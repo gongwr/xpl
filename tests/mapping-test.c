@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2005 Matthias Clasen
  *
  * This library is free software; you can redistribute it and/or
@@ -29,11 +29,11 @@
 #include <process.h>
 #endif
 
-static xchar_t *dir, *global_filename, *global_displayname, *childname;
+static gchar *dir, *global_filename, *global_displayname, *childname;
 
-static xboolean_t stop = FALSE;
+static gboolean stop = FALSE;
 
-static xint_t parent_pid;
+static gint parent_pid;
 
 #ifndef G_OS_WIN32
 
@@ -45,72 +45,72 @@ handle_usr1 (int signum)
 
 #endif
 
-static xboolean_t
-check_stop (xpointer_t data)
+static gboolean
+check_stop (gpointer data)
 {
-  xmain_loop_t *loop = data;
+  GMainLoop *loop = data;
 
 #ifdef G_OS_WIN32
-  stop = xfile_test ("STOP", XFILE_TEST_EXISTS);
+  stop = g_file_test ("STOP", G_FILE_TEST_EXISTS);
 #endif
 
   if (stop)
-    xmain_loop_quit (loop);
+    g_main_loop_quit (loop);
 
   return TRUE;
 }
 
 static void
-write_or_die (const xchar_t *filename,
-	      const xchar_t *contents,
-	      xssize_t       length)
+write_or_die (const gchar *filename,
+	      const gchar *contents,
+	      gssize       length)
 {
-  xerror_t *error = NULL;
-  xchar_t *displayname;
+  GError *error = NULL;
+  gchar *displayname;    
 
-  if (!xfile_set_contents (filename, contents, length, &error))
+  if (!g_file_set_contents (filename, contents, length, &error)) 
     {
-      displayname = xfilename_display_name (childname);
-      g_print ("failed to write '%s': %s\n",
+      displayname = g_filename_display_name (childname);
+      g_print ("failed to write '%s': %s\n", 
 	       displayname, error->message);
       exit (1);
     }
 }
 
-static xmapped_file_t *
-map_or_die (const xchar_t *filename,
-	    xboolean_t     writable)
+static GMappedFile *
+map_or_die (const gchar *filename,
+	    gboolean     writable)
 {
-  xerror_t *error = NULL;
-  xmapped_file_t *map;
-  xchar_t *displayname;
+  GError *error = NULL;
+  GMappedFile *map;
+  gchar *displayname;
 
-  map = xmapped_file_new (filename, writable, &error);
+  map = g_mapped_file_new (filename, writable, &error);
   if (!map)
     {
-      displayname = xfilename_display_name (childname);
-      g_print ("failed to map '%s' non-writable, shared: %s\n",
+      displayname = g_filename_display_name (childname);
+      g_print ("failed to map '%s' non-writable, shared: %s\n", 
 	       displayname, error->message);
       exit (1);
     }
 
   return map;
 }
-
-static xboolean_t
-signal_parent (xpointer_t data)
+    
+static gboolean
+signal_parent (gpointer data)
 {
 #ifndef G_OS_WIN32
   kill (parent_pid, SIGUSR1);
 #endif
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static int
 child_main (int argc, char *argv[])
 {
-  xmapped_file_t *map;
-  xmain_loop_t *loop;
+  GMappedFile *map;
+  GMainLoop *loop;
 
   parent_pid = atoi (argv[2]);
   map = map_or_die (global_filename, FALSE);
@@ -118,16 +118,16 @@ child_main (int argc, char *argv[])
 #ifndef G_OS_WIN32
   signal (SIGUSR1, handle_usr1);
 #endif
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
   g_idle_add (check_stop, loop);
   g_idle_add (signal_parent, NULL);
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
 
  g_message ("test_child_private: received parent signal");
 
-  write_or_die (childname,
-		xmapped_file_get_contents (map),
-		xmapped_file_get_length (map));
+  write_or_die (childname, 
+		g_mapped_file_get_contents (map),
+		g_mapped_file_get_length (map));
 
   signal_parent (NULL);
 
@@ -137,68 +137,68 @@ child_main (int argc, char *argv[])
 static void
 test_mapping (void)
 {
-  xmapped_file_t *map;
+  GMappedFile *map;
 
   write_or_die (global_filename, "ABC", -1);
 
   map = map_or_die (global_filename, FALSE);
-  xassert (xmapped_file_get_length (map) == 3);
-  xmapped_file_free (map);
+  g_assert (g_mapped_file_get_length (map) == 3);
+  g_mapped_file_free (map);
 
   map = map_or_die (global_filename, TRUE);
-  xassert (xmapped_file_get_length (map) == 3);
-  xmapped_file_free (map);
+  g_assert (g_mapped_file_get_length (map) == 3);
+  g_mapped_file_free (map);
   g_message ("test_mapping: ok");
 }
 
-static void
+static void 
 test_private (void)
 {
-  xerror_t *error = NULL;
-  xmapped_file_t *map;
-  xchar_t *buffer;
-  xsize_t len;
+  GError *error = NULL;
+  GMappedFile *map;
+  gchar *buffer;
+  gsize len;
 
   write_or_die (global_filename, "ABC", -1);
   map = map_or_die (global_filename, TRUE);
 
-  buffer = (xchar_t *)xmapped_file_get_contents (map);
+  buffer = (gchar *)g_mapped_file_get_contents (map);
   buffer[0] = '1';
   buffer[1] = '2';
   buffer[2] = '3';
-  xmapped_file_free (map);
+  g_mapped_file_free (map);
 
-  if (!xfile_get_contents (global_filename, &buffer, &len, &error))
+  if (!g_file_get_contents (global_filename, &buffer, &len, &error))
     {
       g_print ("failed to read '%s': %s\n",
                global_displayname, error->message);
       exit (1);
-
+      
     }
-  xassert (len == 3);
-  xassert (strcmp (buffer, "ABC") == 0);
+  g_assert (len == 3);
+  g_assert (strcmp (buffer, "ABC") == 0);
   g_free (buffer);
 
   g_message ("test_private: ok");
 }
 
 static void
-test_child_private (xchar_t *argv0)
+test_child_private (gchar *argv0)
 {
-  xerror_t *error = NULL;
-  xmapped_file_t *map;
-  xchar_t *buffer;
-  xsize_t len;
-  xchar_t *child_argv[4];
-  xpid_t  child_pid;
+  GError *error = NULL;
+  GMappedFile *map;
+  gchar *buffer;
+  gsize len;
+  gchar *child_argv[4];
+  GPid  child_pid;
 #ifndef G_OS_WIN32
-  xmain_loop_t *loop;
+  GMainLoop *loop;
 #endif
-  xchar_t pid[100];
-
+  gchar pid[100];
+  
 #ifdef G_OS_WIN32
   g_remove ("STOP");
-  xassert (!xfile_test ("STOP", XFILE_TEST_EXISTS));
+  g_assert (!g_file_test ("STOP", G_FILE_TEST_EXISTS));
 #endif
 
   write_or_die (global_filename, "ABC", -1);
@@ -216,16 +216,16 @@ test_child_private (xchar_t *argv0)
   if (!g_spawn_async (dir, child_argv, NULL,
 		      0, NULL, NULL, &child_pid, &error))
     {
-      g_print ("failed to spawn child: %s\n",
+      g_print ("failed to spawn child: %s\n", 
 	       error->message);
-      exit (1);
+      exit (1);            
     }
  g_message ("test_child_private: child spawned");
 
 #ifndef G_OS_WIN32
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
   g_idle_add (check_stop, loop);
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
   stop = FALSE;
 #else
   g_usleep (2000000);
@@ -233,43 +233,43 @@ test_child_private (xchar_t *argv0)
 
  g_message ("test_child_private: received first child signal");
 
-  buffer = (xchar_t *)xmapped_file_get_contents (map);
+  buffer = (gchar *)g_mapped_file_get_contents (map);
   buffer[0] = '1';
   buffer[1] = '2';
   buffer[2] = '3';
-  xmapped_file_free (map);
+  g_mapped_file_free (map);
 
 #ifndef G_OS_WIN32
   kill (child_pid, SIGUSR1);
 #else
-  xfile_set_contents ("STOP", "Hey there\n", -1, NULL);
+  g_file_set_contents ("STOP", "Hey there\n", -1, NULL);
 #endif
 
 #ifndef G_OS_WIN32
   g_idle_add (check_stop, loop);
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
 #else
   g_usleep (2000000);
 #endif
 
  g_message ("test_child_private: received second child signal");
 
-  if (!xfile_get_contents (childname, &buffer, &len, &error))
+  if (!g_file_get_contents (childname, &buffer, &len, &error))
     {
-      xchar_t *name;
+      gchar *name;
 
-      name = xfilename_display_name (childname);
+      name = g_filename_display_name (childname);
       g_print ("failed to read '%s': %s\n", name, error->message);
-      exit (1);
+      exit (1);      
     }
-  xassert (len == 3);
-  xassert (strcmp (buffer, "ABC") == 0);
+  g_assert (len == 3);
+  g_assert (strcmp (buffer, "ABC") == 0);
   g_free (buffer);
 
   g_message ("test_child_private: ok");
 }
 
-static int
+static int 
 parent_main (int   argc,
 	     char *argv[])
 {
@@ -286,7 +286,7 @@ parent_main (int   argc,
 }
 
 int
-main (int argc,
+main (int argc, 
       char *argv[])
 {
   int ret;
@@ -304,12 +304,12 @@ main (int argc,
 
   dir = g_get_current_dir ();
   global_filename = g_build_filename (dir, "maptest", NULL);
-  global_displayname = xfilename_display_name (global_filename);
+  global_displayname = g_filename_display_name (global_filename);
   childname = g_build_filename (dir, "mapchild", NULL);
 
   if (argc > 1)
     ret = child_main (argc, argv);
-  else
+  else 
     ret = parent_main (argc, argv);
 
   g_free (childname);

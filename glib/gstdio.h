@@ -57,7 +57,7 @@ typedef struct stat GStatBuf;
 #if defined(G_OS_UNIX) && !defined(G_STDIO_WRAP_ON_UNIX)
 
 /* Just pass on to the system functions, so there's no potential for data
- * format mismatches, especially with large file interfaces.
+ * format mismatches, especially with large file interfaces. 
  * A few functions can't be handled in this way, since they are not defined
  * in a portable system header that we could include here.
  *
@@ -80,18 +80,18 @@ typedef struct stat GStatBuf;
 #define g_utime   utime
 #endif
 
-XPL_AVAILABLE_IN_ALL
-int g_access (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_access (const gchar *filename,
 	      int          mode);
 
-XPL_AVAILABLE_IN_ALL
-int g_chdir  (const xchar_t *path);
+GLIB_AVAILABLE_IN_ALL
+int g_chdir  (const gchar *path);
 
-XPL_AVAILABLE_IN_ALL
-int g_unlink (const xchar_t *filename);
+GLIB_AVAILABLE_IN_ALL
+int g_unlink (const gchar *filename);
 
-XPL_AVAILABLE_IN_ALL
-int g_rmdir  (const xchar_t *filename);
+GLIB_AVAILABLE_IN_ALL
+int g_rmdir  (const gchar *filename);
 
 #else /* ! G_OS_UNIX */
 
@@ -105,76 +105,76 @@ int g_rmdir  (const xchar_t *filename);
  * API.
  */
 
-XPL_AVAILABLE_IN_ALL
-int g_access    (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_access    (const gchar *filename,
 		 int          mode);
 
-XPL_AVAILABLE_IN_ALL
-int g_chmod     (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_chmod     (const gchar *filename,
 		 int          mode);
 
-XPL_AVAILABLE_IN_ALL
-int g_open      (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_open      (const gchar *filename,
                  int          flags,
                  int          mode);
 
-XPL_AVAILABLE_IN_ALL
-int g_creat     (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_creat     (const gchar *filename,
                  int          mode);
 
-XPL_AVAILABLE_IN_ALL
-int g_rename    (const xchar_t *oldfilename,
-                 const xchar_t *newfilename);
+GLIB_AVAILABLE_IN_ALL
+int g_rename    (const gchar *oldfilename,
+                 const gchar *newfilename);
 
-XPL_AVAILABLE_IN_ALL
-int g_mkdir     (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_mkdir     (const gchar *filename,
                  int          mode);
 
-XPL_AVAILABLE_IN_ALL
-int g_chdir     (const xchar_t *path);
+GLIB_AVAILABLE_IN_ALL
+int g_chdir     (const gchar *path);
 
-XPL_AVAILABLE_IN_ALL
-int g_stat      (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_stat      (const gchar *filename,
                  GStatBuf    *buf);
 
-XPL_AVAILABLE_IN_ALL
-int g_lstat     (const xchar_t *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_lstat     (const gchar *filename,
                  GStatBuf    *buf);
 
-XPL_AVAILABLE_IN_ALL
-int g_unlink    (const xchar_t *filename);
+GLIB_AVAILABLE_IN_ALL
+int g_unlink    (const gchar *filename);
 
-XPL_AVAILABLE_IN_ALL
-int g_remove    (const xchar_t *filename);
+GLIB_AVAILABLE_IN_ALL
+int g_remove    (const gchar *filename);
 
-XPL_AVAILABLE_IN_ALL
-int g_rmdir     (const xchar_t *filename);
+GLIB_AVAILABLE_IN_ALL
+int g_rmdir     (const gchar *filename);
 
-XPL_AVAILABLE_IN_ALL
-FILE *g_fopen   (const xchar_t *filename,
-                 const xchar_t *mode);
+GLIB_AVAILABLE_IN_ALL
+FILE *g_fopen   (const gchar *filename,
+                 const gchar *mode);
 
-XPL_AVAILABLE_IN_ALL
-FILE *g_freopen (const xchar_t *filename,
-                 const xchar_t *mode,
+GLIB_AVAILABLE_IN_ALL
+FILE *g_freopen (const gchar *filename,
+                 const gchar *mode,
                  FILE        *stream);
 
-XPL_AVAILABLE_IN_2_64
-xint_t g_fsync    (xint_t fd);
+GLIB_AVAILABLE_IN_2_64
+gint g_fsync    (gint fd);
 
 struct utimbuf;			/* Don't need the real definition of struct utimbuf when just
 				 * including this header.
 				 */
 
-XPL_AVAILABLE_IN_ALL
-int g_utime     (const xchar_t    *filename,
+GLIB_AVAILABLE_IN_ALL
+int g_utime     (const gchar    *filename,
 		 struct utimbuf *utb);
 
 #endif /* G_OS_UNIX */
 
-XPL_AVAILABLE_IN_2_36
-xboolean_t g_close (xint_t       fd,
-                  xerror_t   **error);
+GLIB_AVAILABLE_IN_2_36
+gboolean g_close (gint       fd,
+                  GError   **error);
 
 G_END_DECLS
 

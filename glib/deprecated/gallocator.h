@@ -16,7 +16,7 @@
 #ifndef __G_ALLOCATOR_H__
 #define __G_ALLOCATOR_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -39,48 +39,48 @@ typedef struct _GMemChunk  GMemChunk;
 #define g_mem_chunk_create(type, x, y)  (g_mem_chunk_new (NULL, sizeof (type), 0, 0))
 
 
-XPL_DEPRECATED
-GMemChunk *     g_mem_chunk_new         (const xchar_t  *name,
-                                         xint_t          atom_size,
-                                         xsize_t         area_size,
-                                         xint_t          type);
-XPL_DEPRECATED
+GLIB_DEPRECATED
+GMemChunk *     g_mem_chunk_new         (const gchar  *name,
+                                         gint          atom_size,
+                                         gsize         area_size,
+                                         gint          type);
+GLIB_DEPRECATED
 void            g_mem_chunk_destroy     (GMemChunk    *mem_chunk);
-XPL_DEPRECATED
-xpointer_t        g_mem_chunk_alloc       (GMemChunk    *mem_chunk);
-XPL_DEPRECATED
-xpointer_t        g_mem_chunk_alloc0      (GMemChunk    *mem_chunk);
-XPL_DEPRECATED
+GLIB_DEPRECATED
+gpointer        g_mem_chunk_alloc       (GMemChunk    *mem_chunk);
+GLIB_DEPRECATED
+gpointer        g_mem_chunk_alloc0      (GMemChunk    *mem_chunk);
+GLIB_DEPRECATED
 void            g_mem_chunk_free        (GMemChunk    *mem_chunk,
-                                         xpointer_t      mem);
-XPL_DEPRECATED
+                                         gpointer      mem);
+GLIB_DEPRECATED
 void            g_mem_chunk_clean       (GMemChunk    *mem_chunk);
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void            g_mem_chunk_reset       (GMemChunk    *mem_chunk);
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void            g_mem_chunk_print       (GMemChunk    *mem_chunk);
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void            g_mem_chunk_info        (void);
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void            g_blow_chunks           (void);
 
 
-XPL_DEPRECATED
-GAllocator *    g_allocator_new         (const xchar_t  *name,
-                                         xuint_t         n_preallocs);
-XPL_DEPRECATED
+GLIB_DEPRECATED
+GAllocator *    g_allocator_new         (const gchar  *name,
+                                         guint         n_preallocs);
+GLIB_DEPRECATED
 void            g_allocator_free        (GAllocator   *allocator);
-XPL_DEPRECATED
-void            xlist_push_allocator   (GAllocator   *allocator);
-XPL_DEPRECATED
-void            xlist_pop_allocator    (void);
-XPL_DEPRECATED
-void            xslist_push_allocator  (GAllocator   *allocator);
-XPL_DEPRECATED
-void            xslist_pop_allocator   (void);
-XPL_DEPRECATED
+GLIB_DEPRECATED
+void            g_list_push_allocator   (GAllocator   *allocator);
+GLIB_DEPRECATED
+void            g_list_pop_allocator    (void);
+GLIB_DEPRECATED
+void            g_slist_push_allocator  (GAllocator   *allocator);
+GLIB_DEPRECATED
+void            g_slist_pop_allocator   (void);
+GLIB_DEPRECATED
 void            g_node_push_allocator   (GAllocator   *allocator);
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void            g_node_pop_allocator    (void);
 
 G_END_DECLS

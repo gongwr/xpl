@@ -43,16 +43,16 @@ msgid "Setting application as last used for type not supported yet"
 msgstr "暂不支持设置上次用来打开文件类型的应用程序"
 
 #: gio/gapplication.c:497
-msgid "xapplication_t options"
-msgstr "xapplication_t 选项"
+msgid "GApplication options"
+msgstr "GApplication 选项"
 
 #: gio/gapplication.c:497
-msgid "Show xapplication_t options"
-msgstr "显示 xapplication_t 选项"
+msgid "Show GApplication options"
+msgstr "显示 GApplication 选项"
 
 #: gio/gapplication.c:542
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
-msgstr "进入 xapplication_t 服务模式（从 D-Bus 服务文件中调用）"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgstr "进入 GApplication 服务模式（从 D-Bus 服务文件中调用）"
 
 #: gio/gapplication.c:554
 msgid "Override the application’s ID"
@@ -159,8 +159,8 @@ msgid "PARAMETER"
 msgstr "参数"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "可选的操作调用参数，xvariant_t 格式"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "可选的操作调用参数，GVariant 格式"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
 #, c-format
@@ -287,8 +287,8 @@ msgid "Seek not supported on base stream"
 msgstr "基流不支持定位"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "无法截断 xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "无法截断 GBufferedInputStream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -359,20 +359,20 @@ msgid "%s filetype"
 msgstr "%s 文件类型"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t 包含无效数据"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials 包含无效数据"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "此操作系统上没有实现 xcredentials_t"
+msgid "GCredentials is not implemented on this OS"
+msgstr "此操作系统上没有实现 GCredentials"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
-msgstr "您的平台尚不支持 xcredentials_t"
+msgid "There is no GCredentials support for your platform"
+msgstr "您的平台尚不支持 GCredentials"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "此操作系统上的 xcredentials_t 未包含一个进程 ID"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "此操作系统上的 GCredentials 未包含一个进程 ID"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -552,8 +552,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "对等端和服务器端的用户 ID 必须相同"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "通过 xdbus_auth_observer_t::authorize-authenticated-peer 取消"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "通过 GDBusAuthObserver::authorize-authenticated-peer 取消"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -827,8 +827,8 @@ msgstr "变量的已解析值“%s”不是有效的 D-Bus 签名"
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
-msgstr "从 D-Bus 线格式以类型字符串“%s”反序列化 xvariant_t 时发生错误"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
+msgstr "从 D-Bus 线格式以类型字符串“%s”反序列化 GVariant 时发生错误"
 
 #: gio/gdbusmessage.c:2206
 #, c-format
@@ -869,8 +869,8 @@ msgstr "无法反序列化消息："
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
-msgstr "以类型字符串“%s”序列化 xvariant_t 到 D-Bus 线格式时发生错误"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
+msgstr "以类型字符串“%s”序列化 GVariant 到 D-Bus 线格式时发生错误"
 
 #: gio/gdbusmessage.c:2835
 #, c-format
@@ -1330,27 +1330,27 @@ msgstr "DTLS 支持不可用"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "无法处理版本为 %d 的 xemblem_t 编码"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "无法处理版本为 %d 的 GEmblem 编码"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "xemblem_t 编码中有不正确的符号数量（%d）"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "GEmblem 编码中有不正确的符号数量（%d）"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "无法处理版本为 %d 的 xemblemed_icon_t 编码"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "无法处理版本为 %d 的 GEmblemedIcon 编码"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "xemblemed_icon_t 编码中有不正确的符号数量（%d）"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "GEmblemedIcon 编码中有不正确的符号数量（%d）"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "xemblemed_icon_t 中应为 xemblem_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "GEmblemedIcon 中应为 GEmblem"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1441,12 +1441,12 @@ msgstr "文件枚举器已关闭"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "无法处理版本为 %d 的 xfile_icon_t 编码"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "无法处理版本为 %d 的 GFileIcon 编码"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "xfile_icon_t 有不正确的输入数据"
+msgid "Malformed input data for GFileIcon"
+msgstr "GFileIcon 有不正确的输入数据"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1513,8 +1513,8 @@ msgstr "类名 %s 没有类型"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "类型 %s 没有实现 xicon_t 接口"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "类型 %s 没有实现 GIcon 接口"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1528,8 +1528,8 @@ msgstr "不正确的版本号：%s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "类型 %s 没有实现 xicon_t 接口的 from_tokens() 方法"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "类型 %s 没有实现 GIcon 接口的 from_tokens() 方法"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2672,8 +2672,8 @@ msgstr "<%s id='%s'> 尚未定义。"
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "无效的 xvariant_t 类型字符串“%s”"
+msgid "Invalid GVariant type string “%s”"
+msgstr "无效的 GVariant 类型字符串“%s”"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2895,11 +2895,11 @@ msgstr "不要强制键名的限制"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"编译所有的 xsettings_t 架构文件为架构缓存。\n"
+"编译所有的 GSettings 架构文件为架构缓存。\n"
 "要使用扩展 .gschema.xml，需要有架构文件，\n"
 "缓存文件被称为 gschemas.compiled。"
 
@@ -3252,16 +3252,16 @@ msgid "Error removing old file: %s"
 msgstr "移除旧文件出错：%s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
-msgstr "提供的 xseek_type_t 无效"
+msgid "Invalid GSeekType supplied"
+msgstr "提供的 GSeekType 无效"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "无效的搜寻请求"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "无法截断 xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "无法截断 GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -3789,8 +3789,8 @@ msgstr "套接字 I/O 超时"
 # "fd" is abbr. of "File Descriptor", 文件描述符
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "正在从文件描述符创建 xsocket_t：%s"
+msgid "creating GSocket from fd: %s"
+msgstr "正在从文件描述符创建 GSocket：%s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
 #, c-format
@@ -3931,8 +3931,8 @@ msgid "Error sending message: %s"
 msgstr "发送信息时出错：%s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "Windows 不支持 xsocket_control_message_t"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "Windows 不支持 GSocketControlMessage"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -3945,8 +3945,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "无法读取套接字认证信息：%s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "此操作系统上没有实现 xsocket_get_credentials"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "此操作系统上没有实现 g_socket_get_credentials"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4076,8 +4076,8 @@ msgstr "此平台不支持管道（pipe）"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "无法处理版本为 %d 的 xthemed_icon_t 编码"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "无法处理版本为 %d 的 GThemedIcon 编码"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4130,8 +4130,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "当前的 TLS 后端不支持 PKCS #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "本 xtls_backend_t 不支持创建 PKCS #11 证书"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "本 GTlsBackend 不支持创建 PKCS #11 证书"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4431,28 +4431,28 @@ msgstr "路径名“%s”不是绝对路径"
 # 参考 coreutils 里 date 的翻译，时间格式应该保持“%H:%M:%S”，如果要使用单位，那么“%H时%M分%S秒”应该去掉占位的 0，不然就会出现“08时01分01秒”这种表达。因此我认为应该直接使用“%H:%M:%S”格式。
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%Y年%-m月%-d日 %A %H:%M:%S"
 
 # 原来的格式是“%y/%m/%d”，但“/”这个符号会有误解。所以换成分隔符。
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%Y-%m-%d"
 
 # 跟其他时间格式不统一
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 # 同上面，去掉了时分秒单位。
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%p %I:%M:%S"
 
@@ -4835,13 +4835,13 @@ msgstr "十二月"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "上午"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "下午"
 
@@ -6341,11 +6341,11 @@ msgstr "%.1f EB"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "写入 unix 出错：%s"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "am"
 #~ msgstr "上"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "pm"
 #~ msgstr "下"
 

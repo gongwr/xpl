@@ -29,19 +29,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_PROXY_ADDRESS_ENUMERATOR         (xproxy_address_enumerator_get_type ())
-#define G_PROXY_ADDRESS_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PROXY_ADDRESS_ENUMERATOR, xproxy_address_enumerator))
-#define G_PROXY_ADDRESS_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_PROXY_ADDRESS_ENUMERATOR, GProxyAddressEnumeratorClass))
-#define X_IS_PROXY_ADDRESS_ENUMERATOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_PROXY_ADDRESS_ENUMERATOR))
-#define X_IS_PROXY_ADDRESS_ENUMERATOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_PROXY_ADDRESS_ENUMERATOR))
-#define G_PROXY_ADDRESS_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_PROXY_ADDRESS_ENUMERATOR, GProxyAddressEnumeratorClass))
+#define G_TYPE_PROXY_ADDRESS_ENUMERATOR         (g_proxy_address_enumerator_get_type ())
+#define G_PROXY_ADDRESS_ENUMERATOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_PROXY_ADDRESS_ENUMERATOR, GProxyAddressEnumerator))
+#define G_PROXY_ADDRESS_ENUMERATOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_PROXY_ADDRESS_ENUMERATOR, GProxyAddressEnumeratorClass))
+#define G_IS_PROXY_ADDRESS_ENUMERATOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_PROXY_ADDRESS_ENUMERATOR))
+#define G_IS_PROXY_ADDRESS_ENUMERATOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_PROXY_ADDRESS_ENUMERATOR))
+#define G_PROXY_ADDRESS_ENUMERATOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_PROXY_ADDRESS_ENUMERATOR, GProxyAddressEnumeratorClass))
 
 /**
- * xproxy_address_enumerator_t:
+ * GProxyAddressEnumerator:
  *
- * A subclass of #xsocket_address_enumerator_t that takes another address
- * enumerator and wraps each of its results in a #xproxy_address_t as
- * directed by the default #xproxy_resolver_t.
+ * A subclass of #GSocketAddressEnumerator that takes another address
+ * enumerator and wraps each of its results in a #GProxyAddress as
+ * directed by the default #GProxyResolver.
  */
 
 typedef struct _GProxyAddressEnumeratorClass GProxyAddressEnumeratorClass;
@@ -50,19 +50,19 @@ typedef struct _GProxyAddressEnumeratorPrivate GProxyAddressEnumeratorPrivate;
 struct _GProxyAddressEnumerator
 {
   /*< private >*/
-  xsocket_address_enumerator_t parent_instance;
+  GSocketAddressEnumerator parent_instance;
   GProxyAddressEnumeratorPrivate *priv;
 };
 
 /**
  * GProxyAddressEnumeratorClass:
  *
- * Class structure for #xproxy_address_enumerator_t.
+ * Class structure for #GProxyAddressEnumerator.
  */
 struct _GProxyAddressEnumeratorClass
 {
   /*< private >*/
-  xsocket_address_enumerator_class_t parent_class;
+  GSocketAddressEnumeratorClass parent_class;
 
   void (*_g_reserved1) (void);
   void (*_g_reserved2) (void);
@@ -73,8 +73,8 @@ struct _GProxyAddressEnumeratorClass
   void (*_g_reserved7) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           xproxy_address_enumerator_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType           g_proxy_address_enumerator_get_type    (void) G_GNUC_CONST;
 
 G_END_DECLS
 

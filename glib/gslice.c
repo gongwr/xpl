@@ -1,4 +1,4 @@
-/* XPL sliced memory - fast concurrent memory chunk allocator
+/* GLIB sliced memory - fast concurrent memory chunk allocator
  * Copyright (C) 2005 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -90,9 +90,9 @@
  * object size used at allocation time is still available when freeing.
  *
  * Here is an example for using the slice allocator:
- * |[<!-- language="C" -->
- * xchar_t *mem[10000];
- * xint_t i;
+ * |[<!-- language="C" --> 
+ * gchar *mem[10000];
+ * gint i;
  *
  * // Allocate 10000 blocks.
  * for (i = 0; i < 10000; i++)
@@ -111,7 +111,7 @@
  *
  * And here is an example for using the using the slice allocator
  * with data structures:
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * GRealArray *array;
  *
  * // Allocate one block, using the g_slice_new() macro.
@@ -187,8 +187,8 @@
 
 /* --- macros and constants --- */
 #define LARGEALIGNMENT          (256)
-#define P2ALIGNMENT             (2 * sizeof (xsize_t))                            /* fits 2 pointers (assumed to be 2 * XPL_SIZEOF_SIZE_T below) */
-#define ALIGN(size, base)       ((base) * (xsize_t) (((size) + (base) - 1) / (base)))
+#define P2ALIGNMENT             (2 * sizeof (gsize))                            /* fits 2 pointers (assumed to be 2 * GLIB_SIZEOF_SIZE_T below) */
+#define ALIGN(size, base)       ((base) * (gsize) (((size) + (base) - 1) / (base)))
 #define NATIVE_MALLOC_PADDING   P2ALIGNMENT                                     /* per-page padding left for native malloc(3) see [1] */
 #define SLAB_INFO_SIZE          P2ALIGN (sizeof (SlabInfo) + NATIVE_MALLOC_PADDING)
 #define MAX_MAGAZINE_SIZE       (256)                                           /* see [3] and allocator_get_magazine_threshold() for this */
@@ -201,10 +201,10 @@
 #define SLAB_BPAGE_SIZE(al,csz) (8 * (csz) + SLAB_INFO_SIZE)
 
 /* optimized version of ALIGN (size, P2ALIGNMENT) */
-#if     XPL_SIZEOF_SIZE_T * 2 == 8  /* P2ALIGNMENT */
-#define P2ALIGN(size)   (((size) + 0x7) & ~(xsize_t) 0x7)
-#elif   XPL_SIZEOF_SIZE_T * 2 == 16 /* P2ALIGNMENT */
-#define P2ALIGN(size)   (((size) + 0xf) & ~(xsize_t) 0xf)
+#if     GLIB_SIZEOF_SIZE_T * 2 == 8  /* P2ALIGNMENT */
+#define P2ALIGN(size)   (((size) + 0x7) & ~(gsize) 0x7)
+#elif   GLIB_SIZEOF_SIZE_T * 2 == 16 /* P2ALIGNMENT */
+#define P2ALIGN(size)   (((size) + 0xf) & ~(gsize) 0xf)
 #else
 #define P2ALIGN(size)   ALIGN (size, P2ALIGNMENT)
 #endif
@@ -223,54 +223,54 @@ struct _ChunkLink {
 };
 struct _SlabInfo {
   ChunkLink *chunks;
-  xuint_t n_allocated;
+  guint n_allocated;
   SlabInfo *next, *prev;
 };
 typedef struct {
   ChunkLink *chunks;
-  xsize_t      count;                     /* approximative chunks list length */
+  gsize      count;                     /* approximative chunks list length */
 } Magazine;
 typedef struct {
   Magazine   *magazine1;                /* array of MAX_SLAB_INDEX (allocator) */
   Magazine   *magazine2;                /* array of MAX_SLAB_INDEX (allocator) */
 } ThreadMemory;
 typedef struct {
-  xboolean_t always_malloc;
-  xboolean_t bypass_magazines;
-  xboolean_t debug_blocks;
-  xsize_t    working_set_msecs;
-  xuint_t    color_increment;
+  gboolean always_malloc;
+  gboolean bypass_magazines;
+  gboolean debug_blocks;
+  gsize    working_set_msecs;
+  guint    color_increment;
 } SliceConfig;
 typedef struct {
   /* const after initialization */
-  xsize_t         min_page_size, max_page_size;
+  gsize         min_page_size, max_page_size;
   SliceConfig   config;
-  xsize_t         max_slab_chunk_size_for_magazine_cache;
+  gsize         max_slab_chunk_size_for_magazine_cache;
   /* magazine cache */
-  xmutex_t        magazine_mutex;
+  GMutex        magazine_mutex;
   ChunkLink   **magazines;                /* array of MAX_SLAB_INDEX (allocator) */
-  xuint_t        *contention_counters;      /* array of MAX_SLAB_INDEX (allocator) */
-  xint_t          mutex_counter;
-  xuint_t         stamp_counter;
-  xuint_t         last_stamp;
+  guint        *contention_counters;      /* array of MAX_SLAB_INDEX (allocator) */
+  gint          mutex_counter;
+  guint         stamp_counter;
+  guint         last_stamp;
   /* slab allocator */
-  xmutex_t        slab_mutex;
+  GMutex        slab_mutex;
   SlabInfo    **slab_stack;                /* array of MAX_SLAB_INDEX (allocator) */
-  xuint_t        color_accu;
+  guint        color_accu;
 } Allocator;
 
 /* --- g-slice prototypes --- */
-static xpointer_t     slab_allocator_alloc_chunk       (xsize_t      chunk_size);
-static void         slab_allocator_free_chunk        (xsize_t      chunk_size,
-                                                      xpointer_t   mem);
-static void         private_thread_memory_cleanup    (xpointer_t   data);
-static xpointer_t     allocator_memalign               (xsize_t      alignment,
-                                                      xsize_t      memsize);
-static void         allocator_memfree                (xsize_t      memsize,
-                                                      xpointer_t   mem);
+static gpointer     slab_allocator_alloc_chunk       (gsize      chunk_size);
+static void         slab_allocator_free_chunk        (gsize      chunk_size,
+                                                      gpointer   mem);
+static void         private_thread_memory_cleanup    (gpointer   data);
+static gpointer     allocator_memalign               (gsize      alignment,
+                                                      gsize      memsize);
+static void         allocator_memfree                (gsize      memsize,
+                                                      gpointer   mem);
 static inline void  magazine_cache_update_stamp      (void);
-static inline xsize_t allocator_get_magazine_threshold (Allocator *allocator,
-                                                      xuint_t      ix);
+static inline gsize allocator_get_magazine_threshold (Allocator *allocator,
+                                                      guint      ix);
 
 /* --- g-slice memory checker --- */
 static void     smc_notify_alloc  (void   *pointer,
@@ -279,8 +279,8 @@ static int      smc_notify_free   (void   *pointer,
                                    size_t  size);
 
 /* --- variables --- */
-static xprivate_t    private_thread_memory = G_PRIVATE_INIT (private_thread_memory_cleanup);
-static xsize_t       sys_page_size = 0;
+static GPrivate    private_thread_memory = G_PRIVATE_INIT (private_thread_memory_cleanup);
+static gsize       sys_page_size = 0;
 static Allocator   allocator[1] = { { 0, }, };
 static SliceConfig slice_config = {
   FALSE,        /* always_malloc */
@@ -289,12 +289,12 @@ static SliceConfig slice_config = {
   15 * 1000,    /* working_set_msecs */
   1,            /* color increment, alt: 0x7fffffff */
 };
-static xmutex_t      smc_tree_mutex; /* mutex for G_SLICE=debug-blocks */
+static GMutex      smc_tree_mutex; /* mutex for G_SLICE=debug-blocks */
 
 /* --- auxiliary functions --- */
 void
 g_slice_set_config (GSliceConfig ckey,
-                    sint64_t       value)
+                    gint64       value)
 {
   g_return_if_fail (sys_page_size == 0);
   switch (ckey)
@@ -315,7 +315,7 @@ g_slice_set_config (GSliceConfig ckey,
     }
 }
 
-sint64_t
+gint64
 g_slice_get_config (GSliceConfig ckey)
 {
   switch (ckey)
@@ -335,17 +335,17 @@ g_slice_get_config (GSliceConfig ckey)
     }
 }
 
-sint64_t*
+gint64*
 g_slice_get_config_state (GSliceConfig ckey,
-                          sint64_t       address,
-                          xuint_t       *n_values)
+                          gint64       address,
+                          guint       *n_values)
 {
-  xuint_t i = 0;
-  xreturn_val_if_fail (n_values != NULL, NULL);
+  guint i = 0;
+  g_return_val_if_fail (n_values != NULL, NULL);
   *n_values = 0;
   switch (ckey)
     {
-      sint64_t array[64];
+      gint64 array[64];
     case G_SLICE_CONFIG_CONTENTION_COUNTER:
       array[i++] = SLAB_CHUNK_SIZE (allocator, address);
       array[i++] = allocator->contention_counters[address];
@@ -360,8 +360,8 @@ g_slice_get_config_state (GSliceConfig ckey,
 static void
 slice_config_init (SliceConfig *config)
 {
-  const xchar_t *val;
-  xchar_t *val_allocated = NULL;
+  const gchar *val;
+  gchar *val_allocated = NULL;
 
   *config = slice_config;
 
@@ -380,7 +380,7 @@ slice_config_init (SliceConfig *config)
   {
 
   wchar_t wvalue[128];  /* at least big enough for `always-malloc,debug-blocks` */
-  xsize_t len;
+  gsize len;
 
   len = GetEnvironmentVariableW (L"G_SLICE", wvalue, G_N_ELEMENTS (wvalue));
 
@@ -399,9 +399,9 @@ slice_config_init (SliceConfig *config)
     }
   else
     {
-      /* it’s safe to use xutf16_to_utf8() here as it only allocates using
+      /* it’s safe to use g_utf16_to_utf8() here as it only allocates using
        * malloc() rather than GSlice */
-      val = val_allocated = xutf16_to_utf8 (wvalue, -1, NULL, NULL, NULL);
+      val = val_allocated = g_utf16_to_utf8 (wvalue, -1, NULL, NULL, NULL);
     }
 
   }
@@ -409,13 +409,13 @@ slice_config_init (SliceConfig *config)
 
   if (val != NULL)
     {
-      xint_t flags;
+      gint flags;
       const GDebugKey keys[] = {
         { "always-malloc", 1 << 0 },
         { "debug-blocks",  1 << 1 },
       };
 
-      flags = g_parse_debuxstring (val, keys, G_N_ELEMENTS (keys));
+      flags = g_parse_debug_string (val, keys, G_N_ELEMENTS (keys));
       if (flags & (1 << 0))
         config->always_malloc = TRUE;
       if (flags & (1 << 1))
@@ -441,7 +441,7 @@ slice_config_init (SliceConfig *config)
 static void
 g_slice_init_nomessage (void)
 {
-  /* we may not use xerror() or friends here */
+  /* we may not use g_error() or friends here */
   mem_assert (sys_page_size == 0);
   mem_assert (MIN_MAGAZINE_SIZE >= 4);
 
@@ -482,7 +482,7 @@ g_slice_init_nomessage (void)
     }
   else
     {
-      allocator->contention_counters = g_new0 (xuint_t, MAX_SLAB_INDEX (allocator));
+      allocator->contention_counters = g_new0 (guint, MAX_SLAB_INDEX (allocator));
       allocator->magazines = g_new0 (ChunkLink*, MAX_SLAB_INDEX (allocator));
       allocator->slab_stack = g_new0 (SlabInfo*, MAX_SLAB_INDEX (allocator));
     }
@@ -498,8 +498,8 @@ g_slice_init_nomessage (void)
     allocator->max_slab_chunk_size_for_magazine_cache = 0;      /* non-optimized cases */
 }
 
-static inline xuint_t
-allocator_categorize (xsize_t aligned_chunk_size)
+static inline guint
+allocator_categorize (gsize aligned_chunk_size)
 {
   /* speed up the likely path */
   if (G_LIKELY (aligned_chunk_size && aligned_chunk_size <= allocator->max_slab_chunk_size_for_magazine_cache))
@@ -517,10 +517,10 @@ allocator_categorize (xsize_t aligned_chunk_size)
 }
 
 static inline void
-g_mutex_lock_a (xmutex_t *mutex,
-                xuint_t  *contention_counter)
+g_mutex_lock_a (GMutex *mutex,
+                guint  *contention_counter)
 {
-  xboolean_t contention = FALSE;
+  gboolean contention = FALSE;
   if (!g_mutex_trylock (mutex))
     {
       g_mutex_lock (mutex);
@@ -552,8 +552,8 @@ thread_memory_from_self (void)
   ThreadMemory *tmem = g_private_get (&private_thread_memory);
   if (G_UNLIKELY (!tmem))
     {
-      static xmutex_t init_mutex;
-      xuint_t n_magazines;
+      static GMutex init_mutex;
+      guint n_magazines;
 
       g_mutex_lock (&init_mutex);
       if G_UNLIKELY (sys_page_size == 0)
@@ -591,10 +591,10 @@ magazine_chain_pop_head (ChunkLink **magazine_chunks)
 }
 
 #if 0 /* useful for debugging */
-static xuint_t
+static guint
 magazine_count (ChunkLink *head)
 {
-  xuint_t count = 0;
+  guint count = 0;
   if (!head)
     return 0;
   while (head)
@@ -609,9 +609,9 @@ magazine_count (ChunkLink *head)
 }
 #endif
 
-static inline xsize_t
+static inline gsize
 allocator_get_magazine_threshold (Allocator *local_allocator,
-                                  xuint_t ix)
+                                  guint ix)
 {
   /* the magazine size calculated here has a lower bound of MIN_MAGAZINE_SIZE,
    * which is required by the implementation. also, for moderately sized chunks
@@ -622,9 +622,9 @@ allocator_get_magazine_threshold (Allocator *local_allocator,
    * MAX_MAGAZINE_SIZE. for larger chunks, this number is scaled down so that
    * the content of a single magazine doesn't exceed ca. 16KB.
    */
-  xsize_t chunk_size = SLAB_CHUNK_SIZE (local_allocator, ix);
-  xuint_t threshold = MAX (MIN_MAGAZINE_SIZE, local_allocator->max_page_size / MAX (5 * chunk_size, 5 * 32));
-  xuint_t contention_counter = local_allocator->contention_counters[ix];
+  gsize chunk_size = SLAB_CHUNK_SIZE (local_allocator, ix);
+  guint threshold = MAX (MIN_MAGAZINE_SIZE, local_allocator->max_page_size / MAX (5 * chunk_size, 5 * 32));
+  guint contention_counter = local_allocator->contention_counters[ix];
   if (G_UNLIKELY (contention_counter))  /* single CPU bias */
     {
       /* adapt contention counter thresholds to chunk sizes */
@@ -640,7 +640,7 @@ magazine_cache_update_stamp (void)
 {
   if (allocator->stamp_counter >= MAX_STAMP_COUNTER)
     {
-      sint64_t now_us = g_get_real_time ();
+      gint64 now_us = g_get_real_time ();
       allocator->last_stamp = now_us / 1000; /* milli seconds */
       allocator->stamp_counter = 0;
     }
@@ -677,8 +677,8 @@ magazine_chain_prepare_fields (ChunkLink *magazine_chunks)
 
 static void
 magazine_cache_trim (Allocator *local_allocator,
-                     xuint_t ix,
-                     xuint_t stamp)
+                     guint ix,
+                     guint stamp)
 {
   /* g_mutex_lock (local_allocator->mutex); done by caller */
   /* trim magazine cache from tail */
@@ -710,7 +710,7 @@ magazine_cache_trim (Allocator *local_allocator,
   /* free trash */
   if (trash)
     {
-      const xsize_t chunk_size = SLAB_CHUNK_SIZE (local_allocator, ix);
+      const gsize chunk_size = SLAB_CHUNK_SIZE (local_allocator, ix);
       g_mutex_lock (&local_allocator->slab_mutex);
       while (trash)
         {
@@ -728,9 +728,9 @@ magazine_cache_trim (Allocator *local_allocator,
 }
 
 static void
-magazine_cache_push_magazine (xuint_t      ix,
+magazine_cache_push_magazine (guint      ix,
                               ChunkLink *magazine_chunks,
-                              xsize_t      count) /* must be >= MIN_MAGAZINE_SIZE */
+                              gsize      count) /* must be >= MIN_MAGAZINE_SIZE */
 {
   ChunkLink *current = magazine_chain_prepare_fields (magazine_chunks);
   ChunkLink *next, *prev;
@@ -745,7 +745,7 @@ magazine_cache_push_magazine (xuint_t      ix,
   magazine_chain_prev (next) = current;
   magazine_chain_prev (current) = prev;
   magazine_chain_next (current) = next;
-  magazine_chain_count (current) = (xpointer_t) count;
+  magazine_chain_count (current) = (gpointer) count;
   /* stamp magazine */
   magazine_cache_update_stamp();
   magazine_chain_stamp (current) = GUINT_TO_POINTER (allocator->last_stamp);
@@ -756,14 +756,14 @@ magazine_cache_push_magazine (xuint_t      ix,
 }
 
 static ChunkLink*
-magazine_cache_pop_magazine (xuint_t  ix,
-                             xsize_t *countp)
+magazine_cache_pop_magazine (guint  ix,
+                             gsize *countp)
 {
   g_mutex_lock_a (&allocator->magazine_mutex, &allocator->contention_counters[ix]);
   if (!allocator->magazines[ix])
     {
-      xuint_t magazine_threshold = allocator_get_magazine_threshold (allocator, ix);
-      xsize_t i, chunk_size = SLAB_CHUNK_SIZE (allocator, ix);
+      guint magazine_threshold = allocator_get_magazine_threshold (allocator, ix);
+      gsize i, chunk_size = SLAB_CHUNK_SIZE (allocator, ix);
       ChunkLink *chunk, *head;
       g_mutex_unlock (&allocator->magazine_mutex);
       g_mutex_lock (&allocator->slab_mutex);
@@ -792,7 +792,7 @@ magazine_cache_pop_magazine (xuint_t  ix,
       allocator->magazines[ix] = next == current ? NULL : next;
       g_mutex_unlock (&allocator->magazine_mutex);
       /* clear special fields and hand out */
-      *countp = (xsize_t) magazine_chain_count (current);
+      *countp = (gsize) magazine_chain_count (current);
       magazine_chain_prev (current) = NULL;
       magazine_chain_next (current) = NULL;
       magazine_chain_count (current) = NULL;
@@ -803,15 +803,15 @@ magazine_cache_pop_magazine (xuint_t  ix,
 
 /* --- thread magazines --- */
 static void
-private_thread_memory_cleanup (xpointer_t data)
+private_thread_memory_cleanup (gpointer data)
 {
   ThreadMemory *tmem = data;
-  const xuint_t n_magazines = MAX_SLAB_INDEX (allocator);
-  xuint_t ix;
+  const guint n_magazines = MAX_SLAB_INDEX (allocator);
+  guint ix;
   for (ix = 0; ix < n_magazines; ix++)
     {
       Magazine *mags[2];
-      xuint_t j;
+      guint j;
       mags[0] = &tmem->magazine1[ix];
       mags[1] = &tmem->magazine2[ix];
       for (j = 0; j < 2; j++)
@@ -821,7 +821,7 @@ private_thread_memory_cleanup (xpointer_t data)
             magazine_cache_push_magazine (ix, mag->chunks, mag->count);
           else
             {
-              const xsize_t chunk_size = SLAB_CHUNK_SIZE (allocator, ix);
+              const gsize chunk_size = SLAB_CHUNK_SIZE (allocator, ix);
               g_mutex_lock (&allocator->slab_mutex);
               while (mag->chunks)
                 {
@@ -837,7 +837,7 @@ private_thread_memory_cleanup (xpointer_t data)
 
 static void
 thread_memory_magazine1_reload (ThreadMemory *tmem,
-                                xuint_t         ix)
+                                guint         ix)
 {
   Magazine *mag = &tmem->magazine1[ix];
   mem_assert (mag->chunks == NULL); /* ensure that we may reset mag->count */
@@ -847,7 +847,7 @@ thread_memory_magazine1_reload (ThreadMemory *tmem,
 
 static void
 thread_memory_magazine2_unload (ThreadMemory *tmem,
-                                xuint_t         ix)
+                                guint         ix)
 {
   Magazine *mag = &tmem->magazine2[ix];
   magazine_cache_push_magazine (ix, mag->chunks, mag->count);
@@ -857,30 +857,30 @@ thread_memory_magazine2_unload (ThreadMemory *tmem,
 
 static inline void
 thread_memory_swap_magazines (ThreadMemory *tmem,
-                              xuint_t         ix)
+                              guint         ix)
 {
   Magazine xmag = tmem->magazine1[ix];
   tmem->magazine1[ix] = tmem->magazine2[ix];
   tmem->magazine2[ix] = xmag;
 }
 
-static inline xboolean_t
+static inline gboolean
 thread_memory_magazine1_is_empty (ThreadMemory *tmem,
-                                  xuint_t         ix)
+                                  guint         ix)
 {
   return tmem->magazine1[ix].chunks == NULL;
 }
 
-static inline xboolean_t
+static inline gboolean
 thread_memory_magazine2_is_full (ThreadMemory *tmem,
-                                 xuint_t         ix)
+                                 guint         ix)
 {
   return tmem->magazine2[ix].count >= allocator_get_magazine_threshold (allocator, ix);
 }
 
-static inline xpointer_t
+static inline gpointer
 thread_memory_magazine1_alloc (ThreadMemory *tmem,
-                               xuint_t         ix)
+                               guint         ix)
 {
   Magazine *mag = &tmem->magazine1[ix];
   ChunkLink *chunk = magazine_chain_pop_head (&mag->chunks);
@@ -891,8 +891,8 @@ thread_memory_magazine1_alloc (ThreadMemory *tmem,
 
 static inline void
 thread_memory_magazine2_free (ThreadMemory *tmem,
-                              xuint_t         ix,
-                              xpointer_t      mem)
+                              guint         ix,
+                              gpointer      mem)
 {
   Magazine *mag = &tmem->magazine2[ix];
   ChunkLink *chunk = mem;
@@ -1001,7 +1001,7 @@ thread_memory_magazine2_free (ThreadMemory *tmem,
  *
  * The memory blocks must be equal-sized, allocated via
  * g_slice_alloc() or g_slice_alloc0() and linked together by
- * a @next pointer (similar to #xslist_t). The name of the
+ * a @next pointer (similar to #GSList). The name of the
  * @next field in @type is passed as third argument.
  * Note that the exact release behaviour can be changed with the
  * [`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
@@ -1033,13 +1033,13 @@ thread_memory_magazine2_free (ThreadMemory *tmem,
  *
  * Since: 2.10
  */
-xpointer_t
-g_slice_alloc (xsize_t mem_size)
+gpointer
+g_slice_alloc (gsize mem_size)
 {
   ThreadMemory *tmem;
-  xsize_t chunk_size;
-  xpointer_t mem;
-  xuint_t acat;
+  gsize chunk_size;
+  gpointer mem;
+  guint acat;
 
   /* This gets the private structure for this thread.  If the private
    * structure does not yet exist, it is created.
@@ -1053,7 +1053,7 @@ g_slice_alloc (xsize_t mem_size)
   acat = allocator_categorize (chunk_size);
   if (G_LIKELY (acat == 1))     /* allocate through magazine layer */
     {
-      xuint_t ix = SLAB_INDEX (allocator, chunk_size);
+      guint ix = SLAB_INDEX (allocator, chunk_size);
       if (G_UNLIKELY (thread_memory_magazine1_is_empty (tmem, ix)))
         {
           thread_memory_swap_magazines (tmem, ix);
@@ -1073,7 +1073,7 @@ g_slice_alloc (xsize_t mem_size)
   if (G_UNLIKELY (allocator->config.debug_blocks))
     smc_notify_alloc (mem, mem_size);
 
-  TRACE (XPL_SLICE_ALLOC((void*)mem, mem_size));
+  TRACE (GLIB_SLICE_ALLOC((void*)mem, mem_size));
 
   return mem;
 }
@@ -1092,10 +1092,10 @@ g_slice_alloc (xsize_t mem_size)
  *
  * Since: 2.10
  */
-xpointer_t
-g_slice_alloc0 (xsize_t mem_size)
+gpointer
+g_slice_alloc0 (gsize mem_size)
 {
-  xpointer_t mem = g_slice_alloc (mem_size);
+  gpointer mem = g_slice_alloc (mem_size);
   if (mem)
     memset (mem, 0, mem_size);
   return mem;
@@ -1116,11 +1116,11 @@ g_slice_alloc0 (xsize_t mem_size)
  *
  * Since: 2.14
  */
-xpointer_t
-g_slice_copy (xsize_t         mem_size,
-              xconstpointer mem_block)
+gpointer
+g_slice_copy (gsize         mem_size,
+              gconstpointer mem_block)
 {
-  xpointer_t mem = g_slice_alloc (mem_size);
+  gpointer mem = g_slice_alloc (mem_size);
   if (mem)
     memcpy (mem, mem_block, mem_size);
   return mem;
@@ -1144,11 +1144,11 @@ g_slice_copy (xsize_t         mem_size,
  * Since: 2.10
  */
 void
-g_slice_free1 (xsize_t    mem_size,
-               xpointer_t mem_block)
+g_slice_free1 (gsize    mem_size,
+               gpointer mem_block)
 {
-  xsize_t chunk_size = P2ALIGN (mem_size);
-  xuint_t acat = allocator_categorize (chunk_size);
+  gsize chunk_size = P2ALIGN (mem_size);
+  guint acat = allocator_categorize (chunk_size);
   if (G_UNLIKELY (!mem_block))
     return;
   if (G_UNLIKELY (allocator->config.debug_blocks) &&
@@ -1157,7 +1157,7 @@ g_slice_free1 (xsize_t    mem_size,
   if (G_LIKELY (acat == 1))             /* allocate through magazine layer */
     {
       ThreadMemory *tmem = thread_memory_from_self();
-      xuint_t ix = SLAB_INDEX (allocator, chunk_size);
+      guint ix = SLAB_INDEX (allocator, chunk_size);
       if (G_UNLIKELY (thread_memory_magazine2_is_full (tmem, ix)))
         {
           thread_memory_swap_magazines (tmem, ix);
@@ -1182,7 +1182,7 @@ g_slice_free1 (xsize_t    mem_size,
         memset (mem_block, 0, mem_size);
       g_free (mem_block);
     }
-  TRACE (XPL_SLICE_FREE((void*)mem_block, mem_size));
+  TRACE (GLIB_SLICE_FREE((void*)mem_block, mem_size));
 }
 
 /**
@@ -1195,7 +1195,7 @@ g_slice_free1 (xsize_t    mem_size,
  *
  * The memory blocks must be equal-sized, allocated via
  * g_slice_alloc() or g_slice_alloc0() and linked together by a
- * @next pointer (similar to #xslist_t). The offset of the @next
+ * @next pointer (similar to #GSList). The offset of the @next
  * field in each block is passed as third argument.
  * Note that the exact release behaviour can be changed with the
  * [`G_DEBUG=gc-friendly`][G_DEBUG] environment variable, also see
@@ -1206,11 +1206,11 @@ g_slice_free1 (xsize_t    mem_size,
  * Since: 2.10
  */
 void
-g_slice_free_chain_with_offset (xsize_t    mem_size,
-                                xpointer_t mem_chain,
-                                xsize_t    next_offset)
+g_slice_free_chain_with_offset (gsize    mem_size,
+                                gpointer mem_chain,
+                                gsize    next_offset)
 {
-  xpointer_t slice = mem_chain;
+  gpointer slice = mem_chain;
   /* while the thread magazines and the magazine cache are implemented so that
    * they can easily be extended to allow for free lists containing more free
    * lists for the first level nodes, which would allow O(1) freeing in this
@@ -1226,16 +1226,16 @@ g_slice_free_chain_with_offset (xsize_t    mem_size,
    *   g_mutex_lock()/g_mutex_unlock() has already been moved out of the
    *   inner loop for freeing chained slices.
    */
-  xsize_t chunk_size = P2ALIGN (mem_size);
-  xuint_t acat = allocator_categorize (chunk_size);
+  gsize chunk_size = P2ALIGN (mem_size);
+  guint acat = allocator_categorize (chunk_size);
   if (G_LIKELY (acat == 1))             /* allocate through magazine layer */
     {
       ThreadMemory *tmem = thread_memory_from_self();
-      xuint_t ix = SLAB_INDEX (allocator, chunk_size);
+      guint ix = SLAB_INDEX (allocator, chunk_size);
       while (slice)
         {
-          xuint8_t *current = slice;
-          slice = *(xpointer_t*) (current + next_offset);
+          guint8 *current = slice;
+          slice = *(gpointer*) (current + next_offset);
           if (G_UNLIKELY (allocator->config.debug_blocks) &&
               !smc_notify_free (current, mem_size))
             abort();
@@ -1255,8 +1255,8 @@ g_slice_free_chain_with_offset (xsize_t    mem_size,
       g_mutex_lock (&allocator->slab_mutex);
       while (slice)
         {
-          xuint8_t *current = slice;
-          slice = *(xpointer_t*) (current + next_offset);
+          guint8 *current = slice;
+          slice = *(gpointer*) (current + next_offset);
           if (G_UNLIKELY (allocator->config.debug_blocks) &&
               !smc_notify_free (current, mem_size))
             abort();
@@ -1269,8 +1269,8 @@ g_slice_free_chain_with_offset (xsize_t    mem_size,
   else                                  /* delegate to system malloc */
     while (slice)
       {
-        xuint8_t *current = slice;
-        slice = *(xpointer_t*) (current + next_offset);
+        guint8 *current = slice;
+        slice = *(gpointer*) (current + next_offset);
         if (G_UNLIKELY (allocator->config.debug_blocks) &&
             !smc_notify_free (current, mem_size))
           abort();
@@ -1283,7 +1283,7 @@ g_slice_free_chain_with_offset (xsize_t    mem_size,
 /* --- single page allocator --- */
 static void
 allocator_slab_stack_push (Allocator *local_allocator,
-                           xuint_t ix,
+                           guint ix,
                            SlabInfo *sinfo)
 {
   /* insert slab at slab ring head */
@@ -1303,28 +1303,28 @@ allocator_slab_stack_push (Allocator *local_allocator,
   local_allocator->slab_stack[ix] = sinfo;
 }
 
-static xsize_t
+static gsize
 allocator_aligned_page_size (Allocator *local_allocator,
-                             xsize_t n_bytes)
+                             gsize n_bytes)
 {
-  xsize_t val = (xsize_t) 1 << g_bit_storage (n_bytes - 1);
+  gsize val = (gsize) 1 << g_bit_storage (n_bytes - 1);
   val = MAX (val, local_allocator->min_page_size);
   return val;
 }
 
 static void
 allocator_add_slab (Allocator *local_allocator,
-                    xuint_t ix,
-                    xsize_t chunk_size)
+                    guint ix,
+                    gsize chunk_size)
 {
   ChunkLink *chunk;
   SlabInfo *sinfo;
-  xsize_t addr, padding, n_chunks, color = 0;
-  xsize_t page_size;
+  gsize addr, padding, n_chunks, color = 0;
+  gsize page_size;
   int errsv;
-  xpointer_t aligned_memory;
-  xuint8_t *mem;
-  xuint_t i;
+  gpointer aligned_memory;
+  guint8 *mem;
+  guint i;
 
   page_size = allocator_aligned_page_size (local_allocator, SLAB_BPAGE_SIZE (local_allocator, chunk_size));
   /* allocate 1 page for the chunks and the slab */
@@ -1334,21 +1334,21 @@ allocator_add_slab (Allocator *local_allocator,
 
   if (!mem)
     {
-      const xchar_t *syserr = strerror (errsv);
+      const gchar *syserr = strerror (errsv);
       mem_error ("failed to allocate %u bytes (alignment: %u): %s\n",
-                 (xuint_t) (page_size - NATIVE_MALLOC_PADDING), (xuint_t) page_size, syserr);
+                 (guint) (page_size - NATIVE_MALLOC_PADDING), (guint) page_size, syserr);
     }
   /* mask page address */
-  addr = ((xsize_t) mem / page_size) * page_size;
+  addr = ((gsize) mem / page_size) * page_size;
   /* assert alignment */
-  mem_assert (aligned_memory == (xpointer_t) addr);
+  mem_assert (aligned_memory == (gpointer) addr);
   /* basic slab info setup */
   sinfo = (SlabInfo*) (mem + page_size - SLAB_INFO_SIZE);
   sinfo->n_allocated = 0;
   sinfo->chunks = NULL;
   /* figure cache colorization */
-  n_chunks = ((xuint8_t*) sinfo - mem) / chunk_size;
-  padding = ((xuint8_t*) sinfo - mem) - n_chunks * chunk_size;
+  n_chunks = ((guint8*) sinfo - mem) / chunk_size;
+  padding = ((guint8*) sinfo - mem) - n_chunks * chunk_size;
   if (padding)
     {
       color = (local_allocator->color_accu * P2ALIGNMENT) % padding;
@@ -1359,7 +1359,7 @@ allocator_add_slab (Allocator *local_allocator,
   sinfo->chunks = chunk;
   for (i = 0; i < n_chunks - 1; i++)
     {
-      chunk->next = (ChunkLink*) ((xuint8_t*) chunk + chunk_size);
+      chunk->next = (ChunkLink*) ((guint8*) chunk + chunk_size);
       chunk = chunk->next;
     }
   chunk->next = NULL;   /* last chunk */
@@ -1367,11 +1367,11 @@ allocator_add_slab (Allocator *local_allocator,
   allocator_slab_stack_push (local_allocator, ix, sinfo);
 }
 
-static xpointer_t
-slab_allocator_alloc_chunk (xsize_t chunk_size)
+static gpointer
+slab_allocator_alloc_chunk (gsize chunk_size)
 {
   ChunkLink *chunk;
-  xuint_t ix = SLAB_INDEX (allocator, chunk_size);
+  guint ix = SLAB_INDEX (allocator, chunk_size);
   /* ensure non-empty slab */
   if (!allocator->slab_stack[ix] || !allocator->slab_stack[ix]->chunks)
     allocator_add_slab (allocator, ix, chunk_size);
@@ -1386,16 +1386,16 @@ slab_allocator_alloc_chunk (xsize_t chunk_size)
 }
 
 static void
-slab_allocator_free_chunk (xsize_t    chunk_size,
-                           xpointer_t mem)
+slab_allocator_free_chunk (gsize    chunk_size,
+                           gpointer mem)
 {
   ChunkLink *chunk;
-  xboolean_t was_empty;
-  xuint_t ix = SLAB_INDEX (allocator, chunk_size);
-  xsize_t page_size = allocator_aligned_page_size (allocator, SLAB_BPAGE_SIZE (allocator, chunk_size));
-  xsize_t addr = ((xsize_t) mem / page_size) * page_size;
+  gboolean was_empty;
+  guint ix = SLAB_INDEX (allocator, chunk_size);
+  gsize page_size = allocator_aligned_page_size (allocator, SLAB_BPAGE_SIZE (allocator, chunk_size));
+  gsize addr = ((gsize) mem / page_size) * page_size;
   /* mask page address */
-  xuint8_t *page = (xuint8_t*) addr;
+  guint8 *page = (guint8*) addr;
   SlabInfo *sinfo = (SlabInfo*) (page + page_size - SLAB_INFO_SIZE);
   /* assert valid chunk count */
   mem_assert (sinfo->n_allocated > 0);
@@ -1449,12 +1449,12 @@ static GTrashStack *compat_valloc_trash = NULL;
 G_GNUC_END_IGNORE_DEPRECATIONS
 #endif
 
-static xpointer_t
-allocator_memalign (xsize_t alignment,
-                    xsize_t memsize)
+static gpointer
+allocator_memalign (gsize alignment,
+                    gsize memsize)
 {
-  xpointer_t aligned_memory = NULL;
-  xint_t err = ENOMEM;
+  gpointer aligned_memory = NULL;
+  gint err = ENOMEM;
 #if     HAVE_POSIX_MEMALIGN
   err = posix_memalign (&aligned_memory, alignment, memsize);
 #elif   HAVE_MEMALIGN
@@ -1471,13 +1471,13 @@ allocator_memalign (xsize_t alignment,
   mem_assert (memsize <= sys_page_size);
   if (!compat_valloc_trash)
     {
-      const xuint_t n_pages = 16;
-      xuint8_t *mem = malloc (n_pages * sys_page_size);
+      const guint n_pages = 16;
+      guint8 *mem = malloc (n_pages * sys_page_size);
       err = errno;
       if (mem)
         {
-          xint_t i = n_pages;
-          xuint8_t *amem = (xuint8_t*) ALIGN ((xsize_t) mem, sys_page_size);
+          gint i = n_pages;
+          guint8 *amem = (guint8*) ALIGN ((gsize) mem, sys_page_size);
           if (amem != mem)
             i--;        /* mem wasn't page aligned */
           G_GNUC_BEGIN_IGNORE_DEPRECATIONS
@@ -1496,8 +1496,8 @@ allocator_memalign (xsize_t alignment,
 }
 
 static void
-allocator_memfree (xsize_t    memsize,
-                   xpointer_t mem)
+allocator_memfree (gsize    memsize,
+                   gpointer mem)
 {
 #if     HAVE_POSIX_MEMALIGN || HAVE_MEMALIGN || HAVE_VALLOC
   free (mem);
@@ -1536,9 +1536,9 @@ typedef struct {
 } SmcEntry;
 static void             smc_tree_insert      (SmcKType  key,
                                               SmcVType  value);
-static xboolean_t         smc_tree_lookup      (SmcKType  key,
+static gboolean         smc_tree_lookup      (SmcKType  key,
                                               SmcVType *value_p);
-static xboolean_t         smc_tree_remove      (SmcKType  key);
+static gboolean         smc_tree_remove      (SmcKType  key);
 
 
 /* --- g-slice memory checker implementation --- */
@@ -1567,7 +1567,7 @@ smc_notify_free (void   *pointer,
 {
   size_t address = (size_t) pointer;
   SmcVType real_size;
-  xboolean_t found_one;
+  gboolean found_one;
 
   if (!pointer)
     return 1; /* ignore */
@@ -1683,13 +1683,13 @@ smc_tree_insert (SmcKType key,
   g_mutex_unlock (&smc_tree_mutex);
 }
 
-static xboolean_t
+static gboolean
 smc_tree_lookup (SmcKType  key,
                  SmcVType *value_p)
 {
   SmcEntry *entry = NULL;
   unsigned int ix0 = SMC_TRUNK_HASH (key), ix1 = SMC_BRANCH_HASH (key);
-  xboolean_t found_one = FALSE;
+  gboolean found_one = FALSE;
   *value_p = 0;
   g_mutex_lock (&smc_tree_mutex);
   if (smc_tree_root && smc_tree_root[ix0])
@@ -1707,11 +1707,11 @@ smc_tree_lookup (SmcKType  key,
   return found_one;
 }
 
-static xboolean_t
+static gboolean
 smc_tree_remove (SmcKType key)
 {
   unsigned int ix0 = SMC_TRUNK_HASH (key), ix1 = SMC_BRANCH_HASH (key);
-  xboolean_t found_one = FALSE;
+  gboolean found_one = FALSE;
   g_mutex_lock (&smc_tree_mutex);
   if (smc_tree_root && smc_tree_root[ix0])
     {
@@ -1738,7 +1738,7 @@ smc_tree_remove (SmcKType key)
 
 #ifdef G_ENABLE_DEBUG
 void
-g_slice_debuxtree_statistics (void)
+g_slice_debug_tree_statistics (void)
 {
   g_mutex_lock (&smc_tree_mutex);
   if (smc_tree_root)
@@ -1773,13 +1773,13 @@ g_slice_debuxtree_statistics (void)
   else
     g_fprintf (stderr, "GSlice: MemChecker: root=NULL\n");
   g_mutex_unlock (&smc_tree_mutex);
-
+  
   /* sample statistics (beast + GSLice + 24h scripted core & GUI activity):
    *  PID %CPU %MEM   VSZ  RSS      COMMAND
    * 8887 30.3 45.8 456068 414856   beast-0.7.1 empty.bse
    * $ cat /proc/8887/statm # total-program-size resident-set-size shared-pages text/code data/stack library dirty-pages
    * 114017 103714 2354 344 0 108676 0
-   * $ cat /proc/8887/status
+   * $ cat /proc/8887/status 
    * Name:   beast-0.7.1
    * VmSize:   456068 kB
    * VmLck:         0 kB
@@ -1790,7 +1790,7 @@ g_slice_debuxtree_statistics (void)
    * VmLib:     13036 kB
    * VmPTE:       456 kB
    * Threads:        3
-   * (gdb) print g_slice_debuxtree_statistics ()
+   * (gdb) print g_slice_debug_tree_statistics ()
    * GSlice: MemChecker: 422 trunks, 213068 branches, 0 old branches
    * GSlice: MemChecker: 504.900474 branches per trunk, 98.81% utilization
    * GSlice: MemChecker: 4.965039 entries per branch, 1 minimum, 37 maximum

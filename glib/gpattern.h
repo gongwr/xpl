@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997, 1999  Peter Mattis, Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 #ifndef __G_PATTERN_H__
 #define __G_PATTERN_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -27,36 +27,36 @@
 G_BEGIN_DECLS
 
 
-typedef struct _GPatternSpec    xpattern_spec_t;
+typedef struct _GPatternSpec    GPatternSpec;
 
-XPL_AVAILABLE_IN_ALL
-xpattern_spec_t* xpattern_spec_new       (const xchar_t  *pattern);
-XPL_AVAILABLE_IN_ALL
-void          xpattern_spec_free      (xpattern_spec_t *pspec);
-XPL_AVAILABLE_IN_2_70
-xpattern_spec_t *xpattern_spec_copy (xpattern_spec_t *pspec);
-XPL_AVAILABLE_IN_ALL
-xboolean_t      xpattern_spec_equal     (xpattern_spec_t *pspec1,
-					xpattern_spec_t *pspec2);
-XPL_AVAILABLE_IN_2_70
-xboolean_t xpattern_spec_match (xpattern_spec_t *pspec,
-                               xsize_t string_length,
-                               const xchar_t *string,
-                               const xchar_t *string_reversed);
-XPL_AVAILABLE_IN_2_70
-xboolean_t xpattern_spec_match_string (xpattern_spec_t *pspec,
-                                      const xchar_t *string);
-XPL_DEPRECATED_IN_2_70_FOR (xpattern_spec_match)
-xboolean_t      g_pattern_match          (xpattern_spec_t *pspec,
-					xuint_t         string_length,
-					const xchar_t  *string,
-					const xchar_t  *string_reversed);
-XPL_DEPRECATED_IN_2_70_FOR (xpattern_spec_match_string)
-xboolean_t      g_pattern_match_string   (xpattern_spec_t *pspec,
-					const xchar_t  *string);
-XPL_AVAILABLE_IN_ALL
-xboolean_t      g_pattern_match_simple   (const xchar_t  *pattern,
-					const xchar_t  *string);
+GLIB_AVAILABLE_IN_ALL
+GPatternSpec* g_pattern_spec_new       (const gchar  *pattern);
+GLIB_AVAILABLE_IN_ALL
+void          g_pattern_spec_free      (GPatternSpec *pspec);
+GLIB_AVAILABLE_IN_2_70
+GPatternSpec *g_pattern_spec_copy (GPatternSpec *pspec);
+GLIB_AVAILABLE_IN_ALL
+gboolean      g_pattern_spec_equal     (GPatternSpec *pspec1,
+					GPatternSpec *pspec2);
+GLIB_AVAILABLE_IN_2_70
+gboolean g_pattern_spec_match (GPatternSpec *pspec,
+                               gsize string_length,
+                               const gchar *string,
+                               const gchar *string_reversed);
+GLIB_AVAILABLE_IN_2_70
+gboolean g_pattern_spec_match_string (GPatternSpec *pspec,
+                                      const gchar *string);
+GLIB_DEPRECATED_IN_2_70_FOR (g_pattern_spec_match)
+gboolean      g_pattern_match          (GPatternSpec *pspec,
+					guint         string_length,
+					const gchar  *string,
+					const gchar  *string_reversed);
+GLIB_DEPRECATED_IN_2_70_FOR (g_pattern_spec_match_string)
+gboolean      g_pattern_match_string   (GPatternSpec *pspec,
+					const gchar  *string);
+GLIB_AVAILABLE_IN_ALL
+gboolean      g_pattern_match_simple   (const gchar  *pattern,
+					const gchar  *string);
 
 G_END_DECLS
 

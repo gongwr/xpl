@@ -48,11 +48,11 @@ G_BEGIN_DECLS
 #define G_TRACE_CURRENT_TIME 0
 #endif
 
-void (g_trace_mark) (sint64_t       begin_time_nsec,
-                     sint64_t       duration_nsec,
-                     const xchar_t *group,
-                     const xchar_t *name,
-                     const xchar_t *message_format,
+void (g_trace_mark) (gint64       begin_time_nsec,
+                     gint64       duration_nsec,
+                     const gchar *group,
+                     const gchar *name,
+                     const gchar *message_format,
                      ...) G_GNUC_PRINTF (5, 6);
 
 #ifndef HAVE_SYSPROF
@@ -66,14 +66,14 @@ void (g_trace_mark) (sint64_t       begin_time_nsec,
 #endif
 #endif
 
-xuint_t   (g_trace_define_int64_counter) (const char *group,
+guint   (g_trace_define_int64_counter) (const char *group,
                                         const char *name,
                                         const char *description);
-void    (g_trace_set_int64_counter)    (xuint_t       id,
-                                        sint64_t      value);
+void    (g_trace_set_int64_counter)    (guint       id,
+                                        gint64      value);
 
 #ifndef HAVE_SYSPROF
-#define g_trace_define_int64_counter(g, n, d) ((xuint_t) -1)
+#define g_trace_define_int64_counter(g, n, d) ((guint) -1)
 #define g_trace_set_int64_counter(i,v)
 #endif
 

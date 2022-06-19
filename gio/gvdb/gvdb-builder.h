@@ -25,42 +25,42 @@
 typedef struct _GvdbItem GvdbItem;
 
 G_GNUC_INTERNAL
-xhashtable_t *            gvdb_hash_table_new                             (xhashtable_t    *parent,
-                                                                         const xchar_t   *key);
+GHashTable *            gvdb_hash_table_new                             (GHashTable    *parent,
+                                                                         const gchar   *key);
 
 G_GNUC_INTERNAL
-GvdbItem *              gvdb_hash_table_insert                          (xhashtable_t    *table,
-                                                                         const xchar_t   *key);
+GvdbItem *              gvdb_hash_table_insert                          (GHashTable    *table,
+                                                                         const gchar   *key);
 G_GNUC_INTERNAL
-void                    gvdb_hash_table_insert_string                   (xhashtable_t    *table,
-                                                                         const xchar_t   *key,
-                                                                         const xchar_t   *value);
+void                    gvdb_hash_table_insert_string                   (GHashTable    *table,
+                                                                         const gchar   *key,
+                                                                         const gchar   *value);
 
 G_GNUC_INTERNAL
 void                    gvdb_item_set_value                             (GvdbItem      *item,
-                                                                         xvariant_t      *value);
+                                                                         GVariant      *value);
 G_GNUC_INTERNAL
 void                    gvdb_item_set_hash_table                        (GvdbItem      *item,
-                                                                         xhashtable_t    *table);
+                                                                         GHashTable    *table);
 G_GNUC_INTERNAL
 void                    gvdb_item_set_parent                            (GvdbItem      *item,
                                                                          GvdbItem      *parent);
 
 G_GNUC_INTERNAL
-xboolean_t                gvdb_table_write_contents                       (xhashtable_t     *table,
-                                                                         const xchar_t    *filename,
-                                                                         xboolean_t        byteswap,
-                                                                         xerror_t        **error);
+gboolean                gvdb_table_write_contents                       (GHashTable     *table,
+                                                                         const gchar    *filename,
+                                                                         gboolean        byteswap,
+                                                                         GError        **error);
 G_GNUC_INTERNAL
-void                    gvdb_table_write_contents_async                 (xhashtable_t          *table,
-                                                                         const xchar_t         *filename,
-                                                                         xboolean_t             byteswap,
-                                                                         xcancellable_t        *cancellable,
-                                                                         xasync_ready_callback_t  callback,
-                                                                         xpointer_t             user_data);
+void                    gvdb_table_write_contents_async                 (GHashTable          *table,
+                                                                         const gchar         *filename,
+                                                                         gboolean             byteswap,
+                                                                         GCancellable        *cancellable,
+                                                                         GAsyncReadyCallback  callback,
+                                                                         gpointer             user_data);
 G_GNUC_INTERNAL
-xboolean_t                gvdb_table_write_contents_finish                (xhashtable_t          *table,
-                                                                         xasync_result_t        *result,
-                                                                         xerror_t             **error);
+gboolean                gvdb_table_write_contents_finish                (GHashTable          *table,
+                                                                         GAsyncResult        *result,
+                                                                         GError             **error);
 
 #endif /* __gvdb_builder_h__ */

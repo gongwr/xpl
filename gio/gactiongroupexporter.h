@@ -19,8 +19,8 @@
  */
 
 
-#ifndef __XACTION_GROUP_EXPORTER_H__
-#define __XACTION_GROUP_EXPORTER_H__
+#ifndef __G_ACTION_GROUP_EXPORTER_H__
+#define __G_ACTION_GROUP_EXPORTER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,16 +30,16 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_2_32
-xuint_t                   xdbus_connection_export_action_group           (xdbus_connection_t  *connection,
-                                                                         const xchar_t      *object_path,
-                                                                         xaction_group_t     *action_group,
-                                                                         xerror_t          **error);
+GLIB_AVAILABLE_IN_2_32
+guint                   g_dbus_connection_export_action_group           (GDBusConnection  *connection,
+                                                                         const gchar      *object_path,
+                                                                         GActionGroup     *action_group,
+                                                                         GError          **error);
 
-XPL_AVAILABLE_IN_2_32
-void                    xdbus_connection_unexport_action_group         (xdbus_connection_t  *connection,
-                                                                         xuint_t             export_id);
+GLIB_AVAILABLE_IN_2_32
+void                    g_dbus_connection_unexport_action_group         (GDBusConnection  *connection,
+                                                                         guint             export_id);
 
 G_END_DECLS
 
-#endif /* __XACTION_GROUP_EXPORTER_H__ */
+#endif /* __G_ACTION_GROUP_EXPORTER_H__ */

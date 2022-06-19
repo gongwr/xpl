@@ -2,13 +2,13 @@
 #include <string.h>
 #include <stdio.h>
 
-xmain_loop_t *loop;
+GMainLoop *loop;
 
 int cancel_timeout = 0;
 int io_timeout = 0;
-xboolean_t async = FALSE;
-xboolean_t graceful = FALSE;
-xboolean_t verbose = FALSE;
+gboolean async = FALSE;
+gboolean graceful = FALSE;
+gboolean verbose = FALSE;
 static GOptionEntry cmd_entries[] = {
   {"cancel", 'c', 0, G_OPTION_ARG_INT, &cancel_timeout,
    "Cancel any op after the specified amount of seconds", NULL},
@@ -23,71 +23,71 @@ static GOptionEntry cmd_entries[] = {
   G_OPTION_ENTRY_NULL
 };
 
-static xpointer_t
-cancel_thread (xpointer_t data)
+static gpointer
+cancel_thread (gpointer data)
 {
-  xcancellable_t *cancellable = data;
+  GCancellable *cancellable = data;
 
   g_usleep (1000*1000*cancel_timeout);
   g_print ("Cancelling\n");
-  xcancellable_cancel (cancellable);
+  g_cancellable_cancel (cancellable);
   return NULL;
 }
 
 static char *
-socket_address_to_string (xsocket_address_t *address)
+socket_address_to_string (GSocketAddress *address)
 {
-  xinet_address_t *inet_address;
+  GInetAddress *inet_address;
   char *str, *res;
   int port;
 
   inet_address = g_inet_socket_address_get_address (G_INET_SOCKET_ADDRESS (address));
-  str = xinet_address_to_string (inet_address);
+  str = g_inet_address_to_string (inet_address);
   port = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (address));
-  res = xstrdup_printf ("%s:%d", str, port);
+  res = g_strdup_printf ("%s:%d", str, port);
   g_free (str);
   return res;
 }
 
 static void
-async_cb (xobject_t *source_object,
-	  xasync_result_t *res,
-	  xpointer_t user_data)
+async_cb (GObject *source_object,
+	  GAsyncResult *res,
+	  gpointer user_data)
 {
-  xasync_result_t **resp = user_data;
-  *resp = xobject_ref (res);
-  xmain_loop_quit (loop);
+  GAsyncResult **resp = user_data;
+  *resp = g_object_ref (res);
+  g_main_loop_quit (loop);
 }
 
 static void
-socket_client_event (xsocket_client_t *client,
+socket_client_event (GSocketClient *client,
 		     GSocketClientEvent event,
-		     xsocket_connectable_t *connectable,
-		     xsocket_connection_t *connection)
+		     GSocketConnectable *connectable,
+		     GSocketConnection *connection)
 {
-  static xenum_class_t *event_class;
-  sint64_t now_us;
+  static GEnumClass *event_class;
+  gint64 now_us;
 
   if (!event_class)
-    event_class = xtype_class_ref (XTYPE_SOCKET_CLIENT_EVENT);
+    event_class = g_type_class_ref (G_TYPE_SOCKET_CLIENT_EVENT);
 
   now_us = g_get_real_time ();
-  g_print ("%" G_GINT64_FORMAT " xsocket_client_t => %s [%s]\n",
+  g_print ("%" G_GINT64_FORMAT " GSocketClient => %s [%s]\n",
 	  now_us,
-	  xenum_get_value (event_class, event)->value_nick,
+	  g_enum_get_value (event_class, event)->value_nick,
 	  connection ? G_OBJECT_TYPE_NAME (connection) : "");
 }
 
 int
 main (int argc, char *argv[])
 {
-  xoption_context_t *context;
-  xsocket_client_t *client;
-  xsocket_connection_t *connection;
-  xsocket_address_t *address;
-  xcancellable_t *cancellable;
-  xoutput_stream_t *out;
-  xerror_t *error = NULL;
+  GOptionContext *context;
+  GSocketClient *client;
+  GSocketConnection *connection;
+  GSocketAddress *address;
+  GCancellable *cancellable;
+  GOutputStream *out;
+  GError *error = NULL;
   char buffer[1000];
 
   context = g_option_context_new (" <hostname>[:port] - send data to tcp host");
@@ -105,38 +105,38 @@ main (int argc, char *argv[])
     }
 
   if (async)
-    loop = xmain_loop_new (NULL, FALSE);
+    loop = g_main_loop_new (NULL, FALSE);
 
   if (cancel_timeout)
     {
-      xthread_t *thread;
-      cancellable = xcancellable_new ();
-      thread = xthread_new ("cancel", cancel_thread, cancellable);
-      xthread_unref (thread);
+      GThread *thread;
+      cancellable = g_cancellable_new ();
+      thread = g_thread_new ("cancel", cancel_thread, cancellable);
+      g_thread_unref (thread);
     }
   else
     {
       cancellable = NULL;
     }
 
-  client = xsocket_client_new ();
+  client = g_socket_client_new ();
   if (io_timeout)
-    xsocket_client_set_timeout (client, io_timeout);
+    g_socket_client_set_timeout (client, io_timeout);
   if (verbose)
-    xsignal_connect (client, "event", G_CALLBACK (socket_client_event), NULL);
+    g_signal_connect (client, "event", G_CALLBACK (socket_client_event), NULL);
 
   if (async)
     {
-      xasync_result_t *res;
-      xsocket_client_connect_to_host_async (client, argv[1], 7777,
+      GAsyncResult *res;
+      g_socket_client_connect_to_host_async (client, argv[1], 7777,
 					     cancellable, async_cb, &res);
-      xmain_loop_run (loop);
-      connection = xsocket_client_connect_to_host_finish (client, res, &error);
-      xobject_unref (res);
+      g_main_loop_run (loop);
+      connection = g_socket_client_connect_to_host_finish (client, res, &error);
+      g_object_unref (res);
     }
   else
     {
-      connection = xsocket_client_connect_to_host (client,
+      connection = g_socket_client_connect_to_host (client,
 						    argv[1],
 						    7777,
 						    cancellable, &error);
@@ -146,9 +146,9 @@ main (int argc, char *argv[])
       g_printerr ("%s can't connect: %s\n", argv[0], error->message);
       return 1;
     }
-  xobject_unref (client);
+  g_object_unref (client);
 
-  address = xsocket_connection_get_remote_address (connection, &error);
+  address = g_socket_connection_get_remote_address (connection, &error);
   if (!address)
     {
       g_printerr ("Error getting remote address: %s\n",
@@ -157,21 +157,21 @@ main (int argc, char *argv[])
     }
   g_print ("Connected to address: %s\n",
 	   socket_address_to_string (address));
-  xobject_unref (address);
+  g_object_unref (address);
 
   if (graceful)
     g_tcp_connection_set_graceful_disconnect (G_TCP_CONNECTION (connection), TRUE);
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (connection));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (connection));
 
   while (fgets(buffer, sizeof (buffer), stdin) != NULL)
     {
       /* FIXME if (async) */
-      if (!xoutput_stream_write_all (out, buffer, strlen (buffer),
+      if (!g_output_stream_write_all (out, buffer, strlen (buffer),
 				      NULL, cancellable, &error))
 	{
 	  g_warning ("send error: %s",  error->message);
-	  xerror_free (error);
+	  g_error_free (error);
 	  error = NULL;
 	}
     }
@@ -179,29 +179,29 @@ main (int argc, char *argv[])
   g_print ("closing stream\n");
   if (async)
     {
-      xasync_result_t *res;
-      g_io_stream_close_async (XIO_STREAM (connection),
+      GAsyncResult *res;
+      g_io_stream_close_async (G_IO_STREAM (connection),
 			       0, cancellable, async_cb, &res);
-      xmain_loop_run (loop);
-      if (!g_io_stream_close_finish (XIO_STREAM (connection),
+      g_main_loop_run (loop);
+      if (!g_io_stream_close_finish (G_IO_STREAM (connection),
 				     res, &error))
 	{
-	  xobject_unref (res);
+	  g_object_unref (res);
 	  g_warning ("close error: %s",  error->message);
 	  return 1;
 	}
-      xobject_unref (res);
+      g_object_unref (res);
     }
   else
     {
-      if (!g_io_stream_close (XIO_STREAM (connection), cancellable, &error))
+      if (!g_io_stream_close (G_IO_STREAM (connection), cancellable, &error))
 	{
 	  g_warning ("close error: %s",  error->message);
 	  return 1;
 	}
     }
 
-  xobject_unref (connection);
+  g_object_unref (connection);
 
   return 0;
 }

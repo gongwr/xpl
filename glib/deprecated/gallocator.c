@@ -16,8 +16,8 @@
 #include "config.h"
 
 /* we know we are deprecated here, no need for warnings */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include "gallocator.h"
@@ -26,18 +26,18 @@
 #include <glib/gslice.h>
 
 struct _GMemChunk {
-  xuint_t alloc_size;           /* the size of an atom */
+  guint alloc_size;           /* the size of an atom */
 };
 
 GMemChunk*
-g_mem_chunk_new (const xchar_t *name,
-                 xint_t         atom_size,
-                 xsize_t        area_size,
-                 xint_t         type)
+g_mem_chunk_new (const gchar *name,
+                 gint         atom_size,
+                 gsize        area_size,
+                 gint         type)
 {
   GMemChunk *mem_chunk;
 
-  xreturn_val_if_fail (atom_size > 0, NULL);
+  g_return_val_if_fail (atom_size > 0, NULL);
 
   mem_chunk = g_slice_new (GMemChunk);
   mem_chunk->alloc_size = atom_size;
@@ -53,25 +53,25 @@ g_mem_chunk_destroy (GMemChunk *mem_chunk)
   g_slice_free (GMemChunk, mem_chunk);
 }
 
-xpointer_t
+gpointer
 g_mem_chunk_alloc (GMemChunk *mem_chunk)
 {
-  xreturn_val_if_fail (mem_chunk != NULL, NULL);
+  g_return_val_if_fail (mem_chunk != NULL, NULL);
 
   return g_slice_alloc (mem_chunk->alloc_size);
 }
 
-xpointer_t
+gpointer
 g_mem_chunk_alloc0 (GMemChunk *mem_chunk)
 {
-  xreturn_val_if_fail (mem_chunk != NULL, NULL);
+  g_return_val_if_fail (mem_chunk != NULL, NULL);
 
   return g_slice_alloc0 (mem_chunk->alloc_size);
 }
 
 void
 g_mem_chunk_free (GMemChunk *mem_chunk,
-                  xpointer_t   mem)
+                  gpointer   mem)
 {
   g_return_if_fail (mem_chunk != NULL);
 
@@ -79,8 +79,8 @@ g_mem_chunk_free (GMemChunk *mem_chunk,
 }
 
 GAllocator*
-g_allocator_new (const xchar_t *name,
-                 xuint_t        n_preallocs)
+g_allocator_new (const gchar *name,
+                 guint        n_preallocs)
 {
   /* some (broken) GAllocator uses depend on non-NULL allocators */
   return (void *) 1;
@@ -94,11 +94,11 @@ void g_mem_chunk_print          (GMemChunk *mem_chunk)  { }
 void g_mem_chunk_info           (void)                  { }
 void g_blow_chunks              (void)                  { }
 
-void xlist_push_allocator      (GAllocator *allocator) { }
-void xlist_pop_allocator       (void)                  { }
+void g_list_push_allocator      (GAllocator *allocator) { }
+void g_list_pop_allocator       (void)                  { }
 
-void xslist_push_allocator     (GAllocator *allocator) { }
-void xslist_pop_allocator      (void)                  { }
+void g_slist_push_allocator     (GAllocator *allocator) { }
+void g_slist_pop_allocator      (void)                  { }
 
 void g_node_push_allocator      (GAllocator *allocator) { }
 void g_node_pop_allocator       (void)                  { }

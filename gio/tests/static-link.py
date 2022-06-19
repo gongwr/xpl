@@ -23,10 +23,10 @@ import sys
 import tempfile
 import subprocess
 
-if "XPL_TEST_COMPILATION" not in os.environ:
+if "GLIB_TEST_COMPILATION" not in os.environ:
     print(
-        """test_t disabled because XPL_TEST_COMPILATION is not set in the env.
-If you wish to run this test, set XPL_TEST_COMPILATION=1 in the env,
+        """Test disabled because GLIB_TEST_COMPILATION is not set in the env.
+If you wish to run this test, set GLIB_TEST_COMPILATION=1 in the env,
 and make sure you have glib build dependencies installed, including
 meson."""
     )

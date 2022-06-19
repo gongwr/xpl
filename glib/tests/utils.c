@@ -21,8 +21,8 @@
  * Author: Matthias Clasen
  */
 
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include "glib.h"
@@ -38,18 +38,18 @@
 #include <windows.h>
 #endif
 
-static xboolean_t
-strv_check (const xchar_t * const *strv, ...)
+static gboolean
+strv_check (const gchar * const *strv, ...)
 {
   va_list args;
-  xchar_t *s;
-  xint_t i;
+  gchar *s;
+  gint i;
 
   va_start (args, strv);
   for (i = 0; strv[i]; i++)
     {
-      s = va_arg (args, xchar_t*);
-      if (xstrcmp0 (strv[i], s) != 0)
+      s = va_arg (args, gchar*);
+      if (g_strcmp0 (strv[i], s) != 0)
         {
           va_end (args);
           return FALSE;
@@ -64,15 +64,15 @@ strv_check (const xchar_t * const *strv, ...)
 static void
 test_language_names (void)
 {
-  const xchar_t * const *names;
+  const gchar * const *names;
 
   g_setenv ("LANGUAGE", "de:en_US", TRUE);
   names = g_get_language_names ();
-  xassert (strv_check (names, "de", "en_US", "en", "C", NULL));
+  g_assert (strv_check (names, "de", "en_US", "en", "C", NULL));
 
   g_setenv ("LANGUAGE", "tt_RU.UTF-8@iqtelif", TRUE);
   names = g_get_language_names ();
-  xassert (strv_check (names,
+  g_assert (strv_check (names,
                         "tt_RU.UTF-8@iqtelif",
                         "tt_RU@iqtelif",
                         "tt.UTF-8@iqtelif",
@@ -91,12 +91,12 @@ test_locale_variants (void)
   char **v;
 
   v = g_get_locale_variants ("fr_BE");
-  xassert (strv_check ((const xchar_t * const *) v, "fr_BE", "fr", NULL));
-  xstrfreev (v);
+  g_assert (strv_check ((const gchar * const *) v, "fr_BE", "fr", NULL));
+  g_strfreev (v);
 
   v = g_get_locale_variants ("sr_SR@latin");
-  xassert (strv_check ((const xchar_t * const *) v, "sr_SR@latin", "sr@latin", "sr_SR", "sr", NULL));
-  xstrfreev (v);
+  g_assert (strv_check ((const gchar * const *) v, "sr_SR@latin", "sr@latin", "sr_SR", "sr", NULL));
+  g_strfreev (v);
 }
 
 static void
@@ -104,39 +104,39 @@ test_version (void)
 {
   if (g_test_verbose ())
     g_printerr ("(header %d.%d.%d library %d.%d.%d) ",
-              XPL_MAJOR_VERSION, XPL_MINOR_VERSION, XPL_MICRO_VERSION,
+              GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION,
               glib_major_version, glib_minor_version, glib_micro_version);
 
-  xassert (glib_check_version (XPL_MAJOR_VERSION,
-                                XPL_MINOR_VERSION,
-                                XPL_MICRO_VERSION) == NULL);
-  xassert (glib_check_version (XPL_MAJOR_VERSION,
-                                XPL_MINOR_VERSION,
+  g_assert (glib_check_version (GLIB_MAJOR_VERSION,
+                                GLIB_MINOR_VERSION,
+                                GLIB_MICRO_VERSION) == NULL);
+  g_assert (glib_check_version (GLIB_MAJOR_VERSION,
+                                GLIB_MINOR_VERSION,
                                 0) == NULL);
-  xassert (glib_check_version (XPL_MAJOR_VERSION - 1,
+  g_assert (glib_check_version (GLIB_MAJOR_VERSION - 1,
                                 0,
                                 0) != NULL);
-  xassert (glib_check_version (XPL_MAJOR_VERSION + 1,
+  g_assert (glib_check_version (GLIB_MAJOR_VERSION + 1,
                                 0,
                                 0) != NULL);
-  xassert (glib_check_version (XPL_MAJOR_VERSION,
-                                XPL_MINOR_VERSION + 1,
+  g_assert (glib_check_version (GLIB_MAJOR_VERSION,
+                                GLIB_MINOR_VERSION + 1,
                                 0) != NULL);
   /* don't use + 1 here, since a +/-1 difference can
    * happen due to post-release version bumps in git
    */
-  xassert (glib_check_version (XPL_MAJOR_VERSION,
-                                XPL_MINOR_VERSION,
-                                XPL_MICRO_VERSION + 3) != NULL);
+  g_assert (glib_check_version (GLIB_MAJOR_VERSION,
+                                GLIB_MINOR_VERSION,
+                                GLIB_MICRO_VERSION + 3) != NULL);
 }
 
-static const xchar_t *argv0;
+static const gchar *argv0;
 
 static void
 test_appname (void)
 {
-  const xchar_t *prgname;
-  const xchar_t *appname;
+  const gchar *prgname;
+  const gchar *appname;
 
   prgname = g_get_prgname ();
   appname = g_get_application_name ();
@@ -158,18 +158,18 @@ test_appname (void)
   g_assert_cmpstr (appname, ==, "appname");
 }
 
-static xpointer_t
-thread_prgname_check (xpointer_t data)
+static gpointer
+thread_prgname_check (gpointer data)
 {
-  xint_t *n_threads_got_prgname = (xint_t *) data;
-  const xchar_t *old_prgname;
+  gint *n_threads_got_prgname = (gint *) data;
+  const gchar *old_prgname;
 
   old_prgname = g_get_prgname ();
   g_assert_cmpstr (old_prgname, ==, "prgname");
 
   g_atomic_int_inc (n_threads_got_prgname);
 
-  while (xstrcmp0 (g_get_prgname (), "prgname2") != 0);
+  while (g_strcmp0 (g_get_prgname (), "prgname2") != 0);
 
   return NULL;
 }
@@ -177,19 +177,19 @@ thread_prgname_check (xpointer_t data)
 static void
 test_prgname_thread_safety (void)
 {
-  xsize_t i;
-  xint_t n_threads_got_prgname;
-  xthread_t *threads[4];
+  gsize i;
+  gint n_threads_got_prgname;
+  GThread *threads[4];
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/847");
-  g_test_summary ("test_t that threads racing to get and set the program name "
+  g_test_summary ("Test that threads racing to get and set the program name "
                   "always receive a valid program name.");
 
   g_set_prgname ("prgname");
   g_atomic_int_set (&n_threads_got_prgname, 0);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    threads[i] = xthread_new (NULL, thread_prgname_check, &n_threads_got_prgname);
+    threads[i] = g_thread_new (NULL, thread_prgname_check, &n_threads_got_prgname);
 
   while (g_atomic_int_get (&n_threads_got_prgname) != G_N_ELEMENTS (threads))
     g_usleep (50);
@@ -198,7 +198,7 @@ test_prgname_thread_safety (void)
 
   /* Wait for all the workers to exit. */
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   /* reset prgname */
   g_set_prgname ("prgname");
@@ -218,12 +218,12 @@ test_tmpdir (void)
 #endif
 
 #if TEST_BUILTINS
-static xint_t
-builtin_bit_nth_lsf1 (xulong_t mask, xint_t nth_bit)
+static gint
+builtin_bit_nth_lsf1 (gulong mask, gint nth_bit)
 {
   if (nth_bit >= 0)
     {
-      if (G_LIKELY (nth_bit < XPL_SIZEOF_LONG * 8 - 1))
+      if (G_LIKELY (nth_bit < GLIB_SIZEOF_LONG * 8 - 1))
         mask &= -(1UL << (nth_bit + 1));
       else
         mask = 0;
@@ -231,12 +231,12 @@ builtin_bit_nth_lsf1 (xulong_t mask, xint_t nth_bit)
   return __builtin_ffsl (mask) - 1;
 }
 
-static xint_t
-builtin_bit_nth_lsf2 (xulong_t mask, xint_t nth_bit)
+static gint
+builtin_bit_nth_lsf2 (gulong mask, gint nth_bit)
 {
   if (nth_bit >= 0)
     {
-      if (G_LIKELY (nth_bit < XPL_SIZEOF_LONG * 8 - 1))
+      if (G_LIKELY (nth_bit < GLIB_SIZEOF_LONG * 8 - 1))
         mask &= -(1UL << (nth_bit + 1));
       else
         mask = 0;
@@ -244,27 +244,27 @@ builtin_bit_nth_lsf2 (xulong_t mask, xint_t nth_bit)
   return mask ? __builtin_ctzl (mask) : -1;
 }
 
-static xint_t
-builtin_bit_nth_msf (xulong_t mask, xint_t nth_bit)
+static gint
+builtin_bit_nth_msf (gulong mask, gint nth_bit)
 {
-  if (nth_bit >= 0 && nth_bit < XPL_SIZEOF_LONG * 8)
+  if (nth_bit >= 0 && nth_bit < GLIB_SIZEOF_LONG * 8)
     mask &= (1UL << nth_bit) - 1;
-  return mask ? XPL_SIZEOF_LONG * 8 - 1 - __builtin_clzl (mask) : -1;
+  return mask ? GLIB_SIZEOF_LONG * 8 - 1 - __builtin_clzl (mask) : -1;
 }
 
-static xuint_t
-builtin_bit_storage (xulong_t number)
+static guint
+builtin_bit_storage (gulong number)
 {
-  return number ? XPL_SIZEOF_LONG * 8 - __builtin_clzl (number) : 1;
+  return number ? GLIB_SIZEOF_LONG * 8 - __builtin_clzl (number) : 1;
 }
 #endif
 
-static xint_t
-naive_bit_nth_lsf (xulong_t mask, xint_t nth_bit)
+static gint
+naive_bit_nth_lsf (gulong mask, gint nth_bit)
 {
   if (G_UNLIKELY (nth_bit < -1))
     nth_bit = -1;
-  while (nth_bit < ((XPL_SIZEOF_LONG * 8) - 1))
+  while (nth_bit < ((GLIB_SIZEOF_LONG * 8) - 1))
     {
       nth_bit++;
       if (mask & (1UL << nth_bit))
@@ -273,11 +273,11 @@ naive_bit_nth_lsf (xulong_t mask, xint_t nth_bit)
   return -1;
 }
 
-static xint_t
-naive_bit_nth_msf (xulong_t mask, xint_t nth_bit)
+static gint
+naive_bit_nth_msf (gulong mask, gint nth_bit)
 {
-  if (nth_bit < 0 || G_UNLIKELY (nth_bit > XPL_SIZEOF_LONG * 8))
-    nth_bit = XPL_SIZEOF_LONG * 8;
+  if (nth_bit < 0 || G_UNLIKELY (nth_bit > GLIB_SIZEOF_LONG * 8))
+    nth_bit = GLIB_SIZEOF_LONG * 8;
   while (nth_bit > 0)
     {
       nth_bit--;
@@ -287,10 +287,10 @@ naive_bit_nth_msf (xulong_t mask, xint_t nth_bit)
   return -1;
 }
 
-static xuint_t
-naive_bit_storage (xulong_t number)
+static guint
+naive_bit_storage (gulong number)
 {
-  xuint_t n_bits = 0;
+  guint n_bits = 0;
 
   do
     {
@@ -304,15 +304,15 @@ naive_bit_storage (xulong_t number)
 static void
 test_basic_bits (void)
 {
-  xulong_t i;
-  xint_t nth_bit;
+  gulong i;
+  gint nth_bit;
 
   /* we loop like this: 0, -1, 1, -2, 2, -3, 3, ... */
-  for (i = 0; (xlong_t) i < 1500; i = -(i + ((xlong_t) i >= 0)))
+  for (i = 0; (glong) i < 1500; i = -(i + ((glong) i >= 0)))
     {
-      xuint_t naive_bit_storage_i = naive_bit_storage (i);
+      guint naive_bit_storage_i = naive_bit_storage (i);
 
-      /* test_t the g_bit_*() implementations against the compiler builtins (if
+      /* Test the g_bit_*() implementations against the compiler builtins (if
        * available), and against a slow-but-correct ‘naive’ implementation.
        * They should all agree.
        *
@@ -325,10 +325,10 @@ test_basic_bits (void)
       g_assert_cmpint (naive_bit_storage_i, ==, g_bit_storage (i));
       g_assert_cmpint (naive_bit_storage_i, ==, (g_bit_storage) (i));
 
-      for (nth_bit = -3; nth_bit <= 2 + XPL_SIZEOF_LONG * 8; nth_bit++)
+      for (nth_bit = -3; nth_bit <= 2 + GLIB_SIZEOF_LONG * 8; nth_bit++)
         {
-          xint_t naive_bit_nth_lsf_i_nth_bit = naive_bit_nth_lsf (i, nth_bit);
-          xint_t naive_bit_nth_msf_i_nth_bit = naive_bit_nth_msf (i, nth_bit);
+          gint naive_bit_nth_lsf_i_nth_bit = naive_bit_nth_lsf (i, nth_bit);
+          gint naive_bit_nth_msf_i_nth_bit = naive_bit_nth_msf (i, nth_bit);
 
 #if TEST_BUILTINS
           g_assert_cmpint (naive_bit_nth_lsf_i_nth_bit, ==,
@@ -356,14 +356,14 @@ test_basic_bits (void)
 static void
 test_bits (void)
 {
-  xulong_t mask;
-  xint_t max_bit;
-  xint_t i, pos;
+  gulong mask;
+  gint max_bit;
+  gint i, pos;
 
   pos = g_bit_nth_lsf (0, -1);
   g_assert_cmpint (pos, ==, -1);
 
-  max_bit = sizeof (xulong_t) * 8;
+  max_bit = sizeof (gulong) * 8;
   for (i = 0; i < max_bit; i++)
     {
       mask = 1UL << i;
@@ -408,9 +408,9 @@ test_bits (void)
 static void
 test_swap (void)
 {
-  xuint16_t a16, b16;
-  xuint32_t a32, b32;
-  xuint64_t a64, b64;
+  guint16 a16, b16;
+  guint32 a32, b32;
+  guint64 a64, b64;
 
   a16 = 0xaabb;
   b16 = 0xbbaa;
@@ -431,30 +431,30 @@ test_swap (void)
 static void
 test_find_program (void)
 {
-  xchar_t *res;
+  gchar *res;
 
 #ifdef G_OS_UNIX
-  xchar_t *relative_path;
-  xchar_t *absolute_path;
-  xchar_t *cwd;
-  xsize_t i;
+  gchar *relative_path;
+  gchar *absolute_path;
+  gchar *cwd;
+  gsize i;
 
   res = g_find_program_in_path ("sh");
-  xassert (res != NULL);
+  g_assert (res != NULL);
   g_free (res);
 
   res = g_find_program_in_path ("/bin/sh");
-  xassert (res != NULL);
+  g_assert (res != NULL);
   g_free (res);
 
   cwd = g_get_current_dir ();
   absolute_path = g_find_program_in_path ("sh");
-  relative_path = xstrdup (absolute_path);
+  relative_path = g_strdup (absolute_path);
   for (i = 0; cwd[i] != '\0'; i++)
     {
       if (cwd[i] == '/' && cwd[i + 1] != '\0')
         {
-          xchar_t *relative_path_2 = xstrconcat ("../", relative_path, NULL);
+          gchar *relative_path_2 = g_strconcat ("../", relative_path, NULL);
           g_free (relative_path);
           relative_path = relative_path_2;
         }
@@ -474,13 +474,13 @@ test_find_program (void)
 #endif
 
   res = g_find_program_in_path ("this_program_does_not_exit");
-  xassert (res == NULL);
+  g_assert (res == NULL);
 
   res = g_find_program_in_path ("/bin");
-  xassert (res == NULL);
+  g_assert (res == NULL);
 
   res = g_find_program_in_path ("/etc/passwd");
-  xassert (res == NULL);
+  g_assert (res == NULL);
 }
 
 static void
@@ -491,35 +491,35 @@ test_debug (void)
     { "key2", 2 },
     { "key3", 4 },
   };
-  xuint_t res;
+  guint res;
 
-  res = g_parse_debuxstring (NULL, keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string (NULL, keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 0);
 
-  res = g_parse_debuxstring ("foobabla;#!%!$%112 223", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("foobabla;#!%!$%112 223", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 0);
 
-  res = g_parse_debuxstring ("key1:key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("key1:key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debuxstring ("key1;key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("key1;key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debuxstring ("key1,key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("key1,key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debuxstring ("key1   key2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("key1   key2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debuxstring ("key1\tkey2", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("key1\tkey2", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 3);
 
-  res = g_parse_debuxstring ("all", keys, G_N_ELEMENTS (keys));
+  res = g_parse_debug_string ("all", keys, G_N_ELEMENTS (keys));
   g_assert_cmpint (res, ==, 7);
 
   if (g_test_subprocess ())
     {
-      res = g_parse_debuxstring ("help", keys, G_N_ELEMENTS (keys));
+      res = g_parse_debug_string ("help", keys, G_N_ELEMENTS (keys));
       g_assert_cmpint (res, ==, 0);
       return;
     }
@@ -531,8 +531,8 @@ test_debug (void)
 static void
 test_codeset (void)
 {
-  xchar_t *c;
-  const xchar_t *c2;
+  gchar *c;
+  const gchar *c2;
 
   c = g_get_codeset ();
   g_get_charset (&c2);
@@ -547,7 +547,7 @@ test_codeset2 (void)
 {
   if (g_test_subprocess ())
     {
-      const xchar_t *c;
+      const gchar *c;
       g_setenv ("CHARSET", "UTF-8", TRUE);
       g_get_charset (&c);
       g_assert_cmpstr (c, ==, "UTF-8");
@@ -560,13 +560,13 @@ test_codeset2 (void)
 static void
 test_console_charset (void)
 {
-  const xchar_t *c1;
-  const xchar_t *c2;
+  const gchar *c1;
+  const gchar *c2;
 
 #ifdef G_OS_WIN32
   /* store current environment and unset $LANG to make sure it does not interfere */
   const unsigned int initial_cp = GetConsoleOutputCP ();
-  xchar_t *initial_lang = xstrdup (g_getenv ("LANG"));
+  gchar *initial_lang = g_strdup (g_getenv ("LANG"));
   g_unsetenv ("LANG");
 
   /* set console output codepage to something specific (ISO-8859-1 aka CP28591) and query it */
@@ -593,28 +593,17 @@ test_console_charset (void)
 #endif
 }
 
-static void
-test_basename (void)
-{
-  const xchar_t *path = "/path/to/a/file/deep/down.sh";
-  const xchar_t *b;
-
-  b = g_basename (path);
-
-  g_assert_cmpstr (b, ==, "down.sh");
-}
-
-extern const xchar_t *glib_pgettext (const xchar_t *msgidctxt, xsize_t msgidoffset);
+extern const gchar *glib_pgettext (const gchar *msgidctxt, gsize msgidoffset);
 
 static void
 test_gettext (void)
 {
-  const xchar_t *am0, *am1, *am2, *am3;
+  const gchar *am0, *am1, *am2, *am3;
 
-  am0 = glib_pgettext ("xdatetime_t\004AM", strlen ("xdatetime_t") + 1);
-  am1 = g_dpgettext ("glib20", "xdatetime_t\004AM", strlen ("xdatetime_t") + 1);
-  am2 = g_dpgettext ("glib20", "xdatetime_t|AM", 0);
-  am3 = g_dpgettext2 ("glib20", "xdatetime_t", "AM");
+  am0 = glib_pgettext ("GDateTime\004AM", strlen ("GDateTime") + 1);
+  am1 = g_dpgettext ("glib20", "GDateTime\004AM", strlen ("GDateTime") + 1);
+  am2 = g_dpgettext ("glib20", "GDateTime|AM", 0);
+  am3 = g_dpgettext2 ("glib20", "GDateTime", "AM");
 
   g_assert_cmpstr (am0, ==, am1);
   g_assert_cmpstr (am1, ==, am2);
@@ -624,44 +613,44 @@ test_gettext (void)
 static void
 test_username (void)
 {
-  const xchar_t *name;
+  const gchar *name;
 
   name = g_get_user_name ();
 
-  xassert (name != NULL);
+  g_assert (name != NULL);
 }
 
 static void
 test_realname (void)
 {
-  const xchar_t *name;
+  const gchar *name;
 
   name = g_get_real_name ();
 
-  xassert (name != NULL);
+  g_assert (name != NULL);
 }
 
 static void
 test_hostname (void)
 {
-  const xchar_t *name;
+  const gchar *name;
 
   name = g_get_host_name ();
 
-  xassert (name != NULL);
-  g_assert_true (xutf8_validate (name, -1, NULL));
+  g_assert (name != NULL);
+  g_assert_true (g_utf8_validate (name, -1, NULL));
 }
 
 #ifdef G_OS_UNIX
 static void
 test_xdg_dirs (void)
 {
-  xchar_t *xdg;
-  const xchar_t *dir;
-  const xchar_t * const *dirs;
-  xchar_t *s;
+  gchar *xdg;
+  const gchar *dir;
+  const gchar * const *dirs;
+  gchar *s;
 
-  xdg = xstrdup (g_getenv ("XDG_CONFIG_HOME"));
+  xdg = g_strdup (g_getenv ("XDG_CONFIG_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".config", NULL);
 
@@ -670,7 +659,7 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = xstrdup (g_getenv ("XDG_DATA_HOME"));
+  xdg = g_strdup (g_getenv ("XDG_DATA_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".local", "share", NULL);
 
@@ -679,7 +668,7 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = xstrdup (g_getenv ("XDG_CACHE_HOME"));
+  xdg = g_strdup (g_getenv ("XDG_CACHE_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".cache", NULL);
 
@@ -688,7 +677,7 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = xstrdup (g_getenv ("XDG_STATE_HOME"));
+  xdg = g_strdup (g_getenv ("XDG_STATE_HOME"));
   if (!xdg)
     xdg = g_build_filename (g_get_home_dir (), ".local/state", NULL);
 
@@ -697,22 +686,22 @@ test_xdg_dirs (void)
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = xstrdup (g_getenv ("XDG_RUNTIME_DIR"));
+  xdg = g_strdup (g_getenv ("XDG_RUNTIME_DIR"));
   if (!xdg)
-    xdg = xstrdup (g_get_user_cache_dir ());
+    xdg = g_strdup (g_get_user_cache_dir ());
 
   dir = g_get_user_runtime_dir ();
 
   g_assert_cmpstr (dir, ==, xdg);
   g_free (xdg);
 
-  xdg = (xchar_t *)g_getenv ("XDG_CONFIG_DIRS");
+  xdg = (gchar *)g_getenv ("XDG_CONFIG_DIRS");
   if (!xdg)
     xdg = "/etc/xdg";
 
   dirs = g_get_system_config_dirs ();
 
-  s = xstrjoinv (":", (xchar_t **)dirs);
+  s = g_strjoinv (":", (gchar **)dirs);
 
   g_assert_cmpstr (s, ==, xdg);
 
@@ -723,7 +712,7 @@ test_xdg_dirs (void)
 static void
 test_special_dir (void)
 {
-  const xchar_t *dir, *dir2;
+  const gchar *dir, *dir2;
 
   dir = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
   g_reload_user_special_dirs_cache ();
@@ -735,21 +724,21 @@ test_special_dir (void)
 static void
 test_desktop_special_dir (void)
 {
-  const xchar_t *dir, *dir2;
+  const gchar *dir, *dir2;
 
   dir = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
-  xassert (dir != NULL);
+  g_assert (dir != NULL);
 
   g_reload_user_special_dirs_cache ();
   dir2 = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
-  xassert (dir2 != NULL);
+  g_assert (dir2 != NULL);
 }
 
 static void
 test_os_info (void)
 {
-  xchar_t *name;
-  xchar_t *contents = NULL;
+  gchar *name;
+  gchar *contents = NULL;
 #if defined (G_OS_UNIX) && !(defined (G_OS_WIN32) || defined (__APPLE__))
   struct utsname info;
 #endif
@@ -764,8 +753,8 @@ test_os_info (void)
   /* These OSs have a special case so NAME should always succeed */
   g_assert_nonnull (name);
 #elif defined (G_OS_UNIX)
-  if (xfile_get_contents ("/etc/os-release", &contents, NULL, NULL) ||
-      xfile_get_contents ("/usr/lib/os-release", &contents, NULL, NULL) ||
+  if (g_file_get_contents ("/etc/os-release", &contents, NULL, NULL) ||
+      g_file_get_contents ("/usr/lib/os-release", &contents, NULL, NULL) ||
       uname (&info) == 0)
     g_assert_nonnull (name);
   else
@@ -778,71 +767,71 @@ test_os_info (void)
   g_free (contents);
 }
 
-static xboolean_t
-source_test (xpointer_t data)
+static gboolean
+source_test (gpointer data)
 {
   g_assert_not_reached ();
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
 test_clear_source (void)
 {
-  xuint_t id;
+  guint id;
 
   id = g_idle_add (source_test, NULL);
   g_assert_cmpuint (id, >, 0);
 
-  g_clear_handle_id (&id, xsource_remove);
+  g_clear_handle_id (&id, g_source_remove);
   g_assert_cmpuint (id, ==, 0);
 
   id = g_timeout_add (100, source_test, NULL);
   g_assert_cmpuint (id, >, 0);
 
-  g_clear_handle_id (&id, xsource_remove);
+  g_clear_handle_id (&id, g_source_remove);
   g_assert_cmpuint (id, ==, 0);
 }
 
 static void
 test_clear_pointer (void)
 {
-  xpointer_t a;
+  gpointer a;
 
   a = g_malloc (5);
   g_clear_pointer (&a, g_free);
-  xassert (a == NULL);
+  g_assert (a == NULL);
 
   a = g_malloc (5);
   (g_clear_pointer) (&a, g_free);
-  xassert (a == NULL);
+  g_assert (a == NULL);
 }
 
-/* test_t that g_clear_pointer() works with a xdestroy_notify_t which contains a cast.
+/* Test that g_clear_pointer() works with a GDestroyNotify which contains a cast.
  * See https://gitlab.gnome.org/GNOME/glib/issues/1425 */
 static void
 test_clear_pointer_cast (void)
 {
-  xhashtable_t *hash_table = NULL;
+  GHashTable *hash_table = NULL;
 
-  hash_table = xhash_table_new (xstr_hash, xstr_equal);
+  hash_table = g_hash_table_new (g_str_hash, g_str_equal);
 
   g_assert_nonnull (hash_table);
 
-  g_clear_pointer (&hash_table, (void (*) (xhashtable_t *)) xhash_table_destroy);
+  g_clear_pointer (&hash_table, (void (*) (GHashTable *)) g_hash_table_destroy);
 
   g_assert_null (hash_table);
 }
 
-/* test_t that the macro version of g_clear_pointer() only evaluates its argument
+/* Test that the macro version of g_clear_pointer() only evaluates its argument
  * once, just like the function version would. */
 static void
 test_clear_pointer_side_effects (void)
 {
-  xchar_t **my_string_array, **i;
+  gchar **my_string_array, **i;
 
-  my_string_array = g_new0 (xchar_t*, 3);
-  my_string_array[0] = xstrdup ("hello");
-  my_string_array[1] = xstrdup ("there");
+  my_string_array = g_new0 (gchar*, 3);
+  my_string_array[0] = g_strdup ("hello");
+  my_string_array[1] = g_strdup ("there");
   my_string_array[2] = NULL;
 
   i = my_string_array;
@@ -862,9 +851,9 @@ test_clear_pointer_side_effects (void)
 static int obj_count;
 
 static void
-get_obj (xpointer_t *obj_out)
+get_obj (gpointer *obj_out)
 {
-  xpointer_t obj = g_malloc (5);
+  gpointer obj = g_malloc (5);
   obj_count++;
 
   if (obj_out)
@@ -880,47 +869,47 @@ get_obj (xpointer_t *obj_out)
 static void
 test_take_pointer (void)
 {
-  xpointer_t a;
-  xpointer_t b;
+  gpointer a;
+  gpointer b;
 
   get_obj (NULL);
 
   get_obj (&a);
-  xassert (a);
+  g_assert (a);
 
   /* ensure that it works to skip the macro */
   b = (g_steal_pointer) (&a);
-  xassert (!a);
+  g_assert (!a);
   obj_count--;
   g_free (b);
 
-  xassert (!obj_count);
+  g_assert (!obj_count);
 }
 
 static void
 test_misc_mem (void)
 {
-  xpointer_t a;
+  gpointer a;
 
   a = g_try_malloc (0);
-  xassert (a == NULL);
+  g_assert (a == NULL);
 
   a = g_try_malloc0 (0);
-  xassert (a == NULL);
+  g_assert (a == NULL);
 
   a = g_malloc (16);
   a = g_try_realloc (a, 20);
   a = g_try_realloc (a, 0);
 
-  xassert (a == NULL);
+  g_assert (a == NULL);
 }
 
 static void
 aligned_alloc_nz (void)
 {
-  xpointer_t a;
+  gpointer a;
 
-  /* test_t an alignment that’s zero */
+  /* Test an alignment that’s zero */
   a = g_aligned_alloc (16, sizeof(char), 0);
   g_aligned_free (a);
   exit (0);
@@ -929,9 +918,9 @@ aligned_alloc_nz (void)
 static void
 aligned_alloc_npot (void)
 {
-  xpointer_t a;
+  gpointer a;
 
-  /* test_t an alignment that’s not a power of two */
+  /* Test an alignment that’s not a power of two */
   a = g_aligned_alloc (16, sizeof(char), 15);
   g_aligned_free (a);
   exit (0);
@@ -940,9 +929,9 @@ aligned_alloc_npot (void)
 static void
 aligned_alloc_nmov (void)
 {
-  xpointer_t a;
+  gpointer a;
 
-  /* test_t an alignment that’s not a multiple of sizeof(void*) */
+  /* Test an alignment that’s not a multiple of sizeof(void*) */
   a = g_aligned_alloc (16, sizeof(char), sizeof(void *) / 2);
   g_aligned_free (a);
   exit (0);
@@ -951,7 +940,7 @@ aligned_alloc_nmov (void)
 static void
 test_aligned_mem (void)
 {
-  xpointer_t a;
+  gpointer a;
 
   g_test_summary ("Aligned memory allocator");
 
@@ -981,7 +970,7 @@ test_aligned_mem (void)
 static void
 test_aligned_mem_alignment (void)
 {
-  xchar_t *p;
+  gchar *p;
 
   g_test_summary ("Check that g_aligned_alloc() returns a correctly aligned pointer");
 
@@ -995,9 +984,9 @@ test_aligned_mem_alignment (void)
 static void
 test_aligned_mem_zeroed (void)
 {
-  xsize_t n_blocks = 10;
-  xuint_t *p;
-  xsize_t i;
+  gsize n_blocks = 10;
+  guint *p;
+  gsize i;
 
   g_test_summary ("Check that g_aligned_alloc0() zeroes out its allocation");
 
@@ -1013,13 +1002,13 @@ test_aligned_mem_zeroed (void)
 static void
 test_nullify (void)
 {
-  xpointer_t p = &test_nullify;
+  gpointer p = &test_nullify;
 
-  xassert (p != NULL);
+  g_assert (p != NULL);
 
   g_nullify_pointer (&p);
 
-  xassert (p == NULL);
+  g_assert (p == NULL);
 }
 
 static void
@@ -1044,13 +1033,13 @@ test_atexit (void)
 static void
 test_check_setuid (void)
 {
-  xboolean_t res;
+  gboolean res;
 
-  res = XPL_PRIVATE_CALL(g_check_setuid) ();
-  xassert (!res);
+  res = GLIB_PRIVATE_CALL(g_check_setuid) ();
+  g_assert (!res);
 }
 
-/* test_t the defined integer limits are correct, as some compilers have had
+/* Test the defined integer limits are correct, as some compilers have had
  * problems with signed/unsigned conversion in the past. These limits should not
  * vary between platforms, compilers or architectures.
  *
@@ -1059,11 +1048,11 @@ test_check_setuid (void)
 static void
 test_int_limits (void)
 {
-  xchar_t *str = NULL;
+  gchar *str = NULL;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1663");
 
-  str = xstrdup_printf ("%d %d %u\n"
+  str = g_strdup_printf ("%d %d %u\n"
                          "%" G_GINT16_FORMAT " %" G_GINT16_FORMAT " %" G_GUINT16_FORMAT "\n"
                          "%" G_GINT32_FORMAT " %" G_GINT32_FORMAT " %" G_GUINT32_FORMAT "\n"
                          "%" G_GINT64_FORMAT " %" G_GINT64_FORMAT " %" G_GUINT64_FORMAT "\n",
@@ -1083,12 +1072,12 @@ test_int_limits (void)
 static void
 test_clear_list (void)
 {
-    xlist_t *list = NULL;
+    GList *list = NULL;
 
     g_clear_list (&list, NULL);
     g_assert_null (list);
 
-    list = xlist_prepend (list, "test");
+    list = g_list_prepend (list, "test");
     g_assert_nonnull (list);
 
     g_clear_list (&list, NULL);
@@ -1097,7 +1086,7 @@ test_clear_list (void)
     g_clear_list (&list, g_free);
     g_assert_null (list);
 
-    list = xlist_prepend (list, g_malloc (16));
+    list = g_list_prepend (list, g_malloc (16));
     g_assert_nonnull (list);
 
     g_clear_list (&list, g_free);
@@ -1107,12 +1096,12 @@ test_clear_list (void)
 static void
 test_clear_slist (void)
 {
-    xslist_t *slist = NULL;
+    GSList *slist = NULL;
 
     g_clear_slist (&slist, NULL);
     g_assert_null (slist);
 
-    slist = xslist_prepend (slist, "test");
+    slist = g_slist_prepend (slist, "test");
     g_assert_nonnull (slist);
 
     g_clear_slist (&slist, NULL);
@@ -1121,7 +1110,7 @@ test_clear_slist (void)
     g_clear_slist (&slist, g_free);
     g_assert_null (slist);
 
-    slist = xslist_prepend (slist, g_malloc (16));
+    slist = g_slist_prepend (slist, g_malloc (16));
     g_assert_nonnull (slist);
 
     g_clear_slist (&slist, g_free);
@@ -1162,7 +1151,6 @@ main (int   argc,
   g_test_add_func ("/utils/codeset", test_codeset);
   g_test_add_func ("/utils/codeset2", test_codeset2);
   g_test_add_func ("/utils/console-charset", test_console_charset);
-  g_test_add_func ("/utils/basename", test_basename);
   g_test_add_func ("/utils/gettext", test_gettext);
   g_test_add_func ("/utils/username", test_username);
   g_test_add_func ("/utils/realname", test_realname);

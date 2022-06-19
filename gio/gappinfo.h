@@ -29,39 +29,39 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_APP_INFO            (xapp_info_get_type ())
-#define G_APP_INFO(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_APP_INFO, xapp_info_t))
-#define X_IS_APP_INFO(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_APP_INFO))
-#define G_APP_INFO_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_APP_INFO, xapp_info_iface_t))
+#define G_TYPE_APP_INFO            (g_app_info_get_type ())
+#define G_APP_INFO(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_APP_INFO, GAppInfo))
+#define G_IS_APP_INFO(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_APP_INFO))
+#define G_APP_INFO_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_APP_INFO, GAppInfoIface))
 
-#define XTYPE_APP_LAUNCH_CONTEXT         (xapp_launch_context_get_type ())
-#define G_APP_LAUNCH_CONTEXT(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_APP_LAUNCH_CONTEXT, xapp_launch_context_t))
-#define G_APP_LAUNCH_CONTEXT_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_APP_LAUNCH_CONTEXT, xapp_launch_context_class_t))
-#define X_IS_APP_LAUNCH_CONTEXT(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_APP_LAUNCH_CONTEXT))
-#define X_IS_APP_LAUNCH_CONTEXT_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_APP_LAUNCH_CONTEXT))
-#define G_APP_LAUNCH_CONTEXT_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_APP_LAUNCH_CONTEXT, xapp_launch_context_class_t))
+#define G_TYPE_APP_LAUNCH_CONTEXT         (g_app_launch_context_get_type ())
+#define G_APP_LAUNCH_CONTEXT(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_APP_LAUNCH_CONTEXT, GAppLaunchContext))
+#define G_APP_LAUNCH_CONTEXT_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_APP_LAUNCH_CONTEXT, GAppLaunchContextClass))
+#define G_IS_APP_LAUNCH_CONTEXT(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_APP_LAUNCH_CONTEXT))
+#define G_IS_APP_LAUNCH_CONTEXT_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_APP_LAUNCH_CONTEXT))
+#define G_APP_LAUNCH_CONTEXT_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_APP_LAUNCH_CONTEXT, GAppLaunchContextClass))
 
-typedef struct _GAppLaunchContextClass   xapp_launch_context_class_t;
-typedef struct _xapp_launch_context_private xapp_launch_context_private_t;
+typedef struct _GAppLaunchContextClass   GAppLaunchContextClass;
+typedef struct _GAppLaunchContextPrivate GAppLaunchContextPrivate;
 
 /**
- * xapp_info_t:
+ * GAppInfo:
  *
  * Information about an installed application and methods to launch
  * it (with file arguments).
  */
 
 /**
- * xapp_info_iface_t:
- * @x_iface: The parent interface.
- * @dup: Copies a #xapp_info_t.
+ * GAppInfoIface:
+ * @g_iface: The parent interface.
+ * @dup: Copies a #GAppInfo.
  * @equal: Checks two #GAppInfos for equality.
- * @get_id: Gets a string identifier for a #xapp_info_t.
- * @get_name: Gets the name of the application for a #xapp_info_t.
- * @get_description: Gets a short description for the application described by the #xapp_info_t.
- * @get_executable: Gets the executable name for the #xapp_info_t.
- * @get_icon: Gets the #xicon_t for the #xapp_info_t.
- * @launch: Launches an application specified by the #xapp_info_t.
+ * @get_id: Gets a string identifier for a #GAppInfo.
+ * @get_name: Gets the name of the application for a #GAppInfo.
+ * @get_description: Gets a short description for the application described by the #GAppInfo.
+ * @get_executable: Gets the executable name for the #GAppInfo.
+ * @get_icon: Gets the #GIcon for the #GAppInfo.
+ * @launch: Launches an application specified by the #GAppInfo.
  * @supports_uris: Indicates whether the application specified supports launching URIs.
  * @supports_files: Indicates whether the application specified accepts filename arguments.
  * @launch_uris: Launches an application with a list of URIs.
@@ -69,202 +69,202 @@ typedef struct _xapp_launch_context_private xapp_launch_context_private_t;
  * [FreeDesktop.Org Startup Notification Specification](http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt).
  * @set_as_default_for_type: Sets an application as default for a given content type.
  * @set_as_default_for_extension: Sets an application as default for a given file extension.
- * @add_supports_type: Adds to the #xapp_info_t information about supported file types.
- * @can_remove_supports_type: Checks for support for removing supported file types from a #xapp_info_t.
- * @remove_supports_type: Removes a supported application type from a #xapp_info_t.
- * @can_delete: Checks if a #xapp_info_t can be deleted. Since 2.20
- * @do_delete: Deletes a #xapp_info_t. Since 2.20
- * @get_commandline: Gets the commandline for the #xapp_info_t. Since 2.20
- * @get_display_name: Gets the display name for the #xapp_info_t. Since 2.24
- * @set_as_last_used_for_type: Sets the application as the last used. See xapp_info_set_as_last_used_for_type().
+ * @add_supports_type: Adds to the #GAppInfo information about supported file types.
+ * @can_remove_supports_type: Checks for support for removing supported file types from a #GAppInfo.
+ * @remove_supports_type: Removes a supported application type from a #GAppInfo.
+ * @can_delete: Checks if a #GAppInfo can be deleted. Since 2.20
+ * @do_delete: Deletes a #GAppInfo. Since 2.20
+ * @get_commandline: Gets the commandline for the #GAppInfo. Since 2.20
+ * @get_display_name: Gets the display name for the #GAppInfo. Since 2.24
+ * @set_as_last_used_for_type: Sets the application as the last used. See g_app_info_set_as_last_used_for_type().
  * @get_supported_types: Retrieves the list of content types that @app_info claims to support.
  * @launch_uris_async: Asynchronously launches an application with a list of URIs. (Since: 2.60)
  * @launch_uris_finish: Finishes an operation started with @launch_uris_async. (Since: 2.60)
 
  * Application Information interface, for operating system portability.
  */
-typedef struct _xapp_info_iface    xapp_info_iface_t;
+typedef struct _GAppInfoIface    GAppInfoIface;
 
-struct _xapp_info_iface
+struct _GAppInfoIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xapp_info_t *   (* dup)                          (xapp_info_t           *appinfo);
-  xboolean_t     (* equal)                        (xapp_info_t           *appinfo1,
-                                                 xapp_info_t           *appinfo2);
-  const char * (* get_id)                       (xapp_info_t           *appinfo);
-  const char * (* get_name)                     (xapp_info_t           *appinfo);
-  const char * (* get_description)              (xapp_info_t           *appinfo);
-  const char * (* get_executable)               (xapp_info_t           *appinfo);
-  xicon_t *      (* get_icon)                     (xapp_info_t           *appinfo);
-  xboolean_t     (* launch)                       (xapp_info_t           *appinfo,
-                                                 xlist_t              *files,
-                                                 xapp_launch_context_t  *context,
-                                                 xerror_t            **error);
-  xboolean_t     (* supports_uris)                (xapp_info_t           *appinfo);
-  xboolean_t     (* supports_files)               (xapp_info_t           *appinfo);
-  xboolean_t     (* launch_uris)                  (xapp_info_t           *appinfo,
-                                                 xlist_t              *uris,
-                                                 xapp_launch_context_t  *context,
-                                                 xerror_t            **error);
-  xboolean_t     (* should_show)                  (xapp_info_t           *appinfo);
+  GAppInfo *   (* dup)                          (GAppInfo           *appinfo);
+  gboolean     (* equal)                        (GAppInfo           *appinfo1,
+                                                 GAppInfo           *appinfo2);
+  const char * (* get_id)                       (GAppInfo           *appinfo);
+  const char * (* get_name)                     (GAppInfo           *appinfo);
+  const char * (* get_description)              (GAppInfo           *appinfo);
+  const char * (* get_executable)               (GAppInfo           *appinfo);
+  GIcon *      (* get_icon)                     (GAppInfo           *appinfo);
+  gboolean     (* launch)                       (GAppInfo           *appinfo,
+                                                 GList              *files,
+                                                 GAppLaunchContext  *context,
+                                                 GError            **error);
+  gboolean     (* supports_uris)                (GAppInfo           *appinfo);
+  gboolean     (* supports_files)               (GAppInfo           *appinfo);
+  gboolean     (* launch_uris)                  (GAppInfo           *appinfo,
+                                                 GList              *uris,
+                                                 GAppLaunchContext  *context,
+                                                 GError            **error);
+  gboolean     (* should_show)                  (GAppInfo           *appinfo);
 
   /* For changing associations */
-  xboolean_t     (* set_as_default_for_type)      (xapp_info_t           *appinfo,
+  gboolean     (* set_as_default_for_type)      (GAppInfo           *appinfo,
                                                  const char         *content_type,
-                                                 xerror_t            **error);
-  xboolean_t     (* set_as_default_for_extension) (xapp_info_t           *appinfo,
+                                                 GError            **error);
+  gboolean     (* set_as_default_for_extension) (GAppInfo           *appinfo,
                                                  const char         *extension,
-                                                 xerror_t            **error);
-  xboolean_t     (* add_supports_type)            (xapp_info_t           *appinfo,
+                                                 GError            **error);
+  gboolean     (* add_supports_type)            (GAppInfo           *appinfo,
                                                  const char         *content_type,
-                                                 xerror_t            **error);
-  xboolean_t     (* can_remove_supports_type)     (xapp_info_t           *appinfo);
-  xboolean_t     (* remove_supports_type)         (xapp_info_t           *appinfo,
+                                                 GError            **error);
+  gboolean     (* can_remove_supports_type)     (GAppInfo           *appinfo);
+  gboolean     (* remove_supports_type)         (GAppInfo           *appinfo,
                                                  const char         *content_type,
-                                                 xerror_t            **error);
-  xboolean_t     (* can_delete)                   (xapp_info_t           *appinfo);
-  xboolean_t     (* do_delete)                    (xapp_info_t           *appinfo);
-  const char * (* get_commandline)              (xapp_info_t           *appinfo);
-  const char * (* get_display_name)             (xapp_info_t           *appinfo);
-  xboolean_t     (* set_as_last_used_for_type)    (xapp_info_t           *appinfo,
+                                                 GError            **error);
+  gboolean     (* can_delete)                   (GAppInfo           *appinfo);
+  gboolean     (* do_delete)                    (GAppInfo           *appinfo);
+  const char * (* get_commandline)              (GAppInfo           *appinfo);
+  const char * (* get_display_name)             (GAppInfo           *appinfo);
+  gboolean     (* set_as_last_used_for_type)    (GAppInfo           *appinfo,
                                                  const char         *content_type,
-                                                 xerror_t            **error);
-  const char ** (* get_supported_types)         (xapp_info_t           *appinfo);
-  void         (* launch_uris_async)            (xapp_info_t           *appinfo,
-                                                 xlist_t              *uris,
-                                                 xapp_launch_context_t  *context,
-                                                 xcancellable_t       *cancellable,
-                                                 xasync_ready_callback_t callback,
-                                                 xpointer_t            user_data);
-  xboolean_t     (* launch_uris_finish)           (xapp_info_t           *appinfo,
-                                                 xasync_result_t       *result,
-                                                 xerror_t            **error);
+                                                 GError            **error);
+  const char ** (* get_supported_types)         (GAppInfo           *appinfo);
+  void         (* launch_uris_async)            (GAppInfo           *appinfo,
+                                                 GList              *uris,
+                                                 GAppLaunchContext  *context,
+                                                 GCancellable       *cancellable,
+                                                 GAsyncReadyCallback callback,
+                                                 gpointer            user_data);
+  gboolean     (* launch_uris_finish)           (GAppInfo           *appinfo,
+                                                 GAsyncResult       *result,
+                                                 GError            **error);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t       xapp_info_get_type                     (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xapp_info_t *  xapp_info_create_from_commandline      (const char           *commandline,
+GLIB_AVAILABLE_IN_ALL
+GType       g_app_info_get_type                     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GAppInfo *  g_app_info_create_from_commandline      (const char           *commandline,
                                                      const char           *application_name,
                                                      GAppInfoCreateFlags   flags,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xapp_info_t *  xapp_info_dup                          (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_equal                        (xapp_info_t             *appinfo1,
-                                                     xapp_info_t             *appinfo2);
-XPL_AVAILABLE_IN_ALL
-const char *xapp_info_get_id                       (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-const char *xapp_info_get_name                     (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-const char *xapp_info_get_display_name             (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-const char *xapp_info_get_description              (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-const char *xapp_info_get_executable               (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-const char *xapp_info_get_commandline              (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-xicon_t *     xapp_info_get_icon                     (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_launch                       (xapp_info_t             *appinfo,
-                                                     xlist_t                *files,
-                                                     xapp_launch_context_t    *context,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_supports_uris                (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_supports_files               (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_launch_uris                  (xapp_info_t             *appinfo,
-                                                     xlist_t                *uris,
-                                                     xapp_launch_context_t    *context,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_2_60
-void        xapp_info_launch_uris_async            (xapp_info_t             *appinfo,
-                                                     xlist_t                *uris,
-                                                     xapp_launch_context_t    *context,
-                                                     xcancellable_t         *cancellable,
-                                                     xasync_ready_callback_t   callback,
-                                                     xpointer_t              user_data);
-XPL_AVAILABLE_IN_2_60
-xboolean_t    xapp_info_launch_uris_finish           (xapp_info_t             *appinfo,
-                                                     xasync_result_t         *result,
-                                                     xerror_t              **error);
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_ALL
+GAppInfo *  g_app_info_dup                          (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_equal                        (GAppInfo             *appinfo1,
+                                                     GAppInfo             *appinfo2);
+GLIB_AVAILABLE_IN_ALL
+const char *g_app_info_get_id                       (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+const char *g_app_info_get_name                     (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+const char *g_app_info_get_display_name             (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+const char *g_app_info_get_description              (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+const char *g_app_info_get_executable               (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+const char *g_app_info_get_commandline              (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+GIcon *     g_app_info_get_icon                     (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_launch                       (GAppInfo             *appinfo,
+                                                     GList                *files,
+                                                     GAppLaunchContext    *context,
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_supports_uris                (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_supports_files               (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_launch_uris                  (GAppInfo             *appinfo,
+                                                     GList                *uris,
+                                                     GAppLaunchContext    *context,
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_2_60
+void        g_app_info_launch_uris_async            (GAppInfo             *appinfo,
+                                                     GList                *uris,
+                                                     GAppLaunchContext    *context,
+                                                     GCancellable         *cancellable,
+                                                     GAsyncReadyCallback   callback,
+                                                     gpointer              user_data);
+GLIB_AVAILABLE_IN_2_60
+gboolean    g_app_info_launch_uris_finish           (GAppInfo             *appinfo,
+                                                     GAsyncResult         *result,
+                                                     GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_should_show                  (xapp_info_t             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_should_show                  (GAppInfo             *appinfo);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_set_as_default_for_type      (xapp_info_t             *appinfo,
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_set_as_default_for_type      (GAppInfo             *appinfo,
                                                      const char           *content_type,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_set_as_default_for_extension (xapp_info_t             *appinfo,
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_set_as_default_for_extension (GAppInfo             *appinfo,
                                                      const char           *extension,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_add_supports_type            (xapp_info_t             *appinfo,
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_add_supports_type            (GAppInfo             *appinfo,
                                                      const char           *content_type,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_can_remove_supports_type     (xapp_info_t             *appinfo);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_remove_supports_type         (xapp_info_t             *appinfo,
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_can_remove_supports_type     (GAppInfo             *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_remove_supports_type         (GAppInfo             *appinfo,
                                                      const char           *content_type,
-                                                     xerror_t              **error);
-XPL_AVAILABLE_IN_2_34
-const char **xapp_info_get_supported_types         (xapp_info_t             *appinfo);
+                                                     GError              **error);
+GLIB_AVAILABLE_IN_2_34
+const char **g_app_info_get_supported_types         (GAppInfo             *appinfo);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_can_delete                   (xapp_info_t   *appinfo);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_delete                       (xapp_info_t   *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_can_delete                   (GAppInfo   *appinfo);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_delete                       (GAppInfo   *appinfo);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xapp_info_set_as_last_used_for_type    (xapp_info_t             *appinfo,
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_app_info_set_as_last_used_for_type    (GAppInfo             *appinfo,
                                                      const char           *content_type,
-                                                     xerror_t              **error);
+                                                     GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xlist_t *   xapp_info_get_all                     (void);
-XPL_AVAILABLE_IN_ALL
-xlist_t *   xapp_info_get_all_for_type            (const char  *content_type);
-XPL_AVAILABLE_IN_ALL
-xlist_t *   xapp_info_get_recommended_for_type    (const xchar_t *content_type);
-XPL_AVAILABLE_IN_ALL
-xlist_t *   xapp_info_get_fallback_for_type       (const xchar_t *content_type);
+GLIB_AVAILABLE_IN_ALL
+GList *   g_app_info_get_all                     (void);
+GLIB_AVAILABLE_IN_ALL
+GList *   g_app_info_get_all_for_type            (const char  *content_type);
+GLIB_AVAILABLE_IN_ALL
+GList *   g_app_info_get_recommended_for_type    (const gchar *content_type);
+GLIB_AVAILABLE_IN_ALL
+GList *   g_app_info_get_fallback_for_type       (const gchar *content_type);
 
-XPL_AVAILABLE_IN_ALL
-void      xapp_info_reset_type_associations     (const char  *content_type);
-XPL_AVAILABLE_IN_ALL
-xapp_info_t *xapp_info_get_default_for_type        (const char  *content_type,
-                                                  xboolean_t     must_support_uris);
-XPL_AVAILABLE_IN_ALL
-xapp_info_t *xapp_info_get_default_for_uri_scheme  (const char  *uri_scheme);
+GLIB_AVAILABLE_IN_ALL
+void      g_app_info_reset_type_associations     (const char  *content_type);
+GLIB_AVAILABLE_IN_ALL
+GAppInfo *g_app_info_get_default_for_type        (const char  *content_type,
+                                                  gboolean     must_support_uris);
+GLIB_AVAILABLE_IN_ALL
+GAppInfo *g_app_info_get_default_for_uri_scheme  (const char  *uri_scheme);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t  xapp_info_launch_default_for_uri      (const char              *uri,
-                                                  xapp_launch_context_t       *context,
-                                                  xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean  g_app_info_launch_default_for_uri      (const char              *uri,
+                                                  GAppLaunchContext       *context,
+                                                  GError                 **error);
 
-XPL_AVAILABLE_IN_2_50
-void      xapp_info_launch_default_for_uri_async  (const char           *uri,
-                                                    xapp_launch_context_t    *context,
-                                                    xcancellable_t         *cancellable,
-                                                    xasync_ready_callback_t   callback,
-                                                    xpointer_t              user_data);
-XPL_AVAILABLE_IN_2_50
-xboolean_t  xapp_info_launch_default_for_uri_finish (xasync_result_t         *result,
-                                                    xerror_t              **error);
+GLIB_AVAILABLE_IN_2_50
+void      g_app_info_launch_default_for_uri_async  (const char           *uri,
+                                                    GAppLaunchContext    *context,
+                                                    GCancellable         *cancellable,
+                                                    GAsyncReadyCallback   callback,
+                                                    gpointer              user_data);
+GLIB_AVAILABLE_IN_2_50
+gboolean  g_app_info_launch_default_for_uri_finish (GAsyncResult         *result,
+                                                    GError              **error);
 
 
 /**
- * xapp_launch_context_t:
+ * GAppLaunchContext:
  *
  * Integrating the launch with the launching application. This is used to
  * handle for instance startup notification and launching the new application
@@ -272,30 +272,30 @@ xboolean_t  xapp_info_launch_default_for_uri_finish (xasync_result_t         *re
  */
 struct _GAppLaunchContext
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
-  xapp_launch_context_private_t *priv;
+  GAppLaunchContextPrivate *priv;
 };
 
 struct _GAppLaunchContextClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  char * (* get_display)           (xapp_launch_context_t *context,
-                                    xapp_info_t          *info,
-                                    xlist_t             *files);
-  char * (* get_startup_notify_id) (xapp_launch_context_t *context,
-                                    xapp_info_t          *info,
-                                    xlist_t             *files);
-  void   (* launch_failed)         (xapp_launch_context_t *context,
+  char * (* get_display)           (GAppLaunchContext *context,
+                                    GAppInfo          *info,
+                                    GList             *files);
+  char * (* get_startup_notify_id) (GAppLaunchContext *context,
+                                    GAppInfo          *info,
+                                    GList             *files);
+  void   (* launch_failed)         (GAppLaunchContext *context,
                                     const char        *startup_notify_id);
-  void   (* launched)              (xapp_launch_context_t *context,
-                                    xapp_info_t          *info,
-                                    xvariant_t          *platform_data);
-  void   (* launch_started)        (xapp_launch_context_t *context,
-                                    xapp_info_t          *info,
-                                    xvariant_t          *platform_data);
+  void   (* launched)              (GAppLaunchContext *context,
+                                    GAppInfo          *info,
+                                    GVariant          *platform_data);
+  void   (* launch_started)        (GAppLaunchContext *context,
+                                    GAppInfo          *info,
+                                    GVariant          *platform_data);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -303,46 +303,46 @@ struct _GAppLaunchContextClass
   void (*_g_reserved3) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t              xapp_launch_context_get_type              (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xapp_launch_context_t *xapp_launch_context_new                   (void);
+GLIB_AVAILABLE_IN_ALL
+GType              g_app_launch_context_get_type              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GAppLaunchContext *g_app_launch_context_new                   (void);
 
-XPL_AVAILABLE_IN_2_32
-void               xapp_launch_context_setenv                (xapp_launch_context_t *context,
+GLIB_AVAILABLE_IN_2_32
+void               g_app_launch_context_setenv                (GAppLaunchContext *context,
                                                                const char        *variable,
                                                                const char        *value);
-XPL_AVAILABLE_IN_2_32
-void               xapp_launch_context_unsetenv              (xapp_launch_context_t *context,
+GLIB_AVAILABLE_IN_2_32
+void               g_app_launch_context_unsetenv              (GAppLaunchContext *context,
                                                                const char        *variable);
-XPL_AVAILABLE_IN_2_32
-char **            xapp_launch_context_get_environment       (xapp_launch_context_t *context);
+GLIB_AVAILABLE_IN_2_32
+char **            g_app_launch_context_get_environment       (GAppLaunchContext *context);
 
-XPL_AVAILABLE_IN_ALL
-char *             xapp_launch_context_get_display           (xapp_launch_context_t *context,
-                                                               xapp_info_t          *info,
-                                                               xlist_t             *files);
-XPL_AVAILABLE_IN_ALL
-char *             xapp_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
-                                                               xapp_info_t          *info,
-                                                               xlist_t             *files);
-XPL_AVAILABLE_IN_ALL
-void               xapp_launch_context_launch_failed         (xapp_launch_context_t *context,
+GLIB_AVAILABLE_IN_ALL
+char *             g_app_launch_context_get_display           (GAppLaunchContext *context,
+                                                               GAppInfo          *info,
+                                                               GList             *files);
+GLIB_AVAILABLE_IN_ALL
+char *             g_app_launch_context_get_startup_notify_id (GAppLaunchContext *context,
+                                                               GAppInfo          *info,
+                                                               GList             *files);
+GLIB_AVAILABLE_IN_ALL
+void               g_app_launch_context_launch_failed         (GAppLaunchContext *context,
                                                                const char *       startup_notify_id);
 
-#define XTYPE_APP_INFO_MONITOR                             (xapp_info_monitor_get_type ())
-#define G_APP_INFO_MONITOR(inst)                            (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_APP_INFO_MONITOR, xapp_info_monitor_t))
-#define X_IS_APP_INFO_MONITOR(inst)                         (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_APP_INFO_MONITOR))
+#define G_TYPE_APP_INFO_MONITOR                             (g_app_info_monitor_get_type ())
+#define G_APP_INFO_MONITOR(inst)                            (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_APP_INFO_MONITOR, GAppInfoMonitor))
+#define G_IS_APP_INFO_MONITOR(inst)                         (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_APP_INFO_MONITOR))
 
-typedef struct _GAppInfoMonitor                             xapp_info_monitor_t;
+typedef struct _GAppInfoMonitor                             GAppInfoMonitor;
 
-XPL_AVAILABLE_IN_2_40
-xtype_t                   xapp_info_monitor_get_type                     (void);
+GLIB_AVAILABLE_IN_2_40
+GType                   g_app_info_monitor_get_type                     (void);
 
-XPL_AVAILABLE_IN_2_40
-xapp_info_monitor_t *       xapp_info_monitor_get                          (void);
+GLIB_AVAILABLE_IN_2_40
+GAppInfoMonitor *       g_app_info_monitor_get                          (void);
 
 G_END_DECLS
 

@@ -32,12 +32,12 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_VOLUME_MONITOR         (g_volume_monitor_get_type ())
-#define G_VOLUME_MONITOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_VOLUME_MONITOR, xvolume_monitor))
-#define G_VOLUME_MONITOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_VOLUME_MONITOR, GVolumeMonitorClass))
-#define G_VOLUME_MONITOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_VOLUME_MONITOR, GVolumeMonitorClass))
-#define X_IS_VOLUME_MONITOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_VOLUME_MONITOR))
-#define X_IS_VOLUME_MONITOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_VOLUME_MONITOR))
+#define G_TYPE_VOLUME_MONITOR         (g_volume_monitor_get_type ())
+#define G_VOLUME_MONITOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VOLUME_MONITOR, GVolumeMonitor))
+#define G_VOLUME_MONITOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VOLUME_MONITOR, GVolumeMonitorClass))
+#define G_VOLUME_MONITOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VOLUME_MONITOR, GVolumeMonitorClass))
+#define G_IS_VOLUME_MONITOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VOLUME_MONITOR))
+#define G_IS_VOLUME_MONITOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VOLUME_MONITOR))
 
 /**
  * G_VOLUME_MONITOR_EXTENSION_POINT_NAME:
@@ -48,75 +48,75 @@ G_BEGIN_DECLS
 #define G_VOLUME_MONITOR_EXTENSION_POINT_NAME "gio-volume-monitor"
 
 /**
- * xvolume_monitor_t:
+ * GVolumeMonitor:
  *
  * A Volume Monitor that watches for volume events.
  **/
 typedef struct _GVolumeMonitorClass GVolumeMonitorClass;
 
-struct _xvolume_monitor
+struct _GVolumeMonitor
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
-  xpointer_t priv;
+  gpointer priv;
 };
 
 struct _GVolumeMonitorClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /*< public >*/
   /* signals */
-  void      (* volume_added)         (xvolume_monitor_t *volume_monitor,
-                                      xvolume_t        *volume);
-  void      (* volume_removed)       (xvolume_monitor_t *volume_monitor,
-                                      xvolume_t        *volume);
-  void      (* volume_changed)       (xvolume_monitor_t *volume_monitor,
-                                      xvolume_t        *volume);
+  void      (* volume_added)         (GVolumeMonitor *volume_monitor,
+                                      GVolume        *volume);
+  void      (* volume_removed)       (GVolumeMonitor *volume_monitor,
+                                      GVolume        *volume);
+  void      (* volume_changed)       (GVolumeMonitor *volume_monitor,
+                                      GVolume        *volume);
 
-  void      (* mount_added)          (xvolume_monitor_t *volume_monitor,
-                                      xmount_t         *mount);
-  void      (* mount_removed)        (xvolume_monitor_t *volume_monitor,
-                                      xmount_t         *mount);
-  void      (* mount_pre_unmount)    (xvolume_monitor_t *volume_monitor,
-                                      xmount_t         *mount);
-  void      (* mount_changed)        (xvolume_monitor_t *volume_monitor,
-                                      xmount_t         *mount);
+  void      (* mount_added)          (GVolumeMonitor *volume_monitor,
+                                      GMount         *mount);
+  void      (* mount_removed)        (GVolumeMonitor *volume_monitor,
+                                      GMount         *mount);
+  void      (* mount_pre_unmount)    (GVolumeMonitor *volume_monitor,
+                                      GMount         *mount);
+  void      (* mount_changed)        (GVolumeMonitor *volume_monitor,
+                                      GMount         *mount);
 
-  void      (* drive_connected)      (xvolume_monitor_t *volume_monitor,
-                                      xdrive_t	     *drive);
-  void      (* drive_disconnected)   (xvolume_monitor_t *volume_monitor,
-                                      xdrive_t         *drive);
-  void      (* drive_changed)        (xvolume_monitor_t *volume_monitor,
-                                      xdrive_t         *drive);
+  void      (* drive_connected)      (GVolumeMonitor *volume_monitor,
+                                      GDrive	     *drive);
+  void      (* drive_disconnected)   (GVolumeMonitor *volume_monitor,
+                                      GDrive         *drive);
+  void      (* drive_changed)        (GVolumeMonitor *volume_monitor,
+                                      GDrive         *drive);
 
   /* Vtable */
 
-  xboolean_t  (* is_supported)         (void);
+  gboolean  (* is_supported)         (void);
 
-  xlist_t   * (* get_connected_drives) (xvolume_monitor_t *volume_monitor);
-  xlist_t   * (* get_volumes)          (xvolume_monitor_t *volume_monitor);
-  xlist_t   * (* get_mounts)           (xvolume_monitor_t *volume_monitor);
+  GList   * (* get_connected_drives) (GVolumeMonitor *volume_monitor);
+  GList   * (* get_volumes)          (GVolumeMonitor *volume_monitor);
+  GList   * (* get_mounts)           (GVolumeMonitor *volume_monitor);
 
-  xvolume_t * (* get_volume_for_uuid)  (xvolume_monitor_t *volume_monitor,
+  GVolume * (* get_volume_for_uuid)  (GVolumeMonitor *volume_monitor,
                                       const char     *uuid);
 
-  xmount_t  * (* get_mount_for_uuid)   (xvolume_monitor_t *volume_monitor,
+  GMount  * (* get_mount_for_uuid)   (GVolumeMonitor *volume_monitor,
                                       const char     *uuid);
 
 
   /* These arguments are unfortunately backwards by mistake (bug #520169). Deprecated in 2.20. */
-  xvolume_t * (* adopt_orphan_mount)   (xmount_t         *mount,
-                                      xvolume_monitor_t *volume_monitor);
+  GVolume * (* adopt_orphan_mount)   (GMount         *mount,
+                                      GVolumeMonitor *volume_monitor);
 
   /* signal added in 2.17 */
-  void      (* drive_eject_button)   (xvolume_monitor_t *volume_monitor,
-                                      xdrive_t         *drive);
+  void      (* drive_eject_button)   (GVolumeMonitor *volume_monitor,
+                                      GDrive         *drive);
 
   /* signal added in 2.21 */
-  void      (* drive_stop_button)   (xvolume_monitor_t *volume_monitor,
-                                     xdrive_t         *drive);
+  void      (* drive_stop_button)   (GVolumeMonitor *volume_monitor,
+                                     GDrive         *drive);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -128,26 +128,26 @@ struct _GVolumeMonitorClass
   void (*_g_reserved6) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           g_volume_monitor_get_type             (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType           g_volume_monitor_get_type             (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xvolume_monitor_t *g_volume_monitor_get                  (void);
-XPL_AVAILABLE_IN_ALL
-xlist_t *         g_volume_monitor_get_connected_drives (xvolume_monitor_t *volume_monitor);
-XPL_AVAILABLE_IN_ALL
-xlist_t *         g_volume_monitor_get_volumes          (xvolume_monitor_t *volume_monitor);
-XPL_AVAILABLE_IN_ALL
-xlist_t *         g_volume_monitor_get_mounts           (xvolume_monitor_t *volume_monitor);
-XPL_AVAILABLE_IN_ALL
-xvolume_t *       g_volume_monitor_get_volume_for_uuid  (xvolume_monitor_t *volume_monitor,
+GLIB_AVAILABLE_IN_ALL
+GVolumeMonitor *g_volume_monitor_get                  (void);
+GLIB_AVAILABLE_IN_ALL
+GList *         g_volume_monitor_get_connected_drives (GVolumeMonitor *volume_monitor);
+GLIB_AVAILABLE_IN_ALL
+GList *         g_volume_monitor_get_volumes          (GVolumeMonitor *volume_monitor);
+GLIB_AVAILABLE_IN_ALL
+GList *         g_volume_monitor_get_mounts           (GVolumeMonitor *volume_monitor);
+GLIB_AVAILABLE_IN_ALL
+GVolume *       g_volume_monitor_get_volume_for_uuid  (GVolumeMonitor *volume_monitor,
                                                        const char     *uuid);
-XPL_AVAILABLE_IN_ALL
-xmount_t *        g_volume_monitor_get_mount_for_uuid   (xvolume_monitor_t *volume_monitor,
+GLIB_AVAILABLE_IN_ALL
+GMount *        g_volume_monitor_get_mount_for_uuid   (GVolumeMonitor *volume_monitor,
                                                        const char     *uuid);
 
-XPL_DEPRECATED
-xvolume_t *       g_volume_monitor_adopt_orphan_mount   (xmount_t         *mount);
+GLIB_DEPRECATED
+GVolume *       g_volume_monitor_adopt_orphan_mount   (GMount         *mount);
 
 G_END_DECLS
 

@@ -25,39 +25,39 @@
 #include <glib-unix.h>
 #include <fam.h>
 
-static xmutex_t         fam_lock;
-static xboolean_t       fam_initialised;
+static GMutex         fam_lock;
+static gboolean       fam_initialised;
 static FAMConnection  fam_connection;
-static xsource_t       *fam_source;
+static GSource       *fam_source;
 
-#define XTYPE_FAM_FILE_MONITOR      (g_fam_file_monitor_get_type ())
-#define G_FAM_FILE_MONITOR(inst)     (XTYPE_CHECK_INSTANCE_CAST ((inst), \
-                                      XTYPE_FAM_FILE_MONITOR, GFamFileMonitor))
+#define G_TYPE_FAM_FILE_MONITOR      (g_fam_file_monitor_get_type ())
+#define G_FAM_FILE_MONITOR(inst)     (G_TYPE_CHECK_INSTANCE_CAST ((inst), \
+                                      G_TYPE_FAM_FILE_MONITOR, GFamFileMonitor))
 
-typedef xlocal_file_monitor_class_t GFamFileMonitorClass;
+typedef GLocalFileMonitorClass GFamFileMonitorClass;
 
 typedef struct
 {
-  xlocal_file_monitor_t parent_instance;
+  GLocalFileMonitor parent_instance;
 
   FAMRequest request;
 } GFamFileMonitor;
 
-static xtype_t g_fam_file_monitor_get_type (void);
-G_DEFINE_DYNAMIC_TYPE (GFamFileMonitor, g_fam_file_monitor, XTYPE_LOCAL_FILE_MONITOR)
+static GType g_fam_file_monitor_get_type (void);
+G_DEFINE_DYNAMIC_TYPE (GFamFileMonitor, g_fam_file_monitor, G_TYPE_LOCAL_FILE_MONITOR)
 
-static xboolean_t
-g_fam_file_monitor_callback (xint_t         fd,
-                             xio_condition_t condition,
-                             xpointer_t     user_data)
+static gboolean
+g_fam_file_monitor_callback (gint         fd,
+                             GIOCondition condition,
+                             gpointer     user_data)
 {
-  sint64_t now = xsource_get_time (fam_source);
+  gint64 now = g_source_get_time (fam_source);
 
   g_mutex_lock (&fam_lock);
 
   while (FAMPending (&fam_connection))
     {
-      const xchar_t *child;
+      const gchar *child;
       FAMEvent ev;
 
       if (FAMNextEvent (&fam_connection, &ev) != 1)
@@ -88,19 +88,19 @@ g_fam_file_monitor_callback (xint_t         fd,
       switch (ev.code)
         {
         case FAMAcknowledge:
-          xsource_unref (ev.userdata);
+          g_source_unref (ev.userdata);
           break;
 
         case FAMChanged:
-          xfile_monitor_source_handle_event (ev.userdata, XFILE_MONITOR_EVENT_CHANGED, child, NULL, NULL, now);
+          g_file_monitor_source_handle_event (ev.userdata, G_FILE_MONITOR_EVENT_CHANGED, child, NULL, NULL, now);
           break;
 
         case FAMDeleted:
-          xfile_monitor_source_handle_event (ev.userdata, XFILE_MONITOR_EVENT_DELETED, child, NULL, NULL, now);
+          g_file_monitor_source_handle_event (ev.userdata, G_FILE_MONITOR_EVENT_DELETED, child, NULL, NULL, now);
           break;
 
         case FAMCreated:
-          xfile_monitor_source_handle_event (ev.userdata, XFILE_MONITOR_EVENT_CREATED, child, NULL, NULL, now);
+          g_file_monitor_source_handle_event (ev.userdata, G_FILE_MONITOR_EVENT_CREATED, child, NULL, NULL, now);
           break;
 
         default:
@@ -114,7 +114,7 @@ g_fam_file_monitor_callback (xint_t         fd,
   return TRUE;
 }
 
-static xboolean_t
+static gboolean
 g_fam_file_monitor_is_supported (void)
 {
   g_mutex_lock (&fam_lock);
@@ -133,8 +133,8 @@ g_fam_file_monitor_is_supported (void)
 #endif
 
           fam_source = g_unix_fd_source_new (FAMCONNECTION_GETFD (&fam_connection), G_IO_IN);
-          xsource_set_callback (fam_source, (xsource_func_t) g_fam_file_monitor_callback, NULL, NULL);
-          xsource_attach (fam_source, XPL_PRIVATE_CALL(g_get_worker_context) ());
+          g_source_set_callback (fam_source, (GSourceFunc) g_fam_file_monitor_callback, NULL, NULL);
+          g_source_attach (fam_source, GLIB_PRIVATE_CALL(g_get_worker_context) ());
         }
     }
 
@@ -143,14 +143,14 @@ g_fam_file_monitor_is_supported (void)
   return fam_initialised;
 }
 
-static xboolean_t
-g_fam_file_monitor_cancel (xfile_monitor_t *monitor)
+static gboolean
+g_fam_file_monitor_cancel (GFileMonitor *monitor)
 {
   GFamFileMonitor *gffm = G_FAM_FILE_MONITOR (monitor);
 
   g_mutex_lock (&fam_lock);
 
-  xassert (fam_initialised);
+  g_assert (fam_initialised);
 
   FAMCancelMonitor (&fam_connection, &gffm->request);
 
@@ -160,19 +160,19 @@ g_fam_file_monitor_cancel (xfile_monitor_t *monitor)
 }
 
 static void
-g_fam_file_monitor_start (xlocal_file_monitor_t  *local_monitor,
-                          const xchar_t        *dirname,
-                          const xchar_t        *basename,
-                          const xchar_t        *filename,
+g_fam_file_monitor_start (GLocalFileMonitor  *local_monitor,
+                          const gchar        *dirname,
+                          const gchar        *basename,
+                          const gchar        *filename,
                           GFileMonitorSource *source)
 {
   GFamFileMonitor *gffm = G_FAM_FILE_MONITOR (local_monitor);
 
   g_mutex_lock (&fam_lock);
 
-  xassert (fam_initialised);
+  g_assert (fam_initialised);
 
-  xsource_ref ((xsource_t *) source);
+  g_source_ref ((GSource *) source);
 
   if (dirname)
     FAMMonitorDirectory (&fam_connection, dirname, &gffm->request, source);
@@ -190,7 +190,7 @@ g_fam_file_monitor_init (GFamFileMonitor* monitor)
 static void
 g_fam_file_monitor_class_init (GFamFileMonitorClass *class)
 {
-  xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (class);
+  GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (class);
 
   class->is_supported = g_fam_file_monitor_is_supported;
   class->start = g_fam_file_monitor_start;
@@ -203,27 +203,27 @@ g_fam_file_monitor_class_finalize (GFamFileMonitorClass *class)
 }
 
 void
-xio_module_load (xio_module_t *module)
+g_io_module_load (GIOModule *module)
 {
-  xtype_module_use (XTYPE_MODULE (module));
+  g_type_module_use (G_TYPE_MODULE (module));
 
-  g_fam_file_monitor_register_type (XTYPE_MODULE (module));
+  g_fam_file_monitor_register_type (G_TYPE_MODULE (module));
 
   g_io_extension_point_implement (G_LOCAL_FILE_MONITOR_EXTENSION_POINT_NAME,
-                                 XTYPE_FAM_FILE_MONITOR, "fam", 10);
+                                 G_TYPE_FAM_FILE_MONITOR, "fam", 10);
 
   g_io_extension_point_implement (G_NFS_FILE_MONITOR_EXTENSION_POINT_NAME,
-                                 XTYPE_FAM_FILE_MONITOR, "fam", 10);
+                                 G_TYPE_FAM_FILE_MONITOR, "fam", 10);
 }
 
 void
-xio_module_unload (xio_module_t *module)
+g_io_module_unload (GIOModule *module)
 {
   g_assert_not_reached ();
 }
 
 char **
-xio_module_query (void)
+g_io_module_query (void)
 {
   char *eps[] = {
     G_LOCAL_FILE_MONITOR_EXTENSION_POINT_NAME,
@@ -231,5 +231,5 @@ xio_module_query (void)
     NULL
   };
 
-  return xstrdupv (eps);
+  return g_strdupv (eps);
 }

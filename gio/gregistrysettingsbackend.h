@@ -22,7 +22,7 @@
 
 #include <glib-object.h>
 
-xtype_t g_registry_backend_get_type (void);
+GType g_registry_backend_get_type (void);
 
 
 #endif /* __G_REGISTRY_SETTINGS_BACKEND_H__ */

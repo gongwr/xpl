@@ -27,96 +27,96 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_CERTIFICATE            (xtls_certificate_get_type ())
-#define G_TLS_CERTIFICATE(inst)           (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_CERTIFICATE, xtls_certificate))
-#define G_TLS_CERTIFICATE_CLASS(class)    (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_TLS_CERTIFICATE, GTlsCertificateClass))
-#define X_IS_TLS_CERTIFICATE(inst)        (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TLS_CERTIFICATE))
-#define X_IS_TLS_CERTIFICATE_CLASS(class) (XTYPE_CHECK_CLASS_TYPE ((class), XTYPE_TLS_CERTIFICATE))
-#define G_TLS_CERTIFICATE_GET_CLASS(inst) (XTYPE_INSTANCE_GET_CLASS ((inst), XTYPE_TLS_CERTIFICATE, GTlsCertificateClass))
+#define G_TYPE_TLS_CERTIFICATE            (g_tls_certificate_get_type ())
+#define G_TLS_CERTIFICATE(inst)           (G_TYPE_CHECK_INSTANCE_CAST ((inst), G_TYPE_TLS_CERTIFICATE, GTlsCertificate))
+#define G_TLS_CERTIFICATE_CLASS(class)    (G_TYPE_CHECK_CLASS_CAST ((class), G_TYPE_TLS_CERTIFICATE, GTlsCertificateClass))
+#define G_IS_TLS_CERTIFICATE(inst)        (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_TLS_CERTIFICATE))
+#define G_IS_TLS_CERTIFICATE_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), G_TYPE_TLS_CERTIFICATE))
+#define G_TLS_CERTIFICATE_GET_CLASS(inst) (G_TYPE_INSTANCE_GET_CLASS ((inst), G_TYPE_TLS_CERTIFICATE, GTlsCertificateClass))
 
 typedef struct _GTlsCertificateClass   GTlsCertificateClass;
 typedef struct _GTlsCertificatePrivate GTlsCertificatePrivate;
 
 struct _GTlsCertificate {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   GTlsCertificatePrivate *priv;
 };
 
 struct _GTlsCertificateClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xtls_certificate_flags_t  (* verify) (xtls_certificate_t     *cert,
-				    xsocket_connectable_t  *identity,
-				    xtls_certificate_t     *trusted_ca);
+  GTlsCertificateFlags  (* verify) (GTlsCertificate     *cert,
+				    GSocketConnectable  *identity,
+				    GTlsCertificate     *trusted_ca);
 
   /*< private >*/
   /* Padding for future expansion */
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xtls_certificate_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_tls_certificate_get_type           (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t      *xtls_certificate_new_from_pem       (const xchar_t         *data,
-							    xssize_t               length,
-							    xerror_t             **error);
-XPL_AVAILABLE_IN_2_72
-xtls_certificate_t      *xtls_certificate_new_from_pkcs12      (const xuint8_t      *data,
-                                                              xsize_t              length,
-                                                              const xchar_t       *password,
-                                                              xerror_t           **error);
-XPL_AVAILABLE_IN_2_72
-xtls_certificate_t      *xtls_certificate_new_from_file_with_password (const xchar_t  *file,
-                                                                     const xchar_t  *password,
-                                                                     xerror_t      **error);
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t      *xtls_certificate_new_from_file      (const xchar_t         *file,
-							    xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t      *xtls_certificate_new_from_files     (const xchar_t         *cert_file,
-							    const xchar_t         *key_file,
-							    xerror_t             **error);
-XPL_AVAILABLE_IN_2_68
-xtls_certificate_t      *xtls_certificate_new_from_pkcs11_uris (const xchar_t       *pkcs11_uri,
-                                                              const xchar_t       *private_key_pkcs11_uri,
-                                                              xerror_t           **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate      *g_tls_certificate_new_from_pem       (const gchar         *data,
+							    gssize               length,
+							    GError             **error);
+GLIB_AVAILABLE_IN_2_72
+GTlsCertificate      *g_tls_certificate_new_from_pkcs12      (const guint8      *data,
+                                                              gsize              length,
+                                                              const gchar       *password,
+                                                              GError           **error);
+GLIB_AVAILABLE_IN_2_72
+GTlsCertificate      *g_tls_certificate_new_from_file_with_password (const gchar  *file,
+                                                                     const gchar  *password,
+                                                                     GError      **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate      *g_tls_certificate_new_from_file      (const gchar         *file,
+							    GError             **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate      *g_tls_certificate_new_from_files     (const gchar         *cert_file,
+							    const gchar         *key_file,
+							    GError             **error);
+GLIB_AVAILABLE_IN_2_68
+GTlsCertificate      *g_tls_certificate_new_from_pkcs11_uris (const gchar       *pkcs11_uri,
+                                                              const gchar       *private_key_pkcs11_uri,
+                                                              GError           **error);
 
-XPL_AVAILABLE_IN_ALL
-xlist_t                *xtls_certificate_list_new_from_file (const xchar_t         *file,
-							    xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+GList                *g_tls_certificate_list_new_from_file (const gchar         *file,
+							    GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t      *xtls_certificate_get_issuer         (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate      *g_tls_certificate_get_issuer         (GTlsCertificate     *cert);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_flags_t  xtls_certificate_verify             (xtls_certificate_t     *cert,
-							    xsocket_connectable_t  *identity,
-							    xtls_certificate_t     *trusted_ca);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificateFlags  g_tls_certificate_verify             (GTlsCertificate     *cert,
+							    GSocketConnectable  *identity,
+							    GTlsCertificate     *trusted_ca);
 
-XPL_AVAILABLE_IN_2_34
-xboolean_t              xtls_certificate_is_same            (xtls_certificate_t     *cert_one,
-                                                            xtls_certificate_t     *cert_two);
+GLIB_AVAILABLE_IN_2_34
+gboolean              g_tls_certificate_is_same            (GTlsCertificate     *cert_one,
+                                                            GTlsCertificate     *cert_two);
 
-XPL_AVAILABLE_IN_2_70
-xdatetime_t            *xtls_certificate_get_not_valid_before (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_2_70
+GDateTime            *g_tls_certificate_get_not_valid_before (GTlsCertificate     *cert);
 
-XPL_AVAILABLE_IN_2_70
-xdatetime_t            *xtls_certificate_get_not_valid_after  (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_2_70
+GDateTime            *g_tls_certificate_get_not_valid_after  (GTlsCertificate     *cert);
 
-XPL_AVAILABLE_IN_2_70
-xchar_t                *xtls_certificate_get_subject_name     (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_2_70
+gchar                *g_tls_certificate_get_subject_name     (GTlsCertificate     *cert);
 
-XPL_AVAILABLE_IN_2_70
-xchar_t                *xtls_certificate_get_issuer_name      (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_2_70
+gchar                *g_tls_certificate_get_issuer_name      (GTlsCertificate     *cert);
 
-XPL_AVAILABLE_IN_2_70
-xptr_array_t            *xtls_certificate_get_dns_names        (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_2_70
+GPtrArray            *g_tls_certificate_get_dns_names        (GTlsCertificate     *cert);
 
-XPL_AVAILABLE_IN_2_70
-xptr_array_t            *xtls_certificate_get_ip_addresses     (xtls_certificate_t     *cert);
+GLIB_AVAILABLE_IN_2_70
+GPtrArray            *g_tls_certificate_get_ip_addresses     (GTlsCertificate     *cert);
 
 G_END_DECLS
 

@@ -29,17 +29,17 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKS5_PROXY         (_g_socks5_proxy_get_type ())
-#define G_SOCKS5_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKS5_PROXY, GSocks5Proxy))
-#define G_SOCKS5_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SOCKS5_PROXY, GSocks5ProxyClass))
-#define X_IS_SOCKS5_PROXY(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SOCKS5_PROXY))
-#define X_IS_SOCKS5_PROXY_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_SOCKS5_PROXY))
-#define G_SOCKS5_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SOCKS5_PROXY, GSocks5ProxyClass))
+#define G_TYPE_SOCKS5_PROXY         (_g_socks5_proxy_get_type ())
+#define G_SOCKS5_PROXY(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_SOCKS5_PROXY, GSocks5Proxy))
+#define G_SOCKS5_PROXY_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_SOCKS5_PROXY, GSocks5ProxyClass))
+#define G_IS_SOCKS5_PROXY(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_SOCKS5_PROXY))
+#define G_IS_SOCKS5_PROXY_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_SOCKS5_PROXY))
+#define G_SOCKS5_PROXY_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_SOCKS5_PROXY, GSocks5ProxyClass))
 
 typedef struct _GSocks5Proxy	    GSocks5Proxy;
 typedef struct _GSocks5ProxyClass   GSocks5ProxyClass;
 
-xtype_t _g_socks5_proxy_get_type (void);
+GType _g_socks5_proxy_get_type (void);
 
 G_END_DECLS
 

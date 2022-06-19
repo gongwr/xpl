@@ -23,8 +23,8 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_MEMORY_MONITOR_DBUS         (xmemory_monitor_dbus_get_type ())
-G_DECLARE_FINAL_TYPE (GMemoryMonitorDBus, xmemory_monitor_dbus, G, MEMORY_MONITOR_DBUS, xobject_t)
+#define G_TYPE_MEMORY_MONITOR_DBUS         (g_memory_monitor_dbus_get_type ())
+G_DECLARE_FINAL_TYPE (GMemoryMonitorDBus, g_memory_monitor_dbus, G, MEMORY_MONITOR_DBUS, GObject)
 
 G_END_DECLS
 

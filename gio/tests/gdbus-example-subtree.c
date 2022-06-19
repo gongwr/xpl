@@ -4,13 +4,13 @@
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static xdbus_node_info_t *introspection_data = NULL;
-static xdbus_interface_info_t *manager_interface_info = NULL;
-static xdbus_interface_info_t *block_interface_info = NULL;
-static xdbus_interface_info_t *partition_interface_info = NULL;
+static GDBusNodeInfo *introspection_data = NULL;
+static GDBusInterfaceInfo *manager_interface_info = NULL;
+static GDBusInterfaceInfo *block_interface_info = NULL;
+static GDBusInterfaceInfo *partition_interface_info = NULL;
 
 /* Introspection data for the service we are exporting */
-static const xchar_t introspection_xml[] =
+static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='org.gtk.GDBus.Example.Manager'>"
   "    <method name='Hello'>"
@@ -40,35 +40,35 @@ static const xchar_t introspection_xml[] =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-manager_method_call (xdbus_connection_t       *connection,
-                     const xchar_t           *sender,
-                     const xchar_t           *object_path,
-                     const xchar_t           *interface_name,
-                     const xchar_t           *method_name,
-                     xvariant_t              *parameters,
-                     xdbus_method_invocation_t *invocation,
-                     xpointer_t               user_data)
+manager_method_call (GDBusConnection       *connection,
+                     const gchar           *sender,
+                     const gchar           *object_path,
+                     const gchar           *interface_name,
+                     const gchar           *method_name,
+                     GVariant              *parameters,
+                     GDBusMethodInvocation *invocation,
+                     gpointer               user_data)
 {
-  const xchar_t *greeting;
-  xchar_t *response;
+  const gchar *greeting;
+  gchar *response;
 
   g_assert_cmpstr (interface_name, ==, "org.gtk.GDBus.Example.Manager");
   g_assert_cmpstr (method_name, ==, "Hello");
 
-  xvariant_get (parameters, "(&s)", &greeting);
+  g_variant_get (parameters, "(&s)", &greeting);
 
-  response = xstrdup_printf ("Method %s.%s with user_data '%s' on object path %s called with arg '%s'",
+  response = g_strdup_printf ("Method %s.%s with user_data '%s' on object path %s called with arg '%s'",
                               interface_name,
                               method_name,
-                              (const xchar_t *) user_data,
+                              (const gchar *) user_data,
                               object_path,
                               greeting);
-  xdbus_method_invocation_return_value (invocation,
-                                         xvariant_new ("(s)", response));
+  g_dbus_method_invocation_return_value (invocation,
+                                         g_variant_new ("(s)", response));
   g_free (response);
 }
 
-const xdbus_interface_vtable_t manager_vtable =
+const GDBusInterfaceVTable manager_vtable =
 {
   manager_method_call,
   NULL,                 /* get_property */
@@ -79,37 +79,37 @@ const xdbus_interface_vtable_t manager_vtable =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-block_method_call (xdbus_connection_t       *connection,
-                   const xchar_t           *sender,
-                   const xchar_t           *object_path,
-                   const xchar_t           *interface_name,
-                   const xchar_t           *method_name,
-                   xvariant_t              *parameters,
-                   xdbus_method_invocation_t *invocation,
-                   xpointer_t               user_data)
+block_method_call (GDBusConnection       *connection,
+                   const gchar           *sender,
+                   const gchar           *object_path,
+                   const gchar           *interface_name,
+                   const gchar           *method_name,
+                   GVariant              *parameters,
+                   GDBusMethodInvocation *invocation,
+                   gpointer               user_data)
 {
   g_assert_cmpstr (interface_name, ==, "org.gtk.GDBus.Example.Block");
 
-  if (xstrcmp0 (method_name, "Hello") == 0)
+  if (g_strcmp0 (method_name, "Hello") == 0)
     {
-      const xchar_t *greeting;
-      xchar_t *response;
+      const gchar *greeting;
+      gchar *response;
 
-      xvariant_get (parameters, "(&s)", &greeting);
+      g_variant_get (parameters, "(&s)", &greeting);
 
-      response = xstrdup_printf ("Method %s.%s with user_data '%s' on object path %s called with arg '%s'",
+      response = g_strdup_printf ("Method %s.%s with user_data '%s' on object path %s called with arg '%s'",
                                   interface_name,
                                   method_name,
-                                  (const xchar_t *) user_data,
+                                  (const gchar *) user_data,
                                   object_path,
                                   greeting);
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_new ("(s)", response));
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_new ("(s)", response));
       g_free (response);
     }
-  else if (xstrcmp0 (method_name, "DoStuff") == 0)
+  else if (g_strcmp0 (method_name, "DoStuff") == 0)
     {
-      xdbus_method_invocation_return_dbus_error (invocation,
+      g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.gtk.GDBus.TestSubtree.Error.Failed",
                                                   "This method intentionally always fails");
     }
@@ -119,22 +119,22 @@ block_method_call (xdbus_connection_t       *connection,
     }
 }
 
-static xvariant_t *
-block_get_property (xdbus_connection_t  *connection,
-                    const xchar_t      *sender,
-                    const xchar_t      *object_path,
-                    const xchar_t      *interface_name,
-                    const xchar_t      *property_name,
-                    xerror_t          **error,
-                    xpointer_t          user_data)
+static GVariant *
+block_get_property (GDBusConnection  *connection,
+                    const gchar      *sender,
+                    const gchar      *object_path,
+                    const gchar      *interface_name,
+                    const gchar      *property_name,
+                    GError          **error,
+                    gpointer          user_data)
 {
-  xvariant_t *ret;
-  const xchar_t *node;
-  xint_t major;
-  xint_t minor;
+  GVariant *ret;
+  const gchar *node;
+  gint major;
+  gint minor;
 
   node = strrchr (object_path, '/') + 1;
-  if (xstr_has_prefix (node, "sda"))
+  if (g_str_has_prefix (node, "sda"))
     major = 8;
   else
     major = 9;
@@ -144,15 +144,15 @@ block_get_property (xdbus_connection_t  *connection,
     minor = 0;
 
   ret = NULL;
-  if (xstrcmp0 (property_name, "Major") == 0)
+  if (g_strcmp0 (property_name, "Major") == 0)
     {
-      ret = xvariant_new_int32 (major);
+      ret = g_variant_new_int32 (major);
     }
-  else if (xstrcmp0 (property_name, "Minor") == 0)
+  else if (g_strcmp0 (property_name, "Minor") == 0)
     {
-      ret = xvariant_new_int32 (minor);
+      ret = g_variant_new_int32 (minor);
     }
-  else if (xstrcmp0 (property_name, "Notes") == 0)
+  else if (g_strcmp0 (property_name, "Notes") == 0)
     {
       g_set_error (error,
                    G_IO_ERROR,
@@ -169,21 +169,21 @@ block_get_property (xdbus_connection_t  *connection,
   return ret;
 }
 
-static xboolean_t
-block_set_property (xdbus_connection_t  *connection,
-                    const xchar_t      *sender,
-                    const xchar_t      *object_path,
-                    const xchar_t      *interface_name,
-                    const xchar_t      *property_name,
-                    xvariant_t         *value,
-                    xerror_t          **error,
-                    xpointer_t          user_data)
+static gboolean
+block_set_property (GDBusConnection  *connection,
+                    const gchar      *sender,
+                    const gchar      *object_path,
+                    const gchar      *interface_name,
+                    const gchar      *property_name,
+                    GVariant         *value,
+                    GError          **error,
+                    gpointer          user_data)
 {
   /* TODO */
   g_assert_not_reached ();
 }
 
-const xdbus_interface_vtable_t block_vtable =
+const GDBusInterfaceVTable block_vtable =
 {
   block_method_call,
   block_get_property,
@@ -194,35 +194,35 @@ const xdbus_interface_vtable_t block_vtable =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-partition_method_call (xdbus_connection_t       *connection,
-                       const xchar_t           *sender,
-                       const xchar_t           *object_path,
-                       const xchar_t           *interface_name,
-                       const xchar_t           *method_name,
-                       xvariant_t              *parameters,
-                       xdbus_method_invocation_t *invocation,
-                       xpointer_t               user_data)
+partition_method_call (GDBusConnection       *connection,
+                       const gchar           *sender,
+                       const gchar           *object_path,
+                       const gchar           *interface_name,
+                       const gchar           *method_name,
+                       GVariant              *parameters,
+                       GDBusMethodInvocation *invocation,
+                       gpointer               user_data)
 {
-  const xchar_t *greeting;
-  xchar_t *response;
+  const gchar *greeting;
+  gchar *response;
 
   g_assert_cmpstr (interface_name, ==, "org.gtk.GDBus.Example.Partition");
   g_assert_cmpstr (method_name, ==, "Hello");
 
-  xvariant_get (parameters, "(&s)", &greeting);
+  g_variant_get (parameters, "(&s)", &greeting);
 
-  response = xstrdup_printf ("Method %s.%s with user_data '%s' on object path %s called with arg '%s'",
+  response = g_strdup_printf ("Method %s.%s with user_data '%s' on object path %s called with arg '%s'",
                               interface_name,
                               method_name,
-                              (const xchar_t *) user_data,
+                              (const gchar *) user_data,
                               object_path,
                               greeting);
-  xdbus_method_invocation_return_value (invocation,
-                                         xvariant_new ("(s)", response));
+  g_dbus_method_invocation_return_value (invocation,
+                                         g_variant_new ("(s)", response));
   g_free (response);
 }
 
-const xdbus_interface_vtable_t partition_vtable =
+const GDBusInterfaceVTable partition_vtable =
 {
   partition_method_call,
   NULL,
@@ -232,70 +232,70 @@ const xdbus_interface_vtable_t partition_vtable =
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static xchar_t **
-subtree_enumerate (xdbus_connection_t       *connection,
-                   const xchar_t           *sender,
-                   const xchar_t           *object_path,
-                   xpointer_t               user_data)
+static gchar **
+subtree_enumerate (GDBusConnection       *connection,
+                   const gchar           *sender,
+                   const gchar           *object_path,
+                   gpointer               user_data)
 {
-  xchar_t **nodes;
-  xptr_array_t *p;
+  gchar **nodes;
+  GPtrArray *p;
 
-  p = xptr_array_new ();
-  xptr_array_add (p, xstrdup ("sda"));
-  xptr_array_add (p, xstrdup ("sda1"));
-  xptr_array_add (p, xstrdup ("sda2"));
-  xptr_array_add (p, xstrdup ("sda3"));
-  xptr_array_add (p, xstrdup ("sdb"));
-  xptr_array_add (p, xstrdup ("sdb1"));
-  xptr_array_add (p, xstrdup ("sdc"));
-  xptr_array_add (p, xstrdup ("sdc1"));
-  xptr_array_add (p, NULL);
-  nodes = (xchar_t **) xptr_array_free (p, FALSE);
+  p = g_ptr_array_new ();
+  g_ptr_array_add (p, g_strdup ("sda"));
+  g_ptr_array_add (p, g_strdup ("sda1"));
+  g_ptr_array_add (p, g_strdup ("sda2"));
+  g_ptr_array_add (p, g_strdup ("sda3"));
+  g_ptr_array_add (p, g_strdup ("sdb"));
+  g_ptr_array_add (p, g_strdup ("sdb1"));
+  g_ptr_array_add (p, g_strdup ("sdc"));
+  g_ptr_array_add (p, g_strdup ("sdc1"));
+  g_ptr_array_add (p, NULL);
+  nodes = (gchar **) g_ptr_array_free (p, FALSE);
 
   return nodes;
 }
 
-static xdbus_interface_info_t **
-subtree_introspect (xdbus_connection_t       *connection,
-                    const xchar_t           *sender,
-                    const xchar_t           *object_path,
-                    const xchar_t           *node,
-                    xpointer_t               user_data)
+static GDBusInterfaceInfo **
+subtree_introspect (GDBusConnection       *connection,
+                    const gchar           *sender,
+                    const gchar           *object_path,
+                    const gchar           *node,
+                    gpointer               user_data)
 {
-  xptr_array_t *p;
+  GPtrArray *p;
 
-  p = xptr_array_new ();
+  p = g_ptr_array_new ();
   if (node == NULL)
     {
-      xptr_array_add (p, g_dbus_interface_info_ref (manager_interface_info));
+      g_ptr_array_add (p, g_dbus_interface_info_ref (manager_interface_info));
     }
   else
     {
-      xptr_array_add (p, g_dbus_interface_info_ref (block_interface_info));
+      g_ptr_array_add (p, g_dbus_interface_info_ref (block_interface_info));
       if (strlen (node) == 4)
-        xptr_array_add (p,
+        g_ptr_array_add (p,
                          g_dbus_interface_info_ref (partition_interface_info));
     }
 
-  xptr_array_add (p, NULL);
+  g_ptr_array_add (p, NULL);
 
-  return (xdbus_interface_info_t **) xptr_array_free (p, FALSE);
+  return (GDBusInterfaceInfo **) g_ptr_array_free (p, FALSE);
 }
 
-static const xdbus_interface_vtable_t *
-subtree_dispatch (xdbus_connection_t             *connection,
-                  const xchar_t                 *sender,
-                  const xchar_t                 *object_path,
-                  const xchar_t                 *interface_name,
-                  const xchar_t                 *node,
-                  xpointer_t                    *out_user_data,
-                  xpointer_t                     user_data)
+static const GDBusInterfaceVTable *
+subtree_dispatch (GDBusConnection             *connection,
+                  const gchar                 *sender,
+                  const gchar                 *object_path,
+                  const gchar                 *interface_name,
+                  const gchar                 *node,
+                  gpointer                    *out_user_data,
+                  gpointer                     user_data)
 {
-  const xdbus_interface_vtable_t *vtable_to_return;
-  xpointer_t user_data_to_return;
+  const GDBusInterfaceVTable *vtable_to_return;
+  gpointer user_data_to_return;
 
-  if (xstrcmp0 (interface_name, "org.gtk.GDBus.Example.Manager") == 0)
+  if (g_strcmp0 (interface_name, "org.gtk.GDBus.Example.Manager") == 0)
     {
       user_data_to_return = "The Root";
       vtable_to_return = &manager_vtable;
@@ -307,9 +307,9 @@ subtree_dispatch (xdbus_connection_t             *connection,
       else
         user_data_to_return = "A block device";
 
-      if (xstrcmp0 (interface_name, "org.gtk.GDBus.Example.Block") == 0)
+      if (g_strcmp0 (interface_name, "org.gtk.GDBus.Example.Block") == 0)
         vtable_to_return = &block_vtable;
-      else if (xstrcmp0 (interface_name, "org.gtk.GDBus.Example.Partition") == 0)
+      else if (g_strcmp0 (interface_name, "org.gtk.GDBus.Example.Partition") == 0)
         vtable_to_return = &partition_vtable;
       else
         g_assert_not_reached ();
@@ -320,7 +320,7 @@ subtree_dispatch (xdbus_connection_t             *connection,
   return vtable_to_return;
 }
 
-const xdbus_subtree_vtable_t subtree_vtable =
+const GDBusSubtreeVTable subtree_vtable =
 {
   subtree_enumerate,
   subtree_introspect,
@@ -331,33 +331,33 @@ const xdbus_subtree_vtable_t subtree_vtable =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-on_bus_acquired (xdbus_connection_t *connection,
-                 const xchar_t     *name,
-                 xpointer_t         user_data)
+on_bus_acquired (GDBusConnection *connection,
+                 const gchar     *name,
+                 gpointer         user_data)
 {
-  xuint_t registration_id;
+  guint registration_id;
 
-  registration_id = xdbus_connection_register_subtree (connection,
+  registration_id = g_dbus_connection_register_subtree (connection,
                                                         "/org/gtk/GDBus/TestSubtree/Devices",
                                                         &subtree_vtable,
                                                         G_DBUS_SUBTREE_FLAGS_NONE,
                                                         NULL,  /* user_data */
                                                         NULL,  /* user_data_free_func */
-                                                        NULL); /* xerror_t** */
-  xassert (registration_id > 0);
+                                                        NULL); /* GError** */
+  g_assert (registration_id > 0);
 }
 
 static void
-on_name_acquired (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  xpointer_t         user_data)
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
 {
 }
 
 static void
-on_name_lost (xdbus_connection_t *connection,
-              const xchar_t     *name,
-              xpointer_t         user_data)
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
 {
   exit (1);
 }
@@ -365,22 +365,22 @@ on_name_lost (xdbus_connection_t *connection,
 int
 main (int argc, char *argv[])
 {
-  xuint_t owner_id;
-  xmain_loop_t *loop;
+  guint owner_id;
+  GMainLoop *loop;
 
   /* We are lazy here - we don't want to manually provide
    * the introspection data structures - so we just build
    * them from XML.
    */
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  xassert (introspection_data != NULL);
+  g_assert (introspection_data != NULL);
 
   manager_interface_info = g_dbus_node_info_lookup_interface (introspection_data, "org.gtk.GDBus.Example.Manager");
   block_interface_info = g_dbus_node_info_lookup_interface (introspection_data, "org.gtk.GDBus.Example.Block");
   partition_interface_info = g_dbus_node_info_lookup_interface (introspection_data, "org.gtk.GDBus.Example.Partition");
-  xassert (manager_interface_info != NULL);
-  xassert (block_interface_info != NULL);
-  xassert (partition_interface_info != NULL);
+  g_assert (manager_interface_info != NULL);
+  g_assert (block_interface_info != NULL);
+  g_assert (partition_interface_info != NULL);
 
   owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                              "org.gtk.GDBus.TestSubtree",
@@ -391,8 +391,8 @@ main (int argc, char *argv[])
                              NULL,
                              NULL);
 
-  loop = xmain_loop_new (NULL, FALSE);
-  xmain_loop_run (loop);
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
 
   g_bus_unown_name (owner_id);
 

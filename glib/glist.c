@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -39,25 +39,25 @@
  * @title: Doubly-Linked Lists
  * @short_description: linked lists that can be iterated over in both directions
  *
- * The #xlist_t structure and its associated functions provide a standard
+ * The #GList structure and its associated functions provide a standard
  * doubly-linked list data structure. The benefit of this data-structure
  * is to provide insertion/deletion operations in O(1) complexity where
- * access/search operations are in O(n). The benefit of #xlist_t over
- * #xslist_t (singly linked list) is that the worst case on access/search
+ * access/search operations are in O(n). The benefit of #GList over
+ * #GSList (singly linked list) is that the worst case on access/search
  * operations is divided by two which comes at a cost in space as we need
  * to retain two pointers in place of one.
  *
  * Each element in the list contains a piece of data, together with
  * pointers which link to the previous and next elements in the list.
  * Using these pointers it is possible to move through the list in both
- * directions (unlike the singly-linked [xslist_t][glib-Singly-Linked-Lists],
+ * directions (unlike the singly-linked [GSList][glib-Singly-Linked-Lists],
  * which only allows movement through the list in the forward direction).
  *
- * The double linked list does not keep track of the number of items
+ * The double linked list does not keep track of the number of items 
  * and does not keep track of both the start and end of the list. If
- * you want fast access to both the start and the end of the list,
+ * you want fast access to both the start and the end of the list, 
  * and/or the number of items in the list, use a
- * [xqueue_t][glib-Double-ended-Queues] instead.
+ * [GQueue][glib-Double-ended-Queues] instead.
  *
  * The data contained in each element can be either integer values, by
  * using one of the [Type Conversion Macros][glib-Type-Conversion-Macros],
@@ -66,74 +66,74 @@
  * List elements are allocated from the [slice allocator][glib-Memory-Slices],
  * which is more efficient than allocating elements individually.
  *
- * Note that most of the #xlist_t functions expect to be passed a pointer
+ * Note that most of the #GList functions expect to be passed a pointer
  * to the first element in the list. The functions which insert
  * elements return the new start of the list, which may have changed.
  *
- * There is no function to create a #xlist_t. %NULL is considered to be
- * a valid, empty list so you simply set a #xlist_t* to %NULL to initialize
+ * There is no function to create a #GList. %NULL is considered to be
+ * a valid, empty list so you simply set a #GList* to %NULL to initialize
  * it.
  *
- * To add elements, use xlist_append(), xlist_prepend(),
- * xlist_insert() and xlist_insert_sorted().
+ * To add elements, use g_list_append(), g_list_prepend(),
+ * g_list_insert() and g_list_insert_sorted().
  *
  * To visit all elements in the list, use a loop over the list:
  * |[<!-- language="C" -->
- * xlist_t *l;
+ * GList *l;
  * for (l = list; l != NULL; l = l->next)
  *   {
  *     // do something with l->data
  *   }
  * ]|
  *
- * To call a function for each element in the list, use xlist_foreach().
+ * To call a function for each element in the list, use g_list_foreach().
  *
  * To loop over the list and modify it (e.g. remove a certain element)
  * a while loop is more appropriate, for example:
  * |[<!-- language="C" -->
- * xlist_t *l = list;
+ * GList *l = list;
  * while (l != NULL)
  *   {
- *     xlist_t *next = l->next;
+ *     GList *next = l->next;
  *     if (should_be_removed (l))
  *       {
  *         // possibly free l->data
- *         list = xlist_delete_link (list, l);
+ *         list = g_list_delete_link (list, l);
  *       }
  *     l = next;
  *   }
  * ]|
  *
- * To remove elements, use xlist_remove().
+ * To remove elements, use g_list_remove().
  *
- * To navigate in a list, use xlist_first(), xlist_last(),
- * xlist_next(), xlist_previous().
+ * To navigate in a list, use g_list_first(), g_list_last(),
+ * g_list_next(), g_list_previous().
  *
- * To find elements in the list use xlist_nth(), xlist_nth_data(),
- * xlist_find() and xlist_find_custom().
+ * To find elements in the list use g_list_nth(), g_list_nth_data(),
+ * g_list_find() and g_list_find_custom().
  *
- * To find the index of an element use xlist_position() and
- * xlist_index().
+ * To find the index of an element use g_list_position() and
+ * g_list_index().
  *
- * To free the entire list, use xlist_free() or xlist_free_full().
+ * To free the entire list, use g_list_free() or g_list_free_full().
  */
 
 /**
- * xlist_t:
+ * GList:
  * @data: holds the element's data, which can be a pointer to any kind
- *        of data, or any integer value using the
+ *        of data, or any integer value using the 
  *        [Type Conversion Macros][glib-Type-Conversion-Macros]
  * @next: contains the link to the next element in the list
  * @prev: contains the link to the previous element in the list
  *
- * The #xlist_t struct is used for each element in a doubly-linked list.
+ * The #GList struct is used for each element in a doubly-linked list.
  **/
 
 /**
- * xlist_previous:
- * @list: an element in a #xlist_t
+ * g_list_previous:
+ * @list: an element in a #GList
  *
- * A convenience macro to get the previous element in a #xlist_t.
+ * A convenience macro to get the previous element in a #GList.
  * Note that it is considered perfectly acceptable to access
  * @list->prev directly.
  *
@@ -142,85 +142,85 @@
  **/
 
 /**
- * xlist_next:
- * @list: an element in a #xlist_t
+ * g_list_next:
+ * @list: an element in a #GList
  *
- * A convenience macro to get the next element in a #xlist_t.
+ * A convenience macro to get the next element in a #GList.
  * Note that it is considered perfectly acceptable to access
  * @list->next directly.
  *
  * Returns: the next element, or %NULL if there are no more elements
  **/
 
-#define _xlist_alloc()         g_slice_new (xlist_t)
-#define _xlist_alloc0()        g_slice_new0 (xlist_t)
-#define _xlist_free1(list)     g_slice_free (xlist_t, list)
+#define _g_list_alloc()         g_slice_new (GList)
+#define _g_list_alloc0()        g_slice_new0 (GList)
+#define _g_list_free1(list)     g_slice_free (GList, list)
 
 /**
- * xlist_alloc:
+ * g_list_alloc:
  *
- * Allocates space for one #xlist_t element. It is called by
- * xlist_append(), xlist_prepend(), xlist_insert() and
- * xlist_insert_sorted() and so is rarely used on its own.
+ * Allocates space for one #GList element. It is called by
+ * g_list_append(), g_list_prepend(), g_list_insert() and
+ * g_list_insert_sorted() and so is rarely used on its own.
  *
- * Returns: a pointer to the newly-allocated #xlist_t element
+ * Returns: a pointer to the newly-allocated #GList element
  **/
-xlist_t *
-xlist_alloc (void)
+GList *
+g_list_alloc (void)
 {
-  return _xlist_alloc0 ();
+  return _g_list_alloc0 ();
 }
 
 /**
- * xlist_free:
- * @list: the first link of a #xlist_t
+ * g_list_free: 
+ * @list: the first link of a #GList
  *
- * Frees all of the memory used by a #xlist_t.
+ * Frees all of the memory used by a #GList.
  * The freed elements are returned to the slice allocator.
  *
  * If list elements contain dynamically-allocated memory, you should
- * either use xlist_free_full() or free them manually first.
+ * either use g_list_free_full() or free them manually first.
  *
  * It can be combined with g_steal_pointer() to ensure the list head pointer
  * is not left dangling:
  * |[<!-- language="C" -->
- * xlist_t *list_of_borrowed_things = …;  /<!-- -->* (transfer container) *<!-- -->/
- * xlist_free (g_steal_pointer (&list_of_borrowed_things));
+ * GList *list_of_borrowed_things = …;  /<!-- -->* (transfer container) *<!-- -->/
+ * g_list_free (g_steal_pointer (&list_of_borrowed_things));
  * ]|
  */
 void
-xlist_free (xlist_t *list)
+g_list_free (GList *list)
 {
-  g_slice_free_chain (xlist_t, list, next);
+  g_slice_free_chain (GList, list, next);
 }
 
 /**
- * xlist_free_1:
- * @list: a #xlist_t element
+ * g_list_free_1:
+ * @list: a #GList element
  *
- * Frees one #xlist_t element, but does not update links from the next and
+ * Frees one #GList element, but does not update links from the next and
  * previous elements in the list, so you should not call this function on an
  * element that is currently part of a list.
  *
- * It is usually used after xlist_remove_link().
+ * It is usually used after g_list_remove_link().
  */
 /**
- * xlist_free1:
+ * g_list_free1:
  *
- * Another name for xlist_free_1().
+ * Another name for g_list_free_1().
  **/
 void
-xlist_free_1 (xlist_t *list)
+g_list_free_1 (GList *list)
 {
-  _xlist_free1 (list);
+  _g_list_free1 (list);
 }
 
 /**
- * xlist_free_full:
- * @list: the first link of a #xlist_t
+ * g_list_free_full:
+ * @list: the first link of a #GList
  * @free_func: the function to be called to free each element's data
  *
- * Convenience method, which frees all the memory used by a #xlist_t,
+ * Convenience method, which frees all the memory used by a #GList,
  * and calls @free_func on every element's data.
  *
  * @free_func must not modify the list (eg, by removing the freed
@@ -231,23 +231,23 @@ xlist_free_1 (xlist_t *list)
  * is cleared before any of the list elements are freed, to prevent double frees
  * from @free_func:
  * |[<!-- language="C" -->
- * xlist_t *list_of_owned_things = …;  /<!-- -->* (transfer full) (element-type xobject_t) *<!-- -->/
- * xlist_free_full (g_steal_pointer (&list_of_owned_things), xobject_unref);
+ * GList *list_of_owned_things = …;  /<!-- -->* (transfer full) (element-type GObject) *<!-- -->/
+ * g_list_free_full (g_steal_pointer (&list_of_owned_things), g_object_unref);
  * ]|
  *
  * Since: 2.28
  */
 void
-xlist_free_full (xlist_t          *list,
-                  xdestroy_notify_t  free_func)
+g_list_free_full (GList          *list,
+                  GDestroyNotify  free_func)
 {
-  xlist_foreach (list, (GFunc) free_func, NULL);
-  xlist_free (list);
+  g_list_foreach (list, (GFunc) free_func, NULL);
+  g_list_free (list);
 }
 
 /**
- * xlist_append:
- * @list: a pointer to a #xlist_t
+ * g_list_append:
+ * @list: a pointer to a #GList
  * @data: the data for the new element
  *
  * Adds a new element on to the end of the list.
@@ -255,41 +255,41 @@ xlist_free_full (xlist_t          *list,
  * Note that the return value is the new start of the list,
  * if @list was empty; make sure you store the new value.
  *
- * xlist_append() has to traverse the entire list to find the end,
+ * g_list_append() has to traverse the entire list to find the end,
  * which is inefficient when adding multiple elements. A common idiom
- * to avoid the inefficiency is to use xlist_prepend() and reverse
- * the list with xlist_reverse() when all elements have been added.
+ * to avoid the inefficiency is to use g_list_prepend() and reverse
+ * the list with g_list_reverse() when all elements have been added.
  *
  * |[<!-- language="C" -->
  * // Notice that these are initialized to the empty list.
- * xlist_t *string_list = NULL, *number_list = NULL;
+ * GList *string_list = NULL, *number_list = NULL;
  *
  * // This is a list of strings.
- * string_list = xlist_append (string_list, "first");
- * string_list = xlist_append (string_list, "second");
- *
+ * string_list = g_list_append (string_list, "first");
+ * string_list = g_list_append (string_list, "second");
+ * 
  * // This is a list of integers.
- * number_list = xlist_append (number_list, GINT_TO_POINTER (27));
- * number_list = xlist_append (number_list, GINT_TO_POINTER (14));
+ * number_list = g_list_append (number_list, GINT_TO_POINTER (27));
+ * number_list = g_list_append (number_list, GINT_TO_POINTER (14));
  * ]|
  *
- * Returns: either @list or the new start of the #xlist_t if @list was %NULL
+ * Returns: either @list or the new start of the #GList if @list was %NULL
  */
-xlist_t *
-xlist_append (xlist_t    *list,
-               xpointer_t  data)
+GList *
+g_list_append (GList    *list,
+               gpointer  data)
 {
-  xlist_t *new_list;
-  xlist_t *last;
-
-  new_list = _xlist_alloc ();
+  GList *new_list;
+  GList *last;
+  
+  new_list = _g_list_alloc ();
   new_list->data = data;
   new_list->next = NULL;
-
+  
   if (list)
     {
-      last = xlist_last (list);
-      /* xassert (last != NULL); */
+      last = g_list_last (list);
+      /* g_assert (last != NULL); */
       last->next = new_list;
       new_list->prev = last;
 
@@ -303,39 +303,39 @@ xlist_append (xlist_t    *list,
 }
 
 /**
- * xlist_prepend:
- * @list: a pointer to a #xlist_t, this must point to the top of the list
+ * g_list_prepend:
+ * @list: a pointer to a #GList, this must point to the top of the list
  * @data: the data for the new element
  *
  * Prepends a new element on to the start of the list.
  *
  * Note that the return value is the new start of the list,
- * which will have changed, so make sure you store the new value.
+ * which will have changed, so make sure you store the new value. 
  *
  * |[<!-- language="C" -->
  * // Notice that it is initialized to the empty list.
- * xlist_t *list = NULL;
+ * GList *list = NULL;
  *
- * list = xlist_prepend (list, "last");
- * list = xlist_prepend (list, "first");
+ * list = g_list_prepend (list, "last");
+ * list = g_list_prepend (list, "first");
  * ]|
  *
  * Do not use this function to prepend a new element to a different
- * element than the start of the list. Use xlist_insert_before() instead.
+ * element than the start of the list. Use g_list_insert_before() instead.
  *
- * Returns: a pointer to the newly prepended element, which is the new
- *     start of the #xlist_t
+ * Returns: a pointer to the newly prepended element, which is the new 
+ *     start of the #GList
  */
-xlist_t *
-xlist_prepend (xlist_t    *list,
-                xpointer_t  data)
+GList *
+g_list_prepend (GList    *list,
+                gpointer  data)
 {
-  xlist_t *new_list;
-
-  new_list = _xlist_alloc ();
+  GList *new_list;
+  
+  new_list = _g_list_alloc ();
   new_list->data = data;
   new_list->next = list;
-
+  
   if (list)
     {
       new_list->prev = list->prev;
@@ -345,40 +345,40 @@ xlist_prepend (xlist_t    *list,
     }
   else
     new_list->prev = NULL;
-
+  
   return new_list;
 }
 
 /**
- * xlist_insert:
- * @list: a pointer to a #xlist_t, this must point to the top of the list
+ * g_list_insert:
+ * @list: a pointer to a #GList, this must point to the top of the list
  * @data: the data for the new element
- * @position: the position to insert the element. If this is
- *     negative, or is larger than the number of elements in the
+ * @position: the position to insert the element. If this is 
+ *     negative, or is larger than the number of elements in the 
  *     list, the new element is added on to the end of the list.
- *
+ * 
  * Inserts a new element into the list at the given position.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_insert (xlist_t    *list,
-               xpointer_t  data,
-               xint_t      position)
+GList *
+g_list_insert (GList    *list,
+               gpointer  data,
+               gint      position)
 {
-  xlist_t *new_list;
-  xlist_t *tmp_list;
+  GList *new_list;
+  GList *tmp_list;
 
   if (position < 0)
-    return xlist_append (list, data);
+    return g_list_append (list, data);
   else if (position == 0)
-    return xlist_prepend (list, data);
+    return g_list_prepend (list, data);
 
-  tmp_list = xlist_nth (list, position);
+  tmp_list = g_list_nth (list, position);
   if (!tmp_list)
-    return xlist_append (list, data);
+    return g_list_append (list, data);
 
-  new_list = _xlist_alloc ();
+  new_list = _g_list_alloc ();
   new_list->data = data;
   new_list->prev = tmp_list->prev;
   tmp_list->prev->next = new_list;
@@ -389,8 +389,8 @@ xlist_insert (xlist_t    *list,
 }
 
 /**
- * xlist_insert_before_link:
- * @list: a pointer to a #xlist_t, this must point to the top of the list
+ * g_list_insert_before_link:
+ * @list: a pointer to a #GList, this must point to the top of the list
  * @sibling: (nullable): the list element before which the new element
  *     is inserted or %NULL to insert at the end of the list
  * @link_: the list element to be added, which must not be part of
@@ -398,22 +398,22 @@ xlist_insert (xlist_t    *list,
  *
  * Inserts @link_ into the list before the given position.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  *
  * Since: 2.62
  */
-xlist_t *
-xlist_insert_before_link (xlist_t *list,
-                           xlist_t *sibling,
-                           xlist_t *link_)
+GList *
+g_list_insert_before_link (GList *list,
+                           GList *sibling,
+                           GList *link_)
 {
-  xreturn_val_if_fail (link_ != NULL, list);
-  xreturn_val_if_fail (link_->prev == NULL, list);
-  xreturn_val_if_fail (link_->next == NULL, list);
+  g_return_val_if_fail (link_ != NULL, list);
+  g_return_val_if_fail (link_->prev == NULL, list);
+  g_return_val_if_fail (link_->next == NULL, list);
 
   if (list == NULL)
     {
-      xreturn_val_if_fail (sibling == NULL, list);
+      g_return_val_if_fail (sibling == NULL, list);
       return link_;
     }
   else if (sibling != NULL)
@@ -428,13 +428,13 @@ xlist_insert_before_link (xlist_t *list,
         }
       else
         {
-          xreturn_val_if_fail (sibling == list, link_);
+          g_return_val_if_fail (sibling == list, link_);
           return link_;
         }
     }
   else
     {
-      xlist_t *last;
+      GList *last;
 
       for (last = list; last->next != NULL; last = last->next) {}
 
@@ -447,33 +447,33 @@ xlist_insert_before_link (xlist_t *list,
 }
 
 /**
- * xlist_insert_before:
- * @list: a pointer to a #xlist_t, this must point to the top of the list
- * @sibling: the list element before which the new element
+ * g_list_insert_before:
+ * @list: a pointer to a #GList, this must point to the top of the list
+ * @sibling: the list element before which the new element 
  *     is inserted or %NULL to insert at the end of the list
  * @data: the data for the new element
  *
  * Inserts a new element into the list before the given position.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_insert_before (xlist_t    *list,
-                      xlist_t    *sibling,
-                      xpointer_t  data)
+GList *
+g_list_insert_before (GList    *list,
+                      GList    *sibling,
+                      gpointer  data)
 {
   if (list == NULL)
     {
-      list = xlist_alloc ();
+      list = g_list_alloc ();
       list->data = data;
-      xreturn_val_if_fail (sibling == NULL, list);
+      g_return_val_if_fail (sibling == NULL, list);
       return list;
     }
   else if (sibling != NULL)
     {
-      xlist_t *node;
+      GList *node;
 
-      node = _xlist_alloc ();
+      node = _g_list_alloc ();
       node->data = data;
       node->prev = sibling->prev;
       node->next = sibling;
@@ -485,17 +485,17 @@ xlist_insert_before (xlist_t    *list,
         }
       else
         {
-          xreturn_val_if_fail (sibling == list, node);
+          g_return_val_if_fail (sibling == list, node);
           return node;
         }
     }
   else
     {
-      xlist_t *last;
+      GList *last;
 
       for (last = list; last->next != NULL; last = last->next) {}
 
-      last->next = _xlist_alloc ();
+      last->next = _g_list_alloc ();
       last->next->data = data;
       last->next->prev = last;
       last->next->next = NULL;
@@ -505,46 +505,46 @@ xlist_insert_before (xlist_t    *list,
 }
 
 /**
- * xlist_concat:
- * @list1: a #xlist_t, this must point to the top of the list
- * @list2: the #xlist_t to add to the end of the first #xlist_t,
+ * g_list_concat:
+ * @list1: a #GList, this must point to the top of the list
+ * @list2: the #GList to add to the end of the first #GList,
  *     this must point  to the top of the list
  *
- * Adds the second #xlist_t onto the end of the first #xlist_t.
- * Note that the elements of the second #xlist_t are not copied.
+ * Adds the second #GList onto the end of the first #GList.
+ * Note that the elements of the second #GList are not copied.
  * They are used directly.
  *
  * This function is for example used to move an element in the list.
  * The following example moves an element to the top of the list:
  * |[<!-- language="C" -->
- * list = xlist_remove_link (list, llink);
- * list = xlist_concat (llink, list);
+ * list = g_list_remove_link (list, llink);
+ * list = g_list_concat (llink, list);
  * ]|
  *
- * Returns: the start of the new #xlist_t, which equals @list1 if not %NULL
+ * Returns: the start of the new #GList, which equals @list1 if not %NULL 
  */
-xlist_t *
-xlist_concat (xlist_t *list1,
-               xlist_t *list2)
+GList *
+g_list_concat (GList *list1,
+               GList *list2)
 {
-  xlist_t *tmp_list;
-
+  GList *tmp_list;
+  
   if (list2)
     {
-      tmp_list = xlist_last (list1);
+      tmp_list = g_list_last (list1);
       if (tmp_list)
         tmp_list->next = list2;
       else
         list1 = list2;
       list2->prev = tmp_list;
     }
-
+  
   return list1;
 }
 
-static inline xlist_t *
-_xlist_remove_link (xlist_t *list,
-                     xlist_t *link)
+static inline GList *
+_g_list_remove_link (GList *list,
+                     GList *link)
 {
   if (link == NULL)
     return list;
@@ -574,21 +574,21 @@ _xlist_remove_link (xlist_t *list,
 }
 
 /**
- * xlist_remove:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_remove:
+ * @list: a #GList, this must point to the top of the list
  * @data: the data of the element to remove
  *
- * Removes an element from a #xlist_t.
+ * Removes an element from a #GList.
  * If two elements contain the same data, only the first is removed.
- * If none of the elements contain the data, the #xlist_t is unchanged.
+ * If none of the elements contain the data, the #GList is unchanged.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_remove (xlist_t         *list,
-               xconstpointer  data)
+GList *
+g_list_remove (GList         *list,
+               gconstpointer  data)
 {
-  xlist_t *tmp;
+  GList *tmp;
 
   tmp = list;
   while (tmp)
@@ -597,8 +597,8 @@ xlist_remove (xlist_t         *list,
         tmp = tmp->next;
       else
         {
-          list = _xlist_remove_link (list, tmp);
-          _xlist_free1 (tmp);
+          list = _g_list_remove_link (list, tmp);
+          _g_list_free1 (tmp);
 
           break;
         }
@@ -607,22 +607,22 @@ xlist_remove (xlist_t         *list,
 }
 
 /**
- * xlist_remove_all:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_remove_all:
+ * @list: a #GList, this must point to the top of the list
  * @data: data to remove
  *
  * Removes all list nodes with data equal to @data.
  * Returns the new head of the list. Contrast with
- * xlist_remove() which removes only the first node
+ * g_list_remove() which removes only the first node
  * matching the given data.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_remove_all (xlist_t         *list,
-                   xconstpointer  data)
+GList *
+g_list_remove_all (GList         *list,
+                   gconstpointer  data)
 {
-  xlist_t *tmp = list;
+  GList *tmp = list;
 
   while (tmp)
     {
@@ -630,7 +630,7 @@ xlist_remove_all (xlist_t         *list,
         tmp = tmp->next;
       else
         {
-          xlist_t *next = tmp->next;
+          GList *next = tmp->next;
 
           if (tmp->prev)
             tmp->prev->next = next;
@@ -639,7 +639,7 @@ xlist_remove_all (xlist_t         *list,
           if (next)
             next->prev = tmp->prev;
 
-          _xlist_free1 (tmp);
+          _g_list_free1 (tmp);
           tmp = next;
         }
     }
@@ -647,81 +647,81 @@ xlist_remove_all (xlist_t         *list,
 }
 
 /**
- * xlist_remove_link:
- * @list: a #xlist_t, this must point to the top of the list
- * @llink: an element in the #xlist_t
+ * g_list_remove_link:
+ * @list: a #GList, this must point to the top of the list
+ * @llink: an element in the #GList
  *
- * Removes an element from a #xlist_t, without freeing the element.
- * The removed element's prev and next links are set to %NULL, so
+ * Removes an element from a #GList, without freeing the element.
+ * The removed element's prev and next links are set to %NULL, so 
  * that it becomes a self-contained list with one element.
  *
  * This function is for example used to move an element in the list
- * (see the example for xlist_concat()) or to remove an element in
+ * (see the example for g_list_concat()) or to remove an element in
  * the list before freeing its data:
- * |[<!-- language="C" -->
- * list = xlist_remove_link (list, llink);
+ * |[<!-- language="C" --> 
+ * list = g_list_remove_link (list, llink);
  * free_some_data_that_may_access_the_list_again (llink->data);
- * xlist_free (llink);
+ * g_list_free (llink);
  * ]|
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_remove_link (xlist_t *list,
-                    xlist_t *llink)
+GList *
+g_list_remove_link (GList *list,
+                    GList *llink)
 {
-  return _xlist_remove_link (list, llink);
+  return _g_list_remove_link (list, llink);
 }
 
 /**
- * xlist_delete_link:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_delete_link:
+ * @list: a #GList, this must point to the top of the list
  * @link_: node to delete from @list
  *
- * Removes the node link_ from the list and frees it.
- * Compare this to xlist_remove_link() which removes the node
+ * Removes the node link_ from the list and frees it. 
+ * Compare this to g_list_remove_link() which removes the node 
  * without freeing it.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_delete_link (xlist_t *list,
-                    xlist_t *link_)
+GList *
+g_list_delete_link (GList *list,
+                    GList *link_)
 {
-  list = _xlist_remove_link (list, link_);
-  _xlist_free1 (link_);
+  list = _g_list_remove_link (list, link_);
+  _g_list_free1 (link_);
 
   return list;
 }
 
 /**
- * xlist_copy:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_copy:
+ * @list: a #GList, this must point to the top of the list
  *
- * Copies a #xlist_t.
+ * Copies a #GList.
  *
- * Note that this is a "shallow" copy. If the list elements
- * consist of pointers to data, the pointers are copied but
- * the actual data is not. See xlist_copy_deep() if you need
+ * Note that this is a "shallow" copy. If the list elements 
+ * consist of pointers to data, the pointers are copied but 
+ * the actual data is not. See g_list_copy_deep() if you need
  * to copy the data as well.
  *
  * Returns: the start of the new list that holds the same data as @list
  */
-xlist_t *
-xlist_copy (xlist_t *list)
+GList *
+g_list_copy (GList *list)
 {
-  return xlist_copy_deep (list, NULL, NULL);
+  return g_list_copy_deep (list, NULL, NULL);
 }
 
 /**
- * xlist_copy_deep:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_copy_deep:
+ * @list: a #GList, this must point to the top of the list
  * @func: a copy function used to copy every element in the list
  * @user_data: user data passed to the copy function @func, or %NULL
  *
- * Makes a full (deep) copy of a #xlist_t.
+ * Makes a full (deep) copy of a #GList.
  *
- * In contrast with xlist_copy(), this function uses @func to make
+ * In contrast with g_list_copy(), this function uses @func to make
  * a copy of each list element, in addition to copying the list
  * container itself.
  *
@@ -732,32 +732,32 @@ xlist_copy (xlist_t *list)
  * `-Wcast-function-type` warning.
  *
  * For instance, if @list holds a list of GObjects, you can do:
- * |[<!-- language="C" -->
- * another_list = xlist_copy_deep (list, (GCopyFunc) xobject_ref, NULL);
+ * |[<!-- language="C" -->   
+ * another_list = g_list_copy_deep (list, (GCopyFunc) g_object_ref, NULL);
  * ]|
  *
  * And, to entirely free the new list, you could do:
- * |[<!-- language="C" -->
- * xlist_free_full (another_list, xobject_unref);
+ * |[<!-- language="C" --> 
+ * g_list_free_full (another_list, g_object_unref);
  * ]|
  *
- * Returns: the start of the new list that holds a full copy of @list,
- *     use xlist_free_full() to free it
+ * Returns: the start of the new list that holds a full copy of @list, 
+ *     use g_list_free_full() to free it
  *
  * Since: 2.34
  */
-xlist_t *
-xlist_copy_deep (xlist_t     *list,
+GList *
+g_list_copy_deep (GList     *list,
                   GCopyFunc  func,
-                  xpointer_t   user_data)
+                  gpointer   user_data)
 {
-  xlist_t *new_list = NULL;
+  GList *new_list = NULL;
 
   if (list)
     {
-      xlist_t *last;
+      GList *last;
 
-      new_list = _xlist_alloc ();
+      new_list = _g_list_alloc ();
       if (func)
         new_list->data = func (list->data, user_data);
       else
@@ -767,7 +767,7 @@ xlist_copy_deep (xlist_t     *list,
       list = list->next;
       while (list)
         {
-          last->next = _xlist_alloc ();
+          last->next = _g_list_alloc ();
           last->next->prev = last;
           last = last->next;
           if (func)
@@ -783,19 +783,19 @@ xlist_copy_deep (xlist_t     *list,
 }
 
 /**
- * xlist_reverse:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_reverse:
+ * @list: a #GList, this must point to the top of the list
  *
- * Reverses a #xlist_t.
+ * Reverses a #GList.
  * It simply switches the next and prev pointers of each element.
  *
- * Returns: the start of the reversed #xlist_t
+ * Returns: the start of the reversed #GList
  */
-xlist_t *
-xlist_reverse (xlist_t *list)
+GList *
+g_list_reverse (GList *list)
 {
-  xlist_t *last;
-
+  GList *last;
+  
   last = NULL;
   while (list)
     {
@@ -804,90 +804,90 @@ xlist_reverse (xlist_t *list)
       last->next = last->prev;
       last->prev = list;
     }
-
+  
   return last;
 }
 
 /**
- * xlist_nth:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_nth:
+ * @list: a #GList, this must point to the top of the list
  * @n: the position of the element, counting from 0
  *
- * Gets the element at the given position in a #xlist_t.
+ * Gets the element at the given position in a #GList.
  *
  * This iterates over the list until it reaches the @n-th position. If you
  * intend to iterate over every element, it is better to use a for-loop as
- * described in the #xlist_t introduction.
+ * described in the #GList introduction.
  *
- * Returns: the element, or %NULL if the position is off
- *     the end of the #xlist_t
+ * Returns: the element, or %NULL if the position is off 
+ *     the end of the #GList
  */
-xlist_t *
-xlist_nth (xlist_t *list,
-            xuint_t  n)
+GList *
+g_list_nth (GList *list,
+            guint  n)
 {
   while ((n-- > 0) && list)
     list = list->next;
-
+  
   return list;
 }
 
 /**
- * xlist_nth_prev:
- * @list: a #xlist_t
+ * g_list_nth_prev:
+ * @list: a #GList
  * @n: the position of the element, counting from 0
  *
  * Gets the element @n places before @list.
  *
- * Returns: the element, or %NULL if the position is
- *     off the end of the #xlist_t
+ * Returns: the element, or %NULL if the position is 
+ *     off the end of the #GList
  */
-xlist_t *
-xlist_nth_prev (xlist_t *list,
-                 xuint_t  n)
+GList *
+g_list_nth_prev (GList *list,
+                 guint  n)
 {
   while ((n-- > 0) && list)
     list = list->prev;
-
+  
   return list;
 }
 
 /**
- * xlist_nth_data:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_nth_data:
+ * @list: a #GList, this must point to the top of the list
  * @n: the position of the element
  *
  * Gets the data of the element at the given position.
  *
  * This iterates over the list until it reaches the @n-th position. If you
  * intend to iterate over every element, it is better to use a for-loop as
- * described in the #xlist_t introduction.
+ * described in the #GList introduction.
  *
- * Returns: the element's data, or %NULL if the position
- *     is off the end of the #xlist_t
+ * Returns: the element's data, or %NULL if the position 
+ *     is off the end of the #GList
  */
-xpointer_t
-xlist_nth_data (xlist_t *list,
-                 xuint_t  n)
+gpointer
+g_list_nth_data (GList *list,
+                 guint  n)
 {
   while ((n-- > 0) && list)
     list = list->next;
-
+  
   return list ? list->data : NULL;
 }
 
 /**
- * xlist_find:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_find:
+ * @list: a #GList, this must point to the top of the list
  * @data: the element data to find
  *
- * Finds the element in a #xlist_t which contains the given data.
+ * Finds the element in a #GList which contains the given data.
  *
- * Returns: the found #xlist_t element, or %NULL if it is not found
+ * Returns: the found #GList element, or %NULL if it is not found
  */
-xlist_t *
-xlist_find (xlist_t         *list,
-             xconstpointer  data)
+GList *
+g_list_find (GList         *list,
+             gconstpointer  data)
 {
   while (list)
     {
@@ -895,32 +895,32 @@ xlist_find (xlist_t         *list,
         break;
       list = list->next;
     }
-
+  
   return list;
 }
 
 /**
- * xlist_find_custom:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_find_custom:
+ * @list: a #GList, this must point to the top of the list
  * @data: user data passed to the function
- * @func: the function to call for each element.
+ * @func: the function to call for each element. 
  *     It should return 0 when the desired element is found
  *
- * Finds an element in a #xlist_t, using a supplied function to
- * find the desired element. It iterates over the list, calling
- * the given function which should return 0 when the desired
- * element is found. The function takes two #xconstpointer arguments,
- * the #xlist_t element's data as the first argument and the
+ * Finds an element in a #GList, using a supplied function to 
+ * find the desired element. It iterates over the list, calling 
+ * the given function which should return 0 when the desired 
+ * element is found. The function takes two #gconstpointer arguments, 
+ * the #GList element's data as the first argument and the 
  * given user data.
  *
- * Returns: the found #xlist_t element, or %NULL if it is not found
+ * Returns: the found #GList element, or %NULL if it is not found
  */
-xlist_t *
-xlist_find_custom (xlist_t         *list,
-                    xconstpointer  data,
+GList *
+g_list_find_custom (GList         *list,
+                    gconstpointer  data,
                     GCompareFunc   func)
 {
-  xreturn_val_if_fail (func != NULL, list);
+  g_return_val_if_fail (func != NULL, list);
 
   while (list)
     {
@@ -933,21 +933,21 @@ xlist_find_custom (xlist_t         *list,
 }
 
 /**
- * xlist_position:
- * @list: a #xlist_t, this must point to the top of the list
- * @llink: an element in the #xlist_t
+ * g_list_position:
+ * @list: a #GList, this must point to the top of the list
+ * @llink: an element in the #GList
  *
- * Gets the position of the given element
- * in the #xlist_t (starting from 0).
+ * Gets the position of the given element 
+ * in the #GList (starting from 0).
  *
- * Returns: the position of the element in the #xlist_t,
+ * Returns: the position of the element in the #GList, 
  *     or -1 if the element is not found
  */
-xint_t
-xlist_position (xlist_t *list,
-                 xlist_t *llink)
+gint
+g_list_position (GList *list,
+                 GList *llink)
 {
-  xint_t i;
+  gint i;
 
   i = 0;
   while (list)
@@ -962,21 +962,21 @@ xlist_position (xlist_t *list,
 }
 
 /**
- * xlist_index:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_index:
+ * @list: a #GList, this must point to the top of the list
  * @data: the data to find
  *
- * Gets the position of the element containing
+ * Gets the position of the element containing 
  * the given data (starting from 0).
  *
- * Returns: the index of the element containing the data,
+ * Returns: the index of the element containing the data, 
  *     or -1 if the data is not found
  */
-xint_t
-xlist_index (xlist_t         *list,
-              xconstpointer  data)
+gint
+g_list_index (GList         *list,
+              gconstpointer  data)
 {
-  xint_t i;
+  gint i;
 
   i = 0;
   while (list)
@@ -991,82 +991,82 @@ xlist_index (xlist_t         *list,
 }
 
 /**
- * xlist_last:
- * @list: any #xlist_t element
+ * g_list_last:
+ * @list: any #GList element
  *
- * Gets the last element in a #xlist_t.
+ * Gets the last element in a #GList.
  *
- * Returns: the last element in the #xlist_t,
- *     or %NULL if the #xlist_t has no elements
+ * Returns: the last element in the #GList,
+ *     or %NULL if the #GList has no elements
  */
-xlist_t *
-xlist_last (xlist_t *list)
+GList *
+g_list_last (GList *list)
 {
   if (list)
     {
       while (list->next)
         list = list->next;
     }
-
+  
   return list;
 }
 
 /**
- * xlist_first:
- * @list: any #xlist_t element
+ * g_list_first:
+ * @list: any #GList element
  *
- * Gets the first element in a #xlist_t.
+ * Gets the first element in a #GList.
  *
- * Returns: the first element in the #xlist_t,
- *     or %NULL if the #xlist_t has no elements
+ * Returns: the first element in the #GList, 
+ *     or %NULL if the #GList has no elements
  */
-xlist_t *
-xlist_first (xlist_t *list)
+GList *
+g_list_first (GList *list)
 {
   if (list)
     {
       while (list->prev)
         list = list->prev;
     }
-
+  
   return list;
 }
 
 /**
- * xlist_length:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_length:
+ * @list: a #GList, this must point to the top of the list
  *
- * Gets the number of elements in a #xlist_t.
+ * Gets the number of elements in a #GList.
  *
  * This function iterates over the whole list to count its elements.
- * Use a #xqueue_t instead of a xlist_t if you regularly need the number
+ * Use a #GQueue instead of a GList if you regularly need the number
  * of items. To check whether the list is non-empty, it is faster to check
  * @list against %NULL.
  *
- * Returns: the number of elements in the #xlist_t
+ * Returns: the number of elements in the #GList
  */
-xuint_t
-xlist_length (xlist_t *list)
+guint
+g_list_length (GList *list)
 {
-  xuint_t length;
-
+  guint length;
+  
   length = 0;
   while (list)
     {
       length++;
       list = list->next;
     }
-
+  
   return length;
 }
 
 /**
- * xlist_foreach:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_foreach:
+ * @list: a #GList, this must point to the top of the list
  * @func: the function to call with each element's data
  * @user_data: user data to pass to the function
  *
- * Calls a function for each element of a #xlist_t.
+ * Calls a function for each element of a #GList.
  *
  * It is safe for @func to remove the element from @list, but it must
  * not modify any part of the list after that element.
@@ -1074,43 +1074,43 @@ xlist_length (xlist_t *list)
 /**
  * GFunc:
  * @data: the element's data
- * @user_data: user data passed to xlist_foreach() or xslist_foreach()
+ * @user_data: user data passed to g_list_foreach() or g_slist_foreach()
  *
- * Specifies the type of functions passed to xlist_foreach() and
- * xslist_foreach().
+ * Specifies the type of functions passed to g_list_foreach() and
+ * g_slist_foreach().
  */
 void
-xlist_foreach (xlist_t    *list,
+g_list_foreach (GList    *list,
                 GFunc     func,
-                xpointer_t  user_data)
+                gpointer  user_data)
 {
   while (list)
     {
-      xlist_t *next = list->next;
+      GList *next = list->next;
       (*func) (list->data, user_data);
       list = next;
     }
 }
 
-static xlist_t*
-xlist_insert_sorted_real (xlist_t    *list,
-                           xpointer_t  data,
+static GList*
+g_list_insert_sorted_real (GList    *list,
+                           gpointer  data,
                            GFunc     func,
-                           xpointer_t  user_data)
+                           gpointer  user_data)
 {
-  xlist_t *tmp_list = list;
-  xlist_t *new_list;
-  xint_t cmp;
+  GList *tmp_list = list;
+  GList *new_list;
+  gint cmp;
 
-  xreturn_val_if_fail (func != NULL, list);
-
-  if (!list)
+  g_return_val_if_fail (func != NULL, list);
+  
+  if (!list) 
     {
-      new_list = _xlist_alloc0 ();
+      new_list = _g_list_alloc0 ();
       new_list->data = data;
       return new_list;
     }
-
+  
   cmp = ((GCompareDataFunc) func) (data, tmp_list->data, user_data);
 
   while ((tmp_list->next) && (cmp > 0))
@@ -1120,7 +1120,7 @@ xlist_insert_sorted_real (xlist_t    *list,
       cmp = ((GCompareDataFunc) func) (data, tmp_list->data, user_data);
     }
 
-  new_list = _xlist_alloc0 ();
+  new_list = _g_list_alloc0 ();
   new_list->data = data;
 
   if ((!tmp_list->next) && (cmp > 0))
@@ -1129,7 +1129,7 @@ xlist_insert_sorted_real (xlist_t    *list,
       new_list->prev = tmp_list;
       return list;
     }
-
+   
   if (tmp_list->prev)
     {
       tmp_list->prev->next = new_list;
@@ -1137,7 +1137,7 @@ xlist_insert_sorted_real (xlist_t    *list,
     }
   new_list->next = tmp_list;
   tmp_list->prev = new_list;
-
+ 
   if (tmp_list == list)
     return new_list;
   else
@@ -1145,35 +1145,35 @@ xlist_insert_sorted_real (xlist_t    *list,
 }
 
 /**
- * xlist_insert_sorted:
- * @list: a pointer to a #xlist_t, this must point to the top of the
+ * g_list_insert_sorted:
+ * @list: a pointer to a #GList, this must point to the top of the
  *     already sorted list
  * @data: the data for the new element
- * @func: the function to compare elements in the list. It should
- *     return a number > 0 if the first parameter comes after the
+ * @func: the function to compare elements in the list. It should 
+ *     return a number > 0 if the first parameter comes after the 
  *     second parameter in the sort order.
  *
- * Inserts a new element into the list, using the given comparison
+ * Inserts a new element into the list, using the given comparison 
  * function to determine its position.
  *
  * If you are adding many new elements to a list, and the number of
  * new elements is much larger than the length of the list, use
- * xlist_prepend() to add the new items and sort the list afterwards
- * with xlist_sort().
+ * g_list_prepend() to add the new items and sort the list afterwards
+ * with g_list_sort().
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
-xlist_t *
-xlist_insert_sorted (xlist_t        *list,
-                      xpointer_t      data,
+GList *
+g_list_insert_sorted (GList        *list,
+                      gpointer      data,
                       GCompareFunc  func)
 {
-  return xlist_insert_sorted_real (list, data, (GFunc) func, NULL);
+  return g_list_insert_sorted_real (list, data, (GFunc) func, NULL);
 }
 
 /**
- * xlist_insert_sorted_with_data:
- * @list: a pointer to a #xlist_t, this must point to the top of the
+ * g_list_insert_sorted_with_data:
+ * @list: a pointer to a #GList, this must point to the top of the
  *     already sorted list
  * @data: the data for the new element
  * @func: the function to compare elements in the list. It should
@@ -1181,37 +1181,37 @@ xlist_insert_sorted (xlist_t        *list,
  *     second parameter in the sort order.
  * @user_data: user data to pass to comparison function
  *
- * Inserts a new element into the list, using the given comparison
+ * Inserts a new element into the list, using the given comparison 
  * function to determine its position.
  *
  * If you are adding many new elements to a list, and the number of
  * new elements is much larger than the length of the list, use
- * xlist_prepend() to add the new items and sort the list afterwards
- * with xlist_sort().
+ * g_list_prepend() to add the new items and sort the list afterwards
+ * with g_list_sort().
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  *
  * Since: 2.10
  */
-xlist_t *
-xlist_insert_sorted_with_data (xlist_t            *list,
-                                xpointer_t          data,
+GList *
+g_list_insert_sorted_with_data (GList            *list,
+                                gpointer          data,
                                 GCompareDataFunc  func,
-                                xpointer_t          user_data)
+                                gpointer          user_data)
 {
-  return xlist_insert_sorted_real (list, data, (GFunc) func, user_data);
+  return g_list_insert_sorted_real (list, data, (GFunc) func, user_data);
 }
 
-static xlist_t *
-xlist_sort_merge (xlist_t     *l1,
-                   xlist_t     *l2,
+static GList *
+g_list_sort_merge (GList     *l1, 
+                   GList     *l2,
                    GFunc     compare_func,
-                   xpointer_t  user_data)
+                   gpointer  user_data)
 {
-  xlist_t list, *l, *lprev;
-  xint_t cmp;
+  GList list, *l, *lprev;
+  gint cmp;
 
-  l = &list;
+  l = &list; 
   lprev = NULL;
 
   while (l1 && l2)
@@ -1222,14 +1222,14 @@ xlist_sort_merge (xlist_t     *l1,
         {
           l->next = l1;
           l1 = l1->next;
-        }
-      else
+        } 
+      else 
         {
           l->next = l2;
           l2 = l2->next;
         }
       l = l->next;
-      l->prev = lprev;
+      l->prev = lprev; 
       lprev = l;
     }
   l->next = l1 ? l1 : l2;
@@ -1238,49 +1238,49 @@ xlist_sort_merge (xlist_t     *l1,
   return list.next;
 }
 
-static xlist_t *
-xlist_sort_real (xlist_t    *list,
+static GList * 
+g_list_sort_real (GList    *list,
                   GFunc     compare_func,
-                  xpointer_t  user_data)
+                  gpointer  user_data)
 {
-  xlist_t *l1, *l2;
-
-  if (!list)
+  GList *l1, *l2;
+  
+  if (!list) 
     return NULL;
-  if (!list->next)
+  if (!list->next) 
     return list;
-
-  l1 = list;
+  
+  l1 = list; 
   l2 = list->next;
 
   while ((l2 = l2->next) != NULL)
     {
-      if ((l2 = l2->next) == NULL)
+      if ((l2 = l2->next) == NULL) 
         break;
       l1 = l1->next;
     }
-  l2 = l1->next;
-  l1->next = NULL;
+  l2 = l1->next; 
+  l1->next = NULL; 
 
-  return xlist_sort_merge (xlist_sort_real (list, compare_func, user_data),
-                            xlist_sort_real (l2, compare_func, user_data),
+  return g_list_sort_merge (g_list_sort_real (list, compare_func, user_data),
+                            g_list_sort_real (l2, compare_func, user_data),
                             compare_func,
                             user_data);
 }
 
 /**
- * xlist_sort:
- * @list: a #xlist_t, this must point to the top of the list
- * @compare_func: the comparison function used to sort the #xlist_t.
- *     This function is passed the data from 2 elements of the #xlist_t
- *     and should return 0 if they are equal, a negative value if the
- *     first element comes before the second, or a positive value if
+ * g_list_sort:
+ * @list: a #GList, this must point to the top of the list
+ * @compare_func: the comparison function used to sort the #GList.
+ *     This function is passed the data from 2 elements of the #GList 
+ *     and should return 0 if they are equal, a negative value if the 
+ *     first element comes before the second, or a positive value if 
  *     the first element comes after the second.
  *
- * Sorts a #xlist_t using the given comparison function. The algorithm
+ * Sorts a #GList using the given comparison function. The algorithm 
  * used is a stable sort.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
 /**
  * GCompareFunc:
@@ -1295,23 +1295,23 @@ xlist_sort_real (xlist_t    *list,
  * Returns: negative value if @a < @b; zero if @a = @b; positive
  *          value if @a > @b
  */
-xlist_t *
-xlist_sort (xlist_t        *list,
+GList *
+g_list_sort (GList        *list,
              GCompareFunc  compare_func)
 {
-  return xlist_sort_real (list, (GFunc) compare_func, NULL);
+  return g_list_sort_real (list, (GFunc) compare_func, NULL);
 }
 
 /**
- * xlist_sort_with_data:
- * @list: a #xlist_t, this must point to the top of the list
+ * g_list_sort_with_data:
+ * @list: a #GList, this must point to the top of the list
  * @compare_func: comparison function
  * @user_data: user data to pass to comparison function
  *
- * Like xlist_sort(), but the comparison function accepts
+ * Like g_list_sort(), but the comparison function accepts 
  * a user data argument.
  *
- * Returns: the (possibly changed) start of the #xlist_t
+ * Returns: the (possibly changed) start of the #GList
  */
 /**
  * GCompareDataFunc:
@@ -1327,30 +1327,30 @@ xlist_sort (xlist_t        *list,
  * Returns: negative value if @a < @b; zero if @a = @b; positive
  *          value if @a > @b
  */
-xlist_t *
-xlist_sort_with_data (xlist_t            *list,
+GList *
+g_list_sort_with_data (GList            *list,
                        GCompareDataFunc  compare_func,
-                       xpointer_t          user_data)
+                       gpointer          user_data)
 {
-  return xlist_sort_real (list, (GFunc) compare_func, user_data);
+  return g_list_sort_real (list, (GFunc) compare_func, user_data);
 }
 
 /**
  * g_clear_list: (skip)
- * @list_ptr: (not nullable): a #xlist_t return location
- * @destroy: (nullable): the function to pass to xlist_free_full() or %NULL to not free elements
+ * @list_ptr: (not nullable): a #GList return location
+ * @destroy: (nullable): the function to pass to g_list_free_full() or %NULL to not free elements
  *
- * Clears a pointer to a #xlist_t, freeing it and, optionally, freeing its elements using @destroy.
+ * Clears a pointer to a #GList, freeing it and, optionally, freeing its elements using @destroy.
  *
- * @list_ptr must be a valid pointer. If @list_ptr points to a null #xlist_t, this does nothing.
+ * @list_ptr must be a valid pointer. If @list_ptr points to a null #GList, this does nothing.
  *
  * Since: 2.64
  */
 void
-(g_clear_list) (xlist_t          **list_ptr,
-                xdestroy_notify_t   destroy)
+(g_clear_list) (GList          **list_ptr,
+                GDestroyNotify   destroy)
 {
-  xlist_t *list;
+  GList *list;
 
   list = *list_ptr;
   if (list)
@@ -1358,8 +1358,8 @@ void
       *list_ptr = NULL;
 
       if (destroy)
-        xlist_free_full (list, destroy);
+        g_list_free_full (list, destroy);
       else
-        xlist_free (list);
+        g_list_free (list);
     }
 }

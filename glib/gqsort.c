@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1991, 1992, 1996, 1997,1999,2004 Free Software Foundation, Inc.
  * Copyright (C) 2000 Eazel, Inc.
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
@@ -92,17 +92,17 @@ msort_with_tmp (const struct msort_param *p, void *b, size_t n)
 	{
 	  if ((*cmp) (b1, b2, arg) <= 0)
 	    {
-	      *(xuint32_t *) tmp = *(xuint32_t *) b1;
-	      b1 += sizeof (xuint32_t);
+	      *(guint32 *) tmp = *(guint32 *) b1;
+	      b1 += sizeof (guint32);
 	      --n1;
 	    }
 	  else
 	    {
-	      *(xuint32_t *) tmp = *(xuint32_t *) b2;
-	      b2 += sizeof (xuint32_t);
+	      *(guint32 *) tmp = *(guint32 *) b2;
+	      b2 += sizeof (guint32);
 	      --n2;
 	    }
-	  tmp += sizeof (xuint32_t);
+	  tmp += sizeof (guint32);
 	}
       break;
     case 1:
@@ -110,17 +110,17 @@ msort_with_tmp (const struct msort_param *p, void *b, size_t n)
 	{
 	  if ((*cmp) (b1, b2, arg) <= 0)
 	    {
-	      *(xuint64_t *) tmp = *(xuint64_t *) b1;
-	      b1 += sizeof (xuint64_t);
+	      *(guint64 *) tmp = *(guint64 *) b1;
+	      b1 += sizeof (guint64);
 	      --n1;
 	    }
 	  else
 	    {
-	      *(xuint64_t *) tmp = *(xuint64_t *) b2;
-	      b2 += sizeof (xuint64_t);
+	      *(guint64 *) tmp = *(guint64 *) b2;
+	      b2 += sizeof (guint64);
 	      --n2;
 	    }
-	  tmp += sizeof (xuint64_t);
+	  tmp += sizeof (guint64);
 	}
       break;
     case 2:
@@ -262,17 +262,16 @@ msort_r (void *b, size_t n, size_t s, GCompareDataFunc cmp, void *arg)
     }
   else
     {
-      if ((s & (sizeof (xuint32_t) - 1)) == 0
-	  && ((char *) b - (char *) 0) % ALIGNOF_GUINT32 == 0)
+      if ((s & (sizeof (guint32) - 1)) == 0
+	  && (guintptr) b % ALIGNOF_GUINT32 == 0)
 	{
-	  if (s == sizeof (xuint32_t))
+	  if (s == sizeof (guint32))
 	    p.var = 0;
-	  else if (s == sizeof (xuint64_t)
-		   && ((char *) b - (char *) 0) % ALIGNOF_GUINT64 == 0)
+	  else if (s == sizeof (guint64)
+		   && (guintptr) b % ALIGNOF_GUINT64 == 0)
 	    p.var = 1;
 	  else if ((s & (sizeof (unsigned long) - 1)) == 0
-		   && ((char *) b - (char *) 0)
-		      % ALIGNOF_UNSIGNED_LONG == 0)
+		   && (guintptr) b % ALIGNOF_UNSIGNED_LONG == 0)
 	    p.var = 2;
 	}
       msort_with_tmp (&p, b, n);
@@ -294,11 +293,11 @@ msort_r (void *b, size_t n, size_t s, GCompareDataFunc cmp, void *arg)
  * This is guaranteed to be a stable sort since version 2.32.
  */
 void
-g_qsort_with_data (xconstpointer    pbase,
-                   xint_t             total_elems,
-                   xsize_t            size,
+g_qsort_with_data (gconstpointer    pbase,
+                   gint             total_elems,
+                   gsize            size,
                    GCompareDataFunc compare_func,
-                   xpointer_t         user_data)
+                   gpointer         user_data)
 {
-  msort_r ((xpointer_t)pbase, total_elems, size, compare_func, user_data);
+  msort_r ((gpointer)pbase, total_elems, size, compare_func, user_data);
 }

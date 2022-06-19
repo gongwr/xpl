@@ -1,11 +1,11 @@
-/*
+/* 
  * Copyright © 2008 Ryan Lortie
- *
+ * 
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- *
+ * 
  * See the included COPYING file for more information.
  */
 
@@ -13,19 +13,19 @@
 #include <stdio.h>
 #include <glib.h>
 
-/* keep track of xstring_t instances to make sure nothing leaks */
+/* keep track of GString instances to make sure nothing leaks */
 static int strings_allocated;
 
 /* === the GMarkupParser functions === */
 static void
-subparser_start_element (xmarkup_parse_context_t  *context,
-                         const xchar_t          *element_name,
-                         const xchar_t         **attribute_names,
-                         const xchar_t         **attribute_values,
-                         xpointer_t              user_data,
-                         xerror_t              **error)
+subparser_start_element (GMarkupParseContext  *context,
+                         const gchar          *element_name,
+                         const gchar         **attribute_names,
+                         const gchar         **attribute_values,
+                         gpointer              user_data,
+                         GError              **error)
 {
-  xstring_append_printf (user_data, "{%s}", element_name);
+  g_string_append_printf (user_data, "{%s}", element_name);
 
   /* we don't like trouble... */
   if (strcmp (element_name, "trouble") == 0)
@@ -34,20 +34,20 @@ subparser_start_element (xmarkup_parse_context_t  *context,
 }
 
 static void
-subparser_end_element (xmarkup_parse_context_t  *context,
-                       const xchar_t          *element_name,
-                       xpointer_t              user_data,
-                       xerror_t              **error)
+subparser_end_element (GMarkupParseContext  *context,
+                       const gchar          *element_name,
+                       gpointer              user_data,
+                       GError              **error)
 {
-  xstring_append_printf (user_data, "{/%s}", element_name);
+  g_string_append_printf (user_data, "{/%s}", element_name);
 }
 
 static void
-subparser_error (xmarkup_parse_context_t *context,
-                 xerror_t              *error,
-                 xpointer_t             user_data)
+subparser_error (GMarkupParseContext *context,
+                 GError              *error,
+                 gpointer             user_data)
 {
-  xstring_free (user_data, TRUE);
+  g_string_free (user_data, TRUE);
   strings_allocated--;
 }
 
@@ -64,26 +64,26 @@ static GMarkupParser subparser_parser =
  * replay the starting tag into the subparser...
  */
 static void
-subparser_start (xmarkup_parse_context_t *ctx)
+subparser_start (GMarkupParseContext *ctx)
 {
-  xpointer_t user_data;
+  gpointer user_data;
 
-  user_data = xstring_new (NULL);
+  user_data = g_string_new (NULL);
   strings_allocated++;
-  xmarkup_parse_context_push (ctx, &subparser_parser, user_data);
+  g_markup_parse_context_push (ctx, &subparser_parser, user_data);
 }
 
 static char *
-subparser_end (xmarkup_parse_context_t  *ctx,
-               xerror_t              **error)
+subparser_end (GMarkupParseContext  *ctx,
+               GError              **error)
 {
-  xstring_t *string;
+  GString *string;
   char *result;
 
-  string = xmarkup_parse_context_pop (ctx);
+  string = g_markup_parse_context_pop (ctx);
   result = string->str;
 
-  xstring_free (string, FALSE);
+  g_string_free (string, FALSE);
   strings_allocated--;
 
   if (result == NULL || result[0] == '\0')
@@ -101,17 +101,17 @@ subparser_end (xmarkup_parse_context_t  *ctx,
 /* convenience functions for a parser that -does-
  * replay the starting tag into the subparser...
  */
-static xboolean_t
-replay_parser_start (xmarkup_parse_context_t  *ctx,
+static gboolean
+replay_parser_start (GMarkupParseContext  *ctx,
                      const char           *element_name,
                      const char          **attribute_names,
                      const char          **attribute_values,
-                     xerror_t              **error)
+                     GError              **error)
 {
-  xerror_t *tmp_error = NULL;
-  xpointer_t user_data;
+  GError *tmp_error = NULL;
+  gpointer user_data;
 
-  user_data = xstring_new (NULL);
+  user_data = g_string_new (NULL);
   strings_allocated++;
 
   subparser_parser.start_element (ctx, element_name,
@@ -121,34 +121,34 @@ replay_parser_start (xmarkup_parse_context_t  *ctx,
   if (tmp_error)
     {
       g_propagate_error (error, tmp_error);
-      xstring_free (user_data, TRUE);
+      g_string_free (user_data, TRUE);
       strings_allocated--;
 
       return FALSE;
     }
 
-  xmarkup_parse_context_push (ctx, &subparser_parser, user_data);
+  g_markup_parse_context_push (ctx, &subparser_parser, user_data);
 
   return TRUE;
 }
 
 static char *
-replay_parser_end (xmarkup_parse_context_t  *ctx,
-                   xerror_t              **error)
+replay_parser_end (GMarkupParseContext  *ctx,
+                   GError              **error)
 {
-  xerror_t *tmp_error = NULL;
-  xstring_t *string;
+  GError *tmp_error = NULL;
+  GString *string;
   char *result;
 
-  string = xmarkup_parse_context_pop (ctx);
+  string = g_markup_parse_context_pop (ctx);
 
-  subparser_parser.end_element (ctx, xmarkup_parse_context_get_element (ctx),
+  subparser_parser.end_element (ctx, g_markup_parse_context_get_element (ctx),
                                 string, &tmp_error);
 
   if (tmp_error)
     {
       g_propagate_error (error, tmp_error);
-      xstring_free (string, TRUE);
+      g_string_free (string, TRUE);
       strings_allocated--;
 
       return NULL;
@@ -156,7 +156,7 @@ replay_parser_end (xmarkup_parse_context_t  *ctx,
 
   result = string->str;
 
-  xstring_free (string, FALSE);
+  g_string_free (string, FALSE);
   strings_allocated--;
 
   if (result == NULL || result[0] == '\0')
@@ -173,19 +173,19 @@ replay_parser_end (xmarkup_parse_context_t  *ctx,
 
 
 /* === start interface between subparser and calling parser === */
-static void      subparser_start      (xmarkup_parse_context_t  *ctx);
-static char     *subparser_end        (xmarkup_parse_context_t  *ctx,
-                                       xerror_t              **error);
+static void      subparser_start      (GMarkupParseContext  *ctx);
+static char     *subparser_end        (GMarkupParseContext  *ctx,
+                                       GError              **error);
 /* === end interface between subparser and calling parser === */
 
 /* === start interface between replay parser and calling parser === */
-static xboolean_t  replay_parser_start  (xmarkup_parse_context_t  *ctx,
+static gboolean  replay_parser_start  (GMarkupParseContext  *ctx,
                                        const char           *element_name,
                                        const char          **attribute_names,
                                        const char          **attribute_values,
-                                       xerror_t              **error);
-static char     *replay_parser_end    (xmarkup_parse_context_t  *ctx,
-                                       xerror_t              **error);
+                                       GError              **error);
+static char     *replay_parser_end    (GMarkupParseContext  *ctx,
+                                       GError              **error);
 /* === end interface between replay parser and calling parser === */
 
 
@@ -200,14 +200,14 @@ static char     *replay_parser_end    (xmarkup_parse_context_t  *ctx,
  * (so the unknown tag is fed to the subparser...)
  */
 static void
-start_element (xmarkup_parse_context_t  *context,
-               const xchar_t          *element_name,
-               const xchar_t         **attribute_names,
-               const xchar_t         **attribute_values,
-               xpointer_t              user_data,
-               xerror_t              **error)
+start_element (GMarkupParseContext  *context,
+               const gchar          *element_name,
+               const gchar         **attribute_names,
+               const gchar         **attribute_values,
+               gpointer              user_data,
+               GError              **error)
 {
-  xstring_append_printf (user_data, "<%s>", element_name);
+  g_string_append_printf (user_data, "<%s>", element_name);
 
   if (strcmp (element_name, "test") == 0)
     {
@@ -229,10 +229,10 @@ start_element (xmarkup_parse_context_t  *context,
 }
 
 static void
-end_element (xmarkup_parse_context_t  *context,
-             const xchar_t          *element_name,
-             xpointer_t              user_data,
-             xerror_t              **error)
+end_element (GMarkupParseContext  *context,
+             const gchar          *element_name,
+             gpointer              user_data,
+             GError              **error)
 {
   if (strcmp (element_name, "test") == 0)
     {
@@ -245,7 +245,7 @@ end_element (xmarkup_parse_context_t  *context,
       if ((result = subparser_end (context, error)) == NULL)
         return;
 
-      xstring_append_printf (user_data, "<<%s>>", result);
+      g_string_append_printf (user_data, "<<%s>>", result);
       g_free (result);
     }
   else
@@ -255,11 +255,11 @@ end_element (xmarkup_parse_context_t  *context,
       if ((result = replay_parser_end (context, error)) == NULL)
         return;
 
-      xstring_append_printf (user_data, "[[%s]]", result);
+      g_string_append_printf (user_data, "[[%s]]", result);
       g_free (result);
     }
 
-  xstring_append_printf (user_data, "</%s>", element_name);
+  g_string_append_printf (user_data, "</%s>", element_name);
 }
 
 static GMarkupParser parser =
@@ -279,40 +279,40 @@ typedef struct
 } TestCase;
 
 static void
-test (xconstpointer user_data)
+test (gconstpointer user_data)
 {
   const TestCase *tc = user_data;
-  xmarkup_parse_context_t *ctx;
-  xstring_t *string;
-  xboolean_t result;
-  xerror_t *error;
+  GMarkupParseContext *ctx;
+  GString *string;
+  gboolean result;
+  GError *error;
 
   error = NULL;
-  string = xstring_new (NULL);
-  ctx = xmarkup_parse_context_new (&parser, 0, string, NULL);
-  result = xmarkup_parse_context_parse (ctx, tc->markup,
+  string = g_string_new (NULL);
+  ctx = g_markup_parse_context_new (&parser, 0, string, NULL);
+  result = g_markup_parse_context_parse (ctx, tc->markup,
                                          strlen (tc->markup), &error);
   if (result)
-    result = xmarkup_parse_context_end_parse (ctx, &error);
-  xmarkup_parse_context_free (ctx);
-  xassert (strings_allocated == 0);
+    result = g_markup_parse_context_end_parse (ctx, &error);
+  g_markup_parse_context_free (ctx);
+  g_assert (strings_allocated == 0);
 
   if (result)
     {
       if (tc->error_message)
-        xerror ("expected failure (about '%s') passed!\n"
+        g_error ("expected failure (about '%s') passed!\n"
                  "  in: %s\n  out: %s",
                  tc->error_message, tc->markup, string->str);
     }
   else
     {
       if (!tc->error_message)
-        xerror ("unexpected failure: '%s'\n"
+        g_error ("unexpected failure: '%s'\n"
                  "  in: %s\n  out: %s",
                  error->message, tc->markup, string->str);
 
       if (!strstr (error->message, tc->error_message))
-        xerror ("failed for the wrong reason.\n"
+        g_error ("failed for the wrong reason.\n"
                  "  expecting message about '%s'\n"
                  "  got message '%s'\n"
                  "  in: %s\n  out: %s",
@@ -320,16 +320,16 @@ test (xconstpointer user_data)
     }
 
   if (strcmp (string->str, tc->result) != 0)
-    xerror ("got the wrong result.\n"
+    g_error ("got the wrong result.\n"
              "  expected: '%s'\n"
              "  got: '%s'\n"
              "  input: %s",
              tc->result, string->str, tc->markup);
 
   if (error)
-    xerror_free (error);
+    g_error_free (error);
 
-  xstring_free (string, TRUE);
+  g_string_free (string, TRUE);
 }
 
 TestCase test_cases[] = /* successful runs */
@@ -359,7 +359,7 @@ TestCase error_cases[] = /* error cases */
 
 #define add_tests(func, basename, array) \
   G_STMT_START { \
-    xsize_t __add_tests_i;                                                \
+    gsize __add_tests_i;                                                \
                                                                         \
     for (__add_tests_i  = 0;                                            \
          __add_tests_i < G_N_ELEMENTS (array);                          \
@@ -367,7 +367,7 @@ TestCase error_cases[] = /* error cases */
       {                                                                 \
         char *testname;                                                 \
                                                                         \
-        testname = xstrdup_printf ("%s/%" G_GSIZE_FORMAT,              \
+        testname = g_strdup_printf ("%s/%" G_GSIZE_FORMAT,              \
                                     basename, __add_tests_i);           \
         g_test_add_data_func (testname, &array[__add_tests_i], func);   \
         g_free (testname);                                              \

@@ -1,4 +1,4 @@
-/* test_t case for GNOME #662395
+/* Test case for GNOME #662395
  *
  * Copyright (C) 2008-2010 Red Hat, Inc.
  * Copyright (C) 2011 Nokia Corporation
@@ -32,74 +32,74 @@
 #define MY_TYPE_OUTPUT_STREAM \
         (my_output_stream_get_type ())
 #define MY_OUTPUT_STREAM(o) \
-        (XTYPE_CHECK_INSTANCE_CAST ((o), \
+        (G_TYPE_CHECK_INSTANCE_CAST ((o), \
                                      MY_TYPE_OUTPUT_STREAM, \
                                      MyOutputStream))
 #define MY_IS_OUTPUT_STREAM(o) \
-        (XTYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_OUTPUT_STREAM))
+        (G_TYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_OUTPUT_STREAM))
 
 G_LOCK_DEFINE_STATIC (write);
 
 typedef struct {
-    xfilter_output_stream_t parent;
+    GFilterOutputStream parent;
 
-    xint_t started;  /* (atomic) */
-    xint_t finished;  /* (atomic) */
-    xint_t flushed;  /* (atomic) */
+    gint started;  /* (atomic) */
+    gint finished;  /* (atomic) */
+    gint flushed;  /* (atomic) */
 
-    xoutput_stream_t *real_output;
+    GOutputStream *real_output;
 } MyOutputStream;
 
 typedef struct {
-    xfilter_output_stream_class_t parent;
+    GFilterOutputStreamClass parent;
 } MyOutputStreamClass;
 
-static xtype_t my_output_stream_get_type (void) G_GNUC_CONST;
+static GType my_output_stream_get_type (void) G_GNUC_CONST;
 
-XDEFINE_TYPE (MyOutputStream, my_output_stream, XTYPE_FILTER_OUTPUT_STREAM)
+G_DEFINE_TYPE (MyOutputStream, my_output_stream, G_TYPE_FILTER_OUTPUT_STREAM)
 
 /* Called from GDBusWorker thread */
-static xssize_t
-my_output_stream_write (xoutput_stream_t  *os,
+static gssize
+my_output_stream_write (GOutputStream  *os,
                         const void     *buffer,
-                        xsize_t           count,
-                        xcancellable_t   *cancellable,
-                        xerror_t        **error)
+                        gsize           count,
+                        GCancellable   *cancellable,
+                        GError        **error)
 {
   MyOutputStream *self = MY_OUTPUT_STREAM (os);
-  xfilter_output_stream_t *filter = G_FILTER_OUTPUT_STREAM (os);
-  xoutput_stream_t *real = g_filter_output_stream_get_base_stream (filter);
-  xssize_t ret;
+  GFilterOutputStream *filter = G_FILTER_OUTPUT_STREAM (os);
+  GOutputStream *real = g_filter_output_stream_get_base_stream (filter);
+  gssize ret;
 
   g_atomic_int_add (&self->started, count);
   /* Other threads can make writing block forever by taking this lock */
   G_LOCK (write);
-  ret = xoutput_stream_write (real, buffer, count, cancellable, error);
+  ret = g_output_stream_write (real, buffer, count, cancellable, error);
   G_UNLOCK (write);
   g_atomic_int_add (&self->finished, count);
   return ret;
 }
 
 /* Called from GDBusWorker thread */
-static xboolean_t
-my_output_stream_flush (xoutput_stream_t             *os,
-                        xcancellable_t              *cancellable,
-                        xerror_t                   **error)
+static gboolean
+my_output_stream_flush (GOutputStream             *os,
+                        GCancellable              *cancellable,
+                        GError                   **error)
 {
   MyOutputStream *self = MY_OUTPUT_STREAM (os);
-  xfilter_output_stream_t *filter = G_FILTER_OUTPUT_STREAM (os);
-  xoutput_stream_t *real = g_filter_output_stream_get_base_stream (filter);
-  xint_t started, finished;
-  xboolean_t ret;
+  GFilterOutputStream *filter = G_FILTER_OUTPUT_STREAM (os);
+  GOutputStream *real = g_filter_output_stream_get_base_stream (filter);
+  gint started, finished;
+  gboolean ret;
 
   /* These should be equal because you're not allowed to flush with a
-   * write pending, and xoutput_stream_t enforces that for its subclasses
+   * write pending, and GOutputStream enforces that for its subclasses
    */
   started = g_atomic_int_get (&self->started);
   finished = g_atomic_int_get (&self->finished);
   g_assert_cmpint (started, ==, finished);
 
-  ret = xoutput_stream_flush (real, cancellable, error);
+  ret = g_output_stream_flush (real, cancellable, error);
 
   /* As above, this shouldn't have changed during the flush */
   finished = g_atomic_int_get (&self->finished);
@@ -111,8 +111,8 @@ my_output_stream_flush (xoutput_stream_t             *os,
 }
 
 /* Called from any thread; thread-safe */
-static xint_t
-my_output_stream_get_bytes_started (xoutput_stream_t *os)
+static gint
+my_output_stream_get_bytes_started (GOutputStream *os)
 {
   MyOutputStream *self = MY_OUTPUT_STREAM (os);
 
@@ -120,8 +120,8 @@ my_output_stream_get_bytes_started (xoutput_stream_t *os)
 }
 
 /* Called from any thread; thread-safe */
-static xint_t
-my_output_stream_get_bytes_finished (xoutput_stream_t *os)
+static gint
+my_output_stream_get_bytes_finished (GOutputStream *os)
 {
   MyOutputStream *self = MY_OUTPUT_STREAM (os);
 
@@ -129,8 +129,8 @@ my_output_stream_get_bytes_finished (xoutput_stream_t *os)
 }
 
 /* Called from any thread; thread-safe */
-static xint_t
-my_output_stream_get_bytes_flushed (xoutput_stream_t *os)
+static gint
+my_output_stream_get_bytes_flushed (GOutputStream *os)
 {
   MyOutputStream *self = MY_OUTPUT_STREAM (os);
 
@@ -145,7 +145,7 @@ my_output_stream_init (MyOutputStream *self)
 static void
 my_output_stream_class_init (MyOutputStreamClass *cls)
 {
-  xoutput_stream_class_t *ostream_class = (xoutput_stream_class_t *) cls;
+  GOutputStreamClass *ostream_class = (GOutputStreamClass *) cls;
 
   ostream_class->write_fn = my_output_stream_write;
   ostream_class->flush = my_output_stream_flush;
@@ -154,101 +154,101 @@ my_output_stream_class_init (MyOutputStreamClass *cls)
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct {
-    xerror_t *error;
-    xchar_t *guid;
-    xboolean_t flushed;
+    GError *error;
+    gchar *guid;
+    gboolean flushed;
 
-    xio_stream_t *client_stream;
-    xinput_stream_t *client_istream;
-    xoutput_stream_t *client_ostream;
-    xoutput_stream_t *client_real_ostream;
-    xdbus_connection_t *client_conn;
+    GIOStream *client_stream;
+    GInputStream *client_istream;
+    GOutputStream *client_ostream;
+    GOutputStream *client_real_ostream;
+    GDBusConnection *client_conn;
 
-    xio_stream_t *server_stream;
-    xinput_stream_t *server_istream;
-    xoutput_stream_t *server_ostream;
-    xdbus_connection_t *server_conn;
+    GIOStream *server_stream;
+    GInputStream *server_istream;
+    GOutputStream *server_ostream;
+    GDBusConnection *server_conn;
 } Fixture;
 
 static void
-setup_client_cb (xobject_t      *source,
-                 xasync_result_t *res,
-                 xpointer_t      user_data)
+setup_client_cb (GObject      *source,
+                 GAsyncResult *res,
+                 gpointer      user_data)
 {
   Fixture *f = user_data;
 
-  f->client_conn = xdbus_connection_new_finish (res, &f->error);
+  f->client_conn = g_dbus_connection_new_finish (res, &f->error);
   g_assert_no_error (f->error);
-  g_assert_true (X_IS_DBUS_CONNECTION (f->client_conn));
+  g_assert_true (G_IS_DBUS_CONNECTION (f->client_conn));
   g_assert_true (f->client_conn == G_DBUS_CONNECTION (source));
 }
 
 static void
-setup_server_cb (xobject_t      *source,
-                 xasync_result_t *res,
-                 xpointer_t      user_data)
+setup_server_cb (GObject      *source,
+                 GAsyncResult *res,
+                 gpointer      user_data)
 {
   Fixture *f = user_data;
 
-  f->server_conn = xdbus_connection_new_finish (res, &f->error);
+  f->server_conn = g_dbus_connection_new_finish (res, &f->error);
   g_assert_no_error (f->error);
-  g_assert_true (X_IS_DBUS_CONNECTION (f->server_conn));
+  g_assert_true (G_IS_DBUS_CONNECTION (f->server_conn));
   g_assert_true (f->server_conn == G_DBUS_CONNECTION (source));
 }
 
 static void
 setup (Fixture       *f,
-       xconstpointer  test_data G_GNUC_UNUSED)
+       gconstpointer  test_data G_GNUC_UNUSED)
 {
-  xboolean_t ok;
+  gboolean ok;
 
   f->guid = g_dbus_generate_guid ();
 
   ok = test_pipe (&f->server_istream, &f->client_real_ostream, &f->error);
   g_assert_no_error (f->error);
-  g_assert_true (X_IS_OUTPUT_STREAM (f->client_real_ostream));
-  g_assert_true (X_IS_INPUT_STREAM (f->server_istream));
+  g_assert_true (G_IS_OUTPUT_STREAM (f->client_real_ostream));
+  g_assert_true (G_IS_INPUT_STREAM (f->server_istream));
   g_assert_true (ok);
 
-  f->client_ostream = xobject_new (MY_TYPE_OUTPUT_STREAM,
+  f->client_ostream = g_object_new (MY_TYPE_OUTPUT_STREAM,
                                     "base-stream", f->client_real_ostream,
                                     "close-base-stream", TRUE,
                                     NULL);
-  g_assert_true (X_IS_OUTPUT_STREAM (f->client_ostream));
+  g_assert_true (G_IS_OUTPUT_STREAM (f->client_ostream));
 
   ok = test_pipe (&f->client_istream, &f->server_ostream, &f->error);
   g_assert_no_error (f->error);
-  g_assert_true (X_IS_OUTPUT_STREAM (f->server_ostream));
-  g_assert_true (X_IS_INPUT_STREAM (f->client_istream));
+  g_assert_true (G_IS_OUTPUT_STREAM (f->server_ostream));
+  g_assert_true (G_IS_INPUT_STREAM (f->client_istream));
   g_assert_true (ok);
 
   f->client_stream = test_io_stream_new (f->client_istream, f->client_ostream);
   f->server_stream = test_io_stream_new (f->server_istream, f->server_ostream);
 
-  xdbus_connection_new (f->client_stream, NULL,
+  g_dbus_connection_new (f->client_stream, NULL,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                          NULL, NULL, setup_client_cb, f);
-  xdbus_connection_new (f->server_stream, f->guid,
+  g_dbus_connection_new (f->server_stream, f->guid,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER,
                          NULL, NULL, setup_server_cb, f);
 
   while (f->client_conn == NULL || f->server_conn == NULL)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 }
 
 static void
-flush_cb (xobject_t      *source,
-          xasync_result_t *res,
-          xpointer_t      user_data)
+flush_cb (GObject      *source,
+          GAsyncResult *res,
+          gpointer      user_data)
 {
   Fixture *f = user_data;
-  xboolean_t ok;
+  gboolean ok;
 
-  g_assert_true (X_IS_DBUS_CONNECTION (source));
-  g_assert_true (X_IS_DBUS_CONNECTION (f->client_conn));
+  g_assert_true (G_IS_DBUS_CONNECTION (source));
+  g_assert_true (G_IS_DBUS_CONNECTION (f->client_conn));
   g_assert_cmpuint ((guintptr) f->client_conn, ==, (guintptr) G_DBUS_CONNECTION (source));
 
-  ok = xdbus_connection_flush_finish (f->client_conn, res, &f->error);
+  ok = g_dbus_connection_flush_finish (f->client_conn, res, &f->error);
   g_assert_no_error (f->error);
   g_assert_true (ok);
 
@@ -257,17 +257,17 @@ flush_cb (xobject_t      *source,
 
 static void
 test_flush_busy (Fixture       *f,
-                 xconstpointer  test_data G_GNUC_UNUSED)
+                 gconstpointer  test_data G_GNUC_UNUSED)
 {
-  xint_t initial, started;
-  xboolean_t ok;
+  gint initial, started;
+  gboolean ok;
 
   initial = my_output_stream_get_bytes_started (f->client_ostream);
   /* make sure the actual write will block */
   G_LOCK (write);
 
-  ok = xdbus_connection_emit_signal (f->client_conn, NULL, "/",
-                                      "com.example.foo_t", "SomeSignal", NULL,
+  ok = g_dbus_connection_emit_signal (f->client_conn, NULL, "/",
+                                      "com.example.Foo", "SomeSignal", NULL,
                                       &f->error);
   g_assert_no_error (f->error);
   g_assert_true (ok);
@@ -277,7 +277,7 @@ test_flush_busy (Fixture       *f,
    */
   do {
     started = my_output_stream_get_bytes_started (f->client_ostream);
-    xthread_yield ();
+    g_thread_yield ();
   } while (initial >= started);
 
   /* we haven't flushed anything */
@@ -285,7 +285,7 @@ test_flush_busy (Fixture       *f,
                    <=, initial);
 
   /* start to flush: it can't happen til the write finishes */
-  xdbus_connection_flush (f->client_conn, NULL, flush_cb, f);
+  g_dbus_connection_flush (f->client_conn, NULL, flush_cb, f);
 
   /* we still haven't actually flushed anything */
   g_assert_cmpint (my_output_stream_get_bytes_flushed (f->client_ostream),
@@ -296,7 +296,7 @@ test_flush_busy (Fixture       *f,
 
   /* wait for the flush to happen */
   while (!f->flushed)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
   /* now we have flushed at least what we'd written - but before fixing
    * GNOME#662395 this assertion would fail
@@ -307,15 +307,15 @@ test_flush_busy (Fixture       *f,
 
 static void
 test_flush_idle (Fixture       *f,
-                 xconstpointer  test_data G_GNUC_UNUSED)
+                 gconstpointer  test_data G_GNUC_UNUSED)
 {
-  xint_t initial, finished;
-  xboolean_t ok;
+  gint initial, finished;
+  gboolean ok;
 
   initial = my_output_stream_get_bytes_finished (f->client_ostream);
 
-  ok = xdbus_connection_emit_signal (f->client_conn, NULL, "/",
-                                      "com.example.foo_t", "SomeSignal", NULL,
+  ok = g_dbus_connection_emit_signal (f->client_conn, NULL, "/",
+                                      "com.example.Foo", "SomeSignal", NULL,
                                       &f->error);
   g_assert_no_error (f->error);
   g_assert_true (ok);
@@ -323,7 +323,7 @@ test_flush_idle (Fixture       *f,
   /* wait for at least part of the message to have been written */
   do {
     finished = my_output_stream_get_bytes_finished (f->client_ostream);
-    xthread_yield ();
+    g_thread_yield ();
   } while (initial >= finished);
 
   /* we haven't flushed anything */
@@ -331,7 +331,7 @@ test_flush_idle (Fixture       *f,
                    <=, initial);
 
   /* flush with fully-written, but unflushed, messages */
-  ok = xdbus_connection_flush_sync (f->client_conn, NULL, &f->error);
+  ok = g_dbus_connection_flush_sync (f->client_conn, NULL, &f->error);
 
   /* now we have flushed at least what we'd written - but before fixing
    * GNOME#662395 this assertion would fail
@@ -342,7 +342,7 @@ test_flush_idle (Fixture       *f,
 
 static void
 teardown (Fixture       *f,
-          xconstpointer  test_data G_GNUC_UNUSED)
+          gconstpointer  test_data G_GNUC_UNUSED)
 {
   g_clear_error (&f->error);
 
@@ -366,7 +366,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  xint_t ret;
+  gint ret;
 
   g_test_init (&argc, &argv, G_TEST_OPTION_ISOLATE_DIRS, NULL);
 

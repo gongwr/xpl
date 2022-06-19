@@ -23,7 +23,7 @@
 import os
 import sys
 
-srcdir = os.getenv('UNINSTALLED_XPL_SRCDIR', None)
+srcdir = os.getenv('UNINSTALLED_GLIB_SRCDIR', None)
 filedir = os.path.dirname(__file__)
 
 if srcdir is not None:

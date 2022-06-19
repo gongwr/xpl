@@ -22,7 +22,7 @@
 #ifndef __G_BYTES_H__
 #define __G_BYTES_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -31,65 +31,65 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xbytes_t *        xbytes_new                     (xconstpointer   data,
-                                                 xsize_t           size);
+GLIB_AVAILABLE_IN_ALL
+GBytes *        g_bytes_new                     (gconstpointer   data,
+                                                 gsize           size);
 
-XPL_AVAILABLE_IN_ALL
-xbytes_t *        xbytes_new_take                (xpointer_t        data,
-                                                 xsize_t           size);
+GLIB_AVAILABLE_IN_ALL
+GBytes *        g_bytes_new_take                (gpointer        data,
+                                                 gsize           size);
 
-XPL_AVAILABLE_IN_ALL
-xbytes_t *        xbytes_new_static              (xconstpointer   data,
-                                                 xsize_t           size);
+GLIB_AVAILABLE_IN_ALL
+GBytes *        g_bytes_new_static              (gconstpointer   data,
+                                                 gsize           size);
 
-XPL_AVAILABLE_IN_ALL
-xbytes_t *        xbytes_new_with_free_func      (xconstpointer   data,
-                                                 xsize_t           size,
-                                                 xdestroy_notify_t  free_func,
-                                                 xpointer_t        user_data);
+GLIB_AVAILABLE_IN_ALL
+GBytes *        g_bytes_new_with_free_func      (gconstpointer   data,
+                                                 gsize           size,
+                                                 GDestroyNotify  free_func,
+                                                 gpointer        user_data);
 
-XPL_AVAILABLE_IN_ALL
-xbytes_t *        xbytes_new_from_bytes          (xbytes_t         *bytes,
-                                                 xsize_t           offset,
-                                                 xsize_t           length);
+GLIB_AVAILABLE_IN_ALL
+GBytes *        g_bytes_new_from_bytes          (GBytes         *bytes,
+                                                 gsize           offset,
+                                                 gsize           length);
 
-XPL_AVAILABLE_IN_ALL
-xconstpointer   xbytes_get_data                (xbytes_t         *bytes,
-                                                 xsize_t          *size);
+GLIB_AVAILABLE_IN_ALL
+gconstpointer   g_bytes_get_data                (GBytes         *bytes,
+                                                 gsize          *size);
 
-XPL_AVAILABLE_IN_ALL
-xsize_t           xbytes_get_size                (xbytes_t         *bytes);
+GLIB_AVAILABLE_IN_ALL
+gsize           g_bytes_get_size                (GBytes         *bytes);
 
-XPL_AVAILABLE_IN_ALL
-xbytes_t *        xbytes_ref                     (xbytes_t         *bytes);
+GLIB_AVAILABLE_IN_ALL
+GBytes *        g_bytes_ref                     (GBytes         *bytes);
 
-XPL_AVAILABLE_IN_ALL
-void            xbytes_unref                   (xbytes_t         *bytes);
+GLIB_AVAILABLE_IN_ALL
+void            g_bytes_unref                   (GBytes         *bytes);
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t        xbytes_unref_to_data           (xbytes_t         *bytes,
-                                                 xsize_t          *size);
+GLIB_AVAILABLE_IN_ALL
+gpointer        g_bytes_unref_to_data           (GBytes         *bytes,
+                                                 gsize          *size);
 
-XPL_AVAILABLE_IN_ALL
-xbyte_array_t *    xbytes_unref_to_array          (xbytes_t         *bytes);
+GLIB_AVAILABLE_IN_ALL
+GByteArray *    g_bytes_unref_to_array          (GBytes         *bytes);
 
-XPL_AVAILABLE_IN_ALL
-xuint_t           xbytes_hash                    (xconstpointer   bytes);
+GLIB_AVAILABLE_IN_ALL
+guint           g_bytes_hash                    (gconstpointer   bytes);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t        xbytes_equal                   (xconstpointer   bytes1,
-                                                 xconstpointer   bytes2);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_bytes_equal                   (gconstpointer   bytes1,
+                                                 gconstpointer   bytes2);
 
-XPL_AVAILABLE_IN_ALL
-xint_t            xbytes_compare                 (xconstpointer   bytes1,
-                                                 xconstpointer   bytes2);
+GLIB_AVAILABLE_IN_ALL
+gint            g_bytes_compare                 (gconstpointer   bytes1,
+                                                 gconstpointer   bytes2);
 
-XPL_AVAILABLE_IN_2_70
-xconstpointer   xbytes_get_region              (xbytes_t         *bytes,
-                                                 xsize_t           element_size,
-                                                 xsize_t           offset,
-                                                 xsize_t           n_elements);
+GLIB_AVAILABLE_IN_2_70
+gconstpointer   g_bytes_get_region              (GBytes         *bytes,
+                                                 gsize           element_size,
+                                                 gsize           offset,
+                                                 gsize           n_elements);
 
 
 G_END_DECLS

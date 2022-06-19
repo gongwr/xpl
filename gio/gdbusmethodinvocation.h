@@ -29,9 +29,9 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_METHOD_INVOCATION         (xdbus_method_invocation_get_type ())
-#define G_DBUS_METHOD_INVOCATION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_METHOD_INVOCATION, xdbus_method_invocation))
-#define X_IS_DBUS_METHOD_INVOCATION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_METHOD_INVOCATION))
+#define G_TYPE_DBUS_METHOD_INVOCATION         (g_dbus_method_invocation_get_type ())
+#define G_DBUS_METHOD_INVOCATION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_METHOD_INVOCATION, GDBusMethodInvocation))
+#define G_IS_DBUS_METHOD_INVOCATION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_METHOD_INVOCATION))
 
 /**
  * G_DBUS_METHOD_INVOCATION_HANDLED:
@@ -45,13 +45,13 @@ G_BEGIN_DECLS
  * use %TRUE instead, often written like this:
  *
  * |[
- *   xdbus_method_invocation_return_error (invocation, ...);
+ *   g_dbus_method_invocation_return_error (invocation, ...);
  *   return TRUE;    // handled
  * ]|
  *
  * Since: 2.68
  */
-#define G_DBUS_METHOD_INVOCATION_HANDLED TRUE XPL_AVAILABLE_MACRO_IN_2_68
+#define G_DBUS_METHOD_INVOCATION_HANDLED TRUE GLIB_AVAILABLE_MACRO_IN_2_68
 
 /**
  * G_DBUS_METHOD_INVOCATION_UNHANDLED:
@@ -66,66 +66,66 @@ G_BEGIN_DECLS
  *
  * Since: 2.68
  */
-#define G_DBUS_METHOD_INVOCATION_UNHANDLED FALSE XPL_AVAILABLE_MACRO_IN_2_68
+#define G_DBUS_METHOD_INVOCATION_UNHANDLED FALSE GLIB_AVAILABLE_MACRO_IN_2_68
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                  xdbus_method_invocation_get_type             (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-const xchar_t           *xdbus_method_invocation_get_sender           (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-const xchar_t           *xdbus_method_invocation_get_object_path      (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-const xchar_t           *xdbus_method_invocation_get_interface_name   (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-const xchar_t           *xdbus_method_invocation_get_method_name      (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-const xdbus_method_info_t *xdbus_method_invocation_get_method_info      (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_2_38
-const xdbus_property_info_t *xdbus_method_invocation_get_property_info  (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t       *xdbus_method_invocation_get_connection       (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-xdbus_message_t          *xdbus_method_invocation_get_message          (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-xvariant_t              *xdbus_method_invocation_get_parameters       (xdbus_method_invocation_t *invocation);
-XPL_AVAILABLE_IN_ALL
-xpointer_t               xdbus_method_invocation_get_user_data        (xdbus_method_invocation_t *invocation);
+GLIB_AVAILABLE_IN_ALL
+GType                  g_dbus_method_invocation_get_type             (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+const gchar           *g_dbus_method_invocation_get_sender           (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+const gchar           *g_dbus_method_invocation_get_object_path      (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+const gchar           *g_dbus_method_invocation_get_interface_name   (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+const gchar           *g_dbus_method_invocation_get_method_name      (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+const GDBusMethodInfo *g_dbus_method_invocation_get_method_info      (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_2_38
+const GDBusPropertyInfo *g_dbus_method_invocation_get_property_info  (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection       *g_dbus_method_invocation_get_connection       (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+GDBusMessage          *g_dbus_method_invocation_get_message          (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+GVariant              *g_dbus_method_invocation_get_parameters       (GDBusMethodInvocation *invocation);
+GLIB_AVAILABLE_IN_ALL
+gpointer               g_dbus_method_invocation_get_user_data        (GDBusMethodInvocation *invocation);
 
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_value         (xdbus_method_invocation_t *invocation,
-                                                                      xvariant_t              *parameters);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_value_with_unix_fd_list (xdbus_method_invocation_t *invocation,
-                                                                                xvariant_t              *parameters,
-                                                                                xunix_fd_list_t           *fd_list);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_error         (xdbus_method_invocation_t *invocation,
-                                                                      xquark                 domain,
-                                                                      xint_t                   code,
-                                                                      const xchar_t           *format,
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_value         (GDBusMethodInvocation *invocation,
+                                                                      GVariant              *parameters);
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_value_with_unix_fd_list (GDBusMethodInvocation *invocation,
+                                                                                GVariant              *parameters,
+                                                                                GUnixFDList           *fd_list);
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_error         (GDBusMethodInvocation *invocation,
+                                                                      GQuark                 domain,
+                                                                      gint                   code,
+                                                                      const gchar           *format,
                                                                       ...) G_GNUC_PRINTF(4, 5);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_error_valist  (xdbus_method_invocation_t *invocation,
-                                                                      xquark                 domain,
-                                                                      xint_t                   code,
-                                                                      const xchar_t           *format,
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_error_valist  (GDBusMethodInvocation *invocation,
+                                                                      GQuark                 domain,
+                                                                      gint                   code,
+                                                                      const gchar           *format,
                                                                       va_list                var_args)
                                                                       G_GNUC_PRINTF(4, 0);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_error_literal (xdbus_method_invocation_t *invocation,
-                                                                      xquark                 domain,
-                                                                      xint_t                   code,
-                                                                      const xchar_t           *message);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_gerror        (xdbus_method_invocation_t *invocation,
-                                                                      const xerror_t          *error);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_take_error           (xdbus_method_invocation_t *invocation,
-                                                                      xerror_t                *error);
-XPL_AVAILABLE_IN_ALL
-void                   xdbus_method_invocation_return_dbus_error    (xdbus_method_invocation_t *invocation,
-                                                                      const xchar_t           *error_name,
-                                                                      const xchar_t           *error_message);
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_error_literal (GDBusMethodInvocation *invocation,
+                                                                      GQuark                 domain,
+                                                                      gint                   code,
+                                                                      const gchar           *message);
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_gerror        (GDBusMethodInvocation *invocation,
+                                                                      const GError          *error);
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_take_error           (GDBusMethodInvocation *invocation,
+                                                                      GError                *error);
+GLIB_AVAILABLE_IN_ALL
+void                   g_dbus_method_invocation_return_dbus_error    (GDBusMethodInvocation *invocation,
+                                                                      const gchar           *error_name,
+                                                                      const gchar           *error_message);
 
 G_END_DECLS
 

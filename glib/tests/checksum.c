@@ -2,11 +2,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-/* test_t xchecksum_t by computing the checksums of every initial
- * substring of this string, calling xchecksum_update with chunks of
+/* Test GChecksum by computing the checksums of every initial
+ * substring of this string, calling g_checksum_update with chunks of
  * every possible size. That is, first it computes the checksums of
  * "", then "T". Then it computes the checksums of "Th", first by
- * feeding the xchecksum_t 1 letter a time, then 2. Then it does "The",
+ * feeding the GChecksum 1 letter a time, then 2. Then it does "The",
  * first feeding it one letter at a time, then 2, then 3. Etc.
  *
  * MD5, SHA1, and SHA256 all use a 64-byte buffer internally; this
@@ -577,7 +577,7 @@ const char *SHA256_sums[] = {
   "df3a0c35d5345d6d792415c1310bd4589cdf68bac96ed599d6bb0c1545ffc86c"
 };
 
-const xchar_t *SHA384_sums[] = {
+const gchar *SHA384_sums[] = {
   "38b060a751ac96384cd9327eb1b1e36a21fdb71114be07434c0cc7bf63f6e1da274edebfe76f65fbd51ad2f14898b95b",
   "0dc52f16d3eca9ca8498ef2d3dc4874b3ff09ddaabbaad2b40694f028b5ce96b4f1beef0f7909216561d97f3ed52f898",
   "1f523ff2c063b7e066a7939cb32835e2419fcb17a84cde41db20e6bf232a7e8bbf604b8e72a78a71b1143fed864db2fd",
@@ -764,7 +764,7 @@ const xchar_t *SHA384_sums[] = {
   "396d84c9c1a2ee76b0163c38533cbc8bc453089e87b9790a62bf5175e614713fea4f16378b416fd8650351345cd44c07"
 };
 
-const xchar_t *SHA512_sums[] = {
+const gchar *SHA512_sums[] = {
   "cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e",
   "b2396a002fe7aec008808687d7cbacb340b7f7a090008382f3c95870f6fb10415f61f5737c102d4bfec58fe525407ea2001e761dab1da8a501d9523921f0ec21",
   "11ee0d7b40a7a4dd95f63b8c2a9a36b77daee5ca7d46fb5cb7f871db29650ce9c78306ec1fa9c4075ad0615a7f9e63697dd05cf79cedcdecc82cade38ce7638a",
@@ -953,38 +953,38 @@ const xchar_t *SHA512_sums[] = {
 
 typedef struct {
   GChecksumType  checksum_type;
-  const xchar_t   *sum;
+  const gchar   *sum;
   int            length;
 } ChecksumTest;
 
 static void
-test_checksum (xconstpointer d)
+test_checksum (gconstpointer d)
 {
   const ChecksumTest *test = d;
-  xchecksum_t *checksum;
-  xchecksum_t *checksum2;
+  GChecksum *checksum;
+  GChecksum *checksum2;
   const char *p;
   int chunk_length;
 
   for (chunk_length = MIN (test->length, 1); chunk_length < test->length; chunk_length++)
     {
-      checksum = xchecksum_new (test->checksum_type);
+      checksum = g_checksum_new (test->checksum_type);
       for (p = FIXED_STR; p < FIXED_STR + test->length; p += chunk_length)
 	{
-	  xchecksum_update (checksum, (const xuchar_t *)p,
+	  g_checksum_update (checksum, (const guchar *)p,
 			     MIN (chunk_length, test->length - (p - FIXED_STR)));
 	}
-      checksum2 = xchecksum_copy (checksum);
-      g_assert_cmpstr (xchecksum_get_string (checksum), ==, test->sum);
-      xchecksum_free (checksum);
+      checksum2 = g_checksum_copy (checksum);
+      g_assert_cmpstr (g_checksum_get_string (checksum), ==, test->sum);
+      g_checksum_free (checksum);
 
-      g_assert_cmpstr (xchecksum_get_string (checksum2), ==, test->sum);
-      xchecksum_free (checksum2);
+      g_assert_cmpstr (g_checksum_get_string (checksum2), ==, test->sum);
+      g_checksum_free (checksum2);
     }
 }
 
-static xint_t
-hexval (const xchar_t c)
+static gint
+hexval (const gchar c)
 {
   switch (c)
     {
@@ -1011,13 +1011,13 @@ hexval (const xchar_t c)
     }
 }
 
-static xuint8_t *
-sum_to_digest (const xchar_t *sum, xsize_t *len)
+static guint8 *
+sum_to_digest (const gchar *sum, gsize *len)
 {
-  xsize_t i, l;
-  xuint8_t *digest;
+  gsize i, l;
+  guint8 *digest;
 
-  xassert (strlen (sum) % 2 == 0);
+  g_assert (strlen (sum) % 2 == 0);
   l = strlen (sum) / 2;
 
   digest = g_malloc (l);
@@ -1029,52 +1029,52 @@ sum_to_digest (const xchar_t *sum, xsize_t *len)
 }
 
 static void
-test_checksum_reset (xconstpointer d)
+test_checksum_reset (gconstpointer d)
 {
   const ChecksumTest *test = d;
-  xchecksum_t *checksum;
+  GChecksum *checksum;
   const char *p;
   int chunk_length;
-  xuint8_t *digest;
-  xuint8_t *digest2;
-  xsize_t len, len2;
+  guint8 *digest;
+  guint8 *digest2;
+  gsize len, len2;
 
-  checksum = xchecksum_new (test->checksum_type);
+  checksum = g_checksum_new (test->checksum_type);
 
   for (chunk_length = MIN (test->length, 1); chunk_length < test->length; chunk_length++)
     {
       for (p = FIXED_STR; p < FIXED_STR + test->length; p += chunk_length)
 	{
-	  xchecksum_update (checksum, (const xuchar_t *)p,
+	  g_checksum_update (checksum, (const guchar *)p,
 			     MIN (chunk_length, test->length - (p - FIXED_STR)));
 	}
 
-      len2 = xchecksum_type_get_length (test->checksum_type);
+      len2 = g_checksum_type_get_length (test->checksum_type);
       digest = sum_to_digest (test->sum, &len);
       g_assert_cmpint (len, ==, len2);
       digest2 = g_malloc (len2);
-      xchecksum_get_digest (checksum, digest2, &len2);
+      g_checksum_get_digest (checksum, digest2, &len2);
       g_assert_cmpmem (digest, len, digest2, len);
       g_free (digest);
       g_free (digest2);
 
-      xchecksum_reset (checksum);
+      g_checksum_reset (checksum);
     }
 
-  xchecksum_free (checksum);
+  g_checksum_free (checksum);
 }
 
 typedef struct {
   GChecksumType   checksum_type;
-  const xchar_t   **sums;
+  const gchar   **sums;
 } ChecksumComputeTest;
 
 static void
-test_checksum_string (xconstpointer d)
+test_checksum_string (gconstpointer d)
 {
   const ChecksumComputeTest *test = d;
-  xsize_t length;
-  xchar_t *checksum;
+  gsize length;
+  gchar *checksum;
 
   for (length = 0; length <= FIXED_LEN; length++)
     {
@@ -1093,18 +1093,18 @@ test_checksum_string (xconstpointer d)
 }
 
 static void
-test_checksum_bytes (xconstpointer d)
+test_checksum_bytes (gconstpointer d)
 {
   const ChecksumComputeTest *test = d;
-  xbytes_t *input;
-  xsize_t length;
-  xchar_t *checksum;
+  GBytes *input;
+  gsize length;
+  gchar *checksum;
 
   for (length = 0; length <= FIXED_LEN; length++)
     {
-      input = xbytes_new_static (FIXED_STR, length);
+      input = g_bytes_new_static (FIXED_STR, length);
       checksum = g_compute_checksum_for_bytes (test->checksum_type, input);
-      xbytes_unref (input);
+      g_bytes_unref (input);
 
       g_assert_cmpstr (checksum, ==, test->sums[length]);
       g_free (checksum);
@@ -1115,55 +1115,55 @@ static void
 add_checksum_test (GChecksumType  type,
                    const char    *type_name,
                    const char    *sum,
-                   xint_t           length)
+                   gint           length)
 {
   ChecksumTest *test;
-  xchar_t *path;
+  gchar *path;
 
   test = g_new0 (ChecksumTest, 1);
   test->checksum_type = type;
   test->sum = sum;
   test->length = length;
 
-  path = xstrdup_printf ("/checksum/%s/%d", type_name, length);
+  path = g_strdup_printf ("/checksum/%s/%d", type_name, length);
   g_test_add_data_func (path, test, test_checksum);
   g_free (path);
 
-  path = xstrdup_printf ("/checksum/%s/reset/%d", type_name, length);
+  path = g_strdup_printf ("/checksum/%s/reset/%d", type_name, length);
   g_test_add_data_func_full (path, test, test_checksum_reset, g_free);
   g_free (path);
 }
 
 static void
 add_checksum_string_test (GChecksumType   type,
-                          const xchar_t    *type_name,
-                          const xchar_t   **sums)
+                          const gchar    *type_name,
+                          const gchar   **sums)
 {
   ChecksumComputeTest *test;
-  xchar_t *path;
+  gchar *path;
 
   test = g_new0 (ChecksumComputeTest, 1);
   test->checksum_type = type;
   test->sums = sums;
 
-  path = xstrdup_printf ("/checksum/%s/string", type_name);
+  path = g_strdup_printf ("/checksum/%s/string", type_name);
   g_test_add_data_func_full (path, test, test_checksum_string, g_free);
   g_free (path);
 }
 
 static void
 add_checksum_bytes_test (GChecksumType   type,
-                          const xchar_t    *type_name,
-                          const xchar_t   **sums)
+                          const gchar    *type_name,
+                          const gchar   **sums)
 {
   ChecksumComputeTest *test;
-  xchar_t *path;
+  gchar *path;
 
   test = g_new0 (ChecksumComputeTest, 1);
   test->checksum_type = type;
   test->sums = sums;
 
-  path = xstrdup_printf ("/checksum/%s/bytes", type_name);
+  path = g_strdup_printf ("/checksum/%s/bytes", type_name);
   g_test_add_data_func_full (path, test, test_checksum_bytes, g_free);
   g_free (path);
 }
@@ -1171,14 +1171,14 @@ add_checksum_bytes_test (GChecksumType   type,
 static void
 test_unsupported (void)
 {
-  g_assert_cmpint (xchecksum_type_get_length (20), ==, -1);
-  xassert (xchecksum_new (20) == NULL);
+  g_assert_cmpint (g_checksum_type_get_length (20), ==, -1);
+  g_assert (g_checksum_new (20) == NULL);
 }
 
 int
 main (int argc, char *argv[])
 {
-  xsize_t length;
+  gsize length;
 
   g_test_init (&argc, &argv, NULL);
 

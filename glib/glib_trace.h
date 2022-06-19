@@ -1,5 +1,5 @@
-/* XPL - Library of useful routines for C programming
- *
+/* GLIB - Library of useful routines for C programming
+ * 
  * Copyright (C) 2009,2010 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XPLTRACE_H__
-#define __XPLTRACE_H__
+#ifndef __GLIBTRACE_H__
+#define __GLIBTRACE_H__
 
 #ifndef SIZEOF_CHAR
 #error "config.h must be included prior to glib_trace.h"
@@ -40,4 +40,4 @@
 
 #endif
 
-#endif /* __XPLTRACE_H__ */
+#endif /* __GLIBTRACE_H__ */

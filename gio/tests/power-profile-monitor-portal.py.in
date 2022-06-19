@@ -28,7 +28,7 @@ try:
     import dbusmock
     from gi.repository import GLib
     from gi.repository import Gio
-    from gi.repository import xobject_t
+    from gi.repository import GObject
 
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
@@ -36,7 +36,7 @@ try:
     XDG_DESKTOP_PORTAL_PATH = "@libexecdir@/xdg-desktop-portal"
 
     class TestPowerProfileMonitorPortal(dbusmock.DBusTestCase):
-        '''test_t xpower_profile_monitor_portal_t'''
+        '''Test GPowerProfileMonitorPortal'''
 
         @classmethod
         def setUpClass(klass):
@@ -51,7 +51,7 @@ try:
             except AttributeError:
                 raise unittest.SkipTest('Power Profile Monitor not in '
                                         'introspection data. Requires '
-                                        'xobject-Introspection > 1.69.0')
+                                        'GObject-Introspection > 1.69.0')
             try:
                 (self.p_mock, self.obj_ppd) = self.spawn_server_template(
                     'power_profiles_daemon', {}, stdout=subprocess.PIPE)
@@ -81,7 +81,7 @@ try:
 
             os.environ['GTK_USE_PORTAL'] = "1"
             self.power_profile_monitor = Gio.PowerProfileMonitor.dup_default()
-            assert("xpower_profile_monitor_portal_t" in str(self.power_profile_monitor))
+            assert("GPowerProfileMonitorPortal" in str(self.power_profile_monitor))
             self.power_profile_monitor.connect("notify::power-saver-enabled", self.power_saver_enabled_cb)
             self.mainloop = GLib.MainLoop()
             self.main_context = self.mainloop.get_context()
@@ -128,7 +128,7 @@ try:
 
             # Create a new power profile monitor and check its property value is
             # correct by default.
-            new_power_profile_monitor = xobject_t.new(xobject_t.type_from_name('xpower_profile_monitor_portal_t'))
+            new_power_profile_monitor = GObject.new(GObject.type_from_name('GPowerProfileMonitorPortal'))
             new_power_profile_monitor.init()
             self.assertTrue(new_power_profile_monitor.get_power_saver_enabled())
 

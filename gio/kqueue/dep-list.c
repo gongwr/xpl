@@ -30,7 +30,7 @@
 
 #include "dep-list.h"
 
-static xboolean_t kdl_debug_enabled = FALSE;
+static gboolean kdl_debug_enabled = FALSE;
 #define perror_msg if (kdl_debug_enabled) g_warning
 
 
@@ -80,7 +80,7 @@ dep_list* dl_create (char *path, ino_t inode)
  *
  * @param[in] dl A pointer to list to make a copy. May be NULL.
  * @return A shallow copy of the list.
- **/
+ **/ 
 dep_list*
 dl_shallow_copy (const dep_list *dl)
 {
@@ -228,7 +228,7 @@ error:
  *
  * This function performs something like a set intersection. The same items
  * will be removed from the both lists. Items are comapred by a filename.
- *
+ * 
  * @param[in,out] before A pointer to a pointer to a list. Will contain items
  *     which were not found in the 'after' list.
  * @param[in,out] after  A pointer to a pointer to a list. Will contain items
@@ -361,15 +361,15 @@ G_STMT_START {                                                          \
  *
  * @param[in,out] removed  A list of the removed files in the directory.
  * @param[in,out] added    A list of the added files of the directory.
- * @param[in]     cbs      A pointer to #traverse_cbs, a user-defined set of
+ * @param[in]     cbs      A pointer to #traverse_cbs, a user-defined set of 
  *     traverse callbacks.
  * @param[in]     udata    A pointer to the user-defined data.
  * @return 0 if no files were renamed, >0 otherwise.
 **/
 static int
-dl_detect_moves (dep_list           **removed,
-                 dep_list           **added,
-                 const traverse_cbs  *cbs,
+dl_detect_moves (dep_list           **removed, 
+                 dep_list           **added, 
+                 const traverse_cbs  *cbs, 
                  void                *udata)
 {
     assert (cbs != NULL);
@@ -402,7 +402,7 @@ dl_detect_moves (dep_list           **removed,
  *
  * @param[in,out] removed  A list of the removed files in the directory.
  * @param[in,out] current  A list with the current contents of the directory.
- * @param[in]     cbs      A pointer to #traverse_cbs, a user-defined set of
+ * @param[in]     cbs      A pointer to #traverse_cbs, a user-defined set of 
  *     traverse callbacks.
  * @param[in]     udata    A pointer to the user-defined data.
  * @return 0 if no files were renamed, >0 otherwise.
@@ -433,7 +433,7 @@ dl_detect_replacements (dep_list           **removed,
  *    foo/bar
  *
  * And you also have a directory tmp with a file 1:
- *
+ * 
  *    tmp/1
  *
  * You do not watching directory tmp.
@@ -447,7 +447,7 @@ dl_detect_replacements (dep_list           **removed,
  *
  * @param[in,out] previous A list with the previous contents of the directory.
  * @param[in,out] current  A list with the current contents of the directory.
- * @param[in]     cbs      A pointer to #traverse_cbs, a user-defined set of
+ * @param[in]     cbs      A pointer to #traverse_cbs, a user-defined set of 
  *     traverse callbacks.
  * @param[in]     udata    A pointer to the user-defined data.
  * @return 0 if no files were renamed, >0 otherwise.
@@ -472,12 +472,12 @@ dl_detect_overwrites (dep_list           **previous,
 
 /**
  * Traverse a list and invoke a callback for each item.
- *
+ * 
  * @param[in] list  A #dep_list.
  * @param[in] cb    A #single_entry_cb callback function.
  * @param[in] udata A pointer to the user-defined data.
  **/
-static void
+static void 
 dl_emit_single_cb_on (dep_list        *list,
                       single_entry_cb  cb,
                       void            *udata)
@@ -513,12 +513,12 @@ dl_calculate (dep_list           *before,
 
     assert (cbs != NULL);
 
-    dl_diff (&was, &now);
+    dl_diff (&was, &now); 
 
     need_update += dl_detect_moves (&was, &now, cbs, udata);
     need_update += dl_detect_replacements (&was, &lst, cbs, udata);
     dl_detect_overwrites (&pre, &lst, cbs, udata);
-
+ 
     if (need_update) {
         cb_invoke (cbs, names_updated, udata);
     }
@@ -528,7 +528,7 @@ dl_calculate (dep_list           *before,
 
     cb_invoke (cbs, many_added, udata, now);
     cb_invoke (cbs, many_removed, udata, was);
-
+    
     dl_shallow_free (lst);
     dl_shallow_free (now);
     dl_shallow_free (pre);

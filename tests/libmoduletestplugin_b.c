@@ -19,7 +19,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #undef G_DISABLE_ASSERT
@@ -27,9 +27,9 @@
 
 #include        <gmodule.h>
 
-G_MODULE_EXPORT xchar_t* gplugin_b_state;
+G_MODULE_EXPORT gchar* gplugin_b_state;
 
-G_MODULE_EXPORT const xchar_t* g_module_check_init (GModule *module);
+G_MODULE_EXPORT const gchar* g_module_check_init (GModule *module);
 G_MODULE_EXPORT void   g_module_unload (GModule *module);
 
 G_MODULE_EXPORT void gplugin_b_func (void);
@@ -37,7 +37,7 @@ G_MODULE_EXPORT void gplugin_clash_func (void);
 G_MODULE_EXPORT void g_clash_func (void);
 G_MODULE_EXPORT void gplugin_say_boo_func (void);
 
-G_MODULE_EXPORT const xchar_t*
+G_MODULE_EXPORT const gchar*
 g_module_check_init (GModule *module)
 {
   gplugin_b_state = "check-init";

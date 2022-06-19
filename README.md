@@ -27,7 +27,7 @@ See [SECURITY.md](SECURITY.md) for more details.
 
 API documentation is available online for GLib for the:
  * [GLib](https://docs.gtk.org/glib/)
- * [xobject_t](https://docs.gtk.org/gobject/)
+ * [GObject](https://docs.gtk.org/gobject/)
  * [GModule](https://docs.gtk.org/gmodule/)
  * [GIO](https://docs.gtk.org/gio/)
 

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,13 +25,13 @@
 #ifndef __G_WIN32_H__
 #define __G_WIN32_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
 #include <glib/gtypes.h>
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 
 G_BEGIN_DECLS
 
@@ -63,9 +63,9 @@ G_BEGIN_DECLS
  * g_win32_. Or that was the idea at some time, but there is just one
  * of those:
  */
-XPL_AVAILABLE_IN_ALL
-xint_t		g_win32_ftruncate	(xint_t		 f,
-					 xuint_t		 size);
+GLIB_AVAILABLE_IN_ALL
+gint		g_win32_ftruncate	(gint		 f,
+					 guint		 size);
 #endif /* G_OS_WIN32 */
 
 /* The MS setlocale uses locale names of the form "English_United
@@ -74,36 +74,36 @@ xint_t		g_win32_ftruncate	(xint_t		 f,
  * returns it as a string of the above form for use in forming file
  * names etc. The returned string should be deallocated with g_free().
  */
-XPL_AVAILABLE_IN_ALL
-xchar_t* 		g_win32_getlocale  (void);
+GLIB_AVAILABLE_IN_ALL
+gchar* 		g_win32_getlocale  (void);
 
 /* Translate a Win32 error code (as returned by GetLastError()) into
  * the corresponding message. The returned string should be deallocated
  * with g_free().
  */
-XPL_AVAILABLE_IN_ALL
-xchar_t*          g_win32_error_message (xint_t error);
+GLIB_AVAILABLE_IN_ALL
+gchar*          g_win32_error_message (gint error);
 
-XPL_DEPRECATED
-xchar_t*          g_win32_get_package_installation_directory (const xchar_t *package,
-							    const xchar_t *dll_name);
+GLIB_DEPRECATED
+gchar*          g_win32_get_package_installation_directory (const gchar *package,
+							    const gchar *dll_name);
 
-XPL_DEPRECATED
-xchar_t*          g_win32_get_package_installation_subdirectory (const xchar_t *package,
-							       const xchar_t *dll_name,
-							       const xchar_t *subdir);
+GLIB_DEPRECATED
+gchar*          g_win32_get_package_installation_subdirectory (const gchar *package,
+							       const gchar *dll_name,
+							       const gchar *subdir);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t*          g_win32_get_package_installation_directory_of_module (xpointer_t hmodule);
+GLIB_AVAILABLE_IN_ALL
+gchar*          g_win32_get_package_installation_directory_of_module (gpointer hmodule);
 
-XPL_DEPRECATED_IN_2_44_FOR(g_win32_check_windows_version)
-xuint_t		g_win32_get_windows_version (void);
+GLIB_DEPRECATED_IN_2_44_FOR(g_win32_check_windows_version)
+guint		g_win32_get_windows_version (void);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t*          g_win32_locale_filename_from_utf8 (const xchar_t *utf8filename);
+GLIB_AVAILABLE_IN_ALL
+gchar*          g_win32_locale_filename_from_utf8 (const gchar *utf8filename);
 
-XPL_AVAILABLE_IN_2_40
-xchar_t **        g_win32_get_command_line (void);
+GLIB_AVAILABLE_IN_2_40
+gchar **        g_win32_get_command_line (void);
 
 /* As of GLib 2.14 we only support NT-based Windows */
 #define G_WIN32_IS_NT_BASED() TRUE
@@ -127,14 +127,14 @@ typedef enum
   G_WIN32_OS_SERVER,
 } GWin32OSType;
 
-XPL_AVAILABLE_IN_2_44
-xboolean_t g_win32_check_windows_version (const xint_t major,
-                                        const xint_t minor,
-                                        const xint_t spver,
+GLIB_AVAILABLE_IN_2_44
+gboolean g_win32_check_windows_version (const gint major,
+                                        const gint minor,
+                                        const gint spver,
                                         const GWin32OSType os_type);
 
 G_END_DECLS
 
-#endif	 /* XPLATFORM_WIN32 */
+#endif	 /* G_PLATFORM_WIN32 */
 
 #endif /* __G_WIN32_H__ */

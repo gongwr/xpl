@@ -30,7 +30,7 @@ not signed.
 
 ## Reporting a Vulnerability
 
-If you think you've identified a security issue in GLib, xobject_t or GIO, please
+If you think you've identified a security issue in GLib, GObject or GIO, please
 **do not** report the issue publicly via a mailing list, IRC, a public issue on
 the GitLab issue tracker, a merge request, or any other public venue.
 

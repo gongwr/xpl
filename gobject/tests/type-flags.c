@@ -4,52 +4,52 @@
 #include <glib-object.h>
 
 #define TEST_TYPE_FINAL (test_final_get_type())
-G_DECLARE_FINAL_TYPE (test_final, test_final, TEST, FINAL, xobject)
+G_DECLARE_FINAL_TYPE (TestFinal, test_final, TEST, FINAL, GObject)
 
-struct _test_final
+struct _TestFinal
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 };
 
-struct _test_final_class
+struct _TestFinalClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (test_final, test_final, XTYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (TestFinal, test_final, G_TYPE_OBJECT)
 
 static void
-test_final_class_init (test_final_class_t *klass)
+test_final_class_init (TestFinalClass *klass)
 {
 }
 
 static void
-test_final_init (test_final_t *self)
+test_final_init (TestFinal *self)
 {
 }
 
 #define TEST_TYPE_FINAL2 (test_final2_get_type())
-G_DECLARE_FINAL_TYPE (test_final2, test_final2, TEST, FINAL2, test_final)
+G_DECLARE_FINAL_TYPE (TestFinal2, test_final2, TEST, FINAL2, TestFinal)
 
-struct _test_final2
+struct _TestFinal2
 {
-  test_final_t parent_instance;
+  TestFinal parent_instance;
 };
 
-struct _test_final2_class
+struct _TestFinal2Class
 {
-  test_final_class_t parent_class;
+  TestFinalClass parent_class;
 };
 
-XDEFINE_TYPE (test_final2, test_final2, TEST_TYPE_FINAL)
+G_DEFINE_TYPE (TestFinal2, test_final2, TEST_TYPE_FINAL)
 
 static void
-test_final2_class_init (test_final2_class_t *klass)
+test_final2_class_init (TestFinal2Class *klass)
 {
 }
 
 static void
-test_final2_init (test_final2_t *self)
+test_final2_init (TestFinal2 *self)
 {
 }
 
@@ -59,10 +59,10 @@ test_final2_init (test_final2_t *self)
 static void
 test_type_flags_final (void)
 {
-  xtype_t final2_type;
+  GType final2_type;
 
   /* This is the message we print out when registering the type */
-  g_test_expect_message ("GLib-xobject_t", G_LOG_LEVEL_WARNING,
+  g_test_expect_message ("GLib-GObject", G_LOG_LEVEL_WARNING,
                          "*cannot derive*");
 
   /* This is the message when we fail to return from the GOnce init
@@ -72,7 +72,7 @@ test_type_flags_final (void)
                          "*g_once_init_leave: assertion*");
 
   final2_type = TEST_TYPE_FINAL2;
-  g_assert_true (final2_type == XTYPE_INVALID);
+  g_assert_true (final2_type == G_TYPE_INVALID);
 
   g_test_assert_expected_messages ();
 }

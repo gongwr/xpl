@@ -27,15 +27,15 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 
 #: ../gio/gapplication.c:495
-msgid "xapplication_t options"
+msgid "GApplication options"
 msgstr "Opcije Gprograma"
 
 #: ../gio/gapplication.c:495
-msgid "Show xapplication_t options"
+msgid "Show GApplication options"
 msgstr "Pokazuje opcije Gprograma"
 
 #: ../gio/gapplication.c:540
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
 "Ulazi u režim usluge Gprograma (koristi sa datoteka usluge D-sabirnice)"
 
@@ -146,7 +146,7 @@ msgid "PARAMETER"
 msgstr "PARAMETAR"
 
 #: ../gio/gapplication-tool.c:74
-msgid "Optional parameter to the action invocation, in xvariant_t format"
+msgid "Optional parameter to the action invocation, in GVariant format"
 msgstr "Izborni parametar za prizivanje radnje, u zapisu Gvarijanta"
 
 #: ../gio/gapplication-tool.c:96 ../gio/gresource-tool.c:526
@@ -279,7 +279,7 @@ msgid "Seek not supported on base stream"
 msgstr "Nije podržavano premotavanje osnovnog toka"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
 msgstr "Ne mogu da skratim ulazni tok u Gmeđumemoriji"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
@@ -353,15 +353,15 @@ msgid "%s filetype"
 msgstr "%s vrsta datoteke"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "xcredentials_t is not implemented on this OS"
+msgid "GCredentials is not implemented on this OS"
 msgstr "Guverenja nisu podržana na operativnom sistemu"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no xcredentials_t support for your platform"
+msgid "There is no GCredentials support for your platform"
 msgstr "Nemate podršku za Guverenja na ovoj platformi"
 
 #: ../gio/gcredentials.c:513
-msgid "xcredentials_t does not contain a process ID on this OS"
+msgid "GCredentials does not contain a process ID on this OS"
 msgstr "Guverenja ne sadrže IB procesa na ovom operativnom sistemu"
 
 #: ../gio/gcredentials.c:565
@@ -563,8 +563,8 @@ msgstr ""
 "%s)"
 
 #: ../gio/gdbusauth.c:1171
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Poništeno preko xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Poništeno preko GDBusAuthObserver::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:262
 #, c-format
@@ -851,7 +851,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:1873
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
 "Greška pri deserijalizaciji Gvarijanta sa niskom vrste „%s“ iz žičanog "
 "formata D-magistrale"
@@ -897,7 +897,7 @@ msgstr "Ne mogu da deserijalizujem poruku: "
 #: ../gio/gdbusmessage.c:2519
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
 "Greška pri serijalizaciji Gvarijanta sa niskom vrste „%s“ iz žičanog formata "
 "D-magistrale"
@@ -1343,27 +1343,27 @@ msgstr "DTLS podrška nije dostupna"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
+msgid "Can’t handle version %d of GEmblem encoding"
 msgstr "Ne mogu da radim sa izdanjem %d kodiranja GEmblema"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
 msgstr "Neispravno zadat broj tokena (%d) u kodiranju GEmblema"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
 msgstr "Ne mogu da radim sa izdanjem %d kodiranja ikonice GEmblema"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
 msgstr "Nije ispravno zadat broj tokena (%d) u kodiranju ikonice GEmblema"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Očekivano je xemblem_t za ikonicu GEmblema"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Očekivano je GEmblem za ikonicu GEmblema"
 
 #: ../gio/gfile.c:1071 ../gio/gfile.c:1309 ../gio/gfile.c:1447
 #: ../gio/gfile.c:1685 ../gio/gfile.c:1740 ../gio/gfile.c:1798
@@ -1462,11 +1462,11 @@ msgstr "Brojanje datoteka je već završeno"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgid "Can’t handle version %d of GFileIcon encoding"
 msgstr "Ne mogu da radim sa izdanjem %d kodiranja ikonice GDatoteke"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
 msgstr "Loši ulazni podaci za ikonicu GDatoteke"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
@@ -1530,7 +1530,7 @@ msgstr "Ne postoji vrsta za naziv klase %s"
 
 #: ../gio/gicon.c:320
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
+msgid "Type %s does not implement the GIcon interface"
 msgstr "Vrsta %s ne podržava sučelje GIkonice"
 
 #: ../gio/gicon.c:331
@@ -1545,7 +1545,7 @@ msgstr "Broj izdanja je loše zadat: %s"
 
 #: ../gio/gicon.c:359
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
 msgstr "%s vrsta ne podržava „from_tokens()“ na sučelju GIkonice"
 
 #: ../gio/gicon.c:461
@@ -2601,7 +2601,7 @@ msgstr "<%s id='%s'> nije (još) definisano."
 
 #: ../gio/glib-compile-schemas.c:1004
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
+msgid "Invalid GVariant type string “%s”"
 msgstr "Neispravna vrsta niske GVarijanta „%s“"
 
 #: ../gio/glib-compile-schemas.c:1034
@@ -2791,7 +2791,7 @@ msgstr "Ne nameće ograničenja naziva ključa"
 
 #: ../gio/glib-compile-schemas.c:2099
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3120,7 +3120,7 @@ msgid "Error removing old file: %s"
 msgstr "Greška prilikom uklanjanja stare datoteke: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid xseek_type_t supplied"
+msgid "Invalid GSeekType supplied"
 msgstr "Nije ispravno određena vrsta GPretrage"
 
 #: ../gio/gmemoryinputstream.c:484
@@ -3128,7 +3128,7 @@ msgid "Invalid seek request"
 msgstr "Neispravan zahtev pretrage"
 
 #: ../gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
 msgstr "Ne mogu da skratim ulazni tok GMemorije"
 
 #: ../gio/gmemoryoutputstream.c:567
@@ -3654,7 +3654,7 @@ msgstr "Isteklo vreme za U/I utičnice"
 
 #: ../gio/gsocket.c:549
 #, c-format
-msgid "creating xsocket_t from fd: %s"
+msgid "creating GSocket from fd: %s"
 msgstr "pravim GUtičnicu iz fd-a: %s"
 
 #: ../gio/gsocket.c:578 ../gio/gsocket.c:632 ../gio/gsocket.c:639
@@ -3790,7 +3790,7 @@ msgid "Error sending message: %s"
 msgstr "Greška pri slanju poruke: %s"
 
 #: ../gio/gsocket.c:4711
-msgid "xsocket_control_message_t not supported on Windows"
+msgid "GSocketControlMessage not supported on Windows"
 msgstr "Poruka upravljanja Gutičnicom nije podržana na Vindouzu"
 
 #: ../gio/gsocket.c:5164 ../gio/gsocket.c:5237 ../gio/gsocket.c:5463
@@ -3804,7 +3804,7 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Ne mogu da pročitam uverenja utičnice: %s"
 
 #: ../gio/gsocket.c:5744
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr "g_utičnica_dobavlja_uverenja nije primenjena za ovaj operativni sistem"
 
 #: ../gio/gsocketclient.c:176
@@ -3931,7 +3931,7 @@ msgstr "Nepoznata greška SOCKSv5 posrednika."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgid "Can’t handle version %d of GThemedIcon encoding"
 msgstr "Ne mogu da radim sa izdanjem kodiranja %d ikonice GTemiranja"
 
 #: ../gio/gthreadedresolver.c:118
@@ -4278,25 +4278,25 @@ msgstr "Naziv putanje „%s“ nije apsolutna putanja"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A, %d. %B %Y. %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%T"
 
@@ -4679,13 +4679,13 @@ msgstr "Dec"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:563
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "PrP"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:566
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "PoP"
 

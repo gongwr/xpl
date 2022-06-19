@@ -28,33 +28,33 @@
 
 /**
  * SECTION:gmenu
- * @title: xmenu_t
- * @short_description: A simple implementation of xmenu_model_t
+ * @title: GMenu
+ * @short_description: A simple implementation of GMenuModel
  * @include: gio/gio.h
  *
- * #xmenu_t is a simple implementation of #xmenu_model_t.
- * You populate a #xmenu_t by adding #xmenu_item_t instances to it.
+ * #GMenu is a simple implementation of #GMenuModel.
+ * You populate a #GMenu by adding #GMenuItem instances to it.
  *
  * There are some convenience functions to allow you to directly
- * add items (avoiding #xmenu_item_t) for the common cases. To add
- * a regular item, use xmenu_insert(). To add a section, use
- * xmenu_insert_section(). To add a submenu, use
- * xmenu_insert_submenu().
+ * add items (avoiding #GMenuItem) for the common cases. To add
+ * a regular item, use g_menu_insert(). To add a section, use
+ * g_menu_insert_section(). To add a submenu, use
+ * g_menu_insert_submenu().
  */
 
 /**
- * xmenu_t:
+ * GMenu:
  *
- * #xmenu_t is an opaque structure type.  You must access it using the
+ * #GMenu is an opaque structure type.  You must access it using the
  * functions below.
  *
  * Since: 2.32
  */
 
 /**
- * xmenu_item_t:
+ * GMenuItem:
  *
- * #xmenu_item_t is an opaque structure type.  You must access it using the
+ * #GMenuItem is an opaque structure type.  You must access it using the
  * functions below.
  *
  * Since: 2.32
@@ -62,75 +62,75 @@
 
 struct _GMenuItem
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xhashtable_t *attributes;
-  xhashtable_t *links;
-  xboolean_t    cow;
+  GHashTable *attributes;
+  GHashTable *links;
+  gboolean    cow;
 };
 
-typedef xobject_class_t xmenu_item_class_t;
+typedef GObjectClass GMenuItemClass;
 
 struct _GMenu
 {
-  xmenu_model_t parent_instance;
+  GMenuModel parent_instance;
 
-  xarray_t   *items;
-  xboolean_t  mutable;
+  GArray   *items;
+  gboolean  mutable;
 };
 
-typedef xmenu_model_class_t xmenu_class_t;
+typedef GMenuModelClass GMenuClass;
 
-XDEFINE_TYPE (xmenu, xmenu, XTYPE_MENU_MODEL)
-XDEFINE_TYPE (xmenu_item, xmenu_item, XTYPE_OBJECT)
+G_DEFINE_TYPE (GMenu, g_menu, G_TYPE_MENU_MODEL)
+G_DEFINE_TYPE (GMenuItem, g_menu_item, G_TYPE_OBJECT)
 
 struct item
 {
-  xhashtable_t *attributes;
-  xhashtable_t *links;
+  GHashTable *attributes;
+  GHashTable *links;
 };
 
-static xboolean_t
-xmenu_is_mutable (xmenu_model_t *model)
+static gboolean
+g_menu_is_mutable (GMenuModel *model)
 {
-  xmenu_t *menu = XMENU (model);
+  GMenu *menu = G_MENU (model);
 
   return menu->mutable;
 }
 
-static xint_t
-xmenu_get_n_items (xmenu_model_t *model)
+static gint
+g_menu_get_n_items (GMenuModel *model)
 {
-  xmenu_t *menu = XMENU (model);
+  GMenu *menu = G_MENU (model);
 
   return menu->items->len;
 }
 
 static void
-xmenu_get_item_attributes (xmenu_model_t  *model,
-                            xint_t         position,
-                            xhashtable_t **table)
+g_menu_get_item_attributes (GMenuModel  *model,
+                            gint         position,
+                            GHashTable **table)
 {
-  xmenu_t *menu = XMENU (model);
+  GMenu *menu = G_MENU (model);
 
-  *table = xhash_table_ref (g_array_index (menu->items, struct item, position).attributes);
+  *table = g_hash_table_ref (g_array_index (menu->items, struct item, position).attributes);
 }
 
 static void
-xmenu_get_item_links (xmenu_model_t  *model,
-                       xint_t         position,
-                       xhashtable_t **table)
+g_menu_get_item_links (GMenuModel  *model,
+                       gint         position,
+                       GHashTable **table)
 {
-  xmenu_t *menu = XMENU (model);
+  GMenu *menu = G_MENU (model);
 
-  *table = xhash_table_ref (g_array_index (menu->items, struct item, position).links);
+  *table = g_hash_table_ref (g_array_index (menu->items, struct item, position).links);
 }
 
 /**
- * xmenu_insert_item:
- * @menu: a #xmenu_t
+ * g_menu_insert_item:
+ * @menu: a #GMenu
  * @position: the position at which to insert the item
- * @item: the #xmenu_item_t to insert
+ * @item: the #GMenuItem to insert
  *
  * Inserts @item into @menu.
  *
@@ -146,320 +146,320 @@ xmenu_get_item_links (xmenu_model_t  *model,
  * You should probably just free @item once you're done.
  *
  * There are many convenience functions to take care of common cases.
- * See xmenu_insert(), xmenu_insert_section() and
- * xmenu_insert_submenu() as well as "prepend" and "append" variants of
+ * See g_menu_insert(), g_menu_insert_section() and
+ * g_menu_insert_submenu() as well as "prepend" and "append" variants of
  * each of these functions.
  *
  * Since: 2.32
  */
 void
-xmenu_insert_item (xmenu_t     *menu,
-                    xint_t       position,
-                    xmenu_item_t *item)
+g_menu_insert_item (GMenu     *menu,
+                    gint       position,
+                    GMenuItem *item)
 {
   struct item new_item;
 
-  g_return_if_fail (X_IS_MENU (menu));
-  g_return_if_fail (X_IS_MENU_ITEM (item));
+  g_return_if_fail (G_IS_MENU (menu));
+  g_return_if_fail (G_IS_MENU_ITEM (item));
 
-  if (position < 0 || (xuint_t) position > menu->items->len)
+  if (position < 0 || (guint) position > menu->items->len)
     position = menu->items->len;
 
-  new_item.attributes = xhash_table_ref (item->attributes);
-  new_item.links = xhash_table_ref (item->links);
+  new_item.attributes = g_hash_table_ref (item->attributes);
+  new_item.links = g_hash_table_ref (item->links);
   item->cow = TRUE;
 
   g_array_insert_val (menu->items, position, new_item);
-  xmenu_model_items_changed (XMENU_MODEL (menu), position, 0, 1);
+  g_menu_model_items_changed (G_MENU_MODEL (menu), position, 0, 1);
 }
 
 /**
- * xmenu_prepend_item:
- * @menu: a #xmenu_t
- * @item: a #xmenu_item_t to prepend
+ * g_menu_prepend_item:
+ * @menu: a #GMenu
+ * @item: a #GMenuItem to prepend
  *
  * Prepends @item to the start of @menu.
  *
- * See xmenu_insert_item() for more information.
+ * See g_menu_insert_item() for more information.
  *
  * Since: 2.32
  */
 void
-xmenu_prepend_item (xmenu_t     *menu,
-                     xmenu_item_t *item)
+g_menu_prepend_item (GMenu     *menu,
+                     GMenuItem *item)
 {
-  xmenu_insert_item (menu, 0, item);
+  g_menu_insert_item (menu, 0, item);
 }
 
 /**
- * xmenu_append_item:
- * @menu: a #xmenu_t
- * @item: a #xmenu_item_t to append
+ * g_menu_append_item:
+ * @menu: a #GMenu
+ * @item: a #GMenuItem to append
  *
  * Appends @item to the end of @menu.
  *
- * See xmenu_insert_item() for more information.
+ * See g_menu_insert_item() for more information.
  *
  * Since: 2.32
  */
 void
-xmenu_append_item (xmenu_t     *menu,
-                    xmenu_item_t *item)
+g_menu_append_item (GMenu     *menu,
+                    GMenuItem *item)
 {
-  xmenu_insert_item (menu, -1, item);
+  g_menu_insert_item (menu, -1, item);
 }
 
 /**
- * xmenu_freeze:
- * @menu: a #xmenu_t
+ * g_menu_freeze:
+ * @menu: a #GMenu
  *
  * Marks @menu as frozen.
  *
  * After the menu is frozen, it is an error to attempt to make any
- * changes to it.  In effect this means that the #xmenu_t API must no
+ * changes to it.  In effect this means that the #GMenu API must no
  * longer be used.
  *
- * This function causes xmenu_model_is_mutable() to begin returning
+ * This function causes g_menu_model_is_mutable() to begin returning
  * %FALSE, which has some positive performance implications.
  *
  * Since: 2.32
  */
 void
-xmenu_freeze (xmenu_t *menu)
+g_menu_freeze (GMenu *menu)
 {
-  g_return_if_fail (X_IS_MENU (menu));
+  g_return_if_fail (G_IS_MENU (menu));
 
   menu->mutable = FALSE;
 }
 
 /**
- * xmenu_new:
+ * g_menu_new:
  *
- * Creates a new #xmenu_t.
+ * Creates a new #GMenu.
  *
  * The new menu has no items.
  *
- * Returns: a new #xmenu_t
+ * Returns: a new #GMenu
  *
  * Since: 2.32
  */
-xmenu_t *
-xmenu_new (void)
+GMenu *
+g_menu_new (void)
 {
-  return xobject_new (XTYPE_MENU, NULL);
+  return g_object_new (G_TYPE_MENU, NULL);
 }
 
 /**
- * xmenu_insert:
- * @menu: a #xmenu_t
+ * g_menu_insert:
+ * @menu: a #GMenu
  * @position: the position at which to insert the item
  * @label: (nullable): the section label, or %NULL
  * @detailed_action: (nullable): the detailed action string, or %NULL
  *
  * Convenience function for inserting a normal menu item into @menu.
- * Combine xmenu_item_new() and xmenu_insert_item() for a more flexible
+ * Combine g_menu_item_new() and g_menu_insert_item() for a more flexible
  * alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_insert (xmenu_t       *menu,
-               xint_t         position,
-               const xchar_t *label,
-               const xchar_t *detailed_action)
+g_menu_insert (GMenu       *menu,
+               gint         position,
+               const gchar *label,
+               const gchar *detailed_action)
 {
-  xmenu_item_t *menu_item;
+  GMenuItem *menu_item;
 
-  menu_item = xmenu_item_new (label, detailed_action);
-  xmenu_insert_item (menu, position, menu_item);
-  xobject_unref (menu_item);
+  menu_item = g_menu_item_new (label, detailed_action);
+  g_menu_insert_item (menu, position, menu_item);
+  g_object_unref (menu_item);
 }
 
 /**
- * xmenu_prepend:
- * @menu: a #xmenu_t
+ * g_menu_prepend:
+ * @menu: a #GMenu
  * @label: (nullable): the section label, or %NULL
  * @detailed_action: (nullable): the detailed action string, or %NULL
  *
  * Convenience function for prepending a normal menu item to the start
- * of @menu.  Combine xmenu_item_new() and xmenu_insert_item() for a more
+ * of @menu.  Combine g_menu_item_new() and g_menu_insert_item() for a more
  * flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_prepend (xmenu_t       *menu,
-                const xchar_t *label,
-                const xchar_t *detailed_action)
+g_menu_prepend (GMenu       *menu,
+                const gchar *label,
+                const gchar *detailed_action)
 {
-  xmenu_insert (menu, 0, label, detailed_action);
+  g_menu_insert (menu, 0, label, detailed_action);
 }
 
 /**
- * xmenu_append:
- * @menu: a #xmenu_t
+ * g_menu_append:
+ * @menu: a #GMenu
  * @label: (nullable): the section label, or %NULL
  * @detailed_action: (nullable): the detailed action string, or %NULL
  *
  * Convenience function for appending a normal menu item to the end of
- * @menu.  Combine xmenu_item_new() and xmenu_insert_item() for a more
+ * @menu.  Combine g_menu_item_new() and g_menu_insert_item() for a more
  * flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_append (xmenu_t       *menu,
-               const xchar_t *label,
-               const xchar_t *detailed_action)
+g_menu_append (GMenu       *menu,
+               const gchar *label,
+               const gchar *detailed_action)
 {
-  xmenu_insert (menu, -1, label, detailed_action);
+  g_menu_insert (menu, -1, label, detailed_action);
 }
 
 /**
- * xmenu_insert_section:
- * @menu: a #xmenu_t
+ * g_menu_insert_section:
+ * @menu: a #GMenu
  * @position: the position at which to insert the item
  * @label: (nullable): the section label, or %NULL
- * @section: a #xmenu_model_t with the items of the section
+ * @section: a #GMenuModel with the items of the section
  *
  * Convenience function for inserting a section menu item into @menu.
- * Combine xmenu_item_new_section() and xmenu_insert_item() for a more
+ * Combine g_menu_item_new_section() and g_menu_insert_item() for a more
  * flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_insert_section (xmenu_t       *menu,
-                       xint_t         position,
-                       const xchar_t *label,
-                       xmenu_model_t  *section)
+g_menu_insert_section (GMenu       *menu,
+                       gint         position,
+                       const gchar *label,
+                       GMenuModel  *section)
 {
-  xmenu_item_t *menu_item;
+  GMenuItem *menu_item;
 
-  menu_item = xmenu_item_new_section (label, section);
-  xmenu_insert_item (menu, position, menu_item);
-  xobject_unref (menu_item);
+  menu_item = g_menu_item_new_section (label, section);
+  g_menu_insert_item (menu, position, menu_item);
+  g_object_unref (menu_item);
 }
 
 
 /**
- * xmenu_prepend_section:
- * @menu: a #xmenu_t
+ * g_menu_prepend_section:
+ * @menu: a #GMenu
  * @label: (nullable): the section label, or %NULL
- * @section: a #xmenu_model_t with the items of the section
+ * @section: a #GMenuModel with the items of the section
  *
  * Convenience function for prepending a section menu item to the start
- * of @menu.  Combine xmenu_item_new_section() and xmenu_insert_item() for
+ * of @menu.  Combine g_menu_item_new_section() and g_menu_insert_item() for
  * a more flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_prepend_section (xmenu_t       *menu,
-                        const xchar_t *label,
-                        xmenu_model_t  *section)
+g_menu_prepend_section (GMenu       *menu,
+                        const gchar *label,
+                        GMenuModel  *section)
 {
-  xmenu_insert_section (menu, 0, label, section);
+  g_menu_insert_section (menu, 0, label, section);
 }
 
 /**
- * xmenu_append_section:
- * @menu: a #xmenu_t
+ * g_menu_append_section:
+ * @menu: a #GMenu
  * @label: (nullable): the section label, or %NULL
- * @section: a #xmenu_model_t with the items of the section
+ * @section: a #GMenuModel with the items of the section
  *
  * Convenience function for appending a section menu item to the end of
- * @menu.  Combine xmenu_item_new_section() and xmenu_insert_item() for a
+ * @menu.  Combine g_menu_item_new_section() and g_menu_insert_item() for a
  * more flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_append_section (xmenu_t       *menu,
-                       const xchar_t *label,
-                       xmenu_model_t  *section)
+g_menu_append_section (GMenu       *menu,
+                       const gchar *label,
+                       GMenuModel  *section)
 {
-  xmenu_insert_section (menu, -1, label, section);
+  g_menu_insert_section (menu, -1, label, section);
 }
 
 /**
- * xmenu_insert_submenu:
- * @menu: a #xmenu_t
+ * g_menu_insert_submenu:
+ * @menu: a #GMenu
  * @position: the position at which to insert the item
  * @label: (nullable): the section label, or %NULL
- * @submenu: a #xmenu_model_t with the items of the submenu
+ * @submenu: a #GMenuModel with the items of the submenu
  *
  * Convenience function for inserting a submenu menu item into @menu.
- * Combine xmenu_item_new_submenu() and xmenu_insert_item() for a more
+ * Combine g_menu_item_new_submenu() and g_menu_insert_item() for a more
  * flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_insert_submenu (xmenu_t       *menu,
-                       xint_t         position,
-                       const xchar_t *label,
-                       xmenu_model_t  *submenu)
+g_menu_insert_submenu (GMenu       *menu,
+                       gint         position,
+                       const gchar *label,
+                       GMenuModel  *submenu)
 {
-  xmenu_item_t *menu_item;
+  GMenuItem *menu_item;
 
-  menu_item = xmenu_item_new_submenu (label, submenu);
-  xmenu_insert_item (menu, position, menu_item);
-  xobject_unref (menu_item);
+  menu_item = g_menu_item_new_submenu (label, submenu);
+  g_menu_insert_item (menu, position, menu_item);
+  g_object_unref (menu_item);
 }
 
 /**
- * xmenu_prepend_submenu:
- * @menu: a #xmenu_t
+ * g_menu_prepend_submenu:
+ * @menu: a #GMenu
  * @label: (nullable): the section label, or %NULL
- * @submenu: a #xmenu_model_t with the items of the submenu
+ * @submenu: a #GMenuModel with the items of the submenu
  *
  * Convenience function for prepending a submenu menu item to the start
- * of @menu.  Combine xmenu_item_new_submenu() and xmenu_insert_item() for
+ * of @menu.  Combine g_menu_item_new_submenu() and g_menu_insert_item() for
  * a more flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_prepend_submenu (xmenu_t       *menu,
-                        const xchar_t *label,
-                        xmenu_model_t  *submenu)
+g_menu_prepend_submenu (GMenu       *menu,
+                        const gchar *label,
+                        GMenuModel  *submenu)
 {
-  xmenu_insert_submenu (menu, 0, label, submenu);
+  g_menu_insert_submenu (menu, 0, label, submenu);
 }
 
 /**
- * xmenu_append_submenu:
- * @menu: a #xmenu_t
+ * g_menu_append_submenu:
+ * @menu: a #GMenu
  * @label: (nullable): the section label, or %NULL
- * @submenu: a #xmenu_model_t with the items of the submenu
+ * @submenu: a #GMenuModel with the items of the submenu
  *
  * Convenience function for appending a submenu menu item to the end of
- * @menu.  Combine xmenu_item_new_submenu() and xmenu_insert_item() for a
+ * @menu.  Combine g_menu_item_new_submenu() and g_menu_insert_item() for a
  * more flexible alternative.
  *
  * Since: 2.32
  */
 void
-xmenu_append_submenu (xmenu_t       *menu,
-                       const xchar_t *label,
-                       xmenu_model_t  *submenu)
+g_menu_append_submenu (GMenu       *menu,
+                       const gchar *label,
+                       GMenuModel  *submenu)
 {
-  xmenu_insert_submenu (menu, -1, label, submenu);
+  g_menu_insert_submenu (menu, -1, label, submenu);
 }
 
 static void
-xmenu_clear_item (struct item *item)
+g_menu_clear_item (struct item *item)
 {
   if (item->attributes != NULL)
-    xhash_table_unref (item->attributes);
+    g_hash_table_unref (item->attributes);
   if (item->links != NULL)
-    xhash_table_unref (item->links);
+    g_hash_table_unref (item->links);
 }
 
 /**
- * xmenu_remove:
- * @menu: a #xmenu_t
+ * g_menu_remove:
+ * @menu: a #GMenu
  * @position: the position of the item to remove
  *
  * Removes an item from the menu.
@@ -476,102 +476,102 @@ xmenu_clear_item (struct item *item)
  * Since: 2.32
  */
 void
-xmenu_remove (xmenu_t *menu,
-               xint_t   position)
+g_menu_remove (GMenu *menu,
+               gint   position)
 {
-  g_return_if_fail (X_IS_MENU (menu));
-  g_return_if_fail (0 <= position && (xuint_t) position < menu->items->len);
+  g_return_if_fail (G_IS_MENU (menu));
+  g_return_if_fail (0 <= position && (guint) position < menu->items->len);
 
-  xmenu_clear_item (&g_array_index (menu->items, struct item, position));
+  g_menu_clear_item (&g_array_index (menu->items, struct item, position));
   g_array_remove_index (menu->items, position);
-  xmenu_model_items_changed (XMENU_MODEL (menu), position, 1, 0);
+  g_menu_model_items_changed (G_MENU_MODEL (menu), position, 1, 0);
 }
 
 /**
- * xmenu_remove_all:
- * @menu: a #xmenu_t
+ * g_menu_remove_all:
+ * @menu: a #GMenu
  *
  * Removes all items in the menu.
  *
  * Since: 2.38
  **/
 void
-xmenu_remove_all (xmenu_t *menu)
+g_menu_remove_all (GMenu *menu)
 {
-  xint_t i, n;
+  gint i, n;
 
-  g_return_if_fail (X_IS_MENU (menu));
+  g_return_if_fail (G_IS_MENU (menu));
   n = menu->items->len;
 
   for (i = 0; i < n; i++)
-    xmenu_clear_item (&g_array_index (menu->items, struct item, i));
+    g_menu_clear_item (&g_array_index (menu->items, struct item, i));
   g_array_set_size (menu->items, 0);
 
-  xmenu_model_items_changed (XMENU_MODEL (menu), 0, n, 0);
+  g_menu_model_items_changed (G_MENU_MODEL (menu), 0, n, 0);
 }
 
 static void
-xmenu_finalize (xobject_t *object)
+g_menu_finalize (GObject *object)
 {
-  xmenu_t *menu = XMENU (object);
+  GMenu *menu = G_MENU (object);
   struct item *items;
-  xint_t n_items;
-  xint_t i;
+  gint n_items;
+  gint i;
 
   n_items = menu->items->len;
   items = (struct item *) g_array_free (menu->items, FALSE);
   for (i = 0; i < n_items; i++)
-    xmenu_clear_item (&items[i]);
+    g_menu_clear_item (&items[i]);
   g_free (items);
 
-  XOBJECT_CLASS (xmenu_parent_class)
+  G_OBJECT_CLASS (g_menu_parent_class)
     ->finalize (object);
 }
 
 static void
-xmenu_init (xmenu_t *menu)
+g_menu_init (GMenu *menu)
 {
   menu->items = g_array_new (FALSE, FALSE, sizeof (struct item));
   menu->mutable = TRUE;
 }
 
 static void
-xmenu_class_init (xmenu_class_t *class)
+g_menu_class_init (GMenuClass *class)
 {
-  xmenu_model_class_t *model_class = XMENU_MODEL_CLASS (class);
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GMenuModelClass *model_class = G_MENU_MODEL_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-  object_class->finalize = xmenu_finalize;
+  object_class->finalize = g_menu_finalize;
 
-  model_class->is_mutable = xmenu_is_mutable;
-  model_class->get_n_items = xmenu_get_n_items;
-  model_class->get_item_attributes = xmenu_get_item_attributes;
-  model_class->get_item_links = xmenu_get_item_links;
+  model_class->is_mutable = g_menu_is_mutable;
+  model_class->get_n_items = g_menu_get_n_items;
+  model_class->get_item_attributes = g_menu_get_item_attributes;
+  model_class->get_item_links = g_menu_get_item_links;
 }
 
 
 static void
-xmenu_item_clear_cow (xmenu_item_t *menu_item)
+g_menu_item_clear_cow (GMenuItem *menu_item)
 {
   if (menu_item->cow)
     {
-      xhash_table_iter_t iter;
-      xhashtable_t *new;
-      xpointer_t key;
-      xpointer_t val;
+      GHashTableIter iter;
+      GHashTable *new;
+      gpointer key;
+      gpointer val;
 
-      new = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xvariant_unref);
-      xhash_table_iter_init (&iter, menu_item->attributes);
-      while (xhash_table_iter_next (&iter, &key, &val))
-        xhash_table_insert (new, xstrdup (key), xvariant_ref (val));
-      xhash_table_unref (menu_item->attributes);
+      new = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_variant_unref);
+      g_hash_table_iter_init (&iter, menu_item->attributes);
+      while (g_hash_table_iter_next (&iter, &key, &val))
+        g_hash_table_insert (new, g_strdup (key), g_variant_ref (val));
+      g_hash_table_unref (menu_item->attributes);
       menu_item->attributes = new;
 
-      new = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xobject_unref);
-      xhash_table_iter_init (&iter, menu_item->links);
-      while (xhash_table_iter_next (&iter, &key, &val))
-        xhash_table_insert (new, xstrdup (key), xobject_ref (val));
-      xhash_table_unref (menu_item->links);
+      new = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_object_unref);
+      g_hash_table_iter_init (&iter, menu_item->links);
+      while (g_hash_table_iter_next (&iter, &key, &val))
+        g_hash_table_insert (new, g_strdup (key), g_object_ref (val));
+      g_hash_table_unref (menu_item->links);
       menu_item->links = new;
 
       menu_item->cow = FALSE;
@@ -579,42 +579,42 @@ xmenu_item_clear_cow (xmenu_item_t *menu_item)
 }
 
 static void
-xmenu_item_finalize (xobject_t *object)
+g_menu_item_finalize (GObject *object)
 {
-  xmenu_item_t *menu_item = XMENU_ITEM (object);
+  GMenuItem *menu_item = G_MENU_ITEM (object);
 
-  xhash_table_unref (menu_item->attributes);
-  xhash_table_unref (menu_item->links);
+  g_hash_table_unref (menu_item->attributes);
+  g_hash_table_unref (menu_item->links);
 
-  XOBJECT_CLASS (xmenu_item_parent_class)
+  G_OBJECT_CLASS (g_menu_item_parent_class)
     ->finalize (object);
 }
 
 static void
-xmenu_item_init (xmenu_item_t *menu_item)
+g_menu_item_init (GMenuItem *menu_item)
 {
-  menu_item->attributes = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xvariant_unref);
-  menu_item->links = xhash_table_new_full (xstr_hash, xstr_equal, g_free, xobject_unref);
+  menu_item->attributes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_variant_unref);
+  menu_item->links = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
   menu_item->cow = FALSE;
 }
 
 static void
-xmenu_item_class_init (xmenu_item_class_t *class)
+g_menu_item_class_init (GMenuItemClass *class)
 {
-  class->finalize = xmenu_item_finalize;
+  class->finalize = g_menu_item_finalize;
 }
 
-/* We treat attribute names the same as xsettings_t keys:
+/* We treat attribute names the same as GSettings keys:
  * - only lowercase ascii, digits and '-'
  * - must start with lowercase
  * - must not end with '-'
  * - no consecutive '-'
  * - not longer than 1024 chars
  */
-static xboolean_t
-valid_attribute_name (const xchar_t *name)
+static gboolean
+valid_attribute_name (const gchar *name)
 {
-  xint_t i;
+  gint i;
 
   if (!g_ascii_islower (name[0]))
     return FALSE;
@@ -640,16 +640,16 @@ valid_attribute_name (const xchar_t *name)
 }
 
 /**
- * xmenu_item_set_attribute_value:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_attribute_value:
+ * @menu_item: a #GMenuItem
  * @attribute: the attribute to set
- * @value: (nullable): a #xvariant_t to use as the value, or %NULL
+ * @value: (nullable): a #GVariant to use as the value, or %NULL
  *
  * Sets or unsets an attribute on @menu_item.
  *
  * The attribute to set or unset is specified by @attribute. This
- * can be one of the standard attribute names %XMENU_ATTRIBUTE_LABEL,
- * %XMENU_ATTRIBUTE_ACTION, %XMENU_ATTRIBUTE_TARGET, or a custom
+ * can be one of the standard attribute names %G_MENU_ATTRIBUTE_LABEL,
+ * %G_MENU_ATTRIBUTE_ACTION, %G_MENU_ATTRIBUTE_TARGET, or a custom
  * attribute name.
  * Attribute names are restricted to lowercase characters, numbers
  * and '-'. Furthermore, the names must begin with a lowercase character,
@@ -660,90 +660,90 @@ valid_attribute_name (const xchar_t *name)
  *
  * If @value is non-%NULL then it is used as the new value for the
  * attribute.  If @value is %NULL then the attribute is unset. If
- * the @value #xvariant_t is floating, it is consumed.
+ * the @value #GVariant is floating, it is consumed.
  *
- * See also xmenu_item_set_attribute() for a more convenient way to do
+ * See also g_menu_item_set_attribute() for a more convenient way to do
  * the same.
  *
  * Since: 2.32
  */
 void
-xmenu_item_set_attribute_value (xmenu_item_t   *menu_item,
-                                 const xchar_t *attribute,
-                                 xvariant_t    *value)
+g_menu_item_set_attribute_value (GMenuItem   *menu_item,
+                                 const gchar *attribute,
+                                 GVariant    *value)
 {
-  g_return_if_fail (X_IS_MENU_ITEM (menu_item));
+  g_return_if_fail (G_IS_MENU_ITEM (menu_item));
   g_return_if_fail (attribute != NULL);
   g_return_if_fail (valid_attribute_name (attribute));
 
-  xmenu_item_clear_cow (menu_item);
+  g_menu_item_clear_cow (menu_item);
 
   if (value != NULL)
-    xhash_table_insert (menu_item->attributes, xstrdup (attribute), xvariant_ref_sink (value));
+    g_hash_table_insert (menu_item->attributes, g_strdup (attribute), g_variant_ref_sink (value));
   else
-    xhash_table_remove (menu_item->attributes, attribute);
+    g_hash_table_remove (menu_item->attributes, attribute);
 }
 
 /**
- * xmenu_item_set_attribute:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_attribute:
+ * @menu_item: a #GMenuItem
  * @attribute: the attribute to set
- * @format_string: (nullable): a #xvariant_t format string, or %NULL
+ * @format_string: (nullable): a #GVariant format string, or %NULL
  * @...: positional parameters, as per @format_string
  *
  * Sets or unsets an attribute on @menu_item.
  *
  * The attribute to set or unset is specified by @attribute. This
- * can be one of the standard attribute names %XMENU_ATTRIBUTE_LABEL,
- * %XMENU_ATTRIBUTE_ACTION, %XMENU_ATTRIBUTE_TARGET, or a custom
+ * can be one of the standard attribute names %G_MENU_ATTRIBUTE_LABEL,
+ * %G_MENU_ATTRIBUTE_ACTION, %G_MENU_ATTRIBUTE_TARGET, or a custom
  * attribute name.
  * Attribute names are restricted to lowercase characters, numbers
  * and '-'. Furthermore, the names must begin with a lowercase character,
  * must not end with a '-', and must not contain consecutive dashes.
  *
  * If @format_string is non-%NULL then the proper position parameters
- * are collected to create a #xvariant_t instance to use as the attribute
+ * are collected to create a #GVariant instance to use as the attribute
  * value.  If it is %NULL then the positional parameterrs are ignored
  * and the named attribute is unset.
  *
- * See also xmenu_item_set_attribute_value() for an equivalent call
- * that directly accepts a #xvariant_t.
+ * See also g_menu_item_set_attribute_value() for an equivalent call
+ * that directly accepts a #GVariant.
  *
  * Since: 2.32
  */
 void
-xmenu_item_set_attribute (xmenu_item_t   *menu_item,
-                           const xchar_t *attribute,
-                           const xchar_t *format_string,
+g_menu_item_set_attribute (GMenuItem   *menu_item,
+                           const gchar *attribute,
+                           const gchar *format_string,
                            ...)
 {
-  xvariant_t *value;
+  GVariant *value;
 
   if (format_string != NULL)
     {
       va_list ap;
 
       va_start (ap, format_string);
-      value = xvariant_new_va (format_string, NULL, &ap);
+      value = g_variant_new_va (format_string, NULL, &ap);
       va_end (ap);
     }
   else
     value = NULL;
 
-  xmenu_item_set_attribute_value (menu_item, attribute, value);
+  g_menu_item_set_attribute_value (menu_item, attribute, value);
 }
 
 /**
- * xmenu_item_set_link:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_link:
+ * @menu_item: a #GMenuItem
  * @link: type of link to establish or unset
- * @model: (nullable): the #xmenu_model_t to link to (or %NULL to unset)
+ * @model: (nullable): the #GMenuModel to link to (or %NULL to unset)
  *
  * Creates a link from @menu_item to @model if non-%NULL, or unsets it.
  *
  * Links are used to establish a relationship between a particular menu
- * item and another menu.  For example, %XMENU_LINK_SUBMENU is used to
- * associate a submenu with a particular menu item, and %XMENU_LINK_SECTION
+ * item and another menu.  For example, %G_MENU_LINK_SUBMENU is used to
+ * associate a submenu with a particular menu item, and %G_MENU_LINK_SECTION
  * is used to create a section. Other types of link can be used, but there
  * is no guarantee that clients will be able to make sense of them.
  * Link types are restricted to lowercase characters, numbers
@@ -753,25 +753,25 @@ xmenu_item_set_attribute (xmenu_item_t   *menu_item,
  * Since: 2.32
  */
 void
-xmenu_item_set_link (xmenu_item_t   *menu_item,
-                      const xchar_t *link,
-                      xmenu_model_t  *model)
+g_menu_item_set_link (GMenuItem   *menu_item,
+                      const gchar *link,
+                      GMenuModel  *model)
 {
-  g_return_if_fail (X_IS_MENU_ITEM (menu_item));
+  g_return_if_fail (G_IS_MENU_ITEM (menu_item));
   g_return_if_fail (link != NULL);
   g_return_if_fail (valid_attribute_name (link));
 
-  xmenu_item_clear_cow (menu_item);
+  g_menu_item_clear_cow (menu_item);
 
   if (model != NULL)
-    xhash_table_insert (menu_item->links, xstrdup (link), xobject_ref (model));
+    g_hash_table_insert (menu_item->links, g_strdup (link), g_object_ref (model));
   else
-    xhash_table_remove (menu_item->links, link);
+    g_hash_table_remove (menu_item->links, link);
 }
 
 /**
- * xmenu_item_get_attribute_value:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_get_attribute_value:
+ * @menu_item: a #GMenuItem
  * @attribute: the attribute name to query
  * @expected_type: (nullable): the expected type of the attribute
  *
@@ -785,22 +785,22 @@ xmenu_item_set_link (xmenu_item_t   *menu_item,
  *
  * Since: 2.34
  */
-xvariant_t *
-xmenu_item_get_attribute_value (xmenu_item_t          *menu_item,
-                                 const xchar_t        *attribute,
-                                 const xvariant_type_t *expected_type)
+GVariant *
+g_menu_item_get_attribute_value (GMenuItem          *menu_item,
+                                 const gchar        *attribute,
+                                 const GVariantType *expected_type)
 {
-  xvariant_t *value;
+  GVariant *value;
 
-  xreturn_val_if_fail (X_IS_MENU_ITEM (menu_item), NULL);
-  xreturn_val_if_fail (attribute != NULL, NULL);
+  g_return_val_if_fail (G_IS_MENU_ITEM (menu_item), NULL);
+  g_return_val_if_fail (attribute != NULL, NULL);
 
-  value = xhash_table_lookup (menu_item->attributes, attribute);
+  value = g_hash_table_lookup (menu_item->attributes, attribute);
 
   if (value != NULL)
     {
-      if (expected_type == NULL || xvariant_is_of_type (value, expected_type))
-        xvariant_ref (value);
+      if (expected_type == NULL || g_variant_is_of_type (value, expected_type))
+        g_variant_ref (value);
       else
         value = NULL;
     }
@@ -809,15 +809,15 @@ xmenu_item_get_attribute_value (xmenu_item_t          *menu_item,
 }
 
 /**
- * xmenu_item_get_attribute:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_get_attribute:
+ * @menu_item: a #GMenuItem
  * @attribute: the attribute name to query
- * @format_string: a #xvariant_t format string
+ * @format_string: a #GVariant format string
  * @...: positional parameters, as per @format_string
  *
  * Queries the named @attribute on @menu_item.
  *
- * If the attribute exists and matches the #xvariant_type_t corresponding
+ * If the attribute exists and matches the #GVariantType corresponding
  * to @format_string then @format_string is used to deconstruct the
  * value into the positional parameters and %TRUE is returned.
  *
@@ -830,37 +830,37 @@ xmenu_item_get_attribute_value (xmenu_item_t          *menu_item,
  *
  * Since: 2.34
  */
-xboolean_t
-xmenu_item_get_attribute (xmenu_item_t   *menu_item,
-                           const xchar_t *attribute,
-                           const xchar_t *format_string,
+gboolean
+g_menu_item_get_attribute (GMenuItem   *menu_item,
+                           const gchar *attribute,
+                           const gchar *format_string,
                            ...)
 {
-  xvariant_t *value;
+  GVariant *value;
   va_list ap;
 
-  xreturn_val_if_fail (X_IS_MENU_ITEM (menu_item), FALSE);
-  xreturn_val_if_fail (attribute != NULL, FALSE);
-  xreturn_val_if_fail (format_string != NULL, FALSE);
+  g_return_val_if_fail (G_IS_MENU_ITEM (menu_item), FALSE);
+  g_return_val_if_fail (attribute != NULL, FALSE);
+  g_return_val_if_fail (format_string != NULL, FALSE);
 
-  value = xhash_table_lookup (menu_item->attributes, attribute);
+  value = g_hash_table_lookup (menu_item->attributes, attribute);
 
   if (value == NULL)
     return FALSE;
 
-  if (!xvariant_check_format_string (value, format_string, FALSE))
+  if (!g_variant_check_format_string (value, format_string, FALSE))
     return FALSE;
 
   va_start (ap, format_string);
-  xvariant_get_va (value, format_string, NULL, &ap);
+  g_variant_get_va (value, format_string, NULL, &ap);
   va_end (ap);
 
   return TRUE;
 }
 
 /**
- * xmenu_item_get_link:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_get_link:
+ * @menu_item: a #GMenuItem
  * @link: the link name to query
  *
  * Queries the named @link on @menu_item.
@@ -869,27 +869,27 @@ xmenu_item_get_attribute (xmenu_item_t   *menu_item,
  *
  * Since: 2.34
  */
-xmenu_model_t *
-xmenu_item_get_link (xmenu_item_t   *menu_item,
-                      const xchar_t *link)
+GMenuModel *
+g_menu_item_get_link (GMenuItem   *menu_item,
+                      const gchar *link)
 {
-  xmenu_model_t *model;
+  GMenuModel *model;
 
-  xreturn_val_if_fail (X_IS_MENU_ITEM (menu_item), NULL);
-  xreturn_val_if_fail (link != NULL, NULL);
-  xreturn_val_if_fail (valid_attribute_name (link), NULL);
+  g_return_val_if_fail (G_IS_MENU_ITEM (menu_item), NULL);
+  g_return_val_if_fail (link != NULL, NULL);
+  g_return_val_if_fail (valid_attribute_name (link), NULL);
 
-  model = xhash_table_lookup (menu_item->links, link);
+  model = g_hash_table_lookup (menu_item->links, link);
 
   if (model)
-    xobject_ref (model);
+    g_object_ref (model);
 
   return model;
 }
 
 /**
- * xmenu_item_set_label:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_label:
+ * @menu_item: a #GMenuItem
  * @label: (nullable): the label to set, or %NULL to unset
  *
  * Sets or unsets the "label" attribute of @menu_item.
@@ -900,23 +900,23 @@ xmenu_item_get_link (xmenu_item_t   *menu_item,
  * Since: 2.32
  */
 void
-xmenu_item_set_label (xmenu_item_t   *menu_item,
-                       const xchar_t *label)
+g_menu_item_set_label (GMenuItem   *menu_item,
+                       const gchar *label)
 {
-  xvariant_t *value;
+  GVariant *value;
 
   if (label != NULL)
-    value = xvariant_new_string (label);
+    value = g_variant_new_string (label);
   else
     value = NULL;
 
-  xmenu_item_set_attribute_value (menu_item, XMENU_ATTRIBUTE_LABEL, value);
+  g_menu_item_set_attribute_value (menu_item, G_MENU_ATTRIBUTE_LABEL, value);
 }
 
 /**
- * xmenu_item_set_submenu:
- * @menu_item: a #xmenu_item_t
- * @submenu: (nullable): a #xmenu_model_t, or %NULL
+ * g_menu_item_set_submenu:
+ * @menu_item: a #GMenuItem
+ * @submenu: (nullable): a #GMenuModel, or %NULL
  *
  * Sets or unsets the "submenu" link of @menu_item to @submenu.
  *
@@ -929,39 +929,39 @@ xmenu_item_set_label (xmenu_item_t   *menu_item,
  * Since: 2.32
  */
 void
-xmenu_item_set_submenu (xmenu_item_t  *menu_item,
-                         xmenu_model_t *submenu)
+g_menu_item_set_submenu (GMenuItem  *menu_item,
+                         GMenuModel *submenu)
 {
-  xmenu_item_set_link (menu_item, XMENU_LINK_SUBMENU, submenu);
+  g_menu_item_set_link (menu_item, G_MENU_LINK_SUBMENU, submenu);
 }
 
 /**
- * xmenu_item_set_section:
- * @menu_item: a #xmenu_item_t
- * @section: (nullable): a #xmenu_model_t, or %NULL
+ * g_menu_item_set_section:
+ * @menu_item: a #GMenuItem
+ * @section: (nullable): a #GMenuModel, or %NULL
  *
  * Sets or unsets the "section" link of @menu_item to @section.
  *
  * The effect of having one menu appear as a section of another is
  * exactly as it sounds: the items from @section become a direct part of
- * the menu that @menu_item is added to.  See xmenu_item_new_section()
+ * the menu that @menu_item is added to.  See g_menu_item_new_section()
  * for more information about what it means for a menu item to be a
  * section.
  *
  * Since: 2.32
  */
 void
-xmenu_item_set_section (xmenu_item_t  *menu_item,
-                         xmenu_model_t *section)
+g_menu_item_set_section (GMenuItem  *menu_item,
+                         GMenuModel *section)
 {
-  xmenu_item_set_link (menu_item, XMENU_LINK_SECTION, section);
+  g_menu_item_set_link (menu_item, G_MENU_LINK_SECTION, section);
 }
 
 /**
- * xmenu_item_set_action_and_target_value:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_action_and_target_value:
+ * @menu_item: a #GMenuItem
  * @action: (nullable): the name of the action for this item
- * @target_value: (nullable): a #xvariant_t to use as the action target
+ * @target_value: (nullable): a #GVariant to use as the action target
  *
  * Sets or unsets the "action" and "target" attributes of @menu_item.
  *
@@ -976,7 +976,7 @@ xmenu_item_set_section (xmenu_item_t  *menu_item,
  * types) are expected to have the "action" attribute set to identify
  * the action that they are associated with.  The state type of the
  * action help to determine the disposition of the menu item.  See
- * #xaction_t and #xaction_group_t for an overview of actions.
+ * #GAction and #GActionGroup for an overview of actions.
  *
  * In general, clicking on the menu item will result in activation of
  * the named action with the "target" attribute given as the parameter
@@ -996,22 +996,22 @@ xmenu_item_set_section (xmenu_item_t  *menu_item,
  * indication).  The item should be marked as 'selected' when the string
  * state is equal to the value of the @target property.
  *
- * See xmenu_item_set_action_and_target() or
- * xmenu_item_set_detailed_action() for two equivalent calls that are
+ * See g_menu_item_set_action_and_target() or
+ * g_menu_item_set_detailed_action() for two equivalent calls that are
  * probably more convenient for most uses.
  *
  * Since: 2.32
  */
 void
-xmenu_item_set_action_and_target_value (xmenu_item_t   *menu_item,
-                                         const xchar_t *action,
-                                         xvariant_t    *target_value)
+g_menu_item_set_action_and_target_value (GMenuItem   *menu_item,
+                                         const gchar *action,
+                                         GVariant    *target_value)
 {
-  xvariant_t *action_value;
+  GVariant *action_value;
 
   if (action != NULL)
     {
-      action_value = xvariant_new_string (action);
+      action_value = g_variant_new_string (action);
     }
   else
     {
@@ -1019,15 +1019,15 @@ xmenu_item_set_action_and_target_value (xmenu_item_t   *menu_item,
       target_value = NULL;
     }
 
-  xmenu_item_set_attribute_value (menu_item, XMENU_ATTRIBUTE_ACTION, action_value);
-  xmenu_item_set_attribute_value (menu_item, XMENU_ATTRIBUTE_TARGET, target_value);
+  g_menu_item_set_attribute_value (menu_item, G_MENU_ATTRIBUTE_ACTION, action_value);
+  g_menu_item_set_attribute_value (menu_item, G_MENU_ATTRIBUTE_TARGET, target_value);
 }
 
 /**
- * xmenu_item_set_action_and_target:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_action_and_target:
+ * @menu_item: a #GMenuItem
  * @action: (nullable): the name of the action for this item
- * @format_string: (nullable): a xvariant_t format string
+ * @format_string: (nullable): a GVariant format string
  * @...: positional parameters, as per @format_string
  *
  * Sets or unsets the "action" and "target" attributes of @menu_item.
@@ -1038,152 +1038,152 @@ xmenu_item_set_action_and_target_value (xmenu_item_t   *menu_item,
  *
  * If @action is non-%NULL then the "action" attribute is set.
  * @format_string is then inspected.  If it is non-%NULL then the proper
- * position parameters are collected to create a #xvariant_t instance to
+ * position parameters are collected to create a #GVariant instance to
  * use as the target value.  If it is %NULL then the positional
  * parameters are ignored and the "target" attribute is unset.
  *
- * See also xmenu_item_set_action_and_target_value() for an equivalent
- * call that directly accepts a #xvariant_t.  See
- * xmenu_item_set_detailed_action() for a more convenient version that
+ * See also g_menu_item_set_action_and_target_value() for an equivalent
+ * call that directly accepts a #GVariant.  See
+ * g_menu_item_set_detailed_action() for a more convenient version that
  * works with string-typed targets.
  *
- * See also xmenu_item_set_action_and_target_value() for a
+ * See also g_menu_item_set_action_and_target_value() for a
  * description of the semantics of the action and target attributes.
  *
  * Since: 2.32
  */
 void
-xmenu_item_set_action_and_target (xmenu_item_t   *menu_item,
-                                   const xchar_t *action,
-                                   const xchar_t *format_string,
+g_menu_item_set_action_and_target (GMenuItem   *menu_item,
+                                   const gchar *action,
+                                   const gchar *format_string,
                                    ...)
 {
-  xvariant_t *value;
+  GVariant *value;
 
   if (format_string != NULL)
     {
       va_list ap;
 
       va_start (ap, format_string);
-      value = xvariant_new_va (format_string, NULL, &ap);
+      value = g_variant_new_va (format_string, NULL, &ap);
       va_end (ap);
     }
   else
     value = NULL;
 
-  xmenu_item_set_action_and_target_value (menu_item, action, value);
+  g_menu_item_set_action_and_target_value (menu_item, action, value);
 }
 
 /**
- * xmenu_item_set_detailed_action:
- * @menu_item: a #xmenu_item_t
+ * g_menu_item_set_detailed_action:
+ * @menu_item: a #GMenuItem
  * @detailed_action: the "detailed" action string
  *
  * Sets the "action" and possibly the "target" attribute of @menu_item.
  *
  * The format of @detailed_action is the same format parsed by
- * xaction_parse_detailed_name().
+ * g_action_parse_detailed_name().
  *
- * See xmenu_item_set_action_and_target() or
- * xmenu_item_set_action_and_target_value() for more flexible (but
+ * See g_menu_item_set_action_and_target() or
+ * g_menu_item_set_action_and_target_value() for more flexible (but
  * slightly less convenient) alternatives.
  *
- * See also xmenu_item_set_action_and_target_value() for a description of
+ * See also g_menu_item_set_action_and_target_value() for a description of
  * the semantics of the action and target attributes.
  *
  * Since: 2.32
  */
 void
-xmenu_item_set_detailed_action (xmenu_item_t   *menu_item,
-                                 const xchar_t *detailed_action)
+g_menu_item_set_detailed_action (GMenuItem   *menu_item,
+                                 const gchar *detailed_action)
 {
-  xerror_t *error = NULL;
-  xvariant_t *target;
-  xchar_t *name;
+  GError *error = NULL;
+  GVariant *target;
+  gchar *name;
 
-  if (!xaction_parse_detailed_name (detailed_action, &name, &target, &error))
-    xerror ("xmenu_item_set_detailed_action: %s", error->message);
+  if (!g_action_parse_detailed_name (detailed_action, &name, &target, &error))
+    g_error ("g_menu_item_set_detailed_action: %s", error->message);
 
-  xmenu_item_set_action_and_target_value (menu_item, name, target);
+  g_menu_item_set_action_and_target_value (menu_item, name, target);
   if (target)
-    xvariant_unref (target);
+    g_variant_unref (target);
   g_free (name);
 }
 
 /**
- * xmenu_item_new:
+ * g_menu_item_new:
  * @label: (nullable): the section label, or %NULL
  * @detailed_action: (nullable): the detailed action string, or %NULL
  *
- * Creates a new #xmenu_item_t.
+ * Creates a new #GMenuItem.
  *
  * If @label is non-%NULL it is used to set the "label" attribute of the
  * new item.
  *
  * If @detailed_action is non-%NULL it is used to set the "action" and
  * possibly the "target" attribute of the new item.  See
- * xmenu_item_set_detailed_action() for more information.
+ * g_menu_item_set_detailed_action() for more information.
  *
- * Returns: a new #xmenu_item_t
+ * Returns: a new #GMenuItem
  *
  * Since: 2.32
  */
-xmenu_item_t *
-xmenu_item_new (const xchar_t *label,
-                 const xchar_t *detailed_action)
+GMenuItem *
+g_menu_item_new (const gchar *label,
+                 const gchar *detailed_action)
 {
-  xmenu_item_t *menu_item;
+  GMenuItem *menu_item;
 
-  menu_item = xobject_new (XTYPE_MENU_ITEM, NULL);
+  menu_item = g_object_new (G_TYPE_MENU_ITEM, NULL);
 
   if (label != NULL)
-    xmenu_item_set_label (menu_item, label);
+    g_menu_item_set_label (menu_item, label);
 
   if (detailed_action != NULL)
-    xmenu_item_set_detailed_action (menu_item, detailed_action);
+    g_menu_item_set_detailed_action (menu_item, detailed_action);
 
   return menu_item;
 }
 
 /**
- * xmenu_item_new_submenu:
+ * g_menu_item_new_submenu:
  * @label: (nullable): the section label, or %NULL
- * @submenu: a #xmenu_model_t with the items of the submenu
+ * @submenu: a #GMenuModel with the items of the submenu
  *
- * Creates a new #xmenu_item_t representing a submenu.
+ * Creates a new #GMenuItem representing a submenu.
  *
- * This is a convenience API around xmenu_item_new() and
- * xmenu_item_set_submenu().
+ * This is a convenience API around g_menu_item_new() and
+ * g_menu_item_set_submenu().
  *
- * Returns: a new #xmenu_item_t
+ * Returns: a new #GMenuItem
  *
  * Since: 2.32
  */
-xmenu_item_t *
-xmenu_item_new_submenu (const xchar_t *label,
-                         xmenu_model_t  *submenu)
+GMenuItem *
+g_menu_item_new_submenu (const gchar *label,
+                         GMenuModel  *submenu)
 {
-  xmenu_item_t *menu_item;
+  GMenuItem *menu_item;
 
-  menu_item = xobject_new (XTYPE_MENU_ITEM, NULL);
+  menu_item = g_object_new (G_TYPE_MENU_ITEM, NULL);
 
   if (label != NULL)
-    xmenu_item_set_label (menu_item, label);
+    g_menu_item_set_label (menu_item, label);
 
-  xmenu_item_set_submenu (menu_item, submenu);
+  g_menu_item_set_submenu (menu_item, submenu);
 
   return menu_item;
 }
 
 /**
- * xmenu_item_new_section:
+ * g_menu_item_new_section:
  * @label: (nullable): the section label, or %NULL
- * @section: a #xmenu_model_t with the items of the section
+ * @section: a #GMenuModel with the items of the section
  *
- * Creates a new #xmenu_item_t representing a section.
+ * Creates a new #GMenuItem representing a section.
  *
- * This is a convenience API around xmenu_item_new() and
- * xmenu_item_set_section().
+ * This is a convenience API around g_menu_item_new() and
+ * g_menu_item_set_section().
  *
  * The effect of having one menu appear as a section of another is
  * exactly as it sounds: the items from @section become a direct part of
@@ -1198,7 +1198,7 @@ xmenu_item_new_submenu (const xchar_t *label,
  * program.  It probably contains an "Undo" and "Redo" item, followed by
  * a separator, followed by "Cut", "Copy" and "Paste".
  *
- * This would be accomplished by creating three #xmenu_t instances.  The
+ * This would be accomplished by creating three #GMenu instances.  The
  * first would be populated with the "Undo" and "Redo" items, and the
  * second with the "Cut", "Copy" and "Paste" items.  The first and
  * second menus would then be added as submenus of the third.  In XML
@@ -1241,123 +1241,123 @@ xmenu_item_new_submenu (const xchar_t *label,
  * </menu>
  * ]|
  *
- * Returns: a new #xmenu_item_t
+ * Returns: a new #GMenuItem
  *
  * Since: 2.32
  */
-xmenu_item_t *
-xmenu_item_new_section (const xchar_t *label,
-                         xmenu_model_t  *section)
+GMenuItem *
+g_menu_item_new_section (const gchar *label,
+                         GMenuModel  *section)
 {
-  xmenu_item_t *menu_item;
+  GMenuItem *menu_item;
 
-  menu_item = xobject_new (XTYPE_MENU_ITEM, NULL);
+  menu_item = g_object_new (G_TYPE_MENU_ITEM, NULL);
 
   if (label != NULL)
-    xmenu_item_set_label (menu_item, label);
+    g_menu_item_set_label (menu_item, label);
 
-  xmenu_item_set_section (menu_item, section);
+  g_menu_item_set_section (menu_item, section);
 
   return menu_item;
 }
 
 /**
- * xmenu_item_new_from_model:
- * @model: a #xmenu_model_t
+ * g_menu_item_new_from_model:
+ * @model: a #GMenuModel
  * @item_index: the index of an item in @model
  *
- * Creates a #xmenu_item_t as an exact copy of an existing menu item in a
- * #xmenu_model_t.
+ * Creates a #GMenuItem as an exact copy of an existing menu item in a
+ * #GMenuModel.
  *
  * @item_index must be valid (ie: be sure to call
- * xmenu_model_get_n_items() first).
+ * g_menu_model_get_n_items() first).
  *
- * Returns: a new #xmenu_item_t.
+ * Returns: a new #GMenuItem.
  *
  * Since: 2.34
  */
-xmenu_item_t *
-xmenu_item_new_from_model (xmenu_model_t *model,
-                            xint_t        item_index)
+GMenuItem *
+g_menu_item_new_from_model (GMenuModel *model,
+                            gint        item_index)
 {
-  xmenu_model_class_t *class = XMENU_MODEL_GET_CLASS (model);
-  xmenu_item_t *menu_item;
+  GMenuModelClass *class = G_MENU_MODEL_GET_CLASS (model);
+  GMenuItem *menu_item;
 
-  menu_item = xobject_new (XTYPE_MENU_ITEM, NULL);
+  menu_item = g_object_new (G_TYPE_MENU_ITEM, NULL);
 
   /* With some trickery we can be pretty efficient.
    *
-   * A xmenu_model_t must either implement iterate_item_attributes() or
+   * A GMenuModel must either implement iterate_item_attributes() or
    * get_item_attributes().  If it implements get_item_attributes() then
    * we are in luck -- we can just take a reference on the returned
    * hashtable and mark ourselves as copy-on-write.
    *
    * In the case that the model is based on get_item_attributes (which
-   * is the case for both xmenu_t and xdbus_menu_model_t) then this is
-   * basically just xhash_table_ref().
+   * is the case for both GMenu and GDBusMenuModel) then this is
+   * basically just g_hash_table_ref().
    */
   if (class->get_item_attributes)
     {
-      xhashtable_t *attributes = NULL;
+      GHashTable *attributes = NULL;
 
       class->get_item_attributes (model, item_index, &attributes);
       if (attributes)
         {
-          xhash_table_unref (menu_item->attributes);
+          g_hash_table_unref (menu_item->attributes);
           menu_item->attributes = attributes;
           menu_item->cow = TRUE;
         }
     }
   else
     {
-      xmenu_attribute_iter_t *iter;
-      const xchar_t *attribute;
-      xvariant_t *value;
+      GMenuAttributeIter *iter;
+      const gchar *attribute;
+      GVariant *value;
 
-      iter = xmenu_model_iterate_item_attributes (model, item_index);
-      while (xmenu_attribute_iter_get_next (iter, &attribute, &value))
-        xhash_table_insert (menu_item->attributes, xstrdup (attribute), value);
-      xobject_unref (iter);
+      iter = g_menu_model_iterate_item_attributes (model, item_index);
+      while (g_menu_attribute_iter_get_next (iter, &attribute, &value))
+        g_hash_table_insert (menu_item->attributes, g_strdup (attribute), value);
+      g_object_unref (iter);
     }
 
   /* Same story for the links... */
   if (class->get_item_links)
     {
-      xhashtable_t *links = NULL;
+      GHashTable *links = NULL;
 
       class->get_item_links (model, item_index, &links);
       if (links)
         {
-          xhash_table_unref (menu_item->links);
+          g_hash_table_unref (menu_item->links);
           menu_item->links = links;
           menu_item->cow = TRUE;
         }
     }
   else
     {
-      xmenu_link_iter_t *iter;
-      const xchar_t *link;
-      xmenu_model_t *value;
+      GMenuLinkIter *iter;
+      const gchar *link;
+      GMenuModel *value;
 
-      iter = xmenu_model_iterate_item_links (model, item_index);
-      while (xmenu_link_iter_get_next (iter, &link, &value))
-        xhash_table_insert (menu_item->links, xstrdup (link), value);
-      xobject_unref (iter);
+      iter = g_menu_model_iterate_item_links (model, item_index);
+      while (g_menu_link_iter_get_next (iter, &link, &value))
+        g_hash_table_insert (menu_item->links, g_strdup (link), value);
+      g_object_unref (iter);
     }
 
   return menu_item;
 }
 
 /**
- * xmenu_item_set_icon:
- * @menu_item: a #xmenu_item_t
- * @icon: a #xicon_t, or %NULL
+ * g_menu_item_set_icon:
+ * @menu_item: a #GMenuItem
+ * @icon: a #GIcon, or %NULL
  *
  * Sets (or unsets) the icon on @menu_item.
  *
- * This call is the same as calling xicon_serialize() and using the
- * result as the value to xmenu_item_set_attribute_value() for
- * %XMENU_ATTRIBUTE_ICON.
+ * This call is the same as calling g_icon_serialize() and using the
+ * result as the value to g_menu_item_set_attribute_value() for
+ * %G_MENU_ATTRIBUTE_ICON.
  *
  * This API is only intended for use with "noun" menu items; things like
  * bookmarks or applications in an "Open With" menu.  Don't use it on
@@ -1369,20 +1369,20 @@ xmenu_item_new_from_model (xmenu_model_t *model,
  * Since: 2.38
  **/
 void
-xmenu_item_set_icon (xmenu_item_t *menu_item,
-                      xicon_t     *icon)
+g_menu_item_set_icon (GMenuItem *menu_item,
+                      GIcon     *icon)
 {
-  xvariant_t *value;
+  GVariant *value;
 
-  g_return_if_fail (X_IS_MENU_ITEM (menu_item));
-  g_return_if_fail (icon == NULL || X_IS_ICON (icon));
+  g_return_if_fail (G_IS_MENU_ITEM (menu_item));
+  g_return_if_fail (icon == NULL || G_IS_ICON (icon));
 
   if (icon != NULL)
-    value = xicon_serialize (icon);
+    value = g_icon_serialize (icon);
   else
     value = NULL;
 
-  xmenu_item_set_attribute_value (menu_item, XMENU_ATTRIBUTE_ICON, value);
+  g_menu_item_set_attribute_value (menu_item, G_MENU_ATTRIBUTE_ICON, value);
   if (value)
-    xvariant_unref (value);
+    g_variant_unref (value);
 }

@@ -47,52 +47,52 @@
 #define USE_LIBELF
 #endif
 
-/* xresource_t functions {{{1 */
-static xresource_t *
-get_resource (const xchar_t *file)
+/* GResource functions {{{1 */
+static GResource *
+get_resource (const gchar *file)
 {
-  xchar_t *content;
-  xsize_t size;
-  xresource_t *resource;
-  xbytes_t *data;
+  gchar *content;
+  gsize size;
+  GResource *resource;
+  GBytes *data;
 
   resource = NULL;
 
-  if (xfile_get_contents (file, &content, &size, NULL))
+  if (g_file_get_contents (file, &content, &size, NULL))
     {
-      data = xbytes_new_take (content, size);
+      data = g_bytes_new_take (content, size);
       resource = g_resource_new_from_data (data, NULL);
-      xbytes_unref (data);
+      g_bytes_unref (data);
     }
 
   return resource;
 }
 
 static void
-list_resource (xresource_t   *resource,
-               const xchar_t *path,
-               const xchar_t *section,
-               const xchar_t *prefix,
-               xboolean_t     details)
+list_resource (GResource   *resource,
+               const gchar *path,
+               const gchar *section,
+               const gchar *prefix,
+               gboolean     details)
 {
-  xchar_t **children;
-  xsize_t size;
-  xuint32_t flags;
-  xint_t i;
-  xchar_t *child;
-  xerror_t *error = NULL;
-  xint_t len;
+  gchar **children;
+  gsize size;
+  guint32 flags;
+  gint i;
+  gchar *child;
+  GError *error = NULL;
+  gint len;
 
   children = g_resource_enumerate_children (resource, path, 0, &error);
   if (error)
     {
       g_printerr ("%s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
   for (i = 0; children[i]; i++)
     {
-      child = xstrconcat (path, children[i], NULL);
+      child = g_strconcat (path, children[i], NULL);
 
       len = MIN (strlen (child), strlen (prefix));
       if (strncmp (child, prefix, len) != 0)
@@ -113,26 +113,26 @@ list_resource (xresource_t   *resource,
 
       g_free (child);
     }
-  xstrfreev (children);
+  g_strfreev (children);
 }
 
 static void
-extract_resource (xresource_t   *resource,
-                  const xchar_t *path)
+extract_resource (GResource   *resource,
+                  const gchar *path)
 {
-  xbytes_t *bytes;
+  GBytes *bytes;
 
   bytes = g_resource_lookup_data (resource, path, 0, NULL);
   if (bytes != NULL)
     {
-      xconstpointer data;
-      xsize_t size, written;
+      gconstpointer data;
+      gsize size, written;
 
-      data = xbytes_get_data (bytes, &size);
+      data = g_bytes_get_data (bytes, &size);
       written = fwrite (data, 1, size, stdout);
       if (written < size)
         g_printerr ("Data truncated\n");
-      xbytes_unref (bytes);
+      g_bytes_unref (bytes);
     }
 }
 
@@ -141,8 +141,8 @@ extract_resource (xresource_t   *resource,
 #ifdef USE_LIBELF
 
 static Elf *
-get_elf (const xchar_t *file,
-         xint_t        *fd)
+get_elf (const gchar *file,
+         gint        *fd)
 {
   Elf *elf;
 
@@ -171,27 +171,27 @@ get_elf (const xchar_t *file,
   return elf;
 }
 
-typedef xboolean_t (*SectionCallback) (GElf_Shdr   *shdr,
-                                     const xchar_t *name,
-                                     xpointer_t     data);
+typedef gboolean (*SectionCallback) (GElf_Shdr   *shdr,
+                                     const gchar *name,
+                                     gpointer     data);
 
 static void
 elf_foreach_resource_section (Elf             *elf,
                               SectionCallback  callback,
-                              xpointer_t         data)
+                              gpointer         data)
 {
   int ret G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
   size_t shstrndx, shnum;
   size_t scnidx;
   Elf_Scn *scn;
   GElf_Shdr *shdr, shdr_mem;
-  const xchar_t *section_name;
+  const gchar *section_name;
 
   ret = elf_getshdrstrndx (elf, &shstrndx);
-  xassert (ret == 0);
+  g_assert (ret == 0);
 
   ret = elf_getshdrnum (elf, &shnum);
-  xassert (ret == 0);
+  g_assert (ret == 0);
 
   for (scnidx = 1; scnidx < shnum; scnidx++)
     {
@@ -208,7 +208,7 @@ elf_foreach_resource_section (Elf             *elf,
 
       section_name = elf_strptr (elf, shstrndx, shdr->sh_name);
       if (section_name == NULL ||
-          !xstr_has_prefix (section_name, ".gresource."))
+          !g_str_has_prefix (section_name, ".gresource."))
         continue;
 
       if (!callback (shdr, section_name + strlen (".gresource."), data))
@@ -216,13 +216,13 @@ elf_foreach_resource_section (Elf             *elf,
     }
 }
 
-static xresource_t *
+static GResource *
 resource_from_section (GElf_Shdr *shdr,
                        int        fd)
 {
-  xsize_t page_size, page_offset;
+  gsize page_size, page_offset;
   char *contents;
-  xresource_t *resource;
+  GResource *resource;
 
   resource = NULL;
 
@@ -232,16 +232,16 @@ resource_from_section (GElf_Shdr *shdr,
                    PROT_READ, MAP_PRIVATE, fd, shdr->sh_offset - page_offset);
   if (contents != MAP_FAILED)
     {
-      xbytes_t *bytes;
-      xerror_t *error = NULL;
+      GBytes *bytes;
+      GError *error = NULL;
 
-      bytes = xbytes_new_static (contents + page_offset, shdr->sh_size);
+      bytes = g_bytes_new_static (contents + page_offset, shdr->sh_size);
       resource = g_resource_new_from_data (bytes, &error);
-      xbytes_unref (bytes);
+      g_bytes_unref (bytes);
       if (error)
         {
           g_printerr ("%s\n", error->message);
-          xerror_free (error);
+          g_error_free (error);
         }
     }
   else
@@ -255,19 +255,19 @@ resource_from_section (GElf_Shdr *shdr,
 typedef struct
 {
   int fd;
-  const xchar_t *section;
-  const xchar_t *path;
-  xboolean_t details;
-  xboolean_t found;
+  const gchar *section;
+  const gchar *path;
+  gboolean details;
+  gboolean found;
 } CallbackData;
 
-static xboolean_t
+static gboolean
 list_resources_cb (GElf_Shdr   *shdr,
-                   const xchar_t *section,
-                   xpointer_t     data)
+                   const gchar *section,
+                   gpointer     data)
 {
   CallbackData *d = data;
-  xresource_t *resource;
+  GResource *resource;
 
   if (d->section && strcmp (section, d->section) != 0)
     return TRUE;
@@ -290,9 +290,9 @@ list_resources_cb (GElf_Shdr   *shdr,
 static void
 elf_list_resources (Elf         *elf,
                     int          fd,
-                    const xchar_t *section,
-                    const xchar_t *path,
-                    xboolean_t     details)
+                    const gchar *section,
+                    const gchar *path,
+                    gboolean     details)
 {
   CallbackData data;
 
@@ -308,13 +308,13 @@ elf_list_resources (Elf         *elf,
     g_printerr ("Can't find resource section %s\n", section);
 }
 
-static xboolean_t
+static gboolean
 extract_resource_cb (GElf_Shdr   *shdr,
-                     const xchar_t *section,
-                     xpointer_t     data)
+                     const gchar *section,
+                     gpointer     data)
 {
   CallbackData *d = data;
-  xresource_t *resource;
+  GResource *resource;
 
   if (d->section && strcmp (section, d->section) != 0)
     return TRUE;
@@ -334,8 +334,8 @@ extract_resource_cb (GElf_Shdr   *shdr,
 static void
 elf_extract_resource (Elf         *elf,
                       int          fd,
-                      const xchar_t *section,
-                      const xchar_t *path)
+                      const gchar *section,
+                      const gchar *path)
 {
   CallbackData data;
 
@@ -350,10 +350,10 @@ elf_extract_resource (Elf         *elf,
     g_printerr ("Can't find resource section %s\n", section);
 }
 
-static xboolean_t
+static gboolean
 print_section_name (GElf_Shdr   *shdr,
-                    const xchar_t *name,
-                    xpointer_t     data)
+                    const gchar *name,
+                    gpointer     data)
 {
   g_print ("%s\n", name);
   return TRUE;
@@ -364,17 +364,17 @@ print_section_name (GElf_Shdr   *shdr,
   /* Toplevel commands {{{1 */
 
 static void
-cmd_sections (const xchar_t *file,
-              const xchar_t *section,
-              const xchar_t *path,
-              xboolean_t     details)
+cmd_sections (const gchar *file,
+              const gchar *section,
+              const gchar *path,
+              gboolean     details)
 {
-  xresource_t *resource;
+  GResource *resource;
 
 #ifdef USE_LIBELF
 
   Elf *elf;
-  xint_t fd;
+  gint fd;
 
   if ((elf = get_elf (file, &fd)))
     {
@@ -401,12 +401,12 @@ cmd_sections (const xchar_t *file,
 }
 
 static void
-cmd_list (const xchar_t *file,
-          const xchar_t *section,
-          const xchar_t *path,
-          xboolean_t     details)
+cmd_list (const gchar *file,
+          const gchar *section,
+          const gchar *path,
+          gboolean     details)
 {
-  xresource_t *resource;
+  GResource *resource;
 
 #ifdef USE_LIBELF
   Elf *elf;
@@ -437,12 +437,12 @@ cmd_list (const xchar_t *file,
 }
 
 static void
-cmd_extract (const xchar_t *file,
-             const xchar_t *section,
-             const xchar_t *path,
-             xboolean_t     details)
+cmd_extract (const gchar *file,
+             const gchar *section,
+             const gchar *path,
+             gboolean     details)
 {
-  xresource_t *resource;
+  GResource *resource;
 
 #ifdef USE_LIBELF
 
@@ -473,18 +473,18 @@ cmd_extract (const xchar_t *file,
     }
 }
 
-static xint_t
-cmd_help (xboolean_t     requested,
-          const xchar_t *command)
+static gint
+cmd_help (gboolean     requested,
+          const gchar *command)
 {
-  const xchar_t *description;
-  const xchar_t *synopsis;
-  xchar_t *option;
-  xstring_t *string;
+  const gchar *description = NULL;
+  const gchar *synopsis = NULL;
+  gchar *option;
+  GString *string;
 
   option = NULL;
 
-  string = xstring_new (NULL);
+  string = g_string_new (NULL);
 
   if (command == NULL)
     ;
@@ -507,7 +507,7 @@ cmd_help (xboolean_t     requested,
                       "If SECTION is given, only list resources in this section\n"
                       "If PATH is given, only list matching resources");
       synopsis = _("FILE [PATH]");
-      option = xstrdup_printf ("[--section %s]", _("SECTION"));
+      option = g_strdup_printf ("[--section %s]", _("SECTION"));
     }
 
   else if (strcmp (command, "details") == 0)
@@ -517,26 +517,26 @@ cmd_help (xboolean_t     requested,
                       "If PATH is given, only list matching resources\n"
                       "Details include the section, size and compression");
       synopsis = _("FILE [PATH]");
-      option = xstrdup_printf ("[--section %s]", _("SECTION"));
+      option = g_strdup_printf ("[--section %s]", _("SECTION"));
     }
 
   else if (strcmp (command, "extract") == 0)
     {
       description = _("Extract a resource file to stdout");
       synopsis = _("FILE PATH");
-      option = xstrdup_printf ("[--section %s]", _("SECTION"));
+      option = g_strdup_printf ("[--section %s]", _("SECTION"));
     }
 
   else
     {
-      xstring_printf (string, _("Unknown command %s\n\n"), command);
+      g_string_printf (string, _("Unknown command %s\n\n"), command);
       requested = FALSE;
       command = NULL;
     }
 
   if (command == NULL)
     {
-      xstring_append (string,
+      g_string_append (string,
       _("Usage:\n"
         "  gresource [--section SECTION] COMMAND [ARGS…]\n"
         "\n"
@@ -551,38 +551,38 @@ cmd_help (xboolean_t     requested,
     }
   else
     {
-      xstring_append_printf (string, _("Usage:\n  gresource %s%s%s %s\n\n%s\n\n"),
+      g_string_append_printf (string, _("Usage:\n  gresource %s%s%s %s\n\n%s\n\n"),
                               option ? option : "", option ? " " : "", command, synopsis[0] ? synopsis : "", description);
 
-      xstring_append (string, _("Arguments:\n"));
+      g_string_append (string, _("Arguments:\n"));
 
       if (option)
-        xstring_append (string,
+        g_string_append (string,
                          _("  SECTION   An (optional) elf section name\n"));
 
       if (strstr (synopsis, _("[COMMAND]")))
-        xstring_append (string,
+        g_string_append (string,
                        _("  COMMAND   The (optional) command to explain\n"));
 
       if (strstr (synopsis, _("FILE")))
         {
           if (strcmp (command, "sections") == 0)
-            xstring_append (string,
+            g_string_append (string,
                              _("  FILE      An elf file (a binary or a shared library)\n"));
           else
-            xstring_append (string,
+            g_string_append (string,
                              _("  FILE      An elf file (a binary or a shared library)\n"
                                "            or a compiled resource file\n"));
         }
 
       if (strstr (synopsis, _("[PATH]")))
-        xstring_append (string,
+        g_string_append (string,
                        _("  PATH      An (optional) resource path (may be partial)\n"));
       else if (strstr (synopsis, _("PATH")))
-        xstring_append (string,
+        g_string_append (string,
                        _("  PATH      A resource path\n"));
 
-      xstring_append (string, "\n");
+      g_string_append (string, "\n");
     }
 
   if (requested)
@@ -591,7 +591,7 @@ cmd_help (xboolean_t     requested,
     g_printerr ("%s\n", string->str);
 
   g_free (option);
-  xstring_free (string, TRUE);
+  g_string_free (string, TRUE);
 
   return requested ? 0 : 1;
 }
@@ -601,15 +601,15 @@ cmd_help (xboolean_t     requested,
 int
 main (int argc, char *argv[])
 {
-  xchar_t *section = NULL;
-  xboolean_t details = FALSE;
-  void (* function) (const xchar_t *, const xchar_t *, const xchar_t *, xboolean_t);
+  gchar *section = NULL;
+  gboolean details = FALSE;
+  void (* function) (const gchar *, const gchar *, const gchar *, gboolean);
 
 #ifdef G_OS_WIN32
-  xchar_t *tmp;
+  gchar *tmp;
 #endif
 
-  setlocale (LC_ALL, XPL_DEFAULT_LOCALE);
+  setlocale (LC_ALL, GLIB_DEFAULT_LOCALE);
   textdomain (GETTEXT_PACKAGE);
 
 #ifdef G_OS_WIN32
@@ -617,7 +617,7 @@ main (int argc, char *argv[])
   bindtextdomain (GETTEXT_PACKAGE, tmp);
   g_free (tmp);
 #else
-  bindtextdomain (GETTEXT_PACKAGE, XPL_LOCALE_DIR);
+  bindtextdomain (GETTEXT_PACKAGE, GLIB_LOCALE_DIR);
 #endif
 
 #ifdef HAVE_BIND_TEXTDOMAIN_CODESET

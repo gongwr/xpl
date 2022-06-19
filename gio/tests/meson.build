@@ -7,8 +7,8 @@ common_gio_tests_deps = [
 
 test_c_args = [
   '-DG_LOG_DOMAIN="GLib-GIO"',
-  '-DXPL_MKENUMS="@0@"'.format(glib_mkenums),
-  '-DXPL_COMPILE_SCHEMAS="@0@"'.format(glib_compile_schemas.full_path()),
+  '-DGLIB_MKENUMS="@0@"'.format(glib_mkenums),
+  '-DGLIB_COMPILE_SCHEMAS="@0@"'.format(glib_compile_schemas.full_path()),
   '-UG_DISABLE_ASSERT',
 ]
 
@@ -40,7 +40,7 @@ giotypefuncs_inc = custom_target(
   input : gio_headers + [gioenumtypes_h] + gobject_install_headers,
   command: [gengiotypefuncs_prog, '@OUTPUT@', '@INPUT@'])
 
-#  test_t programs buildable on all platforms
+#  Test programs buildable on all platforms
 gio_tests = {
   'appmonitor' : {
     # FIXME: https://gitlab.gnome.org/GNOME/glib/-/issues/1392
@@ -171,7 +171,15 @@ else
   }
 endif
 
-#  test_t programs buildable on UNIX only
+have_dbus_daemon = find_program('dbus-daemon', required : false).found()
+if have_dbus_daemon
+  gio_tests += {
+    'debugcontroller' : {},
+    'defaultvalue' : {'extra_sources' : [giotypefuncs_inc]},
+  }
+endif
+
+#  Test programs buildable on UNIX only
 if host_machine.system() != 'windows'
   gio_tests += {
     'file' : {},
@@ -183,6 +191,7 @@ if host_machine.system() != 'windows'
     },
     'gdbus-peer-object-manager' : {},
     'live-g-file' : {},
+    'resolver-parsing' : {'dependencies' : [network_libs]},
     'socket-address' : {},
     'stream-rw_all' : {},
     'unix-fd' : {},
@@ -244,8 +253,6 @@ if host_machine.system() != 'windows'
     }
   endif
 
-  #  test_t programs that need to bring up a session bus (requires dbus-daemon)
-  have_dbus_daemon = find_program('dbus-daemon', required : false).found()
   if have_dbus_daemon
     annotate_args = [
       '--annotate', 'org.project.Bar', 'Key1', 'Value1',
@@ -318,8 +325,6 @@ if host_machine.system() != 'windows'
         'extra_sources' : extra_sources,
         'suite' : ['slow'],
       },
-      'debugcontroller' : {},
-      'defaultvalue' : {'extra_sources' : [giotypefuncs_inc]},
       'gdbus-auth' : {'extra_sources' : extra_sources},
       'gdbus-bz627724' : {'extra_sources' : extra_sources},
       'gdbus-close-pending' : {'extra_sources' : extra_sources},
@@ -333,6 +338,7 @@ if host_machine.system() != 'windows'
         'suite' : ['slow'],
       },
       'gdbus-introspection' : {'extra_sources' : extra_sources},
+      'gdbus-method-invocation' : {'extra_sources' : extra_sources},
       'gdbus-names' : {'extra_sources' : extra_sources},
       'gdbus-proxy' : {'extra_sources' : extra_sources},
       'gdbus-proxy-threads' : {
@@ -343,7 +349,7 @@ if host_machine.system() != 'windows'
       'gdbus-proxy-well-known-name' : {'extra_sources' : extra_sources},
       'gdbus-test-codegen' : {
         'extra_sources' : [extra_sources, gdbus_test_codegen_generated, gdbus_test_codegen_generated_interface_info],
-        'c_args' : ['-DXPL_VERSION_MIN_REQUIRED=XPL_VERSION_2_32'],
+        'c_args' : ['-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_32'],
       },
       'gdbus-threading' : {
         'extra_sources' : extra_sources,
@@ -359,13 +365,13 @@ if host_machine.system() != 'windows'
       'gdbus-test-codegen-old' : {
         'source' : 'gdbus-test-codegen.c',
         'extra_sources' : [extra_sources, gdbus_test_codegen_generated, gdbus_test_codegen_generated_interface_info],
-        'c_args' : ['-DXPL_VERSION_MIN_REQUIRED=XPL_VERSION_2_36',
-                    '-DXPL_VERSION_MAX_ALLOWED=XPL_VERSION_2_36'],
+        'c_args' : ['-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_36',
+                    '-DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_36'],
       },
       'gdbus-test-codegen-min-required-2-64' : {
         'source' : 'gdbus-test-codegen.c',
         'extra_sources' : [extra_sources, gdbus_test_codegen_generated_min_required_2_64, gdbus_test_codegen_generated_interface_info],
-        'c_args' : ['-DXPL_VERSION_MIN_REQUIRED=XPL_VERSION_2_64'],
+        'c_args' : ['-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_64'],
       },
       'gapplication' : {'extra_sources' : extra_sources},
     }
@@ -429,7 +435,7 @@ if host_machine.system() != 'windows'
   endif
 endif # unix
 
-#  test_t programs buildable on Windows only
+#  Test programs buildable on Windows only
 if host_machine.system() == 'windows'
   gio_tests += {'win32-streams' : {}}
 endif

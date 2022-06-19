@@ -45,10 +45,10 @@
 
 /**
  * SECTION:gnetworkaddress
- * @short_description: A xsocket_connectable_t for resolving hostnames
+ * @short_description: A GSocketConnectable for resolving hostnames
  * @include: gio/gio.h
  *
- * #xnetwork_address_t provides an easy way to resolve a hostname and
+ * #GNetworkAddress provides an easy way to resolve a hostname and
  * then attempt to connect to that host, handling the possibility of
  * multiple IP addresses and multiple address families.
  *
@@ -56,24 +56,24 @@
  * as this object is kept alive which may have unexpected results if
  * alive for too long.
  *
- * See #xsocket_connectable_t for an example of using the connectable
+ * See #GSocketConnectable for an example of using the connectable
  * interface.
  */
 
 /**
- * xnetwork_address_t:
+ * GNetworkAddress:
  *
- * A #xsocket_connectable_t for resolving a hostname and connecting to
+ * A #GSocketConnectable for resolving a hostname and connecting to
  * that host.
  */
 
 struct _GNetworkAddressPrivate {
-  xchar_t *hostname;
-  xuint16_t port;
-  xlist_t *cached_sockaddrs;
-  xchar_t *scheme;
+  gchar *hostname;
+  guint16 port;
+  GList *cached_sockaddrs;
+  gchar *scheme;
 
-  sint64_t resolver_serial;
+  gint64 resolver_serial;
 };
 
 enum {
@@ -83,75 +83,75 @@ enum {
   PROP_SCHEME,
 };
 
-static void g_network_address_set_property (xobject_t      *object,
-                                            xuint_t         prop_id,
-                                            const xvalue_t *value,
-                                            xparam_spec_t   *pspec);
-static void g_network_address_get_property (xobject_t      *object,
-                                            xuint_t         prop_id,
-                                            xvalue_t       *value,
-                                            xparam_spec_t   *pspec);
+static void g_network_address_set_property (GObject      *object,
+                                            guint         prop_id,
+                                            const GValue *value,
+                                            GParamSpec   *pspec);
+static void g_network_address_get_property (GObject      *object,
+                                            guint         prop_id,
+                                            GValue       *value,
+                                            GParamSpec   *pspec);
 
-static void                      g_network_address_connectable_iface_init       (xsocket_connectable_iface_t *iface);
-static xsocket_address_enumerator_t *g_network_address_connectable_enumerate        (xsocket_connectable_t      *connectable);
-static xsocket_address_enumerator_t	*g_network_address_connectable_proxy_enumerate  (xsocket_connectable_t      *connectable);
-static xchar_t                    *g_network_address_connectable_to_string        (xsocket_connectable_t      *connectable);
+static void                      g_network_address_connectable_iface_init       (GSocketConnectableIface *iface);
+static GSocketAddressEnumerator *g_network_address_connectable_enumerate        (GSocketConnectable      *connectable);
+static GSocketAddressEnumerator	*g_network_address_connectable_proxy_enumerate  (GSocketConnectable      *connectable);
+static gchar                    *g_network_address_connectable_to_string        (GSocketConnectable      *connectable);
 
-G_DEFINE_TYPE_WITH_CODE (xnetwork_address, g_network_address, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xnetwork_address)
-                         G_IMPLEMENT_INTERFACE (XTYPE_SOCKET_CONNECTABLE,
+G_DEFINE_TYPE_WITH_CODE (GNetworkAddress, g_network_address, G_TYPE_OBJECT,
+                         G_ADD_PRIVATE (GNetworkAddress)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_SOCKET_CONNECTABLE,
                                                 g_network_address_connectable_iface_init))
 
 static void
-g_network_address_finalize (xobject_t *object)
+g_network_address_finalize (GObject *object)
 {
-  xnetwork_address_t *addr = G_NETWORK_ADDRESS (object);
+  GNetworkAddress *addr = G_NETWORK_ADDRESS (object);
 
   g_free (addr->priv->hostname);
   g_free (addr->priv->scheme);
-  xlist_free_full (addr->priv->cached_sockaddrs, xobject_unref);
+  g_list_free_full (addr->priv->cached_sockaddrs, g_object_unref);
 
-  XOBJECT_CLASS (g_network_address_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_network_address_parent_class)->finalize (object);
 }
 
 static void
 g_network_address_class_init (GNetworkAddressClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->set_property = g_network_address_set_property;
-  xobject_class->get_property = g_network_address_get_property;
-  xobject_class->finalize = g_network_address_finalize;
+  gobject_class->set_property = g_network_address_set_property;
+  gobject_class->get_property = g_network_address_get_property;
+  gobject_class->finalize = g_network_address_finalize;
 
-  xobject_class_install_property (xobject_class, PROP_HOSTNAME,
-                                   xparam_spec_string ("hostname",
+  g_object_class_install_property (gobject_class, PROP_HOSTNAME,
+                                   g_param_spec_string ("hostname",
                                                         P_("Hostname"),
                                                         P_("Hostname to resolve"),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
-  xobject_class_install_property (xobject_class, PROP_PORT,
-                                   xparam_spec_uint ("port",
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_PORT,
+                                   g_param_spec_uint ("port",
                                                       P_("Port"),
                                                       P_("Network port"),
                                                       0, 65535, 0,
-                                                      XPARAM_READWRITE |
-                                                      XPARAM_CONSTRUCT_ONLY |
-                                                      XPARAM_STATIC_STRINGS));
+                                                      G_PARAM_READWRITE |
+                                                      G_PARAM_CONSTRUCT_ONLY |
+                                                      G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_SCHEME,
-                                   xparam_spec_string ("scheme",
+  g_object_class_install_property (gobject_class, PROP_SCHEME,
+                                   g_param_spec_string ("scheme",
                                                         P_("Scheme"),
                                                         P_("URI Scheme"),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
 }
 
 static void
-g_network_address_connectable_iface_init (xsocket_connectable_iface_t *connectable_iface)
+g_network_address_connectable_iface_init (GSocketConnectableIface *connectable_iface)
 {
   connectable_iface->enumerate  = g_network_address_connectable_enumerate;
   connectable_iface->proxy_enumerate = g_network_address_connectable_proxy_enumerate;
@@ -159,33 +159,33 @@ g_network_address_connectable_iface_init (xsocket_connectable_iface_t *connectab
 }
 
 static void
-g_network_address_init (xnetwork_address_t *addr)
+g_network_address_init (GNetworkAddress *addr)
 {
   addr->priv = g_network_address_get_instance_private (addr);
 }
 
 static void
-g_network_address_set_property (xobject_t      *object,
-                                xuint_t         prop_id,
-                                const xvalue_t *value,
-                                xparam_spec_t   *pspec)
+g_network_address_set_property (GObject      *object,
+                                guint         prop_id,
+                                const GValue *value,
+                                GParamSpec   *pspec)
 {
-  xnetwork_address_t *addr = G_NETWORK_ADDRESS (object);
+  GNetworkAddress *addr = G_NETWORK_ADDRESS (object);
 
   switch (prop_id)
     {
     case PROP_HOSTNAME:
       g_free (addr->priv->hostname);
-      addr->priv->hostname = xvalue_dup_string (value);
+      addr->priv->hostname = g_value_dup_string (value);
       break;
 
     case PROP_PORT:
-      addr->priv->port = xvalue_get_uint (value);
+      addr->priv->port = g_value_get_uint (value);
       break;
 
     case PROP_SCHEME:
       g_free (addr->priv->scheme);
-      addr->priv->scheme = xvalue_dup_string (value);
+      addr->priv->scheme = g_value_dup_string (value);
       break;
 
     default:
@@ -196,25 +196,25 @@ g_network_address_set_property (xobject_t      *object,
 }
 
 static void
-g_network_address_get_property (xobject_t    *object,
-                                xuint_t       prop_id,
-                                xvalue_t     *value,
-                                xparam_spec_t *pspec)
+g_network_address_get_property (GObject    *object,
+                                guint       prop_id,
+                                GValue     *value,
+                                GParamSpec *pspec)
 {
-  xnetwork_address_t *addr = G_NETWORK_ADDRESS (object);
+  GNetworkAddress *addr = G_NETWORK_ADDRESS (object);
 
   switch (prop_id)
     {
     case PROP_HOSTNAME:
-      xvalue_set_string (value, addr->priv->hostname);
+      g_value_set_string (value, addr->priv->hostname);
       break;
 
     case PROP_PORT:
-      xvalue_set_uint (value, addr->priv->port);
+      g_value_set_uint (value, addr->priv->port);
       break;
 
     case PROP_SCHEME:
-      xvalue_set_string (value, addr->priv->scheme);
+      g_value_set_string (value, addr->priv->scheme);
       break;
 
     default:
@@ -226,64 +226,64 @@ g_network_address_get_property (xobject_t    *object,
 
 /*
  * inet_addresses_to_inet_socket_addresses:
- * @addresses: (transfer full): #xlist_t of #xinet_address_t
+ * @addresses: (transfer full): #GList of #GInetAddress
  *
- * Returns: (transfer full): #xlist_t of #xinet_socket_address_t
+ * Returns: (transfer full): #GList of #GInetSocketAddress
  */
-static xlist_t *
-inet_addresses_to_inet_socket_addresses (xnetwork_address_t *addr,
-                                         xlist_t           *addresses)
+static GList *
+inet_addresses_to_inet_socket_addresses (GNetworkAddress *addr,
+                                         GList           *addresses)
 {
-  xlist_t *a, *socket_addresses = NULL;
+  GList *a, *socket_addresses = NULL;
 
   for (a = addresses; a; a = a->next)
     {
-      xsocket_address_t *sockaddr = g_inet_socket_address_new (a->data, addr->priv->port);
-      socket_addresses = xlist_append (socket_addresses, g_steal_pointer (&sockaddr));
-      xobject_unref (a->data);
+      GSocketAddress *sockaddr = g_inet_socket_address_new (a->data, addr->priv->port);
+      socket_addresses = g_list_append (socket_addresses, g_steal_pointer (&sockaddr));
+      g_object_unref (a->data);
     }
 
-  xlist_free (addresses);
+  g_list_free (addresses);
   return socket_addresses;
 }
 
 /*
  * g_network_address_set_cached_addresses:
- * @addr: A #xnetwork_address_t
- * @addresses: (transfer full): List of #xinet_address_t or #xinet_socket_address_t
- * @resolver_serial: Serial of #xresolver_t used
+ * @addr: A #GNetworkAddress
+ * @addresses: (transfer full): List of #GInetAddress or #GInetSocketAddress
+ * @resolver_serial: Serial of #GResolver used
  *
  * Consumes @addresses and uses them to replace the current internal list.
  */
 static void
-g_network_address_set_cached_addresses (xnetwork_address_t *addr,
-                                        xlist_t           *addresses,
-                                        xuint64_t          resolver_serial)
+g_network_address_set_cached_addresses (GNetworkAddress *addr,
+                                        GList           *addresses,
+                                        guint64          resolver_serial)
 {
-  xassert (addresses != NULL);
+  g_assert (addresses != NULL);
 
   if (addr->priv->cached_sockaddrs)
-    xlist_free_full (addr->priv->cached_sockaddrs, xobject_unref);
+    g_list_free_full (addr->priv->cached_sockaddrs, g_object_unref);
 
-  if (X_IS_INET_SOCKET_ADDRESS (addresses->data))
+  if (G_IS_INET_SOCKET_ADDRESS (addresses->data))
     addr->priv->cached_sockaddrs = g_steal_pointer (&addresses);
   else
     addr->priv->cached_sockaddrs = inet_addresses_to_inet_socket_addresses (addr, g_steal_pointer (&addresses));
   addr->priv->resolver_serial = resolver_serial;
 }
 
-static xboolean_t
-g_network_address_parse_sockaddr (xnetwork_address_t *addr)
+static gboolean
+g_network_address_parse_sockaddr (GNetworkAddress *addr)
 {
-  xsocket_address_t *sockaddr;
+  GSocketAddress *sockaddr;
 
-  xassert (addr->priv->cached_sockaddrs == NULL);
+  g_assert (addr->priv->cached_sockaddrs == NULL);
 
   sockaddr = g_inet_socket_address_new_from_string (addr->priv->hostname,
                                                     addr->priv->port);
   if (sockaddr)
     {
-      addr->priv->cached_sockaddrs = xlist_append (addr->priv->cached_sockaddrs, sockaddr);
+      addr->priv->cached_sockaddrs = g_list_append (addr->priv->cached_sockaddrs, sockaddr);
       return TRUE;
     }
   else
@@ -295,24 +295,24 @@ g_network_address_parse_sockaddr (xnetwork_address_t *addr)
  * @hostname: the hostname
  * @port: the port
  *
- * Creates a new #xsocket_connectable_t for connecting to the given
+ * Creates a new #GSocketConnectable for connecting to the given
  * @hostname and @port.
  *
  * Note that depending on the configuration of the machine, a
  * @hostname of `localhost` may refer to the IPv4 loopback address
  * only, or to both IPv4 and IPv6; use
- * g_network_address_new_loopback() to create a #xnetwork_address_t that
+ * g_network_address_new_loopback() to create a #GNetworkAddress that
  * is guaranteed to resolve to both addresses.
  *
- * Returns: (transfer full) (type xnetwork_address_t): the new #xnetwork_address_t
+ * Returns: (transfer full) (type GNetworkAddress): the new #GNetworkAddress
  *
  * Since: 2.22
  */
-xsocket_connectable_t *
-g_network_address_new (const xchar_t *hostname,
-                       xuint16_t      port)
+GSocketConnectable *
+g_network_address_new (const gchar *hostname,
+                       guint16      port)
 {
-  return xobject_new (XTYPE_NETWORK_ADDRESS,
+  return g_object_new (G_TYPE_NETWORK_ADDRESS,
                        "hostname", hostname,
                        "port", port,
                        NULL);
@@ -322,7 +322,7 @@ g_network_address_new (const xchar_t *hostname,
  * g_network_address_new_loopback:
  * @port: the port
  *
- * Creates a new #xsocket_connectable_t for connecting to the local host
+ * Creates a new #GSocketConnectable for connecting to the local host
  * over a loopback connection to the given @port. This is intended for
  * use in connecting to local services which may be running on IPv4 or
  * IPv6.
@@ -333,37 +333,37 @@ g_network_address_new (const xchar_t *hostname,
  * resolving `localhost`, and an IPv6 address for `localhost6`.
  *
  * g_network_address_get_hostname() will always return `localhost` for
- * a #xnetwork_address_t created with this constructor.
+ * a #GNetworkAddress created with this constructor.
  *
- * Returns: (transfer full) (type xnetwork_address_t): the new #xnetwork_address_t
+ * Returns: (transfer full) (type GNetworkAddress): the new #GNetworkAddress
  *
  * Since: 2.44
  */
-xsocket_connectable_t *
-g_network_address_new_loopback (xuint16_t port)
+GSocketConnectable *
+g_network_address_new_loopback (guint16 port)
 {
-  xnetwork_address_t *addr;
-  xlist_t *addrs = NULL;
+  GNetworkAddress *addr;
+  GList *addrs = NULL;
 
-  addr = xobject_new (XTYPE_NETWORK_ADDRESS,
+  addr = g_object_new (G_TYPE_NETWORK_ADDRESS,
                        "hostname", "localhost",
                        "port", port,
                        NULL);
 
-  addrs = xlist_append (addrs, xinet_address_new_loopback (AF_INET6));
-  addrs = xlist_append (addrs, xinet_address_new_loopback (AF_INET));
+  addrs = g_list_append (addrs, g_inet_address_new_loopback (AF_INET6));
+  addrs = g_list_append (addrs, g_inet_address_new_loopback (AF_INET));
   g_network_address_set_cached_addresses (addr, g_steal_pointer (&addrs), 0);
 
-  return XSOCKET_CONNECTABLE (addr);
+  return G_SOCKET_CONNECTABLE (addr);
 }
 
 /**
  * g_network_address_parse:
  * @host_and_port: the hostname and optionally a port
  * @default_port: the default port if not in @host_and_port
- * @error: a pointer to a #xerror_t, or %NULL
+ * @error: a pointer to a #GError, or %NULL
  *
- * Creates a new #xsocket_connectable_t for connecting to the given
+ * Creates a new #GSocketConnectable for connecting to the given
  * @hostname and @port. May fail and return %NULL in case
  * parsing @host_and_port fails.
  *
@@ -385,28 +385,28 @@ g_network_address_new_loopback (xuint16_t port)
  * is deprecated, because it depends on the contents of /etc/services,
  * which is generally quite sparse on platforms other than Linux.)
  *
- * Returns: (transfer full) (type xnetwork_address_t): the new
- *   #xnetwork_address_t, or %NULL on error
+ * Returns: (transfer full) (type GNetworkAddress): the new
+ *   #GNetworkAddress, or %NULL on error
  *
  * Since: 2.22
  */
-xsocket_connectable_t *
-g_network_address_parse (const xchar_t  *host_and_port,
-                         xuint16_t       default_port,
-                         xerror_t      **error)
+GSocketConnectable *
+g_network_address_parse (const gchar  *host_and_port,
+                         guint16       default_port,
+                         GError      **error)
 {
-  xsocket_connectable_t *connectable;
-  const xchar_t *port;
-  xuint16_t portnum;
-  xchar_t *name;
+  GSocketConnectable *connectable;
+  const gchar *port;
+  guint16 portnum;
+  gchar *name;
 
-  xreturn_val_if_fail (host_and_port != NULL, NULL);
+  g_return_val_if_fail (host_and_port != NULL, NULL);
 
   port = NULL;
   if (host_and_port[0] == '[')
     /* escaped host part (to allow, eg. "[2001:db8::1]:888") */
     {
-      const xchar_t *end;
+      const gchar *end;
 
       end = strchr (host_and_port, ']');
       if (end == NULL)
@@ -429,7 +429,7 @@ g_network_address_parse (const xchar_t  *host_and_port,
           return NULL;
         }
 
-      name = xstrndup (host_and_port + 1, end - host_and_port - 1);
+      name = g_strndup (host_and_port + 1, end - host_and_port - 1);
     }
 
   else if ((port = strchr (host_and_port, ':')))
@@ -442,16 +442,16 @@ g_network_address_parse (const xchar_t  *host_and_port,
         /* more than one ':' in string */
         {
           /* this is actually an unescaped IPv6 address */
-          name = xstrdup (host_and_port);
+          name = g_strdup (host_and_port);
           port = NULL;
         }
       else
-        name = xstrndup (host_and_port, port - host_and_port - 1);
+        name = g_strndup (host_and_port, port - host_and_port - 1);
     }
 
   else
     /* plain hostname, no port */
-    name = xstrdup (host_and_port);
+    name = g_strdup (host_and_port);
 
   if (port != NULL)
     {
@@ -522,31 +522,31 @@ g_network_address_parse (const xchar_t  *host_and_port,
  * g_network_address_parse_uri:
  * @uri: the hostname and optionally a port
  * @default_port: The default port if none is found in the URI
- * @error: a pointer to a #xerror_t, or %NULL
+ * @error: a pointer to a #GError, or %NULL
  *
- * Creates a new #xsocket_connectable_t for connecting to the given
+ * Creates a new #GSocketConnectable for connecting to the given
  * @uri. May fail and return %NULL in case parsing @uri fails.
  *
  * Using this rather than g_network_address_new() or
- * g_network_address_parse() allows #xsocket_client_t to determine
+ * g_network_address_parse() allows #GSocketClient to determine
  * when to use application-specific proxy protocols.
  *
- * Returns: (transfer full) (type xnetwork_address_t): the new
- *   #xnetwork_address_t, or %NULL on error
+ * Returns: (transfer full) (type GNetworkAddress): the new
+ *   #GNetworkAddress, or %NULL on error
  *
  * Since: 2.26
  */
-xsocket_connectable_t *
-g_network_address_parse_uri (const xchar_t  *uri,
-    			     xuint16_t       default_port,
-			     xerror_t      **error)
+GSocketConnectable *
+g_network_address_parse_uri (const gchar  *uri,
+    			     guint16       default_port,
+			     GError      **error)
 {
-  xsocket_connectable_t *conn = NULL;
-  xchar_t *scheme = NULL;
-  xchar_t *hostname = NULL;
-  xint_t port;
+  GSocketConnectable *conn = NULL;
+  gchar *scheme = NULL;
+  gchar *hostname = NULL;
+  gint port;
 
-  if (!xuri_split_network (uri, XURI_FLAGS_NONE,
+  if (!g_uri_split_network (uri, G_URI_FLAGS_NONE,
                             &scheme, &hostname, &port, NULL))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
@@ -557,9 +557,9 @@ g_network_address_parse_uri (const xchar_t  *uri,
   if (port <= 0)
     port = default_port;
 
-  conn = xobject_new (XTYPE_NETWORK_ADDRESS,
+  conn = g_object_new (G_TYPE_NETWORK_ADDRESS,
                        "hostname", hostname,
-                       "port", (xuint_t) port,
+                       "port", (guint) port,
                        "scheme", scheme,
                        NULL);
   g_free (scheme);
@@ -570,7 +570,7 @@ g_network_address_parse_uri (const xchar_t  *uri,
 
 /**
  * g_network_address_get_hostname:
- * @addr: a #xnetwork_address_t
+ * @addr: a #GNetworkAddress
  *
  * Gets @addr's hostname. This might be either UTF-8 or ASCII-encoded,
  * depending on what @addr was created with.
@@ -579,17 +579,17 @@ g_network_address_parse_uri (const xchar_t  *uri,
  *
  * Since: 2.22
  */
-const xchar_t *
-g_network_address_get_hostname (xnetwork_address_t *addr)
+const gchar *
+g_network_address_get_hostname (GNetworkAddress *addr)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_ADDRESS (addr), NULL);
+  g_return_val_if_fail (G_IS_NETWORK_ADDRESS (addr), NULL);
 
   return addr->priv->hostname;
 }
 
 /**
  * g_network_address_get_port:
- * @addr: a #xnetwork_address_t
+ * @addr: a #GNetworkAddress
  *
  * Gets @addr's port number
  *
@@ -597,17 +597,17 @@ g_network_address_get_hostname (xnetwork_address_t *addr)
  *
  * Since: 2.22
  */
-xuint16_t
-g_network_address_get_port (xnetwork_address_t *addr)
+guint16
+g_network_address_get_port (GNetworkAddress *addr)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_ADDRESS (addr), 0);
+  g_return_val_if_fail (G_IS_NETWORK_ADDRESS (addr), 0);
 
   return addr->priv->port;
 }
 
 /**
  * g_network_address_get_scheme:
- * @addr: a #xnetwork_address_t
+ * @addr: a #GNetworkAddress
  *
  * Gets @addr's scheme
  *
@@ -615,16 +615,16 @@ g_network_address_get_port (xnetwork_address_t *addr)
  *
  * Since: 2.26
  */
-const xchar_t *
-g_network_address_get_scheme (xnetwork_address_t *addr)
+const gchar *
+g_network_address_get_scheme (GNetworkAddress *addr)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_ADDRESS (addr), NULL);
+  g_return_val_if_fail (G_IS_NETWORK_ADDRESS (addr), NULL);
 
   return addr->priv->scheme;
 }
 
-#define XTYPE_NETWORK_ADDRESS_ADDRESS_ENUMERATOR (xnetwork_address_address_enumerator_get_type ())
-#define G_NETWORK_ADDRESS_ADDRESS_ENUMERATOR(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_NETWORK_ADDRESS_ADDRESS_ENUMERATOR, xnetwork_address_address_enumerator))
+#define G_TYPE_NETWORK_ADDRESS_ADDRESS_ENUMERATOR (_g_network_address_address_enumerator_get_type ())
+#define G_NETWORK_ADDRESS_ADDRESS_ENUMERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_NETWORK_ADDRESS_ADDRESS_ENUMERATOR, GNetworkAddressAddressEnumerator))
 
 typedef enum {
   RESOLVE_STATE_NONE = 0,
@@ -633,102 +633,102 @@ typedef enum {
 } ResolveState;
 
 typedef struct {
-  xsocket_address_enumerator_t parent_instance;
+  GSocketAddressEnumerator parent_instance;
 
-  xnetwork_address_t *addr; /* (owned) */
-  xlist_t *addresses; /* (owned) (nullable) */
-  xlist_t *current_item; /* (unowned) (nullable) */
-  xtask_t *queued_task; /* (owned) (nullable) */
-  xtask_t *waiting_task; /* (owned) (nullable) */
-  xerror_t *last_error; /* (owned) (nullable) */
-  xsource_t *wait_source; /* (owned) (nullable) */
-  xmain_context_t *context; /* (owned) (nullable) */
+  GNetworkAddress *addr; /* (owned) */
+  GList *addresses; /* (owned) (nullable) */
+  GList *current_item; /* (unowned) (nullable) */
+  GTask *queued_task; /* (owned) (nullable) */
+  GTask *waiting_task; /* (owned) (nullable) */
+  GError *last_error; /* (owned) (nullable) */
+  GSource *wait_source; /* (owned) (nullable) */
+  GMainContext *context; /* (owned) (nullable) */
   ResolveState state;
-} xnetwork_address_address_enumerator_t;
+} GNetworkAddressAddressEnumerator;
 
 typedef struct {
-  xsocket_address_enumerator_class_t parent_class;
+  GSocketAddressEnumeratorClass parent_class;
 
-} xnetwork_address_address_enumerator_class_t;
+} GNetworkAddressAddressEnumeratorClass;
 
-static xtype_t xnetwork_address_address_enumerator_get_type (void);
-XDEFINE_TYPE (xnetwork_address_address_enumerator, xnetwork_address_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
+static GType _g_network_address_address_enumerator_get_type (void);
+G_DEFINE_TYPE (GNetworkAddressAddressEnumerator, _g_network_address_address_enumerator, G_TYPE_SOCKET_ADDRESS_ENUMERATOR)
 
 static void
-xnetwork_address_address_enumerator_finalize (xobject_t *object)
+g_network_address_address_enumerator_finalize (GObject *object)
 {
-  xnetwork_address_address_enumerator_t *addr_enum =
+  GNetworkAddressAddressEnumerator *addr_enum =
     G_NETWORK_ADDRESS_ADDRESS_ENUMERATOR (object);
 
   if (addr_enum->wait_source)
     {
-      xsource_destroy (addr_enum->wait_source);
-      g_clear_pointer (&addr_enum->wait_source, xsource_unref);
+      g_source_destroy (addr_enum->wait_source);
+      g_clear_pointer (&addr_enum->wait_source, g_source_unref);
     }
   g_clear_object (&addr_enum->queued_task);
   g_clear_object (&addr_enum->waiting_task);
   g_clear_error (&addr_enum->last_error);
-  xobject_unref (addr_enum->addr);
-  g_clear_pointer (&addr_enum->context, xmain_context_unref);
-  xlist_free_full (addr_enum->addresses, xobject_unref);
+  g_object_unref (addr_enum->addr);
+  g_clear_pointer (&addr_enum->context, g_main_context_unref);
+  g_list_free_full (addr_enum->addresses, g_object_unref);
 
-  XOBJECT_CLASS (xnetwork_address_address_enumerator_parent_class)->finalize (object);
+  G_OBJECT_CLASS (_g_network_address_address_enumerator_parent_class)->finalize (object);
 }
 
-static inline xsocket_family_t
-get_address_family (xinet_socket_address_t *address)
+static inline GSocketFamily
+get_address_family (GInetSocketAddress *address)
 {
-  return xinet_address_get_family (g_inet_socket_address_get_address (address));
+  return g_inet_address_get_family (g_inet_socket_address_get_address (address));
 }
 
 static void
-list_split_families (xlist_t  *list,
-                     xlist_t **out_ipv4,
-                     xlist_t **out_ipv6)
+list_split_families (GList  *list,
+                     GList **out_ipv4,
+                     GList **out_ipv6)
 {
-  xassert (out_ipv4);
-  xassert (out_ipv6);
+  g_assert (out_ipv4);
+  g_assert (out_ipv6);
 
   while (list)
     {
-      xsocket_family_t family = get_address_family (list->data);
+      GSocketFamily family = get_address_family (list->data);
       switch (family)
         {
-          case XSOCKET_FAMILY_IPV4:
-            *out_ipv4 = xlist_prepend (*out_ipv4, list->data);
+          case G_SOCKET_FAMILY_IPV4:
+            *out_ipv4 = g_list_prepend (*out_ipv4, list->data);
             break;
-          case XSOCKET_FAMILY_IPV6:
-            *out_ipv6 = xlist_prepend (*out_ipv6, list->data);
+          case G_SOCKET_FAMILY_IPV6:
+            *out_ipv6 = g_list_prepend (*out_ipv6, list->data);
             break;
-          case XSOCKET_FAMILY_INVALID:
-          case XSOCKET_FAMILY_UNIX:
+          case G_SOCKET_FAMILY_INVALID:
+          case G_SOCKET_FAMILY_UNIX:
             g_assert_not_reached ();
         }
 
-      list = xlist_next (list);
+      list = g_list_next (list);
     }
 
-  *out_ipv4 = xlist_reverse (*out_ipv4);
-  *out_ipv6 = xlist_reverse (*out_ipv6);
+  *out_ipv4 = g_list_reverse (*out_ipv4);
+  *out_ipv6 = g_list_reverse (*out_ipv6);
 }
 
-static xlist_t *
-list_interleave_families (xlist_t *list1,
-                          xlist_t *list2)
+static GList *
+list_interleave_families (GList *list1,
+                          GList *list2)
 {
-  xlist_t *interleaved = NULL;
+  GList *interleaved = NULL;
 
   while (list1 || list2)
     {
       if (list1)
         {
-          interleaved = xlist_append (interleaved, list1->data);
-          list1 = xlist_delete_link (list1, list1);
+          interleaved = g_list_append (interleaved, list1->data);
+          list1 = g_list_delete_link (list1, list1);
         }
       if (list2)
         {
-          interleaved = xlist_append (interleaved, list2->data);
-          list2 = xlist_delete_link (list2, list2);
+          interleaved = g_list_append (interleaved, list2->data);
+          list2 = g_list_delete_link (list2, list2);
         }
     }
 
@@ -746,10 +746,10 @@ list_interleave_families (xlist_t *list1,
  *
  * Returns: (transfer container): A new list
  */
-static xlist_t *
-list_copy_interleaved (xlist_t *list)
+static GList *
+list_copy_interleaved (GList *list)
 {
-  xlist_t *ipv4 = NULL, *ipv6 = NULL;
+  GList *ipv4 = NULL, *ipv6 = NULL;
 
   list_split_families (list, &ipv4, &ipv6);
   return list_interleave_families (ipv6, ipv4);
@@ -760,49 +760,49 @@ list_copy_interleaved (xlist_t *list)
  * @current_item: (transfer container): Item after which to resort
  * @new_list: (transfer container): New list to be interleaved and concatenated
  *
- * This differs from xlist_concat() + list_copy_interleaved() in that it sorts
+ * This differs from g_list_concat() + list_copy_interleaved() in that it sorts
  * items in the previous list starting from @current_item and concats the results
  * to @parent_list.
  *
  * Returns: (transfer container): New start of list
  */
-static xlist_t *
-list_concat_interleaved (xlist_t *parent_list,
-                         xlist_t *current_item,
-                         xlist_t *new_list)
+static GList *
+list_concat_interleaved (GList *parent_list,
+                         GList *current_item,
+                         GList *new_list)
 {
-  xlist_t *ipv4 = NULL, *ipv6 = NULL, *interleaved, *trailing = NULL;
-  xsocket_family_t last_family = XSOCKET_FAMILY_IPV4; /* Default to starting with ipv6 */
+  GList *ipv4 = NULL, *ipv6 = NULL, *interleaved, *trailing = NULL;
+  GSocketFamily last_family = G_SOCKET_FAMILY_IPV4; /* Default to starting with ipv6 */
 
   if (current_item)
     {
       last_family = get_address_family (current_item->data);
 
       /* Unused addresses will get removed, resorted, then readded */
-      trailing = xlist_next (current_item);
+      trailing = g_list_next (current_item);
       current_item->next = NULL;
     }
 
   list_split_families (trailing, &ipv4, &ipv6);
   list_split_families (new_list, &ipv4, &ipv6);
-  xlist_free (new_list);
+  g_list_free (new_list);
 
   if (trailing)
-    xlist_free (trailing);
+    g_list_free (trailing);
 
-  if (last_family == XSOCKET_FAMILY_IPV4)
+  if (last_family == G_SOCKET_FAMILY_IPV4)
     interleaved = list_interleave_families (ipv6, ipv4);
   else
     interleaved = list_interleave_families (ipv4, ipv6);
 
-  return xlist_concat (parent_list, interleaved);
+  return g_list_concat (parent_list, interleaved);
 }
 
 static void
-maybe_update_address_cache (xnetwork_address_address_enumerator_t *addr_enum,
-                            xresolver_t                        *resolver)
+maybe_update_address_cache (GNetworkAddressAddressEnumerator *addr_enum,
+                            GResolver                        *resolver)
 {
-  xlist_t *addresses, *p;
+  GList *addresses, *p;
 
   /* Only cache complete results */
   if (addr_enum->state & RESOLVE_STATE_WAITING_ON_IPV4 || addr_enum->state & RESOLVE_STATE_WAITING_ON_IPV6)
@@ -811,17 +811,17 @@ maybe_update_address_cache (xnetwork_address_address_enumerator_t *addr_enum,
   /* The enumerators list will not necessarily be fully sorted */
   addresses = list_copy_interleaved (addr_enum->addresses);
   for (p = addresses; p; p = p->next)
-    xobject_ref (p->data);
+    g_object_ref (p->data);
 
   g_network_address_set_cached_addresses (addr_enum->addr, g_steal_pointer (&addresses), g_resolver_get_serial (resolver));
 }
 
 static void
-xnetwork_address_address_enumerator_add_addresses (xnetwork_address_address_enumerator_t *addr_enum,
-                                                    xlist_t                            *addresses,
-                                                    xresolver_t                        *resolver)
+g_network_address_address_enumerator_add_addresses (GNetworkAddressAddressEnumerator *addr_enum,
+                                                    GList                            *addresses,
+                                                    GResolver                        *resolver)
 {
-  xlist_t *new_addresses = inet_addresses_to_inet_socket_addresses (addr_enum->addr, addresses);
+  GList *new_addresses = inet_addresses_to_inet_socket_addresses (addr_enum->addr, addresses);
 
   if (addr_enum->addresses == NULL)
     addr_enum->addresses = g_steal_pointer (&new_addresses);
@@ -831,20 +831,20 @@ xnetwork_address_address_enumerator_add_addresses (xnetwork_address_address_enum
   maybe_update_address_cache (addr_enum, resolver);
 }
 
-static xpointer_t
-copy_object (xconstpointer src,
-             xpointer_t      user_data)
+static gpointer
+copy_object (gconstpointer src,
+             gpointer      user_data)
 {
-  return xobject_ref (G_OBJECT (src));
+  return g_object_ref (G_OBJECT (src));
 }
 
-static xsocket_address_t *
-init_and_query_next_address (xnetwork_address_address_enumerator_t *addr_enum)
+static GSocketAddress *
+init_and_query_next_address (GNetworkAddressAddressEnumerator *addr_enum)
 {
-  xlist_t *next_item;
+  GList *next_item;
 
   if (addr_enum->addresses == NULL)
-    addr_enum->addresses = xlist_copy_deep (addr_enum->addr->priv->cached_sockaddrs,
+    addr_enum->addresses = g_list_copy_deep (addr_enum->addr->priv->cached_sockaddrs,
                                              copy_object, NULL);
 
   /* We always want to look at the next item at call time to get the latest results.
@@ -853,36 +853,36 @@ init_and_query_next_address (xnetwork_address_address_enumerator_t *addr_enum)
   if (addr_enum->current_item == NULL)
     next_item = addr_enum->current_item = addr_enum->addresses;
   else
-    next_item = xlist_next (addr_enum->current_item);
+    next_item = g_list_next (addr_enum->current_item);
 
   if (next_item)
     {
       addr_enum->current_item = next_item;
-      return xobject_ref (addr_enum->current_item->data);
+      return g_object_ref (addr_enum->current_item->data);
     }
   else
     return NULL;
 }
 
-static xsocket_address_t *
-xnetwork_address_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
-                                           xcancellable_t              *cancellable,
-                                           xerror_t                   **error)
+static GSocketAddress *
+g_network_address_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
+                                           GCancellable              *cancellable,
+                                           GError                   **error)
 {
-  xnetwork_address_address_enumerator_t *addr_enum =
+  GNetworkAddressAddressEnumerator *addr_enum =
     G_NETWORK_ADDRESS_ADDRESS_ENUMERATOR (enumerator);
 
   if (addr_enum->addresses == NULL)
     {
-      xnetwork_address_t *addr = addr_enum->addr;
-      xresolver_t *resolver = g_resolver_get_default ();
-      sint64_t serial = g_resolver_get_serial (resolver);
+      GNetworkAddress *addr = addr_enum->addr;
+      GResolver *resolver = g_resolver_get_default ();
+      gint64 serial = g_resolver_get_serial (resolver);
 
       if (addr->priv->resolver_serial != 0 &&
           addr->priv->resolver_serial != serial)
         {
           /* Resolver has reloaded, discard cached addresses */
-          xlist_free_full (addr->priv->cached_sockaddrs, xobject_unref);
+          g_list_free_full (addr->priv->cached_sockaddrs, g_object_unref);
           addr->priv->cached_sockaddrs = NULL;
         }
 
@@ -890,48 +890,48 @@ xnetwork_address_address_enumerator_next (xsocket_address_enumerator_t  *enumera
         g_network_address_parse_sockaddr (addr);
       if (!addr->priv->cached_sockaddrs)
         {
-          xlist_t *addresses;
+          GList *addresses;
 
           addresses = g_resolver_lookup_by_name (resolver,
                                                  addr->priv->hostname,
                                                  cancellable, error);
           if (!addresses)
             {
-              xobject_unref (resolver);
+              g_object_unref (resolver);
               return NULL;
             }
 
           g_network_address_set_cached_addresses (addr, g_steal_pointer (&addresses), serial);
         }
 
-      xobject_unref (resolver);
+      g_object_unref (resolver);
     }
 
   return init_and_query_next_address (addr_enum);
 }
 
 static void
-complete_queued_task (xnetwork_address_address_enumerator_t *addr_enum,
-                      xtask_t                            *task,
-                      xerror_t                           *error)
+complete_queued_task (GNetworkAddressAddressEnumerator *addr_enum,
+                      GTask                            *task,
+                      GError                           *error)
 {
   if (error)
-    xtask_return_error (task, error);
+    g_task_return_error (task, error);
   else
     {
-      xsocket_address_t *sockaddr = init_and_query_next_address (addr_enum);
-      xtask_return_pointer (task, g_steal_pointer (&sockaddr), xobject_unref);
+      GSocketAddress *sockaddr = init_and_query_next_address (addr_enum);
+      g_task_return_pointer (task, g_steal_pointer (&sockaddr), g_object_unref);
     }
-  xobject_unref (task);
+  g_object_unref (task);
 }
 
 static int
-on_address_timeout (xpointer_t user_data)
+on_address_timeout (gpointer user_data)
 {
-  xnetwork_address_address_enumerator_t *addr_enum = user_data;
+  GNetworkAddressAddressEnumerator *addr_enum = user_data;
 
   /* Upon completion it may get unref'd by the owner */
-  xobject_ref (addr_enum);
+  g_object_ref (addr_enum);
 
   if (addr_enum->queued_task != NULL)
       complete_queued_task (addr_enum, g_steal_pointer (&addr_enum->queued_task),
@@ -940,35 +940,35 @@ on_address_timeout (xpointer_t user_data)
       complete_queued_task (addr_enum, g_steal_pointer (&addr_enum->waiting_task),
                             NULL);
 
-  g_clear_pointer (&addr_enum->wait_source, xsource_unref);
-  xobject_unref (addr_enum);
+  g_clear_pointer (&addr_enum->wait_source, g_source_unref);
+  g_object_unref (addr_enum);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
-got_ipv6_addresses (xobject_t      *source_object,
-                    xasync_result_t *result,
-                    xpointer_t      user_data)
+got_ipv6_addresses (GObject      *source_object,
+                    GAsyncResult *result,
+                    gpointer      user_data)
 {
-  xnetwork_address_address_enumerator_t *addr_enum = user_data;
-  xresolver_t *resolver = G_RESOLVER (source_object);
-  xlist_t *addresses;
-  xerror_t *error = NULL;
+  GNetworkAddressAddressEnumerator *addr_enum = user_data;
+  GResolver *resolver = G_RESOLVER (source_object);
+  GList *addresses;
+  GError *error = NULL;
 
   addr_enum->state ^= RESOLVE_STATE_WAITING_ON_IPV6;
 
   addresses = g_resolver_lookup_by_name_with_flags_finish (resolver, result, &error);
   if (!error)
-    xnetwork_address_address_enumerator_add_addresses (addr_enum, g_steal_pointer (&addresses), resolver);
+    g_network_address_address_enumerator_add_addresses (addr_enum, g_steal_pointer (&addresses), resolver);
   else
     g_debug ("IPv6 DNS error: %s", error->message);
 
   /* If ipv4 was first and waiting on us it can stop waiting */
   if (addr_enum->wait_source)
     {
-      xsource_destroy (addr_enum->wait_source);
-      g_clear_pointer (&addr_enum->wait_source, xsource_unref);
+      g_source_destroy (addr_enum->wait_source);
+      g_clear_pointer (&addr_enum->wait_source, g_source_unref);
     }
 
   /* If we got an error before ipv4 then let its response handle it.
@@ -986,7 +986,7 @@ got_ipv6_addresses (xobject_t      *source_object,
     }
   else if (addr_enum->queued_task != NULL)
     {
-      xerror_t *task_error = NULL;
+      GError *task_error = NULL;
 
       /* If both errored just use the ipv6 one,
          but if ipv6 errored and ipv4 didn't we don't error */
@@ -999,31 +999,31 @@ got_ipv6_addresses (xobject_t      *source_object,
     }
 
   g_clear_error (&error);
-  xobject_unref (addr_enum);
+  g_object_unref (addr_enum);
 }
 
 static void
-got_ipv4_addresses (xobject_t      *source_object,
-                    xasync_result_t *result,
-                    xpointer_t      user_data)
+got_ipv4_addresses (GObject      *source_object,
+                    GAsyncResult *result,
+                    gpointer      user_data)
 {
-  xnetwork_address_address_enumerator_t *addr_enum = user_data;
-  xresolver_t *resolver = G_RESOLVER (source_object);
-  xlist_t *addresses;
-  xerror_t *error = NULL;
+  GNetworkAddressAddressEnumerator *addr_enum = user_data;
+  GResolver *resolver = G_RESOLVER (source_object);
+  GList *addresses;
+  GError *error = NULL;
 
   addr_enum->state ^= RESOLVE_STATE_WAITING_ON_IPV4;
 
   addresses = g_resolver_lookup_by_name_with_flags_finish (resolver, result, &error);
   if (!error)
-    xnetwork_address_address_enumerator_add_addresses (addr_enum, g_steal_pointer (&addresses), resolver);
+    g_network_address_address_enumerator_add_addresses (addr_enum, g_steal_pointer (&addresses), resolver);
   else
     g_debug ("IPv4 DNS error: %s", error->message);
 
   if (addr_enum->wait_source)
     {
-      xsource_destroy (addr_enum->wait_source);
-      g_clear_pointer (&addr_enum->wait_source, xsource_unref);
+      g_source_destroy (addr_enum->wait_source);
+      g_clear_pointer (&addr_enum->wait_source, g_source_unref);
     }
 
   /* If ipv6 already came in and errored then we return.
@@ -1033,7 +1033,7 @@ got_ipv4_addresses (xobject_t      *source_object,
    */
   if (addr_enum->last_error)
     {
-      xassert (addr_enum->queued_task);
+      g_assert (addr_enum->queued_task);
       g_clear_error (&addr_enum->last_error);
       complete_queued_task (addr_enum, g_steal_pointer (&addr_enum->queued_task),
                             g_steal_pointer (&error));
@@ -1046,41 +1046,41 @@ got_ipv4_addresses (xobject_t      *source_object,
     {
       addr_enum->last_error = g_steal_pointer (&error);
       addr_enum->wait_source = g_timeout_source_new (HAPPY_EYEBALLS_RESOLUTION_DELAY_MS);
-      xsource_set_callback (addr_enum->wait_source,
+      g_source_set_callback (addr_enum->wait_source,
                              on_address_timeout,
                              addr_enum, NULL);
-      xsource_attach (addr_enum->wait_source, addr_enum->context);
+      g_source_attach (addr_enum->wait_source, addr_enum->context);
     }
 
   g_clear_error (&error);
-  xobject_unref (addr_enum);
+  g_object_unref (addr_enum);
 }
 
 static void
-xnetwork_address_address_enumerator_next_async (xsocket_address_enumerator_t  *enumerator,
-                                                 xcancellable_t              *cancellable,
-                                                 xasync_ready_callback_t        callback,
-                                                 xpointer_t                   user_data)
+g_network_address_address_enumerator_next_async (GSocketAddressEnumerator  *enumerator,
+                                                 GCancellable              *cancellable,
+                                                 GAsyncReadyCallback        callback,
+                                                 gpointer                   user_data)
 {
-  xnetwork_address_address_enumerator_t *addr_enum =
+  GNetworkAddressAddressEnumerator *addr_enum =
     G_NETWORK_ADDRESS_ADDRESS_ENUMERATOR (enumerator);
-  xsocket_address_t *sockaddr;
-  xtask_t *task;
+  GSocketAddress *sockaddr;
+  GTask *task;
 
-  task = xtask_new (addr_enum, cancellable, callback, user_data);
-  xtask_set_source_tag (task, xnetwork_address_address_enumerator_next_async);
+  task = g_task_new (addr_enum, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_network_address_address_enumerator_next_async);
 
   if (addr_enum->addresses == NULL && addr_enum->state == RESOLVE_STATE_NONE)
     {
-      xnetwork_address_t *addr = addr_enum->addr;
-      xresolver_t *resolver = g_resolver_get_default ();
-      sint64_t serial = g_resolver_get_serial (resolver);
+      GNetworkAddress *addr = addr_enum->addr;
+      GResolver *resolver = g_resolver_get_default ();
+      gint64 serial = g_resolver_get_serial (resolver);
 
       if (addr->priv->resolver_serial != 0 &&
           addr->priv->resolver_serial != serial)
         {
           /* Resolver has reloaded, discard cached addresses */
-          xlist_free_full (addr->priv->cached_sockaddrs, xobject_unref);
+          g_list_free_full (addr->priv->cached_sockaddrs, g_object_unref);
           addr->priv->cached_sockaddrs = NULL;
         }
 
@@ -1092,7 +1092,7 @@ xnetwork_address_address_enumerator_next_async (xsocket_address_enumerator_t  *e
             {
               /* It does not make sense for this to be called multiple
                * times before the initial callback has been called */
-              xassert (addr_enum->queued_task == NULL);
+              g_assert (addr_enum->queued_task == NULL);
 
               addr_enum->state = RESOLVE_STATE_WAITING_ON_IPV4 | RESOLVE_STATE_WAITING_ON_IPV6;
               addr_enum->queued_task = g_steal_pointer (&task);
@@ -1101,18 +1101,18 @@ xnetwork_address_address_enumerator_next_async (xsocket_address_enumerator_t  *e
                                                           addr->priv->hostname,
                                                           G_RESOLVER_NAME_LOOKUP_FLAGS_IPV6_ONLY,
                                                           cancellable,
-                                                          got_ipv6_addresses, xobject_ref (addr_enum));
+                                                          got_ipv6_addresses, g_object_ref (addr_enum));
               g_resolver_lookup_by_name_with_flags_async (resolver,
                                                           addr->priv->hostname,
                                                           G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY,
                                                           cancellable,
-                                                          got_ipv4_addresses, xobject_ref (addr_enum));
+                                                          got_ipv4_addresses, g_object_ref (addr_enum));
             }
-          xobject_unref (resolver);
+          g_object_unref (resolver);
           return;
         }
 
-      xobject_unref (resolver);
+      g_object_unref (resolver);
     }
 
   sockaddr = init_and_query_next_address (addr_enum);
@@ -1123,59 +1123,59 @@ xnetwork_address_address_enumerator_next_async (xsocket_address_enumerator_t  *e
     }
   else
     {
-      xtask_return_pointer (task, sockaddr, xobject_unref);
-      xobject_unref (task);
+      g_task_return_pointer (task, sockaddr, g_object_unref);
+      g_object_unref (task);
     }
 }
 
-static xsocket_address_t *
-xnetwork_address_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerator,
-                                                  xasync_result_t              *result,
-                                                  xerror_t                   **error)
+static GSocketAddress *
+g_network_address_address_enumerator_next_finish (GSocketAddressEnumerator  *enumerator,
+                                                  GAsyncResult              *result,
+                                                  GError                   **error)
 {
-  xreturn_val_if_fail (xtask_is_valid (result, enumerator), NULL);
+  g_return_val_if_fail (g_task_is_valid (result, enumerator), NULL);
 
-  return xtask_propagate_pointer (XTASK (result), error);
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
 static void
-xnetwork_address_address_enumerator_init (xnetwork_address_address_enumerator_t *enumerator)
+_g_network_address_address_enumerator_init (GNetworkAddressAddressEnumerator *enumerator)
 {
-  enumerator->context = xmain_context_ref_thread_default ();
+  enumerator->context = g_main_context_ref_thread_default ();
 }
 
 static void
-xnetwork_address_address_enumerator_class_init (xnetwork_address_address_enumerator_class_t *addrenum_class)
+_g_network_address_address_enumerator_class_init (GNetworkAddressAddressEnumeratorClass *addrenum_class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (addrenum_class);
-  xsocket_address_enumerator_class_t *enumerator_class =
-    XSOCKET_ADDRESS_ENUMERATOR_CLASS (addrenum_class);
+  GObjectClass *object_class = G_OBJECT_CLASS (addrenum_class);
+  GSocketAddressEnumeratorClass *enumerator_class =
+    G_SOCKET_ADDRESS_ENUMERATOR_CLASS (addrenum_class);
 
-  enumerator_class->next = xnetwork_address_address_enumerator_next;
-  enumerator_class->next_async = xnetwork_address_address_enumerator_next_async;
-  enumerator_class->next_finish = xnetwork_address_address_enumerator_next_finish;
-  object_class->finalize = xnetwork_address_address_enumerator_finalize;
+  enumerator_class->next = g_network_address_address_enumerator_next;
+  enumerator_class->next_async = g_network_address_address_enumerator_next_async;
+  enumerator_class->next_finish = g_network_address_address_enumerator_next_finish;
+  object_class->finalize = g_network_address_address_enumerator_finalize;
 }
 
-static xsocket_address_enumerator_t *
-g_network_address_connectable_enumerate (xsocket_connectable_t *connectable)
+static GSocketAddressEnumerator *
+g_network_address_connectable_enumerate (GSocketConnectable *connectable)
 {
-  xnetwork_address_address_enumerator_t *addr_enum;
+  GNetworkAddressAddressEnumerator *addr_enum;
 
-  addr_enum = xobject_new (XTYPE_NETWORK_ADDRESS_ADDRESS_ENUMERATOR, NULL);
-  addr_enum->addr = xobject_ref (G_NETWORK_ADDRESS (connectable));
+  addr_enum = g_object_new (G_TYPE_NETWORK_ADDRESS_ADDRESS_ENUMERATOR, NULL);
+  addr_enum->addr = g_object_ref (G_NETWORK_ADDRESS (connectable));
 
-  return (xsocket_address_enumerator_t *)addr_enum;
+  return (GSocketAddressEnumerator *)addr_enum;
 }
 
-static xsocket_address_enumerator_t *
-g_network_address_connectable_proxy_enumerate (xsocket_connectable_t *connectable)
+static GSocketAddressEnumerator *
+g_network_address_connectable_proxy_enumerate (GSocketConnectable *connectable)
 {
-  xnetwork_address_t *self = G_NETWORK_ADDRESS (connectable);
-  xsocket_address_enumerator_t *proxy_enum;
-  xchar_t *uri;
+  GNetworkAddress *self = G_NETWORK_ADDRESS (connectable);
+  GSocketAddressEnumerator *proxy_enum;
+  gchar *uri;
 
-  uri = xuri_join (XURI_FLAGS_NONE,
+  uri = g_uri_join (G_URI_FLAGS_NONE,
                     self->priv->scheme ? self->priv->scheme : "none",
                     NULL,
                     self->priv->hostname,
@@ -1184,7 +1184,7 @@ g_network_address_connectable_proxy_enumerate (xsocket_connectable_t *connectabl
                     NULL,
                     NULL);
 
-  proxy_enum = xobject_new (XTYPE_PROXY_ADDRESS_ENUMERATOR,
+  proxy_enum = g_object_new (G_TYPE_PROXY_ADDRESS_ENUMERATOR,
                              "connectable", connectable,
       	       	       	     "uri", uri,
       	       	       	     NULL);
@@ -1194,26 +1194,26 @@ g_network_address_connectable_proxy_enumerate (xsocket_connectable_t *connectabl
   return proxy_enum;
 }
 
-static xchar_t *
-g_network_address_connectable_to_string (xsocket_connectable_t *connectable)
+static gchar *
+g_network_address_connectable_to_string (GSocketConnectable *connectable)
 {
-  xnetwork_address_t *addr;
-  const xchar_t *scheme;
-  xuint16_t port;
-  xstring_t *out;  /* owned */
+  GNetworkAddress *addr;
+  const gchar *scheme;
+  guint16 port;
+  GString *out;  /* owned */
 
   addr = G_NETWORK_ADDRESS (connectable);
-  out = xstring_new ("");
+  out = g_string_new ("");
 
   scheme = g_network_address_get_scheme (addr);
   if (scheme != NULL)
-    xstring_append_printf (out, "%s:", scheme);
+    g_string_append_printf (out, "%s:", scheme);
 
-  xstring_append (out, g_network_address_get_hostname (addr));
+  g_string_append (out, g_network_address_get_hostname (addr));
 
   port = g_network_address_get_port (addr);
   if (port != 0)
-    xstring_append_printf (out, ":%u", port);
+    g_string_append_printf (out, ":%u", port);
 
-  return xstring_free (out, FALSE);
+  return g_string_free (out, FALSE);
 }

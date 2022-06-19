@@ -1,4 +1,4 @@
-/* test_t for NaN that does not need libm.
+/* Test for NaN that does not need libm.
    Copyright (C) 2007-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -33,7 +33,7 @@ extern int isnanf (float x);
 #  endif
 # endif
 #else
-/* test_t whether X is a NaN.  */
+/* Test whether X is a NaN.  */
 # undef isnanf
 # define isnanf rpl_isnanf
 extern int isnanf (float x);

@@ -88,7 +88,7 @@ foreach tool: python_tools
   meson.override_find_program(tool, tool_bin)
 endforeach
 
-# Generate a header file containing the xobject_t enum types for the enums defined
+# Generate a header file containing the GObject enum types for the enums defined
 # in libglib.
 #
 # For now, we only include gunicode.h here, since GScriptType is needed for
@@ -134,7 +134,7 @@ libgobject = library('gobject-2.0',
   install : true,
   include_directories : [configinc],
   dependencies : [libffi_dep, libglib_dep],
-  c_args : ['-DG_LOG_DOMAIN="GLib-xobject_t"', '-DGOBJECT_COMPILATION'] + glib_hidden_visibility_args,
+  c_args : ['-DG_LOG_DOMAIN="GLib-GObject"', '-DGOBJECT_COMPILATION'] + glib_hidden_visibility_args,
   link_args : glib_link_flags,
 )
 
@@ -143,7 +143,7 @@ pkg.generate(libgobject,
   version : glib_version,
   install_dir : glib_pkgconfigreldir,
   filebase : 'gobject-2.0',
-  name : 'xobject_t',
+  name : 'GObject',
   description : 'GLib Type, Object, Parameter and Signal Library',
 )
 

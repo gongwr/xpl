@@ -50,7 +50,7 @@ if host_system != 'windows'
   }
 endif
 
-common_c_args = test_cargs + ['-DXPL_DISABLE_DEPRECATION_WARNINGS']
+common_c_args = test_cargs + ['-DGLIB_DISABLE_DEPRECATION_WARNINGS']
 common_deps = [libm, thread_dep, libglib_dep, libgobject_dep]
 
 foreach test_name, extra_args : gobject_tests
@@ -72,7 +72,7 @@ foreach test_name, extra_args : gobject_tests
     )
   endif
 
-  # FIXME? $(XPL_DEBUG_FLAGS)
+  # FIXME? $(GLIB_DEBUG_FLAGS)
   exe = executable(test_name, [source, extra_sources],
     c_args : common_c_args + extra_args.get('c_args', []),
     dependencies : common_deps + extra_args.get('dependencies', []),

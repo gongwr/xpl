@@ -20,7 +20,7 @@
 
 <refnamediv>
   <refname>gsettings</refname>
-  <refpurpose>xsettings_t configuration tool</refpurpose>
+  <refpurpose>GSettings configuration tool</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
@@ -105,7 +105,7 @@
 
 <refsect1><title>Description</title>
 <para><command>gsettings</command> offers a simple commandline
-interface to <link linkend="xsettings_t"><type>xsettings_t</type></link>.
+interface to <link linkend="GSettings"><type>GSettings</type></link>.
 It lets you get, set or monitor an individual key for changes.
 </para>
 <para>
@@ -118,7 +118,7 @@ if the schema does not have a fixed path.
 <para>
 When setting a key, you also need specify a <replaceable>VALUE</replaceable>
 The format for the value is that of a serialized
-<link linkend="xvariant_t"><type>xvariant_t</type></link>,
+<link linkend="GVariant"><type>GVariant</type></link>,
 so e.g. a string
 must include explicit quotes: "'foo'". This format is also used when printing
 out values.
@@ -137,7 +137,7 @@ the dconf database.
 <listitem><para>
 Gets the value of <replaceable>KEY</replaceable>.
 The value is printed out as a serialized
-<link linkend="xvariant_t"><type>xvariant_t</type></link>.
+<link linkend="GVariant"><type>GVariant</type></link>.
 </para></listitem>
 </varlistentry>
 
@@ -176,7 +176,7 @@ Queries the description of valid values for <replaceable>KEY</replaceable>.
 <listitem><para>
 Sets the value of <replaceable>KEY</replaceable> to
 <replaceable>VALUE</replaceable>. The value is specified as a serialized
-<link linkend="xvariant_t"><type>xvariant_t</type></link>.
+<link linkend="GVariant"><type>GVariant</type></link>.
 </para></listitem>
 </varlistentry>
 

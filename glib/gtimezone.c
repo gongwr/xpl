@@ -48,24 +48,24 @@
 
 /**
  * SECTION:timezone
- * @title: xtimezone_t
+ * @title: GTimeZone
  * @short_description: a structure representing a time zone
- * @see_also: #xdatetime_t
+ * @see_also: #GDateTime
  *
- * #xtimezone_t is a structure that represents a time zone, at no
+ * #GTimeZone is a structure that represents a time zone, at no
  * particular point in time.  It is refcounted and immutable.
  *
  * Each time zone has an identifier (for example, ‘Europe/London’) which is
- * platform dependent. See xtime_zone_new() for information on the identifier
+ * platform dependent. See g_time_zone_new() for information on the identifier
  * formats. The identifier of a time zone can be retrieved using
- * xtime_zone_get_identifier().
+ * g_time_zone_get_identifier().
  *
  * A time zone contains a number of intervals.  Each interval has
  * an abbreviation to describe it (for example, ‘PDT’), an offset to UTC and a
  * flag indicating if the daylight savings time is in effect during that
  * interval.  A time zone always has at least one interval — interval 0. Note
  * that interval abbreviations are not the same as time zone identifiers
- * (apart from ‘UTC’), and cannot be passed to xtime_zone_new().
+ * (apart from ‘UTC’), and cannot be passed to g_time_zone_new().
  *
  * Every UTC time is contained within exactly one interval, but a given
  * local time may be contained within zero, one or two intervals (due to
@@ -78,13 +78,13 @@
  * that some properties (like the abbreviation) change between intervals
  * without other properties changing.
  *
- * #xtimezone_t is available since GLib 2.26.
+ * #GTimeZone is available since GLib 2.26.
  */
 
 /**
- * xtimezone_t:
+ * GTimeZone:
  *
- * #xtimezone_t is an opaque structure whose members cannot be accessed
+ * #GTimeZone is an opaque structure whose members cannot be accessed
  * directly.
  *
  * Since: 2.26
@@ -93,28 +93,28 @@
 /* IANA zoneinfo file format {{{1 */
 
 /* unaligned */
-typedef struct { xchar_t bytes[8]; } gint64_be;
-typedef struct { xchar_t bytes[4]; } gint32_be;
-typedef struct { xchar_t bytes[4]; } guint32_be;
+typedef struct { gchar bytes[8]; } gint64_be;
+typedef struct { gchar bytes[4]; } gint32_be;
+typedef struct { gchar bytes[4]; } guint32_be;
 
-static inline sint64_t gint64_from_be (const gint64_be be) {
-  sint64_t tmp; memcpy (&tmp, &be, sizeof tmp); return GINT64_FROM_BE (tmp);
+static inline gint64 gint64_from_be (const gint64_be be) {
+  gint64 tmp; memcpy (&tmp, &be, sizeof tmp); return GINT64_FROM_BE (tmp);
 }
 
 static inline gint32 gint32_from_be (const gint32_be be) {
   gint32 tmp; memcpy (&tmp, &be, sizeof tmp); return GINT32_FROM_BE (tmp);
 }
 
-static inline xuint32_t guint32_from_be (const guint32_be be) {
-  xuint32_t tmp; memcpy (&tmp, &be, sizeof tmp); return GUINT32_FROM_BE (tmp);
+static inline guint32 guint32_from_be (const guint32_be be) {
+  guint32 tmp; memcpy (&tmp, &be, sizeof tmp); return GUINT32_FROM_BE (tmp);
 }
 
 /* The layout of an IANA timezone file header */
 struct tzhead
 {
-  xchar_t      tzh_magic[4];
-  xchar_t      tzh_version;
-  xuchar_t     tzh_reserved[15];
+  gchar      tzh_magic[4];
+  gchar      tzh_version;
+  guchar     tzh_reserved[15];
 
   guint32_be tzh_ttisgmtcnt;
   guint32_be tzh_ttisstdcnt;
@@ -127,8 +127,8 @@ struct tzhead
 struct ttinfo
 {
   gint32_be tt_gmtoff;
-  xuint8_t    tt_isdst;
-  xuint8_t    tt_abbrind;
+  guint8    tt_isdst;
+  guint8    tt_abbrind;
 };
 
 /* A Transition Date structure for TZ Rules, an intermediate structure
@@ -137,11 +137,11 @@ struct ttinfo
  */
 typedef struct
 {
-  xint_t     year;
-  xint_t     mon;
-  xint_t     mday;
-  xint_t     wday;
-  xint_t     week;
+  gint     year;
+  gint     mon;
+  gint     mday;
+  gint     wday;
+  gint     week;
   gint32   offset;  /* hour*3600 + min*60 + sec; can be negative.  */
 } TimeZoneDate;
 
@@ -157,48 +157,48 @@ typedef struct
  */
 typedef struct
 {
-  xuint_t        start_year;
+  guint        start_year;
   gint32       std_offset;
   gint32       dlt_offset;
   TimeZoneDate dlt_start;
   TimeZoneDate dlt_end;
-  xchar_t std_name[NAME_SIZE];
-  xchar_t dlt_name[NAME_SIZE];
+  gchar std_name[NAME_SIZE];
+  gchar dlt_name[NAME_SIZE];
 } TimeZoneRule;
 
-/* xtimezone_t's internal representation of a Daylight Savings (Summer)
+/* GTimeZone's internal representation of a Daylight Savings (Summer)
    time interval.
  */
 typedef struct
 {
   gint32     gmt_offset;
-  xboolean_t   is_dst;
-  xchar_t     *abbrev;
+  gboolean   is_dst;
+  gchar     *abbrev;
 } TransitionInfo;
 
-/* xtimezone_t's representation of a transition time to or from Daylight
+/* GTimeZone's representation of a transition time to or from Daylight
    Savings (Summer) time and Standard time for the zone. */
 typedef struct
 {
-  sint64_t time;
-  xint_t   info_index;
+  gint64 time;
+  gint   info_index;
 } Transition;
 
-/* xtimezone_t structure */
+/* GTimeZone structure */
 struct _GTimeZone
 {
-  xchar_t   *name;
-  xarray_t  *t_info;         /* Array of TransitionInfo */
-  xarray_t  *transitions;    /* Array of Transition */
-  xint_t     ref_count;
+  gchar   *name;
+  GArray  *t_info;         /* Array of TransitionInfo */
+  GArray  *transitions;    /* Array of Transition */
+  gint     ref_count;
 };
 
 G_LOCK_DEFINE_STATIC (time_zones);
-static xhashtable_t/*<string?, xtimezone_t>*/ *time_zones;
+static GHashTable/*<string?, GTimeZone>*/ *time_zones;
 G_LOCK_DEFINE_STATIC (tz_default);
-static xtimezone_t *tz_default = NULL;
+static GTimeZone *tz_default = NULL;
 G_LOCK_DEFINE_STATIC (tz_local);
-static xtimezone_t *tz_local = NULL;
+static GTimeZone *tz_local = NULL;
 
 #define MIN_TZYEAR 1916 /* Daylight Savings started in WWI */
 #define MAX_TZYEAR 2999 /* And it's not likely ever to go away, but
@@ -206,26 +206,26 @@ static xtimezone_t *tz_local = NULL;
                            away. */
 
 #ifdef G_OS_UNIX
-static xtimezone_t *parse_footertz (const xchar_t *, size_t);
+static GTimeZone *parse_footertz (const gchar *, size_t);
 #endif
 
 /**
- * xtime_zone_unref:
- * @tz: a #xtimezone_t
+ * g_time_zone_unref:
+ * @tz: a #GTimeZone
  *
  * Decreases the reference count on @tz.
  *
  * Since: 2.26
  **/
 void
-xtime_zone_unref (xtimezone_t *tz)
+g_time_zone_unref (GTimeZone *tz)
 {
   int ref_count;
 
 again:
   ref_count = g_atomic_int_get (&tz->ref_count);
 
-  xassert (ref_count > 0);
+  g_assert (ref_count > 0);
 
   if (ref_count == 1)
     {
@@ -241,13 +241,13 @@ again:
             }
 
           if (time_zones != NULL)
-            xhash_table_remove (time_zones, tz->name);
+            g_hash_table_remove (time_zones, tz->name);
           G_UNLOCK(time_zones);
         }
 
       if (tz->t_info != NULL)
         {
-          xuint_t idx;
+          guint idx;
           for (idx = 0; idx < tz->t_info->len; idx++)
             {
               TransitionInfo *info = &g_array_index (tz->t_info, TransitionInfo, idx);
@@ -259,7 +259,7 @@ again:
         g_array_free (tz->transitions, TRUE);
       g_free (tz->name);
 
-      g_slice_free (xtimezone_t, tz);
+      g_slice_free (GTimeZone, tz);
     }
 
   else if G_UNLIKELY (!g_atomic_int_compare_and_exchange (&tz->ref_count,
@@ -269,8 +269,8 @@ again:
 }
 
 /**
- * xtime_zone_ref:
- * @tz: a #xtimezone_t
+ * g_time_zone_ref:
+ * @tz: a #GTimeZone
  *
  * Increases the reference count on @tz.
  *
@@ -278,10 +278,10 @@ again:
  *
  * Since: 2.26
  **/
-xtimezone_t *
-xtime_zone_ref (xtimezone_t *tz)
+GTimeZone *
+g_time_zone_ref (GTimeZone *tz)
 {
-  xassert (tz->ref_count > 0);
+  g_assert (tz->ref_count > 0);
 
   g_atomic_int_inc (&tz->ref_count);
 
@@ -301,10 +301,10 @@ xtime_zone_ref (xtimezone_t *tz)
  * and POSIX Base Definitions 8.3 TZ rule time:
  * https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html#tag_08_03
  */
-static xboolean_t
-parse_time (const xchar_t *time_,
+static gboolean
+parse_time (const gchar *time_,
             gint32      *offset,
-            xboolean_t    rfc8536)
+            gboolean    rfc8536)
 {
   if (*time_ < '0' || '9' < *time_)
     return FALSE;
@@ -378,14 +378,14 @@ parse_time (const xchar_t *time_,
   return *time_ == '\0';
 }
 
-static xboolean_t
-parse_constant_offset (const xchar_t *name,
+static gboolean
+parse_constant_offset (const gchar *name,
                        gint32      *offset,
-                       xboolean_t    rfc8536)
+                       gboolean    rfc8536)
 {
   /* Internet RFC 8536 section 3.3.1 and POSIX 8.3 TZ together say
      that a transition time must be numeric.  */
-  if (!rfc8536 && xstrcmp0 (name, "UTC") == 0)
+  if (!rfc8536 && g_strcmp0 (name, "UTC") == 0)
     {
       *offset = 0;
       return TRUE;
@@ -419,7 +419,7 @@ parse_constant_offset (const xchar_t *name,
 }
 
 static void
-zone_for_constant_offset (xtimezone_t *gtz, const xchar_t *name)
+zone_for_constant_offset (GTimeZone *gtz, const gchar *name)
 {
   gint32 offset;
   TransitionInfo info;
@@ -429,9 +429,9 @@ zone_for_constant_offset (xtimezone_t *gtz, const xchar_t *name)
 
   info.gmt_offset = offset;
   info.is_dst = FALSE;
-  info.abbrev =  xstrdup (name);
+  info.abbrev =  g_strdup (name);
 
-  gtz->name = xstrdup (name);
+  gtz->name = g_strdup (name);
   gtz->t_info = g_array_sized_new (FALSE, TRUE, sizeof (TransitionInfo), 1);
   g_array_append_val (gtz->t_info, info);
 
@@ -447,15 +447,15 @@ zone_for_constant_offset (xtimezone_t *gtz, const xchar_t *name)
  * text file looking for TZ= followed by the timezone, possibly quoted
  *
  */
-static xchar_t *
+static gchar *
 zone_identifier_illumos (void)
 {
-  xchar_t *resolved_identifier = NULL;
-  xchar_t *contents = NULL;
-  const xchar_t *line_start = NULL;
-  xsize_t tz_len = 0;
+  gchar *resolved_identifier = NULL;
+  gchar *contents = NULL;
+  const gchar *line_start = NULL;
+  gsize tz_len = 0;
 
-  if (!xfile_get_contents ("/etc/default/init", &contents, NULL, NULL) )
+  if (!g_file_get_contents ("/etc/default/init", &contents, NULL, NULL) )
     return NULL;
 
   /* is TZ= the first/only line in the file? */
@@ -464,7 +464,7 @@ zone_identifier_illumos (void)
       /* found TZ= on the first line, skip over the TZ= */
       line_start = contents + 3;
     }
-  else
+  else 
     {
       /* find a newline followed by TZ= */
       line_start = strstr (contents, "\nTZ=");
@@ -472,7 +472,7 @@ zone_identifier_illumos (void)
         line_start = line_start + 4; /* skip past the \nTZ= */
     }
 
-  /*
+  /* 
    * line_start is NULL if we didn't find TZ= at the start of any line,
    * otherwise it points to what is after the '=' (possibly '\0')
    */
@@ -492,13 +492,13 @@ zone_identifier_illumos (void)
          *(line_start + tz_len) != '\n' &&
          *(line_start + tz_len) != '"'  &&
          *(line_start + tz_len) != '\'')
-    tz_len++;
+    tz_len++; 
 
   if (tz_len > 0)
     {
       /* found it */
-      resolved_identifier = xstrndup (line_start, tz_len);
-      xstrchomp (resolved_identifier);
+      resolved_identifier = g_strndup (line_start, tz_len);
+      g_strchomp (resolved_identifier);
       g_free (contents);
       return g_steal_pointer (&resolved_identifier);
     }
@@ -510,34 +510,34 @@ zone_identifier_illumos (void)
 /*
  * returns the path to the top of the Olson zoneinfo timezone hierarchy.
  */
-static const xchar_t *
+static const gchar *
 zone_info_base_dir (void)
 {
-  if (xfile_test ("/usr/share/zoneinfo", XFILE_TEST_IS_DIR))
+  if (g_file_test ("/usr/share/zoneinfo", G_FILE_TEST_IS_DIR))
     return "/usr/share/zoneinfo";     /* Most distros */
-  else if (xfile_test ("/usr/share/lib/zoneinfo", XFILE_TEST_IS_DIR))
+  else if (g_file_test ("/usr/share/lib/zoneinfo", G_FILE_TEST_IS_DIR))
     return "/usr/share/lib/zoneinfo"; /* Illumos distros */
 
   /* need a better fallback case */
   return "/usr/share/zoneinfo";
 }
 
-static xchar_t *
+static gchar *
 zone_identifier_unix (void)
 {
-  xchar_t *resolved_identifier = NULL;
-  xsize_t prefix_len = 0;
-  xchar_t *canonical_path = NULL;
-  xerror_t *read_link_err = NULL;
-  const xchar_t *tzdir;
+  gchar *resolved_identifier = NULL;
+  gsize prefix_len = 0;
+  gchar *canonical_path = NULL;
+  GError *read_link_err = NULL;
+  const gchar *tzdir;
 
   /* Resolve the actual timezone pointed to by /etc/localtime. */
-  resolved_identifier = xfile_read_link ("/etc/localtime", &read_link_err);
+  resolved_identifier = g_file_read_link ("/etc/localtime", &read_link_err);
   if (resolved_identifier == NULL)
     {
-      xboolean_t not_a_symlink = xerror_matches (read_link_err,
-                                                XFILE_ERROR,
-                                                XFILE_ERROR_INVAL);
+      gboolean not_a_symlink = g_error_matches (read_link_err,
+                                                G_FILE_ERROR,
+                                                G_FILE_ERROR_INVAL);
       g_clear_error (&read_link_err);
 
       /* if /etc/localtime is not a symlink, try:
@@ -549,10 +549,10 @@ zone_identifier_unix (void)
        *    as a last-ditch effort to parse the TZ= setting from within
        *    /etc/default/init
        */
-      if (not_a_symlink && (xfile_get_contents ("/var/db/zoneinfo",
+      if (not_a_symlink && (g_file_get_contents ("/var/db/zoneinfo",
                                                  &resolved_identifier,
                                                  NULL, NULL) ||
-                            xfile_get_contents ("/etc/timezone",
+                            g_file_get_contents ("/etc/timezone",
                                                  &resolved_identifier,
                                                  NULL, NULL)
 #if defined(__sun) && defined(__SVR4)
@@ -560,11 +560,11 @@ zone_identifier_unix (void)
                             (resolved_identifier = zone_identifier_illumos ())
 #endif
                                                              ))
-        xstrchomp (resolved_identifier);
+        g_strchomp (resolved_identifier);
       else
         {
           /* Error */
-          xassert (resolved_identifier == NULL);
+          g_assert (resolved_identifier == NULL);
           goto out;
         }
     }
@@ -581,7 +581,7 @@ zone_identifier_unix (void)
     tzdir = zone_info_base_dir ();
 
   /* Strip the prefix and slashes if possible. */
-  if (xstr_has_prefix (resolved_identifier, tzdir))
+  if (g_str_has_prefix (resolved_identifier, tzdir))
     {
       prefix_len = strlen (tzdir);
       while (*(resolved_identifier + prefix_len) == '/')
@@ -592,7 +592,7 @@ zone_identifier_unix (void)
     memmove (resolved_identifier, resolved_identifier + prefix_len,
              strlen (resolved_identifier) - prefix_len + 1  /* nul terminator */);
 
-  xassert (resolved_identifier != NULL);
+  g_assert (resolved_identifier != NULL);
 
 out:
   g_free (canonical_path);
@@ -600,14 +600,14 @@ out:
   return resolved_identifier;
 }
 
-static xbytes_t*
-zone_info_unix (const xchar_t *identifier,
-                const xchar_t *resolved_identifier)
+static GBytes*
+zone_info_unix (const gchar *identifier,
+                const gchar *resolved_identifier)
 {
-  xchar_t *filename = NULL;
-  xmapped_file_t *file = NULL;
-  xbytes_t *zoneinfo = NULL;
-  const xchar_t *tzdir;
+  gchar *filename = NULL;
+  GMappedFile *file = NULL;
+  GBytes *zoneinfo = NULL;
+  const gchar *tzdir;
 
   tzdir = g_getenv ("TZDIR");
   if (tzdir == NULL)
@@ -623,7 +623,7 @@ zone_info_unix (const xchar_t *identifier,
         identifier ++;
 
       if (g_path_is_absolute (identifier))
-        filename = xstrdup (identifier);
+        filename = g_strdup (identifier);
       else
         filename = g_build_filename (tzdir, identifier, NULL);
     }
@@ -632,20 +632,20 @@ zone_info_unix (const xchar_t *identifier,
       if (resolved_identifier == NULL)
         goto out;
 
-      filename = xstrdup ("/etc/localtime");
+      filename = g_strdup ("/etc/localtime");
     }
 
-  file = xmapped_file_new (filename, FALSE, NULL);
+  file = g_mapped_file_new (filename, FALSE, NULL);
   if (file != NULL)
     {
-      zoneinfo = xbytes_new_with_free_func (xmapped_file_get_contents (file),
-                                             xmapped_file_get_length (file),
-                                             (xdestroy_notify_t)xmapped_file_unref,
-                                             xmapped_file_ref (file));
-      xmapped_file_unref (file);
+      zoneinfo = g_bytes_new_with_free_func (g_mapped_file_get_contents (file),
+                                             g_mapped_file_get_length (file),
+                                             (GDestroyNotify)g_mapped_file_unref,
+                                             g_mapped_file_ref (file));
+      g_mapped_file_unref (file);
     }
 
-  xassert (resolved_identifier != NULL);
+  g_assert (resolved_identifier != NULL);
 
 out:
   g_free (filename);
@@ -654,22 +654,22 @@ out:
 }
 
 static void
-init_zone_from_iana_info (xtimezone_t *gtz,
-                          xbytes_t    *zoneinfo,
-                          xchar_t     *identifier  /* (transfer full) */)
+init_zone_from_iana_info (GTimeZone *gtz,
+                          GBytes    *zoneinfo,
+                          gchar     *identifier  /* (transfer full) */)
 {
-  xsize_t size;
-  xuint_t index;
-  xuint32_t time_count, type_count;
-  xuint8_t *tz_transitions, *tz_type_index, *tz_ttinfo;
-  xuint8_t *tz_abbrs;
-  xsize_t timesize = sizeof (gint32);
-  xconstpointer header_data = xbytes_get_data (zoneinfo, &size);
-  const xchar_t *data = header_data;
+  gsize size;
+  guint index;
+  guint32 time_count, type_count;
+  guint8 *tz_transitions, *tz_type_index, *tz_ttinfo;
+  guint8 *tz_abbrs;
+  gsize timesize = sizeof (gint32);
+  gconstpointer header_data = g_bytes_get_data (zoneinfo, &size);
+  const gchar *data = header_data;
   const struct tzhead *header = header_data;
-  xtimezone_t *footertz = NULL;
-  xuint_t extra_time_count = 0, extra_type_count = 0;
-  sint64_t last_explicit_transition_time;
+  GTimeZone *footertz = NULL;
+  guint extra_time_count = 0, extra_type_count = 0;
+  gint64 last_explicit_transition_time;
 
   g_return_if_fail (size >= sizeof (struct tzhead) &&
                     memcmp (header, "TZif", 4) == 0);
@@ -680,28 +680,28 @@ init_zone_from_iana_info (xtimezone_t *gtz,
       {
         /* Skip ahead to the newer 64-bit data if it's available. */
         header = (const struct tzhead *)
-          (((const xchar_t *) (header + 1)) +
+          (((const gchar *) (header + 1)) +
            guint32_from_be(header->tzh_ttisgmtcnt) +
            guint32_from_be(header->tzh_ttisstdcnt) +
            8 * guint32_from_be(header->tzh_leapcnt) +
            5 * guint32_from_be(header->tzh_timecnt) +
            6 * guint32_from_be(header->tzh_typecnt) +
            guint32_from_be(header->tzh_charcnt));
-        timesize = sizeof (sint64_t);
+        timesize = sizeof (gint64);
       }
   time_count = guint32_from_be(header->tzh_timecnt);
   type_count = guint32_from_be(header->tzh_typecnt);
 
   if (header->tzh_version >= '2')
     {
-      const xchar_t *footer = (((const xchar_t *) (header + 1))
+      const gchar *footer = (((const gchar *) (header + 1))
                              + guint32_from_be(header->tzh_ttisgmtcnt)
                              + guint32_from_be(header->tzh_ttisstdcnt)
                              + 12 * guint32_from_be(header->tzh_leapcnt)
                              + 9 * time_count
                              + 6 * type_count
                              + guint32_from_be(header->tzh_charcnt));
-      const xchar_t *footerlast;
+      const gchar *footerlast;
       size_t footerlen;
       g_return_if_fail (footer <= data + size - 2 && footer[0] == '\n');
       footerlast = memchr (footer + 1, '\n', data + size - (footer + 1));
@@ -716,7 +716,7 @@ init_zone_from_iana_info (xtimezone_t *gtz,
         }
     }
 
-  tz_transitions = ((xuint8_t *) (header) + sizeof (*header));
+  tz_transitions = ((guint8 *) (header) + sizeof (*header));
   tz_type_index = tz_transitions + timesize * time_count;
   tz_ttinfo = tz_type_index + time_count;
   tz_abbrs = tz_ttinfo + sizeof (struct ttinfo) * type_count;
@@ -733,7 +733,7 @@ init_zone_from_iana_info (xtimezone_t *gtz,
       struct ttinfo info = ((struct ttinfo*)tz_ttinfo)[index];
       t_info.gmt_offset = gint32_from_be (info.tt_gmtoff);
       t_info.is_dst = info.tt_isdst ? TRUE : FALSE;
-      t_info.abbrev = xstrdup ((xchar_t *) &tz_abbrs[info.tt_abbrind]);
+      t_info.abbrev = g_strdup ((gchar *) &tz_abbrs[info.tt_abbrind]);
       g_array_append_val (gtz->t_info, t_info);
     }
 
@@ -746,8 +746,8 @@ init_zone_from_iana_info (xtimezone_t *gtz,
         trans.time = gint32_from_be (((gint32_be*)tz_transitions)[index]);
       last_explicit_transition_time = trans.time;
       trans.info_index = tz_type_index[index];
-      xassert (trans.info_index >= 0);
-      xassert ((xuint_t) trans.info_index < gtz->t_info->len);
+      g_assert (trans.info_index >= 0);
+      g_assert ((guint) trans.info_index < gtz->t_info->len);
       g_array_append_val (gtz->transitions, trans);
     }
 
@@ -782,7 +782,7 @@ init_zone_from_iana_info (xtimezone_t *gtz,
             }
         }
 
-      xtime_zone_unref (footertz);
+      g_time_zone_unref (footertz);
     }
 }
 
@@ -807,17 +807,17 @@ copy_windows_systemtime (SYSTEMTIME *s_time, TimeZoneDate *tzdate)
 }
 
 /* UTC = local time + bias while local time = UTC + offset */
-static xboolean_t
+static gboolean
 rule_from_windows_time_zone_info (TimeZoneRule *rule,
                                   TIME_ZONE_INFORMATION *tzi)
 {
-  xchar_t *std_name, *dlt_name;
+  gchar *std_name, *dlt_name;
 
-  std_name = xutf16_to_utf8 ((xunichar2_t *)tzi->StandardName, -1, NULL, NULL, NULL);
+  std_name = g_utf16_to_utf8 ((gunichar2 *)tzi->StandardName, -1, NULL, NULL, NULL);
   if (std_name == NULL)
     return FALSE;
 
-  dlt_name = xutf16_to_utf8 ((xunichar2_t *)tzi->DaylightName, -1, NULL, NULL, NULL);
+  dlt_name = g_utf16_to_utf8 ((gunichar2 *)tzi->DaylightName, -1, NULL, NULL, NULL);
   if (dlt_name == NULL)
     {
       g_free (std_name);
@@ -848,14 +848,14 @@ rule_from_windows_time_zone_info (TimeZoneRule *rule,
   return TRUE;
 }
 
-static xchar_t*
+static gchar*
 windows_default_tzname (void)
 {
-  const xunichar2_t *subkey =
+  const gunichar2 *subkey =
     L"SYSTEM\\CurrentControlSet\\Control\\TimeZoneInformation";
   HKEY key;
-  xchar_t *key_name = NULL;
-  xunichar2_t *key_name_w = NULL;
+  gchar *key_name = NULL;
+  gunichar2 *key_name_w = NULL;
   if (RegOpenKeyExW (HKEY_LOCAL_MACHINE, subkey, 0,
                      KEY_QUERY_VALUE, &key) == ERROR_SUCCESS)
     {
@@ -863,7 +863,7 @@ windows_default_tzname (void)
       if (RegQueryValueExW (key, L"TimeZoneKeyName", NULL, NULL,
                             NULL, &size) == ERROR_SUCCESS)
         {
-          key_name_w = g_malloc ((xint_t)size);
+          key_name_w = g_malloc ((gint)size);
 
           if (key_name_w == NULL ||
               RegQueryValueExW (key, L"TimeZoneKeyName", NULL, NULL,
@@ -873,7 +873,7 @@ windows_default_tzname (void)
               key_name = NULL;
             }
           else
-            key_name = xutf16_to_utf8 (key_name_w, -1, NULL, NULL, NULL);
+            key_name = g_utf16_to_utf8 (key_name_w, -1, NULL, NULL, NULL);
         }
       RegCloseKey (key);
     }
@@ -917,30 +917,30 @@ register_tzi_to_tzi (RegTZI *reg, TIME_ZONE_INFORMATION *tzi)
   tzi->DaylightBias = reg->DaylightBias;
 }
 
-static xuint_t
-rules_from_windows_time_zone (const xchar_t   *identifier,
-                              const xchar_t   *resolved_identifier,
+static guint
+rules_from_windows_time_zone (const gchar   *identifier,
+                              const gchar   *resolved_identifier,
                               TimeZoneRule **rules)
 {
   HKEY key;
-  xchar_t *subkey = NULL;
-  xchar_t *subkey_dynamic = NULL;
-  const xchar_t *key_name;
-  const xchar_t *reg_key =
+  gchar *subkey = NULL;
+  gchar *subkey_dynamic = NULL;
+  const gchar *key_name;
+  const gchar *reg_key =
     "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Time Zones\\";
   TIME_ZONE_INFORMATION tzi;
   DWORD size;
-  xuint_t rules_num = 0;
+  guint rules_num = 0;
   RegTZI regtzi = { 0 }, regtzi_prev;
   WCHAR winsyspath[MAX_PATH];
-  xunichar2_t *subkey_w, *subkey_dynamic_w;
+  gunichar2 *subkey_w, *subkey_dynamic_w;
 
   subkey_dynamic_w = NULL;
 
   if (GetSystemDirectoryW (winsyspath, MAX_PATH) == 0)
     return 0;
 
-  xassert (rules != NULL);
+  g_assert (rules != NULL);
 
   *rules = NULL;
   key_name = NULL;
@@ -953,13 +953,13 @@ rules_from_windows_time_zone (const xchar_t   *identifier,
   if (!key_name)
     return 0;
 
-  subkey = xstrconcat (reg_key, key_name, NULL);
-  subkey_w = xutf8_to_utf16 (subkey, -1, NULL, NULL, NULL);
+  subkey = g_strconcat (reg_key, key_name, NULL);
+  subkey_w = g_utf8_to_utf16 (subkey, -1, NULL, NULL, NULL);
   if (subkey_w == NULL)
     goto utf16_conv_failed;
 
-  subkey_dynamic = xstrconcat (subkey, "\\Dynamic DST", NULL);
-  subkey_dynamic_w = xutf8_to_utf16 (subkey_dynamic, -1, NULL, NULL, NULL);
+  subkey_dynamic = g_strconcat (subkey, "\\Dynamic DST", NULL);
+  subkey_dynamic_w = g_utf8_to_utf16 (subkey_dynamic, -1, NULL, NULL, NULL);
   if (subkey_dynamic_w == NULL)
     goto utf16_conv_failed;
 
@@ -1015,7 +1015,7 @@ rules_from_windows_time_zone (const xchar_t   *identifier,
 
       for (year = first, i = 0; *rules != NULL && year <= last; year++)
         {
-          xboolean_t failed = FALSE;
+          gboolean failed = FALSE;
           swprintf_s (s, 11, L"%d", year);
 
           if (!failed)
@@ -1101,33 +1101,33 @@ utf16_conv_failed:
 static void
 find_relative_date (TimeZoneDate *buffer)
 {
-  xuint_t wday;
-  xdate_t date;
-  xdate_clear (&date, 1);
+  guint wday;
+  GDate date;
+  g_date_clear (&date, 1);
   wday = buffer->wday;
 
   /* Get last day if last is needed, first day otherwise */
   if (buffer->mon == 13 || buffer->mon == 14) /* Julian Date */
     {
-      xdate_set_dmy (&date, 1, 1, buffer->year);
-      if (wday >= 59 && buffer->mon == 13 && xdate_is_leap_year (buffer->year))
-        xdate_add_days (&date, wday);
+      g_date_set_dmy (&date, 1, 1, buffer->year);
+      if (wday >= 59 && buffer->mon == 13 && g_date_is_leap_year (buffer->year))
+        g_date_add_days (&date, wday);
       else
-        xdate_add_days (&date, wday - 1);
-      buffer->mon = (int) xdate_get_month (&date);
-      buffer->mday = (int) xdate_get_day (&date);
+        g_date_add_days (&date, wday - 1);
+      buffer->mon = (int) g_date_get_month (&date);
+      buffer->mday = (int) g_date_get_day (&date);
       buffer->wday = 0;
     }
   else /* M.W.D */
     {
-      xuint_t days;
-      xuint_t days_in_month = xdate_get_days_in_month (buffer->mon, buffer->year);
+      guint days;
+      guint days_in_month = g_date_get_days_in_month (buffer->mon, buffer->year);
       GDateWeekday first_wday;
 
-      xdate_set_dmy (&date, 1, buffer->mon, buffer->year);
-      first_wday = xdate_get_weekday (&date);
+      g_date_set_dmy (&date, 1, buffer->mon, buffer->year);
+      first_wday = g_date_get_weekday (&date);
 
-      if ((xuint_t) first_wday > wday)
+      if ((guint) first_wday > wday)
         ++(buffer->week);
       /* week is 1 <= w <= 5, we need 0-based */
       days = 7 * (buffer->week - 1) + wday - first_wday;
@@ -1139,22 +1139,22 @@ find_relative_date (TimeZoneDate *buffer)
       while (days >= days_in_month)
         days -= 7;
 
-      xdate_add_days (&date, days);
+      g_date_add_days (&date, days);
 
-      buffer->mday = xdate_get_day (&date);
+      buffer->mday = g_date_get_day (&date);
     }
 }
 
 /* Offset is previous offset of local time. Returns 0 if month is 0 */
-static sint64_t
+static gint64
 boundary_for_year (TimeZoneDate *boundary,
-                   xint_t          year,
+                   gint          year,
                    gint32        offset)
 {
   TimeZoneDate buffer;
-  xdate_t date;
-  const xuint64_t unix_epoch_start = 719163L;
-  const xuint64_t seconds_per_day = 86400L;
+  GDate date;
+  const guint64 unix_epoch_start = 719163L;
+  const guint64 seconds_per_day = 86400L;
 
   if (!boundary->mon)
     return 0;
@@ -1168,42 +1168,42 @@ boundary_for_year (TimeZoneDate *boundary,
         find_relative_date (&buffer);
     }
 
-  xassert (buffer.year == year);
-  xdate_clear (&date, 1);
-  xdate_set_dmy (&date, buffer.mday, buffer.mon, buffer.year);
-  return ((xdate_get_julian (&date) - unix_epoch_start) * seconds_per_day +
+  g_assert (buffer.year == year);
+  g_date_clear (&date, 1);
+  g_date_set_dmy (&date, buffer.mday, buffer.mon, buffer.year);
+  return ((g_date_get_julian (&date) - unix_epoch_start) * seconds_per_day +
           buffer.offset - offset);
 }
 
 static void
 fill_transition_info_from_rule (TransitionInfo *info,
                                 TimeZoneRule   *rule,
-                                xboolean_t        is_dst)
+                                gboolean        is_dst)
 {
-  xint_t offset = is_dst ? rule->dlt_offset : rule->std_offset;
-  xchar_t *name = is_dst ? rule->dlt_name : rule->std_name;
+  gint offset = is_dst ? rule->dlt_offset : rule->std_offset;
+  gchar *name = is_dst ? rule->dlt_name : rule->std_name;
 
   info->gmt_offset = offset;
   info->is_dst = is_dst;
 
   if (name)
-    info->abbrev = xstrdup (name);
+    info->abbrev = g_strdup (name);
 
   else
-    info->abbrev = xstrdup_printf ("%+03d%02d",
+    info->abbrev = g_strdup_printf ("%+03d%02d",
                                       (int) offset / 3600,
                                       (int) abs (offset / 60) % 60);
 }
 
 static void
-init_zone_from_rules (xtimezone_t    *gtz,
+init_zone_from_rules (GTimeZone    *gtz,
                       TimeZoneRule *rules,
-                      xuint_t         rules_num,
-                      xchar_t        *identifier  /* (transfer full) */)
+                      guint         rules_num,
+                      gchar        *identifier  /* (transfer full) */)
 {
-  xuint_t type_count = 0, trans_count = 0, info_index = 0;
-  xuint_t ri; /* rule index */
-  xboolean_t skip_first_std_trans = TRUE;
+  guint type_count = 0, trans_count = 0, info_index = 0;
+  guint ri; /* rule index */
+  gboolean skip_first_std_trans = TRUE;
   gint32 last_offset;
 
   type_count = 0;
@@ -1214,8 +1214,8 @@ init_zone_from_rules (xtimezone_t    *gtz,
     {
       if (rules[ri].dlt_start.mon || rules[ri].dlt_end.mon)
         {
-          xuint_t rulespan = (rules[ri + 1].start_year - rules[ri].start_year);
-          xuint_t transitions = rules[ri].dlt_start.mon > 0 ? 1 : 0;
+          guint rulespan = (rules[ri + 1].start_year - rules[ri].start_year);
+          guint transitions = rules[ri].dlt_start.mon > 0 ? 1 : 0;
           transitions += rules[ri].dlt_end.mon > 0 ? 1 : 0;
           type_count += rules[ri].dlt_start.mon > 0 ? 2 : 1;
           trans_count += transitions * rulespan;
@@ -1248,8 +1248,8 @@ init_zone_from_rules (xtimezone_t    *gtz,
               /* The previous rule was a southern hemisphere rule that
                  starts the year with DST, so we need to add a
                  transition to return to standard time */
-              xuint_t year = rules[ri].start_year;
-              sint64_t std_time =  boundary_for_year (&rules[ri].dlt_end,
+              guint year = rules[ri].start_year;
+              gint64 std_time =  boundary_for_year (&rules[ri].dlt_end,
                                                     year, last_offset);
               Transition std_trans = {std_time, info_index};
               g_array_append_val (gtz->transitions, std_trans);
@@ -1261,10 +1261,10 @@ init_zone_from_rules (xtimezone_t    *gtz,
          }
       else
         {
-          const xuint_t start_year = rules[ri].start_year;
-          const xuint_t end_year = rules[ri + 1].start_year;
-          xboolean_t dlt_first;
-          xuint_t year;
+          const guint start_year = rules[ri].start_year;
+          const guint end_year = rules[ri + 1].start_year;
+          gboolean dlt_first;
+          guint year;
           TransitionInfo std_info, dlt_info;
           if (rules[ri].dlt_start.mon > 12)
             dlt_first = rules[ri].dlt_start.wday > rules[ri].dlt_end.wday;
@@ -1289,9 +1289,9 @@ init_zone_from_rules (xtimezone_t    *gtz,
               gint32 std_offset = (dlt_first ? rules[ri].std_offset :
                                    last_offset);
               /* NB: boundary_for_year returns 0 if mon == 0 */
-              sint64_t std_time =  boundary_for_year (&rules[ri].dlt_end,
+              gint64 std_time =  boundary_for_year (&rules[ri].dlt_end,
                                                     year, dlt_offset);
-              sint64_t dlt_time = boundary_for_year (&rules[ri].dlt_start,
+              gint64 dlt_time = boundary_for_year (&rules[ri].dlt_start,
                                                    year, std_offset);
               Transition std_trans = {std_time, info_index};
               Transition dlt_trans = {dlt_time, info_index + 1};
@@ -1327,7 +1327,7 @@ init_zone_from_rules (xtimezone_t    *gtz,
          starts the year with DST, so we need to add a
          transition to return to standard time */
       TransitionInfo info;
-      xuint_t year = rules[ri].start_year;
+      guint year = rules[ri].start_year;
       Transition trans;
       fill_transition_info_from_rule (&info, &(rules[ri - 1]), FALSE);
       g_array_append_val (gtz->t_info, info);
@@ -1353,10 +1353,10 @@ init_zone_from_rules (xtimezone_t    *gtz,
  *  - mm is 00 to 59
  *  - ss is 00 to 59
  */
-static xboolean_t
-parse_mwd_boundary (xchar_t **pos, TimeZoneDate *boundary)
+static gboolean
+parse_mwd_boundary (gchar **pos, TimeZoneDate *boundary)
 {
-  xint_t month, week, day;
+  gint month, week, day;
 
   if (**pos == '\0' || **pos < '0' || '9' < **pos)
     return FALSE;
@@ -1411,12 +1411,12 @@ parse_mwd_boundary (xchar_t **pos, TimeZoneDate *boundary)
  *   n   This specifies the zero-based Julian day with n between 0 and 365.
  *       February 29 is counted in leap years.
  */
-static xboolean_t
-parse_julian_boundary (xchar_t** pos, TimeZoneDate *boundary,
-                       xboolean_t ignore_leap)
+static gboolean
+parse_julian_boundary (gchar** pos, TimeZoneDate *boundary,
+                       gboolean ignore_leap)
 {
-  xint_t day = 0;
-  xdate_t date;
+  gint day = 0;
+  GDate date;
 
   while (**pos >= '0' && '9' >= **pos)
     {
@@ -1435,27 +1435,27 @@ parse_julian_boundary (xchar_t** pos, TimeZoneDate *boundary,
     {
       if (day < 0 || 365 < day)
         return FALSE;
-      /* xdate_t wants day in range 1->366 */
+      /* GDate wants day in range 1->366 */
       day++;
     }
 
-  xdate_clear (&date, 1);
-  xdate_set_julian (&date, day);
+  g_date_clear (&date, 1);
+  g_date_set_julian (&date, day);
   boundary->year = 0;
-  boundary->mon = (int) xdate_get_month (&date);
-  boundary->mday = (int) xdate_get_day (&date);
+  boundary->mon = (int) g_date_get_month (&date);
+  boundary->mday = (int) g_date_get_day (&date);
   boundary->wday = 0;
 
   return TRUE;
 }
 
-static xboolean_t
-parse_tz_boundary (const xchar_t  *identifier,
+static gboolean
+parse_tz_boundary (const gchar  *identifier,
                    TimeZoneDate *boundary)
 {
-  xchar_t *pos;
+  gchar *pos;
 
-  pos = (xchar_t*)identifier;
+  pos = (gchar*)identifier;
   /* Month-week-weekday */
   if (*pos == 'M')
     {
@@ -1490,7 +1490,7 @@ parse_tz_boundary (const xchar_t  *identifier,
     }
 }
 
-static xuint_t
+static guint
 create_ruleset_from_rule (TimeZoneRule **rules, TimeZoneRule *rule)
 {
   *rules = g_new0 (TimeZoneRule, 2);
@@ -1507,48 +1507,48 @@ create_ruleset_from_rule (TimeZoneRule **rules, TimeZoneRule *rule)
   return 2;
 }
 
-static xboolean_t
-parse_offset (xchar_t **pos, gint32 *target)
+static gboolean
+parse_offset (gchar **pos, gint32 *target)
 {
-  xchar_t *buffer;
-  xchar_t *target_pos = *pos;
-  xboolean_t ret;
+  gchar *buffer;
+  gchar *target_pos = *pos;
+  gboolean ret;
 
   while (**pos == '+' || **pos == '-' || **pos == ':' ||
          (**pos >= '0' && '9' >= **pos))
     ++(*pos);
 
-  buffer = xstrndup (target_pos, *pos - target_pos);
+  buffer = g_strndup (target_pos, *pos - target_pos);
   ret = parse_constant_offset (buffer, target, FALSE);
   g_free (buffer);
 
   return ret;
 }
 
-static xboolean_t
-parse_identifier_boundary (xchar_t **pos, TimeZoneDate *target)
+static gboolean
+parse_identifier_boundary (gchar **pos, TimeZoneDate *target)
 {
-  xchar_t *buffer;
-  xchar_t *target_pos = *pos;
-  xboolean_t ret;
+  gchar *buffer;
+  gchar *target_pos = *pos;
+  gboolean ret;
 
   while (**pos != ',' && **pos != '\0')
     ++(*pos);
-  buffer = xstrndup (target_pos, *pos - target_pos);
+  buffer = g_strndup (target_pos, *pos - target_pos);
   ret = parse_tz_boundary (buffer, target);
   g_free (buffer);
 
   return ret;
 }
 
-static xboolean_t
-set_tz_name (xchar_t **pos, xchar_t *buffer, xuint_t size)
+static gboolean
+set_tz_name (gchar **pos, gchar *buffer, guint size)
 {
-  xboolean_t quoted = **pos == '<';
-  xchar_t *name_pos = *pos;
-  xuint_t len;
+  gboolean quoted = **pos == '<';
+  gchar *name_pos = *pos;
+  guint len;
 
-  xassert (size != 0);
+  g_assert (size != 0);
 
   if (quoted)
     {
@@ -1571,14 +1571,14 @@ set_tz_name (xchar_t **pos, xchar_t *buffer, xuint_t size)
 
   memset (buffer, 0, size);
   /* name_pos isn't 0-terminated, so we have to limit the length expressly */
-  len = (xuint_t) (*pos - name_pos) > size - 1 ? size - 1 : (xuint_t) (*pos - name_pos);
+  len = (guint) (*pos - name_pos) > size - 1 ? size - 1 : (guint) (*pos - name_pos);
   strncpy (buffer, name_pos, len);
   *pos += quoted;
   return TRUE;
 }
 
-static xboolean_t
-parse_identifier_boundaries (xchar_t **pos, TimeZoneRule *tzr)
+static gboolean
+parse_identifier_boundaries (gchar **pos, TimeZoneRule *tzr)
 {
   if (*(*pos)++ != ',')
     return FALSE;
@@ -1597,21 +1597,21 @@ parse_identifier_boundaries (xchar_t **pos, TimeZoneRule *tzr)
  * Creates an array of TimeZoneRule from a TZ environment variable
  * type of identifier.  Should free rules afterwards
  */
-static xuint_t
-rules_from_identifier (const xchar_t   *identifier,
+static guint
+rules_from_identifier (const gchar   *identifier,
                        TimeZoneRule **rules)
 {
-  xchar_t *pos;
+  gchar *pos;
   TimeZoneRule tzr;
 
-  xassert (rules != NULL);
+  g_assert (rules != NULL);
 
   *rules = NULL;
 
   if (!identifier)
     return 0;
 
-  pos = (xchar_t*)identifier;
+  pos = (gchar*)identifier;
   memset (&tzr, 0, sizeof (tzr));
   /* Standard offset */
   if (!(set_tz_name (&pos, tzr.std_name, NAME_SIZE)) ||
@@ -1634,7 +1634,7 @@ rules_from_identifier (const xchar_t   *identifier,
 #ifdef G_OS_WIN32
     /* Windows allows us to use the US DST boundaries if they're not given */
     {
-      xuint_t i, rules_num = 0;
+      guint i, rules_num = 0;
 
       /* Use US rules, Windows' default is Pacific Standard Time */
       if ((rules_num = rules_from_windows_time_zone ("Pacific Standard Time",
@@ -1665,23 +1665,23 @@ rules_from_identifier (const xchar_t   *identifier,
 }
 
 #ifdef G_OS_UNIX
-static xtimezone_t *
-parse_footertz (const xchar_t *footer, size_t footerlen)
+static GTimeZone *
+parse_footertz (const gchar *footer, size_t footerlen)
 {
-  xchar_t *tzstring = xstrndup (footer + 1, footerlen - 2);
-  xtimezone_t *footertz = NULL;
+  gchar *tzstring = g_strndup (footer + 1, footerlen - 2);
+  GTimeZone *footertz = NULL;
 
   /* FIXME: The allocation for tzstring could be avoided by
-     passing a xsize_t identifier_len argument to rules_from_identifier
+     passing a gsize identifier_len argument to rules_from_identifier
      and changing the code in that function to stop assuming that
      identifier is nul-terminated.  */
   TimeZoneRule *rules;
-  xuint_t rules_num = rules_from_identifier (tzstring, &rules);
+  guint rules_num = rules_from_identifier (tzstring, &rules);
 
   g_free (tzstring);
   if (rules_num > 1)
     {
-      footertz = g_slice_new0 (xtimezone_t);
+      footertz = g_slice_new0 (GTimeZone);
       init_zone_from_rules (footertz, rules, rules_num, NULL);
       footertz->ref_count++;
     }
@@ -1692,41 +1692,41 @@ parse_footertz (const xchar_t *footer, size_t footerlen)
 
 /* Construction {{{1 */
 /**
- * xtime_zone_new:
+ * g_time_zone_new:
  * @identifier: (nullable): a timezone identifier
  *
- * A version of xtime_zone_new_identifier() which returns the UTC time zone
+ * A version of g_time_zone_new_identifier() which returns the UTC time zone
  * if @identifier could not be parsed or loaded.
  *
  * If you need to check whether @identifier was loaded successfully, use
- * xtime_zone_new_identifier().
+ * g_time_zone_new_identifier().
  *
  * Returns: (transfer full) (not nullable): the requested timezone
- * Deprecated: 2.68: Use xtime_zone_new_identifier() instead, as it provides
+ * Deprecated: 2.68: Use g_time_zone_new_identifier() instead, as it provides
  *     error reporting. Change your code to handle a potentially %NULL return
  *     value.
  *
  * Since: 2.26
  **/
-xtimezone_t *
-xtime_zone_new (const xchar_t *identifier)
+GTimeZone *
+g_time_zone_new (const gchar *identifier)
 {
-  xtimezone_t *tz = xtime_zone_new_identifier (identifier);
+  GTimeZone *tz = g_time_zone_new_identifier (identifier);
 
   /* Always fall back to UTC. */
   if (tz == NULL)
-    tz = xtime_zone_new_utc ();
+    tz = g_time_zone_new_utc ();
 
-  xassert (tz != NULL);
+  g_assert (tz != NULL);
 
   return g_steal_pointer (&tz);
 }
 
 /**
- * xtime_zone_new_identifier:
+ * g_time_zone_new_identifier:
  * @identifier: (nullable): a timezone identifier
  *
- * Creates a #xtimezone_t corresponding to @identifier. If @identifier cannot be
+ * Creates a #GTimeZone corresponding to @identifier. If @identifier cannot be
  * parsed or loaded, %NULL is returned.
  *
  * @identifier can either be an RFC3339/ISO 8601 time offset or
@@ -1765,7 +1765,7 @@ xtime_zone_new (const xchar_t *identifier)
  * Offsets are time values to be added to the local time to get
  * Coordinated Universal Time (UTC).
  *
- * xtime_zone_new_local() calls this function with the value of the
+ * g_time_zone_new_local() calls this function with the value of the
  * `TZ` environment variable. This function itself is independent of
  * the value of `TZ`, but if @identifier is %NULL then `/etc/localtime`
  * will be consulted to discover the correct time zone on UNIX and the
@@ -1789,28 +1789,28 @@ xtime_zone_new (const xchar_t *identifier)
  * [Microsoft Time Zone Index Values](http://msdn.microsoft.com/en-us/library/ms912391%28v=winembedded.11%29.aspx)
  * for the list of time zones on Windows.
  *
- * You should release the return value by calling xtime_zone_unref()
+ * You should release the return value by calling g_time_zone_unref()
  * when you are done with it.
  *
  * Returns: (transfer full) (nullable): the requested timezone, or %NULL on
  *     failure
  * Since: 2.68
  */
-xtimezone_t *
-xtime_zone_new_identifier (const xchar_t *identifier)
+GTimeZone *
+g_time_zone_new_identifier (const gchar *identifier)
 {
-  xtimezone_t *tz = NULL;
+  GTimeZone *tz = NULL;
   TimeZoneRule *rules;
-  xint_t rules_num;
-  xchar_t *resolved_identifier = NULL;
+  gint rules_num;
+  gchar *resolved_identifier = NULL;
 
   if (identifier)
     {
       G_LOCK (time_zones);
       if (time_zones == NULL)
-        time_zones = xhash_table_new (xstr_hash, xstr_equal);
+        time_zones = g_hash_table_new (g_str_hash, g_str_equal);
 
-      tz = xhash_table_lookup (time_zones, identifier);
+      tz = g_hash_table_lookup (time_zones, identifier);
       if (tz)
         {
           g_atomic_int_inc (&tz->ref_count);
@@ -1818,7 +1818,7 @@ xtime_zone_new_identifier (const xchar_t *identifier)
           return tz;
         }
       else
-        resolved_identifier = xstrdup (identifier);
+        resolved_identifier = g_strdup (identifier);
     }
   else
     {
@@ -1833,14 +1833,14 @@ xtime_zone_new_identifier (const xchar_t *identifier)
           /* Flush default if changed. If the identifier couldn’t be resolved,
            * we’re going to fall back to UTC eventually, so don’t clear out the
            * cache if it’s already UTC. */
-          if (!(resolved_identifier == NULL && xstr_equal (tz_default->name, "UTC")) &&
-              xstrcmp0 (tz_default->name, resolved_identifier) != 0)
+          if (!(resolved_identifier == NULL && g_str_equal (tz_default->name, "UTC")) &&
+              g_strcmp0 (tz_default->name, resolved_identifier) != 0)
             {
-              g_clear_pointer (&tz_default, xtime_zone_unref);
+              g_clear_pointer (&tz_default, g_time_zone_unref);
             }
           else
             {
-              tz = xtime_zone_ref (tz_default);
+              tz = g_time_zone_ref (tz_default);
               G_UNLOCK (tz_default);
 
               g_free (resolved_identifier);
@@ -1849,7 +1849,7 @@ xtime_zone_new_identifier (const xchar_t *identifier)
         }
     }
 
-  tz = g_slice_new0 (xtimezone_t);
+  tz = g_slice_new0 (GTimeZone);
   tz->ref_count = 0;
 
   zone_for_constant_offset (tz, identifier);
@@ -1864,11 +1864,11 @@ xtime_zone_new_identifier (const xchar_t *identifier)
   if (tz->t_info == NULL)
     {
 #ifdef G_OS_UNIX
-      xbytes_t *zoneinfo = zone_info_unix (identifier, resolved_identifier);
+      GBytes *zoneinfo = zone_info_unix (identifier, resolved_identifier);
       if (zoneinfo != NULL)
         {
           init_zone_from_iana_info (tz, zoneinfo, g_steal_pointer (&resolved_identifier));
-          xbytes_unref (zoneinfo);
+          g_bytes_unref (zoneinfo);
         }
 #elif defined (G_OS_WIN32)
       if ((rules_num = rules_from_windows_time_zone (identifier,
@@ -1914,7 +1914,7 @@ xtime_zone_new_identifier (const xchar_t *identifier)
   /* Failed to load the timezone. */
   if (tz->t_info == NULL)
     {
-      g_slice_free (xtimezone_t, tz);
+      g_slice_free (GTimeZone, tz);
 
       if (identifier)
         G_UNLOCK (time_zones);
@@ -1924,11 +1924,11 @@ xtime_zone_new_identifier (const xchar_t *identifier)
       return NULL;
     }
 
-  xassert (tz->name != NULL);
-  xassert (tz->t_info != NULL);
+  g_assert (tz->name != NULL);
+  g_assert (tz->t_info != NULL);
 
   if (identifier)
-    xhash_table_insert (time_zones, tz->name, tz);
+    g_hash_table_insert (time_zones, tz->name, tz);
   else if (tz->name)
     {
       /* Caching reference */
@@ -1947,71 +1947,71 @@ xtime_zone_new_identifier (const xchar_t *identifier)
 }
 
 /**
- * xtime_zone_new_utc:
+ * g_time_zone_new_utc:
  *
- * Creates a #xtimezone_t corresponding to UTC.
+ * Creates a #GTimeZone corresponding to UTC.
  *
- * This is equivalent to calling xtime_zone_new() with a value like
+ * This is equivalent to calling g_time_zone_new() with a value like
  * "Z", "UTC", "+00", etc.
  *
- * You should release the return value by calling xtime_zone_unref()
+ * You should release the return value by calling g_time_zone_unref()
  * when you are done with it.
  *
  * Returns: the universal timezone
  *
  * Since: 2.26
  **/
-xtimezone_t *
-xtime_zone_new_utc (void)
+GTimeZone *
+g_time_zone_new_utc (void)
 {
-  static xtimezone_t *utc = NULL;
-  static xsize_t initialised;
+  static GTimeZone *utc = NULL;
+  static gsize initialised;
 
   if (g_once_init_enter (&initialised))
     {
-      utc = xtime_zone_new_identifier ("UTC");
-      xassert (utc != NULL);
+      utc = g_time_zone_new_identifier ("UTC");
+      g_assert (utc != NULL);
       g_once_init_leave (&initialised, TRUE);
     }
 
-  return xtime_zone_ref (utc);
+  return g_time_zone_ref (utc);
 }
 
 /**
- * xtime_zone_new_local:
+ * g_time_zone_new_local:
  *
- * Creates a #xtimezone_t corresponding to local time.  The local time
+ * Creates a #GTimeZone corresponding to local time.  The local time
  * zone may change between invocations to this function; for example,
  * if the system administrator changes it.
  *
- * This is equivalent to calling xtime_zone_new() with the value of
+ * This is equivalent to calling g_time_zone_new() with the value of
  * the `TZ` environment variable (including the possibility of %NULL).
  *
- * You should release the return value by calling xtime_zone_unref()
+ * You should release the return value by calling g_time_zone_unref()
  * when you are done with it.
  *
  * Returns: the local timezone
  *
  * Since: 2.26
  **/
-xtimezone_t *
-xtime_zone_new_local (void)
+GTimeZone *
+g_time_zone_new_local (void)
 {
-  const xchar_t *tzenv = g_getenv ("TZ");
-  xtimezone_t *tz;
+  const gchar *tzenv = g_getenv ("TZ");
+  GTimeZone *tz;
 
   G_LOCK (tz_local);
 
   /* Is time zone changed and must be flushed? */
-  if (tz_local && xstrcmp0 (xtime_zone_get_identifier (tz_local), tzenv))
-    g_clear_pointer (&tz_local, xtime_zone_unref);
+  if (tz_local && g_strcmp0 (g_time_zone_get_identifier (tz_local), tzenv))
+    g_clear_pointer (&tz_local, g_time_zone_unref);
 
   if (tz_local == NULL)
-    tz_local = xtime_zone_new_identifier (tzenv);
+    tz_local = g_time_zone_new_identifier (tzenv);
   if (tz_local == NULL)
-    tz_local = xtime_zone_new_utc ();
+    tz_local = g_time_zone_new_utc ();
 
-  tz = xtime_zone_ref (tz_local);
+  tz = g_time_zone_ref (tz_local);
 
   G_UNLOCK (tz_local);
 
@@ -2019,48 +2019,48 @@ xtime_zone_new_local (void)
 }
 
 /**
- * xtime_zone_new_offset:
+ * g_time_zone_new_offset:
  * @seconds: offset to UTC, in seconds
  *
- * Creates a #xtimezone_t corresponding to the given constant offset from UTC,
+ * Creates a #GTimeZone corresponding to the given constant offset from UTC,
  * in seconds.
  *
- * This is equivalent to calling xtime_zone_new() with a string in the form
+ * This is equivalent to calling g_time_zone_new() with a string in the form
  * `[+|-]hh[:mm[:ss]]`.
  *
  * It is possible for this function to fail if @seconds is too big (greater than
  * 24 hours), in which case this function will return the UTC timezone for
  * backwards compatibility. To detect failures like this, use
- * xtime_zone_new_identifier() directly.
+ * g_time_zone_new_identifier() directly.
  *
  * Returns: (transfer full): a timezone at the given offset from UTC, or UTC on
  *   failure
  * Since: 2.58
  */
-xtimezone_t *
-xtime_zone_new_offset (gint32 seconds)
+GTimeZone *
+g_time_zone_new_offset (gint32 seconds)
 {
-  xtimezone_t *tz = NULL;
-  xchar_t *identifier = NULL;
+  GTimeZone *tz = NULL;
+  gchar *identifier = NULL;
 
   /* Seemingly, we should be using @seconds directly to set the
    * #TransitionInfo.gmt_offset to avoid all this string building and parsing.
-   * However, we always need to set the #xtimezone_t.name to a constructed
+   * However, we always need to set the #GTimeZone.name to a constructed
    * string anyway, so we might as well reuse its code.
-   * xtime_zone_new_identifier() should never fail in this situation. */
-  identifier = xstrdup_printf ("%c%02u:%02u:%02u",
+   * g_time_zone_new_identifier() should never fail in this situation. */
+  identifier = g_strdup_printf ("%c%02u:%02u:%02u",
                                 (seconds >= 0) ? '+' : '-',
                                 (ABS (seconds) / 60) / 60,
                                 (ABS (seconds) / 60) % 60,
                                 ABS (seconds) % 60);
-  tz = xtime_zone_new_identifier (identifier);
+  tz = g_time_zone_new_identifier (identifier);
 
   if (tz == NULL)
-    tz = xtime_zone_new_utc ();
+    tz = g_time_zone_new_utc ();
   else
-    xassert (xtime_zone_get_offset (tz, 0) == seconds);
+    g_assert (g_time_zone_get_offset (tz, 0) == seconds);
 
-  xassert (tz != NULL);
+  g_assert (tz != NULL);
   g_free (identifier);
 
   return tz;
@@ -2079,11 +2079,11 @@ xtime_zone_new_offset (gint32 seconds)
  * standard-time (i.e., non-DST) tinfo, so that's what we do.
  */
 inline static const TransitionInfo*
-interval_info (xtimezone_t *tz,
-               xuint_t      interval)
+interval_info (GTimeZone *tz,
+               guint      interval)
 {
-  xuint_t index;
-  xreturn_val_if_fail (tz->t_info != NULL, NULL);
+  guint index;
+  g_return_val_if_fail (tz->t_info != NULL, NULL);
   if (interval && tz->transitions && interval <= tz->transitions->len)
     index = (TRANSITION(interval - 1)).info_index;
   else
@@ -2100,9 +2100,9 @@ interval_info (xtimezone_t *tz,
   return &(TRANSITION_INFO(index));
 }
 
-inline static sint64_t
-interval_start (xtimezone_t *tz,
-                xuint_t      interval)
+inline static gint64
+interval_start (GTimeZone *tz,
+                guint      interval)
 {
   if (!interval || tz->transitions == NULL || tz->transitions->len == 0)
     return G_MININT64;
@@ -2111,46 +2111,46 @@ interval_start (xtimezone_t *tz,
   return (TRANSITION(interval - 1)).time;
 }
 
-inline static sint64_t
-interval_end (xtimezone_t *tz,
-              xuint_t      interval)
+inline static gint64
+interval_end (GTimeZone *tz,
+              guint      interval)
 {
   if (tz->transitions && interval < tz->transitions->len)
     {
-      sint64_t lim = (TRANSITION(interval)).time;
+      gint64 lim = (TRANSITION(interval)).time;
       return lim - (lim != G_MININT64);
     }
   return G_MAXINT64;
 }
 
 inline static gint32
-interval_offset (xtimezone_t *tz,
-                 xuint_t      interval)
+interval_offset (GTimeZone *tz,
+                 guint      interval)
 {
-  xreturn_val_if_fail (tz->t_info != NULL, 0);
+  g_return_val_if_fail (tz->t_info != NULL, 0);
   return interval_info (tz, interval)->gmt_offset;
 }
 
-inline static xboolean_t
-interval_isdst (xtimezone_t *tz,
-                xuint_t      interval)
+inline static gboolean
+interval_isdst (GTimeZone *tz,
+                guint      interval)
 {
-  xreturn_val_if_fail (tz->t_info != NULL, 0);
+  g_return_val_if_fail (tz->t_info != NULL, 0);
   return interval_info (tz, interval)->is_dst;
 }
 
 
-inline static xchar_t*
-interval_abbrev (xtimezone_t *tz,
-                  xuint_t      interval)
+inline static gchar*
+interval_abbrev (GTimeZone *tz,
+                  guint      interval)
 {
-  xreturn_val_if_fail (tz->t_info != NULL, 0);
+  g_return_val_if_fail (tz->t_info != NULL, 0);
   return interval_info (tz, interval)->abbrev;
 }
 
-inline static sint64_t
-interval_local_start (xtimezone_t *tz,
-                      xuint_t      interval)
+inline static gint64
+interval_local_start (GTimeZone *tz,
+                      guint      interval)
 {
   if (interval)
     return interval_start (tz, interval) + interval_offset (tz, interval);
@@ -2158,9 +2158,9 @@ interval_local_start (xtimezone_t *tz,
   return G_MININT64;
 }
 
-inline static sint64_t
-interval_local_end (xtimezone_t *tz,
-                    xuint_t      interval)
+inline static gint64
+interval_local_end (GTimeZone *tz,
+                    guint      interval)
 {
   if (tz->transitions && interval < tz->transitions->len)
     return interval_end (tz, interval) + interval_offset (tz, interval);
@@ -2168,20 +2168,20 @@ interval_local_end (xtimezone_t *tz,
   return G_MAXINT64;
 }
 
-static xboolean_t
-interval_valid (xtimezone_t *tz,
-                xuint_t      interval)
+static gboolean
+interval_valid (GTimeZone *tz,
+                guint      interval)
 {
   if ( tz->transitions == NULL)
     return interval == 0;
   return interval <= tz->transitions->len;
 }
 
-/* xtime_zone_find_interval() {{{1 */
+/* g_time_zone_find_interval() {{{1 */
 
 /**
- * xtime_zone_adjust_time:
- * @tz: a #xtimezone_t
+ * g_time_zone_adjust_time:
+ * @tz: a #GTimeZone
  * @type: the #GTimeType of @time_
  * @time_: a pointer to a number of seconds since January 1, 1970
  *
@@ -2189,11 +2189,11 @@ interval_valid (xtimezone_t *tz,
  * possibly adjusting @time_ if required to fit into an interval.
  * The meaning of @time_ depends on @type.
  *
- * This function is similar to xtime_zone_find_interval(), with the
+ * This function is similar to g_time_zone_find_interval(), with the
  * difference that it always succeeds (by making the adjustments
  * described below).
  *
- * In any of the cases where xtime_zone_find_interval() succeeds then
+ * In any of the cases where g_time_zone_find_interval() succeeds then
  * this function returns the same value, without modifying @time_.
  *
  * This function may, however, modify @time_ in order to deal with
@@ -2206,13 +2206,13 @@ interval_valid (xtimezone_t *tz,
  *
  * Since: 2.26
  **/
-xint_t
-xtime_zone_adjust_time (xtimezone_t *tz,
+gint
+g_time_zone_adjust_time (GTimeZone *tz,
                          GTimeType  type,
-                         sint64_t    *time_)
+                         gint64    *time_)
 {
-  xuint_t i, intervals;
-  xboolean_t interval_is_dst;
+  guint i, intervals;
+  gboolean interval_is_dst;
 
   if (tz->transitions == NULL)
     return 0;
@@ -2225,7 +2225,7 @@ xtime_zone_adjust_time (xtimezone_t *tz,
     if (*time_ <= interval_end (tz, i))
       break;
 
-  xassert (interval_start (tz, i) <= *time_ && *time_ <= interval_end (tz, i));
+  g_assert (interval_start (tz, i) <= *time_ && *time_ <= interval_end (tz, i));
 
   if (type != G_TIME_TYPE_UNIVERSAL)
     {
@@ -2276,8 +2276,8 @@ xtime_zone_adjust_time (xtimezone_t *tz,
 }
 
 /**
- * xtime_zone_find_interval:
- * @tz: a #xtimezone_t
+ * g_time_zone_find_interval:
+ * @tz: a #GTimeZone
  * @type: the #GTimeType of @time_
  * @time_: a number of seconds since January 1, 1970
  *
@@ -2304,13 +2304,13 @@ xtime_zone_adjust_time (xtimezone_t *tz,
  *
  * Since: 2.26
  */
-xint_t
-xtime_zone_find_interval (xtimezone_t *tz,
+gint
+g_time_zone_find_interval (GTimeZone *tz,
                            GTimeType  type,
-                           sint64_t     time_)
+                           gint64     time_)
 {
-  xuint_t i, intervals;
-  xboolean_t interval_is_dst;
+  guint i, intervals;
+  gboolean interval_is_dst;
 
   if (tz->transitions == NULL)
     return 0;
@@ -2354,8 +2354,8 @@ xtime_zone_find_interval (xtimezone_t *tz,
 /* Public API accessors {{{1 */
 
 /**
- * xtime_zone_get_abbreviation:
- * @tz: a #xtimezone_t
+ * g_time_zone_get_abbreviation:
+ * @tz: a #GTimeZone
  * @interval: an interval within the timezone
  *
  * Determines the time zone abbreviation to be used during a particular
@@ -2369,18 +2369,18 @@ xtime_zone_find_interval (xtimezone_t *tz,
  *
  * Since: 2.26
  **/
-const xchar_t *
-xtime_zone_get_abbreviation (xtimezone_t *tz,
-                              xint_t       interval)
+const gchar *
+g_time_zone_get_abbreviation (GTimeZone *tz,
+                              gint       interval)
 {
-  xreturn_val_if_fail (interval_valid (tz, (xuint_t)interval), NULL);
+  g_return_val_if_fail (interval_valid (tz, (guint)interval), NULL);
 
-  return interval_abbrev (tz, (xuint_t)interval);
+  return interval_abbrev (tz, (guint)interval);
 }
 
 /**
- * xtime_zone_get_offset:
- * @tz: a #xtimezone_t
+ * g_time_zone_get_offset:
+ * @tz: a #GTimeZone
  * @interval: an interval within the timezone
  *
  * Determines the offset to UTC in effect during a particular @interval
@@ -2396,17 +2396,17 @@ xtime_zone_get_abbreviation (xtimezone_t *tz,
  * Since: 2.26
  **/
 gint32
-xtime_zone_get_offset (xtimezone_t *tz,
-                        xint_t       interval)
+g_time_zone_get_offset (GTimeZone *tz,
+                        gint       interval)
 {
-  xreturn_val_if_fail (interval_valid (tz, (xuint_t)interval), 0);
+  g_return_val_if_fail (interval_valid (tz, (guint)interval), 0);
 
-  return interval_offset (tz, (xuint_t)interval);
+  return interval_offset (tz, (guint)interval);
 }
 
 /**
- * xtime_zone_is_dst:
- * @tz: a #xtimezone_t
+ * g_time_zone_is_dst:
+ * @tz: a #GTimeZone
  * @interval: an interval within the timezone
  *
  * Determines if daylight savings time is in effect during a particular
@@ -2416,23 +2416,23 @@ xtime_zone_get_offset (xtimezone_t *tz,
  *
  * Since: 2.26
  **/
-xboolean_t
-xtime_zone_is_dst (xtimezone_t *tz,
-                    xint_t       interval)
+gboolean
+g_time_zone_is_dst (GTimeZone *tz,
+                    gint       interval)
 {
-  xreturn_val_if_fail (interval_valid (tz, interval), FALSE);
+  g_return_val_if_fail (interval_valid (tz, interval), FALSE);
 
   if (tz->transitions == NULL)
     return FALSE;
 
-  return interval_isdst (tz, (xuint_t)interval);
+  return interval_isdst (tz, (guint)interval);
 }
 
 /**
- * xtime_zone_get_identifier:
- * @tz: a #xtimezone_t
+ * g_time_zone_get_identifier:
+ * @tz: a #GTimeZone
  *
- * Get the identifier of this #xtimezone_t, as passed to xtime_zone_new().
+ * Get the identifier of this #GTimeZone, as passed to g_time_zone_new().
  * If the identifier passed at construction time was not recognised, `UTC` will
  * be returned. If it was %NULL, the identifier of the local timezone at
  * construction time will be returned.
@@ -2444,10 +2444,10 @@ xtime_zone_is_dst (xtimezone_t *tz,
  * Returns: identifier for this timezone
  * Since: 2.58
  */
-const xchar_t *
-xtime_zone_get_identifier (xtimezone_t *tz)
+const gchar *
+g_time_zone_get_identifier (GTimeZone *tz)
 {
-  xreturn_val_if_fail (tz != NULL, NULL);
+  g_return_val_if_fail (tz != NULL, NULL);
 
   return tz->name;
 }

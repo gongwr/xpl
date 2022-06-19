@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -29,7 +29,7 @@
 #ifndef __G_MACROS_H__
 #define __G_MACROS_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -54,7 +54,7 @@
 
 /* Here we provide G_GNUC_EXTENSION as an alias for __extension__,
  * where this is valid. This allows for warningless compilation of
- * "long long" types even in the presence of '-ansi -pedantic'.
+ * "long long" types even in the presence of '-ansi -pedantic'. 
  */
 #if G_GNUC_CHECK_VERSION(2, 8)
 #define G_GNUC_EXTENSION __extension__
@@ -106,10 +106,10 @@
  * define G_IMPLEMENT_INLINES to mean "don't implement this here".
  */
 #ifdef G_IMPLEMENT_INLINES
-#  define G_INLINE_FUNC extern XPL_DEPRECATED_MACRO_IN_2_48_FOR(static inline)
+#  define G_INLINE_FUNC extern GLIB_DEPRECATED_MACRO_IN_2_48_FOR(static inline)
 #  undef  G_CAN_INLINE
 #else
-#  define G_INLINE_FUNC static inline XPL_DEPRECATED_MACRO_IN_2_48_FOR(static inline)
+#  define G_INLINE_FUNC static inline GLIB_DEPRECATED_MACRO_IN_2_48_FOR(static inline)
 #endif /* G_IMPLEMENT_INLINES */
 
 /*
@@ -161,7 +161,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xboolean_t xtype_check_value (const xvalue_t *value) G_GNUC_PURE;
+ * gboolean g_type_check_value (const GValue *value) G_GNUC_PURE;
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-pure-function-attribute) for more details.
@@ -191,7 +191,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xpointer_t g_malloc (xsize_t n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+ * gpointer g_malloc (gsize n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
  * ]|
  *
  * See the
@@ -228,7 +228,7 @@
  *
  * Since: 2.58
  */
-/* Note: We can’t annotate this with XPL_AVAILABLE_MACRO_IN_2_58 because it’s
+/* Note: We can’t annotate this with GLIB_AVAILABLE_MACRO_IN_2_58 because it’s
  * used within the GLib headers in function declarations which are always
  * evaluated when a header is included. This results in warnings in third party
  * code which includes glib.h, even if the third party code doesn’t use the new
@@ -263,7 +263,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xchar_t *xstrconcat (const xchar_t *string1,
+ * gchar *g_strconcat (const gchar *string1,
  *                     ...) G_GNUC_NULL_TERMINATED;
  * ]|
  *
@@ -318,7 +318,7 @@
  * semicolon.
  *
  * |[<!-- language="C" -->
- * xpointer_t g_malloc (xsize_t n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+ * gpointer g_malloc (gsize n_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-alloc_005fsize-function-attribute) for more details.
@@ -340,8 +340,8 @@
  * semicolon.
  *
  * |[<!-- language="C" -->
- * xpointer_t g_malloc_n (xsize_t n_blocks,
- *                      xsize_t n_block_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE2(1, 2);
+ * gpointer g_malloc_n (gsize n_blocks,
+ *                      gsize n_block_bytes) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE2(1, 2);
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-alloc_005fsize-function-attribute) for more details.
@@ -376,9 +376,9 @@
  * for more details.
  *
  * |[<!-- language="C" -->
- * xint_t g_snprintf (xchar_t  *string,
- *                  xulong_t       n,
- *                  xchar_t const *format,
+ * gint g_snprintf (gchar  *string,
+ *                  gulong       n,
+ *                  gchar const *format,
  *                  ...) G_GNUC_PRINTF (3, 4);
  * ]|
  */
@@ -420,7 +420,7 @@
  * the compiler check the format passed to the function.
  *
  * |[<!-- language="C" -->
- * xsize_t my_strftime (MyBuffer *buffer,
+ * gsize my_strftime (MyBuffer *buffer,
  *                    const char *format,
  *                    const struct tm *tm) G_GNUC_STRFTIME (2);
  * ]|
@@ -450,7 +450,7 @@
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-Wformat-nonliteral-1) for more details.
  *
  * |[<!-- language="C" -->
- * xchar_t *g_dgettext (xchar_t *domain_name, xchar_t *msgid) G_GNUC_FORMAT (2);
+ * gchar *g_dgettext (gchar *domain_name, gchar *msgid) G_GNUC_FORMAT (2);
  * ]|
  */
 
@@ -487,7 +487,7 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xchar_t g_ascii_tolower (xchar_t c) G_GNUC_CONST;
+ * gchar g_ascii_tolower (gchar c) G_GNUC_CONST;
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-const-function-attribute) for more details.
@@ -510,8 +510,8 @@
  * argument declaration.
  *
  * |[<!-- language="C" -->
- * void my_unused_function (G_GNUC_UNUSED xint_t unused_argument,
- *                          xint_t other_argument) G_GNUC_UNUSED;
+ * void my_unused_function (G_GNUC_UNUSED gint unused_argument,
+ *                          gint other_argument) G_GNUC_UNUSED;
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-unused-function-attribute) for more details.
@@ -543,7 +543,7 @@
   __attribute__((__format__ (gnu_scanf, format_idx, arg_idx)))
 #define G_GNUC_STRFTIME( format_idx )    \
   __attribute__((__format__ (gnu_strftime, format_idx, 0))) \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 #else
 #define G_GNUC_PRINTF( format_idx, arg_idx )    \
   __attribute__((__format__ (__printf__, format_idx, arg_idx)))
@@ -551,7 +551,7 @@
   __attribute__((__format__ (__scanf__, format_idx, arg_idx)))
 #define G_GNUC_STRFTIME( format_idx )    \
   __attribute__((__format__ (__strftime__, format_idx, 0))) \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 #endif
 
 #else
@@ -559,7 +559,7 @@
 #define G_GNUC_PRINTF( format_idx, arg_idx )
 #define G_GNUC_SCANF( format_idx, arg_idx )
 #define G_GNUC_STRFTIME( format_idx ) \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 
 #endif
 
@@ -632,10 +632,10 @@
  */
 #if g_macro__has_attribute(fallthrough)
 #define G_GNUC_FALLTHROUGH __attribute__((fallthrough)) \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 #else
 #define G_GNUC_FALLTHROUGH \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 #endif
 
 /**
@@ -688,10 +688,10 @@
 #if G_GNUC_CHECK_VERSION(4, 5) || defined(__clang__)
 #define G_GNUC_DEPRECATED_FOR(f)                        \
   __attribute__((deprecated("Use " #f " instead")))     \
-  XPL_AVAILABLE_MACRO_IN_2_26
+  GLIB_AVAILABLE_MACRO_IN_2_26
 #else
 #define G_GNUC_DEPRECATED_FOR(f)      G_GNUC_DEPRECATED \
-  XPL_AVAILABLE_MACRO_IN_2_26
+  GLIB_AVAILABLE_MACRO_IN_2_26
 #endif /* __GNUC__ */
 
 #ifdef __ICC
@@ -721,7 +721,7 @@
 #else
 #define G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 #define G_GNUC_END_IGNORE_DEPRECATIONS
-#define XPL_CANNOT_IGNORE_DEPRECATIONS
+#define GLIB_CANNOT_IGNORE_DEPRECATIONS
 #endif
 
 /**
@@ -751,8 +751,8 @@
  * Place the attribute after the declaration, just before the semicolon.
  *
  * |[<!-- language="C" -->
- * xlist_t *xlist_append (xlist_t *list,
- *                       xpointer_t data) G_GNUC_WARN_UNUSED_RESULT;
+ * GList *g_list_append (GList *list,
+ *                       gpointer data) G_GNUC_WARN_UNUSED_RESULT;
  * ]|
  *
  * See the [GNU C documentation](https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html#index-warn_005funused_005fresult-function-attribute) for more details.
@@ -791,11 +791,11 @@
  * introduced.
  */
 #if defined (__GNUC__) && (__GNUC__ < 3)
-#define G_GNUC_FUNCTION         __FUNCTION__ XPL_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
-#define G_GNUC_PRETTY_FUNCTION  __PRETTY_FUNCTION__ XPL_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
+#define G_GNUC_FUNCTION         __FUNCTION__ GLIB_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
+#define G_GNUC_PRETTY_FUNCTION  __PRETTY_FUNCTION__ GLIB_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
 #else   /* !__GNUC__ */
-#define G_GNUC_FUNCTION         "" XPL_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
-#define G_GNUC_PRETTY_FUNCTION  "" XPL_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
+#define G_GNUC_FUNCTION         "" GLIB_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
+#define G_GNUC_PRETTY_FUNCTION  "" GLIB_DEPRECATED_MACRO_IN_2_26_FOR(G_STRFUNC)
 #endif  /* !__GNUC__ */
 
 #if g_macro__has_feature(attribute_analyzer_noreturn) && defined(__clang_analyzer__)
@@ -903,8 +903,8 @@
 
 /* Macros by analogy to GINT_TO_POINTER, GPOINTER_TO_INT
  */
-#define GPOINTER_TO_SIZE(p)	((xsize_t) (p))
-#define GSIZE_TO_POINTER(s)	((xpointer_t) (xsize_t) (s))
+#define GPOINTER_TO_SIZE(p)	((gsize) (p))
+#define GSIZE_TO_POINTER(s)	((gpointer) (gsize) (s))
 
 /* Provide convenience macros for handling structure
  * fields through their offsets.
@@ -912,14 +912,14 @@
 
 #if G_GNUC_CHECK_VERSION(4, 0) || defined(_MSC_VER)
 #define G_STRUCT_OFFSET(struct_type, member) \
-      ((xlong_t) offsetof (struct_type, member))
+      ((glong) offsetof (struct_type, member))
 #else
 #define G_STRUCT_OFFSET(struct_type, member)	\
-      ((xlong_t) ((xuint8_t*) &((struct_type*) 0)->member))
+      ((glong) ((guint8*) &((struct_type*) 0)->member))
 #endif
 
 #define G_STRUCT_MEMBER_P(struct_p, struct_offset)   \
-    ((xpointer_t) ((xuint8_t*) (struct_p) + (xlong_t) (struct_offset)))
+    ((gpointer) ((guint8*) (struct_p) + (glong) (struct_offset)))
 #define G_STRUCT_MEMBER(member_type, struct_p, struct_offset)   \
     (*(member_type*) G_STRUCT_MEMBER_P ((struct_p), (struct_offset)))
 
@@ -970,10 +970,10 @@
  */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__cplusplus)
 #define G_ALIGNOF(type) _Alignof (type) \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 #else
 #define G_ALIGNOF(type) (G_STRUCT_OFFSET (struct { char a; type b; }, b)) \
-  XPL_AVAILABLE_MACRO_IN_2_60
+  GLIB_AVAILABLE_MACRO_IN_2_60
 #endif
 
 /**
@@ -992,9 +992,9 @@
  * const and API consumers should adjust their code accordingly
  */
 #ifdef G_DISABLE_CONST_RETURNS
-#define G_CONST_RETURN XPL_DEPRECATED_MACRO_IN_2_30_FOR(const)
+#define G_CONST_RETURN GLIB_DEPRECATED_MACRO_IN_2_30_FOR(const)
 #else
-#define G_CONST_RETURN const XPL_DEPRECATED_MACRO_IN_2_30_FOR(const)
+#define G_CONST_RETURN const GLIB_DEPRECATED_MACRO_IN_2_30_FOR(const)
 #endif
 
 /**
@@ -1015,7 +1015,7 @@
  *
  * Since: 2.68
  */
-/* Note: We can’t annotate this with XPL_AVAILABLE_MACRO_IN_2_68 because it’s
+/* Note: We can’t annotate this with GLIB_AVAILABLE_MACRO_IN_2_68 because it’s
  * used within the GLib headers in function declarations which are always
  * evaluated when a header is included. This results in warnings in third party
  * code which includes glib.h, even if the third party code doesn’t use the new
@@ -1061,19 +1061,19 @@
  */
 #if g_macro__has_attribute(__noreturn__)
 # define G_NORETURN_FUNCPTR __attribute__ ((__noreturn__))      \
-  XPL_AVAILABLE_MACRO_IN_2_68
+  GLIB_AVAILABLE_MACRO_IN_2_68
 #else
 # define G_NORETURN_FUNCPTR /* empty */         \
-  XPL_AVAILABLE_MACRO_IN_2_68
+  GLIB_AVAILABLE_MACRO_IN_2_68
 #endif
 
 /*
- * The G_LIKELY and G_UNLIKELY macros let the programmer give hints to
+ * The G_LIKELY and G_UNLIKELY macros let the programmer give hints to 
  * the compiler about the expected result of an expression. Some compilers
  * can use this information for optimizations.
  *
  * The _G_BOOLEAN_EXPR macro is intended to trigger a gcc warning when
- * putting assignments in g_return_if_fail ().
+ * putting assignments in g_return_if_fail ().  
  */
 #if G_GNUC_CHECK_VERSION(2, 0) && defined(__OPTIMIZE__)
 #define _G_BOOLEAN_EXPR(expr)                   \
@@ -1092,12 +1092,12 @@
 #define G_UNLIKELY(expr) (expr)
 #endif
 
-/* XPL_CANNOT_IGNORE_DEPRECATIONS is defined above for compilers that do not
+/* GLIB_CANNOT_IGNORE_DEPRECATIONS is defined above for compilers that do not
  * have a way to temporarily suppress deprecation warnings. In these cases,
  * suppress the deprecated attribute altogether (otherwise a simple #include
  * <glib.h> will emit a barrage of warnings).
  */
-#if defined(XPL_CANNOT_IGNORE_DEPRECATIONS)
+#if defined(GLIB_CANNOT_IGNORE_DEPRECATIONS)
 #define G_DEPRECATED
 #elif G_GNUC_CHECK_VERSION(3, 1) || defined(__clang__)
 #define G_DEPRECATED __attribute__((__deprecated__))
@@ -1107,7 +1107,7 @@
 #define G_DEPRECATED
 #endif
 
-#if defined(XPL_CANNOT_IGNORE_DEPRECATIONS)
+#if defined(GLIB_CANNOT_IGNORE_DEPRECATIONS)
 #define G_DEPRECATED_FOR(f) G_DEPRECATED
 #elif G_GNUC_CHECK_VERSION(4, 5) || defined(__clang__)
 #define G_DEPRECATED_FOR(f) __attribute__((__deprecated__("Use '" #f "' instead")))
@@ -1125,8 +1125,8 @@
 #define G_UNAVAILABLE(maj,min) G_DEPRECATED
 #endif
 
-#ifndef _XPL_EXTERN
-#define _XPL_EXTERN extern
+#ifndef _GLIB_EXTERN
+#define _GLIB_EXTERN extern
 #endif
 
 /* These macros are used to mark deprecated symbols in GLib headers,
@@ -1135,55 +1135,55 @@
  * or define your own wrappers around it.
  */
 
-#ifdef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DEPRECATED _XPL_EXTERN
-#define XPL_DEPRECATED_FOR(f) _XPL_EXTERN
-#define XPL_UNAVAILABLE(maj,min) _XPL_EXTERN
-#define XPL_UNAVAILABLE_STATIC_INLINE(maj,min)
+#ifdef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DEPRECATED _GLIB_EXTERN
+#define GLIB_DEPRECATED_FOR(f) _GLIB_EXTERN
+#define GLIB_UNAVAILABLE(maj,min) _GLIB_EXTERN
+#define GLIB_UNAVAILABLE_STATIC_INLINE(maj,min)
 #else
-#define XPL_DEPRECATED G_DEPRECATED _XPL_EXTERN
-#define XPL_DEPRECATED_FOR(f) G_DEPRECATED_FOR(f) _XPL_EXTERN
-#define XPL_UNAVAILABLE(maj,min) G_UNAVAILABLE(maj,min) _XPL_EXTERN
-#define XPL_UNAVAILABLE_STATIC_INLINE(maj,min) G_UNAVAILABLE(maj,min)
+#define GLIB_DEPRECATED G_DEPRECATED _GLIB_EXTERN
+#define GLIB_DEPRECATED_FOR(f) G_DEPRECATED_FOR(f) _GLIB_EXTERN
+#define GLIB_UNAVAILABLE(maj,min) G_UNAVAILABLE(maj,min) _GLIB_EXTERN
+#define GLIB_UNAVAILABLE_STATIC_INLINE(maj,min) G_UNAVAILABLE(maj,min)
 #endif
 
-#if !defined(XPL_DISABLE_DEPRECATION_WARNINGS) && \
+#if !defined(GLIB_DISABLE_DEPRECATION_WARNINGS) && \
     (G_GNUC_CHECK_VERSION(4, 6) ||                 \
      __clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 4))
-#define _XPL_GNUC_DO_PRAGMA(x) _Pragma(G_STRINGIFY (x))
-#define XPL_DEPRECATED_MACRO _XPL_GNUC_DO_PRAGMA(GCC warning "Deprecated pre-processor symbol")
-#define XPL_DEPRECATED_MACRO_FOR(f) \
-  _XPL_GNUC_DO_PRAGMA(GCC warning G_STRINGIFY (Deprecated pre-processor symbol: replace with #f))
-#define XPL_UNAVAILABLE_MACRO(maj,min) \
-  _XPL_GNUC_DO_PRAGMA(GCC warning G_STRINGIFY (Not available before maj.min))
+#define _GLIB_GNUC_DO_PRAGMA(x) _Pragma(G_STRINGIFY (x))
+#define GLIB_DEPRECATED_MACRO _GLIB_GNUC_DO_PRAGMA(GCC warning "Deprecated pre-processor symbol")
+#define GLIB_DEPRECATED_MACRO_FOR(f) \
+  _GLIB_GNUC_DO_PRAGMA(GCC warning G_STRINGIFY (Deprecated pre-processor symbol: replace with #f))
+#define GLIB_UNAVAILABLE_MACRO(maj,min) \
+  _GLIB_GNUC_DO_PRAGMA(GCC warning G_STRINGIFY (Not available before maj.min))
 #else
-#define XPL_DEPRECATED_MACRO
-#define XPL_DEPRECATED_MACRO_FOR(f)
-#define XPL_UNAVAILABLE_MACRO(maj,min)
+#define GLIB_DEPRECATED_MACRO
+#define GLIB_DEPRECATED_MACRO_FOR(f)
+#define GLIB_UNAVAILABLE_MACRO(maj,min)
 #endif
 
-#if !defined(XPL_DISABLE_DEPRECATION_WARNINGS) && \
+#if !defined(GLIB_DISABLE_DEPRECATION_WARNINGS) && \
     (G_GNUC_CHECK_VERSION(6, 1) ||                 \
      (defined (__clang_major__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 0))))
-#define XPL_DEPRECATED_ENUMERATOR G_DEPRECATED
-#define XPL_DEPRECATED_ENUMERATOR_FOR(f) G_DEPRECATED_FOR(f)
-#define XPL_UNAVAILABLE_ENUMERATOR(maj,min) G_UNAVAILABLE(maj,min)
+#define GLIB_DEPRECATED_ENUMERATOR G_DEPRECATED
+#define GLIB_DEPRECATED_ENUMERATOR_FOR(f) G_DEPRECATED_FOR(f)
+#define GLIB_UNAVAILABLE_ENUMERATOR(maj,min) G_UNAVAILABLE(maj,min)
 #else
-#define XPL_DEPRECATED_ENUMERATOR
-#define XPL_DEPRECATED_ENUMERATOR_FOR(f)
-#define XPL_UNAVAILABLE_ENUMERATOR(maj,min)
+#define GLIB_DEPRECATED_ENUMERATOR
+#define GLIB_DEPRECATED_ENUMERATOR_FOR(f)
+#define GLIB_UNAVAILABLE_ENUMERATOR(maj,min)
 #endif
 
-#if !defined(XPL_DISABLE_DEPRECATION_WARNINGS) && \
+#if !defined(GLIB_DISABLE_DEPRECATION_WARNINGS) && \
     (G_GNUC_CHECK_VERSION(3, 1) ||                 \
      (defined (__clang_major__) && (__clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 0))))
-#define XPL_DEPRECATED_TYPE G_DEPRECATED
-#define XPL_DEPRECATED_TYPE_FOR(f) G_DEPRECATED_FOR(f)
-#define XPL_UNAVAILABLE_TYPE(maj,min) G_UNAVAILABLE(maj,min)
+#define GLIB_DEPRECATED_TYPE G_DEPRECATED
+#define GLIB_DEPRECATED_TYPE_FOR(f) G_DEPRECATED_FOR(f)
+#define GLIB_UNAVAILABLE_TYPE(maj,min) G_UNAVAILABLE(maj,min)
 #else
-#define XPL_DEPRECATED_TYPE
-#define XPL_DEPRECATED_TYPE_FOR(f)
-#define XPL_UNAVAILABLE_TYPE(maj,min)
+#define GLIB_DEPRECATED_TYPE
+#define GLIB_DEPRECATED_TYPE_FOR(f)
+#define GLIB_UNAVAILABLE_TYPE(maj,min)
 #endif
 
 #ifndef __GI_SCANNER__
@@ -1191,71 +1191,71 @@
 #if g_macro__has_attribute(cleanup)
 
 /* these macros are private */
-#define _XPL_AUTOPTR_FUNC_NAME(TypeNameNoT) glib_autoptr_cleanup_##TypeNameNoT
-#define _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeNameNoT) glib_autoptr_clear_##TypeNameNoT
-#define _XPL_AUTOPTR_TYPENAME(TypeNameNoT)  TypeNameNoT##_autoptr_t
-#define _XPL_AUTOPTR_LIST_FUNC_NAME(TypeNameNoT) glib_listautoptr_cleanup_##TypeNameNoT
-#define _XPL_AUTOPTR_LIST_TYPENAME(TypeNameNoT)  TypeNameNoT##_listautoptr_t
-#define _XPL_AUTOPTR_SLIST_FUNC_NAME(TypeNameNoT) glib_slistautoptr_cleanup_##TypeNameNoT
-#define _XPL_AUTOPTR_SLIST_TYPENAME(TypeNameNoT)  TypeNameNoT##_slistautoptr_t
-#define _XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeNameNoT) glib_queueautoptr_cleanup_##TypeNameNoT
-#define _XPL_AUTOPTR_QUEUE_TYPENAME(TypeNameNoT)  TypeNameNoT##_queueautoptr_t
-#define _XPL_AUTO_FUNC_NAME(TypeNameNoT)    glib_auto_cleanup_##TypeNameNoT
-#define _XPL_CLEANUP(func)               __attribute__((cleanup(func)))
-#define _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeNameNoT, ParentNameNoT, cleanup) \
-  typedef TypeNameNoT##_t *_XPL_AUTOPTR_TYPENAME(TypeNameNoT);                                                           \
-  typedef xlist_t *_XPL_AUTOPTR_LIST_TYPENAME(TypeNameNoT);                                                         \
-  typedef xslist_t *_XPL_AUTOPTR_SLIST_TYPENAME(TypeNameNoT);                                                       \
-  typedef xqueue_t *_XPL_AUTOPTR_QUEUE_TYPENAME(TypeNameNoT);                                                       \
+#define _GLIB_AUTOPTR_FUNC_NAME(TypeName) glib_autoptr_cleanup_##TypeName
+#define _GLIB_AUTOPTR_CLEAR_FUNC_NAME(TypeName) glib_autoptr_clear_##TypeName
+#define _GLIB_AUTOPTR_TYPENAME(TypeName)  TypeName##_autoptr
+#define _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) glib_listautoptr_cleanup_##TypeName
+#define _GLIB_AUTOPTR_LIST_TYPENAME(TypeName)  TypeName##_listautoptr
+#define _GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName) glib_slistautoptr_cleanup_##TypeName
+#define _GLIB_AUTOPTR_SLIST_TYPENAME(TypeName)  TypeName##_slistautoptr
+#define _GLIB_AUTOPTR_QUEUE_FUNC_NAME(TypeName) glib_queueautoptr_cleanup_##TypeName
+#define _GLIB_AUTOPTR_QUEUE_TYPENAME(TypeName)  TypeName##_queueautoptr
+#define _GLIB_AUTO_FUNC_NAME(TypeName)    glib_auto_cleanup_##TypeName
+#define _GLIB_CLEANUP(func)               __attribute__((cleanup(func)))
+#define _GLIB_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeName, ParentName, cleanup) \
+  typedef TypeName *_GLIB_AUTOPTR_TYPENAME(TypeName);                                                           \
+  typedef GList *_GLIB_AUTOPTR_LIST_TYPENAME(TypeName);                                                         \
+  typedef GSList *_GLIB_AUTOPTR_SLIST_TYPENAME(TypeName);                                                       \
+  typedef GQueue *_GLIB_AUTOPTR_QUEUE_TYPENAME(TypeName);                                                       \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeNameNoT) (TypeNameNoT##_t *_ptr)                     \
-    { if (_ptr) (cleanup) ((ParentNameNoT##_t *) _ptr); }                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_FUNC_NAME(TypeNameNoT) (TypeNameNoT##_t **_ptr)                          \
-    { _XPL_AUTOPTR_CLEAR_FUNC_NAME(TypeNameNoT) (*_ptr); }                                                        \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_LIST_FUNC_NAME(TypeNameNoT) (xlist_t **_l)                          \
-    { xlist_free_full (*_l, (xdestroy_notify_t) (void(*)(void)) cleanup); }                                       \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_SLIST_FUNC_NAME(TypeNameNoT) (xslist_t **_l)                        \
-    { xslist_free_full (*_l, (xdestroy_notify_t) (void(*)(void)) cleanup); }                                      \
-  static G_GNUC_UNUSED inline void _XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeNameNoT) (xqueue_t **_q)                        \
-    { if (*_q) g_queue_free_full (*_q, (xdestroy_notify_t) (void(*)(void)) cleanup); }                             \
+  static G_GNUC_UNUSED inline void _GLIB_AUTOPTR_CLEAR_FUNC_NAME(TypeName) (TypeName *_ptr)                     \
+    { if (_ptr) (cleanup) ((ParentName *) _ptr); }                                                              \
+  static G_GNUC_UNUSED inline void _GLIB_AUTOPTR_FUNC_NAME(TypeName) (TypeName **_ptr)                          \
+    { _GLIB_AUTOPTR_CLEAR_FUNC_NAME(TypeName) (*_ptr); }                                                        \
+  static G_GNUC_UNUSED inline void _GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName) (GList **_l)                          \
+    { g_list_free_full (*_l, (GDestroyNotify) (void(*)(void)) cleanup); }                                       \
+  static G_GNUC_UNUSED inline void _GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName) (GSList **_l)                        \
+    { g_slist_free_full (*_l, (GDestroyNotify) (void(*)(void)) cleanup); }                                      \
+  static G_GNUC_UNUSED inline void _GLIB_AUTOPTR_QUEUE_FUNC_NAME(TypeName) (GQueue **_q)                        \
+    { if (*_q) g_queue_free_full (*_q, (GDestroyNotify) (void(*)(void)) cleanup); }                             \
   G_GNUC_END_IGNORE_DEPRECATIONS
-#define _XPL_DEFINE_AUTOPTR_CHAINUP(ModuleObjNameNoT, ParentNameNoT) \
-  _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(ModuleObjNameNoT, ParentNameNoT, _XPL_AUTOPTR_CLEAR_FUNC_NAME(ParentNameNoT))
+#define _GLIB_DEFINE_AUTOPTR_CHAINUP(ModuleObjName, ParentName) \
+  _GLIB_DEFINE_AUTOPTR_CLEANUP_FUNCS(ModuleObjName, ParentName, _GLIB_AUTOPTR_CLEAR_FUNC_NAME(ParentName))
 
 
 /* these macros are API */
-#define G_DEFINE_AUTOPTR_CLEANUP_FUNC(TypeNameNoT, func) \
-  _XPL_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeNameNoT, TypeNameNoT, func)
+#define G_DEFINE_AUTOPTR_CLEANUP_FUNC(TypeName, func) \
+  _GLIB_DEFINE_AUTOPTR_CLEANUP_FUNCS(TypeName, TypeName, func)
 #define G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func) \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTO_FUNC_NAME(TypeName) (TypeName##_t *_ptr) { (func) (_ptr); }                         \
+  static G_GNUC_UNUSED inline void _GLIB_AUTO_FUNC_NAME(TypeName) (TypeName *_ptr) { (func) (_ptr); }                         \
   G_GNUC_END_IGNORE_DEPRECATIONS
 #define G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none) \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                              \
-  static G_GNUC_UNUSED inline void _XPL_AUTO_FUNC_NAME(TypeName) (TypeName##_t *_ptr) { if (*_ptr != none) (func) (*_ptr); }     \
+  static G_GNUC_UNUSED inline void _GLIB_AUTO_FUNC_NAME(TypeName) (TypeName *_ptr) { if (*_ptr != none) (func) (*_ptr); }     \
   G_GNUC_END_IGNORE_DEPRECATIONS
-#define x_autoptr(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_FUNC_NAME(TypeName)) _XPL_AUTOPTR_TYPENAME(TypeName)
-#define g_autolist(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_LIST_FUNC_NAME(TypeName)) _XPL_AUTOPTR_LIST_TYPENAME(TypeName)
-#define g_autoslist(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_SLIST_FUNC_NAME(TypeName)) _XPL_AUTOPTR_SLIST_TYPENAME(TypeName)
-#define g_autoqueue(TypeName) _XPL_CLEANUP(_XPL_AUTOPTR_QUEUE_FUNC_NAME(TypeName)) _XPL_AUTOPTR_QUEUE_TYPENAME(TypeName)
-#define x_auto(TypeName) _XPL_CLEANUP(_XPL_AUTO_FUNC_NAME(TypeName)) TypeName##_t
-#define g_autofree _XPL_CLEANUP(g_autoptr_cleanup_generic_gfree)
+#define g_autoptr(TypeName) _GLIB_CLEANUP(_GLIB_AUTOPTR_FUNC_NAME(TypeName)) _GLIB_AUTOPTR_TYPENAME(TypeName)
+#define g_autolist(TypeName) _GLIB_CLEANUP(_GLIB_AUTOPTR_LIST_FUNC_NAME(TypeName)) _GLIB_AUTOPTR_LIST_TYPENAME(TypeName)
+#define g_autoslist(TypeName) _GLIB_CLEANUP(_GLIB_AUTOPTR_SLIST_FUNC_NAME(TypeName)) _GLIB_AUTOPTR_SLIST_TYPENAME(TypeName)
+#define g_autoqueue(TypeName) _GLIB_CLEANUP(_GLIB_AUTOPTR_QUEUE_FUNC_NAME(TypeName)) _GLIB_AUTOPTR_QUEUE_TYPENAME(TypeName)
+#define g_auto(TypeName) _GLIB_CLEANUP(_GLIB_AUTO_FUNC_NAME(TypeName)) TypeName
+#define g_autofree _GLIB_CLEANUP(g_autoptr_cleanup_generic_gfree)
 
 #else /* not GNU C */
 /* this (dummy) macro is private */
-#define _XPL_DEFINE_AUTOPTR_CHAINUP(ModuleObjName, ParentName)
+#define _GLIB_DEFINE_AUTOPTR_CHAINUP(ModuleObjName, ParentName)
 
 /* these (dummy) macros are API */
 #define G_DEFINE_AUTOPTR_CLEANUP_FUNC(TypeName, func)
 #define G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)
 #define G_DEFINE_AUTO_CLEANUP_FREE_FUNC(TypeName, func, none)
 
-/* no declaration of x_auto() or x_autoptr() here */
+/* no declaration of g_auto() or g_autoptr() here */
 #endif /* __GNUC__ */
 
 #else
 
-#define _XPL_DEFINE_AUTOPTR_CHAINUP(ModuleObjName, ParentName)
+#define _GLIB_DEFINE_AUTOPTR_CHAINUP(ModuleObjName, ParentName)
 
 #define G_DEFINE_AUTOPTR_CLEANUP_FUNC(TypeName, func)
 #define G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(TypeName, func)
@@ -1265,7 +1265,7 @@
 
 /**
  * G_SIZEOF_MEMBER:
- * @struct_type: a structure type, e.g. #xoutput_vector_t
+ * @struct_type: a structure type, e.g. #GOutputVector
  * @member: a field in the structure, e.g. `size`
  *
  * Returns the size of @member in the struct definition without having a
@@ -1276,7 +1276,7 @@
  * Since: 2.64
  */
 #define G_SIZEOF_MEMBER(struct_type, member) \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     sizeof (((struct_type *) 0)->member)
 
 #endif /* __G_MACROS_H__ */

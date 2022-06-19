@@ -38,17 +38,17 @@
  * @short_description: An object containing credentials
  * @include: gio/gio.h
  *
- * The #xcredentials_t type is a reference-counted wrapper for native
+ * The #GCredentials type is a reference-counted wrapper for native
  * credentials. This information is typically used for identifying,
  * authenticating and authorizing other processes.
  *
  * Some operating systems supports looking up the credentials of the
  * remote peer of a communication endpoint - see e.g.
- * xsocket_get_credentials().
+ * g_socket_get_credentials().
  *
  * Some operating systems supports securely sending and receiving
  * credentials over a Unix Domain Socket, see
- * #xunix_credentials_message_t, g_unix_connection_send_credentials() and
+ * #GUnixCredentialsMessage, g_unix_connection_send_credentials() and
  * g_unix_connection_receive_credentials() for details.
  *
  * On Linux, the native credential type is a `struct ucred` - see the
@@ -78,9 +78,9 @@
  */
 
 /**
- * xcredentials_t:
+ * GCredentials:
  *
- * The #xcredentials_t structure contains only private data and
+ * The #GCredentials structure contains only private data and
  * should only be accessed using the provided API.
  *
  * Since: 2.26
@@ -88,7 +88,7 @@
 struct _GCredentials
 {
   /*< private >*/
-  xobject_t parent_instance;
+  GObject parent_instance;
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   struct ucred native;
@@ -109,59 +109,59 @@ struct _GCredentials
   #ifdef __GNUC__
   #pragma GCC diagnostic push
   #pragma GCC diagnostic warning "-Wcpp"
-  #warning Please add xcredentials_t support for your OS
+  #warning Please add GCredentials support for your OS
   #pragma GCC diagnostic pop
   #endif
 #endif
 };
 
 /**
- * xcredentials_class_t:
+ * GCredentialsClass:
  *
- * Class structure for #xcredentials_t.
+ * Class structure for #GCredentials.
  *
  * Since: 2.26
  */
-struct _xcredentials_class
+struct _GCredentialsClass
 {
   /*< private >*/
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-XDEFINE_TYPE (xcredentials, xcredentials, XTYPE_OBJECT)
+G_DEFINE_TYPE (GCredentials, g_credentials, G_TYPE_OBJECT)
 
 static void
-xcredentials_finalize (xobject_t *object)
+g_credentials_finalize (GObject *object)
 {
 #if G_CREDENTIALS_USE_SOLARIS_UCRED
-  xcredentials_t *credentials = G_CREDENTIALS (object);
+  GCredentials *credentials = G_CREDENTIALS (object);
 
   ucred_free (credentials->native);
 #endif
 
-  if (XOBJECT_CLASS (xcredentials_parent_class)->finalize != NULL)
-    XOBJECT_CLASS (xcredentials_parent_class)->finalize (object);
+  if (G_OBJECT_CLASS (g_credentials_parent_class)->finalize != NULL)
+    G_OBJECT_CLASS (g_credentials_parent_class)->finalize (object);
 }
 
 
 static void
-xcredentials_class_init (xcredentials_class_t *klass)
+g_credentials_class_init (GCredentialsClass *klass)
 {
-  xobject_class_t *xobject_class;
+  GObjectClass *gobject_class;
 
-  xobject_class = XOBJECT_CLASS (klass);
-  xobject_class->finalize = xcredentials_finalize;
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = g_credentials_finalize;
 }
 
 static void
-xcredentials_init (xcredentials_t *credentials)
+g_credentials_init (GCredentials *credentials)
 {
 #if G_CREDENTIALS_USE_LINUX_UCRED
   credentials->native.pid = getpid ();
   credentials->native.uid = geteuid ();
   credentials->native.gid = getegid ();
 #elif G_CREDENTIALS_USE_APPLE_XUCRED
-  xsize_t i;
+  gsize i;
 
   credentials->native.cr_version = XUCRED_VERSION;
   credentials->native.cr_uid = geteuid ();
@@ -201,26 +201,26 @@ xcredentials_init (xcredentials_t *credentials)
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * xcredentials_new:
+ * g_credentials_new:
  *
- * Creates a new #xcredentials_t object with credentials matching the
+ * Creates a new #GCredentials object with credentials matching the
  * the current process.
  *
- * Returns: (transfer full): A #xcredentials_t. Free with xobject_unref().
+ * Returns: (transfer full): A #GCredentials. Free with g_object_unref().
  *
  * Since: 2.26
  */
-xcredentials_t *
-xcredentials_new (void)
+GCredentials *
+g_credentials_new (void)
 {
-  return xobject_new (XTYPE_CREDENTIALS, NULL);
+  return g_object_new (G_TYPE_CREDENTIALS, NULL);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
- * xcredentials_to_string:
- * @credentials: A #xcredentials_t object.
+ * g_credentials_to_string:
+ * @credentials: A #GCredentials object.
  *
  * Creates a human-readable textual representation of @credentials
  * that can be used in logging and debug messages. The format of the
@@ -230,83 +230,83 @@ xcredentials_new (void)
  *
  * Since: 2.26
  */
-xchar_t *
-xcredentials_to_string (xcredentials_t *credentials)
+gchar *
+g_credentials_to_string (GCredentials *credentials)
 {
-  xstring_t *ret;
+  GString *ret;
 #if G_CREDENTIALS_USE_APPLE_XUCRED
   glib_typeof (credentials->native.cr_ngroups) i;
 #endif
 
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), NULL);
 
-  ret = xstring_new ("xcredentials_t:");
+  ret = g_string_new ("GCredentials:");
 #if G_CREDENTIALS_USE_LINUX_UCRED
-  xstring_append (ret, "linux-ucred:");
+  g_string_append (ret, "linux-ucred:");
   if (credentials->native.pid != (pid_t) -1)
-    xstring_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.pid);
+    g_string_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.pid);
   if (credentials->native.uid != (uid_t) -1)
-    xstring_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.uid);
+    g_string_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.uid);
   if (credentials->native.gid != (gid_t) -1)
-    xstring_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.gid);
+    g_string_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.gid);
   if (ret->str[ret->len - 1] == ',')
     ret->str[ret->len - 1] = '\0';
 #elif G_CREDENTIALS_USE_APPLE_XUCRED
-  xstring_append (ret, "apple-xucred:");
-  xstring_append_printf (ret, "version=%u,", credentials->native.cr_version);
+  g_string_append (ret, "apple-xucred:");
+  g_string_append_printf (ret, "version=%u,", credentials->native.cr_version);
   if (credentials->native.cr_uid != (uid_t) -1)
-    xstring_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.cr_uid);
+    g_string_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.cr_uid);
   for (i = 0; i < credentials->native.cr_ngroups; i++)
-    xstring_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.cr_groups[i]);
+    g_string_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.cr_groups[i]);
   if (ret->str[ret->len - 1] == ',')
     ret->str[ret->len - 1] = '\0';
 #elif G_CREDENTIALS_USE_FREEBSD_CMSGCRED
-  xstring_append (ret, "freebsd-cmsgcred:");
+  g_string_append (ret, "freebsd-cmsgcred:");
   if (credentials->native.cmcred_pid != (pid_t) -1)
-    xstring_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.cmcred_pid);
+    g_string_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.cmcred_pid);
   if (credentials->native.cmcred_euid != (uid_t) -1)
-    xstring_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.cmcred_euid);
+    g_string_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.cmcred_euid);
   if (credentials->native.cmcred_gid != (gid_t) -1)
-    xstring_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.cmcred_gid);
+    g_string_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.cmcred_gid);
 #elif G_CREDENTIALS_USE_NETBSD_UNPCBID
-  xstring_append (ret, "netbsd-unpcbid:");
+  g_string_append (ret, "netbsd-unpcbid:");
   if (credentials->native.unp_pid != (pid_t) -1)
-    xstring_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.unp_pid);
+    g_string_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.unp_pid);
   if (credentials->native.unp_euid != (uid_t) -1)
-    xstring_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.unp_euid);
+    g_string_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.unp_euid);
   if (credentials->native.unp_egid != (gid_t) -1)
-    xstring_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.unp_egid);
+    g_string_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.unp_egid);
   ret->str[ret->len - 1] = '\0';
 #elif G_CREDENTIALS_USE_OPENBSD_SOCKPEERCRED
-  xstring_append (ret, "openbsd-sockpeercred:");
+  g_string_append (ret, "openbsd-sockpeercred:");
   if (credentials->native.pid != (pid_t) -1)
-    xstring_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.pid);
+    g_string_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.pid);
   if (credentials->native.uid != (uid_t) -1)
-    xstring_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.uid);
+    g_string_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.uid);
   if (credentials->native.gid != (gid_t) -1)
-    xstring_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (sint64_t) credentials->native.gid);
+    g_string_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (gint64) credentials->native.gid);
   if (ret->str[ret->len - 1] == ',')
     ret->str[ret->len - 1] = '\0';
 #elif G_CREDENTIALS_USE_SOLARIS_UCRED
-  xstring_append (ret, "solaris-ucred:");
+  g_string_append (ret, "solaris-ucred:");
   {
     id_t id;
     if ((id = ucred_getpid (credentials->native)) != (id_t) -1)
-      xstring_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (sint64_t) id);
+      g_string_append_printf (ret, "pid=%" G_GINT64_FORMAT ",", (gint64) id);
     if ((id = ucred_geteuid (credentials->native)) != (id_t) -1)
-      xstring_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (sint64_t) id);
+      g_string_append_printf (ret, "uid=%" G_GINT64_FORMAT ",", (gint64) id);
     if ((id = ucred_getegid (credentials->native)) != (id_t) -1)
-      xstring_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (sint64_t) id);
+      g_string_append_printf (ret, "gid=%" G_GINT64_FORMAT ",", (gint64) id);
     if (ret->str[ret->len - 1] == ',')
       ret->str[ret->len - 1] = '\0';
   }
 #elif G_CREDENTIALS_USE_WIN32_PID
-  xstring_append_printf (ret, "win32-pid:pid=%lu", credentials->native);
+  g_string_append_printf (ret, "win32-pid:pid=%lu", credentials->native);
 #else
-  xstring_append (ret, "unknown");
+  g_string_append (ret, "unknown");
 #endif
 
-  return xstring_free (ret, FALSE);
+  return g_string_free (ret, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -321,9 +321,9 @@ xcredentials_to_string (xcredentials_t *credentials)
  * pid 0, uid /proc/sys/kernel/overflowuid and gid
  * /proc/sys/kernel/overflowgid.
  */
-static xboolean_t
+static gboolean
 linux_ucred_check_valid (struct ucred  *native,
-                         xerror_t       **error)
+                         GError       **error)
 {
   if (native->pid == 0
       || native->uid == (uid_t) -1
@@ -332,7 +332,7 @@ linux_ucred_check_valid (struct ucred  *native,
       g_set_error_literal (error,
                            G_IO_ERROR,
                            G_IO_ERROR_INVALID_DATA,
-                           _("xcredentials_t contains invalid data"));
+                           _("GCredentials contains invalid data"));
       return FALSE;
     }
 
@@ -341,14 +341,14 @@ linux_ucred_check_valid (struct ucred  *native,
 #endif
 
 /**
- * xcredentials_is_same_user:
- * @credentials: A #xcredentials_t.
- * @other_credentials: A #xcredentials_t.
+ * g_credentials_is_same_user:
+ * @credentials: A #GCredentials.
+ * @other_credentials: A #GCredentials.
  * @error: Return location for error or %NULL.
  *
  * Checks if @credentials and @other_credentials is the same user.
  *
- * This operation can fail if #xcredentials_t is not supported on the
+ * This operation can fail if #GCredentials is not supported on the
  * the OS.
  *
  * Returns: %TRUE if @credentials and @other_credentials has the same
@@ -356,16 +356,16 @@ linux_ucred_check_valid (struct ucred  *native,
  *
  * Since: 2.26
  */
-xboolean_t
-xcredentials_is_same_user (xcredentials_t  *credentials,
-                            xcredentials_t  *other_credentials,
-                            xerror_t       **error)
+gboolean
+g_credentials_is_same_user (GCredentials  *credentials,
+                            GCredentials  *other_credentials,
+                            GError       **error)
 {
-  xboolean_t ret;
+  gboolean ret;
 
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), FALSE);
-  xreturn_val_if_fail (X_IS_CREDENTIALS (other_credentials), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), FALSE);
+  g_return_val_if_fail (G_IS_CREDENTIALS (other_credentials), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
 #if G_CREDENTIALS_USE_LINUX_UCRED
@@ -392,20 +392,20 @@ xcredentials_is_same_user (xcredentials_t  *credentials,
   g_set_error_literal (error,
                        G_IO_ERROR,
                        G_IO_ERROR_NOT_SUPPORTED,
-                       _("xcredentials_t is not implemented on this OS"));
+                       _("GCredentials is not implemented on this OS"));
 #endif
 
   return ret;
 }
 
-static xboolean_t
+static gboolean
 credentials_native_type_check (GCredentialsType  requested_type,
                                const char       *op)
 {
-  xenum_class_t *enum_class;
-  xenum_value_t *requested;
+  GEnumClass *enum_class;
+  GEnumValue *requested;
 #if G_CREDENTIALS_SUPPORTED
-  xenum_value_t *supported;
+  GEnumValue *supported;
 #endif
 
 #if G_CREDENTIALS_SUPPORTED
@@ -413,52 +413,52 @@ credentials_native_type_check (GCredentialsType  requested_type,
     return TRUE;
 #endif
 
-  enum_class = xtype_class_ref (xcredentials_type_get_type ());
-  requested = xenum_get_value (enum_class, requested_type);
+  enum_class = g_type_class_ref (g_credentials_type_get_type ());
+  requested = g_enum_get_value (enum_class, requested_type);
 
 #if G_CREDENTIALS_SUPPORTED
-  supported = xenum_get_value (enum_class, G_CREDENTIALS_NATIVE_TYPE);
-  xassert (supported);
-  g_warning ("xcredentials_%s_native: Trying to %s credentials of type %s "
+  supported = g_enum_get_value (enum_class, G_CREDENTIALS_NATIVE_TYPE);
+  g_assert (supported);
+  g_warning ("g_credentials_%s_native: Trying to %s credentials of type %s "
              "but only %s is supported on this platform.",
              op, op,
              requested ? requested->value_name : "(unknown)",
              supported->value_name);
 #else
-  g_warning ("xcredentials_%s_native: Trying to %s credentials of type %s "
-             "but there is no support for xcredentials_t on this platform.",
+  g_warning ("g_credentials_%s_native: Trying to %s credentials of type %s "
+             "but there is no support for GCredentials on this platform.",
              op, op,
              requested ? requested->value_name : "(unknown)");
 #endif
 
-  xtype_class_unref (enum_class);
+  g_type_class_unref (enum_class);
   return FALSE;
 }
 
 /**
- * xcredentials_get_native: (skip)
- * @credentials: A #xcredentials_t.
+ * g_credentials_get_native: (skip)
+ * @credentials: A #GCredentials.
  * @native_type: The type of native credentials to get.
  *
  * Gets a pointer to native credentials of type @native_type from
  * @credentials.
  *
  * It is a programming error (which will cause a warning to be
- * logged) to use this method if there is no #xcredentials_t support for
+ * logged) to use this method if there is no #GCredentials support for
  * the OS or if @native_type isn't supported by the OS.
  *
  * Returns: (transfer none) (nullable): The pointer to native credentials or
- *     %NULL if there is no #xcredentials_t support for the OS or if @native_type
+ *     %NULL if there is no #GCredentials support for the OS or if @native_type
  *     isn't supported by the OS. Do not free the returned data, it is owned
  *     by @credentials.
  *
  * Since: 2.26
  */
-xpointer_t
-xcredentials_get_native (xcredentials_t     *credentials,
+gpointer
+g_credentials_get_native (GCredentials     *credentials,
                           GCredentialsType  native_type)
 {
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), NULL);
 
   if (!credentials_native_type_check (native_type, "get"))
     return NULL;
@@ -473,8 +473,8 @@ xcredentials_get_native (xcredentials_t     *credentials,
 }
 
 /**
- * xcredentials_set_native:
- * @credentials: A #xcredentials_t.
+ * g_credentials_set_native:
+ * @credentials: A #GCredentials.
  * @native_type: The type of native credentials to set.
  * @native: (not nullable): A pointer to native credentials.
  *
@@ -482,15 +482,15 @@ xcredentials_get_native (xcredentials_t     *credentials,
  * into @credentials.
  *
  * It is a programming error (which will cause a warning to be
- * logged) to use this method if there is no #xcredentials_t support for
+ * logged) to use this method if there is no #GCredentials support for
  * the OS or if @native_type isn't supported by the OS.
  *
  * Since: 2.26
  */
 void
-xcredentials_set_native (xcredentials_t     *credentials,
+g_credentials_set_native (GCredentials     *credentials,
                           GCredentialsType  native_type,
-                          xpointer_t          native)
+                          gpointer          native)
 {
   if (!credentials_native_type_check (native_type, "set"))
     return;
@@ -508,14 +508,14 @@ xcredentials_set_native (xcredentials_t     *credentials,
 
 #ifdef G_OS_UNIX
 /**
- * xcredentials_get_unix_user:
- * @credentials: A #xcredentials_t
+ * g_credentials_get_unix_user:
+ * @credentials: A #GCredentials
  * @error: Return location for error or %NULL.
  *
  * Tries to get the UNIX user identifier from @credentials. This
  * method is only available on UNIX platforms.
  *
- * This operation can fail if #xcredentials_t is not supported on the
+ * This operation can fail if #GCredentials is not supported on the
  * OS or if the native credentials type does not contain information
  * about the UNIX user.
  *
@@ -524,13 +524,13 @@ xcredentials_set_native (xcredentials_t     *credentials,
  * Since: 2.26
  */
 uid_t
-xcredentials_get_unix_user (xcredentials_t    *credentials,
-                             xerror_t         **error)
+g_credentials_get_unix_user (GCredentials    *credentials,
+                             GError         **error)
 {
   uid_t ret;
 
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), -1);
-  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), -1);
+  g_return_val_if_fail (error == NULL || *error == NULL, -1);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   if (linux_ucred_check_valid (&credentials->native, error))
@@ -547,7 +547,7 @@ xcredentials_get_unix_user (xcredentials_t    *credentials,
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                    /* No point in translating the part in parentheses... */
                    "%s (struct xucred cr_version %u != %u)",
-                   _("There is no xcredentials_t support for your platform"),
+                   _("There is no GCredentials support for your platform"),
                    credentials->native.cr_version,
                    XUCRED_VERSION);
       ret = -1;
@@ -565,21 +565,21 @@ xcredentials_get_unix_user (xcredentials_t    *credentials,
   g_set_error_literal (error,
                        G_IO_ERROR,
                        G_IO_ERROR_NOT_SUPPORTED,
-                       _("There is no xcredentials_t support for your platform"));
+                       _("There is no GCredentials support for your platform"));
 #endif
 
   return ret;
 }
 
 /**
- * xcredentials_get_unix_pid:
- * @credentials: A #xcredentials_t
+ * g_credentials_get_unix_pid:
+ * @credentials: A #GCredentials
  * @error: Return location for error or %NULL.
  *
  * Tries to get the UNIX process identifier from @credentials. This
  * method is only available on UNIX platforms.
  *
- * This operation can fail if #xcredentials_t is not supported on the
+ * This operation can fail if #GCredentials is not supported on the
  * OS or if the native credentials type does not contain information
  * about the UNIX process ID.
  *
@@ -588,13 +588,13 @@ xcredentials_get_unix_user (xcredentials_t    *credentials,
  * Since: 2.36
  */
 pid_t
-xcredentials_get_unix_pid (xcredentials_t    *credentials,
-                            xerror_t         **error)
+g_credentials_get_unix_pid (GCredentials    *credentials,
+                            GError         **error)
 {
   pid_t ret;
 
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), -1);
-  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), -1);
+  g_return_val_if_fail (error == NULL || *error == NULL, -1);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   if (linux_ucred_check_valid (&credentials->native, error))
@@ -623,22 +623,22 @@ xcredentials_get_unix_pid (xcredentials_t    *credentials,
     g_set_error_literal (error,
                          G_IO_ERROR,
                          G_IO_ERROR_NOT_SUPPORTED,
-                         _("xcredentials_t does not contain a process ID on this OS"));
+                         _("GCredentials does not contain a process ID on this OS"));
 #endif
 
   return ret;
 }
 
 /**
- * xcredentials_set_unix_user:
- * @credentials: A #xcredentials_t.
+ * g_credentials_set_unix_user:
+ * @credentials: A #GCredentials.
  * @uid: The UNIX user identifier to set.
  * @error: Return location for error or %NULL.
  *
  * Tries to set the UNIX user identifier on @credentials. This method
  * is only available on UNIX platforms.
  *
- * This operation can fail if #xcredentials_t is not supported on the
+ * This operation can fail if #GCredentials is not supported on the
  * OS or if the native credentials type does not contain information
  * about the UNIX user. It can also fail if the OS does not allow the
  * use of "spoofed" credentials.
@@ -647,16 +647,16 @@ xcredentials_get_unix_pid (xcredentials_t    *credentials,
  *
  * Since: 2.26
  */
-xboolean_t
-xcredentials_set_unix_user (xcredentials_t    *credentials,
+gboolean
+g_credentials_set_unix_user (GCredentials    *credentials,
                              uid_t            uid,
-                             xerror_t         **error)
+                             GError         **error)
 {
-  xboolean_t ret = FALSE;
+  gboolean ret = FALSE;
 
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), FALSE);
-  xreturn_val_if_fail (uid != (uid_t) -1, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), FALSE);
+  g_return_val_if_fail (uid != (uid_t) -1, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   credentials->native.uid = uid;
@@ -683,7 +683,7 @@ xcredentials_set_unix_user (xcredentials_t    *credentials,
   g_set_error_literal (error,
                        G_IO_ERROR,
                        G_IO_ERROR_NOT_SUPPORTED,
-                       _("xcredentials_t is not implemented on this OS"));
+                       _("GCredentials is not implemented on this OS"));
   ret = FALSE;
 #endif
 
@@ -692,10 +692,10 @@ xcredentials_set_unix_user (xcredentials_t    *credentials,
 
 #ifdef __APPLE__
 void
-_xcredentials_set_local_peerid (xcredentials_t *credentials,
+_g_credentials_set_local_peerid (GCredentials *credentials,
                                  pid_t         pid)
 {
-  g_return_if_fail (X_IS_CREDENTIALS (credentials));
+  g_return_if_fail (G_IS_CREDENTIALS (credentials));
   g_return_if_fail (pid >= 0);
 
   credentials->pid = pid;

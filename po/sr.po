@@ -37,15 +37,15 @@ msgstr ""
 "подржано"
 
 #: gio/gapplication.c:500
-msgid "xapplication_t options"
+msgid "GApplication options"
 msgstr "Опције Гпрограма"
 
 #: gio/gapplication.c:500
-msgid "Show xapplication_t options"
+msgid "Show GApplication options"
 msgstr "Показује опције Гпрограма"
 
 #: gio/gapplication.c:545
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
 "Улази у режим услуге Гпрограма (користи са датотека услуге Д-сабирнице)"
 
@@ -158,7 +158,7 @@ msgid "PARAMETER"
 msgstr "ПАРАМЕТАР"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
+msgid "Optional parameter to the action invocation, in GVariant format"
 msgstr "Изборни параметар за призивање радње, у запису Гваријанта"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
@@ -286,7 +286,7 @@ msgid "Seek not supported on base stream"
 msgstr "Није подржавано премотавање основног тока"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
 msgstr "Не могу да скратим улазни ток у Гмеђумеморији"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
@@ -358,19 +358,19 @@ msgid "%s filetype"
 msgstr "%s врста датотеке"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
+msgid "GCredentials contains invalid data"
 msgstr "Г-акредитиви садрже неисправне податке"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
+msgid "GCredentials is not implemented on this OS"
 msgstr "Гуверења нису подржана на оперативном систему"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
+msgid "There is no GCredentials support for your platform"
 msgstr "Немате подршку за Гуверења на овој платформи"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
+msgid "GCredentials does not contain a process ID on this OS"
 msgstr "Гуверења не садрже ИБ процеса на овом оперативном систему"
 
 #: gio/gcredentials.c:680
@@ -576,8 +576,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Кориснички ИБ-ови морају бити исти и за парњака и за сервер"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Поништено преко xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Поништено преко GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:300
 #, c-format
@@ -878,7 +878,7 @@ msgstr ""
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
 "Грешка при десеријализацији Гваријанта са ниском врсте „%s“ из жичаног "
 "формата Д-магистрале"
@@ -928,7 +928,7 @@ msgstr "Не могу да десеријализујем поруку: "
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
 "Грешка при серијализацији Гваријанта са ниском врсте „%s“ из жичаног формата "
 "Д-магистрале"
@@ -1398,26 +1398,26 @@ msgstr "ДТЛС подршка није доступна"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
+msgid "Can’t handle version %d of GEmblem encoding"
 msgstr "Не могу да радим са издањем %d кодирања ГЕмблема"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
 msgstr "Неисправно задат број токена (%d) у кодирању ГЕмблема"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
 msgstr "Не могу да радим са издањем %d кодирања иконице ГЕмблема"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
 msgstr "Није исправно задат број токена (%d) у кодирању иконице ГЕмблема"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
 msgstr "Очекивано је ГЕмблем за иконицу ГЕмблема"
 
 #. Translators: This is an error message when
@@ -1509,11 +1509,11 @@ msgstr "Бројање датотека је већ завршено"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
+msgid "Can’t handle version %d of GFileIcon encoding"
 msgstr "Не могу да радим са издањем %d кодирања иконице ГДатотеке"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
 msgstr "Лоши улазни подаци за иконицу ГДатотеке"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
@@ -1581,7 +1581,7 @@ msgstr "Не постоји врста за назив класе %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
+msgid "Type %s does not implement the GIcon interface"
 msgstr "Врста %s не подржава сучеље ГИконице"
 
 #: gio/gicon.c:339
@@ -1596,7 +1596,7 @@ msgstr "Број издања је лоше задат: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
 msgstr "%s врста не подржава „from_tokens()“ на сучељу ГИконице"
 
 #: gio/gicon.c:469
@@ -2767,7 +2767,7 @@ msgstr "<%s id='%s'> није (још) дефинисано."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
+msgid "Invalid GVariant type string “%s”"
 msgstr "Неисправна врста ниске ГВаријанта „%s“"
 
 #: gio/glib-compile-schemas.c:1047
@@ -2996,7 +2996,7 @@ msgstr "Не намеће ограничења назива кључа"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3355,7 +3355,7 @@ msgid "Error removing old file: %s"
 msgstr "Грешка приликом уклањања старе датотеке: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
+msgid "Invalid GSeekType supplied"
 msgstr "Није исправно одређена врста ГПретраге"
 
 #: gio/gmemoryinputstream.c:484
@@ -3363,7 +3363,7 @@ msgid "Invalid seek request"
 msgstr "Неисправан захтев претраге"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
 msgstr "Не могу да скратим улазни ток ГМеморије"
 
 #: gio/gmemoryoutputstream.c:568
@@ -3891,7 +3891,7 @@ msgstr "Истекло време за У/И утичнице"
 
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
+msgid "creating GSocket from fd: %s"
 msgstr "правим ГУтичницу из фд-а: %s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
@@ -4035,7 +4035,7 @@ msgid "Error sending message: %s"
 msgstr "Грешка при слању поруке: %s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
+msgid "GSocketControlMessage not supported on Windows"
 msgstr "Порука управљања Гутичницом није подржана на Виндоузу"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
@@ -4049,7 +4049,7 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Не могу да прочитам уверења утичнице: %s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr "г_утичница_добавља_уверења није примењена за овај оперативни систем"
 
 #: gio/gsocketclient.c:191
@@ -4182,7 +4182,7 @@ msgstr "Спојке нису подржане на овој платформи"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
+msgid "Can’t handle version %d of GThemedIcon encoding"
 msgstr "Не могу да радим са издањем кодирања %d иконице ГТемирања"
 
 #: gio/gthreadedresolver.c:152
@@ -4232,12 +4232,12 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "Не могу да рашчланим ПЕМ шифровано уверење"
 
 #: gio/gtlscertificate.c:796
-#| msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+#| msgid "This GTlsBackend does not support creating PKCS #11 certificates"
 msgid "The current TLS backend does not support PKCS #12"
 msgstr "Тренутни ТЛС позадинац не подржава ПКЦС #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
 msgstr "Овај ГТлс позадинац не подржава стварање ПКЦС #11 уверења"
 
 #: gio/gtlspassword.c:111
@@ -4555,25 +4555,25 @@ msgstr "Назив путање „%s“ није апсолутна путањ�
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A, %d. %B %Y. %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%T"
 
@@ -4956,13 +4956,13 @@ msgstr "Дец"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "ПрП"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "ПоП"
 

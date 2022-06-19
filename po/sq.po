@@ -160,37 +160,37 @@ msgstr "Emër host i pasaktë"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:202
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "PD"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:204
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "MD"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%Y-%b-%d %I.%M.%S.%p %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%Y-%b-%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%I.%M.%S. %Z"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I.%M.%S.%p %Z"
 
@@ -1590,11 +1590,11 @@ msgid "%s type"
 msgstr "Lloj %s"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "xcredentials_t is not implemented on this OS"
+msgid "GCredentials is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:447
-msgid "There is no xcredentials_t support for your platform"
+msgid "There is no GCredentials support for your platform"
 msgstr ""
 
 # (pofilter) untranslated: checks whether a string has been translated at all
@@ -1772,7 +1772,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1159
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:266
@@ -2021,7 +2021,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:1517
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string '%s' from the D-Bus wire format"
+"Error deserializing GVariant with type string '%s' from the D-Bus wire format"
 msgstr ""
 
 #: ../gio/gdbusmessage.c:1705
@@ -2060,7 +2060,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:2163
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string '%s' to the D-Bus wire format"
+"Error serializing GVariant with type string '%s' to the D-Bus wire format"
 msgstr ""
 
 #: ../gio/gdbusmessage.c:2303
@@ -2458,26 +2458,26 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of xemblem_t encoding"
+msgid "Can't handle version %d of GEmblem encoding"
 msgstr ""
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:368
 #, c-format
-msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgid "Can't handle version %d of GEmblemedIcon encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:378
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:401
-msgid "Expected a xemblem_t for xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
 msgstr ""
 
 # (pofilter) isfuzzy: Check if the unit has been marked fuzzy.
@@ -2595,11 +2595,11 @@ msgstr "Enumuruesi i file është rregullisht i mbyllur"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of xfile_icon_t encoding"
+msgid "Can't handle version %d of GFileIcon encoding"
 msgstr ""
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
 msgstr ""
 
 # (pofilter) untranslated: checks whether a string has been translated at all
@@ -2637,7 +2637,7 @@ msgstr ""
 
 #: ../gio/gicon.c:314
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
+msgid "Type %s does not implement the GIcon interface"
 msgstr ""
 
 #: ../gio/gicon.c:325
@@ -2652,7 +2652,7 @@ msgstr ""
 
 #: ../gio/gicon.c:353
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
 msgstr ""
 
 #: ../gio/gicon.c:430
@@ -2754,7 +2754,7 @@ msgstr ""
 # (pofilter) untranslated: checks whether a string has been translated at all
 #: ../gio/glib-compile-schemas.c:958
 #, fuzzy, c-format
-msgid "invalid xvariant_t type string '%s'"
+msgid "invalid GVariant type string '%s'"
 msgstr "Lloj i pasaktë atributi (pritej string)"
 
 #: ../gio/glib-compile-schemas.c:988
@@ -2925,7 +2925,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:1973
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3353,8 +3353,8 @@ msgstr "Gabim gjatë fshirjes së file: %s"
 
 # (pofilter) untranslated: checks whether a string has been translated at all
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid xseek_type_t supplied"
-msgstr "Dhënë xseek_type_t i pavlefshëm"
+msgid "Invalid GSeekType supplied"
+msgstr "Dhënë GSeekType i pavlefshëm"
 
 # (pofilter) variables: translation contains variables not in original: %s
 # (pofilter) isfuzzy: Check if the unit has been marked fuzzy.
@@ -3365,8 +3365,8 @@ msgstr "Kërkesë pikëvendosje e pavlefshme"
 
 # (pofilter) untranslated: checks whether a string has been translated at all
 #: ../gio/gmemoryinputstream.c:520
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "E pamundur ndërprerja e xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "E pamundur ndërprerja e GMemoryInputStream"
 
 # (pofilter) untranslated: checks whether a string has been translated at all
 #: ../gio/gmemoryoutputstream.c:496
@@ -3719,7 +3719,7 @@ msgstr ""
 # (pofilter) printf: checks whether printf format strings match
 #: ../gio/gsocket.c:464
 #, fuzzy, c-format
-msgid "creating xsocket_t from fd: %s"
+msgid "creating GSocket from fd: %s"
 msgstr "Gabim gjatë leximit nga file: %s"
 
 # (pofilter) isfuzzy: Check if the unit has been marked fuzzy.
@@ -3844,7 +3844,7 @@ msgstr "Gabim gjatë hapjes së file: %s"
 # (pofilter) untranslated: checks whether a string has been translated at all
 #: ../gio/gsocket.c:3081
 #, fuzzy
-msgid "xsocket_control_message_t not supported on windows"
+msgid "GSocketControlMessage not supported on windows"
 msgstr "ndryshimi i shoqërimeve nuk suportohet në win32"
 
 # (pofilter) variables: translation contains variables not in original: %s, %s
@@ -3857,7 +3857,7 @@ msgid "Error receiving message: %s"
 msgstr "Gabim gjatë fshirjes së file: %s"
 
 #: ../gio/gsocket.c:3598
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
 
 #: ../gio/gsocketclient.c:798 ../gio/gsocketclient.c:1368
@@ -3974,7 +3974,7 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of xthemed_icon_t encoding"
+msgid "Can't handle version %d of GThemedIcon encoding"
 msgstr ""
 
 #: ../gio/gtlscertificate.c:226

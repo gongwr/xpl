@@ -28,51 +28,51 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_APPLICATION                                  (xapplication_get_type ())
-#define G_APPLICATION(inst)                                 (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_APPLICATION, xapplication_t))
-#define G_APPLICATION_CLASS(class)                          (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_APPLICATION, xapplication_class_t))
-#define X_IS_APPLICATION(inst)                              (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_APPLICATION))
-#define X_IS_APPLICATION_CLASS(class)                       (XTYPE_CHECK_CLASS_TYPE ((class), XTYPE_APPLICATION))
-#define G_APPLICATION_GET_CLASS(inst)                       (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_APPLICATION, xapplication_class_t))
+#define G_TYPE_APPLICATION                                  (g_application_get_type ())
+#define G_APPLICATION(inst)                                 (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_APPLICATION, GApplication))
+#define G_APPLICATION_CLASS(class)                          (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_APPLICATION, GApplicationClass))
+#define G_IS_APPLICATION(inst)                              (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_APPLICATION))
+#define G_IS_APPLICATION_CLASS(class)                       (G_TYPE_CHECK_CLASS_TYPE ((class), G_TYPE_APPLICATION))
+#define G_APPLICATION_GET_CLASS(inst)                       (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_APPLICATION, GApplicationClass))
 
-typedef struct _xapplication_private                         xapplication_private_t;
-typedef struct _xapplication_class                           xapplication_class_t;
+typedef struct _GApplicationPrivate                         GApplicationPrivate;
+typedef struct _GApplicationClass                           GApplicationClass;
 
-struct _xapplication
+struct _GApplication
 {
   /*< private >*/
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xapplication_private_t *priv;
+  GApplicationPrivate *priv;
 };
 
-struct _xapplication_class
+struct _GApplicationClass
 {
   /*< private >*/
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /*< public >*/
   /* signals */
-  void                      (* startup)             (xapplication_t              *application);
+  void                      (* startup)             (GApplication              *application);
 
-  void                      (* activate)            (xapplication_t              *application);
+  void                      (* activate)            (GApplication              *application);
 
-  void                      (* open)                (xapplication_t              *application,
-                                                     xfile_t                    **files,
-                                                     xint_t                       n_files,
-                                                     const xchar_t               *hint);
+  void                      (* open)                (GApplication              *application,
+                                                     GFile                    **files,
+                                                     gint                       n_files,
+                                                     const gchar               *hint);
 
-  int                       (* command_line)        (xapplication_t              *application,
-                                                     xapplication_command_line_t   *command_line);
+  int                       (* command_line)        (GApplication              *application,
+                                                     GApplicationCommandLine   *command_line);
 
   /* vfuncs */
 
   /**
-   * xapplication_class_t::local_command_line:
-   * @application: a #xapplication_t
+   * GApplicationClass::local_command_line:
+   * @application: a #GApplication
    * @arguments: (inout) (array zero-terminated=1): array of command line arguments
    * @exit_status: (out): exit status to fill after processing the command line.
    *
@@ -83,169 +83,169 @@ struct _xapplication_class
    *
    * The last argument to local_command_line() is a pointer to the @status
    * variable which can used to set the exit status that is returned from
-   * xapplication_run().
+   * g_application_run().
    *
-   * See xapplication_run() for more details on #xapplication_t startup.
+   * See g_application_run() for more details on #GApplication startup.
    *
    * Returns: %TRUE if the commandline has been completely handled
    */
-  xboolean_t                  (* local_command_line)  (xapplication_t              *application,
-                                                     xchar_t                   ***arguments,
+  gboolean                  (* local_command_line)  (GApplication              *application,
+                                                     gchar                   ***arguments,
                                                      int                       *exit_status);
 
-  void                      (* before_emit)         (xapplication_t              *application,
-                                                     xvariant_t                  *platform_data);
-  void                      (* after_emit)          (xapplication_t              *application,
-                                                     xvariant_t                  *platform_data);
-  void                      (* add_platform_data)   (xapplication_t              *application,
-                                                     xvariant_builder_t           *builder);
-  void                      (* quit_mainloop)       (xapplication_t              *application);
-  void                      (* run_mainloop)        (xapplication_t              *application);
-  void                      (* shutdown)            (xapplication_t              *application);
+  void                      (* before_emit)         (GApplication              *application,
+                                                     GVariant                  *platform_data);
+  void                      (* after_emit)          (GApplication              *application,
+                                                     GVariant                  *platform_data);
+  void                      (* add_platform_data)   (GApplication              *application,
+                                                     GVariantBuilder           *builder);
+  void                      (* quit_mainloop)       (GApplication              *application);
+  void                      (* run_mainloop)        (GApplication              *application);
+  void                      (* shutdown)            (GApplication              *application);
 
-  xboolean_t                  (* dbus_register)       (xapplication_t              *application,
-                                                     xdbus_connection_t           *connection,
-                                                     const xchar_t               *object_path,
-                                                     xerror_t                   **error);
-  void                      (* dbus_unregister)     (xapplication_t              *application,
-                                                     xdbus_connection_t           *connection,
-                                                     const xchar_t               *object_path);
-  xint_t                      (* handle_local_options)(xapplication_t              *application,
-                                                     xvariant_dict_t              *options);
-  xboolean_t                  (* name_lost)           (xapplication_t              *application);
+  gboolean                  (* dbus_register)       (GApplication              *application,
+                                                     GDBusConnection           *connection,
+                                                     const gchar               *object_path,
+                                                     GError                   **error);
+  void                      (* dbus_unregister)     (GApplication              *application,
+                                                     GDBusConnection           *connection,
+                                                     const gchar               *object_path);
+  gint                      (* handle_local_options)(GApplication              *application,
+                                                     GVariantDict              *options);
+  gboolean                  (* name_lost)           (GApplication              *application);
 
   /*< private >*/
-  xpointer_t padding[7];
+  gpointer padding[7];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   xapplication_get_type                          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                   g_application_get_type                          (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xapplication_id_is_valid                       (const xchar_t              *application_id);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_application_id_is_valid                       (const gchar              *application_id);
 
-XPL_AVAILABLE_IN_ALL
-xapplication_t *          xapplication_new                               (const xchar_t              *application_id,
+GLIB_AVAILABLE_IN_ALL
+GApplication *          g_application_new                               (const gchar              *application_id,
                                                                          GApplicationFlags         flags);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *           xapplication_get_application_id                (xapplication_t             *application);
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_set_application_id                (xapplication_t             *application,
-                                                                         const xchar_t              *application_id);
+GLIB_AVAILABLE_IN_ALL
+const gchar *           g_application_get_application_id                (GApplication             *application);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_set_application_id                (GApplication             *application,
+                                                                         const gchar              *application_id);
 
-XPL_AVAILABLE_IN_2_34
-xdbus_connection_t *       xapplication_get_dbus_connection               (xapplication_t             *application);
-XPL_AVAILABLE_IN_2_34
-const xchar_t *           xapplication_get_dbus_object_path              (xapplication_t             *application);
+GLIB_AVAILABLE_IN_2_34
+GDBusConnection *       g_application_get_dbus_connection               (GApplication             *application);
+GLIB_AVAILABLE_IN_2_34
+const gchar *           g_application_get_dbus_object_path              (GApplication             *application);
 
-XPL_AVAILABLE_IN_ALL
-xuint_t                   xapplication_get_inactivity_timeout            (xapplication_t             *application);
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_set_inactivity_timeout            (xapplication_t             *application,
-                                                                         xuint_t                     inactivity_timeout);
+GLIB_AVAILABLE_IN_ALL
+guint                   g_application_get_inactivity_timeout            (GApplication             *application);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_set_inactivity_timeout            (GApplication             *application,
+                                                                         guint                     inactivity_timeout);
 
-XPL_AVAILABLE_IN_ALL
-GApplicationFlags       xapplication_get_flags                         (xapplication_t             *application);
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_set_flags                         (xapplication_t             *application,
+GLIB_AVAILABLE_IN_ALL
+GApplicationFlags       g_application_get_flags                         (GApplication             *application);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_set_flags                         (GApplication             *application,
                                                                          GApplicationFlags         flags);
 
-XPL_AVAILABLE_IN_2_42
-const xchar_t *           xapplication_get_resource_base_path            (xapplication_t             *application);
-XPL_AVAILABLE_IN_2_42
-void                    xapplication_set_resource_base_path            (xapplication_t             *application,
-                                                                         const xchar_t              *resource_path);
+GLIB_AVAILABLE_IN_2_42
+const gchar *           g_application_get_resource_base_path            (GApplication             *application);
+GLIB_AVAILABLE_IN_2_42
+void                    g_application_set_resource_base_path            (GApplication             *application,
+                                                                         const gchar              *resource_path);
 
-XPL_DEPRECATED
-void                    xapplication_set_action_group                  (xapplication_t             *application,
-                                                                         xaction_group_t             *action_group);
+GLIB_DEPRECATED
+void                    g_application_set_action_group                  (GApplication             *application,
+                                                                         GActionGroup             *action_group);
 
-XPL_AVAILABLE_IN_2_40
-void                    xapplication_add_main_option_entries           (xapplication_t             *application,
+GLIB_AVAILABLE_IN_2_40
+void                    g_application_add_main_option_entries           (GApplication             *application,
                                                                          const GOptionEntry       *entries);
 
-XPL_AVAILABLE_IN_2_42
-void                    xapplication_add_main_option                   (xapplication_t             *application,
+GLIB_AVAILABLE_IN_2_42
+void                    g_application_add_main_option                   (GApplication             *application,
                                                                          const char               *long_name,
                                                                          char                      short_name,
                                                                          GOptionFlags              flags,
                                                                          GOptionArg                arg,
                                                                          const char               *description,
                                                                          const char               *arg_description);
-XPL_AVAILABLE_IN_2_40
-void                    xapplication_add_option_group                  (xapplication_t             *application,
-                                                                         xoption_group_t             *group);
-XPL_AVAILABLE_IN_2_56
-void                    xapplication_set_option_context_parameter_string (xapplication_t             *application,
-                                                                           const xchar_t              *parameter_string);
-XPL_AVAILABLE_IN_2_56
-void                    xapplication_set_option_context_summary        (xapplication_t             *application,
-                                                                         const xchar_t              *summary);
-XPL_AVAILABLE_IN_2_56
-void                    xapplication_set_option_context_description    (xapplication_t             *application,
-                                                                         const xchar_t              *description);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xapplication_get_is_registered                 (xapplication_t             *application);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xapplication_get_is_remote                     (xapplication_t             *application);
+GLIB_AVAILABLE_IN_2_40
+void                    g_application_add_option_group                  (GApplication             *application,
+                                                                         GOptionGroup             *group);
+GLIB_AVAILABLE_IN_2_56
+void                    g_application_set_option_context_parameter_string (GApplication             *application,
+                                                                           const gchar              *parameter_string);
+GLIB_AVAILABLE_IN_2_56
+void                    g_application_set_option_context_summary        (GApplication             *application,
+                                                                         const gchar              *summary);
+GLIB_AVAILABLE_IN_2_56
+void                    g_application_set_option_context_description    (GApplication             *application,
+                                                                         const gchar              *description);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_application_get_is_registered                 (GApplication             *application);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_application_get_is_remote                     (GApplication             *application);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xapplication_register                          (xapplication_t             *application,
-                                                                         xcancellable_t             *cancellable,
-                                                                         xerror_t                  **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_application_register                          (GApplication             *application,
+                                                                         GCancellable             *cancellable,
+                                                                         GError                  **error);
 
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_hold                              (xapplication_t             *application);
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_release                           (xapplication_t             *application);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_hold                              (GApplication             *application);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_release                           (GApplication             *application);
 
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_activate                          (xapplication_t             *application);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_activate                          (GApplication             *application);
 
-XPL_AVAILABLE_IN_ALL
-void                    xapplication_open                              (xapplication_t             *application,
-                                                                         xfile_t                   **files,
-                                                                         xint_t                      n_files,
-                                                                         const xchar_t              *hint);
+GLIB_AVAILABLE_IN_ALL
+void                    g_application_open                              (GApplication             *application,
+                                                                         GFile                   **files,
+                                                                         gint                      n_files,
+                                                                         const gchar              *hint);
 
-XPL_AVAILABLE_IN_ALL
-int                     xapplication_run                               (xapplication_t             *application,
+GLIB_AVAILABLE_IN_ALL
+int                     g_application_run                               (GApplication             *application,
                                                                          int                       argc,
                                                                          char                    **argv);
 
-XPL_AVAILABLE_IN_2_32
-void                    xapplication_quit                              (xapplication_t             *application);
+GLIB_AVAILABLE_IN_2_32
+void                    g_application_quit                              (GApplication             *application);
 
-XPL_AVAILABLE_IN_2_32
-xapplication_t *          xapplication_get_default                       (void);
-XPL_AVAILABLE_IN_2_32
-void                    xapplication_set_default                       (xapplication_t             *application);
+GLIB_AVAILABLE_IN_2_32
+GApplication *          g_application_get_default                       (void);
+GLIB_AVAILABLE_IN_2_32
+void                    g_application_set_default                       (GApplication             *application);
 
-XPL_AVAILABLE_IN_2_38
-void                    xapplication_mark_busy                         (xapplication_t             *application);
-XPL_AVAILABLE_IN_2_38
-void                    xapplication_unmark_busy                       (xapplication_t             *application);
-XPL_AVAILABLE_IN_2_44
-xboolean_t                xapplication_get_is_busy                       (xapplication_t             *application);
+GLIB_AVAILABLE_IN_2_38
+void                    g_application_mark_busy                         (GApplication             *application);
+GLIB_AVAILABLE_IN_2_38
+void                    g_application_unmark_busy                       (GApplication             *application);
+GLIB_AVAILABLE_IN_2_44
+gboolean                g_application_get_is_busy                       (GApplication             *application);
 
-XPL_AVAILABLE_IN_2_40
-void                    xapplication_send_notification                 (xapplication_t             *application,
-                                                                         const xchar_t              *id,
-                                                                         xnotification_t            *notification);
-XPL_AVAILABLE_IN_2_40
-void                    xapplication_withdraw_notification             (xapplication_t             *application,
-                                                                         const xchar_t              *id);
+GLIB_AVAILABLE_IN_2_40
+void                    g_application_send_notification                 (GApplication             *application,
+                                                                         const gchar              *id,
+                                                                         GNotification            *notification);
+GLIB_AVAILABLE_IN_2_40
+void                    g_application_withdraw_notification             (GApplication             *application,
+                                                                         const gchar              *id);
 
-XPL_AVAILABLE_IN_2_44
-void                    xapplication_bind_busy_property                (xapplication_t             *application,
-                                                                         xpointer_t                  object,
-                                                                         const xchar_t              *property);
+GLIB_AVAILABLE_IN_2_44
+void                    g_application_bind_busy_property                (GApplication             *application,
+                                                                         gpointer                  object,
+                                                                         const gchar              *property);
 
-XPL_AVAILABLE_IN_2_44
-void                    xapplication_unbind_busy_property              (xapplication_t             *application,
-                                                                         xpointer_t                  object,
-                                                                         const xchar_t              *property);
+GLIB_AVAILABLE_IN_2_44
+void                    g_application_unbind_busy_property              (GApplication             *application,
+                                                                         gpointer                  object,
+                                                                         const gchar              *property);
 
 G_END_DECLS
 

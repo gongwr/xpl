@@ -29,17 +29,17 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TCP_WRAPPER_CONNECTION            (g_tcp_wrapper_connection_get_type ())
-#define G_TCP_WRAPPER_CONNECTION(inst)           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                  XTYPE_TCP_WRAPPER_CONNECTION, xtcp_wrapper_connection))
-#define G_TCP_WRAPPER_CONNECTION_CLASS(class)    (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                  XTYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnectionClass))
-#define X_IS_TCP_WRAPPER_CONNECTION(inst)        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                  XTYPE_TCP_WRAPPER_CONNECTION))
-#define X_IS_TCP_WRAPPER_CONNECTION_CLASS(class) (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                  XTYPE_TCP_WRAPPER_CONNECTION))
-#define G_TCP_WRAPPER_CONNECTION_GET_CLASS(inst) (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                  XTYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnectionClass))
+#define G_TYPE_TCP_WRAPPER_CONNECTION            (g_tcp_wrapper_connection_get_type ())
+#define G_TCP_WRAPPER_CONNECTION(inst)           (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                  G_TYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnection))
+#define G_TCP_WRAPPER_CONNECTION_CLASS(class)    (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                  G_TYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnectionClass))
+#define G_IS_TCP_WRAPPER_CONNECTION(inst)        (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                  G_TYPE_TCP_WRAPPER_CONNECTION))
+#define G_IS_TCP_WRAPPER_CONNECTION_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                  G_TYPE_TCP_WRAPPER_CONNECTION))
+#define G_TCP_WRAPPER_CONNECTION_GET_CLASS(inst) (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                  G_TYPE_TCP_WRAPPER_CONNECTION, GTcpWrapperConnectionClass))
 
 typedef struct _GTcpWrapperConnectionPrivate GTcpWrapperConnectionPrivate;
 typedef struct _GTcpWrapperConnectionClass   GTcpWrapperConnectionClass;
@@ -51,18 +51,18 @@ struct _GTcpWrapperConnectionClass
 
 struct _GTcpWrapperConnection
 {
-  xtcp_connection_t parent_instance;
+  GTcpConnection parent_instance;
   GTcpWrapperConnectionPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t              g_tcp_wrapper_connection_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType              g_tcp_wrapper_connection_get_type (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *g_tcp_wrapper_connection_new                (xio_stream_t             *base_io_stream,
-								xsocket_t               *socket);
-XPL_AVAILABLE_IN_ALL
-xio_stream_t         *g_tcp_wrapper_connection_get_base_io_stream (xtcp_wrapper_connection_t *conn);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *g_tcp_wrapper_connection_new                (GIOStream             *base_io_stream,
+								GSocket               *socket);
+GLIB_AVAILABLE_IN_ALL
+GIOStream         *g_tcp_wrapper_connection_get_base_io_stream (GTcpWrapperConnection *conn);
 
 G_END_DECLS
 

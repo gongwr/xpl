@@ -37,62 +37,62 @@ G_BEGIN_DECLS
  */
 #define G_NETWORK_MONITOR_EXTENSION_POINT_NAME "gio-network-monitor"
 
-#define XTYPE_NETWORK_MONITOR             (xnetwork_monitor_get_type ())
-#define G_NETWORK_MONITOR(o)               (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR, xnetwork_monitor))
-#define X_IS_NETWORK_MONITOR(o)            (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR))
-#define G_NETWORK_MONITOR_GET_INTERFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_NETWORK_MONITOR, GNetworkMonitorInterface))
+#define G_TYPE_NETWORK_MONITOR             (g_network_monitor_get_type ())
+#define G_NETWORK_MONITOR(o)               (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_MONITOR, GNetworkMonitor))
+#define G_IS_NETWORK_MONITOR(o)            (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_MONITOR))
+#define G_NETWORK_MONITOR_GET_INTERFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_NETWORK_MONITOR, GNetworkMonitorInterface))
 
 typedef struct _GNetworkMonitorInterface GNetworkMonitorInterface;
 
 struct _GNetworkMonitorInterface {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
-  void     (*network_changed)  (xnetwork_monitor_t      *monitor,
-				xboolean_t              network_available);
+  void     (*network_changed)  (GNetworkMonitor      *monitor,
+				gboolean              network_available);
 
-  xboolean_t (*can_reach)        (xnetwork_monitor_t      *monitor,
-				xsocket_connectable_t   *connectable,
-				xcancellable_t         *cancellable,
-				xerror_t              **error);
-  void     (*can_reach_async)  (xnetwork_monitor_t      *monitor,
-				xsocket_connectable_t   *connectable,
-				xcancellable_t         *cancellable,
-				xasync_ready_callback_t   callback,
-				xpointer_t              user_data);
-  xboolean_t (*can_reach_finish) (xnetwork_monitor_t      *monitor,
-				xasync_result_t         *result,
-				xerror_t              **error);
+  gboolean (*can_reach)        (GNetworkMonitor      *monitor,
+				GSocketConnectable   *connectable,
+				GCancellable         *cancellable,
+				GError              **error);
+  void     (*can_reach_async)  (GNetworkMonitor      *monitor,
+				GSocketConnectable   *connectable,
+				GCancellable         *cancellable,
+				GAsyncReadyCallback   callback,
+				gpointer              user_data);
+  gboolean (*can_reach_finish) (GNetworkMonitor      *monitor,
+				GAsyncResult         *result,
+				GError              **error);
 };
 
-XPL_AVAILABLE_IN_2_32
-xtype_t                 xnetwork_monitor_get_type              (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_32
-xnetwork_monitor_t      *xnetwork_monitor_get_default           (void);
+GLIB_AVAILABLE_IN_2_32
+GType                 g_network_monitor_get_type              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_32
+GNetworkMonitor      *g_network_monitor_get_default           (void);
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t              xnetwork_monitor_get_network_available (xnetwork_monitor_t     *monitor);
+GLIB_AVAILABLE_IN_2_32
+gboolean              g_network_monitor_get_network_available (GNetworkMonitor     *monitor);
 
-XPL_AVAILABLE_IN_2_46
-xboolean_t              xnetwork_monitor_get_network_metered   (xnetwork_monitor_t     *monitor);
+GLIB_AVAILABLE_IN_2_46
+gboolean              g_network_monitor_get_network_metered   (GNetworkMonitor     *monitor);
 
-XPL_AVAILABLE_IN_2_44
-GNetworkConnectivity  xnetwork_monitor_get_connectivity      (xnetwork_monitor_t     *monitor);
+GLIB_AVAILABLE_IN_2_44
+GNetworkConnectivity  g_network_monitor_get_connectivity      (GNetworkMonitor     *monitor);
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t              xnetwork_monitor_can_reach             (xnetwork_monitor_t     *monitor,
-                                                               xsocket_connectable_t  *connectable,
-                                                               xcancellable_t        *cancellable,
-                                                               xerror_t             **error);
-XPL_AVAILABLE_IN_2_32
-void                  xnetwork_monitor_can_reach_async       (xnetwork_monitor_t     *monitor,
-                                                               xsocket_connectable_t  *connectable,
-                                                               xcancellable_t        *cancellable,
-                                                               xasync_ready_callback_t  callback,
-                                                               xpointer_t             user_data);
-XPL_AVAILABLE_IN_2_32
-xboolean_t              xnetwork_monitor_can_reach_finish      (xnetwork_monitor_t     *monitor,
-                                                               xasync_result_t        *result,
-                                                               xerror_t             **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean              g_network_monitor_can_reach             (GNetworkMonitor     *monitor,
+                                                               GSocketConnectable  *connectable,
+                                                               GCancellable        *cancellable,
+                                                               GError             **error);
+GLIB_AVAILABLE_IN_2_32
+void                  g_network_monitor_can_reach_async       (GNetworkMonitor     *monitor,
+                                                               GSocketConnectable  *connectable,
+                                                               GCancellable        *cancellable,
+                                                               GAsyncReadyCallback  callback,
+                                                               gpointer             user_data);
+GLIB_AVAILABLE_IN_2_32
+gboolean              g_network_monitor_can_reach_finish      (GNetworkMonitor     *monitor,
+                                                               GAsyncResult        *result,
+                                                               GError             **error);
 
 G_END_DECLS
 

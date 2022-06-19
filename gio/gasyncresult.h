@@ -29,56 +29,56 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_ASYNC_RESULT            (xasync_result_get_type ())
-#define G_ASYNC_RESULT(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_ASYNC_RESULT, xasync_result_t))
-#define X_IS_ASYNC_RESULT(obj)	       (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_ASYNC_RESULT))
-#define G_ASYNC_RESULT_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_ASYNC_RESULT, xasync_result_iface_t))
+#define G_TYPE_ASYNC_RESULT            (g_async_result_get_type ())
+#define G_ASYNC_RESULT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_ASYNC_RESULT, GAsyncResult))
+#define G_IS_ASYNC_RESULT(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_ASYNC_RESULT))
+#define G_ASYNC_RESULT_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_ASYNC_RESULT, GAsyncResultIface))
 
 /**
- * xasync_result_t:
+ * GAsyncResult:
  *
  * Holds results information for an asynchronous operation,
  * usually passed directly to an asynchronous _finish() operation.
  **/
-typedef struct _GAsyncResultIface    xasync_result_iface_t;
+typedef struct _GAsyncResultIface    GAsyncResultIface;
 
 
 /**
- * xasync_result_iface_t:
- * @x_iface: The parent interface.
+ * GAsyncResultIface:
+ * @g_iface: The parent interface.
  * @get_user_data: Gets the user data passed to the callback.
  * @get_source_object: Gets the source object that issued the asynchronous operation.
  * @is_tagged: Checks if a result is tagged with a particular source.
  *
- * Interface definition for #xasync_result_t.
+ * Interface definition for #GAsyncResult.
  **/
 struct _GAsyncResultIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xpointer_t  (* get_user_data)     (xasync_result_t *res);
-  xobject_t * (* get_source_object) (xasync_result_t *res);
+  gpointer  (* get_user_data)     (GAsyncResult *res);
+  GObject * (* get_source_object) (GAsyncResult *res);
 
-  xboolean_t  (* is_tagged)         (xasync_result_t *res,
-				   xpointer_t      source_tag);
+  gboolean  (* is_tagged)         (GAsyncResult *res,
+				   gpointer      source_tag);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xasync_result_get_type          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_async_result_get_type          (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t xasync_result_get_user_data     (xasync_result_t *res);
-XPL_AVAILABLE_IN_ALL
-xobject_t *xasync_result_get_source_object (xasync_result_t *res);
+GLIB_AVAILABLE_IN_ALL
+gpointer g_async_result_get_user_data     (GAsyncResult *res);
+GLIB_AVAILABLE_IN_ALL
+GObject *g_async_result_get_source_object (GAsyncResult *res);
 
-XPL_AVAILABLE_IN_2_34
-xboolean_t xasync_result_legacy_propagate_error (xasync_result_t  *res,
-						xerror_t       **error);
-XPL_AVAILABLE_IN_2_34
-xboolean_t xasync_result_is_tagged              (xasync_result_t  *res,
-						xpointer_t       source_tag);
+GLIB_AVAILABLE_IN_2_34
+gboolean g_async_result_legacy_propagate_error (GAsyncResult  *res,
+						GError       **error);
+GLIB_AVAILABLE_IN_2_34
+gboolean g_async_result_is_tagged              (GAsyncResult  *res,
+						gpointer       source_tag);
 
 G_END_DECLS
 

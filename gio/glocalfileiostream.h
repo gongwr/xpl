@@ -26,32 +26,32 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LOCAL_FILE_IO_STREAM         (_xlocal_file_io_stream_get_type ())
-#define G_LOCAL_FILE_IO_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_LOCAL_FILE_IO_STREAM, xlocal_file_io_stream))
-#define G_LOCAL_FILE_IO_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_LOCAL_FILE_IO_STREAM, xlocal_file_io_stream_class))
-#define X_IS_LOCAL_FILE_IO_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_LOCAL_FILE_IO_STREAM))
-#define X_IS_LOCAL_FILE_IO_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_LOCAL_FILE_IO_STREAM))
-#define G_LOCAL_FILE_IO_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_LOCAL_FILE_IO_STREAM, xlocal_file_io_stream_class))
+#define G_TYPE_LOCAL_FILE_IO_STREAM         (_g_local_file_io_stream_get_type ())
+#define G_LOCAL_FILE_IO_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_LOCAL_FILE_IO_STREAM, GLocalFileIOStream))
+#define G_LOCAL_FILE_IO_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_LOCAL_FILE_IO_STREAM, GLocalFileIOStreamClass))
+#define G_IS_LOCAL_FILE_IO_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_LOCAL_FILE_IO_STREAM))
+#define G_IS_LOCAL_FILE_IO_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_LOCAL_FILE_IO_STREAM))
+#define G_LOCAL_FILE_IO_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_LOCAL_FILE_IO_STREAM, GLocalFileIOStreamClass))
 
-typedef struct _xlocal_file_io_stream         xlocal_file_io_stream_t;
-typedef struct _xlocal_file_io_stream_class    xlocal_file_io_stream_class_t;
+typedef struct _GLocalFileIOStream         GLocalFileIOStream;
+typedef struct _GLocalFileIOStreamClass    GLocalFileIOStreamClass;
 typedef struct _GLocalFileIOStreamPrivate  GLocalFileIOStreamPrivate;
 
-struct _xlocal_file_io_stream
+struct _GLocalFileIOStream
 {
-  xfile_io_stream_t parent_instance;
+  GFileIOStream parent_instance;
 
-  xinput_stream_t *input_stream;
-  xoutput_stream_t *output_stream;
+  GInputStream *input_stream;
+  GOutputStream *output_stream;
 };
 
-struct _xlocal_file_io_stream_class
+struct _GLocalFileIOStreamClass
 {
   GFileIOStreamClass parent_class;
 };
 
-xtype_t           _xlocal_file_io_stream_get_type (void) G_GNUC_CONST;
-xfile_io_stream_t * _xlocal_file_io_stream_new (GLocalFileOutputStream *output_stream);
+GType           _g_local_file_io_stream_get_type (void) G_GNUC_CONST;
+GFileIOStream * _g_local_file_io_stream_new (GLocalFileOutputStream *output_stream);
 
 G_END_DECLS
 

@@ -54,7 +54,7 @@ typedef struct XdgGlobList XdgGlobList;
 
 struct XdgGlobHashNode
 {
-  xdxunichar_t character;
+  xdg_unichar_t character;
   const char *mime_type;
   int weight;
   int case_sensitive;
@@ -183,13 +183,13 @@ _xdg_glob_hash_node_dump (XdgGlobHashNode *glob_hash_node,
 
 static XdgGlobHashNode *
 _xdg_glob_hash_insert_ucs4 (XdgGlobHashNode *glob_hash_node,
-			    xdxunichar_t   *text,
+			    xdg_unichar_t   *text,
 			    const char      *mime_type,
 			    int              weight,
 			    int              case_sensitive)
 {
   XdgGlobHashNode *node;
-  xdxunichar_t character;
+  xdg_unichar_t character;
 
   character = text[0];
 
@@ -302,7 +302,7 @@ _xdg_glob_hash_insert_text (XdgGlobHashNode *glob_hash_node,
 			    int              case_sensitive)
 {
   XdgGlobHashNode *node;
-  xdxunichar_t *unitext;
+  xdg_unichar_t *unitext;
   int len;
 
   unitext = _xdg_convert_to_ucs4 (text, &len);
@@ -327,7 +327,7 @@ _xdg_glob_hash_node_lookup_file_name (XdgGlobHashNode *glob_hash_node,
 {
   int n;
   XdgGlobHashNode *node;
-  xdxunichar_t character;
+  xdg_unichar_t character;
 
   if (glob_hash_node == NULL)
     return 0;
@@ -340,7 +340,7 @@ _xdg_glob_hash_node_lookup_file_name (XdgGlobHashNode *glob_hash_node,
         {
           len--;
           n = 0;
-          if (len > 0)
+          if (len > 0) 
 	    {
 	      n = _xdg_glob_hash_node_lookup_file_name (node->child,
 							file_name,
@@ -357,7 +357,7 @@ _xdg_glob_hash_node_lookup_file_name (XdgGlobHashNode *glob_hash_node,
                 {
 	          mime_types[n].mime = node->mime_type;
 		  mime_types[n].weight = node->weight;
-		  n++;
+		  n++; 
                 }
 	      node = node->child;
 	      while (n < n_mime_types && node && node->character == 0)
@@ -566,7 +566,7 @@ _xdg_glob_determine_type (const char *glob)
 	  return XDG_GLOB_FULL;
 
       first_char = FALSE;
-      ptr = _xdxutf8_next_char (ptr);
+      ptr = _xdg_utf8_next_char (ptr);
     }
   if (maybe_in_simple_glob)
     return XDG_GLOB_SIMPLE;

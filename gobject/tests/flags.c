@@ -19,7 +19,7 @@
 #include <glib-object.h>
 
 /* Check that validation of flags works on architectures where
- * #xint_t and #xlong_t are different sizes, as the flags are cast
+ * #gint and #glong are different sizes, as the flags are cast
  * between types a few times.
  *
  * See: https://gitlab.gnome.org/GNOME/glib/issues/1572
@@ -29,8 +29,8 @@ enum {
   PROP_FLAGS = 1
 };
 
-typedef struct _xtest xtest_t;
-typedef struct _xtest_class xtest_class_t;
+typedef struct _GTest GTest;
+typedef struct _GTestClass GTestClass;
 
 typedef enum {
   NO_FLAG      = 0,
@@ -38,83 +38,83 @@ typedef enum {
   HIGHEST_FLAG = 1 << 31
 } MyFlagsEnum;
 
-struct _xtest {
-  xobject_t object;
+struct _GTest {
+  GObject object;
   MyFlagsEnum flags;
 };
 
-struct _xtest_class {
-  xobject_class_t parent_class;
+struct _GTestClass {
+  GObjectClass parent_class;
 };
 
-static xtype_t xtest_get_type (void);
-static xtype_t xtest_flags_get_type (void);
+static GType my_test_get_type (void);
+static GType my_test_flags_get_type (void);
 
-#define XTYPE_TEST (xtest_get_type())
-#define XTEST(test) (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, xtest_t))
-XDEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
+#define G_TYPE_TEST (my_test_get_type())
+#define MY_TEST(test) (G_TYPE_CHECK_INSTANCE_CAST ((test), G_TYPE_TEST, GTest))
+G_DEFINE_TYPE (GTest, my_test, G_TYPE_OBJECT)
 
-static void xtest_class_init (xtest_class_t * klass);
-static void xtest_init (xtest_t * test);
-static void xtest_get_property (xobject_t    *object,
-				  xuint_t       prop_id,
-				  xvalue_t     *value,
-				  xparam_spec_t *pspec);
-static void xtest_set_property (xobject_t      *object,
-				  xuint_t         prop_id,
-				  const xvalue_t *value,
-				  xparam_spec_t   *pspec);
+static void my_test_class_init (GTestClass * klass);
+static void my_test_init (GTest * test);
+static void my_test_get_property (GObject    *object,
+				  guint       prop_id,
+				  GValue     *value,
+				  GParamSpec *pspec);
+static void my_test_set_property (GObject      *object,
+				  guint         prop_id,
+				  const GValue *value,
+				  GParamSpec   *pspec);
 
-static xtype_t
-xtest_flags_get_type (void)
+static GType
+my_test_flags_get_type (void)
 {
-  static xtype_t flags_type = 0;
+  static GType flags_type = 0;
 
   if (G_UNLIKELY(flags_type == 0))
     {
-      static const xflags_value_t values[] = {
+      static const GFlagsValue values[] = {
 	{ LOWEST_FLAG,  "LOWEST_FLAG",  "lowest" },
 	{ HIGHEST_FLAG, "HIGHEST_FLAG", "highest" },
 	{ 0, NULL, NULL }
       };
 
-      flags_type = xflags_register_static (g_intern_static_string ("GTestFlags"), values);
+      flags_type = g_flags_register_static (g_intern_static_string ("GTestFlags"), values);
     }
   return flags_type;
 }
 
 static void
-xtest_class_init (xtest_class_t *klass)
+my_test_class_init (GTestClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->get_property = xtest_get_property;
-  xobject_class->set_property = xtest_set_property;
+  gobject_class->get_property = my_test_get_property;
+  gobject_class->set_property = my_test_set_property;
 
-  xobject_class_install_property (xobject_class, 1,
-				   xparam_spec_flags ("flags",
+  g_object_class_install_property (gobject_class, 1,
+				   g_param_spec_flags ("flags",
 						       "Flags",
 						       "Flags test property",
-						       xtest_flags_get_type(), 0,
-						       XPARAM_READWRITE | XPARAM_CONSTRUCT));
+						       my_test_flags_get_type(), 0,
+						       G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 }
 
-static void xtest_init (xtest_t *test)
+static void my_test_init (GTest *test)
 {
 }
 
 static void
-xtest_get_property (xobject_t    *object,
-		      xuint_t       prop_id,
-		      xvalue_t     *value,
-		      xparam_spec_t *pspec)
+my_test_get_property (GObject    *object,
+		      guint       prop_id,
+		      GValue     *value,
+		      GParamSpec *pspec)
 {
-  xtest_t *test = XTEST (object);
+  GTest *test = MY_TEST (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      xvalue_set_flags (value, test->flags);
+      g_value_set_flags (value, test->flags);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -123,17 +123,17 @@ xtest_get_property (xobject_t    *object,
 }
 
 static void
-xtest_set_property (xobject_t      *object,
-		      xuint_t         prop_id,
-		      const xvalue_t *value,
-		      xparam_spec_t   *pspec)
+my_test_set_property (GObject      *object,
+		      guint         prop_id,
+		      const GValue *value,
+		      GParamSpec   *pspec)
 {
-  xtest_t *test = XTEST (object);
+  GTest *test = MY_TEST (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      test->flags = xvalue_get_flags (value);
+      test->flags = g_value_get_flags (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -144,29 +144,29 @@ xtest_set_property (xobject_t      *object,
 static void
 check_flags_validation (void)
 {
-  xuint_t test_flags[] = {
+  guint test_flags[] = {
     NO_FLAG,
     LOWEST_FLAG,
     HIGHEST_FLAG,
     LOWEST_FLAG | HIGHEST_FLAG
   };
-  xuint_t flag_read;
-  xsize_t i;
+  guint flag_read;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (test_flags); i++)
     {
-      xuint_t flag_set = test_flags[i];
-      xobject_t *test = xobject_new (XTYPE_TEST,
+      guint flag_set = test_flags[i];
+      GObject *test = g_object_new (G_TYPE_TEST,
 				    "flags", flag_set,
 				    NULL);
 
-      xobject_get (test, "flags", &flag_read, NULL);
+      g_object_get (test, "flags", &flag_read, NULL);
 
-      /* This check will fail in case of xint_t -> xlong_t conversion
+      /* This check will fail in case of gint -> glong conversion
        * in value_flags_enum_collect_value() */
       g_assert_cmpint (flag_read, ==, flag_set);
 
-      xobject_unref (test);
+      g_object_unref (test);
     }
 }
 

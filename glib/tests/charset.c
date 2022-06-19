@@ -13,7 +13,7 @@
 
 #define TEST_LOCALE "fr_FR.UTF-8@latin:en_US.UTF-8"
 
-const xchar_t *TEST_RESULT[] = {
+const gchar *TEST_RESULT[] = {
   "fr_FR.UTF-8@latin",
   "fr_FR@latin",
   "fr.UTF-8@latin",
@@ -30,7 +30,7 @@ const xchar_t *TEST_RESULT[] = {
   NULL
 };
 
-const xchar_t *TEST_TABLE[] = {
+const gchar *TEST_TABLE[] = {
   "LANGUAGE",
   "LC_ALL",
   "LC_CTYPE",
@@ -41,15 +41,15 @@ const xchar_t *TEST_TABLE[] = {
 static void
 test_language_names_with_category (void)
 {
-  const xchar_t * const *language_names = NULL;
-  xsize_t i, j;
+  const gchar * const *language_names = NULL;
+  gsize i, j;
 
   for (i = 0; TEST_TABLE[i]; ++i)
     {
-      g_test_message ("test_t %" G_GSIZE_FORMAT, i);
+      g_test_message ("Test %" G_GSIZE_FORMAT, i);
       g_assert_true (g_setenv (TEST_TABLE[i], TEST_LOCALE, TRUE));
       language_names = g_get_language_names_with_category ("LC_CTYPE");
-      g_assert_cmpuint (xstrv_length ((xchar_t **)language_names), ==, xstrv_length ((xchar_t **)TEST_RESULT));
+      g_assert_cmpuint (g_strv_length ((gchar **)language_names), ==, g_strv_length ((gchar **)TEST_RESULT));
 
       for (j = 0; language_names[j]; ++j)
         {
@@ -62,7 +62,7 @@ test_language_names_with_category (void)
 static void
 test_language_names_with_category_async (void)
 {
-  xthread_join (xthread_new (
+  g_thread_join (g_thread_new (
       NULL, (GThreadFunc)g_get_language_names_with_category, "LC_CTYPE"));
 
   /* g_get_language_names_with_category returns a pointer to a memory

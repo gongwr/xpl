@@ -33,9 +33,9 @@
 #include "gio/gunixsocketaddress.h"
 #endif
 
-static const xchar_t *info = NULL;
-static xcancellable_t *cancellable = NULL;
-static xint_t return_value = 0;
+static const gchar *info = NULL;
+static GCancellable *cancellable = NULL;
+static gint return_value = 0;
 
 static G_NORETURN void
 usage (void)
@@ -45,29 +45,29 @@ usage (void)
   fprintf (stderr, "       Use -s to do synchronous lookups.\n");
   fprintf (stderr, "       Use -c to cancel operation.\n");
   fprintf (stderr, "       Use -e to use enumerator.\n");
-  fprintf (stderr, "       Use -inet to use xinet_socket_address_t enumerator (ip:port).\n");
+  fprintf (stderr, "       Use -inet to use GInetSocketAddress enumerator (ip:port).\n");
 #ifdef G_OS_UNIX
   fprintf (stderr, "       Use -unix to use GUnixSocketAddress enumerator (path).\n");
 #endif
-  fprintf (stderr, "       Use -proxyaddr tp use xproxy_address_t enumerator "
+  fprintf (stderr, "       Use -proxyaddr tp use GProxyAddress enumerator "
                    "(ip:port:protocol:dest_host:dest_port[:username[:password]]).\n");
-  fprintf (stderr, "       Use -netaddr to use xnetwork_address_t enumerator (host:port).\n");
-  fprintf (stderr, "       Use -neturi to use xnetwork_address_t enumerator (uri).\n");
-  fprintf (stderr, "       Use -netsrv to use xnetwork_service_t enumerator (srv/protocol/domain).\n");
-  fprintf (stderr, "       Use -connect to create a connection using xsocket_client_t object (uri).\n");
+  fprintf (stderr, "       Use -netaddr to use GNetworkAddress enumerator (host:port).\n");
+  fprintf (stderr, "       Use -neturi to use GNetworkAddress enumerator (uri).\n");
+  fprintf (stderr, "       Use -netsrv to use GNetworkService enumerator (srv/protocol/domain).\n");
+  fprintf (stderr, "       Use -connect to create a connection using GSocketClient object (uri).\n");
   exit (1);
 }
 
 static void
-print_and_free_error (xerror_t *error)
+print_and_free_error (GError *error)
 {
   fprintf (stderr, "Failed to obtain proxies: %s\n", error->message);
-  xerror_free (error);
+  g_error_free (error);
   return_value = 1;
 }
 
 static void
-print_proxies (const xchar_t *info, xchar_t **proxies)
+print_proxies (const gchar *info, gchar **proxies)
 {
   printf ("Proxies for URI '%s' are:\n", info);
 
@@ -79,15 +79,15 @@ print_proxies (const xchar_t *info, xchar_t **proxies)
 }
 
 static void
-_proxy_lookup_cb (xobject_t *source_object,
-		  xasync_result_t *result,
-		  xpointer_t user_data)
+_proxy_lookup_cb (GObject *source_object,
+		  GAsyncResult *result,
+		  gpointer user_data)
 {
-  xerror_t *error = NULL;
-  xchar_t **proxies;
-  xmain_loop_t *loop = user_data;
+  GError *error = NULL;
+  gchar **proxies;
+  GMainLoop *loop = user_data;
 
-  proxies = xproxy_resolver_lookup_finish (G_PROXY_RESOLVER (source_object),
+  proxies = g_proxy_resolver_lookup_finish (G_PROXY_RESOLVER (source_object),
 					    result,
 					    &error);
   if (error)
@@ -97,52 +97,52 @@ _proxy_lookup_cb (xobject_t *source_object,
   else
     {
       print_proxies (info, proxies);
-      xstrfreev (proxies);
+      g_strfreev (proxies);
     }
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 }
 
 static void
-use_resolver (xboolean_t synchronous)
+use_resolver (gboolean synchronous)
 {
-  xproxy_resolver_t *resolver;
+  GProxyResolver *resolver;
 
-  resolver = xproxy_resolver_get_default ();
+  resolver = g_proxy_resolver_get_default ();
 
   if (synchronous)
     {
-      xerror_t *error = NULL;
-      xchar_t **proxies;
+      GError *error = NULL;
+      gchar **proxies;
 
-      proxies = xproxy_resolver_lookup (resolver, info, cancellable, &error);
+      proxies = g_proxy_resolver_lookup (resolver, info, cancellable, &error);
 
       if (error)
 	  print_and_free_error (error);
       else
 	  print_proxies (info, proxies);
 
-      xstrfreev (proxies);
+      g_strfreev (proxies);
     }
   else
     {
-      xmain_loop_t *loop = xmain_loop_new (NULL, FALSE);
+      GMainLoop *loop = g_main_loop_new (NULL, FALSE);
 
-      xproxy_resolver_lookup_async (resolver,
+      g_proxy_resolver_lookup_async (resolver,
 				     info,
 				     cancellable,
 				     _proxy_lookup_cb,
 				     loop);
 
-      xmain_loop_run (loop);
-      xmain_loop_unref (loop);
+      g_main_loop_run (loop);
+      g_main_loop_unref (loop);
     }
 }
 
 static void
-print_proxy_address (xsocket_address_t *sockaddr)
+print_proxy_address (GSocketAddress *sockaddr)
 {
-  xproxy_address_t *proxy = NULL;
+  GProxyAddress *proxy = NULL;
 
   if (sockaddr == NULL)
     {
@@ -150,28 +150,28 @@ print_proxy_address (xsocket_address_t *sockaddr)
       return;
     }
 
-  if (X_IS_PROXY_ADDRESS (sockaddr))
+  if (G_IS_PROXY_ADDRESS (sockaddr))
     {
       proxy = G_PROXY_ADDRESS (sockaddr);
-      printf ("\t%s://", xproxy_address_get_protocol(proxy));
+      printf ("\t%s://", g_proxy_address_get_protocol(proxy));
     }
   else
     {
       printf ("\tdirect://");
     }
 
-  if (X_IS_INET_SOCKET_ADDRESS (sockaddr))
+  if (G_IS_INET_SOCKET_ADDRESS (sockaddr))
     {
-      xinet_address_t *inetaddr;
-      xuint_t port;
-      xchar_t *addr;
+      GInetAddress *inetaddr;
+      guint port;
+      gchar *addr;
 
-      xobject_get (sockaddr,
+      g_object_get (sockaddr,
 		    "address", &inetaddr,
 		    "port", &port,
 		    NULL);
 
-      addr = xinet_address_to_string (inetaddr);
+      addr = g_inet_address_to_string (inetaddr);
 
       printf ("%s:%u", addr, port);
 
@@ -180,64 +180,64 @@ print_proxy_address (xsocket_address_t *sockaddr)
 
   if (proxy)
     {
-      if (xproxy_address_get_username(proxy))
+      if (g_proxy_address_get_username(proxy))
         printf (" (Username: %s  Password: %s)",
-                xproxy_address_get_username(proxy),
-                xproxy_address_get_password(proxy));
+                g_proxy_address_get_username(proxy),
+                g_proxy_address_get_password(proxy));
       printf (" (Hostname: %s, Port: %i)",
-              xproxy_address_get_destination_hostname (proxy),
-              xproxy_address_get_destination_port (proxy));
+              g_proxy_address_get_destination_hostname (proxy),
+              g_proxy_address_get_destination_port (proxy));
     }
 
   printf ("\n");
 }
 
 static void
-_proxy_enumerate_cb (xobject_t *object,
-		     xasync_result_t *result,
-		     xpointer_t user_data)
+_proxy_enumerate_cb (GObject *object,
+		     GAsyncResult *result,
+		     gpointer user_data)
 {
-  xerror_t *error = NULL;
-  xmain_loop_t *loop = user_data;
-  xsocket_address_enumerator_t *enumerator = XSOCKET_ADDRESS_ENUMERATOR (object);
-  xsocket_address_t *sockaddr;
+  GError *error = NULL;
+  GMainLoop *loop = user_data;
+  GSocketAddressEnumerator *enumerator = G_SOCKET_ADDRESS_ENUMERATOR (object);
+  GSocketAddress *sockaddr;
 
-  sockaddr = xsocket_address_enumerator_next_finish (enumerator,
+  sockaddr = g_socket_address_enumerator_next_finish (enumerator,
 						      result,
 						      &error);
   if (sockaddr)
     {
       print_proxy_address (sockaddr);
-      xsocket_address_enumerator_next_async (enumerator,
+      g_socket_address_enumerator_next_async (enumerator,
                                               cancellable,
 					      _proxy_enumerate_cb,
 					      loop);
-      xobject_unref (sockaddr);
+      g_object_unref (sockaddr);
     }
   else
     {
       if (error)
 	print_and_free_error (error);
 
-      xmain_loop_quit (loop);
+      g_main_loop_quit (loop);
     }
 }
 
 static void
-run_with_enumerator (xboolean_t synchronous, xsocket_address_enumerator_t *enumerator)
+run_with_enumerator (gboolean synchronous, GSocketAddressEnumerator *enumerator)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   if (synchronous)
     {
-      xsocket_address_t *sockaddr;
+      GSocketAddress *sockaddr;
 
-      while ((sockaddr = xsocket_address_enumerator_next (enumerator,
+      while ((sockaddr = g_socket_address_enumerator_next (enumerator,
 							   cancellable,
 							   &error)))
 	{
 	  print_proxy_address (sockaddr);
-	  xobject_unref (sockaddr);
+	  g_object_unref (sockaddr);
 	}
 
       if (error)
@@ -245,80 +245,80 @@ run_with_enumerator (xboolean_t synchronous, xsocket_address_enumerator_t *enume
     }
   else
     {
-      xmain_loop_t *loop = xmain_loop_new (NULL, FALSE);
+      GMainLoop *loop = g_main_loop_new (NULL, FALSE);
 
-      xsocket_address_enumerator_next_async (enumerator,
+      g_socket_address_enumerator_next_async (enumerator,
                                               cancellable,
 					      _proxy_enumerate_cb,
 					      loop);
-      xmain_loop_run (loop);
-      xmain_loop_unref (loop);
+      g_main_loop_run (loop);
+      g_main_loop_unref (loop);
     }
 }
 
 static void
-use_enumerator (xboolean_t synchronous)
+use_enumerator (gboolean synchronous)
 {
-  xsocket_address_enumerator_t *enumerator;
+  GSocketAddressEnumerator *enumerator;
 
-  enumerator = xobject_new (XTYPE_PROXY_ADDRESS_ENUMERATOR,
+  enumerator = g_object_new (G_TYPE_PROXY_ADDRESS_ENUMERATOR,
 			     "uri", info,
 			     NULL);
 
   printf ("Proxies for URI '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-use_inet_address (xboolean_t synchronous)
+use_inet_address (gboolean synchronous)
 {
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_address_t *sockaddr;
-  xinet_address_t *addr = NULL;
-  xuint_t port = 0;
-  xchar_t **ip_and_port;
+  GSocketAddressEnumerator *enumerator;
+  GSocketAddress *sockaddr;
+  GInetAddress *addr = NULL;
+  guint port = 0;
+  gchar **ip_and_port;
 
-  ip_and_port = xstrsplit (info, ":", 2);
+  ip_and_port = g_strsplit (info, ":", 2);
 
   if (ip_and_port[0])
     {
-      addr = xinet_address_new_from_string (ip_and_port[0]);
+      addr = g_inet_address_new_from_string (ip_and_port[0]);
       if (ip_and_port [1])
 	port = strtoul (ip_and_port [1], NULL, 10);
     }
 
-  xstrfreev (ip_and_port);
+  g_strfreev (ip_and_port);
 
   if (addr == NULL || port <= 0 || port >= 65535)
     {
       fprintf (stderr, "Bad 'ip:port' parameter '%s'\n", info);
       if (addr)
-	xobject_unref (addr);
+	g_object_unref (addr);
       return_value = 1;
       return;
     }
 
   sockaddr = g_inet_socket_address_new (addr, port);
-  xobject_unref (addr);
+  g_object_unref (addr);
 
   enumerator =
-    xsocket_connectable_proxy_enumerate (XSOCKET_CONNECTABLE (sockaddr));
-  xobject_unref (sockaddr);
+    g_socket_connectable_proxy_enumerate (G_SOCKET_CONNECTABLE (sockaddr));
+  g_object_unref (sockaddr);
 
   printf ("Proxies for ip and port '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 #ifdef G_OS_UNIX
 static void
-use_unix_address (xboolean_t synchronous)
+use_unix_address (gboolean synchronous)
 {
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_address_t *sockaddr;
+  GSocketAddressEnumerator *enumerator;
+  GSocketAddress *sockaddr;
 
   sockaddr = g_unix_socket_address_new_with_type (info, -1, G_UNIX_SOCKET_ADDRESS_ABSTRACT);
 
@@ -330,31 +330,31 @@ use_unix_address (xboolean_t synchronous)
     }
 
   enumerator =
-    xsocket_connectable_proxy_enumerate (XSOCKET_CONNECTABLE (sockaddr));
-  xobject_unref (sockaddr);
+    g_socket_connectable_proxy_enumerate (G_SOCKET_CONNECTABLE (sockaddr));
+  g_object_unref (sockaddr);
 
   printf ("Proxies for path '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 #endif
 
 static void
-use_proxy_address (xboolean_t synchronous)
+use_proxy_address (gboolean synchronous)
 {
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_address_t *sockaddr;
-  xinet_address_t *addr;
-  xuint_t port = 0;
-  xchar_t *protocol;
-  xchar_t *dest_host;
-  xuint_t dest_port;
-  xchar_t *username = NULL;
-  xchar_t *password = NULL;
-  xchar_t **split_info;
+  GSocketAddressEnumerator *enumerator;
+  GSocketAddress *sockaddr;
+  GInetAddress *addr;
+  guint port = 0;
+  gchar *protocol;
+  gchar *dest_host;
+  guint dest_port;
+  gchar *username = NULL;
+  gchar *password = NULL;
+  gchar **split_info;
 
-  split_info = xstrsplit (info, ":", 7);
+  split_info = g_strsplit (info, ":", 7);
 
   if (!split_info[0]
       || !split_info[1]
@@ -367,47 +367,47 @@ use_proxy_address (xboolean_t synchronous)
       return;
     }
 
-  addr = xinet_address_new_from_string (split_info[0]);
+  addr = g_inet_address_new_from_string (split_info[0]);
   port = strtoul (split_info [1], NULL, 10);
-  protocol = xstrdup (split_info[2]);
-  dest_host = xstrdup (split_info[3]);
+  protocol = g_strdup (split_info[2]);
+  dest_host = g_strdup (split_info[3]);
   dest_port = strtoul (split_info[4], NULL, 10);
-
+ 
   if (split_info[5])
     {
-      username = xstrdup (split_info[5]);
+      username = g_strdup (split_info[5]);
       if (split_info[6])
-        password = xstrdup (split_info[6]);
+        password = g_strdup (split_info[6]);
     }
 
-  xstrfreev (split_info);
+  g_strfreev (split_info);
 
-  sockaddr = xproxy_address_new (addr, port,
+  sockaddr = g_proxy_address_new (addr, port,
                                   protocol, dest_host, dest_port,
                                   username, password);
-
-  xobject_unref (addr);
+  
+  g_object_unref (addr);
   g_free (protocol);
   g_free (dest_host);
   g_free (username);
   g_free (password);
 
   enumerator =
-    xsocket_connectable_proxy_enumerate (XSOCKET_CONNECTABLE (sockaddr));
-  xobject_unref (sockaddr);
+    g_socket_connectable_proxy_enumerate (G_SOCKET_CONNECTABLE (sockaddr));
+  g_object_unref (sockaddr);
 
   printf ("Proxies for ip and port '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-use_network_address (xboolean_t synchronous)
+use_network_address (gboolean synchronous)
 {
-  xerror_t *error = NULL;
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_connectable_t *connectable;
+  GError *error = NULL;
+  GSocketAddressEnumerator *enumerator;
+  GSocketConnectable *connectable;
 
   connectable = g_network_address_parse (info, -1, &error);
 
@@ -417,21 +417,21 @@ use_network_address (xboolean_t synchronous)
       return;
     }
 
-  enumerator = xsocket_connectable_proxy_enumerate (connectable);
-  xobject_unref (connectable);
+  enumerator = g_socket_connectable_proxy_enumerate (connectable);
+  g_object_unref (connectable);
 
   printf ("Proxies for hostname and port '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-use_network_uri (xboolean_t synchronous)
+use_network_uri (gboolean synchronous)
 {
-  xerror_t *error = NULL;
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_connectable_t *connectable;
+  GError *error = NULL;
+  GSocketAddressEnumerator *enumerator;
+  GSocketConnectable *connectable;
 
   connectable = g_network_address_parse_uri (info, 0, &error);
 
@@ -441,28 +441,28 @@ use_network_uri (xboolean_t synchronous)
       return;
     }
 
-  enumerator = xsocket_connectable_proxy_enumerate (connectable);
-  xobject_unref (connectable);
+  enumerator = g_socket_connectable_proxy_enumerate (connectable);
+  g_object_unref (connectable);
 
   printf ("Proxies for URI '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-use_network_service (xboolean_t synchronous)
+use_network_service (gboolean synchronous)
 {
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_connectable_t *connectable = NULL;
-  xchar_t **split;
+  GSocketAddressEnumerator *enumerator;
+  GSocketConnectable *connectable = NULL;
+  gchar **split;
 
-  split = xstrsplit (info, "/", 3);
+  split = g_strsplit (info, "/", 3);
 
   if (split[0] && split[1] && split[2])
     connectable = g_network_service_new (split[0], split[1], split[2]);
 
-  xstrfreev (split);
+  g_strfreev (split);
 
   if (connectable == NULL)
     {
@@ -471,32 +471,32 @@ use_network_service (xboolean_t synchronous)
        return;
     }
 
-  enumerator = xsocket_connectable_proxy_enumerate (connectable);
-  xobject_unref (connectable);
+  enumerator = g_socket_connectable_proxy_enumerate (connectable);
+  g_object_unref (connectable);
 
   printf ("Proxies for hostname and port '%s' are:\n", info);
   run_with_enumerator (synchronous, enumerator);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-_socket_connect_cb (xobject_t *object,
-		    xasync_result_t *result,
-		    xpointer_t user_data)
+_socket_connect_cb (GObject *object,
+		    GAsyncResult *result,
+		    gpointer user_data)
 {
-  xerror_t *error = NULL;
-  xmain_loop_t *loop = user_data;
-  xsocket_client_t *client = XSOCKET_CLIENT (object);
-  xsocket_connection_t *connection;
+  GError *error = NULL;
+  GMainLoop *loop = user_data;
+  GSocketClient *client = G_SOCKET_CLIENT (object);
+  GSocketConnection *connection;
 
-  connection = xsocket_client_connect_to_uri_finish (client,
+  connection = g_socket_client_connect_to_uri_finish (client,
 						      result,
 						      &error);
   if (connection)
     {
-      xsocket_address_t *proxy_addr;
-      proxy_addr = xsocket_connection_get_remote_address (connection, NULL);
+      GSocketAddress *proxy_addr;
+      proxy_addr = g_socket_connection_get_remote_address (connection, NULL);
       print_proxy_address (proxy_addr);
     }
   else
@@ -504,25 +504,25 @@ _socket_connect_cb (xobject_t *object,
       print_and_free_error (error);
     }
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 }
 
 static void
-use_socket_client (xboolean_t synchronous)
+use_socket_client (gboolean synchronous)
 {
-  xerror_t *error = NULL;
-  xsocket_client_t *client;
+  GError *error = NULL;
+  GSocketClient *client;
 
-  client = xsocket_client_new ();
+  client = g_socket_client_new ();
 
   printf ("Proxies for URI '%s' are:\n", info);
 
   if (synchronous)
     {
-      xsocket_connection_t *connection;
-      xsocket_address_t *proxy_addr;
+      GSocketConnection *connection;
+      GSocketAddress *proxy_addr;
 
-      connection = xsocket_client_connect_to_uri (client,
+      connection = g_socket_client_connect_to_uri (client,
 						   info,
 						   0,
       						   cancellable,
@@ -530,7 +530,7 @@ use_socket_client (xboolean_t synchronous)
 
       if (connection)
 	{
-	  proxy_addr = xsocket_connection_get_remote_address (connection, NULL);
+	  proxy_addr = g_socket_connection_get_remote_address (connection, NULL);
 	  print_proxy_address (proxy_addr);
 	}
       else
@@ -540,20 +540,20 @@ use_socket_client (xboolean_t synchronous)
     }
   else
     {
-      xmain_loop_t *loop = xmain_loop_new (NULL, FALSE);
+      GMainLoop *loop = g_main_loop_new (NULL, FALSE);
 
-      xsocket_client_connect_to_uri_async (client,
+      g_socket_client_connect_to_uri_async (client,
 					    info,
 					    0,
 					    cancellable,
 					    _socket_connect_cb,
 					    loop);
 
-      xmain_loop_run (loop);
-      xmain_loop_unref (loop);
+      g_main_loop_run (loop);
+      g_main_loop_unref (loop);
     }
 
-  xobject_unref (client);
+  g_object_unref (client);
 }
 
 typedef enum
@@ -571,11 +571,11 @@ typedef enum
   USE_SOCKET_CLIENT,
 } ProxyTestType;
 
-xint_t
-main (xint_t argc, xchar_t **argv)
+gint
+main (gint argc, gchar **argv)
 {
-  xboolean_t synchronous = FALSE;
-  xboolean_t cancel = FALSE;
+  gboolean synchronous = FALSE;
+  gboolean cancel = FALSE;
   ProxyTestType type = USE_RESOLVER;
 
   while (argc >= 2 && argv[1][0] == '-')
@@ -617,8 +617,8 @@ main (xint_t argc, xchar_t **argv)
 
   if (cancel)
     {
-      cancellable = xcancellable_new ();
-      xcancellable_cancel (cancellable);
+      cancellable = g_cancellable_new ();
+      g_cancellable_cancel (cancellable);
     }
 
   switch (type)

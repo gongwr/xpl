@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 
 G_BEGIN_DECLS
 
-xsize_t  _g_unix_content_type_get_sniff_len (void);
+gsize  _g_unix_content_type_get_sniff_len (void);
 char * _g_unix_content_type_unalias       (const char *type);
 char **_g_unix_content_type_get_parents   (const char *type);
 

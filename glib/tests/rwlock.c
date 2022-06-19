@@ -21,8 +21,8 @@
  */
 
 /* We are testing some deprecated APIs here */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
@@ -55,12 +55,12 @@ static void
 test_rwlock3 (void)
 {
   static GRWLock lock;
-  xboolean_t ret;
+  gboolean ret;
 
   ret = g_rw_lock_writer_trylock (&lock);
-  xassert (ret);
+  g_assert (ret);
   ret = g_rw_lock_writer_trylock (&lock);
-  xassert (!ret);
+  g_assert (!ret);
 
   g_rw_lock_writer_unlock (&lock);
 }
@@ -80,12 +80,12 @@ static void
 test_rwlock5 (void)
 {
   static GRWLock lock;
-  xboolean_t ret;
+  gboolean ret;
 
   ret = g_rw_lock_reader_trylock (&lock);
-  xassert (ret);
+  g_assert (ret);
   ret = g_rw_lock_reader_trylock (&lock);
-  xassert (ret);
+  g_assert (ret);
 
   g_rw_lock_reader_unlock (&lock);
   g_rw_lock_reader_unlock (&lock);
@@ -95,16 +95,16 @@ static void
 test_rwlock6 (void)
 {
   static GRWLock lock;
-  xboolean_t ret;
+  gboolean ret;
 
   g_rw_lock_writer_lock (&lock);
   ret = g_rw_lock_reader_trylock (&lock);
-  xassert (!ret);
+  g_assert (!ret);
   g_rw_lock_writer_unlock (&lock);
 
   g_rw_lock_reader_lock (&lock);
   ret = g_rw_lock_writer_trylock (&lock);
-  xassert (!ret);
+  g_assert (!ret);
   g_rw_lock_reader_unlock (&lock);
 }
 
@@ -114,15 +114,15 @@ test_rwlock6 (void)
 #define THREADS    100
 
 
-xthread_t *owners[LOCKS];
+GThread *owners[LOCKS];
 GRWLock  locks[LOCKS];
 
 static void
-acquire (xint_t nr)
+acquire (gint nr)
 {
-  xthread_t *self;
+  GThread *self;
 
-  self = xthread_self ();
+  self = g_thread_self ();
 
   if (!g_rw_lock_writer_trylock (&locks[nr]))
     {
@@ -132,25 +132,25 @@ acquire (xint_t nr)
       g_rw_lock_writer_lock (&locks[nr]);
     }
 
-  xassert (owners[nr] == NULL);   /* hopefully nobody else is here */
+  g_assert (owners[nr] == NULL);   /* hopefully nobody else is here */
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
-  xthread_yield ();
-  xthread_yield ();
-  xthread_yield ();
+  g_thread_yield ();
+  g_thread_yield ();
+  g_thread_yield ();
 
-  xassert (owners[nr] == self);   /* hopefully this is still us... */
+  g_assert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
 
   g_rw_lock_writer_unlock (&locks[nr]);
 }
 
-static xpointer_t
-thread_func (xpointer_t data)
+static gpointer
+thread_func (gpointer data)
 {
-  xint_t i;
-  xrand_t *rand;
+  gint i;
+  GRand *rand;
 
   rand = g_rand_new ();
 
@@ -165,36 +165,36 @@ thread_func (xpointer_t data)
 static void
 test_rwlock7 (void)
 {
-  xint_t i;
-  xthread_t *threads[THREADS];
+  gint i;
+  GThread *threads[THREADS];
 
   for (i = 0; i < LOCKS; i++)
     g_rw_lock_init (&locks[i]);
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = xthread_new ("test", thread_func, NULL);
+    threads[i] = g_thread_new ("test", thread_func, NULL);
 
   for (i = 0; i < THREADS; i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   for (i = 0; i < LOCKS; i++)
     g_rw_lock_clear (&locks[i]);
 
   for (i = 0; i < LOCKS; i++)
-    xassert (owners[i] == NULL);
+    g_assert (owners[i] == NULL);
 }
 
-static xint_t even;
+static gint even;
 static GRWLock even_lock;
-xthread_t *writers[2];
-xthread_t *readers[10];
+GThread *writers[2];
+GThread *readers[10];
 
 static void
-change_even (xpointer_t data)
+change_even (gpointer data)
 {
   g_rw_lock_writer_lock (&even_lock);
 
-  xassert (even % 2 == 0);
+  g_assert (even % 2 == 0);
 
   even += 1;
 
@@ -203,25 +203,25 @@ change_even (xpointer_t data)
   else
     even -= 1;
 
-  xassert (even % 2 == 0);
+  g_assert (even % 2 == 0);
 
   g_rw_lock_writer_unlock (&even_lock);
 }
 
 static void
-verify_even (xpointer_t data)
+verify_even (gpointer data)
 {
   g_rw_lock_reader_lock (&even_lock);
 
-  xassert (even % 2 == 0);
+  g_assert (even % 2 == 0);
 
   g_rw_lock_reader_unlock (&even_lock);
 }
 
-static xpointer_t
-writer_func (xpointer_t data)
+static gpointer
+writer_func (gpointer data)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < 100000; i++)
     change_even (data);
@@ -229,10 +229,10 @@ writer_func (xpointer_t data)
   return NULL;
 }
 
-static xpointer_t
-reader_func (xpointer_t data)
+static gpointer
+reader_func (gpointer data)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < 100000; i++)
     verify_even (data);
@@ -249,24 +249,24 @@ reader_func (xpointer_t data)
 static void
 test_rwlock8 (void)
 {
-  xint_t i;
+  gint i;
 
   even = 0;
   g_rw_lock_init (&even_lock);
 
   for (i = 0; i < 2; i++)
-    writers[i] = xthread_new ("a", writer_func, GINT_TO_POINTER (i));
+    writers[i] = g_thread_new ("a", writer_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < 10; i++)
-    readers[i] = xthread_new ("b", reader_func, NULL);
+    readers[i] = g_thread_new ("b", reader_func, NULL);
 
   for (i = 0; i < 2; i++)
-    xthread_join (writers[i]);
+    g_thread_join (writers[i]);
 
   for (i = 0; i < 10; i++)
-    xthread_join (readers[i]);
+    g_thread_join (readers[i]);
 
-  xassert (even % 2 == 0);
+  g_assert (even % 2 == 0);
 
   g_rw_lock_clear (&even_lock);
 }

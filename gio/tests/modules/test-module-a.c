@@ -1,4 +1,4 @@
-/* test_t module for xio_module_t tests
+/* Test module for GIOModule tests
  * Copyright (C) 2013 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -20,23 +20,23 @@
  * if advised of the possibility of such damage.
  */
 
-#include "config.h" /* for _XPL_EXTERN */
+#include "config.h" /* for _GLIB_EXTERN */
 
 #include <gio/gio.h>
 
 #include "symbol-visibility.h"
 
 typedef struct _TestA {
-  xobject_t parent;
-} test_a_t;
+  GObject parent;
+} TestA;
 
 typedef struct _TestAClass {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 } TestAClass;
 
-xtype_t test_a_get_type (void);
+GType test_a_get_type (void);
 
-XDEFINE_TYPE (test_a_t, test_a, XTYPE_OBJECT)
+G_DEFINE_TYPE (TestA, test_a, G_TYPE_OBJECT)
 
 static void
 test_a_class_init (TestAClass *class)
@@ -44,12 +44,12 @@ test_a_class_init (TestAClass *class)
 }
 
 static void
-test_a_init (test_a_t *self)
+test_a_init (TestA *self)
 {
 }
 
-XPL_TEST_EXPORT_SYMBOL void
-xio_module_load (xio_module_t *module)
+GLIB_TEST_EXPORT_SYMBOL void
+g_io_module_load (GIOModule *module)
 {
   g_io_extension_point_implement ("test-extension-point",
                                   test_a_get_type (),
@@ -57,7 +57,7 @@ xio_module_load (xio_module_t *module)
                                   30);
 }
 
-XPL_TEST_EXPORT_SYMBOL void
-xio_module_unload (xio_module_t *module)
+GLIB_TEST_EXPORT_SYMBOL void
+g_io_module_unload (GIOModule *module)
 {
 }

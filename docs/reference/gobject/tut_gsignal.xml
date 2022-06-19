@@ -1,22 +1,22 @@
 <?xml version='1.0' encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
                "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 ]>
 <chapter id="chapter-signal">
-  <title>The xobject_t messaging system</title>
+  <title>The GObject messaging system</title>
 
   <sect1 id="closure">
     <title>Closures</title>
 
     <para>
       Closures are central to the concept of asynchronous signal delivery
-      which is widely used throughout GTK+ and GNOME applications. A closure is an
+      which is widely used throughout GTK+ and GNOME applications. A closure is an 
       abstraction, a generic representation of a callback. It is a small structure
       which contains three objects:
       <itemizedlist>
         <listitem><para>a function pointer (the callback itself) whose prototype looks like:
 <informalexample><programlisting>
-return_type function_callback (… , xpointer_t user_data);
+return_type function_callback (… , gpointer user_data);
 </programlisting></informalexample>
         </para></listitem>
         <listitem><para>
@@ -31,9 +31,9 @@ return_type function_callback (… , xpointer_t user_data);
     </para>
 
     <para>
-      The <link linkend="xclosure_t"><type>xclosure_t</type></link> structure represents the common functionality of all
+      The <link linkend="GClosure"><type>GClosure</type></link> structure represents the common functionality of all
       closure implementations: there exists a different closure implementation for
-      each separate runtime which wants to use the xobject_t type system.
+      each separate runtime which wants to use the GObject type system.
       <footnote><para>
         In practice, closures sit at the boundary of language runtimes: if you are
         writing Python code and one of your Python callbacks receives a signal from
@@ -42,27 +42,27 @@ return_type function_callback (… , xpointer_t user_data);
         it behaves as a normal C object for GTK+ and as a normal Python object for
         Python code.
       </para></footnote>
-      The xobject_t library provides a simple <link linkend="GCClosure"><type>GCClosure</type></link> type which
+      The GObject library provides a simple <link linkend="GCClosure"><type>GCClosure</type></link> type which
       is a specific implementation of closures to be used with C/C++ callbacks.
     </para>
     <para>
-      A <link linkend="xclosure_t"><type>xclosure_t</type></link> provides simple services:
+      A <link linkend="GClosure"><type>GClosure</type></link> provides simple services:
       <itemizedlist>
         <listitem><para>
-          Invocation (<function><link linkend="g-closure-invoke">xclosure_invoke</link></function>): this is what closures
+          Invocation (<function><link linkend="g-closure-invoke">g_closure_invoke</link></function>): this is what closures 
           were created for: they hide the details of callback invocation from the
           callback invoker.</para>
         </listitem>
         <listitem><para>
           Notification: the closure notifies listeners of certain events such as
           closure invocation, closure invalidation and closure finalization. Listeners
-          can be registered with <function><link linkend="g-closure-add-finalize-notifier">xclosure_add_finalize_notifier</link></function>
-          (finalization notification), <function><link linkend="g-closure-add-invalidate-notifier">xclosure_add_invalidate_notifier</link></function>
-          (invalidation notification) and
-          <function><link linkend="g-closure-add-marshal-guards">xclosure_add_marshal_guards</link></function> (invocation notification).
+          can be registered with <function><link linkend="g-closure-add-finalize-notifier">g_closure_add_finalize_notifier</link></function>
+          (finalization notification), <function><link linkend="g-closure-add-invalidate-notifier">g_closure_add_invalidate_notifier</link></function> 
+          (invalidation notification) and 
+          <function><link linkend="g-closure-add-marshal-guards">g_closure_add_marshal_guards</link></function> (invocation notification).
           There exist symmetric deregistration functions for finalization and invalidation
-          events (<function><link linkend="g-closure-remove-finalize-notifier">xclosure_remove_finalize_notifier</link></function> and
-          <function><link linkend="g-closure-remove-invalidate-notifier">xclosure_remove_invalidate_notifier</link></function>) but not for the invocation
+          events (<function><link linkend="g-closure-remove-finalize-notifier">g_closure_remove_finalize_notifier</link></function> and
+          <function><link linkend="g-closure-remove-invalidate-notifier">g_closure_remove_invalidate_notifier</link></function>) but not for the invocation 
           process.
           <footnote><para>
             Closures are reference counted and notify listeners of their destruction in a two-stage
@@ -78,7 +78,7 @@ return_type function_callback (… , xpointer_t user_data);
       <para>
         If you are using C or C++
         to connect a callback to a given event, you will either use simple <link linkend="GCClosure"><type>GCClosure</type></link>s
-        which have a pretty minimal API or the even simpler <function><link linkend="g-signal-connect">xsignal_connect</link></function>
+        which have a pretty minimal API or the even simpler <function><link linkend="g-signal-connect">g_signal_connect</link></function> 
         functions (which will be presented a bit later).
       </para>
 
@@ -90,12 +90,12 @@ return_type function_callback (… , xpointer_t user_data);
         the <parameter>destroy_data</parameter> function if the user has
         supplied one.
       </para>
-
+  
       <para>
         <function><link linkend="g-cclosure-new-swap">g_cclosure_new_swap</link></function> will create a new closure which can invoke the
         user-provided <parameter>callback_func</parameter> with the
         user-provided <parameter>user_data</parameter> as its first parameter
-        (instead of being the
+        (instead of being the 
         last parameter as with <function><link linkend="g-cclosure-new">g_cclosure_new</link></function>). When the closure
         is finalized (second stage of the destruction process), it will invoke
         the <parameter>destroy_data</parameter> function if the user has
@@ -112,12 +112,12 @@ return_type function_callback (… , xpointer_t user_data);
         the correct stack frame for the called function and executing a <emphasis>call</emphasis>
         assembly instruction.
       </para>
-
+  
       <para>
-        C closure marshallers transform the array of GValues which represent
+        C closure marshallers transform the array of GValues which represent 
         the parameters to the target function into a C-style function parameter list, invoke
         the user-supplied C function with this new parameter list, get the return value of the
-        function, transform it into a xvalue_t and return this xvalue_t to the marshaller caller.
+        function, transform it into a GValue and return this GValue to the marshaller caller.
       </para>
 
       <para>
@@ -130,27 +130,27 @@ return_type function_callback (… , xpointer_t user_data);
 
       <para>
         An example of a custom marshaller is given below, illustrating how
-        <type>xvalue_t</type>s can be converted to a C function call. The
+        <type>GValue</type>s can be converted to a C function call. The
         marshaller is for a C function which takes an integer as its first
         parameter and returns void.
 <informalexample><programlisting>
-g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
-                              xvalue_t       *return_value,
-                              xuint_t         n_param_values,
-                              const xvalue_t *param_values,
-                              xpointer_t      invocation_hint,
-                              xpointer_t      marshal_data)
+g_cclosure_marshal_VOID__INT (GClosure     *closure,
+                              GValue       *return_value,
+                              guint         n_param_values,
+                              const GValue *param_values,
+                              gpointer      invocation_hint,
+                              gpointer      marshal_data)
 {
-  typedef void (*GMarshalFunc_VOID__INT) (xpointer_t     data1,
-                                          xint_t         arg_1,
-                                          xpointer_t     data2);
+  typedef void (*GMarshalFunc_VOID__INT) (gpointer     data1,
+                                          gint         arg_1,
+                                          gpointer     data2);
   register GMarshalFunc_VOID__INT callback;
   register GCClosure *cc = (GCClosure*) closure;
-  register xpointer_t data1, data2;
+  register gpointer data1, data2;
 
   g_return_if_fail (n_param_values == 2);
 
-  data1 = xvalue_peek_pointer (param_values + 0);
+  data1 = g_value_peek_pointer (param_values + 0);
   data2 = closure->data;
 
   callback = (GMarshalFunc_VOID__INT) (marshal_data ? marshal_data : cc->callback);
@@ -161,12 +161,12 @@ g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
 }
 </programlisting></informalexample>
       </para>
-
+  
       <para>
         There exist other kinds of marshallers, for example there is a generic
         Python marshaller which is used by all Python closures (a Python closure
         is used to invoke a callback written in Python). This Python marshaller
-        transforms the input xvalue_t list representing the function parameters
+        transforms the input GValue list representing the function parameters
         into a Python tuple which is the equivalent structure in Python.
       </para>
 
@@ -177,7 +177,7 @@ g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
     <title>Signals</title>
 
     <para>
-      xobject_t's signals have nothing to do with standard UNIX signals: they connect
+      GObject's signals have nothing to do with standard UNIX signals: they connect 
       arbitrary application-specific events with any number of listeners.
       For example, in GTK+, every user event (keystroke or mouse move) is received
       from the windowing system and generates a GTK+ event in the form of a signal emission
@@ -187,7 +187,7 @@ g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
     <para>
       Each signal is registered in the type system together with the type on which
       it can be emitted: users of the type are said to <emphasis>connect</emphasis>
-      to the signal on a given type instance when they register a closure to be
+      to the signal on a given type instance when they register a closure to be  
       invoked upon the signal emission. The closure will be called synchronously on emission.
       Users can also emit the signal by themselves or stop the emission of the signal from
       within one of the closures connected to the signal.
@@ -198,7 +198,7 @@ g_cclosure_marshal_VOID__INT (xclosure_t     *closure,
       connected to this signal on this type instance will be invoked. All the closures
       connected to such a signal represent callbacks whose signature looks like:
 <informalexample><programlisting>
-return_type function_callback (xpointer_t instance, …, xpointer_t user_data);
+return_type function_callback (gpointer instance, …, gpointer user_data);
 </programlisting></informalexample>
     </para>
 
@@ -206,19 +206,19 @@ return_type function_callback (xpointer_t instance, …, xpointer_t user_data);
       <title>Signal registration</title>
 
 	  <para>
-		To register a new signal on an existing type, we can use any of <function><link linkend="g-signal-newv">xsignal_newv</link></function>,
-		<function><link linkend="g-signal-new-valist">xsignal_new_valist</link></function> or <function><link linkend="g-signal-new">xsignal_new</link></function> functions:
+		To register a new signal on an existing type, we can use any of <function><link linkend="g-signal-newv">g_signal_newv</link></function>,
+		<function><link linkend="g-signal-new-valist">g_signal_new_valist</link></function> or <function><link linkend="g-signal-new">g_signal_new</link></function> functions:
 <informalexample><programlisting>
-xuint_t xsignal_newv (const xchar_t        *signal_name,
-                     xtype_t               itype,
+guint g_signal_newv (const gchar        *signal_name,
+                     GType               itype,
                      GSignalFlags        signal_flags,
-                     xclosure_t           *class_closure,
+                     GClosure           *class_closure,
                      GSignalAccumulator  accumulator,
-                     xpointer_t            accu_data,
+                     gpointer            accu_data,
                      GSignalCMarshaller  c_marshaller,
-                     xtype_t               return_type,
-                     xuint_t               n_params,
-                     xtype_t              *param_types);
+                     GType               return_type,
+                     guint               n_params,
+                     GType              *param_types);
 </programlisting></informalexample>
 		The number of parameters to these functions is a bit intimidating but they are relatively
 		simple:
@@ -235,8 +235,8 @@ xuint_t xsignal_newv (const xchar_t        *signal_name,
 			</para></listitem>
 		  <listitem><para>
 			  <parameter>class_closure</parameter>: this is the default closure for the signal: if it is not NULL upon
-			  the signal emission, it will be invoked upon this emission of the signal. The
-			  moment where this closure is invoked compared to other closures connected to that
+			  the signal emission, it will be invoked upon this emission of the signal. The 
+			  moment where this closure is invoked compared to other closures connected to that 
 			  signal depends partly on the signal_flags.
 			</para></listitem>
 			<listitem><para>
@@ -290,23 +290,23 @@ xuint_t xsignal_newv (const xchar_t        *signal_name,
 		  of a given signal on <emphasis>any</emphasis> of the instances of the type which supports that signal.
 			</para></listitem>
 		  <listitem><para>
-		  You can use <function><link linkend="g-signal-override-class-closure">xsignal_override_class_closure</link></function> which
+		  You can use <function><link linkend="g-signal-override-class-closure">g_signal_override_class_closure</link></function> which
 		  overrides the class closure of a given type. It is possible to call this function
 		  only on a derived type of the type on which the signal was registered.
 		  This function is of use only to language bindings.
 			</para></listitem>
 		  <listitem><para>
-		  You can register a closure with the <function><link linkend="g-signal-connect">xsignal_connect</link></function>
+		  You can register a closure with the <function><link linkend="g-signal-connect">g_signal_connect</link></function>
 		  family of functions. This is an instance-specific operation: the closure
 		  will be invoked only during emission of a given signal on a given instance.
 			</para></listitem>
 		</itemizedlist>
-		It is also possible to connect a different kind of callback on a given signal:
-		emission hooks are invoked whenever a given signal is emitted whatever the instance on
+		It is also possible to connect a different kind of callback on a given signal: 
+		emission hooks are invoked whenever a given signal is emitted whatever the instance on 
 		which it is emitted. Emission hooks are used for example to get all mouse_clicked
 		emissions in an application to be able to emit the small mouse click sound.
-		Emission hooks are connected with <function><link linkend="g-signal-add-emission-hook">xsignal_add_emission_hook</link></function>
-		and removed with <function><link linkend="g-signal-remove-emission-hook">xsignal_remove_emission_hook</link></function>.
+		Emission hooks are connected with <function><link linkend="g-signal-add-emission-hook">g_signal_add_emission_hook</link></function>
+		and removed with <function><link linkend="g-signal-remove-emission-hook">g_signal_remove_emission_hook</link></function>.
 	  </para>
 
 	</sect2>
@@ -315,18 +315,18 @@ xuint_t xsignal_newv (const xchar_t        *signal_name,
 	  <title>Signal emission</title>
 
 	  <para>
-		Signal emission is done through the use of the <function><link linkend="g-signal-emit">xsignal_emit</link></function> family
+		Signal emission is done through the use of the <function><link linkend="g-signal-emit">g_signal_emit</link></function> family 
 		of functions.
 <informalexample><programlisting>
-void xsignal_emitv (const xvalue_t *instance_and_params,
-                     xuint_t         signal_id,
-                     xquark        detail,
-                     xvalue_t       *return_value);
+void g_signal_emitv (const GValue *instance_and_params,
+                     guint         signal_id,
+                     GQuark        detail,
+                     GValue       *return_value);
 </programlisting></informalexample>
 		<itemizedlist>
 		  <listitem><para>
 			The <parameter>instance_and_params</parameter> array of GValues contains the list of input
-			parameters to the signal. The first element of the array is the
+			parameters to the signal. The first element of the array is the 
 			instance pointer on which to invoke the signal. The following elements of
 			the array contain the list of parameters to the signal.
 			</para></listitem>
@@ -334,9 +334,9 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 			<parameter>signal_id</parameter> identifies the signal to invoke.
 			</para></listitem>
 		  <listitem><para>
-			<parameter>detail</parameter> identifies the specific detail of the signal to invoke. A detail is a kind of
+			<parameter>detail</parameter> identifies the specific detail of the signal to invoke. A detail is a kind of 
 			magic token/argument which is passed around during signal emission and which is used
-			by closures connected to the signal to filter out unwanted signal emissions. In most
+			by closures connected to the signal to filter out unwanted signal emissions. In most 
 			cases, you can safely set this value to zero. See <xref linkend="signal-detail"/> for
 			more details about this parameter.
 			</para></listitem>
@@ -344,7 +344,7 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 			<parameter>return_value</parameter> holds the return value of the last closure invoked during emission if
 			no accumulator was specified. If an accumulator was specified during signal creation,
 			this accumulator is used to calculate the return value as a function of the return
-			values of all the closures invoked during emission.
+			values of all the closures invoked during emission. 
 			If no closure is invoked during
 			emission, the <parameter>return_value</parameter> is nonetheless initialized to zero/null.
 			</para></listitem>
@@ -366,8 +366,8 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 			</para></listitem>
 		  <listitem><para>
 			<literal>HANDLER_RUN_FIRST</literal>: if any closure were connected
-			with the <function><link linkend="g-signal-connect">xsignal_connect</link></function> family of
-			functions, and if they are not blocked (with the <function><link linkend="g-signal-handler-block">xsignal_handler_block</link></function>
+			with the <function><link linkend="g-signal-connect">g_signal_connect</link></function> family of 
+			functions, and if they are not blocked (with the <function><link linkend="g-signal-handler-block">g_signal_handler_block</link></function>
 			family of functions) they are run here, from first to last connected.
 			</para></listitem>
 		  <listitem><para>
@@ -377,8 +377,8 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 			</para></listitem>
 		  <listitem><para>
 			<literal>HANDLER_RUN_LAST</literal>: if any closure were connected
-			with the <function>xsignal_connect_after</function> family of
-			functions, if they were not invoked during <literal>HANDLER_RUN_FIRST</literal> and if they
+			with the <function>g_signal_connect_after</function> family of 
+			functions, if they were not invoked during <literal>HANDLER_RUN_FIRST</literal> and if they 
 			are not blocked, they are run here, from first to last connected.
 			</para></listitem>
 		  <listitem><para>
@@ -388,20 +388,20 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 			</para></listitem>
 		</orderedlist>
 	  </para>
-
+  
 	  <para>
 		If, at any point during emission (except in <literal>RUN_CLEANUP</literal> or
 		<literal>EMISSION_HOOK</literal> state), one of the closures stops the signal emission with
-		<function><link linkend="g-signal-stop-emission">xsignal_stop_emission</link></function>,
+		<function><link linkend="g-signal-stop-emission">g_signal_stop_emission</link></function>,
 		emission jumps to <literal>RUN_CLEANUP</literal> state.
 	  </para>
-
+  
 	  <para>
-		If, at any point during emission, one of the closures or emission hook
+		If, at any point during emission, one of the closures or emission hook 
 		emits the same signal on the same instance, emission is restarted from
 		the <literal>RUN_FIRST</literal> state.
 	  </para>
-
+  
 	  <para>
 		The accumulator function is invoked in all states, after invocation
 		of each closure (except in <literal>RUN_EMISSION_HOOK</literal> and
@@ -413,7 +413,7 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 
 	  <para>
 		If no accumulator function was provided, the value returned by the last handler
-		run will be returned by <function><link linkend="g-signal-emit">xsignal_emit</link></function>.
+		run will be returned by <function><link linkend="g-signal-emit">g_signal_emit</link></function>.
 	  </para>
 
 	</sect2>
@@ -424,24 +424,24 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 
 	  <para>All the functions related to signal emission or signal connection have a parameter
 		named the <emphasis>detail</emphasis>. Sometimes, this parameter is hidden by the API
-		but it is always there, in one form or another.
+		but it is always there, in one form or another. 
 	  </para>
 
 	  <para>
 	    Of the three main connection functions,
-		only one has an explicit detail parameter as a <link linkend="xquark"><type>xquark</type></link>:
-		<link linkend="g-signal-connect-closure-by-id"><function>xsignal_connect_closure_by_id</function></link>.
+		only one has an explicit detail parameter as a <link linkend="GQuark"><type>GQuark</type></link>:
+		<link linkend="g-signal-connect-closure-by-id"><function>g_signal_connect_closure_by_id</function></link>.
 		<footnote>
-		  <para>A xquark is an integer which uniquely represents a string. It is possible to transform
-		   back and forth between the integer and string representations with the functions
+		  <para>A GQuark is an integer which uniquely represents a string. It is possible to transform
+		   back and forth between the integer and string representations with the functions 
 		   <function><link linkend="g-quark-from-string">g_quark_from_string</link></function> and <function><link linkend="g-quark-to-string">g_quark_to_string</link></function>.
 		  </para>
 		</footnote>
 	  </para>
 	  <para>
 	    The two other functions,
-	    <link linkend="g-signal-connect-closure"><function>xsignal_connect_closure</function></link> and
-	    <link linkend="g-signal-connect-data"><function>xsignal_connect_data</function></link>
+	    <link linkend="g-signal-connect-closure"><function>g_signal_connect_closure</function></link> and
+	    <link linkend="g-signal-connect-data"><function>g_signal_connect_data</function></link>
 	    hide the detail parameter in the signal name identification.
 		Their <parameter>detailed_signal</parameter> parameter is a
 		string which identifies the name of the signal to connect to.
@@ -451,18 +451,18 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 		<emphasis>notify::cursor_position</emphasis> will actually
 		connect to the signal named <emphasis>notify</emphasis> with the
 		<emphasis>cursor_position</emphasis> detail.
-		Internally, the detail string is transformed to a xquark if it is present.
+		Internally, the detail string is transformed to a GQuark if it is present.
 	  </para>
 
 	  <para>
 	    Of the four main signal emission functions, one hides it in its
 	    signal name parameter:
-	    <link linkend="g-signal-connect"><function>xsignal_connect</function></link>.
+	    <link linkend="g-signal-connect"><function>g_signal_connect</function></link>.
 	    The other three have an explicit detail parameter as a
-	    <link linkend="xquark"><type>xquark</type></link> again:
-	    <link linkend="g-signal-emit"><function>xsignal_emit</function></link>,
-	    <link linkend="g-signal-emitv"><function>xsignal_emitv</function></link> and
-	    <link linkend="g-signal-emit-valist"><function>xsignal_emit_valist</function></link>.
+	    <link linkend="GQuark"><type>GQuark</type></link> again:
+	    <link linkend="g-signal-emit"><function>g_signal_emit</function></link>,
+	    <link linkend="g-signal-emitv"><function>g_signal_emitv</function></link> and
+	    <link linkend="g-signal-emit-valist"><function>g_signal_emit_valist</function></link>.
 	  </para>
 
 	  <para>
@@ -477,8 +477,8 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 		This completely optional filtering mechanism is mainly used as an optimization for signals
 		which are often emitted for many different reasons: the clients can filter out which events they are
 		interested in before the closure's marshalling code runs. For example, this is used extensively
-		by the <link linkend="xobject-notify"><structfield>notify</structfield></link> signal of xobject_t: whenever a property is modified on a xobject_t,
-		instead of just emitting the <emphasis>notify</emphasis> signal, xobject_t associates as a detail to this
+		by the <link linkend="GObject-notify"><structfield>notify</structfield></link> signal of GObject: whenever a property is modified on a GObject,
+		instead of just emitting the <emphasis>notify</emphasis> signal, GObject associates as a detail to this
 		signal emission the name of the property modified. This allows clients who wish to be notified of changes
 		to only one property to filter most events before receiving them.
 	  </para>
@@ -492,3 +492,4 @@ void xsignal_emitv (const xvalue_t *instance_and_params,
 
   </sect1>
 </chapter>
+

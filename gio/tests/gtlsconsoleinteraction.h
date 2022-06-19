@@ -25,19 +25,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_CONSOLE_INTERACTION         (xtls_console_interaction_get_type ())
-#define G_TLS_CONSOLE_INTERACTION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteraction))
-#define G_TLS_CONSOLE_INTERACTION_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteractionClass))
-#define X_IS_TLS_CONSOLE_INTERACTION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_TLS_CONSOLE_INTERACTION))
-#define X_IS_TLS_CONSOLE_INTERACTION_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_TLS_CONSOLE_INTERACTION))
-#define G_TLS_CONSOLE_INTERACTION_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteractionClass))
+#define G_TYPE_TLS_CONSOLE_INTERACTION         (g_tls_console_interaction_get_type ())
+#define G_TLS_CONSOLE_INTERACTION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteraction))
+#define G_TLS_CONSOLE_INTERACTION_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteractionClass))
+#define G_IS_TLS_CONSOLE_INTERACTION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_TLS_CONSOLE_INTERACTION))
+#define G_IS_TLS_CONSOLE_INTERACTION_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_TLS_CONSOLE_INTERACTION))
+#define G_TLS_CONSOLE_INTERACTION_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_TLS_CONSOLE_INTERACTION, GTlsConsoleInteractionClass))
 
 typedef struct _GTlsConsoleInteraction        GTlsConsoleInteraction;
 typedef struct _GTlsConsoleInteractionClass   GTlsConsoleInteractionClass;
 
 struct _GTlsConsoleInteraction
 {
-  xtls_interaction_t parent_instance;
+  GTlsInteraction parent_instance;
 };
 
 struct _GTlsConsoleInteractionClass
@@ -45,9 +45,9 @@ struct _GTlsConsoleInteractionClass
   GTlsInteractionClass parent_class;
 };
 
-xtype_t                  xtls_console_interaction_get_type    (void) G_GNUC_CONST;
+GType                  g_tls_console_interaction_get_type    (void) G_GNUC_CONST;
 
-xtls_interaction_t *      xtls_console_interaction_new         (void);
+GTlsInteraction *      g_tls_console_interaction_new         (void);
 
 G_END_DECLS
 

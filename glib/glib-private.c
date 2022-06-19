@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2011 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ glib__private__ (void)
     g_get_worker_context,
 
     g_check_setuid,
-    xmain_context_new_with_next_id,
+    g_main_context_new_with_next_id,
 
     g_dir_open_with_errno,
     g_dir_new_from_dirp,

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 
 G_BEGIN_DECLS
 
-xmutex_t *_g_async_queue_get_mutex (xasync_queue_t *queue);
+GMutex *_g_async_queue_get_mutex (GAsyncQueue *queue);
 
 G_END_DECLS
 

@@ -32,103 +32,103 @@
 #include "giomodule.h"
 #include "giomodule-priv.h"
 
-struct _xdummy_proxy_resolver {
-  xobject_t parent_instance;
+struct _GDummyProxyResolver {
+  GObject parent_instance;
 };
 
-static void xdummy_proxy_resolver_iface_init (xproxy_resolver_interface_t *iface);
+static void g_dummy_proxy_resolver_iface_init (GProxyResolverInterface *iface);
 
-#define xdummy_proxy_resolver_get_type _xdummy_proxy_resolver_get_type
-G_DEFINE_TYPE_WITH_CODE (xdummy_proxy_resolver, xdummy_proxy_resolver, XTYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (XTYPE_PROXY_RESOLVER,
-						xdummy_proxy_resolver_iface_init)
-			 _xio_modules_ensure_extension_points_registered ();
+#define g_dummy_proxy_resolver_get_type _g_dummy_proxy_resolver_get_type
+G_DEFINE_TYPE_WITH_CODE (GDummyProxyResolver, g_dummy_proxy_resolver, G_TYPE_OBJECT,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_PROXY_RESOLVER,
+						g_dummy_proxy_resolver_iface_init)
+			 _g_io_modules_ensure_extension_points_registered ();
 			 g_io_extension_point_implement (G_PROXY_RESOLVER_EXTENSION_POINT_NAME,
 							 g_define_type_id,
 							 "dummy",
 							 -100))
 
 static void
-xdummy_proxy_resolver_finalize (xobject_t *object)
+g_dummy_proxy_resolver_finalize (GObject *object)
 {
   /* must chain up */
-  XOBJECT_CLASS (xdummy_proxy_resolver_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_dummy_proxy_resolver_parent_class)->finalize (object);
 }
 
 static void
-xdummy_proxy_resolver_init (xdummy_proxy_resolver_t *resolver)
+g_dummy_proxy_resolver_init (GDummyProxyResolver *resolver)
 {
 }
 
-static xboolean_t
-xdummy_proxy_resolver_is_supported (xproxy_resolver_t *resolver)
+static gboolean
+g_dummy_proxy_resolver_is_supported (GProxyResolver *resolver)
 {
   return TRUE;
 }
 
-static xchar_t **
-xdummy_proxy_resolver_lookup (xproxy_resolver_t  *resolver,
-			       const xchar_t     *uri,
-			       xcancellable_t    *cancellable,
-			       xerror_t         **error)
+static gchar **
+g_dummy_proxy_resolver_lookup (GProxyResolver  *resolver,
+			       const gchar     *uri,
+			       GCancellable    *cancellable,
+			       GError         **error)
 {
-  xchar_t **proxies;
+  gchar **proxies;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
 
-  proxies = g_new0 (xchar_t *, 2);
-  proxies[0] = xstrdup ("direct://");
+  proxies = g_new0 (gchar *, 2);
+  proxies[0] = g_strdup ("direct://");
 
   return proxies;
 }
 
 static void
-xdummy_proxy_resolver_lookup_async (xproxy_resolver_t      *resolver,
-				     const xchar_t         *uri,
-				     xcancellable_t        *cancellable,
-				     xasync_ready_callback_t  callback,
-				     xpointer_t             user_data)
+g_dummy_proxy_resolver_lookup_async (GProxyResolver      *resolver,
+				     const gchar         *uri,
+				     GCancellable        *cancellable,
+				     GAsyncReadyCallback  callback,
+				     gpointer             user_data)
 {
-  xerror_t *error = NULL;
-  xtask_t *task;
-  xchar_t **proxies;
+  GError *error = NULL;
+  GTask *task;
+  gchar **proxies;
 
-  task = xtask_new (resolver, cancellable, callback, user_data);
-  xtask_set_source_tag (task, xdummy_proxy_resolver_lookup_async);
+  task = g_task_new (resolver, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_dummy_proxy_resolver_lookup_async);
 
-  proxies = xdummy_proxy_resolver_lookup (resolver, uri, cancellable, &error);
+  proxies = g_dummy_proxy_resolver_lookup (resolver, uri, cancellable, &error);
   if (proxies)
-    xtask_return_pointer (task, proxies, (xdestroy_notify_t) xstrfreev);
+    g_task_return_pointer (task, proxies, (GDestroyNotify) g_strfreev);
   else
-    xtask_return_error (task, error);
-  xobject_unref (task);
+    g_task_return_error (task, error);
+  g_object_unref (task);
 }
 
-static xchar_t **
-xdummy_proxy_resolver_lookup_finish (xproxy_resolver_t     *resolver,
-				      xasync_result_t       *result,
-				      xerror_t            **error)
+static gchar **
+g_dummy_proxy_resolver_lookup_finish (GProxyResolver     *resolver,
+				      GAsyncResult       *result,
+				      GError            **error)
 {
-  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  g_return_val_if_fail (g_task_is_valid (result, resolver), NULL);
 
-  return xtask_propagate_pointer (XTASK (result), error);
-}
-
-static void
-xdummy_proxy_resolver_class_init (xdummy_proxy_resolver_class_t *resolver_class)
-{
-  xobject_class_t *object_class;
-
-  object_class = XOBJECT_CLASS (resolver_class);
-  object_class->finalize = xdummy_proxy_resolver_finalize;
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
 static void
-xdummy_proxy_resolver_iface_init (xproxy_resolver_interface_t *iface)
+g_dummy_proxy_resolver_class_init (GDummyProxyResolverClass *resolver_class)
 {
-  iface->is_supported = xdummy_proxy_resolver_is_supported;
-  iface->lookup = xdummy_proxy_resolver_lookup;
-  iface->lookup_async = xdummy_proxy_resolver_lookup_async;
-  iface->lookup_finish = xdummy_proxy_resolver_lookup_finish;
+  GObjectClass *object_class;
+  
+  object_class = G_OBJECT_CLASS (resolver_class);
+  object_class->finalize = g_dummy_proxy_resolver_finalize;
+}
+
+static void
+g_dummy_proxy_resolver_iface_init (GProxyResolverInterface *iface)
+{
+  iface->is_supported = g_dummy_proxy_resolver_is_supported;
+  iface->lookup = g_dummy_proxy_resolver_lookup;
+  iface->lookup_async = g_dummy_proxy_resolver_lookup_async;
+  iface->lookup_finish = g_dummy_proxy_resolver_lookup_finish;
 }

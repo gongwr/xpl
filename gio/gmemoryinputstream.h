@@ -29,24 +29,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_MEMORY_INPUT_STREAM         (g_memory_input_stream_get_type ())
-#define G_MEMORY_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_MEMORY_INPUT_STREAM, xmemory_input_stream))
-#define G_MEMORY_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_MEMORY_INPUT_STREAM, GMemoryInputStreamClass))
-#define X_IS_MEMORY_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_MEMORY_INPUT_STREAM))
-#define X_IS_MEMORY_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_MEMORY_INPUT_STREAM))
-#define G_MEMORY_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_MEMORY_INPUT_STREAM, GMemoryInputStreamClass))
+#define G_TYPE_MEMORY_INPUT_STREAM         (g_memory_input_stream_get_type ())
+#define G_MEMORY_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_MEMORY_INPUT_STREAM, GMemoryInputStream))
+#define G_MEMORY_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_MEMORY_INPUT_STREAM, GMemoryInputStreamClass))
+#define G_IS_MEMORY_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_MEMORY_INPUT_STREAM))
+#define G_IS_MEMORY_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_MEMORY_INPUT_STREAM))
+#define G_MEMORY_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_MEMORY_INPUT_STREAM, GMemoryInputStreamClass))
 
 /**
- * xmemory_input_stream_t:
+ * GMemoryInputStream:
  *
- * Implements #xinput_stream_t for arbitrary memory chunks.
+ * Implements #GInputStream for arbitrary memory chunks.
  **/
 typedef struct _GMemoryInputStreamClass    GMemoryInputStreamClass;
 typedef struct _GMemoryInputStreamPrivate  GMemoryInputStreamPrivate;
 
 struct _GMemoryInputStream
 {
-  xinput_stream_t parent_instance;
+  GInputStream parent_instance;
 
   /*< private >*/
   GMemoryInputStreamPrivate *priv;
@@ -54,7 +54,7 @@ struct _GMemoryInputStream
 
 struct _GMemoryInputStreamClass
 {
-  xinput_stream_class_t parent_class;
+  GInputStreamClass parent_class;
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -65,25 +65,25 @@ struct _GMemoryInputStreamClass
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t          g_memory_input_stream_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t * g_memory_input_stream_new           (void);
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t * g_memory_input_stream_new_from_data (const void         *data,
-                                                    xssize_t              len,
-                                                    xdestroy_notify_t      destroy);
-XPL_AVAILABLE_IN_2_34
-xinput_stream_t * g_memory_input_stream_new_from_bytes (xbytes_t            *bytes);
+GLIB_AVAILABLE_IN_ALL
+GType          g_memory_input_stream_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GInputStream * g_memory_input_stream_new           (void);
+GLIB_AVAILABLE_IN_ALL
+GInputStream * g_memory_input_stream_new_from_data (const void         *data,
+                                                    gssize              len,
+                                                    GDestroyNotify      destroy);
+GLIB_AVAILABLE_IN_2_34
+GInputStream * g_memory_input_stream_new_from_bytes (GBytes            *bytes);
 
-XPL_AVAILABLE_IN_ALL
-void           g_memory_input_stream_add_data      (xmemory_input_stream_t *stream,
+GLIB_AVAILABLE_IN_ALL
+void           g_memory_input_stream_add_data      (GMemoryInputStream *stream,
                                                     const void         *data,
-                                                    xssize_t              len,
-                                                    xdestroy_notify_t      destroy);
-XPL_AVAILABLE_IN_2_34
-void           g_memory_input_stream_add_bytes     (xmemory_input_stream_t     *stream,
-						    xbytes_t                 *bytes);
+                                                    gssize              len,
+                                                    GDestroyNotify      destroy);
+GLIB_AVAILABLE_IN_2_34
+void           g_memory_input_stream_add_bytes     (GMemoryInputStream     *stream,
+						    GBytes                 *bytes);
 
 G_END_DECLS
 

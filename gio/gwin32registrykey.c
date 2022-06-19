@@ -76,7 +76,7 @@ typedef struct _KEY_BASIC_INFORMATION {
 typedef struct _UNICODE_STRING {
   USHORT Length;
   USHORT MaximumLength;
-  PWSTR  buffer_t;
+  PWSTR  Buffer;
 } UNICODE_STRING, *PUNICODE_STRING;
 #endif
 typedef const UNICODE_STRING* PCUNICODE_STRING;
@@ -125,10 +125,10 @@ typedef enum
   G_WIN32_REGISTRY_UPDATED_PATH = 1,
 } GWin32RegistryKeyUpdateFlag;
 
-static xsize_t
-xutf16_len (const xunichar2_t *str)
+static gsize
+g_utf16_len (const gunichar2 *str)
 {
-  xsize_t result;
+  gsize result;
 
   for (result = 0; str[0] != 0; str++, result++)
     ;
@@ -136,21 +136,21 @@ xutf16_len (const xunichar2_t *str)
   return result;
 }
 
-static xunichar2_t *
-g_wcsdup (const xunichar2_t *str, xssize_t str_len)
+static gunichar2 *
+g_wcsdup (const gunichar2 *str, gssize str_len)
 {
-  xsize_t str_len_unsigned;
-  xsize_t str_size;
+  gsize str_len_unsigned;
+  gsize str_size;
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   if (str_len < 0)
-    str_len_unsigned = xutf16_len (str);
+    str_len_unsigned = g_utf16_len (str);
   else
-    str_len_unsigned = (xsize_t) str_len;
+    str_len_unsigned = (gsize) str_len;
 
-  xassert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
-  str_size = (str_len_unsigned + 1) * sizeof (xunichar2_t);
+  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (gunichar2) - 1);
+  str_size = (str_len_unsigned + 1) * sizeof (gunichar2);
 
   return g_memdup2 (str, str_size);
 }
@@ -172,11 +172,11 @@ g_win32_registry_subkey_iter_copy (const GWin32RegistrySubkeyIter *iter)
 {
   GWin32RegistrySubkeyIter *new_iter;
 
-  xreturn_val_if_fail (iter != NULL, NULL);
+  g_return_val_if_fail (iter != NULL, NULL);
 
   new_iter = g_new0 (GWin32RegistrySubkeyIter, 1);
 
-  new_iter->key = xobject_ref (iter->key);
+  new_iter->key = g_object_ref (iter->key);
   new_iter->counter = iter->counter;
   new_iter->subkey_count = iter->subkey_count;
   new_iter->subkey_name = g_wcsdup (iter->subkey_name, iter->subkey_name_size);
@@ -204,7 +204,7 @@ g_win32_registry_subkey_iter_free (GWin32RegistrySubkeyIter *iter)
 {
   g_return_if_fail (iter != NULL);
 
-  xobject_unref (iter->key);
+  g_object_unref (iter->key);
   g_free (iter->subkey_name);
   g_free (iter->subkey_name_u8);
   g_free (iter);
@@ -254,11 +254,11 @@ g_win32_registry_value_iter_copy (const GWin32RegistryValueIter *iter)
 {
   GWin32RegistryValueIter *new_iter;
 
-  xreturn_val_if_fail (iter != NULL, NULL);
+  g_return_val_if_fail (iter != NULL, NULL);
 
   new_iter = g_new0 (GWin32RegistryValueIter, 1);
 
-  new_iter->key = xobject_ref (iter->key);
+  new_iter->key = g_object_ref (iter->key);
   new_iter->counter = iter->counter;
   new_iter->value_count = iter->value_count;
   new_iter->value_name = g_wcsdup (iter->value_name, iter->value_name_size);
@@ -270,18 +270,18 @@ g_win32_registry_value_iter_copy (const GWin32RegistryValueIter *iter)
   new_iter->value_data_size = iter->value_data_size;
 
   if (iter->value_name_u8 != NULL)
-    new_iter->value_name_u8 = xstrdup (iter->value_name_u8);
+    new_iter->value_name_u8 = g_strdup (iter->value_name_u8);
 
   new_iter->value_name_u8_len = iter->value_name_u8_len;
 
   if (iter->value_data_u8 != NULL)
-    new_iter->value_data_u8 = xstrdup (iter->value_data_u8);
+    new_iter->value_data_u8 = g_strdup (iter->value_data_u8);
 
   new_iter->value_data_u8_size = iter->value_data_u8_size;
 
   if (iter->value_data_expanded != NULL)
-    new_iter->value_data_expanded = g_wcsdup ((xunichar2_t *) iter->value_data_expanded,
-                                              iter->value_data_expanded_charsize * sizeof (xunichar2_t));
+    new_iter->value_data_expanded = g_wcsdup ((gunichar2 *) iter->value_data_expanded,
+                                              iter->value_data_expanded_charsize * sizeof (gunichar2));
 
   new_iter->value_data_expanded_charsize = iter->value_data_expanded_charsize;
 
@@ -308,7 +308,7 @@ g_win32_registry_value_iter_free (GWin32RegistryValueIter *iter)
 {
   g_return_if_fail (iter != NULL);
 
-  xobject_unref (iter->key);
+  g_object_unref (iter->key);
   g_free (iter->value_name);
   g_free (iter->value_data);
   g_free (iter->value_data_expanded);
@@ -357,8 +357,8 @@ G_DEFINE_BOXED_TYPE (GWin32RegistryValueIter, g_win32_registry_value_iter,
  * the moment there is no API for writing into registry keys or creating
  * new ones.
  *
- * #GWin32RegistryKey implements the #xinitable_t interface, so if it is manually
- * constructed by e.g. xobject_new() you must call xinitable_init() and check
+ * #GWin32RegistryKey implements the #GInitable interface, so if it is manually
+ * constructed by e.g. g_object_new() you must call g_initable_init() and check
  * the results before using the object. This is done automatically
  * in g_win32_registry_key_new() and g_win32_registry_key_get_child(), so these
  * functions can return %NULL.
@@ -398,27 +398,27 @@ struct _GWin32RegistryKeyPrivate {
    * Can become out of sync if the key is renamed from while we have it
    * open, check watch_indicator to see if anything changed.
    */
-  xunichar2_t *absolute_path_w;
+  gunichar2 *absolute_path_w;
 
   /* Full absolute path of the key, in UTF-8. Allocated when needed by
    * converting the UTF-16 value from absolute_path_w. */
-  xchar_t *absolute_path;
+  gchar *absolute_path;
 
   /* TRUE if this object represents one of the pre-defined keys
    * (and thus must not be closed).
    */
-  xboolean_t predefined;
+  gboolean predefined;
 
   /* Set to G_WIN32_KEY_UNWATCHED if the key is not being watched.
    * Set to G_WIN32_KEY_WATCHED when the key is put on watch notification.
    */
-  xint_t watch_indicator;
+  gint watch_indicator;
 
   /* Set to G_WIN32_KEY_UNKNOWN while the key is not being watched.
    * Set to G_WIN32_KEY_UNCHANGED once the key is put under watch.
    * Set to G_WIN32_KEY_CHANGED by the watch notification APC on key change.
    */
-  xint_t change_indicator;
+  gint change_indicator;
 
   /* Unset after the key is changed, individual bits are set when their
    * respective key parameters are updated from the registry.
@@ -429,21 +429,21 @@ struct _GWin32RegistryKeyPrivate {
 
   GWin32RegistryKeyWatchCallbackFunc callback;
 
-  xpointer_t user_data;
+  gpointer user_data;
 };
 
-static void     g_win32_registry_key_initable_iface_init (xinitable_iface_t  *iface);
-static xboolean_t g_win32_registry_key_initable_init       (xinitable_t       *initable,
-                                                          xcancellable_t    *cancellable,
-                                                          xerror_t         **error);
+static void     g_win32_registry_key_initable_iface_init (GInitableIface  *iface);
+static gboolean g_win32_registry_key_initable_init       (GInitable       *initable,
+                                                          GCancellable    *cancellable,
+                                                          GError         **error);
 
-G_DEFINE_TYPE_WITH_CODE (GWin32RegistryKey, g_win32_registry_key, XTYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (GWin32RegistryKey, g_win32_registry_key, G_TYPE_OBJECT,
                          G_ADD_PRIVATE (GWin32RegistryKey)
-                         G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
                                                 g_win32_registry_key_initable_iface_init));
 
 static void
-g_win32_registry_key_dispose (xobject_t *object)
+g_win32_registry_key_dispose (GObject *object)
 {
   GWin32RegistryKey *key;
   GWin32RegistryKeyPrivate *priv;
@@ -461,13 +461,13 @@ g_win32_registry_key_dispose (xobject_t *object)
       priv->handle = INVALID_HANDLE_VALUE;
     }
 
-  XOBJECT_CLASS (g_win32_registry_key_parent_class)->dispose (object);
+  G_OBJECT_CLASS (g_win32_registry_key_parent_class)->dispose (object);
 }
 
 /**
  * g_win32_registry_key_new:
  * @path: absolute full name of a key to open (in UTF-8)
- * @error: (nullable): a pointer to a %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to a %NULL #GError, or %NULL
  *
  * Creates an object that represents a registry key specified by @path.
  * @path must start with one of the following pre-defined names:
@@ -483,15 +483,15 @@ g_win32_registry_key_dispose (xobject_t *object)
  * @path must not end with '\\'.
  *
  * Returns: (nullable) (transfer full): a #GWin32RegistryKey or %NULL if can't
- *   be opened. Free with xobject_unref().
+ *   be opened. Free with g_object_unref().
  */
 GWin32RegistryKey *
-g_win32_registry_key_new (const xchar_t  *path,
-                          xerror_t      **error)
+g_win32_registry_key_new (const gchar  *path,
+                          GError      **error)
 {
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  return xinitable_new (XTYPE_WIN32_REGISTRY_KEY,
+  return g_initable_new (G_TYPE_WIN32_REGISTRY_KEY,
                          NULL,
                          error,
                          "path",
@@ -502,7 +502,7 @@ g_win32_registry_key_new (const xchar_t  *path,
 /**
  * g_win32_registry_key_new_w:
  * @path: (in) (transfer none): absolute full name of a key to open (in UTF-16)
- * @error: (inout) (optional) (nullable): a pointer to a %NULL #xerror_t, or %NULL
+ * @error: (inout) (optional) (nullable): a pointer to a %NULL #GError, or %NULL
  *
  * Creates an object that represents a registry key specified by @path.
  * @path must start with one of the following pre-defined names:
@@ -518,17 +518,17 @@ g_win32_registry_key_new (const xchar_t  *path,
  * @path must not end with L'\\'.
  *
  * Returns: (nullable) (transfer full): a #GWin32RegistryKey or %NULL if can't
- *   be opened. Free with xobject_unref().
+ *   be opened. Free with g_object_unref().
  */
 GWin32RegistryKey *
-g_win32_registry_key_new_w (const xunichar2_t  *path,
-                            xerror_t          **error)
+g_win32_registry_key_new_w (const gunichar2  *path,
+                            GError          **error)
 {
-  xobject_t *result;
+  GObject *result;
 
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  result = xinitable_new (XTYPE_WIN32_REGISTRY_KEY,
+  result = g_initable_new (G_TYPE_WIN32_REGISTRY_KEY,
                            NULL,
                            error,
                            "path-utf16",
@@ -539,36 +539,36 @@ g_win32_registry_key_new_w (const xunichar2_t  *path,
 }
 
 static void
-g_win32_registry_key_initable_iface_init (xinitable_iface_t *iface)
+g_win32_registry_key_initable_iface_init (GInitableIface *iface)
 {
   iface->init = g_win32_registry_key_initable_init;
 }
 
-static xboolean_t
-g_win32_registry_key_initable_init (xinitable_t     *initable,
-                                    xcancellable_t  *cancellable,
-                                    xerror_t       **error)
+static gboolean
+g_win32_registry_key_initable_init (GInitable     *initable,
+                                    GCancellable  *cancellable,
+                                    GError       **error)
 {
   GWin32RegistryKey *key;
   GWin32RegistryKeyPrivate *priv;
-  xunichar2_t *path;
-  xunichar2_t *first_chunk_end;
-  xsize_t first_chunk_len;
-  xunichar2_t *second_chunk_begin;
-  xunichar2_t *first_chunk;
+  gunichar2 *path;
+  gunichar2 *first_chunk_end;
+  gsize first_chunk_len;
+  gunichar2 *second_chunk_begin;
+  gunichar2 *first_chunk;
   HKEY ancestor;
   HKEY key_handle;
   LONG opened;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (initable), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (initable), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   key = G_WIN32_REGISTRY_KEY (initable);
   priv = key->priv;
 
   if (priv->absolute_path_w == NULL)
     {
-      priv->absolute_path_w = xutf8_to_utf16 (priv->absolute_path,
+      priv->absolute_path_w = g_utf8_to_utf16 (priv->absolute_path,
                                                -1,
                                                NULL,
                                                NULL,
@@ -646,26 +646,26 @@ g_win32_registry_key_initable_init (xinitable_t     *initable,
  * g_win32_registry_key_get_child:
  * @key: (in) (transfer none): a parent #GWin32RegistryKey
  * @subkey: (in) (transfer none): name of a child key to open (in UTF-8), relative to @key
- * @error: (inout) (optional) (nullable): a pointer to a %NULL #xerror_t, or %NULL
+ * @error: (inout) (optional) (nullable): a pointer to a %NULL #GError, or %NULL
  *
  * Opens a @subkey of the @key.
  *
  * Returns: (nullable): a #GWin32RegistryKey or %NULL if can't be opened. Free
- *                      with xobject_unref().
+ *                      with g_object_unref().
  */
 GWin32RegistryKey *
 g_win32_registry_key_get_child (GWin32RegistryKey  *key,
-                                const xchar_t        *subkey,
-                                xerror_t            **error)
+                                const gchar        *subkey,
+                                GError            **error)
 {
-  xunichar2_t *subkey_w;
+  gunichar2 *subkey_w;
   GWin32RegistryKey *result = NULL;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), NULL);
-  xreturn_val_if_fail (subkey != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), NULL);
+  g_return_val_if_fail (subkey != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  subkey_w = xutf8_to_utf16 (subkey, -1, NULL, NULL, error);
+  subkey_w = g_utf8_to_utf16 (subkey, -1, NULL, NULL, error);
 
   if (subkey_w != NULL)
     {
@@ -680,28 +680,28 @@ g_win32_registry_key_get_child (GWin32RegistryKey  *key,
  * g_win32_registry_key_get_child_w:
  * @key: (in) (transfer none): a parent #GWin32RegistryKey
  * @subkey: (in) (transfer none): name of a child key to open (in UTF-8), relative to @key
- * @error: (inout) (optional) (nullable): a pointer to a %NULL #xerror_t, or %NULL
+ * @error: (inout) (optional) (nullable): a pointer to a %NULL #GError, or %NULL
  *
  * Opens a @subkey of the @key.
  *
  * Returns: (nullable): a #GWin32RegistryKey or %NULL if can't be opened. Free
- *                      with xobject_unref().
+ *                      with g_object_unref().
  */
 GWin32RegistryKey *
 g_win32_registry_key_get_child_w (GWin32RegistryKey  *key,
-                                  const xunichar2_t    *subkey,
-                                  xerror_t            **error)
+                                  const gunichar2    *subkey,
+                                  GError            **error)
 {
   HKEY key_handle;
   LONG opened;
-  const xunichar2_t *end_of_subkey;
-  xsize_t subkey_len;
+  const gunichar2 *end_of_subkey;
+  gsize subkey_len;
   GWin32RegistryKey *result;
-  const xunichar2_t *key_path;
+  const gunichar2 *key_path;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), NULL);
-  xreturn_val_if_fail (subkey != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), NULL);
+  g_return_val_if_fail (subkey != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (subkey[0] == L'\\')
     {
@@ -732,11 +732,11 @@ g_win32_registry_key_get_child_w (GWin32RegistryKey  *key,
       return NULL;
     }
 
-  result = xobject_new (XTYPE_WIN32_REGISTRY_KEY, NULL);
+  result = g_object_new (G_TYPE_WIN32_REGISTRY_KEY, NULL);
 
   result->priv->handle = key_handle;
   result->priv->absolute_path_w =
-      g_malloc ((wcslen (key_path) + 2 + subkey_len) * sizeof (xunichar2_t));
+      g_malloc ((wcslen (key_path) + 2 + subkey_len) * sizeof (gunichar2));
   result->priv->absolute_path_w[0] = L'\0';
   wcscat (&result->priv->absolute_path_w[0], key_path);
   wcscat (&result->priv->absolute_path_w[wcslen (key_path)], L"\\");
@@ -744,7 +744,7 @@ g_win32_registry_key_get_child_w (GWin32RegistryKey  *key,
   result->priv->predefined = (subkey[0] == L'\0' && key->priv->predefined);
 
   if (subkey[0] != L'\0')
-    result->priv->ancestor = xobject_ref (key);
+    result->priv->ancestor = g_object_ref (key);
   else
     result->priv->ancestor = NULL;
 
@@ -757,7 +757,7 @@ g_win32_registry_key_get_child_w (GWin32RegistryKey  *key,
  * g_win32_registry_subkey_iter_init:
  * @iter: (in) (transfer none): a pointer to a #GWin32RegistrySubkeyIter
  * @key: (in) (transfer none): a #GWin32RegistryKey to iterate over
- * @error: (inout) (optional) (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (inout) (optional) (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Initialises (without allocating) a #GWin32RegistrySubkeyIter.  @iter may be
  * completely uninitialised prior to this call; its old value is
@@ -771,18 +771,18 @@ g_win32_registry_key_get_child_w (GWin32RegistryKey  *key,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_subkey_iter_init (GWin32RegistrySubkeyIter  *iter,
                                    GWin32RegistryKey         *key,
-                                   xerror_t                   **error)
+                                   GError                   **error)
 {
   LONG status;
   DWORD subkey_count;
   DWORD max_subkey_len;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   status = RegQueryInfoKeyW (key->priv->handle,
                              NULL, NULL, NULL,
@@ -797,10 +797,10 @@ g_win32_registry_subkey_iter_init (GWin32RegistrySubkeyIter  *iter,
       return FALSE;
     }
 
-  iter->key = xobject_ref (key);
+  iter->key = g_object_ref (key);
   iter->counter = -1;
   iter->subkey_count = subkey_count;
-  iter->subkey_name_size = sizeof (xunichar2_t) * (max_subkey_len + 1);
+  iter->subkey_name_size = sizeof (gunichar2) * (max_subkey_len + 1);
   iter->subkey_name = g_malloc (iter->subkey_name_size);
   iter->subkey_name_u8 = NULL;
 
@@ -840,10 +840,10 @@ g_win32_registry_subkey_iter_clear (GWin32RegistrySubkeyIter *iter)
  *
  * Since: 2.46
  **/
-xsize_t
+gsize
 g_win32_registry_subkey_iter_n_subkeys (GWin32RegistrySubkeyIter *iter)
 {
-  xreturn_val_if_fail (iter != NULL, 0);
+  g_return_val_if_fail (iter != NULL, 0);
 
   return iter->subkey_count;
 }
@@ -854,7 +854,7 @@ g_win32_registry_subkey_iter_n_subkeys (GWin32RegistrySubkeyIter *iter)
  * @skip_errors: (in): %TRUE if iterator should silently ignore errors (such as
  *     the actual number of subkeys being less than expected) and
  *     proceed forward
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Moves iterator to the next subkey.
  * Enumeration errors can be ignored if @skip_errors is %TRUE
@@ -866,7 +866,7 @@ g_win32_registry_subkey_iter_n_subkeys (GWin32RegistrySubkeyIter *iter)
  *   iterate_key_recursive (GWin32RegistryKey *key)
  *   {
  *     GWin32RegistrySubkeyIter iter;
- *     xchar_t *name;
+ *     gchar *name;
  *     GWin32RegistryKey *child;
  *
  *     if (!g_win32_registry_subkey_iter_init (&iter, key, NULL))
@@ -892,16 +892,16 @@ g_win32_registry_subkey_iter_n_subkeys (GWin32RegistrySubkeyIter *iter)
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_subkey_iter_next (GWin32RegistrySubkeyIter  *iter,
-                                   xboolean_t                   skip_errors,
-                                   xerror_t                   **error)
+                                   gboolean                   skip_errors,
+                                   GError                   **error)
 {
   LONG status;
   DWORD subkey_len;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->subkey_count)
     {
@@ -953,7 +953,7 @@ g_win32_registry_subkey_iter_next (GWin32RegistrySubkeyIter  *iter,
  *     to store the length of @subkey_name, in gunichar2s, excluding
  *     NUL-terminator.
  *     %NULL if length is not needed.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Same as g_win32_registry_subkey_iter_get_next(), but outputs UTF-16-encoded
  * data, without converting it to UTF-8 first.
@@ -962,15 +962,15 @@ g_win32_registry_subkey_iter_next (GWin32RegistrySubkeyIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_subkey_iter_get_name_w (GWin32RegistrySubkeyIter  *iter,
-                                         const xunichar2_t          **subkey_name,
-                                         xsize_t                     *subkey_name_len,
-                                         xerror_t                   **error)
+                                         const gunichar2          **subkey_name,
+                                         gsize                     *subkey_name_len,
+                                         GError                   **error)
 {
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (subkey_name != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (subkey_name != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->subkey_count)
     {
@@ -996,7 +996,7 @@ g_win32_registry_subkey_iter_get_name_w (GWin32RegistrySubkeyIter  *iter,
  * @subkey_name_len: (out) (optional): Pointer to a location to store the
  *     length of @subkey_name, in gchars, excluding NUL-terminator.
  *     %NULL if length is not needed.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Gets the name of the subkey at the @iter potision.
  *
@@ -1004,17 +1004,17 @@ g_win32_registry_subkey_iter_get_name_w (GWin32RegistrySubkeyIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_subkey_iter_get_name (GWin32RegistrySubkeyIter  *iter,
-                                       const xchar_t              **subkey_name,
-                                       xsize_t                     *subkey_name_len,
-                                       xerror_t                   **error)
+                                       const gchar              **subkey_name,
+                                       gsize                     *subkey_name_len,
+                                       GError                   **error)
 {
-  xlong_t subkey_name_len_glong;
+  glong subkey_name_len_glong;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (subkey_name != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (subkey_name != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->subkey_count)
     {
@@ -1025,7 +1025,7 @@ g_win32_registry_subkey_iter_get_name (GWin32RegistrySubkeyIter  *iter,
     }
 
   g_clear_pointer (&iter->subkey_name_u8, g_free);
-  iter->subkey_name_u8 = xutf16_to_utf8 (iter->subkey_name,
+  iter->subkey_name_u8 = g_utf16_to_utf8 (iter->subkey_name,
                                           iter->subkey_name_len,
                                           NULL,
                                           &subkey_name_len_glong,
@@ -1046,7 +1046,7 @@ g_win32_registry_subkey_iter_get_name (GWin32RegistrySubkeyIter  *iter,
  * g_win32_registry_value_iter_init:
  * @iter: (in) (transfer none): a pointer to a #GWin32RegistryValueIter
  * @key: (in) (transfer none): a #GWin32RegistryKey to iterate over
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Initialises (without allocating) a #GWin32RegistryValueIter.  @iter may be
  * completely uninitialised prior to this call; its old value is
@@ -1060,19 +1060,19 @@ g_win32_registry_subkey_iter_get_name (GWin32RegistrySubkeyIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_init (GWin32RegistryValueIter  *iter,
                                   GWin32RegistryKey        *key,
-                                  xerror_t                  **error)
+                                  GError                  **error)
 {
   LONG status;
   DWORD value_count;
   DWORD max_value_len;
   DWORD max_data_len;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   status = RegQueryInfoKeyW (key->priv->handle,
                              NULL, NULL, NULL, NULL, NULL, NULL,
@@ -1087,10 +1087,10 @@ g_win32_registry_value_iter_init (GWin32RegistryValueIter  *iter,
       return FALSE;
     }
 
-  iter->key = xobject_ref (key);
+  iter->key = g_object_ref (key);
   iter->counter = -1;
   iter->value_count = value_count;
-  iter->value_name_size = sizeof (xunichar2_t) * (max_value_len + 1);
+  iter->value_name_size = sizeof (gunichar2) * (max_value_len + 1);
   iter->value_name = g_malloc (iter->value_name_size);
   /* FIXME: max_value_data_len is said to have no size limit in newer W32
    * versions (and its size limit in older ones is 1MB!). Consider limiting it
@@ -1100,7 +1100,7 @@ g_win32_registry_value_iter_init (GWin32RegistryValueIter  *iter,
    * Registry without a 0-terminator (for multiline strings - 00-terminator),
    * and we need to terminate it ourselves.
    */
-  iter->value_data_size = max_data_len + sizeof (xunichar2_t) * 2;
+  iter->value_data_size = max_data_len + sizeof (gunichar2) * 2;
   iter->value_data = g_malloc (iter->value_data_size);
   iter->value_name_u8 = NULL;
   iter->value_data_u8 = NULL;
@@ -1148,10 +1148,10 @@ g_win32_registry_value_iter_clear (GWin32RegistryValueIter *iter)
  *
  * Since: 2.46
  **/
-xsize_t
+gsize
 g_win32_registry_value_iter_n_values (GWin32RegistryValueIter *iter)
 {
-  xreturn_val_if_fail (iter != NULL, 0);
+  g_return_val_if_fail (iter != NULL, 0);
 
   return iter->value_count;
 }
@@ -1193,12 +1193,12 @@ _g_win32_registry_type_w_to_g (DWORD value_type)
     }
 }
 
-static xsize_t
+static gsize
 ensure_nul_termination (GWin32RegistryValueType  value_type,
-                        xuint8_t                  *value_data,
-                        xsize_t                    value_data_size)
+                        guint8                  *value_data,
+                        gsize                    value_data_size)
 {
-  xsize_t new_size = value_data_size;
+  gsize new_size = value_data_size;
 
   if (value_type == G_WIN32_REGISTRY_VALUE_EXPAND_STR ||
       value_type == G_WIN32_REGISTRY_VALUE_LINK ||
@@ -1238,7 +1238,7 @@ ensure_nul_termination (GWin32RegistryValueType  value_type,
  * @skip_errors: (in): %TRUE if iterator should silently ignore errors (such as
  *     the actual number of values being less than expected) and
  *     proceed forward
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Advances iterator to the next value in the key. If no more values remain then
  * FALSE is returned.
@@ -1251,9 +1251,9 @@ ensure_nul_termination (GWin32RegistryValueType  value_type,
  *   iterate_values_recursive (GWin32RegistryKey *key)
  *   {
  *     GWin32RegistryValueIter iter;
- *     xchar_t *name;
+ *     gchar *name;
  *     GWin32RegistryValueType val_type;
- *     xchar_t *val_data;
+ *     gchar *val_data;
  *
  *     if (!g_win32_registry_value_iter_init (&iter, key, NULL))
  *       return;
@@ -1278,10 +1278,10 @@ ensure_nul_termination (GWin32RegistryValueType  value_type,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_next (GWin32RegistryValueIter  *iter,
-                                  xboolean_t                  skip_errors,
-                                  xerror_t                  **error)
+                                  gboolean                  skip_errors,
+                                  GError                  **error)
 {
   LONG status;
   DWORD value_name_len_w;
@@ -1289,8 +1289,8 @@ g_win32_registry_value_iter_next (GWin32RegistryValueIter  *iter,
   DWORD value_type_w;
   GWin32RegistryValueType value_type_g;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->value_count)
     {
@@ -1310,7 +1310,7 @@ g_win32_registry_value_iter_next (GWin32RegistryValueIter  *iter,
       g_clear_pointer (&iter->value_data_u8, g_free);
       g_clear_pointer (&iter->value_data_expanded_u8, g_free);
       /* Including 0-terminator */
-      value_name_len_w = iter->value_name_size / sizeof (xunichar2_t);
+      value_name_len_w = iter->value_name_size / sizeof (gunichar2);
       value_data_size_w = iter->value_data_size;
       status = RegEnumValueW (iter->key->priv->handle,
                               iter->counter,
@@ -1351,7 +1351,7 @@ g_win32_registry_value_iter_next (GWin32RegistryValueIter  *iter,
  * @iter: (in) (transfer none): a #GWin32RegistryValueIter
  * @value_type: (out): Pointer to a location to store the type of
  *     the value.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Stores the type of the value currently being iterated over in @value_type.
  *
@@ -1359,14 +1359,14 @@ g_win32_registry_value_iter_next (GWin32RegistryValueIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_get_value_type (GWin32RegistryValueIter  *iter,
                                             GWin32RegistryValueType  *value_type,
-                                            xerror_t                  **error)
+                                            GError                  **error)
 {
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (value_type != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (value_type != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->value_count)
     {
@@ -1388,7 +1388,7 @@ g_win32_registry_value_iter_get_value_type (GWin32RegistryValueIter  *iter,
  * @value_name_len: (out) (optional): Pointer to a location to store the length
  *     of @value_name, in gunichar2s, excluding NUL-terminator.
  *     %NULL if length is not needed.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Stores the name of the value currently being iterated over in @value_name,
  * and its length - in @value_name (if not %NULL).
@@ -1397,15 +1397,15 @@ g_win32_registry_value_iter_get_value_type (GWin32RegistryValueIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_get_name_w (GWin32RegistryValueIter  *iter,
-                                        xunichar2_t               **value_name,
-                                        xsize_t                    *value_name_len,
-                                        xerror_t                  **error)
+                                        gunichar2               **value_name,
+                                        gsize                    *value_name_len,
+                                        GError                  **error)
 {
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (value_name != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (value_name != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->value_count)
     {
@@ -1430,7 +1430,7 @@ g_win32_registry_value_iter_get_name_w (GWin32RegistryValueIter  *iter,
  * @value_name_len: (out) (optional): Pointer to a location to store the length
  *     of @value_name, in gchars, excluding NUL-terminator.
  *     %NULL if length is not needed.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Stores the name of the value currently being iterated over in @value_name,
  * and its length - in @value_name_len (if not %NULL).
@@ -1439,17 +1439,17 @@ g_win32_registry_value_iter_get_name_w (GWin32RegistryValueIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_get_name (GWin32RegistryValueIter  *iter,
-                                      xchar_t                   **value_name,
-                                      xsize_t                    *value_name_len,
-                                      xerror_t                  **error)
+                                      gchar                   **value_name,
+                                      gsize                    *value_name_len,
+                                      GError                  **error)
 {
-  xlong_t value_name_len_glong;
+  glong value_name_len_glong;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (value_name != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (value_name != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->value_count)
     {
@@ -1460,7 +1460,7 @@ g_win32_registry_value_iter_get_name (GWin32RegistryValueIter  *iter,
 
   if (iter->value_name_u8 == NULL)
     {
-      iter->value_name_u8 = xutf16_to_utf8 (iter->value_name, iter->value_name_len, NULL,
+      iter->value_name_u8 = g_utf16_to_utf8 (iter->value_name, iter->value_name_len, NULL,
                                              &value_name_len_glong, error);
 
       if (iter->value_name_u8 == NULL)
@@ -1475,28 +1475,28 @@ g_win32_registry_value_iter_get_name (GWin32RegistryValueIter  *iter,
   return TRUE;
 }
 
-static xboolean_t
-expand_value (xunichar2_t  *value,
-              const xunichar2_t  *value_name,
-              xpointer_t   *expanded_value,
-              xsize_t      *expanded_charsize,
-              xerror_t    **error)
+static gboolean
+expand_value (gunichar2  *value,
+              const gunichar2  *value_name,
+              gpointer   *expanded_value,
+              gsize      *expanded_charsize,
+              GError    **error)
 {
   DWORD value_data_expanded_charsize_w;
 
   value_data_expanded_charsize_w =
       ExpandEnvironmentStringsW (value,
-                                 (xunichar2_t *) *expanded_value,
+                                 (gunichar2 *) *expanded_value,
                                  *expanded_charsize);
 
   if (value_data_expanded_charsize_w > *expanded_charsize)
     {
       *expanded_value = g_realloc (*expanded_value,
-                                   value_data_expanded_charsize_w * sizeof (xunichar2_t));
+                                   value_data_expanded_charsize_w * sizeof (gunichar2));
       *expanded_charsize = value_data_expanded_charsize_w;
       value_data_expanded_charsize_w =
           ExpandEnvironmentStringsW (value,
-                                     (xunichar2_t *) *expanded_value,
+                                     (gunichar2 *) *expanded_value,
                                      *expanded_charsize);
     }
 
@@ -1522,7 +1522,7 @@ expand_value (xunichar2_t  *value,
  * @value_data_size: (out) (optional): Pointer to a location to store the size
  *     of @value_data, in bytes (including any NUL-terminators, if it's a string).
  *     %NULL if length is not needed.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Stores the data of the value currently being iterated over in @value_data,
  * and its length - in @value_data_len (if not %NULL).
@@ -1531,16 +1531,16 @@ expand_value (xunichar2_t  *value,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_get_data_w (GWin32RegistryValueIter  *iter,
-                                        xboolean_t                  auto_expand,
-                                        xpointer_t                 *value_data,
-                                        xsize_t                    *value_data_size,
-                                        xerror_t                  **error)
+                                        gboolean                  auto_expand,
+                                        gpointer                 *value_data,
+                                        gsize                    *value_data_size,
+                                        GError                  **error)
 {
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (value_data != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (value_data != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->value_count)
     {
@@ -1561,9 +1561,9 @@ g_win32_registry_value_iter_get_data_w (GWin32RegistryValueIter  *iter,
 
   if (iter->value_type == iter->value_expanded_type)
     {
-      if (!expand_value ((xunichar2_t *) iter->value_data,
+      if (!expand_value ((gunichar2 *) iter->value_data,
                          iter->value_name,
-                         (xpointer_t *) &iter->value_data_expanded,
+                         (gpointer *) &iter->value_data_expanded,
                          &iter->value_data_expanded_charsize,
                          error))
         return FALSE;
@@ -1574,7 +1574,7 @@ g_win32_registry_value_iter_get_data_w (GWin32RegistryValueIter  *iter,
   *value_data = iter->value_data_expanded;
 
   if (value_data_size)
-    *value_data_size = iter->value_data_expanded_charsize * sizeof (xunichar2_t);
+    *value_data_size = iter->value_data_expanded_charsize * sizeof (gunichar2);
 
   return TRUE;
 }
@@ -1589,7 +1589,7 @@ g_win32_registry_value_iter_get_data_w (GWin32RegistryValueIter  *iter,
  * @value_data_size: (out) (optional): Pointer to a location to store the length
  *     of @value_data, in bytes (including any NUL-terminators, if it's a string).
  *     %NULL if length is not needed
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Stores the data of the value currently being iterated over in @value_data,
  * and its length - in @value_data_len (if not %NULL).
@@ -1598,20 +1598,20 @@ g_win32_registry_value_iter_get_data_w (GWin32RegistryValueIter  *iter,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_value_iter_get_data (GWin32RegistryValueIter  *iter,
-                                      xboolean_t                  auto_expand,
-                                      xpointer_t                 *value_data,
-                                      xsize_t                    *value_data_size,
-                                      xerror_t                  **error)
+                                      gboolean                  auto_expand,
+                                      gpointer                 *value_data,
+                                      gsize                    *value_data_size,
+                                      GError                  **error)
 {
-  xsize_t value_data_len_gsize;
-  xpointer_t tmp;
-  xsize_t tmp_size;
+  gsize value_data_len_gsize;
+  gpointer tmp;
+  gsize tmp_size;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (value_data != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (value_data != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if G_UNLIKELY (iter->counter >= iter->value_count)
     {
@@ -1637,8 +1637,8 @@ g_win32_registry_value_iter_get_data (GWin32RegistryValueIter  *iter,
     {
       if (iter->value_data_u8 == NULL)
         {
-          iter->value_data_u8 = g_convert ((const xchar_t *) iter->value_data,
-                                           iter->value_actual_data_size - sizeof (xunichar2_t) /* excl. 0 */,
+          iter->value_data_u8 = g_convert ((const gchar *) iter->value_data,
+                                           iter->value_actual_data_size - sizeof (gunichar2) /* excl. 0 */,
                                            "UTF8", "UTF16", NULL,
                                            &value_data_len_gsize,
                                            error);
@@ -1666,8 +1666,8 @@ g_win32_registry_value_iter_get_data (GWin32RegistryValueIter  *iter,
                                                    error))
         return FALSE;
 
-      iter->value_data_expanded_u8 = g_convert ((const xchar_t *) iter->value_data_expanded,
-                                                iter->value_data_expanded_charsize * sizeof (xunichar2_t) - sizeof (xunichar2_t) /* excl. 0 */,
+      iter->value_data_expanded_u8 = g_convert ((const gchar *) iter->value_data_expanded,
+                                                iter->value_data_expanded_charsize * sizeof (gunichar2) - sizeof (gunichar2) /* excl. 0 */,
                                                 "UTF8", "UTF16", NULL,
                                                 &value_data_len_gsize,
                                                 error);
@@ -1695,8 +1695,8 @@ _g_win32_registry_key_reread_kernel (GWin32RegistryKey        *key,
   ULONG basic_info_size;
   ULONG datasize;
 
-  basic_info_size = 256 * sizeof (xunichar2_t) + sizeof (KEY_BASIC_INFORMATION);
-  basic_info = g_malloc (basic_info_size + sizeof (xunichar2_t));
+  basic_info_size = 256 * sizeof (gunichar2) + sizeof (KEY_BASIC_INFORMATION);
+  basic_info = g_malloc (basic_info_size + sizeof (gunichar2));
   status = nt_query_key (key->priv->handle,
                          KeyBasicInformation,
                          basic_info,
@@ -1708,7 +1708,7 @@ _g_win32_registry_key_reread_kernel (GWin32RegistryKey        *key,
       g_free (basic_info);
       basic_info_size = datasize;
        /* +1 for 0-terminator */
-      basic_info = g_malloc (basic_info_size + sizeof (xunichar2_t));
+      basic_info = g_malloc (basic_info_size + sizeof (gunichar2));
       status = nt_query_key (key->priv->handle,
                              KeyBasicInformation,
                              basic_info,
@@ -1727,7 +1727,7 @@ _g_win32_registry_key_reread_kernel (GWin32RegistryKey        *key,
   ((char *) basic_info)[datasize + 1] = 0;
 
   buf->absolute_path_w = g_wcsdup (&basic_info->Name[0],
-                                   basic_info->NameLength + sizeof (xunichar2_t));
+                                   basic_info->NameLength + sizeof (gunichar2));
   g_free (basic_info);
 }
 
@@ -1767,12 +1767,12 @@ _g_win32_registry_key_reread (GWin32RegistryKey        *key,
     _g_win32_registry_key_reread_user (key, buf);
 }
 
-static xboolean_t
+static gboolean
 _g_win32_registry_key_update_path (GWin32RegistryKey *key)
 {
   GWin32RegistryKeyPrivate tmp;
-  xboolean_t changed;
-  xint_t change_indicator;
+  gboolean changed;
+  gint change_indicator;
 
   change_indicator = g_atomic_int_get (&key->priv->change_indicator);
 
@@ -1806,12 +1806,12 @@ _g_win32_registry_key_update_path (GWin32RegistryKey *key)
  *
  * Since: 2.46
  **/
-const xchar_t *
+const gchar *
 g_win32_registry_key_get_path (GWin32RegistryKey *key)
 {
-  xint_t change_indicator;
+  gint change_indicator;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), NULL);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), NULL);
 
   change_indicator = g_atomic_int_get (&key->priv->change_indicator);
 
@@ -1826,7 +1826,7 @@ g_win32_registry_key_get_path (GWin32RegistryKey *key)
     {
       g_free (key->priv->absolute_path);
       key->priv->absolute_path =
-          xutf16_to_utf8 (key->priv->absolute_path_w, -1,
+          g_utf16_to_utf8 (key->priv->absolute_path_w, -1,
                            NULL, NULL, NULL);
     }
 
@@ -1843,12 +1843,12 @@ g_win32_registry_key_get_path (GWin32RegistryKey *key)
  *
  * Since: 2.46
  **/
-const xunichar2_t *
+const gunichar2 *
 g_win32_registry_key_get_path_w (GWin32RegistryKey *key)
 {
-  xint_t change_indicator;
+  gint change_indicator;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), NULL);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), NULL);
 
   change_indicator = g_atomic_int_get (&key->priv->change_indicator);
 
@@ -1868,25 +1868,25 @@ g_win32_registry_key_get_path_w (GWin32RegistryKey *key)
  *
  * Since: 2.66
  */
-const xunichar2_t * const *
+const gunichar2 * const *
 g_win32_registry_get_os_dirs_w (void)
 {
-  static xunichar2_t **mui_os_dirs = NULL;
+  static gunichar2 **mui_os_dirs = NULL;
 
   if (g_once_init_enter (&mui_os_dirs))
     {
-      xunichar2_t **new_mui_os_dirs;
-      xunichar2_t *system32 = NULL;
-      xunichar2_t *syswow64 = NULL;
+      gunichar2 **new_mui_os_dirs;
+      gunichar2 *system32 = NULL;
+      gunichar2 *syswow64 = NULL;
       UINT buffer_size;
-      xsize_t array_index = 0;
+      gsize array_index = 0;
 
       buffer_size = GetSystemWow64DirectoryW (NULL, 0);
 
       if (buffer_size > 0)
         {
           UINT copied;
-          syswow64 = g_malloc (buffer_size * sizeof (xunichar2_t));
+          syswow64 = g_malloc (buffer_size * sizeof (gunichar2));
           copied = GetSystemWow64DirectoryW (syswow64, buffer_size);
           if (copied <= 0)
             g_clear_pointer (&syswow64, g_free);
@@ -1897,13 +1897,13 @@ g_win32_registry_get_os_dirs_w (void)
       if (buffer_size > 0)
         {
           UINT copied;
-          system32 = g_malloc (buffer_size * sizeof (xunichar2_t));
+          system32 = g_malloc (buffer_size * sizeof (gunichar2));
           copied = GetSystemDirectoryW (system32, buffer_size);
           if (copied <= 0)
             g_clear_pointer (&system32, g_free);
         }
 
-      new_mui_os_dirs = g_new0 (xunichar2_t *, 3);
+      new_mui_os_dirs = g_new0 (gunichar2 *, 3);
 
       if (system32 != NULL)
         new_mui_os_dirs[array_index++] = system32;
@@ -1916,7 +1916,7 @@ g_win32_registry_get_os_dirs_w (void)
       g_once_init_leave (&mui_os_dirs, new_mui_os_dirs);
     }
 
-  return (const xunichar2_t * const *) mui_os_dirs;
+  return (const gunichar2 * const *) mui_os_dirs;
 }
 
 /**
@@ -1929,28 +1929,28 @@ g_win32_registry_get_os_dirs_w (void)
  *
  * Since: 2.66
  */
-const xchar_t * const *
+const gchar * const *
 g_win32_registry_get_os_dirs (void)
 {
-  static xchar_t **mui_os_dirs = NULL;
+  static gchar **mui_os_dirs = NULL;
 
   if (g_once_init_enter (&mui_os_dirs))
     {
-      xchar_t **new_mui_os_dirs;
-      xsize_t array_index;
-      xsize_t new_array_index;
-      const xunichar2_t * const *mui_os_dirs_utf16 = g_win32_registry_get_os_dirs_w ();
+      gchar **new_mui_os_dirs;
+      gsize array_index;
+      gsize new_array_index;
+      const gunichar2 * const *mui_os_dirs_utf16 = g_win32_registry_get_os_dirs_w ();
 
       for (array_index = 0; mui_os_dirs_utf16[array_index] != NULL; array_index++)
         ;
 
-      new_mui_os_dirs = g_new0 (xchar_t *, array_index + 1);
+      new_mui_os_dirs = g_new0 (gchar *, array_index + 1);
 
       for (array_index = 0, new_array_index = 0;
            mui_os_dirs_utf16[array_index] != NULL;
            array_index++)
         {
-          new_mui_os_dirs[new_array_index] = xutf16_to_utf8 (mui_os_dirs_utf16[array_index],
+          new_mui_os_dirs[new_array_index] = g_utf16_to_utf8 (mui_os_dirs_utf16[array_index],
                                                               -1, NULL, NULL, NULL);
           if (new_mui_os_dirs[new_array_index] != NULL)
             new_array_index += 1;
@@ -1961,7 +1961,7 @@ g_win32_registry_get_os_dirs (void)
       g_once_init_leave (&mui_os_dirs, new_mui_os_dirs);
     }
 
-  return (const xchar_t * const *) mui_os_dirs;
+  return (const gchar * const *) mui_os_dirs;
 }
 
 /**
@@ -1979,7 +1979,7 @@ g_win32_registry_get_os_dirs (void)
  * @value_data: (out callee-allocates) (optional): contents of the value.
  * @value_data_size: (out) (optional): size of the buffer pointed
  *   by @value_data.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Get data from a value of a key. String data is guaranteed to be
  * appropriately terminated and will be in UTF-8.
@@ -2007,37 +2007,37 @@ g_win32_registry_get_os_dirs (void)
  *
  * Since: 2.66
  **/
-xboolean_t
+gboolean
 g_win32_registry_key_get_value (GWin32RegistryKey        *key,
-                                const xchar_t * const      *mui_dll_dirs,
-                                xboolean_t                  auto_expand,
-                                const xchar_t              *value_name,
+                                const gchar * const      *mui_dll_dirs,
+                                gboolean                  auto_expand,
+                                const gchar              *value_name,
                                 GWin32RegistryValueType  *value_type,
-                                xpointer_t                 *value_data,
-                                xsize_t                    *value_data_size,
-                                xerror_t                  **error)
+                                gpointer                 *value_data,
+                                gsize                    *value_data_size,
+                                GError                  **error)
 {
   GWin32RegistryValueType value_type_g;
-  xpointer_t value_data_w;
-  xsize_t value_data_w_size;
-  xunichar2_t *value_name_w;
-  xchar_t *value_data_u8;
-  xsize_t value_data_u8_len;
-  xboolean_t result;
-  xsize_t mui_dll_dirs_count;
-  xunichar2_t **mui_dll_dirs_utf16;
-  const xchar_t * const *mui_os_dirs;
+  gpointer value_data_w;
+  gsize value_data_w_size;
+  gunichar2 *value_name_w;
+  gchar *value_data_u8;
+  gsize value_data_u8_len;
+  gboolean result;
+  gsize mui_dll_dirs_count;
+  gunichar2 **mui_dll_dirs_utf16;
+  const gchar * const *mui_os_dirs;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), FALSE);
-  xreturn_val_if_fail (value_name != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), FALSE);
+  g_return_val_if_fail (value_name != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   /* No sense calling this function with all of these set to NULL */
-  xreturn_val_if_fail (value_type != NULL ||
+  g_return_val_if_fail (value_type != NULL ||
                         value_data != NULL ||
                         value_data_size != NULL, FALSE);
 
-  value_name_w = xutf8_to_utf16 (value_name, -1, NULL, NULL, error);
+  value_name_w = g_utf8_to_utf16 (value_name, -1, NULL, NULL, error);
 
   if (value_name_w == NULL)
     return FALSE;
@@ -2048,14 +2048,14 @@ g_win32_registry_key_get_value (GWin32RegistryKey        *key,
   if (mui_dll_dirs != NULL &&
       mui_dll_dirs != mui_os_dirs)
     {
-      xsize_t i;
+      gsize i;
 
-      mui_dll_dirs_count = xstrv_length ((xchar_t **) mui_dll_dirs);
-      mui_dll_dirs_utf16 = g_new0 (xunichar2_t *, mui_dll_dirs_count + 1);
+      mui_dll_dirs_count = g_strv_length ((gchar **) mui_dll_dirs);
+      mui_dll_dirs_utf16 = g_new0 (gunichar2 *, mui_dll_dirs_count + 1);
 
       for (i = 0; mui_dll_dirs[i] != NULL; i++)
         {
-          mui_dll_dirs_utf16[i] = xutf8_to_utf16 (mui_dll_dirs[i], -1, NULL, NULL, error);
+          mui_dll_dirs_utf16[i] = g_utf8_to_utf16 (mui_dll_dirs[i], -1, NULL, NULL, error);
 
           if (mui_dll_dirs_utf16[i] == NULL)
             break;
@@ -2079,11 +2079,11 @@ g_win32_registry_key_get_value (GWin32RegistryKey        *key,
   else if (mui_dll_dirs != NULL &&
            mui_dll_dirs == mui_os_dirs)
     {
-      mui_dll_dirs_utf16 = (xunichar2_t **) g_win32_registry_get_os_dirs_w ();
+      mui_dll_dirs_utf16 = (gunichar2 **) g_win32_registry_get_os_dirs_w ();
     }
 
   result = g_win32_registry_key_get_value_w (key,
-                                             (const xunichar2_t * const *) mui_dll_dirs_utf16,
+                                             (const gunichar2 * const *) mui_dll_dirs_utf16,
                                              auto_expand,
                                              value_name_w,
                                              &value_type_g,
@@ -2095,7 +2095,7 @@ g_win32_registry_key_get_value (GWin32RegistryKey        *key,
   if (mui_dll_dirs_utf16 != NULL &&
       mui_dll_dirs != mui_os_dirs)
     {
-      xsize_t array_index;
+      gsize array_index;
       for (array_index = 0; mui_dll_dirs_utf16[array_index] != NULL; array_index++)
         g_free (mui_dll_dirs_utf16[array_index]);
       g_free (mui_dll_dirs_utf16);
@@ -2109,8 +2109,8 @@ g_win32_registry_key_get_value (GWin32RegistryKey        *key,
       value_type_g == G_WIN32_REGISTRY_VALUE_STR ||
       value_type_g == G_WIN32_REGISTRY_VALUE_MULTI_STR)
     {
-      value_data_u8 = g_convert ((const xchar_t *) value_data_w,
-                                 value_data_w_size - sizeof (xunichar2_t) /* excl. 0 */,
+      value_data_u8 = g_convert ((const gchar *) value_data_w,
+                                 value_data_w_size - sizeof (gunichar2) /* excl. 0 */,
                                  "UTF8",
                                  "UTF16",
                                  NULL,
@@ -2159,9 +2159,9 @@ MuiRegQueryValueExW (HKEY                     hKey,
                      LPDWORD                  lpType,
                      LPBYTE                   lpData,
                      LPDWORD                  lpcbData,
-                     const xunichar2_t * const *mui_dll_dirs)
+                     const gunichar2 * const *mui_dll_dirs)
 {
-  xsize_t dir_index;
+  gsize dir_index;
   LSTATUS result = ERROR_PATH_NOT_FOUND;
   DWORD bufsize;
   DWORD data_size;
@@ -2246,7 +2246,7 @@ MuiRegQueryValueExW (HKEY                     hKey,
  * @value_data: (out callee-allocates) (optional): contents of the value.
  * @value_data_size: (out) (optional): size of the buffer pointed
  *   by @value_data.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Get data from a value of a key. String data is guaranteed to be
  * appropriately terminated and will be in UTF-16.
@@ -2278,15 +2278,15 @@ MuiRegQueryValueExW (HKEY                     hKey,
  *
  * Since: 2.66
  **/
-xboolean_t
+gboolean
 g_win32_registry_key_get_value_w (GWin32RegistryKey        *key,
-                                  const xunichar2_t * const  *mui_dll_dirs,
-                                  xboolean_t                  auto_expand,
-                                  const xunichar2_t          *value_name,
+                                  const gunichar2 * const  *mui_dll_dirs,
+                                  gboolean                  auto_expand,
+                                  const gunichar2          *value_name,
                                   GWin32RegistryValueType  *value_type,
-                                  xpointer_t                 *value_data,
-                                  xsize_t                    *value_data_size,
-                                  xerror_t                  **error)
+                                  gpointer                 *value_data,
+                                  gsize                    *value_data_size,
+                                  GError                  **error)
 {
   LONG status;
   DWORD value_type_w;
@@ -2297,12 +2297,12 @@ g_win32_registry_key_get_value_w (GWin32RegistryKey        *key,
   DWORD req_value_data_size;
   DWORD req_value_data_size2;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), FALSE);
-  xreturn_val_if_fail (value_name != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), FALSE);
+  g_return_val_if_fail (value_name != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   /* No sense calling this functions with all of these set to NULL */
-  xreturn_val_if_fail (value_type != NULL ||
+  g_return_val_if_fail (value_type != NULL ||
                         value_data != NULL ||
                         value_data_size != NULL, FALSE);
 
@@ -2338,13 +2338,13 @@ g_win32_registry_key_get_value_w (GWin32RegistryKey        *key,
       return TRUE;
     }
 
-  req_value_data = g_malloc (req_value_data_size + sizeof (xunichar2_t) * 2);
+  req_value_data = g_malloc (req_value_data_size + sizeof (gunichar2) * 2);
   req_value_data_size2 = req_value_data_size;
   status = MuiRegQueryValueExW (key->priv->handle,
                                 value_name,
                                 NULL,
                                 &value_type_w2,
-                                (xpointer_t) req_value_data,
+                                (gpointer) req_value_data,
                                 &req_value_data_size2,
                                 mui_dll_dirs);
 
@@ -2374,17 +2374,17 @@ g_win32_registry_key_get_value_w (GWin32RegistryKey        *key,
     }
 
   req_value_data_size = ensure_nul_termination (value_type_g,
-                                                (xuint8_t *) req_value_data,
+                                                (guint8 *) req_value_data,
                                                 req_value_data_size2);
 
   if (value_type_g == G_WIN32_REGISTRY_VALUE_EXPAND_STR && auto_expand)
     {
-      xsize_t value_data_expanded_charsize_w = 0;
-      xunichar2_t *value_data_expanded = NULL;
+      gsize value_data_expanded_charsize_w = 0;
+      gunichar2 *value_data_expanded = NULL;
 
-      if (!expand_value ((xunichar2_t *) req_value_data,
+      if (!expand_value ((gunichar2 *) req_value_data,
                          value_name,
-                         (xpointer_t *) &value_data_expanded,
+                         (gpointer *) &value_data_expanded,
                          &value_data_expanded_charsize_w,
                          error))
         return FALSE;
@@ -2400,7 +2400,7 @@ g_win32_registry_key_get_value_w (GWin32RegistryKey        *key,
         g_free (value_data_expanded);
 
       if (value_data_size)
-        *value_data_size = value_data_expanded_charsize_w * sizeof (xunichar2_t);
+        *value_data_size = value_data_expanded_charsize_w * sizeof (gunichar2);
 
       return TRUE;
     }
@@ -2425,7 +2425,7 @@ key_changed (PVOID            closure,
              ULONG            reserved)
 {
   GWin32RegistryKey *key = G_WIN32_REGISTRY_KEY (closure);
-  xpointer_t user_data;
+  gpointer user_data;
   GWin32RegistryKeyWatchCallbackFunc callback;
 
   callback = g_steal_pointer (&key->priv->callback);
@@ -2439,7 +2439,7 @@ key_changed (PVOID            closure,
   if (callback)
     callback (key, user_data);
 
-  xobject_unref (key);
+  g_object_unref (key);
 }
 
 /**
@@ -2450,7 +2450,7 @@ key_changed (PVOID            closure,
  * @watch_flags: (in): specifies the types of changes to watch for.
  * @callback: (in) (nullable): a function to invoke when a change occurs.
  * @user_data: (in) (nullable): a pointer to pass to @callback on invocation.
- * @error: (nullable): a pointer to %NULL #xerror_t, or %NULL
+ * @error: (nullable): a pointer to %NULL #GError, or %NULL
  *
  * Puts @key under a watch.
  *
@@ -2476,20 +2476,20 @@ key_changed (PVOID            closure,
  *
  * Since: 2.46
  **/
-xboolean_t
+gboolean
 g_win32_registry_key_watch (GWin32RegistryKey                   *key,
-                            xboolean_t                             watch_children,
+                            gboolean                             watch_children,
                             GWin32RegistryKeyWatcherFlags        watch_flags,
                             GWin32RegistryKeyWatchCallbackFunc   callback,
-                            xpointer_t                             user_data,
-                            xerror_t                             **error)
+                            gpointer                             user_data,
+                            GError                             **error)
 {
   ULONG filter;
-  xboolean_t started_to_watch;
+  gboolean started_to_watch;
   NTSTATUS status;
   PIO_STATUS_BLOCK status_block;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), FALSE);
 
   filter = ((watch_flags & G_WIN32_REGISTRY_WATCH_NAME)       ? REG_NOTIFY_CHANGE_NAME       : 0) |
            ((watch_flags & G_WIN32_REGISTRY_WATCH_ATTRIBUTES) ? REG_NOTIFY_CHANGE_ATTRIBUTES : 0) |
@@ -2498,7 +2498,7 @@ g_win32_registry_key_watch (GWin32RegistryKey                   *key,
 
   if (filter == 0)
     {
-      g_critical ("No supported flags specified in watch_flags (%x)", (xuint_t) watch_flags);
+      g_critical ("No supported flags specified in watch_flags (%x)", (guint) watch_flags);
       return FALSE;
     }
 
@@ -2536,7 +2536,7 @@ g_win32_registry_key_watch (GWin32RegistryKey                   *key,
   g_atomic_int_set (&key->priv->change_indicator, G_WIN32_KEY_UNCHANGED);
 
   /* Keep it alive until APC is called */
-  xobject_ref (key);
+  g_object_ref (key);
 
   status_block = g_malloc (sizeof (IO_STATUS_BLOCK));
 
@@ -2558,7 +2558,7 @@ g_win32_registry_key_watch (GWin32RegistryKey                   *key,
 
   g_atomic_int_set (&key->priv->change_indicator, G_WIN32_KEY_UNKNOWN);
   g_atomic_int_set (&key->priv->watch_indicator, G_WIN32_KEY_UNWATCHED);
-  xobject_unref (key);
+  g_object_unref (key);
   g_free (status_block);
 
   return FALSE;
@@ -2579,7 +2579,7 @@ g_win32_registry_key_watch (GWin32RegistryKey                   *key,
 void
 g_win32_registry_key_erase_change_indicator (GWin32RegistryKey *key)
 {
-  g_return_if_fail (X_IS_WIN32_REGISTRY_KEY (key));
+  g_return_if_fail (G_IS_WIN32_REGISTRY_KEY (key));
 
   g_atomic_int_set (&key->priv->change_indicator, G_WIN32_KEY_UNKNOWN);
 }
@@ -2595,12 +2595,12 @@ g_win32_registry_key_erase_change_indicator (GWin32RegistryKey *key)
  *
  * Since: 2.46
  */
-xboolean_t
+gboolean
 g_win32_registry_key_has_changed (GWin32RegistryKey *key)
 {
-  xint_t changed;
+  gint changed;
 
-  xreturn_val_if_fail (X_IS_WIN32_REGISTRY_KEY (key), FALSE);
+  g_return_val_if_fail (G_IS_WIN32_REGISTRY_KEY (key), FALSE);
 
   changed = g_atomic_int_get (&key->priv->change_indicator);
 
@@ -2608,21 +2608,21 @@ g_win32_registry_key_has_changed (GWin32RegistryKey *key)
 }
 
 static void
-g_win32_registry_key_get_property (xobject_t    *object,
-                                   xuint_t       prop_id,
-                                   xvalue_t     *value,
-                                   xparam_spec_t *pspec)
+g_win32_registry_key_get_property (GObject    *object,
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
 {
   GWin32RegistryKey *key = G_WIN32_REGISTRY_KEY (object);
 
   switch (prop_id)
     {
       case PROP_PATH:
-        xvalue_set_string (value, g_win32_registry_key_get_path (key));
+        g_value_set_string (value, g_win32_registry_key_get_path (key));
         break;
 
       case PROP_PATH_UTF16:
-        xvalue_set_pointer (value, (xpointer_t) g_win32_registry_key_get_path_w (key));
+        g_value_set_pointer (value, (gpointer) g_win32_registry_key_get_path_w (key));
         break;
 
       default:
@@ -2631,44 +2631,44 @@ g_win32_registry_key_get_property (xobject_t    *object,
 }
 
 static void
-g_win32_registry_key_set_property (xobject_t      *object,
-                                   xuint_t         prop_id,
-                                   const xvalue_t *value,
-                                   xparam_spec_t   *pspec)
+g_win32_registry_key_set_property (GObject      *object,
+                                   guint         prop_id,
+                                   const GValue *value,
+                                   GParamSpec   *pspec)
 {
   GWin32RegistryKey *key = G_WIN32_REGISTRY_KEY (object);
   GWin32RegistryKeyPrivate *priv = key->priv;
-  const xchar_t *path;
-  xunichar2_t *path_w;
+  const gchar *path;
+  gunichar2 *path_w;
 
   switch (prop_id)
     {
     case PROP_PATH:
-      path = xvalue_get_string (value);
+      path = g_value_get_string (value);
 
       if (path == NULL)
         break;
 
-      path_w = xutf8_to_utf16 (path, -1, NULL, NULL, NULL);
+      path_w = g_utf8_to_utf16 (path, -1, NULL, NULL, NULL);
 
       if (path_w == NULL)
         break;
 
       /* Construct only */
-      xassert (priv->absolute_path_w == NULL);
-      xassert (priv->absolute_path == NULL);
+      g_assert (priv->absolute_path_w == NULL);
+      g_assert (priv->absolute_path == NULL);
       priv->absolute_path_w = path_w;
-      priv->absolute_path = xvalue_dup_string (value);
+      priv->absolute_path = g_value_dup_string (value);
       break;
 
     case PROP_PATH_UTF16:
-      path_w = (xunichar2_t *) xvalue_get_pointer (value);
+      path_w = (gunichar2 *) g_value_get_pointer (value);
 
       if (path_w == NULL)
         break;
 
       /* Construct only */
-      xassert (priv->absolute_path_w == NULL);
+      g_assert (priv->absolute_path_w == NULL);
       priv->absolute_path_w = g_wcsdup (path_w, -1);
       break;
 
@@ -2680,11 +2680,11 @@ g_win32_registry_key_set_property (xobject_t      *object,
 static void
 g_win32_registry_key_class_init (GWin32RegistryKeyClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->dispose = g_win32_registry_key_dispose;
-  xobject_class->set_property = g_win32_registry_key_set_property;
-  xobject_class->get_property = g_win32_registry_key_get_property;
+  gobject_class->dispose = g_win32_registry_key_dispose;
+  gobject_class->set_property = g_win32_registry_key_set_property;
+  gobject_class->get_property = g_win32_registry_key_get_property;
 
   /**
    * GWin32RegistryKey:path:
@@ -2693,15 +2693,15 @@ g_win32_registry_key_class_init (GWin32RegistryKeyClass *klass)
    *
    * Since: 2.46
    */
-  xobject_class_install_property (xobject_class,
+  g_object_class_install_property (gobject_class,
                                    PROP_PATH,
-                                   xparam_spec_string ("path",
+                                   g_param_spec_string ("path",
                                                         "Path",
                                                         "Path to the key in the registry",
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
 
   /**
    * GWin32RegistryKey:path-utf16:
@@ -2710,14 +2710,14 @@ g_win32_registry_key_class_init (GWin32RegistryKeyClass *klass)
    *
    * Since: 2.46
    */
-  xobject_class_install_property (xobject_class,
+  g_object_class_install_property (gobject_class,
                                    PROP_PATH_UTF16,
-                                   xparam_spec_pointer ("path-utf16",
+                                   g_param_spec_pointer ("path-utf16",
                                                         "Path (UTF-16)",
                                                         "Path to the key in the registry, in UTF-16",
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
 }
 
 static void

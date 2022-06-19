@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -46,21 +46,21 @@
  * @short_description: text buffers which grow automatically
  *     as text is added
  *
- * A #xstring_t is an object that handles the memory management of a C
- * string for you.  The emphasis of #xstring_t is on text, typically
- * UTF-8.  Crucially, the "str" member of a #xstring_t is guaranteed to
+ * A #GString is an object that handles the memory management of a C
+ * string for you.  The emphasis of #GString is on text, typically
+ * UTF-8.  Crucially, the "str" member of a #GString is guaranteed to
  * have a trailing nul character, and it is therefore always safe to
- * call functions such as strchr() or xstrdup() on it.
+ * call functions such as strchr() or g_strdup() on it.
  *
- * However, a #xstring_t can also hold arbitrary binary data, because it
+ * However, a #GString can also hold arbitrary binary data, because it
  * has a "len" member, which includes any possible embedded nul
- * characters in the data.  Conceptually then, #xstring_t is like a
- * #xbyte_array_t with the addition of many convenience methods for text,
+ * characters in the data.  Conceptually then, #GString is like a
+ * #GByteArray with the addition of many convenience methods for text,
  * and a guaranteed nul terminator.
  */
 
 /**
- * xstring_t:
+ * GString:
  * @str: points to the character data. It may move as text is added.
  *   The @str field is null-terminated and so
  *   can be used as an ordinary C string.
@@ -69,16 +69,16 @@
  * @allocated_len: the number of bytes that can be stored in the
  *   string before it needs to be reallocated. May be larger than @len.
  *
- * The xstring_t struct contains the public fields of a xstring_t.
+ * The GString struct contains the public fields of a GString.
  */
 
 static void
-xstring_maybe_expand (xstring_t *string,
-                       xsize_t    len)
+g_string_maybe_expand (GString *string,
+                       gsize    len)
 {
   /* Detect potential overflow */
   if G_UNLIKELY ((G_MAXSIZE - string->len - 1) < len)
-    xerror ("adding %" G_GSIZE_FORMAT " to string would overflow", len);
+    g_error ("adding %" G_GSIZE_FORMAT " to string would overflow", len);
 
   if (string->len + len >= string->allocated_len)
     {
@@ -92,66 +92,66 @@ xstring_maybe_expand (xstring_t *string,
 }
 
 /**
- * xstring_sized_new: (constructor)
+ * g_string_sized_new: (constructor)
  * @dfl_size: the default size of the space allocated to hold the string
  *
- * Creates a new #xstring_t, with enough space for @dfl_size
+ * Creates a new #GString, with enough space for @dfl_size
  * bytes. This is useful if you are going to add a lot of
  * text to the string and don't want it to be reallocated
  * too often.
  *
- * Returns: (transfer full): the new #xstring_t
+ * Returns: (transfer full): the new #GString
  */
-xstring_t *
-xstring_sized_new (xsize_t dfl_size)
+GString *
+g_string_sized_new (gsize dfl_size)
 {
-  xstring_t *string = g_slice_new (xstring_t);
+  GString *string = g_slice_new (GString);
 
   string->allocated_len = 0;
   string->len   = 0;
   string->str   = NULL;
 
-  xstring_maybe_expand (string, MAX (dfl_size, 64));
+  g_string_maybe_expand (string, MAX (dfl_size, 64));
   string->str[0] = 0;
 
   return string;
 }
 
 /**
- * xstring_new: (constructor)
+ * g_string_new: (constructor)
  * @init: (nullable): the initial text to copy into the string, or %NULL to
  *   start with an empty string
  *
- * Creates a new #xstring_t, initialized with the given string.
+ * Creates a new #GString, initialized with the given string.
  *
- * Returns: (transfer full): the new #xstring_t
+ * Returns: (transfer full): the new #GString
  */
-xstring_t *
-xstring_new (const xchar_t *init)
+GString *
+g_string_new (const gchar *init)
 {
-  xstring_t *string;
+  GString *string;
 
   if (init == NULL || *init == '\0')
-    string = xstring_sized_new (2);
+    string = g_string_sized_new (2);
   else
     {
-      xint_t len;
+      gint len;
 
       len = strlen (init);
-      string = xstring_sized_new (len + 2);
+      string = g_string_sized_new (len + 2);
 
-      xstring_append_len (string, init, len);
+      g_string_append_len (string, init, len);
     }
 
   return string;
 }
 
 /**
- * xstring_new_len: (constructor)
+ * g_string_new_len: (constructor)
  * @init: initial contents of the string
  * @len: length of @init to use
  *
- * Creates a new #xstring_t with @len bytes of the @init buffer.
+ * Creates a new #GString with @len bytes of the @init buffer.
  * Because a length is provided, @init need not be nul-terminated,
  * and can contain embedded nul bytes.
  *
@@ -159,33 +159,33 @@ xstring_new (const xchar_t *init)
  * responsibility to ensure that @init has at least @len addressable
  * bytes.
  *
- * Returns: (transfer full): a new #xstring_t
+ * Returns: (transfer full): a new #GString
  */
-xstring_t *
-xstring_new_len (const xchar_t *init,
-                  xssize_t       len)
+GString *
+g_string_new_len (const gchar *init,
+                  gssize       len)
 {
-  xstring_t *string;
+  GString *string;
 
   if (len < 0)
-    return xstring_new (init);
+    return g_string_new (init);
   else
     {
-      string = xstring_sized_new (len);
+      string = g_string_sized_new (len);
 
       if (init)
-        xstring_append_len (string, init, len);
+        g_string_append_len (string, init, len);
 
       return string;
     }
 }
 
 /**
- * xstring_free:
- * @string: (transfer full): a #xstring_t
+ * g_string_free:
+ * @string: (transfer full): a #GString
  * @free_segment: if %TRUE, the actual character data is freed as well
  *
- * Frees the memory allocated for the #xstring_t.
+ * Frees the memory allocated for the #GString.
  * If @free_segment is %TRUE it also frees the character data.  If
  * it's %FALSE, the caller gains ownership of the buffer and must
  * free it after use with g_free().
@@ -193,13 +193,13 @@ xstring_new_len (const xchar_t *init,
  * Returns: (nullable): the character data of @string
  *          (i.e. %NULL if @free_segment is %TRUE)
  */
-xchar_t *
-xstring_free (xstring_t  *string,
-               xboolean_t  free_segment)
+gchar *
+g_string_free (GString  *string,
+               gboolean  free_segment)
 {
-  xchar_t *segment;
+  gchar *segment;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   if (free_segment)
     {
@@ -209,61 +209,61 @@ xstring_free (xstring_t  *string,
   else
     segment = string->str;
 
-  g_slice_free (xstring_t, string);
+  g_slice_free (GString, string);
 
   return segment;
 }
 
 /**
- * xstring_free_to_bytes:
- * @string: (transfer full): a #xstring_t
+ * g_string_free_to_bytes:
+ * @string: (transfer full): a #GString
  *
  * Transfers ownership of the contents of @string to a newly allocated
- * #xbytes_t.  The #xstring_t structure itself is deallocated, and it is
+ * #GBytes.  The #GString structure itself is deallocated, and it is
  * therefore invalid to use @string after invoking this function.
  *
- * Note that while #xstring_t ensures that its buffer always has a
+ * Note that while #GString ensures that its buffer always has a
  * trailing nul character (not reflected in its "len"), the returned
- * #xbytes_t does not include this extra nul; i.e. it has length exactly
+ * #GBytes does not include this extra nul; i.e. it has length exactly
  * equal to the "len" member.
  *
- * Returns: (transfer full): A newly allocated #xbytes_t containing contents of @string; @string itself is freed
+ * Returns: (transfer full): A newly allocated #GBytes containing contents of @string; @string itself is freed
  * Since: 2.34
  */
-xbytes_t*
-xstring_free_to_bytes (xstring_t *string)
+GBytes*
+g_string_free_to_bytes (GString *string)
 {
-  xsize_t len;
-  xchar_t *buf;
+  gsize len;
+  gchar *buf;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   len = string->len;
 
-  buf = xstring_free (string, FALSE);
+  buf = g_string_free (string, FALSE);
 
-  return xbytes_new_take (buf, len);
+  return g_bytes_new_take (buf, len);
 }
 
 /**
- * xstring_equal:
- * @v: a #xstring_t
- * @v2: another #xstring_t
+ * g_string_equal:
+ * @v: a #GString
+ * @v2: another #GString
  *
  * Compares two strings for equality, returning %TRUE if they are equal.
- * For use with #xhashtable_t.
+ * For use with #GHashTable.
  *
  * Returns: %TRUE if the strings are the same length and contain the
  *     same bytes
  */
-xboolean_t
-xstring_equal (const xstring_t *v,
-                const xstring_t *v2)
+gboolean
+g_string_equal (const GString *v,
+                const GString *v2)
 {
-  xchar_t *p, *q;
-  xstring_t *string1 = (xstring_t *) v;
-  xstring_t *string2 = (xstring_t *) v2;
-  xsize_t i = string1->len;
+  gchar *p, *q;
+  GString *string1 = (GString *) v;
+  GString *string2 = (GString *) v2;
+  gsize i = string1->len;
 
   if (i != string2->len)
     return FALSE;
@@ -282,19 +282,19 @@ xstring_equal (const xstring_t *v,
 }
 
 /**
- * xstring_hash:
+ * g_string_hash:
  * @str: a string to hash
  *
- * Creates a hash code for @str; for use with #xhashtable_t.
+ * Creates a hash code for @str; for use with #GHashTable.
  *
  * Returns: hash code for @str
  */
-xuint_t
-xstring_hash (const xstring_t *str)
+guint
+g_string_hash (const GString *str)
 {
-  const xchar_t *p = str->str;
-  xsize_t n = str->len;
-  xuint_t h = 0;
+  const gchar *p = str->str;
+  gsize n = str->len;
+  guint h = 0;
 
   /* 31 bit hash function */
   while (n--)
@@ -307,52 +307,52 @@ xstring_hash (const xstring_t *str)
 }
 
 /**
- * xstring_assign:
- * @string: the destination #xstring_t. Its current contents
+ * g_string_assign:
+ * @string: the destination #GString. Its current contents
  *          are destroyed.
  * @rval: the string to copy into @string
  *
- * Copies the bytes from a string into a #xstring_t,
+ * Copies the bytes from a string into a #GString,
  * destroying any previous contents. It is rather like
  * the standard strcpy() function, except that you do not
  * have to worry about having enough space to copy the string.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_assign (xstring_t     *string,
-                 const xchar_t *rval)
+GString *
+g_string_assign (GString     *string,
+                 const gchar *rval)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
-  xreturn_val_if_fail (rval != NULL, string);
+  g_return_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (rval != NULL, string);
 
   /* Make sure assigning to itself doesn't corrupt the string. */
   if (string->str != rval)
     {
       /* Assigning from substring should be ok, since
-       * xstring_truncate() does not reallocate.
+       * g_string_truncate() does not reallocate.
        */
-      xstring_truncate (string, 0);
-      xstring_append (string, rval);
+      g_string_truncate (string, 0);
+      g_string_append (string, rval);
     }
 
   return string;
 }
 
 /**
- * xstring_truncate:
- * @string: a #xstring_t
+ * g_string_truncate:
+ * @string: a #GString
  * @len: the new size of @string
  *
- * Cuts off the end of the xstring_t, leaving the first @len bytes.
+ * Cuts off the end of the GString, leaving the first @len bytes.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_truncate (xstring_t *string,
-                   xsize_t    len)
+GString *
+g_string_truncate (GString *string,
+                   gsize    len)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   string->len = MIN (len, string->len);
   string->str[string->len] = 0;
@@ -361,11 +361,11 @@ xstring_truncate (xstring_t *string,
 }
 
 /**
- * xstring_set_size:
- * @string: a #xstring_t
+ * g_string_set_size:
+ * @string: a #GString
  * @len: the new length
  *
- * Sets the length of a #xstring_t. If the length is less than
+ * Sets the length of a #GString. If the length is less than
  * the current length, the string will be truncated. If the
  * length is greater than the current length, the contents
  * of the newly added area are undefined. (However, as
@@ -373,14 +373,14 @@ xstring_truncate (xstring_t *string,
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_set_size (xstring_t *string,
-                   xsize_t    len)
+GString *
+g_string_set_size (GString *string,
+                   gsize    len)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   if (len >= string->allocated_len)
-    xstring_maybe_expand (string, len - string->len);
+    g_string_maybe_expand (string, len - string->len);
 
   string->len = len;
   string->str[len] = 0;
@@ -389,8 +389,8 @@ xstring_set_size (xstring_t *string,
 }
 
 /**
- * xstring_insert_len:
- * @string: a #xstring_t
+ * g_string_insert_len:
+ * @string: a #GString
  * @pos: position in @string where insertion should
  *       happen, or -1 for at the end
  * @val: bytes to insert
@@ -409,16 +409,16 @@ xstring_set_size (xstring_t *string,
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_insert_len (xstring_t     *string,
-                     xssize_t       pos,
-                     const xchar_t *val,
-                     xssize_t       len)
+GString *
+g_string_insert_len (GString     *string,
+                     gssize       pos,
+                     const gchar *val,
+                     gssize       len)
 {
-  xsize_t len_unsigned, pos_unsigned;
+  gsize len_unsigned, pos_unsigned;
 
-  xreturn_val_if_fail (string != NULL, NULL);
-  xreturn_val_if_fail (len == 0 || val != NULL, string);
+  g_return_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (len == 0 || val != NULL, string);
 
   if (len == 0)
     return string;
@@ -432,7 +432,7 @@ xstring_insert_len (xstring_t     *string,
   else
     {
       pos_unsigned = pos;
-      xreturn_val_if_fail (pos_unsigned <= string->len, string);
+      g_return_val_if_fail (pos_unsigned <= string->len, string);
     }
 
   /* Check whether val represents a substring of string.
@@ -442,10 +442,10 @@ xstring_insert_len (xstring_t     *string,
    */
   if (G_UNLIKELY (val >= string->str && val <= string->str + string->len))
     {
-      xsize_t offset = val - string->str;
-      xsize_t precount = 0;
+      gsize offset = val - string->str;
+      gsize precount = 0;
 
-      xstring_maybe_expand (string, len_unsigned);
+      g_string_maybe_expand (string, len_unsigned);
       val = string->str + offset;
       /* At this point, val is valid again.  */
 
@@ -470,7 +470,7 @@ xstring_insert_len (xstring_t     *string,
     }
   else
     {
-      xstring_maybe_expand (string, len_unsigned);
+      g_string_maybe_expand (string, len_unsigned);
 
       /* If we aren't appending at the end, move a hunk
        * of the old string to the end, opening up space
@@ -494,8 +494,8 @@ xstring_insert_len (xstring_t     *string,
 }
 
 /**
- * xstring_append_uri_escaped:
- * @string: a #xstring_t
+ * g_string_append_uri_escaped:
+ * @string: a #GString
  * @unescaped: a string
  * @reserved_chars_allowed: a string of reserved characters allowed
  *     to be used, or %NULL
@@ -508,37 +508,37 @@ xstring_insert_len (xstring_t     *string,
  *
  * Since: 2.16
  */
-xstring_t *
-xstring_append_uri_escaped (xstring_t     *string,
-                             const xchar_t *unescaped,
-                             const xchar_t *reserved_chars_allowed,
-                             xboolean_t     allow_utf8)
+GString *
+g_string_append_uri_escaped (GString     *string,
+                             const gchar *unescaped,
+                             const gchar *reserved_chars_allowed,
+                             gboolean     allow_utf8)
 {
-  _uri_encoder (string, (const xuchar_t *) unescaped, strlen (unescaped),
+  _uri_encoder (string, (const guchar *) unescaped, strlen (unescaped),
                 reserved_chars_allowed, allow_utf8);
   return string;
 }
 
 /**
- * xstring_append:
- * @string: a #xstring_t
+ * g_string_append:
+ * @string: a #GString
  * @val: the string to append onto the end of @string
  *
- * Adds a string onto the end of a #xstring_t, expanding
+ * Adds a string onto the end of a #GString, expanding
  * it if necessary.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_append (xstring_t     *string,
-                 const xchar_t *val)
+GString *
+g_string_append (GString     *string,
+                 const gchar *val)
 {
-  return xstring_insert_len (string, -1, val, -1);
+  return g_string_insert_len (string, -1, val, -1);
 }
 
 /**
- * xstring_append_len:
- * @string: a #xstring_t
+ * g_string_append_len:
+ * @string: a #GString
  * @val: bytes to append
  * @len: number of bytes of @val to use, or -1 for all of @val
  *
@@ -550,41 +550,41 @@ xstring_append (xstring_t     *string,
  *
  * If @len is negative, @val must be nul-terminated and @len
  * is considered to request the entire string length. This
- * makes xstring_append_len() equivalent to xstring_append().
+ * makes g_string_append_len() equivalent to g_string_append().
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_append_len (xstring_t     *string,
-                     const xchar_t *val,
-                     xssize_t       len)
+GString *
+g_string_append_len (GString     *string,
+                     const gchar *val,
+                     gssize       len)
 {
-  return xstring_insert_len (string, -1, val, len);
+  return g_string_insert_len (string, -1, val, len);
 }
 
 /**
- * xstring_append_c:
- * @string: a #xstring_t
+ * g_string_append_c:
+ * @string: a #GString
  * @c: the byte to append onto the end of @string
  *
- * Adds a byte onto the end of a #xstring_t, expanding
+ * Adds a byte onto the end of a #GString, expanding
  * it if necessary.
  *
  * Returns: (transfer none): @string
  */
-#undef xstring_append_c
-xstring_t *
-xstring_append_c (xstring_t *string,
-                   xchar_t    c)
+#undef g_string_append_c
+GString *
+g_string_append_c (GString *string,
+                   gchar    c)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
-  return xstring_insert_c (string, -1, c);
+  return g_string_insert_c (string, -1, c);
 }
 
 /**
- * xstring_append_unichar:
- * @string: a #xstring_t
+ * g_string_append_unichar:
+ * @string: a #GString
  * @wc: a Unicode character
  *
  * Converts a Unicode character into UTF-8, and appends it
@@ -592,35 +592,35 @@ xstring_append_c (xstring_t *string,
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_append_unichar (xstring_t  *string,
-                         xunichar_t  wc)
+GString *
+g_string_append_unichar (GString  *string,
+                         gunichar  wc)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
-  return xstring_insert_unichar (string, -1, wc);
+  return g_string_insert_unichar (string, -1, wc);
 }
 
 /**
- * xstring_prepend:
- * @string: a #xstring_t
+ * g_string_prepend:
+ * @string: a #GString
  * @val: the string to prepend on the start of @string
  *
- * Adds a string on to the start of a #xstring_t,
+ * Adds a string on to the start of a #GString,
  * expanding it if necessary.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_prepend (xstring_t     *string,
-                  const xchar_t *val)
+GString *
+g_string_prepend (GString     *string,
+                  const gchar *val)
 {
-  return xstring_insert_len (string, 0, val, -1);
+  return g_string_insert_len (string, 0, val, -1);
 }
 
 /**
- * xstring_prepend_len:
- * @string: a #xstring_t
+ * g_string_prepend_len:
+ * @string: a #GString
  * @val: bytes to prepend
  * @len: number of bytes in @val to prepend, or -1 for all of @val
  *
@@ -632,40 +632,40 @@ xstring_prepend (xstring_t     *string,
  *
  * If @len is negative, @val must be nul-terminated and @len
  * is considered to request the entire string length. This
- * makes xstring_prepend_len() equivalent to xstring_prepend().
+ * makes g_string_prepend_len() equivalent to g_string_prepend().
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_prepend_len (xstring_t     *string,
-                      const xchar_t *val,
-                      xssize_t       len)
+GString *
+g_string_prepend_len (GString     *string,
+                      const gchar *val,
+                      gssize       len)
 {
-  return xstring_insert_len (string, 0, val, len);
+  return g_string_insert_len (string, 0, val, len);
 }
 
 /**
- * xstring_prepend_c:
- * @string: a #xstring_t
- * @c: the byte to prepend on the start of the #xstring_t
+ * g_string_prepend_c:
+ * @string: a #GString
+ * @c: the byte to prepend on the start of the #GString
  *
- * Adds a byte onto the start of a #xstring_t,
+ * Adds a byte onto the start of a #GString,
  * expanding it if necessary.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_prepend_c (xstring_t *string,
-                    xchar_t    c)
+GString *
+g_string_prepend_c (GString *string,
+                    gchar    c)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
-  return xstring_insert_c (string, 0, c);
+  return g_string_insert_c (string, 0, c);
 }
 
 /**
- * xstring_prepend_unichar:
- * @string: a #xstring_t
+ * g_string_prepend_unichar:
+ * @string: a #GString
  * @wc: a Unicode character
  *
  * Converts a Unicode character into UTF-8, and prepends it
@@ -673,59 +673,59 @@ xstring_prepend_c (xstring_t *string,
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_prepend_unichar (xstring_t  *string,
-                          xunichar_t  wc)
+GString *
+g_string_prepend_unichar (GString  *string,
+                          gunichar  wc)
 {
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
-  return xstring_insert_unichar (string, 0, wc);
+  return g_string_insert_unichar (string, 0, wc);
 }
 
 /**
- * xstring_insert:
- * @string: a #xstring_t
+ * g_string_insert:
+ * @string: a #GString
  * @pos: the position to insert the copy of the string
  * @val: the string to insert
  *
- * Inserts a copy of a string into a #xstring_t,
+ * Inserts a copy of a string into a #GString,
  * expanding it if necessary.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_insert (xstring_t     *string,
-                 xssize_t       pos,
-                 const xchar_t *val)
+GString *
+g_string_insert (GString     *string,
+                 gssize       pos,
+                 const gchar *val)
 {
-  return xstring_insert_len (string, pos, val, -1);
+  return g_string_insert_len (string, pos, val, -1);
 }
 
 /**
- * xstring_insert_c:
- * @string: a #xstring_t
+ * g_string_insert_c:
+ * @string: a #GString
  * @pos: the position to insert the byte
  * @c: the byte to insert
  *
- * Inserts a byte into a #xstring_t, expanding it if necessary.
+ * Inserts a byte into a #GString, expanding it if necessary.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_insert_c (xstring_t *string,
-                   xssize_t   pos,
-                   xchar_t    c)
+GString *
+g_string_insert_c (GString *string,
+                   gssize   pos,
+                   gchar    c)
 {
-  xsize_t pos_unsigned;
+  gsize pos_unsigned;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
-  xstring_maybe_expand (string, 1);
+  g_string_maybe_expand (string, 1);
 
   if (pos < 0)
     pos = string->len;
   else
-    xreturn_val_if_fail ((xsize_t) pos <= string->len, string);
+    g_return_val_if_fail ((gsize) pos <= string->len, string);
   pos_unsigned = pos;
 
   /* If not just an append, move the old stuff */
@@ -743,8 +743,8 @@ xstring_insert_c (xstring_t *string,
 }
 
 /**
- * xstring_insert_unichar:
- * @string: a #xstring_t
+ * g_string_insert_unichar:
+ * @string: a #GString
  * @pos: the position at which to insert character, or -1
  *     to append at the end of the string
  * @wc: a Unicode character
@@ -754,17 +754,17 @@ xstring_insert_c (xstring_t *string,
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_insert_unichar (xstring_t  *string,
-                         xssize_t    pos,
-                         xunichar_t  wc)
+GString *
+g_string_insert_unichar (GString  *string,
+                         gssize    pos,
+                         gunichar  wc)
 {
-  xint_t charlen, first, i;
-  xchar_t *dest;
+  gint charlen, first, i;
+  gchar *dest;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
-  /* Code copied from xunichar_to_utf() */
+  /* Code copied from g_unichar_to_utf() */
   if (wc < 0x80)
     {
       first = 0;
@@ -797,19 +797,19 @@ xstring_insert_unichar (xstring_t  *string,
     }
   /* End of copied code */
 
-  xstring_maybe_expand (string, charlen);
+  g_string_maybe_expand (string, charlen);
 
   if (pos < 0)
     pos = string->len;
   else
-    xreturn_val_if_fail ((xsize_t) pos <= string->len, string);
+    g_return_val_if_fail ((gsize) pos <= string->len, string);
 
   /* If not just an append, move the old stuff */
-  if ((xsize_t) pos < string->len)
+  if ((gsize) pos < string->len)
     memmove (string->str + pos + charlen, string->str + pos, string->len - pos);
 
   dest = string->str + pos;
-  /* Code copied from xunichar_to_utf() */
+  /* Code copied from g_unichar_to_utf() */
   for (i = charlen - 1; i > 0; --i)
     {
       dest[i] = (wc & 0x3f) | 0x80;
@@ -826,8 +826,8 @@ xstring_insert_unichar (xstring_t  *string,
 }
 
 /**
- * xstring_overwrite:
- * @string: a #xstring_t
+ * g_string_overwrite:
+ * @string: a #GString
  * @pos: the position at which to start overwriting
  * @val: the string that will overwrite the @string starting at @pos
  *
@@ -837,18 +837,18 @@ xstring_insert_unichar (xstring_t  *string,
  *
  * Since: 2.14
  */
-xstring_t *
-xstring_overwrite (xstring_t     *string,
-                    xsize_t        pos,
-                    const xchar_t *val)
+GString *
+g_string_overwrite (GString     *string,
+                    gsize        pos,
+                    const gchar *val)
 {
-  xreturn_val_if_fail (val != NULL, string);
-  return xstring_overwrite_len (string, pos, val, strlen (val));
+  g_return_val_if_fail (val != NULL, string);
+  return g_string_overwrite_len (string, pos, val, strlen (val));
 }
 
 /**
- * xstring_overwrite_len:
- * @string: a #xstring_t
+ * g_string_overwrite_len:
+ * @string: a #GString
  * @pos: the position at which to start overwriting
  * @val: the string that will overwrite the @string starting at @pos
  * @len: the number of bytes to write from @val
@@ -860,21 +860,21 @@ xstring_overwrite (xstring_t     *string,
  *
  * Since: 2.14
  */
-xstring_t *
-xstring_overwrite_len (xstring_t     *string,
-                        xsize_t        pos,
-                        const xchar_t *val,
-                        xssize_t       len)
+GString *
+g_string_overwrite_len (GString     *string,
+                        gsize        pos,
+                        const gchar *val,
+                        gssize       len)
 {
-  xsize_t end;
+  gsize end;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   if (!len)
     return string;
 
-  xreturn_val_if_fail (val != NULL, string);
-  xreturn_val_if_fail (pos <= string->len, string);
+  g_return_val_if_fail (val != NULL, string);
+  g_return_val_if_fail (pos <= string->len, string);
 
   if (len < 0)
     len = strlen (val);
@@ -882,7 +882,7 @@ xstring_overwrite_len (xstring_t     *string,
   end = pos + len;
 
   if (end > string->len)
-    xstring_maybe_expand (string, end - string->len);
+    g_string_maybe_expand (string, end - string->len);
 
   memcpy (string->str + pos, val, len);
 
@@ -896,36 +896,36 @@ xstring_overwrite_len (xstring_t     *string,
 }
 
 /**
- * xstring_erase:
- * @string: a #xstring_t
+ * g_string_erase:
+ * @string: a #GString
  * @pos: the position of the content to remove
  * @len: the number of bytes to remove, or -1 to remove all
  *       following bytes
  *
- * Removes @len bytes from a #xstring_t, starting at position @pos.
- * The rest of the #xstring_t is shifted down to fill the gap.
+ * Removes @len bytes from a #GString, starting at position @pos.
+ * The rest of the #GString is shifted down to fill the gap.
  *
  * Returns: (transfer none): @string
  */
-xstring_t *
-xstring_erase (xstring_t *string,
-                xssize_t   pos,
-                xssize_t   len)
+GString *
+g_string_erase (GString *string,
+                gssize   pos,
+                gssize   len)
 {
-  xsize_t len_unsigned, pos_unsigned;
+  gsize len_unsigned, pos_unsigned;
 
-  xreturn_val_if_fail (string != NULL, NULL);
-  xreturn_val_if_fail (pos >= 0, string);
+  g_return_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (pos >= 0, string);
   pos_unsigned = pos;
 
-  xreturn_val_if_fail (pos_unsigned <= string->len, string);
+  g_return_val_if_fail (pos_unsigned <= string->len, string);
 
   if (len < 0)
     len_unsigned = string->len - pos_unsigned;
   else
     {
       len_unsigned = len;
-      xreturn_val_if_fail (pos_unsigned + len_unsigned <= string->len, string);
+      g_return_val_if_fail (pos_unsigned + len_unsigned <= string->len, string);
 
       if (pos_unsigned + len_unsigned < string->len)
         memmove (string->str + pos_unsigned,
@@ -941,15 +941,15 @@ xstring_erase (xstring_t *string,
 }
 
 /**
- * xstring_replace:
- * @string: a #xstring_t
+ * g_string_replace:
+ * @string: a #GString
  * @find: the string to find in @string
  * @replace: the string to insert in place of @find
  * @limit: the maximum instances of @find to replace with @replace, or `0` for
  * no limit
  *
- * Replaces the string @find with the string @replace in a #xstring_t up to
- * @limit times. If the number of instances of @find in the #xstring_t is
+ * Replaces the string @find with the string @replace in a #GString up to
+ * @limit times. If the number of instances of @find in the #GString is
  * less than @limit, all instances are replaced. If @limit is `0`,
  * all instances of @find are replaced.
  *
@@ -962,19 +962,19 @@ xstring_erase (xstring_t *string,
  *
  * Since: 2.68
  */
-xuint_t
-xstring_replace (xstring_t     *string,
-                  const xchar_t *find,
-                  const xchar_t *replace,
-                  xuint_t        limit)
+guint
+g_string_replace (GString     *string,
+                  const gchar *find,
+                  const gchar *replace,
+                  guint        limit)
 {
-  xsize_t f_len, r_len, pos;
-  xchar_t *cur, *next;
-  xuint_t n = 0;
+  gsize f_len, r_len, pos;
+  gchar *cur, *next;
+  guint n = 0;
 
-  xreturn_val_if_fail (string != NULL, 0);
-  xreturn_val_if_fail (find != NULL, 0);
-  xreturn_val_if_fail (replace != NULL, 0);
+  g_return_val_if_fail (string != NULL, 0);
+  g_return_val_if_fail (find != NULL, 0);
+  g_return_val_if_fail (replace != NULL, 0);
 
   f_len = strlen (find);
   r_len = strlen (replace);
@@ -983,8 +983,8 @@ xstring_replace (xstring_t     *string,
   while ((next = strstr (cur, find)) != NULL)
     {
       pos = next - string->str;
-      xstring_erase (string, pos, f_len);
-      xstring_insert (string, pos, replace);
+      g_string_erase (string, pos, f_len);
+      g_string_insert (string, pos, replace);
       cur = string->str + pos + r_len;
       n++;
       /* Only match the empty string once at any given position, to
@@ -1004,8 +1004,8 @@ xstring_replace (xstring_t     *string,
 }
 
 /**
- * xstring_ascii_down:
- * @string: a xstring_t
+ * g_string_ascii_down:
+ * @string: a GString
  *
  * Converts all uppercase ASCII letters to lowercase ASCII letters.
  *
@@ -1013,13 +1013,13 @@ xstring_replace (xstring_t     *string,
  *     uppercase characters converted to lowercase in place,
  *     with semantics that exactly match g_ascii_tolower().
  */
-xstring_t *
-xstring_ascii_down (xstring_t *string)
+GString *
+g_string_ascii_down (GString *string)
 {
-  xchar_t *s;
-  xint_t n;
+  gchar *s;
+  gint n;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   n = string->len;
   s = string->str;
@@ -1035,8 +1035,8 @@ xstring_ascii_down (xstring_t *string)
 }
 
 /**
- * xstring_ascii_up:
- * @string: a xstring_t
+ * g_string_ascii_up:
+ * @string: a GString
  *
  * Converts all lowercase ASCII letters to uppercase ASCII letters.
  *
@@ -1044,13 +1044,13 @@ xstring_ascii_down (xstring_t *string)
  *     lowercase characters converted to uppercase in place,
  *     with semantics that exactly match g_ascii_toupper().
  */
-xstring_t *
-xstring_ascii_up (xstring_t *string)
+GString *
+g_string_ascii_up (GString *string)
 {
-  xchar_t *s;
-  xint_t n;
+  gchar *s;
+  gint n;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   n = string->len;
   s = string->str;
@@ -1066,27 +1066,27 @@ xstring_ascii_up (xstring_t *string)
 }
 
 /**
- * xstring_down:
- * @string: a #xstring_t
+ * g_string_down:
+ * @string: a #GString
  *
- * Converts a #xstring_t to lowercase.
+ * Converts a #GString to lowercase.
  *
- * Returns: (transfer none): the #xstring_t
+ * Returns: (transfer none): the #GString
  *
  * Deprecated:2.2: This function uses the locale-specific
  *     tolower() function, which is almost never the right thing.
- *     Use xstring_ascii_down() or xutf8_strdown() instead.
+ *     Use g_string_ascii_down() or g_utf8_strdown() instead.
  */
-xstring_t *
-xstring_down (xstring_t *string)
+GString *
+g_string_down (GString *string)
 {
-  xuchar_t *s;
-  xlong_t n;
+  guchar *s;
+  glong n;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   n = string->len;
-  s = (xuchar_t *) string->str;
+  s = (guchar *) string->str;
 
   while (n)
     {
@@ -1100,27 +1100,27 @@ xstring_down (xstring_t *string)
 }
 
 /**
- * xstring_up:
- * @string: a #xstring_t
+ * g_string_up:
+ * @string: a #GString
  *
- * Converts a #xstring_t to uppercase.
+ * Converts a #GString to uppercase.
  *
  * Returns: (transfer none): @string
  *
  * Deprecated:2.2: This function uses the locale-specific
  *     toupper() function, which is almost never the right thing.
- *     Use xstring_ascii_up() or xutf8_strup() instead.
+ *     Use g_string_ascii_up() or g_utf8_strup() instead.
  */
-xstring_t *
-xstring_up (xstring_t *string)
+GString *
+g_string_up (GString *string)
 {
-  xuchar_t *s;
-  xlong_t n;
+  guchar *s;
+  glong n;
 
-  xreturn_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (string != NULL, NULL);
 
   n = string->len;
-  s = (xuchar_t *) string->str;
+  s = (guchar *) string->str;
 
   while (n)
     {
@@ -1134,25 +1134,25 @@ xstring_up (xstring_t *string)
 }
 
 /**
- * xstring_append_vprintf:
- * @string: a #xstring_t
+ * g_string_append_vprintf:
+ * @string: a #GString
  * @format: (not nullable): the string format. See the printf() documentation
  * @args: the list of arguments to insert in the output
  *
- * Appends a formatted string onto the end of a #xstring_t.
- * This function is similar to xstring_append_printf()
+ * Appends a formatted string onto the end of a #GString.
+ * This function is similar to g_string_append_printf()
  * except that the arguments to the format string are passed
  * as a va_list.
  *
  * Since: 2.14
  */
 void
-xstring_append_vprintf (xstring_t     *string,
-                         const xchar_t *format,
+g_string_append_vprintf (GString     *string,
+                         const gchar *format,
                          va_list      args)
 {
-  xchar_t *buf;
-  xint_t len;
+  gchar *buf;
+  gint len;
 
   g_return_if_fail (string != NULL);
   g_return_if_fail (format != NULL);
@@ -1161,7 +1161,7 @@ xstring_append_vprintf (xstring_t     *string,
 
   if (len >= 0)
     {
-      xstring_maybe_expand (string, len);
+      g_string_maybe_expand (string, len);
       memcpy (string->str + string->len, buf, len + 1);
       string->len += len;
       g_free (buf);
@@ -1169,98 +1169,98 @@ xstring_append_vprintf (xstring_t     *string,
 }
 
 /**
- * xstring_vprintf:
- * @string: a #xstring_t
+ * g_string_vprintf:
+ * @string: a #GString
  * @format: (not nullable): the string format. See the printf() documentation
  * @args: the parameters to insert into the format string
  *
- * Writes a formatted string into a #xstring_t.
- * This function is similar to xstring_printf() except that
+ * Writes a formatted string into a #GString.
+ * This function is similar to g_string_printf() except that
  * the arguments to the format string are passed as a va_list.
  *
  * Since: 2.14
  */
 void
-xstring_vprintf (xstring_t     *string,
-                  const xchar_t *format,
+g_string_vprintf (GString     *string,
+                  const gchar *format,
                   va_list      args)
 {
-  xstring_truncate (string, 0);
-  xstring_append_vprintf (string, format, args);
+  g_string_truncate (string, 0);
+  g_string_append_vprintf (string, format, args);
 }
 
 /**
- * xstring_sprintf:
- * @string: a #xstring_t
+ * g_string_sprintf:
+ * @string: a #GString
  * @format: the string format. See the sprintf() documentation
  * @...: the parameters to insert into the format string
  *
- * Writes a formatted string into a #xstring_t.
+ * Writes a formatted string into a #GString.
  * This is similar to the standard sprintf() function,
- * except that the #xstring_t buffer automatically expands
+ * except that the #GString buffer automatically expands
  * to contain the results. The previous contents of the
- * #xstring_t are destroyed.
+ * #GString are destroyed.
  *
- * Deprecated: This function has been renamed to xstring_printf().
+ * Deprecated: This function has been renamed to g_string_printf().
  */
 
 /**
- * xstring_printf:
- * @string: a #xstring_t
+ * g_string_printf:
+ * @string: a #GString
  * @format: the string format. See the printf() documentation
  * @...: the parameters to insert into the format string
  *
- * Writes a formatted string into a #xstring_t.
+ * Writes a formatted string into a #GString.
  * This is similar to the standard sprintf() function,
- * except that the #xstring_t buffer automatically expands
+ * except that the #GString buffer automatically expands
  * to contain the results. The previous contents of the
- * #xstring_t are destroyed.
+ * #GString are destroyed.
  */
 void
-xstring_printf (xstring_t     *string,
-                 const xchar_t *format,
+g_string_printf (GString     *string,
+                 const gchar *format,
                  ...)
 {
   va_list args;
 
-  xstring_truncate (string, 0);
+  g_string_truncate (string, 0);
 
   va_start (args, format);
-  xstring_append_vprintf (string, format, args);
+  g_string_append_vprintf (string, format, args);
   va_end (args);
 }
 
 /**
- * xstring_sprintfa:
- * @string: a #xstring_t
+ * g_string_sprintfa:
+ * @string: a #GString
  * @format: the string format. See the sprintf() documentation
  * @...: the parameters to insert into the format string
  *
- * Appends a formatted string onto the end of a #xstring_t.
- * This function is similar to xstring_sprintf() except that
- * the text is appended to the #xstring_t.
+ * Appends a formatted string onto the end of a #GString.
+ * This function is similar to g_string_sprintf() except that
+ * the text is appended to the #GString.
  *
- * Deprecated: This function has been renamed to xstring_append_printf()
+ * Deprecated: This function has been renamed to g_string_append_printf()
  */
 
 /**
- * xstring_append_printf:
- * @string: a #xstring_t
+ * g_string_append_printf:
+ * @string: a #GString
  * @format: the string format. See the printf() documentation
  * @...: the parameters to insert into the format string
  *
- * Appends a formatted string onto the end of a #xstring_t.
- * This function is similar to xstring_printf() except
- * that the text is appended to the #xstring_t.
+ * Appends a formatted string onto the end of a #GString.
+ * This function is similar to g_string_printf() except
+ * that the text is appended to the #GString.
  */
 void
-xstring_append_printf (xstring_t     *string,
-                        const xchar_t *format,
+g_string_append_printf (GString     *string,
+                        const gchar *format,
                         ...)
 {
   va_list args;
 
   va_start (args, format);
-  xstring_append_vprintf (string, format, args);
+  g_string_append_vprintf (string, format, args);
   va_end (args);
 }

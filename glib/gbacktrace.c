@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -85,8 +85,8 @@ static void stack_trace (const char * const *args);
 #endif
 
 /* People want to hit this from their debugger... */
-XPL_AVAILABLE_IN_ALL volatile xboolean_t glib_on_error_halt;
-volatile xboolean_t glib_on_error_halt = TRUE;
+GLIB_AVAILABLE_IN_ALL volatile gboolean glib_on_error_halt;
+volatile gboolean glib_on_error_halt = TRUE;
 
 /**
  * g_on_error_query:
@@ -105,10 +105,10 @@ volatile xboolean_t glib_on_error_halt = TRUE;
  * #include <glib.h>
  *
  * static void
- * log_handler (const xchar_t   *log_domain,
+ * log_handler (const gchar   *log_domain,
  *              GLogLevelFlags log_level,
- *              const xchar_t   *message,
- *              xpointer_t       user_data)
+ *              const gchar   *message,
+ *              gpointer       user_data)
  * {
  *   g_log_default_handler (log_domain, log_level, message, user_data);
  *
@@ -143,13 +143,13 @@ volatile xboolean_t glib_on_error_halt = TRUE;
  * calling g_on_error_stack_trace() instead.
  */
 void
-g_on_error_query (const xchar_t *prg_name)
+g_on_error_query (const gchar *prg_name)
 {
 #ifndef G_OS_WIN32
-  static const xchar_t * const query1 = "[E]xit, [H]alt";
-  static const xchar_t * const query2 = ", show [S]tack trace";
-  static const xchar_t * const query3 = " or [P]roceed";
-  xchar_t buf[16];
+  static const gchar * const query1 = "[E]xit, [H]alt";
+  static const gchar * const query2 = ", show [S]tack trace";
+  static const gchar * const query3 = " or [P]roceed";
+  gchar buf[16];
 
   if (!prg_name)
     prg_name = g_get_prgname ();
@@ -160,14 +160,14 @@ g_on_error_query (const xchar_t *prg_name)
     _g_fprintf (stdout,
                 "%s (pid:%u): %s%s%s: ",
                 prg_name,
-                (xuint_t) getpid (),
+                (guint) getpid (),
                 query1,
                 query2,
                 query3);
   else
     _g_fprintf (stdout,
                 "(process:%u): %s%s: ",
-                (xuint_t) getpid (),
+                (guint) getpid (),
                 query1,
                 query3);
   fflush (stdout);
@@ -212,7 +212,7 @@ g_on_error_query (const xchar_t *prg_name)
 
     if (prg_name && *prg_name)
       {
-        caption = xutf8_to_utf16 (prg_name, -1, NULL, NULL, NULL);
+        caption = g_utf8_to_utf16 (prg_name, -1, NULL, NULL, NULL);
       }
 
     MessageBoxW (NULL, L"g_on_error_query called, program terminating",
@@ -249,18 +249,18 @@ g_on_error_query (const xchar_t *prg_name)
  * handle that exception (see [Running GLib Applications](glib-running.html)).
  */
 void
-g_on_error_stack_trace (const xchar_t *prg_name)
+g_on_error_stack_trace (const gchar *prg_name)
 {
 #if defined(G_OS_UNIX)
   pid_t pid;
-  xchar_t buf[16];
-  const xchar_t *args[5] = { DEBUGGER, NULL, NULL, NULL, NULL };
+  gchar buf[16];
+  const gchar *args[5] = { DEBUGGER, NULL, NULL, NULL, NULL };
   int status;
 
   if (!prg_name)
     return;
 
-  _g_sprintf (buf, "%u", (xuint_t) getpid ());
+  _g_sprintf (buf, "%u", (guint) getpid ());
 
 #ifdef USE_LLDB
   args[1] = prg_name;
@@ -302,7 +302,7 @@ g_on_error_stack_trace (const xchar_t *prg_name)
 
 #ifndef G_OS_WIN32
 
-static xboolean_t stack_trace_done = FALSE;
+static gboolean stack_trace_done = FALSE;
 
 static void
 stack_trace_sigchld (int signum)

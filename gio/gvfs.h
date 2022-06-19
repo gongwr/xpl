@@ -29,94 +29,94 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_VFS         (xvfs_get_type ())
-#define XVFS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_VFS, xvfs))
-#define XVFS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_VFS, xvfs_class_t))
-#define XVFS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_VFS, xvfs_class_t))
-#define X_IS_VFS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_VFS))
-#define X_IS_VFS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_VFS))
+#define G_TYPE_VFS         (g_vfs_get_type ())
+#define G_VFS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_VFS, GVfs))
+#define G_VFS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_VFS, GVfsClass))
+#define G_VFS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_VFS, GVfsClass))
+#define G_IS_VFS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_VFS))
+#define G_IS_VFS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_VFS))
 
 /**
- * xvfs_file_lookup_func_t:
- * @vfs: a #xvfs_t
- * @identifier: the identifier to look up a #xfile_t for. This can either
- *     be an URI or a parse name as returned by xfile_get_parse_name()
+ * GVfsFileLookupFunc:
+ * @vfs: a #GVfs
+ * @identifier: the identifier to look up a #GFile for. This can either
+ *     be an URI or a parse name as returned by g_file_get_parse_name()
  * @user_data: user data passed to the function
  *
- * This function type is used by xvfs_register_uri_scheme() to make it
- * possible for a client to associate an URI scheme to a different #xfile_t
+ * This function type is used by g_vfs_register_uri_scheme() to make it
+ * possible for a client to associate an URI scheme to a different #GFile
  * implementation.
  *
  * The client should return a reference to the new file that has been
  * created for @uri, or %NULL to continue with the default implementation.
  *
- * Returns: (transfer full): a #xfile_t for @identifier.
+ * Returns: (transfer full): a #GFile for @identifier.
  *
  * Since: 2.50
  */
-typedef xfile_t * (* xvfs_file_lookup_func_t) (xvfs_t       *vfs,
+typedef GFile * (* GVfsFileLookupFunc) (GVfs       *vfs,
                                         const char *identifier,
-                                        xpointer_t    user_data);
+                                        gpointer    user_data);
 
 /**
- * XVFS_EXTENSION_POINT_NAME:
+ * G_VFS_EXTENSION_POINT_NAME:
  *
- * Extension point for #xvfs_t functionality.
+ * Extension point for #GVfs functionality.
  * See [Extending GIO][extending-gio].
  */
-#define XVFS_EXTENSION_POINT_NAME "gio-vfs"
+#define G_VFS_EXTENSION_POINT_NAME "gio-vfs"
 
 /**
- * xvfs_t:
+ * GVfs:
  *
  * Virtual File System object.
  **/
-typedef struct _GVfsClass    xvfs_class_t;
+typedef struct _GVfsClass    GVfsClass;
 
 struct _GVfs
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 };
 
 struct _GVfsClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* Virtual Table */
 
-  xboolean_t              (* is_active)                 (xvfs_t       *vfs);
-  xfile_t               * (* get_file_for_path)         (xvfs_t       *vfs,
+  gboolean              (* is_active)                 (GVfs       *vfs);
+  GFile               * (* get_file_for_path)         (GVfs       *vfs,
                                                        const char *path);
-  xfile_t               * (* get_file_for_uri)          (xvfs_t       *vfs,
+  GFile               * (* get_file_for_uri)          (GVfs       *vfs,
                                                        const char *uri);
-  const xchar_t * const * (* get_supported_uri_schemes) (xvfs_t       *vfs);
-  xfile_t               * (* parse_name)                (xvfs_t       *vfs,
+  const gchar * const * (* get_supported_uri_schemes) (GVfs       *vfs);
+  GFile               * (* parse_name)                (GVfs       *vfs,
                                                        const char *parse_name);
 
   /*< private >*/
-  void                  (* local_file_add_info)       (xvfs_t       *vfs,
+  void                  (* local_file_add_info)       (GVfs       *vfs,
 						       const char *filename,
-						       xuint64_t     device,
-						       xfile_attribute_matcher_t *attribute_matcher,
-						       xfile_info_t  *info,
-						       xcancellable_t *cancellable,
-						       xpointer_t   *extra_data,
-						       xdestroy_notify_t *free_extra_data);
-  void                  (* add_writable_namespaces)   (xvfs_t       *vfs,
-						       xfile_attribute_info_list_t *list);
-  xboolean_t              (* local_file_set_attributes) (xvfs_t       *vfs,
+						       guint64     device,
+						       GFileAttributeMatcher *attribute_matcher,
+						       GFileInfo  *info,
+						       GCancellable *cancellable,
+						       gpointer   *extra_data,
+						       GDestroyNotify *free_extra_data);
+  void                  (* add_writable_namespaces)   (GVfs       *vfs,
+						       GFileAttributeInfoList *list);
+  gboolean              (* local_file_set_attributes) (GVfs       *vfs,
 						       const char *filename,
-						       xfile_info_t  *info,
-                                                       xfile_query_info_flags_t flags,
-                                                       xcancellable_t *cancellable,
-						       xerror_t    **error);
-  void                  (* local_file_removed)        (xvfs_t       *vfs,
+						       GFileInfo  *info,
+                                                       GFileQueryInfoFlags flags,
+                                                       GCancellable *cancellable,
+						       GError    **error);
+  void                  (* local_file_removed)        (GVfs       *vfs,
 						       const char *filename);
-  void                  (* local_file_moved)          (xvfs_t       *vfs,
+  void                  (* local_file_moved)          (GVfs       *vfs,
 						       const char *source,
 						       const char *dest);
-  xicon_t *               (* deserialize_icon)          (xvfs_t       *vfs,
-                                                       xvariant_t   *value);
+  GIcon *               (* deserialize_icon)          (GVfs       *vfs,
+                                                       GVariant   *value);
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
   void (*_g_reserved2) (void);
@@ -126,40 +126,40 @@ struct _GVfsClass
   void (*_g_reserved6) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xvfs_get_type                  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_vfs_get_type                  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xvfs_is_active                 (xvfs_t       *vfs);
-XPL_AVAILABLE_IN_ALL
-xfile_t *               xvfs_get_file_for_path         (xvfs_t       *vfs,
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_vfs_is_active                 (GVfs       *vfs);
+GLIB_AVAILABLE_IN_ALL
+GFile *               g_vfs_get_file_for_path         (GVfs       *vfs,
                                                        const char *path);
-XPL_AVAILABLE_IN_ALL
-xfile_t *               xvfs_get_file_for_uri          (xvfs_t       *vfs,
+GLIB_AVAILABLE_IN_ALL
+GFile *               g_vfs_get_file_for_uri          (GVfs       *vfs,
                                                        const char *uri);
-XPL_AVAILABLE_IN_ALL
-const xchar_t* const * xvfs_get_supported_uri_schemes  (xvfs_t       *vfs);
+GLIB_AVAILABLE_IN_ALL
+const gchar* const * g_vfs_get_supported_uri_schemes  (GVfs       *vfs);
 
-XPL_AVAILABLE_IN_ALL
-xfile_t *               xvfs_parse_name                (xvfs_t       *vfs,
+GLIB_AVAILABLE_IN_ALL
+GFile *               g_vfs_parse_name                (GVfs       *vfs,
                                                        const char *parse_name);
 
-XPL_AVAILABLE_IN_ALL
-xvfs_t *                xvfs_get_default               (void);
-XPL_AVAILABLE_IN_ALL
-xvfs_t *                xvfs_get_local                 (void);
+GLIB_AVAILABLE_IN_ALL
+GVfs *                g_vfs_get_default               (void);
+GLIB_AVAILABLE_IN_ALL
+GVfs *                g_vfs_get_local                 (void);
 
-XPL_AVAILABLE_IN_2_50
-xboolean_t              xvfs_register_uri_scheme       (xvfs_t               *vfs,
+GLIB_AVAILABLE_IN_2_50
+gboolean              g_vfs_register_uri_scheme       (GVfs               *vfs,
                                                        const char         *scheme,
-                                                       xvfs_file_lookup_func_t  uri_func,
-                                                       xpointer_t            uri_data,
-                                                       xdestroy_notify_t      uri_destroy,
-                                                       xvfs_file_lookup_func_t  parse_name_func,
-                                                       xpointer_t            parse_name_data,
-                                                       xdestroy_notify_t      parse_name_destroy);
-XPL_AVAILABLE_IN_2_50
-xboolean_t              xvfs_unregister_uri_scheme     (xvfs_t               *vfs,
+                                                       GVfsFileLookupFunc  uri_func,
+                                                       gpointer            uri_data,
+                                                       GDestroyNotify      uri_destroy,
+                                                       GVfsFileLookupFunc  parse_name_func,
+                                                       gpointer            parse_name_data,
+                                                       GDestroyNotify      parse_name_destroy);
+GLIB_AVAILABLE_IN_2_50
+gboolean              g_vfs_unregister_uri_scheme     (GVfs               *vfs,
                                                        const char         *scheme);
 
 

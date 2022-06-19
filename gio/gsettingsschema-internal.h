@@ -22,55 +22,55 @@
 
 struct _GSettingsSchemaKey
 {
-  xsettings_schema_t *schema;
-  const xchar_t *name;
+  GSettingsSchema *schema;
+  const gchar *name;
 
-  xuint_t is_flags : 1;
-  xuint_t is_enum  : 1;
+  guint is_flags : 1;
+  guint is_enum  : 1;
 
-  const xuint32_t *strinfo;
-  xsize_t strinfo_length;
+  const guint32 *strinfo;
+  gsize strinfo_length;
 
-  const xchar_t *unparsed;
-  xchar_t lc_char;
+  const gchar *unparsed;
+  gchar lc_char;
 
-  const xvariant_type_t *type;
-  xvariant_t *minimum, *maximum;
-  xvariant_t *default_value;
-  xvariant_t *desktop_overrides;
+  const GVariantType *type;
+  GVariant *minimum, *maximum;
+  GVariant *default_value;
+  GVariant *desktop_overrides;
 
-  xint_t ref_count;
+  gint ref_count;
 };
 
-const xchar_t *           g_settings_schema_get_gettext_domain            (xsettings_schema_t  *schema);
-xvariant_iter_t *          g_settings_schema_get_value                     (xsettings_schema_t  *schema,
-                                                                         const xchar_t      *key);
-const xquark *          g_settings_schema_list                          (xsettings_schema_t  *schema,
-                                                                         xint_t             *n_items);
-const xchar_t *           g_settings_schema_get_string                    (xsettings_schema_t  *schema,
-                                                                         const xchar_t      *key);
+const gchar *           g_settings_schema_get_gettext_domain            (GSettingsSchema  *schema);
+GVariantIter *          g_settings_schema_get_value                     (GSettingsSchema  *schema,
+                                                                         const gchar      *key);
+const GQuark *          g_settings_schema_list                          (GSettingsSchema  *schema,
+                                                                         gint             *n_items);
+const gchar *           g_settings_schema_get_string                    (GSettingsSchema  *schema,
+                                                                         const gchar      *key);
 
-xsettings_schema_t *       g_settings_schema_get_child_schema              (xsettings_schema_t *schema,
-                                                                         const xchar_t     *name);
+GSettingsSchema *       g_settings_schema_get_child_schema              (GSettingsSchema *schema,
+                                                                         const gchar     *name);
 
-void                    g_settings_schema_key_init                      (xsettings_schema_key_t *key,
-                                                                         xsettings_schema_t    *schema,
-                                                                         const xchar_t        *name);
-void                    g_settings_schema_key_clear                     (xsettings_schema_key_t *key);
-xboolean_t                g_settings_schema_key_type_check                (xsettings_schema_key_t *key,
-                                                                         xvariant_t           *value);
-xvariant_t *              g_settings_schema_key_range_fixup               (xsettings_schema_key_t *key,
-                                                                         xvariant_t           *value);
-xvariant_t *              g_settings_schema_key_get_translated_default    (xsettings_schema_key_t *key);
-xvariant_t *              g_settings_schema_key_get_per_desktop_default   (xsettings_schema_key_t *key);
+void                    g_settings_schema_key_init                      (GSettingsSchemaKey *key,
+                                                                         GSettingsSchema    *schema,
+                                                                         const gchar        *name);
+void                    g_settings_schema_key_clear                     (GSettingsSchemaKey *key);
+gboolean                g_settings_schema_key_type_check                (GSettingsSchemaKey *key,
+                                                                         GVariant           *value);
+GVariant *              g_settings_schema_key_range_fixup               (GSettingsSchemaKey *key,
+                                                                         GVariant           *value);
+GVariant *              g_settings_schema_key_get_translated_default    (GSettingsSchemaKey *key);
+GVariant *              g_settings_schema_key_get_per_desktop_default   (GSettingsSchemaKey *key);
 
-xint_t                    g_settings_schema_key_to_enum                   (xsettings_schema_key_t *key,
-                                                                         xvariant_t           *value);
-xvariant_t *              g_settings_schema_key_from_enum                 (xsettings_schema_key_t *key,
-                                                                         xint_t                value);
-xuint_t                   g_settings_schema_key_to_flags                  (xsettings_schema_key_t *key,
-                                                                         xvariant_t           *value);
-xvariant_t *              g_settings_schema_key_from_flags                (xsettings_schema_key_t *key,
-                                                                         xuint_t               value);
+gint                    g_settings_schema_key_to_enum                   (GSettingsSchemaKey *key,
+                                                                         GVariant           *value);
+GVariant *              g_settings_schema_key_from_enum                 (GSettingsSchemaKey *key,
+                                                                         gint                value);
+guint                   g_settings_schema_key_to_flags                  (GSettingsSchemaKey *key,
+                                                                         GVariant           *value);
+GVariant *              g_settings_schema_key_from_flags                (GSettingsSchemaKey *key,
+                                                                         guint               value);
 
 #endif /* __G_SETTINGS_SCHEMA_INTERNAL_H__ */

@@ -18,17 +18,17 @@ msgstr ""
 "X-Generator: Poedit 2.0.6\n"
 
 #: gio/gapplication.c:500
-msgid "xapplication_t options"
-msgstr "Pilihan xapplication_t"
+msgid "GApplication options"
+msgstr "Pilihan GApplication"
 
 #: gio/gapplication.c:500
-msgid "Show xapplication_t options"
-msgstr "Tunjuk pilihan xapplication_t"
+msgid "Show GApplication options"
+msgstr "Tunjuk pilihan GApplication"
 
 #: gio/gapplication.c:545
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
-"Masukkan mod perkhidmatan xapplication_t (guna dari fail perkhidmatan D-Bus)"
+"Masukkan mod perkhidmatan GApplication (guna dari fail perkhidmatan D-Bus)"
 
 #: gio/gapplication.c:557
 msgid "Override the application’s ID"
@@ -135,8 +135,8 @@ msgid "PARAMETER"
 msgstr "PARAMETER"
 
 #: gio/gapplication-tool.c:74
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Parameter pilihan ke penyeruan tindakan, dalam format xvariant_t"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Parameter pilihan ke penyeruan tindakan, dalam format GVariant"
 
 #: gio/gapplication-tool.c:96 gio/gresource-tool.c:531 gio/gsettings-tool.c:659
 #, c-format
@@ -263,8 +263,8 @@ msgid "Seek not supported on base stream"
 msgstr "Jangkau tidak disokong pada strim asas"
 
 #: gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Tidak dapat pangkas xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Tidak dapat pangkas GBufferedInputStream"
 
 #: gio/gbufferedinputstream.c:982 gio/ginputstream.c:1208 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -336,20 +336,20 @@ msgid "%s filetype"
 msgstr "Jenis fail %s"
 
 #: gio/gcredentials.c:289
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t mengandungi data tidak sah"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials mengandungi data tidak sah"
 
 #: gio/gcredentials.c:345 gio/gcredentials.c:609
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t tidak dilaksana pada OS ini"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials tidak dilaksana pada OS ini"
 
 #: gio/gcredentials.c:503
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Tidak terdapat sokongan xcredentials_t untuk platform anda"
+msgid "There is no GCredentials support for your platform"
+msgstr "Tidak terdapat sokongan GCredentials untuk platform anda"
 
 #: gio/gcredentials.c:552
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t tidak mengandungi ID proses dalam OS ini"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials tidak mengandungi ID proses dalam OS ini"
 
 #: gio/gcredentials.c:603
 msgid "Credentials spoofing is not possible on this OS"
@@ -545,8 +545,8 @@ msgstr ""
 "(tersedia: %s)"
 
 #: gio/gdbusauth.c:1167
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Dibatalkan melalui xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Dibatalkan melalui GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:264
 #, c-format
@@ -826,9 +826,9 @@ msgstr ""
 #: gio/gdbusmessage.c:1925
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Ralat menyahsiri xvariant_t dengan rentetan jenis \"%s\" dari format wayar D-"
+"Ralat menyahsiri GVariant dengan rentetan jenis \"%s\" dari format wayar D-"
 "Bus"
 
 #: gio/gdbusmessage.c:2110
@@ -878,9 +878,9 @@ msgstr "Tidak dapat nyahsirikan mesej: "
 #: gio/gdbusmessage.c:2590
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"Ralat menyahsiri xvariant_t dengan rentetan jenis \"%s\" ke format wayar D-Bus"
+"Ralat menyahsiri GVariant dengan rentetan jenis \"%s\" ke format wayar D-Bus"
 
 #: gio/gdbusmessage.c:2727
 #, c-format
@@ -1330,27 +1330,27 @@ msgstr "Sokongan DTLS tidak tersedia"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan xemblem_t"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan GEmblem"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Bilangan token cacat (%d) dalam pengekodan xemblem_t"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Bilangan token cacat (%d) dalam pengekodan GEmblem"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan xemblemed_icon_t"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan GEmblemedIcon"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Bilangan token cacat (%d) dalam pengekodan xemblemed_icon_t"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Bilangan token cacat (%d) dalam pengekodan GEmblemedIcon"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Dijangka xemblem_t untuk xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Dijangka GEmblem untuk GEmblemedIcon"
 
 #: gio/gfile.c:1076 gio/gfile.c:1314 gio/gfile.c:1452 gio/gfile.c:1690
 #: gio/gfile.c:1745 gio/gfile.c:1803 gio/gfile.c:1887 gio/gfile.c:1944
@@ -1451,12 +1451,12 @@ msgstr "Enumerator fail sudah pun ditutup"
 
 #: gio/gfileicon.c:236
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan xfile_icon_t"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan GFileIcon"
 
 #: gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Data input cacat untuk xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Data input cacat untuk GFileIcon"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1519,8 +1519,8 @@ msgstr "Tiada jenis bagi nama kelas %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "Jenis %s tidak laksanakan antaramuka xicon_t"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "Jenis %s tidak laksanakan antaramuka GIcon"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1534,8 +1534,8 @@ msgstr "Nombor versi cacat: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Jenis %s tidak dilaksana from_tokens() pada antaramuka xicon_t"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Jenis %s tidak dilaksana from_tokens() pada antaramuka GIcon"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2628,8 +2628,8 @@ msgstr "<%s id='%s'> tidak (belum) ditakrif."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Rentetan jenis xvariant_t \"%s\" tidak sah"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Rentetan jenis GVariant \"%s\" tidak sah"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2861,11 +2861,11 @@ msgstr "Jangan paksa sekatan nama kunci"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Kompil semua fail skema xsettings_t menjadi cache skema.\n"
+"Kompil semua fail skema GSettings menjadi cache skema.\n"
 "Fail skema diperlukan untuk menghasilkan sambungan .gschema.xml,\n"
 "dan fail cache dikenali sebagai gschemas.compiled."
 
@@ -3184,16 +3184,16 @@ msgid "Error removing old file: %s"
 msgstr "Ralat membuang fail lama: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid xseek_type_t supplied"
-msgstr "xseek_type_t dibekalkan tidak sah"
+msgid "Invalid GSeekType supplied"
+msgstr "GSeekType dibekalkan tidak sah"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Permintaan jangkau tidak sah"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Tidak dapat pangkas xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Tidak dapat pangkas GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3724,8 +3724,8 @@ msgstr "I/O soket telah tamat masa"
 
 #: gio/gsocket.c:583
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "mencipta xsocket_t dari fd: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "mencipta GSocket dari fd: %s"
 
 #: gio/gsocket.c:612 gio/gsocket.c:666 gio/gsocket.c:673
 #, c-format
@@ -3859,8 +3859,8 @@ msgid "Error sending message: %s"
 msgstr "Ralat menghantar mesej: %s"
 
 #: gio/gsocket.c:4946
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t tidak disokong dalam Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage tidak disokong dalam Windows"
 
 #: gio/gsocket.c:5415 gio/gsocket.c:5488 gio/gsocket.c:5714
 #, c-format
@@ -3873,8 +3873,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Tidak boleh membaca kelayakan soket: %s"
 
 #: gio/gsocket.c:6004
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "xsocket_get_credentials tidak dilaksana untuk OS ini"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "g_socket_get_credentials tidak dilaksana untuk OS ini"
 
 #: gio/gsocketclient.c:182
 #, c-format
@@ -4000,8 +4000,8 @@ msgstr "Ralat proksi SOCKSv5 tidak diketahui."
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan xthemed_icon_t"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Tidak dapat mengendalikan versi %d bagi pengekodan GThemedIcon"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4050,8 +4050,8 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "Tidak dapat menghurai sijil terenkod-PEM"
 
 #: gio/gtlscertificate.c:710
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "xtls_backend_t ini tidak menyokong penciptaa sijil PKCS #11"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "GTlsBackend ini tidak menyokong penciptaa sijil PKCS #11"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4360,25 +4360,25 @@ msgstr "Nama laluan \"%s\" bukanlah laluan yang mutlak"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:220
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %b %e %H:%M:%S %Y"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:223
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%m/%d/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4789,13 +4789,13 @@ msgstr "Dis"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:588
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:591
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "PM"
 

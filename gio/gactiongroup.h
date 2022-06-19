@@ -17,8 +17,8 @@
  * Authors: Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XACTION_GROUP_H__
-#define __XACTION_GROUP_H__
+#ifndef __G_ACTION_GROUP_H__
+#define __G_ACTION_GROUP_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,133 +29,133 @@
 G_BEGIN_DECLS
 
 
-#define XTYPE_ACTION_GROUP                                 (xaction_group_get_type ())
-#define XACTION_GROUP(inst)                                (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_ACTION_GROUP, xaction_group_t))
-#define X_IS_ACTION_GROUP(inst)                             (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_ACTION_GROUP))
-#define XACTION_GROUP_GET_IFACE(inst)                      (XTYPE_INSTANCE_GET_INTERFACE ((inst),                  \
-                                                             XTYPE_ACTION_GROUP, xaction_group_interface_t))
+#define G_TYPE_ACTION_GROUP                                 (g_action_group_get_type ())
+#define G_ACTION_GROUP(inst)                                (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_ACTION_GROUP, GActionGroup))
+#define G_IS_ACTION_GROUP(inst)                             (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_ACTION_GROUP))
+#define G_ACTION_GROUP_GET_IFACE(inst)                      (G_TYPE_INSTANCE_GET_INTERFACE ((inst),                  \
+                                                             G_TYPE_ACTION_GROUP, GActionGroupInterface))
 
-typedef struct _xaction_group_interface                       xaction_group_interface_t;
+typedef struct _GActionGroupInterface                       GActionGroupInterface;
 
-struct _xaction_group_interface
+struct _GActionGroupInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* virtual functions */
-  xboolean_t              (* has_action)                 (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
+  gboolean              (* has_action)                 (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
 
-  xchar_t **              (* list_actions)               (xaction_group_t  *action_group);
+  gchar **              (* list_actions)               (GActionGroup  *action_group);
 
-  xboolean_t              (* get_action_enabled)         (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
+  gboolean              (* get_action_enabled)         (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
 
-  const xvariant_type_t *  (* get_action_parameter_type)  (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
+  const GVariantType *  (* get_action_parameter_type)  (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
 
-  const xvariant_type_t *  (* get_action_state_type)      (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
+  const GVariantType *  (* get_action_state_type)      (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
 
-  xvariant_t *            (* get_action_state_hint)      (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
+  GVariant *            (* get_action_state_hint)      (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
 
-  xvariant_t *            (* get_action_state)           (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
+  GVariant *            (* get_action_state)           (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
 
-  void                  (* change_action_state)        (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name,
-                                                        xvariant_t      *value);
+  void                  (* change_action_state)        (GActionGroup  *action_group,
+                                                        const gchar   *action_name,
+                                                        GVariant      *value);
 
-  void                  (* activate_action)            (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name,
-                                                        xvariant_t      *parameter);
+  void                  (* activate_action)            (GActionGroup  *action_group,
+                                                        const gchar   *action_name,
+                                                        GVariant      *parameter);
 
   /* signals */
-  void                  (* action_added)               (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
-  void                  (* action_removed)             (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name);
-  void                  (* action_enabled_changed)     (xaction_group_t  *action_group,
-                                                        const xchar_t   *action_name,
-                                                        xboolean_t       enabled);
-  void                  (* action_state_changed)       (xaction_group_t   *action_group,
-                                                        const xchar_t    *action_name,
-                                                        xvariant_t       *state);
+  void                  (* action_added)               (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
+  void                  (* action_removed)             (GActionGroup  *action_group,
+                                                        const gchar   *action_name);
+  void                  (* action_enabled_changed)     (GActionGroup  *action_group,
+                                                        const gchar   *action_name,
+                                                        gboolean       enabled);
+  void                  (* action_state_changed)       (GActionGroup   *action_group,
+                                                        const gchar    *action_name,
+                                                        GVariant       *state);
 
   /* more virtual functions */
-  xboolean_t              (* query_action)               (xaction_group_t        *action_group,
-                                                        const xchar_t         *action_name,
-                                                        xboolean_t            *enabled,
-                                                        const xvariant_type_t **parameter_type,
-                                                        const xvariant_type_t **state_type,
-                                                        xvariant_t           **state_hint,
-                                                        xvariant_t           **state);
+  gboolean              (* query_action)               (GActionGroup        *action_group,
+                                                        const gchar         *action_name,
+                                                        gboolean            *enabled,
+                                                        const GVariantType **parameter_type,
+                                                        const GVariantType **state_type,
+                                                        GVariant           **state_hint,
+                                                        GVariant           **state);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   xaction_group_get_type                         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                   g_action_group_get_type                         (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xaction_group_has_action                       (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
-XPL_AVAILABLE_IN_ALL
-xchar_t **                xaction_group_list_actions                     (xaction_group_t *action_group);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_action_group_has_action                       (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
+GLIB_AVAILABLE_IN_ALL
+gchar **                g_action_group_list_actions                     (GActionGroup *action_group);
 
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *    xaction_group_get_action_parameter_type        (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *    xaction_group_get_action_state_type            (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
-XPL_AVAILABLE_IN_ALL
-xvariant_t *              xaction_group_get_action_state_hint            (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *    g_action_group_get_action_parameter_type        (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *    g_action_group_get_action_state_type            (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
+GLIB_AVAILABLE_IN_ALL
+GVariant *              g_action_group_get_action_state_hint            (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xaction_group_get_action_enabled               (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_action_group_get_action_enabled               (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
 
-XPL_AVAILABLE_IN_ALL
-xvariant_t *              xaction_group_get_action_state                 (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
-XPL_AVAILABLE_IN_ALL
-void                    xaction_group_change_action_state              (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name,
-                                                                         xvariant_t     *value);
+GLIB_AVAILABLE_IN_ALL
+GVariant *              g_action_group_get_action_state                 (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_group_change_action_state              (GActionGroup *action_group,
+                                                                         const gchar  *action_name,
+                                                                         GVariant     *value);
 
-XPL_AVAILABLE_IN_ALL
-void                    xaction_group_activate_action                  (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name,
-                                                                         xvariant_t     *parameter);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_group_activate_action                  (GActionGroup *action_group,
+                                                                         const gchar  *action_name,
+                                                                         GVariant     *parameter);
 
 /* signals */
-XPL_AVAILABLE_IN_ALL
-void                    xaction_group_action_added                     (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
-XPL_AVAILABLE_IN_ALL
-void                    xaction_group_action_removed                   (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name);
-XPL_AVAILABLE_IN_ALL
-void                    xaction_group_action_enabled_changed           (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name,
-                                                                         xboolean_t      enabled);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_group_action_added                     (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_group_action_removed                   (GActionGroup *action_group,
+                                                                         const gchar  *action_name);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_group_action_enabled_changed           (GActionGroup *action_group,
+                                                                         const gchar  *action_name,
+                                                                         gboolean      enabled);
 
-XPL_AVAILABLE_IN_ALL
-void                    xaction_group_action_state_changed             (xaction_group_t *action_group,
-                                                                         const xchar_t  *action_name,
-                                                                         xvariant_t     *state);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_group_action_state_changed             (GActionGroup *action_group,
+                                                                         const gchar  *action_name,
+                                                                         GVariant     *state);
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t                xaction_group_query_action                     (xaction_group_t        *action_group,
-                                                                         const xchar_t         *action_name,
-                                                                         xboolean_t            *enabled,
-                                                                         const xvariant_type_t **parameter_type,
-                                                                         const xvariant_type_t **state_type,
-                                                                         xvariant_t           **state_hint,
-                                                                         xvariant_t           **state);
+GLIB_AVAILABLE_IN_2_32
+gboolean                g_action_group_query_action                     (GActionGroup        *action_group,
+                                                                         const gchar         *action_name,
+                                                                         gboolean            *enabled,
+                                                                         const GVariantType **parameter_type,
+                                                                         const GVariantType **state_type,
+                                                                         GVariant           **state_hint,
+                                                                         GVariant           **state);
 
 G_END_DECLS
 
-#endif /* __XACTION_GROUP_H__ */
+#endif /* __G_ACTION_GROUP_H__ */

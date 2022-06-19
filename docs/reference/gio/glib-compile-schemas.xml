@@ -20,7 +20,7 @@
 
 <refnamediv>
   <refname>glib-compile-schemas</refname>
-  <refpurpose>xsettings_t schema compiler</refpurpose>
+  <refpurpose>GSettings schema compiler</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
@@ -32,16 +32,16 @@
 </refsynopsisdiv>
 
 <refsect1><title>Description</title>
-<para><command>glib-compile-schemas</command> compiles all the xsettings_t XML
+<para><command>glib-compile-schemas</command> compiles all the GSettings XML
 schema files in <replaceable>DIRECTORY</replaceable> into a binary file
 with the name <filename>gschemas.compiled</filename> that can be used
-by <link linkend="xsettings_t"><type>xsettings_t</type></link>. The XML schema
+by <link linkend="GSettings"><type>GSettings</type></link>. The XML schema
 files must have the filename extension <filename>.gschema.xml</filename>.
 For a detailed description of the XML file format, see the
-<link linkend="xsettings_t"><type>xsettings_t</type></link> documentation.
+<link linkend="GSettings"><type>GSettings</type></link> documentation.
 </para>
 <para>
-At runtime, xsettings_t looks for schemas in the
+At runtime, GSettings looks for schemas in the
 <filename>glib-2.0/schemas</filename> subdirectories of all directories
 specified in the <envar>XDG_DATA_DIRS</envar> environment variable. The
 usual location to install schema files is
@@ -51,7 +51,7 @@ usual location to install schema files is
 In addition to schema files, glib-compile-schemas reads 'vendor override'
 files, which are key files that can override default values for keys in
 the schemas. The group names in the key files are the schema id, and the
-values are written in serialized xvariant_t form.
+values are written in serialized GVariant form.
 Vendor override files must have the filename extension
 <filename>.gschema.override</filename>.
 </para>

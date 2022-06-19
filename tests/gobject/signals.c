@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2013 Red Hat, Inc.
  * Copy and pasted from accumulator.c and modified.
  *
@@ -38,97 +38,97 @@
  */
 
 /*
- * test_object_t, a parent class for test_object_t
+ * TestObject, a parent class for TestObject
  */
 #define TEST_TYPE_OBJECT         (test_object_get_type ())
-typedef struct _test_object        test_object_t;
-typedef struct _test_object_class   test_object_class_t;
-static xboolean_t callback1_ran = FALSE, callback2_ran = FALSE, callback3_ran = FALSE, default_handler_ran = FALSE;
+typedef struct _TestObject        TestObject;
+typedef struct _TestObjectClass   TestObjectClass;
+static gboolean callback1_ran = FALSE, callback2_ran = FALSE, callback3_ran = FALSE, default_handler_ran = FALSE;
 
-struct _test_object
+struct _TestObject
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 };
-struct _test_object_class
+struct _TestObjectClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  void   (*test_signal) (test_object_t *object);
+  void   (*test_signal) (TestObject *object);
 };
 
-static xtype_t test_object_get_type (void);
+static GType test_object_get_type (void);
 
 static void
-test_object_real_signal (test_object_t *object)
+test_object_real_signal (TestObject *object)
 {
   default_handler_ran = TRUE;
 }
 
 static void
-test_object_signal_callback3 (test_object_t *object,
-                              xpointer_t    data)
+test_object_signal_callback3 (TestObject *object,
+                              gpointer    data)
 {
   callback3_ran = TRUE;
 }
 
 static void
-test_object_signal_callback2 (test_object_t *object,
-                              xpointer_t    data)
+test_object_signal_callback2 (TestObject *object,
+                              gpointer    data)
 {
   callback2_ran = TRUE;
 }
 
 static void
-test_object_signal_callback1 (test_object_t *object,
-                              xpointer_t    data)
+test_object_signal_callback1 (TestObject *object,
+                              gpointer    data)
 {
   callback1_ran = TRUE;
-  xsignal_handlers_disconnect_by_func (G_OBJECT (object),
+  g_signal_handlers_disconnect_by_func (G_OBJECT (object),
                                         test_object_signal_callback2,
                                         data);
-  xsignal_connect (object, "test-signal",
+  g_signal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback3), NULL);
 }
 
 static void
-test_object_class_init (test_object_class_t *class)
+test_object_class_init (TestObjectClass *class)
 {
   class->test_signal = test_object_real_signal;
 
-  xsignal_new ("test-signal",
+  g_signal_new ("test-signal",
                 G_OBJECT_CLASS_TYPE (class),
                 G_SIGNAL_RUN_LAST,
-                G_STRUCT_OFFSET (test_object_class_t, test_signal),
-                NULL, NULL, NULL, XTYPE_NONE, 0);
+                G_STRUCT_OFFSET (TestObjectClass, test_signal),
+                NULL, NULL, NULL, G_TYPE_NONE, 0);
 }
 
-static DEFINE_TYPE(test_object, test_object,
+static DEFINE_TYPE(TestObject, test_object,
                    test_object_class_init, NULL, NULL,
-                   XTYPE_OBJECT)
+                   G_TYPE_OBJECT)
 
 int
 main (int   argc,
       char *argv[])
 {
-  test_object_t *object;
+  TestObject *object;
 
   g_log_set_always_fatal (g_log_set_always_fatal (G_LOG_FATAL_MASK) |
                           G_LOG_LEVEL_WARNING |
                           G_LOG_LEVEL_CRITICAL);
 
-  object = xobject_new (TEST_TYPE_OBJECT, NULL);
+  object = g_object_new (TEST_TYPE_OBJECT, NULL);
 
-  xsignal_connect (object, "test-signal",
+  g_signal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback1), NULL);
-  xsignal_connect (object, "test-signal",
+  g_signal_connect (object, "test-signal",
                     G_CALLBACK (test_object_signal_callback2), NULL);
-  xsignal_emit_by_name (object, "test-signal");
+  g_signal_emit_by_name (object, "test-signal");
 
-  xassert (callback1_ran);
-  xassert (!callback2_ran);
-  xassert (!callback3_ran);
-  xassert (default_handler_ran);
+  g_assert (callback1_ran);
+  g_assert (!callback2_ran);
+  g_assert (!callback3_ran);
+  g_assert (default_handler_ran);
 
-  xobject_unref (object);
+  g_object_unref (object);
   return 0;
 }

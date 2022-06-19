@@ -29,9 +29,9 @@
  * SECTION:gpollableoutputstream
  * @short_description: Interface for pollable output streams
  * @include: gio/gio.h
- * @see_also: #xoutput_stream_t, #xfile_descriptor_based_t, #xpollable_input_stream_t
+ * @see_also: #GOutputStream, #GFileDescriptorBased, #GPollableInputStream
  *
- * #xpollable_output_stream_t is implemented by #GOutputStreams that
+ * #GPollableOutputStream is implemented by #GOutputStreams that
  * can be polled for readiness to write. This can be used when
  * interfacing with a non-GIO API that expects
  * UNIX-file-descriptor-style asynchronous I/O rather than GIO-style.
@@ -39,41 +39,41 @@
  * Since: 2.28
  */
 
-G_DEFINE_INTERFACE (xpollable_output_stream, xpollable_output_stream, XTYPE_OUTPUT_STREAM)
+G_DEFINE_INTERFACE (GPollableOutputStream, g_pollable_output_stream, G_TYPE_OUTPUT_STREAM)
 
-static xboolean_t xpollable_output_stream_default_can_poll           (xpollable_output_stream_t *stream);
-static xssize_t   xpollable_output_stream_default_write_nonblocking  (xpollable_output_stream_t  *stream,
+static gboolean g_pollable_output_stream_default_can_poll           (GPollableOutputStream *stream);
+static gssize   g_pollable_output_stream_default_write_nonblocking  (GPollableOutputStream  *stream,
 								     const void             *buffer,
-								     xsize_t                   count,
-								     xerror_t                **error);
-static GPollableReturn xpollable_output_stream_default_writev_nonblocking (xpollable_output_stream_t  *stream,
-									    const xoutput_vector_t    *vectors,
-									    xsize_t                   n_vectors,
-									    xsize_t                  *bytes_written,
-									    xerror_t                **error);
+								     gsize                   count,
+								     GError                **error);
+static GPollableReturn g_pollable_output_stream_default_writev_nonblocking (GPollableOutputStream  *stream,
+									    const GOutputVector    *vectors,
+									    gsize                   n_vectors,
+									    gsize                  *bytes_written,
+									    GError                **error);
 
 static void
-xpollable_output_stream_default_init (xpollable_output_stream_interface_t *iface)
+g_pollable_output_stream_default_init (GPollableOutputStreamInterface *iface)
 {
-  iface->can_poll           = xpollable_output_stream_default_can_poll;
-  iface->write_nonblocking  = xpollable_output_stream_default_write_nonblocking;
-  iface->writev_nonblocking = xpollable_output_stream_default_writev_nonblocking;
+  iface->can_poll           = g_pollable_output_stream_default_can_poll;
+  iface->write_nonblocking  = g_pollable_output_stream_default_write_nonblocking;
+  iface->writev_nonblocking = g_pollable_output_stream_default_writev_nonblocking;
 }
 
-static xboolean_t
-xpollable_output_stream_default_can_poll (xpollable_output_stream_t *stream)
+static gboolean
+g_pollable_output_stream_default_can_poll (GPollableOutputStream *stream)
 {
   return TRUE;
 }
 
 /**
- * xpollable_output_stream_can_poll:
- * @stream: a #xpollable_output_stream_t.
+ * g_pollable_output_stream_can_poll:
+ * @stream: a #GPollableOutputStream.
  *
  * Checks if @stream is actually pollable. Some classes may implement
- * #xpollable_output_stream_t but have only certain instances of that
+ * #GPollableOutputStream but have only certain instances of that
  * class be pollable. If this method returns %FALSE, then the behavior
- * of other #xpollable_output_stream_t methods is undefined.
+ * of other #GPollableOutputStream methods is undefined.
  *
  * For any given stream, the value returned by this method is constant;
  * a stream cannot switch from pollable to non-pollable or vice versa.
@@ -82,80 +82,80 @@ xpollable_output_stream_default_can_poll (xpollable_output_stream_t *stream)
  *
  * Since: 2.28
  */
-xboolean_t
-xpollable_output_stream_can_poll (xpollable_output_stream_t *stream)
+gboolean
+g_pollable_output_stream_can_poll (GPollableOutputStream *stream)
 {
-  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
+  g_return_val_if_fail (G_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
 
   return G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->can_poll (stream);
 }
 
 /**
- * xpollable_output_stream_is_writable:
- * @stream: a #xpollable_output_stream_t.
+ * g_pollable_output_stream_is_writable:
+ * @stream: a #GPollableOutputStream.
  *
  * Checks if @stream can be written.
  *
  * Note that some stream types may not be able to implement this 100%
- * reliably, and it is possible that a call to xoutput_stream_write()
+ * reliably, and it is possible that a call to g_output_stream_write()
  * after this returns %TRUE would still block. To guarantee
  * non-blocking behavior, you should always use
- * xpollable_output_stream_write_nonblocking(), which will return a
+ * g_pollable_output_stream_write_nonblocking(), which will return a
  * %G_IO_ERROR_WOULD_BLOCK error rather than blocking.
  *
  * Returns: %TRUE if @stream is writable, %FALSE if not. If an error
  *   has occurred on @stream, this will result in
- *   xpollable_output_stream_is_writable() returning %TRUE, and the
+ *   g_pollable_output_stream_is_writable() returning %TRUE, and the
  *   next attempt to write will return the error.
  *
  * Since: 2.28
  */
-xboolean_t
-xpollable_output_stream_is_writable (xpollable_output_stream_t *stream)
+gboolean
+g_pollable_output_stream_is_writable (GPollableOutputStream *stream)
 {
-  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
+  g_return_val_if_fail (G_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
 
   return G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->is_writable (stream);
 }
 
 /**
- * xpollable_output_stream_create_source:
- * @stream: a #xpollable_output_stream_t.
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
+ * g_pollable_output_stream_create_source:
+ * @stream: a #GPollableOutputStream.
+ * @cancellable: (nullable): a #GCancellable, or %NULL
  *
- * Creates a #xsource_t that triggers when @stream can be written, or
+ * Creates a #GSource that triggers when @stream can be written, or
  * @cancellable is triggered or an error occurs. The callback on the
- * source is of the #xpollable_source_func_t type.
+ * source is of the #GPollableSourceFunc type.
  *
- * As with xpollable_output_stream_is_writable(), it is possible that
+ * As with g_pollable_output_stream_is_writable(), it is possible that
  * the stream may not actually be writable even after the source
- * triggers, so you should use xpollable_output_stream_write_nonblocking()
- * rather than xoutput_stream_write() from the callback.
+ * triggers, so you should use g_pollable_output_stream_write_nonblocking()
+ * rather than g_output_stream_write() from the callback.
  *
- * Returns: (transfer full): a new #xsource_t
+ * Returns: (transfer full): a new #GSource
  *
  * Since: 2.28
  */
-xsource_t *
-xpollable_output_stream_create_source (xpollable_output_stream_t *stream,
-					xcancellable_t          *cancellable)
+GSource *
+g_pollable_output_stream_create_source (GPollableOutputStream *stream,
+					GCancellable          *cancellable)
 {
-  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), NULL);
+  g_return_val_if_fail (G_IS_POLLABLE_OUTPUT_STREAM (stream), NULL);
 
   return G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->
 	  create_source (stream, cancellable);
 }
 
-static xssize_t
-xpollable_output_stream_default_write_nonblocking (xpollable_output_stream_t  *stream,
+static gssize
+g_pollable_output_stream_default_write_nonblocking (GPollableOutputStream  *stream,
 						    const void             *buffer,
-						    xsize_t                   count,
-						    xerror_t                **error)
+						    gsize                   count,
+						    GError                **error)
 {
-  if (!xpollable_output_stream_is_writable (stream))
+  if (!g_pollable_output_stream_is_writable (stream))
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK,
-                           xstrerror (EAGAIN));
+                           g_strerror (EAGAIN));
       return -1;
     }
 
@@ -164,20 +164,20 @@ xpollable_output_stream_default_write_nonblocking (xpollable_output_stream_t  *s
 }
 
 static GPollableReturn
-xpollable_output_stream_default_writev_nonblocking (xpollable_output_stream_t  *stream,
-						     const xoutput_vector_t    *vectors,
-						     xsize_t                   n_vectors,
-						     xsize_t                  *bytes_written,
-						     xerror_t                **error)
+g_pollable_output_stream_default_writev_nonblocking (GPollableOutputStream  *stream,
+						     const GOutputVector    *vectors,
+						     gsize                   n_vectors,
+						     gsize                  *bytes_written,
+						     GError                **error)
 {
-  xsize_t _bytes_written = 0;
-  xpollable_output_stream_interface_t *iface = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream);
-  xsize_t i;
-  xerror_t *err = NULL;
+  gsize _bytes_written = 0;
+  GPollableOutputStreamInterface *iface = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream);
+  gsize i;
+  GError *err = NULL;
 
   for (i = 0; i < n_vectors; i++)
     {
-      xssize_t res;
+      gssize res;
 
       /* Would we overflow here? In that case simply return and let the caller
        * handle this like a short write */
@@ -200,7 +200,7 @@ xpollable_output_stream_default_writev_nonblocking (xpollable_output_stream_t  *
               g_clear_error (&err);
               return G_POLLABLE_RETURN_OK;
             }
-          else if (xerror_matches (err, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
+          else if (g_error_matches (err, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK))
             {
               g_clear_error (&err);
               return G_POLLABLE_RETURN_WOULD_BLOCK;
@@ -214,7 +214,7 @@ xpollable_output_stream_default_writev_nonblocking (xpollable_output_stream_t  *
 
       _bytes_written += res;
       /* if we had a short write break the loop here */
-      if ((xsize_t) res < vectors[i].size)
+      if ((gsize) res < vectors[i].size)
         break;
     }
 
@@ -225,18 +225,18 @@ xpollable_output_stream_default_writev_nonblocking (xpollable_output_stream_t  *
 }
 
 /**
- * xpollable_output_stream_write_nonblocking:
- * @stream: a #xpollable_output_stream_t
- * @buffer: (array length=count) (element-type xuint8_t): a buffer to write
+ * g_pollable_output_stream_write_nonblocking:
+ * @stream: a #GPollableOutputStream
+ * @buffer: (array length=count) (element-type guint8): a buffer to write
  *     data from
  * @count: the number of bytes you want to write
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Attempts to write up to @count bytes from @buffer to @stream, as
- * with xoutput_stream_write(). If @stream is not currently writable,
+ * with g_output_stream_write(). If @stream is not currently writable,
  * this will immediately return %G_IO_ERROR_WOULD_BLOCK, and you can
- * use xpollable_output_stream_create_source() to create a #xsource_t
+ * use g_pollable_output_stream_create_source() to create a #GSource
  * that will be triggered when @stream is writable.
  *
  * Note that since this method never blocks, you cannot actually
@@ -253,25 +253,25 @@ xpollable_output_stream_default_writev_nonblocking (xpollable_output_stream_t  *
  * Returns: the number of bytes written, or -1 on error (including
  *   %G_IO_ERROR_WOULD_BLOCK).
  */
-xssize_t
-xpollable_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
+gssize
+g_pollable_output_stream_write_nonblocking (GPollableOutputStream  *stream,
 					    const void             *buffer,
-					    xsize_t                   count,
-					    xcancellable_t           *cancellable,
-					    xerror_t                **error)
+					    gsize                   count,
+					    GCancellable           *cancellable,
+					    GError                **error)
 {
-  xssize_t res;
+  gssize res;
 
-  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), -1);
-  xreturn_val_if_fail (buffer != NULL, 0);
+  g_return_val_if_fail (G_IS_POLLABLE_OUTPUT_STREAM (stream), -1);
+  g_return_val_if_fail (buffer != NULL, 0);
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (count == 0)
     return 0;
 
-  if (((xssize_t) count) < 0)
+  if (((gssize) count) < 0)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
 		   _("Too large count value passed to %s"), G_STRFUNC);
@@ -279,31 +279,31 @@ xpollable_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
     }
 
   if (cancellable)
-    xcancellable_push_current (cancellable);
+    g_cancellable_push_current (cancellable);
 
   res = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->
     write_nonblocking (stream, buffer, count, error);
 
   if (cancellable)
-    xcancellable_pop_current (cancellable);
+    g_cancellable_pop_current (cancellable);
 
   return res;
 }
 
 /**
- * xpollable_output_stream_writev_nonblocking:
- * @stream: a #xpollable_output_stream_t
+ * g_pollable_output_stream_writev_nonblocking:
+ * @stream: a #GPollableOutputStream
  * @vectors: (array length=n_vectors): the buffer containing the #GOutputVectors to write.
  * @n_vectors: the number of vectors to write
  * @bytes_written: (out) (optional): location to store the number of bytes that were
  *     written to the stream
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Attempts to write the bytes contained in the @n_vectors @vectors to @stream,
- * as with xoutput_stream_writev(). If @stream is not currently writable,
+ * as with g_output_stream_writev(). If @stream is not currently writable,
  * this will immediately return %@G_POLLABLE_RETURN_WOULD_BLOCK, and you can
- * use xpollable_output_stream_create_source() to create a #xsource_t
+ * use g_pollable_output_stream_create_source() to create a #GSource
  * that will be triggered when @stream is writable. @error will *not* be
  * set in that case.
  *
@@ -327,45 +327,45 @@ xpollable_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
  * Since: 2.60
  */
 GPollableReturn
-xpollable_output_stream_writev_nonblocking (xpollable_output_stream_t  *stream,
-					     const xoutput_vector_t    *vectors,
-					     xsize_t                   n_vectors,
-					     xsize_t                  *bytes_written,
-					     xcancellable_t           *cancellable,
-					     xerror_t                **error)
+g_pollable_output_stream_writev_nonblocking (GPollableOutputStream  *stream,
+					     const GOutputVector    *vectors,
+					     gsize                   n_vectors,
+					     gsize                  *bytes_written,
+					     GCancellable           *cancellable,
+					     GError                **error)
 {
-  xpollable_output_stream_interface_t *iface;
+  GPollableOutputStreamInterface *iface;
   GPollableReturn res;
-  xsize_t _bytes_written = 0;
+  gsize _bytes_written = 0;
 
   if (bytes_written)
     *bytes_written = 0;
 
-  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (vectors != NULL || n_vectors == 0, G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (G_IS_POLLABLE_OUTPUT_STREAM (stream), G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (vectors != NULL || n_vectors == 0, G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return G_POLLABLE_RETURN_FAILED;
 
   if (n_vectors == 0)
     return G_POLLABLE_RETURN_OK;
 
   iface = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream);
-  xreturn_val_if_fail (iface->writev_nonblocking != NULL, G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (iface->writev_nonblocking != NULL, G_POLLABLE_RETURN_FAILED);
 
   if (cancellable)
-    xcancellable_push_current (cancellable);
+    g_cancellable_push_current (cancellable);
 
   res = iface->
     writev_nonblocking (stream, vectors, n_vectors, &_bytes_written, error);
 
   if (cancellable)
-    xcancellable_pop_current (cancellable);
+    g_cancellable_pop_current (cancellable);
 
   if (res == G_POLLABLE_RETURN_FAILED)
-    g_warn_if_fail (error == NULL || (*error != NULL && !xerror_matches (*error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK)));
+    g_warn_if_fail (error == NULL || (*error != NULL && !g_error_matches (*error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK)));
   else if (res == G_POLLABLE_RETURN_WOULD_BLOCK)
     g_warn_if_fail (error == NULL || *error == NULL);
 

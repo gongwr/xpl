@@ -38,6 +38,10 @@ import taptestrunner
 Result = collections.namedtuple("Result", ("info", "out", "err", "subs"))
 
 
+def on_win32():
+    return sys.platform.find('win') != -1
+
+
 class TestCodegen(unittest.TestCase):
     """Integration test for running gdbus-codegen.
 
@@ -122,56 +126,56 @@ class TestCodegen(unittest.TestCase):
             "#endif",
             "standard_typedefs_and_helpers": "typedef struct\n"
             "{\n"
-            "  xdbus_arg_info_t parent_struct;\n"
-            "  xboolean_t use_gvariant;\n"
+            "  GDBusArgInfo parent_struct;\n"
+            "  gboolean use_gvariant;\n"
             "} _ExtendedGDBusArgInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  xdbus_method_info_t parent_struct;\n"
-            "  const xchar_t *signal_name;\n"
-            "  xboolean_t pass_fdlist;\n"
+            "  GDBusMethodInfo parent_struct;\n"
+            "  const gchar *signal_name;\n"
+            "  gboolean pass_fdlist;\n"
             "} _ExtendedGDBusMethodInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  xdbus_signalInfo_t parent_struct;\n"
-            "  const xchar_t *signal_name;\n"
+            "  GDBusSignalInfo parent_struct;\n"
+            "  const gchar *signal_name;\n"
             "} _ExtendedGDBusSignalInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  xdbus_property_info_t parent_struct;\n"
-            "  const xchar_t *hyphen_name;\n"
-            "  xuint_t use_gvariant : 1;\n"
-            "  xuint_t emits_changed_signal : 1;\n"
+            "  GDBusPropertyInfo parent_struct;\n"
+            "  const gchar *hyphen_name;\n"
+            "  guint use_gvariant : 1;\n"
+            "  guint emits_changed_signal : 1;\n"
             "} _ExtendedGDBusPropertyInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
-            "  xdbus_interface_info_t parent_struct;\n"
-            "  const xchar_t *hyphen_name;\n"
+            "  GDBusInterfaceInfo parent_struct;\n"
+            "  const gchar *hyphen_name;\n"
             "} _ExtendedGDBusInterfaceInfo;\n"
             "\n"
             "typedef struct\n"
             "{\n"
             "  const _ExtendedGDBusPropertyInfo *info;\n"
-            "  xuint_t prop_id;\n"
-            "  xvalue_t orixvalue; /* the value before the change */\n"
+            "  guint prop_id;\n"
+            "  GValue orig_value; /* the value before the change */\n"
             "} ChangedProperty;\n"
             "\n"
             "static void\n"
             "_changed_property_free (ChangedProperty *data)\n"
             "{\n"
-            "  xvalue_unset (&data->orixvalue);\n"
+            "  g_value_unset (&data->orig_value);\n"
             "  g_free (data);\n"
             "}\n"
             "\n"
-            "static xboolean_t\n"
-            "_xstrv_equal0 (xchar_t **a, xchar_t **b)\n"
+            "static gboolean\n"
+            "_g_strv_equal0 (gchar **a, gchar **b)\n"
             "{\n"
-            "  xboolean_t ret = FALSE;\n"
-            "  xuint_t n;\n"
+            "  gboolean ret = FALSE;\n"
+            "  guint n;\n"
             "  if (a == NULL && b == NULL)\n"
             "    {\n"
             "      ret = TRUE;\n"
@@ -179,20 +183,20 @@ class TestCodegen(unittest.TestCase):
             "    }\n"
             "  if (a == NULL || b == NULL)\n"
             "    goto out;\n"
-            "  if (xstrv_length (a) != xstrv_length (b))\n"
+            "  if (g_strv_length (a) != g_strv_length (b))\n"
             "    goto out;\n"
             "  for (n = 0; a[n] != NULL; n++)\n"
-            "    if (xstrcmp0 (a[n], b[n]) != 0)\n"
+            "    if (g_strcmp0 (a[n], b[n]) != 0)\n"
             "      goto out;\n"
             "  ret = TRUE;\n"
             "out:\n"
             "  return ret;\n"
             "}\n"
             "\n"
-            "static xboolean_t\n"
-            "_xvariant_equal0 (xvariant_t *a, xvariant_t *b)\n"
+            "static gboolean\n"
+            "_g_variant_equal0 (GVariant *a, GVariant *b)\n"
             "{\n"
-            "  xboolean_t ret = FALSE;\n"
+            "  gboolean ret = FALSE;\n"
             "  if (a == NULL && b == NULL)\n"
             "    {\n"
             "      ret = TRUE;\n"
@@ -200,55 +204,55 @@ class TestCodegen(unittest.TestCase):
             "    }\n"
             "  if (a == NULL || b == NULL)\n"
             "    goto out;\n"
-            "  ret = xvariant_equal (a, b);\n"
+            "  ret = g_variant_equal (a, b);\n"
             "out:\n"
             "  return ret;\n"
             "}\n"
             "\n"
-            "G_GNUC_UNUSED static xboolean_t\n"
-            "_xvalue_equal (const xvalue_t *a, const xvalue_t *b)\n"
+            "G_GNUC_UNUSED static gboolean\n"
+            "_g_value_equal (const GValue *a, const GValue *b)\n"
             "{\n"
-            "  xboolean_t ret = FALSE;\n"
-            "  xassert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
+            "  gboolean ret = FALSE;\n"
+            "  g_assert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
             "  switch (G_VALUE_TYPE (a))\n"
             "    {\n"
-            "      case XTYPE_BOOLEAN:\n"
-            "        ret = (xvalue_get_boolean (a) == xvalue_get_boolean (b));\n"
+            "      case G_TYPE_BOOLEAN:\n"
+            "        ret = (g_value_get_boolean (a) == g_value_get_boolean (b));\n"
             "        break;\n"
-            "      case XTYPE_UCHAR:\n"
-            "        ret = (xvalue_get_uchar (a) == xvalue_get_uchar (b));\n"
+            "      case G_TYPE_UCHAR:\n"
+            "        ret = (g_value_get_uchar (a) == g_value_get_uchar (b));\n"
             "        break;\n"
-            "      case XTYPE_INT:\n"
-            "        ret = (xvalue_get_int (a) == xvalue_get_int (b));\n"
+            "      case G_TYPE_INT:\n"
+            "        ret = (g_value_get_int (a) == g_value_get_int (b));\n"
             "        break;\n"
-            "      case XTYPE_UINT:\n"
-            "        ret = (xvalue_get_uint (a) == xvalue_get_uint (b));\n"
+            "      case G_TYPE_UINT:\n"
+            "        ret = (g_value_get_uint (a) == g_value_get_uint (b));\n"
             "        break;\n"
-            "      case XTYPE_INT64:\n"
-            "        ret = (xvalue_get_int64 (a) == xvalue_get_int64 (b));\n"
+            "      case G_TYPE_INT64:\n"
+            "        ret = (g_value_get_int64 (a) == g_value_get_int64 (b));\n"
             "        break;\n"
-            "      case XTYPE_UINT64:\n"
-            "        ret = (xvalue_get_uint64 (a) == xvalue_get_uint64 (b));\n"
+            "      case G_TYPE_UINT64:\n"
+            "        ret = (g_value_get_uint64 (a) == g_value_get_uint64 (b));\n"
             "        break;\n"
-            "      case XTYPE_DOUBLE:\n"
+            "      case G_TYPE_DOUBLE:\n"
             "        {\n"
             "          /* Avoid -Wfloat-equal warnings by doing a direct bit compare */\n"
-            "          xdouble_t da = xvalue_get_double (a);\n"
-            "          xdouble_t db = xvalue_get_double (b);\n"
-            "          ret = memcmp (&da, &db, sizeof (xdouble_t)) == 0;\n"
+            "          gdouble da = g_value_get_double (a);\n"
+            "          gdouble db = g_value_get_double (b);\n"
+            "          ret = memcmp (&da, &db, sizeof (gdouble)) == 0;\n"
             "        }\n"
             "        break;\n"
-            "      case XTYPE_STRING:\n"
-            "        ret = (xstrcmp0 (xvalue_get_string (a), xvalue_get_string (b)) == 0);\n"
+            "      case G_TYPE_STRING:\n"
+            "        ret = (g_strcmp0 (g_value_get_string (a), g_value_get_string (b)) == 0);\n"
             "        break;\n"
-            "      case XTYPE_VARIANT:\n"
-            "        ret = _xvariant_equal0 (xvalue_get_variant (a), xvalue_get_variant (b));\n"
+            "      case G_TYPE_VARIANT:\n"
+            "        ret = _g_variant_equal0 (g_value_get_variant (a), g_value_get_variant (b));\n"
             "        break;\n"
             "      default:\n"
-            "        if (G_VALUE_TYPE (a) == XTYPE_STRV)\n"
-            "          ret = _xstrv_equal0 (xvalue_get_boxed (a), xvalue_get_boxed (b));\n"
+            "        if (G_VALUE_TYPE (a) == G_TYPE_STRV)\n"
+            "          ret = _g_strv_equal0 (g_value_get_boxed (a), g_value_get_boxed (b));\n"
             "        else\n"
-            '          g_critical ("_xvalue_equal() does not handle type %s", xtype_name (G_VALUE_TYPE (a)));\n'
+            '          g_critical ("_g_value_equal() does not handle type %s", g_type_name (G_VALUE_TYPE (a)));\n'
             "        break;\n"
             "    }\n"
             "  return ret;\n"
@@ -272,17 +276,18 @@ class TestCodegen(unittest.TestCase):
             return self.runCodegen(interface_file.name, *args)
 
     def test_help(self):
-        """test_t the --help argument."""
+        """Test the --help argument."""
         result = self.runCodegen("--help")
         self.assertIn("usage: gdbus-codegen", result.out)
 
     def test_no_args(self):
-        """test_t running with no arguments at all."""
+        """Test running with no arguments at all."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegen()
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_empty_interface_header(self):
-        """test_t generating a header with an empty interface file."""
+        """Test generating a header with an empty interface file."""
         result = self.runCodegenWithInterface("", "--output", "/dev/stdout", "--header")
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -304,8 +309,9 @@ G_END_DECLS
             result.out.strip(),
         )
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_empty_interface_body(self):
-        """test_t generating a body with an empty interface file."""
+        """Test generating a body with an empty interface file."""
         result = self.runCodegenWithInterface("", "--output", "/dev/stdout", "--body")
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -323,8 +329,9 @@ G_END_DECLS
             result.out.strip(),
         )
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_reproducible(self):
-        """test_t builds are reproducible regardless of file ordering."""
+        """Test builds are reproducible regardless of file ordering."""
         xml_contents1 = """
         <node>
           <interface name="com.acme.Coyote">
@@ -383,7 +390,7 @@ G_END_DECLS
                 self.assertEqual(result1.out, result2.out)
 
     def test_generate_docbook(self):
-        """test_t the basic functionality of the docbook generator."""
+        """Test the basic functionality of the docbook generator."""
         xml_contents = """
         <node>
           <interface name="org.project.Bar.Frobnicator">
@@ -403,7 +410,7 @@ G_END_DECLS
             self.assertTrue(len(xml_data) != 0)
 
     def test_generate_rst(self):
-        """test_t the basic functionality of the rst generator."""
+        """Test the basic functionality of the rst generator."""
         xml_contents = """
         <node>
           <interface name="org.project.Bar.Frobnicator">
@@ -422,8 +429,9 @@ G_END_DECLS
             rst = f.readlines()
             self.assertTrue(len(rst) != 0)
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_min_required_invalid(self):
-        """test_t running with an invalid --glib-min-required."""
+        """Test running with an invalid --glib-min-required."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
                 "",
@@ -434,16 +442,18 @@ G_END_DECLS
                 "hello mum",
             )
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_min_required_too_low(self):
-        """test_t running with a --glib-min-required which is too low (and hence
+        """Test running with a --glib-min-required which is too low (and hence
         probably a typo)."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
                 "", "--output", "/dev/stdout", "--body", "--glib-min-required", "2.6"
             )
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_min_required_major_only(self):
-        """test_t running with a --glib-min-required which contains only a major version."""
+        """Test running with a --glib-min-required which contains only a major version."""
         result = self.runCodegenWithInterface(
             "",
             "--output",
@@ -457,40 +467,45 @@ G_END_DECLS
         self.assertEqual("", result.err)
         self.assertNotEqual("", result.out.strip())
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_min_required_with_micro(self):
-        """test_t running with a --glib-min-required which contains a micro version."""
+        """Test running with a --glib-min-required which contains a micro version."""
         result = self.runCodegenWithInterface(
             "", "--output", "/dev/stdout", "--header", "--glib-min-required", "2.46.2"
         )
         self.assertEqual("", result.err)
         self.assertNotEqual("", result.out.strip())
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_max_allowed_too_low(self):
-        """test_t running with a --glib-max-allowed which is too low (and hence
+        """Test running with a --glib-max-allowed which is too low (and hence
         probably a typo)."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
                 "", "--output", "/dev/stdout", "--body", "--glib-max-allowed", "2.6"
             )
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_max_allowed_major_only(self):
-        """test_t running with a --glib-max-allowed which contains only a major version."""
+        """Test running with a --glib-max-allowed which contains only a major version."""
         result = self.runCodegenWithInterface(
             "", "--output", "/dev/stdout", "--header", "--glib-max-allowed", "3"
         )
         self.assertEqual("", result.err)
         self.assertNotEqual("", result.out.strip())
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_max_allowed_with_micro(self):
-        """test_t running with a --glib-max-allowed which contains a micro version."""
+        """Test running with a --glib-max-allowed which contains a micro version."""
         result = self.runCodegenWithInterface(
             "", "--output", "/dev/stdout", "--header", "--glib-max-allowed", "2.46.2"
         )
         self.assertEqual("", result.err)
         self.assertNotEqual("", result.out.strip())
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_max_allowed_unstable(self):
-        """test_t running with a --glib-max-allowed which is unstable. It should
+        """Test running with a --glib-max-allowed which is unstable. It should
         be rounded up to the next stable version number, and hence should not
         end up less than --glib-min-required."""
         result = self.runCodegenWithInterface(
@@ -506,8 +521,9 @@ G_END_DECLS
         self.assertEqual("", result.err)
         self.assertNotEqual("", result.out.strip())
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_glib_max_allowed_less_than_min_required(self):
-        """test_t running with a --glib-max-allowed which is less than
+        """Test running with a --glib-max-allowed which is less than
         --glib-min-required."""
         with self.assertRaises(subprocess.CalledProcessError):
             self.runCodegenWithInterface(
@@ -521,8 +537,9 @@ G_END_DECLS
                 "2.64",
             )
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_unix_fd_types_and_annotations(self):
-        """test_t an interface with `h` arguments, no annotation, and GLib < 2.64.
+        """Test an interface with `h` arguments, no annotation, and GLib < 2.64.
 
         See issue #1726.
         """
@@ -551,7 +568,7 @@ G_END_DECLS
             interface_xml, "--output", "/dev/stdout", "--header"
         )
         self.assertEqual("", result.err)
-        self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 6)
+        self.assertEqual(result.out.strip().count("GUnixFDList"), 6)
 
         # Specify an old --glib-min-required.
         result = self.runCodegenWithInterface(
@@ -563,10 +580,10 @@ G_END_DECLS
             "2.32",
         )
         self.assertEqual("", result.err)
-        self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 6)
+        self.assertEqual(result.out.strip().count("GUnixFDList"), 6)
 
         # Specify a --glib-min-required ≥ 2.64. There should be more
-        # mentions of `xunix_fd_list_t` now, since the annotation is not needed to
+        # mentions of `GUnixFDList` now, since the annotation is not needed to
         # trigger its use.
         result = self.runCodegenWithInterface(
             interface_xml,
@@ -577,10 +594,11 @@ G_END_DECLS
             "2.64",
         )
         self.assertEqual("", result.err)
-        self.assertEqual(result.out.strip().count("xunix_fd_list_t"), 18)
+        self.assertEqual(result.out.strip().count("GUnixFDList"), 18)
 
+    @unittest.skipIf(on_win32(), "requires /dev/stdout")
     def test_call_flags_and_timeout_method_args(self):
-        """test_t that generated method call functions have @call_flags and
+        """Test that generated method call functions have @call_flags and
         @timeout_msec args if and only if GLib >= 2.64.
         """
         interface_xml = """
@@ -596,7 +614,7 @@ G_END_DECLS
         )
         self.assertEqual("", result.err)
         self.assertEqual(result.out.strip().count("GDBusCallFlags call_flags,"), 0)
-        self.assertEqual(result.out.strip().count("xint_t timeout_msec,"), 0)
+        self.assertEqual(result.out.strip().count("gint timeout_msec,"), 0)
 
         # Specify an old --glib-min-required.
         result = self.runCodegenWithInterface(
@@ -609,7 +627,7 @@ G_END_DECLS
         )
         self.assertEqual("", result.err)
         self.assertEqual(result.out.strip().count("GDBusCallFlags call_flags,"), 0)
-        self.assertEqual(result.out.strip().count("xint_t timeout_msec,"), 0)
+        self.assertEqual(result.out.strip().count("gint timeout_msec,"), 0)
 
         # Specify a --glib-min-required ≥ 2.64. The two arguments should be
         # present for both the async and sync method call functions.
@@ -623,10 +641,10 @@ G_END_DECLS
         )
         self.assertEqual("", result.err)
         self.assertEqual(result.out.strip().count("GDBusCallFlags call_flags,"), 2)
-        self.assertEqual(result.out.strip().count("xint_t timeout_msec,"), 2)
+        self.assertEqual(result.out.strip().count("gint timeout_msec,"), 2)
 
     def test_generate_valid_docbook(self):
-        """test_t the basic functionality of the docbook generator."""
+        """Test the basic functionality of the docbook generator."""
         xml_contents = """
         <node>
           <interface name="org.project.Bar.Frobnicator">

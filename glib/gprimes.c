@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@
 #include "gprimes.h"
 
 
-static const xuint_t g_primes[] =
+static const guint g_primes[] =
 {
   11,
   19,
@@ -71,11 +71,11 @@ static const xuint_t g_primes[] =
 
 /**
  * g_spaced_primes_closest:
- * @num: a #xuint_t
+ * @num: a #guint
  *
  * Gets the smallest prime number from a built-in array of primes which
  * is larger than @num. This is used within GLib to calculate the optimum
- * size of a #xhashtable_t.
+ * size of a #GHashTable.
  *
  * The built-in array of primes ranges from 11 to 13845163 such that
  * each prime is approximately 1.5-2 times the previous prime.
@@ -83,10 +83,10 @@ static const xuint_t g_primes[] =
  * Returns: the smallest prime number from a built-in array of primes
  *     which is larger than @num
  */
-xuint_t
-g_spaced_primes_closest (xuint_t num)
+guint
+g_spaced_primes_closest (guint num)
 {
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (g_primes); i++)
     if (g_primes[i] > num)

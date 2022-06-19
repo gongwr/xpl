@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1998  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #include "config.h"
@@ -37,14 +37,14 @@
  *
  * The GLib headers annotate deprecated APIs in a way that produces
  * compiler warnings if these deprecated APIs are used. The warnings
- * can be turned off by defining the macro %XPL_DISABLE_DEPRECATION_WARNINGS
+ * can be turned off by defining the macro %GLIB_DISABLE_DEPRECATION_WARNINGS
  * before including the glib.h header.
  *
  * GLib also provides support for building applications against
  * defined subsets of deprecated or new GLib APIs. Define the macro
- * %XPL_VERSION_MIN_REQUIRED to specify up to what version of GLib
+ * %GLIB_VERSION_MIN_REQUIRED to specify up to what version of GLib
  * you want to receive warnings about deprecated APIs. Define the
- * macro %XPL_VERSION_MAX_ALLOWED to specify the newest version of
+ * macro %GLIB_VERSION_MAX_ALLOWED to specify the newest version of
  * GLib whose API you want to use.
  */
 
@@ -58,7 +58,7 @@
  */
 
 /**
- * XPL_MAJOR_VERSION:
+ * GLIB_MAJOR_VERSION:
  *
  * The major version number of the GLib library.
  *
@@ -77,7 +77,7 @@
  */
 
 /**
- * XPL_MINOR_VERSION:
+ * GLIB_MINOR_VERSION:
  *
  * The minor version number of the GLib library.
  *
@@ -96,7 +96,7 @@
  */
 
 /**
- * XPL_MICRO_VERSION:
+ * GLIB_MICRO_VERSION:
  *
  * The micro version number of the GLib library.
  *
@@ -106,7 +106,7 @@
  */
 
 /**
- * XPL_CHECK_VERSION:
+ * GLIB_CHECK_VERSION:
  * @major: the major version to check for
  * @minor: the minor version to check for
  * @micro: the micro version to check for
@@ -138,11 +138,11 @@
  * against at application run time.
  */
 
-const xuint_t glib_major_version = XPL_MAJOR_VERSION;
-const xuint_t glib_minor_version = XPL_MINOR_VERSION;
-const xuint_t glib_micro_version = XPL_MICRO_VERSION;
-const xuint_t glib_interface_age = XPL_INTERFACE_AGE;
-const xuint_t glib_binary_age = XPL_BINARY_AGE;
+const guint glib_major_version = GLIB_MAJOR_VERSION;
+const guint glib_minor_version = GLIB_MINOR_VERSION;
+const guint glib_micro_version = GLIB_MICRO_VERSION;
+const guint glib_interface_age = GLIB_INTERFACE_AGE;
+const guint glib_binary_age = GLIB_BINARY_AGE;
 
 /**
  * glib_check_version:
@@ -153,8 +153,8 @@ const xuint_t glib_binary_age = XPL_BINARY_AGE;
  * Checks that the GLib library in use is compatible with the
  * given version.
  *
- * Generally you would pass in the constants %XPL_MAJOR_VERSION,
- * %XPL_MINOR_VERSION, %XPL_MICRO_VERSION as the three arguments
+ * Generally you would pass in the constants %GLIB_MAJOR_VERSION,
+ * %GLIB_MINOR_VERSION, %GLIB_MICRO_VERSION as the three arguments
  * to this function; that produces a check that the library in use
  * is compatible with the version of GLib the application or module
  * was compiled against.
@@ -173,19 +173,19 @@ const xuint_t glib_binary_age = XPL_BINARY_AGE;
  *
  * Since: 2.6
  */
-const xchar_t *
-glib_check_version (xuint_t required_major,
-                    xuint_t required_minor,
-                    xuint_t required_micro)
+const gchar *
+glib_check_version (guint required_major,
+                    guint required_minor,
+                    guint required_micro)
 {
-  xint_t glib_effective_micro = 100 * XPL_MINOR_VERSION + XPL_MICRO_VERSION;
-  xint_t required_effective_micro = 100 * required_minor + required_micro;
+  gint glib_effective_micro = 100 * GLIB_MINOR_VERSION + GLIB_MICRO_VERSION;
+  gint required_effective_micro = 100 * required_minor + required_micro;
 
-  if (required_major > XPL_MAJOR_VERSION)
+  if (required_major > GLIB_MAJOR_VERSION)
     return "GLib version too old (major mismatch)";
-  if (required_major < XPL_MAJOR_VERSION)
+  if (required_major < GLIB_MAJOR_VERSION)
     return "GLib version too new (major mismatch)";
-  if (required_effective_micro < glib_effective_micro - XPL_BINARY_AGE)
+  if (required_effective_micro < glib_effective_micro - GLIB_BINARY_AGE)
     return "GLib version too new (micro mismatch)";
   if (required_effective_micro > glib_effective_micro)
     return "GLib version too old (micro mismatch)";

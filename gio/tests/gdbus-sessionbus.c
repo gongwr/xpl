@@ -20,13 +20,13 @@
 
 #include "gdbus-sessionbus.h"
 
-static xtest_dbus_t *singleton = NULL;
+static GTestDBus *singleton = NULL;
 
 void
 session_bus_up (void)
 {
-  xchar_t *relative, *servicesdir;
-  xassert (singleton == NULL);
+  gchar *relative, *servicesdir;
+  g_assert (singleton == NULL);
   singleton = g_test_dbus_new (G_TEST_DBUS_NONE);
 
   /* We ignore deprecations here so that gdbus-test-codegen-old can
@@ -46,22 +46,22 @@ session_bus_up (void)
 void
 session_bus_stop (void)
 {
-  xassert (singleton != NULL);
+  g_assert (singleton != NULL);
   g_test_dbus_stop (singleton);
 }
 
 void
 session_bus_down (void)
 {
-  xassert (singleton != NULL);
+  g_assert (singleton != NULL);
   g_test_dbus_down (singleton);
   g_clear_object (&singleton);
 }
 
-xint_t
+gint
 session_bus_run (void)
 {
-  xint_t ret;
+  gint ret;
 
   session_bus_up ();
   ret = g_test_run ();

@@ -1,4 +1,4 @@
-/* GMODULE - XPL wrapper code for dynamic module loading
+/* GMODULE - GLIB wrapper code for dynamic module loading
  * Copyright (C) 1998 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -19,10 +19,10 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 
@@ -79,12 +79,12 @@
  * it must ensure that it is never unloaded, by calling g_module_make_resident().
  *
  * Example: Calling a function defined in a GModule
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * // the function signature for 'say_hello'
  * typedef void (* SayHelloFunc) (const char *message);
  *
- * xboolean_t
- * just_say_hello (const char *filename, xerror_t **error)
+ * gboolean
+ * just_say_hello (const char *filename, GError **error)
  * {
  *   SayHelloFunc  say_hello;
  *   GModule      *module;
@@ -97,7 +97,7 @@
  *       return FALSE;
  *     }
  *
- *   if (!g_module_symbol (module, "say_hello", (xpointer_t *)&say_hello))
+ *   if (!g_module_symbol (module, "say_hello", (gpointer *)&say_hello))
  *     {
  *       g_set_error (error, SAY_ERROR, SAY_ERROR_OPEN,
  *                    "%s: %s", filename, g_module_error ());
@@ -194,46 +194,46 @@
 /* --- structures --- */
 struct _GModule
 {
-  xchar_t	*file_name;
-  xpointer_t handle;
-  xuint_t ref_count : 31;
-  xuint_t is_resident : 1;
+  gchar	*file_name;
+  gpointer handle;
+  guint ref_count : 31;
+  guint is_resident : 1;
   GModuleUnload unload;
   GModule *next;
 };
 
 
 /* --- prototypes --- */
-static xpointer_t _g_module_open (const xchar_t  *file_name,
-                                xboolean_t      bind_lazy,
-                                xboolean_t      bind_local,
-                                xerror_t      **error);
-static void		_g_module_close		(xpointer_t	 handle);
-static xpointer_t		_g_module_self		(void);
-static xpointer_t		_g_module_symbol	(xpointer_t	 handle,
-						 const xchar_t	*symbol_name);
-static xchar_t*		_g_module_build_path	(const xchar_t	*directory,
-						 const xchar_t	*module_name);
-static inline void	g_module_set_error	(const xchar_t	*error);
-static inline GModule*	g_module_find_by_handle (xpointer_t	 handle);
-static inline GModule*	g_module_find_by_name	(const xchar_t	*name);
+static gpointer _g_module_open (const gchar  *file_name,
+                                gboolean      bind_lazy,
+                                gboolean      bind_local,
+                                GError      **error);
+static void		_g_module_close		(gpointer	 handle);
+static gpointer		_g_module_self		(void);
+static gpointer		_g_module_symbol	(gpointer	 handle,
+						 const gchar	*symbol_name);
+static gchar*		_g_module_build_path	(const gchar	*directory,
+						 const gchar	*module_name);
+static inline void	g_module_set_error	(const gchar	*error);
+static inline GModule*	g_module_find_by_handle (gpointer	 handle);
+static inline GModule*	g_module_find_by_name	(const gchar	*name);
 
 
 /* --- variables --- */
 static GModule	     *modules = NULL;
 static GModule	     *main_module = NULL;
-static xprivate_t       module_error_private = G_PRIVATE_INIT (g_free);
-static xboolean_t	      module_debug_initialized = FALSE;
-static xuint_t	      module_debug_flags = 0;
+static GPrivate       module_error_private = G_PRIVATE_INIT (g_free);
+static gboolean	      module_debug_initialized = FALSE;
+static guint	      module_debug_flags = 0;
 
 
 /* --- inline functions --- */
 static inline GModule*
-g_module_find_by_handle (xpointer_t handle)
+g_module_find_by_handle (gpointer handle)
 {
   GModule *module;
   GModule *retval = NULL;
-
+  
   if (main_module && main_module->handle == handle)
     retval = main_module;
   else
@@ -248,11 +248,11 @@ g_module_find_by_handle (xpointer_t handle)
 }
 
 static inline GModule*
-g_module_find_by_name (const xchar_t *name)
+g_module_find_by_name (const gchar *name)
 {
   GModule *module;
   GModule *retval = NULL;
-
+  
   for (module = modules; module; module = module->next)
     if (strcmp (name, module->file_name) == 0)
 	{
@@ -264,16 +264,16 @@ g_module_find_by_name (const xchar_t *name)
 }
 
 static inline void
-g_module_set_error_unduped (xchar_t *error)
+g_module_set_error_unduped (gchar *error)
 {
   g_private_replace (&module_error_private, error);
   errno = 0;
 }
 
 static inline void
-g_module_set_error (const xchar_t *error)
+g_module_set_error (const gchar *error)
 {
-  g_module_set_error_unduped (xstrdup (error));
+  g_module_set_error_unduped (g_strdup (error));
 }
 
 
@@ -289,33 +289,33 @@ g_module_set_error (const xchar_t *error)
 #undef	SUPPORT_OR_RETURN
 #define	SUPPORT_OR_RETURN(rv)	{ g_module_set_error ("dynamic modules are " \
                                               "not supported by this system"); return rv; }
-static xpointer_t
-_g_module_open (const xchar_t  *file_name,
-                xboolean_t      bind_lazy,
-                xboolean_t      bind_local,
-                xerror_t      **error)
+static gpointer
+_g_module_open (const gchar  *file_name,
+                gboolean      bind_lazy,
+                gboolean      bind_local,
+                GError      **error)
 {
   g_module_set_error (NULL);
   return NULL;
 }
 static void
-_g_module_close (xpointer_t handle)
+_g_module_close (gpointer handle)
 {
 }
-static xpointer_t
+static gpointer
 _g_module_self (void)
 {
   return NULL;
 }
-static xpointer_t
-_g_module_symbol (xpointer_t	 handle,
-		  const xchar_t	*symbol_name)
+static gpointer
+_g_module_symbol (gpointer	 handle,
+		  const gchar	*symbol_name)
 {
   return NULL;
 }
-static xchar_t*
-_g_module_build_path (const xchar_t *directory,
-		      const xchar_t *module_name)
+static gchar*
+_g_module_build_path (const gchar *directory,
+		      const gchar *module_name)
 {
   return NULL;
 }
@@ -339,32 +339,32 @@ G_DEFINE_QUARK (g-module-error-quark, g_module_error)
  *
  * Returns: %TRUE if modules are supported
  */
-xboolean_t
+gboolean
 g_module_supported (void)
 {
   SUPPORT_OR_RETURN (FALSE);
-
+  
   return TRUE;
 }
 
-static xchar_t*
-parse_libtool_archive (const xchar_t* libtool_name)
+static gchar*
+parse_libtool_archive (const gchar* libtool_name)
 {
-  const xuint_t TOKEN_DLNAME = G_TOKEN_LAST + 1;
-  const xuint_t TOKEN_INSTALLED = G_TOKEN_LAST + 2;
-  const xuint_t TOKEN_LIBDIR = G_TOKEN_LAST + 3;
-  xchar_t *lt_dlname = NULL;
-  xboolean_t lt_installed = TRUE;
-  xchar_t *lt_libdir = NULL;
-  xchar_t *name;
+  const guint TOKEN_DLNAME = G_TOKEN_LAST + 1;
+  const guint TOKEN_INSTALLED = G_TOKEN_LAST + 2;
+  const guint TOKEN_LIBDIR = G_TOKEN_LAST + 3;
+  gchar *lt_dlname = NULL;
+  gboolean lt_installed = TRUE;
+  gchar *lt_libdir = NULL;
+  gchar *name;
   GTokenType token;
-  xscanner_t *scanner;
-
+  GScanner *scanner;
+  
   int fd = g_open (libtool_name, O_RDONLY, 0);
   if (fd < 0)
     {
-      xchar_t *display_libtool_name = xfilename_display_name (libtool_name);
-      g_module_set_error_unduped (xstrdup_printf ("failed to open libtool archive \"%s\"", display_libtool_name));
+      gchar *display_libtool_name = g_filename_display_name (libtool_name);
+      g_module_set_error_unduped (g_strdup_printf ("failed to open libtool archive \"%s\"", display_libtool_name));
       g_free (display_libtool_name);
       return NULL;
     }
@@ -372,25 +372,25 @@ parse_libtool_archive (const xchar_t* libtool_name)
   scanner = g_scanner_new (NULL);
   g_scanner_input_file (scanner, fd);
   scanner->config->symbol_2_token = TRUE;
-  g_scanner_scope_add_symbol (scanner, 0, "dlname",
+  g_scanner_scope_add_symbol (scanner, 0, "dlname", 
 			      GUINT_TO_POINTER (TOKEN_DLNAME));
-  g_scanner_scope_add_symbol (scanner, 0, "installed",
+  g_scanner_scope_add_symbol (scanner, 0, "installed", 
 			      GUINT_TO_POINTER (TOKEN_INSTALLED));
-  g_scanner_scope_add_symbol (scanner, 0, "libdir",
+  g_scanner_scope_add_symbol (scanner, 0, "libdir", 
 			      GUINT_TO_POINTER (TOKEN_LIBDIR));
   while (!g_scanner_eof (scanner))
     {
       token = g_scanner_get_next_token (scanner);
-      if (token == TOKEN_DLNAME || token == TOKEN_INSTALLED ||
+      if (token == TOKEN_DLNAME || token == TOKEN_INSTALLED || 
 	  token == TOKEN_LIBDIR)
 	{
 	  if (g_scanner_get_next_token (scanner) != '=' ||
-	      g_scanner_get_next_token (scanner) !=
-	      (token == TOKEN_INSTALLED ?
+	      g_scanner_get_next_token (scanner) != 
+	      (token == TOKEN_INSTALLED ? 
 	       G_TOKEN_IDENTIFIER : G_TOKEN_STRING))
 	    {
-	      xchar_t *display_libtool_name = xfilename_display_name (libtool_name);
-	      g_module_set_error_unduped (xstrdup_printf ("unable to parse libtool archive \"%s\"", display_libtool_name));
+	      gchar *display_libtool_name = g_filename_display_name (libtool_name);
+	      g_module_set_error_unduped (g_strdup_printf ("unable to parse libtool archive \"%s\"", display_libtool_name));
 	      g_free (display_libtool_name);
 
 	      g_free (lt_dlname);
@@ -405,30 +405,30 @@ parse_libtool_archive (const xchar_t* libtool_name)
 	      if (token == TOKEN_DLNAME)
 		{
 		  g_free (lt_dlname);
-		  lt_dlname = xstrdup (scanner->value.v_string);
+		  lt_dlname = g_strdup (scanner->value.v_string);
 		}
 	      else if (token == TOKEN_INSTALLED)
-		lt_installed =
+		lt_installed = 
 		  strcmp (scanner->value.v_identifier, "yes") == 0;
 	      else /* token == TOKEN_LIBDIR */
 		{
 		  g_free (lt_libdir);
-		  lt_libdir = xstrdup (scanner->value.v_string);
+		  lt_libdir = g_strdup (scanner->value.v_string);
 		}
 	    }
-	}
+	}      
     }
 
   if (!lt_installed)
     {
-      xchar_t *dir = g_path_get_dirname (libtool_name);
+      gchar *dir = g_path_get_dirname (libtool_name);
       g_free (lt_libdir);
-      lt_libdir = xstrconcat (dir, G_DIR_SEPARATOR_S ".libs", NULL);
+      lt_libdir = g_strconcat (dir, G_DIR_SEPARATOR_S ".libs", NULL);
       g_free (dir);
     }
 
-  name = xstrconcat (lt_libdir, G_DIR_SEPARATOR_S, lt_dlname, NULL);
-
+  name = g_strconcat (lt_libdir, G_DIR_SEPARATOR_S, lt_dlname, NULL);
+  
   g_free (lt_dlname);
   g_free (lt_libdir);
   g_scanner_destroy (scanner);
@@ -450,12 +450,12 @@ _g_module_debug_init (void)
     { "resident-modules", G_MODULE_DEBUG_RESIDENT_MODULES },
     { "bind-now-modules", G_MODULE_DEBUG_BIND_NOW_MODULES }
   };
-  const xchar_t *env;
+  const gchar *env;
 
   env = g_getenv ("G_DEBUG");
 
   module_debug_flags =
-    !env ? 0 : g_parse_debuxstring (env, keys, G_N_ELEMENTS (keys));
+    !env ? 0 : g_parse_debug_string (env, keys, G_N_ELEMENTS (keys));
 
   module_debug_initialized = TRUE;
 }
@@ -468,7 +468,7 @@ static GRecMutex g_module_global_lock;
  *     to obtain a #GModule representing the main program itself
  * @flags: the flags used for opening the module. This can be the
  *     logical OR of any of the #GModuleFlags
- * @error: #xerror_t.
+ * @error: #GError.
  *
  * Opens a module. If the module has already been opened,
  * its reference count is incremented.
@@ -488,18 +488,18 @@ static GRecMutex g_module_global_lock;
  * Since: 2.70
  */
 GModule*
-g_module_open_full (const xchar_t   *file_name,
+g_module_open_full (const gchar   *file_name,
                     GModuleFlags   flags,
-                    xerror_t       **error)
+                    GError       **error)
 {
   GModule *module;
-  xpointer_t handle = NULL;
-  xchar_t *name = NULL;
-
+  gpointer handle = NULL;
+  gchar *name = NULL;
+  
   SUPPORT_OR_RETURN (NULL);
 
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
-
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  
   g_rec_mutex_lock (&g_module_global_lock);
 
   if (G_UNLIKELY (!module_debug_initialized))
@@ -509,7 +509,7 @@ g_module_open_full (const xchar_t   *file_name,
     flags &= ~G_MODULE_BIND_LAZY;
 
   if (!file_name)
-    {
+    {      
       if (!main_module)
 	{
 	  handle = _g_module_self ();
@@ -534,25 +534,25 @@ g_module_open_full (const xchar_t   *file_name,
       g_rec_mutex_unlock (&g_module_global_lock);
       return main_module;
     }
-
+  
   /* we first search the module list by name */
   module = g_module_find_by_name (file_name);
   if (module)
     {
       module->ref_count++;
-
+      
       g_rec_mutex_unlock (&g_module_global_lock);
       return module;
     }
 
   /* check whether we have a readable file right away */
-  if (xfile_test (file_name, XFILE_TEST_IS_REGULAR))
-    name = xstrdup (file_name);
+  if (g_file_test (file_name, G_FILE_TEST_IS_REGULAR))
+    name = g_strdup (file_name);
   /* try completing file name with standard library suffix */
   if (!name)
     {
-      name = xstrconcat (file_name, "." G_MODULE_SUFFIX, NULL);
-      if (!xfile_test (name, XFILE_TEST_IS_REGULAR))
+      name = g_strconcat (file_name, "." G_MODULE_SUFFIX, NULL);
+      if (!g_file_test (name, G_FILE_TEST_IS_REGULAR))
 	{
 	  g_free (name);
 	  name = NULL;
@@ -561,8 +561,8 @@ g_module_open_full (const xchar_t   *file_name,
   /* try completing by appending libtool suffix */
   if (!name)
     {
-      name = xstrconcat (file_name, ".la", NULL);
-      if (!xfile_test (name, XFILE_TEST_IS_REGULAR))
+      name = g_strconcat (file_name, ".la", NULL);
+      if (!g_file_test (name, G_FILE_TEST_IS_REGULAR))
 	{
 	  g_free (name);
 	  name = NULL;
@@ -573,23 +573,23 @@ g_module_open_full (const xchar_t   *file_name,
    */
   if (!name)
     {
-      xchar_t *dot = strrchr (file_name, '.');
-      xchar_t *slash = strrchr (file_name, G_DIR_SEPARATOR);
-
+      gchar *dot = strrchr (file_name, '.');
+      gchar *slash = strrchr (file_name, G_DIR_SEPARATOR);
+      
       /* make sure the name has a suffix */
       if (!dot || dot < slash)
-	name = xstrconcat (file_name, "." G_MODULE_SUFFIX, NULL);
+	name = g_strconcat (file_name, "." G_MODULE_SUFFIX, NULL);
       else
-	name = xstrdup (file_name);
+	name = g_strdup (file_name);
     }
 
   /* ok, try loading the module */
-  xassert (name != NULL);
+  g_assert (name != NULL);
 
   /* if it's a libtool archive, figure library file to load */
-  if (xstr_has_suffix (name, ".la")) /* libtool archive? */
+  if (g_str_has_suffix (name, ".la")) /* libtool archive? */
     {
-      xchar_t *real_name = parse_libtool_archive (name);
+      gchar *real_name = parse_libtool_archive (name);
 
       /* real_name might be NULL, but then module error is already set */
       if (real_name)
@@ -605,10 +605,10 @@ g_module_open_full (const xchar_t   *file_name,
 
   if (handle)
     {
-      xchar_t *saved_error;
+      gchar *saved_error;
       GModuleCheckInit check_init;
-      const xchar_t *check_failed = NULL;
-
+      const gchar *check_failed = NULL;
+      
       /* search the module list by handle, since file names are not unique */
       module = g_module_find_by_handle (handle);
       if (module)
@@ -616,36 +616,36 @@ g_module_open_full (const xchar_t   *file_name,
 	  _g_module_close (module->handle);
 	  module->ref_count++;
 	  g_module_set_error (NULL);
-
+	  
 	  g_rec_mutex_unlock (&g_module_global_lock);
 	  return module;
 	}
-
-      saved_error = xstrdup (g_module_error ());
+      
+      saved_error = g_strdup (g_module_error ());
       g_module_set_error (NULL);
-
+      
       module = g_new (GModule, 1);
-      module->file_name = xstrdup (file_name);
+      module->file_name = g_strdup (file_name);
       module->handle = handle;
       module->ref_count = 1;
       module->is_resident = FALSE;
       module->unload = NULL;
       module->next = modules;
       modules = module;
-
+      
       /* check initialization */
-      if (g_module_symbol (module, "g_module_check_init", (xpointer_t) &check_init) && check_init != NULL)
+      if (g_module_symbol (module, "g_module_check_init", (gpointer) &check_init) && check_init != NULL)
 	check_failed = check_init (module);
-
+      
       /* we don't call unload() if the initialization check failed. */
       if (!check_failed)
-	g_module_symbol (module, "g_module_unload", (xpointer_t) &module->unload);
-
+	g_module_symbol (module, "g_module_unload", (gpointer) &module->unload);
+      
       if (check_failed)
 	{
-	  xchar_t *temp_error;
+	  gchar *temp_error;
 
-          temp_error = xstrconcat ("GModule (", file_name, ") ",
+          temp_error = g_strconcat ("GModule (", file_name, ") ",
                                     "initialization check failed: ",
                                     check_failed, NULL);
 	  g_module_close (module);
@@ -680,7 +680,7 @@ g_module_open_full (const xchar_t   *file_name,
  * Returns: a #GModule on success, or %NULL on failure
  */
 GModule *
-g_module_open (const xchar_t  *file_name,
+g_module_open (const gchar  *file_name,
                GModuleFlags  flags)
 {
   return g_module_open_full (file_name, flags, NULL);
@@ -694,18 +694,18 @@ g_module_open (const xchar_t  *file_name,
  *
  * Returns: %TRUE on success
  */
-xboolean_t
+gboolean
 g_module_close (GModule *module)
 {
   SUPPORT_OR_RETURN (FALSE);
-
-  xreturn_val_if_fail (module != NULL, FALSE);
-  xreturn_val_if_fail (module->ref_count > 0, FALSE);
-
+  
+  g_return_val_if_fail (module != NULL, FALSE);
+  g_return_val_if_fail (module->ref_count > 0, FALSE);
+  
   g_rec_mutex_lock (&g_module_global_lock);
 
   module->ref_count--;
-
+  
   if (!module->ref_count && !module->is_resident && module->unload)
     {
       GModuleUnload unload;
@@ -719,9 +719,9 @@ g_module_close (GModule *module)
     {
       GModule *last;
       GModule *node;
-
+      
       last = NULL;
-
+      
       node = modules;
       while (node)
 	{
@@ -737,12 +737,12 @@ g_module_close (GModule *module)
 	  node = last->next;
 	}
       module->next = NULL;
-
+      
       _g_module_close (module->handle);
       g_free (module->file_name);
       g_free (module);
     }
-
+  
   g_rec_mutex_unlock (&g_module_global_lock);
   return g_module_error() == NULL;
 }
@@ -769,7 +769,7 @@ g_module_make_resident (GModule *module)
  *
  * Returns: a string describing the last module error
  */
-const xchar_t *
+const gchar *
 g_module_error (void)
 {
   return g_private_get (&module_error_private);
@@ -786,46 +786,46 @@ g_module_error (void)
  *
  * Returns: %TRUE on success
  */
-xboolean_t
+gboolean
 g_module_symbol (GModule     *module,
-                 const xchar_t *symbol_name,
-                 xpointer_t    *symbol)
+                 const gchar *symbol_name,
+                 gpointer    *symbol)
 {
-  const xchar_t *module_error;
+  const gchar *module_error;
 
   if (symbol)
     *symbol = NULL;
   SUPPORT_OR_RETURN (FALSE);
-
-  xreturn_val_if_fail (module != NULL, FALSE);
-  xreturn_val_if_fail (symbol_name != NULL, FALSE);
-  xreturn_val_if_fail (symbol != NULL, FALSE);
-
+  
+  g_return_val_if_fail (module != NULL, FALSE);
+  g_return_val_if_fail (symbol_name != NULL, FALSE);
+  g_return_val_if_fail (symbol != NULL, FALSE);
+  
   g_rec_mutex_lock (&g_module_global_lock);
 
 #ifdef	G_MODULE_NEED_USCORE
   {
-    xchar_t *name;
+    gchar *name;
 
-    name = xstrconcat ("_", symbol_name, NULL);
+    name = g_strconcat ("_", symbol_name, NULL);
     *symbol = _g_module_symbol (module->handle, name);
     g_free (name);
   }
 #else	/* !G_MODULE_NEED_USCORE */
   *symbol = _g_module_symbol (module->handle, symbol_name);
 #endif	/* !G_MODULE_NEED_USCORE */
-
+  
   module_error = g_module_error ();
   if (module_error)
     {
-      xchar_t *error;
+      gchar *error;
 
-      error = xstrconcat ("'", symbol_name, "': ", module_error, NULL);
+      error = g_strconcat ("'", symbol_name, "': ", module_error, NULL);
       g_module_set_error (error);
       g_free (error);
       *symbol = NULL;
     }
-
+  
   g_rec_mutex_unlock (&g_module_global_lock);
   return !module_error;
 }
@@ -840,14 +840,14 @@ g_module_symbol (GModule     *module,
  *
  * Returns: (transfer none): the filename of the module
  */
-const xchar_t *
+const gchar *
 g_module_name (GModule *module)
 {
-  xreturn_val_if_fail (module != NULL, NULL);
-
+  g_return_val_if_fail (module != NULL, NULL);
+  
   if (module == main_module)
     return "main";
-
+  
   return module->file_name;
 }
 
@@ -875,12 +875,12 @@ g_module_name (GModule *module)
  * Returns: the complete path of the module, including the standard library
  *     prefix and suffix. This should be freed when no longer needed
  */
-xchar_t *
-g_module_build_path (const xchar_t *directory,
-                     const xchar_t *module_name)
+gchar *
+g_module_build_path (const gchar *directory,
+                     const gchar *module_name)
 {
-  xreturn_val_if_fail (module_name != NULL, NULL);
-
+  g_return_val_if_fail (module_name != NULL, NULL);
+  
   return _g_module_build_path (directory, module_name);
 }
 
@@ -889,19 +889,19 @@ g_module_build_path (const xchar_t *directory,
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN GModule *    g_module_open_utf8 (const xchar_t  *file_name,
+_GLIB_EXTERN GModule *    g_module_open_utf8 (const gchar  *file_name,
                                               GModuleFlags  flags);
 
-_XPL_EXTERN const xchar_t *g_module_name_utf8 (GModule      *module);
+_GLIB_EXTERN const gchar *g_module_name_utf8 (GModule      *module);
 
 GModule*
-g_module_open_utf8 (const xchar_t    *file_name,
+g_module_open_utf8 (const gchar    *file_name,
                     GModuleFlags    flags)
 {
   return g_module_open (file_name, flags);
 }
 
-const xchar_t *
+const gchar *
 g_module_name_utf8 (GModule *module)
 {
   return g_module_name (module);

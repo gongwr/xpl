@@ -63,10 +63,10 @@ struct StructureItem
 {
   const char *filename;
   const char *link_to;
-  xfile_type_t file_type;
-  xfile_create_flags_t create_flags;
-  xuint32_t mode;
-  xboolean_t handle_special;
+  GFileType file_type;
+  GFileCreateFlags create_flags;
+  guint32 mode;
+  gboolean handle_special;
   enum StructureExtraFlags extra_flags;
 };
 
@@ -79,42 +79,42 @@ struct StructureItem
 
 static const struct StructureItem sample_struct[] = {
 /*	 filename				link	file_type				create_flags		mode | handle_special | extra_flags              */
-    {"dir1",				NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_NONE, 0, 0, TEST_DELETE_NORMAL | TEST_DELETE_NON_EMPTY | TEST_REPLACE | TEST_OPEN},
-    {"dir1/subdir",			NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_NONE, 0, 0, TEST_COPY	| TEST_COPY_ERROR_RECURSE | TEST_APPEND},
-    {"dir2",				NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_NONE, 0, 0, TEST_DELETE_NORMAL | TEST_MOVE | TEST_CREATE},
-    {TEST_DIR_TARGET,		NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_COPY_ERROR_RECURSE},
-    {TEST_DIR_NO_ACCESS,	NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_PRIVATE, S_IRUSR + S_IWUSR + S_IRGRP + S_IWGRP + S_IROTH + S_IWOTH, 0, TEST_NO_ACCESS | TEST_OPEN},
-    {TEST_DIR_NO_WRITE,		NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_PRIVATE, S_IRUSR + S_IXUSR + S_IRGRP + S_IXGRP + S_IROTH + S_IXOTH, 0, 0},
-    {TEST_TARGET_FILE,		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_OPEN},
-	{"normal_file",			NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_ENUMERATE_FILE | TEST_CREATE | TEST_OVERWRITE},
-	{"normal_file-symlink",	"normal_file",	XFILE_TYPE_SYMBOLIC_LINK, XFILE_CREATE_NONE, 0, 0, TEST_ENUMERATE_FILE | TEST_COPY | TEST_OPEN},
-    {"executable_file",		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, S_IRWXU + S_IRWXG + S_IRWXO, 0, TEST_DELETE_TRASH | TEST_COPY | TEST_OPEN | TEST_OVERWRITE | TEST_REPLACE},
-    {"private_file",		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_PRIVATE, 0, 0, TEST_COPY | TEST_OPEN | TEST_OVERWRITE | TEST_APPEND},
-    {"normal_file2",		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_OVERWRITE | TEST_REPLACE},
-    {"readonly_file",		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, S_IRUSR + S_IRGRP + S_IROTH, 0, TEST_DELETE_NORMAL | TEST_OPEN},
+    {"dir1",				NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_NONE, 0, 0, TEST_DELETE_NORMAL | TEST_DELETE_NON_EMPTY | TEST_REPLACE | TEST_OPEN},
+    {"dir1/subdir",			NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_NONE, 0, 0, TEST_COPY	| TEST_COPY_ERROR_RECURSE | TEST_APPEND},
+    {"dir2",				NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_NONE, 0, 0, TEST_DELETE_NORMAL | TEST_MOVE | TEST_CREATE},
+    {TEST_DIR_TARGET,		NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_COPY_ERROR_RECURSE},
+    {TEST_DIR_NO_ACCESS,	NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_PRIVATE, S_IRUSR + S_IWUSR + S_IRGRP + S_IWGRP + S_IROTH + S_IWOTH, 0, TEST_NO_ACCESS | TEST_OPEN},
+    {TEST_DIR_NO_WRITE,		NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_PRIVATE, S_IRUSR + S_IXUSR + S_IRGRP + S_IXGRP + S_IROTH + S_IXOTH, 0, 0},
+    {TEST_TARGET_FILE,		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_OPEN},
+	{"normal_file",			NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_ENUMERATE_FILE | TEST_CREATE | TEST_OVERWRITE},
+	{"normal_file-symlink",	"normal_file",	G_FILE_TYPE_SYMBOLIC_LINK, G_FILE_CREATE_NONE, 0, 0, TEST_ENUMERATE_FILE | TEST_COPY | TEST_OPEN},
+    {"executable_file",		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, S_IRWXU + S_IRWXG + S_IRWXO, 0, TEST_DELETE_TRASH | TEST_COPY | TEST_OPEN | TEST_OVERWRITE | TEST_REPLACE},
+    {"private_file",		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_PRIVATE, 0, 0, TEST_COPY | TEST_OPEN | TEST_OVERWRITE | TEST_APPEND},
+    {"normal_file2",		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_OVERWRITE | TEST_REPLACE},
+    {"readonly_file",		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, S_IRUSR + S_IRGRP + S_IROTH, 0, TEST_DELETE_NORMAL | TEST_OPEN},
     {"UTF_pr\xcc\x8ci\xcc\x81lis\xcc\x8c z",
-    						NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_CREATE | TEST_OPEN | TEST_OVERWRITE},
+    						NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_CREATE | TEST_OPEN | TEST_OVERWRITE},
     {"dir_pr\xcc\x8ci\xcc\x81lis\xcc\x8c z",
-    						NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_NONE, 0, 0, TEST_DELETE_NORMAL | TEST_CREATE},
-    {"pattern_file",		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_COPY | TEST_OPEN | TEST_APPEND},
-    {TEST_NAME_NOT_EXISTS,	NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_DELETE_NORMAL | TEST_NOT_EXISTS | TEST_COPY | TEST_OPEN},
-    {TEST_NAME_NOT_EXISTS,	NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_DELETE_TRASH | TEST_NOT_EXISTS | TEST_MOVE},
-    {"not_exists2",			NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_NOT_EXISTS | TEST_CREATE},
-    {"not_exists3",			NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_NOT_EXISTS | TEST_REPLACE},
-    {"not_exists4",			NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_NOT_EXISTS | TEST_APPEND},
-    {"dir_no-execute/file",	NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_DELETE_NORMAL | TEST_DELETE_FAILURE | TEST_NOT_EXISTS | TEST_OPEN},
-	{"lost_symlink",		"nowhere",	XFILE_TYPE_SYMBOLIC_LINK, XFILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_DELETE_NORMAL | TEST_OPEN | TEST_INVALID_SYMLINK},
-    {"dir_hidden",		NULL,	XFILE_TYPE_DIRECTORY,	XFILE_CREATE_NONE, 0, 0, 0},
-    {"dir_hidden/.hidden",		NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, 0},
-    {"dir_hidden/.a-hidden-file",	NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_HIDDEN},
-    {"dir_hidden/file-in-.hidden1",	NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_HIDDEN | TEST_DOT_HIDDEN},
-    {"dir_hidden/file-in-.hidden2",	NULL,	XFILE_TYPE_REGULAR,	XFILE_CREATE_NONE, 0, 0, TEST_HIDDEN | TEST_DOT_HIDDEN},
+    						NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_NONE, 0, 0, TEST_DELETE_NORMAL | TEST_CREATE},
+    {"pattern_file",		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_COPY | TEST_OPEN | TEST_APPEND},
+    {TEST_NAME_NOT_EXISTS,	NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_DELETE_NORMAL | TEST_NOT_EXISTS | TEST_COPY | TEST_OPEN},
+    {TEST_NAME_NOT_EXISTS,	NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_DELETE_TRASH | TEST_NOT_EXISTS | TEST_MOVE},
+    {"not_exists2",			NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_NOT_EXISTS | TEST_CREATE},
+    {"not_exists3",			NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_NOT_EXISTS | TEST_REPLACE},
+    {"not_exists4",			NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_NOT_EXISTS | TEST_APPEND},
+    {"dir_no-execute/file",	NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, TEST_DELETE_NORMAL | TEST_DELETE_FAILURE | TEST_NOT_EXISTS | TEST_OPEN},
+	{"lost_symlink",		"nowhere",	G_FILE_TYPE_SYMBOLIC_LINK, G_FILE_CREATE_NONE, 0, 0, TEST_COPY | TEST_DELETE_NORMAL | TEST_OPEN | TEST_INVALID_SYMLINK},
+    {"dir_hidden",		NULL,	G_FILE_TYPE_DIRECTORY,	G_FILE_CREATE_NONE, 0, 0, 0},
+    {"dir_hidden/.hidden",		NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, TEST_HANDLE_SPECIAL, 0},
+    {"dir_hidden/.a-hidden-file",	NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_HIDDEN},
+    {"dir_hidden/file-in-.hidden1",	NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_HIDDEN | TEST_DOT_HIDDEN},
+    {"dir_hidden/file-in-.hidden2",	NULL,	G_FILE_TYPE_REGULAR,	G_FILE_CREATE_NONE, 0, 0, TEST_HIDDEN | TEST_DOT_HIDDEN},
   };
 
-static xboolean_t test_suite;
-static xboolean_t write_test;
-static xboolean_t verbose;
-static xboolean_t posix_compat;
+static gboolean test_suite;
+static gboolean write_test;
+static gboolean verbose;
+static gboolean posix_compat;
 
 #ifdef G_OS_UNIX
 /*
@@ -139,12 +139,12 @@ static xboolean_t posix_compat;
  * Returns: %TRUE if we have Linux `CAP_DAC_OVERRIDE` or equivalent
  *  privileges
  */
-static xboolean_t
+static gboolean
 check_cap_dac_override (const char *tmpdir)
 {
-  xchar_t *dac_denies_write;
-  xchar_t *inside;
-  xboolean_t have_cap;
+  gchar *dac_denies_write;
+  gchar *inside;
+  gboolean have_cap;
 
   dac_denies_write = g_build_filename (tmpdir, "dac-denies-write", NULL);
   inside = g_build_filename (dac_denies_write, "inside", NULL);
@@ -189,80 +189,80 @@ static void log (const g_char *format, ...)
 }
 #endif
 
-static xfile_t *
-create_empty_file (xfile_t * parent, const char *filename,
-		   xfile_create_flags_t create_flags)
+static GFile *
+create_empty_file (GFile * parent, const char *filename,
+		   GFileCreateFlags create_flags)
 {
-  xfile_t *child;
-  xerror_t *error;
-  xfile_output_stream_t *outs;
+  GFile *child;
+  GError *error;
+  GFileOutputStream *outs;
 
-  child = xfile_get_child (parent, filename);
+  child = g_file_get_child (parent, filename);
   g_assert_nonnull (child);
 
   error = NULL;
-  outs = xfile_replace (child, NULL, FALSE, create_flags, NULL, &error);
+  outs = g_file_replace (child, NULL, FALSE, create_flags, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (outs);
   error = NULL;
-  xoutput_stream_close (G_OUTPUT_STREAM (outs), NULL, &error);
-  xobject_unref (outs);
+  g_output_stream_close (G_OUTPUT_STREAM (outs), NULL, &error);
+  g_object_unref (outs);
   return child;
 }
 
-static xfile_t *
-create_empty_dir (xfile_t * parent, const char *filename)
+static GFile *
+create_empty_dir (GFile * parent, const char *filename)
 {
-  xfile_t *child;
-  xboolean_t res;
-  xerror_t *error;
+  GFile *child;
+  gboolean res;
+  GError *error;
 
-  child = xfile_get_child (parent, filename);
+  child = g_file_get_child (parent, filename);
   g_assert_nonnull (child);
   error = NULL;
-  res = xfile_make_directory (child, NULL, &error);
+  res = g_file_make_directory (child, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   return child;
 }
 
-static xfile_t *
-create_symlink (xfile_t * parent, const char *filename, const char *points_to)
+static GFile *
+create_symlink (GFile * parent, const char *filename, const char *points_to)
 {
-  xfile_t *child;
-  xboolean_t res;
-  xerror_t *error;
+  GFile *child;
+  gboolean res;
+  GError *error;
 
-  child = xfile_get_child (parent, filename);
+  child = g_file_get_child (parent, filename);
   g_assert_nonnull (child);
   error = NULL;
-  res = xfile_make_symbolic_link (child, points_to, NULL, &error);
+  res = g_file_make_symbolic_link (child, points_to, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
   return child;
 }
 
 static void
-test_create_structure (xconstpointer test_data)
+test_create_structure (gconstpointer test_data)
 {
-  xfile_t *root;
-  xfile_t *child;
-  xboolean_t res;
-  xerror_t *error = NULL;
-  xfile_output_stream_t *outs;
-  xdata_output_stream_t *outds;
-  xuint_t i;
+  GFile *root;
+  GFile *child;
+  gboolean res;
+  GError *error = NULL;
+  GFileOutputStream *outs;
+  GDataOutputStream *outds;
+  guint i;
   struct StructureItem item;
 
   g_assert_nonnull (test_data);
   log ("\n  Going to create testing structure in '%s'...\n",
        (char *) test_data);
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
 
   /*  create root directory  */
-  xfile_make_directory (root, NULL, &error);
+  g_file_make_directory (root, NULL, &error);
   g_assert_no_error (error);
 
   /*  create any other items  */
@@ -271,29 +271,29 @@ test_create_structure (xconstpointer test_data)
       item = sample_struct[i];
       if ((item.handle_special)
 	  || ((!posix_compat)
-	      && (item.file_type == XFILE_TYPE_SYMBOLIC_LINK)))
+	      && (item.file_type == G_FILE_TYPE_SYMBOLIC_LINK)))
 	continue;
 
       child = NULL;
       switch (item.file_type)
 	{
-	case XFILE_TYPE_REGULAR:
+	case G_FILE_TYPE_REGULAR:
 	  log ("    Creating file '%s'...\n", item.filename);
 	  child = create_empty_file (root, item.filename, item.create_flags);
 	  break;
-	case XFILE_TYPE_DIRECTORY:
+	case G_FILE_TYPE_DIRECTORY:
 	  log ("    Creating directory '%s'...\n", item.filename);
 	  child = create_empty_dir (root, item.filename);
 	  break;
-	case XFILE_TYPE_SYMBOLIC_LINK:
+	case G_FILE_TYPE_SYMBOLIC_LINK:
 	  log ("    Creating symlink '%s' --> '%s'...\n", item.filename,
 	       item.link_to);
 	  child = create_symlink (root, item.filename, item.link_to);
 	  break;
-        case XFILE_TYPE_UNKNOWN:
-        case XFILE_TYPE_SPECIAL:
-        case XFILE_TYPE_SHORTCUT:
-        case XFILE_TYPE_MOUNTABLE:
+        case G_FILE_TYPE_UNKNOWN:
+        case G_FILE_TYPE_SPECIAL:
+        case G_FILE_TYPE_SHORTCUT:
+        case G_FILE_TYPE_MOUNTABLE:
 	default:
 	  break;
 	}
@@ -302,9 +302,9 @@ test_create_structure (xconstpointer test_data)
       if ((item.mode > 0) && (posix_compat))
 	{
 	  res =
-	    xfile_set_attribute_uint32 (child, XFILE_ATTRIBUTE_UNIX_MODE,
+	    g_file_set_attribute_uint32 (child, G_FILE_ATTRIBUTE_UNIX_MODE,
 					 item.mode,
-					 XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+					 G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
 					 NULL, &error);
 	  g_assert_true (res);
 	  g_assert_no_error (error);
@@ -312,7 +312,7 @@ test_create_structure (xconstpointer test_data)
 
       if ((item.extra_flags & TEST_DOT_HIDDEN) == TEST_DOT_HIDDEN)
 	{
-	  xchar_t *dir, *path, *basename;
+	  gchar *dir, *path, *basename;
 	  FILE *f;
 
 	  dir = g_path_get_dirname (item.filename);
@@ -328,49 +328,49 @@ test_create_structure (xconstpointer test_data)
 	  g_free (basename);
 	}
 
-      xobject_unref (child);
+      g_object_unref (child);
     }
 
   /*  create a pattern file  */
   log ("    Creating pattern file...");
-  child = xfile_get_child (root, "pattern_file");
+  child = g_file_get_child (root, "pattern_file");
   g_assert_nonnull (child);
 
   outs =
-    xfile_replace (child, NULL, FALSE, XFILE_CREATE_NONE, NULL, &error);
+    g_file_replace (child, NULL, FALSE, G_FILE_CREATE_NONE, NULL, &error);
   g_assert_no_error (error);
 
   g_assert_nonnull (outs);
-  outds = xdata_output_stream_new (G_OUTPUT_STREAM (outs));
+  outds = g_data_output_stream_new (G_OUTPUT_STREAM (outs));
   g_assert_nonnull (outds);
   for (i = 0; i < PATTERN_FILE_SIZE; i++)
     {
-      xdata_output_stream_put_byte (outds, i % 256, NULL, &error);
+      g_data_output_stream_put_byte (outds, i % 256, NULL, &error);
       g_assert_no_error (error);
     }
 
-  xoutput_stream_close (G_OUTPUT_STREAM (outs), NULL, &error);
+  g_output_stream_close (G_OUTPUT_STREAM (outs), NULL, &error);
   g_assert_no_error (error);
-  xobject_unref (outds);
-  xobject_unref (outs);
-  xobject_unref (child);
+  g_object_unref (outds);
+  g_object_unref (outs);
+  g_object_unref (child);
   log (" done.\n");
 
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
-static xfile_t *
-file_exists (xfile_t * parent, const char *filename, xboolean_t * result)
+static GFile *
+file_exists (GFile * parent, const char *filename, gboolean * result)
 {
-  xfile_t *child;
-  xboolean_t res;
+  GFile *child;
+  gboolean res;
 
   if (result)
     *result = FALSE;
 
-  child = xfile_get_child (parent, filename);
+  child = g_file_get_child (parent, filename);
   g_assert_nonnull (child);
-  res = xfile_query_exists (child, NULL);
+  res = g_file_query_exists (child, NULL);
   if (result)
     *result = res;
 
@@ -378,39 +378,39 @@ file_exists (xfile_t * parent, const char *filename, xboolean_t * result)
 }
 
 static void
-test_attributes (struct StructureItem item, xfile_info_t * info)
+test_attributes (struct StructureItem item, GFileInfo * info)
 {
-  xfile_type_t ftype;
-  xuint32_t mode;
+  GFileType ftype;
+  guint32 mode;
   const char *name, *display_name, *edit_name, *copy_name, *symlink_target;
-  xboolean_t utf8_valid;
-  xboolean_t has_attr;
-  xboolean_t is_symlink;
-  xboolean_t is_hidden;
-  xboolean_t can_read, can_write;
+  gboolean utf8_valid;
+  gboolean has_attr;
+  gboolean is_symlink;
+  gboolean is_hidden;
+  gboolean can_read, can_write;
 
   /*  standard::type  */
-  has_attr = xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_TYPE);
+  has_attr = g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_TYPE);
   g_assert_true (has_attr);
-  ftype = xfile_info_get_file_type (info);
-  g_assert_cmpint (ftype, !=, XFILE_TYPE_UNKNOWN);
+  ftype = g_file_info_get_file_type (info);
+  g_assert_cmpint (ftype, !=, G_FILE_TYPE_UNKNOWN);
   g_assert_cmpint (ftype, ==, item.file_type);
 
   /*  unix::mode  */
   if ((item.mode > 0) && (posix_compat))
     {
       mode =
-	xfile_info_get_attribute_uint32 (info,
-					  XFILE_ATTRIBUTE_UNIX_MODE) & 0xFFF;
+	g_file_info_get_attribute_uint32 (info,
+					  G_FILE_ATTRIBUTE_UNIX_MODE) & 0xFFF;
       g_assert_cmpint (mode, ==, item.mode);
     }
 
   /*  access::can-read  */
-  if (item.file_type != XFILE_TYPE_SYMBOLIC_LINK)
+  if (item.file_type != G_FILE_TYPE_SYMBOLIC_LINK)
     {
       can_read =
-	xfile_info_get_attribute_boolean (info,
-					   XFILE_ATTRIBUTE_ACCESS_CAN_READ);
+	g_file_info_get_attribute_boolean (info,
+					   G_FILE_ATTRIBUTE_ACCESS_CAN_READ);
       g_assert_true (can_read);
     }
 
@@ -418,51 +418,51 @@ test_attributes (struct StructureItem item, xfile_info_t * info)
   if ((write_test) && ((item.extra_flags & TEST_OVERWRITE) == TEST_OVERWRITE))
     {
       can_write =
-	xfile_info_get_attribute_boolean (info,
-					   XFILE_ATTRIBUTE_ACCESS_CAN_WRITE);
+	g_file_info_get_attribute_boolean (info,
+					   G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE);
       g_assert_true (can_write);
     }
 
   /*  standard::name  */
-  name = xfile_info_get_name (info);
+  name = g_file_info_get_name (info);
   g_assert_nonnull (name);
 
   /*  standard::display-name  */
-  display_name = xfile_info_get_display_name (info);
+  display_name = g_file_info_get_display_name (info);
   g_assert_nonnull (display_name);
-  utf8_valid = xutf8_validate (display_name, -1, NULL);
+  utf8_valid = g_utf8_validate (display_name, -1, NULL);
   g_assert_true (utf8_valid);
 
   /*  standard::edit-name  */
-  edit_name = xfile_info_get_edit_name (info);
+  edit_name = g_file_info_get_edit_name (info);
   if (edit_name)
     {
-      utf8_valid = xutf8_validate (edit_name, -1, NULL);
+      utf8_valid = g_utf8_validate (edit_name, -1, NULL);
       g_assert_true (utf8_valid);
     }
 
   /*  standard::copy-name  */
   copy_name =
-    xfile_info_get_attribute_string (info,
-				      XFILE_ATTRIBUTE_STANDARD_COPY_NAME);
+    g_file_info_get_attribute_string (info,
+				      G_FILE_ATTRIBUTE_STANDARD_COPY_NAME);
   if (copy_name)
     {
-      utf8_valid = xutf8_validate (copy_name, -1, NULL);
+      utf8_valid = g_utf8_validate (copy_name, -1, NULL);
       g_assert_true (utf8_valid);
     }
 
   /*  standard::is-symlink  */
   if (posix_compat)
     {
-      is_symlink = xfile_info_get_is_symlink (info);
+      is_symlink = g_file_info_get_is_symlink (info);
       g_assert_cmpint (is_symlink, ==,
-		       item.file_type == XFILE_TYPE_SYMBOLIC_LINK);
+		       item.file_type == G_FILE_TYPE_SYMBOLIC_LINK);
     }
 
   /*  standard::symlink-target  */
-  if ((item.file_type == XFILE_TYPE_SYMBOLIC_LINK) && (posix_compat))
+  if ((item.file_type == G_FILE_TYPE_SYMBOLIC_LINK) && (posix_compat))
     {
-      symlink_target = xfile_info_get_symlink_target (info);
+      symlink_target = g_file_info_get_symlink_target (info);
       g_assert_cmpstr (symlink_target, ==, item.link_to);
     }
 
@@ -470,49 +470,49 @@ test_attributes (struct StructureItem item, xfile_info_t * info)
   if ((item.extra_flags & TEST_HIDDEN) == TEST_HIDDEN)
     {
       is_hidden =
-	xfile_info_get_attribute_boolean (info,
-					   XFILE_ATTRIBUTE_STANDARD_IS_HIDDEN);
+	g_file_info_get_attribute_boolean (info,
+					   G_FILE_ATTRIBUTE_STANDARD_IS_HIDDEN);
       g_assert_true (is_hidden);
     }
 
   /* unix::is-mountpoint */
   if (posix_compat)
     {
-      xboolean_t is_mountpoint =
-        xfile_info_get_attribute_boolean (info,
-                                      XFILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT);
+      gboolean is_mountpoint =
+        g_file_info_get_attribute_boolean (info,
+                                      G_FILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT);
       g_assert_false (is_mountpoint);
     }
 }
 
 static void
-test_initial_structure (xconstpointer test_data)
+test_initial_structure (gconstpointer test_data)
 {
-  xfile_t *root;
-  xfile_t *child;
-  xboolean_t res;
-  xerror_t *error;
-  xfile_input_stream_t *ins;
-  xuint_t i;
-  xfile_info_t *info;
-  xuint32_t size;
-  xuchar_t *buffer;
-  xssize_t read, total_read;
+  GFile *root;
+  GFile *child;
+  gboolean res;
+  GError *error;
+  GFileInputStream *ins;
+  guint i;
+  GFileInfo *info;
+  guint32 size;
+  guchar *buffer;
+  gssize read, total_read;
   struct StructureItem item;
 
   g_assert_nonnull (test_data);
   log ("\n  Testing sample structure in '%s'...\n", (char *) test_data);
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
   /*  test the structure  */
   for (i = 0; i < G_N_ELEMENTS (sample_struct); i++)
     {
       item = sample_struct[i];
-      if (((!posix_compat) && (item.file_type == XFILE_TYPE_SYMBOLIC_LINK))
+      if (((!posix_compat) && (item.file_type == G_FILE_TYPE_SYMBOLIC_LINK))
 	  || (item.handle_special))
 	continue;
 
@@ -524,15 +524,15 @@ test_initial_structure (xconstpointer test_data)
 
       error = NULL;
       info =
-	xfile_query_info (child, "*", XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+	g_file_query_info (child, "*", G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
 			   NULL, &error);
       g_assert_no_error (error);
       g_assert_nonnull (info);
 
       test_attributes (item, info);
 
-      xobject_unref (child);
-      xobject_unref (info);
+      g_object_unref (child);
+      g_object_unref (info);
     }
 
   /*  read and test the pattern file  */
@@ -543,16 +543,16 @@ test_initial_structure (xconstpointer test_data)
 
   error = NULL;
   info =
-    xfile_query_info (child, "*", XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL,
+    g_file_query_info (child, "*", G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL,
 		       &error);
   g_assert_no_error (error);
   g_assert_nonnull (info);
-  size = xfile_info_get_size (info);
+  size = g_file_info_get_size (info);
   g_assert_cmpint (size, ==, PATTERN_FILE_SIZE);
-  xobject_unref (info);
+  g_object_unref (info);
 
   error = NULL;
-  ins = xfile_read (child, NULL, &error);
+  ins = g_file_read (child, NULL, &error);
   g_assert_nonnull (ins);
   g_assert_no_error (error);
 
@@ -563,7 +563,7 @@ test_initial_structure (xconstpointer test_data)
     {
       error = NULL;
       read =
-	xinput_stream_read (G_INPUT_STREAM (ins), buffer + total_read,
+	g_input_stream_read (G_INPUT_STREAM (ins), buffer + total_read,
 			     PATTERN_FILE_SIZE, NULL, &error);
       g_assert_no_error (error);
       total_read += read;
@@ -573,50 +573,50 @@ test_initial_structure (xconstpointer test_data)
   g_assert_cmpint (total_read, ==, PATTERN_FILE_SIZE);
 
   error = NULL;
-  res = xinput_stream_close (G_INPUT_STREAM (ins), NULL, &error);
+  res = g_input_stream_close (G_INPUT_STREAM (ins), NULL, &error);
   g_assert_no_error (error);
   g_assert_true (res);
 
   for (i = 0; i < PATTERN_FILE_SIZE; i++)
     g_assert_cmpint (*(buffer + i), ==, i % 256);
 
-  xobject_unref (ins);
-  xobject_unref (child);
+  g_object_unref (ins);
+  g_object_unref (child);
   g_free (buffer);
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
 static void
-traverse_recurse_dirs (xfile_t * parent, xfile_t * root)
+traverse_recurse_dirs (GFile * parent, GFile * root)
 {
-  xboolean_t res;
-  xerror_t *error;
-  xfile_enumerator_t *enumerator;
-  xfile_info_t *info;
-  xfile_t *descend;
+  gboolean res;
+  GError *error;
+  GFileEnumerator *enumerator;
+  GFileInfo *info;
+  GFile *descend;
   char *relative_path;
-  xuint_t i;
-  xboolean_t found;
+  guint i;
+  gboolean found;
 
   g_assert_nonnull (root);
 
   error = NULL;
   enumerator =
-    xfile_enumerate_children (parent, "*",
-			       XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL,
+    g_file_enumerate_children (parent, "*",
+			       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL,
 			       &error);
   g_assert_nonnull (enumerator);
   g_assert_no_error (error);
 
-  g_assert_true (xfile_enumerator_get_container (enumerator) == parent);
+  g_assert_true (g_file_enumerator_get_container (enumerator) == parent);
 
   error = NULL;
-  info = xfile_enumerator_next_file (enumerator, NULL, &error);
+  info = g_file_enumerator_next_file (enumerator, NULL, &error);
   while ((info) && (!error))
     {
-      descend = xfile_enumerator_get_child (enumerator, info);
+      descend = g_file_enumerator_get_child (enumerator, info);
       g_assert_nonnull (descend);
-      relative_path = xfile_get_relative_path (root, descend);
+      relative_path = g_file_get_relative_path (root, descend);
       g_assert_nonnull (relative_path);
 
       found = FALSE;
@@ -634,77 +634,77 @@ traverse_recurse_dirs (xfile_t * parent, xfile_t * root)
       g_assert_true (found);
 
       log ("  Found file %s, relative to root: %s\n",
-	   xfile_info_get_display_name (info), relative_path);
+	   g_file_info_get_display_name (info), relative_path);
 
-      if (xfile_info_get_file_type (info) == XFILE_TYPE_DIRECTORY)
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
 	traverse_recurse_dirs (descend, root);
 
-      xobject_unref (descend);
+      g_object_unref (descend);
       error = NULL;
-      xobject_unref (info);
+      g_object_unref (info);
       g_free (relative_path);
 
-      info = xfile_enumerator_next_file (enumerator, NULL, &error);
+      info = g_file_enumerator_next_file (enumerator, NULL, &error);
     }
   g_assert_no_error (error);
 
   error = NULL;
-  res = xfile_enumerator_close (enumerator, NULL, &error);
+  res = g_file_enumerator_close (enumerator, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
-  g_assert_true (xfile_enumerator_is_closed (enumerator));
+  g_assert_true (g_file_enumerator_is_closed (enumerator));
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-test_traverse_structure (xconstpointer test_data)
+test_traverse_structure (gconstpointer test_data)
 {
-  xfile_t *root;
-  xboolean_t res;
+  GFile *root;
+  gboolean res;
 
   g_assert_nonnull (test_data);
   log ("\n  Traversing through the sample structure in '%s'...\n",
        (char *) test_data);
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
   traverse_recurse_dirs (root, root);
 
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
 
 
 
 static void
-test_enumerate (xconstpointer test_data)
+test_enumerate (gconstpointer test_data)
 {
-  xfile_t *root, *child;
-  xboolean_t res;
-  xerror_t *error;
-  xfile_enumerator_t *enumerator;
-  xfile_info_t *info;
-  xuint_t i;
+  GFile *root, *child;
+  gboolean res;
+  GError *error;
+  GFileEnumerator *enumerator;
+  GFileInfo *info;
+  guint i;
   struct StructureItem item;
 
 
   g_assert_nonnull (test_data);
-  log ("\n  test_t enumerate '%s'...\n", (char *) test_data);
+  log ("\n  Test enumerate '%s'...\n", (char *) test_data);
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
 
   for (i = 0; i < G_N_ELEMENTS (sample_struct); i++)
     {
       item = sample_struct[i];
-      if ((!posix_compat) && (item.file_type == XFILE_TYPE_SYMBOLIC_LINK))
+      if ((!posix_compat) && (item.file_type == G_FILE_TYPE_SYMBOLIC_LINK))
 	continue;
 
       if (((item.extra_flags & TEST_NOT_EXISTS) == TEST_NOT_EXISTS) ||
@@ -714,12 +714,12 @@ test_enumerate (xconstpointer test_data)
 	      TEST_ENUMERATE_FILE))
 	{
 	  log ("    Testing file '%s'\n", item.filename);
-	  child = xfile_get_child (root, item.filename);
+	  child = g_file_get_child (root, item.filename);
 	  g_assert_nonnull (child);
 	  error = NULL;
 	  enumerator =
-	    xfile_enumerate_children (child, "*",
-				       XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+	    g_file_enumerate_children (child, "*",
+				       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
 				       NULL, &error);
 
 	  if ((item.extra_flags & TEST_NOT_EXISTS) == TEST_NOT_EXISTS)
@@ -737,61 +737,61 @@ test_enumerate (xconstpointer test_data)
 	      g_assert_nonnull (enumerator);
 
 	      error = NULL;
-	      info = xfile_enumerator_next_file (enumerator, NULL, &error);
+	      info = g_file_enumerator_next_file (enumerator, NULL, &error);
 	      g_assert_null (info);
 	      g_assert_no_error (error);
 	      /*  no items should be found, no error should be logged  */
 	    }
 
 	  if (error)
-	    xerror_free (error);
+	    g_error_free (error);
 
 	  if (enumerator)
 	    {
 	      error = NULL;
-	      res = xfile_enumerator_close (enumerator, NULL, &error);
+	      res = g_file_enumerator_close (enumerator, NULL, &error);
 	      g_assert_true (res);
 	      g_assert_no_error (error);
 
-              xobject_unref (enumerator);
+              g_object_unref (enumerator);
 	    }
-	  xobject_unref (child);
+	  g_object_unref (child);
 	}
     }
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
 static void
-do_copy_move (xfile_t * root, struct StructureItem item, const char *target_dir,
+do_copy_move (GFile * root, struct StructureItem item, const char *target_dir,
 	      enum StructureExtraFlags extra_flags)
 {
-  xfile_t *dst_dir, *src_file, *dst_file;
-  xboolean_t res;
-  xerror_t *error;
+  GFile *dst_dir, *src_file, *dst_file;
+  gboolean res;
+  GError *error;
 #ifdef G_OS_UNIX
-  xboolean_t have_cap_dac_override = check_cap_dac_override (xfile_peek_path (root));
+  gboolean have_cap_dac_override = check_cap_dac_override (g_file_peek_path (root));
 #endif
 
   log ("    do_copy_move: '%s' --> '%s'\n", item.filename, target_dir);
 
-  dst_dir = xfile_get_child (root, target_dir);
+  dst_dir = g_file_get_child (root, target_dir);
   g_assert_nonnull (dst_dir);
-  src_file = xfile_get_child (root, item.filename);
+  src_file = g_file_get_child (root, item.filename);
   g_assert_nonnull (src_file);
-  dst_file = xfile_get_child (dst_dir, item.filename);
+  dst_file = g_file_get_child (dst_dir, item.filename);
   g_assert_nonnull (dst_file);
 
   error = NULL;
   if ((item.extra_flags & TEST_COPY) == TEST_COPY)
     res =
-      xfile_copy (src_file, dst_file,
-		   XFILE_COPY_NOFOLLOW_SYMLINKS |
+      g_file_copy (src_file, dst_file,
+		   G_FILE_COPY_NOFOLLOW_SYMLINKS |
 		   ((extra_flags ==
-		     TEST_OVERWRITE) ? XFILE_COPY_OVERWRITE :
-		    XFILE_COPY_NONE), NULL, NULL, NULL, &error);
+		     TEST_OVERWRITE) ? G_FILE_COPY_OVERWRITE :
+		    G_FILE_COPY_NONE), NULL, NULL, NULL, &error);
   else
     res =
-      xfile_move (src_file, dst_file, XFILE_COPY_NOFOLLOW_SYMLINKS, NULL,
+      g_file_move (src_file, dst_file, G_FILE_COPY_NOFOLLOW_SYMLINKS, NULL,
 		   NULL, NULL, &error);
 
   if (error)
@@ -834,7 +834,7 @@ do_copy_move (xfile_t * root, struct StructureItem item, const char *target_dir,
 #ifdef G_OS_UNIX
       if (have_cap_dac_override)
 	{
-	  g_test_message ("Unable to exercise xfile_copy() or xfile_move() "
+	  g_test_message ("Unable to exercise g_file_copy() or g_file_move() "
 	                  "failing with EACCES: we probably have "
 	                  "CAP_DAC_OVERRIDE");
 	  g_assert_true (res);
@@ -855,28 +855,28 @@ do_copy_move (xfile_t * root, struct StructureItem item, const char *target_dir,
     }
 
   if (error)
-    xerror_free (error);
+    g_error_free (error);
 
 
-  xobject_unref (dst_dir);
-  xobject_unref (src_file);
-  xobject_unref (dst_file);
+  g_object_unref (dst_dir);
+  g_object_unref (src_file);
+  g_object_unref (dst_file);
 }
 
 static void
-test_copy_move (xconstpointer test_data)
+test_copy_move (gconstpointer test_data)
 {
-  xfile_t *root;
-  xboolean_t res;
-  xuint_t i;
+  GFile *root;
+  gboolean res;
+  guint i;
   struct StructureItem item;
 
   log ("\n");
 
   g_assert_nonnull (test_data);
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
 
@@ -884,7 +884,7 @@ test_copy_move (xconstpointer test_data)
     {
       item = sample_struct[i];
 
-      if ((!posix_compat) && (item.file_type == XFILE_TYPE_SYMBOLIC_LINK))
+      if ((!posix_compat) && (item.file_type == G_FILE_TYPE_SYMBOLIC_LINK))
 	continue;
 
       if (((item.extra_flags & TEST_COPY) == TEST_COPY) ||
@@ -923,30 +923,30 @@ test_copy_move (xconstpointer test_data)
 	    }
 	}
     }
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
-/* test_t that XFILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT is TRUE for / and for another
+/* Test that G_FILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT is TRUE for / and for another
  * known mountpoint. The FALSE case is tested for many directories and files by
  * test_initial_structure(), via test_attributes().
  */
 static void
-test_unix_is_mountpoint (xconstpointer data)
+test_unix_is_mountpoint (gconstpointer data)
 {
-  const xchar_t *path = data;
-  xfile_t *file = xfile_new_for_path (path);
-  xfile_info_t *info;
-  xboolean_t is_mountpoint;
-  xerror_t *error = NULL;
+  const gchar *path = data;
+  GFile *file = g_file_new_for_path (path);
+  GFileInfo *info;
+  gboolean is_mountpoint;
+  GError *error = NULL;
 
-  info = xfile_query_info (file, XFILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT,
-                            XFILE_QUERY_INFO_NONE, NULL, &error);
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT,
+                            G_FILE_QUERY_INFO_NONE, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (info);
 
   is_mountpoint =
-    xfile_info_get_attribute_boolean (info,
-                                       XFILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT);
+    g_file_info_get_attribute_boolean (info,
+                                       G_FILE_ATTRIBUTE_UNIX_IS_MOUNTPOINT);
   g_assert_true (is_mountpoint);
 
   g_clear_object (&info);
@@ -954,21 +954,21 @@ test_unix_is_mountpoint (xconstpointer data)
 }
 
 static void
-test_create (xconstpointer test_data)
+test_create (gconstpointer test_data)
 {
-  xfile_t *root, *child;
-  xboolean_t res;
-  xerror_t *error;
-  xuint_t i;
+  GFile *root, *child;
+  gboolean res;
+  GError *error;
+  guint i;
   struct StructureItem item;
-  xfile_output_stream_t *os;
+  GFileOutputStream *os;
 
   g_assert_nonnull (test_data);
   log ("\n");
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
   for (i = 0; i < G_N_ELEMENTS (sample_struct); i++)
@@ -981,19 +981,19 @@ test_create (xconstpointer test_data)
 	{
 	  log ("  test_create: '%s'\n", item.filename);
 
-	  child = xfile_get_child (root, item.filename);
+	  child = g_file_get_child (root, item.filename);
 	  g_assert_nonnull (child);
 	  error = NULL;
 	  os = NULL;
 
 	  if ((item.extra_flags & TEST_CREATE) == TEST_CREATE)
-	    os = xfile_create (child, item.create_flags, NULL, &error);
+	    os = g_file_create (child, item.create_flags, NULL, &error);
 	  else if ((item.extra_flags & TEST_REPLACE) == TEST_REPLACE)
 	    os =
-	      xfile_replace (child, NULL, TRUE, item.create_flags, NULL,
+	      g_file_replace (child, NULL, TRUE, item.create_flags, NULL,
 			      &error);
 	  else if ((item.extra_flags & TEST_APPEND) == TEST_APPEND)
-	    os = xfile_append_to (child, item.create_flags, NULL, &error);
+	    os = g_file_append_to (child, item.create_flags, NULL, &error);
 
 
 	  if (error)
@@ -1005,7 +1005,7 @@ test_create (xconstpointer test_data)
 	      g_assert_null (os);
 	      g_assert_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS);
 	    }
-	  else if (item.file_type == XFILE_TYPE_DIRECTORY)
+	  else if (item.file_type == G_FILE_TYPE_DIRECTORY)
 	    {
 	      g_assert_null (os);
 	      if ((item.extra_flags & TEST_CREATE) == TEST_CREATE)
@@ -1020,59 +1020,59 @@ test_create (xconstpointer test_data)
 	    }
 
 	  if (error)
-	    xerror_free (error);
+	    g_error_free (error);
 
 	  if (os)
 	    {
 	      error = NULL;
 	      res =
-		xoutput_stream_close (G_OUTPUT_STREAM (os), NULL, &error);
+		g_output_stream_close (G_OUTPUT_STREAM (os), NULL, &error);
 	      if (error)
-		log ("         xoutput_stream_close: error %d = %s\n",
+		log ("         g_output_stream_close: error %d = %s\n",
 		     error->code, error->message);
 	      g_assert_true (res);
 	      g_assert_no_error (error);
-              xobject_unref (os);
+              g_object_unref (os);
 	    }
-	  xobject_unref (child);
+	  g_object_unref (child);
 	}
     }
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
 static void
-test_open (xconstpointer test_data)
+test_open (gconstpointer test_data)
 {
-  xfile_t *root, *child;
-  xboolean_t res;
-  xerror_t *error;
-  xuint_t i;
+  GFile *root, *child;
+  gboolean res;
+  GError *error;
+  guint i;
   struct StructureItem item;
-  xfile_input_stream_t *input_stream;
+  GFileInputStream *input_stream;
 
   g_assert_nonnull (test_data);
   log ("\n");
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
   for (i = 0; i < G_N_ELEMENTS (sample_struct); i++)
     {
       item = sample_struct[i];
 
-      if ((!posix_compat) && (item.file_type == XFILE_TYPE_SYMBOLIC_LINK))
+      if ((!posix_compat) && (item.file_type == G_FILE_TYPE_SYMBOLIC_LINK))
 	continue;
 
       if ((item.extra_flags & TEST_OPEN) == TEST_OPEN)
 	{
 	  log ("  test_open: '%s'\n", item.filename);
 
-	  child = xfile_get_child (root, item.filename);
+	  child = g_file_get_child (root, item.filename);
 	  g_assert_nonnull (child);
 	  error = NULL;
-	  input_stream = xfile_read (child, NULL, &error);
+	  input_stream = g_file_read (child, NULL, &error);
 
 	  if (((item.extra_flags & TEST_NOT_EXISTS) == TEST_NOT_EXISTS) ||
 	      ((item.extra_flags & TEST_INVALID_SYMLINK) ==
@@ -1081,7 +1081,7 @@ test_open (xconstpointer test_data)
 	      g_assert_null (input_stream);
 	      g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND);
 	    }
-	  else if (item.file_type == XFILE_TYPE_DIRECTORY)
+	  else if (item.file_type == G_FILE_TYPE_DIRECTORY)
 	    {
 	      g_assert_null (input_stream);
 	      g_assert_error (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY);
@@ -1093,48 +1093,48 @@ test_open (xconstpointer test_data)
 	    }
 
 	  if (error)
-	    xerror_free (error);
+	    g_error_free (error);
 
 	  if (input_stream)
 	    {
 	      error = NULL;
 	      res =
-		xinput_stream_close (G_INPUT_STREAM (input_stream), NULL,
+		g_input_stream_close (G_INPUT_STREAM (input_stream), NULL,
 				      &error);
 	      g_assert_true (res);
 	      g_assert_no_error (error);
-              xobject_unref (input_stream);
+              g_object_unref (input_stream);
 	    }
-	  xobject_unref (child);
+	  g_object_unref (child);
 	}
     }
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
 static void
-test_delete (xconstpointer test_data)
+test_delete (gconstpointer test_data)
 {
-  xfile_t *root;
-  xfile_t *child;
-  xboolean_t res;
-  xerror_t *error;
-  xuint_t i;
+  GFile *root;
+  GFile *child;
+  gboolean res;
+  GError *error;
+  guint i;
   struct StructureItem item;
-  xchar_t *path;
+  gchar *path;
 
   g_assert_nonnull (test_data);
   log ("\n");
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
   for (i = 0; i < G_N_ELEMENTS (sample_struct); i++)
     {
       item = sample_struct[i];
 
-      if ((!posix_compat) && (item.file_type == XFILE_TYPE_SYMBOLIC_LINK))
+      if ((!posix_compat) && (item.file_type == G_FILE_TYPE_SYMBOLIC_LINK))
 	continue;
 
       if (((item.extra_flags & TEST_DELETE_NORMAL) == TEST_DELETE_NORMAL) ||
@@ -1144,15 +1144,15 @@ test_delete (xconstpointer test_data)
 	  g_assert_nonnull (child);
 	  /*  we don't care about result here  */
 
-          path = xfile_get_path (child);
+          path = g_file_get_path (child);
 	  log ("  Deleting %s, path = %s\n", item.filename, path);
           g_free (path);
 
 	  error = NULL;
 	  if ((item.extra_flags & TEST_DELETE_NORMAL) == TEST_DELETE_NORMAL)
-	    res = xfile_delete (child, NULL, &error);
+	    res = g_file_delete (child, NULL, &error);
 	  else
-	    res = xfile_trash (child, NULL, &error);
+	    res = g_file_trash (child, NULL, &error);
 
 	  if ((item.extra_flags & TEST_DELETE_NON_EMPTY) ==
 	      TEST_DELETE_NON_EMPTY)
@@ -1174,65 +1174,65 @@ test_delete (xconstpointer test_data)
 	  if (error)
 	    {
 	      log ("      result = %d, error = %s\n", res, error->message);
-	      xerror_free (error);
+	      g_error_free (error);
 	    }
 
-	  xobject_unref (child);
+	  g_object_unref (child);
 	}
     }
-  xobject_unref (root);
+  g_object_unref (root);
 }
 
 static void
-test_make_directory_with_parents (xconstpointer test_data)
+test_make_directory_with_parents (gconstpointer test_data)
 {
-  xfile_t *root, *child, *grandchild, *greatgrandchild;
-  xboolean_t res;
-  xerror_t *error = NULL;
+  GFile *root, *child, *grandchild, *greatgrandchild;
+  gboolean res;
+  GError *error = NULL;
 #ifdef G_OS_UNIX
-  xboolean_t have_cap_dac_override = check_cap_dac_override (test_data);
+  gboolean have_cap_dac_override = check_cap_dac_override (test_data);
 #endif
 
   g_assert_nonnull (test_data);
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-  res = xfile_query_exists (root, NULL);
+  res = g_file_query_exists (root, NULL);
   g_assert_true (res);
 
-  child = xfile_get_child (root, "a");
-  grandchild = xfile_get_child (child, "b");
-  greatgrandchild = xfile_get_child (grandchild, "c");
+  child = g_file_get_child (root, "a");
+  grandchild = g_file_get_child (child, "b");
+  greatgrandchild = g_file_get_child (grandchild, "c");
 
   /* Check that we can successfully make directory hierarchies of
    * depth 1, 2, or 3
    */
-  res = xfile_make_directory_with_parents (child, NULL, &error);
+  res = g_file_make_directory_with_parents (child, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
-  res = xfile_query_exists (child, NULL);
+  res = g_file_query_exists (child, NULL);
   g_assert_true (res);
 
-  xfile_delete (child, NULL, NULL);
+  g_file_delete (child, NULL, NULL);
 
-  res = xfile_make_directory_with_parents (grandchild, NULL, &error);
-  g_assert_true (res);
-  g_assert_no_error (error);
-  res = xfile_query_exists (grandchild, NULL);
-  g_assert_true (res);
-
-  xfile_delete (grandchild, NULL, NULL);
-  xfile_delete (child, NULL, NULL);
-
-  res = xfile_make_directory_with_parents (greatgrandchild, NULL, &error);
+  res = g_file_make_directory_with_parents (grandchild, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
-  res = xfile_query_exists (greatgrandchild, NULL);
+  res = g_file_query_exists (grandchild, NULL);
   g_assert_true (res);
 
-  xfile_delete (greatgrandchild, NULL, NULL);
-  xfile_delete (grandchild, NULL, NULL);
-  xfile_delete (child, NULL, NULL);
+  g_file_delete (grandchild, NULL, NULL);
+  g_file_delete (child, NULL, NULL);
+
+  res = g_file_make_directory_with_parents (greatgrandchild, NULL, &error);
+  g_assert_true (res);
+  g_assert_no_error (error);
+  res = g_file_query_exists (greatgrandchild, NULL);
+  g_assert_true (res);
+
+  g_file_delete (greatgrandchild, NULL, NULL);
+  g_file_delete (grandchild, NULL, NULL);
+  g_file_delete (child, NULL, NULL);
 
   /* Now test failure by trying to create a directory hierarchy
    * where a ancestor exists but is read-only
@@ -1247,121 +1247,121 @@ test_make_directory_with_parents (xconstpointer test_data)
    * and in particular if we're root */
   if (have_cap_dac_override)
     {
-      g_test_skip ("Unable to exercise xfile_make_directory_with_parents "
+      g_test_skip ("Unable to exercise g_file_make_directory_with_parents "
                    "failing with EACCES: we probably have "
                    "CAP_DAC_OVERRIDE");
       goto out;
     }
 #endif
 
-  xfile_make_directory (child, NULL, NULL);
+  g_file_make_directory (child, NULL, NULL);
   g_assert_true (res);
 
-  res = xfile_set_attribute_uint32 (child,
-                                     XFILE_ATTRIBUTE_UNIX_MODE,
+  res = g_file_set_attribute_uint32 (child,
+                                     G_FILE_ATTRIBUTE_UNIX_MODE,
                                      S_IRUSR + S_IXUSR, /* -r-x------ */
-                                     XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                     G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                      NULL, NULL);
   g_assert_true (res);
 
-  res = xfile_make_directory_with_parents (grandchild, NULL, &error);
+  res = g_file_make_directory_with_parents (grandchild, NULL, &error);
   g_assert_false (res);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED);
   g_clear_error (&error);
 
-  res = xfile_make_directory_with_parents (greatgrandchild, NULL, &error);
+  res = g_file_make_directory_with_parents (greatgrandchild, NULL, &error);
   g_assert_false (res);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED);
   g_clear_error (&error);
 
 out:
-  xobject_unref (greatgrandchild);
-  xobject_unref (grandchild);
-  xobject_unref (child);
-  xobject_unref (root);
+  g_object_unref (greatgrandchild);
+  g_object_unref (grandchild);
+  g_object_unref (child);
+  g_object_unref (root);
 }
 
 
 static void
-cleanup_dir_recurse (xfile_t *parent, xfile_t *root)
+cleanup_dir_recurse (GFile *parent, GFile *root)
 {
-  xboolean_t res;
-  xerror_t *error;
-  xfile_enumerator_t *enumerator;
-  xfile_info_t *info;
-  xfile_t *descend;
+  gboolean res;
+  GError *error;
+  GFileEnumerator *enumerator;
+  GFileInfo *info;
+  GFile *descend;
   char *relative_path;
 
   g_assert_nonnull (root);
 
   enumerator =
-    xfile_enumerate_children (parent, "*",
-			       XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL,
+    g_file_enumerate_children (parent, "*",
+			       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS, NULL,
 			       NULL);
   if (! enumerator)
 	  return;
 
   error = NULL;
-  info = xfile_enumerator_next_file (enumerator, NULL, &error);
+  info = g_file_enumerator_next_file (enumerator, NULL, &error);
   while ((info) && (!error))
     {
-      descend = xfile_enumerator_get_child (enumerator, info);
+      descend = g_file_enumerator_get_child (enumerator, info);
       g_assert_nonnull (descend);
-      relative_path = xfile_get_relative_path (root, descend);
+      relative_path = g_file_get_relative_path (root, descend);
       g_assert_nonnull (relative_path);
       g_free (relative_path);
 
-      log ("    deleting '%s'\n", xfile_info_get_display_name (info));
+      log ("    deleting '%s'\n", g_file_info_get_display_name (info));
 
-      if (xfile_info_get_file_type (info) == XFILE_TYPE_DIRECTORY)
+      if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
     	  cleanup_dir_recurse (descend, root);
-
+      
       error = NULL;
-      res = xfile_delete (descend, NULL, &error);
+      res = g_file_delete (descend, NULL, &error);
       g_assert_true (res);
 
-      xobject_unref (descend);
+      g_object_unref (descend);
       error = NULL;
-      xobject_unref (info);
+      g_object_unref (info);
 
-      info = xfile_enumerator_next_file (enumerator, NULL, &error);
+      info = g_file_enumerator_next_file (enumerator, NULL, &error);
     }
   g_assert_no_error (error);
 
   error = NULL;
-  res = xfile_enumerator_close (enumerator, NULL, &error);
+  res = g_file_enumerator_close (enumerator, NULL, &error);
   g_assert_true (res);
   g_assert_no_error (error);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 }
 
 static void
-prep_clean_structure (xconstpointer test_data)
+prep_clean_structure (gconstpointer test_data)
 {
-  xfile_t *root;
-
+  GFile *root;
+  
   g_assert_nonnull (test_data);
   log ("\n  Cleaning target testing structure in '%s'...\n",
        (char *) test_data);
 
-  root = xfile_new_for_commandline_arg ((char *) test_data);
+  root = g_file_new_for_commandline_arg ((char *) test_data);
   g_assert_nonnull (root);
-
+  
   cleanup_dir_recurse (root, root);
 
-  xfile_delete (root, NULL, NULL);
-
-  xobject_unref (root);
+  g_file_delete (root, NULL, NULL);
+  
+  g_object_unref (root);
 }
 
 int
 main (int argc, char *argv[])
 {
-  static xboolean_t only_create_struct;
+  static gboolean only_create_struct;
   const char *target_path;
-  xerror_t *error;
-  xoption_context_t *context;
+  GError *error;
+  GOptionContext *context;
 
   static GOptionEntry cmd_entries[] = {
     {"read-write", 'w', 0, G_OPTION_ARG_NONE, &write_test,
@@ -1370,7 +1370,7 @@ main (int argc, char *argv[])
      "Only create testing structure (no tests)", NULL},
     {"verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose, "Be verbose", NULL},
     {"posix", 'x', 0, G_OPTION_ARG_NONE, &posix_compat,
-     "test_t POSIX-specific features (unix permissions, symlinks)", NULL},
+     "Test POSIX-specific features (unix permissions, symlinks)", NULL},
     G_OPTION_ENTRY_NULL
   };
 
@@ -1384,7 +1384,7 @@ main (int argc, char *argv[])
   /*  strip all gtester-specific args  */
   g_test_init (&argc, &argv, NULL);
 
-  /*  no extra parameters specified, assume we're executed from glib test suite  */
+  /*  no extra parameters specified, assume we're executed from glib test suite  */ 
   if (argc < 2)
     {
 	  test_suite = TRUE;
@@ -1392,13 +1392,13 @@ main (int argc, char *argv[])
 	  write_test = TRUE;
 	  only_create_struct = FALSE;
 	  target_path = DEFAULT_TEST_DIR;
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 	  posix_compat = FALSE;
 #else
 	  posix_compat = TRUE;
 #endif
     }
-
+  
   /*  add trailing args  */
   error = NULL;
   context = g_option_context_new ("target_path");
@@ -1409,11 +1409,11 @@ main (int argc, char *argv[])
       return g_test_run ();
     }
 
-  /*  remaining arg should is the target path; we don't care of the extra args here  */
+  /*  remaining arg should is the target path; we don't care of the extra args here  */ 
   if (argc >= 2)
     target_path = strdup (argv[1]);
-
-  if (! target_path)
+  
+  if (! target_path) 
     {
       g_printerr ("error: target path was not specified\n");
       g_printerr ("%s", g_option_context_get_help (context, TRUE, NULL));
@@ -1423,11 +1423,11 @@ main (int argc, char *argv[])
   g_option_context_free (context);
 
   /*  Write test - clean target directory first  */
-  /*    this can be also considered as a test - enumerate + delete  */
+  /*    this can be also considered as a test - enumerate + delete  */ 
   if (write_test || only_create_struct)
     g_test_add_data_func ("/live-g-file/prep_clean_structure", target_path,
     	  	  prep_clean_structure);
-
+  
   /*  Write test - create new testing structure  */
   if (write_test || only_create_struct)
     g_test_add_data_func ("/live-g-file/create_structure", target_path,
@@ -1448,7 +1448,7 @@ main (int argc, char *argv[])
     g_test_add_data_func ("/live-g-file/test_enumerate", target_path,
 			  test_enumerate);
 
-  /*  Read test - open (xfile_read())  */
+  /*  Read test - open (g_file_read())  */
   if (!only_create_struct)
     g_test_add_data_func ("/live-g-file/test_open", target_path, test_open);
 

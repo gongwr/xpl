@@ -28,17 +28,17 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SIMPLE_PERMISSION      (g_simple_permission_get_type ())
-#define G_SIMPLE_PERMISSION(inst)     (XTYPE_CHECK_INSTANCE_CAST ((inst),   \
-                                       XTYPE_SIMPLE_PERMISSION,             \
-                                       xsimple_permission))
-#define X_IS_SIMPLE_PERMISSION(inst)  (XTYPE_CHECK_INSTANCE_TYPE ((inst),   \
-                                       XTYPE_SIMPLE_PERMISSION))
+#define G_TYPE_SIMPLE_PERMISSION      (g_simple_permission_get_type ())
+#define G_SIMPLE_PERMISSION(inst)     (G_TYPE_CHECK_INSTANCE_CAST ((inst),   \
+                                       G_TYPE_SIMPLE_PERMISSION,             \
+                                       GSimplePermission))
+#define G_IS_SIMPLE_PERMISSION(inst)  (G_TYPE_CHECK_INSTANCE_TYPE ((inst),   \
+                                       G_TYPE_SIMPLE_PERMISSION))
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   g_simple_permission_get_type            (void);
-XPL_AVAILABLE_IN_ALL
-xpermission_t *           g_simple_permission_new                 (xboolean_t allowed);
+GLIB_AVAILABLE_IN_ALL
+GType                   g_simple_permission_get_type            (void);
+GLIB_AVAILABLE_IN_ALL
+GPermission *           g_simple_permission_new                 (gboolean allowed);
 
 G_END_DECLS
 

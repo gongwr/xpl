@@ -33,7 +33,7 @@
  * taking care of certain portability issues for you.
  *
  * This can be used, for example, if you want to call setsockopt()
- * on a #xsocket_t.
+ * on a #GSocket.
  *
  * Note that while WinSock has many of the same APIs as the
  * traditional UNIX socket API, most of them behave at least slightly
@@ -61,14 +61,14 @@ void
 g_networking_init (void)
 {
 #ifdef G_OS_WIN32
-  static xsize_t inited = 0;
+  static gsize inited = 0;
 
   if (g_once_init_enter (&inited))
     {
       WSADATA wsadata;
 
       if (WSAStartup (MAKEWORD (2, 0), &wsadata) != 0)
-        xerror ("Windows Sockets could not be initialized");
+        g_error ("Windows Sockets could not be initialized");
 
       g_once_init_leave (&inited, 1);
     }

@@ -20,12 +20,12 @@ In sync with PCRE 7.0
 <refnamediv>
 <refname>Regular expression syntax</refname>
 <refpurpose>
-syntax and semantics of regular expressions supported by xregex_t
+syntax and semantics of regular expressions supported by GRegex
 </refpurpose>
 </refnamediv>
 
 <refsect1>
-<title>xregex_t regular expression details</title>
+<title>GRegex regular expression details</title>
 <para>
 A regular expression is a pattern that is matched against a
 string from left to right. Most characters stand for themselves in a
@@ -39,7 +39,7 @@ The quick brown fox
 
 <para>
 matches a portion of a string that is identical to itself. When
-caseless matching is specified (the <varname>XREGEX_CASELESS</varname> flag), letters are
+caseless matching is specified (the <varname>G_REGEX_CASELESS</varname> flag), letters are
 matched independently of case.
 </para>
 
@@ -180,7 +180,7 @@ backslash, you write \\.
 </para>
 
 <para>
-If a pattern is compiled with the <varname>XREGEX_EXTENDED</varname>
+If a pattern is compiled with the <varname>G_REGEX_EXTENDED</varname>
 option, whitespace in the pattern (other than in a character class) and
 characters between a # outside a character class and the next newline
 are ignored.
@@ -304,7 +304,7 @@ digit.
 
 <para>
 The handling of a backslash followed by a digit other than 0 is complicated.
-Outside a character class, xregex_t reads it and any following digits as a
+Outside a character class, GRegex reads it and any following digits as a
 decimal number. If the number is less than 10, or if there
 have been at least that many previous capturing left parentheses in the
 expression, the entire sequence is taken as a back reference. A
@@ -314,7 +314,7 @@ of parenthesized subpatterns.
 
 <para>
 Inside a character class, or if the decimal number is greater than 9
-and there have not been that many capturing subpatterns, xregex_t re-reads
+and there have not been that many capturing subpatterns, GRegex re-reads
 up to three octal digits following the backslash, and uses them to generate
 a data character. Any subsequent digits stand for themselves. For example:
 </para>
@@ -532,7 +532,7 @@ example, \p{Greek} or \P{Han}.
 <para>
 Those that are not part of an identified script are lumped together as
 "Common". The current list of scripts can be found in the documentation for
-the #xunicode_script_t enumeration. Script names for use with \p{} can be
+the #GUnicodeScript enumeration. Script names for use with \p{} can be
 found by replacing all spaces with underscores, e.g. for Linear B use
 \p{Linear_B}.
 </para>
@@ -558,7 +558,7 @@ examples have the same effect:
 
 <para>
 In addition to the two-letter category codes listed in the
-documentation for the #xunicode_type_t enumeration, the following
+documentation for the #GUnicodeType enumeration, the following
 general category property codes are supported:
 </para>
 
@@ -613,7 +613,7 @@ a modifier or "other".
 
 <para>
 The long synonyms for these properties that Perl supports (such as \ep{Letter})
-are not supported by xregex_t, nor is it permitted to prefix any of these
+are not supported by GRegex, nor is it permitted to prefix any of these
 properties with "Is".
 </para>
 
@@ -645,7 +645,7 @@ property are typically accents that affect the preceding character.
 </para>
 
 <para>
-Matching characters by Unicode property is not fast, because xregex_t has
+Matching characters by Unicode property is not fast, because GRegex has
 to search a structure that contains data for over fifteen thousand
 characters. That is why the traditional escape sequences such as \d and
 \w do not use Unicode properties.
@@ -719,7 +719,7 @@ The \A, \Z, and \z assertions differ from the traditional circumflex
 and dollar (described in the next section) in that they only ever match
 at the very start and end of the string, whatever options are
 set. Thus, they are independent of multiline mode. These three assertions
-are not affected by the <varname>XREGEX_MATCH_NOTBOL</varname> or <varname>XREGEX_MATCH_NOTEOL</varname> options,
+are not affected by the <varname>G_REGEX_MATCH_NOTBOL</varname> or <varname>G_REGEX_MATCH_NOTEOL</varname> options,
 which affect only the behaviour of the circumflex and dollar metacharacters.
 However, if the start_position argument of a matching function is non-zero,
 indicating that matching is to start at a point other than the beginning of
@@ -757,7 +757,7 @@ Outside a character class, in the default matching mode, the circumflex
 character is an assertion that is true only if the current matching
 point is at the start of the string. If the start_position argument to
 the matching functions is non-zero, circumflex can never match if the
-<varname>XREGEX_MULTILINE</varname> option is unset. Inside a character class, circumflex
+<varname>G_REGEX_MULTILINE</varname> option is unset. Inside a character class, circumflex
 has an entirely different meaning (see below).
 </para>
 
@@ -782,17 +782,17 @@ appears. Dollar has no special meaning in a character class.
 
 <para>
 The meaning of dollar can be changed so that it matches only at the
-very end of the string, by setting the <varname>XREGEX_DOLLAR_ENDONLY</varname> option at
+very end of the string, by setting the <varname>G_REGEX_DOLLAR_ENDONLY</varname> option at
 compile time. This does not affect the \Z assertion.
 </para>
 
 <para>
 The meanings of the circumflex and dollar characters are changed if the
-<varname>XREGEX_MULTILINE</varname> option is set. When this is the case,
+<varname>G_REGEX_MULTILINE</varname> option is set. When this is the case,
 a circumflex matches immediately after internal newlines as well as at the
 start of the string. It does not match after a newline that ends the string.
 A dollar matches before any newlines in the string, as well as at the very
-end, when <varname>XREGEX_MULTILINE</varname> is set. When newline is
+end, when <varname>G_REGEX_MULTILINE</varname> is set. When newline is
 specified as the two-character sequence CRLF, isolated CR and LF characters
 do not indicate newlines.
 </para>
@@ -803,14 +803,14 @@ For example, the pattern /^abc$/ matches the string "def\nabc" (where
 patterns that are anchored in single line mode because all branches start with
 ^ are not anchored in multiline mode, and a match for circumflex is possible
 when the <varname>start_position</varname> argument of a matching function
-is non-zero. The <varname>XREGEX_DOLLAR_ENDONLY</varname> option is ignored
-if <varname>XREGEX_MULTILINE</varname> is set.
+is non-zero. The <varname>G_REGEX_DOLLAR_ENDONLY</varname> option is ignored
+if <varname>G_REGEX_MULTILINE</varname> is set.
 </para>
 
 <para>
 Note that the sequences \A, \Z, and \z can be used to match the start and
 end of the string in both modes, and if all branches of a pattern start with
-\A it is always anchored, whether or not <varname>XREGEX_MULTILINE</varname>
+\A it is always anchored, whether or not <varname>G_REGEX_MULTILINE</varname>
 is set.
 </para>
 </refsect1>
@@ -833,7 +833,7 @@ characters.
 </para>
 
 <para>
-If the <varname>XREGEX_DOTALL</varname> flag is set, dots match newlines
+If the <varname>G_REGEX_DOTALL</varname> flag is set, dots match newlines
 as well. The handling of dot is entirely independent of the handling of circumflex
 and dollar, the only relationship being that they both involve newline
 characters. Dot has no special meaning in a character class.
@@ -841,7 +841,7 @@ characters. Dot has no special meaning in a character class.
 
 <para>
 The behaviour of dot with regard to newlines can be changed. If the
-<varname>XREGEX_DOTALL</varname> option is set, a dot matches any one
+<varname>G_REGEX_DOTALL</varname> option is set, a dot matches any one
 character, without exception. If newline is defined as the two-character
 sequence CRLF, it takes two dots to match it.
 </para>
@@ -866,7 +866,7 @@ this reason, the \C escape sequence is best avoided.
 </para>
 
 <para>
-xregex_t does not allow \C to appear in lookbehind assertions (described
+GRegex does not allow \C to appear in lookbehind assertions (described
 below), because in UTF-8 mode this would make it impossible to calculate
 the length of the lookbehind.
 </para>
@@ -916,8 +916,8 @@ match "A", whereas a caseful version would.
 <para>
 Characters that might indicate line breaks are never treated
 in any special way when matching character classes, whatever line-ending
-sequence is in use, and whatever setting of the <varname>XREGEX_DOTALL</varname>
-and <varname>XREGEX_MULTILINE</varname> options is used. A class such as [^a]
+sequence is in use, and whatever setting of the <varname>G_REGEX_DOTALL</varname>
+and <varname>G_REGEX_MULTILINE</varname> options is used. A class such as [^a]
 always matches one of these characters.
 </para>
 
@@ -971,7 +971,7 @@ escaping other non-alphanumeric characters does no harm.
 <refsect1>
 <title>Posix character classes</title>
 <para>
-xregex_t supports the POSIX notation for character classes. This uses names
+GRegex supports the POSIX notation for character classes. This uses names
 enclosed by [: and :] within the enclosing square brackets. For example,
 </para>
 
@@ -1073,7 +1073,7 @@ after the colon. For example,
 </programlisting>
 
 <para>
-matches "1", "2", or any non-digit. xregex_t also recognize the
+matches "1", "2", or any non-digit. GRegex also recognize the
 POSIX syntax [.ch.] and [=ch=] where "ch" is a "collating element", but
 these are not supported, and an error is given if they are encountered.
 </para>
@@ -1106,8 +1106,8 @@ left to right, and the first one that succeeds is used. If the alternatives are 
 <refsect1>
 <title>Internal option setting</title>
 <para>
-The settings of the <varname>XREGEX_CASELESS</varname>, <varname>XREGEX_MULTILINE</varname>, <varname>XREGEX_MULTILINE</varname>,
-and <varname>XREGEX_EXTENDED</varname> options can be changed from within the pattern by a
+The settings of the <varname>G_REGEX_CASELESS</varname>, <varname>G_REGEX_MULTILINE</varname>, <varname>G_REGEX_MULTILINE</varname>,
+and <varname>G_REGEX_EXTENDED</varname> options can be changed from within the pattern by a
 sequence of Perl-style option letters enclosed between "(?" and ")". The
 option letters are
 </para>
@@ -1125,19 +1125,19 @@ option letters are
 <tbody>
   <row>
     <entry>i</entry>
-    <entry><varname>XREGEX_CASELESS</varname></entry>
+    <entry><varname>G_REGEX_CASELESS</varname></entry>
   </row>
   <row>
     <entry>m</entry>
-    <entry><varname>XREGEX_MULTILINE</varname></entry>
+    <entry><varname>G_REGEX_MULTILINE</varname></entry>
   </row>
   <row>
     <entry>s</entry>
-    <entry><varname>XREGEX_DOTALL</varname></entry>
+    <entry><varname>G_REGEX_DOTALL</varname></entry>
   </row>
   <row>
     <entry>x</entry>
-    <entry><varname>XREGEX_EXTENDED</varname></entry>
+    <entry><varname>G_REGEX_EXTENDED</varname></entry>
   </row>
 </tbody>
 </tgroup>
@@ -1146,8 +1146,8 @@ option letters are
 <para>
 For example, (?im) sets caseless, multiline matching. It is also
 possible to unset these options by preceding the letter with a hyphen, and a
-combined setting and unsetting such as (?im-sx), which sets <varname>XREGEX_CASELESS</varname>
-and <varname>XREGEX_MULTILINE</varname> while unsetting <varname>XREGEX_DOTALL</varname> and <varname>XREGEX_EXTENDED</varname>,
+combined setting and unsetting such as (?im-sx), which sets <varname>G_REGEX_CASELESS</varname>
+and <varname>G_REGEX_MULTILINE</varname> while unsetting <varname>G_REGEX_DOTALL</varname> and <varname>G_REGEX_EXTENDED</varname>,
 is also permitted. If a letter appears both before and after the
 hyphen, the option is unset.
 </para>
@@ -1168,7 +1168,7 @@ affects only that part of the current pattern that follows it, so
 </programlisting>
 
 <para>
-matches abc and aBc and no other strings (assuming <varname>XREGEX_CASELESS</varname> is not
+matches abc and aBc and no other strings (assuming <varname>G_REGEX_CASELESS</varname> is not
 used). By this means, options can be made to have different settings
 in different parts of the pattern. Any changes made in one alternative
 do carry on into subsequent branches within the same subpattern. For
@@ -1187,8 +1187,8 @@ some very weird behaviour otherwise.
 </para>
 
 <para>
-The options <varname>XREGEX_UNGREEDY</varname> and
-<varname>XREGEX_EXTRA</varname> and <varname>XREGEX_DUPNAMES</varname>
+The options <varname>G_REGEX_UNGREEDY</varname> and
+<varname>G_REGEX_EXTRA</varname> and <varname>G_REGEX_DUPNAMES</varname>
 can be changed in the same way as the Perl-compatible options by using
 the characters U, X and J respectively.
 </para>
@@ -1211,7 +1211,7 @@ cat(aract|erpillar|) matches one of the words "cat", "cataract", or
 <listitem><para>
 It sets up the subpattern as a capturing subpattern. This means
 that, when the whole pattern matches, that portion of the
-string that matched the subpattern can be obtained using <function>xmatch_info_fetch()</function>.
+string that matched the subpattern can be obtained using <function>g_match_info_fetch()</function>.
 Opening parentheses are counted from left to right (starting from 1, as
 subpattern 0 is the whole matched string) to obtain numbers for the
 capturing subpatterns.
@@ -1275,7 +1275,7 @@ subsequent branches, so the above patterns match "SUNDAY" as well as
 Identifying capturing parentheses by number is simple, but it can be
 very hard to keep track of the numbers in complicated regular expressions.
 Furthermore, if an expression is modified, the numbers may
-change. To help with this difficulty, xregex_t supports the naming of
+change. To help with this difficulty, GRegex supports the naming of
 subpatterns.  A subpattern can be named in one of three ways: (?&lt;name&gt;...) or
 (?'name'...) as in Perl, or (?P&lt;name&gt;...) as in Python.
 References to capturing parentheses from other
@@ -1288,7 +1288,7 @@ Names consist of up to 32 alphanumeric characters and underscores. Named
 capturing parentheses are still allocated numbers as well as names, exactly as
 if the names were not present.
 By default, a name must be unique within a pattern, but it is possible to relax
-this constraint by setting the <varname>XREGEX_DUPNAMES</varname> option at
+this constraint by setting the <varname>G_REGEX_DUPNAMES</varname> option at
 compile time. This can be useful for patterns where only one instance of the
 named parentheses can match. Suppose you want to match the name of a weekday,
 either as a 3-letter abbreviation or as the full name, and in both cases you
@@ -1487,7 +1487,7 @@ only way the rest of the pattern matches.
 </para>
 
 <para>
-If the <varname>XREGEX_UNGREEDY</varname> flag is set, the quantifiers are not greedy
+If the <varname>G_REGEX_UNGREEDY</varname> flag is set, the quantifiers are not greedy
 by default, but individual ones can be made greedy by following them with
 a question mark. In other words, it inverts the default behaviour.
 </para>
@@ -1500,17 +1500,17 @@ minimum or maximum.
 </para>
 
 <para>
-If a pattern starts with .* or .{0,} and the <varname>XREGEX_DOTALL</varname> flag
+If a pattern starts with .* or .{0,} and the <varname>G_REGEX_DOTALL</varname> flag
 is set, thus allowing the dot to match newlines, the
 pattern is implicitly anchored, because whatever follows will be tried
 against every character position in the string, so there is no
 point in retrying the overall match at any position after the first.
-xregex_t normally treats such a pattern as though it were preceded by \A.
+GRegex normally treats such a pattern as though it were preceded by \A.
 </para>
 
 <para>
 In cases where it is known that the string contains no newlines, it
-is worth setting <varname>XREGEX_DOTALL</varname> in order to obtain this optimization,
+is worth setting <varname>G_REGEX_DOTALL</varname> in order to obtain this optimization,
 or alternatively using ^ to indicate anchoring explicitly.
 </para>
 
@@ -1632,7 +1632,7 @@ this notation, the previous example can be rewritten as
 
 <para>
 Possessive quantifiers are always greedy; the setting of the
-<varname>XREGEX_UNGREEDY</varname> option is ignored. They are a convenient notation for the
+<varname>G_REGEX_UNGREEDY</varname> option is ignored. They are a convenient notation for the
 simpler forms of atomic group. However, there is no difference in the
 meaning of a possessive quantifier and the equivalent
 atomic group, though there may be a performance difference;
@@ -1647,7 +1647,7 @@ It ultimately found its way into Perl at release 5.10.
 </para>
 
 <para>
-xregex_t has an optimization that automatically "possessifies" certain simple
+GRegex has an optimization that automatically "possessifies" certain simple
 pattern constructs. For example, the sequence A+B is treated as A++B because
 there is no point in backtracking into a sequence of A's when B must follow.
 </para>
@@ -1658,7 +1658,7 @@ can itself be repeated an unlimited number of times, the use of an
 atomic group is the only way to avoid some failing matches taking a
 very long time indeed. The pattern
 </para>
-
+ 
 <programlisting>
 (\D+|&lt;\d+&gt;)*[!?]
 </programlisting>
@@ -1678,7 +1678,7 @@ it takes a long time before reporting failure. This is because the
 string can be divided between the internal \D+ repeat and the external
 * repeat in a large number of ways, and all have to be tried. (The
 example uses [!?] rather than a single character at the end, because
-xregex_t has an optimization that allows for fast failure
+GRegex has an optimization that allows for fast failure
 when a single character is used. It remember the last single character
 that is required for a match, and fail early if it is not present
 in the string.) If the pattern is changed so that it uses an atomic
@@ -1797,7 +1797,7 @@ always fails if it starts to match "a" rather than "bc". Because there
 may be many capturing parentheses in a pattern, all digits following
 the backslash are taken as part of a potential back reference number.
 If the pattern continues with a digit character, some delimiter must be
-used to terminate the back reference. If the <varname>XREGEX_EXTENDED</varname> flag is
+used to terminate the back reference. If the <varname>G_REGEX_EXTENDED</varname> flag is
 set, this can be whitespace. Otherwise an empty comment (see "Comments" below) can be used.
 </para>
 
@@ -1952,7 +1952,7 @@ current position, the assertion fails.
 </para>
 
 <para>
-xregex_t does not allow the \C escape (which matches a single byte in UTF-8
+GRegex does not allow the \C escape (which matches a single byte in UTF-8
 mode) to appear in lookbehind assertions, because it makes it impossible
 to calculate the length of the lookbehind. The \X and \R escapes, which can
 match different numbers of bytes, are also not permitted.
@@ -1970,7 +1970,7 @@ abcd$
 
 <para>
 when applied to a long string that does not match. Because matching
-proceeds from left to right, xregex_t will look for each "a" in the string
+proceeds from left to right, GRegex will look for each "a" in the string
 and then see if what follows matches the rest of the pattern. If the
 pattern is specified as
 </para>
@@ -2090,7 +2090,7 @@ matched.
 
 <para>
 Consider the following pattern, which contains non-significant white space
-to make it more readable (assume the <varname>XREGEX_EXTENDED</varname>)
+to make it more readable (assume the <varname>G_REGEX_EXTENDED</varname>)
 and to divide it into three parts for ease of discussion:
 </para>
 
@@ -2118,8 +2118,8 @@ optionally enclosed in parentheses.
 Perl uses the syntax (?(&lt;name&gt;)...) or (?('name')...) to test for a used
 subpattern by name, the Python syntax (?(name)...) is also recognized. However,
 there is a possible ambiguity with this syntax, because subpattern names may
-consist entirely of digits. xregex_t looks first for a named subpattern; if it
-cannot find one and the name consists entirely of digits, xregex_t looks for a
+consist entirely of digits. GRegex looks first for a named subpattern; if it
+cannot find one and the name consists entirely of digits, GRegex looks for a
 subpattern of that number, which must be greater than zero. Using subpattern
 names that consist entirely of digits is not recommended.
 </para>
@@ -2226,7 +2226,7 @@ at all.
 </para>
 
 <para>
-If the <varname>XREGEX_EXTENDED</varname> option is set, an unescaped #
+If the <varname>G_REGEX_EXTENDED</varname> option is set, an unescaped #
 character outside a character class introduces a comment that continues to
 immediately after the next newline in the pattern.
 </para>
@@ -2260,7 +2260,7 @@ recursively to the pattern in which it appears.
 </para>
 
 <para>
-Obviously, xregex_t cannot support the interpolation of Perl code. Instead, it
+Obviously, GRegex cannot support the interpolation of Perl code. Instead, it
 supports special syntax for recursion of the entire pattern, and also for
 individual subpattern recursion. This kind of recursion was introduced into
 Perl at release 5.10.
@@ -2275,7 +2275,7 @@ a recursive call of the entire regular expression.
 </para>
 
 <para>
-In xregex_t (like Python, but unlike Perl), a recursive subpattern call is always
+In GRegex (like Python, but unlike Perl), a recursive subpattern call is always
 treated as an atomic group. That is, once it has matched some of the subject
 string, it is never re-entered, even if it contains untried alternatives and
 there is a subsequent matching failure.
@@ -2283,7 +2283,7 @@ there is a subsequent matching failure.
 
 <para>
 This pattern solves the nested parentheses problem (assume the
-<varname>XREGEX_EXTENDED</varname> option is set so that white space is
+<varname>G_REGEX_EXTENDED</varname> option is set so that white space is
 ignored):
 </para>
 
@@ -2312,7 +2312,7 @@ We have put the pattern into parentheses, and caused the recursion to
 refer to them instead of the whole pattern. In a larger pattern, keeping
 track of parenthesis numbers can be tricky. It may be more convenient to
 use named parentheses instead.
-The Perl syntax for this is (?&amp;name); xregex_t also supports the(?P>name)
+The Perl syntax for this is (?&amp;name); GRegex also supports the(?P>name)
 syntax. We could rewrite the above example as follows:
 </para>
 
@@ -2344,7 +2344,7 @@ At the end of a match, the values set for any capturing subpatterns are
 those from the outermost level of the recursion at which the subpattern
 value is set.
 
-<!-- Callouts are not supported by xregex_t
+<!-- Callouts are not supported by GRegex
 If you want to obtain intermediate values, a callout
 function can be used (see below and the pcrecallout documentation). -->
 
@@ -2442,7 +2442,7 @@ processing option does not affect the called subpattern.
 </para>
 </refsect1>
 
-<!-- Callouts are not supported by xregex_t
+<!-- Callouts are not supported by GRegex
 <refsect1>
 <title>Callouts</title>
 <para>

@@ -56,32 +56,32 @@ typedef enum
 
 typedef struct
 {
-  xint_t                      ref_count;  /* (atomic) */
-  xuint_t                     id;
-  xchar_t                    *name;
+  gint                      ref_count;  /* (atomic) */
+  guint                     id;
+  gchar                    *name;
   GBusNameWatcherFlags      flags;
-  xchar_t                    *name_owner;
+  gchar                    *name_owner;
   GBusNameAppearedCallback  name_appeared_handler;
   GBusNameVanishedCallback  name_vanished_handler;
-  xpointer_t                  user_data;
-  xdestroy_notify_t            user_data_free_func;
-  xmain_context_t             *main_context;
+  gpointer                  user_data;
+  GDestroyNotify            user_data_free_func;
+  GMainContext             *main_context;
 
-  xdbus_connection_t          *connection;
-  xulong_t                    disconnected_signal_handler_id;
-  xuint_t                     name_owner_changed_subscription_id;
+  GDBusConnection          *connection;
+  gulong                    disconnected_signal_handler_id;
+  guint                     name_owner_changed_subscription_id;
 
   PreviousCall              previous_call;
 
-  xboolean_t                  cancelled;
-  xboolean_t                  initialized;
+  gboolean                  cancelled;
+  gboolean                  initialized;
 } Client;
 
 /* Must be accessed atomically. */
-static xuint_t next_global_id = 1;  /* (atomic) */
+static guint next_global_id = 1;  /* (atomic) */
 
 /* Must be accessed with @lock held. */
-static xhashtable_t *map_id_to_client = NULL;
+static GHashTable *map_id_to_client = NULL;
 
 static Client *
 client_ref (Client *client)
@@ -90,11 +90,11 @@ client_ref (Client *client)
   return client;
 }
 
-static xboolean_t
-free_user_data_cb (xpointer_t user_data)
+static gboolean
+free_user_data_cb (gpointer user_data)
 {
-  /* The user data is actually freed by the xdestroy_notify_t for the idle source */
-  return XSOURCE_REMOVE;
+  /* The user data is actually freed by the GDestroyNotify for the idle source */
+  return G_SOURCE_REMOVE;
 }
 
 static void
@@ -105,10 +105,10 @@ client_unref (Client *client)
       if (client->connection != NULL)
         {
           if (client->name_owner_changed_subscription_id > 0)
-            xdbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
+            g_dbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
           if (client->disconnected_signal_handler_id > 0)
-            xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
-          xobject_unref (client->connection);
+            g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+          g_object_unref (client->connection);
         }
       g_free (client->name);
       g_free (client->name_owner);
@@ -116,21 +116,21 @@ client_unref (Client *client)
       if (client->user_data_free_func != NULL)
         {
           /* Ensure client->user_data_free_func() is called from the right thread */
-          if (client->main_context != xmain_context_get_thread_default ())
+          if (client->main_context != g_main_context_get_thread_default ())
             {
-              xsource_t *idle_source = g_idle_source_new ();
-              xsource_set_callback (idle_source, free_user_data_cb,
+              GSource *idle_source = g_idle_source_new ();
+              g_source_set_callback (idle_source, free_user_data_cb,
                                      client->user_data,
                                      client->user_data_free_func);
-              xsource_set_name (idle_source, "[gio, gdbusnamewatching.c] free_user_data_cb");
-              xsource_attach (idle_source, client->main_context);
-              xsource_unref (idle_source);
+              g_source_set_name (idle_source, "[gio, gdbusnamewatching.c] free_user_data_cb");
+              g_source_attach (idle_source, client->main_context);
+              g_source_unref (idle_source);
             }
           else
             client->user_data_free_func (client->user_data);
         }
 
-      xmain_context_unref (client->main_context);
+      g_main_context_unref (client->main_context);
 
       g_free (client);
     }
@@ -151,10 +151,10 @@ typedef struct
   /* keep this separate because client->connection may
    * be set to NULL after scheduling the call
    */
-  xdbus_connection_t *connection;
+  GDBusConnection *connection;
 
   /* ditto */
-  xchar_t *name_owner;
+  gchar *name_owner;
 
   CallType call_type;
 } CallHandlerData;
@@ -163,17 +163,17 @@ static void
 call_handler_data_free (CallHandlerData *data)
 {
   if (data->connection != NULL)
-    xobject_unref (data->connection);
+    g_object_unref (data->connection);
   g_free (data->name_owner);
   client_unref (data->client);
   g_free (data);
 }
 
 static void
-actually_do_call (Client *client, xdbus_connection_t *connection, const xchar_t *name_owner, CallType call_type)
+actually_do_call (Client *client, GDBusConnection *connection, const gchar *name_owner, CallType call_type)
 {
   /* The client might have been cancelled (g_bus_unwatch_name()) while we were
-   * sitting in the #xmain_context_t dispatch queue. */
+   * sitting in the #GMainContext dispatch queue. */
   if (client->cancelled)
     return;
 
@@ -204,8 +204,8 @@ actually_do_call (Client *client, xdbus_connection_t *connection, const xchar_t 
     }
 }
 
-static xboolean_t
-call_in_idle_cb (xpointer_t _data)
+static gboolean
+call_in_idle_cb (gpointer _data)
 {
   CallHandlerData *data = _data;
   actually_do_call (data->client, data->connection, data->name_owner, data->call_type);
@@ -216,37 +216,37 @@ static void
 schedule_call_in_idle (Client *client, CallType call_type)
 {
   CallHandlerData *data;
-  xsource_t *idle_source;
+  GSource *idle_source;
 
   data = g_new0 (CallHandlerData, 1);
   data->client = client_ref (client);
-  data->connection = client->connection != NULL ? xobject_ref (client->connection) : NULL;
-  data->name_owner = xstrdup (client->name_owner);
+  data->connection = client->connection != NULL ? g_object_ref (client->connection) : NULL;
+  data->name_owner = g_strdup (client->name_owner);
   data->call_type = call_type;
 
   idle_source = g_idle_source_new ();
-  xsource_set_priority (idle_source, G_PRIORITY_HIGH);
-  xsource_set_callback (idle_source,
+  g_source_set_priority (idle_source, G_PRIORITY_HIGH);
+  g_source_set_callback (idle_source,
                          call_in_idle_cb,
                          data,
-                         (xdestroy_notify_t) call_handler_data_free);
-  xsource_set_static_name (idle_source, "[gio, gdbusnamewatching.c] call_in_idle_cb");
-  xsource_attach (idle_source, client->main_context);
-  xsource_unref (idle_source);
+                         (GDestroyNotify) call_handler_data_free);
+  g_source_set_static_name (idle_source, "[gio, gdbusnamewatching.c] call_in_idle_cb");
+  g_source_attach (idle_source, client->main_context);
+  g_source_unref (idle_source);
 }
 
 static void
 do_call (Client *client, CallType call_type)
 {
-  xmain_context_t *current_context;
+  GMainContext *current_context;
 
   /* only schedule in idle if we're not in the right thread */
-  current_context = xmain_context_ref_thread_default ();
+  current_context = g_main_context_ref_thread_default ();
   if (current_context != client->main_context)
     schedule_call_in_idle (client, call_type);
   else
     actually_do_call (client, client->connection, client->name_owner, call_type);
-  xmain_context_unref (current_context);
+  g_main_context_unref (current_context);
 }
 
 static void
@@ -280,16 +280,16 @@ call_vanished_handler (Client *client)
 /* Return a reference to the #Client for @watcher_id, or %NULL if it’s been
  * unwatched. This is safe to call from any thread. */
 static Client *
-dup_client (xuint_t watcher_id)
+dup_client (guint watcher_id)
 {
   Client *client;
 
   G_LOCK (lock);
 
-  xassert (watcher_id != 0);
-  xassert (map_id_to_client != NULL);
+  g_assert (watcher_id != 0);
+  g_assert (map_id_to_client != NULL);
 
-  client = xhash_table_lookup (map_id_to_client, GUINT_TO_POINTER (watcher_id));
+  client = g_hash_table_lookup (map_id_to_client, GUINT_TO_POINTER (watcher_id));
 
   if (client != NULL)
     client_ref (client);
@@ -303,12 +303,12 @@ dup_client (xuint_t watcher_id)
  * has started finalising the #Client. Avoid that by looking up the #Client
  * atomically. */
 static void
-on_connection_disconnected (xdbus_connection_t *connection,
-                            xboolean_t         remote_peer_vanished,
-                            xerror_t          *error,
-                            xpointer_t         user_data)
+on_connection_disconnected (GDBusConnection *connection,
+                            gboolean         remote_peer_vanished,
+                            GError          *error,
+                            gpointer         user_data)
 {
-  xuint_t watcher_id = GPOINTER_TO_UINT (user_data);
+  guint watcher_id = GPOINTER_TO_UINT (user_data);
   Client *client = NULL;
 
   client = dup_client (watcher_id);
@@ -316,10 +316,10 @@ on_connection_disconnected (xdbus_connection_t *connection,
     return;
 
   if (client->name_owner_changed_subscription_id > 0)
-    xdbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
+    g_dbus_connection_signal_unsubscribe (client->connection, client->name_owner_changed_subscription_id);
   if (client->disconnected_signal_handler_id > 0)
-    xsignal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
-  xobject_unref (client->connection);
+    g_signal_handler_disconnect (client->connection, client->disconnected_signal_handler_id);
+  g_object_unref (client->connection);
   client->disconnected_signal_handler_id = 0;
   client->name_owner_changed_subscription_id = 0;
   client->connection = NULL;
@@ -333,19 +333,19 @@ on_connection_disconnected (xdbus_connection_t *connection,
 
 /* Will always be called from the thread which acquired client->main_context. */
 static void
-on_name_owner_changed (xdbus_connection_t *connection,
-                       const xchar_t      *sender_name,
-                       const xchar_t      *object_path,
-                       const xchar_t      *interface_name,
-                       const xchar_t      *signal_name,
-                       xvariant_t         *parameters,
-                       xpointer_t          user_data)
+on_name_owner_changed (GDBusConnection *connection,
+                       const gchar      *sender_name,
+                       const gchar      *object_path,
+                       const gchar      *interface_name,
+                       const gchar      *signal_name,
+                       GVariant         *parameters,
+                       gpointer          user_data)
 {
-  xuint_t watcher_id = GPOINTER_TO_UINT (user_data);
+  guint watcher_id = GPOINTER_TO_UINT (user_data);
   Client *client = NULL;
-  const xchar_t *name;
-  const xchar_t *old_owner;
-  const xchar_t *new_owner;
+  const gchar *name;
+  const gchar *old_owner;
+  const gchar *new_owner;
 
   client = dup_client (watcher_id);
   if (client == NULL)
@@ -354,19 +354,19 @@ on_name_owner_changed (xdbus_connection_t *connection,
   if (!client->initialized)
     goto out;
 
-  if (xstrcmp0 (object_path, "/org/freedesktop/DBus") != 0 ||
-      xstrcmp0 (interface_name, "org.freedesktop.DBus") != 0 ||
-      xstrcmp0 (sender_name, "org.freedesktop.DBus") != 0)
+  if (g_strcmp0 (object_path, "/org/freedesktop/DBus") != 0 ||
+      g_strcmp0 (interface_name, "org.freedesktop.DBus") != 0 ||
+      g_strcmp0 (sender_name, "org.freedesktop.DBus") != 0)
     goto out;
 
-  xvariant_get (parameters,
+  g_variant_get (parameters,
                  "(&s&s&s)",
                  &name,
                  &old_owner,
                  &new_owner);
 
   /* we only care about a specific name */
-  if (xstrcmp0 (name, client->name) != 0)
+  if (g_strcmp0 (name, client->name) != 0)
     goto out;
 
   if ((old_owner != NULL && strlen (old_owner) > 0) && client->name_owner != NULL)
@@ -380,7 +380,7 @@ on_name_owner_changed (xdbus_connection_t *connection,
     {
       g_warn_if_fail (client->name_owner == NULL);
       g_free (client->name_owner);
-      client->name_owner = xstrdup (new_owner);
+      client->name_owner = g_strdup (new_owner);
       call_appeared_handler (client);
     }
 
@@ -391,29 +391,29 @@ on_name_owner_changed (xdbus_connection_t *connection,
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-get_name_owner_cb (xobject_t      *source_object,
-                   xasync_result_t *res,
-                   xpointer_t      user_data)
+get_name_owner_cb (GObject      *source_object,
+                   GAsyncResult *res,
+                   gpointer      user_data)
 {
   Client *client = user_data;
-  xvariant_t *result;
+  GVariant *result;
   const char *name_owner;
 
   name_owner = NULL;
   result = NULL;
 
-  result = xdbus_connection_call_finish (client->connection,
+  result = g_dbus_connection_call_finish (client->connection,
                                           res,
                                           NULL);
   if (result != NULL)
     {
-      xvariant_get (result, "(&s)", &name_owner);
+      g_variant_get (result, "(&s)", &name_owner);
     }
 
   if (name_owner != NULL)
     {
       g_warn_if_fail (client->name_owner == NULL);
-      client->name_owner = xstrdup (name_owner);
+      client->name_owner = g_strdup (name_owner);
       call_appeared_handler (client);
     }
   else
@@ -424,7 +424,7 @@ get_name_owner_cb (xobject_t      *source_object,
   client->initialized = TRUE;
 
   if (result != NULL)
-    xvariant_unref (result);
+    g_variant_unref (result);
   client_unref (client);
 }
 
@@ -433,39 +433,39 @@ get_name_owner_cb (xobject_t      *source_object,
 static void
 invoke_get_name_owner (Client *client)
 {
-  xdbus_connection_call (client->connection,
+  g_dbus_connection_call (client->connection,
                           "org.freedesktop.DBus",  /* bus name */
                           "/org/freedesktop/DBus", /* object path */
                           "org.freedesktop.DBus",  /* interface name */
                           "GetNameOwner",          /* method name */
-                          xvariant_new ("(s)", client->name),
+                          g_variant_new ("(s)", client->name),
                           G_VARIANT_TYPE ("(s)"),
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
                           NULL,
-                          (xasync_ready_callback_t) get_name_owner_cb,
+                          (GAsyncReadyCallback) get_name_owner_cb,
                           client_ref (client));
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-start_service_by_name_cb (xobject_t      *source_object,
-                          xasync_result_t *res,
-                          xpointer_t      user_data)
+start_service_by_name_cb (GObject      *source_object,
+                          GAsyncResult *res,
+                          gpointer      user_data)
 {
   Client *client = user_data;
-  xvariant_t *result;
+  GVariant *result;
 
   result = NULL;
 
-  result = xdbus_connection_call_finish (client->connection,
+  result = g_dbus_connection_call_finish (client->connection,
                                           res,
                                           NULL);
   if (result != NULL)
     {
-      xuint32_t start_service_result;
-      xvariant_get (result, "(u)", &start_service_result);
+      guint32 start_service_result;
+      g_variant_get (result, "(u)", &start_service_result);
 
       if (start_service_result == 1) /* DBUS_START_REPLY_SUCCESS */
         {
@@ -497,7 +497,7 @@ start_service_by_name_cb (xobject_t      *source_object,
     }
 
   if (result != NULL)
-    xvariant_unref (result);
+    g_variant_unref (result);
   client_unref (client);
 }
 
@@ -507,13 +507,13 @@ static void
 has_connection (Client *client)
 {
   /* listen for disconnection */
-  client->disconnected_signal_handler_id = xsignal_connect (client->connection,
+  client->disconnected_signal_handler_id = g_signal_connect (client->connection,
                                                              "closed",
                                                              G_CALLBACK (on_connection_disconnected),
                                                              GUINT_TO_POINTER (client->id));
 
   /* start listening to NameOwnerChanged messages immediately */
-  client->name_owner_changed_subscription_id = xdbus_connection_signal_subscribe (client->connection,
+  client->name_owner_changed_subscription_id = g_dbus_connection_signal_subscribe (client->connection,
                                                                                    "org.freedesktop.DBus",  /* name */
                                                                                    "org.freedesktop.DBus",  /* if */
                                                                                    "NameOwnerChanged",      /* signal */
@@ -526,17 +526,17 @@ has_connection (Client *client)
 
   if (client->flags & G_BUS_NAME_WATCHER_FLAGS_AUTO_START)
     {
-      xdbus_connection_call (client->connection,
+      g_dbus_connection_call (client->connection,
                               "org.freedesktop.DBus",  /* bus name */
                               "/org/freedesktop/DBus", /* object path */
                               "org.freedesktop.DBus",  /* interface name */
                               "StartServiceByName",    /* method name */
-                              xvariant_new ("(su)", client->name, 0),
+                              g_variant_new ("(su)", client->name, 0),
                               G_VARIANT_TYPE ("(u)"),
                               G_DBUS_CALL_FLAGS_NONE,
                               -1,
                               NULL,
-                              (xasync_ready_callback_t) start_service_by_name_cb,
+                              (GAsyncReadyCallback) start_service_by_name_cb,
                               client_ref (client));
     }
   else
@@ -548,9 +548,9 @@ has_connection (Client *client)
 
 
 static void
-connection_get_cb (xobject_t      *source_object,
-                   xasync_result_t *res,
-                   xpointer_t      user_data)
+connection_get_cb (GObject      *source_object,
+                   GAsyncResult *res,
+                   gpointer      user_data)
 {
   Client *client = user_data;
 
@@ -593,7 +593,7 @@ connection_get_cb (xobject_t      *source_object,
  *
  * If the name vanishes or appears (for example the application owning
  * the name could restart), the handlers are also invoked. If the
- * #xdbus_connection_t that is used for watching the name disconnects, then
+ * #GDBusConnection that is used for watching the name disconnects, then
  * @name_vanished_handler is invoked since it is no longer
  * possible to access the name.
  *
@@ -614,37 +614,37 @@ connection_get_cb (xobject_t      *source_object,
  *
  * Since: 2.26
  */
-xuint_t
-g_bus_watch_name (xbus_type_t                  bus_type,
-                  const xchar_t              *name,
+guint
+g_bus_watch_name (GBusType                  bus_type,
+                  const gchar              *name,
                   GBusNameWatcherFlags      flags,
                   GBusNameAppearedCallback  name_appeared_handler,
                   GBusNameVanishedCallback  name_vanished_handler,
-                  xpointer_t                  user_data,
-                  xdestroy_notify_t            user_data_free_func)
+                  gpointer                  user_data,
+                  GDestroyNotify            user_data_free_func)
 {
   Client *client;
 
-  xreturn_val_if_fail (g_dbus_is_name (name), 0);
+  g_return_val_if_fail (g_dbus_is_name (name), 0);
 
   G_LOCK (lock);
 
   client = g_new0 (Client, 1);
   client->ref_count = 1;
-  client->id = (xuint_t) g_atomic_int_add (&next_global_id, 1); /* TODO: uh oh, handle overflow */
-  client->name = xstrdup (name);
+  client->id = (guint) g_atomic_int_add (&next_global_id, 1); /* TODO: uh oh, handle overflow */
+  client->name = g_strdup (name);
   client->flags = flags;
   client->name_appeared_handler = name_appeared_handler;
   client->name_vanished_handler = name_vanished_handler;
   client->user_data = user_data;
   client->user_data_free_func = user_data_free_func;
-  client->main_context = xmain_context_ref_thread_default ();
+  client->main_context = g_main_context_ref_thread_default ();
 
   if (map_id_to_client == NULL)
     {
-      map_id_to_client = xhash_table_new (g_direct_hash, g_direct_equal);
+      map_id_to_client = g_hash_table_new (g_direct_hash, g_direct_equal);
     }
-  xhash_table_insert (map_id_to_client,
+  g_hash_table_insert (map_id_to_client,
                        GUINT_TO_POINTER (client->id),
                        client);
 
@@ -660,7 +660,7 @@ g_bus_watch_name (xbus_type_t                  bus_type,
 
 /**
  * g_bus_watch_name_on_connection:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @name: The name (well-known or unique) to watch.
  * @flags: Flags from the #GBusNameWatcherFlags enumeration.
  * @name_appeared_handler: (nullable): Handler to invoke when @name is known to exist or %NULL.
@@ -668,48 +668,48 @@ g_bus_watch_name (xbus_type_t                  bus_type,
  * @user_data: User data to pass to handlers.
  * @user_data_free_func: (nullable): Function for freeing @user_data or %NULL.
  *
- * Like g_bus_watch_name() but takes a #xdbus_connection_t instead of a
- * #xbus_type_t.
+ * Like g_bus_watch_name() but takes a #GDBusConnection instead of a
+ * #GBusType.
  *
  * Returns: An identifier (never 0) that can be used with
  * g_bus_unwatch_name() to stop watching the name.
  *
  * Since: 2.26
  */
-xuint_t g_bus_watch_name_on_connection (xdbus_connection_t          *connection,
-                                      const xchar_t              *name,
+guint g_bus_watch_name_on_connection (GDBusConnection          *connection,
+                                      const gchar              *name,
                                       GBusNameWatcherFlags      flags,
                                       GBusNameAppearedCallback  name_appeared_handler,
                                       GBusNameVanishedCallback  name_vanished_handler,
-                                      xpointer_t                  user_data,
-                                      xdestroy_notify_t            user_data_free_func)
+                                      gpointer                  user_data,
+                                      GDestroyNotify            user_data_free_func)
 {
   Client *client;
 
-  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  xreturn_val_if_fail (g_dbus_is_name (name), 0);
+  g_return_val_if_fail (G_IS_DBUS_CONNECTION (connection), 0);
+  g_return_val_if_fail (g_dbus_is_name (name), 0);
 
   G_LOCK (lock);
 
   client = g_new0 (Client, 1);
   client->ref_count = 1;
-  client->id = (xuint_t) g_atomic_int_add (&next_global_id, 1); /* TODO: uh oh, handle overflow */
-  client->name = xstrdup (name);
+  client->id = (guint) g_atomic_int_add (&next_global_id, 1); /* TODO: uh oh, handle overflow */
+  client->name = g_strdup (name);
   client->flags = flags;
   client->name_appeared_handler = name_appeared_handler;
   client->name_vanished_handler = name_vanished_handler;
   client->user_data = user_data;
   client->user_data_free_func = user_data_free_func;
-  client->main_context = xmain_context_ref_thread_default ();
+  client->main_context = g_main_context_ref_thread_default ();
 
   if (map_id_to_client == NULL)
-    map_id_to_client = xhash_table_new (g_direct_hash, g_direct_equal);
+    map_id_to_client = g_hash_table_new (g_direct_hash, g_direct_equal);
 
-  xhash_table_insert (map_id_to_client,
+  g_hash_table_insert (map_id_to_client,
                        GUINT_TO_POINTER (client->id),
                        client);
 
-  client->connection = xobject_ref (connection);
+  client->connection = g_object_ref (connection);
   G_UNLOCK (lock);
 
   has_connection (client);
@@ -718,13 +718,13 @@ xuint_t g_bus_watch_name_on_connection (xdbus_connection_t          *connection,
 }
 
 typedef struct {
-  xclosure_t *name_appeared_closure;
-  xclosure_t *name_vanished_closure;
+  GClosure *name_appeared_closure;
+  GClosure *name_vanished_closure;
 } WatchNameData;
 
 static WatchNameData *
-watch_name_data_new (xclosure_t *name_appeared_closure,
-                     xclosure_t *name_vanished_closure)
+watch_name_data_new (GClosure *name_appeared_closure,
+                     GClosure *name_vanished_closure)
 {
   WatchNameData *data;
 
@@ -732,78 +732,78 @@ watch_name_data_new (xclosure_t *name_appeared_closure,
 
   if (name_appeared_closure != NULL)
     {
-      data->name_appeared_closure = xclosure_ref (name_appeared_closure);
-      xclosure_sink (name_appeared_closure);
+      data->name_appeared_closure = g_closure_ref (name_appeared_closure);
+      g_closure_sink (name_appeared_closure);
       if (G_CLOSURE_NEEDS_MARSHAL (name_appeared_closure))
-        xclosure_set_marshal (name_appeared_closure, g_cclosure_marshal_generic);
+        g_closure_set_marshal (name_appeared_closure, g_cclosure_marshal_generic);
     }
 
   if (name_vanished_closure != NULL)
     {
-      data->name_vanished_closure = xclosure_ref (name_vanished_closure);
-      xclosure_sink (name_vanished_closure);
+      data->name_vanished_closure = g_closure_ref (name_vanished_closure);
+      g_closure_sink (name_vanished_closure);
       if (G_CLOSURE_NEEDS_MARSHAL (name_vanished_closure))
-        xclosure_set_marshal (name_vanished_closure, g_cclosure_marshal_generic);
+        g_closure_set_marshal (name_vanished_closure, g_cclosure_marshal_generic);
     }
 
   return data;
 }
 
 static void
-watch_with_closures_on_name_appeared (xdbus_connection_t *connection,
-                                      const xchar_t     *name,
-                                      const xchar_t     *name_owner,
-                                      xpointer_t         user_data)
+watch_with_closures_on_name_appeared (GDBusConnection *connection,
+                                      const gchar     *name,
+                                      const gchar     *name_owner,
+                                      gpointer         user_data)
 {
   WatchNameData *data = user_data;
-  xvalue_t params[3] = { G_VALUE_INIT, G_VALUE_INIT, G_VALUE_INIT };
+  GValue params[3] = { G_VALUE_INIT, G_VALUE_INIT, G_VALUE_INIT };
 
-  xvalue_init (&params[0], XTYPE_DBUS_CONNECTION);
-  xvalue_set_object (&params[0], connection);
+  g_value_init (&params[0], G_TYPE_DBUS_CONNECTION);
+  g_value_set_object (&params[0], connection);
 
-  xvalue_init (&params[1], XTYPE_STRING);
-  xvalue_set_string (&params[1], name);
+  g_value_init (&params[1], G_TYPE_STRING);
+  g_value_set_string (&params[1], name);
 
-  xvalue_init (&params[2], XTYPE_STRING);
-  xvalue_set_string (&params[2], name_owner);
+  g_value_init (&params[2], G_TYPE_STRING);
+  g_value_set_string (&params[2], name_owner);
 
-  xclosure_invoke (data->name_appeared_closure, NULL, 3, params, NULL);
+  g_closure_invoke (data->name_appeared_closure, NULL, 3, params, NULL);
 
-  xvalue_unset (params + 0);
-  xvalue_unset (params + 1);
-  xvalue_unset (params + 2);
+  g_value_unset (params + 0);
+  g_value_unset (params + 1);
+  g_value_unset (params + 2);
 }
 
 static void
-watch_with_closures_on_name_vanished (xdbus_connection_t *connection,
-                                      const xchar_t     *name,
-                                      xpointer_t         user_data)
+watch_with_closures_on_name_vanished (GDBusConnection *connection,
+                                      const gchar     *name,
+                                      gpointer         user_data)
 {
   WatchNameData *data = user_data;
-  xvalue_t params[2] = { G_VALUE_INIT, G_VALUE_INIT };
+  GValue params[2] = { G_VALUE_INIT, G_VALUE_INIT };
 
-  xvalue_init (&params[0], XTYPE_DBUS_CONNECTION);
-  xvalue_set_object (&params[0], connection);
+  g_value_init (&params[0], G_TYPE_DBUS_CONNECTION);
+  g_value_set_object (&params[0], connection);
 
-  xvalue_init (&params[1], XTYPE_STRING);
-  xvalue_set_string (&params[1], name);
+  g_value_init (&params[1], G_TYPE_STRING);
+  g_value_set_string (&params[1], name);
 
-  xclosure_invoke (data->name_vanished_closure, NULL, 2, params, NULL);
+  g_closure_invoke (data->name_vanished_closure, NULL, 2, params, NULL);
 
-  xvalue_unset (params + 0);
-  xvalue_unset (params + 1);
+  g_value_unset (params + 0);
+  g_value_unset (params + 1);
 }
 
 static void
-bus_watch_name_free_func (xpointer_t user_data)
+bus_watch_name_free_func (gpointer user_data)
 {
   WatchNameData *data = user_data;
 
   if (data->name_appeared_closure != NULL)
-    xclosure_unref (data->name_appeared_closure);
+    g_closure_unref (data->name_appeared_closure);
 
   if (data->name_vanished_closure != NULL)
-    xclosure_unref (data->name_vanished_closure);
+    g_closure_unref (data->name_vanished_closure);
 
   g_free (data);
 }
@@ -813,9 +813,9 @@ bus_watch_name_free_func (xpointer_t user_data)
  * @bus_type: The type of bus to watch a name on.
  * @name: The name (well-known or unique) to watch.
  * @flags: Flags from the #GBusNameWatcherFlags enumeration.
- * @name_appeared_closure: (nullable): #xclosure_t to invoke when @name is known
+ * @name_appeared_closure: (nullable): #GClosure to invoke when @name is known
  * to exist or %NULL.
- * @name_vanished_closure: (nullable): #xclosure_t to invoke when @name is known
+ * @name_vanished_closure: (nullable): #GClosure to invoke when @name is known
  * to not exist or %NULL.
  *
  * Version of g_bus_watch_name() using closures instead of callbacks for
@@ -826,12 +826,12 @@ bus_watch_name_free_func (xpointer_t user_data)
  *
  * Since: 2.26
  */
-xuint_t
-g_bus_watch_name_with_closures (xbus_type_t                 bus_type,
-                                const xchar_t             *name,
+guint
+g_bus_watch_name_with_closures (GBusType                 bus_type,
+                                const gchar             *name,
                                 GBusNameWatcherFlags     flags,
-                                xclosure_t                *name_appeared_closure,
-                                xclosure_t                *name_vanished_closure)
+                                GClosure                *name_appeared_closure,
+                                GClosure                *name_vanished_closure)
 {
   return g_bus_watch_name (bus_type,
           name,
@@ -844,12 +844,12 @@ g_bus_watch_name_with_closures (xbus_type_t                 bus_type,
 
 /**
  * g_bus_watch_name_on_connection_with_closures: (rename-to g_bus_watch_name_on_connection)
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @name: The name (well-known or unique) to watch.
  * @flags: Flags from the #GBusNameWatcherFlags enumeration.
- * @name_appeared_closure: (nullable): #xclosure_t to invoke when @name is known
+ * @name_appeared_closure: (nullable): #GClosure to invoke when @name is known
  * to exist or %NULL.
- * @name_vanished_closure: (nullable): #xclosure_t to invoke when @name is known
+ * @name_vanished_closure: (nullable): #GClosure to invoke when @name is known
  * to not exist or %NULL.
  *
  * Version of g_bus_watch_name_on_connection() using closures instead of callbacks for
@@ -860,12 +860,12 @@ g_bus_watch_name_with_closures (xbus_type_t                 bus_type,
  *
  * Since: 2.26
  */
-xuint_t g_bus_watch_name_on_connection_with_closures (
-                                      xdbus_connection_t          *connection,
-                                      const xchar_t              *name,
+guint g_bus_watch_name_on_connection_with_closures (
+                                      GDBusConnection          *connection,
+                                      const gchar              *name,
                                       GBusNameWatcherFlags      flags,
-                                      xclosure_t                 *name_appeared_closure,
-                                      xclosure_t                 *name_vanished_closure)
+                                      GClosure                 *name_appeared_closure,
+                                      GClosure                 *name_vanished_closure)
 {
   return g_bus_watch_name_on_connection (connection,
           name,
@@ -883,16 +883,16 @@ xuint_t g_bus_watch_name_on_connection_with_closures (
  * Stops watching a name.
  *
  * Note that there may still be D-Bus traffic to process (relating to watching
- * and unwatching the name) in the current thread-default #xmain_context_t after
- * this function has returned. You should continue to iterate the #xmain_context_t
- * until the #xdestroy_notify_t function passed to g_bus_watch_name() is called, in
- * order to avoid memory leaks through callbacks queued on the #xmain_context_t
+ * and unwatching the name) in the current thread-default #GMainContext after
+ * this function has returned. You should continue to iterate the #GMainContext
+ * until the #GDestroyNotify function passed to g_bus_watch_name() is called, in
+ * order to avoid memory leaks through callbacks queued on the #GMainContext
  * after it’s stopped being iterated.
  *
  * Since: 2.26
  */
 void
-g_bus_unwatch_name (xuint_t watcher_id)
+g_bus_unwatch_name (guint watcher_id)
 {
   Client *client;
 
@@ -903,14 +903,14 @@ g_bus_unwatch_name (xuint_t watcher_id)
   G_LOCK (lock);
   if (watcher_id == 0 ||
       map_id_to_client == NULL ||
-      (client = xhash_table_lookup (map_id_to_client, GUINT_TO_POINTER (watcher_id))) == NULL)
+      (client = g_hash_table_lookup (map_id_to_client, GUINT_TO_POINTER (watcher_id))) == NULL)
     {
       g_warning ("Invalid id %d passed to g_bus_unwatch_name()", watcher_id);
       goto out;
     }
 
   client->cancelled = TRUE;
-  g_warn_if_fail (xhash_table_remove (map_id_to_client, GUINT_TO_POINTER (watcher_id)));
+  g_warn_if_fail (g_hash_table_remove (map_id_to_client, GUINT_TO_POINTER (watcher_id)));
 
  out:
   G_UNLOCK (lock);

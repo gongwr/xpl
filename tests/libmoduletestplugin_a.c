@@ -19,7 +19,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #undef G_DISABLE_ASSERT
@@ -34,7 +34,7 @@ G_MODULE_EXPORT void g_clash_func (void);
 G_MODULE_EXPORT void gplugin_say_boo_func (void);
 G_MODULE_EXPORT void gplugin_a_module_func (GModule *module);
 
-G_MODULE_EXPORT xchar_t* gplugin_a_state;
+G_MODULE_EXPORT gchar* gplugin_a_state;
 
 G_MODULE_EXPORT void
 gplugin_a_func (void)

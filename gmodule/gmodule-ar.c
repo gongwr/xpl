@@ -1,4 +1,4 @@
-/* GMODULE - XPL wrapper code for dynamic module loading
+/* GMODULE - GLIB wrapper code for dynamic module loading
  * Copyright (C) 1998, 2000 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -15,7 +15,7 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/* 
  * MT safe
  */
 
@@ -31,10 +31,10 @@
 #include <dlfcn.h>
 
 /* --- functions --- */
-static xchar_t*
-fetch_dlerror (xboolean_t replace_null)
+static gchar*
+fetch_dlerror (gboolean replace_null)
 {
-  xchar_t *msg = dlerror ();
+  gchar *msg = dlerror ();
 
   /* make sure we always return an error message != NULL, if
    * expected to do so. */
@@ -45,9 +45,9 @@ fetch_dlerror (xboolean_t replace_null)
   return msg;
 }
 
-static xchar_t* _g_module_get_member(const xchar_t* file_name)
+static gchar* _g_module_get_member(const gchar* file_name)
 {
-  xchar_t* member = NULL;
+  gchar* member = NULL;
   struct fl_hdr file_header;
   struct ar_hdr ar_header;
   long first_member;
@@ -97,86 +97,86 @@ exit:
   return member;
 }
 
-static xpointer_t
-_g_module_open (const xchar_t *file_name,
-		xboolean_t     bind_lazy,
-		xboolean_t     bind_local,
-                xerror_t     **error)
+static gpointer
+_g_module_open (const gchar *file_name,
+		gboolean     bind_lazy,
+		gboolean     bind_local,
+                GError     **error)
 {
-  xpointer_t handle;
-  xchar_t* member;
-  xchar_t* full_name;
+  gpointer handle;
+  gchar* member;
+  gchar* full_name;
 
   /* extract name of first member of archive */
 
   member = _g_module_get_member (file_name);
   if (member != NULL)
     {
-      full_name = xstrconcat (file_name, "(", member, ")", NULL);
+      full_name = g_strconcat (file_name, "(", member, ")", NULL);
       g_free (member);
     }
   else
-    full_name = xstrdup (file_name);
-
-  handle = dlopen (full_name,
+    full_name = g_strdup (file_name);
+  
+  handle = dlopen (full_name, 
 		   (bind_local ? RTLD_LOCAL : RTLD_GLOBAL) | RTLD_MEMBER | (bind_lazy ? RTLD_LAZY : RTLD_NOW));
 
   g_free (full_name);
 
   if (!handle)
     {
-      const xchar_t *message = fetch_dlerror (TRUE);
+      const gchar *message = fetch_dlerror (TRUE);
 
       g_module_set_error (message);
       g_set_error_literal (error, G_MODULE_ERROR, G_MODULE_ERROR_FAILED, message);
     }
-
+  
   return handle;
 }
 
-static xpointer_t
+static gpointer
 _g_module_self (void)
 {
-  xpointer_t handle;
+  gpointer handle;
 
   handle = dlopen (NULL, RTLD_GLOBAL | RTLD_LAZY);
   if (!handle)
     g_module_set_error (fetch_dlerror (TRUE));
-
+  
   return handle;
 }
 
 static void
-_g_module_close (xpointer_t handle)
+_g_module_close (gpointer handle)
 {
   if (dlclose (handle) != 0)
     g_module_set_error (fetch_dlerror (TRUE));
 }
 
-static xpointer_t
-_g_module_symbol (xpointer_t     handle,
-		  const xchar_t *symbol_name)
+static gpointer
+_g_module_symbol (gpointer     handle,
+		  const gchar *symbol_name)
 {
-  xpointer_t p;
-
+  gpointer p;
+  
   p = dlsym (handle, symbol_name);
   if (!p)
     g_module_set_error (fetch_dlerror (FALSE));
-
+  
   return p;
 }
 
-static xchar_t*
-_g_module_build_path (const xchar_t *directory,
-		      const xchar_t *module_name)
+static gchar*
+_g_module_build_path (const gchar *directory,
+		      const gchar *module_name)
 {
   if (directory && *directory) {
     if (strncmp (module_name, "lib", 3) == 0)
-      return xstrconcat (directory, "/", module_name, NULL);
+      return g_strconcat (directory, "/", module_name, NULL);
     else
-      return xstrconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
+      return g_strconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
   } else if (strncmp (module_name, "lib", 3) == 0)
-    return xstrdup (module_name);
+    return g_strdup (module_name);
   else
-    return xstrconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
+    return g_strconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
 }

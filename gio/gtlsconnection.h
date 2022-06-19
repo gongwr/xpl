@@ -27,18 +27,18 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_CONNECTION            (xtls_connection_get_type ())
-#define G_TLS_CONNECTION(inst)           (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_CONNECTION, xtls_connection))
-#define G_TLS_CONNECTION_CLASS(class)    (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_TLS_CONNECTION, GTlsConnectionClass))
-#define X_IS_TLS_CONNECTION(inst)        (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TLS_CONNECTION))
-#define X_IS_TLS_CONNECTION_CLASS(class) (XTYPE_CHECK_CLASS_TYPE ((class), XTYPE_TLS_CONNECTION))
-#define G_TLS_CONNECTION_GET_CLASS(inst) (XTYPE_INSTANCE_GET_CLASS ((inst), XTYPE_TLS_CONNECTION, GTlsConnectionClass))
+#define G_TYPE_TLS_CONNECTION            (g_tls_connection_get_type ())
+#define G_TLS_CONNECTION(inst)           (G_TYPE_CHECK_INSTANCE_CAST ((inst), G_TYPE_TLS_CONNECTION, GTlsConnection))
+#define G_TLS_CONNECTION_CLASS(class)    (G_TYPE_CHECK_CLASS_CAST ((class), G_TYPE_TLS_CONNECTION, GTlsConnectionClass))
+#define G_IS_TLS_CONNECTION(inst)        (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_TLS_CONNECTION))
+#define G_IS_TLS_CONNECTION_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), G_TYPE_TLS_CONNECTION))
+#define G_TLS_CONNECTION_GET_CLASS(inst) (G_TYPE_INSTANCE_GET_CLASS ((inst), G_TYPE_TLS_CONNECTION, GTlsConnectionClass))
 
 typedef struct _GTlsConnectionClass   GTlsConnectionClass;
 typedef struct _GTlsConnectionPrivate GTlsConnectionPrivate;
 
 struct _GTlsConnection {
-  xio_stream_t parent_instance;
+  GIOStream parent_instance;
 
   GTlsConnectionPrivate *priv;
 };
@@ -53,159 +53,159 @@ struct _GTlsConnection {
  * @get_binding_data: Retrieve TLS channel binding data (Since: 2.66)
  * @get_negotiated_protocol: Get ALPN-negotiated protocol (Since: 2.70)
  *
- * The class structure for the #xtls_connection_t type.
+ * The class structure for the #GTlsConnection type.
  *
  * Since: 2.28
  */
 struct _GTlsConnectionClass
 {
-  xio_stream_class_t parent_class;
+  GIOStreamClass parent_class;
 
   /* signals */
-  xboolean_t          ( *accept_certificate) (xtls_connection_t       *connection,
-					    xtls_certificate_t      *peer_cert,
-					    xtls_certificate_flags_t  errors);
+  gboolean          ( *accept_certificate) (GTlsConnection       *connection,
+					    GTlsCertificate      *peer_cert,
+					    GTlsCertificateFlags  errors);
 
   /* methods */
-  xboolean_t ( *handshake )        (xtls_connection_t       *conn,
-				  xcancellable_t         *cancellable,
-				  xerror_t              **error);
+  gboolean ( *handshake )        (GTlsConnection       *conn,
+				  GCancellable         *cancellable,
+				  GError              **error);
 
-  void     ( *handshake_async )  (xtls_connection_t       *conn,
+  void     ( *handshake_async )  (GTlsConnection       *conn,
 				  int                   io_priority,
-				  xcancellable_t         *cancellable,
-				  xasync_ready_callback_t   callback,
-				  xpointer_t              user_data);
-  xboolean_t ( *handshake_finish ) (xtls_connection_t       *conn,
-				  xasync_result_t         *result,
-				  xerror_t              **error);
+				  GCancellable         *cancellable,
+				  GAsyncReadyCallback   callback,
+				  gpointer              user_data);
+  gboolean ( *handshake_finish ) (GTlsConnection       *conn,
+				  GAsyncResult         *result,
+				  GError              **error);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  xboolean_t ( *get_binding_data)  (xtls_connection_t          *conn,
+  gboolean ( *get_binding_data)  (GTlsConnection          *conn,
                                   GTlsChannelBindingType   type,
-                                  xbyte_array_t              *data,
-                                  xerror_t                 **error);
+                                  GByteArray              *data,
+                                  GError                 **error);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-  const xchar_t *(*get_negotiated_protocol) (xtls_connection_t *conn);
+  const gchar *(*get_negotiated_protocol) (GTlsConnection *conn);
 
   /*< private >*/
   /* Padding for future expansion */
-  xpointer_t padding[6];
+  gpointer padding[6];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xtls_connection_get_type                    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_tls_connection_get_type                    (void) G_GNUC_CONST;
 
-XPL_DEPRECATED
-void                  xtls_connection_set_use_system_certdb       (xtls_connection_t       *conn,
-                                                                    xboolean_t              use_system_certdb);
-XPL_DEPRECATED
-xboolean_t              xtls_connection_get_use_system_certdb       (xtls_connection_t       *conn);
+GLIB_DEPRECATED
+void                  g_tls_connection_set_use_system_certdb       (GTlsConnection       *conn,
+                                                                    gboolean              use_system_certdb);
+GLIB_DEPRECATED
+gboolean              g_tls_connection_get_use_system_certdb       (GTlsConnection       *conn);
 
-XPL_AVAILABLE_IN_ALL
-void                  xtls_connection_set_database                (xtls_connection_t       *conn,
-								    xtls_database_t         *database);
-XPL_AVAILABLE_IN_ALL
-xtls_database_t *        xtls_connection_get_database                (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_ALL
+void                  g_tls_connection_set_database                (GTlsConnection       *conn,
+								    GTlsDatabase         *database);
+GLIB_AVAILABLE_IN_ALL
+GTlsDatabase *        g_tls_connection_get_database                (GTlsConnection       *conn);
 
-XPL_AVAILABLE_IN_ALL
-void                  xtls_connection_set_certificate             (xtls_connection_t       *conn,
-                                                                    xtls_certificate_t      *certificate);
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t      *xtls_connection_get_certificate             (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_ALL
+void                  g_tls_connection_set_certificate             (GTlsConnection       *conn,
+                                                                    GTlsCertificate      *certificate);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate      *g_tls_connection_get_certificate             (GTlsConnection       *conn);
 
-XPL_AVAILABLE_IN_ALL
-void                  xtls_connection_set_interaction             (xtls_connection_t       *conn,
-                                                                    xtls_interaction_t      *interaction);
-XPL_AVAILABLE_IN_ALL
-xtls_interaction_t *     xtls_connection_get_interaction             (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_ALL
+void                  g_tls_connection_set_interaction             (GTlsConnection       *conn,
+                                                                    GTlsInteraction      *interaction);
+GLIB_AVAILABLE_IN_ALL
+GTlsInteraction *     g_tls_connection_get_interaction             (GTlsConnection       *conn);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t      *xtls_connection_get_peer_certificate        (xtls_connection_t       *conn);
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_flags_t  xtls_connection_get_peer_certificate_errors (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate      *g_tls_connection_get_peer_certificate        (GTlsConnection       *conn);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificateFlags  g_tls_connection_get_peer_certificate_errors (GTlsConnection       *conn);
 
-XPL_AVAILABLE_IN_ALL
-void                  xtls_connection_set_require_close_notify    (xtls_connection_t       *conn,
-								    xboolean_t              require_close_notify);
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xtls_connection_get_require_close_notify    (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_ALL
+void                  g_tls_connection_set_require_close_notify    (GTlsConnection       *conn,
+								    gboolean              require_close_notify);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_tls_connection_get_require_close_notify    (GTlsConnection       *conn);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_DEPRECATED_IN_2_60
-void                  xtls_connection_set_rehandshake_mode        (xtls_connection_t       *conn,
+GLIB_DEPRECATED_IN_2_60
+void                  g_tls_connection_set_rehandshake_mode        (GTlsConnection       *conn,
 								    GTlsRehandshakeMode   mode);
-XPL_DEPRECATED_IN_2_60
-GTlsRehandshakeMode   xtls_connection_get_rehandshake_mode        (xtls_connection_t       *conn);
+GLIB_DEPRECATED_IN_2_60
+GTlsRehandshakeMode   g_tls_connection_get_rehandshake_mode        (GTlsConnection       *conn);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-XPL_AVAILABLE_IN_2_60
-void                  xtls_connection_set_advertised_protocols    (xtls_connection_t       *conn,
-                                                                    const xchar_t * const  *protocols);
+GLIB_AVAILABLE_IN_2_60
+void                  g_tls_connection_set_advertised_protocols    (GTlsConnection       *conn,
+                                                                    const gchar * const  *protocols);
 
-XPL_AVAILABLE_IN_2_60
-const xchar_t *         xtls_connection_get_negotiated_protocol     (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_2_60
+const gchar *         g_tls_connection_get_negotiated_protocol     (GTlsConnection       *conn);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_IN_2_66
-xboolean_t              xtls_connection_get_channel_binding_data    (xtls_connection_t          *conn,
+GLIB_AVAILABLE_IN_2_66
+gboolean              g_tls_connection_get_channel_binding_data    (GTlsConnection          *conn,
                                                                     GTlsChannelBindingType   type,
-                                                                    xbyte_array_t              *data,
-                                                                    xerror_t                 **error);
+                                                                    GByteArray              *data,
+                                                                    GError                 **error);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xtls_connection_handshake                   (xtls_connection_t       *conn,
-								    xcancellable_t         *cancellable,
-								    xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_tls_connection_handshake                   (GTlsConnection       *conn,
+								    GCancellable         *cancellable,
+								    GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-void                  xtls_connection_handshake_async             (xtls_connection_t       *conn,
+GLIB_AVAILABLE_IN_ALL
+void                  g_tls_connection_handshake_async             (GTlsConnection       *conn,
 								    int                   io_priority,
-								    xcancellable_t         *cancellable,
-								    xasync_ready_callback_t   callback,
-								    xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xtls_connection_handshake_finish            (xtls_connection_t       *conn,
-								    xasync_result_t         *result,
-								    xerror_t              **error);
+								    GCancellable         *cancellable,
+								    GAsyncReadyCallback   callback,
+								    gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_tls_connection_handshake_finish            (GTlsConnection       *conn,
+								    GAsyncResult         *result,
+								    GError              **error);
 
-XPL_AVAILABLE_IN_2_70
-GTlsProtocolVersion   xtls_connection_get_protocol_version        (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_2_70
+GTlsProtocolVersion   g_tls_connection_get_protocol_version        (GTlsConnection       *conn);
 
-XPL_AVAILABLE_IN_2_70
-xchar_t *               xtls_connection_get_ciphersuite_name        (xtls_connection_t       *conn);
+GLIB_AVAILABLE_IN_2_70
+gchar *               g_tls_connection_get_ciphersuite_name        (GTlsConnection       *conn);
 
 /**
  * G_TLS_ERROR:
  *
  * Error domain for TLS. Errors in this domain will be from the
- * #GTlsError enumeration. See #xerror_t for more information on error
+ * #GTlsError enumeration. See #GError for more information on error
  * domains.
  */
-#define G_TLS_ERROR (xtls_error_quark ())
-XPL_AVAILABLE_IN_ALL
-xquark xtls_error_quark (void);
+#define G_TLS_ERROR (g_tls_error_quark ())
+GLIB_AVAILABLE_IN_ALL
+GQuark g_tls_error_quark (void);
 
 /**
  * G_TLS_CHANNEL_BINDING_ERROR:
  *
  * Error domain for TLS channel binding. Errors in this domain will be from the
- * #GTlsChannelBindingError enumeration. See #xerror_t for more information on error
+ * #GTlsChannelBindingError enumeration. See #GError for more information on error
  * domains.
  *
  * Since: 2.66
  */
-#define G_TLS_CHANNEL_BINDING_ERROR (xtls_channel_bindinxerror_quark ())
-XPL_AVAILABLE_IN_2_66
-xquark xtls_channel_bindinxerror_quark (void);
+#define G_TLS_CHANNEL_BINDING_ERROR (g_tls_channel_binding_error_quark ())
+GLIB_AVAILABLE_IN_2_66
+GQuark g_tls_channel_binding_error_quark (void);
 
 /*< protected >*/
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xtls_connection_emit_accept_certificate     (xtls_connection_t       *conn,
-								    xtls_certificate_t      *peer_cert,
-								    xtls_certificate_flags_t  errors);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_tls_connection_emit_accept_certificate     (GTlsConnection       *conn,
+								    GTlsCertificate      *peer_cert,
+								    GTlsCertificateFlags  errors);
 
 G_END_DECLS
 

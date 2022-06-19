@@ -20,7 +20,7 @@
 
 <refnamediv>
   <refname>gresource</refname>
-  <refpurpose>xresource_t tool</refpurpose>
+  <refpurpose>GResource tool</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
@@ -59,7 +59,7 @@
 
 <refsect1><title>Description</title>
 <para><command>gresource</command> offers a simple commandline
-interface to <link linkend="xresource_t"><type>xresource_t</type></link>.
+interface to <link linkend="GResource"><type>GResource</type></link>.
 It lets you list and extract resources that have been compiled
 into a resource file or included in an elf file (a binary or a
 shared library).

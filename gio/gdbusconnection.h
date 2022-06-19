@@ -29,310 +29,310 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_CONNECTION         (xdbus_connection_get_type ())
-#define G_DBUS_CONNECTION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_CONNECTION, xdbus_connection))
-#define X_IS_DBUS_CONNECTION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_CONNECTION))
+#define G_TYPE_DBUS_CONNECTION         (g_dbus_connection_get_type ())
+#define G_DBUS_CONNECTION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_CONNECTION, GDBusConnection))
+#define G_IS_DBUS_CONNECTION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_CONNECTION))
 
-XPL_AVAILABLE_IN_ALL
-xtype_t            xdbus_connection_get_type                   (void) G_GNUC_CONST;
-
-/* ---------------------------------------------------------------------------------------------------- */
-
-XPL_AVAILABLE_IN_ALL
-void              g_bus_get                    (xbus_type_t             bus_type,
-                                                xcancellable_t        *cancellable,
-                                                xasync_ready_callback_t  callback,
-                                                xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t  *g_bus_get_finish             (xasync_result_t        *res,
-                                                xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t  *g_bus_get_sync               (xbus_type_t            bus_type,
-                                                xcancellable_t       *cancellable,
-                                                xerror_t            **error);
+GLIB_AVAILABLE_IN_ALL
+GType            g_dbus_connection_get_type                   (void) G_GNUC_CONST;
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_new                        (xio_stream_t              *stream,
-                                                               const xchar_t            *guid,
+GLIB_AVAILABLE_IN_ALL
+void              g_bus_get                    (GBusType             bus_type,
+                                                GCancellable        *cancellable,
+                                                GAsyncReadyCallback  callback,
+                                                gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection  *g_bus_get_finish             (GAsyncResult        *res,
+                                                GError             **error);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection  *g_bus_get_sync               (GBusType            bus_type,
+                                                GCancellable       *cancellable,
+                                                GError            **error);
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_new                        (GIOStream              *stream,
+                                                               const gchar            *guid,
                                                                GDBusConnectionFlags    flags,
-                                                               xdbus_auth_observer_t      *observer,
-                                                               xcancellable_t           *cancellable,
-                                                               xasync_ready_callback_t     callback,
-                                                               xpointer_t                user_data);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t *xdbus_connection_new_finish                 (xasync_result_t           *res,
-                                                               xerror_t                **error);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t *xdbus_connection_new_sync                   (xio_stream_t              *stream,
-                                                               const xchar_t            *guid,
+                                                               GDBusAuthObserver      *observer,
+                                                               GCancellable           *cancellable,
+                                                               GAsyncReadyCallback     callback,
+                                                               gpointer                user_data);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection *g_dbus_connection_new_finish                 (GAsyncResult           *res,
+                                                               GError                **error);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection *g_dbus_connection_new_sync                   (GIOStream              *stream,
+                                                               const gchar            *guid,
                                                                GDBusConnectionFlags    flags,
-                                                               xdbus_auth_observer_t      *observer,
-                                                               xcancellable_t           *cancellable,
-                                                               xerror_t                **error);
+                                                               GDBusAuthObserver      *observer,
+                                                               GCancellable           *cancellable,
+                                                               GError                **error);
 
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_new_for_address            (const xchar_t            *address,
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_new_for_address            (const gchar            *address,
                                                                GDBusConnectionFlags    flags,
-                                                               xdbus_auth_observer_t      *observer,
-                                                               xcancellable_t           *cancellable,
-                                                               xasync_ready_callback_t     callback,
-                                                               xpointer_t                user_data);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t *xdbus_connection_new_for_address_finish     (xasync_result_t           *res,
-                                                               xerror_t                **error);
-XPL_AVAILABLE_IN_ALL
-xdbus_connection_t *xdbus_connection_new_for_address_sync       (const xchar_t            *address,
+                                                               GDBusAuthObserver      *observer,
+                                                               GCancellable           *cancellable,
+                                                               GAsyncReadyCallback     callback,
+                                                               gpointer                user_data);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection *g_dbus_connection_new_for_address_finish     (GAsyncResult           *res,
+                                                               GError                **error);
+GLIB_AVAILABLE_IN_ALL
+GDBusConnection *g_dbus_connection_new_for_address_sync       (const gchar            *address,
                                                                GDBusConnectionFlags    flags,
-                                                               xdbus_auth_observer_t      *observer,
-                                                               xcancellable_t           *cancellable,
-                                                               xerror_t                **error);
+                                                               GDBusAuthObserver      *observer,
+                                                               GCancellable           *cancellable,
+                                                               GError                **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_start_message_processing   (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_is_closed                  (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_ALL
-xio_stream_t       *xdbus_connection_get_stream                 (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_ALL
-const xchar_t     *xdbus_connection_get_guid                   (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_ALL
-const xchar_t     *xdbus_connection_get_unique_name            (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_ALL
-xcredentials_t    *xdbus_connection_get_peer_credentials       (xdbus_connection_t    *connection);
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_start_message_processing   (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_is_closed                  (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_ALL
+GIOStream       *g_dbus_connection_get_stream                 (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_ALL
+const gchar     *g_dbus_connection_get_guid                   (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_ALL
+const gchar     *g_dbus_connection_get_unique_name            (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_ALL
+GCredentials    *g_dbus_connection_get_peer_credentials       (GDBusConnection    *connection);
 
-XPL_AVAILABLE_IN_2_34
-xuint32_t          xdbus_connection_get_last_serial            (xdbus_connection_t    *connection);
+GLIB_AVAILABLE_IN_2_34
+guint32          g_dbus_connection_get_last_serial            (GDBusConnection    *connection);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_get_exit_on_close          (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_set_exit_on_close          (xdbus_connection_t    *connection,
-                                                               xboolean_t            exit_on_close);
-XPL_AVAILABLE_IN_ALL
-xdbus_capability_flags_t  xdbus_connection_get_capabilities      (xdbus_connection_t    *connection);
-XPL_AVAILABLE_IN_2_60
-GDBusConnectionFlags  xdbus_connection_get_flags             (xdbus_connection_t    *connection);
-
-/* ---------------------------------------------------------------------------------------------------- */
-
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_close                          (xdbus_connection_t     *connection,
-                                                                   xcancellable_t        *cancellable,
-                                                                   xasync_ready_callback_t  callback,
-                                                                   xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_close_finish                   (xdbus_connection_t     *connection,
-                                                                   xasync_result_t        *res,
-                                                                   xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_close_sync                     (xdbus_connection_t     *connection,
-                                                                   xcancellable_t        *cancellable,
-                                                                   xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_get_exit_on_close          (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_set_exit_on_close          (GDBusConnection    *connection,
+                                                               gboolean            exit_on_close);
+GLIB_AVAILABLE_IN_ALL
+GDBusCapabilityFlags  g_dbus_connection_get_capabilities      (GDBusConnection    *connection);
+GLIB_AVAILABLE_IN_2_60
+GDBusConnectionFlags  g_dbus_connection_get_flags             (GDBusConnection    *connection);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_flush                          (xdbus_connection_t     *connection,
-                                                                   xcancellable_t        *cancellable,
-                                                                   xasync_ready_callback_t  callback,
-                                                                   xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_flush_finish                   (xdbus_connection_t     *connection,
-                                                                   xasync_result_t        *res,
-                                                                   xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_flush_sync                     (xdbus_connection_t     *connection,
-                                                                   xcancellable_t        *cancellable,
-                                                                   xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_close                          (GDBusConnection     *connection,
+                                                                   GCancellable        *cancellable,
+                                                                   GAsyncReadyCallback  callback,
+                                                                   gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_close_finish                   (GDBusConnection     *connection,
+                                                                   GAsyncResult        *res,
+                                                                   GError             **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_close_sync                     (GDBusConnection     *connection,
+                                                                   GCancellable        *cancellable,
+                                                                   GError             **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_send_message                   (xdbus_connection_t     *connection,
-                                                                   xdbus_message_t        *message,
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_flush                          (GDBusConnection     *connection,
+                                                                   GCancellable        *cancellable,
+                                                                   GAsyncReadyCallback  callback,
+                                                                   gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_flush_finish                   (GDBusConnection     *connection,
+                                                                   GAsyncResult        *res,
+                                                                   GError             **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_flush_sync                     (GDBusConnection     *connection,
+                                                                   GCancellable        *cancellable,
+                                                                   GError             **error);
+
+/* ---------------------------------------------------------------------------------------------------- */
+
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_send_message                   (GDBusConnection     *connection,
+                                                                   GDBusMessage        *message,
                                                                    GDBusSendMessageFlags flags,
-                                                                   volatile xuint32_t    *out_serial,
-                                                                   xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_send_message_with_reply        (xdbus_connection_t     *connection,
-                                                                   xdbus_message_t        *message,
+                                                                   volatile guint32    *out_serial,
+                                                                   GError             **error);
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_send_message_with_reply        (GDBusConnection     *connection,
+                                                                   GDBusMessage        *message,
                                                                    GDBusSendMessageFlags flags,
-                                                                   xint_t                 timeout_msec,
-                                                                   volatile xuint32_t    *out_serial,
-                                                                   xcancellable_t        *cancellable,
-                                                                   xasync_ready_callback_t  callback,
-                                                                   xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xdbus_message_t    *xdbus_connection_send_message_with_reply_finish (xdbus_connection_t     *connection,
-                                                                   xasync_result_t        *res,
-                                                                   xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xdbus_message_t    *xdbus_connection_send_message_with_reply_sync   (xdbus_connection_t     *connection,
-                                                                   xdbus_message_t        *message,
+                                                                   gint                 timeout_msec,
+                                                                   volatile guint32    *out_serial,
+                                                                   GCancellable        *cancellable,
+                                                                   GAsyncReadyCallback  callback,
+                                                                   gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+GDBusMessage    *g_dbus_connection_send_message_with_reply_finish (GDBusConnection     *connection,
+                                                                   GAsyncResult        *res,
+                                                                   GError             **error);
+GLIB_AVAILABLE_IN_ALL
+GDBusMessage    *g_dbus_connection_send_message_with_reply_sync   (GDBusConnection     *connection,
+                                                                   GDBusMessage        *message,
                                                                    GDBusSendMessageFlags flags,
-                                                                   xint_t                 timeout_msec,
-                                                                   volatile xuint32_t    *out_serial,
-                                                                   xcancellable_t        *cancellable,
-                                                                   xerror_t             **error);
+                                                                   gint                 timeout_msec,
+                                                                   volatile guint32    *out_serial,
+                                                                   GCancellable        *cancellable,
+                                                                   GError             **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t  xdbus_connection_emit_signal                       (xdbus_connection_t    *connection,
-                                                               const xchar_t        *destination_bus_name,
-                                                               const xchar_t        *object_path,
-                                                               const xchar_t        *interface_name,
-                                                               const xchar_t        *signal_name,
-                                                               xvariant_t           *parameters,
-                                                               xerror_t            **error);
-XPL_AVAILABLE_IN_ALL
-void      xdbus_connection_call                              (xdbus_connection_t    *connection,
-                                                               const xchar_t        *bus_name,
-                                                               const xchar_t        *object_path,
-                                                               const xchar_t        *interface_name,
-                                                               const xchar_t        *method_name,
-                                                               xvariant_t           *parameters,
-                                                               const xvariant_type_t *reply_type,
+GLIB_AVAILABLE_IN_ALL
+gboolean  g_dbus_connection_emit_signal                       (GDBusConnection    *connection,
+                                                               const gchar        *destination_bus_name,
+                                                               const gchar        *object_path,
+                                                               const gchar        *interface_name,
+                                                               const gchar        *signal_name,
+                                                               GVariant           *parameters,
+                                                               GError            **error);
+GLIB_AVAILABLE_IN_ALL
+void      g_dbus_connection_call                              (GDBusConnection    *connection,
+                                                               const gchar        *bus_name,
+                                                               const gchar        *object_path,
+                                                               const gchar        *interface_name,
+                                                               const gchar        *method_name,
+                                                               GVariant           *parameters,
+                                                               const GVariantType *reply_type,
                                                                GDBusCallFlags      flags,
-                                                               xint_t                timeout_msec,
-                                                               xcancellable_t       *cancellable,
-                                                               xasync_ready_callback_t callback,
-                                                               xpointer_t            user_data);
-XPL_AVAILABLE_IN_ALL
-xvariant_t *xdbus_connection_call_finish                       (xdbus_connection_t    *connection,
-                                                               xasync_result_t       *res,
-                                                               xerror_t            **error);
-XPL_AVAILABLE_IN_ALL
-xvariant_t *xdbus_connection_call_sync                         (xdbus_connection_t    *connection,
-                                                               const xchar_t        *bus_name,
-                                                               const xchar_t        *object_path,
-                                                               const xchar_t        *interface_name,
-                                                               const xchar_t        *method_name,
-                                                               xvariant_t           *parameters,
-                                                               const xvariant_type_t *reply_type,
+                                                               gint                timeout_msec,
+                                                               GCancellable       *cancellable,
+                                                               GAsyncReadyCallback callback,
+                                                               gpointer            user_data);
+GLIB_AVAILABLE_IN_ALL
+GVariant *g_dbus_connection_call_finish                       (GDBusConnection    *connection,
+                                                               GAsyncResult       *res,
+                                                               GError            **error);
+GLIB_AVAILABLE_IN_ALL
+GVariant *g_dbus_connection_call_sync                         (GDBusConnection    *connection,
+                                                               const gchar        *bus_name,
+                                                               const gchar        *object_path,
+                                                               const gchar        *interface_name,
+                                                               const gchar        *method_name,
+                                                               GVariant           *parameters,
+                                                               const GVariantType *reply_type,
                                                                GDBusCallFlags      flags,
-                                                               xint_t                timeout_msec,
-                                                               xcancellable_t       *cancellable,
-                                                               xerror_t            **error);
-XPL_AVAILABLE_IN_2_30
-void      xdbus_connection_call_with_unix_fd_list            (xdbus_connection_t    *connection,
-                                                               const xchar_t        *bus_name,
-                                                               const xchar_t        *object_path,
-                                                               const xchar_t        *interface_name,
-                                                               const xchar_t        *method_name,
-                                                               xvariant_t           *parameters,
-                                                               const xvariant_type_t *reply_type,
+                                                               gint                timeout_msec,
+                                                               GCancellable       *cancellable,
+                                                               GError            **error);
+GLIB_AVAILABLE_IN_2_30
+void      g_dbus_connection_call_with_unix_fd_list            (GDBusConnection    *connection,
+                                                               const gchar        *bus_name,
+                                                               const gchar        *object_path,
+                                                               const gchar        *interface_name,
+                                                               const gchar        *method_name,
+                                                               GVariant           *parameters,
+                                                               const GVariantType *reply_type,
                                                                GDBusCallFlags      flags,
-                                                               xint_t                timeout_msec,
-                                                               xunix_fd_list_t        *fd_list,
-                                                               xcancellable_t       *cancellable,
-                                                               xasync_ready_callback_t callback,
-                                                               xpointer_t            user_data);
-XPL_AVAILABLE_IN_2_30
-xvariant_t *xdbus_connection_call_with_unix_fd_list_finish     (xdbus_connection_t    *connection,
-                                                               xunix_fd_list_t       **out_fd_list,
-                                                               xasync_result_t       *res,
-                                                               xerror_t            **error);
-XPL_AVAILABLE_IN_2_30
-xvariant_t *xdbus_connection_call_with_unix_fd_list_sync       (xdbus_connection_t    *connection,
-                                                               const xchar_t        *bus_name,
-                                                               const xchar_t        *object_path,
-                                                               const xchar_t        *interface_name,
-                                                               const xchar_t        *method_name,
-                                                               xvariant_t           *parameters,
-                                                               const xvariant_type_t *reply_type,
+                                                               gint                timeout_msec,
+                                                               GUnixFDList        *fd_list,
+                                                               GCancellable       *cancellable,
+                                                               GAsyncReadyCallback callback,
+                                                               gpointer            user_data);
+GLIB_AVAILABLE_IN_2_30
+GVariant *g_dbus_connection_call_with_unix_fd_list_finish     (GDBusConnection    *connection,
+                                                               GUnixFDList       **out_fd_list,
+                                                               GAsyncResult       *res,
+                                                               GError            **error);
+GLIB_AVAILABLE_IN_2_30
+GVariant *g_dbus_connection_call_with_unix_fd_list_sync       (GDBusConnection    *connection,
+                                                               const gchar        *bus_name,
+                                                               const gchar        *object_path,
+                                                               const gchar        *interface_name,
+                                                               const gchar        *method_name,
+                                                               GVariant           *parameters,
+                                                               const GVariantType *reply_type,
                                                                GDBusCallFlags      flags,
-                                                               xint_t                timeout_msec,
-                                                               xunix_fd_list_t        *fd_list,
-                                                               xunix_fd_list_t       **out_fd_list,
-                                                               xcancellable_t       *cancellable,
-                                                               xerror_t            **error);
+                                                               gint                timeout_msec,
+                                                               GUnixFDList        *fd_list,
+                                                               GUnixFDList       **out_fd_list,
+                                                               GCancellable       *cancellable,
+                                                               GError            **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 
 /**
  * GDBusInterfaceMethodCallFunc:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender: The unique bus name of the remote caller.
  * @object_path: The object path that the method was invoked on.
  * @interface_name: The D-Bus interface name the method was invoked on.
  * @method_name: The name of the method that was invoked.
- * @parameters: A #xvariant_t tuple with parameters.
- * @invocation: (transfer full): A #xdbus_method_invocation_t object that must be used to return a value or error.
- * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_object().
+ * @parameters: A #GVariant tuple with parameters.
+ * @invocation: (transfer full): A #GDBusMethodInvocation object that must be used to return a value or error.
+ * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_object().
  *
- * The type of the @method_call function in #xdbus_interface_vtable_t.
+ * The type of the @method_call function in #GDBusInterfaceVTable.
  *
  * Since: 2.26
  */
-typedef void (*GDBusInterfaceMethodCallFunc) (xdbus_connection_t       *connection,
-                                              const xchar_t           *sender,
-                                              const xchar_t           *object_path,
-                                              const xchar_t           *interface_name,
-                                              const xchar_t           *method_name,
-                                              xvariant_t              *parameters,
-                                              xdbus_method_invocation_t *invocation,
-                                              xpointer_t               user_data);
+typedef void (*GDBusInterfaceMethodCallFunc) (GDBusConnection       *connection,
+                                              const gchar           *sender,
+                                              const gchar           *object_path,
+                                              const gchar           *interface_name,
+                                              const gchar           *method_name,
+                                              GVariant              *parameters,
+                                              GDBusMethodInvocation *invocation,
+                                              gpointer               user_data);
 
 /**
  * GDBusInterfaceGetPropertyFunc:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender: The unique bus name of the remote caller.
  * @object_path: The object path that the method was invoked on.
  * @interface_name: The D-Bus interface name for the property.
  * @property_name: The name of the property to get the value of.
  * @error: Return location for error.
- * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_object().
+ * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_object().
  *
- * The type of the @get_property function in #xdbus_interface_vtable_t.
+ * The type of the @get_property function in #GDBusInterfaceVTable.
  *
- * Returns: A #xvariant_t with the value for @property_name or %NULL if
- *     @error is set. If the returned #xvariant_t is floating, it is
+ * Returns: A #GVariant with the value for @property_name or %NULL if
+ *     @error is set. If the returned #GVariant is floating, it is
  *     consumed - otherwise its reference count is decreased by one.
  *
  * Since: 2.26
  */
-typedef xvariant_t *(*GDBusInterfaceGetPropertyFunc) (xdbus_connection_t       *connection,
-                                                    const xchar_t           *sender,
-                                                    const xchar_t           *object_path,
-                                                    const xchar_t           *interface_name,
-                                                    const xchar_t           *property_name,
-                                                    xerror_t               **error,
-                                                    xpointer_t               user_data);
+typedef GVariant *(*GDBusInterfaceGetPropertyFunc) (GDBusConnection       *connection,
+                                                    const gchar           *sender,
+                                                    const gchar           *object_path,
+                                                    const gchar           *interface_name,
+                                                    const gchar           *property_name,
+                                                    GError               **error,
+                                                    gpointer               user_data);
 
 /**
  * GDBusInterfaceSetPropertyFunc:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender: The unique bus name of the remote caller.
  * @object_path: The object path that the method was invoked on.
  * @interface_name: The D-Bus interface name for the property.
  * @property_name: The name of the property to get the value of.
  * @value: The value to set the property to.
  * @error: Return location for error.
- * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_object().
+ * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_object().
  *
- * The type of the @set_property function in #xdbus_interface_vtable_t.
+ * The type of the @set_property function in #GDBusInterfaceVTable.
  *
  * Returns: %TRUE if the property was set to @value, %FALSE if @error is set.
  *
  * Since: 2.26
  */
-typedef xboolean_t  (*GDBusInterfaceSetPropertyFunc) (xdbus_connection_t       *connection,
-                                                    const xchar_t           *sender,
-                                                    const xchar_t           *object_path,
-                                                    const xchar_t           *interface_name,
-                                                    const xchar_t           *property_name,
-                                                    xvariant_t              *value,
-                                                    xerror_t               **error,
-                                                    xpointer_t               user_data);
+typedef gboolean  (*GDBusInterfaceSetPropertyFunc) (GDBusConnection       *connection,
+                                                    const gchar           *sender,
+                                                    const gchar           *object_path,
+                                                    const gchar           *interface_name,
+                                                    const gchar           *property_name,
+                                                    GVariant              *value,
+                                                    GError               **error,
+                                                    gpointer               user_data);
 
 /**
- * xdbus_interface_vtable_t:
+ * GDBusInterfaceVTable:
  * @method_call: Function for handling incoming method calls.
  * @get_property: Function for getting a property.
  * @set_property: Function for setting a property.
@@ -345,9 +345,9 @@ typedef xboolean_t  (*GDBusInterfaceSetPropertyFunc) (xdbus_connection_t       *
  * function. The D-Bus call will be directed to your @method_call function,
  * with the provided @interface_name set to "org.freedesktop.DBus.Properties".
  *
- * Ownership of the #xdbus_method_invocation_t object passed to the
+ * Ownership of the #GDBusMethodInvocation object passed to the
  * method_call() function is transferred to your handler; you must
- * call one of the methods of #xdbus_method_invocation_t to return a reply
+ * call one of the methods of #GDBusMethodInvocation to return a reply
  * (possibly empty), or an error. These functions also take ownership
  * of the passed-in invocation object, so unless the invocation
  * object has otherwise been referenced, it will be then be freed.
@@ -361,10 +361,10 @@ typedef xboolean_t  (*GDBusInterfaceSetPropertyFunc) (xdbus_connection_t       *
  * performed for `Set` calls, and the provided value is also checked for
  * being the correct type.
  *
- * For both `Get` and `Set` calls, the #xdbus_method_invocation_t
+ * For both `Get` and `Set` calls, the #GDBusMethodInvocation
  * passed to the @method_call handler can be queried with
- * xdbus_method_invocation_get_property_info() to get a pointer
- * to the #xdbus_property_info_t of the property.
+ * g_dbus_method_invocation_get_property_info() to get a pointer
+ * to the #GDBusPropertyInfo of the property.
  *
  * If you have readable properties specified in your interface info,
  * you must ensure that you either provide a non-%NULL @get_property()
@@ -392,39 +392,39 @@ struct _GDBusInterfaceVTable
    * gdbusconnection.c:_g_dbus_interface_vtable_copy() when
    * changing this.
    */
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-XPL_AVAILABLE_IN_ALL
-xuint_t            xdbus_connection_register_object            (xdbus_connection_t            *connection,
-                                                               const xchar_t                *object_path,
-                                                               xdbus_interface_info_t         *interface_info,
-                                                               const xdbus_interface_vtable_t *vtable,
-                                                               xpointer_t                    user_data,
-                                                               xdestroy_notify_t              user_data_free_func,
-                                                               xerror_t                    **error);
-XPL_AVAILABLE_IN_2_46
-xuint_t            xdbus_connection_register_object_with_closures (xdbus_connection_t         *connection,
-                                                                  const xchar_t             *object_path,
-                                                                  xdbus_interface_info_t      *interface_info,
-                                                                  xclosure_t                *method_call_closure,
-                                                                  xclosure_t                *get_property_closure,
-                                                                  xclosure_t                *set_property_closure,
-                                                                  xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_unregister_object          (xdbus_connection_t            *connection,
-                                                               xuint_t                       registration_id);
+GLIB_AVAILABLE_IN_ALL
+guint            g_dbus_connection_register_object            (GDBusConnection            *connection,
+                                                               const gchar                *object_path,
+                                                               GDBusInterfaceInfo         *interface_info,
+                                                               const GDBusInterfaceVTable *vtable,
+                                                               gpointer                    user_data,
+                                                               GDestroyNotify              user_data_free_func,
+                                                               GError                    **error);
+GLIB_AVAILABLE_IN_2_46
+guint            g_dbus_connection_register_object_with_closures (GDBusConnection         *connection,
+                                                                  const gchar             *object_path,
+                                                                  GDBusInterfaceInfo      *interface_info,
+                                                                  GClosure                *method_call_closure,
+                                                                  GClosure                *get_property_closure,
+                                                                  GClosure                *set_property_closure,
+                                                                  GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_unregister_object          (GDBusConnection            *connection,
+                                                               guint                       registration_id);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
  * GDBusSubtreeEnumerateFunc:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender: The unique bus name of the remote caller.
- * @object_path: The object path that was registered with xdbus_connection_register_subtree().
- * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_subtree().
+ * @object_path: The object path that was registered with g_dbus_connection_register_subtree().
+ * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_subtree().
  *
- * The type of the @enumerate function in #xdbus_subtree_vtable_t.
+ * The type of the @enumerate function in #GDBusSubtreeVTable.
  *
  * This function is called when generating introspection data and also
  * when preparing to dispatch incoming messages in the event that the
@@ -434,26 +434,26 @@ xboolean_t         xdbus_connection_unregister_object          (xdbus_connection
  * Hierarchies are not supported; the items that you return should not
  * contain the `/` character.
  *
- * The return value will be freed with xstrfreev().
+ * The return value will be freed with g_strfreev().
  *
  * Returns: (array zero-terminated=1) (transfer full): A newly allocated array of strings for node names that are children of @object_path.
  *
  * Since: 2.26
  */
-typedef xchar_t** (*GDBusSubtreeEnumerateFunc) (xdbus_connection_t       *connection,
-                                              const xchar_t           *sender,
-                                              const xchar_t           *object_path,
-                                              xpointer_t               user_data);
+typedef gchar** (*GDBusSubtreeEnumerateFunc) (GDBusConnection       *connection,
+                                              const gchar           *sender,
+                                              const gchar           *object_path,
+                                              gpointer               user_data);
 
 /**
  * GDBusSubtreeIntrospectFunc:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender: The unique bus name of the remote caller.
- * @object_path: The object path that was registered with xdbus_connection_register_subtree().
+ * @object_path: The object path that was registered with g_dbus_connection_register_subtree().
  * @node: A node that is a child of @object_path (relative to @object_path) or %NULL for the root of the subtree.
- * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_subtree().
+ * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_subtree().
  *
- * The type of the @introspect function in #xdbus_subtree_vtable_t.
+ * The type of the @introspect function in #GDBusSubtreeVTable.
  *
  * Subtrees are flat.  @node, if non-%NULL, is always exactly one
  * segment of the object path (ie: it never contains a slash).
@@ -462,7 +462,7 @@ typedef xchar_t** (*GDBusSubtreeEnumerateFunc) (xdbus_connection_t       *connec
  * at this node.
  *
  * If this function returns non-%NULL, the return value is expected to
- * be a %NULL-terminated array of pointers to #xdbus_interface_info_t
+ * be a %NULL-terminated array of pointers to #GDBusInterfaceInfo
  * structures describing the interfaces implemented by @node.  This
  * array will have g_dbus_interface_info_unref() called on each item
  * before being freed with g_free().
@@ -472,50 +472,50 @@ typedef xchar_t** (*GDBusSubtreeEnumerateFunc) (xdbus_connection_t       *connec
  * remote introspector in the empty array case, but not in the %NULL
  * case.
  *
- * Returns: (array zero-terminated=1) (nullable) (transfer full): A %NULL-terminated array of pointers to #xdbus_interface_info_t, or %NULL.
+ * Returns: (array zero-terminated=1) (nullable) (transfer full): A %NULL-terminated array of pointers to #GDBusInterfaceInfo, or %NULL.
  *
  * Since: 2.26
  */
-typedef xdbus_interface_info_t ** (*GDBusSubtreeIntrospectFunc) (xdbus_connection_t       *connection,
-                                                             const xchar_t           *sender,
-                                                             const xchar_t           *object_path,
-                                                             const xchar_t           *node,
-                                                             xpointer_t               user_data);
+typedef GDBusInterfaceInfo ** (*GDBusSubtreeIntrospectFunc) (GDBusConnection       *connection,
+                                                             const gchar           *sender,
+                                                             const gchar           *object_path,
+                                                             const gchar           *node,
+                                                             gpointer               user_data);
 
 /**
  * GDBusSubtreeDispatchFunc:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender: The unique bus name of the remote caller.
- * @object_path: The object path that was registered with xdbus_connection_register_subtree().
+ * @object_path: The object path that was registered with g_dbus_connection_register_subtree().
  * @interface_name: The D-Bus interface name that the method call or property access is for.
  * @node: A node that is a child of @object_path (relative to @object_path) or %NULL for the root of the subtree.
- * @out_user_data: (nullable) (not optional): Return location for user data to pass to functions in the returned #xdbus_interface_vtable_t.
- * @user_data: The @user_data #xpointer_t passed to xdbus_connection_register_subtree().
+ * @out_user_data: (nullable) (not optional): Return location for user data to pass to functions in the returned #GDBusInterfaceVTable.
+ * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_subtree().
  *
- * The type of the @dispatch function in #xdbus_subtree_vtable_t.
+ * The type of the @dispatch function in #GDBusSubtreeVTable.
  *
  * Subtrees are flat.  @node, if non-%NULL, is always exactly one
  * segment of the object path (ie: it never contains a slash).
  *
- * Returns: (nullable): A #xdbus_interface_vtable_t or %NULL if you don't want to handle the methods.
+ * Returns: (nullable): A #GDBusInterfaceVTable or %NULL if you don't want to handle the methods.
  *
  * Since: 2.26
  */
-typedef const xdbus_interface_vtable_t * (*GDBusSubtreeDispatchFunc) (xdbus_connection_t             *connection,
-                                                                  const xchar_t                 *sender,
-                                                                  const xchar_t                 *object_path,
-                                                                  const xchar_t                 *interface_name,
-                                                                  const xchar_t                 *node,
-                                                                  xpointer_t                    *out_user_data,
-                                                                  xpointer_t                     user_data);
+typedef const GDBusInterfaceVTable * (*GDBusSubtreeDispatchFunc) (GDBusConnection             *connection,
+                                                                  const gchar                 *sender,
+                                                                  const gchar                 *object_path,
+                                                                  const gchar                 *interface_name,
+                                                                  const gchar                 *node,
+                                                                  gpointer                    *out_user_data,
+                                                                  gpointer                     user_data);
 
 /**
- * xdbus_subtree_vtable_t:
+ * GDBusSubtreeVTable:
  * @enumerate: Function for enumerating child nodes.
  * @introspect: Function for introspecting a child node.
  * @dispatch: Function for dispatching a remote call on a child node.
  *
- * Virtual table for handling subtrees registered with xdbus_connection_register_subtree().
+ * Virtual table for handling subtrees registered with g_dbus_connection_register_subtree().
  *
  * Since: 2.26
  */
@@ -530,82 +530,82 @@ struct _GDBusSubtreeVTable
    * gdbusconnection.c:_g_dbus_subtree_vtable_copy() when
    * changing this.
    */
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-XPL_AVAILABLE_IN_ALL
-xuint_t            xdbus_connection_register_subtree           (xdbus_connection_t            *connection,
-                                                               const xchar_t                *object_path,
-                                                               const xdbus_subtree_vtable_t   *vtable,
+GLIB_AVAILABLE_IN_ALL
+guint            g_dbus_connection_register_subtree           (GDBusConnection            *connection,
+                                                               const gchar                *object_path,
+                                                               const GDBusSubtreeVTable   *vtable,
                                                                GDBusSubtreeFlags           flags,
-                                                               xpointer_t                    user_data,
-                                                               xdestroy_notify_t              user_data_free_func,
-                                                               xerror_t                    **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xdbus_connection_unregister_subtree         (xdbus_connection_t            *connection,
-                                                               xuint_t                       registration_id);
+                                                               gpointer                    user_data,
+                                                               GDestroyNotify              user_data_free_func,
+                                                               GError                    **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_dbus_connection_unregister_subtree         (GDBusConnection            *connection,
+                                                               guint                       registration_id);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
  * GDBusSignalCallback:
- * @connection: A #xdbus_connection_t.
+ * @connection: A #GDBusConnection.
  * @sender_name: (nullable): The unique bus name of the sender of the signal,
    or %NULL on a peer-to-peer D-Bus connection.
  * @object_path: The object path that the signal was emitted on.
  * @interface_name: The name of the interface.
  * @signal_name: The name of the signal.
- * @parameters: A #xvariant_t tuple with parameters for the signal.
+ * @parameters: A #GVariant tuple with parameters for the signal.
  * @user_data: User data passed when subscribing to the signal.
  *
- * Signature for callback function used in xdbus_connection_signal_subscribe().
+ * Signature for callback function used in g_dbus_connection_signal_subscribe().
  *
  * Since: 2.26
  */
-typedef void (*GDBusSignalCallback) (xdbus_connection_t  *connection,
-                                     const xchar_t      *sender_name,
-                                     const xchar_t      *object_path,
-                                     const xchar_t      *interface_name,
-                                     const xchar_t      *signal_name,
-                                     xvariant_t         *parameters,
-                                     xpointer_t          user_data);
+typedef void (*GDBusSignalCallback) (GDBusConnection  *connection,
+                                     const gchar      *sender_name,
+                                     const gchar      *object_path,
+                                     const gchar      *interface_name,
+                                     const gchar      *signal_name,
+                                     GVariant         *parameters,
+                                     gpointer          user_data);
 
-XPL_AVAILABLE_IN_ALL
-xuint_t            xdbus_connection_signal_subscribe           (xdbus_connection_t     *connection,
-                                                               const xchar_t         *sender,
-                                                               const xchar_t         *interface_name,
-                                                               const xchar_t         *member,
-                                                               const xchar_t         *object_path,
-                                                               const xchar_t         *arg0,
+GLIB_AVAILABLE_IN_ALL
+guint            g_dbus_connection_signal_subscribe           (GDBusConnection     *connection,
+                                                               const gchar         *sender,
+                                                               const gchar         *interface_name,
+                                                               const gchar         *member,
+                                                               const gchar         *object_path,
+                                                               const gchar         *arg0,
                                                                GDBusSignalFlags     flags,
                                                                GDBusSignalCallback  callback,
-                                                               xpointer_t             user_data,
-                                                               xdestroy_notify_t       user_data_free_func);
-XPL_AVAILABLE_IN_ALL
-void             xdbus_connection_signal_unsubscribe         (xdbus_connection_t     *connection,
-                                                               xuint_t                subscription_id);
+                                                               gpointer             user_data,
+                                                               GDestroyNotify       user_data_free_func);
+GLIB_AVAILABLE_IN_ALL
+void             g_dbus_connection_signal_unsubscribe         (GDBusConnection     *connection,
+                                                               guint                subscription_id);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 /**
  * GDBusMessageFilterFunction:
- * @connection: (transfer none): A #xdbus_connection_t.
- * @message: (transfer full): A locked #xdbus_message_t that the filter function takes ownership of.
+ * @connection: (transfer none): A #GDBusConnection.
+ * @message: (transfer full): A locked #GDBusMessage that the filter function takes ownership of.
  * @incoming: %TRUE if it is a message received from the other peer, %FALSE if it is
  * a message to be sent to the other peer.
  * @user_data: User data passed when adding the filter.
  *
- * Signature for function used in xdbus_connection_add_filter().
+ * Signature for function used in g_dbus_connection_add_filter().
  *
- * A filter function is passed a #xdbus_message_t and expected to return
- * a #xdbus_message_t too. Passive filter functions that don't modify the
+ * A filter function is passed a #GDBusMessage and expected to return
+ * a #GDBusMessage too. Passive filter functions that don't modify the
  * message can simply return the @message object:
  * |[
- * static xdbus_message_t *
- * passive_filter (xdbus_connection_t *connection
- *                 xdbus_message_t    *message,
- *                 xboolean_t         incoming,
- *                 xpointer_t         user_data)
+ * static GDBusMessage *
+ * passive_filter (GDBusConnection *connection
+ *                 GDBusMessage    *message,
+ *                 gboolean         incoming,
+ *                 gpointer         user_data)
  * {
  *   // inspect @message
  *   return message;
@@ -613,15 +613,15 @@ void             xdbus_connection_signal_unsubscribe         (xdbus_connection_t
  * ]|
  * Filter functions that wants to drop a message can simply return %NULL:
  * |[
- * static xdbus_message_t *
- * drop_filter (xdbus_connection_t *connection
- *              xdbus_message_t    *message,
- *              xboolean_t         incoming,
- *              xpointer_t         user_data)
+ * static GDBusMessage *
+ * drop_filter (GDBusConnection *connection
+ *              GDBusMessage    *message,
+ *              gboolean         incoming,
+ *              gpointer         user_data)
  * {
  *   if (should_drop_message)
  *     {
- *       xobject_unref (message);
+ *       g_object_unref (message);
  *       message = NULL;
  *     }
  *   return message;
@@ -629,52 +629,52 @@ void             xdbus_connection_signal_unsubscribe         (xdbus_connection_t
  * ]|
  * Finally, a filter function may modify a message by copying it:
  * |[
- * static xdbus_message_t *
- * modifying_filter (xdbus_connection_t *connection
- *                   xdbus_message_t    *message,
- *                   xboolean_t         incoming,
- *                   xpointer_t         user_data)
+ * static GDBusMessage *
+ * modifying_filter (GDBusConnection *connection
+ *                   GDBusMessage    *message,
+ *                   gboolean         incoming,
+ *                   gpointer         user_data)
  * {
- *   xdbus_message_t *copy;
- *   xerror_t *error;
+ *   GDBusMessage *copy;
+ *   GError *error;
  *
  *   error = NULL;
- *   copy = xdbus_message_copy (message, &error);
+ *   copy = g_dbus_message_copy (message, &error);
  *   // handle @error being set
- *   xobject_unref (message);
+ *   g_object_unref (message);
  *
  *   // modify @copy
  *
  *   return copy;
  * }
  * ]|
- * If the returned #xdbus_message_t is different from @message and cannot
+ * If the returned #GDBusMessage is different from @message and cannot
  * be sent on @connection (it could use features, such as file
  * descriptors, not compatible with @connection), then a warning is
  * logged to standard error. Applications can
- * check this ahead of time using xdbus_message_to_blob() passing a
- * #xdbus_capability_flags_t value obtained from @connection.
+ * check this ahead of time using g_dbus_message_to_blob() passing a
+ * #GDBusCapabilityFlags value obtained from @connection.
  *
- * Returns: (transfer full) (nullable): A #xdbus_message_t that will be freed with
- * xobject_unref() or %NULL to drop the message. Passive filter
+ * Returns: (transfer full) (nullable): A #GDBusMessage that will be freed with
+ * g_object_unref() or %NULL to drop the message. Passive filter
  * functions can simply return the passed @message object.
  *
  * Since: 2.26
  */
-typedef xdbus_message_t *(*GDBusMessageFilterFunction) (xdbus_connection_t *connection,
-                                                     xdbus_message_t    *message,
-                                                     xboolean_t         incoming,
-                                                     xpointer_t         user_data);
+typedef GDBusMessage *(*GDBusMessageFilterFunction) (GDBusConnection *connection,
+                                                     GDBusMessage    *message,
+                                                     gboolean         incoming,
+                                                     gpointer         user_data);
 
-XPL_AVAILABLE_IN_ALL
-xuint_t xdbus_connection_add_filter (xdbus_connection_t            *connection,
+GLIB_AVAILABLE_IN_ALL
+guint g_dbus_connection_add_filter (GDBusConnection            *connection,
                                     GDBusMessageFilterFunction  filter_function,
-                                    xpointer_t                    user_data,
-                                    xdestroy_notify_t              user_data_free_func);
+                                    gpointer                    user_data,
+                                    GDestroyNotify              user_data_free_func);
 
-XPL_AVAILABLE_IN_ALL
-void  xdbus_connection_remove_filter (xdbus_connection_t    *connection,
-                                       xuint_t               filter_id);
+GLIB_AVAILABLE_IN_ALL
+void  g_dbus_connection_remove_filter (GDBusConnection    *connection,
+                                       guint               filter_id);
 
 /* ---------------------------------------------------------------------------------------------------- */
 

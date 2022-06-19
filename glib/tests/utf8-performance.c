@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  *
  * Copyright (C) 2010 Mikhail Zabaluev <mikhail.zabaluev@gmail.com>
  *
@@ -25,7 +25,7 @@
 static const char str_ascii[] =
     "The quick brown fox jumps over the lazy dog";
 
-static const xchar_t str_latin1[] =
+static const gchar str_latin1[] =
     "Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich";
 
 /* Energizing GOELRO-talk in Russian, used by KDE */
@@ -38,7 +38,7 @@ static const char str_cyrillic[] =
 static const char str_han[] =
     "漢字，亦稱中文字、中国字，在台灣又被稱為國字，是漢字文化圈廣泛使用的一種文字，屬於表意文字的詞素音節文字";
 
-typedef int (* GrindFunc) (const char *, xsize_t);
+typedef int (* GrindFunc) (const char *, gsize);
 
 #define GRIND_LOOP_BEGIN                 \
   {                                      \
@@ -49,16 +49,16 @@ typedef int (* GrindFunc) (const char *, xsize_t);
   }
 
 static int
-grind_get_char (const char *str, xsize_t len)
+grind_get_char (const char *str, gsize len)
 {
-  xunichar_t acc = 0;
+  gunichar acc = 0;
   GRIND_LOOP_BEGIN
     {
       const char *p = str;
       while (*p)
         {
-          acc += xutf8_get_char (p);
-          p = xutf8_next_char (p);
+          acc += g_utf8_get_char (p);
+          p = g_utf8_next_char (p);
         }
     }
   GRIND_LOOP_END;
@@ -66,16 +66,16 @@ grind_get_char (const char *str, xsize_t len)
 }
 
 static int
-grind_get_char_validated (const char *str, xsize_t len)
+grind_get_char_validated (const char *str, gsize len)
 {
-  xunichar_t acc = 0;
+  gunichar acc = 0;
   GRIND_LOOP_BEGIN
     {
       const char *p = str;
       while (*p)
         {
-          acc += xutf8_get_char_validated (p, -1);
-          p = xutf8_next_char (p);
+          acc += g_utf8_get_char_validated (p, -1);
+          p = g_utf8_next_char (p);
         }
     }
   GRIND_LOOP_END;
@@ -83,12 +83,12 @@ grind_get_char_validated (const char *str, xsize_t len)
 }
 
 static int
-grind_utf8_to_ucs4 (const char *str, xsize_t len)
+grind_utf8_to_ucs4 (const char *str, gsize len)
 {
   GRIND_LOOP_BEGIN
     {
-      xunichar_t *ustr;
-      ustr = xutf8_to_ucs4 (str, -1, NULL, NULL, NULL);
+      gunichar *ustr;
+      ustr = g_utf8_to_ucs4 (str, -1, NULL, NULL, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -96,16 +96,16 @@ grind_utf8_to_ucs4 (const char *str, xsize_t len)
 }
 
 static int
-grind_get_char_backwards (const char *str, xsize_t len)
+grind_get_char_backwards (const char *str, gsize len)
 {
-  xunichar_t acc = 0;
+  gunichar acc = 0;
   GRIND_LOOP_BEGIN
     {
       const char *p = str + len;
       do
 	{
-	  p = xutf8_prev_char (p);
-	  acc += xutf8_get_char (p);
+	  p = g_utf8_prev_char (p);
+	  acc += g_utf8_get_char (p);
         }
       while (p != str);
     }
@@ -114,12 +114,12 @@ grind_get_char_backwards (const char *str, xsize_t len)
 }
 
 static int
-grind_utf8_to_ucs4_sized (const char *str, xsize_t len)
+grind_utf8_to_ucs4_sized (const char *str, gsize len)
 {
   GRIND_LOOP_BEGIN
     {
-      xunichar_t *ustr;
-      ustr = xutf8_to_ucs4 (str, len, NULL, NULL, NULL);
+      gunichar *ustr;
+      ustr = g_utf8_to_ucs4 (str, len, NULL, NULL, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -127,12 +127,12 @@ grind_utf8_to_ucs4_sized (const char *str, xsize_t len)
 }
 
 static int
-grind_utf8_to_ucs4_fast (const char *str, xsize_t len)
+grind_utf8_to_ucs4_fast (const char *str, gsize len)
 {
   GRIND_LOOP_BEGIN
     {
-      xunichar_t *ustr;
-      ustr = xutf8_to_ucs4_fast (str, -1, NULL);
+      gunichar *ustr;
+      ustr = g_utf8_to_ucs4_fast (str, -1, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -140,12 +140,12 @@ grind_utf8_to_ucs4_fast (const char *str, xsize_t len)
 }
 
 static int
-grind_utf8_to_ucs4_fast_sized (const char *str, xsize_t len)
+grind_utf8_to_ucs4_fast_sized (const char *str, gsize len)
 {
   GRIND_LOOP_BEGIN
     {
-      xunichar_t *ustr;
-      ustr = xutf8_to_ucs4_fast (str, len, NULL);
+      gunichar *ustr;
+      ustr = g_utf8_to_ucs4_fast (str, len, NULL);
       g_free (ustr);
     }
   GRIND_LOOP_END;
@@ -153,19 +153,19 @@ grind_utf8_to_ucs4_fast_sized (const char *str, xsize_t len)
 }
 
 static int
-grind_utf8_validate (const char *str, xsize_t len)
+grind_utf8_validate (const char *str, gsize len)
 {
   GRIND_LOOP_BEGIN
-    xutf8_validate (str, -1, NULL);
+    g_utf8_validate (str, -1, NULL);
   GRIND_LOOP_END;
   return 0;
 }
 
 static int
-grind_utf8_validate_sized (const char *str, xsize_t len)
+grind_utf8_validate_sized (const char *str, gsize len)
 {
   GRIND_LOOP_BEGIN
-    xutf8_validate (str, len, NULL);
+    g_utf8_validate (str, len, NULL);
   GRIND_LOOP_END;
   return 0;
 }
@@ -176,18 +176,18 @@ typedef struct _GrindData {
 } GrindData;
 
 static void
-perform (xconstpointer data)
+perform (gconstpointer data)
 {
   GrindData *gd = (GrindData *) data;
   GrindFunc grind_func = gd->func;
   const char *str = gd->str;
-  xsize_t len;
-  xulong_t bytes_ground;
-  xdouble_t time_elapsed;
-  xdouble_t result;
+  gsize len;
+  gulong bytes_ground;
+  gdouble time_elapsed;
+  gdouble result;
 
   len = strlen (str);
-  bytes_ground = (xulong_t) len * NUM_ITERATIONS;
+  bytes_ground = (gulong) len * NUM_ITERATIONS;
 
   g_test_timer_start ();
 
@@ -195,7 +195,7 @@ perform (xconstpointer data)
 
   time_elapsed = g_test_timer_elapsed ();
 
-  result = ((xdouble_t) bytes_ground / time_elapsed) * 1.0e-6;
+  result = ((gdouble) bytes_ground / time_elapsed) * 1.0e-6;
 
   g_test_maximized_result (result, "%7.1f MB/s", result);
 
@@ -208,11 +208,11 @@ add_cases(const char *path, GrindFunc func)
 #define ADD_CASE(script)                              \
   G_STMT_START {                                      \
     GrindData *gd;                                    \
-    xchar_t *full_path;                                 \
+    gchar *full_path;                                 \
     gd = g_slice_new0(GrindData);                     \
     gd->func = func;                                  \
     gd->str = str_##script;                           \
-    full_path = xstrdup_printf("%s/" #script, path); \
+    full_path = g_strdup_printf("%s/" #script, path); \
     g_test_add_data_func (full_path, gd, perform);    \
     g_free (full_path);                               \
   } G_STMT_END

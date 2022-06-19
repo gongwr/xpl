@@ -1,8 +1,8 @@
 #include <gio/gio.h>
 
-static xchar_t *opt_name         = NULL;
-static xboolean_t opt_system_bus = FALSE;
-static xboolean_t opt_auto_start = FALSE;
+static gchar *opt_name         = NULL;
+static gboolean opt_system_bus = FALSE;
+static gboolean opt_auto_start = FALSE;
 
 static GOptionEntry opt_entries[] =
 {
@@ -13,10 +13,10 @@ static GOptionEntry opt_entries[] =
 };
 
 static void
-on_name_appeared (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  const xchar_t     *name_owner,
-                  xpointer_t         user_data)
+on_name_appeared (GDBusConnection *connection,
+                  const gchar     *name,
+                  const gchar     *name_owner,
+                  gpointer         user_data)
 {
   g_print ("Name %s on %s is owned by %s\n",
            name,
@@ -25,9 +25,9 @@ on_name_appeared (xdbus_connection_t *connection,
 }
 
 static void
-on_name_vanished (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  xpointer_t         user_data)
+on_name_vanished (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
 {
   g_print ("Name %s does not exist on %s\n",
            name,
@@ -37,10 +37,10 @@ on_name_vanished (xdbus_connection_t *connection,
 int
 main (int argc, char *argv[])
 {
-  xuint_t watcher_id;
-  xmain_loop_t *loop;
-  xoption_context_t *opt_context;
-  xerror_t *error;
+  guint watcher_id;
+  GMainLoop *loop;
+  GOptionContext *opt_context;
+  GError *error;
   GBusNameWatcherFlags flags;
 
   error = NULL;
@@ -73,8 +73,8 @@ main (int argc, char *argv[])
                                  NULL,
                                  NULL);
 
-  loop = xmain_loop_new (NULL, FALSE);
-  xmain_loop_run (loop);
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
 
   g_bus_unwatch_name (watcher_id);
 

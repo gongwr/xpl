@@ -29,31 +29,31 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_SERVER         (xdbus_server_get_type ())
-#define G_DBUS_SERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_SERVER, xdbus_server))
-#define X_IS_DBUS_SERVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_SERVER))
+#define G_TYPE_DBUS_SERVER         (g_dbus_server_get_type ())
+#define G_DBUS_SERVER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_SERVER, GDBusServer))
+#define G_IS_DBUS_SERVER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_SERVER))
 
-XPL_AVAILABLE_IN_ALL
-xtype_t             xdbus_server_get_type           (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xdbus_server_t      *xdbus_server_new_sync           (const xchar_t       *address,
-                                                    xdbus_server_flags_t   flags,
-                                                    const xchar_t       *guid,
-                                                    xdbus_auth_observer_t *observer,
-                                                    xcancellable_t      *cancellable,
-                                                    xerror_t           **error);
-XPL_AVAILABLE_IN_ALL
-const xchar_t      *xdbus_server_get_client_address (xdbus_server_t       *server);
-XPL_AVAILABLE_IN_ALL
-const xchar_t      *xdbus_server_get_guid           (xdbus_server_t       *server);
-XPL_AVAILABLE_IN_ALL
-xdbus_server_flags_t  xdbus_server_get_flags          (xdbus_server_t       *server);
-XPL_AVAILABLE_IN_ALL
-void              xdbus_server_start              (xdbus_server_t       *server);
-XPL_AVAILABLE_IN_ALL
-void              xdbus_server_stop               (xdbus_server_t       *server);
-XPL_AVAILABLE_IN_ALL
-xboolean_t          xdbus_server_is_active          (xdbus_server_t       *server);
+GLIB_AVAILABLE_IN_ALL
+GType             g_dbus_server_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GDBusServer      *g_dbus_server_new_sync           (const gchar       *address,
+                                                    GDBusServerFlags   flags,
+                                                    const gchar       *guid,
+                                                    GDBusAuthObserver *observer,
+                                                    GCancellable      *cancellable,
+                                                    GError           **error);
+GLIB_AVAILABLE_IN_ALL
+const gchar      *g_dbus_server_get_client_address (GDBusServer       *server);
+GLIB_AVAILABLE_IN_ALL
+const gchar      *g_dbus_server_get_guid           (GDBusServer       *server);
+GLIB_AVAILABLE_IN_ALL
+GDBusServerFlags  g_dbus_server_get_flags          (GDBusServer       *server);
+GLIB_AVAILABLE_IN_ALL
+void              g_dbus_server_start              (GDBusServer       *server);
+GLIB_AVAILABLE_IN_ALL
+void              g_dbus_server_stop               (GDBusServer       *server);
+GLIB_AVAILABLE_IN_ALL
+gboolean          g_dbus_server_is_active          (GDBusServer       *server);
 
 G_END_DECLS
 

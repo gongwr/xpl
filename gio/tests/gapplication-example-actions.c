@@ -3,120 +3,120 @@
 #include <string.h>
 
 static void
-activate (xapplication_t *application)
+activate (GApplication *application)
 {
-  xapplication_hold (application);
+  g_application_hold (application);
   g_print ("activated\n");
-  xapplication_release (application);
+  g_application_release (application);
 }
 
 static void
-activate_action (xaction_t  *action,
-                 xvariant_t *parameter,
-                 xpointer_t  data)
+activate_action (GAction  *action,
+                 GVariant *parameter,
+                 gpointer  data)
 {
-  xapplication_t *application = G_APPLICATION (data);
+  GApplication *application = G_APPLICATION (data);
 
-  xapplication_hold (application);
+  g_application_hold (application);
   g_print ("action %s activated\n", g_action_get_name (action));
-  xapplication_release (application);
+  g_application_release (application);
 }
 
 static void
-activate_toggle_action (xsimple_action_t *action,
-                        xvariant_t      *parameter,
-                        xpointer_t       data)
+activate_toggle_action (GSimpleAction *action,
+                        GVariant      *parameter,
+                        gpointer       data)
 {
-  xapplication_t *application = G_APPLICATION (data);
-  xvariant_t *state;
-  xboolean_t b;
+  GApplication *application = G_APPLICATION (data);
+  GVariant *state;
+  gboolean b;
 
   g_print ("action %s activated\n", g_action_get_name (G_ACTION (action)));
 
-  xapplication_hold (application);
+  g_application_hold (application);
   state = g_action_get_state (G_ACTION (action));
-  b = xvariant_get_boolean (state);
-  xvariant_unref (state);
-  g_simple_action_set_state (action, xvariant_new_boolean (!b));
+  b = g_variant_get_boolean (state);
+  g_variant_unref (state);
+  g_simple_action_set_state (action, g_variant_new_boolean (!b));
   g_print ("state change %d -> %d\n", b, !b);
-  xapplication_release (application);
+  g_application_release (application);
 }
 
 static void
-add_actions (xapplication_t *app)
+add_actions (GApplication *app)
 {
-  xsimple_action_t *action;
+  GSimpleAction *action;
 
   action = g_simple_action_new ("simple-action", NULL);
-  xsignal_connect (action, "activate", G_CALLBACK (activate_action), app);
-  xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
-  xobject_unref (action);
+  g_signal_connect (action, "activate", G_CALLBACK (activate_action), app);
+  g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
+  g_object_unref (action);
 
   action = g_simple_action_new_stateful ("toggle-action", NULL,
-                                         xvariant_new_boolean (FALSE));
-  xsignal_connect (action, "activate", G_CALLBACK (activate_toggle_action), app);
-  xaction_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
-  xobject_unref (action);
+                                         g_variant_new_boolean (FALSE));
+  g_signal_connect (action, "activate", G_CALLBACK (activate_toggle_action), app);
+  g_action_map_add_action (G_ACTION_MAP (app), G_ACTION (action));
+  g_object_unref (action);
 }
 
 static void
-describe_and_activate_action (xaction_group_t *group,
-                              const xchar_t  *name)
+describe_and_activate_action (GActionGroup *group,
+                              const gchar  *name)
 {
-  const xvariant_type_t *param_type;
-  xvariant_t *state;
-  xboolean_t enabled;
-  xchar_t *tmp;
+  const GVariantType *param_type;
+  GVariant *state;
+  gboolean enabled;
+  gchar *tmp;
 
-  param_type = xaction_group_get_action_parameter_type (group, name);
-  state = xaction_group_get_action_state (group, name);
-  enabled = xaction_group_get_action_enabled (group, name);
+  param_type = g_action_group_get_action_parameter_type (group, name);
+  state = g_action_group_get_action_state (group, name);
+  enabled = g_action_group_get_action_enabled (group, name);
 
   g_print ("action name:      %s\n", name);
-  tmp = param_type ? xvariant_type_dup_string (param_type) : NULL;
+  tmp = param_type ? g_variant_type_dup_string (param_type) : NULL;
   g_print ("parameter type:   %s\n", tmp ? tmp : "<none>");
   g_free (tmp);
   g_print ("state type:       %s\n",
-           state ? xvariant_get_type_string (state) : "<none>");
-  tmp = state ? xvariant_print (state, FALSE) : NULL;
+           state ? g_variant_get_type_string (state) : "<none>");
+  tmp = state ? g_variant_print (state, FALSE) : NULL;
   g_print ("state:            %s\n", tmp ? tmp : "<none>");
   g_free (tmp);
   g_print ("enabled:          %s\n", enabled ? "true" : "false");
 
   if (state != NULL)
-    xvariant_unref (state);
+    g_variant_unref (state);
 
-  xaction_group_activate_action (group, name, NULL);
+  g_action_group_activate_action (group, name, NULL);
 }
 
 int
 main (int argc, char **argv)
 {
-  xapplication_t *app;
+  GApplication *app;
   int status;
 
-  app = xapplication_new ("org.gtk.test_application_t", 0);
-  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  xapplication_set_inactivity_timeout (app, 10000);
+  app = g_application_new ("org.gtk.TestApplication", 0);
+  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  g_application_set_inactivity_timeout (app, 10000);
 
   add_actions (app);
 
   if (argc > 1 && strcmp (argv[1], "--simple-action") == 0)
     {
-      xapplication_register (app, NULL, NULL);
-      describe_and_activate_action (XACTION_GROUP (app), "simple-action");
+      g_application_register (app, NULL, NULL);
+      describe_and_activate_action (G_ACTION_GROUP (app), "simple-action");
       exit (0);
     }
   else if (argc > 1 && strcmp (argv[1], "--toggle-action") == 0)
     {
-      xapplication_register (app, NULL, NULL);
-      describe_and_activate_action (XACTION_GROUP (app), "toggle-action");
+      g_application_register (app, NULL, NULL);
+      describe_and_activate_action (G_ACTION_GROUP (app), "toggle-action");
       exit (0);
     }
 
-  status = xapplication_run (app, argc, argv);
+  status = g_application_run (app, argc, argv);
 
-  xobject_unref (app);
+  g_object_unref (app);
 
   return status;
 }

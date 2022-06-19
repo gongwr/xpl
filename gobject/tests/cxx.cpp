@@ -15,7 +15,7 @@
  */
 
 /* A trivial C++ program to be compiled in C++ mode, which
- * smoketests that the xobject_t headers are valid C++ headers. */
+ * smoketests that the GObject headers are valid C++ headers. */
 
 #include <glib-object.h>
 

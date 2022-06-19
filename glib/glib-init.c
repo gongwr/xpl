@@ -43,8 +43,8 @@
 G_STATIC_ASSERT (CHAR_BIT == 8);
 
 /* We assume that data pointers are the same size as function pointers... */
-G_STATIC_ASSERT (sizeof (xpointer_t) == sizeof (GFunc));
-G_STATIC_ASSERT (G_ALIGNOF (xpointer_t) == G_ALIGNOF (GFunc));
+G_STATIC_ASSERT (sizeof (gpointer) == sizeof (GFunc));
+G_STATIC_ASSERT (G_ALIGNOF (gpointer) == G_ALIGNOF (GFunc));
 /* ... and that all function pointers are the same size. */
 G_STATIC_ASSERT (sizeof (GFunc) == sizeof (GCompareDataFunc));
 G_STATIC_ASSERT (G_ALIGNOF (GFunc) == G_ALIGNOF (GCompareDataFunc));
@@ -72,45 +72,45 @@ G_STATIC_ASSERT (G_ALIGNOF (TestChar) == G_ALIGNOF (int));
 G_STATIC_ASSERT (G_ALIGNOF (TestShort) == G_ALIGNOF (int));
 G_STATIC_ASSERT (G_ALIGNOF (TestInt) == G_ALIGNOF (int));
 
-G_STATIC_ASSERT (sizeof (xchar_t) == 1);
-G_STATIC_ASSERT (sizeof (xuchar_t) == 1);
+G_STATIC_ASSERT (sizeof (gchar) == 1);
+G_STATIC_ASSERT (sizeof (guchar) == 1);
 G_STATIC_ASSERT (sizeof (gint8) * CHAR_BIT == 8);
-G_STATIC_ASSERT (sizeof (xuint8_t) * CHAR_BIT == 8);
+G_STATIC_ASSERT (sizeof (guint8) * CHAR_BIT == 8);
 G_STATIC_ASSERT (sizeof (gint16) * CHAR_BIT == 16);
-G_STATIC_ASSERT (sizeof (xuint16_t) * CHAR_BIT == 16);
+G_STATIC_ASSERT (sizeof (guint16) * CHAR_BIT == 16);
 G_STATIC_ASSERT (sizeof (gint32) * CHAR_BIT == 32);
-G_STATIC_ASSERT (sizeof (xuint32_t) * CHAR_BIT == 32);
-G_STATIC_ASSERT (sizeof (sint64_t) * CHAR_BIT == 64);
-G_STATIC_ASSERT (sizeof (xuint64_t) * CHAR_BIT == 64);
+G_STATIC_ASSERT (sizeof (guint32) * CHAR_BIT == 32);
+G_STATIC_ASSERT (sizeof (gint64) * CHAR_BIT == 64);
+G_STATIC_ASSERT (sizeof (guint64) * CHAR_BIT == 64);
 
-G_STATIC_ASSERT (sizeof (void *) == XPL_SIZEOF_VOID_P);
+G_STATIC_ASSERT (sizeof (void *) == GLIB_SIZEOF_VOID_P);
 G_STATIC_ASSERT (sizeof (gintptr) == sizeof (void *));
 G_STATIC_ASSERT (sizeof (guintptr) == sizeof (void *));
 
-G_STATIC_ASSERT (sizeof (long) == XPL_SIZEOF_LONG);
+G_STATIC_ASSERT (sizeof (long) == GLIB_SIZEOF_LONG);
 
 G_STATIC_ASSERT (G_HAVE_GINT64 == 1);
 
-G_STATIC_ASSERT (sizeof (size_t) == XPL_SIZEOF_SIZE_T);
+G_STATIC_ASSERT (sizeof (size_t) == GLIB_SIZEOF_SIZE_T);
 /* Not a typo: ssize_t is POSIX, not Standard C, but if it exists then
  * it's the same size as size_t. */
-G_STATIC_ASSERT (sizeof (size_t) == XPL_SIZEOF_SSIZE_T);
-G_STATIC_ASSERT (sizeof (xsize_t) == XPL_SIZEOF_SSIZE_T);
-G_STATIC_ASSERT (sizeof (xsize_t) == sizeof (size_t));
+G_STATIC_ASSERT (sizeof (size_t) == GLIB_SIZEOF_SSIZE_T);
+G_STATIC_ASSERT (sizeof (gsize) == GLIB_SIZEOF_SSIZE_T);
+G_STATIC_ASSERT (sizeof (gsize) == sizeof (size_t));
 /* Again this is size_t not ssize_t, because ssize_t is POSIX, not C99 */
-G_STATIC_ASSERT (sizeof (xssize_t) == sizeof (size_t));
-G_STATIC_ASSERT (G_ALIGNOF (xsize_t) == G_ALIGNOF (size_t));
-G_STATIC_ASSERT (G_ALIGNOF (xssize_t) == G_ALIGNOF (size_t));
+G_STATIC_ASSERT (sizeof (gssize) == sizeof (size_t));
+G_STATIC_ASSERT (G_ALIGNOF (gsize) == G_ALIGNOF (size_t));
+G_STATIC_ASSERT (G_ALIGNOF (gssize) == G_ALIGNOF (size_t));
 
-/* xoffset_t is always 64-bit, even if off_t is only 32-bit
+/* goffset is always 64-bit, even if off_t is only 32-bit
  * (compiling without large-file-support on 32-bit) */
-G_STATIC_ASSERT (sizeof (xoffset_t) == sizeof (sint64_t));
-G_STATIC_ASSERT (G_ALIGNOF (xoffset_t) == G_ALIGNOF (sint64_t));
+G_STATIC_ASSERT (sizeof (goffset) == sizeof (gint64));
+G_STATIC_ASSERT (G_ALIGNOF (goffset) == G_ALIGNOF (gint64));
 
 G_STATIC_ASSERT (sizeof (gfloat) == sizeof (float));
 G_STATIC_ASSERT (G_ALIGNOF (gfloat) == G_ALIGNOF (float));
-G_STATIC_ASSERT (sizeof (xdouble_t) == sizeof (double));
-G_STATIC_ASSERT (G_ALIGNOF (xdouble_t) == G_ALIGNOF (double));
+G_STATIC_ASSERT (sizeof (gdouble) == sizeof (double));
+G_STATIC_ASSERT (G_ALIGNOF (gdouble) == G_ALIGNOF (double));
 
 G_STATIC_ASSERT (sizeof (gintptr) == sizeof (intptr_t));
 G_STATIC_ASSERT (sizeof (guintptr) == sizeof (uintptr_t));
@@ -118,24 +118,24 @@ G_STATIC_ASSERT (G_ALIGNOF (gintptr) == G_ALIGNOF (intptr_t));
 G_STATIC_ASSERT (G_ALIGNOF (guintptr) == G_ALIGNOF (uintptr_t));
 
 G_STATIC_ASSERT (sizeof (gint8) == sizeof (int8_t));
-G_STATIC_ASSERT (sizeof (xuint8_t) == sizeof (uint8_t));
+G_STATIC_ASSERT (sizeof (guint8) == sizeof (uint8_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint8) == G_ALIGNOF (int8_t));
-G_STATIC_ASSERT (G_ALIGNOF (xuint8_t) == G_ALIGNOF (uint8_t));
+G_STATIC_ASSERT (G_ALIGNOF (guint8) == G_ALIGNOF (uint8_t));
 
 G_STATIC_ASSERT (sizeof (gint16) == sizeof (int16_t));
-G_STATIC_ASSERT (sizeof (xuint16_t) == sizeof (uint16_t));
+G_STATIC_ASSERT (sizeof (guint16) == sizeof (uint16_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint16) == G_ALIGNOF (int16_t));
-G_STATIC_ASSERT (G_ALIGNOF (xuint16_t) == G_ALIGNOF (uint16_t));
+G_STATIC_ASSERT (G_ALIGNOF (guint16) == G_ALIGNOF (uint16_t));
 
 G_STATIC_ASSERT (sizeof (gint32) == sizeof (int32_t));
-G_STATIC_ASSERT (sizeof (xuint32_t) == sizeof (uint32_t));
+G_STATIC_ASSERT (sizeof (guint32) == sizeof (uint32_t));
 G_STATIC_ASSERT (G_ALIGNOF (gint32) == G_ALIGNOF (int32_t));
-G_STATIC_ASSERT (G_ALIGNOF (xuint32_t) == G_ALIGNOF (uint32_t));
+G_STATIC_ASSERT (G_ALIGNOF (guint32) == G_ALIGNOF (uint32_t));
 
-G_STATIC_ASSERT (sizeof (sint64_t) == sizeof (int64_t));
-G_STATIC_ASSERT (sizeof (xuint64_t) == sizeof (uint64_t));
-G_STATIC_ASSERT (G_ALIGNOF (sint64_t) == G_ALIGNOF (int64_t));
-G_STATIC_ASSERT (G_ALIGNOF (xuint64_t) == G_ALIGNOF (uint64_t));
+G_STATIC_ASSERT (sizeof (gint64) == sizeof (int64_t));
+G_STATIC_ASSERT (sizeof (guint64) == sizeof (uint64_t));
+G_STATIC_ASSERT (G_ALIGNOF (gint64) == G_ALIGNOF (int64_t));
+G_STATIC_ASSERT (G_ALIGNOF (guint64) == G_ALIGNOF (uint64_t));
 
 /**
  * g_mem_gc_friendly:
@@ -143,18 +143,18 @@ G_STATIC_ASSERT (G_ALIGNOF (xuint64_t) == G_ALIGNOF (uint64_t));
  * This variable is %TRUE if the `G_DEBUG` environment variable
  * includes the key `gc-friendly`.
  */
-xboolean_t g_mem_gc_friendly = FALSE;
+gboolean g_mem_gc_friendly = FALSE;
 
 GLogLevelFlags g_log_msg_prefix = G_LOG_LEVEL_ERROR | G_LOG_LEVEL_WARNING |
                                   G_LOG_LEVEL_CRITICAL | G_LOG_LEVEL_DEBUG;
 GLogLevelFlags g_log_always_fatal = G_LOG_FATAL_MASK;
 
-static xboolean_t
-debug_key_matches (const xchar_t *key,
-                   const xchar_t *token,
-                   xuint_t        length)
+static gboolean
+debug_key_matches (const gchar *key,
+                   const gchar *token,
+                   guint        length)
 {
-  /* may not call GLib functions: see note in g_parse_debuxstring() */
+  /* may not call GLib functions: see note in g_parse_debug_string() */
   for (; length; length--, key++, token++)
     {
       char k = (*key   == '_') ? '-' : tolower (*key  );
@@ -167,7 +167,7 @@ debug_key_matches (const xchar_t *key,
   return *key == '\0';
 }
 
-/* The xvariant_t documentation indirectly says that int is at least 32 bits
+/* The GVariant documentation indirectly says that int is at least 32 bits
  * (by saying that b, y, n, q, i, u, h are promoted to int). On any
  * reasonable platform, int is in fact *exactly* 32 bits long, because
  * otherwise, {signed char, short, int} wouldn't be sufficient to provide
@@ -175,7 +175,7 @@ debug_key_matches (const xchar_t *key,
 G_STATIC_ASSERT (sizeof (int) == sizeof (gint32));
 
 /**
- * g_parse_debuxstring:
+ * g_parse_debug_string:
  * @string: (nullable): a list of debug options separated by colons, spaces, or
  * commas, or %NULL.
  * @keys: (array length=nkeys): pointer to an array of #GDebugKey which associate
@@ -183,7 +183,7 @@ G_STATIC_ASSERT (sizeof (int) == sizeof (gint32));
  * @nkeys: the number of #GDebugKeys in the array.
  *
  * Parses a string containing debugging options
- * into a %xuint_t containing bit flags. This is used
+ * into a %guint containing bit flags. This is used
  * within GDK and GTK+ to parse the debug options passed on the
  * command line or through environment variables.
  *
@@ -197,13 +197,13 @@ G_STATIC_ASSERT (sizeof (int) == sizeof (gint32));
  *
  * Returns: the combined set of bit flags.
  */
-xuint_t
-g_parse_debuxstring  (const xchar_t     *string,
+guint
+g_parse_debug_string  (const gchar     *string,
                        const GDebugKey *keys,
-                       xuint_t            nkeys)
+                       guint            nkeys)
 {
-  xuint_t i;
-  xuint_t result = 0;
+  guint i;
+  guint result = 0;
 
   if (string == NULL)
     return 0;
@@ -226,9 +226,9 @@ g_parse_debuxstring  (const xchar_t     *string,
     }
   else
     {
-      const xchar_t *p = string;
-      const xchar_t *q;
-      xboolean_t invert = FALSE;
+      const gchar *p = string;
+      const gchar *q;
+      gboolean invert = FALSE;
 
       while (*p)
        {
@@ -254,7 +254,7 @@ g_parse_debuxstring  (const xchar_t     *string,
 
       if (invert)
         {
-          xuint_t all_flags = 0;
+          guint all_flags = 0;
 
           for (i = 0; i < nkeys; i++)
             all_flags |= keys[i].value;
@@ -266,17 +266,17 @@ g_parse_debuxstring  (const xchar_t     *string,
   return result;
 }
 
-static xuint_t
-g_parse_debug_envvar (const xchar_t     *envvar,
+static guint
+g_parse_debug_envvar (const gchar     *envvar,
                       const GDebugKey *keys,
-                      xint_t             n_keys,
-                      xuint_t            default_value)
+                      gint             n_keys,
+                      guint            default_value)
 {
-  const xchar_t *value;
+  const gchar *value;
 
 #ifdef OS_WIN32
   /* "fatal-warnings,fatal-criticals,all,help" is pretty short */
-  xchar_t buffer[100];
+  gchar buffer[100];
 
   if (GetEnvironmentVariable (envvar, buffer, 100) < 100)
     value = buffer;
@@ -289,7 +289,7 @@ g_parse_debug_envvar (const xchar_t     *envvar,
   if (value == NULL)
     return default_value;
 
-  return g_parse_debuxstring (value, keys, n_keys);
+  return g_parse_debug_string (value, keys, n_keys);
 }
 
 static void
@@ -327,7 +327,7 @@ g_debug_init (void)
 void
 glib_init (void)
 {
-  static xboolean_t glib_inited;
+  static gboolean glib_inited;
 
   if (glib_inited)
     return;
@@ -337,10 +337,10 @@ glib_init (void)
   g_messages_prefixed_init ();
   g_debug_init ();
   g_quark_init ();
-  xerror_init ();
+  g_error_init ();
 }
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 
 HMODULE glib_dll = NULL;
 void glib_win32_init (void);
@@ -349,14 +349,14 @@ void
 glib_win32_init (void)
 {
   /* May be called more than once in static compilation mode */
-  static xboolean_t win32_already_init = FALSE;
+  static gboolean win32_already_init = FALSE;
   if (!win32_already_init)
     {
       win32_already_init = TRUE;
 
       g_crash_handler_win32_init ();
 #ifdef THREADS_WIN32
-      xthread_win32_init ();
+      g_thread_win32_init ();
 #endif
 
       g_clock_win32_init ();
@@ -367,16 +367,16 @@ glib_win32_init (void)
 }
 
 static void
-glib_win32_deinit (xboolean_t detach_thread)
+glib_win32_deinit (gboolean detach_thread)
 {
 #ifdef THREADS_WIN32
   if (detach_thread)
-    xthread_win32_process_detach ();
+    g_thread_win32_process_detach ();
 #endif
   g_crash_handler_win32_deinit ();
 }
 
-#ifndef XPL_STATIC_COMPILATION
+#ifndef GLIB_STATIC_COMPILATION
 
 BOOL WINAPI DllMain (HINSTANCE hinstDLL,
                      DWORD     fdwReason,
@@ -396,7 +396,7 @@ DllMain (HINSTANCE hinstDLL,
 
     case DLL_THREAD_DETACH:
 #ifdef THREADS_WIN32
-      xthread_win32_thread_detach ();
+      g_thread_win32_thread_detach ();
 #endif
       break;
 
@@ -412,7 +412,7 @@ DllMain (HINSTANCE hinstDLL,
   return TRUE;
 }
 
-#elif defined(G_HAS_CONSTRUCTORS) /* && XPLATFORM_WIN32 && XPL_STATIC_COMPILATION */
+#elif defined(G_HAS_CONSTRUCTORS) /* && G_PLATFORM_WIN32 && GLIB_STATIC_COMPILATION */
 #ifdef G_DEFINE_CONSTRUCTOR_NEEDS_PRAGMA
 #pragma G_DEFINE_CONSTRUCTOR_PRAGMA_ARGS(glib_init_ctor)
 #endif
@@ -436,11 +436,11 @@ glib_init_dtor (void)
   glib_win32_deinit (FALSE);
 }
 
-#else /* XPLATFORM_WIN32 && XPL_STATIC_COMPILATION && !G_HAS_CONSTRUCTORS */
+#else /* G_PLATFORM_WIN32 && GLIB_STATIC_COMPILATION && !G_HAS_CONSTRUCTORS */
 #error Your platform/compiler is missing constructor support
-#endif /* XPL_STATIC_COMPILATION */
+#endif /* GLIB_STATIC_COMPILATION */
 
-#elif defined(G_HAS_CONSTRUCTORS) /* && !XPLATFORM_WIN32 */
+#elif defined(G_HAS_CONSTRUCTORS) /* && !G_PLATFORM_WIN32 */
 
 #ifdef G_DEFINE_CONSTRUCTOR_NEEDS_PRAGMA
 #pragma G_DEFINE_CONSTRUCTOR_PRAGMA_ARGS(glib_init_ctor)
@@ -453,6 +453,6 @@ glib_init_ctor (void)
   glib_init ();
 }
 
-#else /* !XPLATFORM_WIN32 && !G_HAS_CONSTRUCTORS */
+#else /* !G_PLATFORM_WIN32 && !G_HAS_CONSTRUCTORS */
 # error Your platform/compiler is missing constructor support
-#endif /* XPLATFORM_WIN32 */
+#endif /* G_PLATFORM_WIN32 */

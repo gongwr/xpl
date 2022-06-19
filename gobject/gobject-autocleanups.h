@@ -17,15 +17,15 @@
  * Author: Ryan Lortie <desrt@desrt.ca>
  */
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xclosure, xclosure_unref)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xenum_class, xtype_class_unref)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xflags_class, xtype_class_unref)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xobject, xobject_unref)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xinitially_unowned, xobject_unref)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xparam_spec, xparam_spec_unref)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xtype_class, xtype_class_unref)
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(xvalue, xvalue_unset)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GClosure, g_closure_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GEnumClass, g_type_class_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GFlagsClass, g_type_class_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GObject, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GInitiallyUnowned, g_object_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GParamSpec, g_param_spec_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GTypeClass, g_type_class_unref)
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(GValue, g_value_unset)

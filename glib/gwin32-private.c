@@ -22,23 +22,23 @@
  * Also returns %FALSE when `%` is followed by anything other
  * than `e` or `p`.
  */
-static xboolean_t
+static gboolean
 _g_win32_subst_pid_and_event_w (wchar_t       *local_debugger,
-                                xsize_t          debugger_size,
+                                gsize          debugger_size,
                                 const wchar_t *cmdline,
                                 DWORD          pid,
                                 guintptr       event)
 {
-  xsize_t i = 0, dbg_i = 0;
+  gsize i = 0, dbg_i = 0;
 /* These are integers, and they can't be longer than 20 characters
  * even when they are 64-bit and in decimal notation.
  * Use 30 just to be sure.
  */
 #define STR_BUFFER_SIZE 30
   wchar_t pid_str[STR_BUFFER_SIZE] = {0};
-  xsize_t pid_str_len;
+  gsize pid_str_len;
   wchar_t event_str[STR_BUFFER_SIZE] = {0};
-  xsize_t event_str_len;
+  gsize event_str_len;
 
   _snwprintf_s (pid_str, STR_BUFFER_SIZE, G_N_ELEMENTS (pid_str), L"%lu", pid);
   pid_str[G_N_ELEMENTS (pid_str) - 1] = 0;
@@ -54,14 +54,14 @@ _g_win32_subst_pid_and_event_w (wchar_t       *local_debugger,
         local_debugger[dbg_i++] = cmdline[i++];
       else if (cmdline[i + 1] == L'p')
         {
-          xsize_t j = 0;
+          gsize j = 0;
           while (j < pid_str_len && dbg_i < debugger_size)
             local_debugger[dbg_i++] = pid_str[j++];
           i += 2;
         }
       else if (cmdline[i + 1] == L'e')
         {
-          xsize_t j = 0;
+          gsize j = 0;
           while (j < event_str_len && dbg_i < debugger_size)
             local_debugger[dbg_i++] = event_str[j++];
           i += 2;

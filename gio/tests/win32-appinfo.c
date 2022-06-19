@@ -26,8 +26,8 @@
 #include "../giowin32-private.c"
 
 static int
-xutf16_cmp0 (const xunichar2_t *str1,
-              const xunichar2_t *str2)
+g_utf16_cmp0 (const gunichar2 *str1,
+              const gunichar2 *str2)
 {
   if (!str1)
     return -(str1 != str2);
@@ -50,8 +50,8 @@ xutf16_cmp0 (const xunichar2_t *str1,
 
 #define g_assert_cmputf16(s1, cmp, s2, s1u8, s2u8) \
 G_STMT_START { \
-  const xunichar2_t *__s1 = (s1), *__s2 = (s2); \
-  if (xutf16_cmp0 (__s1, __s2) cmp 0) ; else \
+  const gunichar2 *__s1 = (s1), *__s2 = (s2); \
+  if (g_utf16_cmp0 (__s1, __s2) cmp 0) ; else \
     g_assertion_message_cmpstr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                 #s1u8 " " #cmp " " #s2u8, s1u8, #cmp, s2u8); \
 } G_STMT_END
@@ -59,13 +59,13 @@ G_STMT_START { \
 static void
 test_utf16_strfuncs (void)
 {
-  xsize_t i;
+  gsize i;
 
   struct {
-    xsize_t len;
-    const xunichar2_t utf16[10];
-    const xchar_t *utf8;
-    const xchar_t *utf8_folded;
+    gsize len;
+    const gunichar2 utf16[10];
+    const gchar *utf8;
+    const gchar *utf8_folded;
   } string_cases[] = {
     {
       0,
@@ -89,16 +89,16 @@ test_utf16_strfuncs (void)
 
   for (i = 0; i < G_N_ELEMENTS (string_cases); i++)
     {
-      xsize_t len;
-      xunichar2_t *str;
-      xboolean_t success;
-      xchar_t *utf8;
-      xchar_t *utf8_folded;
+      gsize len;
+      gunichar2 *str;
+      gboolean success;
+      gchar *utf8;
+      gchar *utf8_folded;
 
-      len = xutf16_len (string_cases[i].utf16);
+      len = g_utf16_len (string_cases[i].utf16);
       g_assert_cmpuint (len, ==, string_cases[i].len);
 
-      str = (xunichar2_t *) xutf16_find_basename (string_cases[i].utf16, -1);
+      str = (gunichar2 *) g_utf16_find_basename (string_cases[i].utf16, -1);
       /* This only works because all testcases lack separators */
       g_assert_true (string_cases[i].utf16 == str);
 
@@ -110,7 +110,7 @@ test_utf16_strfuncs (void)
       g_assert_cmpmem (string_cases[i].utf16, len, str, len);
       g_free (str);
 
-      success = xutf16_to_utf8_and_fold (string_cases[i].utf16, -1, NULL, NULL);
+      success = g_utf16_to_utf8_and_fold (string_cases[i].utf16, -1, NULL, NULL);
 
       if (string_cases[i].utf8 == NULL)
         g_assert_false (success);
@@ -118,21 +118,21 @@ test_utf16_strfuncs (void)
         g_assert_true (success);
 
       utf8 = NULL;
-      success = xutf16_to_utf8_and_fold (string_cases[i].utf16, -1, &utf8, NULL);
+      success = g_utf16_to_utf8_and_fold (string_cases[i].utf16, -1, &utf8, NULL);
 
       if (string_cases[i].utf8 != NULL)
         {
           g_assert_true (success);
           g_assert_cmpstr (string_cases[i].utf8, ==, utf8);
           /* This only works because all testcases lack separators */
-          g_assert_true (utf8 == xutf8_find_basename (utf8, len));
+          g_assert_true (utf8 == g_utf8_find_basename (utf8, len));
         }
 
       g_free (utf8);
 
       utf8 = NULL;
       utf8_folded = NULL;
-      success = xutf16_to_utf8_and_fold (string_cases[i].utf16, -1, &utf8, &utf8_folded);
+      success = g_utf16_to_utf8_and_fold (string_cases[i].utf16, -1, &utf8, &utf8_folded);
 
       if (string_cases[i].utf8 != NULL)
         {
@@ -149,7 +149,7 @@ struct {
   const char *orig;
   const char *executable;
   const char *executable_basename;
-  xboolean_t    is_rundll32;
+  gboolean    is_rundll32;
   const char *fixed;
 } rundll32_commandlines[] = {
   {
@@ -330,18 +330,18 @@ struct {
 static void
 test_win32_rundll32_fixup (void)
 {
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (rundll32_commandlines); i++)
     {
-      xunichar2_t *argument;
-      xunichar2_t *expected;
+      gunichar2 *argument;
+      gunichar2 *expected;
 
       if (!rundll32_commandlines[i].is_rundll32)
         continue;
 
-      argument = xutf8_to_utf16 (rundll32_commandlines[i].orig, -1, NULL, NULL, NULL);
-      expected = xutf8_to_utf16 (rundll32_commandlines[i].fixed, -1, NULL, NULL, NULL);
+      argument = g_utf8_to_utf16 (rundll32_commandlines[i].orig, -1, NULL, NULL, NULL);
+      expected = g_utf8_to_utf16 (rundll32_commandlines[i].fixed, -1, NULL, NULL, NULL);
 
       g_assert_nonnull (argument);
       g_assert_nonnull (expected);
@@ -357,18 +357,18 @@ test_win32_rundll32_fixup (void)
 static void
 test_win32_extract_executable (void)
 {
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (rundll32_commandlines); i++)
     {
-      xunichar2_t *argument;
-      xchar_t *dll_function;
-      xchar_t *executable;
-      xchar_t *executable_basename;
-      xchar_t *executable_folded;
-      xchar_t *executable_folded_basename;
+      gunichar2 *argument;
+      gchar *dll_function;
+      gchar *executable;
+      gchar *executable_basename;
+      gchar *executable_folded;
+      gchar *executable_folded_basename;
 
-      argument = xutf8_to_utf16 (rundll32_commandlines[i].orig, -1, NULL, NULL, NULL);
+      argument = g_utf8_to_utf16 (rundll32_commandlines[i].orig, -1, NULL, NULL, NULL);
 
       _g_win32_extract_executable (argument, NULL, NULL, NULL, NULL, &dll_function);
 
@@ -410,12 +410,12 @@ test_win32_extract_executable (void)
 static void
 test_win32_parse_filename (void)
 {
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (rundll32_commandlines); i++)
     {
-      xunichar2_t *argument;
-      argument = xutf8_to_utf16 (rundll32_commandlines[i].orig, -1, NULL, NULL, NULL);
+      gunichar2 *argument;
+      argument = g_utf8_to_utf16 (rundll32_commandlines[i].orig, -1, NULL, NULL, NULL);
       /* Just checking that it doesn't blow up on various (sometimes incorrect) strings */
       _g_win32_parse_filename (argument, FALSE, NULL, NULL, NULL, NULL);
       g_free (argument);
@@ -425,7 +425,7 @@ test_win32_parse_filename (void)
 static void
 do_fail_on_broken_utf16_1 (void)
 {
-  const xunichar2_t utf16[] = { 0xd800, 0x0000 };
+  const gunichar2 utf16[] = { 0xd800, 0x0000 };
   _g_win32_extract_executable (utf16, NULL, NULL, NULL, NULL, NULL);
 }
 
@@ -433,8 +433,8 @@ static void
 do_fail_on_broken_utf16_2 (void)
 {
   /* "rundll32.exe <invalid utf16> r" */
-  xchar_t *dll_function;
-  const xunichar2_t utf16[] = { 0x0072, 0x0075, 0x006E, 0x0064, 0x006C, 0x006C, 0x0033, 0x0032,
+  gchar *dll_function;
+  const gunichar2 utf16[] = { 0x0072, 0x0075, 0x006E, 0x0064, 0x006C, 0x006C, 0x0033, 0x0032,
                               0x002E, 0x0065, 0x0078, 0x0065, 0x0020, 0xd800, 0x0020, 0x0072, 0x0000 };
   _g_win32_extract_executable (utf16, NULL, NULL, NULL, NULL, &dll_function);
 }

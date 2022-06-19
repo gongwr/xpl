@@ -19,7 +19,7 @@
 #ifndef __G_HMAC_H__
 #define __G_HMAC_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -29,53 +29,53 @@
 G_BEGIN_DECLS
 
 /**
- * xhmac_t:
+ * GHmac:
  *
  * An opaque structure representing a HMAC operation.
- * To create a new xhmac_t, use g_hmac_new(). To free
- * a xhmac_t, use g_hmac_unref().
+ * To create a new GHmac, use g_hmac_new(). To free
+ * a GHmac, use g_hmac_unref().
  *
  * Since: 2.30
  */
-typedef struct _GHmac       xhmac_t;
+typedef struct _GHmac       GHmac;
 
-XPL_AVAILABLE_IN_2_30
-xhmac_t *               g_hmac_new                    (GChecksumType  digest_type,
-                                                     const xuchar_t  *key,
-                                                     xsize_t          key_len);
-XPL_AVAILABLE_IN_2_30
-xhmac_t *               g_hmac_copy                   (const xhmac_t   *hmac);
-XPL_AVAILABLE_IN_2_30
-xhmac_t *               g_hmac_ref                    (xhmac_t         *hmac);
-XPL_AVAILABLE_IN_2_30
-void                  g_hmac_unref                  (xhmac_t         *hmac);
-XPL_AVAILABLE_IN_2_30
-void                  g_hmac_update                 (xhmac_t         *hmac,
-                                                     const xuchar_t  *data,
-                                                     xssize_t         length);
-XPL_AVAILABLE_IN_2_30
-const xchar_t *         g_hmac_get_string             (xhmac_t         *hmac);
-XPL_AVAILABLE_IN_2_30
-void                  g_hmac_get_digest             (xhmac_t         *hmac,
-                                                     xuint8_t        *buffer,
-                                                     xsize_t         *digest_len);
+GLIB_AVAILABLE_IN_2_30
+GHmac *               g_hmac_new                    (GChecksumType  digest_type,
+                                                     const guchar  *key,
+                                                     gsize          key_len);
+GLIB_AVAILABLE_IN_2_30
+GHmac *               g_hmac_copy                   (const GHmac   *hmac);
+GLIB_AVAILABLE_IN_2_30
+GHmac *               g_hmac_ref                    (GHmac         *hmac);
+GLIB_AVAILABLE_IN_2_30
+void                  g_hmac_unref                  (GHmac         *hmac);
+GLIB_AVAILABLE_IN_2_30
+void                  g_hmac_update                 (GHmac         *hmac,
+                                                     const guchar  *data,
+                                                     gssize         length);
+GLIB_AVAILABLE_IN_2_30
+const gchar *         g_hmac_get_string             (GHmac         *hmac);
+GLIB_AVAILABLE_IN_2_30
+void                  g_hmac_get_digest             (GHmac         *hmac,
+                                                     guint8        *buffer,
+                                                     gsize         *digest_len);
 
-XPL_AVAILABLE_IN_2_30
-xchar_t                *g_compute_hmac_for_data       (GChecksumType  digest_type,
-                                                     const xuchar_t  *key,
-                                                     xsize_t          key_len,
-                                                     const xuchar_t  *data,
-                                                     xsize_t          length);
-XPL_AVAILABLE_IN_2_30
-xchar_t                *g_compute_hmac_for_string     (GChecksumType  digest_type,
-                                                     const xuchar_t  *key,
-                                                     xsize_t          key_len,
-                                                     const xchar_t   *str,
-                                                     xssize_t         length);
-XPL_AVAILABLE_IN_2_50
-xchar_t               *g_compute_hmac_for_bytes       (GChecksumType  digest_type,
-                                                     xbytes_t        *key,
-                                                     xbytes_t        *data);
+GLIB_AVAILABLE_IN_2_30
+gchar                *g_compute_hmac_for_data       (GChecksumType  digest_type,
+                                                     const guchar  *key,
+                                                     gsize          key_len,
+                                                     const guchar  *data,
+                                                     gsize          length);
+GLIB_AVAILABLE_IN_2_30
+gchar                *g_compute_hmac_for_string     (GChecksumType  digest_type,
+                                                     const guchar  *key,
+                                                     gsize          key_len,
+                                                     const gchar   *str,
+                                                     gssize         length);
+GLIB_AVAILABLE_IN_2_50
+gchar               *g_compute_hmac_for_bytes       (GChecksumType  digest_type,
+                                                     GBytes        *key,
+                                                     GBytes        *data);
 
 
 G_END_DECLS

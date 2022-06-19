@@ -39,266 +39,266 @@
 #define TEST_SIZE			0xFFFFFFF0
 
 static void
-test_assigned_values (xfile_info_t *info)
+test_assigned_values (GFileInfo *info)
 {
   const char *name, *display_name, *mistake;
-  xuint64_t size;
-  xfile_type_t type;
-
-  /*  test_t for attributes presence */
-  g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_NAME));
-  g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME));
-  g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SIZE));
-  g_assert_false (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_COPY_NAME));
-
+  guint64 size;
+  GFileType type;
+  
+  /*  Test for attributes presence */
+  g_assert_true (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_NAME));
+  g_assert_true (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME));
+  g_assert_true (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE));
+  g_assert_false (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME));
+	
   /*  Retrieve data back and compare */
-
-  name = xfile_info_get_attribute_byte_string (info, XFILE_ATTRIBUTE_STANDARD_NAME);
-  display_name = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME);
-  mistake = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_STANDARD_COPY_NAME);
-  size = xfile_info_get_attribute_uint64 (info, XFILE_ATTRIBUTE_STANDARD_SIZE);
-  type = xfile_info_get_file_type (info);
-
+  
+  name = g_file_info_get_attribute_byte_string (info, G_FILE_ATTRIBUTE_STANDARD_NAME);
+  display_name = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME);
+  mistake = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_COPY_NAME);
+  size = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE);
+  type = g_file_info_get_file_type (info);
+  
   g_assert_cmpstr (name, ==, TEST_NAME);
   g_assert_cmpstr (display_name, ==, TEST_DISPLAY_NAME);
   g_assert_null (mistake);
   g_assert_cmpint (size, ==, TEST_SIZE);
-  g_assert_cmpstr (name, ==, xfile_info_get_name (info));
-  g_assert_cmpstr (display_name, ==, xfile_info_get_display_name (info));
-  g_assert_cmpint (size, ==, xfile_info_get_size (info)	);
-  g_assert_cmpint (type, ==, XFILE_TYPE_DIRECTORY);
+  g_assert_cmpstr (name, ==, g_file_info_get_name (info));
+  g_assert_cmpstr (display_name, ==, g_file_info_get_display_name (info));
+  g_assert_cmpint (size, ==, g_file_info_get_size (info)	);
+  g_assert_cmpint (type, ==, G_FILE_TYPE_DIRECTORY);
 }
 
 
 
 static void
-test_xfile_info (void)
+test_g_file_info (void)
 {
-  xfile_info_t *info;
-  xfile_info_t *info_dup;
-  xfile_info_t *info_copy;
+  GFileInfo *info;
+  GFileInfo *info_dup;
+  GFileInfo *info_copy;
   char **attr_list;
-  xfile_attribute_matcher_t *matcher;
-
-  info = xfile_info_new ();
-
-  /*  test_t for empty instance */
-  attr_list = xfile_info_list_attributes (info, NULL);
+  GFileAttributeMatcher *matcher;
+  
+  info = g_file_info_new ();
+  
+  /*  Test for empty instance */
+  attr_list = g_file_info_list_attributes (info, NULL);
   g_assert_nonnull (attr_list);
   g_assert_null (*attr_list);
-  xstrfreev (attr_list);
+  g_strfreev (attr_list);
 
-  xfile_info_set_attribute_byte_string (info, XFILE_ATTRIBUTE_STANDARD_NAME, TEST_NAME);
-  xfile_info_set_attribute_string (info, XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME, TEST_DISPLAY_NAME);
-  xfile_info_set_attribute_uint64 (info, XFILE_ATTRIBUTE_STANDARD_SIZE, TEST_SIZE);
-  xfile_info_set_file_type (info, XFILE_TYPE_DIRECTORY);
-
+  g_file_info_set_attribute_byte_string (info, G_FILE_ATTRIBUTE_STANDARD_NAME, TEST_NAME);
+  g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME, TEST_DISPLAY_NAME);
+  g_file_info_set_attribute_uint64 (info, G_FILE_ATTRIBUTE_STANDARD_SIZE, TEST_SIZE);
+  g_file_info_set_file_type (info, G_FILE_TYPE_DIRECTORY);
+	
   /*  The attr list should not be empty now */
-  attr_list = xfile_info_list_attributes (info, NULL);
+  attr_list = g_file_info_list_attributes (info, NULL);
   g_assert_nonnull (attr_list);
   g_assert_nonnull (*attr_list);
-  xstrfreev (attr_list);
+  g_strfreev (attr_list);
 
   test_assigned_values (info);
-
-  /*  test_t dups */
-  info_dup = xfile_info_dup (info);
+	
+  /*  Test dups */
+  info_dup = g_file_info_dup (info);
   g_assert_nonnull (info_dup);
   test_assigned_values (info_dup);
-
-  info_copy = xfile_info_new ();
-  xfile_info_copy_into (info_dup, info_copy);
+  
+  info_copy = g_file_info_new ();
+  g_file_info_copy_into (info_dup, info_copy);
   g_assert_nonnull (info_copy);
   test_assigned_values (info_copy);
 
-  /*  test_t remove attribute */
-  g_assert_false (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER));
-  xfile_info_set_attribute_int32 (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER, 10);
-  g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER));
+  /*  Test remove attribute */
+  g_assert_false (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER));
+  g_file_info_set_attribute_int32 (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER, 10);
+  g_assert_true (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER));
 
-  g_assert_cmpint (xfile_info_get_attribute_type (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER), ==, XFILE_ATTRIBUTE_TYPE_INT32);
-  g_assert_cmpint (xfile_info_get_attribute_status (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER), !=, XFILE_ATTRIBUTE_STATUS_ERROR_SETTING);
+  g_assert_cmpint (g_file_info_get_attribute_type (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER), ==, G_FILE_ATTRIBUTE_TYPE_INT32);
+  g_assert_cmpint (g_file_info_get_attribute_status (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER), !=, G_FILE_ATTRIBUTE_STATUS_ERROR_SETTING);
 
-  xfile_info_remove_attribute (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER);
-  g_assert_false (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER));
-  g_assert_cmpint (xfile_info_get_attribute_type (info, XFILE_ATTRIBUTE_STANDARD_SORT_ORDER), ==, XFILE_ATTRIBUTE_TYPE_INVALID);
+  g_file_info_remove_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER);
+  g_assert_false (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER));
+  g_assert_cmpint (g_file_info_get_attribute_type (info, G_FILE_ATTRIBUTE_STANDARD_SORT_ORDER), ==, G_FILE_ATTRIBUTE_TYPE_INVALID);
 
-  matcher = xfile_attribute_matcher_new (XFILE_ATTRIBUTE_STANDARD_NAME ","
-                                          XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME);
+  matcher = g_file_attribute_matcher_new (G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                          G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME);
 
-  g_assert_true (xfile_attribute_matcher_matches (matcher, XFILE_ATTRIBUTE_STANDARD_NAME));
-  g_assert_false (xfile_attribute_matcher_matches_only (matcher, XFILE_ATTRIBUTE_STANDARD_NAME));
-  g_assert_false (xfile_attribute_matcher_matches (matcher, XFILE_ATTRIBUTE_STANDARD_SIZE));
+  g_assert_true (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_NAME));
+  g_assert_false (g_file_attribute_matcher_matches_only (matcher, G_FILE_ATTRIBUTE_STANDARD_NAME));
+  g_assert_false (g_file_attribute_matcher_matches (matcher, G_FILE_ATTRIBUTE_STANDARD_SIZE));
 
-  xfile_info_set_attribute_mask (info, matcher);
-  xfile_attribute_matcher_unref (matcher);
+  g_file_info_set_attribute_mask (info, matcher);
+  g_file_attribute_matcher_unref (matcher);
 
-  g_assert_false (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_SIZE));
-  g_assert_true (xfile_info_has_attribute (info, XFILE_ATTRIBUTE_STANDARD_NAME));
+  g_assert_false (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_SIZE));
+  g_assert_true (g_file_info_has_attribute (info, G_FILE_ATTRIBUTE_STANDARD_NAME));
 
-  xobject_unref (info);
-  xobject_unref (info_dup);
-  xobject_unref (info_copy);
+  g_object_unref (info);
+  g_object_unref (info_dup);
+  g_object_unref (info_copy);
 }
 
 static void
-test_xfile_info_modification_time (void)
+test_g_file_info_modification_time (void)
 {
-  xfile_t *file = NULL;
-  xfile_io_stream_t *io_stream = NULL;
-  xfile_info_t *info = NULL;
-  xdatetime_t *dt = NULL, *dt_usecs = NULL, *dt_new = NULL, *dt_new_usecs = NULL;
+  GFile *file = NULL;
+  GFileIOStream *io_stream = NULL;
+  GFileInfo *info = NULL;
+  GDateTime *dt = NULL, *dt_usecs = NULL, *dt_new = NULL, *dt_new_usecs = NULL;
   GTimeSpan ts;
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_test_summary ("test_t that getting the modification time of a file works.");
+  g_test_summary ("Test that getting the modification time of a file works.");
 
-  file = xfile_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
+  file = g_file_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
   g_assert_no_error (error);
 
-  info = xfile_query_info (file,
-                            XFILE_ATTRIBUTE_TIME_MODIFIED,
-                            XFILE_QUERY_INFO_NONE,
+  info = g_file_query_info (file,
+                            G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                            G_FILE_QUERY_INFO_NONE,
                             NULL, &error);
   g_assert_no_error (error);
 
   /* Check the modification time is retrievable. */
-  dt = xfile_info_get_modification_date_time (info);
+  dt = g_file_info_get_modification_date_time (info);
   g_assert_nonnull (dt);
 
   /* Try again with microsecond precision. */
   g_clear_object (&info);
-  info = xfile_query_info (file,
-                            XFILE_ATTRIBUTE_TIME_MODIFIED "," XFILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-                            XFILE_QUERY_INFO_NONE,
+  info = g_file_query_info (file,
+                            G_FILE_ATTRIBUTE_TIME_MODIFIED "," G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+                            G_FILE_QUERY_INFO_NONE,
                             NULL, &error);
   g_assert_no_error (error);
 
-  dt_usecs = xfile_info_get_modification_date_time (info);
+  dt_usecs = g_file_info_get_modification_date_time (info);
   g_assert_nonnull (dt_usecs);
 
-  ts = xdate_time_difference (dt_usecs, dt);
+  ts = g_date_time_difference (dt_usecs, dt);
   g_assert_cmpint (ts, >=, 0);
   g_assert_cmpint (ts, <, G_USEC_PER_SEC);
 
   /* Try round-tripping the modification time. */
-  dt_new = xdate_time_add (dt_usecs, G_USEC_PER_SEC + 50);
-  xfile_info_set_modification_date_time (info, dt_new);
+  dt_new = g_date_time_add (dt_usecs, G_USEC_PER_SEC + 50);
+  g_file_info_set_modification_date_time (info, dt_new);
 
-  dt_new_usecs = xfile_info_get_modification_date_time (info);
-  ts = xdate_time_difference (dt_new_usecs, dt_new);
+  dt_new_usecs = g_file_info_get_modification_date_time (info);
+  ts = g_date_time_difference (dt_new_usecs, dt_new);
   g_assert_cmpint (ts, ==, 0);
 
   /* Clean up. */
   g_clear_object (&io_stream);
-  xfile_delete (file, NULL, NULL);
+  g_file_delete (file, NULL, NULL);
   g_clear_object (&file);
 
   g_clear_object (&info);
-  xdate_time_unref (dt);
-  xdate_time_unref (dt_usecs);
-  xdate_time_unref (dt_new);
-  xdate_time_unref (dt_new_usecs);
+  g_date_time_unref (dt);
+  g_date_time_unref (dt_usecs);
+  g_date_time_unref (dt_new);
+  g_date_time_unref (dt_new_usecs);
 }
 
 static void
-test_xfile_info_access_time (void)
+test_g_file_info_access_time (void)
 {
-  xfile_t *file = NULL;
-  xfile_io_stream_t *io_stream = NULL;
-  xfile_info_t *info = NULL;
-  xdatetime_t *dt = NULL, *dt_usecs = NULL, *dt_new = NULL, *dt_new_usecs = NULL,
+  GFile *file = NULL;
+  GFileIOStream *io_stream = NULL;
+  GFileInfo *info = NULL;
+  GDateTime *dt = NULL, *dt_usecs = NULL, *dt_new = NULL, *dt_new_usecs = NULL,
             *dt_before_epoch = NULL, *dt_before_epoch_returned = NULL;
   GTimeSpan ts;
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_test_summary ("test_t that getting the access time of a file works.");
+  g_test_summary ("Test that getting the access time of a file works.");
 
-  file = xfile_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
+  file = g_file_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
   g_assert_no_error (error);
 
-  info = xfile_query_info (file,
-                            XFILE_ATTRIBUTE_TIME_ACCESS,
-                            XFILE_QUERY_INFO_NONE,
+  info = g_file_query_info (file,
+                            G_FILE_ATTRIBUTE_TIME_ACCESS,
+                            G_FILE_QUERY_INFO_NONE,
                             NULL, &error);
   g_assert_no_error (error);
 
   /* Check the access time is retrievable. */
-  dt = xfile_info_get_access_date_time (info);
+  dt = g_file_info_get_access_date_time (info);
   g_assert_nonnull (dt);
 
   /* Try again with microsecond precision. */
   g_clear_object (&info);
-  info = xfile_query_info (file,
-                            XFILE_ATTRIBUTE_TIME_ACCESS "," XFILE_ATTRIBUTE_TIME_ACCESS_USEC,
-                            XFILE_QUERY_INFO_NONE,
+  info = g_file_query_info (file,
+                            G_FILE_ATTRIBUTE_TIME_ACCESS "," G_FILE_ATTRIBUTE_TIME_ACCESS_USEC,
+                            G_FILE_QUERY_INFO_NONE,
                             NULL, &error);
   g_assert_no_error (error);
 
-  dt_usecs = xfile_info_get_access_date_time (info);
+  dt_usecs = g_file_info_get_access_date_time (info);
   g_assert_nonnull (dt_usecs);
 
-  ts = xdate_time_difference (dt_usecs, dt);
+  ts = g_date_time_difference (dt_usecs, dt);
   g_assert_cmpint (ts, >, 0);
   g_assert_cmpint (ts, <, G_USEC_PER_SEC);
 
   /* Try round-tripping the access time. */
-  dt_new = xdate_time_add (dt_usecs, G_USEC_PER_SEC + 50);
-  xfile_info_set_access_date_time (info, dt_new);
+  dt_new = g_date_time_add (dt_usecs, G_USEC_PER_SEC + 50);
+  g_file_info_set_access_date_time (info, dt_new);
 
-  dt_new_usecs = xfile_info_get_access_date_time (info);
-  ts = xdate_time_difference (dt_new_usecs, dt_new);
+  dt_new_usecs = g_file_info_get_access_date_time (info);
+  ts = g_date_time_difference (dt_new_usecs, dt_new);
   g_assert_cmpint (ts, ==, 0);
 
   // try with a negative timestamp
-  dt_before_epoch = xdate_time_new_from_unix_utc (-10000);
-  xfile_info_set_access_date_time (info, dt_before_epoch);
-  dt_before_epoch_returned = xfile_info_get_access_date_time (info);
-  ts = xdate_time_difference (dt_before_epoch, dt_before_epoch_returned);
+  dt_before_epoch = g_date_time_new_from_unix_utc (-10000);
+  g_file_info_set_access_date_time (info, dt_before_epoch);
+  dt_before_epoch_returned = g_file_info_get_access_date_time (info);
+  ts = g_date_time_difference (dt_before_epoch, dt_before_epoch_returned);
   g_assert_cmpint (ts, ==, 0);
 
   /* Clean up. */
   g_clear_object (&io_stream);
-  xfile_delete (file, NULL, NULL);
+  g_file_delete (file, NULL, NULL);
   g_clear_object (&file);
 
   g_clear_object (&info);
-  xdate_time_unref (dt);
-  xdate_time_unref (dt_usecs);
-  xdate_time_unref (dt_new);
-  xdate_time_unref (dt_new_usecs);
-  xdate_time_unref (dt_before_epoch);
-  xdate_time_unref (dt_before_epoch_returned);
+  g_date_time_unref (dt);
+  g_date_time_unref (dt_usecs);
+  g_date_time_unref (dt_new);
+  g_date_time_unref (dt_new_usecs);
+  g_date_time_unref (dt_before_epoch);
+  g_date_time_unref (dt_before_epoch_returned);
 }
 
 static void
-test_xfile_info_creation_time (void)
+test_g_file_info_creation_time (void)
 {
-  xfile_t *file = NULL;
-  xfile_io_stream_t *io_stream = NULL;
-  xfile_info_t *info = NULL;
-  xdatetime_t *dt = NULL, *dt_usecs = NULL, *dt_new = NULL, *dt_new_usecs = NULL,
+  GFile *file = NULL;
+  GFileIOStream *io_stream = NULL;
+  GFileInfo *info = NULL;
+  GDateTime *dt = NULL, *dt_usecs = NULL, *dt_new = NULL, *dt_new_usecs = NULL,
             *dt_before_epoch = NULL, *dt_before_epoch_returned = NULL;
   GTimeSpan ts;
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_test_summary ("test_t that getting the creation time of a file works.");
+  g_test_summary ("Test that getting the creation time of a file works.");
 
-  file = xfile_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
+  file = g_file_new_tmp ("g-file-info-test-XXXXXX", &io_stream, &error);
   g_assert_no_error (error);
 
-  info = xfile_query_info (file,
-                            XFILE_ATTRIBUTE_TIME_CREATED,
-                            XFILE_QUERY_INFO_NONE,
+  info = g_file_query_info (file,
+                            G_FILE_ATTRIBUTE_TIME_CREATED,
+                            G_FILE_QUERY_INFO_NONE,
                             NULL, &error);
   g_assert_no_error (error);
 
   /* Check the creation time is retrievable. */
-  dt = xfile_info_get_creation_date_time (info);
+  dt = g_file_info_get_creation_date_time (info);
   if (!dt)
     {
       g_test_skip ("Skipping testing creation time as it’s not supported by the kernel");
-      xfile_delete (file, NULL, NULL);
+      g_file_delete (file, NULL, NULL);
       g_clear_object (&file);
       g_clear_object (&info);
       return;
@@ -306,46 +306,46 @@ test_xfile_info_creation_time (void)
 
   /* Try again with microsecond precision. */
   g_clear_object (&info);
-  info = xfile_query_info (file,
-                            XFILE_ATTRIBUTE_TIME_CREATED "," XFILE_ATTRIBUTE_TIME_CREATED_USEC,
-                            XFILE_QUERY_INFO_NONE,
+  info = g_file_query_info (file,
+                            G_FILE_ATTRIBUTE_TIME_CREATED "," G_FILE_ATTRIBUTE_TIME_CREATED_USEC,
+                            G_FILE_QUERY_INFO_NONE,
                             NULL, &error);
   g_assert_no_error (error);
 
-  dt_usecs = xfile_info_get_creation_date_time (info);
+  dt_usecs = g_file_info_get_creation_date_time (info);
   g_assert_nonnull (dt_usecs);
 
-  ts = xdate_time_difference (dt_usecs, dt);
+  ts = g_date_time_difference (dt_usecs, dt);
   g_assert_cmpint (ts, >, 0);
   g_assert_cmpint (ts, <, G_USEC_PER_SEC);
 
   /* Try round-tripping the creation time. */
-  dt_new = xdate_time_add (dt_usecs, G_USEC_PER_SEC + 50);
-  xfile_info_set_creation_date_time (info, dt_new);
+  dt_new = g_date_time_add (dt_usecs, G_USEC_PER_SEC + 50);
+  g_file_info_set_creation_date_time (info, dt_new);
 
-  dt_new_usecs = xfile_info_get_creation_date_time (info);
-  ts = xdate_time_difference (dt_new_usecs, dt_new);
+  dt_new_usecs = g_file_info_get_creation_date_time (info);
+  ts = g_date_time_difference (dt_new_usecs, dt_new);
   g_assert_cmpint (ts, ==, 0);
 
   // try with a negative timestamp
-  dt_before_epoch = xdate_time_new_from_unix_utc (-10000);
-  xfile_info_set_creation_date_time (info, dt_before_epoch);
-  dt_before_epoch_returned = xfile_info_get_creation_date_time (info);
-  ts = xdate_time_difference (dt_before_epoch, dt_before_epoch_returned);
+  dt_before_epoch = g_date_time_new_from_unix_utc (-10000);
+  g_file_info_set_creation_date_time (info, dt_before_epoch);
+  dt_before_epoch_returned = g_file_info_get_creation_date_time (info);
+  ts = g_date_time_difference (dt_before_epoch, dt_before_epoch_returned);
   g_assert_cmpint (ts, ==, 0);
 
   /* Clean up. */
   g_clear_object (&io_stream);
-  xfile_delete (file, NULL, NULL);
+  g_file_delete (file, NULL, NULL);
   g_clear_object (&file);
 
   g_clear_object (&info);
-  xdate_time_unref (dt);
-  xdate_time_unref (dt_usecs);
-  xdate_time_unref (dt_new);
-  xdate_time_unref (dt_new_usecs);
-  xdate_time_unref (dt_before_epoch);
-  xdate_time_unref (dt_before_epoch_returned);
+  g_date_time_unref (dt);
+  g_date_time_unref (dt_usecs);
+  g_date_time_unref (dt_new);
+  g_date_time_unref (dt_new_usecs);
+  g_date_time_unref (dt_before_epoch);
+  g_date_time_unref (dt_before_epoch_returned);
 }
 
 #ifdef G_OS_WIN32
@@ -353,35 +353,35 @@ static void
 test_internal_enhanced_stdio (void)
 {
   char *p0, *p1, *ps;
-  xboolean_t try_sparse;
-  xchar_t *tmp_dir_root;
+  gboolean try_sparse;
+  gchar *tmp_dir_root;
   wchar_t *tmp_dir_root_w;
-  xchar_t *c;
+  gchar *c;
   DWORD fsflags;
   FILE *f;
   SYSTEMTIME st;
   FILETIME ft;
   HANDLE h;
   GStatBuf statbuf_p0, statbuf_p1, statbuf_ps;
-  xfile_t *gf_p0, *gf_p1, *gf_ps;
-  xfile_info_t *fi_p0, *fi_p1, *fi_ps;
-  xuint64_t size_p0, alsize_p0, size_ps, alsize_ps;
-  const xchar_t *id_p0;
-  const xchar_t *id_p1;
-  xuint64_t time_p0;
-  xchar_t *tmp_dir;
+  GFile *gf_p0, *gf_p1, *gf_ps;
+  GFileInfo *fi_p0, *fi_p1, *fi_ps;
+  guint64 size_p0, alsize_p0, size_ps, alsize_ps;
+  const gchar *id_p0;
+  const gchar *id_p1;
+  guint64 time_p0;
+  gchar *tmp_dir;
   wchar_t *programdata_dir_w;
   wchar_t *users_dir_w;
-  static const GUID folder_id_programdata =
+  static const GUID folder_id_programdata = 
     { 0x62AB5D82, 0xFDC1, 0x4DC3, { 0xA9, 0xDD, 0x07, 0x0D, 0x1D, 0x49, 0x5D, 0x97 } };
-  static const GUID folder_id_users =
+  static const GUID folder_id_users = 
     { 0x0762D272, 0xC50A, 0x4BB0, { 0xA3, 0x82, 0x69, 0x7D, 0xCD, 0x72, 0x9B, 0x80 } };
-  xdatetime_t *dt = NULL, *dt2 = NULL;
+  GDateTime *dt = NULL, *dt2 = NULL;
   GTimeSpan ts;
   /* Just before SYSTEMTIME limit (Jan 1 30827) */
-  const sint64_t one_sec_before_systemtime_limit = 910670515199;
-  xboolean_t retval;
-  xerror_t *local_error = NULL;
+  const gint64 one_sec_before_systemtime_limit = 910670515199;
+  gboolean retval;
+  GError *local_error = NULL;
 
 
   programdata_dir_w = NULL;
@@ -392,33 +392,33 @@ test_internal_enhanced_stdio (void)
 
   if (programdata_dir_w != NULL && users_dir_w != NULL)
     {
-      xchar_t *programdata;
-      xchar_t *users_dir;
-      xchar_t *allusers;
-      xchar_t *commondata;
-      xfile_t *gf_programdata, *gf_allusers, *gf_commondata;
-      xfile_info_t *fi_programdata, *fi_allusers, *fi_allusers_target, *fi_commondata, *fi_commondata_target;
-      xfile_type_t ft_allusers;
-      xfile_type_t ft_allusers_target;
-      xfile_type_t ft_programdata;
-      xfile_type_t ft_commondata;
-      xboolean_t allusers_is_symlink;
-      xboolean_t commondata_is_symlink;
-      xboolean_t commondata_is_mount_point;
-      xuint32_t allusers_reparse_tag;
-      xuint32_t commondata_reparse_tag;
-      const xchar_t *id_allusers;
-      const xchar_t *id_allusers_target;
-      const xchar_t *id_commondata_target;
-      const xchar_t *id_programdata;
-      const xchar_t *allusers_target;
-      const xchar_t *commondata_target;
+      gchar *programdata;
+      gchar *users_dir;
+      gchar *allusers;
+      gchar *commondata;
+      GFile *gf_programdata, *gf_allusers, *gf_commondata;
+      GFileInfo *fi_programdata, *fi_allusers, *fi_allusers_target, *fi_commondata, *fi_commondata_target;
+      GFileType ft_allusers;
+      GFileType ft_allusers_target;
+      GFileType ft_programdata;
+      GFileType ft_commondata;
+      gboolean allusers_is_symlink;
+      gboolean commondata_is_symlink;
+      gboolean commondata_is_mount_point;
+      guint32 allusers_reparse_tag;
+      guint32 commondata_reparse_tag;
+      const gchar *id_allusers;
+      const gchar *id_allusers_target;
+      const gchar *id_commondata_target;
+      const gchar *id_programdata;
+      const gchar *allusers_target;
+      const gchar *commondata_target;
 
       /* C:/ProgramData */
-      programdata = xutf16_to_utf8 (programdata_dir_w, -1, NULL, NULL, NULL);
+      programdata = g_utf16_to_utf8 (programdata_dir_w, -1, NULL, NULL, NULL);
       g_assert_nonnull (programdata);
       /* C:/Users */
-      users_dir = xutf16_to_utf8 (users_dir_w, -1, NULL, NULL, NULL);
+      users_dir = g_utf16_to_utf8 (users_dir_w, -1, NULL, NULL, NULL);
       g_assert_nonnull (users_dir);
       /* "C:/Users/All Users" is a known directory symlink
        * for "C:/ProgramData".
@@ -438,83 +438,83 @@ test_internal_enhanced_stdio (void)
        *  and these directories have no interesting properties other
        *  than [not] being symlinks).
        */
-      gf_programdata = xfile_new_for_path (programdata);
-      gf_allusers = xfile_new_for_path (allusers);
-      gf_commondata = xfile_new_for_path (commondata);
+      gf_programdata = g_file_new_for_path (programdata);
+      gf_allusers = g_file_new_for_path (allusers);
+      gf_commondata = g_file_new_for_path (commondata);
 
-      fi_programdata = xfile_query_info (gf_programdata,
-                                          XFILE_ATTRIBUTE_ID_FILE ","
-                                          XFILE_ATTRIBUTE_STANDARD_TYPE,
-                                          XFILE_QUERY_INFO_NONE,
+      fi_programdata = g_file_query_info (gf_programdata,
+                                          G_FILE_ATTRIBUTE_ID_FILE ","
+                                          G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                          G_FILE_QUERY_INFO_NONE,
                                           NULL, NULL);
 
-      fi_allusers_target = xfile_query_info (gf_allusers,
-                                              XFILE_ATTRIBUTE_ID_FILE ","
-                                              XFILE_ATTRIBUTE_STANDARD_TYPE,
-                                              XFILE_QUERY_INFO_NONE,
+      fi_allusers_target = g_file_query_info (gf_allusers,
+                                              G_FILE_ATTRIBUTE_ID_FILE ","
+                                              G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                              G_FILE_QUERY_INFO_NONE,
                                               NULL, NULL);
 
-      fi_allusers = xfile_query_info (gf_allusers,
-                                       XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET ","
-                                       XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
-                                       XFILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG ","
-                                       XFILE_ATTRIBUTE_ID_FILE ","
-                                       XFILE_ATTRIBUTE_STANDARD_TYPE,
-                                       XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+      fi_allusers = g_file_query_info (gf_allusers,
+                                       G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET ","
+                                       G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+                                       G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG ","
+                                       G_FILE_ATTRIBUTE_ID_FILE ","
+                                       G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                       G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                        NULL, NULL);
 
-      fi_commondata = xfile_query_info (gf_commondata,
-                                         XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET ","
-                                         XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
-                                         XFILE_ATTRIBUTE_DOS_IS_MOUNTPOINT ","
-                                         XFILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG ","
-                                         XFILE_ATTRIBUTE_ID_FILE ","
-                                         XFILE_ATTRIBUTE_STANDARD_TYPE,
-                                         XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+      fi_commondata = g_file_query_info (gf_commondata,
+                                         G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET ","
+                                         G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK ","
+                                         G_FILE_ATTRIBUTE_DOS_IS_MOUNTPOINT ","
+                                         G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG ","
+                                         G_FILE_ATTRIBUTE_ID_FILE ","
+                                         G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                         G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                          NULL, NULL);
 
-      fi_commondata_target = xfile_query_info (gf_commondata,
-                                                XFILE_ATTRIBUTE_ID_FILE ","
-                                                XFILE_ATTRIBUTE_STANDARD_TYPE,
-                                                XFILE_QUERY_INFO_NONE,
+      fi_commondata_target = g_file_query_info (gf_commondata,
+                                                G_FILE_ATTRIBUTE_ID_FILE ","
+                                                G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                                G_FILE_QUERY_INFO_NONE,
                                                 NULL, NULL);
 
-      g_assert_true (xfile_info_has_attribute (fi_programdata, XFILE_ATTRIBUTE_ID_FILE));
-      g_assert_true (xfile_info_has_attribute (fi_programdata, XFILE_ATTRIBUTE_STANDARD_TYPE));
+      g_assert_true (g_file_info_has_attribute (fi_programdata, G_FILE_ATTRIBUTE_ID_FILE));
+      g_assert_true (g_file_info_has_attribute (fi_programdata, G_FILE_ATTRIBUTE_STANDARD_TYPE));
 
-      g_assert_true (xfile_info_has_attribute (fi_allusers_target, XFILE_ATTRIBUTE_ID_FILE));
-      g_assert_true (xfile_info_has_attribute (fi_allusers_target, XFILE_ATTRIBUTE_STANDARD_TYPE));
-      g_assert_true (xfile_info_has_attribute (fi_commondata_target, XFILE_ATTRIBUTE_ID_FILE));
-      g_assert_true (xfile_info_has_attribute (fi_commondata_target, XFILE_ATTRIBUTE_STANDARD_TYPE));
+      g_assert_true (g_file_info_has_attribute (fi_allusers_target, G_FILE_ATTRIBUTE_ID_FILE));
+      g_assert_true (g_file_info_has_attribute (fi_allusers_target, G_FILE_ATTRIBUTE_STANDARD_TYPE));
+      g_assert_true (g_file_info_has_attribute (fi_commondata_target, G_FILE_ATTRIBUTE_ID_FILE));
+      g_assert_true (g_file_info_has_attribute (fi_commondata_target, G_FILE_ATTRIBUTE_STANDARD_TYPE));
 
-      g_assert_true (xfile_info_has_attribute (fi_allusers, XFILE_ATTRIBUTE_ID_FILE));
-      g_assert_true (xfile_info_has_attribute (fi_allusers, XFILE_ATTRIBUTE_STANDARD_TYPE));
-      g_assert_true (xfile_info_has_attribute (fi_allusers, XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK));
-      g_assert_true (xfile_info_has_attribute (fi_allusers, XFILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG));
-      g_assert_true (xfile_info_has_attribute (fi_allusers, XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET));
+      g_assert_true (g_file_info_has_attribute (fi_allusers, G_FILE_ATTRIBUTE_ID_FILE));
+      g_assert_true (g_file_info_has_attribute (fi_allusers, G_FILE_ATTRIBUTE_STANDARD_TYPE));
+      g_assert_true (g_file_info_has_attribute (fi_allusers, G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK));
+      g_assert_true (g_file_info_has_attribute (fi_allusers, G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG));
+      g_assert_true (g_file_info_has_attribute (fi_allusers, G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET));
 
-      g_assert_true (xfile_info_has_attribute (fi_commondata, XFILE_ATTRIBUTE_ID_FILE));
-      g_assert_true (xfile_info_has_attribute (fi_commondata, XFILE_ATTRIBUTE_STANDARD_TYPE));
-      g_assert_true (xfile_info_has_attribute (fi_commondata, XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK));
-      g_assert_true (xfile_info_has_attribute (fi_commondata, XFILE_ATTRIBUTE_DOS_IS_MOUNTPOINT));
-      g_assert_true (xfile_info_has_attribute (fi_commondata, XFILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG));
-      g_assert_true (xfile_info_has_attribute (fi_commondata, XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET));
+      g_assert_true (g_file_info_has_attribute (fi_commondata, G_FILE_ATTRIBUTE_ID_FILE));
+      g_assert_true (g_file_info_has_attribute (fi_commondata, G_FILE_ATTRIBUTE_STANDARD_TYPE));
+      g_assert_true (g_file_info_has_attribute (fi_commondata, G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK));
+      g_assert_true (g_file_info_has_attribute (fi_commondata, G_FILE_ATTRIBUTE_DOS_IS_MOUNTPOINT));
+      g_assert_true (g_file_info_has_attribute (fi_commondata, G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG));
+      g_assert_true (g_file_info_has_attribute (fi_commondata, G_FILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET));
 
-      ft_allusers = xfile_info_get_file_type (fi_allusers);
-      ft_allusers_target = xfile_info_get_file_type (fi_allusers_target);
-      ft_programdata = xfile_info_get_file_type (fi_programdata);
-      ft_commondata = xfile_info_get_file_type (fi_commondata);
+      ft_allusers = g_file_info_get_file_type (fi_allusers);
+      ft_allusers_target = g_file_info_get_file_type (fi_allusers_target);
+      ft_programdata = g_file_info_get_file_type (fi_programdata);
+      ft_commondata = g_file_info_get_file_type (fi_commondata);
 
-      g_assert_cmpint (ft_allusers, ==, XFILE_TYPE_DIRECTORY);
-      g_assert_cmpint (ft_allusers_target, ==, XFILE_TYPE_DIRECTORY);
-      g_assert_cmpint (ft_programdata, ==, XFILE_TYPE_DIRECTORY);
-      g_assert_cmpint (ft_commondata, ==, XFILE_TYPE_DIRECTORY);
+      g_assert_cmpint (ft_allusers, ==, G_FILE_TYPE_DIRECTORY);
+      g_assert_cmpint (ft_allusers_target, ==, G_FILE_TYPE_DIRECTORY);
+      g_assert_cmpint (ft_programdata, ==, G_FILE_TYPE_DIRECTORY);
+      g_assert_cmpint (ft_commondata, ==, G_FILE_TYPE_DIRECTORY);
 
-      allusers_is_symlink = xfile_info_get_attribute_boolean (fi_allusers, XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK);
-      allusers_reparse_tag = xfile_info_get_attribute_uint32 (fi_allusers, XFILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG);
-      commondata_is_symlink = xfile_info_get_attribute_boolean (fi_commondata, XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK);
-      commondata_is_mount_point = xfile_info_get_attribute_boolean (fi_commondata, XFILE_ATTRIBUTE_DOS_IS_MOUNTPOINT);
-      commondata_reparse_tag = xfile_info_get_attribute_uint32 (fi_commondata, XFILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG);
+      allusers_is_symlink = g_file_info_get_attribute_boolean (fi_allusers, G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK);
+      allusers_reparse_tag = g_file_info_get_attribute_uint32 (fi_allusers, G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG);
+      commondata_is_symlink = g_file_info_get_attribute_boolean (fi_commondata, G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK);
+      commondata_is_mount_point = g_file_info_get_attribute_boolean (fi_commondata, G_FILE_ATTRIBUTE_DOS_IS_MOUNTPOINT);
+      commondata_reparse_tag = g_file_info_get_attribute_uint32 (fi_commondata, G_FILE_ATTRIBUTE_DOS_REPARSE_POINT_TAG);
 
       g_assert_true (allusers_is_symlink);
       g_assert_cmpuint (allusers_reparse_tag, ==, IO_REPARSE_TAG_SYMLINK);
@@ -522,31 +522,31 @@ test_internal_enhanced_stdio (void)
       g_assert_true (commondata_is_mount_point);
       g_assert_cmpuint (commondata_reparse_tag, ==, IO_REPARSE_TAG_MOUNT_POINT);
 
-      id_allusers = xfile_info_get_attribute_string (fi_allusers, XFILE_ATTRIBUTE_ID_FILE);
-      id_allusers_target = xfile_info_get_attribute_string (fi_allusers_target, XFILE_ATTRIBUTE_ID_FILE);
-      id_commondata_target = xfile_info_get_attribute_string (fi_commondata_target, XFILE_ATTRIBUTE_ID_FILE);
-      id_programdata = xfile_info_get_attribute_string (fi_programdata, XFILE_ATTRIBUTE_ID_FILE);
+      id_allusers = g_file_info_get_attribute_string (fi_allusers, G_FILE_ATTRIBUTE_ID_FILE);
+      id_allusers_target = g_file_info_get_attribute_string (fi_allusers_target, G_FILE_ATTRIBUTE_ID_FILE);
+      id_commondata_target = g_file_info_get_attribute_string (fi_commondata_target, G_FILE_ATTRIBUTE_ID_FILE);
+      id_programdata = g_file_info_get_attribute_string (fi_programdata, G_FILE_ATTRIBUTE_ID_FILE);
 
       g_assert_cmpstr (id_allusers_target, ==, id_programdata);
       g_assert_cmpstr (id_commondata_target, ==, id_programdata);
       g_assert_cmpstr (id_allusers, !=, id_programdata);
 
-      allusers_target = xfile_info_get_symlink_target (fi_allusers);
+      allusers_target = g_file_info_get_symlink_target (fi_allusers);
 
-      g_assert_true (xstr_has_suffix (allusers_target, "ProgramData"));
+      g_assert_true (g_str_has_suffix (allusers_target, "ProgramData"));
 
-      commondata_target = xfile_info_get_symlink_target (fi_commondata);
+      commondata_target = g_file_info_get_symlink_target (fi_commondata);
 
-      g_assert_true (xstr_has_suffix (commondata_target, "ProgramData"));
+      g_assert_true (g_str_has_suffix (commondata_target, "ProgramData"));
 
-      xobject_unref (fi_allusers);
-      xobject_unref (fi_allusers_target);
-      xobject_unref (fi_commondata);
-      xobject_unref (fi_commondata_target);
-      xobject_unref (fi_programdata);
-      xobject_unref (gf_allusers);
-      xobject_unref (gf_commondata);
-      xobject_unref (gf_programdata);
+      g_object_unref (fi_allusers);
+      g_object_unref (fi_allusers_target);
+      g_object_unref (fi_commondata);
+      g_object_unref (fi_commondata_target);
+      g_object_unref (fi_programdata);
+      g_object_unref (gf_allusers);
+      g_object_unref (gf_commondata);
+      g_object_unref (gf_programdata);
 
       g_free (allusers);
       g_free (commondata);
@@ -570,7 +570,7 @@ test_internal_enhanced_stdio (void)
    * doesn't seem to be out of place.
    */
   try_sparse = FALSE;
-  tmp_dir_root = xstrdup (tmp_dir);
+  tmp_dir_root = g_strdup (tmp_dir);
   /* We need "C:\\" or "C:/", with a trailing [back]slash */
   for (c = tmp_dir_root; c && c[0] && c[1]; c++)
     if (c[0] == ':')
@@ -578,7 +578,7 @@ test_internal_enhanced_stdio (void)
         c[2] = '\0';
         break;
       }
-  tmp_dir_root_w = xutf8_to_utf16 (tmp_dir_root, -1, NULL, NULL, NULL);
+  tmp_dir_root_w = g_utf8_to_utf16 (tmp_dir_root, -1, NULL, NULL, NULL);
   g_assert_nonnull (tmp_dir_root_w);
   g_free (tmp_dir_root);
   g_assert_true (GetVolumeInformationW (tmp_dir_root_w, NULL, 0, NULL, NULL, &fsflags, NULL, 0));
@@ -629,21 +629,21 @@ test_internal_enhanced_stdio (void)
 
       g_stat (ps, &statbuf_ps);
 
-      gf_ps = xfile_new_for_path (ps);
+      gf_ps = g_file_new_for_path (ps);
 
-      fi_ps = xfile_query_info (gf_ps,
-                                 XFILE_ATTRIBUTE_STANDARD_SIZE ","
-                                 XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
-                                 XFILE_QUERY_INFO_NONE,
+      fi_ps = g_file_query_info (gf_ps,
+                                 G_FILE_ATTRIBUTE_STANDARD_SIZE ","
+                                 G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE,
+                                 G_FILE_QUERY_INFO_NONE,
                                  NULL, NULL);
 
       g_remove (ps);
 
-      g_assert_true (xfile_info_has_attribute (fi_ps, XFILE_ATTRIBUTE_STANDARD_SIZE));
-      g_assert_true (xfile_info_has_attribute (fi_ps, XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE));
+      g_assert_true (g_file_info_has_attribute (fi_ps, G_FILE_ATTRIBUTE_STANDARD_SIZE));
+      g_assert_true (g_file_info_has_attribute (fi_ps, G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE));
 
-      size_ps = xfile_info_get_attribute_uint64 (fi_ps, XFILE_ATTRIBUTE_STANDARD_SIZE);
-      alsize_ps = xfile_info_get_attribute_uint64 (fi_ps, XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE);
+      size_ps = g_file_info_get_attribute_uint64 (fi_ps, G_FILE_ATTRIBUTE_STANDARD_SIZE);
+      alsize_ps = g_file_info_get_attribute_uint64 (fi_ps, G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE);
 
       /* allocated size should small (usually - size of the FS cluster,
        * let's assume it's less than 1 gigabyte),
@@ -654,10 +654,14 @@ test_internal_enhanced_stdio (void)
       g_assert_cmpuint (alsize_ps, <, 0x40000000);
       g_assert_cmpuint (size_ps, >, G_GUINT64_CONSTANT (0xFFFFFFFF));
       g_assert_cmpuint (statbuf_ps.st_size, >, 0);
+#if defined(_WIN64)
+      g_assert_cmpuint (statbuf_ps.st_size, ==, G_GUINT64_CONSTANT (0x10000000f));
+#else
       g_assert_cmpuint (statbuf_ps.st_size, <=, 0xFFFFFFFF);
+#endif
 
-      xobject_unref (fi_ps);
-      xobject_unref (gf_ps);
+      g_object_unref (fi_ps);
+      g_object_unref (gf_ps);
     }
 
   /* Wa-a-ay past 02/07/2106 @ 6:28am (UTC),
@@ -699,41 +703,41 @@ test_internal_enhanced_stdio (void)
   g_assert_cmpint (g_stat (p0, &statbuf_p0), ==, 0);
   g_assert_cmpint (g_stat (p1, &statbuf_p1), ==, 0);
 
-  gf_p0 = xfile_new_for_path (p0);
-  gf_p1 = xfile_new_for_path (p1);
+  gf_p0 = g_file_new_for_path (p0);
+  gf_p1 = g_file_new_for_path (p1);
 
-  fi_p0 = xfile_query_info (gf_p0,
-                             XFILE_ATTRIBUTE_STANDARD_SIZE ","
-                             XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE ","
-                             XFILE_ATTRIBUTE_ID_FILE ","
-                             XFILE_ATTRIBUTE_TIME_MODIFIED ","
-                             XFILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-                             XFILE_QUERY_INFO_NONE,
+  fi_p0 = g_file_query_info (gf_p0,
+                             G_FILE_ATTRIBUTE_STANDARD_SIZE ","
+                             G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE ","
+                             G_FILE_ATTRIBUTE_ID_FILE ","
+                             G_FILE_ATTRIBUTE_TIME_MODIFIED ","
+                             G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+                             G_FILE_QUERY_INFO_NONE,
                              NULL, NULL);
 
-  fi_p1 = xfile_query_info (gf_p1,
-                             XFILE_ATTRIBUTE_STANDARD_SIZE ","
-                             XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE ","
-                             XFILE_ATTRIBUTE_ID_FILE ","
-                             XFILE_ATTRIBUTE_TIME_MODIFIED ","
-                             XFILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-                             XFILE_QUERY_INFO_NONE,
+  fi_p1 = g_file_query_info (gf_p1,
+                             G_FILE_ATTRIBUTE_STANDARD_SIZE ","
+                             G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE ","
+                             G_FILE_ATTRIBUTE_ID_FILE ","
+                             G_FILE_ATTRIBUTE_TIME_MODIFIED ","
+                             G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+                             G_FILE_QUERY_INFO_NONE,
                              NULL, NULL);
 
-  g_assert_true (xfile_info_has_attribute (fi_p0, XFILE_ATTRIBUTE_STANDARD_SIZE));
-  g_assert_true (xfile_info_has_attribute (fi_p0, XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE));
-  g_assert_true (xfile_info_has_attribute (fi_p0, XFILE_ATTRIBUTE_ID_FILE));
-  g_assert_true (xfile_info_has_attribute (fi_p0, XFILE_ATTRIBUTE_TIME_MODIFIED));
-  g_assert_true (xfile_info_has_attribute (fi_p0, XFILE_ATTRIBUTE_TIME_MODIFIED_USEC));
+  g_assert_true (g_file_info_has_attribute (fi_p0, G_FILE_ATTRIBUTE_STANDARD_SIZE));
+  g_assert_true (g_file_info_has_attribute (fi_p0, G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE));
+  g_assert_true (g_file_info_has_attribute (fi_p0, G_FILE_ATTRIBUTE_ID_FILE));
+  g_assert_true (g_file_info_has_attribute (fi_p0, G_FILE_ATTRIBUTE_TIME_MODIFIED));
+  g_assert_true (g_file_info_has_attribute (fi_p0, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC));
 
-  g_assert_true (xfile_info_has_attribute (fi_p1, XFILE_ATTRIBUTE_STANDARD_SIZE));
-  g_assert_true (xfile_info_has_attribute (fi_p1, XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE));
-  g_assert_true (xfile_info_has_attribute (fi_p1, XFILE_ATTRIBUTE_ID_FILE));
-  g_assert_true (xfile_info_has_attribute (fi_p1, XFILE_ATTRIBUTE_TIME_MODIFIED));
-  g_assert_true (xfile_info_has_attribute (fi_p1, XFILE_ATTRIBUTE_TIME_MODIFIED_USEC));
+  g_assert_true (g_file_info_has_attribute (fi_p1, G_FILE_ATTRIBUTE_STANDARD_SIZE));
+  g_assert_true (g_file_info_has_attribute (fi_p1, G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE));
+  g_assert_true (g_file_info_has_attribute (fi_p1, G_FILE_ATTRIBUTE_ID_FILE));
+  g_assert_true (g_file_info_has_attribute (fi_p1, G_FILE_ATTRIBUTE_TIME_MODIFIED));
+  g_assert_true (g_file_info_has_attribute (fi_p1, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC));
 
-  size_p0 = xfile_info_get_attribute_uint64 (fi_p0, XFILE_ATTRIBUTE_STANDARD_SIZE);
-  alsize_p0 = xfile_info_get_attribute_uint64 (fi_p0, XFILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE);
+  size_p0 = g_file_info_get_attribute_uint64 (fi_p0, G_FILE_ATTRIBUTE_STANDARD_SIZE);
+  alsize_p0 = g_file_info_get_attribute_uint64 (fi_p0, G_FILE_ATTRIBUTE_STANDARD_ALLOCATED_SIZE);
 
   /* size should be 1, allocated size should be something else
    * (could be 0 or the size of the FS cluster, but never 1).
@@ -742,8 +746,8 @@ test_internal_enhanced_stdio (void)
   g_assert_cmpuint (size_p0, ==, 1);
   g_assert_cmpuint (alsize_p0, !=, size_p0);
 
-  id_p0 = xfile_info_get_attribute_string (fi_p0, XFILE_ATTRIBUTE_ID_FILE);
-  id_p1 = xfile_info_get_attribute_string (fi_p1, XFILE_ATTRIBUTE_ID_FILE);
+  id_p0 = g_file_info_get_attribute_string (fi_p0, G_FILE_ATTRIBUTE_ID_FILE);
+  id_p1 = g_file_info_get_attribute_string (fi_p1, G_FILE_ATTRIBUTE_ID_FILE);
 
   /* st_ino from W32 stat() is useless for file identification.
    * It will be either 0, or it will be the same for both files.
@@ -751,9 +755,9 @@ test_internal_enhanced_stdio (void)
   g_assert_cmpint (statbuf_p0.st_ino, ==, statbuf_p1.st_ino);
   g_assert_cmpstr (id_p0, !=, id_p1);
 
-  time_p0 = xfile_info_get_attribute_uint64 (fi_p0, XFILE_ATTRIBUTE_TIME_MODIFIED);
+  time_p0 = g_file_info_get_attribute_uint64 (fi_p0, G_FILE_ATTRIBUTE_TIME_MODIFIED);
 
-  /* Check that xfile_info_t doesn't suffer from Y2106 problem.
+  /* Check that GFileInfo doesn't suffer from Y2106 problem.
    * Don't check stat(), as its contents may vary depending on
    * the host platform architecture
    * (time fields are 32-bit on 32-bit Windows,
@@ -762,60 +766,60 @@ test_internal_enhanced_stdio (void)
    */
   g_assert_cmpuint (time_p0, >, G_GUINT64_CONSTANT (0xFFFFFFFF));
 
-  dt = xfile_info_get_modification_date_time (fi_p0);
+  dt = g_file_info_get_modification_date_time (fi_p0);
   g_assert_nonnull (dt);
-  dt2 = xdate_time_add (dt, G_USEC_PER_SEC / 100 * 200);
-  xobject_unref (fi_p0);
-  fi_p0 = xfile_info_new ();
-  xfile_info_set_modification_date_time (fi_p0, dt2);
+  dt2 = g_date_time_add (dt, G_USEC_PER_SEC / 100 * 200);
+  g_object_unref (fi_p0);
+  fi_p0 = g_file_info_new ();
+  g_file_info_set_modification_date_time (fi_p0, dt2);
 
-  g_assert_true (xfile_set_attributes_from_info (gf_p0,
+  g_assert_true (g_file_set_attributes_from_info (gf_p0,
                                                   fi_p0,
-                                                  XFILE_QUERY_INFO_NONE,
+                                                  G_FILE_QUERY_INFO_NONE,
                                                   NULL,
                                                   NULL));
-  xdate_time_unref (dt2);
-  xobject_unref (fi_p0);
-  fi_p0 = xfile_query_info (gf_p0,
-                             XFILE_ATTRIBUTE_TIME_MODIFIED ","
-                             XFILE_ATTRIBUTE_TIME_MODIFIED_USEC,
-                             XFILE_QUERY_INFO_NONE,
+  g_date_time_unref (dt2);
+  g_object_unref (fi_p0);
+  fi_p0 = g_file_query_info (gf_p0,
+                             G_FILE_ATTRIBUTE_TIME_MODIFIED ","
+                             G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC,
+                             G_FILE_QUERY_INFO_NONE,
                              NULL, NULL);
-  dt2 = xfile_info_get_modification_date_time (fi_p0);
-  ts = xdate_time_difference (dt2, dt);
+  dt2 = g_file_info_get_modification_date_time (fi_p0);
+  ts = g_date_time_difference (dt2, dt);
   g_assert_cmpint (ts, >, 0);
   g_assert_cmpint (ts, <, G_USEC_PER_SEC / 100 * 300);
 
-  xdate_time_unref (dt);
-  xdate_time_unref (dt2);
+  g_date_time_unref (dt);
+  g_date_time_unref (dt2);
 
-  xfile_info_set_attribute_uint64 (fi_p0,
-                                    XFILE_ATTRIBUTE_TIME_MODIFIED,
+  g_file_info_set_attribute_uint64 (fi_p0,
+                                    G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                     one_sec_before_systemtime_limit);
-  xfile_info_set_attribute_uint32 (fi_p0, XFILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
-  g_assert_true (xfile_set_attributes_from_info (gf_p0,
+  g_file_info_set_attribute_uint32 (fi_p0, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
+  g_assert_true (g_file_set_attributes_from_info (gf_p0,
                                                   fi_p0,
-                                                  XFILE_QUERY_INFO_NONE,
+                                                  G_FILE_QUERY_INFO_NONE,
                                                   NULL,
                                                   NULL));
 
-  xfile_info_set_attribute_uint64 (fi_p0,
-                                   XFILE_ATTRIBUTE_TIME_MODIFIED,
+  g_file_info_set_attribute_uint64 (fi_p0,
+                                   G_FILE_ATTRIBUTE_TIME_MODIFIED,
                                    one_sec_before_systemtime_limit + G_USEC_PER_SEC * 2);
-  xfile_info_set_attribute_uint32 (fi_p0, XFILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
-  retval = xfile_set_attributes_from_info (gf_p0,
+  g_file_info_set_attribute_uint32 (fi_p0, G_FILE_ATTRIBUTE_TIME_MODIFIED_USEC, 0);
+  retval = g_file_set_attributes_from_info (gf_p0,
                                             fi_p0,
-                                            XFILE_QUERY_INFO_NONE,
+                                            G_FILE_QUERY_INFO_NONE,
                                             NULL,
                                             &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_DATA);
   g_assert_false (retval);
   g_clear_error (&local_error);
 
-  xobject_unref (fi_p0);
-  xobject_unref (fi_p1);
-  xobject_unref (gf_p0);
-  xobject_unref (gf_p1);
+  g_object_unref (fi_p0);
+  g_object_unref (fi_p1);
+  g_object_unref (gf_p0);
+  g_object_unref (gf_p1);
   g_remove (p0);
   g_remove (p1);
   g_free (p0);
@@ -827,36 +831,36 @@ test_internal_enhanced_stdio (void)
 static void
 test_xattrs (void)
 {
-  xfile_t *file = NULL;
-  xfile_io_stream_t *stream = NULL;
-  xfile_info_t *file_info0 = NULL, *file_info1 = NULL;
-  xerror_t *local_error = NULL;
+  GFile *file = NULL;
+  GFileIOStream *stream = NULL;
+  GFileInfo *file_info0 = NULL, *file_info1 = NULL;
+  GError *local_error = NULL;
 
-  g_test_summary ("test_t setting and getting escaped xattrs");
+  g_test_summary ("Test setting and getting escaped xattrs");
 
   /* Create a temporary file; no need to write anything to it. */
-  file = xfile_new_tmp ("g-file-info-test-xattrs-XXXXXX", &stream, &local_error);
+  file = g_file_new_tmp ("g-file-info-test-xattrs-XXXXXX", &stream, &local_error);
   g_assert_no_error (local_error);
   g_assert_nonnull (file);
 
-  g_io_stream_close (XIO_STREAM (stream), NULL, NULL);
-  xobject_unref (stream);
+  g_io_stream_close (G_IO_STREAM (stream), NULL, NULL);
+  g_object_unref (stream);
 
   /* Check the existing xattrs. */
-  file_info0 = xfile_query_info (file, "xattr::*", XFILE_QUERY_INFO_NONE, NULL, &local_error);
+  file_info0 = g_file_query_info (file, "xattr::*", G_FILE_QUERY_INFO_NONE, NULL, &local_error);
   g_assert_no_error (local_error);
   g_assert_nonnull (file_info0);
 
   /* Set some new xattrs, with escaping and some embedded nuls. */
-  xfile_info_set_attribute_string (file_info0, "xattr::escaped", "hello\\x82\\x80\\xbd");
-  xfile_info_set_attribute_string (file_info0, "xattr::string", "hi there");
-  xfile_info_set_attribute_string (file_info0, "xattr::embedded-nul", "hi\\x00there");
+  g_file_info_set_attribute_string (file_info0, "xattr::escaped", "hello\\x82\\x80\\xbd");
+  g_file_info_set_attribute_string (file_info0, "xattr::string", "hi there");
+  g_file_info_set_attribute_string (file_info0, "xattr::embedded-nul", "hi\\x00there");
 
-  xfile_set_attributes_from_info (file, file_info0, XFILE_QUERY_INFO_NONE, NULL, &local_error);
+  g_file_set_attributes_from_info (file, file_info0, G_FILE_QUERY_INFO_NONE, NULL, &local_error);
 
-  xobject_unref (file_info0);
+  g_object_unref (file_info0);
 
-  if (xerror_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+  if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
     {
       g_test_skip ("xattrs not supported on this file system");
       g_clear_error (&local_error);
@@ -866,23 +870,23 @@ test_xattrs (void)
       g_assert_no_error (local_error);
 
       /* Check they were set properly. */
-      file_info1 = xfile_query_info (file, "xattr::*", XFILE_QUERY_INFO_NONE, NULL, &local_error);
+      file_info1 = g_file_query_info (file, "xattr::*", G_FILE_QUERY_INFO_NONE, NULL, &local_error);
       g_assert_no_error (local_error);
       g_assert_nonnull (file_info1);
 
-      g_assert_true (xfile_info_has_namespace (file_info1, "xattr"));
+      g_assert_true (g_file_info_has_namespace (file_info1, "xattr"));
 
-      g_assert_cmpstr (xfile_info_get_attribute_string (file_info1, "xattr::escaped"), ==, "hello\\x82\\x80\\xbd");
-      g_assert_cmpstr (xfile_info_get_attribute_string (file_info1, "xattr::string"), ==, "hi there");
-      g_assert_cmpstr (xfile_info_get_attribute_string (file_info1, "xattr::embedded-nul"), ==, "hi\\x00there");
+      g_assert_cmpstr (g_file_info_get_attribute_string (file_info1, "xattr::escaped"), ==, "hello\\x82\\x80\\xbd");
+      g_assert_cmpstr (g_file_info_get_attribute_string (file_info1, "xattr::string"), ==, "hi there");
+      g_assert_cmpstr (g_file_info_get_attribute_string (file_info1, "xattr::embedded-nul"), ==, "hi\\x00there");
 
-      xobject_unref (file_info1);
+      g_object_unref (file_info1);
     }
 
   /* Tidy up. */
-  xfile_delete (file, NULL, NULL);
+  g_file_delete (file, NULL, NULL);
 
-  xobject_unref (file);
+  g_object_unref (file);
 }
 
 int
@@ -891,14 +895,14 @@ main (int   argc,
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_func ("/g-file-info/test_xfile_info", test_xfile_info);
-  g_test_add_func ("/g-file-info/test_xfile_info/modification-time", test_xfile_info_modification_time);
-  g_test_add_func ("/g-file-info/test_xfile_info/access-time", test_xfile_info_access_time);
-  g_test_add_func ("/g-file-info/test_xfile_info/creation-time", test_xfile_info_creation_time);
+  g_test_add_func ("/g-file-info/test_g_file_info", test_g_file_info);
+  g_test_add_func ("/g-file-info/test_g_file_info/modification-time", test_g_file_info_modification_time);
+  g_test_add_func ("/g-file-info/test_g_file_info/access-time", test_g_file_info_access_time);
+  g_test_add_func ("/g-file-info/test_g_file_info/creation-time", test_g_file_info_creation_time);
 #ifdef G_OS_WIN32
   g_test_add_func ("/g-file-info/internal-enhanced-stdio", test_internal_enhanced_stdio);
 #endif
   g_test_add_func ("/g-file-info/xattrs", test_xattrs);
-
+  
   return g_test_run();
 }

@@ -34,8 +34,8 @@
 static void
 print_address (void)
 {
-  xerror_t *error = NULL;
-  xchar_t *addr;
+  GError *error = NULL;
+  gchar *addr;
 
   addr = g_dbus_address_get_for_bus_sync (G_BUS_TYPE_SESSION, NULL,
       &error);
@@ -48,34 +48,34 @@ print_address (void)
 
 #ifdef G_OS_UNIX
 
-static xsocket_t *mock_bus = NULL;
-static xchar_t *mock_bus_path = NULL;
+static GSocket *mock_bus = NULL;
+static gchar *mock_bus_path = NULL;
 /* this is deliberately something that needs escaping */
-static xchar_t tmpdir[] = "/tmp/gdbus,unix,test.XXXXXX";
+static gchar tmpdir[] = "/tmp/gdbus,unix,test.XXXXXX";
 
 static void
 set_up_mock_xdg_runtime_dir (void)
 {
-  xerror_t *error = NULL;
-  xsocket_address_t *addr;
+  GError *error = NULL;
+  GSocketAddress *addr;
 
-  mock_bus = xsocket_new (XSOCKET_FAMILY_UNIX, XSOCKET_TYPE_STREAM, 0,
+  mock_bus = g_socket_new (G_SOCKET_FAMILY_UNIX, G_SOCKET_TYPE_STREAM, 0,
       &error);
   g_assert_no_error (error);
-  g_assert_true (X_IS_SOCKET (mock_bus));
+  g_assert_true (G_IS_SOCKET (mock_bus));
 
   /* alters tmpdir in-place */
   if (g_mkdtemp_full (tmpdir, 0700) == NULL)
     {
       int errsv = errno;
-      xerror ("g_mkdtemp_full: %s", xstrerror (errsv));
+      g_error ("g_mkdtemp_full: %s", g_strerror (errsv));
     }
 
-  mock_bus_path = xstrconcat (tmpdir, "/bus", NULL);
+  mock_bus_path = g_strconcat (tmpdir, "/bus", NULL);
   addr = g_unix_socket_address_new (mock_bus_path);
-  xsocket_bind (mock_bus, addr, FALSE, &error);
+  g_socket_bind (mock_bus, addr, FALSE, &error);
   g_assert_no_error (error);
-  xobject_unref (addr);
+  g_object_unref (addr);
 
   g_setenv ("XDG_RUNTIME_DIR", tmpdir, TRUE);
 }
@@ -83,33 +83,33 @@ set_up_mock_xdg_runtime_dir (void)
 static void
 tear_down_mock_xdg_runtime_dir (void)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  xsocket_close (mock_bus, &error);
+  g_socket_close (mock_bus, &error);
   g_assert_no_error (error);
 
   if (g_unlink (mock_bus_path) < 0)
     {
       int errsv = errno;
-      xerror ("g_unlink(\"%s\"): %s", mock_bus_path, xstrerror (errsv));
+      g_error ("g_unlink(\"%s\"): %s", mock_bus_path, g_strerror (errsv));
     }
 
   if (g_rmdir (tmpdir) < 0)
     {
       int errsv = errno;
-      xerror ("g_rmdir(\"%s\"): %s", tmpdir, xstrerror (errsv));
+      g_error ("g_rmdir(\"%s\"): %s", tmpdir, g_strerror (errsv));
     }
 
   g_clear_object (&mock_bus);
   g_clear_pointer (&mock_bus_path, g_free);
 }
 
-static xchar_t *path = NULL;
+static gchar *path = NULL;
 
 static void
 set_up_mock_dbus_launch (void)
 {
-  path = xstrconcat (g_test_get_dir (G_TEST_BUILT), ":",
+  path = g_strconcat (g_test_get_dir (G_TEST_BUILT), ":",
       g_getenv ("PATH"), NULL);
   g_setenv ("PATH", path, TRUE);
 
@@ -184,10 +184,10 @@ check_and_cleanup_autolaunched_win32_bus (void)
    * So connect+disconnect here is not only connectivity test,
    * but also the workaround the bus process infinite run.
    */
-  xerror_t *err = NULL;
-  xdbus_connection_t *bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &err);
+  GError *err = NULL;
+  GDBusConnection *bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &err);
   g_assert_no_error (err);
-  xobject_unref (bus);
+  g_object_unref (bus);
 }
 
 static void

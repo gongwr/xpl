@@ -5,18 +5,18 @@
 #define DATA_SIZE 1024
 #define BLOCK_SIZE 32
 #define NUM_BLOCKS 32
-static xuchar_t data[DATA_SIZE];
+static guchar data[DATA_SIZE];
 
 static void
-test_incremental (xboolean_t line_break,
-                  xsize_t    length)
+test_incremental (gboolean line_break,
+                  gsize    length)
 {
   char *p;
-  xsize_t len, decoded_len, max, input_len, block_size;
+  gsize len, decoded_len, max, input_len, block_size;
   int state, save;
-  xuint_t decoder_save;
+  guint decoder_save;
   char *text;
-  xuchar_t *data2;
+  guchar *data2;
 
   data2 = g_malloc (length);
   text = g_malloc (length * 4);
@@ -64,28 +64,28 @@ test_incremental (xboolean_t line_break,
 }
 
 static void
-test_incremental_break (xconstpointer d)
+test_incremental_break (gconstpointer d)
 {
-  xint_t length = GPOINTER_TO_INT (d);
+  gint length = GPOINTER_TO_INT (d);
 
   test_incremental (TRUE, length);
 }
 
 static void
-test_incremental_nobreak (xconstpointer d)
+test_incremental_nobreak (gconstpointer d)
 {
-  xint_t length = GPOINTER_TO_INT (d);
+  gint length = GPOINTER_TO_INT (d);
 
   test_incremental (FALSE, length);
 }
 
 static void
-test_full (xconstpointer d)
+test_full (gconstpointer d)
 {
-  xint_t length = GPOINTER_TO_INT (d);
+  gint length = GPOINTER_TO_INT (d);
   char *text;
-  xuchar_t *data2;
-  xsize_t len;
+  guchar *data2;
+  gsize len;
 
   text = g_base64_encode (data, length);
   data2 = g_base64_decode (text, &len);
@@ -98,8 +98,8 @@ test_full (xconstpointer d)
 
 struct MyRawData
 {
-  xint_t length;   /* of data */
-  xuchar_t data[DATA_SIZE];
+  gint length;   /* of data */
+  guchar data[DATA_SIZE];
 };
 
 /* 100 pre-encoded string from data[] buffer. Data length from 1..100
@@ -220,7 +220,7 @@ static void
 test_base64_encode (void)
 {
   int i;
-  xint_t length = 1;
+  gint length = 1;
   char *text;
   struct MyRawData myraw;
 
@@ -236,15 +236,15 @@ test_base64_encode (void)
     }
 }
 
-/* test_t that incremental and all-in-one encoding of strings of a length which
+/* Test that incremental and all-in-one encoding of strings of a length which
  * is not a multiple of 3 bytes behave the same, as the state carried over
  * between g_base64_encode_step() calls varies depending on how the input is
  * split up. This is like the test_base64_decode_smallblock() test, but for
  * encoding. */
 static void
-test_base64_encode_incremental_small_block (xconstpointer block_size_p)
+test_base64_encode_incremental_small_block (gconstpointer block_size_p)
 {
-  xsize_t i;
+  gsize i;
   struct MyRawData myraw;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=780066");
@@ -253,11 +253,11 @@ test_base64_encode_incremental_small_block (xconstpointer block_size_p)
 
   for (i = 0; ok_100_encode_strs[i] != NULL; i++)
     {
-      const xuint_t block_size = GPOINTER_TO_UINT (block_size_p);
-      xchar_t *encoded_complete = NULL;
-      xchar_t encoded_stepped[1024];
-      xint_t state = 0, save = 0;
-      xsize_t len_written, len_read, len_to_read, input_length;
+      const guint block_size = GPOINTER_TO_UINT (block_size_p);
+      gchar *encoded_complete = NULL;
+      gchar encoded_stepped[1024];
+      gint state = 0, save = 0;
+      gsize len_written, len_read, len_to_read, input_length;
 
       input_length = i + 1;
 
@@ -290,11 +290,11 @@ test_base64_encode_incremental_small_block (xconstpointer block_size_p)
 }
 
 static void
-decode_and_compare (const xchar_t            *datap,
+decode_and_compare (const gchar            *datap,
                     const struct MyRawData *p)
 {
-  xuchar_t *data2;
-  xsize_t len;
+  guchar *data2;
+  gsize len;
 
   data2 = g_base64_decode (datap, &len);
   g_assert_cmpmem (p->data, p->length, data2, len);
@@ -302,14 +302,14 @@ decode_and_compare (const xchar_t            *datap,
 }
 
 static void
-decode_inplace_and_compare (const xchar_t            *datap,
+decode_inplace_and_compare (const gchar            *datap,
                             const struct MyRawData *p)
 {
-  xchar_t *data;
-  xuchar_t *data2;
-  xsize_t len;
+  gchar *data;
+  guchar *data2;
+  gsize len;
 
-  data = xstrdup (datap);
+  data = g_strdup (datap);
   data2 = g_base64_decode_inplace (data, &len);
   g_assert_cmpmem (p->data, p->length, data2, len);
   g_free (data2);
@@ -366,22 +366,22 @@ test_base64_encode_decode (void)
 }
 
 static void
-test_base64_decode_smallblock (xconstpointer blocksize_p)
+test_base64_decode_smallblock (gconstpointer blocksize_p)
 {
-  const xuint_t blocksize = GPOINTER_TO_UINT (blocksize_p);
-  xuint_t i;
+  const guint blocksize = GPOINTER_TO_UINT (blocksize_p);
+  guint i;
 
   for (i = 0; ok_100_encode_strs[i]; i++)
     {
       const char *str = ok_100_encode_strs[i];
       const char *p;
-      xsize_t len = strlen (str);
-      xint_t state = 0;
-      xuint_t save = 0;
-      xuchar_t *decoded;
-      xsize_t decoded_size = 0;
-      xuchar_t *decoded_atonce;
-      xsize_t decoded_atonce_size = 0;
+      gsize len = strlen (str);
+      gint state = 0;
+      guint save = 0;
+      guchar *decoded;
+      gsize decoded_size = 0;
+      guchar *decoded_atonce;
+      gsize decoded_atonce_size = 0;
 
       decoded = g_malloc (len / 4 * 3 + 3);
 
@@ -389,7 +389,7 @@ test_base64_decode_smallblock (xconstpointer blocksize_p)
       while (len > 0)
         {
           int chunk_len = MIN (blocksize, len);
-          xsize_t size = g_base64_decode_step (p, chunk_len,
+          gsize size = g_base64_decode_step (p, chunk_len,
                                              decoded + decoded_size,
                                              &state, &save);
           decoded_size += size;
@@ -400,19 +400,19 @@ test_base64_decode_smallblock (xconstpointer blocksize_p)
       decoded_atonce = g_base64_decode (str, &decoded_atonce_size);
 
       g_assert_cmpmem (decoded, decoded_size, decoded_atonce, decoded_atonce_size);
-
+      
       g_free (decoded);
       g_free (decoded_atonce);
     }
 }
 
-/* test_t that calling g_base64_encode (NULL, 0) returns correct output. This is
+/* Test that calling g_base64_encode (NULL, 0) returns correct output. This is
  * as per the first test vector in RFC 4648 §10.
  * https://tools.ietf.org/html/rfc4648#section-10 */
 static void
 test_base64_encode_empty (void)
 {
-  xchar_t *encoded = NULL;
+  gchar *encoded = NULL;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1698");
 
@@ -420,25 +420,25 @@ test_base64_encode_empty (void)
   g_assert_cmpstr (encoded, ==, "");
   g_free (encoded);
 
-  encoded = g_base64_encode ((const xuchar_t *) "", 0);
+  encoded = g_base64_encode ((const guchar *) "", 0);
   g_assert_cmpstr (encoded, ==, "");
   g_free (encoded);
 }
 
-/* test_t that calling g_base64_decode ("", *) returns correct output. This is
+/* Test that calling g_base64_decode ("", *) returns correct output. This is
  * as per the first test vector in RFC 4648 §10. Note that calling
  * g_base64_decode (NULL, *) is not allowed.
  * https://tools.ietf.org/html/rfc4648#section-10 */
 static void
 test_base64_decode_empty (void)
 {
-  xuchar_t *decoded = NULL;
-  xsize_t decoded_len;
+  guchar *decoded = NULL;
+  gsize decoded_len;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/issues/1698");
 
   decoded = g_base64_decode ("", &decoded_len);
-  g_assert_cmpstr ((xchar_t *) decoded, ==, "");
+  g_assert_cmpstr ((gchar *) decoded, ==, "");
   g_assert_cmpuint (decoded_len, ==, 0);
   g_free (decoded);
 }
@@ -450,8 +450,8 @@ test_base64_encode_decode_rfc4648 (void)
 {
   const struct
     {
-      const xchar_t *decoded;  /* technically this should be a byte array, but all the test vectors are ASCII strings */
-      const xchar_t *encoded;
+      const gchar *decoded;  /* technically this should be a byte array, but all the test vectors are ASCII strings */
+      const gchar *encoded;
     }
   vectors[] =
     {
@@ -463,22 +463,22 @@ test_base64_encode_decode_rfc4648 (void)
       { "fooba", "Zm9vYmE=" },
       { "foobar", "Zm9vYmFy" },
     };
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (vectors); i++)
     {
-      xchar_t *encoded = NULL;
-      xuchar_t *decoded = NULL;
-      xsize_t expected_decoded_len = strlen (vectors[i].decoded);
-      xsize_t decoded_len;
+      gchar *encoded = NULL;
+      guchar *decoded = NULL;
+      gsize expected_decoded_len = strlen (vectors[i].decoded);
+      gsize decoded_len;
 
       g_test_message ("Vector %" G_GSIZE_FORMAT ": %s", i, vectors[i].decoded);
 
-      encoded = g_base64_encode ((const xuchar_t *) vectors[i].decoded, expected_decoded_len);
+      encoded = g_base64_encode ((const guchar *) vectors[i].decoded, expected_decoded_len);
       g_assert_cmpstr (encoded, ==, vectors[i].encoded);
 
       decoded = g_base64_decode (encoded, &decoded_len);
-      g_assert_cmpstr ((xchar_t *) decoded, ==, vectors[i].decoded);
+      g_assert_cmpstr ((gchar *) decoded, ==, vectors[i].decoded);
       g_assert_cmpuint (decoded_len, ==, expected_decoded_len);
 
       g_free (encoded);
@@ -489,12 +489,12 @@ test_base64_encode_decode_rfc4648 (void)
 int
 main (int argc, char *argv[])
 {
-  xint_t i;
+  gint i;
 
   g_test_init (&argc, &argv, NULL);
 
   for (i = 0; i < DATA_SIZE; i++)
-    data[i] = (xuchar_t)i;
+    data[i] = (guchar)i;
 
   g_test_add_data_func ("/base64/full/1", GINT_TO_POINTER (DATA_SIZE), test_full);
   g_test_add_data_func ("/base64/full/2", GINT_TO_POINTER (1), test_full);

@@ -16,7 +16,7 @@
           <bookmark:application name="populate-recent" exec="populate-recent --info %u" timestamp="1128121528" count="1"/>
         </bookmark:applications>
 	<bookmark:groups>
-	  <fail>test_t</fail>
+	  <fail>Test</fail>
 	</bookmark:groups>
       </metadata>
     </info>

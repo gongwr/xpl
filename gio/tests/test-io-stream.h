@@ -27,25 +27,25 @@
 
 typedef struct
 {
-  xio_stream_t parent_instance;
-  xinput_stream_t *input_stream;
-  xoutput_stream_t *output_stream;
+  GIOStream parent_instance;
+  GInputStream *input_stream;
+  GOutputStream *output_stream;
 } TestIOStream;
 
 typedef struct
 {
-  xio_stream_class_t parent_class;
+  GIOStreamClass parent_class;
 } TestIOStreamClass;
 
-xtype_t test_io_stream_get_type (void) G_GNUC_CONST;
+GType test_io_stream_get_type (void) G_GNUC_CONST;
 
 #define TEST_TYPE_IO_STREAM  (test_io_stream_get_type ())
-#define TEST_IO_STREAM(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), \
+#define TEST_IO_STREAM(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), \
                               TEST_TYPE_IO_STREAM, TestIOStream))
-#define TEST_IS_IO_STREAM(o) (XTYPE_CHECK_INSTANCE_TYPE ((o), \
+#define TEST_IS_IO_STREAM(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), \
                                                           TEST_TYPE_IO_STREAM))
 
-xio_stream_t *test_io_stream_new (xinput_stream_t  *input_stream,
-                               xoutput_stream_t *output_stream);
+GIOStream *test_io_stream_new (GInputStream  *input_stream,
+                               GOutputStream *output_stream);
 
 #endif /* guard */

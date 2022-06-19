@@ -15,8 +15,8 @@
 
 typedef struct
 {
-  xboolean_t success;
-  xuint64_t c, a, b;
+  gboolean success;
+  guint64 c, a, b;
 } Case;
 
 static void
@@ -34,11 +34,11 @@ test_checked_guint_add (void)
       { FALSE,                 0,                1,      G_MAXUINT },
       { FALSE,                 0,        G_MAXUINT,      G_MAXUINT }
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      xuint_t result;
+      guint result;
 
       g_assert_cmpuint (cases[i].success, ==, g_uint_checked_add (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -56,16 +56,16 @@ test_checked_guint_mul (void)
       { TRUE,                   G_MAXINT,         G_MAXINT,              1 },
       { TRUE,                          0,        G_MAXUINT,              0 },
       { TRUE,                  G_MAXUINT,        G_MAXUINT,              1 },
-      { TRUE,       2 * (xuint_t) G_MAXINT,                2,       G_MAXINT },
-      { TRUE,       2 * (xuint_t) G_MAXINT,         G_MAXINT,              2 },
+      { TRUE,       2 * (guint) G_MAXINT,                2,       G_MAXINT },
+      { TRUE,       2 * (guint) G_MAXINT,         G_MAXINT,              2 },
       { FALSE,                         0,                3,       G_MAXINT },
       { FALSE,                         0,         G_MAXINT,              3 }
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      xuint_t result;
+      guint result;
 
       g_assert_cmpuint (cases[i].success, ==, g_uint_checked_mul (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -89,11 +89,11 @@ test_checked_guint64_add (void)
       { FALSE,                 0,                1,    G_MAXUINT64 },
       { FALSE,                 0,      G_MAXUINT64,    G_MAXUINT64 }
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      xuint64_t result;
+      guint64 result;
 
       g_assert_cmpuint (cases[i].success, ==, g_uint64_checked_add (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -111,16 +111,16 @@ test_checked_guint64_mul (void)
       { TRUE,                 G_MAXINT64,       G_MAXINT64,              1 },
       { TRUE,                          0,      G_MAXUINT64,              0 },
       { TRUE,                G_MAXUINT64,      G_MAXUINT64,              1 },
-      { TRUE,   2 * (xuint64_t) G_MAXINT64,                2,     G_MAXINT64 },
-      { TRUE,   2 * (xuint64_t) G_MAXINT64,       G_MAXINT64,              2 },
+      { TRUE,   2 * (guint64) G_MAXINT64,                2,     G_MAXINT64 },
+      { TRUE,   2 * (guint64) G_MAXINT64,       G_MAXINT64,              2 },
       { FALSE,                         0,                3,     G_MAXINT64 },
       { FALSE,                         0,       G_MAXINT64,              3 }
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      xuint64_t result;
+      guint64 result;
 
       g_assert_cmpuint (cases[i].success, ==, g_uint64_checked_mul (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -144,11 +144,11 @@ test_checked_gsize_add (void)
       { FALSE,                 0,                1,      G_MAXSIZE },
       { FALSE,                 0,        G_MAXSIZE,      G_MAXSIZE }
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      xsize_t result;
+      gsize result;
 
       g_assert_cmpuint (cases[i].success, ==, g_size_checked_add (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -166,16 +166,16 @@ test_checked_gsize_mul (void)
       { TRUE,                 G_MAXSSIZE,       G_MAXSSIZE,              1 },
       { TRUE,                          0,        G_MAXSIZE,              0 },
       { TRUE,                  G_MAXSIZE,        G_MAXSIZE,              1 },
-      { TRUE,     2 * (xsize_t) G_MAXSSIZE,                2,     G_MAXSSIZE },
-      { TRUE,     2 * (xsize_t) G_MAXSSIZE,       G_MAXSSIZE,              2 },
+      { TRUE,     2 * (gsize) G_MAXSSIZE,                2,     G_MAXSSIZE },
+      { TRUE,     2 * (gsize) G_MAXSSIZE,       G_MAXSSIZE,              2 },
       { FALSE,                         0,                3,     G_MAXSSIZE },
       { FALSE,                         0,       G_MAXSSIZE,              3 }
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (cases); i++)
     {
-      xsize_t result;
+      gsize result;
 
       g_assert_cmpuint (cases[i].success, ==, g_size_checked_mul (&result, cases[i].a, cases[i].b));
       if (cases[i].success)
@@ -188,12 +188,12 @@ main (int argc, char **argv)
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_func ("/glib/checked-math/xuint_t-add", test_checked_guint_add);
-  g_test_add_func ("/glib/checked-math/xuint_t-mul", test_checked_guint_mul);
-  g_test_add_func ("/glib/checked-math/xuint64_t-add", test_checked_guint64_add);
-  g_test_add_func ("/glib/checked-math/xuint64_t-mul", test_checked_guint64_mul);
-  g_test_add_func ("/glib/checked-math/xsize_t-add", test_checked_gsize_add);
-  g_test_add_func ("/glib/checked-math/xsize_t-mul", test_checked_gsize_mul);
+  g_test_add_func ("/glib/checked-math/guint-add", test_checked_guint_add);
+  g_test_add_func ("/glib/checked-math/guint-mul", test_checked_guint_mul);
+  g_test_add_func ("/glib/checked-math/guint64-add", test_checked_guint64_add);
+  g_test_add_func ("/glib/checked-math/guint64-mul", test_checked_guint64_mul);
+  g_test_add_func ("/glib/checked-math/gsize-add", test_checked_gsize_add);
+  g_test_add_func ("/glib/checked-math/gsize-mul", test_checked_gsize_mul);
 
   return g_test_run ();
 }

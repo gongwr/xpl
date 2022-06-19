@@ -30,23 +30,23 @@
 #endif
 
 static void
-test_resource (xresource_t *resource)
+test_resource (GResource *resource)
 {
-  xerror_t *error = NULL;
-  xboolean_t found, success;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
+  GError *error = NULL;
+  gboolean found, success;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
   char **children;
-  xinput_stream_t *in;
+  GInputStream *in;
   char buffer[128];
-  const xchar_t *not_found_paths[] =
+  const gchar *not_found_paths[] =
     {
       "/not/there",
       "/",
       "",
     };
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (not_found_paths); i++)
     {
@@ -110,17 +110,17 @@ test_resource (xresource_t *resource)
 				 "/test1.txt",
 				 G_RESOURCE_LOOKUP_FLAGS_NONE,
 				 &error);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
   g_assert_no_error (error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
 
   data = g_resource_lookup_data (resource,
                                  "/empty.txt",
                                  G_RESOURCE_LOOKUP_FLAGS_NONE,
                                  &error);
-  g_assert_cmpuint (xbytes_get_size (data), ==, 0);
+  g_assert_cmpuint (g_bytes_get_size (data), ==, 0);
   g_assert_no_error (error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
 
   for (i = 0; i < G_N_ELEMENTS (not_found_paths); i++)
     {
@@ -140,7 +140,7 @@ test_resource (xresource_t *resource)
   g_assert_nonnull (in);
   g_assert_no_error (error);
 
-  success = xinput_stream_read_all (in, buffer, sizeof (buffer) - 1,
+  success = g_input_stream_read_all (in, buffer, sizeof (buffer) - 1,
 				     &size,
 				     NULL, &error);
   g_assert_true (success);
@@ -149,7 +149,7 @@ test_resource (xresource_t *resource)
   buffer[size] = 0;
   g_assert_cmpstr (buffer, ==, "test1\n");
 
-  xinput_stream_close (in, NULL, &error);
+  g_input_stream_close (in, NULL, &error);
   g_assert_no_error (error);
   g_clear_object (&in);
 
@@ -160,14 +160,14 @@ test_resource (xresource_t *resource)
   g_assert_no_error (error);
   g_assert_nonnull (in);
 
-  success = xinput_stream_read_all (in, buffer, sizeof (buffer) - 1,
+  success = g_input_stream_read_all (in, buffer, sizeof (buffer) - 1,
                                      &size,
                                      NULL, &error);
   g_assert_no_error (error);
   g_assert_true (success);
   g_assert_cmpint (size, ==, 0);
 
-  xinput_stream_close (in, NULL, &error);
+  g_input_stream_close (in, NULL, &error);
   g_assert_no_error (error);
   g_clear_object (&in);
 
@@ -177,10 +177,10 @@ test_resource (xresource_t *resource)
 				 &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test2\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test2\n");
+  g_bytes_unref (data);
 
   data = g_resource_lookup_data (resource,
 				 "/a_prefix/test2-alias.txt",
@@ -188,14 +188,14 @@ test_resource (xresource_t *resource)
 				 &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test2\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test2\n");
+  g_bytes_unref (data);
 
   for (i = 0; i < G_N_ELEMENTS (not_found_paths); i++)
     {
-      if (xstr_equal (not_found_paths[i], "/"))
+      if (g_str_equal (not_found_paths[i], "/"))
         continue;
 
       children = g_resource_enumerate_children (resource,
@@ -213,18 +213,18 @@ test_resource (xresource_t *resource)
 					     &error);
   g_assert_nonnull (children);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (children), ==, 2);
-  xstrfreev (children);
+  g_assert_cmpint (g_strv_length (children), ==, 2);
+  g_strfreev (children);
 
-  /* test_t the preferred lookup where we have a trailing slash. */
+  /* Test the preferred lookup where we have a trailing slash. */
   children = g_resource_enumerate_children  (resource,
 					     "/a_prefix/",
 					     G_RESOURCE_LOOKUP_FLAGS_NONE,
 					     &error);
   g_assert_nonnull (children);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (children), ==, 2);
-  xstrfreev (children);
+  g_assert_cmpint (g_strv_length (children), ==, 2);
+  g_strfreev (children);
 
   /* test with a path > 256 and no trailing slash to test the
    * slow path of resources where we allocate a modified path.
@@ -246,12 +246,12 @@ test_resource (xresource_t *resource)
 static void
 test_resource_file (void)
 {
-  xresource_t *resource;
-  xerror_t *error = NULL;
+  GResource *resource;
+  GError *error = NULL;
 
   resource = g_resource_load ("not-there", &error);
   g_assert_null (resource);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
   g_clear_error (&error);
 
   resource = g_resource_load (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL), &error);
@@ -266,8 +266,8 @@ static void
 test_resource_file_path (void)
 {
   static const struct {
-    const xchar_t *input;
-    const xchar_t *expected;
+    const gchar *input;
+    const gchar *expected;
   } test_uris[] = {
     { "resource://", "resource:///" },
     { "resource:///", "resource:///" },
@@ -285,22 +285,22 @@ test_resource_file_path (void)
     { "resource://a/b/c/..png", "resource:///a/b/c/..png" },
     { "resource://a/b/c/./png", "resource:///a/b/c/png" },
   };
-  xuint_t i;
+  guint i;
 
   for (i = 0; i < G_N_ELEMENTS (test_uris); i++)
     {
-      xfile_t *file;
-      xchar_t *uri;
+      GFile *file;
+      gchar *uri;
 
-      file = xfile_new_for_uri (test_uris[i].input);
+      file = g_file_new_for_uri (test_uris[i].input);
       g_assert_nonnull (file);
 
-      uri = xfile_get_uri (file);
+      uri = g_file_get_uri (file);
       g_assert_nonnull (uri);
 
       g_assert_cmpstr (uri, ==, test_uris[i].expected);
 
-      xobject_unref (file);
+      g_object_unref (file);
       g_free (uri);
     }
 }
@@ -308,20 +308,20 @@ test_resource_file_path (void)
 static void
 test_resource_data (void)
 {
-  xresource_t *resource;
-  xerror_t *error = NULL;
-  xboolean_t loaded_file;
+  GResource *resource;
+  GError *error = NULL;
+  gboolean loaded_file;
   char *content;
-  xsize_t content_size;
-  xbytes_t *data;
+  gsize content_size;
+  GBytes *data;
 
-  loaded_file = xfile_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
+  loaded_file = g_file_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
                                      &content, &content_size, NULL);
   g_assert_true (loaded_file);
 
-  data = xbytes_new_take (content, content_size);
+  data = g_bytes_new_take (content, content_size);
   resource = g_resource_new_from_data (data, &error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
   g_assert_nonnull (resource);
   g_assert_no_error (error);
 
@@ -333,25 +333,25 @@ test_resource_data (void)
 static void
 test_resource_data_unaligned (void)
 {
-  xresource_t *resource;
-  xerror_t *error = NULL;
-  xboolean_t loaded_file;
+  GResource *resource;
+  GError *error = NULL;
+  gboolean loaded_file;
   char *content, *content_copy;
-  xsize_t content_size;
-  xbytes_t *data;
+  gsize content_size;
+  GBytes *data;
 
-  loaded_file = xfile_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
+  loaded_file = g_file_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
                                      &content, &content_size, NULL);
   g_assert_true (loaded_file);
 
   content_copy = g_new (char, content_size + 1);
   memcpy (content_copy + 1, content, content_size);
 
-  data = xbytes_new_with_free_func (content_copy + 1, content_size,
-                                     (xdestroy_notify_t) g_free, content_copy);
+  data = g_bytes_new_with_free_func (content_copy + 1, content_size,
+                                     (GDestroyNotify) g_free, content_copy);
   g_free (content);
   resource = g_resource_new_from_data (data, &error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
   g_assert_nonnull (resource);
   g_assert_no_error (error);
 
@@ -360,39 +360,39 @@ test_resource_data_unaligned (void)
   g_resource_unref (resource);
 }
 
-/* test_t error handling for corrupt xresource_t files (specifically, a corrupt
+/* Test error handling for corrupt GResource files (specifically, a corrupt
  * GVDB header). */
 static void
 test_resource_data_corrupt (void)
 {
   /* A GVDB header is 6 guint32s, and requires a magic number in the first two
    * guint32s. A set of zero bytes of a greater length is considered corrupt. */
-  static const xuint8_t data[sizeof (xuint32_t) * 7] = { 0, };
-  xbytes_t *bytes = NULL;
-  xresource_t *resource = NULL;
-  xerror_t *local_error = NULL;
+  static const guint8 data[sizeof (guint32) * 7] = { 0, };
+  GBytes *bytes = NULL;
+  GResource *resource = NULL;
+  GError *local_error = NULL;
 
-  bytes = xbytes_new_static (data, sizeof (data));
+  bytes = g_bytes_new_static (data, sizeof (data));
   resource = g_resource_new_from_data (bytes, &local_error);
-  xbytes_unref (bytes);
+  g_bytes_unref (bytes);
   g_assert_error (local_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_INTERNAL);
   g_assert_null (resource);
 
   g_clear_error (&local_error);
 }
 
-/* test_t handling for empty xresource_t files. They should also be treated as
+/* Test handling for empty GResource files. They should also be treated as
  * corrupt. */
 static void
 test_resource_data_empty (void)
 {
-  xbytes_t *bytes = NULL;
-  xresource_t *resource = NULL;
-  xerror_t *local_error = NULL;
+  GBytes *bytes = NULL;
+  GResource *resource = NULL;
+  GError *local_error = NULL;
 
-  bytes = xbytes_new_static (NULL, 0);
+  bytes = g_bytes_new_static (NULL, 0);
   resource = g_resource_new_from_data (bytes, &local_error);
-  xbytes_unref (bytes);
+  g_bytes_unref (bytes);
   g_assert_error (local_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_INTERNAL);
   g_assert_null (resource);
 
@@ -402,14 +402,14 @@ test_resource_data_empty (void)
 static void
 test_resource_registered (void)
 {
-  xresource_t *resource;
-  xerror_t *error = NULL;
-  xboolean_t found, success;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
+  GResource *resource;
+  GError *error = NULL;
+  gboolean found, success;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
   char **children;
-  xinput_stream_t *in;
+  GInputStream *in;
   char buffer[128];
 
   resource = g_resource_load (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL), &error);
@@ -460,9 +460,9 @@ test_resource_registered (void)
   data = g_resources_lookup_data ("/test1.txt",
 				  G_RESOURCE_LOOKUP_FLAGS_NONE,
 				  &error);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
   g_assert_no_error (error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
 
   in = g_resources_open_stream ("/test1.txt",
 				G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -470,7 +470,7 @@ test_resource_registered (void)
   g_assert_nonnull (in);
   g_assert_no_error (error);
 
-  success = xinput_stream_read_all (in, buffer, sizeof (buffer) - 1,
+  success = g_input_stream_read_all (in, buffer, sizeof (buffer) - 1,
 				     &size,
 				     NULL, &error);
   g_assert_true (success);
@@ -479,7 +479,7 @@ test_resource_registered (void)
   buffer[size] = 0;
   g_assert_cmpstr (buffer, ==, "test1\n");
 
-  xinput_stream_close (in, NULL, &error);
+  g_input_stream_close (in, NULL, &error);
   g_assert_no_error (error);
   g_clear_object (&in);
 
@@ -487,8 +487,8 @@ test_resource_registered (void)
                                   G_RESOURCE_LOOKUP_FLAGS_NONE,
                                   &error);
   g_assert_no_error (error);
-  g_assert_cmpuint (xbytes_get_size (data), ==, 0);
-  xbytes_unref (data);
+  g_assert_cmpuint (g_bytes_get_size (data), ==, 0);
+  g_bytes_unref (data);
 
   in = g_resources_open_stream ("/empty.txt",
                                 G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -496,14 +496,14 @@ test_resource_registered (void)
   g_assert_no_error (error);
   g_assert_nonnull (in);
 
-  success = xinput_stream_read_all (in, buffer, sizeof (buffer) - 1,
+  success = g_input_stream_read_all (in, buffer, sizeof (buffer) - 1,
                                      &size,
                                      NULL, &error);
   g_assert_no_error (error);
   g_assert_true (success);
   g_assert_cmpint (size, ==, 0);
 
-  xinput_stream_close (in, NULL, &error);
+  g_input_stream_close (in, NULL, &error);
   g_assert_no_error (error);
   g_clear_object (&in);
 
@@ -512,20 +512,20 @@ test_resource_registered (void)
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test2\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test2\n");
+  g_bytes_unref (data);
 
   data = g_resources_lookup_data ("/a_prefix/test2-alias.txt",
 				  G_RESOURCE_LOOKUP_FLAGS_NONE,
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test2\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test2\n");
+  g_bytes_unref (data);
 
   children = g_resources_enumerate_children ("/not/here",
 					     G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -539,8 +539,8 @@ test_resource_registered (void)
 					     &error);
   g_assert_nonnull (children);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (children), ==, 2);
-  xstrfreev (children);
+  g_assert_cmpint (g_strv_length (children), ==, 2);
+  g_strfreev (children);
 
   g_resources_unregister (resource);
   g_resource_unref (resource);
@@ -556,11 +556,11 @@ test_resource_registered (void)
 static void
 test_resource_automatic (void)
 {
-  xerror_t *error = NULL;
-  xboolean_t found;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
+  GError *error = NULL;
+  gboolean found;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
 
   found = g_resources_get_info ("/auto_loaded/test1.txt",
 				G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -575,20 +575,20 @@ test_resource_automatic (void)
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
+  g_bytes_unref (data);
 }
 
 static void
 test_resource_manual (void)
 {
-  xerror_t *error = NULL;
-  xboolean_t found;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
+  GError *error = NULL;
+  gboolean found;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
 
   found = g_resources_get_info ("/manual_loaded/test1.txt",
 				G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -603,19 +603,19 @@ test_resource_manual (void)
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
+  g_bytes_unref (data);
 }
 
 static void
 test_resource_manual2 (void)
 {
-  xresource_t *resource;
-  xbytes_t *data;
-  xsize_t size;
-  xerror_t *error = NULL;
+  GResource *resource;
+  GBytes *data;
+  gsize size;
+  GError *error = NULL;
 
   resource = _g_test2_get_resource ();
 
@@ -625,15 +625,15 @@ test_resource_manual2 (void)
 				 &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
+  g_bytes_unref (data);
 
   g_resource_unref (resource);
 }
 
-/* test_t building resources with external data option,
+/* Test building resources with external data option,
  * where data is linked in as binary instead of compiled in.
  * Checks if resources are automatically registered and
  * data can be found and read. */
@@ -644,11 +644,11 @@ test_resource_binary_linked (void)
   g_test_skip ("--external-data test only works on Linux");
   return;
   #else /* if __linux__ */
-  xerror_t *error = NULL;
-  xboolean_t found;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
+  GError *error = NULL;
+  gboolean found;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
 
   found = g_resources_get_info ("/binary_linked/test1.txt",
 				G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -663,25 +663,25 @@ test_resource_binary_linked (void)
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
+  g_bytes_unref (data);
   #endif /* if __linux__ */
 }
 
-/* test_t resource whose xml file starts with more than one digit
+/* Test resource whose xml file starts with more than one digit
  * and where no explicit c-name is given
  * Checks if resources are successfully registered and
  * data can be found and read. */
 static void
 test_resource_digits (void)
 {
-  xerror_t *error = NULL;
-  xboolean_t found;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
+  GError *error = NULL;
+  gboolean found;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
 
   found = g_resources_get_info ("/digit_test/test1.txt",
 				G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -696,23 +696,23 @@ test_resource_digits (void)
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
   g_assert_cmpint (size, ==, 6);
-  g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
-  xbytes_unref (data);
+  g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
+  g_bytes_unref (data);
 }
 
 static void
 test_resource_module (void)
 {
-  xio_module_t *module;
-  xboolean_t found;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
-  xerror_t *error;
+  GIOModule *module;
+  gboolean found;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
+  GError *error;
 
-#ifdef XPL_STATIC_COMPILATION
+#ifdef GLIB_STATIC_COMPILATION
   /* The resource module is statically linked with a separate copy
    * of a GLib so g_static_resource_init won't work as expected. */
   g_test_skip ("Resource modules aren't supported in static builds.");
@@ -721,7 +721,7 @@ test_resource_module (void)
 
   if (g_module_supported ())
     {
-      module = xio_module_new (g_test_get_filename (G_TEST_BUILT,
+      module = g_io_module_new (g_test_get_filename (G_TEST_BUILT,
                                                      MODULE_FILENAME_PREFIX "resourceplugin",
                                                      NULL));
 
@@ -734,7 +734,7 @@ test_resource_module (void)
       g_assert_error (error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND);
       g_clear_error (&error);
 
-      xtype_module_use (XTYPE_MODULE (module));
+      g_type_module_use (G_TYPE_MODULE (module));
 
       found = g_resources_get_info ("/resourceplugin/test1.txt",
 				    G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -749,12 +749,12 @@ test_resource_module (void)
 				      &error);
       g_assert_nonnull (data);
       g_assert_no_error (error);
-      size = xbytes_get_size (data);
+      size = g_bytes_get_size (data);
       g_assert_cmpint (size, ==, 6);
-      g_assert_cmpstr (xbytes_get_data (data, NULL), ==, "test1\n");
-      xbytes_unref (data);
+      g_assert_cmpstr (g_bytes_get_data (data, NULL), ==, "test1\n");
+      g_bytes_unref (data);
 
-      xtype_module_unuse (XTYPE_MODULE (module));
+      g_type_module_unuse (G_TYPE_MODULE (module));
 
       found = g_resources_get_info ("/resourceplugin/test1.txt",
 				    G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -770,57 +770,57 @@ test_resource_module (void)
 static void
 test_uri_query_info (void)
 {
-  xresource_t *resource;
-  xerror_t *error = NULL;
-  xboolean_t loaded_file;
+  GResource *resource;
+  GError *error = NULL;
+  gboolean loaded_file;
   char *content;
-  xsize_t content_size;
-  xbytes_t *data;
-  xfile_t *file;
-  xfile_info_t *info;
+  gsize content_size;
+  GBytes *data;
+  GFile *file;
+  GFileInfo *info;
   const char *content_type;
-  xchar_t *mime_type = NULL;
+  gchar *mime_type = NULL;
   const char *fs_type;
-  xboolean_t readonly;
+  gboolean readonly;
 
-  loaded_file = xfile_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
+  loaded_file = g_file_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
                                      &content, &content_size, NULL);
   g_assert_true (loaded_file);
 
-  data = xbytes_new_take (content, content_size);
+  data = g_bytes_new_take (content, content_size);
   resource = g_resource_new_from_data (data, &error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
   g_assert_nonnull (resource);
   g_assert_no_error (error);
 
   g_resources_register (resource);
 
-  file = xfile_new_for_uri ("resource://" "/a_prefix/test2-alias.txt");
-  info = xfile_query_info (file, "*", 0, NULL, &error);
+  file = g_file_new_for_uri ("resource://" "/a_prefix/test2-alias.txt");
+  info = g_file_query_info (file, "*", 0, NULL, &error);
   g_assert_no_error (error);
 
-  content_type = xfile_info_get_content_type (info);
+  content_type = g_file_info_get_content_type (info);
   g_assert_nonnull (content_type);
   mime_type = g_content_type_get_mime_type (content_type);
   g_assert_nonnull (mime_type);
   g_assert_cmpstr (mime_type, ==, "text/plain");
   g_free (mime_type);
 
-  xobject_unref (info);
+  g_object_unref (info);
 
-  info = xfile_query_filesystem_info (file, "*", NULL, &error);
+  info = g_file_query_filesystem_info (file, "*", NULL, &error);
   g_assert_no_error (error);
 
-  fs_type = xfile_info_get_attribute_string (info, XFILE_ATTRIBUTE_FILESYSTEM_TYPE);
+  fs_type = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
   g_assert_cmpstr (fs_type, ==, "resource");
-  readonly = xfile_info_get_attribute_boolean (info, XFILE_ATTRIBUTE_FILESYSTEM_READONLY);
+  readonly = g_file_info_get_attribute_boolean (info, G_FILE_ATTRIBUTE_FILESYSTEM_READONLY);
   g_assert_true (readonly);
 
-  xobject_unref (info);
+  g_object_unref (info);
 
-  g_assert_cmpuint  (xfile_hash (file), !=, 0);
+  g_assert_cmpuint  (g_file_hash (file), !=, 0);
 
-  xobject_unref (file);
+  g_object_unref (file);
 
   g_resources_unregister (resource);
   g_resource_unref (resource);
@@ -829,137 +829,137 @@ test_uri_query_info (void)
 static void
 test_uri_file (void)
 {
-  xresource_t *resource;
-  xerror_t *error = NULL;
-  xboolean_t loaded_file;
+  GResource *resource;
+  GError *error = NULL;
+  gboolean loaded_file;
   char *content;
-  xsize_t content_size;
-  xbytes_t *data;
-  xfile_t *file;
-  xfile_info_t *info;
-  xchar_t *name;
-  xfile_t *file2, *parent;
-  xfile_enumerator_t *enumerator;
-  xchar_t *scheme;
-  xfile_attribute_info_list_t *attrs;
-  xinput_stream_t *stream;
-  xchar_t buf[1024];
-  xboolean_t ret;
-  xssize_t skipped;
+  gsize content_size;
+  GBytes *data;
+  GFile *file;
+  GFileInfo *info;
+  gchar *name;
+  GFile *file2, *parent;
+  GFileEnumerator *enumerator;
+  gchar *scheme;
+  GFileAttributeInfoList *attrs;
+  GInputStream *stream;
+  gchar buf[1024];
+  gboolean ret;
+  gssize skipped;
 
-  loaded_file = xfile_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
+  loaded_file = g_file_get_contents (g_test_get_filename (G_TEST_BUILT, "test.gresource", NULL),
                                      &content, &content_size, NULL);
   g_assert_true (loaded_file);
 
-  data = xbytes_new_take (content, content_size);
+  data = g_bytes_new_take (content, content_size);
   resource = g_resource_new_from_data (data, &error);
-  xbytes_unref (data);
+  g_bytes_unref (data);
   g_assert_nonnull (resource);
   g_assert_no_error (error);
 
   g_resources_register (resource);
 
-  file = xfile_new_for_uri ("resource://" "/a_prefix/test2-alias.txt");
+  file = g_file_new_for_uri ("resource://" "/a_prefix/test2-alias.txt");
 
-  g_assert_null (xfile_get_path (file));
+  g_assert_null (g_file_get_path (file));
 
-  name = xfile_get_parse_name (file);
+  name = g_file_get_parse_name (file);
   g_assert_cmpstr (name, ==, "resource:///a_prefix/test2-alias.txt");
   g_free (name);
 
-  name = xfile_get_uri (file);
+  name = g_file_get_uri (file);
   g_assert_cmpstr (name, ==, "resource:///a_prefix/test2-alias.txt");
   g_free (name);
 
-  g_assert_false (xfile_is_native (file));
-  g_assert_false (xfile_has_uri_scheme (file, "http"));
-  g_assert_true (xfile_has_uri_scheme (file, "resource"));
-  scheme = xfile_get_uri_scheme (file);
+  g_assert_false (g_file_is_native (file));
+  g_assert_false (g_file_has_uri_scheme (file, "http"));
+  g_assert_true (g_file_has_uri_scheme (file, "resource"));
+  scheme = g_file_get_uri_scheme (file);
   g_assert_cmpstr (scheme, ==, "resource");
   g_free (scheme);
 
-  file2 = xfile_dup (file);
-  g_assert_true (xfile_equal (file, file2));
-  xobject_unref (file2);
+  file2 = g_file_dup (file);
+  g_assert_true (g_file_equal (file, file2));
+  g_object_unref (file2);
 
-  parent = xfile_get_parent (file);
-  enumerator = xfile_enumerate_children (parent, XFILE_ATTRIBUTE_STANDARD_NAME, 0, NULL, &error);
+  parent = g_file_get_parent (file);
+  enumerator = g_file_enumerate_children (parent, G_FILE_ATTRIBUTE_STANDARD_NAME, 0, NULL, &error);
   g_assert_no_error (error);
 
-  file2 = xfile_get_child_for_display_name (parent, "test2-alias.txt", &error);
+  file2 = g_file_get_child_for_display_name (parent, "test2-alias.txt", &error);
   g_assert_no_error (error);
-  g_assert_true (xfile_equal (file, file2));
-  xobject_unref (file2);
+  g_assert_true (g_file_equal (file, file2));
+  g_object_unref (file2);
 
-  info = xfile_enumerator_next_file (enumerator, NULL, &error);
-  g_assert_no_error (error);
-  g_assert_nonnull (info);
-  xobject_unref (info);
-
-  info = xfile_enumerator_next_file (enumerator, NULL, &error);
+  info = g_file_enumerator_next_file (enumerator, NULL, &error);
   g_assert_no_error (error);
   g_assert_nonnull (info);
-  xobject_unref (info);
+  g_object_unref (info);
 
-  info = xfile_enumerator_next_file (enumerator, NULL, &error);
+  info = g_file_enumerator_next_file (enumerator, NULL, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (info);
+  g_object_unref (info);
+
+  info = g_file_enumerator_next_file (enumerator, NULL, &error);
   g_assert_no_error (error);
   g_assert_null (info);
 
-  xfile_enumerator_close (enumerator, NULL, &error);
+  g_file_enumerator_close (enumerator, NULL, &error);
   g_assert_no_error (error);
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 
-  file2 = xfile_new_for_uri ("resource://" "a_prefix/../a_prefix//test2-alias.txt");
-  g_assert_true (xfile_equal (file, file2));
+  file2 = g_file_new_for_uri ("resource://" "a_prefix/../a_prefix//test2-alias.txt");
+  g_assert_true (g_file_equal (file, file2));
 
-  g_assert_true (xfile_has_prefix (file, parent));
+  g_assert_true (g_file_has_prefix (file, parent));
 
-  name = xfile_get_relative_path (parent, file);
+  name = g_file_get_relative_path (parent, file);
   g_assert_cmpstr (name, ==, "test2-alias.txt");
   g_free (name);
 
-  xobject_unref (parent);
+  g_object_unref (parent);
 
-  attrs = xfile_query_settable_attributes (file, NULL, &error);
+  attrs = g_file_query_settable_attributes (file, NULL, &error);
   g_assert_no_error (error);
-  xfile_attribute_info_list_unref (attrs);
+  g_file_attribute_info_list_unref (attrs);
 
-  attrs = xfile_query_writable_namespaces (file, NULL, &error);
+  attrs = g_file_query_writable_namespaces (file, NULL, &error);
   g_assert_no_error (error);
-  xfile_attribute_info_list_unref (attrs);
+  g_file_attribute_info_list_unref (attrs);
 
-  stream = G_INPUT_STREAM (xfile_read (file, NULL, &error));
+  stream = G_INPUT_STREAM (g_file_read (file, NULL, &error));
   g_assert_no_error (error);
-  g_assert_cmpint (xseekable_tell (G_SEEKABLE (stream)), ==, 0);
-  g_assert_true (xseekable_can_seek (G_SEEKABLE (G_SEEKABLE (stream))));
-  ret = xseekable_seek (G_SEEKABLE (stream), 1, G_SEEK_SET, NULL, &error);
+  g_assert_cmpint (g_seekable_tell (G_SEEKABLE (stream)), ==, 0);
+  g_assert_true (g_seekable_can_seek (G_SEEKABLE (G_SEEKABLE (stream))));
+  ret = g_seekable_seek (G_SEEKABLE (stream), 1, G_SEEK_SET, NULL, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
-  skipped = xinput_stream_skip (stream, 1, NULL, &error);
+  skipped = g_input_stream_skip (stream, 1, NULL, &error);
   g_assert_cmpint (skipped, ==, 1);
   g_assert_no_error (error);
 
   memset (buf, 0, 1024);
-  ret = xinput_stream_read_all (stream, &buf, 1024, NULL, NULL, &error);
+  ret = g_input_stream_read_all (stream, &buf, 1024, NULL, NULL, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
   g_assert_cmpstr (buf, ==, "st2\n");
-  info = xfile_input_stream_query_info (XFILE_INPUT_STREAM (stream),
-                                         XFILE_ATTRIBUTE_STANDARD_SIZE,
+  info = g_file_input_stream_query_info (G_FILE_INPUT_STREAM (stream),
+                                         G_FILE_ATTRIBUTE_STANDARD_SIZE,
                                          NULL,
                                          &error);
   g_assert_no_error (error);
   g_assert_nonnull (info);
-  g_assert_cmpint (xfile_info_get_size (info), ==, 6);
-  xobject_unref (info);
+  g_assert_cmpint (g_file_info_get_size (info), ==, 6);
+  g_object_unref (info);
 
-  ret = xinput_stream_close (stream, NULL, &error);
+  ret = g_input_stream_close (stream, NULL, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
-  xobject_unref (stream);
+  g_object_unref (stream);
 
-  xobject_unref (file);
-  xobject_unref (file2);
+  g_object_unref (file);
+  g_object_unref (file2);
 
   g_resources_unregister (resource);
   g_resource_unref (resource);
@@ -968,12 +968,12 @@ test_uri_file (void)
 static void
 test_resource_64k (void)
 {
-  xerror_t *error = NULL;
-  xboolean_t found;
-  xsize_t size;
-  xuint32_t flags;
-  xbytes_t *data;
-  xchar_t **tokens;
+  GError *error = NULL;
+  gboolean found;
+  gsize size;
+  guint32 flags;
+  GBytes *data;
+  gchar **tokens;
 
   found = g_resources_get_info ("/big_prefix/gresource-big-test.txt",
 				G_RESOURCE_LOOKUP_FLAGS_NONE,
@@ -994,10 +994,10 @@ test_resource_64k (void)
 				  &error);
   g_assert_nonnull (data);
   g_assert_no_error (error);
-  size = xbytes_get_size (data);
+  size = g_bytes_get_size (data);
 
   g_assert_cmpint (size, ==, (26 + 26 + 10) * (100 + 1) * 12);
-  tokens = xstrsplit ((const xchar_t *) xbytes_get_data (data, NULL), "\n", -1);
+  tokens = g_strsplit ((const gchar *) g_bytes_get_data (data, NULL), "\n", -1);
 
   /* check tokens[x] == entry at gresource-big-test.txt's line, where x = line - 1 */
   g_assert_cmpstr (tokens[0], ==, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -1005,8 +1005,8 @@ test_resource_64k (void)
   g_assert_cmpstr (tokens[183], ==, "7777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777777");
   g_assert_cmpstr (tokens[600], ==, "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
   g_assert_cmpstr (tokens[742], ==, "8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888");
-  xstrfreev (tokens);
-  xbytes_unref (data);
+  g_strfreev (tokens);
+  g_bytes_unref (data);
 }
 
 /* Check that g_resources_get_info() respects G_RESOURCE_OVERLAYS */
@@ -1015,14 +1015,14 @@ test_overlay (void)
 {
   if (g_test_subprocess ())
     {
-       xerror_t *error = NULL;
-       xboolean_t res;
-       xsize_t size;
+       GError *error = NULL;
+       gboolean res;
+       gsize size;
        char *overlay;
        char *path;
 
        path = g_test_build_filename (G_TEST_DIST, "test1.overlay", NULL);
-       overlay = xstrconcat ("/auto_loaded/test1.txt=", path, NULL);
+       overlay = g_strconcat ("/auto_loaded/test1.txt=", path, NULL);
 
        g_setenv ("G_RESOURCE_OVERLAYS", overlay, TRUE);
        res = g_resources_get_info ("/auto_loaded/test1.txt", 0, &size, NULL, &error);

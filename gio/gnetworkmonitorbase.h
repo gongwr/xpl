@@ -23,45 +23,45 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_BASE         (xnetwork_monitor_base_get_type ())
-#define G_NETWORK_MONITOR_BASE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base))
-#define G_NETWORK_MONITOR_BASE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class))
-#define X_IS_NETWORK_MONITOR_BASE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_BASE))
-#define X_IS_NETWORK_MONITOR_BASE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_MONITOR_BASE))
-#define G_NETWORK_MONITOR_BASE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_BASE, xnetwork_monitor_base_class))
+#define G_TYPE_NETWORK_MONITOR_BASE         (g_network_monitor_base_get_type ())
+#define G_NETWORK_MONITOR_BASE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_MONITOR_BASE, GNetworkMonitorBase))
+#define G_NETWORK_MONITOR_BASE_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NETWORK_MONITOR_BASE, GNetworkMonitorBaseClass))
+#define G_IS_NETWORK_MONITOR_BASE(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_MONITOR_BASE))
+#define G_IS_NETWORK_MONITOR_BASE_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NETWORK_MONITOR_BASE))
+#define G_NETWORK_MONITOR_BASE_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NETWORK_MONITOR_BASE, GNetworkMonitorBaseClass))
 
-typedef struct _GNetworkMonitorBase        xnetwork_monitor_base_t;
-typedef struct _Xnetwork_monitor_base_class_t   xnetwork_monitor_base_class_t;
+typedef struct _GNetworkMonitorBase        GNetworkMonitorBase;
+typedef struct _GNetworkMonitorBaseClass   GNetworkMonitorBaseClass;
 typedef struct _GNetworkMonitorBasePrivate GNetworkMonitorBasePrivate;
 
 struct _GNetworkMonitorBase {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   GNetworkMonitorBasePrivate *priv;
 };
 
-struct _Xnetwork_monitor_base_class_t {
-  xobject_class_t parent_class;
+struct _GNetworkMonitorBaseClass {
+  GObjectClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t xnetwork_monitor_base_get_type (void);
+GLIB_AVAILABLE_IN_ALL
+GType g_network_monitor_base_get_type (void);
 
 /*< protected >*/
-XPL_AVAILABLE_IN_2_32
-void xnetwork_monitor_base_add_network    (xnetwork_monitor_base_t  *monitor,
-					    xinet_address_mask_t     *network);
-XPL_AVAILABLE_IN_2_32
-void xnetwork_monitor_base_remove_network (xnetwork_monitor_base_t  *monitor,
-					    xinet_address_mask_t     *network);
-XPL_AVAILABLE_IN_ALL
-void xnetwork_monitor_base_set_networks   (xnetwork_monitor_base_t  *monitor,
-					    xinet_address_mask_t    **networks,
-					    xint_t                  length);
+GLIB_AVAILABLE_IN_2_32
+void g_network_monitor_base_add_network    (GNetworkMonitorBase  *monitor,
+					    GInetAddressMask     *network);
+GLIB_AVAILABLE_IN_2_32
+void g_network_monitor_base_remove_network (GNetworkMonitorBase  *monitor,
+					    GInetAddressMask     *network);
+GLIB_AVAILABLE_IN_ALL
+void g_network_monitor_base_set_networks   (GNetworkMonitorBase  *monitor,
+					    GInetAddressMask    **networks,
+					    gint                  length);
 
 G_END_DECLS
 

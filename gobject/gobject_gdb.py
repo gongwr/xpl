@@ -24,7 +24,7 @@ def read_global_var(symname):
     return gdb.selected_frame().read_var(symname)
 
 
-def xtype_to_typenode(gtype):
+def g_type_to_typenode(gtype):
     def lookup_fundamental_type(typenode):
         if typenode == 0:
             return None
@@ -42,15 +42,15 @@ def xtype_to_typenode(gtype):
     return typenode
 
 
-def xtype_to_name(gtype):
-    typenode = xtype_to_typenode(gtype)
+def g_type_to_name(gtype):
+    typenode = g_type_to_typenode(gtype)
     if typenode is not None:
         return glib_gdb.g_quark_to_string(typenode["qname"])
     return None
 
 
-def is_xtype_instance(val):
-    def is_xtype_instance_helper(type):
+def is_g_type_instance(val):
+    def is_g_type_instance_helper(type):
         if str(type) == "GTypeInstance":
             return True
 
@@ -65,22 +65,22 @@ def is_xtype_instance(val):
             return False
 
         first_field = fields[0]
-        return is_xtype_instance_helper(first_field.type)
+        return is_g_type_instance_helper(first_field.type)
 
     type = val.type
     if type.code != gdb.TYPE_CODE_PTR:
         return False
     type = type.target()
-    return is_xtype_instance_helper(type)
+    return is_g_type_instance_helper(type)
 
 
-def xtype_name_from_instance(instance):
+def g_type_name_from_instance(instance):
     if long(instance) != 0:
         try:
             inst = instance.cast(gdb.lookup_type("GTypeInstance").pointer())
             klass = inst["g_class"]
             gtype = klass["g_type"]
-            name = xtype_to_name(gtype)
+            name = g_type_to_name(gtype)
             return name
         except RuntimeError:
             pass
@@ -88,39 +88,39 @@ def xtype_name_from_instance(instance):
 
 
 class GTypePrettyPrinter:
-    "Prints a xtype_t instance pointer"
+    "Prints a GType instance pointer"
 
     def __init__(self, val):
         self.val = val
 
     def to_string(self):
-        name = xtype_name_from_instance(self.val)
+        name = g_type_name_from_instance(self.val)
         if name:
             return ("0x%x [%s]") % (long(self.val), name)
         return ("0x%x") % (long(self.val))
 
 
-def is_xtype_class_instance(val):
+def is_g_type_class_instance(val):
     type = val.type
     if type.code != gdb.TYPE_CODE_PTR:
         return False
-    return str(type.target()) == "xtype_class_t"
+    return str(type.target()) == "GTypeClass"
 
 
 class GTypeHandlePrettyPrinter:
-    "Prints a xtype_t instance"
+    "Prints a GType instance"
 
     def __init__(self, val, hint=""):
         self.val = val
         self.hint = hint
 
     def to_string(self):
-        typenode = xtype_to_typenode(self.val)
+        typenode = g_type_to_typenode(self.val)
         if typenode is not None:
             name = glib_gdb.g_quark_to_string(typenode["qname"])
             s = ("0x%x [%s%s") % (long(self.val), self.hint, name)
             for i in range(1, int(typenode["n_supers"])):
-                node = xtype_to_typenode(typenode["supers"][i])
+                node = g_type_to_typenode(typenode["supers"][i])
                 if node:
                     name = glib_gdb.g_quark_to_string(node["qname"])
                 else:
@@ -132,11 +132,11 @@ class GTypeHandlePrettyPrinter:
 
 
 def pretty_printer_lookup(val):
-    if is_xtype_instance(val):
+    if is_g_type_instance(val):
         return GTypePrettyPrinter(val)
-    if str(val.type) == "xtype_t":
+    if str(val.type) == "GType":
         return GTypeHandlePrettyPrinter(val)
-    if is_xtype_class_instance(val):
+    if is_g_type_class_instance(val):
         return GTypeHandlePrettyPrinter(val["g_type"], "g_type: ")
 
     return None
@@ -148,7 +148,7 @@ def get_signal_name(id):
     id = long(id)
     if id == 0:
         return None
-    val = read_global_var("xsignal_nodes")
+    val = read_global_var("g_signal_nodes")
     max_s = read_global_var("g_n_signal_nodes")
     max_s = long(max_s)
     if id < max_s:
@@ -189,9 +189,9 @@ class SignalFrame(FrameDecorator):
             v = frame_var(frame, name)
             if v is None or v.is_optimized_out:
                 return None
-            v = v.cast(gdb.lookup_type("xobject_t").pointer())
+            v = v.cast(gdb.lookup_type("GObject").pointer())
             # Ensure this is a somewhat correct object pointer
-            if v is not None and xtype_name_from_instance(v):
+            if v is not None and g_type_name_from_instance(v):
                 if array is not None:
                     array.append(v)
                 return v
@@ -231,11 +231,11 @@ class SignalFrame(FrameDecorator):
                     signal = self.get_detailed_signal_from_frame(frame, signal)
                     self.append(signals, signal)
 
-            if name == "xsignal_emitv":
+            if name == "g_signal_emitv":
                 instance_and_params = self.read_var(frame, "instance_and_params")
                 if instance_and_params:
                     instance = instance_and_params[0]["v_pointer"].cast(
-                        gdb.Type("xobject_t").pointer()
+                        gdb.Type("GObject").pointer()
                     )
                     self.append(instances, instance)
                 id = self.read_var(frame, "signal_id")
@@ -244,7 +244,7 @@ class SignalFrame(FrameDecorator):
                     signal = self.get_detailed_signal_from_frame(frame, signal)
                     self.append(signals, signal)
 
-            if name == "xsignal_emit_valist" or name == "xsignal_emit":
+            if name == "g_signal_emit_valist" or name == "g_signal_emit":
                 self.read_object(frame, "instance", instances)
                 id = self.read_var(frame, "signal_id")
                 signal = get_signal_name(id)
@@ -252,7 +252,7 @@ class SignalFrame(FrameDecorator):
                     signal = self.get_detailed_signal_from_frame(frame, signal)
                     self.append(signals, signal)
 
-            if name == "xsignal_emit_by_name":
+            if name == "g_signal_emit_by_name":
                 self.read_object(frame, "instance", instances)
                 self.read_var(frame, "detailed_signal", signals)
                 break
@@ -306,18 +306,18 @@ class GFrameDecorator:
                 if start == 0:
                     break
                 prev_name = frame_name(self.queue[start - 1])
-                if prev_name.find("_marshal_") >= 0 or prev_name == "xclosure_invoke":
+                if prev_name.find("_marshal_") >= 0 or prev_name == "g_closure_invoke":
                     start = start - 1
                 else:
                     break
             end = emission + 1
             while end < len(self.queue):
                 if frame_name(self.queue[end]) in [
-                    "xsignal_emitv",
-                    "xsignal_emit_valist",
-                    "xsignal_emit",
-                    "xsignal_emit_by_name",
-                    "_xclosure_invoke_va",
+                    "g_signal_emitv",
+                    "g_signal_emit_valist",
+                    "g_signal_emit",
+                    "g_signal_emit_by_name",
+                    "_g_closure_invoke_va",
                 ]:
                     end = end + 1
                 else:

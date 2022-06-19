@@ -24,9 +24,9 @@
 #include "xdp-dbus.h"
 #include "gportalsupport.h"
 
-static xinitable_iface_t *initable_parent_iface;
-static void xnetwork_monitor_portal_iface_init (GNetworkMonitorInterface *iface);
-static void xnetwork_monitor_portal_initable_iface_init (xinitable_iface_t *iface);
+static GInitableIface *initable_parent_iface;
+static void g_network_monitor_portal_iface_init (GNetworkMonitorInterface *iface);
+static void g_network_monitor_portal_initable_iface_init (GInitableIface *iface);
 
 enum
 {
@@ -38,52 +38,52 @@ enum
 
 struct _GNetworkMonitorPortalPrivate
 {
-  xdbus_proxy_t *proxy;
-  xboolean_t has_network;
+  GDBusProxy *proxy;
+  gboolean has_network;
 
-  xboolean_t available;
-  xboolean_t metered;
+  gboolean available;
+  gboolean metered;
   GNetworkConnectivity connectivity;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GNetworkMonitorPortal, xnetwork_monitor_portal, XTYPE_NETWORK_MONITOR_BASE,
+G_DEFINE_TYPE_WITH_CODE (GNetworkMonitorPortal, g_network_monitor_portal, G_TYPE_NETWORK_MONITOR_BASE,
                          G_ADD_PRIVATE (GNetworkMonitorPortal)
-                         G_IMPLEMENT_INTERFACE (XTYPE_NETWORK_MONITOR,
-                                                xnetwork_monitor_portal_iface_init)
-                         G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                xnetwork_monitor_portal_initable_iface_init)
-                         _xio_modules_ensure_extension_points_registered ();
+                         G_IMPLEMENT_INTERFACE (G_TYPE_NETWORK_MONITOR,
+                                                g_network_monitor_portal_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                g_network_monitor_portal_initable_iface_init)
+                         _g_io_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_NETWORK_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
                                                          "portal",
                                                          40))
 
 static void
-xnetwork_monitor_portal_init (GNetworkMonitorPortal *nm)
+g_network_monitor_portal_init (GNetworkMonitorPortal *nm)
 {
-  nm->priv = xnetwork_monitor_portal_get_instance_private (nm);
+  nm->priv = g_network_monitor_portal_get_instance_private (nm);
 }
 
 static void
-xnetwork_monitor_portal_get_property (xobject_t    *object,
-                                       xuint_t       prop_id,
-                                       xvalue_t     *value,
-                                       xparam_spec_t *pspec)
+g_network_monitor_portal_get_property (GObject    *object,
+                                       guint       prop_id,
+                                       GValue     *value,
+                                       GParamSpec *pspec)
 {
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (object);
 
   switch (prop_id)
     {
     case PROP_NETWORK_AVAILABLE:
-      xvalue_set_boolean (value, nm->priv->available);
+      g_value_set_boolean (value, nm->priv->available);
       break;
 
     case PROP_NETWORK_METERED:
-      xvalue_set_boolean (value, nm->priv->metered);
+      g_value_set_boolean (value, nm->priv->metered);
       break;
 
     case PROP_CONNECTIVITY:
-      xvalue_set_enum (value, nm->priv->connectivity);
+      g_value_set_enum (value, nm->priv->connectivity);
       break;
 
     default:
@@ -92,35 +92,35 @@ xnetwork_monitor_portal_get_property (xobject_t    *object,
     }
 }
 
-static xboolean_t
-is_valid_connectivity (xuint32_t value)
+static gboolean
+is_valid_connectivity (guint32 value)
 {
-  xenum_value_t *enum_value;
-  xenum_class_t *enum_klass;
+  GEnumValue *enum_value;
+  GEnumClass *enum_klass;
 
-  enum_klass = xtype_class_ref (XTYPE_NETWORK_CONNECTIVITY);
-  enum_value = xenum_get_value (enum_klass, value);
+  enum_klass = g_type_class_ref (G_TYPE_NETWORK_CONNECTIVITY);
+  enum_value = g_enum_get_value (enum_klass, value);
 
-  xtype_class_unref (enum_klass);
+  g_type_class_unref (enum_klass);
 
   return enum_value != NULL;
 }
 
 static void
-got_available (xobject_t *source,
-               xasync_result_t *res,
-               xpointer_t data)
+got_available (GObject *source,
+               GAsyncResult *res,
+               gpointer data)
 {
-  xdbus_proxy_t *proxy = G_DBUS_PROXY (source);
+  GDBusProxy *proxy = G_DBUS_PROXY (source);
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (data);
-  xerror_t *error = NULL;
-  xvariant_t *ret;
-  xboolean_t available;
-
-  ret = xdbus_proxy_call_finish (proxy, res, &error);
+  GError *error = NULL;
+  GVariant *ret;
+  gboolean available;
+  
+  ret = g_dbus_proxy_call_finish (proxy, res, &error);
   if (ret == NULL)
     {
-      if (!xerror_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+      if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
         {
           g_warning ("%s", error->message);
           g_clear_error (&error);
@@ -130,45 +130,45 @@ got_available (xobject_t *source,
       g_clear_error (&error);
 
       /* Fall back to version 1 */
-      ret = xdbus_proxy_get_cached_property (nm->priv->proxy, "available");
+      ret = g_dbus_proxy_get_cached_property (nm->priv->proxy, "available");
       if (ret == NULL)
         {
           g_warning ("Failed to get the '%s' property", "available");
           return;
         }
 
-      available = xvariant_get_boolean (ret);
-      xvariant_unref (ret);
+      available = g_variant_get_boolean (ret);
+      g_variant_unref (ret);
     }
   else
     {
-      xvariant_get (ret, "(b)", &available);
-      xvariant_unref (ret);
+      g_variant_get (ret, "(b)", &available);
+      g_variant_unref (ret);
     }
 
   if (nm->priv->available != available)
     {
       nm->priv->available = available;
-      xobject_notify (G_OBJECT (nm), "network-available");
-      xsignal_emit_by_name (nm, "network-changed", available);
+      g_object_notify (G_OBJECT (nm), "network-available");
+      g_signal_emit_by_name (nm, "network-changed", available);
     }
 }
 
 static void
-got_metered (xobject_t *source,
-             xasync_result_t *res,
-             xpointer_t data)
+got_metered (GObject *source,
+             GAsyncResult *res,
+             gpointer data)
 {
-  xdbus_proxy_t *proxy = G_DBUS_PROXY (source);
+  GDBusProxy *proxy = G_DBUS_PROXY (source);
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (data);
-  xerror_t *error = NULL;
-  xvariant_t *ret;
-  xboolean_t metered;
-
-  ret = xdbus_proxy_call_finish (proxy, res, &error);
+  GError *error = NULL;
+  GVariant *ret;
+  gboolean metered;
+  
+  ret = g_dbus_proxy_call_finish (proxy, res, &error);
   if (ret == NULL)
     {
-      if (!xerror_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+      if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
         {
           g_warning ("%s", error->message);
           g_clear_error (&error);
@@ -178,45 +178,45 @@ got_metered (xobject_t *source,
       g_clear_error (&error);
 
       /* Fall back to version 1 */
-      ret = xdbus_proxy_get_cached_property (nm->priv->proxy, "metered");
+      ret = g_dbus_proxy_get_cached_property (nm->priv->proxy, "metered");
       if (ret == NULL)
         {
           g_warning ("Failed to get the '%s' property", "metered");
           return;
         }
 
-      metered = xvariant_get_boolean (ret);
-      xvariant_unref (ret);
+      metered = g_variant_get_boolean (ret);
+      g_variant_unref (ret);
     }
   else
     {
-      xvariant_get (ret, "(b)", &metered);
-      xvariant_unref (ret);
+      g_variant_get (ret, "(b)", &metered);
+      g_variant_unref (ret);
     }
 
   if (nm->priv->metered != metered)
     {
       nm->priv->metered = metered;
-      xobject_notify (G_OBJECT (nm), "network-metered");
-      xsignal_emit_by_name (nm, "network-changed", nm->priv->available);
+      g_object_notify (G_OBJECT (nm), "network-metered");
+      g_signal_emit_by_name (nm, "network-changed", nm->priv->available);
     }
 }
 
 static void
-got_connectivity (xobject_t *source,
-                  xasync_result_t *res,
-                  xpointer_t data)
+got_connectivity (GObject *source,
+                  GAsyncResult *res,
+                  gpointer data)
 {
-  xdbus_proxy_t *proxy = G_DBUS_PROXY (source);
+  GDBusProxy *proxy = G_DBUS_PROXY (source);
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (data);
-  xerror_t *error = NULL;
-  xvariant_t *ret;
+  GError *error = NULL;
+  GVariant *ret;
   GNetworkConnectivity connectivity;
-
-  ret = xdbus_proxy_call_finish (proxy, res, &error);
+  
+  ret = g_dbus_proxy_call_finish (proxy, res, &error);
   if (ret == NULL)
     {
-      if (!xerror_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+      if (!g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
         {
           g_warning ("%s", error->message);
           g_clear_error (&error);
@@ -226,54 +226,54 @@ got_connectivity (xobject_t *source,
       g_clear_error (&error);
 
       /* Fall back to version 1 */
-      ret = xdbus_proxy_get_cached_property (nm->priv->proxy, "connectivity");
+      ret = g_dbus_proxy_get_cached_property (nm->priv->proxy, "connectivity");
       if (ret == NULL)
         {
           g_warning ("Failed to get the '%s' property", "connectivity");
           return;
         }
 
-      connectivity = xvariant_get_uint32 (ret);
-      xvariant_unref (ret);
+      connectivity = g_variant_get_uint32 (ret);
+      g_variant_unref (ret);
     }
   else
     {
-      xvariant_get (ret, "(u)", &connectivity);
-      xvariant_unref (ret);
+      g_variant_get (ret, "(u)", &connectivity);
+      g_variant_unref (ret);
     }
 
   if (nm->priv->connectivity != connectivity &&
       is_valid_connectivity (connectivity))
     {
       nm->priv->connectivity = connectivity;
-      xobject_notify (G_OBJECT (nm), "connectivity");
-      xsignal_emit_by_name (nm, "network-changed", nm->priv->available);
+      g_object_notify (G_OBJECT (nm), "connectivity");
+      g_signal_emit_by_name (nm, "network-changed", nm->priv->available);
     }
 }
 
 static void
-got_status (xobject_t *source,
-            xasync_result_t *res,
-            xpointer_t data)
+got_status (GObject *source,
+            GAsyncResult *res,
+            gpointer data)
 {
-  xdbus_proxy_t *proxy = G_DBUS_PROXY (source);
+  GDBusProxy *proxy = G_DBUS_PROXY (source);
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (data);
-  xerror_t *error = NULL;
-  xvariant_t *ret;
-  xvariant_t *status;
-  xboolean_t available;
-  xboolean_t metered;
+  GError *error = NULL;
+  GVariant *ret;
+  GVariant *status;
+  gboolean available;
+  gboolean metered;
   GNetworkConnectivity connectivity;
 
-  ret = xdbus_proxy_call_finish (proxy, res, &error);
+  ret = g_dbus_proxy_call_finish (proxy, res, &error);
   if (ret == NULL)
     {
-      if (xerror_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
+      if (g_error_matches (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD))
         {
           /* Fall back to version 2 */
-          xdbus_proxy_call (proxy, "GetConnectivity", NULL, 0, -1, NULL, got_connectivity, nm);
-          xdbus_proxy_call (proxy, "GetMetered", NULL, 0, -1, NULL, got_metered, nm);
-          xdbus_proxy_call (proxy, "GetAvailable", NULL, 0, -1, NULL, got_available, nm);
+          g_dbus_proxy_call (proxy, "GetConnectivity", NULL, 0, -1, NULL, got_connectivity, nm);
+          g_dbus_proxy_call (proxy, "GetMetered", NULL, 0, -1, NULL, got_metered, nm);
+          g_dbus_proxy_call (proxy, "GetAvailable", NULL, 0, -1, NULL, got_available, nm);
         }
       else
         g_warning ("%s", error->message);
@@ -282,53 +282,53 @@ got_status (xobject_t *source,
       return;
     }
 
-  xvariant_get (ret, "(@a{sv})", &status);
-  xvariant_unref (ret);
+  g_variant_get (ret, "(@a{sv})", &status);
+  g_variant_unref (ret);
 
-  xvariant_lookup (status, "available", "b", &available);
-  xvariant_lookup (status, "metered", "b", &metered);
-  xvariant_lookup (status, "connectivity", "u", &connectivity);
-  xvariant_unref (status);
+  g_variant_lookup (status, "available", "b", &available);
+  g_variant_lookup (status, "metered", "b", &metered);
+  g_variant_lookup (status, "connectivity", "u", &connectivity);
+  g_variant_unref (status);
 
-  xobject_freeze_notify (G_OBJECT (nm));
+  g_object_freeze_notify (G_OBJECT (nm));
 
   if (nm->priv->available != available)
     {
       nm->priv->available = available;
-      xobject_notify (G_OBJECT (nm), "network-available");
+      g_object_notify (G_OBJECT (nm), "network-available");
     }
 
   if (nm->priv->metered != metered)
     {
       nm->priv->metered = metered;
-      xobject_notify (G_OBJECT (nm), "network-metered");
+      g_object_notify (G_OBJECT (nm), "network-metered");
     }
 
   if (nm->priv->connectivity != connectivity &&
       is_valid_connectivity (connectivity))
     {
       nm->priv->connectivity = connectivity;
-      xobject_notify (G_OBJECT (nm), "connectivity");
+      g_object_notify (G_OBJECT (nm), "connectivity");
     }
 
-  xobject_thaw_notify (G_OBJECT (nm));
+  g_object_thaw_notify (G_OBJECT (nm));
 
-  xsignal_emit_by_name (nm, "network-changed", available);
+  g_signal_emit_by_name (nm, "network-changed", available);
 }
 
 static void
-update_properties (xdbus_proxy_t *proxy,
+update_properties (GDBusProxy *proxy,
                    GNetworkMonitorPortal *nm)
 {
   /* Try version 3 first */
-  xdbus_proxy_call (proxy, "GetStatus", NULL, 0, -1, NULL, got_status, nm);
+  g_dbus_proxy_call (proxy, "GetStatus", NULL, 0, -1, NULL, got_status, nm);
 }
 
 static void
-proxy_signal (xdbus_proxy_t            *proxy,
+proxy_signal (GDBusProxy            *proxy,
               const char            *sender,
               const char            *signal,
-              xvariant_t              *parameters,
+              GVariant              *parameters,
               GNetworkMonitorPortal *nm)
 {
   if (!nm->priv->has_network)
@@ -338,17 +338,17 @@ proxy_signal (xdbus_proxy_t            *proxy,
     return;
 
   /* Version 1 updates "available" with the "changed" signal */
-  if (xvariant_is_of_type (parameters, G_VARIANT_TYPE ("(b)")))
+  if (g_variant_is_of_type (parameters, G_VARIANT_TYPE ("(b)")))
     {
-      xboolean_t available;
+      gboolean available;
 
-      xvariant_get (parameters, "(b)", &available);
+      g_variant_get (parameters, "(b)", &available);
       if (nm->priv->available != available)
         {
           nm->priv->available = available;
-          xobject_notify (G_OBJECT (nm), "available");
+          g_object_notify (G_OBJECT (nm), "available");
         }
-      xsignal_emit_by_name (nm, "network-changed", available);
+      g_signal_emit_by_name (nm, "network-changed", available);
     }
   else
     {
@@ -357,69 +357,69 @@ proxy_signal (xdbus_proxy_t            *proxy,
 }
 
 static void
-proxy_properties_changed (xdbus_proxy_t            *proxy,
-                          xvariant_t              *changed,
-                          xvariant_t              *invalidated,
+proxy_properties_changed (GDBusProxy            *proxy,
+                          GVariant              *changed,
+                          GVariant              *invalidated,
                           GNetworkMonitorPortal *nm)
 {
-  xboolean_t should_emit_changed = FALSE;
-  xvariant_t *ret;
+  gboolean should_emit_changed = FALSE;
+  GVariant *ret;
 
   if (!nm->priv->has_network)
     return;
 
-  ret = xdbus_proxy_get_cached_property (proxy, "connectivity");
+  ret = g_dbus_proxy_get_cached_property (proxy, "connectivity");
   if (ret)
     {
-      GNetworkConnectivity connectivity = xvariant_get_uint32 (ret);
+      GNetworkConnectivity connectivity = g_variant_get_uint32 (ret);
       if (nm->priv->connectivity != connectivity &&
           is_valid_connectivity (connectivity))
         {
           nm->priv->connectivity = connectivity;
-          xobject_notify (G_OBJECT (nm), "connectivity");
+          g_object_notify (G_OBJECT (nm), "connectivity");
           should_emit_changed = TRUE;
         }
-      xvariant_unref (ret);
+      g_variant_unref (ret);
     }
 
-  ret = xdbus_proxy_get_cached_property (proxy, "metered");
+  ret = g_dbus_proxy_get_cached_property (proxy, "metered");
   if (ret)
     {
-      xboolean_t metered = xvariant_get_boolean (ret);
+      gboolean metered = g_variant_get_boolean (ret);
       if (nm->priv->metered != metered)
         {
           nm->priv->metered = metered;
-          xobject_notify (G_OBJECT (nm), "network-metered");
+          g_object_notify (G_OBJECT (nm), "network-metered");
           should_emit_changed = TRUE;
         }
-      xvariant_unref (ret);
+      g_variant_unref (ret);
     }
 
-  ret = xdbus_proxy_get_cached_property (proxy, "available");
+  ret = g_dbus_proxy_get_cached_property (proxy, "available");
   if (ret)
     {
-      xboolean_t available = xvariant_get_boolean (ret);
+      gboolean available = g_variant_get_boolean (ret);
       if (nm->priv->available != available)
         {
           nm->priv->available = available;
-          xobject_notify (G_OBJECT (nm), "network-available");
+          g_object_notify (G_OBJECT (nm), "network-available");
           should_emit_changed = TRUE;
-        }
-      xvariant_unref (ret);
+        } 
+      g_variant_unref (ret);
     }
 
   if (should_emit_changed)
-    xsignal_emit_by_name (nm, "network-changed", nm->priv->available);
+    g_signal_emit_by_name (nm, "network-changed", nm->priv->available);
 }
-
-static xboolean_t
-xnetwork_monitor_portal_initable_init (xinitable_t     *initable,
-                                        xcancellable_t  *cancellable,
-                                        xerror_t       **error)
+                           
+static gboolean
+g_network_monitor_portal_initable_init (GInitable     *initable,
+                                        GCancellable  *cancellable,
+                                        GError       **error)
 {
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (initable);
-  xdbus_proxy_t *proxy;
-  xchar_t *name_owner = NULL;
+  GDBusProxy *proxy;
+  gchar *name_owner = NULL;
 
   nm->priv->available = FALSE;
   nm->priv->metered = FALSE;
@@ -431,7 +431,7 @@ xnetwork_monitor_portal_initable_init (xinitable_t     *initable,
       return FALSE;
     }
 
-  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                          NULL,
                                          "org.freedesktop.portal.Desktop",
@@ -442,11 +442,11 @@ xnetwork_monitor_portal_initable_init (xinitable_t     *initable,
   if (!proxy)
     return FALSE;
 
-  name_owner = xdbus_proxy_get_name_owner (proxy);
+  name_owner = g_dbus_proxy_get_name_owner (proxy);
 
   if (!name_owner)
     {
-      xobject_unref (proxy);
+      g_object_unref (proxy);
       g_set_error (error,
                    G_DBUS_ERROR,
                    G_DBUS_ERROR_NAME_HAS_NO_OWNER,
@@ -456,8 +456,8 @@ xnetwork_monitor_portal_initable_init (xinitable_t     *initable,
 
   g_free (name_owner);
 
-  xsignal_connect (proxy, "g-signal", G_CALLBACK (proxy_signal), nm);
-  xsignal_connect (proxy, "g-properties-changed", G_CALLBACK (proxy_properties_changed), nm);
+  g_signal_connect (proxy, "g-signal", G_CALLBACK (proxy_signal), nm);
+  g_signal_connect (proxy, "g-properties-changed", G_CALLBACK (proxy_properties_changed), nm);
 
   nm->priv->proxy = proxy;
   nm->priv->has_network = glib_network_available_in_sandbox ();
@@ -472,127 +472,127 @@ xnetwork_monitor_portal_initable_init (xinitable_t     *initable,
 }
 
 static void
-xnetwork_monitor_portal_finalize (xobject_t *object)
+g_network_monitor_portal_finalize (GObject *object)
 {
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (object);
 
   g_clear_object (&nm->priv->proxy);
 
-  XOBJECT_CLASS (xnetwork_monitor_portal_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_network_monitor_portal_parent_class)->finalize (object);
 }
 
 static void
-xnetwork_monitor_portal_class_init (GNetworkMonitorPortalClass *class)
+g_network_monitor_portal_class_init (GNetworkMonitorPortalClass *class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
 
-  xobject_class->finalize  = xnetwork_monitor_portal_finalize;
-  xobject_class->get_property = xnetwork_monitor_portal_get_property;
+  gobject_class->finalize  = g_network_monitor_portal_finalize;
+  gobject_class->get_property = g_network_monitor_portal_get_property;
 
-  xobject_class_override_property (xobject_class, PROP_NETWORK_AVAILABLE, "network-available");
-  xobject_class_override_property (xobject_class, PROP_NETWORK_METERED, "network-metered");
-  xobject_class_override_property (xobject_class, PROP_CONNECTIVITY, "connectivity");
+  g_object_class_override_property (gobject_class, PROP_NETWORK_AVAILABLE, "network-available");
+  g_object_class_override_property (gobject_class, PROP_NETWORK_METERED, "network-metered");
+  g_object_class_override_property (gobject_class, PROP_CONNECTIVITY, "connectivity");
 }
 
-static xboolean_t
-xnetwork_monitor_portal_can_reach (xnetwork_monitor_t     *monitor,
-                                    xsocket_connectable_t  *connectable,
-                                    xcancellable_t        *cancellable,
-                                    xerror_t             **error)
+static gboolean
+g_network_monitor_portal_can_reach (GNetworkMonitor     *monitor,
+                                    GSocketConnectable  *connectable,
+                                    GCancellable        *cancellable,
+                                    GError             **error)
 {
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (monitor);
-  xvariant_t *ret;
-  xnetwork_address_t *address;
-  xboolean_t reachable = FALSE;
+  GVariant *ret;
+  GNetworkAddress *address;
+  gboolean reachable = FALSE;
 
-  if (!X_IS_NETWORK_ADDRESS (connectable))
+  if (!G_IS_NETWORK_ADDRESS (connectable))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                   "Can't handle this kind of xsocket_connectable_t (%s)",
+                   "Can't handle this kind of GSocketConnectable (%s)",
                    G_OBJECT_TYPE_NAME (connectable));
       return FALSE;
     }
 
   address = G_NETWORK_ADDRESS (connectable);
 
-  ret = xdbus_proxy_call_sync (nm->priv->proxy,
+  ret = g_dbus_proxy_call_sync (nm->priv->proxy,
                                 "CanReach",
-                                xvariant_new ("(su)",
+                                g_variant_new ("(su)",
                                                g_network_address_get_hostname (address),
                                                g_network_address_get_port (address)),
                                 G_DBUS_CALL_FLAGS_NONE,
                                 -1,
                                 cancellable,
                                 error);
-
+  
   if (ret)
     {
-      xvariant_get (ret, "(b)", &reachable);
-      xvariant_unref (ret);
+      g_variant_get (ret, "(b)", &reachable);
+      g_variant_unref (ret);
     }
 
   return reachable;
 }
 
 static void
-can_reach_done (xobject_t      *source,
-                xasync_result_t *result,
-                xpointer_t      data)
+can_reach_done (GObject      *source,
+                GAsyncResult *result,
+                gpointer      data)
 {
-  xtask_t *task = data;
-  GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (xtask_get_source_object (task));
-  xerror_t *error = NULL;
-  xvariant_t *ret;
-  xboolean_t reachable;
+  GTask *task = data;
+  GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (g_task_get_source_object (task));
+  GError *error = NULL;
+  GVariant *ret;
+  gboolean reachable;
 
-  ret = xdbus_proxy_call_finish (nm->priv->proxy, result, &error);
+  ret = g_dbus_proxy_call_finish (nm->priv->proxy, result, &error);
   if (ret == NULL)
     {
-      xtask_return_error (task, error);
-      xobject_unref (task);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
-
-  xvariant_get (ret, "(b)", &reachable);
-  xvariant_unref (ret);
+ 
+  g_variant_get (ret, "(b)", &reachable);
+  g_variant_unref (ret);
 
   if (reachable)
-    xtask_return_boolean (task, TRUE);
+    g_task_return_boolean (task, TRUE);
   else
-    xtask_return_new_error (task,
+    g_task_return_new_error (task,
                              G_IO_ERROR, G_IO_ERROR_HOST_UNREACHABLE,
                              "Can't reach host");
 
-  xobject_unref (task);
+  g_object_unref (task);
 }
 
 static void
-xnetwork_monitor_portal_can_reach_async (xnetwork_monitor_t     *monitor,
-                                          xsocket_connectable_t  *connectable,
-                                          xcancellable_t        *cancellable,
-                                          xasync_ready_callback_t  callback,
-                                          xpointer_t             data)
+g_network_monitor_portal_can_reach_async (GNetworkMonitor     *monitor,
+                                          GSocketConnectable  *connectable,
+                                          GCancellable        *cancellable,
+                                          GAsyncReadyCallback  callback,
+                                          gpointer             data)
 {
   GNetworkMonitorPortal *nm = G_NETWORK_MONITOR_PORTAL (monitor);
-  xtask_t *task;
-  xnetwork_address_t *address;
+  GTask *task;
+  GNetworkAddress *address;
 
-  task = xtask_new (monitor, cancellable, callback, data);
+  task = g_task_new (monitor, cancellable, callback, data);
 
-  if (!X_IS_NETWORK_ADDRESS (connectable))
+  if (!G_IS_NETWORK_ADDRESS (connectable))
     {
-      xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                               "Can't handle this kind of xsocket_connectable_t (%s)",
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                               "Can't handle this kind of GSocketConnectable (%s)",
                                G_OBJECT_TYPE_NAME (connectable));
-      xobject_unref (task);
+      g_object_unref (task);
       return;
     }
 
   address = G_NETWORK_ADDRESS (connectable);
 
-  xdbus_proxy_call (nm->priv->proxy,
+  g_dbus_proxy_call (nm->priv->proxy,
                      "CanReach",
-                     xvariant_new ("(su)",
+                     g_variant_new ("(su)",
                                     g_network_address_get_hostname (address),
                                     g_network_address_get_port (address)),
                      G_DBUS_CALL_FLAGS_NONE,
@@ -602,26 +602,26 @@ xnetwork_monitor_portal_can_reach_async (xnetwork_monitor_t     *monitor,
                      task);
 }
 
-static xboolean_t
-xnetwork_monitor_portal_can_reach_finish (xnetwork_monitor_t  *monitor,
-                                           xasync_result_t     *result,
-                                           xerror_t          **error)
+static gboolean
+g_network_monitor_portal_can_reach_finish (GNetworkMonitor  *monitor,
+                                           GAsyncResult     *result,
+                                           GError          **error)
 {
-  return xtask_propagate_boolean (XTASK (result), error);
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 static void
-xnetwork_monitor_portal_iface_init (GNetworkMonitorInterface *monitor_iface)
+g_network_monitor_portal_iface_init (GNetworkMonitorInterface *monitor_iface)
 {
-  monitor_iface->can_reach = xnetwork_monitor_portal_can_reach;
-  monitor_iface->can_reach_async = xnetwork_monitor_portal_can_reach_async;
-  monitor_iface->can_reach_finish = xnetwork_monitor_portal_can_reach_finish;
+  monitor_iface->can_reach = g_network_monitor_portal_can_reach;
+  monitor_iface->can_reach_async = g_network_monitor_portal_can_reach_async;
+  monitor_iface->can_reach_finish = g_network_monitor_portal_can_reach_finish;
 }
 
 static void
-xnetwork_monitor_portal_initable_iface_init (xinitable_iface_t *iface)
+g_network_monitor_portal_initable_iface_init (GInitableIface *iface)
 {
-  initable_parent_iface = xtype_interface_peek_parent (iface);
+  initable_parent_iface = g_type_interface_peek_parent (iface);
 
-  iface->init = xnetwork_monitor_portal_initable_init;
+  iface->init = g_network_monitor_portal_initable_init;
 }

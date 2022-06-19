@@ -25,28 +25,28 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_INTERFACE         (g_dbus_interface_get_type())
-#define G_DBUS_INTERFACE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_INTERFACE, xdbus_interface))
-#define X_IS_DBUS_INTERFACE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_INTERFACE))
-#define G_DBUS_INTERFACE_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_INTERFACE, xdbus_interface_iface_t))
+#define G_TYPE_DBUS_INTERFACE         (g_dbus_interface_get_type())
+#define G_DBUS_INTERFACE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_INTERFACE, GDBusInterface))
+#define G_IS_DBUS_INTERFACE(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_INTERFACE))
+#define G_DBUS_INTERFACE_GET_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE((o), G_TYPE_DBUS_INTERFACE, GDBusInterfaceIface))
 
 /**
- * xdbus_interface_t:
+ * GDBusInterface:
  *
  * Base type for D-Bus interfaces.
  *
  * Since: 2.30
  */
 
-typedef struct _GDBusInterfaceIface xdbus_interface_iface_t;
+typedef struct _GDBusInterfaceIface GDBusInterfaceIface;
 
 /**
- * xdbus_interface_iface_t:
+ * GDBusInterfaceIface:
  * @parent_iface: The parent interface.
- * @get_info: Returns a #xdbus_interface_info_t. See g_dbus_interface_get_info().
- * @get_object: Gets the enclosing #xdbus_object_t. See g_dbus_interface_get_object().
- * @set_object: Sets the enclosing #xdbus_object_t. See g_dbus_interface_set_object().
- * @dup_object: Gets a reference to the enclosing #xdbus_object_t. See g_dbus_interface_dup_object(). Added in 2.32.
+ * @get_info: Returns a #GDBusInterfaceInfo. See g_dbus_interface_get_info().
+ * @get_object: Gets the enclosing #GDBusObject. See g_dbus_interface_get_object().
+ * @set_object: Sets the enclosing #GDBusObject. See g_dbus_interface_set_object().
+ * @dup_object: Gets a reference to the enclosing #GDBusObject. See g_dbus_interface_dup_object(). Added in 2.32.
  *
  * Base type for D-Bus interfaces.
  *
@@ -54,27 +54,27 @@ typedef struct _GDBusInterfaceIface xdbus_interface_iface_t;
  */
 struct _GDBusInterfaceIface
 {
-  xtype_interface_t parent_iface;
+  GTypeInterface parent_iface;
 
   /* Virtual Functions */
-  xdbus_interface_info_t   *(*get_info)   (xdbus_interface_t      *interface_);
-  xdbus_object_t          *(*get_object) (xdbus_interface_t      *interface_);
-  void                  (*set_object) (xdbus_interface_t      *interface_,
-                                       xdbus_object_t         *object);
-  xdbus_object_t          *(*dup_object) (xdbus_interface_t      *interface_);
+  GDBusInterfaceInfo   *(*get_info)   (GDBusInterface      *interface_);
+  GDBusObject          *(*get_object) (GDBusInterface      *interface_);
+  void                  (*set_object) (GDBusInterface      *interface_,
+                                       GDBusObject         *object);
+  GDBusObject          *(*dup_object) (GDBusInterface      *interface_);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 g_dbus_interface_get_type         (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xdbus_interface_info_t   *g_dbus_interface_get_info         (xdbus_interface_t      *interface_);
-XPL_AVAILABLE_IN_ALL
-xdbus_object_t          *g_dbus_interface_get_object       (xdbus_interface_t      *interface_);
-XPL_AVAILABLE_IN_ALL
-void                  g_dbus_interface_set_object       (xdbus_interface_t      *interface_,
-                                                         xdbus_object_t         *object);
-XPL_AVAILABLE_IN_2_32
-xdbus_object_t          *g_dbus_interface_dup_object       (xdbus_interface_t      *interface_);
+GLIB_AVAILABLE_IN_ALL
+GType                 g_dbus_interface_get_type         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GDBusInterfaceInfo   *g_dbus_interface_get_info         (GDBusInterface      *interface_);
+GLIB_AVAILABLE_IN_ALL
+GDBusObject          *g_dbus_interface_get_object       (GDBusInterface      *interface_);
+GLIB_AVAILABLE_IN_ALL
+void                  g_dbus_interface_set_object       (GDBusInterface      *interface_,
+                                                         GDBusObject         *object);
+GLIB_AVAILABLE_IN_2_32
+GDBusObject          *g_dbus_interface_dup_object       (GDBusInterface      *interface_);
 
 G_END_DECLS
 

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_TIMER_H__
 #define __G_TIMER_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -37,40 +37,40 @@ G_BEGIN_DECLS
  */
 
 /* microseconds per second */
-typedef struct _GTimer		xtimer_t;
+typedef struct _GTimer		GTimer;
 
 #define G_USEC_PER_SEC 1000000
 
-XPL_AVAILABLE_IN_ALL
-xtimer_t*  g_timer_new	         (void);
-XPL_AVAILABLE_IN_ALL
-void	 g_timer_destroy         (xtimer_t      *timer);
-XPL_AVAILABLE_IN_ALL
-void	 g_timer_start	         (xtimer_t      *timer);
-XPL_AVAILABLE_IN_ALL
-void	 g_timer_stop	         (xtimer_t      *timer);
-XPL_AVAILABLE_IN_ALL
-void	 g_timer_reset	         (xtimer_t      *timer);
-XPL_AVAILABLE_IN_ALL
-void	 g_timer_continue        (xtimer_t      *timer);
-XPL_AVAILABLE_IN_ALL
-xdouble_t  g_timer_elapsed         (xtimer_t      *timer,
-				  xulong_t      *microseconds);
-XPL_AVAILABLE_IN_2_62
-xboolean_t g_timer_is_active       (xtimer_t      *timer);
+GLIB_AVAILABLE_IN_ALL
+GTimer*  g_timer_new	         (void);
+GLIB_AVAILABLE_IN_ALL
+void	 g_timer_destroy         (GTimer      *timer);
+GLIB_AVAILABLE_IN_ALL
+void	 g_timer_start	         (GTimer      *timer);
+GLIB_AVAILABLE_IN_ALL
+void	 g_timer_stop	         (GTimer      *timer);
+GLIB_AVAILABLE_IN_ALL
+void	 g_timer_reset	         (GTimer      *timer);
+GLIB_AVAILABLE_IN_ALL
+void	 g_timer_continue        (GTimer      *timer);
+GLIB_AVAILABLE_IN_ALL
+gdouble  g_timer_elapsed         (GTimer      *timer,
+				  gulong      *microseconds);
+GLIB_AVAILABLE_IN_2_62
+gboolean g_timer_is_active       (GTimer      *timer);
 
-XPL_AVAILABLE_IN_ALL
-void     g_usleep                (xulong_t       microseconds);
+GLIB_AVAILABLE_IN_ALL
+void     g_usleep                (gulong       microseconds);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_DEPRECATED_IN_2_62
-void     g_time_val_add          (GTimeVal    *time_,
-                                  xlong_t        microseconds);
-XPL_DEPRECATED_IN_2_62_FOR(xdate_time_new_from_iso8601)
-xboolean_t g_time_val_from_iso8601 (const xchar_t *iso_date,
+GLIB_DEPRECATED_IN_2_62
+void     g_time_val_add          (GTimeVal    *time_, 
+                                  glong        microseconds);
+GLIB_DEPRECATED_IN_2_62_FOR(g_date_time_new_from_iso8601)
+gboolean g_time_val_from_iso8601 (const gchar *iso_date,
 				  GTimeVal    *time_);
-XPL_DEPRECATED_IN_2_62_FOR(xdate_time_format)
-xchar_t*   g_time_val_to_iso8601   (GTimeVal    *time_) G_GNUC_MALLOC;
+GLIB_DEPRECATED_IN_2_62_FOR(g_date_time_format)
+gchar*   g_time_val_to_iso8601   (GTimeVal    *time_) G_GNUC_MALLOC;
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 G_END_DECLS

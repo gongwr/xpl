@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2003  Matthias Clasen
  *
  * This library is free software; you can redistribute it and/or
@@ -20,20 +20,20 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-int _g_gnulib_printf    (char const *format,
+int _g_gnulib_printf    (char const *format, 
 			 ...);
 int _g_gnulib_fprintf   (FILE        *file,
-			 char const *format,
+			 char const *format, 
 			 ...);
 int _g_gnulib_sprintf   (char       *string,
-			 char const *format,
+			 char const *format, 
 			 ...);
 int _g_gnulib_snprintf  (char       *string,
 			 size_t       n,
-			 char const *format,
+			 char const *format, 
 			 ...);
 int _g_gnulib_vprintf   (char const *format,
-			 va_list      args);
+			 va_list      args);            
 int _g_gnulib_vfprintf  (FILE        *file,
 			 char const *format,
 			 va_list      args);

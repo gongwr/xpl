@@ -35,49 +35,49 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_CREDENTIALS         (xcredentials_get_type ())
-#define G_CREDENTIALS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CREDENTIALS, xcredentials_t))
-#define G_CREDENTIALS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CREDENTIALS, xcredentials_class_t))
-#define G_CREDENTIALS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CREDENTIALS, xcredentials_class_t))
-#define X_IS_CREDENTIALS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CREDENTIALS))
-#define X_IS_CREDENTIALS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CREDENTIALS))
+#define G_TYPE_CREDENTIALS         (g_credentials_get_type ())
+#define G_CREDENTIALS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_CREDENTIALS, GCredentials))
+#define G_CREDENTIALS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_CREDENTIALS, GCredentialsClass))
+#define G_CREDENTIALS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_CREDENTIALS, GCredentialsClass))
+#define G_IS_CREDENTIALS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_CREDENTIALS))
+#define G_IS_CREDENTIALS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_CREDENTIALS))
 
-typedef struct _xcredentials_class   xcredentials_class_t;
+typedef struct _GCredentialsClass   GCredentialsClass;
 
-XPL_AVAILABLE_IN_ALL
-xtype_t            xcredentials_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType            g_credentials_get_type           (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xcredentials_t    *xcredentials_new                (void);
+GLIB_AVAILABLE_IN_ALL
+GCredentials    *g_credentials_new                (void);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t           *xcredentials_to_string          (xcredentials_t    *credentials);
+GLIB_AVAILABLE_IN_ALL
+gchar           *g_credentials_to_string          (GCredentials    *credentials);
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t         xcredentials_get_native         (xcredentials_t    *credentials,
+GLIB_AVAILABLE_IN_ALL
+gpointer         g_credentials_get_native         (GCredentials    *credentials,
                                                    GCredentialsType native_type);
 
-XPL_AVAILABLE_IN_ALL
-void             xcredentials_set_native         (xcredentials_t    *credentials,
+GLIB_AVAILABLE_IN_ALL
+void             g_credentials_set_native         (GCredentials    *credentials,
                                                    GCredentialsType native_type,
-                                                   xpointer_t         native);
+                                                   gpointer         native);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xcredentials_is_same_user       (xcredentials_t    *credentials,
-                                                   xcredentials_t    *other_credentials,
-                                                   xerror_t         **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_credentials_is_same_user       (GCredentials    *credentials,
+                                                   GCredentials    *other_credentials,
+                                                   GError         **error);
 
 #ifdef G_OS_UNIX
-XPL_AVAILABLE_IN_2_36
-pid_t            xcredentials_get_unix_pid       (xcredentials_t    *credentials,
-                                                   xerror_t         **error);
-XPL_AVAILABLE_IN_ALL
-uid_t            xcredentials_get_unix_user      (xcredentials_t    *credentials,
-                                                   xerror_t         **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xcredentials_set_unix_user      (xcredentials_t    *credentials,
+GLIB_AVAILABLE_IN_2_36
+pid_t            g_credentials_get_unix_pid       (GCredentials    *credentials,
+                                                   GError         **error);
+GLIB_AVAILABLE_IN_ALL
+uid_t            g_credentials_get_unix_user      (GCredentials    *credentials,
+                                                   GError         **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_credentials_set_unix_user      (GCredentials    *credentials,
                                                    uid_t           uid,
-                                                   xerror_t         **error);
+                                                   GError         **error);
 #endif
 
 G_END_DECLS

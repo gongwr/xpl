@@ -23,17 +23,17 @@ G_BEGIN_DECLS
 
 #include "glib.h"
 
-xchar_t *_g_time_locale_to_utf8 (const xchar_t *opsysstring,
-                               xssize_t len,
-                               xsize_t *bytes_read,
-                               xsize_t *bytes_written,
-                               xerror_t **error) G_GNUC_MALLOC;
+gchar *_g_time_locale_to_utf8 (const gchar *opsysstring,
+                               gssize len,
+                               gsize *bytes_read,
+                               gsize *bytes_written,
+                               GError **error) G_GNUC_MALLOC;
 
-xchar_t *_g_ctype_locale_to_utf8 (const xchar_t *opsysstring,
-                                xssize_t len,
-                                xsize_t *bytes_read,
-                                xsize_t *bytes_written,
-                                xerror_t **error) G_GNUC_MALLOC;
+gchar *_g_ctype_locale_to_utf8 (const gchar *opsysstring,
+                                gssize len,
+                                gsize *bytes_read,
+                                gsize *bytes_written,
+                                GError **error) G_GNUC_MALLOC;
 
 G_END_DECLS
 

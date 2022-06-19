@@ -28,18 +28,18 @@
 #include <gio/gunixoutputstream.h>
 #endif
 
-xmain_loop_t *loop;
-xpollable_input_stream_t *in;
-xoutput_stream_t *out;
+GMainLoop *loop;
+GPollableInputStream *in;
+GOutputStream *out;
 
-static xboolean_t
-poll_source_callback (xpollable_input_stream_t *in,
-		      xpointer_t              user_data)
+static gboolean
+poll_source_callback (GPollableInputStream *in,
+		      gpointer              user_data)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
   char buf[2];
-  xssize_t nread;
-  xboolean_t *success = user_data;
+  gssize nread;
+  gboolean *success = user_data;
 
   g_assert_true (g_pollable_input_stream_is_readable (G_POLLABLE_INPUT_STREAM (in)));
 
@@ -50,33 +50,33 @@ poll_source_callback (xpollable_input_stream_t *in,
   g_assert_false (g_pollable_input_stream_is_readable (G_POLLABLE_INPUT_STREAM (in)));
 
   *success = TRUE;
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
-static xboolean_t
-check_source_readability_callback (xpointer_t user_data)
+static gboolean
+check_source_readability_callback (gpointer user_data)
 {
-  xboolean_t expected = GPOINTER_TO_INT (user_data);
-  xboolean_t readable;
+  gboolean expected = GPOINTER_TO_INT (user_data);
+  gboolean readable;
 
   readable = g_pollable_input_stream_is_readable (in);
   g_assert_cmpint (readable, ==, expected);
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
-static xboolean_t
-write_callback (xpointer_t user_data)
+static gboolean
+write_callback (gpointer user_data)
 {
   const char *buf = "x";
-  xssize_t nwrote;
-  xerror_t *error = NULL;
+  gssize nwrote;
+  GError *error = NULL;
 
-  g_assert_true (xpollable_output_stream_is_writable (G_POLLABLE_OUTPUT_STREAM (out)));
+  g_assert_true (g_pollable_output_stream_is_writable (G_POLLABLE_OUTPUT_STREAM (out)));
 
-  nwrote = xoutput_stream_write (out, buf, 2, NULL, &error);
+  nwrote = g_output_stream_write (out, buf, 2, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpint (nwrote, ==, 2);
-  g_assert_true (xpollable_output_stream_is_writable (G_POLLABLE_OUTPUT_STREAM (out)));
+  g_assert_true (g_pollable_output_stream_is_writable (G_POLLABLE_OUTPUT_STREAM (out)));
 
 /* Give the pipe a few ticks to propagate the write for sockets. On my
  * iMac i7, 40 works, 30 doesn't. */
@@ -84,32 +84,32 @@ write_callback (xpointer_t user_data)
 
   check_source_readability_callback (GINT_TO_POINTER (TRUE));
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
-static xboolean_t
-check_source_and_quit_callback (xpointer_t user_data)
+static gboolean
+check_source_and_quit_callback (gpointer user_data)
 {
   check_source_readability_callback (user_data);
-  xmain_loop_quit (loop);
-  return XSOURCE_REMOVE;
+  g_main_loop_quit (loop);
+  return G_SOURCE_REMOVE;
 }
 
 static void
 test_streams (void)
 {
-  xboolean_t readable;
-  xerror_t *error = NULL;
+  gboolean readable;
+  GError *error = NULL;
   char buf[1];
-  xssize_t nread;
-  xsource_t *poll_source;
-  xboolean_t success = FALSE;
+  gssize nread;
+  GSource *poll_source;
+  gboolean success = FALSE;
 
-  xassert (g_pollable_input_stream_can_poll (in));
-  xassert (xpollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (out)));
+  g_assert (g_pollable_input_stream_can_poll (in));
+  g_assert (g_pollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (out)));
 
   readable = g_pollable_input_stream_is_readable (in);
-  xassert (!readable);
+  g_assert (!readable);
 
   nread = g_pollable_input_stream_read_nonblocking (in, buf, 1, NULL, &error);
   g_assert_cmpint (nread, ==, -1);
@@ -132,18 +132,18 @@ test_streams (void)
    */
 
   poll_source = g_pollable_input_stream_create_source (in, NULL);
-  xsource_set_priority (poll_source, 1);
-  xsource_set_callback (poll_source, (xsource_func_t) poll_source_callback, &success, NULL);
-  xsource_attach (poll_source, NULL);
-  xsource_unref (poll_source);
+  g_source_set_priority (poll_source, 1);
+  g_source_set_callback (poll_source, (GSourceFunc) poll_source_callback, &success, NULL);
+  g_source_attach (poll_source, NULL);
+  g_source_unref (poll_source);
 
   g_idle_add_full (2, check_source_readability_callback, GINT_TO_POINTER (FALSE), NULL);
   g_idle_add_full (3, write_callback, NULL, NULL);
   g_idle_add_full (4, check_source_and_quit_callback, GINT_TO_POINTER (FALSE), NULL);
 
-  loop = xmain_loop_new (NULL, FALSE);
-  xmain_loop_run (loop);
-  xmain_loop_unref (loop);
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 
   g_assert_cmpint (success, ==, TRUE);
 }
@@ -155,8 +155,8 @@ test_streams (void)
     in = G_POLLABLE_INPUT_STREAM (g_unix_input_stream_new (fd, FALSE)); \
     out = g_unix_output_stream_new (fd, FALSE);                         \
                                                                         \
-    xassert (!g_pollable_input_stream_can_poll (in));                  \
-    xassert (!xpollable_output_stream_can_poll (                      \
+    g_assert (!g_pollable_input_stream_can_poll (in));                  \
+    g_assert (!g_pollable_output_stream_can_poll (                      \
         G_POLLABLE_OUTPUT_STREAM (out)));                               \
                                                                         \
     g_clear_object (&in);                                               \
@@ -168,7 +168,7 @@ test_pollable_unix_pipe (void)
 {
   int pipefds[2], status;
 
-  g_test_summary ("test_t that pipes are considered pollable, just like sockets");
+  g_test_summary ("Test that pipes are considered pollable, just like sockets");
 
   status = pipe (pipefds);
   g_assert_cmpint (status, ==, 0);
@@ -178,8 +178,8 @@ test_pollable_unix_pipe (void)
 
   test_streams ();
 
-  xobject_unref (in);
-  xobject_unref (out);
+  g_object_unref (in);
+  g_object_unref (out);
 }
 
 static void
@@ -191,7 +191,7 @@ test_pollable_unix_pty (void)
   void *handle;
 #endif
 
-  g_test_summary ("test_t that PTYs are considered pollable");
+  g_test_summary ("Test that PTYs are considered pollable");
 
 #ifdef LIBUTIL_SONAME
   handle = dlopen (LIBUTIL_SONAME, RTLD_GLOBAL | RTLD_LAZY);
@@ -217,8 +217,8 @@ test_pollable_unix_pty (void)
 
   test_streams ();
 
-  xobject_unref (in);
-  xobject_unref (out);
+  g_object_unref (in);
+  g_object_unref (out);
 
   close (a);
   close (b);
@@ -236,7 +236,7 @@ test_pollable_unix_file (void)
 {
   int fd;
 
-  g_test_summary ("test_t that regular files are not considered pollable");
+  g_test_summary ("Test that regular files are not considered pollable");
 
   fd = g_open ("/etc/hosts", O_RDONLY, 0);
   if (fd == -1)
@@ -255,7 +255,7 @@ test_pollable_unix_nulldev (void)
 {
   int fd;
 
-  g_test_summary ("test_t that /dev/null is not considered pollable, but only if "
+  g_test_summary ("Test that /dev/null is not considered pollable, but only if "
                   "on a system where we are able to tell it apart from devices "
                   "that actually implement poll");
 
@@ -274,103 +274,103 @@ test_pollable_unix_nulldev (void)
 static void
 test_pollable_converter (void)
 {
-  xconverter_t *converter;
-  xerror_t *error = NULL;
-  xinput_stream_t *ibase;
+  GConverter *converter;
+  GError *error = NULL;
+  GInputStream *ibase;
   int pipefds[2], status;
 
   status = pipe (pipefds);
   g_assert_cmpint (status, ==, 0);
 
   ibase = G_INPUT_STREAM (g_unix_input_stream_new (pipefds[0], TRUE));
-  converter = XCONVERTER (xcharset_converter_new ("UTF-8", "UTF-8", &error));
+  converter = G_CONVERTER (g_charset_converter_new ("UTF-8", "UTF-8", &error));
   g_assert_no_error (error);
 
-  in = G_POLLABLE_INPUT_STREAM (xconverter_input_stream_new (ibase, converter));
-  xobject_unref (converter);
-  xobject_unref (ibase);
+  in = G_POLLABLE_INPUT_STREAM (g_converter_input_stream_new (ibase, converter));
+  g_object_unref (converter);
+  g_object_unref (ibase);
 
   out = g_unix_output_stream_new (pipefds[1], TRUE);
 
   test_streams ();
 
-  xobject_unref (in);
-  xobject_unref (out);
+  g_object_unref (in);
+  g_object_unref (out);
 }
 
 #endif
 
 static void
-client_connected (xobject_t      *source,
-		  xasync_result_t *result,
-		  xpointer_t      user_data)
+client_connected (GObject      *source,
+		  GAsyncResult *result,
+		  gpointer      user_data)
 {
-  xsocket_client_t *client = XSOCKET_CLIENT (source);
-  xsocket_connection_t **conn = user_data;
-  xerror_t *error = NULL;
+  GSocketClient *client = G_SOCKET_CLIENT (source);
+  GSocketConnection **conn = user_data;
+  GError *error = NULL;
 
-  *conn = xsocket_client_connect_finish (client, result, &error);
+  *conn = g_socket_client_connect_finish (client, result, &error);
   g_assert_no_error (error);
 }
 
 static void
-server_connected (xobject_t      *source,
-		  xasync_result_t *result,
-		  xpointer_t      user_data)
+server_connected (GObject      *source,
+		  GAsyncResult *result,
+		  gpointer      user_data)
 {
-  xsocket_listener_t *listener = XSOCKET_LISTENER (source);
-  xsocket_connection_t **conn = user_data;
-  xerror_t *error = NULL;
+  GSocketListener *listener = G_SOCKET_LISTENER (source);
+  GSocketConnection **conn = user_data;
+  GError *error = NULL;
 
-  *conn = xsocket_listener_accept_finish (listener, result, NULL, &error);
+  *conn = g_socket_listener_accept_finish (listener, result, NULL, &error);
   g_assert_no_error (error);
 }
 
 static void
 test_pollable_socket (void)
 {
-  xinet_address_t *iaddr;
-  xsocket_address_t *saddr, *effective_address;
-  xsocket_listener_t *listener;
-  xsocket_client_t *client;
-  xerror_t *error = NULL;
-  xsocket_connection_t *client_conn = NULL, *server_conn = NULL;
+  GInetAddress *iaddr;
+  GSocketAddress *saddr, *effective_address;
+  GSocketListener *listener;
+  GSocketClient *client;
+  GError *error = NULL;
+  GSocketConnection *client_conn = NULL, *server_conn = NULL;
 
-  iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
+  iaddr = g_inet_address_new_loopback (G_SOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (iaddr, 0);
-  xobject_unref (iaddr);
+  g_object_unref (iaddr);
 
-  listener = xsocket_listener_new ();
-  xsocket_listener_add_address (listener, saddr,
-				 XSOCKET_TYPE_STREAM,
-				 XSOCKET_PROTOCOL_TCP,
+  listener = g_socket_listener_new ();
+  g_socket_listener_add_address (listener, saddr,
+				 G_SOCKET_TYPE_STREAM,
+				 G_SOCKET_PROTOCOL_TCP,
 				 NULL,
 				 &effective_address,
 				 &error);
   g_assert_no_error (error);
-  xobject_unref (saddr);
+  g_object_unref (saddr);
 
-  client = xsocket_client_new ();
+  client = g_socket_client_new ();
 
-  xsocket_client_connect_async (client,
-				 XSOCKET_CONNECTABLE (effective_address),
+  g_socket_client_connect_async (client,
+				 G_SOCKET_CONNECTABLE (effective_address),
 				 NULL, client_connected, &client_conn);
-  xsocket_listener_accept_async (listener, NULL,
+  g_socket_listener_accept_async (listener, NULL,
 				  server_connected, &server_conn);
 
   while (!client_conn || !server_conn)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
-  in = G_POLLABLE_INPUT_STREAM (g_io_stream_get_input_stream (XIO_STREAM (client_conn)));
-  out = g_io_stream_get_output_stream (XIO_STREAM (server_conn));
+  in = G_POLLABLE_INPUT_STREAM (g_io_stream_get_input_stream (G_IO_STREAM (client_conn)));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (server_conn));
 
   test_streams ();
 
-  xobject_unref (client_conn);
-  xobject_unref (server_conn);
-  xobject_unref (client);
-  xobject_unref (listener);
-  xobject_unref (effective_address);
+  g_object_unref (client_conn);
+  g_object_unref (server_conn);
+  g_object_unref (client);
+  g_object_unref (listener);
+  g_object_unref (effective_address);
 }
 
 int

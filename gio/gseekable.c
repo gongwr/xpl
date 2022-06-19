@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -27,47 +27,47 @@
  * SECTION:gseekable
  * @short_description: Stream seeking interface
  * @include: gio/gio.h
- * @see_also: #xinput_stream_t, #xoutput_stream_t
+ * @see_also: #GInputStream, #GOutputStream
  *
- * #xseekable__t is implemented by streams (implementations of
- * #xinput_stream_t or #xoutput_stream_t) that support seeking.
+ * #GSeekable is implemented by streams (implementations of
+ * #GInputStream or #GOutputStream) that support seeking.
  *
  * Seekable streams largely fall into two categories: resizable and
  * fixed-size.
  *
- * #xseekable__t on fixed-sized streams is approximately the same as POSIX
+ * #GSeekable on fixed-sized streams is approximately the same as POSIX
  * lseek() on a block device (for example: attempting to seek past the
  * end of the device is an error).  Fixed streams typically cannot be
  * truncated.
  *
- * #xseekable__t on resizable streams is approximately the same as POSIX
+ * #GSeekable on resizable streams is approximately the same as POSIX
  * lseek() on a normal file.  Seeking past the end and writing data will
  * usually cause the stream to resize by introducing zero bytes.
  **/
 
-typedef xseekable_iface_t xseekable_interface_t;
-G_DEFINE_INTERFACE (xseekable, g_seekable, XTYPE_OBJECT)
+typedef GSeekableIface GSeekableInterface;
+G_DEFINE_INTERFACE (GSeekable, g_seekable, G_TYPE_OBJECT)
 
 static void
-xseekable_default_init (xseekable_interface_t *iface)
+g_seekable_default_init (GSeekableInterface *iface)
 {
 }
 
 /**
- * xseekable_tell:
- * @seekable: a #xseekable__t.
- *
+ * g_seekable_tell:
+ * @seekable: a #GSeekable.
+ * 
  * Tells the current position within the stream.
- *
+ * 
  * Returns: the (positive or zero) offset from the beginning of the
  * buffer, zero if the target is not seekable.
  **/
-xoffset_t
-xseekable_tell (xseekable__t *seekable)
+goffset
+g_seekable_tell (GSeekable *seekable)
 {
-  xseekable_iface_t *iface;
+  GSeekableIface *iface;
 
-  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), 0);
+  g_return_val_if_fail (G_IS_SEEKABLE (seekable), 0);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -75,19 +75,19 @@ xseekable_tell (xseekable__t *seekable)
 }
 
 /**
- * xseekable_can_seek:
- * @seekable: a #xseekable__t.
- *
- * Tests if the stream supports the #xseekable_iface_t.
- *
+ * g_seekable_can_seek:
+ * @seekable: a #GSeekable.
+ * 
+ * Tests if the stream supports the #GSeekableIface.
+ * 
  * Returns: %TRUE if @seekable can be seeked. %FALSE otherwise.
  **/
-xboolean_t
-xseekable_can_seek (xseekable__t *seekable)
+gboolean
+g_seekable_can_seek (GSeekable *seekable)
 {
-  xseekable_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  GSeekableIface *iface;
+  
+  g_return_val_if_fail (G_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -95,12 +95,12 @@ xseekable_can_seek (xseekable__t *seekable)
 }
 
 /**
- * xseekable_seek:
- * @seekable: a #xseekable__t.
- * @offset: a #xoffset_t.
- * @type: a #xseek_type_t.
- * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
- * @error: a #xerror_t location to store the error occurring, or %NULL to
+ * g_seekable_seek:
+ * @seekable: a #GSeekable.
+ * @offset: a #goffset.
+ * @type: a #GSeekType.
+ * @cancellable: (nullable): optional #GCancellable object, %NULL to ignore.
+ * @error: a #GError location to store the error occurring, or %NULL to
  * ignore.
  *
  * Seeks in the stream by the given @offset, modified by @type.
@@ -116,22 +116,22 @@ xseekable_can_seek (xseekable__t *seekable)
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
- * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned.
- *
+ * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+ * 
  * Returns: %TRUE if successful. If an error
  *     has occurred, this function will return %FALSE and set @error
  *     appropriately if present.
  **/
-xboolean_t
-xseekable_seek (xseekable__t     *seekable,
-		 xoffset_t        offset,
-		 xseek_type_t      type,
-		 xcancellable_t  *cancellable,
-		 xerror_t       **error)
+gboolean
+g_seekable_seek (GSeekable     *seekable,
+		 goffset        offset,
+		 GSeekType      type,
+		 GCancellable  *cancellable,
+		 GError       **error)
 {
-  xseekable_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  GSeekableIface *iface;
+  
+  g_return_val_if_fail (G_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -139,20 +139,20 @@ xseekable_seek (xseekable__t     *seekable,
 }
 
 /**
- * xseekable_can_truncate:
- * @seekable: a #xseekable__t.
- *
+ * g_seekable_can_truncate:
+ * @seekable: a #GSeekable.
+ * 
  * Tests if the length of the stream can be adjusted with
- * xseekable_truncate().
- *
+ * g_seekable_truncate().
+ * 
  * Returns: %TRUE if the stream can be truncated, %FALSE otherwise.
  **/
-xboolean_t
-xseekable_can_truncate (xseekable__t *seekable)
+gboolean
+g_seekable_can_truncate (GSeekable *seekable)
 {
-  xseekable_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  GSeekableIface *iface;
+  
+  g_return_val_if_fail (G_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -160,17 +160,17 @@ xseekable_can_truncate (xseekable__t *seekable)
 }
 
 /**
- * xseekable_truncate: (virtual truncate_fn)
- * @seekable: a #xseekable__t.
+ * g_seekable_truncate: (virtual truncate_fn)
+ * @seekable: a #GSeekable.
  * @offset: new length for @seekable, in bytes.
- * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
- * @error: a #xerror_t location to store the error occurring, or %NULL to
+ * @cancellable: (nullable): optional #GCancellable object, %NULL to ignore. 
+ * @error: a #GError location to store the error occurring, or %NULL to 
  * ignore.
- *
+ * 
  * Sets the length of the stream to @offset. If the stream was previously
  * larger than @offset, the extra data is discarded. If the stream was
  * previously shorter than @offset, it is extended with NUL ('\0') bytes.
- *
+ * 
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. If an
@@ -179,17 +179,17 @@ xseekable_can_truncate (xseekable__t *seekable)
  *
  * Returns: %TRUE if successful. If an error
  *     has occurred, this function will return %FALSE and set @error
- *     appropriately if present.
+ *     appropriately if present. 
  **/
-xboolean_t
-xseekable_truncate (xseekable__t     *seekable,
-		     xoffset_t        offset,
-		     xcancellable_t  *cancellable,
-		     xerror_t       **error)
+gboolean
+g_seekable_truncate (GSeekable     *seekable,
+		     goffset        offset,
+		     GCancellable  *cancellable,
+		     GError       **error)
 {
-  xseekable_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  GSeekableIface *iface;
+  
+  g_return_val_if_fail (G_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 

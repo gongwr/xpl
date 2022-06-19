@@ -25,20 +25,20 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_OBJECT_SKELETON         (xdbus_object_skeleton_get_type ())
-#define G_DBUS_OBJECT_SKELETON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_SKELETON, xdbus_object_skeleton))
-#define G_DBUS_OBJECT_SKELETON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_OBJECT_SKELETON, GDBusObjectSkeletonClass))
-#define G_DBUS_OBJECT_SKELETON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_OBJECT_SKELETON, GDBusObjectSkeletonClass))
-#define X_IS_DBUS_OBJECT_SKELETON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_OBJECT_SKELETON))
-#define X_IS_DBUS_OBJECT_SKELETON_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DBUS_OBJECT_SKELETON))
+#define G_TYPE_DBUS_OBJECT_SKELETON         (g_dbus_object_skeleton_get_type ())
+#define G_DBUS_OBJECT_SKELETON(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_OBJECT_SKELETON, GDBusObjectSkeleton))
+#define G_DBUS_OBJECT_SKELETON_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_DBUS_OBJECT_SKELETON, GDBusObjectSkeletonClass))
+#define G_DBUS_OBJECT_SKELETON_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_DBUS_OBJECT_SKELETON, GDBusObjectSkeletonClass))
+#define G_IS_DBUS_OBJECT_SKELETON(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_OBJECT_SKELETON))
+#define G_IS_DBUS_OBJECT_SKELETON_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_DBUS_OBJECT_SKELETON))
 
 typedef struct _GDBusObjectSkeletonClass   GDBusObjectSkeletonClass;
-typedef struct _xdbus_object_skeleton_private xdbus_object_skeleton_private_t;
+typedef struct _GDBusObjectSkeletonPrivate GDBusObjectSkeletonPrivate;
 
 /**
- * xdbus_object_skeleton_t:
+ * GDBusObjectSkeleton:
  *
- * The #xdbus_object_skeleton_t structure contains private data and should only be
+ * The #GDBusObjectSkeleton structure contains private data and should only be
  * accessed using the provided API.
  *
  * Since: 2.30
@@ -46,50 +46,50 @@ typedef struct _xdbus_object_skeleton_private xdbus_object_skeleton_private_t;
 struct _GDBusObjectSkeleton
 {
   /*< private >*/
-  xobject_t parent_instance;
-  xdbus_object_skeleton_private_t *priv;
+  GObject parent_instance;
+  GDBusObjectSkeletonPrivate *priv;
 };
 
 /**
  * GDBusObjectSkeletonClass:
  * @parent_class: The parent class.
- * @authorize_method: Signal class handler for the #xdbus_object_skeleton_t::authorize-method signal.
+ * @authorize_method: Signal class handler for the #GDBusObjectSkeleton::authorize-method signal.
  *
- * Class structure for #xdbus_object_skeleton_t.
+ * Class structure for #GDBusObjectSkeleton.
  *
  * Since: 2.30
  */
 struct _GDBusObjectSkeletonClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* Signals */
-  xboolean_t (*authorize_method) (xdbus_object_skeleton_t       *object,
-                                xdbus_interface_skeleton_t    *interface_,
-                                xdbus_method_invocation_t *invocation);
+  gboolean (*authorize_method) (GDBusObjectSkeleton       *object,
+                                GDBusInterfaceSkeleton    *interface_,
+                                GDBusMethodInvocation *invocation);
 
   /*< private >*/
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                xdbus_object_skeleton_get_type                  (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xdbus_object_skeleton_t *xdbus_object_skeleton_new                       (const xchar_t            *object_path);
-XPL_AVAILABLE_IN_ALL
-void                 xdbus_object_skeleton_flush                     (xdbus_object_skeleton_t    *object);
-XPL_AVAILABLE_IN_ALL
-void                 xdbus_object_skeleton_add_interface             (xdbus_object_skeleton_t    *object,
-                                                                       xdbus_interface_skeleton_t *interface_);
-XPL_AVAILABLE_IN_ALL
-void                 xdbus_object_skeleton_remove_interface          (xdbus_object_skeleton_t    *object,
-                                                                       xdbus_interface_skeleton_t *interface_);
-XPL_AVAILABLE_IN_ALL
-void                 xdbus_object_skeleton_remove_interface_by_name  (xdbus_object_skeleton_t    *object,
-                                                                       const xchar_t            *interface_name);
-XPL_AVAILABLE_IN_ALL
-void                 xdbus_object_skeleton_set_object_path           (xdbus_object_skeleton_t    *object,
-                                                                       const xchar_t            *object_path);
+GLIB_AVAILABLE_IN_ALL
+GType                g_dbus_object_skeleton_get_type                  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GDBusObjectSkeleton *g_dbus_object_skeleton_new                       (const gchar            *object_path);
+GLIB_AVAILABLE_IN_ALL
+void                 g_dbus_object_skeleton_flush                     (GDBusObjectSkeleton    *object);
+GLIB_AVAILABLE_IN_ALL
+void                 g_dbus_object_skeleton_add_interface             (GDBusObjectSkeleton    *object,
+                                                                       GDBusInterfaceSkeleton *interface_);
+GLIB_AVAILABLE_IN_ALL
+void                 g_dbus_object_skeleton_remove_interface          (GDBusObjectSkeleton    *object,
+                                                                       GDBusInterfaceSkeleton *interface_);
+GLIB_AVAILABLE_IN_ALL
+void                 g_dbus_object_skeleton_remove_interface_by_name  (GDBusObjectSkeleton    *object,
+                                                                       const gchar            *interface_name);
+GLIB_AVAILABLE_IN_ALL
+void                 g_dbus_object_skeleton_set_object_path           (GDBusObjectSkeleton    *object,
+                                                                       const gchar            *object_path);
 
 G_END_DECLS
 

@@ -32,7 +32,7 @@ try:
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     class TestPowerProfileMonitor(dbusmock.DBusTestCase):
-        '''test_t xpower_profile_monitor_dbus_t'''
+        '''Test GPowerProfileMonitorDBus'''
 
         @classmethod
         def setUpClass(klass):
@@ -45,7 +45,7 @@ try:
             except AttributeError:
                 raise unittest.SkipTest('Power Profile Monitor not in '
                                         'introspection data. Requires '
-                                        'xobject-Introspection ≥ 1.63.2') # FIXME version
+                                        'GObject-Introspection ≥ 1.63.2') # FIXME version
             try:
                 (self.p_mock, self.obj_ppd) = self.spawn_server_template(
                     'power_profiles_daemon', {}, stdout=subprocess.PIPE)

@@ -35,14 +35,14 @@
 <para><command>glib-compile-resources</command> reads the resource description from
 <replaceable>FILE</replaceable> and the files that it references
 and creates a binary resource bundle that is suitable for use with the
-<link linkend="xresource_t"><type>xresource_t</type></link> API.
+<link linkend="GResource"><type>GResource</type></link> API.
 The resulting bundle is then written out as-is, or as C source for linking into
 an application.
 </para>
 <para>
 The XML resource files normally have the filename extension <filename>.gresource.xml</filename>.
 For a detailed description of the XML file format, see the
-<link linkend="xresource_t"><type>xresource_t</type></link> documentation.
+<link linkend="GResource"><type>GResource</type></link> documentation.
 </para>
 </refsect1>
 
@@ -127,7 +127,7 @@ following make rule would mark <replaceable>test.gresource</replaceable> as
 depending on all the files that <replaceable>test.gresource.xml</replaceable>
 includes, so that is is automatically rebuilt if any of them change:
 <programlisting>
-test.gresource: test.gresource.xml $(shell $(XPL_COMPILE_RESOURCES) --generate-dependencies test.gresource.xml)
+test.gresource: test.gresource.xml $(shell $(GLIB_COMPILE_RESOURCES) --generate-dependencies test.gresource.xml)
 </programlisting>
 Note that this may or may not be portable to non-GNU <command>make</command>.
 </para>
@@ -229,7 +229,7 @@ searched for in the <envar>PATH</envar>.
 <varlistentry>
 <term><envar>GDK_PIXBUF_PIXDATA</envar></term>
 <listitem><para>
-Deprecated since gdk-pixbuf 2.32, as <type>xresource_t</type> supports embedding
+Deprecated since gdk-pixbuf 2.32, as <type>GResource</type> supports embedding
 modern image formats without conversion.
 </para><para>
 The full path to the <command>gdk-pixbuf-pixdata</command> executable. This is
@@ -240,7 +240,7 @@ is searched for in the <envar>PATH</envar>.
 </varlistentry>
 
 <varlistentry>
-<term><envar>JSON_XPL_FORMAT</envar></term>
+<term><envar>JSON_GLIB_FORMAT</envar></term>
 <listitem><para>
 The full path to the <command>json-glib-format</command> executable. This is used
 to preprocess resources with the <literal>json-stripblanks</literal> preprocessing

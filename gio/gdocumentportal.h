@@ -23,9 +23,9 @@
 
 G_BEGIN_DECLS
 
-xlist_t * g_document_portal_add_documents (xlist_t       *uris,
+GList * g_document_portal_add_documents (GList       *uris,
                                          const char  *app_id,
-                                         xerror_t     **error);
+                                         GError     **error);
 
 G_END_DECLS
 

@@ -126,29 +126,29 @@ class TestGenmarshal(unittest.TestCase):
             "standard_marshal_peek_defines": dedent(
                 """
                 #ifdef G_ENABLE_DEBUG
-                #define g_marshal_value_peek_boolean(v)  xvalue_get_boolean (v)
-                #define g_marshal_value_peek_char(v)     xvalue_get_schar (v)
-                #define g_marshal_value_peek_uchar(v)    xvalue_get_uchar (v)
-                #define g_marshal_value_peek_int(v)      xvalue_get_int (v)
-                #define g_marshal_value_peek_uint(v)     xvalue_get_uint (v)
-                #define g_marshal_value_peek_long(v)     xvalue_get_long (v)
-                #define g_marshal_value_peek_ulong(v)    xvalue_get_ulong (v)
-                #define g_marshal_value_peek_int64(v)    xvalue_get_int64 (v)
-                #define g_marshal_value_peek_uint64(v)   xvalue_get_uint64 (v)
-                #define g_marshal_value_peek_enum(v)     xvalue_get_enum (v)
-                #define g_marshal_value_peek_flags(v)    xvalue_get_flags (v)
-                #define g_marshal_value_peek_float(v)    xvalue_get_float (v)
-                #define g_marshal_value_peek_double(v)   xvalue_get_double (v)
-                #define g_marshal_value_peek_string(v)   (char*) xvalue_get_string (v)
-                #define g_marshal_value_peek_param(v)    xvalue_get_param (v)
-                #define g_marshal_value_peek_boxed(v)    xvalue_get_boxed (v)
-                #define g_marshal_value_peek_pointer(v)  xvalue_get_pointer (v)
-                #define g_marshal_value_peek_object(v)   xvalue_get_object (v)
-                #define g_marshal_value_peek_variant(v)  xvalue_get_variant (v)
+                #define g_marshal_value_peek_boolean(v)  g_value_get_boolean (v)
+                #define g_marshal_value_peek_char(v)     g_value_get_schar (v)
+                #define g_marshal_value_peek_uchar(v)    g_value_get_uchar (v)
+                #define g_marshal_value_peek_int(v)      g_value_get_int (v)
+                #define g_marshal_value_peek_uint(v)     g_value_get_uint (v)
+                #define g_marshal_value_peek_long(v)     g_value_get_long (v)
+                #define g_marshal_value_peek_ulong(v)    g_value_get_ulong (v)
+                #define g_marshal_value_peek_int64(v)    g_value_get_int64 (v)
+                #define g_marshal_value_peek_uint64(v)   g_value_get_uint64 (v)
+                #define g_marshal_value_peek_enum(v)     g_value_get_enum (v)
+                #define g_marshal_value_peek_flags(v)    g_value_get_flags (v)
+                #define g_marshal_value_peek_float(v)    g_value_get_float (v)
+                #define g_marshal_value_peek_double(v)   g_value_get_double (v)
+                #define g_marshal_value_peek_string(v)   (char*) g_value_get_string (v)
+                #define g_marshal_value_peek_param(v)    g_value_get_param (v)
+                #define g_marshal_value_peek_boxed(v)    g_value_get_boxed (v)
+                #define g_marshal_value_peek_pointer(v)  g_value_get_pointer (v)
+                #define g_marshal_value_peek_object(v)   g_value_get_object (v)
+                #define g_marshal_value_peek_variant(v)  g_value_get_variant (v)
                 #else /* !G_ENABLE_DEBUG */
                 /* WARNING: This code accesses GValues directly, which is UNSUPPORTED API.
                  *          Do not access GValues directly in your code. Instead, use the
-                 *          xvalue_get_*() functions
+                 *          g_value_get_*() functions
                  */
                 #define g_marshal_value_peek_boolean(v)  (v)->data[0].v_int
                 #define g_marshal_value_peek_char(v)     (v)->data[0].v_int
@@ -197,18 +197,18 @@ class TestGenmarshal(unittest.TestCase):
             return (header_result, body_result)
 
     def test_help(self):
-        """test_t the --help argument."""
+        """Test the --help argument."""
         result = self.runGenmarshal("--help")
         self.assertIn("usage: glib-genmarshal", result.out)
 
     def test_no_args(self):
-        """test_t running with no arguments at all."""
+        """Test running with no arguments at all."""
         result = self.runGenmarshal()
         self.assertEqual("", result.err)
         self.assertEqual("", result.out)
 
     def test_empty_list(self):
-        """test_t running with an empty list."""
+        """Test running with an empty list."""
         (header_result, body_result) = self.runGenmarshalWithList("", "--quiet")
 
         self.assertEqual("", header_result.err)
@@ -250,7 +250,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_boolean(self):
-        """test_t running with a basic VOID:BOOLEAN list."""
+        """Test running with a basic VOID:BOOLEAN list."""
         (header_result, body_result) = self.runGenmarshalWithList(
             "VOID:BOOLEAN", "--quiet"
         )
@@ -297,7 +297,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_boolean_int64(self):
-        """test_t running with a non-trivial VOID:BOOLEAN,INT64 list."""
+        """Test running with a non-trivial VOID:BOOLEAN,INT64 list."""
         (header_result, body_result) = self.runGenmarshalWithList(
             "VOID:BOOLEAN,INT64", "--quiet"
         )
@@ -317,12 +317,12 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:BOOLEAN,INT64 ({list_path}:1) */
             extern
-            void g_cclosure_user_marshal_VOID__BOOLEAN_INT64 (xclosure_t     *closure,
-                                                              xvalue_t       *return_value,
-                                                              xuint_t         n_param_values,
-                                                              const xvalue_t *param_values,
-                                                              xpointer_t      invocation_hint,
-                                                              xpointer_t      marshal_data);
+            void g_cclosure_user_marshal_VOID__BOOLEAN_INT64 (GClosure     *closure,
+                                                              GValue       *return_value,
+                                                              guint         n_param_values,
+                                                              const GValue *param_values,
+                                                              gpointer      invocation_hint,
+                                                              gpointer      marshal_data);
 
 
             G_END_DECLS
@@ -345,19 +345,19 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:BOOLEAN,INT64 ({list_path}:1) */
             void
-            g_cclosure_user_marshal_VOID__BOOLEAN_INT64 (xclosure_t     *closure,
-                                                         xvalue_t       *return_value G_GNUC_UNUSED,
-                                                         xuint_t         n_param_values,
-                                                         const xvalue_t *param_values,
-                                                         xpointer_t      invocation_hint G_GNUC_UNUSED,
-                                                         xpointer_t      marshal_data)
+            g_cclosure_user_marshal_VOID__BOOLEAN_INT64 (GClosure     *closure,
+                                                         GValue       *return_value G_GNUC_UNUSED,
+                                                         guint         n_param_values,
+                                                         const GValue *param_values,
+                                                         gpointer      invocation_hint G_GNUC_UNUSED,
+                                                         gpointer      marshal_data)
             {{
-              typedef void (*GMarshalFunc_VOID__BOOLEAN_INT64) (xpointer_t data1,
-                                                                xboolean_t arg1,
-                                                                sint64_t arg2,
-                                                                xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__BOOLEAN_INT64) (gpointer data1,
+                                                                gboolean arg1,
+                                                                gint64 arg2,
+                                                                gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__BOOLEAN_INT64 callback;
 
               g_return_if_fail (n_param_values == 3);
@@ -365,11 +365,11 @@ class TestGenmarshal(unittest.TestCase):
               if (G_CCLOSURE_SWAP_DATA (closure))
                 {{
                   data1 = closure->data;
-                  data2 = xvalue_peek_pointer (param_values + 0);
+                  data2 = g_value_peek_pointer (param_values + 0);
                 }}
               else
                 {{
-                  data1 = xvalue_peek_pointer (param_values + 0);
+                  data1 = g_value_peek_pointer (param_values + 0);
                   data2 = closure->data;
                 }}
               callback = (GMarshalFunc_VOID__BOOLEAN_INT64) (marshal_data ? marshal_data : cc->callback);
@@ -387,7 +387,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_variant_nostdinc_valist_marshaller(self):
-        """test_t running with a basic VOID:VARIANT list, but without the
+        """Test running with a basic VOID:VARIANT list, but without the
         standard marshallers, and with valist support enabled. This checks that
         the valist marshaller for VARIANT correctly sinks floating variants.
 
@@ -410,20 +410,20 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:VARIANT ({list_path}:1) */
             extern
-            void g_cclosure_user_marshal_VOID__VARIANT (xclosure_t     *closure,
-                                                        xvalue_t       *return_value,
-                                                        xuint_t         n_param_values,
-                                                        const xvalue_t *param_values,
-                                                        xpointer_t      invocation_hint,
-                                                        xpointer_t      marshal_data);
+            void g_cclosure_user_marshal_VOID__VARIANT (GClosure     *closure,
+                                                        GValue       *return_value,
+                                                        guint         n_param_values,
+                                                        const GValue *param_values,
+                                                        gpointer      invocation_hint,
+                                                        gpointer      marshal_data);
             extern
-            void g_cclosure_user_marshal_VOID__VARIANTv (xclosure_t *closure,
-                                                         xvalue_t   *return_value,
-                                                         xpointer_t  instance,
+            void g_cclosure_user_marshal_VOID__VARIANTv (GClosure *closure,
+                                                         GValue   *return_value,
+                                                         gpointer  instance,
                                                          va_list   args,
-                                                         xpointer_t  marshal_data,
+                                                         gpointer  marshal_data,
                                                          int       n_params,
-                                                         xtype_t    *param_types);
+                                                         GType    *param_types);
 
 
             G_END_DECLS
@@ -444,18 +444,18 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:VARIANT ({list_path}:1) */
             void
-            g_cclosure_user_marshal_VOID__VARIANT (xclosure_t     *closure,
-                                                   xvalue_t       *return_value G_GNUC_UNUSED,
-                                                   xuint_t         n_param_values,
-                                                   const xvalue_t *param_values,
-                                                   xpointer_t      invocation_hint G_GNUC_UNUSED,
-                                                   xpointer_t      marshal_data)
+            g_cclosure_user_marshal_VOID__VARIANT (GClosure     *closure,
+                                                   GValue       *return_value G_GNUC_UNUSED,
+                                                   guint         n_param_values,
+                                                   const GValue *param_values,
+                                                   gpointer      invocation_hint G_GNUC_UNUSED,
+                                                   gpointer      marshal_data)
             {{
-              typedef void (*GMarshalFunc_VOID__VARIANT) (xpointer_t data1,
-                                                          xpointer_t arg1,
-                                                          xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__VARIANT) (gpointer data1,
+                                                          gpointer arg1,
+                                                          gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__VARIANT callback;
 
               g_return_if_fail (n_param_values == 2);
@@ -463,11 +463,11 @@ class TestGenmarshal(unittest.TestCase):
               if (G_CCLOSURE_SWAP_DATA (closure))
                 {{
                   data1 = closure->data;
-                  data2 = xvalue_peek_pointer (param_values + 0);
+                  data2 = g_value_peek_pointer (param_values + 0);
                 }}
               else
                 {{
-                  data1 = xvalue_peek_pointer (param_values + 0);
+                  data1 = g_value_peek_pointer (param_values + 0);
                   data2 = closure->data;
                 }}
               callback = (GMarshalFunc_VOID__VARIANT) (marshal_data ? marshal_data : cc->callback);
@@ -478,27 +478,27 @@ class TestGenmarshal(unittest.TestCase):
             }}
 
             void
-            g_cclosure_user_marshal_VOID__VARIANTv (xclosure_t *closure,
-                                                    xvalue_t   *return_value G_GNUC_UNUSED,
-                                                    xpointer_t  instance,
+            g_cclosure_user_marshal_VOID__VARIANTv (GClosure *closure,
+                                                    GValue   *return_value G_GNUC_UNUSED,
+                                                    gpointer  instance,
                                                     va_list   args,
-                                                    xpointer_t  marshal_data,
+                                                    gpointer  marshal_data,
                                                     int       n_params,
-                                                    xtype_t    *param_types)
+                                                    GType    *param_types)
             {{
-              typedef void (*GMarshalFunc_VOID__VARIANT) (xpointer_t data1,
-                                                          xpointer_t arg1,
-                                                          xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__VARIANT) (gpointer data1,
+                                                          gpointer arg1,
+                                                          gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__VARIANT callback;
-              xpointer_t arg0;
+              gpointer arg0;
               va_list args_copy;
 
               G_VA_COPY (args_copy, args);
-              arg0 = (xpointer_t) va_arg (args_copy, xpointer_t);
+              arg0 = (gpointer) va_arg (args_copy, gpointer);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                arg0 = xvariant_ref_sink (arg0);
+                arg0 = g_variant_ref_sink (arg0);
               va_end (args_copy);
 
 
@@ -518,7 +518,7 @@ class TestGenmarshal(unittest.TestCase):
                         arg0,
                         data2);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                xvariant_unref (arg0);
+                g_variant_unref (arg0);
             }}
             """
             )
@@ -528,7 +528,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_string_nostdinc(self):
-        """test_t running with a basic VOID:STRING list, but without the
+        """Test running with a basic VOID:STRING list, but without the
         standard marshallers, and with valist support enabled. This checks that
         the valist marshaller for STRING correctly skips a string copy if the
         argument is static.
@@ -552,20 +552,20 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:STRING ({list_path}:1) */
             extern
-            void g_cclosure_user_marshal_VOID__STRING (xclosure_t     *closure,
-                                                       xvalue_t       *return_value,
-                                                       xuint_t         n_param_values,
-                                                       const xvalue_t *param_values,
-                                                       xpointer_t      invocation_hint,
-                                                       xpointer_t      marshal_data);
+            void g_cclosure_user_marshal_VOID__STRING (GClosure     *closure,
+                                                       GValue       *return_value,
+                                                       guint         n_param_values,
+                                                       const GValue *param_values,
+                                                       gpointer      invocation_hint,
+                                                       gpointer      marshal_data);
             extern
-            void g_cclosure_user_marshal_VOID__STRINGv (xclosure_t *closure,
-                                                        xvalue_t   *return_value,
-                                                        xpointer_t  instance,
+            void g_cclosure_user_marshal_VOID__STRINGv (GClosure *closure,
+                                                        GValue   *return_value,
+                                                        gpointer  instance,
                                                         va_list   args,
-                                                        xpointer_t  marshal_data,
+                                                        gpointer  marshal_data,
                                                         int       n_params,
-                                                        xtype_t    *param_types);
+                                                        GType    *param_types);
 
 
             G_END_DECLS
@@ -586,18 +586,18 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:STRING ({list_path}:1) */
             void
-            g_cclosure_user_marshal_VOID__STRING (xclosure_t     *closure,
-                                                  xvalue_t       *return_value G_GNUC_UNUSED,
-                                                  xuint_t         n_param_values,
-                                                  const xvalue_t *param_values,
-                                                  xpointer_t      invocation_hint G_GNUC_UNUSED,
-                                                  xpointer_t      marshal_data)
+            g_cclosure_user_marshal_VOID__STRING (GClosure     *closure,
+                                                  GValue       *return_value G_GNUC_UNUSED,
+                                                  guint         n_param_values,
+                                                  const GValue *param_values,
+                                                  gpointer      invocation_hint G_GNUC_UNUSED,
+                                                  gpointer      marshal_data)
             {{
-              typedef void (*GMarshalFunc_VOID__STRING) (xpointer_t data1,
-                                                         xpointer_t arg1,
-                                                         xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__STRING) (gpointer data1,
+                                                         gpointer arg1,
+                                                         gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__STRING callback;
 
               g_return_if_fail (n_param_values == 2);
@@ -605,11 +605,11 @@ class TestGenmarshal(unittest.TestCase):
               if (G_CCLOSURE_SWAP_DATA (closure))
                 {{
                   data1 = closure->data;
-                  data2 = xvalue_peek_pointer (param_values + 0);
+                  data2 = g_value_peek_pointer (param_values + 0);
                 }}
               else
                 {{
-                  data1 = xvalue_peek_pointer (param_values + 0);
+                  data1 = g_value_peek_pointer (param_values + 0);
                   data2 = closure->data;
                 }}
               callback = (GMarshalFunc_VOID__STRING) (marshal_data ? marshal_data : cc->callback);
@@ -620,27 +620,27 @@ class TestGenmarshal(unittest.TestCase):
             }}
 
             void
-            g_cclosure_user_marshal_VOID__STRINGv (xclosure_t *closure,
-                                                   xvalue_t   *return_value G_GNUC_UNUSED,
-                                                   xpointer_t  instance,
+            g_cclosure_user_marshal_VOID__STRINGv (GClosure *closure,
+                                                   GValue   *return_value G_GNUC_UNUSED,
+                                                   gpointer  instance,
                                                    va_list   args,
-                                                   xpointer_t  marshal_data,
+                                                   gpointer  marshal_data,
                                                    int       n_params,
-                                                   xtype_t    *param_types)
+                                                   GType    *param_types)
             {{
-              typedef void (*GMarshalFunc_VOID__STRING) (xpointer_t data1,
-                                                         xpointer_t arg1,
-                                                         xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__STRING) (gpointer data1,
+                                                         gpointer arg1,
+                                                         gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__STRING callback;
-              xpointer_t arg0;
+              gpointer arg0;
               va_list args_copy;
 
               G_VA_COPY (args_copy, args);
-              arg0 = (xpointer_t) va_arg (args_copy, xpointer_t);
+              arg0 = (gpointer) va_arg (args_copy, gpointer);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                arg0 = xstrdup (arg0);
+                arg0 = g_strdup (arg0);
               va_end (args_copy);
 
 
@@ -670,7 +670,7 @@ class TestGenmarshal(unittest.TestCase):
         )
 
     def test_void_param_nostdinc(self):
-        """test_t running with a basic VOID:PARAM list, but without the
+        """Test running with a basic VOID:PARAM list, but without the
         standard marshallers, and with valist support enabled. This checks that
         the valist marshaller for PARAM correctly skips a param copy if the
         argument is static.
@@ -695,20 +695,20 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:PARAM ({list_path}:1) */
             extern
-            void g_cclosure_user_marshal_VOID__PARAM (xclosure_t     *closure,
-                                                      xvalue_t       *return_value,
-                                                      xuint_t         n_param_values,
-                                                      const xvalue_t *param_values,
-                                                      xpointer_t      invocation_hint,
-                                                      xpointer_t      marshal_data);
+            void g_cclosure_user_marshal_VOID__PARAM (GClosure     *closure,
+                                                      GValue       *return_value,
+                                                      guint         n_param_values,
+                                                      const GValue *param_values,
+                                                      gpointer      invocation_hint,
+                                                      gpointer      marshal_data);
             extern
-            void g_cclosure_user_marshal_VOID__PARAMv (xclosure_t *closure,
-                                                       xvalue_t   *return_value,
-                                                       xpointer_t  instance,
+            void g_cclosure_user_marshal_VOID__PARAMv (GClosure *closure,
+                                                       GValue   *return_value,
+                                                       gpointer  instance,
                                                        va_list   args,
-                                                       xpointer_t  marshal_data,
+                                                       gpointer  marshal_data,
                                                        int       n_params,
-                                                       xtype_t    *param_types);
+                                                       GType    *param_types);
 
 
             G_END_DECLS
@@ -729,18 +729,18 @@ class TestGenmarshal(unittest.TestCase):
 
             /* VOID:PARAM ({list_path}:1) */
             void
-            g_cclosure_user_marshal_VOID__PARAM (xclosure_t     *closure,
-                                                 xvalue_t       *return_value G_GNUC_UNUSED,
-                                                 xuint_t         n_param_values,
-                                                 const xvalue_t *param_values,
-                                                 xpointer_t      invocation_hint G_GNUC_UNUSED,
-                                                 xpointer_t      marshal_data)
+            g_cclosure_user_marshal_VOID__PARAM (GClosure     *closure,
+                                                 GValue       *return_value G_GNUC_UNUSED,
+                                                 guint         n_param_values,
+                                                 const GValue *param_values,
+                                                 gpointer      invocation_hint G_GNUC_UNUSED,
+                                                 gpointer      marshal_data)
             {{
-              typedef void (*GMarshalFunc_VOID__PARAM) (xpointer_t data1,
-                                                        xpointer_t arg1,
-                                                        xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__PARAM) (gpointer data1,
+                                                        gpointer arg1,
+                                                        gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__PARAM callback;
 
               g_return_if_fail (n_param_values == 2);
@@ -748,11 +748,11 @@ class TestGenmarshal(unittest.TestCase):
               if (G_CCLOSURE_SWAP_DATA (closure))
                 {{
                   data1 = closure->data;
-                  data2 = xvalue_peek_pointer (param_values + 0);
+                  data2 = g_value_peek_pointer (param_values + 0);
                 }}
               else
                 {{
-                  data1 = xvalue_peek_pointer (param_values + 0);
+                  data1 = g_value_peek_pointer (param_values + 0);
                   data2 = closure->data;
                 }}
               callback = (GMarshalFunc_VOID__PARAM) (marshal_data ? marshal_data : cc->callback);
@@ -763,27 +763,27 @@ class TestGenmarshal(unittest.TestCase):
             }}
 
             void
-            g_cclosure_user_marshal_VOID__PARAMv (xclosure_t *closure,
-                                                  xvalue_t   *return_value G_GNUC_UNUSED,
-                                                  xpointer_t  instance,
+            g_cclosure_user_marshal_VOID__PARAMv (GClosure *closure,
+                                                  GValue   *return_value G_GNUC_UNUSED,
+                                                  gpointer  instance,
                                                   va_list   args,
-                                                  xpointer_t  marshal_data,
+                                                  gpointer  marshal_data,
                                                   int       n_params,
-                                                  xtype_t    *param_types)
+                                                  GType    *param_types)
             {{
-              typedef void (*GMarshalFunc_VOID__PARAM) (xpointer_t data1,
-                                                        xpointer_t arg1,
-                                                        xpointer_t data2);
+              typedef void (*GMarshalFunc_VOID__PARAM) (gpointer data1,
+                                                        gpointer arg1,
+                                                        gpointer data2);
               GCClosure *cc = (GCClosure *) closure;
-              xpointer_t data1, data2;
+              gpointer data1, data2;
               GMarshalFunc_VOID__PARAM callback;
-              xpointer_t arg0;
+              gpointer arg0;
               va_list args_copy;
 
               G_VA_COPY (args_copy, args);
-              arg0 = (xpointer_t) va_arg (args_copy, xpointer_t);
+              arg0 = (gpointer) va_arg (args_copy, gpointer);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                arg0 = xparam_spec_ref (arg0);
+                arg0 = g_param_spec_ref (arg0);
               va_end (args_copy);
 
 
@@ -803,7 +803,7 @@ class TestGenmarshal(unittest.TestCase):
                         arg0,
                         data2);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                xparam_spec_unref (arg0);
+                g_param_spec_unref (arg0);
             }}
             """
             )

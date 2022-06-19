@@ -18,8 +18,8 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __XDBUS_AUTH_OBSERVER_H__
-#define __XDBUS_AUTH_OBSERVER_H__
+#ifndef __G_DBUS_AUTH_OBSERVER_H__
+#define __G_DBUS_AUTH_OBSERVER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,23 +29,23 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_AUTH_OBSERVER         (xdbus_auth_observer_get_type ())
-#define XDBUS_AUTH_OBSERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_OBSERVER, xdbus_auth_observer))
-#define X_IS_DBUS_AUTH_OBSERVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_AUTH_OBSERVER))
+#define G_TYPE_DBUS_AUTH_OBSERVER         (g_dbus_auth_observer_get_type ())
+#define G_DBUS_AUTH_OBSERVER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_AUTH_OBSERVER, GDBusAuthObserver))
+#define G_IS_DBUS_AUTH_OBSERVER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_AUTH_OBSERVER))
 
-XPL_AVAILABLE_IN_ALL
-xtype_t              xdbus_auth_observer_get_type                     (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xdbus_auth_observer_t *xdbus_auth_observer_new                          (void);
-XPL_AVAILABLE_IN_ALL
-xboolean_t           xdbus_auth_observer_authorize_authenticated_peer (xdbus_auth_observer_t  *observer,
-                                                                      xio_stream_t          *stream,
-                                                                      xcredentials_t       *credentials);
+GLIB_AVAILABLE_IN_ALL
+GType              g_dbus_auth_observer_get_type                     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GDBusAuthObserver *g_dbus_auth_observer_new                          (void);
+GLIB_AVAILABLE_IN_ALL
+gboolean           g_dbus_auth_observer_authorize_authenticated_peer (GDBusAuthObserver  *observer,
+                                                                      GIOStream          *stream,
+                                                                      GCredentials       *credentials);
 
-XPL_AVAILABLE_IN_2_34
-xboolean_t           xdbus_auth_observer_allow_mechanism (xdbus_auth_observer_t  *observer,
-                                                         const xchar_t        *mechanism);
+GLIB_AVAILABLE_IN_2_34
+gboolean           g_dbus_auth_observer_allow_mechanism (GDBusAuthObserver  *observer,
+                                                         const gchar        *mechanism);
 
 G_END_DECLS
 
-#endif /* _XDBUS_AUTH_OBSERVER_H__ */
+#endif /* _G_DBUS_AUTH_OBSERVER_H__ */

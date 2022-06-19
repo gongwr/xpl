@@ -19,16 +19,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: glib master\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/glib/issues\n"
-"POT-Creation-Date: 2022-02-27 08:05+0000\n"
-"PO-Revision-Date: 2022-03-03 15:32+0100\n"
-"Last-Translator: Philipp Kiemle <philipp.kiemle@gmail.com>\n"
+"POT-Creation-Date: 2022-05-18 14:09+0000\n"
+"PO-Revision-Date: 2022-05-22 12:39+0200\n"
+"Last-Translator: Tim Sabsch <tim@sabsch.com>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: gio/gappinfo.c:333
 msgid "Setting default applications not supported yet"
@@ -40,23 +40,23 @@ msgstr ""
 "Setzen einer Anwendung als »zuletzt verwendet für einen Typ« wird noch nicht "
 "unterstützt"
 
-#: gio/gapplication.c:497
-msgid "xapplication_t options"
-msgstr "Optionen für xapplication_t"
+#: gio/gapplication.c:500
+msgid "GApplication options"
+msgstr "Optionen für GApplication"
 
-#: gio/gapplication.c:497
-msgid "Show xapplication_t options"
-msgstr "Optionen für xapplication_t anzeigen"
+#: gio/gapplication.c:500
+msgid "Show GApplication options"
+msgstr "Optionen für GApplication anzeigen"
 
-#: gio/gapplication.c:542
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
-msgstr "xapplication_t Dienstmodus starten (aus D-Bus Dienstdateien verwenden)"
+#: gio/gapplication.c:545
+msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgstr "GApplication Dienstmodus starten (aus D-Bus Dienstdateien verwenden)"
 
-#: gio/gapplication.c:554
+#: gio/gapplication.c:557
 msgid "Override the application’s ID"
 msgstr "Anwendungskennung überschreiben"
 
-#: gio/gapplication.c:566
+#: gio/gapplication.c:569
 msgid "Replace the running instance"
 msgstr "Laufende Instanz ersetzen"
 
@@ -159,8 +159,8 @@ msgid "PARAMETER"
 msgstr "PARAMETER"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Optionaler Parameter für den Aufruf der Aktion, im xvariant_t-Format"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Optionaler Parameter für den Aufruf der Aktion, im GVariant-Format"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
 #, c-format
@@ -287,8 +287,8 @@ msgid "Seek not supported on base stream"
 msgstr "Suchen im Basis-Datenstrom nicht unterstützt"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "xbuffered_input_stream_t konnte nicht abgeschnitten werden"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "GBufferedInputStream konnte nicht abgeschnitten werden"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -299,7 +299,7 @@ msgstr "Datenstrom ist bereits geschlossen"
 msgid "Truncate not supported on base stream"
 msgstr "Abschneiden wird vom Basis-Datenstrom nicht unterstützt"
 
-#: gio/gcancellable.c:319 gio/gdbusconnection.c:1873 gio/gdbusprivate.c:1418
+#: gio/gcancellable.c:319 gio/gdbusconnection.c:1857 gio/gdbusprivate.c:1418
 #: gio/gsimpleasyncresult.c:871 gio/gsimpleasyncresult.c:897
 #, c-format
 msgid "Operation was cancelled"
@@ -349,30 +349,30 @@ msgstr "Konverter von »%s« in »%s« konnte nicht geöffnet werden"
 msgid "%s type"
 msgstr "%s-Typ"
 
-#: gio/gcontenttype-win32.c:192
+#: gio/gcontenttype-win32.c:196
 msgid "Unknown type"
 msgstr "Unbekannter Typ"
 
-#: gio/gcontenttype-win32.c:194
+#: gio/gcontenttype-win32.c:198
 #, c-format
 msgid "%s filetype"
 msgstr "%s-Dateityp"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t enthält ungültige Daten"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials enthält ungültige Daten"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t ist in diesem Betriebssystem nicht implementiert"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials ist in diesem Betriebssystem nicht implementiert"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Es gibt auf Ihrer Plattform keine Unterstützung für xcredentials_t"
+msgid "There is no GCredentials support for your platform"
+msgstr "Es gibt auf Ihrer Plattform keine Unterstützung für GCredentials"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t enthält in diesem Betriebssystem keine Prozesskennung"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials enthält in diesem Betriebssystem keine Prozesskennung"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -535,7 +535,7 @@ msgstr ""
 "Adresse des Sitzungsbus konnte nicht ermittelt werden (für dieses "
 "Betriebssystem nicht implementiert)"
 
-#: gio/gdbusaddress.c:1373 gio/gdbusconnection.c:7334
+#: gio/gdbusaddress.c:1373 gio/gdbusconnection.c:7318
 #, c-format
 msgid ""
 "Cannot determine bus address from DBUS_STARTER_BUS_TYPE environment variable "
@@ -544,7 +544,7 @@ msgstr ""
 "Bus-Adresse konnte nicht über die Umgebungsvariable DBUS_STARTER_BUS_TYPE "
 "ermittelt werden – unbekannter Wert »%s«"
 
-#: gio/gdbusaddress.c:1382 gio/gdbusconnection.c:7343
+#: gio/gdbusaddress.c:1382 gio/gdbusconnection.c:7327
 msgid ""
 "Cannot determine bus address because the DBUS_STARTER_BUS_TYPE environment "
 "variable is not set"
@@ -579,8 +579,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Benutzerkennungen müssen für Server und Gegenstelle gleich sein"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Abgebrochen durch xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Abgebrochen durch GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:300
 #, c-format
@@ -672,22 +672,22 @@ msgstr "Fehler beim Öffnen des Schlüsselbundes »%s« zum Schreiben: "
 msgid "(Additionally, releasing the lock for “%s” also failed: %s) "
 msgstr "(Außerdem schlug das Entsperren von »%s« ebenso fehl: %s) "
 
-#: gio/gdbusconnection.c:604 gio/gdbusconnection.c:2418
+#: gio/gdbusconnection.c:588 gio/gdbusconnection.c:2402
 msgid "The connection is closed"
 msgstr "Verbindung ist geschlossen"
 
-#: gio/gdbusconnection.c:1903
+#: gio/gdbusconnection.c:1887
 msgid "Timeout was reached"
 msgstr "Zeitüberschreitung wurde erreicht"
 
-#: gio/gdbusconnection.c:2541
+#: gio/gdbusconnection.c:2525
 msgid ""
 "Unsupported flags encountered when constructing a client-side connection"
 msgstr ""
 "Beim Erstellen einer client-seitigen Verbindung wurden nicht unterstützte "
 "Flags entdeckt"
 
-#: gio/gdbusconnection.c:4269 gio/gdbusconnection.c:4623
+#: gio/gdbusconnection.c:4253 gio/gdbusconnection.c:4607
 #, c-format
 msgid ""
 "No such interface “org.freedesktop.DBus.Properties” on object at path %s"
@@ -695,80 +695,80 @@ msgstr ""
 "Keine derartige Schnittstelle »org.freedesktop.DBus.Properties« des Objekts "
 "im Pfad %s"
 
-#: gio/gdbusconnection.c:4414
+#: gio/gdbusconnection.c:4398
 #, c-format
 msgid "No such property “%s”"
 msgstr "Keine derartige Eigenschaft »%s«"
 
-#: gio/gdbusconnection.c:4426
+#: gio/gdbusconnection.c:4410
 #, c-format
 msgid "Property “%s” is not readable"
 msgstr "Eigenschaft »%s« ist nicht lesbar"
 
-#: gio/gdbusconnection.c:4437
+#: gio/gdbusconnection.c:4421
 #, c-format
 msgid "Property “%s” is not writable"
 msgstr "Eigenschaft »%s« ist nicht schreibbar"
 
-#: gio/gdbusconnection.c:4457
+#: gio/gdbusconnection.c:4441
 #, c-format
 msgid "Error setting property “%s”: Expected type “%s” but got “%s”"
 msgstr ""
 "Fehler beim Setzen der Eigenschaft »%s«: Erwarteter Typ war »%s«, aber »%s« "
 "wurde erhalten"
 
-#: gio/gdbusconnection.c:4562 gio/gdbusconnection.c:4777
-#: gio/gdbusconnection.c:6760
+#: gio/gdbusconnection.c:4546 gio/gdbusconnection.c:4761
+#: gio/gdbusconnection.c:6744
 #, c-format
 msgid "No such interface “%s”"
 msgstr "Keine derartige Schnittstelle »%s«"
 
-#: gio/gdbusconnection.c:4999 gio/gdbusconnection.c:7274
+#: gio/gdbusconnection.c:4983 gio/gdbusconnection.c:7258
 #, c-format
 msgid "No such interface “%s” on object at path %s"
 msgstr "Keine derartige Schnittstelle »%s« des Objekts im Pfad %s"
 
-#: gio/gdbusconnection.c:5100
+#: gio/gdbusconnection.c:5084
 #, c-format
 msgid "No such method “%s”"
 msgstr "Keine derartige Methode »%s«"
 
-#: gio/gdbusconnection.c:5131
+#: gio/gdbusconnection.c:5115
 #, c-format
 msgid "Type of message, “%s”, does not match expected type “%s”"
 msgstr "Der Nachrichtentyp »%s« entspricht nicht dem erwarteten Typ »%s«"
 
-#: gio/gdbusconnection.c:5334
+#: gio/gdbusconnection.c:5318
 #, c-format
 msgid "An object is already exported for the interface %s at %s"
 msgstr "Für die Schnittstelle %s auf %s wurde bereits ein Objekt exportiert"
 
-#: gio/gdbusconnection.c:5561
+#: gio/gdbusconnection.c:5545
 #, c-format
 msgid "Unable to retrieve property %s.%s"
 msgstr "Eigenschaft kann nicht abgefragt werden: %s.%s"
 
-#: gio/gdbusconnection.c:5617
+#: gio/gdbusconnection.c:5601
 #, c-format
 msgid "Unable to set property %s.%s"
 msgstr "Eigenschaft kann nicht gesetzt werden: %s.%s"
 
-#: gio/gdbusconnection.c:5796
+#: gio/gdbusconnection.c:5780
 #, c-format
 msgid "Method “%s” returned type “%s”, but expected “%s”"
 msgstr "Methode »%s« gab Typ »%s« zurück, aber »%s« wurde erwartet"
 
-#: gio/gdbusconnection.c:6872
+#: gio/gdbusconnection.c:6856
 #, c-format
 msgid "Method “%s” on interface “%s” with signature “%s” does not exist"
 msgstr "Methode »%s« in Schnittstelle »%s« mit Signatur »%s« existiert nicht"
 
-#: gio/gdbusconnection.c:6993
+#: gio/gdbusconnection.c:6977
 #, c-format
 msgid "A subtree is already exported for %s"
 msgstr "Ein Unterbaum wurde bereits für %s exportiert"
 
-#: gio/gdbusconnection.c:7282
+#: gio/gdbusconnection.c:7266
 #, c-format
 msgid "Object does not exist at path “%s”"
 msgstr "Das Objekt existiert nicht am Pfad »%s«"
@@ -881,9 +881,9 @@ msgstr "Verarbeiteter Wert »%s« für Variante ist keine gültige D-Bus-Signatu
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Fehler beim Deserialisieren von xvariant_t mit der Typenzeichenkette »%s« aus "
+"Fehler beim Deserialisieren von GVariant mit der Typenzeichenkette »%s« aus "
 "dem D-Bus Wire-Format"
 
 #: gio/gdbusmessage.c:2206
@@ -935,9 +935,9 @@ msgstr "Meldung kann nicht deserialisiert werden: "
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"Fehler beim Deserialisieren von xvariant_t mit der Typenzeichenkette »%s« in "
+"Fehler beim Deserialisieren von GVariant mit der Typenzeichenkette »%s« in "
 "das D-Bus Wire-Format"
 
 #: gio/gdbusmessage.c:2835
@@ -1336,7 +1336,7 @@ msgstr "Fehler: Zu viele Argumente.\n"
 msgid "Error: %s is not a valid well-known bus name.\n"
 msgstr "Fehler: %s ist kein gültiger, bekannter Bus-Name\n"
 
-#: gio/gdebugcontrollerdbus.c:357
+#: gio/gdebugcontrollerdbus.c:358
 #, c-format
 msgid "Not authorized to change debug settings"
 msgstr "Nicht berechtigt, Fehlerdiagnose-Einstellungen zu ändern"
@@ -1418,27 +1418,27 @@ msgstr "DTLS-Unterstützung ist nicht verfügbar"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Version %d der xemblem_t-Kodierung kann nicht verarbeitet werden"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Version %d der GEmblem-Kodierung kann nicht verarbeitet werden"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Ungültige Symbolanzahl (%d) in xemblem_t-Kodierung"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Ungültige Symbolanzahl (%d) in GEmblem-Kodierung"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Version %d der xemblemed_icon_t-Kodierung kann nicht verarbeitet werden"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Version %d der GEmblemedIcon-Kodierung kann nicht verarbeitet werden"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Ungültige Symbolanzahl (%d) in xemblemed_icon_t-Kodierung"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Ungültige Symbolanzahl (%d) in GEmblemedIcon-Kodierung"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Es wurde ein xemblem_t für xemblemed_icon_t erwartet"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Es wurde ein GEmblem für GEmblemedIcon erwartet"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1530,12 +1530,12 @@ msgstr "Datei-Enumerator ist bereits geschlossen"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Version %d der xfile_icon_t-Kodierung kann nicht verarbeitet werden"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Version %d der GFileIcon-Kodierung kann nicht verarbeitet werden"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Ungültige Eingangsdaten für xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Ungültige Eingangsdaten für GFileIcon"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1602,8 +1602,8 @@ msgstr "Kein Typ für Klassenname %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "xicon_t-Schnittstelle wird vom Typ %s nicht unterstützt"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "GIcon-Schnittstelle wird vom Typ %s nicht unterstützt"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1617,8 +1617,8 @@ msgstr "Ungültige Versionsnummer: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Typ %s implementiert nicht from_tokens() der xicon_t-Schnittstelle"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Typ %s implementiert nicht from_tokens() der GIcon-Schnittstelle"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -1771,7 +1771,7 @@ msgstr "Fehler beim Schreiben in die Standardausgabe"
 #: gio/gio-tool-mkdir.c:48 gio/gio-tool-monitor.c:37 gio/gio-tool-monitor.c:39
 #: gio/gio-tool-monitor.c:41 gio/gio-tool-monitor.c:43
 #: gio/gio-tool-monitor.c:204 gio/gio-tool-mount.c:1199 gio/gio-tool-open.c:70
-#: gio/gio-tool-remove.c:48 gio/gio-tool-rename.c:45 gio/gio-tool-set.c:89
+#: gio/gio-tool-remove.c:48 gio/gio-tool-rename.c:45 gio/gio-tool-set.c:91
 #: gio/gio-tool-trash.c:220 gio/gio-tool-tree.c:239
 msgid "LOCATION"
 msgstr "ORT"
@@ -2286,7 +2286,7 @@ msgstr "Eine Datei umbenennen."
 msgid "Missing argument"
 msgstr "Fehlendes Argument"
 
-#: gio/gio-tool-rename.c:76 gio/gio-tool-save.c:190 gio/gio-tool-set.c:137
+#: gio/gio-tool-rename.c:76 gio/gio-tool-save.c:190 gio/gio-tool-set.c:139
 msgid "Too many arguments"
 msgstr "Zu viele Argumente"
 
@@ -2350,31 +2350,31 @@ msgstr "Typ des Attributs"
 msgid "TYPE"
 msgstr "TYP"
 
-#: gio/gio-tool-set.c:89
+#: gio/gio-tool-set.c:91
 msgid "ATTRIBUTE"
 msgstr "ATTRIBUT"
 
-#: gio/gio-tool-set.c:89
+#: gio/gio-tool-set.c:91
 msgid "VALUE"
 msgstr "WERT"
 
-#: gio/gio-tool-set.c:93
+#: gio/gio-tool-set.c:95
 msgid "Set a file attribute of LOCATION."
 msgstr "Ein Dateiattribut von ORT festlegen."
 
-#: gio/gio-tool-set.c:113
+#: gio/gio-tool-set.c:115
 msgid "Location not specified"
 msgstr "Kein Ort angegeben"
 
-#: gio/gio-tool-set.c:120
+#: gio/gio-tool-set.c:122
 msgid "Attribute not specified"
 msgstr "Kein Attribut angegeben"
 
-#: gio/gio-tool-set.c:130
+#: gio/gio-tool-set.c:132
 msgid "Value not specified"
 msgstr "Kein Wert angegeben"
 
-#: gio/gio-tool-set.c:180
+#: gio/gio-tool-set.c:182
 #, c-format
 msgid "Invalid attribute type “%s”"
 msgstr "Ungültiger Attributtyp »%s«"
@@ -2811,8 +2811,8 @@ msgstr "<%s id='%s'> (noch) nicht definiert."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Ungültige xvariant_t-Typzeichenkette »%s«"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Ungültige GVariant-Typzeichenkette »%s«"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -3050,11 +3050,11 @@ msgstr "Keine Einschränkungen für Schlüsselnamen erzwingen"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Alle xsettings_t-Schemadateien in eine Zwischenspeicherdatei kompilieren.\n"
+"Alle GSettings-Schemadateien in eine Zwischenspeicherdatei kompilieren.\n"
 "Schemadateien müssen die Erweiterung .gschema.xml haben,\n"
 "die Zwischenspeicherdatei die Erweiterung gschemas.compiled."
 
@@ -3391,13 +3391,13 @@ msgstr "Fehler beim Erzeugen der Sicherungskopie: %s"
 msgid "Error renaming temporary file: %s"
 msgstr "Fehler beim Umbenennen der temporären Datei: %s"
 
-#: gio/glocalfileoutputstream.c:609 gio/glocalfileoutputstream.c:1237
+#: gio/glocalfileoutputstream.c:609 gio/glocalfileoutputstream.c:1239
 #, c-format
 msgid "Error truncating file: %s"
 msgstr "Fehler beim Abschneiden der Datei: %s"
 
 #: gio/glocalfileoutputstream.c:662 gio/glocalfileoutputstream.c:907
-#: gio/glocalfileoutputstream.c:1218 gio/gsubprocess.c:229
+#: gio/glocalfileoutputstream.c:1220 gio/gsubprocess.c:229
 #, c-format
 msgid "Error opening file “%s”: %s"
 msgstr "Fehler beim Öffnen der Datei »%s«: %s"
@@ -3420,16 +3420,16 @@ msgid "Error removing old file: %s"
 msgstr "Fehler beim Entfernen der alten Datei: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
-msgstr "Ungültiger xseek_type_t übergeben"
+msgid "Invalid GSeekType supplied"
+msgstr "Ungültiger GSeekType übergeben"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Ungültige Suchanfrage"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "xmemory_input_stream_t konnte nicht abgeschnitten werden"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "GMemoryInputStream konnte nicht abgeschnitten werden"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -3555,7 +3555,11 @@ msgstr "An %s übermittelte Vektorsumme ist zu groß"
 msgid "Source stream is already closed"
 msgstr "Quelldatenstrom ist bereits geschlossen"
 
+#. Translators: the first placeholder is a domain name, the
+#. * second is an error message
 #: gio/gresolver.c:401 gio/gthreadedresolver.c:150 gio/gthreadedresolver.c:168
+#: gio/gthreadedresolver.c:780 gio/gthreadedresolver.c:804
+#: gio/gthreadedresolver.c:829 gio/gthreadedresolver.c:844
 #, c-format
 msgid "Error resolving “%s”: %s"
 msgstr "Fehler beim Auflösen von »%s«: %s"
@@ -3966,8 +3970,8 @@ msgstr "Zeitüberschreitung bei Ein-/Ausgabeoperation des Sockets"
 
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "xsocket_t wird erstellt von Dateideskriptor: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "GSocket wird erstellt von Dateideskriptor: %s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
 #, c-format
@@ -4112,8 +4116,8 @@ msgid "Error sending message: %s"
 msgstr "Fehler beim Senden der Nachricht: %s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t wird unter Windows nicht unterstützt"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage wird unter Windows nicht unterstützt"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4126,9 +4130,9 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Socket-Berechtigungen konnten nicht gelesen werden: %s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
-"xsocket_get_credentials ist für dieses Betriebssystem nicht implementiert"
+"g_socket_get_credentials ist für dieses Betriebssystem nicht implementiert"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4264,8 +4268,8 @@ msgstr "Weiterleitungen werden auf dieser Plattform nicht unterstützt"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Version %d der xthemed_icon_t-Kodierung kann nicht verarbeitet werden"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Version %d der GThemedIcon-Kodierung kann nicht verarbeitet werden"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4276,22 +4280,40 @@ msgstr "Es wurden keine gültigen Adressen gefunden"
 msgid "Error reverse-resolving “%s”: %s"
 msgstr "Fehler beim Rückwärtsauflösen von »%s«: %s"
 
-#: gio/gthreadedresolver.c:676 gio/gthreadedresolver.c:755
-#: gio/gthreadedresolver.c:853 gio/gthreadedresolver.c:903
+#. Translators: the placeholder is a DNS record type, such as ‘MX’ or ‘SRV’
+#: gio/gthreadedresolver.c:550 gio/gthreadedresolver.c:572
+#: gio/gthreadedresolver.c:610 gio/gthreadedresolver.c:657
+#: gio/gthreadedresolver.c:686 gio/gthreadedresolver.c:698
+#, c-format
+msgid "Error parsing DNS %s record: malformed DNS packet"
+msgstr "Fehler bei der Verarbeitung des DNS %s-Eintrags: ungültiges DNS-Paket"
+
+#: gio/gthreadedresolver.c:756 gio/gthreadedresolver.c:893
+#: gio/gthreadedresolver.c:991 gio/gthreadedresolver.c:1041
 #, c-format
 msgid "No DNS record of the requested type for “%s”"
-msgstr "Kein DNS-Datensatz des angeforderten Typs für »%s«"
+msgstr "Kein DNS-Eintrag des angeforderten Typs für »%s«"
 
-#: gio/gthreadedresolver.c:681 gio/gthreadedresolver.c:858
+#: gio/gthreadedresolver.c:761 gio/gthreadedresolver.c:996
 #, c-format
 msgid "Temporarily unable to resolve “%s”"
 msgstr "»%s« kann vorübergehend nicht aufgelöst werden"
 
-#: gio/gthreadedresolver.c:686 gio/gthreadedresolver.c:863
-#: gio/gthreadedresolver.c:973
+#: gio/gthreadedresolver.c:766 gio/gthreadedresolver.c:1001
+#: gio/gthreadedresolver.c:1111
 #, c-format
 msgid "Error resolving “%s”"
 msgstr "Fehler beim Auflösen von »%s«"
+
+#: gio/gthreadedresolver.c:780 gio/gthreadedresolver.c:804
+#: gio/gthreadedresolver.c:829 gio/gthreadedresolver.c:844
+msgid "Malformed DNS packet"
+msgstr "Ungültiges DNS-Paket"
+
+#: gio/gthreadedresolver.c:886
+#, c-format
+msgid "Failed to parse DNS response for “%s”: "
+msgstr "Fehler bei der Verarbeitung der DNS-Antwort zu »%s«: "
 
 #: gio/gtlscertificate.c:478
 msgid "No PEM-encoded private key found"
@@ -4318,9 +4340,9 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Das aktuelle TLS-Backend unterstützt PKCS #12 nicht"
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
 msgstr ""
-"Das xtls_backend_t unterstützt die Erstellung von PKCS #11-Zertifikaten nicht"
+"Das GTlsBackend unterstützt die Erstellung von PKCS #11-Zertifikaten nicht"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4638,25 +4660,25 @@ msgstr "Der Pfadname »%s« ist kein absoluter Pfad"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e. %b %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S"
 
@@ -5039,13 +5061,13 @@ msgstr "Dez"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "PM"
 
@@ -5991,7 +6013,7 @@ msgstr "Unerwarteter Fehler beim Lesen von Daten eines Kindprozesses (%s)"
 msgid "Unexpected error in waitpid() (%s)"
 msgstr "Unerwarteter Fehler in waitpid() (%s)"
 
-#: glib/gspawn.c:1175 glib/gspawn-win32.c:1431
+#: glib/gspawn.c:1175 glib/gspawn-win32.c:1438
 #, c-format
 msgid "Child process exited with code %ld"
 msgstr "Der Kindprozess wurde mit Status %ld beendet"
@@ -6091,27 +6113,27 @@ msgstr "dup() im Kindprozess ist fehlgeschlagen (%s)"
 msgid "Invalid program name: %s"
 msgstr "Ungültiger Programmname: %s"
 
-#: glib/gspawn-win32.c:481 glib/gspawn-win32.c:800
+#: glib/gspawn-win32.c:481 glib/gspawn-win32.c:807
 #, c-format
 msgid "Invalid string in argument vector at %d: %s"
 msgstr "Ungültige Zeichenkette im Argumentsvektor bei %d: %s"
 
-#: glib/gspawn-win32.c:492 glib/gspawn-win32.c:816
+#: glib/gspawn-win32.c:492 glib/gspawn-win32.c:823
 #, c-format
 msgid "Invalid string in environment: %s"
 msgstr "Ungültige Zeichenkette in der Umgebung: %s"
 
-#: glib/gspawn-win32.c:796
+#: glib/gspawn-win32.c:803
 #, c-format
 msgid "Invalid working directory: %s"
 msgstr "Ungültiger Arbeitsordner: %s"
 
-#: glib/gspawn-win32.c:861
+#: glib/gspawn-win32.c:868
 #, c-format
 msgid "Failed to execute helper program (%s)"
 msgstr "Hilfsprogramm (%s) konnte nicht ausgeführt werden"
 
-#: glib/gspawn-win32.c:1089
+#: glib/gspawn-win32.c:1096
 msgid ""
 "Unexpected error in g_io_channel_win32_poll() reading data from a child "
 "process"

@@ -20,45 +20,45 @@
 /* GRegistryBackend implementation notes:
  *
  *   - All settings are stored under the path:
- *       HKEY_CURRENT_USER\Software\xsettings_t\
+ *       HKEY_CURRENT_USER\Software\GSettings\
  *     This means all settings are per-user. Permissions and system-wide
  *     defaults are not implemented and will probably always be out of scope of
  *     the Windows port of GLib.
  *
- *   - The registry type system is limited. Most xvariant_t types are stored as
- *     literals via xvariant_print/parse(). Strings are stored without the
- *     quotes that xvariant_t requires. Integer types are stored as native
+ *   - The registry type system is limited. Most GVariant types are stored as
+ *     literals via g_variant_print/parse(). Strings are stored without the
+ *     quotes that GVariant requires. Integer types are stored as native
  *     REG_DWORD or REG_QWORD. The REG_MULTI_SZ (string array) type could be
  *     used to avoid flattening container types.
  *
  *   - Notifications are handled; the change event is watched for in a separate
  *     thread (Windows does not provide a callback API) which sends them with
  *     g_idle_add to the GLib main loop. The threading is done using Windows
- *     API functions, so there is no dependence on xthread_t.
+ *     API functions, so there is no dependence on GThread.
  *
  *   - Windows doesn't tell us which value has changed. This means we have to
  *     maintain a cache of every stored value so we can play spot the
  *     difference. This should not be a performance issue because if you are
- *     storing thousands of values in xsettings_t, you are probably using it
+ *     storing thousands of values in GSettings, you are probably using it
  *     wrong.
  *
  *   - The cache stores the value as a registry type. Because many variants are
  *     stored as string representations, values which have changed equality but
- *     not equivalence may trigger spurious change notifications. xsettings_t
+ *     not equivalence may trigger spurious change notifications. GSettings
  *     users must already deal with this possibility and converting all data to
- *     xvariant_t values would be more effort.
+ *     GVariant values would be more effort.
  *
  *   - Because we have to cache every registry value locally, reads are done
  *     from the cache rather than directly from the registry. Writes update
  *     both. This means that the backend will not work if the watch thread is
- *     not running. A xsettings_t object always subscribes to changes so we can
+ *     not running. A GSettings object always subscribes to changes so we can
  *     be sure that the watch thread will be running, but if for some reason
  *     the backend is being used directly you should bear that in mind.
  *
  *   - The registry is totally user-editable, so we are very forgiving about
  *     errors in the data we get.
  *
- *   - The registry uses backslashes as path separators. xsettings_t keys only
+ *   - The registry uses backslashes as path separators. GSettings keys only
  *     allow [A-Za-z\-] so no escaping is needed. No attempt is made to solve
  *     clashes between keys differing only in case.
  *
@@ -70,9 +70,9 @@
  *     all the values of a key may not exceed 65,535 characters.
  *
  *   - Terminology:
- *     * in xsettings_t, a 'key' is eg. /desktop/gnome/background/primary-color
+ *     * in GSettings, a 'key' is eg. /desktop/gnome/background/primary-color
  *     * in the registry, the 'key' is path, which contains some 'values'.
- *     * in this file, any xsettings_t key is a 'key', while a registry key is
+ *     * in this file, any GSettings key is a 'key', while a registry key is
  *       termed a 'path', which contains 'values'.
  *
  *   - My set of tests for this backend are currently at:
@@ -97,7 +97,7 @@
 
 //#define TRACE
 
-/* xsettings_t' limit */
+/* GSettings' limit */
 #define MAX_KEY_NAME_LENGTH   128
 
 /* Testing (on Windows XP SP3) shows that WaitForMultipleObjects fails with
@@ -113,7 +113,7 @@ typedef struct
   HANDLE event;
   HKEY hpath;
   char *prefix;
-  xnode_t *cache_node;
+  GNode *cache_node;
 } RegistryWatch;
 
 /* Simple message passing for the watch thread. Not enough traffic to
@@ -135,12 +135,12 @@ typedef struct
 
 typedef struct
 {
-  xsettings_backend_t *owner;
+  GSettingsBackend *owner;
   HANDLE *thread;
 
   /* Details of the things we are watching. */
   int watches_remaining;
-  xptr_array_t *events, *handles, *prefixes, *cache_nodes;
+  GPtrArray *events, *handles, *prefixes, *cache_nodes;
 
   /* Communication with the main thread. Only one message is stored at a time,
    * to make sure that messages are acknowledged before being overwritten we
@@ -152,31 +152,31 @@ typedef struct
   HANDLE message_sent_event, message_received_event;
 } WatchThreadState;
 
-#define XTYPE_REGISTRY_BACKEND      (g_registry_backend_get_type ())
-#define G_REGISTRY_BACKEND(inst)     (XTYPE_CHECK_INSTANCE_CAST ((inst),         \
-                                      XTYPE_REGISTRY_BACKEND, GRegistryBackend))
-#define X_IS_REGISTRY_BACKEND(inst)  (XTYPE_CHECK_INSTANCE_TYPE ((inst),         \
-                                      XTYPE_REGISTRY_BACKEND))
+#define G_TYPE_REGISTRY_BACKEND      (g_registry_backend_get_type ())
+#define G_REGISTRY_BACKEND(inst)     (G_TYPE_CHECK_INSTANCE_CAST ((inst),         \
+                                      G_TYPE_REGISTRY_BACKEND, GRegistryBackend))
+#define G_IS_REGISTRY_BACKEND(inst)  (G_TYPE_CHECK_INSTANCE_TYPE ((inst),         \
+                                      G_TYPE_REGISTRY_BACKEND))
 
-typedef xsettings_backend_class_t GRegistryBackendClass;
+typedef GSettingsBackendClass GRegistryBackendClass;
 
 typedef struct {
-  xsettings_backend_t parent_instance;
+  GSettingsBackend parent_instance;
 
-  xchar_t *base_path;
-  xunichar2_t *base_pathw;
+  gchar *base_path;
+  gunichar2 *base_pathw;
 
   /* A stored copy of the whole tree being watched. When we receive a change notification
    * we have to check against this to see what has changed ... every time ...*/
   CRITICAL_SECTION *cache_lock;
-  xnode_t *cache_root;
+  GNode *cache_root;
 
   WatchThreadState *watch;
 } GRegistryBackend;
 
 G_DEFINE_TYPE_WITH_CODE (GRegistryBackend,
                          g_registry_backend,
-                         XTYPE_SETTINGS_BACKEND,
+                         G_TYPE_SETTINGS_BACKEND,
                          g_io_extension_point_implement (G_SETTINGS_BACKEND_EXTENSION_POINT_NAME,
                                                          g_define_type_id, "registry", 90))
 
@@ -203,20 +203,20 @@ trace (const char *format,
  * they will mostly occur from people messing with the registry by hand. */
 static void G_GNUC_PRINTF (2, 3)
 g_message_win32_error (DWORD        result_code,
-                       const xchar_t *format,
+                       const gchar *format,
                       ...)
 {
   va_list va;
-  xchar_t *message;
-  xchar_t *win32_error;
-  xchar_t *win32_message;
+  gchar *message;
+  gchar *win32_error;
+  gchar *win32_message;
 
   g_return_if_fail (result_code != 0);
 
   va_start (va, format);
-  message = xstrdup_vprintf (format, va);
+  message = g_strdup_vprintf (format, va);
   win32_error = g_win32_error_message (result_code);
-  win32_message = xstrdup_printf ("%s: %s", message, win32_error);
+  win32_message = g_strdup_printf ("%s: %s", message, win32_error);
   g_free (message);
   g_free (win32_error);
 
@@ -228,17 +228,17 @@ g_message_win32_error (DWORD        result_code,
   g_free (win32_message);
 }
 
-/* Make gsettings key into a registry path & value pair.
- *
+/* Make gsettings key into a registry path & value pair. 
+ * 
  * Note that the return value *only* needs freeing - registry_value_name
  * is a pointer to further inside the same block of memory.
  */
-static xchar_t *
-parse_key (const xchar_t  *key_name,
-           const xchar_t  *registry_prefix,
-           xchar_t       **value_name)
+static gchar *
+parse_key (const gchar  *key_name,
+           const gchar  *registry_prefix,
+           gchar       **value_name)
 {
-  xchar_t *path_name, *c;
+  gchar *path_name, *c;
 
   /* All key paths are treated as absolute; gsettings doesn't seem to enforce a
    * preceding /.
@@ -247,9 +247,9 @@ parse_key (const xchar_t  *key_name,
     key_name++;
 
   if (registry_prefix == NULL)
-    path_name = xstrdup (key_name);
+    path_name = g_strdup (key_name);
   else
-    path_name = xstrjoin ("/", registry_prefix, key_name, NULL);
+    path_name = g_strjoin ("/", registry_prefix, key_name, NULL);
 
   /* Prefix is expected to be in registry format (\ separators) so don't escape that. */
   for (c = path_name + (registry_prefix ? strlen (registry_prefix) : 0); *c != 0; c++)
@@ -268,22 +268,22 @@ parse_key (const xchar_t  *key_name,
 }
 
 static DWORD
-xvariant_get_as_dword (xvariant_t *variant)
+g_variant_get_as_dword (GVariant *variant)
 {
-  switch (xvariant_get_type_string (variant)[0])
+  switch (g_variant_get_type_string (variant)[0])
     {
     case 'b':
-      return xvariant_get_boolean (variant);
+      return g_variant_get_boolean (variant);
     case 'y':
-      return xvariant_get_byte (variant);
+      return g_variant_get_byte (variant);
     case 'n':
-      return xvariant_get_int16 (variant);
+      return g_variant_get_int16 (variant);
     case 'q':
-      return xvariant_get_uint16 (variant);
+      return g_variant_get_uint16 (variant);
     case 'i':
-      return xvariant_get_int32 (variant);
+      return g_variant_get_int32 (variant);
     case 'u':
-      return xvariant_get_uint32 (variant);
+      return g_variant_get_uint32 (variant);
     default:
       g_warn_if_reached ();
     }
@@ -291,14 +291,14 @@ xvariant_get_as_dword (xvariant_t *variant)
 }
 
 static DWORDLONG
-xvariant_get_as_qword (xvariant_t *variant)
+g_variant_get_as_qword (GVariant *variant)
 {
-  switch (xvariant_get_type_string (variant)[0])
+  switch (g_variant_get_type_string (variant)[0])
     {
     case 'x':
-      return xvariant_get_int64 (variant);
+      return g_variant_get_int64 (variant);
     case 't':
-      return xvariant_get_uint64 (variant);
+      return g_variant_get_uint64 (variant);
     default:
       g_warn_if_reached ();
     }
@@ -307,8 +307,8 @@ xvariant_get_as_qword (xvariant_t *variant)
 
 static void
 handle_read_error (LONG         result,
-                   const xchar_t *path_name,
-                   const xchar_t *value_name)
+                   const gchar *path_name,
+                   const gchar *value_name)
 {
   /* file not found means key value not set, this isn't an error for us. */
   if (result != ERROR_FILE_NOT_FOUND)
@@ -325,7 +325,7 @@ typedef struct {
   DWORD type;
 
   union {
-    xint_t  dword;  /* FIXME: could inline QWORD on 64-bit systems too */
+    gint  dword;  /* FIXME: could inline QWORD on 64-bit systems too */
     void *ptr;
   };
 } RegistryValue;
@@ -334,15 +334,15 @@ static char *
 registry_value_dump (RegistryValue value)
 {
   if (value.type == REG_DWORD)
-    return xstrdup_printf ("%d", value.dword);
+    return g_strdup_printf ("%d", value.dword);
   else if (value.type == REG_QWORD)
-    return xstrdup_printf ("%"G_GINT64_FORMAT, value.ptr == NULL ? 0: *(DWORDLONG *)value.ptr);
+    return g_strdup_printf ("%"G_GINT64_FORMAT, value.ptr == NULL ? 0: *(DWORDLONG *)value.ptr);
   else if (value.type == REG_SZ)
-    return xstrdup_printf ("%s", (char *)value.ptr);
+    return g_strdup_printf ("%s", (char *)value.ptr);
   else if (value.type == REG_NONE)
-    return xstrdup_printf ("<empty>");
+    return g_strdup_printf ("<empty>");
   else
-    return xstrdup_printf ("<invalid>");
+    return g_strdup_printf ("<invalid>");
 }
 
 static void
@@ -359,14 +359,14 @@ registry_value_free (RegistryValue value)
  * don't sort it in a clever way. Each node corresponds to a path element
  * ('key' in registry terms) or a value.
  *
- * Each subscription uses the same cache. Because xsettings_t can subscribe to
+ * Each subscription uses the same cache. Because GSettings can subscribe to
  * the tree at any node any number of times, we need to reference count the
  * nodes.
  */
 typedef struct
 {
   /* Component of path that this node represents */
-  xchar_t *name;
+  gchar *name;
 
   /* If a watch is subscribed at this point (subscription_count > 0) we can
    * block its next notification. This is useful because if two watches cover
@@ -378,31 +378,31 @@ typedef struct
   /* Number of times g_settings_subscribe has been called for this location
    * (I guess you can't subscribe more than 16383 times) */
   gint32 subscription_count : 14;
-
+  
   gint32 ref_count : 9;
 
   gint32 readable : 1;
   RegistryValue value;
 } RegistryCacheItem;
 
-static xnode_t *
-registry_cache_add_item (xnode_t         *parent,
-                         xchar_t         *name,
+static GNode *
+registry_cache_add_item (GNode         *parent,
+                         gchar         *name,
                          RegistryValue  value,
-                         xint_t           ref_count)
+                         gint           ref_count)
 {
   RegistryCacheItem *item;
-  xnode_t *cache_node;
+  GNode *cache_node;
 
-  xreturn_val_if_fail (name != NULL, NULL);
-  xreturn_val_if_fail (parent != NULL, NULL);
+  g_return_val_if_fail (name != NULL, NULL);
+  g_return_val_if_fail (parent != NULL, NULL);
 
   item = g_slice_new (RegistryCacheItem);
 
   /* Ref count should be the number of watch points above this node */
   item->ref_count = ref_count;
 
-  item->name = xstrdup (name);
+  item->name = g_strdup (name);
   item->value = value;
   item->subscription_count = 0;
   item->block_count = 0;
@@ -418,13 +418,13 @@ registry_cache_add_item (xnode_t         *parent,
 }
 
 /* The reference counting of cache tree nodes works like this: when a node is
- * subscribed to (xsettings_t wants us to watch that path and everything below
+ * subscribed to (GSettings wants us to watch that path and everything below
  * it) the reference count of that node and everything below is increased, as
  * well as each parent up to the root.
  */
 
 static void
-_ref_down (xnode_t *node)
+_ref_down (GNode *node)
 {
   RegistryCacheItem *item = node->data;
 
@@ -434,10 +434,10 @@ _ref_down (xnode_t *node)
 }
 
 static void
-registry_cache_ref_tree (xnode_t *tree)
+registry_cache_ref_tree (GNode *tree)
 {
   RegistryCacheItem *item = tree->data;
-  xnode_t *node = tree->parent;
+  GNode *node = tree->parent;
 
   g_return_if_fail (tree != NULL);
 
@@ -465,7 +465,7 @@ registry_cache_item_free (RegistryCacheItem *item)
 
 /* Unreferencing has to be done bottom-up */
 static void
-_unref_node (xnode_t *node)
+_unref_node (GNode *node)
 {
   RegistryCacheItem *item = node->data;
 
@@ -481,7 +481,7 @@ _unref_node (xnode_t *node)
 }
 
 static void
-_unref_down (xnode_t *node)
+_unref_down (GNode *node)
 {
   g_node_children_foreach (node, G_TRAVERSE_ALL,
                            (GNodeForeachFunc)_unref_down, NULL);
@@ -489,9 +489,9 @@ _unref_down (xnode_t *node)
 }
 
 static void
-registry_cache_unref_tree (xnode_t *tree)
+registry_cache_unref_tree (GNode *tree)
 {
-  xnode_t *parent = tree->parent, *next_parent;
+  GNode *parent = tree->parent, *next_parent;
 
   _unref_down (tree);
 
@@ -505,8 +505,8 @@ registry_cache_unref_tree (xnode_t *tree)
 
 #if 0
 static void
-registry_cache_dump (xnode_t    *cache_node,
-                     xpointer_t  data)
+registry_cache_dump (GNode    *cache_node,
+                     gpointer  data)
 {
   RegistryCacheItem *item = cache_node->data;
 
@@ -521,7 +521,7 @@ registry_cache_dump (xnode_t    *cache_node,
   if (item == NULL)
     g_print ("*root*\n");
   else
-    g_print ("'%s'  [%i] @ %x = %s\n", item->name, item->ref_count, (xuint_t)cache_node,
+    g_print ("'%s'  [%i] @ %x = %s\n", item->name, item->ref_count, (guint)cache_node,
              registry_value_dump (item->value));
   g_node_children_foreach (cache_node, G_TRAVERSE_ALL, registry_cache_dump,
                            GINT_TO_POINTER (new_depth));
@@ -530,13 +530,13 @@ registry_cache_dump (xnode_t    *cache_node,
 
 typedef struct
 {
-  xchar_t *name;
-  xnode_t *result;
+  gchar *name;
+  GNode *result;
 } RegistryCacheSearch;
 
-static xboolean_t
-registry_cache_find_compare (xnode_t    *node,
-                             xpointer_t  data)
+static gboolean
+registry_cache_find_compare (GNode    *node,
+                             gpointer  data)
 {
   RegistryCacheSearch *search = data;
   RegistryCacheItem *item = node->data;
@@ -544,8 +544,8 @@ registry_cache_find_compare (xnode_t    *node,
   if (item == NULL)  /* root node */
     return FALSE;
 
-  xreturn_val_if_fail (search->name != NULL, FALSE);
-  xreturn_val_if_fail (item->name != NULL, FALSE);
+  g_return_val_if_fail (search->name != NULL, FALSE);
+  g_return_val_if_fail (item->name != NULL, FALSE);
 
   if (strcmp (search->name, item->name) == 0)
     {
@@ -556,9 +556,9 @@ registry_cache_find_compare (xnode_t    *node,
   return FALSE;
 }
 
-static xnode_t *
-registry_cache_find_immediate_child (xnode_t *node,
-                                     xchar_t *name)
+static GNode *
+registry_cache_find_immediate_child (GNode *node,
+                                     gchar *name)
 {
   RegistryCacheSearch search;
 
@@ -571,16 +571,16 @@ registry_cache_find_immediate_child (xnode_t *node,
   return search.result;
 }
 
-static xnode_t *
-registry_cache_get_node_for_key_recursive (xnode_t    *node,
-                                           xchar_t    *key_name,
-                                           xboolean_t  create_if_not_found,
-                                           xint_t      n_parent_watches)
+static GNode *
+registry_cache_get_node_for_key_recursive (GNode    *node,
+                                           gchar    *key_name,
+                                           gboolean  create_if_not_found,
+                                           gint      n_parent_watches)
 {
   RegistryCacheItem *item;
-  xchar_t *component = key_name;
-  xchar_t *c = strchr (component, '/');
-  xnode_t *child;
+  gchar *component = key_name;
+  gchar *c = strchr (component, '/');
+  GNode *child;
 
   if (c != NULL)
     *c = 0;
@@ -615,23 +615,23 @@ registry_cache_get_node_for_key_recursive (xnode_t    *node,
                                                     n_parent_watches);
 }
 
-/* Look up a xsettings_t key in the cache. */
-static xnode_t *
-registry_cache_get_node_for_key (xnode_t       *root,
-                                 const xchar_t *key_name,
-                                 xboolean_t     create_if_not_found)
+/* Look up a GSettings key in the cache. */
+static GNode *
+registry_cache_get_node_for_key (GNode       *root,
+                                 const gchar *key_name,
+                                 gboolean     create_if_not_found)
 {
-  xnode_t *child = NULL;
-  xnode_t *result = NULL;
-  xchar_t *component, *c;
+  GNode *child = NULL;
+  GNode *result = NULL;
+  gchar *component, *c;
 
-  xreturn_val_if_fail (key_name != NULL, NULL);
+  g_return_val_if_fail (key_name != NULL, NULL);
 
   if (key_name[0] == '/')
     key_name++;
 
   /* Ignore preceding / */
-  component = xstrdup (key_name);
+  component = g_strdup (key_name);
   c = strchr (component, '/');
 
   if (c == NULL)
@@ -669,14 +669,14 @@ registry_cache_get_node_for_key (xnode_t       *root,
 /* Check the cache node against the registry key it represents. Return TRUE if
  * they differ, and update the cache with the new value.
  */
-static xboolean_t
-registry_cache_update_node (xnode_t        *cache_node,
+static gboolean
+registry_cache_update_node (GNode        *cache_node,
                             RegistryValue registry_value)
 {
   RegistryCacheItem *cache_item;
 
-  xreturn_val_if_fail (cache_node != NULL, FALSE);
-  xreturn_val_if_fail (cache_node->data != NULL, FALSE);
+  g_return_val_if_fail (cache_node != NULL, FALSE);
+  g_return_val_if_fail (cache_node->data != NULL, FALSE);
 
   cache_item = cache_node->data;
 
@@ -690,7 +690,7 @@ registry_cache_update_node (xnode_t        *cache_node,
       cache_item->value = registry_value;
       return TRUE;
     }
-
+ 
   switch (registry_value.type)
     {
     case REG_DWORD:
@@ -705,7 +705,7 @@ registry_cache_update_node (xnode_t        *cache_node,
       }
     case REG_QWORD:
       {
-        xreturn_val_if_fail (registry_value.ptr != NULL &&
+        g_return_val_if_fail (registry_value.ptr != NULL &&
                               cache_item->value.ptr != NULL, FALSE);
 
         if (memcmp (registry_value.ptr, cache_item->value.ptr, 8)==0)
@@ -723,8 +723,8 @@ registry_cache_update_node (xnode_t        *cache_node,
     case REG_SZ:
       {
         /* Value should not exist if it is NULL, an empty string is "" */
-        xreturn_val_if_fail (cache_item->value.ptr != NULL, FALSE);
-        xreturn_val_if_fail (registry_value.ptr != NULL, FALSE);
+        g_return_val_if_fail (cache_item->value.ptr != NULL, FALSE);
+        g_return_val_if_fail (registry_value.ptr != NULL, FALSE);
 
         if (strcmp (registry_value.ptr, cache_item->value.ptr) == 0)
           {
@@ -745,14 +745,14 @@ registry_cache_update_node (xnode_t        *cache_node,
 }
 
 /* Blocking notifications is a useful optimisation. When a change is made
- * through xsettings_t we update the cache manually, but a notification is
+ * through GSettings we update the cache manually, but a notification is
  * triggered as well. This function is also used for nested notifications,
  * eg. if /test and /test/foo are watched, and /test/foo/value is changed then
  * we will get notified both for /test/foo and /test and it is helpful to block
  * the second.
  */
 static void
-registry_cache_block_notification (xnode_t *node)
+registry_cache_block_notification (GNode *node)
 {
   RegistryCacheItem *item = node->data;
 
@@ -765,30 +765,30 @@ registry_cache_block_notification (xnode_t *node)
     registry_cache_block_notification (node->parent);
 }
 
-static void registry_cache_destroy_tree (xnode_t            *node,
+static void registry_cache_destroy_tree (GNode            *node,
                                          WatchThreadState *self);
 
 /***************************************************************************
  * Reading and writing
  ***************************************************************************/
 
-static xboolean_t
+static gboolean
 registry_read (HKEY           hpath,
-               const xchar_t   *path_name,
-               const xchar_t   *value_name,
+               const gchar   *path_name,
+               const gchar   *value_name,
                RegistryValue *p_value)
 {
   LONG result;
   DWORD value_data_size;
-  xpointer_t *buffer;
-  xunichar2_t *value_namew;
+  gpointer *buffer;
+  gunichar2 *value_namew;
 
-  xreturn_val_if_fail (p_value != NULL, FALSE);
+  g_return_val_if_fail (p_value != NULL, FALSE);
 
   p_value->type = REG_NONE;
   p_value->ptr = NULL;
 
-  value_namew = xutf8_to_utf16 (value_name, -1, NULL, NULL, NULL);
+  value_namew = g_utf8_to_utf16 (value_name, -1, NULL, NULL, NULL);
 
   result = RegQueryValueExW (hpath, value_namew, 0, &p_value->type, NULL, &value_data_size);
   if (result != ERROR_SUCCESS)
@@ -800,7 +800,7 @@ registry_read (HKEY           hpath,
 
   if (p_value->type == REG_SZ && value_data_size == 0)
     {
-      p_value->ptr = xstrdup ("");
+      p_value->ptr = g_strdup ("");
       g_free (value_namew);
       return TRUE;
     }
@@ -826,7 +826,7 @@ registry_read (HKEY           hpath,
 
   if (p_value->type == REG_SZ)
     {
-      xchar_t *valueu8 = xutf16_to_utf8 (p_value->ptr, -1, NULL, NULL, NULL);
+      gchar *valueu8 = g_utf16_to_utf8 (p_value->ptr, -1, NULL, NULL, NULL);
       g_free (p_value->ptr);
       p_value->ptr = valueu8;
     }
@@ -834,19 +834,19 @@ registry_read (HKEY           hpath,
   return TRUE;
 }
 
-static xvariant_t *
-g_registry_backend_read (xsettings_backend_t   *backend,
-                         const xchar_t        *key_name,
-                         const xvariant_type_t *expected_type,
-                         xboolean_t            default_value)
+static GVariant *
+g_registry_backend_read (GSettingsBackend   *backend,
+                         const gchar        *key_name,
+                         const GVariantType *expected_type,
+                         gboolean            default_value)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (backend);
-  xnode_t *cache_node;
+  GNode *cache_node;
   RegistryValue registry_value;
-  xvariant_t *gsettings_value = NULL;
-  xchar_t *gsettings_type;
+  GVariant *gsettings_value = NULL;
+  gchar *gsettings_type;
 
-  xreturn_val_if_fail (expected_type != NULL, NULL);
+  g_return_val_if_fail (expected_type != NULL, NULL);
 
   if (default_value)
     return NULL;
@@ -869,7 +869,7 @@ g_registry_backend_read (xsettings_backend_t   *backend,
 
   registry_value = ((RegistryCacheItem *)cache_node->data)->value;
 
-  gsettings_type = xvariant_type_dup_string (expected_type);
+  gsettings_type = g_variant_type_dup_string (expected_type);
 
   /* The registry is user-editable, so we need to be fault-tolerant here. */
   switch (gsettings_type[0])
@@ -881,7 +881,7 @@ g_registry_backend_read (xsettings_backend_t   *backend,
     case 'i':
     case 'u':
       if (registry_value.type == REG_DWORD)
-        gsettings_value = xvariant_new (gsettings_type, registry_value.dword);
+        gsettings_value = g_variant_new (gsettings_type, registry_value.dword);
       break;
 
     case 't':
@@ -889,7 +889,7 @@ g_registry_backend_read (xsettings_backend_t   *backend,
       if (registry_value.type == REG_QWORD)
         {
           DWORDLONG qword_value = *(DWORDLONG *)registry_value.ptr;
-          gsettings_value = xvariant_new (gsettings_type, qword_value);
+          gsettings_value = g_variant_new (gsettings_type, qword_value);
         }
       break;
 
@@ -897,12 +897,12 @@ g_registry_backend_read (xsettings_backend_t   *backend,
       if (registry_value.type == REG_SZ)
         {
           if (gsettings_type[0] == 's')
-            gsettings_value = xvariant_new_string ((char *)registry_value.ptr);
+            gsettings_value = g_variant_new_string ((char *)registry_value.ptr);
           else
             {
-              xerror_t *error = NULL;
+              GError *error = NULL;
 
-              gsettings_value = xvariant_parse (expected_type, registry_value.ptr,
+              gsettings_value = g_variant_parse (expected_type, registry_value.ptr,
                                                  NULL, NULL, &error);
 
               if (error != NULL)
@@ -925,29 +925,29 @@ typedef struct
   HKEY hroot;
 } RegistryWrite;
 
-static xboolean_t
+static gboolean
 g_registry_backend_write_one (const char *key_name,
-                              xvariant_t   *variant,
-                              xpointer_t    user_data)
+                              GVariant   *variant,
+                              gpointer    user_data)
 {
   GRegistryBackend *self;
   RegistryWrite *action;
   RegistryValue value;
   HKEY hroot;
   HKEY hpath;
-  xchar_t *path_name;
-  xunichar2_t *path_namew;
-  xchar_t *value_name = NULL;
-  xunichar2_t *value_namew;
+  gchar *path_name;
+  gunichar2 *path_namew;
+  gchar *value_name = NULL;
+  gunichar2 *value_namew;
   DWORD value_data_size;
   LPVOID value_data;
-  xunichar2_t *value_dataw;
+  gunichar2 *value_dataw;
   LONG result;
-  xnode_t *node;
-  xboolean_t changed;
-  const xchar_t *type_string;
+  GNode *node;
+  gboolean changed;
+  const gchar *type_string;
 
-  type_string = xvariant_get_type_string (variant);
+  type_string = g_variant_get_type_string (variant);
   action = user_data;
   self = G_REGISTRY_BACKEND (action->self);
   hroot = action->hroot;
@@ -964,7 +964,7 @@ g_registry_backend_write_one (const char *key_name,
     case 'i':
     case 'u':
       value.type = REG_DWORD;
-      value.dword = xvariant_get_as_dword (variant);
+      value.dword = g_variant_get_as_dword (variant);
       value_data_size = 4;
       value_data = &value.dword;
       break;
@@ -973,7 +973,7 @@ g_registry_backend_write_one (const char *key_name,
     case 't':
       value.type = REG_QWORD;
       value.ptr = g_malloc (8);
-      *(DWORDLONG *)value.ptr = xvariant_get_as_qword (variant);
+      *(DWORDLONG *)value.ptr = g_variant_get_as_qword (variant);
       value_data_size = 8;
       value_data = value.ptr;
       break;
@@ -982,24 +982,24 @@ g_registry_backend_write_one (const char *key_name,
       value.type = REG_SZ;
       if (type_string[0] == 's')
         {
-          xsize_t length;
-          value.ptr = xstrdup (xvariant_get_string (variant, &length));
+          gsize length;
+          value.ptr = g_strdup (g_variant_get_string (variant, &length));
           value_data_size = length + 1;
           value_data = value.ptr;
         }
       else
         {
-          xstring_t *value_string;
-          value_string = xvariant_print_string (variant, NULL, FALSE);
+          GString *value_string;
+          value_string = g_variant_print_string (variant, NULL, FALSE);
           value_data_size = value_string->len + 1;
-          value.ptr = value_data = xstring_free (value_string, FALSE);
+          value.ptr = value_data = g_string_free (value_string, FALSE);
         }
       break;
     }
 
   /* First update the cache, because the value may not have changed and we can
    * save a write.
-   *
+   * 
    * If 'value' has changed then its memory will not be freed by update_node(),
    * because it will be stored in the node.
    */
@@ -1021,7 +1021,7 @@ g_registry_backend_write_one (const char *key_name,
 
   trace ("Set key: %s / %s\n", path_name, value_name);
 
-  path_namew = xutf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
+  path_namew = g_utf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
 
   /* Store the value in the registry */
   result = RegCreateKeyExW (hroot, path_namew, 0, NULL, 0, KEY_WRITE, NULL, &hpath, NULL);
@@ -1037,7 +1037,7 @@ g_registry_backend_write_one (const char *key_name,
 
   g_free (path_namew);
 
-  value_namew = xutf8_to_utf16 (value_name, -1, NULL, NULL, NULL);
+  value_namew = g_utf8_to_utf16 (value_name, -1, NULL, NULL, NULL);
 
   value_dataw = NULL;
 
@@ -1053,9 +1053,9 @@ g_registry_backend_write_one (const char *key_name,
     case 't':
       break;
     default:
-      value_dataw = xutf8_to_utf16 (value_data, -1, NULL, NULL, NULL);
+      value_dataw = g_utf8_to_utf16 (value_data, -1, NULL, NULL, NULL);
       value_data = value_dataw;
-      value_data_size = (DWORD)((wcslen (value_data) + 1) * sizeof (xunichar2_t));
+      value_data_size = (DWORD)((wcslen (value_data) + 1) * sizeof (gunichar2));
       break;
     }
 
@@ -1078,15 +1078,15 @@ g_registry_backend_write_one (const char *key_name,
   return FALSE;
 }
 
-/* The dconf write policy is to do the write while making out it succeeded,
+/* The dconf write policy is to do the write while making out it succeeded, 
  * and then backtrack if it didn't. The registry functions are synchronous so
  * we can't do that. */
 
-static xboolean_t
-g_registry_backend_write (xsettings_backend_t *backend,
-                          const xchar_t      *key_name,
-                          xvariant_t         *value,
-                          xpointer_t          origin_tag)
+static gboolean
+g_registry_backend_write (GSettingsBackend *backend,
+                          const gchar      *key_name,
+                          GVariant         *value,
+                          gpointer          origin_tag)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (backend);
   LONG result;
@@ -1111,10 +1111,10 @@ g_registry_backend_write (xsettings_backend_t *backend,
   return TRUE;
 }
 
-static xboolean_t
-g_registry_backend_write_tree (xsettings_backend_t *backend,
-                               xtree_t            *values,
-                               xpointer_t          origin_tag)
+static gboolean
+g_registry_backend_write_tree (GSettingsBackend *backend,
+                               GTree            *values,
+                               gpointer          origin_tag)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (backend);
   LONG result;
@@ -1131,7 +1131,7 @@ g_registry_backend_write_tree (xsettings_backend_t *backend,
 
   action.self =  self;
   action.hroot = hroot;
-  xtree_foreach (values, (GTraverseFunc)g_registry_backend_write_one,
+  g_tree_foreach (values, (GTraverseFunc)g_registry_backend_write_one,
                   &action);
 
   g_settings_backend_changed_tree (backend, values, origin_tag);
@@ -1141,16 +1141,16 @@ g_registry_backend_write_tree (xsettings_backend_t *backend,
 }
 
 static void
-g_registry_backend_reset (xsettings_backend_t *backend,
-                          const xchar_t      *key_name,
-                          xpointer_t          origin_tag)
+g_registry_backend_reset (GSettingsBackend *backend,
+                          const gchar      *key_name,
+                          gpointer          origin_tag)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (backend);
-  xchar_t *path_name;
-  xunichar2_t *path_namew;
-  xchar_t *value_name = NULL;
-  xunichar2_t *value_namew;
-  xnode_t *cache_node;
+  gchar *path_name;
+  gunichar2 *path_namew;
+  gchar *value_name = NULL;
+  gunichar2 *value_namew;
+  GNode *cache_node;
   LONG result;
   HKEY hpath;
 
@@ -1163,7 +1163,7 @@ g_registry_backend_reset (xsettings_backend_t *backend,
 
   /* Remove from the registry */
   path_name = parse_key (key_name, self->base_path, &value_name);
-  path_namew = xutf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
+  path_namew = g_utf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
 
   result = RegOpenKeyExW (HKEY_CURRENT_USER, path_namew, 0, KEY_SET_VALUE, &hpath);
   g_free (path_namew);
@@ -1175,7 +1175,7 @@ g_registry_backend_reset (xsettings_backend_t *backend,
       return;
     }
 
-  value_namew = xutf8_to_utf16 (value_name, -1, NULL, NULL, NULL);
+  value_namew = g_utf8_to_utf16 (value_name, -1, NULL, NULL, NULL);
 
   result = RegDeleteValueW (hpath, value_namew);
   g_free (value_namew);
@@ -1193,19 +1193,19 @@ g_registry_backend_reset (xsettings_backend_t *backend,
   g_settings_backend_changed (backend, key_name, origin_tag);
 }
 
-static xboolean_t
-g_registry_backend_get_writable (xsettings_backend_t *backend,
-                                 const xchar_t      *key_name)
+static gboolean
+g_registry_backend_get_writable (GSettingsBackend *backend,
+                                 const gchar      *key_name)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (backend);
-  xchar_t *path_name;
-  xunichar2_t *path_namew;
-  xchar_t *value_name;
+  gchar *path_name;
+  gunichar2 *path_namew;
+  gchar *value_name = NULL;
   HKEY hpath;
   LONG result;
 
   path_name = parse_key (key_name, self->base_path, &value_name);
-  path_namew = xutf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
+  path_namew = g_utf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
 
   /* Note: we create the key if it wasn't created yet, but it is not much
    * of a problem since at the end of the day we have to create it anyway
@@ -1236,12 +1236,12 @@ g_registry_backend_get_writable (xsettings_backend_t *backend,
 
 static void
 _free_watch (WatchThreadState *self,
-             xuint_t             index,
-             xnode_t            *cache_node);
+             guint             index,
+             GNode            *cache_node);
 
 static void
-registry_cache_item_reset_readable (xnode_t    *node,
-                                    xpointer_t  data)
+registry_cache_item_reset_readable (GNode    *node,
+                                    gpointer  data)
 {
   RegistryCacheItem *item = node->data;
   item->readable = FALSE;
@@ -1249,7 +1249,7 @@ registry_cache_item_reset_readable (xnode_t    *node,
 
 /* Delete a node and any children, for when it has been deleted from the registry */
 static void
-registry_cache_destroy_tree (xnode_t            *node,
+registry_cache_destroy_tree (GNode            *node,
                              WatchThreadState *self)
 {
   RegistryCacheItem *item = node->data;
@@ -1259,7 +1259,7 @@ registry_cache_destroy_tree (xnode_t            *node,
 
   if (item->subscription_count > 0)
     {
-      xuint_t i;
+      guint i;
 
       /* There must be some watches active if this node is a watch point */
       g_warn_if_fail (self->cache_nodes->len > 1);
@@ -1267,7 +1267,7 @@ registry_cache_destroy_tree (xnode_t            *node,
       /* This is a watch point that has been deleted. Let's free the watch! */
       for (i = 1; i < self->cache_nodes->len; i++)
         {
-          if (xptr_array_index (self->cache_nodes, i) == node)
+          if (g_ptr_array_index (self->cache_nodes, i) == node)
             break;
         }
 
@@ -1289,28 +1289,28 @@ registry_cache_destroy_tree (xnode_t            *node,
 typedef struct
 {
   GRegistryBackend *self;
-  xchar_t *prefix;          /* prefix is a gsettings path, all items are subkeys of this. */
-  xptr_array_t *items;       /* each item is a subkey below prefix that has changed. */
+  gchar *prefix;          /* prefix is a gsettings path, all items are subkeys of this. */
+  GPtrArray *items;       /* each item is a subkey below prefix that has changed. */
 } RegistryEvent;
 
 typedef struct
 {
   RegistryEvent *event;
-  xchar_t *current_key_name;
+  gchar *current_key_name;
 } DeletedItemData;
 
 static void
-mark_all_subkeys_as_changed (xnode_t    *node,
-                             xpointer_t  data)
+mark_all_subkeys_as_changed (GNode    *node,
+                             gpointer  data)
 {
   RegistryCacheItem *item = node->data;
   DeletedItemData *item_data = data;
 
   if (item_data->current_key_name == NULL)
-    item_data->current_key_name = xstrdup (item->name);
+    item_data->current_key_name = g_strdup (item->name);
   else
     {
-      xchar_t *name;
+      gchar *name;
 
       name = g_build_path ("/", item_data->current_key_name, item->name, NULL);
       g_free (item_data->current_key_name);
@@ -1322,12 +1322,12 @@ mark_all_subkeys_as_changed (xnode_t    *node,
     g_node_children_foreach (node, G_TRAVERSE_ALL,
                              mark_all_subkeys_as_changed, data);
   else
-    xptr_array_add (item_data->event->items, item_data->current_key_name);
+    g_ptr_array_add (item_data->event->items, item_data->current_key_name);
 }
 
 static void
-registry_cache_remove_deleted (xnode_t    *node,
-                               xpointer_t  data)
+registry_cache_remove_deleted (GNode    *node,
+                               gpointer  data)
 {
   RegistryCacheItem *item = node->data;
   RegistryEvent *event = data;
@@ -1345,7 +1345,7 @@ registry_cache_remove_deleted (xnode_t    *node,
 }
 
 /* Update cache from registry, and optionally report on the changes.
- *
+ * 
  * This function is sometimes called from the watch thread, with no locking. It
  * does call g_registry_backend functions, but this is okay because they only
  * access self->base which is constant.
@@ -1361,16 +1361,16 @@ registry_cache_remove_deleted (xnode_t    *node,
 static void
 registry_cache_update (GRegistryBackend *self,
                        HKEY              hpath,
-                       const xchar_t      *prefix,
-                       const xchar_t      *partial_key_name,
-                       xnode_t            *cache_node,
+                       const gchar      *prefix,
+                       const gchar      *partial_key_name,
+                       GNode            *cache_node,
                        int               n_watches,
                        RegistryEvent    *event)
 {
-  xunichar2_t bufferw[MAX_KEY_NAME_LENGTH + 1];
-  xchar_t *buffer;
-  xchar_t *key_name;
-  xint_t i;
+  gunichar2 bufferw[MAX_KEY_NAME_LENGTH + 1];
+  gchar *buffer;
+  gchar *key_name;
+  gint i;
   LONG result;
   RegistryCacheItem *item;
 
@@ -1406,11 +1406,11 @@ registry_cache_update (GRegistryBackend *self,
       result = RegOpenKeyExW (hpath, bufferw, 0, KEY_READ, &hsubpath);
       if (result == ERROR_SUCCESS)
         {
-          xnode_t *subkey_node;
+          GNode *subkey_node;
           RegistryCacheItem *child_item;
-          xchar_t *new_partial_key_name;
+          gchar *new_partial_key_name;
 
-          buffer = xutf16_to_utf8 (bufferw, -1, NULL, NULL, NULL);
+          buffer = g_utf16_to_utf8 (bufferw, -1, NULL, NULL, NULL);
           if (buffer == NULL)
             continue;
 
@@ -1443,16 +1443,16 @@ registry_cache_update (GRegistryBackend *self,
   while (1)
     {
       DWORD bufferw_size = MAX_KEY_NAME_LENGTH + 1;
-      xnode_t *cache_child_node;
+      GNode *cache_child_node;
       RegistryCacheItem *child_item;
       RegistryValue value;
-      xboolean_t changed = FALSE;
+      gboolean changed = FALSE;
 
       result = RegEnumValueW (hpath, i++, bufferw, &bufferw_size, NULL, NULL, NULL, NULL);
       if (result != ERROR_SUCCESS)
         break;
 
-      buffer = xutf16_to_utf8 (bufferw, -1, NULL, NULL, NULL);
+      buffer = g_utf16_to_utf8 (bufferw, -1, NULL, NULL, NULL);
 
       if (buffer == NULL || buffer[0] == 0)
         {
@@ -1481,7 +1481,7 @@ registry_cache_update (GRegistryBackend *self,
         }
       else
         {
-         /* For efficiency, instead of converting every value back to a xvariant_t to
+         /* For efficiency, instead of converting every value back to a GVariant to
           * compare it, we compare them as registry values (integers, or string
           * representations of the variant). The spurious change notifications that may
           * result should not be a big issue.
@@ -1495,14 +1495,14 @@ registry_cache_update (GRegistryBackend *self,
       child_item->readable = TRUE;
       if (changed && event != NULL)
         {
-          xchar_t *item;
+          gchar *item_path;
 
           if (partial_key_name == NULL)
-            item = xstrdup (buffer);
+            item_path = g_strdup (buffer);
           else
-            item = g_build_path ("/", partial_key_name, buffer, NULL);
+            item_path = g_build_path ("/", partial_key_name, buffer, NULL);
 
-          xptr_array_add (event->items, item);
+          g_ptr_array_add (event->items, item_path);
         }
 
       g_free (buffer);
@@ -1535,43 +1535,43 @@ registry_watch_key (HKEY   hpath,
 }
 
 /* This handler runs in the main thread to emit the changed signals */
-static xboolean_t
+static gboolean
 watch_handler (RegistryEvent *event)
 {
   trace ("Watch handler: got event in %s, items %i.\n", event->prefix, event->items->len);
 
-  /* xsettings_t requires us to NULL-terminate the array. */
-  xptr_array_add (event->items, NULL);
+  /* GSettings requires us to NULL-terminate the array. */
+  g_ptr_array_add (event->items, NULL);
   g_settings_backend_keys_changed (G_SETTINGS_BACKEND (event->self), event->prefix,
-                                   (xchar_t const **)event->items->pdata, NULL);
+                                   (gchar const **)event->items->pdata, NULL);
 
-  xptr_array_free (event->items, TRUE);
+  g_ptr_array_free (event->items, TRUE);
   g_free (event->prefix);
-  xobject_unref (event->self);
+  g_object_unref (event->self);
   g_slice_free (RegistryEvent, event);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
 _free_watch (WatchThreadState *self,
-             xuint_t             index,
-             xnode_t            *cache_node)
+             guint             index,
+             GNode            *cache_node)
 {
   HKEY hpath;
   HANDLE cond;
-  xchar_t *prefix;
+  gchar *prefix;
 
   g_return_if_fail (index > 0 && index < self->events->len);
 
-  cond = xptr_array_index (self->events, index);
-  hpath = xptr_array_index (self->handles, index);
-  prefix = xptr_array_index (self->prefixes, index);
+  cond = g_ptr_array_index (self->events, index);
+  hpath = g_ptr_array_index (self->handles, index);
+  prefix = g_ptr_array_index (self->prefixes, index);
 
   trace ("Freeing watch %i [%s]\n", index, prefix);
-
+ 
   /* These can be NULL if the watch was already dead, this can happen when eg.
-   * a key is deleted but xsettings_t is still subscribed to it - the watch is
+   * a key is deleted but GSettings is still subscribed to it - the watch is
    * kept alive so that the unsubscribe function works properly, but does not
    * do anything.
    */
@@ -1590,10 +1590,10 @@ _free_watch (WatchThreadState *self,
   /* As long as we remove from each array at the same time, it doesn't matter that
    * their orders get messed up - they all get messed up the same.
    */
-  xptr_array_remove_index_fast (self->handles, index);
-  xptr_array_remove_index_fast (self->events, index);
-  xptr_array_remove_index_fast (self->prefixes, index);
-  xptr_array_remove_index_fast (self->cache_nodes, index);
+  g_ptr_array_remove_index_fast (self->handles, index);
+  g_ptr_array_remove_index_fast (self->events, index);
+  g_ptr_array_remove_index_fast (self->prefixes, index);
+  g_ptr_array_remove_index_fast (self->cache_nodes, index);
 }
 
 static void
@@ -1614,10 +1614,10 @@ watch_thread_handle_message (WatchThreadState *self)
 
         if (result == ERROR_SUCCESS)
           {
-            xptr_array_add (self->events, watch->event);
-            xptr_array_add (self->handles, watch->hpath);
-            xptr_array_add (self->prefixes, watch->prefix);
-            xptr_array_add (self->cache_nodes, watch->cache_node);
+            g_ptr_array_add (self->events, watch->event);
+            g_ptr_array_add (self->handles, watch->hpath);
+            g_ptr_array_add (self->prefixes, watch->prefix);
+            g_ptr_array_add (self->cache_nodes, watch->cache_node);
 
             trace ("watch thread: new watch on %s, %i total\n", watch->prefix,
                    self->events->len);
@@ -1636,13 +1636,13 @@ watch_thread_handle_message (WatchThreadState *self)
 
     case WATCH_THREAD_REMOVE_WATCH:
       {
-        xnode_t *cache_node;
+        GNode *cache_node;
         RegistryCacheItem *cache_item;
-        xuint_t i;
+        guint i;
 
         for (i = 1; i < self->prefixes->len; i++)
           {
-            if (strcmp (xptr_array_index (self->prefixes, i),
+            if (strcmp (g_ptr_array_index (self->prefixes, i),
                         self->message.watch.prefix) == 0)
               break;
           }
@@ -1658,7 +1658,7 @@ watch_thread_handle_message (WatchThreadState *self)
             break;
           }
 
-        cache_node = xptr_array_index (self->cache_nodes, i);
+        cache_node = g_ptr_array_index (self->cache_nodes, i);
 
         trace ("watch thread: unsubscribe: freeing node %p, prefix %s, index %i\n",
                cache_node, self->message.watch.prefix, i);
@@ -1667,7 +1667,7 @@ watch_thread_handle_message (WatchThreadState *self)
           {
             cache_item = cache_node->data;
 
-            /* There may be more than one xsettings_t object subscribed to this
+            /* There may be more than one GSettings object subscribed to this
              * path, only free the watch when the last one unsubscribes.
              */
             cache_item->subscription_count--;
@@ -1684,11 +1684,11 @@ watch_thread_handle_message (WatchThreadState *self)
 
     case WATCH_THREAD_STOP:
       {
-        xuint_t i;
+        guint i;
 
         /* Free any remaining cache and watch handles */
         for (i = 1; i < self->events->len; i++)
-          _free_watch (self, i, xptr_array_index (self->cache_nodes, i));
+          _free_watch (self, i, g_ptr_array_index (self->cache_nodes, i));
 
         SetEvent (self->message_received_event);
         ExitThread (0);
@@ -1706,14 +1706,14 @@ watch_thread_function (LPVOID parameter)
   WatchThreadState *self = (WatchThreadState *)parameter;
   DWORD result;
 
-  self->events = xptr_array_new ();
-  self->handles = xptr_array_new ();
-  self->prefixes = xptr_array_new ();
-  self->cache_nodes = xptr_array_new ();
-  xptr_array_add (self->events, self->message_sent_event);
-  xptr_array_add (self->handles, NULL);
-  xptr_array_add (self->prefixes, NULL);
-  xptr_array_add (self->cache_nodes, NULL);
+  self->events = g_ptr_array_new ();
+  self->handles = g_ptr_array_new ();
+  self->prefixes = g_ptr_array_new ();
+  self->cache_nodes = g_ptr_array_new ();
+  g_ptr_array_add (self->events, self->message_sent_event);
+  g_ptr_array_add (self->handles, NULL);
+  g_ptr_array_add (self->prefixes, NULL);
+  g_ptr_array_add (self->cache_nodes, NULL);
 
   while (1)
     {
@@ -1732,11 +1732,11 @@ watch_thread_function (LPVOID parameter)
         {
           HKEY hpath;
           HANDLE cond;
-          xchar_t *prefix;
-          xnode_t *cache_node;
+          gchar *prefix;
+          GNode *cache_node;
           RegistryCacheItem *cache_item;
           RegistryEvent *event;
-          xint_t notify_index;
+          gint notify_index;
 
           /* One of our notifications has triggered. All we know is which one, and which key
            * this is for. We do most of the processing here, because we may as well. If the
@@ -1744,10 +1744,10 @@ watch_thread_function (LPVOID parameter)
            * receive another change notification from the OS anyway.
            */
           notify_index = result - WAIT_OBJECT_0;
-          hpath = xptr_array_index (self->handles, notify_index);
-          cond = xptr_array_index (self->events, notify_index);
-          prefix = xptr_array_index (self->prefixes, notify_index);
-          cache_node = xptr_array_index (self->cache_nodes, notify_index);
+          hpath = g_ptr_array_index (self->handles, notify_index);
+          cond = g_ptr_array_index (self->events, notify_index);
+          prefix = g_ptr_array_index (self->prefixes, notify_index);
+          cache_node = g_ptr_array_index (self->cache_nodes, notify_index);
 
           trace ("Watch thread: notify received on prefix %i: %s.\n", notify_index, prefix);
 
@@ -1800,9 +1800,9 @@ watch_thread_function (LPVOID parameter)
            * likely to block (only when changing notification subscriptions).
            */
           event = g_slice_new (RegistryEvent);
-          event->self = G_REGISTRY_BACKEND (xobject_ref (self->owner));
-          event->prefix = xstrdup (prefix);
-          event->items = xptr_array_new_with_free_func (g_free);
+          event->self = G_REGISTRY_BACKEND (g_object_ref (self->owner));
+          event->prefix = g_strdup (prefix);
+          event->items = g_ptr_array_new_with_free_func (g_free);
 
           EnterCriticalSection (G_REGISTRY_BACKEND (self->owner)->cache_lock);
           registry_cache_update (G_REGISTRY_BACKEND (self->owner), hpath,
@@ -1810,12 +1810,12 @@ watch_thread_function (LPVOID parameter)
           LeaveCriticalSection (G_REGISTRY_BACKEND (self->owner)->cache_lock);
 
           if (event->items->len > 0)
-            g_idle_add ((xsource_func_t) watch_handler, event);
+            g_idle_add ((GSourceFunc) watch_handler, event);
           else
             {
-              xobject_unref (event->self);
+              g_object_unref (event->self);
               g_free (event->prefix);
-              xptr_array_free (event->items, TRUE);
+              g_ptr_array_free (event->items, TRUE);
               g_slice_free (RegistryEvent, event);
             }
         }
@@ -1829,12 +1829,12 @@ watch_thread_function (LPVOID parameter)
   return -1;
 }
 
-static xboolean_t
+static gboolean
 watch_start (GRegistryBackend *self)
 {
   WatchThreadState *watch;
 
-  xreturn_val_if_fail (self->watch == NULL, FALSE);
+  g_return_val_if_fail (self->watch == NULL, FALSE);
 
   watch = g_slice_new (WatchThreadState);
   watch->owner = G_SETTINGS_BACKEND (self);
@@ -1910,20 +1910,20 @@ watch_stop_unlocked (GRegistryBackend *self)
   self->watch = NULL;
 }
 
-static xboolean_t
+static gboolean
 watch_add_notify (GRegistryBackend *self,
                   HANDLE            event,
                   HKEY              hpath,
-                  xchar_t            *gsettings_prefix)
+                  gchar            *gsettings_prefix)
 {
   WatchThreadState *watch = self->watch;
-  xnode_t *cache_node;
+  GNode *cache_node;
   RegistryCacheItem *cache_item;
 #ifdef TRACE
   DWORD result;
 #endif
 
-  xreturn_val_if_fail (watch != NULL, FALSE);
+  g_return_val_if_fail (watch != NULL, FALSE);
 
   trace ("watch_add_notify: prefix %s.\n", gsettings_prefix);
 
@@ -1939,7 +1939,7 @@ watch_add_notify (GRegistryBackend *self,
       g_warn_if_reached ();
       return FALSE;
     }
-
+  
   cache_item = cache_node->data;
 
   cache_item->subscription_count++;
@@ -1985,7 +1985,7 @@ watch_add_notify (GRegistryBackend *self,
 
 static void
 watch_remove_notify (GRegistryBackend *self,
-                     const xchar_t      *key_name)
+                     const gchar      *key_name)
 {
   WatchThreadState *watch = self->watch;
   LONG result;
@@ -1999,7 +1999,7 @@ watch_remove_notify (GRegistryBackend *self,
 
   EnterCriticalSection (watch->message_lock);
   watch->message.type = WATCH_THREAD_REMOVE_WATCH;
-  watch->message.watch.prefix = xstrdup (key_name);
+  watch->message.watch.prefix = g_strdup (key_name);
 
   SetEvent (watch->message_sent_event);
 
@@ -2022,13 +2022,13 @@ watch_remove_notify (GRegistryBackend *self,
  * key. Our job is easier because keys and values are separate.
  */
 static void
-g_registry_backend_subscribe (xsettings_backend_t *backend,
+g_registry_backend_subscribe (GSettingsBackend *backend,
                               const char       *key_name)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (backend);
-  xchar_t *path_name;
-  xunichar2_t *path_namew;
-  xchar_t *value_name = NULL;
+  gchar *path_name;
+  gunichar2 *path_namew;
+  gchar *value_name = NULL;
   HKEY hpath;
   HANDLE event;
   LONG result;
@@ -2054,7 +2054,7 @@ g_registry_backend_subscribe (xsettings_backend_t *backend,
 
   trace ("Subscribing to %s [registry %s / %s] - watch %x\n", key_name, path_name, value_name, self->watch);
 
-  path_namew = xutf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
+  path_namew = g_utf8_to_utf16 (path_name, -1, NULL, NULL, NULL);
   g_free (path_name);
 
   /* Give the caller the benefit of the doubt if the key doesn't exist and create it. The caller
@@ -2081,7 +2081,7 @@ g_registry_backend_subscribe (xsettings_backend_t *backend,
 
   /* The actual watch is added by the thread, which has to re-subscribe each time it
    * receives a change. */
-  if (!watch_add_notify (self, event, hpath, xstrdup (key_name)))
+  if (!watch_add_notify (self, event, hpath, g_strdup (key_name)))
     {
       g_atomic_int_inc (&self->watch->watches_remaining);
       RegCloseKey (hpath);
@@ -2090,7 +2090,7 @@ g_registry_backend_subscribe (xsettings_backend_t *backend,
 }
 
 static void
-g_registry_backend_unsubscribe (xsettings_backend_t *backend,
+g_registry_backend_unsubscribe (GSettingsBackend *backend,
                                 const char       *key_name)
 {
   trace ("unsubscribe: %s.\n", key_name);
@@ -2103,7 +2103,7 @@ g_registry_backend_unsubscribe (xsettings_backend_t *backend,
  ********************************************************************************/
 
 static void
-g_registry_backend_finalize (xobject_t *object)
+g_registry_backend_finalize (GObject *object)
 {
   GRegistryBackend *self = G_REGISTRY_BACKEND (object);
   RegistryCacheItem *item;
@@ -2130,8 +2130,8 @@ g_registry_backend_finalize (xobject_t *object)
 static void
 g_registry_backend_class_init (GRegistryBackendClass *class)
 {
-  xsettings_backend_class_t *backend_class = G_SETTINGS_BACKEND_CLASS (class);
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GSettingsBackendClass *backend_class = G_SETTINGS_BACKEND_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
   object_class->finalize = g_registry_backend_finalize;
 
@@ -2149,13 +2149,13 @@ g_registry_backend_init (GRegistryBackend *self)
 {
   RegistryCacheItem *item;
 
-  self->base_path = xstrdup_printf ("Software\\xsettings_t");
-  self->base_pathw = xutf8_to_utf16 (self->base_path, -1, NULL, NULL, NULL);
+  self->base_path = g_strdup_printf ("Software\\GSettings");
+  self->base_pathw = g_utf8_to_utf16 (self->base_path, -1, NULL, NULL, NULL);
 
   item = g_slice_new (RegistryCacheItem);
   item->value.type = REG_NONE;
   item->value.ptr = NULL;
-  item->name = xstrdup ("<root>");
+  item->name = g_strdup ("<root>");
   item->ref_count = 1;
   self->cache_root = g_node_new (item);
 

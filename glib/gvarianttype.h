@@ -21,7 +21,7 @@
 #ifndef __G_VARIANT_TYPE_H__
 #define __G_VARIANT_TYPE_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -30,36 +30,36 @@
 G_BEGIN_DECLS
 
 /**
- * xvariant_type_t:
+ * GVariantType:
  *
- * A type in the xvariant_t type system.
+ * A type in the GVariant type system.
  *
- * Two types may not be compared by value; use xvariant_type_equal() or
- * xvariant_type_is_subtype_of().  May be copied using
- * xvariant_type_copy() and freed using xvariant_type_free().
+ * Two types may not be compared by value; use g_variant_type_equal() or
+ * g_variant_type_is_subtype_of().  May be copied using
+ * g_variant_type_copy() and freed using g_variant_type_free().
  **/
-typedef struct _GVariantType xvariant_type_t;
+typedef struct _GVariantType GVariantType;
 
 /**
  * G_VARIANT_TYPE_BOOLEAN:
  *
  * The type of a value that can be either %TRUE or %FALSE.
  **/
-#define G_VARIANT_TYPE_BOOLEAN              ((const xvariant_type_t *) "b")
+#define G_VARIANT_TYPE_BOOLEAN              ((const GVariantType *) "b")
 
 /**
  * G_VARIANT_TYPE_BYTE:
  *
  * The type of an integer value that can range from 0 to 255.
  **/
-#define G_VARIANT_TYPE_BYTE                 ((const xvariant_type_t *) "y")
+#define G_VARIANT_TYPE_BYTE                 ((const GVariantType *) "y")
 
 /**
  * G_VARIANT_TYPE_INT16:
  *
  * The type of an integer value that can range from -32768 to 32767.
  **/
-#define G_VARIANT_TYPE_INT16                ((const xvariant_type_t *) "n")
+#define G_VARIANT_TYPE_INT16                ((const GVariantType *) "n")
 
 /**
  * G_VARIANT_TYPE_UINT16:
@@ -67,7 +67,7 @@ typedef struct _GVariantType xvariant_type_t;
  * The type of an integer value that can range from 0 to 65535.
  * There were about this many people living in Toronto in the 1870s.
  **/
-#define G_VARIANT_TYPE_UINT16               ((const xvariant_type_t *) "q")
+#define G_VARIANT_TYPE_UINT16               ((const GVariantType *) "q")
 
 /**
  * G_VARIANT_TYPE_INT32:
@@ -75,7 +75,7 @@ typedef struct _GVariantType xvariant_type_t;
  * The type of an integer value that can range from -2147483648 to
  * 2147483647.
  **/
-#define G_VARIANT_TYPE_INT32                ((const xvariant_type_t *) "i")
+#define G_VARIANT_TYPE_INT32                ((const GVariantType *) "i")
 
 /**
  * G_VARIANT_TYPE_UINT32:
@@ -83,7 +83,7 @@ typedef struct _GVariantType xvariant_type_t;
  * The type of an integer value that can range from 0 to 4294967295.
  * That's one number for everyone who was around in the late 1970s.
  **/
-#define G_VARIANT_TYPE_UINT32               ((const xvariant_type_t *) "u")
+#define G_VARIANT_TYPE_UINT32               ((const GVariantType *) "u")
 
 /**
  * G_VARIANT_TYPE_INT64:
@@ -91,7 +91,7 @@ typedef struct _GVariantType xvariant_type_t;
  * The type of an integer value that can range from
  * -9223372036854775808 to 9223372036854775807.
  **/
-#define G_VARIANT_TYPE_INT64                ((const xvariant_type_t *) "x")
+#define G_VARIANT_TYPE_INT64                ((const GVariantType *) "x")
 
 /**
  * G_VARIANT_TYPE_UINT64:
@@ -101,7 +101,7 @@ typedef struct _GVariantType xvariant_type_t;
  * but a Rubik's cube can have a bit more than twice as many possible
  * positions.
  **/
-#define G_VARIANT_TYPE_UINT64               ((const xvariant_type_t *) "t")
+#define G_VARIANT_TYPE_UINT64               ((const GVariantType *) "t")
 
 /**
  * G_VARIANT_TYPE_DOUBLE:
@@ -112,14 +112,14 @@ typedef struct _GVariantType xvariant_type_t;
  * estimated number of fundamental particles in the observable
  * universe.
  **/
-#define G_VARIANT_TYPE_DOUBLE               ((const xvariant_type_t *) "d")
+#define G_VARIANT_TYPE_DOUBLE               ((const GVariantType *) "d")
 
 /**
  * G_VARIANT_TYPE_STRING:
  *
  * The type of a string.  "" is a string.  %NULL is not a string.
  **/
-#define G_VARIANT_TYPE_STRING               ((const xvariant_type_t *) "s")
+#define G_VARIANT_TYPE_STRING               ((const GVariantType *) "s")
 
 /**
  * G_VARIANT_TYPE_OBJECT_PATH:
@@ -132,7 +132,7 @@ typedef struct _GVariantType xvariant_type_t;
  * use of this type.  If you are, then the D-Bus specification contains a
  * precise description of valid object paths.
  **/
-#define G_VARIANT_TYPE_OBJECT_PATH          ((const xvariant_type_t *) "o")
+#define G_VARIANT_TYPE_OBJECT_PATH          ((const GVariantType *) "o")
 
 /**
  * G_VARIANT_TYPE_SIGNATURE:
@@ -144,7 +144,7 @@ typedef struct _GVariantType xvariant_type_t;
  * use of this type.  If you are, then the D-Bus specification contains a
  * precise description of valid signature strings.
  **/
-#define G_VARIANT_TYPE_SIGNATURE            ((const xvariant_type_t *) "g")
+#define G_VARIANT_TYPE_SIGNATURE            ((const GVariantType *) "g")
 
 /**
  * G_VARIANT_TYPE_VARIANT:
@@ -152,7 +152,7 @@ typedef struct _GVariantType xvariant_type_t;
  * The type of a box that contains any other value (including another
  * variant).
  **/
-#define G_VARIANT_TYPE_VARIANT              ((const xvariant_type_t *) "v")
+#define G_VARIANT_TYPE_VARIANT              ((const GVariantType *) "v")
 
 /**
  * G_VARIANT_TYPE_HANDLE:
@@ -164,7 +164,7 @@ typedef struct _GVariantType xvariant_type_t;
  * If you are not interacting with D-Bus, then there is no reason to make
  * use of this type.
  **/
-#define G_VARIANT_TYPE_HANDLE               ((const xvariant_type_t *) "h")
+#define G_VARIANT_TYPE_HANDLE               ((const GVariantType *) "h")
 
 /**
  * G_VARIANT_TYPE_UNIT:
@@ -172,7 +172,7 @@ typedef struct _GVariantType xvariant_type_t;
  * The empty tuple type.  Has only one instance.  Known also as "triv"
  * or "void".
  **/
-#define G_VARIANT_TYPE_UNIT                 ((const xvariant_type_t *) "()")
+#define G_VARIANT_TYPE_UNIT                 ((const GVariantType *) "()")
 
 /**
  * G_VARIANT_TYPE_ANY:
@@ -180,7 +180,7 @@ typedef struct _GVariantType xvariant_type_t;
  * An indefinite type that is a supertype of every type (including
  * itself).
  **/
-#define G_VARIANT_TYPE_ANY                  ((const xvariant_type_t *) "*")
+#define G_VARIANT_TYPE_ANY                  ((const GVariantType *) "*")
 
 /**
  * G_VARIANT_TYPE_BASIC:
@@ -188,21 +188,21 @@ typedef struct _GVariantType xvariant_type_t;
  * An indefinite type that is a supertype of every basic (ie:
  * non-container) type.
  **/
-#define G_VARIANT_TYPE_BASIC                ((const xvariant_type_t *) "?")
+#define G_VARIANT_TYPE_BASIC                ((const GVariantType *) "?")
 
 /**
  * G_VARIANT_TYPE_MAYBE:
  *
  * An indefinite type that is a supertype of every maybe type.
  **/
-#define G_VARIANT_TYPE_MAYBE                ((const xvariant_type_t *) "m*")
+#define G_VARIANT_TYPE_MAYBE                ((const GVariantType *) "m*")
 
 /**
  * G_VARIANT_TYPE_ARRAY:
  *
  * An indefinite type that is a supertype of every array type.
  **/
-#define G_VARIANT_TYPE_ARRAY                ((const xvariant_type_t *) "a*")
+#define G_VARIANT_TYPE_ARRAY                ((const GVariantType *) "a*")
 
 /**
  * G_VARIANT_TYPE_TUPLE:
@@ -210,7 +210,7 @@ typedef struct _GVariantType xvariant_type_t;
  * An indefinite type that is a supertype of every tuple type,
  * regardless of the number of items in the tuple.
  **/
-#define G_VARIANT_TYPE_TUPLE                ((const xvariant_type_t *) "r")
+#define G_VARIANT_TYPE_TUPLE                ((const GVariantType *) "r")
 
 /**
  * G_VARIANT_TYPE_DICT_ENTRY:
@@ -218,7 +218,7 @@ typedef struct _GVariantType xvariant_type_t;
  * An indefinite type that is a supertype of every dictionary entry
  * type.
  **/
-#define G_VARIANT_TYPE_DICT_ENTRY           ((const xvariant_type_t *) "{?*}")
+#define G_VARIANT_TYPE_DICT_ENTRY           ((const GVariantType *) "{?*}")
 
 /**
  * G_VARIANT_TYPE_DICTIONARY:
@@ -227,21 +227,21 @@ typedef struct _GVariantType xvariant_type_t;
  * that is, any array type that has an element type equal to any
  * dictionary entry type.
  **/
-#define G_VARIANT_TYPE_DICTIONARY           ((const xvariant_type_t *) "a{?*}")
+#define G_VARIANT_TYPE_DICTIONARY           ((const GVariantType *) "a{?*}")
 
 /**
  * G_VARIANT_TYPE_STRING_ARRAY:
  *
  * The type of an array of strings.
  **/
-#define G_VARIANT_TYPE_STRING_ARRAY         ((const xvariant_type_t *) "as")
+#define G_VARIANT_TYPE_STRING_ARRAY         ((const GVariantType *) "as")
 
 /**
  * G_VARIANT_TYPE_OBJECT_PATH_ARRAY:
  *
  * The type of an array of object paths.
  **/
-#define G_VARIANT_TYPE_OBJECT_PATH_ARRAY    ((const xvariant_type_t *) "ao")
+#define G_VARIANT_TYPE_OBJECT_PATH_ARRAY    ((const GVariantType *) "ao")
 
 /**
  * G_VARIANT_TYPE_BYTESTRING:
@@ -251,14 +251,14 @@ typedef struct _GVariantType xvariant_type_t;
  * convention is that the nul terminator character should be included as
  * the last character in the array.
  **/
-#define G_VARIANT_TYPE_BYTESTRING           ((const xvariant_type_t *) "ay")
+#define G_VARIANT_TYPE_BYTESTRING           ((const GVariantType *) "ay")
 
 /**
  * G_VARIANT_TYPE_BYTESTRING_ARRAY:
  *
  * The type of an array of byte strings (an array of arrays of bytes).
  **/
-#define G_VARIANT_TYPE_BYTESTRING_ARRAY     ((const xvariant_type_t *) "aay")
+#define G_VARIANT_TYPE_BYTESTRING_ARRAY     ((const GVariantType *) "aay")
 
 /**
  * G_VARIANT_TYPE_VARDICT:
@@ -268,114 +268,114 @@ typedef struct _GVariantType xvariant_type_t;
  *
  * Since: 2.30
  **/
-#define G_VARIANT_TYPE_VARDICT              ((const xvariant_type_t *) "a{sv}")
+#define G_VARIANT_TYPE_VARDICT              ((const GVariantType *) "a{sv}")
 
 
 /**
  * G_VARIANT_TYPE:
- * @type_string: a well-formed #xvariant_type_t type string
+ * @type_string: a well-formed #GVariantType type string
  *
- * Converts a string to a const #xvariant_type_t.  Depending on the
+ * Converts a string to a const #GVariantType.  Depending on the
  * current debugging level, this function may perform a runtime check
- * to ensure that @string is a valid xvariant_t type string.
+ * to ensure that @string is a valid GVariant type string.
  *
  * It is always a programmer error to use this macro with an invalid
- * type string. If in doubt, use xvariant_type_string_is_valid() to
+ * type string. If in doubt, use g_variant_type_string_is_valid() to
  * check if the string is valid.
  *
  * Since 2.24
  **/
 #ifndef G_DISABLE_CHECKS
-# define G_VARIANT_TYPE(type_string)            (xvariant_type_checked_ ((type_string)))
+# define G_VARIANT_TYPE(type_string)            (g_variant_type_checked_ ((type_string)))
 #else
-# define G_VARIANT_TYPE(type_string)            ((const xvariant_type_t *) (type_string))
+# define G_VARIANT_TYPE(type_string)            ((const GVariantType *) (type_string))
 #endif
 
 /* type string checking */
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_string_is_valid          (const xchar_t         *type_string);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_string_scan              (const xchar_t         *string,
-                                                                         const xchar_t         *limit,
-                                                                         const xchar_t        **endptr);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_string_is_valid          (const gchar         *type_string);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_string_scan              (const gchar         *string,
+                                                                         const gchar         *limit,
+                                                                         const gchar        **endptr);
 
 /* create/destroy */
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_type_free                     (xvariant_type_t        *type);
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_type_copy                     (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_type_new                      (const xchar_t         *type_string);
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_type_free                     (GVariantType        *type);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_type_copy                     (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_type_new                      (const gchar         *type_string);
 
 /* getters */
-XPL_AVAILABLE_IN_ALL
-xsize_t                           xvariant_type_get_string_length        (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *                   xvariant_type_peek_string              (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xchar_t *                         xvariant_type_dup_string               (const xvariant_type_t  *type);
+GLIB_AVAILABLE_IN_ALL
+gsize                           g_variant_type_get_string_length        (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+const gchar *                   g_variant_type_peek_string              (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gchar *                         g_variant_type_dup_string               (const GVariantType  *type);
 
 /* classification */
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_definite              (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_container             (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_basic                 (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_maybe                 (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_array                 (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_tuple                 (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_dict_entry            (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_variant               (const xvariant_type_t  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_definite              (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_container             (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_basic                 (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_maybe                 (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_array                 (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_tuple                 (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_dict_entry            (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_variant               (const GVariantType  *type);
 
 /* for hash tables */
-XPL_AVAILABLE_IN_ALL
-xuint_t                           xvariant_type_hash                     (xconstpointer        type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_equal                    (xconstpointer        type1,
-                                                                         xconstpointer        type2);
+GLIB_AVAILABLE_IN_ALL
+guint                           g_variant_type_hash                     (gconstpointer        type);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_equal                    (gconstpointer        type1,
+                                                                         gconstpointer        type2);
 
 /* subtypes */
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_type_is_subtype_of            (const xvariant_type_t  *type,
-                                                                         const xvariant_type_t  *supertype);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_type_is_subtype_of            (const GVariantType  *type,
+                                                                         const GVariantType  *supertype);
 
 /* type iterator interface */
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            xvariant_type_element                  (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            xvariant_type_first                    (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            xvariant_type_next                     (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-xsize_t                           xvariant_type_n_items                  (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            xvariant_type_key                      (const xvariant_type_t  *type);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            xvariant_type_value                    (const xvariant_type_t  *type);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *            g_variant_type_element                  (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *            g_variant_type_first                    (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *            g_variant_type_next                     (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+gsize                           g_variant_type_n_items                  (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *            g_variant_type_key                      (const GVariantType  *type);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *            g_variant_type_value                    (const GVariantType  *type);
 
 /* constructors */
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_type_new_array                (const xvariant_type_t  *element);
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_type_new_maybe                (const xvariant_type_t  *element);
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_type_new_tuple                (const xvariant_type_t * const *items,
-                                                                         xint_t                 length);
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_type_new_dict_entry           (const xvariant_type_t  *key,
-                                                                         const xvariant_type_t  *value);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_type_new_array                (const GVariantType  *element);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_type_new_maybe                (const GVariantType  *element);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_type_new_tuple                (const GVariantType * const *items,
+                                                                         gint                 length);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_type_new_dict_entry           (const GVariantType  *key,
+                                                                         const GVariantType  *value);
 
 /*< private >*/
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *            xvariant_type_checked_                 (const xchar_t *);
-XPL_AVAILABLE_IN_2_60
-xsize_t                           xvariant_type_string_get_depth_        (const xchar_t *type_string);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *            g_variant_type_checked_                 (const gchar *);
+GLIB_AVAILABLE_IN_2_60
+gsize                           g_variant_type_string_get_depth_        (const gchar *type_string);
 
 G_END_DECLS
 

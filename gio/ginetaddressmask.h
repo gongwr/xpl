@@ -16,8 +16,8 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XINET_ADDRESS_MASK_H__
-#define __XINET_ADDRESS_MASK_H__
+#ifndef __G_INET_ADDRESS_MASK_H__
+#define __G_INET_ADDRESS_MASK_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -27,58 +27,58 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INET_ADDRESS_MASK         (xinet_address_mask_get_type ())
-#define XINET_ADDRESS_MASK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_ADDRESS_MASK, xinet_address_mask))
-#define XINET_ADDRESS_MASK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_class))
-#define X_IS_INET_ADDRESS_MASK(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INET_ADDRESS_MASK))
-#define X_IS_INET_ADDRESS_MASK_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INET_ADDRESS_MASK))
-#define XINET_ADDRESS_MASK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INET_ADDRESS_MASK, xinet_address_mask_class))
+#define G_TYPE_INET_ADDRESS_MASK         (g_inet_address_mask_get_type ())
+#define G_INET_ADDRESS_MASK(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_INET_ADDRESS_MASK, GInetAddressMask))
+#define G_INET_ADDRESS_MASK_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_INET_ADDRESS_MASK, GInetAddressMaskClass))
+#define G_IS_INET_ADDRESS_MASK(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_INET_ADDRESS_MASK))
+#define G_IS_INET_ADDRESS_MASK_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_INET_ADDRESS_MASK))
+#define G_INET_ADDRESS_MASK_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_INET_ADDRESS_MASK, GInetAddressMaskClass))
 
-typedef struct _xinet_address_mask_class   xinet_address_mask_class_t;
-typedef struct _xinet_address_mask_private xinet_address_mask_private_t;
+typedef struct _GInetAddressMaskClass   GInetAddressMaskClass;
+typedef struct _GInetAddressMaskPrivate GInetAddressMaskPrivate;
 
 struct _GInetAddressMask
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
-  xinet_address_mask_private_t *priv;
+  GInetAddressMaskPrivate *priv;
 };
 
-struct _xinet_address_mask_class
+struct _GInetAddressMaskClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
 };
 
-XPL_AVAILABLE_IN_2_32
-xtype_t xinet_address_mask_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_32
+GType g_inet_address_mask_get_type (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_32
-xinet_address_mask_t *xinet_address_mask_new             (xinet_address_t      *addr,
-						       xuint_t              length,
-						       xerror_t           **error);
+GLIB_AVAILABLE_IN_2_32
+GInetAddressMask *g_inet_address_mask_new             (GInetAddress      *addr,
+						       guint              length,
+						       GError           **error);
 
-XPL_AVAILABLE_IN_2_32
-xinet_address_mask_t *xinet_address_mask_new_from_string (const xchar_t       *mask_string,
-						       xerror_t           **error);
-XPL_AVAILABLE_IN_2_32
-xchar_t            *xinet_address_mask_to_string       (xinet_address_mask_t  *mask);
+GLIB_AVAILABLE_IN_2_32
+GInetAddressMask *g_inet_address_mask_new_from_string (const gchar       *mask_string,
+						       GError           **error);
+GLIB_AVAILABLE_IN_2_32
+gchar            *g_inet_address_mask_to_string       (GInetAddressMask  *mask);
 
-XPL_AVAILABLE_IN_2_32
-xsocket_family_t     xinet_address_mask_get_family      (xinet_address_mask_t  *mask);
-XPL_AVAILABLE_IN_2_32
-xinet_address_t     *xinet_address_mask_get_address     (xinet_address_mask_t  *mask);
-XPL_AVAILABLE_IN_2_32
-xuint_t             xinet_address_mask_get_length      (xinet_address_mask_t  *mask);
+GLIB_AVAILABLE_IN_2_32
+GSocketFamily     g_inet_address_mask_get_family      (GInetAddressMask  *mask);
+GLIB_AVAILABLE_IN_2_32
+GInetAddress     *g_inet_address_mask_get_address     (GInetAddressMask  *mask);
+GLIB_AVAILABLE_IN_2_32
+guint             g_inet_address_mask_get_length      (GInetAddressMask  *mask);
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t          xinet_address_mask_matches         (xinet_address_mask_t  *mask,
-						       xinet_address_t      *address);
-XPL_AVAILABLE_IN_2_32
-xboolean_t          xinet_address_mask_equal           (xinet_address_mask_t  *mask,
-						       xinet_address_mask_t  *mask2);
+GLIB_AVAILABLE_IN_2_32
+gboolean          g_inet_address_mask_matches         (GInetAddressMask  *mask,
+						       GInetAddress      *address);
+GLIB_AVAILABLE_IN_2_32
+gboolean          g_inet_address_mask_equal           (GInetAddressMask  *mask,
+						       GInetAddressMask  *mask2);
 
 G_END_DECLS
 
-#endif /* __XINET_ADDRESS_MASK_H__ */
+#endif /* __G_INET_ADDRESS_MASK_H__ */

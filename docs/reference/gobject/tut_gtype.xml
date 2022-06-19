@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding="UTF-8"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" 
                "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 ]>
   <chapter id="chapter-gtype">
@@ -7,62 +7,62 @@
 
       <para>
         A type, as manipulated by the GLib type system, is much more generic than what
-        is usually understood as an Object type. It is best explained by looking at the
+        is usually understood as an Object type. It is best explained by looking at the 
         structure and the functions used to register new types in the type system.
         <informalexample><programlisting>
-typedef struct _GTypeInfo               xtype_info_t;
+typedef struct _GTypeInfo               GTypeInfo;
 struct _GTypeInfo
 {
   /* interface types, classed types, instantiated types */
-  xuint16_t                class_size;
-
-  xbase_init_func_t          base_init;
-  xbase_finalize_func_t      base_finalize;
-
+  guint16                class_size;
+  
+  GBaseInitFunc          base_init;
+  GBaseFinalizeFunc      base_finalize;
+  
   /* classed types, instantiated types */
-  xclass_init_func_t         class_init;
-  xclass_finalize_func_t     class_finalize;
-  xconstpointer          class_data;
-
+  GClassInitFunc         class_init;
+  GClassFinalizeFunc     class_finalize;
+  gconstpointer          class_data;
+  
   /* instantiated types */
-  xuint16_t                instance_size;
-  xuint16_t                n_preallocs;
-  xinstance_init_func_t      instance_init;
-
+  guint16                instance_size;
+  guint16                n_preallocs;
+  GInstanceInitFunc      instance_init;
+  
   /* value handling */
-  const xtype_value_table_t *value_table;
+  const GTypeValueTable *value_table;
 };
-xtype_t xtype_register_static (xtype_t             parent_type,
-                              const xchar_t      *type_name,
-                              const xtype_info_t  *info,
-                              xtype_flags_t        flags);
-xtype_t xtype_register_fundamental (xtype_t                       type_id,
-                                   const xchar_t                *type_name,
-                                   const xtype_info_t            *info,
+GType g_type_register_static (GType             parent_type,
+                              const gchar      *type_name,
+                              const GTypeInfo  *info,
+                              GTypeFlags        flags);
+GType g_type_register_fundamental (GType                       type_id,
+                                   const gchar                *type_name,
+                                   const GTypeInfo            *info,
                                    const GTypeFundamentalInfo *finfo,
-                                   xtype_flags_t                  flags);
+                                   GTypeFlags                  flags);
         </programlisting></informalexample>
       </para>
 
       <para>
-        <function><link linkend="g-type-register-static">xtype_register_static</link></function>,
-        <function><link linkend="g-type-register-dynamic">xtype_register_dynamic</link></function> and
-        <function><link linkend="g-type-register-fundamental">xtype_register_fundamental</link></function>
+        <function><link linkend="g-type-register-static">g_type_register_static</link></function>,
+        <function><link linkend="g-type-register-dynamic">g_type_register_dynamic</link></function> and 
+        <function><link linkend="g-type-register-fundamental">g_type_register_fundamental</link></function>
         are the C functions, defined in
         <filename>gtype.h</filename> and implemented in <filename>gtype.c</filename>
-        which you should use to register a new <link linkend="xtype_t"><type>xtype_t</type></link> in the program's type system.
-        It is not likely you will ever need to use
-        <function><link linkend="g-type-register-fundamental">xtype_register_fundamental</link></function>
+        which you should use to register a new <link linkend="GType"><type>GType</type></link> in the program's type system.
+        It is not likely you will ever need to use 
+        <function><link linkend="g-type-register-fundamental">g_type_register_fundamental</link></function>
         but in case you want to, the last chapter explains how to create
         new fundamental types.
       </para>
 
       <para>
-        Fundamental types are top-level types which do not derive from any other type
+        Fundamental types are top-level types which do not derive from any other type 
         while other non-fundamental types derive from other types.
         Upon initialization, the type system not only initializes its
         internal data structures but it also registers a number of core
-        types: some of these are fundamental types. Others are types derived from these
+        types: some of these are fundamental types. Others are types derived from these 
         fundamental types.
       </para>
 
@@ -70,77 +70,77 @@ xtype_t xtype_register_fundamental (xtype_t                       type_id,
         Fundamental and non-fundamental types are defined by:
         <itemizedlist>
           <listitem><para>
-            class size: the class_size field in <link linkend="xtype_info_t"><type>xtype_info_t</type></link>.
+            class size: the class_size field in <link linkend="GTypeInfo"><type>GTypeInfo</type></link>.
           </para></listitem>
           <listitem><para>
-            class initialization functions (C++ constructor): the <function>base_init</function> and
-            <function>class_init</function> fields in <link linkend="xtype_info_t"><type>xtype_info_t</type></link>.
+            class initialization functions (C++ constructor): the <function>base_init</function> and 
+            <function>class_init</function> fields in <link linkend="GTypeInfo"><type>GTypeInfo</type></link>.
           </para></listitem>
           <listitem><para>
-            class destruction functions (C++ destructor): the base_finalize and
-            class_finalize fields in <link linkend="xtype_info_t"><type>xtype_info_t</type></link>.
+            class destruction functions (C++ destructor): the base_finalize and 
+            class_finalize fields in <link linkend="GTypeInfo"><type>GTypeInfo</type></link>.
           </para></listitem>
           <listitem><para>
-            instance size (C++ parameter to new): the instance_size field in
-            <link linkend="xtype_info_t"><type>xtype_info_t</type></link>.
+            instance size (C++ parameter to new): the instance_size field in 
+            <link linkend="GTypeInfo"><type>GTypeInfo</type></link>.
           </para></listitem>
           <listitem><para>
             instantiation policy (C++ type of new operator): the n_preallocs
-            field in <link linkend="xtype_info_t"><type>xtype_info_t</type></link>.
+            field in <link linkend="GTypeInfo"><type>GTypeInfo</type></link>.
           </para></listitem>
           <listitem><para>
-            copy functions (C++ copy operators): the value_table field in
-            <link linkend="xtype_info_t"><type>xtype_info_t</type></link>.
+            copy functions (C++ copy operators): the value_table field in 
+            <link linkend="GTypeInfo"><type>GTypeInfo</type></link>.
           </para></listitem>
           <listitem><para>
-            type characteristic flags: <link linkend="xtype_flags_t"><type>xtype_flags_t</type></link>.
+            type characteristic flags: <link linkend="GTypeFlags"><type>GTypeFlags</type></link>.
           </para></listitem>
         </itemizedlist>
-        Fundamental types are also defined by a set of <link linkend="GTypeFundamentalFlags"><type>GTypeFundamentalFlags</type></link>
+        Fundamental types are also defined by a set of <link linkend="GTypeFundamentalFlags"><type>GTypeFundamentalFlags</type></link> 
         which are stored in a <link linkend="GTypeFundamentalInfo"><type>GTypeFundamentalInfo</type></link>.
         Non-fundamental types are furthermore defined by the type of their parent which is
-        passed as the parent_type parameter to <function><link linkend="g-type-register-static">xtype_register_static</link></function>
-        and <function><link linkend="g-type-register-dynamic">xtype_register_dynamic</link></function>.
+        passed as the parent_type parameter to <function><link linkend="g-type-register-static">g_type_register_static</link></function>
+        and <function><link linkend="g-type-register-dynamic">g_type_register_dynamic</link></function>.
       </para>
-
+      
       <sect1 id="gtype-copy">
         <title>Copy functions</title>
 
         <para>
-          The major common point between <emphasis>all</emphasis> GLib types (fundamental and
+          The major common point between <emphasis>all</emphasis> GLib types (fundamental and 
           non-fundamental, classed and non-classed, instantiatable and non-instantiatable) is that
           they can all be manipulated through a single API to copy/assign them.
         </para>
 
         <para>
-          The <link linkend="xvalue_t"><type>xvalue_t</type></link> structure is used as an abstract container for all of these
-          types. Its simplistic API (defined in <filename>gobject/gvalue.h</filename>) can be
+          The <link linkend="GValue"><type>GValue</type></link> structure is used as an abstract container for all of these 
+          types. Its simplistic API (defined in <filename>gobject/gvalue.h</filename>) can be 
           used to invoke the value_table functions registered
-          during type registration: for example <function><link linkend="g-value-copy">xvalue_copy</link></function> copies the
-          content of a <link linkend="xvalue_t"><type>xvalue_t</type></link> to another <link linkend="xvalue_t"><type>xvalue_t</type></link>. This is similar
+          during type registration: for example <function><link linkend="g-value-copy">g_value_copy</link></function> copies the 
+          content of a <link linkend="GValue"><type>GValue</type></link> to another <link linkend="GValue"><type>GValue</type></link>. This is similar
           to a C++ assignment which invokes the C++ copy operator to modify the default
           bit-by-bit copy semantics of C++/C structures/classes.
         </para>
 
         <para>
-          The following code shows how you can copy around a 64 bit integer, as well as a <link linkend="xobject_t"><type>xobject_t</type></link>
+          The following code shows how you can copy around a 64 bit integer, as well as a <link linkend="GObject"><type>GObject</type></link>
           instance pointer:
 <informalexample><programlisting>
 static void test_int (void)
 {
-  xvalue_t a_value = G_VALUE_INIT;
-  xvalue_t b_value = G_VALUE_INIT;
-  xuint64_t a, b;
+  GValue a_value = G_VALUE_INIT;
+  GValue b_value = G_VALUE_INIT;
+  guint64 a, b;
 
   a = 0xdeadbeef;
 
-  xvalue_init (&amp;a_value, XTYPE_UINT64);
-  xvalue_set_uint64 (&amp;a_value, a);
+  g_value_init (&amp;a_value, G_TYPE_UINT64);
+  g_value_set_uint64 (&amp;a_value, a);
 
-  xvalue_init (&amp;b_value, XTYPE_UINT64);
-  xvalue_copy (&amp;a_value, &amp;b_value);
+  g_value_init (&amp;b_value, G_TYPE_UINT64);
+  g_value_copy (&amp;a_value, &amp;b_value);
 
-  b = xvalue_get_uint64 (&amp;b_value);
+  b = g_value_get_uint64 (&amp;b_value);
 
   if (a == b) {
     g_print ("Yay !! 10 lines of code to copy around a uint64.\n");
@@ -151,38 +151,38 @@ static void test_int (void)
 
 static void test_object (void)
 {
-  xobject_t *obj;
-  xvalue_t obj_vala = G_VALUE_INIT;
-  xvalue_t obj_valb = G_VALUE_INIT;
-  obj = xobject_new (VIEWER_TYPE_FILE, NULL);
+  GObject *obj;
+  GValue obj_vala = G_VALUE_INIT;
+  GValue obj_valb = G_VALUE_INIT;
+  obj = g_object_new (VIEWER_TYPE_FILE, NULL);
 
-  xvalue_init (&amp;obj_vala, VIEWER_TYPE_FILE);
-  xvalue_set_object (&amp;obj_vala, obj);
+  g_value_init (&amp;obj_vala, VIEWER_TYPE_FILE);
+  g_value_set_object (&amp;obj_vala, obj);
 
-  xvalue_init (&amp;obj_valb, XTYPE_OBJECT);
+  g_value_init (&amp;obj_valb, G_TYPE_OBJECT);
 
-  /* xvalue_copy's semantics for XTYPE_OBJECT types is to copy the reference.
-   * This function thus calls xobject_ref.
+  /* g_value_copy's semantics for G_TYPE_OBJECT types is to copy the reference.
+   * This function thus calls g_object_ref.
    * It is interesting to note that the assignment works here because
-   * VIEWER_TYPE_FILE is a XTYPE_OBJECT.
+   * VIEWER_TYPE_FILE is a G_TYPE_OBJECT.
    */
-  xvalue_copy (&amp;obj_vala, &amp;obj_valb);
+  g_value_copy (&amp;obj_vala, &amp;obj_valb);
 
-  xobject_unref (G_OBJECT (obj));
-  xobject_unref (G_OBJECT (obj));
+  g_object_unref (G_OBJECT (obj));
+  g_object_unref (G_OBJECT (obj));
 }
 </programlisting></informalexample>
           The important point about the above code is that the exact semantics of the copy calls
-          is undefined since they depend on the implementation of the copy function. Certain
-          copy functions might decide to allocate a new chunk of memory and then to copy the
+          is undefined since they depend on the implementation of the copy function. Certain 
+          copy functions might decide to allocate a new chunk of memory and then to copy the 
           data from the source to the destination. Others might want to simply increment
-          the reference count of the instance and copy the reference to the new xvalue_t.
+          the reference count of the instance and copy the reference to the new GValue.
         </para>
-
+        
         <para>
           The value table used to specify these assignment functions is
           documented in
-          <link linkend="xtype_value_table_t"><type>xtype_value_table_t</type></link>.
+          <link linkend="GTypeValueTable"><type>GTypeValueTable</type></link>.
         </para>
         <para>
           Interestingly, it is also very unlikely
@@ -206,7 +206,7 @@ static void test_object (void)
           </para></listitem>
           <listitem><para>
             Use the <function>object_method</function> pattern for function names: to invoke
-            the method named <function>save</function> on an instance of object type <type>file</type>, call
+            the method named <function>save</function> on an instance of object type <type>file</type>, call 
             <function>file_save</function>.
           </para></listitem>
           <listitem><para>Use prefixing to avoid namespace conflicts with other projects.
@@ -214,8 +214,8 @@ static void test_object (void)
             prefix all your function names with <emphasis>viewer_</emphasis>.
             For example: <function>viewer_object_method</function>.
           </para></listitem>
-          <listitem><para>Create a macro named <function>PREFIX_TYPE_OBJECT</function> which always
-            returns the xtype_t for the associated object type. For an object of type
+          <listitem><para>Create a macro named <function>PREFIX_TYPE_OBJECT</function> which always 
+            returns the GType for the associated object type. For an object of type 
             <emphasis>File</emphasis> in the <emphasis>Viewer</emphasis> namespace,
             use: <function>VIEWER_TYPE_FILE</function>.
             This macro is implemented using a function named
@@ -228,12 +228,12 @@ static void test_object (void)
               to define various other conventional macros for your object:
             </para>
             <itemizedlist>
-              <listitem><para><function>PREFIX_OBJECT (obj)</function>, which
+              <listitem><para><function>PREFIX_OBJECT (obj)</function>, which 
                 returns a pointer of type <type>PrefixObject</type>. This macro is used to enforce
                 static type safety by doing explicit casts wherever needed. It also enforces
                 dynamic type safety by doing runtime checks. It is possible to disable the dynamic
                 type checks in production builds (see <link linkend="glib-building">building GLib</link>).
-                For example, we would create
+                For example, we would create 
                 <function>VIEWER_FILE (obj)</function> to keep the previous example.
               </para></listitem>
               <listitem><para><function>PREFIX_OBJECT_CLASS (klass)</function>, which
@@ -243,7 +243,7 @@ static void test_object (void)
                 <function>VIEWER_FILE_CLASS</function>.
               </para></listitem>
               <listitem><para><function>PREFIX_IS_OBJECT (obj)</function>, which
-                returns a <type>xboolean_t</type> which indicates whether the input
+                returns a <type>gboolean</type> which indicates whether the input
                 object instance pointer is non-<type>NULL</type> and of type <type>OBJECT</type>.
                 For example, <function>VIEWER_IS_FILE</function>.
               </para></listitem>
@@ -260,21 +260,21 @@ static void test_object (void)
             </itemizedlist>
           </listitem>
         </itemizedlist>
-        The implementation of these macros is pretty straightforward: a number of simple-to-use
-        macros are provided in <filename>gtype.h</filename>. For the example we used above, we would
+        The implementation of these macros is pretty straightforward: a number of simple-to-use 
+        macros are provided in <filename>gtype.h</filename>. For the example we used above, we would 
         write the following trivial code to declare the macros:
 <informalexample><programlisting>
 #define VIEWER_TYPE_FILE viewer_file_get_type ()
-G_DECLARE_FINAL_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
+G_DECLARE_FINAL_TYPE (ViewerFile, viewer_file, VIEWER, FILE, GObject)
 </programlisting></informalexample>
       </para>
 
       <para>
         Unless your code has special requirements, you can use the
-        <function><link linkend="G-DEFINE-TYPE:CAPS">XDEFINE_TYPE</link></function>
+        <function><link linkend="G-DEFINE-TYPE:CAPS">G_DEFINE_TYPE</link></function>
 	macro to define a class:
 <informalexample><programlisting>
-XDEFINE_TYPE (viewer_file, viewer_file, XTYPE_OBJECT)
+G_DEFINE_TYPE (ViewerFile, viewer_file, G_TYPE_OBJECT)
 </programlisting></informalexample>
       </para>
 
@@ -282,15 +282,15 @@ XDEFINE_TYPE (viewer_file, viewer_file, XTYPE_OBJECT)
         Otherwise, the <function>viewer_file_get_type</function> function must be
         implemented manually:
 <informalexample><programlisting>
-xtype_t viewer_file_get_type (void)
+GType viewer_file_get_type (void)
 {
-  static xtype_t type = 0;
+  static GType type = 0;
   if (type == 0) {
-    const xtype_info_t info = {
+    const GTypeInfo info = {
       /* You fill this structure. */
     };
-    type = xtype_register_static (XTYPE_OBJECT,
-                                   "viewer_file_t",
+    type = g_type_register_static (G_TYPE_OBJECT,
+                                   "ViewerFile",
                                    &amp;info, 0);
   }
   return type;
@@ -305,17 +305,17 @@ xtype_t viewer_file_get_type (void)
 
         <para>
           A lot of types are not instantiatable by the type system and do not have
-          a class. Most of these types are fundamental trivial types such as <emphasis>xchar_t</emphasis>,
+          a class. Most of these types are fundamental trivial types such as <emphasis>gchar</emphasis>, 
           and are already registered by GLib.
         </para>
 
         <para>
           In the rare case of needing to register such a type in the type
           system, fill a
-          <link linkend="xtype_info_t"><type>xtype_info_t</type></link> structure with zeros since these types are also most of the time
+          <link linkend="GTypeInfo"><type>GTypeInfo</type></link> structure with zeros since these types are also most of the time
           fundamental:
           <informalexample><programlisting>
-  xtype_info_t info = {
+  GTypeInfo info = {
     0,                                /* class_size */
     NULL,                        /* base_init */
     NULL,                        /* base_destroy */
@@ -327,7 +327,7 @@ xtype_t viewer_file_get_type (void)
     NULL,                        /* instance_init */
     NULL,                        /* value_table */
   };
-  static const xtype_value_table_t value_table = {
+  static const GTypeValueTable value_table = {
     value_init_long0,                /* value_init */
     NULL,                        /* value_free */
     value_copy_long0,                /* value_copy */
@@ -338,7 +338,7 @@ xtype_t viewer_file_get_type (void)
     value_lcopy_char,                /* lcopy_value */
   };
   info.value_table = &amp;value_table;
-  type = xtype_register_fundamental (XTYPE_CHAR, "xchar_t", &amp;info, &amp;finfo, 0);
+  type = g_type_register_fundamental (G_TYPE_CHAR, "gchar", &amp;info, &amp;finfo, 0);
           </programlisting></informalexample>
         </para>
 
@@ -346,9 +346,9 @@ xtype_t viewer_file_get_type (void)
         <para>
           Having non-instantiatable types might seem a bit useless: what good is a type
           if you cannot instantiate an instance of that type ? Most of these types
-          are used in conjunction with <link linkend="xvalue_t"><type>xvalue_t</type></link>s: a xvalue_t is initialized
-          with an integer or a string and it is passed around by using the registered
-          type's value_table. <link linkend="xvalue_t"><type>xvalue_t</type></link>s (and by extension these trivial fundamental
+          are used in conjunction with <link linkend="GValue"><type>GValue</type></link>s: a GValue is initialized
+          with an integer or a string and it is passed around by using the registered 
+          type's value_table. <link linkend="GValue"><type>GValue</type></link>s (and by extension these trivial fundamental
           types) are most useful when used in conjunction with object properties and signals.
         </para>
 
@@ -360,88 +360,88 @@ xtype_t viewer_file_get_type (void)
         <para>
           This section covers the theory behind objects. See
           <xref linkend="howto-gobject"/> for the recommended way to define a
-          xobject_t.
+          GObject.
         </para>
 
         <para>
           Types which are registered with a class and are declared instantiatable are
-          what most closely resembles an <emphasis>object</emphasis>.
-          Although <link linkend="xobject_t"><type>xobject_t</type></link>s (detailed in <xref linkend="chapter-gobject"/>)
+          what most closely resembles an <emphasis>object</emphasis>. 
+          Although <link linkend="GObject"><type>GObject</type></link>s (detailed in <xref linkend="chapter-gobject"/>) 
           are the most well known type of instantiatable
-          classed types, other kinds of similar objects used as the base of an inheritance
+          classed types, other kinds of similar objects used as the base of an inheritance 
           hierarchy have been externally developed and they are all built on the fundamental
           features described below.
         </para>
 
         <para>
-          For example, the code below shows how you could register
+          For example, the code below shows how you could register 
           such a fundamental object type in the type system (using none of the
-          xobject_t convenience API):
+          GObject convenience API):
 <informalexample><programlisting>
 typedef struct {
-  xobject_t parent;
+  GObject parent;
 
   /* instance members */
-  xchar_t *filename;
-} viewer_file_t;
+  gchar *filename;
+} ViewerFile;
 
 typedef struct {
-  xobject_class_t parent;
+  GObjectClass parent;
 
   /* class members */
   /* the first is public, pure and virtual */
-  void (*open)  (viewer_file_t  *self,
-                 xerror_t     **error);
+  void (*open)  (ViewerFile  *self,
+                 GError     **error);
 
   /* the second is public and virtual */
-  void (*close) (viewer_file_t  *self,
-                 xerror_t     **error);
+  void (*close) (ViewerFile  *self,
+                 GError     **error);
 } ViewerFileClass;
 
 #define VIEWER_TYPE_FILE (viewer_file_get_type ())
 
-xtype_t
+GType 
 viewer_file_get_type (void)
 {
-  static xtype_t type = 0;
+  static GType type = 0;
   if (type == 0) {
-    const xtype_info_t info = {
+    const GTypeInfo info = {
       sizeof (ViewerFileClass),
       NULL,           /* base_init */
       NULL,           /* base_finalize */
-      (xclass_init_func_t) viewer_file_class_init,
+      (GClassInitFunc) viewer_file_class_init,
       NULL,           /* class_finalize */
       NULL,           /* class_data */
-      sizeof (viewer_file_t),
+      sizeof (ViewerFile),
       0,              /* n_preallocs */
-      (xinstance_init_func_t) NULL /* instance_init */
+      (GInstanceInitFunc) NULL /* instance_init */
     };
-    type = xtype_register_static (XTYPE_OBJECT,
-                                   "viewer_file_t",
+    type = g_type_register_static (G_TYPE_OBJECT,
+                                   "ViewerFile",
                                    &amp;info, 0);
   }
   return type;
 }
 </programlisting></informalexample>
           Upon the first call to <function>viewer_file_get_type</function>, the type named
-          <emphasis>viewer_file_t</emphasis> will be registered in the type system as inheriting
-          from the type <emphasis>XTYPE_OBJECT</emphasis>.
+          <emphasis>ViewerFile</emphasis> will be registered in the type system as inheriting
+          from the type <emphasis>G_TYPE_OBJECT</emphasis>.
         </para>
 
         <para>
-          Every object must define two structures: its class structure and its
+          Every object must define two structures: its class structure and its 
           instance structure. All class structures must contain as first member
-          a <link linkend="xtype_class_t"><type>xtype_class_t</type></link> structure. All instance structures must contain as first
+          a <link linkend="GTypeClass"><type>GTypeClass</type></link> structure. All instance structures must contain as first
           member a <link linkend="GTypeInstance"><type>GTypeInstance</type></link> structure. The declaration of these C types,
           coming from <filename>gtype.h</filename> is shown below:
 <informalexample><programlisting>
 struct _GTypeClass
 {
-  xtype_t g_type;
+  GType g_type;
 };
 struct _GTypeInstance
 {
-  xtype_class_t *g_class;
+  GTypeClass *g_class;
 };
 </programlisting></informalexample>
           These constraints allow the type system to make sure that every object instance
@@ -459,7 +459,7 @@ typedef struct {
   int field_b;
 } A;
 typedef struct {
-  xtype_class_t parent_class;
+  GTypeClass parent_class;
   void (*method_a) (void);
   void (*method_b) (void);
 } AClass;
@@ -475,7 +475,7 @@ typedef struct {
   void (*method_c) (void);
   void (*method_d) (void);
 } BClass;
-</programlisting></informalexample>
+</programlisting></informalexample>          
           The C standard mandates that the first field of a C structure is stored starting
           in the first byte of the buffer used to hold the structure's fields in memory.
           This means that the first field of an instance of an object B is A's first field
@@ -486,7 +486,7 @@ typedef struct {
 
         <para>
           Thanks to these simple conditions, it is possible to detect the type of every
-          object instance by doing:
+          object instance by doing: 
 <informalexample><programlisting>
 B *b;
 b->parent.parent.g_class->g_type
@@ -502,8 +502,8 @@ B *b;
           <title>Initialization and Destruction</title>
 
           <para>
-            instantiation of these types can be done with
-            <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>,
+            instantiation of these types can be done with 
+            <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>,
             which will look up the type information
             structure associated with the type requested. Then, the instance size and instantiation
             policy (if the <structfield>n_preallocs</structfield> field is set
@@ -520,9 +520,9 @@ B *b;
             the class structure of the parent class. The rest of class structure is initialized to zero.  If there
             is no parent, the entire class structure is initialized to zero. The type system then invokes the
             <function>base_class_initialization</function> functions
-            (<link linkend="xbase_init_func_t"><type>xbase_init_func_t</type></link>) from topmost
+            (<link linkend="GBaseInitFunc"><type>GBaseInitFunc</type></link>) from topmost 
             fundamental object to bottom-most most derived object. The object's <function>class_init</function>
-            (<link linkend="xclass_init_func_t"><type>xclass_init_func_t</type></link>) function is invoked afterwards to complete
+            (<link linkend="GClassInitFunc"><type>GClassInitFunc</type></link>) function is invoked afterwards to complete
             initialization of the class structure.
             Finally, the object's interfaces are initialized (we will discuss interface initialization
             in more detail later).
@@ -532,25 +532,25 @@ B *b;
             Once the type system has a pointer to an initialized class structure, it sets the object's
             instance class pointer to the object's class structure and invokes the object's
             <function>instance_init</function>
-            (<link linkend="xinstance_init_func_t"><type>xinstance_init_func_t</type></link>)
-            functions, from top-most fundamental
+            (<link linkend="GInstanceInitFunc"><type>GInstanceInitFunc</type></link>)
+            functions, from top-most fundamental 
             type to bottom-most most-derived type.
           </para>
 
           <para>
-            Object instance destruction through <function><link linkend="g-type-free-instance">xtype_free_instance</link></function> is very simple:
+            Object instance destruction through <function><link linkend="g-type-free-instance">g_type_free_instance</link></function> is very simple:
             the instance structure is returned to the instance pool if there is one and if this was the
             last living instance of the object, the class is destroyed.
           </para>
 
 
           <para>
-            Class destruction (the concept of destruction is sometimes partly
-            referred to as finalization in xtype_t) is the symmetric process of
-            the initialization: interfaces are destroyed first.
-            Then, the most derived
-            class_finalize (<link linkend="xclass_finalize_func_t"><type>xclass_finalize_func_t</type></link>) function is invoked. Finally, the
-            base_class_finalize (<link linkend="xbase_finalize_func_t"><type>xbase_finalize_func_t</type></link>) functions are
+            Class destruction (the concept of destruction is sometimes partly 
+            referred to as finalization in GType) is the symmetric process of 
+            the initialization: interfaces are destroyed first. 
+            Then, the most derived 
+            class_finalize (<link linkend="GClassFinalizeFunc"><type>GClassFinalizeFunc</type></link>) function is invoked. Finally, the
+            base_class_finalize (<link linkend="GBaseFinalizeFunc"><type>GBaseFinalizeFunc</type></link>) functions are 
             invoked from bottom-most most-derived type to top-most fundamental type and
             the class structure is freed.
           </para>
@@ -558,25 +558,25 @@ B *b;
           <para>
             The base initialization/finalization process is
             very similar to the C++ constructor/destructor paradigm. The practical details are different
-            though and it is important not to get confused by superficial similarities.
+            though and it is important not to get confused by superficial similarities. 
             GTypes have no instance destruction mechanism. It is
             the user's responsibility to implement correct destruction semantics on top
-            of the existing xtype_t code. (This is what xobject_t does: see
+            of the existing GType code. (This is what GObject does: see 
             <xref linkend="chapter-gobject"/>.)
            Furthermore, C++ code equivalent to the <function>base_init</function>
-           and <function>class_init</function> callbacks of xtype_t is usually not needed because C++ cannot really create object
+           and <function>class_init</function> callbacks of GType is usually not needed because C++ cannot really create object 
            types at runtime.
           </para>
 
           <para>
             The instantiation/finalization process can be summarized as follows:
             <table id="gtype-init-fini-table">
-              <title>xtype_t Instantiation/Finalization</title>
+              <title>GType Instantiation/Finalization</title>
               <tgroup cols="3">
                 <colspec colwidth="*" colnum="1" align="left"/>
                 <colspec colwidth="*" colnum="2" align="left"/>
                 <colspec colwidth="8*" colnum="3" align="left"/>
-
+    
                 <thead>
                   <row>
                     <entry>Invocation time</entry>
@@ -586,49 +586,49 @@ B *b;
                 </thead>
                 <tbody>
                   <row>
-                    <entry morerows="2">First call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function> for target type</entry>
+                    <entry morerows="2">First call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function> for target type</entry>
                     <entry>type's <function>base_init</function> function</entry>
-                    <entry>On the inheritance tree of classes from fundamental type to target type.
+                    <entry>On the inheritance tree of classes from fundamental type to target type. 
                       <function>base_init</function> is invoked once for each class structure.</entry>
                   </row>
                   <row>
-                    <!--entry>First call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function> for target type</entry-->
+                    <!--entry>First call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function> for target type</entry-->
                     <entry>target type's <function>class_init</function> function</entry>
                     <entry>On target type's class structure</entry>
                   </row>
                   <row>
-                    <!--entry>First call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function> for target type</entry-->
-                    <entry>interface initialization, see
+                    <!--entry>First call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function> for target type</entry-->
+                    <entry>interface initialization, see 
                       <xref linkend="gtype-non-instantiatable-classed-init"/></entry>
                     <entry></entry>
                   </row>
                   <row>
-                    <entry>Each call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function> for target type</entry>
+                    <entry>Each call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function> for target type</entry>
                     <entry>target type's <function>instance_init</function> function</entry>
                     <entry>On object's instance</entry>
                   </row>
                   <row>
-                    <entry morerows="2">Last call to <function><link linkend="g-type-free-instance">xtype_free_instance</link></function> for target type</entry>
+                    <entry morerows="2">Last call to <function><link linkend="g-type-free-instance">g_type_free_instance</link></function> for target type</entry>
                     <entry>interface destruction, see
                       <xref linkend="gtype-non-instantiatable-classed-dest"/></entry>
                     <entry></entry>
                   </row>
                   <row>
-                    <!--entry>Last call to <function><link linkend="g-type-free-instance">xtype_free_instance</link></function> for target type</entry-->
+                    <!--entry>Last call to <function><link linkend="g-type-free-instance">g_type_free_instance</link></function> for target type</entry-->
                     <entry>target type's <function>class_finalize</function> function</entry>
                     <entry>On target type's class structure</entry>
                   </row>
                   <row>
-                    <!--entry>Last call to <function><link linkend="g-type-free-instance">xtype_free_instance</link></function> for target type</entry-->
+                    <!--entry>Last call to <function><link linkend="g-type-free-instance">g_type_free_instance</link></function> for target type</entry-->
                     <entry>type's <function>base_finalize</function> function</entry>
-                    <entry>On the inheritance tree of classes from fundamental type to target type.
+                    <entry>On the inheritance tree of classes from fundamental type to target type. 
                       <function>base_finalize</function> is invoked once for each class structure.</entry>
                   </row>
                 </tbody>
               </tgroup>
             </table>
           </para>
-
+          
         </sect2>
 
       </sect1>
@@ -643,34 +643,34 @@ B *b;
         </para>
 
         <para>
-          xtype_t's interfaces are very similar to Java's interfaces. They allow
+          GType's interfaces are very similar to Java's interfaces. They allow
           to describe a common API that several classes will adhere to.
           Imagine the play, pause and stop buttons on hi-fi equipment — those can
           be seen as a playback interface. Once you know what they do, you can
           control your CD player, MP3 player or anything that uses these symbols.
           To declare an interface you have to register a non-instantiatable
-          classed type which derives from
-          <link linkend="xtype_interface_t"><type>xtype_interface_t</type></link>. The following piece of code declares such an interface.
+          classed type which derives from 
+          <link linkend="GTypeInterface"><type>GTypeInterface</type></link>. The following piece of code declares such an interface.
 <informalexample><programlisting>
 #define VIEWER_TYPE_EDITABLE viewer_editable_get_type ()
-G_DECLARE_INTERFACE (ViewerEditable, viewer_editable, VIEWER, EDITABLE, xobject_t)
+G_DECLARE_INTERFACE (ViewerEditable, viewer_editable, VIEWER, EDITABLE, GObject)
 
 struct _ViewerEditableInterface {
-  xtype_interface_t parent;
+  GTypeInterface parent;
 
   void (*save) (ViewerEditable  *self,
-                xerror_t         **error);
+                GError         **error);
 };
 
 void viewer_editable_save (ViewerEditable  *self,
-                           xerror_t         **error);
+                           GError         **error);
 </programlisting></informalexample>
           The interface function, <function>viewer_editable_save</function> is implemented
           in a pretty simple way:
 <informalexample><programlisting>
 void
 viewer_editable_save (ViewerEditable  *self,
-                      xerror_t         **error)
+                      GError         **error)
 {
   ViewerEditableinterface *iface;
 
@@ -683,14 +683,14 @@ viewer_editable_save (ViewerEditable  *self,
 }
 </programlisting></informalexample>
          <function>viewer_editable_get_type</function> registers a type named <emphasis>ViewerEditable</emphasis>
-         which inherits from <type>XTYPE_INTERFACE</type>. All interfaces must
-         be children of <type>XTYPE_INTERFACE</type> in the  inheritance tree.
+         which inherits from <type>G_TYPE_INTERFACE</type>. All interfaces must
+         be children of <type>G_TYPE_INTERFACE</type> in the  inheritance tree.
         </para>
 
         <para>
           An interface is defined by only one structure which must contain as first member
-          a <link linkend="xtype_interface_t"><type>xtype_interface_t</type></link> structure. The interface structure is expected to
-          contain the function pointers of the interface methods. It is good style to
+          a <link linkend="GTypeInterface"><type>GTypeInterface</type></link> structure. The interface structure is expected to
+          contain the function pointers of the interface methods. It is good style to 
           define helper functions for each of the interface methods which simply call
           the interface's method directly: <function>viewer_editable_save</function>
           is one of these.
@@ -713,7 +713,7 @@ viewer_file_editable_interface_init (ViewerEditableInterface *iface)
   iface->save = viewer_file_save;
 }
 
-G_DEFINE_TYPE_WITH_CODE (viewer_file, viewer_file, VIEWER_TYPE_FILE,
+G_DEFINE_TYPE_WITH_CODE (ViewerFile, viewer_file, VIEWER_TYPE_FILE,
                          G_IMPLEMENT_INTERFACE (VIEWER_TYPE_EDITABLE,
                                                 viewer_file_editable_interface_init))
 </programlisting></informalexample>
@@ -721,10 +721,10 @@ G_DEFINE_TYPE_WITH_CODE (viewer_file, viewer_file, VIEWER_TYPE_FILE,
 
         <para>
           If your code does have special requirements, you must write a custom
-          <function>get_type</function> function to register your xtype_t which
-          inherits from some <link linkend="xobject_t"><type>xobject_t</type></link>
+          <function>get_type</function> function to register your GType which
+          inherits from some <link linkend="GObject"><type>GObject</type></link>
           and which implements the interface <type>ViewerEditable</type>. For
-          example, this code registers a new <type>viewer_file_t</type> class which
+          example, this code registers a new <type>ViewerFile</type> class which
           implements <type>ViewerEditable</type>:
 <informalexample><programlisting>
 static void
@@ -734,39 +734,39 @@ viewer_file_save (ViewerEditable *editable)
 }
 
 static void
-viewer_file_editable_interface_init (xpointer_t x_iface,
-                                     xpointer_t iface_data)
+viewer_file_editable_interface_init (gpointer g_iface,
+                                     gpointer iface_data)
 {
-  ViewerEditableInterface *iface = x_iface;
+  ViewerEditableInterface *iface = g_iface;
 
   iface->save = viewer_file_save;
 }
 
-xtype_t
+GType 
 viewer_file_get_type (void)
 {
-  static xtype_t type = 0;
+  static GType type = 0;
   if (type == 0) {
-    const xtype_info_t info = {
+    const GTypeInfo info = {
       sizeof (ViewerFileClass),
       NULL,   /* base_init */
       NULL,   /* base_finalize */
       NULL,   /* class_init */
       NULL,   /* class_finalize */
       NULL,   /* class_data */
-      sizeof (viewer_file_t),
+      sizeof (ViewerFile),
       0,      /* n_preallocs */
       NULL    /* instance_init */
     };
-    const xinterface_info_t editable_info = {
+    const GInterfaceInfo editable_info = {
       (GInterfaceInitFunc) viewer_file_editable_interface_init,  /* interface_init */
       NULL,   /* interface_finalize */
       NULL    /* interface_data */
     };
-    type = xtype_register_static (VIEWER_TYPE_FILE,
-                                   "viewer_file_t",
+    type = g_type_register_static (VIEWER_TYPE_FILE,
+                                   "ViewerFile",
                                    &amp;info, 0);
-    xtype_add_interface_static (type,
+    g_type_add_interface_static (type,
                                  VIEWER_TYPE_EDITABLE,
                                  &amp;editable_info);
   }
@@ -776,18 +776,18 @@ viewer_file_get_type (void)
         </para>
 
         <para>
-          <function><link linkend="g-type-add-interface-static">xtype_add_interface_static</link></function> records in the type system that
-          a given type implements also <type>foo_interface_t</type>
-          (<function>foo_interface_get_type</function> returns the type of
-          <type>foo_interface_t</type>).
-                The <link linkend="xinterface_info_t"><type>xinterface_info_t</type></link> structure holds
+          <function><link linkend="g-type-add-interface-static">g_type_add_interface_static</link></function> records in the type system that
+          a given type implements also <type>FooInterface</type> 
+          (<function>foo_interface_get_type</function> returns the type of 
+          <type>FooInterface</type>).
+                The <link linkend="GInterfaceInfo"><type>GInterfaceInfo</type></link> structure holds
           information about the implementation of the interface:
 <informalexample><programlisting>
 struct _GInterfaceInfo
 {
   GInterfaceInitFunc     interface_init;
   GInterfaceFinalizeFunc interface_finalize;
-  xpointer_t               interface_data;
+  gpointer               interface_data;
 };
 </programlisting></informalexample>
         </para>
@@ -836,7 +836,7 @@ struct _GInterfaceInfo
             <link linkend="G-DEFINE-INTERFACE:CAPS">G_DEFINE_INTERFACE</link>
             which can be used to define the interface:
 <informalexample><programlisting>
-G_DEFINE_INTERFACE (ViewerEditable, viewer_editable, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (ViewerEditable, viewer_editable, G_TYPE_OBJECT)
 
 static void
 viewer_editable_default_init (ViewerEditableInterface *iface)
@@ -847,14 +847,14 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
           </para>
 
           <para>
-            Or you can do that yourself in a xtype_t function for your interface:
+            Or you can do that yourself in a GType function for your interface:
 <informalexample><programlisting>
-xtype_t
+GType
 viewer_editable_get_type (void)
 {
-  static xsize_t type_id = 0;
+  static gsize type_id = 0;
   if (g_once_init_enter (&amp;type_id)) {
-    const xtype_info_t info = {
+    const GTypeInfo info = {
       sizeof (ViewerEditableInterface),
       NULL,   /* base_init */
       NULL,   /* base_finalize */
@@ -865,7 +865,7 @@ viewer_editable_get_type (void)
       0,      /* n_preallocs */
       NULL    /* instance_init */
     };
-    xtype_t type = xtype_register_static (XTYPE_INTERFACE,
+    GType type = g_type_register_static (G_TYPE_INTERFACE,
                                          "ViewerEditable",
                                          &amp;info, 0);
     g_once_init_leave (&amp;type_id, type);
@@ -892,7 +892,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
               <colspec colwidth="*" colnum="1" align="left"/>
               <colspec colwidth="*" colnum="2" align="left"/>
               <colspec colwidth="8*" colnum="3" align="left"/>
-
+              
               <thead>
                 <row>
                   <entry>Invocation time</entry>
@@ -903,7 +903,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
               </thead>
               <tbody>
                 <row>
-                  <entry>First call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>
+                  <entry>First call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>
                     for <emphasis>any</emphasis> type implementing interface
                    </entry>
                   <entry>interface's <function>base_init</function> function</entry>
@@ -911,7 +911,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
                   <entry>Rarely necessary to use this. Called once per instantiated classed type implementing the interface.</entry>
                 </row>
                 <row>
-                  <entry>First call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>
+                  <entry>First call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>
                     for <emphasis>each</emphasis> type implementing interface
                    </entry>
                   <entry>interface's <function>default_init</function> function</entry>
@@ -919,7 +919,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
                   <entry>Register interface's signals, properties, etc. here. Will be called once.</entry>
                 </row>
                 <row>
-                  <entry>First call to <function><link linkend="g-type-create-instance">xtype_create_instance</link></function>
+                  <entry>First call to <function><link linkend="g-type-create-instance">g_type_create_instance</link></function>
                     for <emphasis>any</emphasis> type implementing interface
                    </entry>
                   <entry>implementation's <function>interface_init</function> function</entry>
@@ -934,27 +934,27 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
             </tgroup>
           </table>
         </para>
-
+        
         </sect2>
-
+        
         <sect2 id="gtype-non-instantiatable-classed-dest">
           <title>Interface Destruction</title>
 
           <para>
             When the last instance of an instantiatable type which registered
-            an interface implementation is destroyed, the interface's
+            an interface implementation is destroyed, the interface's 
             implementations associated to the type are destroyed.
           </para>
 
           <para>
-            To destroy an interface implementation, xtype_t first calls the
-            implementation's <function>interface_finalize</function> function
-            and then the interface's most-derived
+            To destroy an interface implementation, GType first calls the 
+            implementation's <function>interface_finalize</function> function 
+            and then the interface's most-derived 
             <function>base_finalize</function> function.
           </para>
 
           <para>
-            Again, it is important to understand, as in
+            Again, it is important to understand, as in 
             <xref linkend="gtype-non-instantiatable-classed-init"/>,
               that both <function>interface_finalize</function> and <function>base_finalize</function>
               are invoked exactly once for the destruction of each implementation of an interface. Thus,
@@ -962,7 +962,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
               which would hold the number of instances of implementations of an interface such that
               the interface's class is destroyed only once (when the integer variable reaches zero).
           </para>
-
+          
         <para>
           The above process can be summarized as follows:
           <table id="ginterface-fini-table">
@@ -971,7 +971,7 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
               <colspec colwidth="*" colnum="1" align="left"/>
               <colspec colwidth="*" colnum="2" align="left"/>
               <colspec colwidth="8*" colnum="3" align="left"/>
-
+              
               <thead>
                 <row>
                   <entry>Invocation time</entry>
@@ -981,14 +981,14 @@ viewer_editable_default_init (ViewerEditableInterface *iface)
               </thead>
               <tbody>
                 <row>
-                  <entry morerows="1">Last call to <function><link linkend="g-type-free-instance">xtype_free_instance</link></function> for type
+                  <entry morerows="1">Last call to <function><link linkend="g-type-free-instance">g_type_free_instance</link></function> for type
                     implementing interface
                    </entry>
                   <entry>interface's <function>interface_finalize</function> function</entry>
                   <entry>On interface's vtable</entry>
                 </row>
                 <row>
-                  <!--entry>Last call to <function><link linkend="g-type-free-instance">xtype_free_instance</link></function>for type
+                  <!--entry>Last call to <function><link linkend="g-type-free-instance">g_type_free_instance</link></function>for type
                     implementing interface
                    </entry-->
                   <entry>interface's <function>base_finalize</function> function</entry>

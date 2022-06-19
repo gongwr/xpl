@@ -27,22 +27,22 @@
 #endif
 
 static void
-child_setup (xpointer_t user_data)
+child_setup (gpointer user_data)
 {
 }
 
 typedef struct
 {
   int wait_status;
-  xboolean_t done;
+  gboolean done;
 } ChildStatus;
 
 static ChildStatus child_status = { -1, FALSE };
 
 static void
-child_watch_cb (xpid_t pid,
-                xint_t status,
-                xpointer_t user_data)
+child_watch_cb (GPid pid,
+                gint status,
+                gpointer user_data)
 {
   child_status.wait_status = status;
   child_status.done = TRUE;
@@ -52,17 +52,17 @@ int
 main (int    argc,
       char **argv)
 {
-  xboolean_t search_path = FALSE;
-  xboolean_t search_path_from_envp = FALSE;
-  xboolean_t slow_path = FALSE;
-  xboolean_t unset_path_in_envp = FALSE;
-  xchar_t *chdir_child = NULL;
-  xchar_t *set_path_in_envp = NULL;
-  xchar_t **envp = NULL;
+  gboolean search_path = FALSE;
+  gboolean search_path_from_envp = FALSE;
+  gboolean slow_path = FALSE;
+  gboolean unset_path_in_envp = FALSE;
+  gchar *chdir_child = NULL;
+  gchar *set_path_in_envp = NULL;
+  gchar **envp = NULL;
   GOptionEntry entries[] =
   {
     { "chdir-child", '\0',
-      G_OPTION_FLAG_NONE, G_OPTION_ARXFILENAME, &chdir_child,
+      G_OPTION_FLAG_NONE, G_OPTION_ARG_FILENAME, &chdir_child,
       "Run PROGRAM in this working directory", NULL },
     { "search-path", '\0',
       G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &search_path,
@@ -71,7 +71,7 @@ main (int    argc,
       G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &search_path_from_envp,
       "Search PATH from specified environment", NULL },
     { "set-path-in-envp", '\0',
-      G_OPTION_FLAG_NONE, G_OPTION_ARXFILENAME, &set_path_in_envp,
+      G_OPTION_FLAG_NONE, G_OPTION_ARG_FILENAME, &set_path_in_envp,
       "Set PATH in specified environment to this value", "PATH", },
     { "unset-path-in-envp", '\0',
       G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE, &unset_path_in_envp,
@@ -81,11 +81,11 @@ main (int    argc,
       "Use a child-setup function to avoid the posix_spawn fast path", NULL },
     G_OPTION_ENTRY_NULL
   };
-  xerror_t *error = NULL;
+  GError *error = NULL;
   int ret = 1;
   GSpawnFlags spawn_flags = G_SPAWN_DO_NOT_REAP_CHILD;
-  xpid_t pid;
-  xoption_context_t *context = NULL;
+  GPid pid;
+  GOptionContext *context = NULL;
 
   context = g_option_context_new ("PROGRAM [ARGS...]");
   g_option_context_add_main_entries (context, entries, NULL);
@@ -145,7 +145,7 @@ main (int    argc,
   g_child_watch_add (pid, child_watch_cb, NULL);
 
   while (!child_status.done)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
   g_spawn_close_pid (pid);
 
@@ -165,7 +165,7 @@ out:
   g_free (set_path_in_envp);
   g_free (chdir_child);
   g_clear_error (&error);
-  xstrfreev (envp);
+  g_strfreev (envp);
   g_option_context_free (context);
   return ret;
 }

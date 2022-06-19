@@ -21,16 +21,16 @@ msgstr ""
 "X-Generator: Lokalize 1.5\n"
 
 #: ../gio/gapplication.c:520
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
-msgstr "xapplication_t ಸೇವೆಯ ಕ್ರಮವನ್ನು ನಮೂದಿಸಿ (D-Bus ಸೇವೆ ಕಡತಗಳಿಂದ ಬಳಸು)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgstr "GApplication ಸೇವೆಯ ಕ್ರಮವನ್ನು ನಮೂದಿಸಿ (D-Bus ಸೇವೆ ಕಡತಗಳಿಂದ ಬಳಸು)"
 
 #: ../gio/gapplication.c:525
-msgid "xapplication_t options"
-msgstr "xapplication_t ಆಯ್ಕೆಗಳು"
+msgid "GApplication options"
+msgstr "GApplication ಆಯ್ಕೆಗಳು"
 
 #: ../gio/gapplication.c:525
-msgid "Show xapplication_t options"
-msgstr "xapplication_t ಆಯ್ಕೆಗಳನ್ನು ತೋರಿಸು"
+msgid "Show GApplication options"
+msgstr "GApplication ಆಯ್ಕೆಗಳನ್ನು ತೋರಿಸು"
 
 #: ../gio/gapplication-tool.c:45 ../gio/gapplication-tool.c:46
 #: ../gio/gresource-tool.c:485 ../gio/gsettings-tool.c:521
@@ -132,8 +132,8 @@ msgid "PARAMETER"
 msgstr "PARAMETER"
 
 #: ../gio/gapplication-tool.c:74
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "xvariant_t ನಲ್ಲಿ ರದ್ಧತಿಯ ಕಾರ್ಯದ ಐಚ್ಛಿಕ ನಿಯತಾಂಕ"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "GVariant ನಲ್ಲಿ ರದ್ಧತಿಯ ಕಾರ್ಯದ ಐಚ್ಛಿಕ ನಿಯತಾಂಕ"
 
 #: ../gio/gapplication-tool.c:96 ../gio/gresource-tool.c:523
 #: ../gio/gsettings-tool.c:607
@@ -265,8 +265,8 @@ msgid "Seek not supported on base stream"
 msgstr "ಮೂಲ ಸ್ಟ್ರೀಮ್‍ನಲ್ಲಿ ಕೋರುವಿಕೆಗೆ ಬೆಂಬಲವಿಲ್ಲ"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "xbuffered_input_stream_t ಅನ್ನು ಕಡಿತಗೊಳಿಸಲಾಗಿಲ್ಲ"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "GBufferedInputStream ಅನ್ನು ಕಡಿತಗೊಳಿಸಲಾಗಿಲ್ಲ"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1202
 #: ../gio/giostream.c:277 ../gio/goutputstream.c:1654
@@ -340,16 +340,16 @@ msgid "%s filetype"
 msgstr "%s ಕಡತದ ಬಗೆ"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "ಈ OS ನಲ್ಲಿ xcredentials_t ಅನ್ನು ಅಳವಡಿಸಲಾಗಿಲ್ಲ"
+msgid "GCredentials is not implemented on this OS"
+msgstr "ಈ OS ನಲ್ಲಿ GCredentials ಅನ್ನು ಅಳವಡಿಸಲಾಗಿಲ್ಲ"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no xcredentials_t support for your platform"
-msgstr "ನಿಮ್ಮ ಪ್ಲಾಟ್‌ಫಾರ್ಮಿಗೆ xcredentials_t ಬೆಂಬಲವಿಲ್ಲ"
+msgid "There is no GCredentials support for your platform"
+msgstr "ನಿಮ್ಮ ಪ್ಲಾಟ್‌ಫಾರ್ಮಿಗೆ GCredentials ಬೆಂಬಲವಿಲ್ಲ"
 
 #: ../gio/gcredentials.c:513
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "ಈ OS ನಲ್ಲಿ xcredentials_t ಒಂದು ಪ್ರಕ್ರಿಯೆ ID ಯನ್ನು ಹೊಂದಿಲ್ಲ"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "ಈ OS ನಲ್ಲಿ GCredentials ಒಂದು ಪ್ರಕ್ರಿಯೆ ID ಯನ್ನು ಹೊಂದಿಲ್ಲ"
 
 #: ../gio/gcredentials.c:565
 msgid "Credentials spoofing is not possible on this OS"
@@ -546,8 +546,8 @@ msgstr ""
 "%s)"
 
 #: ../gio/gdbusauth.c:1170
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "xdbus_auth_observer_t::authorize-authenticated-peer ಮೂಲಕ ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "GDBusAuthObserver::authorize-authenticated-peer ಮೂಲಕ ರದ್ದುಗೊಳಿಸಲಾಗಿದೆ"
 
 #: ../gio/gdbusauthmechanismsha1.c:261
 #, c-format
@@ -827,9 +827,9 @@ msgstr ""
 #: ../gio/gdbusmessage.c:1867
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string '%s' from the D-Bus wire format"
+"Error deserializing GVariant with type string '%s' from the D-Bus wire format"
 msgstr ""
-"D-Bus ವೈರ್ ವಿನ್ಯಾಸದಿಂದ xvariant_t ಅನ್ನು '%s' ಬಗೆಯ ವಾಕ್ಯಾಂಶದೊಂದಿಗೆ ಡಿಸೀರಿಯಲೈಸ್ "
+"D-Bus ವೈರ್ ವಿನ್ಯಾಸದಿಂದ GVariant ಅನ್ನು '%s' ಬಗೆಯ ವಾಕ್ಯಾಂಶದೊಂದಿಗೆ ಡಿಸೀರಿಯಲೈಸ್ "
 "ಮಾಡುವಲ್ಲಿ ದೋಷ"
 
 #: ../gio/gdbusmessage.c:2051
@@ -876,9 +876,9 @@ msgstr "ಸಂದೇಶವನ್ನು ಡಿಸಿರಿಯಲೈಸ್ ಮಾ�
 #: ../gio/gdbusmessage.c:2515
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string '%s' to the D-Bus wire format"
+"Error serializing GVariant with type string '%s' to the D-Bus wire format"
 msgstr ""
-"xvariant_t ಅನ್ನು '%s' ಎಂಬ ಬಗೆ ವಾಕ್ಯಾಂಶದೊಂದಿಗೆ D-Bus ವೈರ್ ಫಾರ್ಮ್ಯಾಟ್‌ಗೆ "
+"GVariant ಅನ್ನು '%s' ಎಂಬ ಬಗೆ ವಾಕ್ಯಾಂಶದೊಂದಿಗೆ D-Bus ವೈರ್ ಫಾರ್ಮ್ಯಾಟ್‌ಗೆ "
 "ಅನುಕ್ರಮಿತಗೊಳಿಸುವಲ್ಲಿ ದೋಷ"
 
 #: ../gio/gdbusmessage.c:2652
@@ -1274,27 +1274,27 @@ msgstr "TLS ಬೆಂಬಲವು ಲಭ್ಯವಿಲ್ಲ"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can't handle version %d of xemblem_t encoding"
-msgstr "xemblem_t ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgid "Can't handle version %d of GEmblem encoding"
+msgstr "GEmblem ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "xemblem_t ಎನ್ಕೋಡಿಂಗಿನಲ್ಲಿ ತಪ್ಪಾದ ಸಂಖ್ಯೆಯ ಟೋಕನ್‌ಗಳು (%d)"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "GEmblem ಎನ್ಕೋಡಿಂಗಿನಲ್ಲಿ ತಪ್ಪಾದ ಸಂಖ್ಯೆಯ ಟೋಕನ್‌ಗಳು (%d)"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can't handle version %d of xemblemed_icon_t encoding"
-msgstr "xemblemed_icon_t ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgstr "GEmblemedIcon ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "xemblemed_icon_t ಎನ್ಕೋಡಿಂಗಿನಲ್ಲಿ ತಪ್ಪಾದ ಸಂಖ್ಯೆಯ ಟೋಕನ್‌ಗಳು (%d)"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "GEmblemedIcon ಎನ್ಕೋಡಿಂಗಿನಲ್ಲಿ ತಪ್ಪಾದ ಸಂಖ್ಯೆಯ ಟೋಕನ್‌ಗಳು (%d)"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "xemblemed_icon_t ಗಾಗಿ xemblem_t ಅನ್ನು ನಿರೀಕ್ಷಿಸಲಾಗಿತ್ತು"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "GEmblemedIcon ಗಾಗಿ GEmblem ಅನ್ನು ನಿರೀಕ್ಷಿಸಲಾಗಿತ್ತು"
 
 #: ../gio/gfile.c:962 ../gio/gfile.c:1200 ../gio/gfile.c:1338
 #: ../gio/gfile.c:1576 ../gio/gfile.c:1631 ../gio/gfile.c:1689
@@ -1401,12 +1401,12 @@ msgstr "ಕಡತ ಎನ್ಯುಮರೇಟರ್ ಈಗಾಗಲೆ ಮುಚ
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of xfile_icon_t encoding"
-msgstr "xfile_icon_t ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgid "Can't handle version %d of GFileIcon encoding"
+msgstr "GFileIcon ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
-msgstr "xfile_icon_t ಗಾಗಿನ ತಪ್ಪಾದ ಇನ್‌ಪುಟ್ ದತ್ತಾಂಶ"
+msgid "Malformed input data for GFileIcon"
+msgstr "GFileIcon ಗಾಗಿನ ತಪ್ಪಾದ ಇನ್‌ಪುಟ್ ದತ್ತಾಂಶ"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -1439,8 +1439,8 @@ msgstr "ವರ್ಗದ ಹೆಸರು %s ಗೆ ಪ್ರಕಾರವಿಲ್
 
 #: ../gio/gicon.c:320
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "ಪ್ರಕಾರ %s ವು xicon_t ಸಂಪರ್ಕಸಾಧನವನ್ನು ಅನ್ವಯಿಸುವುದಿಲ್ಲ"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "ಪ್ರಕಾರ %s ವು GIcon ಸಂಪರ್ಕಸಾಧನವನ್ನು ಅನ್ವಯಿಸುವುದಿಲ್ಲ"
 
 #: ../gio/gicon.c:331
 #, c-format
@@ -1454,9 +1454,9 @@ msgstr "ತಪ್ಪಾದ ಆವೃತ್ತಿ ಸಂಖ್ಯೆ: %s"
 
 #: ../gio/gicon.c:359
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
 msgstr ""
-"ಪ್ರಕಾರ %s ವು from_tokens() ಅನ್ನು xicon_t ಸಂಪರ್ಕಸಾಧನದ ಮೇಲೆ ಅನ್ವಯಿಸುವುದಿಲ್ಲ"
+"ಪ್ರಕಾರ %s ವು from_tokens() ಅನ್ನು GIcon ಸಂಪರ್ಕಸಾಧನದ ಮೇಲೆ ಅನ್ವಯಿಸುವುದಿಲ್ಲ"
 
 #: ../gio/gicon.c:461
 msgid "Can't handle the supplied version of the icon encoding"
@@ -1690,8 +1690,8 @@ msgstr "<%s id='%s'> ಅನ್ನು (ಇನ್ನೂ ಸಹ) ಸೂಚಿಸಲ
 
 #: ../gio/glib-compile-schemas.c:989
 #, c-format
-msgid "invalid xvariant_t type string '%s'"
-msgstr "ಅಮಾನ್ಯವಾದ xvariant_t ಬಗೆಯ ವಾಕ್ಯಾಂಶ '%s'"
+msgid "invalid GVariant type string '%s'"
+msgstr "ಅಮಾನ್ಯವಾದ GVariant ಬಗೆಯ ವಾಕ್ಯಾಂಶ '%s'"
 
 #: ../gio/glib-compile-schemas.c:1019
 msgid "<override> given but schema isn't extending anything"
@@ -1857,11 +1857,11 @@ msgstr "ಕೀಲಿ ಹೆಸರಿನ ನಿರ್ಬಂಧನೆಗಳನ್�
 
 #: ../gio/glib-compile-schemas.c:2026
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"ಎಲ್ಲಾ xsettings_t ಸ್ಕೀಮಾ ಕಡತಗಳನ್ನು ಒಂದು ಸ್ಕೀಮಾ ಕ್ಯಾಶ್‌ಗೆ ಕಂಪೈಲ್ ಮಾಡು.\n"
+"ಎಲ್ಲಾ GSettings ಸ್ಕೀಮಾ ಕಡತಗಳನ್ನು ಒಂದು ಸ್ಕೀಮಾ ಕ್ಯಾಶ್‌ಗೆ ಕಂಪೈಲ್ ಮಾಡು.\n"
 "ಸ್ಕೀಮಾ ಕಡತಗಳು .gschema.xml ವಿಸ್ತರಣೆಯನ್ನು ಹೊಂದಿರಬೇಕು,\n"
 "ಕ್ಯಾಶೆ ಕಡತವನ್ನು gschemas.compiled ಎಂದು ಕರೆಯಲಾಗುತ್ತದೆ."
 
@@ -2174,16 +2174,16 @@ msgid "Error removing old file: %s"
 msgstr "ಹಳೆಯ ಕಡತವನ್ನು ತೆಗೆದು ಹಾಕುವಲ್ಲಿ ದೋಷ: %s"
 
 #: ../gio/gmemoryinputstream.c:471 ../gio/gmemoryoutputstream.c:769
-msgid "Invalid xseek_type_t supplied"
-msgstr "ಅಮಾನ್ಯವಾದ xseek_type_t ಅನ್ನು ಒದಗಿಸಲಾಗಿದೆ"
+msgid "Invalid GSeekType supplied"
+msgstr "ಅಮಾನ್ಯವಾದ GSeekType ಅನ್ನು ಒದಗಿಸಲಾಗಿದೆ"
 
 #: ../gio/gmemoryinputstream.c:481
 msgid "Invalid seek request"
 msgstr "ಅಮಾನ್ಯವಾದ ಕೋರಿಕೆ"
 
 #: ../gio/gmemoryinputstream.c:505
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "xmemory_input_stream_t ಅನ್ನು ಕಡಿತಗೊಳಿಸಲಾಗಿಲ್ಲ"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "GMemoryInputStream ಅನ್ನು ಕಡಿತಗೊಳಿಸಲಾಗಿಲ್ಲ"
 
 #: ../gio/gmemoryoutputstream.c:565
 msgid "Memory output stream not resizable"
@@ -2699,8 +2699,8 @@ msgstr "ಸಾಕೆಟ್ I/O ಕಾಲಾವಧಿ ತೀರಿದೆ"
 
 #: ../gio/gsocket.c:443
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "fd ಇಂದ xsocket_t ಅನ್ನು ರಚಿಸಲಾಗುತ್ತಿದೆ: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "fd ಇಂದ GSocket ಅನ್ನು ರಚಿಸಲಾಗುತ್ತಿದೆ: %s"
 
 #: ../gio/gsocket.c:471 ../gio/gsocket.c:525 ../gio/gsocket.c:532
 #, c-format
@@ -2793,8 +2793,8 @@ msgid "Error sending message: %s"
 msgstr "ಸಂದೇಶವನ್ನು ಕಳುಹಿಸುವಲ್ಲಿ ದೋಷ: %s"
 
 #: ../gio/gsocket.c:3922
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "Windows ನಲ್ಲಿ xsocket_control_message_t ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "Windows ನಲ್ಲಿ GSocketControlMessage ಬೆಂಬಲಿತವಾಗಿಲ್ಲ"
 
 #: ../gio/gsocket.c:4534 ../gio/gsocket.c:4669
 #, c-format
@@ -2807,8 +2807,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "ಸಾಕೆಟ್‌ ರುಜುವಾತುಗಳನ್ನು ಓದಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ: %s"
 
 #: ../gio/gsocket.c:4800
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "xsocket_get_credentials ಅನ್ನು ಈ OS ನಲ್ಲಿ ಅನ್ವಯಿಸಲಾಗಿಲ್ಲ"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "g_socket_get_credentials ಅನ್ನು ಈ OS ನಲ್ಲಿ ಅನ್ವಯಿಸಲಾಗಿಲ್ಲ"
 
 #: ../gio/gsocketclient.c:176
 #, c-format
@@ -2934,8 +2934,8 @@ msgstr "ಅಜ್ಞಾತ SOCKSv5 ಪ್ರಾಕ್ಸಿ ದೋಷ."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can't handle version %d of xthemed_icon_t encoding"
-msgstr "xthemed_icon_t ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
+msgid "Can't handle version %d of GThemedIcon encoding"
+msgstr "GThemedIcon ಎನ್ಕೋಡಿಂಗ್‌ನ ಆವೃತ್ತಿ %d ಅನ್ನು ನಿಭಾಯಿಸಲು ಸಾಧ್ಯವಾಗಿಲ್ಲ"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -3285,37 +3285,37 @@ msgstr "ಅಮಾನ್ಯವಾದ ಅತಿಥೇಯದ ಹೆಸರು"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:201
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "ಪೂರ್ವಾಹ್ನ"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:203
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "ಅಪರಾಹ್ನ"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:206
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A %d %b %Y %I:%M:%S %p %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:209
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%A %d %b %Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:212
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%I:%M:%S  %Z"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:215
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p %Z"
 

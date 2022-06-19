@@ -29,52 +29,52 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_content_type_equals            (const xchar_t  *type1,
-                                           const xchar_t  *type2);
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_content_type_is_a              (const xchar_t  *type,
-                                           const xchar_t  *supertype);
-XPL_AVAILABLE_IN_2_52
-xboolean_t g_content_type_is_mime_type      (const xchar_t *type,
-                                           const xchar_t *mime_type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_content_type_is_unknown        (const xchar_t  *type);
-XPL_AVAILABLE_IN_ALL
-xchar_t *  g_content_type_get_description   (const xchar_t  *type);
-XPL_AVAILABLE_IN_ALL
-xchar_t *  g_content_type_get_mime_type     (const xchar_t  *type);
-XPL_AVAILABLE_IN_ALL
-xicon_t *  g_content_type_get_icon          (const xchar_t  *type);
-XPL_AVAILABLE_IN_2_34
-xicon_t *  g_content_type_get_symbolic_icon (const xchar_t  *type);
-XPL_AVAILABLE_IN_2_34
-xchar_t *  g_content_type_get_generic_icon_name (const xchar_t  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_content_type_equals            (const gchar  *type1,
+                                           const gchar  *type2);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_content_type_is_a              (const gchar  *type,
+                                           const gchar  *supertype);
+GLIB_AVAILABLE_IN_2_52
+gboolean g_content_type_is_mime_type      (const gchar *type,
+                                           const gchar *mime_type);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_content_type_is_unknown        (const gchar  *type);
+GLIB_AVAILABLE_IN_ALL
+gchar *  g_content_type_get_description   (const gchar  *type);
+GLIB_AVAILABLE_IN_ALL
+gchar *  g_content_type_get_mime_type     (const gchar  *type);
+GLIB_AVAILABLE_IN_ALL
+GIcon *  g_content_type_get_icon          (const gchar  *type);
+GLIB_AVAILABLE_IN_2_34
+GIcon *  g_content_type_get_symbolic_icon (const gchar  *type);
+GLIB_AVAILABLE_IN_2_34
+gchar *  g_content_type_get_generic_icon_name (const gchar  *type);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_content_type_can_be_executable (const xchar_t  *type);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_content_type_can_be_executable (const gchar  *type);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t *  g_content_type_from_mime_type    (const xchar_t  *mime_type);
+GLIB_AVAILABLE_IN_ALL
+gchar *  g_content_type_from_mime_type    (const gchar  *mime_type);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t *  g_content_type_guess             (const xchar_t  *filename,
-                                           const xuchar_t *data,
-                                           xsize_t         data_size,
-                                           xboolean_t     *result_uncertain);
+GLIB_AVAILABLE_IN_ALL
+gchar *  g_content_type_guess             (const gchar  *filename,
+                                           const guchar *data,
+                                           gsize         data_size,
+                                           gboolean     *result_uncertain);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t ** g_content_type_guess_for_tree    (xfile_t        *root);
+GLIB_AVAILABLE_IN_ALL
+gchar ** g_content_type_guess_for_tree    (GFile        *root);
 
-XPL_AVAILABLE_IN_ALL
-xlist_t *  g_content_types_get_registered   (void);
+GLIB_AVAILABLE_IN_ALL
+GList *  g_content_types_get_registered   (void);
 
 /*< private >*/
 #ifndef __GTK_DOC_IGNORE__
-XPL_AVAILABLE_IN_2_60
-const xchar_t * const *g_content_type_get_mime_dirs (void);
-XPL_AVAILABLE_IN_2_60
-void                 g_content_type_set_mime_dirs (const xchar_t * const *dirs);
+GLIB_AVAILABLE_IN_2_60
+const gchar * const *g_content_type_get_mime_dirs (void);
+GLIB_AVAILABLE_IN_2_60
+void                 g_content_type_set_mime_dirs (const gchar * const *dirs);
 #endif /* __GTK_DOC_IGNORE__ */
 
 G_END_DECLS

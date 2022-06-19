@@ -3,95 +3,95 @@
 static void
 test_registration_serial (void)
 {
-  xint_t serial1, serial2, serial3;
+  gint serial1, serial2, serial3;
 
-  serial1 = xtype_get_type_registration_serial ();
+  serial1 = g_type_get_type_registration_serial ();
   g_pointer_type_register_static ("my+pointer");
-  serial2 = xtype_get_type_registration_serial ();
-  xassert (serial1 != serial2);
-  serial3 = xtype_get_type_registration_serial ();
-  xassert (serial2 == serial3);
+  serial2 = g_type_get_type_registration_serial ();
+  g_assert (serial1 != serial2);
+  serial3 = g_type_get_type_registration_serial ();
+  g_assert (serial2 == serial3);
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} bar_interface_t;
+  GTypeInterface g_iface;
+} BarInterface;
 
-xtype_t bar_get_type (void);
+GType bar_get_type (void);
 
-G_DEFINE_INTERFACE (bar, bar, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (Bar, bar, G_TYPE_OBJECT)
 
 static void
-bar_default_init (bar_interface_t *iface)
+bar_default_init (BarInterface *iface)
 {
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} foo_interface_t;
+  GTypeInterface g_iface;
+} FooInterface;
 
-xtype_t foo_get_type (void);
+GType foo_get_type (void);
 
-G_DEFINE_INTERFACE_WITH_CODE (foo, foo, XTYPE_OBJECT,
-                              xtype_interface_add_prerequisite (g_define_type_id, bar_get_type ()))
+G_DEFINE_INTERFACE_WITH_CODE (Foo, foo, G_TYPE_OBJECT,
+                              g_type_interface_add_prerequisite (g_define_type_id, bar_get_type ()))
 
 static void
-foo_default_init (foo_interface_t *iface)
+foo_default_init (FooInterface *iface)
 {
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} baa_interface_t;
+  GTypeInterface g_iface;
+} BaaInterface;
 
-xtype_t baa_get_type (void);
+GType baa_get_type (void);
 
-G_DEFINE_INTERFACE (baa, baa, XTYPE_INVALID)
+G_DEFINE_INTERFACE (Baa, baa, G_TYPE_INVALID)
 
 static void
-baa_default_init (baa_interface_t *iface)
+baa_default_init (BaaInterface *iface)
 {
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} boo_interface_t;
+  GTypeInterface g_iface;
+} BooInterface;
 
-xtype_t boo_get_type (void);
+GType boo_get_type (void);
 
-G_DEFINE_INTERFACE_WITH_CODE (boo, boo, XTYPE_INVALID,
-                              xtype_interface_add_prerequisite (g_define_type_id, baa_get_type ()))
+G_DEFINE_INTERFACE_WITH_CODE (Boo, boo, G_TYPE_INVALID,
+                              g_type_interface_add_prerequisite (g_define_type_id, baa_get_type ()))
 
 static void
-boo_default_init (boo_interface_t *iface)
+boo_default_init (BooInterface *iface)
 {
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} bibi_interface_t;
+  GTypeInterface g_iface;
+} BibiInterface;
 
-xtype_t bibi_get_type (void);
+GType bibi_get_type (void);
 
-G_DEFINE_INTERFACE (bibi, bibi, XTYPE_INITIALLY_UNOWNED)
+G_DEFINE_INTERFACE (Bibi, bibi, G_TYPE_INITIALLY_UNOWNED)
 
 static void
-bibi_default_init (bibi_interface_t *iface)
+bibi_default_init (BibiInterface *iface)
 {
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} bozo_interface_t;
+  GTypeInterface g_iface;
+} BozoInterface;
 
-xtype_t bozo_get_type (void);
+GType bozo_get_type (void);
 
-G_DEFINE_INTERFACE_WITH_CODE (bozo, bozo, XTYPE_INVALID,
-                              xtype_interface_add_prerequisite (g_define_type_id, foo_get_type ());
-                              xtype_interface_add_prerequisite (g_define_type_id, bibi_get_type ()))
+G_DEFINE_INTERFACE_WITH_CODE (Bozo, bozo, G_TYPE_INVALID,
+                              g_type_interface_add_prerequisite (g_define_type_id, foo_get_type ());
+                              g_type_interface_add_prerequisite (g_define_type_id, bibi_get_type ()))
 
 static void
-bozo_default_init (bozo_interface_t *iface)
+bozo_default_init (BozoInterface *iface)
 {
 }
 
@@ -100,80 +100,80 @@ bozo_default_init (bozo_interface_t *iface)
 static void
 test_interface_prerequisite (void)
 {
-  xtype_t *prereqs;
-  xuint_t n_prereqs;
-  xpointer_t iface;
-  xpointer_t parent;
+  GType *prereqs;
+  guint n_prereqs;
+  gpointer iface;
+  gpointer parent;
 
-  prereqs = xtype_interface_prerequisites (foo_get_type (), &n_prereqs);
+  prereqs = g_type_interface_prerequisites (foo_get_type (), &n_prereqs);
   g_assert_cmpint (n_prereqs, ==, 2);
-  xassert (prereqs[0] == bar_get_type ());
-  xassert (prereqs[1] == XTYPE_OBJECT);
-  xassert (xtype_interface_instantiatable_prerequisite (foo_get_type ()) == XTYPE_OBJECT);
+  g_assert (prereqs[0] == bar_get_type ());
+  g_assert (prereqs[1] == G_TYPE_OBJECT);
+  g_assert (g_type_interface_instantiatable_prerequisite (foo_get_type ()) == G_TYPE_OBJECT);
 
-  iface = xtype_default_interface_ref (foo_get_type ());
-  parent = xtype_interface_peek_parent (iface);
-  xassert (parent == NULL);
-  xtype_default_interface_unref (iface);
+  iface = g_type_default_interface_ref (foo_get_type ());
+  parent = g_type_interface_peek_parent (iface);
+  g_assert (parent == NULL);
+  g_type_default_interface_unref (iface);
 
   g_free (prereqs);
 
-  g_assert_cmpint (xtype_interface_instantiatable_prerequisite (baa_get_type ()), ==, XTYPE_INVALID);
-  g_assert_cmpint (xtype_interface_instantiatable_prerequisite (boo_get_type ()), ==, XTYPE_INVALID);
+  g_assert_cmpint (g_type_interface_instantiatable_prerequisite (baa_get_type ()), ==, G_TYPE_INVALID);
+  g_assert_cmpint (g_type_interface_instantiatable_prerequisite (boo_get_type ()), ==, G_TYPE_INVALID);
 
-  g_assert_cmpint (xtype_interface_instantiatable_prerequisite (bozo_get_type ()), ==, XTYPE_INITIALLY_UNOWNED);
+  g_assert_cmpint (g_type_interface_instantiatable_prerequisite (bozo_get_type ()), ==, G_TYPE_INITIALLY_UNOWNED);
 }
 
 typedef struct {
-  xtype_interface_t x_iface;
-} baz_interface_t;
+  GTypeInterface g_iface;
+} BazInterface;
 
-xtype_t baz_get_type (void);
+GType baz_get_type (void);
 
-G_DEFINE_INTERFACE (baz, baz, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (Baz, baz, G_TYPE_OBJECT)
 
 static void
-baz_default_init (baz_interface_t *iface)
+baz_default_init (BazInterface *iface)
 {
 }
 
 typedef struct {
-  xobject_t parent;
-} bazo_t;
+  GObject parent;
+} Bazo;
 
 typedef struct {
-  xobject_class_t parent_class;
-} bazo_class_t;
+  GObjectClass parent_class;
+} BazoClass;
 
-xtype_t bazo_get_type (void);
-static void bazo_iface_init (baz_interface_t *i);
+GType bazo_get_type (void);
+static void bazo_iface_init (BazInterface *i);
 
-G_DEFINE_TYPE_WITH_CODE (bazo, bazo, XTYPE_INITIALLY_UNOWNED,
+G_DEFINE_TYPE_WITH_CODE (Bazo, bazo, G_TYPE_INITIALLY_UNOWNED,
                          G_IMPLEMENT_INTERFACE (baz_get_type (),
                                                 bazo_iface_init);)
 
 static void
-bazo_init (bazo_t *b)
+bazo_init (Bazo *b)
 {
 }
 
 static void
-bazo_class_init (bazo_class_t *c)
+bazo_class_init (BazoClass *c)
 {
 }
 
 static void
-bazo_iface_init (baz_interface_t *i)
+bazo_iface_init (BazInterface *i)
 {
 }
 
-static xint_t check_called;
+static gint check_called;
 
 static void
-check_func (xpointer_t check_data,
-            xpointer_t x_iface)
+check_func (gpointer check_data,
+            gpointer g_iface)
 {
-  xassert (check_data == &check_called);
+  g_assert (check_data == &check_called);
 
   check_called++;
 }
@@ -181,24 +181,24 @@ check_func (xpointer_t check_data,
 static void
 test_interface_check (void)
 {
-  xobject_t *o;
+  GObject *o;
 
   check_called = 0;
-  xtype_add_interface_check (&check_called, check_func);
-  o = xobject_new (bazo_get_type (), NULL);
-  xobject_unref (o);
+  g_type_add_interface_check (&check_called, check_func);
+  o = g_object_new (bazo_get_type (), NULL);
+  g_object_unref (o);
   g_assert_cmpint (check_called, ==, 1);
-  xtype_remove_interface_check (&check_called, check_func);
+  g_type_remove_interface_check (&check_called, check_func);
 }
 
 static void
 test_next_base (void)
 {
-  xtype_t type;
+  GType type;
 
-  type = xtype_next_base (bazo_get_type (), XTYPE_OBJECT);
+  type = g_type_next_base (bazo_get_type (), G_TYPE_OBJECT);
 
-  xassert (type == XTYPE_INITIALLY_UNOWNED);
+  g_assert (type == G_TYPE_INITIALLY_UNOWNED);
 }
 
 int

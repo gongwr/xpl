@@ -40,7 +40,7 @@ test_subst_pid_and_event (void)
   char *debugger_enough_utf8;
   wchar_t debugger_big[65535] = {0};
   char *debugger_big_utf8;
-  xchar_t *output;
+  gchar *output;
   guintptr be = (guintptr) 0xFFFFFFFF;
   DWORD bp = G_MAXSIZE;
 
@@ -57,14 +57,14 @@ test_subst_pid_and_event (void)
   /* This should fit */
   g_assert_true (_g_win32_subst_pid_and_event_w (debugger_enough, G_N_ELEMENTS (debugger_enough),
                                                  not_enough, 10, 200));
-  debugger_enough_utf8 = xutf16_to_utf8 (debugger_enough, -1, NULL, NULL, NULL);
+  debugger_enough_utf8 = g_utf16_to_utf8 (debugger_enough, -1, NULL, NULL, NULL);
   g_assert_cmpstr (debugger_enough_utf8, ==, "too long when 200 and 10 are substituted");
   g_free (debugger_enough_utf8);
 
   g_assert_true (_g_win32_subst_pid_and_event_w (debugger_big, G_N_ELEMENTS (debugger_big),
                                                  L"multipl%e big %e %entries and %pids are %provided here", bp, be));
-  debugger_big_utf8 = xutf16_to_utf8 (debugger_big, -1, NULL, NULL, NULL);
-  output = xstrdup_printf ("multipl%llu big %llu %lluntries and %luids are %lurovided here", (xuint64_t) be, (xuint64_t) be, (xuint64_t) be, bp, bp);
+  debugger_big_utf8 = g_utf16_to_utf8 (debugger_big, -1, NULL, NULL, NULL);
+  output = g_strdup_printf ("multipl%llu big %llu %lluntries and %luids are %lurovided here", (guint64) be, (guint64) be, (guint64) be, bp, bp);
   g_assert_cmpstr (debugger_big_utf8, ==, output);
   g_free (debugger_big_utf8);
   g_free (output);
@@ -116,7 +116,7 @@ static void
 test_veh_debug (void)
 {
   /* Set up a debugger to be run on crash */
-  xchar_t *command = xstrdup_printf ("%s %s", argv0, "%p %e");
+  gchar *command = g_strdup_printf ("%s %s", argv0, "%p %e");
   g_setenv ("G_DEBUGGER", command, TRUE);
   /* Because the "debugger" here is not really a debugger,
    * it can't write into stderr of this process, unless

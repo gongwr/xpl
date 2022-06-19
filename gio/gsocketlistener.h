@@ -23,8 +23,8 @@
  *          Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XSOCKET_LISTENER_H__
-#define __XSOCKET_LISTENER_H__
+#ifndef __G_SOCKET_LISTENER_H__
+#define __G_SOCKET_LISTENER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -34,17 +34,17 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_LISTENER                              (xsocket_listener_get_type ())
-#define XSOCKET_LISTENER(inst)                             (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_LISTENER, xsocket_listener))
-#define XSOCKET_LISTENER_CLASS(class)                      (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_LISTENER, GSocketListenerClass))
-#define X_IS_SOCKET_LISTENER(inst)                          (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET_LISTENER))
-#define X_IS_SOCKET_LISTENER_CLASS(class)                   (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET_LISTENER))
-#define XSOCKET_LISTENER_GET_CLASS(inst)                   (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_LISTENER, GSocketListenerClass))
+#define G_TYPE_SOCKET_LISTENER                              (g_socket_listener_get_type ())
+#define G_SOCKET_LISTENER(inst)                             (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET_LISTENER, GSocketListener))
+#define G_SOCKET_LISTENER_CLASS(class)                      (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET_LISTENER, GSocketListenerClass))
+#define G_IS_SOCKET_LISTENER(inst)                          (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET_LISTENER))
+#define G_IS_SOCKET_LISTENER_CLASS(class)                   (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET_LISTENER))
+#define G_SOCKET_LISTENER_GET_CLASS(inst)                   (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET_LISTENER, GSocketListenerClass))
 
 typedef struct _GSocketListenerPrivate                      GSocketListenerPrivate;
 typedef struct _GSocketListenerClass                        GSocketListenerClass;
@@ -53,17 +53,17 @@ typedef struct _GSocketListenerClass                        GSocketListenerClass
  * GSocketListenerClass:
  * @changed: virtual method called when the set of socket listened to changes
  *
- * Class structure for #xsocket_listener_t.
+ * Class structure for #GSocketListener.
  **/
 struct _GSocketListenerClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  void (* changed) (xsocket_listener_t *listener);
+  void (* changed) (GSocketListener *listener);
 
-  void (* event) (xsocket_listener_t      *listener,
+  void (* event) (GSocketListener      *listener,
                   GSocketListenerEvent  event,
-                  xsocket_t              *socket);
+                  GSocket              *socket);
 
   /* Padding for future expansion */
   void (*_g_reserved2) (void);
@@ -75,81 +75,81 @@ struct _GSocketListenerClass
 
 struct _GSocketListener
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
   GSocketListenerPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   xsocket_listener_get_type                      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                   g_socket_listener_get_type                      (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_listener_t *       xsocket_listener_new                           (void);
+GLIB_AVAILABLE_IN_ALL
+GSocketListener *       g_socket_listener_new                           (void);
 
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_listener_set_backlog                   (xsocket_listener_t     *listener,
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_listener_set_backlog                   (GSocketListener     *listener,
 									 int                  listen_backlog);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xsocket_listener_add_socket                    (xsocket_listener_t     *listener,
-                                                                         xsocket_t             *socket,
-									 xobject_t             *source_object,
-									 xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xsocket_listener_add_address                   (xsocket_listener_t     *listener,
-                                                                         xsocket_address_t      *address,
-									 xsocket_type_t          type,
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_socket_listener_add_socket                    (GSocketListener     *listener,
+                                                                         GSocket             *socket,
+									 GObject             *source_object,
+									 GError             **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_socket_listener_add_address                   (GSocketListener     *listener,
+                                                                         GSocketAddress      *address,
+									 GSocketType          type,
 									 GSocketProtocol      protocol,
-									 xobject_t             *source_object,
-                                                                         xsocket_address_t     **effective_address,
-									 xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xsocket_listener_add_inet_port                 (xsocket_listener_t     *listener,
-                                                                         xuint16_t              port,
-									 xobject_t             *source_object,
-									 xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xuint16_t                 xsocket_listener_add_any_inet_port             (xsocket_listener_t     *listener,
-									 xobject_t             *source_object,
-									 xerror_t             **error);
+									 GObject             *source_object,
+                                                                         GSocketAddress     **effective_address,
+									 GError             **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_socket_listener_add_inet_port                 (GSocketListener     *listener,
+                                                                         guint16              port,
+									 GObject             *source_object,
+									 GError             **error);
+GLIB_AVAILABLE_IN_ALL
+guint16                 g_socket_listener_add_any_inet_port             (GSocketListener     *listener,
+									 GObject             *source_object,
+									 GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_t *               xsocket_listener_accept_socket                 (xsocket_listener_t      *listener,
-									 xobject_t             **source_object,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_listener_accept_socket_async           (xsocket_listener_t      *listener,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xsocket_t *               xsocket_listener_accept_socket_finish          (xsocket_listener_t      *listener,
-                                                                         xasync_result_t         *result,
-									 xobject_t             **source_object,
-                                                                         xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GSocket *               g_socket_listener_accept_socket                 (GSocketListener      *listener,
+									 GObject             **source_object,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_listener_accept_socket_async           (GSocketListener      *listener,
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GSocket *               g_socket_listener_accept_socket_finish          (GSocketListener      *listener,
+                                                                         GAsyncResult         *result,
+									 GObject             **source_object,
+                                                                         GError              **error);
 
 
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_listener_accept                        (xsocket_listener_t      *listener,
-									 xobject_t             **source_object,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_listener_accept                        (GSocketListener      *listener,
+									 GObject             **source_object,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_listener_accept_async                  (xsocket_listener_t      *listener,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_listener_accept_async                  (GSocketListener      *listener,
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_listener_accept_finish                 (xsocket_listener_t      *listener,
-                                                                         xasync_result_t         *result,
-									 xobject_t             **source_object,
-                                                                         xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_listener_accept_finish                 (GSocketListener      *listener,
+                                                                         GAsyncResult         *result,
+									 GObject             **source_object,
+                                                                         GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_listener_close                         (xsocket_listener_t      *listener);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_listener_close                         (GSocketListener      *listener);
 
 G_END_DECLS
 
-#endif /* __XSOCKET_LISTENER_H__ */
+#endif /* __G_SOCKET_LISTENER_H__ */

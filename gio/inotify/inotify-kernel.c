@@ -59,7 +59,7 @@ G_LOCK_EXTERN (inotify_lock);
 
 static ik_event_t *
 ik_event_new (struct inotify_event *kevent,
-              sint64_t                now)
+              gint64                now)
 {
   ik_event_t *event = g_new0 (ik_event_t, 1);
 
@@ -69,7 +69,7 @@ ik_event_new (struct inotify_event *kevent,
   event->len = kevent->len;
   event->timestamp = now;
   if (event->len)
-    event->name = xstrdup (kevent->name);
+    event->name = g_strdup (kevent->name);
   else
     event->name = NULL;
 
@@ -91,19 +91,19 @@ _ik_event_free (ik_event_t *event)
 
 typedef struct
 {
-  xsource_t     source;
+  GSource     source;
 
-  xqueue_t      queue;
-  xpointer_t    fd_tag;
-  xint_t        fd;
+  GQueue      queue;
+  gpointer    fd_tag;
+  gint        fd;
 
-  xhashtable_t *unmatched_moves;
-  xboolean_t    is_bored;
+  GHashTable *unmatched_moves;
+  gboolean    is_bored;
 } InotifyKernelSource;
 
 static InotifyKernelSource *inotify_source;
 
-static sint64_t
+static gint64
 ik_source_get_dispatch_time (InotifyKernelSource *iks)
 {
   ik_event_t *head;
@@ -126,23 +126,23 @@ ik_source_get_dispatch_time (InotifyKernelSource *iks)
   return head->timestamp + MOVE_PAIR_DELAY;
 }
 
-static xboolean_t
+static gboolean
 ik_source_can_dispatch_now (InotifyKernelSource *iks,
-                            sint64_t               now)
+                            gint64               now)
 {
-  sint64_t dispatch_time;
+  gint64 dispatch_time;
 
   dispatch_time = ik_source_get_dispatch_time (iks);
 
   return 0 <= dispatch_time && dispatch_time <= now;
 }
 
-static xsize_t
+static gsize
 ik_source_read_some_events (InotifyKernelSource *iks,
-                            xchar_t               *buffer,
-                            xsize_t                buffer_len)
+                            gchar               *buffer,
+                            gsize                buffer_len)
 {
-  xssize_t result;
+  gssize result;
   int errsv;
 
 again:
@@ -157,21 +157,21 @@ again:
       if (errsv == EAGAIN)
         return 0;
 
-      xerror ("inotify read(): %s", xstrerror (errsv));
+      g_error ("inotify read(): %s", g_strerror (errsv));
     }
   else if (result == 0)
-    xerror ("inotify unexpectedly hit eof");
+    g_error ("inotify unexpectedly hit eof");
 
   return result;
 }
 
-static xchar_t *
+static gchar *
 ik_source_read_all_the_events (InotifyKernelSource *iks,
-                               xchar_t               *buffer,
-                               xsize_t                buffer_len,
-                               xsize_t               *length_out)
+                               gchar               *buffer,
+                               gsize                buffer_len,
+                               gsize               *length_out)
 {
-  xsize_t n_read;
+  gsize n_read;
 
   n_read = ik_source_read_some_events (iks, buffer, buffer_len);
 
@@ -180,16 +180,16 @@ ik_source_read_all_the_events (InotifyKernelSource *iks,
    */
   if (n_read + MAX_EVENT_SIZE > buffer_len)
     {
-      xchar_t *new_buffer;
-      xuint_t n_readable;
-      xint_t result;
+      gchar *new_buffer;
+      guint n_readable;
+      gint result;
       int errsv;
 
       /* figure out how many more bytes there are to read */
       result = ioctl (iks->fd, FIONREAD, &n_readable);
       errsv = errno;
       if (result != 0)
-        xerror ("inotify ioctl(FIONREAD): %s", xstrerror (errsv));
+        g_error ("inotify ioctl(FIONREAD): %s", g_strerror (errsv));
 
       if (n_readable != 0)
         {
@@ -214,24 +214,24 @@ ik_source_read_all_the_events (InotifyKernelSource *iks,
   return buffer;
 }
 
-static xboolean_t
-ik_source_dispatch (xsource_t     *source,
-                    xsource_func_t  func,
-                    xpointer_t     user_data)
+static gboolean
+ik_source_dispatch (GSource     *source,
+                    GSourceFunc  func,
+                    gpointer     user_data)
 {
   InotifyKernelSource *iks = (InotifyKernelSource *) source;
-  xboolean_t (*user_callback) (ik_event_t *event) = (void *) func;
-  xboolean_t interesting = FALSE;
-  sint64_t now;
+  gboolean (*user_callback) (ik_event_t *event) = (void *) func;
+  gboolean interesting = FALSE;
+  gint64 now;
 
-  now = xsource_get_time (source);
+  now = g_source_get_time (source);
 
-  if (iks->is_bored || xsource_query_unix_fd (source, iks->fd_tag))
+  if (iks->is_bored || g_source_query_unix_fd (source, iks->fd_tag))
     {
-      xchar_t stack_buffer[4096];
-      xsize_t buffer_len;
-      xchar_t *buffer;
-      xsize_t offset;
+      gchar stack_buffer[4096];
+      gsize buffer_len;
+      gchar *buffer;
+      gsize offset;
 
       /* We want to read all of the available events.
        *
@@ -267,12 +267,12 @@ ik_source_dispatch (xsource_t     *source,
             {
               ik_event_t *pair;
 
-              pair = xhash_table_lookup (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
+              pair = g_hash_table_lookup (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
               if (pair != NULL)
                 {
-                  xassert (!pair->pair);
+                  g_assert (!pair->pair);
 
-                  xhash_table_remove (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
+                  g_hash_table_remove (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
                   event->is_second_in_pair = TRUE;
                   event->pair = pair;
                   pair->pair = event;
@@ -284,9 +284,9 @@ ik_source_dispatch (xsource_t     *source,
 
           else if (event->mask & IN_MOVED_FROM)
             {
-              xboolean_t new;
+              gboolean new;
 
-              new = xhash_table_insert (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie), event);
+              new = g_hash_table_insert (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie), event);
               if G_UNLIKELY (!new)
                 g_warning ("inotify: got IN_MOVED_FROM event with already-pending cookie %#x", event->cookie);
 
@@ -304,7 +304,7 @@ ik_source_dispatch (xsource_t     *source,
            * In that case, we need to switch back to polling the file
            * descriptor in the usual way.
            */
-          xassert (iks->is_bored);
+          g_assert (iks->is_bored);
           interesting = TRUE;
         }
 
@@ -320,7 +320,7 @@ ik_source_dispatch (xsource_t     *source,
       event = g_queue_pop_head (&iks->queue);
 
       if (event->mask & IN_MOVED_FROM && !event->pair)
-        xhash_table_remove (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
+        g_hash_table_remove (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
 
       G_LOCK (inotify_lock);
 
@@ -330,7 +330,7 @@ ik_source_dispatch (xsource_t     *source,
     }
 
   /* The queue gets blocked iff we have unmatched moves */
-  xassert ((iks->queue.length > 0) == (xhash_table_size (iks->unmatched_moves) > 0));
+  g_assert ((iks->queue.length > 0) == (g_hash_table_size (iks->unmatched_moves) > 0));
 
   /* Here's where we decide what will wake us up next.
    *
@@ -344,46 +344,46 @@ ik_source_dispatch (xsource_t     *source,
     {
       if (iks->is_bored)
         {
-          xsource_modify_unix_fd (source, iks->fd_tag, G_IO_IN);
+          g_source_modify_unix_fd (source, iks->fd_tag, G_IO_IN);
           iks->is_bored = FALSE;
         }
 
-      xsource_set_ready_time (source, ik_source_get_dispatch_time (iks));
+      g_source_set_ready_time (source, ik_source_get_dispatch_time (iks));
     }
   else
     {
-      xuint64_t dispatch_time = ik_source_get_dispatch_time (iks);
-      xuint64_t boredom_time = now + BOREDOM_SLEEP_TIME;
+      guint64 dispatch_time = ik_source_get_dispatch_time (iks);
+      guint64 boredom_time = now + BOREDOM_SLEEP_TIME;
 
       if (!iks->is_bored)
         {
-          xsource_modify_unix_fd (source, iks->fd_tag, 0);
+          g_source_modify_unix_fd (source, iks->fd_tag, 0);
           iks->is_bored = TRUE;
         }
 
-      xsource_set_ready_time (source, MIN (dispatch_time, boredom_time));
+      g_source_set_ready_time (source, MIN (dispatch_time, boredom_time));
     }
 
   return TRUE;
 }
 
 static InotifyKernelSource *
-ik_source_new (xboolean_t (* callback) (ik_event_t *event))
+ik_source_new (gboolean (* callback) (ik_event_t *event))
 {
-  static xsource_funcs_t source_funcs = {
+  static GSourceFuncs source_funcs = {
     NULL, NULL,
     ik_source_dispatch,
     NULL, NULL, NULL
   };
   InotifyKernelSource *iks;
-  xsource_t *source;
+  GSource *source;
 
-  source = xsource_new (&source_funcs, sizeof (InotifyKernelSource));
+  source = g_source_new (&source_funcs, sizeof (InotifyKernelSource));
   iks = (InotifyKernelSource *) source;
 
-  xsource_set_static_name (source, "inotify kernel source");
+  g_source_set_static_name (source, "inotify kernel source");
 
-  iks->unmatched_moves = xhash_table_new (NULL, NULL);
+  iks->unmatched_moves = g_hash_table_new (NULL, NULL);
   iks->fd = inotify_init1 (IN_CLOEXEC);
 
   if (iks->fd < 0)
@@ -391,23 +391,23 @@ ik_source_new (xboolean_t (* callback) (ik_event_t *event))
 
   if (iks->fd >= 0)
     {
-      xerror_t *error = NULL;
+      GError *error = NULL;
 
       g_unix_set_fd_nonblocking (iks->fd, TRUE, &error);
       g_assert_no_error (error);
 
-      iks->fd_tag = xsource_add_unix_fd (source, iks->fd, G_IO_IN);
+      iks->fd_tag = g_source_add_unix_fd (source, iks->fd, G_IO_IN);
     }
 
-  xsource_set_callback (source, (xsource_func_t) callback, NULL, NULL);
+  g_source_set_callback (source, (GSourceFunc) callback, NULL, NULL);
 
-  xsource_attach (source, XPL_PRIVATE_CALL (g_get_worker_context) ());
+  g_source_attach (source, GLIB_PRIVATE_CALL (g_get_worker_context) ());
 
   return iks;
 }
 
-xboolean_t
-_ik_startup (xboolean_t (*cb)(ik_event_t *event))
+gboolean
+_ik_startup (gboolean (*cb)(ik_event_t *event))
 {
   if (g_once_init_enter (&inotify_source))
     g_once_init_leave (&inotify_source, ik_source_new (cb));
@@ -417,13 +417,13 @@ _ik_startup (xboolean_t (*cb)(ik_event_t *event))
 
 gint32
 _ik_watch (const char *path,
-           xuint32_t     mask,
+           guint32     mask,
            int        *err)
 {
   gint32 wd = -1;
 
-  xassert (path != NULL);
-  xassert (inotify_source && inotify_source->fd >= 0);
+  g_assert (path != NULL);
+  g_assert (inotify_source && inotify_source->fd >= 0);
 
   wd = inotify_add_watch (inotify_source->fd, path, mask);
 
@@ -436,7 +436,7 @@ _ik_watch (const char *path,
       return wd;
     }
 
-  xassert (wd >= 0);
+  g_assert (wd >= 0);
   return wd;
 }
 
@@ -444,8 +444,8 @@ int
 _ik_ignore (const char *path,
             gint32      wd)
 {
-  xassert (wd >= 0);
-  xassert (inotify_source && inotify_source->fd >= 0);
+  g_assert (wd >= 0);
+  g_assert (inotify_source && inotify_source->fd >= 0);
 
   if (inotify_rm_watch (inotify_source->fd, wd) < 0)
     {

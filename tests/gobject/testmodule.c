@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * testmodule.c: Dummy dynamic type module
  * Copyright (C) 2003 Red Hat, Inc.
  *
@@ -19,48 +19,48 @@
 #include "testmodule.h"
 #include "testcommon.h"
 
-static xboolean_t test_module_load   (xtype_module_t *module);
-static void     test_module_unload (xtype_module_t *module);
+static gboolean test_module_load   (GTypeModule *module);
+static void     test_module_unload (GTypeModule *module);
 
 static void
-test_module_class_init (test_module_class_t *class)
+test_module_class_init (TestModuleClass *class)
 {
-  xtype_module_class_t *module_class = XTYPE_MODULE_CLASS (class);
+  GTypeModuleClass *module_class = G_TYPE_MODULE_CLASS (class);
 
   module_class->load = test_module_load;
   module_class->unload = test_module_unload;
 }
 
-DEFINE_TYPE (test_module, test_module,
+DEFINE_TYPE (TestModule, test_module,
 	     test_module_class_init, NULL, NULL,
-	     XTYPE_TYPE_MODULE)
+	     G_TYPE_TYPE_MODULE)
 
-static xboolean_t
-test_module_load (xtype_module_t *module)
+static gboolean
+test_module_load (GTypeModule *module)
 {
-  test_module_t *test_module = TEST_MODULE (module);
+  TestModule *test_module = TEST_MODULE (module);
 
   test_module->register_func (module);
-
+  
   return TRUE;
 }
 
 static void
-test_module_unload (xtype_module_t *module)
+test_module_unload (GTypeModule *module)
 {
 }
 
-xtype_module_t *
-test_module_new (test_module_register_func_t register_func)
+GTypeModule *
+test_module_new (TestModuleRegisterFunc register_func)
 {
-  test_module_t *test_module = xobject_new (TEST_TYPE_MODULE, NULL);
-  xtype_module_t *module = XTYPE_MODULE (test_module);
-
+  TestModule *test_module = g_object_new (TEST_TYPE_MODULE, NULL);
+  GTypeModule *module = G_TYPE_MODULE (test_module);
+  
   test_module->register_func = register_func;
 
   /* Register the types initially */
-  xtype_module_use (module);
-  xtype_module_unuse (module);
+  g_type_module_use (module);
+  g_type_module_unuse (module);
 
-  return XTYPE_MODULE (module);
+  return G_TYPE_MODULE (module);
 }

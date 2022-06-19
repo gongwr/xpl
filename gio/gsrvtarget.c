@@ -44,26 +44,26 @@
  * You can use g_resolver_lookup_service() or
  * g_resolver_lookup_service_async() to find the #GSrvTargets
  * for a given service. However, if you are simply planning to connect
- * to the remote service, you can use #xnetwork_service_t's
- * #xsocket_connectable_t interface and not need to worry about
- * #xsrv_target_t at all.
+ * to the remote service, you can use #GNetworkService's
+ * #GSocketConnectable interface and not need to worry about
+ * #GSrvTarget at all.
  */
 
 struct _GSrvTarget {
-  xchar_t   *hostname;
-  xuint16_t  port;
+  gchar   *hostname;
+  guint16  port;
 
-  xuint16_t  priority;
-  xuint16_t  weight;
+  guint16  priority;
+  guint16  weight;
 };
 
 /**
- * xsrv_target_t:
+ * GSrvTarget:
  *
  * A single target host/port that a network service is running on.
  */
 
-G_DEFINE_BOXED_TYPE (xsrv_target_t, g_srv_target,
+G_DEFINE_BOXED_TYPE (GSrvTarget, g_srv_target,
                      g_srv_target_copy, g_srv_target_free)
 
 /**
@@ -73,24 +73,24 @@ G_DEFINE_BOXED_TYPE (xsrv_target_t, g_srv_target,
  * @priority: the target's priority
  * @weight: the target's weight
  *
- * Creates a new #xsrv_target_t with the given parameters.
+ * Creates a new #GSrvTarget with the given parameters.
  *
  * You should not need to use this; normally #GSrvTargets are
- * created by #xresolver_t.
+ * created by #GResolver.
  *
- * Returns: a new #xsrv_target_t.
+ * Returns: a new #GSrvTarget.
  *
  * Since: 2.22
  */
-xsrv_target_t *
-g_srv_target_new (const xchar_t *hostname,
-                  xuint16_t      port,
-                  xuint16_t      priority,
-                  xuint16_t      weight)
+GSrvTarget *
+g_srv_target_new (const gchar *hostname,
+                  guint16      port,
+                  guint16      priority,
+                  guint16      weight)
 {
-  xsrv_target_t *target = g_slice_new0 (xsrv_target_t);
+  GSrvTarget *target = g_slice_new0 (GSrvTarget);
 
-  target->hostname = xstrdup (hostname);
+  target->hostname = g_strdup (hostname);
   target->port = port;
   target->priority = priority;
   target->weight = weight;
@@ -100,7 +100,7 @@ g_srv_target_new (const xchar_t *hostname,
 
 /**
  * g_srv_target_copy:
- * @target: a #xsrv_target_t
+ * @target: a #GSrvTarget
  *
  * Copies @target
  *
@@ -108,8 +108,8 @@ g_srv_target_new (const xchar_t *hostname,
  *
  * Since: 2.22
  */
-xsrv_target_t *
-g_srv_target_copy (xsrv_target_t *target)
+GSrvTarget *
+g_srv_target_copy (GSrvTarget *target)
 {
   return g_srv_target_new (target->hostname, target->port,
                            target->priority, target->weight);
@@ -117,22 +117,22 @@ g_srv_target_copy (xsrv_target_t *target)
 
 /**
  * g_srv_target_free:
- * @target: a #xsrv_target_t
+ * @target: a #GSrvTarget
  *
  * Frees @target
  *
  * Since: 2.22
  */
 void
-g_srv_target_free (xsrv_target_t *target)
+g_srv_target_free (GSrvTarget *target)
 {
   g_free (target->hostname);
-  g_slice_free (xsrv_target_t, target);
+  g_slice_free (GSrvTarget, target);
 }
 
 /**
  * g_srv_target_get_hostname:
- * @target: a #xsrv_target_t
+ * @target: a #GSrvTarget
  *
  * Gets @target's hostname (in ASCII form; if you are going to present
  * this to the user, you should use g_hostname_is_ascii_encoded() to
@@ -143,15 +143,15 @@ g_srv_target_free (xsrv_target_t *target)
  *
  * Since: 2.22
  */
-const xchar_t *
-g_srv_target_get_hostname (xsrv_target_t *target)
+const gchar *
+g_srv_target_get_hostname (GSrvTarget *target)
 {
   return target->hostname;
 }
 
 /**
  * g_srv_target_get_port:
- * @target: a #xsrv_target_t
+ * @target: a #GSrvTarget
  *
  * Gets @target's port
  *
@@ -159,53 +159,53 @@ g_srv_target_get_hostname (xsrv_target_t *target)
  *
  * Since: 2.22
  */
-xuint16_t
-g_srv_target_get_port (xsrv_target_t *target)
+guint16
+g_srv_target_get_port (GSrvTarget *target)
 {
   return target->port;
 }
 
 /**
  * g_srv_target_get_priority:
- * @target: a #xsrv_target_t
+ * @target: a #GSrvTarget
  *
  * Gets @target's priority. You should not need to look at this;
- * #xresolver_t already sorts the targets according to the algorithm in
+ * #GResolver already sorts the targets according to the algorithm in
  * RFC 2782.
  *
  * Returns: @target's priority
  *
  * Since: 2.22
  */
-xuint16_t
-g_srv_target_get_priority (xsrv_target_t *target)
+guint16
+g_srv_target_get_priority (GSrvTarget *target)
 {
   return target->priority;
 }
 
 /**
  * g_srv_target_get_weight:
- * @target: a #xsrv_target_t
+ * @target: a #GSrvTarget
  *
  * Gets @target's weight. You should not need to look at this;
- * #xresolver_t already sorts the targets according to the algorithm in
+ * #GResolver already sorts the targets according to the algorithm in
  * RFC 2782.
  *
  * Returns: @target's weight
  *
  * Since: 2.22
  */
-xuint16_t
-g_srv_target_get_weight (xsrv_target_t *target)
+guint16
+g_srv_target_get_weight (GSrvTarget *target)
 {
   return target->weight;
 }
 
-static xint_t
-compare_target (xconstpointer a, xconstpointer b)
+static gint
+compare_target (gconstpointer a, gconstpointer b)
 {
-  xsrv_target_t *ta = (xsrv_target_t *)a;
-  xsrv_target_t *tb = (xsrv_target_t *)b;
+  GSrvTarget *ta = (GSrvTarget *)a;
+  GSrvTarget *tb = (GSrvTarget *)b;
 
   if (ta->priority == tb->priority)
     {
@@ -221,7 +221,7 @@ compare_target (xconstpointer a, xconstpointer b)
 
 /**
  * g_srv_target_list_sort: (skip)
- * @targets: a #xlist_t of #xsrv_target_t
+ * @targets: a #GList of #GSrvTarget
  *
  * Sorts @targets in place according to the algorithm in RFC 2782.
  *
@@ -229,12 +229,12 @@ compare_target (xconstpointer a, xconstpointer b)
  *
  * Since: 2.22
  */
-xlist_t *
-g_srv_target_list_sort (xlist_t *targets)
+GList *
+g_srv_target_list_sort (GList *targets)
 {
-  xint_t sum, num, val, priority, weight;
-  xlist_t *t, *out, *tail;
-  xsrv_target_t *target;
+  gint sum, num, val, priority, weight;
+  GList *t, *out, *tail;
+  GSrvTarget *target;
 
   if (!targets)
     return NULL;
@@ -248,7 +248,7 @@ g_srv_target_list_sort (xlist_t *targets)
            * available at this domain.'
            */
           g_srv_target_free (target);
-          xlist_free (targets);
+          g_list_free (targets);
           return NULL;
         }
     }
@@ -256,7 +256,7 @@ g_srv_target_list_sort (xlist_t *targets)
   /* Sort input list by priority, and put the 0-weight targets first
    * in each priority group. Initialize output list to %NULL.
    */
-  targets = xlist_sort (targets, compare_target);
+  targets = g_list_sort (targets, compare_target);
   out = tail = NULL;
 
   /* For each group of targets with the same priority, remove them
@@ -264,7 +264,7 @@ g_srv_target_list_sort (xlist_t *targets)
    */
   while (targets)
     {
-      priority = ((xsrv_target_t *)targets->data)->priority;
+      priority = ((GSrvTarget *)targets->data)->priority;
 
       /* Count the number of targets at this priority level, and
        * compute the sum of their weights.
@@ -272,7 +272,7 @@ g_srv_target_list_sort (xlist_t *targets)
       sum = num = 0;
       for (t = targets; t; t = t->next)
         {
-          target = (xsrv_target_t *)t->data;
+          target = (GSrvTarget *)t->data;
           if (target->priority != priority)
             break;
           sum += target->weight;
@@ -289,13 +289,13 @@ g_srv_target_list_sort (xlist_t *targets)
           val = g_random_int_range (0, sum + 1);
           for (t = targets; ; t = t->next)
             {
-              weight = ((xsrv_target_t *)t->data)->weight;
+              weight = ((GSrvTarget *)t->data)->weight;
               if (weight >= val)
                 break;
               val -= weight;
             }
 
-          targets = xlist_remove_link (targets, t);
+          targets = g_list_remove_link (targets, t);
 
           if (!out)
             out = t;

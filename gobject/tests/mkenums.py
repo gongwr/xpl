@@ -324,12 +324,12 @@ comment: {standard_bottom_comment}
         )
 
     def test_help(self):
-        """test_t the --help argument."""
+        """Test the --help argument."""
         result = self.runMkenums("--help")
         self.assertIn("usage: glib-mkenums", result.out)
 
     def test_no_args(self):
-        """test_t running with no arguments at all."""
+        """Test running with no arguments at all."""
         result = self.runMkenums()
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -343,7 +343,7 @@ comment: {standard_bottom_comment}
         )
 
     def test_empty_template(self):
-        """test_t running with an empty template and no header files."""
+        """Test running with an empty template and no header files."""
         result = self.runMkenumsWithTemplate("")
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -357,7 +357,7 @@ comment: {standard_bottom_comment}
         )
 
     def test_no_headers(self):
-        """test_t running with a complete template, but no header files."""
+        """Test running with a complete template, but no header files."""
         result = self.runMkenumsWithAllSubstitutions()
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -378,7 +378,7 @@ comment: {standard_bottom_comment}
         )
 
     def test_empty_header(self):
-        """test_t an empty header."""
+        """Test an empty header."""
         result = self.runMkenumsWithHeader("")
         self.assertEqual("", result.err)
         self.assertEqual(
@@ -399,7 +399,7 @@ comment: {standard_bottom_comment}
         )
 
     def test_enum_name(self):
-        """test_t typedefs with an enum and a typedef name. Bug #794506."""
+        """Test typedefs with an enum and a typedef name. Bug #794506."""
         h_contents = """
         typedef enum _SomeEnumIdentifier {
           ENUM_VALUE
@@ -415,16 +415,16 @@ comment: {standard_bottom_comment}
             "ENUM_IDENTIFIER",
             "SOME",
             "",
-            "xenum",
+            "enum",
             "Enum",
-            "XENUM",
+            "ENUM",
             "ENUM_VALUE",
             "value",
             "0",
         )
 
     def test_non_utf8_encoding(self):
-        """test_t source files with non-UTF-8 encoding. Bug #785113."""
+        """Test source files with non-UTF-8 encoding. Bug #785113."""
         h_contents = """
         /* Copyright © La Peña */
         typedef enum {
@@ -441,16 +441,16 @@ comment: {standard_bottom_comment}
             "ENUM_IDENTIFIER",
             "SOME",
             "",
-            "xenum",
+            "enum",
             "Enum",
-            "XENUM",
+            "ENUM",
             "ENUM_VALUE",
             "value",
             "0",
         )
 
     def test_reproducible(self):
-        """test_t builds are reproducible regardless of file ordering.
+        """Test builds are reproducible regardless of file ordering.
         Bug #691436."""
         template_contents = "template"
 
@@ -494,7 +494,7 @@ comment: {standard_bottom_comment}
             self.assertEqual(result1.out, result2.out)
 
     def test_no_nick(self):
-        """test_t trigraphs with a desc but no nick. Issue #1360."""
+        """Test trigraphs with a desc but no nick. Issue #1360."""
         h_contents = """
         typedef enum {
           GEGL_SAMPLER_NEAREST = 0,   /*< desc="nearest"      >*/
@@ -510,9 +510,9 @@ comment: {standard_bottom_comment}
             "SAMPLER_TYPE",
             "GEGL",
             "",
-            "xenum",
+            "enum",
             "Enum",
-            "XENUM",
+            "ENUM",
             "GEGL_SAMPLER_NEAREST",
             "nearest",
             "0",
@@ -570,7 +570,7 @@ comment: {standard_bottom_comment}
         )
 
     def test_since(self):
-        """test_t user-provided 'since' version handling
+        """Test user-provided 'since' version handling
         https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1492"""
         h_contents = """
         typedef enum { /*< since=1.0 >*/
@@ -587,16 +587,16 @@ comment: {standard_bottom_comment}
             "WMS_MESSAGE_PROTOCOL",
             "QMI",
             "1.0",
-            "xenum",
+            "enum",
             "Enum",
-            "XENUM",
+            "ENUM",
             "QMI_WMS_MESSAGE_PROTOCOL_CDMA",
             "cdma",
             "0",
         )
 
     def test_enum_private_public(self):
-        """test_t private/public enums. Bug #782162."""
+        """Test private/public enums. Bug #782162."""
         h_contents1 = """
         typedef enum {
           ENUM_VALUE_PUBLIC1,
@@ -625,9 +625,9 @@ comment: {standard_bottom_comment}
             "ENUM_A",
             "SOME",
             "",
-            "xenum",
+            "enum",
             "Enum",
-            "XENUM",
+            "ENUM",
             "ENUM_VALUE_PUBLIC1",
             "public1",
             "0",
@@ -642,28 +642,28 @@ comment: {standard_bottom_comment}
             "ENUM_B",
             "SOME",
             "",
-            "xenum",
+            "enum",
             "Enum",
-            "XENUM",
+            "ENUM",
             "ENUM_VALUE_PUBLIC2",
             "public2",
             "0",
         )
 
     def test_available_in(self):
-        """test_t XPL_AVAILABLE_ENUMERATOR_IN_2_68 handling
+        """Test GLIB_AVAILABLE_ENUMERATOR_IN_2_68 handling
         https://gitlab.gnome.org/GNOME/glib/-/issues/2327"""
         h_contents = """
         typedef enum {
-          G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER XPL_AVAILABLE_ENUMERATOR_IN_2_68 = (1<<2)
-        } xdbus_server_flags_t;
+          G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER GLIB_AVAILABLE_ENUMERATOR_IN_2_68 = (1<<2)
+        } GDBusServerFlags;
         """
         result = self.runMkenumsWithHeader(h_contents)
         self.assertEqual("", result.err)
         self.assertSingleEnum(
             result,
-            "xdbus_server_flags_t",
-            "xdbus_server_flags",
+            "GDBusServerFlags",
+            "g_dbus_server_flags",
             "G_DBUS_SERVER_FLAGS",
             "DBUS_SERVER_FLAGS",
             "G",
@@ -677,19 +677,19 @@ comment: {standard_bottom_comment}
         )
 
     def test_deprecated_in(self):
-        """test_t XPL_DEPRECATED_ENUMERATOR_IN_2_68 handling
+        """Test GLIB_DEPRECATED_ENUMERATOR_IN_2_68 handling
         https://gitlab.gnome.org/GNOME/glib/-/issues/2327"""
         h_contents = """
         typedef enum {
-          G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER XPL_DEPRECATED_ENUMERATOR_IN_2_68 = (1<<2)
-        } xdbus_server_flags_t;
+          G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER GLIB_DEPRECATED_ENUMERATOR_IN_2_68 = (1<<2)
+        } GDBusServerFlags;
         """
         result = self.runMkenumsWithHeader(h_contents)
         self.assertEqual("", result.err)
         self.assertSingleEnum(
             result,
-            "xdbus_server_flags_t",
-            "xdbus_server_flags",
+            "GDBusServerFlags",
+            "g_dbus_server_flags",
             "G_DBUS_SERVER_FLAGS",
             "DBUS_SERVER_FLAGS",
             "G",
@@ -703,19 +703,19 @@ comment: {standard_bottom_comment}
         )
 
     def test_deprecated_in_for(self):
-        """test_t XPL_DEPRECATED_ENUMERATOR_IN_2_68_FOR() handling
+        """Test GLIB_DEPRECATED_ENUMERATOR_IN_2_68_FOR() handling
         https://gitlab.gnome.org/GNOME/glib/-/issues/2327"""
         h_contents = """
         typedef enum {
-          G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER XPL_DEPRECATED_ENUMERATOR_IN_2_68_FOR(G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER2) = (1<<2)
-        } xdbus_server_flags_t;
+          G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER GLIB_DEPRECATED_ENUMERATOR_IN_2_68_FOR(G_DBUS_SERVER_FLAGS_AUTHENTICATION_REQUIRE_SAME_USER2) = (1<<2)
+        } GDBusServerFlags;
         """
         result = self.runMkenumsWithHeader(h_contents)
         self.assertEqual("", result.err)
         self.assertSingleEnum(
             result,
-            "xdbus_server_flags_t",
-            "xdbus_server_flags",
+            "GDBusServerFlags",
+            "g_dbus_server_flags",
             "G_DBUS_SERVER_FLAGS",
             "DBUS_SERVER_FLAGS",
             "G",

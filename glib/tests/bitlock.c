@@ -5,9 +5,9 @@
 static void
 test_bitlocks (void)
 {
-  xuint64_t start = g_get_monotonic_time ();
-  xint_t lock = 0;
-  xint_t i;
+  guint64 start = g_get_monotonic_time ();
+  gint lock = 0;
+  gint i;
 
   for (i = 0; i < ITERATIONS; i++)
     {
@@ -16,8 +16,8 @@ test_bitlocks (void)
     }
 
   {
-    xdouble_t elapsed;
-    xdouble_t rate;
+    gdouble elapsed;
+    gdouble rate;
 
     elapsed = g_get_monotonic_time () - start;
     elapsed /= 1000000;

@@ -1,15 +1,15 @@
-# Configure paths for XPL
+# Configure paths for GLIB
 # Owen Taylor     1997-2001
 
 # Increment this whenever this file is changed.
 #serial 4
 
-dnl AM_PATH_XPL_2_0([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, MODULES]]]])
-dnl test_t for XPL, and define XPL_CFLAGS and XPL_LIBS, if gmodule, gobject,
+dnl AM_PATH_GLIB_2_0([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, MODULES]]]])
+dnl Test for GLIB, and define GLIB_CFLAGS and GLIB_LIBS, if gmodule, gobject,
 dnl gthread, or gio is specified in MODULES, pass to pkg-config
 dnl
-AC_DEFUN([AM_PATH_XPL_2_0],
-[dnl
+AC_DEFUN([AM_PATH_GLIB_2_0],
+[dnl 
 dnl Get the cflags and libraries from pkg-config
 dnl
 
@@ -17,7 +17,7 @@ dnl We can't use PKG_PREREQ because that needs 0.29.
 m4_ifndef([PKG_PROG_PKG_CONFIG],
           [pkg.m4 version 0.28 or later is required])
 
-AC_ARG_ENABLE(glibtest, [  --disable-glibtest      do not try to compile and run a test XPL program],
+AC_ARG_ENABLE(glibtest, [  --disable-glibtest      do not try to compile and run a test GLIB program],
 		    , enable_glibtest=yes)
 
   min_glib_version=ifelse([$1], [], [2.0.0], [$1])
@@ -25,19 +25,19 @@ AC_ARG_ENABLE(glibtest, [  --disable-glibtest      do not try to compile and run
   for module in . $4
   do
       case "$module" in
-         gmodule)
+         gmodule) 
              pkg_config_args="$pkg_config_args gmodule-2.0"
          ;;
-         gmodule-no-export)
+         gmodule-no-export) 
              pkg_config_args="$pkg_config_args gmodule-no-export-2.0"
          ;;
-         gobject)
+         gobject) 
              pkg_config_args="$pkg_config_args gobject-2.0"
          ;;
-         gthread)
+         gthread) 
              pkg_config_args="$pkg_config_args gthread-2.0"
          ;;
-         gio*)
+         gio*) 
              pkg_config_args="$pkg_config_args $module-2.0"
          ;;
       esac
@@ -52,16 +52,16 @@ AC_ARG_ENABLE(glibtest, [  --disable-glibtest      do not try to compile and run
     PKG_CONFIG=no
   fi
 
-  dnl For XPL_CFLAGS and XPL_LIBS
-  PKG_CHECK_MODULES([XPL], [$pkg_config_args], [:], [:])
+  dnl For GLIB_CFLAGS and GLIB_LIBS
+  PKG_CHECK_MODULES([GLIB], [$pkg_config_args], [:], [:])
 
   dnl For the tools
-  PKG_CHECK_VAR([XPL_GENMARSHAL], [glib-2.0], [glib_genmarshal])
+  PKG_CHECK_VAR([GLIB_GENMARSHAL], [glib-2.0], [glib_genmarshal])
   PKG_CHECK_VAR([GOBJECT_QUERY], [glib-2.0], [gobject_query])
-  PKG_CHECK_VAR([XPL_MKENUMS], [glib-2.0], [glib_mkenums])
-  PKG_CHECK_VAR([XPL_COMPILE_RESOURCES], [gio-2.0], [glib_compile_resources])
+  PKG_CHECK_VAR([GLIB_MKENUMS], [glib-2.0], [glib_mkenums])
+  PKG_CHECK_VAR([GLIB_COMPILE_RESOURCES], [gio-2.0], [glib_compile_resources])
 
-  AC_MSG_CHECKING(for XPL - version >= $min_glib_version)
+  AC_MSG_CHECKING(for GLIB - version >= $min_glib_version)
 
   if test x$PKG_CONFIG != xno ; then
     ## don't try to run the test against uninstalled libtool libs
@@ -87,8 +87,8 @@ AC_ARG_ENABLE(glibtest, [  --disable-glibtest      do not try to compile and run
     if test "x$enable_glibtest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $XPL_CFLAGS"
-      LIBS="$XPL_LIBS $LIBS"
+      CFLAGS="$CFLAGS $GLIB_CFLAGS"
+      LIBS="$GLIB_LIBS $LIBS"
 dnl
 dnl Now check if the installed GLib is sufficiently new. (Also sanity
 dnl checks the results of pkg-config to some extent)
@@ -99,7 +99,7 @@ dnl
 #include <stdio.h>
 #include <stdlib.h>
 
-int
+int 
 main (void)
 {
   unsigned int major, minor, micro;
@@ -115,7 +115,7 @@ main (void)
       (glib_minor_version != $glib_config_minor_version) ||
       (glib_micro_version != $glib_config_micro_version))
     {
-      printf("\n*** 'pkg-config --modversion glib-2.0' returned %d.%d.%d, but XPL (%d.%d.%d)\n",
+      printf("\n*** 'pkg-config --modversion glib-2.0' returned %d.%d.%d, but GLIB (%d.%d.%d)\n", 
              $glib_config_major_version, $glib_config_minor_version, $glib_config_micro_version,
              glib_major_version, glib_minor_version, glib_micro_version);
       printf ("*** was found! If pkg-config was correct, then it is best\n");
@@ -125,13 +125,13 @@ main (void)
       printf("*** required on your system.\n");
       printf("*** If pkg-config was wrong, set the environment variable PKG_CONFIG_PATH\n");
       printf("*** to point to the correct configuration files\n");
-    }
-  else if ((glib_major_version != XPL_MAJOR_VERSION) ||
-	   (glib_minor_version != XPL_MINOR_VERSION) ||
-           (glib_micro_version != XPL_MICRO_VERSION))
+    } 
+  else if ((glib_major_version != GLIB_MAJOR_VERSION) ||
+	   (glib_minor_version != GLIB_MINOR_VERSION) ||
+           (glib_micro_version != GLIB_MICRO_VERSION))
     {
       printf("*** GLib header files (version %d.%d.%d) do not match\n",
-	     XPL_MAJOR_VERSION, XPL_MINOR_VERSION, XPL_MICRO_VERSION);
+	     GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
       printf("*** library (version %d.%d.%d)\n",
 	     glib_major_version, glib_minor_version, glib_micro_version);
     }
@@ -169,7 +169,7 @@ main (void)
   fi
   if test "x$no_glib" = x ; then
      AC_MSG_RESULT(yes (version $glib_config_major_version.$glib_config_minor_version.$glib_config_micro_version))
-     ifelse([$2], , :, [$2])
+     ifelse([$2], , :, [$2])     
   else
      AC_MSG_RESULT(no)
      if test "$PKG_CONFIG" = "no" ; then
@@ -182,8 +182,8 @@ main (void)
           echo "*** Could not run GLib test program, checking why..."
           ac_save_CFLAGS="$CFLAGS"
           ac_save_LIBS="$LIBS"
-          CFLAGS="$CFLAGS $XPL_CFLAGS"
-          LIBS="$LIBS $XPL_LIBS"
+          CFLAGS="$CFLAGS $GLIB_CFLAGS"
+          LIBS="$LIBS $GLIB_LIBS"
           AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <glib.h>
 #include <stdio.h>
@@ -203,12 +203,12 @@ main (void)
           LIBS="$ac_save_LIBS"
        fi
      fi
-     XPL_CFLAGS=""
-     XPL_LIBS=""
-     XPL_GENMARSHAL=""
+     GLIB_CFLAGS=""
+     GLIB_LIBS=""
+     GLIB_GENMARSHAL=""
      GOBJECT_QUERY=""
-     XPL_MKENUMS=""
-     XPL_COMPILE_RESOURCES=""
+     GLIB_MKENUMS=""
+     GLIB_COMPILE_RESOURCES=""
      ifelse([$3], , :, [$3])
   fi
   rm -f conf.glibtest

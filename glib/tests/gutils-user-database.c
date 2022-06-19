@@ -22,7 +22,7 @@
 static void
 test_get_user_database_entry (void)
 {
-  const xchar_t *r = NULL;
+  const gchar *r = NULL;
 
   r = g_get_user_name ();
   g_assert_nonnull (r);

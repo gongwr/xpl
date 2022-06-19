@@ -6,7 +6,7 @@ int LLVMFuzzerTestOneInput (const unsigned char *data, size_t size);
 #ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
 static GLogWriterOutput
 empty_logging_func (GLogLevelFlags log_level, const GLogField *fields,
-                    xsize_t n_fields, xpointer_t user_data)
+                    gsize n_fields, gpointer user_data)
 {
   return G_LOG_WRITER_HANDLED;
 }

@@ -24,32 +24,32 @@ int
 main (int   argc,
       char *argv[])
 {
-  xdbus_connection_t *c;
-  xerror_t *error;
-  xboolean_t ret;
+  GDBusConnection *c;
+  GError *error;
+  gboolean ret;
 
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION,
-                      NULL, /* xcancellable_t* */
+                      NULL, /* GCancellable* */
                       &error);
   g_assert_no_error (error);
 
   error = NULL;
-  xdbus_connection_emit_signal (c,
-                                 NULL, /* const xchar_t *destination_bus_name */
+  g_dbus_connection_emit_signal (c,
+                                 NULL, /* const gchar *destination_bus_name */
                                  "/org/gtk/GDBus/FlushObject",
                                  "org.gtk.GDBus.FlushInterface",
                                  "SomeSignal",
-                                 NULL, /* xvariant_t *parameters */
+                                 NULL, /* GVariant *parameters */
                                  &error);
   g_assert_no_error (error);
 
   error = NULL;
-  ret = xdbus_connection_flush_sync (c,
-                                      NULL, /* xcancellable_t* */
+  ret = g_dbus_connection_flush_sync (c,
+                                      NULL, /* GCancellable* */
                                       &error);
   g_assert_no_error (error);
-  xassert (ret);
+  g_assert (ret);
 
   /* and now exit immediately! */
   return 0;

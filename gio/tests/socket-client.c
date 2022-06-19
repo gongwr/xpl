@@ -7,15 +7,15 @@
 
 #include "gtlsconsoleinteraction.h"
 
-xmain_loop_t *loop;
+GMainLoop *loop;
 
-xboolean_t verbose = FALSE;
-xboolean_t non_blocking = FALSE;
-xboolean_t use_udp = FALSE;
+gboolean verbose = FALSE;
+gboolean non_blocking = FALSE;
+gboolean use_udp = FALSE;
 int cancel_timeout = 0;
 int read_timeout = 0;
-xboolean_t unix_socket = FALSE;
-xboolean_t tls = FALSE;
+gboolean unix_socket = FALSE;
+gboolean tls = FALSE;
 
 static GOptionEntry cmd_entries[] = {
   {"cancel", 'c', 0, G_OPTION_ARG_INT, &cancel_timeout,
@@ -39,11 +39,11 @@ static GOptionEntry cmd_entries[] = {
 
 #include "socket-common.c"
 
-static xboolean_t
-accept_certificate (xtls_client_connection_t *conn,
-		    xtls_certificate_t      *cert,
-		    xtls_certificate_flags_t  errors,
-		    xpointer_t              user_data)
+static gboolean
+accept_certificate (GTlsClientConnection *conn,
+		    GTlsCertificate      *cert,
+		    GTlsCertificateFlags  errors,
+		    gpointer              user_data)
 {
   g_print ("Certificate would have been rejected ( ");
   if (errors & G_TLS_CERTIFICATE_UNKNOWN_CA)
@@ -63,39 +63,39 @@ accept_certificate (xtls_client_connection_t *conn,
   return TRUE;
 }
 
-static xtls_certificate_t *
-lookup_client_certificate (xtls_client_connection_t  *conn,
-			   xerror_t               **error)
+static GTlsCertificate *
+lookup_client_certificate (GTlsClientConnection  *conn,
+			   GError               **error)
 {
-  xlist_t *l, *accepted;
-  xlist_t *c, *certificates;
-  xtls_database_t *database;
-  xtls_certificate_t *certificate = NULL;
-  xtls_connection_t *base;
+  GList *l, *accepted;
+  GList *c, *certificates;
+  GTlsDatabase *database;
+  GTlsCertificate *certificate = NULL;
+  GTlsConnection *base;
 
-  accepted = xtls_client_connection_get_accepted_cas (conn);
-  for (l = accepted; l != NULL; l = xlist_next (l))
+  accepted = g_tls_client_connection_get_accepted_cas (conn);
+  for (l = accepted; l != NULL; l = g_list_next (l))
     {
       base = G_TLS_CONNECTION (conn);
-      database = xtls_connection_get_database (base);
-      certificates = xtls_database_lookup_certificates_issued_by (database, l->data,
-                                                                   xtls_connection_get_interaction (base),
+      database = g_tls_connection_get_database (base);
+      certificates = g_tls_database_lookup_certificates_issued_by (database, l->data,
+                                                                   g_tls_connection_get_interaction (base),
                                                                    G_TLS_DATABASE_LOOKUP_KEYPAIR,
                                                                    NULL, error);
       if (error && *error)
         break;
 
       if (certificates)
-          certificate = xobject_ref (certificates->data);
+          certificate = g_object_ref (certificates->data);
 
-      for (c = certificates; c != NULL; c = xlist_next (c))
-        xobject_unref (c->data);
-      xlist_free (certificates);
+      for (c = certificates; c != NULL; c = g_list_next (c))
+        g_object_unref (c->data);
+      g_list_free (certificates);
     }
 
-  for (l = accepted; l != NULL; l = xlist_next (l))
-    xbyte_array_unref (l->data);
-  xlist_free (accepted);
+  for (l = accepted; l != NULL; l = g_list_next (l))
+    g_byte_array_unref (l->data);
+  g_list_free (accepted);
 
   if (certificate == NULL && error && !*error)
     g_set_error_literal (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED,
@@ -103,45 +103,45 @@ lookup_client_certificate (xtls_client_connection_t  *conn,
   return certificate;
 }
 
-static xboolean_t
+static gboolean
 make_connection (const char       *argument,
-		 xtls_certificate_t  *certificate,
-		 xcancellable_t     *cancellable,
-		 xsocket_t         **socket,
-		 xsocket_address_t  **address,
-		 xio_stream_t       **connection,
-		 xinput_stream_t    **istream,
-		 xoutput_stream_t   **ostream,
-		 xerror_t          **error)
+		 GTlsCertificate  *certificate,
+		 GCancellable     *cancellable,
+		 GSocket         **socket,
+		 GSocketAddress  **address,
+		 GIOStream       **connection,
+		 GInputStream    **istream,
+		 GOutputStream   **ostream,
+		 GError          **error)
 {
-  xsocket_type_t socket_type;
-  xsocket_family_t socket_family;
-  xsocket_address_enumerator_t *enumerator;
-  xsocket_connectable_t *connectable;
-  xsocket_address_t *src_address;
-  xtls_interaction_t *interaction;
-  xerror_t *err = NULL;
+  GSocketType socket_type;
+  GSocketFamily socket_family;
+  GSocketAddressEnumerator *enumerator;
+  GSocketConnectable *connectable;
+  GSocketAddress *src_address;
+  GTlsInteraction *interaction;
+  GError *err = NULL;
 
   if (use_udp)
-    socket_type = XSOCKET_TYPE_DATAGRAM;
+    socket_type = G_SOCKET_TYPE_DATAGRAM;
   else
-    socket_type = XSOCKET_TYPE_STREAM;
+    socket_type = G_SOCKET_TYPE_STREAM;
 
   if (unix_socket)
-    socket_family = XSOCKET_FAMILY_UNIX;
+    socket_family = G_SOCKET_FAMILY_UNIX;
   else
-    socket_family = XSOCKET_FAMILY_IPV4;
+    socket_family = G_SOCKET_FAMILY_IPV4;
 
-  *socket = xsocket_new (socket_family, socket_type, 0, error);
+  *socket = g_socket_new (socket_family, socket_type, 0, error);
   if (*socket == NULL)
     return FALSE;
 
   if (read_timeout)
-    xsocket_set_timeout (*socket, read_timeout);
+    g_socket_set_timeout (*socket, read_timeout);
 
   if (unix_socket)
     {
-      xsocket_address_t *addr;
+      GSocketAddress *addr;
 
       addr = socket_address_from_string (argument);
       if (addr == NULL)
@@ -150,7 +150,7 @@ make_connection (const char       *argument,
                        "Could not parse '%s' as unix socket name", argument);
           return FALSE;
         }
-      connectable = XSOCKET_CONNECTABLE (addr);
+      connectable = G_SOCKET_CONNECTABLE (addr);
     }
   else
     {
@@ -159,10 +159,10 @@ make_connection (const char       *argument,
         return FALSE;
     }
 
-  enumerator = xsocket_connectable_enumerate (connectable);
+  enumerator = g_socket_connectable_enumerate (connectable);
   while (TRUE)
     {
-      *address = xsocket_address_enumerator_next (enumerator, cancellable, error);
+      *address = g_socket_address_enumerator_next (enumerator, cancellable, error);
       if (*address == NULL)
         {
           if (error != NULL && *error == NULL)
@@ -171,19 +171,19 @@ make_connection (const char       *argument,
           return FALSE;
         }
 
-      if (xsocket_connect (*socket, *address, cancellable, &err))
+      if (g_socket_connect (*socket, *address, cancellable, &err))
         break;
       g_message ("Connection to %s failed: %s, trying next", socket_address_to_string (*address), err->message);
       g_clear_error (&err);
 
-      xobject_unref (*address);
+      g_object_unref (*address);
     }
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
 
   g_print ("Connected to %s\n",
            socket_address_to_string (*address));
 
-  src_address = xsocket_get_local_address (*socket, error);
+  src_address = g_socket_get_local_address (*socket, error);
   if (!src_address)
     {
       g_prefix_error (error, "Error getting local address: ");
@@ -192,7 +192,7 @@ make_connection (const char       *argument,
 
   g_print ("local address: %s\n",
            socket_address_to_string (src_address));
-  xobject_unref (src_address);
+  g_object_unref (src_address);
 
   if (use_udp)
     {
@@ -201,40 +201,40 @@ make_connection (const char       *argument,
       *ostream = NULL;
     }
   else
-    *connection = XIO_STREAM (xsocket_connection_factory_create_connection (*socket));
+    *connection = G_IO_STREAM (g_socket_connection_factory_create_connection (*socket));
 
   if (tls)
     {
-      xio_stream_t *tls_conn;
+      GIOStream *tls_conn;
 
-      tls_conn = xtls_client_connection_new (*connection, connectable, error);
+      tls_conn = g_tls_client_connection_new (*connection, connectable, error);
       if (!tls_conn)
         {
           g_prefix_error (error, "Could not create TLS connection: ");
           return FALSE;
         }
 
-      xsignal_connect (tls_conn, "accept-certificate",
+      g_signal_connect (tls_conn, "accept-certificate",
                         G_CALLBACK (accept_certificate), NULL);
 
-      interaction = xtls_console_interaction_new ();
-      xtls_connection_set_interaction (G_TLS_CONNECTION (tls_conn), interaction);
-      xobject_unref (interaction);
+      interaction = g_tls_console_interaction_new ();
+      g_tls_connection_set_interaction (G_TLS_CONNECTION (tls_conn), interaction);
+      g_object_unref (interaction);
 
       if (certificate)
-        xtls_connection_set_certificate (G_TLS_CONNECTION (tls_conn), certificate);
+        g_tls_connection_set_certificate (G_TLS_CONNECTION (tls_conn), certificate);
 
-      xobject_unref (*connection);
-      *connection = XIO_STREAM (tls_conn);
+      g_object_unref (*connection);
+      *connection = G_IO_STREAM (tls_conn);
 
-      if (!xtls_connection_handshake (G_TLS_CONNECTION (tls_conn),
+      if (!g_tls_connection_handshake (G_TLS_CONNECTION (tls_conn),
                                        cancellable, error))
         {
           g_prefix_error (error, "Error during TLS handshake: ");
           return FALSE;
         }
     }
-  xobject_unref (connectable);
+  g_object_unref (connectable);
 
   if (*connection)
     {
@@ -249,22 +249,22 @@ int
 main (int argc,
       char *argv[])
 {
-  xsocket_t *socket;
-  xsocket_address_t *address;
-  xerror_t *error = NULL;
-  xoption_context_t *context;
-  xcancellable_t *cancellable;
-  xio_stream_t *connection;
-  xinput_stream_t *istream;
-  xoutput_stream_t *ostream;
-  xsocket_address_t *src_address;
-  xtls_certificate_t *certificate = NULL;
-  xint_t i;
+  GSocket *socket;
+  GSocketAddress *address;
+  GError *error = NULL;
+  GOptionContext *context;
+  GCancellable *cancellable;
+  GIOStream *connection;
+  GInputStream *istream;
+  GOutputStream *ostream;
+  GSocketAddress *src_address;
+  GTlsCertificate *certificate = NULL;
+  gint i;
 
   address = NULL;
   connection = NULL;
 
-  context = g_option_context_new (" <hostname>[:port] - test_t xsocket_t client stuff");
+  context = g_option_context_new (" <hostname>[:port] - Test GSocket client stuff");
   g_option_context_add_main_entries (context, cmd_entries, NULL);
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
@@ -286,17 +286,17 @@ main (int argc,
 
   if (cancel_timeout)
     {
-      xthread_t *thread;
-      cancellable = xcancellable_new ();
-      thread = xthread_new ("cancel", cancel_thread, cancellable);
-      xthread_unref (thread);
+      GThread *thread;
+      cancellable = g_cancellable_new ();
+      thread = g_thread_new ("cancel", cancel_thread, cancellable);
+      g_thread_unref (thread);
     }
   else
     {
       cancellable = NULL;
     }
 
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
 
   for (i = 0; i < 2; i++)
     {
@@ -304,7 +304,7 @@ main (int argc,
                            &connection, &istream, &ostream, &error))
           break;
 
-      if (xerror_matches (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED))
+      if (g_error_matches (error, G_TLS_ERROR, G_TLS_ERROR_CERTIFICATE_REQUIRED))
         {
           g_clear_error (&error);
           certificate = lookup_client_certificate (G_TLS_CLIENT_CONNECTION (connection), &error);
@@ -316,15 +316,15 @@ main (int argc,
       return 1;
     }
 
-  /* TODO: test_t non-blocking connect/handshake */
+  /* TODO: Test non-blocking connect/handshake */
   if (non_blocking)
-    xsocket_set_blocking (socket, FALSE);
+    g_socket_set_blocking (socket, FALSE);
 
   while (TRUE)
     {
-      xchar_t buffer[4096];
-      xssize_t size;
-      xsize_t to_send;
+      gchar buffer[4096];
+      gssize size;
+      gsize to_send;
 
       if (fgets (buffer, sizeof buffer, stdin) == NULL)
 	break;
@@ -335,26 +335,26 @@ main (int argc,
 	  if (use_udp)
 	    {
 	      ensure_socket_condition (socket, G_IO_OUT, cancellable);
-	      size = xsocket_send_to (socket, address,
+	      size = g_socket_send_to (socket, address,
 				       buffer, to_send,
 				       cancellable, &error);
 	    }
 	  else
 	    {
 	      ensure_connection_condition (connection, G_IO_OUT, cancellable);
-	      size = xoutput_stream_write (ostream,
+	      size = g_output_stream_write (ostream,
 					    buffer, to_send,
 					    cancellable, &error);
 	    }
 
 	  if (size < 0)
 	    {
-	      if (xerror_matches (error,
+	      if (g_error_matches (error,
 				   G_IO_ERROR,
 				   G_IO_ERROR_WOULD_BLOCK))
 		{
 		  g_print ("socket send would block, handling\n");
-		  xerror_free (error);
+		  g_error_free (error);
 		  error = NULL;
 		  continue;
 		}
@@ -380,14 +380,14 @@ main (int argc,
       if (use_udp)
 	{
 	  ensure_socket_condition (socket, G_IO_IN, cancellable);
-	  size = xsocket_receive_from (socket, &src_address,
+	  size = g_socket_receive_from (socket, &src_address,
 					buffer, sizeof buffer,
 					cancellable, &error);
 	}
       else
 	{
 	  ensure_connection_condition (connection, G_IO_IN, cancellable);
-	  size = xinput_stream_read (istream,
+	  size = g_input_stream_read (istream,
 				      buffer, sizeof buffer,
 				      cancellable, &error);
 	}
@@ -425,11 +425,11 @@ main (int argc,
 		      error->message);
 	  return 1;
 	}
-      xobject_unref (connection);
+      g_object_unref (connection);
     }
   else
     {
-      if (!xsocket_close (socket, &error))
+      if (!g_socket_close (socket, &error))
 	{
 	  g_printerr ("Error closing socket: %s\n",
 		      error->message);
@@ -437,8 +437,8 @@ main (int argc,
 	}
     }
 
-  xobject_unref (socket);
-  xobject_unref (address);
+  g_object_unref (socket);
+  g_object_unref (address);
 
   return 0;
 }

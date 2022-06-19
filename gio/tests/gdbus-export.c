@@ -25,41 +25,41 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a shared mainloop */
-static xmain_loop_t *loop = NULL;
+static GMainLoop *loop = NULL;
 
-static xdbus_connection_t *c = NULL;
+static GDBusConnection *c = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* test_t that we can export objects, the hierarchy is correct and the right handlers are invoked */
+/* Test that we can export objects, the hierarchy is correct and the right handlers are invoked */
 /* ---------------------------------------------------------------------------------------------------- */
 
-static const xdbus_arg_info_t foo_method1_in_args =
+static const GDBusArgInfo foo_method1_in_args =
 {
   -1,
   "an_input_string",
   "s",
   NULL
 };
-static const xdbus_arg_info_t * const foo_method1_in_arg_pointers[] = {&foo_method1_in_args, NULL};
+static const GDBusArgInfo * const foo_method1_in_arg_pointers[] = {&foo_method1_in_args, NULL};
 
-static const xdbus_arg_info_t foo_method1_out_args =
+static const GDBusArgInfo foo_method1_out_args =
 {
   -1,
   "an_output_string",
   "s",
   NULL
 };
-static const xdbus_arg_info_t * const foo_method1_out_arg_pointers[] = {&foo_method1_out_args, NULL};
+static const GDBusArgInfo * const foo_method1_out_arg_pointers[] = {&foo_method1_out_args, NULL};
 
-static const xdbus_method_info_t foo_method_info_method1 =
+static const GDBusMethodInfo foo_method_info_method1 =
 {
   -1,
   "Method1",
-  (xdbus_arg_info_t **) &foo_method1_in_arg_pointers,
-  (xdbus_arg_info_t **) &foo_method1_out_arg_pointers,
+  (GDBusArgInfo **) &foo_method1_in_arg_pointers,
+  (GDBusArgInfo **) &foo_method1_out_arg_pointers,
   NULL
 };
-static const xdbus_method_info_t foo_method_info_method2 =
+static const GDBusMethodInfo foo_method_info_method2 =
 {
   -1,
   "Method2",
@@ -67,18 +67,18 @@ static const xdbus_method_info_t foo_method_info_method2 =
   NULL,
   NULL
 };
-static const xdbus_method_info_t * const foo_method_info_pointers[] = {&foo_method_info_method1, &foo_method_info_method2, NULL};
+static const GDBusMethodInfo * const foo_method_info_pointers[] = {&foo_method_info_method1, &foo_method_info_method2, NULL};
 
-static const xdbus_signalInfo_t foo_signal_info =
+static const GDBusSignalInfo foo_signal_info =
 {
   -1,
   "SignalAlpha",
   NULL,
   NULL
 };
-static const xdbus_signalInfo_t * const foo_signal_info_pointers[] = {&foo_signal_info, NULL};
+static const GDBusSignalInfo * const foo_signal_info_pointers[] = {&foo_signal_info, NULL};
 
-static const xdbus_property_info_t foo_property_info[] =
+static const GDBusPropertyInfo foo_property_info[] =
 {
   {
     -1,
@@ -102,7 +102,7 @@ static const xdbus_property_info_t foo_property_info[] =
     NULL
   }
 };
-static const xdbus_property_info_t * const foo_property_info_pointers[] =
+static const GDBusPropertyInfo * const foo_property_info_pointers[] =
 {
   &foo_property_info[0],
   &foo_property_info[1],
@@ -110,83 +110,83 @@ static const xdbus_property_info_t * const foo_property_info_pointers[] =
   NULL
 };
 
-static const xdbus_interface_info_t foo_interface_info =
+static const GDBusInterfaceInfo foo_interface_info =
 {
   -1,
-  "org.example.foo_t",
-  (xdbus_method_info_t **) &foo_method_info_pointers,
-  (xdbus_signalInfo_t **) &foo_signal_info_pointers,
-  (xdbus_property_info_t **)&foo_property_info_pointers,
+  "org.example.Foo",
+  (GDBusMethodInfo **) &foo_method_info_pointers,
+  (GDBusSignalInfo **) &foo_signal_info_pointers,
+  (GDBusPropertyInfo **)&foo_property_info_pointers,
   NULL,
 };
 
-/* Foo2 is just foo_t without the properties */
-static const xdbus_interface_info_t foo2_interface_info =
+/* Foo2 is just Foo without the properties */
+static const GDBusInterfaceInfo foo2_interface_info =
 {
   -1,
   "org.example.Foo2",
-  (xdbus_method_info_t **) &foo_method_info_pointers,
-  (xdbus_signalInfo_t **) &foo_signal_info_pointers,
+  (GDBusMethodInfo **) &foo_method_info_pointers,
+  (GDBusSignalInfo **) &foo_signal_info_pointers,
   NULL,
   NULL
 };
 
 static void
-foo_method_call (xdbus_connection_t       *connection,
-                 const xchar_t           *sender,
-                 const xchar_t           *object_path,
-                 const xchar_t           *interface_name,
-                 const xchar_t           *method_name,
-                 xvariant_t              *parameters,
-                 xdbus_method_invocation_t *invocation,
-                 xpointer_t               user_data)
+foo_method_call (GDBusConnection       *connection,
+                 const gchar           *sender,
+                 const gchar           *object_path,
+                 const gchar           *interface_name,
+                 const gchar           *method_name,
+                 GVariant              *parameters,
+                 GDBusMethodInvocation *invocation,
+                 gpointer               user_data)
 {
-  if (xstrcmp0 (method_name, "Method1") == 0)
+  if (g_strcmp0 (method_name, "Method1") == 0)
     {
-      const xchar_t *input;
-      xchar_t *output;
-      xvariant_get (parameters, "(&s)", &input);
-      output = xstrdup_printf ("You passed the string '%s'. Jolly good!", input);
-      xdbus_method_invocation_return_value (invocation, xvariant_new ("(s)", output));
+      const gchar *input;
+      gchar *output;
+      g_variant_get (parameters, "(&s)", &input);
+      output = g_strdup_printf ("You passed the string '%s'. Jolly good!", input);
+      g_dbus_method_invocation_return_value (invocation, g_variant_new ("(s)", output));
       g_free (output);
     }
   else
     {
-      xdbus_method_invocation_return_dbus_error (invocation,
+      g_dbus_method_invocation_return_dbus_error (invocation,
                                                   "org.example.SomeError",
                                                   "How do you like them apples, buddy!");
     }
 }
 
-static xvariant_t *
-foo_get_property (xdbus_connection_t       *connection,
-                  const xchar_t           *sender,
-                  const xchar_t           *object_path,
-                  const xchar_t           *interface_name,
-                  const xchar_t           *property_name,
-                  xerror_t               **error,
-                  xpointer_t               user_data)
+static GVariant *
+foo_get_property (GDBusConnection       *connection,
+                  const gchar           *sender,
+                  const gchar           *object_path,
+                  const gchar           *interface_name,
+                  const gchar           *property_name,
+                  GError               **error,
+                  gpointer               user_data)
 {
-  xvariant_t *ret;
-  xchar_t *s;
-  s = xstrdup_printf ("Property '%s' Is What It Is!", property_name);
-  ret = xvariant_new_string (s);
+  GVariant *ret;
+  gchar *s;
+  s = g_strdup_printf ("Property '%s' Is What It Is!", property_name);
+  ret = g_variant_new_string (s);
   g_free (s);
   return ret;
 }
 
-static xboolean_t
-foo_set_property (xdbus_connection_t       *connection,
-                  const xchar_t           *sender,
-                  const xchar_t           *object_path,
-                  const xchar_t           *interface_name,
-                  const xchar_t           *property_name,
-                  xvariant_t              *value,
-                  xerror_t               **error,
-                  xpointer_t               user_data)
+static gboolean
+foo_set_property (GDBusConnection       *connection,
+                  const gchar           *sender,
+                  const gchar           *object_path,
+                  const gchar           *interface_name,
+                  const gchar           *property_name,
+                  GVariant              *value,
+                  GError               **error,
+                  gpointer               user_data)
 {
-  xchar_t *s;
-  s = xvariant_print (value, TRUE);
+  gchar *s;
+  s = g_variant_print (value, TRUE);
   g_set_error (error,
                G_DBUS_ERROR,
                G_DBUS_ERROR_SPAWN_FILE_INVALID,
@@ -196,7 +196,7 @@ foo_set_property (xdbus_connection_t       *connection,
   return FALSE;
 }
 
-static const xdbus_interface_vtable_t foo_vtable =
+static const GDBusInterfaceVTable foo_vtable =
 {
   foo_method_call,
   foo_get_property,
@@ -206,7 +206,7 @@ static const xdbus_interface_vtable_t foo_vtable =
 
 /* -------------------- */
 
-static const xdbus_method_info_t bar_method_info[] =
+static const GDBusMethodInfo bar_method_info[] =
 {
   {
     -1,
@@ -223,9 +223,9 @@ static const xdbus_method_info_t bar_method_info[] =
     NULL
   }
 };
-static const xdbus_method_info_t * const bar_method_info_pointers[] = {&bar_method_info[0], &bar_method_info[1], NULL};
+static const GDBusMethodInfo * const bar_method_info_pointers[] = {&bar_method_info[0], &bar_method_info[1], NULL};
 
-static const xdbus_signalInfo_t bar_signal_info[] =
+static const GDBusSignalInfo bar_signal_info[] =
 {
   {
     -1,
@@ -234,9 +234,9 @@ static const xdbus_signalInfo_t bar_signal_info[] =
     NULL
   }
 };
-static const xdbus_signalInfo_t * const bar_signal_info_pointers[] = {&bar_signal_info[0], NULL};
+static const GDBusSignalInfo * const bar_signal_info_pointers[] = {&bar_signal_info[0], NULL};
 
-static const xdbus_property_info_t bar_property_info[] =
+static const GDBusPropertyInfo bar_property_info[] =
 {
   {
     -1,
@@ -246,21 +246,21 @@ static const xdbus_property_info_t bar_property_info[] =
     NULL
   }
 };
-static const xdbus_property_info_t * const bar_property_info_pointers[] = {&bar_property_info[0], NULL};
+static const GDBusPropertyInfo * const bar_property_info_pointers[] = {&bar_property_info[0], NULL};
 
-static const xdbus_interface_info_t bar_interface_info =
+static const GDBusInterfaceInfo bar_interface_info =
 {
   -1,
   "org.example.Bar",
-  (xdbus_method_info_t **) bar_method_info_pointers,
-  (xdbus_signalInfo_t **) bar_signal_info_pointers,
-  (xdbus_property_info_t **) bar_property_info_pointers,
+  (GDBusMethodInfo **) bar_method_info_pointers,
+  (GDBusSignalInfo **) bar_signal_info_pointers,
+  (GDBusPropertyInfo **) bar_property_info_pointers,
   NULL,
 };
 
 /* -------------------- */
 
-static const xdbus_method_info_t dyna_method_info[] =
+static const GDBusMethodInfo dyna_method_info[] =
 {
   {
     -1,
@@ -270,47 +270,47 @@ static const xdbus_method_info_t dyna_method_info[] =
     NULL
   }
 };
-static const xdbus_method_info_t * const dyna_method_info_pointers[] = {&dyna_method_info[0], NULL};
+static const GDBusMethodInfo * const dyna_method_info_pointers[] = {&dyna_method_info[0], NULL};
 
-static const xdbus_interface_info_t dyna_interface_info =
+static const GDBusInterfaceInfo dyna_interface_info =
 {
   -1,
   "org.example.Dyna",
-  (xdbus_method_info_t **) dyna_method_info_pointers,
+  (GDBusMethodInfo **) dyna_method_info_pointers,
   NULL, /* no signals */
   NULL, /* no properties */
   NULL,
 };
 
 static void
-dyna_cyber (xdbus_connection_t *connection,
-            const xchar_t *sender,
-            const xchar_t *object_path,
-            const xchar_t *interface_name,
-            const xchar_t *method_name,
-            xvariant_t *parameters,
-            xdbus_method_invocation_t *invocation,
-            xpointer_t user_data)
+dyna_cyber (GDBusConnection *connection,
+            const gchar *sender,
+            const gchar *object_path,
+            const gchar *interface_name,
+            const gchar *method_name,
+            GVariant *parameters,
+            GDBusMethodInvocation *invocation,
+            gpointer user_data)
 {
-  xptr_array_t *data = user_data;
-  xchar_t *node_name;
-  xuint_t n;
+  GPtrArray *data = user_data;
+  gchar *node_name;
+  guint n;
 
   node_name = strrchr (object_path, '/') + 1;
 
   /* Add new node if it is not already known */
   for (n = 0; n < data->len ; n++)
     {
-      if (xstrcmp0 (xptr_array_index (data, n), node_name) == 0)
+      if (g_strcmp0 (g_ptr_array_index (data, n), node_name) == 0)
         goto out;
     }
-  xptr_array_add (data, xstrdup(node_name));
+  g_ptr_array_add (data, g_strdup(node_name));
 
   out:
-    xdbus_method_invocation_return_value (invocation, NULL);
+    g_dbus_method_invocation_return_value (invocation, NULL);
 }
 
-static const xdbus_interface_vtable_t dyna_interface_vtable =
+static const GDBusInterfaceVTable dyna_interface_vtable =
 {
   dyna_cyber,
   NULL,
@@ -321,32 +321,32 @@ static const xdbus_interface_vtable_t dyna_interface_vtable =
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-introspect_callback (xdbus_proxy_t   *proxy,
-                     xasync_result_t *res,
-                     xpointer_t      user_data)
+introspect_callback (GDBusProxy   *proxy,
+                     GAsyncResult *res,
+                     gpointer      user_data)
 {
-  xchar_t **xml_data = user_data;
-  xvariant_t *result;
-  xerror_t *error;
+  gchar **xml_data = user_data;
+  GVariant *result;
+  GError *error;
 
   error = NULL;
-  result = xdbus_proxy_call_finish (proxy,
+  result = g_dbus_proxy_call_finish (proxy,
                                               res,
                                               &error);
   g_assert_no_error (error);
-  xassert (result != NULL);
-  xvariant_get (result, "(s)", xml_data);
-  xvariant_unref (result);
+  g_assert (result != NULL);
+  g_variant_get (result, "(s)", xml_data);
+  g_variant_unref (result);
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 }
 
-static xint_t
-compare_strings (xconstpointer a,
-                 xconstpointer b)
+static gint
+compare_strings (gconstpointer a,
+                 gconstpointer b)
 {
-  const xchar_t *sa = *(const xchar_t **) a;
-  const xchar_t *sb = *(const xchar_t **) b;
+  const gchar *sa = *(const gchar **) a;
+  const gchar *sb = *(const gchar **) b;
 
   /* Array terminator must sort last */
   if (sa == NULL)
@@ -357,160 +357,160 @@ compare_strings (xconstpointer a,
   return strcmp (sa, sb);
 }
 
-static xchar_t **
-get_nodes_at (xdbus_connection_t  *c,
-              const xchar_t      *object_path)
+static gchar **
+get_nodes_at (GDBusConnection  *c,
+              const gchar      *object_path)
 {
-  xerror_t *error;
-  xdbus_proxy_t *proxy;
-  xchar_t *xml_data;
-  xptr_array_t *p;
-  xdbus_node_info_t *node_info;
-  xuint_t n;
+  GError *error;
+  GDBusProxy *proxy;
+  gchar *xml_data;
+  GPtrArray *p;
+  GDBusNodeInfo *node_info;
+  guint n;
 
   error = NULL;
-  proxy = xdbus_proxy_new_sync (c,
+  proxy = g_dbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
                                  G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                  NULL,
-                                 xdbus_connection_get_unique_name (c),
+                                 g_dbus_connection_get_unique_name (c),
                                  object_path,
                                  "org.freedesktop.DBus.Introspectable",
                                  NULL,
                                  &error);
   g_assert_no_error (error);
-  xassert (proxy != NULL);
+  g_assert (proxy != NULL);
 
   /* do this async to avoid libdbus-1 deadlocks */
   xml_data = NULL;
-  xdbus_proxy_call (proxy,
+  g_dbus_proxy_call (proxy,
                      "Introspect",
                      NULL,
                      G_DBUS_CALL_FLAGS_NONE,
                      -1,
                      NULL,
-                     (xasync_ready_callback_t) introspect_callback,
+                     (GAsyncReadyCallback) introspect_callback,
                      &xml_data);
-  xmain_loop_run (loop);
-  xassert (xml_data != NULL);
+  g_main_loop_run (loop);
+  g_assert (xml_data != NULL);
 
   node_info = g_dbus_node_info_new_for_xml (xml_data, &error);
   g_assert_no_error (error);
-  xassert (node_info != NULL);
+  g_assert (node_info != NULL);
 
-  p = xptr_array_new ();
+  p = g_ptr_array_new ();
   for (n = 0; node_info->nodes != NULL && node_info->nodes[n] != NULL; n++)
     {
-      const xdbus_node_info_t *sub_node_info = node_info->nodes[n];
-      xptr_array_add (p, xstrdup (sub_node_info->path));
+      const GDBusNodeInfo *sub_node_info = node_info->nodes[n];
+      g_ptr_array_add (p, g_strdup (sub_node_info->path));
     }
-  xptr_array_add (p, NULL);
+  g_ptr_array_add (p, NULL);
 
-  xobject_unref (proxy);
+  g_object_unref (proxy);
   g_free (xml_data);
   g_dbus_node_info_unref (node_info);
 
   /* Nodes are semantically unordered; sort array so tests can rely on order */
-  xptr_array_sort (p, compare_strings);
+  g_ptr_array_sort (p, compare_strings);
 
-  return (xchar_t **) xptr_array_free (p, FALSE);
+  return (gchar **) g_ptr_array_free (p, FALSE);
 }
 
-static xboolean_t
-has_interface (xdbus_connection_t *c,
-               const xchar_t     *object_path,
-               const xchar_t     *interface_name)
+static gboolean
+has_interface (GDBusConnection *c,
+               const gchar     *object_path,
+               const gchar     *interface_name)
 {
-  xerror_t *error;
-  xdbus_proxy_t *proxy;
-  xchar_t *xml_data;
-  xdbus_node_info_t *node_info;
-  xboolean_t ret;
+  GError *error;
+  GDBusProxy *proxy;
+  gchar *xml_data;
+  GDBusNodeInfo *node_info;
+  gboolean ret;
 
   error = NULL;
-  proxy = xdbus_proxy_new_sync (c,
+  proxy = g_dbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
                                  G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                  NULL,
-                                 xdbus_connection_get_unique_name (c),
+                                 g_dbus_connection_get_unique_name (c),
                                  object_path,
                                  "org.freedesktop.DBus.Introspectable",
                                  NULL,
                                  &error);
   g_assert_no_error (error);
-  xassert (proxy != NULL);
+  g_assert (proxy != NULL);
 
   /* do this async to avoid libdbus-1 deadlocks */
   xml_data = NULL;
-  xdbus_proxy_call (proxy,
+  g_dbus_proxy_call (proxy,
                      "Introspect",
                      NULL,
                      G_DBUS_CALL_FLAGS_NONE,
                      -1,
                      NULL,
-                     (xasync_ready_callback_t) introspect_callback,
+                     (GAsyncReadyCallback) introspect_callback,
                      &xml_data);
-  xmain_loop_run (loop);
-  xassert (xml_data != NULL);
+  g_main_loop_run (loop);
+  g_assert (xml_data != NULL);
 
   node_info = g_dbus_node_info_new_for_xml (xml_data, &error);
   g_assert_no_error (error);
-  xassert (node_info != NULL);
+  g_assert (node_info != NULL);
 
   ret = (g_dbus_node_info_lookup_interface (node_info, interface_name) != NULL);
 
-  xobject_unref (proxy);
+  g_object_unref (proxy);
   g_free (xml_data);
   g_dbus_node_info_unref (node_info);
 
   return ret;
 }
 
-static xuint_t
-count_interfaces (xdbus_connection_t *c,
-                  const xchar_t     *object_path)
+static guint
+count_interfaces (GDBusConnection *c,
+                  const gchar     *object_path)
 {
-  xerror_t *error;
-  xdbus_proxy_t *proxy;
-  xchar_t *xml_data;
-  xdbus_node_info_t *node_info;
-  xuint_t ret;
+  GError *error;
+  GDBusProxy *proxy;
+  gchar *xml_data;
+  GDBusNodeInfo *node_info;
+  guint ret;
 
   error = NULL;
-  proxy = xdbus_proxy_new_sync (c,
+  proxy = g_dbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
                                  G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                  NULL,
-                                 xdbus_connection_get_unique_name (c),
+                                 g_dbus_connection_get_unique_name (c),
                                  object_path,
                                  "org.freedesktop.DBus.Introspectable",
                                  NULL,
                                  &error);
   g_assert_no_error (error);
-  xassert (proxy != NULL);
+  g_assert (proxy != NULL);
 
   /* do this async to avoid libdbus-1 deadlocks */
   xml_data = NULL;
-  xdbus_proxy_call (proxy,
+  g_dbus_proxy_call (proxy,
                      "Introspect",
                      NULL,
                      G_DBUS_CALL_FLAGS_NONE,
                      -1,
                      NULL,
-                     (xasync_ready_callback_t) introspect_callback,
+                     (GAsyncReadyCallback) introspect_callback,
                      &xml_data);
-  xmain_loop_run (loop);
-  xassert (xml_data != NULL);
+  g_main_loop_run (loop);
+  g_assert (xml_data != NULL);
 
   node_info = g_dbus_node_info_new_for_xml (xml_data, &error);
   g_assert_no_error (error);
-  xassert (node_info != NULL);
+  g_assert (node_info != NULL);
 
   ret = 0;
   while (node_info->interfaces != NULL && node_info->interfaces[ret] != NULL)
     ret++;
 
-  xobject_unref (proxy);
+  g_object_unref (proxy);
   g_free (xml_data);
   g_dbus_node_info_unref (node_info);
 
@@ -518,62 +518,62 @@ count_interfaces (xdbus_connection_t *c,
 }
 
 static void
-dyna_create_callback (xdbus_proxy_t   *proxy,
-                      xasync_result_t  *res,
-                      xpointer_t      user_data)
+dyna_create_callback (GDBusProxy   *proxy,
+                      GAsyncResult  *res,
+                      gpointer      user_data)
 {
-  xvariant_t *result;
-  xerror_t *error;
+  GVariant *result;
+  GError *error;
 
   error = NULL;
-  result = xdbus_proxy_call_finish (proxy,
+  result = g_dbus_proxy_call_finish (proxy,
                                      res,
                                      &error);
   g_assert_no_error (error);
-  xassert (result != NULL);
-  xvariant_unref (result);
+  g_assert (result != NULL);
+  g_variant_unref (result);
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 }
 
 /* Dynamically create @object_name under /foo/dyna */
 static void
-dyna_create (xdbus_connection_t *c,
-             const xchar_t     *object_name)
+dyna_create (GDBusConnection *c,
+             const gchar     *object_name)
 {
-  xerror_t *error;
-  xdbus_proxy_t *proxy;
-  xchar_t *object_path;
+  GError *error;
+  GDBusProxy *proxy;
+  gchar *object_path;
 
-  object_path = xstrconcat ("/foo/dyna/", object_name, NULL);
+  object_path = g_strconcat ("/foo/dyna/", object_name, NULL);
 
   error = NULL;
-  proxy = xdbus_proxy_new_sync (c,
+  proxy = g_dbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
                                  G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                  NULL,
-                                 xdbus_connection_get_unique_name (c),
+                                 g_dbus_connection_get_unique_name (c),
                                  object_path,
                                  "org.example.Dyna",
                                  NULL,
                                  &error);
   g_assert_no_error (error);
-  xassert (proxy != NULL);
+  g_assert (proxy != NULL);
 
   /* do this async to avoid libdbus-1 deadlocks */
-  xdbus_proxy_call (proxy,
+  g_dbus_proxy_call (proxy,
                      "DynaCyber",
-                     xvariant_new ("()"),
+                     g_variant_new ("()"),
                      G_DBUS_CALL_FLAGS_NONE,
                      -1,
                      NULL,
-                     (xasync_ready_callback_t) dyna_create_callback,
+                     (GAsyncReadyCallback) dyna_create_callback,
                      NULL);
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
 
   g_assert_no_error (error);
 
-  xobject_unref (proxy);
+  g_object_unref (proxy);
   g_free (object_path);
 
   return;
@@ -581,92 +581,78 @@ dyna_create (xdbus_connection_t *c,
 
 typedef struct
 {
-  xuint_t num_unregistered_calls;
-  xuint_t num_unregistered_subtree_calls;
-  xuint_t num_subtree_nodes;
-} object_registration_data_t;
+  guint num_unregistered_calls;
+  guint num_unregistered_subtree_calls;
+  guint num_subtree_nodes;
+} ObjectRegistrationData;
 
 static void
-on_object_unregistered (xpointer_t user_data)
+on_object_unregistered (gpointer user_data)
 {
-  object_registration_data_t *data = user_data;
+  ObjectRegistrationData *data = user_data;
 
   data->num_unregistered_calls++;
 }
 
 static void
-on_subtree_unregistered (xpointer_t user_data)
+on_subtree_unregistered (gpointer user_data)
 {
-  object_registration_data_t *data = user_data;
+  ObjectRegistrationData *data = user_data;
 
   data->num_unregistered_subtree_calls++;
 }
 
-static xboolean_t
-_xstrv_has_string (const xchar_t* const * haystack,
-                    const xchar_t *needle)
-{
-  xuint_t n;
-
-  for (n = 0; haystack != NULL && haystack[n] != NULL; n++)
-    {
-      if (xstrcmp0 (haystack[n], needle) == 0)
-        return TRUE;
-    }
-  return FALSE;
-}
-
 /* -------------------- */
 
-static xchar_t **
-subtree_enumerate (xdbus_connection_t       *connection,
-                   const xchar_t           *sender,
-                   const xchar_t           *object_path,
-                   xpointer_t               user_data)
+static gchar **
+subtree_enumerate (GDBusConnection       *connection,
+                   const gchar           *sender,
+                   const gchar           *object_path,
+                   gpointer               user_data)
 {
-  object_registration_data_t *data = user_data;
-  xptr_array_t *p;
-  xchar_t **nodes;
-  xuint_t n;
+  ObjectRegistrationData *data = user_data;
+  GPtrArray *p;
+  gchar **nodes;
+  guint n;
 
-  p = xptr_array_new ();
+  p = g_ptr_array_new ();
 
   for (n = 0; n < data->num_subtree_nodes; n++)
     {
-      xptr_array_add (p, xstrdup_printf ("vp%d", n));
-      xptr_array_add (p, xstrdup_printf ("evp%d", n));
+      g_ptr_array_add (p, g_strdup_printf ("vp%d", n));
+      g_ptr_array_add (p, g_strdup_printf ("evp%d", n));
     }
-  xptr_array_add (p, NULL);
+  g_ptr_array_add (p, NULL);
 
-  nodes = (xchar_t **) xptr_array_free (p, FALSE);
+  nodes = (gchar **) g_ptr_array_free (p, FALSE);
 
   return nodes;
 }
 
 /* Only allows certain objects, and aborts on unknowns */
-static xdbus_interface_info_t **
-subtree_introspect (xdbus_connection_t       *connection,
-                    const xchar_t           *sender,
-                    const xchar_t           *object_path,
-                    const xchar_t           *node,
-                    xpointer_t               user_data)
+static GDBusInterfaceInfo **
+subtree_introspect (GDBusConnection       *connection,
+                    const gchar           *sender,
+                    const gchar           *object_path,
+                    const gchar           *node,
+                    gpointer               user_data)
 {
-  const xdbus_interface_info_t *interfaces[2] = {
+  const GDBusInterfaceInfo *interfaces[2] = {
      NULL /* filled in below */, NULL
   };
 
-  /* VPs implement the foo_t interface, EVPs implement the Bar interface. The root
+  /* VPs implement the Foo interface, EVPs implement the Bar interface. The root
    * does not implement any interfaces
    */
   if (node == NULL)
     {
       return NULL;
     }
-  else if (xstr_has_prefix (node, "vp"))
+  else if (g_str_has_prefix (node, "vp"))
     {
       interfaces[0] = &foo_interface_info;
     }
-  else if (xstr_has_prefix (node, "evp"))
+  else if (g_str_has_prefix (node, "evp"))
     {
       interfaces[0] = &bar_interface_info;
     }
@@ -678,22 +664,22 @@ subtree_introspect (xdbus_connection_t       *connection,
   return g_memdup2 (interfaces, 2 * sizeof (void *));
 }
 
-static const xdbus_interface_vtable_t *
-subtree_dispatch (xdbus_connection_t             *connection,
-                  const xchar_t                 *sender,
-                  const xchar_t                 *object_path,
-                  const xchar_t                 *interface_name,
-                  const xchar_t                 *node,
-                  xpointer_t                    *out_user_data,
-                  xpointer_t                     user_data)
+static const GDBusInterfaceVTable *
+subtree_dispatch (GDBusConnection             *connection,
+                  const gchar                 *sender,
+                  const gchar                 *object_path,
+                  const gchar                 *interface_name,
+                  const gchar                 *node,
+                  gpointer                    *out_user_data,
+                  gpointer                     user_data)
 {
-  if (xstrcmp0 (interface_name, "org.example.foo_t") == 0)
+  if (g_strcmp0 (interface_name, "org.example.Foo") == 0)
     return &foo_vtable;
   else
     return NULL;
 }
 
-static const xdbus_subtree_vtable_t subtree_vtable =
+static const GDBusSubtreeVTable subtree_vtable =
 {
   subtree_enumerate,
   subtree_introspect,
@@ -703,19 +689,19 @@ static const xdbus_subtree_vtable_t subtree_vtable =
 
 /* -------------------- */
 
-static xchar_t **
-dynamic_subtree_enumerate (xdbus_connection_t       *connection,
-                           const xchar_t           *sender,
-                           const xchar_t           *object_path,
-                           xpointer_t               user_data)
+static gchar **
+dynamic_subtree_enumerate (GDBusConnection       *connection,
+                           const gchar           *sender,
+                           const gchar           *object_path,
+                           gpointer               user_data)
 {
-  xptr_array_t *data = user_data;
-  xchar_t **nodes = g_new (xchar_t*, data->len + 1);
-  xuint_t n;
+  GPtrArray *data = user_data;
+  gchar **nodes = g_new (gchar*, data->len + 1);
+  guint n;
 
   for (n = 0; n < data->len; n++)
     {
-      nodes[n] = xstrdup (xptr_array_index (data, n));
+      nodes[n] = g_strdup (g_ptr_array_index (data, n));
     }
   nodes[data->len] = NULL;
 
@@ -723,32 +709,32 @@ dynamic_subtree_enumerate (xdbus_connection_t       *connection,
 }
 
 /* Allow all objects to be introspected */
-static xdbus_interface_info_t **
-dynamic_subtree_introspect (xdbus_connection_t       *connection,
-                            const xchar_t           *sender,
-                            const xchar_t           *object_path,
-                            const xchar_t           *node,
-                            xpointer_t               user_data)
+static GDBusInterfaceInfo **
+dynamic_subtree_introspect (GDBusConnection       *connection,
+                            const gchar           *sender,
+                            const gchar           *object_path,
+                            const gchar           *node,
+                            gpointer               user_data)
 {
-  const xdbus_interface_info_t *interfaces[2] = { &dyna_interface_info, NULL };
+  const GDBusInterfaceInfo *interfaces[2] = { &dyna_interface_info, NULL };
 
   return g_memdup2 (interfaces, 2 * sizeof (void *));
 }
 
-static const xdbus_interface_vtable_t *
-dynamic_subtree_dispatch (xdbus_connection_t             *connection,
-                          const xchar_t                 *sender,
-                          const xchar_t                 *object_path,
-                          const xchar_t                 *interface_name,
-                          const xchar_t                 *node,
-                          xpointer_t                    *out_user_data,
-                          xpointer_t                     user_data)
+static const GDBusInterfaceVTable *
+dynamic_subtree_dispatch (GDBusConnection             *connection,
+                          const gchar                 *sender,
+                          const gchar                 *object_path,
+                          const gchar                 *interface_name,
+                          const gchar                 *node,
+                          gpointer                    *out_user_data,
+                          gpointer                     user_data)
 {
   *out_user_data = user_data;
   return &dyna_interface_vtable;
 }
 
-static const xdbus_subtree_vtable_t dynamic_subtree_vtable =
+static const GDBusSubtreeVTable dynamic_subtree_vtable =
 {
   dynamic_subtree_enumerate,
   dynamic_subtree_introspect,
@@ -760,36 +746,36 @@ static const xdbus_subtree_vtable_t dynamic_subtree_vtable =
 
 typedef struct
 {
-  const xchar_t *object_path;
-  xboolean_t check_remote_errors;
+  const gchar *object_path;
+  gboolean check_remote_errors;
 } TestDispatchThreadFuncArgs;
 
-static xpointer_t
-test_dispatch_thread_func (xpointer_t user_data)
+static gpointer
+test_dispatch_thread_func (gpointer user_data)
 {
   TestDispatchThreadFuncArgs *args = user_data;
-  const xchar_t *object_path = args->object_path;
-  xdbus_proxy_t *foo_proxy;
-  xvariant_t *value;
-  xvariant_t *inner;
-  xerror_t *error;
-  xchar_t *s;
-  const xchar_t *value_str;
+  const gchar *object_path = args->object_path;
+  GDBusProxy *foo_proxy;
+  GVariant *value;
+  GVariant *inner;
+  GError *error;
+  gchar *s;
+  const gchar *value_str;
 
-  foo_proxy = xdbus_proxy_new_sync (c,
+  foo_proxy = g_dbus_proxy_new_sync (c,
                                      G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS |
                                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                      NULL,
-                                     xdbus_connection_get_unique_name (c),
+                                     g_dbus_connection_get_unique_name (c),
                                      object_path,
-                                     "org.example.foo_t",
+                                     "org.example.Foo",
                                      NULL,
                                      &error);
-  xassert (foo_proxy != NULL);
+  g_assert (foo_proxy != NULL);
 
   /* generic interfaces */
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Peer.Ping",
                                   NULL,
                                   G_DBUS_CALL_FLAGS_NONE,
@@ -797,27 +783,27 @@ test_dispatch_thread_func (xpointer_t user_data)
                                   NULL,
                                   &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
-  xvariant_unref (value);
+  g_assert (value != NULL);
+  g_variant_unref (value);
 
   /* user methods */
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "Method1",
-                                  xvariant_new ("(s)", "winwinwin"),
+                                  g_variant_new ("(s)", "winwinwin"),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
-  xassert (xvariant_is_of_type (value, G_VARIANT_TYPE ("(s)")));
-  xvariant_get (value, "(&s)", &value_str);
+  g_assert (value != NULL);
+  g_assert (g_variant_is_of_type (value, G_VARIANT_TYPE ("(s)")));
+  g_variant_get (value, "(&s)", &value_str);
   g_assert_cmpstr (value_str, ==, "You passed the string 'winwinwin'. Jolly good!");
-  xvariant_unref (value);
+  g_variant_unref (value);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "Method2",
                                   NULL,
                                   G_DBUS_CALL_FLAGS_NONE,
@@ -826,24 +812,24 @@ test_dispatch_thread_func (xpointer_t user_data)
                                   &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR);
   g_assert_cmpstr (error->message, ==, "GDBus.Error:org.example.SomeError: How do you like them apples, buddy!");
-  xerror_free (error);
-  xassert (value == NULL);
+  g_error_free (error);
+  g_assert (value == NULL);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "Method2",
-                                  xvariant_new ("(s)", "failfailfail"),
+                                  g_variant_new ("(s)", "failfailfail"),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS);
   g_assert_cmpstr (error->message, ==, "GDBus.Error:org.freedesktop.DBus.Error.InvalidArgs: Type of message, “(s)”, does not match expected type “()”");
-  xerror_free (error);
-  xassert (value == NULL);
+  g_error_free (error);
+  g_assert (value == NULL);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "NonExistantMethod",
                                   NULL,
                                   G_DBUS_CALL_FLAGS_NONE,
@@ -852,11 +838,11 @@ test_dispatch_thread_func (xpointer_t user_data)
                                   &error);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
   g_assert_cmpstr (error->message, ==, "GDBus.Error:org.freedesktop.DBus.Error.UnknownMethod: No such method “NonExistantMethod”");
-  xerror_free (error);
-  xassert (value == NULL);
+  g_error_free (error);
+  g_assert (value == NULL);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.example.FooXYZ.NonExistant",
                                   NULL,
                                   G_DBUS_CALL_FLAGS_NONE,
@@ -864,157 +850,157 @@ test_dispatch_thread_func (xpointer_t user_data)
                                   NULL,
                                   &error);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
-  xerror_free (error);
-  xassert (value == NULL);
+  g_error_free (error);
+  g_assert (value == NULL);
 
   /* user properties */
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Properties.Get",
-                                  xvariant_new ("(ss)",
-                                                 "org.example.foo_t",
+                                  g_variant_new ("(ss)",
+                                                 "org.example.Foo",
                                                  "PropertyUno"),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
-  xassert (xvariant_is_of_type (value, G_VARIANT_TYPE ("(v)")));
-  xvariant_get (value, "(v)", &inner);
-  xassert (xvariant_is_of_type (inner, G_VARIANT_TYPE_STRING));
-  g_assert_cmpstr (xvariant_get_string (inner, NULL), ==, "Property 'PropertyUno' Is What It Is!");
-  xvariant_unref (value);
-  xvariant_unref (inner);
+  g_assert (value != NULL);
+  g_assert (g_variant_is_of_type (value, G_VARIANT_TYPE ("(v)")));
+  g_variant_get (value, "(v)", &inner);
+  g_assert (g_variant_is_of_type (inner, G_VARIANT_TYPE_STRING));
+  g_assert_cmpstr (g_variant_get_string (inner, NULL), ==, "Property 'PropertyUno' Is What It Is!");
+  g_variant_unref (value);
+  g_variant_unref (inner);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Properties.Get",
-                                  xvariant_new ("(ss)",
-                                                 "org.example.foo_t",
+                                  g_variant_new ("(ss)",
+                                                 "org.example.Foo",
                                                  "ThisDoesntExist"),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
-  xassert (value == NULL);
+  g_assert (value == NULL);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS);
   g_assert_cmpstr (error->message, ==, "GDBus.Error:org.freedesktop.DBus.Error.InvalidArgs: No such property “ThisDoesntExist”");
-  xerror_free (error);
+  g_error_free (error);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Properties.Get",
-                                  xvariant_new ("(ss)",
-                                                 "org.example.foo_t",
+                                  g_variant_new ("(ss)",
+                                                 "org.example.Foo",
                                                  "NotReadable"),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
-  xassert (value == NULL);
+  g_assert (value == NULL);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS);
   g_assert_cmpstr (error->message, ==, "GDBus.Error:org.freedesktop.DBus.Error.InvalidArgs: Property “NotReadable” is not readable");
-  xerror_free (error);
+  g_error_free (error);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Properties.Set",
-                                  xvariant_new ("(ssv)",
-                                                 "org.example.foo_t",
+                                  g_variant_new ("(ssv)",
+                                                 "org.example.Foo",
                                                  "NotReadable",
-                                                 xvariant_new_string ("But Writable you are!")),
+                                                 g_variant_new_string ("But Writable you are!")),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
-  xassert (value == NULL);
+  g_assert (value == NULL);
   if (args->check_remote_errors)
     {
       /* _with_closures variant doesn't support customizing error data. */
       g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_SPAWN_FILE_INVALID);
       g_assert_cmpstr (error->message, ==, "GDBus.Error:org.freedesktop.DBus.Error.Spawn.FileInvalid: Returning some error instead of writing the value ''But Writable you are!'' to the property 'NotReadable'");
     }
-  xassert (error != NULL && error->domain == G_DBUS_ERROR);
-  xerror_free (error);
+  g_assert (error != NULL && error->domain == G_DBUS_ERROR);
+  g_error_free (error);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Properties.Set",
-                                  xvariant_new ("(ssv)",
-                                                 "org.example.foo_t",
+                                  g_variant_new ("(ssv)",
+                                                 "org.example.Foo",
                                                  "NotWritable",
-                                                 xvariant_new_uint32 (42)),
+                                                 g_variant_new_uint32 (42)),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
-  xassert (value == NULL);
+  g_assert (value == NULL);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS);
   g_assert_cmpstr (error->message, ==, "GDBus.Error:org.freedesktop.DBus.Error.InvalidArgs: Property “NotWritable” is not writable");
-  xerror_free (error);
+  g_error_free (error);
 
   error = NULL;
-  value = xdbus_proxy_call_sync (foo_proxy,
+  value = g_dbus_proxy_call_sync (foo_proxy,
                                   "org.freedesktop.DBus.Properties.GetAll",
-                                  xvariant_new ("(s)",
-                                                 "org.example.foo_t"),
+                                  g_variant_new ("(s)",
+                                                 "org.example.Foo"),
                                   G_DBUS_CALL_FLAGS_NONE,
                                   -1,
                                   NULL,
                                   &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
-  xassert (xvariant_is_of_type (value, G_VARIANT_TYPE ("(a{sv})")));
-  s = xvariant_print (value, TRUE);
+  g_assert (value != NULL);
+  g_assert (g_variant_is_of_type (value, G_VARIANT_TYPE ("(a{sv})")));
+  s = g_variant_print (value, TRUE);
   g_assert_cmpstr (s, ==, "({'PropertyUno': <\"Property 'PropertyUno' Is What It Is!\">, 'NotWritable': <\"Property 'NotWritable' Is What It Is!\">},)");
   g_free (s);
-  xvariant_unref (value);
+  g_variant_unref (value);
 
-  xobject_unref (foo_proxy);
+  g_object_unref (foo_proxy);
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
   return NULL;
 }
 
 static void
-test_dispatch (const xchar_t *object_path,
-               xboolean_t     check_remote_errors)
+test_dispatch (const gchar *object_path,
+               gboolean     check_remote_errors)
 {
-  xthread_t *thread;
-
+  GThread *thread;
+  
   TestDispatchThreadFuncArgs args = {object_path, check_remote_errors};
 
   /* run this in a thread to avoid deadlocks */
-  thread = xthread_new ("test_dispatch",
+  thread = g_thread_new ("test_dispatch",
                          test_dispatch_thread_func,
-                         (xpointer_t) &args);
-  xmain_loop_run (loop);
-  xthread_join (thread);
+                         (gpointer) &args);
+  g_main_loop_run (loop);
+  g_thread_join (thread);
 }
 
 static void
 test_object_registration (void)
 {
-  xerror_t *error;
-  object_registration_data_t data;
-  xptr_array_t *dyna_data;
-  xchar_t **nodes;
-  xuint_t boss_foo_reg_id;
-  xuint_t boss_bar_reg_id;
-  xuint_t worker1_foo_reg_id;
-  xuint_t worker1p1_foo_reg_id;
-  xuint_t worker2_bar_reg_id;
-  xuint_t intern1_foo_reg_id;
-  xuint_t intern2_bar_reg_id;
-  xuint_t intern2_foo_reg_id;
-  xuint_t intern3_bar_reg_id;
-  xuint_t registration_id;
-  xuint_t subtree_registration_id;
-  xuint_t non_subtree_object_path_foo_reg_id;
-  xuint_t non_subtree_object_path_bar_reg_id;
-  xuint_t dyna_subtree_registration_id;
-  xuint_t num_successful_registrations;
+  GError *error;
+  ObjectRegistrationData data;
+  GPtrArray *dyna_data;
+  gchar **nodes;
+  guint boss_foo_reg_id;
+  guint boss_bar_reg_id;
+  guint worker1_foo_reg_id;
+  guint worker1p1_foo_reg_id;
+  guint worker2_bar_reg_id;
+  guint intern1_foo_reg_id;
+  guint intern2_bar_reg_id;
+  guint intern2_foo_reg_id;
+  guint intern3_bar_reg_id;
+  guint registration_id;
+  guint subtree_registration_id;
+  guint non_subtree_object_path_foo_reg_id;
+  guint non_subtree_object_path_bar_reg_id;
+  guint dyna_subtree_registration_id;
+  guint num_successful_registrations;
 
   data.num_unregistered_calls = 0;
   data.num_unregistered_subtree_calls = 0;
@@ -1025,153 +1011,153 @@ test_object_registration (void)
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  xassert (c != NULL);
+  g_assert (c != NULL);
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        &foo_vtable,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   boss_foo_reg_id = registration_id;
   num_successful_registrations++;
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss",
-                                                       (xdbus_interface_info_t *) &bar_interface_info,
+                                                       (GDBusInterfaceInfo *) &bar_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   boss_bar_reg_id = registration_id;
   num_successful_registrations++;
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/worker1",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   worker1_foo_reg_id = registration_id;
   num_successful_registrations++;
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/worker1p1",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   worker1p1_foo_reg_id = registration_id;
   num_successful_registrations++;
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/worker2",
-                                                       (xdbus_interface_info_t *) &bar_interface_info,
+                                                       (GDBusInterfaceInfo *) &bar_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   worker2_bar_reg_id = registration_id;
   num_successful_registrations++;
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/interns/intern1",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   intern1_foo_reg_id = registration_id;
   num_successful_registrations++;
 
   /* ... and try again at another path */
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/interns/intern2",
-                                                       (xdbus_interface_info_t *) &bar_interface_info,
+                                                       (GDBusInterfaceInfo *) &bar_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   intern2_bar_reg_id = registration_id;
   num_successful_registrations++;
 
   /* register at the same path/interface - this should fail */
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/interns/intern2",
-                                                       (xdbus_interface_info_t *) &bar_interface_info,
+                                                       (GDBusInterfaceInfo *) &bar_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS);
-  xassert (!g_dbus_error_is_remote_error (error));
-  xerror_free (error);
+  g_assert (!g_dbus_error_is_remote_error (error));
+  g_error_free (error);
   error = NULL;
-  xassert (registration_id == 0);
+  g_assert (registration_id == 0);
 
   /* register at different interface - shouldn't fail */
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/interns/intern2",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   intern2_foo_reg_id = registration_id;
   num_successful_registrations++;
 
   /* unregister it via the id */
-  xassert (xdbus_connection_unregister_object (c, registration_id));
-  xmain_context_iteration (NULL, FALSE);
+  g_assert (g_dbus_connection_unregister_object (c, registration_id));
+  g_main_context_iteration (NULL, FALSE);
   g_assert_cmpint (data.num_unregistered_calls, ==, 1);
   intern2_foo_reg_id = 0;
 
   /* register it back */
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/interns/intern2",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   intern2_foo_reg_id = registration_id;
   num_successful_registrations++;
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/interns/intern3",
-                                                       (xdbus_interface_info_t *) &bar_interface_info,
+                                                       (GDBusInterfaceInfo *) &bar_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   intern3_bar_reg_id = registration_id;
   num_successful_registrations++;
 
   /* now register a whole subtree at /foo/boss/executives */
-  subtree_registration_id = xdbus_connection_register_subtree (c,
+  subtree_registration_id = g_dbus_connection_register_subtree (c,
                                                                 "/foo/boss/executives",
                                                                 &subtree_vtable,
                                                                 G_DBUS_SUBTREE_FLAGS_NONE,
@@ -1179,9 +1165,9 @@ test_object_registration (void)
                                                                 on_subtree_unregistered,
                                                                 &error);
   g_assert_no_error (error);
-  xassert (subtree_registration_id > 0);
+  g_assert (subtree_registration_id > 0);
   /* try registering it again.. this should fail */
-  registration_id = xdbus_connection_register_subtree (c,
+  registration_id = g_dbus_connection_register_subtree (c,
                                                         "/foo/boss/executives",
                                                         &subtree_vtable,
                                                         G_DBUS_SUBTREE_FLAGS_NONE,
@@ -1189,17 +1175,17 @@ test_object_registration (void)
                                                         on_subtree_unregistered,
                                                         &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS);
-  xassert (!g_dbus_error_is_remote_error (error));
-  xerror_free (error);
+  g_assert (!g_dbus_error_is_remote_error (error));
+  g_error_free (error);
   error = NULL;
-  xassert (registration_id == 0);
+  g_assert (registration_id == 0);
 
   /* unregister it, then register it again */
   g_assert_cmpint (data.num_unregistered_subtree_calls, ==, 0);
-  xassert (xdbus_connection_unregister_subtree (c, subtree_registration_id));
-  xmain_context_iteration (NULL, FALSE);
+  g_assert (g_dbus_connection_unregister_subtree (c, subtree_registration_id));
+  g_main_context_iteration (NULL, FALSE);
   g_assert_cmpint (data.num_unregistered_subtree_calls, ==, 1);
-  subtree_registration_id = xdbus_connection_register_subtree (c,
+  subtree_registration_id = g_dbus_connection_register_subtree (c,
                                                                 "/foo/boss/executives",
                                                                 &subtree_vtable,
                                                                 G_DBUS_SUBTREE_FLAGS_NONE,
@@ -1207,7 +1193,7 @@ test_object_registration (void)
                                                                 on_subtree_unregistered,
                                                                 &error);
   g_assert_no_error (error);
-  xassert (subtree_registration_id > 0);
+  g_assert (subtree_registration_id > 0);
 
   /* try to register something under /foo/boss/executives - this should work
    * because registered subtrees and registered objects can coexist.
@@ -1215,60 +1201,60 @@ test_object_registration (void)
    * Make the exported object implement *two* interfaces so we can check
    * that the right introspection handler is invoked.
    */
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/executives/non_subtree_object",
-                                                       (xdbus_interface_info_t *) &bar_interface_info,
+                                                       (GDBusInterfaceInfo *) &bar_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   non_subtree_object_path_bar_reg_id = registration_id;
   num_successful_registrations++;
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo/boss/executives/non_subtree_object",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        NULL,
                                                        &data,
                                                        on_object_unregistered,
                                                        &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
   non_subtree_object_path_foo_reg_id = registration_id;
   num_successful_registrations++;
 
   /* now register a dynamic subtree, spawning objects as they are called */
-  dyna_data = xptr_array_new_with_free_func (g_free);
-  dyna_subtree_registration_id = xdbus_connection_register_subtree (c,
+  dyna_data = g_ptr_array_new_with_free_func (g_free);
+  dyna_subtree_registration_id = g_dbus_connection_register_subtree (c,
                                                                      "/foo/dyna",
                                                                      &dynamic_subtree_vtable,
                                                                      G_DBUS_SUBTREE_FLAGS_DISPATCH_TO_UNENUMERATED_NODES,
                                                                      dyna_data,
-                                                                     (xdestroy_notify_t)xptr_array_unref,
+                                                                     (GDestroyNotify)g_ptr_array_unref,
                                                                      &error);
   g_assert_no_error (error);
-  xassert (dyna_subtree_registration_id > 0);
+  g_assert (dyna_subtree_registration_id > 0);
 
   /* First assert that we have no nodes in the dynamic subtree */
   nodes = get_nodes_at (c, "/foo/dyna");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 0);
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 0);
+  g_strfreev (nodes);
   g_assert_cmpint (count_interfaces (c, "/foo/dyna"), ==, 4);
 
   /* Install three nodes in the dynamic subtree via the dyna_data backdoor and
    * assert that they show up correctly in the introspection data */
-  xptr_array_add (dyna_data, xstrdup ("lol"));
-  xptr_array_add (dyna_data, xstrdup ("cat"));
-  xptr_array_add (dyna_data, xstrdup ("cheezburger"));
+  g_ptr_array_add (dyna_data, g_strdup ("lol"));
+  g_ptr_array_add (dyna_data, g_strdup ("cat"));
+  g_ptr_array_add (dyna_data, g_strdup ("cheezburger"));
   nodes = get_nodes_at (c, "/foo/dyna");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 3);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 3);
   g_assert_cmpstr (nodes[0], ==, "cat");
   g_assert_cmpstr (nodes[1], ==, "cheezburger");
   g_assert_cmpstr (nodes[2], ==, "lol");
-  xstrfreev (nodes);
+  g_strfreev (nodes);
   g_assert_cmpint (count_interfaces (c, "/foo/dyna/lol"), ==, 4);
   g_assert_cmpint (count_interfaces (c, "/foo/dyna/cat"), ==, 4);
   g_assert_cmpint (count_interfaces (c, "/foo/dyna/cheezburger"), ==, 4);
@@ -1276,110 +1262,110 @@ test_object_registration (void)
   /* Call a non-existing object path and assert that it has been created */
   dyna_create (c, "dynamicallycreated");
   nodes = get_nodes_at (c, "/foo/dyna");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 4);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 4);
   g_assert_cmpstr (nodes[0], ==, "cat");
   g_assert_cmpstr (nodes[1], ==, "cheezburger");
   g_assert_cmpstr (nodes[2], ==, "dynamicallycreated");
   g_assert_cmpstr (nodes[3], ==, "lol");
-  xstrfreev (nodes);
+  g_strfreev (nodes);
   g_assert_cmpint (count_interfaces (c, "/foo/dyna/dynamicallycreated"), ==, 4);
 
   /* now check that the object hierarchy is properly generated... yes, it's a bit
    * perverse that we round-trip to the bus to introspect ourselves ;-)
    */
   nodes = get_nodes_at (c, "/");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 1);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 1);
   g_assert_cmpstr (nodes[0], ==, "foo");
-  xstrfreev (nodes);
+  g_strfreev (nodes);
   g_assert_cmpint (count_interfaces (c, "/"), ==, 0);
 
   nodes = get_nodes_at (c, "/foo");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 2);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 2);
   g_assert_cmpstr (nodes[0], ==, "boss");
   g_assert_cmpstr (nodes[1], ==, "dyna");
-  xstrfreev (nodes);
+  g_strfreev (nodes);
   g_assert_cmpint (count_interfaces (c, "/foo"), ==, 0);
 
   nodes = get_nodes_at (c, "/foo/boss");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 5);
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "worker1"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "worker1p1"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "worker2"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "interns"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "executives"));
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 5);
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "worker1"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "worker1p1"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "worker2"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "interns"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "executives"));
+  g_strfreev (nodes);
   /* any registered object always implement org.freedesktop.DBus.[Peer,Introspectable,Properties] */
   g_assert_cmpint (count_interfaces (c, "/foo/boss"), ==, 5);
-  xassert (has_interface (c, "/foo/boss", foo_interface_info.name));
-  xassert (has_interface (c, "/foo/boss", bar_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss", foo_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss", bar_interface_info.name));
 
   /* check subtree nodes - we should have only non_subtree_object in /foo/boss/executives
    * because data.num_subtree_nodes is 0
    */
   nodes = get_nodes_at (c, "/foo/boss/executives");
-  xassert (nodes != NULL);
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "non_subtree_object"));
-  g_assert_cmpint (xstrv_length (nodes), ==, 1);
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "non_subtree_object"));
+  g_assert_cmpint (g_strv_length (nodes), ==, 1);
+  g_strfreev (nodes);
   g_assert_cmpint (count_interfaces (c, "/foo/boss/executives"), ==, 0);
 
   /* now change data.num_subtree_nodes and check */
   data.num_subtree_nodes = 2;
   nodes = get_nodes_at (c, "/foo/boss/executives");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 5);
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "non_subtree_object"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "vp0"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "vp1"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "evp0"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "evp1"));
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 5);
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "non_subtree_object"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "vp0"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "vp1"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "evp0"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "evp1"));
   /* check that /foo/boss/executives/non_subtree_object is not handled by the
    * subtree handlers - we can do this because objects from subtree handlers
    * has exactly one interface and non_subtree_object has two
    */
   g_assert_cmpint (count_interfaces (c, "/foo/boss/executives/non_subtree_object"), ==, 5);
-  xassert (has_interface (c, "/foo/boss/executives/non_subtree_object", foo_interface_info.name));
-  xassert (has_interface (c, "/foo/boss/executives/non_subtree_object", bar_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss/executives/non_subtree_object", foo_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss/executives/non_subtree_object", bar_interface_info.name));
   /* check that the vp and evp objects are handled by the subtree handlers */
   g_assert_cmpint (count_interfaces (c, "/foo/boss/executives/vp0"), ==, 4);
   g_assert_cmpint (count_interfaces (c, "/foo/boss/executives/vp1"), ==, 4);
   g_assert_cmpint (count_interfaces (c, "/foo/boss/executives/evp0"), ==, 4);
   g_assert_cmpint (count_interfaces (c, "/foo/boss/executives/evp1"), ==, 4);
-  xassert (has_interface (c, "/foo/boss/executives/vp0", foo_interface_info.name));
-  xassert (has_interface (c, "/foo/boss/executives/vp1", foo_interface_info.name));
-  xassert (has_interface (c, "/foo/boss/executives/evp0", bar_interface_info.name));
-  xassert (has_interface (c, "/foo/boss/executives/evp1", bar_interface_info.name));
-  xstrfreev (nodes);
+  g_assert (has_interface (c, "/foo/boss/executives/vp0", foo_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss/executives/vp1", foo_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss/executives/evp0", bar_interface_info.name));
+  g_assert (has_interface (c, "/foo/boss/executives/evp1", bar_interface_info.name));
+  g_strfreev (nodes);
   data.num_subtree_nodes = 3;
   nodes = get_nodes_at (c, "/foo/boss/executives");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 7);
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "non_subtree_object"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "vp0"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "vp1"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "vp2"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "evp0"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "evp1"));
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "evp2"));
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 7);
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "non_subtree_object"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "vp0"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "vp1"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "vp2"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "evp0"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "evp1"));
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "evp2"));
+  g_strfreev (nodes);
 
   /* This is to check that a bug (rather, class of bugs) in gdbusconnection.c's
    *
-   *  xdbus_connection_list_registered_unlocked()
+   *  g_dbus_connection_list_registered_unlocked()
    *
    * where /foo/boss/worker1 reported a child '1', is now fixed.
    */
   nodes = get_nodes_at (c, "/foo/boss/worker1");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 0);
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 0);
+  g_strfreev (nodes);
 
   /* check that calls are properly dispatched to the functions in foo_vtable for objects
-   * implementing the org.example.foo_t interface
+   * implementing the org.example.Foo interface
    *
    * We do this for both a regular registered object (/foo/boss) and also for an object
    * registered through the subtree mechanism.
@@ -1390,33 +1376,33 @@ test_object_registration (void)
   /* To prevent from exiting and attaching a D-Bus tool like D-Feet; uncomment: */
 #if 0
   g_debug ("Point D-feet or other tool at: %s", g_test_dbus_get_temporary_address());
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
 #endif
 
   /* check that unregistering the subtree handler works */
   g_assert_cmpint (data.num_unregistered_subtree_calls, ==, 1);
-  xassert (xdbus_connection_unregister_subtree (c, subtree_registration_id));
-  xmain_context_iteration (NULL, FALSE);
+  g_assert (g_dbus_connection_unregister_subtree (c, subtree_registration_id));
+  g_main_context_iteration (NULL, FALSE);
   g_assert_cmpint (data.num_unregistered_subtree_calls, ==, 2);
   nodes = get_nodes_at (c, "/foo/boss/executives");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 1);
-  xassert (_xstrv_has_string ((const xchar_t* const *) nodes, "non_subtree_object"));
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 1);
+  g_assert (g_strv_contains ((const gchar* const *) nodes, "non_subtree_object"));
+  g_strfreev (nodes);
 
-  xassert (xdbus_connection_unregister_object (c, boss_foo_reg_id));
-  xassert (xdbus_connection_unregister_object (c, boss_bar_reg_id));
-  xassert (xdbus_connection_unregister_object (c, worker1_foo_reg_id));
-  xassert (xdbus_connection_unregister_object (c, worker1p1_foo_reg_id));
-  xassert (xdbus_connection_unregister_object (c, worker2_bar_reg_id));
-  xassert (xdbus_connection_unregister_object (c, intern1_foo_reg_id));
-  xassert (xdbus_connection_unregister_object (c, intern2_bar_reg_id));
-  xassert (xdbus_connection_unregister_object (c, intern2_foo_reg_id));
-  xassert (xdbus_connection_unregister_object (c, intern3_bar_reg_id));
-  xassert (xdbus_connection_unregister_object (c, non_subtree_object_path_bar_reg_id));
-  xassert (xdbus_connection_unregister_object (c, non_subtree_object_path_foo_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, boss_foo_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, boss_bar_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, worker1_foo_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, worker1p1_foo_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, worker2_bar_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, intern1_foo_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, intern2_bar_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, intern2_foo_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, intern3_bar_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, non_subtree_object_path_bar_reg_id));
+  g_assert (g_dbus_connection_unregister_object (c, non_subtree_object_path_foo_reg_id));
 
-  xmain_context_iteration (NULL, FALSE);
+  g_main_context_iteration (NULL, FALSE);
   g_assert_cmpint (data.num_unregistered_calls, ==, num_successful_registrations);
 
   /* check that we no longer export any objects - TODO: it looks like there's a bug in
@@ -1424,107 +1410,107 @@ test_object_registration (void)
    */
 #if 0
   nodes = get_nodes_at (c, "/");
-  xassert (nodes != NULL);
-  g_assert_cmpint (xstrv_length (nodes), ==, 0);
-  xstrfreev (nodes);
+  g_assert (nodes != NULL);
+  g_assert_cmpint (g_strv_length (nodes), ==, 0);
+  g_strfreev (nodes);
 #endif
 
-  xobject_unref (c);
+  g_object_unref (c);
 }
 
 static void
 test_object_registration_with_closures (void)
 {
-  xerror_t *error;
-  xuint_t registration_id;
+  GError *error;
+  guint registration_id;
 
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  xassert (c != NULL);
+  g_assert (c != NULL);
 
-  registration_id = xdbus_connection_register_object_with_closures (c,
+  registration_id = g_dbus_connection_register_object_with_closures (c,
                                                                      "/foo/boss",
-                                                                     (xdbus_interface_info_t *) &foo_interface_info,
+                                                                     (GDBusInterfaceInfo *) &foo_interface_info,
                                                                      g_cclosure_new (G_CALLBACK (foo_method_call), NULL, NULL),
                                                                      g_cclosure_new (G_CALLBACK (foo_get_property), NULL, NULL),
                                                                      g_cclosure_new (G_CALLBACK (foo_set_property), NULL, NULL),
                                                                      &error);
   g_assert_no_error (error);
-  xassert (registration_id > 0);
+  g_assert (registration_id > 0);
 
   test_dispatch ("/foo/boss", FALSE);
 
-  xassert (xdbus_connection_unregister_object (c, registration_id));
+  g_assert (g_dbus_connection_unregister_object (c, registration_id));
 
-  xobject_unref (c);
+  g_object_unref (c);
 }
 
-static const xdbus_interface_info_t test_interface_info1 =
+static const GDBusInterfaceInfo test_interface_info1 =
 {
   -1,
-  "org.example.foo_t",
-  (xdbus_method_info_t **) NULL,
-  (xdbus_signalInfo_t **) NULL,
-  (xdbus_property_info_t **) NULL,
+  "org.example.Foo",
+  (GDBusMethodInfo **) NULL,
+  (GDBusSignalInfo **) NULL,
+  (GDBusPropertyInfo **) NULL,
   NULL,
 };
 
-static const xdbus_interface_info_t test_interface_info2 =
+static const GDBusInterfaceInfo test_interface_info2 =
 {
   -1,
   "org.freedesktop.DBus.Properties",
-  (xdbus_method_info_t **) NULL,
-  (xdbus_signalInfo_t **) NULL,
-  (xdbus_property_info_t **) NULL,
+  (GDBusMethodInfo **) NULL,
+  (GDBusSignalInfo **) NULL,
+  (GDBusPropertyInfo **) NULL,
   NULL,
 };
 
 static void
-check_interfaces (xdbus_connection_t  *c,
-                  const xchar_t      *object_path,
-                  const xchar_t     **interfaces)
+check_interfaces (GDBusConnection  *c,
+                  const gchar      *object_path,
+                  const gchar     **interfaces)
 {
-  xerror_t *error;
-  xdbus_proxy_t *proxy;
-  xchar_t *xml_data;
-  xdbus_node_info_t *node_info;
-  xint_t i, j;
+  GError *error;
+  GDBusProxy *proxy;
+  gchar *xml_data;
+  GDBusNodeInfo *node_info;
+  gint i, j;
 
   error = NULL;
-  proxy = xdbus_proxy_new_sync (c,
+  proxy = g_dbus_proxy_new_sync (c,
                                  G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES |
                                  G_DBUS_PROXY_FLAGS_DO_NOT_CONNECT_SIGNALS,
                                  NULL,
-                                 xdbus_connection_get_unique_name (c),
+                                 g_dbus_connection_get_unique_name (c),
                                  object_path,
                                  "org.freedesktop.DBus.Introspectable",
                                  NULL,
                                  &error);
   g_assert_no_error (error);
-  xassert (proxy != NULL);
+  g_assert (proxy != NULL);
 
   /* do this async to avoid libdbus-1 deadlocks */
   xml_data = NULL;
-  xdbus_proxy_call (proxy,
+  g_dbus_proxy_call (proxy,
                      "Introspect",
                      NULL,
                      G_DBUS_CALL_FLAGS_NONE,
                      -1,
                      NULL,
-                     (xasync_ready_callback_t) introspect_callback,
+                     (GAsyncReadyCallback) introspect_callback,
                      &xml_data);
-  xmain_loop_run (loop);
-  xassert (xml_data != NULL);
+  g_main_loop_run (loop);
+  g_assert (xml_data != NULL);
 
   node_info = g_dbus_node_info_new_for_xml (xml_data, &error);
   g_assert_no_error (error);
-  xassert (node_info != NULL);
+  g_assert (node_info != NULL);
 
-  xassert (node_info->interfaces != NULL);
+  g_assert (node_info->interfaces != NULL);
   for (i = 0; node_info->interfaces[i]; i++) ;
 #if 0
-  if (xstrv_length ((xchar_t**)interfaces) != i - 1)
+  if (g_strv_length ((gchar**)interfaces) != i - 1)
     {
       g_printerr ("expected ");
       for (i = 0; interfaces[i]; i++)
@@ -1535,7 +1521,7 @@ check_interfaces (xdbus_connection_t  *c,
       g_printerr ("\n");
     }
 #endif
-  g_assert_cmpint (xstrv_length ((xchar_t**)interfaces), ==, i - 1);
+  g_assert_cmpint (g_strv_length ((gchar**)interfaces), ==, i - 1);
 
   for (i = 0; interfaces[i]; i++)
     {
@@ -1550,7 +1536,7 @@ check_interfaces (xdbus_connection_t  *c,
  found: ;
     }
 
-  xobject_unref (proxy);
+  g_object_unref (proxy);
   g_free (xml_data);
   g_dbus_node_info_unref (node_info);
 }
@@ -1558,10 +1544,10 @@ check_interfaces (xdbus_connection_t  *c,
 static void
 test_registered_interfaces (void)
 {
-  xerror_t *error;
-  xuint_t id1, id2;
-  const xchar_t *interfaces[] = {
-    "org.example.foo_t",
+  GError *error;
+  guint id1, id2;
+  const gchar *interfaces[] = {
+    "org.example.Foo",
     "org.freedesktop.DBus.Properties",
     "org.freedesktop.DBus.Introspectable",
     NULL,
@@ -1570,104 +1556,104 @@ test_registered_interfaces (void)
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  xassert (c != NULL);
+  g_assert (c != NULL);
 
-  id1 = xdbus_connection_register_object (c,
+  id1 = g_dbus_connection_register_object (c,
                                            "/test",
-                                           (xdbus_interface_info_t *) &test_interface_info1,
+                                           (GDBusInterfaceInfo *) &test_interface_info1,
                                            NULL,
                                            NULL,
                                            NULL,
                                            &error);
   g_assert_no_error (error);
-  xassert (id1 > 0);
-  id2 = xdbus_connection_register_object (c,
+  g_assert (id1 > 0);
+  id2 = g_dbus_connection_register_object (c,
                                            "/test",
-                                           (xdbus_interface_info_t *) &test_interface_info2,
+                                           (GDBusInterfaceInfo *) &test_interface_info2,
                                            NULL,
                                            NULL,
                                            NULL,
                                            &error);
   g_assert_no_error (error);
-  xassert (id2 > 0);
+  g_assert (id2 > 0);
 
   check_interfaces (c, "/test", interfaces);
 
-  xassert (xdbus_connection_unregister_object (c, id1));
-  xassert (xdbus_connection_unregister_object (c, id2));
-  xobject_unref (c);
+  g_assert (g_dbus_connection_unregister_object (c, id1));
+  g_assert (g_dbus_connection_unregister_object (c, id2));
+  g_object_unref (c);
 }
 
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-test_async_method_call (xdbus_connection_t       *connection,
-                        const xchar_t           *sender,
-                        const xchar_t           *object_path,
-                        const xchar_t           *interface_name,
-                        const xchar_t           *method_name,
-                        xvariant_t              *parameters,
-                        xdbus_method_invocation_t *invocation,
-                        xpointer_t               user_data)
+test_async_method_call (GDBusConnection       *connection,
+                        const gchar           *sender,
+                        const gchar           *object_path,
+                        const gchar           *interface_name,
+                        const gchar           *method_name,
+                        GVariant              *parameters,
+                        GDBusMethodInvocation *invocation,
+                        gpointer               user_data)
 {
-  const xdbus_property_info_t *property;
+  const GDBusPropertyInfo *property;
 
   /* Strictly speaking, this function should also expect to receive
    * method calls not on the org.freedesktop.DBus.Properties interface,
    * but we don't do any during this testcase, so assert that.
    */
   g_assert_cmpstr (interface_name, ==, "org.freedesktop.DBus.Properties");
-  xassert (xdbus_method_invocation_get_method_info (invocation) == NULL);
+  g_assert (g_dbus_method_invocation_get_method_info (invocation) == NULL);
 
-  property = xdbus_method_invocation_get_property_info (invocation);
+  property = g_dbus_method_invocation_get_property_info (invocation);
 
   /* We should never be seeing any property calls on the com.example.Bar
    * interface because it doesn't export any properties.
    *
-   * In each case below make sure the interface is org.example.foo_t.
+   * In each case below make sure the interface is org.example.Foo.
    */
 
   /* Do a whole lot of asserts to make sure that invalid calls are still
-   * getting properly rejected by xdbus_connection_t and that our
+   * getting properly rejected by GDBusConnection and that our
    * environment is as we expect it to be.
    */
-  if (xstr_equal (method_name, "Get"))
+  if (g_str_equal (method_name, "Get"))
     {
-      const xchar_t *iface_name, *prop_name;
+      const gchar *iface_name, *prop_name;
 
-      xvariant_get (parameters, "(&s&s)", &iface_name, &prop_name);
-      g_assert_cmpstr (iface_name, ==, "org.example.foo_t");
-      xassert (property != NULL);
+      g_variant_get (parameters, "(&s&s)", &iface_name, &prop_name);
+      g_assert_cmpstr (iface_name, ==, "org.example.Foo");
+      g_assert (property != NULL);
       g_assert_cmpstr (prop_name, ==, property->name);
-      xassert (property->flags & G_DBUS_PROPERTY_INFO_FLAGS_READABLE);
-      xdbus_method_invocation_return_value (invocation, xvariant_new ("(v)", xvariant_new_string (prop_name)));
+      g_assert (property->flags & G_DBUS_PROPERTY_INFO_FLAGS_READABLE);
+      g_dbus_method_invocation_return_value (invocation, g_variant_new ("(v)", g_variant_new_string (prop_name)));
     }
 
-  else if (xstr_equal (method_name, "Set"))
+  else if (g_str_equal (method_name, "Set"))
     {
-      const xchar_t *iface_name, *prop_name;
-      xvariant_t *value;
+      const gchar *iface_name, *prop_name;
+      GVariant *value;
 
-      xvariant_get (parameters, "(&s&sv)", &iface_name, &prop_name, &value);
-      g_assert_cmpstr (iface_name, ==, "org.example.foo_t");
-      xassert (property != NULL);
+      g_variant_get (parameters, "(&s&sv)", &iface_name, &prop_name, &value);
+      g_assert_cmpstr (iface_name, ==, "org.example.Foo");
+      g_assert (property != NULL);
       g_assert_cmpstr (prop_name, ==, property->name);
-      xassert (property->flags & G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE);
-      xassert (xvariant_is_of_type (value, G_VARIANT_TYPE (property->signature)));
-      xdbus_method_invocation_return_value (invocation, xvariant_new ("()"));
-      xvariant_unref (value);
+      g_assert (property->flags & G_DBUS_PROPERTY_INFO_FLAGS_WRITABLE);
+      g_assert (g_variant_is_of_type (value, G_VARIANT_TYPE (property->signature)));
+      g_dbus_method_invocation_return_value (invocation, g_variant_new ("()"));
+      g_variant_unref (value);
     }
 
-  else if (xstr_equal (method_name, "GetAll"))
+  else if (g_str_equal (method_name, "GetAll"))
     {
-      const xchar_t *iface_name;
+      const gchar *iface_name;
 
-      xvariant_get (parameters, "(&s)", &iface_name);
-      g_assert_cmpstr (iface_name, ==, "org.example.foo_t");
-      xassert (property == NULL);
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_new_parsed ("({ 'PropertyUno': < 'uno' >,"
+      g_variant_get (parameters, "(&s)", &iface_name);
+      g_assert_cmpstr (iface_name, ==, "org.example.Foo");
+      g_assert (property == NULL);
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_new_parsed ("({ 'PropertyUno': < 'uno' >,"
                                                                    "   'NotWritable': < 'notwrite' > },)"));
     }
 
@@ -1675,34 +1661,34 @@ test_async_method_call (xdbus_connection_t       *connection,
     g_assert_not_reached ();
 }
 
-static xint_t outstanding_cases;
+static gint outstanding_cases;
 
 static void
-ensure_result_cb (xobject_t      *source,
-                  xasync_result_t *result,
-                  xpointer_t      user_data)
+ensure_result_cb (GObject      *source,
+                  GAsyncResult *result,
+                  gpointer      user_data)
 {
-  xdbus_connection_t *connection = G_DBUS_CONNECTION (source);
-  xvariant_t *reply;
+  GDBusConnection *connection = G_DBUS_CONNECTION (source);
+  GVariant *reply;
 
-  reply = xdbus_connection_call_finish (connection, result, NULL);
+  reply = g_dbus_connection_call_finish (connection, result, NULL);
 
   if (user_data == NULL)
     {
       /* Expected an error */
-      xassert (reply == NULL);
+      g_assert (reply == NULL);
     }
   else
     {
       /* Expected a reply of a particular format. */
-      xchar_t *str;
+      gchar *str;
 
-      xassert (reply != NULL);
-      str = xvariant_print (reply, TRUE);
-      g_assert_cmpstr (str, ==, (const xchar_t *) user_data);
+      g_assert (reply != NULL);
+      str = g_variant_print (reply, TRUE);
+      g_assert_cmpstr (str, ==, (const gchar *) user_data);
       g_free (str);
 
-      xvariant_unref (reply);
+      g_variant_unref (reply);
     }
 
   g_assert_cmpint (outstanding_cases, >, 0);
@@ -1710,19 +1696,19 @@ ensure_result_cb (xobject_t      *source,
 }
 
 static void
-test_async_case (xdbus_connection_t *connection,
-                 const xchar_t     *expected_reply,
-                 const xchar_t     *method,
-                 const xchar_t     *format_string,
+test_async_case (GDBusConnection *connection,
+                 const gchar     *expected_reply,
+                 const gchar     *method,
+                 const gchar     *format_string,
                  ...)
 {
   va_list ap;
 
   va_start (ap, format_string);
 
-  xdbus_connection_call (connection, xdbus_connection_get_unique_name (connection), "/foo",
-                          "org.freedesktop.DBus.Properties", method, xvariant_new_va (format_string, NULL, &ap),
-                          NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, ensure_result_cb, (xpointer_t) expected_reply);
+  g_dbus_connection_call (connection, g_dbus_connection_get_unique_name (connection), "/foo",
+                          "org.freedesktop.DBus.Properties", method, g_variant_new_va (format_string, NULL, &ap),
+                          NULL, G_DBUS_CALL_FLAGS_NONE, -1, NULL, ensure_result_cb, (gpointer) expected_reply);
 
   va_end (ap);
 
@@ -1732,75 +1718,75 @@ test_async_case (xdbus_connection_t *connection,
 static void
 test_async_properties (void)
 {
-  xerror_t *error = NULL;
-  xuint_t registration_id, registration_id2;
-  static const xdbus_interface_vtable_t vtable = {
+  GError *error = NULL;
+  guint registration_id, registration_id2;
+  static const GDBusInterfaceVTable vtable = {
     test_async_method_call, NULL, NULL, { 0 }
   };
 
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  xassert (c != NULL);
+  g_assert (c != NULL);
 
-  registration_id = xdbus_connection_register_object (c,
+  registration_id = g_dbus_connection_register_object (c,
                                                        "/foo",
-                                                       (xdbus_interface_info_t *) &foo_interface_info,
+                                                       (GDBusInterfaceInfo *) &foo_interface_info,
                                                        &vtable, NULL, NULL, &error);
   g_assert_no_error (error);
-  xassert (registration_id);
-  registration_id2 = xdbus_connection_register_object (c,
+  g_assert (registration_id);
+  registration_id2 = g_dbus_connection_register_object (c,
                                                         "/foo",
-                                                        (xdbus_interface_info_t *) &foo2_interface_info,
+                                                        (GDBusInterfaceInfo *) &foo2_interface_info,
                                                         &vtable, NULL, NULL, &error);
   g_assert_no_error (error);
-  xassert (registration_id);
+  g_assert (registration_id);
 
   test_async_case (c, NULL, "random", "()");
 
-  /* test_t a variety of error cases */
+  /* Test a variety of error cases */
   test_async_case (c, NULL, "Get", "(si)", "wrong signature", 5);
   test_async_case (c, NULL, "Get", "(ss)", "org.example.WrongInterface", "zzz");
-  test_async_case (c, NULL, "Get", "(ss)", "org.example.foo_t", "NoSuchProperty");
-  test_async_case (c, NULL, "Get", "(ss)", "org.example.foo_t", "NotReadable");
+  test_async_case (c, NULL, "Get", "(ss)", "org.example.Foo", "NoSuchProperty");
+  test_async_case (c, NULL, "Get", "(ss)", "org.example.Foo", "NotReadable");
 
   test_async_case (c, NULL, "Set", "(si)", "wrong signature", 5);
-  test_async_case (c, NULL, "Set", "(ssv)", "org.example.WrongInterface", "zzz", xvariant_new_string (""));
-  test_async_case (c, NULL, "Set", "(ssv)", "org.example.foo_t", "NoSuchProperty", xvariant_new_string (""));
-  test_async_case (c, NULL, "Set", "(ssv)", "org.example.foo_t", "NotWritable", xvariant_new_string (""));
-  test_async_case (c, NULL, "Set", "(ssv)", "org.example.foo_t", "PropertyUno", xvariant_new_object_path ("/wrong"));
+  test_async_case (c, NULL, "Set", "(ssv)", "org.example.WrongInterface", "zzz", g_variant_new_string (""));
+  test_async_case (c, NULL, "Set", "(ssv)", "org.example.Foo", "NoSuchProperty", g_variant_new_string (""));
+  test_async_case (c, NULL, "Set", "(ssv)", "org.example.Foo", "NotWritable", g_variant_new_string (""));
+  test_async_case (c, NULL, "Set", "(ssv)", "org.example.Foo", "PropertyUno", g_variant_new_object_path ("/wrong"));
 
   test_async_case (c, NULL, "GetAll", "(si)", "wrong signature", 5);
   test_async_case (c, NULL, "GetAll", "(s)", "org.example.WrongInterface");
 
   /* Make sure that we get no unexpected async property calls for com.example.Foo2 */
   test_async_case (c, NULL, "Get", "(ss)", "org.example.Foo2", "zzz");
-  test_async_case (c, NULL, "Set", "(ssv)", "org.example.Foo2", "zzz", xvariant_new_string (""));
+  test_async_case (c, NULL, "Set", "(ssv)", "org.example.Foo2", "zzz", g_variant_new_string (""));
   test_async_case (c, "(@a{sv} {},)", "GetAll", "(s)", "org.example.Foo2");
 
   /* Now do the proper things */
-  test_async_case (c, "(<'PropertyUno'>,)", "Get", "(ss)", "org.example.foo_t", "PropertyUno");
-  test_async_case (c, "(<'NotWritable'>,)", "Get", "(ss)", "org.example.foo_t", "NotWritable");
-  test_async_case (c, "()", "Set", "(ssv)", "org.example.foo_t", "PropertyUno", xvariant_new_string (""));
-  test_async_case (c, "()", "Set", "(ssv)", "org.example.foo_t", "NotReadable", xvariant_new_string (""));
-  test_async_case (c, "({'PropertyUno': <'uno'>, 'NotWritable': <'notwrite'>},)", "GetAll", "(s)", "org.example.foo_t");
+  test_async_case (c, "(<'PropertyUno'>,)", "Get", "(ss)", "org.example.Foo", "PropertyUno");
+  test_async_case (c, "(<'NotWritable'>,)", "Get", "(ss)", "org.example.Foo", "NotWritable");
+  test_async_case (c, "()", "Set", "(ssv)", "org.example.Foo", "PropertyUno", g_variant_new_string (""));
+  test_async_case (c, "()", "Set", "(ssv)", "org.example.Foo", "NotReadable", g_variant_new_string (""));
+  test_async_case (c, "({'PropertyUno': <'uno'>, 'NotWritable': <'notwrite'>},)", "GetAll", "(s)", "org.example.Foo");
 
   while (outstanding_cases)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
-  xdbus_connection_unregister_object (c, registration_id);
-  xdbus_connection_unregister_object (c, registration_id2);
-  xobject_unref (c);
+  g_dbus_connection_unregister_object (c, registration_id);
+  g_dbus_connection_unregister_object (c, registration_id2);
+  g_object_unref (c);
 }
 
 typedef struct
 {
-  xdbus_connection_t *connection;  /* (owned) */
-  xuint_t registration_id;
-  xuint_t subtree_registration_id;
+  GDBusConnection *connection;  /* (owned) */
+  guint registration_id;
+  guint subtree_registration_id;
 } ThreadedUnregistrationData;
 
-static xpointer_t
-unregister_thread_cb (xpointer_t user_data)
+static gpointer
+unregister_thread_cb (gpointer user_data)
 {
   ThreadedUnregistrationData *data = user_data;
 
@@ -1812,39 +1798,39 @@ unregister_thread_cb (xpointer_t user_data)
   usleep (330);
 
   if (data->registration_id > 0)
-    g_assert_true (xdbus_connection_unregister_object (data->connection, data->registration_id));
+    g_assert_true (g_dbus_connection_unregister_object (data->connection, data->registration_id));
 
   if (data->subtree_registration_id > 0)
-    g_assert_true (xdbus_connection_unregister_subtree (data->connection, data->subtree_registration_id));
+    g_assert_true (g_dbus_connection_unregister_subtree (data->connection, data->subtree_registration_id));
 
   return NULL;
 }
 
 static void
-async_result_cb (xobject_t      *source_object,
-                 xasync_result_t *result,
-                 xpointer_t      user_data)
+async_result_cb (GObject      *source_object,
+                 GAsyncResult *result,
+                 gpointer      user_data)
 {
-  xasync_result_t **result_out = user_data;
+  GAsyncResult **result_out = user_data;
 
-  *result_out = xobject_ref (result);
-  xmain_context_wakeup (NULL);
+  *result_out = g_object_ref (result);
+  g_main_context_wakeup (NULL);
 }
 
 /* Returns %TRUE if this iteration resolved the race with the unregistration
  * first, %FALSE if the call handler was invoked first. */
-static xboolean_t
-test_threaded_unregistration_iteration (xboolean_t subtree)
+static gboolean
+test_threaded_unregistration_iteration (gboolean subtree)
 {
   ThreadedUnregistrationData data = { NULL, 0, 0 };
-  object_registration_data_t object_registration_data = { 0, 0, 2 };
-  xerror_t *local_error = NULL;
-  xthread_t *unregister_thread = NULL;
-  const xchar_t *object_path;
-  xvariant_t *value = NULL;
-  const xchar_t *value_str;
-  xasync_result_t *call_result = NULL;
-  xboolean_t unregistration_was_first;
+  ObjectRegistrationData object_registration_data = { 0, 0, 2 };
+  GError *local_error = NULL;
+  GThread *unregister_thread = NULL;
+  const gchar *object_path;
+  GVariant *value = NULL;
+  const gchar *value_str;
+  GAsyncResult *call_result = NULL;
+  gboolean unregistration_was_first;
 
   data.connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &local_error);
   g_assert_no_error (local_error);
@@ -1853,9 +1839,9 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
   /* Register an object or a subtree */
   if (!subtree)
     {
-      data.registration_id = xdbus_connection_register_object (data.connection,
+      data.registration_id = g_dbus_connection_register_object (data.connection,
                                                                 "/foo/boss",
-                                                                (xdbus_interface_info_t *) &foo_interface_info,
+                                                                (GDBusInterfaceInfo *) &foo_interface_info,
                                                                 &foo_vtable,
                                                                 &object_registration_data,
                                                                 on_object_unregistered,
@@ -1867,7 +1853,7 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
     }
   else
     {
-      data.subtree_registration_id = xdbus_connection_register_subtree (data.connection,
+      data.subtree_registration_id = g_dbus_connection_register_subtree (data.connection,
                                                                          "/foo/boss/executives",
                                                                          &subtree_vtable,
                                                                          G_DBUS_SUBTREE_FLAGS_NONE,
@@ -1881,21 +1867,21 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
     }
 
   /* Allow the registrations to go through. */
-  xmain_context_iteration (NULL, FALSE);
+  g_main_context_iteration (NULL, FALSE);
 
   /* Spawn a thread to unregister the object/subtree. This will race with
    * the call we subsequently make. */
-  unregister_thread = xthread_new ("unregister-object",
+  unregister_thread = g_thread_new ("unregister-object",
                                     unregister_thread_cb, &data);
 
   /* Call a method on the object (or an object in the subtree). The callback
    * will be invoked in this main context. */
-  xdbus_connection_call (data.connection,
-                          xdbus_connection_get_unique_name (data.connection),
+  g_dbus_connection_call (data.connection,
+                          g_dbus_connection_get_unique_name (data.connection),
                           object_path,
-                          "org.example.foo_t",
+                          "org.example.Foo",
                           "Method1",
-                          xvariant_new ("(s)", "winwinwin"),
+                          g_variant_new ("(s)", "winwinwin"),
                           NULL,
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -1904,9 +1890,9 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
                           &call_result);
 
   while (call_result == NULL)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
-  value = xdbus_connection_call_finish (data.connection, call_result, &local_error);
+  value = g_dbus_connection_call_finish (data.connection, call_result, &local_error);
 
   /* The result of the method could either be an error (that the object doesn’t
    * exist) or a valid result, depending on how the thread was scheduled
@@ -1915,8 +1901,8 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
   if (value != NULL)
     {
       g_assert_no_error (local_error);
-      g_assert_true (xvariant_is_of_type (value, G_VARIANT_TYPE ("(s)")));
-      xvariant_get (value, "(&s)", &value_str);
+      g_assert_true (g_variant_is_of_type (value, G_VARIANT_TYPE ("(s)")));
+      g_variant_get (value, "(&s)", &value_str);
       g_assert_cmpstr (value_str, ==, "You passed the string 'winwinwin'. Jolly good!");
     }
   else
@@ -1925,11 +1911,11 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
       g_assert_error (local_error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
     }
 
-  g_clear_pointer (&value, xvariant_unref);
+  g_clear_pointer (&value, g_variant_unref);
   g_clear_error (&local_error);
 
   /* Tidy up. */
-  xthread_join (g_steal_pointer (&unregister_thread));
+  g_thread_join (g_steal_pointer (&unregister_thread));
 
   g_clear_object (&call_result);
   g_clear_object (&data.connection);
@@ -1938,15 +1924,15 @@ test_threaded_unregistration_iteration (xboolean_t subtree)
 }
 
 static void
-test_threaded_unregistration (xconstpointer test_data)
+test_threaded_unregistration (gconstpointer test_data)
 {
-  xboolean_t subtree = GPOINTER_TO_INT (test_data);
-  xuint_t i;
-  xuint_t n_iterations_unregistration_first = 0;
-  xuint_t n_iterations_call_first = 0;
+  gboolean subtree = GPOINTER_TO_INT (test_data);
+  guint i;
+  guint n_iterations_unregistration_first = 0;
+  guint n_iterations_call_first = 0;
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2400");
-  g_test_summary ("test_t that object/subtree unregistration from one thread "
+  g_test_summary ("Test that object/subtree unregistration from one thread "
                   "doesn’t cause problems when racing with method callbacks "
                   "in another thread for that object or subtree");
 
@@ -1976,12 +1962,12 @@ int
 main (int   argc,
       char *argv[])
 {
-  xint_t ret;
+  gint ret;
 
   g_test_init (&argc, &argv, NULL);
 
   /* all the tests rely on a shared main loop */
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
 
   g_test_add_func ("/gdbus/object-registration", test_object_registration);
   g_test_add_func ("/gdbus/object-registration-with-closures", test_object_registration_with_closures);
@@ -1995,7 +1981,7 @@ main (int   argc,
 
   ret = session_bus_run ();
 
-  xmain_loop_unref (loop);
+  g_main_loop_unref (loop);
 
   return ret;
 }

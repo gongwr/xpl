@@ -1,4 +1,4 @@
-/* XPL sliced memory - fast threaded memory chunk allocator
+/* GLIB sliced memory - fast threaded memory chunk allocator
  * Copyright (C) 2005 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 #ifndef __G_SLICE_H__
 #define __G_SLICE_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -29,20 +29,20 @@ G_BEGIN_DECLS
 
 /* slices - fast allocation/release of small memory blocks
  */
-XPL_AVAILABLE_IN_ALL
-xpointer_t g_slice_alloc          	(xsize_t	       block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_ALL
-xpointer_t g_slice_alloc0         	(xsize_t         block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_ALL
-xpointer_t g_slice_copy                   (xsize_t         block_size,
-                                         xconstpointer mem_block) G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_ALL
-void     g_slice_free1          	(xsize_t         block_size,
-					 xpointer_t      mem_block);
-XPL_AVAILABLE_IN_ALL
-void     g_slice_free_chain_with_offset (xsize_t         block_size,
-					 xpointer_t      mem_chain,
-					 xsize_t         next_offset);
+GLIB_AVAILABLE_IN_ALL
+gpointer g_slice_alloc          	(gsize	       block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
+gpointer g_slice_alloc0         	(gsize         block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
+gpointer g_slice_copy                   (gsize         block_size,
+                                         gconstpointer mem_block) G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_ALL
+void     g_slice_free1          	(gsize         block_size,
+					 gpointer      mem_block);
+GLIB_AVAILABLE_IN_ALL
+void     g_slice_free_chain_with_offset (gsize         block_size,
+					 gpointer      mem_chain,
+					 gsize         next_offset);
 #define  g_slice_new(type)      ((type*) g_slice_alloc (sizeof (type)))
 
 /* Allow the compiler to inline memset(). Since the size is a constant, this
@@ -50,8 +50,8 @@ void     g_slice_free_chain_with_offset (xsize_t         block_size,
 #if defined (__GNUC__) && (__GNUC__ >= 2) && defined (__OPTIMIZE__)
 #  define g_slice_new0(type)                                    \
   (type *) (G_GNUC_EXTENSION ({                                 \
-    xsize_t __s = sizeof (type);                                  \
-    xpointer_t __p;                                               \
+    gsize __s = sizeof (type);                                  \
+    gpointer __p;                                               \
     __p = g_slice_alloc (__s);                                  \
     memset (__p, 0, __s);                                       \
     __p;                                                        \
@@ -98,16 +98,16 @@ typedef enum {
   G_SLICE_CONFIG_CONTENTION_COUNTER
 } GSliceConfig;
 
-XPL_DEPRECATED_IN_2_34
-void     g_slice_set_config	   (GSliceConfig ckey, sint64_t value);
-XPL_DEPRECATED_IN_2_34
-sint64_t   g_slice_get_config	   (GSliceConfig ckey);
-XPL_DEPRECATED_IN_2_34
-sint64_t*  g_slice_get_config_state  (GSliceConfig ckey, sint64_t address, xuint_t *n_values);
+GLIB_DEPRECATED_IN_2_34
+void     g_slice_set_config	   (GSliceConfig ckey, gint64 value);
+GLIB_DEPRECATED_IN_2_34
+gint64   g_slice_get_config	   (GSliceConfig ckey);
+GLIB_DEPRECATED_IN_2_34
+gint64*  g_slice_get_config_state  (GSliceConfig ckey, gint64 address, guint *n_values);
 
 #ifdef G_ENABLE_DEBUG
-XPL_AVAILABLE_IN_ALL
-void     g_slice_debuxtree_statistics (void);
+GLIB_AVAILABLE_IN_ALL
+void     g_slice_debug_tree_statistics (void);
 #endif
 
 G_END_DECLS

@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1998-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -26,11 +26,11 @@
 #include <glib/gprintf.h>
 
 
-static xchar_t *indent_inc = NULL;
-static xuint_t spacing = 1;
+static gchar *indent_inc = NULL;
+static guint spacing = 1;
 static FILE *f_out = NULL;
-static xtype_t root = 0;
-static xboolean_t recursion = TRUE;
+static GType root = 0;
+static gboolean recursion = TRUE;
 
 #if 0
 #  define	O_SPACE	"\\as"
@@ -49,54 +49,54 @@ static xboolean_t recursion = TRUE;
 #endif
 
 static void
-show_nodes (xtype_t        type,
-	    xtype_t        sibling,
-	    const xchar_t *indent)
+show_nodes (GType        type,
+	    GType        sibling,
+	    const gchar *indent)
 {
-  xtype_t   *children;
-  xuint_t i;
-
+  GType   *children;
+  guint i;
+  
   if (!type)
     return;
-
-  children = xtype_children (type, NULL);
-
+  
+  children = g_type_children (type, NULL);
+  
   if (type != root)
     for (i = 0; i < spacing; i++)
       g_fprintf (f_out, "%s%s\n", indent, O_VLINE);
-
+  
   g_fprintf (f_out, "%s%s%s%s",
 	   indent,
 	   sibling ? O_BRANCH : (type != root ? O_LLEAF : O_SPACE),
 	   O_ESPACE,
-	   xtype_name (type));
-
-  for (i = strlen (xtype_name (type)); i <= strlen (indent_inc); i++)
+	   g_type_name (type));
+  
+  for (i = strlen (g_type_name (type)); i <= strlen (indent_inc); i++)
     fputs (O_KEY_FILL, f_out);
-
+  
   fputc ('\n', f_out);
-
+  
   if (children && recursion)
     {
-      xchar_t *new_indent;
-      xtype_t   *child;
-
+      gchar *new_indent;
+      GType   *child;
+      
       if (sibling)
-	new_indent = xstrconcat (indent, O_VLINE, indent_inc, NULL);
+	new_indent = g_strconcat (indent, O_VLINE, indent_inc, NULL);
       else
-	new_indent = xstrconcat (indent, O_SPACE, indent_inc, NULL);
-
+	new_indent = g_strconcat (indent, O_SPACE, indent_inc, NULL);
+      
       for (child = children; *child; child++)
 	show_nodes (child[0], child[1], new_indent);
-
+      
       g_free (new_indent);
     }
-
+  
   g_free (children);
 }
 
-static xint_t
-help (xchar_t *arg)
+static gint
+help (gchar *arg)
 {
   g_fprintf (stderr, "usage: gobject-query <qualifier> [-r <type>] [-{i|b} \"\"] [-s #] [-{h|x|y}]\n");
   g_fprintf (stderr, "       -r       specify root type\n");
@@ -108,27 +108,27 @@ help (xchar_t *arg)
   g_fprintf (stderr, "qualifiers:\n");
   g_fprintf (stderr, "       froots   iterate over fundamental roots\n");
   g_fprintf (stderr, "       tree     print type tree\n");
-
+  
   return arg != NULL;
 }
 
 int
-main (xint_t   argc,
-      xchar_t *argv[])
+main (gint   argc,
+      gchar *argv[])
 {
   GLogLevelFlags fatal_mask;
-  xboolean_t gen_froots = 0;
-  xboolean_t gen_tree = 0;
-  xint_t i;
-  const xchar_t *iindent = "";
+  gboolean gen_froots = 0;
+  gboolean gen_tree = 0;
+  gint i;
+  const gchar *iindent = "";
 
   f_out = stdout;
-
+  
   fatal_mask = g_log_set_always_fatal (G_LOG_FATAL_MASK);
   fatal_mask |= G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL;
   g_log_set_always_fatal (fatal_mask);
-
-  root = XTYPE_OBJECT;
+  
+  root = G_TYPE_OBJECT;
 
   for (i = 1; i < argc; i++)
     {
@@ -144,13 +144,13 @@ main (xint_t   argc,
 	  if (i < argc)
 	    {
 	      char *p;
-	      xuint_t n;
-
+	      guint n;
+	      
 	      p = argv[i];
 	      while (*p)
 		p++;
 	      n = p - argv[i];
-	      indent_inc = g_new (xchar_t, n * strlen (O_SPACE) + 1);
+	      indent_inc = g_new (gchar, n * strlen (O_SPACE) + 1);
 	      *indent_inc = 0;
 	      while (n)
 		{
@@ -169,7 +169,7 @@ main (xint_t   argc,
 	{
 	  i++;
 	  if (i < argc)
-	    root = xtype_from_name (argv[i]);
+	    root = g_type_from_name (argv[i]);
 	}
       else if (strcmp ("-n", argv[i]) == 0)
 	{
@@ -194,30 +194,30 @@ main (xint_t   argc,
       else
 	return help (argv[i]);
     }
-
+  
   if (!gen_froots && !gen_tree)
     return help ((argc > 0) ? argv[i-1] : NULL);
-
+  
   if (!indent_inc)
     {
-      indent_inc = g_new (xchar_t, strlen (O_SPACE) + 1);
+      indent_inc = g_new (gchar, strlen (O_SPACE) + 1);
       *indent_inc = 0;
       strcpy (indent_inc, O_SPACE);
     }
-
+  
   if (gen_tree)
     show_nodes (root, 0, iindent);
   if (gen_froots)
     {
       root = ~0;
-      for (i = 0; i <= XTYPE_FUNDAMENTAL_MAX; i += XTYPE_MAKE_FUNDAMENTAL (1))
+      for (i = 0; i <= G_TYPE_FUNDAMENTAL_MAX; i += G_TYPE_MAKE_FUNDAMENTAL (1))
 	{
-	  const xchar_t *name = xtype_name (i);
-
+	  const gchar *name = g_type_name (i);
+	  
 	  if (name)
 	    show_nodes (i, 0, iindent);
 	}
     }
-
+  
   return 0;
 }

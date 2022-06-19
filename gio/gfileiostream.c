@@ -35,89 +35,89 @@
  * SECTION:gfileiostream
  * @short_description:  File read and write streaming operations
  * @include: gio/gio.h
- * @see_also: #xio_stream_t, #xfile_input_stream_t, #xfile_output_stream_t, #xseekable__t
+ * @see_also: #GIOStream, #GFileInputStream, #GFileOutputStream, #GSeekable
  *
- * xfile_io_stream_t provides io streams that both read and write to the same
+ * GFileIOStream provides io streams that both read and write to the same
  * file handle.
  *
- * xfile_io_stream_t implements #xseekable__t, which allows the io
+ * GFileIOStream implements #GSeekable, which allows the io
  * stream to jump to arbitrary positions in the file and to truncate
  * the file, provided the filesystem of the file supports these
  * operations.
  *
  * To find the position of a file io stream, use
- * xseekable_tell().
+ * g_seekable_tell().
  *
- * To find out if a file io stream supports seeking, use xseekable_can_seek().
- * To position a file io stream, use xseekable_seek().
+ * To find out if a file io stream supports seeking, use g_seekable_can_seek().
+ * To position a file io stream, use g_seekable_seek().
  * To find out if a file io stream supports truncating, use
- * xseekable_can_truncate(). To truncate a file io
- * stream, use xseekable_truncate().
+ * g_seekable_can_truncate(). To truncate a file io
+ * stream, use g_seekable_truncate().
  *
- * The default implementation of all the #xfile_io_stream_t operations
- * and the implementation of #xseekable__t just call into the same operations
+ * The default implementation of all the #GFileIOStream operations
+ * and the implementation of #GSeekable just call into the same operations
  * on the output stream.
  * Since: 2.22
  **/
 
-static void       xfile_io_stream_seekable_iface_init    (xseekable_iface_t       *iface);
-static xoffset_t    xfile_io_stream_seekable_tell          (xseekable__t            *seekable);
-static xboolean_t   xfile_io_stream_seekable_can_seek      (xseekable__t            *seekable);
-static xboolean_t   xfile_io_stream_seekable_seek          (xseekable__t            *seekable,
-							   xoffset_t               offset,
-							   xseek_type_t             type,
-							   xcancellable_t         *cancellable,
-							   xerror_t              **error);
-static xboolean_t   xfile_io_stream_seekable_can_truncate  (xseekable__t            *seekable);
-static xboolean_t   xfile_io_stream_seekable_truncate      (xseekable__t            *seekable,
-							   xoffset_t               offset,
-							   xcancellable_t         *cancellable,
-							   xerror_t              **error);
-static void       xfile_io_stream_real_query_info_async  (xfile_io_stream_t    *stream,
+static void       g_file_io_stream_seekable_iface_init    (GSeekableIface       *iface);
+static goffset    g_file_io_stream_seekable_tell          (GSeekable            *seekable);
+static gboolean   g_file_io_stream_seekable_can_seek      (GSeekable            *seekable);
+static gboolean   g_file_io_stream_seekable_seek          (GSeekable            *seekable,
+							   goffset               offset,
+							   GSeekType             type,
+							   GCancellable         *cancellable,
+							   GError              **error);
+static gboolean   g_file_io_stream_seekable_can_truncate  (GSeekable            *seekable);
+static gboolean   g_file_io_stream_seekable_truncate      (GSeekable            *seekable,
+							   goffset               offset,
+							   GCancellable         *cancellable,
+							   GError              **error);
+static void       g_file_io_stream_real_query_info_async  (GFileIOStream    *stream,
 							   const char           *attributes,
 							   int                   io_priority,
-							   xcancellable_t         *cancellable,
-							   xasync_ready_callback_t   callback,
-							   xpointer_t              user_data);
-static xfile_info_t *xfile_io_stream_real_query_info_finish (xfile_io_stream_t    *stream,
-							   xasync_result_t         *result,
-							   xerror_t              **error);
+							   GCancellable         *cancellable,
+							   GAsyncReadyCallback   callback,
+							   gpointer              user_data);
+static GFileInfo *g_file_io_stream_real_query_info_finish (GFileIOStream    *stream,
+							   GAsyncResult         *result,
+							   GError              **error);
 
 struct _GFileIOStreamPrivate {
-  xasync_ready_callback_t outstanding_callback;
+  GAsyncReadyCallback outstanding_callback;
 };
 
-G_DEFINE_TYPE_WITH_CODE (xfile_io_stream, xfile_io_stream, XTYPE_IO_STREAM,
-                         G_ADD_PRIVATE (xfile_io_stream_t)
-			 G_IMPLEMENT_INTERFACE (XTYPE_SEEKABLE,
-						xfile_io_stream_seekable_iface_init))
+G_DEFINE_TYPE_WITH_CODE (GFileIOStream, g_file_io_stream, G_TYPE_IO_STREAM,
+                         G_ADD_PRIVATE (GFileIOStream)
+			 G_IMPLEMENT_INTERFACE (G_TYPE_SEEKABLE,
+						g_file_io_stream_seekable_iface_init))
 
 static void
-xfile_io_stream_seekable_iface_init (xseekable_iface_t *iface)
+g_file_io_stream_seekable_iface_init (GSeekableIface *iface)
 {
-  iface->tell = xfile_io_stream_seekable_tell;
-  iface->can_seek = xfile_io_stream_seekable_can_seek;
-  iface->seek = xfile_io_stream_seekable_seek;
-  iface->can_truncate = xfile_io_stream_seekable_can_truncate;
-  iface->truncate_fn = xfile_io_stream_seekable_truncate;
+  iface->tell = g_file_io_stream_seekable_tell;
+  iface->can_seek = g_file_io_stream_seekable_can_seek;
+  iface->seek = g_file_io_stream_seekable_seek;
+  iface->can_truncate = g_file_io_stream_seekable_can_truncate;
+  iface->truncate_fn = g_file_io_stream_seekable_truncate;
 }
 
 static void
-xfile_io_stream_init (xfile_io_stream_t *stream)
+g_file_io_stream_init (GFileIOStream *stream)
 {
-  stream->priv = xfile_io_stream_get_instance_private (stream);
+  stream->priv = g_file_io_stream_get_instance_private (stream);
 }
 
 /**
- * xfile_io_stream_query_info:
- * @stream: a #xfile_io_stream_t.
+ * g_file_io_stream_query_info:
+ * @stream: a #GFileIOStream.
  * @attributes: a file attribute query string.
- * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
- * @error: a #xerror_t, %NULL to ignore.
+ * @cancellable: (nullable): optional #GCancellable object, %NULL to ignore.
+ * @error: a #GError, %NULL to ignore.
  *
  * Queries a file io stream for the given @attributes.
  * This function blocks while querying the stream. For the asynchronous
- * version of this function, see xfile_io_stream_query_info_async().
+ * version of this function, see g_file_io_stream_query_info_async().
  * While the stream is blocked, the stream will set the pending flag
  * internally, and any other operations on the stream will fail with
  * %G_IO_ERROR_PENDING.
@@ -133,23 +133,23 @@ xfile_io_stream_init (xfile_io_stream_t *stream)
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be set, and %NULL will
  * be returned.
  *
- * Returns: (transfer full): a #xfile_info_t for the @stream, or %NULL on error.
+ * Returns: (transfer full): a #GFileInfo for the @stream, or %NULL on error.
  *
  * Since: 2.22
  **/
-xfile_info_t *
-xfile_io_stream_query_info (xfile_io_stream_t      *stream,
+GFileInfo *
+g_file_io_stream_query_info (GFileIOStream      *stream,
 			     const char             *attributes,
-			     xcancellable_t           *cancellable,
-			     xerror_t                **error)
+			     GCancellable           *cancellable,
+			     GError                **error)
 {
   GFileIOStreamClass *class;
-  xio_stream_t *io_stream;
-  xfile_info_t *info;
+  GIOStream *io_stream;
+  GFileInfo *info;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), NULL);
 
-  io_stream = XIO_STREAM (stream);
+  io_stream = G_IO_STREAM (stream);
 
   if (!g_io_stream_set_pending (io_stream, error))
     return NULL;
@@ -157,9 +157,9 @@ xfile_io_stream_query_info (xfile_io_stream_t      *stream,
   info = NULL;
 
   if (cancellable)
-    xcancellable_push_current (cancellable);
+    g_cancellable_push_current (cancellable);
 
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
   if (class->query_info)
     info = class->query_info (stream, attributes, cancellable, error);
   else
@@ -167,7 +167,7 @@ xfile_io_stream_query_info (xfile_io_stream_t      *stream,
                          _("Stream doesn’t support query_info"));
 
   if (cancellable)
-    xcancellable_pop_current (cancellable);
+    g_cancellable_pop_current (cancellable);
 
   g_io_stream_clear_pending (io_stream);
 
@@ -175,103 +175,103 @@ xfile_io_stream_query_info (xfile_io_stream_t      *stream,
 }
 
 static void
-async_ready_callback_wrapper (xobject_t *source_object,
-			      xasync_result_t *res,
-			      xpointer_t      user_data)
+async_ready_callback_wrapper (GObject *source_object,
+			      GAsyncResult *res,
+			      gpointer      user_data)
 {
-  xfile_io_stream_t *stream = XFILE_IO_STREAM (source_object);
+  GFileIOStream *stream = G_FILE_IO_STREAM (source_object);
 
-  g_io_stream_clear_pending (XIO_STREAM (stream));
+  g_io_stream_clear_pending (G_IO_STREAM (stream));
   if (stream->priv->outstanding_callback)
     (*stream->priv->outstanding_callback) (source_object, res, user_data);
-  xobject_unref (stream);
+  g_object_unref (stream);
 }
 
 /**
- * xfile_io_stream_query_info_async:
- * @stream: a #xfile_io_stream_t.
+ * g_file_io_stream_query_info_async:
+ * @stream: a #GFileIOStream.
  * @attributes: a file attribute query string.
  * @io_priority: the [I/O priority][gio-GIOScheduler] of the request
- * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
+ * @cancellable: (nullable): optional #GCancellable object, %NULL to ignore.
  * @callback: (scope async): callback to call when the request is satisfied
  * @user_data: (closure): the data to pass to callback function
  *
- * Asynchronously queries the @stream for a #xfile_info_t. When completed,
- * @callback will be called with a #xasync_result_t which can be used to
- * finish the operation with xfile_io_stream_query_info_finish().
+ * Asynchronously queries the @stream for a #GFileInfo. When completed,
+ * @callback will be called with a #GAsyncResult which can be used to
+ * finish the operation with g_file_io_stream_query_info_finish().
  *
  * For the synchronous version of this function, see
- * xfile_io_stream_query_info().
+ * g_file_io_stream_query_info().
  *
  * Since: 2.22
  **/
 void
-xfile_io_stream_query_info_async (xfile_io_stream_t     *stream,
+g_file_io_stream_query_info_async (GFileIOStream     *stream,
 					  const char           *attributes,
 					  int                   io_priority,
-					  xcancellable_t         *cancellable,
-					  xasync_ready_callback_t   callback,
-					  xpointer_t              user_data)
+					  GCancellable         *cancellable,
+					  GAsyncReadyCallback   callback,
+					  gpointer              user_data)
 {
   GFileIOStreamClass *klass;
-  xio_stream_t *io_stream;
-  xerror_t *error = NULL;
+  GIOStream *io_stream;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_FILE_IO_STREAM (stream));
+  g_return_if_fail (G_IS_FILE_IO_STREAM (stream));
 
-  io_stream = XIO_STREAM (stream);
+  io_stream = G_IO_STREAM (stream);
 
   if (!g_io_stream_set_pending (io_stream, &error))
     {
-      xtask_report_error (stream, callback, user_data,
-                           xfile_io_stream_query_info_async,
+      g_task_report_error (stream, callback, user_data,
+                           g_file_io_stream_query_info_async,
                            error);
       return;
     }
 
-  klass = XFILE_IO_STREAM_GET_CLASS (stream);
+  klass = G_FILE_IO_STREAM_GET_CLASS (stream);
 
   stream->priv->outstanding_callback = callback;
-  xobject_ref (stream);
+  g_object_ref (stream);
   klass->query_info_async (stream, attributes, io_priority, cancellable,
                            async_ready_callback_wrapper, user_data);
 }
 
 /**
- * xfile_io_stream_query_info_finish:
- * @stream: a #xfile_io_stream_t.
- * @result: a #xasync_result_t.
- * @error: a #xerror_t, %NULL to ignore.
+ * g_file_io_stream_query_info_finish:
+ * @stream: a #GFileIOStream.
+ * @result: a #GAsyncResult.
+ * @error: a #GError, %NULL to ignore.
  *
  * Finalizes the asynchronous query started
- * by xfile_io_stream_query_info_async().
+ * by g_file_io_stream_query_info_async().
  *
- * Returns: (transfer full): A #xfile_info_t for the finished query.
+ * Returns: (transfer full): A #GFileInfo for the finished query.
  *
  * Since: 2.22
  **/
-xfile_info_t *
-xfile_io_stream_query_info_finish (xfile_io_stream_t     *stream,
-				    xasync_result_t         *result,
-				    xerror_t              **error)
+GFileInfo *
+g_file_io_stream_query_info_finish (GFileIOStream     *stream,
+				    GAsyncResult         *result,
+				    GError              **error)
 {
   GFileIOStreamClass *class;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
-  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), NULL);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (result), NULL);
 
-  if (xasync_result_legacy_propagate_error (result, error))
+  if (g_async_result_legacy_propagate_error (result, error))
     return NULL;
-  else if (xasync_result_is_tagged (result, xfile_io_stream_query_info_async))
-    return xtask_propagate_pointer (XTASK (result), error);
+  else if (g_async_result_is_tagged (result, g_file_io_stream_query_info_async))
+    return g_task_propagate_pointer (G_TASK (result), error);
 
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
   return class->query_info_finish (stream, result, error);
 }
 
 /**
- * xfile_io_stream_get_etag:
- * @stream: a #xfile_io_stream_t.
+ * g_file_io_stream_get_etag:
+ * @stream: a #GFileIOStream.
  *
  * Gets the entity tag for the file when it has been written.
  * This must be called after the stream has been written
@@ -282,15 +282,15 @@ xfile_io_stream_query_info_finish (xfile_io_stream_t     *stream,
  * Since: 2.22
  **/
 char *
-xfile_io_stream_get_etag (xfile_io_stream_t  *stream)
+g_file_io_stream_get_etag (GFileIOStream  *stream)
 {
   GFileIOStreamClass *class;
-  xio_stream_t *io_stream;
+  GIOStream *io_stream;
   char *etag;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), NULL);
 
-  io_stream = XIO_STREAM (stream);
+  io_stream = G_IO_STREAM (stream);
 
   if (!g_io_stream_is_closed (io_stream))
     {
@@ -300,22 +300,22 @@ xfile_io_stream_get_etag (xfile_io_stream_t  *stream)
 
   etag = NULL;
 
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
   if (class->get_etag)
     etag = class->get_etag (stream);
 
   return etag;
 }
 
-static xoffset_t
-xfile_io_stream_tell (xfile_io_stream_t  *stream)
+static goffset
+g_file_io_stream_tell (GFileIOStream  *stream)
 {
   GFileIOStreamClass *class;
-  xoffset_t offset;
+  goffset offset;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), 0);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), 0);
 
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
 
   offset = 0;
   if (class->tell)
@@ -324,21 +324,21 @@ xfile_io_stream_tell (xfile_io_stream_t  *stream)
   return offset;
 }
 
-static xoffset_t
-xfile_io_stream_seekable_tell (xseekable__t *seekable)
+static goffset
+g_file_io_stream_seekable_tell (GSeekable *seekable)
 {
-  return xfile_io_stream_tell (XFILE_IO_STREAM (seekable));
+  return g_file_io_stream_tell (G_FILE_IO_STREAM (seekable));
 }
 
-static xboolean_t
-xfile_io_stream_can_seek (xfile_io_stream_t  *stream)
+static gboolean
+g_file_io_stream_can_seek (GFileIOStream  *stream)
 {
   GFileIOStreamClass *class;
-  xboolean_t can_seek;
+  gboolean can_seek;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), FALSE);
 
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
 
   can_seek = FALSE;
   if (class->seek)
@@ -351,27 +351,27 @@ xfile_io_stream_can_seek (xfile_io_stream_t  *stream)
   return can_seek;
 }
 
-static xboolean_t
-xfile_io_stream_seekable_can_seek (xseekable__t *seekable)
+static gboolean
+g_file_io_stream_seekable_can_seek (GSeekable *seekable)
 {
-  return xfile_io_stream_can_seek (XFILE_IO_STREAM (seekable));
+  return g_file_io_stream_can_seek (G_FILE_IO_STREAM (seekable));
 }
 
-static xboolean_t
-xfile_io_stream_seek (xfile_io_stream_t  *stream,
-		       xoffset_t             offset,
-		       xseek_type_t           type,
-		       xcancellable_t       *cancellable,
-		       xerror_t            **error)
+static gboolean
+g_file_io_stream_seek (GFileIOStream  *stream,
+		       goffset             offset,
+		       GSeekType           type,
+		       GCancellable       *cancellable,
+		       GError            **error)
 {
   GFileIOStreamClass *class;
-  xio_stream_t *io_stream;
-  xboolean_t res;
+  GIOStream *io_stream;
+  gboolean res;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), FALSE);
 
-  io_stream = XIO_STREAM (stream);
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  io_stream = G_IO_STREAM (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
 
   if (!class->seek)
     {
@@ -384,38 +384,38 @@ xfile_io_stream_seek (xfile_io_stream_t  *stream,
     return FALSE;
 
   if (cancellable)
-    xcancellable_push_current (cancellable);
+    g_cancellable_push_current (cancellable);
 
   res = class->seek (stream, offset, type, cancellable, error);
 
   if (cancellable)
-    xcancellable_pop_current (cancellable);
+    g_cancellable_pop_current (cancellable);
 
   g_io_stream_clear_pending (io_stream);
 
   return res;
 }
 
-static xboolean_t
-xfile_io_stream_seekable_seek (xseekable__t  *seekable,
-				    xoffset_t     offset,
-				    xseek_type_t   type,
-				    xcancellable_t  *cancellable,
-				    xerror_t    **error)
+static gboolean
+g_file_io_stream_seekable_seek (GSeekable  *seekable,
+				    goffset     offset,
+				    GSeekType   type,
+				    GCancellable  *cancellable,
+				    GError    **error)
 {
-  return xfile_io_stream_seek (XFILE_IO_STREAM (seekable),
+  return g_file_io_stream_seek (G_FILE_IO_STREAM (seekable),
 				offset, type, cancellable, error);
 }
 
-static xboolean_t
-xfile_io_stream_can_truncate (xfile_io_stream_t  *stream)
+static gboolean
+g_file_io_stream_can_truncate (GFileIOStream  *stream)
 {
   GFileIOStreamClass *class;
-  xboolean_t can_truncate;
+  gboolean can_truncate;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), FALSE);
 
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
 
   can_truncate = FALSE;
   if (class->truncate_fn)
@@ -428,26 +428,26 @@ xfile_io_stream_can_truncate (xfile_io_stream_t  *stream)
   return can_truncate;
 }
 
-static xboolean_t
-xfile_io_stream_seekable_can_truncate (xseekable__t  *seekable)
+static gboolean
+g_file_io_stream_seekable_can_truncate (GSeekable  *seekable)
 {
-  return xfile_io_stream_can_truncate (XFILE_IO_STREAM (seekable));
+  return g_file_io_stream_can_truncate (G_FILE_IO_STREAM (seekable));
 }
 
-static xboolean_t
-xfile_io_stream_truncate (xfile_io_stream_t  *stream,
-			   xoffset_t             size,
-			   xcancellable_t       *cancellable,
-			   xerror_t            **error)
+static gboolean
+g_file_io_stream_truncate (GFileIOStream  *stream,
+			   goffset             size,
+			   GCancellable       *cancellable,
+			   GError            **error)
 {
   GFileIOStreamClass *class;
-  xio_stream_t *io_stream;
-  xboolean_t res;
+  GIOStream *io_stream;
+  gboolean res;
 
-  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  g_return_val_if_fail (G_IS_FILE_IO_STREAM (stream), FALSE);
 
-  io_stream = XIO_STREAM (stream);
-  class = XFILE_IO_STREAM_GET_CLASS (stream);
+  io_stream = G_IO_STREAM (stream);
+  class = G_FILE_IO_STREAM_GET_CLASS (stream);
 
   if (!class->truncate_fn)
     {
@@ -460,141 +460,141 @@ xfile_io_stream_truncate (xfile_io_stream_t  *stream,
     return FALSE;
 
   if (cancellable)
-    xcancellable_push_current (cancellable);
+    g_cancellable_push_current (cancellable);
 
   res = class->truncate_fn (stream, size, cancellable, error);
 
   if (cancellable)
-    xcancellable_pop_current (cancellable);
+    g_cancellable_pop_current (cancellable);
 
   g_io_stream_clear_pending (io_stream);
 
   return res;
 }
 
-static xboolean_t
-xfile_io_stream_seekable_truncate (xseekable__t     *seekable,
-				    xoffset_t        size,
-				    xcancellable_t  *cancellable,
-				    xerror_t       **error)
+static gboolean
+g_file_io_stream_seekable_truncate (GSeekable     *seekable,
+				    goffset        size,
+				    GCancellable  *cancellable,
+				    GError       **error)
 {
-  return xfile_io_stream_truncate (XFILE_IO_STREAM (seekable),
+  return g_file_io_stream_truncate (G_FILE_IO_STREAM (seekable),
 					size, cancellable, error);
 }
 /*****************************************************
  *   Default implementations based on output stream  *
  *****************************************************/
 
-static xoffset_t
-xfile_io_stream_real_tell (xfile_io_stream_t    *stream)
+static goffset
+g_file_io_stream_real_tell (GFileIOStream    *stream)
 {
-  xoutput_stream_t *out;
-  xseekable__t *seekable;
+  GOutputStream *out;
+  GSeekable *seekable;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
   seekable = G_SEEKABLE (out);
 
-  return xseekable_tell (seekable);
+  return g_seekable_tell (seekable);
 }
 
-static xboolean_t
-xfile_io_stream_real_can_seek (xfile_io_stream_t    *stream)
+static gboolean
+g_file_io_stream_real_can_seek (GFileIOStream    *stream)
 {
-  xoutput_stream_t *out;
-  xseekable__t *seekable;
+  GOutputStream *out;
+  GSeekable *seekable;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
   seekable = G_SEEKABLE (out);
 
-  return xseekable_can_seek (seekable);
+  return g_seekable_can_seek (seekable);
 }
 
-static xboolean_t
-xfile_io_stream_real_seek (xfile_io_stream_t    *stream,
-			    xoffset_t           offset,
-			    xseek_type_t         type,
-			    xcancellable_t     *cancellable,
-			    xerror_t          **error)
+static gboolean
+g_file_io_stream_real_seek (GFileIOStream    *stream,
+			    goffset           offset,
+			    GSeekType         type,
+			    GCancellable     *cancellable,
+			    GError          **error)
 {
-  xoutput_stream_t *out;
-  xseekable__t *seekable;
+  GOutputStream *out;
+  GSeekable *seekable;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
   seekable = G_SEEKABLE (out);
 
-  return xseekable_seek (seekable, offset, type, cancellable, error);
+  return g_seekable_seek (seekable, offset, type, cancellable, error);
 }
 
-static  xboolean_t
-xfile_io_stream_real_can_truncate (xfile_io_stream_t    *stream)
+static  gboolean
+g_file_io_stream_real_can_truncate (GFileIOStream    *stream)
 {
-  xoutput_stream_t *out;
-  xseekable__t *seekable;
+  GOutputStream *out;
+  GSeekable *seekable;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
   seekable = G_SEEKABLE (out);
 
-  return xseekable_can_truncate (seekable);
+  return g_seekable_can_truncate (seekable);
 }
 
-static xboolean_t
-xfile_io_stream_real_truncate_fn (xfile_io_stream_t    *stream,
-				   xoffset_t               size,
-				   xcancellable_t         *cancellable,
-				   xerror_t              **error)
+static gboolean
+g_file_io_stream_real_truncate_fn (GFileIOStream    *stream,
+				   goffset               size,
+				   GCancellable         *cancellable,
+				   GError              **error)
 {
-  xoutput_stream_t *out;
-  xseekable__t *seekable;
+  GOutputStream *out;
+  GSeekable *seekable;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
   seekable = G_SEEKABLE (out);
 
-  return xseekable_truncate (seekable, size, cancellable, error);
+  return g_seekable_truncate (seekable, size, cancellable, error);
 }
 
 static char *
-xfile_io_stream_real_get_etag (xfile_io_stream_t    *stream)
+g_file_io_stream_real_get_etag (GFileIOStream    *stream)
 {
-  xoutput_stream_t *out;
-  xfile_output_stream_t *file_out;
+  GOutputStream *out;
+  GFileOutputStream *file_out;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
-  file_out = XFILE_OUTPUT_STREAM (out);
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
+  file_out = G_FILE_OUTPUT_STREAM (out);
 
-  return xfile_output_stream_get_etag (file_out);
+  return g_file_output_stream_get_etag (file_out);
 }
 
-static xfile_info_t *
-xfile_io_stream_real_query_info (xfile_io_stream_t    *stream,
+static GFileInfo *
+g_file_io_stream_real_query_info (GFileIOStream    *stream,
 				  const char           *attributes,
-				  xcancellable_t         *cancellable,
-				  xerror_t              **error)
+				  GCancellable         *cancellable,
+				  GError              **error)
 {
-  xoutput_stream_t *out;
-  xfile_output_stream_t *file_out;
+  GOutputStream *out;
+  GFileOutputStream *file_out;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
-  file_out = XFILE_OUTPUT_STREAM (out);
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
+  file_out = G_FILE_OUTPUT_STREAM (out);
 
-  return xfile_output_stream_query_info (file_out,
+  return g_file_output_stream_query_info (file_out,
 					  attributes, cancellable, error);
 }
 
 typedef struct {
-  xobject_t *object;
-  xasync_ready_callback_t callback;
-  xpointer_t user_data;
+  GObject *object;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
 } AsyncOpWrapper;
 
 static AsyncOpWrapper *
-async_op_wrapper_new (xpointer_t object,
-		      xasync_ready_callback_t callback,
-		      xpointer_t user_data)
+async_op_wrapper_new (gpointer object,
+		      GAsyncReadyCallback callback,
+		      gpointer user_data)
 {
   AsyncOpWrapper *data;
 
   data = g_new0 (AsyncOpWrapper, 1);
-  data->object = xobject_ref (object);
+  data->object = g_object_ref (object);
   data->callback = callback;
   data->user_data = user_data;
 
@@ -602,61 +602,61 @@ async_op_wrapper_new (xpointer_t object,
 }
 
 static void
-async_op_wrapper_callback (xobject_t *source_object,
-			   xasync_result_t *res,
-			   xpointer_t user_data)
+async_op_wrapper_callback (GObject *source_object,
+			   GAsyncResult *res,
+			   gpointer user_data)
 {
   AsyncOpWrapper *data  = user_data;
   data->callback (data->object, res, data->user_data);
-  xobject_unref (data->object);
+  g_object_unref (data->object);
   g_free (data);
 }
 
 static void
-xfile_io_stream_real_query_info_async (xfile_io_stream_t     *stream,
+g_file_io_stream_real_query_info_async (GFileIOStream     *stream,
 					const char           *attributes,
 					int                   io_priority,
-					xcancellable_t         *cancellable,
-					xasync_ready_callback_t   callback,
-					xpointer_t              user_data)
+					GCancellable         *cancellable,
+					GAsyncReadyCallback   callback,
+					gpointer              user_data)
 {
-  xoutput_stream_t *out;
-  xfile_output_stream_t *file_out;
+  GOutputStream *out;
+  GFileOutputStream *file_out;
   AsyncOpWrapper *data;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
-  file_out = XFILE_OUTPUT_STREAM (out);
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
+  file_out = G_FILE_OUTPUT_STREAM (out);
 
   data = async_op_wrapper_new (stream, callback, user_data);
-  xfile_output_stream_query_info_async (file_out,
+  g_file_output_stream_query_info_async (file_out,
 					 attributes, io_priority,
 					 cancellable, async_op_wrapper_callback, data);
 }
 
-static xfile_info_t *
-xfile_io_stream_real_query_info_finish (xfile_io_stream_t     *stream,
-					 xasync_result_t      *res,
-					 xerror_t           **error)
+static GFileInfo *
+g_file_io_stream_real_query_info_finish (GFileIOStream     *stream,
+					 GAsyncResult      *res,
+					 GError           **error)
 {
-  xoutput_stream_t *out;
-  xfile_output_stream_t *file_out;
+  GOutputStream *out;
+  GFileOutputStream *file_out;
 
-  out = g_io_stream_get_output_stream (XIO_STREAM (stream));
-  file_out = XFILE_OUTPUT_STREAM (out);
+  out = g_io_stream_get_output_stream (G_IO_STREAM (stream));
+  file_out = G_FILE_OUTPUT_STREAM (out);
 
-  return xfile_output_stream_query_info_finish (file_out, res, error);
+  return g_file_output_stream_query_info_finish (file_out, res, error);
 }
 
 static void
-xfile_io_stream_class_init (GFileIOStreamClass *klass)
+g_file_io_stream_class_init (GFileIOStreamClass *klass)
 {
-  klass->tell = xfile_io_stream_real_tell;
-  klass->can_seek = xfile_io_stream_real_can_seek;
-  klass->seek = xfile_io_stream_real_seek;
-  klass->can_truncate = xfile_io_stream_real_can_truncate;
-  klass->truncate_fn = xfile_io_stream_real_truncate_fn;
-  klass->query_info = xfile_io_stream_real_query_info;
-  klass->query_info_async = xfile_io_stream_real_query_info_async;
-  klass->query_info_finish = xfile_io_stream_real_query_info_finish;
-  klass->get_etag = xfile_io_stream_real_get_etag;
+  klass->tell = g_file_io_stream_real_tell;
+  klass->can_seek = g_file_io_stream_real_can_seek;
+  klass->seek = g_file_io_stream_real_seek;
+  klass->can_truncate = g_file_io_stream_real_can_truncate;
+  klass->truncate_fn = g_file_io_stream_real_truncate_fn;
+  klass->query_info = g_file_io_stream_real_query_info;
+  klass->query_info_async = g_file_io_stream_real_query_info_async;
+  klass->query_info_finish = g_file_io_stream_real_query_info_finish;
+  klass->get_etag = g_file_io_stream_real_get_etag;
 }

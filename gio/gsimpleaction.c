@@ -26,41 +26,41 @@
 
 /**
  * SECTION:gsimpleaction
- * @title: xsimple_action_t
- * @short_description: A simple xaction_t implementation
+ * @title: GSimpleAction
+ * @short_description: A simple GAction implementation
  * @include: gio/gio.h
  *
- * A #xsimple_action_t is the obvious simple implementation of the #xaction_t
+ * A #GSimpleAction is the obvious simple implementation of the #GAction
  * interface. This is the easiest way to create an action for purposes of
- * adding it to a #xsimple_action_group_t.
+ * adding it to a #GSimpleActionGroup.
  *
  * See also #GtkAction.
  */
 
 /**
- * xsimple_action_t:
+ * GSimpleAction:
  *
- * #xsimple_action_t is an opaque data structure and can only be accessed
+ * #GSimpleAction is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 struct _GSimpleAction
 {
-  xobject_t       parent_instance;
+  GObject       parent_instance;
 
-  xchar_t        *name;
-  xvariant_type_t *parameter_type;
-  xboolean_t      enabled;
-  xvariant_t     *state;
-  xvariant_t     *state_hint;
-  xboolean_t      state_set_already;
+  gchar        *name;
+  GVariantType *parameter_type;
+  gboolean      enabled;
+  GVariant     *state;
+  GVariant     *state_hint;
+  gboolean      state_set_already;
 };
 
-typedef xobject_class_t GSimpleActionClass;
+typedef GObjectClass GSimpleActionClass;
 
-static void g_simple_action_iface_init (xaction_interface_t *iface);
-G_DEFINE_TYPE_WITH_CODE (xsimple_action_t, g_simple_action, XTYPE_OBJECT,
-  G_IMPLEMENT_INTERFACE (XTYPE_ACTION, g_simple_action_iface_init))
+static void g_simple_action_iface_init (GActionInterface *iface);
+G_DEFINE_TYPE_WITH_CODE (GSimpleAction, g_simple_action, G_TYPE_OBJECT,
+  G_IMPLEMENT_INTERFACE (G_TYPE_ACTION, g_simple_action_iface_init))
 
 enum
 {
@@ -79,65 +79,65 @@ enum
   NR_SIGNALS
 };
 
-static xuint_t g_simple_action_signals[NR_SIGNALS];
+static guint g_simple_action_signals[NR_SIGNALS];
 
-static const xchar_t *
-g_simple_action_get_name (xaction_t *action)
+static const gchar *
+g_simple_action_get_name (GAction *action)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   return simple->name;
 }
 
-static const xvariant_type_t *
-g_simple_action_get_parameter_type (xaction_t *action)
+static const GVariantType *
+g_simple_action_get_parameter_type (GAction *action)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   return simple->parameter_type;
 }
 
-static const xvariant_type_t *
-g_simple_action_get_state_type (xaction_t *action)
+static const GVariantType *
+g_simple_action_get_state_type (GAction *action)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   if (simple->state != NULL)
-    return xvariant_get_type (simple->state);
+    return g_variant_get_type (simple->state);
   else
     return NULL;
 }
 
-static xvariant_t *
-g_simple_action_get_state_hint (xaction_t *action)
+static GVariant *
+g_simple_action_get_state_hint (GAction *action)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   if (simple->state_hint != NULL)
-    return xvariant_ref (simple->state_hint);
+    return g_variant_ref (simple->state_hint);
   else
     return NULL;
 }
 
-static xboolean_t
-g_simple_action_get_enabled (xaction_t *action)
+static gboolean
+g_simple_action_get_enabled (GAction *action)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   return simple->enabled;
 }
 
 static void
-g_simple_action_change_state (xaction_t  *action,
-                              xvariant_t *value)
+g_simple_action_change_state (GAction  *action,
+                              GVariant *value)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   /* If the user connected a signal handler then they are responsible
    * for handling state changes.
    */
-  if (xsignal_has_handler_pending (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, TRUE))
-    xsignal_emit (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, value);
+  if (g_signal_has_handler_pending (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, TRUE))
+    g_signal_emit (action, g_simple_action_signals[SIGNAL_CHANGE_STATE], 0, value);
 
   /* If not, then the default behaviour is to just set the state. */
   else
@@ -146,8 +146,8 @@ g_simple_action_change_state (xaction_t  *action,
 
 /**
  * g_simple_action_set_state:
- * @simple: a #xsimple_action_t
- * @value: the new #xvariant_t for the state
+ * @simple: a #GSimpleAction
+ * @value: the new #GVariant for the state
  *
  * Sets the state of the action.
  *
@@ -158,112 +158,112 @@ g_simple_action_change_state (xaction_t  *action,
  * property.  Instead, they should call g_action_change_state() to
  * request the change.
  *
- * If the @value xvariant_t is floating, it is consumed.
+ * If the @value GVariant is floating, it is consumed.
  *
  * Since: 2.30
  **/
 void
-g_simple_action_set_state (xsimple_action_t *simple,
-                           xvariant_t      *value)
+g_simple_action_set_state (GSimpleAction *simple,
+                           GVariant      *value)
 {
-  g_return_if_fail (X_IS_SIMPLE_ACTION (simple));
+  g_return_if_fail (G_IS_SIMPLE_ACTION (simple));
   g_return_if_fail (value != NULL);
 
   {
-    const xvariant_type_t *state_type;
+    const GVariantType *state_type;
 
     state_type = simple->state ?
-                   xvariant_get_type (simple->state) : NULL;
+                   g_variant_get_type (simple->state) : NULL;
     g_return_if_fail (state_type != NULL);
-    g_return_if_fail (xvariant_is_of_type (value, state_type));
+    g_return_if_fail (g_variant_is_of_type (value, state_type));
   }
 
-  xvariant_ref_sink (value);
+  g_variant_ref_sink (value);
 
-  if (!simple->state || !xvariant_equal (simple->state, value))
+  if (!simple->state || !g_variant_equal (simple->state, value))
     {
       if (simple->state)
-        xvariant_unref (simple->state);
+        g_variant_unref (simple->state);
 
-      simple->state = xvariant_ref (value);
+      simple->state = g_variant_ref (value);
 
-      xobject_notify (G_OBJECT (simple), "state");
+      g_object_notify (G_OBJECT (simple), "state");
     }
 
-  xvariant_unref (value);
+  g_variant_unref (value);
 }
 
-static xvariant_t *
-g_simple_action_get_state (xaction_t *action)
+static GVariant *
+g_simple_action_get_state (GAction *action)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
-  return simple->state ? xvariant_ref (simple->state) : NULL;
+  return simple->state ? g_variant_ref (simple->state) : NULL;
 }
 
 static void
-g_simple_action_activate (xaction_t  *action,
-                          xvariant_t *parameter)
+g_simple_action_activate (GAction  *action,
+                          GVariant *parameter)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (action);
+  GSimpleAction *simple = G_SIMPLE_ACTION (action);
 
   g_return_if_fail (simple->parameter_type == NULL ?
                       parameter == NULL :
                     (parameter != NULL &&
-                     xvariant_is_of_type (parameter,
+                     g_variant_is_of_type (parameter,
                                            simple->parameter_type)));
 
   if (parameter != NULL)
-    xvariant_ref_sink (parameter);
+    g_variant_ref_sink (parameter);
 
   if (simple->enabled)
     {
       /* If the user connected a signal handler then they are responsible
        * for handling activation.
        */
-      if (xsignal_has_handler_pending (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, TRUE))
-        xsignal_emit (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, parameter);
+      if (g_signal_has_handler_pending (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, TRUE))
+        g_signal_emit (action, g_simple_action_signals[SIGNAL_ACTIVATE], 0, parameter);
 
       /* If not, do some reasonable defaults for stateful actions. */
       else if (simple->state)
         {
           /* If we have no parameter and this is a boolean action, toggle. */
-          if (parameter == NULL && xvariant_is_of_type (simple->state, G_VARIANT_TYPE_BOOLEAN))
+          if (parameter == NULL && g_variant_is_of_type (simple->state, G_VARIANT_TYPE_BOOLEAN))
             {
-              xboolean_t was_enabled = xvariant_get_boolean (simple->state);
-              g_simple_action_change_state (action, xvariant_new_boolean (!was_enabled));
+              gboolean was_enabled = g_variant_get_boolean (simple->state);
+              g_simple_action_change_state (action, g_variant_new_boolean (!was_enabled));
             }
 
           /* else, if the parameter and state type are the same, do a change-state */
-          else if (xvariant_is_of_type (simple->state, xvariant_get_type (parameter)))
+          else if (g_variant_is_of_type (simple->state, g_variant_get_type (parameter)))
             g_simple_action_change_state (action, parameter);
         }
     }
 
   if (parameter != NULL)
-    xvariant_unref (parameter);
+    g_variant_unref (parameter);
 }
 
 static void
-g_simple_action_set_property (xobject_t    *object,
-                              xuint_t       prop_id,
-                              const xvalue_t     *value,
-                              xparam_spec_t *pspec)
+g_simple_action_set_property (GObject    *object,
+                              guint       prop_id,
+                              const GValue     *value,
+                              GParamSpec *pspec)
 {
-  xsimple_action_t *action = G_SIMPLE_ACTION (object);
+  GSimpleAction *action = G_SIMPLE_ACTION (object);
 
   switch (prop_id)
     {
     case PROP_NAME:
-      action->name = xstrdup (xvalue_get_string (value));
+      action->name = g_strdup (g_value_get_string (value));
       break;
 
     case PROP_PARAMETER_TYPE:
-      action->parameter_type = xvalue_dup_boxed (value);
+      action->parameter_type = g_value_dup_boxed (value);
       break;
 
     case PROP_ENABLED:
-      action->enabled = xvalue_get_boolean (value);
+      action->enabled = g_value_get_boolean (value);
       break;
 
     case PROP_STATE:
@@ -275,11 +275,11 @@ g_simple_action_set_property (xobject_t    *object,
        */
       if (!action->state_set_already)
         {
-          action->state = xvalue_dup_variant (value);
+          action->state = g_value_dup_variant (value);
           action->state_set_already = TRUE;
         }
       else
-        g_simple_action_set_state (action, xvalue_get_variant (value));
+        g_simple_action_set_state (action, g_value_get_variant (value));
 
       break;
 
@@ -289,33 +289,33 @@ g_simple_action_set_property (xobject_t    *object,
 }
 
 static void
-g_simple_action_get_property (xobject_t    *object,
-                              xuint_t       prop_id,
-                              xvalue_t     *value,
-                              xparam_spec_t *pspec)
+g_simple_action_get_property (GObject    *object,
+                              guint       prop_id,
+                              GValue     *value,
+                              GParamSpec *pspec)
 {
-  xaction_t *action = G_ACTION (object);
+  GAction *action = G_ACTION (object);
 
   switch (prop_id)
     {
     case PROP_NAME:
-      xvalue_set_string (value, g_simple_action_get_name (action));
+      g_value_set_string (value, g_simple_action_get_name (action));
       break;
 
     case PROP_PARAMETER_TYPE:
-      xvalue_set_boxed (value, g_simple_action_get_parameter_type (action));
+      g_value_set_boxed (value, g_simple_action_get_parameter_type (action));
       break;
 
     case PROP_ENABLED:
-      xvalue_set_boolean (value, g_simple_action_get_enabled (action));
+      g_value_set_boolean (value, g_simple_action_get_enabled (action));
       break;
 
     case PROP_STATE_TYPE:
-      xvalue_set_boxed (value, g_simple_action_get_state_type (action));
+      g_value_set_boxed (value, g_simple_action_get_state_type (action));
       break;
 
     case PROP_STATE:
-      xvalue_take_variant (value, g_simple_action_get_state (action));
+      g_value_take_variant (value, g_simple_action_get_state (action));
       break;
 
     default:
@@ -324,30 +324,30 @@ g_simple_action_get_property (xobject_t    *object,
 }
 
 static void
-g_simple_action_finalize (xobject_t *object)
+g_simple_action_finalize (GObject *object)
 {
-  xsimple_action_t *simple = G_SIMPLE_ACTION (object);
+  GSimpleAction *simple = G_SIMPLE_ACTION (object);
 
   g_free (simple->name);
   if (simple->parameter_type)
-    xvariant_type_free (simple->parameter_type);
+    g_variant_type_free (simple->parameter_type);
   if (simple->state)
-    xvariant_unref (simple->state);
+    g_variant_unref (simple->state);
   if (simple->state_hint)
-    xvariant_unref (simple->state_hint);
+    g_variant_unref (simple->state_hint);
 
-  XOBJECT_CLASS (g_simple_action_parent_class)
+  G_OBJECT_CLASS (g_simple_action_parent_class)
     ->finalize (object);
 }
 
 void
-g_simple_action_init (xsimple_action_t *simple)
+g_simple_action_init (GSimpleAction *simple)
 {
   simple->enabled = TRUE;
 }
 
 void
-g_simple_action_iface_init (xaction_interface_t *iface)
+g_simple_action_iface_init (GActionInterface *iface)
 {
   iface->get_name = g_simple_action_get_name;
   iface->get_parameter_type = g_simple_action_get_parameter_type;
@@ -362,15 +362,15 @@ g_simple_action_iface_init (xaction_interface_t *iface)
 void
 g_simple_action_class_init (GSimpleActionClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
   object_class->set_property = g_simple_action_set_property;
   object_class->get_property = g_simple_action_get_property;
   object_class->finalize = g_simple_action_finalize;
 
   /**
-   * xsimple_action_t::activate:
-   * @simple: the #xsimple_action_t
+   * GSimpleAction::activate:
+   * @simple: the #GSimpleAction
    * @parameter: (nullable): the parameter to the activation, or %NULL if it has
    *   no parameter
    *
@@ -382,26 +382,26 @@ g_simple_action_class_init (GSimpleActionClass *class)
    *
    * Since GLib 2.40, if no handler is connected to this signal then the
    * default behaviour for boolean-stated actions with a %NULL parameter
-   * type is to toggle them via the #xsimple_action_t::change-state signal.
+   * type is to toggle them via the #GSimpleAction::change-state signal.
    * For stateful actions where the state type is equal to the parameter
    * type, the default is to forward them directly to
-   * #xsimple_action_t::change-state.  This should allow almost all users
-   * of #xsimple_action_t to connect only one handler or the other.
+   * #GSimpleAction::change-state.  This should allow almost all users
+   * of #GSimpleAction to connect only one handler or the other.
    *
    * Since: 2.28
    */
   g_simple_action_signals[SIGNAL_ACTIVATE] =
-    xsignal_new (I_("activate"),
-                  XTYPE_SIMPLE_ACTION,
+    g_signal_new (I_("activate"),
+                  G_TYPE_SIMPLE_ACTION,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_MUST_COLLECT,
                   0, NULL, NULL,
                   NULL,
-                  XTYPE_NONE, 1,
-                  XTYPE_VARIANT);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_VARIANT);
 
   /**
-   * xsimple_action_t::change-state:
-   * @simple: the #xsimple_action_t
+   * GSimpleAction::change-state:
+   * @simple: the #GSimpleAction
    * @value: (nullable): the requested value for the state
    *
    * Indicates that the action just received a request to change its
@@ -421,13 +421,13 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * An example of a 'change-state' handler:
    * |[<!-- language="C" -->
    * static void
-   * change_volume_state (xsimple_action_t *action,
-   *                      xvariant_t      *value,
-   *                      xpointer_t       user_data)
+   * change_volume_state (GSimpleAction *action,
+   *                      GVariant      *value,
+   *                      gpointer       user_data)
    * {
-   *   xint_t requested;
+   *   gint requested;
    *
-   *   requested = xvariant_get_int32 (value);
+   *   requested = g_variant_get_int32 (value);
    *
    *   // Volume only goes from 0 to 10
    *   if (0 <= requested && requested <= 10)
@@ -441,50 +441,50 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.30
    */
   g_simple_action_signals[SIGNAL_CHANGE_STATE] =
-    xsignal_new (I_("change-state"),
-                  XTYPE_SIMPLE_ACTION,
+    g_signal_new (I_("change-state"),
+                  G_TYPE_SIMPLE_ACTION,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_MUST_COLLECT,
                   0, NULL, NULL,
                   NULL,
-                  XTYPE_NONE, 1,
-                  XTYPE_VARIANT);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_VARIANT);
 
   /**
-   * xsimple_action_t:name:
+   * GSimpleAction:name:
    *
    * The name of the action. This is mostly meaningful for identifying
-   * the action once it has been added to a #xsimple_action_group_t.
+   * the action once it has been added to a #GSimpleActionGroup.
    *
    * Since: 2.28
    **/
-  xobject_class_install_property (object_class, PROP_NAME,
-                                   xparam_spec_string ("name",
+  g_object_class_install_property (object_class, PROP_NAME,
+                                   g_param_spec_string ("name",
                                                         P_("Action Name"),
                                                         P_("The name used to invoke the action"),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsimple_action_t:parameter-type:
+   * GSimpleAction:parameter-type:
    *
    * The type of the parameter that must be given when activating the
    * action.
    *
    * Since: 2.28
    **/
-  xobject_class_install_property (object_class, PROP_PARAMETER_TYPE,
-                                   xparam_spec_boxed ("parameter-type",
+  g_object_class_install_property (object_class, PROP_PARAMETER_TYPE,
+                                   g_param_spec_boxed ("parameter-type",
                                                        P_("Parameter Type"),
-                                                       P_("The type of xvariant_t passed to activate()"),
-                                                       XTYPE_VARIANT_TYPE,
-                                                       XPARAM_READWRITE |
-                                                       XPARAM_CONSTRUCT_ONLY |
-                                                       XPARAM_STATIC_STRINGS));
+                                                       P_("The type of GVariant passed to activate()"),
+                                                       G_TYPE_VARIANT_TYPE,
+                                                       G_PARAM_READWRITE |
+                                                       G_PARAM_CONSTRUCT_ONLY |
+                                                       G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsimple_action_t:enabled:
+   * GSimpleAction:enabled:
    *
    * If @action is currently enabled.
    *
@@ -493,50 +493,50 @@ g_simple_action_class_init (GSimpleActionClass *class)
    *
    * Since: 2.28
    **/
-  xobject_class_install_property (object_class, PROP_ENABLED,
-                                   xparam_spec_boolean ("enabled",
+  g_object_class_install_property (object_class, PROP_ENABLED,
+                                   g_param_spec_boolean ("enabled",
                                                          P_("Enabled"),
                                                          P_("If the action can be activated"),
                                                          TRUE,
-                                                         XPARAM_READWRITE |
-                                                         XPARAM_STATIC_STRINGS));
+                                                         G_PARAM_READWRITE |
+                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsimple_action_t:state-type:
+   * GSimpleAction:state-type:
    *
-   * The #xvariant_type_t of the state that the action has, or %NULL if the
+   * The #GVariantType of the state that the action has, or %NULL if the
    * action is stateless.
    *
    * Since: 2.28
    **/
-  xobject_class_install_property (object_class, PROP_STATE_TYPE,
-                                   xparam_spec_boxed ("state-type",
+  g_object_class_install_property (object_class, PROP_STATE_TYPE,
+                                   g_param_spec_boxed ("state-type",
                                                        P_("State Type"),
                                                        P_("The type of the state kept by the action"),
-                                                       XTYPE_VARIANT_TYPE,
-                                                       XPARAM_READABLE |
-                                                       XPARAM_STATIC_STRINGS));
+                                                       G_TYPE_VARIANT_TYPE,
+                                                       G_PARAM_READABLE |
+                                                       G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsimple_action_t:state:
+   * GSimpleAction:state:
    *
    * The state of the action, or %NULL if the action is stateless.
    *
    * Since: 2.28
    **/
-  xobject_class_install_property (object_class, PROP_STATE,
-                                   xparam_spec_variant ("state",
+  g_object_class_install_property (object_class, PROP_STATE,
+                                   g_param_spec_variant ("state",
                                                          P_("State"),
                                                          P_("The state the action is in"),
                                                          G_VARIANT_TYPE_ANY,
                                                          NULL,
-                                                         XPARAM_READWRITE | XPARAM_CONSTRUCT |
-                                                         XPARAM_STATIC_STRINGS));
+                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT |
+                                                         G_PARAM_STATIC_STRINGS));
 }
 
 /**
  * g_simple_action_set_enabled:
- * @simple: a #xsimple_action_t
+ * @simple: a #GSimpleAction
  * @enabled: whether the action is enabled
  *
  * Sets the action as enabled or not.
@@ -550,24 +550,24 @@ g_simple_action_class_init (GSimpleActionClass *class)
  * Since: 2.28
  **/
 void
-g_simple_action_set_enabled (xsimple_action_t *simple,
-                             xboolean_t       enabled)
+g_simple_action_set_enabled (GSimpleAction *simple,
+                             gboolean       enabled)
 {
-  g_return_if_fail (X_IS_SIMPLE_ACTION (simple));
+  g_return_if_fail (G_IS_SIMPLE_ACTION (simple));
 
   enabled = !!enabled;
 
   if (simple->enabled != enabled)
     {
       simple->enabled = enabled;
-      xobject_notify (G_OBJECT (simple), "enabled");
+      g_object_notify (G_OBJECT (simple), "enabled");
     }
 }
 
 /**
  * g_simple_action_set_state_hint:
- * @simple: a #xsimple_action_t
- * @state_hint: (nullable): a #xvariant_t representing the state hint
+ * @simple: a #GSimpleAction
+ * @state_hint: (nullable): a #GVariant representing the state hint
  *
  * Sets the state hint for the action.
  *
@@ -577,43 +577,43 @@ g_simple_action_set_enabled (xsimple_action_t *simple,
  * Since: 2.44
  **/
 void
-g_simple_action_set_state_hint (xsimple_action_t *simple,
-                                xvariant_t      *state_hint)
+g_simple_action_set_state_hint (GSimpleAction *simple,
+                                GVariant      *state_hint)
 {
-  g_return_if_fail (X_IS_SIMPLE_ACTION (simple));
+  g_return_if_fail (G_IS_SIMPLE_ACTION (simple));
 
   if (simple->state_hint != NULL)
     {
-      xvariant_unref (simple->state_hint);
+      g_variant_unref (simple->state_hint);
       simple->state_hint = NULL;
     }
 
   if (state_hint != NULL)
-    simple->state_hint = xvariant_ref (state_hint);
+    simple->state_hint = g_variant_ref (state_hint);
 }
 
 /**
  * g_simple_action_new:
  * @name: the name of the action
  * @parameter_type: (nullable): the type of parameter that will be passed to
- *   handlers for the #xsimple_action_t::activate signal, or %NULL for no parameter
+ *   handlers for the #GSimpleAction::activate signal, or %NULL for no parameter
  *
  * Creates a new action.
  *
  * The created action is stateless. See g_simple_action_new_stateful() to create
  * an action that has state.
  *
- * Returns: a new #xsimple_action_t
+ * Returns: a new #GSimpleAction
  *
  * Since: 2.28
  **/
-xsimple_action_t *
-g_simple_action_new (const xchar_t        *name,
-                     const xvariant_type_t *parameter_type)
+GSimpleAction *
+g_simple_action_new (const gchar        *name,
+                     const GVariantType *parameter_type)
 {
-  xreturn_val_if_fail (name != NULL, NULL);
+  g_return_val_if_fail (name != NULL, NULL);
 
-  return xobject_new (XTYPE_SIMPLE_ACTION,
+  return g_object_new (G_TYPE_SIMPLE_ACTION,
                        "name", name,
                        "parameter-type", parameter_type,
                        NULL);
@@ -623,26 +623,26 @@ g_simple_action_new (const xchar_t        *name,
  * g_simple_action_new_stateful:
  * @name: the name of the action
  * @parameter_type: (nullable): the type of the parameter that will be passed to
- *   handlers for the #xsimple_action_t::activate signal, or %NULL for no parameter
+ *   handlers for the #GSimpleAction::activate signal, or %NULL for no parameter
  * @state: the initial state of the action
  *
  * Creates a new stateful action.
  *
- * All future state values must have the same #xvariant_type_t as the initial
+ * All future state values must have the same #GVariantType as the initial
  * @state.
  *
- * If the @state #xvariant_t is floating, it is consumed.
+ * If the @state #GVariant is floating, it is consumed.
  *
- * Returns: a new #xsimple_action_t
+ * Returns: a new #GSimpleAction
  *
  * Since: 2.28
  **/
-xsimple_action_t *
-g_simple_action_new_stateful (const xchar_t        *name,
-                              const xvariant_type_t *parameter_type,
-                              xvariant_t           *state)
+GSimpleAction *
+g_simple_action_new_stateful (const gchar        *name,
+                              const GVariantType *parameter_type,
+                              GVariant           *state)
 {
-  return xobject_new (XTYPE_SIMPLE_ACTION,
+  return g_object_new (G_TYPE_SIMPLE_ACTION,
                        "name", name,
                        "parameter-type", parameter_type,
                        "state", state,

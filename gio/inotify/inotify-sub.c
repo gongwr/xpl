@@ -17,7 +17,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this library; if not, see <http://www.gnu.org/licenses/>.
 
-   Authors:
+   Authors: 
 		 John McCutchan <john@johnmccutchan.com>
 */
 
@@ -27,29 +27,29 @@
 
 #include "inotify-sub.h"
 
-static xboolean_t is_debug_enabled = FALSE;
+static gboolean is_debug_enabled = FALSE;
 #define IS_W if (is_debug_enabled) g_warning
 
-static xchar_t*
-dup_dirname (const xchar_t *dirname)
+static gchar*
+dup_dirname (const gchar *dirname)
 {
-  xchar_t *d_dirname = xstrdup (dirname);
+  gchar *d_dirname = g_strdup (dirname);
   size_t len = strlen (d_dirname);
-
+  
   if (d_dirname[len - 1] == '/')
     d_dirname[len - 1] = '\0';
-
+  
   return d_dirname;
 }
 
 inotify_sub*
-_ih_sub_new (const xchar_t *dirname,
-             const xchar_t *basename,
-             const xchar_t *filename,
-             xpointer_t     user_data)
+_ih_sub_new (const gchar *dirname, 
+             const gchar *basename,
+             const gchar *filename,
+             gpointer     user_data)
 {
   inotify_sub *sub = NULL;
-
+  
   sub = g_new0 (inotify_sub, 1);
 
   if (filename)
@@ -61,14 +61,14 @@ _ih_sub_new (const xchar_t *dirname,
   else
     {
       sub->dirname = dup_dirname (dirname);
-      sub->filename = xstrdup (basename);
+      sub->filename = g_strdup (basename);
       sub->hardlinks = FALSE;
     }
 
   sub->user_data = user_data;
 
   IS_W ("new subscription for %s being setup\n", sub->dirname);
-
+  
   return sub;
 }
 

@@ -5,179 +5,179 @@
 
 #define N_THREADS 10
 
-static xchar_t *test_file;
+static gchar *test_file;
 
 char *test_file_buffer;
-xsize_t test_file_size;
+gsize test_file_size;
 static char async_read_buffer[8192];
 
 static void
-read_data (xobject_t *source, xasync_result_t *result, xpointer_t loop)
+read_data (GObject *source, GAsyncResult *result, gpointer loop)
 {
-  xinput_stream_t *in = G_INPUT_STREAM (source);
-  xerror_t *error = NULL;
-  xssize_t nread;
+  GInputStream *in = G_INPUT_STREAM (source);
+  GError *error = NULL;
+  gssize nread;
 
-  nread = xinput_stream_read_finish (in, result, &error);
+  nread = g_input_stream_read_finish (in, result, &error);
   g_assert_no_error (error);
 
   g_assert_cmpint (nread, >, 0);
   g_assert_cmpint (nread, <=, MIN(sizeof (async_read_buffer), test_file_size));
-  xassert (memcmp (async_read_buffer, test_file_buffer, nread) == 0);
+  g_assert (memcmp (async_read_buffer, test_file_buffer, nread) == 0);
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 }
 
 static void
-opened_for_read (xobject_t *source, xasync_result_t *result, xpointer_t loop)
+opened_for_read (GObject *source, GAsyncResult *result, gpointer loop)
 {
-  xfile_t *file = XFILE (source);
-  xfile_input_stream_t *in;
-  xerror_t *error = NULL;
+  GFile *file = G_FILE (source);
+  GFileInputStream *in;
+  GError *error = NULL;
 
-  in = xfile_read_finish (file, result, &error);
+  in = g_file_read_finish (file, result, &error);
   g_assert_no_error (error);
 
   memset (async_read_buffer, 0, sizeof (async_read_buffer));
-  xinput_stream_read_async (G_INPUT_STREAM (in),
+  g_input_stream_read_async (G_INPUT_STREAM (in),
 			     async_read_buffer, sizeof (async_read_buffer),
 			     G_PRIORITY_DEFAULT, NULL,
 			     read_data, loop);
 
-  xobject_unref (in);
+  g_object_unref (in);
 }
 
-/* test_t 1: Async I/O started in a thread with a thread-default context
+/* Test 1: Async I/O started in a thread with a thread-default context
  * will stick to that thread, and will complete even if the default
  * main loop is blocked. (NB: the last part would not be true if we
- * were testing xfile_monitor_t!)
+ * were testing GFileMonitor!)
  */
 
-static xboolean_t idle_start_test1_thread (xpointer_t loop);
-static xpointer_t test1_thread (xpointer_t user_data);
+static gboolean idle_start_test1_thread (gpointer loop);
+static gpointer test1_thread (gpointer user_data);
 
-static xboolean_t test1_done;
-static xcond_t test1_cond;
-static xmutex_t test1_mutex;
+static gboolean test1_done;
+static GCond test1_cond;
+static GMutex test1_mutex;
 
 static void
 test_thread_independence (void)
 {
-  xmain_loop_t *loop;
+  GMainLoop *loop;
 
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
   g_idle_add (idle_start_test1_thread, loop);
-  xmain_loop_run (loop);
-  xmain_loop_unref (loop);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 }
 
-static xboolean_t
-idle_start_test1_thread (xpointer_t loop)
+static gboolean
+idle_start_test1_thread (gpointer loop)
 {
-  sint64_t time;
-  xthread_t *thread;
-  xboolean_t io_completed;
+  gint64 time;
+  GThread *thread;
+  gboolean io_completed;
 
   g_mutex_lock (&test1_mutex);
-  thread = xthread_new ("test1", test1_thread, NULL);
+  thread = g_thread_new ("test1", test1_thread, NULL);
 
   time = g_get_monotonic_time () + 2 * G_TIME_SPAN_SECOND;
   while (!test1_done)
     {
       io_completed = g_cond_wait_until (&test1_cond, &test1_mutex, time);
-      xassert (io_completed);
+      g_assert (io_completed);
     }
-  xthread_join (thread);
+  g_thread_join (thread);
 
   g_mutex_unlock (&test1_mutex);
-  xmain_loop_quit (loop);
-  return XSOURCE_REMOVE;
+  g_main_loop_quit (loop);
+  return G_SOURCE_REMOVE;
 }
 
-static xpointer_t
-test1_thread (xpointer_t user_data)
+static gpointer
+test1_thread (gpointer user_data)
 {
-  xmain_context_t *context;
-  xmain_loop_t *loop;
-  xfile_t *file;
+  GMainContext *context;
+  GMainLoop *loop;
+  GFile *file;
 
   /* Wait for main thread to be waiting on test1_cond */
   g_mutex_lock (&test1_mutex);
 
-  context = xmain_context_new ();
-  xassert (xmain_context_get_thread_default () == NULL);
-  xmain_context_push_thread_default (context);
-  xassert (xmain_context_get_thread_default () == context);
+  context = g_main_context_new ();
+  g_assert (g_main_context_get_thread_default () == NULL);
+  g_main_context_push_thread_default (context);
+  g_assert (g_main_context_get_thread_default () == context);
 
-  file = xfile_new_for_path (test_file);
-  xassert (xfile_supports_thread_contexts (file));
+  file = g_file_new_for_path (test_file);
+  g_assert (g_file_supports_thread_contexts (file));
 
-  loop = xmain_loop_new (context, FALSE);
-  xfile_read_async (file, G_PRIORITY_DEFAULT, NULL,
+  loop = g_main_loop_new (context, FALSE);
+  g_file_read_async (file, G_PRIORITY_DEFAULT, NULL,
 		     opened_for_read, loop);
-  xobject_unref (file);
-  xmain_loop_run (loop);
-  xmain_loop_unref (loop);
+  g_object_unref (file);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 
   test1_done = TRUE;
   g_cond_signal (&test1_cond);
   g_mutex_unlock (&test1_mutex);
 
-  xmain_context_pop_thread_default (context);
-  xmain_context_unref (context);
+  g_main_context_pop_thread_default (context);
+  g_main_context_unref (context);
 
   return NULL;
 }
 
-/* test_t 2: If we push a thread-default context in the main thread, we
+/* Test 2: If we push a thread-default context in the main thread, we
  * can run async ops in that context without running the default
  * context.
  */
 
-static xboolean_t test2_fail (xpointer_t user_data);
+static gboolean test2_fail (gpointer user_data);
 
 static void
 test_context_independence (void)
 {
-  xmain_context_t *context;
-  xmain_loop_t *loop;
-  xfile_t *file;
-  xuint_t default_timeout;
-  xsource_t *thread_default_timeout;
+  GMainContext *context;
+  GMainLoop *loop;
+  GFile *file;
+  guint default_timeout;
+  GSource *thread_default_timeout;
 
-  context = xmain_context_new ();
-  xassert (xmain_context_get_thread_default () == NULL);
-  xmain_context_push_thread_default (context);
-  xassert (xmain_context_get_thread_default () == context);
+  context = g_main_context_new ();
+  g_assert (g_main_context_get_thread_default () == NULL);
+  g_main_context_push_thread_default (context);
+  g_assert (g_main_context_get_thread_default () == context);
 
-  file = xfile_new_for_path (test_file);
-  xassert (xfile_supports_thread_contexts (file));
+  file = g_file_new_for_path (test_file);
+  g_assert (g_file_supports_thread_contexts (file));
 
   /* Add a timeout to the main loop, to fail immediately if it gets run */
   default_timeout = g_timeout_add_full (G_PRIORITY_HIGH, 0,
 					test2_fail, NULL, NULL);
   /* Add a timeout to the alternate loop, to fail if the I/O *doesn't* run */
   thread_default_timeout = g_timeout_source_new_seconds (2);
-  xsource_set_callback (thread_default_timeout, test2_fail, NULL, NULL);
-  xsource_attach (thread_default_timeout, context);
+  g_source_set_callback (thread_default_timeout, test2_fail, NULL, NULL);
+  g_source_attach (thread_default_timeout, context);
 
-  loop = xmain_loop_new (context, FALSE);
-  xfile_read_async (file, G_PRIORITY_DEFAULT, NULL,
+  loop = g_main_loop_new (context, FALSE);
+  g_file_read_async (file, G_PRIORITY_DEFAULT, NULL,
 		     opened_for_read, loop);
-  xobject_unref (file);
-  xmain_loop_run (loop);
-  xmain_loop_unref (loop);
+  g_object_unref (file);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 
-  xsource_remove (default_timeout);
-  xsource_destroy (thread_default_timeout);
-  xsource_unref (thread_default_timeout);
+  g_source_remove (default_timeout);
+  g_source_destroy (thread_default_timeout);
+  g_source_unref (thread_default_timeout);
 
-  xmain_context_pop_thread_default (context);
-  xmain_context_unref (context);
+  g_main_context_pop_thread_default (context);
+  g_main_context_unref (context);
 }
 
-static xboolean_t
-test2_fail (xpointer_t user_data)
+static gboolean
+test2_fail (gpointer user_data)
 {
   g_assert_not_reached ();
   return FALSE;
@@ -186,45 +186,45 @@ test2_fail (xpointer_t user_data)
 
 typedef struct
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xmain_context_t *context;
+  GMainContext *context;
 } PerThreadThing;
 
-typedef xobject_class_t PerThreadThingClass;
+typedef GObjectClass PerThreadThingClass;
 
-static xtype_t per_thread_thing_get_type (void);
+static GType per_thread_thing_get_type (void);
 
-XDEFINE_TYPE (PerThreadThing, per_thread_thing, XTYPE_OBJECT)
+G_DEFINE_TYPE (PerThreadThing, per_thread_thing, G_TYPE_OBJECT)
 
-static xcontext_specific_group_t group;
-static xpointer_t instances[N_THREADS];
-static xint_t is_running;
-static xint_t current_value;
-static xint_t observed_values[N_THREADS];
+static GContextSpecificGroup group;
+static gpointer instances[N_THREADS];
+static gint is_running;
+static gint current_value;
+static gint observed_values[N_THREADS];
 
 static void
 start_func (void)
 {
-  xassert (!is_running);
+  g_assert (!is_running);
   g_atomic_int_set (&is_running, TRUE);
 }
 
 static void
 stop_func (void)
 {
-  xassert (is_running);
+  g_assert (is_running);
   g_atomic_int_set (&is_running, FALSE);
 }
 
 static void
-per_thread_thing_finalize (xobject_t *object)
+per_thread_thing_finalize (GObject *object)
 {
   PerThreadThing *thing = (PerThreadThing *) object;
 
-  xcontext_specific_group_remove (&group, thing->context, thing, stop_func);
+  g_context_specific_group_remove (&group, thing->context, thing, stop_func);
 
-  XOBJECT_CLASS (per_thread_thing_parent_class)->finalize (object);
+  G_OBJECT_CLASS (per_thread_thing_parent_class)->finalize (object);
 }
 
 static void
@@ -237,64 +237,64 @@ per_thread_thing_class_init (PerThreadThingClass *class)
 {
   class->finalize = per_thread_thing_finalize;
 
-  xsignal_new ("changed", per_thread_thing_get_type (), G_SIGNAL_RUN_FIRST, 0,
-                NULL, NULL, g_cclosure_marshal_VOID__VOID, XTYPE_NONE, 0);
+  g_signal_new ("changed", per_thread_thing_get_type (), G_SIGNAL_RUN_FIRST, 0,
+                NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
-static xpointer_t
+static gpointer
 per_thread_thing_get (void)
 {
-  return xcontext_specific_group_get (&group, per_thread_thing_get_type (),
+  return g_context_specific_group_get (&group, per_thread_thing_get_type (),
                                        G_STRUCT_OFFSET (PerThreadThing, context),
                                        start_func);
 }
 
-static xpointer_t
-test_identity_thread (xpointer_t user_data)
+static gpointer
+test_identity_thread (gpointer user_data)
 {
-  xuint_t thread_nr = GPOINTER_TO_UINT (user_data);
-  xmain_context_t *my_context;
-  xuint_t i, j;
+  guint thread_nr = GPOINTER_TO_UINT (user_data);
+  GMainContext *my_context;
+  guint i, j;
 
-  my_context = xmain_context_new ();
-  xmain_context_push_thread_default (my_context);
+  my_context = g_main_context_new ();
+  g_main_context_push_thread_default (my_context);
 
-  xassert (!instances[thread_nr]);
+  g_assert (!instances[thread_nr]);
   instances[thread_nr] = per_thread_thing_get ();
-  xassert (g_atomic_int_get (&is_running));
+  g_assert (g_atomic_int_get (&is_running));
 
   for (i = 0; i < 100; i++)
     {
-      xpointer_t instance = per_thread_thing_get ();
+      gpointer instance = per_thread_thing_get ();
 
       for (j = 0; j < N_THREADS; j++)
-        xassert ((instance == instances[j]) == (thread_nr == j));
+        g_assert ((instance == instances[j]) == (thread_nr == j));
 
-      xassert (g_atomic_int_get (&is_running));
+      g_assert (g_atomic_int_get (&is_running));
 
-      xthread_yield ();
+      g_thread_yield ();
 
-      xassert (g_atomic_int_get (&is_running));
+      g_assert (g_atomic_int_get (&is_running));
     }
 
   for (i = 0; i < 100; i++)
     {
-      xobject_unref (instances[thread_nr]);
+      g_object_unref (instances[thread_nr]);
 
       for (j = 0; j < N_THREADS; j++)
-        xassert ((instances[thread_nr] == instances[j]) == (thread_nr == j));
+        g_assert ((instances[thread_nr] == instances[j]) == (thread_nr == j));
 
-      xassert (g_atomic_int_get (&is_running));
+      g_assert (g_atomic_int_get (&is_running));
 
-      xthread_yield ();
+      g_thread_yield ();
     }
 
   /* drop the last ref */
-  xobject_unref (instances[thread_nr]);
+  g_object_unref (instances[thread_nr]);
   instances[thread_nr] = NULL;
 
-  xmain_context_pop_thread_default (my_context);
-  xmain_context_unref (my_context);
+  g_main_context_pop_thread_default (my_context);
+  g_main_context_unref (my_context);
 
   /* at least one thread should see this cleared on exit */
   return GUINT_TO_POINTER (!group.requested_state);
@@ -303,53 +303,53 @@ test_identity_thread (xpointer_t user_data)
 static void
 test_context_specific_identity (void)
 {
-  xthread_t *threads[N_THREADS];
-  xboolean_t exited = FALSE;
-  xuint_t i;
+  GThread *threads[N_THREADS];
+  gboolean exited = FALSE;
+  guint i;
 
-  xassert (!g_atomic_int_get (&is_running));
+  g_assert (!g_atomic_int_get (&is_running));
   for (i = 0; i < N_THREADS; i++)
-    threads[i] = xthread_new ("test", test_identity_thread, GUINT_TO_POINTER (i));
+    threads[i] = g_thread_new ("test", test_identity_thread, GUINT_TO_POINTER (i));
   for (i = 0; i < N_THREADS; i++)
-    exited |= GPOINTER_TO_UINT (xthread_join (threads[i]));
-  xassert (exited);
-  xassert (!group.requested_state);
+    exited |= GPOINTER_TO_UINT (g_thread_join (threads[i]));
+  g_assert (exited);
+  g_assert (!group.requested_state);
 }
 
 static void
 changed_emitted (PerThreadThing *thing,
-                 xpointer_t        user_data)
+                 gpointer        user_data)
 {
-  xint_t *observed_value = user_data;
+  gint *observed_value = user_data;
 
   g_atomic_int_set (observed_value, g_atomic_int_get (&current_value));
 }
 
-static xpointer_t
-test_emit_thread (xpointer_t user_data)
+static gpointer
+test_emit_thread (gpointer user_data)
 {
-  xint_t *observed_value = user_data;
-  xmain_context_t *my_context;
-  xpointer_t instance;
+  gint *observed_value = user_data;
+  GMainContext *my_context;
+  gpointer instance;
 
-  my_context = xmain_context_new ();
-  xmain_context_push_thread_default (my_context);
+  my_context = g_main_context_new ();
+  g_main_context_push_thread_default (my_context);
 
   instance = per_thread_thing_get ();
-  xassert (g_atomic_int_get (&is_running));
+  g_assert (g_atomic_int_get (&is_running));
 
-  xsignal_connect (instance, "changed", G_CALLBACK (changed_emitted), observed_value);
+  g_signal_connect (instance, "changed", G_CALLBACK (changed_emitted), observed_value);
 
   /* observe after connection */
   g_atomic_int_set (observed_value, g_atomic_int_get (&current_value));
 
   while (g_atomic_int_get (&current_value) != -1)
-    xmain_context_iteration (my_context, TRUE);
+    g_main_context_iteration (my_context, TRUE);
 
-  xobject_unref (instance);
+  g_object_unref (instance);
 
-  xmain_context_pop_thread_default (my_context);
-  xmain_context_unref (my_context);
+  g_main_context_pop_thread_default (my_context);
+  g_main_context_unref (my_context);
 
   /* at least one thread should see this cleared on exit */
   return GUINT_TO_POINTER (!group.requested_state);
@@ -358,18 +358,18 @@ test_emit_thread (xpointer_t user_data)
 static void
 test_context_specific_emit (void)
 {
-  xthread_t *threads[N_THREADS];
-  xboolean_t exited = FALSE;
-  xsize_t i;
-  xint_t k, n;
+  GThread *threads[N_THREADS];
+  gboolean exited = FALSE;
+  gsize i;
+  gint k, n;
 
   for (i = 0; i < N_THREADS; i++)
-    threads[i] = xthread_new ("test", test_emit_thread, &observed_values[i]);
+    threads[i] = g_thread_new ("test", test_emit_thread, &observed_values[i]);
 
   /* make changes and ensure that they are observed */
   for (n = 0; n < 1000; n++)
     {
-      sint64_t expiry;
+      gint64 expiry;
 
       /* don't burn CPU forever */
       expiry = g_get_monotonic_time () + 10 * G_TIME_SPAN_SECOND;
@@ -378,51 +378,51 @@ test_context_specific_emit (void)
 
       /* wake them to notice */
       for (k = 0; k < g_test_rand_int_range (1, 5); k++)
-        xcontext_specific_group_emit (&group, xsignal_lookup ("changed", per_thread_thing_get_type ()));
+        g_context_specific_group_emit (&group, g_signal_lookup ("changed", per_thread_thing_get_type ()));
 
       for (i = 0; i < N_THREADS; i++)
         while (g_atomic_int_get (&observed_values[i]) != n)
           {
-            xthread_yield ();
+            g_thread_yield ();
 
             if (g_get_monotonic_time () > expiry)
-              xerror ("timed out");
+              g_error ("timed out");
           }
     }
 
   /* tell them to quit */
   g_atomic_int_set (&current_value, -1);
-  xcontext_specific_group_emit (&group, xsignal_lookup ("notify", XTYPE_OBJECT));
+  g_context_specific_group_emit (&group, g_signal_lookup ("notify", G_TYPE_OBJECT));
 
   for (i = 0; i < N_THREADS; i++)
-    exited |= GPOINTER_TO_UINT (xthread_join (threads[i]));
-  xassert (exited);
-  xassert (!group.requested_state);
+    exited |= GPOINTER_TO_UINT (g_thread_join (threads[i]));
+  g_assert (exited);
+  g_assert (!group.requested_state);
 }
 
 static void
 test_context_specific_emit_and_unref (void)
 {
-  xpointer_t obj;
+  gpointer obj;
 
   obj = per_thread_thing_get ();
-  xcontext_specific_group_emit (&group, xsignal_lookup ("changed", per_thread_thing_get_type ()));
-  xobject_unref (obj);
+  g_context_specific_group_emit (&group, g_signal_lookup ("changed", per_thread_thing_get_type ()));
+  g_object_unref (obj);
 
-  while (xmain_context_iteration (NULL, 0))
+  while (g_main_context_iteration (NULL, 0))
     ;
 }
 
 int
 main (int argc, char **argv)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
   int ret;
 
   g_test_init (&argc, &argv, NULL);
 
   test_file = g_test_build_filename (G_TEST_DIST, "contexts.c", NULL);
-  xfile_get_contents (test_file, &test_file_buffer,
+  g_file_get_contents (test_file, &test_file_buffer,
 		       &test_file_size, &error);
   g_assert_no_error (error);
 

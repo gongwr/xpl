@@ -46,32 +46,32 @@
 /* ---------- MyIOStream ------------------------------------------------- */
 
 #define MY_TYPE_IO_STREAM  (my_io_stream_get_type ())
-#define MY_IO_STREAM(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_IO_STREAM, MyIOStream))
-#define MY_IS_IO_STREAM(o) (XTYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_IO_STREAM))
+#define MY_IO_STREAM(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_IO_STREAM, MyIOStream))
+#define MY_IS_IO_STREAM(o) (G_TYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_IO_STREAM))
 
 typedef struct
 {
-  xio_stream_t parent_instance;
-  xinput_stream_t *input_stream;
-  xoutput_stream_t *output_stream;
+  GIOStream parent_instance;
+  GInputStream *input_stream;
+  GOutputStream *output_stream;
 } MyIOStream;
 
 typedef struct
 {
-  xio_stream_class_t parent_class;
+  GIOStreamClass parent_class;
 } MyIOStreamClass;
 
-static xtype_t my_io_stream_get_type (void) G_GNUC_CONST;
+static GType my_io_stream_get_type (void) G_GNUC_CONST;
 
-XDEFINE_TYPE (MyIOStream, my_io_stream, XTYPE_IO_STREAM)
+G_DEFINE_TYPE (MyIOStream, my_io_stream, G_TYPE_IO_STREAM)
 
 static void
-my_io_stream_finalize (xobject_t *object)
+my_io_stream_finalize (GObject *object)
 {
   MyIOStream *stream = MY_IO_STREAM (object);
-  xobject_unref (stream->input_stream);
-  xobject_unref (stream->output_stream);
-  XOBJECT_CLASS (my_io_stream_parent_class)->finalize (object);
+  g_object_unref (stream->input_stream);
+  g_object_unref (stream->output_stream);
+  G_OBJECT_CLASS (my_io_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -79,15 +79,15 @@ my_io_stream_init (MyIOStream *stream)
 {
 }
 
-static xinput_stream_t *
-my_io_stream_get_input_stream (xio_stream_t *_stream)
+static GInputStream *
+my_io_stream_get_input_stream (GIOStream *_stream)
 {
   MyIOStream *stream = MY_IO_STREAM (_stream);
   return stream->input_stream;
 }
 
-static xoutput_stream_t *
-my_io_stream_get_output_stream (xio_stream_t *_stream)
+static GOutputStream *
+my_io_stream_get_output_stream (GIOStream *_stream)
 {
   MyIOStream *stream = MY_IO_STREAM (_stream);
   return stream->output_stream;
@@ -96,64 +96,64 @@ my_io_stream_get_output_stream (xio_stream_t *_stream)
 static void
 my_io_stream_class_init (MyIOStreamClass *klass)
 {
-  xobject_class_t *xobject_class;
-  xio_stream_class_t *giostream_class;
+  GObjectClass *gobject_class;
+  GIOStreamClass *giostream_class;
 
-  xobject_class = XOBJECT_CLASS (klass);
-  xobject_class->finalize = my_io_stream_finalize;
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = my_io_stream_finalize;
 
-  giostream_class = XIO_STREAM_CLASS (klass);
+  giostream_class = G_IO_STREAM_CLASS (klass);
   giostream_class->get_input_stream  = my_io_stream_get_input_stream;
   giostream_class->get_output_stream = my_io_stream_get_output_stream;
 }
 
-static xio_stream_t *
-my_io_stream_new (xinput_stream_t  *input_stream,
-                  xoutput_stream_t *output_stream)
+static GIOStream *
+my_io_stream_new (GInputStream  *input_stream,
+                  GOutputStream *output_stream)
 {
   MyIOStream *stream;
-  xreturn_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
-  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
-  stream = MY_IO_STREAM (xobject_new (MY_TYPE_IO_STREAM, NULL));
-  stream->input_stream = xobject_ref (input_stream);
-  stream->output_stream = xobject_ref (output_stream);
-  return XIO_STREAM (stream);
+  g_return_val_if_fail (G_IS_INPUT_STREAM (input_stream), NULL);
+  g_return_val_if_fail (G_IS_OUTPUT_STREAM (output_stream), NULL);
+  stream = MY_IO_STREAM (g_object_new (MY_TYPE_IO_STREAM, NULL));
+  stream->input_stream = g_object_ref (input_stream);
+  stream->output_stream = g_object_ref (output_stream);
+  return G_IO_STREAM (stream);
 }
 
 /* ---------- MySlowCloseOutputStream ------------------------------------ */
 
 typedef struct
 {
-  xfilter_output_stream_t parent_instance;
+  GFilterOutputStream parent_instance;
 } MySlowCloseOutputStream;
 
 typedef struct
 {
-  xfilter_output_stream_class_t parent_class;
+  GFilterOutputStreamClass parent_class;
 } MySlowCloseOutputStreamClass;
 
 #define MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM \
   (my_slow_close_output_stream_get_type ())
 #define MY_OUTPUT_STREAM(o) \
-  (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM, \
+  (G_TYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM, \
                                MySlowCloseOutputStream))
 #define MY_IS_SLOW_CLOSE_OUTPUT_STREAM(o) \
-  (XTYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM))
+  (G_TYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM))
 
-static xtype_t my_slow_close_output_stream_get_type (void) G_GNUC_CONST;
+static GType my_slow_close_output_stream_get_type (void) G_GNUC_CONST;
 
-XDEFINE_TYPE (MySlowCloseOutputStream, my_slow_close_output_stream,
-               XTYPE_FILTER_OUTPUT_STREAM)
+G_DEFINE_TYPE (MySlowCloseOutputStream, my_slow_close_output_stream,
+               G_TYPE_FILTER_OUTPUT_STREAM)
 
 static void
 my_slow_close_output_stream_init (MySlowCloseOutputStream *stream)
 {
 }
 
-static xboolean_t
-my_slow_close_output_stream_close (xoutput_stream_t  *stream,
-                                   xcancellable_t   *cancellable,
-                                   xerror_t        **error)
+static gboolean
+my_slow_close_output_stream_close (GOutputStream  *stream,
+                                   GCancellable   *cancellable,
+                                   GError        **error)
 {
   g_usleep (CLOSE_TIME_MS * 1000);
   return G_OUTPUT_STREAM_CLASS (my_slow_close_output_stream_parent_class)->
@@ -161,26 +161,26 @@ my_slow_close_output_stream_close (xoutput_stream_t  *stream,
 }
 
 typedef struct {
-    xoutput_stream_t *stream;
-    xint_t io_priority;
-    xcancellable_t *cancellable;
-    xasync_ready_callback_t callback;
-    xpointer_t user_data;
+    GOutputStream *stream;
+    gint io_priority;
+    GCancellable *cancellable;
+    GAsyncReadyCallback callback;
+    gpointer user_data;
 } DelayedClose;
 
 static void
-delayed_close_free (xpointer_t data)
+delayed_close_free (gpointer data)
 {
   DelayedClose *df = data;
 
-  xobject_unref (df->stream);
+  g_object_unref (df->stream);
   if (df->cancellable)
-    xobject_unref (df->cancellable);
+    g_object_unref (df->cancellable);
   g_free (df);
 }
 
-static xboolean_t
-delayed_close_cb (xpointer_t data)
+static gboolean
+delayed_close_cb (gpointer data)
 {
   DelayedClose *df = data;
 
@@ -188,35 +188,35 @@ delayed_close_cb (xpointer_t data)
     close_async (df->stream, df->io_priority, df->cancellable, df->callback,
                  df->user_data);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
-my_slow_close_output_stream_close_async  (xoutput_stream_t            *stream,
+my_slow_close_output_stream_close_async  (GOutputStream            *stream,
                                           int                       io_priority,
-                                          xcancellable_t             *cancellable,
-                                          xasync_ready_callback_t       callback,
-                                          xpointer_t                  user_data)
+                                          GCancellable             *cancellable,
+                                          GAsyncReadyCallback       callback,
+                                          gpointer                  user_data)
 {
-  xsource_t *later;
+  GSource *later;
   DelayedClose *df;
 
   df = g_new0 (DelayedClose, 1);
-  df->stream = xobject_ref (stream);
+  df->stream = g_object_ref (stream);
   df->io_priority = io_priority;
-  df->cancellable = (cancellable != NULL ? xobject_ref (cancellable) : NULL);
+  df->cancellable = (cancellable != NULL ? g_object_ref (cancellable) : NULL);
   df->callback = callback;
   df->user_data = user_data;
 
   later = g_timeout_source_new (CLOSE_TIME_MS);
-  xsource_set_callback (later, delayed_close_cb, df, delayed_close_free);
-  xsource_attach (later, xmain_context_get_thread_default ());
+  g_source_set_callback (later, delayed_close_cb, df, delayed_close_free);
+  g_source_attach (later, g_main_context_get_thread_default ());
 }
 
-static xboolean_t
-my_slow_close_output_stream_close_finish  (xoutput_stream_t  *stream,
-                                xasync_result_t   *result,
-                                xerror_t        **error)
+static gboolean
+my_slow_close_output_stream_close_finish  (GOutputStream  *stream,
+                                GAsyncResult   *result,
+                                GError        **error)
 {
   return G_OUTPUT_STREAM_CLASS (my_slow_close_output_stream_parent_class)->
     close_finish (stream, result, error);
@@ -225,7 +225,7 @@ my_slow_close_output_stream_close_finish  (xoutput_stream_t  *stream,
 static void
 my_slow_close_output_stream_class_init (MySlowCloseOutputStreamClass *klass)
 {
-  xoutput_stream_class_t *ostream_class;
+  GOutputStreamClass *ostream_class;
 
   ostream_class = G_OUTPUT_STREAM_CLASS (klass);
   ostream_class->close_fn = my_slow_close_output_stream_close;
@@ -233,49 +233,49 @@ my_slow_close_output_stream_class_init (MySlowCloseOutputStreamClass *klass)
   ostream_class->close_finish = my_slow_close_output_stream_close_finish;
 }
 
-static xio_stream_t *
-my_io_stream_new_for_fds (xint_t fd_in, xint_t fd_out)
+static GIOStream *
+my_io_stream_new_for_fds (gint fd_in, gint fd_out)
 {
-  xio_stream_t *stream;
-  xinput_stream_t *input_stream;
-  xoutput_stream_t *real_output_stream;
-  xoutput_stream_t *output_stream;
+  GIOStream *stream;
+  GInputStream *input_stream;
+  GOutputStream *real_output_stream;
+  GOutputStream *output_stream;
 
   input_stream = g_unix_input_stream_new (fd_in, TRUE);
   real_output_stream = g_unix_output_stream_new (fd_out, TRUE);
-  output_stream = xobject_new (MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM,
+  output_stream = g_object_new (MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM,
                                 "base-stream", real_output_stream,
                                 NULL);
   stream = my_io_stream_new (input_stream, output_stream);
-  xobject_unref (input_stream);
-  xobject_unref (output_stream);
-  xobject_unref (real_output_stream);
+  g_object_unref (input_stream);
+  g_object_unref (output_stream);
+  g_object_unref (real_output_stream);
   return stream;
 }
 
 /* ---------- Tests ------------------------------------------------------ */
 
 typedef struct {
-  xint_t server_to_client[2];
-  xint_t client_to_server[2];
-  xio_stream_t *server_iostream;
-  xdbus_connection_t *server_conn;
-  xio_stream_t *iostream;
-  xdbus_connection_t *connection;
-  xchar_t *guid;
-  xerror_t *error;
+  gint server_to_client[2];
+  gint client_to_server[2];
+  GIOStream *server_iostream;
+  GDBusConnection *server_conn;
+  GIOStream *iostream;
+  GDBusConnection *connection;
+  gchar *guid;
+  GError *error;
 } Fixture;
 
 static void
 setup (Fixture       *f,
-       xconstpointer  context)
+       gconstpointer  context)
 {
   f->guid = g_dbus_generate_guid ();
 }
 
 static void
 teardown (Fixture       *f,
-          xconstpointer  context)
+          gconstpointer  context)
 {
   g_clear_object (&f->server_iostream);
   g_clear_object (&f->server_conn);
@@ -286,35 +286,35 @@ teardown (Fixture       *f,
 }
 
 static void
-on_new_conn (xobject_t      *source,
-             xasync_result_t *res,
-             xpointer_t      user_data)
+on_new_conn (GObject      *source,
+             GAsyncResult *res,
+             gpointer      user_data)
 {
-  xdbus_connection_t **connection = user_data;
-  xerror_t *error = NULL;
+  GDBusConnection **connection = user_data;
+  GError *error = NULL;
 
-  *connection = xdbus_connection_new_for_address_finish (res, &error);
+  *connection = g_dbus_connection_new_for_address_finish (res, &error);
   g_assert_no_error (error);
 }
 
 static void
 test_once (Fixture       *f,
-           xconstpointer  context)
+           gconstpointer  context)
 {
-  xdbus_message_t *message;
-  xboolean_t pipe_res;
+  GDBusMessage *message;
+  gboolean pipe_res;
 
   pipe_res = g_unix_open_pipe (f->server_to_client, FD_CLOEXEC, &f->error);
-  xassert (pipe_res);
+  g_assert (pipe_res);
   pipe_res = g_unix_open_pipe (f->client_to_server, FD_CLOEXEC, &f->error);
-  xassert (pipe_res);
+  g_assert (pipe_res);
 
   f->server_iostream = my_io_stream_new_for_fds (f->client_to_server[0],
                                                  f->server_to_client[1]);
   f->iostream = my_io_stream_new_for_fds (f->server_to_client[0],
                                           f->client_to_server[1]);
 
-  xdbus_connection_new (f->server_iostream,
+  g_dbus_connection_new (f->server_iostream,
                          f->guid,
                          (G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER |
                           G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS),
@@ -322,7 +322,7 @@ test_once (Fixture       *f,
                          NULL /* cancellable */,
                          on_new_conn, &f->server_conn);
 
-  xdbus_connection_new (f->iostream,
+  g_dbus_connection_new (f->iostream,
                          NULL,
                          G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                          NULL /* auth observer */,
@@ -330,31 +330,31 @@ test_once (Fixture       *f,
                          on_new_conn, &f->connection);
 
   while (f->server_conn == NULL || f->connection == NULL)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
   /*
    * queue a message - it'll sometimes be sent while the close is pending,
    * triggering the bug
    */
-  message = xdbus_message_new_signal ("/", "com.example.foo_t", "Bar");
-  xdbus_connection_send_message (f->connection, message, 0, NULL, &f->error);
+  message = g_dbus_message_new_signal ("/", "com.example.Foo", "Bar");
+  g_dbus_connection_send_message (f->connection, message, 0, NULL, &f->error);
   g_assert_no_error (f->error);
-  xobject_unref (message);
+  g_object_unref (message);
 
   /* close the connection (deliberately or via last-unref) */
-  if (xstrcmp0 (context, "unref") == 0)
+  if (g_strcmp0 (context, "unref") == 0)
     {
       g_clear_object (&f->connection);
     }
   else
     {
-      xdbus_connection_close_sync (f->connection, NULL, &f->error);
+      g_dbus_connection_close_sync (f->connection, NULL, &f->error);
       g_assert_no_error (f->error);
     }
 
   /* either way, wait for the connection to close */
-  while (!xdbus_connection_is_closed (f->server_conn))
-    xmain_context_iteration (NULL, TRUE);
+  while (!g_dbus_connection_is_closed (f->server_conn))
+    g_main_context_iteration (NULL, TRUE);
 
   /* clean up before the next run */
   g_clear_object (&f->iostream);
@@ -366,9 +366,9 @@ test_once (Fixture       *f,
 
 static void
 test_many_times (Fixture       *f,
-                 xconstpointer  context)
+                 gconstpointer  context)
 {
-  xuint_t i, n_repeats;
+  guint i, n_repeats;
 
   if (g_test_slow ())
     n_repeats = N_REPEATS_SLOW;

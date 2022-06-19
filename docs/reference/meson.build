@@ -1,5 +1,5 @@
 # The list of minor versions in the 2.x.x series which have had
-# XPL_AVAILABLE_IN_* macros. This should include the current unreleased stable
+# GLIB_AVAILABLE_IN_* macros. This should include the current unreleased stable
 # version.
 #
 # FIXME: It would be good to be able to generate this list:
@@ -11,10 +11,10 @@ stable_2_series_versions = [
 ]
 
 ignore_decorators = [
-  'XPL_VAR',
+  'GLIB_VAR',
   'G_GNUC_INTERNAL',
   'G_GNUC_WARN_UNUSED_RESULT',
-  'XPL_AVAILABLE_IN_ALL',
+  'GLIB_AVAILABLE_IN_ALL',
 ]
 
 foreach version : stable_2_series_versions
@@ -22,23 +22,23 @@ foreach version : stable_2_series_versions
     # Note that gtkdoc is going to use those in regex, and the longest match
     # must come first. That's why '_FOR()' variant comes first.
     # gtkdoc special-case '()' and replace it by a regex matching a symbol name.
-    'XPL_AVAILABLE_IN_2_' + version,
-    'XPL_DEPRECATED_IN_2_' + version + '_FOR()',
-    'XPL_DEPRECATED_IN_2_' + version,
+    'GLIB_AVAILABLE_IN_2_' + version,
+    'GLIB_DEPRECATED_IN_2_' + version + '_FOR()',
+    'GLIB_DEPRECATED_IN_2_' + version,
 
-    'XPL_AVAILABLE_STATIC_INLINE_IN_2_' + version,
+    'GLIB_AVAILABLE_STATIC_INLINE_IN_2_' + version,
 
-    'XPL_AVAILABLE_ENUMERATOR_IN_2_' + version,
-    'XPL_DEPRECATED_ENUMERATOR_IN_2_' + version + '_FOR()',
-    'XPL_DEPRECATED_ENUMERATOR_IN_2_' + version,
+    'GLIB_AVAILABLE_ENUMERATOR_IN_2_' + version,
+    'GLIB_DEPRECATED_ENUMERATOR_IN_2_' + version + '_FOR()',
+    'GLIB_DEPRECATED_ENUMERATOR_IN_2_' + version,
 
-    'XPL_AVAILABLE_MACRO_IN_2_' + version,
-    'XPL_DEPRECATED_MACRO_IN_2_' + version + '_FOR()',
-    'XPL_DEPRECATED_MACRO_IN_2_' + version,
+    'GLIB_AVAILABLE_MACRO_IN_2_' + version,
+    'GLIB_DEPRECATED_MACRO_IN_2_' + version + '_FOR()',
+    'GLIB_DEPRECATED_MACRO_IN_2_' + version,
 
-    'XPL_AVAILABLE_TYPE_IN_2_' + version,
-    'XPL_DEPRECATED_TYPE_IN_2_' + version + '_FOR()',
-    'XPL_DEPRECATED_TYPE_IN_2_' + version,
+    'GLIB_AVAILABLE_TYPE_IN_2_' + version,
+    'GLIB_DEPRECATED_TYPE_IN_2_' + version + '_FOR()',
+    'GLIB_DEPRECATED_TYPE_IN_2_' + version,
   ]
 endforeach
 

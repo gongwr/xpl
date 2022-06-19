@@ -32,215 +32,215 @@ G_BEGIN_DECLS
 #define G_TLS_DATABASE_PURPOSE_AUTHENTICATE_SERVER "1.3.6.1.5.5.7.3.1"
 #define G_TLS_DATABASE_PURPOSE_AUTHENTICATE_CLIENT "1.3.6.1.5.5.7.3.2"
 
-#define XTYPE_TLS_DATABASE            (xtls_database_get_type ())
-#define G_TLS_DATABASE(inst)           (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_DATABASE, xtls_database))
-#define G_TLS_DATABASE_CLASS(class)    (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_TLS_DATABASE, GTlsDatabaseClass))
-#define X_IS_TLS_DATABASE(inst)        (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TLS_DATABASE))
-#define X_IS_TLS_DATABASE_CLASS(class) (XTYPE_CHECK_CLASS_TYPE ((class), XTYPE_TLS_DATABASE))
-#define G_TLS_DATABASE_GET_CLASS(inst) (XTYPE_INSTANCE_GET_CLASS ((inst), XTYPE_TLS_DATABASE, GTlsDatabaseClass))
+#define G_TYPE_TLS_DATABASE            (g_tls_database_get_type ())
+#define G_TLS_DATABASE(inst)           (G_TYPE_CHECK_INSTANCE_CAST ((inst), G_TYPE_TLS_DATABASE, GTlsDatabase))
+#define G_TLS_DATABASE_CLASS(class)    (G_TYPE_CHECK_CLASS_CAST ((class), G_TYPE_TLS_DATABASE, GTlsDatabaseClass))
+#define G_IS_TLS_DATABASE(inst)        (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_TLS_DATABASE))
+#define G_IS_TLS_DATABASE_CLASS(class) (G_TYPE_CHECK_CLASS_TYPE ((class), G_TYPE_TLS_DATABASE))
+#define G_TLS_DATABASE_GET_CLASS(inst) (G_TYPE_INSTANCE_GET_CLASS ((inst), G_TYPE_TLS_DATABASE, GTlsDatabaseClass))
 
 typedef struct _GTlsDatabaseClass   GTlsDatabaseClass;
 typedef struct _GTlsDatabasePrivate GTlsDatabasePrivate;
 
 struct _GTlsDatabase
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   GTlsDatabasePrivate *priv;
 };
 
 struct _GTlsDatabaseClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* virtual methods */
 
-  xtls_certificate_flags_t  (*verify_chain)                         (xtls_database_t            *self,
-                                                                 xtls_certificate_t         *chain,
-                                                                 const xchar_t             *purpose,
-                                                                 xsocket_connectable_t      *identity,
-                                                                 xtls_interaction_t         *interaction,
+  GTlsCertificateFlags  (*verify_chain)                         (GTlsDatabase            *self,
+                                                                 GTlsCertificate         *chain,
+                                                                 const gchar             *purpose,
+                                                                 GSocketConnectable      *identity,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseVerifyFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
 
-  void                  (*verify_chain_async)                   (xtls_database_t            *self,
-                                                                 xtls_certificate_t         *chain,
-                                                                 const xchar_t             *purpose,
-                                                                 xsocket_connectable_t      *identity,
-                                                                 xtls_interaction_t         *interaction,
+  void                  (*verify_chain_async)                   (GTlsDatabase            *self,
+                                                                 GTlsCertificate         *chain,
+                                                                 const gchar             *purpose,
+                                                                 GSocketConnectable      *identity,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseVerifyFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
 
-  xtls_certificate_flags_t  (*verify_chain_finish)                  (xtls_database_t            *self,
-                                                                 xasync_result_t            *result,
-                                                                 xerror_t                 **error);
+  GTlsCertificateFlags  (*verify_chain_finish)                  (GTlsDatabase            *self,
+                                                                 GAsyncResult            *result,
+                                                                 GError                 **error);
 
-  xchar_t*                (*create_certificate_handle)            (xtls_database_t            *self,
-                                                                 xtls_certificate_t         *certificate);
+  gchar*                (*create_certificate_handle)            (GTlsDatabase            *self,
+                                                                 GTlsCertificate         *certificate);
 
-  xtls_certificate_t*      (*lookup_certificate_for_handle)        (xtls_database_t            *self,
-                                                                 const xchar_t             *handle,
-                                                                 xtls_interaction_t         *interaction,
+  GTlsCertificate*      (*lookup_certificate_for_handle)        (GTlsDatabase            *self,
+                                                                 const gchar             *handle,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseLookupFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
 
-  void                  (*lookup_certificate_for_handle_async)  (xtls_database_t            *self,
-                                                                 const xchar_t             *handle,
-                                                                 xtls_interaction_t         *interaction,
+  void                  (*lookup_certificate_for_handle_async)  (GTlsDatabase            *self,
+                                                                 const gchar             *handle,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseLookupFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
 
-  xtls_certificate_t*      (*lookup_certificate_for_handle_finish) (xtls_database_t            *self,
-                                                                 xasync_result_t            *result,
-                                                                 xerror_t                 **error);
+  GTlsCertificate*      (*lookup_certificate_for_handle_finish) (GTlsDatabase            *self,
+                                                                 GAsyncResult            *result,
+                                                                 GError                 **error);
 
-  xtls_certificate_t*      (*lookup_certificate_issuer)            (xtls_database_t            *self,
-                                                                 xtls_certificate_t         *certificate,
-                                                                 xtls_interaction_t         *interaction,
+  GTlsCertificate*      (*lookup_certificate_issuer)            (GTlsDatabase            *self,
+                                                                 GTlsCertificate         *certificate,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseLookupFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
 
-  void                  (*lookup_certificate_issuer_async)      (xtls_database_t            *self,
-                                                                 xtls_certificate_t         *certificate,
-                                                                 xtls_interaction_t         *interaction,
+  void                  (*lookup_certificate_issuer_async)      (GTlsDatabase            *self,
+                                                                 GTlsCertificate         *certificate,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseLookupFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
 
-  xtls_certificate_t*      (*lookup_certificate_issuer_finish)     (xtls_database_t            *self,
-                                                                 xasync_result_t            *result,
-                                                                 xerror_t                 **error);
+  GTlsCertificate*      (*lookup_certificate_issuer_finish)     (GTlsDatabase            *self,
+                                                                 GAsyncResult            *result,
+                                                                 GError                 **error);
 
-  xlist_t*                (*lookup_certificates_issued_by)        (xtls_database_t            *self,
-                                                                 xbyte_array_t              *issuer_raw_dn,
-                                                                 xtls_interaction_t         *interaction,
+  GList*                (*lookup_certificates_issued_by)        (GTlsDatabase            *self,
+                                                                 GByteArray              *issuer_raw_dn,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseLookupFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
 
-  void                  (*lookup_certificates_issued_by_async)  (xtls_database_t            *self,
-                                                                 xbyte_array_t              *issuer_raw_dn,
-                                                                 xtls_interaction_t         *interaction,
+  void                  (*lookup_certificates_issued_by_async)  (GTlsDatabase            *self,
+                                                                 GByteArray              *issuer_raw_dn,
+                                                                 GTlsInteraction         *interaction,
                                                                  GTlsDatabaseLookupFlags  flags,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
 
-  xlist_t*                (*lookup_certificates_issued_by_finish) (xtls_database_t            *self,
-                                                                 xasync_result_t            *result,
-                                                                 xerror_t                 **error);
+  GList*                (*lookup_certificates_issued_by_finish) (GTlsDatabase            *self,
+                                                                 GAsyncResult            *result,
+                                                                 GError                 **error);
 
   /*< private >*/
   /* Padding for future expansion */
-  xpointer_t padding[16];
+  gpointer padding[16];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                xtls_database_get_type                              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                g_tls_database_get_type                              (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_flags_t xtls_database_verify_chain                          (xtls_database_t            *self,
-                                                                           xtls_certificate_t         *chain,
-                                                                           const xchar_t             *purpose,
-                                                                           xsocket_connectable_t      *identity,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificateFlags g_tls_database_verify_chain                          (GTlsDatabase            *self,
+                                                                           GTlsCertificate         *chain,
+                                                                           const gchar             *purpose,
+                                                                           GSocketConnectable      *identity,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseVerifyFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xerror_t                 **error);
+                                                                           GCancellable            *cancellable,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-void                 xtls_database_verify_chain_async                    (xtls_database_t            *self,
-                                                                           xtls_certificate_t         *chain,
-                                                                           const xchar_t             *purpose,
-                                                                           xsocket_connectable_t      *identity,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+void                 g_tls_database_verify_chain_async                    (GTlsDatabase            *self,
+                                                                           GTlsCertificate         *chain,
+                                                                           const gchar             *purpose,
+                                                                           GSocketConnectable      *identity,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseVerifyFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xasync_ready_callback_t      callback,
-                                                                           xpointer_t                 user_data);
+                                                                           GCancellable            *cancellable,
+                                                                           GAsyncReadyCallback      callback,
+                                                                           gpointer                 user_data);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_flags_t xtls_database_verify_chain_finish                   (xtls_database_t            *self,
-                                                                           xasync_result_t            *result,
-                                                                           xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificateFlags g_tls_database_verify_chain_finish                   (GTlsDatabase            *self,
+                                                                           GAsyncResult            *result,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t*               xtls_database_create_certificate_handle             (xtls_database_t            *self,
-                                                                           xtls_certificate_t         *certificate);
+GLIB_AVAILABLE_IN_ALL
+gchar*               g_tls_database_create_certificate_handle             (GTlsDatabase            *self,
+                                                                           GTlsCertificate         *certificate);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t*     xtls_database_lookup_certificate_for_handle         (xtls_database_t            *self,
-                                                                           const xchar_t             *handle,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate*     g_tls_database_lookup_certificate_for_handle         (GTlsDatabase            *self,
+                                                                           const gchar             *handle,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseLookupFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xerror_t                 **error);
+                                                                           GCancellable            *cancellable,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-void                 xtls_database_lookup_certificate_for_handle_async   (xtls_database_t            *self,
-                                                                           const xchar_t             *handle,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+void                 g_tls_database_lookup_certificate_for_handle_async   (GTlsDatabase            *self,
+                                                                           const gchar             *handle,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseLookupFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xasync_ready_callback_t      callback,
-                                                                           xpointer_t                 user_data);
+                                                                           GCancellable            *cancellable,
+                                                                           GAsyncReadyCallback      callback,
+                                                                           gpointer                 user_data);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t*     xtls_database_lookup_certificate_for_handle_finish  (xtls_database_t            *self,
-                                                                           xasync_result_t            *result,
-                                                                           xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate*     g_tls_database_lookup_certificate_for_handle_finish  (GTlsDatabase            *self,
+                                                                           GAsyncResult            *result,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t*     xtls_database_lookup_certificate_issuer             (xtls_database_t            *self,
-                                                                           xtls_certificate_t         *certificate,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate*     g_tls_database_lookup_certificate_issuer             (GTlsDatabase            *self,
+                                                                           GTlsCertificate         *certificate,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseLookupFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xerror_t                 **error);
+                                                                           GCancellable            *cancellable,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-void                 xtls_database_lookup_certificate_issuer_async       (xtls_database_t            *self,
-                                                                           xtls_certificate_t         *certificate,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+void                 g_tls_database_lookup_certificate_issuer_async       (GTlsDatabase            *self,
+                                                                           GTlsCertificate         *certificate,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseLookupFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xasync_ready_callback_t      callback,
-                                                                           xpointer_t                 user_data);
+                                                                           GCancellable            *cancellable,
+                                                                           GAsyncReadyCallback      callback,
+                                                                           gpointer                 user_data);
 
-XPL_AVAILABLE_IN_ALL
-xtls_certificate_t*     xtls_database_lookup_certificate_issuer_finish      (xtls_database_t            *self,
-                                                                           xasync_result_t            *result,
-                                                                           xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsCertificate*     g_tls_database_lookup_certificate_issuer_finish      (GTlsDatabase            *self,
+                                                                           GAsyncResult            *result,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-xlist_t*               xtls_database_lookup_certificates_issued_by         (xtls_database_t            *self,
-                                                                           xbyte_array_t              *issuer_raw_dn,
-                                                                           xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+GList*               g_tls_database_lookup_certificates_issued_by         (GTlsDatabase            *self,
+                                                                           GByteArray              *issuer_raw_dn,
+                                                                           GTlsInteraction         *interaction,
                                                                            GTlsDatabaseLookupFlags  flags,
-                                                                           xcancellable_t            *cancellable,
-                                                                           xerror_t                 **error);
+                                                                           GCancellable            *cancellable,
+                                                                           GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-void                 xtls_database_lookup_certificates_issued_by_async    (xtls_database_t            *self,
-                                                                            xbyte_array_t              *issuer_raw_dn,
-                                                                            xtls_interaction_t         *interaction,
+GLIB_AVAILABLE_IN_ALL
+void                 g_tls_database_lookup_certificates_issued_by_async    (GTlsDatabase            *self,
+                                                                            GByteArray              *issuer_raw_dn,
+                                                                            GTlsInteraction         *interaction,
                                                                             GTlsDatabaseLookupFlags  flags,
-                                                                            xcancellable_t            *cancellable,
-                                                                            xasync_ready_callback_t      callback,
-                                                                            xpointer_t                 user_data);
+                                                                            GCancellable            *cancellable,
+                                                                            GAsyncReadyCallback      callback,
+                                                                            gpointer                 user_data);
 
-XPL_AVAILABLE_IN_ALL
-xlist_t*               xtls_database_lookup_certificates_issued_by_finish   (xtls_database_t            *self,
-                                                                            xasync_result_t            *result,
-                                                                            xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+GList*               g_tls_database_lookup_certificates_issued_by_finish   (GTlsDatabase            *self,
+                                                                            GAsyncResult            *result,
+                                                                            GError                 **error);
 
 G_END_DECLS
 

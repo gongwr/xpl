@@ -25,13 +25,13 @@
 
 /**
  * SECTION:gactionmap
- * @title: xaction_map_t
+ * @title: GActionMap
  * @include: gio/gio.h
  * @short_description: Interface for action containers
  *
- * The xaction_map_t interface is implemented by #xaction_group_t
+ * The GActionMap interface is implemented by #GActionGroup
  * implementations that operate by containing a number of
- * named #xaction_t instances, such as #xsimple_action_group_t.
+ * named #GAction instances, such as #GSimpleActionGroup.
  *
  * One useful application of this interface is to map the
  * names of actions from various action groups to unique,
@@ -43,55 +43,55 @@
  **/
 
 /**
- * xaction_map_t:
+ * GActionMap:
  *
- * #xaction_map_t is an opaque data structure and can only be accessed
+ * #GActionMap is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 /**
- * xaction_map_interface_t:
- * @lookup_action: the virtual function pointer for xaction_map_lookup_action()
- * @add_action: the virtual function pointer for xaction_map_add_action()
- * @remove_action: the virtual function pointer for xaction_map_remove_action()
+ * GActionMapInterface:
+ * @lookup_action: the virtual function pointer for g_action_map_lookup_action()
+ * @add_action: the virtual function pointer for g_action_map_add_action()
+ * @remove_action: the virtual function pointer for g_action_map_remove_action()
  *
- * The virtual function table for #xaction_map_t.
+ * The virtual function table for #GActionMap.
  *
  * Since: 2.32
  **/
 
-G_DEFINE_INTERFACE (xaction_map, xaction_map, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (GActionMap, g_action_map, G_TYPE_OBJECT)
 
 static void
-xaction_map_default_init (xaction_map_interface_t *iface)
+g_action_map_default_init (GActionMapInterface *iface)
 {
 }
 
 /**
- * xaction_map_lookup_action:
- * @action_map: a #xaction_map_t
+ * g_action_map_lookup_action:
+ * @action_map: a #GActionMap
  * @action_name: the name of an action
  *
  * Looks up the action with the name @action_name in @action_map.
  *
  * If no such action exists, returns %NULL.
  *
- * Returns: (nullable) (transfer none): a #xaction_t, or %NULL
+ * Returns: (nullable) (transfer none): a #GAction, or %NULL
  *
  * Since: 2.32
  */
-xaction_t *
-xaction_map_lookup_action (xaction_map_t  *action_map,
-                            const xchar_t *action_name)
+GAction *
+g_action_map_lookup_action (GActionMap  *action_map,
+                            const gchar *action_name)
 {
   return G_ACTION_MAP_GET_IFACE (action_map)
     ->lookup_action (action_map, action_name);
 }
 
 /**
- * xaction_map_add_action:
- * @action_map: a #xaction_map_t
- * @action: a #xaction_t
+ * g_action_map_add_action:
+ * @action_map: a #GActionMap
+ * @action: a #GAction
  *
  * Adds an action to the @action_map.
  *
@@ -103,15 +103,15 @@ xaction_map_lookup_action (xaction_map_t  *action_map,
  * Since: 2.32
  */
 void
-xaction_map_add_action (xaction_map_t *action_map,
-                         xaction_t    *action)
+g_action_map_add_action (GActionMap *action_map,
+                         GAction    *action)
 {
   G_ACTION_MAP_GET_IFACE (action_map)->add_action (action_map, action);
 }
 
 /**
- * xaction_map_remove_action:
- * @action_map: a #xaction_map_t
+ * g_action_map_remove_action:
+ * @action_map: a #GActionMap
  * @action_name: the name of the action
  *
  * Removes the named action from the action map.
@@ -121,14 +121,14 @@ xaction_map_add_action (xaction_map_t *action_map,
  * Since: 2.32
  */
 void
-xaction_map_remove_action (xaction_map_t  *action_map,
-                            const xchar_t *action_name)
+g_action_map_remove_action (GActionMap  *action_map,
+                            const gchar *action_name)
 {
   G_ACTION_MAP_GET_IFACE (action_map)->remove_action (action_map, action_name);
 }
 
 /**
- * xaction_entry_t:
+ * GActionEntry:
  * @name: the name of the action
  * @activate: the callback to connect to the "activate" signal of the
  *            action.  Since GLib 2.40, this can be %NULL for stateful
@@ -139,9 +139,9 @@ xaction_map_remove_action (xaction_map_t  *action_map,
  *            just calls @change_state (which you should provide).
  * @parameter_type: the type of the parameter that must be passed to the
  *                  activate function for this action, given as a single
- *                  xvariant_t type string (or %NULL for no parameter)
+ *                  GVariant type string (or %NULL for no parameter)
  * @state: the initial state for this action, given in
- *         [xvariant_t text format][gvariant-text].  The state is parsed
+ *         [GVariant text format][gvariant-text].  The state is parsed
  *         with no extra type information, so type tags must be added to
  *         the string if they are necessary.  Stateless actions should
  *         give %NULL here.
@@ -150,7 +150,7 @@ xaction_map_remove_action (xaction_map_t  *action_map,
  *                handler here; stateless actions should not.
  *
  * This struct defines a single action.  It is for use with
- * xaction_map_add_action_entries().
+ * g_action_map_add_action_entries().
  *
  * The order of the items in the structure are intended to reflect
  * frequency of use.  It is permissible to use an incomplete initialiser
@@ -158,81 +158,81 @@ xaction_map_remove_action (xaction_map_t  *action_map,
  * after @name are optional.  Additional optional fields may be added in
  * the future.
  *
- * See xaction_map_add_action_entries() for an example.
+ * See g_action_map_add_action_entries() for an example.
  **/
 
 /**
- * xaction_map_add_action_entries:
- * @action_map: a #xaction_map_t
- * @entries: (array length=n_entries) (element-type xaction_entry_t): a pointer to
- *           the first item in an array of #xaction_entry_t structs
+ * g_action_map_add_action_entries:
+ * @action_map: a #GActionMap
+ * @entries: (array length=n_entries) (element-type GActionEntry): a pointer to
+ *           the first item in an array of #GActionEntry structs
  * @n_entries: the length of @entries, or -1 if @entries is %NULL-terminated
  * @user_data: the user data for signal connections
  *
- * A convenience function for creating multiple #xsimple_action_t instances
- * and adding them to a #xaction_map_t.
+ * A convenience function for creating multiple #GSimpleAction instances
+ * and adding them to a #GActionMap.
  *
- * Each action is constructed as per one #xaction_entry_t.
+ * Each action is constructed as per one #GActionEntry.
  *
  * |[<!-- language="C" -->
  * static void
- * activate_quit (xsimple_action_t *simple,
- *                xvariant_t      *parameter,
- *                xpointer_t       user_data)
+ * activate_quit (GSimpleAction *simple,
+ *                GVariant      *parameter,
+ *                gpointer       user_data)
  * {
  *   exit (0);
  * }
  *
  * static void
- * activate_print_string (xsimple_action_t *simple,
- *                        xvariant_t      *parameter,
- *                        xpointer_t       user_data)
+ * activate_print_string (GSimpleAction *simple,
+ *                        GVariant      *parameter,
+ *                        gpointer       user_data)
  * {
- *   g_print ("%s\n", xvariant_get_string (parameter, NULL));
+ *   g_print ("%s\n", g_variant_get_string (parameter, NULL));
  * }
  *
- * static xaction_group_t *
+ * static GActionGroup *
  * create_action_group (void)
  * {
- *   const xaction_entry_t entries[] = {
+ *   const GActionEntry entries[] = {
  *     { "quit",         activate_quit              },
  *     { "print-string", activate_print_string, "s" }
  *   };
- *   xsimple_action_group_t *group;
+ *   GSimpleActionGroup *group;
  *
  *   group = g_simple_action_group_new ();
- *   xaction_map_add_action_entries (G_ACTION_MAP (group), entries, G_N_ELEMENTS (entries), NULL);
+ *   g_action_map_add_action_entries (G_ACTION_MAP (group), entries, G_N_ELEMENTS (entries), NULL);
  *
- *   return XACTION_GROUP (group);
+ *   return G_ACTION_GROUP (group);
  * }
  * ]|
  *
  * Since: 2.32
  */
 void
-xaction_map_add_action_entries (xaction_map_t         *action_map,
-                                 const xaction_entry_t *entries,
-                                 xint_t                n_entries,
-                                 xpointer_t            user_data)
+g_action_map_add_action_entries (GActionMap         *action_map,
+                                 const GActionEntry *entries,
+                                 gint                n_entries,
+                                 gpointer            user_data)
 {
-  xint_t i;
+  gint i;
 
-  g_return_if_fail (X_IS_ACTION_MAP (action_map));
+  g_return_if_fail (G_IS_ACTION_MAP (action_map));
   g_return_if_fail (entries != NULL || n_entries == 0);
 
   for (i = 0; n_entries == -1 ? entries[i].name != NULL : i < n_entries; i++)
     {
-      const xaction_entry_t *entry = &entries[i];
-      const xvariant_type_t *parameter_type;
-      xsimple_action_t *action;
+      const GActionEntry *entry = &entries[i];
+      const GVariantType *parameter_type;
+      GSimpleAction *action;
 
       if (entry->parameter_type)
         {
-          if (!xvariant_type_string_is_valid (entry->parameter_type))
+          if (!g_variant_type_string_is_valid (entry->parameter_type))
             {
-              g_critical ("xaction_map_add_entries: the type "
+              g_critical ("g_action_map_add_entries: the type "
                           "string '%s' given as the parameter type for "
-                          "action '%s' is not a valid xvariant_t type "
+                          "action '%s' is not a valid GVariant type "
                           "string.  This action will not be added.",
                           entry->parameter_type, entry->name);
               return;
@@ -245,17 +245,17 @@ xaction_map_add_action_entries (xaction_map_t         *action_map,
 
       if (entry->state)
         {
-          xerror_t *error = NULL;
-          xvariant_t *state;
+          GError *error = NULL;
+          GVariant *state;
 
-          state = xvariant_parse (NULL, entry->state, NULL, NULL, &error);
+          state = g_variant_parse (NULL, entry->state, NULL, NULL, &error);
           if (state == NULL)
             {
-              g_critical ("xaction_map_add_entries: xvariant_t could "
+              g_critical ("g_action_map_add_entries: GVariant could "
                           "not parse the state value given for action '%s' "
                           "('%s'): %s.  This action will not be added.",
                           entry->name, entry->state, error->message);
-              xerror_free (error);
+              g_error_free (error);
               continue;
             }
 
@@ -263,7 +263,7 @@ xaction_map_add_action_entries (xaction_map_t         *action_map,
                                                  parameter_type,
                                                  state);
 
-          xvariant_unref (state);
+          g_variant_unref (state);
         }
       else
         {
@@ -272,14 +272,14 @@ xaction_map_add_action_entries (xaction_map_t         *action_map,
         }
 
       if (entry->activate != NULL)
-        xsignal_connect (action, "activate",
+        g_signal_connect (action, "activate",
                           G_CALLBACK (entry->activate), user_data);
 
       if (entry->change_state != NULL)
-        xsignal_connect (action, "change-state",
+        g_signal_connect (action, "change-state",
                           G_CALLBACK (entry->change_state), user_data);
 
-      xaction_map_add_action (action_map, G_ACTION (action));
-      xobject_unref (action);
+      g_action_map_add_action (action_map, G_ACTION (action));
+      g_object_unref (action);
     }
 }

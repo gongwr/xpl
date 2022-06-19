@@ -24,10 +24,10 @@
 
 #include "test-io-stream.h"
 
-XDEFINE_TYPE (TestIOStream, test_io_stream, XTYPE_IO_STREAM)
+G_DEFINE_TYPE (TestIOStream, test_io_stream, G_TYPE_IO_STREAM)
 
 static void
-test_io_stream_finalize (xobject_t *object)
+test_io_stream_finalize (GObject *object)
 {
   TestIOStream *stream = TEST_IO_STREAM (object);
 
@@ -37,7 +37,7 @@ test_io_stream_finalize (xobject_t *object)
   g_clear_object (&stream->input_stream);
   g_clear_object (&stream->output_stream);
 
-  XOBJECT_CLASS (test_io_stream_parent_class)->finalize (object);
+  G_OBJECT_CLASS (test_io_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -45,16 +45,16 @@ test_io_stream_init (TestIOStream *stream)
 {
 }
 
-static xinput_stream_t *
-test_io_stream_get_input_stream (xio_stream_t *_stream)
+static GInputStream *
+test_io_stream_get_input_stream (GIOStream *_stream)
 {
   TestIOStream *stream = TEST_IO_STREAM (_stream);
 
   return stream->input_stream;
 }
 
-static xoutput_stream_t *
-test_io_stream_get_output_stream (xio_stream_t *_stream)
+static GOutputStream *
+test_io_stream_get_output_stream (GIOStream *_stream)
 {
   TestIOStream *stream = TEST_IO_STREAM (_stream);
 
@@ -64,13 +64,13 @@ test_io_stream_get_output_stream (xio_stream_t *_stream)
 static void
 test_io_stream_class_init (TestIOStreamClass *klass)
 {
-  xobject_class_t *xobject_class;
-  xio_stream_class_t *giostream_class;
+  GObjectClass *gobject_class;
+  GIOStreamClass *giostream_class;
 
-  xobject_class = XOBJECT_CLASS (klass);
-  xobject_class->finalize = test_io_stream_finalize;
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = test_io_stream_finalize;
 
-  giostream_class = XIO_STREAM_CLASS (klass);
+  giostream_class = G_IO_STREAM_CLASS (klass);
   giostream_class->get_input_stream  = test_io_stream_get_input_stream;
   giostream_class->get_output_stream = test_io_stream_get_output_stream;
 }
@@ -80,23 +80,23 @@ test_io_stream_class_init (TestIOStreamClass *klass)
  * @input_stream: an input stream
  * @output_stream: an output stream
  *
- * Return a simple #xio_stream_t binding together @input_stream and
+ * Return a simple #GIOStream binding together @input_stream and
  * @output_stream. They have no additional semantics as a result of being
  * part of this I/O stream: in particular, closing one does not close
- * the other (although closing the #xio_stream_t will close both sub-streams).
+ * the other (although closing the #GIOStream will close both sub-streams).
  *
- * Returns: (transfer full): a new #xio_stream_t
+ * Returns: (transfer full): a new #GIOStream
  */
-xio_stream_t *
-test_io_stream_new (xinput_stream_t  *input_stream,
-                    xoutput_stream_t *output_stream)
+GIOStream *
+test_io_stream_new (GInputStream  *input_stream,
+                    GOutputStream *output_stream)
 {
   TestIOStream *stream;
 
-  xreturn_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
-  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
-  stream = TEST_IO_STREAM (xobject_new (TEST_TYPE_IO_STREAM, NULL));
-  stream->input_stream = xobject_ref (input_stream);
-  stream->output_stream = xobject_ref (output_stream);
-  return XIO_STREAM (stream);
+  g_return_val_if_fail (G_IS_INPUT_STREAM (input_stream), NULL);
+  g_return_val_if_fail (G_IS_OUTPUT_STREAM (output_stream), NULL);
+  stream = TEST_IO_STREAM (g_object_new (TEST_TYPE_IO_STREAM, NULL));
+  stream->input_stream = g_object_ref (input_stream);
+  stream->output_stream = g_object_ref (output_stream);
+  return G_IO_STREAM (stream);
 }

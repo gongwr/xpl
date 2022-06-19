@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1998-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __XTYPE_H__
-#define __XTYPE_H__
+#ifndef __G_TYPE_H__
+#define __G_TYPE_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -28,166 +28,166 @@ G_BEGIN_DECLS
 /* Basic Type Macros
  */
 /**
- * XTYPE_FUNDAMENTAL:
- * @type: A #xtype_t value.
- *
+ * G_TYPE_FUNDAMENTAL:
+ * @type: A #GType value.
+ * 
  * The fundamental type which is the ancestor of @type.
  *
- * Fundamental types are types that serve as ultimate bases for the derived types,
+ * Fundamental types are types that serve as ultimate bases for the derived types, 
  * thus they are the roots of distinct inheritance hierarchies.
  */
-#define XTYPE_FUNDAMENTAL(type)	(xtype_fundamental (type))
+#define G_TYPE_FUNDAMENTAL(type)	(g_type_fundamental (type))
 /**
- * XTYPE_FUNDAMENTAL_MAX:
- *
+ * G_TYPE_FUNDAMENTAL_MAX:
+ * 
  * An integer constant that represents the number of identifiers reserved
  * for types that are assigned at compile-time.
  */
-#define	XTYPE_FUNDAMENTAL_MAX		(255 << XTYPE_FUNDAMENTAL_SHIFT)
+#define	G_TYPE_FUNDAMENTAL_MAX		(255 << G_TYPE_FUNDAMENTAL_SHIFT)
 
 /* Constant fundamental types,
  */
 /**
- * XTYPE_INVALID:
- *
- * An invalid #xtype_t used as error return value in some functions which return
- * a #xtype_t.
+ * G_TYPE_INVALID:
+ * 
+ * An invalid #GType used as error return value in some functions which return
+ * a #GType. 
  */
-#define XTYPE_INVALID			XTYPE_MAKE_FUNDAMENTAL (0)
+#define G_TYPE_INVALID			G_TYPE_MAKE_FUNDAMENTAL (0)
 /**
- * XTYPE_NONE:
- *
+ * G_TYPE_NONE:
+ * 
  * A fundamental type which is used as a replacement for the C
  * void return type.
  */
-#define XTYPE_NONE			XTYPE_MAKE_FUNDAMENTAL (1)
+#define G_TYPE_NONE			G_TYPE_MAKE_FUNDAMENTAL (1)
 /**
- * XTYPE_INTERFACE:
- *
+ * G_TYPE_INTERFACE:
+ * 
  * The fundamental type from which all interfaces are derived.
  */
-#define XTYPE_INTERFACE		XTYPE_MAKE_FUNDAMENTAL (2)
+#define G_TYPE_INTERFACE		G_TYPE_MAKE_FUNDAMENTAL (2)
 /**
- * XTYPE_CHAR:
+ * G_TYPE_CHAR:
+ * 
+ * The fundamental type corresponding to #gchar.
  *
- * The fundamental type corresponding to #xchar_t.
- *
- * The type designated by %XTYPE_CHAR is unconditionally an 8-bit signed integer.
- * This may or may not be the same type a the C type "xchar_t".
+ * The type designated by %G_TYPE_CHAR is unconditionally an 8-bit signed integer.
+ * This may or may not be the same type a the C type "gchar".
  */
-#define XTYPE_CHAR			XTYPE_MAKE_FUNDAMENTAL (3)
+#define G_TYPE_CHAR			G_TYPE_MAKE_FUNDAMENTAL (3)
 /**
- * XTYPE_UCHAR:
- *
- * The fundamental type corresponding to #xuchar_t.
+ * G_TYPE_UCHAR:
+ * 
+ * The fundamental type corresponding to #guchar.
  */
-#define XTYPE_UCHAR			XTYPE_MAKE_FUNDAMENTAL (4)
+#define G_TYPE_UCHAR			G_TYPE_MAKE_FUNDAMENTAL (4)
 /**
- * XTYPE_BOOLEAN:
- *
- * The fundamental type corresponding to #xboolean_t.
+ * G_TYPE_BOOLEAN:
+ * 
+ * The fundamental type corresponding to #gboolean.
  */
-#define XTYPE_BOOLEAN			XTYPE_MAKE_FUNDAMENTAL (5)
+#define G_TYPE_BOOLEAN			G_TYPE_MAKE_FUNDAMENTAL (5)
 /**
- * XTYPE_INT:
- *
- * The fundamental type corresponding to #xint_t.
+ * G_TYPE_INT:
+ * 
+ * The fundamental type corresponding to #gint.
  */
-#define XTYPE_INT			XTYPE_MAKE_FUNDAMENTAL (6)
+#define G_TYPE_INT			G_TYPE_MAKE_FUNDAMENTAL (6)
 /**
- * XTYPE_UINT:
- *
- * The fundamental type corresponding to #xuint_t.
+ * G_TYPE_UINT:
+ * 
+ * The fundamental type corresponding to #guint.
  */
-#define XTYPE_UINT			XTYPE_MAKE_FUNDAMENTAL (7)
+#define G_TYPE_UINT			G_TYPE_MAKE_FUNDAMENTAL (7)
 /**
- * XTYPE_LONG:
- *
- * The fundamental type corresponding to #xlong_t.
+ * G_TYPE_LONG:
+ * 
+ * The fundamental type corresponding to #glong.
  */
-#define XTYPE_LONG			XTYPE_MAKE_FUNDAMENTAL (8)
+#define G_TYPE_LONG			G_TYPE_MAKE_FUNDAMENTAL (8)
 /**
- * XTYPE_ULONG:
- *
- * The fundamental type corresponding to #xulong_t.
+ * G_TYPE_ULONG:
+ * 
+ * The fundamental type corresponding to #gulong.
  */
-#define XTYPE_ULONG			XTYPE_MAKE_FUNDAMENTAL (9)
+#define G_TYPE_ULONG			G_TYPE_MAKE_FUNDAMENTAL (9)
 /**
- * XTYPE_INT64:
- *
- * The fundamental type corresponding to #sint64_t.
+ * G_TYPE_INT64:
+ * 
+ * The fundamental type corresponding to #gint64.
  */
-#define XTYPE_INT64			XTYPE_MAKE_FUNDAMENTAL (10)
+#define G_TYPE_INT64			G_TYPE_MAKE_FUNDAMENTAL (10)
 /**
- * XTYPE_UINT64:
- *
- * The fundamental type corresponding to #xuint64_t.
+ * G_TYPE_UINT64:
+ * 
+ * The fundamental type corresponding to #guint64.
  */
-#define XTYPE_UINT64			XTYPE_MAKE_FUNDAMENTAL (11)
+#define G_TYPE_UINT64			G_TYPE_MAKE_FUNDAMENTAL (11)
 /**
- * XTYPE_ENUM:
- *
+ * G_TYPE_ENUM:
+ * 
  * The fundamental type from which all enumeration types are derived.
  */
-#define XTYPE_ENUM			XTYPE_MAKE_FUNDAMENTAL (12)
+#define G_TYPE_ENUM			G_TYPE_MAKE_FUNDAMENTAL (12)
 /**
- * XTYPE_FLAGS:
- *
+ * G_TYPE_FLAGS:
+ * 
  * The fundamental type from which all flags types are derived.
  */
-#define XTYPE_FLAGS			XTYPE_MAKE_FUNDAMENTAL (13)
+#define G_TYPE_FLAGS			G_TYPE_MAKE_FUNDAMENTAL (13)
 /**
- * XTYPE_FLOAT:
- *
+ * G_TYPE_FLOAT:
+ * 
  * The fundamental type corresponding to #gfloat.
  */
-#define XTYPE_FLOAT			XTYPE_MAKE_FUNDAMENTAL (14)
+#define G_TYPE_FLOAT			G_TYPE_MAKE_FUNDAMENTAL (14)
 /**
- * XTYPE_DOUBLE:
- *
- * The fundamental type corresponding to #xdouble_t.
+ * G_TYPE_DOUBLE:
+ * 
+ * The fundamental type corresponding to #gdouble.
  */
-#define XTYPE_DOUBLE			XTYPE_MAKE_FUNDAMENTAL (15)
+#define G_TYPE_DOUBLE			G_TYPE_MAKE_FUNDAMENTAL (15)
 /**
- * XTYPE_STRING:
- *
+ * G_TYPE_STRING:
+ * 
  * The fundamental type corresponding to nul-terminated C strings.
  */
-#define XTYPE_STRING			XTYPE_MAKE_FUNDAMENTAL (16)
+#define G_TYPE_STRING			G_TYPE_MAKE_FUNDAMENTAL (16)
 /**
- * XTYPE_POINTER:
- *
- * The fundamental type corresponding to #xpointer_t.
+ * G_TYPE_POINTER:
+ * 
+ * The fundamental type corresponding to #gpointer.
  */
-#define XTYPE_POINTER			XTYPE_MAKE_FUNDAMENTAL (17)
+#define G_TYPE_POINTER			G_TYPE_MAKE_FUNDAMENTAL (17)
 /**
- * XTYPE_BOXED:
- *
+ * G_TYPE_BOXED:
+ * 
  * The fundamental type from which all boxed types are derived.
  */
-#define XTYPE_BOXED			XTYPE_MAKE_FUNDAMENTAL (18)
+#define G_TYPE_BOXED			G_TYPE_MAKE_FUNDAMENTAL (18)
 /**
- * XTYPE_PARAM:
- *
- * The fundamental type from which all #xparam_spec_t types are derived.
+ * G_TYPE_PARAM:
+ * 
+ * The fundamental type from which all #GParamSpec types are derived.
  */
-#define XTYPE_PARAM			XTYPE_MAKE_FUNDAMENTAL (19)
+#define G_TYPE_PARAM			G_TYPE_MAKE_FUNDAMENTAL (19)
 /**
- * XTYPE_OBJECT:
- *
- * The fundamental type for #xobject_t.
+ * G_TYPE_OBJECT:
+ * 
+ * The fundamental type for #GObject.
  */
-#define XTYPE_OBJECT			XTYPE_MAKE_FUNDAMENTAL (20)
+#define G_TYPE_OBJECT			G_TYPE_MAKE_FUNDAMENTAL (20)
 /**
- * XTYPE_VARIANT:
+ * G_TYPE_VARIANT:
  *
- * The fundamental type corresponding to #xvariant_t.
+ * The fundamental type corresponding to #GVariant.
  *
- * All floating #xvariant_t instances passed through the #xtype_t system are
+ * All floating #GVariant instances passed through the #GType system are
  * consumed.
- *
+ * 
  * Note that callbacks in closures, and signal handlers
- * for signals of return type %XTYPE_VARIANT, must never return floating
+ * for signals of return type %G_TYPE_VARIANT, must never return floating
  * variants.
  *
  * Note: GLib 2.24 did include a boxed type with this name. It was replaced
@@ -195,188 +195,188 @@ G_BEGIN_DECLS
  *
  * Since: 2.26
  */
-#define	XTYPE_VARIANT                  XTYPE_MAKE_FUNDAMENTAL (21)
+#define	G_TYPE_VARIANT                  G_TYPE_MAKE_FUNDAMENTAL (21)
 
 
 /* Reserved fundamental type numbers to create new fundamental
- * type IDs with XTYPE_MAKE_FUNDAMENTAL().
+ * type IDs with G_TYPE_MAKE_FUNDAMENTAL().
  *
  * Open an issue on https://gitlab.gnome.org/GNOME/glib/issues/new for
  * reservations.
  */
 /**
- * XTYPE_FUNDAMENTAL_SHIFT:
+ * G_TYPE_FUNDAMENTAL_SHIFT:
  *
  * Shift value used in converting numbers to type IDs.
  */
-#define	XTYPE_FUNDAMENTAL_SHIFT	(2)
+#define	G_TYPE_FUNDAMENTAL_SHIFT	(2)
 /**
- * XTYPE_MAKE_FUNDAMENTAL:
+ * G_TYPE_MAKE_FUNDAMENTAL:
  * @x: the fundamental type number.
- *
+ * 
  * Get the type ID for the fundamental type number @x.
  *
- * Use xtype_fundamental_next() instead of this macro to create new fundamental
+ * Use g_type_fundamental_next() instead of this macro to create new fundamental 
  * types.
  *
- * Returns: the xtype_t
+ * Returns: the GType
  */
-#define	XTYPE_MAKE_FUNDAMENTAL(x)	((xtype_t) ((x) << XTYPE_FUNDAMENTAL_SHIFT))
+#define	G_TYPE_MAKE_FUNDAMENTAL(x)	((GType) ((x) << G_TYPE_FUNDAMENTAL_SHIFT))
 /**
- * XTYPE_RESERVED_XPL_FIRST:
- *
+ * G_TYPE_RESERVED_GLIB_FIRST:
+ * 
  * First fundamental type number to create a new fundamental type id with
- * XTYPE_MAKE_FUNDAMENTAL() reserved for GLib.
+ * G_TYPE_MAKE_FUNDAMENTAL() reserved for GLib.
  */
-#define XTYPE_RESERVED_XPL_FIRST	(22)
+#define G_TYPE_RESERVED_GLIB_FIRST	(22)
 /**
- * XTYPE_RESERVED_XPL_LAST:
- *
+ * G_TYPE_RESERVED_GLIB_LAST:
+ * 
  * Last fundamental type number reserved for GLib.
  */
-#define XTYPE_RESERVED_XPL_LAST	(31)
+#define G_TYPE_RESERVED_GLIB_LAST	(31)
 /**
- * XTYPE_RESERVED_BSE_FIRST:
- *
+ * G_TYPE_RESERVED_BSE_FIRST:
+ * 
  * First fundamental type number to create a new fundamental type id with
- * XTYPE_MAKE_FUNDAMENTAL() reserved for BSE.
+ * G_TYPE_MAKE_FUNDAMENTAL() reserved for BSE.
  */
-#define XTYPE_RESERVED_BSE_FIRST	(32)
+#define G_TYPE_RESERVED_BSE_FIRST	(32)
 /**
- * XTYPE_RESERVED_BSE_LAST:
- *
+ * G_TYPE_RESERVED_BSE_LAST:
+ * 
  * Last fundamental type number reserved for BSE.
  */
-#define XTYPE_RESERVED_BSE_LAST	(48)
+#define G_TYPE_RESERVED_BSE_LAST	(48)
 /**
- * XTYPE_RESERVED_USER_FIRST:
- *
- * First available fundamental type number to create new fundamental
- * type id with XTYPE_MAKE_FUNDAMENTAL().
+ * G_TYPE_RESERVED_USER_FIRST:
+ * 
+ * First available fundamental type number to create new fundamental 
+ * type id with G_TYPE_MAKE_FUNDAMENTAL().
  */
-#define XTYPE_RESERVED_USER_FIRST	(49)
+#define G_TYPE_RESERVED_USER_FIRST	(49)
 
 
 /* Type Checking Macros
  */
 /**
- * XTYPE_IS_FUNDAMENTAL:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_FUNDAMENTAL:
+ * @type: A #GType value
+ * 
  * Checks if @type is a fundamental type.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_FUNDAMENTAL(type)             ((type) <= XTYPE_FUNDAMENTAL_MAX)
+#define G_TYPE_IS_FUNDAMENTAL(type)             ((type) <= G_TYPE_FUNDAMENTAL_MAX)
 /**
- * XTYPE_IS_DERIVED:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_DERIVED:
+ * @type: A #GType value
+ * 
  * Checks if @type is derived (or in object-oriented terminology:
  * inherited) from another type (this holds true for all non-fundamental
  * types).
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_DERIVED(type)                 ((type) > XTYPE_FUNDAMENTAL_MAX)
+#define G_TYPE_IS_DERIVED(type)                 ((type) > G_TYPE_FUNDAMENTAL_MAX)
 /**
- * XTYPE_IS_INTERFACE:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_INTERFACE:
+ * @type: A #GType value
+ * 
  * Checks if @type is an interface type.
  *
  * An interface type provides a pure API, the implementation
  * of which is provided by another type (which is then said to conform
  * to the interface).  GLib interfaces are somewhat analogous to Java
- * interfaces and C++ classes containing only pure virtual functions,
- * with the difference that xtype_t interfaces are not derivable (but see
- * xtype_interface_add_prerequisite() for an alternative).
+ * interfaces and C++ classes containing only pure virtual functions, 
+ * with the difference that GType interfaces are not derivable (but see
+ * g_type_interface_add_prerequisite() for an alternative).
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_INTERFACE(type)               (XTYPE_FUNDAMENTAL (type) == XTYPE_INTERFACE)
+#define G_TYPE_IS_INTERFACE(type)               (G_TYPE_FUNDAMENTAL (type) == G_TYPE_INTERFACE)
 /**
- * XTYPE_IS_CLASSED:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_CLASSED:
+ * @type: A #GType value
+ * 
  * Checks if @type is a classed type.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_CLASSED(type)                 (xtype_test_flags ((type), XTYPE_FLAG_CLASSED))
+#define G_TYPE_IS_CLASSED(type)                 (g_type_test_flags ((type), G_TYPE_FLAG_CLASSED))
 /**
- * XTYPE_IS_INSTANTIATABLE:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_INSTANTIATABLE:
+ * @type: A #GType value
+ * 
  * Checks if @type can be instantiated.  Instantiation is the
  * process of creating an instance (object) of this type.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_INSTANTIATABLE(type)          (xtype_test_flags ((type), XTYPE_FLAG_INSTANTIATABLE))
+#define G_TYPE_IS_INSTANTIATABLE(type)          (g_type_test_flags ((type), G_TYPE_FLAG_INSTANTIATABLE))
 /**
- * XTYPE_IS_DERIVABLE:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_DERIVABLE:
+ * @type: A #GType value
+ * 
  * Checks if @type is a derivable type.  A derivable type can
  * be used as the base class of a flat (single-level) class hierarchy.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_DERIVABLE(type)               (xtype_test_flags ((type), XTYPE_FLAG_DERIVABLE))
+#define G_TYPE_IS_DERIVABLE(type)               (g_type_test_flags ((type), G_TYPE_FLAG_DERIVABLE))
 /**
- * XTYPE_IS_DEEP_DERIVABLE:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_DEEP_DERIVABLE:
+ * @type: A #GType value
+ * 
  * Checks if @type is a deep derivable type.  A deep derivable type
  * can be used as the base class of a deep (multi-level) class hierarchy.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_DEEP_DERIVABLE(type)          (xtype_test_flags ((type), XTYPE_FLAG_DEEP_DERIVABLE))
+#define G_TYPE_IS_DEEP_DERIVABLE(type)          (g_type_test_flags ((type), G_TYPE_FLAG_DEEP_DERIVABLE))
 /**
- * XTYPE_IS_ABSTRACT:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_ABSTRACT:
+ * @type: A #GType value
+ * 
  * Checks if @type is an abstract type.  An abstract type cannot be
  * instantiated and is normally used as an abstract base class for
  * derived classes.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_ABSTRACT(type)                (xtype_test_flags ((type), XTYPE_FLAG_ABSTRACT))
+#define G_TYPE_IS_ABSTRACT(type)                (g_type_test_flags ((type), G_TYPE_FLAG_ABSTRACT))
 /**
- * XTYPE_IS_VALUE_ABSTRACT:
- * @type: A #xtype_t value
- *
+ * G_TYPE_IS_VALUE_ABSTRACT:
+ * @type: A #GType value
+ * 
  * Checks if @type is an abstract value type.  An abstract value type introduces
- * a value table, but can't be used for xvalue_init() and is normally used as
+ * a value table, but can't be used for g_value_init() and is normally used as
  * an abstract base type for derived value types.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_VALUE_ABSTRACT(type)          (xtype_test_flags ((type), XTYPE_FLAG_VALUE_ABSTRACT))
+#define G_TYPE_IS_VALUE_ABSTRACT(type)          (g_type_test_flags ((type), G_TYPE_FLAG_VALUE_ABSTRACT))
 /**
- * XTYPE_IS_VALUE_TYPE:
- * @type: A #xtype_t value
- *
- * Checks if @type is a value type and can be used with xvalue_init().
+ * G_TYPE_IS_VALUE_TYPE:
+ * @type: A #GType value
+ * 
+ * Checks if @type is a value type and can be used with g_value_init(). 
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_IS_VALUE_TYPE(type)              (xtype_check_is_value_type (type))
+#define G_TYPE_IS_VALUE_TYPE(type)              (g_type_check_is_value_type (type))
 /**
- * XTYPE_HAS_VALUE_TABLE:
- * @type: A #xtype_t value
- *
- * Checks if @type has a #xtype_value_table_t.
+ * G_TYPE_HAS_VALUE_TABLE:
+ * @type: A #GType value
+ * 
+ * Checks if @type has a #GTypeValueTable.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_HAS_VALUE_TABLE(type)            (xtype_value_table_peek (type) != NULL)
+#define G_TYPE_HAS_VALUE_TABLE(type)            (g_type_value_table_peek (type) != NULL)
 /**
- * XTYPE_IS_FINAL:
- * @type: a #xtype_t value
+ * G_TYPE_IS_FINAL:
+ * @type: a #GType value
  *
  * Checks if @type is a final type. A final type cannot be derived any
  * further.
@@ -385,85 +385,85 @@ G_BEGIN_DECLS
  *
  * Since: 2.70
  */
-#define XTYPE_IS_FINAL(type)                   (xtype_test_flags ((type), XTYPE_FLAG_FINAL)) XPL_AVAILABLE_MACRO_IN_2_70
+#define G_TYPE_IS_FINAL(type)                   (g_type_test_flags ((type), G_TYPE_FLAG_FINAL)) GLIB_AVAILABLE_MACRO_IN_2_70
 
 
 /* Typedefs
  */
 /**
- * xtype_t:
- *
+ * GType:
+ * 
  * A numerical value which represents the unique identifier of a registered
  * type.
  */
-#if     XPL_SIZEOF_SIZE_T != XPL_SIZEOF_LONG || !defined __cplusplus
-typedef xsize_t                           xtype_t;
-#else   /* for historic reasons, C++ links against xulong_t GTypes */
-typedef xulong_t                          xtype_t;
+#if     GLIB_SIZEOF_SIZE_T != GLIB_SIZEOF_LONG || !defined __cplusplus
+typedef gsize                           GType;
+#else   /* for historic reasons, C++ links against gulong GTypes */
+typedef gulong                          GType;
 #endif
-typedef struct _GValue                  xvalue_t;
-typedef union  _xtype_c_value             xtype_c_value_t;
+typedef struct _GValue                  GValue;
+typedef union  _GTypeCValue             GTypeCValue;
 typedef struct _GTypePlugin             GTypePlugin;
-typedef struct _GTypeClass              xtype_class_t;
-typedef struct _GTypeInterface          xtype_interface_t;
+typedef struct _GTypeClass              GTypeClass;
+typedef struct _GTypeInterface          GTypeInterface;
 typedef struct _GTypeInstance           GTypeInstance;
-typedef struct _GTypeInfo               xtype_info_t;
+typedef struct _GTypeInfo               GTypeInfo;
 typedef struct _GTypeFundamentalInfo    GTypeFundamentalInfo;
-typedef struct _GInterfaceInfo          xinterface_info_t;
-typedef struct _xtype_value_table_t         xtype_value_table_t;
+typedef struct _GInterfaceInfo          GInterfaceInfo;
+typedef struct _GTypeValueTable         GTypeValueTable;
 typedef struct _GTypeQuery		GTypeQuery;
 
 
 /* Basic Type Structures
  */
 /**
- * xtype_class_t:
- *
+ * GTypeClass:
+ * 
  * An opaque structure used as the base of all classes.
  */
 struct _GTypeClass
 {
   /*< private >*/
-  xtype_t g_type;
+  GType g_type;
 };
 /**
  * GTypeInstance:
- *
+ * 
  * An opaque structure used as the base of all type instances.
  */
 struct _GTypeInstance
 {
   /*< private >*/
-  xtype_class_t *g_class;
+  GTypeClass *g_class;
 };
 /**
- * xtype_interface_t:
- *
+ * GTypeInterface:
+ * 
  * An opaque structure used as the base of all interface types.
  */
 struct _GTypeInterface
 {
   /*< private >*/
-  xtype_t g_type;         /* iface type */
-  xtype_t g_instance_type;
+  GType g_type;         /* iface type */
+  GType g_instance_type;
 };
 /**
  * GTypeQuery:
- * @type: the #xtype_t value of the type
+ * @type: the #GType value of the type
  * @type_name: the name of the type
  * @class_size: the size of the class structure
  * @instance_size: the size of the instance structure
- *
+ * 
  * A structure holding information for a specific type.
  *
- * See also: xtype_query()
+ * See also: g_type_query()
  */
 struct _GTypeQuery
 {
-  xtype_t		type;
-  const xchar_t  *type_name;
-  xuint_t		class_size;
-  xuint_t		instance_size;
+  GType		type;
+  const gchar  *type_name;
+  guint		class_size;
+  guint		instance_size;
 };
 
 
@@ -472,48 +472,48 @@ struct _GTypeQuery
  */
 /*< protected >*/
 /**
- * XTYPE_CHECK_INSTANCE:
+ * G_TYPE_CHECK_INSTANCE:
  * @instance: Location of a #GTypeInstance structure
- *
+ * 
  * Checks if @instance is a valid #GTypeInstance structure,
  * otherwise issues a warning and returns %FALSE. %NULL is not a valid
  * #GTypeInstance.
- *
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_CHECK_INSTANCE(instance)				(_XTYPE_CHI ((GTypeInstance*) (instance)))
+#define G_TYPE_CHECK_INSTANCE(instance)				(_G_TYPE_CHI ((GTypeInstance*) (instance)))
 /**
- * XTYPE_CHECK_INSTANCE_CAST:
+ * G_TYPE_CHECK_INSTANCE_CAST:
  * @instance: (nullable): Location of a #GTypeInstance structure
  * @g_type: The type to be returned
- * @c_type_t: The corresponding C type of @g_type
- *
+ * @c_type: The corresponding C type of @g_type
+ * 
  * Checks that @instance is an instance of the type identified by @g_type
- * and issues a warning if this is not the case. Returns @instance casted
+ * and issues a warning if this is not the case. Returns @instance casted 
  * to a pointer to @c_type.
  *
  * No warning will be issued if @instance is %NULL, and %NULL will be returned.
- *
+ * 
  * This macro should only be used in type implementations.
  */
-#define XTYPE_CHECK_INSTANCE_CAST(instance, g_type, c_type_t)    (_XTYPE_CIC ((instance), (g_type), c_type_t))
+#define G_TYPE_CHECK_INSTANCE_CAST(instance, g_type, c_type)    (_G_TYPE_CIC ((instance), (g_type), c_type))
 /**
- * XTYPE_CHECK_INSTANCE_TYPE:
+ * G_TYPE_CHECK_INSTANCE_TYPE:
  * @instance: (nullable): Location of a #GTypeInstance structure.
  * @g_type: The type to be checked
- *
+ * 
  * Checks if @instance is an instance of the type identified by @g_type. If
  * @instance is %NULL, %FALSE will be returned.
- *
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_CHECK_INSTANCE_TYPE(instance, g_type)            (_XTYPE_CIT ((instance), (g_type)))
+#define G_TYPE_CHECK_INSTANCE_TYPE(instance, g_type)            (_G_TYPE_CIT ((instance), (g_type)))
 /**
- * XTYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE:
+ * G_TYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE:
  * @instance: (nullable): Location of a #GTypeInstance structure.
  * @g_type: The fundamental type to be checked
  *
@@ -524,261 +524,261 @@ struct _GTypeQuery
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE(instance, g_type)            (_XTYPE_CIFT ((instance), (g_type)))
+#define G_TYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE(instance, g_type)            (_G_TYPE_CIFT ((instance), (g_type)))
 /**
- * XTYPE_INSTANCE_GET_CLASS:
+ * G_TYPE_INSTANCE_GET_CLASS:
  * @instance: Location of the #GTypeInstance structure
- * @g_type: The #xtype_t of the class to be returned
+ * @g_type: The #GType of the class to be returned
  * @c_type: The C type of the class structure
- *
+ * 
  * Get the class structure of a given @instance, casted
  * to a specified ancestor type @g_type of the instance.
- *
- * Note that while calling a xinstance_init_func_t(), the class pointer
+ * 
+ * Note that while calling a GInstanceInitFunc(), the class pointer
  * gets modified, so it might not always return the expected pointer.
- *
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: a pointer to the class structure
  */
-#define XTYPE_INSTANCE_GET_CLASS(instance, g_type, c_type)     (_XTYPE_IGC ((instance), (g_type), c_type))
+#define G_TYPE_INSTANCE_GET_CLASS(instance, g_type, c_type)     (_G_TYPE_IGC ((instance), (g_type), c_type))
 /**
- * XTYPE_INSTANCE_GET_INTERFACE:
+ * G_TYPE_INSTANCE_GET_INTERFACE:
  * @instance: Location of the #GTypeInstance structure
- * @g_type: The #xtype_t of the interface to be returned
+ * @g_type: The #GType of the interface to be returned
  * @c_type: The C type of the interface structure
- *
+ * 
  * Get the interface structure for interface @g_type of a given @instance.
- *
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: a pointer to the interface structure
  */
-#define XTYPE_INSTANCE_GET_INTERFACE(instance, g_type, c_type) (_XTYPE_IGI ((instance), (g_type), c_type))
+#define G_TYPE_INSTANCE_GET_INTERFACE(instance, g_type, c_type) (_G_TYPE_IGI ((instance), (g_type), c_type))
 /**
- * XTYPE_CHECK_CLASS_CAST:
- * @g_class: Location of a #xtype_class_t structure
+ * G_TYPE_CHECK_CLASS_CAST:
+ * @g_class: Location of a #GTypeClass structure
  * @g_type: The type to be returned
  * @c_type: The corresponding C type of class structure of @g_type
- *
+ * 
  * Checks that @g_class is a class structure of the type identified by @g_type
- * and issues a warning if this is not the case. Returns @g_class casted
+ * and issues a warning if this is not the case. Returns @g_class casted 
  * to a pointer to @c_type. %NULL is not a valid class structure.
- *
+ * 
  * This macro should only be used in type implementations.
  */
-#define XTYPE_CHECK_CLASS_CAST(g_class, g_type, c_type)        (_XTYPE_CCC ((g_class), (g_type), c_type))
+#define G_TYPE_CHECK_CLASS_CAST(g_class, g_type, c_type)        (_G_TYPE_CCC ((g_class), (g_type), c_type))
 /**
- * XTYPE_CHECK_CLASS_TYPE:
- * @g_class: (nullable): Location of a #xtype_class_t structure
+ * G_TYPE_CHECK_CLASS_TYPE:
+ * @g_class: (nullable): Location of a #GTypeClass structure
  * @g_type: The type to be checked
- *
- * Checks if @g_class is a class structure of the type identified by
+ * 
+ * Checks if @g_class is a class structure of the type identified by 
  * @g_type. If @g_class is %NULL, %FALSE will be returned.
- *
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_CHECK_CLASS_TYPE(g_class, g_type)                (_XTYPE_CCT ((g_class), (g_type)))
+#define G_TYPE_CHECK_CLASS_TYPE(g_class, g_type)                (_G_TYPE_CCT ((g_class), (g_type)))
 /**
- * XTYPE_CHECK_VALUE:
- * @value: a #xvalue_t
- *
+ * G_TYPE_CHECK_VALUE:
+ * @value: a #GValue
+ * 
  * Checks if @value has been initialized to hold values
  * of a value type.
- *
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_CHECK_VALUE(value)				(_XTYPE_CHV ((value)))
+#define G_TYPE_CHECK_VALUE(value)				(_G_TYPE_CHV ((value)))
 /**
- * XTYPE_CHECK_VALUE_TYPE:
- * @value: a #xvalue_t
+ * G_TYPE_CHECK_VALUE_TYPE:
+ * @value: a #GValue
  * @g_type: The type to be checked
- *
+ * 
  * Checks if @value has been initialized to hold values
- * of type @g_type.
- *
+ * of type @g_type. 
+ * 
  * This macro should only be used in type implementations.
  *
  * Returns: %TRUE on success
  */
-#define XTYPE_CHECK_VALUE_TYPE(value, g_type)			(_XTYPE_CVH ((value), (g_type)))
+#define G_TYPE_CHECK_VALUE_TYPE(value, g_type)			(_G_TYPE_CVH ((value), (g_type)))
 /**
- * XTYPE_FROM_INSTANCE:
+ * G_TYPE_FROM_INSTANCE:
  * @instance: Location of a valid #GTypeInstance structure
- *
- * Get the type identifier from a given @instance structure.
- *
+ * 
+ * Get the type identifier from a given @instance structure. 
+ * 
  * This macro should only be used in type implementations.
  *
- * Returns: the #xtype_t
+ * Returns: the #GType
  */
-#define XTYPE_FROM_INSTANCE(instance)                          (XTYPE_FROM_CLASS (((GTypeInstance*) (instance))->g_class))
+#define G_TYPE_FROM_INSTANCE(instance)                          (G_TYPE_FROM_CLASS (((GTypeInstance*) (instance))->g_class))
 /**
- * XTYPE_FROM_CLASS:
- * @g_class: Location of a valid #xtype_class_t structure
- *
+ * G_TYPE_FROM_CLASS:
+ * @g_class: Location of a valid #GTypeClass structure
+ * 
  * Get the type identifier from a given @class structure.
- *
+ * 
  * This macro should only be used in type implementations.
  *
- * Returns: the #xtype_t
+ * Returns: the #GType
  */
-#define XTYPE_FROM_CLASS(g_class)                              (((xtype_class_t*) (g_class))->g_type)
+#define G_TYPE_FROM_CLASS(g_class)                              (((GTypeClass*) (g_class))->g_type)
 /**
- * XTYPE_FROM_INTERFACE:
- * @x_iface: Location of a valid #xtype_interface_t structure
- *
+ * G_TYPE_FROM_INTERFACE:
+ * @g_iface: Location of a valid #GTypeInterface structure
+ * 
  * Get the type identifier from a given @interface structure.
- *
+ * 
  * This macro should only be used in type implementations.
  *
- * Returns: the #xtype_t
+ * Returns: the #GType
  */
-#define XTYPE_FROM_INTERFACE(x_iface)                          (((xtype_interface_t*) (x_iface))->g_type)
+#define G_TYPE_FROM_INTERFACE(g_iface)                          (((GTypeInterface*) (g_iface))->g_type)
 
 /**
- * XTYPE_INSTANCE_GET_PRIVATE:
+ * G_TYPE_INSTANCE_GET_PRIVATE:
  * @instance: the instance of a type deriving from @private_type
  * @g_type: the type identifying which private data to retrieve
  * @c_type: The C type for the private structure
- *
+ * 
  * Gets the private structure for a particular type.
  *
  * The private structure must have been registered in the
- * class_init function with xtype_class_add_private().
- *
+ * class_init function with g_type_class_add_private().
+ * 
  * This macro should only be used in type implementations.
- *
+ * 
  * Since: 2.4
  * Deprecated: 2.58: Use G_ADD_PRIVATE() and the generated
  *   `your_type_get_instance_private()` function instead
  * Returns: (not nullable): a pointer to the private data structure
  */
-#define XTYPE_INSTANCE_GET_PRIVATE(instance, g_type, c_type)   ((c_type*) xtype_instance_get_private ((GTypeInstance*) (instance), (g_type))) XPL_DEPRECATED_MACRO_IN_2_58_FOR(G_ADD_PRIVATE)
+#define G_TYPE_INSTANCE_GET_PRIVATE(instance, g_type, c_type)   ((c_type*) g_type_instance_get_private ((GTypeInstance*) (instance), (g_type))) GLIB_DEPRECATED_MACRO_IN_2_58_FOR(G_ADD_PRIVATE)
 
 /**
- * XTYPE_CLASS_GET_PRIVATE:
+ * G_TYPE_CLASS_GET_PRIVATE:
  * @klass: the class of a type deriving from @private_type
  * @g_type: the type identifying which private data to retrieve
  * @c_type: The C type for the private structure
- *
+ * 
  * Gets the private class structure for a particular type.
  *
  * The private structure must have been registered in the
- * get_type() function with xtype_add_class_private().
- *
+ * get_type() function with g_type_add_class_private().
+ * 
  * This macro should only be used in type implementations.
- *
+ * 
  * Since: 2.24
  * Returns: (not nullable): a pointer to the private data structure
  */
-#define XTYPE_CLASS_GET_PRIVATE(klass, g_type, c_type)   ((c_type*) xtype_class_get_private ((xtype_class_t*) (klass), (g_type)))
+#define G_TYPE_CLASS_GET_PRIVATE(klass, g_type, c_type)   ((c_type*) g_type_class_get_private ((GTypeClass*) (klass), (g_type)))
 
 /**
  * GTypeDebugFlags:
- * @XTYPE_DEBUG_NONE: Print no messages
- * @XTYPE_DEBUG_OBJECTS: Print messages about object bookkeeping
- * @XTYPE_DEBUG_SIGNALS: Print messages about signal emissions
- * @XTYPE_DEBUG_MASK: Mask covering all debug flags
- * @XTYPE_DEBUG_INSTANCE_COUNT: Keep a count of instances of each type
+ * @G_TYPE_DEBUG_NONE: Print no messages
+ * @G_TYPE_DEBUG_OBJECTS: Print messages about object bookkeeping
+ * @G_TYPE_DEBUG_SIGNALS: Print messages about signal emissions
+ * @G_TYPE_DEBUG_MASK: Mask covering all debug flags
+ * @G_TYPE_DEBUG_INSTANCE_COUNT: Keep a count of instances of each type
  *
- * These flags used to be passed to xtype_init_with_debug_flags() which
+ * These flags used to be passed to g_type_init_with_debug_flags() which
  * is now deprecated.
  *
  * If you need to enable debugging features, use the GOBJECT_DEBUG
  * environment variable.
  *
- * Deprecated: 2.36: xtype_init() is now done automatically
+ * Deprecated: 2.36: g_type_init() is now done automatically
  */
 typedef enum	/*< skip >*/
 {
-  XTYPE_DEBUG_NONE	= 0,
-  XTYPE_DEBUG_OBJECTS	= 1 << 0,
-  XTYPE_DEBUG_SIGNALS	= 1 << 1,
-  XTYPE_DEBUG_INSTANCE_COUNT = 1 << 2,
-  XTYPE_DEBUG_MASK	= 0x07
-} GTypeDebugFlags XPL_DEPRECATED_TYPE_IN_2_36;
+  G_TYPE_DEBUG_NONE	= 0,
+  G_TYPE_DEBUG_OBJECTS	= 1 << 0,
+  G_TYPE_DEBUG_SIGNALS	= 1 << 1,
+  G_TYPE_DEBUG_INSTANCE_COUNT = 1 << 2,
+  G_TYPE_DEBUG_MASK	= 0x07
+} GTypeDebugFlags GLIB_DEPRECATED_TYPE_IN_2_36;
 
 
 /* --- prototypes --- */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_DEPRECATED_IN_2_36
-void                  xtype_init                    (void);
-XPL_DEPRECATED_IN_2_36
-void                  xtype_init_with_debug_flags   (GTypeDebugFlags  debug_flags);
+GLIB_DEPRECATED_IN_2_36
+void                  g_type_init                    (void);
+GLIB_DEPRECATED_IN_2_36
+void                  g_type_init_with_debug_flags   (GTypeDebugFlags  debug_flags);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         xtype_name                    (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-xquark                xtype_qname                   (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xtype_from_name               (const xchar_t     *name);
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xtype_parent                  (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-xuint_t                 xtype_depth                   (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xtype_next_base               (xtype_t            leaf_type,
-						      xtype_t            root_type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xtype_is_a                    (xtype_t            type,
-						      xtype_t            is_a_type);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_class_ref               (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_class_peek              (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_class_peek_static       (xtype_t            type);
-XPL_AVAILABLE_IN_ALL
-void                  xtype_class_unref             (xpointer_t         g_class);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_class_peek_parent       (xpointer_t         g_class);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_interface_peek          (xpointer_t         instance_class,
-						      xtype_t            iface_type);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_interface_peek_parent   (xpointer_t         x_iface);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_type_name                    (GType            type);
+GLIB_AVAILABLE_IN_ALL
+GQuark                g_type_qname                   (GType            type);
+GLIB_AVAILABLE_IN_ALL
+GType                 g_type_from_name               (const gchar     *name);
+GLIB_AVAILABLE_IN_ALL
+GType                 g_type_parent                  (GType            type);
+GLIB_AVAILABLE_IN_ALL
+guint                 g_type_depth                   (GType            type);
+GLIB_AVAILABLE_IN_ALL
+GType                 g_type_next_base               (GType            leaf_type,
+						      GType            root_type);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_type_is_a                    (GType            type,
+						      GType            is_a_type);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_class_ref               (GType            type);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_class_peek              (GType            type);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_class_peek_static       (GType            type);
+GLIB_AVAILABLE_IN_ALL
+void                  g_type_class_unref             (gpointer         g_class);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_class_peek_parent       (gpointer         g_class);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_interface_peek          (gpointer         instance_class,
+						      GType            iface_type);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_interface_peek_parent   (gpointer         g_iface);
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_default_interface_ref   (xtype_t            g_type);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_default_interface_peek  (xtype_t            g_type);
-XPL_AVAILABLE_IN_ALL
-void                  xtype_default_interface_unref (xpointer_t         x_iface);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_default_interface_ref   (GType            g_type);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_default_interface_peek  (GType            g_type);
+GLIB_AVAILABLE_IN_ALL
+void                  g_type_default_interface_unref (gpointer         g_iface);
 
 /* g_free() the returned arrays */
-XPL_AVAILABLE_IN_ALL
-xtype_t*                xtype_children                (xtype_t            type,
-						      xuint_t           *n_children);
-XPL_AVAILABLE_IN_ALL
-xtype_t*                xtype_interfaces              (xtype_t            type,
-						      xuint_t           *n_interfaces);
+GLIB_AVAILABLE_IN_ALL
+GType*                g_type_children                (GType            type,
+						      guint           *n_children);
+GLIB_AVAILABLE_IN_ALL
+GType*                g_type_interfaces              (GType            type,
+						      guint           *n_interfaces);
 
 /* per-type _static_ data */
-XPL_AVAILABLE_IN_ALL
-void                  xtype_set_qdata               (xtype_t            type,
-						      xquark           quark,
-						      xpointer_t         data);
-XPL_AVAILABLE_IN_ALL
-xpointer_t              xtype_get_qdata               (xtype_t            type,
-						      xquark           quark);
-XPL_AVAILABLE_IN_ALL
-void		      xtype_query		     (xtype_t	       type,
+GLIB_AVAILABLE_IN_ALL
+void                  g_type_set_qdata               (GType            type,
+						      GQuark           quark,
+						      gpointer         data);
+GLIB_AVAILABLE_IN_ALL
+gpointer              g_type_get_qdata               (GType            type,
+						      GQuark           quark);
+GLIB_AVAILABLE_IN_ALL
+void		      g_type_query		     (GType	       type,
 						      GTypeQuery      *query);
 
-XPL_AVAILABLE_IN_2_44
-int                   xtype_get_instance_count      (xtype_t            type);
+GLIB_AVAILABLE_IN_2_44
+int                   g_type_get_instance_count      (GType            type);
 
 /* --- type registration --- */
 /**
- * xbase_init_func_t:
- * @g_class: (type xobject_t.TypeClass): The #xtype_class_t structure to initialize
- *
+ * GBaseInitFunc:
+ * @g_class: (type GObject.TypeClass): The #GTypeClass structure to initialize
+ * 
  * A callback function used by the type system to do base initialization
  * of the class structures of derived types.
  *
@@ -788,68 +788,68 @@ int                   xtype_get_instance_count      (xtype_t            type);
  *
  * For example, class members (such as strings) that are not sufficiently
  * handled by a plain memory copy of the parent class into the derived class
- * have to be altered. See xclass_init_func_t() for a discussion of the class
+ * have to be altered. See GClassInitFunc() for a discussion of the class
  * initialization process.
  */
-typedef void   (*xbase_init_func_t)              (xpointer_t         g_class);
+typedef void   (*GBaseInitFunc)              (gpointer         g_class);
 /**
- * xbase_finalize_func_t:
- * @g_class: (type xobject_t.TypeClass): The #xtype_class_t structure to finalize
- *
+ * GBaseFinalizeFunc:
+ * @g_class: (type GObject.TypeClass): The #GTypeClass structure to finalize
+ * 
  * A callback function used by the type system to finalize those portions
  * of a derived types class structure that were setup from the corresponding
- * xbase_init_func_t() function.
+ * GBaseInitFunc() function.
  *
  * Class finalization basically works the inverse way in which class
  * initialization is performed.
  *
- * See xclass_init_func_t() for a discussion of the class initialization process.
+ * See GClassInitFunc() for a discussion of the class initialization process.
  */
-typedef void   (*xbase_finalize_func_t)          (xpointer_t         g_class);
+typedef void   (*GBaseFinalizeFunc)          (gpointer         g_class);
 /**
- * xclass_init_func_t:
- * @g_class: (type xobject_t.TypeClass): The #xtype_class_t structure to initialize.
- * @class_data: The @class_data member supplied via the #xtype_info_t structure.
- *
+ * GClassInitFunc:
+ * @g_class: (type GObject.TypeClass): The #GTypeClass structure to initialize.
+ * @class_data: The @class_data member supplied via the #GTypeInfo structure.
+ * 
  * A callback function used by the type system to initialize the class
  * of a specific type.
  *
  * This function should initialize all static class members.
  *
  * The initialization process of a class involves:
- *
+ * 
  * - Copying common members from the parent class over to the
  *   derived class structure.
  * - Zero initialization of the remaining members not copied
  *   over from the parent class.
- * - Invocation of the xbase_init_func_t() initializers of all parent
+ * - Invocation of the GBaseInitFunc() initializers of all parent
  *   types and the class' type.
- * - Invocation of the class' xclass_init_func_t() initializer.
+ * - Invocation of the class' GClassInitFunc() initializer.
  *
  * Since derived classes are partially initialized through a memory copy
- * of the parent class, the general rule is that xbase_init_func_t() and
- * xbase_finalize_func_t() should take care of necessary reinitialization
+ * of the parent class, the general rule is that GBaseInitFunc() and
+ * GBaseFinalizeFunc() should take care of necessary reinitialization
  * and release of those class members that were introduced by the type
- * that specified these xbase_init_func_t()/xbase_finalize_func_t().
- * xclass_init_func_t() should only care about initializing static
+ * that specified these GBaseInitFunc()/GBaseFinalizeFunc().
+ * GClassInitFunc() should only care about initializing static
  * class members, while dynamic class members (such as allocated strings
- * or reference counted resources) are better handled by a xbase_init_func_t()
+ * or reference counted resources) are better handled by a GBaseInitFunc()
  * for this type, so proper initialization of the dynamic class members
  * is performed for class initialization of derived types as well.
  *
  * An example may help to correspond the intend of the different class
  * initializers:
- *
+ * 
  * |[<!-- language="C" -->
  * typedef struct {
- *   xobject_class_t parent_class;
- *   xint_t         static_integer;
- *   xchar_t       *dynamic_string;
+ *   GObjectClass parent_class;
+ *   gint         static_integer;
+ *   gchar       *dynamic_string;
  * } TypeAClass;
  * static void
  * type_a_base_class_init (TypeAClass *class)
  * {
- *   class->dynamic_string = xstrdup ("some string");
+ *   class->dynamic_string = g_strdup ("some string");
  * }
  * static void
  * type_a_base_class_finalize (TypeAClass *class)
@@ -861,21 +861,21 @@ typedef void   (*xbase_finalize_func_t)          (xpointer_t         g_class);
  * {
  *   class->static_integer = 42;
  * }
- *
+ * 
  * typedef struct {
  *   TypeAClass   parent_class;
  *   gfloat       static_float;
- *   xstring_t     *dynamic_xstring;
+ *   GString     *dynamic_gstring;
  * } TypeBClass;
  * static void
  * type_b_base_class_init (TypeBClass *class)
  * {
- *   class->dynamic_xstring = xstring_new ("some other string");
+ *   class->dynamic_gstring = g_string_new ("some other string");
  * }
  * static void
  * type_b_base_class_finalize (TypeBClass *class)
  * {
- *   xstring_free (class->dynamic_xstring);
+ *   g_string_free (class->dynamic_gstring);
  * }
  * static void
  * type_b_class_init (TypeBClass *class)
@@ -886,54 +886,54 @@ typedef void   (*xbase_finalize_func_t)          (xpointer_t         g_class);
  *
  * Initialization of TypeBClass will first cause initialization of
  * TypeAClass (derived classes reference their parent classes, see
- * xtype_class_ref() on this).
+ * g_type_class_ref() on this).
  *
  * Initialization of TypeAClass roughly involves zero-initializing its fields,
- * then calling its xbase_init_func_t() type_a_base_class_init() to allocate
- * its dynamic members (dynamic_string), and finally calling its xclass_init_func_t()
+ * then calling its GBaseInitFunc() type_a_base_class_init() to allocate
+ * its dynamic members (dynamic_string), and finally calling its GClassInitFunc()
  * type_a_class_init() to initialize its static members (static_integer).
  * The first step in the initialization process of TypeBClass is then
- * a plain memory copy of the contents of TypeAClass into TypeBClass and
+ * a plain memory copy of the contents of TypeAClass into TypeBClass and 
  * zero-initialization of the remaining fields in TypeBClass.
  * The dynamic members of TypeAClass within TypeBClass now need
  * reinitialization which is performed by calling type_a_base_class_init()
  * with an argument of TypeBClass.
  *
- * After that, the xbase_init_func_t() of TypeBClass, type_b_base_class_init()
- * is called to allocate the dynamic members of TypeBClass (dynamic_xstring),
- * and finally the xclass_init_func_t() of TypeBClass, type_b_class_init(),
+ * After that, the GBaseInitFunc() of TypeBClass, type_b_base_class_init()
+ * is called to allocate the dynamic members of TypeBClass (dynamic_gstring),
+ * and finally the GClassInitFunc() of TypeBClass, type_b_class_init(),
  * is called to complete the initialization process with the static members
  * (static_float).
  *
- * Corresponding finalization counter parts to the xbase_init_func_t() functions
+ * Corresponding finalization counter parts to the GBaseInitFunc() functions
  * have to be provided to release allocated resources at class finalization
  * time.
  */
-typedef void   (*xclass_init_func_t)             (xpointer_t         g_class,
-					      xpointer_t         class_data);
+typedef void   (*GClassInitFunc)             (gpointer         g_class,
+					      gpointer         class_data);
 /**
- * xclass_finalize_func_t:
- * @g_class: (type xobject_t.TypeClass): The #xtype_class_t structure to finalize
- * @class_data: The @class_data member supplied via the #xtype_info_t structure
- *
+ * GClassFinalizeFunc:
+ * @g_class: (type GObject.TypeClass): The #GTypeClass structure to finalize
+ * @class_data: The @class_data member supplied via the #GTypeInfo structure
+ * 
  * A callback function used by the type system to finalize a class.
  *
  * This function is rarely needed, as dynamically allocated class resources
- * should be handled by xbase_init_func_t() and xbase_finalize_func_t().
+ * should be handled by GBaseInitFunc() and GBaseFinalizeFunc().
  *
- * Also, specification of a xclass_finalize_func_t() in the #xtype_info_t
+ * Also, specification of a GClassFinalizeFunc() in the #GTypeInfo
  * structure of a static type is invalid, because classes of static types
  * will never be finalized (they are artificially kept alive when their
  * reference count drops to zero).
  */
-typedef void   (*xclass_finalize_func_t)         (xpointer_t         g_class,
-					      xpointer_t         class_data);
+typedef void   (*GClassFinalizeFunc)         (gpointer         g_class,
+					      gpointer         class_data);
 /**
- * xinstance_init_func_t:
+ * GInstanceInitFunc:
  * @instance: The instance to initialize
- * @g_class: (type xobject_t.TypeClass): The class of the type the instance is
+ * @g_class: (type GObject.TypeClass): The class of the type the instance is
  *    created for
- *
+ * 
  * A callback function used by the type system to initialize a new
  * instance of a type.
  *
@@ -948,13 +948,13 @@ typedef void   (*xclass_finalize_func_t)         (xpointer_t         g_class,
  * The extended members of @instance are guaranteed to have been filled with
  * zeros before this function is called.
  */
-typedef void   (*xinstance_init_func_t)          (GTypeInstance   *instance,
-					      xpointer_t         g_class);
+typedef void   (*GInstanceInitFunc)          (GTypeInstance   *instance,
+					      gpointer         g_class);
 /**
  * GInterfaceInitFunc:
- * @x_iface: (type xobject_t.TypeInterface): The interface structure to initialize
- * @iface_data: The @interface_data supplied via the #xinterface_info_t structure
- *
+ * @g_iface: (type GObject.TypeInterface): The interface structure to initialize
+ * @iface_data: The @interface_data supplied via the #GInterfaceInfo structure
+ * 
  * A callback function used by the type system to initialize a new
  * interface.
  *
@@ -964,100 +964,100 @@ typedef void   (*xinstance_init_func_t)          (GTypeInstance   *instance,
  * The members of @iface_data are guaranteed to have been filled with
  * zeros before this function is called.
  */
-typedef void   (*GInterfaceInitFunc)         (xpointer_t         x_iface,
-					      xpointer_t         iface_data);
+typedef void   (*GInterfaceInitFunc)         (gpointer         g_iface,
+					      gpointer         iface_data);
 /**
  * GInterfaceFinalizeFunc:
- * @x_iface: (type xobject_t.TypeInterface): The interface structure to finalize
- * @iface_data: The @interface_data supplied via the #xinterface_info_t structure
- *
+ * @g_iface: (type GObject.TypeInterface): The interface structure to finalize
+ * @iface_data: The @interface_data supplied via the #GInterfaceInfo structure
+ * 
  * A callback function used by the type system to finalize an interface.
  *
  * This function should destroy any internal data and release any resources
  * allocated by the corresponding GInterfaceInitFunc() function.
  */
-typedef void   (*GInterfaceFinalizeFunc)     (xpointer_t         x_iface,
-					      xpointer_t         iface_data);
+typedef void   (*GInterfaceFinalizeFunc)     (gpointer         g_iface,
+					      gpointer         iface_data);
 /**
  * GTypeClassCacheFunc:
- * @cache_data: data that was given to the xtype_add_class_cache_func() call
- * @g_class: (type xobject_t.TypeClass): The #xtype_class_t structure which is
+ * @cache_data: data that was given to the g_type_add_class_cache_func() call
+ * @g_class: (type GObject.TypeClass): The #GTypeClass structure which is
  *    unreferenced
- *
- * A callback function which is called when the reference count of a class
+ * 
+ * A callback function which is called when the reference count of a class 
  * drops to zero.
  *
- * It may use xtype_class_ref() to prevent the class from being freed. You
- * should not call xtype_class_unref() from a #GTypeClassCacheFunc function
- * to prevent infinite recursion, use xtype_class_unref_uncached() instead.
- *
- * The functions have to check the class id passed in to figure
+ * It may use g_type_class_ref() to prevent the class from being freed. You
+ * should not call g_type_class_unref() from a #GTypeClassCacheFunc function
+ * to prevent infinite recursion, use g_type_class_unref_uncached() instead.
+ * 
+ * The functions have to check the class id passed in to figure 
  * whether they actually want to cache the class of this type, since all
  * classes are routed through the same #GTypeClassCacheFunc chain.
- *
- * Returns: %TRUE to stop further #GTypeClassCacheFuncs from being
+ * 
+ * Returns: %TRUE to stop further #GTypeClassCacheFuncs from being 
  *  called, %FALSE to continue
  */
-typedef xboolean_t (*GTypeClassCacheFunc)	     (xpointer_t	       cache_data,
-					      xtype_class_t      *g_class);
+typedef gboolean (*GTypeClassCacheFunc)	     (gpointer	       cache_data,
+					      GTypeClass      *g_class);
 /**
  * GTypeInterfaceCheckFunc:
- * @check_data: data passed to xtype_add_interface_check()
- * @x_iface: (type xobject_t.TypeInterface): the interface that has been
+ * @check_data: data passed to g_type_add_interface_check()
+ * @g_iface: (type GObject.TypeInterface): the interface that has been
  *    initialized
- *
+ * 
  * A callback called after an interface vtable is initialized.
  *
- * See xtype_add_interface_check().
- *
+ * See g_type_add_interface_check().
+ * 
  * Since: 2.4
  */
-typedef void     (*GTypeInterfaceCheckFunc)  (xpointer_t	       check_data,
-					      xpointer_t         x_iface);
+typedef void     (*GTypeInterfaceCheckFunc)  (gpointer	       check_data,
+					      gpointer         g_iface);
 /**
  * GTypeFundamentalFlags:
- * @XTYPE_FLAG_CLASSED: Indicates a classed type
- * @XTYPE_FLAG_INSTANTIATABLE: Indicates an instantiatable type (implies classed)
- * @XTYPE_FLAG_DERIVABLE: Indicates a flat derivable type
- * @XTYPE_FLAG_DEEP_DERIVABLE: Indicates a deep derivable type (implies derivable)
- *
+ * @G_TYPE_FLAG_CLASSED: Indicates a classed type
+ * @G_TYPE_FLAG_INSTANTIATABLE: Indicates an instantiatable type (implies classed)
+ * @G_TYPE_FLAG_DERIVABLE: Indicates a flat derivable type
+ * @G_TYPE_FLAG_DEEP_DERIVABLE: Indicates a deep derivable type (implies derivable)
+ * 
  * Bit masks used to check or determine specific characteristics of a
  * fundamental type.
  */
 typedef enum    /*< skip >*/
 {
-  XTYPE_FLAG_CLASSED           = (1 << 0),
-  XTYPE_FLAG_INSTANTIATABLE    = (1 << 1),
-  XTYPE_FLAG_DERIVABLE         = (1 << 2),
-  XTYPE_FLAG_DEEP_DERIVABLE    = (1 << 3)
+  G_TYPE_FLAG_CLASSED           = (1 << 0),
+  G_TYPE_FLAG_INSTANTIATABLE    = (1 << 1),
+  G_TYPE_FLAG_DERIVABLE         = (1 << 2),
+  G_TYPE_FLAG_DEEP_DERIVABLE    = (1 << 3)
 } GTypeFundamentalFlags;
 /**
- * xtype_flags_t:
- * @XTYPE_FLAG_ABSTRACT: Indicates an abstract type. No instances can be
+ * GTypeFlags:
+ * @G_TYPE_FLAG_ABSTRACT: Indicates an abstract type. No instances can be
  *  created for an abstract type
- * @XTYPE_FLAG_VALUE_ABSTRACT: Indicates an abstract value type, i.e. a type
+ * @G_TYPE_FLAG_VALUE_ABSTRACT: Indicates an abstract value type, i.e. a type
  *  that introduces a value table, but can't be used for
- *  xvalue_init()
- * @XTYPE_FLAG_FINAL: Indicates a final type. A final type is a non-derivable
+ *  g_value_init()
+ * @G_TYPE_FLAG_FINAL: Indicates a final type. A final type is a non-derivable
  *  leaf node in a deep derivable type hierarchy tree. Since: 2.70
- *
+ * 
  * Bit masks used to check or determine characteristics of a type.
  */
 typedef enum    /*< skip >*/
 {
-  XTYPE_FLAG_ABSTRACT = (1 << 4),
-  XTYPE_FLAG_VALUE_ABSTRACT = (1 << 5),
-  XTYPE_FLAG_FINAL XPL_AVAILABLE_ENUMERATOR_IN_2_70 = (1 << 6)
-} xtype_flags_t;
+  G_TYPE_FLAG_ABSTRACT = (1 << 4),
+  G_TYPE_FLAG_VALUE_ABSTRACT = (1 << 5),
+  G_TYPE_FLAG_FINAL GLIB_AVAILABLE_ENUMERATOR_IN_2_70 = (1 << 6)
+} GTypeFlags;
 /**
- * xtype_info_t:
+ * GTypeInfo:
  * @class_size: Size of the class structure (required for interface, classed and instantiatable types)
  * @base_init: Location of the base initialization function (optional)
  * @base_finalize: Location of the base finalization function (optional)
  * @class_init: Location of the class initialization function for
- *  classed and instantiatable types. Location of the default vtable
- *  inititalization function for interface types. (optional) This function
- *  is used both to fill in virtual functions in the class or default vtable,
+ *  classed and instantiatable types. Location of the default vtable 
+ *  inititalization function for interface types. (optional) This function 
+ *  is used both to fill in virtual functions in the class or default vtable, 
  *  and to do type-specific setup such as registering signals and object
  *  properties.
  * @class_finalize: Location of the class finalization function for
@@ -1067,57 +1067,57 @@ typedef enum    /*< skip >*/
  * @instance_size: Size of the instance (object) structure (required for instantiatable types only)
  * @n_preallocs: Prior to GLib 2.10, it specified the number of pre-allocated (cached) instances to reserve memory for (0 indicates no caching). Since GLib 2.10, it is ignored, since instances are allocated with the [slice allocator][glib-Memory-Slices] now.
  * @instance_init: Location of the instance initialization function (optional, for instantiatable types only)
- * @value_table: A #xtype_value_table_t function table for generic handling of GValues
+ * @value_table: A #GTypeValueTable function table for generic handling of GValues
  *  of this type (usually only useful for fundamental types)
- *
+ * 
  * This structure is used to provide the type system with the information
  * required to initialize and destruct (finalize) a type's class and
  * its instances.
  *
- * The initialized structure is passed to the xtype_register_static() function
- * (or is copied into the provided #xtype_info_t structure in the
- * xtype_plugin_complete_type_info()). The type system will perform a deep
+ * The initialized structure is passed to the g_type_register_static() function
+ * (or is copied into the provided #GTypeInfo structure in the
+ * g_type_plugin_complete_type_info()). The type system will perform a deep
  * copy of this structure, so its memory does not need to be persistent
- * across invocation of xtype_register_static().
+ * across invocation of g_type_register_static().
  */
 struct _GTypeInfo
 {
   /* interface types, classed types, instantiated types */
-  xuint16_t                class_size;
-
-  xbase_init_func_t          base_init;
-  xbase_finalize_func_t      base_finalize;
-
+  guint16                class_size;
+  
+  GBaseInitFunc          base_init;
+  GBaseFinalizeFunc      base_finalize;
+  
   /* interface types, classed types, instantiated types */
-  xclass_init_func_t         class_init;
-  xclass_finalize_func_t     class_finalize;
-  xconstpointer          class_data;
-
+  GClassInitFunc         class_init;
+  GClassFinalizeFunc     class_finalize;
+  gconstpointer          class_data;
+  
   /* instantiated types */
-  xuint16_t                instance_size;
-  xuint16_t                n_preallocs;
-  xinstance_init_func_t      instance_init;
-
+  guint16                instance_size;
+  guint16                n_preallocs;
+  GInstanceInitFunc      instance_init;
+  
   /* value handling */
-  const xtype_value_table_t	*value_table;
+  const GTypeValueTable	*value_table;
 };
 /**
  * GTypeFundamentalInfo:
  * @type_flags: #GTypeFundamentalFlags describing the characteristics of the fundamental type
- *
+ * 
  * A structure that provides information to the type system which is
- * used specifically for managing fundamental types.
+ * used specifically for managing fundamental types.  
  */
 struct _GTypeFundamentalInfo
 {
   GTypeFundamentalFlags  type_flags;
 };
 /**
- * xinterface_info_t:
+ * GInterfaceInfo:
  * @interface_init: location of the interface initialization function
  * @interface_finalize: location of the interface finalization function
  * @interface_data: user-supplied data passed to the interface init/finalize functions
- *
+ * 
  * A structure that provides information to the type system which is
  * used specifically for managing interface types.
  */
@@ -1125,38 +1125,38 @@ struct _GInterfaceInfo
 {
   GInterfaceInitFunc     interface_init;
   GInterfaceFinalizeFunc interface_finalize;
-  xpointer_t               interface_data;
+  gpointer               interface_data;
 };
 /**
- * xtype_value_table_t:
+ * GTypeValueTable:
  * @value_init: Default initialize @values contents by poking values
  *  directly into the value->data array. The data array of
- *  the #xvalue_t passed into this function was zero-filled
+ *  the #GValue passed into this function was zero-filled
  *  with `memset()`, so no care has to be taken to free any
  *  old contents. E.g. for the implementation of a string
  *  value that may never be %NULL, the implementation might
  *  look like:
  *  |[<!-- language="C" -->
- *  value->data[0].v_pointer = xstrdup ("");
+ *  value->data[0].v_pointer = g_strdup ("");
  *  ]|
  * @value_free: Free any old contents that might be left in the
  *  data array of the passed in @value. No resources may
- *  remain allocated through the #xvalue_t contents after
+ *  remain allocated through the #GValue contents after
  *  this function returns. E.g. for our above string type:
  *  |[<!-- language="C" -->
  *  // only free strings without a specific flag for static storage
  *  if (!(value->data[1].v_uint & G_VALUE_NOCOPY_CONTENTS))
  *    g_free (value->data[0].v_pointer);
  *  ]|
- * @value_copy: @dest_value is a #xvalue_t with zero-filled data section
- *  and @src_value is a properly setup #xvalue_t of same or
+ * @value_copy: @dest_value is a #GValue with zero-filled data section
+ *  and @src_value is a properly setup #GValue of same or
  *  derived type.
  *  The purpose of this function is to copy the contents of
  *  @src_value into @dest_value in a way, that even after
  *  @src_value has been freed, the contents of @dest_value
  *  remain valid. String type example:
  *  |[<!-- language="C" -->
- *  dest_value->data[0].v_pointer = xstrdup (src_value->data[0].v_pointer);
+ *  dest_value->data[0].v_pointer = g_strdup (src_value->data[0].v_pointer);
  *  ]|
  * @value_peek_pointer: If the value contents fit into a pointer, such as objects
  *  or strings, return this pointer, so the caller can peek at
@@ -1178,7 +1178,7 @@ struct _GInterfaceInfo
  *  needs to be used, and for collection of floats 'd'.
  * @collect_value: The collect_value() function is responsible for converting the
  *  values collected from a variable argument list into contents
- *  suitable for storage in a xvalue_t. This function should setup
+ *  suitable for storage in a GValue. This function should setup
  *  @value similar to value_init(); e.g. for a string value that
  *  does not allow %NULL pointers, it needs to either spew an error,
  *  or do an implicit conversion by storing an empty string.
@@ -1186,7 +1186,7 @@ struct _GInterfaceInfo
  *  array, so just like for value_init() it is guaranteed to not
  *  contain any old contents that might need freeing.
  *  @n_collect_values is exactly the string length of @collect_format,
- *  and @collect_values is an array of unions #xtype_c_value_t with
+ *  and @collect_values is an array of unions #GTypeCValue with
  *  length @n_collect_values, containing the collected values
  *  according to @collect_format.
  *  @collect_flags is an argument provided as a hint by the caller.
@@ -1198,7 +1198,7 @@ struct _GInterfaceInfo
  *  For our above string example, we continue with:
  *  |[<!-- language="C" -->
  *  if (!collect_values[0].v_pointer)
- *    value->data[0].v_pointer = xstrdup ("");
+ *    value->data[0].v_pointer = g_strdup ("");
  *  else if (collect_flags & G_VALUE_NOCOPY_CONTENTS)
  *  {
  *    value->data[0].v_pointer = collect_values[0].v_pointer;
@@ -1206,7 +1206,7 @@ struct _GInterfaceInfo
  *    value->data[1].v_uint = G_VALUE_NOCOPY_CONTENTS;
  *  }
  *  else
- *    value->data[0].v_pointer = xstrdup (collect_values[0].v_pointer);
+ *    value->data[0].v_pointer = g_strdup (collect_values[0].v_pointer);
  *  return NULL;
  *  ]|
  *  It should be noted, that it is generally a bad idea to follow the
@@ -1216,13 +1216,13 @@ struct _GInterfaceInfo
  *  incremented for reference counted contents stored in the value->data
  *  array.  To deviate from our string example for a moment, and taking
  *  a look at an exemplary implementation for collect_value() of
- *  #xobject_t:
- *  |[<!-- language="C" -->
- *    xobject_t *object = G_OBJECT (collect_values[0].v_pointer);
- *    xreturn_val_if_fail (object != NULL,
- *       xstrdup_printf ("Object passed as invalid NULL pointer"));
+ *  #GObject:
+ *  |[<!-- language="C" --> 
+ *    GObject *object = G_OBJECT (collect_values[0].v_pointer);
+ *    g_return_val_if_fail (object != NULL,
+ *       g_strdup_printf ("Object passed as invalid NULL pointer"));
  *    // never honour G_VALUE_NOCOPY_CONTENTS for ref-counted types
- *    value->data[0].v_pointer = xobject_ref (object);
+ *    value->data[0].v_pointer = g_object_ref (object);
  *    return NULL;
  *  ]|
  *  The reference count for valid objects is always incremented,
@@ -1235,7 +1235,7 @@ struct _GInterfaceInfo
  *  The calling code makes no assumptions about the @value
  *  contents being valid upon error returns, @value
  *  is simply thrown away without further freeing. As such, it is
- *  a good idea to not allocate #xvalue_t contents, prior to returning
+ *  a good idea to not allocate #GValue contents, prior to returning
  *  an error, however, collect_values() is not obliged to return
  *  a correctly setup @value for error returns, simply because
  *  any non-%NULL return is considered a fatal condition so further
@@ -1254,131 +1254,131 @@ struct _GInterfaceInfo
  *  by returning a newly allocated string describing an error condition.
  *  To complete the string example:
  *  |[<!-- language="C" -->
- *  xchar_t **string_p = collect_values[0].v_pointer;
- *  xreturn_val_if_fail (string_p != NULL,
- *      xstrdup_printf ("string location passed as NULL"));
+ *  gchar **string_p = collect_values[0].v_pointer;
+ *  g_return_val_if_fail (string_p != NULL,
+ *      g_strdup_printf ("string location passed as NULL"));
  *  if (collect_flags & G_VALUE_NOCOPY_CONTENTS)
  *    *string_p = value->data[0].v_pointer;
  *  else
- *    *string_p = xstrdup (value->data[0].v_pointer);
+ *    *string_p = g_strdup (value->data[0].v_pointer);
  *  ]|
  *  And an illustrative version of lcopy_value() for
  *  reference-counted types:
  *  |[<!-- language="C" -->
- *  xobject_t **object_p = collect_values[0].v_pointer;
- *  xreturn_val_if_fail (object_p != NULL,
- *    xstrdup_printf ("object location passed as NULL"));
+ *  GObject **object_p = collect_values[0].v_pointer;
+ *  g_return_val_if_fail (object_p != NULL,
+ *    g_strdup_printf ("object location passed as NULL"));
  *  if (!value->data[0].v_pointer)
  *    *object_p = NULL;
  *  else if (collect_flags & G_VALUE_NOCOPY_CONTENTS) // always honour
  *    *object_p = value->data[0].v_pointer;
  *  else
- *    *object_p = xobject_ref (value->data[0].v_pointer);
+ *    *object_p = g_object_ref (value->data[0].v_pointer);
  *  return NULL;
  *  ]|
- *
- * The #xtype_value_table_t provides the functions required by the #xvalue_t
+ * 
+ * The #GTypeValueTable provides the functions required by the #GValue
  * implementation, to serve as a container for values of a type.
  */
 
-struct _xtype_value_table_t
+struct _GTypeValueTable
 {
-  void     (*value_init)         (xvalue_t       *value);
-  void     (*value_free)         (xvalue_t       *value);
-  void     (*value_copy)         (const xvalue_t *src_value,
-				  xvalue_t       *dest_value);
+  void     (*value_init)         (GValue       *value);
+  void     (*value_free)         (GValue       *value);
+  void     (*value_copy)         (const GValue *src_value,
+				  GValue       *dest_value);
   /* varargs functionality (optional) */
-  xpointer_t (*value_peek_pointer) (const xvalue_t *value);
-  const xchar_t *collect_format;
-  xchar_t*   (*collect_value)      (xvalue_t       *value,
-				  xuint_t         n_collect_values,
-				  xtype_c_value_t  *collect_values,
-				  xuint_t		collect_flags);
-  const xchar_t *lcopy_format;
-  xchar_t*   (*lcopy_value)        (const xvalue_t *value,
-				  xuint_t         n_collect_values,
-				  xtype_c_value_t  *collect_values,
-				  xuint_t		collect_flags);
+  gpointer (*value_peek_pointer) (const GValue *value);
+  const gchar *collect_format;
+  gchar*   (*collect_value)      (GValue       *value,
+				  guint         n_collect_values,
+				  GTypeCValue  *collect_values,
+				  guint		collect_flags);
+  const gchar *lcopy_format;
+  gchar*   (*lcopy_value)        (const GValue *value,
+				  guint         n_collect_values,
+				  GTypeCValue  *collect_values,
+				  guint		collect_flags);
 };
-XPL_AVAILABLE_IN_ALL
-xtype_t xtype_register_static		(xtype_t			     parent_type,
-					 const xchar_t		    *type_name,
-					 const xtype_info_t	    *info,
-					 xtype_flags_t		     flags);
-XPL_AVAILABLE_IN_ALL
-xtype_t xtype_register_static_simple     (xtype_t                       parent_type,
-					 const xchar_t                *type_name,
-					 xuint_t                       class_size,
-					 xclass_init_func_t              class_init,
-					 xuint_t                       instance_size,
-					 xinstance_init_func_t           instance_init,
-					 xtype_flags_t	             flags);
-
-XPL_AVAILABLE_IN_ALL
-xtype_t xtype_register_dynamic		(xtype_t			     parent_type,
-					 const xchar_t		    *type_name,
+GLIB_AVAILABLE_IN_ALL
+GType g_type_register_static		(GType			     parent_type,
+					 const gchar		    *type_name,
+					 const GTypeInfo	    *info,
+					 GTypeFlags		     flags);
+GLIB_AVAILABLE_IN_ALL
+GType g_type_register_static_simple     (GType                       parent_type,
+					 const gchar                *type_name,
+					 guint                       class_size,
+					 GClassInitFunc              class_init,
+					 guint                       instance_size,
+					 GInstanceInitFunc           instance_init,
+					 GTypeFlags	             flags);
+  
+GLIB_AVAILABLE_IN_ALL
+GType g_type_register_dynamic		(GType			     parent_type,
+					 const gchar		    *type_name,
 					 GTypePlugin		    *plugin,
-					 xtype_flags_t		     flags);
-XPL_AVAILABLE_IN_ALL
-xtype_t xtype_register_fundamental	(xtype_t			     type_id,
-					 const xchar_t		    *type_name,
-					 const xtype_info_t	    *info,
+					 GTypeFlags		     flags);
+GLIB_AVAILABLE_IN_ALL
+GType g_type_register_fundamental	(GType			     type_id,
+					 const gchar		    *type_name,
+					 const GTypeInfo	    *info,
 					 const GTypeFundamentalInfo *finfo,
-					 xtype_flags_t		     flags);
-XPL_AVAILABLE_IN_ALL
-void  xtype_add_interface_static	(xtype_t			     instance_type,
-					 xtype_t			     interface_type,
-					 const xinterface_info_t	    *info);
-XPL_AVAILABLE_IN_ALL
-void  xtype_add_interface_dynamic	(xtype_t			     instance_type,
-					 xtype_t			     interface_type,
+					 GTypeFlags		     flags);
+GLIB_AVAILABLE_IN_ALL
+void  g_type_add_interface_static	(GType			     instance_type,
+					 GType			     interface_type,
+					 const GInterfaceInfo	    *info);
+GLIB_AVAILABLE_IN_ALL
+void  g_type_add_interface_dynamic	(GType			     instance_type,
+					 GType			     interface_type,
 					 GTypePlugin		    *plugin);
-XPL_AVAILABLE_IN_ALL
-void  xtype_interface_add_prerequisite (xtype_t			     interface_type,
-					 xtype_t			     prerequisite_type);
-XPL_AVAILABLE_IN_ALL
-xtype_t*xtype_interface_prerequisites    (xtype_t                       interface_type,
-					 xuint_t                      *n_prerequisites);
-XPL_AVAILABLE_IN_2_68
-xtype_t xtype_interface_instantiatable_prerequisite
-                                        (xtype_t                       interface_type);
-XPL_DEPRECATED_IN_2_58
-void     xtype_class_add_private       (xpointer_t                    g_class,
-                                         xsize_t                       private_size);
-XPL_AVAILABLE_IN_2_38
-xint_t     xtype_add_instance_private    (xtype_t                       class_type,
-                                         xsize_t                       private_size);
-XPL_AVAILABLE_IN_ALL
-xpointer_t xtype_instance_get_private    (GTypeInstance              *instance,
-                                         xtype_t                       private_type);
-XPL_AVAILABLE_IN_2_38
-void     xtype_class_adjust_private_offset (xpointer_t                g_class,
-                                             xint_t                   *private_size_or_offset);
+GLIB_AVAILABLE_IN_ALL
+void  g_type_interface_add_prerequisite (GType			     interface_type,
+					 GType			     prerequisite_type);
+GLIB_AVAILABLE_IN_ALL
+GType*g_type_interface_prerequisites    (GType                       interface_type,
+					 guint                      *n_prerequisites);
+GLIB_AVAILABLE_IN_2_68
+GType g_type_interface_instantiatable_prerequisite
+                                        (GType                       interface_type);
+GLIB_DEPRECATED_IN_2_58
+void     g_type_class_add_private       (gpointer                    g_class,
+                                         gsize                       private_size);
+GLIB_AVAILABLE_IN_2_38
+gint     g_type_add_instance_private    (GType                       class_type,
+                                         gsize                       private_size);
+GLIB_AVAILABLE_IN_ALL
+gpointer g_type_instance_get_private    (GTypeInstance              *instance,
+                                         GType                       private_type);
+GLIB_AVAILABLE_IN_2_38
+void     g_type_class_adjust_private_offset (gpointer                g_class,
+                                             gint                   *private_size_or_offset);
 
-XPL_AVAILABLE_IN_ALL
-void      xtype_add_class_private      (xtype_t    		     class_type,
-					 xsize_t    		     private_size);
-XPL_AVAILABLE_IN_ALL
-xpointer_t  xtype_class_get_private      (xtype_class_t 		    *klass,
-					 xtype_t			     private_type);
-XPL_AVAILABLE_IN_2_38
-xint_t      xtype_class_get_instance_private_offset (xpointer_t         g_class);
+GLIB_AVAILABLE_IN_ALL
+void      g_type_add_class_private      (GType    		     class_type,
+					 gsize    		     private_size);
+GLIB_AVAILABLE_IN_ALL
+gpointer  g_type_class_get_private      (GTypeClass 		    *klass,
+					 GType			     private_type);
+GLIB_AVAILABLE_IN_2_38
+gint      g_type_class_get_instance_private_offset (gpointer         g_class);
 
-XPL_AVAILABLE_IN_2_34
-void      xtype_ensure                 (xtype_t                       type);
-XPL_AVAILABLE_IN_2_36
-xuint_t     xtype_get_type_registration_serial (void);
+GLIB_AVAILABLE_IN_2_34
+void      g_type_ensure                 (GType                       type);
+GLIB_AVAILABLE_IN_2_36
+guint     g_type_get_type_registration_serial (void);
 
 
-/* --- xtype_t boilerplate --- */
+/* --- GType boilerplate --- */
 /**
  * G_DECLARE_FINAL_TYPE:
- * @ModuleObjNameNoT: The name of the new type, in camel case (like `GtkWidget`)
+ * @ModuleObjName: The name of the new type, in camel case (like `GtkWidget`)
  * @module_obj_name: The name of the new type in lowercase, with words
  *  separated by `_` (like `gtk_widget`)
  * @MODULE: The name of the module, in all caps (like `GTK`)
  * @OBJ_NAME: The bare name of the type, in all caps (like `WIDGET`)
- * @ParentNameNoT: the name of the parent type, in camel case (like `GtkWidget`)
+ * @ParentName: the name of the parent type, in camel case (like `GtkWidget`)
  *
  * A convenience macro for emitting the usual declarations in the header file
  * for a type which is not (at the present time) intended to be subclassed.
@@ -1409,15 +1409,15 @@ xuint_t     xtype_get_type_registration_serial (void);
  *  GtkWindow parent;
  *  ...
  * };
- * XDEFINE_TYPE (MyAppWindow, my_app_window, GTK_TYPE_WINDOW)
+ * G_DEFINE_TYPE (MyAppWindow, my_app_window, GTK_TYPE_WINDOW)
  * ]|
  *
  * This results in the following things happening:
  *
- * - the usual `my_app_window_get_type()` function is declared with a return type of #xtype_t
+ * - the usual `my_app_window_get_type()` function is declared with a return type of #GType
  *
  * - the `MyAppWindow` type is defined as a `typedef` of `struct _MyAppWindow`.  The struct itself is not
- *   defined and should be defined from the .c file before XDEFINE_TYPE() is used.
+ *   defined and should be defined from the .c file before G_DEFINE_TYPE() is used.
  *
  * - the `MY_APP_WINDOW()` cast is emitted as `static inline` function along with the `MY_APP_IS_WINDOW()` type
  *   checking function
@@ -1428,9 +1428,9 @@ xuint_t     xtype_get_type_registration_serial (void);
  *   and therefore the fact that the size of the class structure is exposed is not a concern and it can be
  *   freely changed at any point in the future.
  *
- * - x_autoptr() support being added for your type, based on the type of your parent class
+ * - g_autoptr() support being added for your type, based on the type of your parent class
  *
- * You can only use this function if your parent type also supports x_autoptr().
+ * You can only use this function if your parent type also supports g_autoptr().
  *
  * Because the type macro (`MY_APP_TYPE_WINDOW` in the above example) is not a callable, you must continue to
  * manually define this as a macro for yourself.
@@ -1448,29 +1448,29 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.44
  **/
-#define G_DECLARE_FINAL_TYPE(ModuleObjNameNoT, module_obj_name, MODULE, OBJ_NAME, ParentNameNoT) \
-  xtype_t module_obj_name##_get_type (void);                                                               \
+#define G_DECLARE_FINAL_TYPE(ModuleObjName, module_obj_name, MODULE, OBJ_NAME, ParentName) \
+  GType module_obj_name##_get_type (void);                                                               \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                       \
-  typedef struct _##ModuleObjNameNoT ModuleObjNameNoT##_t;                                                         \
-  typedef struct { ParentNameNoT##_class_t parent_class; } ModuleObjNameNoT##_class_t;                               \
+  typedef struct _##ModuleObjName ModuleObjName;                                                         \
+  typedef struct { ParentName##Class parent_class; } ModuleObjName##Class;                               \
                                                                                                          \
-  _XPL_DEFINE_AUTOPTR_CHAINUP (ModuleObjNameNoT, ParentNameNoT)                                               \
-  G_DEFINE_AUTOPTR_CLEANUP_FUNC (ModuleObjNameNoT##_class, xtype_class_unref)                               \
+  _GLIB_DEFINE_AUTOPTR_CHAINUP (ModuleObjName, ParentName)                                               \
+  G_DEFINE_AUTOPTR_CLEANUP_FUNC (ModuleObjName##Class, g_type_class_unref)                               \
                                                                                                          \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT##_t * MODULE##_##OBJ_NAME (xpointer_t ptr) {                       \
-    return XTYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_t); }             \
-  G_GNUC_UNUSED static inline xboolean_t MODULE##_IS_##OBJ_NAME (xpointer_t ptr) {                           \
-    return XTYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                            \
+  G_GNUC_UNUSED static inline ModuleObjName * MODULE##_##OBJ_NAME (gpointer ptr) {                       \
+    return G_TYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjName); }             \
+  G_GNUC_UNUSED static inline gboolean MODULE##_IS_##OBJ_NAME (gpointer ptr) {                           \
+    return G_TYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                            \
   G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * G_DECLARE_DERIVABLE_TYPE:
- * @ModuleObjNameNoT: The name of the new type, in camel case (like `GtkWidget`)
+ * @ModuleObjName: The name of the new type, in camel case (like `GtkWidget`)
  * @module_obj_name: The name of the new type in lowercase, with words
  *  separated by `_` (like `gtk_widget`)
  * @MODULE: The name of the module, in all caps (like `GTK`)
  * @OBJ_NAME: The bare name of the type, in all caps (like `WIDGET`)
- * @ParentNameNoT: the name of the parent type, in camel case (like `GtkWidget`)
+ * @ParentName: the name of the parent type, in camel case (like `GtkWidget`)
  *
  * A convenience macro for emitting the usual declarations in the
  * header file for a type which is intended to be subclassed.
@@ -1490,9 +1490,9 @@ xuint_t     xtype_get_type_registration_serial (void);
  *   GtkWidgetClass parent_class;
  *
  *   void (* handle_frob)  (GtkFrobber *frobber,
- *                          xuint_t       n_frobs);
+ *                          guint       n_frobs);
  *
- *   xpointer_t padding[12];
+ *   gpointer padding[12];
  * };
  *
  * GtkWidget *    gtk_frobber_new   (void);
@@ -1516,7 +1516,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * This results in the following things happening:
  *
- * - the usual `gtk_frobber_get_type()` function is declared with a return type of #xtype_t
+ * - the usual `gtk_frobber_get_type()` function is declared with a return type of #GType
  *
  * - the `GtkFrobber` struct is created with `GtkWidget` as the first and only item.  You are expected to use
  *   a private structure from your .c file to store your instance variables.
@@ -1528,9 +1528,9 @@ xuint_t     xtype_get_type_registration_serial (void);
  *   the `GTK_IS_FROBBER()` and `GTK_IS_FROBBER_CLASS()` type checking functions and `GTK_FROBBER_GET_CLASS()`
  *   function.
  *
- * - x_autoptr() support being added for your type, based on the type of your parent class
+ * - g_autoptr() support being added for your type, based on the type of your parent class
  *
- * You can only use this function if your parent type also supports x_autoptr().
+ * You can only use this function if your parent type also supports g_autoptr().
  *
  * Because the type macro (`GTK_TYPE_FROBBER` in the above example) is not a callable, you must continue to
  * manually define this as a macro for yourself.
@@ -1551,31 +1551,31 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.44
  **/
-#define G_DECLARE_DERIVABLE_TYPE(ModuleObjNameNoT, module_obj_name, MODULE, OBJ_NAME, ParentNameNoT) \
-  xtype_t module_obj_name##_get_type (void);                                                               \
+#define G_DECLARE_DERIVABLE_TYPE(ModuleObjName, module_obj_name, MODULE, OBJ_NAME, ParentName) \
+  GType module_obj_name##_get_type (void);                                                               \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                       \
-  typedef struct _##ModuleObjNameNoT ModuleObjNameNoT##_t;                                                         \
-  typedef struct _##ModuleObjNameNoT##_class ModuleObjNameNoT##_class_t;                                           \
-  struct _##ModuleObjNameNoT { ParentNameNoT##_t parent_instance; };                                               \
+  typedef struct _##ModuleObjName ModuleObjName;                                                         \
+  typedef struct _##ModuleObjName##Class ModuleObjName##Class;                                           \
+  struct _##ModuleObjName { ParentName parent_instance; };                                               \
                                                                                                          \
-  _XPL_DEFINE_AUTOPTR_CHAINUP (ModuleObjNameNoT, ParentNameNoT)                                               \
-  G_DEFINE_AUTOPTR_CLEANUP_FUNC (ModuleObjNameNoT##_class, xtype_class_unref)                               \
+  _GLIB_DEFINE_AUTOPTR_CHAINUP (ModuleObjName, ParentName)                                               \
+  G_DEFINE_AUTOPTR_CLEANUP_FUNC (ModuleObjName##Class, g_type_class_unref)                               \
                                                                                                          \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT##_t * MODULE##_##OBJ_NAME (xpointer_t ptr) {                       \
-    return XTYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_t); }             \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT##_class_t * MODULE##_##OBJ_NAME##_CLASS (xpointer_t ptr) {        \
-    return XTYPE_CHECK_CLASS_CAST (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_class_t); }         \
-  G_GNUC_UNUSED static inline xboolean_t MODULE##_IS_##OBJ_NAME (xpointer_t ptr) {                           \
-    return XTYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                            \
-  G_GNUC_UNUSED static inline xboolean_t MODULE##_IS_##OBJ_NAME##_CLASS (xpointer_t ptr) {                   \
-    return XTYPE_CHECK_CLASS_TYPE (ptr, module_obj_name##_get_type ()); }                               \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT##_class_t * MODULE##_##OBJ_NAME##_GET_CLASS (xpointer_t ptr) {    \
-    return XTYPE_INSTANCE_GET_CLASS (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_class_t); }       \
+  G_GNUC_UNUSED static inline ModuleObjName * MODULE##_##OBJ_NAME (gpointer ptr) {                       \
+    return G_TYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjName); }             \
+  G_GNUC_UNUSED static inline ModuleObjName##Class * MODULE##_##OBJ_NAME##_CLASS (gpointer ptr) {        \
+    return G_TYPE_CHECK_CLASS_CAST (ptr, module_obj_name##_get_type (), ModuleObjName##Class); }         \
+  G_GNUC_UNUSED static inline gboolean MODULE##_IS_##OBJ_NAME (gpointer ptr) {                           \
+    return G_TYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                            \
+  G_GNUC_UNUSED static inline gboolean MODULE##_IS_##OBJ_NAME##_CLASS (gpointer ptr) {                   \
+    return G_TYPE_CHECK_CLASS_TYPE (ptr, module_obj_name##_get_type ()); }                               \
+  G_GNUC_UNUSED static inline ModuleObjName##Class * MODULE##_##OBJ_NAME##_GET_CLASS (gpointer ptr) {    \
+    return G_TYPE_INSTANCE_GET_CLASS (ptr, module_obj_name##_get_type (), ModuleObjName##Class); }       \
   G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * G_DECLARE_INTERFACE:
- * @ModuleObjNameNoT: The name of the new type, in camel case (like `GtkWidget`)
+ * @ModuleObjName: The name of the new type, in camel case (like `GtkWidget`)
  * @module_obj_name: The name of the new type in lowercase, with words
  *  separated by `_` (like `gtk_widget`)
  * @MODULE: The name of the module, in all caps (like `GTK`)
@@ -1592,16 +1592,16 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * #define MY_TYPE_MODEL my_model_get_type ()
  * GDK_AVAILABLE_IN_3_12
- * G_DECLARE_INTERFACE (MyModel, my_model, MY, MODEL, xobject_t)
+ * G_DECLARE_INTERFACE (MyModel, my_model, MY, MODEL, GObject)
  *
  * struct _MyModelInterface
  * {
- *   xtype_interface_t x_iface;
+ *   GTypeInterface g_iface;
  *
- *   xpointer_t (* get_item)  (MyModel *model);
+ *   gpointer (* get_item)  (MyModel *model);
  * };
  *
- * xpointer_t my_model_get_item (MyModel *model);
+ * gpointer my_model_get_item (MyModel *model);
  *
  * ...
  *
@@ -1611,7 +1611,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  * And use it as follow in your C file:
  *
  * |[<!-- language="C" -->
- * G_DEFINE_INTERFACE (MyModel, my_model, XTYPE_OBJECT);
+ * G_DEFINE_INTERFACE (MyModel, my_model, G_TYPE_OBJECT);
  *
  * static void
  * my_model_default_init (MyModelInterface *iface)
@@ -1622,7 +1622,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * This results in the following things happening:
  *
- * - the usual `my_model_get_type()` function is declared with a return type of #xtype_t
+ * - the usual `my_model_get_type()` function is declared with a return type of #GType
  *
  * - the `MyModelInterface` type is defined as a typedef to `struct _MyModelInterface`,
  *   which is left undefined. You should do this from the header file directly after
@@ -1631,9 +1631,9 @@ xuint_t     xtype_get_type_registration_serial (void);
  * - the `MY_MODEL()` cast is emitted as `static inline` functions along with
  *   the `MY_IS_MODEL()` type checking function and `MY_MODEL_GET_IFACE()` function.
  *
- * - x_autoptr() support being added for your type, based on your prerequisite type.
+ * - g_autoptr() support being added for your type, based on your prerequisite type.
  *
- * You can only use this function if your prerequisite type also supports x_autoptr().
+ * You can only use this function if your prerequisite type also supports g_autoptr().
  *
  * Because the type macro (`MY_TYPE_MODEL` in the above example) is not a callable, you must continue to
  * manually define this as a macro for yourself.
@@ -1643,69 +1643,69 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.44
  **/
-#define G_DECLARE_INTERFACE(ModuleObjNameNoT, module_obj_name, MODULE, OBJ_NAME, PrerequisiteNameNoT) \
-  xtype_t module_obj_name##_get_type (void);                                                                 \
+#define G_DECLARE_INTERFACE(ModuleObjName, module_obj_name, MODULE, OBJ_NAME, PrerequisiteName) \
+  GType module_obj_name##_get_type (void);                                                                 \
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                                                         \
-  typedef struct _##ModuleObjNameNoT ModuleObjNameNoT##_t;                                                           \
-  typedef struct _##ModuleObjNameNoT##_interface ModuleObjNameNoT##_interface_t;                                     \
+  typedef struct _##ModuleObjName ModuleObjName;                                                           \
+  typedef struct _##ModuleObjName##Interface ModuleObjName##Interface;                                     \
                                                                                                            \
-  _XPL_DEFINE_AUTOPTR_CHAINUP (ModuleObjNameNoT, PrerequisiteNameNoT)                                           \
+  _GLIB_DEFINE_AUTOPTR_CHAINUP (ModuleObjName, PrerequisiteName)                                           \
                                                                                                            \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT##_t * MODULE##_##OBJ_NAME (xpointer_t ptr) {                         \
-    return XTYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_t); }               \
-  G_GNUC_UNUSED static inline xboolean_t MODULE##_IS_##OBJ_NAME (xpointer_t ptr) {                             \
-    return XTYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                              \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT##_interface_t * MODULE##_##OBJ_NAME##_GET_IFACE (xpointer_t ptr) {  \
-    return XTYPE_INSTANCE_GET_INTERFACE (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_interface_t); } \
+  G_GNUC_UNUSED static inline ModuleObjName * MODULE##_##OBJ_NAME (gpointer ptr) {                         \
+    return G_TYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjName); }               \
+  G_GNUC_UNUSED static inline gboolean MODULE##_IS_##OBJ_NAME (gpointer ptr) {                             \
+    return G_TYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                              \
+  G_GNUC_UNUSED static inline ModuleObjName##Interface * MODULE##_##OBJ_NAME##_GET_IFACE (gpointer ptr) {  \
+    return G_TYPE_INSTANCE_GET_INTERFACE (ptr, module_obj_name##_get_type (), ModuleObjName##Interface); } \
   G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * XDEFINE_TYPE:
+ * G_DEFINE_TYPE:
  * @TN: The name of the new type, in Camel case.
- * @t_n: The name of the new type, in lowercase, with words
+ * @t_n: The name of the new type, in lowercase, with words 
  *  separated by `_`.
- * @T_P: The #xtype_t of the parent type.
- *
+ * @T_P: The #GType of the parent type.
+ * 
  * A convenience macro for type implementations, which declares a class
- * initialization function, an instance initialization function (see #xtype_info_t
+ * initialization function, an instance initialization function (see #GTypeInfo
  * for information about these) and a static variable named `t_n_parent_class`
  * pointing to the parent class. Furthermore, it defines a `*_get_type()` function.
  * See G_DEFINE_TYPE_EXTENDED() for an example.
- *
+ * 
  * Since: 2.4
  */
-#define XDEFINE_TYPE(TN, t_n, T_P)			    G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, 0, {})
+#define G_DEFINE_TYPE(TN, t_n, T_P)			    G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, 0, {})
 /**
  * G_DEFINE_TYPE_WITH_CODE:
  * @TN: The name of the new type, in Camel case.
  * @t_n: The name of the new type in lowercase, with words separated by `_`.
- * @T_P: The #xtype_t of the parent type.
+ * @T_P: The #GType of the parent type.
  * @_C_: Custom code that gets inserted in the `*_get_type()` function.
- *
+ * 
  * A convenience macro for type implementations.
  *
- * Similar to XDEFINE_TYPE(), but allows you to insert custom code into the
+ * Similar to G_DEFINE_TYPE(), but allows you to insert custom code into the
  * `*_get_type()` function, e.g. interface implementations via G_IMPLEMENT_INTERFACE().
  * See G_DEFINE_TYPE_EXTENDED() for an example.
- *
+ * 
  * Since: 2.4
  */
-#define G_DEFINE_TYPE_WITH_CODE(TNxT, t_n, T_P, _C_)	    _G_DEFINE_TYPE_EXTENDED_BEGIN (TNxT, t_n, T_P, 0) {_C_;} _G_DEFINE_TYPE_EXTENDED_END()
+#define G_DEFINE_TYPE_WITH_CODE(TN, t_n, T_P, _C_)	    _G_DEFINE_TYPE_EXTENDED_BEGIN (TN, t_n, T_P, 0) {_C_;} _G_DEFINE_TYPE_EXTENDED_END()
 /**
  * G_DEFINE_TYPE_WITH_PRIVATE:
  * @TN: The name of the new type, in Camel case.
- * @t_n: The name of the new type, in lowercase, with words
+ * @t_n: The name of the new type, in lowercase, with words 
  *  separated by `_`.
- * @T_P: The #xtype_t of the parent type.
- *
+ * @T_P: The #GType of the parent type.
+ * 
  * A convenience macro for type implementations, which declares a class
- * initialization function, an instance initialization function (see #xtype_info_t
+ * initialization function, an instance initialization function (see #GTypeInfo
  * for information about these), a static variable named `t_n_parent_class`
  * pointing to the parent class, and adds private instance data to the type.
  *
  * Furthermore, it defines a `*_get_type()` function. See G_DEFINE_TYPE_EXTENDED()
  * for an example.
- *
+ * 
  * Note that private structs added with this macros must have a struct
  * name of the form `TN ## Private`.
  *
@@ -1720,26 +1720,26 @@ xuint_t     xtype_get_type_registration_serial (void);
 /**
  * G_DEFINE_ABSTRACT_TYPE:
  * @TN: The name of the new type, in Camel case.
- * @t_n: The name of the new type, in lowercase, with words
+ * @t_n: The name of the new type, in lowercase, with words 
  *  separated by `_`.
- * @T_P: The #xtype_t of the parent type.
- *
+ * @T_P: The #GType of the parent type.
+ * 
  * A convenience macro for type implementations.
  *
- * Similar to XDEFINE_TYPE(), but defines an abstract type.
+ * Similar to G_DEFINE_TYPE(), but defines an abstract type.
  * See G_DEFINE_TYPE_EXTENDED() for an example.
- *
+ * 
  * Since: 2.4
  */
-#define G_DEFINE_ABSTRACT_TYPE(TN, t_n, T_P)		    G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, XTYPE_FLAG_ABSTRACT, {})
+#define G_DEFINE_ABSTRACT_TYPE(TN, t_n, T_P)		    G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, G_TYPE_FLAG_ABSTRACT, {})
 /**
  * G_DEFINE_ABSTRACT_TYPE_WITH_CODE:
  * @TN: The name of the new type, in Camel case.
- * @t_n: The name of the new type, in lowercase, with words
+ * @t_n: The name of the new type, in lowercase, with words 
  *  separated by `_`.
- * @T_P: The #xtype_t of the parent type.
+ * @T_P: The #GType of the parent type.
  * @_C_: Custom code that gets inserted in the `type_name_get_type()` function.
- *
+ * 
  * A convenience macro for type implementations.
  *
  * Similar to G_DEFINE_TYPE_WITH_CODE(), but defines an abstract type and
@@ -1747,46 +1747,46 @@ xuint_t     xtype_get_type_registration_serial (void);
  * interface implementations via G_IMPLEMENT_INTERFACE().
  *
  * See G_DEFINE_TYPE_EXTENDED() for an example.
- *
+ * 
  * Since: 2.4
  */
-#define G_DEFINE_ABSTRACT_TYPE_WITH_CODE(TNxT, t_n, T_P, _C_) _G_DEFINE_TYPE_EXTENDED_BEGIN (TNxT, t_n, T_P, XTYPE_FLAG_ABSTRACT) {_C_;} _G_DEFINE_TYPE_EXTENDED_END()
+#define G_DEFINE_ABSTRACT_TYPE_WITH_CODE(TN, t_n, T_P, _C_) _G_DEFINE_TYPE_EXTENDED_BEGIN (TN, t_n, T_P, G_TYPE_FLAG_ABSTRACT) {_C_;} _G_DEFINE_TYPE_EXTENDED_END()
 /**
  * G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE:
  * @TN: The name of the new type, in Camel case.
- * @t_n: The name of the new type, in lowercase, with words
+ * @t_n: The name of the new type, in lowercase, with words 
  *  separated by `_`.
- * @T_P: The #xtype_t of the parent type.
+ * @T_P: The #GType of the parent type.
  *
  * Similar to G_DEFINE_TYPE_WITH_PRIVATE(), but defines an abstract type.
  *
  * See G_DEFINE_TYPE_EXTENDED() for an example.
- *
+ * 
  * Since: 2.38
  */
-#define G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(TN, t_n, T_P)   G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, XTYPE_FLAG_ABSTRACT, G_ADD_PRIVATE (TN))
+#define G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE(TN, t_n, T_P)   G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, G_TYPE_FLAG_ABSTRACT, G_ADD_PRIVATE (TN))
 /**
  * G_DEFINE_FINAL_TYPE:
  * @TN: the name of the new type, in Camel case
  * @t_n: the name of the new type, in lower case, with words
  *   separated by `_` (snake case)
- * @T_P: the #xtype_t of the parent type
+ * @T_P: the #GType of the parent type
  *
  * A convenience macro for type implementations.
  *
- * Similar to XDEFINE_TYPE(), but defines a final type.
+ * Similar to G_DEFINE_TYPE(), but defines a final type.
  *
  * See G_DEFINE_TYPE_EXTENDED() for an example.
  *
  * Since: 2.70
  */
-#define G_DEFINE_FINAL_TYPE(TN, t_n, T_P)                      G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, XTYPE_FLAG_FINAL, {}) XPL_AVAILABLE_MACRO_IN_2_70
+#define G_DEFINE_FINAL_TYPE(TN, t_n, T_P)                      G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, G_TYPE_FLAG_FINAL, {}) GLIB_AVAILABLE_MACRO_IN_2_70
 /**
  * G_DEFINE_FINAL_TYPE_WITH_CODE:
  * @TN: the name of the new type, in Camel case
  * @t_n: the name of the new type, in lower case, with words
  *   separated by `_` (snake case)
- * @T_P: the #xtype_t of the parent type
+ * @T_P: the #GType of the parent type
  * @_C_: Custom code that gets inserted in the `type_name_get_type()` function.
  *
  * A convenience macro for type implementations.
@@ -1799,13 +1799,13 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.70
  */
-#define G_DEFINE_FINAL_TYPE_WITH_CODE(TN, t_n, T_P, _C_)       _G_DEFINE_TYPE_EXTENDED_BEGIN (TN, t_n, T_P, XTYPE_FLAG_FINAL) {_C_;} _G_DEFINE_TYPE_EXTENDED_END() XPL_AVAILABLE_MACRO_IN_2_70
+#define G_DEFINE_FINAL_TYPE_WITH_CODE(TN, t_n, T_P, _C_)       _G_DEFINE_TYPE_EXTENDED_BEGIN (TN, t_n, T_P, G_TYPE_FLAG_FINAL) {_C_;} _G_DEFINE_TYPE_EXTENDED_END() GLIB_AVAILABLE_MACRO_IN_2_70
 /**
  * G_DEFINE_FINAL_TYPE_WITH_PRIVATE:
  * @TN: the name of the new type, in Camel case
  * @t_n: the name of the new type, in lower case, with words
  *   separated by `_` (snake case)
- * @T_P: the #xtype_t of the parent type
+ * @T_P: the #GType of the parent type
  *
  * A convenience macro for type implementations.
  *
@@ -1815,18 +1815,18 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.70
  */
-#define G_DEFINE_FINAL_TYPE_WITH_PRIVATE(TN, t_n, T_P)         G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, XTYPE_FLAG_FINAL, G_ADD_PRIVATE (TN)) XPL_AVAILABLE_MACRO_IN_2_70
+#define G_DEFINE_FINAL_TYPE_WITH_PRIVATE(TN, t_n, T_P)         G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, G_TYPE_FLAG_FINAL, G_ADD_PRIVATE (TN)) GLIB_AVAILABLE_MACRO_IN_2_70
 /**
  * G_DEFINE_TYPE_EXTENDED:
  * @TN: The name of the new type, in Camel case.
  * @t_n: The name of the new type, in lowercase, with words
  *    separated by `_`.
- * @T_P: The #xtype_t of the parent type.
- * @_f_: #xtype_flags_t to pass to xtype_register_static()
+ * @T_P: The #GType of the parent type.
+ * @_f_: #GTypeFlags to pass to g_type_register_static()
  * @_C_: Custom code that gets inserted in the `*_get_type()` function.
  *
  * The most general convenience macro for type implementations, on which
- * XDEFINE_TYPE(), etc are based.
+ * G_DEFINE_TYPE(), etc are based.
  *
  * |[<!-- language="C" -->
  * G_DEFINE_TYPE_EXTENDED (GtkGadget,
@@ -1843,43 +1843,43 @@ xuint_t     xtype_get_type_registration_serial (void);
  * |[<!-- language="C" -->
  * static void     gtk_gadget_init       (GtkGadget      *self);
  * static void     gtk_gadget_class_init (GtkGadgetClass *klass);
- * static xpointer_t gtk_gadget_parent_class = NULL;
- * static xint_t     GtkGadget_private_offset;
- * static void     gtk_gadget_class_intern_init (xpointer_t klass)
+ * static gpointer gtk_gadget_parent_class = NULL;
+ * static gint     GtkGadget_private_offset;
+ * static void     gtk_gadget_class_intern_init (gpointer klass)
  * {
- *   gtk_gadget_parent_class = xtype_class_peek_parent (klass);
+ *   gtk_gadget_parent_class = g_type_class_peek_parent (klass);
  *   if (GtkGadget_private_offset != 0)
- *     xtype_class_adjust_private_offset (klass, &GtkGadget_private_offset);
+ *     g_type_class_adjust_private_offset (klass, &GtkGadget_private_offset);
  *   gtk_gadget_class_init ((GtkGadgetClass*) klass);
  * }
- * static inline xpointer_t gtk_gadget_get_instance_private (GtkGadget *self)
+ * static inline gpointer gtk_gadget_get_instance_private (GtkGadget *self)
  * {
  *   return (G_STRUCT_MEMBER_P (self, GtkGadget_private_offset));
  * }
  *
- * xtype_t
+ * GType
  * gtk_gadget_get_type (void)
  * {
- *   static xsize_t static_g_define_type_id = 0;
+ *   static gsize static_g_define_type_id = 0;
  *   if (g_once_init_enter (&static_g_define_type_id))
  *     {
- *       xtype_t g_define_type_id =
- *         xtype_register_static_simple (GTK_TYPE_WIDGET,
+ *       GType g_define_type_id =
+ *         g_type_register_static_simple (GTK_TYPE_WIDGET,
  *                                        g_intern_static_string ("GtkGadget"),
  *                                        sizeof (GtkGadgetClass),
- *                                        (xclass_init_func_t) gtk_gadget_class_intern_init,
+ *                                        (GClassInitFunc) gtk_gadget_class_intern_init,
  *                                        sizeof (GtkGadget),
- *                                        (xinstance_init_func_t) gtk_gadget_init,
+ *                                        (GInstanceInitFunc) gtk_gadget_init,
  *                                        0);
  *       {
  *         GtkGadget_private_offset =
- *           xtype_add_instance_private (g_define_type_id, sizeof (GtkGadgetPrivate));
+ *           g_type_add_instance_private (g_define_type_id, sizeof (GtkGadgetPrivate));
  *       }
  *       {
- *         const xinterface_info_t g_implement_interface_info = {
+ *         const GInterfaceInfo g_implement_interface_info = {
  *           (GInterfaceInitFunc) gtk_gadget_gizmo_init
  *         };
- *         xtype_add_interface_static (g_define_type_id, TYPE_GIZMO, &g_implement_interface_info);
+ *         g_type_add_interface_static (g_define_type_id, TYPE_GIZMO, &g_implement_interface_info);
  *       }
  *       g_once_init_leave (&static_g_define_type_id, g_define_type_id);
  *     }
@@ -1899,10 +1899,10 @@ xuint_t     xtype_get_type_registration_serial (void);
  * G_DEFINE_INTERFACE:
  * @TN: The name of the new type, in Camel case.
  * @t_n: The name of the new type, in lowercase, with words separated by `_`.
- * @T_P: The #xtype_t of the prerequisite type for the interface, or %XTYPE_INVALID
+ * @T_P: The #GType of the prerequisite type for the interface, or %G_TYPE_INVALID
  * for no prerequisite type.
  *
- * A convenience macro for #xtype_interface_t definitions, which declares
+ * A convenience macro for #GTypeInterface definitions, which declares
  * a default vtable initialization function and defines a `*_get_type()`
  * function.
  *
@@ -1911,24 +1911,24 @@ xuint_t     xtype_get_type_registration_serial (void);
  * name `TN ## Interface`.
  *
  * The initialization function has signature
- * `static void t_n ## _default_init (TypeName##_interface_t *klass);`, rather than
+ * `static void t_n ## _default_init (TypeName##Interface *klass);`, rather than
  * the full #GInterfaceInitFunc signature, for brevity and convenience. If you
  * need to use an initialization function with an `iface_data` argument, you
- * must write the #xtype_interface_t definitions manually.
+ * must write the #GTypeInterface definitions manually.
  *
  * Since: 2.24
  */
-#define G_DEFINE_INTERFACE(TNxT, t_n, T_P)		    G_DEFINE_INTERFACE_WITH_CODE(TNxT, t_n, T_P, ;)
+#define G_DEFINE_INTERFACE(TN, t_n, T_P)		    G_DEFINE_INTERFACE_WITH_CODE(TN, t_n, T_P, ;)
 
 /**
  * G_DEFINE_INTERFACE_WITH_CODE:
  * @TN: The name of the new type, in Camel case.
  * @t_n: The name of the new type, in lowercase, with words separated by `_`.
- * @T_P: The #xtype_t of the prerequisite type for the interface, or %XTYPE_INVALID
+ * @T_P: The #GType of the prerequisite type for the interface, or %G_TYPE_INVALID
  * for no prerequisite type.
  * @_C_: Custom code that gets inserted in the `*_get_type()` function.
  *
- * A convenience macro for #xtype_interface_t definitions.
+ * A convenience macro for #GTypeInterface definitions.
  *
  * Similar to G_DEFINE_INTERFACE(), but allows you to insert custom code
  * into the `*_get_type()` function, e.g. additional interface implementations
@@ -1939,11 +1939,11 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.24
  */
-#define G_DEFINE_INTERFACE_WITH_CODE(TNxT, t_n, T_P, _C_)     _G_DEFINE_INTERFACE_EXTENDED_BEGIN(TNxT, t_n, T_P) {_C_;} _G_DEFINE_INTERFACE_EXTENDED_END()
+#define G_DEFINE_INTERFACE_WITH_CODE(TN, t_n, T_P, _C_)     _G_DEFINE_INTERFACE_EXTENDED_BEGIN(TN, t_n, T_P) {_C_;} _G_DEFINE_INTERFACE_EXTENDED_END()
 
 /**
  * G_IMPLEMENT_INTERFACE:
- * @TYPE_IFACE: The #xtype_t of the interface to add
+ * @TYPE_IFACE: The #GType of the interface to add
  * @iface_init: (type GInterfaceInitFunc): The interface init function, of type #GInterfaceInitFunc
  *
  * A convenience macro to ease interface addition in the `_C_` section
@@ -1956,10 +1956,10 @@ xuint_t     xtype_get_type_registration_serial (void);
  * Since: 2.4
  */
 #define G_IMPLEMENT_INTERFACE(TYPE_IFACE, iface_init)       { \
-  const xinterface_info_t g_implement_interface_info = { \
+  const GInterfaceInfo g_implement_interface_info = { \
     (GInterfaceInitFunc)(void (*)(void)) iface_init, NULL, NULL \
   }; \
-  xtype_add_interface_static (g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
+  g_type_add_interface_static (g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
 }
 
 /**
@@ -1973,41 +1973,41 @@ xuint_t     xtype_get_type_registration_serial (void);
  * For instance:
  *
  * |[<!-- language="C" -->
- *   typedef struct _xobject xobject_t;
- *   typedef struct _xobject_class xobject_class_t;
+ *   typedef struct _MyObject MyObject;
+ *   typedef struct _MyObjectClass MyObjectClass;
  *
  *   typedef struct {
- *     xint_t foo;
- *     xint_t bar;
- *   } xobject_private_t;
+ *     gint foo;
+ *     gint bar;
+ *   } MyObjectPrivate;
  *
- *   G_DEFINE_TYPE_WITH_CODE (xobject_t, my_object, XTYPE_OBJECT,
- *                            G_ADD_PRIVATE (xobject_t))
+ *   G_DEFINE_TYPE_WITH_CODE (MyObject, my_object, G_TYPE_OBJECT,
+ *                            G_ADD_PRIVATE (MyObject))
  * ]|
  *
- * Will add `xobject_private_t` as the private data to any instance of the
- * `xobject_t` type.
+ * Will add `MyObjectPrivate` as the private data to any instance of the
+ * `MyObject` type.
  *
  * `G_DEFINE_TYPE_*` macros will automatically create a private function
  * based on the arguments to this macro, which can be used to safely
  * retrieve the private data from an instance of the type; for instance:
  *
  * |[<!-- language="C" -->
- *   xint_t
- *   my_object_get_foo (xobject_t *obj)
+ *   gint
+ *   my_object_get_foo (MyObject *obj)
  *   {
- *     xobject_private_t *priv = my_object_get_instance_private (obj);
+ *     MyObjectPrivate *priv = my_object_get_instance_private (obj);
  *
- *     xreturn_val_if_fail (MY_IS_OBJECT (obj), 0);
+ *     g_return_val_if_fail (MY_IS_OBJECT (obj), 0);
  *
  *     return priv->foo;
  *   }
  *
  *   void
- *   my_object_set_bar (xobject_t *obj,
- *                      xint_t      bar)
+ *   my_object_set_bar (MyObject *obj,
+ *                      gint      bar)
  *   {
- *     xobject_private_t *priv = my_object_get_instance_private (obj);
+ *     MyObjectPrivate *priv = my_object_get_instance_private (obj);
  *
  *     g_return_if_fail (MY_IS_OBJECT (obj));
  *
@@ -2016,11 +2016,11 @@ xuint_t     xtype_get_type_registration_serial (void);
  *   }
  * ]|
  *
- * Since GLib 2.72, the returned `xobject_private_t` pointer is guaranteed to be
+ * Since GLib 2.72, the returned `MyObjectPrivate` pointer is guaranteed to be
  * aligned to at least the alignment of the largest basic GLib type (typically
- * this is #xuint64_t or #xdouble_t). If you need larger alignment for an element in
+ * this is #guint64 or #gdouble). If you need larger alignment for an element in
  * the struct, you should allocate it on the heap (aligned), or arrange for your
- * `xobject_private_t` struct to be appropriately padded.
+ * `MyObjectPrivate` struct to be appropriately padded.
  *
  * Note that this macro can only be used together with the `G_DEFINE_TYPE_*`
  * macros, since it depends on variable names from those macros.
@@ -2036,7 +2036,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  */
 #define G_ADD_PRIVATE(TypeName) { \
   TypeName##_private_offset = \
-    xtype_add_instance_private (g_define_type_id, sizeof (TypeName##_private_t)); \
+    g_type_add_instance_private (g_define_type_id, sizeof (TypeName##Private)); \
 }
 
 /**
@@ -2097,71 +2097,71 @@ xuint_t     xtype_get_type_registration_serial (void);
  * a function that has been added in 2.38. see bug:
  * https://bugzilla.gnome.org/show_bug.cgi?id=703191
  */
-#if XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_38
+#if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_38
 #define _G_DEFINE_TYPE_EXTENDED_CLASS_INIT(TypeName, type_name) \
-static void     type_name##_class_intern_init (xpointer_t klass) \
+static void     type_name##_class_intern_init (gpointer klass) \
 { \
-  type_name##_parent_class = xtype_class_peek_parent (klass); \
+  type_name##_parent_class = g_type_class_peek_parent (klass); \
   if (TypeName##_private_offset != 0) \
-    xtype_class_adjust_private_offset (klass, &TypeName##_private_offset); \
-  type_name##_class_init ((TypeName##_class_t*) klass); \
+    g_type_class_adjust_private_offset (klass, &TypeName##_private_offset); \
+  type_name##_class_init ((TypeName##Class*) klass); \
 }
 
 #else
 #define _G_DEFINE_TYPE_EXTENDED_CLASS_INIT(TypeName, type_name) \
-static void     type_name##_class_intern_init (xpointer_t klass) \
+static void     type_name##_class_intern_init (gpointer klass) \
 { \
-  type_name##_parent_class = xtype_class_peek_parent (klass); \
-  type_name##_class_init ((TypeName##_class_t*) klass); \
+  type_name##_parent_class = g_type_class_peek_parent (klass); \
+  type_name##_class_init ((TypeName##Class*) klass); \
 }
-#endif /* XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_38 */
+#endif /* GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_38 */
 
 /* Added for _G_DEFINE_TYPE_EXTENDED_WITH_PRELUDE */
 #define _G_DEFINE_TYPE_EXTENDED_BEGIN_PRE(TypeName, type_name, TYPE_PARENT) \
 \
-static void     type_name##_init              (TypeName##_t        *self); \
-static void     type_name##_class_init        (TypeName##_class_t *klass); \
-static xtype_t    type_name##_get_type_once     (void); \
-static xpointer_t type_name##_parent_class = NULL; \
-static xint_t     TypeName##_private_offset; \
+static void     type_name##_init              (TypeName        *self); \
+static void     type_name##_class_init        (TypeName##Class *klass); \
+static GType    type_name##_get_type_once     (void); \
+static gpointer type_name##_parent_class = NULL; \
+static gint     TypeName##_private_offset; \
 \
 _G_DEFINE_TYPE_EXTENDED_CLASS_INIT(TypeName, type_name) \
 \
 G_GNUC_UNUSED \
-static inline xpointer_t \
-type_name##_get_instance_private (TypeName##_t *self) \
+static inline gpointer \
+type_name##_get_instance_private (TypeName *self) \
 { \
   return (G_STRUCT_MEMBER_P (self, TypeName##_private_offset)); \
 } \
 \
-xtype_t \
+GType \
 type_name##_get_type (void) \
 { \
-  static xsize_t static_g_define_type_id = 0;
+  static gsize static_g_define_type_id = 0;
   /* Prelude goes here */
 
 /* Added for _G_DEFINE_TYPE_EXTENDED_WITH_PRELUDE */
-#define _G_DEFINE_TYPE_EXTENDED_BEGIN_REGISTER(TypeNameNoT, type_name, TYPE_PARENT, flags) \
+#define _G_DEFINE_TYPE_EXTENDED_BEGIN_REGISTER(TypeName, type_name, TYPE_PARENT, flags) \
   if (g_once_init_enter (&static_g_define_type_id)) \
     { \
-      xtype_t g_define_type_id = type_name##_get_type_once (); \
+      GType g_define_type_id = type_name##_get_type_once (); \
       g_once_init_leave (&static_g_define_type_id, g_define_type_id); \
     }					\
   return static_g_define_type_id; \
 } /* closes type_name##_get_type() */ \
 \
 G_GNUC_NO_INLINE \
-static xtype_t \
+static GType \
 type_name##_get_type_once (void) \
 { \
-  xtype_t g_define_type_id = \
-        xtype_register_static_simple (TYPE_PARENT, \
-                                       g_intern_static_string (#TypeNameNoT), \
-                                       sizeof (TypeNameNoT##_class_t), \
-                                       (xclass_init_func_t)(void (*)(void)) type_name##_class_intern_init, \
-                                       sizeof (TypeNameNoT##_t), \
-                                       (xinstance_init_func_t)(void (*)(void)) type_name##_init, \
-                                       (xtype_flags_t) flags); \
+  GType g_define_type_id = \
+        g_type_register_static_simple (TYPE_PARENT, \
+                                       g_intern_static_string (#TypeName), \
+                                       sizeof (TypeName##Class), \
+                                       (GClassInitFunc)(void (*)(void)) type_name##_class_intern_init, \
+                                       sizeof (TypeName), \
+                                       (GInstanceInitFunc)(void (*)(void)) type_name##_init, \
+                                       (GTypeFlags) flags); \
     { /* custom code follows */
 #define _G_DEFINE_TYPE_EXTENDED_END()	\
       /* following custom code */	\
@@ -2172,30 +2172,30 @@ type_name##_get_type_once (void) \
 /* This was defined before we had G_DEFINE_TYPE_WITH_CODE_AND_PRELUDE, it's simplest
  * to keep it.
  */
-#define _G_DEFINE_TYPE_EXTENDED_BEGIN(TypeNameNoT, type_name, TYPE_PARENT, flags) \
-  _G_DEFINE_TYPE_EXTENDED_BEGIN_PRE(TypeNameNoT, type_name, TYPE_PARENT) \
-  _G_DEFINE_TYPE_EXTENDED_BEGIN_REGISTER(TypeNameNoT, type_name, TYPE_PARENT, flags) \
+#define _G_DEFINE_TYPE_EXTENDED_BEGIN(TypeName, type_name, TYPE_PARENT, flags) \
+  _G_DEFINE_TYPE_EXTENDED_BEGIN_PRE(TypeName, type_name, TYPE_PARENT) \
+  _G_DEFINE_TYPE_EXTENDED_BEGIN_REGISTER(TypeName, type_name, TYPE_PARENT, flags) \
 
-#define _G_DEFINE_INTERFACE_EXTENDED_BEGIN(TypeNameNoT, type_name, TYPE_PREREQ) \
+#define _G_DEFINE_INTERFACE_EXTENDED_BEGIN(TypeName, type_name, TYPE_PREREQ) \
 \
-static void     type_name##_default_init        (TypeNameNoT##_interface_t *klass); \
+static void     type_name##_default_init        (TypeName##Interface *klass); \
 \
-xtype_t \
+GType \
 type_name##_get_type (void) \
 { \
-  static xsize_t static_g_define_type_id = 0; \
+  static gsize static_g_define_type_id = 0; \
   if (g_once_init_enter (&static_g_define_type_id)) \
     { \
-      xtype_t g_define_type_id = \
-        xtype_register_static_simple (XTYPE_INTERFACE, \
-                                       g_intern_static_string (#TypeNameNoT), \
-                                       sizeof (TypeNameNoT##_interface_t), \
-                                       (xclass_init_func_t)(void (*)(void)) type_name##_default_init, \
+      GType g_define_type_id = \
+        g_type_register_static_simple (G_TYPE_INTERFACE, \
+                                       g_intern_static_string (#TypeName), \
+                                       sizeof (TypeName##Interface), \
+                                       (GClassInitFunc)(void (*)(void)) type_name##_default_init, \
                                        0, \
-                                       (xinstance_init_func_t)NULL, \
-                                       (xtype_flags_t) 0); \
-      if (TYPE_PREREQ != XTYPE_INVALID) \
-        xtype_interface_add_prerequisite (g_define_type_id, TYPE_PREREQ); \
+                                       (GInstanceInitFunc)NULL, \
+                                       (GTypeFlags) 0); \
+      if (TYPE_PREREQ != G_TYPE_INVALID) \
+        g_type_interface_add_prerequisite (g_define_type_id, TYPE_PREREQ); \
       { /* custom code follows */
 #define _G_DEFINE_INTERFACE_EXTENDED_END()	\
         /* following custom code */		\
@@ -2213,20 +2213,20 @@ type_name##_get_type (void) \
  * @copy_func: the #GBoxedCopyFunc for the new type
  * @free_func: the #GBoxedFreeFunc for the new type
  *
- * A convenience macro for defining a new custom boxed type.
+ * A convenience macro for defining a new custom boxed type. 
  *
  * Using this macro is the recommended way of defining new custom boxed
- * types, over calling xboxed_type_register_static() directly. It defines
+ * types, over calling g_boxed_type_register_static() directly. It defines 
  * a `type_name_get_type()` function which will return the newly defined
- * #xtype_t, enabling lazy instantiation.
+ * #GType, enabling lazy instantiation.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * G_DEFINE_BOXED_TYPE (MyStruct, my_struct, my_struct_copy, my_struct_free)
  *
- * void
+ * void 
  * foo ()
  * {
- *   xtype_t type = my_struct_get_type ();
+ *   GType type = my_struct_get_type ();
  *   // ... your code ...
  * }
  * ]|
@@ -2247,7 +2247,7 @@ type_name##_get_type (void) \
  *
  * Similar to G_DEFINE_BOXED_TYPE(), but allows to insert custom code into the
  * `type_name_get_type()` function, e.g. to register value transformations with
- * xvalue_register_transform_func(), for instance:
+ * g_value_register_transform_func(), for instance:
  *
  * |[<!-- language="C" -->
  * G_DEFINE_BOXED_TYPE_WITH_CODE (GdkRectangle, gdk_rectangle,
@@ -2256,7 +2256,7 @@ type_name##_get_type (void) \
  *                                register_rectangle_transform_funcs (g_define_type_id))
  * ]|
  *
- * Similarly to the `G_DEFINE_TYPE_*` family of macros, the #xtype_t of the newly
+ * Similarly to the `G_DEFINE_TYPE_*` family of macros, the #GType of the newly
  * defined boxed type is exposed in the `g_define_type_id` variable.
  *
  * Since: 2.26
@@ -2268,26 +2268,26 @@ type_name##_get_type (void) \
  */
 #if !defined (__cplusplus) && (G_GNUC_CHECK_VERSION(2, 7)) && !(defined (__APPLE__) && defined (__ppc64__))
 #define _G_DEFINE_BOXED_TYPE_BEGIN(TypeName, type_name, copy_func, free_func) \
-static xtype_t type_name##_get_type_once (void); \
+static GType type_name##_get_type_once (void); \
 \
-xtype_t \
+GType \
 type_name##_get_type (void) \
 { \
-  static xsize_t static_g_define_type_id = 0; \
+  static gsize static_g_define_type_id = 0; \
   if (g_once_init_enter (&static_g_define_type_id)) \
     { \
-      xtype_t g_define_type_id = type_name##_get_type_once (); \
+      GType g_define_type_id = type_name##_get_type_once (); \
       g_once_init_leave (&static_g_define_type_id, g_define_type_id); \
     } \
   return static_g_define_type_id; \
 } \
 \
 G_GNUC_NO_INLINE \
-static xtype_t \
+static GType \
 type_name##_get_type_once (void) \
 { \
-  xtype_t (* _g_register_boxed) \
-    (const xchar_t *, \
+  GType (* _g_register_boxed) \
+    (const gchar *, \
      union \
        { \
          TypeName * (*do_copy_type) (TypeName *); \
@@ -2299,32 +2299,32 @@ type_name##_get_type_once (void) \
          void (* do_free_type) (TypeName *); \
          GBoxedFreeFunc do_free_boxed; \
        } __attribute__((__transparent_union__)) \
-    ) = xboxed_type_register_static; \
-  xtype_t g_define_type_id = \
+    ) = g_boxed_type_register_static; \
+  GType g_define_type_id = \
     _g_register_boxed (g_intern_static_string (#TypeName), copy_func, free_func); \
   { /* custom code follows */
 #else
 #define _G_DEFINE_BOXED_TYPE_BEGIN(TypeName, type_name, copy_func, free_func) \
-static xtype_t type_name##_get_type_once (void); \
+static GType type_name##_get_type_once (void); \
 \
-xtype_t \
+GType \
 type_name##_get_type (void) \
 { \
-  static xsize_t static_g_define_type_id = 0; \
+  static gsize static_g_define_type_id = 0; \
   if (g_once_init_enter (&static_g_define_type_id)) \
     { \
-      xtype_t g_define_type_id = type_name##_get_type_once (); \
+      GType g_define_type_id = type_name##_get_type_once (); \
       g_once_init_leave (&static_g_define_type_id, g_define_type_id); \
     } \
   return static_g_define_type_id; \
 } \
 \
 G_GNUC_NO_INLINE \
-static xtype_t \
+static GType \
 type_name##_get_type_once (void) \
 { \
-  xtype_t g_define_type_id = \
-    xboxed_type_register_static (g_intern_static_string (#TypeName), \
+  GType g_define_type_id = \
+    g_boxed_type_register_static (g_intern_static_string (#TypeName), \
                                   (GBoxedCopyFunc) copy_func, \
                                   (GBoxedFreeFunc) free_func); \
   { /* custom code follows */
@@ -2358,158 +2358,158 @@ type_name##_get_type_once (void) \
 #define G_DEFINE_POINTER_TYPE_WITH_CODE(TypeName, type_name, _C_) _G_DEFINE_POINTER_TYPE_BEGIN (TypeName, type_name) {_C_;} _G_DEFINE_TYPE_EXTENDED_END()
 
 #define _G_DEFINE_POINTER_TYPE_BEGIN(TypeName, type_name) \
-static xtype_t type_name##_get_type_once (void); \
+static GType type_name##_get_type_once (void); \
 \
-xtype_t \
+GType \
 type_name##_get_type (void) \
 { \
-  static xsize_t static_g_define_type_id = 0; \
+  static gsize static_g_define_type_id = 0; \
   if (g_once_init_enter (&static_g_define_type_id)) \
     { \
-      xtype_t g_define_type_id = type_name##_get_type_once (); \
+      GType g_define_type_id = type_name##_get_type_once (); \
       g_once_init_leave (&static_g_define_type_id, g_define_type_id); \
     } \
   return static_g_define_type_id; \
 } \
 \
 G_GNUC_NO_INLINE \
-static xtype_t \
+static GType \
 type_name##_get_type_once (void) \
 { \
-  xtype_t g_define_type_id = \
+  GType g_define_type_id = \
     g_pointer_type_register_static (g_intern_static_string (#TypeName)); \
   { /* custom code follows */
 
 /* --- protected (for fundamental type implementations) --- */
-XPL_AVAILABLE_IN_ALL
-GTypePlugin*	 xtype_get_plugin		(xtype_t		     type);
-XPL_AVAILABLE_IN_ALL
-GTypePlugin*	 xtype_interface_get_plugin	(xtype_t		     instance_type,
-						 xtype_t               interface_type);
-XPL_AVAILABLE_IN_ALL
-xtype_t		 xtype_fundamental_next	(void);
-XPL_AVAILABLE_IN_ALL
-xtype_t		 xtype_fundamental		(xtype_t		     type_id);
-XPL_AVAILABLE_IN_ALL
-GTypeInstance*   xtype_create_instance         (xtype_t               type);
-XPL_AVAILABLE_IN_ALL
-void             xtype_free_instance           (GTypeInstance      *instance);
+GLIB_AVAILABLE_IN_ALL
+GTypePlugin*	 g_type_get_plugin		(GType		     type);
+GLIB_AVAILABLE_IN_ALL
+GTypePlugin*	 g_type_interface_get_plugin	(GType		     instance_type,
+						 GType               interface_type);
+GLIB_AVAILABLE_IN_ALL
+GType		 g_type_fundamental_next	(void);
+GLIB_AVAILABLE_IN_ALL
+GType		 g_type_fundamental		(GType		     type_id);
+GLIB_AVAILABLE_IN_ALL
+GTypeInstance*   g_type_create_instance         (GType               type);
+GLIB_AVAILABLE_IN_ALL
+void             g_type_free_instance           (GTypeInstance      *instance);
 
-XPL_AVAILABLE_IN_ALL
-void		 xtype_add_class_cache_func    (xpointer_t	     cache_data,
+GLIB_AVAILABLE_IN_ALL
+void		 g_type_add_class_cache_func    (gpointer	     cache_data,
 						 GTypeClassCacheFunc cache_func);
-XPL_AVAILABLE_IN_ALL
-void		 xtype_remove_class_cache_func (xpointer_t	     cache_data,
+GLIB_AVAILABLE_IN_ALL
+void		 g_type_remove_class_cache_func (gpointer	     cache_data,
 						 GTypeClassCacheFunc cache_func);
-XPL_AVAILABLE_IN_ALL
-void             xtype_class_unref_uncached    (xpointer_t            g_class);
+GLIB_AVAILABLE_IN_ALL
+void             g_type_class_unref_uncached    (gpointer            g_class);
 
-XPL_AVAILABLE_IN_ALL
-void             xtype_add_interface_check     (xpointer_t	         check_data,
+GLIB_AVAILABLE_IN_ALL
+void             g_type_add_interface_check     (gpointer	         check_data,
 						 GTypeInterfaceCheckFunc check_func);
-XPL_AVAILABLE_IN_ALL
-void             xtype_remove_interface_check  (xpointer_t	         check_data,
+GLIB_AVAILABLE_IN_ALL
+void             g_type_remove_interface_check  (gpointer	         check_data,
 						 GTypeInterfaceCheckFunc check_func);
 
-XPL_AVAILABLE_IN_ALL
-xtype_value_table_t* xtype_value_table_peek        (xtype_t		     type);
+GLIB_AVAILABLE_IN_ALL
+GTypeValueTable* g_type_value_table_peek        (GType		     type);
 
 
 /*< private >*/
-XPL_AVAILABLE_IN_ALL
-xboolean_t	 xtype_check_instance          (GTypeInstance      *instance) G_GNUC_PURE;
-XPL_AVAILABLE_IN_ALL
-GTypeInstance*   xtype_check_instance_cast     (GTypeInstance      *instance,
-						 xtype_t               iface_type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xtype_check_instance_is_a	(GTypeInstance      *instance,
-						 xtype_t               iface_type) G_GNUC_PURE;
-XPL_AVAILABLE_IN_2_42
-xboolean_t         xtype_check_instance_is_fundamentally_a (GTypeInstance *instance,
-                                                           xtype_t          fundamental_type) G_GNUC_PURE;
-XPL_AVAILABLE_IN_ALL
-xtype_class_t*      xtype_check_class_cast        (xtype_class_t         *g_class,
-						 xtype_t               is_a_type);
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xtype_check_class_is_a        (xtype_class_t         *g_class,
-						 xtype_t               is_a_type) G_GNUC_PURE;
-XPL_AVAILABLE_IN_ALL
-xboolean_t	 xtype_check_is_value_type     (xtype_t		     type) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xboolean_t	 xtype_check_value             (const xvalue_t       *value) G_GNUC_PURE;
-XPL_AVAILABLE_IN_ALL
-xboolean_t	 xtype_check_value_holds	(const xvalue_t	    *value,
-						 xtype_t		     type) G_GNUC_PURE;
-XPL_AVAILABLE_IN_ALL
-xboolean_t         xtype_test_flags              (xtype_t               type,
-						 xuint_t               flags) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+gboolean	 g_type_check_instance          (GTypeInstance      *instance) G_GNUC_PURE;
+GLIB_AVAILABLE_IN_ALL
+GTypeInstance*   g_type_check_instance_cast     (GTypeInstance      *instance,
+						 GType               iface_type);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_type_check_instance_is_a	(GTypeInstance      *instance,
+						 GType               iface_type) G_GNUC_PURE;
+GLIB_AVAILABLE_IN_2_42
+gboolean         g_type_check_instance_is_fundamentally_a (GTypeInstance *instance,
+                                                           GType          fundamental_type) G_GNUC_PURE;
+GLIB_AVAILABLE_IN_ALL
+GTypeClass*      g_type_check_class_cast        (GTypeClass         *g_class,
+						 GType               is_a_type);
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_type_check_class_is_a        (GTypeClass         *g_class,
+						 GType               is_a_type) G_GNUC_PURE;
+GLIB_AVAILABLE_IN_ALL
+gboolean	 g_type_check_is_value_type     (GType		     type) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+gboolean	 g_type_check_value             (const GValue       *value) G_GNUC_PURE;
+GLIB_AVAILABLE_IN_ALL
+gboolean	 g_type_check_value_holds	(const GValue	    *value,
+						 GType		     type) G_GNUC_PURE;
+GLIB_AVAILABLE_IN_ALL
+gboolean         g_type_test_flags              (GType               type,
+						 guint               flags) G_GNUC_CONST;
 
 
 /* --- debugging functions --- */
-XPL_AVAILABLE_IN_ALL
-const xchar_t *    xtype_name_from_instance      (GTypeInstance	*instance);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *    xtype_name_from_class         (xtype_class_t	*g_class);
+GLIB_AVAILABLE_IN_ALL
+const gchar *    g_type_name_from_instance      (GTypeInstance	*instance);
+GLIB_AVAILABLE_IN_ALL
+const gchar *    g_type_name_from_class         (GTypeClass	*g_class);
 
 
 /* --- implementation bits --- */
 #ifndef G_DISABLE_CAST_CHECKS
-#  define _XTYPE_CIC(ip, gt, ct) \
-    ((ct*) (void *) xtype_check_instance_cast ((GTypeInstance*) ip, gt))
-#  define _XTYPE_CCC(cp, gt, ct) \
-    ((ct*) (void *) xtype_check_class_cast ((xtype_class_t*) cp, gt))
+#  define _G_TYPE_CIC(ip, gt, ct) \
+    ((ct*) (void *) g_type_check_instance_cast ((GTypeInstance*) ip, gt))
+#  define _G_TYPE_CCC(cp, gt, ct) \
+    ((ct*) (void *) g_type_check_class_cast ((GTypeClass*) cp, gt))
 #else /* G_DISABLE_CAST_CHECKS */
-#  define _XTYPE_CIC(ip, gt, ct)       ((ct*) ip)
-#  define _XTYPE_CCC(cp, gt, ct)       ((ct*) cp)
+#  define _G_TYPE_CIC(ip, gt, ct)       ((ct*) ip)
+#  define _G_TYPE_CCC(cp, gt, ct)       ((ct*) cp)
 #endif /* G_DISABLE_CAST_CHECKS */
-#define _XTYPE_CHI(ip)			(xtype_check_instance ((GTypeInstance*) ip))
-#define _XTYPE_CHV(vl)			(xtype_check_value ((xvalue_t*) vl))
-#define _XTYPE_IGC(ip, gt, ct)         ((ct*) (((GTypeInstance*) ip)->g_class))
-#define _XTYPE_IGI(ip, gt, ct)         ((ct*) xtype_interface_peek (((GTypeInstance*) ip)->g_class, gt))
-#define _XTYPE_CIFT(ip, ft)            (xtype_check_instance_is_fundamentally_a ((GTypeInstance*) ip, ft))
+#define _G_TYPE_CHI(ip)			(g_type_check_instance ((GTypeInstance*) ip))
+#define _G_TYPE_CHV(vl)			(g_type_check_value ((GValue*) vl))
+#define _G_TYPE_IGC(ip, gt, ct)         ((ct*) (((GTypeInstance*) ip)->g_class))
+#define _G_TYPE_IGI(ip, gt, ct)         ((ct*) g_type_interface_peek (((GTypeInstance*) ip)->g_class, gt))
+#define _G_TYPE_CIFT(ip, ft)            (g_type_check_instance_is_fundamentally_a ((GTypeInstance*) ip, ft))
 #ifdef	__GNUC__
-#  define _XTYPE_CIT(ip, gt)             (G_GNUC_EXTENSION ({ \
-  GTypeInstance *__inst = (GTypeInstance*) ip; xtype_t __t = gt; xboolean_t __r; \
+#  define _G_TYPE_CIT(ip, gt)             (G_GNUC_EXTENSION ({ \
+  GTypeInstance *__inst = (GTypeInstance*) ip; GType __t = gt; gboolean __r; \
   if (!__inst) \
     __r = FALSE; \
   else if (__inst->g_class && __inst->g_class->g_type == __t) \
     __r = TRUE; \
   else \
-    __r = xtype_check_instance_is_a (__inst, __t); \
+    __r = g_type_check_instance_is_a (__inst, __t); \
   __r; \
 }))
-#  define _XTYPE_CCT(cp, gt)             (G_GNUC_EXTENSION ({ \
-  xtype_class_t *__class = (xtype_class_t*) cp; xtype_t __t = gt; xboolean_t __r; \
+#  define _G_TYPE_CCT(cp, gt)             (G_GNUC_EXTENSION ({ \
+  GTypeClass *__class = (GTypeClass*) cp; GType __t = gt; gboolean __r; \
   if (!__class) \
     __r = FALSE; \
   else if (__class->g_type == __t) \
     __r = TRUE; \
   else \
-    __r = xtype_check_class_is_a (__class, __t); \
+    __r = g_type_check_class_is_a (__class, __t); \
   __r; \
 }))
-#  define _XTYPE_CVH(vl, gt)             (G_GNUC_EXTENSION ({ \
-  const xvalue_t *__val = (const xvalue_t*) vl; xtype_t __t = gt; xboolean_t __r; \
+#  define _G_TYPE_CVH(vl, gt)             (G_GNUC_EXTENSION ({ \
+  const GValue *__val = (const GValue*) vl; GType __t = gt; gboolean __r; \
   if (!__val) \
     __r = FALSE; \
   else if (__val->g_type == __t)		\
     __r = TRUE; \
   else \
-    __r = xtype_check_value_holds (__val, __t); \
+    __r = g_type_check_value_holds (__val, __t); \
   __r; \
 }))
 #else  /* !__GNUC__ */
-#  define _XTYPE_CIT(ip, gt)             (xtype_check_instance_is_a ((GTypeInstance*) ip, gt))
-#  define _XTYPE_CCT(cp, gt)             (xtype_check_class_is_a ((xtype_class_t*) cp, gt))
-#  define _XTYPE_CVH(vl, gt)             (xtype_check_value_holds ((const xvalue_t*) vl, gt))
+#  define _G_TYPE_CIT(ip, gt)             (g_type_check_instance_is_a ((GTypeInstance*) ip, gt))
+#  define _G_TYPE_CCT(cp, gt)             (g_type_check_class_is_a ((GTypeClass*) cp, gt))
+#  define _G_TYPE_CVH(vl, gt)             (g_type_check_value_holds ((const GValue*) vl, gt))
 #endif /* !__GNUC__ */
 /**
- * XTYPE_FLAG_RESERVED_ID_BIT:
- *
+ * G_TYPE_FLAG_RESERVED_ID_BIT:
+ * 
  * A bit in the type number that's supposed to be left untouched.
  */
-#define	XTYPE_FLAG_RESERVED_ID_BIT	((xtype_t) (1 << 0))
+#define	G_TYPE_FLAG_RESERVED_ID_BIT	((GType) (1 << 0))
 
 G_END_DECLS
 
-#endif /* __XTYPE_H__ */
+#endif /* __G_TYPE_H__ */

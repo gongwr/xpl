@@ -30,28 +30,28 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_ZLIB_DECOMPRESSOR         (g_zlib_decompressor_get_type ())
-#define G_ZLIB_DECOMPRESSOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_ZLIB_DECOMPRESSOR, xzlib_decompressor))
-#define G_ZLIB_DECOMPRESSOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_ZLIB_DECOMPRESSOR, GZlibDecompressorClass))
-#define X_IS_ZLIB_DECOMPRESSOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_ZLIB_DECOMPRESSOR))
-#define X_IS_ZLIB_DECOMPRESSOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_ZLIB_DECOMPRESSOR))
-#define G_ZLIB_DECOMPRESSOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_ZLIB_DECOMPRESSOR, GZlibDecompressorClass))
+#define G_TYPE_ZLIB_DECOMPRESSOR         (g_zlib_decompressor_get_type ())
+#define G_ZLIB_DECOMPRESSOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_ZLIB_DECOMPRESSOR, GZlibDecompressor))
+#define G_ZLIB_DECOMPRESSOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_ZLIB_DECOMPRESSOR, GZlibDecompressorClass))
+#define G_IS_ZLIB_DECOMPRESSOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_ZLIB_DECOMPRESSOR))
+#define G_IS_ZLIB_DECOMPRESSOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_ZLIB_DECOMPRESSOR))
+#define G_ZLIB_DECOMPRESSOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_ZLIB_DECOMPRESSOR, GZlibDecompressorClass))
 
 typedef struct _GZlibDecompressorClass   GZlibDecompressorClass;
 
 struct _GZlibDecompressorClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t              g_zlib_decompressor_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType              g_zlib_decompressor_get_type (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xzlib_decompressor_t *g_zlib_decompressor_new (GZlibCompressorFormat format);
+GLIB_AVAILABLE_IN_ALL
+GZlibDecompressor *g_zlib_decompressor_new (GZlibCompressorFormat format);
 
-XPL_AVAILABLE_IN_ALL
-xfile_info_t         *g_zlib_decompressor_get_file_info (xzlib_decompressor_t *decompressor);
+GLIB_AVAILABLE_IN_ALL
+GFileInfo         *g_zlib_decompressor_get_file_info (GZlibDecompressor *decompressor);
 
 G_END_DECLS
 

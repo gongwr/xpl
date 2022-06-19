@@ -29,259 +29,259 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GAppLaunchContext             xapp_launch_context_t;
-typedef struct _GAppInfo                      xapp_info_t; /* Dummy typedef */
-typedef struct _GAsyncResult                  xasync_result_t; /* Dummy typedef */
-typedef struct _GAsyncInitable                xasync_initable_t;
-typedef struct _GBufferedInputStream          xbuffered_input_stream_t;
-typedef struct _GBufferedOutputStream         xbuffered_output_stream_t;
-typedef struct _GCancellable                  xcancellable_t;
-typedef struct _GCharsetConverter             xcharset_converter_t;
-typedef struct _GConverter                    xconverter_t;
-typedef struct _GConverterInputStream         xconverter_input_stream_t;
-typedef struct _xconverter_output_stream        xconverter_output_stream_t;
-typedef struct _GDatagramBased                xdatagram_based_t;
-typedef struct _GDataInputStream              xdata_input_stream_t;
-typedef struct _GSimplePermission             xsimple_permission_t;
-typedef struct _GZlibCompressor               xzlib_compressor_t;
-typedef struct _GZlibDecompressor             xzlib_decompressor_t;
+typedef struct _GAppLaunchContext             GAppLaunchContext;
+typedef struct _GAppInfo                      GAppInfo; /* Dummy typedef */
+typedef struct _GAsyncResult                  GAsyncResult; /* Dummy typedef */
+typedef struct _GAsyncInitable                GAsyncInitable;
+typedef struct _GBufferedInputStream          GBufferedInputStream;
+typedef struct _GBufferedOutputStream         GBufferedOutputStream;
+typedef struct _GCancellable                  GCancellable;
+typedef struct _GCharsetConverter             GCharsetConverter;
+typedef struct _GConverter                    GConverter;
+typedef struct _GConverterInputStream         GConverterInputStream;
+typedef struct _GConverterOutputStream        GConverterOutputStream;
+typedef struct _GDatagramBased                GDatagramBased;
+typedef struct _GDataInputStream              GDataInputStream;
+typedef struct _GSimplePermission             GSimplePermission;
+typedef struct _GZlibCompressor               GZlibCompressor;
+typedef struct _GZlibDecompressor             GZlibDecompressor;
 
-typedef struct _GSimpleActionGroup            xsimple_action_group_t;
-typedef struct _GRemoteActionGroup            xremote_action_group_t;
-typedef struct _GDBusActionGroup              xdbus_action_group_t;
-typedef struct _GActionMap                    xaction_map_t;
-typedef struct _GActionGroup                  xaction_group_t;
-typedef struct _GPropertyAction               xproperty_action_t;
-typedef struct _GSimpleAction                 xsimple_action_t;
-typedef struct _GAction                       xaction_t;
-typedef struct _xapplication                  xapplication_t;
-typedef struct _GApplicationCommandLine       xapplication_command_line_t;
-typedef struct _GSettingsBackend              xsettings_backend_t;
-typedef struct _GSettings                     xsettings_t;
-typedef struct _GPermission                   xpermission_t;
+typedef struct _GSimpleActionGroup            GSimpleActionGroup;
+typedef struct _GRemoteActionGroup            GRemoteActionGroup;
+typedef struct _GDBusActionGroup              GDBusActionGroup;
+typedef struct _GActionMap                    GActionMap;
+typedef struct _GActionGroup                  GActionGroup;
+typedef struct _GPropertyAction               GPropertyAction;
+typedef struct _GSimpleAction                 GSimpleAction;
+typedef struct _GAction                       GAction;
+typedef struct _GApplication                  GApplication;
+typedef struct _GApplicationCommandLine       GApplicationCommandLine;
+typedef struct _GSettingsBackend              GSettingsBackend;
+typedef struct _GSettings                     GSettings;
+typedef struct _GPermission                   GPermission;
 
-typedef struct _GMenuModel                    xmenu_model_t;
-typedef struct _GNotification                 xnotification_t;
+typedef struct _GMenuModel                    GMenuModel;
+typedef struct _GNotification                 GNotification;
 
 /**
- * xdrive_t:
+ * GDrive:
  *
  * Opaque drive object.
  **/
-typedef struct _GDrive                        xdrive_t; /* Dummy typedef */
-typedef struct _GFileEnumerator               xfile_enumerator_t;
-typedef struct _GFileMonitor                  xfile_monitor_t;
-typedef struct _GFilterInputStream            xfilter_input_stream_t;
-typedef struct _GFilterOutputStream           xfilter_output_stream_t;
+typedef struct _GDrive                        GDrive; /* Dummy typedef */
+typedef struct _GFileEnumerator               GFileEnumerator;
+typedef struct _GFileMonitor                  GFileMonitor;
+typedef struct _GFilterInputStream            GFilterInputStream;
+typedef struct _GFilterOutputStream           GFilterOutputStream;
 
 /**
- * xfile_t:
+ * GFile:
  *
- * A handle to an object implementing the #xfile_iface_t interface.
+ * A handle to an object implementing the #GFileIface interface.
  * Generally stores a location within the file system. Handles do not
  * necessarily represent files or directories that currently exist.
  **/
-typedef struct _GFile                         xfile_t; /* Dummy typedef */
-typedef struct _xfile_info                     xfile_info_t;
+typedef struct _GFile                         GFile; /* Dummy typedef */
+typedef struct _GFileInfo                     GFileInfo;
 
 /**
- * xfile_attribute_matcher_t:
+ * GFileAttributeMatcher:
  *
  * Determines if a string matches a file attribute.
  **/
-typedef struct _GFileAttributeMatcher         xfile_attribute_matcher_t;
-typedef struct _GFileAttributeInfo            xfile_attribute_info_t;
-typedef struct _GFileAttributeInfoList        xfile_attribute_info_list_t;
-typedef struct _GFileDescriptorBased          xfile_descriptor_based_t;
-typedef struct _xfile_input_stream              xfile_input_stream_t;
-typedef struct _GFileOutputStream             xfile_output_stream_t;
-typedef struct _GFileIOStream                 xfile_io_stream_t;
-typedef struct _GFileIcon                     xfile_icon_t;
-typedef struct _xfilename_completer            xfilename_completer_t;
+typedef struct _GFileAttributeMatcher         GFileAttributeMatcher;
+typedef struct _GFileAttributeInfo            GFileAttributeInfo;
+typedef struct _GFileAttributeInfoList        GFileAttributeInfoList;
+typedef struct _GFileDescriptorBased          GFileDescriptorBased;
+typedef struct _GFileInputStream              GFileInputStream;
+typedef struct _GFileOutputStream             GFileOutputStream;
+typedef struct _GFileIOStream                 GFileIOStream;
+typedef struct _GFileIcon                     GFileIcon;
+typedef struct _GFilenameCompleter            GFilenameCompleter;
 
 
-typedef struct _GIcon                         xicon_t; /* Dummy typedef */
-typedef struct _GInetAddress                  xinet_address_t;
-typedef struct _GInetAddressMask              xinet_address_mask_t;
-typedef struct _GInetSocketAddress            xinet_socket_address_t;
-typedef struct _GNativeSocketAddress          xnative_socket_address_t;
-typedef struct _GInputStream                  xinput_stream_t;
-typedef struct _GInitable                     xinitable_t;
-typedef struct _xio_module                     xio_module_t;
-typedef struct _GIOExtensionPoint             xio_extension_point_t;
-typedef struct _GIOExtension                  xio_extension_t;
+typedef struct _GIcon                         GIcon; /* Dummy typedef */
+typedef struct _GInetAddress                  GInetAddress;
+typedef struct _GInetAddressMask              GInetAddressMask;
+typedef struct _GInetSocketAddress            GInetSocketAddress;
+typedef struct _GNativeSocketAddress          GNativeSocketAddress;
+typedef struct _GInputStream                  GInputStream;
+typedef struct _GInitable                     GInitable;
+typedef struct _GIOModule                     GIOModule;
+typedef struct _GIOExtensionPoint             GIOExtensionPoint;
+typedef struct _GIOExtension                  GIOExtension;
 
 /**
- * xio_scheduler_job_t:
+ * GIOSchedulerJob:
  *
  * Opaque class for defining and scheduling IO jobs.
  **/
-typedef struct _GIOSchedulerJob               xio_scheduler_job_t;
-typedef struct _GIOStreamAdapter              xio_stream_adapter_t;
-typedef struct _GLoadableIcon                 xloadable_icon_t; /* Dummy typedef */
-typedef struct _xbytes_icon                    xbytes_icon_t;
-typedef struct _GMemoryInputStream            xmemory_input_stream_t;
-typedef struct _GMemoryOutputStream           xmemory_output_stream_t;
+typedef struct _GIOSchedulerJob               GIOSchedulerJob;
+typedef struct _GIOStreamAdapter              GIOStreamAdapter;
+typedef struct _GLoadableIcon                 GLoadableIcon; /* Dummy typedef */
+typedef struct _GBytesIcon                    GBytesIcon;
+typedef struct _GMemoryInputStream            GMemoryInputStream;
+typedef struct _GMemoryOutputStream           GMemoryOutputStream;
 
 /**
- * xmount_t:
+ * GMount:
  *
  * A handle to an object implementing the #GMountIface interface.
  **/
-typedef struct _GMount                        xmount_t; /* Dummy typedef */
-typedef struct _GMountOperation               xmount_operation_t;
-typedef struct _GNetworkAddress               xnetwork_address_t;
-typedef struct _GNetworkMonitor               xnetwork_monitor_t;
-typedef struct _GNetworkService               xnetwork_service_t;
-typedef struct _xoutput_stream                 xoutput_stream_t;
-typedef struct _xio_stream                    xio_stream_t;
-typedef struct _GSimpleIOStream               xsimple_io_stream_t;
-typedef struct _GPollableInputStream          xpollable_input_stream_t; /* Dummy typedef */
-typedef struct _GPollableOutputStream         xpollable_output_stream_t; /* Dummy typedef */
-typedef struct _GResolver                     xresolver_t;
+typedef struct _GMount                        GMount; /* Dummy typedef */
+typedef struct _GMountOperation               GMountOperation;
+typedef struct _GNetworkAddress               GNetworkAddress;
+typedef struct _GNetworkMonitor               GNetworkMonitor;
+typedef struct _GNetworkService               GNetworkService;
+typedef struct _GOutputStream                 GOutputStream;
+typedef struct _GIOStream                     GIOStream;
+typedef struct _GSimpleIOStream               GSimpleIOStream;
+typedef struct _GPollableInputStream          GPollableInputStream; /* Dummy typedef */
+typedef struct _GPollableOutputStream         GPollableOutputStream; /* Dummy typedef */
+typedef struct _GResolver                     GResolver;
 
 /**
- * xresource_t:
+ * GResource:
  *
  * A resource bundle.
  *
  * Since: 2.32
  */
-typedef struct _GResource                     xresource_t;
-typedef struct _GSeekable                     xseekable__t;
-typedef struct _GSimpleAsyncResult            xsimple_async_result_t;
+typedef struct _GResource                     GResource;
+typedef struct _GSeekable                     GSeekable;
+typedef struct _GSimpleAsyncResult            GSimpleAsyncResult;
 
 /**
- * xsocket_t:
+ * GSocket:
  *
  * A lowlevel network socket object.
  *
  * Since: 2.22
  **/
-typedef struct _GSocket                       xsocket_t;
+typedef struct _GSocket                       GSocket;
 
 /**
- * xsocket_control_message_t:
+ * GSocketControlMessage:
  *
  * Base class for socket-type specific control messages that can be sent and
- * received over #xsocket_t.
+ * received over #GSocket.
  **/
-typedef struct _GSocketControlMessage         xsocket_control_message_t;
+typedef struct _GSocketControlMessage         GSocketControlMessage;
 /**
- * xsocket_client_t:
+ * GSocketClient:
  *
  * A helper class for network clients to make connections.
  *
  * Since: 2.22
  **/
-typedef struct _GSocketClient                               xsocket_client_t;
+typedef struct _GSocketClient                               GSocketClient;
 /**
- * xsocket_connection_t:
+ * GSocketConnection:
  *
- * A socket connection xio_stream_t object for connection-oriented sockets.
+ * A socket connection GIOStream object for connection-oriented sockets.
  *
  * Since: 2.22
  **/
-typedef struct _xsocket_connection                           xsocket_connection_t;
+typedef struct _GSocketConnection                           GSocketConnection;
 /**
- * xsocket_listener_t:
+ * GSocketListener:
  *
  * A helper class for network servers to listen for and accept connections.
  *
  * Since: 2.22
  **/
-typedef struct _GSocketListener                             xsocket_listener_t;
+typedef struct _GSocketListener                             GSocketListener;
 /**
- * xsocket_service_t:
+ * GSocketService:
  *
  * A helper class for handling accepting incoming connections in the
  * glib mainloop.
  *
  * Since: 2.22
  **/
-typedef struct _GSocketService                              xsocket_service_t;
-typedef struct _GSocketAddress                xsocket_address_t;
-typedef struct _GSocketAddressEnumerator      xsocket_address_enumerator_t;
-typedef struct _GSocketConnectable            xsocket_connectable_t;
-typedef struct _GSrvTarget                    xsrv_target_t;
-typedef struct _GTask                         xtask_t;
+typedef struct _GSocketService                              GSocketService;
+typedef struct _GSocketAddress                GSocketAddress;
+typedef struct _GSocketAddressEnumerator      GSocketAddressEnumerator;
+typedef struct _GSocketConnectable            GSocketConnectable;
+typedef struct _GSrvTarget                    GSrvTarget;
+typedef struct _GTask                         GTask;
 /**
- * xtcp_connection_t:
+ * GTcpConnection:
  *
- * A #xsocket_connection_t for TCP/IP connections.
+ * A #GSocketConnection for TCP/IP connections.
  *
  * Since: 2.22
  **/
-typedef struct _GTcpConnection                              xtcp_connection_t;
-typedef struct _GTcpWrapperConnection                       xtcp_wrapper_connection_t;
+typedef struct _GTcpConnection                              GTcpConnection;
+typedef struct _GTcpWrapperConnection                       GTcpWrapperConnection;
 /**
- * xthreaded_socket_service_t:
+ * GThreadedSocketService:
  *
  * A helper class for handling accepting incoming connections in the
  * glib mainloop and handling them in a thread.
  *
  * Since: 2.22
  **/
-typedef struct _GThreadedSocketService                      xthreaded_socket_service_t;
-typedef struct _GDtlsConnection               xdtls_connection_t;
-typedef struct _GDtlsClientConnection         xdtls_client_connection_t; /* Dummy typedef */
-typedef struct _GDtlsServerConnection         xdtls_server_connection_t; /* Dummy typedef */
-typedef struct _GThemedIcon                   xthemed_icon_t;
-typedef struct _GTlsCertificate               xtls_certificate_t;
-typedef struct _GTlsClientConnection          xtls_client_connection_t; /* Dummy typedef */
-typedef struct _GTlsConnection                xtls_connection_t;
-typedef struct _GTlsDatabase                  xtls_database_t;
-typedef struct _GTlsFileDatabase              xtls_file_database_t;
-typedef struct _GTlsInteraction               xtls_interaction_t;
-typedef struct _GTlsPassword                  xtls_password_t;
-typedef struct _GTlsServerConnection          xtls_server_connection_t; /* Dummy typedef */
-typedef struct _GVfs                          xvfs_t; /* Dummy typedef */
+typedef struct _GThreadedSocketService                      GThreadedSocketService;
+typedef struct _GDtlsConnection               GDtlsConnection;
+typedef struct _GDtlsClientConnection         GDtlsClientConnection; /* Dummy typedef */
+typedef struct _GDtlsServerConnection         GDtlsServerConnection; /* Dummy typedef */
+typedef struct _GThemedIcon                   GThemedIcon;
+typedef struct _GTlsCertificate               GTlsCertificate;
+typedef struct _GTlsClientConnection          GTlsClientConnection; /* Dummy typedef */
+typedef struct _GTlsConnection                GTlsConnection;
+typedef struct _GTlsDatabase                  GTlsDatabase;
+typedef struct _GTlsFileDatabase              GTlsFileDatabase;
+typedef struct _GTlsInteraction               GTlsInteraction;
+typedef struct _GTlsPassword                  GTlsPassword;
+typedef struct _GTlsServerConnection          GTlsServerConnection; /* Dummy typedef */
+typedef struct _GVfs                          GVfs; /* Dummy typedef */
 
 /**
- * xproxy_resolver_t:
+ * GProxyResolver:
  *
  * A helper class to enumerate proxies base on URI.
  *
  * Since: 2.26
  **/
-typedef struct _GProxyResolver                xproxy_resolver_t;
-typedef struct _GProxy			      xproxy_t;
-typedef struct _GProxyAddress		      xproxy_address_t;
-typedef struct _GProxyAddressEnumerator	      xproxy_address_enumerator_t;
+typedef struct _GProxyResolver                GProxyResolver;
+typedef struct _GProxy			      GProxy;
+typedef struct _GProxyAddress		      GProxyAddress;
+typedef struct _GProxyAddressEnumerator	      GProxyAddressEnumerator;
 
 /**
- * xvolume_t:
+ * GVolume:
  *
  * Opaque mountable volume object.
  **/
-typedef struct _xvolume                       xvolume_t; /* Dummy typedef */
-typedef struct _xvolume_monitor                xvolume_monitor_t;
+typedef struct _GVolume                       GVolume; /* Dummy typedef */
+typedef struct _GVolumeMonitor                GVolumeMonitor;
 
 /**
- * xasync_ready_callback_t:
+ * GAsyncReadyCallback:
  * @source_object: (nullable): the object the asynchronous operation was started with.
- * @res: a #xasync_result_t.
+ * @res: a #GAsyncResult.
  * @user_data: user data passed to the callback.
  *
  * Type definition for a function that will be called back when an asynchronous
- * operation within GIO has been completed. #xasync_ready_callback_t
- * callbacks from #xtask_t are guaranteed to be invoked in a later
+ * operation within GIO has been completed. #GAsyncReadyCallback
+ * callbacks from #GTask are guaranteed to be invoked in a later
  * iteration of the
  * [thread-default main context][g-main-context-push-thread-default]
- * where the #xtask_t was created. All other users of
- * #xasync_ready_callback_t must likewise call it asynchronously in a
+ * where the #GTask was created. All other users of
+ * #GAsyncReadyCallback must likewise call it asynchronously in a
  * later iteration of the main context.
  *
  * The asynchronous operation is guaranteed to have held a reference to
  * @source_object from the time when the `*_async()` function was called, until
  * after this callback returns.
  **/
-typedef void (*xasync_ready_callback_t) (xobject_t *source_object,
-				     xasync_result_t *res,
-				     xpointer_t user_data);
+typedef void (*GAsyncReadyCallback) (GObject *source_object,
+				     GAsyncResult *res,
+				     gpointer user_data);
 
 /**
- * xfile_progress_callback_t:
+ * GFileProgressCallback:
  * @current_num_bytes: the current number of bytes in the operation.
  * @total_num_bytes: the total number of bytes in the operation.
  * @user_data: user data passed to the callback.
@@ -290,41 +290,41 @@ typedef void (*xasync_ready_callback_t) (xobject_t *source_object,
  * a file or copying a file, a progress callback is used to pass how
  * far along that operation is to the application.
  **/
-typedef void (*xfile_progress_callback_t) (xoffset_t current_num_bytes,
-                                       xoffset_t total_num_bytes,
-                                       xpointer_t user_data);
+typedef void (*GFileProgressCallback) (goffset current_num_bytes,
+                                       goffset total_num_bytes,
+                                       gpointer user_data);
 
 /**
- * xfile_read_more_callback_t:
+ * GFileReadMoreCallback:
  * @file_contents: the data as currently read.
  * @file_size: the size of the data currently read.
  * @callback_data: (closure): data passed to the callback.
  *
- * When loading the partial contents of a file with xfile_load_partial_contents_async(),
+ * When loading the partial contents of a file with g_file_load_partial_contents_async(),
  * it may become necessary to determine if any more data from the file should be loaded.
- * A #xfile_read_more_callback_t function facilitates this by returning %TRUE if more data
+ * A #GFileReadMoreCallback function facilitates this by returning %TRUE if more data
  * should be read, or %FALSE otherwise.
  *
  * Returns: %TRUE if more data should be read back. %FALSE otherwise.
  **/
-typedef xboolean_t (* xfile_read_more_callback_t) (const char *file_contents,
-                                            xoffset_t file_size,
-                                            xpointer_t callback_data);
+typedef gboolean (* GFileReadMoreCallback) (const char *file_contents,
+                                            goffset file_size,
+                                            gpointer callback_data);
 
 /**
- * xfile_measure_progress_callback_t:
+ * GFileMeasureProgressCallback:
  * @reporting: %TRUE if more reports will come
  * @current_size: the current cumulative size measurement
  * @num_dirs: the number of directories visited so far
  * @num_files: the number of non-directory files encountered
  * @user_data: the data passed to the original request for this callback
  *
- * This callback type is used by xfile_measure_disk_usage() to make
+ * This callback type is used by g_file_measure_disk_usage() to make
  * periodic progress reports when measuring the amount of disk spaced
  * used by a directory.
  *
  * These calls are made on a best-effort basis and not all types of
- * #xfile_t will support them.  At the minimum, however, one call will
+ * #GFile will support them.  At the minimum, however, one call will
  * always be made immediately.
  *
  * In the case that there is no support, @reporting will be set to
@@ -333,13 +333,13 @@ typedef xboolean_t (* xfile_read_more_callback_t) (const char *file_contents,
  * all-zeros during the first (immediate) call.  In this way, you can
  * know which type of progress UI to show without a delay.
  *
- * For xfile_measure_disk_usage() the callback is made directly.  For
- * xfile_measure_disk_usage_async() the callback is made via the
+ * For g_file_measure_disk_usage() the callback is made directly.  For
+ * g_file_measure_disk_usage_async() the callback is made via the
  * default main context of the calling thread (ie: the same way that the
  * final async result would be reported).
  *
  * @current_size is in the same units as requested by the operation (see
- * %XFILE_MEASURE_APPARENT_SIZE).
+ * %G_FILE_MEASURE_APPARENT_SIZE).
  *
  * The frequency of the updates is implementation defined, but is
  * ideally about once every 200ms.
@@ -349,16 +349,16 @@ typedef xboolean_t (* xfile_read_more_callback_t) (const char *file_contents,
  *
  * Since: 2.38
  **/
-typedef void (* xfile_measure_progress_callback_t) (xboolean_t reporting,
-                                               xuint64_t  current_size,
-                                               xuint64_t  num_dirs,
-                                               xuint64_t  num_files,
-                                               xpointer_t user_data);
+typedef void (* GFileMeasureProgressCallback) (gboolean reporting,
+                                               guint64  current_size,
+                                               guint64  num_dirs,
+                                               guint64  num_files,
+                                               gpointer user_data);
 
 /**
  * GIOSchedulerJobFunc:
- * @job: a #xio_scheduler_job_t.
- * @cancellable: optional #xcancellable_t object, %NULL to ignore.
+ * @job: a #GIOSchedulerJob.
+ * @cancellable: optional #GCancellable object, %NULL to ignore.
  * @user_data: the data to pass to callback function
  *
  * I/O Job function.
@@ -369,60 +369,60 @@ typedef void (* xfile_measure_progress_callback_t) (xboolean_t reporting,
  * Returns: %TRUE if this function should be called again to
  *    complete the job, %FALSE if the job is complete (or cancelled)
  **/
-typedef xboolean_t (*GIOSchedulerJobFunc) (xio_scheduler_job_t *job,
-					 xcancellable_t    *cancellable,
-					 xpointer_t         user_data);
+typedef gboolean (*GIOSchedulerJobFunc) (GIOSchedulerJob *job,
+					 GCancellable    *cancellable,
+					 gpointer         user_data);
 
 /**
- * xsimple_async_thread_func_t:
- * @res: a #xsimple_async_result_t.
- * @object: a #xobject_t.
- * @cancellable: optional #xcancellable_t object, %NULL to ignore.
+ * GSimpleAsyncThreadFunc:
+ * @res: a #GSimpleAsyncResult.
+ * @object: a #GObject.
+ * @cancellable: optional #GCancellable object, %NULL to ignore.
  *
  * Simple thread function that runs an asynchronous operation and
  * checks for cancellation.
  **/
-typedef void (*xsimple_async_thread_func_t) (xsimple_async_result_t *res,
-                                        xobject_t *object,
-                                        xcancellable_t *cancellable);
+typedef void (*GSimpleAsyncThreadFunc) (GSimpleAsyncResult *res,
+                                        GObject *object,
+                                        GCancellable *cancellable);
 
 /**
- * xsocket_source_func_t:
- * @socket: the #xsocket_t
+ * GSocketSourceFunc:
+ * @socket: the #GSocket
  * @condition: the current condition at the source fired.
  * @user_data: data passed in by the user.
  *
- * This is the function type of the callback used for the #xsource_t
- * returned by xsocket_create_source().
+ * This is the function type of the callback used for the #GSource
+ * returned by g_socket_create_source().
  *
  * Returns: it should return %FALSE if the source should be removed.
  *
  * Since: 2.22
  */
-typedef xboolean_t (*xsocket_source_func_t) (xsocket_t *socket,
-				       xio_condition_t condition,
-				       xpointer_t user_data);
+typedef gboolean (*GSocketSourceFunc) (GSocket *socket,
+				       GIOCondition condition,
+				       gpointer user_data);
 
 /**
- * xdatagram_based_source_func_t:
- * @datagram_based: the #xdatagram_based_t
+ * GDatagramBasedSourceFunc:
+ * @datagram_based: the #GDatagramBased
  * @condition: the current condition at the source fired
  * @user_data: data passed in by the user
  *
- * This is the function type of the callback used for the #xsource_t
+ * This is the function type of the callback used for the #GSource
  * returned by g_datagram_based_create_source().
  *
- * Returns: %XSOURCE_REMOVE if the source should be removed,
+ * Returns: %G_SOURCE_REMOVE if the source should be removed,
  *   %G_SOURCE_CONTINUE otherwise
  *
  * Since: 2.48
  */
-typedef xboolean_t (*xdatagram_based_source_func_t) (xdatagram_based_t *datagram_based,
-                                              xio_condition_t    condition,
-                                              xpointer_t        user_data);
+typedef gboolean (*GDatagramBasedSourceFunc) (GDatagramBased *datagram_based,
+                                              GIOCondition    condition,
+                                              gpointer        user_data);
 
 /**
- * xinput_vector_t:
+ * GInputVector:
  * @buffer: Pointer to a buffer where data will be written.
  * @size: the available size in @buffer.
  *
@@ -433,17 +433,17 @@ typedef xboolean_t (*xdatagram_based_source_func_t) (xdatagram_based_t *datagram
  *
  * Since: 2.22
  */
-typedef struct _xinput_vector_t xinput_vector_t;
+typedef struct _GInputVector GInputVector;
 
-struct _xinput_vector_t {
-  xpointer_t buffer;
-  xsize_t size;
+struct _GInputVector {
+  gpointer buffer;
+  gsize size;
 };
 
 /**
- * xinput_message_t:
+ * GInputMessage:
  * @address: (optional) (out) (transfer full): return location
- *   for a #xsocket_address_t, or %NULL
+ *   for a #GSocketAddress, or %NULL
  * @vectors: (array length=num_vectors) (out): pointer to an
  *   array of input vectors
  * @num_vectors: the number of input vectors pointed to by @vectors
@@ -479,23 +479,23 @@ struct _xinput_vector_t {
  *
  * Since: 2.48
  */
-typedef struct _xinput_message_t xinput_message_t;
+typedef struct _GInputMessage GInputMessage;
 
-struct _xinput_message_t {
-  xsocket_address_t         **address;
+struct _GInputMessage {
+  GSocketAddress         **address;
 
-  xinput_vector_t            *vectors;
-  xuint_t                    num_vectors;
+  GInputVector            *vectors;
+  guint                    num_vectors;
 
-  xsize_t                    bytes_received;
-  xint_t                     flags;
+  gsize                    bytes_received;
+  gint                     flags;
 
-  xsocket_control_message_t ***control_messages;
-  xuint_t                   *num_control_messages;
+  GSocketControlMessage ***control_messages;
+  guint                   *num_control_messages;
 };
 
 /**
- * xoutput_vector_t:
+ * GOutputVector:
  * @buffer: Pointer to a buffer of data to read.
  * @size: the size of @buffer.
  *
@@ -506,16 +506,16 @@ struct _xinput_message_t {
  *
  * Since: 2.22
  */
-typedef struct _xoutput_vector xoutput_vector_t;
+typedef struct _GOutputVector GOutputVector;
 
-struct _xoutput_vector {
-  xconstpointer buffer;
-  xsize_t size;
+struct _GOutputVector {
+  gconstpointer buffer;
+  gsize size;
 };
 
 /**
- * xoutput_message_t:
- * @address: (nullable): a #xsocket_address_t, or %NULL
+ * GOutputMessage:
+ * @address: (nullable): a #GSocketAddress, or %NULL
  * @vectors: pointer to an array of output vectors
  * @num_vectors: the number of output vectors pointed to by @vectors.
  * @bytes_sent: initialize to 0. Will be set to the number of bytes
@@ -530,92 +530,92 @@ struct _xoutput_vector {
  * were one buffer.
  *
  * If @address is %NULL then the message is sent to the default receiver
- * (as previously set by xsocket_connect()).
+ * (as previously set by g_socket_connect()).
  *
  * Since: 2.44
  */
-typedef struct _xoutput_message xoutput_message_t;
+typedef struct _GOutputMessage GOutputMessage;
 
-struct _xoutput_message {
-  xsocket_address_t         *address;
+struct _GOutputMessage {
+  GSocketAddress         *address;
 
-  xoutput_vector_t          *vectors;
-  xuint_t                   num_vectors;
+  GOutputVector          *vectors;
+  guint                   num_vectors;
 
-  xuint_t                   bytes_sent;
+  guint                   bytes_sent;
 
-  xsocket_control_message_t **control_messages;
-  xuint_t                   num_control_messages;
+  GSocketControlMessage **control_messages;
+  guint                   num_control_messages;
 };
 
-typedef struct _GCredentials                  xcredentials_t;
-typedef struct _GUnixCredentialsMessage       xunix_credentials_message_t;
-typedef struct _GUnixFDList                   xunix_fd_list_t;
-typedef struct _GDBusMessage                  xdbus_message_t;
-typedef struct _GDBusConnection               xdbus_connection_t;
-typedef struct _GDBusProxy                    xdbus_proxy_t;
-typedef struct _GDBusMethodInvocation         xdbus_method_invocation_t;
-typedef struct _xdbus_server                   xdbus_server_t;
-typedef struct _GDBusAuthObserver             xdbus_auth_observer_t;
-typedef struct _GDBusErrorEntry               xdbus_error_entry_t;
-typedef struct _GDBusInterfaceVTable          xdbus_interface_vtable_t;
-typedef struct _GDBusSubtreeVTable            xdbus_subtree_vtable_t;
-typedef struct _GDBusAnnotationInfo           xdbus_annotation_info_t;
-typedef struct _GDBusArgInfo                  xdbus_arg_info_t;
-typedef struct _GDBusMethodInfo               xdbus_method_info_t;
-typedef struct _GDBusSignalInfo               xdbus_signalInfo_t;
-typedef struct _GDBusPropertyInfo             xdbus_property_info_t;
-typedef struct _GDBusInterfaceInfo            xdbus_interface_info_t;
-typedef struct _GDBusNodeInfo                 xdbus_node_info_t;
+typedef struct _GCredentials                  GCredentials;
+typedef struct _GUnixCredentialsMessage       GUnixCredentialsMessage;
+typedef struct _GUnixFDList                   GUnixFDList;
+typedef struct _GDBusMessage                  GDBusMessage;
+typedef struct _GDBusConnection               GDBusConnection;
+typedef struct _GDBusProxy                    GDBusProxy;
+typedef struct _GDBusMethodInvocation         GDBusMethodInvocation;
+typedef struct _GDBusServer                   GDBusServer;
+typedef struct _GDBusAuthObserver             GDBusAuthObserver;
+typedef struct _GDBusErrorEntry               GDBusErrorEntry;
+typedef struct _GDBusInterfaceVTable          GDBusInterfaceVTable;
+typedef struct _GDBusSubtreeVTable            GDBusSubtreeVTable;
+typedef struct _GDBusAnnotationInfo           GDBusAnnotationInfo;
+typedef struct _GDBusArgInfo                  GDBusArgInfo;
+typedef struct _GDBusMethodInfo               GDBusMethodInfo;
+typedef struct _GDBusSignalInfo               GDBusSignalInfo;
+typedef struct _GDBusPropertyInfo             GDBusPropertyInfo;
+typedef struct _GDBusInterfaceInfo            GDBusInterfaceInfo;
+typedef struct _GDBusNodeInfo                 GDBusNodeInfo;
 
 /**
- * xcancellable_source_func_t:
- * @cancellable: the #xcancellable_t
+ * GCancellableSourceFunc:
+ * @cancellable: the #GCancellable
  * @user_data: data passed in by the user.
  *
- * This is the function type of the callback used for the #xsource_t
- * returned by xcancellable_source_new().
+ * This is the function type of the callback used for the #GSource
+ * returned by g_cancellable_source_new().
  *
  * Returns: it should return %FALSE if the source should be removed.
  *
  * Since: 2.28
  */
-typedef xboolean_t (*xcancellable_source_func_t) (xcancellable_t *cancellable,
-					    xpointer_t      user_data);
+typedef gboolean (*GCancellableSourceFunc) (GCancellable *cancellable,
+					    gpointer      user_data);
 
 /**
- * xpollable_source_func_t:
- * @pollable_stream: the #xpollable_input_stream_t or #xpollable_output_stream_t
+ * GPollableSourceFunc:
+ * @pollable_stream: the #GPollableInputStream or #GPollableOutputStream
  * @user_data: data passed in by the user.
  *
- * This is the function type of the callback used for the #xsource_t
+ * This is the function type of the callback used for the #GSource
  * returned by g_pollable_input_stream_create_source() and
- * xpollable_output_stream_create_source().
+ * g_pollable_output_stream_create_source().
  *
  * Returns: it should return %FALSE if the source should be removed.
  *
  * Since: 2.28
  */
-typedef xboolean_t (*xpollable_source_func_t) (xobject_t  *pollable_stream,
-					 xpointer_t  user_data);
+typedef gboolean (*GPollableSourceFunc) (GObject  *pollable_stream,
+					 gpointer  user_data);
 
-typedef struct _GDBusInterface              xdbus_interface_t; /* Dummy typedef */
-typedef struct _GDBusInterfaceSkeleton      xdbus_interface_skeleton_t;
-typedef struct _GDBusObject                 xdbus_object_t;  /* Dummy typedef */
-typedef struct _GDBusObjectSkeleton         xdbus_object_skeleton_t;
-typedef struct _GDBusObjectProxy            xdbus_object_proxy_t;
-typedef struct _GDBusObjectManager          xdbus_object_manager_t;  /* Dummy typedef */
-typedef struct _GDBusObjectManagerClient    xdbus_object_manager_client_t;
-typedef struct _GDBusObjectManagerServer    xdbus_object_manager_server_t;
+typedef struct _GDBusInterface              GDBusInterface; /* Dummy typedef */
+typedef struct _GDBusInterfaceSkeleton      GDBusInterfaceSkeleton;
+typedef struct _GDBusObject                 GDBusObject;  /* Dummy typedef */
+typedef struct _GDBusObjectSkeleton         GDBusObjectSkeleton;
+typedef struct _GDBusObjectProxy            GDBusObjectProxy;
+typedef struct _GDBusObjectManager          GDBusObjectManager;  /* Dummy typedef */
+typedef struct _GDBusObjectManagerClient    GDBusObjectManagerClient;
+typedef struct _GDBusObjectManagerServer    GDBusObjectManagerServer;
 
 /**
- * xdbus_proxy_type_func_t:
- * @manager: A #xdbus_object_manager_client_t.
+ * GDBusProxyTypeFunc:
+ * @manager: A #GDBusObjectManagerClient.
  * @object_path: The object path of the remote object.
- * @interface_name: (nullable): The interface name of the remote object or %NULL if a #xdbus_object_proxy_t #xtype_t is requested.
+ * @interface_name: (nullable): The interface name of the remote object or %NULL if a #GDBusObjectProxy #GType is requested.
  * @user_data: User data.
  *
- * Function signature for a function used to determine the #xtype_t to
+ * Function signature for a function used to determine the #GType to
  * use for an interface proxy (if @interface_name is not %NULL) or
  * object proxy (if @interface_name is %NULL).
  *
@@ -623,35 +623,35 @@ typedef struct _GDBusObjectManagerServer    xdbus_object_manager_server_t;
  * [thread-default main loop][g-main-context-push-thread-default]
  * that @manager was constructed in.
  *
- * Returns: A #xtype_t to use for the remote object. The returned type
- *   must be a #xdbus_proxy_t or #xdbus_object_proxy_t -derived
+ * Returns: A #GType to use for the remote object. The returned type
+ *   must be a #GDBusProxy or #GDBusObjectProxy -derived
  *   type.
  *
  * Since: 2.30
  */
-typedef xtype_t (*xdbus_proxy_type_func_t) (xdbus_object_manager_client_t   *manager,
-                                     const xchar_t                *object_path,
-                                     const xchar_t                *interface_name,
-                                     xpointer_t                    user_data);
+typedef GType (*GDBusProxyTypeFunc) (GDBusObjectManagerClient   *manager,
+                                     const gchar                *object_path,
+                                     const gchar                *interface_name,
+                                     gpointer                    user_data);
 
-typedef struct _GTestDBus xtest_dbus_t;
+typedef struct _GTestDBus GTestDBus;
 
 /**
- * xsubprocess_t:
+ * GSubprocess:
  *
  * A child process.
  *
  * Since: 2.40
  */
-typedef struct _xsubprocess                   xsubprocess_t;
+typedef struct _GSubprocess                   GSubprocess;
 /**
- * xsubprocess_launcher_t:
+ * GSubprocessLauncher:
  *
  * Options for launching a child process.
  *
  * Since: 2.40
  */
-typedef struct _xsubprocess_launcher           xsubprocess_launcher_t;
+typedef struct _GSubprocessLauncher           GSubprocessLauncher;
 
 G_END_DECLS
 

@@ -31,51 +31,51 @@
 
 /**
  * SECTION:gactiongroupexporter
- * @title: xaction_group_t exporter
+ * @title: GActionGroup exporter
  * @include: gio/gio.h
  * @short_description: Export GActionGroups on D-Bus
- * @see_also: #xaction_group_t, #xdbus_action_group_t
+ * @see_also: #GActionGroup, #GDBusActionGroup
  *
- * These functions support exporting a #xaction_group_t on D-Bus.
+ * These functions support exporting a #GActionGroup on D-Bus.
  * The D-Bus interface that is used is a private implementation
  * detail.
  *
- * To access an exported #xaction_group_t remotely, use
- * xdbus_action_group_get() to obtain a #xdbus_action_group_t.
+ * To access an exported #GActionGroup remotely, use
+ * g_dbus_action_group_get() to obtain a #GDBusActionGroup.
  */
 
-static xvariant_t *
-xaction_group_describe_action (xaction_group_t *action_group,
-                                const xchar_t  *name)
+static GVariant *
+g_action_group_describe_action (GActionGroup *action_group,
+                                const gchar  *name)
 {
-  const xvariant_type_t *type;
-  xvariant_builder_t builder;
-  xboolean_t enabled;
-  xvariant_t *state;
+  const GVariantType *type;
+  GVariantBuilder builder;
+  gboolean enabled;
+  GVariant *state;
 
-  xvariant_builder_init (&builder, G_VARIANT_TYPE ("(bgav)"));
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("(bgav)"));
 
-  enabled = xaction_group_get_action_enabled (action_group, name);
-  xvariant_builder_add (&builder, "b", enabled);
+  enabled = g_action_group_get_action_enabled (action_group, name);
+  g_variant_builder_add (&builder, "b", enabled);
 
-  if ((type = xaction_group_get_action_parameter_type (action_group, name)))
+  if ((type = g_action_group_get_action_parameter_type (action_group, name)))
     {
-      xchar_t *str = xvariant_type_dup_string (type);
-      xvariant_builder_add (&builder, "g", str);
+      gchar *str = g_variant_type_dup_string (type);
+      g_variant_builder_add (&builder, "g", str);
       g_free (str);
     }
   else
-    xvariant_builder_add (&builder, "g", "");
+    g_variant_builder_add (&builder, "g", "");
 
-  xvariant_builder_open (&builder, G_VARIANT_TYPE ("av"));
-  if ((state = xaction_group_get_action_state (action_group, name)))
+  g_variant_builder_open (&builder, G_VARIANT_TYPE ("av"));
+  if ((state = g_action_group_get_action_state (action_group, name)))
     {
-      xvariant_builder_add (&builder, "v", state);
-      xvariant_unref (state);
+      g_variant_builder_add (&builder, "v", state);
+      g_variant_unref (state);
     }
-  xvariant_builder_close (&builder);
+  g_variant_builder_close (&builder);
 
-  return xvariant_builder_end (&builder);
+  return g_variant_builder_end (&builder);
 }
 
 /* Using XML saves us dozens of relocations vs. using the introspection
@@ -85,7 +85,7 @@ xaction_group_describe_action (xaction_group_t *action_group,
  * It's also a lot easier to read. :)
  *
  * For documentation of this interface, see
- * https://wiki.gnome.org/Projects/GLib/xapplication_t/DBusAPI
+ * https://wiki.gnome.org/Projects/GLib/GApplication/DBusAPI
  */
 const char org_gtk_Actions_xml[] =
   "<node>"
@@ -119,16 +119,16 @@ const char org_gtk_Actions_xml[] =
   "  </interface>"
   "</node>";
 
-static xdbus_interface_info_t *org_gtk_Actions;
+static GDBusInterfaceInfo *org_gtk_Actions;
 
 typedef struct
 {
-  xaction_group_t    *action_group;
-  xdbus_connection_t *connection;
-  xmain_context_t    *context;
-  xchar_t           *object_path;
-  xhashtable_t      *pending_changes;
-  xsource_t         *pendinxsource;
+  GActionGroup    *action_group;
+  GDBusConnection *connection;
+  GMainContext    *context;
+  gchar           *object_path;
+  GHashTable      *pending_changes;
+  GSource         *pending_source;
 } GActionGroupExporter;
 
 #define ACTION_ADDED_EVENT             (1u<<0)
@@ -136,161 +136,161 @@ typedef struct
 #define ACTION_STATE_CHANGED_EVENT     (1u<<2)
 #define ACTION_ENABLED_CHANGED_EVENT   (1u<<3)
 
-static xboolean_t
-xaction_group_exporter_dispatch_events (xpointer_t user_data)
+static gboolean
+g_action_group_exporter_dispatch_events (gpointer user_data)
 {
   GActionGroupExporter *exporter = user_data;
-  xvariant_builder_t removes;
-  xvariant_builder_t enabled_changes;
-  xvariant_builder_t state_changes;
-  xvariant_builder_t adds;
-  xhash_table_iter_t iter;
-  xpointer_t value;
-  xpointer_t key;
+  GVariantBuilder removes;
+  GVariantBuilder enabled_changes;
+  GVariantBuilder state_changes;
+  GVariantBuilder adds;
+  GHashTableIter iter;
+  gpointer value;
+  gpointer key;
 
-  xvariant_builder_init (&removes, G_VARIANT_TYPE_STRING_ARRAY);
-  xvariant_builder_init (&enabled_changes, G_VARIANT_TYPE ("a{sb}"));
-  xvariant_builder_init (&state_changes, G_VARIANT_TYPE ("a{sv}"));
-  xvariant_builder_init (&adds, G_VARIANT_TYPE ("a{s(bgav)}"));
+  g_variant_builder_init (&removes, G_VARIANT_TYPE_STRING_ARRAY);
+  g_variant_builder_init (&enabled_changes, G_VARIANT_TYPE ("a{sb}"));
+  g_variant_builder_init (&state_changes, G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_init (&adds, G_VARIANT_TYPE ("a{s(bgav)}"));
 
-  xhash_table_iter_init (&iter, exporter->pending_changes);
-  while (xhash_table_iter_next (&iter, &key, &value))
+  g_hash_table_iter_init (&iter, exporter->pending_changes);
+  while (g_hash_table_iter_next (&iter, &key, &value))
     {
-      xuint_t events = GPOINTER_TO_INT (value);
-      const xchar_t *name = key;
+      guint events = GPOINTER_TO_INT (value);
+      const gchar *name = key;
 
       /* Adds and removes are incompatible with enabled or state
        * changes, but we must report at least one event.
        */
-      xassert (((events & (ACTION_ENABLED_CHANGED_EVENT | ACTION_STATE_CHANGED_EVENT)) == 0) !=
+      g_assert (((events & (ACTION_ENABLED_CHANGED_EVENT | ACTION_STATE_CHANGED_EVENT)) == 0) !=
                 ((events & (ACTION_REMOVED_EVENT | ACTION_ADDED_EVENT)) == 0));
 
       if (events & ACTION_REMOVED_EVENT)
-        xvariant_builder_add (&removes, "s", name);
+        g_variant_builder_add (&removes, "s", name);
 
       if (events & ACTION_ENABLED_CHANGED_EVENT)
         {
-          xboolean_t enabled;
+          gboolean enabled;
 
-          enabled = xaction_group_get_action_enabled (exporter->action_group, name);
-          xvariant_builder_add (&enabled_changes, "{sb}", name, enabled);
+          enabled = g_action_group_get_action_enabled (exporter->action_group, name);
+          g_variant_builder_add (&enabled_changes, "{sb}", name, enabled);
         }
 
       if (events & ACTION_STATE_CHANGED_EVENT)
         {
-          xvariant_t *state;
+          GVariant *state;
 
-          state = xaction_group_get_action_state (exporter->action_group, name);
-          xvariant_builder_add (&state_changes, "{sv}", name, state);
-          xvariant_unref (state);
+          state = g_action_group_get_action_state (exporter->action_group, name);
+          g_variant_builder_add (&state_changes, "{sv}", name, state);
+          g_variant_unref (state);
         }
 
       if (events & ACTION_ADDED_EVENT)
         {
-          xvariant_t *description;
+          GVariant *description;
 
-          description = xaction_group_describe_action (exporter->action_group, name);
-          xvariant_builder_add (&adds, "{s@(bgav)}", name, description);
+          description = g_action_group_describe_action (exporter->action_group, name);
+          g_variant_builder_add (&adds, "{s@(bgav)}", name, description);
         }
     }
 
-  xhash_table_remove_all (exporter->pending_changes);
+  g_hash_table_remove_all (exporter->pending_changes);
 
-  xdbus_connection_emit_signal (exporter->connection, NULL, exporter->object_path,
+  g_dbus_connection_emit_signal (exporter->connection, NULL, exporter->object_path,
                                  "org.gtk.Actions", "Changed",
-                                 xvariant_new ("(asa{sb}a{sv}a{s(bgav)})",
+                                 g_variant_new ("(asa{sb}a{sv}a{s(bgav)})",
                                                 &removes, &enabled_changes,
                                                 &state_changes, &adds),
                                  NULL);
 
-  exporter->pendinxsource = NULL;
+  exporter->pending_source = NULL;
 
   return FALSE;
 }
 
 static void
-xaction_group_exporter_flush_queue (GActionGroupExporter *exporter)
+g_action_group_exporter_flush_queue (GActionGroupExporter *exporter)
 {
-  if (exporter->pendinxsource)
+  if (exporter->pending_source)
     {
-      xsource_destroy (exporter->pendinxsource);
-      xaction_group_exporter_dispatch_events (exporter);
-      xassert (exporter->pendinxsource == NULL);
+      g_source_destroy (exporter->pending_source);
+      g_action_group_exporter_dispatch_events (exporter);
+      g_assert (exporter->pending_source == NULL);
     }
 }
 
-static xuint_t
-xaction_group_exporter_get_events (GActionGroupExporter *exporter,
-                                    const xchar_t          *name)
+static guint
+g_action_group_exporter_get_events (GActionGroupExporter *exporter,
+                                    const gchar          *name)
 {
-  return (xsize_t) xhash_table_lookup (exporter->pending_changes, name);
+  return (gsize) g_hash_table_lookup (exporter->pending_changes, name);
 }
 
 static void
-xaction_group_exporter_set_events (GActionGroupExporter *exporter,
-                                    const xchar_t          *name,
-                                    xuint_t                 events)
+g_action_group_exporter_set_events (GActionGroupExporter *exporter,
+                                    const gchar          *name,
+                                    guint                 events)
 {
-  xboolean_t have_events;
-  xboolean_t is_queued;
+  gboolean have_events;
+  gboolean is_queued;
 
   if (events != 0)
-    xhash_table_insert (exporter->pending_changes, xstrdup (name), GINT_TO_POINTER (events));
+    g_hash_table_insert (exporter->pending_changes, g_strdup (name), GINT_TO_POINTER (events));
   else
-    xhash_table_remove (exporter->pending_changes, name);
+    g_hash_table_remove (exporter->pending_changes, name);
 
-  have_events = xhash_table_size (exporter->pending_changes) > 0;
-  is_queued = exporter->pendinxsource != NULL;
+  have_events = g_hash_table_size (exporter->pending_changes) > 0;
+  is_queued = exporter->pending_source != NULL;
 
   if (have_events && !is_queued)
     {
-      xsource_t *source;
+      GSource *source;
 
       source = g_idle_source_new ();
-      exporter->pendinxsource = source;
-      xsource_set_callback (source, xaction_group_exporter_dispatch_events, exporter, NULL);
-      xsource_set_static_name (source, "[gio] xaction_group_exporter_dispatch_events");
-      xsource_attach (source, exporter->context);
-      xsource_unref (source);
+      exporter->pending_source = source;
+      g_source_set_callback (source, g_action_group_exporter_dispatch_events, exporter, NULL);
+      g_source_set_static_name (source, "[gio] g_action_group_exporter_dispatch_events");
+      g_source_attach (source, exporter->context);
+      g_source_unref (source);
     }
 
   if (!have_events && is_queued)
     {
-      xsource_destroy (exporter->pendinxsource);
-      exporter->pendinxsource = NULL;
+      g_source_destroy (exporter->pending_source);
+      exporter->pending_source = NULL;
     }
 }
 
 static void
-xaction_group_exporter_action_added (xaction_group_t *action_group,
-                                      const xchar_t  *action_name,
-                                      xpointer_t      user_data)
+g_action_group_exporter_action_added (GActionGroup *action_group,
+                                      const gchar  *action_name,
+                                      gpointer      user_data)
 {
   GActionGroupExporter *exporter = user_data;
-  xuint_t event_mask;
+  guint event_mask;
 
-  event_mask = xaction_group_exporter_get_events (exporter, action_name);
+  event_mask = g_action_group_exporter_get_events (exporter, action_name);
 
   /* The action is new, so we should not have any pending
    * enabled-changed or state-changed signals for it.
    */
-  xassert (~event_mask & (ACTION_STATE_CHANGED_EVENT |
+  g_assert (~event_mask & (ACTION_STATE_CHANGED_EVENT |
                            ACTION_ENABLED_CHANGED_EVENT));
 
   event_mask |= ACTION_ADDED_EVENT;
 
-  xaction_group_exporter_set_events (exporter, action_name, event_mask);
+  g_action_group_exporter_set_events (exporter, action_name, event_mask);
 }
 
 static void
-xaction_group_exporter_action_removed (xaction_group_t *action_group,
-                                        const xchar_t  *action_name,
-                                        xpointer_t      user_data)
+g_action_group_exporter_action_removed (GActionGroup *action_group,
+                                        const gchar  *action_name,
+                                        gpointer      user_data)
 {
   GActionGroupExporter *exporter = user_data;
-  xuint_t event_mask;
+  guint event_mask;
 
-  event_mask = xaction_group_exporter_get_events (exporter, action_name);
+  event_mask = g_action_group_exporter_get_events (exporter, action_name);
 
   /* If the add event for this is still queued then just cancel it since
    * it's gone now.
@@ -300,7 +300,7 @@ xaction_group_exporter_action_removed (xaction_group_t *action_group,
    */
   if (event_mask & ACTION_ADDED_EVENT)
     {
-      xassert (~event_mask & ~(ACTION_STATE_CHANGED_EVENT | ACTION_ENABLED_CHANGED_EVENT));
+      g_assert (~event_mask & ~(ACTION_STATE_CHANGED_EVENT | ACTION_ENABLED_CHANGED_EVENT));
       event_mask &= ~ACTION_ADDED_EVENT;
     }
 
@@ -312,24 +312,24 @@ xaction_group_exporter_action_removed (xaction_group_t *action_group,
       event_mask &= ~(ACTION_STATE_CHANGED_EVENT | ACTION_ENABLED_CHANGED_EVENT);
     }
 
-  xaction_group_exporter_set_events (exporter, action_name, event_mask);
+  g_action_group_exporter_set_events (exporter, action_name, event_mask);
 }
 
 static void
-xaction_group_exporter_action_state_changed (xaction_group_t *action_group,
-                                              const xchar_t  *action_name,
-                                              xvariant_t     *value,
-                                              xpointer_t      user_data)
+g_action_group_exporter_action_state_changed (GActionGroup *action_group,
+                                              const gchar  *action_name,
+                                              GVariant     *value,
+                                              gpointer      user_data)
 {
   GActionGroupExporter *exporter = user_data;
-  xuint_t event_mask;
+  guint event_mask;
 
-  event_mask = xaction_group_exporter_get_events (exporter, action_name);
+  event_mask = g_action_group_exporter_get_events (exporter, action_name);
 
   /* If it was removed, it must have been added back.  Otherwise, why
    * are we hearing about changes?
    */
-  xassert (~event_mask & ACTION_REMOVED_EVENT ||
+  g_assert (~event_mask & ACTION_REMOVED_EVENT ||
             event_mask & ACTION_ADDED_EVENT);
 
   /* If it is freshly added, don't also bother with the state change
@@ -339,171 +339,171 @@ xaction_group_exporter_action_state_changed (xaction_group_t *action_group,
   if (~event_mask & ACTION_ADDED_EVENT)
     event_mask |= ACTION_STATE_CHANGED_EVENT;
 
-  xaction_group_exporter_set_events (exporter, action_name, event_mask);
+  g_action_group_exporter_set_events (exporter, action_name, event_mask);
 }
 
 static void
-xaction_group_exporter_action_enabled_changed (xaction_group_t *action_group,
-                                                const xchar_t  *action_name,
-                                                xboolean_t      enabled,
-                                                xpointer_t      user_data)
+g_action_group_exporter_action_enabled_changed (GActionGroup *action_group,
+                                                const gchar  *action_name,
+                                                gboolean      enabled,
+                                                gpointer      user_data)
 {
   GActionGroupExporter *exporter = user_data;
-  xuint_t event_mask;
+  guint event_mask;
 
-  event_mask = xaction_group_exporter_get_events (exporter, action_name);
+  event_mask = g_action_group_exporter_get_events (exporter, action_name);
 
   /* Reasoning as above. */
-  xassert (~event_mask & ACTION_REMOVED_EVENT ||
+  g_assert (~event_mask & ACTION_REMOVED_EVENT ||
             event_mask & ACTION_ADDED_EVENT);
 
   if (~event_mask & ACTION_ADDED_EVENT)
     event_mask |= ACTION_ENABLED_CHANGED_EVENT;
 
-  xaction_group_exporter_set_events (exporter, action_name, event_mask);
+  g_action_group_exporter_set_events (exporter, action_name, event_mask);
 }
 
 static void
-org_gtk_Actions_method_call (xdbus_connection_t       *connection,
-                             const xchar_t           *sender,
-                             const xchar_t           *object_path,
-                             const xchar_t           *interface_name,
-                             const xchar_t           *method_name,
-                             xvariant_t              *parameters,
-                             xdbus_method_invocation_t *invocation,
-                             xpointer_t               user_data)
+org_gtk_Actions_method_call (GDBusConnection       *connection,
+                             const gchar           *sender,
+                             const gchar           *object_path,
+                             const gchar           *interface_name,
+                             const gchar           *method_name,
+                             GVariant              *parameters,
+                             GDBusMethodInvocation *invocation,
+                             gpointer               user_data)
 {
   GActionGroupExporter *exporter = user_data;
-  xvariant_t *result = NULL;
+  GVariant *result = NULL;
 
-  xaction_group_exporter_flush_queue (exporter);
+  g_action_group_exporter_flush_queue (exporter);
 
-  if (xstr_equal (method_name, "List"))
+  if (g_str_equal (method_name, "List"))
     {
-      xchar_t **list;
+      gchar **list;
 
-      list = xaction_group_list_actions (exporter->action_group);
-      result = xvariant_new ("(^as)", list);
-      xstrfreev (list);
+      list = g_action_group_list_actions (exporter->action_group);
+      result = g_variant_new ("(^as)", list);
+      g_strfreev (list);
     }
 
-  else if (xstr_equal (method_name, "Describe"))
+  else if (g_str_equal (method_name, "Describe"))
     {
-      const xchar_t *name;
-      xvariant_t *desc;
+      const gchar *name;
+      GVariant *desc;
 
-      xvariant_get (parameters, "(&s)", &name);
+      g_variant_get (parameters, "(&s)", &name);
 
-      if (!xaction_group_has_action (exporter->action_group, name))
+      if (!g_action_group_has_action (exporter->action_group, name))
         {
-          xdbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
+          g_dbus_method_invocation_return_error (invocation, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS,
                                                  "The named action ('%s') does not exist.", name);
           return;
         }
 
-      desc = xaction_group_describe_action (exporter->action_group, name);
-      result = xvariant_new ("(@(bgav))", desc);
+      desc = g_action_group_describe_action (exporter->action_group, name);
+      result = g_variant_new ("(@(bgav))", desc);
     }
 
-  else if (xstr_equal (method_name, "DescribeAll"))
+  else if (g_str_equal (method_name, "DescribeAll"))
     {
-      xvariant_builder_t builder;
-      xchar_t **list;
-      xint_t i;
+      GVariantBuilder builder;
+      gchar **list;
+      gint i;
 
-      list = xaction_group_list_actions (exporter->action_group);
-      xvariant_builder_init (&builder, G_VARIANT_TYPE ("a{s(bgav)}"));
+      list = g_action_group_list_actions (exporter->action_group);
+      g_variant_builder_init (&builder, G_VARIANT_TYPE ("a{s(bgav)}"));
       for (i = 0; list[i]; i++)
         {
-          const xchar_t *name = list[i];
-          xvariant_t *description;
+          const gchar *name = list[i];
+          GVariant *description;
 
-          description = xaction_group_describe_action (exporter->action_group, name);
-          xvariant_builder_add (&builder, "{s@(bgav)}", name, description);
+          description = g_action_group_describe_action (exporter->action_group, name);
+          g_variant_builder_add (&builder, "{s@(bgav)}", name, description);
         }
-      result = xvariant_new ("(a{s(bgav)})", &builder);
-      xstrfreev (list);
+      result = g_variant_new ("(a{s(bgav)})", &builder);
+      g_strfreev (list);
     }
 
-  else if (xstr_equal (method_name, "Activate"))
+  else if (g_str_equal (method_name, "Activate"))
     {
-      xvariant_t *parameter = NULL;
-      xvariant_t *platform_data;
-      xvariant_iter_t *iter;
-      const xchar_t *name;
+      GVariant *parameter = NULL;
+      GVariant *platform_data;
+      GVariantIter *iter;
+      const gchar *name;
 
-      xvariant_get (parameters, "(&sav@a{sv})", &name, &iter, &platform_data);
-      xvariant_iter_next (iter, "v", &parameter);
-      xvariant_iter_free (iter);
+      g_variant_get (parameters, "(&sav@a{sv})", &name, &iter, &platform_data);
+      g_variant_iter_next (iter, "v", &parameter);
+      g_variant_iter_free (iter);
 
-      if (X_IS_REMOTE_ACTION_GROUP (exporter->action_group))
-        xremote_action_group_activate_action_full (G_REMOTE_ACTION_GROUP (exporter->action_group),
+      if (G_IS_REMOTE_ACTION_GROUP (exporter->action_group))
+        g_remote_action_group_activate_action_full (G_REMOTE_ACTION_GROUP (exporter->action_group),
                                                     name, parameter, platform_data);
       else
-        xaction_group_activate_action (exporter->action_group, name, parameter);
+        g_action_group_activate_action (exporter->action_group, name, parameter);
 
       if (parameter)
-        xvariant_unref (parameter);
+        g_variant_unref (parameter);
 
-      xvariant_unref (platform_data);
+      g_variant_unref (platform_data);
     }
 
-  else if (xstr_equal (method_name, "SetState"))
+  else if (g_str_equal (method_name, "SetState"))
     {
-      xvariant_t *platform_data;
-      const xchar_t *name;
-      xvariant_t *state;
+      GVariant *platform_data;
+      const gchar *name;
+      GVariant *state;
 
-      xvariant_get (parameters, "(&sv@a{sv})", &name, &state, &platform_data);
+      g_variant_get (parameters, "(&sv@a{sv})", &name, &state, &platform_data);
 
-      if (X_IS_REMOTE_ACTION_GROUP (exporter->action_group))
-        xremote_action_group_change_action_state_full (G_REMOTE_ACTION_GROUP (exporter->action_group),
+      if (G_IS_REMOTE_ACTION_GROUP (exporter->action_group))
+        g_remote_action_group_change_action_state_full (G_REMOTE_ACTION_GROUP (exporter->action_group),
                                                         name, state, platform_data);
       else
-        xaction_group_change_action_state (exporter->action_group, name, state);
+        g_action_group_change_action_state (exporter->action_group, name, state);
 
-      xvariant_unref (platform_data);
-      xvariant_unref (state);
+      g_variant_unref (platform_data);
+      g_variant_unref (state);
     }
 
   else
     g_assert_not_reached ();
 
-  xdbus_method_invocation_return_value (invocation, result);
+  g_dbus_method_invocation_return_value (invocation, result);
 }
 
 static void
-xaction_group_exporter_free (xpointer_t user_data)
+g_action_group_exporter_free (gpointer user_data)
 {
   GActionGroupExporter *exporter = user_data;
 
-  xsignal_handlers_disconnect_by_func (exporter->action_group,
-                                        xaction_group_exporter_action_added, exporter);
-  xsignal_handlers_disconnect_by_func (exporter->action_group,
-                                        xaction_group_exporter_action_enabled_changed, exporter);
-  xsignal_handlers_disconnect_by_func (exporter->action_group,
-                                        xaction_group_exporter_action_state_changed, exporter);
-  xsignal_handlers_disconnect_by_func (exporter->action_group,
-                                        xaction_group_exporter_action_removed, exporter);
+  g_signal_handlers_disconnect_by_func (exporter->action_group,
+                                        g_action_group_exporter_action_added, exporter);
+  g_signal_handlers_disconnect_by_func (exporter->action_group,
+                                        g_action_group_exporter_action_enabled_changed, exporter);
+  g_signal_handlers_disconnect_by_func (exporter->action_group,
+                                        g_action_group_exporter_action_state_changed, exporter);
+  g_signal_handlers_disconnect_by_func (exporter->action_group,
+                                        g_action_group_exporter_action_removed, exporter);
 
-  xhash_table_unref (exporter->pending_changes);
-  if (exporter->pendinxsource)
-    xsource_destroy (exporter->pendinxsource);
+  g_hash_table_unref (exporter->pending_changes);
+  if (exporter->pending_source)
+    g_source_destroy (exporter->pending_source);
 
-  xmain_context_unref (exporter->context);
-  xobject_unref (exporter->connection);
-  xobject_unref (exporter->action_group);
+  g_main_context_unref (exporter->context);
+  g_object_unref (exporter->connection);
+  g_object_unref (exporter->action_group);
   g_free (exporter->object_path);
 
   g_slice_free (GActionGroupExporter, exporter);
 }
 
 /**
- * xdbus_connection_export_action_group:
- * @connection: a #xdbus_connection_t
+ * g_dbus_connection_export_action_group:
+ * @connection: a #GDBusConnection
  * @object_path: a D-Bus object path
- * @action_group: a #xaction_group_t
- * @error: a pointer to a %NULL #xerror_t, or %NULL
+ * @action_group: a #GActionGroup
+ * @error: a pointer to a %NULL #GError, or %NULL
  *
  * Exports @action_group on @connection at @object_path.
  *
@@ -515,7 +515,7 @@ xaction_group_exporter_free (xpointer_t user_data)
  * returned (with @error set accordingly).
  *
  * You can unexport the action group using
- * xdbus_connection_unexport_action_group() with the return value of
+ * g_dbus_connection_unexport_action_group() with the return value of
  * this function.
  *
  * The thread default main context is taken at the time of this call.
@@ -531,35 +531,35 @@ xaction_group_exporter_free (xpointer_t user_data)
  *
  * Since: 2.32
  **/
-xuint_t
-xdbus_connection_export_action_group (xdbus_connection_t  *connection,
-                                       const xchar_t      *object_path,
-                                       xaction_group_t     *action_group,
-                                       xerror_t          **error)
+guint
+g_dbus_connection_export_action_group (GDBusConnection  *connection,
+                                       const gchar      *object_path,
+                                       GActionGroup     *action_group,
+                                       GError          **error)
 {
-  const xdbus_interface_vtable_t vtable = {
+  const GDBusInterfaceVTable vtable = {
     org_gtk_Actions_method_call, NULL, NULL, { 0 }
   };
   GActionGroupExporter *exporter;
-  xuint_t id;
+  guint id;
 
   if G_UNLIKELY (org_gtk_Actions == NULL)
     {
-      xerror_t *error = NULL;
-      xdbus_node_info_t *info;
+      GError *error = NULL;
+      GDBusNodeInfo *info;
 
       info = g_dbus_node_info_new_for_xml (org_gtk_Actions_xml, &error);
       if G_UNLIKELY (info == NULL)
-        xerror ("%s", error->message);
+        g_error ("%s", error->message);
       org_gtk_Actions = g_dbus_node_info_lookup_interface (info, "org.gtk.Actions");
-      xassert (org_gtk_Actions != NULL);
+      g_assert (org_gtk_Actions != NULL);
       g_dbus_interface_info_ref (org_gtk_Actions);
       g_dbus_node_info_unref (info);
     }
 
   exporter = g_slice_new (GActionGroupExporter);
-  id = xdbus_connection_register_object (connection, object_path, org_gtk_Actions, &vtable,
-                                          exporter, xaction_group_exporter_free, error);
+  id = g_dbus_connection_register_object (connection, object_path, org_gtk_Actions, &vtable,
+                                          exporter, g_action_group_exporter_free, error);
 
   if (id == 0)
     {
@@ -567,42 +567,42 @@ xdbus_connection_export_action_group (xdbus_connection_t  *connection,
       return 0;
     }
 
-  exporter->context = xmain_context_ref_thread_default ();
-  exporter->pending_changes = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
-  exporter->pendinxsource = NULL;
-  exporter->action_group = xobject_ref (action_group);
-  exporter->connection = xobject_ref (connection);
-  exporter->object_path = xstrdup (object_path);
+  exporter->context = g_main_context_ref_thread_default ();
+  exporter->pending_changes = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  exporter->pending_source = NULL;
+  exporter->action_group = g_object_ref (action_group);
+  exporter->connection = g_object_ref (connection);
+  exporter->object_path = g_strdup (object_path);
 
-  xsignal_connect (action_group, "action-added",
-                    G_CALLBACK (xaction_group_exporter_action_added), exporter);
-  xsignal_connect (action_group, "action-removed",
-                    G_CALLBACK (xaction_group_exporter_action_removed), exporter);
-  xsignal_connect (action_group, "action-state-changed",
-                    G_CALLBACK (xaction_group_exporter_action_state_changed), exporter);
-  xsignal_connect (action_group, "action-enabled-changed",
-                    G_CALLBACK (xaction_group_exporter_action_enabled_changed), exporter);
+  g_signal_connect (action_group, "action-added",
+                    G_CALLBACK (g_action_group_exporter_action_added), exporter);
+  g_signal_connect (action_group, "action-removed",
+                    G_CALLBACK (g_action_group_exporter_action_removed), exporter);
+  g_signal_connect (action_group, "action-state-changed",
+                    G_CALLBACK (g_action_group_exporter_action_state_changed), exporter);
+  g_signal_connect (action_group, "action-enabled-changed",
+                    G_CALLBACK (g_action_group_exporter_action_enabled_changed), exporter);
 
   return id;
 }
 
 /**
- * xdbus_connection_unexport_action_group:
- * @connection: a #xdbus_connection_t
- * @export_id: the ID from xdbus_connection_export_action_group()
+ * g_dbus_connection_unexport_action_group:
+ * @connection: a #GDBusConnection
+ * @export_id: the ID from g_dbus_connection_export_action_group()
  *
  * Reverses the effect of a previous call to
- * xdbus_connection_export_action_group().
+ * g_dbus_connection_export_action_group().
  *
  * It is an error to call this function with an ID that wasn't returned
- * from xdbus_connection_export_action_group() or to call it with the
+ * from g_dbus_connection_export_action_group() or to call it with the
  * same ID more than once.
  *
  * Since: 2.32
  **/
 void
-xdbus_connection_unexport_action_group (xdbus_connection_t *connection,
-                                         xuint_t            export_id)
+g_dbus_connection_unexport_action_group (GDBusConnection *connection,
+                                         guint            export_id)
 {
-  xdbus_connection_unregister_object (connection, export_id);
+  g_dbus_connection_unregister_object (connection, export_id);
 }

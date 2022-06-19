@@ -39,40 +39,40 @@
 typedef struct {
   kqueue_sub *sub;
   GFileMonitorSource *source;
-  xboolean_t handle_deleted;
+  gboolean handle_deleted;
 } handle_ctx;
 
 /**
- * handle_created:
+ * handle_created: 
  * @udata: a pointer to user data (#handle_context).
  * @path: file name of a new file.
  * @inode: inode number of a new file.
  *
  * A callback function for the directory diff calculation routine,
- * produces XFILE_MONITOR_EVENT_CREATED event for a created file.
+ * produces G_FILE_MONITOR_EVENT_CREATED event for a created file.
  **/
 static void
 handle_created (void *udata, const char *path, ino_t inode)
 {
   handle_ctx *ctx = NULL;
-  sint64_t now;
-  xchar_t *fullname;
+  gint64 now;
+  gchar *fullname;
   struct stat st;
 
   (void) inode;
   ctx = (handle_ctx *) udata;
-  xassert (udata != NULL);
-  xassert (ctx->sub != NULL);
-  xassert (ctx->source != NULL);
+  g_assert (udata != NULL);
+  g_assert (ctx->sub != NULL);
+  g_assert (ctx->source != NULL);
 
   now = g_get_monotonic_time ();
-  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CREATED, path,
+  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_CREATED, path,
                                       NULL, NULL, now);
 
   /* Copied from ih_event_callback to report 'CHANGES_DONE_HINT' earlier. */
   fullname = g_build_filename (ctx->sub->filename, path, NULL);
   if (stat (fullname, &st) != 0 || !S_ISREG (st.st_mode) || st.st_nlink != 1)
-    xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CHANGES_DONE_HINT, path,
+    g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT, path,
                                         NULL, NULL, now);
   g_free (fullname);
 }
@@ -84,7 +84,7 @@ handle_created (void *udata, const char *path, ino_t inode)
  * @inode: inode number of the removed file.
  *
  * A callback function for the directory diff calculation routine,
- * produces XFILE_MONITOR_EVENT_DELETED event for a deleted file.
+ * produces G_FILE_MONITOR_EVENT_DELETED event for a deleted file.
  **/
 static void
 handle_deleted (void *udata, const char *path, ino_t inode)
@@ -93,14 +93,14 @@ handle_deleted (void *udata, const char *path, ino_t inode)
 
   (void) inode;
   ctx = (handle_ctx *) udata;
-  xassert (udata != NULL);
-  xassert (ctx->sub != NULL);
-  xassert (ctx->source != NULL);
+  g_assert (udata != NULL);
+  g_assert (ctx->sub != NULL);
+  g_assert (ctx->source != NULL);
 
   if (!ctx->handle_deleted)
     return;
 
-  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_DELETED, path,
+  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_DELETED, path,
                                       NULL, NULL, g_get_monotonic_time ());
 }
 
@@ -113,7 +113,7 @@ handle_deleted (void *udata, const char *path, ino_t inode)
  * @to_inode: inode number of the replaced file.
  *
  * A callback function for the directory diff calculation routine,
- * produces XFILE_MONITOR_EVENT_RENAMED event on a move.
+ * produces G_FILE_MONITOR_EVENT_RENAMED event on a move.
  **/
 static void
 handle_moved (void       *udata,
@@ -128,11 +128,11 @@ handle_moved (void       *udata,
   (void) to_inode;
 
   ctx = (handle_ctx *) udata;
-  xassert (udata != NULL);
-  xassert (ctx->sub != NULL);
-  xassert (ctx->source != NULL);
+  g_assert (udata != NULL);
+  g_assert (ctx->sub != NULL);
+  g_assert (ctx->source != NULL);
 
-  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_RENAMED,
+  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_RENAMED,
                                       from_path, to_path, NULL, g_get_monotonic_time ());
 }
 
@@ -143,7 +143,7 @@ handle_moved (void       *udata,
  * @node: inode number of the overwritten file.
  *
  * A callback function for the directory diff calculation routine,
- * produces XFILE_MONITOR_EVENT_DELETED/CREATED event pair when
+ * produces G_FILE_MONITOR_EVENT_DELETED/CREATED event pair when
  * an overwrite occurs in the directory (see dep-list for details).
  **/
 static void
@@ -153,14 +153,14 @@ handle_overwritten (void *udata, const char *path, ino_t inode)
 
   (void) inode;
   ctx = (handle_ctx *) udata;
-  xassert (udata != NULL);
-  xassert (ctx->sub != NULL);
-  xassert (ctx->source != NULL);
+  g_assert (udata != NULL);
+  g_assert (ctx->sub != NULL);
+  g_assert (ctx->source != NULL);
 
-  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_DELETED,
+  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_DELETED,
                                       path, NULL, NULL, g_get_monotonic_time ());
 
-  xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CREATED,
+  g_file_monitor_source_handle_event (ctx->source, G_FILE_MONITOR_EVENT_CREATED,
                                       path, NULL, NULL, g_get_monotonic_time ());
 }
 
@@ -177,7 +177,7 @@ static const traverse_cbs cbs = {
 
 
 void
-_kh_dir_diff (kqueue_sub *sub, xboolean_t handle_deleted)
+_kh_dir_diff (kqueue_sub *sub, gboolean handle_deleted)
 {
   dep_list *was;
   handle_ctx ctx;

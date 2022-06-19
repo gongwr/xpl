@@ -41,14 +41,14 @@ struct _GWin32FSMonitorPrivate
   PFILE_NOTIFY_INFORMATION file_notify_buffer;
   DWORD buffer_filled_bytes;
   HANDLE hDirectory;
-  xboolean_t isfile;
+  gboolean isfile;
   wchar_t *wfullpath_with_long_prefix;
   wchar_t *wfilename_short;
   wchar_t *wfilename_long;
   DWORD file_attribs;
   PFILE_NOTIFY_INFORMATION pfni_prev;
   /* Needed in the APC where we only have this private struct */
-  xfile_monitor_t *self;
+  GFileMonitor *self;
   GFileMonitorSource *fms;
 };
 
@@ -60,12 +60,12 @@ enum GWin32FileMonitorFileAlias
   G_WIN32_FILE_MONITOR_NO_MATCH_FOUND
 };
 
-GWin32FSMonitorPrivate* g_win32_fs_monitor_create (xboolean_t isfile);
+GWin32FSMonitorPrivate* g_win32_fs_monitor_create (gboolean isfile);
 
 void g_win32_fs_monitor_init (GWin32FSMonitorPrivate *monitor,
-                              const xchar_t *dirname,
-                              const xchar_t *filename,
-                              xboolean_t isfile);
+                              const gchar *dirname,
+                              const gchar *filename,
+                              gboolean isfile);
 
 void g_win32_fs_monitor_finalize (GWin32FSMonitorPrivate *monitor);
 

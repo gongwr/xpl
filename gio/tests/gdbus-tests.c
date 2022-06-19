@@ -29,41 +29,41 @@
 
 typedef struct
 {
-  xmain_loop_t *loop;
-  xboolean_t   timed_out;
+  GMainLoop *loop;
+  gboolean   timed_out;
 } PropertyNotifyData;
 
 static void
-on_property_notify (xobject_t    *object,
-                    xparam_spec_t *pspec,
-                    xpointer_t    user_data)
+on_property_notify (GObject    *object,
+                    GParamSpec *pspec,
+                    gpointer    user_data)
 {
   PropertyNotifyData *data = user_data;
-  xmain_loop_quit (data->loop);
+  g_main_loop_quit (data->loop);
 }
 
-static xboolean_t
-on_property_notify_timeout (xpointer_t user_data)
+static gboolean
+on_property_notify_timeout (gpointer user_data)
 {
   PropertyNotifyData *data = user_data;
   data->timed_out = TRUE;
-  xmain_loop_quit (data->loop);
+  g_main_loop_quit (data->loop);
   return G_SOURCE_CONTINUE;
 }
 
-xboolean_t
-_g_assert_property_notify_run (xpointer_t     object,
-                               const xchar_t *property_name)
+gboolean
+_g_assert_property_notify_run (gpointer     object,
+                               const gchar *property_name)
 {
-  xchar_t *s;
-  xulong_t handler_id;
-  xuint_t timeout_id;
+  gchar *s;
+  gulong handler_id;
+  guint timeout_id;
   PropertyNotifyData data;
 
-  data.loop = xmain_loop_new (xmain_context_get_thread_default (), FALSE);
+  data.loop = g_main_loop_new (g_main_context_get_thread_default (), FALSE);
   data.timed_out = FALSE;
-  s = xstrdup_printf ("notify::%s", property_name);
-  handler_id = xsignal_connect (object,
+  s = g_strdup_printf ("notify::%s", property_name);
+  handler_id = g_signal_connect (object,
                                  s,
                                  G_CALLBACK (on_property_notify),
                                  &data);
@@ -71,59 +71,59 @@ _g_assert_property_notify_run (xpointer_t     object,
   timeout_id = g_timeout_add_seconds (30,
                                       on_property_notify_timeout,
                                       &data);
-  xmain_loop_run (data.loop);
-  xsignal_handler_disconnect (object, handler_id);
-  xsource_remove (timeout_id);
-  xmain_loop_unref (data.loop);
+  g_main_loop_run (data.loop);
+  g_signal_handler_disconnect (object, handler_id);
+  g_source_remove (timeout_id);
+  g_main_loop_unref (data.loop);
 
   return data.timed_out;
 }
 
-static xboolean_t
-_give_up (xpointer_t data)
+static gboolean
+_give_up (gpointer data)
 {
-  xerror ("%s", (const xchar_t *) data);
-  xreturn_val_if_reached (G_SOURCE_CONTINUE);
+  g_error ("%s", (const gchar *) data);
+  g_return_val_if_reached (G_SOURCE_CONTINUE);
 }
 
 typedef struct
 {
-  xmain_context_t *context;
-  xboolean_t name_appeared;
-  xboolean_t unwatch_complete;
+  GMainContext *context;
+  gboolean name_appeared;
+  gboolean unwatch_complete;
 } WatchData;
 
 static void
-name_appeared_cb (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  const xchar_t     *name_owner,
-                  xpointer_t         user_data)
+name_appeared_cb (GDBusConnection *connection,
+                  const gchar     *name,
+                  const gchar     *name_owner,
+                  gpointer         user_data)
 {
   WatchData *data = user_data;
 
-  xassert (name_owner != NULL);
+  g_assert (name_owner != NULL);
   data->name_appeared = TRUE;
-  xmain_context_wakeup (data->context);
+  g_main_context_wakeup (data->context);
 }
 
 static void
-watch_free_cb (xpointer_t user_data)
+watch_free_cb (gpointer user_data)
 {
   WatchData *data = user_data;
 
   data->unwatch_complete = TRUE;
-  xmain_context_wakeup (data->context);
+  g_main_context_wakeup (data->context);
 }
 
 void
-ensure_gdbus_testserver_up (xdbus_connection_t *connection,
-                            xmain_context_t    *context)
+ensure_gdbus_testserver_up (GDBusConnection *connection,
+                            GMainContext    *context)
 {
-  xsource_t *timeout_source = NULL;
-  xuint_t watch_id;
+  GSource *timeout_source = NULL;
+  guint watch_id;
   WatchData data = { context, FALSE, FALSE };
 
-  xmain_context_push_thread_default (context);
+  g_main_context_push_thread_default (context);
 
   watch_id = g_bus_watch_name_on_connection (connection,
                                              "com.example.TestService",
@@ -134,84 +134,84 @@ ensure_gdbus_testserver_up (xdbus_connection_t *connection,
                                              watch_free_cb);
 
   timeout_source = g_timeout_source_new_seconds (60);
-  xsource_set_callback (timeout_source, _give_up,
+  g_source_set_callback (timeout_source, _give_up,
                          "waited more than ~ 60s for gdbus-testserver to take its bus name",
                          NULL);
-  xsource_attach (timeout_source, context);
+  g_source_attach (timeout_source, context);
 
   while (!data.name_appeared)
-    xmain_context_iteration (context, TRUE);
+    g_main_context_iteration (context, TRUE);
 
   g_bus_unwatch_name (watch_id);
   watch_id = 0;
 
   while (!data.unwatch_complete)
-    xmain_context_iteration (context, TRUE);
+    g_main_context_iteration (context, TRUE);
 
-  xsource_destroy (timeout_source);
-  xsource_unref (timeout_source);
+  g_source_destroy (timeout_source);
+  g_source_unref (timeout_source);
 
-  xmain_context_pop_thread_default (context);
+  g_main_context_pop_thread_default (context);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 typedef struct
 {
-  xmain_loop_t *loop;
-  xboolean_t   timed_out;
+  GMainLoop *loop;
+  gboolean   timed_out;
 } SignalReceivedData;
 
 static void
-on_signal_received (xpointer_t user_data)
+on_signal_received (gpointer user_data)
 {
   SignalReceivedData *data = user_data;
-  xmain_loop_quit (data->loop);
+  g_main_loop_quit (data->loop);
 }
 
-static xboolean_t
-on_signal_received_timeout (xpointer_t user_data)
+static gboolean
+on_signal_received_timeout (gpointer user_data)
 {
   SignalReceivedData *data = user_data;
   data->timed_out = TRUE;
-  xmain_loop_quit (data->loop);
+  g_main_loop_quit (data->loop);
   return G_SOURCE_CONTINUE;
 }
 
-xboolean_t
-_g_assert_signal_received_run (xpointer_t     object,
-                               const xchar_t *signal_name)
+gboolean
+_g_assert_signal_received_run (gpointer     object,
+                               const gchar *signal_name)
 {
-  xulong_t handler_id;
-  xuint_t timeout_id;
+  gulong handler_id;
+  guint timeout_id;
   SignalReceivedData data;
 
-  data.loop = xmain_loop_new (xmain_context_get_thread_default (), FALSE);
+  data.loop = g_main_loop_new (g_main_context_get_thread_default (), FALSE);
   data.timed_out = FALSE;
-  handler_id = xsignal_connect_swapped (object,
+  handler_id = g_signal_connect_swapped (object,
                                          signal_name,
                                          G_CALLBACK (on_signal_received),
                                          &data);
   timeout_id = g_timeout_add_seconds (30,
                                       on_signal_received_timeout,
                                       &data);
-  xmain_loop_run (data.loop);
-  xsignal_handler_disconnect (object, handler_id);
-  xsource_remove (timeout_id);
-  xmain_loop_unref (data.loop);
+  g_main_loop_run (data.loop);
+  g_signal_handler_disconnect (object, handler_id);
+  g_source_remove (timeout_id);
+  g_main_loop_unref (data.loop);
 
   return data.timed_out;
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-xdbus_connection_t *
-_g_bus_get_priv (xbus_type_t            bus_type,
-                 xcancellable_t       *cancellable,
-                 xerror_t            **error)
+GDBusConnection *
+_g_bus_get_priv (GBusType            bus_type,
+                 GCancellable       *cancellable,
+                 GError            **error)
 {
-  xchar_t *address;
-  xdbus_connection_t *ret;
+  gchar *address;
+  GDBusConnection *ret;
 
   ret = NULL;
 
@@ -219,10 +219,10 @@ _g_bus_get_priv (xbus_type_t            bus_type,
   if (address == NULL)
     goto out;
 
-  ret = xdbus_connection_new_for_address_sync (address,
+  ret = g_dbus_connection_new_for_address_sync (address,
                                                 G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT |
                                                 G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION,
-                                                NULL, /* xdbus_auth_observer_t */
+                                                NULL, /* GDBusAuthObserver */
                                                 cancellable,
                                                 error);
   g_free (address);

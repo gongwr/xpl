@@ -7,7 +7,7 @@
 #include <glib.h>
 
 static int depth = 0;
-static xstring_t *string;
+static GString *string;
 
 static void
 indent (int extra)
@@ -15,80 +15,80 @@ indent (int extra)
   int i = 0;
   while (i < depth)
     {
-      xstring_append (string, "  ");
+      g_string_append (string, "  ");
       ++i;
     }
 }
 
 static void
-start_element_handler  (xmarkup_parse_context_t *context,
-                        const xchar_t         *element_name,
-                        const xchar_t        **attribute_names,
-                        const xchar_t        **attribute_values,
-                        xpointer_t             user_data,
-                        xerror_t             **error)
+start_element_handler  (GMarkupParseContext *context,
+                        const gchar         *element_name,
+                        const gchar        **attribute_names,
+                        const gchar        **attribute_values,
+                        gpointer             user_data,
+                        GError             **error)
 {
   int i;
-
+  
   indent (0);
-  xstring_append_printf (string, "ELEMENT '%s'\n", element_name);
+  g_string_append_printf (string, "ELEMENT '%s'\n", element_name);
 
   i = 0;
   while (attribute_names[i] != NULL)
     {
       indent (1);
 
-      xstring_append_printf (string, "%s=\"%s\"\n",
+      g_string_append_printf (string, "%s=\"%s\"\n",
                               attribute_names[i],
                               attribute_values[i]);
-
+      
       ++i;
     }
-
+  
   ++depth;
 }
 
 static void
-end_element_handler (xmarkup_parse_context_t *context,
-                     const xchar_t         *element_name,
-                     xpointer_t             user_data,
-                     xerror_t             **error)
+end_element_handler (GMarkupParseContext *context,
+                     const gchar         *element_name,
+                     gpointer             user_data,
+                     GError             **error)
 {
   --depth;
   indent (0);
-  xstring_append_printf (string, "END '%s'\n", element_name);
+  g_string_append_printf (string, "END '%s'\n", element_name);
   }
 
 static void
-text_handler (xmarkup_parse_context_t *context,
-              const xchar_t         *text,
-              xsize_t                text_len,
-              xpointer_t             user_data,
-              xerror_t             **error)
+text_handler (GMarkupParseContext *context,
+              const gchar         *text,
+              gsize                text_len,
+              gpointer             user_data,
+              GError             **error)
 {
   indent (0);
-  xstring_append_printf (string, "TEXT '%.*s'\n", (int)text_len, text);
+  g_string_append_printf (string, "TEXT '%.*s'\n", (int)text_len, text);
 }
 
 
 static void
-passthrough_handler (xmarkup_parse_context_t *context,
-                     const xchar_t         *passthrough_text,
-                     xsize_t                text_len,
-                     xpointer_t             user_data,
-                     xerror_t             **error)
+passthrough_handler (GMarkupParseContext *context,
+                     const gchar         *passthrough_text,
+                     gsize                text_len,
+                     gpointer             user_data,
+                     GError             **error)
 {
   indent (0);
 
-  xstring_append_printf (string, "PASS '%.*s'\n", (int)text_len, passthrough_text);
+  g_string_append_printf (string, "PASS '%.*s'\n", (int)text_len, passthrough_text);
 }
 
 static void
-error_handler (xmarkup_parse_context_t *context,
-               xerror_t              *error,
-               xpointer_t             user_data)
+error_handler (GMarkupParseContext *context,
+               GError              *error,
+               gpointer             user_data)
 {
-  xstring_append_printf (string, "ERROR %s\n", error->message);
+  g_string_append_printf (string, "ERROR %s\n", error->message);
 }
 
 static const GMarkupParser parser = {
@@ -108,39 +108,39 @@ static const GMarkupParser silent_parser = {
 };
 
 static int
-test_in_chunks (const xchar_t       *contents,
-                xint_t               length,
-                xint_t               chunk_size,
+test_in_chunks (const gchar       *contents,
+                gint               length,
+                gint               chunk_size,
                 GMarkupParseFlags  flags)
 {
-  xmarkup_parse_context_t *context;
+  GMarkupParseContext *context;
   int i = 0;
-
-  context = xmarkup_parse_context_new (&silent_parser, flags, NULL, NULL);
+  
+  context = g_markup_parse_context_new (&silent_parser, flags, NULL, NULL);
 
   while (i < length)
     {
       int this_chunk = MIN (length - i, chunk_size);
 
-      if (!xmarkup_parse_context_parse (context,
+      if (!g_markup_parse_context_parse (context,
                                          contents + i,
                                          this_chunk,
                                          NULL))
         {
-          xmarkup_parse_context_free (context);
+          g_markup_parse_context_free (context);
           return 1;
         }
 
       i += this_chunk;
     }
-
-  if (!xmarkup_parse_context_end_parse (context, NULL))
+      
+  if (!g_markup_parse_context_end_parse (context, NULL))
     {
-      xmarkup_parse_context_free (context);
+      g_markup_parse_context_free (context);
       return 1;
     }
 
-  xmarkup_parse_context_free (context);
+  g_markup_parse_context_free (context);
 
   return 0;
 }
@@ -149,22 +149,22 @@ test_in_chunks (const xchar_t       *contents,
  * and length handling. All results should be equal. %TRUE is returned if the
  * file was parsed successfully on every attempt; %FALSE if it failed to parse
  * on every attempt. The test aborts if some attempts succeed and some fail. */
-static xboolean_t
-test_file (const xchar_t       *filename,
+static gboolean
+test_file (const gchar       *filename,
            GMarkupParseFlags  flags)
 {
-  xchar_t *contents = NULL, *contents_unterminated = NULL;
-  xsize_t length_bytes;
-  xerror_t *local_error = NULL;
-  xmarkup_parse_context_t *context;
-  xint_t line, col;
-  xuint_t n_failures = 0;
-  xuint_t n_tests = 0;
-  const xsize_t chunk_sizes_bytes[] = { 1, 2, 5, 12, 1024 };
-  xsize_t i;
-  xstring_t *first_string = NULL;
+  gchar *contents = NULL, *contents_unterminated = NULL;
+  gsize length_bytes;
+  GError *local_error = NULL;
+  GMarkupParseContext *context;
+  gint line, col;
+  guint n_failures = 0;
+  guint n_tests = 0;
+  const gsize chunk_sizes_bytes[] = { 1, 2, 5, 12, 1024 };
+  gsize i;
+  GString *first_string = NULL;
 
-  xfile_get_contents (filename, &contents, &length_bytes, &local_error);
+  g_file_get_contents (filename, &contents, &length_bytes, &local_error);
   g_assert_no_error (local_error);
 
   /* Make a copy of the contents with no trailing nul. */
@@ -172,28 +172,28 @@ test_file (const xchar_t       *filename,
   if (contents_unterminated != NULL)
     memcpy (contents_unterminated, contents, length_bytes);
 
-  /* test_t with nul termination. */
-  context = xmarkup_parse_context_new (&parser, flags, NULL, NULL);
-  xassert (xmarkup_parse_context_get_user_data (context) == NULL);
-  xmarkup_parse_context_get_position (context, &line, &col);
+  /* Test with nul termination. */
+  context = g_markup_parse_context_new (&parser, flags, NULL, NULL);
+  g_assert (g_markup_parse_context_get_user_data (context) == NULL);
+  g_markup_parse_context_get_position (context, &line, &col);
   g_assert_cmpint (line, ==, 1);
   g_assert_cmpint (col, ==, 1);
 
-  if (!xmarkup_parse_context_parse (context, contents, -1, NULL) ||
-      !xmarkup_parse_context_end_parse (context, NULL))
+  if (!g_markup_parse_context_parse (context, contents, -1, NULL) ||
+      !g_markup_parse_context_end_parse (context, NULL))
     n_failures++;
   n_tests++;
 
-  xmarkup_parse_context_free (context);
+  g_markup_parse_context_free (context);
 
   /* FIXME: Swap out the error string so we only return one copy of it, not
    * @n_tests copies. This should be fixed properly by eliminating the global
    * state in this file. */
   first_string = g_steal_pointer (&string);
-  string = xstring_new ("");
+  string = g_string_new ("");
 
   /* With the length specified explicitly and a nul terminator present (since
-   * xfile_get_contents() always adds one). */
+   * g_file_get_contents() always adds one). */
   if (test_in_chunks (contents, length_bytes, length_bytes, flags) != 0)
     n_failures++;
   n_tests++;
@@ -215,7 +215,7 @@ test_file (const xchar_t       *filename,
   g_free (contents_unterminated);
 
   /* FIXME: Restore the error string. */
-  xstring_free (string, TRUE);
+  g_string_free (string, TRUE);
   string = g_steal_pointer (&first_string);
 
   /* We expect the file to either always be parsed successfully, or never be
@@ -227,20 +227,20 @@ test_file (const xchar_t       *filename,
   return (n_failures == 0);
 }
 
-static xchar_t *
-get_expected_filename (const xchar_t       *filename,
+static gchar *
+get_expected_filename (const gchar       *filename,
                        GMarkupParseFlags  flags)
 {
-  xchar_t *f, *p, *expected;
+  gchar *f, *p, *expected;
 
-  f = xstrdup (filename);
+  f = g_strdup (filename);
   p = strstr (f, ".gmarkup");
   if (p)
     *p = 0;
   if (flags == 0)
-    expected = xstrconcat (f, ".expected", NULL);
+    expected = g_strconcat (f, ".expected", NULL);
   else if (flags == G_MARKUP_TREAT_CDATA_AS_TEXT)
-    expected = xstrconcat (f, ".cdata-as-text", NULL);
+    expected = g_strconcat (f, ".cdata-as-text", NULL);
   else
     g_assert_not_reached ();
 
@@ -250,48 +250,48 @@ get_expected_filename (const xchar_t       *filename,
 }
 
 static void
-test_parse (xconstpointer d)
+test_parse (gconstpointer d)
 {
-  const xchar_t *filename = d;
-  xchar_t *expected_file;
-  xchar_t *expected;
-  xboolean_t valid_input;
-  xerror_t *error = NULL;
-  xboolean_t res;
+  const gchar *filename = d;
+  gchar *expected_file;
+  gchar *expected;
+  gboolean valid_input;
+  GError *error = NULL;
+  gboolean res;
 
   valid_input = strstr (filename, "valid") != NULL;
   expected_file = get_expected_filename (filename, 0);
 
   depth = 0;
-  string = xstring_sized_new (0);
+  string = g_string_sized_new (0);
 
   res = test_file (filename, 0);
   g_assert_cmpint (res, ==, valid_input);
 
-  xfile_get_contents (expected_file, &expected, NULL, &error);
+  g_file_get_contents (expected_file, &expected, NULL, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (string->str, ==, expected);
   g_free (expected);
 
-  xstring_free (string, TRUE);
+  g_string_free (string, TRUE);
 
   g_free (expected_file);
 
   expected_file = get_expected_filename (filename, G_MARKUP_TREAT_CDATA_AS_TEXT);
-  if (xfile_test (expected_file, XFILE_TEST_EXISTS))
+  if (g_file_test (expected_file, G_FILE_TEST_EXISTS))
     {
       depth = 0;
-      string = xstring_sized_new (0);
+      string = g_string_sized_new (0);
 
       res = test_file (filename, G_MARKUP_TREAT_CDATA_AS_TEXT);
       g_assert_cmpint (res, ==, valid_input);
 
-      xfile_get_contents (expected_file, &expected, NULL, &error);
+      g_file_get_contents (expected_file, &expected, NULL, &error);
       g_assert_no_error (error);
       g_assert_cmpstr (string->str, ==, expected);
       g_free (expected);
 
-      xstring_free (string, TRUE);
+      g_string_free (string, TRUE);
     }
 
   g_free (expected_file);
@@ -300,10 +300,10 @@ test_parse (xconstpointer d)
 int
 main (int argc, char *argv[])
 {
-  xdir_t *dir;
-  xerror_t *error;
-  const xchar_t *name;
-  xchar_t *path;
+  GDir *dir;
+  GError *error;
+  const gchar *name;
+  gchar *path;
 
   g_setenv ("LC_ALL", "C", TRUE);
   setlocale (LC_ALL, "");
@@ -313,7 +313,7 @@ main (int argc, char *argv[])
   /* allow to easily generate expected output for new test cases */
   if (argc > 1)
     {
-      xint_t arg = 1;
+      gint arg = 1;
       GMarkupParseFlags flags = 0;
 
       if (strcmp (argv[1], "--cdata-as-text") == 0)
@@ -321,7 +321,7 @@ main (int argc, char *argv[])
           flags = G_MARKUP_TREAT_CDATA_AS_TEXT;
           arg = 2;
         }
-      string = xstring_sized_new (0);
+      string = g_string_sized_new (0);
       test_file (argv[arg], flags);
       g_print ("%s", string->str);
       return 0;
@@ -337,7 +337,7 @@ main (int argc, char *argv[])
       if (!strstr (name, "gmarkup"))
         continue;
 
-      path = xstrdup_printf ("/markup/parse/%s", name);
+      path = g_strdup_printf ("/markup/parse/%s", name);
       g_test_add_data_func_full (path, g_test_build_filename (G_TEST_DIST, "markups", name, NULL),
                                  test_parse, g_free);
       g_free (path);

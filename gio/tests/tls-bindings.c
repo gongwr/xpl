@@ -13,33 +13,33 @@
 static void
 get_tls_channel_binding (void)
 {
-  xtls_backend_t *backend;
-  xchar_t *not_null = "NOT_NULL";
-  xtls_connection_t *tls = NULL;
-  xerror_t *error = NULL;
+  GTlsBackend *backend;
+  gchar *not_null = "NOT_NULL";
+  GTlsConnection *tls = NULL;
+  GError *error = NULL;
 
-  backend = xtls_backend_get_default ();
+  backend = g_tls_backend_get_default ();
   g_assert_nonnull (backend);
 
-  /* check unimplemented xtls_connection_t API sanity */
-  tls = G_TLS_CONNECTION (xobject_new (
-          xtls_backend_get_client_connection_type (backend), NULL));
+  /* check unimplemented GTlsConnection API sanity */
+  tls = G_TLS_CONNECTION (g_object_new (
+          g_tls_backend_get_client_connection_type (backend), NULL));
   g_assert_nonnull (tls);
 
-  g_assert_false (xtls_connection_get_channel_binding_data (tls,
+  g_assert_false (g_tls_connection_get_channel_binding_data (tls, 
           G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, NULL));
 
-  g_assert_false (xtls_connection_get_channel_binding_data (tls,
+  g_assert_false (g_tls_connection_get_channel_binding_data (tls, 
           G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, &error));
   g_assert_error (error, G_TLS_CHANNEL_BINDING_ERROR,
                          G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED);
   g_clear_error (&error);
 
   if (g_test_subprocess ())
-    g_assert_false (xtls_connection_get_channel_binding_data (tls,
-            G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, (xerror_t **)&not_null));
+    g_assert_false (g_tls_connection_get_channel_binding_data (tls, 
+            G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, (GError **)&not_null));
 
-  xobject_unref (tls);
+  g_object_unref (tls);
   g_test_trap_subprocess (NULL, 0, 0);
   g_test_trap_assert_failed ();
   g_test_trap_assert_stderr ("*GLib-GIO-CRITICAL*");
@@ -48,33 +48,33 @@ get_tls_channel_binding (void)
 static void
 get_dtls_channel_binding (void)
 {
-  xtls_backend_t *backend;
-  xchar_t *not_null = "NOT_NULL";
-  xdtls_connection_t *dtls = NULL;
-  xerror_t *error = NULL;
+  GTlsBackend *backend;
+  gchar *not_null = "NOT_NULL";
+  GDtlsConnection *dtls = NULL;
+  GError *error = NULL;
 
-  backend = xtls_backend_get_default ();
+  backend = g_tls_backend_get_default ();
   g_assert_nonnull (backend);
 
   /* repeat for the dtls now */
-  dtls = XDTLS_CONNECTION (xobject_new (
-          xtls_backend_get_dtls_client_connection_type (backend), NULL));
+  dtls = G_DTLS_CONNECTION (g_object_new (
+          g_tls_backend_get_dtls_client_connection_type (backend), NULL));
   g_assert_nonnull (dtls);
 
-  g_assert_false (xdtls_connection_get_channel_binding_data (dtls,
+  g_assert_false (g_dtls_connection_get_channel_binding_data (dtls, 
           G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, NULL));
 
-  g_assert_false (xdtls_connection_get_channel_binding_data (dtls,
+  g_assert_false (g_dtls_connection_get_channel_binding_data (dtls, 
           G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, &error));
   g_assert_error (error, G_TLS_CHANNEL_BINDING_ERROR,
                          G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED);
   g_clear_error (&error);
 
   if (g_test_subprocess ())
-    g_assert_false (xdtls_connection_get_channel_binding_data (dtls,
-            G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, (xerror_t **)&not_null));
+    g_assert_false (g_dtls_connection_get_channel_binding_data (dtls, 
+            G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, (GError **)&not_null));
 
-  xobject_unref (dtls);
+  g_object_unref (dtls);
   g_test_trap_subprocess (NULL, 0, 0);
   g_test_trap_assert_failed ();
   g_test_trap_assert_stderr ("*GLib-GIO-CRITICAL*");

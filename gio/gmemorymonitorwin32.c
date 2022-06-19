@@ -28,48 +28,48 @@
 
 #include <windows.h>
 
-#define XTYPE_MEMORY_MONITOR_WIN32 (xmemory_monitor_win32_get_type ())
-G_DECLARE_FINAL_TYPE (GMemoryMonitorWin32, xmemory_monitor_win32, G, MEMORY_MONITOR_WIN32, xobject_t)
+#define G_TYPE_MEMORY_MONITOR_WIN32 (g_memory_monitor_win32_get_type ())
+G_DECLARE_FINAL_TYPE (GMemoryMonitorWin32, g_memory_monitor_win32, G, MEMORY_MONITOR_WIN32, GObject)
 
-#define G_MEMORY_MONITOR_WIN32_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
+#define G_MEMORY_MONITOR_WIN32_GET_INITABLE_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_INITABLE, GInitable))
 
-static void xmemory_monitor_win32_iface_init (GMemoryMonitorInterface *iface);
-static void xmemory_monitor_win32_initable_iface_init (xinitable_iface_t *iface);
+static void g_memory_monitor_win32_iface_init (GMemoryMonitorInterface *iface);
+static void g_memory_monitor_win32_initable_iface_init (GInitableIface *iface);
 
 struct _GMemoryMonitorWin32
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   HANDLE event;
   HANDLE mem;
   HANDLE thread;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorWin32, xmemory_monitor_win32, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                xmemory_monitor_win32_initable_iface_init)
-                         G_IMPLEMENT_INTERFACE (XTYPE_MEMORY_MONITOR,
-                                                xmemory_monitor_win32_iface_init)
-                         _xio_modules_ensure_extension_points_registered ();
+G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorWin32, g_memory_monitor_win32, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                g_memory_monitor_win32_initable_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_MEMORY_MONITOR,
+                                                g_memory_monitor_win32_iface_init)
+                         _g_io_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_MEMORY_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
                                                          "win32",
                                                          30))
 
 static void
-xmemory_monitor_win32_init (GMemoryMonitorWin32 *win32)
+g_memory_monitor_win32_init (GMemoryMonitorWin32 *win32)
 {
 }
 
-static xboolean_t
-watch_handler (xpointer_t user_data)
+static gboolean
+watch_handler (gpointer user_data)
 {
   GMemoryMonitorWin32 *win32 = user_data;
 
-  xsignal_emit_by_name (win32, "low-memory-warning",
+  g_signal_emit_by_name (win32, "low-memory-warning",
                          G_MEMORY_MONITOR_WARNING_LEVEL_LOW);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 /* Thread which watches for win32 memory resource events */
@@ -94,7 +94,7 @@ watch_thread_function (LPVOID parameter)
                         FALSE,
                         DUPLICATE_SAME_ACCESS))
     {
-      xchar_t *emsg;
+      gchar *emsg;
 
       emsg = g_win32_error_message (GetLastError ());
       g_debug ("DuplicateHandle failed: %s", emsg);
@@ -110,7 +110,7 @@ watch_thread_function (LPVOID parameter)
                         FALSE,
                         DUPLICATE_SAME_ACCESS))
     {
-      xchar_t *emsg;
+      gchar *emsg;
 
       emsg = g_win32_error_message (GetLastError ());
       g_debug ("DuplicateHandle failed: %s", emsg);
@@ -124,7 +124,7 @@ watch_thread_function (LPVOID parameter)
     {
       if (!QueryMemoryResourceNotification (handles[1], &low_memory_state))
         {
-          xchar_t *emsg;
+          gchar *emsg;
 
           emsg = g_win32_error_message (GetLastError ());
           g_debug ("QueryMemoryResourceNotification failed: %s", emsg);
@@ -141,7 +141,7 @@ watch_thread_function (LPVOID parameter)
           g_idle_add_full (G_PRIORITY_DEFAULT,
                            watch_handler,
                            g_steal_pointer (&win32),
-                           xobject_unref);
+                           g_object_unref);
           /* throttle a bit the loop */
           g_usleep (G_USEC_PER_SEC);
           continue;
@@ -157,7 +157,7 @@ watch_thread_function (LPVOID parameter)
 
           case WAIT_FAILED:
             {
-              xchar_t *emsg;
+              gchar *emsg;
 
               emsg = g_win32_error_message (GetLastError ());
               g_debug ("WaitForMultipleObjects failed: %s", emsg);
@@ -180,10 +180,10 @@ end:
   return 0;
 }
 
-static xboolean_t
-xmemory_monitor_win32_initable_init (xinitable_t     *initable,
-                                      xcancellable_t  *cancellable,
-                                      xerror_t       **error)
+static gboolean
+g_memory_monitor_win32_initable_init (GInitable     *initable,
+                                      GCancellable  *cancellable,
+                                      GError       **error)
 {
   GMemoryMonitorWin32 *win32 = G_MEMORY_MONITOR_WIN32 (initable);
   GWeakRef *weak_ref = NULL;
@@ -206,7 +206,7 @@ xmemory_monitor_win32_initable_init (xinitable_t     *initable,
 
   weak_ref = g_new0 (GWeakRef, 1);
   g_weak_ref_init (weak_ref, win32);
-  /* Use CreateThread (not xthread_t) with a small stack to make it more lightweight. */
+  /* Use CreateThread (not GThread) with a small stack to make it more lightweight. */
   win32->thread = CreateThread (NULL, 1024, watch_thread_function, weak_ref, 0, NULL);
   if (win32->thread == NULL)
     {
@@ -221,7 +221,7 @@ xmemory_monitor_win32_initable_init (xinitable_t     *initable,
 }
 
 static void
-xmemory_monitor_win32_finalize (xobject_t *object)
+g_memory_monitor_win32_finalize (GObject *object)
 {
   GMemoryMonitorWin32 *win32 = G_MEMORY_MONITOR_WIN32 (object);
 
@@ -238,24 +238,24 @@ xmemory_monitor_win32_finalize (xobject_t *object)
   if (win32->mem)
     CloseHandle (win32->mem);
 
-  XOBJECT_CLASS (xmemory_monitor_win32_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_memory_monitor_win32_parent_class)->finalize (object);
 }
 
 static void
-xmemory_monitor_win32_class_init (GMemoryMonitorWin32Class *nl_class)
+g_memory_monitor_win32_class_init (GMemoryMonitorWin32Class *nl_class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  xobject_class->finalize = xmemory_monitor_win32_finalize;
+  gobject_class->finalize = g_memory_monitor_win32_finalize;
 }
 
 static void
-xmemory_monitor_win32_iface_init (GMemoryMonitorInterface *monitor_iface)
+g_memory_monitor_win32_iface_init (GMemoryMonitorInterface *monitor_iface)
 {
 }
 
 static void
-xmemory_monitor_win32_initable_iface_init (xinitable_iface_t *iface)
+g_memory_monitor_win32_initable_iface_init (GInitableIface *iface)
 {
-  iface->init = xmemory_monitor_win32_initable_init;
+  iface->init = g_memory_monitor_win32_initable_init;
 }

@@ -30,7 +30,7 @@
  * _g_win32_sid_replace: (skip)
  * @dest: A pointer to a SID storage
  * @src: Existing SID
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Creates a copy of the @src SID and puts that into @dest, after freeing
  * existing SID in @dest (if any).
@@ -39,17 +39,17 @@
  *
  * Returns: TRUE on success, FALSE otherwise
  */
-static xboolean_t
+static gboolean
 _g_win32_sid_replace (SID **dest,
                       SID  *src,
-                      xerror_t **error)
+                      GError **error)
 {
   DWORD sid_len;
   SID *new_sid;
 
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
-  xreturn_val_if_fail (src != NULL, FALSE);
-  xreturn_val_if_fail (dest && *dest == NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (src != NULL, FALSE);
+  g_return_val_if_fail (dest && *dest == NULL, FALSE);
 
   sid_len = GetLengthSid (src);
   new_sid = g_malloc (sid_len);
@@ -74,7 +74,7 @@ _g_win32_sid_replace (SID **dest,
 /**
  * _g_win32_token_get_sid: (skip)
  * @token: A handle of an access token
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Gets user SID of the @token and returns a copy of that SID.
  *
@@ -83,14 +83,14 @@ _g_win32_sid_replace (SID **dest,
  */
 static SID *
 _g_win32_token_get_sid (HANDLE token,
-                        xerror_t **error)
+                        GError **error)
 {
   TOKEN_USER *token_user = NULL;
   DWORD n;
   PSID psid;
   SID *result = NULL;
 
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!GetTokenInformation (token, TokenUser, NULL, 0, &n)
       && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
@@ -130,7 +130,7 @@ _g_win32_token_get_sid (HANDLE token,
  * _g_win32_process_get_access_token_sid: (skip)
  * @process_id: Identifier of a process to get an access token of
  *              (use 0 to get a token of the current process)
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Opens the process identified by @process_id and opens its token,
  * then retrieves SID of the token user and returns a copy of that SID.
@@ -140,13 +140,13 @@ _g_win32_token_get_sid (HANDLE token,
  */
 SID *
 _g_win32_process_get_access_token_sid (DWORD process_id,
-                                       xerror_t **error)
+                                       GError **error)
 {
   HANDLE process_handle;
   HANDLE process_token;
   SID *result = NULL;
 
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (process_id == 0)
     process_handle = GetCurrentProcess ();
@@ -181,19 +181,19 @@ _g_win32_process_get_access_token_sid (DWORD process_id,
 /**
  * _g_win32_sid_to_string: (skip)
  * @sid: a SID.
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Convert a SID to its string form.
  *
  * Returns: A newly-allocated string, or NULL in case of an error.
  */
-xchar_t *
-_g_win32_sid_to_string (SID *sid, xerror_t **error)
+gchar *
+_g_win32_sid_to_string (SID *sid, GError **error)
 {
-  xchar_t *tmp, *ret;
+  gchar *tmp, *ret;
 
-  xreturn_val_if_fail (sid != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (sid != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!ConvertSidToStringSidA (sid, &tmp))
     {
@@ -203,26 +203,26 @@ _g_win32_sid_to_string (SID *sid, xerror_t **error)
       return NULL;
     }
 
-  ret = xstrdup (tmp);
+  ret = g_strdup (tmp);
   LocalFree (tmp);
   return ret;
 }
 
 /**
  * _g_win32_current_process_sid_string: (skip)
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Get the current process SID, as a string.
  *
  * Returns: A newly-allocated string, or NULL in case of an error.
  */
-xchar_t *
-_g_win32_current_process_sid_string (xerror_t **error)
+gchar *
+_g_win32_current_process_sid_string (GError **error)
 {
   SID *sid;
-  xchar_t *ret;
+  gchar *ret;
 
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   sid = _g_win32_process_get_access_token_sid (0, error);
   if (!sid)

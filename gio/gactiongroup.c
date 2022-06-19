@@ -25,30 +25,30 @@
 
 /**
  * SECTION:gactiongroup
- * @title: xaction_group_t
+ * @title: GActionGroup
  * @short_description: A group of actions
  * @include: gio/gio.h
- * @see_also: #xaction_t
+ * @see_also: #GAction
  *
- * #xaction_group_t represents a group of actions. Actions can be used to
+ * #GActionGroup represents a group of actions. Actions can be used to
  * expose functionality in a structured way, either from one part of a
  * program to another, or to the outside world. Action groups are often
- * used together with a #xmenu_model_t that provides additional
+ * used together with a #GMenuModel that provides additional
  * representation data for displaying the actions to the user, e.g. in
  * a menu.
  *
- * The main way to interact with the actions in a xaction_group_t is to
- * activate them with xaction_group_activate_action(). Activating an
- * action may require a #xvariant_t parameter. The required type of the
- * parameter can be inquired with xaction_group_get_action_parameter_type().
- * Actions may be disabled, see xaction_group_get_action_enabled().
+ * The main way to interact with the actions in a GActionGroup is to
+ * activate them with g_action_group_activate_action(). Activating an
+ * action may require a #GVariant parameter. The required type of the
+ * parameter can be inquired with g_action_group_get_action_parameter_type().
+ * Actions may be disabled, see g_action_group_get_action_enabled().
  * Activating a disabled action has no effect.
  *
- * Actions may optionally have a state in the form of a #xvariant_t. The
+ * Actions may optionally have a state in the form of a #GVariant. The
  * current state of an action can be inquired with
- * xaction_group_get_action_state(). Activating a stateful action may
+ * g_action_group_get_action_state(). Activating a stateful action may
  * change its state, but it is also possible to set the state by calling
- * xaction_group_change_action_state().
+ * g_action_group_change_action_state().
  *
  * As typical example, consider a text editing application which has an
  * option to change the current font to 'bold'. A good way to represent
@@ -56,58 +56,58 @@
  * action would toggle the state.
  *
  * Each action in the group has a unique name (which is a string).  All
- * method calls, except xaction_group_list_actions() take the name of
+ * method calls, except g_action_group_list_actions() take the name of
  * an action as an argument.
  *
- * The #xaction_group_t API is meant to be the 'public' API to the action
+ * The #GActionGroup API is meant to be the 'public' API to the action
  * group.  The calls here are exactly the interaction that 'external
  * forces' (eg: UI, incoming D-Bus messages, etc.) are supposed to have
  * with actions.  'Internal' APIs (ie: ones meant only to be accessed by
  * the action group implementation) are found on subclasses.  This is
- * why you will find - for example - xaction_group_get_action_enabled()
+ * why you will find - for example - g_action_group_get_action_enabled()
  * but not an equivalent set() call.
  *
  * Signals are emitted on the action group in response to state changes
  * on individual actions.
  *
- * Implementations of #xaction_group_t should provide implementations for
- * the virtual functions xaction_group_list_actions() and
- * xaction_group_query_action().  The other virtual functions should
+ * Implementations of #GActionGroup should provide implementations for
+ * the virtual functions g_action_group_list_actions() and
+ * g_action_group_query_action().  The other virtual functions should
  * not be implemented - their "wrappers" are actually implemented with
- * calls to xaction_group_query_action().
+ * calls to g_action_group_query_action().
  */
 
 /**
- * xaction_group_t:
+ * GActionGroup:
  *
- * #xaction_group_t is an opaque data structure and can only be accessed
+ * #GActionGroup is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 /**
- * xaction_group_interface_t:
- * @has_action: the virtual function pointer for xaction_group_has_action()
- * @list_actions: the virtual function pointer for xaction_group_list_actions()
- * @get_action_parameter_type: the virtual function pointer for xaction_group_get_action_parameter_type()
- * @get_action_state_type: the virtual function pointer for xaction_group_get_action_state_type()
- * @get_action_state_hint: the virtual function pointer for xaction_group_get_action_state_hint()
- * @get_action_enabled: the virtual function pointer for xaction_group_get_action_enabled()
- * @get_action_state: the virtual function pointer for xaction_group_get_action_state()
- * @change_action_state: the virtual function pointer for xaction_group_change_action_state()
- * @query_action: the virtual function pointer for xaction_group_query_action()
- * @activate_action: the virtual function pointer for xaction_group_activate_action()
- * @change_action_state: the virtual function pointer for xaction_group_change_action_state()
- * @action_added: the class closure for the #xaction_group_t::action-added signal
- * @action_removed: the class closure for the #xaction_group_t::action-removed signal
- * @action_enabled_changed: the class closure for the #xaction_group_t::action-enabled-changed signal
- * @action_state_changed: the class closure for the #xaction_group_t::action-enabled-changed signal
+ * GActionGroupInterface:
+ * @has_action: the virtual function pointer for g_action_group_has_action()
+ * @list_actions: the virtual function pointer for g_action_group_list_actions()
+ * @get_action_parameter_type: the virtual function pointer for g_action_group_get_action_parameter_type()
+ * @get_action_state_type: the virtual function pointer for g_action_group_get_action_state_type()
+ * @get_action_state_hint: the virtual function pointer for g_action_group_get_action_state_hint()
+ * @get_action_enabled: the virtual function pointer for g_action_group_get_action_enabled()
+ * @get_action_state: the virtual function pointer for g_action_group_get_action_state()
+ * @change_action_state: the virtual function pointer for g_action_group_change_action_state()
+ * @query_action: the virtual function pointer for g_action_group_query_action()
+ * @activate_action: the virtual function pointer for g_action_group_activate_action()
+ * @change_action_state: the virtual function pointer for g_action_group_change_action_state()
+ * @action_added: the class closure for the #GActionGroup::action-added signal
+ * @action_removed: the class closure for the #GActionGroup::action-removed signal
+ * @action_enabled_changed: the class closure for the #GActionGroup::action-enabled-changed signal
+ * @action_state_changed: the class closure for the #GActionGroup::action-enabled-changed signal
  *
- * The virtual function table for #xaction_group_t.
+ * The virtual function table for #GActionGroup.
  *
  * Since: 2.28
  **/
 
-G_DEFINE_INTERFACE (xaction_group, xaction_group, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (GActionGroup, g_action_group, G_TYPE_OBJECT)
 
 enum
 {
@@ -118,80 +118,80 @@ enum
   NR_SIGNALS
 };
 
-static xuint_t xaction_group_signals[NR_SIGNALS];
+static guint g_action_group_signals[NR_SIGNALS];
 
-static xboolean_t
-xaction_group_real_has_action (xaction_group_t *action_group,
-                                const xchar_t  *action_name)
+static gboolean
+g_action_group_real_has_action (GActionGroup *action_group,
+                                const gchar  *action_name)
 {
-  return xaction_group_query_action (action_group, action_name, NULL, NULL, NULL, NULL, NULL);
+  return g_action_group_query_action (action_group, action_name, NULL, NULL, NULL, NULL, NULL);
 }
 
-static xboolean_t
-xaction_group_real_get_action_enabled (xaction_group_t *action_group,
-                                        const xchar_t  *action_name)
+static gboolean
+g_action_group_real_get_action_enabled (GActionGroup *action_group,
+                                        const gchar  *action_name)
 {
-  xboolean_t enabled = FALSE;
+  gboolean enabled = FALSE;
 
-  xaction_group_query_action (action_group, action_name, &enabled, NULL, NULL, NULL, NULL);
+  g_action_group_query_action (action_group, action_name, &enabled, NULL, NULL, NULL, NULL);
 
   return enabled;
 }
 
-static const xvariant_type_t *
-xaction_group_real_get_action_parameter_type (xaction_group_t *action_group,
-                                               const xchar_t  *action_name)
+static const GVariantType *
+g_action_group_real_get_action_parameter_type (GActionGroup *action_group,
+                                               const gchar  *action_name)
 {
-  const xvariant_type_t *type = NULL;
+  const GVariantType *type = NULL;
 
-  xaction_group_query_action (action_group, action_name, NULL, &type, NULL, NULL, NULL);
+  g_action_group_query_action (action_group, action_name, NULL, &type, NULL, NULL, NULL);
 
   return type;
 }
 
-static const xvariant_type_t *
-xaction_group_real_get_action_state_type (xaction_group_t *action_group,
-                                           const xchar_t  *action_name)
+static const GVariantType *
+g_action_group_real_get_action_state_type (GActionGroup *action_group,
+                                           const gchar  *action_name)
 {
-  const xvariant_type_t *type = NULL;
+  const GVariantType *type = NULL;
 
-  xaction_group_query_action (action_group, action_name, NULL, NULL, &type, NULL, NULL);
+  g_action_group_query_action (action_group, action_name, NULL, NULL, &type, NULL, NULL);
 
   return type;
 }
 
-static xvariant_t *
-xaction_group_real_get_action_state_hint (xaction_group_t *action_group,
-                                           const xchar_t  *action_name)
+static GVariant *
+g_action_group_real_get_action_state_hint (GActionGroup *action_group,
+                                           const gchar  *action_name)
 {
-  xvariant_t *hint = NULL;
+  GVariant *hint = NULL;
 
-  xaction_group_query_action (action_group, action_name, NULL, NULL, NULL, &hint, NULL);
+  g_action_group_query_action (action_group, action_name, NULL, NULL, NULL, &hint, NULL);
 
   return hint;
 }
 
-static xvariant_t *
-xaction_group_real_get_action_state (xaction_group_t *action_group,
-                                      const xchar_t  *action_name)
+static GVariant *
+g_action_group_real_get_action_state (GActionGroup *action_group,
+                                      const gchar  *action_name)
 {
-  xvariant_t *state = NULL;
+  GVariant *state = NULL;
 
-  xaction_group_query_action (action_group, action_name, NULL, NULL, NULL, NULL, &state);
+  g_action_group_query_action (action_group, action_name, NULL, NULL, NULL, NULL, &state);
 
   return state;
 }
 
-static xboolean_t
-xaction_group_real_query_action (xaction_group_t        *action_group,
-                                  const xchar_t         *action_name,
-                                  xboolean_t            *enabled,
-                                  const xvariant_type_t **parameter_type,
-                                  const xvariant_type_t **state_type,
-                                  xvariant_t           **state_hint,
-                                  xvariant_t           **state)
+static gboolean
+g_action_group_real_query_action (GActionGroup        *action_group,
+                                  const gchar         *action_name,
+                                  gboolean            *enabled,
+                                  const GVariantType **parameter_type,
+                                  const GVariantType **state_type,
+                                  GVariant           **state_hint,
+                                  GVariant           **state)
 {
-  xaction_group_interface_t *iface = XACTION_GROUP_GET_IFACE (action_group);
+  GActionGroupInterface *iface = G_ACTION_GROUP_GET_IFACE (action_group);
 
   /* we expect implementations to override this method, but we also
    * allow for implementations that existed before this method was
@@ -199,14 +199,14 @@ xaction_group_real_query_action (xaction_group_t        *action_group,
    *
    * detect the case that neither has happened and report it.
    */
-  if G_UNLIKELY (iface->has_action == xaction_group_real_has_action ||
-                 iface->get_action_enabled == xaction_group_real_get_action_enabled ||
-                 iface->get_action_parameter_type == xaction_group_real_get_action_parameter_type ||
-                 iface->get_action_state_type == xaction_group_real_get_action_state_type ||
-                 iface->get_action_state_hint == xaction_group_real_get_action_state_hint ||
-                 iface->get_action_state == xaction_group_real_get_action_state)
+  if G_UNLIKELY (iface->has_action == g_action_group_real_has_action ||
+                 iface->get_action_enabled == g_action_group_real_get_action_enabled ||
+                 iface->get_action_parameter_type == g_action_group_real_get_action_parameter_type ||
+                 iface->get_action_state_type == g_action_group_real_get_action_state_type ||
+                 iface->get_action_state_hint == g_action_group_real_get_action_state_hint ||
+                 iface->get_action_state == g_action_group_real_get_action_state)
     {
-      g_critical ("Class '%s' implements xaction_group_t interface without overriding "
+      g_critical ("Class '%s' implements GActionGroup interface without overriding "
                   "query_action() method -- bailing out to avoid infinite recursion.",
                   G_OBJECT_TYPE_NAME (action_group));
       return FALSE;
@@ -234,19 +234,19 @@ xaction_group_real_query_action (xaction_group_t        *action_group,
 }
 
 static void
-xaction_group_default_init (xaction_group_interface_t *iface)
+g_action_group_default_init (GActionGroupInterface *iface)
 {
-  iface->has_action = xaction_group_real_has_action;
-  iface->get_action_enabled = xaction_group_real_get_action_enabled;
-  iface->get_action_parameter_type = xaction_group_real_get_action_parameter_type;
-  iface->get_action_state_type = xaction_group_real_get_action_state_type;
-  iface->get_action_state_hint = xaction_group_real_get_action_state_hint;
-  iface->get_action_state = xaction_group_real_get_action_state;
-  iface->query_action = xaction_group_real_query_action;
+  iface->has_action = g_action_group_real_has_action;
+  iface->get_action_enabled = g_action_group_real_get_action_enabled;
+  iface->get_action_parameter_type = g_action_group_real_get_action_parameter_type;
+  iface->get_action_state_type = g_action_group_real_get_action_state_type;
+  iface->get_action_state_hint = g_action_group_real_get_action_state_hint;
+  iface->get_action_state = g_action_group_real_get_action_state;
+  iface->query_action = g_action_group_real_query_action;
 
   /**
-   * xaction_group_t::action-added:
-   * @action_group: the #xaction_group_t that changed
+   * GActionGroup::action-added:
+   * @action_group: the #GActionGroup that changed
    * @action_name: the name of the action in @action_group
    *
    * Signals that a new action was just added to the group.
@@ -255,19 +255,19 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    *
    * Since: 2.28
    **/
-  xaction_group_signals[SIGNAL_ACTION_ADDED] =
-    xsignal_new (I_("action-added"),
-                  XTYPE_ACTION_GROUP,
+  g_action_group_signals[SIGNAL_ACTION_ADDED] =
+    g_signal_new (I_("action-added"),
+                  G_TYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
-                  G_STRUCT_OFFSET (xaction_group_interface_t, action_added),
+                  G_STRUCT_OFFSET (GActionGroupInterface, action_added),
                   NULL, NULL,
                   NULL,
-                  XTYPE_NONE, 1,
-                  XTYPE_STRING);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_STRING);
 
   /**
-   * xaction_group_t::action-removed:
-   * @action_group: the #xaction_group_t that changed
+   * GActionGroup::action-removed:
+   * @action_group: the #GActionGroup that changed
    * @action_name: the name of the action in @action_group
    *
    * Signals that an action is just about to be removed from the group.
@@ -276,20 +276,20 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    *
    * Since: 2.28
    **/
-  xaction_group_signals[SIGNAL_ACTION_REMOVED] =
-    xsignal_new (I_("action-removed"),
-                  XTYPE_ACTION_GROUP,
+  g_action_group_signals[SIGNAL_ACTION_REMOVED] =
+    g_signal_new (I_("action-removed"),
+                  G_TYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
-                  G_STRUCT_OFFSET (xaction_group_interface_t, action_removed),
+                  G_STRUCT_OFFSET (GActionGroupInterface, action_removed),
                   NULL, NULL,
                   NULL,
-                  XTYPE_NONE, 1,
-                  XTYPE_STRING);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_STRING);
 
 
   /**
-   * xaction_group_t::action-enabled-changed:
-   * @action_group: the #xaction_group_t that changed
+   * GActionGroup::action-enabled-changed:
+   * @action_group: the #GActionGroup that changed
    * @action_name: the name of the action in @action_group
    * @enabled: whether the action is enabled or not
    *
@@ -297,24 +297,24 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    *
    * Since: 2.28
    **/
-  xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED] =
-    xsignal_new (I_("action-enabled-changed"),
-                  XTYPE_ACTION_GROUP,
+  g_action_group_signals[SIGNAL_ACTION_ENABLED_CHANGED] =
+    g_signal_new (I_("action-enabled-changed"),
+                  G_TYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
-                  G_STRUCT_OFFSET (xaction_group_interface_t,
+                  G_STRUCT_OFFSET (GActionGroupInterface,
                                    action_enabled_changed),
                   NULL, NULL,
                   _g_cclosure_marshal_VOID__STRING_BOOLEAN,
-                  XTYPE_NONE, 2,
-                  XTYPE_STRING,
-                  XTYPE_BOOLEAN);
-  xsignal_set_va_marshaller (xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
-                              XTYPE_FROM_INTERFACE (iface),
+                  G_TYPE_NONE, 2,
+                  G_TYPE_STRING,
+                  G_TYPE_BOOLEAN);
+  g_signal_set_va_marshaller (g_action_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
+                              G_TYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__STRING_BOOLEANv);
 
   /**
-   * xaction_group_t::action-state-changed:
-   * @action_group: the #xaction_group_t that changed
+   * GActionGroup::action-state-changed:
+   * @action_group: the #GActionGroup that changed
    * @action_name: the name of the action in @action_group
    * @value: the new value of the state
    *
@@ -322,31 +322,31 @@ xaction_group_default_init (xaction_group_interface_t *iface)
    *
    * Since: 2.28
    **/
-  xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED] =
-    xsignal_new (I_("action-state-changed"),
-                  XTYPE_ACTION_GROUP,
+  g_action_group_signals[SIGNAL_ACTION_STATE_CHANGED] =
+    g_signal_new (I_("action-state-changed"),
+                  G_TYPE_ACTION_GROUP,
                   G_SIGNAL_RUN_LAST |
                   G_SIGNAL_DETAILED |
                   G_SIGNAL_MUST_COLLECT,
-                  G_STRUCT_OFFSET (xaction_group_interface_t,
+                  G_STRUCT_OFFSET (GActionGroupInterface,
                                    action_state_changed),
                   NULL, NULL,
                   _g_cclosure_marshal_VOID__STRING_VARIANT,
-                  XTYPE_NONE, 2,
-                  XTYPE_STRING,
-                  XTYPE_VARIANT);
-  xsignal_set_va_marshaller (xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED],
-                              XTYPE_FROM_INTERFACE (iface),
+                  G_TYPE_NONE, 2,
+                  G_TYPE_STRING,
+                  G_TYPE_VARIANT);
+  g_signal_set_va_marshaller (g_action_group_signals[SIGNAL_ACTION_STATE_CHANGED],
+                              G_TYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__STRING_VARIANTv);
 }
 
 /**
- * xaction_group_list_actions:
- * @action_group: a #xaction_group_t
+ * g_action_group_list_actions:
+ * @action_group: a #GActionGroup
  *
  * Lists the actions contained within @action_group.
  *
- * The caller is responsible for freeing the list with xstrfreev() when
+ * The caller is responsible for freeing the list with g_strfreev() when
  * it is no longer required.
  *
  * Returns: (transfer full): a %NULL-terminated array of the names of the
@@ -354,18 +354,18 @@ xaction_group_default_init (xaction_group_interface_t *iface)
  *
  * Since: 2.28
  **/
-xchar_t **
-xaction_group_list_actions (xaction_group_t *action_group)
+gchar **
+g_action_group_list_actions (GActionGroup *action_group)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), NULL);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->list_actions (action_group);
 }
 
 /**
- * xaction_group_has_action:
- * @action_group: a #xaction_group_t
+ * g_action_group_has_action:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to check for
  *
  * Checks if the named action exists within @action_group.
@@ -374,30 +374,30 @@ xaction_group_list_actions (xaction_group_t *action_group)
  *
  * Since: 2.28
  **/
-xboolean_t
-xaction_group_has_action (xaction_group_t *action_group,
-                           const xchar_t  *action_name)
+gboolean
+g_action_group_has_action (GActionGroup *action_group,
+                           const gchar  *action_name)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), FALSE);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), FALSE);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->has_action (action_group, action_name);
 }
 
 /**
- * xaction_group_get_action_parameter_type:
- * @action_group: a #xaction_group_t
+ * g_action_group_get_action_parameter_type:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to query
  *
  * Queries the type of the parameter that must be given when activating
  * the named action within @action_group.
  *
- * When activating the action using xaction_group_activate_action(),
- * the #xvariant_t given to that function must be of the type returned
+ * When activating the action using g_action_group_activate_action(),
+ * the #GVariant given to that function must be of the type returned
  * by this function.
  *
  * In the case that this function returns %NULL, you must not give any
- * #xvariant_t, but %NULL instead.
+ * #GVariant, but %NULL instead.
  *
  * The parameter type of a particular action will never change but it is
  * possible for an action to be removed and for a new action to be added
@@ -407,33 +407,33 @@ xaction_group_has_action (xaction_group_t *action_group,
  *
  * Since: 2.28
  **/
-const xvariant_type_t *
-xaction_group_get_action_parameter_type (xaction_group_t *action_group,
-                                          const xchar_t  *action_name)
+const GVariantType *
+g_action_group_get_action_parameter_type (GActionGroup *action_group,
+                                          const gchar  *action_name)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), NULL);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->get_action_parameter_type (action_group, action_name);
 }
 
 /**
- * xaction_group_get_action_state_type:
- * @action_group: a #xaction_group_t
+ * g_action_group_get_action_state_type:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to query
  *
  * Queries the type of the state of the named action within
  * @action_group.
  *
  * If the action is stateful then this function returns the
- * #xvariant_type_t of the state.  All calls to
- * xaction_group_change_action_state() must give a #xvariant_t of this
- * type and xaction_group_get_action_state() will return a #xvariant_t
+ * #GVariantType of the state.  All calls to
+ * g_action_group_change_action_state() must give a #GVariant of this
+ * type and g_action_group_get_action_state() will return a #GVariant
  * of the same type.
  *
  * If the action is not stateful then this function will return %NULL.
- * In that case, xaction_group_get_action_state() will return %NULL
- * and you must not call xaction_group_change_action_state().
+ * In that case, g_action_group_get_action_state() will return %NULL
+ * and you must not call g_action_group_change_action_state().
  *
  * The state type of a particular action will never change but it is
  * possible for an action to be removed and for a new action to be added
@@ -443,19 +443,19 @@ xaction_group_get_action_parameter_type (xaction_group_t *action_group,
  *
  * Since: 2.28
  **/
-const xvariant_type_t *
-xaction_group_get_action_state_type (xaction_group_t *action_group,
-                                      const xchar_t  *action_name)
+const GVariantType *
+g_action_group_get_action_state_type (GActionGroup *action_group,
+                                      const gchar  *action_name)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), NULL);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->get_action_state_type (action_group, action_name);
 }
 
 /**
- * xaction_group_get_action_state_hint:
- * @action_group: a #xaction_group_t
+ * g_action_group_get_action_state_hint:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to query
  *
  * Requests a hint about the valid range of values for the state of the
@@ -465,8 +465,8 @@ xaction_group_get_action_state_type (xaction_group_t *action_group,
  * or that there is no hint about the valid range of values for the
  * state of the action.
  *
- * If a #xvariant_t array is returned then each item in the array is a
- * possible value for the state.  If a #xvariant_t pair (ie: two-tuple) is
+ * If a #GVariant array is returned then each item in the array is a
+ * possible value for the state.  If a #GVariant pair (ie: two-tuple) is
  * returned then the tuple specifies the inclusive lower and upper bound
  * of valid values for the state.
  *
@@ -475,25 +475,25 @@ xaction_group_get_action_state_type (xaction_group_t *action_group,
  * within the range may fail.
  *
  * The return value (if non-%NULL) should be freed with
- * xvariant_unref() when it is no longer required.
+ * g_variant_unref() when it is no longer required.
  *
  * Returns: (nullable) (transfer full): the state range hint
  *
  * Since: 2.28
  **/
-xvariant_t *
-xaction_group_get_action_state_hint (xaction_group_t *action_group,
-                                      const xchar_t  *action_name)
+GVariant *
+g_action_group_get_action_state_hint (GActionGroup *action_group,
+                                      const gchar  *action_name)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), NULL);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->get_action_state_hint (action_group, action_name);
 }
 
 /**
- * xaction_group_get_action_enabled:
- * @action_group: a #xaction_group_t
+ * g_action_group_get_action_enabled:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to query
  *
  * Checks if the named action within @action_group is currently enabled.
@@ -505,47 +505,47 @@ xaction_group_get_action_state_hint (xaction_group_t *action_group,
  *
  * Since: 2.28
  **/
-xboolean_t
-xaction_group_get_action_enabled (xaction_group_t *action_group,
-                                   const xchar_t  *action_name)
+gboolean
+g_action_group_get_action_enabled (GActionGroup *action_group,
+                                   const gchar  *action_name)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), FALSE);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), FALSE);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->get_action_enabled (action_group, action_name);
 }
 
 /**
- * xaction_group_get_action_state:
- * @action_group: a #xaction_group_t
+ * g_action_group_get_action_state:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to query
  *
  * Queries the current state of the named action within @action_group.
  *
  * If the action is not stateful then %NULL will be returned.  If the
  * action is stateful then the type of the return value is the type
- * given by xaction_group_get_action_state_type().
+ * given by g_action_group_get_action_state_type().
  *
  * The return value (if non-%NULL) should be freed with
- * xvariant_unref() when it is no longer required.
+ * g_variant_unref() when it is no longer required.
  *
  * Returns: (nullable) (transfer full): the current state of the action
  *
  * Since: 2.28
  **/
-xvariant_t *
-xaction_group_get_action_state (xaction_group_t *action_group,
-                                 const xchar_t  *action_name)
+GVariant *
+g_action_group_get_action_state (GActionGroup *action_group,
+                                 const gchar  *action_name)
 {
-  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  g_return_val_if_fail (G_IS_ACTION_GROUP (action_group), NULL);
 
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->get_action_state (action_group, action_name);
 }
 
 /**
- * xaction_group_change_action_state:
- * @action_group: a #xaction_group_t
+ * g_action_group_change_action_state:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to request the change on
  * @value: the new state
  *
@@ -553,32 +553,32 @@ xaction_group_get_action_state (xaction_group_t *action_group,
  * changed to @value.
  *
  * The action must be stateful and @value must be of the correct type.
- * See xaction_group_get_action_state_type().
+ * See g_action_group_get_action_state_type().
  *
  * This call merely requests a change.  The action may refuse to change
  * its state or may change its state to something other than @value.
- * See xaction_group_get_action_state_hint().
+ * See g_action_group_get_action_state_hint().
  *
- * If the @value xvariant_t is floating, it is consumed.
+ * If the @value GVariant is floating, it is consumed.
  *
  * Since: 2.28
  **/
 void
-xaction_group_change_action_state (xaction_group_t *action_group,
-                                    const xchar_t  *action_name,
-                                    xvariant_t     *value)
+g_action_group_change_action_state (GActionGroup *action_group,
+                                    const gchar  *action_name,
+                                    GVariant     *value)
 {
-  g_return_if_fail (X_IS_ACTION_GROUP (action_group));
+  g_return_if_fail (G_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
   g_return_if_fail (value != NULL);
 
-  XACTION_GROUP_GET_IFACE (action_group)
+  G_ACTION_GROUP_GET_IFACE (action_group)
     ->change_action_state (action_group, action_name, value);
 }
 
 /**
- * xaction_group_activate_action:
- * @action_group: a #xaction_group_t
+ * g_action_group_activate_action:
+ * @action_group: a #GActionGroup
  * @action_name: the name of the action to activate
  * @parameter: (nullable): parameters to the activation
  *
@@ -587,29 +587,29 @@ xaction_group_change_action_state (xaction_group_t *action_group,
  * If the action is expecting a parameter, then the correct type of
  * parameter must be given as @parameter.  If the action is expecting no
  * parameters then @parameter must be %NULL.  See
- * xaction_group_get_action_parameter_type().
+ * g_action_group_get_action_parameter_type().
  *
- * If the #xaction_group_t implementation supports asynchronous remote
+ * If the #GActionGroup implementation supports asynchronous remote
  * activation over D-Bus, this call may return before the relevant
  * D-Bus traffic has been sent, or any replies have been received. In
  * order to block on such asynchronous activation calls,
- * xdbus_connection_flush() should be called prior to the code, which
+ * g_dbus_connection_flush() should be called prior to the code, which
  * depends on the result of the action activation. Without flushing
  * the D-Bus connection, there is no guarantee that the action would
  * have been activated.
  *
  * The following code which runs in a remote app instance, shows an
  * example of a "quit" action being activated on the primary app
- * instance over D-Bus. Here xdbus_connection_flush() is called
- * before `exit()`. Without xdbus_connection_flush(), the "quit" action
+ * instance over D-Bus. Here g_dbus_connection_flush() is called
+ * before `exit()`. Without g_dbus_connection_flush(), the "quit" action
  * may fail to be activated on the primary instance.
  *
  * |[<!-- language="C" -->
  * // call "quit" action on primary instance
- * xaction_group_activate_action (XACTION_GROUP (app), "quit", NULL);
+ * g_action_group_activate_action (G_ACTION_GROUP (app), "quit", NULL);
  *
  * // make sure the action is activated now
- * xdbus_connection_flush (...);
+ * g_dbus_connection_flush (...);
  *
  * g_debug ("application has been terminated. exiting.");
  *
@@ -619,124 +619,124 @@ xaction_group_change_action_state (xaction_group_t *action_group,
  * Since: 2.28
  **/
 void
-xaction_group_activate_action (xaction_group_t *action_group,
-                                const xchar_t  *action_name,
-                                xvariant_t     *parameter)
+g_action_group_activate_action (GActionGroup *action_group,
+                                const gchar  *action_name,
+                                GVariant     *parameter)
 {
-  g_return_if_fail (X_IS_ACTION_GROUP (action_group));
+  g_return_if_fail (G_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  XACTION_GROUP_GET_IFACE (action_group)
+  G_ACTION_GROUP_GET_IFACE (action_group)
     ->activate_action (action_group, action_name, parameter);
 }
 
 /**
- * xaction_group_action_added:
- * @action_group: a #xaction_group_t
+ * g_action_group_action_added:
+ * @action_group: a #GActionGroup
  * @action_name: the name of an action in the group
  *
- * Emits the #xaction_group_t::action-added signal on @action_group.
+ * Emits the #GActionGroup::action-added signal on @action_group.
  *
- * This function should only be called by #xaction_group_t implementations.
+ * This function should only be called by #GActionGroup implementations.
  *
  * Since: 2.28
  **/
 void
-xaction_group_action_added (xaction_group_t *action_group,
-                             const xchar_t  *action_name)
+g_action_group_action_added (GActionGroup *action_group,
+                             const gchar  *action_name)
 {
-  g_return_if_fail (X_IS_ACTION_GROUP (action_group));
+  g_return_if_fail (G_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  xsignal_emit (action_group,
-                 xaction_group_signals[SIGNAL_ACTION_ADDED],
+  g_signal_emit (action_group,
+                 g_action_group_signals[SIGNAL_ACTION_ADDED],
                  g_quark_try_string (action_name),
                  action_name);
 }
 
 /**
- * xaction_group_action_removed:
- * @action_group: a #xaction_group_t
+ * g_action_group_action_removed:
+ * @action_group: a #GActionGroup
  * @action_name: the name of an action in the group
  *
- * Emits the #xaction_group_t::action-removed signal on @action_group.
+ * Emits the #GActionGroup::action-removed signal on @action_group.
  *
- * This function should only be called by #xaction_group_t implementations.
+ * This function should only be called by #GActionGroup implementations.
  *
  * Since: 2.28
  **/
 void
-xaction_group_action_removed (xaction_group_t *action_group,
-                               const xchar_t  *action_name)
+g_action_group_action_removed (GActionGroup *action_group,
+                               const gchar  *action_name)
 {
-  g_return_if_fail (X_IS_ACTION_GROUP (action_group));
+  g_return_if_fail (G_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  xsignal_emit (action_group,
-                 xaction_group_signals[SIGNAL_ACTION_REMOVED],
+  g_signal_emit (action_group,
+                 g_action_group_signals[SIGNAL_ACTION_REMOVED],
                  g_quark_try_string (action_name),
                  action_name);
 }
 
 /**
- * xaction_group_action_enabled_changed:
- * @action_group: a #xaction_group_t
+ * g_action_group_action_enabled_changed:
+ * @action_group: a #GActionGroup
  * @action_name: the name of an action in the group
  * @enabled: whether or not the action is now enabled
  *
- * Emits the #xaction_group_t::action-enabled-changed signal on @action_group.
+ * Emits the #GActionGroup::action-enabled-changed signal on @action_group.
  *
- * This function should only be called by #xaction_group_t implementations.
+ * This function should only be called by #GActionGroup implementations.
  *
  * Since: 2.28
  **/
 void
-xaction_group_action_enabled_changed (xaction_group_t *action_group,
-                                       const xchar_t  *action_name,
-                                       xboolean_t      enabled)
+g_action_group_action_enabled_changed (GActionGroup *action_group,
+                                       const gchar  *action_name,
+                                       gboolean      enabled)
 {
-  g_return_if_fail (X_IS_ACTION_GROUP (action_group));
+  g_return_if_fail (G_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
   enabled = !!enabled;
 
-  xsignal_emit (action_group,
-                 xaction_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
+  g_signal_emit (action_group,
+                 g_action_group_signals[SIGNAL_ACTION_ENABLED_CHANGED],
                  g_quark_try_string (action_name),
                  action_name,
                  enabled);
 }
 
 /**
- * xaction_group_action_state_changed:
- * @action_group: a #xaction_group_t
+ * g_action_group_action_state_changed:
+ * @action_group: a #GActionGroup
  * @action_name: the name of an action in the group
  * @state: the new state of the named action
  *
- * Emits the #xaction_group_t::action-state-changed signal on @action_group.
+ * Emits the #GActionGroup::action-state-changed signal on @action_group.
  *
- * This function should only be called by #xaction_group_t implementations.
+ * This function should only be called by #GActionGroup implementations.
  *
  * Since: 2.28
  **/
 void
-xaction_group_action_state_changed (xaction_group_t *action_group,
-                                     const xchar_t  *action_name,
-                                     xvariant_t     *state)
+g_action_group_action_state_changed (GActionGroup *action_group,
+                                     const gchar  *action_name,
+                                     GVariant     *state)
 {
-  g_return_if_fail (X_IS_ACTION_GROUP (action_group));
+  g_return_if_fail (G_IS_ACTION_GROUP (action_group));
   g_return_if_fail (action_name != NULL);
 
-  xsignal_emit (action_group,
-                 xaction_group_signals[SIGNAL_ACTION_STATE_CHANGED],
+  g_signal_emit (action_group,
+                 g_action_group_signals[SIGNAL_ACTION_STATE_CHANGED],
                  g_quark_try_string (action_name),
                  action_name,
                  state);
 }
 
 /**
- * xaction_group_query_action:
- * @action_group: a #xaction_group_t
+ * g_action_group_query_action:
+ * @action_group: a #GActionGroup
  * @action_name: the name of an action in the group
  * @enabled: (out): if the action is presently enabled
  * @parameter_type: (out) (optional): the parameter type, or %NULL if none needed
@@ -747,18 +747,18 @@ xaction_group_action_state_changed (xaction_group_t *action_group,
  * Queries all aspects of the named action within an @action_group.
  *
  * This function acquires the information available from
- * xaction_group_has_action(), xaction_group_get_action_enabled(),
- * xaction_group_get_action_parameter_type(),
- * xaction_group_get_action_state_type(),
- * xaction_group_get_action_state_hint() and
- * xaction_group_get_action_state() with a single function call.
+ * g_action_group_has_action(), g_action_group_get_action_enabled(),
+ * g_action_group_get_action_parameter_type(),
+ * g_action_group_get_action_state_type(),
+ * g_action_group_get_action_state_hint() and
+ * g_action_group_get_action_state() with a single function call.
  *
  * This provides two main benefits.
  *
  * The first is the improvement in efficiency that comes with not having
  * to perform repeated lookups of the action in order to discover
  * different things about it.  The second is that implementing
- * #xaction_group_t can now be done by only overriding this one virtual
+ * #GActionGroup can now be done by only overriding this one virtual
  * function.
  *
  * The interface provides a default implementation of this function that
@@ -776,15 +776,15 @@ xaction_group_action_state_changed (xaction_group_t *action_group,
  *
  * Since: 2.32
  **/
-xboolean_t
-xaction_group_query_action (xaction_group_t        *action_group,
-                             const xchar_t         *action_name,
-                             xboolean_t            *enabled,
-                             const xvariant_type_t **parameter_type,
-                             const xvariant_type_t **state_type,
-                             xvariant_t           **state_hint,
-                             xvariant_t           **state)
+gboolean
+g_action_group_query_action (GActionGroup        *action_group,
+                             const gchar         *action_name,
+                             gboolean            *enabled,
+                             const GVariantType **parameter_type,
+                             const GVariantType **state_type,
+                             GVariant           **state_hint,
+                             GVariant           **state)
 {
-  return XACTION_GROUP_GET_IFACE (action_group)
+  return G_ACTION_GROUP_GET_IFACE (action_group)
     ->query_action (action_group, action_name, enabled, parameter_type, state_type, state_hint, state);
 }

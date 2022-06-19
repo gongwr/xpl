@@ -16,16 +16,16 @@
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
-static xobject_t      *got_source;
-static xasync_result_t *got_result;
-static xpointer_t      got_user_data;
+static GObject      *got_source;
+static GAsyncResult *got_result;
+static gpointer      got_user_data;
 
 static void
-ensure_destroyed (xpointer_t obj)
+ensure_destroyed (gpointer obj)
 {
-  xobject_add_weak_pointer (obj, &obj);
-  xobject_unref (obj);
-  xassert (obj == NULL);
+  g_object_add_weak_pointer (obj, &obj);
+  g_object_unref (obj);
+  g_assert (obj == NULL);
 }
 
 static void
@@ -41,46 +41,46 @@ reset (void)
 }
 
 static void
-check (xpointer_t a, xpointer_t b, xpointer_t c)
+check (gpointer a, gpointer b, gpointer c)
 {
-  xassert (a == got_source);
-  xassert (b == got_result);
-  xassert (c == got_user_data);
+  g_assert (a == got_source);
+  g_assert (b == got_result);
+  g_assert (c == got_user_data);
 }
 
 static void
-callback_func (xobject_t      *source,
-               xasync_result_t *result,
-               xpointer_t      user_data)
+callback_func (GObject      *source,
+               GAsyncResult *result,
+               gpointer      user_data)
 {
   got_source = source;
-  got_result = xobject_ref (result);
+  got_result = g_object_ref (result);
   got_user_data = user_data;
 }
 
-static xboolean_t
-test_simple_async_idle (xpointer_t user_data)
+static gboolean
+test_simple_async_idle (gpointer user_data)
 {
-  xsimple_async_result_t *result;
-  xobject_t *a, *b, *c;
-  xboolean_t *ran = user_data;
+  GSimpleAsyncResult *result;
+  GObject *a, *b, *c;
+  gboolean *ran = user_data;
 
-  a = xobject_new (XTYPE_OBJECT, NULL);
-  b = xobject_new (XTYPE_OBJECT, NULL);
-  c = xobject_new (XTYPE_OBJECT, NULL);
+  a = g_object_new (G_TYPE_OBJECT, NULL);
+  b = g_object_new (G_TYPE_OBJECT, NULL);
+  c = g_object_new (G_TYPE_OBJECT, NULL);
 
-  result = xsimple_async_result_new (a, callback_func, b, test_simple_async_idle);
-  xassert (xasync_result_get_user_data (G_ASYNC_RESULT (result)) == b);
+  result = g_simple_async_result_new (a, callback_func, b, test_simple_async_idle);
+  g_assert (g_async_result_get_user_data (G_ASYNC_RESULT (result)) == b);
   check (NULL, NULL, NULL);
-  xsimple_async_result_complete (result);
+  g_simple_async_result_complete (result);
   check (a, result, b);
-  xobject_unref (result);
+  g_object_unref (result);
 
-  xassert (xsimple_async_result_is_valid (got_result, a, test_simple_async_idle));
-  xassert (!xsimple_async_result_is_valid (got_result, b, test_simple_async_idle));
-  xassert (!xsimple_async_result_is_valid (got_result, c, test_simple_async_idle));
-  xassert (!xsimple_async_result_is_valid (got_result, b, callback_func));
-  xassert (!xsimple_async_result_is_valid ((xpointer_t) a, NULL, NULL));
+  g_assert (g_simple_async_result_is_valid (got_result, a, test_simple_async_idle));
+  g_assert (!g_simple_async_result_is_valid (got_result, b, test_simple_async_idle));
+  g_assert (!g_simple_async_result_is_valid (got_result, c, test_simple_async_idle));
+  g_assert (!g_simple_async_result_is_valid (got_result, b, callback_func));
+  g_assert (!g_simple_async_result_is_valid ((gpointer) a, NULL, NULL));
   reset ();
   reset ();
   reset ();
@@ -90,30 +90,30 @@ test_simple_async_idle (xpointer_t user_data)
   ensure_destroyed (c);
 
   *ran = TRUE;
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
 test_simple_async (void)
 {
-  xsimple_async_result_t *result;
-  xobject_t *a, *b;
-  xboolean_t ran_test_in_idle = FALSE;
+  GSimpleAsyncResult *result;
+  GObject *a, *b;
+  gboolean ran_test_in_idle = FALSE;
 
   g_idle_add (test_simple_async_idle, &ran_test_in_idle);
-  xmain_context_iteration (NULL, FALSE);
+  g_main_context_iteration (NULL, FALSE);
 
-  xassert (ran_test_in_idle);
+  g_assert (ran_test_in_idle);
 
-  a = xobject_new (XTYPE_OBJECT, NULL);
-  b = xobject_new (XTYPE_OBJECT, NULL);
+  a = g_object_new (G_TYPE_OBJECT, NULL);
+  b = g_object_new (G_TYPE_OBJECT, NULL);
 
-  result = xsimple_async_result_new (a, callback_func, b, test_simple_async);
+  result = g_simple_async_result_new (a, callback_func, b, test_simple_async);
   check (NULL, NULL, NULL);
-  xsimple_async_result_complete_in_idle (result);
-  xobject_unref (result);
+  g_simple_async_result_complete_in_idle (result);
+  g_object_unref (result);
   check (NULL, NULL, NULL);
-  xmain_context_iteration (NULL, FALSE);
+  g_main_context_iteration (NULL, FALSE);
   check (a, result, b);
   reset ();
 
@@ -124,65 +124,65 @@ test_simple_async (void)
 static void
 test_valid (void)
 {
-  xasync_result_t *result;
-  xobject_t *a, *b;
+  GAsyncResult *result;
+  GObject *a, *b;
 
-  a = xobject_new (XTYPE_OBJECT, NULL);
-  b = xobject_new (XTYPE_OBJECT, NULL);
+  a = g_object_new (G_TYPE_OBJECT, NULL);
+  b = g_object_new (G_TYPE_OBJECT, NULL);
 
   /* Without source or tag */
-  result = (xasync_result_t *) xsimple_async_result_new (NULL, NULL, NULL, NULL);
-  g_assert_true (xsimple_async_result_is_valid (result, NULL, NULL));
-  g_assert_true (xsimple_async_result_is_valid (result, NULL, test_valid));
-  g_assert_true (xsimple_async_result_is_valid (result, NULL, test_simple_async));
-  g_assert_false (xsimple_async_result_is_valid (result, a, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, a, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, a, test_simple_async));
-  xobject_unref (result);
+  result = (GAsyncResult *) g_simple_async_result_new (NULL, NULL, NULL, NULL);
+  g_assert_true (g_simple_async_result_is_valid (result, NULL, NULL));
+  g_assert_true (g_simple_async_result_is_valid (result, NULL, test_valid));
+  g_assert_true (g_simple_async_result_is_valid (result, NULL, test_simple_async));
+  g_assert_false (g_simple_async_result_is_valid (result, a, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, a, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, a, test_simple_async));
+  g_object_unref (result);
 
   /* Without source, with tag */
-  result = (xasync_result_t *) xsimple_async_result_new (NULL, NULL, NULL, test_valid);
-  g_assert_true (xsimple_async_result_is_valid (result, NULL, NULL));
-  g_assert_true (xsimple_async_result_is_valid (result, NULL, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, test_simple_async));
-  g_assert_false (xsimple_async_result_is_valid (result, a, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, a, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, a, test_simple_async));
-  xobject_unref (result);
+  result = (GAsyncResult *) g_simple_async_result_new (NULL, NULL, NULL, test_valid);
+  g_assert_true (g_simple_async_result_is_valid (result, NULL, NULL));
+  g_assert_true (g_simple_async_result_is_valid (result, NULL, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, test_simple_async));
+  g_assert_false (g_simple_async_result_is_valid (result, a, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, a, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, a, test_simple_async));
+  g_object_unref (result);
 
   /* With source, without tag */
-  result = (xasync_result_t *) xsimple_async_result_new (a, NULL, NULL, NULL);
-  g_assert_true (xsimple_async_result_is_valid (result, a, NULL));
-  g_assert_true (xsimple_async_result_is_valid (result, a, test_valid));
-  g_assert_true (xsimple_async_result_is_valid (result, a, test_simple_async));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, test_simple_async));
-  g_assert_false (xsimple_async_result_is_valid (result, b, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, b, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, b, test_simple_async));
-  xobject_unref (result);
+  result = (GAsyncResult *) g_simple_async_result_new (a, NULL, NULL, NULL);
+  g_assert_true (g_simple_async_result_is_valid (result, a, NULL));
+  g_assert_true (g_simple_async_result_is_valid (result, a, test_valid));
+  g_assert_true (g_simple_async_result_is_valid (result, a, test_simple_async));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, test_simple_async));
+  g_assert_false (g_simple_async_result_is_valid (result, b, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, b, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, b, test_simple_async));
+  g_object_unref (result);
 
   /* With source and tag */
-  result = (xasync_result_t *) xsimple_async_result_new (a, NULL, NULL, test_valid);
-  g_assert_true (xsimple_async_result_is_valid (result, a, test_valid));
-  g_assert_true (xsimple_async_result_is_valid (result, a, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, a, test_simple_async));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, test_simple_async));
-  g_assert_false (xsimple_async_result_is_valid (result, b, NULL));
-  g_assert_false (xsimple_async_result_is_valid (result, b, test_valid));
-  g_assert_false (xsimple_async_result_is_valid (result, b, test_simple_async));
-  xobject_unref (result);
+  result = (GAsyncResult *) g_simple_async_result_new (a, NULL, NULL, test_valid);
+  g_assert_true (g_simple_async_result_is_valid (result, a, test_valid));
+  g_assert_true (g_simple_async_result_is_valid (result, a, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, a, test_simple_async));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, test_simple_async));
+  g_assert_false (g_simple_async_result_is_valid (result, b, NULL));
+  g_assert_false (g_simple_async_result_is_valid (result, b, test_valid));
+  g_assert_false (g_simple_async_result_is_valid (result, b, test_simple_async));
+  g_object_unref (result);
 
-  /* Non-xsimple_async_result_t */
-  result = (xasync_result_t *) xtask_new (NULL, NULL, NULL, NULL);
-  g_assert_false (xsimple_async_result_is_valid (result, NULL, NULL));
-  xobject_unref (result);
+  /* Non-GSimpleAsyncResult */
+  result = (GAsyncResult *) g_task_new (NULL, NULL, NULL, NULL);
+  g_assert_false (g_simple_async_result_is_valid (result, NULL, NULL));
+  g_object_unref (result);
 
-  xobject_unref (a);
-  xobject_unref (b);
+  g_object_unref (a);
+  g_object_unref (b);
 }
 
 int

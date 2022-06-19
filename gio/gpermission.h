@@ -28,99 +28,99 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_PERMISSION             (g_permission_get_type ())
-#define G_PERMISSION(inst)            (XTYPE_CHECK_INSTANCE_CAST ((inst),   \
-                                       XTYPE_PERMISSION, xpermission))
-#define G_PERMISSION_CLASS(class)     (XTYPE_CHECK_CLASS_CAST ((class),     \
-                                       XTYPE_PERMISSION, GPermissionClass))
-#define X_IS_PERMISSION(inst)         (XTYPE_CHECK_INSTANCE_TYPE ((inst),   \
-                                       XTYPE_PERMISSION))
-#define X_IS_PERMISSION_CLASS(class)  (XTYPE_CHECK_CLASS_TYPE ((class),     \
-                                       XTYPE_PERMISSION))
-#define G_PERMISSION_GET_CLASS(inst)  (XTYPE_INSTANCE_GET_CLASS ((inst),    \
-                                       XTYPE_PERMISSION, GPermissionClass))
+#define G_TYPE_PERMISSION             (g_permission_get_type ())
+#define G_PERMISSION(inst)            (G_TYPE_CHECK_INSTANCE_CAST ((inst),   \
+                                       G_TYPE_PERMISSION, GPermission))
+#define G_PERMISSION_CLASS(class)     (G_TYPE_CHECK_CLASS_CAST ((class),     \
+                                       G_TYPE_PERMISSION, GPermissionClass))
+#define G_IS_PERMISSION(inst)         (G_TYPE_CHECK_INSTANCE_TYPE ((inst),   \
+                                       G_TYPE_PERMISSION))
+#define G_IS_PERMISSION_CLASS(class)  (G_TYPE_CHECK_CLASS_TYPE ((class),     \
+                                       G_TYPE_PERMISSION))
+#define G_PERMISSION_GET_CLASS(inst)  (G_TYPE_INSTANCE_GET_CLASS ((inst),    \
+                                       G_TYPE_PERMISSION, GPermissionClass))
 
 typedef struct _GPermissionPrivate    GPermissionPrivate;
 typedef struct _GPermissionClass      GPermissionClass;
 
 struct _GPermission
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
   GPermissionPrivate *priv;
 };
 
 struct _GPermissionClass {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xboolean_t (*acquire)        (xpermission_t          *permission,
-                              xcancellable_t         *cancellable,
-                              xerror_t              **error);
-  void     (*acquire_async)  (xpermission_t          *permission,
-                              xcancellable_t         *cancellable,
-                              xasync_ready_callback_t   callback,
-                              xpointer_t              user_data);
-  xboolean_t (*acquire_finish) (xpermission_t          *permission,
-                              xasync_result_t         *result,
-                              xerror_t              **error);
+  gboolean (*acquire)        (GPermission          *permission,
+                              GCancellable         *cancellable,
+                              GError              **error);
+  void     (*acquire_async)  (GPermission          *permission,
+                              GCancellable         *cancellable,
+                              GAsyncReadyCallback   callback,
+                              gpointer              user_data);
+  gboolean (*acquire_finish) (GPermission          *permission,
+                              GAsyncResult         *result,
+                              GError              **error);
 
-  xboolean_t (*release)        (xpermission_t          *permission,
-                              xcancellable_t         *cancellable,
-                              xerror_t              **error);
-  void     (*release_async)  (xpermission_t          *permission,
-                              xcancellable_t         *cancellable,
-                              xasync_ready_callback_t   callback,
-                              xpointer_t              user_data);
-  xboolean_t (*release_finish) (xpermission_t          *permission,
-                              xasync_result_t         *result,
-                              xerror_t              **error);
+  gboolean (*release)        (GPermission          *permission,
+                              GCancellable         *cancellable,
+                              GError              **error);
+  void     (*release_async)  (GPermission          *permission,
+                              GCancellable         *cancellable,
+                              GAsyncReadyCallback   callback,
+                              gpointer              user_data);
+  gboolean (*release_finish) (GPermission          *permission,
+                              GAsyncResult         *result,
+                              GError              **error);
 
-  xpointer_t reserved[16];
+  gpointer reserved[16];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           g_permission_get_type           (void);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_acquire            (xpermission_t          *permission,
-                                                 xcancellable_t         *cancellable,
-                                                 xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void            g_permission_acquire_async      (xpermission_t          *permission,
-                                                 xcancellable_t         *cancellable,
-                                                 xasync_ready_callback_t   callback,
-                                                 xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_acquire_finish     (xpermission_t          *permission,
-                                                 xasync_result_t         *result,
-                                                 xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GType           g_permission_get_type           (void);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_acquire            (GPermission          *permission,
+                                                 GCancellable         *cancellable,
+                                                 GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void            g_permission_acquire_async      (GPermission          *permission,
+                                                 GCancellable         *cancellable,
+                                                 GAsyncReadyCallback   callback,
+                                                 gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_acquire_finish     (GPermission          *permission,
+                                                 GAsyncResult         *result,
+                                                 GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_release            (xpermission_t          *permission,
-                                                 xcancellable_t         *cancellable,
-                                                 xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void            g_permission_release_async      (xpermission_t          *permission,
-                                                 xcancellable_t         *cancellable,
-                                                 xasync_ready_callback_t   callback,
-                                                 xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_release_finish     (xpermission_t          *permission,
-                                                 xasync_result_t         *result,
-                                                 xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_release            (GPermission          *permission,
+                                                 GCancellable         *cancellable,
+                                                 GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void            g_permission_release_async      (GPermission          *permission,
+                                                 GCancellable         *cancellable,
+                                                 GAsyncReadyCallback   callback,
+                                                 gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_release_finish     (GPermission          *permission,
+                                                 GAsyncResult         *result,
+                                                 GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_get_allowed        (xpermission_t   *permission);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_get_can_acquire    (xpermission_t   *permission);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_permission_get_can_release    (xpermission_t   *permission);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_get_allowed        (GPermission   *permission);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_get_can_acquire    (GPermission   *permission);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_permission_get_can_release    (GPermission   *permission);
 
-XPL_AVAILABLE_IN_ALL
-void            g_permission_impl_update        (xpermission_t  *permission,
-                                                 xboolean_t      allowed,
-                                                 xboolean_t      can_acquire,
-                                                 xboolean_t      can_release);
+GLIB_AVAILABLE_IN_ALL
+void            g_permission_impl_update        (GPermission  *permission,
+                                                 gboolean      allowed,
+                                                 gboolean      can_acquire,
+                                                 gboolean      can_release);
 
 G_END_DECLS
 

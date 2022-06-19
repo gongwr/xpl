@@ -25,33 +25,33 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LOCAL_FILE         (_g_local_file_get_type ())
-#define G_LOCAL_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_LOCAL_FILE, GLocalFile))
-#define G_LOCAL_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_LOCAL_FILE, GLocalFileClass))
-#define X_IS_LOCAL_FILE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_LOCAL_FILE))
-#define X_IS_LOCAL_FILE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_LOCAL_FILE))
-#define G_LOCAL_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_LOCAL_FILE, GLocalFileClass))
+#define G_TYPE_LOCAL_FILE         (_g_local_file_get_type ())
+#define G_LOCAL_FILE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_LOCAL_FILE, GLocalFile))
+#define G_LOCAL_FILE_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_LOCAL_FILE, GLocalFileClass))
+#define G_IS_LOCAL_FILE(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_LOCAL_FILE))
+#define G_IS_LOCAL_FILE_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_LOCAL_FILE))
+#define G_LOCAL_FILE_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_LOCAL_FILE, GLocalFileClass))
 
 typedef struct _GLocalFile        GLocalFile;
 typedef struct _GLocalFileClass   GLocalFileClass;
 
 struct _GLocalFileClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-xtype_t   _g_local_file_get_type (void) G_GNUC_CONST;
+GType   _g_local_file_get_type (void) G_GNUC_CONST;
 
-xfile_t * _g_local_file_new      (const char *filename);
+GFile * _g_local_file_new      (const char *filename);
 
 const char * _g_local_file_get_filename (GLocalFile *file);
 
-xboolean_t g_local_file_is_nfs_home (const xchar_t *filename);
+gboolean g_local_file_is_nfs_home (const gchar *filename);
 
-xfile_t * g_local_file_new_from_dirname_and_basename (const char *dirname,
+GFile * g_local_file_new_from_dirname_and_basename (const char *dirname,
                                                     const char *basename);
 
-xchar_t *_g_local_file_find_topdir_for (const char *file_path);
+gchar *_g_local_file_find_topdir_for (const char *file_path);
 
 G_END_DECLS
 

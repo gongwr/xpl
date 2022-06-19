@@ -20,175 +20,175 @@
 #include <gio/gio.h>
 
 static void
-async_result_cb (xobject_t      *obj,
-                 xasync_result_t *result,
-                 xpointer_t      user_data)
+async_result_cb (GObject      *obj,
+                 GAsyncResult *result,
+                 gpointer      user_data)
 {
-  xasync_result_t **result_out = user_data;
-  *result_out = xobject_ref (result);
+  GAsyncResult **result_out = user_data;
+  *result_out = g_object_ref (result);
 }
 
 static void
 test_uris (void)
 {
-  xproxy_resolver_t *resolver;
-  const xchar_t *ignore_hosts[2] = { "127.0.0.1", NULL };
-  xchar_t **proxies;
-  xerror_t *error = NULL;
-  const xchar_t *uri;
-  xchar_t *str = NULL;
-  xasync_result_t *result = NULL;
+  GProxyResolver *resolver;
+  const gchar *ignore_hosts[2] = { "127.0.0.1", NULL };
+  gchar **proxies;
+  GError *error = NULL;
+  const gchar *uri;
+  gchar *str = NULL;
+  GAsyncResult *result = NULL;
 
   /* Valid URI. */
   uri = "http://%E0%B4%A8%E0%B4%B2:80/";
-  resolver = xsimple_proxy_resolver_new (NULL, (char **) ignore_hosts);
+  resolver = g_simple_proxy_resolver_new (NULL, (char **) ignore_hosts);
 
-  proxies = xproxy_resolver_lookup (resolver, uri, NULL, &error);
+  proxies = g_proxy_resolver_lookup (resolver, uri, NULL, &error);
   g_assert_no_error (error);
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  xproxy_resolver_lookup_async (resolver, uri, NULL, async_result_cb, &result);
+  g_proxy_resolver_lookup_async (resolver, uri, NULL, async_result_cb, &result);
   while (result == NULL)
-    xmain_context_iteration (NULL, TRUE);
-  proxies = xproxy_resolver_lookup_finish (resolver, result, &error);
+    g_main_context_iteration (NULL, TRUE);
+  proxies = g_proxy_resolver_lookup_finish (resolver, result, &error);
   g_assert_no_error (error);
-  xstrfreev (proxies);
+  g_strfreev (proxies);
   g_clear_object (&result);
 
-  xobject_unref (resolver);
+  g_object_unref (resolver);
 
   /* Invalid URI. */
   uri = "%E0%B4%A8%E0%B4%B2";
-  str = xstrdup_printf ("Invalid URI ‘%s’", uri);
-  resolver = xsimple_proxy_resolver_new (NULL, (char **) ignore_hosts);
+  str = g_strdup_printf ("Invalid URI ‘%s’", uri);
+  resolver = g_simple_proxy_resolver_new (NULL, (char **) ignore_hosts);
 
-  proxies = xproxy_resolver_lookup (resolver, uri, NULL, &error);
+  proxies = g_proxy_resolver_lookup (resolver, uri, NULL, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, str);
   g_clear_error (&error);
   g_assert_null (proxies);
   g_clear_object (&result);
 
-  xproxy_resolver_lookup_async (resolver, uri, NULL, async_result_cb, &result);
+  g_proxy_resolver_lookup_async (resolver, uri, NULL, async_result_cb, &result);
   while (result == NULL)
-    xmain_context_iteration (NULL, TRUE);
-  proxies = xproxy_resolver_lookup_finish (resolver, result, &error);
+    g_main_context_iteration (NULL, TRUE);
+  proxies = g_proxy_resolver_lookup_finish (resolver, result, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, str);
   g_clear_error (&error);
   g_assert_null (proxies);
-  xobject_unref (result);
+  g_object_unref (result);
 
-  xobject_unref (resolver);
+  g_object_unref (resolver);
   g_free (str);
 
-  resolver = xsimple_proxy_resolver_new ("default://", (char **) ignore_hosts);
-  xsimple_proxy_resolver_set_uri_proxy (XSIMPLE_PROXY_RESOLVER (resolver),
+  resolver = g_simple_proxy_resolver_new ("default://", (char **) ignore_hosts);
+  g_simple_proxy_resolver_set_uri_proxy (G_SIMPLE_PROXY_RESOLVER (resolver),
                                          "http", "http://proxy.example.com");
-  xsimple_proxy_resolver_set_uri_proxy (XSIMPLE_PROXY_RESOLVER (resolver),
+  g_simple_proxy_resolver_set_uri_proxy (G_SIMPLE_PROXY_RESOLVER (resolver),
                                          "ftp", "ftp://proxy.example.com");
 
-  proxies = xproxy_resolver_lookup (resolver, "http://one.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "http://one.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "http://proxy.example.com");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "HTTP://uppercase.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "HTTP://uppercase.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "http://proxy.example.com");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "htt://missing-letter.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "htt://missing-letter.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "default://");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "https://extra-letter.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "https://extra-letter.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "default://");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "ftp://five.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "ftp://five.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "ftp://proxy.example.com");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "http://127.0.0.1/",
+  proxies = g_proxy_resolver_lookup (resolver, "http://127.0.0.1/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "direct://");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  xobject_unref (resolver);
+  g_object_unref (resolver);
 }
 
 static void
 test_socks (void)
 {
-  xproxy_resolver_t *resolver;
-  const xchar_t *ignore_hosts[2] = { "127.0.0.1", NULL };
-  xchar_t **proxies;
-  xerror_t *error = NULL;
+  GProxyResolver *resolver;
+  const gchar *ignore_hosts[2] = { "127.0.0.1", NULL };
+  gchar **proxies;
+  GError *error = NULL;
 
-  resolver = xsimple_proxy_resolver_new ("socks://proxy.example.com", (char **) ignore_hosts);
+  resolver = g_simple_proxy_resolver_new ("socks://proxy.example.com", (char **) ignore_hosts);
 
-  proxies = xproxy_resolver_lookup (resolver, "http://one.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "http://one.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 3);
+  g_assert_cmpint (g_strv_length (proxies), ==, 3);
   g_assert_cmpstr (proxies[0], ==, "socks5://proxy.example.com");
   g_assert_cmpstr (proxies[1], ==, "socks4a://proxy.example.com");
   g_assert_cmpstr (proxies[2], ==, "socks4://proxy.example.com");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "http://127.0.0.1/",
+  proxies = g_proxy_resolver_lookup (resolver, "http://127.0.0.1/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "direct://");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  xobject_unref (resolver);
+  g_object_unref (resolver);
 
-  resolver = xsimple_proxy_resolver_new ("default-proxy://", (char **) ignore_hosts);
-  xsimple_proxy_resolver_set_uri_proxy (XSIMPLE_PROXY_RESOLVER (resolver),
+  resolver = g_simple_proxy_resolver_new ("default-proxy://", (char **) ignore_hosts);
+  g_simple_proxy_resolver_set_uri_proxy (G_SIMPLE_PROXY_RESOLVER (resolver),
                                          "http", "socks://proxy.example.com");
 
-  proxies = xproxy_resolver_lookup (resolver, "http://one.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "http://one.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 3);
+  g_assert_cmpint (g_strv_length (proxies), ==, 3);
   g_assert_cmpstr (proxies[0], ==, "socks5://proxy.example.com");
   g_assert_cmpstr (proxies[1], ==, "socks4a://proxy.example.com");
   g_assert_cmpstr (proxies[2], ==, "socks4://proxy.example.com");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "ftp://two.example.com/",
+  proxies = g_proxy_resolver_lookup (resolver, "ftp://two.example.com/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "default-proxy://");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  proxies = xproxy_resolver_lookup (resolver, "http://127.0.0.1/",
+  proxies = g_proxy_resolver_lookup (resolver, "http://127.0.0.1/",
                                      NULL, &error);
   g_assert_no_error (error);
-  g_assert_cmpint (xstrv_length (proxies), ==, 1);
+  g_assert_cmpint (g_strv_length (proxies), ==, 1);
   g_assert_cmpstr (proxies[0], ==, "direct://");
-  xstrfreev (proxies);
+  g_strfreev (proxies);
 
-  xobject_unref (resolver);
+  g_object_unref (resolver);
 }
 
 static const char *ignore_hosts[] = {
@@ -258,25 +258,25 @@ static const int n_ignore_tests = G_N_ELEMENTS (ignore_tests);
 static void
 test_ignore (void)
 {
-  xproxy_resolver_t *resolver;
-  xerror_t *error = NULL;
+  GProxyResolver *resolver;
+  GError *error = NULL;
   char **proxies;
   int i;
 
-  resolver = xsimple_proxy_resolver_new ("http://localhost:8080",
+  resolver = g_simple_proxy_resolver_new ("http://localhost:8080",
                                           (char **)ignore_hosts);
 
   for (i = 0; i < n_ignore_tests; i++)
     {
-      proxies = xproxy_resolver_lookup (resolver, ignore_tests[i].uri,
+      proxies = g_proxy_resolver_lookup (resolver, ignore_tests[i].uri,
 					 NULL, &error);
       g_assert_no_error (error);
 
       g_assert_cmpstr (proxies[0], ==, ignore_tests[i].proxy);
-      xstrfreev (proxies);
+      g_strfreev (proxies);
     }
 
-  xobject_unref (resolver);
+  g_object_unref (resolver);
 }
 
 int

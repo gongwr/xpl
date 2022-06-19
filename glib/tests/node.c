@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #undef G_DISABLE_ASSERT
@@ -32,17 +32,17 @@
 #include "glib.h"
 
 typedef struct {
-  xstring_t *s;
-  xint_t count;
+  GString *s;
+  gint count;
 } CallbackData;
 
-static xboolean_t
-node_build_string (xnode_t    *node,
-                   xpointer_t  data)
+static gboolean
+node_build_string (GNode    *node,
+                   gpointer  data)
 {
   CallbackData *d = data;
 
-  xstring_append_c (d->s, GPOINTER_TO_INT (node->data));
+  g_string_append_c (d->s, GPOINTER_TO_INT (node->data));
 
   d->count--;
 
@@ -55,23 +55,23 @@ node_build_string (xnode_t    *node,
 typedef struct {
     GTraverseType   traverse;
     GTraverseFlags  flags;
-    xint_t            depth;
-    xint_t            limit;
-    const xchar_t    *expected;
+    gint            depth;
+    gint            limit;
+    const gchar    *expected;
 } TraverseData;
 
 static void
 traversal_test (void)
 {
-  xnode_t *root;
-  xnode_t *node_B;
-  xnode_t *node_C;
-  xnode_t *node_D;
-  xnode_t *node_E;
-  xnode_t *node_F;
-  xnode_t *node_G;
-  xnode_t *node_J;
-  xnode_t *n;
+  GNode *root;
+  GNode *node_B;
+  GNode *node_C;
+  GNode *node_D;
+  GNode *node_E;
+  GNode *node_F;
+  GNode *node_G;
+  GNode *node_J;
+  GNode *n;
   TraverseData orders[] = {
     { G_PRE_ORDER,   G_TRAVERSE_ALL,       -1, -1, "ABCDEFGHIJK" },
     { G_PRE_ORDER,   G_TRAVERSE_ALL,        1, -1, "A"           },
@@ -165,7 +165,7 @@ traversal_test (void)
     { G_LEVEL_ORDER, G_TRAVERSE_ALL,        3,  7, "ABFCDEG"     },
     { G_LEVEL_ORDER, G_TRAVERSE_ALL,        3,  8, "ABFCDEG"     },
   };
-  xsize_t i;
+  gsize i;
   CallbackData data;
 
   root = g_node_new (GINT_TO_POINTER ('A'));
@@ -201,16 +201,16 @@ traversal_test (void)
   node_E = node_D->next;
 
   n = g_node_last_sibling (node_C);
-  xassert (n == node_E);
+  g_assert (n == node_E);
   n = g_node_last_sibling (node_D);
-  xassert (n == node_E);
+  g_assert (n == node_E);
   n = g_node_last_sibling (node_E);
-  xassert (n == node_E);
+  g_assert (n == node_E);
 
-  data.s = xstring_new ("");
+  data.s = g_string_new ("");  
   for (i = 0; i < G_N_ELEMENTS (orders); i++)
     {
-      xstring_set_size (data.s, 0);
+      g_string_set_size (data.s, 0);
       data.count = orders[i].limit;
       g_node_traverse (root, orders[i].traverse, orders[i].flags, orders[i].depth, node_build_string, &data);
       g_assert_cmpstr (data.s->str, ==,  orders[i].expected);
@@ -219,45 +219,45 @@ traversal_test (void)
   g_node_reverse_children (node_B);
   g_node_reverse_children (node_G);
 
-  xstring_set_size (data.s, 0);
+  g_string_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ABFEDCGKJIH");
-
+  
   g_node_append (node_D, g_node_new (GINT_TO_POINTER ('L')));
   g_node_insert (node_D, -1, g_node_new (GINT_TO_POINTER ('M')));
 
-  xstring_set_size (data.s, 0);
+  g_string_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_LEVEL_ORDER, G_TRAVERSE_ALL, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ABFEDCGLMKJIH");
 
-  xstring_set_size (data.s, 0);
+  g_string_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_PRE_ORDER, G_TRAVERSE_LEAFS, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ELMCKJIH");
 
-  xstring_set_size (data.s, 0);
+  g_string_set_size (data.s, 0);
   data.count = -1;
   g_node_traverse (root, G_PRE_ORDER, G_TRAVERSE_NON_LEAFS, -1, node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "ABDFG");
 
   g_node_destroy (root);
-  xstring_free (data.s, TRUE);
+  g_string_free (data.s, TRUE);
 }
 
 static void
 construct_test (void)
 {
-  xnode_t *root;
-  xnode_t *node;
-  xnode_t *node_B;
-  xnode_t *node_D;
-  xnode_t *node_F;
-  xnode_t *node_G;
-  xnode_t *node_J;
-  xnode_t *node_H;
-  xuint_t i;
+  GNode *root;
+  GNode *node;
+  GNode *node_B;
+  GNode *node_D;
+  GNode *node_F;
+  GNode *node_G;
+  GNode *node_J;
+  GNode *node_H;
+  guint i;
 
   root = g_node_new (GINT_TO_POINTER ('A'));
   g_assert_cmpint (g_node_depth (root), ==, 1);
@@ -265,7 +265,7 @@ construct_test (void)
 
   node_B = g_node_new (GINT_TO_POINTER ('B'));
   g_node_append (root, node_B);
-  xassert (root->children == node_B);
+  g_assert (root->children == node_B);
 
   g_node_append_data (node_B, GINT_TO_POINTER ('E'));
   g_node_prepend_data (node_B, GINT_TO_POINTER ('C'));
@@ -274,7 +274,7 @@ construct_test (void)
 
   node_F = g_node_new (GINT_TO_POINTER ('F'));
   g_node_append (root, node_F);
-  xassert (root->children->next == node_F);
+  g_assert (root->children->next == node_F);
 
   node_G = g_node_new (GINT_TO_POINTER ('G'));
   g_node_append (node_F, node_G);
@@ -301,11 +301,11 @@ construct_test (void)
   g_assert_cmpint (g_node_n_nodes (root, G_TRAVERSE_ALL), ==, 11);
   g_assert_cmpint (g_node_max_height (node_F), ==, 3);
   g_assert_cmpint (g_node_n_children (node_G), ==, 4);
-  xassert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('F')) == node_F);
-  xassert (g_node_find_child (node_G, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('H')) == node_H);
-  xassert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('H')) == NULL);
-  xassert (g_node_find (root, G_LEVEL_ORDER, G_TRAVERSE_NON_LEAFS, GINT_TO_POINTER ('I')) == NULL);
-  xassert (g_node_find (root, G_IN_ORDER, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('J')) == node_J);
+  g_assert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('F')) == node_F);
+  g_assert (g_node_find_child (node_G, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('H')) == node_H);
+  g_assert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('H')) == NULL);
+  g_assert (g_node_find (root, G_LEVEL_ORDER, G_TRAVERSE_NON_LEAFS, GINT_TO_POINTER ('I')) == NULL);
+  g_assert (g_node_find (root, G_IN_ORDER, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('J')) == node_J);
 
   for (i = 0; i < g_node_n_children (node_B); i++)
     {
@@ -322,9 +322,9 @@ construct_test (void)
 static void
 allocation_test (void)
 {
-  xnode_t *root;
-  xnode_t *node;
-  xint_t i;
+  GNode *root;
+  GNode *node;
+  gint i;
 
   root = g_node_new (NULL);
   node = root;
@@ -345,11 +345,11 @@ allocation_test (void)
 static void
 misc_test (void)
 {
-  xnode_t *root;
-  xnode_t *node_B;
-  xnode_t *node_C;
-  xnode_t *node_D;
-  xnode_t *node_E;
+  GNode *root;
+  GNode *node_B;
+  GNode *node_C;
+  GNode *node_D;
+  GNode *node_E;
   CallbackData data;
 
   root = g_node_new (GINT_TO_POINTER ('A'));
@@ -362,43 +362,43 @@ misc_test (void)
   node_E = g_node_new (GINT_TO_POINTER ('E'));
   g_node_append (node_C, node_E);
 
-  xassert (g_node_get_root (node_E) == root);
-  xassert (g_node_is_ancestor (root, node_B));
-  xassert (g_node_is_ancestor (root, node_E));
-  xassert (!g_node_is_ancestor (node_B, node_D));
-  xassert (g_node_first_sibling (node_D) == node_B);
-  xassert (g_node_first_sibling (node_E) == node_E);
-  xassert (g_node_first_sibling (root) == root);
+  g_assert (g_node_get_root (node_E) == root);
+  g_assert (g_node_is_ancestor (root, node_B));
+  g_assert (g_node_is_ancestor (root, node_E));
+  g_assert (!g_node_is_ancestor (node_B, node_D));
+  g_assert (g_node_first_sibling (node_D) == node_B);
+  g_assert (g_node_first_sibling (node_E) == node_E);
+  g_assert (g_node_first_sibling (root) == root);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('B')), ==, 0);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('C')), ==, 1);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('D')), ==, 2);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('E')), ==, -1);
 
-  data.s = xstring_new ("");
+  data.s = g_string_new ("");
   data.count = -1;
   g_node_children_foreach (root, G_TRAVERSE_ALL, (GNodeForeachFunc)node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "BCD");
 
-  xstring_set_size (data.s, 0);
+  g_string_set_size (data.s, 0);
   data.count = -1;
   g_node_children_foreach (root, G_TRAVERSE_LEAVES, (GNodeForeachFunc)node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "BD");
 
-  xstring_set_size (data.s, 0);
+  g_string_set_size (data.s, 0);
   data.count = -1;
   g_node_children_foreach (root, G_TRAVERSE_NON_LEAVES, (GNodeForeachFunc)node_build_string, &data);
   g_assert_cmpstr (data.s->str, ==, "C");
-  xstring_free (data.s, TRUE);
+  g_string_free (data.s, TRUE);
 
   g_node_destroy (root);
 }
 
-static xboolean_t
-check_order (xnode_t    *node,
-             xpointer_t  data)
+static gboolean
+check_order (GNode    *node,
+             gpointer  data)
 {
-  xchar_t **expected = data;
-  xchar_t d;
+  gchar **expected = data;
+  gchar d;
 
   d = GPOINTER_TO_INT (node->data);
   g_assert_cmpint (d, ==, **expected);
@@ -410,11 +410,11 @@ check_order (xnode_t    *node,
 static void
 unlink_test (void)
 {
-  xnode_t *root;
-  xnode_t *node;
-  xnode_t *bnode;
-  xnode_t *cnode;
-  xchar_t *expected;
+  GNode *root;
+  GNode *node;
+  GNode *bnode;
+  GNode *cnode;
+  gchar *expected;
 
   /*
    *        -------- a --------
@@ -461,11 +461,11 @@ unlink_test (void)
   g_node_destroy (cnode);
 }
 
-static xpointer_t
-copy_up (xconstpointer src,
-         xpointer_t      data)
+static gpointer
+copy_up (gconstpointer src,
+         gpointer      data)
 {
-  xchar_t l, u;
+  gchar l, u;
 
   l = GPOINTER_TO_INT (src);
   u = g_ascii_toupper (l);
@@ -476,9 +476,9 @@ copy_up (xconstpointer src,
 static void
 copy_test (void)
 {
-  xnode_t *root;
-  xnode_t *copy;
-  xchar_t *expected;
+  GNode *root;
+  GNode *copy;
+  gchar *expected;
 
   root = g_node_new (GINT_TO_POINTER ('a'));
   g_node_append_data (root, GINT_TO_POINTER ('b'));

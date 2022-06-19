@@ -32,23 +32,23 @@
 
 /**
  * SECTION:gbytesicon
- * @short_description: An icon stored in memory as a xbytes_t
+ * @short_description: An icon stored in memory as a GBytes
  * @include: gio/gio.h
- * @see_also: #xicon_t, #xloadable_icon_t, #xbytes_t
+ * @see_also: #GIcon, #GLoadableIcon, #GBytes
  *
- * #xbytes_icon_t specifies an image held in memory in a common format (usually
+ * #GBytesIcon specifies an image held in memory in a common format (usually
  * png) to be used as icon.
  *
  * Since: 2.38
  **/
 
-typedef xobject_class_t xbytes_icon_class_t;
+typedef GObjectClass GBytesIconClass;
 
-struct _xbytes_icon
+struct _GBytesIcon
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xbytes_t *bytes;
+  GBytes *bytes;
 };
 
 enum
@@ -57,24 +57,24 @@ enum
   PROP_BYTES
 };
 
-static void xbytes_icon_icon_iface_init          (xicon_iface_t          *iface);
-static void xbytes_icon_loadable_icon_iface_init (xloadable_icon_iface_t  *iface);
-G_DEFINE_TYPE_WITH_CODE (xbytes_icon, xbytes_icon, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_ICON, xbytes_icon_icon_iface_init)
-                         G_IMPLEMENT_INTERFACE (XTYPE_LOADABLE_ICON, xbytes_icon_loadable_icon_iface_init))
+static void g_bytes_icon_icon_iface_init          (GIconIface          *iface);
+static void g_bytes_icon_loadable_icon_iface_init (GLoadableIconIface  *iface);
+G_DEFINE_TYPE_WITH_CODE (GBytesIcon, g_bytes_icon, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_ICON, g_bytes_icon_icon_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_LOADABLE_ICON, g_bytes_icon_loadable_icon_iface_init))
 
 static void
-xbytes_icon_get_property (xobject_t    *object,
-                           xuint_t       prop_id,
-                           xvalue_t     *value,
-                           xparam_spec_t *pspec)
+g_bytes_icon_get_property (GObject    *object,
+                           guint       prop_id,
+                           GValue     *value,
+                           GParamSpec *pspec)
 {
-  xbytes_icon_t *icon = XBYTES_ICON (object);
+  GBytesIcon *icon = G_BYTES_ICON (object);
 
   switch (prop_id)
     {
       case PROP_BYTES:
-        xvalue_set_boxed (value, icon->bytes);
+        g_value_set_boxed (value, icon->bytes);
         break;
 
       default:
@@ -83,17 +83,17 @@ xbytes_icon_get_property (xobject_t    *object,
 }
 
 static void
-xbytes_icon_set_property (xobject_t      *object,
-                          xuint_t         prop_id,
-                          const xvalue_t *value,
-                          xparam_spec_t   *pspec)
+g_bytes_icon_set_property (GObject      *object,
+                          guint         prop_id,
+                          const GValue *value,
+                          GParamSpec   *pspec)
 {
-  xbytes_icon_t *icon = XBYTES_ICON (object);
+  GBytesIcon *icon = G_BYTES_ICON (object);
 
   switch (prop_id)
     {
       case PROP_BYTES:
-        icon->bytes = xvalue_dup_boxed (value);
+        icon->bytes = g_value_dup_boxed (value);
         break;
 
       default:
@@ -102,127 +102,127 @@ xbytes_icon_set_property (xobject_t      *object,
 }
 
 static void
-xbytes_icon_finalize (xobject_t *object)
+g_bytes_icon_finalize (GObject *object)
 {
-  xbytes_icon_t *icon;
+  GBytesIcon *icon;
 
-  icon = XBYTES_ICON (object);
+  icon = G_BYTES_ICON (object);
 
-  xbytes_unref (icon->bytes);
+  g_bytes_unref (icon->bytes);
 
-  XOBJECT_CLASS (xbytes_icon_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_bytes_icon_parent_class)->finalize (object);
 }
 
 static void
-xbytes_icon_class_init (xbytes_icon_class_t *klass)
+g_bytes_icon_class_init (GBytesIconClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->get_property = xbytes_icon_get_property;
-  xobject_class->set_property = xbytes_icon_set_property;
-  xobject_class->finalize = xbytes_icon_finalize;
+  gobject_class->get_property = g_bytes_icon_get_property;
+  gobject_class->set_property = g_bytes_icon_set_property;
+  gobject_class->finalize = g_bytes_icon_finalize;
 
   /**
-   * xbytes_icon_t:bytes:
+   * GBytesIcon:bytes:
    *
    * The bytes containing the icon.
    */
-  xobject_class_install_property (xobject_class, PROP_BYTES,
-                                   xparam_spec_boxed ("bytes",
+  g_object_class_install_property (gobject_class, PROP_BYTES,
+                                   g_param_spec_boxed ("bytes",
                                                        P_("bytes"),
                                                        P_("The bytes containing the icon"),
-                                                       XTYPE_BYTES,
-                                                       XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+                                                       G_TYPE_BYTES,
+                                                       G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
-xbytes_icon_init (xbytes_icon_t *bytes)
+g_bytes_icon_init (GBytesIcon *bytes)
 {
 }
 
 /**
- * xbytes_icon_new:
- * @bytes: a #xbytes_t.
+ * g_bytes_icon_new:
+ * @bytes: a #GBytes.
  *
  * Creates a new icon for a bytes.
  *
  * This cannot fail, but loading and interpreting the bytes may fail later on
  * (for example, if g_loadable_icon_load() is called) if the image is invalid.
  *
- * Returns: (transfer full) (type xbytes_icon_t): a #xicon_t for the given
+ * Returns: (transfer full) (type GBytesIcon): a #GIcon for the given
  *   @bytes.
  *
  * Since: 2.38
  **/
-xicon_t *
-xbytes_icon_new (xbytes_t *bytes)
+GIcon *
+g_bytes_icon_new (GBytes *bytes)
 {
-  xreturn_val_if_fail (bytes != NULL, NULL);
+  g_return_val_if_fail (bytes != NULL, NULL);
 
-  return xobject_new (XTYPE_BYTES_ICON, "bytes", bytes, NULL);
+  return g_object_new (G_TYPE_BYTES_ICON, "bytes", bytes, NULL);
 }
 
 /**
- * xbytes_icon_get_bytes:
- * @icon: a #xicon_t.
+ * g_bytes_icon_get_bytes:
+ * @icon: a #GIcon.
  *
- * Gets the #xbytes_t associated with the given @icon.
+ * Gets the #GBytes associated with the given @icon.
  *
- * Returns: (transfer none): a #xbytes_t.
+ * Returns: (transfer none): a #GBytes.
  *
  * Since: 2.38
  **/
-xbytes_t *
-xbytes_icon_get_bytes (xbytes_icon_t *icon)
+GBytes *
+g_bytes_icon_get_bytes (GBytesIcon *icon)
 {
-  xreturn_val_if_fail (X_IS_BYTES_ICON (icon), NULL);
+  g_return_val_if_fail (G_IS_BYTES_ICON (icon), NULL);
 
   return icon->bytes;
 }
 
-static xuint_t
-xbytes_icon_hash (xicon_t *icon)
+static guint
+g_bytes_icon_hash (GIcon *icon)
 {
-  xbytes_icon_t *bytes_icon = XBYTES_ICON (icon);
+  GBytesIcon *bytes_icon = G_BYTES_ICON (icon);
 
-  return xbytes_hash (bytes_icon->bytes);
+  return g_bytes_hash (bytes_icon->bytes);
 }
 
-static xboolean_t
-xbytes_icon_equal (xicon_t *icon1,
-                    xicon_t *icon2)
+static gboolean
+g_bytes_icon_equal (GIcon *icon1,
+                    GIcon *icon2)
 {
-  xbytes_icon_t *bytes1 = XBYTES_ICON (icon1);
-  xbytes_icon_t *bytes2 = XBYTES_ICON (icon2);
+  GBytesIcon *bytes1 = G_BYTES_ICON (icon1);
+  GBytesIcon *bytes2 = G_BYTES_ICON (icon2);
 
-  return xbytes_equal (bytes1->bytes, bytes2->bytes);
+  return g_bytes_equal (bytes1->bytes, bytes2->bytes);
 }
 
-static xvariant_t *
-xbytes_icon_serialize (xicon_t *icon)
+static GVariant *
+g_bytes_icon_serialize (GIcon *icon)
 {
-  xbytes_icon_t *bytes_icon = XBYTES_ICON (icon);
+  GBytesIcon *bytes_icon = G_BYTES_ICON (icon);
 
-  return xvariant_new ("(sv)", "bytes",
-                        xvariant_new_from_bytes (G_VARIANT_TYPE_BYTESTRING, bytes_icon->bytes, TRUE));
+  return g_variant_new ("(sv)", "bytes",
+                        g_variant_new_from_bytes (G_VARIANT_TYPE_BYTESTRING, bytes_icon->bytes, TRUE));
 }
 
 static void
-xbytes_icon_icon_iface_init (xicon_iface_t *iface)
+g_bytes_icon_icon_iface_init (GIconIface *iface)
 {
-  iface->hash = xbytes_icon_hash;
-  iface->equal = xbytes_icon_equal;
-  iface->serialize = xbytes_icon_serialize;
+  iface->hash = g_bytes_icon_hash;
+  iface->equal = g_bytes_icon_equal;
+  iface->serialize = g_bytes_icon_serialize;
 }
 
-static xinput_stream_t *
-xbytes_icon_load (xloadable_icon_t  *icon,
+static GInputStream *
+g_bytes_icon_load (GLoadableIcon  *icon,
                    int            size,
                    char          **type,
-                   xcancellable_t   *cancellable,
-                   xerror_t        **error)
+                   GCancellable   *cancellable,
+                   GError        **error)
 {
-  xbytes_icon_t *bytes_icon = XBYTES_ICON (icon);
+  GBytesIcon *bytes_icon = G_BYTES_ICON (icon);
 
   if (type)
     *type = NULL;
@@ -231,39 +231,39 @@ xbytes_icon_load (xloadable_icon_t  *icon,
 }
 
 static void
-xbytes_icon_load_async (xloadable_icon_t       *icon,
+g_bytes_icon_load_async (GLoadableIcon       *icon,
                          int                  size,
-                         xcancellable_t        *cancellable,
-                         xasync_ready_callback_t  callback,
-                         xpointer_t             user_data)
+                         GCancellable        *cancellable,
+                         GAsyncReadyCallback  callback,
+                         gpointer             user_data)
 {
-  xbytes_icon_t *bytes_icon = XBYTES_ICON (icon);
-  xtask_t *task;
+  GBytesIcon *bytes_icon = G_BYTES_ICON (icon);
+  GTask *task;
 
-  task = xtask_new (icon, cancellable, callback, user_data);
-  xtask_set_source_tag (task, xbytes_icon_load_async);
-  xtask_return_pointer (task, g_memory_input_stream_new_from_bytes (bytes_icon->bytes), xobject_unref);
-  xobject_unref (task);
+  task = g_task_new (icon, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_bytes_icon_load_async);
+  g_task_return_pointer (task, g_memory_input_stream_new_from_bytes (bytes_icon->bytes), g_object_unref);
+  g_object_unref (task);
 }
 
-static xinput_stream_t *
-xbytes_icon_load_finish (xloadable_icon_t  *icon,
-                          xasync_result_t   *res,
+static GInputStream *
+g_bytes_icon_load_finish (GLoadableIcon  *icon,
+                          GAsyncResult   *res,
                           char          **type,
-                          xerror_t        **error)
+                          GError        **error)
 {
-  xreturn_val_if_fail (xtask_is_valid (res, icon), NULL);
+  g_return_val_if_fail (g_task_is_valid (res, icon), NULL);
 
   if (type)
     *type = NULL;
 
-  return xtask_propagate_pointer (XTASK (res), error);
+  return g_task_propagate_pointer (G_TASK (res), error);
 }
 
 static void
-xbytes_icon_loadable_icon_iface_init (xloadable_icon_iface_t *iface)
+g_bytes_icon_loadable_icon_iface_init (GLoadableIconIface *iface)
 {
-  iface->load = xbytes_icon_load;
-  iface->load_async = xbytes_icon_load_async;
-  iface->load_finish = xbytes_icon_load_finish;
+  iface->load = g_bytes_icon_load;
+  iface->load_async = g_bytes_icon_load_async;
+  iface->load_finish = g_bytes_icon_load_finish;
 }

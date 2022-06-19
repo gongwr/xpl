@@ -1,5 +1,5 @@
 project('glib', 'c', 'cpp',
-  version : '2.72.0',
+  version : '2.72.2',
   # NOTE: We keep this pinned at 0.52 because that's what Debian Stable ships
   meson_version : '>= 0.52.0',
   default_options : [
@@ -146,11 +146,11 @@ glibconfig_conf = configuration_data()
 # use them later in test programs (autoconf does this automatically)
 glib_conf_prefix = ''
 
-glib_conf.set('XPL_MAJOR_VERSION', major_version)
-glib_conf.set('XPL_MINOR_VERSION', minor_version)
-glib_conf.set('XPL_MICRO_VERSION', micro_version)
-glib_conf.set('XPL_INTERFACE_AGE', interface_age)
-glib_conf.set('XPL_BINARY_AGE', binary_age)
+glib_conf.set('GLIB_MAJOR_VERSION', major_version)
+glib_conf.set('GLIB_MINOR_VERSION', minor_version)
+glib_conf.set('GLIB_MICRO_VERSION', micro_version)
+glib_conf.set('GLIB_INTERFACE_AGE', interface_age)
+glib_conf.set('GLIB_BINARY_AGE', binary_age)
 glib_conf.set_quoted('GETTEXT_PACKAGE', 'glib20')
 glib_conf.set_quoted('PACKAGE_BUGREPORT', 'https://gitlab.gnome.org/GNOME/glib/issues/new')
 glib_conf.set_quoted('PACKAGE_NAME', 'glib')
@@ -165,8 +165,8 @@ glibconfig_conf.set('LT_CURRENT_MINUS_AGE', soversion)
 
 glib_conf.set('_GNU_SOURCE', 1)
 
-if host_system == 'windows'
-  # Poll doesn't work on devices on Windows
+if host_system in ['windows', 'darwin']
+  # Poll doesn't work on devices on Windows, and macOS's poll() implementation is known to be broken
   glib_conf.set('BROKEN_POLL', true)
 endif
 
@@ -222,19 +222,19 @@ if get_option('default_library') != 'static'
     endif
     glib_conf.set('DLL_EXPORT', true)
     if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl'
-      glib_conf.set('_XPL_EXTERN', '__declspec(dllexport) extern')
+      glib_conf.set('_GLIB_EXTERN', '__declspec(dllexport) extern')
     elif cc.has_argument('-fvisibility=hidden')
-      glib_conf.set('_XPL_EXTERN', '__attribute__((visibility("default"))) __declspec(dllexport) extern')
+      glib_conf.set('_GLIB_EXTERN', '__attribute__((visibility("default"))) __declspec(dllexport) extern')
       glib_hidden_visibility_args = ['-fvisibility=hidden']
     endif
   elif cc.has_argument('-fvisibility=hidden')
-    glib_conf.set('_XPL_EXTERN', '__attribute__((visibility("default"))) extern')
+    glib_conf.set('_GLIB_EXTERN', '__attribute__((visibility("default"))) extern')
     glib_hidden_visibility_args = ['-fvisibility=hidden']
   endif
 endif
 
 if get_option('default_library') == 'static'
-  glibconfig_conf.set('XPL_STATIC_COMPILATION', '1')
+  glibconfig_conf.set('GLIB_STATIC_COMPILATION', '1')
   glibconfig_conf.set('GOBJECT_STATIC_COMPILATION', '1')
   glibconfig_conf.set('G_INTL_STATIC_COMPILATION', '1')
   glibconfig_conf.set('FFI_STATIC_BUILD', '1')
@@ -243,12 +243,12 @@ endif
 # Cygwin glib port maintainers made it clear
 # (via the patches they apply) that they want no
 # part of glib W32 code, therefore we do not define
-# XPLATFORM_WIN32 for host_system == 'cygwin'.
-# This makes XPLATFORM_WIN32 a synonym for
+# G_PLATFORM_WIN32 for host_system == 'cygwin'.
+# This makes G_PLATFORM_WIN32 a synonym for
 # G_OS_WIN32.
 if host_system == 'windows'
   glib_os = '''#define G_OS_WIN32
-#define XPLATFORM_WIN32'''
+#define G_PLATFORM_WIN32'''
 elif host_system == 'cygwin'
   glib_os = '''#define G_OS_UNIX
 #define G_WITH_CYGWIN'''
@@ -497,7 +497,7 @@ endif
 add_project_arguments(cc.get_supported_arguments(warning_c_args), language: 'c')
 add_project_arguments(cxx.get_supported_arguments(warning_cxx_args), language: 'cpp')
 
-# FIXME: We cannot build some of the xresource_t tests with -z nodelete, which
+# FIXME: We cannot build some of the GResource tests with -z nodelete, which
 # means we cannot use that flag in add_project_link_arguments(), and must add
 # it to the relevant targets manually. We do the same with -Bsymbolic-functions
 # because that is what the autotools build did.
@@ -1131,7 +1131,7 @@ endif
 # Our printf is 'good' only if vsnpintf()/snprintf()/printf() supports C99 well enough
 use_system_printf = have_good_vsnprintf and have_good_snprintf and have_good_printf
 glib_conf.set('USE_SYSTEM_PRINTF', use_system_printf)
-glibconfig_conf.set('XPL_USING_SYSTEM_PRINTF', use_system_printf)
+glibconfig_conf.set('GLIB_USING_SYSTEM_PRINTF', use_system_printf)
 
 if not use_system_printf
   # gnulib has vasprintf so override the previous check
@@ -1274,7 +1274,7 @@ else
   have_long_long = false
 endif
 
-# test_t whether the compiler supports the 'long double' type.
+# Test whether the compiler supports the 'long double' type.
 if cc.compiles('''/* The Stardent Vistra knows sizeof(long double), but does not support it.  */
                   long double foo = 0.0;
                   /* On Ultrix 4.3 cc, long double is 4 and double is 8.  */
@@ -1283,12 +1283,12 @@ if cc.compiles('''/* The Stardent Vistra knows sizeof(long double), but does not
   glib_conf.set('HAVE_LONG_DOUBLE', 1)
 endif
 
-# test_t whether <stddef.h> has the 'wchar_t' type.
+# Test whether <stddef.h> has the 'wchar_t' type.
 if cc.has_header_symbol('stddef.h', 'wchar_t')
   glib_conf.set('HAVE_WCHAR_T', 1)
 endif
 
-# test_t whether <wchar.h> has the 'wint_t' type.
+# Test whether <wchar.h> has the 'wint_t' type.
 if cc.has_header_symbol('wchar.h', 'wint_t')
   glib_conf.set('HAVE_WINT_T', 1)
 endif
@@ -1351,7 +1351,7 @@ endif
 # Some platforms (Apple) hard-code int64_t to long long instead of
 # using long on 64-bit architectures. This can cause type mismatch
 # warnings when trying to interface with code using the standard
-# library type. test_t for the warnings and set sint64_t to whichever
+# library type. Test for the warnings and set gint64 to whichever
 # works.
 if long_long_size == long_size
   if cc.compiles('''#if defined(_AIX) && !defined(__GNUC__)
@@ -1450,7 +1450,7 @@ glibconfig_conf.set_quoted('guint32_format', guint32_format)
 glib_conf.set('ALIGNOF_GUINT32', guint32_align)
 
 if int_size == 8
-  sint64_t = 'int'
+  gint64 = 'int'
   gint64_modifier=''
   gint64_format='i'
   guint64_format='u'
@@ -1459,7 +1459,7 @@ if int_size == 8
   guint64_constant='(val)'
   guint64_align = int_align
 elif long_size == 8 and (long_long_size != long_size or int64_t_typedef == 'long')
-  sint64_t = 'long'
+  gint64 = 'long'
   glib_extension=''
   gint64_modifier='l'
   gint64_format='li'
@@ -1468,7 +1468,7 @@ elif long_size == 8 and (long_long_size != long_size or int64_t_typedef == 'long
   guint64_constant='(val##UL)'
   guint64_align = long_align
 elif long_long_size == 8 and (long_long_size != long_size or int64_t_typedef == 'long long')
-  sint64_t = 'long long'
+  gint64 = 'long long'
   glib_extension='G_GNUC_EXTENSION '
   gint64_modifier=int64_m
   gint64_format=int64_m + 'i'
@@ -1480,7 +1480,7 @@ else
   error('Compiler provides no native 64-bit integer type')
 endif
 glibconfig_conf.set('glib_extension', glib_extension)
-glibconfig_conf.set('sint64_t', sint64_t)
+glibconfig_conf.set('gint64', gint64)
 glibconfig_conf.set_quoted('gint64_modifier', gint64_modifier)
 glibconfig_conf.set_quoted('gint64_format', gint64_format)
 glibconfig_conf.set_quoted('guint64_format', guint64_format)
@@ -1492,16 +1492,16 @@ if host_system == 'windows'
   glibconfig_conf.set('g_pid_type', 'void*')
   glibconfig_conf.set_quoted('g_pid_format', 'p')
   if host_machine.cpu_family() == 'x86_64'
-    glibconfig_conf.set_quoted('xpollfd_format', '%#' + int64_m + 'x')
+    glibconfig_conf.set_quoted('g_pollfd_format', '%#' + int64_m + 'x')
   else
-    glibconfig_conf.set_quoted('xpollfd_format', '%#x')
+    glibconfig_conf.set_quoted('g_pollfd_format', '%#x')
   endif
   glibconfig_conf.set('g_dir_separator', '\\\\')
   glibconfig_conf.set('g_searchpath_separator', ';')
 else
   glibconfig_conf.set('g_pid_type', 'int')
   glibconfig_conf.set_quoted('g_pid_format', 'i')
-  glibconfig_conf.set_quoted('xpollfd_format', '%d')
+  glibconfig_conf.set_quoted('g_pollfd_format', '%d')
   glibconfig_conf.set('g_dir_separator', '/')
   glibconfig_conf.set('g_searchpath_separator', ':')
 endif
@@ -1601,22 +1601,22 @@ if voidp_size == int_size
   glibconfig_conf.set_quoted('gintptr_modifier', '')
   glibconfig_conf.set_quoted('gintptr_format', 'i')
   glibconfig_conf.set_quoted('guintptr_format', 'u')
-  glibconfig_conf.set('glib_gpi_cast', '(xint_t)')
-  glibconfig_conf.set('glib_gpui_cast', '(xuint_t)')
+  glibconfig_conf.set('glib_gpi_cast', '(gint)')
+  glibconfig_conf.set('glib_gpui_cast', '(guint)')
 elif voidp_size == long_size
   glibconfig_conf.set('glib_intptr_type_define', 'long')
   glibconfig_conf.set_quoted('gintptr_modifier', 'l')
   glibconfig_conf.set_quoted('gintptr_format', 'li')
   glibconfig_conf.set_quoted('guintptr_format', 'lu')
-  glibconfig_conf.set('glib_gpi_cast', '(xlong_t)')
-  glibconfig_conf.set('glib_gpui_cast', '(xulong_t)')
+  glibconfig_conf.set('glib_gpi_cast', '(glong)')
+  glibconfig_conf.set('glib_gpui_cast', '(gulong)')
 elif voidp_size == long_long_size
   glibconfig_conf.set('glib_intptr_type_define', 'long long')
   glibconfig_conf.set_quoted('gintptr_modifier', int64_m)
   glibconfig_conf.set_quoted('gintptr_format', int64_m + 'i')
   glibconfig_conf.set_quoted('guintptr_format', int64_m + 'u')
-  glibconfig_conf.set('glib_gpi_cast', '(sint64_t)')
-  glibconfig_conf.set('glib_gpui_cast', '(xuint64_t)')
+  glibconfig_conf.set('glib_gpi_cast', '(gint64)')
+  glibconfig_conf.set('glib_gpui_cast', '(guint64)')
 else
   error('Could not determine size of void *')
 endif
@@ -1638,10 +1638,10 @@ else
 endif
 glibconfig_conf.set('g_module_suffix', g_module_suffix)
 
-glibconfig_conf.set('XPL_MAJOR_VERSION', major_version)
-glibconfig_conf.set('XPL_MINOR_VERSION', minor_version)
-glibconfig_conf.set('XPL_MICRO_VERSION', micro_version)
-glibconfig_conf.set('XPL_VERSION', glib_version)
+glibconfig_conf.set('GLIB_MAJOR_VERSION', major_version)
+glibconfig_conf.set('GLIB_MINOR_VERSION', minor_version)
+glibconfig_conf.set('GLIB_MICRO_VERSION', micro_version)
+glibconfig_conf.set('GLIB_VERSION', glib_version)
 
 glibconfig_conf.set('glib_void_p', voidp_size)
 glibconfig_conf.set('glib_long', long_size)
@@ -1709,7 +1709,7 @@ va_list_val_copy_prog = '''
 
 if cc_can_run
   rres = cc.run(va_list_val_copy_prog, name : 'va_lists can be copied as values')
-  glib_va_val_copy = rres.returncode() == 0
+  glib_va_val_copy = rres.compiled() and rres.returncode() == 0
 else
   glib_va_val_copy = meson.get_cross_property('va_val_copy', true)
 endif
@@ -1756,12 +1756,12 @@ g_have_gnuc_varargs = cc.compiles('''
   }''', name : 'GNUC varargs macros')
 
 if cc.has_header('alloca.h')
-  glibconfig_conf.set('XPL_HAVE_ALLOCA_H', true)
+  glibconfig_conf.set('GLIB_HAVE_ALLOCA_H', true)
 endif
 has_syspoll = cc.has_header('sys/poll.h')
 has_systypes = cc.has_header('sys/types.h')
 if has_syspoll
-  glibconfig_conf.set('XPL_HAVE_SYS_POLL_H', true)
+  glibconfig_conf.set('GLIB_HAVE_SYS_POLL_H', true)
 endif
 has_winsock2 = cc.has_header('winsock2.h')
 
@@ -1894,7 +1894,7 @@ endif
 if host_system == 'windows' and not get_option('force_posix_threads')
   thread_dep = []
   threads_implementation = 'win32'
-  glibconfig_conf.set('xthreads_impl_def', 'WIN32')
+  glibconfig_conf.set('g_threads_impl_def', 'WIN32')
   glib_conf.set('THREADS_WIN32', 1)
 else
   thread_dep = dependency('threads')
@@ -1904,7 +1904,7 @@ else
       # define _GNU_SOURCE
       #endif
       #include <pthread.h>'''
-  glibconfig_conf.set('xthreads_impl_def', 'POSIX')
+  glibconfig_conf.set('g_threads_impl_def', 'POSIX')
   glib_conf.set('THREADS_POSIX', 1)
   if cc.has_header_symbol('pthread.h', 'pthread_attr_setstacksize')
     glib_conf.set('HAVE_PTHREAD_ATTR_SETSTACKSIZE', 1)
@@ -1988,7 +1988,7 @@ stack_grows_check_prog = '''
 
 if cc_can_run
   rres = cc.run(stack_grows_check_prog, name : 'stack grows check')
-  growing_stack = rres.returncode() == 0
+  growing_stack = rres.compiled() and rres.returncode() == 0
 else
   growing_stack = meson.get_cross_property('growing_stack', false)
 endif
@@ -2119,7 +2119,7 @@ else
     have_bind_textdomain_codeset = true  # proxy-libintl supports it
   else
     libintl_deps = [libintl] + libintl_deps
-    have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset',
+    have_bind_textdomain_codeset = cc.has_function('bind_textdomain_codeset', 
                                                    dependencies : libintl_deps)
   endif
 endif
@@ -2130,7 +2130,7 @@ glib_conf.set('HAVE_BIND_TEXTDOMAIN_CODESET', have_bind_textdomain_codeset)
 glib_conf.set('HAVE_DCGETTEXT', 1)
 glib_conf.set('HAVE_GETTEXT', 1)
 
-glib_conf.set_quoted('XPL_LOCALE_DIR', join_paths(glib_datadir, 'locale'))
+glib_conf.set_quoted('GLIB_LOCALE_DIR', join_paths(glib_datadir, 'locale'))
 
 # libmount is only used by gio, but we need to fetch the libs to generate the
 # pkg-config file below
@@ -2224,7 +2224,7 @@ cmdline_test_code = '''
 static int
 __getcmdline (void)
 {
-/* This code is a dumbed-down version of xfile_get_contents() */
+/* This code is a dumbed-down version of g_file_get_contents() */
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -2365,7 +2365,7 @@ if want_systemtap and enable_dtrace
     tapset_install_dir = join_paths(get_option('datadir'), 'systemtap/tapset', host_machine.cpu_family())
   endif
   stp_cdata = configuration_data()
-  stp_cdata.set('ABS_XPL_RUNTIME_LIBDIR', glib_libdir)
+  stp_cdata.set('ABS_GLIB_RUNTIME_LIBDIR', glib_libdir)
   stp_cdata.set('LT_CURRENT', minor_version * 100)
   stp_cdata.set('LT_REVISION', micro_version)
   enable_systemtap = true

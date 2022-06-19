@@ -29,70 +29,70 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LOADABLE_ICON            (g_loadable_icon_get_type ())
-#define G_LOADABLE_ICON(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_LOADABLE_ICON, xloadable_icon))
-#define X_IS_LOADABLE_ICON(obj)	        (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_LOADABLE_ICON))
-#define G_LOADABLE_ICON_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_LOADABLE_ICON, xloadable_icon_iface_t))
+#define G_TYPE_LOADABLE_ICON            (g_loadable_icon_get_type ())
+#define G_LOADABLE_ICON(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_LOADABLE_ICON, GLoadableIcon))
+#define G_IS_LOADABLE_ICON(obj)	        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_LOADABLE_ICON))
+#define G_LOADABLE_ICON_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_LOADABLE_ICON, GLoadableIconIface))
 
 /**
- * xloadable_icon_t:
+ * GLoadableIcon:
  *
  * Generic type for all kinds of icons that can be loaded
  * as a stream.
  **/
-typedef struct _xloadable_icon_iface    		xloadable_icon_iface_t;
+typedef struct _GLoadableIconIface    		GLoadableIconIface;
 
 /**
- * xloadable_icon_iface_t:
- * @x_iface: The parent interface.
+ * GLoadableIconIface:
+ * @g_iface: The parent interface.
  * @load: Loads an icon.
  * @load_async: Loads an icon asynchronously.
  * @load_finish: Finishes an asynchronous icon load.
  *
  * Interface for icons that can be loaded as a stream.
  **/
-struct _xloadable_icon_iface
+struct _GLoadableIconIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xinput_stream_t * (* load)        (xloadable_icon_t       *icon,
+  GInputStream * (* load)        (GLoadableIcon       *icon,
                                   int                  size,
                                   char               **type,
-                                  xcancellable_t        *cancellable,
-                                  xerror_t             **error);
-  void           (* load_async)  (xloadable_icon_t       *icon,
+                                  GCancellable        *cancellable,
+                                  GError             **error);
+  void           (* load_async)  (GLoadableIcon       *icon,
                                   int                  size,
-                                  xcancellable_t        *cancellable,
-                                  xasync_ready_callback_t  callback,
-                                  xpointer_t             user_data);
-  xinput_stream_t * (* load_finish) (xloadable_icon_t       *icon,
-                                  xasync_result_t        *res,
+                                  GCancellable        *cancellable,
+                                  GAsyncReadyCallback  callback,
+                                  gpointer             user_data);
+  GInputStream * (* load_finish) (GLoadableIcon       *icon,
+                                  GAsyncResult        *res,
                                   char               **type,
-                                  xerror_t             **error);
+                                  GError             **error);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t         g_loadable_icon_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType         g_loadable_icon_get_type    (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t *g_loadable_icon_load        (xloadable_icon_t        *icon,
+GLIB_AVAILABLE_IN_ALL
+GInputStream *g_loadable_icon_load        (GLoadableIcon        *icon,
 					   int                   size,
 					   char                **type,
-					   xcancellable_t         *cancellable,
-					   xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void          g_loadable_icon_load_async  (xloadable_icon_t        *icon,
+					   GCancellable         *cancellable,
+					   GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void          g_loadable_icon_load_async  (GLoadableIcon        *icon,
 					   int                   size,
-					   xcancellable_t         *cancellable,
-					   xasync_ready_callback_t   callback,
-					   xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t *g_loadable_icon_load_finish (xloadable_icon_t        *icon,
-					   xasync_result_t         *res,
+					   GCancellable         *cancellable,
+					   GAsyncReadyCallback   callback,
+					   gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GInputStream *g_loadable_icon_load_finish (GLoadableIcon        *icon,
+					   GAsyncResult         *res,
 					   char                **type,
-					   xerror_t              **error);
+					   GError              **error);
 
 G_END_DECLS
 

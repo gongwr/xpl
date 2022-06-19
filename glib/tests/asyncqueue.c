@@ -1,4 +1,4 @@
-/* Unit tests for xasync_queue_t
+/* Unit tests for GAsyncQueue
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -21,16 +21,16 @@
  */
 
 /* We are testing some deprecated APIs here */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
 
-static xint_t
-compare_func (xconstpointer d1, xconstpointer d2, xpointer_t data)
+static gint
+compare_func (gconstpointer d1, gconstpointer d2, gpointer data)
 {
-  xint_t i1, i2;
+  gint i1, i2;
 
   i1 = GPOINTER_TO_INT (d1);
   i2 = GPOINTER_TO_INT (d2);
@@ -41,7 +41,7 @@ compare_func (xconstpointer d1, xconstpointer d2, xpointer_t data)
 static
 void test_async_queue_sort (void)
 {
-  xasync_queue_t *q;
+  GAsyncQueue *q;
 
   q = g_async_queue_new ();
 
@@ -100,10 +100,10 @@ void test_async_queue_sort (void)
   g_async_queue_unref (q);
 }
 
-static xint_t destroy_count;
+static gint destroy_count;
 
 static void
-destroy_notify (xpointer_t item)
+destroy_notify (gpointer item)
 {
   destroy_count++;
 }
@@ -111,7 +111,7 @@ destroy_notify (xpointer_t item)
 static void
 test_async_queue_destroy (void)
 {
-  xasync_queue_t *q;
+  GAsyncQueue *q;
 
   destroy_count = 0;
 
@@ -131,18 +131,18 @@ test_async_queue_destroy (void)
   g_assert_cmpint (destroy_count, ==, 4);
 }
 
-static xasync_queue_t *q;
+static GAsyncQueue *q;
 
-static xthread_t *threads[10];
-static xint_t counts[10];
-static xint_t sums[10];
-static xint_t total;
+static GThread *threads[10];
+static gint counts[10];
+static gint sums[10];
+static gint total;
 
-static xpointer_t
-thread_func (xpointer_t data)
+static gpointer
+thread_func (gpointer data)
 {
-  xint_t pos = GPOINTER_TO_INT (data);
-  xint_t value;
+  gint pos = GPOINTER_TO_INT (data);
+  gint value;
 
   while (1)
     {
@@ -163,14 +163,14 @@ thread_func (xpointer_t data)
 static void
 test_async_queue_threads (void)
 {
-  xint_t i, j;
-  xint_t s, c;
-  xint_t value;
+  gint i, j;
+  gint s, c;
+  gint value;
 
   q = g_async_queue_new ();
 
   for (i = 0; i < 10; i++)
-    threads[i] = xthread_new ("test", thread_func, GINT_TO_POINTER (i));
+    threads[i] = g_thread_new ("test", thread_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < 100; i++)
     {
@@ -190,7 +190,7 @@ test_async_queue_threads (void)
     g_async_queue_push (q, GINT_TO_POINTER(-1));
 
   for (i = 0; i < 10; i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   g_assert_cmpint (g_async_queue_length (q), ==, 0);
 
@@ -213,10 +213,10 @@ test_async_queue_threads (void)
 static void
 test_async_queue_timed (void)
 {
-  xasync_queue_t *q;
+  GAsyncQueue *q;
   GTimeVal tv;
-  sint64_t start, end, diff;
-  xpointer_t val;
+  gint64 start, end, diff;
+  gpointer val;
 
   g_get_current_time (&tv);
   if (g_test_undefined ())
@@ -283,7 +283,7 @@ test_async_queue_timed (void)
 static void
 test_async_queue_remove (void)
 {
-  xasync_queue_t *q;
+  GAsyncQueue *q;
 
   q = g_async_queue_new ();
 
@@ -329,7 +329,7 @@ test_async_queue_remove (void)
 static void
 test_async_queue_push_front (void)
 {
-  xasync_queue_t *q;
+  GAsyncQueue *q;
 
   q = g_async_queue_new ();
 
@@ -375,8 +375,8 @@ test_async_queue_push_front (void)
 static void
 test_basics (void)
 {
-  xasync_queue_t *q;
-  xpointer_t item;
+  GAsyncQueue *q;
+  gpointer item;
 
   destroy_count = 0;
 

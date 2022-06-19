@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2001 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -27,8 +27,8 @@
 /* same type transforms
  */
 static void
-value_transform_memcpy_data0 (const xvalue_t *src_value,
-                              xvalue_t       *dest_value)
+value_transform_memcpy_data0 (const GValue *src_value,
+                              GValue       *dest_value)
 {
   memcpy (&dest_value->data[0], &src_value->data[0], sizeof (src_value->data[0]));
 }
@@ -46,83 +46,83 @@ value_transform_memcpy_data0 (const xvalue_t *src_value,
  */
 #define DEFINE_CAST(func_name, from_member, ctype, to_member)               \
 static void                                                                 \
-value_transform_##func_name (const xvalue_t *src_value,                       \
-                             xvalue_t       *dest_value)                      \
+value_transform_##func_name (const GValue *src_value,                       \
+                             GValue       *dest_value)                      \
 {                                                                           \
   ctype c_value = src_value->data[0].from_member;                           \
   dest_value->data[0].to_member = c_value;                                  \
 } extern void glib_dummy_decl (void)
 DEFINE_CAST (int_s8,            v_int,    gint8,   v_int);
-DEFINE_CAST (int_u8,            v_int,    xuint8_t,  v_uint);
-DEFINE_CAST (int_uint,          v_int,    xuint_t,   v_uint);
-DEFINE_CAST (int_long,          v_int,    xlong_t,   v_long);
-DEFINE_CAST (int_ulong,         v_int,    xulong_t,  v_ulong);
-DEFINE_CAST (int_int64,         v_int,    sint64_t,  v_int64);
-DEFINE_CAST (int_uint64,        v_int,    xuint64_t, v_uint64);
+DEFINE_CAST (int_u8,            v_int,    guint8,  v_uint);
+DEFINE_CAST (int_uint,          v_int,    guint,   v_uint);
+DEFINE_CAST (int_long,          v_int,    glong,   v_long);
+DEFINE_CAST (int_ulong,         v_int,    gulong,  v_ulong);
+DEFINE_CAST (int_int64,         v_int,    gint64,  v_int64);
+DEFINE_CAST (int_uint64,        v_int,    guint64, v_uint64);
 DEFINE_CAST (int_float,         v_int,    gfloat,  v_float);
-DEFINE_CAST (int_double,        v_int,    xdouble_t, v_double);
+DEFINE_CAST (int_double,        v_int,    gdouble, v_double);
 DEFINE_CAST (uint_s8,           v_uint,   gint8,   v_int);
-DEFINE_CAST (uint_u8,           v_uint,   xuint8_t,  v_uint);
-DEFINE_CAST (uint_int,          v_uint,   xint_t,    v_int);
-DEFINE_CAST (uint_long,         v_uint,   xlong_t,   v_long);
-DEFINE_CAST (uint_ulong,        v_uint,   xulong_t,  v_ulong);
-DEFINE_CAST (uint_int64,        v_uint,   sint64_t,  v_int64);
-DEFINE_CAST (uint_uint64,       v_uint,   xuint64_t, v_uint64);
+DEFINE_CAST (uint_u8,           v_uint,   guint8,  v_uint);
+DEFINE_CAST (uint_int,          v_uint,   gint,    v_int);
+DEFINE_CAST (uint_long,         v_uint,   glong,   v_long);
+DEFINE_CAST (uint_ulong,        v_uint,   gulong,  v_ulong);
+DEFINE_CAST (uint_int64,        v_uint,   gint64,  v_int64);
+DEFINE_CAST (uint_uint64,       v_uint,   guint64, v_uint64);
 DEFINE_CAST (uint_float,        v_uint,   gfloat,  v_float);
-DEFINE_CAST (uint_double,       v_uint,   xdouble_t, v_double);
+DEFINE_CAST (uint_double,       v_uint,   gdouble, v_double);
 DEFINE_CAST (long_s8,           v_long,   gint8,   v_int);
-DEFINE_CAST (long_u8,           v_long,   xuint8_t,  v_uint);
-DEFINE_CAST (long_int,          v_long,   xint_t,    v_int);
-DEFINE_CAST (long_uint,         v_long,   xuint_t,   v_uint);
-DEFINE_CAST (long_ulong,        v_long,   xulong_t,  v_ulong);
-DEFINE_CAST (long_int64,        v_long,   sint64_t,  v_int64);
-DEFINE_CAST (long_uint64,       v_long,   xuint64_t, v_uint64);
+DEFINE_CAST (long_u8,           v_long,   guint8,  v_uint);
+DEFINE_CAST (long_int,          v_long,   gint,    v_int);
+DEFINE_CAST (long_uint,         v_long,   guint,   v_uint);
+DEFINE_CAST (long_ulong,        v_long,   gulong,  v_ulong);
+DEFINE_CAST (long_int64,        v_long,   gint64,  v_int64);
+DEFINE_CAST (long_uint64,       v_long,   guint64, v_uint64);
 DEFINE_CAST (long_float,        v_long,   gfloat,  v_float);
-DEFINE_CAST (long_double,       v_long,   xdouble_t, v_double);
+DEFINE_CAST (long_double,       v_long,   gdouble, v_double);
 DEFINE_CAST (ulong_s8,          v_ulong,  gint8,   v_int);
-DEFINE_CAST (ulong_u8,          v_ulong,  xuint8_t,  v_uint);
-DEFINE_CAST (ulong_int,         v_ulong,  xint_t,    v_int);
-DEFINE_CAST (ulong_uint,        v_ulong,  xuint_t,   v_uint);
-DEFINE_CAST (ulong_int64,       v_ulong,  sint64_t,  v_int64);
-DEFINE_CAST (ulong_uint64,      v_ulong,  xuint64_t, v_uint64);
-DEFINE_CAST (ulong_long,        v_ulong,  xlong_t,   v_long);
+DEFINE_CAST (ulong_u8,          v_ulong,  guint8,  v_uint);
+DEFINE_CAST (ulong_int,         v_ulong,  gint,    v_int);
+DEFINE_CAST (ulong_uint,        v_ulong,  guint,   v_uint);
+DEFINE_CAST (ulong_int64,       v_ulong,  gint64,  v_int64);
+DEFINE_CAST (ulong_uint64,      v_ulong,  guint64, v_uint64);
+DEFINE_CAST (ulong_long,        v_ulong,  glong,   v_long);
 DEFINE_CAST (ulong_float,       v_ulong,  gfloat,  v_float);
-DEFINE_CAST (ulong_double,      v_ulong,  xdouble_t, v_double);
+DEFINE_CAST (ulong_double,      v_ulong,  gdouble, v_double);
 DEFINE_CAST (int64_s8,          v_int64,  gint8,   v_int);
-DEFINE_CAST (int64_u8,          v_int64,  xuint8_t,  v_uint);
-DEFINE_CAST (int64_int,         v_int64,  xint_t,    v_int);
-DEFINE_CAST (int64_uint,        v_int64,  xuint_t,   v_uint);
-DEFINE_CAST (int64_long,        v_int64,  xlong_t,   v_long);
-DEFINE_CAST (int64_uint64,      v_int64,  xuint64_t, v_uint64);
-DEFINE_CAST (int64_ulong,       v_int64,  xulong_t,  v_ulong);
+DEFINE_CAST (int64_u8,          v_int64,  guint8,  v_uint);
+DEFINE_CAST (int64_int,         v_int64,  gint,    v_int);
+DEFINE_CAST (int64_uint,        v_int64,  guint,   v_uint);
+DEFINE_CAST (int64_long,        v_int64,  glong,   v_long);
+DEFINE_CAST (int64_uint64,      v_int64,  guint64, v_uint64);
+DEFINE_CAST (int64_ulong,       v_int64,  gulong,  v_ulong);
 DEFINE_CAST (int64_float,       v_int64,  gfloat,  v_float);
-DEFINE_CAST (int64_double,      v_int64,  xdouble_t, v_double);
+DEFINE_CAST (int64_double,      v_int64,  gdouble, v_double);
 DEFINE_CAST (uint64_s8,         v_uint64, gint8,   v_int);
-DEFINE_CAST (uint64_u8,         v_uint64, xuint8_t,  v_uint);
-DEFINE_CAST (uint64_int,        v_uint64, xint_t,    v_int);
-DEFINE_CAST (uint64_uint,       v_uint64, xuint_t,   v_uint);
-DEFINE_CAST (uint64_long,       v_uint64, xlong_t,   v_long);
-DEFINE_CAST (uint64_ulong,      v_uint64, xulong_t,  v_ulong);
-DEFINE_CAST (uint64_int64,      v_uint64, sint64_t,  v_int64);
+DEFINE_CAST (uint64_u8,         v_uint64, guint8,  v_uint);
+DEFINE_CAST (uint64_int,        v_uint64, gint,    v_int);
+DEFINE_CAST (uint64_uint,       v_uint64, guint,   v_uint);
+DEFINE_CAST (uint64_long,       v_uint64, glong,   v_long);
+DEFINE_CAST (uint64_ulong,      v_uint64, gulong,  v_ulong);
+DEFINE_CAST (uint64_int64,      v_uint64, gint64,  v_int64);
 DEFINE_CAST (uint64_float,      v_uint64, gfloat,  v_float);
-DEFINE_CAST (uint64_double,     v_uint64, xdouble_t, v_double);
+DEFINE_CAST (uint64_double,     v_uint64, gdouble, v_double);
 DEFINE_CAST (float_s8,          v_float,  gint8,   v_int);
-DEFINE_CAST (float_u8,          v_float,  xuint8_t,  v_uint);
-DEFINE_CAST (float_int,         v_float,  xint_t,    v_int);
-DEFINE_CAST (float_uint,        v_float,  xuint_t,   v_uint);
-DEFINE_CAST (float_long,        v_float,  xlong_t,   v_long);
-DEFINE_CAST (float_ulong,       v_float,  xulong_t,  v_ulong);
-DEFINE_CAST (float_int64,       v_float,  sint64_t,  v_int64);
-DEFINE_CAST (float_uint64,      v_float,  xuint64_t, v_uint64);
-DEFINE_CAST (float_double,      v_float,  xdouble_t, v_double);
+DEFINE_CAST (float_u8,          v_float,  guint8,  v_uint);
+DEFINE_CAST (float_int,         v_float,  gint,    v_int);
+DEFINE_CAST (float_uint,        v_float,  guint,   v_uint);
+DEFINE_CAST (float_long,        v_float,  glong,   v_long);
+DEFINE_CAST (float_ulong,       v_float,  gulong,  v_ulong);
+DEFINE_CAST (float_int64,       v_float,  gint64,  v_int64);
+DEFINE_CAST (float_uint64,      v_float,  guint64, v_uint64);
+DEFINE_CAST (float_double,      v_float,  gdouble, v_double);
 DEFINE_CAST (double_s8,         v_double, gint8,   v_int);
-DEFINE_CAST (double_u8,         v_double, xuint8_t,  v_uint);
-DEFINE_CAST (double_int,        v_double, xint_t,    v_int);
-DEFINE_CAST (double_uint,       v_double, xuint_t,   v_uint);
-DEFINE_CAST (double_long,       v_double, xlong_t,   v_long);
-DEFINE_CAST (double_ulong,      v_double, xulong_t,  v_ulong);
-DEFINE_CAST (double_int64,      v_double, sint64_t,  v_int64);
-DEFINE_CAST (double_uint64,     v_double, xuint64_t, v_uint64);
+DEFINE_CAST (double_u8,         v_double, guint8,  v_uint);
+DEFINE_CAST (double_int,        v_double, gint,    v_int);
+DEFINE_CAST (double_uint,       v_double, guint,   v_uint);
+DEFINE_CAST (double_long,       v_double, glong,   v_long);
+DEFINE_CAST (double_ulong,      v_double, gulong,  v_ulong);
+DEFINE_CAST (double_int64,      v_double, gint64,  v_int64);
+DEFINE_CAST (double_uint64,     v_double, guint64, v_uint64);
 DEFINE_CAST (double_float,      v_double, gfloat,  v_float);
 
 
@@ -130,8 +130,8 @@ DEFINE_CAST (double_float,      v_double, gfloat,  v_float);
  */
 #define DEFINE_BOOL_CHECK(func_name, from_member)                           \
 static void                                                                 \
-value_transform_##func_name (const xvalue_t *src_value,                       \
-                             xvalue_t       *dest_value)                      \
+value_transform_##func_name (const GValue *src_value,                       \
+                             GValue       *dest_value)                      \
 {                                                                           \
   dest_value->data[0].v_int = src_value->data[0].from_member != 0;  \
 } extern void glib_dummy_decl (void)
@@ -147,16 +147,16 @@ DEFINE_BOOL_CHECK (uint64_bool, v_uint64);
  */
 #define DEFINE_SPRINTF(func_name, from_member, format)                      \
 static void                                                                 \
-value_transform_##func_name (const xvalue_t *src_value,                       \
-                             xvalue_t       *dest_value)                      \
+value_transform_##func_name (const GValue *src_value,                       \
+                             GValue       *dest_value)                      \
 {                                                                           \
-  dest_value->data[0].v_pointer = xstrdup_printf ((format),                \
+  dest_value->data[0].v_pointer = g_strdup_printf ((format),                \
 						   src_value->data[0].from_member);             \
 } extern void glib_dummy_decl (void)
 DEFINE_SPRINTF (int_string,     v_int,    "%d");
 DEFINE_SPRINTF (uint_string,    v_uint,   "%u");
-DEFINE_SPRINTF (lonxstring,    v_long,   "%ld");
-DEFINE_SPRINTF (ulonxstring,   v_ulong,  "%lu");
+DEFINE_SPRINTF (long_string,    v_long,   "%ld");
+DEFINE_SPRINTF (ulong_string,   v_ulong,  "%lu");
 DEFINE_SPRINTF (int64_string,   v_int64,  "%" G_GINT64_FORMAT);
 DEFINE_SPRINTF (uint64_string,  v_uint64, "%" G_GUINT64_FORMAT);
 DEFINE_SPRINTF (float_string,   v_float,  "%f");
@@ -166,263 +166,263 @@ DEFINE_SPRINTF (double_string,  v_double, "%f");
 /* special cases
  */
 static void
-value_transform_bool_string (const xvalue_t *src_value,
-                             xvalue_t       *dest_value)
+value_transform_bool_string (const GValue *src_value,
+                             GValue       *dest_value)
 {
-  dest_value->data[0].v_pointer = xstrdup_printf ("%s",
+  dest_value->data[0].v_pointer = g_strdup_printf ("%s",
                                                    src_value->data[0].v_int ?
                                                    "TRUE" : "FALSE");
 }
 static void
-value_transform_strinxstring (const xvalue_t *src_value,
-                               xvalue_t       *dest_value)
+value_transform_string_string (const GValue *src_value,
+                               GValue       *dest_value)
 {
-  dest_value->data[0].v_pointer = xstrdup (src_value->data[0].v_pointer);
+  dest_value->data[0].v_pointer = g_strdup (src_value->data[0].v_pointer);
 }
 static void
-value_transform_enum_string (const xvalue_t *src_value,
-                             xvalue_t       *dest_value)
+value_transform_enum_string (const GValue *src_value,
+                             GValue       *dest_value)
 {
-  xint_t v_enum = src_value->data[0].v_long;
-  xchar_t *str = xenum_to_string (G_VALUE_TYPE (src_value), v_enum);
+  gint v_enum = src_value->data[0].v_long;
+  gchar *str = g_enum_to_string (G_VALUE_TYPE (src_value), v_enum);
 
   dest_value->data[0].v_pointer = str;
 }
 static void
-value_transform_flags_string (const xvalue_t *src_value,
-                              xvalue_t       *dest_value)
+value_transform_flags_string (const GValue *src_value,
+                              GValue       *dest_value)
 {
-  xflags_class_t *class = xtype_class_ref (G_VALUE_TYPE (src_value));
-  xflags_value_t *flags_value = xflags_get_first_value (class, src_value->data[0].v_ulong);
+  GFlagsClass *class = g_type_class_ref (G_VALUE_TYPE (src_value));
+  GFlagsValue *flags_value = g_flags_get_first_value (class, src_value->data[0].v_ulong);
 
-  /* Note: this does not use xflags_to_string()
+  /* Note: this does not use g_flags_to_string()
    * to keep backwards compatibility.
    */
   if (flags_value)
     {
-      xstring_t *xstring = xstring_new (NULL);
-      xuint_t v_flags = src_value->data[0].v_ulong;
-
+      GString *gstring = g_string_new (NULL);
+      guint v_flags = src_value->data[0].v_ulong;
+      
       do
         {
           v_flags &= ~flags_value->value;
-
-          if (xstring->str[0])
-            xstring_append (xstring, " | ");
-          xstring_append (xstring, flags_value->value_name);
-          flags_value = xflags_get_first_value (class, v_flags);
+          
+          if (gstring->str[0])
+            g_string_append (gstring, " | ");
+          g_string_append (gstring, flags_value->value_name);
+          flags_value = g_flags_get_first_value (class, v_flags);
         }
       while (flags_value && v_flags);
-
+      
       if (v_flags)
-        dest_value->data[0].v_pointer = xstrdup_printf ("%s | %u",
-                                                         xstring->str,
+        dest_value->data[0].v_pointer = g_strdup_printf ("%s | %u",
+                                                         gstring->str,
                                                          v_flags);
       else
-        dest_value->data[0].v_pointer = xstrdup (xstring->str);
-      xstring_free (xstring, TRUE);
+        dest_value->data[0].v_pointer = g_strdup (gstring->str);
+      g_string_free (gstring, TRUE);
     }
   else
-    dest_value->data[0].v_pointer = xstrdup_printf ("%lu", src_value->data[0].v_ulong);
-
-  xtype_class_unref (class);
+    dest_value->data[0].v_pointer = g_strdup_printf ("%lu", src_value->data[0].v_ulong);
+  
+  g_type_class_unref (class);
 }
 
 
 /* registration
  */
 void
-_xvalue_transforms_init (void)
+_g_value_transforms_init (void)
 {
   /* some transformations are a bit questionable,
    * we currently skip those
    */
 #define SKIP____register_transform_func(type1,type2,transform_func)     /* skip questionable transforms */ \
   (void)0
-
+  
   /* numeric types (plus to string) */
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_CHAR,            value_transform_int_int);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_UCHAR,           value_transform_int_u8);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_BOOLEAN,         value_transform_int_bool);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_INT,             value_transform_int_int);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_UINT,            value_transform_int_uint);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_LONG,            value_transform_int_long);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_ULONG,           value_transform_int_ulong);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_INT64,           value_transform_int_int64);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_UINT64,          value_transform_int_uint64);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_ENUM,            value_transform_int_long);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_FLAGS,           value_transform_int_ulong);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_FLOAT,           value_transform_int_float);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_DOUBLE,          value_transform_int_double);
-  xvalue_register_transform_func (XTYPE_CHAR,         XTYPE_STRING,          value_transform_int_string);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_CHAR,            value_transform_uint_s8);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_UCHAR,           value_transform_uint_uint);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_BOOLEAN,         value_transform_uint_bool);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_INT,             value_transform_uint_int);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_UINT,            value_transform_uint_uint);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_LONG,            value_transform_uint_long);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_ULONG,           value_transform_uint_ulong);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_INT64,           value_transform_uint_int64);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_UINT64,          value_transform_uint_uint64);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_ENUM,            value_transform_uint_long);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_FLAGS,           value_transform_uint_ulong);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_FLOAT,           value_transform_uint_float);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_DOUBLE,          value_transform_uint_double);
-  xvalue_register_transform_func (XTYPE_UCHAR,        XTYPE_STRING,          value_transform_uint_string);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_CHAR,            value_transform_int_s8);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_UCHAR,           value_transform_int_u8);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_BOOLEAN,         value_transform_int_int);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_INT,             value_transform_int_int);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_UINT,            value_transform_int_uint);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_LONG,            value_transform_int_long);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_ULONG,           value_transform_int_ulong);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_INT64,           value_transform_int_int64);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_UINT64,          value_transform_int_uint64);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_ENUM,            value_transform_int_long);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_FLAGS,           value_transform_int_ulong);
-  SKIP____register_transform_func (XTYPE_BOOLEAN,      XTYPE_FLOAT,           value_transform_int_float);
-  SKIP____register_transform_func (XTYPE_BOOLEAN,      XTYPE_DOUBLE,          value_transform_int_double);
-  xvalue_register_transform_func (XTYPE_BOOLEAN,      XTYPE_STRING,          value_transform_bool_string);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_CHAR,            value_transform_int_s8);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_UCHAR,           value_transform_int_u8);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_BOOLEAN,         value_transform_int_bool);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_INT,             value_transform_int_int);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_UINT,            value_transform_int_uint);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_LONG,            value_transform_int_long);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_ULONG,           value_transform_int_ulong);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_INT64,           value_transform_int_int64);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_UINT64,          value_transform_int_uint64);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_ENUM,            value_transform_int_long);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_FLAGS,           value_transform_int_ulong);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_FLOAT,           value_transform_int_float);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_DOUBLE,          value_transform_int_double);
-  xvalue_register_transform_func (XTYPE_INT,          XTYPE_STRING,          value_transform_int_string);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_CHAR,            value_transform_uint_s8);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_UCHAR,           value_transform_uint_u8);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_BOOLEAN,         value_transform_uint_bool);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_INT,             value_transform_uint_int);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_UINT,            value_transform_uint_uint);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_LONG,            value_transform_uint_long);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_ULONG,           value_transform_uint_ulong);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_INT64,           value_transform_uint_int64);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_UINT64,          value_transform_uint_uint64);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_ENUM,            value_transform_uint_long);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_FLAGS,           value_transform_uint_ulong);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_FLOAT,           value_transform_uint_float);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_DOUBLE,          value_transform_uint_double);
-  xvalue_register_transform_func (XTYPE_UINT,         XTYPE_STRING,          value_transform_uint_string);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_CHAR,            value_transform_long_s8);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_UCHAR,           value_transform_long_u8);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_BOOLEAN,         value_transform_long_bool);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_INT,             value_transform_long_int);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_UINT,            value_transform_long_uint);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_LONG,            value_transform_long_long);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_ULONG,           value_transform_long_ulong);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_INT64,           value_transform_long_int64);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_UINT64,          value_transform_long_uint64);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_ENUM,            value_transform_long_long);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_FLAGS,           value_transform_long_ulong);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_FLOAT,           value_transform_long_float);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_DOUBLE,          value_transform_long_double);
-  xvalue_register_transform_func (XTYPE_LONG,         XTYPE_STRING,          value_transform_lonxstring);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_CHAR,            value_transform_ulong_s8);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_UCHAR,           value_transform_ulong_u8);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_BOOLEAN,         value_transform_ulong_bool);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_INT,             value_transform_ulong_int);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_UINT,            value_transform_ulong_uint);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_LONG,            value_transform_ulong_long);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_ULONG,           value_transform_ulong_ulong);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_INT64,           value_transform_ulong_int64);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_UINT64,          value_transform_ulong_uint64);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_ENUM,            value_transform_ulong_long);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_FLAGS,           value_transform_ulong_ulong);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_FLOAT,           value_transform_ulong_float);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_DOUBLE,          value_transform_ulong_double);
-  xvalue_register_transform_func (XTYPE_ULONG,        XTYPE_STRING,          value_transform_ulonxstring);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_CHAR,            value_transform_int64_s8);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_UCHAR,           value_transform_int64_u8);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_BOOLEAN,         value_transform_int64_bool);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_INT,             value_transform_int64_int);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_UINT,            value_transform_int64_uint);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_LONG,            value_transform_int64_long);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_ULONG,           value_transform_int64_ulong);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_INT64,           value_transform_int64_int64);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_UINT64,          value_transform_int64_uint64);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_ENUM,            value_transform_int64_long);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_FLAGS,           value_transform_int64_ulong);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_FLOAT,           value_transform_int64_float);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_DOUBLE,          value_transform_int64_double);
-  xvalue_register_transform_func (XTYPE_INT64,        XTYPE_STRING,          value_transform_int64_string);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_CHAR,            value_transform_uint64_s8);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_UCHAR,           value_transform_uint64_u8);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_BOOLEAN,         value_transform_uint64_bool);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_INT,             value_transform_uint64_int);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_UINT,            value_transform_uint64_uint);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_LONG,            value_transform_uint64_long);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_ULONG,           value_transform_uint64_ulong);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_INT64,           value_transform_uint64_int64);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_UINT64,          value_transform_uint64_uint64);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_ENUM,            value_transform_uint64_long);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_FLAGS,           value_transform_uint64_ulong);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_FLOAT,           value_transform_uint64_float);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_DOUBLE,          value_transform_uint64_double);
-  xvalue_register_transform_func (XTYPE_UINT64,       XTYPE_STRING,          value_transform_uint64_string);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_CHAR,            value_transform_long_s8);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_UCHAR,           value_transform_long_u8);
-  SKIP____register_transform_func (XTYPE_ENUM,         XTYPE_BOOLEAN,         value_transform_long_bool);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_INT,             value_transform_long_int);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_UINT,            value_transform_long_uint);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_LONG,            value_transform_long_long);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_ULONG,           value_transform_long_ulong);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_INT64,           value_transform_long_int64);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_UINT64,          value_transform_long_uint64);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_ENUM,            value_transform_long_long);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_FLAGS,           value_transform_long_ulong);
-  SKIP____register_transform_func (XTYPE_ENUM,         XTYPE_FLOAT,           value_transform_long_float);
-  SKIP____register_transform_func (XTYPE_ENUM,         XTYPE_DOUBLE,          value_transform_long_double);
-  xvalue_register_transform_func (XTYPE_ENUM,         XTYPE_STRING,          value_transform_enum_string);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_CHAR,            value_transform_ulong_s8);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_UCHAR,           value_transform_ulong_u8);
-  SKIP____register_transform_func (XTYPE_FLAGS,        XTYPE_BOOLEAN,         value_transform_ulong_bool);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_INT,             value_transform_ulong_int);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_UINT,            value_transform_ulong_uint);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_LONG,            value_transform_ulong_long);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_ULONG,           value_transform_ulong_ulong);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_INT64,           value_transform_ulong_int64);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_UINT64,          value_transform_ulong_uint64);
-  SKIP____register_transform_func (XTYPE_FLAGS,        XTYPE_ENUM,            value_transform_ulong_long);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_FLAGS,           value_transform_ulong_ulong);
-  SKIP____register_transform_func (XTYPE_FLAGS,        XTYPE_FLOAT,           value_transform_ulong_float);
-  SKIP____register_transform_func (XTYPE_FLAGS,        XTYPE_DOUBLE,          value_transform_ulong_double);
-  xvalue_register_transform_func (XTYPE_FLAGS,        XTYPE_STRING,          value_transform_flags_string);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_CHAR,            value_transform_float_s8);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_UCHAR,           value_transform_float_u8);
-  SKIP____register_transform_func (XTYPE_FLOAT,        XTYPE_BOOLEAN,         value_transform_float_bool);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_INT,             value_transform_float_int);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_UINT,            value_transform_float_uint);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_LONG,            value_transform_float_long);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_ULONG,           value_transform_float_ulong);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_INT64,           value_transform_float_int64);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_UINT64,          value_transform_float_uint64);
-  SKIP____register_transform_func (XTYPE_FLOAT,        XTYPE_ENUM,            value_transform_float_long);
-  SKIP____register_transform_func (XTYPE_FLOAT,        XTYPE_FLAGS,           value_transform_float_ulong);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_FLOAT,           value_transform_float_float);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_DOUBLE,          value_transform_float_double);
-  xvalue_register_transform_func (XTYPE_FLOAT,        XTYPE_STRING,          value_transform_float_string);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_CHAR,            value_transform_double_s8);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_UCHAR,           value_transform_double_u8);
-  SKIP____register_transform_func (XTYPE_DOUBLE,       XTYPE_BOOLEAN,         value_transform_double_bool);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_INT,             value_transform_double_int);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_UINT,            value_transform_double_uint);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_LONG,            value_transform_double_long);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_ULONG,           value_transform_double_ulong);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_INT64,           value_transform_double_int64);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_UINT64,          value_transform_double_uint64);
-  SKIP____register_transform_func (XTYPE_DOUBLE,       XTYPE_ENUM,            value_transform_double_long);
-  SKIP____register_transform_func (XTYPE_DOUBLE,       XTYPE_FLAGS,           value_transform_double_ulong);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_FLOAT,           value_transform_double_float);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_DOUBLE,          value_transform_double_double);
-  xvalue_register_transform_func (XTYPE_DOUBLE,       XTYPE_STRING,          value_transform_double_string);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_CHAR,            value_transform_int_int);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_UCHAR,           value_transform_int_u8);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_BOOLEAN,         value_transform_int_bool);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_INT,             value_transform_int_int);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_UINT,            value_transform_int_uint);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_LONG,            value_transform_int_long);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_ULONG,           value_transform_int_ulong);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_INT64,           value_transform_int_int64);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_UINT64,          value_transform_int_uint64);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_ENUM,            value_transform_int_long);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_FLAGS,           value_transform_int_ulong);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_FLOAT,           value_transform_int_float);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_DOUBLE,          value_transform_int_double);
+  g_value_register_transform_func (G_TYPE_CHAR,         G_TYPE_STRING,          value_transform_int_string);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_CHAR,            value_transform_uint_s8);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_UCHAR,           value_transform_uint_uint);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_BOOLEAN,         value_transform_uint_bool);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_INT,             value_transform_uint_int);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_UINT,            value_transform_uint_uint);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_LONG,            value_transform_uint_long);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_ULONG,           value_transform_uint_ulong);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_INT64,           value_transform_uint_int64);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_UINT64,          value_transform_uint_uint64);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_ENUM,            value_transform_uint_long);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_FLAGS,           value_transform_uint_ulong);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_FLOAT,           value_transform_uint_float);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_DOUBLE,          value_transform_uint_double);
+  g_value_register_transform_func (G_TYPE_UCHAR,        G_TYPE_STRING,          value_transform_uint_string);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_CHAR,            value_transform_int_s8);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_UCHAR,           value_transform_int_u8);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_BOOLEAN,         value_transform_int_int);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_INT,             value_transform_int_int);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_UINT,            value_transform_int_uint);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_LONG,            value_transform_int_long);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_ULONG,           value_transform_int_ulong);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_INT64,           value_transform_int_int64);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_UINT64,          value_transform_int_uint64);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_ENUM,            value_transform_int_long);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_FLAGS,           value_transform_int_ulong);
+  SKIP____register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_FLOAT,           value_transform_int_float);
+  SKIP____register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_DOUBLE,          value_transform_int_double);
+  g_value_register_transform_func (G_TYPE_BOOLEAN,      G_TYPE_STRING,          value_transform_bool_string);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_CHAR,            value_transform_int_s8);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_UCHAR,           value_transform_int_u8);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_BOOLEAN,         value_transform_int_bool);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_INT,             value_transform_int_int);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_UINT,            value_transform_int_uint);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_LONG,            value_transform_int_long);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_ULONG,           value_transform_int_ulong);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_INT64,           value_transform_int_int64);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_UINT64,          value_transform_int_uint64);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_ENUM,            value_transform_int_long);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_FLAGS,           value_transform_int_ulong);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_FLOAT,           value_transform_int_float);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_DOUBLE,          value_transform_int_double);
+  g_value_register_transform_func (G_TYPE_INT,          G_TYPE_STRING,          value_transform_int_string);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_CHAR,            value_transform_uint_s8);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_UCHAR,           value_transform_uint_u8);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_BOOLEAN,         value_transform_uint_bool);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_INT,             value_transform_uint_int);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_UINT,            value_transform_uint_uint);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_LONG,            value_transform_uint_long);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_ULONG,           value_transform_uint_ulong);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_INT64,           value_transform_uint_int64);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_UINT64,          value_transform_uint_uint64);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_ENUM,            value_transform_uint_long);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_FLAGS,           value_transform_uint_ulong);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_FLOAT,           value_transform_uint_float);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_DOUBLE,          value_transform_uint_double);
+  g_value_register_transform_func (G_TYPE_UINT,         G_TYPE_STRING,          value_transform_uint_string);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_CHAR,            value_transform_long_s8);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_UCHAR,           value_transform_long_u8);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_BOOLEAN,         value_transform_long_bool);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_INT,             value_transform_long_int);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_UINT,            value_transform_long_uint);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_LONG,            value_transform_long_long);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_ULONG,           value_transform_long_ulong);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_INT64,           value_transform_long_int64);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_UINT64,          value_transform_long_uint64);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_ENUM,            value_transform_long_long);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_FLAGS,           value_transform_long_ulong);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_FLOAT,           value_transform_long_float);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_DOUBLE,          value_transform_long_double);
+  g_value_register_transform_func (G_TYPE_LONG,         G_TYPE_STRING,          value_transform_long_string);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_CHAR,            value_transform_ulong_s8);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_UCHAR,           value_transform_ulong_u8);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_BOOLEAN,         value_transform_ulong_bool);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_INT,             value_transform_ulong_int);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_UINT,            value_transform_ulong_uint);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_LONG,            value_transform_ulong_long);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_ULONG,           value_transform_ulong_ulong);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_INT64,           value_transform_ulong_int64);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_UINT64,          value_transform_ulong_uint64);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_ENUM,            value_transform_ulong_long);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_FLAGS,           value_transform_ulong_ulong);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_FLOAT,           value_transform_ulong_float);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_DOUBLE,          value_transform_ulong_double);
+  g_value_register_transform_func (G_TYPE_ULONG,        G_TYPE_STRING,          value_transform_ulong_string);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_CHAR,            value_transform_int64_s8);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_UCHAR,           value_transform_int64_u8);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_BOOLEAN,         value_transform_int64_bool);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_INT,             value_transform_int64_int);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_UINT,            value_transform_int64_uint);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_LONG,            value_transform_int64_long);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_ULONG,           value_transform_int64_ulong);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_INT64,           value_transform_int64_int64);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_UINT64,          value_transform_int64_uint64);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_ENUM,            value_transform_int64_long);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_FLAGS,           value_transform_int64_ulong);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_FLOAT,           value_transform_int64_float);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_DOUBLE,          value_transform_int64_double);
+  g_value_register_transform_func (G_TYPE_INT64,        G_TYPE_STRING,          value_transform_int64_string);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_CHAR,            value_transform_uint64_s8);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_UCHAR,           value_transform_uint64_u8);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_BOOLEAN,         value_transform_uint64_bool);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_INT,             value_transform_uint64_int);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_UINT,            value_transform_uint64_uint);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_LONG,            value_transform_uint64_long);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_ULONG,           value_transform_uint64_ulong);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_INT64,           value_transform_uint64_int64);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_UINT64,          value_transform_uint64_uint64);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_ENUM,            value_transform_uint64_long);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_FLAGS,           value_transform_uint64_ulong);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_FLOAT,           value_transform_uint64_float);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_DOUBLE,          value_transform_uint64_double);
+  g_value_register_transform_func (G_TYPE_UINT64,       G_TYPE_STRING,          value_transform_uint64_string);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_CHAR,            value_transform_long_s8);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_UCHAR,           value_transform_long_u8);
+  SKIP____register_transform_func (G_TYPE_ENUM,         G_TYPE_BOOLEAN,         value_transform_long_bool);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_INT,             value_transform_long_int);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_UINT,            value_transform_long_uint);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_LONG,            value_transform_long_long);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_ULONG,           value_transform_long_ulong);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_INT64,           value_transform_long_int64);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_UINT64,          value_transform_long_uint64);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_ENUM,            value_transform_long_long);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_FLAGS,           value_transform_long_ulong);
+  SKIP____register_transform_func (G_TYPE_ENUM,         G_TYPE_FLOAT,           value_transform_long_float);
+  SKIP____register_transform_func (G_TYPE_ENUM,         G_TYPE_DOUBLE,          value_transform_long_double);
+  g_value_register_transform_func (G_TYPE_ENUM,         G_TYPE_STRING,          value_transform_enum_string);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_CHAR,            value_transform_ulong_s8);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_UCHAR,           value_transform_ulong_u8);
+  SKIP____register_transform_func (G_TYPE_FLAGS,        G_TYPE_BOOLEAN,         value_transform_ulong_bool);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_INT,             value_transform_ulong_int);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_UINT,            value_transform_ulong_uint);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_LONG,            value_transform_ulong_long);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_ULONG,           value_transform_ulong_ulong);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_INT64,           value_transform_ulong_int64);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_UINT64,          value_transform_ulong_uint64);
+  SKIP____register_transform_func (G_TYPE_FLAGS,        G_TYPE_ENUM,            value_transform_ulong_long);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_FLAGS,           value_transform_ulong_ulong);
+  SKIP____register_transform_func (G_TYPE_FLAGS,        G_TYPE_FLOAT,           value_transform_ulong_float);
+  SKIP____register_transform_func (G_TYPE_FLAGS,        G_TYPE_DOUBLE,          value_transform_ulong_double);
+  g_value_register_transform_func (G_TYPE_FLAGS,        G_TYPE_STRING,          value_transform_flags_string);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_CHAR,            value_transform_float_s8);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_UCHAR,           value_transform_float_u8);
+  SKIP____register_transform_func (G_TYPE_FLOAT,        G_TYPE_BOOLEAN,         value_transform_float_bool);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_INT,             value_transform_float_int);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_UINT,            value_transform_float_uint);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_LONG,            value_transform_float_long);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_ULONG,           value_transform_float_ulong);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_INT64,           value_transform_float_int64);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_UINT64,          value_transform_float_uint64);
+  SKIP____register_transform_func (G_TYPE_FLOAT,        G_TYPE_ENUM,            value_transform_float_long);
+  SKIP____register_transform_func (G_TYPE_FLOAT,        G_TYPE_FLAGS,           value_transform_float_ulong);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_FLOAT,           value_transform_float_float);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_DOUBLE,          value_transform_float_double);
+  g_value_register_transform_func (G_TYPE_FLOAT,        G_TYPE_STRING,          value_transform_float_string);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_CHAR,            value_transform_double_s8);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_UCHAR,           value_transform_double_u8);
+  SKIP____register_transform_func (G_TYPE_DOUBLE,       G_TYPE_BOOLEAN,         value_transform_double_bool);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_INT,             value_transform_double_int);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_UINT,            value_transform_double_uint);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_LONG,            value_transform_double_long);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_ULONG,           value_transform_double_ulong);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_INT64,           value_transform_double_int64);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_UINT64,          value_transform_double_uint64);
+  SKIP____register_transform_func (G_TYPE_DOUBLE,       G_TYPE_ENUM,            value_transform_double_long);
+  SKIP____register_transform_func (G_TYPE_DOUBLE,       G_TYPE_FLAGS,           value_transform_double_ulong);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_FLOAT,           value_transform_double_float);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_DOUBLE,          value_transform_double_double);
+  g_value_register_transform_func (G_TYPE_DOUBLE,       G_TYPE_STRING,          value_transform_double_string);
   /* string types */
-  xvalue_register_transform_func (XTYPE_STRING,       XTYPE_STRING,          value_transform_strinxstring);
+  g_value_register_transform_func (G_TYPE_STRING,       G_TYPE_STRING,          value_transform_string_string);
 }

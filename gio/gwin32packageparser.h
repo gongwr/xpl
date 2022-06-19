@@ -21,28 +21,28 @@
 
 #include <gio/gio.h>
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 
 typedef struct _GWin32PackageExtGroup GWin32PackageExtGroup;
 
 struct _GWin32PackageExtGroup
 {
-  xptr_array_t *verbs;
-  xptr_array_t *extensions;
+  GPtrArray *verbs;
+  GPtrArray *extensions;
 };
 
-typedef xboolean_t (*GWin32PackageParserCallback)(xpointer_t         user_data,
-                                                const xunichar2_t *full_package_name,
-                                                const xunichar2_t *package_name,
-                                                const xunichar2_t *app_user_model_id,
-                                                xboolean_t         show_in_applist,
-                                                xptr_array_t       *supported_extgroups,
-                                                xptr_array_t       *supported_protocols);
+typedef gboolean (*GWin32PackageParserCallback)(gpointer         user_data,
+                                                const gunichar2 *full_package_name,
+                                                const gunichar2 *package_name,
+                                                const gunichar2 *app_user_model_id,
+                                                gboolean         show_in_applist,
+                                                GPtrArray       *supported_extgroups,
+                                                GPtrArray       *supported_protocols);
 
-xboolean_t g_win32_package_parser_enum_packages (GWin32PackageParserCallback   callback,
-                                               xpointer_t                      user_data,
-                                               xerror_t                      **error);
+gboolean g_win32_package_parser_enum_packages (GWin32PackageParserCallback   callback,
+                                               gpointer                      user_data,
+                                               GError                      **error);
 
-#endif /* XPLATFORM_WIN32 */
+#endif /* G_PLATFORM_WIN32 */
 
 #endif /* __G_WIN32_PACKAGE_PARSER_H__ */

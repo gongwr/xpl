@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_CACHE_H__
 #define __G_CACHE_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,17 +33,17 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GCache          GCache XPL_DEPRECATED_TYPE_IN_2_26_FOR(xhashtable_t);
+typedef struct _GCache          GCache GLIB_DEPRECATED_TYPE_IN_2_26_FOR(GHashTable);
 
-typedef xpointer_t        (*GCacheNewFunc)        (xpointer_t       key) XPL_DEPRECATED_TYPE_IN_2_26;
-typedef xpointer_t        (*GCacheDupFunc)        (xpointer_t       value) XPL_DEPRECATED_TYPE_IN_2_26;
-typedef void            (*GCacheDestroyFunc)    (xpointer_t       value) XPL_DEPRECATED_TYPE_IN_2_26;
+typedef gpointer        (*GCacheNewFunc)        (gpointer       key) GLIB_DEPRECATED_TYPE_IN_2_26;
+typedef gpointer        (*GCacheDupFunc)        (gpointer       value) GLIB_DEPRECATED_TYPE_IN_2_26;
+typedef void            (*GCacheDestroyFunc)    (gpointer       value) GLIB_DEPRECATED_TYPE_IN_2_26;
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
 /* Caches
  */
-XPL_DEPRECATED
+GLIB_DEPRECATED
 GCache*  g_cache_new           (GCacheNewFunc      value_new_func,
                                 GCacheDestroyFunc  value_destroy_func,
                                 GCacheDupFunc      key_dup_func,
@@ -51,22 +51,22 @@ GCache*  g_cache_new           (GCacheNewFunc      value_new_func,
                                 GHashFunc          hash_key_func,
                                 GHashFunc          hash_value_func,
                                 GEqualFunc         key_equal_func);
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void     g_cache_destroy       (GCache            *cache);
-XPL_DEPRECATED
-xpointer_t g_cache_insert        (GCache            *cache,
-                                xpointer_t           key);
-XPL_DEPRECATED
+GLIB_DEPRECATED
+gpointer g_cache_insert        (GCache            *cache,
+                                gpointer           key);
+GLIB_DEPRECATED
 void     g_cache_remove        (GCache            *cache,
-                                xconstpointer      value);
-XPL_DEPRECATED
+                                gconstpointer      value);
+GLIB_DEPRECATED
 void     g_cache_key_foreach   (GCache            *cache,
                                 GHFunc             func,
-                                xpointer_t           user_data);
-XPL_DEPRECATED
+                                gpointer           user_data);
+GLIB_DEPRECATED
 void     g_cache_value_foreach (GCache            *cache,
                                 GHFunc             func,
-                                xpointer_t           user_data);
+                                gpointer           user_data);
 
 G_GNUC_END_IGNORE_DEPRECATIONS
 

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2008 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 #ifndef __G_HOST_UTILS_H__
 #define __G_HOST_UTILS_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -26,17 +26,17 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t  g_hostname_is_non_ascii     (const xchar_t *hostname);
-XPL_AVAILABLE_IN_ALL
-xboolean_t  g_hostname_is_ascii_encoded (const xchar_t *hostname);
-XPL_AVAILABLE_IN_ALL
-xboolean_t  g_hostname_is_ip_address    (const xchar_t *hostname);
+GLIB_AVAILABLE_IN_ALL
+gboolean  g_hostname_is_non_ascii     (const gchar *hostname);
+GLIB_AVAILABLE_IN_ALL
+gboolean  g_hostname_is_ascii_encoded (const gchar *hostname);
+GLIB_AVAILABLE_IN_ALL
+gboolean  g_hostname_is_ip_address    (const gchar *hostname);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t    *g_hostname_to_ascii         (const xchar_t *hostname);
-XPL_AVAILABLE_IN_ALL
-xchar_t    *g_hostname_to_unicode       (const xchar_t *hostname);
+GLIB_AVAILABLE_IN_ALL
+gchar    *g_hostname_to_ascii         (const gchar *hostname);
+GLIB_AVAILABLE_IN_ALL
+gchar    *g_hostname_to_unicode       (const gchar *hostname);
 
 G_END_DECLS
 

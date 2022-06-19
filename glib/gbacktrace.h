@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_BACKTRACE_H__
 #define __G_BACKTRACE_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -37,10 +37,10 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-void g_on_error_query (const xchar_t *prg_name);
-XPL_AVAILABLE_IN_ALL
-void g_on_error_stack_trace (const xchar_t *prg_name);
+GLIB_AVAILABLE_IN_ALL
+void g_on_error_query (const gchar *prg_name);
+GLIB_AVAILABLE_IN_ALL
+void g_on_error_stack_trace (const gchar *prg_name);
 
 /**
  * G_BREAKPOINT:

@@ -1,4 +1,4 @@
-/* test_t for NaN that does not need libm.
+/* Test for NaN that does not need libm.
    Copyright (C) 2008-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify

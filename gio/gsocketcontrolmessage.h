@@ -18,8 +18,8 @@
  * Authors: Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XSOCKET_CONTROL_MESSAGE_H__
-#define __XSOCKET_CONTROL_MESSAGE_H__
+#ifndef __G_SOCKET_CONTROL_MESSAGE_H__
+#define __G_SOCKET_CONTROL_MESSAGE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,48 +29,48 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_CONTROL_MESSAGE                       (xsocket_control_message_get_type ())
-#define XSOCKET_CONTROL_MESSAGE(inst)                      (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_CONTROL_MESSAGE,                          \
-                                                             xsocket_control_message))
-#define XSOCKET_CONTROL_MESSAGE_CLASS(class)               (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_CONTROL_MESSAGE,                          \
-                                                             xsocket_control_message_class_t))
-#define X_IS_SOCKET_CONTROL_MESSAGE(inst)                   (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET_CONTROL_MESSAGE))
-#define X_IS_SOCKET_CONTROL_MESSAGE_CLASS(class)            (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET_CONTROL_MESSAGE))
-#define XSOCKET_CONTROL_MESSAGE_GET_CLASS(inst)            (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_CONTROL_MESSAGE,                          \
-                                                             xsocket_control_message_class_t))
+#define G_TYPE_SOCKET_CONTROL_MESSAGE                       (g_socket_control_message_get_type ())
+#define G_SOCKET_CONTROL_MESSAGE(inst)                      (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET_CONTROL_MESSAGE,                          \
+                                                             GSocketControlMessage))
+#define G_SOCKET_CONTROL_MESSAGE_CLASS(class)               (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET_CONTROL_MESSAGE,                          \
+                                                             GSocketControlMessageClass))
+#define G_IS_SOCKET_CONTROL_MESSAGE(inst)                   (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET_CONTROL_MESSAGE))
+#define G_IS_SOCKET_CONTROL_MESSAGE_CLASS(class)            (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET_CONTROL_MESSAGE))
+#define G_SOCKET_CONTROL_MESSAGE_GET_CLASS(inst)            (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET_CONTROL_MESSAGE,                          \
+                                                             GSocketControlMessageClass))
 
-typedef struct _xsocket_control_message_private                xsocket_control_message_private_t;
-typedef struct _xsocket_control_message_class                  xsocket_control_message_class_t;
+typedef struct _GSocketControlMessagePrivate                GSocketControlMessagePrivate;
+typedef struct _GSocketControlMessageClass                  GSocketControlMessageClass;
 
 /**
- * xsocket_control_message_class_t:
+ * GSocketControlMessageClass:
  * @get_size: gets the size of the message.
  * @get_level: gets the protocol of the message.
  * @get_type: gets the protocol specific type of the message.
  * @serialize: Writes out the message data.
  * @deserialize: Tries to deserialize a message.
  *
- * Class structure for #xsocket_control_message_t.
+ * Class structure for #GSocketControlMessage.
  **/
 
-struct _xsocket_control_message_class
+struct _GSocketControlMessageClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xsize_t                  (* get_size)  (xsocket_control_message_t  *message);
-  int                    (* get_level) (xsocket_control_message_t  *message);
-  int                    (* get_type)  (xsocket_control_message_t  *message);
-  void                   (* serialize) (xsocket_control_message_t  *message,
-					xpointer_t                data);
-  xsocket_control_message_t *(* deserialize) (int                   level,
+  gsize                  (* get_size)  (GSocketControlMessage  *message);
+  int                    (* get_level) (GSocketControlMessage  *message);
+  int                    (* get_type)  (GSocketControlMessage  *message);
+  void                   (* serialize) (GSocketControlMessage  *message,
+					gpointer                data);
+  GSocketControlMessage *(* deserialize) (int                   level,
 					  int                   type,
-					  xsize_t                 size,
-					  xpointer_t              data);
+					  gsize                 size,
+					  gpointer              data);
 
   /*< private >*/
 
@@ -84,28 +84,28 @@ struct _xsocket_control_message_class
 
 struct _GSocketControlMessage
 {
-  xobject_t parent_instance;
-  xsocket_control_message_private_t *priv;
+  GObject parent_instance;
+  GSocketControlMessagePrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                  xsocket_control_message_get_type     (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xsize_t                  xsocket_control_message_get_size     (xsocket_control_message_t *message);
-XPL_AVAILABLE_IN_ALL
-int                    xsocket_control_message_get_level    (xsocket_control_message_t *message);
-XPL_AVAILABLE_IN_ALL
-int                    xsocket_control_message_get_msg_type (xsocket_control_message_t *message);
-XPL_AVAILABLE_IN_ALL
-void                   xsocket_control_message_serialize    (xsocket_control_message_t *message,
-							      xpointer_t               data);
-XPL_AVAILABLE_IN_ALL
-xsocket_control_message_t *xsocket_control_message_deserialize  (int                    level,
+GLIB_AVAILABLE_IN_ALL
+GType                  g_socket_control_message_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+gsize                  g_socket_control_message_get_size     (GSocketControlMessage *message);
+GLIB_AVAILABLE_IN_ALL
+int                    g_socket_control_message_get_level    (GSocketControlMessage *message);
+GLIB_AVAILABLE_IN_ALL
+int                    g_socket_control_message_get_msg_type (GSocketControlMessage *message);
+GLIB_AVAILABLE_IN_ALL
+void                   g_socket_control_message_serialize    (GSocketControlMessage *message,
+							      gpointer               data);
+GLIB_AVAILABLE_IN_ALL
+GSocketControlMessage *g_socket_control_message_deserialize  (int                    level,
 							      int                    type,
-							      xsize_t                  size,
-							      xpointer_t               data);
+							      gsize                  size,
+							      gpointer               data);
 
 
 G_END_DECLS
 
-#endif /* __XSOCKET_CONTROL_MESSAGE_H__ */
+#endif /* __G_SOCKET_CONTROL_MESSAGE_H__ */

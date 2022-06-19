@@ -18,10 +18,10 @@
 #include <glib.h>
 
 static int
-int_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
+int_compare_data (gconstpointer p1, gconstpointer p2, gpointer data)
 {
-  const xint_t *i1 = p1;
-  const xint_t *i2 = p2;
+  const gint *i1 = p1;
+  const gint *i2 = p2;
 
   return *i1 - *i2;
 }
@@ -29,8 +29,8 @@ int_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
 static void
 test_sort_basic (void)
 {
-  xint_t *data;
-  xint_t i;
+  gint *data;
+  gint i;
 
   data = g_malloc (10000 * sizeof (int));
   for (i = 0; i < 10000; i++)
@@ -49,8 +49,8 @@ test_sort_basic (void)
 static void
 test_sort_zero_elements (void)
 {
-  xint_t *data, *data_copy;
-  xsize_t i;
+  gint *data, *data_copy;
+  gsize i;
 
   data = g_malloc (100 * sizeof (int));
   data_copy = g_malloc (100 * sizeof (int));
@@ -82,7 +82,7 @@ typedef struct {
 } BigItem;
 
 static int
-item_compare_data (xconstpointer p1, xconstpointer p2, xpointer_t data)
+item_compare_data (gconstpointer p1, gconstpointer p2, gpointer data)
 {
   const SortItem *i1 = p1;
   const SortItem *i2 = p2;
@@ -94,7 +94,7 @@ static void
 test_sort_stable (void)
 {
   SortItem *data;
-  xint_t i;
+  gint i;
 
   data = g_malloc (10000 * sizeof (SortItem));
   for (i = 0; i < 10000; i++)
@@ -118,7 +118,7 @@ static void
 test_sort_big (void)
 {
   BigItem *data;
-  xint_t i;
+  gint i;
 
   data = g_malloc (10000 * sizeof (BigItem));
   for (i = 0; i < 10000; i++)

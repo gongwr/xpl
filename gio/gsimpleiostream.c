@@ -29,38 +29,38 @@
  * SECTION:gsimpleiostream
  * @short_description: A wrapper around an input and an output stream.
  * @include: gio/gio.h
- * @see_also: #xio_stream_t
+ * @see_also: #GIOStream
  *
- * xsimple_io_stream_t creates a #xio_stream_t from an arbitrary #xinput_stream_t and
- * #xoutput_stream_t. This allows any pair of input and output streams to be used
- * with #xio_stream_t methods.
+ * GSimpleIOStream creates a #GIOStream from an arbitrary #GInputStream and
+ * #GOutputStream. This allows any pair of input and output streams to be used
+ * with #GIOStream methods.
  *
- * This is useful when you obtained a #xinput_stream_t and a #xoutput_stream_t
+ * This is useful when you obtained a #GInputStream and a #GOutputStream
  * by other means, for instance creating them with platform specific methods as
  * g_unix_input_stream_new() or g_win32_input_stream_new(), and you want
- * to take advantage of the methods provided by #xio_stream_t.
+ * to take advantage of the methods provided by #GIOStream.
  *
  * Since: 2.44
  */
 
 /**
- * xsimple_io_stream_t:
+ * GSimpleIOStream:
  *
- * A wrapper around a #xinput_stream_t and a #xoutput_stream_t.
+ * A wrapper around a #GInputStream and a #GOutputStream.
  *
  * Since: 2.44
  */
 struct _GSimpleIOStream
 {
-  xio_stream_t parent;
+  GIOStream parent;
 
-  xinput_stream_t *input_stream;
-  xoutput_stream_t *output_stream;
+  GInputStream *input_stream;
+  GOutputStream *output_stream;
 };
 
 struct _GSimpleIOStreamClass
 {
-  xio_stream_class_t parent;
+  GIOStreamClass parent;
 };
 
 typedef struct _GSimpleIOStreamClass GSimpleIOStreamClass;
@@ -72,38 +72,38 @@ enum
   PROP_OUTPUT_STREAM
 };
 
-XDEFINE_TYPE (xsimple_io_stream, g_simple_io_stream, XTYPE_IO_STREAM)
+G_DEFINE_TYPE (GSimpleIOStream, g_simple_io_stream, G_TYPE_IO_STREAM)
 
 static void
-g_simple_io_stream_finalize (xobject_t *object)
+g_simple_io_stream_finalize (GObject *object)
 {
-  xsimple_io_stream_t *stream = G_SIMPLE_IO_STREAM (object);
+  GSimpleIOStream *stream = G_SIMPLE_IO_STREAM (object);
 
   if (stream->input_stream)
-    xobject_unref (stream->input_stream);
+    g_object_unref (stream->input_stream);
 
   if (stream->output_stream)
-    xobject_unref (stream->output_stream);
+    g_object_unref (stream->output_stream);
 
-  XOBJECT_CLASS (g_simple_io_stream_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_simple_io_stream_parent_class)->finalize (object);
 }
 
 static void
-g_simple_io_stream_set_property (xobject_t      *object,
-                                 xuint_t         prop_id,
-                                 const xvalue_t *value,
-                                 xparam_spec_t   *pspec)
+g_simple_io_stream_set_property (GObject      *object,
+                                 guint         prop_id,
+                                 const GValue *value,
+                                 GParamSpec   *pspec)
 {
-  xsimple_io_stream_t *stream = G_SIMPLE_IO_STREAM (object);
+  GSimpleIOStream *stream = G_SIMPLE_IO_STREAM (object);
 
   switch (prop_id)
     {
     case PROP_INPUT_STREAM:
-      stream->input_stream = xvalue_dup_object (value);
+      stream->input_stream = g_value_dup_object (value);
       break;
 
     case PROP_OUTPUT_STREAM:
-      stream->output_stream = xvalue_dup_object (value);
+      stream->output_stream = g_value_dup_object (value);
       break;
 
     default:
@@ -113,21 +113,21 @@ g_simple_io_stream_set_property (xobject_t      *object,
 }
 
 static void
-g_simple_io_stream_get_property (xobject_t    *object,
-                                 xuint_t       prop_id,
-                                 xvalue_t     *value,
-                                 xparam_spec_t *pspec)
+g_simple_io_stream_get_property (GObject    *object,
+                                 guint       prop_id,
+                                 GValue     *value,
+                                 GParamSpec *pspec)
 {
-  xsimple_io_stream_t *stream = G_SIMPLE_IO_STREAM (object);
+  GSimpleIOStream *stream = G_SIMPLE_IO_STREAM (object);
 
   switch (prop_id)
     {
     case PROP_INPUT_STREAM:
-      xvalue_set_object (value, stream->input_stream);
+      g_value_set_object (value, stream->input_stream);
       break;
 
     case PROP_OUTPUT_STREAM:
-      xvalue_set_object (value, stream->output_stream);
+      g_value_set_object (value, stream->output_stream);
       break;
 
     default:
@@ -136,18 +136,18 @@ g_simple_io_stream_get_property (xobject_t    *object,
     }
 }
 
-static xinput_stream_t *
-g_simple_io_stream_get_input_stream (xio_stream_t *stream)
+static GInputStream *
+g_simple_io_stream_get_input_stream (GIOStream *stream)
 {
-  xsimple_io_stream_t *simple_stream = G_SIMPLE_IO_STREAM (stream);
+  GSimpleIOStream *simple_stream = G_SIMPLE_IO_STREAM (stream);
 
   return simple_stream->input_stream;
 }
 
-static xoutput_stream_t *
-g_simple_io_stream_get_output_stream (xio_stream_t *stream)
+static GOutputStream *
+g_simple_io_stream_get_output_stream (GIOStream *stream)
 {
-  xsimple_io_stream_t *simple_stream = G_SIMPLE_IO_STREAM (stream);
+  GSimpleIOStream *simple_stream = G_SIMPLE_IO_STREAM (stream);
 
   return simple_stream->output_stream;
 }
@@ -155,67 +155,67 @@ g_simple_io_stream_get_output_stream (xio_stream_t *stream)
 static void
 g_simple_io_stream_class_init (GSimpleIOStreamClass *class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
-  xio_stream_class_t *io_class = XIO_STREAM_CLASS (class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
+  GIOStreamClass *io_class = G_IO_STREAM_CLASS (class);
 
-  xobject_class->finalize = g_simple_io_stream_finalize;
-  xobject_class->get_property = g_simple_io_stream_get_property;
-  xobject_class->set_property = g_simple_io_stream_set_property;
+  gobject_class->finalize = g_simple_io_stream_finalize;
+  gobject_class->get_property = g_simple_io_stream_get_property;
+  gobject_class->set_property = g_simple_io_stream_set_property;
 
   io_class->get_input_stream = g_simple_io_stream_get_input_stream;
   io_class->get_output_stream = g_simple_io_stream_get_output_stream;
 
   /**
-   * xsimple_io_stream_t:input-stream:
+   * GSimpleIOStream:input-stream:
    *
    * Since: 2.44
    */
-  xobject_class_install_property (xobject_class, PROP_INPUT_STREAM,
-                                   xparam_spec_object ("input-stream",
+  g_object_class_install_property (gobject_class, PROP_INPUT_STREAM,
+                                   g_param_spec_object ("input-stream",
                                                         P_("Input stream"),
-                                                        P_("The xinput_stream_t to read from"),
-                                                        XTYPE_INPUT_STREAM,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_STATIC_STRINGS |
-                                                        XPARAM_CONSTRUCT_ONLY));
+                                                        P_("The GInputStream to read from"),
+                                                        G_TYPE_INPUT_STREAM,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS |
+                                                        G_PARAM_CONSTRUCT_ONLY));
 
   /**
-   * xsimple_io_stream_t:output-stream:
+   * GSimpleIOStream:output-stream:
    *
    * Since: 2.44
    */
-  xobject_class_install_property (xobject_class, PROP_OUTPUT_STREAM,
-                                   xparam_spec_object ("output-stream",
+  g_object_class_install_property (gobject_class, PROP_OUTPUT_STREAM,
+                                   g_param_spec_object ("output-stream",
                                                         P_("Output stream"),
-                                                        P_("The xoutput_stream_t to write to"),
-                                                        XTYPE_OUTPUT_STREAM,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_STATIC_STRINGS |
-                                                        XPARAM_CONSTRUCT_ONLY));
+                                                        P_("The GOutputStream to write to"),
+                                                        G_TYPE_OUTPUT_STREAM,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS |
+                                                        G_PARAM_CONSTRUCT_ONLY));
 }
 
 static void
-g_simple_io_stream_init (xsimple_io_stream_t *stream)
+g_simple_io_stream_init (GSimpleIOStream *stream)
 {
 }
 
 /**
  * g_simple_io_stream_new:
- * @input_stream: a #xinput_stream_t.
- * @output_stream: a #xoutput_stream_t.
+ * @input_stream: a #GInputStream.
+ * @output_stream: a #GOutputStream.
  *
- * Creates a new #xsimple_io_stream_t wrapping @input_stream and @output_stream.
- * See also #xio_stream_t.
+ * Creates a new #GSimpleIOStream wrapping @input_stream and @output_stream.
+ * See also #GIOStream.
  *
- * Returns: a new #xsimple_io_stream_t instance.
+ * Returns: a new #GSimpleIOStream instance.
  *
  * Since: 2.44
  */
-xio_stream_t *
-g_simple_io_stream_new (xinput_stream_t  *input_stream,
-                        xoutput_stream_t *output_stream)
+GIOStream *
+g_simple_io_stream_new (GInputStream  *input_stream,
+                        GOutputStream *output_stream)
 {
-  return xobject_new (XTYPE_SIMPLE_IO_STREAM,
+  return g_object_new (G_TYPE_SIMPLE_IO_STREAM,
                        "input-stream", input_stream,
                        "output-stream", output_stream,
                        NULL);

@@ -29,34 +29,34 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DATA_OUTPUT_STREAM         (xdata_output_stream_get_type ())
-#define G_DATA_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DATA_OUTPUT_STREAM, xdata_output_stream_t))
-#define G_DATA_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DATA_OUTPUT_STREAM, xdata_output_stream_class_t))
-#define X_IS_DATA_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DATA_OUTPUT_STREAM))
-#define X_IS_DATA_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DATA_OUTPUT_STREAM))
-#define G_DATA_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DATA_OUTPUT_STREAM, xdata_output_stream_class_t))
+#define G_TYPE_DATA_OUTPUT_STREAM         (g_data_output_stream_get_type ())
+#define G_DATA_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DATA_OUTPUT_STREAM, GDataOutputStream))
+#define G_DATA_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_DATA_OUTPUT_STREAM, GDataOutputStreamClass))
+#define G_IS_DATA_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DATA_OUTPUT_STREAM))
+#define G_IS_DATA_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_DATA_OUTPUT_STREAM))
+#define G_DATA_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_DATA_OUTPUT_STREAM, GDataOutputStreamClass))
 
 /**
- * xdata_output_stream_t:
+ * GDataOutputStream:
  *
- * An implementation of #xbuffered_output_stream_t that allows for high-level
+ * An implementation of #GBufferedOutputStream that allows for high-level
  * data manipulation of arbitrary data (including binary operations).
  **/
-typedef struct _GDataOutputStream         xdata_output_stream_t;
-typedef struct _xdata_output_stream_class    xdata_output_stream_class_t;
-typedef struct _xdata_output_stream_private  xdata_output_stream_private_t;
+typedef struct _GDataOutputStream         GDataOutputStream;
+typedef struct _GDataOutputStreamClass    GDataOutputStreamClass;
+typedef struct _GDataOutputStreamPrivate  GDataOutputStreamPrivate;
 
 struct _GDataOutputStream
 {
-  xfilter_output_stream_t parent_instance;
+  GFilterOutputStream parent_instance;
 
   /*< private >*/
-  xdata_output_stream_private_t *priv;
+  GDataOutputStreamPrivate *priv;
 };
 
-struct _xdata_output_stream_class
+struct _GDataOutputStreamClass
 {
-  xfilter_output_stream_class_t parent_class;
+  GFilterOutputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -68,57 +68,57 @@ struct _xdata_output_stream_class
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                xdata_output_stream_get_type       (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xdata_output_stream_t *  xdata_output_stream_new            (xoutput_stream_t         *base_stream);
+GLIB_AVAILABLE_IN_ALL
+GType                g_data_output_stream_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GDataOutputStream *  g_data_output_stream_new            (GOutputStream         *base_stream);
 
-XPL_AVAILABLE_IN_ALL
-void                 xdata_output_stream_set_byte_order (xdata_output_stream_t     *stream,
-							  xdata_stream_byte_order_t   order);
-XPL_AVAILABLE_IN_ALL
-xdata_stream_byte_order_t xdata_output_stream_get_byte_order (xdata_output_stream_t     *stream);
+GLIB_AVAILABLE_IN_ALL
+void                 g_data_output_stream_set_byte_order (GDataOutputStream     *stream,
+							  GDataStreamByteOrder   order);
+GLIB_AVAILABLE_IN_ALL
+GDataStreamByteOrder g_data_output_stream_get_byte_order (GDataOutputStream     *stream);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_byte       (xdata_output_stream_t     *stream,
-							  xuchar_t                 data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_int16      (xdata_output_stream_t     *stream,
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_byte       (GDataOutputStream     *stream,
+							  guchar                 data,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_int16      (GDataOutputStream     *stream,
 							  gint16                 data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_uint16     (xdata_output_stream_t     *stream,
-							  xuint16_t                data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_int32      (xdata_output_stream_t     *stream,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_uint16     (GDataOutputStream     *stream,
+							  guint16                data,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_int32      (GDataOutputStream     *stream,
 							  gint32                 data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_uint32     (xdata_output_stream_t     *stream,
-							  xuint32_t                data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_int64      (xdata_output_stream_t     *stream,
-							  sint64_t                 data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_uint64     (xdata_output_stream_t     *stream,
-							  xuint64_t                data,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xdata_output_stream_put_string     (xdata_output_stream_t     *stream,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_uint32     (GDataOutputStream     *stream,
+							  guint32                data,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_int64      (GDataOutputStream     *stream,
+							  gint64                 data,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_uint64     (GDataOutputStream     *stream,
+							  guint64                data,
+							  GCancellable          *cancellable,
+							  GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_data_output_stream_put_string     (GDataOutputStream     *stream,
 							  const char            *str,
-							  xcancellable_t          *cancellable,
-							  xerror_t               **error);
+							  GCancellable          *cancellable,
+							  GError               **error);
 
 G_END_DECLS
 

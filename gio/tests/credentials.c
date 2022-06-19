@@ -30,19 +30,19 @@
 static void
 test_basic (void)
 {
-  xcredentials_t *creds = xcredentials_new ();
-  xchar_t *stringified;
+  GCredentials *creds = g_credentials_new ();
+  gchar *stringified;
   DWORD *pid;
 
-  stringified = xcredentials_to_string (creds);
+  stringified = g_credentials_to_string (creds);
   g_test_message ("%s", stringified);
   g_free (stringified);
 
-  pid = xcredentials_get_native (creds,
+  pid = g_credentials_get_native (creds,
                                   G_CREDENTIALS_TYPE_WIN32_PID);
   g_assert_cmpuint (*pid, ==, GetCurrentProcessId ());
 
-  xobject_unref (creds);
+  g_object_unref (creds);
 }
 
 #else
@@ -50,22 +50,22 @@ test_basic (void)
 static void
 test_basic (void)
 {
-  xcredentials_t *creds = xcredentials_new ();
-  xcredentials_t *other = xcredentials_new ();
-  xpointer_t bad_native_creds;
+  GCredentials *creds = g_credentials_new ();
+  GCredentials *other = g_credentials_new ();
+  gpointer bad_native_creds;
 #if G_CREDENTIALS_SUPPORTED
-  xerror_t *error = NULL;
-  xboolean_t set;
+  GError *error = NULL;
+  gboolean set;
   pid_t not_me;
-  xchar_t *stringified;
+  gchar *stringified;
 #endif
 
   /* You can always get a credentials object, but it might not work. */
-  xassert (creds != NULL);
-  xassert (other != NULL);
+  g_assert (creds != NULL);
+  g_assert (other != NULL);
 
 #if G_CREDENTIALS_SUPPORTED
-  xassert (xcredentials_is_same_user (creds, other, &error));
+  g_assert (g_credentials_is_same_user (creds, other, &error));
   g_assert_no_error (error);
 
   if (geteuid () == 0)
@@ -73,49 +73,49 @@ test_basic (void)
   else
     not_me = 0;
 
-  g_assert_cmpuint (xcredentials_get_unix_user (creds, &error), ==,
+  g_assert_cmpuint (g_credentials_get_unix_user (creds, &error), ==,
       geteuid ());
   g_assert_no_error (error);
 
 #if G_CREDENTIALS_HAS_PID
-  g_assert_cmpint (xcredentials_get_unix_pid (creds, &error), ==,
+  g_assert_cmpint (g_credentials_get_unix_pid (creds, &error), ==,
       getpid ());
   g_assert_no_error (error);
 #else
-  g_assert_cmpint (xcredentials_get_unix_pid (creds, &error), ==, -1);
+  g_assert_cmpint (g_credentials_get_unix_pid (creds, &error), ==, -1);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 #endif
 
-  set = xcredentials_set_unix_user (other, not_me, &error);
+  set = g_credentials_set_unix_user (other, not_me, &error);
 #if G_CREDENTIALS_SPOOFING_SUPPORTED
   g_assert_no_error (error);
-  xassert (set);
+  g_assert (set);
 
-  g_assert_cmpuint (xcredentials_get_unix_user (other, &error), ==, not_me);
-  xassert (!xcredentials_is_same_user (creds, other, &error));
+  g_assert_cmpuint (g_credentials_get_unix_user (other, &error), ==, not_me);
+  g_assert (!g_credentials_is_same_user (creds, other, &error));
   g_assert_no_error (error);
 #else
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED);
-  xassert (!set);
+  g_assert (!set);
   g_clear_error (&error);
 
-  g_assert_cmpuint (xcredentials_get_unix_user (other, &error), ==, geteuid ());
-  xassert (xcredentials_is_same_user (creds, other, &error));
+  g_assert_cmpuint (g_credentials_get_unix_user (other, &error), ==, geteuid ());
+  g_assert (g_credentials_is_same_user (creds, other, &error));
   g_assert_no_error (error);
 #endif
 
-  stringified = xcredentials_to_string (creds);
+  stringified = g_credentials_to_string (creds);
   g_test_message ("%s", stringified);
   g_free (stringified);
 
-  stringified = xcredentials_to_string (other);
+  stringified = g_credentials_to_string (other);
   g_test_message ("%s", stringified);
   g_free (stringified);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
         {
-          struct ucred *native = xcredentials_get_native (creds,
+          struct ucred *native = g_credentials_get_native (creds,
               G_CREDENTIALS_TYPE_LINUX_UCRED);
 
           g_assert_cmpuint (native->uid, ==, geteuid ());
@@ -123,7 +123,7 @@ test_basic (void)
         }
 #elif G_CREDENTIALS_USE_APPLE_XUCRED
         {
-          struct xucred *native = xcredentials_get_native (creds,
+          struct xucred *native = g_credentials_get_native (creds,
               G_CREDENTIALS_TYPE_APPLE_XUCRED);
 
           g_assert_cmpuint (native->cr_version, ==, XUCRED_VERSION);
@@ -131,7 +131,7 @@ test_basic (void)
         }
 #elif G_CREDENTIALS_USE_FREEBSD_CMSGCRED
         {
-          struct cmsgcred *native = xcredentials_get_native (creds,
+          struct cmsgcred *native = g_credentials_get_native (creds,
               G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED);
 
           g_assert_cmpuint (native->cmcred_euid, ==, geteuid ());
@@ -139,7 +139,7 @@ test_basic (void)
         }
 #elif G_CREDENTIALS_USE_NETBSD_UNPCBID
         {
-          struct unpcbid *native = xcredentials_get_native (creds,
+          struct unpcbid *native = g_credentials_get_native (creds,
               G_CREDENTIALS_TYPE_NETBSD_UNPCBID);
 
           g_assert_cmpuint (native->unp_euid, ==, geteuid ());
@@ -147,7 +147,7 @@ test_basic (void)
         }
 #elif G_CREDENTIALS_USE_OPENBSD_SOCKPEERCRED
         {
-          struct sockpeercred *native = xcredentials_get_native (creds,
+          struct sockpeercred *native = g_credentials_get_native (creds,
               G_CREDENTIALS_TYPE_OPENBSD_SOCKPEERCRED);
 
           g_assert_cmpuint (native->uid, ==, geteuid ());
@@ -155,7 +155,7 @@ test_basic (void)
         }
 #elif G_CREDENTIALS_USE_SOLARIS_UCRED
         {
-          ucred_t *native = xcredentials_get_native (creds,
+          ucred_t *native = g_credentials_get_native (creds,
               G_CREDENTIALS_TYPE_SOLARIS_UCRED);
 
           g_assert_cmpuint (ucred_geteuid (native), ==, geteuid ());
@@ -168,19 +168,19 @@ test_basic (void)
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
-                         "*xcredentials_get_native: Trying to get*"
+                         "*g_credentials_get_native: Trying to get*"
                          "G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED "
                          "but only G_CREDENTIALS_TYPE_LINUX_UCRED*"
                          "supported*");
-  bad_native_creds = xcredentials_get_native (creds, G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED);
+  bad_native_creds = g_credentials_get_native (creds, G_CREDENTIALS_TYPE_FREEBSD_CMSGCRED);
   g_test_assert_expected_messages ();
   g_assert_null (bad_native_creds);
 #else
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
-                         "*xcredentials_get_native: Trying to get*"
+                         "*g_credentials_get_native: Trying to get*"
                          "G_CREDENTIALS_TYPE_LINUX_UCRED "
                          "but only G_CREDENTIALS_TYPE_*supported*");
-  bad_native_creds = xcredentials_get_native (creds, G_CREDENTIALS_TYPE_LINUX_UCRED);
+  bad_native_creds = g_credentials_get_native (creds, G_CREDENTIALS_TYPE_LINUX_UCRED);
   g_test_assert_expected_messages ();
   g_assert_null (bad_native_creds);
 #endif
@@ -188,15 +188,15 @@ test_basic (void)
 #else /* ! G_CREDENTIALS_SUPPORTED */
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
-                         "*xcredentials_get_native: Trying to get "
+                         "*g_credentials_get_native: Trying to get "
                          "credentials *but*no support*");
-  bad_native_creds = xcredentials_get_native (creds, G_CREDENTIALS_TYPE_LINUX_UCRED);
+  bad_native_creds = g_credentials_get_native (creds, G_CREDENTIALS_TYPE_LINUX_UCRED);
   g_test_assert_expected_messages ();
   g_assert_null (bad_native_creds);
 #endif
 
-  xobject_unref (creds);
-  xobject_unref (other);
+  g_object_unref (creds);
+  g_object_unref (other);
 }
 
 #endif /* !G_OS_WIN32 */

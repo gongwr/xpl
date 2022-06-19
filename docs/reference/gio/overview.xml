@@ -10,7 +10,7 @@
     useful APIs for desktop applications (such as networking and
     D-Bus support). The goal is to overcome the shortcomings of GnomeVFS
     and provide an API that is so good that developers prefer it over raw
-    POSIX calls. Among other things that means using xobject_t. It also means
+    POSIX calls. Among other things that means using GObject. It also means
     not cloning the POSIX API, but providing higher-level, document-centric
     interfaces.
   </para>
@@ -20,27 +20,27 @@
     interfaces and base classes for I/O and files:
     <variablelist>
        <varlistentry>
-         <term>xfile_t</term>
+         <term>GFile</term>
          <listitem><para>reference to a file</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xfile_info_t</term>
+         <term>GFileInfo</term>
          <listitem><para>information about a file or filesystem</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xfile_enumerator_t</term>
+         <term>GFileEnumerator</term>
          <listitem><para>list files in directories</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xdrive_t</term>
+         <term>GDrive</term>
          <listitem><para>represents a drive</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xvolume_t</term>
+         <term>GVolume</term>
          <listitem><para>represents a file system in an abstract way</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xmount_t</term>
+         <term>GMount</term>
          <listitem><para>represents a mounted file system</para></listitem>
        </varlistentry>
     </variablelist>
@@ -48,19 +48,19 @@
     output stream hierarchies that can be found in frameworks like Java:
     <variablelist>
        <varlistentry>
-         <term>xinput_stream_t</term>
+         <term>GInputStream</term>
          <listitem><para>read data</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xoutput_stream_t</term>
+         <term>GOutputStream</term>
          <listitem><para>write data</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xio_stream_t</term>
+         <term>GIOStream</term>
          <listitem><para>read and write data</para></listitem>
        </varlistentry>
        <varlistentry>
-         <term>xseekable__t</term>
+         <term>GSeekable</term>
          <listitem><para>interface optionally implemented by streams to support seeking</para></listitem>
        </varlistentry>
     </variablelist>
@@ -68,18 +68,18 @@
     of files they handle:
     <variablelist>
        <varlistentry>
-          <term>xapp_info_t</term>
+          <term>GAppInfo</term>
           <listitem><para>information about an installed application</para></listitem>
        </varlistentry>
        <varlistentry>
-          <term>xicon_t</term>
+          <term>GIcon</term>
           <listitem><para>abstract type for file and application icons</para></listitem>
        </varlistentry>
     </variablelist>
     There is a framework for storing and retrieving application settings:
     <variablelist>
        <varlistentry>
-          <term>xsettings_t</term>
+          <term>GSettings</term>
           <listitem><para>stores and retrieves application settings</para></listitem>
        </varlistentry>
     </variablelist>
@@ -88,27 +88,27 @@
     helper classes:
     <variablelist>
        <varlistentry>
-          <term>xsocket_t</term>
+          <term>GSocket</term>
           <listitem><para>lowlevel platform independent socket object</para></listitem>
        </varlistentry>
        <varlistentry>
-          <term>xresolver_t</term>
+          <term>GResolver</term>
           <listitem><para>asynchronous and cancellable DNS resolver</para></listitem>
        </varlistentry>
        <varlistentry>
-          <term>xsocket_client_t</term>
+          <term>GSocketClient</term>
           <listitem><para>high-level network client helper</para></listitem>
        </varlistentry>
        <varlistentry>
-          <term>xsocket_service_t</term>
+          <term>GSocketService</term>
           <listitem><para>high-level network server helper</para></listitem>
        </varlistentry>
        <varlistentry>
-          <term>xsocket_connection_t</term>
+          <term>GSocketConnection</term>
           <listitem><para>network connection stream</para></listitem>
        </varlistentry>
        <varlistentry>
-          <term>xnetwork_monitor_t</term>
+          <term>GNetworkMonitor</term>
           <listitem><para>network connectivity monitoring</para></listitem>
        </varlistentry>
     </variablelist>
@@ -117,22 +117,22 @@
     and making objects available on the bus:
     <variablelist>
        <varlistentry>
-          <term>xdbus_connection_t</term>
+          <term>GDBusConnection</term>
           <listitem><para>a D-Bus connection</para></listitem>
        </varlistentry>
 
        <varlistentry>
-          <term>xdbus_method_invocation_t</term>
+          <term>GDBusMethodInvocation</term>
           <listitem><para>for handling remote calls</para></listitem>
        </varlistentry>
 
        <varlistentry>
-          <term>xdbus_server_t</term>
+          <term>GDBusServer</term>
           <listitem><para>helper for accepting connections</para></listitem>
        </varlistentry>
 
        <varlistentry>
-          <term>xdbus_proxy_t</term>
+          <term>GDBusProxy</term>
           <listitem><para>proxy to access D-Bus interfaces on a remote object</para></listitem>
        </varlistentry>
 
@@ -223,8 +223,8 @@
       <code>_finish</code> function should be called to retrieve the return
       value of the I/O operation, and any errors which occurred. For more
       information on using and implementing asynchronous functions, see
-      <link linkend="xasync_result_t.description"><type>xasync_result_t</type></link>
-      and <link linkend="xtask_t.description"><type>xtask_t</type></link>.
+      <link linkend="GAsyncResult.description"><type>GAsyncResult</type></link>
+      and <link linkend="GTask.description"><type>GTask</type></link>.
     </para>
 
     <para>
@@ -301,8 +301,8 @@ for a list of all environment variables affecting GIO. In particular,
 <envar>PATH</envar> (used to locate binaries), <envar>GIO_EXTRA_MODULES</envar> (used to locate loadable modules) and <envar>DBUS_{SYSTEM,SESSION}_BUS_ADDRESS</envar> (used to locate the D-Bus system and session bus) are important.
 </para></listitem>
 <listitem><para>
-Don't use xvfs_t, by setting <envar>GIO_USE_VFS=local</envar> in the environment.
-The reason to avoid xvfs_t in security-sensitive programs is that it uses
+Don't use GVfs, by setting <envar>GIO_USE_VFS=local</envar> in the environment.
+The reason to avoid GVfs in security-sensitive programs is that it uses
 many libraries which have not necessarily been audited for security problems.
 Gvfs is also heavily distributed and relies on a session bus to be present.
 </para></listitem>
@@ -328,7 +328,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
     <para>
       If you are using GIO on UNIX-like systems, you may want to use
       UNIX-specific GIO interfaces such as #GUnixInputStream,
-      #GUnixOutputStream, #GUnixMount or #xdesktop_app_info_t.
+      #GUnixOutputStream, #GUnixMount or #GDesktopAppInfo.
       To do so, use the <filename>gio-unix-2.0.pc</filename> file
       instead of <filename>gio-2.0.pc</filename>
     </para>
@@ -365,12 +365,12 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title><envar>GIO_USE_VFS</envar></title>
 
       <para>
-        This environment variable can be set to the name of a #xvfs_t
+        This environment variable can be set to the name of a #GVfs
         implementation to override the default for debugging purposes.
-        The #xvfs_t implementation for local files that is included in GIO
+        The #GVfs implementation for local files that is included in GIO
         has the name "local", the implementation in the gvfs module has
         the name "gvfs".  Most commonly, system software will set this to "local"
-        to avoid having `xfile_t` APIs perform unnecessary D-Bus calls.
+        to avoid having `GFile` APIs perform unnecessary D-Bus calls.
       </para><para>
         The special value <literal>help</literal> can be used to print a list of
         available implementations to standard output.
@@ -387,12 +387,12 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title><envar>GIO_USE_FILE_MONITOR</envar></title>
 
       <para>
-        This variable can be set to the name of a #xfile_monitor_t
+        This variable can be set to the name of a #GFileMonitor
         implementation to override the default for debugging purposes.
-        The #xfile_monitor_t implementation for local files that is included
-        in GIO on Linux has the name "inotify", others that are built
+        The #GFileMonitor implementation for local files that is included
+        in GIO on Linux has the name <literal>inotify</literal>, others that are built
         are built as modules (depending on the platform) are called
-        "fam" and "fen".
+        <literal>fam</literal> and <literal>fen</literal>.
       </para><para>
         The special value <literal>help</literal> can be used to print a list of
         available implementations to standard output.
@@ -403,9 +403,9 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title><envar>GIO_USE_VOLUME_MONITOR</envar></title>
 
       <para>
-        This variable can be set to the name of a #xvolume_monitor_t
+        This variable can be set to the name of a #GVolumeMonitor
         implementation to override the default for debugging purposes.
-        The #xvolume_monitor_t implementation for local files that is included
+        The #GVolumeMonitor implementation for local files that is included
         in GIO has the name "unix", the udisks2-based implementation in the
         gvfs module has the name "udisks2".
       </para><para>
@@ -418,9 +418,9 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title><envar>GIO_USE_TLS</envar></title>
 
       <para>
-        This variable can be set to the name of a #xtls_backend_t
+        This variable can be set to the name of a #GTlsBackend
         implementation to override the default for debugging purposes.
-        GIO does not include a #xtls_backend_t implementation, the gnutls-based
+        GIO does not include a #GTlsBackend implementation, the gnutls-based
         implementation in the glib-networking module has the name "gnutls".
       </para><para>
         The special value <literal>help</literal> can be used to print a list of
@@ -458,7 +458,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title><envar>GSETTINGS_BACKEND</envar></title>
 
       <para>
-        This variable can be set to the name of a #xsettings_backend_t
+        This variable can be set to the name of a #GSettingsBackend
         implementation to override the default for debugging purposes.
         The memory-based implementation that is included in GIO has
         the name "memory", the one in dconf has the name "dconf".
@@ -472,7 +472,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title><envar>GSETTINGS_SCHEMA_DIR</envar></title>
 
       <para>
-        This variable can be set to the names of directories to consider when looking for compiled schemas for #xsettings_t,
+        This variable can be set to the names of directories to consider when looking for compiled schemas for #GSettings,
         in addition to the <filename>glib-2.0/schemas</filename>
         subdirectories of the XDG system data dirs. To specify multiple directories, use <constant>G_SEARCHPATH_SEPARATOR_S</constant> as a separator.
       </para>
@@ -536,7 +536,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
            </varlistentry>
            <varlistentry>
              <term>call</term>
-             <listitem><para>Trace xdbus_connection_call() and xdbus_connection_call_sync() API usage</para></listitem>
+             <listitem><para>Trace g_dbus_connection_call() and g_dbus_connection_call_sync() API usage</para></listitem>
            </varlistentry>
            <varlistentry>
              <term>signal</term>
@@ -548,11 +548,11 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
            </varlistentry>
            <varlistentry>
              <term>return</term>
-             <listitem><para>Show when a reply is returned via the #xdbus_method_invocation_t API</para></listitem>
+             <listitem><para>Show when a reply is returned via the #GDBusMethodInvocation API</para></listitem>
            </varlistentry>
            <varlistentry>
              <term>emission</term>
-             <listitem><para>Trace xdbus_connection_emit_signal() API usage</para></listitem>
+             <listitem><para>Trace g_dbus_connection_emit_signal() API usage</para></listitem>
            </varlistentry>
            <varlistentry>
              <term>authentication</term>
@@ -600,22 +600,22 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
     <para>
       A lot of the functionality that is accessible through GIO
       is implemented in loadable modules, and modules provide a convenient
-      way to extend GIO. In addition to the #xio_module_t API which supports
+      way to extend GIO. In addition to the #GIOModule API which supports
       writing such modules, GIO has a mechanism to define extension points,
-      and register implementations thereof, see #xio_extension_point_t.
+      and register implementations thereof, see #GIOExtensionPoint.
     </para>
     <para>
       The following extension points are currently defined by GIO:
     </para>
 
     <formalpara>
-       <title>XVFS_EXTENSION_POINT_NAME</title>
+       <title>G_VFS_EXTENSION_POINT_NAME</title>
 
        <para>
-          Allows to override the functionality of the #xvfs_t class.
-          Implementations of this extension point must be derived from #xvfs_t.
+          Allows to override the functionality of the #GVfs class.
+          Implementations of this extension point must be derived from #GVfs.
           GIO uses the implementation with the highest priority that is active,
-          see xvfs_is_active().
+          see g_vfs_is_active().
        </para>
        <para>
           GIO implements this extension point for local files, gvfs contains
@@ -629,10 +629,10 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <para>
          Allows to add more volume monitors.
          Implementations of this extension point must be derived from
-         #xvolume_monitor_t. GIO uses all registered extensions.
+         #GVolumeMonitor. GIO uses all registered extensions.
       </para>
       <para>
-        gvfs contains an implementation that works together with the #xvfs_t
+        gvfs contains an implementation that works together with the #GVfs
         implementation in gvfs.
       </para>
    </formalpara>
@@ -643,7 +643,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <para>
          Allows to override the 'native' volume monitor.
          Implementations of this extension point must be derived from
-         #xnative_volume_monitor_t. GIO uses the implementation with
+         #GNativeVolumeMonitor. GIO uses the implementation with
          the highest priority that is supported, as determined by the
          is_supported() vfunc in #GVolumeMonitorClass.
       </para>
@@ -659,29 +659,13 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <para>
         Allows to override the file monitor implementation for
         local files. Implementations of this extension point must
-        be derived from #xlocal_file_monitor_t. GIO uses the implementation
+        be derived from #GLocalFileMonitor. GIO uses the implementation
         with the highest priority that is supported, as determined by the
-        is_supported() vfunc in #xlocal_file_monitor_class_t.
+        is_supported() vfunc in #GLocalFileMonitorClass.
       </para>
       <para>
         GIO uses this extension point internally, to switch between
         its fam-based and inotify-based file monitoring implementations.
-      </para>
-   </formalpara>
-
-   <formalpara>
-      <title>G_LOCAL_DIRECTORY_MONITOR_EXTENSION_POINT_NAME</title>
-
-      <para>
-        Allows to override the directory monitor implementation for
-        local files. Implementations of this extension point must be
-        derived from #GLocalDirectoryMonitor. GIO uses the implementation
-        with the highest priority that is supported, as determined by the
-        is_supported() vfunc in #GLocalDirectoryMonitorClass.
-      </para>
-      <para>
-        GIO uses this extension point internally, to switch between
-        its fam-based and inotify-based directory monitoring implementations.
       </para>
    </formalpara>
 
@@ -706,9 +690,9 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
       <title>G_SETTINGS_BACKEND_EXTENSION_POINT_NAME</title>
 
       <para>
-        Allows to provide an alternative storage for #xsettings_t.
+        Allows to provide an alternative storage for #GSettings.
         Implementations of this extension point must derive from the
-        #xsettings_backend_t type. GIO contains a keyfile-based
+        #GSettingsBackend type. GIO contains a keyfile-based
         implementation of this extension point, another one is provided
         by dconf.
       </para>
@@ -720,7 +704,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
      <para>
        Allows to provide implementations for network proxying.
        Implementations of this extension point must provide the
-       #xproxy_t interface, and must be named after the network
+       #GProxy interface, and must be named after the network
        protocol they are proxying.
      </para>
      <para>
@@ -734,7 +718,7 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
      <para>
        Allows to provide implementations for TLS support.
        Implementations of this extension point must implement
-       the #xtls_backend_t interface.
+       the #GTlsBackend interface.
      </para>
      <para>
        glib-networking contains an implementation of this extension
@@ -758,3 +742,4 @@ Gvfs is also heavily distributed and relies on a session bus to be present.
    </formalpara>
   </chapter>
 </part>
+

@@ -32,8 +32,8 @@
 static void
 test_retval_and_trunc (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   res = g_snprintf (buf, 0, "abc");
   g_assert_cmpint (res, ==, 3);
@@ -46,35 +46,35 @@ test_retval_and_trunc (void)
 
   res = g_snprintf (buf, 1, "abc");
   g_assert_cmpint (res, ==, 3);
-  xassert (buf[0] == '\0');
+  g_assert (buf[0] == '\0');
   g_assert_cmpstr (buf, ==, "");
 
   res = g_snprintf (buf, 2, "abc");
   g_assert_cmpint (res, ==, 3);
-  xassert (buf[1] == '\0');
+  g_assert (buf[1] == '\0');
   g_assert_cmpstr (buf, ==, "a");
 
   res = g_snprintf (buf, 3, "abc");
   g_assert_cmpint (res, ==, 3);
-  xassert (buf[2] == '\0');
+  g_assert (buf[2] == '\0');
   g_assert_cmpstr (buf, ==, "ab");
 
   res = g_snprintf (buf, 4, "abc");
   g_assert_cmpint (res, ==, 3);
-  xassert (buf[3] == '\0');
+  g_assert (buf[3] == '\0');
   g_assert_cmpstr (buf, ==, "abc");
 
   res = g_snprintf (buf, 5, "abc");
   g_assert_cmpint (res, ==, 3);
-  xassert (buf[3] == '\0');
+  g_assert (buf[3] == '\0');
   g_assert_cmpstr (buf, ==, "abc");
 }
 
 static void
 test_d (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %d basic formatting */
 
@@ -124,7 +124,7 @@ test_d (void)
   g_assert_cmpint (res, ==, 2);
   g_assert_cmpstr (buf, ==, "-5");
 
-  res = g_snprintf (buf, 128, "%" G_GUINT16_FORMAT, (xuint16_t)5);
+  res = g_snprintf (buf, 128, "%" G_GUINT16_FORMAT, (guint16)5);
   g_assert_cmpint (res, ==, 1);
   g_assert_cmpstr (buf, ==, "5");
 
@@ -132,23 +132,23 @@ test_d (void)
   g_assert_cmpint (res, ==, 2);
   g_assert_cmpstr (buf, ==, "-5");
 
-  res = g_snprintf (buf, 128, "%" G_GUINT32_FORMAT, (xuint32_t)5);
+  res = g_snprintf (buf, 128, "%" G_GUINT32_FORMAT, (guint32)5);
   g_assert_cmpint (res, ==, 1);
   g_assert_cmpstr (buf, ==, "5");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (sint64_t)-5);
+  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (gint64)-5);
   g_assert_cmpint (res, ==, 2);
   g_assert_cmpstr (buf, ==, "-5");
 
-  res = g_snprintf (buf, 128, "%" G_GUINT64_FORMAT, (xuint64_t)5);
+  res = g_snprintf (buf, 128, "%" G_GUINT64_FORMAT, (guint64)5);
   g_assert_cmpint (res, ==, 1);
   g_assert_cmpstr (buf, ==, "5");
 
-  res = g_snprintf (buf, 128, "%" G_GSSIZE_FORMAT, (xssize_t)-5);
+  res = g_snprintf (buf, 128, "%" G_GSSIZE_FORMAT, (gssize)-5);
   g_assert_cmpint (res, ==, 2);
   g_assert_cmpstr (buf, ==, "-5");
 
-  res = g_snprintf (buf, 128, "%" G_GSIZE_FORMAT, (xsize_t)5);
+  res = g_snprintf (buf, 128, "%" G_GSIZE_FORMAT, (gsize)5);
   g_assert_cmpint (res, ==, 1);
   g_assert_cmpstr (buf, ==, "5");
 
@@ -199,9 +199,9 @@ test_d (void)
 static void
 test_d_invalid (void)
 {
-  const xchar_t *fmt;
-  xchar_t buf[128];
-  xint_t res;
+  const gchar *fmt;
+  gchar buf[128];
+  gint res;
 
   fmt = "% +d";
   res = g_snprintf (buf, 128, fmt, 5);
@@ -218,8 +218,8 @@ test_d_invalid (void)
 static void
 test_o (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %o basic formatting */
 
@@ -259,8 +259,8 @@ test_o (void)
 static void
 test_u (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %u, basic formatting */
 
@@ -292,8 +292,8 @@ test_u (void)
 static void
 test_x (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %x, basic formatting */
 
@@ -351,8 +351,8 @@ test_x (void)
 static void
 test_X (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %X, basic formatting */
 
@@ -410,18 +410,18 @@ test_X (void)
 static void
 test_f (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %f, basic formatting */
 
   res = g_snprintf (buf, 128, "%f", G_PI);
   g_assert_cmpint (res, ==, 8);
-  xassert (0 == strncmp (buf, "3.14159", 7));
+  g_assert (0 == strncmp (buf, "3.14159", 7));
 
   res = g_snprintf (buf, 128, "%.8f", G_PI);
   g_assert_cmpint (res, ==, 10);
-  xassert (0 == strncmp (buf, "3.1415926", 9));
+  g_assert (0 == strncmp (buf, "3.1415926", 9));
 
   res = g_snprintf (buf, 128, "%.0f", G_PI);
   g_assert_cmpint (res, ==, 1);
@@ -439,11 +439,11 @@ test_f (void)
 
   res = g_snprintf (buf, 128, "%+f", G_PI);
   g_assert_cmpint (res, ==, 9);
-  xassert (0 == strncmp (buf, "+3.14159", 8));
+  g_assert (0 == strncmp (buf, "+3.14159", 8));
 
   res = g_snprintf (buf, 128, "% f", G_PI);
   g_assert_cmpint (res, ==, 9);
-  xassert (0 == strncmp (buf, " 3.14159", 8));
+  g_assert (0 == strncmp (buf, " 3.14159", 8));
 
   res = g_snprintf (buf, 128, "%#.0f", G_PI);
   g_assert_cmpint (res, ==, 2);
@@ -454,11 +454,11 @@ test_f (void)
   g_assert_cmpstr (buf, ==, "03.14");
 }
 
-static xboolean_t
-same_value (const xchar_t *actual,
-            const xchar_t *expected)
+static gboolean
+same_value (const gchar *actual, 
+            const gchar *expected)
 {
-  xdouble_t actual_value, expected_value;
+  gdouble actual_value, expected_value;
 
   actual_value = g_ascii_strtod (actual, NULL);
   expected_value = g_ascii_strtod (expected, NULL);
@@ -469,12 +469,12 @@ same_value (const xchar_t *actual,
 static void
 test_e (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   /* %e, basic formatting */
   /* for %e we can't expect to reproduce exact strings and lengths, since SUS
-   * only guarantees that the exponent shall always contain at least two
+   * only guarantees that the exponent shall always contain at least two 
    * digits. On Windows, it seems to be at least three digits long.
    * Therefore, we compare the results of parsing the expected result and the
    * actual result.
@@ -482,52 +482,52 @@ test_e (void)
 
   res = g_snprintf (buf, 128, "%e", G_PI);
   g_assert_cmpint (res, >=, 12);
-  xassert (same_value (buf, "3.141593e+00"));
+  g_assert (same_value (buf, "3.141593e+00"));
 
   res = g_snprintf (buf, 128, "%.8e", G_PI);
   g_assert_cmpint (res, >=, 14);
-  xassert (same_value (buf, "3.14159265e+00"));
+  g_assert (same_value (buf, "3.14159265e+00"));
 
   res = g_snprintf (buf, 128, "%.0e", G_PI);
   g_assert_cmpint (res, >=, 5);
-  xassert (same_value (buf, "3e+00"));
+  g_assert (same_value (buf, "3e+00"));
 
   res = g_snprintf (buf, 128, "%.1e", 0.0);
   g_assert_cmpint (res, >=, 7);
-  xassert (same_value (buf, "0.0e+00"));
+  g_assert (same_value (buf, "0.0e+00"));
 
   res = g_snprintf (buf, 128, "%.1e", 0.00001);
   g_assert_cmpint (res, >=, 7);
-  xassert (same_value (buf, "1.0e-05"));
+  g_assert (same_value (buf, "1.0e-05"));
 
   res = g_snprintf (buf, 128, "%.1e", 10000.0);
   g_assert_cmpint (res, >=, 7);
-  xassert (same_value (buf, "1.0e+04"));
+  g_assert (same_value (buf, "1.0e+04"));
 
   /* %e, flags */
 
   res = g_snprintf (buf, 128, "%+e", G_PI);
   g_assert_cmpint (res, >=, 13);
-  xassert (same_value (buf, "+3.141593e+00"));
+  g_assert (same_value (buf, "+3.141593e+00"));
 
   res = g_snprintf (buf, 128, "% e", G_PI);
   g_assert_cmpint (res, >=, 13);
-  xassert (same_value (buf, " 3.141593e+00"));
+  g_assert (same_value (buf, " 3.141593e+00"));
 
   res = g_snprintf (buf, 128, "%#.0e", G_PI);
   g_assert_cmpint (res, >=, 6);
-  xassert (same_value (buf, "3.e+00"));
+  g_assert (same_value (buf, "3.e+00"));
 
   res = g_snprintf (buf, 128, "%09.2e", G_PI);
   g_assert_cmpint (res, >=, 9);
-  xassert (same_value (buf, "03.14e+00"));
+  g_assert (same_value (buf, "03.14e+00"));
 }
 
 static void
 test_c (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   res = g_snprintf (buf, 128, "%c", 'a');
   g_assert_cmpint (res, ==, 1);
@@ -537,8 +537,8 @@ test_c (void)
 static void
 test_s (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   res = g_snprintf (buf, 128, "%.2s", "abc");
   g_assert_cmpint (res, ==, 2);
@@ -576,10 +576,10 @@ test_s (void)
 static void
 test_n (void)
 {
-  xchar_t buf[128];
-  xint_t res;
-  xint_t i;
-  xlong_t l;
+  gchar buf[128];
+  gint res;
+  gint i;
+  glong l;
 
   res = g_snprintf (buf, 128, "abc%n", &i);
   g_assert_cmpint (res, ==, 3);
@@ -595,8 +595,8 @@ test_n (void)
 static void
 test_percent (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   res = g_snprintf (buf, 128, "%%");
   g_assert_cmpint (res, ==, 1);
@@ -606,8 +606,8 @@ test_percent (void)
 static void
 test_positional_params (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   res = g_snprintf (buf, 128, "%2$c %1$c", 'b', 'a');
   g_assert_cmpint (res, ==, 3);
@@ -627,7 +627,7 @@ test_positional_params2 (void)
 {
   if (g_test_subprocess ())
     {
-      xint_t res;
+      gint res;
 
       res = g_printf ("%2$c %1$c\n", 'b', 'a');
       g_assert_cmpint (res, ==, 4);
@@ -647,8 +647,8 @@ test_positional_params2 (void)
 static void
 test_positional_params3 (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
   res = g_sprintf (buf, "%2$c %1$c", 'b', 'a');
   g_assert_cmpint (res, ==, 3);
@@ -668,7 +668,7 @@ test_percent2 (void)
 {
   if (g_test_subprocess ())
     {
-      xint_t res;
+      gint res;
 
       res = g_printf ("%%");
       g_assert_cmpint (res, ==, 1);
@@ -682,38 +682,38 @@ test_percent2 (void)
 static void
 test_64bit (void)
 {
-  xchar_t buf[128];
-  xint_t res;
+  gchar buf[128];
+  gint res;
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (gint64)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (sint64_t)-123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_FORMAT, (gint64)-123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "-123456");
 
-  res = g_snprintf (buf, 128, "%" G_GUINT64_FORMAT, (xuint64_t)123456);
+  res = g_snprintf (buf, 128, "%" G_GUINT64_FORMAT, (guint64)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "o", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "o", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "361100");
 
-  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "o", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "o", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0361100");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "x", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "x", (gint64)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1e240");
 
-  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "x", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%#" G_GINT64_MODIFIER "x", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0x1e240");
 
-  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "X", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" G_GINT64_MODIFIER "X", (gint64)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1E240");
 
@@ -734,35 +734,35 @@ _Pragma ("GCC diagnostic ignored \"-Wformat\"")
 _Pragma ("GCC diagnostic ignored \"-Wformat-extra-args\"")
 #endif
 
-  res = g_snprintf (buf, 128, "%" "lli", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" "lli", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" "lli", (sint64_t)-123456);
+  res = g_snprintf (buf, 128, "%" "lli", (gint64)-123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "-123456");
 
-  res = g_snprintf (buf, 128, "%" "llu", (xuint64_t)123456);
+  res = g_snprintf (buf, 128, "%" "llu", (guint64)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "123456");
 
-  res = g_snprintf (buf, 128, "%" "ll" "o", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" "ll" "o", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
   g_assert_cmpstr (buf, ==, "361100");
 
-  res = g_snprintf (buf, 128, "%#" "ll" "o", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%#" "ll" "o", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0361100");
 
-  res = g_snprintf (buf, 128, "%" "ll" "x", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" "ll" "x", (gint64)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1e240");
 
-  res = g_snprintf (buf, 128, "%#" "ll" "x", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%#" "ll" "x", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
   g_assert_cmpstr (buf, ==, "0x1e240");
 
-  res = g_snprintf (buf, 128, "%" "ll" "X", (sint64_t)123456);
+  res = g_snprintf (buf, 128, "%" "ll" "X", (gint64)123456);
   g_assert_cmpint (res, ==, 5);
   g_assert_cmpstr (buf, ==, "1E240");
 
@@ -776,30 +776,30 @@ _Pragma ("GCC diagnostic pop")
 static void
 test_64bit2_base (void)
 {
-  xint_t res;
+  gint res;
 
-  res = g_printf ("%" G_GINT64_FORMAT "\n", (sint64_t)123456);
+  res = g_printf ("%" G_GINT64_FORMAT "\n", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" G_GINT64_FORMAT "\n", (sint64_t)-123456);
+  res = g_printf ("%" G_GINT64_FORMAT "\n", (gint64)-123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" G_GUINT64_FORMAT "\n", (xuint64_t)123456);
+  res = g_printf ("%" G_GUINT64_FORMAT "\n", (guint64)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" G_GINT64_MODIFIER "o\n", (sint64_t)123456);
+  res = g_printf ("%" G_GINT64_MODIFIER "o\n", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%#" G_GINT64_MODIFIER "o\n", (sint64_t)123456);
+  res = g_printf ("%#" G_GINT64_MODIFIER "o\n", (gint64)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" G_GINT64_MODIFIER "x\n", (sint64_t)123456);
+  res = g_printf ("%" G_GINT64_MODIFIER "x\n", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
 
-  res = g_printf ("%#" G_GINT64_MODIFIER "x\n", (sint64_t)123456);
+  res = g_printf ("%#" G_GINT64_MODIFIER "x\n", (gint64)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" G_GINT64_MODIFIER "X\n", (sint64_t)123456);
+  res = g_printf ("%" G_GINT64_MODIFIER "X\n", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
 }
 
@@ -807,7 +807,7 @@ test_64bit2_base (void)
 static void
 test_64bit2_win32 (void)
 {
-  xint_t res;
+  gint res;
 
   /* On Win32, test that the "ll" modifier also works, for backward
    * compatibility. One really should use the G_GINT64_MODIFIER (which
@@ -825,28 +825,28 @@ _Pragma ("GCC diagnostic ignored \"-Wformat\"")
 _Pragma ("GCC diagnostic ignored \"-Wformat-extra-args\"")
 #endif
 
-  res = g_printf ("%" "lli\n", (sint64_t)123456);
+  res = g_printf ("%" "lli\n", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" "lli\n", (sint64_t)-123456);
+  res = g_printf ("%" "lli\n", (gint64)-123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" "llu\n", (xuint64_t)123456);
+  res = g_printf ("%" "llu\n", (guint64)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%" "ll" "o\n", (sint64_t)123456);
+  res = g_printf ("%" "ll" "o\n", (gint64)123456);
   g_assert_cmpint (res, ==, 7);
 
-  res = g_printf ("%#" "ll" "o\n", (sint64_t)123456);
+  res = g_printf ("%#" "ll" "o\n", (gint64)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" "ll" "x\n", (sint64_t)123456);
+  res = g_printf ("%" "ll" "x\n", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
 
-  res = g_printf ("%#" "ll" "x\n", (sint64_t)123456);
+  res = g_printf ("%#" "ll" "x\n", (gint64)123456);
   g_assert_cmpint (res, ==, 8);
 
-  res = g_printf ("%" "ll" "X\n", (sint64_t)123456);
+  res = g_printf ("%" "ll" "X\n", (gint64)123456);
   g_assert_cmpint (res, ==, 6);
 
 #if G_GNUC_CHECK_VERSION(4, 6)
@@ -873,11 +873,11 @@ test_64bit2 (void)
 }
 
 G_GNUC_PRINTF(1, 2)
-static xsize_t
-upper_bound (const xchar_t *format, ...)
+static gsize
+upper_bound (const gchar *format, ...)
 {
   va_list args;
-  xsize_t res;
+  gsize res;
 
   va_start (args, format);
   res = g_printf_string_upper_bound (format, args);
@@ -889,25 +889,25 @@ upper_bound (const xchar_t *format, ...)
 static void
 test_upper_bound (void)
 {
-  xsize_t res;
+  gsize res;
 
   res = upper_bound ("bla %s %d: %g\n", "bla", 123, 0.123);
   g_assert_cmpint (res, ==, 20);
 }
 
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
-static xint_t test_vasprintf_va (xchar_t       **string,
-                               const xchar_t  *format,
+static gint test_vasprintf_va (gchar       **string,
+                               const gchar  *format,
                                ...) G_GNUC_PRINTF (2, 3);
 
 /* Wrapper around g_vasprintf() which takes varargs */
-static xint_t
-test_vasprintf_va (xchar_t       **string,
-                   const xchar_t  *format,
+static gint
+test_vasprintf_va (gchar       **string,
+                   const gchar  *format,
                    ...)
 {
   va_list args;
-  xint_t len;
+  gint len;
 
   va_start (args, format);
   len = g_vasprintf (string, format, args);
@@ -921,11 +921,11 @@ static void
 test_vasprintf_invalid_format_placeholder (void)
 {
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
-  xint_t len = 0;
-  xchar_t *buf = "some non-null string";
+  gint len = 0;
+  gchar *buf = "some non-null string";
 #endif
 
-  g_test_summary ("test_t error handling for invalid format placeholder in g_vasprintf()");
+  g_test_summary ("Test error handling for invalid format placeholder in g_vasprintf()");
 
 #if !defined(__APPLE__) && !defined(__FreeBSD__)
 #pragma GCC diagnostic push

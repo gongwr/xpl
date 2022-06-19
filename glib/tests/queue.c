@@ -8,22 +8,22 @@
 
 
 static void
-check_integrity (xqueue_t *queue)
+check_integrity (GQueue *queue)
 {
-  xlist_t *list;
-  xlist_t *last;
-  xlist_t *links;
-  xlist_t *link;
-  xuint_t n;
+  GList *list;
+  GList *last;
+  GList *links;
+  GList *link;
+  guint n;
 
-  xassert (queue->length < 4000000000u);
+  g_assert (queue->length < 4000000000u);
 
-  xassert (g_queue_get_length (queue) == queue->length);
+  g_assert (g_queue_get_length (queue) == queue->length);
 
   if (!queue->head)
-    xassert (!queue->tail);
+    g_assert (!queue->tail);
   if (!queue->tail)
-    xassert (!queue->head);
+    g_assert (!queue->head);
 
   n = 0;
   last = NULL;
@@ -33,8 +33,8 @@ check_integrity (xqueue_t *queue)
         last = list;
       ++n;
     }
-  xassert (n == queue->length);
-  xassert (last == queue->tail);
+  g_assert (n == queue->length);
+  g_assert (last == queue->tail);
 
   n = 0;
   last = NULL;
@@ -44,74 +44,74 @@ check_integrity (xqueue_t *queue)
         last = list;
       ++n;
     }
-  xassert (n == queue->length);
-  xassert (last == queue->head);
+  g_assert (n == queue->length);
+  g_assert (last == queue->head);
 
   links = NULL;
   for (list = queue->head; list != NULL; list = list->next)
-    links = xlist_prepend (links, list);
+    links = g_list_prepend (links, list);
 
   link = links;
   for (list = queue->tail; list != NULL; list = list->prev)
     {
-      xassert (list == link->data);
+      g_assert (list == link->data);
       link = link->next;
     }
-  xlist_free (links);
+  g_list_free (links);
 
   links = NULL;
   for (list = queue->tail; list != NULL; list = list->prev)
-    links = xlist_prepend (links, list);
+    links = g_list_prepend (links, list);
 
   link = links;
   for (list = queue->head; list != NULL; list = list->next)
     {
-      xassert (list == link->data);
+      g_assert (list == link->data);
       link = link->next;
     }
-  xlist_free (links);
+  g_list_free (links);
 }
 
-static xboolean_t
+static gboolean
 rnd_bool (void)
 {
   return g_random_int_range (0, 2);
 }
 
 static void
-check_max (xpointer_t elm, xpointer_t user_data)
+check_max (gpointer elm, gpointer user_data)
 {
-  xint_t *best = user_data;
-  xint_t element = GPOINTER_TO_INT (elm);
+  gint *best = user_data;
+  gint element = GPOINTER_TO_INT (elm);
 
   if (element > *best)
     *best = element;
 }
 
 static void
-check_min (xpointer_t elm, xpointer_t user_data)
+check_min (gpointer elm, gpointer user_data)
 {
-  xint_t *best = user_data;
-  xint_t element = GPOINTER_TO_INT (elm);
+  gint *best = user_data;
+  gint element = GPOINTER_TO_INT (elm);
 
   if (element < *best)
     *best = element;
 }
 
-static xint_t
-find_min (xqueue_t *queue)
+static gint
+find_min (GQueue *queue)
 {
-  xint_t min = G_MAXINT;
+  gint min = G_MAXINT;
 
   g_queue_foreach (queue, check_min, &min);
 
   return min;
 }
 
-static xint_t
-find_max (xqueue_t *queue)
+static gint
+find_max (GQueue *queue)
 {
-  xint_t max = G_MININT;
+  gint max = G_MININT;
 
   g_queue_foreach (queue, check_max, &max);
 
@@ -119,20 +119,20 @@ find_max (xqueue_t *queue)
 }
 
 static void
-delete_elm (xpointer_t elm, xpointer_t user_data)
+delete_elm (gpointer elm, gpointer user_data)
 {
-  g_queue_remove ((xqueue_t *)user_data, elm);
-  check_integrity ((xqueue_t *)user_data);
+  g_queue_remove ((GQueue *)user_data, elm);
+  check_integrity ((GQueue *)user_data);
 }
 
 static void
-delete_all (xqueue_t *queue)
+delete_all (GQueue *queue)
 {
   g_queue_foreach (queue, delete_elm, queue);
 }
 
 static int
-compare_int (xconstpointer a, xconstpointer b, xpointer_t data)
+compare_int (gconstpointer a, gconstpointer b, gpointer data)
 {
   int ai = GPOINTER_TO_INT (a);
   int bi = GPOINTER_TO_INT (b);
@@ -145,8 +145,8 @@ compare_int (xconstpointer a, xconstpointer b, xpointer_t data)
     return -1;
 }
 
-static xint_t
-get_random_position (xqueue_t *queue, xboolean_t allow_offlist)
+static gint
+get_random_position (GQueue *queue, gboolean allow_offlist)
 {
   int n;
   enum { OFF_QUEUE, HEAD, TAIL, MIDDLE, LAST } where;
@@ -191,9 +191,9 @@ get_random_position (xqueue_t *queue, xboolean_t allow_offlist)
 }
 
 static void
-random_test (xconstpointer d)
+random_test (gconstpointer d)
 {
-  xuint32_t seed = GPOINTER_TO_UINT (d);
+  guint32 seed = GPOINTER_TO_UINT (d);
 
   typedef enum {
     IS_EMPTY, GET_LENGTH, REVERSE, COPY,
@@ -215,13 +215,13 @@ random_test (xconstpointer d)
   typedef struct QueueInfo QueueInfo;
   struct QueueInfo
   {
-    xqueue_t *queue;
-    xlist_t *tail;
-    xlist_t *head;
-    xuint_t length;
+    GQueue *queue;
+    GList *tail;
+    GList *head;
+    guint length;
   };
 
-  xint_t i;
+  gint i;
   QueueOp op;
   QueueInfo queues[N_QUEUES];
 
@@ -239,12 +239,12 @@ random_test (xconstpointer d)
     {
       int j;
       QueueInfo *qinf = RANDOM_QUEUE();
-      xqueue_t *q = qinf->queue;
+      GQueue *q = qinf->queue;
       op = g_random_int_range (IS_EMPTY, LAST_OP);
 
-      xassert (qinf->head == q->head);
-      xassert (qinf->tail == q->tail);
-      xassert (qinf->length == q->length);
+      g_assert (qinf->head == q->head);
+      g_assert (qinf->tail == q->tail);
+      g_assert (qinf->length == q->length);
 
       switch (op)
         {
@@ -252,45 +252,45 @@ random_test (xconstpointer d)
           {
             if (g_queue_is_empty (qinf->queue))
               {
-                xassert (q->head == NULL);
-                xassert (q->tail == NULL);
-                xassert (q->length == 0);
+                g_assert (q->head == NULL);
+                g_assert (q->tail == NULL);
+                g_assert (q->length == 0);
               }
             else
               {
-                xassert (q->head);
-                xassert (q->tail);
-                xassert (q->length > 0);
+                g_assert (q->head);
+                g_assert (q->tail);
+                g_assert (q->length > 0);
               }
           }
           break;
         case GET_LENGTH:
           {
-            xuint_t l;
+            guint l;
 
             l = g_queue_get_length (q);
 
-            xassert (qinf->length == q->length);
-            xassert (qinf->length == l);
+            g_assert (qinf->length == q->length);
+            g_assert (qinf->length == l);
           }
           break;
         case REVERSE:
           g_queue_reverse (q);
-          xassert (qinf->tail == q->head);
-          xassert (qinf->head == q->tail);
-          xassert (qinf->length == q->length);
+          g_assert (qinf->tail == q->head);
+          g_assert (qinf->head == q->tail);
+          g_assert (qinf->length == q->length);
           qinf->tail = q->tail;
           qinf->head = q->head;
           break;
         case COPY:
           {
             QueueInfo *random_queue = RANDOM_QUEUE();
-            xqueue_t *new_queue = g_queue_copy (random_queue->queue);
+            GQueue *new_queue = g_queue_copy (random_queue->queue);
 
             g_queue_free (qinf->queue);
             q = qinf->queue = new_queue;
             qinf->head = new_queue->head;
-            qinf->tail = xlist_last (new_queue->head);
+            qinf->tail = g_list_last (new_queue->head);
             qinf->length = new_queue->length;
           }
           break;
@@ -302,7 +302,7 @@ random_test (xconstpointer d)
           break;
         case FIND:
           {
-            xboolean_t find_existing = rnd_bool ();
+            gboolean find_existing = rnd_bool ();
             int first = find_max (q);
             int second = find_min (q);
 
@@ -316,13 +316,13 @@ random_test (xconstpointer d)
 
             if (find_existing)
               {
-                xassert (g_queue_find (q, GINT_TO_POINTER (first)));
-                xassert (g_queue_find (q, GINT_TO_POINTER (second)));
+                g_assert (g_queue_find (q, GINT_TO_POINTER (first)));
+                g_assert (g_queue_find (q, GINT_TO_POINTER (second)));
               }
             else
               {
-                xassert (!g_queue_find (q, GINT_TO_POINTER (first)));
-                xassert (!g_queue_find (q, GINT_TO_POINTER (second)));
+                g_assert (!g_queue_find (q, GINT_TO_POINTER (first)));
+                g_assert (!g_queue_find (q, GINT_TO_POINTER (second)));
               }
           }
           break;
@@ -353,7 +353,7 @@ random_test (xconstpointer d)
             qinf->head = g_queue_find (q, GINT_TO_POINTER (find_min(q)));
             qinf->tail = g_queue_find (q, GINT_TO_POINTER (find_max(q)));
 
-            xassert (qinf->tail == q->tail);
+            g_assert (qinf->tail == q->tail);
           }
           break;
         case PUSH_HEAD:
@@ -390,7 +390,7 @@ random_test (xconstpointer d)
             if (qinf->tail && qinf->tail->next)
               qinf->tail = qinf->tail->next;
             else
-              qinf->tail = xlist_last (qinf->head);
+              qinf->tail = g_list_last (qinf->head);
             qinf->length++;
           }
           break;
@@ -414,7 +414,7 @@ random_test (xconstpointer d)
           if (!g_queue_is_empty (q))
             {
               int n = get_random_position (q, TRUE);
-              xpointer_t elm = g_queue_peek_nth (q, n);
+              gpointer elm = g_queue_peek_nth (q, n);
 
               if (n == (int) (q->length - 1))
                 qinf->tail = qinf->tail->prev;
@@ -422,37 +422,37 @@ random_test (xconstpointer d)
               if (n == 0)
                 qinf->head = qinf->head->next;
 
-              if (n >= 0 && (xuint_t) n < q->length)
+              if (n >= 0 && (guint) n < q->length)
                 qinf->length--;
 
-              xassert (elm == g_queue_pop_nth (q, n));
+              g_assert (elm == g_queue_pop_nth (q, n));
             }
           break;
         case PEEK_HEAD:
           if (qinf->head)
-            xassert (qinf->head->data == g_queue_peek_head (q));
+            g_assert (qinf->head->data == g_queue_peek_head (q));
           else
-            xassert (g_queue_peek_head (q) == NULL);
+            g_assert (g_queue_peek_head (q) == NULL);
           break;
         case PEEK_TAIL:
           if (qinf->tail)
-            xassert (qinf->tail->data == g_queue_peek_tail (q));
+            g_assert (qinf->tail->data == g_queue_peek_tail (q));
           else
-            xassert (g_queue_peek_tail (q) == NULL);
+            g_assert (g_queue_peek_tail (q) == NULL);
           break;
         case PEEK_NTH:
           if (g_queue_is_empty (q))
             {
               for (j = -10; j < 10; ++j)
-                xassert (g_queue_peek_nth (q, j) == NULL);
+                g_assert (g_queue_peek_nth (q, j) == NULL);
             }
           else
             {
-              xlist_t *list;
+              GList *list;
               int n = get_random_position (q, TRUE);
-              if (n < 0 || (xuint_t) n >= q->length)
+              if (n < 0 || (guint) n >= q->length)
                 {
-                  xassert (g_queue_peek_nth (q, n) == NULL);
+                  g_assert (g_queue_peek_nth (q, n) == NULL);
                 }
               else
                 {
@@ -460,7 +460,7 @@ random_test (xconstpointer d)
                   for (j = 0; j < n; ++j)
                     list = list->next;
 
-                  xassert (list->data == g_queue_peek_nth (q, n));
+                  g_assert (list->data == g_queue_peek_nth (q, n));
                 }
             }
           break;
@@ -469,7 +469,7 @@ random_test (xconstpointer d)
           {
             int x = g_random_int_range (0, 386538);
             int n;
-            xlist_t *list;
+            GList *list;
 
             g_queue_remove_all (q, GINT_TO_POINTER (x));
             check_integrity (q);
@@ -485,10 +485,10 @@ random_test (xconstpointer d)
                   break;
                 n++;
               }
-            xassert (list);
-            xassert (g_queue_index (q, GINT_TO_POINTER (x)) ==
+            g_assert (list);
+            g_assert (g_queue_index (q, GINT_TO_POINTER (x)) ==
                       g_queue_link_index (q, list));
-            xassert (g_queue_link_index (q, list) == n);
+            g_assert (g_queue_link_index (q, list) == n);
 
             qinf->head = q->head;
             qinf->tail = q->tail;
@@ -524,7 +524,7 @@ random_test (xconstpointer d)
         case INSERT_BEFORE:
           if (!g_queue_is_empty (q))
             {
-              xpointer_t x = GINT_TO_POINTER (g_random_int_range (0, 386538));
+              gpointer x = GINT_TO_POINTER (g_random_int_range (0, 386538));
 
               g_queue_insert_before (q, qinf->tail, x);
               g_queue_insert_before (q, qinf->head, x);
@@ -538,7 +538,7 @@ random_test (xconstpointer d)
         case INSERT_AFTER:
           if (!g_queue_is_empty (q))
             {
-              xpointer_t x = GINT_TO_POINTER (g_random_int_range (0, 386538));
+              gpointer x = GINT_TO_POINTER (g_random_int_range (0, 386538));
 
               g_queue_insert_after (q, qinf->tail, x);
               g_queue_insert_after (q, qinf->head, x);
@@ -564,10 +564,10 @@ random_test (xconstpointer d)
             check_integrity (q);
             g_queue_insert_sorted (q, GINT_TO_POINTER (max + 1), compare_int, NULL);
             check_integrity (q);
-            xassert (GPOINTER_TO_INT (q->tail->data) == max + 1);
+            g_assert (GPOINTER_TO_INT (q->tail->data) == max + 1);
             g_queue_insert_sorted (q, GINT_TO_POINTER (min - 1), compare_int, NULL);
             check_integrity (q);
-            xassert (GPOINTER_TO_INT (q->head->data) == min - 1);
+            g_assert (GPOINTER_TO_INT (q->head->data) == min - 1);
             qinf->head = q->head;
             qinf->tail = q->tail;
             qinf->length = q->length;
@@ -575,7 +575,7 @@ random_test (xconstpointer d)
           break;
         case PUSH_HEAD_LINK:
           {
-            xlist_t *link = xlist_prepend (NULL, GINT_TO_POINTER (i));
+            GList *link = g_list_prepend (NULL, GINT_TO_POINTER (i));
             g_queue_push_head_link (q, link);
             if (!qinf->tail)
               qinf->tail = link;
@@ -585,7 +585,7 @@ random_test (xconstpointer d)
           break;
         case PUSH_TAIL_LINK:
           {
-            xlist_t *link = xlist_prepend (NULL, GINT_TO_POINTER (i));
+            GList *link = g_list_prepend (NULL, GINT_TO_POINTER (i));
             g_queue_push_tail_link (q, link);
             if (!qinf->head)
               qinf->head = link;
@@ -595,8 +595,8 @@ random_test (xconstpointer d)
           break;
         case PUSH_NTH_LINK:
           {
-            xlist_t *link = xlist_prepend (NULL, GINT_TO_POINTER (i));
-            xint_t n = get_random_position (q, TRUE);
+            GList *link = g_list_prepend (NULL, GINT_TO_POINTER (i));
+            gint n = get_random_position (q, TRUE);
             g_queue_push_nth_link (q, n, link);
 
             if (qinf->head && qinf->head->prev)
@@ -606,7 +606,7 @@ random_test (xconstpointer d)
             if (qinf->tail && qinf->tail->next)
               qinf->tail = qinf->tail->next;
             else
-              qinf->tail = xlist_last (qinf->head);
+              qinf->tail = g_list_last (qinf->head);
             qinf->length++;
           }
           break;
@@ -617,7 +617,7 @@ random_test (xconstpointer d)
               if (!qinf->head)
                 qinf->tail = NULL;
               qinf->length--;
-              xlist_free (g_queue_pop_head_link (q));
+              g_list_free (g_queue_pop_head_link (q));
             }
           break;
         case POP_TAIL_LINK:
@@ -627,12 +627,12 @@ random_test (xconstpointer d)
               if (!qinf->tail)
                 qinf->head = NULL;
               qinf->length--;
-              xlist_free (g_queue_pop_tail_link (q));
+              g_list_free (g_queue_pop_tail_link (q));
             }
           break;
         case POP_NTH_LINK:
           if (g_queue_is_empty (q))
-            xassert (g_queue_pop_nth_link (q, 200) == NULL);
+            g_assert (g_queue_pop_nth_link (q, 200) == NULL);
           else
             {
               int n = get_random_position (q, FALSE);
@@ -645,41 +645,41 @@ random_test (xconstpointer d)
 
               qinf->length--;
 
-              xlist_free (g_queue_pop_nth_link (q, n));
+              g_list_free (g_queue_pop_nth_link (q, n));
             }
           break;
         case PEEK_HEAD_LINK:
           if (g_queue_is_empty (q))
-            xassert (g_queue_peek_head_link (q) == NULL);
+            g_assert (g_queue_peek_head_link (q) == NULL);
           else
-            xassert (g_queue_peek_head_link (q) == qinf->head);
+            g_assert (g_queue_peek_head_link (q) == qinf->head);
           break;
         case PEEK_TAIL_LINK:
           if (g_queue_is_empty (q))
-            xassert (g_queue_peek_tail_link (q) == NULL);
+            g_assert (g_queue_peek_tail_link (q) == NULL);
           else
-            xassert (g_queue_peek_tail_link (q) == qinf->tail);
+            g_assert (g_queue_peek_tail_link (q) == qinf->tail);
           break;
         case PEEK_NTH_LINK:
           if (g_queue_is_empty(q))
-            xassert (g_queue_peek_nth_link (q, 1000) == NULL);
+            g_assert (g_queue_peek_nth_link (q, 1000) == NULL);
           else
             {
-              xint_t n = get_random_position (q, FALSE);
-              xlist_t *link;
+              gint n = get_random_position (q, FALSE);
+              GList *link;
 
               link = q->head;
               for (j = 0; j < n; ++j)
                 link = link->next;
 
-              xassert (g_queue_peek_nth_link (q, n) == link);
+              g_assert (g_queue_peek_nth_link (q, n) == link);
             }
           break;
         case UNLINK:
           if (!g_queue_is_empty (q))
             {
-              xint_t n = g_random_int_range (0, g_queue_get_length (q));
-              xlist_t *link;
+              gint n = g_random_int_range (0, g_queue_get_length (q));
+              GList *link;
 
               link = q->head;
               for (j = 0; j < n; ++j)
@@ -688,7 +688,7 @@ random_test (xconstpointer d)
               g_queue_unlink (q, link);
               check_integrity (q);
 
-              xlist_free (link);
+              g_list_free (link);
 
               qinf->head = q->head;
               qinf->tail = q->tail;
@@ -698,8 +698,8 @@ random_test (xconstpointer d)
         case DELETE_LINK:
           if (!g_queue_is_empty (q))
             {
-              xint_t n = g_random_int_range (0, g_queue_get_length (q));
-              xlist_t *link;
+              gint n = g_random_int_range (0, g_queue_get_length (q));
+              GList *link;
 
               link = q->head;
               for (j = 0; j < n; ++j)
@@ -724,9 +724,9 @@ random_test (xconstpointer d)
           qinf->length != q->length)
         g_printerr ("op: %d\n", op);
 
-      xassert (qinf->head == q->head);
-      xassert (qinf->tail == q->tail);
-      xassert (qinf->length == q->length);
+      g_assert (qinf->head == q->head);
+      g_assert (qinf->tail == q->tail);
+      g_assert (qinf->length == q->length);
 
       for (j = 0; j < N_QUEUES; ++j)
         check_integrity (queues[j].queue);
@@ -737,9 +737,9 @@ random_test (xconstpointer d)
 }
 
 static void
-remove_item (xpointer_t data, xpointer_t q)
+remove_item (gpointer data, gpointer q)
 {
-  xqueue_t *queue = q;
+  GQueue *queue = q;
 
   g_queue_remove (queue, data);
 }
@@ -747,162 +747,162 @@ remove_item (xpointer_t data, xpointer_t q)
 static void
 test_basic (void)
 {
-  xqueue_t *q;
-  xlist_t *node;
-  xpointer_t data;
+  GQueue *q;
+  GList *node;
+  gpointer data;
 
   q = g_queue_new ();
 
-  xassert (g_queue_is_empty (q));
+  g_assert (g_queue_is_empty (q));
   g_queue_push_head (q, GINT_TO_POINTER (2));
   check_integrity (q);
-  xassert (g_queue_peek_head (q) == GINT_TO_POINTER (2));
+  g_assert (g_queue_peek_head (q) == GINT_TO_POINTER (2));
   check_integrity (q);
-  xassert (!g_queue_is_empty (q));
+  g_assert (!g_queue_is_empty (q));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 1);
-  xassert (q->head == q->tail);
+  g_assert_cmpint (g_list_length (q->head), ==, 1);
+  g_assert (q->head == q->tail);
   g_queue_push_head (q, GINT_TO_POINTER (1));
   check_integrity (q);
-  xassert (q->head->next == q->tail);
-  xassert (q->tail->prev == q->head);
-  g_assert_cmpint (xlist_length (q->head), ==, 2);
+  g_assert (q->head->next == q->tail);
+  g_assert (q->tail->prev == q->head);
+  g_assert_cmpint (g_list_length (q->head), ==, 2);
   check_integrity (q);
-  xassert (q->tail->data == GINT_TO_POINTER (2));
-  xassert (q->head->data == GINT_TO_POINTER (1));
+  g_assert (q->tail->data == GINT_TO_POINTER (2));
+  g_assert (q->head->data == GINT_TO_POINTER (1));
   check_integrity (q);
   g_queue_push_tail (q, GINT_TO_POINTER (3));
-  g_assert_cmpint (xlist_length (q->head), ==, 3);
-  xassert (q->head->data == GINT_TO_POINTER (1));
-  xassert (q->head->next->data == GINT_TO_POINTER (2));
-  xassert (q->head->next->next == q->tail);
-  xassert (q->head->next == q->tail->prev);
-  xassert (q->tail->data == GINT_TO_POINTER (3));
+  g_assert_cmpint (g_list_length (q->head), ==, 3);
+  g_assert (q->head->data == GINT_TO_POINTER (1));
+  g_assert (q->head->next->data == GINT_TO_POINTER (2));
+  g_assert (q->head->next->next == q->tail);
+  g_assert (q->head->next == q->tail->prev);
+  g_assert (q->tail->data == GINT_TO_POINTER (3));
   g_queue_push_tail (q, GINT_TO_POINTER (4));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 4);
-  xassert (q->head->data == GINT_TO_POINTER (1));
-  xassert (g_queue_peek_tail (q) == GINT_TO_POINTER (4));
+  g_assert_cmpint (g_list_length (q->head), ==, 4);
+  g_assert (q->head->data == GINT_TO_POINTER (1));
+  g_assert (g_queue_peek_tail (q) == GINT_TO_POINTER (4));
   g_queue_push_tail (q, GINT_TO_POINTER (5));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 5);
-  xassert (g_queue_is_empty (q) == FALSE);
+  g_assert_cmpint (g_list_length (q->head), ==, 5);
+  g_assert (g_queue_is_empty (q) == FALSE);
   check_integrity (q);
   g_assert_cmpint (q->length, ==, 5);
-  xassert (q->head->prev == NULL);
-  xassert (q->head->data == GINT_TO_POINTER (1));
-  xassert (q->head->next->data == GINT_TO_POINTER (2));
-  xassert (q->head->next->next->data == GINT_TO_POINTER (3));
-  xassert (q->head->next->next->next->data == GINT_TO_POINTER (4));
-  xassert (q->head->next->next->next->next->data == GINT_TO_POINTER (5));
-  xassert (q->head->next->next->next->next->next == NULL);
-  xassert (q->head->next->next->next->next == q->tail);
-  xassert (q->tail->data == GINT_TO_POINTER (5));
-  xassert (q->tail->prev->data == GINT_TO_POINTER (4));
-  xassert (q->tail->prev->prev->data == GINT_TO_POINTER (3));
-  xassert (q->tail->prev->prev->prev->data == GINT_TO_POINTER (2));
-  xassert (q->tail->prev->prev->prev->prev->data == GINT_TO_POINTER (1));
-  xassert (q->tail->prev->prev->prev->prev->prev == NULL);
-  xassert (q->tail->prev->prev->prev->prev == q->head);
-  xassert (g_queue_peek_tail (q) == GINT_TO_POINTER (5));
-  xassert (g_queue_peek_head (q) == GINT_TO_POINTER (1));
-  xassert (g_queue_pop_head (q) == GINT_TO_POINTER (1));
+  g_assert (q->head->prev == NULL);
+  g_assert (q->head->data == GINT_TO_POINTER (1));
+  g_assert (q->head->next->data == GINT_TO_POINTER (2));
+  g_assert (q->head->next->next->data == GINT_TO_POINTER (3));
+  g_assert (q->head->next->next->next->data == GINT_TO_POINTER (4));
+  g_assert (q->head->next->next->next->next->data == GINT_TO_POINTER (5));
+  g_assert (q->head->next->next->next->next->next == NULL);
+  g_assert (q->head->next->next->next->next == q->tail);
+  g_assert (q->tail->data == GINT_TO_POINTER (5));
+  g_assert (q->tail->prev->data == GINT_TO_POINTER (4));
+  g_assert (q->tail->prev->prev->data == GINT_TO_POINTER (3));
+  g_assert (q->tail->prev->prev->prev->data == GINT_TO_POINTER (2));
+  g_assert (q->tail->prev->prev->prev->prev->data == GINT_TO_POINTER (1));
+  g_assert (q->tail->prev->prev->prev->prev->prev == NULL);
+  g_assert (q->tail->prev->prev->prev->prev == q->head);
+  g_assert (g_queue_peek_tail (q) == GINT_TO_POINTER (5));
+  g_assert (g_queue_peek_head (q) == GINT_TO_POINTER (1));
+  g_assert (g_queue_pop_head (q) == GINT_TO_POINTER (1));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 4);
+  g_assert_cmpint (g_list_length (q->head), ==, 4);
   g_assert_cmpint (q->length, ==, 4);
-  xassert (g_queue_pop_tail (q) == GINT_TO_POINTER (5));
+  g_assert (g_queue_pop_tail (q) == GINT_TO_POINTER (5));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 3);
+  g_assert_cmpint (g_list_length (q->head), ==, 3);
 
   node = g_queue_pop_head_link (q);
-  xassert (node->data == GINT_TO_POINTER (2));
-  xlist_free_1 (node);
+  g_assert (node->data == GINT_TO_POINTER (2));
+  g_list_free_1 (node);
 
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 2);
-  xassert (g_queue_pop_tail (q) == GINT_TO_POINTER (4));
+  g_assert_cmpint (g_list_length (q->head), ==, 2);
+  g_assert (g_queue_pop_tail (q) == GINT_TO_POINTER (4));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 1);
+  g_assert_cmpint (g_list_length (q->head), ==, 1);
   node = g_queue_pop_head_link (q);
-  xassert (node->data == GINT_TO_POINTER (3));
-  xlist_free_1 (node);
+  g_assert (node->data == GINT_TO_POINTER (3));
+  g_list_free_1 (node);
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
-  xassert (g_queue_pop_tail (q) == NULL);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
+  g_assert (g_queue_pop_tail (q) == NULL);
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
-  xassert (g_queue_pop_head (q) == NULL);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
+  g_assert (g_queue_pop_head (q) == NULL);
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
-  xassert (g_queue_is_empty (q));
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
+  g_assert (g_queue_is_empty (q));
   check_integrity (q);
 
   g_queue_push_head (q, GINT_TO_POINTER (1));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 1);
+  g_assert_cmpint (g_list_length (q->head), ==, 1);
   g_assert_cmpint (q->length, ==, 1);
   g_queue_push_head (q, GINT_TO_POINTER (2));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 2);
+  g_assert_cmpint (g_list_length (q->head), ==, 2);
   g_assert_cmpint (q->length, ==, 2);
   g_queue_push_head (q, GINT_TO_POINTER (3));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 3);
+  g_assert_cmpint (g_list_length (q->head), ==, 3);
   g_assert_cmpint (q->length, ==, 3);
   g_queue_push_head (q, GINT_TO_POINTER (4));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 4);
+  g_assert_cmpint (g_list_length (q->head), ==, 4);
   g_assert_cmpint (q->length, ==, 4);
   g_queue_push_head (q, GINT_TO_POINTER (5));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 5);
+  g_assert_cmpint (g_list_length (q->head), ==, 5);
   g_assert_cmpint (q->length, ==, 5);
-  xassert (g_queue_pop_head (q) == GINT_TO_POINTER (5));
+  g_assert (g_queue_pop_head (q) == GINT_TO_POINTER (5));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 4);
+  g_assert_cmpint (g_list_length (q->head), ==, 4);
   node = q->tail;
-  xassert (node == g_queue_pop_tail_link (q));
+  g_assert (node == g_queue_pop_tail_link (q));
   check_integrity (q);
-  xlist_free_1 (node);
-  g_assert_cmpint (xlist_length (q->head), ==, 3);
+  g_list_free_1 (node);
+  g_assert_cmpint (g_list_length (q->head), ==, 3);
   data = q->head->data;
-  xassert (data == g_queue_pop_head (q));
+  g_assert (data == g_queue_pop_head (q));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 2);
-  xassert (g_queue_pop_tail (q) == GINT_TO_POINTER (2));
+  g_assert_cmpint (g_list_length (q->head), ==, 2);
+  g_assert (g_queue_pop_tail (q) == GINT_TO_POINTER (2));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 1);
-  xassert (q->head == q->tail);
-  xassert (g_queue_pop_tail (q) == GINT_TO_POINTER (3));
+  g_assert_cmpint (g_list_length (q->head), ==, 1);
+  g_assert (q->head == q->tail);
+  g_assert (g_queue_pop_tail (q) == GINT_TO_POINTER (3));
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
-  xassert (g_queue_pop_head (q) == NULL);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
+  g_assert (g_queue_pop_head (q) == NULL);
   check_integrity (q);
-  xassert (g_queue_pop_head_link (q) == NULL);
+  g_assert (g_queue_pop_head_link (q) == NULL);
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
-  xassert (g_queue_pop_tail_link (q) == NULL);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
+  g_assert (g_queue_pop_tail_link (q) == NULL);
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
 
   g_queue_reverse (q);
   check_integrity (q);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
   g_queue_free (q);
 }
 
 static void
 test_copy (void)
 {
-  xqueue_t *q, *q2;
-  xint_t i;
+  GQueue *q, *q2;
+  gint i;
 
   q = g_queue_new ();
   q2 = g_queue_copy (q);
   check_integrity (q);
   check_integrity (q2);
-  g_assert_cmpint (xlist_length (q->head), ==, 0);
-  g_assert_cmpint (xlist_length (q2->head), ==, 0);
+  g_assert_cmpint (g_list_length (q->head), ==, 0);
+  g_assert_cmpint (g_list_length (q2->head), ==, 0);
   g_queue_sort (q, compare_int, NULL);
   check_integrity (q2);
   check_integrity (q);
@@ -913,7 +913,7 @@ test_copy (void)
   for (i = 0; i < 200; ++i)
     {
       g_queue_push_nth (q, GINT_TO_POINTER (i), i);
-      xassert (g_queue_find (q, GINT_TO_POINTER (i)));
+      g_assert (g_queue_find (q, GINT_TO_POINTER (i)));
       check_integrity (q);
       check_integrity (q2);
     }
@@ -927,7 +927,7 @@ test_copy (void)
 
   for (i = 0; i < 200; ++i)
     {
-      xlist_t *l = xlist_prepend (NULL, GINT_TO_POINTER (i));
+      GList *l = g_list_prepend (NULL, GINT_TO_POINTER (i));
 
       g_queue_push_nth_link (q, i, l);
       check_integrity (q);
@@ -951,30 +951,30 @@ test_copy (void)
 static void
 test_off_by_one (void)
 {
-  xqueue_t *q;
-  xlist_t *node;
+  GQueue *q;
+  GList *node;
 
   q = g_queue_new ();
 
   g_queue_push_tail (q, GINT_TO_POINTER (1234));
   check_integrity (q);
   node = g_queue_peek_tail_link (q);
-  xassert (node != NULL && node->data == GINT_TO_POINTER (1234));
+  g_assert (node != NULL && node->data == GINT_TO_POINTER (1234));
   node = g_queue_peek_nth_link (q, g_queue_get_length (q));
-  xassert (node == NULL);
+  g_assert (node == NULL);
   node = g_queue_peek_nth_link (q, g_queue_get_length (q) - 1);
-  xassert (node->data == GINT_TO_POINTER (1234));
+  g_assert (node->data == GINT_TO_POINTER (1234));
   node = g_queue_pop_nth_link (q, g_queue_get_length (q));
-  xassert (node == NULL);
+  g_assert (node == NULL);
   node = g_queue_pop_nth_link (q, g_queue_get_length (q) - 1);
-  xassert (node != NULL && node->data == GINT_TO_POINTER (1234));
-  xlist_free_1 (node);
+  g_assert (node != NULL && node->data == GINT_TO_POINTER (1234));
+  g_list_free_1 (node);
 
   g_queue_free (q);
 }
 
-static xint_t
-find_custom (xconstpointer a, xconstpointer b)
+static gint
+find_custom (gconstpointer a, gconstpointer b)
 {
   return GPOINTER_TO_INT (a) - GPOINTER_TO_INT (b);
 }
@@ -982,19 +982,19 @@ find_custom (xconstpointer a, xconstpointer b)
 static void
 test_find_custom (void)
 {
-  xqueue_t *q;
-  xlist_t *node;
+  GQueue *q;
+  GList *node;
   q = g_queue_new ();
 
   g_queue_push_tail (q, GINT_TO_POINTER (1234));
   g_queue_push_tail (q, GINT_TO_POINTER (1));
   g_queue_push_tail (q, GINT_TO_POINTER (2));
   node = g_queue_find_custom  (q, GINT_TO_POINTER (1), find_custom);
-  xassert (node != NULL);
+  g_assert (node != NULL);
   node = g_queue_find_custom  (q, GINT_TO_POINTER (2), find_custom);
-  xassert (node != NULL);
+  g_assert (node != NULL);
   node = g_queue_find_custom  (q, GINT_TO_POINTER (3), find_custom);
-  xassert (node == NULL);
+  g_assert (node == NULL);
 
   g_queue_free (q);
 }
@@ -1002,22 +1002,22 @@ test_find_custom (void)
 static void
 test_static (void)
 {
-  xqueue_t q;
-  xqueue_t q2 = G_QUEUE_INIT;
+  GQueue q;
+  GQueue q2 = G_QUEUE_INIT;
 
   g_queue_init (&q);
 
   check_integrity (&q);
-  xassert (g_queue_is_empty (&q));
+  g_assert (g_queue_is_empty (&q));
 
   check_integrity (&q2);
-  xassert (g_queue_is_empty (&q2));
+  g_assert (g_queue_is_empty (&q2));
 }
 
 static void
 test_clear (void)
 {
-  xqueue_t *q;
+  GQueue *q;
   q = g_queue_new ();
 
   g_queue_push_tail (q, GINT_TO_POINTER (1234));
@@ -1027,19 +1027,19 @@ test_clear (void)
 
   g_queue_clear (q);
   check_integrity (q);
-  xassert (g_queue_is_empty (q));
+  g_assert (g_queue_is_empty (q));
 
   g_queue_free (q);
 }
 
 typedef struct
 {
-  xboolean_t freed;
+  gboolean freed;
   int x;
 } QueueItem;
 
 static void
-free_func (xpointer_t data)
+free_func (gpointer data)
 {
   QueueItem *item = data;
 
@@ -1062,7 +1062,7 @@ static void
 test_clear_full (void)
 {
   QueueItem *one, *two, *three, *four;
-  xqueue_t *queue;
+  GQueue *queue;
 
   queue = g_queue_new ();
   g_queue_push_tail (queue, one = new_item (1));
@@ -1099,7 +1099,7 @@ static void
 test_clear_full_noop (void)
 {
   QueueItem *one, *two, *three, *four;
-  xqueue_t *queue;
+  GQueue *queue;
 
   queue = g_queue_new ();
   g_queue_push_tail (queue, one = new_item (1));
@@ -1125,18 +1125,18 @@ test_clear_full_noop (void)
   g_queue_free (queue);
 }
 
-/* test_t g_queue_push_nth_link() with various combinations of position (before,
+/* Test g_queue_push_nth_link() with various combinations of position (before,
  * in the middle of, or at the end of the queue) and various existing queues
  * (empty, single element, multiple elements). */
 static void
 test_push_nth_link (void)
 {
-  xqueue_t *q;
+  GQueue *q;
   q = g_queue_new ();
 
   /* Push onto before the front of an empty queue (which results in it being
    * added to the end of the queue). */
-  g_queue_push_nth_link (q, -1, xlist_prepend (NULL, GINT_TO_POINTER (1)));
+  g_queue_push_nth_link (q, -1, g_list_prepend (NULL, GINT_TO_POINTER (1)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 1);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 1);
@@ -1144,7 +1144,7 @@ test_push_nth_link (void)
   g_queue_clear (q);
 
   /* Push onto after the rear of an empty queue. */
-  g_queue_push_nth_link (q, 100, xlist_prepend (NULL, GINT_TO_POINTER (2)));
+  g_queue_push_nth_link (q, 100, g_list_prepend (NULL, GINT_TO_POINTER (2)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 1);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 2);
@@ -1152,7 +1152,7 @@ test_push_nth_link (void)
   g_queue_clear (q);
 
   /* Push onto the front of an empty queue. */
-  g_queue_push_nth_link (q, 0, xlist_prepend (NULL, GINT_TO_POINTER (3)));
+  g_queue_push_nth_link (q, 0, g_list_prepend (NULL, GINT_TO_POINTER (3)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 1);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 3);
@@ -1162,7 +1162,7 @@ test_push_nth_link (void)
   /* Push onto before the front of a non-empty queue (which results in it being
    * added to the end of the queue). */
   g_queue_push_head (q, GINT_TO_POINTER (4));
-  g_queue_push_nth_link (q, -1, xlist_prepend (NULL, GINT_TO_POINTER (5)));
+  g_queue_push_nth_link (q, -1, g_list_prepend (NULL, GINT_TO_POINTER (5)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 2);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 4);
@@ -1172,7 +1172,7 @@ test_push_nth_link (void)
 
   /* Push onto after the rear of a non-empty queue. */
   g_queue_push_head (q, GINT_TO_POINTER (6));
-  g_queue_push_nth_link (q, 100, xlist_prepend (NULL, GINT_TO_POINTER (7)));
+  g_queue_push_nth_link (q, 100, g_list_prepend (NULL, GINT_TO_POINTER (7)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 2);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 6);
@@ -1182,7 +1182,7 @@ test_push_nth_link (void)
 
   /* Push onto the rear of a non-empty queue. */
   g_queue_push_head (q, GINT_TO_POINTER (8));
-  g_queue_push_nth_link (q, 1, xlist_prepend (NULL, GINT_TO_POINTER (9)));
+  g_queue_push_nth_link (q, 1, g_list_prepend (NULL, GINT_TO_POINTER (9)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 2);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 8);
@@ -1192,7 +1192,7 @@ test_push_nth_link (void)
 
   /* Push onto the front of a non-empty queue. */
   g_queue_push_head (q, GINT_TO_POINTER (10));
-  g_queue_push_nth_link (q, 0, xlist_prepend (NULL, GINT_TO_POINTER (11)));
+  g_queue_push_nth_link (q, 0, g_list_prepend (NULL, GINT_TO_POINTER (11)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 2);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 11);
@@ -1203,7 +1203,7 @@ test_push_nth_link (void)
   /* Push into the middle of a non-empty queue. */
   g_queue_push_head (q, GINT_TO_POINTER (12));
   g_queue_push_head (q, GINT_TO_POINTER (13));
-  g_queue_push_nth_link (q, 1, xlist_prepend (NULL, GINT_TO_POINTER (14)));
+  g_queue_push_nth_link (q, 1, g_list_prepend (NULL, GINT_TO_POINTER (14)));
   check_integrity (q);
   g_assert_cmpint (g_queue_get_length (q), ==, 3);
   g_assert_cmpint (GPOINTER_TO_INT (g_queue_peek_nth (q, 0)), ==, 13);
@@ -1217,19 +1217,19 @@ static void
 test_free_full (void)
 {
   QueueItem *one, *two, *three;
-  xqueue_t *queue = NULL;
+  GQueue *queue = NULL;
 
   queue = g_queue_new();
   g_queue_push_tail (queue, one = new_item (1));
   g_queue_push_tail (queue, two = new_item (2));
   g_queue_push_tail (queue, three = new_item (3));
-  xassert (!one->freed);
-  xassert (!two->freed);
-  xassert (!three->freed);
+  g_assert (!one->freed);
+  g_assert (!two->freed);
+  g_assert (!three->freed);
   g_queue_free_full (queue, free_func);
-  xassert (one->freed);
-  xassert (two->freed);
-  xassert (three->freed);
+  g_assert (one->freed);
+  g_assert (two->freed);
+  g_assert (three->freed);
   g_slice_free (QueueItem, one);
   g_slice_free (QueueItem, two);
   g_slice_free (QueueItem, three);
@@ -1238,12 +1238,12 @@ test_free_full (void)
 static void
 test_insert_sibling_link (void)
 {
-  xqueue_t q = G_QUEUE_INIT;
-  xlist_t a = {0};
-  xlist_t b = {0};
-  xlist_t c = {0};
-  xlist_t d = {0};
-  xlist_t e = {0};
+  GQueue q = G_QUEUE_INIT;
+  GList a = {0};
+  GList b = {0};
+  GList c = {0};
+  GList d = {0};
+  GList e = {0};
 
   g_queue_push_head_link (&q, &a);
   g_queue_insert_after_link (&q, &a, &d);
@@ -1272,8 +1272,8 @@ test_insert_sibling_link (void)
 
 int main (int argc, char *argv[])
 {
-  xuint32_t seed;
-  xchar_t *path;
+  guint32 seed;
+  gchar *path;
 
   g_test_init (&argc, &argv, NULL);
 
@@ -1290,7 +1290,7 @@ int main (int argc, char *argv[])
   g_test_add_func ("/queue/push-nth-link", test_push_nth_link);
 
   seed = g_test_rand_int_range (0, G_MAXINT);
-  path = xstrdup_printf ("/queue/random/seed:%u", seed);
+  path = g_strdup_printf ("/queue/random/seed:%u", seed);
   g_test_add_data_func (path, GUINT_TO_POINTER (seed), random_test);
   g_free (path);
 

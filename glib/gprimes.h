@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_PRIMES_H__
 #define __G_PRIMES_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -42,8 +42,8 @@ G_BEGIN_DECLS
  * next largest prime, or the highest it knows about which is about
  * MAXINT/4.
  */
-XPL_AVAILABLE_IN_ALL
-xuint_t	   g_spaced_primes_closest (xuint_t num) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+guint	   g_spaced_primes_closest (guint num) G_GNUC_CONST;
 
 G_END_DECLS
 

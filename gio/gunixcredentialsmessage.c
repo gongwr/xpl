@@ -15,22 +15,22 @@
 
 /**
  * SECTION:gunixcredentialsmessage
- * @title: xunix_credentials_message_t
- * @short_description: A xsocket_control_message_t containing credentials
+ * @title: GUnixCredentialsMessage
+ * @short_description: A GSocketControlMessage containing credentials
  * @include: gio/gunixcredentialsmessage.h
- * @see_also: #GUnixConnection, #xsocket_control_message_t
+ * @see_also: #GUnixConnection, #GSocketControlMessage
  *
- * This #xsocket_control_message_t contains a #xcredentials_t instance.  It
- * may be sent using xsocket_send_message() and received using
- * xsocket_receive_message() over UNIX sockets (ie: sockets in the
- * %XSOCKET_FAMILY_UNIX family).
+ * This #GSocketControlMessage contains a #GCredentials instance.  It
+ * may be sent using g_socket_send_message() and received using
+ * g_socket_receive_message() over UNIX sockets (ie: sockets in the
+ * %G_SOCKET_FAMILY_UNIX family).
  *
  * For an easier way to send and receive credentials over
  * stream-oriented UNIX sockets, see
  * g_unix_connection_send_credentials() and
  * g_unix_connection_receive_credentials(). To receive credentials of
  * a foreign process connected to a socket, use
- * xsocket_get_credentials().
+ * g_socket_get_credentials().
  *
  * Since GLib 2.72, #GUnixCredentialMessage is available on all platforms. It
  * requires underlying system support (such as Windows 10 with `AF_UNIX`) at run
@@ -61,7 +61,7 @@
 
 struct _GUnixCredentialsMessagePrivate
 {
-  xcredentials_t *credentials;
+  GCredentials *credentials;
 };
 
 enum
@@ -70,10 +70,10 @@ enum
   PROP_CREDENTIALS
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (xunix_credentials_message_t, g_unix_credentials_message, XTYPE_SOCKET_CONTROL_MESSAGE)
+G_DEFINE_TYPE_WITH_PRIVATE (GUnixCredentialsMessage, g_unix_credentials_message, G_TYPE_SOCKET_CONTROL_MESSAGE)
 
-static xsize_t
-g_unix_credentials_message_get_size (xsocket_control_message_t *message)
+static gsize
+g_unix_credentials_message_get_size (GSocketControlMessage *message)
 {
 #if G_CREDENTIALS_UNIX_CREDENTIALS_MESSAGE_SUPPORTED
   return G_CREDENTIALS_NATIVE_SIZE;
@@ -83,7 +83,7 @@ g_unix_credentials_message_get_size (xsocket_control_message_t *message)
 }
 
 static int
-g_unix_credentials_message_get_level (xsocket_control_message_t *message)
+g_unix_credentials_message_get_level (GSocketControlMessage *message)
 {
 #if G_CREDENTIALS_UNIX_CREDENTIALS_MESSAGE_SUPPORTED
   return SOL_SOCKET;
@@ -93,7 +93,7 @@ g_unix_credentials_message_get_level (xsocket_control_message_t *message)
 }
 
 static int
-g_unix_credentials_message_get_msg_type (xsocket_control_message_t *message)
+g_unix_credentials_message_get_msg_type (GSocketControlMessage *message)
 {
 #if G_CREDENTIALS_USE_LINUX_UCRED
   return SCM_CREDENTIALS;
@@ -111,15 +111,15 @@ g_unix_credentials_message_get_msg_type (xsocket_control_message_t *message)
 #endif
 }
 
-static xsocket_control_message_t *
-g_unix_credentials_message_deserialize (xint_t     level,
-                                        xint_t     type,
-                                        xsize_t    size,
-                                        xpointer_t data)
+static GSocketControlMessage *
+g_unix_credentials_message_deserialize (gint     level,
+                                        gint     type,
+                                        gsize    size,
+                                        gpointer data)
 {
 #if G_CREDENTIALS_UNIX_CREDENTIALS_MESSAGE_SUPPORTED
-  xsocket_control_message_t *message;
-  xcredentials_t *credentials;
+  GSocketControlMessage *message;
+  GCredentials *credentials;
 
   if (level != SOL_SOCKET || type != g_unix_credentials_message_get_msg_type (NULL))
     return NULL;
@@ -132,18 +132,18 @@ g_unix_credentials_message_deserialize (xint_t     level,
       return NULL;
     }
 
-  credentials = xcredentials_new ();
-  xcredentials_set_native (credentials, G_CREDENTIALS_NATIVE_TYPE, data);
+  credentials = g_credentials_new ();
+  g_credentials_set_native (credentials, G_CREDENTIALS_NATIVE_TYPE, data);
 
-  if (xcredentials_get_unix_user (credentials, NULL) == (uid_t) -1)
+  if (g_credentials_get_unix_user (credentials, NULL) == (uid_t) -1)
     {
       /* This happens on Linux if the remote side didn't pass the credentials */
-      xobject_unref (credentials);
+      g_object_unref (credentials);
       return NULL;
     }
 
   message = g_unix_credentials_message_new_with_credentials (credentials);
-  xobject_unref (credentials);
+  g_object_unref (credentials);
 
   return message;
 
@@ -154,48 +154,48 @@ g_unix_credentials_message_deserialize (xint_t     level,
 }
 
 static void
-g_unix_credentials_message_serialize (xsocket_control_message_t *_message,
-                                      xpointer_t               data)
+g_unix_credentials_message_serialize (GSocketControlMessage *_message,
+                                      gpointer               data)
 {
 #if G_CREDENTIALS_UNIX_CREDENTIALS_MESSAGE_SUPPORTED
-  xunix_credentials_message_t *message = G_UNIX_CREDENTIALS_MESSAGE (_message);
+  GUnixCredentialsMessage *message = G_UNIX_CREDENTIALS_MESSAGE (_message);
 
   memcpy (data,
-          xcredentials_get_native (message->priv->credentials,
+          g_credentials_get_native (message->priv->credentials,
                                     G_CREDENTIALS_NATIVE_TYPE),
           G_CREDENTIALS_NATIVE_SIZE);
 #endif
 }
 
 static void
-g_unix_credentials_message_finalize (xobject_t *object)
+g_unix_credentials_message_finalize (GObject *object)
 {
-  xunix_credentials_message_t *message = G_UNIX_CREDENTIALS_MESSAGE (object);
+  GUnixCredentialsMessage *message = G_UNIX_CREDENTIALS_MESSAGE (object);
 
   if (message->priv->credentials != NULL)
-    xobject_unref (message->priv->credentials);
+    g_object_unref (message->priv->credentials);
 
-  XOBJECT_CLASS (g_unix_credentials_message_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_unix_credentials_message_parent_class)->finalize (object);
 }
 
 static void
-g_unix_credentials_message_init (xunix_credentials_message_t *message)
+g_unix_credentials_message_init (GUnixCredentialsMessage *message)
 {
   message->priv = g_unix_credentials_message_get_instance_private (message);
 }
 
 static void
-g_unix_credentials_message_get_property (xobject_t    *object,
-                                         xuint_t       prop_id,
-                                         xvalue_t     *value,
-                                         xparam_spec_t *pspec)
+g_unix_credentials_message_get_property (GObject    *object,
+                                         guint       prop_id,
+                                         GValue     *value,
+                                         GParamSpec *pspec)
 {
-  xunix_credentials_message_t *message = G_UNIX_CREDENTIALS_MESSAGE (object);
+  GUnixCredentialsMessage *message = G_UNIX_CREDENTIALS_MESSAGE (object);
 
   switch (prop_id)
     {
     case PROP_CREDENTIALS:
-      xvalue_set_object (value, message->priv->credentials);
+      g_value_set_object (value, message->priv->credentials);
       break;
 
     default:
@@ -205,17 +205,17 @@ g_unix_credentials_message_get_property (xobject_t    *object,
 }
 
 static void
-g_unix_credentials_message_set_property (xobject_t      *object,
-                                         xuint_t         prop_id,
-                                         const xvalue_t *value,
-                                         xparam_spec_t   *pspec)
+g_unix_credentials_message_set_property (GObject      *object,
+                                         guint         prop_id,
+                                         const GValue *value,
+                                         GParamSpec   *pspec)
 {
-  xunix_credentials_message_t *message = G_UNIX_CREDENTIALS_MESSAGE (object);
+  GUnixCredentialsMessage *message = G_UNIX_CREDENTIALS_MESSAGE (object);
 
   switch (prop_id)
     {
     case PROP_CREDENTIALS:
-      message->priv->credentials = xvalue_dup_object (value);
+      message->priv->credentials = g_value_dup_object (value);
       break;
 
     default:
@@ -225,30 +225,30 @@ g_unix_credentials_message_set_property (xobject_t      *object,
 }
 
 static void
-g_unix_credentials_message_constructed (xobject_t *object)
+g_unix_credentials_message_constructed (GObject *object)
 {
-  xunix_credentials_message_t *message = G_UNIX_CREDENTIALS_MESSAGE (object);
+  GUnixCredentialsMessage *message = G_UNIX_CREDENTIALS_MESSAGE (object);
 
   if (message->priv->credentials == NULL)
-    message->priv->credentials = xcredentials_new ();
+    message->priv->credentials = g_credentials_new ();
 
-  if (XOBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed != NULL)
-    XOBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed (object);
+  if (G_OBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed != NULL)
+    G_OBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed (object);
 }
 
 static void
 g_unix_credentials_message_class_init (GUnixCredentialsMessageClass *class)
 {
-  xsocket_control_message_class_t *scm_class;
-  xobject_class_t *xobject_class;
+  GSocketControlMessageClass *scm_class;
+  GObjectClass *gobject_class;
 
-  xobject_class = XOBJECT_CLASS (class);
-  xobject_class->get_property = g_unix_credentials_message_get_property;
-  xobject_class->set_property = g_unix_credentials_message_set_property;
-  xobject_class->finalize = g_unix_credentials_message_finalize;
-  xobject_class->constructed = g_unix_credentials_message_constructed;
+  gobject_class = G_OBJECT_CLASS (class);
+  gobject_class->get_property = g_unix_credentials_message_get_property;
+  gobject_class->set_property = g_unix_credentials_message_set_property;
+  gobject_class->finalize = g_unix_credentials_message_finalize;
+  gobject_class->constructed = g_unix_credentials_message_constructed;
 
-  scm_class = XSOCKET_CONTROL_MESSAGE_CLASS (class);
+  scm_class = G_SOCKET_CONTROL_MESSAGE_CLASS (class);
   scm_class->get_size = g_unix_credentials_message_get_size;
   scm_class->get_level = g_unix_credentials_message_get_level;
   scm_class->get_type = g_unix_credentials_message_get_msg_type;
@@ -256,24 +256,24 @@ g_unix_credentials_message_class_init (GUnixCredentialsMessageClass *class)
   scm_class->deserialize = g_unix_credentials_message_deserialize;
 
   /**
-   * xunix_credentials_message_t:credentials:
+   * GUnixCredentialsMessage:credentials:
    *
    * The credentials stored in the message.
    *
    * Since: 2.26
    */
-  xobject_class_install_property (xobject_class,
+  g_object_class_install_property (gobject_class,
                                    PROP_CREDENTIALS,
-                                   xparam_spec_object ("credentials",
+                                   g_param_spec_object ("credentials",
                                                         P_("Credentials"),
                                                         P_("The credentials stored in the message"),
-                                                        XTYPE_CREDENTIALS,
-                                                        XPARAM_READABLE |
-                                                        XPARAM_WRITABLE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_NAME |
-                                                        XPARAM_STATIC_BLURB |
-                                                        XPARAM_STATIC_NICK));
+                                                        G_TYPE_CREDENTIALS,
+                                                        G_PARAM_READABLE |
+                                                        G_PARAM_WRITABLE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_NAME |
+                                                        G_PARAM_STATIC_BLURB |
+                                                        G_PARAM_STATIC_NICK));
 
 }
 
@@ -282,13 +282,13 @@ g_unix_credentials_message_class_init (GUnixCredentialsMessageClass *class)
 /**
  * g_unix_credentials_message_is_supported:
  *
- * Checks if passing #xcredentials_t on a #xsocket_t is supported on this platform.
+ * Checks if passing #GCredentials on a #GSocket is supported on this platform.
  *
  * Returns: %TRUE if supported, %FALSE otherwise
  *
  * Since: 2.26
  */
-xboolean_t
+gboolean
 g_unix_credentials_message_is_supported (void)
 {
 #if G_CREDENTIALS_UNIX_CREDENTIALS_MESSAGE_SUPPORTED
@@ -303,53 +303,53 @@ g_unix_credentials_message_is_supported (void)
 /**
  * g_unix_credentials_message_new:
  *
- * Creates a new #xunix_credentials_message_t with credentials matching the current processes.
+ * Creates a new #GUnixCredentialsMessage with credentials matching the current processes.
  *
- * Returns: a new #xunix_credentials_message_t
+ * Returns: a new #GUnixCredentialsMessage
  *
  * Since: 2.26
  */
-xsocket_control_message_t *
+GSocketControlMessage *
 g_unix_credentials_message_new (void)
 {
-  xreturn_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
-  return xobject_new (XTYPE_UNIX_CREDENTIALS_MESSAGE,
+  g_return_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
+  return g_object_new (G_TYPE_UNIX_CREDENTIALS_MESSAGE,
                        NULL);
 }
 
 /**
  * g_unix_credentials_message_new_with_credentials:
- * @credentials: A #xcredentials_t object.
+ * @credentials: A #GCredentials object.
  *
- * Creates a new #xunix_credentials_message_t holding @credentials.
+ * Creates a new #GUnixCredentialsMessage holding @credentials.
  *
- * Returns: a new #xunix_credentials_message_t
+ * Returns: a new #GUnixCredentialsMessage
  *
  * Since: 2.26
  */
-xsocket_control_message_t *
-g_unix_credentials_message_new_with_credentials (xcredentials_t *credentials)
+GSocketControlMessage *
+g_unix_credentials_message_new_with_credentials (GCredentials *credentials)
 {
-  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
-  xreturn_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
-  return xobject_new (XTYPE_UNIX_CREDENTIALS_MESSAGE,
+  g_return_val_if_fail (G_IS_CREDENTIALS (credentials), NULL);
+  g_return_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
+  return g_object_new (G_TYPE_UNIX_CREDENTIALS_MESSAGE,
                        "credentials", credentials,
                        NULL);
 }
 
 /**
  * g_unix_credentials_message_get_credentials:
- * @message: A #xunix_credentials_message_t.
+ * @message: A #GUnixCredentialsMessage.
  *
  * Gets the credentials stored in @message.
  *
- * Returns: (transfer none): A #xcredentials_t instance. Do not free, it is owned by @message.
+ * Returns: (transfer none): A #GCredentials instance. Do not free, it is owned by @message.
  *
  * Since: 2.26
  */
-xcredentials_t *
-g_unix_credentials_message_get_credentials (xunix_credentials_message_t *message)
+GCredentials *
+g_unix_credentials_message_get_credentials (GUnixCredentialsMessage *message)
 {
-  xreturn_val_if_fail (X_IS_UNIX_CREDENTIALS_MESSAGE (message), NULL);
+  g_return_val_if_fail (G_IS_UNIX_CREDENTIALS_MESSAGE (message), NULL);
   return message->priv->credentials;
 }

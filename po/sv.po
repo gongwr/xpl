@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: glib\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/glib/issues\n"
-"POT-Creation-Date: 2022-03-04 19:21+0000\n"
-"PO-Revision-Date: 2022-03-06 13:44+0100\n"
+"POT-Creation-Date: 2022-03-22 15:19+0000\n"
+"PO-Revision-Date: 2022-03-22 16:33+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -30,16 +30,16 @@ msgid "Setting application as last used for type not supported yet"
 msgstr "Inställning av program som senast använt för typ stöds inte ännu"
 
 #: gio/gapplication.c:500
-msgid "xapplication_t options"
-msgstr "xapplication_t-alternativ"
+msgid "GApplication options"
+msgstr "GApplication-alternativ"
 
 #: gio/gapplication.c:500
-msgid "Show xapplication_t options"
-msgstr "Visa xapplication_t-alternativ"
+msgid "Show GApplication options"
+msgstr "Visa GApplication-alternativ"
 
 #: gio/gapplication.c:545
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
-msgstr "Gå in i xapplication_t-serviceläge (användning från D-Bus-servicefil)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgstr "Gå in i GApplication-serviceläge (användning från D-Bus-servicefil)"
 
 #: gio/gapplication.c:557
 msgid "Override the application’s ID"
@@ -147,8 +147,8 @@ msgid "PARAMETER"
 msgstr "PARAMETER"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Frivillig parameter till åtgärdsstarten, i xvariant_t-format"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Frivillig parameter till åtgärdsstarten, i GVariant-format"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
 #, c-format
@@ -275,8 +275,8 @@ msgid "Seek not supported on base stream"
 msgstr "Sökning stöds inte på basströmmen"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Kan inte kapa av xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Kan inte kapa av GBufferedInputStream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -287,7 +287,7 @@ msgstr "Strömmen är redan stängd"
 msgid "Truncate not supported on base stream"
 msgstr "Kapning stöds inte på basströmmen"
 
-#: gio/gcancellable.c:319 gio/gdbusconnection.c:1873 gio/gdbusprivate.c:1418
+#: gio/gcancellable.c:319 gio/gdbusconnection.c:1857 gio/gdbusprivate.c:1418
 #: gio/gsimpleasyncresult.c:871 gio/gsimpleasyncresult.c:897
 #, c-format
 msgid "Operation was cancelled"
@@ -337,30 +337,30 @@ msgstr "Kunde inte öppna konverteraren från ”%s” till ”%s”"
 msgid "%s type"
 msgstr "%s-typ"
 
-#: gio/gcontenttype-win32.c:192
+#: gio/gcontenttype-win32.c:196
 msgid "Unknown type"
 msgstr "Okänd typ"
 
-#: gio/gcontenttype-win32.c:194
+#: gio/gcontenttype-win32.c:198
 #, c-format
 msgid "%s filetype"
 msgstr "%s-filtyp"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t innehåller ogiltiga data"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials innehåller ogiltiga data"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t är inte implementerat för detta operativsystem"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials är inte implementerat för detta operativsystem"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Det finns inget stöd för xcredentials_t för din plattform"
+msgid "There is no GCredentials support for your platform"
+msgstr "Det finns inget stöd för GCredentials för din plattform"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t innehåller inte ett process-ID för detta OS"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials innehåller inte ett process-ID för detta OS"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -514,7 +514,7 @@ msgstr ""
 "Kan inte fastställa adress för sessionsbuss (inte implementerat för detta "
 "operativsystem)"
 
-#: gio/gdbusaddress.c:1373 gio/gdbusconnection.c:7334
+#: gio/gdbusaddress.c:1373 gio/gdbusconnection.c:7318
 #, c-format
 msgid ""
 "Cannot determine bus address from DBUS_STARTER_BUS_TYPE environment variable "
@@ -523,7 +523,7 @@ msgstr ""
 "Kan inte fastställa bussadressen från miljövariabeln DBUS_STARTER_BUS_TYPE — "
 "okänt värde ”%s”"
 
-#: gio/gdbusaddress.c:1382 gio/gdbusconnection.c:7343
+#: gio/gdbusaddress.c:1382 gio/gdbusconnection.c:7327
 msgid ""
 "Cannot determine bus address because the DBUS_STARTER_BUS_TYPE environment "
 "variable is not set"
@@ -557,8 +557,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Användar-ID:n måste vara samma för motpart och server"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Avbröts via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Avbröts via GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:300
 #, c-format
@@ -649,22 +649,22 @@ msgstr "Fel vid öppning av nyckelringen ”%s” för skrivning: "
 msgid "(Additionally, releasing the lock for “%s” also failed: %s) "
 msgstr "(I tillägg misslyckades även upplåsningen för ”%s”: %s) "
 
-#: gio/gdbusconnection.c:604 gio/gdbusconnection.c:2418
+#: gio/gdbusconnection.c:588 gio/gdbusconnection.c:2402
 msgid "The connection is closed"
 msgstr "Anslutningen är stängd"
 
-#: gio/gdbusconnection.c:1903
+#: gio/gdbusconnection.c:1887
 msgid "Timeout was reached"
 msgstr "Tidsgränsen uppnåddes"
 
-#: gio/gdbusconnection.c:2541
+#: gio/gdbusconnection.c:2525
 msgid ""
 "Unsupported flags encountered when constructing a client-side connection"
 msgstr ""
 "Flaggor som inte stöds påträffades vid konstruktion av en anslutning på "
 "klientsidan"
 
-#: gio/gdbusconnection.c:4269 gio/gdbusconnection.c:4623
+#: gio/gdbusconnection.c:4253 gio/gdbusconnection.c:4607
 #, c-format
 msgid ""
 "No such interface “org.freedesktop.DBus.Properties” on object at path %s"
@@ -672,79 +672,79 @@ msgstr ""
 "Inget sådant gränssnitt ”org.freedesktop.DBus.Properties” på objekt med "
 "sökvägen %s"
 
-#: gio/gdbusconnection.c:4414
+#: gio/gdbusconnection.c:4398
 #, c-format
 msgid "No such property “%s”"
 msgstr "Ingen sådan egenskap ”%s”"
 
-#: gio/gdbusconnection.c:4426
+#: gio/gdbusconnection.c:4410
 #, c-format
 msgid "Property “%s” is not readable"
 msgstr "Egenskapen ”%s” är inte läsbar"
 
-#: gio/gdbusconnection.c:4437
+#: gio/gdbusconnection.c:4421
 #, c-format
 msgid "Property “%s” is not writable"
 msgstr "Egenskapen ”%s” är inte skrivbar"
 
-#: gio/gdbusconnection.c:4457
+#: gio/gdbusconnection.c:4441
 #, c-format
 msgid "Error setting property “%s”: Expected type “%s” but got “%s”"
 msgstr ""
 "Fel vid inställning av egenskapen ”%s”: Förväntade typen ”%s” men fick ”%s”"
 
-#: gio/gdbusconnection.c:4562 gio/gdbusconnection.c:4777
-#: gio/gdbusconnection.c:6760
+#: gio/gdbusconnection.c:4546 gio/gdbusconnection.c:4761
+#: gio/gdbusconnection.c:6744
 #, c-format
 msgid "No such interface “%s”"
 msgstr "Inget sådan gränssnitt ”%s”"
 
-#: gio/gdbusconnection.c:4999 gio/gdbusconnection.c:7274
+#: gio/gdbusconnection.c:4983 gio/gdbusconnection.c:7258
 #, c-format
 msgid "No such interface “%s” on object at path %s"
 msgstr "Inget sådant gränssnitt ”%s” på objekt med sökvägen %s"
 
-#: gio/gdbusconnection.c:5100
+#: gio/gdbusconnection.c:5084
 #, c-format
 msgid "No such method “%s”"
 msgstr "Ingen sådan metod ”%s”"
 
-#: gio/gdbusconnection.c:5131
+#: gio/gdbusconnection.c:5115
 #, c-format
 msgid "Type of message, “%s”, does not match expected type “%s”"
 msgstr "Typ av meddelande, ”%s”, matchar inte förväntade typen ”%s”"
 
-#: gio/gdbusconnection.c:5334
+#: gio/gdbusconnection.c:5318
 #, c-format
 msgid "An object is already exported for the interface %s at %s"
 msgstr "Ett objekt är redan exporterat för gränssnittet %s vid %s"
 
-#: gio/gdbusconnection.c:5561
+#: gio/gdbusconnection.c:5545
 #, c-format
 msgid "Unable to retrieve property %s.%s"
 msgstr "Kunde inte hämta egenskap %s.%s"
 
-#: gio/gdbusconnection.c:5617
+#: gio/gdbusconnection.c:5601
 #, c-format
 msgid "Unable to set property %s.%s"
 msgstr "Kunde inte sätta egenskap %s.%s"
 
-#: gio/gdbusconnection.c:5796
+#: gio/gdbusconnection.c:5780
 #, c-format
 msgid "Method “%s” returned type “%s”, but expected “%s”"
 msgstr "Metoden ”%s” returnerade typen ”%s”, men förväntade ”%s”"
 
-#: gio/gdbusconnection.c:6872
+#: gio/gdbusconnection.c:6856
 #, c-format
 msgid "Method “%s” on interface “%s” with signature “%s” does not exist"
 msgstr "Metoden ”%s” på gränssnittet ”%s” med signaturen ”%s” finns inte"
 
-#: gio/gdbusconnection.c:6993
+#: gio/gdbusconnection.c:6977
 #, c-format
 msgid "A subtree is already exported for %s"
 msgstr "Ett underträd har redan exporterats för %s"
 
-#: gio/gdbusconnection.c:7282
+#: gio/gdbusconnection.c:7266
 #, c-format
 msgid "Object does not exist at path “%s”"
 msgstr "Objektet finns inte på sökvägen ”%s”"
@@ -853,9 +853,9 @@ msgstr "Tolkat värde ”%s” för variant är inte en giltig D-Bus-signatur"
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Fel vid deserialisering av xvariant_t med typsträngen ”%s” från D-Bus-"
+"Fel vid deserialisering av GVariant med typsträngen ”%s” från D-Bus-"
 "transportformatet"
 
 #: gio/gdbusmessage.c:2206
@@ -901,9 +901,9 @@ msgstr "Kan inte deserialisera meddelande: "
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"Fel vid serialisering av xvariant_t med typsträngen ”%s” till D-Bus-"
+"Fel vid serialisering av GVariant med typsträngen ”%s” till D-Bus-"
 "transportformatet"
 
 #: gio/gdbusmessage.c:2835
@@ -1368,27 +1368,27 @@ msgstr "DTLS-stöd finns inte tillgängligt"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Kan inte hantera version %d av xemblem_t-kodning"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Kan inte hantera version %d av GEmblem-kodning"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Felformaterat antal token (%d) i xemblem_t-kodning"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Felformaterat antal token (%d) i GEmblem-kodning"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Kan inte hantera version %d av xemblemed_icon_t-kodning"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Kan inte hantera version %d av GEmblemedIcon-kodning"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Felformaterat antal token (%d) i xemblemed_icon_t-kodning"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Felformaterat antal token (%d) i GEmblemedIcon-kodning"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Förväntade en xemblem_t för xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Förväntade en GEmblem för GEmblemedIcon"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1479,12 +1479,12 @@ msgstr "Filnumreraren är redan stängd"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Kan inte hantera version %d av xfile_icon_t-kodning"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Kan inte hantera version %d av GFileIcon-kodning"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Felformaterade inmatningsdata för xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Felformaterade inmatningsdata för GFileIcon"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1551,8 +1551,8 @@ msgstr "Ingen typ för klassnamnet %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "Typen %s implementerar inte xicon_t-gränssnittet"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "Typen %s implementerar inte GIcon-gränssnittet"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1566,8 +1566,8 @@ msgstr "Felformaterat versionsnummer: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Typen %s implementerar inte from_tokens() på xicon_t-gränssnittet"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Typen %s implementerar inte from_tokens() på GIcon-gränssnittet"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2737,8 +2737,8 @@ msgstr "<%s id='%s'> inte (ännu) angiven."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Ogiltig xvariant_t-typsträng ”%s”"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Ogiltig GVariant-typsträng ”%s”"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2969,11 +2969,11 @@ msgstr "Tvinga inte igenom begränsningar för nyckelnamn"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Kompilera alla xsettings_t-schemafiler till en schemacache.\n"
+"Kompilera alla GSettings-schemafiler till en schemacache.\n"
 "Schemafiler måste ha filändelsen .gschema.xml,\n"
 "och cachefilen kallas för gschemas.compiled."
 
@@ -3297,13 +3297,13 @@ msgstr "Fel vid skapande av säkerhetskopia: %s"
 msgid "Error renaming temporary file: %s"
 msgstr "Fel vid namnbyte på temporärfil: %s"
 
-#: gio/glocalfileoutputstream.c:609 gio/glocalfileoutputstream.c:1237
+#: gio/glocalfileoutputstream.c:609 gio/glocalfileoutputstream.c:1239
 #, c-format
 msgid "Error truncating file: %s"
 msgstr "Fel vid kapning av fil: %s"
 
 #: gio/glocalfileoutputstream.c:662 gio/glocalfileoutputstream.c:907
-#: gio/glocalfileoutputstream.c:1218 gio/gsubprocess.c:229
+#: gio/glocalfileoutputstream.c:1220 gio/gsubprocess.c:229
 #, c-format
 msgid "Error opening file “%s”: %s"
 msgstr "Fel vid öppning av filen ”%s”: %s"
@@ -3326,16 +3326,16 @@ msgid "Error removing old file: %s"
 msgstr "Fel vid borttagning av gammal fil: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
-msgstr "Ogiltig xseek_type_t angavs"
+msgid "Invalid GSeekType supplied"
+msgstr "Ogiltig GSeekType angavs"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Ogiltig sökbegäran"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Kan inte kapa av xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Kan inte kapa av GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -3460,7 +3460,11 @@ msgstr "Summan av vektorer skickade till %s är för stor"
 msgid "Source stream is already closed"
 msgstr "Källströmmen är redan stängd"
 
+#. Translators: the first placeholder is a domain name, the
+#. * second is an error message
 #: gio/gresolver.c:401 gio/gthreadedresolver.c:150 gio/gthreadedresolver.c:168
+#: gio/gthreadedresolver.c:780 gio/gthreadedresolver.c:804
+#: gio/gthreadedresolver.c:829 gio/gthreadedresolver.c:844
 #, c-format
 msgid "Error resolving “%s”: %s"
 msgstr "Fel vid uppslag av ”%s”: %s"
@@ -3864,8 +3868,8 @@ msgstr "Tidsgräns för in/ut på uttaget överstegs"
 
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "skapar xsocket_t från fd: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "skapar GSocket från fd: %s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
 #, c-format
@@ -4006,8 +4010,8 @@ msgid "Error sending message: %s"
 msgstr "Fel vid sändning av meddelande: %s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t stöds inte på Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage stöds inte på Windows"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4020,9 +4024,9 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Kunde inte läsa uttagets inloggningsuppgifter: %s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
-"xsocket_get_credentials har inte implementerats för detta operativsystem"
+"g_socket_get_credentials har inte implementerats för detta operativsystem"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4154,8 +4158,8 @@ msgstr "Rör stöds inte på denna plattform"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Kan inte hantera version %d av xthemed_icon_t-kodning"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Kan inte hantera version %d av GThemedIcon-kodning"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4166,22 +4170,40 @@ msgstr "Inga giltiga adresser hittades"
 msgid "Error reverse-resolving “%s”: %s"
 msgstr "Fel vid omvänt uppslag av ”%s”: %s"
 
-#: gio/gthreadedresolver.c:676 gio/gthreadedresolver.c:755
-#: gio/gthreadedresolver.c:853 gio/gthreadedresolver.c:903
+#. Translators: the placeholder is a DNS record type, such as ‘MX’ or ‘SRV’
+#: gio/gthreadedresolver.c:550 gio/gthreadedresolver.c:572
+#: gio/gthreadedresolver.c:610 gio/gthreadedresolver.c:657
+#: gio/gthreadedresolver.c:686 gio/gthreadedresolver.c:698
+#, c-format
+msgid "Error parsing DNS %s record: malformed DNS packet"
+msgstr "Fel vid tolkning av DNS %s-post: felformulerat DNS-paket"
+
+#: gio/gthreadedresolver.c:756 gio/gthreadedresolver.c:893
+#: gio/gthreadedresolver.c:991 gio/gthreadedresolver.c:1041
 #, c-format
 msgid "No DNS record of the requested type for “%s”"
 msgstr "Inga DNS-poster av den begärda typen för ”%s”"
 
-#: gio/gthreadedresolver.c:681 gio/gthreadedresolver.c:858
+#: gio/gthreadedresolver.c:761 gio/gthreadedresolver.c:996
 #, c-format
 msgid "Temporarily unable to resolve “%s”"
 msgstr "Kan för tillfället inte slå upp ”%s”"
 
-#: gio/gthreadedresolver.c:686 gio/gthreadedresolver.c:863
-#: gio/gthreadedresolver.c:973
+#: gio/gthreadedresolver.c:766 gio/gthreadedresolver.c:1001
+#: gio/gthreadedresolver.c:1111
 #, c-format
 msgid "Error resolving “%s”"
 msgstr "Fel vid uppslag av ”%s”"
+
+#: gio/gthreadedresolver.c:780 gio/gthreadedresolver.c:804
+#: gio/gthreadedresolver.c:829 gio/gthreadedresolver.c:844
+msgid "Malformed DNS packet"
+msgstr "Felformulerat DNS-paket"
+
+#: gio/gthreadedresolver.c:886
+#, c-format
+msgid "Failed to parse DNS response for “%s”: "
+msgstr "Misslyckades med att tolka DNS-svar för ”%s”: "
 
 #: gio/gtlscertificate.c:478
 msgid "No PEM-encoded private key found"
@@ -4208,8 +4230,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Den aktuella TLS-bakänden stöder inte PKCS #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "Denna xtls_backend_t stöder inte skapande av PKCS #11-certifikat"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "Denna GTlsBackend stöder inte skapande av PKCS #11-certifikat"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4517,25 +4539,25 @@ msgstr "Sökvägen ”%s” är ingen absolut sökväg"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e %b %Y %H:%M:%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%y-%m-%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4920,7 +4942,7 @@ msgstr "dec"
 # Glibc är istället tom: https://lh.2xlibre.net/locale/sv_SE/
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "fm"
 
@@ -4928,7 +4950,7 @@ msgstr "fm"
 # Glibc är istället tom: https://lh.2xlibre.net/locale/sv_SE/
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "em"
 

@@ -19,7 +19,7 @@
 #ifndef __G_MARKUP_H__
 #define __G_MARKUP_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -65,12 +65,12 @@ typedef enum
  *
  * Error domain for markup parsing.
  * Errors in this domain will be from the #GMarkupError enumeration.
- * See #xerror_t for information on error domains.
+ * See #GError for information on error domains.
  */
 #define G_MARKUP_ERROR g_markup_error_quark ()
 
-XPL_AVAILABLE_IN_ALL
-xquark g_markup_error_quark (void);
+GLIB_AVAILABLE_IN_ALL
+GQuark g_markup_error_quark (void);
 
 /**
  * GMarkupParseFlags:
@@ -101,15 +101,15 @@ typedef enum
 } GMarkupParseFlags;
 
 /**
- * xmarkup_parse_context_t:
+ * GMarkupParseContext:
  *
  * A parse context is used to parse a stream of bytes that
  * you expect to contain marked-up text.
  *
- * See xmarkup_parse_context_new(), #GMarkupParser, and so
+ * See g_markup_parse_context_new(), #GMarkupParser, and so
  * on for more details.
  */
-typedef struct _GMarkupParseContext xmarkup_parse_context_t;
+typedef struct _GMarkupParseContext GMarkupParseContext;
 typedef struct _GMarkupParser GMarkupParser;
 
 /**
@@ -137,101 +137,101 @@ typedef struct _GMarkupParser GMarkupParser;
  * can set an error; in particular the %G_MARKUP_ERROR_UNKNOWN_ELEMENT,
  * %G_MARKUP_ERROR_UNKNOWN_ATTRIBUTE, and %G_MARKUP_ERROR_INVALID_CONTENT
  * errors are intended to be set from these callbacks. If you set an error
- * from a callback, xmarkup_parse_context_parse() will report that error
+ * from a callback, g_markup_parse_context_parse() will report that error
  * back to its caller.
  */
 struct _GMarkupParser
 {
   /* Called for open tags <foo bar="baz"> */
-  void (*start_element)  (xmarkup_parse_context_t *context,
-                          const xchar_t         *element_name,
-                          const xchar_t        **attribute_names,
-                          const xchar_t        **attribute_values,
-                          xpointer_t             user_data,
-                          xerror_t             **error);
+  void (*start_element)  (GMarkupParseContext *context,
+                          const gchar         *element_name,
+                          const gchar        **attribute_names,
+                          const gchar        **attribute_values,
+                          gpointer             user_data,
+                          GError             **error);
 
   /* Called for close tags </foo> */
-  void (*end_element)    (xmarkup_parse_context_t *context,
-                          const xchar_t         *element_name,
-                          xpointer_t             user_data,
-                          xerror_t             **error);
+  void (*end_element)    (GMarkupParseContext *context,
+                          const gchar         *element_name,
+                          gpointer             user_data,
+                          GError             **error);
 
   /* Called for character data */
   /* text is not nul-terminated */
-  void (*text)           (xmarkup_parse_context_t *context,
-                          const xchar_t         *text,
-                          xsize_t                text_len,
-                          xpointer_t             user_data,
-                          xerror_t             **error);
+  void (*text)           (GMarkupParseContext *context,
+                          const gchar         *text,
+                          gsize                text_len,
+                          gpointer             user_data,
+                          GError             **error);
 
   /* Called for strings that should be re-saved verbatim in this same
    * position, but are not otherwise interpretable.  At the moment
    * this includes comments and processing instructions.
    */
   /* text is not nul-terminated. */
-  void (*passthrough)    (xmarkup_parse_context_t *context,
-                          const xchar_t         *passthrough_text,
-                          xsize_t                text_len,
-                          xpointer_t             user_data,
-                          xerror_t             **error);
+  void (*passthrough)    (GMarkupParseContext *context,
+                          const gchar         *passthrough_text,
+                          gsize                text_len,
+                          gpointer             user_data,
+                          GError             **error);
 
   /* Called on error, including one set by other
-   * methods in the vtable. The xerror_t should not be freed.
+   * methods in the vtable. The GError should not be freed.
    */
-  void (*error)          (xmarkup_parse_context_t *context,
-                          xerror_t              *error,
-                          xpointer_t             user_data);
+  void (*error)          (GMarkupParseContext *context,
+                          GError              *error,
+                          gpointer             user_data);
 };
 
-XPL_AVAILABLE_IN_ALL
-xmarkup_parse_context_t *xmarkup_parse_context_new   (const GMarkupParser *parser,
+GLIB_AVAILABLE_IN_ALL
+GMarkupParseContext *g_markup_parse_context_new   (const GMarkupParser *parser,
                                                    GMarkupParseFlags    flags,
-                                                   xpointer_t             user_data,
-                                                   xdestroy_notify_t       user_data_dnotify);
-XPL_AVAILABLE_IN_2_36
-xmarkup_parse_context_t *xmarkup_parse_context_ref   (xmarkup_parse_context_t *context);
-XPL_AVAILABLE_IN_2_36
-void                 xmarkup_parse_context_unref (xmarkup_parse_context_t *context);
-XPL_AVAILABLE_IN_ALL
-void                 xmarkup_parse_context_free  (xmarkup_parse_context_t *context);
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xmarkup_parse_context_parse (xmarkup_parse_context_t *context,
-                                                   const xchar_t         *text,
-                                                   xssize_t               text_len,
-                                                   xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-void                 xmarkup_parse_context_push  (xmarkup_parse_context_t *context,
+                                                   gpointer             user_data,
+                                                   GDestroyNotify       user_data_dnotify);
+GLIB_AVAILABLE_IN_2_36
+GMarkupParseContext *g_markup_parse_context_ref   (GMarkupParseContext *context);
+GLIB_AVAILABLE_IN_2_36
+void                 g_markup_parse_context_unref (GMarkupParseContext *context);
+GLIB_AVAILABLE_IN_ALL
+void                 g_markup_parse_context_free  (GMarkupParseContext *context);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_markup_parse_context_parse (GMarkupParseContext *context,
+                                                   const gchar         *text,
+                                                   gssize               text_len,
+                                                   GError             **error);
+GLIB_AVAILABLE_IN_ALL
+void                 g_markup_parse_context_push  (GMarkupParseContext *context,
                                                    const GMarkupParser *parser,
-                                                   xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xpointer_t             xmarkup_parse_context_pop   (xmarkup_parse_context_t *context);
+                                                   gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gpointer             g_markup_parse_context_pop   (GMarkupParseContext *context);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t             xmarkup_parse_context_end_parse (xmarkup_parse_context_t *context,
-                                                       xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *        xmarkup_parse_context_get_element (xmarkup_parse_context_t *context);
-XPL_AVAILABLE_IN_ALL
-const xslist_t *       xmarkup_parse_context_get_element_stack (xmarkup_parse_context_t *context);
+GLIB_AVAILABLE_IN_ALL
+gboolean             g_markup_parse_context_end_parse (GMarkupParseContext *context,
+                                                       GError             **error);
+GLIB_AVAILABLE_IN_ALL
+const gchar *        g_markup_parse_context_get_element (GMarkupParseContext *context);
+GLIB_AVAILABLE_IN_ALL
+const GSList *       g_markup_parse_context_get_element_stack (GMarkupParseContext *context);
 
 /* For user-constructed error messages, has no precise semantics */
-XPL_AVAILABLE_IN_ALL
-void                 xmarkup_parse_context_get_position (xmarkup_parse_context_t *context,
-                                                          xint_t                *line_number,
-                                                          xint_t                *char_number);
-XPL_AVAILABLE_IN_ALL
-xpointer_t             xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context);
+GLIB_AVAILABLE_IN_ALL
+void                 g_markup_parse_context_get_position (GMarkupParseContext *context,
+                                                          gint                *line_number,
+                                                          gint                *char_number);
+GLIB_AVAILABLE_IN_ALL
+gpointer             g_markup_parse_context_get_user_data (GMarkupParseContext *context);
 
 /* useful when saving */
-XPL_AVAILABLE_IN_ALL
-xchar_t* g_markup_escape_text (const xchar_t *text,
-                             xssize_t       length);
+GLIB_AVAILABLE_IN_ALL
+gchar* g_markup_escape_text (const gchar *text,
+                             gssize       length);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t *g_markup_printf_escaped (const char *format,
+GLIB_AVAILABLE_IN_ALL
+gchar *g_markup_printf_escaped (const char *format,
 				...) G_GNUC_PRINTF (1, 2);
-XPL_AVAILABLE_IN_ALL
-xchar_t *g_markup_vprintf_escaped (const char *format,
+GLIB_AVAILABLE_IN_ALL
+gchar *g_markup_vprintf_escaped (const char *format,
 				 va_list     args) G_GNUC_PRINTF(1, 0);
 
 typedef enum
@@ -247,13 +247,13 @@ typedef enum
 
 
 /* useful from start_element */
-XPL_AVAILABLE_IN_ALL
-xboolean_t   g_markup_collect_attributes (const xchar_t         *element_name,
-                                        const xchar_t        **attribute_names,
-                                        const xchar_t        **attribute_values,
-                                        xerror_t             **error,
+GLIB_AVAILABLE_IN_ALL
+gboolean   g_markup_collect_attributes (const gchar         *element_name,
+                                        const gchar        **attribute_names,
+                                        const gchar        **attribute_values,
+                                        GError             **error,
                                         GMarkupCollectType   first_type,
-                                        const xchar_t         *first_attr,
+                                        const gchar         *first_attr,
                                         ...);
 
 G_END_DECLS

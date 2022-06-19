@@ -24,12 +24,12 @@
 
 #include <gio/gio.h>
 
-xboolean_t test_pipe (xinput_stream_t  **is,
-                    xoutput_stream_t **os,
-                    xerror_t        **error);
+gboolean test_pipe (GInputStream  **is,
+                    GOutputStream **os,
+                    GError        **error);
 
-xboolean_t test_bidi_pipe (xio_stream_t **left,
-                         xio_stream_t **right,
-                         xerror_t    **error);
+gboolean test_bidi_pipe (GIOStream **left,
+                         GIOStream **right,
+                         GError    **error);
 
 #endif /* guard */

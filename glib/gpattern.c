@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997, 1999  Peter Mattis, Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -44,48 +44,48 @@
  * can not be escaped to include them literally in a pattern.
  *
  * When multiple strings must be matched against the same pattern, it
- * is better to compile the pattern to a #xpattern_spec_t using
- * xpattern_spec_new() and use g_pattern_match_string() instead of
+ * is better to compile the pattern to a #GPatternSpec using
+ * g_pattern_spec_new() and use g_pattern_match_string() instead of
  * g_pattern_match_simple(). This avoids the overhead of repeated
  * pattern compilation.
  **/
 
 /**
- * xpattern_spec_t:
+ * GPatternSpec:
  *
- * A xpattern_spec_t struct is the 'compiled' form of a pattern. This
+ * A GPatternSpec struct is the 'compiled' form of a pattern. This
  * structure is opaque and its fields cannot be accessed directly.
  */
 
 /* keep enum and structure of gpattern.c and patterntest.c in sync */
 typedef enum
 {
-  XMATCH_ALL,       /* "*A?A*" */
-  XMATCH_ALL_TAIL,  /* "*A?AA" */
-  XMATCH_HEAD,      /* "AAAA*" */
-  XMATCH_TAIL,      /* "*AAAA" */
-  XMATCH_EXACT,     /* "AAAAA" */
-  XMATCH_LAST
+  G_MATCH_ALL,       /* "*A?A*" */
+  G_MATCH_ALL_TAIL,  /* "*A?AA" */
+  G_MATCH_HEAD,      /* "AAAA*" */
+  G_MATCH_TAIL,      /* "*AAAA" */
+  G_MATCH_EXACT,     /* "AAAAA" */
+  G_MATCH_LAST
 } GMatchType;
 
 struct _GPatternSpec
 {
   GMatchType match_type;
-  xuint_t      pattern_length;
-  xuint_t      min_length;
-  xuint_t      max_length;
-  xchar_t     *pattern;
+  guint      pattern_length;
+  guint      min_length;
+  guint      max_length;
+  gchar     *pattern;
 };
 
 
 /* --- functions --- */
-static inline xboolean_t
-g_pattern_ph_match (const xchar_t *match_pattern,
-		    const xchar_t *match_string,
-		    xboolean_t    *wildcard_reached_p)
+static inline gboolean
+g_pattern_ph_match (const gchar *match_pattern,
+		    const gchar *match_string,
+		    gboolean    *wildcard_reached_p)
 {
-  const xchar_t *pattern, *string;
-  xchar_t ch;
+  const gchar *pattern, *string;
+  gchar ch;
 
   pattern = match_pattern;
   string = match_string;
@@ -99,7 +99,7 @@ g_pattern_ph_match (const xchar_t *match_pattern,
 	case '?':
 	  if (!*string)
 	    return FALSE;
-	  string = xutf8_next_char (string);
+	  string = g_utf8_next_char (string);
 	  break;
 
 	case '*':
@@ -112,7 +112,7 @@ g_pattern_ph_match (const xchar_t *match_pattern,
 		{
 		  if (!*string)
 		    return FALSE;
-		  string = xutf8_next_char (string);
+		  string = g_utf8_next_char (string);
 		}
 	    }
 	  while (ch == '*' || ch == '?');
@@ -120,12 +120,12 @@ g_pattern_ph_match (const xchar_t *match_pattern,
 	    return TRUE;
 	  do
 	    {
-              xboolean_t next_wildcard_reached = FALSE;
+              gboolean next_wildcard_reached = FALSE;
 	      while (ch != *string)
 		{
 		  if (!*string)
 		    return FALSE;
-		  string = xutf8_next_char (string);
+		  string = g_utf8_next_char (string);
 		}
 	      string++;
 	      if (g_pattern_ph_match (pattern, string, &next_wildcard_reached))
@@ -158,10 +158,10 @@ g_pattern_ph_match (const xchar_t *match_pattern,
 }
 
 /**
- * xpattern_spec_match:
- * @pspec: a #xpattern_spec_t
+ * g_pattern_spec_match:
+ * @pspec: a #GPatternSpec
  * @string_length: the length of @string (in bytes, i.e. strlen(),
- *     not xutf8_strlen())
+ *     not g_utf8_strlen())
  * @string: the UTF-8 encoded string to match
  * @string_reversed: (nullable): the reverse of @string or %NULL
  *
@@ -179,22 +179,22 @@ g_pattern_ph_match (const xchar_t *match_pattern,
  * constructions thereof in the various calls to g_pattern_match().
  *
  * Note also that the reverse of a UTF-8 encoded string can in general
- * not be obtained by xstrreverse(). This works only if the string
+ * not be obtained by g_strreverse(). This works only if the string
  * does not contain any multibyte characters. GLib offers the
- * xutf8_strreverse() function to reverse UTF-8 encoded strings.
+ * g_utf8_strreverse() function to reverse UTF-8 encoded strings.
  *
  * Returns: %TRUE if @string matches @pspec
  *
  * Since: 2.70
  **/
-xboolean_t
-xpattern_spec_match (xpattern_spec_t *pspec,
-                      xsize_t string_length,
-                      const xchar_t *string,
-                      const xchar_t *string_reversed)
+gboolean
+g_pattern_spec_match (GPatternSpec *pspec,
+                      gsize string_length,
+                      const gchar *string,
+                      const gchar *string_reversed)
 {
-  xreturn_val_if_fail (pspec != NULL, FALSE);
-  xreturn_val_if_fail (string != NULL, FALSE);
+  g_return_val_if_fail (pspec != NULL, FALSE);
+  g_return_val_if_fail (string != NULL, FALSE);
 
   if (string_length < pspec->min_length ||
       string_length > pspec->max_length)
@@ -202,49 +202,49 @@ xpattern_spec_match (xpattern_spec_t *pspec,
 
   switch (pspec->match_type)
     {
-      xboolean_t dummy;
-    case XMATCH_ALL:
+      gboolean dummy;
+    case G_MATCH_ALL:
       return g_pattern_ph_match (pspec->pattern, string, &dummy);
-    case XMATCH_ALL_TAIL:
+    case G_MATCH_ALL_TAIL:
       if (string_reversed)
 	return g_pattern_ph_match (pspec->pattern, string_reversed, &dummy);
       else
 	{
-          xboolean_t result;
-          xchar_t *tmp;
-	  tmp = xutf8_strreverse (string, string_length);
+          gboolean result;
+          gchar *tmp;
+	  tmp = g_utf8_strreverse (string, string_length);
 	  result = g_pattern_ph_match (pspec->pattern, tmp, &dummy);
 	  g_free (tmp);
 	  return result;
 	}
-    case XMATCH_HEAD:
+    case G_MATCH_HEAD:
       if (pspec->pattern_length == string_length)
 	return strcmp (pspec->pattern, string) == 0;
       else if (pspec->pattern_length)
 	return strncmp (pspec->pattern, string, pspec->pattern_length) == 0;
       else
 	return TRUE;
-    case XMATCH_TAIL:
+    case G_MATCH_TAIL:
       if (pspec->pattern_length)
         return strcmp (pspec->pattern, string + (string_length - pspec->pattern_length)) == 0;
       else
 	return TRUE;
-    case XMATCH_EXACT:
+    case G_MATCH_EXACT:
       if (pspec->pattern_length != string_length)
         return FALSE;
       else
         return strcmp (pspec->pattern, string) == 0;
     default:
-      xreturn_val_if_fail (pspec->match_type < XMATCH_LAST, FALSE);
+      g_return_val_if_fail (pspec->match_type < G_MATCH_LAST, FALSE);
       return FALSE;
     }
 }
 
 /**
  * g_pattern_match: (skip)
- * @pspec: a #xpattern_spec_t
+ * @pspec: a #GPatternSpec
  * @string_length: the length of @string (in bytes, i.e. strlen(),
- *     not xutf8_strlen())
+ *     not g_utf8_strlen())
  * @string: the UTF-8 encoded string to match
  * @string_reversed: (nullable): the reverse of @string or %NULL
  *
@@ -262,50 +262,50 @@ xpattern_spec_match (xpattern_spec_t *pspec,
  * constructions thereof in the various calls to g_pattern_match().
  *
  * Note also that the reverse of a UTF-8 encoded string can in general
- * not be obtained by xstrreverse(). This works only if the string
+ * not be obtained by g_strreverse(). This works only if the string
  * does not contain any multibyte characters. GLib offers the
- * xutf8_strreverse() function to reverse UTF-8 encoded strings.
+ * g_utf8_strreverse() function to reverse UTF-8 encoded strings.
  *
  * Returns: %TRUE if @string matches @pspec
- * Deprecated: 2.70: Use xpattern_spec_match() instead
+ * Deprecated: 2.70: Use g_pattern_spec_match() instead
  **/
-xboolean_t
-g_pattern_match (xpattern_spec_t *pspec,
-                 xuint_t string_length,
-                 const xchar_t *string,
-                 const xchar_t *string_reversed)
+gboolean
+g_pattern_match (GPatternSpec *pspec,
+                 guint string_length,
+                 const gchar *string,
+                 const gchar *string_reversed)
 {
-  return xpattern_spec_match (pspec, string_length, string, string_reversed);
+  return g_pattern_spec_match (pspec, string_length, string, string_reversed);
 }
 
 /**
- * xpattern_spec_new:
+ * g_pattern_spec_new:
  * @pattern: a zero-terminated UTF-8 encoded string
  *
- * Compiles a pattern to a #xpattern_spec_t.
+ * Compiles a pattern to a #GPatternSpec.
  *
- * Returns: a newly-allocated #xpattern_spec_t
+ * Returns: a newly-allocated #GPatternSpec
  **/
-xpattern_spec_t*
-xpattern_spec_new (const xchar_t *pattern)
+GPatternSpec*
+g_pattern_spec_new (const gchar *pattern)
 {
-  xpattern_spec_t *pspec;
-  xboolean_t seen_joker = FALSE, seen_wildcard = FALSE, more_wildcards = FALSE;
-  xint_t hw_pos = -1, tw_pos = -1, hj_pos = -1, tj_pos = -1;
-  xboolean_t follows_wildcard = FALSE;
-  xuint_t pending_jokers = 0;
-  const xchar_t *s;
-  xchar_t *d;
-  xuint_t i;
-
-  xreturn_val_if_fail (pattern != NULL, NULL);
+  GPatternSpec *pspec;
+  gboolean seen_joker = FALSE, seen_wildcard = FALSE, more_wildcards = FALSE;
+  gint hw_pos = -1, tw_pos = -1, hj_pos = -1, tj_pos = -1;
+  gboolean follows_wildcard = FALSE;
+  guint pending_jokers = 0;
+  const gchar *s;
+  gchar *d;
+  guint i;
+  
+  g_return_val_if_fail (pattern != NULL, NULL);
 
   /* canonicalize pattern and collect necessary stats */
-  pspec = g_new (xpattern_spec_t, 1);
+  pspec = g_new (GPatternSpec, 1);
   pspec->pattern_length = strlen (pattern);
   pspec->min_length = 0;
   pspec->max_length = 0;
-  pspec->pattern = g_new (xchar_t, pspec->pattern_length + 1);
+  pspec->pattern = g_new (gchar, pspec->pattern_length + 1);
   d = pspec->pattern;
   for (i = 0, s = pattern; *s != 0; s++)
     {
@@ -360,7 +360,7 @@ xpattern_spec_new (const xchar_t *pattern)
     {
       if (pspec->pattern[0] == '*')
 	{
-	  pspec->match_type = XMATCH_TAIL;
+	  pspec->match_type = G_MATCH_TAIL;
           memmove (pspec->pattern, pspec->pattern + 1, --pspec->pattern_length);
 	  pspec->pattern[pspec->pattern_length] = 0;
 	  return pspec;
@@ -368,13 +368,13 @@ xpattern_spec_new (const xchar_t *pattern)
       if (pspec->pattern_length > 0 &&
 	  pspec->pattern[pspec->pattern_length - 1] == '*')
 	{
-	  pspec->match_type = XMATCH_HEAD;
+	  pspec->match_type = G_MATCH_HEAD;
 	  pspec->pattern[--pspec->pattern_length] = 0;
 	  return pspec;
 	}
       if (!seen_wildcard)
 	{
-	  pspec->match_type = XMATCH_EXACT;
+	  pspec->match_type = G_MATCH_EXACT;
 	  return pspec;
 	}
     }
@@ -383,49 +383,49 @@ xpattern_spec_new (const xchar_t *pattern)
   tw_pos = pspec->pattern_length - 1 - tw_pos;	/* last pos to tail distance */
   tj_pos = pspec->pattern_length - 1 - tj_pos;	/* last pos to tail distance */
   if (seen_wildcard)
-    pspec->match_type = tw_pos > hw_pos ? XMATCH_ALL_TAIL : XMATCH_ALL;
+    pspec->match_type = tw_pos > hw_pos ? G_MATCH_ALL_TAIL : G_MATCH_ALL;
   else /* seen_joker */
-    pspec->match_type = tj_pos > hj_pos ? XMATCH_ALL_TAIL : XMATCH_ALL;
-  if (pspec->match_type == XMATCH_ALL_TAIL) {
-    xchar_t *tmp = pspec->pattern;
-    pspec->pattern = xutf8_strreverse (pspec->pattern, pspec->pattern_length);
+    pspec->match_type = tj_pos > hj_pos ? G_MATCH_ALL_TAIL : G_MATCH_ALL;
+  if (pspec->match_type == G_MATCH_ALL_TAIL) {
+    gchar *tmp = pspec->pattern;
+    pspec->pattern = g_utf8_strreverse (pspec->pattern, pspec->pattern_length);
     g_free (tmp);
   }
   return pspec;
 }
 
 /**
- * xpattern_spec_copy:
- * @pspec: a #xpattern_spec_t
+ * g_pattern_spec_copy:
+ * @pspec: a #GPatternSpec
  *
- * Copies @pspec in a new #xpattern_spec_t.
+ * Copies @pspec in a new #GPatternSpec.
  *
  * Returns: (transfer full): a copy of @pspec.
  *
  * Since: 2.70
  **/
-xpattern_spec_t *
-xpattern_spec_copy (xpattern_spec_t *pspec)
+GPatternSpec *
+g_pattern_spec_copy (GPatternSpec *pspec)
 {
-  xpattern_spec_t *pspec_copy;
+  GPatternSpec *pspec_copy;
 
-  xreturn_val_if_fail (pspec != NULL, NULL);
+  g_return_val_if_fail (pspec != NULL, NULL);
 
-  pspec_copy = g_new (xpattern_spec_t, 1);
+  pspec_copy = g_new (GPatternSpec, 1);
   *pspec_copy = *pspec;
-  pspec_copy->pattern = xstrndup (pspec->pattern, pspec->pattern_length);
+  pspec_copy->pattern = g_strndup (pspec->pattern, pspec->pattern_length);
 
   return pspec_copy;
 }
 
 /**
- * xpattern_spec_free:
- * @pspec: a #xpattern_spec_t
+ * g_pattern_spec_free:
+ * @pspec: a #GPatternSpec
  *
- * Frees the memory allocated for the #xpattern_spec_t.
+ * Frees the memory allocated for the #GPatternSpec.
  **/
 void
-xpattern_spec_free (xpattern_spec_t *pspec)
+g_pattern_spec_free (GPatternSpec *pspec)
 {
   g_return_if_fail (pspec != NULL);
 
@@ -434,21 +434,21 @@ xpattern_spec_free (xpattern_spec_t *pspec)
 }
 
 /**
- * xpattern_spec_equal:
- * @pspec1: a #xpattern_spec_t
- * @pspec2: another #xpattern_spec_t
+ * g_pattern_spec_equal:
+ * @pspec1: a #GPatternSpec
+ * @pspec2: another #GPatternSpec
  *
  * Compares two compiled pattern specs and returns whether they will
  * match the same set of strings.
  *
  * Returns: Whether the compiled patterns are equal
  **/
-xboolean_t
-xpattern_spec_equal (xpattern_spec_t *pspec1,
-		      xpattern_spec_t *pspec2)
+gboolean
+g_pattern_spec_equal (GPatternSpec *pspec1,
+		      GPatternSpec *pspec2)
 {
-  xreturn_val_if_fail (pspec1 != NULL, FALSE);
-  xreturn_val_if_fail (pspec2 != NULL, FALSE);
+  g_return_val_if_fail (pspec1 != NULL, FALSE);
+  g_return_val_if_fail (pspec2 != NULL, FALSE);
 
   return (pspec1->pattern_length == pspec2->pattern_length &&
 	  pspec1->match_type == pspec2->match_type &&
@@ -456,8 +456,8 @@ xpattern_spec_equal (xpattern_spec_t *pspec1,
 }
 
 /**
- * xpattern_spec_match_string:
- * @pspec: a #xpattern_spec_t
+ * g_pattern_spec_match_string:
+ * @pspec: a #GPatternSpec
  * @string: the UTF-8 encoded string to match
  *
  * Matches a string against a compiled pattern. If the string is to be
@@ -468,19 +468,19 @@ xpattern_spec_equal (xpattern_spec_t *pspec1,
  *
  * Since: 2.70
  **/
-xboolean_t
-xpattern_spec_match_string (xpattern_spec_t *pspec,
-                             const xchar_t *string)
+gboolean
+g_pattern_spec_match_string (GPatternSpec *pspec,
+                             const gchar *string)
 {
-  xreturn_val_if_fail (pspec != NULL, FALSE);
-  xreturn_val_if_fail (string != NULL, FALSE);
+  g_return_val_if_fail (pspec != NULL, FALSE);
+  g_return_val_if_fail (string != NULL, FALSE);
 
-  return xpattern_spec_match (pspec, strlen (string), string, NULL);
+  return g_pattern_spec_match (pspec, strlen (string), string, NULL);
 }
 
 /**
  * g_pattern_match_string: (skip)
- * @pspec: a #xpattern_spec_t
+ * @pspec: a #GPatternSpec
  * @string: the UTF-8 encoded string to match
  *
  * Matches a string against a compiled pattern. If the string is to be
@@ -488,13 +488,13 @@ xpattern_spec_match_string (xpattern_spec_t *pspec,
  * g_pattern_match() instead while supplying the reversed string.
  *
  * Returns: %TRUE if @string matches @pspec
- * Deprecated: 2.70: Use xpattern_spec_match_string() instead
+ * Deprecated: 2.70: Use g_pattern_spec_match_string() instead
  **/
-xboolean_t
-g_pattern_match_string (xpattern_spec_t *pspec,
-                        const xchar_t *string)
+gboolean
+g_pattern_match_string (GPatternSpec *pspec,
+                        const gchar *string)
 {
-  return xpattern_spec_match_string (pspec, string);
+  return g_pattern_spec_match_string (pspec, string);
 }
 
 /**
@@ -504,24 +504,24 @@ g_pattern_match_string (xpattern_spec_t *pspec,
  *
  * Matches a string against a pattern given as a string. If this
  * function is to be called in a loop, it's more efficient to compile
- * the pattern once with xpattern_spec_new() and call
+ * the pattern once with g_pattern_spec_new() and call
  * g_pattern_match_string() repeatedly.
  *
  * Returns: %TRUE if @string matches @pspec
  **/
-xboolean_t
-g_pattern_match_simple (const xchar_t *pattern,
-			const xchar_t *string)
+gboolean
+g_pattern_match_simple (const gchar *pattern,
+			const gchar *string)
 {
-  xpattern_spec_t *pspec;
-  xboolean_t ergo;
+  GPatternSpec *pspec;
+  gboolean ergo;
 
-  xreturn_val_if_fail (pattern != NULL, FALSE);
-  xreturn_val_if_fail (string != NULL, FALSE);
+  g_return_val_if_fail (pattern != NULL, FALSE);
+  g_return_val_if_fail (string != NULL, FALSE);
 
-  pspec = xpattern_spec_new (pattern);
-  ergo = xpattern_spec_match (pspec, strlen (string), string, NULL);
-  xpattern_spec_free (pspec);
+  pspec = g_pattern_spec_new (pattern);
+  ergo = g_pattern_spec_match (pspec, strlen (string), string, NULL);
+  g_pattern_spec_free (pspec);
 
   return ergo;
 }

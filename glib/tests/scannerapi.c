@@ -21,36 +21,36 @@
 #include <stdlib.h>
 
 
-/* xscanner_t fixture */
+/* GScanner fixture */
 typedef struct {
-  xscanner_t *scanner;
+  GScanner *scanner;
 } ScannerFixture;
 static void
 scanner_fixture_setup (ScannerFixture *fix,
-                       xconstpointer   test_data)
+                       gconstpointer   test_data)
 {
   fix->scanner = g_scanner_new (NULL);
-  xassert (fix->scanner != NULL);
+  g_assert (fix->scanner != NULL);
 }
 static void
 scanner_fixture_teardown (ScannerFixture *fix,
-                          xconstpointer   test_data)
+                          gconstpointer   test_data)
 {
-  xassert (fix->scanner != NULL);
+  g_assert (fix->scanner != NULL);
   g_scanner_destroy (fix->scanner);
 }
 
 static void
-scanner_msg_func (xscanner_t *scanner,
-                  xchar_t    *message,
-                  xboolean_t  error)
+scanner_msg_func (GScanner *scanner,
+                  gchar    *message,
+                  gboolean  error)
 {
   g_assert_cmpstr (message, ==, "test");
 }
 
 static void
 test_scanner_warn (ScannerFixture *fix,
-                   xconstpointer   test_data)
+                   gconstpointer   test_data)
 {
   fix->scanner->msg_handler = scanner_msg_func;
   g_scanner_warn (fix->scanner, "test");
@@ -58,7 +58,7 @@ test_scanner_warn (ScannerFixture *fix,
 
 static void
 test_scanner_error (ScannerFixture *fix,
-                    xconstpointer   test_data)
+                    gconstpointer   test_data)
 {
   if (g_test_subprocess ())
     {
@@ -74,31 +74,31 @@ test_scanner_error (ScannerFixture *fix,
 }
 
 static void
-check_keys (xpointer_t key,
-            xpointer_t value,
-            xpointer_t user_data)
+check_keys (gpointer key,
+            gpointer value,
+            gpointer user_data)
 {
   g_assert_cmpint (GPOINTER_TO_INT (value), ==, g_ascii_strtoull (key, NULL, 0));
 }
 
 static void
 test_scanner_symbols (ScannerFixture *fix,
-                      xconstpointer   test_data)
+                      gconstpointer   test_data)
 {
-  xint_t i;
-  xchar_t buf[2];
+  gint i;
+  gchar buf[2];
 
   g_scanner_set_scope (fix->scanner, 1);
 
   for (i = 0; i < 10; i++)
     g_scanner_scope_add_symbol (fix->scanner,
                                 1,
-                                g_ascii_dtostr (buf, 2, (xdouble_t)i),
+                                g_ascii_dtostr (buf, 2, (gdouble)i),
                                 GINT_TO_POINTER (i));
   g_scanner_scope_foreach_symbol (fix->scanner, 1, check_keys, NULL);
   g_assert_cmpint (GPOINTER_TO_INT (g_scanner_lookup_symbol (fix->scanner, "5")), ==, 5);
   g_scanner_scope_remove_symbol (fix->scanner, 1, "5");
-  xassert (g_scanner_lookup_symbol (fix->scanner, "5") == NULL);
+  g_assert (g_scanner_lookup_symbol (fix->scanner, "5") == NULL);
 
   g_assert_cmpint (GPOINTER_TO_INT (g_scanner_scope_lookup_symbol (fix->scanner, 1, "4")), ==, 4);
   g_assert_cmpint (GPOINTER_TO_INT (g_scanner_scope_lookup_symbol (fix->scanner, 1, "5")), ==, 0);
@@ -106,13 +106,13 @@ test_scanner_symbols (ScannerFixture *fix,
 
 static void
 test_scanner_tokens (ScannerFixture *fix,
-                     xconstpointer   test_data)
+                     gconstpointer   test_data)
 {
-  xchar_t buf[] = "(\t\n\r\\){}";
-  const xint_t buflen = strlen (buf);
-  xchar_t tokbuf[] = "(\\){}";
-  const xsize_t tokbuflen = strlen (tokbuf);
-  xsize_t i;
+  gchar buf[] = "(\t\n\r\\){}";
+  const gint buflen = strlen (buf);
+  gchar tokbuf[] = "(\\){}";
+  const gsize tokbuflen = strlen (tokbuf);
+  gsize i;
 
   g_scanner_input_text (fix->scanner, buf, buflen);
 

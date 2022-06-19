@@ -84,22 +84,22 @@
  * SECTION:gsocket
  * @short_description: Low-level socket object
  * @include: gio/gio.h
- * @see_also: #xinitable_t, [<gnetworking.h>][gio-gnetworking.h]
+ * @see_also: #GInitable, [<gnetworking.h>][gio-gnetworking.h]
  *
- * A #xsocket_t is a low-level networking primitive. It is a more or less
- * direct mapping of the BSD socket API in a portable xobject_t based API.
+ * A #GSocket is a low-level networking primitive. It is a more or less
+ * direct mapping of the BSD socket API in a portable GObject based API.
  * It supports both the UNIX socket implementations and winsock2 on Windows.
  *
- * #xsocket_t is the platform independent base upon which the higher level
+ * #GSocket is the platform independent base upon which the higher level
  * network primitives are based. Applications are not typically meant to
- * use it directly, but rather through classes like #xsocket_client_t,
- * #xsocket_service_t and #xsocket_connection_t. However there may be cases where
- * direct use of #xsocket_t is useful.
+ * use it directly, but rather through classes like #GSocketClient,
+ * #GSocketService and #GSocketConnection. However there may be cases where
+ * direct use of #GSocket is useful.
  *
- * #xsocket_t implements the #xinitable_t interface, so if it is manually constructed
- * by e.g. xobject_new() you must call xinitable_init() and check the
+ * #GSocket implements the #GInitable interface, so if it is manually constructed
+ * by e.g. g_object_new() you must call g_initable_init() and check the
  * results before using the object. This is done automatically in
- * xsocket_new() and xsocket_new_from_fd(), so these functions can return
+ * g_socket_new() and g_socket_new_from_fd(), so these functions can return
  * %NULL.
  *
  * Sockets operate in two general modes, blocking or non-blocking. When
@@ -107,11 +107,11 @@
  * parameter) block until the requested operation
  * is finished or there is an error. In non-blocking mode all calls that
  * would block return immediately with a %G_IO_ERROR_WOULD_BLOCK error.
- * To know when a call would successfully run you can call xsocket_condition_check(),
- * or xsocket_condition_wait(). You can also use xsocket_create_source() and
- * attach it to a #xmain_context_t to get callbacks when I/O is possible.
+ * To know when a call would successfully run you can call g_socket_condition_check(),
+ * or g_socket_condition_wait(). You can also use g_socket_create_source() and
+ * attach it to a #GMainContext to get callbacks when I/O is possible.
  * Note that all sockets are always set to non blocking mode in the system, and
- * blocking mode is emulated in xsocket_t.
+ * blocking mode is emulated in GSocket.
  *
  * When working in non-blocking mode applications should always be able to
  * handle getting a %G_IO_ERROR_WOULD_BLOCK error even when some other
@@ -128,80 +128,80 @@
  *
  * All socket file descriptors are set to be close-on-exec.
  *
- * Note that creating a #xsocket_t causes the signal %SIGPIPE to be
+ * Note that creating a #GSocket causes the signal %SIGPIPE to be
  * ignored for the remainder of the program. If you are writing a
- * command-line utility that uses #xsocket_t, you may need to take into
+ * command-line utility that uses #GSocket, you may need to take into
  * account the fact that your program will not automatically be killed
  * if it tries to write to %stdout after it has been closed.
  *
- * Like most other APIs in GLib, #xsocket_t is not inherently thread safe. To use
- * a #xsocket_t concurrently from multiple threads, you must implement your own
+ * Like most other APIs in GLib, #GSocket is not inherently thread safe. To use
+ * a #GSocket concurrently from multiple threads, you must implement your own
  * locking.
  *
  * Since: 2.22
  */
 
-static void     xsocket_initable_iface_init (xinitable_iface_t  *iface);
-static xboolean_t xsocket_initable_init       (xinitable_t       *initable,
-					      xcancellable_t    *cancellable,
-					      xerror_t         **error);
+static void     g_socket_initable_iface_init (GInitableIface  *iface);
+static gboolean g_socket_initable_init       (GInitable       *initable,
+					      GCancellable    *cancellable,
+					      GError         **error);
 
-static void     xsocket_datagram_based_iface_init       (GDatagramBasedInterface *iface);
-static xint_t     xsocket_datagram_based_receive_messages (xdatagram_based_t  *self,
-                                                          xinput_message_t   *messages,
-                                                          xuint_t            num_messages,
-                                                          xint_t             flags,
-                                                          sint64_t           timeout_us,
-                                                          xcancellable_t    *cancellable,
-                                                          xerror_t         **error);
-static xint_t     xsocket_datagram_based_send_messages    (xdatagram_based_t  *self,
-                                                          xoutput_message_t  *messages,
-                                                          xuint_t            num_messages,
-                                                          xint_t             flags,
-                                                          sint64_t           timeout_us,
-                                                          xcancellable_t    *cancellable,
-                                                          xerror_t         **error);
-static xsource_t *xsocket_datagram_based_create_source    (xdatagram_based_t           *self,
-                                                          xio_condition_t              condition,
-                                                          xcancellable_t             *cancellable);
-static xio_condition_t xsocket_datagram_based_condition_check      (xdatagram_based_t   *datagram_based,
-                                                                  xio_condition_t      condition);
-static xboolean_t     xsocket_datagram_based_condition_wait       (xdatagram_based_t   *datagram_based,
-                                                                  xio_condition_t      condition,
-                                                                  sint64_t            timeout_us,
-                                                                  xcancellable_t     *cancellable,
-                                                                  xerror_t          **error);
+static void     g_socket_datagram_based_iface_init       (GDatagramBasedInterface *iface);
+static gint     g_socket_datagram_based_receive_messages (GDatagramBased  *self,
+                                                          GInputMessage   *messages,
+                                                          guint            num_messages,
+                                                          gint             flags,
+                                                          gint64           timeout_us,
+                                                          GCancellable    *cancellable,
+                                                          GError         **error);
+static gint     g_socket_datagram_based_send_messages    (GDatagramBased  *self,
+                                                          GOutputMessage  *messages,
+                                                          guint            num_messages,
+                                                          gint             flags,
+                                                          gint64           timeout_us,
+                                                          GCancellable    *cancellable,
+                                                          GError         **error);
+static GSource *g_socket_datagram_based_create_source    (GDatagramBased           *self,
+                                                          GIOCondition              condition,
+                                                          GCancellable             *cancellable);
+static GIOCondition g_socket_datagram_based_condition_check      (GDatagramBased   *datagram_based,
+                                                                  GIOCondition      condition);
+static gboolean     g_socket_datagram_based_condition_wait       (GDatagramBased   *datagram_based,
+                                                                  GIOCondition      condition,
+                                                                  gint64            timeout_us,
+                                                                  GCancellable     *cancellable,
+                                                                  GError          **error);
 
-static xsocket_address_t *
-cache_recv_address (xsocket_t *socket, struct sockaddr *native, size_t native_len);
+static GSocketAddress *
+cache_recv_address (GSocket *socket, struct sockaddr *native, size_t native_len);
 
-static xssize_t
-xsocket_receive_message_with_timeout  (xsocket_t                 *socket,
-                                        xsocket_address_t         **address,
-                                        xinput_vector_t            *vectors,
-                                        xint_t                     num_vectors,
-                                        xsocket_control_message_t ***messages,
-                                        xint_t                    *num_messages,
-                                        xint_t                    *flags,
-                                        sint64_t                   timeout_us,
-                                        xcancellable_t            *cancellable,
-                                        xerror_t                 **error);
-static xint_t
-xsocket_receive_messages_with_timeout (xsocket_t        *socket,
-                                        xinput_message_t  *messages,
-                                        xuint_t           num_messages,
-                                        xint_t            flags,
-                                        sint64_t          timeout_us,
-                                        xcancellable_t   *cancellable,
-                                        xerror_t        **error);
-static xint_t
-xsocket_send_messages_with_timeout    (xsocket_t        *socket,
-                                        xoutput_message_t *messages,
-                                        xuint_t           num_messages,
-                                        xint_t            flags,
-                                        sint64_t          timeout_us,
-                                        xcancellable_t   *cancellable,
-                                        xerror_t        **error);
+static gssize
+g_socket_receive_message_with_timeout  (GSocket                 *socket,
+                                        GSocketAddress         **address,
+                                        GInputVector            *vectors,
+                                        gint                     num_vectors,
+                                        GSocketControlMessage ***messages,
+                                        gint                    *num_messages,
+                                        gint                    *flags,
+                                        gint64                   timeout_us,
+                                        GCancellable            *cancellable,
+                                        GError                 **error);
+static gint
+g_socket_receive_messages_with_timeout (GSocket        *socket,
+                                        GInputMessage  *messages,
+                                        guint           num_messages,
+                                        gint            flags,
+                                        gint64          timeout_us,
+                                        GCancellable   *cancellable,
+                                        GError        **error);
+static gint
+g_socket_send_messages_with_timeout    (GSocket        *socket,
+                                        GOutputMessage *messages,
+                                        guint           num_messages,
+                                        gint            flags,
+                                        gint64          timeout_us,
+                                        GCancellable   *cancellable,
+                                        GError        **error);
 
 enum
 {
@@ -222,62 +222,62 @@ enum
   PROP_MULTICAST_TTL
 };
 
-/* Size of the receiver cache for xsocket_receive_from() */
+/* Size of the receiver cache for g_socket_receive_from() */
 #define RECV_ADDR_CACHE_SIZE 8
 
 struct _GSocketPrivate
 {
-  xsocket_family_t   family;
-  xsocket_type_t     type;
+  GSocketFamily   family;
+  GSocketType     type;
   GSocketProtocol protocol;
-  xint_t            fd;
-  xint_t            listen_backlog;
-  xuint_t           timeout;
-  xerror_t         *construct_error;
-  xsocket_address_t *remote_address;
-  xuint_t           inited : 1;
-  xuint_t           blocking : 1;
-  xuint_t           keepalive : 1;
-  xuint_t           closed : 1;
-  xuint_t           connected_read : 1;
-  xuint_t           connected_write : 1;
-  xuint_t           listening : 1;
-  xuint_t           timed_out : 1;
-  xuint_t           connect_pending : 1;
+  gint            fd;
+  gint            listen_backlog;
+  guint           timeout;
+  GError         *construct_error;
+  GSocketAddress *remote_address;
+  guint           inited : 1;
+  guint           blocking : 1;
+  guint           keepalive : 1;
+  guint           closed : 1;
+  guint           connected_read : 1;
+  guint           connected_write : 1;
+  guint           listening : 1;
+  guint           timed_out : 1;
+  guint           connect_pending : 1;
 #ifdef G_OS_WIN32
   WSAEVENT        event;
-  xboolean_t        waiting;
+  gboolean        waiting;
   DWORD           waiting_result;
   int             current_events;
   int             current_errors;
   int             selected_events;
-  xlist_t          *requested_conditions; /* list of requested xio_condition_t * */
-  xmutex_t          win32_source_lock;
-  xcond_t           win32_source_cond;
+  GList          *requested_conditions; /* list of requested GIOCondition * */
+  GMutex          win32_source_lock;
+  GCond           win32_source_cond;
 #endif
 
   struct {
-    xsocket_address_t *addr;
+    GSocketAddress *addr;
     struct sockaddr *native;
-    xsize_t native_len;
-    xuint64_t last_used;
+    gsize native_len;
+    guint64 last_used;
   } recv_addr_cache[RECV_ADDR_CACHE_SIZE];
 };
 
-_G_DEFINE_TYPE_EXTENDED_WITH_PRELUDE (xsocket_t, g_socket, XTYPE_OBJECT, 0,
+_G_DEFINE_TYPE_EXTENDED_WITH_PRELUDE (GSocket, g_socket, G_TYPE_OBJECT, 0,
                                       /* Need a prelude for https://bugzilla.gnome.org/show_bug.cgi?id=674885 */
-                                      xtype_ensure (XTYPE_SOCKET_FAMILY);
-                                      xtype_ensure (XTYPE_SOCKET_TYPE);
-                                      xtype_ensure (XTYPE_SOCKET_PROTOCOL);
-                                      xtype_ensure (XTYPE_SOCKET_ADDRESS);
+                                      g_type_ensure (G_TYPE_SOCKET_FAMILY);
+                                      g_type_ensure (G_TYPE_SOCKET_TYPE);
+                                      g_type_ensure (G_TYPE_SOCKET_PROTOCOL);
+                                      g_type_ensure (G_TYPE_SOCKET_ADDRESS);
                                       /* And networking init is appropriate for the prelude */
                                       g_networking_init ();
                                       , /* And now the regular type init code */
-                                      G_ADD_PRIVATE (xsocket_t)
-                                      G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                             xsocket_initable_iface_init);
-                                      G_IMPLEMENT_INTERFACE (XTYPE_DATAGRAM_BASED,
-                                                             xsocket_datagram_based_iface_init));
+                                      G_ADD_PRIVATE (GSocket)
+                                      G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                             g_socket_initable_iface_init);
+                                      G_IMPLEMENT_INTERFACE (G_TYPE_DATAGRAM_BASED,
+                                                             g_socket_datagram_based_iface_init));
 
 static int
 get_socket_errno (void)
@@ -303,7 +303,7 @@ static const char *
 socket_strerror (int err)
 {
 #ifndef G_OS_WIN32
-  return xstrerror (err);
+  return g_strerror (err);
 #else
   const char *msg_ret;
   char *msg;
@@ -320,7 +320,7 @@ socket_strerror (int err)
 /* Wrapper around g_set_error() to avoid doing excess work */
 #define socket_set_error_lazy(err, errsv, fmt)                          \
   G_STMT_START {                                                        \
-    xerror_t **__err = (err);                                             \
+    GError **__err = (err);                                             \
     int __errsv = (errsv);                                              \
                                                                         \
     if (__err)                                                          \
@@ -338,7 +338,7 @@ socket_strerror (int err)
 #ifdef G_OS_WIN32
 #define win32_unset_event_mask(_socket, _mask) _win32_unset_event_mask (_socket, _mask)
 static void
-_win32_unset_event_mask (xsocket_t *socket, int mask)
+_win32_unset_event_mask (GSocket *socket, int mask)
 {
   g_mutex_lock (&socket->priv->win32_source_lock);
   socket->priv->current_events &= ~mask;
@@ -352,64 +352,64 @@ _win32_unset_event_mask (xsocket_t *socket, int mask)
 /* Windows has broken prototypes... */
 #ifdef G_OS_WIN32
 #define getsockopt(sockfd, level, optname, optval, optlen) \
-  getsockopt (sockfd, level, optname, (xpointer_t) optval, (int*) optlen)
+  getsockopt (sockfd, level, optname, (gpointer) optval, (int*) optlen)
 #define setsockopt(sockfd, level, optname, optval, optlen) \
-  setsockopt (sockfd, level, optname, (xpointer_t) optval, optlen)
+  setsockopt (sockfd, level, optname, (gpointer) optval, optlen)
 #define getsockname(sockfd, addr, addrlen) \
   getsockname (sockfd, addr, (int *)addrlen)
 #define getpeername(sockfd, addr, addrlen) \
   getpeername (sockfd, addr, (int *)addrlen)
 #define recv(sockfd, buf, len, flags) \
-  recv (sockfd, (xpointer_t)buf, len, flags)
+  recv (sockfd, (gpointer)buf, len, flags)
 #endif
 
-static xchar_t *
-address_to_string (xsocket_address_t *address)
+static gchar *
+address_to_string (GSocketAddress *address)
 {
-  xstring_t *ret = xstring_new ("");
+  GString *ret = g_string_new ("");
 
-  if (X_IS_INET_SOCKET_ADDRESS (address))
+  if (G_IS_INET_SOCKET_ADDRESS (address))
     {
-      xinet_socket_address_t *isa = G_INET_SOCKET_ADDRESS (address);
-      xinet_address_t *ia = g_inet_socket_address_get_address (isa);
-      xsocket_family_t family = xinet_address_get_family (ia);
-      xchar_t *tmp;
+      GInetSocketAddress *isa = G_INET_SOCKET_ADDRESS (address);
+      GInetAddress *ia = g_inet_socket_address_get_address (isa);
+      GSocketFamily family = g_inet_address_get_family (ia);
+      gchar *tmp;
 
       /* Represent IPv6 addresses in URL style:
        * ::1 port 12345 -> [::1]:12345 */
-      if (family == XSOCKET_FAMILY_IPV6)
-        xstring_append_c (ret, '[');
+      if (family == G_SOCKET_FAMILY_IPV6)
+        g_string_append_c (ret, '[');
 
-      tmp = xinet_address_to_string (ia);
-      xstring_append (ret, tmp);
+      tmp = g_inet_address_to_string (ia);
+      g_string_append (ret, tmp);
       g_free (tmp);
 
-      if (family == XSOCKET_FAMILY_IPV6)
+      if (family == G_SOCKET_FAMILY_IPV6)
         {
-          xuint32_t scope = g_inet_socket_address_get_scope_id (isa);
+          guint32 scope = g_inet_socket_address_get_scope_id (isa);
 
           if (scope != 0)
-            xstring_append_printf (ret, "%%%u", scope);
+            g_string_append_printf (ret, "%%%u", scope);
 
-          xstring_append_c (ret, ']');
+          g_string_append_c (ret, ']');
         }
 
-      xstring_append_c (ret, ':');
+      g_string_append_c (ret, ':');
 
-      xstring_append_printf (ret, "%u", g_inet_socket_address_get_port (isa));
+      g_string_append_printf (ret, "%u", g_inet_socket_address_get_port (isa));
     }
   else
     {
       /* For unknown address types, just show the type */
-      xstring_append_printf (ret, "(%s)", G_OBJECT_TYPE_NAME (address));
+      g_string_append_printf (ret, "(%s)", G_OBJECT_TYPE_NAME (address));
     }
 
-  return xstring_free (ret, FALSE);
+  return g_string_free (ret, FALSE);
 }
 
-static xboolean_t
-check_socket (xsocket_t *socket,
-	      xerror_t **error)
+static gboolean
+check_socket (GSocket *socket,
+	      GError **error)
 {
   if (!socket->priv->inited)
     {
@@ -436,9 +436,9 @@ check_socket (xsocket_t *socket,
   return TRUE;
 }
 
-static xboolean_t
-check_timeout (xsocket_t *socket,
-	       xerror_t **error)
+static gboolean
+check_timeout (GSocket *socket,
+	       GError **error)
 {
   if (socket->priv->timed_out)
     {
@@ -452,19 +452,19 @@ check_timeout (xsocket_t *socket,
 }
 
 static void
-xsocket_details_from_fd (xsocket_t *socket)
+g_socket_details_from_fd (GSocket *socket)
 {
   union {
     struct sockaddr_storage storage;
     struct sockaddr sa;
   } address;
-  xint_t fd;
-  xuint_t addrlen;
+  gint fd;
+  guint addrlen;
   int value, family;
   int errsv;
 
   fd = socket->priv->fd;
-  if (!xsocket_get_option (socket, SOL_SOCKET, SO_TYPE, &value, NULL))
+  if (!g_socket_get_option (socket, SOL_SOCKET, SO_TYPE, &value, NULL))
     {
       errsv = get_socket_errno ();
       goto err;
@@ -473,19 +473,19 @@ xsocket_details_from_fd (xsocket_t *socket)
   switch (value)
     {
      case SOCK_STREAM:
-      socket->priv->type = XSOCKET_TYPE_STREAM;
+      socket->priv->type = G_SOCKET_TYPE_STREAM;
       break;
 
      case SOCK_DGRAM:
-      socket->priv->type = XSOCKET_TYPE_DATAGRAM;
+      socket->priv->type = G_SOCKET_TYPE_DATAGRAM;
       break;
 
      case SOCK_SEQPACKET:
-      socket->priv->type = XSOCKET_TYPE_SEQPACKET;
+      socket->priv->type = G_SOCKET_TYPE_SEQPACKET;
       break;
 
      default:
-      socket->priv->type = XSOCKET_TYPE_INVALID;
+      socket->priv->type = G_SOCKET_TYPE_INVALID;
       break;
     }
 
@@ -498,7 +498,7 @@ xsocket_details_from_fd (xsocket_t *socket)
 
   if (addrlen > 0)
     {
-      xassert (G_STRUCT_OFFSET (struct sockaddr, sa_family) +
+      g_assert (G_STRUCT_OFFSET (struct sockaddr, sa_family) +
 		sizeof address.storage.ss_family <= addrlen);
       family = address.storage.ss_family;
     }
@@ -508,7 +508,7 @@ xsocket_details_from_fd (xsocket_t *socket)
        * But we can use SO_DOMAIN as a workaround there.
        */
 #ifdef SO_DOMAIN
-      if (!xsocket_get_option (socket, SOL_SOCKET, SO_DOMAIN, &family, NULL))
+      if (!g_socket_get_option (socket, SOL_SOCKET, SO_DOMAIN, &family, NULL))
 	{
 	  errsv = get_socket_errno ();
 	  goto err;
@@ -522,21 +522,21 @@ xsocket_details_from_fd (xsocket_t *socket)
 
   switch (family)
     {
-     case XSOCKET_FAMILY_IPV4:
-     case XSOCKET_FAMILY_IPV6:
+     case G_SOCKET_FAMILY_IPV4:
+     case G_SOCKET_FAMILY_IPV6:
        socket->priv->family = address.storage.ss_family;
        switch (socket->priv->type)
 	 {
-	 case XSOCKET_TYPE_STREAM:
-	   socket->priv->protocol = XSOCKET_PROTOCOL_TCP;
+	 case G_SOCKET_TYPE_STREAM:
+	   socket->priv->protocol = G_SOCKET_PROTOCOL_TCP;
 	   break;
 
-	 case XSOCKET_TYPE_DATAGRAM:
-	   socket->priv->protocol = XSOCKET_PROTOCOL_UDP;
+	 case G_SOCKET_TYPE_DATAGRAM:
+	   socket->priv->protocol = G_SOCKET_PROTOCOL_UDP;
 	   break;
 
-	 case XSOCKET_TYPE_SEQPACKET:
-	   socket->priv->protocol = XSOCKET_PROTOCOL_SCTP;
+	 case G_SOCKET_TYPE_SEQPACKET:
+	   socket->priv->protocol = G_SOCKET_PROTOCOL_SCTP;
 	   break;
 
 	 default:
@@ -544,17 +544,17 @@ xsocket_details_from_fd (xsocket_t *socket)
 	 }
        break;
 
-     case XSOCKET_FAMILY_UNIX:
-       socket->priv->family = XSOCKET_FAMILY_UNIX;
-       socket->priv->protocol = XSOCKET_PROTOCOL_DEFAULT;
+     case G_SOCKET_FAMILY_UNIX:
+       socket->priv->family = G_SOCKET_FAMILY_UNIX;
+       socket->priv->protocol = G_SOCKET_PROTOCOL_DEFAULT;
        break;
 
      default:
-       socket->priv->family = XSOCKET_FAMILY_INVALID;
+       socket->priv->family = G_SOCKET_FAMILY_INVALID;
        break;
     }
 
-  if (socket->priv->family != XSOCKET_FAMILY_INVALID)
+  if (socket->priv->family != G_SOCKET_FAMILY_INVALID)
     {
       addrlen = sizeof address;
       if (getpeername (fd, &address.sa, &addrlen) >= 0)
@@ -564,7 +564,7 @@ xsocket_details_from_fd (xsocket_t *socket)
         }
     }
 
-  if (xsocket_get_option (socket, SOL_SOCKET, SO_KEEPALIVE, &value, NULL))
+  if (g_socket_get_option (socket, SOL_SOCKET, SO_KEEPALIVE, &value, NULL))
     {
       socket->priv->keepalive = !!value;
     }
@@ -579,16 +579,16 @@ xsocket_details_from_fd (xsocket_t *socket)
  err:
   g_set_error (&socket->priv->construct_error, G_IO_ERROR,
 	       socket_io_error_from_errno (errsv),
-	       _("creating xsocket_t from fd: %s"),
+	       _("creating GSocket from fd: %s"),
 	       socket_strerror (errsv));
 }
 
 /* Wrapper around socket() that is shared with gnetworkmonitornetlink.c */
-xint_t
-g_socket (xint_t     domain,
-          xint_t     type,
-          xint_t     protocol,
-          xerror_t **error)
+gint
+g_socket (gint     domain,
+          gint     type,
+          gint     protocol,
+          GError **error)
 {
   int fd, errsv;
 
@@ -619,7 +619,7 @@ g_socket (xint_t     domain,
 
     /* We always want to set close-on-exec to protect users. If you
        need to so some weird inheritance to exec you can re-enable this
-       using lower level hacks with xsocket_get_fd(). */
+       using lower level hacks with g_socket_get_fd(). */
     flags = fcntl (fd, F_GETFD, 0);
     if (flags != -1 &&
 	(flags & FD_CLOEXEC) == 0)
@@ -643,25 +643,25 @@ g_socket (xint_t     domain,
   return fd;
 }
 
-static xint_t
-xsocket_create_socket (xsocket_family_t   family,
-			xsocket_type_t     type,
+static gint
+g_socket_create_socket (GSocketFamily   family,
+			GSocketType     type,
 			int             protocol,
-			xerror_t        **error)
+			GError        **error)
 {
-  xint_t native_type;
+  gint native_type;
 
   switch (type)
     {
-     case XSOCKET_TYPE_STREAM:
+     case G_SOCKET_TYPE_STREAM:
       native_type = SOCK_STREAM;
       break;
 
-     case XSOCKET_TYPE_DATAGRAM:
+     case G_SOCKET_TYPE_DATAGRAM:
       native_type = SOCK_DGRAM;
       break;
 
-     case XSOCKET_TYPE_SEQPACKET:
+     case G_SOCKET_TYPE_SEQPACKET:
       native_type = SOCK_SEQPACKET;
       break;
 
@@ -687,17 +687,17 @@ xsocket_create_socket (xsocket_family_t   family,
 }
 
 static void
-xsocket_constructed (xobject_t *object)
+g_socket_constructed (GObject *object)
 {
-  xsocket_t *socket = G_SOCKET (object);
+  GSocket *socket = G_SOCKET (object);
 
   if (socket->priv->fd >= 0)
     /* create socket->priv info from the fd */
-    xsocket_details_from_fd (socket);
+    g_socket_details_from_fd (socket);
 
   else
     /* create the fd from socket->priv info */
-    socket->priv->fd = xsocket_create_socket (socket->priv->family,
+    socket->priv->fd = g_socket_create_socket (socket->priv->family,
 					       socket->priv->type,
 					       socket->priv->protocol,
 					       &socket->priv->construct_error);
@@ -705,9 +705,9 @@ xsocket_constructed (xobject_t *object)
   if (socket->priv->fd != -1)
     {
 #ifndef G_OS_WIN32
-      xerror_t *error = NULL;
+      GError *error = NULL;
 #else
-      xulong_t arg;
+      gulong arg;
 #endif
 
       /* Always use native nonblocking sockets, as Windows sets sockets to
@@ -732,78 +732,78 @@ xsocket_constructed (xobject_t *object)
 
 #ifdef SO_NOSIGPIPE
       /* See note about SIGPIPE below. */
-      xsocket_set_option (socket, SOL_SOCKET, SO_NOSIGPIPE, TRUE, NULL);
+      g_socket_set_option (socket, SOL_SOCKET, SO_NOSIGPIPE, TRUE, NULL);
 #endif
     }
 }
 
 static void
-xsocket_get_property (xobject_t    *object,
-		       xuint_t       prop_id,
-		       xvalue_t     *value,
-		       xparam_spec_t *pspec)
+g_socket_get_property (GObject    *object,
+		       guint       prop_id,
+		       GValue     *value,
+		       GParamSpec *pspec)
 {
-  xsocket_t *socket = G_SOCKET (object);
-  xsocket_address_t *address;
+  GSocket *socket = G_SOCKET (object);
+  GSocketAddress *address;
 
   switch (prop_id)
     {
       case PROP_FAMILY:
-	xvalue_set_enum (value, socket->priv->family);
+	g_value_set_enum (value, socket->priv->family);
 	break;
 
       case PROP_TYPE:
-	xvalue_set_enum (value, socket->priv->type);
+	g_value_set_enum (value, socket->priv->type);
 	break;
 
       case PROP_PROTOCOL:
-	xvalue_set_enum (value, socket->priv->protocol);
+	g_value_set_enum (value, socket->priv->protocol);
 	break;
 
       case PROP_FD:
-	xvalue_set_int (value, socket->priv->fd);
+	g_value_set_int (value, socket->priv->fd);
 	break;
 
       case PROP_BLOCKING:
-	xvalue_set_boolean (value, socket->priv->blocking);
+	g_value_set_boolean (value, socket->priv->blocking);
 	break;
 
       case PROP_LISTEN_BACKLOG:
-	xvalue_set_int (value, socket->priv->listen_backlog);
+	g_value_set_int (value, socket->priv->listen_backlog);
 	break;
 
       case PROP_KEEPALIVE:
-	xvalue_set_boolean (value, socket->priv->keepalive);
+	g_value_set_boolean (value, socket->priv->keepalive);
 	break;
 
       case PROP_LOCAL_ADDRESS:
-	address = xsocket_get_local_address (socket, NULL);
-	xvalue_take_object (value, address);
+	address = g_socket_get_local_address (socket, NULL);
+	g_value_take_object (value, address);
 	break;
 
       case PROP_REMOTE_ADDRESS:
-	address = xsocket_get_remote_address (socket, NULL);
-	xvalue_take_object (value, address);
+	address = g_socket_get_remote_address (socket, NULL);
+	g_value_take_object (value, address);
 	break;
 
       case PROP_TIMEOUT:
-	xvalue_set_uint (value, socket->priv->timeout);
+	g_value_set_uint (value, socket->priv->timeout);
 	break;
 
       case PROP_TTL:
-	xvalue_set_uint (value, xsocket_get_ttl (socket));
+	g_value_set_uint (value, g_socket_get_ttl (socket));
 	break;
 
       case PROP_BROADCAST:
-	xvalue_set_boolean (value, xsocket_get_broadcast (socket));
+	g_value_set_boolean (value, g_socket_get_broadcast (socket));
 	break;
 
       case PROP_MULTICAST_LOOPBACK:
-	xvalue_set_boolean (value, xsocket_get_multicast_loopback (socket));
+	g_value_set_boolean (value, g_socket_get_multicast_loopback (socket));
 	break;
 
       case PROP_MULTICAST_TTL:
-	xvalue_set_uint (value, xsocket_get_multicast_ttl (socket));
+	g_value_set_uint (value, g_socket_get_multicast_ttl (socket));
 	break;
 
       default:
@@ -812,61 +812,61 @@ xsocket_get_property (xobject_t    *object,
 }
 
 static void
-xsocket_set_property (xobject_t      *object,
-		       xuint_t         prop_id,
-		       const xvalue_t *value,
-		       xparam_spec_t   *pspec)
+g_socket_set_property (GObject      *object,
+		       guint         prop_id,
+		       const GValue *value,
+		       GParamSpec   *pspec)
 {
-  xsocket_t *socket = G_SOCKET (object);
+  GSocket *socket = G_SOCKET (object);
 
   switch (prop_id)
     {
       case PROP_FAMILY:
-	socket->priv->family = xvalue_get_enum (value);
+	socket->priv->family = g_value_get_enum (value);
 	break;
 
       case PROP_TYPE:
-	socket->priv->type = xvalue_get_enum (value);
+	socket->priv->type = g_value_get_enum (value);
 	break;
 
       case PROP_PROTOCOL:
-	socket->priv->protocol = xvalue_get_enum (value);
+	socket->priv->protocol = g_value_get_enum (value);
 	break;
 
       case PROP_FD:
-	socket->priv->fd = xvalue_get_int (value);
+	socket->priv->fd = g_value_get_int (value);
 	break;
 
       case PROP_BLOCKING:
-	xsocket_set_blocking (socket, xvalue_get_boolean (value));
+	g_socket_set_blocking (socket, g_value_get_boolean (value));
 	break;
 
       case PROP_LISTEN_BACKLOG:
-	xsocket_set_listen_backlog (socket, xvalue_get_int (value));
+	g_socket_set_listen_backlog (socket, g_value_get_int (value));
 	break;
 
       case PROP_KEEPALIVE:
-	xsocket_set_keepalive (socket, xvalue_get_boolean (value));
+	g_socket_set_keepalive (socket, g_value_get_boolean (value));
 	break;
 
       case PROP_TIMEOUT:
-	xsocket_set_timeout (socket, xvalue_get_uint (value));
+	g_socket_set_timeout (socket, g_value_get_uint (value));
 	break;
 
       case PROP_TTL:
-	xsocket_set_ttl (socket, xvalue_get_uint (value));
+	g_socket_set_ttl (socket, g_value_get_uint (value));
 	break;
 
       case PROP_BROADCAST:
-	xsocket_set_broadcast (socket, xvalue_get_boolean (value));
+	g_socket_set_broadcast (socket, g_value_get_boolean (value));
 	break;
 
       case PROP_MULTICAST_LOOPBACK:
-	xsocket_set_multicast_loopback (socket, xvalue_get_boolean (value));
+	g_socket_set_multicast_loopback (socket, g_value_get_boolean (value));
 	break;
 
       case PROP_MULTICAST_TTL:
-	xsocket_set_multicast_ttl (socket, xvalue_get_uint (value));
+	g_socket_set_multicast_ttl (socket, g_value_get_uint (value));
 	break;
 
       default:
@@ -875,19 +875,19 @@ xsocket_set_property (xobject_t      *object,
 }
 
 static void
-xsocket_finalize (xobject_t *object)
+g_socket_finalize (GObject *object)
 {
-  xsocket_t *socket = G_SOCKET (object);
-  xint_t i;
+  GSocket *socket = G_SOCKET (object);
+  gint i;
 
   g_clear_error (&socket->priv->construct_error);
 
   if (socket->priv->fd != -1 &&
       !socket->priv->closed)
-    xsocket_close (socket, NULL);
+    g_socket_close (socket, NULL);
 
   if (socket->priv->remote_address)
-    xobject_unref (socket->priv->remote_address);
+    g_object_unref (socket->priv->remote_address);
 
 #ifdef G_OS_WIN32
   if (socket->priv->event != WSA_INVALID_EVENT)
@@ -896,7 +896,7 @@ xsocket_finalize (xobject_t *object)
       socket->priv->event = WSA_INVALID_EVENT;
     }
 
-  xassert (socket->priv->requested_conditions == NULL);
+  g_assert (socket->priv->requested_conditions == NULL);
   g_mutex_clear (&socket->priv->win32_source_lock);
   g_cond_clear (&socket->priv->win32_source_cond);
 #endif
@@ -905,19 +905,19 @@ xsocket_finalize (xobject_t *object)
     {
       if (socket->priv->recv_addr_cache[i].addr)
         {
-          xobject_unref (socket->priv->recv_addr_cache[i].addr);
+          g_object_unref (socket->priv->recv_addr_cache[i].addr);
           g_free (socket->priv->recv_addr_cache[i].native);
         }
     }
 
-  if (XOBJECT_CLASS (xsocket_parent_class)->finalize)
-    (*XOBJECT_CLASS (xsocket_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_socket_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_socket_parent_class)->finalize) (object);
 }
 
 static void
-xsocket_class_init (GSocketClass *klass)
+g_socket_class_init (GSocketClass *klass)
 {
-  xobject_class_t *xobject_class G_GNUC_UNUSED = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class G_GNUC_UNUSED = G_OBJECT_CLASS (klass);
 
 #ifdef SIGPIPE
   /* There is no portable, thread-safe way to avoid having the process
@@ -932,192 +932,192 @@ xsocket_class_init (GSocketClass *klass)
   signal (SIGPIPE, SIG_IGN);
 #endif
 
-  xobject_class->finalize = xsocket_finalize;
-  xobject_class->constructed = xsocket_constructed;
-  xobject_class->set_property = xsocket_set_property;
-  xobject_class->get_property = xsocket_get_property;
+  gobject_class->finalize = g_socket_finalize;
+  gobject_class->constructed = g_socket_constructed;
+  gobject_class->set_property = g_socket_set_property;
+  gobject_class->get_property = g_socket_get_property;
 
-  xobject_class_install_property (xobject_class, PROP_FAMILY,
-				   xparam_spec_enum ("family",
+  g_object_class_install_property (gobject_class, PROP_FAMILY,
+				   g_param_spec_enum ("family",
 						      P_("Socket family"),
 						      P_("The sockets address family"),
-						      XTYPE_SOCKET_FAMILY,
-						      XSOCKET_FAMILY_INVALID,
-						      XPARAM_CONSTRUCT_ONLY |
-                                                      XPARAM_READWRITE |
-                                                      XPARAM_STATIC_STRINGS));
+						      G_TYPE_SOCKET_FAMILY,
+						      G_SOCKET_FAMILY_INVALID,
+						      G_PARAM_CONSTRUCT_ONLY |
+                                                      G_PARAM_READWRITE |
+                                                      G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_TYPE,
-				   xparam_spec_enum ("type",
+  g_object_class_install_property (gobject_class, PROP_TYPE,
+				   g_param_spec_enum ("type",
 						      P_("Socket type"),
 						      P_("The sockets type"),
-						      XTYPE_SOCKET_TYPE,
-						      XSOCKET_TYPE_STREAM,
-						      XPARAM_CONSTRUCT_ONLY |
-                                                      XPARAM_READWRITE |
-                                                      XPARAM_STATIC_STRINGS));
+						      G_TYPE_SOCKET_TYPE,
+						      G_SOCKET_TYPE_STREAM,
+						      G_PARAM_CONSTRUCT_ONLY |
+                                                      G_PARAM_READWRITE |
+                                                      G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_PROTOCOL,
-				   xparam_spec_enum ("protocol",
+  g_object_class_install_property (gobject_class, PROP_PROTOCOL,
+				   g_param_spec_enum ("protocol",
 						      P_("Socket protocol"),
 						      P_("The id of the protocol to use, or -1 for unknown"),
-						      XTYPE_SOCKET_PROTOCOL,
-						      XSOCKET_PROTOCOL_UNKNOWN,
-						      XPARAM_CONSTRUCT_ONLY |
-                                                      XPARAM_READWRITE |
-                                                      XPARAM_STATIC_STRINGS));
+						      G_TYPE_SOCKET_PROTOCOL,
+						      G_SOCKET_PROTOCOL_UNKNOWN,
+						      G_PARAM_CONSTRUCT_ONLY |
+                                                      G_PARAM_READWRITE |
+                                                      G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_FD,
-				   xparam_spec_int ("fd",
+  g_object_class_install_property (gobject_class, PROP_FD,
+				   g_param_spec_int ("fd",
 						     P_("File descriptor"),
 						     P_("The sockets file descriptor"),
 						     G_MININT,
 						     G_MAXINT,
 						     -1,
-						     XPARAM_CONSTRUCT_ONLY |
-                                                     XPARAM_READWRITE |
-                                                     XPARAM_STATIC_STRINGS));
+						     G_PARAM_CONSTRUCT_ONLY |
+                                                     G_PARAM_READWRITE |
+                                                     G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_BLOCKING,
-				   xparam_spec_boolean ("blocking",
+  g_object_class_install_property (gobject_class, PROP_BLOCKING,
+				   g_param_spec_boolean ("blocking",
 							 P_("blocking"),
 							 P_("Whether or not I/O on this socket is blocking"),
 							 TRUE,
-							 XPARAM_READWRITE |
-                                                         XPARAM_STATIC_STRINGS));
+							 G_PARAM_READWRITE |
+                                                         G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_LISTEN_BACKLOG,
-				   xparam_spec_int ("listen-backlog",
+  g_object_class_install_property (gobject_class, PROP_LISTEN_BACKLOG,
+				   g_param_spec_int ("listen-backlog",
 						     P_("Listen backlog"),
 						     P_("Outstanding connections in the listen queue"),
 						     0,
 						     SOMAXCONN,
 						     10,
-						     XPARAM_READWRITE |
-                                                     XPARAM_STATIC_STRINGS));
+						     G_PARAM_READWRITE |
+                                                     G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_KEEPALIVE,
-				   xparam_spec_boolean ("keepalive",
+  g_object_class_install_property (gobject_class, PROP_KEEPALIVE,
+				   g_param_spec_boolean ("keepalive",
 							 P_("Keep connection alive"),
 							 P_("Keep connection alive by sending periodic pings"),
 							 FALSE,
-							 XPARAM_READWRITE |
-                                                         XPARAM_STATIC_STRINGS));
+							 G_PARAM_READWRITE |
+                                                         G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_LOCAL_ADDRESS,
-				   xparam_spec_object ("local-address",
+  g_object_class_install_property (gobject_class, PROP_LOCAL_ADDRESS,
+				   g_param_spec_object ("local-address",
 							P_("Local address"),
 							P_("The local address the socket is bound to"),
-							XTYPE_SOCKET_ADDRESS,
-							XPARAM_READABLE |
-                                                        XPARAM_STATIC_STRINGS));
+							G_TYPE_SOCKET_ADDRESS,
+							G_PARAM_READABLE |
+                                                        G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_REMOTE_ADDRESS,
-				   xparam_spec_object ("remote-address",
+  g_object_class_install_property (gobject_class, PROP_REMOTE_ADDRESS,
+				   g_param_spec_object ("remote-address",
 							P_("Remote address"),
 							P_("The remote address the socket is connected to"),
-							XTYPE_SOCKET_ADDRESS,
-							XPARAM_READABLE |
-                                                        XPARAM_STATIC_STRINGS));
+							G_TYPE_SOCKET_ADDRESS,
+							G_PARAM_READABLE |
+                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsocket_t:timeout:
+   * GSocket:timeout:
    *
    * The timeout in seconds on socket I/O
    *
    * Since: 2.26
    */
-  xobject_class_install_property (xobject_class, PROP_TIMEOUT,
-				   xparam_spec_uint ("timeout",
+  g_object_class_install_property (gobject_class, PROP_TIMEOUT,
+				   g_param_spec_uint ("timeout",
 						      P_("Timeout"),
 						      P_("The timeout in seconds on socket I/O"),
 						      0,
 						      G_MAXUINT,
 						      0,
-						      XPARAM_READWRITE |
-						      XPARAM_STATIC_STRINGS));
+						      G_PARAM_READWRITE |
+						      G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsocket_t:broadcast:
+   * GSocket:broadcast:
    *
    * Whether the socket should allow sending to broadcast addresses.
    *
    * Since: 2.32
    */
-  xobject_class_install_property (xobject_class, PROP_BROADCAST,
-				   xparam_spec_boolean ("broadcast",
+  g_object_class_install_property (gobject_class, PROP_BROADCAST,
+				   g_param_spec_boolean ("broadcast",
 							 P_("Broadcast"),
 							 P_("Whether to allow sending to broadcast addresses"),
 							 FALSE,
-							 XPARAM_READWRITE |
-                                                         XPARAM_STATIC_STRINGS));
+							 G_PARAM_READWRITE |
+                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsocket_t:ttl:
+   * GSocket:ttl:
    *
    * Time-to-live for outgoing unicast packets
    *
    * Since: 2.32
    */
-  xobject_class_install_property (xobject_class, PROP_TTL,
-				   xparam_spec_uint ("ttl",
+  g_object_class_install_property (gobject_class, PROP_TTL,
+				   g_param_spec_uint ("ttl",
 						      P_("TTL"),
 						      P_("Time-to-live of outgoing unicast packets"),
 						      0, G_MAXUINT, 0,
-						      XPARAM_READWRITE |
-						      XPARAM_STATIC_STRINGS));
+						      G_PARAM_READWRITE |
+						      G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsocket_t:multicast-loopback:
+   * GSocket:multicast-loopback:
    *
    * Whether outgoing multicast packets loop back to the local host.
    *
    * Since: 2.32
    */
-  xobject_class_install_property (xobject_class, PROP_MULTICAST_LOOPBACK,
-				   xparam_spec_boolean ("multicast-loopback",
+  g_object_class_install_property (gobject_class, PROP_MULTICAST_LOOPBACK,
+				   g_param_spec_boolean ("multicast-loopback",
 							 P_("Multicast loopback"),
 							 P_("Whether outgoing multicast packets loop back to the local host"),
 							 TRUE,
-							 XPARAM_READWRITE |
-                                                         XPARAM_STATIC_STRINGS));
+							 G_PARAM_READWRITE |
+                                                         G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsocket_t:multicast-ttl:
+   * GSocket:multicast-ttl:
    *
    * Time-to-live out outgoing multicast packets
    *
    * Since: 2.32
    */
-  xobject_class_install_property (xobject_class, PROP_MULTICAST_TTL,
-				   xparam_spec_uint ("multicast-ttl",
+  g_object_class_install_property (gobject_class, PROP_MULTICAST_TTL,
+				   g_param_spec_uint ("multicast-ttl",
 						      P_("Multicast TTL"),
 						      P_("Time-to-live of outgoing multicast packets"),
 						      0, G_MAXUINT, 1,
-						      XPARAM_READWRITE |
-						      XPARAM_STATIC_STRINGS));
+						      G_PARAM_READWRITE |
+						      G_PARAM_STATIC_STRINGS));
 }
 
 static void
-xsocket_initable_iface_init (xinitable_iface_t *iface)
+g_socket_initable_iface_init (GInitableIface *iface)
 {
-  iface->init = xsocket_initable_init;
+  iface->init = g_socket_initable_init;
 }
 
 static void
-xsocket_datagram_based_iface_init (GDatagramBasedInterface *iface)
+g_socket_datagram_based_iface_init (GDatagramBasedInterface *iface)
 {
-  iface->receive_messages = xsocket_datagram_based_receive_messages;
-  iface->send_messages = xsocket_datagram_based_send_messages;
-  iface->create_source = xsocket_datagram_based_create_source;
-  iface->condition_check = xsocket_datagram_based_condition_check;
-  iface->condition_wait = xsocket_datagram_based_condition_wait;
+  iface->receive_messages = g_socket_datagram_based_receive_messages;
+  iface->send_messages = g_socket_datagram_based_send_messages;
+  iface->create_source = g_socket_datagram_based_create_source;
+  iface->condition_check = g_socket_datagram_based_condition_check;
+  iface->condition_wait = g_socket_datagram_based_condition_wait;
 }
 
 static void
-xsocket_init (xsocket_t *socket)
+g_socket_init (GSocket *socket)
 {
-  socket->priv = xsocket_get_instance_private (socket);
+  socket->priv = g_socket_get_instance_private (socket);
 
   socket->priv->fd = -1;
   socket->priv->blocking = TRUE;
@@ -1130,14 +1130,14 @@ xsocket_init (xsocket_t *socket)
 #endif
 }
 
-static xboolean_t
-xsocket_initable_init (xinitable_t *initable,
-			xcancellable_t *cancellable,
-			xerror_t  **error)
+static gboolean
+g_socket_initable_init (GInitable *initable,
+			GCancellable *cancellable,
+			GError  **error)
 {
-  xsocket_t  *socket;
+  GSocket  *socket;
 
-  xreturn_val_if_fail (X_IS_SOCKET (initable), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (initable), FALSE);
 
   socket = G_SOCKET (initable);
 
@@ -1153,7 +1153,7 @@ xsocket_initable_init (xinitable_t *initable,
   if (socket->priv->construct_error)
     {
       if (error)
-	*error = xerror_copy (socket->priv->construct_error);
+	*error = g_error_copy (socket->priv->construct_error);
       return FALSE;
     }
 
@@ -1161,30 +1161,30 @@ xsocket_initable_init (xinitable_t *initable,
   return TRUE;
 }
 
-static xboolean_t
-check_datagram_based (xdatagram_based_t  *self,
-                      xerror_t         **error)
+static gboolean
+check_datagram_based (GDatagramBased  *self,
+                      GError         **error)
 {
-  switch (xsocket_get_socket_type (G_SOCKET (self)))
+  switch (g_socket_get_socket_type (G_SOCKET (self)))
     {
-    case XSOCKET_TYPE_INVALID:
-    case XSOCKET_TYPE_STREAM:
+    case G_SOCKET_TYPE_INVALID:
+    case G_SOCKET_TYPE_STREAM:
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                    _("Cannot use datagram operations on a non-datagram "
                      "socket."));
       return FALSE;
-    case XSOCKET_TYPE_DATAGRAM:
-    case XSOCKET_TYPE_SEQPACKET:
+    case G_SOCKET_TYPE_DATAGRAM:
+    case G_SOCKET_TYPE_SEQPACKET:
       /* Fall through. */
       break;
     }
 
-  /* Due to us sharing #GSocketSource with the #xsocket_t implementation, it is
-   * pretty tricky to split out #xsocket_t:timeout so that it does not affect
-   * #xdatagram_based_t operations (but still affects #xsocket_t operations). It is
+  /* Due to us sharing #GSocketSource with the #GSocket implementation, it is
+   * pretty tricky to split out #GSocket:timeout so that it does not affect
+   * #GDatagramBased operations (but still affects #GSocket operations). It is
    * not worth that effort — just disallow it and require the user to specify
    * timeouts on a per-operation basis. */
-  if (xsocket_get_timeout (G_SOCKET (self)) != 0)
+  if (g_socket_get_timeout (G_SOCKET (self)) != 0)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                    _("Cannot use datagram operations on a socket with a "
@@ -1195,84 +1195,84 @@ check_datagram_based (xdatagram_based_t  *self,
   return TRUE;
 }
 
-static xint_t
-xsocket_datagram_based_receive_messages (xdatagram_based_t  *self,
-                                          xinput_message_t   *messages,
-                                          xuint_t            num_messages,
-                                          xint_t             flags,
-                                          sint64_t           timeout_us,
-                                          xcancellable_t    *cancellable,
-                                          xerror_t         **error)
+static gint
+g_socket_datagram_based_receive_messages (GDatagramBased  *self,
+                                          GInputMessage   *messages,
+                                          guint            num_messages,
+                                          gint             flags,
+                                          gint64           timeout_us,
+                                          GCancellable    *cancellable,
+                                          GError         **error)
 {
   if (!check_datagram_based (self, error))
     return FALSE;
 
-  return xsocket_receive_messages_with_timeout (G_SOCKET (self), messages,
+  return g_socket_receive_messages_with_timeout (G_SOCKET (self), messages,
                                                  num_messages, flags, timeout_us,
                                                  cancellable, error);
 }
 
-static xint_t
-xsocket_datagram_based_send_messages (xdatagram_based_t  *self,
-                                       xoutput_message_t  *messages,
-                                       xuint_t            num_messages,
-                                       xint_t             flags,
-                                       sint64_t           timeout_us,
-                                       xcancellable_t    *cancellable,
-                                       xerror_t         **error)
+static gint
+g_socket_datagram_based_send_messages (GDatagramBased  *self,
+                                       GOutputMessage  *messages,
+                                       guint            num_messages,
+                                       gint             flags,
+                                       gint64           timeout_us,
+                                       GCancellable    *cancellable,
+                                       GError         **error)
 {
   if (!check_datagram_based (self, error))
     return FALSE;
 
-  return xsocket_send_messages_with_timeout (G_SOCKET (self), messages,
+  return g_socket_send_messages_with_timeout (G_SOCKET (self), messages,
                                               num_messages, flags, timeout_us,
                                               cancellable, error);
 }
 
-static xsource_t *
-xsocket_datagram_based_create_source (xdatagram_based_t  *self,
-                                       xio_condition_t     condition,
-                                       xcancellable_t    *cancellable)
+static GSource *
+g_socket_datagram_based_create_source (GDatagramBased  *self,
+                                       GIOCondition     condition,
+                                       GCancellable    *cancellable)
 {
   if (!check_datagram_based (self, NULL))
     return NULL;
 
-  return xsocket_create_source (G_SOCKET (self), condition, cancellable);
+  return g_socket_create_source (G_SOCKET (self), condition, cancellable);
 }
 
-static xio_condition_t
-xsocket_datagram_based_condition_check (xdatagram_based_t  *datagram_based,
-                                         xio_condition_t     condition)
+static GIOCondition
+g_socket_datagram_based_condition_check (GDatagramBased  *datagram_based,
+                                         GIOCondition     condition)
 {
   if (!check_datagram_based (datagram_based, NULL))
     return G_IO_ERR;
 
-  return xsocket_condition_check (G_SOCKET (datagram_based), condition);
+  return g_socket_condition_check (G_SOCKET (datagram_based), condition);
 }
 
-static xboolean_t
-xsocket_datagram_based_condition_wait (xdatagram_based_t  *datagram_based,
-                                        xio_condition_t     condition,
-                                        sint64_t           timeout_us,
-                                        xcancellable_t    *cancellable,
-                                        xerror_t         **error)
+static gboolean
+g_socket_datagram_based_condition_wait (GDatagramBased  *datagram_based,
+                                        GIOCondition     condition,
+                                        gint64           timeout_us,
+                                        GCancellable    *cancellable,
+                                        GError         **error)
 {
   if (!check_datagram_based (datagram_based, error))
     return FALSE;
 
-  return xsocket_condition_timed_wait (G_SOCKET (datagram_based), condition,
+  return g_socket_condition_timed_wait (G_SOCKET (datagram_based), condition,
                                         timeout_us, cancellable, error);
 }
 
 /**
- * xsocket_new:
- * @family: the socket family to use, e.g. %XSOCKET_FAMILY_IPV4.
+ * g_socket_new:
+ * @family: the socket family to use, e.g. %G_SOCKET_FAMILY_IPV4.
  * @type: the socket type to use.
  * @protocol: the id of the protocol to use, or 0 for default.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
- * Creates a new #xsocket_t with the defined family, type and protocol.
- * If @protocol is 0 (%XSOCKET_PROTOCOL_DEFAULT) the default protocol type
+ * Creates a new #GSocket with the defined family, type and protocol.
+ * If @protocol is 0 (%G_SOCKET_PROTOCOL_DEFAULT) the default protocol type
  * for the family and type is used.
  *
  * The @protocol is a family and type specific int that specifies what
@@ -1285,18 +1285,18 @@ xsocket_datagram_based_condition_wait (xdatagram_based_t  *datagram_based,
  * system, so you can use protocols not listed in #GSocketProtocol if you
  * know the protocol number used for it.
  *
- * Returns: a #xsocket_t or %NULL on error.
- *     Free the returned object with xobject_unref().
+ * Returns: a #GSocket or %NULL on error.
+ *     Free the returned object with g_object_unref().
  *
  * Since: 2.22
  */
-xsocket_t *
-xsocket_new (xsocket_family_t     family,
-	      xsocket_type_t       type,
+GSocket *
+g_socket_new (GSocketFamily     family,
+	      GSocketType       type,
 	      GSocketProtocol   protocol,
-	      xerror_t          **error)
+	      GError          **error)
 {
-  return G_SOCKET (xinitable_new (XTYPE_SOCKET,
+  return G_SOCKET (g_initable_new (G_TYPE_SOCKET,
 				   NULL, error,
 				   "family", family,
 				   "type", type,
@@ -1305,42 +1305,42 @@ xsocket_new (xsocket_family_t     family,
 }
 
 /**
- * xsocket_new_from_fd:
+ * g_socket_new_from_fd:
  * @fd: a native socket file descriptor.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
- * Creates a new #xsocket_t from a native file descriptor
+ * Creates a new #GSocket from a native file descriptor
  * or winsock SOCKET handle.
  *
  * This reads all the settings from the file descriptor so that
  * all properties should work. Note that the file descriptor
  * will be set to non-blocking mode, independent on the blocking
- * mode of the #xsocket_t.
+ * mode of the #GSocket.
  *
- * On success, the returned #xsocket_t takes ownership of @fd. On failure, the
+ * On success, the returned #GSocket takes ownership of @fd. On failure, the
  * caller must close @fd themselves.
  *
  * Since GLib 2.46, it is no longer a fatal error to call this on a non-socket
- * descriptor.  Instead, a xerror_t will be set with code %G_IO_ERROR_FAILED
+ * descriptor.  Instead, a GError will be set with code %G_IO_ERROR_FAILED
  *
- * Returns: a #xsocket_t or %NULL on error.
- *     Free the returned object with xobject_unref().
+ * Returns: a #GSocket or %NULL on error.
+ *     Free the returned object with g_object_unref().
  *
  * Since: 2.22
  */
-xsocket_t *
-xsocket_new_from_fd (xint_t     fd,
-		      xerror_t **error)
+GSocket *
+g_socket_new_from_fd (gint     fd,
+		      GError **error)
 {
-  return G_SOCKET (xinitable_new (XTYPE_SOCKET,
+  return G_SOCKET (g_initable_new (G_TYPE_SOCKET,
 				   NULL, error,
 				   "fd", fd,
 				   NULL));
 }
 
 /**
- * xsocket_set_blocking:
- * @socket: a #xsocket_t.
+ * g_socket_set_blocking:
+ * @socket: a #GSocket.
  * @blocking: Whether to use blocking I/O or not.
  *
  * Sets the blocking mode of the socket. In blocking mode
@@ -1351,15 +1351,15 @@ xsocket_new_from_fd (xint_t     fd,
  *
  * All sockets are created in blocking mode. However, note that the
  * platform level socket is always non-blocking, and blocking mode
- * is a xsocket_t level feature.
+ * is a GSocket level feature.
  *
  * Since: 2.22
  */
 void
-xsocket_set_blocking (xsocket_t  *socket,
-		       xboolean_t  blocking)
+g_socket_set_blocking (GSocket  *socket,
+		       gboolean  blocking)
 {
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
   blocking = !!blocking;
 
@@ -1367,31 +1367,31 @@ xsocket_set_blocking (xsocket_t  *socket,
     return;
 
   socket->priv->blocking = blocking;
-  xobject_notify (G_OBJECT (socket), "blocking");
+  g_object_notify (G_OBJECT (socket), "blocking");
 }
 
 /**
- * xsocket_get_blocking:
- * @socket: a #xsocket_t.
+ * g_socket_get_blocking:
+ * @socket: a #GSocket.
  *
  * Gets the blocking mode of the socket. For details on blocking I/O,
- * see xsocket_set_blocking().
+ * see g_socket_set_blocking().
  *
  * Returns: %TRUE if blocking I/O is used, %FALSE otherwise.
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_get_blocking (xsocket_t *socket)
+gboolean
+g_socket_get_blocking (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
   return socket->priv->blocking;
 }
 
 /**
- * xsocket_set_keepalive:
- * @socket: a #xsocket_t.
+ * g_socket_set_keepalive:
+ * @socket: a #GSocket.
  * @keepalive: Value for the keepalive flag
  *
  * Sets or unsets the %SO_KEEPALIVE flag on the underlying socket. When
@@ -1402,7 +1402,7 @@ xsocket_get_blocking (xsocket_t *socket)
  * the connection.
  *
  * This option is only functional on certain kinds of sockets. (Notably,
- * %XSOCKET_PROTOCOL_TCP sockets.)
+ * %G_SOCKET_PROTOCOL_TCP sockets.)
  *
  * The exact time between pings is system- and protocol-dependent, but will
  * normally be at least two hours. Most commonly, you would set this flag
@@ -1413,70 +1413,70 @@ xsocket_get_blocking (xsocket_t *socket)
  * Since: 2.22
  */
 void
-xsocket_set_keepalive (xsocket_t  *socket,
-			xboolean_t  keepalive)
+g_socket_set_keepalive (GSocket  *socket,
+			gboolean  keepalive)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
   keepalive = !!keepalive;
   if (socket->priv->keepalive == keepalive)
     return;
 
-  if (!xsocket_set_option (socket, SOL_SOCKET, SO_KEEPALIVE,
+  if (!g_socket_set_option (socket, SOL_SOCKET, SO_KEEPALIVE,
 			    keepalive, &error))
     {
       g_warning ("error setting keepalive: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
   socket->priv->keepalive = keepalive;
-  xobject_notify (G_OBJECT (socket), "keepalive");
+  g_object_notify (G_OBJECT (socket), "keepalive");
 }
 
 /**
- * xsocket_get_keepalive:
- * @socket: a #xsocket_t.
+ * g_socket_get_keepalive:
+ * @socket: a #GSocket.
  *
  * Gets the keepalive mode of the socket. For details on this,
- * see xsocket_set_keepalive().
+ * see g_socket_set_keepalive().
  *
  * Returns: %TRUE if keepalive is active, %FALSE otherwise.
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_get_keepalive (xsocket_t *socket)
+gboolean
+g_socket_get_keepalive (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
   return socket->priv->keepalive;
 }
 
 /**
- * xsocket_get_listen_backlog:
- * @socket: a #xsocket_t.
+ * g_socket_get_listen_backlog:
+ * @socket: a #GSocket.
  *
  * Gets the listen backlog setting of the socket. For details on this,
- * see xsocket_set_listen_backlog().
+ * see g_socket_set_listen_backlog().
  *
  * Returns: the maximum number of pending connections.
  *
  * Since: 2.22
  */
-xint_t
-xsocket_get_listen_backlog  (xsocket_t *socket)
+gint
+g_socket_get_listen_backlog  (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
+  g_return_val_if_fail (G_IS_SOCKET (socket), 0);
 
   return socket->priv->listen_backlog;
 }
 
 /**
- * xsocket_set_listen_backlog:
- * @socket: a #xsocket_t.
+ * g_socket_set_listen_backlog:
+ * @socket: a #GSocket.
  * @backlog: the maximum number of pending connections.
  *
  * Sets the maximum number of outstanding connections allowed
@@ -1484,62 +1484,62 @@ xsocket_get_listen_backlog  (xsocket_t *socket)
  * connecting to the socket and the application is not handling them
  * on time then the new connections will be refused.
  *
- * Note that this must be called before xsocket_listen() and has no
+ * Note that this must be called before g_socket_listen() and has no
  * effect if called after that.
  *
  * Since: 2.22
  */
 void
-xsocket_set_listen_backlog (xsocket_t *socket,
-			     xint_t     backlog)
+g_socket_set_listen_backlog (GSocket *socket,
+			     gint     backlog)
 {
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
   g_return_if_fail (!socket->priv->listening);
 
   if (backlog != socket->priv->listen_backlog)
     {
       socket->priv->listen_backlog = backlog;
-      xobject_notify (G_OBJECT (socket), "listen-backlog");
+      g_object_notify (G_OBJECT (socket), "listen-backlog");
     }
 }
 
 /**
- * xsocket_get_timeout:
- * @socket: a #xsocket_t.
+ * g_socket_get_timeout:
+ * @socket: a #GSocket.
  *
  * Gets the timeout setting of the socket. For details on this, see
- * xsocket_set_timeout().
+ * g_socket_set_timeout().
  *
  * Returns: the timeout in seconds
  *
  * Since: 2.26
  */
-xuint_t
-xsocket_get_timeout (xsocket_t *socket)
+guint
+g_socket_get_timeout (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
+  g_return_val_if_fail (G_IS_SOCKET (socket), 0);
 
   return socket->priv->timeout;
 }
 
 /**
- * xsocket_set_timeout:
- * @socket: a #xsocket_t.
+ * g_socket_set_timeout:
+ * @socket: a #GSocket.
  * @timeout: the timeout for @socket, in seconds, or 0 for none
  *
  * Sets the time in seconds after which I/O operations on @socket will
  * time out if they have not yet completed.
  *
- * On a blocking socket, this means that any blocking #xsocket_t
+ * On a blocking socket, this means that any blocking #GSocket
  * operation will time out after @timeout seconds of inactivity,
  * returning %G_IO_ERROR_TIMED_OUT.
  *
- * On a non-blocking socket, calls to xsocket_condition_wait() will
+ * On a non-blocking socket, calls to g_socket_condition_wait() will
  * also fail with %G_IO_ERROR_TIMED_OUT after the given time. Sources
- * created with xsocket_create_source() will trigger after
+ * created with g_socket_create_source() will trigger after
  * @timeout seconds of inactivity, with the requested condition
- * set, at which point calling xsocket_receive(), xsocket_send(),
- * xsocket_check_connect_result(), etc, will fail with
+ * set, at which point calling g_socket_receive(), g_socket_send(),
+ * g_socket_check_connect_result(), etc, will fail with
  * %G_IO_ERROR_TIMED_OUT.
  *
  * If @timeout is 0 (the default), operations will never time out
@@ -1551,54 +1551,54 @@ xsocket_get_timeout (xsocket_t *socket)
  * Since: 2.26
  */
 void
-xsocket_set_timeout (xsocket_t *socket,
-		      xuint_t    timeout)
+g_socket_set_timeout (GSocket *socket,
+		      guint    timeout)
 {
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
   if (timeout != socket->priv->timeout)
     {
       socket->priv->timeout = timeout;
-      xobject_notify (G_OBJECT (socket), "timeout");
+      g_object_notify (G_OBJECT (socket), "timeout");
     }
 }
 
 /**
- * xsocket_get_ttl:
- * @socket: a #xsocket_t.
+ * g_socket_get_ttl:
+ * @socket: a #GSocket.
  *
  * Gets the unicast time-to-live setting on @socket; see
- * xsocket_set_ttl() for more details.
+ * g_socket_set_ttl() for more details.
  *
  * Returns: the time-to-live setting on @socket
  *
  * Since: 2.32
  */
-xuint_t
-xsocket_get_ttl (xsocket_t *socket)
+guint
+g_socket_get_ttl (GSocket *socket)
 {
-  xerror_t *error = NULL;
-  xint_t value;
+  GError *error = NULL;
+  gint value;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
+  g_return_val_if_fail (G_IS_SOCKET (socket), 0);
 
-  if (socket->priv->family == XSOCKET_FAMILY_IPV4)
+  if (socket->priv->family == G_SOCKET_FAMILY_IPV4)
     {
-      xsocket_get_option (socket, IPPROTO_IP, IP_TTL,
+      g_socket_get_option (socket, IPPROTO_IP, IP_TTL,
 			   &value, &error);
     }
-  else if (socket->priv->family == XSOCKET_FAMILY_IPV6)
+  else if (socket->priv->family == G_SOCKET_FAMILY_IPV6)
     {
-      xsocket_get_option (socket, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
+      g_socket_get_option (socket, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
 			   &value, &error);
     }
   else
-    xreturn_val_if_reached (0);
+    g_return_val_if_reached (0);
 
   if (error)
     {
       g_warning ("error getting unicast ttl: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return 0;
     }
 
@@ -1606,8 +1606,8 @@ xsocket_get_ttl (xsocket_t *socket)
 }
 
 /**
- * xsocket_set_ttl:
- * @socket: a #xsocket_t.
+ * g_socket_set_ttl:
+ * @socket: a #GSocket.
  * @ttl: the time-to-live value for all unicast packets on @socket
  *
  * Sets the time-to-live for outgoing unicast packets on @socket.
@@ -1616,23 +1616,23 @@ xsocket_get_ttl (xsocket_t *socket)
  * Since: 2.32
  */
 void
-xsocket_set_ttl (xsocket_t  *socket,
-                  xuint_t     ttl)
+g_socket_set_ttl (GSocket  *socket,
+                  guint     ttl)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
-  if (socket->priv->family == XSOCKET_FAMILY_IPV4)
+  if (socket->priv->family == G_SOCKET_FAMILY_IPV4)
     {
-      xsocket_set_option (socket, IPPROTO_IP, IP_TTL,
+      g_socket_set_option (socket, IPPROTO_IP, IP_TTL,
 			   ttl, &error);
     }
-  else if (socket->priv->family == XSOCKET_FAMILY_IPV6)
+  else if (socket->priv->family == G_SOCKET_FAMILY_IPV6)
     {
-      xsocket_set_option (socket, IPPROTO_IP, IP_TTL,
+      g_socket_set_option (socket, IPPROTO_IP, IP_TTL,
 			   ttl, NULL);
-      xsocket_set_option (socket, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
+      g_socket_set_option (socket, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
 			   ttl, &error);
     }
   else
@@ -1641,16 +1641,16 @@ xsocket_set_ttl (xsocket_t  *socket,
   if (error)
     {
       g_warning ("error setting unicast ttl: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
-  xobject_notify (G_OBJECT (socket), "ttl");
+  g_object_notify (G_OBJECT (socket), "ttl");
 }
 
 /**
- * xsocket_get_broadcast:
- * @socket: a #xsocket_t.
+ * g_socket_get_broadcast:
+ * @socket: a #GSocket.
  *
  * Gets the broadcast setting on @socket; if %TRUE,
  * it is possible to send packets to broadcast
@@ -1660,19 +1660,19 @@ xsocket_set_ttl (xsocket_t  *socket,
  *
  * Since: 2.32
  */
-xboolean_t
-xsocket_get_broadcast (xsocket_t *socket)
+gboolean
+g_socket_get_broadcast (GSocket *socket)
 {
-  xerror_t *error = NULL;
-  xint_t value;
+  GError *error = NULL;
+  gint value;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
-  if (!xsocket_get_option (socket, SOL_SOCKET, SO_BROADCAST,
+  if (!g_socket_get_option (socket, SOL_SOCKET, SO_BROADCAST,
 			    &value, &error))
     {
       g_warning ("error getting broadcast: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -1680,8 +1680,8 @@ xsocket_get_broadcast (xsocket_t *socket)
 }
 
 /**
- * xsocket_set_broadcast:
- * @socket: a #xsocket_t.
+ * g_socket_set_broadcast:
+ * @socket: a #GSocket.
  * @broadcast: whether @socket should allow sending to broadcast
  *     addresses
  *
@@ -1691,29 +1691,29 @@ xsocket_get_broadcast (xsocket_t *socket)
  * Since: 2.32
  */
 void
-xsocket_set_broadcast (xsocket_t    *socket,
-       	                xboolean_t    broadcast)
+g_socket_set_broadcast (GSocket    *socket,
+       	                gboolean    broadcast)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
   broadcast = !!broadcast;
 
-  if (!xsocket_set_option (socket, SOL_SOCKET, SO_BROADCAST,
+  if (!g_socket_set_option (socket, SOL_SOCKET, SO_BROADCAST,
 			    broadcast, &error))
     {
       g_warning ("error setting broadcast: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
-  xobject_notify (G_OBJECT (socket), "broadcast");
+  g_object_notify (G_OBJECT (socket), "broadcast");
 }
 
 /**
- * xsocket_get_multicast_loopback:
- * @socket: a #xsocket_t.
+ * g_socket_get_multicast_loopback:
+ * @socket: a #GSocket.
  *
  * Gets the multicast loopback setting on @socket; if %TRUE (the
  * default), outgoing multicast packets will be looped back to
@@ -1723,31 +1723,31 @@ xsocket_set_broadcast (xsocket_t    *socket,
  *
  * Since: 2.32
  */
-xboolean_t
-xsocket_get_multicast_loopback (xsocket_t *socket)
+gboolean
+g_socket_get_multicast_loopback (GSocket *socket)
 {
-  xerror_t *error = NULL;
-  xint_t value;
+  GError *error = NULL;
+  gint value;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
-  if (socket->priv->family == XSOCKET_FAMILY_IPV4)
+  if (socket->priv->family == G_SOCKET_FAMILY_IPV4)
     {
-      xsocket_get_option (socket, IPPROTO_IP, IP_MULTICAST_LOOP,
+      g_socket_get_option (socket, IPPROTO_IP, IP_MULTICAST_LOOP,
 			   &value, &error);
     }
-  else if (socket->priv->family == XSOCKET_FAMILY_IPV6)
+  else if (socket->priv->family == G_SOCKET_FAMILY_IPV6)
     {
-      xsocket_get_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
+      g_socket_get_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
 			   &value, &error);
     }
   else
-    xreturn_val_if_reached (FALSE);
+    g_return_val_if_reached (FALSE);
 
   if (error)
     {
       g_warning ("error getting multicast loopback: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -1755,8 +1755,8 @@ xsocket_get_multicast_loopback (xsocket_t *socket)
 }
 
 /**
- * xsocket_set_multicast_loopback:
- * @socket: a #xsocket_t.
+ * g_socket_set_multicast_loopback:
+ * @socket: a #GSocket.
  * @loopback: whether @socket should receive messages sent to its
  *   multicast groups from the local host
  *
@@ -1767,25 +1767,25 @@ xsocket_get_multicast_loopback (xsocket_t *socket)
  * Since: 2.32
  */
 void
-xsocket_set_multicast_loopback (xsocket_t    *socket,
-				 xboolean_t    loopback)
+g_socket_set_multicast_loopback (GSocket    *socket,
+				 gboolean    loopback)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
   loopback = !!loopback;
 
-  if (socket->priv->family == XSOCKET_FAMILY_IPV4)
+  if (socket->priv->family == G_SOCKET_FAMILY_IPV4)
     {
-      xsocket_set_option (socket, IPPROTO_IP, IP_MULTICAST_LOOP,
+      g_socket_set_option (socket, IPPROTO_IP, IP_MULTICAST_LOOP,
 			   loopback, &error);
     }
-  else if (socket->priv->family == XSOCKET_FAMILY_IPV6)
+  else if (socket->priv->family == G_SOCKET_FAMILY_IPV6)
     {
-      xsocket_set_option (socket, IPPROTO_IP, IP_MULTICAST_LOOP,
+      g_socket_set_option (socket, IPPROTO_IP, IP_MULTICAST_LOOP,
 			   loopback, NULL);
-      xsocket_set_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
+      g_socket_set_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_LOOP,
 			   loopback, &error);
     }
   else
@@ -1794,49 +1794,49 @@ xsocket_set_multicast_loopback (xsocket_t    *socket,
   if (error)
     {
       g_warning ("error setting multicast loopback: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
-  xobject_notify (G_OBJECT (socket), "multicast-loopback");
+  g_object_notify (G_OBJECT (socket), "multicast-loopback");
 }
 
 /**
- * xsocket_get_multicast_ttl:
- * @socket: a #xsocket_t.
+ * g_socket_get_multicast_ttl:
+ * @socket: a #GSocket.
  *
  * Gets the multicast time-to-live setting on @socket; see
- * xsocket_set_multicast_ttl() for more details.
+ * g_socket_set_multicast_ttl() for more details.
  *
  * Returns: the multicast time-to-live setting on @socket
  *
  * Since: 2.32
  */
-xuint_t
-xsocket_get_multicast_ttl (xsocket_t *socket)
+guint
+g_socket_get_multicast_ttl (GSocket *socket)
 {
-  xerror_t *error = NULL;
-  xint_t value;
+  GError *error = NULL;
+  gint value;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
+  g_return_val_if_fail (G_IS_SOCKET (socket), 0);
 
-  if (socket->priv->family == XSOCKET_FAMILY_IPV4)
+  if (socket->priv->family == G_SOCKET_FAMILY_IPV4)
     {
-      xsocket_get_option (socket, IPPROTO_IP, IP_MULTICAST_TTL,
+      g_socket_get_option (socket, IPPROTO_IP, IP_MULTICAST_TTL,
 			   &value, &error);
     }
-  else if (socket->priv->family == XSOCKET_FAMILY_IPV6)
+  else if (socket->priv->family == G_SOCKET_FAMILY_IPV6)
     {
-      xsocket_get_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+      g_socket_get_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
 			   &value, &error);
     }
   else
-    xreturn_val_if_reached (FALSE);
+    g_return_val_if_reached (FALSE);
 
   if (error)
     {
       g_warning ("error getting multicast ttl: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -1844,8 +1844,8 @@ xsocket_get_multicast_ttl (xsocket_t *socket)
 }
 
 /**
- * xsocket_set_multicast_ttl:
- * @socket: a #xsocket_t.
+ * g_socket_set_multicast_ttl:
+ * @socket: a #GSocket.
  * @ttl: the time-to-live value for all multicast datagrams on @socket
  *
  * Sets the time-to-live for outgoing multicast datagrams on @socket.
@@ -1855,23 +1855,23 @@ xsocket_get_multicast_ttl (xsocket_t *socket)
  * Since: 2.32
  */
 void
-xsocket_set_multicast_ttl (xsocket_t  *socket,
-                            xuint_t     ttl)
+g_socket_set_multicast_ttl (GSocket  *socket,
+                            guint     ttl)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_SOCKET (socket));
+  g_return_if_fail (G_IS_SOCKET (socket));
 
-  if (socket->priv->family == XSOCKET_FAMILY_IPV4)
+  if (socket->priv->family == G_SOCKET_FAMILY_IPV4)
     {
-      xsocket_set_option (socket, IPPROTO_IP, IP_MULTICAST_TTL,
+      g_socket_set_option (socket, IPPROTO_IP, IP_MULTICAST_TTL,
 			   ttl, &error);
     }
-  else if (socket->priv->family == XSOCKET_FAMILY_IPV6)
+  else if (socket->priv->family == G_SOCKET_FAMILY_IPV6)
     {
-      xsocket_set_option (socket, IPPROTO_IP, IP_MULTICAST_TTL,
+      g_socket_set_option (socket, IPPROTO_IP, IP_MULTICAST_TTL,
 			   ttl, NULL);
-      xsocket_set_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+      g_socket_set_option (socket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
 			   ttl, &error);
     }
   else
@@ -1880,52 +1880,52 @@ xsocket_set_multicast_ttl (xsocket_t  *socket,
   if (error)
     {
       g_warning ("error setting multicast ttl: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
-  xobject_notify (G_OBJECT (socket), "multicast-ttl");
+  g_object_notify (G_OBJECT (socket), "multicast-ttl");
 }
 
 /**
- * xsocket_get_family:
- * @socket: a #xsocket_t.
+ * g_socket_get_family:
+ * @socket: a #GSocket.
  *
  * Gets the socket family of the socket.
  *
- * Returns: a #xsocket_family_t
+ * Returns: a #GSocketFamily
  *
  * Since: 2.22
  */
-xsocket_family_t
-xsocket_get_family (xsocket_t *socket)
+GSocketFamily
+g_socket_get_family (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), XSOCKET_FAMILY_INVALID);
+  g_return_val_if_fail (G_IS_SOCKET (socket), G_SOCKET_FAMILY_INVALID);
 
   return socket->priv->family;
 }
 
 /**
- * xsocket_get_socket_type:
- * @socket: a #xsocket_t.
+ * g_socket_get_socket_type:
+ * @socket: a #GSocket.
  *
  * Gets the socket type of the socket.
  *
- * Returns: a #xsocket_type_t
+ * Returns: a #GSocketType
  *
  * Since: 2.22
  */
-xsocket_type_t
-xsocket_get_socket_type (xsocket_t *socket)
+GSocketType
+g_socket_get_socket_type (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), XSOCKET_TYPE_INVALID);
+  g_return_val_if_fail (G_IS_SOCKET (socket), G_SOCKET_TYPE_INVALID);
 
   return socket->priv->type;
 }
 
 /**
- * xsocket_get_protocol:
- * @socket: a #xsocket_t.
+ * g_socket_get_protocol:
+ * @socket: a #GSocket.
  *
  * Gets the socket protocol id the socket was created with.
  * In case the protocol is unknown, -1 is returned.
@@ -1935,16 +1935,16 @@ xsocket_get_socket_type (xsocket_t *socket)
  * Since: 2.22
  */
 GSocketProtocol
-xsocket_get_protocol (xsocket_t *socket)
+g_socket_get_protocol (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket), -1);
 
   return socket->priv->protocol;
 }
 
 /**
- * xsocket_get_fd:
- * @socket: a #xsocket_t.
+ * g_socket_get_fd:
+ * @socket: a #GSocket.
  *
  * Returns the underlying OS socket object. On unix this
  * is a socket file descriptor, and on Windows this is
@@ -1957,38 +1957,38 @@ xsocket_get_protocol (xsocket_t *socket)
  * Since: 2.22
  */
 int
-xsocket_get_fd (xsocket_t *socket)
+g_socket_get_fd (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket), -1);
 
   return socket->priv->fd;
 }
 
 /**
- * xsocket_get_local_address:
- * @socket: a #xsocket_t.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_get_local_address:
+ * @socket: a #GSocket.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Try to get the local address of a bound socket. This is only
  * useful if the socket has been bound to a local address,
  * either explicitly or implicitly when connecting.
  *
- * Returns: (transfer full): a #xsocket_address_t or %NULL on error.
- *     Free the returned object with xobject_unref().
+ * Returns: (transfer full): a #GSocketAddress or %NULL on error.
+ *     Free the returned object with g_object_unref().
  *
  * Since: 2.22
  */
-xsocket_address_t *
-xsocket_get_local_address (xsocket_t  *socket,
-			    xerror_t  **error)
+GSocketAddress *
+g_socket_get_local_address (GSocket  *socket,
+			    GError  **error)
 {
   union {
     struct sockaddr_storage storage;
     struct sockaddr sa;
   } buffer;
-  xuint_t len = sizeof (buffer);
+  guint len = sizeof (buffer);
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
+  g_return_val_if_fail (G_IS_SOCKET (socket), NULL);
 
   if (getsockname (socket->priv->fd, &buffer.sa, &len) < 0)
     {
@@ -1998,37 +1998,37 @@ xsocket_get_local_address (xsocket_t  *socket,
       return NULL;
     }
 
-  return xsocket_address_new_from_native (&buffer.storage, len);
+  return g_socket_address_new_from_native (&buffer.storage, len);
 }
 
 /**
- * xsocket_get_remote_address:
- * @socket: a #xsocket_t.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_get_remote_address:
+ * @socket: a #GSocket.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Try to get the remote address of a connected socket. This is only
  * useful for connection oriented sockets that have been connected.
  *
- * Returns: (transfer full): a #xsocket_address_t or %NULL on error.
- *     Free the returned object with xobject_unref().
+ * Returns: (transfer full): a #GSocketAddress or %NULL on error.
+ *     Free the returned object with g_object_unref().
  *
  * Since: 2.22
  */
-xsocket_address_t *
-xsocket_get_remote_address (xsocket_t  *socket,
-			     xerror_t  **error)
+GSocketAddress *
+g_socket_get_remote_address (GSocket  *socket,
+			     GError  **error)
 {
   union {
     struct sockaddr_storage storage;
     struct sockaddr sa;
   } buffer;
-  xuint_t len = sizeof (buffer);
+  guint len = sizeof (buffer);
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
+  g_return_val_if_fail (G_IS_SOCKET (socket), NULL);
 
   if (socket->priv->connect_pending)
     {
-      if (!xsocket_check_connect_result (socket, error))
+      if (!g_socket_check_connect_result (socket, error))
         return NULL;
       else
         socket->priv->connect_pending = FALSE;
@@ -2044,59 +2044,59 @@ xsocket_get_remote_address (xsocket_t  *socket,
 	  return NULL;
 	}
 
-      socket->priv->remote_address = xsocket_address_new_from_native (&buffer.storage, len);
+      socket->priv->remote_address = g_socket_address_new_from_native (&buffer.storage, len);
     }
 
-  return xobject_ref (socket->priv->remote_address);
+  return g_object_ref (socket->priv->remote_address);
 }
 
 /**
- * xsocket_is_connected:
- * @socket: a #xsocket_t.
+ * g_socket_is_connected:
+ * @socket: a #GSocket.
  *
  * Check whether the socket is connected. This is only useful for
  * connection-oriented sockets.
  *
- * If using xsocket_shutdown(), this function will return %TRUE until the
+ * If using g_socket_shutdown(), this function will return %TRUE until the
  * socket has been shut down for reading and writing. If you do a non-blocking
  * connect, this function will not return %TRUE until after you call
- * xsocket_check_connect_result().
+ * g_socket_check_connect_result().
  *
  * Returns: %TRUE if socket is connected, %FALSE otherwise.
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_is_connected (xsocket_t *socket)
+gboolean
+g_socket_is_connected (GSocket *socket)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
   return (socket->priv->connected_read || socket->priv->connected_write);
 }
 
 /**
- * xsocket_listen:
- * @socket: a #xsocket_t.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_listen:
+ * @socket: a #GSocket.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Marks the socket as a server socket, i.e. a socket that is used
- * to accept incoming requests using xsocket_accept().
+ * to accept incoming requests using g_socket_accept().
  *
  * Before calling this the socket must be bound to a local address using
- * xsocket_bind().
+ * g_socket_bind().
  *
  * To set the maximum amount of outstanding clients, use
- * xsocket_set_listen_backlog().
+ * g_socket_set_listen_backlog().
  *
  * Returns: %TRUE on success, %FALSE on error.
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_listen (xsocket_t  *socket,
-		 xerror_t  **error)
+gboolean
+g_socket_listen (GSocket  *socket,
+		 GError  **error)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -2116,26 +2116,26 @@ xsocket_listen (xsocket_t  *socket,
 }
 
 /**
- * xsocket_bind:
- * @socket: a #xsocket_t.
- * @address: a #xsocket_address_t specifying the local address.
+ * g_socket_bind:
+ * @socket: a #GSocket.
+ * @address: a #GSocketAddress specifying the local address.
  * @allow_reuse: whether to allow reusing this address
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * When a socket is created it is attached to an address family, but it
- * doesn't have an address in this family. xsocket_bind() assigns the
+ * doesn't have an address in this family. g_socket_bind() assigns the
  * address (sometimes called name) of the socket.
  *
  * It is generally required to bind to a local address before you can
- * receive connections. (See xsocket_listen() and xsocket_accept() ).
+ * receive connections. (See g_socket_listen() and g_socket_accept() ).
  * In certain situations, you may also want to bind a socket that will be
  * used to initiate connections, though this is not normally required.
  *
  * If @socket is a TCP socket, then @allow_reuse controls the setting
  * of the `SO_REUSEADDR` socket option; normally it should be %TRUE for
  * server sockets (sockets that you will eventually call
- * xsocket_accept() on), and %FALSE for client sockets. (Failing to
- * set this flag on a server socket may cause xsocket_bind() to return
+ * g_socket_accept() on), and %FALSE for client sockets. (Failing to
+ * set this flag on a server socket may cause g_socket_bind() to return
  * %G_IO_ERROR_ADDRESS_IN_USE if the server program is stopped and then
  * immediately restarted.)
  *
@@ -2150,27 +2150,27 @@ xsocket_listen (xsocket_t  *socket,
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_bind (xsocket_t         *socket,
-	       xsocket_address_t  *address,
-	       xboolean_t         reuse_address,
-	       xerror_t         **error)
+gboolean
+g_socket_bind (GSocket         *socket,
+	       GSocketAddress  *address,
+	       gboolean         reuse_address,
+	       GError         **error)
 {
   union {
     struct sockaddr_storage storage;
     struct sockaddr sa;
   } addr;
-  xboolean_t so_reuseaddr;
+  gboolean so_reuseaddr;
 #ifdef SO_REUSEPORT
-  xboolean_t so_reuseport;
+  gboolean so_reuseport;
 #endif
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket) && X_IS_SOCKET_ADDRESS (address), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket) && G_IS_SOCKET_ADDRESS (address), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
 
-  if (!xsocket_address_to_native (address, &addr.storage, sizeof addr, error))
+  if (!g_socket_address_to_native (address, &addr.storage, sizeof addr, error))
     return FALSE;
 
   /* On Windows, SO_REUSEADDR has the semantics we want for UDP
@@ -2185,28 +2185,28 @@ xsocket_bind (xsocket_t         *socket,
    */
 
 #ifdef G_OS_WIN32
-  so_reuseaddr = reuse_address && (socket->priv->type == XSOCKET_TYPE_DATAGRAM);
+  so_reuseaddr = reuse_address && (socket->priv->type == G_SOCKET_TYPE_DATAGRAM);
 #else
   so_reuseaddr = !!reuse_address;
 #endif
 
 #ifdef SO_REUSEPORT
-  so_reuseport = reuse_address && (socket->priv->type == XSOCKET_TYPE_DATAGRAM);
+  so_reuseport = reuse_address && (socket->priv->type == G_SOCKET_TYPE_DATAGRAM);
 #endif
 
   /* Ignore errors here, the only likely error is "not supported", and
    * this is a "best effort" thing mainly.
    */
-  xsocket_set_option (socket, SOL_SOCKET, SO_REUSEADDR, so_reuseaddr, NULL);
+  g_socket_set_option (socket, SOL_SOCKET, SO_REUSEADDR, so_reuseaddr, NULL);
 #ifdef SO_REUSEPORT
-  xsocket_set_option (socket, SOL_SOCKET, SO_REUSEPORT, so_reuseport, NULL);
+  g_socket_set_option (socket, SOL_SOCKET, SO_REUSEPORT, so_reuseport, NULL);
 #endif
 
   if (bind (socket->priv->fd, &addr.sa,
-	    xsocket_address_get_native_size (address)) < 0)
+	    g_socket_address_get_native_size (address)) < 0)
     {
       int errsv = get_socket_errno ();
-      xchar_t *address_string = address_to_string (address);
+      gchar *address_string = address_to_string (address);
 
       g_set_error (error,
 		   G_IO_ERROR, socket_io_error_from_errno (errsv),
@@ -2220,15 +2220,15 @@ xsocket_bind (xsocket_t         *socket,
 }
 
 #ifdef G_OS_WIN32
-static xulong_t
-xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
+static gulong
+g_socket_w32_get_adapter_ipv4_addr (const gchar *name_or_ip)
 {
   ULONG bufsize = 15000; /* MS-recommended initial bufsize */
   DWORD ret = ERROR_BUFFER_OVERFLOW;
   unsigned int malloc_iterations = 0;
   PIP_ADAPTER_ADDRESSES addr_buf = NULL, eth_adapter;
   wchar_t *wchar_name_or_ip = NULL;
-  xulong_t ip_result;
+  gulong ip_result;
   NET_IFINDEX if_index;
 
   /*
@@ -2273,7 +2273,7 @@ xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
 
   /*
    *  Step 4: Allocate memory and get adapter addresses.
-   *  buffer_t allocation loop recommended by MS, since size can be dynamic
+   *  Buffer allocation loop recommended by MS, since size can be dynamic
    *  https://docs.microsoft.com/en-us/windows/desktop/api/iphlpapi/nf-iphlpapi-getadaptersaddresses
    */
   #define MAX_ALLOC_ITERATIONS 3
@@ -2300,7 +2300,7 @@ xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
   for (eth_adapter = addr_buf; eth_adapter != NULL; eth_adapter = eth_adapter->Next)
     {
       /* Check if match for interface index/name: */
-      xboolean_t any_match = (if_index > 0) && (eth_adapter->IfIndex == if_index);
+      gboolean any_match = (if_index > 0) && (eth_adapter->IfIndex == if_index);
 
       /* Check if match for friendly name - but only if NO if_index! */
       if (!any_match && if_index == 0 && eth_adapter->FriendlyName &&
@@ -2335,26 +2335,26 @@ xsocket_w32_get_adapter_ipv4_addr (const xchar_t *name_or_ip)
 }
 #endif
 
-static xboolean_t
-xsocket_multicast_group_operation (xsocket_t       *socket,
-				    xinet_address_t  *group,
-                                    xboolean_t       source_specific,
-                                    const xchar_t   *iface,
-				    xboolean_t       join_group,
-				    xerror_t       **error)
+static gboolean
+g_socket_multicast_group_operation (GSocket       *socket,
+				    GInetAddress  *group,
+                                    gboolean       source_specific,
+                                    const gchar   *iface,
+				    gboolean       join_group,
+				    GError       **error)
 {
-  const xuint8_t *native_addr;
-  xint_t optname, result;
+  const guint8 *native_addr;
+  gint optname, result;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
-  xreturn_val_if_fail (socket->priv->type == XSOCKET_TYPE_DATAGRAM, FALSE);
-  xreturn_val_if_fail (X_IS_INET_ADDRESS (group), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (socket->priv->type == G_SOCKET_TYPE_DATAGRAM, FALSE);
+  g_return_val_if_fail (G_IS_INET_ADDRESS (group), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
 
-  native_addr = xinet_address_to_bytes (group);
-  if (xinet_address_get_family (group) == XSOCKET_FAMILY_IPV4)
+  native_addr = g_inet_address_to_bytes (group);
+  if (g_inet_address_get_family (group) == G_SOCKET_FAMILY_IPV4)
     {
 #ifdef HAVE_IP_MREQN
       struct ip_mreqn mc_req;
@@ -2372,7 +2372,7 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
         mc_req.imr_ifindex = 0;  /* Pick any.  */
 #elif defined(G_OS_WIN32)
       if (iface)
-        mc_req.imr_interface.s_addr = xsocket_w32_get_adapter_ipv4_addr (iface);
+        mc_req.imr_interface.s_addr = g_socket_w32_get_adapter_ipv4_addr (iface);
       else
         mc_req.imr_interface.s_addr = g_htonl (INADDR_ANY);
 #else
@@ -2397,7 +2397,7 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
       result = setsockopt (socket->priv->fd, IPPROTO_IP, optname,
 			   &mc_req, sizeof (mc_req));
     }
-  else if (xinet_address_get_family (group) == XSOCKET_FAMILY_IPV6)
+  else if (g_inet_address_get_family (group) == G_SOCKET_FAMILY_IPV6)
     {
       struct ipv6_mreq mc_req_ipv6;
 
@@ -2415,7 +2415,7 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
 			   &mc_req_ipv6, sizeof (mc_req_ipv6));
     }
   else
-    xreturn_val_if_reached (FALSE);
+    g_return_val_if_reached (FALSE);
 
   if (result < 0)
     {
@@ -2433,17 +2433,17 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
 }
 
 /**
- * xsocket_join_multicast_group:
- * @socket: a #xsocket_t.
- * @group: a #xinet_address_t specifying the group address to join.
+ * g_socket_join_multicast_group:
+ * @socket: a #GSocket.
+ * @group: a #GInetAddress specifying the group address to join.
  * @iface: (nullable): Name of the interface to use, or %NULL
  * @source_specific: %TRUE if source-specific multicast should be used
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Registers @socket to receive multicast messages sent to @group.
- * @socket must be a %XSOCKET_TYPE_DATAGRAM socket, and must have
+ * @socket must be a %G_SOCKET_TYPE_DATAGRAM socket, and must have
  * been bound to an appropriate interface and port with
- * xsocket_bind().
+ * g_socket_bind().
  *
  * If @iface is %NULL, the system will automatically pick an interface
  * to bind to based on @group.
@@ -2453,29 +2453,29 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
  * with a %G_IO_ERROR_NOT_SUPPORTED error.
  *
  * To bind to a given source-specific multicast address, use
- * xsocket_join_multicast_group_ssm() instead.
+ * g_socket_join_multicast_group_ssm() instead.
  *
  * Returns: %TRUE on success, %FALSE on error.
  *
  * Since: 2.32
  */
-xboolean_t
-xsocket_join_multicast_group (xsocket_t       *socket,
-			       xinet_address_t  *group,
-                               xboolean_t       source_specific,
-                               const xchar_t   *iface,
-			       xerror_t       **error)
+gboolean
+g_socket_join_multicast_group (GSocket       *socket,
+			       GInetAddress  *group,
+                               gboolean       source_specific,
+                               const gchar   *iface,
+			       GError       **error)
 {
-  return xsocket_multicast_group_operation (socket, group, source_specific, iface, TRUE, error);
+  return g_socket_multicast_group_operation (socket, group, source_specific, iface, TRUE, error);
 }
 
 /**
- * xsocket_leave_multicast_group:
- * @socket: a #xsocket_t.
- * @group: a #xinet_address_t specifying the group address to leave.
+ * g_socket_leave_multicast_group:
+ * @socket: a #GSocket.
+ * @group: a #GInetAddress specifying the group address to leave.
  * @iface: (nullable): Interface used
  * @source_specific: %TRUE if source-specific multicast was used
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Removes @socket from the multicast group defined by @group, @iface,
  * and @source_specific (which must all have the same values they had
@@ -2485,51 +2485,51 @@ xsocket_join_multicast_group (xsocket_t       *socket,
  * unicast messages after calling this.
  *
  * To unbind to a given source-specific multicast address, use
- * xsocket_leave_multicast_group_ssm() instead.
+ * g_socket_leave_multicast_group_ssm() instead.
  *
  * Returns: %TRUE on success, %FALSE on error.
  *
  * Since: 2.32
  */
-xboolean_t
-xsocket_leave_multicast_group (xsocket_t       *socket,
-				xinet_address_t  *group,
-                                xboolean_t       source_specific,
-                                const xchar_t   *iface,
-				xerror_t       **error)
+gboolean
+g_socket_leave_multicast_group (GSocket       *socket,
+				GInetAddress  *group,
+                                gboolean       source_specific,
+                                const gchar   *iface,
+				GError       **error)
 {
-  return xsocket_multicast_group_operation (socket, group, source_specific, iface, FALSE, error);
+  return g_socket_multicast_group_operation (socket, group, source_specific, iface, FALSE, error);
 }
 
-static xboolean_t
-xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
-                                        xinet_address_t  *group,
-                                        xinet_address_t  *source_specific,
-                                        const xchar_t   *iface,
-                                        xboolean_t       join_group,
-                                        xerror_t       **error)
+static gboolean
+g_socket_multicast_group_operation_ssm (GSocket       *socket,
+                                        GInetAddress  *group,
+                                        GInetAddress  *source_specific,
+                                        const gchar   *iface,
+                                        gboolean       join_group,
+                                        GError       **error)
 {
-  xint_t result;
+  gint result;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
-  xreturn_val_if_fail (socket->priv->type == XSOCKET_TYPE_DATAGRAM, FALSE);
-  xreturn_val_if_fail (X_IS_INET_ADDRESS (group), FALSE);
-  xreturn_val_if_fail (iface == NULL || *iface != '\0', FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (socket->priv->type == G_SOCKET_TYPE_DATAGRAM, FALSE);
+  g_return_val_if_fail (G_IS_INET_ADDRESS (group), FALSE);
+  g_return_val_if_fail (iface == NULL || *iface != '\0', FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (!source_specific)
     {
-      return xsocket_multicast_group_operation (socket, group, FALSE, iface,
+      return g_socket_multicast_group_operation (socket, group, FALSE, iface,
                                                  join_group, error);
     }
 
   if (!check_socket (socket, error))
     return FALSE;
 
-  switch (xinet_address_get_family (group))
+  switch (g_inet_address_get_family (group))
     {
-    case XSOCKET_FAMILY_INVALID:
-    case XSOCKET_FAMILY_UNIX:
+    case G_SOCKET_FAMILY_INVALID:
+    case G_SOCKET_FAMILY_UNIX:
       {
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
             join_group ?
@@ -2540,7 +2540,7 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
       }
       break;
 
-    case XSOCKET_FAMILY_IPV4:
+    case G_SOCKET_FAMILY_IPV4:
       {
 #ifdef IP_ADD_SOURCE_MEMBERSHIP
 
@@ -2550,11 +2550,11 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
 #define S_ADDR_FIELD(src) src.imr_interface.s_addr
 #endif
 
-        xint_t optname;
+        gint optname;
         struct ip_mreq_source mc_req_src;
 
-        if (xinet_address_get_family (source_specific) !=
-            XSOCKET_FAMILY_IPV4)
+        if (g_inet_address_get_family (source_specific) !=
+            G_SOCKET_FAMILY_IPV4)
           {
             g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                 join_group ?
@@ -2572,7 +2572,7 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
         if (iface)
           {
 #if defined(G_OS_WIN32)
-            S_ADDR_FIELD(mc_req_src) = xsocket_w32_get_adapter_ipv4_addr (iface);
+            S_ADDR_FIELD(mc_req_src) = g_socket_w32_get_adapter_ipv4_addr (iface);
 #elif defined (HAVE_SIOCGIFADDR)
             int ret;
             struct ifreq ifr;
@@ -2597,7 +2597,7 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
                 int errsv = errno;
 
                 g_set_error (error, G_IO_ERROR,  g_io_error_from_errno (errsv),
-                             _("Interface not found: %s"), xstrerror (errsv));
+                             _("Interface not found: %s"), g_strerror (errsv));
                 return FALSE;
               }
 
@@ -2605,11 +2605,11 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
             S_ADDR_FIELD(mc_req_src) = iface_addr->sin_addr.s_addr;
 #endif  /* defined(G_OS_WIN32) && defined (HAVE_IF_NAMETOINDEX) */
           }
-        memcpy (&mc_req_src.imr_multiaddr, xinet_address_to_bytes (group),
-                xinet_address_get_native_size (group));
+        memcpy (&mc_req_src.imr_multiaddr, g_inet_address_to_bytes (group),
+                g_inet_address_get_native_size (group));
         memcpy (&mc_req_src.imr_sourceaddr,
-                xinet_address_to_bytes (source_specific),
-                xinet_address_get_native_size (source_specific));
+                g_inet_address_to_bytes (source_specific),
+                g_inet_address_get_native_size (source_specific));
 
         optname =
             join_group ? IP_ADD_SOURCE_MEMBERSHIP : IP_DROP_SOURCE_MEMBERSHIP;
@@ -2629,14 +2629,14 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
       }
       break;
 
-    case XSOCKET_FAMILY_IPV6:
+    case G_SOCKET_FAMILY_IPV6:
       {
 #ifdef MCAST_JOIN_SOURCE_GROUP
-        xboolean_t res;
-        xint_t optname;
+        gboolean res;
+        gint optname;
         struct group_source_req mc_req_src;
-        xsocket_address_t *saddr_group, *saddr_source_specific;
-        xuint_t iface_index = 0;
+        GSocketAddress *saddr_group, *saddr_source_specific;
+        guint iface_index = 0;
 
 #if defined (HAVE_IF_NAMETOINDEX)
         if (iface)
@@ -2647,7 +2647,7 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
                 int errsv = errno;
 
                 g_set_error (error, G_IO_ERROR,  g_io_error_from_errno (errsv),
-                             _("Interface not found: %s"), xstrerror (errsv));
+                             _("Interface not found: %s"), g_strerror (errsv));
                 return FALSE;
               }
           }
@@ -2655,19 +2655,19 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
         mc_req_src.gsr_interface = iface_index;
 
         saddr_group = g_inet_socket_address_new (group, 0);
-        res = xsocket_address_to_native (saddr_group, &mc_req_src.gsr_group,
+        res = g_socket_address_to_native (saddr_group, &mc_req_src.gsr_group,
                                           sizeof (mc_req_src.gsr_group),
                                           error);
-        xobject_unref (saddr_group);
+        g_object_unref (saddr_group);
         if (!res)
           return FALSE;
 
         saddr_source_specific = g_inet_socket_address_new (source_specific, 0);
-        res = xsocket_address_to_native (saddr_source_specific,
+        res = g_socket_address_to_native (saddr_source_specific,
                                           &mc_req_src.gsr_source,
                                           sizeof (mc_req_src.gsr_source),
                                           error);
-        xobject_unref (saddr_source_specific);
+        g_object_unref (saddr_source_specific);
 
         if (!res)
           return FALSE;
@@ -2688,7 +2688,7 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
       break;
 
     default:
-      xreturn_val_if_reached (FALSE);
+      g_return_val_if_reached (FALSE);
     }
 
   if (result < 0)
@@ -2707,18 +2707,18 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
 }
 
 /**
- * xsocket_join_multicast_group_ssm:
- * @socket: a #xsocket_t.
- * @group: a #xinet_address_t specifying the group address to join.
- * @source_specific: (nullable): a #xinet_address_t specifying the
+ * g_socket_join_multicast_group_ssm:
+ * @socket: a #GSocket.
+ * @group: a #GInetAddress specifying the group address to join.
+ * @source_specific: (nullable): a #GInetAddress specifying the
  * source-specific multicast address or %NULL to ignore.
  * @iface: (nullable): Name of the interface to use, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Registers @socket to receive multicast messages sent to @group.
- * @socket must be a %XSOCKET_TYPE_DATAGRAM socket, and must have
+ * @socket must be a %G_SOCKET_TYPE_DATAGRAM socket, and must have
  * been bound to an appropriate interface and port with
- * xsocket_bind().
+ * g_socket_bind().
  *
  * If @iface is %NULL, the system will automatically pick an interface
  * to bind to based on @group.
@@ -2735,25 +2735,25 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
  *
  * Since: 2.56
  */
-xboolean_t
-xsocket_join_multicast_group_ssm (xsocket_t       *socket,
-                                   xinet_address_t  *group,
-                                   xinet_address_t  *source_specific,
-                                   const xchar_t   *iface,
-                                   xerror_t       **error)
+gboolean
+g_socket_join_multicast_group_ssm (GSocket       *socket,
+                                   GInetAddress  *group,
+                                   GInetAddress  *source_specific,
+                                   const gchar   *iface,
+                                   GError       **error)
 {
-  return xsocket_multicast_group_operation_ssm (socket, group,
+  return g_socket_multicast_group_operation_ssm (socket, group,
       source_specific, iface, TRUE, error);
 }
 
 /**
- * xsocket_leave_multicast_group_ssm:
- * @socket: a #xsocket_t.
- * @group: a #xinet_address_t specifying the group address to leave.
- * @source_specific: (nullable): a #xinet_address_t specifying the
+ * g_socket_leave_multicast_group_ssm:
+ * @socket: a #GSocket.
+ * @group: a #GInetAddress specifying the group address to leave.
+ * @source_specific: (nullable): a #GInetAddress specifying the
  * source-specific multicast address or %NULL to ignore.
  * @iface: (nullable): Name of the interface to use, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Removes @socket from the multicast group defined by @group, @iface,
  * and @source_specific (which must all have the same values they had
@@ -2766,20 +2766,20 @@ xsocket_join_multicast_group_ssm (xsocket_t       *socket,
  *
  * Since: 2.56
  */
-xboolean_t
-xsocket_leave_multicast_group_ssm (xsocket_t       *socket,
-                                    xinet_address_t  *group,
-                                    xinet_address_t  *source_specific,
-                                    const xchar_t   *iface,
-                                    xerror_t       **error)
+gboolean
+g_socket_leave_multicast_group_ssm (GSocket       *socket,
+                                    GInetAddress  *group,
+                                    GInetAddress  *source_specific,
+                                    const gchar   *iface,
+                                    GError       **error)
 {
-  return xsocket_multicast_group_operation_ssm (socket, group,
+  return g_socket_multicast_group_operation_ssm (socket, group,
       source_specific, iface, FALSE, error);
 }
 
 /**
- * xsocket_speaks_ipv4:
- * @socket: a #xsocket_t
+ * g_socket_speaks_ipv4:
+ * @socket: a #GSocket
  *
  * Checks if a socket is capable of speaking IPv4.
  *
@@ -2795,20 +2795,20 @@ xsocket_leave_multicast_group_ssm (xsocket_t       *socket,
  *
  * Since: 2.22
  **/
-xboolean_t
-xsocket_speaks_ipv4 (xsocket_t *socket)
+gboolean
+g_socket_speaks_ipv4 (GSocket *socket)
 {
   switch (socket->priv->family)
     {
-    case XSOCKET_FAMILY_IPV4:
+    case G_SOCKET_FAMILY_IPV4:
       return TRUE;
 
-    case XSOCKET_FAMILY_IPV6:
+    case G_SOCKET_FAMILY_IPV6:
 #if defined (IPPROTO_IPV6) && defined (IPV6_V6ONLY)
       {
-        xint_t v6_only;
+        gint v6_only;
 
-        if (!xsocket_get_option (socket,
+        if (!g_socket_get_option (socket,
 				  IPPROTO_IPV6, IPV6_V6ONLY,
 				  &v6_only, NULL))
           return FALSE;
@@ -2825,36 +2825,36 @@ xsocket_speaks_ipv4 (xsocket_t *socket)
 }
 
 /**
- * xsocket_accept:
- * @socket: a #xsocket_t.
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_accept:
+ * @socket: a #GSocket.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Accept incoming connections on a connection-based socket. This removes
  * the first outstanding connection request from the listening socket and
- * creates a #xsocket_t object for it.
+ * creates a #GSocket object for it.
  *
- * The @socket must be bound to a local address with xsocket_bind() and
- * must be listening for incoming connections (xsocket_listen()).
+ * The @socket must be bound to a local address with g_socket_bind() and
+ * must be listening for incoming connections (g_socket_listen()).
  *
  * If there are no outstanding connections then the operation will block
  * or return %G_IO_ERROR_WOULD_BLOCK if non-blocking I/O is enabled.
  * To be notified of an incoming connection, wait for the %G_IO_IN condition.
  *
- * Returns: (transfer full): a new #xsocket_t, or %NULL on error.
- *     Free the returned object with xobject_unref().
+ * Returns: (transfer full): a new #GSocket, or %NULL on error.
+ *     Free the returned object with g_object_unref().
  *
  * Since: 2.22
  */
-xsocket_t *
-xsocket_accept (xsocket_t       *socket,
-		 xcancellable_t  *cancellable,
-		 xerror_t       **error)
+GSocket *
+g_socket_accept (GSocket       *socket,
+		 GCancellable  *cancellable,
+		 GError       **error)
 {
-  xsocket_t *new_socket;
-  xint_t ret;
+  GSocket *new_socket;
+  gint ret;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
+  g_return_val_if_fail (G_IS_SOCKET (socket), NULL);
 
   if (!check_socket (socket, error))
     return NULL;
@@ -2882,7 +2882,7 @@ xsocket_accept (xsocket_t       *socket,
 
               if (socket->priv->blocking)
                 {
-                  if (!xsocket_condition_wait (socket,
+                  if (!g_socket_condition_wait (socket,
                                                 G_IO_IN, cancellable, error))
                     return NULL;
 
@@ -2910,7 +2910,7 @@ xsocket_accept (xsocket_t       *socket,
 
     /* We always want to set close-on-exec to protect users. If you
        need to so some weird inheritance to exec you can re-enable this
-       using lower level hacks with xsocket_get_fd(). */
+       using lower level hacks with g_socket_get_fd(). */
     flags = fcntl (ret, F_GETFD, 0);
     if (flags != -1 &&
 	(flags & FD_CLOEXEC) == 0)
@@ -2921,7 +2921,7 @@ xsocket_accept (xsocket_t       *socket,
   }
 #endif
 
-  new_socket = xsocket_new_from_fd (ret, error);
+  new_socket = g_socket_new_from_fd (ret, error);
   if (new_socket == NULL)
     {
 #ifdef G_OS_WIN32
@@ -2937,17 +2937,17 @@ xsocket_accept (xsocket_t       *socket,
 }
 
 /**
- * xsocket_connect:
- * @socket: a #xsocket_t.
- * @address: a #xsocket_address_t specifying the remote address.
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_connect:
+ * @socket: a #GSocket.
+ * @address: a #GSocketAddress specifying the remote address.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Connect the socket to the specified remote address.
  *
  * For connection oriented socket this generally means we attempt to make
  * a connection to the @address. For a connection-less socket it sets
- * the default address for xsocket_send() and discards all incoming datagrams
+ * the default address for g_socket_send() and discards all incoming datagrams
  * from other sources.
  *
  * Generally connection oriented sockets can only connect once, but
@@ -2958,39 +2958,39 @@ xsocket_accept (xsocket_t       *socket,
  * non-blocking I/O is enabled. Then %G_IO_ERROR_PENDING is returned
  * and the user can be notified of the connection finishing by waiting
  * for the G_IO_OUT condition. The result of the connection must then be
- * checked with xsocket_check_connect_result().
+ * checked with g_socket_check_connect_result().
  *
  * Returns: %TRUE if connected, %FALSE on error.
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_connect (xsocket_t         *socket,
-		  xsocket_address_t  *address,
-		  xcancellable_t    *cancellable,
-		  xerror_t         **error)
+gboolean
+g_socket_connect (GSocket         *socket,
+		  GSocketAddress  *address,
+		  GCancellable    *cancellable,
+		  GError         **error)
 {
   union {
     struct sockaddr_storage storage;
     struct sockaddr sa;
   } buffer;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket) && X_IS_SOCKET_ADDRESS (address), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket) && G_IS_SOCKET_ADDRESS (address), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
 
-  if (!xsocket_address_to_native (address, &buffer.storage, sizeof buffer, error))
+  if (!g_socket_address_to_native (address, &buffer.storage, sizeof buffer, error))
     return FALSE;
 
   if (socket->priv->remote_address)
-    xobject_unref (socket->priv->remote_address);
-  socket->priv->remote_address = xobject_ref (address);
+    g_object_unref (socket->priv->remote_address);
+  socket->priv->remote_address = g_object_ref (address);
 
   while (1)
     {
       if (connect (socket->priv->fd, &buffer.sa,
-		   xsocket_address_get_native_size (address)) < 0)
+		   g_socket_address_get_native_size (address)) < 0)
 	{
 	  int errsv = get_socket_errno ();
 
@@ -3007,9 +3007,9 @@ xsocket_connect (xsocket_t         *socket,
 
 	      if (socket->priv->blocking)
 		{
-		  if (xsocket_condition_wait (socket, G_IO_OUT, cancellable, error))
+		  if (g_socket_condition_wait (socket, G_IO_OUT, cancellable, error))
 		    {
-		      if (xsocket_check_connect_result (socket, error))
+		      if (g_socket_check_connect_result (socket, error))
 			break;
 		    }
 		}
@@ -3039,25 +3039,25 @@ xsocket_connect (xsocket_t         *socket,
 }
 
 /**
- * xsocket_check_connect_result:
- * @socket: a #xsocket_t
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_check_connect_result:
+ * @socket: a #GSocket
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Checks and resets the pending connect error for the socket.
- * This is used to check for errors when xsocket_connect() is
+ * This is used to check for errors when g_socket_connect() is
  * used in non-blocking mode.
  *
  * Returns: %TRUE if no error, %FALSE otherwise, setting @error to the error
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_check_connect_result (xsocket_t  *socket,
-			       xerror_t  **error)
+gboolean
+g_socket_check_connect_result (GSocket  *socket,
+			       GError  **error)
 {
   int value;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -3065,7 +3065,7 @@ xsocket_check_connect_result (xsocket_t  *socket,
   if (!check_timeout (socket, error))
     return FALSE;
 
-  if (!xsocket_get_option (socket, SOL_SOCKET, SO_ERROR, &value, error))
+  if (!g_socket_get_option (socket, SOL_SOCKET, SO_ERROR, &value, error))
     {
       g_prefix_error (error, _("Unable to get pending error: "));
       return FALSE;
@@ -3077,7 +3077,7 @@ xsocket_check_connect_result (xsocket_t  *socket,
                            socket_strerror (value));
       if (socket->priv->remote_address)
         {
-          xobject_unref (socket->priv->remote_address);
+          g_object_unref (socket->priv->remote_address);
           socket->priv->remote_address = NULL;
         }
       return FALSE;
@@ -3090,8 +3090,8 @@ xsocket_check_connect_result (xsocket_t  *socket,
 }
 
 /**
- * xsocket_get_available_bytes:
- * @socket: a #xsocket_t
+ * g_socket_get_available_bytes:
+ * @socket: a #GSocket
  *
  * Get the amount of data pending in the OS input buffer, without blocking.
  *
@@ -3102,8 +3102,8 @@ xsocket_check_connect_result (xsocket_t  *socket,
  * Note that on Windows, this function is rather inefficient in the
  * UDP case, and so if you know any plausible upper bound on the size
  * of the incoming packet, it is better to just do a
- * xsocket_receive() with a buffer of that size, rather than calling
- * xsocket_get_available_bytes() first and then doing a receive of
+ * g_socket_receive() with a buffer of that size, rather than calling
+ * g_socket_get_available_bytes() first and then doing a receive of
  * exactly the right size.
  *
  * Returns: the number of bytes that can be read from the socket
@@ -3111,29 +3111,29 @@ xsocket_check_connect_result (xsocket_t  *socket,
  *
  * Since: 2.32
  */
-xssize_t
-xsocket_get_available_bytes (xsocket_t *socket)
+gssize
+g_socket_get_available_bytes (GSocket *socket)
 {
 #ifndef SO_NREAD
-  const xint_t bufsize = 64 * 1024;
-  static xuchar_t *buf = NULL;
+  const gint bufsize = 64 * 1024;
+  static guchar *buf = NULL;
 #endif
 #ifdef G_OS_WIN32
   u_long avail;
 #else
-  xint_t avail;
+  gint avail;
 #endif
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket), -1);
 
   if (!check_socket (socket, NULL))
     return -1;
 
 #ifdef SO_NREAD
-  if (!xsocket_get_option (socket, SOL_SOCKET, SO_NREAD, &avail, NULL))
+  if (!g_socket_get_option (socket, SOL_SOCKET, SO_NREAD, &avail, NULL))
       return -1;
 #else
-  if (socket->priv->type == XSOCKET_TYPE_DATAGRAM)
+  if (socket->priv->type == G_SOCKET_TYPE_DATAGRAM)
     {
       if (G_UNLIKELY (g_once_init_enter (&buf)))
         g_once_init_leave (&buf, g_malloc (bufsize));
@@ -3142,7 +3142,7 @@ xsocket_get_available_bytes (xsocket_t *socket)
        * systems add internal header size to the reported size, making it
        * unusable for this function. */
       avail = recv (socket->priv->fd, buf, bufsize, MSG_PEEK);
-      if ((xint_t) avail == -1)
+      if ((gint) avail == -1)
         {
           int errsv = get_socket_errno ();
 #ifdef G_OS_WIN32
@@ -3170,22 +3170,22 @@ xsocket_get_available_bytes (xsocket_t *socket)
 /* Block on a timed wait for @condition until (@start_time + @timeout).
  * Return %G_IO_ERROR_TIMED_OUT if the timeout is reached; otherwise %TRUE.
  */
-static xboolean_t
-block_on_timeout (xsocket_t       *socket,
-                  xio_condition_t   condition,
-                  sint64_t         timeout_us,
-                  sint64_t         start_time,
-                  xcancellable_t  *cancellable,
-                  xerror_t       **error)
+static gboolean
+block_on_timeout (GSocket       *socket,
+                  GIOCondition   condition,
+                  gint64         timeout_us,
+                  gint64         start_time,
+                  GCancellable  *cancellable,
+                  GError       **error)
 {
-  sint64_t wait_timeout = -1;
+  gint64 wait_timeout = -1;
 
-  xreturn_val_if_fail (timeout_us != 0, TRUE);
+  g_return_val_if_fail (timeout_us != 0, TRUE);
 
   /* check if we've timed out or how much time to wait at most */
   if (timeout_us >= 0)
     {
-      sint64_t elapsed = g_get_monotonic_time () - start_time;
+      gint64 elapsed = g_get_monotonic_time () - start_time;
 
       if (elapsed >= timeout_us)
         {
@@ -3198,22 +3198,22 @@ block_on_timeout (xsocket_t       *socket,
       wait_timeout = timeout_us - elapsed;
     }
 
-  return xsocket_condition_timed_wait (socket, condition, wait_timeout,
+  return g_socket_condition_timed_wait (socket, condition, wait_timeout,
                                         cancellable, error);
 }
 
-static xssize_t
-xsocket_receive_with_timeout (xsocket_t       *socket,
-                               xuint8_t        *buffer,
-                               xsize_t          size,
-                               sint64_t         timeout_us,
-                               xcancellable_t  *cancellable,
-                               xerror_t       **error)
+static gssize
+g_socket_receive_with_timeout (GSocket       *socket,
+                               guint8        *buffer,
+                               gsize          size,
+                               gint64         timeout_us,
+                               GCancellable  *cancellable,
+                               GError       **error)
 {
-  xssize_t ret;
-  sint64_t start_time;
+  gssize ret;
+  gint64 start_time;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket) && buffer != NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -3223,7 +3223,7 @@ xsocket_receive_with_timeout (xsocket_t       *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   while (1)
@@ -3269,28 +3269,28 @@ xsocket_receive_with_timeout (xsocket_t       *socket,
 }
 
 /**
- * xsocket_receive:
- * @socket: a #xsocket_t
- * @buffer: (array length=size) (element-type xuint8_t) (out caller-allocates):
+ * g_socket_receive:
+ * @socket: a #GSocket
+ * @buffer: (array length=size) (element-type guint8) (out caller-allocates):
  *     a buffer to read data into (which should be at least @size bytes long).
  * @size: the number of bytes you want to read from the socket
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Receive data (up to @size bytes) from a socket. This is mainly used by
- * connection-oriented sockets; it is identical to xsocket_receive_from()
+ * connection-oriented sockets; it is identical to g_socket_receive_from()
  * with @address set to %NULL.
  *
- * For %XSOCKET_TYPE_DATAGRAM and %XSOCKET_TYPE_SEQPACKET sockets,
- * xsocket_receive() will always read either 0 or 1 complete messages from
+ * For %G_SOCKET_TYPE_DATAGRAM and %G_SOCKET_TYPE_SEQPACKET sockets,
+ * g_socket_receive() will always read either 0 or 1 complete messages from
  * the socket. If the received message is too large to fit in @buffer, then
  * the data beyond @size bytes will be discarded, without any explicit
  * indication that this has occurred.
  *
- * For %XSOCKET_TYPE_STREAM sockets, xsocket_receive() can return any
+ * For %G_SOCKET_TYPE_STREAM sockets, g_socket_receive() can return any
  * number of bytes, up to @size. If more than @size bytes have been
  * received, the additional data will be returned in future calls to
- * xsocket_receive().
+ * g_socket_receive().
  *
  * If the socket is in blocking mode the call will block until there
  * is some data to receive, the connection is closed, or there is an
@@ -3306,29 +3306,29 @@ xsocket_receive_with_timeout (xsocket_t       *socket,
  *
  * Since: 2.22
  */
-xssize_t
-xsocket_receive (xsocket_t       *socket,
-		  xchar_t         *buffer,
-		  xsize_t          size,
-		  xcancellable_t  *cancellable,
-		  xerror_t       **error)
+gssize
+g_socket_receive (GSocket       *socket,
+		  gchar         *buffer,
+		  gsize          size,
+		  GCancellable  *cancellable,
+		  GError       **error)
 {
-  return xsocket_receive_with_timeout (socket, (xuint8_t *) buffer, size,
+  return g_socket_receive_with_timeout (socket, (guint8 *) buffer, size,
                                         socket->priv->blocking ? -1 : 0,
                                         cancellable, error);
 }
 
 /**
- * xsocket_receive_with_blocking:
- * @socket: a #xsocket_t
- * @buffer: (array length=size) (element-type xuint8_t) (out caller-allocates):
+ * g_socket_receive_with_blocking:
+ * @socket: a #GSocket
+ * @buffer: (array length=size) (element-type guint8) (out caller-allocates):
  *     a buffer to read data into (which should be at least @size bytes long).
  * @size: the number of bytes you want to read from the socket
  * @blocking: whether to do blocking or non-blocking I/O
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
- * This behaves exactly the same as xsocket_receive(), except that
+ * This behaves exactly the same as g_socket_receive(), except that
  * the choice of blocking or non-blocking behavior is determined by
  * the @blocking argument rather than by @socket's properties.
  *
@@ -3337,28 +3337,28 @@ xsocket_receive (xsocket_t       *socket,
  *
  * Since: 2.26
  */
-xssize_t
-xsocket_receive_with_blocking (xsocket_t       *socket,
-				xchar_t         *buffer,
-				xsize_t          size,
-				xboolean_t       blocking,
-				xcancellable_t  *cancellable,
-				xerror_t       **error)
+gssize
+g_socket_receive_with_blocking (GSocket       *socket,
+				gchar         *buffer,
+				gsize          size,
+				gboolean       blocking,
+				GCancellable  *cancellable,
+				GError       **error)
 {
-  return xsocket_receive_with_timeout (socket, (xuint8_t *) buffer, size,
+  return g_socket_receive_with_timeout (socket, (guint8 *) buffer, size,
                                         blocking ? -1 : 0, cancellable, error);
 }
 
 /**
- * xsocket_receive_from:
- * @socket: a #xsocket_t
- * @address: (out) (optional): a pointer to a #xsocket_address_t
+ * g_socket_receive_from:
+ * @socket: a #GSocket
+ * @address: (out) (optional): a pointer to a #GSocketAddress
  *     pointer, or %NULL
- * @buffer: (array length=size) (element-type xuint8_t) (out caller-allocates):
+ * @buffer: (array length=size) (element-type guint8) (out caller-allocates):
  *     a buffer to read data into (which should be at least @size bytes long).
  * @size: the number of bytes you want to read from the socket
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Receive data (up to @size bytes) from a socket.
  *
@@ -3366,27 +3366,27 @@ xsocket_receive_with_blocking (xsocket_t       *socket,
  * source address of the received packet.
  * @address is owned by the caller.
  *
- * See xsocket_receive() for additional information.
+ * See g_socket_receive() for additional information.
  *
  * Returns: Number of bytes read, or 0 if the connection was closed by
  * the peer, or -1 on error
  *
  * Since: 2.22
  */
-xssize_t
-xsocket_receive_from (xsocket_t         *socket,
-		       xsocket_address_t **address,
-		       xchar_t           *buffer,
-		       xsize_t            size,
-		       xcancellable_t    *cancellable,
-		       xerror_t         **error)
+gssize
+g_socket_receive_from (GSocket         *socket,
+		       GSocketAddress **address,
+		       gchar           *buffer,
+		       gsize            size,
+		       GCancellable    *cancellable,
+		       GError         **error)
 {
-  xinput_vector_t v;
+  GInputVector v;
 
   v.buffer = buffer;
   v.size = size;
 
-  return xsocket_receive_message (socket,
+  return g_socket_receive_message (socket,
 				   address,
 				   &v, 1,
 				   NULL, 0, NULL,
@@ -3396,23 +3396,23 @@ xsocket_receive_from (xsocket_t         *socket,
 
 /* See the comment about SIGPIPE above. */
 #ifdef MSG_NOSIGNAL
-#define XSOCKET_DEFAULT_SEND_FLAGS MSG_NOSIGNAL
+#define G_SOCKET_DEFAULT_SEND_FLAGS MSG_NOSIGNAL
 #else
-#define XSOCKET_DEFAULT_SEND_FLAGS 0
+#define G_SOCKET_DEFAULT_SEND_FLAGS 0
 #endif
 
-static xssize_t
-xsocket_send_with_timeout (xsocket_t       *socket,
-                            const xuint8_t  *buffer,
-                            xsize_t          size,
-                            sint64_t         timeout_us,
-                            xcancellable_t  *cancellable,
-                            xerror_t       **error)
+static gssize
+g_socket_send_with_timeout (GSocket       *socket,
+                            const guint8  *buffer,
+                            gsize          size,
+                            gint64         timeout_us,
+                            GCancellable  *cancellable,
+                            GError       **error)
 {
-  xssize_t ret;
-  sint64_t start_time;
+  gssize ret;
+  gint64 start_time;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket) && buffer != NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -3422,12 +3422,12 @@ xsocket_send_with_timeout (xsocket_t       *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   while (1)
     {
-      if ((ret = send (socket->priv->fd, (const char *)buffer, size, XSOCKET_DEFAULT_SEND_FLAGS)) < 0)
+      if ((ret = send (socket->priv->fd, (const char *)buffer, size, G_SOCKET_DEFAULT_SEND_FLAGS)) < 0)
 	{
 	  int errsv = get_socket_errno ();
 
@@ -3463,24 +3463,24 @@ xsocket_send_with_timeout (xsocket_t       *socket,
 }
 
 /**
- * xsocket_send:
- * @socket: a #xsocket_t
- * @buffer: (array length=size) (element-type xuint8_t): the buffer
+ * g_socket_send:
+ * @socket: a #GSocket
+ * @buffer: (array length=size) (element-type guint8): the buffer
  *     containing the data to send.
  * @size: the number of bytes to send
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Tries to send @size bytes from @buffer on the socket. This is
  * mainly used by connection-oriented sockets; it is identical to
- * xsocket_send_to() with @address set to %NULL.
+ * g_socket_send_to() with @address set to %NULL.
  *
  * If the socket is in blocking mode the call will block until there is
  * space for the data in the socket queue. If there is no space available
  * and the socket is in non-blocking mode a %G_IO_ERROR_WOULD_BLOCK error
  * will be returned. To be notified when space is available, wait for the
  * %G_IO_OUT condition. Note though that you may still receive
- * %G_IO_ERROR_WOULD_BLOCK from xsocket_send() even if you were previously
+ * %G_IO_ERROR_WOULD_BLOCK from g_socket_send() even if you were previously
  * notified of a %G_IO_OUT condition. (On Windows in particular, this is
  * very common due to the way the underlying APIs work.)
  *
@@ -3491,29 +3491,29 @@ xsocket_send_with_timeout (xsocket_t       *socket,
  *
  * Since: 2.22
  */
-xssize_t
-xsocket_send (xsocket_t       *socket,
-	       const xchar_t   *buffer,
-	       xsize_t          size,
-	       xcancellable_t  *cancellable,
-	       xerror_t       **error)
+gssize
+g_socket_send (GSocket       *socket,
+	       const gchar   *buffer,
+	       gsize          size,
+	       GCancellable  *cancellable,
+	       GError       **error)
 {
-  return xsocket_send_with_blocking (socket, buffer, size,
+  return g_socket_send_with_blocking (socket, buffer, size,
 				      socket->priv->blocking,
 				      cancellable, error);
 }
 
 /**
- * xsocket_send_with_blocking:
- * @socket: a #xsocket_t
- * @buffer: (array length=size) (element-type xuint8_t): the buffer
+ * g_socket_send_with_blocking:
+ * @socket: a #GSocket
+ * @buffer: (array length=size) (element-type guint8): the buffer
  *     containing the data to send.
  * @size: the number of bytes to send
  * @blocking: whether to do blocking or non-blocking I/O
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
- * This behaves exactly the same as xsocket_send(), except that
+ * This behaves exactly the same as g_socket_send(), except that
  * the choice of blocking or non-blocking behavior is determined by
  * the @blocking argument rather than by @socket's properties.
  *
@@ -3522,53 +3522,53 @@ xsocket_send (xsocket_t       *socket,
  *
  * Since: 2.26
  */
-xssize_t
-xsocket_send_with_blocking (xsocket_t       *socket,
-			     const xchar_t   *buffer,
-			     xsize_t          size,
-			     xboolean_t       blocking,
-			     xcancellable_t  *cancellable,
-			     xerror_t       **error)
+gssize
+g_socket_send_with_blocking (GSocket       *socket,
+			     const gchar   *buffer,
+			     gsize          size,
+			     gboolean       blocking,
+			     GCancellable  *cancellable,
+			     GError       **error)
 {
-  return xsocket_send_with_timeout (socket, (const xuint8_t *) buffer, size,
+  return g_socket_send_with_timeout (socket, (const guint8 *) buffer, size,
                                      blocking ? -1 : 0, cancellable, error);
 }
 
 /**
- * xsocket_send_to:
- * @socket: a #xsocket_t
- * @address: (nullable): a #xsocket_address_t, or %NULL
- * @buffer: (array length=size) (element-type xuint8_t): the buffer
+ * g_socket_send_to:
+ * @socket: a #GSocket
+ * @address: (nullable): a #GSocketAddress, or %NULL
+ * @buffer: (array length=size) (element-type guint8): the buffer
  *     containing the data to send.
  * @size: the number of bytes to send
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Tries to send @size bytes from @buffer to @address. If @address is
  * %NULL then the message is sent to the default receiver (set by
- * xsocket_connect()).
+ * g_socket_connect()).
  *
- * See xsocket_send() for additional information.
+ * See g_socket_send() for additional information.
  *
  * Returns: Number of bytes written (which may be less than @size), or -1
  * on error
  *
  * Since: 2.22
  */
-xssize_t
-xsocket_send_to (xsocket_t         *socket,
-		  xsocket_address_t  *address,
-		  const xchar_t     *buffer,
-		  xsize_t            size,
-		  xcancellable_t    *cancellable,
-		  xerror_t         **error)
+gssize
+g_socket_send_to (GSocket         *socket,
+		  GSocketAddress  *address,
+		  const gchar     *buffer,
+		  gsize            size,
+		  GCancellable    *cancellable,
+		  GError         **error)
 {
-  xoutput_vector_t v;
+  GOutputVector v;
 
   v.buffer = buffer;
   v.size = size;
 
-  return xsocket_send_message (socket,
+  return g_socket_send_message (socket,
 				address,
 				&v, 1,
 				NULL, 0,
@@ -3578,11 +3578,11 @@ xsocket_send_to (xsocket_t         *socket,
 }
 
 /**
- * xsocket_shutdown:
- * @socket: a #xsocket_t
+ * g_socket_shutdown:
+ * @socket: a #GSocket
  * @shutdown_read: whether to shut down the read side
  * @shutdown_write: whether to shut down the write side
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Shut down part or all of a full-duplex connection.
  *
@@ -3603,15 +3603,15 @@ xsocket_send_to (xsocket_t         *socket,
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_shutdown (xsocket_t   *socket,
-		   xboolean_t   shutdown_read,
-		   xboolean_t   shutdown_write,
-		   xerror_t   **error)
+gboolean
+g_socket_shutdown (GSocket   *socket,
+		   gboolean   shutdown_read,
+		   gboolean   shutdown_write,
+		   GError   **error)
 {
   int how;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), TRUE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), TRUE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -3653,9 +3653,9 @@ xsocket_shutdown (xsocket_t   *socket,
 }
 
 /**
- * xsocket_close:
- * @socket: a #xsocket_t
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_close:
+ * @socket: a #GSocket
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Closes the socket, shutting down any active connection.
  *
@@ -3679,10 +3679,10 @@ xsocket_shutdown (xsocket_t   *socket,
  * way to avoid this problem; the easiest fix is to design the network
  * protocol such that the client will never send data "out of turn".
  * Another solution is for the server to half-close the connection by
- * calling xsocket_shutdown() with only the @shutdown_write flag set,
+ * calling g_socket_shutdown() with only the @shutdown_write flag set,
  * and then wait for the client to notice this and close its side of the
- * connection, after which the server can safely call xsocket_close().
- * (This is what #xtcp_connection_t does if you call
+ * connection, after which the server can safely call g_socket_close().
+ * (This is what #GTcpConnection does if you call
  * g_tcp_connection_set_graceful_disconnect(). But of course, this
  * only works if the client will close its connection after the server
  * does.)
@@ -3691,13 +3691,13 @@ xsocket_shutdown (xsocket_t   *socket,
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_close (xsocket_t  *socket,
-		xerror_t  **error)
+gboolean
+g_socket_close (GSocket  *socket,
+		GError  **error)
 {
   int res;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), TRUE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), TRUE);
 
   if (socket->priv->closed)
     return TRUE; /* Multiple close not an error */
@@ -3734,7 +3734,7 @@ xsocket_close (xsocket_t  *socket,
   socket->priv->closed = TRUE;
   if (socket->priv->remote_address)
     {
-      xobject_unref (socket->priv->remote_address);
+      g_object_unref (socket->priv->remote_address);
       socket->priv->remote_address = NULL;
     }
 
@@ -3742,8 +3742,8 @@ xsocket_close (xsocket_t  *socket,
 }
 
 /**
- * xsocket_is_closed:
- * @socket: a #xsocket_t
+ * g_socket_is_closed:
+ * @socket: a #GSocket
  *
  * Checks whether a socket is closed.
  *
@@ -3751,22 +3751,22 @@ xsocket_close (xsocket_t  *socket,
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_is_closed (xsocket_t *socket)
+gboolean
+g_socket_is_closed (GSocket *socket)
 {
   return socket->priv->closed;
 }
 
 /* Broken source, used on errors */
-static xboolean_t
-broken_dispatch (xsource_t     *source,
-		 xsource_func_t  callback,
-		 xpointer_t     user_data)
+static gboolean
+broken_dispatch (GSource     *source,
+		 GSourceFunc  callback,
+		 gpointer     user_data)
 {
   return TRUE;
 }
 
-static xsource_funcs_t broken_funcs =
+static GSourceFuncs broken_funcs =
 {
   NULL,
   NULL,
@@ -3777,8 +3777,8 @@ static xsource_funcs_t broken_funcs =
 };
 
 #ifdef G_OS_WIN32
-static xint_t
-network_events_for_condition (xio_condition_t condition)
+static gint
+network_events_for_condition (GIOCondition condition)
 {
   int event_mask = 0;
 
@@ -3792,18 +3792,18 @@ network_events_for_condition (xio_condition_t condition)
 }
 
 static void
-ensure_event (xsocket_t *socket)
+ensure_event (GSocket *socket)
 {
   if (socket->priv->event == WSA_INVALID_EVENT)
     socket->priv->event = WSACreateEvent();
 }
 
 static void
-update_select_events (xsocket_t *socket)
+update_select_events (GSocket *socket)
 {
   int event_mask;
-  xio_condition_t *ptr;
-  xlist_t *l;
+  GIOCondition *ptr;
+  GList *l;
   WSAEVENT event;
 
   if (socket->priv->closed)
@@ -3834,38 +3834,38 @@ update_select_events (xsocket_t *socket)
 }
 
 static void
-add_condition_watch (xsocket_t      *socket,
-		     xio_condition_t *condition)
+add_condition_watch (GSocket      *socket,
+		     GIOCondition *condition)
 {
   g_mutex_lock (&socket->priv->win32_source_lock);
-  xassert (xlist_find (socket->priv->requested_conditions, condition) == NULL);
+  g_assert (g_list_find (socket->priv->requested_conditions, condition) == NULL);
 
   socket->priv->requested_conditions =
-    xlist_prepend (socket->priv->requested_conditions, condition);
+    g_list_prepend (socket->priv->requested_conditions, condition);
 
   update_select_events (socket);
   g_mutex_unlock (&socket->priv->win32_source_lock);
 }
 
 static void
-remove_condition_watch (xsocket_t      *socket,
-			xio_condition_t *condition)
+remove_condition_watch (GSocket      *socket,
+			GIOCondition *condition)
 {
   g_mutex_lock (&socket->priv->win32_source_lock);
-  xassert (xlist_find (socket->priv->requested_conditions, condition) != NULL);
+  g_assert (g_list_find (socket->priv->requested_conditions, condition) != NULL);
 
   socket->priv->requested_conditions =
-    xlist_remove (socket->priv->requested_conditions, condition);
+    g_list_remove (socket->priv->requested_conditions, condition);
 
   update_select_events (socket);
   g_mutex_unlock (&socket->priv->win32_source_lock);
 }
 
-static xio_condition_t
-update_condition_unlocked (xsocket_t *socket)
+static GIOCondition
+update_condition_unlocked (GSocket *socket)
 {
   WSANETWORKEVENTS events;
-  xio_condition_t condition;
+  GIOCondition condition;
 
   if (!socket->priv->closed &&
       WSAEnumNetworkEvents (socket->priv->fd,
@@ -3931,10 +3931,10 @@ update_condition_unlocked (xsocket_t *socket)
   return condition;
 }
 
-static xio_condition_t
-update_condition (xsocket_t *socket)
+static GIOCondition
+update_condition (GSocket *socket)
 {
-  xio_condition_t res;
+  GIOCondition res;
   g_mutex_lock (&socket->priv->win32_source_lock);
   res = update_condition_unlocked (socket);
   g_mutex_unlock (&socket->priv->win32_source_lock);
@@ -3943,19 +3943,19 @@ update_condition (xsocket_t *socket)
 #endif
 
 typedef struct {
-  xsource_t       source;
+  GSource       source;
 #ifdef G_OS_WIN32
-  xpollfd_t       pollfd;
+  GPollFD       pollfd;
 #else
-  xpointer_t      fd_tag;
+  gpointer      fd_tag;
 #endif
-  xsocket_t      *socket;
-  xio_condition_t  condition;
+  GSocket      *socket;
+  GIOCondition  condition;
 } GSocketSource;
 
-static xboolean_t
-socket_source_prepare (xsource_t *source,
-                       xint_t    *timeout)
+static gboolean
+socket_source_prepare (GSource *source,
+                       gint    *timeout)
 {
   GSocketSource *socket_source = (GSocketSource *)source;
 
@@ -3965,22 +3965,22 @@ socket_source_prepare (xsource_t *source,
   if ((socket_source->pollfd.revents & G_IO_NVAL) != 0)
     return TRUE;
 
-  if (xsocket_is_closed (socket_source->socket))
+  if (g_socket_is_closed (socket_source->socket))
     {
-      xsource_remove_poll (source, &socket_source->pollfd);
+      g_source_remove_poll (source, &socket_source->pollfd);
       socket_source->pollfd.revents = G_IO_NVAL;
       return TRUE;
     }
 
   return (update_condition (socket_source->socket) & socket_source->condition) != 0;
 #else
-  return xsocket_is_closed (socket_source->socket) && socket_source->fd_tag != NULL;
+  return g_socket_is_closed (socket_source->socket) && socket_source->fd_tag != NULL;
 #endif
 }
 
 #ifdef G_OS_WIN32
-static xboolean_t
-socket_source_check_win32 (xsource_t *source)
+static gboolean
+socket_source_check_win32 (GSource *source)
 {
   int timeout;
 
@@ -3988,17 +3988,17 @@ socket_source_check_win32 (xsource_t *source)
 }
 #endif
 
-static xboolean_t
-socket_source_dispatch (xsource_t     *source,
-			xsource_func_t  callback,
-			xpointer_t     user_data)
+static gboolean
+socket_source_dispatch (GSource     *source,
+			GSourceFunc  callback,
+			gpointer     user_data)
 {
-  xsocket_source_func_t func = (xsocket_source_func_t)callback;
+  GSocketSourceFunc func = (GSocketSourceFunc)callback;
   GSocketSource *socket_source = (GSocketSource *)source;
-  xsocket_t *socket = socket_source->socket;
-  sint64_t timeout;
-  xuint_t events;
-  xboolean_t ret;
+  GSocket *socket = socket_source->socket;
+  gint64 timeout;
+  guint events;
+  gboolean ret;
 
 #ifdef G_OS_WIN32
   if ((socket_source->pollfd.revents & G_IO_NVAL) != 0)
@@ -4006,22 +4006,22 @@ socket_source_dispatch (xsource_t     *source,
   else
     events = update_condition (socket_source->socket);
 #else
-  if (xsocket_is_closed (socket_source->socket))
+  if (g_socket_is_closed (socket_source->socket))
     {
       if (socket_source->fd_tag)
-        xsource_remove_unix_fd (source, socket_source->fd_tag);
+        g_source_remove_unix_fd (source, socket_source->fd_tag);
       socket_source->fd_tag = NULL;
       events = G_IO_NVAL;
     }
   else
     {
-      events = xsource_query_unix_fd (source, socket_source->fd_tag);
+      events = g_source_query_unix_fd (source, socket_source->fd_tag);
     }
 #endif
 
-  timeout = xsource_get_ready_time (source);
-  if (timeout >= 0 && timeout < xsource_get_time (source) &&
-      !xsocket_is_closed (socket_source->socket))
+  timeout = g_source_get_ready_time (source);
+  if (timeout >= 0 && timeout < g_source_get_time (source) &&
+      !g_socket_is_closed (socket_source->socket))
     {
       socket->priv->timed_out = TRUE;
       events |= (G_IO_IN | G_IO_OUT);
@@ -4029,19 +4029,19 @@ socket_source_dispatch (xsource_t     *source,
 
   ret = (*func) (socket, events & socket_source->condition, user_data);
 
-  if (socket->priv->timeout && !xsocket_is_closed (socket_source->socket))
-    xsource_set_ready_time (source, g_get_monotonic_time () + socket->priv->timeout * 1000000);
+  if (socket->priv->timeout && !g_socket_is_closed (socket_source->socket))
+    g_source_set_ready_time (source, g_get_monotonic_time () + socket->priv->timeout * 1000000);
   else
-    xsource_set_ready_time (source, -1);
+    g_source_set_ready_time (source, -1);
 
   return ret;
 }
 
 static void
-socket_source_finalize (xsource_t *source)
+socket_source_finalize (GSource *source)
 {
   GSocketSource *socket_source = (GSocketSource *)source;
-  xsocket_t *socket;
+  GSocket *socket;
 
   socket = socket_source->socket;
 
@@ -4049,38 +4049,38 @@ socket_source_finalize (xsource_t *source)
   remove_condition_watch (socket, &socket_source->condition);
 #endif
 
-  xobject_unref (socket);
+  g_object_unref (socket);
 }
 
-static xboolean_t
-socket_source_closure_callback (xsocket_t      *socket,
-				xio_condition_t  condition,
-				xpointer_t      data)
+static gboolean
+socket_source_closure_callback (GSocket      *socket,
+				GIOCondition  condition,
+				gpointer      data)
 {
-  xclosure_t *closure = data;
+  GClosure *closure = data;
 
-  xvalue_t params[2] = { G_VALUE_INIT, G_VALUE_INIT };
-  xvalue_t result_value = G_VALUE_INIT;
-  xboolean_t result;
+  GValue params[2] = { G_VALUE_INIT, G_VALUE_INIT };
+  GValue result_value = G_VALUE_INIT;
+  gboolean result;
 
-  xvalue_init (&result_value, XTYPE_BOOLEAN);
+  g_value_init (&result_value, G_TYPE_BOOLEAN);
 
-  xvalue_init (&params[0], XTYPE_SOCKET);
-  xvalue_set_object (&params[0], socket);
-  xvalue_init (&params[1], XTYPE_IO_CONDITION);
-  xvalue_set_flags (&params[1], condition);
+  g_value_init (&params[0], G_TYPE_SOCKET);
+  g_value_set_object (&params[0], socket);
+  g_value_init (&params[1], G_TYPE_IO_CONDITION);
+  g_value_set_flags (&params[1], condition);
 
-  xclosure_invoke (closure, &result_value, 2, params, NULL);
+  g_closure_invoke (closure, &result_value, 2, params, NULL);
 
-  result = xvalue_get_boolean (&result_value);
-  xvalue_unset (&result_value);
-  xvalue_unset (&params[0]);
-  xvalue_unset (&params[1]);
+  result = g_value_get_boolean (&result_value);
+  g_value_unset (&result_value);
+  g_value_unset (&params[0]);
+  g_value_unset (&params[1]);
 
   return result;
 }
 
-static xsource_funcs_t socket_source_funcs =
+static GSourceFuncs socket_source_funcs =
 {
   socket_source_prepare,
 #ifdef G_OS_WIN32
@@ -4090,16 +4090,16 @@ static xsource_funcs_t socket_source_funcs =
 #endif
   socket_source_dispatch,
   socket_source_finalize,
-  (xsource_func_t)socket_source_closure_callback,
+  (GSourceFunc)socket_source_closure_callback,
   NULL,
 };
 
-static xsource_t *
-socket_source_new (xsocket_t      *socket,
-		   xio_condition_t  condition,
-		   xcancellable_t *cancellable)
+static GSource *
+socket_source_new (GSocket      *socket,
+		   GIOCondition  condition,
+		   GCancellable *cancellable)
 {
-  xsource_t *source;
+  GSource *source;
   GSocketSource *socket_source;
 
 #ifdef G_OS_WIN32
@@ -4108,33 +4108,33 @@ socket_source_new (xsocket_t      *socket,
   if (socket->priv->event == WSA_INVALID_EVENT)
     {
       g_warning ("Failed to create WSAEvent");
-      return xsource_new (&broken_funcs, sizeof (xsource_t));
+      return g_source_new (&broken_funcs, sizeof (GSource));
     }
 #endif
 
   if (!check_socket (socket, NULL))
     {
       g_warning ("Socket check failed");
-      return xsource_new (&broken_funcs, sizeof (xsource_t));
+      return g_source_new (&broken_funcs, sizeof (GSource));
     }
 
   condition |= G_IO_HUP | G_IO_ERR | G_IO_NVAL;
 
-  source = xsource_new (&socket_source_funcs, sizeof (GSocketSource));
-  xsource_set_static_name (source, "xsocket_t");
+  source = g_source_new (&socket_source_funcs, sizeof (GSocketSource));
+  g_source_set_static_name (source, "GSocket");
   socket_source = (GSocketSource *)source;
 
-  socket_source->socket = xobject_ref (socket);
+  socket_source->socket = g_object_ref (socket);
   socket_source->condition = condition;
 
   if (cancellable)
     {
-      xsource_t *cancellable_source;
+      GSource *cancellable_source;
 
-      cancellable_source = xcancellable_source_new (cancellable);
-      xsource_add_child_source (source, cancellable_source);
-      xsource_set_dummy_callback (cancellable_source);
-      xsource_unref (cancellable_source);
+      cancellable_source = g_cancellable_source_new (cancellable);
+      g_source_add_child_source (source, cancellable_source);
+      g_source_set_dummy_callback (cancellable_source);
+      g_source_unref (cancellable_source);
     }
 
 #ifdef G_OS_WIN32
@@ -4142,30 +4142,30 @@ socket_source_new (xsocket_t      *socket,
   socket_source->pollfd.fd = (gintptr) socket->priv->event;
   socket_source->pollfd.events = condition;
   socket_source->pollfd.revents = 0;
-  xsource_add_poll (source, &socket_source->pollfd);
+  g_source_add_poll (source, &socket_source->pollfd);
 #else
-  socket_source->fd_tag = xsource_add_unix_fd (source, socket->priv->fd, condition);
+  socket_source->fd_tag = g_source_add_unix_fd (source, socket->priv->fd, condition);
 #endif
 
   if (socket->priv->timeout)
-    xsource_set_ready_time (source, g_get_monotonic_time () + socket->priv->timeout * 1000000);
+    g_source_set_ready_time (source, g_get_monotonic_time () + socket->priv->timeout * 1000000);
   else
-    xsource_set_ready_time (source, -1);
+    g_source_set_ready_time (source, -1);
 
   return source;
 }
 
 /**
- * xsocket_create_source: (skip)
- * @socket: a #xsocket_t
- * @condition: a #xio_condition_t mask to monitor
- * @cancellable: (nullable): a %xcancellable_t or %NULL
+ * g_socket_create_source: (skip)
+ * @socket: a #GSocket
+ * @condition: a #GIOCondition mask to monitor
+ * @cancellable: (nullable): a %GCancellable or %NULL
  *
- * Creates a #xsource_t that can be attached to a %xmain_context_t to monitor
- * for the availability of the specified @condition on the socket. The #xsource_t
+ * Creates a #GSource that can be attached to a %GMainContext to monitor
+ * for the availability of the specified @condition on the socket. The #GSource
  * keeps a reference to the @socket.
  *
- * The callback on the source is of the #xsocket_source_func_t type.
+ * The callback on the source is of the #GSocketSourceFunc type.
  *
  * It is meaningless to specify %G_IO_ERR or %G_IO_HUP in @condition;
  * these conditions will always be reported output if they are true.
@@ -4174,32 +4174,32 @@ socket_source_new (xsocket_t      *socket,
  * cause the source to trigger, reporting the current condition (which
  * is likely 0 unless cancellation happened at the same time as a
  * condition change). You can check for this in the callback using
- * xcancellable_is_cancelled().
+ * g_cancellable_is_cancelled().
  *
  * If @socket has a timeout set, and it is reached before @condition
  * occurs, the source will then trigger anyway, reporting %G_IO_IN or
  * %G_IO_OUT depending on @condition. However, @socket will have been
- * marked as having had a timeout, and so the next #xsocket_t I/O method
+ * marked as having had a timeout, and so the next #GSocket I/O method
  * you call will then fail with a %G_IO_ERROR_TIMED_OUT.
  *
- * Returns: (transfer full): a newly allocated %xsource_t, free with xsource_unref().
+ * Returns: (transfer full): a newly allocated %GSource, free with g_source_unref().
  *
  * Since: 2.22
  */
-xsource_t *
-xsocket_create_source (xsocket_t      *socket,
-			xio_condition_t  condition,
-			xcancellable_t *cancellable)
+GSource *
+g_socket_create_source (GSocket      *socket,
+			GIOCondition  condition,
+			GCancellable *cancellable)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket) && (cancellable == NULL || X_IS_CANCELLABLE (cancellable)), NULL);
+  g_return_val_if_fail (G_IS_SOCKET (socket) && (cancellable == NULL || G_IS_CANCELLABLE (cancellable)), NULL);
 
   return socket_source_new (socket, condition, cancellable);
 }
 
 /**
- * xsocket_condition_check:
- * @socket: a #xsocket_t
- * @condition: a #xio_condition_t mask to check
+ * g_socket_condition_check:
+ * @socket: a #GSocket
+ * @condition: a #GIOCondition mask to check
  *
  * Checks on the readiness of @socket to perform operations.
  * The operations specified in @condition are checked for and masked
@@ -4208,8 +4208,8 @@ xsocket_create_source (xsocket_t      *socket,
  *
  * Note that on Windows, it is possible for an operation to return
  * %G_IO_ERROR_WOULD_BLOCK even immediately after
- * xsocket_condition_check() has claimed that the socket is ready for
- * writing. Rather than calling xsocket_condition_check() and then
+ * g_socket_condition_check() has claimed that the socket is ready for
+ * writing. Rather than calling g_socket_condition_check() and then
  * writing to the socket if it succeeds, it is generally better to
  * simply try writing to the socket right away, and try again later if
  * the initial attempt returns %G_IO_ERROR_WOULD_BLOCK.
@@ -4219,22 +4219,22 @@ xsocket_create_source (xsocket_t      *socket,
  *
  * This call never blocks.
  *
- * Returns: the @xio_condition_t mask of the current state
+ * Returns: the @GIOCondition mask of the current state
  *
  * Since: 2.22
  */
-xio_condition_t
-xsocket_condition_check (xsocket_t      *socket,
-			  xio_condition_t  condition)
+GIOCondition
+g_socket_condition_check (GSocket      *socket,
+			  GIOCondition  condition)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
+  g_return_val_if_fail (G_IS_SOCKET (socket), 0);
 
   if (!check_socket (socket, NULL))
     return 0;
 
 #ifdef G_OS_WIN32
   {
-    xio_condition_t current_condition;
+    GIOCondition current_condition;
 
     condition |= G_IO_ERR | G_IO_HUP;
 
@@ -4245,8 +4245,8 @@ xsocket_condition_check (xsocket_t      *socket,
   }
 #else
   {
-    xpollfd_t poll_fd;
-    xint_t result;
+    GPollFD poll_fd;
+    gint result;
     poll_fd.fd = socket->priv->fd;
     poll_fd.events = condition;
     poll_fd.revents = 0;
@@ -4261,11 +4261,11 @@ xsocket_condition_check (xsocket_t      *socket,
 }
 
 /**
- * xsocket_condition_wait:
- * @socket: a #xsocket_t
- * @condition: a #xio_condition_t mask to wait for
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: a #xerror_t pointer, or %NULL
+ * g_socket_condition_wait:
+ * @socket: a #GSocket
+ * @condition: a #GIOCondition mask to wait for
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: a #GError pointer, or %NULL
  *
  * Waits for @condition to become true on @socket. When the condition
  * is met, %TRUE is returned.
@@ -4276,42 +4276,42 @@ xsocket_condition_check (xsocket_t      *socket,
  * the appropriate value (%G_IO_ERROR_CANCELLED or
  * %G_IO_ERROR_TIMED_OUT).
  *
- * See also xsocket_condition_timed_wait().
+ * See also g_socket_condition_timed_wait().
  *
  * Returns: %TRUE if the condition was met, %FALSE otherwise
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_condition_wait (xsocket_t       *socket,
-			 xio_condition_t   condition,
-			 xcancellable_t  *cancellable,
-			 xerror_t       **error)
+gboolean
+g_socket_condition_wait (GSocket       *socket,
+			 GIOCondition   condition,
+			 GCancellable  *cancellable,
+			 GError       **error)
 {
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
-  return xsocket_condition_timed_wait (socket, condition, -1,
+  return g_socket_condition_timed_wait (socket, condition, -1,
 					cancellable, error);
 }
 
 /**
- * xsocket_condition_timed_wait:
- * @socket: a #xsocket_t
- * @condition: a #xio_condition_t mask to wait for
+ * g_socket_condition_timed_wait:
+ * @socket: a #GSocket
+ * @condition: a #GIOCondition mask to wait for
  * @timeout_us: the maximum time (in microseconds) to wait, or -1
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: a #xerror_t pointer, or %NULL
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: a #GError pointer, or %NULL
  *
  * Waits for up to @timeout_us microseconds for @condition to become true
  * on @socket. If the condition is met, %TRUE is returned.
  *
  * If @cancellable is cancelled before the condition is met, or if
- * @timeout_us (or the socket's #xsocket_t:timeout) is reached before the
+ * @timeout_us (or the socket's #GSocket:timeout) is reached before the
  * condition is met, then %FALSE is returned and @error, if non-%NULL,
  * is set to the appropriate value (%G_IO_ERROR_CANCELLED or
  * %G_IO_ERROR_TIMED_OUT).
  *
- * If you don't want a timeout, use xsocket_condition_wait().
+ * If you don't want a timeout, use g_socket_condition_wait().
  * (Alternatively, you can pass -1 for @timeout_us.)
  *
  * Note that although @timeout_us is in microseconds for consistency with
@@ -4323,27 +4323,27 @@ xsocket_condition_wait (xsocket_t       *socket,
  *
  * Since: 2.32
  */
-xboolean_t
-xsocket_condition_timed_wait (xsocket_t       *socket,
-			       xio_condition_t   condition,
-			       sint64_t         timeout_us,
-			       xcancellable_t  *cancellable,
-			       xerror_t       **error)
+gboolean
+g_socket_condition_timed_wait (GSocket       *socket,
+			       GIOCondition   condition,
+			       gint64         timeout_us,
+			       GCancellable  *cancellable,
+			       GError       **error)
 {
-  sint64_t start_time;
-  sint64_t timeout_ms;
+  gint64 start_time;
+  gint64 timeout_ms;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
   if (socket->priv->timeout &&
       (timeout_us < 0 || socket->priv->timeout < timeout_us / G_USEC_PER_SEC))
-    timeout_ms = (sint64_t) socket->priv->timeout * 1000;
+    timeout_ms = (gint64) socket->priv->timeout * 1000;
   else if (timeout_us != -1)
     timeout_ms = timeout_us / 1000;
   else
@@ -4353,10 +4353,10 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 
 #ifdef G_OS_WIN32
   {
-    xio_condition_t current_condition;
+    GIOCondition current_condition;
     WSAEVENT events[2];
     DWORD res;
-    xpollfd_t cancel_fd;
+    GPollFD cancel_fd;
     int num_events;
 
     /* Always check these */
@@ -4367,7 +4367,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
     num_events = 0;
     events[num_events++] = socket->priv->event;
 
-    if (xcancellable_make_pollfd (cancellable, &cancel_fd))
+    if (g_cancellable_make_pollfd (cancellable, &cancel_fd))
       events[num_events++] = (WSAEVENT)cancel_fd.fd;
 
     if (timeout_ms == -1)
@@ -4428,7 +4428,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 	    break;
 	  }
 
-	if (xcancellable_set_error_if_cancelled (cancellable, error))
+	if (g_cancellable_set_error_if_cancelled (cancellable, error))
 	  break;
 
         current_condition = update_condition_unlocked (socket);
@@ -4443,21 +4443,21 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
     g_mutex_unlock (&socket->priv->win32_source_lock);
     remove_condition_watch (socket, &condition);
     if (num_events > 1)
-      xcancellable_release_fd (cancellable);
+      g_cancellable_release_fd (cancellable);
 
     return (condition & current_condition) != 0;
   }
 #else
   {
-    xpollfd_t poll_fd[2];
-    xint_t result;
-    xint_t num;
+    GPollFD poll_fd[2];
+    gint result;
+    gint num;
 
     poll_fd[0].fd = socket->priv->fd;
     poll_fd[0].events = condition;
     num = 1;
 
-    if (xcancellable_make_pollfd (cancellable, &poll_fd[1]))
+    if (g_cancellable_make_pollfd (cancellable, &poll_fd[1]))
       num++;
 
     while (TRUE)
@@ -4475,9 +4475,9 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 	      timeout_ms = 0;
 	  }
       }
-
+    
     if (num > 1)
-      xcancellable_release_fd (cancellable);
+      g_cancellable_release_fd (cancellable);
 
     if (result == 0)
       {
@@ -4486,7 +4486,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 	return FALSE;
       }
 
-    return !xcancellable_set_error_if_cancelled (cancellable, error);
+    return !g_cancellable_set_error_if_cancelled (cancellable, error);
   }
   #endif
 }
@@ -4497,20 +4497,20 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
 /* QNX has this weird upper limit, or at least used to back in the 6.x days.
  * This was discovered empirically and doesn't appear to be mentioned in any
  * of the official documentation. */
-# define XSOCKET_CONTROL_BUFFER_SIZE_BYTES 2016
+# define G_SOCKET_CONTROL_BUFFER_SIZE_BYTES 2016
 #else
-# define XSOCKET_CONTROL_BUFFER_SIZE_BYTES 2048
+# define G_SOCKET_CONTROL_BUFFER_SIZE_BYTES 2048
 #endif
 
 /* Unfortunately these have to be macros rather than inline functions due to
  * using alloca(). */
 #define output_message_to_msghdr(message, prev_message, msg, prev_msg, error) \
 G_STMT_START { \
-  const xoutput_message_t  *_message = (message); \
-  const xoutput_message_t *_prev_message = (prev_message); \
+  const GOutputMessage  *_message = (message); \
+  const GOutputMessage *_prev_message = (prev_message); \
   struct msghdr *_msg = (msg); \
   const struct msghdr *_prev_msg = (prev_msg); \
-  xerror_t **_error = (error); \
+  GError **_error = (error); \
  \
   _msg->msg_flags = 0; \
  \
@@ -4522,9 +4522,9 @@ G_STMT_START { \
     } \
   else if (_message->address != NULL) \
     { \
-      _msg->msg_namelen = xsocket_address_get_native_size (_message->address); \
+      _msg->msg_namelen = g_socket_address_get_native_size (_message->address); \
       _msg->msg_name = g_alloca (_msg->msg_namelen); \
-      if (!xsocket_address_to_native (_message->address, _msg->msg_name, \
+      if (!g_socket_address_to_native (_message->address, _msg->msg_name, \
                                        _msg->msg_namelen, _error)) \
         break; \
     } \
@@ -4540,10 +4540,10 @@ G_STMT_START { \
     if (sizeof *_msg->msg_iov == sizeof *_message->vectors && \
         sizeof _msg->msg_iov->iov_base == sizeof _message->vectors->buffer && \
         G_STRUCT_OFFSET (struct iovec, iov_base) == \
-        G_STRUCT_OFFSET (xoutput_vector_t, buffer) && \
+        G_STRUCT_OFFSET (GOutputVector, buffer) && \
         sizeof _msg->msg_iov->iov_len == sizeof _message->vectors->size && \
         G_STRUCT_OFFSET (struct iovec, iov_len) == \
-        G_STRUCT_OFFSET (xoutput_vector_t, size)) \
+        G_STRUCT_OFFSET (GOutputVector, size)) \
       /* ABI is compatible */ \
       { \
         _msg->msg_iov = (struct iovec *) _message->vectors; \
@@ -4552,7 +4552,7 @@ G_STMT_START { \
     else \
       /* ABI is incompatible */ \
       { \
-        xuint_t i; \
+        guint i; \
  \
         _msg->msg_iov = g_newa (struct iovec, _message->num_vectors); \
         for (i = 0; i < _message->num_vectors; i++) \
@@ -4567,11 +4567,11 @@ G_STMT_START { \
   /* control */ \
   { \
     struct cmsghdr *cmsg; \
-    xuint_t i; \
+    guint i; \
  \
     _msg->msg_controllen = 0; \
     for (i = 0; i < _message->num_control_messages; i++) \
-      _msg->msg_controllen += CMSG_SPACE (xsocket_control_message_get_size (_message->control_messages[i])); \
+      _msg->msg_controllen += CMSG_SPACE (g_socket_control_message_get_size (_message->control_messages[i])); \
  \
     if (_msg->msg_controllen == 0) \
       _msg->msg_control = NULL; \
@@ -4583,20 +4583,20 @@ G_STMT_START { \
     cmsg = CMSG_FIRSTHDR (_msg); \
     for (i = 0; i < _message->num_control_messages; i++) \
       { \
-        cmsg->cmsg_level = xsocket_control_message_get_level (_message->control_messages[i]); \
-        cmsg->cmsg_type = xsocket_control_message_get_msg_type (_message->control_messages[i]); \
-        cmsg->cmsg_len = CMSG_LEN (xsocket_control_message_get_size (_message->control_messages[i])); \
-        xsocket_control_message_serialize (_message->control_messages[i], \
+        cmsg->cmsg_level = g_socket_control_message_get_level (_message->control_messages[i]); \
+        cmsg->cmsg_type = g_socket_control_message_get_msg_type (_message->control_messages[i]); \
+        cmsg->cmsg_len = CMSG_LEN (g_socket_control_message_get_size (_message->control_messages[i])); \
+        g_socket_control_message_serialize (_message->control_messages[i], \
                                             CMSG_DATA (cmsg)); \
         cmsg = CMSG_NXTHDR (_msg, cmsg); \
       } \
-    xassert (cmsg == NULL); \
+    g_assert (cmsg == NULL); \
   } \
 } G_STMT_END
 
 #define input_message_to_msghdr(message, msg) \
 G_STMT_START { \
-  const xinput_message_t  *_message = (message); \
+  const GInputMessage  *_message = (message); \
   struct msghdr *_msg = (msg); \
  \
   /* name */ \
@@ -4616,10 +4616,10 @@ G_STMT_START { \
   if (sizeof *_msg->msg_iov == sizeof *_message->vectors && \
       sizeof _msg->msg_iov->iov_base == sizeof _message->vectors->buffer && \
       G_STRUCT_OFFSET (struct iovec, iov_base) == \
-      G_STRUCT_OFFSET (xinput_vector_t, buffer) && \
+      G_STRUCT_OFFSET (GInputVector, buffer) && \
       sizeof _msg->msg_iov->iov_len == sizeof _message->vectors->size && \
       G_STRUCT_OFFSET (struct iovec, iov_len) == \
-      G_STRUCT_OFFSET (xinput_vector_t, size)) \
+      G_STRUCT_OFFSET (GInputVector, size)) \
     /* ABI is compatible */ \
     { \
       _msg->msg_iov = (struct iovec *) _message->vectors; \
@@ -4628,7 +4628,7 @@ G_STMT_START { \
   else \
     /* ABI is incompatible */ \
     { \
-      xuint_t i; \
+      guint i; \
  \
       _msg->msg_iov = g_newa (struct iovec, _message->num_vectors); \
       for (i = 0; i < _message->num_vectors; i++) \
@@ -4647,7 +4647,7 @@ G_STMT_START { \
     } \
   else \
     { \
-      _msg->msg_controllen = XSOCKET_CONTROL_BUFFER_SIZE_BYTES; \
+      _msg->msg_controllen = G_SOCKET_CONTROL_BUFFER_SIZE_BYTES; \
       _msg->msg_control = g_alloca (_msg->msg_controllen); \
     } \
  \
@@ -4657,8 +4657,8 @@ G_STMT_START { \
 
 static void
 input_message_from_msghdr (const struct msghdr  *msg,
-                           xinput_message_t        *message,
-                           xsocket_t              *socket)
+                           GInputMessage        *message,
+                           GSocket              *socket)
 {
   /* decode address */
   if (message->address != NULL)
@@ -4669,19 +4669,19 @@ input_message_from_msghdr (const struct msghdr  *msg,
 
   /* decode control messages */
   {
-    xptr_array_t *my_messages = NULL;
+    GPtrArray *my_messages = NULL;
     struct cmsghdr *cmsg;
 
     if (msg->msg_controllen >= sizeof (struct cmsghdr))
       {
-        xassert (message->control_messages != NULL);
+        g_assert (message->control_messages != NULL);
         for (cmsg = CMSG_FIRSTHDR (msg);
              cmsg != NULL;
              cmsg = CMSG_NXTHDR ((struct msghdr *) msg, cmsg))
           {
-            xsocket_control_message_t *control_message;
+            GSocketControlMessage *control_message;
 
-            control_message = xsocket_control_message_deserialize (cmsg->cmsg_level,
+            control_message = g_socket_control_message_deserialize (cmsg->cmsg_level,
                                                                     cmsg->cmsg_type,
                                                                     cmsg->cmsg_len - ((char *)CMSG_DATA (cmsg) - (char *)cmsg),
                                                                     CMSG_DATA (cmsg));
@@ -4691,8 +4691,8 @@ input_message_from_msghdr (const struct msghdr  *msg,
               continue;
 
             if (my_messages == NULL)
-              my_messages = xptr_array_new ();
-            xptr_array_add (my_messages, control_message);
+              my_messages = g_ptr_array_new ();
+            g_ptr_array_add (my_messages, control_message);
            }
       }
 
@@ -4707,13 +4707,13 @@ input_message_from_msghdr (const struct msghdr  *msg,
           }
         else
           {
-            xptr_array_add (my_messages, NULL);
-            *message->control_messages = (xsocket_control_message_t **) xptr_array_free (my_messages, FALSE);
+            g_ptr_array_add (my_messages, NULL);
+            *message->control_messages = (GSocketControlMessage **) g_ptr_array_free (my_messages, FALSE);
           }
       }
     else
       {
-        xassert (my_messages == NULL);
+        g_assert (my_messages == NULL);
       }
   }
 
@@ -4723,37 +4723,37 @@ input_message_from_msghdr (const struct msghdr  *msg,
 #endif
 
 /**
- * xsocket_send_message:
- * @socket: a #xsocket_t
- * @address: (nullable): a #xsocket_address_t, or %NULL
- * @vectors: (array length=num_vectors): an array of #xoutput_vector_t structs
+ * g_socket_send_message:
+ * @socket: a #GSocket
+ * @address: (nullable): a #GSocketAddress, or %NULL
+ * @vectors: (array length=num_vectors): an array of #GOutputVector structs
  * @num_vectors: the number of elements in @vectors, or -1
  * @messages: (array length=num_messages) (nullable): a pointer to an
  *   array of #GSocketControlMessages, or %NULL.
  * @num_messages: number of elements in @messages, or -1.
  * @flags: an int containing #GSocketMsgFlags flags, which may additionally
  *    contain [other platform specific flags](http://man7.org/linux/man-pages/man2/recv.2.html)
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Send data to @address on @socket.  For sending multiple messages see
- * xsocket_send_messages(); for easier use, see
- * xsocket_send() and xsocket_send_to().
+ * g_socket_send_messages(); for easier use, see
+ * g_socket_send() and g_socket_send_to().
  *
  * If @address is %NULL then the message is sent to the default receiver
- * (set by xsocket_connect()).
+ * (set by g_socket_connect()).
  *
- * @vectors must point to an array of #xoutput_vector_t structs and
+ * @vectors must point to an array of #GOutputVector structs and
  * @num_vectors must be the length of this array. (If @num_vectors is -1,
- * then @vectors is assumed to be terminated by a #xoutput_vector_t with a
- * %NULL buffer pointer.) The #xoutput_vector_t structs describe the buffers
+ * then @vectors is assumed to be terminated by a #GOutputVector with a
+ * %NULL buffer pointer.) The #GOutputVector structs describe the buffers
  * that the sent data will be gathered from. Using multiple
  * #GOutputVectors is more memory-efficient than manually copying
  * data from multiple sources into a single buffer, and more
- * network-efficient than making multiple calls to xsocket_send().
+ * network-efficient than making multiple calls to g_socket_send().
  *
  * @messages, if non-%NULL, is taken to point to an array of @num_messages
- * #xsocket_control_message_t instances. These correspond to the control
+ * #GSocketControlMessage instances. These correspond to the control
  * messages to be sent on the socket.
  * If @num_messages is -1 then @messages is treated as a %NULL-terminated
  * array.
@@ -4768,13 +4768,13 @@ input_message_from_msghdr (const struct msghdr  *msg,
  * and the socket is in non-blocking mode a %G_IO_ERROR_WOULD_BLOCK error
  * will be returned. To be notified when space is available, wait for the
  * %G_IO_OUT condition. Note though that you may still receive
- * %G_IO_ERROR_WOULD_BLOCK from xsocket_send() even if you were previously
+ * %G_IO_ERROR_WOULD_BLOCK from g_socket_send() even if you were previously
  * notified of a %G_IO_OUT condition. (On Windows in particular, this is
  * very common due to the way the underlying APIs work.)
  *
- * The sum of the sizes of each #xoutput_vector_t in vectors must not be
+ * The sum of the sizes of each #GOutputVector in vectors must not be
  * greater than %G_MAXSSIZE. If the message can be larger than this,
- * then it is mandatory to use the xsocket_send_message_with_timeout()
+ * then it is mandatory to use the g_socket_send_message_with_timeout()
  * function.
  *
  * On error -1 is returned and @error is set accordingly.
@@ -4784,24 +4784,24 @@ input_message_from_msghdr (const struct msghdr  *msg,
  *
  * Since: 2.22
  */
-xssize_t
-xsocket_send_message (xsocket_t                *socket,
-		       xsocket_address_t         *address,
-		       xoutput_vector_t          *vectors,
-		       xint_t                    num_vectors,
-		       xsocket_control_message_t **messages,
-		       xint_t                    num_messages,
-		       xint_t                    flags,
-		       xcancellable_t           *cancellable,
-		       xerror_t                **error)
+gssize
+g_socket_send_message (GSocket                *socket,
+		       GSocketAddress         *address,
+		       GOutputVector          *vectors,
+		       gint                    num_vectors,
+		       GSocketControlMessage **messages,
+		       gint                    num_messages,
+		       gint                    flags,
+		       GCancellable           *cancellable,
+		       GError                **error)
 {
   GPollableReturn res;
-  xsize_t bytes_written = 0;
-  xsize_t vectors_size = 0;
+  gsize bytes_written = 0;
+  gsize vectors_size = 0;
 
   if (num_vectors != -1)
     {
-      for (xint_t i = 0; i < num_vectors; i++)
+      for (gint i = 0; i < num_vectors; i++)
         {
           /* No wrap-around for vectors_size */
           if (vectors_size > vectors_size + vectors[i].size)
@@ -4817,7 +4817,7 @@ xsocket_send_message (xsocket_t                *socket,
     }
   else
     {
-      for (xsize_t i = 0; vectors[i].buffer != NULL; i++)
+      for (gsize i = 0; vectors[i].buffer != NULL; i++)
         {
           /* No wrap-around for vectors_size */
           if (vectors_size > vectors_size + vectors[i].size)
@@ -4832,7 +4832,7 @@ xsocket_send_message (xsocket_t                *socket,
         }
     }
 
-  /* Check if vector's buffers are too big for xssize_t */
+  /* Check if vector's buffers are too big for gssize */
   if (vectors_size > G_MAXSSIZE)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
@@ -4841,14 +4841,14 @@ xsocket_send_message (xsocket_t                *socket,
       return -1;
     }
 
-  res = xsocket_send_message_with_timeout (socket, address,
+  res = g_socket_send_message_with_timeout (socket, address,
                                             vectors, num_vectors,
                                             messages, num_messages, flags,
                                             socket->priv->blocking ? -1 : 0,
                                             &bytes_written,
                                             cancellable, error);
 
-  xassert (res != G_POLLABLE_RETURN_OK || bytes_written <= G_MAXSSIZE);
+  g_assert (res != G_POLLABLE_RETURN_OK || bytes_written <= G_MAXSSIZE);
 
   if (res == G_POLLABLE_RETURN_WOULD_BLOCK)
     {
@@ -4859,14 +4859,14 @@ xsocket_send_message (xsocket_t                *socket,
 #endif
     }
 
-  return res == G_POLLABLE_RETURN_OK ? (xssize_t) bytes_written : -1;
+  return res == G_POLLABLE_RETURN_OK ? (gssize) bytes_written : -1;
 }
 
 /**
- * xsocket_send_message_with_timeout:
- * @socket: a #xsocket_t
- * @address: (nullable): a #xsocket_address_t, or %NULL
- * @vectors: (array length=num_vectors): an array of #xoutput_vector_t structs
+ * g_socket_send_message_with_timeout:
+ * @socket: a #GSocket
+ * @address: (nullable): a #GSocketAddress, or %NULL
+ * @vectors: (array length=num_vectors): an array of #GOutputVector structs
  * @num_vectors: the number of elements in @vectors, or -1
  * @messages: (array length=num_messages) (nullable): a pointer to an
  *   array of #GSocketControlMessages, or %NULL.
@@ -4875,10 +4875,10 @@ xsocket_send_message (xsocket_t                *socket,
  *    contain [other platform specific flags](http://man7.org/linux/man-pages/man2/recv.2.html)
  * @timeout_us: the maximum time (in microseconds) to wait, or -1
  * @bytes_written: (out) (optional): location to store the number of bytes that were written to the socket
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
- * This behaves exactly the same as xsocket_send_message(), except that
+ * This behaves exactly the same as g_socket_send_message(), except that
  * the choice of timeout behavior is determined by the @timeout_us argument
  * rather than by @socket's properties.
  *
@@ -4893,31 +4893,31 @@ xsocket_send_message (xsocket_t                *socket,
  * Since: 2.60
  */
 GPollableReturn
-xsocket_send_message_with_timeout (xsocket_t                *socket,
-                                    xsocket_address_t         *address,
-                                    const xoutput_vector_t    *vectors,
-                                    xint_t                    num_vectors,
-                                    xsocket_control_message_t **messages,
-                                    xint_t                    num_messages,
-                                    xint_t                    flags,
-                                    sint64_t                  timeout_us,
-                                    xsize_t                  *bytes_written,
-                                    xcancellable_t           *cancellable,
-                                    xerror_t                **error)
+g_socket_send_message_with_timeout (GSocket                *socket,
+                                    GSocketAddress         *address,
+                                    const GOutputVector    *vectors,
+                                    gint                    num_vectors,
+                                    GSocketControlMessage **messages,
+                                    gint                    num_messages,
+                                    gint                    flags,
+                                    gint64                  timeout_us,
+                                    gsize                  *bytes_written,
+                                    GCancellable           *cancellable,
+                                    GError                **error)
 {
-  xoutput_vector_t one_vector;
+  GOutputVector one_vector;
   char zero;
-  sint64_t start_time;
+  gint64 start_time;
 
   if (bytes_written)
     *bytes_written = 0;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (address == NULL || X_IS_SOCKET_ADDRESS (address), G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (num_vectors == 0 || vectors != NULL, G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (num_messages == 0 || messages != NULL, G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
-  xreturn_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (G_IS_SOCKET (socket), G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (address == NULL || G_IS_SOCKET_ADDRESS (address), G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (num_vectors == 0 || vectors != NULL, G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (num_messages == 0 || messages != NULL, G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
+  g_return_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
 
   start_time = g_get_monotonic_time ();
 
@@ -4927,7 +4927,7 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
   if (!check_timeout (socket, error))
     return G_POLLABLE_RETURN_FAILED;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return G_POLLABLE_RETURN_FAILED;
 
   if (num_vectors == -1)
@@ -4958,13 +4958,13 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
 
 #ifndef G_OS_WIN32
   {
-    xoutput_message_t output_message;
+    GOutputMessage output_message;
     struct msghdr msg;
-    xssize_t result;
-    xerror_t *child_error = NULL;
+    gssize result;
+    GError *child_error = NULL;
 
     output_message.address = address;
-    output_message.vectors = (xoutput_vector_t *) vectors;
+    output_message.vectors = (GOutputVector *) vectors;
     output_message.num_vectors = num_vectors;
     output_message.bytes_sent = 0;
     output_message.control_messages = messages;
@@ -4980,7 +4980,7 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
 
     while (1)
       {
-	result = sendmsg (socket->priv->fd, &msg, flags | XSOCKET_DEFAULT_SEND_FLAGS);
+	result = sendmsg (socket->priv->fd, &msg, flags | G_SOCKET_DEFAULT_SEND_FLAGS);
 	if (result < 0)
 	  {
 	    int errsv = get_socket_errno ();
@@ -5016,11 +5016,11 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
 #else
   {
     struct sockaddr_storage addr;
-    xuint_t addrlen;
+    guint addrlen;
     DWORD bytes_sent;
     int result;
     WSABUF *bufs;
-    xint_t i;
+    gint i;
 
     /* Win32 doesn't support control messages.
        Actually this is possible for raw and datagram sockets
@@ -5029,7 +5029,7 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
     if (num_messages != 0)
       {
         g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                             _("xsocket_control_message_t not supported on Windows"));
+                             _("GSocketControlMessage not supported on Windows"));
 	return G_POLLABLE_RETURN_FAILED;
       }
 
@@ -5038,15 +5038,15 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
     for (i = 0; i < num_vectors; i++)
       {
 	bufs[i].buf = (char *)vectors[i].buffer;
-	bufs[i].len = (xulong_t)vectors[i].size;
+	bufs[i].len = (gulong)vectors[i].size;
       }
 
     /* name */
     addrlen = 0; /* Avoid warning */
     if (address)
       {
-	addrlen = xsocket_address_get_native_size (address);
-	if (!xsocket_address_to_native (address, &addr, sizeof addr, error))
+	addrlen = g_socket_address_get_native_size (address);
+	if (!g_socket_address_to_native (address, &addr, sizeof addr, error))
 	  return G_POLLABLE_RETURN_FAILED;
       }
 
@@ -5101,27 +5101,27 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
 }
 
 /**
- * xsocket_send_messages:
- * @socket: a #xsocket_t
- * @messages: (array length=num_messages): an array of #xoutput_message_t structs
+ * g_socket_send_messages:
+ * @socket: a #GSocket
+ * @messages: (array length=num_messages): an array of #GOutputMessage structs
  * @num_messages: the number of elements in @messages
  * @flags: an int containing #GSocketMsgFlags flags, which may additionally
  *    contain [other platform specific flags](http://man7.org/linux/man-pages/man2/recv.2.html)
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Send multiple data messages from @socket in one go.  This is the most
  * complicated and fully-featured version of this call. For easier use, see
- * xsocket_send(), xsocket_send_to(), and xsocket_send_message().
+ * g_socket_send(), g_socket_send_to(), and g_socket_send_message().
  *
- * @messages must point to an array of #xoutput_message_t structs and
- * @num_messages must be the length of this array. Each #xoutput_message_t
+ * @messages must point to an array of #GOutputMessage structs and
+ * @num_messages must be the length of this array. Each #GOutputMessage
  * contains an address to send the data to, and a pointer to an array of
- * #xoutput_vector_t structs to describe the buffers that the data to be sent
+ * #GOutputVector structs to describe the buffers that the data to be sent
  * for each message will be gathered from. Using multiple #GOutputVectors is
  * more memory-efficient than manually copying data from multiple sources
  * into a single buffer, and more network-efficient than making multiple
- * calls to xsocket_send(). Sending multiple messages in one go avoids the
+ * calls to g_socket_send(). Sending multiple messages in one go avoids the
  * overhead of making a lot of syscalls in scenarios where a lot of data
  * packets need to be sent (e.g. high-bandwidth video streaming over RTP/UDP),
  * or where the same data needs to be sent to multiple recipients.
@@ -5137,7 +5137,7 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
  * will be returned if no data was written at all, otherwise the number of
  * messages sent will be returned. To be notified when space is available,
  * wait for the %G_IO_OUT condition. Note though that you may still receive
- * %G_IO_ERROR_WOULD_BLOCK from xsocket_send() even if you were previously
+ * %G_IO_ERROR_WOULD_BLOCK from g_socket_send() even if you were previously
  * notified of a %G_IO_OUT condition. (On Windows in particular, this is
  * very common due to the way the underlying APIs work.)
  *
@@ -5152,35 +5152,35 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
  *
  * Since: 2.44
  */
-xint_t
-xsocket_send_messages (xsocket_t        *socket,
-		        xoutput_message_t *messages,
-		        xuint_t           num_messages,
-		        xint_t            flags,
-		        xcancellable_t   *cancellable,
-		        xerror_t        **error)
+gint
+g_socket_send_messages (GSocket        *socket,
+		        GOutputMessage *messages,
+		        guint           num_messages,
+		        gint            flags,
+		        GCancellable   *cancellable,
+		        GError        **error)
 {
-  return xsocket_send_messages_with_timeout (socket, messages, num_messages,
+  return g_socket_send_messages_with_timeout (socket, messages, num_messages,
                                               flags,
                                               socket->priv->blocking ? -1 : 0,
                                               cancellable, error);
 }
 
-static xint_t
-xsocket_send_messages_with_timeout (xsocket_t        *socket,
-                                     xoutput_message_t *messages,
-                                     xuint_t           num_messages,
-                                     xint_t            flags,
-                                     sint64_t          timeout_us,
-                                     xcancellable_t   *cancellable,
-                                     xerror_t        **error)
+static gint
+g_socket_send_messages_with_timeout (GSocket        *socket,
+                                     GOutputMessage *messages,
+                                     guint           num_messages,
+                                     gint            flags,
+                                     gint64          timeout_us,
+                                     GCancellable   *cancellable,
+                                     GError        **error)
 {
-  sint64_t start_time;
+  gint64 start_time;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
-  xreturn_val_if_fail (num_messages == 0 || messages != NULL, -1);
-  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), -1);
-  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket), -1);
+  g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), -1);
+  g_return_val_if_fail (error == NULL || *error == NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -5190,7 +5190,7 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (num_messages == 0)
@@ -5199,7 +5199,7 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
 #if !defined (G_OS_WIN32) && defined (HAVE_SENDMMSG)
   {
     struct mmsghdr *msgvec;
-    xuint_t i, num_sent;
+    guint i, num_sent;
 
     /* Clamp the number of vectors if more given than we can write in one go.
      * The caller has to handle short writes anyway.
@@ -5211,9 +5211,9 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
 
     for (i = 0; i < num_messages; ++i)
       {
-        xoutput_message_t *msg = &messages[i];
+        GOutputMessage *msg = &messages[i];
         struct msghdr *msg_hdr = &msgvec[i].msg_hdr;
-        xerror_t *child_error = NULL;
+        GError *child_error = NULL;
 
         msgvec[i].msg_len = 0;
 
@@ -5230,10 +5230,10 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
 
     for (num_sent = 0; num_sent < num_messages;)
       {
-        xint_t ret;
+        gint ret;
 
         ret = sendmmsg (socket->priv->fd, msgvec + num_sent, num_messages - num_sent,
-                        flags | XSOCKET_DEFAULT_SEND_FLAGS);
+                        flags | G_SOCKET_DEFAULT_SEND_FLAGS);
 
         if (ret < 0)
           {
@@ -5280,47 +5280,47 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
   }
 #else
   {
-    xssize_t result;
-    xuint_t i;
-    sint64_t wait_timeout;
+    gssize result;
+    guint i;
+    gint64 wait_timeout;
 
     wait_timeout = timeout_us;
 
     for (i = 0; i < num_messages; ++i)
       {
-        xoutput_message_t *msg = &messages[i];
-        xerror_t *msxerror = NULL;
+        GOutputMessage *msg = &messages[i];
+        GError *msg_error = NULL;
         GPollableReturn pollable_result;
-        xsize_t bytes_written = 0;
+        gsize bytes_written = 0;
 
-        pollable_result = xsocket_send_message_with_timeout (socket, msg->address,
+        pollable_result = g_socket_send_message_with_timeout (socket, msg->address,
                                                               msg->vectors,
                                                               msg->num_vectors,
                                                               msg->control_messages,
                                                               msg->num_control_messages,
                                                               flags, wait_timeout,
                                                               &bytes_written,
-                                                              cancellable, &msxerror);
+                                                              cancellable, &msg_error);
 
         if (pollable_result == G_POLLABLE_RETURN_WOULD_BLOCK)
           {
 #ifndef G_OS_WIN32
-            socket_set_error_lazy (&msxerror, EWOULDBLOCK, _("Error sending message: %s"));
+            socket_set_error_lazy (&msg_error, EWOULDBLOCK, _("Error sending message: %s"));
 #else
-            socket_set_error_lazy (&msxerror, WSAEWOULDBLOCK, _("Error sending message: %s"));
+            socket_set_error_lazy (&msg_error, WSAEWOULDBLOCK, _("Error sending message: %s"));
 #endif
           }
 
         if (G_MAXSSIZE > bytes_written &&
             pollable_result == G_POLLABLE_RETURN_OK)
-          result = (xssize_t) bytes_written;
+          result = (gssize) bytes_written;
         else
           result = -1;
 
         /* check if we've timed out or how much time to wait at most */
         if (timeout_us > 0)
           {
-            sint64_t elapsed = g_get_monotonic_time () - start_time;
+            gint64 elapsed = g_get_monotonic_time () - start_time;
             wait_timeout = MAX (timeout_us - elapsed, 1);
           }
 
@@ -5330,12 +5330,12 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
              * manage to send, provided we managed to send at least one */
             if (i > 0)
               {
-                xerror_free (msxerror);
+                g_error_free (msg_error);
                 return i;
               }
             else
               {
-                g_propagate_error (error, msxerror);
+                g_propagate_error (error, msg_error);
                 return -1;
               }
           }
@@ -5348,13 +5348,13 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
 #endif
 }
 
-static xsocket_address_t *
-cache_recv_address (xsocket_t *socket, struct sockaddr *native, size_t native_len)
+static GSocketAddress *
+cache_recv_address (GSocket *socket, struct sockaddr *native, size_t native_len)
 {
-  xsocket_address_t *saddr;
-  xint_t i;
-  xuint64_t oldest_time = G_MAXUINT64;
-  xint_t oldest_index = 0;
+  GSocketAddress *saddr;
+  gint i;
+  guint64 oldest_time = G_MAXUINT64;
+  gint oldest_index = 0;
 
   if (native_len == 0)
     return NULL;
@@ -5362,9 +5362,9 @@ cache_recv_address (xsocket_t *socket, struct sockaddr *native, size_t native_le
   saddr = NULL;
   for (i = 0; i < RECV_ADDR_CACHE_SIZE; i++)
     {
-      xsocket_address_t *tmp = socket->priv->recv_addr_cache[i].addr;
-      xpointer_t tmp_native = socket->priv->recv_addr_cache[i].native;
-      xsize_t tmp_native_len = socket->priv->recv_addr_cache[i].native_len;
+      GSocketAddress *tmp = socket->priv->recv_addr_cache[i].addr;
+      gpointer tmp_native = socket->priv->recv_addr_cache[i].native;
+      gsize tmp_native_len = socket->priv->recv_addr_cache[i].native_len;
 
       if (!tmp)
         continue;
@@ -5374,7 +5374,7 @@ cache_recv_address (xsocket_t *socket, struct sockaddr *native, size_t native_le
 
       if (memcmp (tmp_native, native, native_len) == 0)
         {
-          saddr = xobject_ref (tmp);
+          saddr = g_object_ref (tmp);
           socket->priv->recv_addr_cache[i].last_used = g_get_monotonic_time ();
           return saddr;
         }
@@ -5386,39 +5386,39 @@ cache_recv_address (xsocket_t *socket, struct sockaddr *native, size_t native_le
         }
     }
 
-  saddr = xsocket_address_new_from_native (native, native_len);
+  saddr = g_socket_address_new_from_native (native, native_len);
 
   if (socket->priv->recv_addr_cache[oldest_index].addr)
     {
-      xobject_unref (socket->priv->recv_addr_cache[oldest_index].addr);
+      g_object_unref (socket->priv->recv_addr_cache[oldest_index].addr);
       g_free (socket->priv->recv_addr_cache[oldest_index].native);
     }
 
   socket->priv->recv_addr_cache[oldest_index].native = g_memdup2 (native, native_len);
   socket->priv->recv_addr_cache[oldest_index].native_len = native_len;
-  socket->priv->recv_addr_cache[oldest_index].addr = xobject_ref (saddr);
+  socket->priv->recv_addr_cache[oldest_index].addr = g_object_ref (saddr);
   socket->priv->recv_addr_cache[oldest_index].last_used = g_get_monotonic_time ();
 
   return saddr;
 }
 
-static xssize_t
-xsocket_receive_message_with_timeout (xsocket_t                 *socket,
-                                       xsocket_address_t         **address,
-                                       xinput_vector_t            *vectors,
-                                       xint_t                     num_vectors,
-                                       xsocket_control_message_t ***messages,
-                                       xint_t                    *num_messages,
-                                       xint_t                    *flags,
-                                       sint64_t                   timeout_us,
-                                       xcancellable_t            *cancellable,
-                                       xerror_t                 **error)
+static gssize
+g_socket_receive_message_with_timeout (GSocket                 *socket,
+                                       GSocketAddress         **address,
+                                       GInputVector            *vectors,
+                                       gint                     num_vectors,
+                                       GSocketControlMessage ***messages,
+                                       gint                    *num_messages,
+                                       gint                    *flags,
+                                       gint64                   timeout_us,
+                                       GCancellable            *cancellable,
+                                       GError                 **error)
 {
-  xinput_vector_t one_vector;
+  GInputVector one_vector;
   char one_byte;
-  sint64_t start_time;
+  gint64 start_time;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket), -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -5428,7 +5428,7 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (num_vectors == -1)
@@ -5449,9 +5449,9 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
 
 #ifndef G_OS_WIN32
   {
-    xinput_message_t input_message;
+    GInputMessage input_message;
     struct msghdr msg;
-    xssize_t result;
+    gssize result;
 
     input_message.address = address;
     input_message.vectors = vectors;
@@ -5459,7 +5459,7 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
     input_message.bytes_received = 0;
     input_message.flags = (flags != NULL) ? *flags : 0;
     input_message.control_messages = messages;
-    input_message.num_control_messages = (xuint_t *) num_messages;
+    input_message.num_control_messages = (guint *) num_messages;
 
     /* We always set the close-on-exec flag so we don't leak file
      * descriptors into child processes.  Note that gunixfdmessage.c
@@ -5475,7 +5475,7 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
     while (1)
       {
 	result = recvmsg (socket->priv->fd, &msg, msg.msg_flags);
-#ifdef MSG_CMSG_CLOEXEC
+#ifdef MSG_CMSG_CLOEXEC	
 	if (result < 0 && get_socket_errno () == EINVAL)
 	  {
 	    /* We must be running on an old kernel.  Call without the flag. */
@@ -5523,14 +5523,14 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
     DWORD win_flags;
     int result;
     WSABUF *bufs;
-    xint_t i;
+    gint i;
 
     /* iov */
     bufs = g_newa (WSABUF, num_vectors);
     for (i = 0; i < num_vectors; i++)
       {
 	bufs[i].buf = (char *)vectors[i].buffer;
-	bufs[i].len = (xulong_t)vectors[i].size;
+	bufs[i].len = (gulong)vectors[i].size;
       }
 
     /* flags */
@@ -5606,27 +5606,27 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
 }
 
 /**
- * xsocket_receive_messages:
- * @socket: a #xsocket_t
- * @messages: (array length=num_messages): an array of #xinput_message_t structs
+ * g_socket_receive_messages:
+ * @socket: a #GSocket
+ * @messages: (array length=num_messages): an array of #GInputMessage structs
  * @num_messages: the number of elements in @messages
  * @flags: an int containing #GSocketMsgFlags flags for the overall operation,
  *    which may additionally contain
  *    [other platform specific flags](http://man7.org/linux/man-pages/man2/recv.2.html)
- * @cancellable: (nullable): a %xcancellable_t or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore
+ * @cancellable: (nullable): a %GCancellable or %NULL
+ * @error: #GError for error reporting, or %NULL to ignore
  *
  * Receive multiple data messages from @socket in one go.  This is the most
  * complicated and fully-featured version of this call. For easier use, see
- * xsocket_receive(), xsocket_receive_from(), and xsocket_receive_message().
+ * g_socket_receive(), g_socket_receive_from(), and g_socket_receive_message().
  *
- * @messages must point to an array of #xinput_message_t structs and
- * @num_messages must be the length of this array. Each #xinput_message_t
- * contains a pointer to an array of #xinput_vector_t structs describing the
+ * @messages must point to an array of #GInputMessage structs and
+ * @num_messages must be the length of this array. Each #GInputMessage
+ * contains a pointer to an array of #GInputVector structs describing the
  * buffers that the data received in each message will be written to. Using
  * multiple #GInputVectors is more memory-efficient than manually copying data
  * out of a single buffer to multiple sources, and more system-call-efficient
- * than making multiple calls to xsocket_receive(), such as in scenarios where
+ * than making multiple calls to g_socket_receive(), such as in scenarios where
  * a lot of data packets need to be received (e.g. high-bandwidth video
  * streaming over RTP/UDP).
  *
@@ -5635,31 +5635,31 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
  * values there are the same as the system values, and the flags
  * are passed in as-is, so you can pass in system-specific flags too. These
  * flags affect the overall receive operation. Flags affecting individual
- * messages are returned in #xinput_message_t.flags.
+ * messages are returned in #GInputMessage.flags.
  *
- * The other members of #xinput_message_t are treated as described in its
+ * The other members of #GInputMessage are treated as described in its
  * documentation.
  *
- * If #xsocket_t:blocking is %TRUE the call will block until @num_messages have
+ * If #GSocket:blocking is %TRUE the call will block until @num_messages have
  * been received, or the end of the stream is reached.
  *
- * If #xsocket_t:blocking is %FALSE the call will return up to @num_messages
+ * If #GSocket:blocking is %FALSE the call will return up to @num_messages
  * without blocking, or %G_IO_ERROR_WOULD_BLOCK if no messages are queued in the
  * operating system to be received.
  *
- * In blocking mode, if #xsocket_t:timeout is positive and is reached before any
+ * In blocking mode, if #GSocket:timeout is positive and is reached before any
  * messages are received, %G_IO_ERROR_TIMED_OUT is returned, otherwise up to
  * @num_messages are returned. (Note: This is effectively the
  * behaviour of `MSG_WAITFORONE` with recvmmsg().)
  *
  * To be notified when messages are available, wait for the
  * %G_IO_IN condition. Note though that you may still receive
- * %G_IO_ERROR_WOULD_BLOCK from xsocket_receive_messages() even if you were
+ * %G_IO_ERROR_WOULD_BLOCK from g_socket_receive_messages() even if you were
  * previously notified of a %G_IO_IN condition.
  *
  * If the remote peer closes the connection, any messages queued in the
  * operating system will be returned, and subsequent calls to
- * xsocket_receive_messages() will return 0 (with no error set).
+ * g_socket_receive_messages() will return 0 (with no error set).
  *
  * On error -1 is returned and @error is set accordingly. An error will only
  * be returned if zero messages could be received; otherwise the number of
@@ -5673,40 +5673,40 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
  *
  * Since: 2.48
  */
-xint_t
-xsocket_receive_messages (xsocket_t        *socket,
-                           xinput_message_t  *messages,
-                           xuint_t           num_messages,
-                           xint_t            flags,
-                           xcancellable_t   *cancellable,
-                           xerror_t        **error)
+gint
+g_socket_receive_messages (GSocket        *socket,
+                           GInputMessage  *messages,
+                           guint           num_messages,
+                           gint            flags,
+                           GCancellable   *cancellable,
+                           GError        **error)
 {
   if (!check_socket (socket, error) ||
       !check_timeout (socket, error))
     return -1;
 
-  return xsocket_receive_messages_with_timeout (socket, messages, num_messages,
+  return g_socket_receive_messages_with_timeout (socket, messages, num_messages,
                                                  flags,
                                                  socket->priv->blocking ? -1 : 0,
                                                  cancellable, error);
 }
 
-static xint_t
-xsocket_receive_messages_with_timeout (xsocket_t        *socket,
-                                        xinput_message_t  *messages,
-                                        xuint_t           num_messages,
-                                        xint_t            flags,
-                                        sint64_t          timeout_us,
-                                        xcancellable_t   *cancellable,
-                                        xerror_t        **error)
+static gint
+g_socket_receive_messages_with_timeout (GSocket        *socket,
+                                        GInputMessage  *messages,
+                                        guint           num_messages,
+                                        gint            flags,
+                                        gint64          timeout_us,
+                                        GCancellable   *cancellable,
+                                        GError        **error)
 {
-  sint64_t start_time;
+  gint64 start_time;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
-  xreturn_val_if_fail (num_messages == 0 || messages != NULL, -1);
-  xreturn_val_if_fail (cancellable == NULL ||
-                        X_IS_CANCELLABLE (cancellable), -1);
-  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
+  g_return_val_if_fail (G_IS_SOCKET (socket), -1);
+  g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
+  g_return_val_if_fail (cancellable == NULL ||
+                        G_IS_CANCELLABLE (cancellable), -1);
+  g_return_val_if_fail (error == NULL || *error == NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -5716,7 +5716,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
   if (!check_timeout (socket, error))
     return -1;
 
-  if (xcancellable_set_error_if_cancelled (cancellable, error))
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return -1;
 
   if (num_messages == 0)
@@ -5725,7 +5725,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
 #if !defined (G_OS_WIN32) && defined (HAVE_RECVMMSG)
   {
     struct mmsghdr *msgvec;
-    xuint_t i, num_received;
+    guint i, num_received;
 
     /* Clamp the number of vectors if more given than we can write in one go.
      * The caller has to handle short writes anyway.
@@ -5737,7 +5737,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
 
     for (i = 0; i < num_messages; ++i)
       {
-        xinput_message_t *msg = &messages[i];
+        GInputMessage *msg = &messages[i];
         struct msghdr *msg_hdr = &msgvec[i].msg_hdr;
 
         input_message_to_msghdr (msg, msg_hdr);
@@ -5754,13 +5754,13 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
 
     for (num_received = 0; num_received < num_messages;)
       {
-        xint_t ret;
+        gint ret;
 
         /* We operate in non-blocking mode and handle the timeout ourselves. */
         ret = recvmmsg (socket->priv->fd,
                         msgvec + num_received,
                         num_messages - num_received,
-                        flags | XSOCKET_DEFAULT_SEND_FLAGS, NULL);
+                        flags | G_SOCKET_DEFAULT_SEND_FLAGS, NULL);
 #ifdef MSG_CMSG_CLOEXEC
         if (ret < 0 && get_socket_errno () == EINVAL)
           {
@@ -5769,7 +5769,7 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
             ret = recvmmsg (socket->priv->fd,
                             msgvec + num_received,
                             num_messages - num_received,
-                            flags | XSOCKET_DEFAULT_SEND_FLAGS, NULL);
+                            flags | G_SOCKET_DEFAULT_SEND_FLAGS, NULL);
           }
 #endif
 
@@ -5827,34 +5827,34 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
   }
 #else
   {
-    xuint_t i;
-    sint64_t wait_timeout;
+    guint i;
+    gint64 wait_timeout;
 
     wait_timeout = timeout_us;
 
     for (i = 0; i < num_messages; i++)
       {
-        xinput_message_t *msg = &messages[i];
-        xssize_t len;
-        xerror_t *msxerror = NULL;
+        GInputMessage *msg = &messages[i];
+        gssize len;
+        GError *msg_error = NULL;
 
         msg->flags = flags;  /* in-out parameter */
 
-        len = xsocket_receive_message_with_timeout (socket,
+        len = g_socket_receive_message_with_timeout (socket,
                                                      msg->address,
                                                      msg->vectors,
                                                      msg->num_vectors,
                                                      msg->control_messages,
-                                                     (xint_t *) msg->num_control_messages,
+                                                     (gint *) msg->num_control_messages,
                                                      &msg->flags,
                                                      wait_timeout,
                                                      cancellable,
-                                                     &msxerror);
+                                                     &msg_error);
 
         /* check if we've timed out or how much time to wait at most */
         if (timeout_us > 0)
           {
-            sint64_t elapsed = g_get_monotonic_time () - start_time;
+            gint64 elapsed = g_get_monotonic_time () - start_time;
             wait_timeout = MAX (timeout_us - elapsed, 1);
           }
 
@@ -5862,16 +5862,16 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
           msg->bytes_received = len;
 
         if (i != 0 &&
-            (xerror_matches (msxerror, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK) ||
-             xerror_matches (msxerror, G_IO_ERROR, G_IO_ERROR_TIMED_OUT)))
+            (g_error_matches (msg_error, G_IO_ERROR, G_IO_ERROR_WOULD_BLOCK) ||
+             g_error_matches (msg_error, G_IO_ERROR, G_IO_ERROR_TIMED_OUT)))
           {
-            g_clear_error (&msxerror);
+            g_clear_error (&msg_error);
             break;
           }
 
-        if (msxerror != NULL)
+        if (msg_error != NULL)
           {
-            g_propagate_error (error, msxerror);
+            g_propagate_error (error, msg_error);
             return -1;
           }
 
@@ -5885,11 +5885,11 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
 }
 
 /**
- * xsocket_receive_message:
- * @socket: a #xsocket_t
- * @address: (out) (optional): a pointer to a #xsocket_address_t
+ * g_socket_receive_message:
+ * @socket: a #GSocket
+ * @address: (out) (optional): a pointer to a #GSocketAddress
  *     pointer, or %NULL
- * @vectors: (array length=num_vectors): an array of #xinput_vector_t structs
+ * @vectors: (array length=num_vectors): an array of #GInputVector structs
  * @num_vectors: the number of elements in @vectors, or -1
  * @messages: (array length=num_messages) (out) (optional) (nullable): a pointer
  *    which may be filled with an array of #GSocketControlMessages, or %NULL
@@ -5898,22 +5898,22 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
  * @flags: (inout): a pointer to an int containing #GSocketMsgFlags flags,
  *    which may additionally contain
  *    [other platform specific flags](http://man7.org/linux/man-pages/man2/recv.2.html)
- * @cancellable: a %xcancellable_t or %NULL
- * @error: a #xerror_t pointer, or %NULL
+ * @cancellable: a %GCancellable or %NULL
+ * @error: a #GError pointer, or %NULL
  *
  * Receive data from a socket.  For receiving multiple messages, see
- * xsocket_receive_messages(); for easier use, see
- * xsocket_receive() and xsocket_receive_from().
+ * g_socket_receive_messages(); for easier use, see
+ * g_socket_receive() and g_socket_receive_from().
  *
  * If @address is non-%NULL then @address will be set equal to the
  * source address of the received packet.
  * @address is owned by the caller.
  *
- * @vector must point to an array of #xinput_vector_t structs and
+ * @vector must point to an array of #GInputVector structs and
  * @num_vectors must be the length of this array.  These structs
  * describe the buffers that received data will be scattered into.
  * If @num_vectors is -1, then @vectors is assumed to be terminated
- * by a #xinput_vector_t with a %NULL buffer pointer.
+ * by a #GInputVector with a %NULL buffer pointer.
  *
  * As a special case, if @num_vectors is 0 (in which case, @vectors
  * may of course be %NULL), then a single byte is received and
@@ -5921,11 +5921,11 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
  * single '\0' byte for the purposes of transferring ancillary data.
  *
  * @messages, if non-%NULL, will be set to point to a newly-allocated
- * array of #xsocket_control_message_t instances or %NULL if no such
+ * array of #GSocketControlMessage instances or %NULL if no such
  * messages was received. These correspond to the control messages
- * received from the kernel, one #xsocket_control_message_t per message
+ * received from the kernel, one #GSocketControlMessage per message
  * from the kernel. This array is %NULL-terminated and must be freed
- * by the caller using g_free() after calling xobject_unref() on each
+ * by the caller using g_free() after calling g_object_unref() on each
  * element. If @messages is %NULL, any control messages received will
  * be discarded.
  *
@@ -5933,21 +5933,21 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
  * messages received.
  *
  * If both @messages and @num_messages are non-%NULL, then
- * @num_messages gives the number of #xsocket_control_message_t instances
+ * @num_messages gives the number of #GSocketControlMessage instances
  * in @messages (ie: not including the %NULL terminator).
  *
  * @flags is an in/out parameter. The commonly available arguments
  * for this are available in the #GSocketMsgFlags enum, but the
  * values there are the same as the system values, and the flags
  * are passed in as-is, so you can pass in system-specific flags too
- * (and xsocket_receive_message() may pass system-specific flags out).
+ * (and g_socket_receive_message() may pass system-specific flags out).
  * Flags passed in to the parameter affect the receive operation; flags returned
  * out of it are relevant to the specific returned message.
  *
- * As with xsocket_receive(), data may be discarded if @socket is
- * %XSOCKET_TYPE_DATAGRAM or %XSOCKET_TYPE_SEQPACKET and you do not
+ * As with g_socket_receive(), data may be discarded if @socket is
+ * %G_SOCKET_TYPE_DATAGRAM or %G_SOCKET_TYPE_SEQPACKET and you do not
  * provide enough buffer space to read a complete message. You can pass
- * %XSOCKET_MSG_PEEK in @flags to peek at the current message without
+ * %G_SOCKET_MSG_PEEK in @flags to peek at the current message without
  * removing it from the receive queue, but there is no portable way to find
  * out the length of the message other than by reading it into a
  * sufficiently-large buffer.
@@ -5966,18 +5966,18 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
  *
  * Since: 2.22
  */
-xssize_t
-xsocket_receive_message (xsocket_t                 *socket,
-			  xsocket_address_t         **address,
-			  xinput_vector_t            *vectors,
-			  xint_t                     num_vectors,
-			  xsocket_control_message_t ***messages,
-			  xint_t                    *num_messages,
-			  xint_t                    *flags,
-			  xcancellable_t            *cancellable,
-			  xerror_t                 **error)
+gssize
+g_socket_receive_message (GSocket                 *socket,
+			  GSocketAddress         **address,
+			  GInputVector            *vectors,
+			  gint                     num_vectors,
+			  GSocketControlMessage ***messages,
+			  gint                    *num_messages,
+			  gint                    *flags,
+			  GCancellable            *cancellable,
+			  GError                 **error)
 {
-  return xsocket_receive_message_with_timeout (socket, address, vectors,
+  return g_socket_receive_message_with_timeout (socket, address, vectors,
                                                  num_vectors, messages,
                                                  num_messages, flags,
                                                  socket->priv->blocking ? -1 : 0,
@@ -5985,12 +5985,12 @@ xsocket_receive_message (xsocket_t                 *socket,
 }
 
 /**
- * xsocket_get_credentials:
- * @socket: a #xsocket_t.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * g_socket_get_credentials:
+ * @socket: a #GSocket.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Returns the credentials of the foreign process connected to this
- * socket, if any (e.g. it is only supported for %XSOCKET_FAMILY_UNIX
+ * socket, if any (e.g. it is only supported for %G_SOCKET_FAMILY_UNIX
  * sockets).
  *
  * If this operation isn't supported on the OS, the method fails with
@@ -6006,23 +6006,23 @@ xsocket_receive_message (xsocket_t                 *socket,
  * - macOS, tvOS, iOS since GLib 2.66
  *
  * Other ways to obtain credentials from a foreign peer includes the
- * #xunix_credentials_message_t type and
+ * #GUnixCredentialsMessage type and
  * g_unix_connection_send_credentials() /
  * g_unix_connection_receive_credentials() functions.
  *
- * Returns: (transfer full): %NULL if @error is set, otherwise a #xcredentials_t object
- * that must be freed with xobject_unref().
+ * Returns: (transfer full): %NULL if @error is set, otherwise a #GCredentials object
+ * that must be freed with g_object_unref().
  *
  * Since: 2.26
  */
-xcredentials_t *
-xsocket_get_credentials (xsocket_t   *socket,
-                          xerror_t   **error)
+GCredentials *
+g_socket_get_credentials (GSocket   *socket,
+                          GError   **error)
 {
-  xcredentials_t *ret;
+  GCredentials *ret;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (G_IS_SOCKET (socket), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!check_socket (socket, error))
     return NULL;
@@ -6033,7 +6033,7 @@ xsocket_get_credentials (xsocket_t   *socket,
 
 #ifdef SO_PEERCRED
   {
-    xuint8_t native_creds_buf[G_CREDENTIALS_NATIVE_SIZE];
+    guint8 native_creds_buf[G_CREDENTIALS_NATIVE_SIZE];
     socklen_t optlen = sizeof (native_creds_buf);
 
     if (getsockopt (socket->priv->fd,
@@ -6042,8 +6042,8 @@ xsocket_get_credentials (xsocket_t   *socket,
                     native_creds_buf,
                     &optlen) == 0)
       {
-        ret = xcredentials_new ();
-        xcredentials_set_native (ret,
+        ret = g_credentials_new ();
+        g_credentials_set_native (ret,
                                   G_CREDENTIALS_NATIVE_TYPE,
                                   native_creds_buf);
       }
@@ -6065,8 +6065,8 @@ xsocket_get_credentials (xsocket_t   *socket,
             pid_t pid;
             socklen_t optlen = sizeof (pid);
 
-            ret = xcredentials_new ();
-            xcredentials_set_native (ret,
+            ret = g_credentials_new ();
+            g_credentials_set_native (ret,
                                       G_CREDENTIALS_NATIVE_TYPE,
                                       &cred);
 
@@ -6075,7 +6075,7 @@ xsocket_get_credentials (xsocket_t   *socket,
                             LOCAL_PEERPID,
                             &pid,
                             &optlen) == 0)
-              _xcredentials_set_local_peerid (ret, pid);
+              _g_credentials_set_local_peerid (ret, pid);
           }
         else
           {
@@ -6114,8 +6114,8 @@ xsocket_get_credentials (xsocket_t   *socket,
                     &cred,
                     &optlen) == 0)
       {
-        ret = xcredentials_new ();
-        xcredentials_set_native (ret,
+        ret = g_credentials_new ();
+        g_credentials_set_native (ret,
                                   G_CREDENTIALS_NATIVE_TYPE,
                                   &cred);
       }
@@ -6126,8 +6126,8 @@ xsocket_get_credentials (xsocket_t   *socket,
 
     if (getpeerucred (socket->priv->fd, &ucred) == 0)
       {
-        ret = xcredentials_new ();
-        xcredentials_set_native (ret,
+        ret = g_credentials_new ();
+        g_credentials_set_native (ret,
                                   G_CREDENTIALS_TYPE_SOLARIS_UCRED,
                                   ucred);
         ucred_free (ucred);
@@ -6144,8 +6144,8 @@ xsocket_get_credentials (xsocket_t   *socket,
                   &drc,
                   NULL, NULL) == 0)
       {
-        ret = xcredentials_new ();
-        xcredentials_set_native (ret,
+        ret = g_credentials_new ();
+        g_credentials_set_native (ret,
                                   G_CREDENTIALS_TYPE_WIN32_PID,
                                   &peerid);
       }
@@ -6170,19 +6170,19 @@ xsocket_get_credentials (xsocket_t   *socket,
   g_set_error_literal (error,
                        G_IO_ERROR,
                        G_IO_ERROR_NOT_SUPPORTED,
-                       _("xsocket_get_credentials not implemented for this OS"));
+                       _("g_socket_get_credentials not implemented for this OS"));
 #endif
 
   return ret;
 }
 
 /**
- * xsocket_get_option:
- * @socket: a #xsocket_t
+ * g_socket_get_option:
+ * @socket: a #GSocket
  * @level: the "API level" of the option (eg, `SOL_SOCKET`)
  * @optname: the "name" of the option (eg, `SO_BROADCAST`)
  * @value: (out): return location for the option value
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Gets the value of an integer-valued option on @socket, as with
  * getsockopt(). (If you need to fetch a  non-integer-valued option,
@@ -6195,8 +6195,8 @@ xsocket_get_credentials (xsocket_t   *socket,
  * headers.
  *
  * Note that even for socket options that are a single byte in size,
- * @value is still a pointer to a #xint_t variable, not a #xuchar_t;
- * xsocket_get_option() will handle the conversion internally.
+ * @value is still a pointer to a #gint variable, not a #guchar;
+ * g_socket_get_option() will handle the conversion internally.
  *
  * Returns: success or failure. On failure, @error will be set, and
  *   the system error value (`errno` or WSAGetLastError()) will still
@@ -6204,24 +6204,24 @@ xsocket_get_credentials (xsocket_t   *socket,
  *
  * Since: 2.36
  */
-xboolean_t
-xsocket_get_option (xsocket_t  *socket,
-		     xint_t      level,
-		     xint_t      optname,
-		     xint_t     *value,
-		     xerror_t  **error)
+gboolean
+g_socket_get_option (GSocket  *socket,
+		     gint      level,
+		     gint      optname,
+		     gint     *value,
+		     GError  **error)
 {
-  xuint_t size;
+  guint size;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
-  /* xsocket_get_option() is called during socket init, so skip the init checks
+  /* g_socket_get_option() is called during socket init, so skip the init checks
    * in check_socket() */
   if (socket->priv->inited && !check_socket (socket, error))
     return FALSE;
 
   *value = 0;
-  size = sizeof (xint_t);
+  size = sizeof (gint);
   if (getsockopt (socket->priv->fd, level, optname, value, &size) != 0)
     {
       int errsv = get_socket_errno ();
@@ -6241,20 +6241,20 @@ xsocket_get_option (xsocket_t  *socket,
   /* If the returned value is smaller than an int then we need to
    * slide it over into the low-order bytes of *value.
    */
-  if (size != sizeof (xint_t))
-    *value = *value >> (8 * (sizeof (xint_t) - size));
+  if (size != sizeof (gint))
+    *value = *value >> (8 * (sizeof (gint) - size));
 #endif
 
   return TRUE;
 }
 
 /**
- * xsocket_set_option:
- * @socket: a #xsocket_t
+ * g_socket_set_option:
+ * @socket: a #GSocket
  * @level: the "API level" of the option (eg, `SOL_SOCKET`)
  * @optname: the "name" of the option (eg, `SO_BROADCAST`)
  * @value: the value to set the option to
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Sets the value of an integer-valued option on @socket, as with
  * setsockopt(). (If you need to set a non-integer-valued option,
@@ -6272,23 +6272,23 @@ xsocket_get_option (xsocket_t  *socket,
  *
  * Since: 2.36
  */
-xboolean_t
-xsocket_set_option (xsocket_t  *socket,
-		     xint_t      level,
-		     xint_t      optname,
-		     xint_t      value,
-		     xerror_t  **error)
+gboolean
+g_socket_set_option (GSocket  *socket,
+		     gint      level,
+		     gint      optname,
+		     gint      value,
+		     GError  **error)
 {
-  xint_t errsv;
+  gint errsv;
 
-  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET (socket), FALSE);
 
-  /* xsocket_set_option() is called during socket init, so skip the init checks
+  /* g_socket_set_option() is called during socket init, so skip the init checks
    * in check_socket() */
   if (socket->priv->inited && !check_socket (socket, error))
     return FALSE;
 
-  if (setsockopt (socket->priv->fd, level, optname, &value, sizeof (xint_t)) == 0)
+  if (setsockopt (socket->priv->fd, level, optname, &value, sizeof (gint)) == 0)
     return TRUE;
 
 #if !defined (__linux__) && !defined (G_OS_WIN32)
@@ -6298,7 +6298,7 @@ xsocket_set_option (xsocket_t  *socket,
   if (errno == EINVAL && value >= SCHAR_MIN && value <= CHAR_MAX)
     {
 #if G_BYTE_ORDER == G_BIG_ENDIAN
-      value = value << (8 * (sizeof (xint_t) - 1));
+      value = value << (8 * (sizeof (gint) - 1));
 #endif
       if (setsockopt (socket->priv->fd, level, optname, &value, 1) == 0)
         return TRUE;

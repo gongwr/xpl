@@ -29,16 +29,16 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SIMPLE_IO_STREAM                  (g_simple_io_stream_get_type ())
-#define G_SIMPLE_IO_STREAM(obj)                  (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SIMPLE_IO_STREAM, xsimple_io_stream))
-#define X_IS_SIMPLE_IO_STREAM(obj)               (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SIMPLE_IO_STREAM))
+#define G_TYPE_SIMPLE_IO_STREAM                  (g_simple_io_stream_get_type ())
+#define G_SIMPLE_IO_STREAM(obj)                  (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_SIMPLE_IO_STREAM, GSimpleIOStream))
+#define G_IS_SIMPLE_IO_STREAM(obj)               (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_SIMPLE_IO_STREAM))
 
-XPL_AVAILABLE_IN_2_44
-xtype_t                g_simple_io_stream_get_type         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_44
+GType                g_simple_io_stream_get_type         (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_44
-xio_stream_t           *g_simple_io_stream_new              (xinput_stream_t  *input_stream,
-                                                          xoutput_stream_t *output_stream);
+GLIB_AVAILABLE_IN_2_44
+GIOStream           *g_simple_io_stream_new              (GInputStream  *input_stream,
+                                                          GOutputStream *output_stream);
 
 G_END_DECLS
 

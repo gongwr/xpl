@@ -26,27 +26,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_WIN32_OUTPUT_STREAM         (g_win32_output_stream_get_type ())
-#define G_WIN32_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WIN32_OUTPUT_STREAM, GWin32OutputStream))
-#define G_WIN32_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WIN32_OUTPUT_STREAM, GWin32OutputStreamClass))
-#define X_IS_WIN32_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_WIN32_OUTPUT_STREAM))
-#define X_IS_WIN32_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_WIN32_OUTPUT_STREAM))
-#define G_WIN32_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_WIN32_OUTPUT_STREAM, GWin32OutputStreamClass))
+#define G_TYPE_WIN32_OUTPUT_STREAM         (g_win32_output_stream_get_type ())
+#define G_WIN32_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_WIN32_OUTPUT_STREAM, GWin32OutputStream))
+#define G_WIN32_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_WIN32_OUTPUT_STREAM, GWin32OutputStreamClass))
+#define G_IS_WIN32_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_WIN32_OUTPUT_STREAM))
+#define G_IS_WIN32_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_WIN32_OUTPUT_STREAM))
+#define G_WIN32_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_WIN32_OUTPUT_STREAM, GWin32OutputStreamClass))
 
 /**
  * GWin32OutputStream:
  *
- * Implements #xoutput_stream_t for outputting to Windows file handles
+ * Implements #GOutputStream for outputting to Windows file handles
  **/
 typedef struct _GWin32OutputStream         GWin32OutputStream;
 typedef struct _GWin32OutputStreamClass    GWin32OutputStreamClass;
 typedef struct _GWin32OutputStreamPrivate  GWin32OutputStreamPrivate;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32OutputStream, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32OutputStream, g_object_unref)
 
 struct _GWin32OutputStream
 {
-  xoutput_stream_t parent_instance;
+  GOutputStream parent_instance;
 
   /*< private >*/
   GWin32OutputStreamPrivate *priv;
@@ -54,7 +54,7 @@ struct _GWin32OutputStream
 
 struct _GWin32OutputStreamClass
 {
-  xoutput_stream_class_t parent_class;
+  GOutputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -65,18 +65,18 @@ struct _GWin32OutputStreamClass
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           g_win32_output_stream_get_type         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType           g_win32_output_stream_get_type         (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t * g_win32_output_stream_new              (void               *handle,
-							xboolean_t            close_handle);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
+GOutputStream * g_win32_output_stream_new              (void               *handle,
+							gboolean            close_handle);
+GLIB_AVAILABLE_IN_ALL
 void            g_win32_output_stream_set_close_handle (GWin32OutputStream *stream,
-							xboolean_t           close_handle);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_win32_output_stream_get_close_handle (GWin32OutputStream *stream);
-XPL_AVAILABLE_IN_ALL
+							gboolean           close_handle);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_win32_output_stream_get_close_handle (GWin32OutputStream *stream);
+GLIB_AVAILABLE_IN_ALL
 void           *g_win32_output_stream_get_handle       (GWin32OutputStream *stream);
 G_END_DECLS
 

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  */
 
 /* We are testing some deprecated APIs here */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
@@ -35,12 +35,12 @@ test_basic (void)
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
   GMemChunk *mem_chunk = g_mem_chunk_new ("test mem chunk", 50, 100, G_ALLOC_AND_FREE);
-  xchar_t *mem[10000];
-  xuint_t i;
+  gchar *mem[10000];
+  guint i;
   for (i = 0; i < 10000; i++)
     {
-      xuint_t j;
-      mem[i] = g_chunk_new (xchar_t, mem_chunk);
+      guint j;
+      mem[i] = g_chunk_new (gchar, mem_chunk);
       for (j = 0; j < 50; j++)
 	mem[i][j] = i * j;
     }

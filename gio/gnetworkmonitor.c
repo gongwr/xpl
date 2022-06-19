@@ -30,11 +30,11 @@
 
 /**
  * SECTION:gnetworkmonitor
- * @title: xnetwork_monitor_t
+ * @title: GNetworkMonitor
  * @short_description: Network status monitor
  * @include: gio/gio.h
  *
- * #xnetwork_monitor_t provides an easy-to-use cross-platform API
+ * #GNetworkMonitor provides an easy-to-use cross-platform API
  * for monitoring network connectivity. On Linux, the available
  * implementations are based on the kernel's netlink interface and
  * on NetworkManager.
@@ -43,9 +43,9 @@
  */
 
 /**
- * xnetwork_monitor_t:
+ * GNetworkMonitor:
  *
- * #xnetwork_monitor_t monitors the status of network connections and
+ * #GNetworkMonitor monitors the status of network connections and
  * indicates when a possibly-user-visible change has occurred.
  *
  * Since: 2.32
@@ -53,22 +53,22 @@
 
 /**
  * GNetworkMonitorInterface:
- * @x_iface: The parent interface.
+ * @g_iface: The parent interface.
  * @network_changed: the virtual function pointer for the
- *  xnetwork_monitor_t::network-changed signal.
- * @can_reach: the virtual function pointer for xnetwork_monitor_can_reach()
+ *  GNetworkMonitor::network-changed signal.
+ * @can_reach: the virtual function pointer for g_network_monitor_can_reach()
  * @can_reach_async: the virtual function pointer for
- *  xnetwork_monitor_can_reach_async()
+ *  g_network_monitor_can_reach_async()
  * @can_reach_finish: the virtual function pointer for
- *  xnetwork_monitor_can_reach_finish()
+ *  g_network_monitor_can_reach_finish()
  *
- * The virtual function table for #xnetwork_monitor_t.
+ * The virtual function table for #GNetworkMonitor.
  *
  * Since: 2.32
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (xnetwork_monitor, xnetwork_monitor, XTYPE_OBJECT,
-                              xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
+G_DEFINE_INTERFACE_WITH_CODE (GNetworkMonitor, g_network_monitor, G_TYPE_OBJECT,
+                              g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_INITABLE))
 
 
 enum {
@@ -76,27 +76,27 @@ enum {
   LAST_SIGNAL
 };
 
-static xuint_t signals[LAST_SIGNAL] = { 0 };
-static xnetwork_monitor_t *network_monitor_default_singleton = NULL;  /* (owned) (atomic) */
+static guint signals[LAST_SIGNAL] = { 0 };
+static GNetworkMonitor *network_monitor_default_singleton = NULL;  /* (owned) (atomic) */
 
 /**
- * xnetwork_monitor_get_default:
+ * g_network_monitor_get_default:
  *
- * Gets the default #xnetwork_monitor_t for the system.
+ * Gets the default #GNetworkMonitor for the system.
  *
- * Returns: (not nullable) (transfer none): a #xnetwork_monitor_t, which will be
+ * Returns: (not nullable) (transfer none): a #GNetworkMonitor, which will be
  *     a dummy object if no network monitor is available
  *
  * Since: 2.32
  */
-xnetwork_monitor_t *
-xnetwork_monitor_get_default (void)
+GNetworkMonitor *
+g_network_monitor_get_default (void)
 {
   if (g_once_init_enter (&network_monitor_default_singleton))
     {
-      xnetwork_monitor_t *singleton;
+      GNetworkMonitor *singleton;
 
-      singleton = _xio_module_get_default (G_NETWORK_MONITOR_EXTENSION_POINT_NAME,
+      singleton = _g_io_module_get_default (G_NETWORK_MONITOR_EXTENSION_POINT_NAME,
                                             "GIO_USE_NETWORK_MONITOR",
                                             NULL);
 
@@ -107,58 +107,58 @@ xnetwork_monitor_get_default (void)
 }
 
 /**
- * xnetwork_monitor_get_network_available:
- * @monitor: the #xnetwork_monitor_t
+ * g_network_monitor_get_network_available:
+ * @monitor: the #GNetworkMonitor
  *
  * Checks if the network is available. "Available" here means that the
  * system has a default route available for at least one of IPv4 or
  * IPv6. It does not necessarily imply that the public Internet is
- * reachable. See #xnetwork_monitor_t:network-available for more details.
+ * reachable. See #GNetworkMonitor:network-available for more details.
  *
  * Returns: whether the network is available
  *
  * Since: 2.32
  */
-xboolean_t
-xnetwork_monitor_get_network_available (xnetwork_monitor_t *monitor)
+gboolean
+g_network_monitor_get_network_available (GNetworkMonitor *monitor)
 {
-  xboolean_t available = FALSE;
+  gboolean available = FALSE;
 
-  xobject_get (G_OBJECT (monitor), "network-available", &available, NULL);
+  g_object_get (G_OBJECT (monitor), "network-available", &available, NULL);
   return available;
 }
 
 /**
- * xnetwork_monitor_get_network_metered:
- * @monitor: the #xnetwork_monitor_t
+ * g_network_monitor_get_network_metered:
+ * @monitor: the #GNetworkMonitor
  *
  * Checks if the network is metered.
- * See #xnetwork_monitor_t:network-metered for more details.
+ * See #GNetworkMonitor:network-metered for more details.
  *
  * Returns: whether the connection is metered
  *
  * Since: 2.46
  */
-xboolean_t
-xnetwork_monitor_get_network_metered (xnetwork_monitor_t *monitor)
+gboolean
+g_network_monitor_get_network_metered (GNetworkMonitor *monitor)
 {
-  xboolean_t metered = FALSE;
+  gboolean metered = FALSE;
 
-  xobject_get (G_OBJECT (monitor), "network-metered", &metered, NULL);
+  g_object_get (G_OBJECT (monitor), "network-metered", &metered, NULL);
   return metered;
 }
 
 /**
- * xnetwork_monitor_get_connectivity:
- * @monitor: the #xnetwork_monitor_t
+ * g_network_monitor_get_connectivity:
+ * @monitor: the #GNetworkMonitor
  *
  * Gets a more detailed networking state than
- * xnetwork_monitor_get_network_available().
+ * g_network_monitor_get_network_available().
  *
- * If #xnetwork_monitor_t:network-available is %FALSE, then the
+ * If #GNetworkMonitor:network-available is %FALSE, then the
  * connectivity state will be %G_NETWORK_CONNECTIVITY_LOCAL.
  *
- * If #xnetwork_monitor_t:network-available is %TRUE, then the
+ * If #GNetworkMonitor:network-available is %TRUE, then the
  * connectivity state will be %G_NETWORK_CONNECTIVITY_FULL (if there
  * is full Internet connectivity), %G_NETWORK_CONNECTIVITY_LIMITED (if
  * the host has a default route, but appears to be unable to actually
@@ -177,27 +177,27 @@ xnetwork_monitor_get_network_metered (xnetwork_monitor_t *monitor)
  * Since: 2.44
  */
 GNetworkConnectivity
-xnetwork_monitor_get_connectivity (xnetwork_monitor_t *monitor)
+g_network_monitor_get_connectivity (GNetworkMonitor *monitor)
 {
   GNetworkConnectivity connectivity;
 
-  xobject_get (G_OBJECT (monitor), "connectivity", &connectivity, NULL);
+  g_object_get (G_OBJECT (monitor), "connectivity", &connectivity, NULL);
 
   return connectivity;
 }
 
 /**
- * xnetwork_monitor_can_reach:
- * @monitor: a #xnetwork_monitor_t
- * @connectable: a #xsocket_connectable_t
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: return location for a #xerror_t, or %NULL
+ * g_network_monitor_can_reach:
+ * @monitor: a #GNetworkMonitor
+ * @connectable: a #GSocketConnectable
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Attempts to determine whether or not the host pointed to by
  * @connectable can be reached, without actually trying to connect to
  * it.
  *
- * This may return %TRUE even when #xnetwork_monitor_t:network-available
+ * This may return %TRUE even when #GNetworkMonitor:network-available
  * is %FALSE, if, for example, @monitor can determine that
  * @connectable refers to a host on a local network.
  *
@@ -209,17 +209,17 @@ xnetwork_monitor_get_connectivity (xnetwork_monitor_t *monitor)
  * Note that although this does not attempt to connect to
  * @connectable, it may still block for a brief period of time (eg,
  * trying to do multicast DNS on the local network), so if you do not
- * want to block, you should use xnetwork_monitor_can_reach_async().
+ * want to block, you should use g_network_monitor_can_reach_async().
  *
  * Returns: %TRUE if @connectable is reachable, %FALSE if not.
  *
  * Since: 2.32
  */
-xboolean_t
-xnetwork_monitor_can_reach (xnetwork_monitor_t     *monitor,
-                             xsocket_connectable_t  *connectable,
-                             xcancellable_t        *cancellable,
-                             xerror_t             **error)
+gboolean
+g_network_monitor_can_reach (GNetworkMonitor     *monitor,
+                             GSocketConnectable  *connectable,
+                             GCancellable        *cancellable,
+                             GError             **error)
 {
   GNetworkMonitorInterface *iface;
 
@@ -228,31 +228,31 @@ xnetwork_monitor_can_reach (xnetwork_monitor_t     *monitor,
 }
 
 static void
-xnetwork_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
-                                        xsocket_connectable_t  *connectable,
-                                        xcancellable_t        *cancellable,
-                                        xasync_ready_callback_t  callback,
-                                        xpointer_t             user_data)
+g_network_monitor_real_can_reach_async (GNetworkMonitor     *monitor,
+                                        GSocketConnectable  *connectable,
+                                        GCancellable        *cancellable,
+                                        GAsyncReadyCallback  callback,
+                                        gpointer             user_data)
 {
-  xtask_t *task;
-  xerror_t *error = NULL;
+  GTask *task;
+  GError *error = NULL;
 
-  task = xtask_new (monitor, cancellable, callback, user_data);
-  xtask_set_source_tag (task, xnetwork_monitor_real_can_reach_async);
+  task = g_task_new (monitor, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_network_monitor_real_can_reach_async);
 
-  if (xnetwork_monitor_can_reach (monitor, connectable, cancellable, &error))
-    xtask_return_boolean (task, TRUE);
+  if (g_network_monitor_can_reach (monitor, connectable, cancellable, &error))
+    g_task_return_boolean (task, TRUE);
   else
-    xtask_return_error (task, error);
-  xobject_unref (task);
+    g_task_return_error (task, error);
+  g_object_unref (task);
 }
 
 /**
- * xnetwork_monitor_can_reach_async:
- * @monitor: a #xnetwork_monitor_t
- * @connectable: a #xsocket_connectable_t
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @callback: (scope async): a #xasync_ready_callback_t to call when the
+ * g_network_monitor_can_reach_async:
+ * @monitor: a #GNetworkMonitor
+ * @connectable: a #GSocketConnectable
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @callback: (scope async): a #GAsyncReadyCallback to call when the
  *     request is satisfied
  * @user_data: (closure): the data to pass to callback function
  *
@@ -260,18 +260,18 @@ xnetwork_monitor_real_can_reach_async (xnetwork_monitor_t     *monitor,
  * pointed to by @connectable can be reached, without actually
  * trying to connect to it.
  *
- * For more details, see xnetwork_monitor_can_reach().
+ * For more details, see g_network_monitor_can_reach().
  *
  * When the operation is finished, @callback will be called.
- * You can then call xnetwork_monitor_can_reach_finish()
+ * You can then call g_network_monitor_can_reach_finish()
  * to get the result of the operation.
  */
 void
-xnetwork_monitor_can_reach_async (xnetwork_monitor_t     *monitor,
-                                   xsocket_connectable_t  *connectable,
-                                   xcancellable_t        *cancellable,
-                                   xasync_ready_callback_t  callback,
-                                   xpointer_t             user_data)
+g_network_monitor_can_reach_async (GNetworkMonitor     *monitor,
+                                   GSocketConnectable  *connectable,
+                                   GCancellable        *cancellable,
+                                   GAsyncReadyCallback  callback,
+                                   gpointer             user_data)
 {
   GNetworkMonitorInterface *iface;
 
@@ -279,31 +279,31 @@ xnetwork_monitor_can_reach_async (xnetwork_monitor_t     *monitor,
   iface->can_reach_async (monitor, connectable, cancellable, callback, user_data);
 }
 
-static xboolean_t
-xnetwork_monitor_real_can_reach_finish (xnetwork_monitor_t  *monitor,
-                                         xasync_result_t     *result,
-                                         xerror_t          **error)
+static gboolean
+g_network_monitor_real_can_reach_finish (GNetworkMonitor  *monitor,
+                                         GAsyncResult     *result,
+                                         GError          **error)
 {
-  xreturn_val_if_fail (xtask_is_valid (result, monitor), FALSE);
+  g_return_val_if_fail (g_task_is_valid (result, monitor), FALSE);
 
-  return xtask_propagate_boolean (XTASK (result), error);
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 /**
- * xnetwork_monitor_can_reach_finish:
- * @monitor: a #xnetwork_monitor_t
- * @result: a #xasync_result_t
+ * g_network_monitor_can_reach_finish:
+ * @monitor: a #GNetworkMonitor
+ * @result: a #GAsyncResult
  * @error: return location for errors, or %NULL
  *
  * Finishes an async network connectivity test.
- * See xnetwork_monitor_can_reach_async().
+ * See g_network_monitor_can_reach_async().
  *
  * Returns: %TRUE if network is reachable, %FALSE if not.
  */
-xboolean_t
-xnetwork_monitor_can_reach_finish (xnetwork_monitor_t     *monitor,
-                                    xasync_result_t        *result,
-                                    xerror_t             **error)
+gboolean
+g_network_monitor_can_reach_finish (GNetworkMonitor     *monitor,
+                                    GAsyncResult        *result,
+                                    GError             **error)
 {
   GNetworkMonitorInterface *iface;
 
@@ -312,32 +312,32 @@ xnetwork_monitor_can_reach_finish (xnetwork_monitor_t     *monitor,
 }
 
 static void
-xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
+g_network_monitor_default_init (GNetworkMonitorInterface *iface)
 {
-  iface->can_reach_async  = xnetwork_monitor_real_can_reach_async;
-  iface->can_reach_finish = xnetwork_monitor_real_can_reach_finish;
+  iface->can_reach_async  = g_network_monitor_real_can_reach_async;
+  iface->can_reach_finish = g_network_monitor_real_can_reach_finish;
 
   /**
-   * xnetwork_monitor_t::network-changed:
-   * @monitor: a #xnetwork_monitor_t
-   * @network_available: the current value of #xnetwork_monitor_t:network-available
+   * GNetworkMonitor::network-changed:
+   * @monitor: a #GNetworkMonitor
+   * @network_available: the current value of #GNetworkMonitor:network-available
    *
    * Emitted when the network configuration changes.
    *
    * Since: 2.32
    */
   signals[NETWORK_CHANGED] =
-    xsignal_new (I_("network-changed"),
-                  XTYPE_NETWORK_MONITOR,
+    g_signal_new (I_("network-changed"),
+                  G_TYPE_NETWORK_MONITOR,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GNetworkMonitorInterface, network_changed),
                   NULL, NULL,
                   NULL,
-                  XTYPE_NONE, 1,
-                  XTYPE_BOOLEAN);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_BOOLEAN);
 
   /**
-   * xnetwork_monitor_t:network-available:
+   * GNetworkMonitor:network-available:
    *
    * Whether the network is considered available. That is, whether the
    * system has a default route for at least one of IPv4 or IPv6.
@@ -348,27 +348,27 @@ xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
    * connected to a functioning router that has lost its own upstream
    * connectivity. Some hosts might only be accessible when a VPN is
    * active. Other hosts might only be accessible when the VPN is
-   * not active. Thus, it is best to use xnetwork_monitor_can_reach()
-   * or xnetwork_monitor_can_reach_async() to test for reachability
+   * not active. Thus, it is best to use g_network_monitor_can_reach()
+   * or g_network_monitor_can_reach_async() to test for reachability
    * on a host-by-host basis. (On the other hand, when the property is
    * %FALSE, the application can reasonably expect that no remote
    * hosts at all are reachable, and should indicate this to the user
    * in its UI.)
    *
-   * See also #xnetwork_monitor_t::network-changed.
+   * See also #GNetworkMonitor::network-changed.
    *
    * Since: 2.32
    */
-  xobject_interface_install_property (iface,
-                                       xparam_spec_boolean ("network-available",
+  g_object_interface_install_property (iface,
+                                       g_param_spec_boolean ("network-available",
                                                              P_("Network available"),
                                                              P_("Whether the network is available"),
                                                              FALSE,
-                                                             XPARAM_READABLE |
-                                                             XPARAM_STATIC_STRINGS));
+                                                             G_PARAM_READABLE |
+                                                             G_PARAM_STATIC_STRINGS));
 
   /**
-   * xnetwork_monitor_t:network-metered:
+   * GNetworkMonitor:network-metered:
    *
    * Whether the network is considered metered. That is, whether the
    * system has traffic flowing through the default connection that is
@@ -386,33 +386,33 @@ xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
    * If this information is not available then no networks will be
    * marked as metered.
    *
-   * See also #xnetwork_monitor_t:network-available.
+   * See also #GNetworkMonitor:network-available.
    *
    * Since: 2.46
    */
-  xobject_interface_install_property (iface,
-                                       xparam_spec_boolean ("network-metered",
+  g_object_interface_install_property (iface,
+                                       g_param_spec_boolean ("network-metered",
                                                              P_("Network metered"),
                                                              P_("Whether the network is metered"),
                                                              FALSE,
-                                                             XPARAM_READABLE |
-                                                             XPARAM_STATIC_STRINGS));
+                                                             G_PARAM_READABLE |
+                                                             G_PARAM_STATIC_STRINGS));
 
   /**
-   * xnetwork_monitor_t:connectivity:
+   * GNetworkMonitor:connectivity:
    *
    * More detailed information about the host's network connectivity.
-   * See xnetwork_monitor_get_connectivity() and
+   * See g_network_monitor_get_connectivity() and
    * #GNetworkConnectivity for more details.
    *
    * Since: 2.44
    */
-  xobject_interface_install_property (iface,
-                                       xparam_spec_enum ("connectivity",
+  g_object_interface_install_property (iface,
+                                       g_param_spec_enum ("connectivity",
                                                           P_("Network connectivity"),
                                                           P_("Level of network connectivity"),
-                                                          XTYPE_NETWORK_CONNECTIVITY,
+                                                          G_TYPE_NETWORK_CONNECTIVITY,
                                                           G_NETWORK_CONNECTIVITY_FULL,
-                                                          XPARAM_READABLE |
-                                                          XPARAM_STATIC_STRINGS));
+                                                          G_PARAM_READABLE |
+                                                          G_PARAM_STATIC_STRINGS));
 }

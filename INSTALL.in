@@ -1,8 +1,8 @@
 Simple install procedure
 ========================
 
-  % tar xf glib-@XPL_VERSION@.tar.gz       # unpack the sources
-  % cd glib-@XPL_VERSION@                  # change to the toplevel directory
+  % tar xf glib-@GLIB_VERSION@.tar.gz       # unpack the sources
+  % cd glib-@GLIB_VERSION@                  # change to the toplevel directory
   % meson _build                            # configure the build
   % ninja -C _build                         # build GLib
 
@@ -70,7 +70,7 @@ Some of the mimetype-related functionality in GIO requires the
 update-mime-database and update-desktop-database utilities, which
 are part of shared-mime-info and desktop-file-utils, respectively.
 
-xobject_t uses libffi to implement generic marshalling functionality.
+GObject uses libffi to implement generic marshalling functionality.
 
 The Nitty-Gritty
 ================

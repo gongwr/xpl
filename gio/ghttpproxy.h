@@ -25,29 +25,29 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_HTTP_PROXY         (_g_http_proxy_get_type ())
-#define G_HTTP_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_HTTP_PROXY, GHttpProxy))
-#define G_HTTP_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_HTTP_PROXY, GHttpProxyClass))
-#define X_IS_HTTP_PROXY(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_HTTP_PROXY))
-#define X_IS_HTTP_PROXY_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_HTTP_PROXY))
-#define G_HTTP_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_HTTP_PROXY, GHttpProxyClass))
+#define G_TYPE_HTTP_PROXY         (_g_http_proxy_get_type ())
+#define G_HTTP_PROXY(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_HTTP_PROXY, GHttpProxy))
+#define G_HTTP_PROXY_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_HTTP_PROXY, GHttpProxyClass))
+#define G_IS_HTTP_PROXY(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_HTTP_PROXY))
+#define G_IS_HTTP_PROXY_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_HTTP_PROXY))
+#define G_HTTP_PROXY_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_HTTP_PROXY, GHttpProxyClass))
 
 typedef struct _GHttpProxy        GHttpProxy;
 typedef struct _GHttpProxyClass   GHttpProxyClass;
 
-xtype_t _g_http_proxy_get_type (void);
+GType _g_http_proxy_get_type (void);
 
-#define XTYPE_HTTPS_PROXY         (_g_https_proxy_get_type ())
-#define G_HTTPS_PROXY(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_HTTPS_PROXY, GHttpsProxy))
-#define G_HTTPS_PROXY_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_HTTPS_PROXY, GHttpsProxyClass))
-#define X_IS_HTTPS_PROXY(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_HTTPS_PROXY))
-#define X_IS_HTTPS_PROXY_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_HTTPS_PROXY))
-#define G_HTTPS_PROXY_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_HTTPS_PROXY, GHttpsProxyClass))
+#define G_TYPE_HTTPS_PROXY         (_g_https_proxy_get_type ())
+#define G_HTTPS_PROXY(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_HTTPS_PROXY, GHttpsProxy))
+#define G_HTTPS_PROXY_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_HTTPS_PROXY, GHttpsProxyClass))
+#define G_IS_HTTPS_PROXY(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_HTTPS_PROXY))
+#define G_IS_HTTPS_PROXY_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_HTTPS_PROXY))
+#define G_HTTPS_PROXY_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_HTTPS_PROXY, GHttpsProxyClass))
 
 typedef struct _GHttpsProxy        GHttpsProxy;
 typedef struct _GHttpsProxyClass   GHttpsProxyClass;
 
-xtype_t _g_https_proxy_get_type (void);
+GType _g_https_proxy_get_type (void);
 
 G_END_DECLS
 

@@ -35,7 +35,7 @@ int
 read_all (int fd, char *buf, int len)
 {
   size_t bytes_read = 0;
-  xssize_t count;
+  gssize count;
 
   while (bytes_read < len)
     {
@@ -58,7 +58,7 @@ int
 write_all (int fd, char *buf, int len)
 {
   size_t bytes_written = 0;
-  xssize_t count;
+  gssize count;
 
   while (bytes_written < len)
     {
@@ -97,7 +97,7 @@ int
 input_callback (int source, int dest)
 {
   int val;
-
+  
   if (!read_all (source, (char *)&val, sizeof(val)))
     {
       fprintf (stderr,"Unexpected EOF\n");
@@ -113,7 +113,7 @@ input_callback (int source, int dest)
     {
       close (source);
       close (dest);
-
+      
       n_active_children--;
       return FALSE;
     }
@@ -125,7 +125,7 @@ create_child (int pos)
   int pid, errsv;
   int in_fds[2];
   int out_fds[2];
-
+  
   my_pipe (in_fds);
   my_pipe (out_fds);
 
@@ -157,20 +157,20 @@ create_child (int pos)
     }
 }
 
-static double
+static double 
 difftimeval (struct timeval *old, struct timeval *new)
 {
   return
     (new->tv_sec - old->tv_sec) * 1000. + (new->tv_usec - old->tv_usec) / 1000;
 }
 
-int
+int 
 main (int argc, char **argv)
 {
   int i, j;
   struct rusage old_usage;
   struct rusage new_usage;
-
+  
   if (argc > 1)
     n_children = atoi(argv[1]);
 
@@ -225,10 +225,10 @@ main (int argc, char **argv)
   printf ("Elapsed system: %g\n",
 	   difftimeval (&old_usage.ru_stime, &new_usage.ru_stime));
   printf ("Elapsed total: %g\n",
-	  difftimeval (&old_usage.ru_utime, &new_usage.ru_utime) +
+	  difftimeval (&old_usage.ru_utime, &new_usage.ru_utime) +	   
 	   difftimeval (&old_usage.ru_stime, &new_usage.ru_stime));
   printf ("total / iteration: %g\n",
-	   (difftimeval (&old_usage.ru_utime, &new_usage.ru_utime) +
+	   (difftimeval (&old_usage.ru_utime, &new_usage.ru_utime) +	   
 	    difftimeval (&old_usage.ru_stime, &new_usage.ru_stime)) /
 	   (n_iters * n_children));
 

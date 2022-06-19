@@ -1,4 +1,4 @@
-/* test_t case for bug 659866 */
+/* Test case for bug 659866 */
 
 #define _POSIX_C_SOURCE 199309L
 #undef _GNU_SOURCE

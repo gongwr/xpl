@@ -48,7 +48,7 @@ ensure_trash_portal (void)
 
   if (g_once_init_enter (&trash))
     {
-      xdbus_connection_t *connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+      GDBusConnection *connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
       GXdpTrash *proxy = NULL;
 
       if (connection != NULL)
@@ -57,7 +57,7 @@ ensure_trash_portal (void)
                                              "org.freedesktop.portal.Desktop",
                                              "/org/freedesktop/portal/desktop",
                                              NULL, NULL);
-          xobject_unref (connection);
+          g_object_unref (connection);
         }
 
       g_once_init_leave (&trash, proxy);
@@ -66,15 +66,15 @@ ensure_trash_portal (void)
   return trash;
 }
 
-xboolean_t
-g_trash_portal_trash_file (xfile_t   *file,
-                           xerror_t **error)
+gboolean
+g_trash_portal_trash_file (GFile   *file,
+                           GError **error)
 {
   char *path = NULL;
-  xunix_fd_list_t *fd_list = NULL;
+  GUnixFDList *fd_list = NULL;
   int fd, fd_in, errsv;
-  xboolean_t ret = FALSE;
-  xuint_t portal_result = 0;
+  gboolean ret = FALSE;
+  guint portal_result = 0;
   GXdpTrash *proxy;
 
   proxy = ensure_trash_portal ();
@@ -85,12 +85,16 @@ g_trash_portal_trash_file (xfile_t   *file,
       goto out;
     }
 
-  path = xfile_get_path (file);
+  path = g_file_get_path (file);
 
   fd = g_open (path, O_RDWR | O_CLOEXEC | O_NOFOLLOW);
   if (fd == -1 && errno == EISDIR)
-    /* If it is a directory, fall back to O_PATH */
-    fd = g_open (path, O_PATH | O_CLOEXEC | O_RDONLY | O_NOFOLLOW);
+    /* If it is a directory, fall back to O_PATH.
+     * Remove O_NOFOLLOW since
+     * a) we know it is a directory, not a symlink, and
+     * b) the portal reject this combination
+     */
+    fd = g_open (path, O_PATH | O_CLOEXEC | O_RDONLY);
 
   errsv = errno;
 
@@ -113,7 +117,7 @@ g_trash_portal_trash_file (xfile_t   *file,
     goto out;
 
   ret = gxdp_trash_call_trash_file_sync (proxy,
-                                         xvariant_new_handle (fd_in),
+                                         g_variant_new_handle (fd_in),
                                          fd_list,
                                          &portal_result,
                                          NULL,

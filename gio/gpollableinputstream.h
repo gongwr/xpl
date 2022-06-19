@@ -27,26 +27,26 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_POLLABLE_INPUT_STREAM               (g_pollable_input_stream_get_type ())
-#define G_POLLABLE_INPUT_STREAM(obj)               (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_POLLABLE_INPUT_STREAM, xpollable_input_stream))
-#define X_IS_POLLABLE_INPUT_STREAM(obj)            (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_POLLABLE_INPUT_STREAM))
-#define G_POLLABLE_INPUT_STREAM_GET_INTERFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_POLLABLE_INPUT_STREAM, xpollable_input_stream_interface_t))
+#define G_TYPE_POLLABLE_INPUT_STREAM               (g_pollable_input_stream_get_type ())
+#define G_POLLABLE_INPUT_STREAM(obj)               (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_POLLABLE_INPUT_STREAM, GPollableInputStream))
+#define G_IS_POLLABLE_INPUT_STREAM(obj)            (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_POLLABLE_INPUT_STREAM))
+#define G_POLLABLE_INPUT_STREAM_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_POLLABLE_INPUT_STREAM, GPollableInputStreamInterface))
 
 /**
- * xpollable_input_stream_t:
+ * GPollableInputStream:
  *
- * An interface for a #xinput_stream_t that can be polled for readability.
+ * An interface for a #GInputStream that can be polled for readability.
  *
  * Since: 2.28
  */
-typedef struct _xpollable_input_stream_interface xpollable_input_stream_interface_t;
+typedef struct _GPollableInputStreamInterface GPollableInputStreamInterface;
 
 /**
- * xpollable_input_stream_interface_t:
- * @x_iface: The parent interface.
- * @can_poll: Checks if the #xpollable_input_stream_t instance is actually pollable
+ * GPollableInputStreamInterface:
+ * @g_iface: The parent interface.
+ * @can_poll: Checks if the #GPollableInputStream instance is actually pollable
  * @is_readable: Checks if the stream is readable
- * @create_source: Creates a #xsource_t to poll the stream
+ * @create_source: Creates a #GSource to poll the stream
  * @read_nonblocking: Does a non-blocking read or returns
  *   %G_IO_ERROR_WOULD_BLOCK
  *
@@ -56,47 +56,47 @@ typedef struct _xpollable_input_stream_interface xpollable_input_stream_interfac
  *
  * The default implementation of @read_nonblocking calls
  * g_pollable_input_stream_is_readable(), and then calls
- * xinput_stream_read() if it returns %TRUE. This means you only need
+ * g_input_stream_read() if it returns %TRUE. This means you only need
  * to override it if it is possible that your @is_readable
  * implementation may return %TRUE when the stream is not actually
  * readable.
  *
  * Since: 2.28
  */
-struct _xpollable_input_stream_interface
+struct _GPollableInputStreamInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
-  xboolean_t     (*can_poll)         (xpollable_input_stream_t  *stream);
+  gboolean     (*can_poll)         (GPollableInputStream  *stream);
 
-  xboolean_t     (*is_readable)      (xpollable_input_stream_t  *stream);
-  xsource_t *    (*create_source)    (xpollable_input_stream_t  *stream,
-				    xcancellable_t          *cancellable);
-  xssize_t       (*read_nonblocking) (xpollable_input_stream_t  *stream,
+  gboolean     (*is_readable)      (GPollableInputStream  *stream);
+  GSource *    (*create_source)    (GPollableInputStream  *stream,
+				    GCancellable          *cancellable);
+  gssize       (*read_nonblocking) (GPollableInputStream  *stream,
 				    void                  *buffer,
-				    xsize_t                  count,
-				    xerror_t               **error);
+				    gsize                  count,
+				    GError               **error);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    g_pollable_input_stream_get_type         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_pollable_input_stream_get_type         (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_pollable_input_stream_can_poll         (xpollable_input_stream_t  *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_pollable_input_stream_can_poll         (GPollableInputStream  *stream);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_pollable_input_stream_is_readable      (xpollable_input_stream_t  *stream);
-XPL_AVAILABLE_IN_ALL
-xsource_t *g_pollable_input_stream_create_source    (xpollable_input_stream_t  *stream,
-						   xcancellable_t          *cancellable);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_pollable_input_stream_is_readable      (GPollableInputStream  *stream);
+GLIB_AVAILABLE_IN_ALL
+GSource *g_pollable_input_stream_create_source    (GPollableInputStream  *stream,
+						   GCancellable          *cancellable);
 
-XPL_AVAILABLE_IN_ALL
-xssize_t   g_pollable_input_stream_read_nonblocking (xpollable_input_stream_t  *stream,
+GLIB_AVAILABLE_IN_ALL
+gssize   g_pollable_input_stream_read_nonblocking (GPollableInputStream  *stream,
 						   void                  *buffer,
-						   xsize_t                  count,
-						   xcancellable_t          *cancellable,
-						   xerror_t               **error);
+						   gsize                  count,
+						   GCancellable          *cancellable,
+						   GError               **error);
 
 G_END_DECLS
 

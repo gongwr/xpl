@@ -17,8 +17,8 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XDTLS_SERVER_CONNECTION_H__
-#define __XDTLS_SERVER_CONNECTION_H__
+#ifndef __G_DTLS_SERVER_CONNECTION_H__
+#define __G_DTLS_SERVER_CONNECTION_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -28,42 +28,42 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DTLS_SERVER_CONNECTION                (xdtls_server_connection_get_type ())
-#define XDTLS_SERVER_CONNECTION(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_DTLS_SERVER_CONNECTION, xdtls_server_connection_t))
-#define X_IS_DTLS_SERVER_CONNECTION(inst)            (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_DTLS_SERVER_CONNECTION))
-#define XDTLS_SERVER_CONNECTION_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_DTLS_SERVER_CONNECTION, xdtls_server_connection_interface_t))
+#define G_TYPE_DTLS_SERVER_CONNECTION                (g_dtls_server_connection_get_type ())
+#define G_DTLS_SERVER_CONNECTION(inst)               (G_TYPE_CHECK_INSTANCE_CAST ((inst), G_TYPE_DTLS_SERVER_CONNECTION, GDtlsServerConnection))
+#define G_IS_DTLS_SERVER_CONNECTION(inst)            (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_DTLS_SERVER_CONNECTION))
+#define G_DTLS_SERVER_CONNECTION_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), G_TYPE_DTLS_SERVER_CONNECTION, GDtlsServerConnectionInterface))
 
 /**
- * xdtls_server_connection_t:
+ * GDtlsServerConnection:
  *
  * DTLS server-side connection. This is the server-side implementation
- * of a #xdtls_connection_t.
+ * of a #GDtlsConnection.
  *
  * Since: 2.48
  */
-typedef struct _xdtls_server_connection_interface xdtls_server_connection_interface_t;
+typedef struct _GDtlsServerConnectionInterface GDtlsServerConnectionInterface;
 
 /**
- * xdtls_server_connection_interface_t:
- * @x_iface: The parent interface.
+ * GDtlsServerConnectionInterface:
+ * @g_iface: The parent interface.
  *
- * vtable for a #xdtls_server_connection_t implementation.
+ * vtable for a #GDtlsServerConnection implementation.
  *
  * Since: 2.48
  */
-struct _xdtls_server_connection_interface
+struct _GDtlsServerConnectionInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 };
 
-XPL_AVAILABLE_IN_2_48
-xtype_t           xdtls_server_connection_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_48
+GType           g_dtls_server_connection_get_type (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_48
-xdatagram_based_t *xdtls_server_connection_new      (xdatagram_based_t   *base_socket,
-                                                   xtls_certificate_t  *certificate,
-                                                   xerror_t          **error);
+GLIB_AVAILABLE_IN_2_48
+GDatagramBased *g_dtls_server_connection_new      (GDatagramBased   *base_socket,
+                                                   GTlsCertificate  *certificate,
+                                                   GError          **error);
 
 G_END_DECLS
 
-#endif /* __XDTLS_SERVER_CONNECTION_H__ */
+#endif /* __G_DTLS_SERVER_CONNECTION_H__ */

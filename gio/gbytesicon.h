@@ -18,8 +18,8 @@
  * Author: Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XBYTES_ICON_H__
-#define __XBYTES_ICON_H__
+#ifndef __G_BYTES_ICON_H__
+#define __G_BYTES_ICON_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,24 +29,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_BYTES_ICON         (xbytes_icon_get_type ())
-#define XBYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, xbytes_icon_t))
-#define X_IS_BYTES_ICON(inst)     (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_BYTES_ICON))
+#define G_TYPE_BYTES_ICON         (g_bytes_icon_get_type ())
+#define G_BYTES_ICON(inst)        (G_TYPE_CHECK_INSTANCE_CAST ((inst), G_TYPE_BYTES_ICON, GBytesIcon))
+#define G_IS_BYTES_ICON(inst)     (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_BYTES_ICON))
 
 /**
- * xbytes_icon_t:
+ * GBytesIcon:
  *
- * Gets an icon for a #xbytes_t. Implements #xloadable_icon_t.
+ * Gets an icon for a #GBytes. Implements #GLoadableIcon.
  **/
-XPL_AVAILABLE_IN_2_38
-xtype_t   xbytes_icon_get_type   (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_38
+GType   g_bytes_icon_get_type   (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_38
-xicon_t * xbytes_icon_new        (xbytes_t     *bytes);
+GLIB_AVAILABLE_IN_2_38
+GIcon * g_bytes_icon_new        (GBytes     *bytes);
 
-XPL_AVAILABLE_IN_2_38
-xbytes_t * xbytes_icon_get_bytes (xbytes_icon_t *icon);
+GLIB_AVAILABLE_IN_2_38
+GBytes * g_bytes_icon_get_bytes (GBytesIcon *icon);
 
 G_END_DECLS
 
-#endif /* __XBYTES_ICON_H__ */
+#endif /* __G_BYTES_ICON_H__ */

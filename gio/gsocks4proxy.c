@@ -38,18 +38,18 @@ struct _GSocks4ProxyClass
 };
 
 #define g_socks4_proxy_get_type _g_socks4_proxy_get_type
-G_DEFINE_TYPE_WITH_CODE (GSocks4Proxy, g_socks4_proxy, XTYPE_SOCKS4A_PROXY,
-			 _xio_modules_ensure_extension_points_registered ();
+G_DEFINE_TYPE_WITH_CODE (GSocks4Proxy, g_socks4_proxy, G_TYPE_SOCKS4A_PROXY,
+			 _g_io_modules_ensure_extension_points_registered ();
 			 g_io_extension_point_implement (G_PROXY_EXTENSION_POINT_NAME,
 							 g_define_type_id,
 							 "socks4",
 							 0))
 
 static void
-g_socks4_proxy_finalize (xobject_t *object)
+g_socks4_proxy_finalize (GObject *object)
 {
   /* must chain up */
-  XOBJECT_CLASS (g_socks4_proxy_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_socks4_proxy_parent_class)->finalize (object);
 }
 
 static void
@@ -62,8 +62,8 @@ g_socks4_proxy_init (GSocks4Proxy *proxy)
 static void
 g_socks4_proxy_class_init (GSocks4ProxyClass *class)
 {
-  xobject_class_t *object_class;
+  GObjectClass *object_class;
 
-  object_class = (xobject_class_t *) class;
+  object_class = (GObjectClass *) class;
   object_class->finalize = g_socks4_proxy_finalize;
 }

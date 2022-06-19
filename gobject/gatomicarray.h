@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 #ifndef __G_ATOMIC_ARRAY_H__
 #define __G_ATOMIC_ARRAY_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -25,24 +25,24 @@
 
 G_BEGIN_DECLS
 
-#define G_ATOMIC_ARRAY_DATA_SIZE(mem) (*((xsize_t *) (mem) - 1))
+#define G_ATOMIC_ARRAY_DATA_SIZE(mem) (*((gsize *) (mem) - 1))
 
 typedef struct _GAtomicArray GAtomicArray;
 struct _GAtomicArray {
-  xpointer_t data;  /* elements - atomic */
+  gpointer data;  /* elements - atomic */
 };
 
 void     _g_atomic_array_init   (GAtomicArray *array);
-xpointer_t _g_atomic_array_copy   (GAtomicArray *array,
-				 xsize_t         header_size,
-				 xsize_t         additional_element_size);
+gpointer _g_atomic_array_copy   (GAtomicArray *array,
+				 gsize         header_size,
+				 gsize         additional_element_size);
 void     _g_atomic_array_update (GAtomicArray *array,
-				 xpointer_t      new_data);
+				 gpointer      new_data);
 
 #define  G_ATOMIC_ARRAY_GET_LOCKED(_array, _type) ((_type *)((_array)->data))
 
 #define G_ATOMIC_ARRAY_DO_TRANSACTION(_array, _type, _C_) G_STMT_START {	\
-    xpointer_t *_datap  = &(_array)->data;				\
+    gpointer *_datap  = &(_array)->data;				\
     _type *transaction_data, *__check;						\
 										\
     __check = g_atomic_pointer_get (_datap);					\

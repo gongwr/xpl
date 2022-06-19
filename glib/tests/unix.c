@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2011 Red Hat, Inc.
  *
  * This work is provided "as is"; redistribution and modification
@@ -18,7 +18,7 @@
  * otherwise) arising in any way out of the use of this software, even
  * if advised of the possibility of such damage.
  *
- * Author: Colin Walters <walters@verbum.org>
+ * Author: Colin Walters <walters@verbum.org> 
  */
 
 #include "config.h"
@@ -30,14 +30,14 @@
 static void
 test_pipe (void)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
   int pipefd[2];
   char buf[1024];
-  xssize_t bytes_read;
-  xboolean_t res;
+  gssize bytes_read;
+  gboolean res;
 
   res = g_unix_open_pipe (pipefd, FD_CLOEXEC, &error);
-  xassert (res);
+  g_assert (res);
   g_assert_no_error (error);
 
   write (pipefd[1], "hello", sizeof ("hello"));
@@ -49,18 +49,18 @@ test_pipe (void)
   close (pipefd[0]);
   close (pipefd[1]);
 
-  xassert (xstr_has_prefix (buf, "hello"));
+  g_assert (g_str_has_prefix (buf, "hello"));
 }
 
 static void
 test_error (void)
 {
-  xerror_t *error = NULL;
-  xboolean_t res;
+  GError *error = NULL;
+  gboolean res;
 
   res = g_unix_set_fd_nonblocking (123456, TRUE, &error);
   g_assert_cmpint (errno, ==, EBADF);
-  xassert (!res);
+  g_assert (!res);
   g_assert_error (error, G_UNIX_ERROR, 0);
   g_clear_error (&error);
 }
@@ -68,100 +68,100 @@ test_error (void)
 static void
 test_nonblocking (void)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
   int pipefd[2];
-  xboolean_t res;
+  gboolean res;
   int flags;
 
   res = g_unix_open_pipe (pipefd, FD_CLOEXEC, &error);
-  xassert (res);
+  g_assert (res);
   g_assert_no_error (error);
 
   res = g_unix_set_fd_nonblocking (pipefd[0], TRUE, &error);
-  xassert (res);
+  g_assert (res);
   g_assert_no_error (error);
-
+ 
   flags = fcntl (pipefd[0], F_GETFL);
   g_assert_cmpint (flags, !=, -1);
-  xassert (flags & O_NONBLOCK);
+  g_assert (flags & O_NONBLOCK);
 
   res = g_unix_set_fd_nonblocking (pipefd[0], FALSE, &error);
-  xassert (res);
+  g_assert (res);
   g_assert_no_error (error);
-
+ 
   flags = fcntl (pipefd[0], F_GETFL);
   g_assert_cmpint (flags, !=, -1);
-  xassert (!(flags & O_NONBLOCK));
+  g_assert (!(flags & O_NONBLOCK));
 
   close (pipefd[0]);
   close (pipefd[1]);
 }
 
-static xboolean_t sig_received = FALSE;
-static xboolean_t sig_timeout = FALSE;
+static gboolean sig_received = FALSE;
+static gboolean sig_timeout = FALSE;
 static int sig_counter = 0;
 
-static xboolean_t
-on_sig_received (xpointer_t user_data)
+static gboolean
+on_sig_received (gpointer user_data)
 {
-  xmain_loop_t *loop = user_data;
-  xmain_loop_quit (loop);
+  GMainLoop *loop = user_data;
+  g_main_loop_quit (loop);
   sig_received = TRUE;
   sig_counter ++;
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
-static xboolean_t
-on_sig_timeout (xpointer_t data)
+static gboolean
+on_sig_timeout (gpointer data)
 {
-  xmain_loop_t *loop = data;
-  xmain_loop_quit (loop);
+  GMainLoop *loop = data;
+  g_main_loop_quit (loop);
   sig_timeout = TRUE;
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
-static xboolean_t
-exit_mainloop (xpointer_t data)
+static gboolean
+exit_mainloop (gpointer data)
 {
-  xmain_loop_t *loop = data;
-  xmain_loop_quit (loop);
-  return XSOURCE_REMOVE;
+  GMainLoop *loop = data;
+  g_main_loop_quit (loop);
+  return G_SOURCE_REMOVE;
 }
 
-static xboolean_t
-on_sig_received_2 (xpointer_t data)
+static gboolean
+on_sig_received_2 (gpointer data)
 {
-  xmain_loop_t *loop = data;
+  GMainLoop *loop = data;
 
   sig_counter ++;
   if (sig_counter == 2)
-    xmain_loop_quit (loop);
-  return XSOURCE_REMOVE;
+    g_main_loop_quit (loop);
+  return G_SOURCE_REMOVE;
 }
 
 static void
 test_signal (int signum)
 {
-  xmain_loop_t *mainloop;
+  GMainLoop *mainloop;
   int id;
 
-  mainloop = xmain_loop_new (NULL, FALSE);
+  mainloop = g_main_loop_new (NULL, FALSE);
 
   sig_received = FALSE;
   sig_counter = 0;
   g_unix_signal_add (signum, on_sig_received, mainloop);
   kill (getpid (), signum);
-  xassert (!sig_received);
+  g_assert (!sig_received);
   id = g_timeout_add (5000, on_sig_timeout, mainloop);
-  xmain_loop_run (mainloop);
-  xassert (sig_received);
+  g_main_loop_run (mainloop);
+  g_assert (sig_received);
   sig_received = FALSE;
-  xsource_remove (id);
+  g_source_remove (id);
 
   /* Ensure we don't get double delivery */
   g_timeout_add (500, exit_mainloop, mainloop);
-  xmain_loop_run (mainloop);
-  xassert (!sig_received);
+  g_main_loop_run (mainloop);
+  g_assert (!sig_received);
 
   /* Ensure that two sources for the same signal get it */
   sig_counter = 0;
@@ -170,11 +170,11 @@ test_signal (int signum)
   id = g_timeout_add (5000, on_sig_timeout, mainloop);
 
   kill (getpid (), signum);
-  xmain_loop_run (mainloop);
+  g_main_loop_run (mainloop);
   g_assert_cmpint (sig_counter, ==, 2);
-  xsource_remove (id);
+  g_source_remove (id);
 
-  xmain_loop_unref (mainloop);
+  g_main_loop_unref (mainloop);
 }
 
 static void
@@ -192,71 +192,71 @@ test_sigterm (void)
 static void
 test_sighup_add_remove (void)
 {
-  xuint_t id;
+  guint id;
   struct sigaction action;
 
   sig_received = FALSE;
   id = g_unix_signal_add (SIGHUP, on_sig_received, NULL);
-  xsource_remove (id);
+  g_source_remove (id);
 
   sigaction (SIGHUP, NULL, &action);
-  xassert (action.sa_handler == SIG_DFL);
+  g_assert (action.sa_handler == SIG_DFL);
 }
 
-static xboolean_t
-nested_idle (xpointer_t data)
+static gboolean
+nested_idle (gpointer data)
 {
-  xmain_loop_t *nested;
-  xmain_context_t *context;
-  xsource_t *source;
+  GMainLoop *nested;
+  GMainContext *context;
+  GSource *source;
 
-  context = xmain_context_new ();
-  nested = xmain_loop_new (context, FALSE);
+  context = g_main_context_new ();
+  nested = g_main_loop_new (context, FALSE);
 
   source = g_unix_signal_source_new (SIGHUP);
-  xsource_set_callback (source, on_sig_received, nested, NULL);
-  xsource_attach (source, context);
-  xsource_unref (source);
+  g_source_set_callback (source, on_sig_received, nested, NULL);
+  g_source_attach (source, context);
+  g_source_unref (source);
 
   kill (getpid (), SIGHUP);
-  xmain_loop_run (nested);
+  g_main_loop_run (nested);
   g_assert_cmpint (sig_counter, ==, 1);
 
-  xmain_loop_unref (nested);
-  xmain_context_unref (context);
+  g_main_loop_unref (nested);
+  g_main_context_unref (context);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
 test_sighup_nested (void)
 {
-  xmain_loop_t *mainloop;
+  GMainLoop *mainloop;
 
-  mainloop = xmain_loop_new (NULL, FALSE);
+  mainloop = g_main_loop_new (NULL, FALSE);
 
   sig_counter = 0;
   sig_received = FALSE;
   g_unix_signal_add (SIGHUP, on_sig_received, mainloop);
   g_idle_add (nested_idle, mainloop);
 
-  xmain_loop_run (mainloop);
+  g_main_loop_run (mainloop);
   g_assert_cmpint (sig_counter, ==, 2);
 
-  xmain_loop_unref (mainloop);
+  g_main_loop_unref (mainloop);
 }
 
-static xboolean_t
-on_sigwinch_received (xpointer_t data)
+static gboolean
+on_sigwinch_received (gpointer data)
 {
-  xmain_loop_t *loop = (xmain_loop_t *) data;
+  GMainLoop *loop = (GMainLoop *) data;
 
   sig_counter ++;
 
   if (sig_counter == 1)
     kill (getpid (), SIGWINCH);
   else if (sig_counter == 2)
-    xmain_loop_quit (loop);
+    g_main_loop_quit (loop);
   else if (sig_counter > 2)
     g_assert_not_reached ();
 
@@ -273,34 +273,34 @@ test_callback_after_signal (void)
    * In other words a new signal is never merged with the one being currently
    * dispatched or whose dispatch had already finished. */
 
-  xmain_loop_t *mainloop;
-  xmain_context_t *context;
-  xsource_t *source;
+  GMainLoop *mainloop;
+  GMainContext *context;
+  GSource *source;
 
   sig_counter = 0;
 
-  context = xmain_context_new ();
-  mainloop = xmain_loop_new (context, FALSE);
+  context = g_main_context_new ();
+  mainloop = g_main_loop_new (context, FALSE);
 
   source = g_unix_signal_source_new (SIGWINCH);
-  xsource_set_callback (source, on_sigwinch_received, mainloop, NULL);
-  xsource_attach (source, context);
-  xsource_unref (source);
+  g_source_set_callback (source, on_sigwinch_received, mainloop, NULL);
+  g_source_attach (source, context);
+  g_source_unref (source);
 
   g_assert_cmpint (sig_counter, ==, 0);
   kill (getpid (), SIGWINCH);
-  xmain_loop_run (mainloop);
+  g_main_loop_run (mainloop);
   g_assert_cmpint (sig_counter, ==, 2);
 
-  xmain_loop_unref (mainloop);
-  xmain_context_unref (context);
+  g_main_loop_unref (mainloop);
+  g_main_context_unref (context);
 }
 
 static void
 test_get_passwd_entry_root (void)
 {
   struct passwd *pwd;
-  xerror_t *local_error = NULL;
+  GError *local_error = NULL;
 
   g_test_summary ("Tests that g_unix_get_passwd_entry() works for a "
                   "known-existing username.");
@@ -318,7 +318,7 @@ static void
 test_get_passwd_entry_nonexistent (void)
 {
   struct passwd *pwd;
-  xerror_t *local_error = NULL;
+  GError *local_error = NULL;
 
   g_test_summary ("Tests that g_unix_get_passwd_entry() returns an error for a "
                   "nonexistent username.");

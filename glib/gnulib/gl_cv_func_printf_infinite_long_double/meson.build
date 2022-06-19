@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# test_t whether the *printf family of functions supports infinite and NaN
+# Test whether the *printf family of functions supports infinite and NaN
 # 'long double' arguments in the %f, %e, %g directives. (ISO C99, POSIX:2001)
 # Result is gl_cv_func_printf_infinite_long_double.
 

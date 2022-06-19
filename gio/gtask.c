@@ -35,34 +35,34 @@
  * @short_description: Cancellable synchronous or asynchronous task
  *     and result
  * @include: gio/gio.h
- * @see_also: #xasync_result_t
+ * @see_also: #GAsyncResult
  *
- * A #xtask_t represents and manages a cancellable "task".
+ * A #GTask represents and manages a cancellable "task".
  *
  * ## Asynchronous operations
  *
- * The most common usage of #xtask_t is as a #xasync_result_t, to
+ * The most common usage of #GTask is as a #GAsyncResult, to
  * manage data during an asynchronous operation. You call
- * xtask_new() in the "start" method, followed by
- * xtask_set_task_data() and the like if you need to keep some
+ * g_task_new() in the "start" method, followed by
+ * g_task_set_task_data() and the like if you need to keep some
  * additional data associated with the task, and then pass the
  * task object around through your asynchronous operation.
  * Eventually, you will call a method such as
- * xtask_return_pointer() or xtask_return_error(), which will
+ * g_task_return_pointer() or g_task_return_error(), which will
  * save the value you give it and then invoke the task's callback
  * function in the
  * [thread-default main context][g-main-context-push-thread-default]
  * where it was created (waiting until the next iteration of the main
- * loop first, if necessary). The caller will pass the #xtask_t back to
- * the operation's finish function (as a #xasync_result_t), and you can
- * use xtask_propagate_pointer() or the like to extract the
+ * loop first, if necessary). The caller will pass the #GTask back to
+ * the operation's finish function (as a #GAsyncResult), and you can
+ * use g_task_propagate_pointer() or the like to extract the
  * return value.
  *
- * Using #xtask_t requires the thread-default #xmain_context_t from when the
- * #xtask_t was constructed to be running at least until the task has completed
+ * Using #GTask requires the thread-default #GMainContext from when the
+ * #GTask was constructed to be running at least until the task has completed
  * and its data has been freed.
  *
- * Here is an example for using xtask_t as a xasync_result_t:
+ * Here is an example for using GTask as a GAsyncResult:
  * |[<!-- language="C" -->
  *     typedef struct {
  *       CakeFrostingType frosting;
@@ -78,54 +78,54 @@
  *
  *     static void
  *     baked_cb (Cake     *cake,
- *               xpointer_t  user_data)
+ *               gpointer  user_data)
  *     {
- *       xtask_t *task = user_data;
- *       DecorationData *decoration = xtask_get_task_data (task);
- *       xerror_t *error = NULL;
+ *       GTask *task = user_data;
+ *       DecorationData *decoration = g_task_get_task_data (task);
+ *       GError *error = NULL;
  *
  *       if (cake == NULL)
  *         {
- *           xtask_return_new_error (task, BAKER_ERROR, BAKER_ERROR_NO_FLOUR,
+ *           g_task_return_new_error (task, BAKER_ERROR, BAKER_ERROR_NO_FLOUR,
  *                                    "Go to the supermarket");
- *           xobject_unref (task);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
  *       if (!cake_decorate (cake, decoration->frosting, decoration->message, &error))
  *         {
- *           xobject_unref (cake);
- *           // xtask_return_error() takes ownership of error
- *           xtask_return_error (task, error);
- *           xobject_unref (task);
+ *           g_object_unref (cake);
+ *           // g_task_return_error() takes ownership of error
+ *           g_task_return_error (task, error);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
- *       xtask_return_pointer (task, cake, xobject_unref);
- *       xobject_unref (task);
+ *       g_task_return_pointer (task, cake, g_object_unref);
+ *       g_object_unref (task);
  *     }
  *
  *     void
  *     baker_bake_cake_async (Baker               *self,
- *                            xuint_t                radius,
+ *                            guint                radius,
  *                            CakeFlavor           flavor,
  *                            CakeFrostingType     frosting,
  *                            const char          *message,
- *                            xcancellable_t        *cancellable,
- *                            xasync_ready_callback_t  callback,
- *                            xpointer_t             user_data)
+ *                            GCancellable        *cancellable,
+ *                            GAsyncReadyCallback  callback,
+ *                            gpointer             user_data)
  *     {
- *       xtask_t *task;
+ *       GTask *task;
  *       DecorationData *decoration;
  *       Cake  *cake;
  *
- *       task = xtask_new (self, cancellable, callback, user_data);
+ *       task = g_task_new (self, cancellable, callback, user_data);
  *       if (radius < 3)
  *         {
- *           xtask_return_new_error (task, BAKER_ERROR, BAKER_ERROR_TOO_SMALL,
+ *           g_task_return_new_error (task, BAKER_ERROR, BAKER_ERROR_TOO_SMALL,
  *                                    "%ucm radius cakes are silly",
  *                                    radius);
- *           xobject_unref (task);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
@@ -133,41 +133,41 @@
  *       if (cake != NULL)
  *         {
  *           // _baker_get_cached_cake() returns a reffed cake
- *           xtask_return_pointer (task, cake, xobject_unref);
- *           xobject_unref (task);
+ *           g_task_return_pointer (task, cake, g_object_unref);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
  *       decoration = g_slice_new (DecorationData);
  *       decoration->frosting = frosting;
- *       decoration->message = xstrdup (message);
- *       xtask_set_task_data (task, decoration, (xdestroy_notify_t) decoration_data_free);
+ *       decoration->message = g_strdup (message);
+ *       g_task_set_task_data (task, decoration, (GDestroyNotify) decoration_data_free);
  *
  *       _baker_begin_cake (self, radius, flavor, cancellable, baked_cb, task);
  *     }
  *
  *     Cake *
  *     baker_bake_cake_finish (Baker         *self,
- *                             xasync_result_t  *result,
- *                             xerror_t       **error)
+ *                             GAsyncResult  *result,
+ *                             GError       **error)
  *     {
- *       xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
+ *       g_return_val_if_fail (g_task_is_valid (result, self), NULL);
  *
- *       return xtask_propagate_pointer (XTASK (result), error);
+ *       return g_task_propagate_pointer (G_TASK (result), error);
  *     }
  * ]|
  *
  * ## Chained asynchronous operations
  *
- * #xtask_t also tries to simplify asynchronous operations that
+ * #GTask also tries to simplify asynchronous operations that
  * internally chain together several smaller asynchronous
- * operations. xtask_get_cancellable(), xtask_get_context(),
- * and xtask_get_priority() allow you to get back the task's
- * #xcancellable_t, #xmain_context_t, and [I/O priority][io-priority]
+ * operations. g_task_get_cancellable(), g_task_get_context(),
+ * and g_task_get_priority() allow you to get back the task's
+ * #GCancellable, #GMainContext, and [I/O priority][io-priority]
  * when starting a new subtask, so you don't have to keep track
- * of them yourself. xtask_attach_source() simplifies the case
+ * of them yourself. g_task_attach_source() simplifies the case
  * of waiting for a source to fire (automatically using the correct
- * #xmain_context_t and priority).
+ * #GMainContext and priority).
  *
  * Here is an example for chained asynchronous operations:
  *   |[<!-- language="C" -->
@@ -181,68 +181,68 @@
  *     decoration_data_free (BakingData *bd)
  *     {
  *       if (bd->cake)
- *         xobject_unref (bd->cake);
+ *         g_object_unref (bd->cake);
  *       g_free (bd->message);
  *       g_slice_free (BakingData, bd);
  *     }
  *
  *     static void
  *     decorated_cb (Cake         *cake,
- *                   xasync_result_t *result,
- *                   xpointer_t      user_data)
+ *                   GAsyncResult *result,
+ *                   gpointer      user_data)
  *     {
- *       xtask_t *task = user_data;
- *       xerror_t *error = NULL;
+ *       GTask *task = user_data;
+ *       GError *error = NULL;
  *
  *       if (!cake_decorate_finish (cake, result, &error))
  *         {
- *           xobject_unref (cake);
- *           xtask_return_error (task, error);
- *           xobject_unref (task);
+ *           g_object_unref (cake);
+ *           g_task_return_error (task, error);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
  *       // baking_data_free() will drop its ref on the cake, so we have to
  *       // take another here to give to the caller.
- *       xtask_return_pointer (task, xobject_ref (cake), xobject_unref);
- *       xobject_unref (task);
+ *       g_task_return_pointer (task, g_object_ref (cake), g_object_unref);
+ *       g_object_unref (task);
  *     }
  *
- *     static xboolean_t
- *     decorator_ready (xpointer_t user_data)
+ *     static gboolean
+ *     decorator_ready (gpointer user_data)
  *     {
- *       xtask_t *task = user_data;
- *       BakingData *bd = xtask_get_task_data (task);
+ *       GTask *task = user_data;
+ *       BakingData *bd = g_task_get_task_data (task);
  *
  *       cake_decorate_async (bd->cake, bd->frosting, bd->message,
- *                            xtask_get_cancellable (task),
+ *                            g_task_get_cancellable (task),
  *                            decorated_cb, task);
  *
- *       return XSOURCE_REMOVE;
+ *       return G_SOURCE_REMOVE;
  *     }
  *
  *     static void
  *     baked_cb (Cake     *cake,
- *               xpointer_t  user_data)
+ *               gpointer  user_data)
  *     {
- *       xtask_t *task = user_data;
- *       BakingData *bd = xtask_get_task_data (task);
- *       xerror_t *error = NULL;
+ *       GTask *task = user_data;
+ *       BakingData *bd = g_task_get_task_data (task);
+ *       GError *error = NULL;
  *
  *       if (cake == NULL)
  *         {
- *           xtask_return_new_error (task, BAKER_ERROR, BAKER_ERROR_NO_FLOUR,
+ *           g_task_return_new_error (task, BAKER_ERROR, BAKER_ERROR_NO_FLOUR,
  *                                    "Go to the supermarket");
- *           xobject_unref (task);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
  *       bd->cake = cake;
  *
  *       // Bail out now if the user has already cancelled
- *       if (xtask_return_error_if_cancelled (task))
+ *       if (g_task_return_error_if_cancelled (task))
  *         {
- *           xobject_unref (task);
+ *           g_object_unref (task);
  *           return;
  *         }
  *
@@ -250,64 +250,64 @@
  *         decorator_ready (task);
  *       else
  *         {
- *           xsource_t *source;
+ *           GSource *source;
  *
  *           source = cake_decorator_wait_source_new (cake);
- *           // Attach @source to @task's xmain_context_t and have it call
+ *           // Attach @source to @task's GMainContext and have it call
  *           // decorator_ready() when it is ready.
- *           xtask_attach_source (task, source, decorator_ready);
- *           xsource_unref (source);
+ *           g_task_attach_source (task, source, decorator_ready);
+ *           g_source_unref (source);
  *         }
  *     }
  *
  *     void
  *     baker_bake_cake_async (Baker               *self,
- *                            xuint_t                radius,
+ *                            guint                radius,
  *                            CakeFlavor           flavor,
  *                            CakeFrostingType     frosting,
  *                            const char          *message,
- *                            xint_t                 priority,
- *                            xcancellable_t        *cancellable,
- *                            xasync_ready_callback_t  callback,
- *                            xpointer_t             user_data)
+ *                            gint                 priority,
+ *                            GCancellable        *cancellable,
+ *                            GAsyncReadyCallback  callback,
+ *                            gpointer             user_data)
  *     {
- *       xtask_t *task;
+ *       GTask *task;
  *       BakingData *bd;
  *
- *       task = xtask_new (self, cancellable, callback, user_data);
- *       xtask_set_priority (task, priority);
+ *       task = g_task_new (self, cancellable, callback, user_data);
+ *       g_task_set_priority (task, priority);
  *
  *       bd = g_slice_new0 (BakingData);
  *       bd->frosting = frosting;
- *       bd->message = xstrdup (message);
- *       xtask_set_task_data (task, bd, (xdestroy_notify_t) baking_data_free);
+ *       bd->message = g_strdup (message);
+ *       g_task_set_task_data (task, bd, (GDestroyNotify) baking_data_free);
  *
  *       _baker_begin_cake (self, radius, flavor, cancellable, baked_cb, task);
  *     }
  *
  *     Cake *
  *     baker_bake_cake_finish (Baker         *self,
- *                             xasync_result_t  *result,
- *                             xerror_t       **error)
+ *                             GAsyncResult  *result,
+ *                             GError       **error)
  *     {
- *       xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
+ *       g_return_val_if_fail (g_task_is_valid (result, self), NULL);
  *
- *       return xtask_propagate_pointer (XTASK (result), error);
+ *       return g_task_propagate_pointer (G_TASK (result), error);
  *     }
  * ]|
  *
  * ## Asynchronous operations from synchronous ones
  *
- * You can use xtask_run_in_thread() to turn a synchronous
+ * You can use g_task_run_in_thread() to turn a synchronous
  * operation into an asynchronous one, by running it in a thread.
  * When it completes, the result will be dispatched to the
  * [thread-default main context][g-main-context-push-thread-default]
- * where the #xtask_t was created.
+ * where the #GTask was created.
  *
  * Running a task in a thread:
  *   |[<!-- language="C" -->
  *     typedef struct {
- *       xuint_t radius;
+ *       guint radius;
  *       CakeFlavor flavor;
  *       CakeFrostingType frosting;
  *       char *message;
@@ -321,66 +321,66 @@
  *     }
  *
  *     static void
- *     bake_cake_thread (xtask_t         *task,
- *                       xpointer_t       source_object,
- *                       xpointer_t       task_data,
- *                       xcancellable_t  *cancellable)
+ *     bake_cake_thread (GTask         *task,
+ *                       gpointer       source_object,
+ *                       gpointer       task_data,
+ *                       GCancellable  *cancellable)
  *     {
  *       Baker *self = source_object;
  *       CakeData *cake_data = task_data;
  *       Cake *cake;
- *       xerror_t *error = NULL;
+ *       GError *error = NULL;
  *
  *       cake = bake_cake (baker, cake_data->radius, cake_data->flavor,
  *                         cake_data->frosting, cake_data->message,
  *                         cancellable, &error);
  *       if (cake)
- *         xtask_return_pointer (task, cake, xobject_unref);
+ *         g_task_return_pointer (task, cake, g_object_unref);
  *       else
- *         xtask_return_error (task, error);
+ *         g_task_return_error (task, error);
  *     }
  *
  *     void
  *     baker_bake_cake_async (Baker               *self,
- *                            xuint_t                radius,
+ *                            guint                radius,
  *                            CakeFlavor           flavor,
  *                            CakeFrostingType     frosting,
  *                            const char          *message,
- *                            xcancellable_t        *cancellable,
- *                            xasync_ready_callback_t  callback,
- *                            xpointer_t             user_data)
+ *                            GCancellable        *cancellable,
+ *                            GAsyncReadyCallback  callback,
+ *                            gpointer             user_data)
  *     {
  *       CakeData *cake_data;
- *       xtask_t *task;
+ *       GTask *task;
  *
  *       cake_data = g_slice_new (CakeData);
  *       cake_data->radius = radius;
  *       cake_data->flavor = flavor;
  *       cake_data->frosting = frosting;
- *       cake_data->message = xstrdup (message);
- *       task = xtask_new (self, cancellable, callback, user_data);
- *       xtask_set_task_data (task, cake_data, (xdestroy_notify_t) cake_data_free);
- *       xtask_run_in_thread (task, bake_cake_thread);
- *       xobject_unref (task);
+ *       cake_data->message = g_strdup (message);
+ *       task = g_task_new (self, cancellable, callback, user_data);
+ *       g_task_set_task_data (task, cake_data, (GDestroyNotify) cake_data_free);
+ *       g_task_run_in_thread (task, bake_cake_thread);
+ *       g_object_unref (task);
  *     }
  *
  *     Cake *
  *     baker_bake_cake_finish (Baker         *self,
- *                             xasync_result_t  *result,
- *                             xerror_t       **error)
+ *                             GAsyncResult  *result,
+ *                             GError       **error)
  *     {
- *       xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
+ *       g_return_val_if_fail (g_task_is_valid (result, self), NULL);
  *
- *       return xtask_propagate_pointer (XTASK (result), error);
+ *       return g_task_propagate_pointer (G_TASK (result), error);
  *     }
  * ]|
  *
  * ## Adding cancellability to uncancellable tasks
- *
- * Finally, xtask_run_in_thread() and xtask_run_in_thread_sync()
+ * 
+ * Finally, g_task_run_in_thread() and g_task_run_in_thread_sync()
  * can be used to turn an uncancellable operation into a
- * cancellable one. If you call xtask_set_return_on_cancel(),
- * passing %TRUE, then if the task's #xcancellable_t is cancelled,
+ * cancellable one. If you call g_task_set_return_on_cancel(),
+ * passing %TRUE, then if the task's #GCancellable is cancelled,
  * it will return control back to the caller immediately, while
  * allowing the task thread to continue running in the background
  * (and simply discarding its result when it finally does finish).
@@ -392,215 +392,215 @@
  * Cancelling a task:
  *   |[<!-- language="C" -->
  *     static void
- *     bake_cake_thread (xtask_t         *task,
- *                       xpointer_t       source_object,
- *                       xpointer_t       task_data,
- *                       xcancellable_t  *cancellable)
+ *     bake_cake_thread (GTask         *task,
+ *                       gpointer       source_object,
+ *                       gpointer       task_data,
+ *                       GCancellable  *cancellable)
  *     {
  *       Baker *self = source_object;
  *       CakeData *cake_data = task_data;
  *       Cake *cake;
- *       xerror_t *error = NULL;
+ *       GError *error = NULL;
  *
  *       cake = bake_cake (baker, cake_data->radius, cake_data->flavor,
  *                         cake_data->frosting, cake_data->message,
  *                         &error);
  *       if (error)
  *         {
- *           xtask_return_error (task, error);
+ *           g_task_return_error (task, error);
  *           return;
  *         }
  *
  *       // If the task has already been cancelled, then we don't want to add
  *       // the cake to the cake cache. Likewise, we don't  want to have the
  *       // task get cancelled in the middle of updating the cache.
- *       // xtask_set_return_on_cancel() will return %TRUE here if it managed
+ *       // g_task_set_return_on_cancel() will return %TRUE here if it managed
  *       // to disable return-on-cancel, or %FALSE if the task was cancelled
  *       // before it could.
- *       if (xtask_set_return_on_cancel (task, FALSE))
+ *       if (g_task_set_return_on_cancel (task, FALSE))
  *         {
  *           // If the caller cancels at this point, their
- *           // xasync_ready_callback_t won't be invoked until we return,
+ *           // GAsyncReadyCallback won't be invoked until we return,
  *           // so we don't have to worry that this code will run at
  *           // the same time as that code does. But if there were
  *           // other functions that might look at the cake cache,
- *           // then we'd probably need a xmutex_t here as well.
+ *           // then we'd probably need a GMutex here as well.
  *           baker_add_cake_to_cache (baker, cake);
- *           xtask_return_pointer (task, cake, xobject_unref);
+ *           g_task_return_pointer (task, cake, g_object_unref);
  *         }
  *     }
  *
  *     void
  *     baker_bake_cake_async (Baker               *self,
- *                            xuint_t                radius,
+ *                            guint                radius,
  *                            CakeFlavor           flavor,
  *                            CakeFrostingType     frosting,
  *                            const char          *message,
- *                            xcancellable_t        *cancellable,
- *                            xasync_ready_callback_t  callback,
- *                            xpointer_t             user_data)
+ *                            GCancellable        *cancellable,
+ *                            GAsyncReadyCallback  callback,
+ *                            gpointer             user_data)
  *     {
  *       CakeData *cake_data;
- *       xtask_t *task;
+ *       GTask *task;
  *
  *       cake_data = g_slice_new (CakeData);
  *
  *       ...
  *
- *       task = xtask_new (self, cancellable, callback, user_data);
- *       xtask_set_task_data (task, cake_data, (xdestroy_notify_t) cake_data_free);
- *       xtask_set_return_on_cancel (task, TRUE);
- *       xtask_run_in_thread (task, bake_cake_thread);
+ *       task = g_task_new (self, cancellable, callback, user_data);
+ *       g_task_set_task_data (task, cake_data, (GDestroyNotify) cake_data_free);
+ *       g_task_set_return_on_cancel (task, TRUE);
+ *       g_task_run_in_thread (task, bake_cake_thread);
  *     }
  *
  *     Cake *
  *     baker_bake_cake_sync (Baker               *self,
- *                           xuint_t                radius,
+ *                           guint                radius,
  *                           CakeFlavor           flavor,
  *                           CakeFrostingType     frosting,
  *                           const char          *message,
- *                           xcancellable_t        *cancellable,
- *                           xerror_t             **error)
+ *                           GCancellable        *cancellable,
+ *                           GError             **error)
  *     {
  *       CakeData *cake_data;
- *       xtask_t *task;
+ *       GTask *task;
  *       Cake *cake;
  *
  *       cake_data = g_slice_new (CakeData);
  *
  *       ...
  *
- *       task = xtask_new (self, cancellable, NULL, NULL);
- *       xtask_set_task_data (task, cake_data, (xdestroy_notify_t) cake_data_free);
- *       xtask_set_return_on_cancel (task, TRUE);
- *       xtask_run_in_thread_sync (task, bake_cake_thread);
+ *       task = g_task_new (self, cancellable, NULL, NULL);
+ *       g_task_set_task_data (task, cake_data, (GDestroyNotify) cake_data_free);
+ *       g_task_set_return_on_cancel (task, TRUE);
+ *       g_task_run_in_thread_sync (task, bake_cake_thread);
  *
- *       cake = xtask_propagate_pointer (task, error);
- *       xobject_unref (task);
+ *       cake = g_task_propagate_pointer (task, error);
+ *       g_object_unref (task);
  *       return cake;
  *     }
  * ]|
  *
- * ## Porting from xsimple_async_result_t
- *
- * #xtask_t's API attempts to be simpler than #xsimple_async_result_t's
+ * ## Porting from GSimpleAsyncResult
+ * 
+ * #GTask's API attempts to be simpler than #GSimpleAsyncResult's
  * in several ways:
- * - You can save task-specific data with xtask_set_task_data(), and
- *   retrieve it later with xtask_get_task_data(). This replaces the
- *   abuse of xsimple_async_result_set_op_res_gpointer() for the same
- *   purpose with #xsimple_async_result_t.
- * - In addition to the task data, #xtask_t also keeps track of the
- *   [priority][io-priority], #xcancellable_t, and
- *   #xmain_context_t associated with the task, so tasks that consist of
+ * - You can save task-specific data with g_task_set_task_data(), and
+ *   retrieve it later with g_task_get_task_data(). This replaces the
+ *   abuse of g_simple_async_result_set_op_res_gpointer() for the same
+ *   purpose with #GSimpleAsyncResult.
+ * - In addition to the task data, #GTask also keeps track of the
+ *   [priority][io-priority], #GCancellable, and
+ *   #GMainContext associated with the task, so tasks that consist of
  *   a chain of simpler asynchronous operations will have easy access
  *   to those values when starting each sub-task.
- * - xtask_return_error_if_cancelled() provides simplified
+ * - g_task_return_error_if_cancelled() provides simplified
  *   handling for cancellation. In addition, cancellation
- *   overrides any other #xtask_t return value by default, like
- *   #xsimple_async_result_t does when
- *   xsimple_async_result_set_check_cancellable() is called.
- *   (You can use xtask_set_check_cancellable() to turn off that
- *   behavior.) On the other hand, xtask_run_in_thread()
+ *   overrides any other #GTask return value by default, like
+ *   #GSimpleAsyncResult does when
+ *   g_simple_async_result_set_check_cancellable() is called.
+ *   (You can use g_task_set_check_cancellable() to turn off that
+ *   behavior.) On the other hand, g_task_run_in_thread()
  *   guarantees that it will always run your
- *   `task_func`, even if the task's #xcancellable_t
+ *   `task_func`, even if the task's #GCancellable
  *   is already cancelled before the task gets a chance to run;
  *   you can start your `task_func` with a
- *   xtask_return_error_if_cancelled() check if you need the
+ *   g_task_return_error_if_cancelled() check if you need the
  *   old behavior.
- * - The "return" methods (eg, xtask_return_pointer())
+ * - The "return" methods (eg, g_task_return_pointer())
  *   automatically cause the task to be "completed" as well, and
  *   there is no need to worry about the "complete" vs "complete
- *   in idle" distinction. (#xtask_t automatically figures out
+ *   in idle" distinction. (#GTask automatically figures out
  *   whether the task's callback can be invoked directly, or
- *   if it needs to be sent to another #xmain_context_t, or delayed
- *   until the next iteration of the current #xmain_context_t.)
- * - The "finish" functions for #xtask_t based operations are generally
- *   much simpler than #xsimple_async_result_t ones, normally consisting
- *   of only a single call to xtask_propagate_pointer() or the like.
- *   Since xtask_propagate_pointer() "steals" the return value from
- *   the #xtask_t, it is not necessary to juggle pointers around to
+ *   if it needs to be sent to another #GMainContext, or delayed
+ *   until the next iteration of the current #GMainContext.)
+ * - The "finish" functions for #GTask based operations are generally
+ *   much simpler than #GSimpleAsyncResult ones, normally consisting
+ *   of only a single call to g_task_propagate_pointer() or the like.
+ *   Since g_task_propagate_pointer() "steals" the return value from
+ *   the #GTask, it is not necessary to juggle pointers around to
  *   prevent it from being freed twice.
- * - With #xsimple_async_result_t, it was common to call
- *   xsimple_async_result_propagate_error() from the
+ * - With #GSimpleAsyncResult, it was common to call
+ *   g_simple_async_result_propagate_error() from the
  *   `_finish()` wrapper function, and have
  *   virtual method implementations only deal with successful
  *   returns. This behavior is deprecated, because it makes it
  *   difficult for a subclass to chain to a parent class's async
  *   methods. Instead, the wrapper function should just be a
  *   simple wrapper, and the virtual method should call an
- *   appropriate `xtask_propagate_` function.
+ *   appropriate `g_task_propagate_` function.
  *   Note that wrapper methods can now use
- *   xasync_result_legacy_propagate_error() to do old-style
- *   #xsimple_async_result_t error-returning behavior, and
- *   xasync_result_is_tagged() to check if a result is tagged as
+ *   g_async_result_legacy_propagate_error() to do old-style
+ *   #GSimpleAsyncResult error-returning behavior, and
+ *   g_async_result_is_tagged() to check if a result is tagged as
  *   having come from the `_async()` wrapper
  *   function (for "short-circuit" results, such as when passing
- *   0 to xinput_stream_read_async()).
+ *   0 to g_input_stream_read_async()).
  */
 
 /**
- * xtask_t:
+ * GTask:
  *
  * The opaque object representing a synchronous or asynchronous task
  * and its result.
  */
 
 struct _GTask {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xpointer_t source_object;
-  xpointer_t source_tag;
-  xchar_t *name;  /* (owned); may only be modified before the #xtask_t is threaded */
+  gpointer source_object;
+  gpointer source_tag;
+  gchar *name;  /* (owned); may only be modified before the #GTask is threaded */
 
-  xpointer_t task_data;
-  xdestroy_notify_t task_data_destroy;
+  gpointer task_data;
+  GDestroyNotify task_data_destroy;
 
-  xmain_context_t *context;
-  sint64_t creation_time;
-  xint_t priority;
-  xcancellable_t *cancellable;
+  GMainContext *context;
+  gint64 creation_time;
+  gint priority;
+  GCancellable *cancellable;
 
-  xasync_ready_callback_t callback;
-  xpointer_t callback_data;
+  GAsyncReadyCallback callback;
+  gpointer callback_data;
 
-  xtask_thread_func_t task_func;
-  xmutex_t lock;
-  xcond_t cond;
+  GTaskThreadFunc task_func;
+  GMutex lock;
+  GCond cond;
 
   /* This can’t be in the bit field because we access it from TRACE(). */
-  xboolean_t thread_cancelled;
+  gboolean thread_cancelled;
 
   /* Protected by the lock when task is threaded: */
-  xboolean_t thread_complete : 1;
-  xboolean_t return_on_cancel : 1;
-  xboolean_t : 0;
+  gboolean thread_complete : 1;
+  gboolean return_on_cancel : 1;
+  gboolean : 0;
 
   /* Unprotected, but written to when task runs in thread: */
-  xboolean_t completed : 1;
-  xboolean_t had_error : 1;
-  xboolean_t result_set : 1;
-  xboolean_t ever_returned : 1;
-  xboolean_t : 0;
+  gboolean completed : 1;
+  gboolean had_error : 1;
+  gboolean result_set : 1;
+  gboolean ever_returned : 1;
+  gboolean : 0;
 
   /* Read-only once task runs in thread: */
-  xboolean_t check_cancellable : 1;
-  xboolean_t synchronous : 1;
-  xboolean_t blocking_other_task : 1;
+  gboolean check_cancellable : 1;
+  gboolean synchronous : 1;
+  gboolean blocking_other_task : 1;
 
-  xerror_t *error;
+  GError *error;
   union {
-    xpointer_t pointer;
-    xssize_t   size;
-    xboolean_t boolean;
+    gpointer pointer;
+    gssize   size;
+    gboolean boolean;
   } result;
-  xdestroy_notify_t result_destroy;
+  GDestroyNotify result_destroy;
 };
 
-#define XTASK_IS_THREADED(task) ((task)->task_func != NULL)
+#define G_TASK_IS_THREADED(task) ((task)->task_func != NULL)
 
-struct _xtask_class
+struct _GTaskClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
 typedef enum
@@ -608,23 +608,23 @@ typedef enum
   PROP_COMPLETED = 1,
 } GTaskProperty;
 
-static void xtask_async_result_iface_init (xasync_result_iface_t *iface);
-static void xtask_thread_pool_init (void);
+static void g_task_async_result_iface_init (GAsyncResultIface *iface);
+static void g_task_thread_pool_init (void);
 
-G_DEFINE_TYPE_WITH_CODE (xtask, xtask, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_ASYNC_RESULT,
-                                                xtask_async_result_iface_init);
-                         xtask_thread_pool_init ();)
+G_DEFINE_TYPE_WITH_CODE (GTask, g_task, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_ASYNC_RESULT,
+                                                g_task_async_result_iface_init);
+                         g_task_thread_pool_init ();)
 
 static GThreadPool *task_pool;
-static xmutex_t task_pool_mutex;
-static xprivate_t task_private = G_PRIVATE_INIT (NULL);
-static xsource_t *task_pool_manager;
-static xuint64_t task_wait_time;
-static xint_t tasks_running;
+static GMutex task_pool_mutex;
+static GPrivate task_private = G_PRIVATE_INIT (NULL);
+static GSource *task_pool_manager;
+static guint64 task_wait_time;
+static gint tasks_running;
 
-static xuint_t task_pool_max_counter;
-static xuint_t tasks_running_counter;
+static guint task_pool_max_counter;
+static guint tasks_running_counter;
 
 /* When the task pool fills up and blocks, and the program keeps
  * queueing more tasks, we will slowly add more threads to the pool
@@ -640,28 +640,28 @@ static xuint_t tasks_running_counter;
  * We specify maximum pool size of 330 to increase the waiting time up
  * to around 30 minutes.
  */
-#define XTASK_POOL_SIZE 10
-#define XTASK_WAIT_TIME_BASE 100000
-#define XTASK_WAIT_TIME_MULTIPLIER 1.03
-#define XTASK_WAIT_TIME_MAX_POOL_SIZE 330
+#define G_TASK_POOL_SIZE 10
+#define G_TASK_WAIT_TIME_BASE 100000
+#define G_TASK_WAIT_TIME_MULTIPLIER 1.03
+#define G_TASK_WAIT_TIME_MAX_POOL_SIZE 330
 
 static void
-xtask_init (xtask_t *task)
+g_task_init (GTask *task)
 {
   task->check_cancellable = TRUE;
 }
 
 static void
-xtask_finalize (xobject_t *object)
+g_task_finalize (GObject *object)
 {
-  xtask_t *task = XTASK (object);
+  GTask *task = G_TASK (object);
 
   g_clear_object (&task->source_object);
   g_clear_object (&task->cancellable);
   g_free (task->name);
 
   if (task->context)
-    xmain_context_unref (task->context);
+    g_main_context_unref (task->context);
 
   if (task->task_data_destroy)
     task->task_data_destroy (task->task_data);
@@ -670,33 +670,33 @@ xtask_finalize (xobject_t *object)
     task->result_destroy (task->result.pointer);
 
   if (task->error)
-      xerror_free (task->error);
+      g_error_free (task->error);
 
-  if (XTASK_IS_THREADED (task))
+  if (G_TASK_IS_THREADED (task))
     {
       g_mutex_clear (&task->lock);
       g_cond_clear (&task->cond);
     }
 
-  XOBJECT_CLASS (xtask_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_task_parent_class)->finalize (object);
 }
 
 /**
- * xtask_new:
- * @source_object: (nullable) (type xobject_t): the #xobject_t that owns
+ * g_task_new:
+ * @source_object: (nullable) (type GObject): the #GObject that owns
  *   this task, or %NULL.
- * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
- * @callback: (scope async): a #xasync_ready_callback_t.
+ * @cancellable: (nullable): optional #GCancellable object, %NULL to ignore.
+ * @callback: (scope async): a #GAsyncReadyCallback.
  * @callback_data: (closure): user data passed to @callback.
  *
- * Creates a #xtask_t acting on @source_object, which will eventually be
+ * Creates a #GTask acting on @source_object, which will eventually be
  * used to invoke @callback in the current
  * [thread-default main context][g-main-context-push-thread-default].
  *
  * Call this in the "start" method of your asynchronous method, and
- * pass the #xtask_t around throughout the asynchronous operation. You
- * can use xtask_set_task_data() to attach task-specific data to the
- * object, which you can retrieve later via xtask_get_task_data().
+ * pass the #GTask around throughout the asynchronous operation. You
+ * can use g_task_set_task_data() to attach task-specific data to the
+ * object, which you can retrieve later via g_task_get_task_data().
  *
  * By default, if @cancellable is cancelled, then the return value of
  * the task will always be %G_IO_ERROR_CANCELLED, even if the task had
@@ -704,31 +704,31 @@ xtask_finalize (xobject_t *object)
  * simplified handling in cases where cancellation may imply that
  * other objects that the task depends on have been destroyed. If you
  * do not want this behavior, you can use
- * xtask_set_check_cancellable() to change it.
+ * g_task_set_check_cancellable() to change it.
  *
- * Returns: a #xtask_t.
+ * Returns: a #GTask.
  *
  * Since: 2.36
  */
-xtask_t *
-xtask_new (xpointer_t              source_object,
-            xcancellable_t         *cancellable,
-            xasync_ready_callback_t   callback,
-            xpointer_t              callback_data)
+GTask *
+g_task_new (gpointer              source_object,
+            GCancellable         *cancellable,
+            GAsyncReadyCallback   callback,
+            gpointer              callback_data)
 {
-  xtask_t *task;
-  xsource_t *source;
+  GTask *task;
+  GSource *source;
 
-  task = xobject_new (XTYPE_TASK, NULL);
-  task->source_object = source_object ? xobject_ref (source_object) : NULL;
-  task->cancellable = cancellable ? xobject_ref (cancellable) : NULL;
+  task = g_object_new (G_TYPE_TASK, NULL);
+  task->source_object = source_object ? g_object_ref (source_object) : NULL;
+  task->cancellable = cancellable ? g_object_ref (cancellable) : NULL;
   task->callback = callback;
   task->callback_data = callback_data;
-  task->context = xmain_context_ref_thread_default ();
+  task->context = g_main_context_ref_thread_default ();
 
   source = g_main_current_source ();
   if (source)
-    task->creation_time = xsource_get_time (source);
+    task->creation_time = g_source_get_time (source);
 
   TRACE (GIO_TASK_NEW (task, source_object, cancellable,
                        callback, callback_data));
@@ -737,102 +737,102 @@ xtask_new (xpointer_t              source_object,
 }
 
 /**
- * xtask_report_error:
- * @source_object: (nullable) (type xobject_t): the #xobject_t that owns
+ * g_task_report_error:
+ * @source_object: (nullable) (type GObject): the #GObject that owns
  *   this task, or %NULL.
- * @callback: (scope async): a #xasync_ready_callback_t.
+ * @callback: (scope async): a #GAsyncReadyCallback.
  * @callback_data: (closure): user data passed to @callback.
  * @source_tag: an opaque pointer indicating the source of this task
  * @error: (transfer full): error to report
  *
- * Creates a #xtask_t and then immediately calls xtask_return_error()
+ * Creates a #GTask and then immediately calls g_task_return_error()
  * on it. Use this in the wrapper function of an asynchronous method
  * when you want to avoid even calling the virtual method. You can
- * then use xasync_result_is_tagged() in the finish method wrapper to
+ * then use g_async_result_is_tagged() in the finish method wrapper to
  * check if the result there is tagged as having been created by the
  * wrapper method, and deal with it appropriately if so.
  *
- * See also xtask_report_new_error().
+ * See also g_task_report_new_error().
  *
  * Since: 2.36
  */
 void
-xtask_report_error (xpointer_t             source_object,
-                     xasync_ready_callback_t  callback,
-                     xpointer_t             callback_data,
-                     xpointer_t             source_tag,
-                     xerror_t              *error)
+g_task_report_error (gpointer             source_object,
+                     GAsyncReadyCallback  callback,
+                     gpointer             callback_data,
+                     gpointer             source_tag,
+                     GError              *error)
 {
-  xtask_t *task;
+  GTask *task;
 
-  task = xtask_new (source_object, NULL, callback, callback_data);
-  xtask_set_source_tag (task, source_tag);
-  xtask_set_name (task, G_STRFUNC);
-  xtask_return_error (task, error);
-  xobject_unref (task);
+  task = g_task_new (source_object, NULL, callback, callback_data);
+  g_task_set_source_tag (task, source_tag);
+  g_task_set_name (task, G_STRFUNC);
+  g_task_return_error (task, error);
+  g_object_unref (task);
 }
 
 /**
- * xtask_report_new_error:
- * @source_object: (nullable) (type xobject_t): the #xobject_t that owns
+ * g_task_report_new_error:
+ * @source_object: (nullable) (type GObject): the #GObject that owns
  *   this task, or %NULL.
- * @callback: (scope async): a #xasync_ready_callback_t.
+ * @callback: (scope async): a #GAsyncReadyCallback.
  * @callback_data: (closure): user data passed to @callback.
  * @source_tag: an opaque pointer indicating the source of this task
- * @domain: a #xquark.
+ * @domain: a #GQuark.
  * @code: an error code.
  * @format: a string with format characters.
  * @...: a list of values to insert into @format.
  *
- * Creates a #xtask_t and then immediately calls
- * xtask_return_new_error() on it. Use this in the wrapper function
+ * Creates a #GTask and then immediately calls
+ * g_task_return_new_error() on it. Use this in the wrapper function
  * of an asynchronous method when you want to avoid even calling the
- * virtual method. You can then use xasync_result_is_tagged() in the
+ * virtual method. You can then use g_async_result_is_tagged() in the
  * finish method wrapper to check if the result there is tagged as
  * having been created by the wrapper method, and deal with it
  * appropriately if so.
  *
- * See also xtask_report_error().
+ * See also g_task_report_error().
  *
  * Since: 2.36
  */
 void
-xtask_report_new_error (xpointer_t             source_object,
-                         xasync_ready_callback_t  callback,
-                         xpointer_t             callback_data,
-                         xpointer_t             source_tag,
-                         xquark               domain,
-                         xint_t                 code,
+g_task_report_new_error (gpointer             source_object,
+                         GAsyncReadyCallback  callback,
+                         gpointer             callback_data,
+                         gpointer             source_tag,
+                         GQuark               domain,
+                         gint                 code,
                          const char          *format,
                          ...)
 {
-  xerror_t *error;
+  GError *error;
   va_list ap;
 
   va_start (ap, format);
-  error = xerror_new_valist (domain, code, format, ap);
+  error = g_error_new_valist (domain, code, format, ap);
   va_end (ap);
 
-  xtask_report_error (source_object, callback, callback_data,
+  g_task_report_error (source_object, callback, callback_data,
                        source_tag, error);
 }
 
 /**
- * xtask_set_task_data:
- * @task: the #xtask_t
+ * g_task_set_task_data:
+ * @task: the #GTask
  * @task_data: (nullable): task-specific data
- * @task_data_destroy: (nullable): #xdestroy_notify_t for @task_data
+ * @task_data_destroy: (nullable): #GDestroyNotify for @task_data
  *
  * Sets @task's task data (freeing the existing task data, if any).
  *
  * Since: 2.36
  */
 void
-xtask_set_task_data (xtask_t          *task,
-                      xpointer_t        task_data,
-                      xdestroy_notify_t  task_data_destroy)
+g_task_set_task_data (GTask          *task,
+                      gpointer        task_data,
+                      GDestroyNotify  task_data_destroy)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
   if (task->task_data_destroy)
     task->task_data_destroy (task->task_data);
@@ -844,25 +844,25 @@ xtask_set_task_data (xtask_t          *task,
 }
 
 /**
- * xtask_set_priority:
- * @task: the #xtask_t
+ * g_task_set_priority:
+ * @task: the #GTask
  * @priority: the [priority][io-priority] of the request
  *
  * Sets @task's priority. If you do not call this, it will default to
  * %G_PRIORITY_DEFAULT.
  *
  * This will affect the priority of #GSources created with
- * xtask_attach_source() and the scheduling of tasks run in threads,
+ * g_task_attach_source() and the scheduling of tasks run in threads,
  * and can also be explicitly retrieved later via
- * xtask_get_priority().
+ * g_task_get_priority().
  *
  * Since: 2.36
  */
 void
-xtask_set_priority (xtask_t *task,
-                     xint_t   priority)
+g_task_set_priority (GTask *task,
+                     gint   priority)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
   task->priority = priority;
 
@@ -870,73 +870,73 @@ xtask_set_priority (xtask_t *task,
 }
 
 /**
- * xtask_set_check_cancellable:
- * @task: the #xtask_t
- * @check_cancellable: whether #xtask_t will check the state of
- *   its #xcancellable_t for you.
+ * g_task_set_check_cancellable:
+ * @task: the #GTask
+ * @check_cancellable: whether #GTask will check the state of
+ *   its #GCancellable for you.
  *
  * Sets or clears @task's check-cancellable flag. If this is %TRUE
- * (the default), then xtask_propagate_pointer(), etc, and
- * xtask_had_error() will check the task's #xcancellable_t first, and
+ * (the default), then g_task_propagate_pointer(), etc, and
+ * g_task_had_error() will check the task's #GCancellable first, and
  * if it has been cancelled, then they will consider the task to have
  * returned an "Operation was cancelled" error
  * (%G_IO_ERROR_CANCELLED), regardless of any other error or return
  * value the task may have had.
  *
- * If @check_cancellable is %FALSE, then the #xtask_t will not check the
+ * If @check_cancellable is %FALSE, then the #GTask will not check the
  * cancellable itself, and it is up to @task's owner to do this (eg,
- * via xtask_return_error_if_cancelled()).
+ * via g_task_return_error_if_cancelled()).
  *
- * If you are using xtask_set_return_on_cancel() as well, then
+ * If you are using g_task_set_return_on_cancel() as well, then
  * you must leave check-cancellable set %TRUE.
  *
  * Since: 2.36
  */
 void
-xtask_set_check_cancellable (xtask_t    *task,
-                              xboolean_t  check_cancellable)
+g_task_set_check_cancellable (GTask    *task,
+                              gboolean  check_cancellable)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
   g_return_if_fail (check_cancellable || !task->return_on_cancel);
 
   task->check_cancellable = check_cancellable;
 }
 
-static void xtask_thread_complete (xtask_t *task);
+static void g_task_thread_complete (GTask *task);
 
 /**
- * xtask_set_return_on_cancel:
- * @task: the #xtask_t
+ * g_task_set_return_on_cancel:
+ * @task: the #GTask
  * @return_on_cancel: whether the task returns automatically when
  *   it is cancelled.
  *
  * Sets or clears @task's return-on-cancel flag. This is only
- * meaningful for tasks run via xtask_run_in_thread() or
- * xtask_run_in_thread_sync().
+ * meaningful for tasks run via g_task_run_in_thread() or
+ * g_task_run_in_thread_sync().
  *
  * If @return_on_cancel is %TRUE, then cancelling @task's
- * #xcancellable_t will immediately cause it to return, as though the
- * task's #xtask_thread_func_t had called
- * xtask_return_error_if_cancelled() and then returned.
+ * #GCancellable will immediately cause it to return, as though the
+ * task's #GTaskThreadFunc had called
+ * g_task_return_error_if_cancelled() and then returned.
  *
  * This allows you to create a cancellable wrapper around an
- * uninterruptible function. The #xtask_thread_func_t just needs to be
+ * uninterruptible function. The #GTaskThreadFunc just needs to be
  * careful that it does not modify any externally-visible state after
  * it has been cancelled. To do that, the thread should call
- * xtask_set_return_on_cancel() again to (atomically) set
+ * g_task_set_return_on_cancel() again to (atomically) set
  * return-on-cancel %FALSE before making externally-visible changes;
  * if the task gets cancelled before the return-on-cancel flag could
- * be changed, xtask_set_return_on_cancel() will indicate this by
+ * be changed, g_task_set_return_on_cancel() will indicate this by
  * returning %FALSE.
  *
  * You can disable and re-enable this flag multiple times if you wish.
- * If the task's #xcancellable_t is cancelled while return-on-cancel is
- * %FALSE, then calling xtask_set_return_on_cancel() to set it %TRUE
+ * If the task's #GCancellable is cancelled while return-on-cancel is
+ * %FALSE, then calling g_task_set_return_on_cancel() to set it %TRUE
  * again will cause the task to be cancelled at that point.
  *
- * If the task's #xcancellable_t is already cancelled before you call
- * xtask_run_in_thread()/xtask_run_in_thread_sync(), then the
- * #xtask_thread_func_t will still be run (for consistency), but the task
+ * If the task's #GCancellable is already cancelled before you call
+ * g_task_run_in_thread()/g_task_run_in_thread_sync(), then the
+ * #GTaskThreadFunc will still be run (for consistency), but the task
  * will also be completed right away.
  *
  * Returns: %TRUE if @task's return-on-cancel flag was changed to
@@ -945,14 +945,14 @@ static void xtask_thread_complete (xtask_t *task);
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_set_return_on_cancel (xtask_t    *task,
-                             xboolean_t  return_on_cancel)
+gboolean
+g_task_set_return_on_cancel (GTask    *task,
+                             gboolean  return_on_cancel)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
-  xreturn_val_if_fail (task->check_cancellable || !return_on_cancel, FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
+  g_return_val_if_fail (task->check_cancellable || !return_on_cancel, FALSE);
 
-  if (!XTASK_IS_THREADED (task))
+  if (!G_TASK_IS_THREADED (task))
     {
       task->return_on_cancel = return_on_cancel;
       return TRUE;
@@ -964,7 +964,7 @@ xtask_set_return_on_cancel (xtask_t    *task,
       if (return_on_cancel && !task->return_on_cancel)
         {
           g_mutex_unlock (&task->lock);
-          xtask_thread_complete (task);
+          g_task_thread_complete (task);
         }
       else
         g_mutex_unlock (&task->lock);
@@ -977,8 +977,8 @@ xtask_set_return_on_cancel (xtask_t    *task,
 }
 
 /**
- * xtask_set_source_tag:
- * @task: the #xtask_t
+ * g_task_set_source_tag:
+ * @task: the #GTask
  * @source_tag: an opaque pointer indicating the source of this task
  *
  * Sets @task's source tag.
@@ -986,7 +986,7 @@ xtask_set_return_on_cancel (xtask_t    *task,
  * You can use this to tag a task return
  * value with a particular pointer (usually a pointer to the function
  * doing the tagging) and then later check it using
- * xtask_get_source_tag() (or xasync_result_is_tagged()) in the
+ * g_task_get_source_tag() (or g_async_result_is_tagged()) in the
  * task's "finish" function, to figure out if the response came from a
  * particular place.
  *
@@ -997,10 +997,10 @@ xtask_set_return_on_cancel (xtask_t    *task,
  * Since: 2.36
  */
 void
-(xtask_set_source_tag) (xtask_t    *task,
-                         xpointer_t  source_tag)
+(g_task_set_source_tag) (GTask    *task,
+                         gpointer  source_tag)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
   task->source_tag = source_tag;
 
@@ -1008,8 +1008,8 @@ void
 }
 
 /**
- * xtask_set_name:
- * @task: a #xtask_t
+ * g_task_set_name:
+ * @task: a #GTask
  * @name: (nullable): a human readable name for the task, or %NULL to unset it
  *
  * Sets @task’s name, used in debugging and profiling. The name defaults to
@@ -1017,60 +1017,60 @@ void
  *
  * The task name should describe in a human readable way what the task does.
  * For example, ‘Open file’ or ‘Connect to network host’. It is used to set the
- * name of the #xsource_t used for idle completion of the task.
+ * name of the #GSource used for idle completion of the task.
  *
  * This function may only be called before the @task is first used in a thread
  * other than the one it was constructed in. It is called automatically by
- * xtask_set_source_tag() if not called already.
+ * g_task_set_source_tag() if not called already.
  *
  * Since: 2.60
  */
 void
-xtask_set_name (xtask_t       *task,
-                 const xchar_t *name)
+g_task_set_name (GTask       *task,
+                 const gchar *name)
 {
-  xchar_t *new_name;
+  gchar *new_name;
 
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
-  new_name = xstrdup (name);
+  new_name = g_strdup (name);
   g_free (task->name);
   task->name = g_steal_pointer (&new_name);
 }
 
 /**
- * xtask_get_source_object:
- * @task: a #xtask_t
+ * g_task_get_source_object:
+ * @task: a #GTask
  *
  * Gets the source object from @task. Like
- * xasync_result_get_source_object(), but does not ref the object.
+ * g_async_result_get_source_object(), but does not ref the object.
  *
- * Returns: (transfer none) (nullable) (type xobject_t): @task's source object, or %NULL
+ * Returns: (transfer none) (nullable) (type GObject): @task's source object, or %NULL
  *
  * Since: 2.36
  */
-xpointer_t
-xtask_get_source_object (xtask_t *task)
+gpointer
+g_task_get_source_object (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
   return task->source_object;
 }
 
-static xobject_t *
-xtask_ref_source_object (xasync_result_t *res)
+static GObject *
+g_task_ref_source_object (GAsyncResult *res)
 {
-  xtask_t *task = XTASK (res);
+  GTask *task = G_TASK (res);
 
   if (task->source_object)
-    return xobject_ref (task->source_object);
+    return g_object_ref (task->source_object);
   else
     return NULL;
 }
 
 /**
- * xtask_get_task_data:
- * @task: a #xtask_t
+ * g_task_get_task_data:
+ * @task: a #GTask
  *
  * Gets @task's `task_data`.
  *
@@ -1078,17 +1078,17 @@ xtask_ref_source_object (xasync_result_t *res)
  *
  * Since: 2.36
  */
-xpointer_t
-xtask_get_task_data (xtask_t *task)
+gpointer
+g_task_get_task_data (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
   return task->task_data;
 }
 
 /**
- * xtask_get_priority:
- * @task: a #xtask_t
+ * g_task_get_priority:
+ * @task: a #GTask
  *
  * Gets @task's priority
  *
@@ -1096,134 +1096,134 @@ xtask_get_task_data (xtask_t *task)
  *
  * Since: 2.36
  */
-xint_t
-xtask_get_priority (xtask_t *task)
+gint
+g_task_get_priority (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), G_PRIORITY_DEFAULT);
+  g_return_val_if_fail (G_IS_TASK (task), G_PRIORITY_DEFAULT);
 
   return task->priority;
 }
 
 /**
- * xtask_get_context:
- * @task: a #xtask_t
+ * g_task_get_context:
+ * @task: a #GTask
  *
- * Gets the #xmain_context_t that @task will return its result in (that
+ * Gets the #GMainContext that @task will return its result in (that
  * is, the context that was the
  * [thread-default main context][g-main-context-push-thread-default]
  * at the point when @task was created).
  *
  * This will always return a non-%NULL value, even if the task's
- * context is the default #xmain_context_t.
+ * context is the default #GMainContext.
  *
- * Returns: (transfer none): @task's #xmain_context_t
+ * Returns: (transfer none): @task's #GMainContext
  *
  * Since: 2.36
  */
-xmain_context_t *
-xtask_get_context (xtask_t *task)
+GMainContext *
+g_task_get_context (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
   return task->context;
 }
 
 /**
- * xtask_get_cancellable:
- * @task: a #xtask_t
+ * g_task_get_cancellable:
+ * @task: a #GTask
  *
- * Gets @task's #xcancellable_t
+ * Gets @task's #GCancellable
  *
- * Returns: (transfer none): @task's #xcancellable_t
+ * Returns: (transfer none): @task's #GCancellable
  *
  * Since: 2.36
  */
-xcancellable_t *
-xtask_get_cancellable (xtask_t *task)
+GCancellable *
+g_task_get_cancellable (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
   return task->cancellable;
 }
 
 /**
- * xtask_get_check_cancellable:
- * @task: the #xtask_t
+ * g_task_get_check_cancellable:
+ * @task: the #GTask
  *
  * Gets @task's check-cancellable flag. See
- * xtask_set_check_cancellable() for more details.
+ * g_task_set_check_cancellable() for more details.
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_get_check_cancellable (xtask_t *task)
+gboolean
+g_task_get_check_cancellable (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
 
   /* Convert from a bit field to a boolean. */
   return task->check_cancellable ? TRUE : FALSE;
 }
 
 /**
- * xtask_get_return_on_cancel:
- * @task: the #xtask_t
+ * g_task_get_return_on_cancel:
+ * @task: the #GTask
  *
  * Gets @task's return-on-cancel flag. See
- * xtask_set_return_on_cancel() for more details.
+ * g_task_set_return_on_cancel() for more details.
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_get_return_on_cancel (xtask_t *task)
+gboolean
+g_task_get_return_on_cancel (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
 
   /* Convert from a bit field to a boolean. */
   return task->return_on_cancel ? TRUE : FALSE;
 }
 
 /**
- * xtask_get_source_tag:
- * @task: a #xtask_t
+ * g_task_get_source_tag:
+ * @task: a #GTask
  *
- * Gets @task's source tag. See xtask_set_source_tag().
+ * Gets @task's source tag. See g_task_set_source_tag().
  *
  * Returns: (transfer none): @task's source tag
  *
  * Since: 2.36
  */
-xpointer_t
-xtask_get_source_tag (xtask_t *task)
+gpointer
+g_task_get_source_tag (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
   return task->source_tag;
 }
 
 /**
- * xtask_get_name:
- * @task: a #xtask_t
+ * g_task_get_name:
+ * @task: a #GTask
  *
- * Gets @task’s name. See xtask_set_name().
+ * Gets @task’s name. See g_task_set_name().
  *
  * Returns: (nullable) (transfer none): @task’s name, or %NULL
  * Since: 2.60
  */
-const xchar_t *
-xtask_get_name (xtask_t *task)
+const gchar *
+g_task_get_name (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
   return task->name;
 }
 
 static void
-xtask_return_now (xtask_t *task)
+g_task_return_now (GTask *task)
 {
   TRACE (GIO_TASK_BEFORE_RETURN (task, task->source_object, task->callback,
                                  task->callback_data));
 
-  xmain_context_push_thread_default (task->context);
+  g_main_context_push_thread_default (task->context);
 
   if (task->callback != NULL)
     {
@@ -1233,36 +1233,35 @@ xtask_return_now (xtask_t *task)
     }
 
   task->completed = TRUE;
-  xobject_notify (G_OBJECT (task), "completed");
+  g_object_notify (G_OBJECT (task), "completed");
 
-  xmain_context_pop_thread_default (task->context);
+  g_main_context_pop_thread_default (task->context);
 }
 
-static xboolean_t
-complete_in_idle_cb (xpointer_t task)
+static gboolean
+complete_in_idle_cb (gpointer task)
 {
-  xtask_return_now (task);
-  xobject_unref (task);
+  g_task_return_now (task);
+  g_object_unref (task);
   return FALSE;
 }
 
 typedef enum {
-  XTASK_RETURN_SUCCESS,
-  XTASK_RETURN_ERROR,
-  XTASK_RETURN_FROM_THREAD
-} xtask_return_type_t;
+  G_TASK_RETURN_SUCCESS,
+  G_TASK_RETURN_ERROR,
+  G_TASK_RETURN_FROM_THREAD
+} GTaskReturnType;
 
 static void
-xtask_return (xtask_t           *task,
-               xtask_return_type_t  type)
+g_task_return (GTask           *task,
+               GTaskReturnType  type)
 {
-  xsource_t *source;
-  xchar_t *source_name = NULL;
+  GSource *source;
 
-  if (type != XTASK_RETURN_FROM_THREAD)
+  if (type != G_TASK_RETURN_FROM_THREAD)
     task->ever_returned = TRUE;
 
-  if (type == XTASK_RETURN_SUCCESS)
+  if (type == G_TASK_RETURN_SUCCESS)
     task->result_set = TRUE;
 
   if (task->synchronous)
@@ -1273,32 +1272,32 @@ xtask_return (xtask_t           *task,
    * want to wait until after the task_func returns, to simplify
    * locking/refcounting/etc.
    */
-  if (XTASK_IS_THREADED (task) && type != XTASK_RETURN_FROM_THREAD)
+  if (G_TASK_IS_THREADED (task) && type != G_TASK_RETURN_FROM_THREAD)
     return;
 
-  xobject_ref (task);
+  g_object_ref (task);
 
   /* See if we can complete the task immediately. First, we have to be
-   * running inside the task's thread/xmain_context_t.
+   * running inside the task's thread/GMainContext.
    */
   source = g_main_current_source ();
-  if (source && xsource_get_context (source) == task->context)
+  if (source && g_source_get_context (source) == task->context)
     {
       /* Second, we can only complete immediately if this is not the
        * same iteration of the main loop that the task was created in.
        */
-      if (xsource_get_time (source) > task->creation_time)
+      if (g_source_get_time (source) > task->creation_time)
         {
           /* Finally, if the task has been cancelled, we shouldn't
            * return synchronously from inside the
-           * xcancellable_t::cancelled handler. It's easier to run
+           * GCancellable::cancelled handler. It's easier to run
            * another iteration of the main loop than tracking how the
            * cancellation was handled.
            */
-          if (!xcancellable_is_cancelled (task->cancellable))
+          if (!g_cancellable_is_cancelled (task->cancellable))
             {
-              xtask_return_now (task);
-              xobject_unref (task);
+              g_task_return_now (task);
+              g_object_unref (task);
               return;
             }
         }
@@ -1306,46 +1305,58 @@ xtask_return (xtask_t           *task,
 
   /* Otherwise, complete in the next iteration */
   source = g_idle_source_new ();
-  source_name = xstrdup_printf ("[gio] %s complete_in_idle_cb",
-                                 (task->name != NULL) ? task->name : "(unnamed)");
-  xsource_set_name (source, source_name);
-  g_free (source_name);
-  xtask_attach_source (task, source, complete_in_idle_cb);
-  xsource_unref (source);
+
+  /* Note: in case the task name is NULL we set it as a const string instead
+   * of going through the concat path which is more expensive and may show in the
+   * profiler if g_task_return is called very often
+   */
+  if (task->name == NULL)
+    g_source_set_static_name (source, "[gio] (unnamed) complete_in_idle_cb");
+  else
+    {
+      gchar *source_name;
+
+      source_name = g_strconcat ("[gio] ", task->name, " complete_in_idle_cb", NULL);
+      g_source_set_name (source, source_name);
+      g_free (source_name);
+    }
+
+  g_task_attach_source (task, source, complete_in_idle_cb);
+  g_source_unref (source);
 }
 
 
 /**
- * xtask_thread_func_t:
- * @task: the #xtask_t
- * @source_object: (type xobject_t): @task's source object
+ * GTaskThreadFunc:
+ * @task: the #GTask
+ * @source_object: (type GObject): @task's source object
  * @task_data: @task's task data
- * @cancellable: @task's #xcancellable_t, or %NULL
+ * @cancellable: @task's #GCancellable, or %NULL
  *
  * The prototype for a task function to be run in a thread via
- * xtask_run_in_thread() or xtask_run_in_thread_sync().
+ * g_task_run_in_thread() or g_task_run_in_thread_sync().
  *
  * If the return-on-cancel flag is set on @task, and @cancellable gets
- * cancelled, then the #xtask_t will be completed immediately (as though
- * xtask_return_error_if_cancelled() had been called), without
+ * cancelled, then the #GTask will be completed immediately (as though
+ * g_task_return_error_if_cancelled() had been called), without
  * waiting for the task function to complete. However, the task
  * function will continue running in its thread in the background. The
  * function therefore needs to be careful about how it uses
  * externally-visible state in this case. See
- * xtask_set_return_on_cancel() for more details.
+ * g_task_set_return_on_cancel() for more details.
  *
  * Other than in that case, @task will be completed when the
- * #xtask_thread_func_t returns, not when it calls a
- * `xtask_return_` function.
+ * #GTaskThreadFunc returns, not when it calls a
+ * `g_task_return_` function.
  *
  * Since: 2.36
  */
 
-static void task_thread_cancelled (xcancellable_t *cancellable,
-                                   xpointer_t      user_data);
+static void task_thread_cancelled (GCancellable *cancellable,
+                                   gpointer      user_data);
 
 static void
-xtask_thread_complete (xtask_t *task)
+g_task_thread_complete (GTask *task)
 {
   g_mutex_lock (&task->lock);
   if (task->thread_complete)
@@ -1363,28 +1374,28 @@ xtask_thread_complete (xtask_t *task)
   g_mutex_unlock (&task->lock);
 
   if (task->cancellable)
-    xsignal_handlers_disconnect_by_func (task->cancellable, task_thread_cancelled, task);
+    g_signal_handlers_disconnect_by_func (task->cancellable, task_thread_cancelled, task);
 
   if (task->synchronous)
     g_cond_signal (&task->cond);
   else
-    xtask_return (task, XTASK_RETURN_FROM_THREAD);
+    g_task_return (task, G_TASK_RETURN_FROM_THREAD);
 }
 
-static xboolean_t
-task_pool_manager_timeout (xpointer_t user_data)
+static gboolean
+task_pool_manager_timeout (gpointer user_data)
 {
   g_mutex_lock (&task_pool_mutex);
-  xthread_pool_set_max_threads (task_pool, tasks_running + 1, NULL);
+  g_thread_pool_set_max_threads (task_pool, tasks_running + 1, NULL);
   g_trace_set_int64_counter (task_pool_max_counter, tasks_running + 1);
-  xsource_set_ready_time (task_pool_manager, -1);
+  g_source_set_ready_time (task_pool_manager, -1);
   g_mutex_unlock (&task_pool_mutex);
 
   return TRUE;
 }
 
 static void
-xtask_thread_setup (void)
+g_task_thread_setup (void)
 {
   g_private_set (&task_private, GUINT_TO_POINTER (TRUE));
   g_mutex_lock (&task_pool_mutex);
@@ -1392,35 +1403,35 @@ xtask_thread_setup (void)
 
   g_trace_set_int64_counter (tasks_running_counter, tasks_running);
 
-  if (tasks_running == XTASK_POOL_SIZE)
-    task_wait_time = XTASK_WAIT_TIME_BASE;
-  else if (tasks_running > XTASK_POOL_SIZE && tasks_running < XTASK_WAIT_TIME_MAX_POOL_SIZE)
-    task_wait_time *= XTASK_WAIT_TIME_MULTIPLIER;
+  if (tasks_running == G_TASK_POOL_SIZE)
+    task_wait_time = G_TASK_WAIT_TIME_BASE;
+  else if (tasks_running > G_TASK_POOL_SIZE && tasks_running < G_TASK_WAIT_TIME_MAX_POOL_SIZE)
+    task_wait_time *= G_TASK_WAIT_TIME_MULTIPLIER;
 
-  if (tasks_running >= XTASK_POOL_SIZE)
-    xsource_set_ready_time (task_pool_manager, g_get_monotonic_time () + task_wait_time);
+  if (tasks_running >= G_TASK_POOL_SIZE)
+    g_source_set_ready_time (task_pool_manager, g_get_monotonic_time () + task_wait_time);
 
   g_mutex_unlock (&task_pool_mutex);
 }
 
 static void
-xtask_thread_cleanup (void)
+g_task_thread_cleanup (void)
 {
-  xint_t tasks_pending;
+  gint tasks_pending;
 
   g_mutex_lock (&task_pool_mutex);
-  tasks_pending = xthread_pool_unprocessed (task_pool);
+  tasks_pending = g_thread_pool_unprocessed (task_pool);
 
-  if (tasks_running > XTASK_POOL_SIZE)
+  if (tasks_running > G_TASK_POOL_SIZE)
     {
-      xthread_pool_set_max_threads (task_pool, tasks_running - 1, NULL);
+      g_thread_pool_set_max_threads (task_pool, tasks_running - 1, NULL);
       g_trace_set_int64_counter (task_pool_max_counter, tasks_running - 1);
     }
-  else if (tasks_running + tasks_pending < XTASK_POOL_SIZE)
-    xsource_set_ready_time (task_pool_manager, -1);
+  else if (tasks_running + tasks_pending < G_TASK_POOL_SIZE)
+    g_source_set_ready_time (task_pool_manager, -1);
 
-  if (tasks_running > XTASK_POOL_SIZE && tasks_running < XTASK_WAIT_TIME_MAX_POOL_SIZE)
-    task_wait_time /= XTASK_WAIT_TIME_MULTIPLIER;
+  if (tasks_running > G_TASK_POOL_SIZE && tasks_running < G_TASK_WAIT_TIME_MAX_POOL_SIZE)
+    task_wait_time /= G_TASK_WAIT_TIME_MULTIPLIER;
 
   tasks_running--;
 
@@ -1431,31 +1442,31 @@ xtask_thread_cleanup (void)
 }
 
 static void
-xtask_thread_pool_thread (xpointer_t thread_data,
-                           xpointer_t pool_data)
+g_task_thread_pool_thread (gpointer thread_data,
+                           gpointer pool_data)
 {
-  xtask_t *task = thread_data;
+  GTask *task = thread_data;
 
-  xtask_thread_setup ();
+  g_task_thread_setup ();
 
   task->task_func (task, task->source_object, task->task_data,
                    task->cancellable);
-  xtask_thread_complete (task);
-  xobject_unref (task);
+  g_task_thread_complete (task);
+  g_object_unref (task);
 
-  xtask_thread_cleanup ();
+  g_task_thread_cleanup ();
 }
 
 static void
-task_thread_cancelled (xcancellable_t *cancellable,
-                       xpointer_t      user_data)
+task_thread_cancelled (GCancellable *cancellable,
+                       gpointer      user_data)
 {
-  xtask_t *task = user_data;
+  GTask *task = user_data;
 
   /* Move this task to the front of the queue - no need for
    * a complete resorting of the queue.
    */
-  xthread_pool_move_to_front (task_pool, task);
+  g_thread_pool_move_to_front (task_pool, task);
 
   g_mutex_lock (&task->lock);
   task->thread_cancelled = TRUE;
@@ -1466,24 +1477,24 @@ task_thread_cancelled (xcancellable_t *cancellable,
       return;
     }
 
-  /* We don't actually set task->error; xtask_return_error() doesn't
-   * use a lock, and xtask_propagate_error() will call
-   * xcancellable_set_error_if_cancelled() anyway.
+  /* We don't actually set task->error; g_task_return_error() doesn't
+   * use a lock, and g_task_propagate_error() will call
+   * g_cancellable_set_error_if_cancelled() anyway.
    */
   g_mutex_unlock (&task->lock);
-  xtask_thread_complete (task);
+  g_task_thread_complete (task);
 }
 
 static void
-task_thread_cancelled_disconnect_notify (xpointer_t  task,
-                                         xclosure_t *closure)
+task_thread_cancelled_disconnect_notify (gpointer  task,
+                                         GClosure *closure)
 {
-  xobject_unref (task);
+  g_object_unref (task);
 }
 
 static void
-xtask_start_task_thread (xtask_t           *task,
-                          xtask_thread_func_t  task_func)
+g_task_start_task_thread (GTask           *task,
+                          GTaskThreadFunc  task_func)
 {
   g_mutex_init (&task->lock);
   g_cond_init (&task->cond);
@@ -1497,48 +1508,48 @@ xtask_start_task_thread (xtask_t           *task,
   if (task->cancellable)
     {
       if (task->return_on_cancel &&
-          xcancellable_set_error_if_cancelled (task->cancellable,
+          g_cancellable_set_error_if_cancelled (task->cancellable,
                                                 &task->error))
         {
           task->thread_cancelled = task->thread_complete = TRUE;
           TRACE (GIO_TASK_AFTER_RUN_IN_THREAD (task, task->thread_cancelled));
-          xthread_pool_push (task_pool, xobject_ref (task), NULL);
+          g_thread_pool_push (task_pool, g_object_ref (task), NULL);
           return;
         }
 
-      /* This introduces a reference count loop between the xtask_t and
-       * xcancellable_t, but is necessary to avoid a race on finalising the xtask_t
+      /* This introduces a reference count loop between the GTask and
+       * GCancellable, but is necessary to avoid a race on finalising the GTask
        * between task_thread_cancelled() (in one thread) and
-       * xtask_thread_complete() (in another).
+       * g_task_thread_complete() (in another).
        *
        * Accordingly, the signal handler *must* be removed once the task has
        * completed.
        */
-      xsignal_connect_data (task->cancellable, "cancelled",
+      g_signal_connect_data (task->cancellable, "cancelled",
                              G_CALLBACK (task_thread_cancelled),
-                             xobject_ref (task),
+                             g_object_ref (task),
                              task_thread_cancelled_disconnect_notify, 0);
     }
 
   if (g_private_get (&task_private))
     task->blocking_other_task = TRUE;
-  xthread_pool_push (task_pool, xobject_ref (task), NULL);
+  g_thread_pool_push (task_pool, g_object_ref (task), NULL);
 }
 
 /**
- * xtask_run_in_thread:
- * @task: a #xtask_t
- * @task_func: (scope async): a #xtask_thread_func_t
+ * g_task_run_in_thread:
+ * @task: a #GTask
+ * @task_func: (scope async): a #GTaskThreadFunc
  *
  * Runs @task_func in another thread. When @task_func returns, @task's
- * #xasync_ready_callback_t will be invoked in @task's #xmain_context_t.
+ * #GAsyncReadyCallback will be invoked in @task's #GMainContext.
  *
  * This takes a ref on @task until the task completes.
  *
- * See #xtask_thread_func_t for more details about how @task_func is handled.
+ * See #GTaskThreadFunc for more details about how @task_func is handled.
  *
  * Although GLib currently rate-limits the tasks queued via
- * xtask_run_in_thread(), you should not assume that it will always
+ * g_task_run_in_thread(), you should not assume that it will always
  * do this. If you have a very large number of tasks to run (several tens of
  * tasks), but don't want them to all run at once, you should only queue a
  * limited number of them (around ten) at a time.
@@ -1546,46 +1557,46 @@ xtask_start_task_thread (xtask_t           *task,
  * Since: 2.36
  */
 void
-xtask_run_in_thread (xtask_t           *task,
-                      xtask_thread_func_t  task_func)
+g_task_run_in_thread (GTask           *task,
+                      GTaskThreadFunc  task_func)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
-  xobject_ref (task);
-  xtask_start_task_thread (task, task_func);
+  g_object_ref (task);
+  g_task_start_task_thread (task, task_func);
 
-  /* The task may already be cancelled, or xthread_pool_push() may
+  /* The task may already be cancelled, or g_thread_pool_push() may
    * have failed.
    */
   if (task->thread_complete)
     {
       g_mutex_unlock (&task->lock);
-      xtask_return (task, XTASK_RETURN_FROM_THREAD);
+      g_task_return (task, G_TASK_RETURN_FROM_THREAD);
     }
   else
     g_mutex_unlock (&task->lock);
 
-  xobject_unref (task);
+  g_object_unref (task);
 }
 
 /**
- * xtask_run_in_thread_sync:
- * @task: a #xtask_t
- * @task_func: (scope async): a #xtask_thread_func_t
+ * g_task_run_in_thread_sync:
+ * @task: a #GTask
+ * @task_func: (scope async): a #GTaskThreadFunc
  *
  * Runs @task_func in another thread, and waits for it to return or be
- * cancelled. You can use xtask_propagate_pointer(), etc, afterward
+ * cancelled. You can use g_task_propagate_pointer(), etc, afterward
  * to get the result of @task_func.
  *
- * See #xtask_thread_func_t for more details about how @task_func is handled.
+ * See #GTaskThreadFunc for more details about how @task_func is handled.
  *
  * Normally this is used with tasks created with a %NULL
  * `callback`, but note that even if the task does
  * have a callback, it will not be invoked when @task_func returns.
- * #xtask_t:completed will be set to %TRUE just before this function returns.
+ * #GTask:completed will be set to %TRUE just before this function returns.
  *
  * Although GLib currently rate-limits the tasks queued via
- * xtask_run_in_thread_sync(), you should not assume that it will
+ * g_task_run_in_thread_sync(), you should not assume that it will
  * always do this. If you have a very large number of tasks to run,
  * but don't want them to all run at once, you should only queue a
  * limited number of them at a time.
@@ -1593,15 +1604,15 @@ xtask_run_in_thread (xtask_t           *task,
  * Since: 2.36
  */
 void
-xtask_run_in_thread_sync (xtask_t           *task,
-                           xtask_thread_func_t  task_func)
+g_task_run_in_thread_sync (GTask           *task,
+                           GTaskThreadFunc  task_func)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
-  xobject_ref (task);
+  g_object_ref (task);
 
   task->synchronous = TRUE;
-  xtask_start_task_thread (task, task_func);
+  g_task_start_task_thread (task, task_func);
 
   while (!task->thread_complete)
     g_cond_wait (&task->cond, &task->lock);
@@ -1614,54 +1625,54 @@ xtask_run_in_thread_sync (xtask_t           *task,
 
   /* Notify of completion in this thread. */
   task->completed = TRUE;
-  xobject_notify (G_OBJECT (task), "completed");
+  g_object_notify (G_OBJECT (task), "completed");
 
-  xobject_unref (task);
+  g_object_unref (task);
 }
 
 /**
- * xtask_attach_source:
- * @task: a #xtask_t
+ * g_task_attach_source:
+ * @task: a #GTask
  * @source: the source to attach
  * @callback: the callback to invoke when @source triggers
  *
  * A utility function for dealing with async operations where you need
- * to wait for a #xsource_t to trigger. Attaches @source to @task's
- * #xmain_context_t with @task's [priority][io-priority], and sets @source's
+ * to wait for a #GSource to trigger. Attaches @source to @task's
+ * #GMainContext with @task's [priority][io-priority], and sets @source's
  * callback to @callback, with @task as the callback's `user_data`.
  *
  * It will set the @source’s name to the task’s name (as set with
- * xtask_set_name()), if one has been set.
+ * g_task_set_name()), if one has been set.
  *
  * This takes a reference on @task until @source is destroyed.
  *
  * Since: 2.36
  */
 void
-xtask_attach_source (xtask_t       *task,
-                      xsource_t     *source,
-                      xsource_func_t  callback)
+g_task_attach_source (GTask       *task,
+                      GSource     *source,
+                      GSourceFunc  callback)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
 
-  xsource_set_callback (source, callback,
-                         xobject_ref (task), xobject_unref);
-  xsource_set_priority (source, task->priority);
+  g_source_set_callback (source, callback,
+                         g_object_ref (task), g_object_unref);
+  g_source_set_priority (source, task->priority);
   if (task->name != NULL)
-    xsource_set_name (source, task->name);
+    g_source_set_name (source, task->name);
 
-  xsource_attach (source, task->context);
+  g_source_attach (source, task->context);
 }
 
 
-static xboolean_t
-xtask_propagate_error (xtask_t   *task,
-                        xerror_t **error)
+static gboolean
+g_task_propagate_error (GTask   *task,
+                        GError **error)
 {
-  xboolean_t error_set;
+  gboolean error_set;
 
   if (task->check_cancellable &&
-      xcancellable_set_error_if_cancelled (task->cancellable, error))
+      g_cancellable_set_error_if_cancelled (task->cancellable, error))
     error_set = TRUE;
   else if (task->error)
     {
@@ -1679,51 +1690,51 @@ xtask_propagate_error (xtask_t   *task,
 }
 
 /**
- * xtask_return_pointer:
- * @task: a #xtask_t
+ * g_task_return_pointer:
+ * @task: a #GTask
  * @result: (nullable) (transfer full): the pointer result of a task
  *     function
- * @result_destroy: (nullable): a #xdestroy_notify_t function.
+ * @result_destroy: (nullable): a #GDestroyNotify function.
  *
  * Sets @task's result to @result and completes the task. If @result
  * is not %NULL, then @result_destroy will be used to free @result if
  * the caller does not take ownership of it with
- * xtask_propagate_pointer().
+ * g_task_propagate_pointer().
  *
  * "Completes the task" means that for an ordinary asynchronous task
  * it will either invoke the task's callback, or else queue that
- * callback to be invoked in the proper #xmain_context_t, or in the next
- * iteration of the current #xmain_context_t. For a task run via
- * xtask_run_in_thread() or xtask_run_in_thread_sync(), calling this
+ * callback to be invoked in the proper #GMainContext, or in the next
+ * iteration of the current #GMainContext. For a task run via
+ * g_task_run_in_thread() or g_task_run_in_thread_sync(), calling this
  * method will save @result to be returned to the caller later, but
- * the task will not actually be completed until the #xtask_thread_func_t
+ * the task will not actually be completed until the #GTaskThreadFunc
  * exits.
  *
  * Note that since the task may be completed before returning from
- * xtask_return_pointer(), you cannot assume that @result is still
+ * g_task_return_pointer(), you cannot assume that @result is still
  * valid after calling this, unless you are still holding another
  * reference on it.
  *
  * Since: 2.36
  */
 void
-xtask_return_pointer (xtask_t          *task,
-                       xpointer_t        result,
-                       xdestroy_notify_t  result_destroy)
+g_task_return_pointer (GTask          *task,
+                       gpointer        result,
+                       GDestroyNotify  result_destroy)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
   g_return_if_fail (!task->ever_returned);
 
   task->result.pointer = result;
   task->result_destroy = result_destroy;
 
-  xtask_return (task, XTASK_RETURN_SUCCESS);
+  g_task_return (task, G_TASK_RETURN_SUCCESS);
 }
 
 /**
- * xtask_propagate_pointer:
- * @task: a #xtask_t
- * @error: return location for a #xerror_t
+ * g_task_propagate_pointer:
+ * @task: a #GTask
+ * @error: return location for a #GError
  *
  * Gets the result of @task as a pointer, and transfers ownership
  * of that value to the caller.
@@ -1738,16 +1749,16 @@ xtask_return_pointer (xtask_t          *task,
  *
  * Since: 2.36
  */
-xpointer_t
-xtask_propagate_pointer (xtask_t   *task,
-                          xerror_t **error)
+gpointer
+g_task_propagate_pointer (GTask   *task,
+                          GError **error)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), NULL);
+  g_return_val_if_fail (G_IS_TASK (task), NULL);
 
-  if (xtask_propagate_error (task, error))
+  if (g_task_propagate_error (task, error))
     return NULL;
 
-  xreturn_val_if_fail (task->result_set, NULL);
+  g_return_val_if_fail (task->result_set, NULL);
 
   task->result_destroy = NULL;
   task->result_set = FALSE;
@@ -1755,34 +1766,34 @@ xtask_propagate_pointer (xtask_t   *task,
 }
 
 /**
- * xtask_return_int:
- * @task: a #xtask_t.
- * @result: the integer (#xssize_t) result of a task function.
+ * g_task_return_int:
+ * @task: a #GTask.
+ * @result: the integer (#gssize) result of a task function.
  *
  * Sets @task's result to @result and completes the task (see
- * xtask_return_pointer() for more discussion of exactly what this
+ * g_task_return_pointer() for more discussion of exactly what this
  * means).
  *
  * Since: 2.36
  */
 void
-xtask_return_int (xtask_t  *task,
-                   xssize_t  result)
+g_task_return_int (GTask  *task,
+                   gssize  result)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
   g_return_if_fail (!task->ever_returned);
 
   task->result.size = result;
 
-  xtask_return (task, XTASK_RETURN_SUCCESS);
+  g_task_return (task, G_TASK_RETURN_SUCCESS);
 }
 
 /**
- * xtask_propagate_int:
- * @task: a #xtask_t.
- * @error: return location for a #xerror_t
+ * g_task_propagate_int:
+ * @task: a #GTask.
+ * @error: return location for a #GError
  *
- * Gets the result of @task as an integer (#xssize_t).
+ * Gets the result of @task as an integer (#gssize).
  *
  * If the task resulted in an error, or was cancelled, then this will
  * instead return -1 and set @error.
@@ -1794,50 +1805,50 @@ xtask_return_int (xtask_t  *task,
  *
  * Since: 2.36
  */
-xssize_t
-xtask_propagate_int (xtask_t   *task,
-                      xerror_t **error)
+gssize
+g_task_propagate_int (GTask   *task,
+                      GError **error)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), -1);
+  g_return_val_if_fail (G_IS_TASK (task), -1);
 
-  if (xtask_propagate_error (task, error))
+  if (g_task_propagate_error (task, error))
     return -1;
 
-  xreturn_val_if_fail (task->result_set, -1);
+  g_return_val_if_fail (task->result_set, -1);
 
   task->result_set = FALSE;
   return task->result.size;
 }
 
 /**
- * xtask_return_boolean:
- * @task: a #xtask_t.
- * @result: the #xboolean_t result of a task function.
+ * g_task_return_boolean:
+ * @task: a #GTask.
+ * @result: the #gboolean result of a task function.
  *
  * Sets @task's result to @result and completes the task (see
- * xtask_return_pointer() for more discussion of exactly what this
+ * g_task_return_pointer() for more discussion of exactly what this
  * means).
  *
  * Since: 2.36
  */
 void
-xtask_return_boolean (xtask_t    *task,
-                       xboolean_t  result)
+g_task_return_boolean (GTask    *task,
+                       gboolean  result)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
   g_return_if_fail (!task->ever_returned);
 
   task->result.boolean = result;
 
-  xtask_return (task, XTASK_RETURN_SUCCESS);
+  g_task_return (task, G_TASK_RETURN_SUCCESS);
 }
 
 /**
- * xtask_propagate_boolean:
- * @task: a #xtask_t.
- * @error: return location for a #xerror_t
+ * g_task_propagate_boolean:
+ * @task: a #GTask.
+ * @error: return location for a #GError
  *
- * Gets the result of @task as a #xboolean_t.
+ * Gets the result of @task as a #gboolean.
  *
  * If the task resulted in an error, or was cancelled, then this will
  * instead return %FALSE and set @error.
@@ -1849,109 +1860,109 @@ xtask_return_boolean (xtask_t    *task,
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_propagate_boolean (xtask_t   *task,
-                          xerror_t **error)
+gboolean
+g_task_propagate_boolean (GTask   *task,
+                          GError **error)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
 
-  if (xtask_propagate_error (task, error))
+  if (g_task_propagate_error (task, error))
     return FALSE;
 
-  xreturn_val_if_fail (task->result_set, FALSE);
+  g_return_val_if_fail (task->result_set, FALSE);
 
   task->result_set = FALSE;
   return task->result.boolean;
 }
 
 /**
- * xtask_return_error:
- * @task: a #xtask_t.
- * @error: (transfer full): the #xerror_t result of a task function.
+ * g_task_return_error:
+ * @task: a #GTask.
+ * @error: (transfer full): the #GError result of a task function.
  *
  * Sets @task's result to @error (which @task assumes ownership of)
- * and completes the task (see xtask_return_pointer() for more
+ * and completes the task (see g_task_return_pointer() for more
  * discussion of exactly what this means).
  *
  * Note that since the task takes ownership of @error, and since the
- * task may be completed before returning from xtask_return_error(),
+ * task may be completed before returning from g_task_return_error(),
  * you cannot assume that @error is still valid after calling this.
- * Call xerror_copy() on the error if you need to keep a local copy
+ * Call g_error_copy() on the error if you need to keep a local copy
  * as well.
  *
- * See also xtask_return_new_error().
+ * See also g_task_return_new_error().
  *
  * Since: 2.36
  */
 void
-xtask_return_error (xtask_t  *task,
-                     xerror_t *error)
+g_task_return_error (GTask  *task,
+                     GError *error)
 {
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
   g_return_if_fail (!task->ever_returned);
   g_return_if_fail (error != NULL);
 
   task->error = error;
 
-  xtask_return (task, XTASK_RETURN_ERROR);
+  g_task_return (task, G_TASK_RETURN_ERROR);
 }
 
 /**
- * xtask_return_new_error:
- * @task: a #xtask_t.
- * @domain: a #xquark.
+ * g_task_return_new_error:
+ * @task: a #GTask.
+ * @domain: a #GQuark.
  * @code: an error code.
  * @format: a string with format characters.
  * @...: a list of values to insert into @format.
  *
- * Sets @task's result to a new #xerror_t created from @domain, @code,
+ * Sets @task's result to a new #GError created from @domain, @code,
  * @format, and the remaining arguments, and completes the task (see
- * xtask_return_pointer() for more discussion of exactly what this
+ * g_task_return_pointer() for more discussion of exactly what this
  * means).
  *
- * See also xtask_return_error().
+ * See also g_task_return_error().
  *
  * Since: 2.36
  */
 void
-xtask_return_new_error (xtask_t           *task,
-                         xquark           domain,
-                         xint_t             code,
+g_task_return_new_error (GTask           *task,
+                         GQuark           domain,
+                         gint             code,
                          const char      *format,
                          ...)
 {
-  xerror_t *error;
+  GError *error;
   va_list args;
 
   va_start (args, format);
-  error = xerror_new_valist (domain, code, format, args);
+  error = g_error_new_valist (domain, code, format, args);
   va_end (args);
 
-  xtask_return_error (task, error);
+  g_task_return_error (task, error);
 }
 
 /**
- * xtask_return_error_if_cancelled:
- * @task: a #xtask_t
+ * g_task_return_error_if_cancelled:
+ * @task: a #GTask
  *
- * Checks if @task's #xcancellable_t has been cancelled, and if so, sets
+ * Checks if @task's #GCancellable has been cancelled, and if so, sets
  * @task's error accordingly and completes the task (see
- * xtask_return_pointer() for more discussion of exactly what this
+ * g_task_return_pointer() for more discussion of exactly what this
  * means).
  *
  * Returns: %TRUE if @task has been cancelled, %FALSE if not
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_return_error_if_cancelled (xtask_t *task)
+gboolean
+g_task_return_error_if_cancelled (GTask *task)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
-  xreturn_val_if_fail (!task->ever_returned, FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
+  g_return_val_if_fail (!task->ever_returned, FALSE);
 
-  if (xcancellable_set_error_if_cancelled (task->cancellable, &error))
+  if (g_cancellable_set_error_if_cancelled (task->cancellable, &error))
     {
       /* We explicitly set task->error so this works even when
        * check-cancellable is not set.
@@ -1959,7 +1970,7 @@ xtask_return_error_if_cancelled (xtask_t *task)
       g_clear_error (&task->error);
       task->error = error;
 
-      xtask_return (task, XTASK_RETURN_ERROR);
+      g_task_return (task, G_TASK_RETURN_ERROR);
       return TRUE;
     }
   else
@@ -1967,8 +1978,8 @@ xtask_return_error_if_cancelled (xtask_t *task)
 }
 
 /**
- * xtask_had_error:
- * @task: a #xtask_t.
+ * g_task_had_error:
+ * @task: a #GTask.
  *
  * Tests if @task resulted in an error.
  *
@@ -1976,78 +1987,78 @@ xtask_return_error_if_cancelled (xtask_t *task)
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_had_error (xtask_t *task)
+gboolean
+g_task_had_error (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
 
   if (task->error != NULL || task->had_error)
     return TRUE;
 
-  if (task->check_cancellable && xcancellable_is_cancelled (task->cancellable))
+  if (task->check_cancellable && g_cancellable_is_cancelled (task->cancellable))
     return TRUE;
 
   return FALSE;
 }
 
 static void
-value_free (xpointer_t value)
+value_free (gpointer value)
 {
-  xvalue_unset (value);
+  g_value_unset (value);
   g_free (value);
 }
 
 /**
- * xtask_return_value:
- * @task: a #xtask_t
- * @result: (nullable) (transfer none): the #xvalue_t result of
+ * g_task_return_value:
+ * @task: a #GTask
+ * @result: (nullable) (transfer none): the #GValue result of
  *                                      a task function
  *
  * Sets @task's result to @result (by copying it) and completes the task.
  *
- * If @result is %NULL then a #xvalue_t of type %XTYPE_POINTER
+ * If @result is %NULL then a #GValue of type %G_TYPE_POINTER
  * with a value of %NULL will be used for the result.
  *
  * This is a very generic low-level method intended primarily for use
- * by language bindings; for C code, xtask_return_pointer() and the
+ * by language bindings; for C code, g_task_return_pointer() and the
  * like will normally be much easier to use.
  *
  * Since: 2.64
  */
 void
-xtask_return_value (xtask_t  *task,
-                     xvalue_t *result)
+g_task_return_value (GTask  *task,
+                     GValue *result)
 {
-  xvalue_t *value;
+  GValue *value;
 
-  g_return_if_fail (X_IS_TASK (task));
+  g_return_if_fail (G_IS_TASK (task));
   g_return_if_fail (!task->ever_returned);
 
-  value = g_new0 (xvalue_t, 1);
+  value = g_new0 (GValue, 1);
 
   if (result == NULL)
     {
-      xvalue_init (value, XTYPE_POINTER);
-      xvalue_set_pointer (value, NULL);
+      g_value_init (value, G_TYPE_POINTER);
+      g_value_set_pointer (value, NULL);
     }
   else
     {
-      xvalue_init (value, G_VALUE_TYPE (result));
-      xvalue_copy (result, value);
+      g_value_init (value, G_VALUE_TYPE (result));
+      g_value_copy (result, value);
     }
 
-  xtask_return_pointer (task, value, value_free);
+  g_task_return_pointer (task, value, value_free);
 }
 
 /**
- * xtask_propagate_value:
- * @task: a #xtask_t
- * @value: (out caller-allocates): return location for the #xvalue_t
- * @error: return location for a #xerror_t
+ * g_task_propagate_value:
+ * @task: a #GTask
+ * @value: (out caller-allocates): return location for the #GValue
+ * @error: return location for a #GError
  *
- * Gets the result of @task as a #xvalue_t, and transfers ownership of
- * that value to the caller. As with xtask_return_value(), this is
- * a generic low-level method; xtask_propagate_pointer() and the like
+ * Gets the result of @task as a #GValue, and transfers ownership of
+ * that value to the caller. As with g_task_return_value(), this is
+ * a generic low-level method; g_task_propagate_pointer() and the like
  * will usually be more useful for C code.
  *
  * If the task resulted in an error, or was cancelled, then this will
@@ -2060,22 +2071,22 @@ xtask_return_value (xtask_t  *task,
  *
  * Since: 2.64
  */
-xboolean_t
-xtask_propagate_value (xtask_t   *task,
-                        xvalue_t  *value,
-                        xerror_t **error)
+gboolean
+g_task_propagate_value (GTask   *task,
+                        GValue  *value,
+                        GError **error)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
-  xreturn_val_if_fail (value != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
+  g_return_val_if_fail (value != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (xtask_propagate_error (task, error))
+  if (g_task_propagate_error (task, error))
     return FALSE;
 
-  xreturn_val_if_fail (task->result_set, FALSE);
-  xreturn_val_if_fail (task->result_destroy == value_free, FALSE);
+  g_return_val_if_fail (task->result_set, FALSE);
+  g_return_val_if_fail (task->result_destroy == value_free, FALSE);
 
-  memcpy (value, task->result.pointer, sizeof (xvalue_t));
+  memcpy (value, task->result.pointer, sizeof (GValue));
   g_free (task->result.pointer);
 
   task->result_destroy = NULL;
@@ -2085,10 +2096,10 @@ xtask_propagate_value (xtask_t   *task,
 }
 
 /**
- * xtask_get_completed:
- * @task: a #xtask_t.
+ * g_task_get_completed:
+ * @task: a #GTask.
  *
- * Gets the value of #xtask_t:completed. This changes from %FALSE to %TRUE after
+ * Gets the value of #GTask:completed. This changes from %FALSE to %TRUE after
  * the task’s callback is invoked, and will return %FALSE if called from inside
  * the callback.
  *
@@ -2096,22 +2107,22 @@ xtask_propagate_value (xtask_t   *task,
  *
  * Since: 2.44
  */
-xboolean_t
-xtask_get_completed (xtask_t *task)
+gboolean
+g_task_get_completed (GTask *task)
 {
-  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  g_return_val_if_fail (G_IS_TASK (task), FALSE);
 
   /* Convert from a bit field to a boolean. */
   return task->completed ? TRUE : FALSE;
 }
 
 /**
- * xtask_is_valid:
- * @result: (type Gio.AsyncResult): A #xasync_result_t
- * @source_object: (nullable) (type xobject_t): the source object
+ * g_task_is_valid:
+ * @result: (type Gio.AsyncResult): A #GAsyncResult
+ * @source_object: (nullable) (type GObject): the source object
  *   expected to be associated with the task
  *
- * Checks that @result is a #xtask_t, and that @source_object is its
+ * Checks that @result is a #GTask, and that @source_object is its
  * source object (or that @source_object is %NULL and @result has no
  * source object). This can be used in g_return_if_fail() checks.
  *
@@ -2120,24 +2131,24 @@ xtask_get_completed (xtask_t *task)
  *
  * Since: 2.36
  */
-xboolean_t
-xtask_is_valid (xpointer_t result,
-                 xpointer_t source_object)
+gboolean
+g_task_is_valid (gpointer result,
+                 gpointer source_object)
 {
-  if (!X_IS_TASK (result))
+  if (!G_IS_TASK (result))
     return FALSE;
 
-  return XTASK (result)->source_object == source_object;
+  return G_TASK (result)->source_object == source_object;
 }
 
-static xint_t
-xtask_compare_priority (xconstpointer a,
-                         xconstpointer b,
-                         xpointer_t      user_data)
+static gint
+g_task_compare_priority (gconstpointer a,
+                         gconstpointer b,
+                         gpointer      user_data)
 {
-  const xtask_t *ta = a;
-  const xtask_t *tb = b;
-  xboolean_t a_cancelled, b_cancelled;
+  const GTask *ta = a;
+  const GTask *tb = b;
+  gboolean a_cancelled, b_cancelled;
 
   /* Tasks that are causing other tasks to block have higher
    * priority.
@@ -2149,9 +2160,9 @@ xtask_compare_priority (xconstpointer a,
 
   /* Let already-cancelled tasks finish right away */
   a_cancelled = (ta->check_cancellable &&
-                 xcancellable_is_cancelled (ta->cancellable));
+                 g_cancellable_is_cancelled (ta->cancellable));
   b_cancelled = (tb->check_cancellable &&
-                 xcancellable_is_cancelled (tb->cancellable));
+                 g_cancellable_is_cancelled (tb->cancellable));
   if (a_cancelled && !b_cancelled)
     return -1;
   else if (b_cancelled && !a_cancelled)
@@ -2161,15 +2172,15 @@ xtask_compare_priority (xconstpointer a,
   return ta->priority - tb->priority;
 }
 
-static xboolean_t
-trivial_source_dispatch (xsource_t     *source,
-                         xsource_func_t  callback,
-                         xpointer_t     user_data)
+static gboolean
+trivial_source_dispatch (GSource     *source,
+                         GSourceFunc  callback,
+                         gpointer     user_data)
 {
   return callback (user_data);
 }
 
-xsource_funcs_t trivial_source_funcs = {
+GSourceFuncs trivial_source_funcs = {
   NULL, /* prepare */
   NULL, /* check */
   trivial_source_dispatch,
@@ -2179,96 +2190,96 @@ xsource_funcs_t trivial_source_funcs = {
 };
 
 static void
-xtask_thread_pool_init (void)
+g_task_thread_pool_init (void)
 {
-  task_pool = xthread_pool_new (xtask_thread_pool_thread, NULL,
-                                 XTASK_POOL_SIZE, FALSE, NULL);
-  xassert (task_pool != NULL);
+  task_pool = g_thread_pool_new (g_task_thread_pool_thread, NULL,
+                                 G_TASK_POOL_SIZE, FALSE, NULL);
+  g_assert (task_pool != NULL);
 
-  xthread_pool_set_sort_function (task_pool, xtask_compare_priority, NULL);
+  g_thread_pool_set_sort_function (task_pool, g_task_compare_priority, NULL);
 
-  task_pool_manager = xsource_new (&trivial_source_funcs, sizeof (xsource_t));
-  xsource_set_static_name (task_pool_manager, "xtask_t thread pool manager");
-  xsource_set_callback (task_pool_manager, task_pool_manager_timeout, NULL, NULL);
-  xsource_set_ready_time (task_pool_manager, -1);
-  xsource_attach (task_pool_manager,
-                   XPL_PRIVATE_CALL (g_get_worker_context ()));
-  xsource_unref (task_pool_manager);
+  task_pool_manager = g_source_new (&trivial_source_funcs, sizeof (GSource));
+  g_source_set_static_name (task_pool_manager, "GTask thread pool manager");
+  g_source_set_callback (task_pool_manager, task_pool_manager_timeout, NULL, NULL);
+  g_source_set_ready_time (task_pool_manager, -1);
+  g_source_attach (task_pool_manager,
+                   GLIB_PRIVATE_CALL (g_get_worker_context ()));
+  g_source_unref (task_pool_manager);
 }
 
 static void
-xtask_get_property (xobject_t    *object,
-                     xuint_t       prop_id,
-                     xvalue_t     *value,
-                     xparam_spec_t *pspec)
+g_task_get_property (GObject    *object,
+                     guint       prop_id,
+                     GValue     *value,
+                     GParamSpec *pspec)
 {
-  xtask_t *task = XTASK (object);
+  GTask *task = G_TASK (object);
 
   switch ((GTaskProperty) prop_id)
     {
     case PROP_COMPLETED:
-      xvalue_set_boolean (value, xtask_get_completed (task));
+      g_value_set_boolean (value, g_task_get_completed (task));
       break;
     }
 }
 
 static void
-xtask_class_init (xtask_class_t *klass)
+g_task_class_init (GTaskClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->get_property = xtask_get_property;
-  xobject_class->finalize = xtask_finalize;
+  gobject_class->get_property = g_task_get_property;
+  gobject_class->finalize = g_task_finalize;
 
   /**
-   * xtask_t:completed:
+   * GTask:completed:
    *
    * Whether the task has completed, meaning its callback (if set) has been
-   * invoked. This can only happen after xtask_return_pointer(),
-   * xtask_return_error() or one of the other return functions have been called
+   * invoked. This can only happen after g_task_return_pointer(),
+   * g_task_return_error() or one of the other return functions have been called
    * on the task.
    *
    * This property is guaranteed to change from %FALSE to %TRUE exactly once.
    *
-   * The #xobject_t::notify signal for this change is emitted in the same main
+   * The #GObject::notify signal for this change is emitted in the same main
    * context as the task’s callback, immediately after that callback is invoked.
    *
    * Since: 2.44
    */
-  xobject_class_install_property (xobject_class, PROP_COMPLETED,
-    xparam_spec_boolean ("completed",
+  g_object_class_install_property (gobject_class, PROP_COMPLETED,
+    g_param_spec_boolean ("completed",
                           P_("Task completed"),
                           P_("Whether the task has completed yet"),
-                          FALSE, XPARAM_READABLE | XPARAM_STATIC_STRINGS));
+                          FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   if (G_UNLIKELY (task_pool_max_counter == 0))
     {
-      /* We use two counters to track characteristics of the xtask_t thread pool.
-       * task pool max size - the value of xthread_pool_set_max_threads()
+      /* We use two counters to track characteristics of the GTask thread pool.
+       * task pool max size - the value of g_thread_pool_set_max_threads()
        * tasks running - the number of running threads
        */
-      task_pool_max_counter = g_trace_define_int64_counter ("GIO", "task pool max size", "Maximum number of threads allowed in the xtask_t thread pool; see xthread_pool_set_max_threads()");
-      tasks_running_counter = g_trace_define_int64_counter ("GIO", "tasks running", "Number of currently running tasks in the xtask_t thread pool");
+      task_pool_max_counter = g_trace_define_int64_counter ("GIO", "task pool max size", "Maximum number of threads allowed in the GTask thread pool; see g_thread_pool_set_max_threads()");
+      tasks_running_counter = g_trace_define_int64_counter ("GIO", "tasks running", "Number of currently running tasks in the GTask thread pool");
     }
 }
 
-static xpointer_t
-xtask_get_user_data (xasync_result_t *res)
+static gpointer
+g_task_get_user_data (GAsyncResult *res)
 {
-  return XTASK (res)->callback_data;
+  return G_TASK (res)->callback_data;
 }
 
-static xboolean_t
-xtask_is_tagged (xasync_result_t *res,
-                  xpointer_t      source_tag)
+static gboolean
+g_task_is_tagged (GAsyncResult *res,
+                  gpointer      source_tag)
 {
-  return XTASK (res)->source_tag == source_tag;
+  return G_TASK (res)->source_tag == source_tag;
 }
 
 static void
-xtask_async_result_iface_init (xasync_result_iface_t *iface)
+g_task_async_result_iface_init (GAsyncResultIface *iface)
 {
-  iface->get_user_data = xtask_get_user_data;
-  iface->get_source_object = xtask_ref_source_object;
-  iface->is_tagged = xtask_is_tagged;
+  iface->get_user_data = g_task_get_user_data;
+  iface->get_source_object = g_task_ref_source_object;
+  iface->is_tagged = g_task_is_tagged;
 }

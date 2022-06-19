@@ -5,125 +5,146 @@
 #include <unistd.h>
 #endif
 
-#define XTYPE_TEST               (xtest_get_type ())
-#define XTEST(test)              (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, xtest_t))
-#define MY_IS_TEST(test)           (XTYPE_CHECK_INSTANCE_TYPE ((test), XTYPE_TEST))
-#define XTEST_CLASS(tclass)      (XTYPE_CHECK_CLASS_CAST ((tclass), XTYPE_TEST, xtest_class_t))
-#define MY_IS_TEST_CLASS(tclass)   (XTYPE_CHECK_CLASS_TYPE ((tclass), XTYPE_TEST))
-#define XTEST_GET_CLASS(test)    (XTYPE_INSTANCE_GET_CLASS ((test), XTYPE_TEST, xtest_class_t))
+#define G_TYPE_TEST               (my_test_get_type ())
+#define MY_TEST(test)              (G_TYPE_CHECK_INSTANCE_CAST ((test), G_TYPE_TEST, GTest))
+#define MY_IS_TEST(test)           (G_TYPE_CHECK_INSTANCE_TYPE ((test), G_TYPE_TEST))
+#define MY_TEST_CLASS(tclass)      (G_TYPE_CHECK_CLASS_CAST ((tclass), G_TYPE_TEST, GTestClass))
+#define MY_IS_TEST_CLASS(tclass)   (G_TYPE_CHECK_CLASS_TYPE ((tclass), G_TYPE_TEST))
+#define MY_TEST_GET_CLASS(test)    (G_TYPE_INSTANCE_GET_CLASS ((test), G_TYPE_TEST, GTestClass))
 
 enum {
   PROP_0,
   PROP_DUMMY
 };
 
-typedef struct _xtest xtest_t;
-typedef struct _xtest_class xtest_class_t;
+typedef struct _GTest GTest;
+typedef struct _GTestClass GTestClass;
 
-struct _xtest
+struct _GTest
 {
-  xobject_t object;
-  xint_t id;
-  xint_t dummy;
+  GObject object;
+  gint id;
+  gint dummy;
 
-  xint_t count;
+  gint count;
 };
 
-struct _xtest_class
+struct _GTestClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-static xtype_t xtest_get_type (void);
-static xboolean_t stopping;
+static GType my_test_get_type (void);
+static gboolean stopping;
 
-static void xtest_class_init (xtest_class_t * klass);
-static void xtest_init (xtest_t * test);
-static void xtest_dispose (xobject_t * object);
-static void xtest_get_property (xobject_t    *object,
-                                  xuint_t       prop_id,
-                                  xvalue_t     *value,
-                                  xparam_spec_t *pspec);
-static void xtest_set_property (xobject_t      *object,
-                                  xuint_t         prop_id,
-                                  const xvalue_t *value,
-                                  xparam_spec_t   *pspec);
+static void my_test_class_init (GTestClass * klass);
+static void my_test_init (GTest * test);
+static void my_test_dispose (GObject * object);
+static void my_test_get_property (GObject    *object,
+                                  guint       prop_id,
+                                  GValue     *value,
+                                  GParamSpec *pspec);
+static void my_test_set_property (GObject      *object,
+                                  guint         prop_id,
+                                  const GValue *value,
+                                  GParamSpec   *pspec);
 
-static xobject_class_t *parent_class = NULL;
+static GObjectClass *parent_class = NULL;
 
-static xtype_t
-xtest_get_type (void)
+static GType
+my_test_get_type (void)
 {
-  static xtype_t test_type = 0;
+  static GType test_type = 0;
 
   if (!test_type) {
-    const xtype_info_t test_info = {
-      sizeof (xtest_class_t),
+    const GTypeInfo test_info = {
+      sizeof (GTestClass),
       NULL,
       NULL,
-      (xclass_init_func_t) xtest_class_init,
+      (GClassInitFunc) my_test_class_init,
       NULL,
       NULL,
-      sizeof (xtest_t),
+      sizeof (GTest),
       0,
-      (xinstance_init_func_t) xtest_init,
+      (GInstanceInitFunc) my_test_init,
       NULL
     };
 
-    test_type = xtype_register_static (XTYPE_OBJECT, "xtest_t", &test_info, 0);
+    test_type = g_type_register_static (G_TYPE_OBJECT, "GTest", &test_info, 0);
   }
   return test_type;
 }
 
 static void
-xtest_class_init (xtest_class_t * klass)
+my_test_class_init (GTestClass * klass)
 {
-  xobject_class_t *xobject_class;
+  GObjectClass *gobject_class;
 
-  xobject_class = (xobject_class_t *) klass;
+  gobject_class = (GObjectClass *) klass;
 
-  parent_class = xtype_class_ref (XTYPE_OBJECT);
+  parent_class = g_type_class_ref (G_TYPE_OBJECT);
 
-  xobject_class->dispose = xtest_dispose;
-  xobject_class->get_property = xtest_get_property;
-  xobject_class->set_property = xtest_set_property;
+  gobject_class->dispose = my_test_dispose;
+  gobject_class->get_property = my_test_get_property;
+  gobject_class->set_property = my_test_set_property;
 
-  xobject_class_install_property (xobject_class,
+  g_object_class_install_property (gobject_class,
 				   PROP_DUMMY,
-				   xparam_spec_int ("dummy",
-						     NULL,
+				   g_param_spec_int ("dummy",
+						     NULL, 
 						     NULL,
 						     0, G_MAXINT, 0,
-						     XPARAM_READWRITE));
+						     G_PARAM_READWRITE));
 }
 
 static void
-xtest_init (xtest_t * test)
+my_test_init (GTest * test)
 {
-  static xuint_t static_id = 1;
+  static guint static_id = 1;
   test->id = static_id++;
 }
 
 static void
-xtest_dispose (xobject_t * object)
+my_test_dispose (GObject * object)
 {
-  XOBJECT_CLASS (parent_class)->dispose (object);
+  G_OBJECT_CLASS (parent_class)->dispose (object);
 }
 
-static void
-xtest_get_property (xobject_t    *object,
-                      xuint_t       prop_id,
-                      xvalue_t     *value,
-                      xparam_spec_t *pspec)
+static void 
+my_test_get_property (GObject    *object,
+                      guint       prop_id,
+                      GValue     *value,
+                      GParamSpec *pspec)
 {
-  xtest_t *test;
+  GTest *test;
 
-  test = XTEST (object);
+  test = MY_TEST (object);
 
   switch (prop_id)
     {
     case PROP_DUMMY:
-      xvalue_set_int (value, test->dummy);
+      g_value_set_int (value, test->dummy);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void 
+my_test_set_property (GObject      *object,
+                      guint         prop_id,
+                      const GValue *value,
+                      GParamSpec   *pspec)
+{
+  GTest *test;
+
+  test = MY_TEST (object);
+
+  switch (prop_id)
+    {
+    case PROP_DUMMY:
+      test->dummy = g_value_get_int (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -132,57 +153,36 @@ xtest_get_property (xobject_t    *object,
 }
 
 static void
-xtest_set_property (xobject_t      *object,
-                      xuint_t         prop_id,
-                      const xvalue_t *value,
-                      xparam_spec_t   *pspec)
+dummy_notify (GObject    *object,
+              GParamSpec *pspec)
 {
-  xtest_t *test;
+  GTest *test;
 
-  test = XTEST (object);
+  test = MY_TEST (object);
 
-  switch (prop_id)
-    {
-    case PROP_DUMMY:
-      test->dummy = xvalue_get_int (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-    }
+  test->count++;  
 }
 
 static void
-dummy_notify (xobject_t    *object,
-              xparam_spec_t *pspec)
+my_test_do_property (GTest * test)
 {
-  xtest_t *test;
+  gint dummy;
 
-  test = XTEST (object);
-
-  test->count++;
+  g_object_get (test, "dummy", &dummy, NULL);
+  g_object_set (test, "dummy", dummy + 1, NULL);
 }
 
-static void
-xtest_do_property (xtest_t * test)
+static gpointer
+run_thread (GTest * test)
 {
-  xint_t dummy;
-
-  xobject_get (test, "dummy", &dummy, NULL);
-  xobject_set (test, "dummy", dummy + 1, NULL);
-}
-
-static xpointer_t
-run_thread (xtest_t * test)
-{
-  xint_t i = 1;
-
+  gint i = 1;
+  
   while (!g_atomic_int_get (&stopping)) {
-    xtest_do_property (test);
+    my_test_do_property (test);
     if ((i++ % 10000) == 0)
       {
         g_print (".%c", 'a' + test->id);
-        xthread_yield(); /* force context switch */
+        g_thread_yield(); /* force context switch */
       }
   }
 
@@ -193,27 +193,27 @@ int
 main (int argc, char **argv)
 {
 #define N_THREADS 5
-  xthread_t *test_threads[N_THREADS];
-  xtest_t *test_objects[N_THREADS];
-  xint_t i;
+  GThread *test_threads[N_THREADS];
+  GTest *test_objects[N_THREADS];
+  gint i;
 
   g_print ("START: %s\n", argv[0]);
   g_log_set_always_fatal (G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL | g_log_set_always_fatal (G_LOG_FATAL_MASK));
 
   for (i = 0; i < N_THREADS; i++) {
-    xtest_t *test;
+    GTest *test;
 
-    test = xobject_new (XTYPE_TEST, NULL);
+    test = g_object_new (G_TYPE_TEST, NULL);
     test_objects[i] = test;
 
-    xassert (test->count == test->dummy);
-    xsignal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
+    g_assert (test->count == test->dummy);
+    g_signal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
   }
 
   g_atomic_int_set (&stopping, FALSE);
 
   for (i = 0; i < N_THREADS; i++)
-    test_threads[i] = xthread_create ((GThreadFunc) run_thread, test_objects[i], TRUE, NULL);
+    test_threads[i] = g_thread_create ((GThreadFunc) run_thread, test_objects[i], TRUE, NULL);
 
   g_usleep (3000000);
 
@@ -222,15 +222,15 @@ main (int argc, char **argv)
 
   /* join all threads */
   for (i = 0; i < N_THREADS; i++)
-    xthread_join (test_threads[i]);
+    g_thread_join (test_threads[i]);
 
   g_print ("stopped\n");
 
   for (i = 0; i < N_THREADS; i++) {
-    xtest_t *test = test_objects[i];
+    GTest *test = test_objects[i];
 
-    xassert (test->count == test->dummy);
-    xobject_unref (test);
+    g_assert (test->count == test->dummy);
+    g_object_unref (test);
   }
 
   return 0;

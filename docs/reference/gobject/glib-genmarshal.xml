@@ -2,7 +2,7 @@
 
 <refentryinfo>
   <title>glib-genmarshal</title>
-  <productname>xobject_t</productname>
+  <productname>GObject</productname>
   <authorgroup>
     <author>
       <contrib>Developer</contrib>
@@ -38,7 +38,7 @@
 
 <refsect1><title>Description</title>
 <para><command>glib-genmarshal</command> is a small utility that generates C code
-marshallers for callback functions of the xclosure_t mechanism in the xobject_t
+marshallers for callback functions of the GClosure mechanism in the GObject
 sublibrary of GLib. The marshaller functions have a standard signature,
 they get passed in the invoking closure, an array of value structures holding
 the callback function parameters and a value structure for the return value
@@ -90,77 +90,77 @@ additional parameters may be present.
 <varlistentry>
 <term><replaceable>BOOLEAN</replaceable></term>
 <listitem><para>
-for boolean types (xboolean_t)
+for boolean types (gboolean)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>CHAR</replaceable></term>
 <listitem><para>
-for signed char types (xchar_t)
+for signed char types (gchar)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>UCHAR</replaceable></term>
 <listitem><para>
-for unsigned char types (xuchar_t)
+for unsigned char types (guchar)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>INT</replaceable></term>
 <listitem><para>
-for signed integer types (xint_t)
+for signed integer types (gint)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>UINT</replaceable></term>
 <listitem><para>
-for unsigned integer types (xuint_t)
+for unsigned integer types (guint)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>LONG</replaceable></term>
 <listitem><para>
-for signed long integer types (xlong_t)
+for signed long integer types (glong)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>ULONG</replaceable></term>
 <listitem><para>
-for unsigned long integer types (xulong_t)
+for unsigned long integer types (gulong)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>INT64</replaceable></term>
 <listitem><para>
-for signed 64bit integer types (sint64_t)
+for signed 64bit integer types (gint64)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>UINT64</replaceable></term>
 <listitem><para>
-for unsigned 64bit integer types (xuint64_t)
+for unsigned 64bit integer types (guint64)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>ENUM</replaceable></term>
 <listitem><para>
-for enumeration types (xint_t)
+for enumeration types (gint)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>FLAGS</replaceable></term>
 <listitem><para>
-for flag enumeration types (xuint_t)
+for flag enumeration types (guint)
 </para></listitem>
 </varlistentry>
 
@@ -174,14 +174,14 @@ for single-precision float types (gfloat)
 <varlistentry>
 <term><replaceable>DOUBLE</replaceable></term>
 <listitem><para>
-for double-precision float types (xdouble_t)
+for double-precision float types (gdouble)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>STRING</replaceable></term>
 <listitem><para>
-for string types (xchar_t*)
+for string types (gchar*)
 </para></listitem>
 </varlistentry>
 
@@ -195,28 +195,28 @@ for boxed (anonymous but reference counted) types (GBoxed*)
 <varlistentry>
 <term><replaceable>PARAM</replaceable></term>
 <listitem><para>
-for xparam_spec_t or derived types (xparam_spec_t*)
+for GParamSpec or derived types (GParamSpec*)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>POINTER</replaceable></term>
 <listitem><para>
-for anonymous pointer types (xpointer_t)
+for anonymous pointer types (gpointer)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>OBJECT</replaceable></term>
 <listitem><para>
-for xobject_t or derived types (xobject_t*)
+for GObject or derived types (GObject*)
 </para></listitem>
 </varlistentry>
 
 <varlistentry>
 <term><replaceable>VARIANT</replaceable></term>
 <listitem><para>
-for xvariant_t types (xvariant_t*)
+for GVariant types (GVariant*)
 </para></listitem>
 </varlistentry>
 
@@ -274,7 +274,7 @@ Skip source location remarks in generated comments.
 <varlistentry>
 <term><option>--stdinc</option></term>
 <listitem><para>
-Use the standard marshallers of the xobject_t library, and include
+Use the standard marshallers of the GObject library, and include
 <filename>glib-object.h</filename> in generated header files. This
 option is mutually exclusive with the <option>--nostdinc</option>
 option.
@@ -284,7 +284,7 @@ option.
 <varlistentry>
 <term><option>--nostdinc</option></term>
 <listitem><para>
-Do not use the standard marshallers of the xobject_t library, and skip
+Do not use the standard marshallers of the GObject library, and skip
 <filename>glib-object.h</filename> include directive in generated header files.
 This option is mutually exclusive with the <option>--stdinc</option> option.
 </para></listitem>
@@ -300,7 +300,7 @@ Mark generated functions as internal, using <literal>G_GNUC_INTERNAL</literal>.
 <varlistentry>
 <term><option>--valist-marshallers</option></term>
 <listitem><para>
-Generate valist marshallers, for use with <function>xsignal_set_va_marshaller()</function>.
+Generate valist marshallers, for use with <function>g_signal_set_va_marshaller()</function>.
 </para></listitem>
 </varlistentry>
 
@@ -481,7 +481,7 @@ the compiler and linker flags for GLib.
 <informalexample><programlisting>
 PKG_PROG_PKG_CONFIG([0.28])
 
-PKG_CHECK_VAR([XPL_GENMARSHAL], [glib-2.0], [glib_genmarshal])
+PKG_CHECK_VAR([GLIB_GENMARSHAL], [glib-2.0], [glib_genmarshal])
 </programlisting></informalexample>
 <para>
 In your <filename>Makefile.am</filename> file you will typically need very
@@ -489,13 +489,13 @@ simple rules to generate the C files needed for the build.
 </para>
 <informalexample><programlisting>
 marshal.h: marshal.list
-        $(AM_V_GEN)$(XPL_GENMARSHAL) \
+        $(AM_V_GEN)$(GLIB_GENMARSHAL) \
                 --header \
                 --output=$@ \
                 $&lt;
 
 marshal.c: marshal.list marshal.h
-        $(AM_V_GEN)$(XPL_GENMARSHAL) \
+        $(AM_V_GEN)$(GLIB_GENMARSHAL) \
                 --include-header=marshal.h \
                 --body \
                 --output=$@ \
@@ -519,15 +519,15 @@ by the header rule.
 To generate marshallers for the following callback functions:
 </para>
 <informalexample><programlisting>
-void   foo (xpointer_t data1,
-            xpointer_t data2);
-void   bar (xpointer_t data1,
-            xint_t     param1,
-            xpointer_t data2);
-gfloat baz (xpointer_t data1,
-            xboolean_t param1,
-            xuchar_t   param2,
-            xpointer_t data2);
+void   foo (gpointer data1,
+            gpointer data2);
+void   bar (gpointer data1,
+            gint     param1,
+            gpointer data2);
+gfloat baz (gpointer data1,
+            gboolean param1,
+            guchar   param2,
+            gpointer data2);
 </programlisting></informalexample>
 <para>
 The <filename>marshaller.list</filename> file has to look like this:
@@ -558,14 +558,14 @@ They can be used directly for GClosures or be passed in as the
 GSignalCMarshaller c_marshaller; argument upon creation of signals:
 </para>
 <informalexample><programlisting>
-xclosure_t *cc_foo, *cc_bar, *cc_baz;
+GClosure *cc_foo, *cc_bar, *cc_baz;
 
 cc_foo = g_cclosure_new (NULL, foo, NULL);
-xclosure_set_marshal (cc_foo, g_cclosure_user_marshal_VOID__VOID);
+g_closure_set_marshal (cc_foo, g_cclosure_user_marshal_VOID__VOID);
 cc_bar = g_cclosure_new (NULL, bar, NULL);
-xclosure_set_marshal (cc_bar, g_cclosure_user_marshal_VOID__INT);
+g_closure_set_marshal (cc_bar, g_cclosure_user_marshal_VOID__INT);
 cc_baz = g_cclosure_new (NULL, baz, NULL);
-xclosure_set_marshal (cc_baz, g_cclosure_user_marshal_FLOAT__BOOLEAN_UCHAR);
+g_closure_set_marshal (cc_baz, g_cclosure_user_marshal_FLOAT__BOOLEAN_UCHAR);
 </programlisting></informalexample>
 </refsect1>
 <refsect1><title>See also</title>

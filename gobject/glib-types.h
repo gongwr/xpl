@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2000-2001 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __XPL_TYPES_H__
-#define __XPL_TYPES_H__
+#ifndef __GLIB_TYPES_H__
+#define __GLIB_TYPES_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION) && !defined(XPL_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION) && !defined(GLIB_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -27,369 +27,369 @@ G_BEGIN_DECLS
 
 /* A hack necesssary to preprocess this file with g-ir-scanner */
 #ifdef __GI_SCANNER__
-typedef xsize_t xtype_t;
+typedef gsize GType;
 #endif
 
 /* --- GLib boxed types --- */
 /**
- * XTYPE_DATE:
+ * G_TYPE_DATE:
  *
- * The #xtype_t for #xdate_t.
+ * The #GType for #GDate.
  */
-#define XTYPE_DATE (xdate_get_type ())
+#define G_TYPE_DATE (g_date_get_type ())
 
 /**
- * XTYPE_STRV:
+ * G_TYPE_STRV:
  *
- * The #xtype_t for a boxed type holding a %NULL-terminated array of strings.
+ * The #GType for a boxed type holding a %NULL-terminated array of strings.
  *
  * The code fragments in the following example show the use of a property of
- * type %XTYPE_STRV with xobject_class_install_property(), xobject_set()
- * and xobject_get().
+ * type %G_TYPE_STRV with g_object_class_install_property(), g_object_set()
+ * and g_object_get().
  *
  * |[
- * xobject_class_install_property (object_class,
+ * g_object_class_install_property (object_class,
  *                                  PROP_AUTHORS,
- *                                  xparam_spec_boxed ("authors",
+ *                                  g_param_spec_boxed ("authors",
  *                                                      _("Authors"),
  *                                                      _("List of authors"),
- *                                                      XTYPE_STRV,
- *                                                      XPARAM_READWRITE));
+ *                                                      G_TYPE_STRV,
+ *                                                      G_PARAM_READWRITE));
  *
- * xchar_t *authors[] = { "Owen", "Tim", NULL };
- * xobject_set (obj, "authors", authors, NULL);
+ * gchar *authors[] = { "Owen", "Tim", NULL };
+ * g_object_set (obj, "authors", authors, NULL);
  *
- * xchar_t *writers[];
- * xobject_get (obj, "authors", &writers, NULL);
+ * gchar *writers[];
+ * g_object_get (obj, "authors", &writers, NULL);
  * /&ast; do something with writers &ast;/
- * xstrfreev (writers);
+ * g_strfreev (writers);
  * ]|
  *
  * Since: 2.4
  */
-#define XTYPE_STRV (xstrv_get_type ())
+#define G_TYPE_STRV (g_strv_get_type ())
 
 /**
- * XTYPE_GSTRING:
+ * G_TYPE_GSTRING:
  *
- * The #xtype_t for #xstring_t.
+ * The #GType for #GString.
  */
-#define XTYPE_GSTRING (xstring_get_type ())
+#define G_TYPE_GSTRING (g_gstring_get_type ())
 
 /**
- * XTYPE_HASH_TABLE:
+ * G_TYPE_HASH_TABLE:
  *
- * The #xtype_t for a boxed type holding a #xhashtable_t reference.
+ * The #GType for a boxed type holding a #GHashTable reference.
  *
  * Since: 2.10
  */
-#define XTYPE_HASH_TABLE (xhash_table_get_type ())
+#define G_TYPE_HASH_TABLE (g_hash_table_get_type ())
 
 /**
- * XTYPE_REGEX:
+ * G_TYPE_REGEX:
  *
- * The #xtype_t for a boxed type holding a #xregex_t reference.
+ * The #GType for a boxed type holding a #GRegex reference.
  *
  * Since: 2.14
  */
-#define XTYPE_REGEX (xregex_get_type ())
+#define G_TYPE_REGEX (g_regex_get_type ())
 
 /**
- * XTYPE_MATCH_INFO:
+ * G_TYPE_MATCH_INFO:
  *
- * The #xtype_t for a boxed type holding a #xmatch_info_t reference.
+ * The #GType for a boxed type holding a #GMatchInfo reference.
  *
  * Since: 2.30
  */
-#define XTYPE_MATCH_INFO (xmatch_info_get_type ())
+#define G_TYPE_MATCH_INFO (g_match_info_get_type ())
 
 /**
- * XTYPE_ARRAY:
+ * G_TYPE_ARRAY:
  *
- * The #xtype_t for a boxed type holding a #xarray_t reference.
+ * The #GType for a boxed type holding a #GArray reference.
  *
  * Since: 2.22
  */
-#define XTYPE_ARRAY (g_array_get_type ())
+#define G_TYPE_ARRAY (g_array_get_type ())
 
 /**
- * XTYPE_BYTE_ARRAY:
+ * G_TYPE_BYTE_ARRAY:
  *
- * The #xtype_t for a boxed type holding a #xbyte_array_t reference.
+ * The #GType for a boxed type holding a #GByteArray reference.
  *
  * Since: 2.22
  */
-#define XTYPE_BYTE_ARRAY (xbyte_array_get_type ())
+#define G_TYPE_BYTE_ARRAY (g_byte_array_get_type ())
 
 /**
- * XTYPE_PTR_ARRAY:
+ * G_TYPE_PTR_ARRAY:
  *
- * The #xtype_t for a boxed type holding a #xptr_array_t reference.
+ * The #GType for a boxed type holding a #GPtrArray reference.
  *
  * Since: 2.22
  */
-#define XTYPE_PTR_ARRAY (xptr_array_get_type ())
+#define G_TYPE_PTR_ARRAY (g_ptr_array_get_type ())
 
 /**
- * XTYPE_BYTES:
+ * G_TYPE_BYTES:
  *
- * The #xtype_t for #xbytes_t.
+ * The #GType for #GBytes.
  *
  * Since: 2.32
  */
-#define XTYPE_BYTES (xbytes_get_type ())
+#define G_TYPE_BYTES (g_bytes_get_type ())
 
 /**
- * XTYPE_VARIANT_TYPE:
+ * G_TYPE_VARIANT_TYPE:
  *
- * The #xtype_t for a boxed type holding a #xvariant_type_t.
+ * The #GType for a boxed type holding a #GVariantType.
  *
  * Since: 2.24
  */
-#define XTYPE_VARIANT_TYPE (xvariant_type_get_gtype ())
+#define G_TYPE_VARIANT_TYPE (g_variant_type_get_gtype ())
 
 /**
- * XTYPE_ERROR:
+ * G_TYPE_ERROR:
  *
- * The #xtype_t for a boxed type holding a #xerror_t.
+ * The #GType for a boxed type holding a #GError.
  *
  * Since: 2.26
  */
-#define XTYPE_ERROR (xerror_get_type ())
+#define G_TYPE_ERROR (g_error_get_type ())
 
 /**
- * XTYPE_DATE_TIME:
+ * G_TYPE_DATE_TIME:
  *
- * The #xtype_t for a boxed type holding a #xdatetime_t.
+ * The #GType for a boxed type holding a #GDateTime.
  *
  * Since: 2.26
  */
-#define XTYPE_DATE_TIME (xdate_time_get_type ())
+#define G_TYPE_DATE_TIME (g_date_time_get_type ())
 
 /**
- * XTYPE_TIME_ZONE:
+ * G_TYPE_TIME_ZONE:
  *
- * The #xtype_t for a boxed type holding a #xtimezone_t.
+ * The #GType for a boxed type holding a #GTimeZone.
  *
  * Since: 2.34
  */
-#define XTYPE_TIME_ZONE (xtime_zone_get_type ())
+#define G_TYPE_TIME_ZONE (g_time_zone_get_type ())
 
 /**
- * XTYPE_IO_CHANNEL:
+ * G_TYPE_IO_CHANNEL:
  *
- * The #xtype_t for #xio_channel_t.
+ * The #GType for #GIOChannel.
  */
-#define XTYPE_IO_CHANNEL (g_io_channel_get_type ())
+#define G_TYPE_IO_CHANNEL (g_io_channel_get_type ())
 
 /**
- * XTYPE_IO_CONDITION:
+ * G_TYPE_IO_CONDITION:
  *
- * The #xtype_t for #xio_condition_t.
+ * The #GType for #GIOCondition.
  */
-#define XTYPE_IO_CONDITION (g_io_condition_get_type ())
+#define G_TYPE_IO_CONDITION (g_io_condition_get_type ())
 
 /**
- * XTYPE_VARIANT_BUILDER:
+ * G_TYPE_VARIANT_BUILDER:
  *
- * The #xtype_t for a boxed type holding a #xvariant_builder_t.
+ * The #GType for a boxed type holding a #GVariantBuilder.
  *
  * Since: 2.30
  */
-#define XTYPE_VARIANT_BUILDER (xvariant_builder_get_type ())
+#define G_TYPE_VARIANT_BUILDER (g_variant_builder_get_type ())
 
 /**
- * XTYPE_VARIANT_DICT:
+ * G_TYPE_VARIANT_DICT:
  *
- * The #xtype_t for a boxed type holding a #xvariant_dict_t.
+ * The #GType for a boxed type holding a #GVariantDict.
  *
  * Since: 2.40
  */
-#define XTYPE_VARIANT_DICT (xvariant_dict_get_type ())
+#define G_TYPE_VARIANT_DICT (g_variant_dict_get_type ())
 
 /**
- * XTYPE_MAIN_LOOP:
+ * G_TYPE_MAIN_LOOP:
  *
- * The #xtype_t for a boxed type holding a #xmain_loop_t.
+ * The #GType for a boxed type holding a #GMainLoop.
  *
  * Since: 2.30
  */
-#define XTYPE_MAIN_LOOP (xmain_loop_get_type ())
+#define G_TYPE_MAIN_LOOP (g_main_loop_get_type ())
 
 /**
- * XTYPE_MAIN_CONTEXT:
+ * G_TYPE_MAIN_CONTEXT:
  *
- * The #xtype_t for a boxed type holding a #xmain_context_t.
+ * The #GType for a boxed type holding a #GMainContext.
  *
  * Since: 2.30
  */
-#define XTYPE_MAIN_CONTEXT (xmain_context_get_type ())
+#define G_TYPE_MAIN_CONTEXT (g_main_context_get_type ())
 
 /**
- * XTYPE_SOURCE:
+ * G_TYPE_SOURCE:
  *
- * The #xtype_t for a boxed type holding a #xsource_t.
+ * The #GType for a boxed type holding a #GSource.
  *
  * Since: 2.30
  */
-#define XTYPE_SOURCE (xsource_get_type ())
+#define G_TYPE_SOURCE (g_source_get_type ())
 
 /**
- * XTYPE_POLLFD:
+ * G_TYPE_POLLFD:
  *
- * The #xtype_t for a boxed type holding a #xpollfd_t.
+ * The #GType for a boxed type holding a #GPollFD.
  *
  * Since: 2.36
  */
-#define XTYPE_POLLFD (xpollfd_get_type ())
+#define G_TYPE_POLLFD (g_pollfd_get_type ())
 
 /**
- * XTYPE_MARKUP_PARSE_CONTEXT:
+ * G_TYPE_MARKUP_PARSE_CONTEXT:
  *
- * The #xtype_t for a boxed type holding a #xmarkup_parse_context_t.
+ * The #GType for a boxed type holding a #GMarkupParseContext.
  *
  * Since: 2.36
  */
-#define XTYPE_MARKUP_PARSE_CONTEXT (xmarkup_parse_context_get_type ())
+#define G_TYPE_MARKUP_PARSE_CONTEXT (g_markup_parse_context_get_type ())
 
 /**
- * XTYPE_KEY_FILE:
+ * G_TYPE_KEY_FILE:
  *
- * The #xtype_t for a boxed type holding a #xkey_file_t.
+ * The #GType for a boxed type holding a #GKeyFile.
  *
  * Since: 2.32
  */
-#define XTYPE_KEY_FILE (xkey_file_get_type ())
+#define G_TYPE_KEY_FILE (g_key_file_get_type ())
 
 /**
- * XTYPE_MAPPED_FILE:
+ * G_TYPE_MAPPED_FILE:
  *
- * The #xtype_t for a boxed type holding a #xmapped_file_t.
+ * The #GType for a boxed type holding a #GMappedFile.
  *
  * Since: 2.40
  */
-#define XTYPE_MAPPED_FILE (xmapped_file_get_type ())
+#define G_TYPE_MAPPED_FILE (g_mapped_file_get_type ())
 
 /**
- * XTYPE_THREAD:
+ * G_TYPE_THREAD:
  *
- * The #xtype_t for a boxed type holding a #xthread_t.
+ * The #GType for a boxed type holding a #GThread.
  *
  * Since: 2.36
  */
-#define XTYPE_THREAD (xthread_get_type ())
+#define G_TYPE_THREAD (g_thread_get_type ())
 
 /**
- * XTYPE_CHECKSUM:
+ * G_TYPE_CHECKSUM:
  *
- * The #xtype_t for a boxed type holding a #xchecksum_t.
+ * The #GType for a boxed type holding a #GChecksum.
  *
  * Since: 2.36
  */
-#define XTYPE_CHECKSUM (xchecksum_get_type ())
+#define G_TYPE_CHECKSUM (g_checksum_get_type ())
 
 /**
- * XTYPE_OPTION_GROUP:
+ * G_TYPE_OPTION_GROUP:
  *
- * The #xtype_t for a boxed type holding a #xoption_group_t.
+ * The #GType for a boxed type holding a #GOptionGroup.
  *
  * Since: 2.44
  */
-#define XTYPE_OPTION_GROUP (xoption_group_get_type ())
+#define G_TYPE_OPTION_GROUP (g_option_group_get_type ())
 
 /**
- * XTYPE_URI:
+ * G_TYPE_URI:
  *
- * The #xtype_t for a boxed type holding a #xuri_t.
+ * The #GType for a boxed type holding a #GUri.
  *
  * Since: 2.66
  */
-#define XTYPE_URI (xuri_get_type ())
+#define G_TYPE_URI (g_uri_get_type ())
 
 /**
- * XTYPE_TREE:
+ * G_TYPE_TREE:
  *
- * The #xtype_t for #xtree_t.
+ * The #GType for #GTree.
  *
  * Since: 2.68
  */
-#define XTYPE_TREE (xtree_get_type ())
+#define G_TYPE_TREE (g_tree_get_type ())
 
 /**
- * XTYPE_PATTERN_SPEC:
+ * G_TYPE_PATTERN_SPEC:
  *
- * The #xtype_t for #xpattern_spec_t.
+ * The #GType for #GPatternSpec.
  *
  * Since: 2.70
  */
-#define XTYPE_PATTERN_SPEC (xpattern_spec_get_type ())
+#define G_TYPE_PATTERN_SPEC (g_pattern_spec_get_type ())
 
-XPL_AVAILABLE_IN_ALL
-xtype_t   xdate_get_type            (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xstrv_get_type            (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xstring_get_type         (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xhash_table_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   g_array_get_type           (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xbyte_array_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xptr_array_get_type       (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xbytes_get_type           (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xvariant_type_get_gtype   (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xregex_get_type           (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_30
-xtype_t   xmatch_info_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xerror_get_type           (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xdate_time_get_type       (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xtime_zone_get_type       (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   g_io_channel_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   g_io_condition_get_type    (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xvariant_builder_get_type (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_40
-xtype_t   xvariant_dict_get_type    (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t   xkey_file_get_type        (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_30
-xtype_t   xmain_loop_get_type       (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_30
-xtype_t   xmain_context_get_type    (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_30
-xtype_t   xsource_get_type          (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_36
-xtype_t   xpollfd_get_type          (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_36
-xtype_t   xthread_get_type          (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_36
-xtype_t   xchecksum_get_type        (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_36
-xtype_t   xmarkup_parse_context_get_type (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_40
-xtype_t   xmapped_file_get_type (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_44
-xtype_t   xoption_group_get_type    (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_66
-xtype_t   xuri_get_type             (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_68
-xtype_t   xtree_get_type            (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_70
-xtype_t xpattern_spec_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_date_get_type            (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_strv_get_type            (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_gstring_get_type         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_hash_table_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_array_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_byte_array_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_ptr_array_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_bytes_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_variant_type_get_gtype   (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_regex_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_30
+GType   g_match_info_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_error_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_date_time_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_time_zone_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_io_channel_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_io_condition_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_variant_builder_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_40
+GType   g_variant_dict_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType   g_key_file_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_30
+GType   g_main_loop_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_30
+GType   g_main_context_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_30
+GType   g_source_get_type          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_36
+GType   g_pollfd_get_type          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_36
+GType   g_thread_get_type          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_36
+GType   g_checksum_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_36
+GType   g_markup_parse_context_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_40
+GType   g_mapped_file_get_type (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_44
+GType   g_option_group_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_66
+GType   g_uri_get_type             (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_68
+GType   g_tree_get_type            (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_70
+GType g_pattern_spec_get_type (void) G_GNUC_CONST;
 
-XPL_DEPRECATED_FOR('XTYPE_VARIANT')
-xtype_t   xvariant_get_gtype        (void) G_GNUC_CONST;
+GLIB_DEPRECATED_FOR('G_TYPE_VARIANT')
+GType   g_variant_get_gtype        (void) G_GNUC_CONST;
 
 G_END_DECLS
 
-#endif  /* __XPL_TYPES_H__ */
+#endif  /* __GLIB_TYPES_H__ */

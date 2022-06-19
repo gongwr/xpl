@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  *
  * gthreadprivate.h - GLib internal thread system related declarations.
  *
@@ -28,12 +28,12 @@
 typedef struct _GRealThread GRealThread;
 struct  _GRealThread
 {
-  xthread_t thread;
+  GThread thread;
 
-  xint_t ref_count;
-  xboolean_t ours;
-  xchar_t *name;
-  xpointer_t retval;
+  gint ref_count;
+  gboolean ours;
+  gchar *name;
+  gpointer retval;
 };
 
 /* system thread implementation (gthread-posix.c, gthread-win32.c) */
@@ -45,7 +45,7 @@ typedef struct
   /* This is for modern Linux */
   struct sched_attr *attr;
 #elif defined(G_OS_WIN32)
-  xint_t thread_prio;
+  gint thread_prio;
 #else
   /* TODO: Add support for macOS and the BSDs */
   void *dummy;
@@ -55,35 +55,35 @@ typedef struct
 void            g_system_thread_wait            (GRealThread  *thread);
 
 GRealThread *g_system_thread_new (GThreadFunc proxy,
-                                  xulong_t stack_size,
+                                  gulong stack_size,
                                   const GThreadSchedulerSettings *scheduler_settings,
                                   const char *name,
                                   GThreadFunc func,
-                                  xpointer_t data,
-                                  xerror_t **error);
+                                  gpointer data,
+                                  GError **error);
 void            g_system_thread_free            (GRealThread  *thread);
 
 void            g_system_thread_exit            (void);
-void            g_system_thread_set_name        (const xchar_t  *name);
+void            g_system_thread_set_name        (const gchar  *name);
 
-xboolean_t        g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
+gboolean        g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
 
 /* gthread.c */
-xthread_t *xthread_new_internal (const xchar_t *name,
+GThread *g_thread_new_internal (const gchar *name,
                                 GThreadFunc proxy,
                                 GThreadFunc func,
-                                xpointer_t data,
-                                xsize_t stack_size,
+                                gpointer data,
+                                gsize stack_size,
                                 const GThreadSchedulerSettings *scheduler_settings,
-                                xerror_t **error);
+                                GError **error);
 
-xboolean_t xthread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
+gboolean g_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings);
 
-xpointer_t        xthread_proxy                  (xpointer_t      thread);
+gpointer        g_thread_proxy                  (gpointer      thread);
 
-xuint_t           xthread_n_created              (void);
+guint           g_thread_n_created              (void);
 
-xpointer_t        g_private_set_alloc0            (xprivate_t       *key,
-                                                 xsize_t           size);
+gpointer        g_private_set_alloc0            (GPrivate       *key,
+                                                 gsize           size);
 
 #endif /* __G_THREADPRIVATE_H__ */

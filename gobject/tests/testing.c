@@ -34,13 +34,13 @@
 static void
 test_assert_finalize_object_subprocess_bad (void)
 {
-  xobject_t *obj = xobject_new (XTYPE_OBJECT, NULL);
-  xobject_ref (obj);
+  GObject *obj = g_object_new (G_TYPE_OBJECT, NULL);
+  g_object_ref (obj);
 
   /* This should emit an assertion failure. */
   g_assert_finalize_object (obj);
 
-  xobject_unref (obj);
+  g_object_unref (obj);
 
   exit (0);
 }
@@ -48,7 +48,7 @@ test_assert_finalize_object_subprocess_bad (void)
 static void
 test_assert_finalize_object (void)
 {
-  xobject_t *obj = xobject_new (XTYPE_OBJECT, NULL);
+  GObject *obj = g_object_new (G_TYPE_OBJECT, NULL);
 
   g_assert_finalize_object (obj);
 

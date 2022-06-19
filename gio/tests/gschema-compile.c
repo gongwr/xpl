@@ -6,38 +6,38 @@
 #include <gstdio.h>
 
 typedef struct {
-  const xchar_t *name;
-  const xchar_t *opt;
-  const xchar_t *err;
+  const gchar *name;
+  const gchar *opt;
+  const gchar *err;
 } SchemaTest;
 
 static void
-test_schema_do_compile (xpointer_t data)
+test_schema_do_compile (gpointer data)
 {
   SchemaTest *test = (SchemaTest *) data;
-  xchar_t *filename = xstrconcat (test->name, ".gschema.xml", NULL);
-  xchar_t *path = g_test_build_filename (G_TEST_DIST, "schema-tests", filename, NULL);
-  const xchar_t *argv[] = {
-    XPL_COMPILE_SCHEMAS,  /* defined in meson.build */
+  gchar *filename = g_strconcat (test->name, ".gschema.xml", NULL);
+  gchar *path = g_test_build_filename (G_TEST_DIST, "schema-tests", filename, NULL);
+  const gchar *argv[] = {
+    GLIB_COMPILE_SCHEMAS,  /* defined in meson.build */
     "--strict",
     "--dry-run",
     "--schema-file", path,
     test->opt,
     NULL
   };
-  xchar_t *envp[] = { NULL };
+  gchar *envp[] = { NULL };
 
   execve (argv[0], (char **) argv, envp);
   g_assert_not_reached ();
 }
 
 static void
-test_schema (xpointer_t data)
+test_schema (gpointer data)
 {
   SchemaTest *test = (SchemaTest *) data;
-  xchar_t *child_name;
+  gchar *child_name;
 
-  child_name = xstrdup_printf ("/gschema/%s%s/subprocess/do_compile", test->name, test->opt ? "/opt" : "");
+  child_name = g_strdup_printf ("/gschema/%s%s/subprocess/do_compile", test->name, test->opt ? "/opt" : "");
   g_test_trap_subprocess (child_name, 0, 0);
   g_free (child_name);
 
@@ -57,7 +57,7 @@ static const SchemaTest tests[] = {
   { "missing-quotes",               NULL, "*unknown keyword*"                                   },
   { "incomplete-list",              NULL, "*to follow array element*"                           },
   { "wrong-category",               NULL, "*unsupported l10n category*"                         },
-  { "bad-type",                     NULL, "*Invalid xvariant_t type string*"                      },
+  { "bad-type",                     NULL, "*Invalid GVariant type string*"                      },
   { "overflow",                     NULL, "*out of range*"                                      },
   { "range-wrong-type",             NULL, "*<range> not allowed for keys of type*"              },
   { "range-missing-min",            NULL, NULL                                                  },
@@ -141,7 +141,7 @@ static const SchemaTest tests[] = {
 int
 main (int argc, char *argv[])
 {
-  xuint_t i;
+  guint i;
 
   setlocale (LC_ALL, "");
 
@@ -149,14 +149,14 @@ main (int argc, char *argv[])
 
   for (i = 0; i < G_N_ELEMENTS (tests); ++i)
     {
-      xchar_t *name;
+      gchar *name;
 
-      name = xstrdup_printf ("/gschema/%s%s", tests[i].name, tests[i].opt ? "/opt" : "");
-      g_test_add_data_func (name, &tests[i], (xpointer_t) test_schema);
+      name = g_strdup_printf ("/gschema/%s%s", tests[i].name, tests[i].opt ? "/opt" : "");
+      g_test_add_data_func (name, &tests[i], (gpointer) test_schema);
       g_free (name);
 
-      name = xstrdup_printf ("/gschema/%s%s/subprocess/do_compile", tests[i].name, tests[i].opt ? "/opt" : "");
-      g_test_add_data_func (name, &tests[i], (xpointer_t) test_schema_do_compile);
+      name = g_strdup_printf ("/gschema/%s%s/subprocess/do_compile", tests[i].name, tests[i].opt ? "/opt" : "");
+      g_test_add_data_func (name, &tests[i], (gpointer) test_schema_do_compile);
       g_free (name);
     }
 

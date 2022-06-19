@@ -62,10 +62,10 @@ typedef HRESULT (STDAPICALLTYPE *CreateXmlReader_func)(REFIID riid, void **ppvOb
 #define sax_CreateXmlReader sax->CreateXmlReader
 #endif
 
-static xsize_t
-xutf16_len (const xunichar2_t *str)
+static gsize
+g_utf16_len (const gunichar2 *str)
 {
-  xsize_t result;
+  gsize result;
 
   for (result = 0; str[0] != 0; str++, result++)
     ;
@@ -73,21 +73,21 @@ xutf16_len (const xunichar2_t *str)
   return result;
 }
 
-static xunichar2_t *
-g_wcsdup (const xunichar2_t *str, xssize_t str_len)
+static gunichar2 *
+g_wcsdup (const gunichar2 *str, gssize str_len)
 {
-  xsize_t str_len_unsigned;
-  xsize_t str_size;
+  gsize str_len_unsigned;
+  gsize str_size;
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   if (str_len < 0)
-    str_len_unsigned = xutf16_len (str);
+    str_len_unsigned = g_utf16_len (str);
   else
-    str_len_unsigned = (xsize_t) str_len;
+    str_len_unsigned = (gsize) str_len;
 
-  xassert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
-  str_size = (str_len_unsigned + 1) * sizeof (xunichar2_t);
+  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (gunichar2) - 1);
+  str_size = (str_len_unsigned + 1) * sizeof (gunichar2);
 
   return g_memdup2 (str, str_size);
 }
@@ -120,8 +120,8 @@ gio_error_from_hresult (HRESULT hresult)
 static void
 free_extgroup (GWin32PackageExtGroup *g)
 {
-  xptr_array_unref (g->verbs);
-  xptr_array_unref (g->extensions);
+  g_ptr_array_unref (g->verbs);
+  g_ptr_array_unref (g->extensions);
   g_free (g);
 }
 
@@ -133,16 +133,16 @@ struct _xml_sax_state
 #endif
 
   GWin32PackageParserCallback callback;
-  xpointer_t user_data;
+  gpointer user_data;
 
   const wchar_t *manifest_filename;
-  xsize_t          package_index;
+  gsize          package_index;
   const wchar_t *wcs_full_name;
   const wchar_t *wcs_name;
   HSTRING        package_family;
 
-  xboolean_t       applist;
-  xboolean_t       exit_early;
+  gboolean       applist;
+  gboolean       exit_early;
 
   UINT64         in_package;
   UINT64         in_applications;
@@ -154,28 +154,28 @@ struct _xml_sax_state
   UINT64         in_sfp;
   UINT64         in_filetype;
   UINT64         in_sv;
-  xptr_array_t     *supported_extensions;
-  xptr_array_t     *supported_protocols;
-  xptr_array_t     *supported_verbs;
-  xptr_array_t     *supported_extgroups;
+  GPtrArray     *supported_extensions;
+  GPtrArray     *supported_protocols;
+  GPtrArray     *supported_verbs;
+  GPtrArray     *supported_extgroups;
   wchar_t       *application_usermodelid;
 };
 
-static xboolean_t parse_manifest_file          (struct _xml_sax_state  *sax);
-static xboolean_t xml_parser_iteration         (struct _xml_sax_state  *sax,
+static gboolean parse_manifest_file          (struct _xml_sax_state  *sax);
+static gboolean xml_parser_iteration         (struct _xml_sax_state  *sax,
                                               IXmlReader             *xml_reader);
-static xboolean_t xml_parser_get_current_state (struct _xml_sax_state  *sax,
+static gboolean xml_parser_get_current_state (struct _xml_sax_state  *sax,
                                               IXmlReader             *xml_reader,
                                               const wchar_t         **local_name,
                                               const wchar_t         **prefix,
                                               const wchar_t         **value);
 
-xboolean_t
+gboolean
 g_win32_package_parser_enum_packages (GWin32PackageParserCallback   callback,
-                                      xpointer_t                      user_data,
-                                      xerror_t                      **error)
+                                      gpointer                      user_data,
+                                      GError                      **error)
 {
-  xboolean_t result = TRUE;
+  gboolean result = TRUE;
   HRESULT hr;
   HSTRING packagemanager_name = NULL;
   HSTRING_HEADER packageanager_name_header;
@@ -185,7 +185,7 @@ g_win32_package_parser_enum_packages (GWin32PackageParserCallback   callback,
   IIterable *packages_iterable = NULL;
   IIterator *packages_iterator = NULL;
   CHAR has_current;
-  xsize_t package_index;
+  gsize package_index;
   const wchar_t *bslash_appmanifest = L"\\AppxManifest.xml";
   struct _xml_sax_state sax_stack;
   struct _xml_sax_state *sax = &sax_stack;
@@ -470,13 +470,13 @@ g_win32_package_parser_enum_packages (GWin32PackageParserCallback   callback,
   return result;
 }
 
-static xboolean_t
+static gboolean
 parse_manifest_file (struct _xml_sax_state *sax)
 {
   HRESULT hr;
   HANDLE file_handle = INVALID_HANDLE_VALUE;
   IStream *file_stream = NULL;
-  xboolean_t result;
+  gboolean result;
   IXmlReader *xml_reader;
 
   file_handle = CreateFileW (sax->manifest_filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -521,10 +521,10 @@ parse_manifest_file (struct _xml_sax_state *sax)
       return FALSE;
     }
 
-  sax->supported_extensions = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
-  sax->supported_protocols = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
-  sax->supported_verbs = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
-  sax->supported_extgroups = xptr_array_new_full (0, (xdestroy_notify_t) free_extgroup);
+  sax->supported_extensions = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
+  sax->supported_protocols = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
+  sax->supported_verbs = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
+  sax->supported_extgroups = g_ptr_array_new_full (0, (GDestroyNotify) free_extgroup);
 
   result = TRUE;
 
@@ -532,10 +532,10 @@ parse_manifest_file (struct _xml_sax_state *sax)
     result = xml_parser_iteration (sax, xml_reader);
 
   g_clear_pointer (&sax->application_usermodelid, g_free);
-  g_clear_pointer (&sax->supported_extensions, xptr_array_unref);
-  g_clear_pointer (&sax->supported_verbs, xptr_array_unref);
-  g_clear_pointer (&sax->supported_extgroups, xptr_array_unref);
-  g_clear_pointer (&sax->supported_protocols, xptr_array_unref);
+  g_clear_pointer (&sax->supported_extensions, g_ptr_array_unref);
+  g_clear_pointer (&sax->supported_verbs, g_ptr_array_unref);
+  g_clear_pointer (&sax->supported_extgroups, g_ptr_array_unref);
+  g_clear_pointer (&sax->supported_protocols, g_ptr_array_unref);
 
   (void) IXmlReader_Release (xml_reader);
   (void) IStream_Release (file_stream);
@@ -543,7 +543,7 @@ parse_manifest_file (struct _xml_sax_state *sax)
   return result;
 }
 
-static xboolean_t
+static gboolean
 xml_parser_get_current_state (struct _xml_sax_state  *sax,
                               IXmlReader             *xml_reader,
                               const wchar_t         **local_name,
@@ -597,7 +597,7 @@ xml_parser_get_current_state (struct _xml_sax_state  *sax,
   return TRUE;
 }
 
-static xboolean_t
+static gboolean
 xml_parser_iteration (struct _xml_sax_state  *sax,
                       IXmlReader             *xml_reader)
 {
@@ -628,7 +628,7 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
     {
     case XmlNodeType_Element:
       is_empty = IXmlReader_IsEmptyElement (xml_reader);
-      xassert (local_name != NULL);
+      g_assert (local_name != NULL);
 
       if (!is_empty &&
           _wcsicmp (local_name, L"Package") == 0 &&
@@ -699,9 +699,9 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
           if (!xml_parser_get_current_state (sax, xml_reader, &local_name, &prefix, &value))
             return FALSE;
 
-          xassert (local_name != NULL);
-          xassert (value != NULL);
-          xassert (prefix != NULL);
+          g_assert (local_name != NULL);
+          g_assert (value != NULL);
+          g_assert (prefix != NULL);
 
           if (is_application &&
               sax->application_usermodelid == NULL &&
@@ -735,22 +735,22 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
             sax->in_extension_fta += 1;
           else if (is_protocol &&
                    _wcsicmp (local_name, L"Name") == 0)
-            xptr_array_add (sax->supported_protocols, g_wcsdup (value, -1));
+            g_ptr_array_add (sax->supported_protocols, g_wcsdup (value, -1));
           else if (is_verb &&
                    _wcsicmp (local_name, L"Id") == 0)
-            xptr_array_add (sax->supported_verbs, g_wcsdup (value, -1));
+            g_ptr_array_add (sax->supported_verbs, g_wcsdup (value, -1));
 
           hr = IXmlReader_MoveToNextAttribute (xml_reader);
         }
       break;
     case XmlNodeType_Text:
-      xassert (value != NULL);
+      g_assert (value != NULL);
 
       if (sax->in_filetype && value[0] != 0)
-        xptr_array_add (sax->supported_extensions, g_wcsdup (value, -1));
+        g_ptr_array_add (sax->supported_extensions, g_wcsdup (value, -1));
       break;
     case XmlNodeType_EndElement:
-      xassert (local_name != NULL);
+      g_assert (local_name != NULL);
 
       if (_wcsicmp (local_name, L"Package") == 0 &&
           prefix[0] == 0)
@@ -791,10 +791,10 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
             sax->exit_early = !sax->callback (sax->user_data, sax->wcs_full_name, sax->wcs_name,
                                               sax->application_usermodelid, sax->applist,
                                               sax->supported_extgroups, sax->supported_protocols);
-          g_clear_pointer (&sax->supported_extgroups, xptr_array_unref);
-          g_clear_pointer (&sax->supported_protocols, xptr_array_unref);
-          sax->supported_protocols = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
-          sax->supported_extgroups = xptr_array_new_full (0, (xdestroy_notify_t) free_extgroup);
+          g_clear_pointer (&sax->supported_extgroups, g_ptr_array_unref);
+          g_clear_pointer (&sax->supported_protocols, g_ptr_array_unref);
+          sax->supported_protocols = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
+          sax->supported_extgroups = g_ptr_array_new_full (0, (GDestroyNotify) free_extgroup);
           sax->in_application -= 1;
         }
       else if (sax->in_extension_fta == 1 &&
@@ -803,10 +803,10 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
         {
           GWin32PackageExtGroup *new_group = g_new0 (GWin32PackageExtGroup, 1);
           new_group->extensions = g_steal_pointer (&sax->supported_extensions);
-          sax->supported_extensions = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
+          sax->supported_extensions = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
           new_group->verbs = g_steal_pointer (&sax->supported_verbs);
-          sax->supported_verbs  = xptr_array_new_full (0, (xdestroy_notify_t) g_free);
-          xptr_array_add (sax->supported_extgroups, new_group);
+          sax->supported_verbs  = g_ptr_array_new_full (0, (GDestroyNotify) g_free);
+          g_ptr_array_add (sax->supported_extgroups, new_group);
           sax->in_fta_group -= 1;
         }
       break;

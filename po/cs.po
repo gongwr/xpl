@@ -38,17 +38,17 @@ msgstr ""
 "podporováno"
 
 #: gio/gapplication.c:497
-msgid "xapplication_t options"
-msgstr "Volby xapplication_t"
+msgid "GApplication options"
+msgstr "Volby GApplication"
 
 #: gio/gapplication.c:497
-msgid "Show xapplication_t options"
-msgstr "Zobrazit volby xapplication_t"
+msgid "Show GApplication options"
+msgstr "Zobrazit volby GApplication"
 
 #: gio/gapplication.c:542
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
-"Vstoupit do režimu služby xapplication_t (použít ze souborů služby D-Bus)"
+"Vstoupit do režimu služby GApplication (použít ze souborů služby D-Bus)"
 
 #: gio/gapplication.c:554
 msgid "Override the application’s ID"
@@ -158,8 +158,8 @@ msgid "PARAMETER"
 msgstr "PARAMETR"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Volitelný parametr k akci vyvolání ve formátu xvariant_t"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Volitelný parametr k akci vyvolání ve formátu GVariant"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
 #, c-format
@@ -286,8 +286,8 @@ msgid "Seek not supported on base stream"
 msgstr "Posouvání není v proudu podporováno"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Nelze zkrátit xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Nelze zkrátit GBufferedInputStream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -358,20 +358,20 @@ msgid "%s filetype"
 msgstr "typ souboru %s"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t obsahuje neplatná data"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials obsahuje neplatná data"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t na tomto OS není implementováno"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials na tomto OS není implementováno"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Danou platformu xcredentials_t nepodporuje"
+msgid "There is no GCredentials support for your platform"
+msgstr "Danou platformu GCredentials nepodporuje"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t na tomto OS neobsahuje ID procesu"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials na tomto OS neobsahuje ID procesu"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -562,8 +562,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "ID uživatele musí být stejné pro klienta i server"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Zrušeno přes xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Zrušeno přes GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -853,9 +853,9 @@ msgstr "Analyzovaná hodnota „%s“ varianty není platným podpisem D-Bus"
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Chyba při rušení serializace xvariant_t s řetězcem typu „%s“ z přenosového "
+"Chyba při rušení serializace GVariant s řetězcem typu „%s“ z přenosového "
 "formátu D-Bus"
 
 #: gio/gdbusmessage.c:2206
@@ -902,9 +902,9 @@ msgstr "Nelze zrušit serializaci zprávy: "
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"Chyba při serializaci xvariant_t s řetězcem typu „%s“ do přenosového formátu D-"
+"Chyba při serializaci GVariant s řetězcem typu „%s“ do přenosového formátu D-"
 "Bus"
 
 #: gio/gdbusmessage.c:2835
@@ -1369,27 +1369,27 @@ msgstr "Podpora DTLS není dostupná"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Nelze zpracovat verzi %d kódování xemblem_t"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Nelze zpracovat verzi %d kódování GEmblem"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Chybný počet tokenů (%d) v kódování xemblem_t"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Chybný počet tokenů (%d) v kódování GEmblem"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Nelze zpracovat verzi %d kódování xemblemed_icon_t"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Nelze zpracovat verzi %d kódování GEmblemedIcon"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Chybný počet tokenů (%d) v kódování xemblemed_icon_t"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Chybný počet tokenů (%d) v kódování GEmblemedIcon"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Očekáváno xemblem_t u xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Očekáváno GEmblem u GEmblemedIcon"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1481,12 +1481,12 @@ msgstr "Souborový enumerator je již uzavřen"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Nelze zpracovat verzi %d kódování xfile_icon_t"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Nelze zpracovat verzi %d kódování GFileIcon"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Chybná vstupní data u xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Chybná vstupní data u GFileIcon"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1553,8 +1553,8 @@ msgstr "Název třídy %s nemá typ"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "Typ %s neimplementuje rozhraní xicon_t"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "Typ %s neimplementuje rozhraní GIcon"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1568,8 +1568,8 @@ msgstr "Chybné číslo verze: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Typ %s neimplementuje from_tokens() v rozhraní xicon_t"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Typ %s neimplementuje from_tokens() v rozhraní GIcon"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2742,8 +2742,8 @@ msgstr "<%s id='%s'> (zatím) nebylo určeno."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Neplatný řetězec typu xvariant_t „%s“"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Neplatný řetězec typu GVariant „%s“"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2971,11 +2971,11 @@ msgstr "Nevynucovat omezení názvů klíče"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Kompilovat všechny soubory schémat xsettings_t do mezipaměti schémat.\n"
+"Kompilovat všechny soubory schémat GSettings do mezipaměti schémat.\n"
 "Soubory schémat musí mít rozšíření .gschema.xml,\n"
 "a soubor mezipaměti se jmenuje gschemas.compiled."
 
@@ -3332,16 +3332,16 @@ msgid "Error removing old file: %s"
 msgstr "Chyba při odstraňování starého souboru: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
-msgstr "Poskytnut neplatný xseek_type_t"
+msgid "Invalid GSeekType supplied"
+msgstr "Poskytnut neplatný GSeekType"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Neplatný požadavek na hledání"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Nelze zkrátit xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Nelze zkrátit GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -3872,8 +3872,8 @@ msgstr "Časový limit V/V soketu vypršel"
 
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "vytváří se xsocket_t z fd: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "vytváří se GSocket z fd: %s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
 #, c-format
@@ -4015,8 +4015,8 @@ msgid "Error sending message: %s"
 msgstr "Chyba při odesílání zprávy: %s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t nepodporováno na Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage nepodporováno na Windows"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4029,8 +4029,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Nelze číst pověření k soketu: %s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "xsocket_get_credentials není u tohoto OS implementováno"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "g_socket_get_credentials není u tohoto OS implementováno"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4162,8 +4162,8 @@ msgstr "Roury nejsou na této platformě podporovány"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Nelze zpracovat verzi %d kódování xthemed_icon_t"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Nelze zpracovat verzi %d kódování GThemedIcon"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4216,8 +4216,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Tato knihovna TLS nepodporuje PKCS #12."
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "Tento xtls_backend_t nepodporuje vytváření certifikátů PKCS #11."
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "Tento GTlsBackend nepodporuje vytváření certifikátů PKCS #11."
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4526,27 +4526,27 @@ msgstr "Název cesty „%s“ není absolutní cestou"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %-d. %B %Y, %H:%M:%S %Z"
 
 # This might be e.g. %Y-%m-%d or %e. %m. %Y as well. See also http://prirucka.ujc.cas.cz/?id=810.
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%Y"
 
 # This might be e.g. %k:%M:%S or %k.%M.%S as well. See also http://prirucka.ujc.cas.cz/?id=820.
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S"
 
@@ -4933,13 +4933,13 @@ msgstr "pro"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "dop."
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "odp."
 

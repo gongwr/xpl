@@ -390,13 +390,13 @@ class Serialiser:
         print("#define MAX_KEY_SIZE", max_lookup)
         print("#define MAX_LOCALE_NAME", max_localename)
         print(
-            "static const xunichar_t src_table[] = {",
+            "static const gunichar src_table[] = {",
             ", ".join(str(ord(c)) for c in src_table),
             "};",
         )
         # cannot do this in plain ascii because of trigraphs... :(
         print(
-            "static const xchar_t ascii_table[] = {",
+            "static const gchar ascii_table[] = {",
             ", ".join(str(ord(c)) for c in ascii_table),
             "};",
         )
@@ -409,17 +409,17 @@ class Serialiser:
             c_pair_array(mapping_ranges),
         )
         print(
-            "static const xuint8_t chains_table[] = {",
+            "static const guint8 chains_table[] = {",
             ", ".join(str(i) for i in chains_table),
             "};",
         )
         print(
-            "static const xuint8_t chain_starts[] = {",
+            "static const guint8 chain_starts[] = {",
             ", ".join(str(i) for i in chain_starts),
             "};",
         )
         print(
-            'static const xchar_t locale_names[] = "'
+            'static const gchar locale_names[] = "'
             + locale_names.replace("\0", "\\0")
             + '";'
         )
@@ -427,7 +427,7 @@ class Serialiser:
             "static const struct locale_entry locale_index[] = ",
             c_pair_array(locale_index),
         )
-        print("static const xuint8_t default_item_id = %u;" % (self.default,))
+        print("static const guint8 default_item_id = %u;" % (self.default,))
 
     def dump(self):
         print(self.mappings)

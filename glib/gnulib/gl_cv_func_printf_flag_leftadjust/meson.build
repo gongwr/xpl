@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# test_t whether the *printf family of functions supports the - flag correctly.
+# Test whether the *printf family of functions supports the - flag correctly.
 # (ISO C99.) See
 # <https://lists.gnu.org/r/bug-coreutils/2008-02/msg00035.html>
 # Result is gl_cv_func_printf_flag_leftadjust.

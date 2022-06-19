@@ -2,26 +2,26 @@
 
 <refentry id='gvariant-text'>
  <refmeta>
-  <refentrytitle>xvariant_t Text Format</refentrytitle>
+  <refentrytitle>GVariant Text Format</refentrytitle>
  </refmeta>
  <refnamediv>
-  <refname>xvariant_t Text Format</refname>
+  <refname>GVariant Text Format</refname>
   <refpurpose>textual representation of GVariants</refpurpose>
  </refnamediv>
 
  <refsect1>
-  <title>xvariant_t Text Format</title>
+  <title>GVariant Text Format</title>
 
   <para>
-   This page attempts to document the xvariant_t text format as produced by
-   <link linkend='g-variant-print'><function>xvariant_print()</function></link> and parsed by the
-   <link linkend='g-variant-parse'><function>xvariant_parse()</function></link> family of functions.  In most
+   This page attempts to document the GVariant text format as produced by
+   <link linkend='g-variant-print'><function>g_variant_print()</function></link> and parsed by the
+   <link linkend='g-variant-parse'><function>g_variant_parse()</function></link> family of functions.  In most
    cases the style closely resembles the formatting of literals in Python but there are some additions and
    exceptions.
   </para>
 
   <para>
-   The functions that deal with xvariant_t text format absolutely always deal in utf-8.  Conceptually, xvariant_t
+   The functions that deal with GVariant text format absolutely always deal in utf-8.  Conceptually, GVariant
    text format is a string of Unicode characters -- not bytes.  Non-ASCII but otherwise printable Unicode
    characters are not treated any differently from normal ASCII characters.
   </para>
@@ -29,7 +29,7 @@
   <para>
    The parser makes two passes.  The purpose of the first pass is to determine the type of the value being
    parsed.  The second pass does the actual parsing.  Based on the fact that all elements in an array have to
-   have the same type, xvariant_t is able to make some deductions that would not otherwise be possible.  As an
+   have the same type, GVariant is able to make some deductions that would not otherwise be possible.  As an
    example:
 
    <informalexample><programlisting>[[1, 2, 3], [4, 5, 6]]</programlisting></informalexample>
@@ -42,7 +42,7 @@
   </para>
 
   <para>
-   As another example, xvariant_t is able to determine that
+   As another example, GVariant is able to determine that
 
    <informalexample><programlisting>["hello", nothing]</programlisting></informalexample>
 
@@ -52,7 +52,7 @@
   <para>
    What the parser accepts as valid input is dependent on context.  The API permits for out-of-band type
    information to be supplied to the parser (which will change its behaviour).  This can be seen in the
-   xsettings_t and GDBus command line utilities where the type information is available from the schema or the
+   GSettings and GDBus command line utilities where the type information is available from the schema or the
    remote introspection information.  The additional information can cause parses to succeed when they would not
    otherwise have been able to (by resolving ambiguous type information) or can cause them to fail (due to
    conflicting type information).  Unless stated otherwise, the examples given in this section assume that no
@@ -64,7 +64,7 @@
   <title>Syntax Summary</title>
 
   <para>
-   The following table describes the rough meaning of symbols that may appear inside xvariant_t text format.
+   The following table describes the rough meaning of symbols that may appear inside GVariant text format.
    Each symbol is described in detail in its own section, including usage examples.
   </para>
 
@@ -297,7 +297,7 @@
    </para>
    <para>
     The usual octal and hexadecimal escapes <literal>\0nnn</literal> and <literal>\xnn</literal> are not
-    supported here.  Those escapes are used to encode byte values and xvariant_t strings are Unicode.
+    supported here.  Those escapes are used to encode byte values and GVariant strings are Unicode.
    </para>
    <para>
     Single-character strings are not interpreted as bytes.  Bytes must be specified by their numerical value.
@@ -308,7 +308,7 @@
    <title>Numbers</title>
    <para>
     Numbers are given by default as decimal values.  Octal and hex values can be given in the usual way (by
-    prefixing with <literal>0</literal> or <literal>0x</literal>).  Note that xvariant_t considers bytes to be
+    prefixing with <literal>0</literal> or <literal>0x</literal>).  Note that GVariant considers bytes to be
     unsigned integers and will print them as a two digit hexadecimal number by default.
    </para>
    <para>
@@ -356,8 +356,8 @@
   <refsect2 id='gvariant-text-arrays'>
    <title>Arrays</title>
    <para>
-    Arrays are formed using the same syntax as Python uses for lists (which is arguably the term that xvariant_t
-    should have used).  Note that, unlike Python lists, xvariant_t arrays are statically typed.  This has two
+    Arrays are formed using the same syntax as Python uses for lists (which is arguably the term that GVariant
+    should have used).  Note that, unlike Python lists, GVariant arrays are statically typed.  This has two
     implications.
    </para>
    <para>
@@ -477,7 +477,7 @@
    </para>
    <para>
     The null case is specified using the keyword <literal>nothing</literal> and the non-null case is explicitly
-    specified using the keyword <literal>just</literal>.  xvariant_t allows <literal>just</literal> to be omitted
+    specified using the keyword <literal>just</literal>.  GVariant allows <literal>just</literal> to be omitted
     in every case that it is able to unambiguously determine the intention of the writer.  There are two cases
     where it must be specified:
    </para>
@@ -539,7 +539,7 @@
     corresponding type code.
    </para>
    <para>
-    Type codes are an <literal>@</literal> ("at" sign) followed by a definite xvariant_t type string.  Some
+    Type codes are an <literal>@</literal> ("at" sign) followed by a definite GVariant type string.  Some
     examples:
    </para>
    <para>
@@ -562,7 +562,7 @@
   <refsect2 id='gvariant-text-bytestrings'>
    <title>Bytestrings</title>
    <para>
-    The bytestring syntax is a piece of syntactic sugar meant to complement the bytestring APIs in xvariant_t.  It
+    The bytestring syntax is a piece of syntactic sugar meant to complement the bytestring APIs in GVariant.  It
     constructs arrays of non-nul bytes (type '<literal>ay</literal>') with a nul terminator at the end. These are
     normal C strings with no particular encoding enforced, so the bytes may not be valid UTF-8.
     Bytestrings are a special case of byte arrays; byte arrays (also type '<literal>ay</literal>'), in the general
@@ -574,7 +574,7 @@
    </para>
    <para>
     Bytestrings support the full range of escapes that you would expect (ie: those supported by
-    <link linkend='g-strcompress'><function>xstrcompress()</function></link>.  This includes the normal control
+    <link linkend='g-strcompress'><function>g_strcompress()</function></link>.  This includes the normal control
     sequence escapes (as mentioned in the section on strings) as well as octal and hexadecimal escapes of the
     forms <literal>\0nnn</literal> and <literal>\xnn</literal>.
    </para>
@@ -590,22 +590,22 @@
   <refsect2 id='gvariant-text-positional'>
    <title>Positional Parameters</title>
    <para>
-    Positional parameters are not a part of the normal xvariant_t text format, but they are mentioned here because
-    they can be used with <link linkend='g-variant-new-parsed'><function>xvariant_new_parsed()</function></link>.
+    Positional parameters are not a part of the normal GVariant text format, but they are mentioned here because
+    they can be used with <link linkend='g-variant-new-parsed'><function>g_variant_new_parsed()</function></link>.
    </para>
    <para>
     A positional parameter is indicated with a <literal>%</literal> followed by any valid
-    <link linkend='gvariant-format-strings'>xvariant_t Format String</link>.  Variable arguments are collected as
+    <link linkend='gvariant-format-strings'>GVariant Format String</link>.  Variable arguments are collected as
     specified by the format string and the resulting value is inserted at the current position.
    </para>
    <para>
     This feature is best explained by example:
    </para>
    <informalexample><programlisting><![CDATA[char *t = "xyz";
-xboolean_t en = false;
-xvariant_t *value;
+gboolean en = false;
+GVariant *value;
 
-value = xvariant_new_parsed ("{'title': <%s>, 'enabled': <%b>}", t, en);]]></programlisting></informalexample>
+value = g_variant_new_parsed ("{'title': <%s>, 'enabled': <%b>}", t, en);]]></programlisting></informalexample>
    <para>
     This constructs a dictionary mapping strings to variants (type '<literal>a{sv}</literal>') with two items in
     it.  The key names are parsed from the string and the values for those keys are taken as variable arguments

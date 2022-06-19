@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2010 Ryan Lortie
  *
  * This library is free software; you can redistribute it and/or
@@ -20,51 +20,51 @@
 static void
 test_listenv (void)
 {
-  xhashtable_t *table;
-  xchar_t **list;
-  xint_t i;
+  GHashTable *table;
+  gchar **list;
+  gint i;
 
-  table = xhash_table_new_full (xstr_hash, xstr_equal,
+  table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                  g_free, g_free);
 
   list = g_get_environ ();
   for (i = 0; list[i]; i++)
     {
-      xchar_t **parts;
+      gchar **parts;
 
-      parts = xstrsplit (list[i], "=", 2);
-      g_assert_null (xhash_table_lookup (table, parts[0]));
-      if (xstrcmp0 (parts[0], ""))
-        xhash_table_insert (table, parts[0], parts[1]);
+      parts = g_strsplit (list[i], "=", 2);
+      g_assert_null (g_hash_table_lookup (table, parts[0]));
+      if (g_strcmp0 (parts[0], ""))
+        g_hash_table_insert (table, parts[0], parts[1]);
       g_free (parts);
     }
-  xstrfreev (list);
+  g_strfreev (list);
 
-  g_assert_cmpint (xhash_table_size (table), >, 0);
+  g_assert_cmpint (g_hash_table_size (table), >, 0);
 
   list = g_listenv ();
   for (i = 0; list[i]; i++)
     {
-      const xchar_t *expected;
-      const xchar_t *value;
+      const gchar *expected;
+      const gchar *value;
 
-      expected = xhash_table_lookup (table, list[i]);
+      expected = g_hash_table_lookup (table, list[i]);
       value = g_getenv (list[i]);
       g_assert_cmpstr (value, ==, expected);
-      xhash_table_remove (table, list[i]);
+      g_hash_table_remove (table, list[i]);
     }
-  g_assert_cmpint (xhash_table_size (table), ==, 0);
-  xhash_table_unref (table);
-  xstrfreev (list);
+  g_assert_cmpint (g_hash_table_size (table), ==, 0);
+  g_hash_table_unref (table);
+  g_strfreev (list);
 }
 
 static void
 test_getenv (void)
 {
-  const xchar_t *data;
-  const xchar_t *variable = "TEST_G_SETENV";
-  const xchar_t *value1 = "works";
-  const xchar_t *value2 = "again";
+  const gchar *data;
+  const gchar *variable = "TEST_G_SETENV";
+  const gchar *value1 = "works";
+  const gchar *value2 = "again";
 
   /* Check that TEST_G_SETENV is not already set */
   g_assert_null (g_getenv (variable));
@@ -142,7 +142,7 @@ test_getenv (void)
 static void
 test_setenv (void)
 {
-  const xchar_t *var, *value;
+  const gchar *var, *value;
 
   var = "NOSUCHENVVAR";
   value = "value1";
@@ -161,10 +161,10 @@ test_setenv (void)
 static void
 test_environ_array (void)
 {
-  xchar_t **env;
-  const xchar_t *value;
+  gchar **env;
+  const gchar *value;
 
-  env = g_new (xchar_t *, 1);
+  env = g_new (gchar *, 1);
   env[0] = NULL;
 
   if (g_test_undefined ())
@@ -180,31 +180,31 @@ test_environ_array (void)
 
   if (g_test_undefined ())
     {
-      xchar_t **undefined_env;
+      gchar **undefined_env;
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* != NULL*");
       undefined_env = g_environ_setenv (env, NULL, "bar", TRUE);
       g_test_assert_expected_messages ();
-      xstrfreev (undefined_env);
+      g_strfreev (undefined_env);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* == NULL*");
       undefined_env = g_environ_setenv (env, "foo=fuz", "bar", TRUE);
       g_test_assert_expected_messages ();
-      xstrfreev (undefined_env);
+      g_strfreev (undefined_env);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* != NULL*");
       undefined_env = g_environ_setenv (env, "foo", NULL, TRUE);
       g_test_assert_expected_messages ();
-      xstrfreev (undefined_env);
+      g_strfreev (undefined_env);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion* != NULL*");
       undefined_env = g_environ_unsetenv (env, NULL);
       g_test_assert_expected_messages ();
-      xstrfreev (undefined_env);
+      g_strfreev (undefined_env);
     }
 
   env = g_environ_setenv (env, "foo", "bar", TRUE);
@@ -229,14 +229,14 @@ test_environ_array (void)
   value = g_environ_getenv (env, "foo2");
   g_assert_null (value);
 
-  xstrfreev (env);
+  g_strfreev (env);
 }
 
 static void
 test_environ_null (void)
 {
-  xchar_t **env;
-  const xchar_t *value;
+  gchar **env;
+  const gchar *value;
 
   env = NULL;
 
@@ -245,7 +245,7 @@ test_environ_null (void)
 
   env = g_environ_setenv (NULL, "foo", "bar", TRUE);
   g_assert_nonnull (env);
-  xstrfreev (env);
+  g_strfreev (env);
 
   env = g_environ_unsetenv (NULL, "foo");
   g_assert_null (env);
@@ -254,8 +254,8 @@ test_environ_null (void)
 static void
 test_environ_case (void)
 {
-  xchar_t **env;
-  const xchar_t *value;
+  gchar **env;
+  const gchar *value;
 
   env = NULL;
 
@@ -263,7 +263,7 @@ test_environ_case (void)
   value = g_environ_getenv (env, "foo");
   g_assert_cmpstr (value, ==, "bar");
 
-  value = g_environ_getenv (env, "foo_t");
+  value = g_environ_getenv (env, "Foo");
 #ifdef G_OS_WIN32
   g_assert_cmpstr (value, ==, "bar");
 #else
@@ -278,7 +278,7 @@ test_environ_case (void)
   g_assert_cmpstr (value, ==, "bar");
 #endif
 
-  env = g_environ_unsetenv (env, "foo_t");
+  env = g_environ_unsetenv (env, "Foo");
   value = g_environ_getenv (env, "foo");
 #ifdef G_OS_WIN32
   g_assert_null (value);
@@ -286,7 +286,7 @@ test_environ_case (void)
   g_assert_cmpstr (value, ==, "bar");
 #endif
 
-  xstrfreev (env);
+  g_strfreev (env);
 }
 
 int

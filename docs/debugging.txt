@@ -10,20 +10,20 @@ Such traps lead to immediate code halts to examine the current
 program state and backtrace.
 Currently, the following trap variables exist:
 
-static volatile xulong_t g_trap_free_size;
-static volatile xulong_t g_trap_realloc_size;
-static volatile xulong_t g_trap_malloc_size;
+static volatile gulong g_trap_free_size;
+static volatile gulong g_trap_realloc_size;
+static volatile gulong g_trap_malloc_size;
 	If set to a size > 0, g_free(), g_realloc() and g_malloc()
 	respectively, will be intercepted if the size matches the
 	size of the corresponding memory block to free/reallocate/allocate.
 	This will only work with g_mem_set_vtable (glib_mem_profiler_table)
 	upon startup though, because memory profiling is required to match
 	on the memory block sizes.
-static volatile xobject_t *g_trap_object_ref;
+static volatile GObject *g_trap_object_ref;
 	If set to a valid object pointer, ref/unref will be intercepted
 	with G_BREAKPOINT ();
-static volatile xpointer_t *g_trap_instance_signals;
-static volatile xpointer_t *g_trace_instance_signals;
+static volatile gpointer *g_trap_instance_signals;
+static volatile gpointer *g_trace_instance_signals;
        If set to a valid instance pointer, debugging messages
        will be spewed about emissions of signals on this instance.
        For g_trap_instance_signals matches, the emissions will
@@ -31,8 +31,8 @@ static volatile xpointer_t *g_trace_instance_signals;
 
 Environment variables for debugging
 ===================================
-When G_ENABLE_DEBUG was defined upon compilation, the xobject_t library
+When G_ENABLE_DEBUG was defined upon compilation, the GObject library 
 supports an environment variable GOBJECT_DEBUG that can be set to a
-combination of the flags passed in to xtype_init() (currently
+combination of the flags passed in to g_type_init() (currently
 "objects" and "signals") to trigger debugging messages about
 object bookkeeping and signal emissions during runtime.

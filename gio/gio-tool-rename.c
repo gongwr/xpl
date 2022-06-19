@@ -30,19 +30,19 @@ static const GOptionEntry entries[] = {
 };
 
 int
-handle_rename (int argc, char *argv[], xboolean_t do_help)
+handle_rename (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xerror_t *error = NULL;
-  xfile_t *file;
-  xfile_t *new_file;
+  GOptionContext *context;
+  GError *error = NULL;
+  GFile *file;
+  GFile *new_file;
   int retval = 0;
-  xchar_t *param;
+  gchar *param;
 
   g_set_prgname ("gio rename");
 
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("%s %s", _("LOCATION"), _("NAME"));
+  param = g_strdup_printf ("%s %s", _("LOCATION"), _("NAME"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -60,7 +60,7 @@ handle_rename (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -80,24 +80,24 @@ handle_rename (int argc, char *argv[], xboolean_t do_help)
 
   g_option_context_free (context);
 
-  file = xfile_new_for_commandline_arg (argv[1]);
-  new_file = xfile_set_display_name (file, argv[2], NULL, &error);
+  file = g_file_new_for_commandline_arg (argv[1]);
+  new_file = g_file_set_display_name (file, argv[2], NULL, &error);
 
   if (new_file == NULL)
     {
       print_error ("%s", error->message);
-      xerror_free (error);
+      g_error_free (error);
       retval = 1;
     }
   else
     {
-      char *uri = xfile_get_uri (new_file);
+      char *uri = g_file_get_uri (new_file);
       g_print (_("Rename successful. New uri: %s\n"), uri);
-      xobject_unref (new_file);
+      g_object_unref (new_file);
       g_free (uri);
     }
 
-  xobject_unref (file);
+  g_object_unref (file);
 
   return retval;
 }

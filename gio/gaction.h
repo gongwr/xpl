@@ -28,70 +28,70 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_ACTION                                       (g_action_get_type ())
-#define G_ACTION(inst)                                      (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_ACTION, xaction_t))
-#define X_IS_ACTION(inst)                                   (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_ACTION))
-#define G_ACTION_GET_IFACE(inst)                            (XTYPE_INSTANCE_GET_INTERFACE ((inst),                  \
-                                                             XTYPE_ACTION, xaction_interface_t))
+#define G_TYPE_ACTION                                       (g_action_get_type ())
+#define G_ACTION(inst)                                      (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_ACTION, GAction))
+#define G_IS_ACTION(inst)                                   (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_ACTION))
+#define G_ACTION_GET_IFACE(inst)                            (G_TYPE_INSTANCE_GET_INTERFACE ((inst),                  \
+                                                             G_TYPE_ACTION, GActionInterface))
 
-typedef struct _xaction_interface                            xaction_interface_t;
+typedef struct _GActionInterface                            GActionInterface;
 
-struct _xaction_interface
+struct _GActionInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* virtual functions */
-  const xchar_t *        (* get_name)             (xaction_t  *action);
-  const xvariant_type_t * (* get_parameter_type)   (xaction_t  *action);
-  const xvariant_type_t * (* get_state_type)       (xaction_t  *action);
-  xvariant_t *           (* get_state_hint)       (xaction_t  *action);
+  const gchar *        (* get_name)             (GAction  *action);
+  const GVariantType * (* get_parameter_type)   (GAction  *action);
+  const GVariantType * (* get_state_type)       (GAction  *action);
+  GVariant *           (* get_state_hint)       (GAction  *action);
 
-  xboolean_t             (* get_enabled)          (xaction_t  *action);
-  xvariant_t *           (* get_state)            (xaction_t  *action);
+  gboolean             (* get_enabled)          (GAction  *action);
+  GVariant *           (* get_state)            (GAction  *action);
 
-  void                 (* change_state)         (xaction_t  *action,
-                                                 xvariant_t *value);
-  void                 (* activate)             (xaction_t  *action,
-                                                 xvariant_t *parameter);
+  void                 (* change_state)         (GAction  *action,
+                                                 GVariant *value);
+  void                 (* activate)             (GAction  *action,
+                                                 GVariant *parameter);
 };
 
-XPL_AVAILABLE_IN_2_30
-xtype_t                   g_action_get_type                               (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_30
+GType                   g_action_get_type                               (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *           g_action_get_name                               (xaction_t            *action);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *    g_action_get_parameter_type                     (xaction_t            *action);
-XPL_AVAILABLE_IN_ALL
-const xvariant_type_t *    g_action_get_state_type                         (xaction_t            *action);
-XPL_AVAILABLE_IN_ALL
-xvariant_t *              g_action_get_state_hint                         (xaction_t            *action);
+GLIB_AVAILABLE_IN_ALL
+const gchar *           g_action_get_name                               (GAction            *action);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *    g_action_get_parameter_type                     (GAction            *action);
+GLIB_AVAILABLE_IN_ALL
+const GVariantType *    g_action_get_state_type                         (GAction            *action);
+GLIB_AVAILABLE_IN_ALL
+GVariant *              g_action_get_state_hint                         (GAction            *action);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                g_action_get_enabled                            (xaction_t            *action);
-XPL_AVAILABLE_IN_ALL
-xvariant_t *              g_action_get_state                              (xaction_t            *action);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_action_get_enabled                            (GAction            *action);
+GLIB_AVAILABLE_IN_ALL
+GVariant *              g_action_get_state                              (GAction            *action);
 
-XPL_AVAILABLE_IN_ALL
-void                    g_action_change_state                           (xaction_t            *action,
-                                                                         xvariant_t           *value);
-XPL_AVAILABLE_IN_ALL
-void                    g_action_activate                               (xaction_t            *action,
-                                                                         xvariant_t           *parameter);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_change_state                           (GAction            *action,
+                                                                         GVariant           *value);
+GLIB_AVAILABLE_IN_ALL
+void                    g_action_activate                               (GAction            *action,
+                                                                         GVariant           *parameter);
 
-XPL_AVAILABLE_IN_2_28
-xboolean_t                g_action_name_is_valid                          (const xchar_t        *action_name);
+GLIB_AVAILABLE_IN_2_28
+gboolean                g_action_name_is_valid                          (const gchar        *action_name);
 
-XPL_AVAILABLE_IN_2_38
-xboolean_t                xaction_parse_detailed_name                    (const xchar_t        *detailed_name,
-                                                                         xchar_t             **action_name,
-                                                                         xvariant_t          **target_value,
-                                                                         xerror_t            **error);
+GLIB_AVAILABLE_IN_2_38
+gboolean                g_action_parse_detailed_name                    (const gchar        *detailed_name,
+                                                                         gchar             **action_name,
+                                                                         GVariant          **target_value,
+                                                                         GError            **error);
 
-XPL_AVAILABLE_IN_2_38
-xchar_t *                 g_action_print_detailed_name                    (const xchar_t        *action_name,
-                                                                         xvariant_t           *target_value);
+GLIB_AVAILABLE_IN_2_38
+gchar *                 g_action_print_detailed_name                    (const gchar        *action_name,
+                                                                         GVariant           *target_value);
 
 G_END_DECLS
 

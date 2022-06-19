@@ -33,24 +33,24 @@
  * @short_description: Base type for D-Bus object managers
  * @include: gio/gio.h
  *
- * The #xdbus_object_manager_t type is the base type for service- and
+ * The #GDBusObjectManager type is the base type for service- and
  * client-side implementations of the standardized
  * [org.freedesktop.DBus.ObjectManager](http://dbus.freedesktop.org/doc/dbus-specification.html#standard-interfaces-objectmanager)
  * interface.
  *
- * See #xdbus_object_manager_client_t for the client-side implementation
- * and #xdbus_object_manager_server_t for the service-side implementation.
+ * See #GDBusObjectManagerClient for the client-side implementation
+ * and #GDBusObjectManagerServer for the service-side implementation.
  */
 
 /**
- * xdbus_object_manager_t:
+ * GDBusObjectManager:
  *
- * #xdbus_object_manager_t is an opaque data structure and can only be accessed
+ * #GDBusObjectManager is an opaque data structure and can only be accessed
  * using the following functions.
  */
 
-typedef xdbus_object_manager_iface_t GDBusObjectManagerInterface;
-G_DEFINE_INTERFACE (xdbus_object_manager, g_dbus_object_manager, XTYPE_OBJECT)
+typedef GDBusObjectManagerIface GDBusObjectManagerInterface;
+G_DEFINE_INTERFACE (GDBusObjectManager, g_dbus_object_manager, G_TYPE_OBJECT)
 
 enum {
   OBJECT_ADDED,
@@ -60,58 +60,58 @@ enum {
   N_SIGNALS
 };
 
-static xuint_t signals[N_SIGNALS];
+static guint signals[N_SIGNALS];
 
 static void
-g_dbus_object_manager_default_init (xdbus_object_manager_iface_t *iface)
+g_dbus_object_manager_default_init (GDBusObjectManagerIface *iface)
 {
   /**
-   * xdbus_object_manager_t::object-added:
-   * @manager: The #xdbus_object_manager_t emitting the signal.
-   * @object: The #xdbus_object_t that was added.
+   * GDBusObjectManager::object-added:
+   * @manager: The #GDBusObjectManager emitting the signal.
+   * @object: The #GDBusObject that was added.
    *
    * Emitted when @object is added to @manager.
    *
    * Since: 2.30
    */
   signals[OBJECT_ADDED] =
-    xsignal_new (I_("object-added"),
-                  XTYPE_FROM_INTERFACE (iface),
+    g_signal_new (I_("object-added"),
+                  G_TYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, object_added),
+                  G_STRUCT_OFFSET (GDBusObjectManagerIface, object_added),
                   NULL,
                   NULL,
                   NULL,
-                  XTYPE_NONE,
+                  G_TYPE_NONE,
                   1,
-                  XTYPE_DBUS_OBJECT);
+                  G_TYPE_DBUS_OBJECT);
 
   /**
-   * xdbus_object_manager_t::object-removed:
-   * @manager: The #xdbus_object_manager_t emitting the signal.
-   * @object: The #xdbus_object_t that was removed.
+   * GDBusObjectManager::object-removed:
+   * @manager: The #GDBusObjectManager emitting the signal.
+   * @object: The #GDBusObject that was removed.
    *
    * Emitted when @object is removed from @manager.
    *
    * Since: 2.30
    */
   signals[OBJECT_REMOVED] =
-    xsignal_new (I_("object-removed"),
-                  XTYPE_FROM_INTERFACE (iface),
+    g_signal_new (I_("object-removed"),
+                  G_TYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, object_removed),
+                  G_STRUCT_OFFSET (GDBusObjectManagerIface, object_removed),
                   NULL,
                   NULL,
                   NULL,
-                  XTYPE_NONE,
+                  G_TYPE_NONE,
                   1,
-                  XTYPE_DBUS_OBJECT);
+                  G_TYPE_DBUS_OBJECT);
 
   /**
-   * xdbus_object_manager_t::interface-added:
-   * @manager: The #xdbus_object_manager_t emitting the signal.
-   * @object: The #xdbus_object_t on which an interface was added.
-   * @interface: The #xdbus_interface_t that was added.
+   * GDBusObjectManager::interface-added:
+   * @manager: The #GDBusObjectManager emitting the signal.
+   * @object: The #GDBusObject on which an interface was added.
+   * @interface: The #GDBusInterface that was added.
    *
    * Emitted when @interface is added to @object.
    *
@@ -121,26 +121,26 @@ g_dbus_object_manager_default_init (xdbus_object_manager_iface_t *iface)
    * Since: 2.30
    */
   signals[INTERFACE_ADDED] =
-    xsignal_new (I_("interface-added"),
-                  XTYPE_FROM_INTERFACE (iface),
+    g_signal_new (I_("interface-added"),
+                  G_TYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, interface_added),
+                  G_STRUCT_OFFSET (GDBusObjectManagerIface, interface_added),
                   NULL,
                   NULL,
                   _g_cclosure_marshal_VOID__OBJECT_OBJECT,
-                  XTYPE_NONE,
+                  G_TYPE_NONE,
                   2,
-                  XTYPE_DBUS_OBJECT,
-                  XTYPE_DBUS_INTERFACE);
-  xsignal_set_va_marshaller (signals[INTERFACE_ADDED],
-                              XTYPE_FROM_INTERFACE (iface),
+                  G_TYPE_DBUS_OBJECT,
+                  G_TYPE_DBUS_INTERFACE);
+  g_signal_set_va_marshaller (signals[INTERFACE_ADDED],
+                              G_TYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECTv);
 
   /**
-   * xdbus_object_manager_t::interface-removed:
-   * @manager: The #xdbus_object_manager_t emitting the signal.
-   * @object: The #xdbus_object_t on which an interface was removed.
-   * @interface: The #xdbus_interface_t that was removed.
+   * GDBusObjectManager::interface-removed:
+   * @manager: The #GDBusObjectManager emitting the signal.
+   * @object: The #GDBusObject on which an interface was removed.
+   * @interface: The #GDBusInterface that was removed.
    *
    * Emitted when @interface has been removed from @object.
    *
@@ -150,19 +150,19 @@ g_dbus_object_manager_default_init (xdbus_object_manager_iface_t *iface)
    * Since: 2.30
    */
   signals[INTERFACE_REMOVED] =
-    xsignal_new (I_("interface-removed"),
-                  XTYPE_FROM_INTERFACE (iface),
+    g_signal_new (I_("interface-removed"),
+                  G_TYPE_FROM_INTERFACE (iface),
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (xdbus_object_manager_iface_t, interface_removed),
+                  G_STRUCT_OFFSET (GDBusObjectManagerIface, interface_removed),
                   NULL,
                   NULL,
                   _g_cclosure_marshal_VOID__OBJECT_OBJECT,
-                  XTYPE_NONE,
+                  G_TYPE_NONE,
                   2,
-                  XTYPE_DBUS_OBJECT,
-                  XTYPE_DBUS_INTERFACE);
-  xsignal_set_va_marshaller (signals[INTERFACE_REMOVED],
-                              XTYPE_FROM_INTERFACE (iface),
+                  G_TYPE_DBUS_OBJECT,
+                  G_TYPE_DBUS_INTERFACE);
+  g_signal_set_va_marshaller (signals[INTERFACE_REMOVED],
+                              G_TYPE_FROM_INTERFACE (iface),
                               _g_cclosure_marshal_VOID__OBJECT_OBJECTv);
 
 }
@@ -171,7 +171,7 @@ g_dbus_object_manager_default_init (xdbus_object_manager_iface_t *iface)
 
 /**
  * g_dbus_object_manager_get_object_path:
- * @manager: A #xdbus_object_manager_t.
+ * @manager: A #GDBusObjectManager.
  *
  * Gets the object path that @manager is for.
  *
@@ -179,75 +179,75 @@ g_dbus_object_manager_default_init (xdbus_object_manager_iface_t *iface)
  *
  * Since: 2.30
  */
-const xchar_t *
-g_dbus_object_manager_get_object_path (xdbus_object_manager_t *manager)
+const gchar *
+g_dbus_object_manager_get_object_path (GDBusObjectManager *manager)
 {
-  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
   return iface->get_object_path (manager);
 }
 
 /**
  * g_dbus_object_manager_get_objects:
- * @manager: A #xdbus_object_manager_t.
+ * @manager: A #GDBusObjectManager.
  *
- * Gets all #xdbus_object_t objects known to @manager.
+ * Gets all #GDBusObject objects known to @manager.
  *
- * Returns: (transfer full) (element-type xdbus_object_t): A list of
- *   #xdbus_object_t objects. The returned list should be freed with
- *   xlist_free() after each element has been freed with
- *   xobject_unref().
+ * Returns: (transfer full) (element-type GDBusObject): A list of
+ *   #GDBusObject objects. The returned list should be freed with
+ *   g_list_free() after each element has been freed with
+ *   g_object_unref().
  *
  * Since: 2.30
  */
-xlist_t *
-g_dbus_object_manager_get_objects (xdbus_object_manager_t *manager)
+GList *
+g_dbus_object_manager_get_objects (GDBusObjectManager *manager)
 {
-  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
   return iface->get_objects (manager);
 }
 
 /**
  * g_dbus_object_manager_get_object:
- * @manager: A #xdbus_object_manager_t.
+ * @manager: A #GDBusObjectManager.
  * @object_path: Object path to look up.
  *
- * Gets the #xdbus_object_t at @object_path, if any.
+ * Gets the #GDBusObject at @object_path, if any.
  *
- * Returns: (transfer full) (nullable): A #xdbus_object_t or %NULL. Free with
- *   xobject_unref().
+ * Returns: (transfer full) (nullable): A #GDBusObject or %NULL. Free with
+ *   g_object_unref().
  *
  * Since: 2.30
  */
-xdbus_object_t *
-g_dbus_object_manager_get_object (xdbus_object_manager_t *manager,
-                                  const xchar_t        *object_path)
+GDBusObject *
+g_dbus_object_manager_get_object (GDBusObjectManager *manager,
+                                  const gchar        *object_path)
 {
-  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
-  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);
   return iface->get_object (manager, object_path);
 }
 
 /**
  * g_dbus_object_manager_get_interface:
- * @manager: A #xdbus_object_manager_t.
+ * @manager: A #GDBusObjectManager.
  * @object_path: Object path to look up.
  * @interface_name: D-Bus interface name to look up.
  *
  * Gets the interface proxy for @interface_name at @object_path, if
  * any.
  *
- * Returns: (transfer full) (nullable): A #xdbus_interface_t instance or %NULL. Free
- *   with xobject_unref().
+ * Returns: (transfer full) (nullable): A #GDBusInterface instance or %NULL. Free
+ *   with g_object_unref().
  *
  * Since: 2.30
  */
-xdbus_interface_t *
-g_dbus_object_manager_get_interface (xdbus_object_manager_t *manager,
-                                     const xchar_t        *object_path,
-                                     const xchar_t        *interface_name)
+GDBusInterface *
+g_dbus_object_manager_get_interface (GDBusObjectManager *manager,
+                                     const gchar        *object_path,
+                                     const gchar        *interface_name)
 {
-  xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
-  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  GDBusObjectManagerIface *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
+  g_return_val_if_fail (g_variant_is_object_path (object_path), NULL);
+  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
   return iface->get_interface (manager, object_path, interface_name);
 }

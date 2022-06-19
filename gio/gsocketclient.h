@@ -20,8 +20,8 @@
  *          Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XSOCKET_CLIENT_H__
-#define __XSOCKET_CLIENT_H__
+#ifndef __G_SOCKET_CLIENT_H__
+#define __G_SOCKET_CLIENT_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,29 +31,29 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_CLIENT                                (xsocket_client_get_type ())
-#define XSOCKET_CLIENT(inst)                               (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_CLIENT, xsocket_client))
-#define XSOCKET_CLIENT_CLASS(class)                        (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_CLIENT, GSocketClientClass))
-#define X_IS_SOCKET_CLIENT(inst)                            (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET_CLIENT))
-#define X_IS_SOCKET_CLIENT_CLASS(class)                     (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET_CLIENT))
-#define XSOCKET_CLIENT_GET_CLASS(inst)                     (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_CLIENT, GSocketClientClass))
+#define G_TYPE_SOCKET_CLIENT                                (g_socket_client_get_type ())
+#define G_SOCKET_CLIENT(inst)                               (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET_CLIENT, GSocketClient))
+#define G_SOCKET_CLIENT_CLASS(class)                        (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET_CLIENT, GSocketClientClass))
+#define G_IS_SOCKET_CLIENT(inst)                            (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET_CLIENT))
+#define G_IS_SOCKET_CLIENT_CLASS(class)                     (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET_CLIENT))
+#define G_SOCKET_CLIENT_GET_CLASS(inst)                     (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET_CLIENT, GSocketClientClass))
 
 typedef struct _GSocketClientPrivate                        GSocketClientPrivate;
 typedef struct _GSocketClientClass                          GSocketClientClass;
 
 struct _GSocketClientClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  void (* event) (xsocket_client_t       *client,
+  void (* event) (GSocketClient       *client,
 		  GSocketClientEvent  event,
-		  xsocket_connectable_t  *connectable,
-		  xio_stream_t           *connection);
+		  GSocketConnectable  *connectable,
+		  GIOStream           *connection);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -64,134 +64,134 @@ struct _GSocketClientClass
 
 struct _GSocketClient
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
   GSocketClientPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   xsocket_client_get_type                        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                   g_socket_client_get_type                        (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_client_t          *xsocket_client_new                             (void);
+GLIB_AVAILABLE_IN_ALL
+GSocketClient          *g_socket_client_new                             (void);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_family_t           xsocket_client_get_family                      (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_set_family                      (xsocket_client_t        *client,
-									 xsocket_family_t         family);
-XPL_AVAILABLE_IN_ALL
-xsocket_type_t             xsocket_client_get_socket_type                 (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_set_socket_type                 (xsocket_client_t        *client,
-									 xsocket_type_t           type);
-XPL_AVAILABLE_IN_ALL
-GSocketProtocol         xsocket_client_get_protocol                    (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_set_protocol                    (xsocket_client_t        *client,
+GLIB_AVAILABLE_IN_ALL
+GSocketFamily           g_socket_client_get_family                      (GSocketClient        *client);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_set_family                      (GSocketClient        *client,
+									 GSocketFamily         family);
+GLIB_AVAILABLE_IN_ALL
+GSocketType             g_socket_client_get_socket_type                 (GSocketClient        *client);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_set_socket_type                 (GSocketClient        *client,
+									 GSocketType           type);
+GLIB_AVAILABLE_IN_ALL
+GSocketProtocol         g_socket_client_get_protocol                    (GSocketClient        *client);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_set_protocol                    (GSocketClient        *client,
 									 GSocketProtocol       protocol);
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t         *xsocket_client_get_local_address               (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_set_local_address               (xsocket_client_t        *client,
-									 xsocket_address_t       *address);
-XPL_AVAILABLE_IN_ALL
-xuint_t                   xsocket_client_get_timeout                     (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_set_timeout                     (xsocket_client_t        *client,
-									 xuint_t                 timeout);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xsocket_client_get_enable_proxy                (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_set_enable_proxy                (xsocket_client_t        *client,
-    									 xboolean_t	      enable);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress         *g_socket_client_get_local_address               (GSocketClient        *client);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_set_local_address               (GSocketClient        *client,
+									 GSocketAddress       *address);
+GLIB_AVAILABLE_IN_ALL
+guint                   g_socket_client_get_timeout                     (GSocketClient        *client);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_set_timeout                     (GSocketClient        *client,
+									 guint                 timeout);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_socket_client_get_enable_proxy                (GSocketClient        *client);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_set_enable_proxy                (GSocketClient        *client,
+    									 gboolean	      enable);
 
-XPL_AVAILABLE_IN_2_28
-xboolean_t                xsocket_client_get_tls                         (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_2_28
-void                    xsocket_client_set_tls                         (xsocket_client_t        *client,
-									 xboolean_t              tls);
-XPL_DEPRECATED_IN_2_72
-xtls_certificate_flags_t    xsocket_client_get_tls_validation_flags        (xsocket_client_t        *client);
-XPL_DEPRECATED_IN_2_72
-void                    xsocket_client_set_tls_validation_flags        (xsocket_client_t        *client,
-									 xtls_certificate_flags_t  flags);
-XPL_AVAILABLE_IN_2_36
-xproxy_resolver_t         *xsocket_client_get_proxy_resolver              (xsocket_client_t        *client);
-XPL_AVAILABLE_IN_2_36
-void                    xsocket_client_set_proxy_resolver              (xsocket_client_t        *client,
-                                                                         xproxy_resolver_t       *proxy_resolver);
+GLIB_AVAILABLE_IN_2_28
+gboolean                g_socket_client_get_tls                         (GSocketClient        *client);
+GLIB_AVAILABLE_IN_2_28
+void                    g_socket_client_set_tls                         (GSocketClient        *client,
+									 gboolean              tls);
+GLIB_DEPRECATED_IN_2_72
+GTlsCertificateFlags    g_socket_client_get_tls_validation_flags        (GSocketClient        *client);
+GLIB_DEPRECATED_IN_2_72
+void                    g_socket_client_set_tls_validation_flags        (GSocketClient        *client,
+									 GTlsCertificateFlags  flags);
+GLIB_AVAILABLE_IN_2_36
+GProxyResolver         *g_socket_client_get_proxy_resolver              (GSocketClient        *client);
+GLIB_AVAILABLE_IN_2_36
+void                    g_socket_client_set_proxy_resolver              (GSocketClient        *client,
+                                                                         GProxyResolver       *proxy_resolver);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect                         (xsocket_client_t        *client,
-                                                                         xsocket_connectable_t   *connectable,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect_to_host                 (xsocket_client_t        *client,
-									 const xchar_t          *host_and_port,
-									 xuint16_t               default_port,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect_to_service              (xsocket_client_t        *client,
-									 const xchar_t          *domain,
-									 const xchar_t          *service,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_2_26
-xsocket_connection_t *     xsocket_client_connect_to_uri                  (xsocket_client_t        *client,
-									 const xchar_t          *uri,
-									 xuint16_t               default_port,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_connect_async                   (xsocket_client_t        *client,
-                                                                         xsocket_connectable_t   *connectable,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect_finish                  (xsocket_client_t        *client,
-                                                                         xasync_result_t         *result,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_connect_to_host_async           (xsocket_client_t        *client,
-									 const xchar_t          *host_and_port,
-									 xuint16_t               default_port,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect_to_host_finish          (xsocket_client_t        *client,
-                                                                         xasync_result_t         *result,
-                                                                         xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect                         (GSocketClient        *client,
+                                                                         GSocketConnectable   *connectable,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect_to_host                 (GSocketClient        *client,
+									 const gchar          *host_and_port,
+									 guint16               default_port,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect_to_service              (GSocketClient        *client,
+									 const gchar          *domain,
+									 const gchar          *service,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_2_26
+GSocketConnection *     g_socket_client_connect_to_uri                  (GSocketClient        *client,
+									 const gchar          *uri,
+									 guint16               default_port,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_connect_async                   (GSocketClient        *client,
+                                                                         GSocketConnectable   *connectable,
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect_finish                  (GSocketClient        *client,
+                                                                         GAsyncResult         *result,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_connect_to_host_async           (GSocketClient        *client,
+									 const gchar          *host_and_port,
+									 guint16               default_port,
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect_to_host_finish          (GSocketClient        *client,
+                                                                         GAsyncResult         *result,
+                                                                         GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_connect_to_service_async        (xsocket_client_t        *client,
-									 const xchar_t          *domain,
-									 const xchar_t          *service,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect_to_service_finish       (xsocket_client_t        *client,
-                                                                         xasync_result_t         *result,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void                    xsocket_client_connect_to_uri_async            (xsocket_client_t        *client,
-									 const xchar_t          *uri,
-									 xuint16_t               default_port,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *     xsocket_client_connect_to_uri_finish           (xsocket_client_t        *client,
-                                                                         xasync_result_t         *result,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void			xsocket_client_add_application_proxy		(xsocket_client_t        *client,
-									 const xchar_t          *protocol);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_connect_to_service_async        (GSocketClient        *client,
+									 const gchar          *domain,
+									 const gchar          *service,
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect_to_service_finish       (GSocketClient        *client,
+                                                                         GAsyncResult         *result,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void                    g_socket_client_connect_to_uri_async            (GSocketClient        *client,
+									 const gchar          *uri,
+									 guint16               default_port,
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *     g_socket_client_connect_to_uri_finish           (GSocketClient        *client,
+                                                                         GAsyncResult         *result,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void			g_socket_client_add_application_proxy		(GSocketClient        *client,
+									 const gchar          *protocol);
 
 G_END_DECLS
 
-#endif /* __XSOCKET_CLIENT_H___ */
+#endif /* __G_SOCKET_CLIENT_H___ */

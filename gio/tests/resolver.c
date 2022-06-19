@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2008 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -32,24 +32,24 @@
 
 #include <gio/gio.h>
 
-static xresolver_t *resolver;
-static xcancellable_t *cancellable;
-static xmain_loop_t *loop;
+static GResolver *resolver;
+static GCancellable *cancellable;
+static GMainLoop *loop;
 static int nlookups = 0;
-static xboolean_t synchronous = FALSE;
-static xuint_t connectable_count = 0;
+static gboolean synchronous = FALSE;
+static guint connectable_count = 0;
 static GResolverRecordType record_type = 0;
 
 static G_NORETURN void
 usage (void)
 {
 	fprintf (stderr, "Usage: resolver [-s] [hostname | IP | service/protocol/domain ] ...\n");
-	fprintf (stderr, "Usage: resolver [-s] [-t MX|TXT|NS|SOA] rrname ...\n");
+	fprintf (stderr, "Usage: resolver [-s] [-t MX|TXT|NS|SOA|SRV] rrname ...\n");
 	fprintf (stderr, "       resolver [-s] -c NUMBER [hostname | IP | service/protocol/domain ]\n");
 	fprintf (stderr, "       Use -s to do synchronous lookups.\n");
-	fprintf (stderr, "       Use -c NUMBER (and only a single resolvable argument) to test xsocket_connectable_t.\n");
+	fprintf (stderr, "       Use -c NUMBER (and only a single resolvable argument) to test GSocketConnectable.\n");
 	fprintf (stderr, "       The given NUMBER determines how many times the connectable will be enumerated.\n");
-	fprintf (stderr, "       Use -t with MX, TXT, NS or SOA to look up DNS records of those types.\n");
+	fprintf (stderr, "       Use -t with MX, TXT, NS, SOA or SRV to look up DNS records of those types.\n");
 	exit (1);
 }
 
@@ -62,23 +62,23 @@ done_lookup (void)
   if (nlookups == 0)
     {
       /* In the sync case we need to make sure we don't call
-       * xmain_loop_quit before the loop is actually running...
+       * g_main_loop_quit before the loop is actually running...
        */
-      g_idle_add ((xsource_func_t)xmain_loop_quit, loop);
+      g_idle_add ((GSourceFunc)g_main_loop_quit, loop);
     }
 }
 
 static void
 print_resolved_name (const char *phys,
                      char       *name,
-                     xerror_t     *error)
+                     GError     *error)
 {
   G_LOCK (response);
   printf ("Address: %s\n", phys);
   if (error)
     {
       printf ("Error:   %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else
     {
@@ -93,29 +93,29 @@ print_resolved_name (const char *phys,
 
 static void
 print_resolved_addresses (const char *name,
-                          xlist_t      *addresses,
-			  xerror_t     *error)
+                          GList      *addresses,
+			  GError     *error)
 {
   char *phys;
-  xlist_t *a;
+  GList *a;
 
   G_LOCK (response);
   printf ("Name:    %s\n", name);
   if (error)
     {
       printf ("Error:   %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else
     {
       for (a = addresses; a; a = a->next)
 	{
-	  phys = xinet_address_to_string (a->data);
+	  phys = g_inet_address_to_string (a->data);
 	  printf ("Address: %s\n", phys);
 	  g_free (phys);
-          xobject_unref (a->data);
+          g_object_unref (a->data);
 	}
-      xlist_free (addresses);
+      g_list_free (addresses);
     }
   printf ("\n");
 
@@ -125,17 +125,17 @@ print_resolved_addresses (const char *name,
 
 static void
 print_resolved_service (const char *service,
-                        xlist_t      *targets,
-			xerror_t     *error)
+                        GList      *targets,
+			GError     *error)
 {
-  xlist_t *t;
+  GList *t;  
 
   G_LOCK (response);
   printf ("Service: %s\n", service);
   if (error)
     {
       printf ("Error: %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else
     {
@@ -143,12 +143,12 @@ print_resolved_service (const char *service,
 	{
 	  printf ("%s:%u (pri %u, weight %u)\n",
 		  g_srv_target_get_hostname (t->data),
-		  (xuint_t)g_srv_target_get_port (t->data),
-		  (xuint_t)g_srv_target_get_priority (t->data),
-		  (xuint_t)g_srv_target_get_weight (t->data));
+		  (guint)g_srv_target_get_port (t->data),
+		  (guint)g_srv_target_get_priority (t->data),
+		  (guint)g_srv_target_get_weight (t->data));
           g_srv_target_free (t->data);
 	}
-      xlist_free (targets);
+      g_list_free (targets);
     }
   printf ("\n");
 
@@ -158,19 +158,19 @@ print_resolved_service (const char *service,
 
 static void
 print_resolved_mx (const char *rrname,
-                   xlist_t      *records,
-                   xerror_t     *error)
+                   GList      *records,
+                   GError     *error)
 {
-  const xchar_t *hostname;
-  xuint16_t priority;
-  xlist_t *t;
+  const gchar *hostname;
+  guint16 priority;
+  GList *t;
 
   G_LOCK (response);
   printf ("Domain: %s\n", rrname);
   if (error)
     {
       printf ("Error: %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else if (!records)
     {
@@ -180,11 +180,11 @@ print_resolved_mx (const char *rrname,
     {
       for (t = records; t; t = t->next)
         {
-          xvariant_get (t->data, "(q&s)", &priority, &hostname);
-          printf ("%s (pri %u)\n", hostname, (xuint_t)priority);
-          xvariant_unref (t->data);
+          g_variant_get (t->data, "(q&s)", &priority, &hostname);
+          printf ("%s (pri %u)\n", hostname, (guint)priority);
+          g_variant_unref (t->data);
         }
-      xlist_free (records);
+      g_list_free (records);
     }
   printf ("\n");
 
@@ -194,19 +194,19 @@ print_resolved_mx (const char *rrname,
 
 static void
 print_resolved_txt (const char *rrname,
-                    xlist_t      *records,
-                    xerror_t     *error)
+                    GList      *records,
+                    GError     *error)
 {
-  const xchar_t **contents;
-  xlist_t *t;
-  xint_t i;
+  const gchar **contents;
+  GList *t;
+  gint i;
 
   G_LOCK (response);
   printf ("Domain: %s\n", rrname);
   if (error)
     {
       printf ("Error: %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else if (!records)
     {
@@ -218,13 +218,53 @@ print_resolved_txt (const char *rrname,
         {
           if (t != records)
             printf ("\n");
-          xvariant_get (t->data, "(^a&s)", &contents);
+          g_variant_get (t->data, "(^a&s)", &contents);
           for (i = 0; contents[i] != NULL; i++)
             printf ("%s\n", contents[i]);
-          xvariant_unref (t->data);
+          g_variant_unref (t->data);
           g_free (contents);
         }
-      xlist_free (records);
+      g_list_free (records);
+    }
+  printf ("\n");
+
+  done_lookup ();
+  G_UNLOCK (response);
+}
+
+static void
+print_resolved_srv (const char *rrname,
+                    GList      *records,
+                    GError     *error)
+{
+  G_LOCK (response);
+  printf ("Domain: %s\n", rrname);
+  if (error)
+    {
+      printf ("Error: %s\n", error->message);
+      g_error_free (error);
+    }
+  else if (!records)
+    {
+      printf ("no SRV records\n");
+    }
+  else
+    {
+      GList *t;
+
+      for (t = records; t != NULL; t = t->next)
+        {
+          guint16 priority, weight, port;
+          const gchar *target;
+
+          g_variant_get (t->data, "(qqq&s)", &priority, &weight, &port, &target);
+
+          printf ("%s (priority %u, weight %u, port %u)\n",
+                  target, (guint) priority, (guint) weight, (guint) port);
+          g_variant_unref (t->data);
+        }
+
+      g_list_free (records);
     }
   printf ("\n");
 
@@ -234,20 +274,20 @@ print_resolved_txt (const char *rrname,
 
 static void
 print_resolved_soa (const char *rrname,
-                    xlist_t      *records,
-                    xerror_t     *error)
+                    GList      *records,
+                    GError     *error)
 {
-  xlist_t *t;
-  const xchar_t *primary_ns;
-  const xchar_t *administrator;
-  xuint32_t serial, refresh, retry, expire, ttl;
+  GList *t;
+  const gchar *primary_ns;
+  const gchar *administrator;
+  guint32 serial, refresh, retry, expire, ttl;
 
   G_LOCK (response);
   printf ("Zone: %s\n", rrname);
   if (error)
     {
       printf ("Error: %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else if (!records)
     {
@@ -257,14 +297,14 @@ print_resolved_soa (const char *rrname,
     {
       for (t = records; t; t = t->next)
         {
-          xvariant_get (t->data, "(&s&suuuuu)", &primary_ns, &administrator,
+          g_variant_get (t->data, "(&s&suuuuu)", &primary_ns, &administrator,
                          &serial, &refresh, &retry, &expire, &ttl);
           printf ("%s %s (serial %u, refresh %u, retry %u, expire %u, ttl %u)\n",
-                  primary_ns, administrator, (xuint_t)serial, (xuint_t)refresh,
-                  (xuint_t)retry, (xuint_t)expire, (xuint_t)ttl);
-          xvariant_unref (t->data);
+                  primary_ns, administrator, (guint)serial, (guint)refresh,
+                  (guint)retry, (guint)expire, (guint)ttl);
+          g_variant_unref (t->data);
         }
-      xlist_free (records);
+      g_list_free (records);
     }
   printf ("\n");
 
@@ -274,18 +314,18 @@ print_resolved_soa (const char *rrname,
 
 static void
 print_resolved_ns (const char *rrname,
-                    xlist_t      *records,
-                    xerror_t     *error)
+                    GList      *records,
+                    GError     *error)
 {
-  xlist_t *t;
-  const xchar_t *hostname;
+  GList *t;
+  const gchar *hostname;
 
   G_LOCK (response);
   printf ("Zone: %s\n", rrname);
   if (error)
     {
       printf ("Error: %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else if (!records)
     {
@@ -295,11 +335,11 @@ print_resolved_ns (const char *rrname,
     {
       for (t = records; t; t = t->next)
         {
-          xvariant_get (t->data, "(&s)", &hostname);
+          g_variant_get (t->data, "(&s)", &hostname);
           printf ("%s\n", hostname);
-          xvariant_unref (t->data);
+          g_variant_unref (t->data);
         }
-      xlist_free (records);
+      g_list_free (records);
     }
   printf ("\n");
 
@@ -310,11 +350,11 @@ print_resolved_ns (const char *rrname,
 static void
 lookup_one_sync (const char *arg)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   if (record_type != 0)
     {
-      xlist_t *records;
+      GList *records;
 
       records = g_resolver_lookup_records (resolver, arg, record_type, cancellable, &error);
       switch (record_type)
@@ -331,6 +371,9 @@ lookup_one_sync (const char *arg)
         case G_RESOLVER_RECORD_TXT:
           print_resolved_txt (arg, records, error);
           break;
+        case G_RESOLVER_RECORD_SRV:
+          print_resolved_srv (arg, records, error);
+          break;
         default:
           g_warn_if_reached ();
           break;
@@ -338,9 +381,9 @@ lookup_one_sync (const char *arg)
     }
   else if (strchr (arg, '/'))
     {
-      xlist_t *targets;
+      GList *targets;
       /* service/protocol/domain */
-      char **parts = xstrsplit (arg, "/", 3);
+      char **parts = g_strsplit (arg, "/", 3);
 
       if (!parts || !parts[2])
 	usage ();
@@ -352,24 +395,24 @@ lookup_one_sync (const char *arg)
     }
   else if (g_hostname_is_ip_address (arg))
     {
-      xinet_address_t *addr = xinet_address_new_from_string (arg);
+      GInetAddress *addr = g_inet_address_new_from_string (arg);
       char *name;
 
       name = g_resolver_lookup_by_address (resolver, addr, cancellable, &error);
       print_resolved_name (arg, name, error);
-      xobject_unref (addr);
+      g_object_unref (addr);
     }
   else
     {
-      xlist_t *addresses;
+      GList *addresses;
 
       addresses = g_resolver_lookup_by_name (resolver, arg, cancellable, &error);
       print_resolved_addresses (arg, addresses, error);
     }
 }
 
-static xpointer_t
-lookup_thread (xpointer_t arg)
+static gpointer
+lookup_thread (gpointer arg)
 {
   lookup_one_sync (arg);
   return NULL;
@@ -382,18 +425,18 @@ start_sync_lookups (char **argv, int argc)
 
   for (i = 0; i < argc; i++)
     {
-      xthread_t *thread;
-      thread = xthread_new ("lookup", lookup_thread, argv[i]);
-      xthread_unref (thread);
+      GThread *thread;
+      thread = g_thread_new ("lookup", lookup_thread, argv[i]);
+      g_thread_unref (thread);
     }
 }
 
 static void
-lookup_by_addr_callback (xobject_t *source, xasync_result_t *result,
-                         xpointer_t user_data)
+lookup_by_addr_callback (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
 {
   const char *phys = user_data;
-  xerror_t *error = NULL;
+  GError *error = NULL;
   char *name;
 
   name = g_resolver_lookup_by_address_finish (resolver, result, &error);
@@ -401,37 +444,37 @@ lookup_by_addr_callback (xobject_t *source, xasync_result_t *result,
 }
 
 static void
-lookup_by_name_callback (xobject_t *source, xasync_result_t *result,
-                         xpointer_t user_data)
+lookup_by_name_callback (GObject *source, GAsyncResult *result,
+                         gpointer user_data)
 {
   const char *name = user_data;
-  xerror_t *error = NULL;
-  xlist_t *addresses;
+  GError *error = NULL;
+  GList *addresses;
 
   addresses = g_resolver_lookup_by_name_finish (resolver, result, &error);
   print_resolved_addresses (name, addresses, error);
 }
 
 static void
-lookup_service_callback (xobject_t *source, xasync_result_t *result,
-			 xpointer_t user_data)
+lookup_service_callback (GObject *source, GAsyncResult *result,
+			 gpointer user_data)
 {
   const char *service = user_data;
-  xerror_t *error = NULL;
-  xlist_t *targets;
+  GError *error = NULL;
+  GList *targets;
 
   targets = g_resolver_lookup_service_finish (resolver, result, &error);
   print_resolved_service (service, targets, error);
 }
 
 static void
-lookup_records_callback (xobject_t      *source,
-                         xasync_result_t *result,
-                         xpointer_t      user_data)
+lookup_records_callback (GObject      *source,
+                         GAsyncResult *result,
+                         gpointer      user_data)
 {
   const char *arg = user_data;
-  xerror_t *error = NULL;
-  xlist_t *records;
+  GError *error = NULL;
+  GList *records;
 
   records = g_resolver_lookup_records_finish (resolver, result, &error);
 
@@ -448,6 +491,9 @@ lookup_records_callback (xobject_t      *source,
       break;
     case G_RESOLVER_RECORD_TXT:
       print_resolved_txt (arg, records, error);
+      break;
+    case G_RESOLVER_RECORD_SRV:
+      print_resolved_srv (arg, records, error);
       break;
     default:
       g_warn_if_reached ();
@@ -470,7 +516,7 @@ start_async_lookups (char **argv, int argc)
       else if (strchr (argv[i], '/'))
 	{
 	  /* service/protocol/domain */
-	  char **parts = xstrsplit (argv[i], "/", 3);
+	  char **parts = g_strsplit (argv[i], "/", 3);
 
 	  if (!parts || !parts[2])
 	    usage ();
@@ -482,11 +528,11 @@ start_async_lookups (char **argv, int argc)
 	}
       else if (g_hostname_is_ip_address (argv[i]))
 	{
-          xinet_address_t *addr = xinet_address_new_from_string (argv[i]);
+          GInetAddress *addr = g_inet_address_new_from_string (argv[i]);
 
 	  g_resolver_lookup_by_address_async (resolver, addr, cancellable,
                                               lookup_by_addr_callback, argv[i]);
-	  xobject_unref (addr);
+	  g_object_unref (addr);
 	}
       else
 	{
@@ -496,90 +542,90 @@ start_async_lookups (char **argv, int argc)
 	}
 
       /* Stress-test the reloading code */
-      xsignal_emit_by_name (resolver, "reload");
+      g_signal_emit_by_name (resolver, "reload");
     }
 }
 
 static void
-print_connectable_sockaddr (xsocket_address_t *sockaddr,
-                            xerror_t         *error)
+print_connectable_sockaddr (GSocketAddress *sockaddr,
+                            GError         *error)
 {
   char *phys;
 
   if (error)
     {
       printf ("Error:   %s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
-  else if (!X_IS_INET_SOCKET_ADDRESS (sockaddr))
+  else if (!G_IS_INET_SOCKET_ADDRESS (sockaddr))
     {
-      printf ("Error:   Unexpected sockaddr type '%s'\n", xtype_name_from_instance ((GTypeInstance *)sockaddr));
-      xobject_unref (sockaddr);
+      printf ("Error:   Unexpected sockaddr type '%s'\n", g_type_name_from_instance ((GTypeInstance *)sockaddr));
+      g_object_unref (sockaddr);
     }
   else
     {
-      xinet_socket_address_t *isa = G_INET_SOCKET_ADDRESS (sockaddr);
-      phys = xinet_address_to_string (g_inet_socket_address_get_address (isa));
+      GInetSocketAddress *isa = G_INET_SOCKET_ADDRESS (sockaddr);
+      phys = g_inet_address_to_string (g_inet_socket_address_get_address (isa));
       printf ("Address: %s%s%s:%d\n",
               strchr (phys, ':') ? "[" : "", phys, strchr (phys, ':') ? "]" : "",
               g_inet_socket_address_get_port (isa));
       g_free (phys);
-      xobject_unref (sockaddr);
+      g_object_unref (sockaddr);
     }
 }
 
 static void
-do_sync_connectable (xsocket_address_enumerator_t *enumerator)
+do_sync_connectable (GSocketAddressEnumerator *enumerator)
 {
-  xsocket_address_t *sockaddr;
-  xerror_t *error = NULL;
+  GSocketAddress *sockaddr;
+  GError *error = NULL;
 
-  while ((sockaddr = xsocket_address_enumerator_next (enumerator, cancellable, &error)))
+  while ((sockaddr = g_socket_address_enumerator_next (enumerator, cancellable, &error)))
     print_connectable_sockaddr (sockaddr, error);
 
-  xobject_unref (enumerator);
+  g_object_unref (enumerator);
   done_lookup ();
 }
 
-static void do_async_connectable (xsocket_address_enumerator_t *enumerator);
+static void do_async_connectable (GSocketAddressEnumerator *enumerator);
 
 static void
-got_next_async (xobject_t *source, xasync_result_t *result, xpointer_t user_data)
+got_next_async (GObject *source, GAsyncResult *result, gpointer user_data)
 {
-  xsocket_address_enumerator_t *enumerator = XSOCKET_ADDRESS_ENUMERATOR (source);
-  xsocket_address_t *sockaddr;
-  xerror_t *error = NULL;
+  GSocketAddressEnumerator *enumerator = G_SOCKET_ADDRESS_ENUMERATOR (source);
+  GSocketAddress *sockaddr;
+  GError *error = NULL;
 
-  sockaddr = xsocket_address_enumerator_next_finish (enumerator, result, &error);
+  sockaddr = g_socket_address_enumerator_next_finish (enumerator, result, &error);
   if (sockaddr || error)
     print_connectable_sockaddr (sockaddr, error);
   if (sockaddr)
     do_async_connectable (enumerator);
   else
     {
-      xobject_unref (enumerator);
+      g_object_unref (enumerator);
       done_lookup ();
     }
 }
 
 static void
-do_async_connectable (xsocket_address_enumerator_t *enumerator)
+do_async_connectable (GSocketAddressEnumerator *enumerator)
 {
-  xsocket_address_enumerator_next_async (enumerator, cancellable,
+  g_socket_address_enumerator_next_async (enumerator, cancellable,
                                           got_next_async, NULL);
 }
 
 static void
-do_connectable (const char *arg, xboolean_t synchronous, xuint_t count)
+do_connectable (const char *arg, gboolean synchronous, guint count)
 {
   char **parts;
-  xsocket_connectable_t *connectable;
-  xsocket_address_enumerator_t *enumerator;
+  GSocketConnectable *connectable;
+  GSocketAddressEnumerator *enumerator;
 
   if (strchr (arg, '/'))
     {
       /* service/protocol/domain */
-      parts = xstrsplit (arg, "/", 3);
+      parts = g_strsplit (arg, "/", 3);
       if (!parts || !parts[2])
 	usage ();
 
@@ -587,9 +633,9 @@ do_connectable (const char *arg, xboolean_t synchronous, xuint_t count)
     }
   else
     {
-      xuint16_t port;
+      guint16 port;
 
-      parts = xstrsplit (arg, ":", 2);
+      parts = g_strsplit (arg, ":", 2);
       if (parts && parts[1])
 	{
 	  arg = parts[0];
@@ -600,11 +646,11 @@ do_connectable (const char *arg, xboolean_t synchronous, xuint_t count)
 
       if (g_hostname_is_ip_address (arg))
 	{
-	  xinet_address_t *addr = xinet_address_new_from_string (arg);
-	  xsocket_address_t *sockaddr = g_inet_socket_address_new (addr, port);
+	  GInetAddress *addr = g_inet_address_new_from_string (arg);
+	  GSocketAddress *sockaddr = g_inet_socket_address_new (addr, port);
 
-	  xobject_unref (addr);
-	  connectable = XSOCKET_CONNECTABLE (sockaddr);
+	  g_object_unref (addr);
+	  connectable = G_SOCKET_CONNECTABLE (sockaddr);
 	}
       else
         connectable = g_network_address_new (arg, port);
@@ -612,15 +658,15 @@ do_connectable (const char *arg, xboolean_t synchronous, xuint_t count)
 
   while (count--)
     {
-      enumerator = xsocket_connectable_enumerate (connectable);
+      enumerator = g_socket_connectable_enumerate (connectable);
 
       if (synchronous)
         do_sync_connectable (enumerator);
       else
         do_async_connectable (enumerator);
     }
-
-  xobject_unref (connectable);
+  
+  g_object_unref (connectable);
 }
 
 #ifdef G_OS_UNIX
@@ -629,27 +675,27 @@ static int cancel_fds[2];
 static void
 interrupted (int sig)
 {
-  xssize_t c;
+  gssize c;
 
   signal (SIGINT, SIG_DFL);
   c = write (cancel_fds[1], "x", 1);
   g_assert_cmpint(c, ==, 1);
 }
 
-static xboolean_t
-async_cancel (xio_channel_t *source, xio_condition_t cond, xpointer_t cancel)
+static gboolean
+async_cancel (GIOChannel *source, GIOCondition cond, gpointer cancel)
 {
-  xcancellable_cancel (cancel);
+  g_cancellable_cancel (cancel);
   return FALSE;
 }
 #endif
 
 
-static xboolean_t
-record_type_arg (const xchar_t *option_name,
-                 const xchar_t *value,
-                 xpointer_t data,
-                 xerror_t **error)
+static gboolean
+record_type_arg (const gchar *option_name,
+                 const gchar *value,
+                 gpointer data,
+                 GError **error)
 {
   if (g_ascii_strcasecmp (value, "MX") == 0) {
     record_type = G_RESOLVER_RECORD_MX;
@@ -659,9 +705,11 @@ record_type_arg (const xchar_t *option_name,
     record_type = G_RESOLVER_RECORD_SOA;
   } else if (g_ascii_strcasecmp (value, "NS") == 0) {
     record_type = G_RESOLVER_RECORD_NS;
+  } else if (g_ascii_strcasecmp (value, "SRV") == 0) {
+    record_type = G_RESOLVER_RECORD_SRV;
   } else {
       g_set_error (error, G_OPTION_ERROR, G_OPTION_ERROR_BAD_VALUE,
-                   "Specify MX, TXT, NS or SOA for the special record lookup types");
+                   "Specify MX, TXT, NS, SOA or SRV for the special record lookup types");
       return FALSE;
   }
 
@@ -678,11 +726,11 @@ static const GOptionEntry option_entries[] = {
 int
 main (int argc, char **argv)
 {
-  xoption_context_t *context;
-  xerror_t *error = NULL;
+  GOptionContext *context;
+  GError *error = NULL;
 #ifdef G_OS_UNIX
-  xio_channel_t *chan;
-  xuint_t watch;
+  GIOChannel *chan;
+  guint watch;
 #endif
 
   context = g_option_context_new ("lookups ...");
@@ -690,7 +738,7 @@ main (int argc, char **argv)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       g_printerr ("%s\n", error->message);
-      xerror_free (error);
+      g_error_free (error);
       usage();
     }
 
@@ -699,7 +747,7 @@ main (int argc, char **argv)
 
   resolver = g_resolver_get_default ();
 
-  cancellable = xcancellable_new ();
+  cancellable = g_cancellable_new ();
 
 #ifdef G_OS_UNIX
   /* Set up cancellation; we want to cancel if the user ^C's the
@@ -718,7 +766,7 @@ main (int argc, char **argv)
 #endif
 
   nlookups = argc - 1;
-  loop = xmain_loop_new (NULL, TRUE);
+  loop = g_main_loop_new (NULL, TRUE);
 
   if (connectable_count)
     {
@@ -733,13 +781,13 @@ main (int argc, char **argv)
         start_async_lookups (argv + 1, argc - 1);
     }
 
-  xmain_loop_run (loop);
-  xmain_loop_unref (loop);
+  g_main_loop_run (loop);
+  g_main_loop_unref (loop);
 
 #ifdef G_OS_UNIX
-  xsource_remove (watch);
+  g_source_remove (watch);
 #endif
-  xobject_unref (cancellable);
+  g_object_unref (cancellable);
   g_option_context_free (context);
 
   return 0;

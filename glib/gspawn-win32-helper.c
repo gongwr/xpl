@@ -42,14 +42,14 @@
 
 
 static void
-write_err_and_exit (xint_t    fd,
+write_err_and_exit (gint    fd,
 		    gintptr msg)
 {
   gintptr en = errno;
-
+  
   write (fd, &msg, sizeof(gintptr));
   write (fd, &en, sizeof(gintptr));
-
+  
   _exit (1);
 }
 
@@ -67,13 +67,13 @@ write_err_and_exit (xint_t    fd,
 
 /* Copy of protect_argv that handles wchar_t strings */
 
-static xint_t
-protect_wargv (xint_t       argc,
+static gint
+protect_wargv (gint       argc,
 	       wchar_t  **wargv,
 	       wchar_t ***new_wargv)
 {
-  xint_t i;
-
+  gint i;
+  
   *new_wargv = g_new (wchar_t *, argc+1);
 
   /* Quote each argv element if necessary, so that it will get
@@ -91,9 +91,9 @@ protect_wargv (xint_t       argc,
     {
       wchar_t *p = wargv[i];
       wchar_t *q;
-      xint_t len = 0;
-      xint_t pre_bslash = 0;
-      xboolean_t need_dblquotes = FALSE;
+      gint len = 0;
+      gint pre_bslash = 0;
+      gboolean need_dblquotes = FALSE;
       while (*p)
 	{
 	  if (*p == ' ' || *p == '\t')
@@ -200,7 +200,7 @@ int
 main (int ignored_argc, char **ignored_argv)
 #endif
 {
-  xhashtable_t *fds;  /* (element-type int int) */
+  GHashTable *fds;  /* (element-type int int) */
   int child_err_report_fd = -1;
   int helper_sync_fd = -1;
   int saved_stderr_fd = -1;
@@ -211,7 +211,7 @@ main (int ignored_argc, char **ignored_argv)
   gintptr handle;
   int saved_errno;
   gintptr no_error = CHILD_NO_ERROR;
-  xint_t argv_zero_offset = ARG_PROGRAM;
+  gint argv_zero_offset = ARG_PROGRAM;
   wchar_t **new_wargv;
   int argc;
   char **argv;
@@ -231,12 +231,12 @@ main (int ignored_argc, char **ignored_argv)
   /* Fetch the wide-char argument vector */
   wargv = CommandLineToArgvW (GetCommandLineW(), &argc);
 
-  xassert (argc >= ARG_COUNT);
+  g_assert (argc >= ARG_COUNT);
 
   /* Convert unicode wargs to utf8 */
   argv = g_new(char *, argc + 1);
   for (i = 0; i < argc; i++)
-    argv[i] = xutf16_to_utf8(wargv[i], -1, NULL, NULL, NULL);
+    argv[i] = g_utf16_to_utf8(wargv[i], -1, NULL, NULL, NULL);
   argv[i] = NULL;
 
   /* argv[ARG_CHILD_ERR_REPORT] is the file descriptor number onto
@@ -292,9 +292,13 @@ main (int ignored_argc, char **ignored_argv)
       checked_dup2 (fd, 1, child_err_report_fd);
     }
 
-  saved_stderr_fd = reopen_noninherited (dup (2), _O_WRONLY);
-  if (saved_stderr_fd == -1)
-    write_err_and_exit (child_err_report_fd, CHILD_DUP_FAILED);
+  /* GUI application do not necessarily have a stderr */
+  if (_fileno (stderr) == 2)
+    {
+      saved_stderr_fd = reopen_noninherited (dup (2), _O_WRONLY);
+      if (saved_stderr_fd == -1)
+        write_err_and_exit (child_err_report_fd, CHILD_DUP_FAILED);
+    }
 
   maxfd = MAX (saved_stderr_fd, maxfd);
   if (argv[ARG_STDERR][0] == '-')
@@ -319,50 +323,53 @@ main (int ignored_argc, char **ignored_argv)
   else if (_wchdir (wargv[ARG_WORKING_DIRECTORY]) < 0)
     write_err_and_exit (child_err_report_fd, CHILD_CHDIR_FAILED);
 
-  fds = xhash_table_new (NULL, NULL);
+  fds = g_hash_table_new (NULL, NULL);
   if (argv[ARG_FDS][0] != '-')
     {
-      xchar_t **fdsv = xstrsplit (argv[ARG_FDS], ",", -1);
-      xsize_t i;
+      gchar **fdsv = g_strsplit (argv[ARG_FDS], ",", -1);
+      gsize i;
 
       for (i = 0; fdsv[i]; i++)
         {
           char *endptr = NULL;
           int sourcefd, targetfd;
-          sint64_t val;
+          gint64 val;
 
           val = g_ascii_strtoll (fdsv[i], &endptr, 10);
-          xassert (val <= G_MAXINT32);
+          g_assert (val <= G_MAXINT32);
           sourcefd = val;
-          xassert (endptr != fdsv[i]);
-          xassert (*endptr == ':');
+          g_assert (endptr != fdsv[i]);
+          g_assert (*endptr == ':');
           val = g_ascii_strtoll (endptr + 1, &endptr, 10);
           targetfd = val;
-          xassert (val <= G_MAXINT32);
-          xassert (*endptr == '\0');
+          g_assert (val <= G_MAXINT32);
+          g_assert (*endptr == '\0');
 
           maxfd = MAX (maxfd, sourcefd);
           maxfd = MAX (maxfd, targetfd);
 
-          xhash_table_insert (fds, GINT_TO_POINTER (targetfd), GINT_TO_POINTER (sourcefd));
+          g_hash_table_insert (fds, GINT_TO_POINTER (targetfd), GINT_TO_POINTER (sourcefd));
         }
 
-      xstrfreev (fdsv);
+      g_strfreev (fdsv);
     }
 
   maxfd++;
   child_err_report_fd = checked_dup2 (child_err_report_fd, maxfd, child_err_report_fd);
   maxfd++;
   helper_sync_fd = checked_dup2 (helper_sync_fd, maxfd, child_err_report_fd);
-  maxfd++;
-  saved_stderr_fd = checked_dup2 (saved_stderr_fd, maxfd, child_err_report_fd);
+  if (saved_stderr_fd >= 0)
+    {
+      maxfd++;
+      saved_stderr_fd = checked_dup2 (saved_stderr_fd, maxfd, child_err_report_fd);
+    }
 
   {
-    xhash_table_iter_t iter;
-    xpointer_t sourcefd, targetfd;
+    GHashTableIter iter;
+    gpointer sourcefd, targetfd;
 
-    xhash_table_iter_init (&iter, fds);
-    while (xhash_table_iter_next (&iter, &targetfd, &sourcefd))
+    g_hash_table_iter_init (&iter, fds);
+    while (g_hash_table_iter_next (&iter, &targetfd, &sourcefd))
       {
         /* If we're doing remapping fd assignments, we need to handle
          * the case where the user has specified e.g. 5 -> 4, 4 -> 6.
@@ -371,24 +378,25 @@ main (int ignored_argc, char **ignored_argv)
          */
         maxfd++;
         checked_dup2 (GPOINTER_TO_INT (sourcefd), maxfd, child_err_report_fd);
-        xhash_table_iter_replace (&iter, GINT_TO_POINTER (maxfd));
+        g_hash_table_iter_replace (&iter, GINT_TO_POINTER (maxfd));
       }
 
-    xhash_table_iter_init (&iter, fds);
-    while (xhash_table_iter_next (&iter, &targetfd, &sourcefd))
+    g_hash_table_iter_init (&iter, fds);
+    while (g_hash_table_iter_next (&iter, &targetfd, &sourcefd))
       checked_dup2 (GPOINTER_TO_INT (sourcefd), GPOINTER_TO_INT (targetfd), child_err_report_fd);
   }
 
-  xhash_table_add (fds, GINT_TO_POINTER (child_err_report_fd));
-  xhash_table_add (fds, GINT_TO_POINTER (helper_sync_fd));
-  xhash_table_add (fds, GINT_TO_POINTER (saved_stderr_fd));
+  g_hash_table_add (fds, GINT_TO_POINTER (child_err_report_fd));
+  g_hash_table_add (fds, GINT_TO_POINTER (helper_sync_fd));
+  if (saved_stderr_fd >= 0)
+    g_hash_table_add (fds, GINT_TO_POINTER (saved_stderr_fd));
 
   /* argv[ARG_CLOSE_DESCRIPTORS] is "y" if file descriptors from 3
    *  upwards should be closed
    */
   if (argv[ARG_CLOSE_DESCRIPTORS][0] == 'y')
     for (i = 3; i < 1000; i++)	/* FIXME real limit? */
-      if (!xhash_table_contains (fds, GINT_TO_POINTER (i)))
+      if (!g_hash_table_contains (fds, GINT_TO_POINTER (i)))
         if (_get_osfhandle (i) != -1)
           close (i);
 
@@ -430,7 +438,9 @@ main (int ignored_argc, char **ignored_argv)
    * Remove redirection so that they would go to original stderr
    * instead of being treated as part of stderr of child process.
    */
-  dup2 (saved_stderr_fd, 2);
+  if (saved_stderr_fd >= 0)
+    dup2 (saved_stderr_fd, 2);
+
   if (handle == -1 && saved_errno != 0)
     {
       int ec = (saved_errno == ENOENT)
@@ -445,8 +455,8 @@ main (int ignored_argc, char **ignored_argv)
   read (helper_sync_fd, &c, 1);
 
   LocalFree (wargv);
-  xstrfreev (argv);
-  xhash_table_unref (fds);
+  g_strfreev (argv);
+  g_hash_table_unref (fds);
 
   return 0;
 }

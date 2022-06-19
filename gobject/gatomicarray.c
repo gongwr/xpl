@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2009 Benjamin Otte <otte@gnome.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -55,12 +55,12 @@ struct _FreeListNode {
 static FreeListNode *freelist = NULL;
 
 /* must hold array lock */
-static xpointer_t
-freelist_alloc (xsize_t size, xboolean_t reuse)
+static gpointer
+freelist_alloc (gsize size, gboolean reuse)
 {
-  xpointer_t mem;
+  gpointer mem;
   FreeListNode *free, **prev;
-  xsize_t real_size;
+  gsize real_size;
 
   if (reuse)
     {
@@ -69,18 +69,18 @@ freelist_alloc (xsize_t size, xboolean_t reuse)
 	  if (G_ATOMIC_ARRAY_DATA_SIZE (free) == size)
 	    {
 	      *prev = free->next;
-	      return (xpointer_t)free;
+	      return (gpointer)free;
 	    }
 	}
     }
 
-  real_size = sizeof (xsize_t) + MAX (size, sizeof (FreeListNode));
+  real_size = sizeof (gsize) + MAX (size, sizeof (FreeListNode));
   mem = g_slice_alloc (real_size);
-  mem = ((char *) mem) + sizeof (xsize_t);
+  mem = ((char *) mem) + sizeof (gsize);
   G_ATOMIC_ARRAY_DATA_SIZE (mem) = size;
 
 #if ENABLE_VALGRIND
-  VALGRIND_MALLOCLIKE_BLOCK (mem, real_size - sizeof (xsize_t), FALSE, FALSE);
+  VALGRIND_MALLOCLIKE_BLOCK (mem, real_size - sizeof (gsize), FALSE, FALSE);
 #endif
 
   return mem;
@@ -88,7 +88,7 @@ freelist_alloc (xsize_t size, xboolean_t reuse)
 
 /* must hold array lock */
 static void
-freelist_free (xpointer_t mem)
+freelist_free (gpointer mem)
 {
   FreeListNode *free;
 
@@ -119,13 +119,13 @@ _g_atomic_array_init (GAtomicArray *array)
  * we then re-grow we may reuse an old pointer
  * value and confuse the transaction check.
  */
-xpointer_t
+gpointer
 _g_atomic_array_copy (GAtomicArray *array,
-		      xsize_t header_size,
-		      xsize_t additional_element_size)
+		      gsize header_size,
+		      gsize additional_element_size)
 {
-  xuint8_t *new, *old;
-  xsize_t old_size, new_size;
+  guint8 *new, *old;
+  gsize old_size, new_size;
 
   G_LOCK (array);
   old = g_atomic_pointer_get (&array->data);
@@ -156,14 +156,14 @@ _g_atomic_array_copy (GAtomicArray *array,
  */
 void
 _g_atomic_array_update (GAtomicArray *array,
-			xpointer_t new_data)
+			gpointer new_data)
 {
-  xuint8_t *old;
+  guint8 *old;
 
   G_LOCK (array);
   old = g_atomic_pointer_get (&array->data);
 
-  xassert (old == NULL || G_ATOMIC_ARRAY_DATA_SIZE (old) <= G_ATOMIC_ARRAY_DATA_SIZE (new_data));
+  g_assert (old == NULL || G_ATOMIC_ARRAY_DATA_SIZE (old) <= G_ATOMIC_ARRAY_DATA_SIZE (new_data));
 
   g_atomic_pointer_set (&array->data, new_data);
   if (old)

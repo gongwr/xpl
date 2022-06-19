@@ -43,25 +43,25 @@ static const GOptionEntry entries[] = {
 };
 
 /* 256k minus malloc overhead */
-#define STREAM_BUFFER_SIZE (1024*256 - 2*sizeof(xpointer_t))
+#define STREAM_BUFFER_SIZE (1024*256 - 2*sizeof(gpointer))
 
-static xboolean_t
-cat (xfile_t *file)
+static gboolean
+cat (GFile *file)
 {
-  xinput_stream_t *in;
+  GInputStream *in;
   char *buffer;
   char *p;
-  xssize_t res;
-  xboolean_t close_res;
-  xerror_t *error;
-  xboolean_t success;
+  gssize res;
+  gboolean close_res;
+  GError *error;
+  gboolean success;
 
   error = NULL;
-  in = (xinput_stream_t *) xfile_read (file, NULL, &error);
+  in = (GInputStream *) g_file_read (file, NULL, &error);
   if (in == NULL)
     {
       print_file_error (file, error->message);
-      xerror_free (error);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -69,10 +69,10 @@ cat (xfile_t *file)
   success = TRUE;
   while (1)
     {
-      res = xinput_stream_read (in, buffer, STREAM_BUFFER_SIZE, NULL, &error);
+      res = g_input_stream_read (in, buffer, STREAM_BUFFER_SIZE, NULL, &error);
       if (res > 0)
         {
-          xssize_t written;
+          gssize written;
 
           p = buffer;
           while (res > 0)
@@ -95,7 +95,7 @@ cat (xfile_t *file)
       else if (res < 0)
         {
           print_file_error (file, error->message);
-          xerror_free (error);
+          g_error_free (error);
           error = NULL;
           success = FALSE;
           break;
@@ -105,11 +105,11 @@ cat (xfile_t *file)
     }
 
  out:
- close_res = xinput_stream_close (in, NULL, &error);
+ close_res = g_input_stream_close (in, NULL, &error);
   if (!close_res)
     {
       print_file_error (file, error->message);
-      xerror_free (error);
+      g_error_free (error);
       success = FALSE;
     }
 
@@ -119,18 +119,18 @@ cat (xfile_t *file)
 }
 
 int
-handle_cat (int argc, char *argv[], xboolean_t do_help)
+handle_cat (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xchar_t *param;
-  xerror_t *error = NULL;
+  GOptionContext *context;
+  gchar *param;
+  GError *error = NULL;
   int i;
-  xboolean_t res;
-  xfile_t *file;
+  gboolean res;
+  GFile *file;
 
   g_set_prgname ("gio cat");
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("%s…", _("LOCATION"));
+  param = g_strdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -152,7 +152,7 @@ handle_cat (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -169,9 +169,9 @@ handle_cat (int argc, char *argv[], xboolean_t do_help)
   res = TRUE;
   for (i = 1; i < argc; i++)
     {
-      file = xfile_new_for_commandline_arg (argv[i]);
+      file = g_file_new_for_commandline_arg (argv[i]);
       res &= cat (file);
-      xobject_unref (file);
+      g_object_unref (file);
     }
 
   return res ? 0 : 2;

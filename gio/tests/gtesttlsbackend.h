@@ -23,21 +23,21 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TEST_TLS_BACKEND         (_g_test_tls_backend_get_type ())
-#define G_TEST_TLS_BACKEND(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_TEST_TLS_BACKEND, GTestTlsBackend))
-#define G_TEST_TLS_BACKEND_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_TEST_TLS_BACKEND, GTestTlsBackendClass))
-#define X_IS_TEST_TLS_BACKEND(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_TEST_TLS_BACKEND))
-#define X_IS_TEST_TLS_BACKEND_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_TEST_TLS_BACKEND))
-#define G_TEST_TLS_BACKEND_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_TEST_TLS_BACKEND, GTestTlsBackendClass))
+#define G_TYPE_TEST_TLS_BACKEND         (_g_test_tls_backend_get_type ())
+#define G_TEST_TLS_BACKEND(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_TEST_TLS_BACKEND, GTestTlsBackend))
+#define G_TEST_TLS_BACKEND_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_TEST_TLS_BACKEND, GTestTlsBackendClass))
+#define G_IS_TEST_TLS_BACKEND(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_TEST_TLS_BACKEND))
+#define G_IS_TEST_TLS_BACKEND_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_TEST_TLS_BACKEND))
+#define G_TEST_TLS_BACKEND_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_TEST_TLS_BACKEND, GTestTlsBackendClass))
 
 typedef struct _GTestTlsBackend       GTestTlsBackend;
 typedef struct _GTestTlsBackendClass  GTestTlsBackendClass;
 
 struct _GTestTlsBackendClass {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-xtype_t _g_test_tls_backend_get_type       (void);
+GType _g_test_tls_backend_get_type       (void);
 
 G_END_DECLS
 

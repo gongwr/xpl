@@ -19,7 +19,7 @@
 #ifndef __G_SPAWN_H__
 #define __G_SPAWN_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,7 +33,7 @@ G_BEGIN_DECLS
  * G_SPAWN_ERROR:
  *
  * Error domain for spawning processes. Errors in this domain will
- * be from the #GSpawnError enumeration. See #xerror_t for information on
+ * be from the #GSpawnError enumeration. See #GError for information on
  * error domains.
  */
 #define G_SPAWN_ERROR g_spawn_error_quark ()
@@ -73,7 +73,7 @@ typedef enum
   G_SPAWN_ERROR_ACCES,  /* execv() returned EACCES */
   G_SPAWN_ERROR_PERM,   /* execv() returned EPERM */
   G_SPAWN_ERROR_TOO_BIG,/* execv() returned E2BIG */
-  G_SPAWN_ERROR_2BIG XPL_DEPRECATED_ENUMERATOR_IN_2_32_FOR(G_SPAWN_ERROR_TOO_BIG) = G_SPAWN_ERROR_TOO_BIG,
+  G_SPAWN_ERROR_2BIG GLIB_DEPRECATED_ENUMERATOR_IN_2_32_FOR(G_SPAWN_ERROR_TOO_BIG) = G_SPAWN_ERROR_TOO_BIG,
   G_SPAWN_ERROR_NOEXEC, /* execv() returned ENOEXEC */
   G_SPAWN_ERROR_NAMETOOLONG, /* ""  "" ENAMETOOLONG */
   G_SPAWN_ERROR_NOENT,       /* ""  "" ENOENT */
@@ -135,7 +135,7 @@ typedef enum
  * and g_environ_unsetenv(), and then pass the complete environment
  * list to the `g_spawn...` function.
  */
-typedef void (* GSpawnChildSetupFunc) (xpointer_t user_data);
+typedef void (* GSpawnChildSetupFunc) (gpointer user_data);
 
 /**
  * GSpawnFlags:
@@ -181,107 +181,107 @@ typedef enum
   G_SPAWN_CLOEXEC_PIPES          = 1 << 8
 } GSpawnFlags;
 
-XPL_AVAILABLE_IN_ALL
-xquark g_spawn_error_quark (void);
-XPL_AVAILABLE_IN_ALL
-xquark g_spawn_exit_error_quark (void);
+GLIB_AVAILABLE_IN_ALL
+GQuark g_spawn_error_quark (void);
+GLIB_AVAILABLE_IN_ALL
+GQuark g_spawn_exit_error_quark (void);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_spawn_async (const xchar_t           *working_directory,
-                        xchar_t                **argv,
-                        xchar_t                **envp,
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_async (const gchar           *working_directory,
+                        gchar                **argv,
+                        gchar                **envp,
                         GSpawnFlags            flags,
                         GSpawnChildSetupFunc   child_setup,
-                        xpointer_t               user_data,
-                        xpid_t                  *child_pid,
-                        xerror_t               **error);
+                        gpointer               user_data,
+                        GPid                  *child_pid,
+                        GError               **error);
 
 
 /* Opens pipes for non-NULL standard_output, standard_input, standard_error,
  * and returns the parent's end of the pipes.
  */
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_spawn_async_with_pipes (const xchar_t          *working_directory,
-                                   xchar_t               **argv,
-                                   xchar_t               **envp,
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_async_with_pipes (const gchar          *working_directory,
+                                   gchar               **argv,
+                                   gchar               **envp,
                                    GSpawnFlags           flags,
                                    GSpawnChildSetupFunc  child_setup,
-                                   xpointer_t              user_data,
-                                   xpid_t                 *child_pid,
-                                   xint_t                 *standard_input,
-                                   xint_t                 *standard_output,
-                                   xint_t                 *standard_error,
-                                   xerror_t              **error);
+                                   gpointer              user_data,
+                                   GPid                 *child_pid,
+                                   gint                 *standard_input,
+                                   gint                 *standard_output,
+                                   gint                 *standard_error,
+                                   GError              **error);
 
-XPL_AVAILABLE_IN_2_68
-xboolean_t g_spawn_async_with_pipes_and_fds (const xchar_t          *working_directory,
-                                           const xchar_t * const  *argv,
-                                           const xchar_t * const  *envp,
+GLIB_AVAILABLE_IN_2_68
+gboolean g_spawn_async_with_pipes_and_fds (const gchar          *working_directory,
+                                           const gchar * const  *argv,
+                                           const gchar * const  *envp,
                                            GSpawnFlags           flags,
                                            GSpawnChildSetupFunc  child_setup,
-                                           xpointer_t              user_data,
-                                           xint_t                  stdin_fd,
-                                           xint_t                  stdout_fd,
-                                           xint_t                  stderr_fd,
-                                           const xint_t           *source_fds,
-                                           const xint_t           *target_fds,
-                                           xsize_t                 n_fds,
-                                           xpid_t                 *child_pid_out,
-                                           xint_t                 *stdin_pipe_out,
-                                           xint_t                 *stdout_pipe_out,
-                                           xint_t                 *stderr_pipe_out,
-                                           xerror_t              **error);
+                                           gpointer              user_data,
+                                           gint                  stdin_fd,
+                                           gint                  stdout_fd,
+                                           gint                  stderr_fd,
+                                           const gint           *source_fds,
+                                           const gint           *target_fds,
+                                           gsize                 n_fds,
+                                           GPid                 *child_pid_out,
+                                           gint                 *stdin_pipe_out,
+                                           gint                 *stdout_pipe_out,
+                                           gint                 *stderr_pipe_out,
+                                           GError              **error);
 
 /* Lets you provide fds for stdin/stdout/stderr */
-XPL_AVAILABLE_IN_2_58
-xboolean_t g_spawn_async_with_fds (const xchar_t          *working_directory,
-                                 xchar_t               **argv,
-                                 xchar_t               **envp,
+GLIB_AVAILABLE_IN_2_58
+gboolean g_spawn_async_with_fds (const gchar          *working_directory,
+                                 gchar               **argv,
+                                 gchar               **envp,
                                  GSpawnFlags           flags,
                                  GSpawnChildSetupFunc  child_setup,
-                                 xpointer_t              user_data,
-                                 xpid_t                 *child_pid,
-                                 xint_t                  stdin_fd,
-                                 xint_t                  stdout_fd,
-                                 xint_t                  stderr_fd,
-                                 xerror_t              **error);
+                                 gpointer              user_data,
+                                 GPid                 *child_pid,
+                                 gint                  stdin_fd,
+                                 gint                  stdout_fd,
+                                 gint                  stderr_fd,
+                                 GError              **error);
 
 /* If standard_output or standard_error are non-NULL, the full
  * standard output or error of the command will be placed there.
  */
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_spawn_sync         (const xchar_t          *working_directory,
-                               xchar_t               **argv,
-                               xchar_t               **envp,
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_sync         (const gchar          *working_directory,
+                               gchar               **argv,
+                               gchar               **envp,
                                GSpawnFlags           flags,
                                GSpawnChildSetupFunc  child_setup,
-                               xpointer_t              user_data,
-                               xchar_t               **standard_output,
-                               xchar_t               **standard_error,
-                               xint_t                 *wait_status,
-                               xerror_t              **error);
+                               gpointer              user_data,
+                               gchar               **standard_output,
+                               gchar               **standard_error,
+                               gint                 *wait_status,
+                               GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_spawn_command_line_sync  (const xchar_t          *command_line,
-                                     xchar_t               **standard_output,
-                                     xchar_t               **standard_error,
-                                     xint_t                 *wait_status,
-                                     xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_spawn_command_line_async (const xchar_t          *command_line,
-                                     xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_command_line_sync  (const gchar          *command_line,
+                                     gchar               **standard_output,
+                                     gchar               **standard_error,
+                                     gint                 *wait_status,
+                                     GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_spawn_command_line_async (const gchar          *command_line,
+                                     GError              **error);
 
-XPL_AVAILABLE_IN_2_70
-xboolean_t g_spawn_check_wait_status (xint_t      wait_status,
-                                    xerror_t  **error);
+GLIB_AVAILABLE_IN_2_70
+gboolean g_spawn_check_wait_status (gint      wait_status,
+                                    GError  **error);
 
-XPL_DEPRECATED_IN_2_70_FOR(g_spawn_check_wait_status)
-xboolean_t g_spawn_check_exit_status (xint_t      wait_status,
-				    xerror_t  **error);
+GLIB_DEPRECATED_IN_2_70_FOR(g_spawn_check_wait_status)
+gboolean g_spawn_check_exit_status (gint      wait_status,
+				    GError  **error);
 
-XPL_AVAILABLE_IN_ALL
-void g_spawn_close_pid (xpid_t pid);
+GLIB_AVAILABLE_IN_ALL
+void g_spawn_close_pid (GPid pid);
 
 G_END_DECLS
 

@@ -25,38 +25,38 @@
 static void
 set_default_database (void)
 {
-  xtls_backend_t *backend;
-  xtls_database_t *default_db, *file_db, *test_db;
-  xerror_t *error = NULL;
-  xchar_t *path;
+  GTlsBackend *backend;
+  GTlsDatabase *default_db, *file_db, *test_db;
+  GError *error = NULL;
+  gchar *path;
 
-  backend = xtls_backend_get_default ();
+  backend = g_tls_backend_get_default ();
   g_assert_nonnull (backend);
 
-  default_db = xtls_backend_get_default_database (backend);
+  default_db = g_tls_backend_get_default_database (backend);
   g_assert_nonnull (default_db);
 
   path = g_test_build_filename (G_TEST_DIST, "cert-tests", "cert1.pem", NULL);
-  file_db = xtls_file_database_new (path, &error);
+  file_db = g_tls_file_database_new (path, &error);
   g_assert_no_error (error);
   g_assert_nonnull (file_db);
 
   /* setting a default database makes get_default_database return that database */
-  xtls_backend_set_default_database (backend, file_db);
-  test_db = xtls_backend_get_default_database (backend);
+  g_tls_backend_set_default_database (backend, file_db);
+  test_db = g_tls_backend_get_default_database (backend);
   g_assert_nonnull (test_db);
   g_assert_true (test_db == file_db);
-  xobject_unref (test_db);
+  g_object_unref (test_db);
 
   /* setting a NULL default database returns the original default database */
-  xtls_backend_set_default_database (backend, NULL);
-  test_db = xtls_backend_get_default_database (backend);
+  g_tls_backend_set_default_database (backend, NULL);
+  test_db = g_tls_backend_get_default_database (backend);
   g_assert_nonnull (test_db);
   g_assert_true (test_db == default_db);
 
-  xobject_unref (default_db);
-  xobject_unref (file_db);
-  xobject_unref (test_db);
+  g_object_unref (default_db);
+  g_object_unref (file_db);
+  g_object_unref (test_db);
   g_free (path);
 }
 

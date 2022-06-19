@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright © 2020 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -30,16 +30,16 @@
  * @short_description: URI-handling utilities
  * @include: glib.h
  *
- * The #xuri_t type and related functions can be used to parse URIs into
+ * The #GUri type and related functions can be used to parse URIs into
  * their components, and build valid URIs from individual components.
  *
- * Note that #xuri_t scope is to help manipulate URIs in various applications,
+ * Note that #GUri scope is to help manipulate URIs in various applications,
  * following [RFC 3986](https://tools.ietf.org/html/rfc3986). In particular,
  * it doesn't intend to cover web browser needs, and doesn't implement the
  * [WHATWG URL](https://url.spec.whatwg.org/) standard. No APIs are provided to
  * help prevent
  * [homograph attacks](https://en.wikipedia.org/wiki/IDN_homograph_attack), so
- * #xuri_t is not suitable for formatting URIs for display to the user for making
+ * #GUri is not suitable for formatting URIs for display to the user for making
  * security-sensitive decisions.
  *
  * ## Relative and absolute URIs # {#relative-absolute-uris}
@@ -62,78 +62,78 @@
  *
  * Absolute URIs have a scheme specified. Any other components of the URI which
  * are missing are specified as explicitly unset in the URI, rather than being
- * resolved relative to a base URI using xuri_parse_relative().
+ * resolved relative to a base URI using g_uri_parse_relative().
  *
  * For example, a valid absolute URI is `file:///home/bob` or
  * `https://search.com?query=string`.
  *
- * A #xuri_t instance is always an absolute URI. A string may be an absolute URI
+ * A #GUri instance is always an absolute URI. A string may be an absolute URI
  * or a relative reference; see the documentation for individual functions as to
  * what forms they accept.
  *
  * ## Parsing URIs
  *
- * The most minimalist APIs for parsing URIs are xuri_split() and
- * xuri_split_with_user(). These split a URI into its component
+ * The most minimalist APIs for parsing URIs are g_uri_split() and
+ * g_uri_split_with_user(). These split a URI into its component
  * parts, and return the parts; the difference between the two is that
- * xuri_split() treats the ‘userinfo’ component of the URI as a
- * single element, while xuri_split_with_user() can (depending on the
- * #xuri_flags_t you pass) treat it as containing a username, password,
- * and authentication parameters. Alternatively, xuri_split_network()
+ * g_uri_split() treats the ‘userinfo’ component of the URI as a
+ * single element, while g_uri_split_with_user() can (depending on the
+ * #GUriFlags you pass) treat it as containing a username, password,
+ * and authentication parameters. Alternatively, g_uri_split_network()
  * can be used when you are only interested in the components that are
  * needed to initiate a network connection to the service (scheme,
  * host, and port).
  *
- * xuri_parse() is similar to xuri_split(), but instead of returning
- * individual strings, it returns a #xuri_t structure (and it requires
+ * g_uri_parse() is similar to g_uri_split(), but instead of returning
+ * individual strings, it returns a #GUri structure (and it requires
  * that the URI be an absolute URI).
  *
- * xuri_resolve_relative() and xuri_parse_relative() allow you to
+ * g_uri_resolve_relative() and g_uri_parse_relative() allow you to
  * resolve a relative URI relative to a base URI.
- * xuri_resolve_relative() takes two strings and returns a string,
- * and xuri_parse_relative() takes a #xuri_t and a string and returns a
- * #xuri_t.
+ * g_uri_resolve_relative() takes two strings and returns a string,
+ * and g_uri_parse_relative() takes a #GUri and a string and returns a
+ * #GUri.
  *
- * All of the parsing functions take a #xuri_flags_t argument describing
+ * All of the parsing functions take a #GUriFlags argument describing
  * exactly how to parse the URI; see the documentation for that type
  * for more details on the specific flags that you can pass. If you
  * need to choose different flags based on the type of URI, you can
- * use xuri_peek_scheme() on the URI string to check the scheme
+ * use g_uri_peek_scheme() on the URI string to check the scheme
  * first, and use that to decide what flags to parse it with.
  *
- * For example, you might want to use %XURI_PARAMS_WWW_FORM when parsing the
- * params for a web URI, so compare the result of xuri_peek_scheme() against
+ * For example, you might want to use %G_URI_PARAMS_WWW_FORM when parsing the
+ * params for a web URI, so compare the result of g_uri_peek_scheme() against
  * `http` and `https`.
  *
  * ## Building URIs
  *
- * xuri_join() and xuri_join_with_user() can be used to construct
+ * g_uri_join() and g_uri_join_with_user() can be used to construct
  * valid URI strings from a set of component strings. They are the
- * inverse of xuri_split() and xuri_split_with_user().
+ * inverse of g_uri_split() and g_uri_split_with_user().
  *
- * Similarly, xuri_build() and xuri_build_with_user() can be used to
- * construct a #xuri_t from a set of component strings.
+ * Similarly, g_uri_build() and g_uri_build_with_user() can be used to
+ * construct a #GUri from a set of component strings.
  *
  * As with the parsing functions, the building functions take a
- * #xuri_flags_t argument. In particular, it is important to keep in mind
+ * #GUriFlags argument. In particular, it is important to keep in mind
  * whether the URI components you are using are already `%`-encoded. If so,
- * you must pass the %XURI_FLAGS_ENCODED flag.
+ * you must pass the %G_URI_FLAGS_ENCODED flag.
  *
  * ## `file://` URIs
  *
  * Note that Windows and Unix both define special rules for parsing
  * `file://` URIs (involving non-UTF-8 character sets on Unix, and the
- * interpretation of path separators on Windows). #xuri_t does not
- * implement these rules. Use xfilename_from_uri() and
- * xfilename_to_uri() if you want to properly convert between
+ * interpretation of path separators on Windows). #GUri does not
+ * implement these rules. Use g_filename_from_uri() and
+ * g_filename_to_uri() if you want to properly convert between
  * `file://` URIs and local filenames.
  *
  * ## URI Equality
  *
- * Note that there is no `xuri_equal ()` function, because comparing
- * URIs usefully requires scheme-specific knowledge that #xuri_t does
- * not have. #xuri_t can help with normalization if you use the various
- * encoded #xuri_flags_t as well as %XURI_FLAGS_SCHEME_NORMALIZE however
+ * Note that there is no `g_uri_equal ()` function, because comparing
+ * URIs usefully requires scheme-specific knowledge that #GUri does
+ * not have. #GUri can help with normalization if you use the various
+ * encoded #GUriFlags as well as %G_URI_FLAGS_SCHEME_NORMALIZE however
  * it is not comprehensive.
  * For example, `data:,foo` and `data:;base64,Zm9v` resolve to the same
  * thing according to the `data:` URI specification which GLib does not
@@ -143,83 +143,83 @@
  */
 
 /**
- * xuri_t:
+ * GUri:
  *
  * A parsed absolute URI.
  *
- * Since #xuri_t only represents absolute URIs, all #xuris will have a
- * URI scheme, so xuri_get_scheme() will always return a non-%NULL
+ * Since #GUri only represents absolute URIs, all #GUris will have a
+ * URI scheme, so g_uri_get_scheme() will always return a non-%NULL
  * answer. Likewise, by definition, all URIs have a path component, so
- * xuri_get_path() will always return a non-%NULL string (which may be empty).
+ * g_uri_get_path() will always return a non-%NULL string (which may be empty).
  *
  * If the URI string has an
  * [‘authority’ component](https://tools.ietf.org/html/rfc3986#section-3) (that
  * is, if the scheme is followed by `://` rather than just `:`), then the
- * #xuri_t will contain a hostname, and possibly a port and ‘userinfo’.
- * Additionally, depending on how the #xuri_t was constructed/parsed (for example,
- * using the %XURI_FLAGS_HAS_PASSWORD and %XURI_FLAGS_HAS_AUTH_PARAMS flags),
+ * #GUri will contain a hostname, and possibly a port and ‘userinfo’.
+ * Additionally, depending on how the #GUri was constructed/parsed (for example,
+ * using the %G_URI_FLAGS_HAS_PASSWORD and %G_URI_FLAGS_HAS_AUTH_PARAMS flags),
  * the userinfo may be split out into a username, password, and
  * additional authorization-related parameters.
  *
- * Normally, the components of a #xuri_t will have all `%`-encoded
- * characters decoded. However, if you construct/parse a #xuri_t with
- * %XURI_FLAGS_ENCODED, then the `%`-encoding will be preserved instead in
+ * Normally, the components of a #GUri will have all `%`-encoded
+ * characters decoded. However, if you construct/parse a #GUri with
+ * %G_URI_FLAGS_ENCODED, then the `%`-encoding will be preserved instead in
  * the userinfo, path, and query fields (and in the host field if also
- * created with %XURI_FLAGS_NON_DNS). In particular, this is necessary if
+ * created with %G_URI_FLAGS_NON_DNS). In particular, this is necessary if
  * the URI may contain binary data or non-UTF-8 text, or if decoding
  * the components might change the interpretation of the URI.
  *
  * For example, with the encoded flag:
  *
  * |[<!-- language="C" -->
- *   x_autoptr(xuri) uri = xuri_parse ("http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fparam%3Dvalue", XURI_FLAGS_ENCODED, &err);
- *   g_assert_cmpstr (xuri_get_query (uri), ==, "query=http%3A%2F%2Fhost%2Fpath%3Fparam%3Dvalue");
+ *   g_autoptr(GUri) uri = g_uri_parse ("http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fparam%3Dvalue", G_URI_FLAGS_ENCODED, &err);
+ *   g_assert_cmpstr (g_uri_get_query (uri), ==, "query=http%3A%2F%2Fhost%2Fpath%3Fparam%3Dvalue");
  * ]|
  *
  * While the default `%`-decoding behaviour would give:
  *
  * |[<!-- language="C" -->
- *   x_autoptr(xuri) uri = xuri_parse ("http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fparam%3Dvalue", XURI_FLAGS_NONE, &err);
- *   g_assert_cmpstr (xuri_get_query (uri), ==, "query=http://host/path?param=value");
+ *   g_autoptr(GUri) uri = g_uri_parse ("http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fparam%3Dvalue", G_URI_FLAGS_NONE, &err);
+ *   g_assert_cmpstr (g_uri_get_query (uri), ==, "query=http://host/path?param=value");
  * ]|
  *
  * During decoding, if an invalid UTF-8 string is encountered, parsing will fail
  * with an error indicating the bad string location:
  *
  * |[<!-- language="C" -->
- *   x_autoptr(xuri) uri = xuri_parse ("http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fbad%3D%00alue", XURI_FLAGS_NONE, &err);
- *   g_assert_error (err, XURI_ERROR, XURI_ERROR_BAD_QUERY);
+ *   g_autoptr(GUri) uri = g_uri_parse ("http://host/path?query=http%3A%2F%2Fhost%2Fpath%3Fbad%3D%00alue", G_URI_FLAGS_NONE, &err);
+ *   g_assert_error (err, G_URI_ERROR, G_URI_ERROR_BAD_QUERY);
  * ]|
  *
- * You should pass %XURI_FLAGS_ENCODED or %XURI_FLAGS_ENCODED_QUERY if you
+ * You should pass %G_URI_FLAGS_ENCODED or %G_URI_FLAGS_ENCODED_QUERY if you
  * need to handle that case manually. In particular, if the query string
  * contains `=` characters that are `%`-encoded, you should let
- * xuri_parse_params() do the decoding once of the query.
+ * g_uri_parse_params() do the decoding once of the query.
  *
- * #xuri_t is immutable once constructed, and can safely be accessed from
+ * #GUri is immutable once constructed, and can safely be accessed from
  * multiple threads. Its reference counting is atomic.
  *
  * Since: 2.66
  */
-struct _xuri {
-  xchar_t     *scheme;
-  xchar_t     *userinfo;
-  xchar_t     *host;
-  xint_t       port;
-  xchar_t     *path;
-  xchar_t     *query;
-  xchar_t     *fragment;
+struct _GUri {
+  gchar     *scheme;
+  gchar     *userinfo;
+  gchar     *host;
+  gint       port;
+  gchar     *path;
+  gchar     *query;
+  gchar     *fragment;
 
-  xchar_t     *user;
-  xchar_t     *password;
-  xchar_t     *auth_params;
+  gchar     *user;
+  gchar     *password;
+  gchar     *auth_params;
 
-  xuri_flags_t  flags;
+  GUriFlags  flags;
 };
 
 /**
- * xuri_ref: (skip)
- * @uri: a #xuri_t
+ * g_uri_ref: (skip)
+ * @uri: a #GUri
  *
  * Increments the reference count of @uri by one.
  *
@@ -227,16 +227,16 @@ struct _xuri {
  *
  * Since: 2.66
  */
-xuri_t *
-xuri_ref (xuri_t *uri)
+GUri *
+g_uri_ref (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return g_atomic_rc_box_acquire (uri);
 }
 
 static void
-xuri_clear (xuri_t *uri)
+g_uri_clear (GUri *uri)
 {
   g_free (uri->scheme);
   g_free (uri->userinfo);
@@ -250,8 +250,8 @@ xuri_clear (xuri_t *uri)
 }
 
 /**
- * xuri_unref: (skip)
- * @uri: a #xuri_t
+ * g_uri_unref: (skip)
+ * @uri: a #GUri
  *
  * Atomically decrements the reference count of @uri by one.
  *
@@ -261,15 +261,15 @@ xuri_clear (xuri_t *uri)
  * Since: 2.66
  */
 void
-xuri_unref (xuri_t *uri)
+g_uri_unref (GUri *uri)
 {
   g_return_if_fail (uri != NULL);
 
-  g_atomic_rc_box_release_full (uri, (xdestroy_notify_t)xuri_clear);
+  g_atomic_rc_box_release_full (uri, (GDestroyNotify)g_uri_clear);
 }
 
-static xboolean_t
-xuri_char_is_unreserved (xchar_t ch)
+static gboolean
+g_uri_char_is_unreserved (gchar ch)
 {
   if (g_ascii_isalnum (ch))
     return TRUE;
@@ -279,26 +279,26 @@ xuri_char_is_unreserved (xchar_t ch)
 #define XDIGIT(c) ((c) <= '9' ? (c) - '0' : ((c) & 0x4F) - 'A' + 10)
 #define HEXCHAR(s) ((XDIGIT (s[1]) << 4) + XDIGIT (s[2]))
 
-static xssize_t
-uri_decoder (xchar_t       **out,
-             const xchar_t  *illegal_chars,
-             const xchar_t  *start,
-             xsize_t         length,
-             xboolean_t      just_normalize,
-             xboolean_t      www_form,
-             xuri_flags_t     flags,
-             xuri_error_t     parse_error,
-             xerror_t      **error)
+static gssize
+uri_decoder (gchar       **out,
+             const gchar  *illegal_chars,
+             const gchar  *start,
+             gsize         length,
+             gboolean      just_normalize,
+             gboolean      www_form,
+             GUriFlags     flags,
+             GUriError     parse_error,
+             GError      **error)
 {
-  xchar_t c;
-  xstring_t *decoded;
-  const xchar_t *invalid, *s, *end;
-  xssize_t len;
+  gchar c;
+  GString *decoded;
+  const gchar *invalid, *s, *end;
+  gssize len;
 
-  if (!(flags & XURI_FLAGS_ENCODED))
+  if (!(flags & G_URI_FLAGS_ENCODED))
     just_normalize = FALSE;
 
-  decoded = xstring_sized_new (length + 1);
+  decoded = g_string_sized_new (length + 1);
   for (s = start, end = s + length; s < end; s++)
     {
       if (*s == '%')
@@ -308,12 +308,12 @@ uri_decoder (xchar_t       **out,
               !g_ascii_isxdigit (s[2]))
             {
               /* % followed by non-hex or the end of the string; this is an error */
-              if (!(flags & XURI_FLAGS_PARSE_RELAXED))
+              if (!(flags & G_URI_FLAGS_PARSE_RELAXED))
                 {
-                  g_set_error_literal (error, XURI_ERROR, parse_error,
+                  g_set_error_literal (error, G_URI_ERROR, parse_error,
                                        /* xgettext: no-c-format */
                                        _("Invalid %-encoding in URI"));
-                  xstring_free (decoded, TRUE);
+                  g_string_free (decoded, TRUE);
                   return -1;
                 }
 
@@ -321,92 +321,92 @@ uri_decoder (xchar_t       **out,
                * fix it to "%25", since that might change the way that
                * the URI's owner would interpret it.
                */
-              xstring_append_c (decoded, *s);
+              g_string_append_c (decoded, *s);
               continue;
             }
 
           c = HEXCHAR (s);
           if (illegal_chars && strchr (illegal_chars, c))
             {
-              g_set_error_literal (error, XURI_ERROR, parse_error,
+              g_set_error_literal (error, G_URI_ERROR, parse_error,
                                    _("Illegal character in URI"));
-              xstring_free (decoded, TRUE);
+              g_string_free (decoded, TRUE);
               return -1;
             }
-          if (just_normalize && !xuri_char_is_unreserved (c))
+          if (just_normalize && !g_uri_char_is_unreserved (c))
             {
               /* Leave the % sequence there but normalize it. */
-              xstring_append_c (decoded, *s);
-              xstring_append_c (decoded, g_ascii_toupper (s[1]));
-              xstring_append_c (decoded, g_ascii_toupper (s[2]));
+              g_string_append_c (decoded, *s);
+              g_string_append_c (decoded, g_ascii_toupper (s[1]));
+              g_string_append_c (decoded, g_ascii_toupper (s[2]));
               s += 2;
             }
           else
             {
-              xstring_append_c (decoded, c);
+              g_string_append_c (decoded, c);
               s += 2;
             }
         }
       else if (www_form && *s == '+')
-        xstring_append_c (decoded, ' ');
+        g_string_append_c (decoded, ' ');
       /* Normalize any illegal characters. */
       else if (just_normalize && (!g_ascii_isgraph (*s)))
-        xstring_append_printf (decoded, "%%%02X", (xuchar_t)*s);
+        g_string_append_printf (decoded, "%%%02X", (guchar)*s);
       else
-        xstring_append_c (decoded, *s);
+        g_string_append_c (decoded, *s);
     }
 
   len = decoded->len;
-  xassert (len >= 0);
+  g_assert (len >= 0);
 
-  if (!(flags & XURI_FLAGS_ENCODED) &&
-      !xutf8_validate (decoded->str, len, &invalid))
+  if (!(flags & G_URI_FLAGS_ENCODED) &&
+      !g_utf8_validate (decoded->str, len, &invalid))
     {
-      g_set_error_literal (error, XURI_ERROR, parse_error,
+      g_set_error_literal (error, G_URI_ERROR, parse_error,
                            _("Non-UTF-8 characters in URI"));
-      xstring_free (decoded, TRUE);
+      g_string_free (decoded, TRUE);
       return -1;
     }
 
   if (out)
-    *out = xstring_free (decoded, FALSE);
+    *out = g_string_free (decoded, FALSE);
   else
-    xstring_free (decoded, TRUE);
+    g_string_free (decoded, TRUE);
 
   return len;
 }
 
-static xboolean_t
-uri_decode (xchar_t       **out,
-            const xchar_t  *illegal_chars,
-            const xchar_t  *start,
-            xsize_t         length,
-            xboolean_t      www_form,
-            xuri_flags_t     flags,
-            xuri_error_t     parse_error,
-            xerror_t      **error)
+static gboolean
+uri_decode (gchar       **out,
+            const gchar  *illegal_chars,
+            const gchar  *start,
+            gsize         length,
+            gboolean      www_form,
+            GUriFlags     flags,
+            GUriError     parse_error,
+            GError      **error)
 {
   return uri_decoder (out, illegal_chars, start, length, FALSE, www_form, flags,
                       parse_error, error) != -1;
 }
 
-static xboolean_t
-uri_normalize (xchar_t       **out,
-               const xchar_t  *start,
-               xsize_t         length,
-               xuri_flags_t     flags,
-               xuri_error_t     parse_error,
-               xerror_t      **error)
+static gboolean
+uri_normalize (gchar       **out,
+               const gchar  *start,
+               gsize         length,
+               GUriFlags     flags,
+               GUriError     parse_error,
+               GError      **error)
 {
   return uri_decoder (out, NULL, start, length, TRUE, FALSE, flags,
                       parse_error, error) != -1;
 }
 
-static xboolean_t
-is_valid (xuchar_t       c,
-          const xchar_t *reserved_chars_allowed)
+static gboolean
+is_valid (guchar       c,
+          const gchar *reserved_chars_allowed)
 {
-  if (xuri_char_is_unreserved (c))
+  if (g_uri_char_is_unreserved (c))
     return TRUE;
 
   if (reserved_chars_allowed && strchr (reserved_chars_allowed, c))
@@ -416,40 +416,40 @@ is_valid (xuchar_t       c,
 }
 
 void
-_uri_encoder (xstring_t      *out,
-              const xuchar_t *start,
-              xsize_t         length,
-              const xchar_t  *reserved_chars_allowed,
-              xboolean_t      allow_utf8)
+_uri_encoder (GString      *out,
+              const guchar *start,
+              gsize         length,
+              const gchar  *reserved_chars_allowed,
+              gboolean      allow_utf8)
 {
-  static const xchar_t hex[] = "0123456789ABCDEF";
-  const xuchar_t *p = start;
-  const xuchar_t *end = p + length;
+  static const gchar hex[] = "0123456789ABCDEF";
+  const guchar *p = start;
+  const guchar *end = p + length;
 
   while (p < end)
     {
-      xunichar_t multibyte_utf8_char = 0;
+      gunichar multibyte_utf8_char = 0;
 
       if (allow_utf8 && *p >= 0x80)
-        multibyte_utf8_char = xutf8_get_char_validated ((xchar_t *)p, end - p);
+        multibyte_utf8_char = g_utf8_get_char_validated ((gchar *)p, end - p);
 
       if (multibyte_utf8_char > 0 &&
-          multibyte_utf8_char != (xunichar_t) -1 && multibyte_utf8_char != (xunichar_t) -2)
+          multibyte_utf8_char != (gunichar) -1 && multibyte_utf8_char != (gunichar) -2)
         {
-          xint_t len = xutf8_skip [*p];
-          xstring_append_len (out, (xchar_t *)p, len);
+          gint len = g_utf8_skip [*p];
+          g_string_append_len (out, (gchar *)p, len);
           p += len;
         }
       else if (is_valid (*p, reserved_chars_allowed))
         {
-          xstring_append_c (out, *p);
+          g_string_append_c (out, *p);
           p++;
         }
       else
         {
-          xstring_append_c (out, '%');
-          xstring_append_c (out, hex[*p >> 4]);
-          xstring_append_c (out, hex[*p & 0xf]);
+          g_string_append_c (out, '%');
+          g_string_append_c (out, hex[*p >> 4]);
+          g_string_append_c (out, hex[*p & 0xf]);
           p++;
         }
     }
@@ -470,28 +470,28 @@ _uri_encoder (xstring_t      *out,
  *
  * IPv6addrz = IPv6address "%25" ZoneID
  *
- * If %XURI_FLAGS_PARSE_RELAXED is specified, this function also accepts:
+ * If %G_URI_FLAGS_PARSE_RELAXED is specified, this function also accepts:
  *
  * IPv6addrz = IPv6address "%" ZoneID
  */
-static xboolean_t
-parse_ip_literal (const xchar_t  *start,
-                  xsize_t         length,
-                  xuri_flags_t     flags,
-                  xchar_t       **out,
-                  xerror_t      **error)
+static gboolean
+parse_ip_literal (const gchar  *start,
+                  gsize         length,
+                  GUriFlags     flags,
+                  gchar       **out,
+                  GError      **error)
 {
-  xchar_t *pct, *zone_id = NULL;
-  xchar_t *addr = NULL;
-  xsize_t addr_length = 0;
-  xsize_t zone_id_length = 0;
-  xchar_t *decoded_zone_id = NULL;
+  gchar *pct, *zone_id = NULL;
+  gchar *addr = NULL;
+  gsize addr_length = 0;
+  gsize zone_id_length = 0;
+  gchar *decoded_zone_id = NULL;
 
   if (start[length - 1] != ']')
     goto bad_ipv6_literal;
 
   /* Drop the square brackets */
-  addr = xstrndup (start + 1, length - 2);
+  addr = g_strndup (start + 1, length - 2);
   addr_length = length - 2;
 
   /* If there's an IPv6 scope ID, split out the zone. */
@@ -506,7 +506,7 @@ parse_ip_literal (const xchar_t  *start,
           zone_id = pct + 3;
           zone_id_length = addr_length - (zone_id - addr);
         }
-      else if (flags & XURI_FLAGS_PARSE_RELAXED &&
+      else if (flags & G_URI_FLAGS_PARSE_RELAXED &&
                addr_length - (pct - addr) >= 2)
         {
           zone_id = pct + 1;
@@ -515,7 +515,7 @@ parse_ip_literal (const xchar_t  *start,
       else
         goto bad_ipv6_literal;
 
-      xassert (zone_id_length >= 1);
+      g_assert (zone_id_length >= 1);
     }
 
   /* addr must be an IPv6 address */
@@ -525,12 +525,12 @@ parse_ip_literal (const xchar_t  *start,
   /* Zone ID must be valid. It can contain %-encoded characters. */
   if (zone_id != NULL &&
       !uri_decode (&decoded_zone_id, NULL, zone_id, zone_id_length, FALSE,
-                   flags, XURI_ERROR_BAD_HOST, NULL))
+                   flags, G_URI_ERROR_BAD_HOST, NULL))
     goto bad_ipv6_literal;
 
   /* Success */
   if (out != NULL && decoded_zone_id != NULL)
-    *out = xstrconcat (addr, "%", decoded_zone_id, NULL);
+    *out = g_strconcat (addr, "%", decoded_zone_id, NULL);
   else if (out != NULL)
     *out = g_steal_pointer (&addr);
 
@@ -542,22 +542,22 @@ parse_ip_literal (const xchar_t  *start,
 bad_ipv6_literal:
   g_free (addr);
   g_free (decoded_zone_id);
-  g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST,
+  g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST,
                _("Invalid IPv6 address ‘%.*s’ in URI"),
-               (xint_t)length, start);
+               (gint)length, start);
 
   return FALSE;
 }
 
-static xboolean_t
-parse_host (const xchar_t  *start,
-            xsize_t         length,
-            xuri_flags_t     flags,
-            xchar_t       **out,
-            xerror_t      **error)
+static gboolean
+parse_host (const gchar  *start,
+            gsize         length,
+            GUriFlags     flags,
+            gchar       **out,
+            GError      **error)
 {
-  xchar_t *decoded = NULL, *host;
-  xchar_t *addr = NULL;
+  gchar *decoded = NULL, *host;
+  gchar *addr = NULL;
 
   if (*start == '[')
     {
@@ -568,7 +568,7 @@ parse_host (const xchar_t  *start,
 
   if (g_ascii_isdigit (*start))
     {
-      addr = xstrndup (start, length);
+      addr = g_strndup (start, length);
       if (g_hostname_is_ip_address (addr))
         {
           host = addr;
@@ -577,18 +577,18 @@ parse_host (const xchar_t  *start,
       g_free (addr);
     }
 
-  if (flags & XURI_FLAGS_NON_DNS)
+  if (flags & G_URI_FLAGS_NON_DNS)
     {
       if (!uri_normalize (&decoded, start, length, flags,
-                          XURI_ERROR_BAD_HOST, error))
+                          G_URI_ERROR_BAD_HOST, error))
         return FALSE;
       host = g_steal_pointer (&decoded);
       goto ok;
     }
 
-  flags &= ~XURI_FLAGS_ENCODED;
+  flags &= ~G_URI_FLAGS_ENCODED;
   if (!uri_decode (&decoded, NULL, start, length, FALSE, flags,
-                   XURI_ERROR_BAD_HOST, error))
+                   G_URI_ERROR_BAD_HOST, error))
     return FALSE;
 
   /* You're not allowed to %-encode an IP address, so if it wasn't
@@ -597,9 +597,9 @@ parse_host (const xchar_t  *start,
   if (g_hostname_is_ip_address (decoded))
     {
       g_free (decoded);
-      g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST,
+      g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST,
                    _("Illegal encoded IP address ‘%.*s’ in URI"),
-                   (xint_t)length, start);
+                   (gint)length, start);
       return FALSE;
     }
 
@@ -609,9 +609,9 @@ parse_host (const xchar_t  *start,
       if (host == NULL)
         {
           g_free (decoded);
-          g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST,
+          g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST,
                        _("Illegal internationalized hostname ‘%.*s’ in URI"),
-                       (xint_t) length, start);
+                       (gint) length, start);
           return FALSE;
         }
     }
@@ -629,21 +629,21 @@ parse_host (const xchar_t  *start,
   return TRUE;
 }
 
-static xboolean_t
-parse_port (const xchar_t  *start,
-            xsize_t         length,
-            xint_t         *out,
-            xerror_t      **error)
+static gboolean
+parse_port (const gchar  *start,
+            gsize         length,
+            gint         *out,
+            GError      **error)
 {
-  xchar_t *end;
-  xulong_t parsed_port;
+  gchar *end;
+  gulong parsed_port;
 
   /* strtoul() allows leading + or -, so we have to check this first. */
   if (!g_ascii_isdigit (*start))
     {
-      g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT,
+      g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT,
                    _("Could not parse port ‘%.*s’ in URI"),
-                   (xint_t)length, start);
+                   (gint)length, start);
       return FALSE;
     }
 
@@ -653,16 +653,16 @@ parse_port (const xchar_t  *start,
   parsed_port = strtoul (start, &end, 10);
   if (end != start + length)
     {
-      g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT,
+      g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT,
                    _("Could not parse port ‘%.*s’ in URI"),
-                   (xint_t)length, start);
+                   (gint)length, start);
       return FALSE;
     }
   else if (parsed_port > 65535)
     {
-      g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_PORT,
+      g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_PORT,
                    _("Port ‘%.*s’ in URI is out of range"),
-                   (xint_t)length, start);
+                   (gint)length, start);
       return FALSE;
     }
 
@@ -671,36 +671,36 @@ parse_port (const xchar_t  *start,
   return TRUE;
 }
 
-static xboolean_t
-parse_userinfo (const xchar_t  *start,
-                xsize_t         length,
-                xuri_flags_t     flags,
-                xchar_t       **user,
-                xchar_t       **password,
-                xchar_t       **auth_params,
-                xerror_t      **error)
+static gboolean
+parse_userinfo (const gchar  *start,
+                gsize         length,
+                GUriFlags     flags,
+                gchar       **user,
+                gchar       **password,
+                gchar       **auth_params,
+                GError      **error)
 {
-  const xchar_t *user_end = NULL, *password_end = NULL, *auth_params_end;
+  const gchar *user_end = NULL, *password_end = NULL, *auth_params_end;
 
   auth_params_end = start + length;
-  if (flags & XURI_FLAGS_HAS_AUTH_PARAMS)
+  if (flags & G_URI_FLAGS_HAS_AUTH_PARAMS)
     password_end = memchr (start, ';', auth_params_end - start);
   if (!password_end)
     password_end = auth_params_end;
-  if (flags & XURI_FLAGS_HAS_PASSWORD)
+  if (flags & G_URI_FLAGS_HAS_PASSWORD)
     user_end = memchr (start, ':', password_end - start);
   if (!user_end)
     user_end = password_end;
 
   if (!uri_normalize (user, start, user_end - start, flags,
-                      XURI_ERROR_BAD_USER, error))
+                      G_URI_ERROR_BAD_USER, error))
     return FALSE;
 
   if (*user_end == ':')
     {
       start = user_end + 1;
       if (!uri_normalize (password, start, password_end - start, flags,
-                          XURI_ERROR_BAD_PASSWORD, error))
+                          G_URI_ERROR_BAD_PASSWORD, error))
         {
           if (user)
             g_clear_pointer (user, g_free);
@@ -714,7 +714,7 @@ parse_userinfo (const xchar_t  *start,
     {
       start = password_end + 1;
       if (!uri_normalize (auth_params, start, auth_params_end - start, flags,
-                          XURI_ERROR_BAD_AUTH_PARAMS, error))
+                          G_URI_ERROR_BAD_AUTH_PARAMS, error))
         {
           if (user)
             g_clear_pointer (user, g_free);
@@ -729,11 +729,11 @@ parse_userinfo (const xchar_t  *start,
   return TRUE;
 }
 
-static xchar_t *
-uri_cleanup (const xchar_t *uri_string)
+static gchar *
+uri_cleanup (const gchar *uri_string)
 {
-  xstring_t *copy;
-  const xchar_t *end;
+  GString *copy;
+  const gchar *end;
 
   /* Skip leading whitespace */
   while (g_ascii_isspace (*uri_string))
@@ -745,26 +745,26 @@ uri_cleanup (const xchar_t *uri_string)
     end--;
 
   /* Copy the rest, encoding unencoded spaces and stripping other whitespace */
-  copy = xstring_sized_new (end - uri_string);
+  copy = g_string_sized_new (end - uri_string);
   while (uri_string < end)
     {
       if (*uri_string == ' ')
-        xstring_append (copy, "%20");
+        g_string_append (copy, "%20");
       else if (g_ascii_isspace (*uri_string))
         ;
       else
-        xstring_append_c (copy, *uri_string);
+        g_string_append_c (copy, *uri_string);
       uri_string++;
     }
 
-  return xstring_free (copy, FALSE);
+  return g_string_free (copy, FALSE);
 }
 
-static xboolean_t
+static gboolean
 should_normalize_empty_path (const char *scheme)
 {
   const char * const schemes[] = { "https", "http", "wss", "ws" };
-  xsize_t i;
+  gsize i;
   for (i = 0; i < G_N_ELEMENTS (schemes); ++i)
     {
       if (!strcmp (schemes[i], scheme))
@@ -821,25 +821,25 @@ default_scheme_port (const char *scheme)
   return -1;
 }
 
-static xboolean_t
-xuri_split_internal (const xchar_t  *uri_string,
-                      xuri_flags_t     flags,
-                      xchar_t       **scheme,
-                      xchar_t       **userinfo,
-                      xchar_t       **user,
-                      xchar_t       **password,
-                      xchar_t       **auth_params,
-                      xchar_t       **host,
-                      xint_t         *port,
-                      xchar_t       **path,
-                      xchar_t       **query,
-                      xchar_t       **fragment,
-                      xerror_t      **error)
+static gboolean
+g_uri_split_internal (const gchar  *uri_string,
+                      GUriFlags     flags,
+                      gchar       **scheme,
+                      gchar       **userinfo,
+                      gchar       **user,
+                      gchar       **password,
+                      gchar       **auth_params,
+                      gchar       **host,
+                      gint         *port,
+                      gchar       **path,
+                      gchar       **query,
+                      gchar       **fragment,
+                      GError      **error)
 {
-  const xchar_t *end, *colon, *at, *path_start, *semi, *question;
-  const xchar_t *p, *bracket, *hostend;
-  xchar_t *cleaned_uri_string = NULL;
-  xchar_t *normalized_scheme = NULL;
+  const gchar *end, *colon, *at, *path_start, *semi, *question;
+  const gchar *p, *bracket, *hostend;
+  gchar *cleaned_uri_string = NULL;
+  gchar *normalized_scheme = NULL;
 
   if (scheme)
     *scheme = NULL;
@@ -862,7 +862,7 @@ xuri_split_internal (const xchar_t  *uri_string,
   if (fragment)
     *fragment = NULL;
 
-  if ((flags & XURI_FLAGS_PARSE_RELAXED) && strpbrk (uri_string, " \t\n\r"))
+  if ((flags & G_URI_FLAGS_PARSE_RELAXED) && strpbrk (uri_string, " \t\n\r"))
     {
       cleaned_uri_string = uri_cleanup (uri_string);
       uri_string = cleaned_uri_string;
@@ -898,9 +898,9 @@ xuri_split_internal (const xchar_t  *uri_string,
       at = memchr (p, '@', path_start - p);
       if (at)
         {
-          if (flags & XURI_FLAGS_PARSE_RELAXED)
+          if (flags & G_URI_FLAGS_PARSE_RELAXED)
             {
-              xchar_t *next_at;
+              gchar *next_at;
 
               /* Any "@"s in the userinfo must be %-encoded, but
                * people get this wrong sometimes. Since "@"s in the
@@ -918,7 +918,7 @@ xuri_split_internal (const xchar_t  *uri_string,
             }
 
           if (user || password || auth_params ||
-              (flags & (XURI_FLAGS_HAS_PASSWORD|XURI_FLAGS_HAS_AUTH_PARAMS)))
+              (flags & (G_URI_FLAGS_HAS_PASSWORD|G_URI_FLAGS_HAS_AUTH_PARAMS)))
             {
               if (!parse_userinfo (p, at - p, flags,
                                    user, password, auth_params,
@@ -927,13 +927,13 @@ xuri_split_internal (const xchar_t  *uri_string,
             }
 
           if (!uri_normalize (userinfo, p, at - p, flags,
-                              XURI_ERROR_BAD_USER, error))
+                              G_URI_ERROR_BAD_USER, error))
             goto fail;
 
           p = at + 1;
         }
 
-      if (flags & XURI_FLAGS_PARSE_RELAXED)
+      if (flags & G_URI_FLAGS_PARSE_RELAXED)
         {
           semi = strchr (p, ';');
           if (semi && semi < path_start)
@@ -984,8 +984,8 @@ xuri_split_internal (const xchar_t  *uri_string,
   if (*end == '#')
     {
       if (!uri_normalize (fragment, end + 1, strlen (end + 1),
-                          flags | (flags & XURI_FLAGS_ENCODED_FRAGMENT ? XURI_FLAGS_ENCODED : 0),
-                          XURI_ERROR_BAD_FRAGMENT, error))
+                          flags | (flags & G_URI_FLAGS_ENCODED_FRAGMENT ? G_URI_FLAGS_ENCODED : 0),
+                          G_URI_ERROR_BAD_FRAGMENT, error))
         goto fail;
     }
 
@@ -994,26 +994,26 @@ xuri_split_internal (const xchar_t  *uri_string,
   if (question)
     {
       if (!uri_normalize (query, question + 1, end - (question + 1),
-                          flags | (flags & XURI_FLAGS_ENCODED_QUERY ? XURI_FLAGS_ENCODED : 0),
-                          XURI_ERROR_BAD_QUERY, error))
+                          flags | (flags & G_URI_FLAGS_ENCODED_QUERY ? G_URI_FLAGS_ENCODED : 0),
+                          G_URI_ERROR_BAD_QUERY, error))
         goto fail;
       end = question;
     }
 
   if (!uri_normalize (path, p, end - p,
-                      flags | (flags & XURI_FLAGS_ENCODED_PATH ? XURI_FLAGS_ENCODED : 0),
-                      XURI_ERROR_BAD_PATH, error))
+                      flags | (flags & G_URI_FLAGS_ENCODED_PATH ? G_URI_FLAGS_ENCODED : 0),
+                      G_URI_ERROR_BAD_PATH, error))
     goto fail;
 
   /* Scheme-based normalization */
-  if (flags & XURI_FLAGS_SCHEME_NORMALIZE && ((scheme && *scheme) || normalized_scheme))
+  if (flags & G_URI_FLAGS_SCHEME_NORMALIZE && ((scheme && *scheme) || normalized_scheme))
     {
       const char *scheme_str = scheme && *scheme ? *scheme : normalized_scheme;
 
       if (should_normalize_empty_path (scheme_str) && path && !**path)
         {
           g_free (*path);
-          *path = xstrdup ("/");
+          *path = g_strdup ("/");
         }
 
       if (port && *port == -1)
@@ -1046,7 +1046,7 @@ xuri_split_internal (const xchar_t  *uri_string,
 }
 
 /**
- * xuri_split:
+ * g_uri_split:
  * @uri_ref: a string containing a relative or absolute URI
  * @flags: flags for parsing @uri_ref
  * @scheme: (out) (nullable) (optional) (transfer full): on return, contains
@@ -1063,7 +1063,7 @@ xuri_split_internal (const xchar_t  *uri_string,
  *    query, or %NULL
  * @fragment: (out) (nullable) (optional) (transfer full): on return, contains
  *    the fragment, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_ref (which can be an
  * [absolute or relative URI][relative-absolute-uris]) according to @flags, and
@@ -1071,45 +1071,45 @@ xuri_split_internal (const xchar_t  *uri_string,
  * returned as %NULL (but note that all URIs always have a path component,
  * though it may be the empty string).
  *
- * If @flags contains %XURI_FLAGS_ENCODED, then `%`-encoded characters in
+ * If @flags contains %G_URI_FLAGS_ENCODED, then `%`-encoded characters in
  * @uri_ref will remain encoded in the output strings. (If not,
  * then all such characters will be decoded.) Note that decoding will
  * only work if the URI components are ASCII or UTF-8, so you will
- * need to use %XURI_FLAGS_ENCODED if they are not.
+ * need to use %G_URI_FLAGS_ENCODED if they are not.
  *
- * Note that the %XURI_FLAGS_HAS_PASSWORD and
- * %XURI_FLAGS_HAS_AUTH_PARAMS @flags are ignored by xuri_split(),
+ * Note that the %G_URI_FLAGS_HAS_PASSWORD and
+ * %G_URI_FLAGS_HAS_AUTH_PARAMS @flags are ignored by g_uri_split(),
  * since it always returns only the full userinfo; use
- * xuri_split_with_user() if you want it split up.
+ * g_uri_split_with_user() if you want it split up.
  *
  * Returns: (skip): %TRUE if @uri_ref parsed successfully, %FALSE
  *   on error.
  *
  * Since: 2.66
  */
-xboolean_t
-xuri_split (const xchar_t  *uri_ref,
-             xuri_flags_t     flags,
-             xchar_t       **scheme,
-             xchar_t       **userinfo,
-             xchar_t       **host,
-             xint_t         *port,
-             xchar_t       **path,
-             xchar_t       **query,
-             xchar_t       **fragment,
-             xerror_t      **error)
+gboolean
+g_uri_split (const gchar  *uri_ref,
+             GUriFlags     flags,
+             gchar       **scheme,
+             gchar       **userinfo,
+             gchar       **host,
+             gint         *port,
+             gchar       **path,
+             gchar       **query,
+             gchar       **fragment,
+             GError      **error)
 {
-  xreturn_val_if_fail (uri_ref != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (uri_ref != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return xuri_split_internal (uri_ref, flags,
+  return g_uri_split_internal (uri_ref, flags,
                                scheme, userinfo, NULL, NULL, NULL,
                                host, port, path, query, fragment,
                                error);
 }
 
 /**
- * xuri_split_with_user:
+ * g_uri_split_with_user:
  * @uri_ref: a string containing a relative or absolute URI
  * @flags: flags for parsing @uri_ref
  * @scheme: (out) (nullable) (optional) (transfer full): on return, contains
@@ -1130,7 +1130,7 @@ xuri_split (const xchar_t  *uri_ref,
  *    query, or %NULL
  * @fragment: (out) (nullable) (optional) (transfer full): on return, contains
  *    the fragment, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_ref (which can be an
  * [absolute or relative URI][relative-absolute-uris]) according to @flags, and
@@ -1138,35 +1138,35 @@ xuri_split (const xchar_t  *uri_ref,
  * returned as %NULL (but note that all URIs always have a path component,
  * though it may be the empty string).
  *
- * See xuri_split(), and the definition of #xuri_flags_t, for more
+ * See g_uri_split(), and the definition of #GUriFlags, for more
  * information on the effect of @flags. Note that @password will only
- * be parsed out if @flags contains %XURI_FLAGS_HAS_PASSWORD, and
+ * be parsed out if @flags contains %G_URI_FLAGS_HAS_PASSWORD, and
  * @auth_params will only be parsed out if @flags contains
- * %XURI_FLAGS_HAS_AUTH_PARAMS.
+ * %G_URI_FLAGS_HAS_AUTH_PARAMS.
  *
  * Returns: (skip): %TRUE if @uri_ref parsed successfully, %FALSE
  *   on error.
  *
  * Since: 2.66
  */
-xboolean_t
-xuri_split_with_user (const xchar_t  *uri_ref,
-                       xuri_flags_t     flags,
-                       xchar_t       **scheme,
-                       xchar_t       **user,
-                       xchar_t       **password,
-                       xchar_t       **auth_params,
-                       xchar_t       **host,
-                       xint_t         *port,
-                       xchar_t       **path,
-                       xchar_t       **query,
-                       xchar_t       **fragment,
-                       xerror_t      **error)
+gboolean
+g_uri_split_with_user (const gchar  *uri_ref,
+                       GUriFlags     flags,
+                       gchar       **scheme,
+                       gchar       **user,
+                       gchar       **password,
+                       gchar       **auth_params,
+                       gchar       **host,
+                       gint         *port,
+                       gchar       **path,
+                       gchar       **query,
+                       gchar       **fragment,
+                       GError      **error)
 {
-  xreturn_val_if_fail (uri_ref != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (uri_ref != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return xuri_split_internal (uri_ref, flags,
+  return g_uri_split_internal (uri_ref, flags,
                                scheme, NULL, user, password, auth_params,
                                host, port, path, query, fragment,
                                error);
@@ -1174,7 +1174,7 @@ xuri_split_with_user (const xchar_t  *uri_ref,
 
 
 /**
- * xuri_split_network:
+ * g_uri_split_network:
  * @uri_string: a string containing an absolute URI
  * @flags: flags for parsing @uri_string
  * @scheme: (out) (nullable) (optional) (transfer full): on return, contains
@@ -1183,11 +1183,11 @@ xuri_split_with_user (const xchar_t  *uri_ref,
  *    host, or %NULL
  * @port: (out) (optional) (transfer full): on return, contains the
  *    port, or `-1`
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_string (which must be an [absolute URI][relative-absolute-uris])
  * according to @flags, and returns the pieces relevant to connecting to a host.
- * See the documentation for xuri_split() for more details; this is
+ * See the documentation for g_uri_split() for more details; this is
  * mostly a wrapper around that function with simpler arguments.
  * However, it will return an error if @uri_string is a relative URI,
  * or does not contain a hostname component.
@@ -1197,20 +1197,20 @@ xuri_split_with_user (const xchar_t  *uri_ref,
  *
  * Since: 2.66
  */
-xboolean_t
-xuri_split_network (const xchar_t  *uri_string,
-                     xuri_flags_t     flags,
-                     xchar_t       **scheme,
-                     xchar_t       **host,
-                     xint_t         *port,
-                     xerror_t      **error)
+gboolean
+g_uri_split_network (const gchar  *uri_string,
+                     GUriFlags     flags,
+                     gchar       **scheme,
+                     gchar       **host,
+                     gint         *port,
+                     GError      **error)
 {
-  xchar_t *my_scheme = NULL, *my_host = NULL;
+  gchar *my_scheme = NULL, *my_host = NULL;
 
-  xreturn_val_if_fail (uri_string != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (uri_string != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (!xuri_split_internal (uri_string, flags,
+  if (!g_uri_split_internal (uri_string, flags,
                              &my_scheme, NULL, NULL, NULL, NULL,
                              &my_host, port, NULL, NULL, NULL,
                              error))
@@ -1220,13 +1220,13 @@ xuri_split_network (const xchar_t  *uri_string,
     {
       if (!my_scheme)
         {
-          g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_SCHEME,
+          g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_SCHEME,
                        _("URI ‘%s’ is not an absolute URI"),
                        uri_string);
         }
       else
         {
-          g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_HOST,
+          g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_HOST,
                        _("URI ‘%s’ has no host component"),
                        uri_string);
         }
@@ -1248,35 +1248,35 @@ xuri_split_network (const xchar_t  *uri_string,
 }
 
 /**
- * xuri_is_valid:
+ * g_uri_is_valid:
  * @uri_string: a string containing an absolute URI
  * @flags: flags for parsing @uri_string
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_string according to @flags, to determine whether it is a valid
  * [absolute URI][relative-absolute-uris], i.e. it does not need to be resolved
- * relative to another URI using xuri_parse_relative().
+ * relative to another URI using g_uri_parse_relative().
  *
  * If it’s not a valid URI, an error is returned explaining how it’s invalid.
  *
- * See xuri_split(), and the definition of #xuri_flags_t, for more
+ * See g_uri_split(), and the definition of #GUriFlags, for more
  * information on the effect of @flags.
  *
  * Returns: %TRUE if @uri_string is a valid absolute URI, %FALSE on error.
  *
  * Since: 2.66
  */
-xboolean_t
-xuri_is_valid (const xchar_t  *uri_string,
-                xuri_flags_t     flags,
-                xerror_t      **error)
+gboolean
+g_uri_is_valid (const gchar  *uri_string,
+                GUriFlags     flags,
+                GError      **error)
 {
-  xchar_t *my_scheme = NULL;
+  gchar *my_scheme = NULL;
 
-  xreturn_val_if_fail (uri_string != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (uri_string != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (!xuri_split_internal (uri_string, flags,
+  if (!g_uri_split_internal (uri_string, flags,
                              &my_scheme, NULL, NULL, NULL, NULL,
                              NULL, NULL, NULL, NULL, NULL,
                              error))
@@ -1284,7 +1284,7 @@ xuri_is_valid (const xchar_t  *uri_string,
 
   if (!my_scheme)
     {
-      g_set_error (error, XURI_ERROR, XURI_ERROR_BAD_SCHEME,
+      g_set_error (error, G_URI_ERROR, G_URI_ERROR_BAD_SCHEME,
                    _("URI ‘%s’ is not an absolute URI"),
                    uri_string);
       return FALSE;
@@ -1302,14 +1302,14 @@ xuri_is_valid (const xchar_t  *uri_string,
  * See https://tools.ietf.org/html/rfc3986#section-5.2.4
  */
 static void
-remove_dot_segments (xchar_t *path)
+remove_dot_segments (gchar *path)
 {
   /* The output can be written to the same buffer that the input
    * is read from, as the output pointer is only ever increased
    * when the input pointer is increased as well, and the input
    * pointer is never decreased. */
-  xchar_t *input = path;
-  xchar_t *output = path;
+  gchar *input = path;
+  gchar *output = path;
 
   if (!*path)
     return;
@@ -1386,79 +1386,79 @@ remove_dot_segments (xchar_t *path)
 }
 
 /**
- * xuri_parse:
+ * g_uri_parse:
  * @uri_string: a string representing an absolute URI
  * @flags: flags describing how to parse @uri_string
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_string according to @flags. If the result is not a
  * valid [absolute URI][relative-absolute-uris], it will be discarded, and an
  * error returned.
  *
- * Return value: (transfer full): a new #xuri_t, or NULL on error.
+ * Return value: (transfer full): a new #GUri, or NULL on error.
  *
  * Since: 2.66
  */
-xuri_t *
-xuri_parse (const xchar_t  *uri_string,
-             xuri_flags_t     flags,
-             xerror_t      **error)
+GUri *
+g_uri_parse (const gchar  *uri_string,
+             GUriFlags     flags,
+             GError      **error)
 {
-  xreturn_val_if_fail (uri_string != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (uri_string != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  return xuri_parse_relative (NULL, uri_string, flags, error);
+  return g_uri_parse_relative (NULL, uri_string, flags, error);
 }
 
 /**
- * xuri_parse_relative:
+ * g_uri_parse_relative:
  * @base_uri: (nullable) (transfer none): a base absolute URI
  * @uri_ref: a string representing a relative or absolute URI
  * @flags: flags describing how to parse @uri_ref
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_ref according to @flags and, if it is a
  * [relative URI][relative-absolute-uris], resolves it relative to @base_uri.
  * If the result is not a valid absolute URI, it will be discarded, and an error
  * returned.
  *
- * Return value: (transfer full): a new #xuri_t, or NULL on error.
+ * Return value: (transfer full): a new #GUri, or NULL on error.
  *
  * Since: 2.66
  */
-xuri_t *
-xuri_parse_relative (xuri_t         *base_uri,
-                      const xchar_t  *uri_ref,
-                      xuri_flags_t     flags,
-                      xerror_t      **error)
+GUri *
+g_uri_parse_relative (GUri         *base_uri,
+                      const gchar  *uri_ref,
+                      GUriFlags     flags,
+                      GError      **error)
 {
-  xuri_t *uri = NULL;
+  GUri *uri = NULL;
 
-  xreturn_val_if_fail (uri_ref != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
-  xreturn_val_if_fail (base_uri == NULL || base_uri->scheme != NULL, NULL);
+  g_return_val_if_fail (uri_ref != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (base_uri == NULL || base_uri->scheme != NULL, NULL);
 
-  /* Use xuri_t struct to construct the return value: there is no guarantee it is
+  /* Use GUri struct to construct the return value: there is no guarantee it is
    * actually correct within the function body. */
-  uri = g_atomic_rc_box_new0 (xuri_t);
+  uri = g_atomic_rc_box_new0 (GUri);
   uri->flags = flags;
 
-  if (!xuri_split_internal (uri_ref, flags,
+  if (!g_uri_split_internal (uri_ref, flags,
                              &uri->scheme, &uri->userinfo,
                              &uri->user, &uri->password, &uri->auth_params,
                              &uri->host, &uri->port,
                              &uri->path, &uri->query, &uri->fragment,
                              error))
     {
-      xuri_unref (uri);
+      g_uri_unref (uri);
       return NULL;
     }
 
   if (!uri->scheme && !base_uri)
     {
-      g_set_error_literal (error, XURI_ERROR, XURI_ERROR_FAILED,
+      g_set_error_literal (error, G_URI_ERROR, G_URI_ERROR_FAILED,
                            _("URI is not absolute, and no base URI was provided"));
-      xuri_unref (uri);
+      g_uri_unref (uri);
       return NULL;
     }
 
@@ -1473,7 +1473,7 @@ xuri_parse_relative (xuri_t         *base_uri,
         remove_dot_segments (uri->path);
       else
         {
-          uri->scheme = xstrdup (base_uri->scheme);
+          uri->scheme = g_strdup (base_uri->scheme);
           if (uri->host)
             remove_dot_segments (uri->path);
           else
@@ -1481,9 +1481,9 @@ xuri_parse_relative (xuri_t         *base_uri,
               if (!*uri->path)
                 {
                   g_free (uri->path);
-                  uri->path = xstrdup (base_uri->path);
+                  uri->path = g_strdup (base_uri->path);
                   if (!uri->query)
-                    uri->query = xstrdup (base_uri->query);
+                    uri->query = g_strdup (base_uri->query);
                 }
               else
                 {
@@ -1491,18 +1491,18 @@ xuri_parse_relative (xuri_t         *base_uri,
                     remove_dot_segments (uri->path);
                   else
                     {
-                      xchar_t *newpath, *last;
+                      gchar *newpath, *last;
 
                       last = strrchr (base_uri->path, '/');
                       if (last)
                         {
-                          newpath = xstrdup_printf ("%.*s/%s",
-                                                     (xint_t)(last - base_uri->path),
+                          newpath = g_strdup_printf ("%.*s/%s",
+                                                     (gint)(last - base_uri->path),
                                                      base_uri->path,
                                                      uri->path);
                         }
                       else
-                        newpath = xstrdup_printf ("/%s", uri->path);
+                        newpath = g_strdup_printf ("/%s", uri->path);
 
                       g_free (uri->path);
                       uri->path = g_steal_pointer (&newpath);
@@ -1511,23 +1511,23 @@ xuri_parse_relative (xuri_t         *base_uri,
                     }
                 }
 
-              uri->userinfo = xstrdup (base_uri->userinfo);
-              uri->user = xstrdup (base_uri->user);
-              uri->password = xstrdup (base_uri->password);
-              uri->auth_params = xstrdup (base_uri->auth_params);
-              uri->host = xstrdup (base_uri->host);
+              uri->userinfo = g_strdup (base_uri->userinfo);
+              uri->user = g_strdup (base_uri->user);
+              uri->password = g_strdup (base_uri->password);
+              uri->auth_params = g_strdup (base_uri->auth_params);
+              uri->host = g_strdup (base_uri->host);
               uri->port = base_uri->port;
             }
         }
 
       /* Scheme normalization couldn't have been done earlier
        * as the relative URI may not have had a scheme */
-      if (flags & XURI_FLAGS_SCHEME_NORMALIZE)
+      if (flags & G_URI_FLAGS_SCHEME_NORMALIZE)
         {
           if (should_normalize_empty_path (uri->scheme) && !*uri->path)
             {
               g_free (uri->path);
-              uri->path = xstrdup ("/");
+              uri->path = g_strdup ("/");
             }
 
           uri->port = normalize_port (uri->scheme, uri->port);
@@ -1542,11 +1542,11 @@ xuri_parse_relative (xuri_t         *base_uri,
 }
 
 /**
- * xuri_resolve_relative:
+ * g_uri_resolve_relative:
  * @base_uri_string: (nullable): a string representing a base URI
  * @uri_ref: a string representing a relative or absolute URI
  * @flags: flags describing how to parse @uri_ref
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Parses @uri_ref according to @flags and, if it is a
  * [relative URI][relative-absolute-uris], resolves it relative to
@@ -1561,37 +1561,37 @@ xuri_parse_relative (xuri_t         *base_uri,
  *
  * Since: 2.66
  */
-xchar_t *
-xuri_resolve_relative (const xchar_t  *base_uri_string,
-                        const xchar_t  *uri_ref,
-                        xuri_flags_t     flags,
-                        xerror_t      **error)
+gchar *
+g_uri_resolve_relative (const gchar  *base_uri_string,
+                        const gchar  *uri_ref,
+                        GUriFlags     flags,
+                        GError      **error)
 {
-  xuri_t *base_uri, *resolved_uri;
-  xchar_t *resolved_uri_string;
+  GUri *base_uri, *resolved_uri;
+  gchar *resolved_uri_string;
 
-  xreturn_val_if_fail (uri_ref != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (uri_ref != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  flags |= XURI_FLAGS_ENCODED;
+  flags |= G_URI_FLAGS_ENCODED;
 
   if (base_uri_string)
     {
-      base_uri = xuri_parse (base_uri_string, flags, error);
+      base_uri = g_uri_parse (base_uri_string, flags, error);
       if (!base_uri)
         return NULL;
     }
   else
     base_uri = NULL;
 
-  resolved_uri = xuri_parse_relative (base_uri, uri_ref, flags, error);
+  resolved_uri = g_uri_parse_relative (base_uri, uri_ref, flags, error);
   if (base_uri)
-    xuri_unref (base_uri);
+    g_uri_unref (base_uri);
   if (!resolved_uri)
     return NULL;
 
-  resolved_uri_string = xuri_to_string (resolved_uri);
-  xuri_unref (resolved_uri);
+  resolved_uri_string = g_uri_to_string (resolved_uri);
+  g_uri_unref (resolved_uri);
   return g_steal_pointer (&resolved_uri_string);
 }
 
@@ -1599,142 +1599,142 @@ xuri_resolve_relative (const xchar_t  *base_uri_string,
  * user can't contain ":" or ";", and split-out password can't contain
  * ";".
  */
-#define USERINFO_ALLOWED_CHARS XURI_RESERVED_CHARS_ALLOWED_IN_USERINFO
+#define USERINFO_ALLOWED_CHARS G_URI_RESERVED_CHARS_ALLOWED_IN_USERINFO
 #define USER_ALLOWED_CHARS "!$&'()*+,="
 #define PASSWORD_ALLOWED_CHARS "!$&'()*+,=:"
 #define AUTH_PARAMS_ALLOWED_CHARS USERINFO_ALLOWED_CHARS
 #define IP_ADDR_ALLOWED_CHARS ":"
-#define HOST_ALLOWED_CHARS XURI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS
-#define PATH_ALLOWED_CHARS XURI_RESERVED_CHARS_ALLOWED_IN_PATH
-#define QUERY_ALLOWED_CHARS XURI_RESERVED_CHARS_ALLOWED_IN_PATH "?"
-#define FRAGMENT_ALLOWED_CHARS XURI_RESERVED_CHARS_ALLOWED_IN_PATH "?"
+#define HOST_ALLOWED_CHARS G_URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS
+#define PATH_ALLOWED_CHARS G_URI_RESERVED_CHARS_ALLOWED_IN_PATH
+#define QUERY_ALLOWED_CHARS G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "?"
+#define FRAGMENT_ALLOWED_CHARS G_URI_RESERVED_CHARS_ALLOWED_IN_PATH "?"
 
-static xchar_t *
-xuri_join_internal (xuri_flags_t    flags,
-                     const xchar_t *scheme,
-                     xboolean_t     userinfo,
-                     const xchar_t *user,
-                     const xchar_t *password,
-                     const xchar_t *auth_params,
-                     const xchar_t *host,
-                     xint_t         port,
-                     const xchar_t *path,
-                     const xchar_t *query,
-                     const xchar_t *fragment)
+static gchar *
+g_uri_join_internal (GUriFlags    flags,
+                     const gchar *scheme,
+                     gboolean     userinfo,
+                     const gchar *user,
+                     const gchar *password,
+                     const gchar *auth_params,
+                     const gchar *host,
+                     gint         port,
+                     const gchar *path,
+                     const gchar *query,
+                     const gchar *fragment)
 {
-  xboolean_t encoded = (flags & XURI_FLAGS_ENCODED);
-  xstring_t *str;
+  gboolean encoded = (flags & G_URI_FLAGS_ENCODED);
+  GString *str;
   char *normalized_scheme = NULL;
 
   /* Restrictions on path prefixes. See:
    * https://tools.ietf.org/html/rfc3986#section-3
    */
-  xreturn_val_if_fail (path != NULL, NULL);
-  xreturn_val_if_fail (host == NULL || (path[0] == '\0' || path[0] == '/'), NULL);
-  xreturn_val_if_fail (host != NULL || (path[0] != '/' || path[1] != '/'), NULL);
+  g_return_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (host == NULL || (path[0] == '\0' || path[0] == '/'), NULL);
+  g_return_val_if_fail (host != NULL || (path[0] != '/' || path[1] != '/'), NULL);
 
-  str = xstring_new (scheme);
+  str = g_string_new (scheme);
   if (scheme)
-    xstring_append_c (str, ':');
+    g_string_append_c (str, ':');
 
-  if (flags & XURI_FLAGS_SCHEME_NORMALIZE && scheme && ((host && port != -1) || path[0] == '\0'))
+  if (flags & G_URI_FLAGS_SCHEME_NORMALIZE && scheme && ((host && port != -1) || path[0] == '\0'))
     normalized_scheme = g_ascii_strdown (scheme, -1);
 
   if (host)
     {
-      xstring_append (str, "//");
+      g_string_append (str, "//");
 
       if (user)
         {
           if (encoded)
-            xstring_append (str, user);
+            g_string_append (str, user);
           else
             {
               if (userinfo)
-                xstring_append_uri_escaped (str, user, USERINFO_ALLOWED_CHARS, TRUE);
+                g_string_append_uri_escaped (str, user, USERINFO_ALLOWED_CHARS, TRUE);
               else
                 /* Encode ':' and ';' regardless of whether we have a
                  * password or auth params, since it may be parsed later
                  * under the assumption that it does.
                  */
-                xstring_append_uri_escaped (str, user, USER_ALLOWED_CHARS, TRUE);
+                g_string_append_uri_escaped (str, user, USER_ALLOWED_CHARS, TRUE);
             }
 
           if (password)
             {
-              xstring_append_c (str, ':');
+              g_string_append_c (str, ':');
               if (encoded)
-                xstring_append (str, password);
+                g_string_append (str, password);
               else
-                xstring_append_uri_escaped (str, password,
+                g_string_append_uri_escaped (str, password,
                                              PASSWORD_ALLOWED_CHARS, TRUE);
             }
 
           if (auth_params)
             {
-              xstring_append_c (str, ';');
+              g_string_append_c (str, ';');
               if (encoded)
-                xstring_append (str, auth_params);
+                g_string_append (str, auth_params);
               else
-                xstring_append_uri_escaped (str, auth_params,
+                g_string_append_uri_escaped (str, auth_params,
                                              AUTH_PARAMS_ALLOWED_CHARS, TRUE);
             }
 
-          xstring_append_c (str, '@');
+          g_string_append_c (str, '@');
         }
 
       if (strchr (host, ':') && g_hostname_is_ip_address (host))
         {
-          xstring_append_c (str, '[');
+          g_string_append_c (str, '[');
           if (encoded)
-            xstring_append (str, host);
+            g_string_append (str, host);
           else
-            xstring_append_uri_escaped (str, host, IP_ADDR_ALLOWED_CHARS, TRUE);
-          xstring_append_c (str, ']');
+            g_string_append_uri_escaped (str, host, IP_ADDR_ALLOWED_CHARS, TRUE);
+          g_string_append_c (str, ']');
         }
       else
         {
           if (encoded)
-            xstring_append (str, host);
+            g_string_append (str, host);
           else
-            xstring_append_uri_escaped (str, host, HOST_ALLOWED_CHARS, TRUE);
+            g_string_append_uri_escaped (str, host, HOST_ALLOWED_CHARS, TRUE);
         }
 
       if (port != -1 && (!normalized_scheme || normalize_port (normalized_scheme, port) != -1))
-        xstring_append_printf (str, ":%d", port);
+        g_string_append_printf (str, ":%d", port);
     }
 
   if (path[0] == '\0' && normalized_scheme && should_normalize_empty_path (normalized_scheme))
-    xstring_append (str, "/");
-  else if (encoded || flags & XURI_FLAGS_ENCODED_PATH)
-    xstring_append (str, path);
+    g_string_append (str, "/");
+  else if (encoded || flags & G_URI_FLAGS_ENCODED_PATH)
+    g_string_append (str, path);
   else
-    xstring_append_uri_escaped (str, path, PATH_ALLOWED_CHARS, TRUE);
+    g_string_append_uri_escaped (str, path, PATH_ALLOWED_CHARS, TRUE);
 
   g_free (normalized_scheme);
 
   if (query)
     {
-      xstring_append_c (str, '?');
-      if (encoded || flags & XURI_FLAGS_ENCODED_QUERY)
-        xstring_append (str, query);
+      g_string_append_c (str, '?');
+      if (encoded || flags & G_URI_FLAGS_ENCODED_QUERY)
+        g_string_append (str, query);
       else
-        xstring_append_uri_escaped (str, query, QUERY_ALLOWED_CHARS, TRUE);
+        g_string_append_uri_escaped (str, query, QUERY_ALLOWED_CHARS, TRUE);
     }
   if (fragment)
     {
-      xstring_append_c (str, '#');
-      if (encoded || flags & XURI_FLAGS_ENCODED_FRAGMENT)
-        xstring_append (str, fragment);
+      g_string_append_c (str, '#');
+      if (encoded || flags & G_URI_FLAGS_ENCODED_FRAGMENT)
+        g_string_append (str, fragment);
       else
-        xstring_append_uri_escaped (str, fragment, FRAGMENT_ALLOWED_CHARS, TRUE);
+        g_string_append_uri_escaped (str, fragment, FRAGMENT_ALLOWED_CHARS, TRUE);
     }
 
-  return xstring_free (str, FALSE);
+  return g_string_free (str, FALSE);
 }
 
 /**
- * xuri_join:
+ * g_uri_join:
  * @flags: flags describing how to build the URI string
  * @scheme: (nullable): the URI scheme, or %NULL
  * @userinfo: (nullable): the userinfo component, or %NULL
@@ -1753,30 +1753,30 @@ xuri_join_internal (xuri_flags_t    flags,
    characters (`//`). See
  * [RFC 3986, section 3](https://tools.ietf.org/html/rfc3986#section-3).
  *
- * See also xuri_join_with_user(), which allows specifying the
+ * See also g_uri_join_with_user(), which allows specifying the
  * components of the ‘userinfo’ separately.
  *
- * %XURI_FLAGS_HAS_PASSWORD and %XURI_FLAGS_HAS_AUTH_PARAMS are ignored if set
+ * %G_URI_FLAGS_HAS_PASSWORD and %G_URI_FLAGS_HAS_AUTH_PARAMS are ignored if set
  * in @flags.
  *
  * Return value: (not nullable) (transfer full): an absolute URI string
  *
  * Since: 2.66
  */
-xchar_t *
-xuri_join (xuri_flags_t    flags,
-            const xchar_t *scheme,
-            const xchar_t *userinfo,
-            const xchar_t *host,
-            xint_t         port,
-            const xchar_t *path,
-            const xchar_t *query,
-            const xchar_t *fragment)
+gchar *
+g_uri_join (GUriFlags    flags,
+            const gchar *scheme,
+            const gchar *userinfo,
+            const gchar *host,
+            gint         port,
+            const gchar *path,
+            const gchar *query,
+            const gchar *fragment)
 {
-  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  return xuri_join_internal (flags,
+  return g_uri_join_internal (flags,
                               scheme,
                               TRUE, userinfo, NULL, NULL,
                               host,
@@ -1787,7 +1787,7 @@ xuri_join (xuri_flags_t    flags,
 }
 
 /**
- * xuri_join_with_user:
+ * g_uri_join_with_user:
  * @flags: flags describing how to build the URI string
  * @scheme: (nullable): the URI scheme, or %NULL
  * @user: (nullable): the user component of the userinfo, or %NULL
@@ -1805,32 +1805,32 @@ xuri_join (xuri_flags_t    flags,
  * an absolute URI string. @path may not be %NULL (though it may be the empty
  * string).
  *
- * In contrast to xuri_join(), this allows specifying the components
+ * In contrast to g_uri_join(), this allows specifying the components
  * of the ‘userinfo’ separately. It otherwise behaves the same.
  *
- * %XURI_FLAGS_HAS_PASSWORD and %XURI_FLAGS_HAS_AUTH_PARAMS are ignored if set
+ * %G_URI_FLAGS_HAS_PASSWORD and %G_URI_FLAGS_HAS_AUTH_PARAMS are ignored if set
  * in @flags.
  *
  * Return value: (not nullable) (transfer full): an absolute URI string
  *
  * Since: 2.66
  */
-xchar_t *
-xuri_join_with_user (xuri_flags_t    flags,
-                      const xchar_t *scheme,
-                      const xchar_t *user,
-                      const xchar_t *password,
-                      const xchar_t *auth_params,
-                      const xchar_t *host,
-                      xint_t         port,
-                      const xchar_t *path,
-                      const xchar_t *query,
-                      const xchar_t *fragment)
+gchar *
+g_uri_join_with_user (GUriFlags    flags,
+                      const gchar *scheme,
+                      const gchar *user,
+                      const gchar *password,
+                      const gchar *auth_params,
+                      const gchar *host,
+                      gint         port,
+                      const gchar *path,
+                      const gchar *query,
+                      const gchar *fragment)
 {
-  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  return xuri_join_internal (flags,
+  return g_uri_join_internal (flags,
                               scheme,
                               FALSE, user, password, auth_params,
                               host,
@@ -1841,8 +1841,8 @@ xuri_join_with_user (xuri_flags_t    flags,
 }
 
 /**
- * xuri_build:
- * @flags: flags describing how to build the #xuri_t
+ * g_uri_build:
+ * @flags: flags describing how to build the #GUri
  * @scheme: (not nullable): the URI scheme
  * @userinfo: (nullable): the userinfo component, or %NULL
  * @host: (nullable): the host component, or %NULL
@@ -1851,47 +1851,47 @@ xuri_join_with_user (xuri_flags_t    flags,
  * @query: (nullable): the query component, or %NULL
  * @fragment: (nullable): the fragment, or %NULL
  *
- * Creates a new #xuri_t from the given components according to @flags.
+ * Creates a new #GUri from the given components according to @flags.
  *
- * See also xuri_build_with_user(), which allows specifying the
+ * See also g_uri_build_with_user(), which allows specifying the
  * components of the "userinfo" separately.
  *
- * Return value: (not nullable) (transfer full): a new #xuri_t
+ * Return value: (not nullable) (transfer full): a new #GUri
  *
  * Since: 2.66
  */
-xuri_t *
-xuri_build (xuri_flags_t    flags,
-             const xchar_t *scheme,
-             const xchar_t *userinfo,
-             const xchar_t *host,
-             xint_t         port,
-             const xchar_t *path,
-             const xchar_t *query,
-             const xchar_t *fragment)
+GUri *
+g_uri_build (GUriFlags    flags,
+             const gchar *scheme,
+             const gchar *userinfo,
+             const gchar *host,
+             gint         port,
+             const gchar *path,
+             const gchar *query,
+             const gchar *fragment)
 {
-  xuri_t *uri;
+  GUri *uri;
 
-  xreturn_val_if_fail (scheme != NULL, NULL);
-  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (scheme != NULL, NULL);
+  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  uri = g_atomic_rc_box_new0 (xuri_t);
+  uri = g_atomic_rc_box_new0 (GUri);
   uri->flags = flags;
   uri->scheme = g_ascii_strdown (scheme, -1);
-  uri->userinfo = xstrdup (userinfo);
-  uri->host = xstrdup (host);
+  uri->userinfo = g_strdup (userinfo);
+  uri->host = g_strdup (host);
   uri->port = port;
-  uri->path = xstrdup (path);
-  uri->query = xstrdup (query);
-  uri->fragment = xstrdup (fragment);
+  uri->path = g_strdup (path);
+  uri->query = g_strdup (query);
+  uri->fragment = g_strdup (fragment);
 
   return g_steal_pointer (&uri);
 }
 
 /**
- * xuri_build_with_user:
- * @flags: flags describing how to build the #xuri_t
+ * g_uri_build_with_user:
+ * @flags: flags describing how to build the #GUri
  * @scheme: (not nullable): the URI scheme
  * @user: (nullable): the user component of the userinfo, or %NULL
  * @password: (nullable): the password component of the userinfo, or %NULL
@@ -1902,129 +1902,129 @@ xuri_build (xuri_flags_t    flags,
  * @query: (nullable): the query component, or %NULL
  * @fragment: (nullable): the fragment, or %NULL
  *
- * Creates a new #xuri_t from the given components according to @flags
- * (%XURI_FLAGS_HAS_PASSWORD is added unconditionally). The @flags must be
+ * Creates a new #GUri from the given components according to @flags
+ * (%G_URI_FLAGS_HAS_PASSWORD is added unconditionally). The @flags must be
  * coherent with the passed values, in particular use `%`-encoded values with
- * %XURI_FLAGS_ENCODED.
+ * %G_URI_FLAGS_ENCODED.
  *
- * In contrast to xuri_build(), this allows specifying the components
+ * In contrast to g_uri_build(), this allows specifying the components
  * of the ‘userinfo’ field separately. Note that @user must be non-%NULL
  * if either @password or @auth_params is non-%NULL.
  *
- * Return value: (not nullable) (transfer full): a new #xuri_t
+ * Return value: (not nullable) (transfer full): a new #GUri
  *
  * Since: 2.66
  */
-xuri_t *
-xuri_build_with_user (xuri_flags_t    flags,
-                       const xchar_t *scheme,
-                       const xchar_t *user,
-                       const xchar_t *password,
-                       const xchar_t *auth_params,
-                       const xchar_t *host,
-                       xint_t         port,
-                       const xchar_t *path,
-                       const xchar_t *query,
-                       const xchar_t *fragment)
+GUri *
+g_uri_build_with_user (GUriFlags    flags,
+                       const gchar *scheme,
+                       const gchar *user,
+                       const gchar *password,
+                       const gchar *auth_params,
+                       const gchar *host,
+                       gint         port,
+                       const gchar *path,
+                       const gchar *query,
+                       const gchar *fragment)
 {
-  xuri_t *uri;
-  xstring_t *userinfo;
+  GUri *uri;
+  GString *userinfo;
 
-  xreturn_val_if_fail (scheme != NULL, NULL);
-  xreturn_val_if_fail (password == NULL || user != NULL, NULL);
-  xreturn_val_if_fail (auth_params == NULL || user != NULL, NULL);
-  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (scheme != NULL, NULL);
+  g_return_val_if_fail (password == NULL || user != NULL, NULL);
+  g_return_val_if_fail (auth_params == NULL || user != NULL, NULL);
+  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  uri = g_atomic_rc_box_new0 (xuri_t);
-  uri->flags = flags | XURI_FLAGS_HAS_PASSWORD;
+  uri = g_atomic_rc_box_new0 (GUri);
+  uri->flags = flags | G_URI_FLAGS_HAS_PASSWORD;
   uri->scheme = g_ascii_strdown (scheme, -1);
-  uri->user = xstrdup (user);
-  uri->password = xstrdup (password);
-  uri->auth_params = xstrdup (auth_params);
-  uri->host = xstrdup (host);
+  uri->user = g_strdup (user);
+  uri->password = g_strdup (password);
+  uri->auth_params = g_strdup (auth_params);
+  uri->host = g_strdup (host);
   uri->port = port;
-  uri->path = xstrdup (path);
-  uri->query = xstrdup (query);
-  uri->fragment = xstrdup (fragment);
+  uri->path = g_strdup (path);
+  uri->query = g_strdup (query);
+  uri->fragment = g_strdup (fragment);
 
   if (user)
     {
-      userinfo = xstring_new (user);
+      userinfo = g_string_new (user);
       if (password)
         {
-          xstring_append_c (userinfo, ':');
-          xstring_append (userinfo, uri->password);
+          g_string_append_c (userinfo, ':');
+          g_string_append (userinfo, uri->password);
         }
       if (auth_params)
         {
-          xstring_append_c (userinfo, ';');
-          xstring_append (userinfo, uri->auth_params);
+          g_string_append_c (userinfo, ';');
+          g_string_append (userinfo, uri->auth_params);
         }
-      uri->userinfo = xstring_free (userinfo, FALSE);
+      uri->userinfo = g_string_free (userinfo, FALSE);
     }
 
   return g_steal_pointer (&uri);
 }
 
 /**
- * xuri_to_string:
- * @uri: a #xuri_t
+ * g_uri_to_string:
+ * @uri: a #GUri
  *
  * Returns a string representing @uri.
  *
  * This is not guaranteed to return a string which is identical to the
  * string that @uri was parsed from. However, if the source URI was
  * syntactically correct (according to RFC 3986), and it was parsed
- * with %XURI_FLAGS_ENCODED, then xuri_to_string() is guaranteed to return
+ * with %G_URI_FLAGS_ENCODED, then g_uri_to_string() is guaranteed to return
  * a string which is at least semantically equivalent to the source
  * URI (according to RFC 3986).
  *
  * If @uri might contain sensitive details, such as authentication parameters,
  * or private data in its query string, and the returned string is going to be
- * logged, then consider using xuri_to_string_partial() to redact parts.
+ * logged, then consider using g_uri_to_string_partial() to redact parts.
  *
  * Return value: (not nullable) (transfer full): a string representing @uri,
  *     which the caller must free.
  *
  * Since: 2.66
  */
-xchar_t *
-xuri_to_string (xuri_t *uri)
+gchar *
+g_uri_to_string (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
-  return xuri_to_string_partial (uri, XURI_HIDE_NONE);
+  return g_uri_to_string_partial (uri, G_URI_HIDE_NONE);
 }
 
 /**
- * xuri_to_string_partial:
- * @uri: a #xuri_t
+ * g_uri_to_string_partial:
+ * @uri: a #GUri
  * @flags: flags describing what parts of @uri to hide
  *
  * Returns a string representing @uri, subject to the options in
- * @flags. See xuri_to_string() and #xuri_hide_flags_t for more details.
+ * @flags. See g_uri_to_string() and #GUriHideFlags for more details.
  *
  * Return value: (not nullable) (transfer full): a string representing
  *     @uri, which the caller must free.
  *
  * Since: 2.66
  */
-xchar_t *
-xuri_to_string_partial (xuri_t          *uri,
-                         xuri_hide_flags_t  flags)
+gchar *
+g_uri_to_string_partial (GUri          *uri,
+                         GUriHideFlags  flags)
 {
-  xboolean_t hide_user = (flags & XURI_HIDE_USERINFO);
-  xboolean_t hide_password = (flags & (XURI_HIDE_USERINFO | XURI_HIDE_PASSWORD));
-  xboolean_t hide_auth_params = (flags & (XURI_HIDE_USERINFO | XURI_HIDE_AUTH_PARAMS));
-  xboolean_t hide_query = (flags & XURI_HIDE_QUERY);
-  xboolean_t hide_fragment = (flags & XURI_HIDE_FRAGMENT);
+  gboolean hide_user = (flags & G_URI_HIDE_USERINFO);
+  gboolean hide_password = (flags & (G_URI_HIDE_USERINFO | G_URI_HIDE_PASSWORD));
+  gboolean hide_auth_params = (flags & (G_URI_HIDE_USERINFO | G_URI_HIDE_AUTH_PARAMS));
+  gboolean hide_query = (flags & G_URI_HIDE_QUERY);
+  gboolean hide_fragment = (flags & G_URI_HIDE_FRAGMENT);
 
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
-  if (uri->flags & (XURI_FLAGS_HAS_PASSWORD | XURI_FLAGS_HAS_AUTH_PARAMS))
+  if (uri->flags & (G_URI_FLAGS_HAS_PASSWORD | G_URI_FLAGS_HAS_AUTH_PARAMS))
     {
-      return xuri_join_with_user (uri->flags,
+      return g_uri_join_with_user (uri->flags,
                                    uri->scheme,
                                    hide_user ? NULL : uri->user,
                                    hide_password ? NULL : uri->password,
@@ -2036,7 +2036,7 @@ xuri_to_string_partial (xuri_t          *uri,
                                    hide_fragment ? NULL : uri->fragment);
     }
 
-  return xuri_join (uri->flags,
+  return g_uri_join (uri->flags,
                      uri->scheme,
                      hide_user ? NULL : uri->userinfo,
                      uri->host,
@@ -2046,12 +2046,12 @@ xuri_to_string_partial (xuri_t          *uri,
                      hide_fragment ? NULL : uri->fragment);
 }
 
-/* This is just a copy of xstr_hash() with g_ascii_toupper() added */
-static xuint_t
-str_ascii_case_hash (xconstpointer v)
+/* This is just a copy of g_str_hash() with g_ascii_toupper() added */
+static guint
+str_ascii_case_hash (gconstpointer v)
 {
   const signed char *p;
-  xuint32_t h = 5381;
+  guint32 h = 5381;
 
   for (p = v; *p != '\0'; p++)
     h = (h << 5) + h + g_ascii_toupper (*p);
@@ -2059,45 +2059,45 @@ str_ascii_case_hash (xconstpointer v)
   return h;
 }
 
-static xboolean_t
-str_ascii_case_equal (xconstpointer v1,
-                      xconstpointer v2)
+static gboolean
+str_ascii_case_equal (gconstpointer v1,
+                      gconstpointer v2)
 {
-  const xchar_t *string1 = v1;
-  const xchar_t *string2 = v2;
+  const gchar *string1 = v1;
+  const gchar *string2 = v2;
 
   return g_ascii_strcasecmp (string1, string2) == 0;
 }
 
 /**
- * xuri_params_iter_t:
+ * GUriParamsIter:
  *
  * Many URI schemes include one or more attribute/value pairs as part of the URI
  * value. For example `scheme://server/path?query=string&is=there` has two
  * attributes – `query=string` and `is=there` – in its query part.
  *
- * A #xuri_params_iter_t structure represents an iterator that can be used to
- * iterate over the attribute/value pairs of a URI query string. #xuri_params_iter_t
+ * A #GUriParamsIter structure represents an iterator that can be used to
+ * iterate over the attribute/value pairs of a URI query string. #GUriParamsIter
  * structures are typically allocated on the stack and then initialized with
- * xuri_params_iter_init(). See the documentation for xuri_params_iter_init()
+ * g_uri_params_iter_init(). See the documentation for g_uri_params_iter_init()
  * for a usage example.
  *
  * Since: 2.66
  */
 typedef struct
 {
-  xuri_params_flags_t flags;
-  const xchar_t    *attr;
-  const xchar_t    *end;
-  xuint8_t          sep_table[256]; /* 1 = index is a separator; 0 otherwise */
+  GUriParamsFlags flags;
+  const gchar    *attr;
+  const gchar    *end;
+  guint8          sep_table[256]; /* 1 = index is a separator; 0 otherwise */
 } RealIter;
 
-G_STATIC_ASSERT (sizeof (xuri_params_iter_t) == sizeof (RealIter));
-G_STATIC_ASSERT (G_ALIGNOF (xuri_params_iter_t) >= G_ALIGNOF (RealIter));
+G_STATIC_ASSERT (sizeof (GUriParamsIter) == sizeof (RealIter));
+G_STATIC_ASSERT (G_ALIGNOF (GUriParamsIter) >= G_ALIGNOF (RealIter));
 
 /**
- * xuri_params_iter_init:
- * @iter: an uninitialized #xuri_params_iter_t
+ * g_uri_params_iter_init:
+ * @iter: an uninitialized #GUriParamsIter
  * @params: a `%`-encoded string containing `attribute=value`
  *   parameters
  * @length: the length of @params, or `-1` if it is nul-terminated
@@ -2114,29 +2114,29 @@ G_STATIC_ASSERT (G_ALIGNOF (xuri_params_iter_t) >= G_ALIGNOF (RealIter));
  * variables must thus outlive the iterator and not be modified during the
  * iteration.
  *
- * If %XURI_PARAMS_WWW_FORM is passed in @flags, `+` characters in the param
+ * If %G_URI_PARAMS_WWW_FORM is passed in @flags, `+` characters in the param
  * string will be replaced with spaces in the output. For example, `foo=bar+baz`
  * will give attribute `foo` with value `bar baz`. This is commonly used on the
  * web (the `https` and `http` schemes only), but is deprecated in favour of
  * the equivalent of encoding spaces as `%20`.
  *
- * Unlike with xuri_parse_params(), %XURI_PARAMS_CASE_INSENSITIVE has no
- * effect if passed to @flags for xuri_params_iter_init(). The caller is
+ * Unlike with g_uri_parse_params(), %G_URI_PARAMS_CASE_INSENSITIVE has no
+ * effect if passed to @flags for g_uri_params_iter_init(). The caller is
  * responsible for doing their own case-insensitive comparisons.
  *
  * |[<!-- language="C" -->
- * xuri_params_iter_t iter;
- * xerror_t *error = NULL;
- * xchar_t *unowned_attr, *unowned_value;
+ * GUriParamsIter iter;
+ * GError *error = NULL;
+ * gchar *unowned_attr, *unowned_value;
  *
- * xuri_params_iter_init (&iter, "foo=bar&baz=bar&foo_t=frob&baz=bar2", -1, "&", XURI_PARAMS_NONE);
- * while (xuri_params_iter_next (&iter, &unowned_attr, &unowned_value, &error))
+ * g_uri_params_iter_init (&iter, "foo=bar&baz=bar&Foo=frob&baz=bar2", -1, "&", G_URI_PARAMS_NONE);
+ * while (g_uri_params_iter_next (&iter, &unowned_attr, &unowned_value, &error))
  *   {
- *     g_autofree xchar_t *attr = g_steal_pointer (&unowned_attr);
- *     g_autofree xchar_t *value = g_steal_pointer (&unowned_value);
+ *     g_autofree gchar *attr = g_steal_pointer (&unowned_attr);
+ *     g_autofree gchar *value = g_steal_pointer (&unowned_value);
  *     // do something with attr and value; this code will be called 4 times
  *     // for the params string in this example: once with attr=foo and value=bar,
- *     // then with baz/bar, then foo_t/frob, then baz/bar2.
+ *     // then with baz/bar, then Foo/frob, then baz/bar2.
  *   }
  * if (error)
  *   // handle parsing error
@@ -2145,14 +2145,14 @@ G_STATIC_ASSERT (G_ALIGNOF (xuri_params_iter_t) >= G_ALIGNOF (RealIter));
  * Since: 2.66
  */
 void
-xuri_params_iter_init (xuri_params_iter_t *iter,
-                        const xchar_t    *params,
-                        xssize_t          length,
-                        const xchar_t    *separators,
-                        xuri_params_flags_t flags)
+g_uri_params_iter_init (GUriParamsIter *iter,
+                        const gchar    *params,
+                        gssize          length,
+                        const gchar    *separators,
+                        GUriParamsFlags flags)
 {
   RealIter *ri = (RealIter *)iter;
-  const xchar_t *s;
+  const gchar *s;
 
   g_return_if_fail (iter != NULL);
   g_return_if_fail (length == 0 || params != NULL);
@@ -2168,25 +2168,25 @@ xuri_params_iter_init (xuri_params_iter_t *iter,
 
   memset (ri->sep_table, FALSE, sizeof (ri->sep_table));
   for (s = separators; *s != '\0'; ++s)
-    ri->sep_table[*(xuchar_t *)s] = TRUE;
+    ri->sep_table[*(guchar *)s] = TRUE;
 
   ri->attr = params;
 }
 
 /**
- * xuri_params_iter_next:
- * @iter: an initialized #xuri_params_iter_t
+ * g_uri_params_iter_next:
+ * @iter: an initialized #GUriParamsIter
  * @attribute: (out) (nullable) (optional) (transfer full): on return, contains
  *     the attribute, or %NULL.
  * @value: (out) (nullable) (optional) (transfer full): on return, contains
  *     the value, or %NULL.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Advances @iter and retrieves the next attribute/value. %FALSE is returned if
  * an error has occurred (in which case @error is set), or if the end of the
  * iteration is reached (in which case @attribute and @value are set to %NULL
  * and the iterator becomes invalid). If %TRUE is returned,
- * xuri_params_iter_next() may be called again to receive another
+ * g_uri_params_iter_next() may be called again to receive another
  * attribute/value pair.
  *
  * Note that the same @attribute may be returned multiple times, since URIs
@@ -2197,20 +2197,20 @@ xuri_params_iter_init (xuri_params_iter_t *iter,
  *
  * Since: 2.66
  */
-xboolean_t
-xuri_params_iter_next (xuri_params_iter_t *iter,
-                        xchar_t         **attribute,
-                        xchar_t         **value,
-                        xerror_t        **error)
+gboolean
+g_uri_params_iter_next (GUriParamsIter *iter,
+                        gchar         **attribute,
+                        gchar         **value,
+                        GError        **error)
 {
   RealIter *ri = (RealIter *)iter;
-  const xchar_t *attr_end, *val, *val_end;
-  xchar_t *decoded_attr, *decoded_value;
-  xboolean_t www_form = ri->flags & XURI_PARAMS_WWW_FORM;
-  xuri_flags_t decode_flags = XURI_FLAGS_NONE;
+  const gchar *attr_end, *val, *val_end;
+  gchar *decoded_attr, *decoded_value;
+  gboolean www_form = ri->flags & G_URI_PARAMS_WWW_FORM;
+  GUriFlags decode_flags = G_URI_FLAGS_NONE;
 
-  xreturn_val_if_fail (iter != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   /* Pre-clear these in case of failure or finishing. */
   if (attribute)
@@ -2221,32 +2221,32 @@ xuri_params_iter_next (xuri_params_iter_t *iter,
   if (ri->attr >= ri->end)
     return FALSE;
 
-  if (ri->flags & XURI_PARAMS_PARSE_RELAXED)
-    decode_flags |= XURI_FLAGS_PARSE_RELAXED;
+  if (ri->flags & G_URI_PARAMS_PARSE_RELAXED)
+    decode_flags |= G_URI_FLAGS_PARSE_RELAXED;
 
   /* Check if each character in @attr is a separator, by indexing by the
    * character value into the @sep_table, which has value 1 stored at an
    * index if that index is a separator. */
   for (val_end = ri->attr; val_end < ri->end; val_end++)
-    if (ri->sep_table[*(xuchar_t *)val_end])
+    if (ri->sep_table[*(guchar *)val_end])
       break;
 
   attr_end = memchr (ri->attr, '=', val_end - ri->attr);
   if (!attr_end)
     {
-      g_set_error_literal (error, XURI_ERROR, XURI_ERROR_FAILED,
+      g_set_error_literal (error, G_URI_ERROR, G_URI_ERROR_FAILED,
                            _("Missing ‘=’ and parameter value"));
       return FALSE;
     }
   if (!uri_decode (&decoded_attr, NULL, ri->attr, attr_end - ri->attr,
-                   www_form, decode_flags, XURI_ERROR_FAILED, error))
+                   www_form, decode_flags, G_URI_ERROR_FAILED, error))
     {
       return FALSE;
     }
 
   val = attr_end + 1;
   if (!uri_decode (&decoded_value, NULL, val, val_end - val,
-                   www_form, decode_flags, XURI_ERROR_FAILED, error))
+                   www_form, decode_flags, G_URI_ERROR_FAILED, error))
     {
       g_free (decoded_attr);
       return FALSE;
@@ -2265,7 +2265,7 @@ xuri_params_iter_next (xuri_params_iter_t *iter,
 }
 
 /**
- * xuri_parse_params:
+ * g_uri_parse_params:
  * @params: a `%`-encoded string containing `attribute=value`
  *   parameters
  * @length: the length of @params, or `-1` if it is nul-terminated
@@ -2275,26 +2275,26 @@ xuri_params_iter_next (xuri_params_iter_t *iter,
  *   anything but ASCII characters. You may pass an empty set, in which case
  *   no splitting will occur.
  * @flags: flags to modify the way the parameters are handled.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Many URI schemes include one or more attribute/value pairs as part of the URI
  * value. This method can be used to parse them into a hash table. When an
  * attribute has multiple occurrences, the last value is the final returned
  * value. If you need to handle repeated attributes differently, use
- * #xuri_params_iter_t.
+ * #GUriParamsIter.
  *
  * The @params string is assumed to still be `%`-encoded, but the returned
  * values will be fully decoded. (Thus it is possible that the returned values
  * may contain `=` or @separators, if the value was encoded in the input.)
- * Invalid `%`-encoding is treated as with the %XURI_FLAGS_PARSE_RELAXED
- * rules for xuri_parse(). (However, if @params is the path or query string
- * from a #xuri_t that was parsed without %XURI_FLAGS_PARSE_RELAXED and
- * %XURI_FLAGS_ENCODED, then you already know that it does not contain any
+ * Invalid `%`-encoding is treated as with the %G_URI_FLAGS_PARSE_RELAXED
+ * rules for g_uri_parse(). (However, if @params is the path or query string
+ * from a #GUri that was parsed without %G_URI_FLAGS_PARSE_RELAXED and
+ * %G_URI_FLAGS_ENCODED, then you already know that it does not contain any
  * invalid encoding.)
  *
- * %XURI_PARAMS_WWW_FORM is handled as documented for xuri_params_iter_init().
+ * %G_URI_PARAMS_WWW_FORM is handled as documented for g_uri_params_iter_init().
  *
- * If %XURI_PARAMS_CASE_INSENSITIVE is passed to @flags, attributes will be
+ * If %G_URI_PARAMS_CASE_INSENSITIVE is passed to @flags, attributes will be
  * compared case-insensitively, so a params string `attr=123&Attr=456` will only
  * return a single attribute–value pair, `Attr=456`. Case will be preserved in
  * the returned attributes.
@@ -2308,44 +2308,44 @@ xuri_params_iter_next (xuri_params_iter_t *iter,
  *
  * Since: 2.66
  */
-xhashtable_t *
-xuri_parse_params (const xchar_t     *params,
-                    xssize_t           length,
-                    const xchar_t     *separators,
-                    xuri_params_flags_t  flags,
-                    xerror_t         **error)
+GHashTable *
+g_uri_parse_params (const gchar     *params,
+                    gssize           length,
+                    const gchar     *separators,
+                    GUriParamsFlags  flags,
+                    GError         **error)
 {
-  xhashtable_t *hash;
-  xuri_params_iter_t iter;
-  xchar_t *attribute, *value;
-  xerror_t *err = NULL;
+  GHashTable *hash;
+  GUriParamsIter iter;
+  gchar *attribute, *value;
+  GError *err = NULL;
 
-  xreturn_val_if_fail (length == 0 || params != NULL, NULL);
-  xreturn_val_if_fail (length >= -1, NULL);
-  xreturn_val_if_fail (separators != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (length == 0 || params != NULL, NULL);
+  g_return_val_if_fail (length >= -1, NULL);
+  g_return_val_if_fail (separators != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (flags & XURI_PARAMS_CASE_INSENSITIVE)
+  if (flags & G_URI_PARAMS_CASE_INSENSITIVE)
     {
-      hash = xhash_table_new_full (str_ascii_case_hash,
+      hash = g_hash_table_new_full (str_ascii_case_hash,
                                     str_ascii_case_equal,
                                     g_free, g_free);
     }
   else
     {
-      hash = xhash_table_new_full (xstr_hash, xstr_equal,
+      hash = g_hash_table_new_full (g_str_hash, g_str_equal,
                                     g_free, g_free);
     }
 
-  xuri_params_iter_init (&iter, params, length, separators, flags);
+  g_uri_params_iter_init (&iter, params, length, separators, flags);
 
-  while (xuri_params_iter_next (&iter, &attribute, &value, &err))
-    xhash_table_insert (hash, attribute, value);
+  while (g_uri_params_iter_next (&iter, &attribute, &value, &err))
+    g_hash_table_insert (hash, attribute, value);
 
   if (err)
     {
       g_propagate_error (error, g_steal_pointer (&err));
-      xhash_table_destroy (hash);
+      g_hash_table_destroy (hash);
       return NULL;
     }
 
@@ -2353,8 +2353,8 @@ xuri_parse_params (const xchar_t     *params,
 }
 
 /**
- * xuri_get_scheme:
- * @uri: a #xuri_t
+ * g_uri_get_scheme:
+ * @uri: a #GUri
  *
  * Gets @uri's scheme. Note that this will always be all-lowercase,
  * regardless of the string or strings that @uri was created from.
@@ -2363,17 +2363,17 @@ xuri_parse_params (const xchar_t     *params,
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_scheme (xuri_t *uri)
+const gchar *
+g_uri_get_scheme (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->scheme;
 }
 
 /**
- * xuri_get_userinfo:
- * @uri: a #xuri_t
+ * g_uri_get_userinfo:
+ * @uri: a #GUri
  *
  * Gets @uri's userinfo, which may contain `%`-encoding, depending on
  * the flags with which @uri was created.
@@ -2382,86 +2382,86 @@ xuri_get_scheme (xuri_t *uri)
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_userinfo (xuri_t *uri)
+const gchar *
+g_uri_get_userinfo (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->userinfo;
 }
 
 /**
- * xuri_get_user:
- * @uri: a #xuri_t
+ * g_uri_get_user:
+ * @uri: a #GUri
  *
  * Gets the ‘username’ component of @uri's userinfo, which may contain
  * `%`-encoding, depending on the flags with which @uri was created.
- * If @uri was not created with %XURI_FLAGS_HAS_PASSWORD or
- * %XURI_FLAGS_HAS_AUTH_PARAMS, this is the same as xuri_get_userinfo().
+ * If @uri was not created with %G_URI_FLAGS_HAS_PASSWORD or
+ * %G_URI_FLAGS_HAS_AUTH_PARAMS, this is the same as g_uri_get_userinfo().
  *
  * Return value: (nullable): @uri's user.
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_user (xuri_t *uri)
+const gchar *
+g_uri_get_user (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->user;
 }
 
 /**
- * xuri_get_password:
- * @uri: a #xuri_t
+ * g_uri_get_password:
+ * @uri: a #GUri
  *
  * Gets @uri's password, which may contain `%`-encoding, depending on
  * the flags with which @uri was created. (If @uri was not created
- * with %XURI_FLAGS_HAS_PASSWORD then this will be %NULL.)
+ * with %G_URI_FLAGS_HAS_PASSWORD then this will be %NULL.)
  *
  * Return value: (nullable): @uri's password.
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_password (xuri_t *uri)
+const gchar *
+g_uri_get_password (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->password;
 }
 
 /**
- * xuri_get_auth_params:
- * @uri: a #xuri_t
+ * g_uri_get_auth_params:
+ * @uri: a #GUri
  *
  * Gets @uri's authentication parameters, which may contain
  * `%`-encoding, depending on the flags with which @uri was created.
- * (If @uri was not created with %XURI_FLAGS_HAS_AUTH_PARAMS then this will
+ * (If @uri was not created with %G_URI_FLAGS_HAS_AUTH_PARAMS then this will
  * be %NULL.)
  *
- * Depending on the URI scheme, xuri_parse_params() may be useful for
+ * Depending on the URI scheme, g_uri_parse_params() may be useful for
  * further parsing this information.
  *
  * Return value: (nullable): @uri's authentication parameters.
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_auth_params (xuri_t *uri)
+const gchar *
+g_uri_get_auth_params (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->auth_params;
 }
 
 /**
- * xuri_get_host:
- * @uri: a #xuri_t
+ * g_uri_get_host:
+ * @uri: a #GUri
  *
  * Gets @uri's host. This will never have `%`-encoded characters,
  * unless it is non-UTF-8 (which can only be the case if @uri was
- * created with %XURI_FLAGS_NON_DNS).
+ * created with %G_URI_FLAGS_NON_DNS).
  *
  * If @uri contained an IPv6 address literal, this value will be just
  * that address, without the brackets around it that are necessary in
@@ -2473,17 +2473,17 @@ xuri_get_auth_params (xuri_t *uri)
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_host (xuri_t *uri)
+const gchar *
+g_uri_get_host (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->host;
 }
 
 /**
- * xuri_get_port:
- * @uri: a #xuri_t
+ * g_uri_get_port:
+ * @uri: a #GUri
  *
  * Gets @uri's port.
  *
@@ -2491,20 +2491,20 @@ xuri_get_host (xuri_t *uri)
  *
  * Since: 2.66
  */
-xint_t
-xuri_get_port (xuri_t *uri)
+gint
+g_uri_get_port (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, -1);
+  g_return_val_if_fail (uri != NULL, -1);
 
-  if (uri->port == -1 && uri->flags & XURI_FLAGS_SCHEME_NORMALIZE)
+  if (uri->port == -1 && uri->flags & G_URI_FLAGS_SCHEME_NORMALIZE)
     return default_scheme_port (uri->scheme);
 
   return uri->port;
 }
 
 /**
- * xuri_get_path:
- * @uri: a #xuri_t
+ * g_uri_get_path:
+ * @uri: a #GUri
  *
  * Gets @uri's path, which may contain `%`-encoding, depending on the
  * flags with which @uri was created.
@@ -2513,39 +2513,39 @@ xuri_get_port (xuri_t *uri)
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_path (xuri_t *uri)
+const gchar *
+g_uri_get_path (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->path;
 }
 
 /**
- * xuri_get_query:
- * @uri: a #xuri_t
+ * g_uri_get_query:
+ * @uri: a #GUri
  *
  * Gets @uri's query, which may contain `%`-encoding, depending on the
  * flags with which @uri was created.
  *
  * For queries consisting of a series of `name=value` parameters,
- * #xuri_params_iter_t or xuri_parse_params() may be useful.
+ * #GUriParamsIter or g_uri_parse_params() may be useful.
  *
  * Return value: (nullable): @uri's query.
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_query (xuri_t *uri)
+const gchar *
+g_uri_get_query (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->query;
 }
 
 /**
- * xuri_get_fragment:
- * @uri: a #xuri_t
+ * g_uri_get_fragment:
+ * @uri: a #GUri
  *
  * Gets @uri's fragment, which may contain `%`-encoding, depending on
  * the flags with which @uri was created.
@@ -2554,18 +2554,18 @@ xuri_get_query (xuri_t *uri)
  *
  * Since: 2.66
  */
-const xchar_t *
-xuri_get_fragment (xuri_t *uri)
+const gchar *
+g_uri_get_fragment (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
   return uri->fragment;
 }
 
 
 /**
- * xuri_get_flags:
- * @uri: a #xuri_t
+ * g_uri_get_flags:
+ * @uri: a #GUri
  *
  * Gets @uri's flags set upon construction.
  *
@@ -2573,16 +2573,16 @@ xuri_get_fragment (xuri_t *uri)
  *
  * Since: 2.66
  **/
-xuri_flags_t
-xuri_get_flags (xuri_t *uri)
+GUriFlags
+g_uri_get_flags (GUri *uri)
 {
-  xreturn_val_if_fail (uri != NULL, XURI_FLAGS_NONE);
+  g_return_val_if_fail (uri != NULL, G_URI_FLAGS_NONE);
 
   return uri->flags;
 }
 
 /**
- * xuri_unescape_segment:
+ * g_uri_unescape_segment:
  * @escaped_string: (nullable): A string, may be %NULL
  * @escaped_string_end: (nullable): Pointer to end of @escaped_string,
  *   may be %NULL
@@ -2598,7 +2598,7 @@ xuri_get_flags (xuri_t *uri)
  * escaped path element, which might confuse pathname handling.
  *
  * Note: `NUL` byte is not accepted in the output, in contrast to
- * xuri_unescape_bytes().
+ * g_uri_unescape_bytes().
  *
  * Returns: (nullable): an unescaped version of @escaped_string,
  * or %NULL on error. The returned string should be freed when no longer
@@ -2607,14 +2607,14 @@ xuri_get_flags (xuri_t *uri)
  *
  * Since: 2.16
  **/
-xchar_t *
-xuri_unescape_segment (const xchar_t *escaped_string,
-                        const xchar_t *escaped_string_end,
-                        const xchar_t *illegal_characters)
+gchar *
+g_uri_unescape_segment (const gchar *escaped_string,
+                        const gchar *escaped_string_end,
+                        const gchar *illegal_characters)
 {
-  xchar_t *unescaped;
-  xsize_t length;
-  xssize_t decoded_len;
+  gchar *unescaped;
+  gsize length;
+  gssize decoded_len;
 
   if (!escaped_string)
     return NULL;
@@ -2628,7 +2628,7 @@ xuri_unescape_segment (const xchar_t *escaped_string,
                              illegal_characters,
                              escaped_string, length,
                              FALSE, FALSE,
-                             XURI_FLAGS_ENCODED,
+                             G_URI_FLAGS_ENCODED,
                              0, NULL);
   if (decoded_len < 0)
     return NULL;
@@ -2643,7 +2643,7 @@ xuri_unescape_segment (const xchar_t *escaped_string,
 }
 
 /**
- * xuri_unescape_string:
+ * g_uri_unescape_string:
  * @escaped_string: an escaped string to be unescaped.
  * @illegal_characters: (nullable): a string of illegal characters
  *   not to be allowed, or %NULL.
@@ -2661,15 +2661,15 @@ xuri_unescape_segment (const xchar_t *escaped_string,
  *
  * Since: 2.16
  **/
-xchar_t *
-xuri_unescape_string (const xchar_t *escaped_string,
-                       const xchar_t *illegal_characters)
+gchar *
+g_uri_unescape_string (const gchar *escaped_string,
+                       const gchar *illegal_characters)
 {
-  return xuri_unescape_segment (escaped_string, NULL, illegal_characters);
+  return g_uri_unescape_segment (escaped_string, NULL, illegal_characters);
 }
 
 /**
- * xuri_escape_string:
+ * g_uri_escape_string:
  * @unescaped: the unescaped input string.
  * @reserved_chars_allowed: (nullable): a string of reserved
  *   characters that are allowed to be used, or %NULL.
@@ -2689,34 +2689,34 @@ xuri_unescape_string (const xchar_t *escaped_string,
  *
  * Since: 2.16
  **/
-xchar_t *
-xuri_escape_string (const xchar_t *unescaped,
-                     const xchar_t *reserved_chars_allowed,
-                     xboolean_t     allow_utf8)
+gchar *
+g_uri_escape_string (const gchar *unescaped,
+                     const gchar *reserved_chars_allowed,
+                     gboolean     allow_utf8)
 {
-  xstring_t *s;
+  GString *s;
 
-  xreturn_val_if_fail (unescaped != NULL, NULL);
+  g_return_val_if_fail (unescaped != NULL, NULL);
 
-  s = xstring_sized_new (strlen (unescaped) * 1.25);
+  s = g_string_sized_new (strlen (unescaped) * 1.25);
 
-  xstring_append_uri_escaped (s, unescaped, reserved_chars_allowed, allow_utf8);
+  g_string_append_uri_escaped (s, unescaped, reserved_chars_allowed, allow_utf8);
 
-  return xstring_free (s, FALSE);
+  return g_string_free (s, FALSE);
 }
 
 /**
- * xuri_unescape_bytes:
+ * g_uri_unescape_bytes:
  * @escaped_string: A URI-escaped string
  * @length: the length (in bytes) of @escaped_string to escape, or `-1` if it
  *   is nul-terminated.
  * @illegal_characters: (nullable): a string of illegal characters
  *   not to be allowed, or %NULL.
- * @error: #xerror_t for error reporting, or %NULL to ignore.
+ * @error: #GError for error reporting, or %NULL to ignore.
  *
  * Unescapes a segment of an escaped string as binary data.
  *
- * Note that in contrast to xuri_unescape_string(), this does allow
+ * Note that in contrast to g_uri_unescape_string(), this does allow
  * nul bytes to appear in the output.
  *
  * If any of the characters in @illegal_characters appears as an escaped
@@ -2726,22 +2726,22 @@ xuri_escape_string (const xchar_t *unescaped,
  * handling.
  *
  * Returns: (transfer full): an unescaped version of @escaped_string
- *     or %NULL on error (if decoding failed, using %XURI_ERROR_FAILED error
- *     code). The returned #xbytes_t should be unreffed when no longer needed.
+ *     or %NULL on error (if decoding failed, using %G_URI_ERROR_FAILED error
+ *     code). The returned #GBytes should be unreffed when no longer needed.
  *
  * Since: 2.66
  **/
-xbytes_t *
-xuri_unescape_bytes (const xchar_t *escaped_string,
-                      xssize_t       length,
+GBytes *
+g_uri_unescape_bytes (const gchar *escaped_string,
+                      gssize       length,
                       const char *illegal_characters,
-                      xerror_t     **error)
+                      GError     **error)
 {
-  xchar_t *buf;
-  xssize_t unescaped_length;
+  gchar *buf;
+  gssize unescaped_length;
 
-  xreturn_val_if_fail (escaped_string != NULL, NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (escaped_string != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (length == -1)
     length = strlen (escaped_string);
@@ -2751,16 +2751,16 @@ xuri_unescape_bytes (const xchar_t *escaped_string,
                                   escaped_string, length,
                                   FALSE,
                                   FALSE,
-                                  XURI_FLAGS_ENCODED,
-                                  XURI_ERROR_FAILED, error);
+                                  G_URI_FLAGS_ENCODED,
+                                  G_URI_ERROR_FAILED, error);
   if (unescaped_length == -1)
     return NULL;
 
-  return xbytes_new_take (buf, unescaped_length);
+  return g_bytes_new_take (buf, unescaped_length);
 }
 
 /**
- * xuri_escape_bytes:
+ * g_uri_escape_bytes:
  * @unescaped: (array length=length): the unescaped input data.
  * @length: the length of @unescaped
  * @reserved_chars_allowed: (nullable): a string of reserved
@@ -2783,27 +2783,27 @@ xuri_unescape_bytes (const xchar_t *escaped_string,
  *
  * Since: 2.66
  */
-xchar_t *
-xuri_escape_bytes (const xuint8_t *unescaped,
-                    xsize_t         length,
-                    const xchar_t  *reserved_chars_allowed)
+gchar *
+g_uri_escape_bytes (const guint8 *unescaped,
+                    gsize         length,
+                    const gchar  *reserved_chars_allowed)
 {
-  xstring_t *string;
+  GString *string;
 
-  xreturn_val_if_fail (unescaped != NULL, NULL);
+  g_return_val_if_fail (unescaped != NULL, NULL);
 
-  string = xstring_sized_new (length * 1.25);
+  string = g_string_sized_new (length * 1.25);
 
   _uri_encoder (string, unescaped, length,
                reserved_chars_allowed, FALSE);
 
-  return xstring_free (string, FALSE);
+  return g_string_free (string, FALSE);
 }
 
-static xssize_t
-xuri_scheme_length (const xchar_t *uri)
+static gssize
+g_uri_scheme_length (const gchar *uri)
 {
-  const xchar_t *p;
+  const gchar *p;
 
   p = uri;
   if (!g_ascii_isalpha (*p))
@@ -2819,7 +2819,7 @@ xuri_scheme_length (const xchar_t *uri)
 }
 
 /**
- * xuri_parse_scheme:
+ * g_uri_parse_scheme:
  * @uri: a valid URI.
  *
  * Gets the scheme portion of a URI string.
@@ -2835,19 +2835,19 @@ xuri_scheme_length (const xchar_t *uri)
  *
  * Since: 2.16
  **/
-xchar_t *
-xuri_parse_scheme (const xchar_t *uri)
+gchar *
+g_uri_parse_scheme (const gchar *uri)
 {
-  xssize_t len;
+  gssize len;
 
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
-  len = xuri_scheme_length (uri);
-  return len == -1 ? NULL : xstrndup (uri, len);
+  len = g_uri_scheme_length (uri);
+  return len == -1 ? NULL : g_strndup (uri, len);
 }
 
 /**
- * xuri_peek_scheme:
+ * g_uri_peek_scheme:
  * @uri: a valid URI.
  *
  * Gets the scheme portion of a URI string.
@@ -2858,7 +2858,7 @@ xuri_parse_scheme (const xchar_t *uri)
  * ]|
  * Common schemes include `file`, `https`, `svn+ssh`, etc.
  *
- * Unlike xuri_parse_scheme(), the returned scheme is normalized to
+ * Unlike g_uri_parse_scheme(), the returned scheme is normalized to
  * all-lowercase and does not need to be freed.
  *
  * Returns: (transfer none) (nullable): The ‘scheme’ component of the URI, or
@@ -2867,16 +2867,16 @@ xuri_parse_scheme (const xchar_t *uri)
  *
  * Since: 2.66
  **/
-const xchar_t *
-xuri_peek_scheme (const xchar_t *uri)
+const gchar *
+g_uri_peek_scheme (const gchar *uri)
 {
-  xssize_t len;
-  xchar_t *lower_scheme;
-  const xchar_t *scheme;
+  gssize len;
+  gchar *lower_scheme;
+  const gchar *scheme;
 
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
-  len = xuri_scheme_length (uri);
+  len = g_uri_scheme_length (uri);
   if (len == -1)
     return NULL;
 
@@ -2887,4 +2887,4 @@ xuri_peek_scheme (const xchar_t *uri)
   return scheme;
 }
 
-G_DEFINE_QUARK (g-uri-quark, xuri_error)
+G_DEFINE_QUARK (g-uri-quark, g_uri_error)

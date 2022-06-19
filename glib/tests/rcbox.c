@@ -24,7 +24,7 @@ typedef struct {
 
 static Point *global_point;
 
-/* test_rcbox_new: test_t g_rc_box_new() */
+/* test_rcbox_new: Test g_rc_box_new() */
 static void
 test_rcbox_new (void)
 {
@@ -43,7 +43,7 @@ test_rcbox_new (void)
   g_rc_box_release (a);
 }
 
-/* test_atomic_rcbox_new: test_t g_atomic_rc_box_new() */
+/* test_atomic_rcbox_new: Test g_atomic_rc_box_new() */
 static void
 test_atomic_rcbox_new (void)
 {
@@ -91,11 +91,11 @@ test_rcbox_release_full (void)
 
   g_assert_true (g_rc_box_acquire (p) == p);
 
-  g_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
+  g_rc_box_release_full (p, (GDestroyNotify) point_clear);
   g_assert_nonnull (global_point);
   g_assert_true (p == global_point);
 
-  g_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
+  g_rc_box_release_full (p, (GDestroyNotify) point_clear);
   g_assert_null (global_point);
 }
 
@@ -115,11 +115,11 @@ test_atomic_rcbox_release_full (void)
 
   g_assert_true (g_atomic_rc_box_acquire (p) == p);
 
-  g_atomic_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
+  g_atomic_rc_box_release_full (p, (GDestroyNotify) point_clear);
   g_assert_nonnull (global_point);
   g_assert_true (p == global_point);
 
-  g_atomic_rc_box_release_full (p, (xdestroy_notify_t) point_clear);
+  g_atomic_rc_box_release_full (p, (GDestroyNotify) point_clear);
   g_assert_null (global_point);
 }
 
@@ -174,11 +174,11 @@ test_rcbox_dup (void)
   g_assert_cmpfloat (a->x, !=, b->x);
   g_assert_cmpfloat (a->y, !=, b->y);
 
-  g_rc_box_release_full (a, (xdestroy_notify_t) point_clear_dup_a);
+  g_rc_box_release_full (a, (GDestroyNotify) point_clear_dup_a);
   g_assert_null (global_point_a);
   g_assert_nonnull (global_point_b);
 
-  g_rc_box_release_full (b, (xdestroy_notify_t) point_clear_dup_b);
+  g_rc_box_release_full (b, (GDestroyNotify) point_clear_dup_b);
   g_assert_null (global_point_b);
 }
 
@@ -212,11 +212,11 @@ test_atomic_rcbox_dup (void)
   g_assert_cmpfloat (a->x, !=, b->x);
   g_assert_cmpfloat (a->y, !=, b->y);
 
-  g_atomic_rc_box_release_full (a, (xdestroy_notify_t) point_clear_dup_a);
+  g_atomic_rc_box_release_full (a, (GDestroyNotify) point_clear_dup_a);
   g_assert_null (global_point_a);
   g_assert_nonnull (global_point_b);
 
-  g_atomic_rc_box_release_full (b, (xdestroy_notify_t) point_clear_dup_b);
+  g_atomic_rc_box_release_full (b, (GDestroyNotify) point_clear_dup_b);
   g_assert_null (global_point_b);
 }
 
@@ -224,28 +224,28 @@ test_atomic_rcbox_dup (void)
  * alignment requirement, is `2 * sizeof(void*)`; GLib only really
  * supports void* sized 8 or 4 (see the comment in gatomic.h)
  */
-#if XPL_SIZEOF_VOID_P == 8
-static const xsize_t rcbox_alignment = 16;
+#if GLIB_SIZEOF_VOID_P == 8
+static const gsize rcbox_alignment = 16;
 #else
-static const xsize_t rcbox_alignment = 8;
+static const gsize rcbox_alignment = 8;
 #endif
 
 /* verify that the refcounted allocation is properly aligned */
 static void
 test_rcbox_alignment (void)
 {
-  const xsize_t block_sizes[] = {
+  const gsize block_sizes[] = {
     1,
     2,
     4,
     sizeof (gint32) * 3,
   };
 
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (block_sizes); i++)
     {
-      xpointer_t p = g_rc_box_alloc0 (block_sizes[i]);
+      gpointer p = g_rc_box_alloc0 (block_sizes[i]);
 
       g_assert_nonnull (p);
       g_assert_true (((guintptr) p & (rcbox_alignment - 1)) == 0);
@@ -258,18 +258,18 @@ test_rcbox_alignment (void)
 static void
 test_atomic_rcbox_alignment (void)
 {
-  const xsize_t block_sizes[] = {
+  const gsize block_sizes[] = {
     1,
     2,
     4,
     sizeof (gint32) * 3,
   };
 
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (block_sizes); i++)
     {
-      xpointer_t p = g_atomic_rc_box_alloc0 (block_sizes[i]);
+      gpointer p = g_atomic_rc_box_alloc0 (block_sizes[i]);
 
       g_assert_nonnull (p);
       g_assert_true (((guintptr) p & (rcbox_alignment - 1)) == 0);

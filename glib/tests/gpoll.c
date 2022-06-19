@@ -32,28 +32,28 @@ init_networking (void)
   WSADATA wsadata;
 
   if (WSAStartup (MAKEWORD (2, 0), &wsadata) != 0)
-    xerror ("Windows Sockets could not be initialized");
+    g_error ("Windows Sockets could not be initialized");
 }
 
 static void
 prepare_fds (SOCKET  sockets[],
-             xpollfd_t fds[],
+             GPollFD fds[],
              int     num_pollees)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < num_pollees; i++)
     {
       fds[i].fd = (gintptr) WSACreateEvent ();
-      xassert (WSAEventSelect (sockets[i], (HANDLE) fds[i].fd, FD_READ | FD_CLOSE) == 0);
+      g_assert (WSAEventSelect (sockets[i], (HANDLE) fds[i].fd, FD_READ | FD_CLOSE) == 0);
     }
 }
 
 static void
-reset_fds (xpollfd_t fds[],
+reset_fds (GPollFD fds[],
            int     num_pollees)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < num_pollees; i++)
     {
@@ -64,7 +64,7 @@ reset_fds (xpollfd_t fds[],
 }
 
 static void
-reset_fds_msg (xpollfd_t fds[],
+reset_fds_msg (GPollFD fds[],
                int     num_pollfds)
 {
   fds[num_pollfds - 1].fd = G_WIN32_MSG_HANDLE;
@@ -74,17 +74,17 @@ reset_fds_msg (xpollfd_t fds[],
 
 static void
 check_fds (SOCKET  sockets[],
-           xpollfd_t fds[],
+           GPollFD fds[],
            int     num_pollees)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < num_pollees; i++)
     {
       if (fds[i].revents != 0)
         {
           WSANETWORKEVENTS events;
-          xassert (WSAEnumNetworkEvents (sockets[i], 0, &events) == 0);
+          g_assert (WSAEnumNetworkEvents (sockets[i], 0, &events) == 0);
 
           fds[i].revents = 0;
           if (events.lNetworkEvents & (FD_READ | FD_ACCEPT))
@@ -114,10 +114,10 @@ check_fds (SOCKET  sockets[],
 static void
 prepare_sockets (SOCKET  sockets[],
                  SOCKET  opp_sockets[],
-                 xpollfd_t fds[],
+                 GPollFD fds[],
                  int     num_pollees)
 {
-  xint_t i;
+  gint i;
   SOCKET server;
   struct sockaddr_in sa;
   unsigned long ul = 1;
@@ -125,7 +125,7 @@ prepare_sockets (SOCKET  sockets[],
   int r;
 
   server = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  xassert (server != INVALID_SOCKET);
+  g_assert (server != INVALID_SOCKET);
 
   memset(&sa, 0, sizeof sa);
 
@@ -134,22 +134,22 @@ prepare_sockets (SOCKET  sockets[],
   sa.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
   sa_size = sizeof (sa);
 
-  xassert (bind (server, (const struct sockaddr *) &sa, sa_size) == 0);
-  xassert (getsockname (server, (struct sockaddr *) &sa, &sa_size) == 0);
-  xassert (listen (server, 1) == 0);
+  g_assert (bind (server, (const struct sockaddr *) &sa, sa_size) == 0);
+  g_assert (getsockname (server, (struct sockaddr *) &sa, &sa_size) == 0);
+  g_assert (listen (server, 1) == 0);
 
   for (i = 0; i < num_pollees; i++)
     {
       opp_sockets[i] = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-      xassert (opp_sockets[i] != INVALID_SOCKET);
-      xassert (ioctlsocket (opp_sockets[i], FIONBIO, &ul) == 0);
+      g_assert (opp_sockets[i] != INVALID_SOCKET);
+      g_assert (ioctlsocket (opp_sockets[i], FIONBIO, &ul) == 0);
 
       r = connect (opp_sockets[i], (const struct sockaddr *) &sa, sizeof (sa));
-      xassert (ASYNC_CONNECT_OK (r));
+      g_assert (ASYNC_CONNECT_OK (r));
 
       sockets[i] = accept (server, NULL, NULL);
-      xassert (sockets[i] != INVALID_SOCKET);
-      xassert (ioctlsocket (sockets[i], FIONBIO, &ul) == 0);
+      g_assert (sockets[i] != INVALID_SOCKET);
+      g_assert (ioctlsocket (sockets[i], FIONBIO, &ul) == 0);
     }
 
   closesocket (server);
@@ -160,7 +160,7 @@ cleanup_sockets (SOCKET sockets[],
                  SOCKET opp_sockets[],
                  int    num_pollees)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < num_pollees; i++)
     {
@@ -170,12 +170,12 @@ cleanup_sockets (SOCKET sockets[],
 }
 
 static void
-bucketize (sint64_t val,
-           xint_t   buckets[],
-           sint64_t bucket_limits[],
-           xint_t   count)
+bucketize (gint64 val,
+           gint   buckets[],
+           gint64 bucket_limits[],
+           gint   count)
 {
-  xint_t i;
+  gint i;
 
   if (val > bucket_limits[count - 1])
     {
@@ -194,11 +194,11 @@ bucketize (sint64_t val,
 }
 
 static void
-print_buckets (xint_t   buckets[],
-               sint64_t bucket_limits[],
-               xint_t   count)
+print_buckets (gint   buckets[],
+               gint64 bucket_limits[],
+               gint   count)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < count; i++)
     if (i < count - 1)
@@ -210,9 +210,9 @@ print_buckets (xint_t   buckets[],
 
   for (i = 0; i < count; i++)
     {
-      xint_t len;
-      xint_t padding;
-      xint_t j;
+      gint len;
+      gint padding;
+      gint j;
       if (buckets[i] < 10)
         len = 1;
       else if (buckets[i] < 100)
@@ -240,15 +240,15 @@ static void
 test_gpoll (void)
 {
   SOCKET sockets[NUM_POLLEES];
-  xpollfd_t fds[NUM_POLLFDS];
+  GPollFD fds[NUM_POLLFDS];
   SOCKET opp_sockets[NUM_POLLEES];
-  xint_t i;
-  xint_t activatable;
-  sint64_t times[REPEAT][2];
+  gint i;
+  gint activatable;
+  gint64 times[REPEAT][2];
 #define BUCKET_COUNT 25
-  sint64_t bucket_limits[BUCKET_COUNT] = {3, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120, 150, 180, 220, 280, 350, 450, 600, 800, 1000};
-  xint_t   buckets[BUCKET_COUNT];
-  sint64_t times_avg = 0, times_min = G_MAXINT64, times_max = 0;
+  gint64 bucket_limits[BUCKET_COUNT] = {3, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100, 120, 150, 180, 220, 280, 350, 450, 600, 800, 1000};
+  gint   buckets[BUCKET_COUNT];
+  gint64 times_avg = 0, times_min = G_MAXINT64, times_max = 0;
 
   prepare_sockets (sockets, opp_sockets, fds, NUM_POLLEES);
   prepare_fds (sockets, fds, NUM_POLLEES);
@@ -256,19 +256,19 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r;
-      sint64_t diff;
+      gint r;
+      gint64 diff;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       times[i][0] = g_get_monotonic_time ();
       r = g_poll (fds, NUM_POLLFDS, 0);
       times[i][1] = g_get_monotonic_time ();
-      xassert (r == 0);
+      g_assert (r == 0);
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
         times_min = diff;
@@ -285,21 +285,21 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   activatable = 0;
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r, s, v, t;
-      sint64_t diff;
+      gint r, s, v, t;
+      gint64 diff;
       MSG msg;
-      xboolean_t found_app;
+      gboolean found_app;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       s = send (opp_sockets[activatable], (const char *) &t, 1, 0);
-      xassert (PostMessage (NULL, WM_APP, 1, 2));
+      g_assert (PostMessage (NULL, WM_APP, 1, 2));
       /* This is to ensure that all sockets catch up, otherwise some might not poll active */
       g_usleep (G_USEC_PER_SEC / 1000);
 
@@ -313,16 +313,16 @@ test_gpoll (void)
       while (!found_app && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
         if (msg.message == WM_APP && msg.wParam == 1 && msg.lParam == 2)
           found_app = TRUE;
-      xassert (s == 1);
-      xassert (r == 2);
-      xassert (v == 1);
-      xassert (found_app);
+      g_assert (s == 1);
+      g_assert (r == 2);
+      g_assert (v == 1);
+      g_assert (found_app);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      xassert (r == 0);
+      g_assert (r == 0);
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
         times_min = diff;
@@ -340,14 +340,14 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   activatable = 0;
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r, s, v, t;
-      sint64_t diff;
+      gint r, s, v, t;
+      gint64 diff;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -361,15 +361,15 @@ test_gpoll (void)
 
       check_fds (sockets, fds, NUM_POLLEES);
       v = recv (sockets[activatable], (char *) &t, 1, 0);
-      xassert (s == 1);
-      xassert (r == 1);
-      xassert (v == 1);
+      g_assert (s == 1);
+      g_assert (r == 1);
+      g_assert (v == 1);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      xassert (r == 0);
+      g_assert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -388,13 +388,13 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r, s, v, t;
-      sint64_t diff;
-      xint_t j;
+      gint r, s, v, t;
+      gint64 diff;
+      gint j;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -411,15 +411,15 @@ test_gpoll (void)
       check_fds (sockets, fds, NUM_POLLEES);
       for (j = 0; j < NUM_POLLEES / 2; j++)
         v += recv (sockets[j], (char *) &t, 1, 0) == 1 ? 1 : 0;
-      xassert (s == NUM_POLLEES / 2);
-      xassert (r == NUM_POLLEES / 2);
-      xassert (v == NUM_POLLEES / 2);
+      g_assert (s == NUM_POLLEES / 2);
+      g_assert (r == NUM_POLLEES / 2);
+      g_assert (v == NUM_POLLEES / 2);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      xassert (r == 0);
+      g_assert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -437,15 +437,15 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r, s, v, t;
-      sint64_t diff;
-      xint_t j;
+      gint r, s, v, t;
+      gint64 diff;
+      gint j;
       MSG msg;
-      xboolean_t found_app;
+      gboolean found_app;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -453,7 +453,7 @@ test_gpoll (void)
 
       for (j = 0; j < NUM_POLLEES / 2; j++)
         s += send (opp_sockets[j], (const char *) &t, 1, 0) == 1 ? 1 : 0;
-      xassert (PostMessage (NULL, WM_APP, 1, 2));
+      g_assert (PostMessage (NULL, WM_APP, 1, 2));
 
       /* This is to ensure that all sockets catch up, otherwise some might not poll active */
       g_usleep (G_USEC_PER_SEC / 1000);
@@ -468,16 +468,16 @@ test_gpoll (void)
       while (!found_app && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
         if (msg.message == WM_APP && msg.wParam == 1 && msg.lParam == 2)
           found_app = TRUE;
-      xassert (s == NUM_POLLEES / 2);
-      xassert (r == NUM_POLLEES / 2 + 1);
-      xassert (v == NUM_POLLEES / 2);
-      xassert (found_app);
+      g_assert (s == NUM_POLLEES / 2);
+      g_assert (r == NUM_POLLEES / 2 + 1);
+      g_assert (v == NUM_POLLEES / 2);
+      g_assert (found_app);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      xassert (r == 0);
+      g_assert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -495,13 +495,13 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r, s, v, t;
-      sint64_t diff;
-      xint_t j;
+      gint r, s, v, t;
+      gint64 diff;
+      gint j;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -518,15 +518,15 @@ test_gpoll (void)
       check_fds (sockets, fds, NUM_POLLEES);
       for (j = 0; j < NUM_POLLEES; j++)
         v += recv (sockets[j], (char *) &t, 1, 0) == 1 ? 1 : 0;
-      xassert (s == NUM_POLLEES);
-      xassert (r == NUM_POLLEES);
-      xassert (v == NUM_POLLEES);
+      g_assert (s == NUM_POLLEES);
+      g_assert (r == NUM_POLLEES);
+      g_assert (v == NUM_POLLEES);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      xassert (r == 0);
+      g_assert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -545,15 +545,15 @@ test_gpoll (void)
   times_avg = 0;
   times_min = G_MAXINT64;
   times_max = 0;
-  memset (buckets, 0, sizeof (xint_t) * BUCKET_COUNT);
+  memset (buckets, 0, sizeof (gint) * BUCKET_COUNT);
 
   for (i = 0; i < REPEAT; i++)
     {
-      xint_t r, s, v, t;
-      sint64_t diff;
-      xint_t j;
+      gint r, s, v, t;
+      gint64 diff;
+      gint j;
       MSG msg;
-      xboolean_t found_app;
+      gboolean found_app;
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
@@ -561,7 +561,7 @@ test_gpoll (void)
 
       for (j = 0; j < activatable; j++)
         s += send (opp_sockets[j], (const char *) &t, 1, 0) == 1 ? 1 : 0;
-      xassert (PostMessage (NULL, WM_APP, 1, 2));
+      g_assert (PostMessage (NULL, WM_APP, 1, 2));
 
       g_usleep (G_USEC_PER_SEC / 1000);
 
@@ -575,16 +575,16 @@ test_gpoll (void)
       while (!found_app && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
         if (msg.message == WM_APP && msg.wParam == 1 && msg.lParam == 2)
           found_app = TRUE;
-      xassert (s == activatable);
-      xassert (r == activatable + 1);
-      xassert (v == activatable);
-      xassert (found_app);
+      g_assert (s == activatable);
+      g_assert (r == activatable + 1);
+      g_assert (v == activatable);
+      g_assert (found_app);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      xassert (r == 0);
+      g_assert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -608,17 +608,17 @@ main (int   argc,
       char *argv[])
 {
   int result;
-  xmain_context_t *ctx;
+  GMainContext *ctx;
 
   g_test_init (&argc, &argv, NULL);
   init_networking ();
-  ctx = xmain_context_new ();
+  ctx = g_main_context_new ();
 
   g_test_add_func ("/gpoll/gpoll", test_gpoll);
 
   result = g_test_run ();
 
-  xmain_context_unref (ctx);
+  g_main_context_unref (ctx);
 
   return result;
 }

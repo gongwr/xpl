@@ -29,66 +29,66 @@
 G_BEGIN_DECLS
 
 
-#define XTYPE_ACTION_MAP                                   (xaction_map_get_type ())
-#define G_ACTION_MAP(inst)                                  (XTYPE_CHECK_INSTANCE_CAST ((inst),                      \
-                                                             XTYPE_ACTION_MAP, xaction_map_t))
-#define X_IS_ACTION_MAP(inst)                               (XTYPE_CHECK_INSTANCE_TYPE ((inst),                      \
-                                                             XTYPE_ACTION_MAP))
-#define G_ACTION_MAP_GET_IFACE(inst)                        (XTYPE_INSTANCE_GET_INTERFACE ((inst),                   \
-                                                             XTYPE_ACTION_MAP, xaction_map_interface_t))
+#define G_TYPE_ACTION_MAP                                   (g_action_map_get_type ())
+#define G_ACTION_MAP(inst)                                  (G_TYPE_CHECK_INSTANCE_CAST ((inst),                      \
+                                                             G_TYPE_ACTION_MAP, GActionMap))
+#define G_IS_ACTION_MAP(inst)                               (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                      \
+                                                             G_TYPE_ACTION_MAP))
+#define G_ACTION_MAP_GET_IFACE(inst)                        (G_TYPE_INSTANCE_GET_INTERFACE ((inst),                   \
+                                                             G_TYPE_ACTION_MAP, GActionMapInterface))
 
-typedef struct _xaction_map_interface                         xaction_map_interface_t;
-typedef struct _xaction_entry                                xaction_entry_t;
+typedef struct _GActionMapInterface                         GActionMapInterface;
+typedef struct _GActionEntry                                GActionEntry;
 
-struct _xaction_map_interface
+struct _GActionMapInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
-  xaction_t * (* lookup_action) (xaction_map_t  *action_map,
-                               const xchar_t *action_name);
-  void      (* add_action)    (xaction_map_t  *action_map,
-                               xaction_t     *action);
-  void      (* remove_action) (xaction_map_t  *action_map,
-                               const xchar_t *action_name);
+  GAction * (* lookup_action) (GActionMap  *action_map,
+                               const gchar *action_name);
+  void      (* add_action)    (GActionMap  *action_map,
+                               GAction     *action);
+  void      (* remove_action) (GActionMap  *action_map,
+                               const gchar *action_name);
 };
 
-struct _xaction_entry
+struct _GActionEntry
 {
-  const xchar_t *name;
+  const gchar *name;
 
-  void (* activate) (xsimple_action_t *action,
-                     xvariant_t      *parameter,
-                     xpointer_t       user_data);
+  void (* activate) (GSimpleAction *action,
+                     GVariant      *parameter,
+                     gpointer       user_data);
 
-  const xchar_t *parameter_type;
+  const gchar *parameter_type;
 
-  const xchar_t *state;
+  const gchar *state;
 
-  void (* change_state) (xsimple_action_t *action,
-                         xvariant_t      *value,
-                         xpointer_t       user_data);
+  void (* change_state) (GSimpleAction *action,
+                         GVariant      *value,
+                         gpointer       user_data);
 
   /*< private >*/
-  xsize_t padding[3];
+  gsize padding[3];
 };
 
-XPL_AVAILABLE_IN_2_32
-xtype_t                   xaction_map_get_type                           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_32
+GType                   g_action_map_get_type                           (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_32
-xaction_t *               xaction_map_lookup_action                      (xaction_map_t         *action_map,
-                                                                         const xchar_t        *action_name);
-XPL_AVAILABLE_IN_2_32
-void                    xaction_map_add_action                         (xaction_map_t         *action_map,
-                                                                         xaction_t            *action);
-XPL_AVAILABLE_IN_2_32
-void                    xaction_map_remove_action                      (xaction_map_t         *action_map,
-                                                                         const xchar_t        *action_name);
-XPL_AVAILABLE_IN_2_32
-void                    xaction_map_add_action_entries                 (xaction_map_t         *action_map,
-                                                                         const xaction_entry_t *entries,
-                                                                         xint_t                n_entries,
-                                                                         xpointer_t            user_data);
+GLIB_AVAILABLE_IN_2_32
+GAction *               g_action_map_lookup_action                      (GActionMap         *action_map,
+                                                                         const gchar        *action_name);
+GLIB_AVAILABLE_IN_2_32
+void                    g_action_map_add_action                         (GActionMap         *action_map,
+                                                                         GAction            *action);
+GLIB_AVAILABLE_IN_2_32
+void                    g_action_map_remove_action                      (GActionMap         *action_map,
+                                                                         const gchar        *action_name);
+GLIB_AVAILABLE_IN_2_32
+void                    g_action_map_add_action_entries                 (GActionMap         *action_map,
+                                                                         const GActionEntry *entries,
+                                                                         gint                n_entries,
+                                                                         gpointer            user_data);
 
 G_END_DECLS
 

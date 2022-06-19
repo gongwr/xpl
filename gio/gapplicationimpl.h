@@ -4,41 +4,41 @@ typedef struct _GApplicationImpl GApplicationImpl;
 
 typedef struct
 {
-  xchar_t *name;
+  gchar *name;
 
-  xvariant_type_t *parameter_type;
-  xboolean_t      enabled;
-  xvariant_t     *state;
-} remote_action_info_t;
+  GVariantType *parameter_type;
+  gboolean      enabled;
+  GVariant     *state;
+} RemoteActionInfo;
 
-void                    xapplication_impl_destroy                      (GApplicationImpl   *impl);
+void                    g_application_impl_destroy                      (GApplicationImpl   *impl);
 
-GApplicationImpl *      xapplication_impl_register                     (xapplication_t        *application,
-                                                                         const xchar_t         *appid,
+GApplicationImpl *      g_application_impl_register                     (GApplication        *application,
+                                                                         const gchar         *appid,
                                                                          GApplicationFlags    flags,
-                                                                         xaction_group_t        *exported_actions,
-                                                                         xremote_action_group_t **remote_actions,
-                                                                         xcancellable_t        *cancellable,
-                                                                         xerror_t             **error);
+                                                                         GActionGroup        *exported_actions,
+                                                                         GRemoteActionGroup **remote_actions,
+                                                                         GCancellable        *cancellable,
+                                                                         GError             **error);
 
-void                    xapplication_impl_activate                     (GApplicationImpl   *impl,
-                                                                         xvariant_t           *platform_data);
+void                    g_application_impl_activate                     (GApplicationImpl   *impl,
+                                                                         GVariant           *platform_data);
 
-void                    xapplication_impl_open                         (GApplicationImpl   *impl,
-                                                                         xfile_t             **files,
-                                                                         xint_t                n_files,
-                                                                         const xchar_t        *hint,
-                                                                         xvariant_t           *platform_data);
+void                    g_application_impl_open                         (GApplicationImpl   *impl,
+                                                                         GFile             **files,
+                                                                         gint                n_files,
+                                                                         const gchar        *hint,
+                                                                         GVariant           *platform_data);
 
-int                     xapplication_impl_command_line                 (GApplicationImpl   *impl,
-                                                                         const xchar_t *const *arguments,
-                                                                         xvariant_t           *platform_data);
+int                     g_application_impl_command_line                 (GApplicationImpl   *impl,
+                                                                         const gchar *const *arguments,
+                                                                         GVariant           *platform_data);
 
-void                    xapplication_impl_flush                        (GApplicationImpl   *impl);
+void                    g_application_impl_flush                        (GApplicationImpl   *impl);
 
-xdbus_connection_t *       xapplication_impl_get_dbus_connection          (GApplicationImpl   *impl);
+GDBusConnection *       g_application_impl_get_dbus_connection          (GApplicationImpl   *impl);
 
-const xchar_t *           xapplication_impl_get_dbus_object_path         (GApplicationImpl   *impl);
+const gchar *           g_application_impl_get_dbus_object_path         (GApplicationImpl   *impl);
 
-void                    xapplication_impl_set_busy_state               (GApplicationImpl   *impl,
-                                                                         xboolean_t            busy);
+void                    g_application_impl_set_busy_state               (GApplicationImpl   *impl,
+                                                                         gboolean            busy);

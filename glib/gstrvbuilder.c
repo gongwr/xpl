@@ -26,82 +26,82 @@
 
 /**
  * SECTION:gstrvbuilder
- * @title: xstrv_builder_t
+ * @title: GStrvBuilder
  * @short_description: Helper to create NULL-terminated string arrays.
  *
- * #xstrv_builder_t is a method of easily building dynamically sized
+ * #GStrvBuilder is a method of easily building dynamically sized
  * NULL-terminated string arrays.
  *
  * The following example shows how to build a two element array:
  *
  * |[<!-- language="C" -->
- *   x_autoptr(xstrv_builder) builder = xstrv_builder_new ();
- *   xstrv_builder_add (builder, "hello");
- *   xstrv_builder_add (builder, "world");
- *   x_auto(xstrv) array = xstrv_builder_end (builder);
+ *   g_autoptr(GStrvBuilder) builder = g_strv_builder_new ();
+ *   g_strv_builder_add (builder, "hello");
+ *   g_strv_builder_add (builder, "world");
+ *   g_auto(GStrv) array = g_strv_builder_end (builder);
  * ]|
  *
  * Since: 2.68
  */
 
-struct _xstrv_builder
+struct _GStrvBuilder
 {
-  xptr_array_t array;
+  GPtrArray array;
 };
 
 /**
- * xstrv_builder_new:
+ * g_strv_builder_new:
  *
- * Creates a new #xstrv_builder_t with a reference count of 1.
- * Use xstrv_builder_unref() on the returned value when no longer needed.
+ * Creates a new #GStrvBuilder with a reference count of 1.
+ * Use g_strv_builder_unref() on the returned value when no longer needed.
  *
- * Returns: (transfer full): the new #xstrv_builder_t
+ * Returns: (transfer full): the new #GStrvBuilder
  *
  * Since: 2.68
  */
-xstrv_builder_t *
-xstrv_builder_new (void)
+GStrvBuilder *
+g_strv_builder_new (void)
 {
-  return (xstrv_builder_t *) xptr_array_new_with_free_func (g_free);
+  return (GStrvBuilder *) g_ptr_array_new_with_free_func (g_free);
 }
 
 /**
- * xstrv_builder_unref:
- * @builder: (transfer full): a #xstrv_builder_t allocated by xstrv_builder_new()
+ * g_strv_builder_unref:
+ * @builder: (transfer full): a #GStrvBuilder allocated by g_strv_builder_new()
  *
  * Decreases the reference count on @builder.
  *
  * In the event that there are no more references, releases all memory
- * associated with the #xstrv_builder_t.
+ * associated with the #GStrvBuilder.
  *
  * Since: 2.68
  **/
 void
-xstrv_builder_unref (xstrv_builder_t *builder)
+g_strv_builder_unref (GStrvBuilder *builder)
 {
-  xptr_array_unref (&builder->array);
+  g_ptr_array_unref (&builder->array);
 }
 
 /**
- * xstrv_builder_ref:
- * @builder: (transfer none): a #xstrv_builder_t
+ * g_strv_builder_ref:
+ * @builder: (transfer none): a #GStrvBuilder
  *
  * Atomically increments the reference count of @builder by one.
  * This function is thread-safe and may be called from any thread.
  *
- * Returns: (transfer full): The passed in #xstrv_builder_t
+ * Returns: (transfer full): The passed in #GStrvBuilder
  *
  * Since: 2.68
  */
-xstrv_builder_t *
-xstrv_builder_ref (xstrv_builder_t *builder)
+GStrvBuilder *
+g_strv_builder_ref (GStrvBuilder *builder)
 {
-  return (xstrv_builder_t *) xptr_array_ref (&builder->array);
+  return (GStrvBuilder *) g_ptr_array_ref (&builder->array);
 }
 
 /**
- * xstrv_builder_add:
- * @builder: a #xstrv_builder_t
+ * g_strv_builder_add:
+ * @builder: a #GStrvBuilder
  * @value: a string.
  *
  * Add a string to the end of the array.
@@ -109,15 +109,15 @@ xstrv_builder_ref (xstrv_builder_t *builder)
  * Since 2.68
  */
 void
-xstrv_builder_add (xstrv_builder_t *builder,
+g_strv_builder_add (GStrvBuilder *builder,
                     const char   *value)
 {
-  xptr_array_add (&builder->array, xstrdup (value));
+  g_ptr_array_add (&builder->array, g_strdup (value));
 }
 
 /**
- * xstrv_builder_addv:
- * @builder: a #xstrv_builder_t
+ * g_strv_builder_addv:
+ * @builder: a #GStrvBuilder
  * @value: (array zero-terminated=1): the vector of strings to add
  *
  * Appends all the strings in the given vector to the builder.
@@ -125,19 +125,19 @@ xstrv_builder_add (xstrv_builder_t *builder,
  * Since 2.70
  */
 void
-xstrv_builder_addv (xstrv_builder_t *builder,
+g_strv_builder_addv (GStrvBuilder *builder,
                      const char **value)
 {
-  xsize_t i = 0;
+  gsize i = 0;
   g_return_if_fail (builder != NULL);
   g_return_if_fail (value != NULL);
   for (i = 0; value[i] != NULL; i++)
-    xstrv_builder_add (builder, value[i]);
+    g_strv_builder_add (builder, value[i]);
 }
 
 /**
- * xstrv_builder_add_many:
- * @builder: a #xstrv_builder_t
+ * g_strv_builder_add_many:
+ * @builder: a #GStrvBuilder
  * @...: one or more strings followed by %NULL
  *
  * Appends all the given strings to the builder.
@@ -145,34 +145,34 @@ xstrv_builder_addv (xstrv_builder_t *builder,
  * Since 2.70
  */
 void
-xstrv_builder_add_many (xstrv_builder_t *builder,
+g_strv_builder_add_many (GStrvBuilder *builder,
                          ...)
 {
   va_list var_args;
-  const xchar_t *str;
+  const gchar *str;
   g_return_if_fail (builder != NULL);
   va_start (var_args, builder);
-  while ((str = va_arg (var_args, xchar_t *)) != NULL)
-    xstrv_builder_add (builder, str);
+  while ((str = va_arg (var_args, gchar *)) != NULL)
+    g_strv_builder_add (builder, str);
   va_end (var_args);
 }
 
 /**
- * xstrv_builder_end:
- * @builder: a #xstrv_builder_t
+ * g_strv_builder_end:
+ * @builder: a #GStrvBuilder
  *
  * Ends the builder process and returns the constructed NULL-terminated string
- * array. The returned value should be freed with xstrfreev() when no longer
+ * array. The returned value should be freed with g_strfreev() when no longer
  * needed.
  *
  * Returns: (transfer full): the constructed string array.
  *
  * Since 2.68
  */
-xstrv_t
-xstrv_builder_end (xstrv_builder_t *builder)
+GStrv
+g_strv_builder_end (GStrvBuilder *builder)
 {
   /* Add NULL terminator */
-  xptr_array_add (&builder->array, NULL);
-  return (xstrv_t) xptr_array_steal (&builder->array, NULL);
+  g_ptr_array_add (&builder->array, NULL);
+  return (GStrv) g_ptr_array_steal (&builder->array, NULL);
 }

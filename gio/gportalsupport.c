@@ -20,41 +20,41 @@
 
 #include "gportalsupport.h"
 
-static xboolean_t use_portal;
-static xboolean_t network_available;
-static xboolean_t dconf_access;
+static gboolean use_portal;
+static gboolean network_available;
+static gboolean dconf_access;
 
 static void
 read_flatpak_info (void)
 {
-  static xsize_t flatpak_info_read = 0;
-  const xchar_t *path = "/.flatpak-info";
+  static gsize flatpak_info_read = 0;
+  const gchar *path = "/.flatpak-info";
 
   if (!g_once_init_enter (&flatpak_info_read))
     return;
 
-  if (xfile_test (path, XFILE_TEST_EXISTS))
+  if (g_file_test (path, G_FILE_TEST_EXISTS))
     {
-      xkey_file_t *keyfile;
+      GKeyFile *keyfile;
 
       use_portal = TRUE;
       network_available = FALSE;
       dconf_access = FALSE;
 
-      keyfile = xkey_file_new ();
-      if (xkey_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, NULL))
+      keyfile = g_key_file_new ();
+      if (g_key_file_load_from_file (keyfile, path, G_KEY_FILE_NONE, NULL))
         {
           char **shared = NULL;
           char *dconf_policy = NULL;
 
-          shared = xkey_file_get_string_list (keyfile, "Context", "shared", NULL, NULL);
+          shared = g_key_file_get_string_list (keyfile, "Context", "shared", NULL, NULL);
           if (shared)
             {
-              network_available = xstrv_contains ((const char * const *)shared, "network");
-              xstrfreev (shared);
+              network_available = g_strv_contains ((const char * const *)shared, "network");
+              g_strfreev (shared);
             }
 
-          dconf_policy = xkey_file_get_string (keyfile, "Session Bus Policy", "ca.desrt.dconf", NULL);
+          dconf_policy = g_key_file_get_string (keyfile, "Session Bus Policy", "ca.desrt.dconf", NULL);
           if (dconf_policy)
             {
               if (strcmp (dconf_policy, "talk") == 0)
@@ -63,7 +63,7 @@ read_flatpak_info (void)
             }
         }
 
-      xkey_file_unref (keyfile);
+      g_key_file_unref (keyfile);
     }
   else
     {
@@ -79,21 +79,21 @@ read_flatpak_info (void)
   g_once_init_leave (&flatpak_info_read, 1);
 }
 
-xboolean_t
+gboolean
 glib_should_use_portal (void)
 {
   read_flatpak_info ();
   return use_portal;
 }
 
-xboolean_t
+gboolean
 glib_network_available_in_sandbox (void)
 {
   read_flatpak_info ();
   return network_available;
 }
 
-xboolean_t
+gboolean
 glib_has_dconf_access_in_sandbox (void)
 {
   read_flatpak_info ();

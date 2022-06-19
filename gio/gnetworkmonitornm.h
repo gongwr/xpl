@@ -23,13 +23,13 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_NM         (_xnetwork_monitor_nm_get_type ())
-#define G_NETWORK_MONITOR_NM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_NM, GNetworkMonitorNM))
-#define G_NETWORK_MONITOR_NM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_NM, GNetworkMonitorNMClass))
-#define X_IS_NETWORK_MONITOR_NM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_NM))
-#define X_IS_NETWORK_MONITOR_NM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_MONITOR_NM))
-#define G_NETWORK_MONITOR_NM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_NM, GNetworkMonitorNMClass))
-#define G_NETWORK_MONITOR_NM_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
+#define G_TYPE_NETWORK_MONITOR_NM         (_g_network_monitor_nm_get_type ())
+#define G_NETWORK_MONITOR_NM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_MONITOR_NM, GNetworkMonitorNM))
+#define G_NETWORK_MONITOR_NM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NETWORK_MONITOR_NM, GNetworkMonitorNMClass))
+#define G_IS_NETWORK_MONITOR_NM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_MONITOR_NM))
+#define G_IS_NETWORK_MONITOR_NM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NETWORK_MONITOR_NM))
+#define G_NETWORK_MONITOR_NM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NETWORK_MONITOR_NM, GNetworkMonitorNMClass))
+#define G_NETWORK_MONITOR_NM_GET_INITABLE_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_INITABLE, GInitable))
 
 
 typedef struct _GNetworkMonitorNM        GNetworkMonitorNM;
@@ -37,16 +37,16 @@ typedef struct _GNetworkMonitorNMClass   GNetworkMonitorNMClass;
 typedef struct _GNetworkMonitorNMPrivate GNetworkMonitorNMPrivate;
 
 struct _GNetworkMonitorNM {
-  xnetwork_monitor_netlink_t parent_instance;
+  GNetworkMonitorNetlink parent_instance;
 
   GNetworkMonitorNMPrivate *priv;
 };
 
 struct _GNetworkMonitorNMClass {
-  xnetwork_monitor_netlink_class_t parent_class;
+  GNetworkMonitorNetlinkClass parent_class;
 };
 
-xtype_t _xnetwork_monitor_nm_get_type (void);
+GType _g_network_monitor_nm_get_type (void);
 
 G_END_DECLS
 

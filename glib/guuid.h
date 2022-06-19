@@ -23,7 +23,7 @@
 #ifndef __G_UUID_H__
 #define __G_UUID_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -31,11 +31,11 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_2_52
-xboolean_t      g_uuid_string_is_valid       (const xchar_t   *str);
+GLIB_AVAILABLE_IN_2_52
+gboolean      g_uuid_string_is_valid       (const gchar   *str);
 
-XPL_AVAILABLE_IN_2_52
-xchar_t *       g_uuid_string_random         (void);
+GLIB_AVAILABLE_IN_2_52
+gchar *       g_uuid_string_random         (void);
 
 G_END_DECLS
 

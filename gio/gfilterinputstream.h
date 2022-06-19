@@ -29,15 +29,15 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILTER_INPUT_STREAM         (g_filter_input_stream_get_type ())
-#define G_FILTER_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILTER_INPUT_STREAM, xfilter_input_stream))
-#define G_FILTER_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILTER_INPUT_STREAM, GFilterInputStreamClass))
-#define X_IS_FILTER_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILTER_INPUT_STREAM))
-#define X_IS_FILTER_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILTER_INPUT_STREAM))
-#define G_FILTER_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILTER_INPUT_STREAM, GFilterInputStreamClass))
+#define G_TYPE_FILTER_INPUT_STREAM         (g_filter_input_stream_get_type ())
+#define G_FILTER_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILTER_INPUT_STREAM, GFilterInputStream))
+#define G_FILTER_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILTER_INPUT_STREAM, GFilterInputStreamClass))
+#define G_IS_FILTER_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILTER_INPUT_STREAM))
+#define G_IS_FILTER_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_FILTER_INPUT_STREAM))
+#define G_FILTER_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_FILTER_INPUT_STREAM, GFilterInputStreamClass))
 
 /**
- * xfilter_input_stream_t:
+ * GFilterInputStream:
  *
  * A base class for all input streams that work on an underlying stream.
  **/
@@ -45,15 +45,15 @@ typedef struct _GFilterInputStreamClass    GFilterInputStreamClass;
 
 struct _GFilterInputStream
 {
-  xinput_stream_t parent_instance;
+  GInputStream parent_instance;
 
   /*<protected >*/
-  xinput_stream_t *base_stream;
+  GInputStream *base_stream;
 };
 
 struct _GFilterInputStreamClass
 {
-  xinput_stream_class_t parent_class;
+  GInputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -63,15 +63,15 @@ struct _GFilterInputStreamClass
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t          g_filter_input_stream_get_type              (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t * g_filter_input_stream_get_base_stream       (xfilter_input_stream_t *stream);
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_filter_input_stream_get_close_base_stream (xfilter_input_stream_t *stream);
-XPL_AVAILABLE_IN_ALL
-void           g_filter_input_stream_set_close_base_stream (xfilter_input_stream_t *stream,
-                                                            xboolean_t            close_base);
+GLIB_AVAILABLE_IN_ALL
+GType          g_filter_input_stream_get_type              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GInputStream * g_filter_input_stream_get_base_stream       (GFilterInputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_filter_input_stream_get_close_base_stream (GFilterInputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+void           g_filter_input_stream_set_close_base_stream (GFilterInputStream *stream,
+                                                            gboolean            close_base);
 
 G_END_DECLS
 

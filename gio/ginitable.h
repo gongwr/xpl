@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XINITABLE_H__
-#define __XINITABLE_H__
+#ifndef __G_INITABLE_H__
+#define __G_INITABLE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,24 +29,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INITABLE            (xinitable_get_type ())
-#define XINITABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_INITABLE, xinitable_t))
-#define X_IS_INITABLE(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_INITABLE))
-#define XINITABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_INITABLE, xinitable_iface_t))
-#define XTYPE_IS_INITABLE(type)   (xtype_is_a ((type), XTYPE_INITABLE))
+#define G_TYPE_INITABLE            (g_initable_get_type ())
+#define G_INITABLE(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_INITABLE, GInitable))
+#define G_IS_INITABLE(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_INITABLE))
+#define G_INITABLE_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_INITABLE, GInitableIface))
+#define G_TYPE_IS_INITABLE(type)   (g_type_is_a ((type), G_TYPE_INITABLE))
 
 /**
- * xinitable_t:
+ * GInitable:
  *
  * Interface for initializable objects.
  *
  * Since: 2.22
  **/
-typedef struct _xinitable_iface xinitable_iface_t;
+typedef struct _GInitableIface GInitableIface;
 
 /**
- * xinitable_iface_t:
- * @x_iface: The parent interface.
+ * GInitableIface:
+ * @g_iface: The parent interface.
  * @init: Initializes the object.
  *
  * Provides an interface for initializing object such that initialization
@@ -54,52 +54,52 @@ typedef struct _xinitable_iface xinitable_iface_t;
  *
  * Since: 2.22
  **/
-struct _xinitable_iface
+struct _GInitableIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xboolean_t    (* init) (xinitable_t    *initable,
-			xcancellable_t *cancellable,
-			xerror_t      **error);
+  gboolean    (* init) (GInitable    *initable,
+			GCancellable *cancellable,
+			GError      **error);
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xinitable_get_type   (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_initable_get_type   (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinitable_init       (xinitable_t     *initable,
-				xcancellable_t  *cancellable,
-				xerror_t       **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_initable_init       (GInitable     *initable,
+				GCancellable  *cancellable,
+				GError       **error);
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t xinitable_new        (xtype_t          object_type,
-				xcancellable_t  *cancellable,
-				xerror_t       **error,
-				const xchar_t   *first_property_name,
+GLIB_AVAILABLE_IN_ALL
+gpointer g_initable_new        (GType          object_type,
+				GCancellable  *cancellable,
+				GError       **error,
+				const gchar   *first_property_name,
 				...);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
-XPL_DEPRECATED_IN_2_54_FOR(xobject_new_with_properties and xinitable_init)
-xpointer_t xinitable_newv       (xtype_t          object_type,
-				xuint_t          n_parameters,
+GLIB_DEPRECATED_IN_2_54_FOR(g_object_new_with_properties and g_initable_init)
+gpointer g_initable_newv       (GType          object_type,
+				guint          n_parameters,
 				GParameter    *parameters,
-				xcancellable_t  *cancellable,
-				xerror_t       **error);
+				GCancellable  *cancellable,
+				GError       **error);
 
 G_GNUC_END_IGNORE_DEPRECATIONS
 
-XPL_AVAILABLE_IN_ALL
-xobject_t* xinitable_new_valist (xtype_t          object_type,
-				const xchar_t   *first_property_name,
+GLIB_AVAILABLE_IN_ALL
+GObject* g_initable_new_valist (GType          object_type,
+				const gchar   *first_property_name,
 				va_list        var_args,
-				xcancellable_t  *cancellable,
-				xerror_t       **error);
+				GCancellable  *cancellable,
+				GError       **error);
 
 G_END_DECLS
 
 
-#endif /* __XINITABLE_H__ */
+#endif /* __G_INITABLE_H__ */

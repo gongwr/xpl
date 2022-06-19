@@ -36,13 +36,13 @@
  * @short_description: Application information from NSBundles
  * @include: gio/gosxappinfo.h
  *
- * #GOsxAppInfo is an implementation of #xapp_info_t based on NSBundle information.
+ * #GOsxAppInfo is an implementation of #GAppInfo based on NSBundle information.
  *
  * Note that `<gio/gosxappinfo.h>` is unique to OSX.
  */
 
-static void        g_osx_app_info_iface_init (xapp_info_iface_t *iface);
-static const char *g_osx_app_info_get_id     (xapp_info_t      *appinfo);
+static void        g_osx_app_info_iface_init (GAppInfoIface *iface);
+static const char *g_osx_app_info_get_id     (GAppInfo      *appinfo);
 
 /**
  * GOsxAppInfo:
@@ -51,27 +51,27 @@ static const char *g_osx_app_info_get_id     (xapp_info_t      *appinfo);
  */
 struct _GOsxAppInfo
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   NSBundle *bundle;
 
   /* Note that these are all NULL until first call
    * to getter at which point they are cached here
    */
-  xchar_t *id;
-  xchar_t *name;
-  xchar_t *executable;
-  xchar_t *filename;
-  xicon_t *icon;
+  gchar *id;
+  gchar *name;
+  gchar *executable;
+  gchar *filename;
+  GIcon *icon;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GOsxAppInfo, g_osx_app_info, XTYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (XTYPE_APP_INFO, g_osx_app_info_iface_init))
+G_DEFINE_TYPE_WITH_CODE (GOsxAppInfo, g_osx_app_info, G_TYPE_OBJECT,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_APP_INFO, g_osx_app_info_iface_init))
 
 static GOsxAppInfo *
 g_osx_app_info_new (NSBundle *bundle)
 {
-  GOsxAppInfo *info = xobject_new (XTYPE_OSX_APP_INFO, NULL);
+  GOsxAppInfo *info = g_object_new (G_TYPE_OSX_APP_INFO, NULL);
 
   info->bundle = [bundle retain];
 
@@ -84,7 +84,7 @@ g_osx_app_info_init (GOsxAppInfo *info)
 }
 
 static void
-g_osx_app_info_finalize (xobject_t *object)
+g_osx_app_info_finalize (GObject *object)
 {
   GOsxAppInfo *info = G_OSX_APP_INFO (object);
 
@@ -96,24 +96,24 @@ g_osx_app_info_finalize (xobject_t *object)
 
   [info->bundle release];
 
-  XOBJECT_CLASS (g_osx_app_info_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_osx_app_info_parent_class)->finalize (object);
 }
 
 static void
 g_osx_app_info_class_init (GOsxAppInfoClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->finalize = g_osx_app_info_finalize;
+  gobject_class->finalize = g_osx_app_info_finalize;
 }
 
-static xapp_info_t *
-g_osx_app_info_dup (xapp_info_t *appinfo)
+static GAppInfo *
+g_osx_app_info_dup (GAppInfo *appinfo)
 {
   GOsxAppInfo *info;
   GOsxAppInfo *new_info;
 
-  xreturn_val_if_fail (appinfo != NULL, NULL);
+  g_return_val_if_fail (appinfo != NULL, NULL);
 
   info = G_OSX_APP_INFO (appinfo);
   new_info = g_osx_app_info_new ([info->bundle retain]);
@@ -121,23 +121,23 @@ g_osx_app_info_dup (xapp_info_t *appinfo)
   return G_APP_INFO (new_info);
 }
 
-static xboolean_t
-g_osx_app_info_equal (xapp_info_t *appinfo1,
-                           xapp_info_t *appinfo2)
+static gboolean
+g_osx_app_info_equal (GAppInfo *appinfo1,
+                           GAppInfo *appinfo2)
 {
-  const xchar_t *str1, *str2;
+  const gchar *str1, *str2;
 
-  xreturn_val_if_fail (appinfo1 != NULL, FALSE);
-  xreturn_val_if_fail (appinfo2 != NULL, FALSE);
+  g_return_val_if_fail (appinfo1 != NULL, FALSE);
+  g_return_val_if_fail (appinfo2 != NULL, FALSE);
 
   str1 = g_osx_app_info_get_id (appinfo1);
   str2 = g_osx_app_info_get_id (appinfo2);
 
-  return (xstrcmp0 (str1, str2) == 0);
+  return (g_strcmp0 (str1, str2) == 0);
 }
 
 /*< internal >
- * get_bundle_strinxvalue:
+ * get_bundle_string_value:
  * @bundle: a #NSBundle
  * @key: an #NSString key
  *
@@ -145,42 +145,42 @@ g_osx_app_info_equal (xapp_info_t *appinfo1,
  * It will be utf8 encoded and it must be g_free()'d.
  *
  */
-static xchar_t *
-get_bundle_strinxvalue (NSBundle *bundle,
+static gchar *
+get_bundle_string_value (NSBundle *bundle,
                          NSString *key)
 {
   NSString *value;
-  const xchar_t *cvalue;
-  xchar_t *ret;
+  const gchar *cvalue;
+  gchar *ret;
 
-  xreturn_val_if_fail (bundle != NULL, NULL);
+  g_return_val_if_fail (bundle != NULL, NULL);
 
   value = (NSString *)[bundle objectForInfoDictionaryKey: key];
   if (!value)
     return NULL;
 
   cvalue = [value cStringUsingEncoding: NSUTF8StringEncoding];
-  ret = xstrdup (cvalue);
+  ret = g_strdup (cvalue);
 
   return ret;
 }
 
 static CFStringRef
-create_cfstring_from_cstr (const xchar_t *cstr)
+create_cfstring_from_cstr (const gchar *cstr)
 {
-  xreturn_val_if_fail (cstr != NULL, NULL);
+  g_return_val_if_fail (cstr != NULL, NULL);
   return CFStringCreateWithCString (NULL, cstr, kCFStringEncodingUTF8);
 }
 
 #ifdef G_ENABLE_DEBUG
-static xchar_t *
+static gchar *
 create_cstr_from_cfstring (CFStringRef str)
 {
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   CFIndex length = CFStringGetLength (str);
   CFIndex maxlen = CFStringGetMaximumSizeForEncoding (length, kCFStringEncodingUTF8);
-  xchar_t *buffer = g_malloc (maxlen + 1);
+  gchar *buffer = g_malloc (maxlen + 1);
   Boolean success = CFStringGetCString (str, (char *) buffer, maxlen,
                                         kCFStringEncodingUTF8);
   if (success)
@@ -203,18 +203,18 @@ url_escape_hostname (const char *url)
     {
       char *host_end, *scheme, *host, *hostname;
 
-      scheme = xstrndup (url, host_start - url);
+      scheme = g_strndup (url, host_start - url);
       host_start += 3;
       host_end = strchr (host_start, '/');
 
       if (host_end != NULL)
-        host = xstrndup (host_start, host_end - host_start);
+        host = g_strndup (host_start, host_end - host_start);
       else
-        host = xstrdup (host_start);
+        host = g_strdup (host_start);
 
       hostname = g_hostname_to_ascii (host);
 
-      ret = xstrconcat (scheme, "://", hostname, host_end, NULL);
+      ret = g_strconcat (scheme, "://", hostname, host_end, NULL);
 
       g_free (scheme);
       g_free (host);
@@ -223,14 +223,14 @@ url_escape_hostname (const char *url)
       return ret;
     }
 
-  return xstrdup (url);
+  return g_strdup (url);
 }
 
 static CFURLRef
-create_url_from_cstr (const xchar_t *cstr,
-                      xboolean_t     is_file)
+create_url_from_cstr (const gchar *cstr,
+                      gboolean     is_file)
 {
-  xchar_t *puny_cstr;
+  gchar *puny_cstr;
   CFStringRef str;
   CFURLRef url;
 
@@ -251,11 +251,11 @@ create_url_from_cstr (const xchar_t *cstr,
 }
 
 static CFArrayRef
-create_url_list_from_glist (xlist_t    *uris,
-                            xboolean_t  are_files)
+create_url_list_from_glist (GList    *uris,
+                            gboolean  are_files)
 {
-  xlist_t *lst;
-  int len = xlist_length (uris);
+  GList *lst;
+  int len = g_list_length (uris);
   CFMutableArrayRef array;
 
   if (!len)
@@ -277,17 +277,17 @@ create_url_list_from_glist (xlist_t    *uris,
 
 static LSLaunchURLSpec *
 create_urlspec_for_appinfo (GOsxAppInfo *info,
-                            xlist_t            *uris,
-                            xboolean_t          are_files)
+                            GList            *uris,
+                            gboolean          are_files)
 {
   LSLaunchURLSpec *urlspec = NULL;
-  const xchar_t *app_cstr;
+  const gchar *app_cstr;
 
-  xreturn_val_if_fail (X_IS_OSX_APP_INFO (info), NULL);
+  g_return_val_if_fail (G_IS_OSX_APP_INFO (info), NULL);
 
   urlspec = g_new0 (LSLaunchURLSpec, 1);
   app_cstr = g_osx_app_info_get_filename (info);
-  xassert (app_cstr != NULL);
+  g_assert (app_cstr != NULL);
 
   /* Strip file:// from app url but ensure filesystem url */
   urlspec->appURL = create_url_from_cstr (app_cstr + strlen ("file://"), TRUE);
@@ -346,7 +346,7 @@ get_bundle_for_id (CFStringRef bundle_id)
 #endif
     {
 #ifdef G_ENABLE_DEBUG /* This can fail often, no reason to alloc strings */
-      xchar_t *id_str = create_cstr_from_cfstring (bundle_id);
+      gchar *id_str = create_cstr_from_cfstring (bundle_id);
       if (id_str)
         {
           g_debug ("Application not found for id \"%s\".", id_str);
@@ -364,47 +364,47 @@ get_bundle_for_id (CFStringRef bundle_id)
 }
 
 static const char *
-g_osx_app_info_get_id (xapp_info_t *appinfo)
+g_osx_app_info_get_id (GAppInfo *appinfo)
 {
   GOsxAppInfo *info = G_OSX_APP_INFO (appinfo);
 
   if (!info->id)
-    info->id = get_bundle_strinxvalue (info->bundle, @"CFBundleIdentifier");
+    info->id = get_bundle_string_value (info->bundle, @"CFBundleIdentifier");
 
   return info->id;
 }
 
 static const char *
-g_osx_app_info_get_name (xapp_info_t *appinfo)
+g_osx_app_info_get_name (GAppInfo *appinfo)
 {
   GOsxAppInfo *info = G_OSX_APP_INFO (appinfo);
 
   if (!info->name)
-    info->name = get_bundle_strinxvalue (info->bundle, @"CFBundleName");
+    info->name = get_bundle_string_value (info->bundle, @"CFBundleName");
 
   return info->name;
 }
 
 static const char *
-g_osx_app_info_get_display_name (xapp_info_t *appinfo)
+g_osx_app_info_get_display_name (GAppInfo *appinfo)
 {
   return g_osx_app_info_get_name (appinfo);
 }
 
 static const char *
-g_osx_app_info_get_description (xapp_info_t *appinfo)
+g_osx_app_info_get_description (GAppInfo *appinfo)
 {
   /* Bundles do not contain descriptions */
   return NULL;
 }
 
 static const char *
-g_osx_app_info_get_executable (xapp_info_t *appinfo)
+g_osx_app_info_get_executable (GAppInfo *appinfo)
 {
   GOsxAppInfo *info = G_OSX_APP_INFO (appinfo);
 
   if (!info->executable)
-    info->executable = get_bundle_strinxvalue (info->bundle, @"CFBundleExecutable");
+    info->executable = get_bundle_string_value (info->bundle, @"CFBundleExecutable");
 
   return info->executable;
 }
@@ -412,11 +412,11 @@ g_osx_app_info_get_executable (xapp_info_t *appinfo)
 const char *
 g_osx_app_info_get_filename (GOsxAppInfo *info)
 {
-  xreturn_val_if_fail (info != NULL, NULL);
+  g_return_val_if_fail (info != NULL, NULL);
 
   if (!info->filename)
     {
-      info->filename = xstrconcat ("file://", [[info->bundle bundlePath]
+      info->filename = g_strconcat ("file://", [[info->bundle bundlePath]
                                     cStringUsingEncoding: NSUTF8StringEncoding],
                                     NULL);
     }
@@ -425,53 +425,53 @@ g_osx_app_info_get_filename (GOsxAppInfo *info)
 }
 
 static const char *
-g_osx_app_info_get_commandline (xapp_info_t *appinfo)
+g_osx_app_info_get_commandline (GAppInfo *appinfo)
 {
   /* There isn't really a command line value */
   return NULL;
 }
 
-static xicon_t *
-g_osx_app_info_get_icon (xapp_info_t *appinfo)
+static GIcon *
+g_osx_app_info_get_icon (GAppInfo *appinfo)
 {
   GOsxAppInfo *info = G_OSX_APP_INFO (appinfo);
 
   if (!info->icon)
     {
-      const xchar_t *app_uri;
-      xchar_t *icon_name, *icon_uri;
-      xfile_t *file;
+      const gchar *app_uri;
+      gchar *icon_name, *icon_uri;
+      GFile *file;
 
-      icon_name = get_bundle_strinxvalue (info->bundle, @"CFBundleIconFile");
+      icon_name = get_bundle_string_value (info->bundle, @"CFBundleIconFile");
       if (!icon_name)
         return NULL;
 
       app_uri = g_osx_app_info_get_filename (info);
-      icon_uri = xstrconcat (app_uri + strlen ("file://"), "/Contents/Resources/", icon_name,
-                              xstr_has_suffix (icon_name, ".icns") ? NULL : ".icns", NULL);
+      icon_uri = g_strconcat (app_uri + strlen ("file://"), "/Contents/Resources/", icon_name,
+                              g_str_has_suffix (icon_name, ".icns") ? NULL : ".icns", NULL);
       g_free (icon_name);
 
-      file = xfile_new_for_path (icon_uri);
-      info->icon = xfile_icon_new (file);
-      xobject_unref (file);
+      file = g_file_new_for_path (icon_uri);
+      info->icon = g_file_icon_new (file);
+      g_object_unref (file);
       g_free (icon_uri);
     }
 
   return info->icon;
 }
 
-static xboolean_t
-g_osx_app_info_launch_internal (xapp_info_t  *appinfo,
-                                     xlist_t     *uris,
-                                     xboolean_t   are_files,
-                                     xerror_t   **error)
+static gboolean
+g_osx_app_info_launch_internal (GAppInfo  *appinfo,
+                                     GList     *uris,
+                                     gboolean   are_files,
+                                     GError   **error)
 {
   GOsxAppInfo *info = G_OSX_APP_INFO (appinfo);
   LSLaunchURLSpec *urlspec;
-  xint_t ret, success = TRUE;
+  gint ret, success = TRUE;
 
-  xreturn_val_if_fail (X_IS_OSX_APP_INFO (appinfo), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_OSX_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   urlspec = create_urlspec_for_appinfo (info, uris, are_files);
 
@@ -487,75 +487,75 @@ g_osx_app_info_launch_internal (xapp_info_t  *appinfo,
   return success;
 }
 
-static xboolean_t
-g_osx_app_info_supports_uris (xapp_info_t *appinfo)
+static gboolean
+g_osx_app_info_supports_uris (GAppInfo *appinfo)
 {
   return TRUE;
 }
 
-static xboolean_t
-g_osx_app_info_supports_files (xapp_info_t *appinfo)
+static gboolean
+g_osx_app_info_supports_files (GAppInfo *appinfo)
 {
   return TRUE;
 }
 
-static xboolean_t
-g_osx_app_info_launch (xapp_info_t           *appinfo,
-                            xlist_t              *files,
-                            xapp_launch_context_t  *launch_context,
-                            xerror_t            **error)
+static gboolean
+g_osx_app_info_launch (GAppInfo           *appinfo,
+                            GList              *files,
+                            GAppLaunchContext  *launch_context,
+                            GError            **error)
 {
   return g_osx_app_info_launch_internal (appinfo, files, TRUE, error);
 }
 
-static xboolean_t
-g_osx_app_info_launch_uris (xapp_info_t           *appinfo,
-                                 xlist_t              *uris,
-                                 xapp_launch_context_t  *launch_context,
-                                 xerror_t            **error)
+static gboolean
+g_osx_app_info_launch_uris (GAppInfo           *appinfo,
+                                 GList              *uris,
+                                 GAppLaunchContext  *launch_context,
+                                 GError            **error)
 {
   return g_osx_app_info_launch_internal (appinfo, uris, FALSE, error);
 }
 
-static xboolean_t
-g_osx_app_info_should_show (xapp_info_t *appinfo)
+static gboolean
+g_osx_app_info_should_show (GAppInfo *appinfo)
 {
   /* Bundles don't have hidden attribute */
   return TRUE;
 }
 
-static xboolean_t
-g_osx_app_info_set_as_default_for_type (xapp_info_t    *appinfo,
+static gboolean
+g_osx_app_info_set_as_default_for_type (GAppInfo    *appinfo,
                                              const char  *content_type,
-                                             xerror_t     **error)
+                                             GError     **error)
 {
   return FALSE;
 }
 
 static const char **
-g_osx_app_info_get_supported_types (xapp_info_t *appinfo)
+g_osx_app_info_get_supported_types (GAppInfo *appinfo)
 {
   /* TODO: get CFBundleDocumentTypes */
   return NULL;
 }
 
-static xboolean_t
-g_osx_app_info_set_as_last_used_for_type (xapp_info_t   *appinfo,
+static gboolean
+g_osx_app_info_set_as_last_used_for_type (GAppInfo   *appinfo,
                                                const char  *content_type,
-                                               xerror_t     **error)
+                                               GError     **error)
 {
   /* Not supported. */
   return FALSE;
 }
 
-static xboolean_t
-g_osx_app_info_can_delete (xapp_info_t *appinfo)
+static gboolean
+g_osx_app_info_can_delete (GAppInfo *appinfo)
 {
   return FALSE;
 }
 
 static void
-g_osx_app_info_iface_init (xapp_info_iface_t *iface)
+g_osx_app_info_iface_init (GAppInfoIface *iface)
 {
   iface->dup = g_osx_app_info_dup;
   iface->equal = g_osx_app_info_equal;
@@ -581,24 +581,24 @@ g_osx_app_info_iface_init (xapp_info_iface_t *iface)
   iface->can_delete = g_osx_app_info_can_delete;
 }
 
-xapp_info_t *
-xapp_info_create_from_commandline (const char           *commandline,
+GAppInfo *
+g_app_info_create_from_commandline (const char           *commandline,
                                     const char           *application_name,
                                     GAppInfoCreateFlags   flags,
-                                    xerror_t              **error)
+                                    GError              **error)
 {
   return NULL;
 }
 
-xlist_t *
+GList *
 g_osx_app_info_get_all_for_scheme (const char *cscheme)
 {
   CFArrayRef bundle_list;
   CFStringRef scheme;
   NSBundle *bundle;
-  xlist_t *info_list = NULL;
-  xint_t i;
-
+  GList *info_list = NULL;
+  gint i;
+  
   scheme = create_cfstring_from_cstr (cscheme);
   bundle_list = LSCopyAllHandlersForURLScheme (scheme);
   CFRelease (scheme);
@@ -609,7 +609,7 @@ g_osx_app_info_get_all_for_scheme (const char *cscheme)
   for (i = 0; i < CFArrayGetCount (bundle_list); i++)
     {
       CFStringRef bundle_id = CFArrayGetValueAtIndex (bundle_list, i);
-      xapp_info_t *info;
+      GAppInfo *info;
 
       bundle = get_bundle_for_id (bundle_id);
 
@@ -617,27 +617,27 @@ g_osx_app_info_get_all_for_scheme (const char *cscheme)
         continue;
 
       info = G_APP_INFO (g_osx_app_info_new (bundle));
-      info_list = xlist_append (info_list, info);
+      info_list = g_list_append (info_list, info);
     }
   CFRelease (bundle_list);
   return info_list;
 }
 
-xlist_t *
-xapp_info_get_all_for_type (const char *content_type)
+GList *
+g_app_info_get_all_for_type (const char *content_type)
 {
-  xchar_t *mime_type;
+  gchar *mime_type;
   CFArrayRef bundle_list;
   CFStringRef type;
   NSBundle *bundle;
-  xlist_t *info_list = NULL;
-  xint_t i;
+  GList *info_list = NULL;
+  gint i;
 
   mime_type = g_content_type_get_mime_type (content_type);
-  if (xstr_has_prefix (mime_type, "x-scheme-handler/"))
+  if (g_str_has_prefix (mime_type, "x-scheme-handler/"))
     {
-      xchar_t *scheme = strchr (mime_type, '/') + 1;
-      xlist_t *ret = g_osx_app_info_get_all_for_scheme (scheme);
+      gchar *scheme = strchr (mime_type, '/') + 1;
+      GList *ret = g_osx_app_info_get_all_for_scheme (scheme);
 
       g_free (mime_type);
       return ret;
@@ -654,7 +654,7 @@ xapp_info_get_all_for_type (const char *content_type)
   for (i = 0; i < CFArrayGetCount (bundle_list); i++)
     {
       CFStringRef bundle_id = CFArrayGetValueAtIndex (bundle_list, i);
-      xapp_info_t *info;
+      GAppInfo *info;
 
       bundle = get_bundle_for_id (bundle_id);
 
@@ -662,29 +662,29 @@ xapp_info_get_all_for_type (const char *content_type)
         continue;
 
       info = G_APP_INFO (g_osx_app_info_new (bundle));
-      info_list = xlist_append (info_list, info);
+      info_list = g_list_append (info_list, info);
     }
   CFRelease (bundle_list);
   return info_list;
 }
 
-xlist_t *
-xapp_info_get_recommended_for_type (const char *content_type)
+GList *
+g_app_info_get_recommended_for_type (const char *content_type)
 {
-  return xapp_info_get_all_for_type (content_type);
+  return g_app_info_get_all_for_type (content_type);
 }
 
-xlist_t *
-xapp_info_get_fallback_for_type (const char *content_type)
+GList *
+g_app_info_get_fallback_for_type (const char *content_type)
 {
-  return xapp_info_get_all_for_type (content_type);
+  return g_app_info_get_all_for_type (content_type);
 }
 
-xapp_info_t *
-xapp_info_get_default_for_type (const char *content_type,
-                                 xboolean_t    must_support_uris)
+GAppInfo *
+g_app_info_get_default_for_type (const char *content_type,
+                                 gboolean    must_support_uris)
 {
-  xchar_t *mime_type;
+  gchar *mime_type;
   CFStringRef type;
   NSBundle *bundle;
 #ifdef AVAILABLE_MAC_OS_X_VERSION_10_10_AND_LATER
@@ -694,10 +694,10 @@ xapp_info_get_default_for_type (const char *content_type,
 #endif
 
   mime_type = g_content_type_get_mime_type (content_type);
-  if (xstr_has_prefix (mime_type, "x-scheme-handler/"))
+  if (g_str_has_prefix (mime_type, "x-scheme-handler/"))
     {
-      xchar_t *scheme = strchr (mime_type, '/') + 1;
-      xapp_info_t *ret = xapp_info_get_default_for_uri_scheme (scheme);
+      gchar *scheme = strchr (mime_type, '/') + 1;
+      GAppInfo *ret = g_app_info_get_default_for_uri_scheme (scheme);
 
       g_free (mime_type);
       return ret;
@@ -732,8 +732,8 @@ xapp_info_get_default_for_type (const char *content_type,
   return G_APP_INFO (g_osx_app_info_new (bundle));
 }
 
-xapp_info_t *
-xapp_info_get_default_for_uri_scheme (const char *uri_scheme)
+GAppInfo *
+g_app_info_get_default_for_uri_scheme (const char *uri_scheme)
 {
   CFStringRef scheme, bundle_id;
   NSBundle *bundle;
@@ -757,8 +757,8 @@ xapp_info_get_default_for_uri_scheme (const char *uri_scheme)
   return G_APP_INFO (g_osx_app_info_new (bundle));
 }
 
-xlist_t *
-xapp_info_get_all (void)
+GList *
+g_app_info_get_all (void)
 {
   /* There is no API for this afaict
    * could manually do it...
@@ -767,6 +767,6 @@ xapp_info_get_all (void)
 }
 
 void
-xapp_info_reset_type_associations (const char *content_type)
+g_app_info_reset_type_associations (const char *content_type)
 {
 }

@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2008 Red Hat, Inc
  *
  * This library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 #include <string.h>
 
 static const struct {
-  const xchar_t *ascii_name, *unicode_name;
+  const gchar *ascii_name, *unicode_name;
 } idn_test_domains[] = {
   /* "example.test" in various languages */
   { "xn--mgbh0fb.xn--kgbechtv", "\xd9\x85\xd8\xab\xd8\xa7\xd9\x84.\xd8\xa5\xd8\xae\xd8\xaa\xd8\xa8\xd8\xa7\xd8\xb1" },
@@ -45,11 +45,11 @@ static const struct {
   { "xn--o3cw4h.idn.icann.org", "\xe0\xb9\x84\xe0\xb8\x97\xe0\xb8\xa2.idn.icann.org" },
   { "xn--mgbqf7g.idn.icann.org", "\xd8\xa7\xd8\xb1\xd8\xaf\xd9\x88.idn.icann.org" }
 };
-static const xint_t num_idn_test_domains = G_N_ELEMENTS (idn_test_domains);
+static const gint num_idn_test_domains = G_N_ELEMENTS (idn_test_domains);
 
 static const struct {
-  const xchar_t *orig_name, *ascii_name;
-  xboolean_t orig_is_unicode, ascii_is_encoded;
+  const gchar *orig_name, *ascii_name;
+  gboolean orig_is_unicode, ascii_is_encoded;
 } non_round_trip_names[] = {
   /* uppercase characters */
   { "EXAMPLE.COM", "example.com", FALSE, FALSE },
@@ -64,9 +64,9 @@ static const struct {
   { "Å.idn.icann.org", "xn--5ca.idn.icann.org", TRUE, TRUE },
   { "ℵℶℷ\xcd\x8f.idn.icann.org", "xn--4dbcd.idn.icann.org", TRUE, TRUE }
 };
-static const xint_t num_non_round_trip_names = G_N_ELEMENTS (non_round_trip_names);
+static const gint num_non_round_trip_names = G_N_ELEMENTS (non_round_trip_names);
 
-static const xchar_t *bad_names[] = {
+static const gchar *bad_names[] = {
   "disallowed\xef\xbf\xbd" "character",
   "non-utf\x88",
   "xn--mixed-\xc3\xbcp",
@@ -87,13 +87,13 @@ static const xchar_t *bad_names[] = {
   "verylongverylongverylongverylongverylongverylongverylongverylongverylong"
   "verylongverylongverylongverylongverylongverylongverylongverylongverylong",
 };
-static const xint_t num_bad_names = G_N_ELEMENTS (bad_names);
+static const gint num_bad_names = G_N_ELEMENTS (bad_names);
 
 static void
 test_to_ascii (void)
 {
-  xint_t i;
-  xchar_t *ascii;
+  gint i;
+  gchar *ascii;
 
   for (i = 0; i < num_idn_test_domains; i++)
     {
@@ -138,8 +138,8 @@ test_to_ascii (void)
 static void
 test_to_unicode (void)
 {
-  xint_t i;
-  xchar_t *unicode;
+  gint i;
+  gchar *unicode;
 
   for (i = 0; i < num_idn_test_domains; i++)
     {
@@ -161,8 +161,8 @@ test_to_unicode (void)
 }
 
 static const struct {
-  const xchar_t *addr;
-  xboolean_t is_addr;
+  const gchar *addr;
+  gboolean is_addr;
 } ip_addr_tests[] = {
   /* IPv6 tests */
 
@@ -309,18 +309,18 @@ static const struct {
   { "1..2.3.4", FALSE },
   { "1..3.4", FALSE }
 };
-static const xint_t num_ip_addr_tests = G_N_ELEMENTS (ip_addr_tests);
+static const gint num_ip_addr_tests = G_N_ELEMENTS (ip_addr_tests);
 
 static void
 test_is_ip_addr (void)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < num_ip_addr_tests; i++)
     {
       if (g_hostname_is_ip_address (ip_addr_tests[i].addr) != ip_addr_tests[i].is_addr)
 	{
-	  char *msg = xstrdup_printf ("g_hostname_is_ip_address (\"%s\") == %s",
+	  char *msg = g_strdup_printf ("g_hostname_is_ip_address (\"%s\") == %s",
 				       ip_addr_tests[i].addr,
 				       ip_addr_tests[i].is_addr ? "TRUE" : "FALSE");
 	  g_assertion_message (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, msg);
@@ -336,11 +336,11 @@ main (int   argc,
       char *argv[])
 {
   g_test_init (&argc, &argv, NULL);
-
+  
   if (argc == 2 && argv[1][0] != '-')
     {
-      const xchar_t *hostname = argv[1];
-      xchar_t *converted;
+      const gchar *hostname = argv[1];
+      gchar *converted;
 
       if (g_hostname_is_non_ascii (hostname))
 	{

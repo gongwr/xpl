@@ -20,16 +20,16 @@
 
 #include <glib.h>
 
-/* test_t that G_STATIC_ASSERT_EXPR can be used as an expression */
+/* Test that G_STATIC_ASSERT_EXPR can be used as an expression */
 static void
 test_assert_static (void)
 {
   G_STATIC_ASSERT (4 == 4);
-  if (G_STATIC_ASSERT_EXPR (1 == 1), sizeof (xchar_t) == 2)
+  if (G_STATIC_ASSERT_EXPR (1 == 1), sizeof (gchar) == 2)
     g_assert_not_reached ();
 }
 
-/* test_t G_ALIGNOF() gives the same results as the G_STRUCT_OFFSET fallback. This
+/* Test G_ALIGNOF() gives the same results as the G_STRUCT_OFFSET fallback. This
  * should be the minimal alignment for the given type.
  *
  * This is necessary because the implementation of G_ALIGNOF() varies depending

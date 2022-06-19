@@ -28,15 +28,15 @@
 #define G_VARIANT_TYPE_INFO_CHAR_TUPLE      '('
 #define G_VARIANT_TYPE_INFO_CHAR_DICT_ENTRY '{'
 #define G_VARIANT_TYPE_INFO_CHAR_VARIANT    'v'
-#define xvariant_type_info_get_type_char(info) \
-  (xvariant_type_info_get_type_string(info)[0])
+#define g_variant_type_info_get_type_char(info) \
+  (g_variant_type_info_get_type_string(info)[0])
 
 typedef struct _GVariantTypeInfo GVariantTypeInfo;
 
 /* < private >
  * GVariantMemberInfo:
  *
- * This structure describes how to construct a xvariant_t instance
+ * This structure describes how to construct a GVariant instance
  * corresponding to a given child of a tuple or dictionary entry in a
  * very short constant time.  It contains the typeinfo of the child,
  * along with 4 constants that allow the bounds of the child's
@@ -112,10 +112,10 @@ typedef struct
 {
   GVariantTypeInfo *type_info;
 
-  xsize_t i, a;
+  gsize i, a;
   gint8 b, c;
 
-  xuint8_t ending_type;
+  guint8 ending_type;
 } GVariantMemberInfo;
 
 #define G_VARIANT_MEMBER_ENDING_FIXED   0
@@ -123,39 +123,39 @@ typedef struct
 #define G_VARIANT_MEMBER_ENDING_OFFSET  2
 
 /* query */
-XPL_AVAILABLE_IN_ALL
-const xchar_t *                   xvariant_type_info_get_type_string     (GVariantTypeInfo   *typeinfo);
+GLIB_AVAILABLE_IN_ALL
+const gchar *                   g_variant_type_info_get_type_string     (GVariantTypeInfo   *typeinfo);
 
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_type_info_query               (GVariantTypeInfo   *typeinfo,
-                                                                         xuint_t              *alignment,
-                                                                         xsize_t              *size);
-XPL_AVAILABLE_IN_2_60
-xsize_t                           xvariant_type_info_query_depth         (GVariantTypeInfo   *typeinfo);
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_type_info_query               (GVariantTypeInfo   *typeinfo,
+                                                                         guint              *alignment,
+                                                                         gsize              *size);
+GLIB_AVAILABLE_IN_2_60
+gsize                           g_variant_type_info_query_depth         (GVariantTypeInfo   *typeinfo);
 
 /* array */
-XPL_AVAILABLE_IN_ALL
-GVariantTypeInfo *              xvariant_type_info_element             (GVariantTypeInfo   *typeinfo);
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_type_info_query_element       (GVariantTypeInfo   *typeinfo,
-                                                                         xuint_t              *alignment,
-                                                                         xsize_t              *size);
+GLIB_AVAILABLE_IN_ALL
+GVariantTypeInfo *              g_variant_type_info_element             (GVariantTypeInfo   *typeinfo);
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_type_info_query_element       (GVariantTypeInfo   *typeinfo,
+                                                                         guint              *alignment,
+                                                                         gsize              *size);
 
 /* structure */
-XPL_AVAILABLE_IN_ALL
-xsize_t                           xvariant_type_info_n_members           (GVariantTypeInfo   *typeinfo);
-XPL_AVAILABLE_IN_ALL
-const GVariantMemberInfo *      xvariant_type_info_member_info         (GVariantTypeInfo   *typeinfo,
-                                                                         xsize_t               index);
+GLIB_AVAILABLE_IN_ALL
+gsize                           g_variant_type_info_n_members           (GVariantTypeInfo   *typeinfo);
+GLIB_AVAILABLE_IN_ALL
+const GVariantMemberInfo *      g_variant_type_info_member_info         (GVariantTypeInfo   *typeinfo,
+                                                                         gsize               index);
 
 /* new/ref/unref */
-XPL_AVAILABLE_IN_ALL
-GVariantTypeInfo *              xvariant_type_info_get                 (const xvariant_type_t *type);
-XPL_AVAILABLE_IN_ALL
-GVariantTypeInfo *              xvariant_type_info_ref                 (GVariantTypeInfo   *typeinfo);
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_type_info_unref               (GVariantTypeInfo   *typeinfo);
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_type_info_assert_no_infos     (void);
+GLIB_AVAILABLE_IN_ALL
+GVariantTypeInfo *              g_variant_type_info_get                 (const GVariantType *type);
+GLIB_AVAILABLE_IN_ALL
+GVariantTypeInfo *              g_variant_type_info_ref                 (GVariantTypeInfo   *typeinfo);
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_type_info_unref               (GVariantTypeInfo   *typeinfo);
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_type_info_assert_no_infos     (void);
 
 #endif /* __G_VARIANT_TYPE_INFO_H__ */

@@ -40,7 +40,7 @@ See the <ulink url="http://www.freedesktop.org/wiki/Software/pkg-config">pkg-con
 for more information about <application>pkg-config</application>.
 </para>
 <para>
-If your application uses or <structname>xobject_t</structname>
+If your application uses or <structname>GObject</structname>
 features, it must be compiled and linked with the options returned
 by the following <application>pkg-config</application> invocation:
 <programlisting>
@@ -80,13 +80,13 @@ Deprecated GLib functions are annotated to make the compiler
 emit warnings when they are used (e.g. with gcc, you need to use
 the -Wdeprecated-declarations option). If these warnings are
 problematic, they can be turned off by defining the preprocessor
-symbol %XPL_DISABLE_DEPRECATION_WARNINGS by using the commandline
-option <literal>-DXPL_DISABLE_DEPRECATION_WARNINGS</literal>
+symbol %GLIB_DISABLE_DEPRECATION_WARNINGS by using the commandline
+option <literal>-DGLIB_DISABLE_DEPRECATION_WARNINGS</literal>
 </para>
 
 <para>
 GLib deprecation annotations are versioned; by defining the
-macros %XPL_VERSION_MIN_REQUIRED and %XPL_VERSION_MAX_ALLOWED,
+macros %GLIB_VERSION_MIN_REQUIRED and %GLIB_VERSION_MAX_ALLOWED,
 you can specify the range of GLib versions whose API you want
 to use. APIs that were deprecated before or introduced after
 this range will trigger compiler warnings.

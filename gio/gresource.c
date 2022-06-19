@@ -43,7 +43,7 @@ struct _GResource
 
 static void register_lazy_static_resources (void);
 
-G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
+G_DEFINE_BOXED_TYPE (GResource, g_resource, g_resource_ref, g_resource_unref)
 
 /**
  * SECTION:gresource
@@ -52,11 +52,11 @@ G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
  *
  * Applications and libraries often contain binary or textual data that is
  * really part of the application, rather than user data. For instance
- * #GtkBuilder .ui files, splashscreen images, xmenu_t markup XML, CSS files,
+ * #GtkBuilder .ui files, splashscreen images, GMenu markup XML, CSS files,
  * icons, etc. These are often shipped as files in `$datadir/appname`, or
  * manually included as literal strings in the code.
  *
- * The #xresource_t API and the [glib-compile-resources][glib-compile-resources] program
+ * The #GResource API and the [glib-compile-resources][glib-compile-resources] program
  * provide a convenient and efficient alternative to this which has some nice properties. You
  * maintain the files as normal files, so its easy to edit them, but during the build the files
  * are combined into a binary bundle that is linked into the executable. This means that loading
@@ -85,18 +85,18 @@ G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
  * `gdk-pixbuf-pixdata` program must be in the `PATH`, or the
  * `GDK_PIXBUF_PIXDATA` environment variable must be set to the full path to the
  * `gdk-pixbuf-pixdata` executable; otherwise the resource compiler will abort.
- * `to-pixdata` has been deprecated since gdk-pixbuf 2.32, as #xresource_t
+ * `to-pixdata` has been deprecated since gdk-pixbuf 2.32, as #GResource
  * supports embedding modern image formats just as well. Instead of using it,
- * embed a PNG or SVG file in your #xresource_t.
+ * embed a PNG or SVG file in your #GResource.
  *
  * `json-stripblanks` which will use the `json-glib-format` command to strip
  * ignorable whitespace from the JSON file. For this to work, the
- * `JSON_XPL_FORMAT` environment variable must be set to the full path to the
+ * `JSON_GLIB_FORMAT` environment variable must be set to the full path to the
  * `json-glib-format` executable, or it must be in the `PATH`;
  * otherwise the preprocessing step is skipped. In addition, at least version
  * 1.6 of `json-glib-format` is required.
  *
- * Resource files will be exported in the xresource_t namespace using the
+ * Resource files will be exported in the GResource namespace using the
  * combination of the given `prefix` and the filename from the `file` element.
  * The `alias` attribute can be used to alter the filename to expose them at a
  * different location in the resource namespace. Typically, this is used to
@@ -137,13 +137,13 @@ G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
  * This will generate `get_resource()`, `register_resource()` and
  * `unregister_resource()` functions, prefixed by the `--c-name` argument passed
  * to [glib-compile-resources][glib-compile-resources]. `get_resource()` returns
- * the generated #xresource_t object. The register and unregister functions
+ * the generated #GResource object. The register and unregister functions
  * register the resource so its files can be accessed using
  * g_resources_lookup_data().
  *
- * Once a #xresource_t has been created and registered all the data in it can be accessed globally in the process by
+ * Once a #GResource has been created and registered all the data in it can be accessed globally in the process by
  * using API calls like g_resources_open_stream() to stream the data or g_resources_lookup_data() to get a direct pointer
- * to the data. You can also use URIs like "resource:///org/gtk/Example/data/splashscreen.png" with #xfile_t to access
+ * to the data. You can also use URIs like "resource:///org/gtk/Example/data/splashscreen.png" with #GFile to access
  * the resource data.
  *
  * Some higher-level APIs, such as #GtkApplication, will automatically load
@@ -151,7 +151,7 @@ G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
  * convenience. See the documentation for those APIs for details.
  *
  * There are two forms of the generated source, the default version uses the compiler support for constructor
- * and destructor functions (where available) to automatically create and register the #xresource_t on startup
+ * and destructor functions (where available) to automatically create and register the #GResource on startup
  * or library load time. If you pass `--manual-register`, two functions to register/unregister the resource are created
  * instead. This requires an explicit initialization call in your application/library, but it works on all platforms,
  * even on the minor ones where constructors are not supported. (Constructor support is available for at least Win32, Mac OS and Linux.)
@@ -178,7 +178,7 @@ G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
  * equivalent names.
  *
  * In the example above, if an application tried to load a resource with the resource path
- * `/org/gtk/libgtk/ui/gtkdialog.ui` then xresource_t would check the filesystem path
+ * `/org/gtk/libgtk/ui/gtkdialog.ui` then GResource would check the filesystem path
  * `/home/desrt/gtk-overlay/ui/gtkdialog.ui`.  If a file was found there, it would be used instead.  This is an
  * overlay, not an outright replacement, which means that if a file is not found at that path, the built-in
  * version will be used instead.  Whiteouts are not currently supported.
@@ -196,18 +196,18 @@ G_DEFINE_BOXED_TYPE (xresource_t, g_resource, g_resource_ref, g_resource_unref)
  * #GStaticResource is an opaque data structure and can only be accessed
  * using the following functions.
  **/
-typedef xboolean_t (* CheckCandidate) (const xchar_t *candidate, xpointer_t user_data);
+typedef gboolean (* CheckCandidate) (const gchar *candidate, gpointer user_data);
 
-static xboolean_t
-open_overlay_stream (const xchar_t *candidate,
-                     xpointer_t     user_data)
+static gboolean
+open_overlay_stream (const gchar *candidate,
+                     gpointer     user_data)
 {
-  xinput_stream_t **res = (xinput_stream_t **) user_data;
-  xerror_t *error = NULL;
-  xfile_t *file;
+  GInputStream **res = (GInputStream **) user_data;
+  GError *error = NULL;
+  GFile *file;
 
-  file = xfile_new_for_path (candidate);
-  *res = (xinput_stream_t *) xfile_read (file, NULL, &error);
+  file = g_file_new_for_path (candidate);
+  *res = (GInputStream *) g_file_read (file, NULL, &error);
 
   if (*res)
     {
@@ -215,69 +215,69 @@ open_overlay_stream (const xchar_t *candidate,
     }
   else
     {
-      if (!xerror_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
         g_warning ("Can't open overlay file '%s': %s", candidate, error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
 
-  xobject_unref (file);
+  g_object_unref (file);
 
   return *res != NULL;
 }
 
-static xboolean_t
-get_overlay_bytes (const xchar_t *candidate,
-                   xpointer_t     user_data)
+static gboolean
+get_overlay_bytes (const gchar *candidate,
+                   gpointer     user_data)
 {
-  xbytes_t **res = (xbytes_t **) user_data;
-  xmapped_file_t *mapped_file;
-  xerror_t *error = NULL;
+  GBytes **res = (GBytes **) user_data;
+  GMappedFile *mapped_file;
+  GError *error = NULL;
 
-  mapped_file = xmapped_file_new (candidate, FALSE, &error);
+  mapped_file = g_mapped_file_new (candidate, FALSE, &error);
 
   if (mapped_file)
     {
       g_message ("Mapped file '%s' as a resource overlay", candidate);
-      *res = xmapped_file_get_bytes (mapped_file);
-      xmapped_file_unref (mapped_file);
+      *res = g_mapped_file_get_bytes (mapped_file);
+      g_mapped_file_unref (mapped_file);
     }
   else
     {
-      if (!xerror_matches (error, XFILE_ERROR, XFILE_ERROR_NOENT))
+      if (!g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT))
         g_warning ("Can't mmap overlay file '%s': %s", candidate, error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
 
   return *res != NULL;
 }
 
-static xboolean_t
-enumerate_overlay_dir (const xchar_t *candidate,
-                       xpointer_t     user_data)
+static gboolean
+enumerate_overlay_dir (const gchar *candidate,
+                       gpointer     user_data)
 {
-  xhashtable_t **hash = (xhashtable_t **) user_data;
-  xerror_t *error = NULL;
-  xdir_t *dir;
-  const xchar_t *name;
+  GHashTable **hash = (GHashTable **) user_data;
+  GError *error = NULL;
+  GDir *dir;
+  const gchar *name;
 
   dir = g_dir_open (candidate, 0, &error);
   if (dir)
     {
       if (*hash == NULL)
         /* note: keep in sync with same line below */
-        *hash = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
+        *hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
       g_message ("Enumerating directory '%s' as resource overlay", candidate);
 
       while ((name = g_dir_read_name (dir)))
         {
-          xchar_t *fullname = g_build_filename (candidate, name, NULL);
+          gchar *fullname = g_build_filename (candidate, name, NULL);
 
           /* match gvdb behaviour by suffixing "/" on dirs */
-          if (xfile_test (fullname, XFILE_TEST_IS_DIR))
-            xhash_table_add (*hash, xstrconcat (name, "/", NULL));
+          if (g_file_test (fullname, G_FILE_TEST_IS_DIR))
+            g_hash_table_add (*hash, g_strconcat (name, "/", NULL));
           else
-            xhash_table_add (*hash, xstrdup (name));
+            g_hash_table_add (*hash, g_strdup (name));
 
           g_free (fullname);
         }
@@ -286,9 +286,9 @@ enumerate_overlay_dir (const xchar_t *candidate,
     }
   else
     {
-      if (!xerror_matches (error, XFILE_ERROR, XFILE_ERROR_NOENT))
+      if (!g_error_matches (error, G_FILE_ERROR, G_FILE_ERROR_NOENT))
         g_warning ("Can't enumerate overlay directory '%s': %s", candidate, error->message);
-      xerror_free (error);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -299,13 +299,13 @@ enumerate_overlay_dir (const xchar_t *candidate,
 }
 
 typedef struct {
-  xsize_t size;
-  xuint32_t flags;
+  gsize size;
+  guint32 flags;
 } InfoData;
 
-static xboolean_t
-get_overlay_info (const xchar_t *candidate,
-                  xpointer_t     user_data)
+static gboolean
+get_overlay_info (const gchar *candidate,
+                  gpointer     user_data)
 {
   InfoData *info = user_data;
   GStatBuf buf;
@@ -319,16 +319,16 @@ get_overlay_info (const xchar_t *candidate,
   return TRUE;
 }
 
-static xboolean_t
-g_resource_find_overlay (const xchar_t    *path,
+static gboolean
+g_resource_find_overlay (const gchar    *path,
                          CheckCandidate  check,
-                         xpointer_t        user_data)
+                         gpointer        user_data)
 {
   /* This is a null-terminated array of replacement strings (with '=' inside) */
-  static const xchar_t * const *overlay_dirs;
-  xboolean_t res = FALSE;
-  xint_t path_len = -1;
-  xint_t i;
+  static const gchar * const *overlay_dirs;
+  gboolean res = FALSE;
+  gint path_len = -1;
+  gint i;
 
   /* We try to be very fast in case there are no overlays.  Otherwise,
    * we can take a bit more time...
@@ -336,27 +336,27 @@ g_resource_find_overlay (const xchar_t    *path,
 
   if (g_once_init_enter (&overlay_dirs))
     {
-      xboolean_t is_setuid = XPL_PRIVATE_CALL (g_check_setuid) ();
-      const xchar_t * const *result;
-      const xchar_t *envvar;
+      gboolean is_setuid = GLIB_PRIVATE_CALL (g_check_setuid) ();
+      const gchar * const *result;
+      const gchar *envvar;
 
       /* Don’t load overlays if setuid, as they could allow reading privileged
        * files. */
       envvar = !is_setuid ? g_getenv ("G_RESOURCE_OVERLAYS") : NULL;
       if (envvar != NULL)
         {
-          xchar_t **parts;
-          xint_t i, j;
+          gchar **parts;
+          gint j;
 
-          parts = xstrsplit (envvar, G_SEARCHPATH_SEPARATOR_S, 0);
+          parts = g_strsplit (envvar, G_SEARCHPATH_SEPARATOR_S, 0);
 
           /* Sanity check the parts, dropping those that are invalid.
            * 'i' may grow faster than 'j'.
            */
           for (i = j = 0; parts[i]; i++)
             {
-              xchar_t *part = parts[i];
-              xchar_t *eq;
+              gchar *part = parts[i];
+              gchar *eq;
 
               eq = strchr (part, '=');
               if (eq == NULL)
@@ -407,14 +407,14 @@ g_resource_find_overlay (const xchar_t    *path,
 
           parts[j] = NULL;
 
-          result = (const xchar_t **) parts;
+          result = (const gchar **) parts;
         }
       else
         {
           /* We go out of the way to avoid malloc() in the normal case
            * where the environment variable is not set.
            */
-          static const xchar_t * const empty_strv[0 + 1];
+          static const gchar *const empty_strv[0 + 1] = { 0 };
           result = empty_strv;
         }
 
@@ -423,19 +423,19 @@ g_resource_find_overlay (const xchar_t    *path,
 
   for (i = 0; overlay_dirs[i]; i++)
     {
-      const xchar_t *src;
-      xint_t src_len;
-      const xchar_t *dst;
-      xint_t dst_len;
-      xchar_t *candidate;
+      const gchar *src;
+      gint src_len;
+      const gchar *dst;
+      gint dst_len;
+      gchar *candidate;
 
       {
-        xchar_t *eq;
+        gchar *eq;
 
         /* split the overlay into src/dst */
         src = overlay_dirs[i];
         eq = strchr (src, '=');
-        xassert (eq); /* we checked this already */
+        g_assert (eq); /* we checked this already */
         src_len = eq - src;
         dst = eq + 1;
         /* hold off on dst_len because we will probably fail the checks below */
@@ -484,9 +484,9 @@ g_resource_find_overlay (const xchar_t    *path,
 /**
  * g_resource_error_quark:
  *
- * Gets the #xresource_t Error Quark.
+ * Gets the #GResource Error Quark.
  *
- * Returns: a #xquark
+ * Returns: a #GQuark
  *
  * Since: 2.32
  */
@@ -494,17 +494,17 @@ G_DEFINE_QUARK (g-resource-error-quark, g_resource_error)
 
 /**
  * g_resource_ref:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  *
  * Atomically increments the reference count of @resource by one. This
  * function is MT-safe and may be called from any thread.
  *
- * Returns: The passed in #xresource_t
+ * Returns: The passed in #GResource
  *
  * Since: 2.32
  **/
-xresource_t *
-g_resource_ref (xresource_t *resource)
+GResource *
+g_resource_ref (GResource *resource)
 {
   g_atomic_int_inc (&resource->ref_count);
   return resource;
@@ -512,7 +512,7 @@ g_resource_ref (xresource_t *resource)
 
 /**
  * g_resource_unref:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  *
  * Atomically decrements the reference count of @resource by one. If the
  * reference count drops to 0, all memory allocated by the resource is
@@ -522,7 +522,7 @@ g_resource_ref (xresource_t *resource)
  * Since: 2.32
  **/
 void
-g_resource_unref (xresource_t *resource)
+g_resource_unref (GResource *resource)
 {
   if (g_atomic_int_dec_and_test (&resource->ref_count))
     {
@@ -535,14 +535,14 @@ g_resource_unref (xresource_t *resource)
  * g_resource_new_from_table:
  * @table: (transfer full): a GvdbTable
  *
- * Returns: (transfer full): a new #xresource_t for @table
+ * Returns: (transfer full): a new #GResource for @table
  */
-static xresource_t *
+static GResource *
 g_resource_new_from_table (GvdbTable *table)
 {
-  xresource_t *resource;
+  GResource *resource;
 
-  resource = g_new (xresource_t, 1);
+  resource = g_new (GResource, 1);
   resource->ref_count = 1;
   resource->table = table;
 
@@ -550,10 +550,10 @@ g_resource_new_from_table (GvdbTable *table)
 }
 
 static void
-g_resource_error_from_gvdb_table_error (xerror_t **g_resource_error,
-                                        xerror_t  *gvdb_table_error  /* (transfer full) */)
+g_resource_error_from_gvdb_table_error (GError **g_resource_error,
+                                        GError  *gvdb_table_error  /* (transfer full) */)
 {
-  if (xerror_matches (gvdb_table_error, XFILE_ERROR, XFILE_ERROR_INVAL))
+  if (g_error_matches (gvdb_table_error, G_FILE_ERROR, G_FILE_ERROR_INVAL))
     g_set_error_literal (g_resource_error,
                          G_RESOURCE_ERROR, G_RESOURCE_ERROR_INTERNAL,
                          gvdb_table_error->message);
@@ -564,10 +564,10 @@ g_resource_error_from_gvdb_table_error (xerror_t **g_resource_error,
 
 /**
  * g_resource_new_from_data:
- * @data: A #xbytes_t
- * @error: return location for a #xerror_t, or %NULL
+ * @data: A #GBytes
+ * @error: return location for a #GError, or %NULL
  *
- * Creates a xresource_t from a reference to the binary resource bundle.
+ * Creates a GResource from a reference to the binary resource bundle.
  * This will keep a reference to @data while the resource lives, so
  * the data should not be modified or freed.
  *
@@ -580,29 +580,29 @@ g_resource_error_from_gvdb_table_error (xerror_t **g_resource_error,
  *
  * If @data is empty or corrupt, %G_RESOURCE_ERROR_INTERNAL will be returned.
  *
- * Returns: (transfer full): a new #xresource_t, or %NULL on error
+ * Returns: (transfer full): a new #GResource, or %NULL on error
  *
  * Since: 2.32
  **/
-xresource_t *
-g_resource_new_from_data (xbytes_t  *data,
-                          xerror_t **error)
+GResource *
+g_resource_new_from_data (GBytes  *data,
+                          GError **error)
 {
   GvdbTable *table;
-  xboolean_t unref_data = FALSE;
-  xerror_t *local_error = NULL;
+  gboolean unref_data = FALSE;
+  GError *local_error = NULL;
 
-  if (((guintptr) xbytes_get_data (data, NULL)) % sizeof (xpointer_t) != 0)
+  if (((guintptr) g_bytes_get_data (data, NULL)) % sizeof (gpointer) != 0)
     {
-      data = xbytes_new (xbytes_get_data (data, NULL),
-                          xbytes_get_size (data));
+      data = g_bytes_new (g_bytes_get_data (data, NULL),
+                          g_bytes_get_size (data));
       unref_data = TRUE;
     }
 
   table = gvdb_table_new_from_bytes (data, TRUE, &local_error);
 
   if (unref_data)
-    xbytes_unref (data);
+    g_bytes_unref (data);
 
   if (table == NULL)
     {
@@ -616,9 +616,9 @@ g_resource_new_from_data (xbytes_t  *data,
 /**
  * g_resource_load:
  * @filename: (type filename): the path of a filename to load, in the GLib filename encoding
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
- * Loads a binary resource bundle and creates a #xresource_t representation of it, allowing
+ * Loads a binary resource bundle and creates a #GResource representation of it, allowing
  * you to query it for data.
  *
  * If you want to use this resource in the global resource namespace you need
@@ -626,19 +626,19 @@ g_resource_new_from_data (xbytes_t  *data,
  *
  * If @filename is empty or the data in it is corrupt,
  * %G_RESOURCE_ERROR_INTERNAL will be returned. If @filename doesn’t exist, or
- * there is an error in reading it, an error from xmapped_file_new() will be
+ * there is an error in reading it, an error from g_mapped_file_new() will be
  * returned.
  *
- * Returns: (transfer full): a new #xresource_t, or %NULL on error
+ * Returns: (transfer full): a new #GResource, or %NULL on error
  *
  * Since: 2.32
  **/
-xresource_t *
-g_resource_load (const xchar_t  *filename,
-                 xerror_t      **error)
+GResource *
+g_resource_load (const gchar  *filename,
+                 GError      **error)
 {
   GvdbTable *table;
-  xerror_t *local_error = NULL;
+  GError *local_error = NULL;
 
   table = gvdb_table_new (filename, FALSE, &local_error);
   if (table == NULL)
@@ -650,26 +650,26 @@ g_resource_load (const xchar_t  *filename,
   return g_resource_new_from_table (table);
 }
 
-static xboolean_t
-do_lookup (xresource_t             *resource,
-           const xchar_t           *path,
+static gboolean
+do_lookup (GResource             *resource,
+           const gchar           *path,
            GResourceLookupFlags   lookup_flags,
-           xsize_t                 *size,
-           xuint32_t               *flags,
+           gsize                 *size,
+           guint32               *flags,
            const void           **data,
-           xsize_t                 *data_size,
-           xerror_t               **error)
+           gsize                 *data_size,
+           GError               **error)
 {
   char *free_path = NULL;
-  xsize_t path_len;
-  xboolean_t res = FALSE;
-  xvariant_t *value;
+  gsize path_len;
+  gboolean res = FALSE;
+  GVariant *value;
 
   /* Drop any trailing slash. */
   path_len = strlen (path);
   if (path_len >= 1 && path[path_len-1] == '/')
     {
-      path = free_path = xstrdup (path);
+      path = free_path = g_strdup (path);
       free_path[path_len-1] = 0;
     }
 
@@ -683,10 +683,10 @@ do_lookup (xresource_t             *resource,
     }
   else
     {
-      xuint32_t _size, _flags;
-      xvariant_t *array;
+      guint32 _size, _flags;
+      GVariant *array;
 
-      xvariant_get (value, "(uu@ay)",
+      g_variant_get (value, "(uu@ay)",
                      &_size,
                      &_flags,
                      &array);
@@ -699,17 +699,17 @@ do_lookup (xresource_t             *resource,
       if (flags)
         *flags = _flags;
       if (data)
-        *data = xvariant_get_data (array);
+        *data = g_variant_get_data (array);
       if (data_size)
         {
           /* Don't report trailing newline that non-compressed files has */
           if (_flags & G_RESOURCE_FLAGS_COMPRESSED)
-            *data_size = xvariant_get_size (array);
+            *data_size = g_variant_get_size (array);
           else
-            *data_size = xvariant_get_size (array) - 1;
+            *data_size = g_variant_get_size (array) - 1;
         }
-      xvariant_unref (array);
-      xvariant_unref (value);
+      g_variant_unref (array);
+      g_variant_unref (value);
 
       res = TRUE;
     }
@@ -720,48 +720,48 @@ do_lookup (xresource_t             *resource,
 
 /**
  * g_resource_open_stream:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks for a file at the specified @path in the resource and
- * returns a #xinput_stream_t that lets you read the data.
+ * returns a #GInputStream that lets you read the data.
  *
  * @lookup_flags controls the behaviour of the lookup.
  *
- * Returns: (transfer full): #xinput_stream_t or %NULL on error.
- *     Free the returned object with xobject_unref()
+ * Returns: (transfer full): #GInputStream or %NULL on error.
+ *     Free the returned object with g_object_unref()
  *
  * Since: 2.32
  **/
-xinput_stream_t *
-g_resource_open_stream (xresource_t             *resource,
-                        const xchar_t           *path,
+GInputStream *
+g_resource_open_stream (GResource             *resource,
+                        const gchar           *path,
                         GResourceLookupFlags   lookup_flags,
-                        xerror_t               **error)
+                        GError               **error)
 {
   const void *data;
-  xsize_t data_size;
-  xuint32_t flags;
-  xinput_stream_t *stream, *stream2;
+  gsize data_size;
+  guint32 flags;
+  GInputStream *stream, *stream2;
 
   if (!do_lookup (resource, path, lookup_flags, NULL, &flags, &data, &data_size, error))
     return NULL;
 
   stream = g_memory_input_stream_new_from_data (data, data_size, NULL);
-  xobject_set_data_full (G_OBJECT (stream), "g-resource",
+  g_object_set_data_full (G_OBJECT (stream), "g-resource",
                           g_resource_ref (resource),
-                          (xdestroy_notify_t)g_resource_unref);
+                          (GDestroyNotify)g_resource_unref);
 
   if (flags & G_RESOURCE_FLAGS_COMPRESSED)
     {
-      xzlib_decompressor_t *decompressor =
+      GZlibDecompressor *decompressor =
         g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
 
-      stream2 = xconverter_input_stream_new (stream, XCONVERTER (decompressor));
-      xobject_unref (decompressor);
-      xobject_unref (stream);
+      stream2 = g_converter_input_stream_new (stream, G_CONVERTER (decompressor));
+      g_object_unref (decompressor);
+      g_object_unref (stream);
       stream = stream2;
     }
 
@@ -770,18 +770,18 @@ g_resource_open_stream (xresource_t             *resource,
 
 /**
  * g_resource_lookup_data:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks for a file at the specified @path in the resource and
- * returns a #xbytes_t that lets you directly access the data in
+ * returns a #GBytes that lets you directly access the data in
  * memory.
  *
  * The data is always followed by a zero byte, so you
  * can safely use the data as a C string. However, that byte
- * is not included in the size of the xbytes_t.
+ * is not included in the size of the GBytes.
  *
  * For uncompressed resource files this is a pointer directly into
  * the resource bundle, which is typically in some readonly data section
@@ -790,37 +790,37 @@ g_resource_open_stream (xresource_t             *resource,
  *
  * @lookup_flags controls the behaviour of the lookup.
  *
- * Returns: (transfer full): #xbytes_t or %NULL on error.
- *     Free the returned object with xbytes_unref()
+ * Returns: (transfer full): #GBytes or %NULL on error.
+ *     Free the returned object with g_bytes_unref()
  *
  * Since: 2.32
  **/
-xbytes_t *
-g_resource_lookup_data (xresource_t             *resource,
-                        const xchar_t           *path,
+GBytes *
+g_resource_lookup_data (GResource             *resource,
+                        const gchar           *path,
                         GResourceLookupFlags   lookup_flags,
-                        xerror_t               **error)
+                        GError               **error)
 {
   const void *data;
-  xuint32_t flags;
-  xsize_t data_size;
-  xsize_t size;
+  guint32 flags;
+  gsize data_size;
+  gsize size;
 
   if (!do_lookup (resource, path, lookup_flags, &size, &flags, &data, &data_size, error))
     return NULL;
 
   if (size == 0)
-    return xbytes_new_with_free_func ("", 0, (xdestroy_notify_t) g_resource_unref, g_resource_ref (resource));
+    return g_bytes_new_with_free_func ("", 0, (GDestroyNotify) g_resource_unref, g_resource_ref (resource));
   else if (flags & G_RESOURCE_FLAGS_COMPRESSED)
     {
       char *uncompressed, *d;
       const char *s;
-      xconverter_result_t res;
-      xsize_t d_size, s_size;
-      xsize_t bytes_read, bytes_written;
+      GConverterResult res;
+      gsize d_size, s_size;
+      gsize bytes_read, bytes_written;
 
 
-      xzlib_decompressor_t *decompressor =
+      GZlibDecompressor *decompressor =
         g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
 
       uncompressed = g_malloc (size + 1);
@@ -832,17 +832,17 @@ g_resource_lookup_data (xresource_t             *resource,
 
       do
         {
-          res = xconverter_convert (XCONVERTER (decompressor),
+          res = g_converter_convert (G_CONVERTER (decompressor),
                                      s, s_size,
                                      d, d_size,
-                                     XCONVERTER_INPUT_AT_END,
+                                     G_CONVERTER_INPUT_AT_END,
                                      &bytes_read,
                                      &bytes_written,
                                      NULL);
-          if (res == XCONVERTER_ERROR)
+          if (res == G_CONVERTER_ERROR)
             {
               g_free (uncompressed);
-              xobject_unref (decompressor);
+              g_object_unref (decompressor);
 
               g_set_error (error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_INTERNAL,
                            _("The resource at “%s” failed to decompress"),
@@ -855,28 +855,28 @@ g_resource_lookup_data (xresource_t             *resource,
           d += bytes_written;
           d_size -= bytes_written;
         }
-      while (res != XCONVERTER_FINISHED);
+      while (res != G_CONVERTER_FINISHED);
 
       uncompressed[size] = 0; /* Zero terminate */
 
-      xobject_unref (decompressor);
+      g_object_unref (decompressor);
 
-      return xbytes_new_take (uncompressed, size);
+      return g_bytes_new_take (uncompressed, size);
     }
   else
-    return xbytes_new_with_free_func (data, data_size, (xdestroy_notify_t)g_resource_unref, g_resource_ref (resource));
+    return g_bytes_new_with_free_func (data, data_size, (GDestroyNotify)g_resource_unref, g_resource_ref (resource));
 }
 
 /**
  * g_resource_get_info:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
  * @size:  (out) (optional): a location to place the length of the contents of the file,
  *    or %NULL if the length is not needed
  * @flags:  (out) (optional): a location to place the flags about the file,
  *    or %NULL if the length is not needed
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks for a file at the specified @path in the resource and
  * if found returns information about it.
@@ -887,29 +887,29 @@ g_resource_lookup_data (xresource_t             *resource,
  *
  * Since: 2.32
  **/
-xboolean_t
-g_resource_get_info (xresource_t             *resource,
-                     const xchar_t           *path,
+gboolean
+g_resource_get_info (GResource             *resource,
+                     const gchar           *path,
                      GResourceLookupFlags   lookup_flags,
-                     xsize_t                 *size,
-                     xuint32_t               *flags,
-                     xerror_t               **error)
+                     gsize                 *size,
+                     guint32               *flags,
+                     GError               **error)
 {
   return do_lookup (resource, path, lookup_flags, size, flags, NULL, NULL, error);
 }
 
 /**
  * g_resource_enumerate_children:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Returns all the names of children at the specified @path in the resource.
  * The return result is a %NULL terminated list of strings which should
- * be released with xstrfreev().
+ * be released with g_strfreev().
  *
- * If @path is invalid or does not exist in the #xresource_t,
+ * If @path is invalid or does not exist in the #GResource,
  * %G_RESOURCE_ERROR_NOT_FOUND will be returned.
  *
  * @lookup_flags controls the behaviour of the lookup.
@@ -918,17 +918,17 @@ g_resource_get_info (xresource_t             *resource,
  *
  * Since: 2.32
  **/
-xchar_t **
-g_resource_enumerate_children (xresource_t             *resource,
-                               const xchar_t           *path,
+gchar **
+g_resource_enumerate_children (GResource             *resource,
+                               const gchar           *path,
                                GResourceLookupFlags   lookup_flags,
-                               xerror_t               **error)
+                               GError               **error)
 {
-  xchar_t local_str[256];
-  const xchar_t *path_with_slash;
-  xchar_t **children;
-  xchar_t *free_path = NULL;
-  xsize_t path_len;
+  gchar local_str[256];
+  const gchar *path_with_slash;
+  gchar **children;
+  gchar *free_path = NULL;
+  gsize path_len;
 
   /*
    * Size of 256 is arbitrarily chosen based on being large enough
@@ -956,7 +956,7 @@ g_resource_enumerate_children (xresource_t             *resource,
            * ideal use of this API as we require trailing / for our lookup
            * into gvdb. Some degenerate application configurations can hit
            * this code path quite a bit, so we try to avoid using the
-           * xstrconcat()/g_free().
+           * g_strconcat()/g_free().
            */
           memcpy (local_str, path, path_len);
           local_str[path_len] = '/';
@@ -965,7 +965,7 @@ g_resource_enumerate_children (xresource_t             *resource,
         }
       else
         {
-          path_with_slash = free_path = xstrconcat (path, "/", NULL);
+          path_with_slash = free_path = g_strconcat (path, "/", NULL);
         }
     }
   else
@@ -989,35 +989,35 @@ g_resource_enumerate_children (xresource_t             *resource,
 }
 
 static GRWLock resources_lock;
-static xlist_t *registered_resources;
+static GList *registered_resources;
 
 /* This is updated atomically, so we can append to it and check for NULL outside the
    lock, but all other accesses are done under the write lock */
 static GStaticResource *lazy_register_resources;
 
 static void
-g_resources_register_unlocked (xresource_t *resource)
+g_resources_register_unlocked (GResource *resource)
 {
-  registered_resources = xlist_prepend (registered_resources, g_resource_ref (resource));
+  registered_resources = g_list_prepend (registered_resources, g_resource_ref (resource));
 }
 
 static void
-g_resources_unregister_unlocked (xresource_t *resource)
+g_resources_unregister_unlocked (GResource *resource)
 {
-  if (xlist_find (registered_resources, resource) == NULL)
+  if (g_list_find (registered_resources, resource) == NULL)
     {
       g_warning ("Tried to remove not registered resource");
     }
   else
     {
-      registered_resources = xlist_remove (registered_resources, resource);
+      registered_resources = g_list_remove (registered_resources, resource);
       g_resource_unref (resource);
     }
 }
 
 /**
  * g_resources_register:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  *
  * Registers the resource with the process-global set of resources.
  * Once a resource is registered the files in it can be accessed
@@ -1026,7 +1026,7 @@ g_resources_unregister_unlocked (xresource_t *resource)
  * Since: 2.32
  **/
 void
-g_resources_register (xresource_t *resource)
+g_resources_register (GResource *resource)
 {
   g_rw_lock_writer_lock (&resources_lock);
   g_resources_register_unlocked (resource);
@@ -1035,14 +1035,14 @@ g_resources_register (xresource_t *resource)
 
 /**
  * g_resources_unregister:
- * @resource: A #xresource_t
+ * @resource: A #GResource
  *
  * Unregisters the resource from the process-global set of resources.
  *
  * Since: 2.32
  **/
 void
-g_resources_unregister (xresource_t *resource)
+g_resources_unregister (GResource *resource)
 {
   g_rw_lock_writer_lock (&resources_lock);
   g_resources_unregister_unlocked (resource);
@@ -1053,27 +1053,27 @@ g_resources_unregister (xresource_t *resource)
  * g_resources_open_stream:
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks for a file at the specified @path in the set of
- * globally registered resources and returns a #xinput_stream_t
+ * globally registered resources and returns a #GInputStream
  * that lets you read the data.
  *
  * @lookup_flags controls the behaviour of the lookup.
  *
- * Returns: (transfer full): #xinput_stream_t or %NULL on error.
- *     Free the returned object with xobject_unref()
+ * Returns: (transfer full): #GInputStream or %NULL on error.
+ *     Free the returned object with g_object_unref()
  *
  * Since: 2.32
  **/
-xinput_stream_t *
-g_resources_open_stream (const xchar_t           *path,
+GInputStream *
+g_resources_open_stream (const gchar           *path,
                          GResourceLookupFlags   lookup_flags,
-                         xerror_t               **error)
+                         GError               **error)
 {
-  xinput_stream_t *res = NULL;
-  xlist_t *l;
-  xinput_stream_t *stream;
+  GInputStream *res = NULL;
+  GList *l;
+  GInputStream *stream;
 
   if (g_resource_find_overlay (path, open_overlay_stream, &res))
     return res;
@@ -1084,12 +1084,12 @@ g_resources_open_stream (const xchar_t           *path,
 
   for (l = registered_resources; l != NULL; l = l->next)
     {
-      xresource_t *r = l->data;
-      xerror_t *my_error = NULL;
+      GResource *r = l->data;
+      GError *my_error = NULL;
 
       stream = g_resource_open_stream (r, path, lookup_flags, &my_error);
       if (stream == NULL &&
-          xerror_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
+          g_error_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
         {
           g_clear_error (&my_error);
         }
@@ -1116,15 +1116,15 @@ g_resources_open_stream (const xchar_t           *path,
  * g_resources_lookup_data:
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks for a file at the specified @path in the set of
- * globally registered resources and returns a #xbytes_t that
+ * globally registered resources and returns a #GBytes that
  * lets you directly access the data in memory.
  *
  * The data is always followed by a zero byte, so you
  * can safely use the data as a C string. However, that byte
- * is not included in the size of the xbytes_t.
+ * is not included in the size of the GBytes.
  *
  * For uncompressed resource files this is a pointer directly into
  * the resource bundle, which is typically in some readonly data section
@@ -1133,19 +1133,19 @@ g_resources_open_stream (const xchar_t           *path,
  *
  * @lookup_flags controls the behaviour of the lookup.
  *
- * Returns: (transfer full): #xbytes_t or %NULL on error.
- *     Free the returned object with xbytes_unref()
+ * Returns: (transfer full): #GBytes or %NULL on error.
+ *     Free the returned object with g_bytes_unref()
  *
  * Since: 2.32
  **/
-xbytes_t *
-g_resources_lookup_data (const xchar_t           *path,
+GBytes *
+g_resources_lookup_data (const gchar           *path,
                          GResourceLookupFlags   lookup_flags,
-                         xerror_t               **error)
+                         GError               **error)
 {
-  xbytes_t *res = NULL;
-  xlist_t *l;
-  xbytes_t *data;
+  GBytes *res = NULL;
+  GList *l;
+  GBytes *data;
 
   if (g_resource_find_overlay (path, get_overlay_bytes, &res))
     return res;
@@ -1156,12 +1156,12 @@ g_resources_lookup_data (const xchar_t           *path,
 
   for (l = registered_resources; l != NULL; l = l->next)
     {
-      xresource_t *r = l->data;
-      xerror_t *my_error = NULL;
+      GResource *r = l->data;
+      GError *my_error = NULL;
 
       data = g_resource_lookup_data (r, path, lookup_flags, &my_error);
       if (data == NULL &&
-          xerror_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
+          g_error_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
         {
           g_clear_error (&my_error);
         }
@@ -1188,12 +1188,12 @@ g_resources_lookup_data (const xchar_t           *path,
  * g_resources_enumerate_children:
  * @path: A pathname inside the resource
  * @lookup_flags: A #GResourceLookupFlags
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Returns all the names of children at the specified @path in the set of
  * globally registered resources.
  * The return result is a %NULL terminated list of strings which should
- * be released with xstrfreev().
+ * be released with g_strfreev().
  *
  * @lookup_flags controls the behaviour of the lookup.
  *
@@ -1201,13 +1201,13 @@ g_resources_lookup_data (const xchar_t           *path,
  *
  * Since: 2.32
  **/
-xchar_t **
-g_resources_enumerate_children (const xchar_t           *path,
+gchar **
+g_resources_enumerate_children (const gchar           *path,
                                 GResourceLookupFlags   lookup_flags,
-                                xerror_t               **error)
+                                GError               **error)
 {
-  xhashtable_t *hash = NULL;
-  xlist_t *l;
+  GHashTable *hash = NULL;
+  GList *l;
   char **children;
   int i;
 
@@ -1228,7 +1228,7 @@ g_resources_enumerate_children (const xchar_t           *path,
 
   for (l = registered_resources; l != NULL; l = l->next)
     {
-      xresource_t *r = l->data;
+      GResource *r = l->data;
 
       children = g_resource_enumerate_children (r, path, 0, NULL);
 
@@ -1236,10 +1236,10 @@ g_resources_enumerate_children (const xchar_t           *path,
         {
           if (hash == NULL)
             /* note: keep in sync with same line above */
-            hash = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
+            hash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
           for (i = 0; children[i] != NULL; i++)
-            xhash_table_add (hash, children[i]);
+            g_hash_table_add (hash, children[i]);
           g_free (children);
         }
     }
@@ -1256,9 +1256,9 @@ g_resources_enumerate_children (const xchar_t           *path,
     }
   else
     {
-      children = (xchar_t **) xhash_table_get_keys_as_array (hash, NULL);
-      xhash_table_steal_all (hash);
-      xhash_table_destroy (hash);
+      children = (gchar **) g_hash_table_get_keys_as_array (hash, NULL);
+      g_hash_table_steal_all (hash);
+      g_hash_table_destroy (hash);
 
       return children;
     }
@@ -1272,7 +1272,7 @@ g_resources_enumerate_children (const xchar_t           *path,
  *    or %NULL if the length is not needed
  * @flags:  (out) (optional): a location to place the #GResourceFlags about the file,
  *    or %NULL if the flags are not needed
- * @error: return location for a #xerror_t, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks for a file at the specified @path in the set of
  * globally registered resources and if found returns information about it.
@@ -1283,16 +1283,16 @@ g_resources_enumerate_children (const xchar_t           *path,
  *
  * Since: 2.32
  **/
-xboolean_t
-g_resources_get_info (const xchar_t           *path,
+gboolean
+g_resources_get_info (const gchar           *path,
                       GResourceLookupFlags   lookup_flags,
-                      xsize_t                 *size,
-                      xuint32_t               *flags,
-                      xerror_t               **error)
+                      gsize                 *size,
+                      guint32               *flags,
+                      GError               **error)
 {
-  xboolean_t res = FALSE;
-  xlist_t *l;
-  xboolean_t r_res;
+  gboolean res = FALSE;
+  GList *l;
+  gboolean r_res;
   InfoData info;
 
   if (g_resource_find_overlay (path, get_overlay_info, &info))
@@ -1311,12 +1311,12 @@ g_resources_get_info (const xchar_t           *path,
 
   for (l = registered_resources; l != NULL; l = l->next)
     {
-      xresource_t *r = l->data;
-      xerror_t *my_error = NULL;
+      GResource *r = l->data;
+      GError *my_error = NULL;
 
       r_res = g_resource_get_info (r, path, lookup_flags, size, flags, &my_error);
       if (!r_res &&
-          xerror_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
+          g_error_matches (my_error, G_RESOURCE_ERROR, G_RESOURCE_ERROR_NOT_FOUND))
         {
           g_clear_error (&my_error);
         }
@@ -1370,14 +1370,14 @@ register_lazy_static_resources_unlocked (void)
 
   while (list != NULL)
     {
-      xbytes_t *bytes = xbytes_new_static (list->data, list->data_len);
-      xresource_t *resource = g_resource_new_from_data (bytes, NULL);
+      GBytes *bytes = g_bytes_new_static (list->data, list->data_len);
+      GResource *resource = g_resource_new_from_data (bytes, NULL);
       if (resource)
         {
           g_resources_register_unlocked (resource);
           g_atomic_pointer_set (&list->resource, resource);
         }
-      xbytes_unref (bytes);
+      g_bytes_unref (bytes);
 
       list = list->next;
     }
@@ -1398,7 +1398,7 @@ register_lazy_static_resources (void)
  * g_static_resource_init:
  * @static_resource: pointer to a static #GStaticResource
  *
- * Initializes a xresource_t from static data using a
+ * Initializes a GResource from static data using a
  * GStaticResource.
  *
  * This is normally used by code generated by
@@ -1424,7 +1424,7 @@ g_static_resource_init (GStaticResource *static_resource)
  * g_static_resource_fini:
  * @static_resource: pointer to a static #GStaticResource
  *
- * Finalized a xresource_t initialized by g_static_resource_init().
+ * Finalized a GResource initialized by g_static_resource_init().
  *
  * This is normally used by code generated by
  * [glib-compile-resources][glib-compile-resources]
@@ -1435,7 +1435,7 @@ g_static_resource_init (GStaticResource *static_resource)
 void
 g_static_resource_fini (GStaticResource *static_resource)
 {
-  xresource_t *resource;
+  GResource *resource;
 
   g_rw_lock_writer_lock (&resources_lock);
 
@@ -1456,17 +1456,17 @@ g_static_resource_fini (GStaticResource *static_resource)
  * g_static_resource_get_resource:
  * @static_resource: pointer to a static #GStaticResource
  *
- * Gets the xresource_t that was registered by a call to g_static_resource_init().
+ * Gets the GResource that was registered by a call to g_static_resource_init().
  *
  * This is normally used by code generated by
  * [glib-compile-resources][glib-compile-resources]
  * and is not typically used by other code.
  *
- * Returns:  (transfer none): a #xresource_t
+ * Returns:  (transfer none): a #GResource
  *
  * Since: 2.32
  **/
-xresource_t *
+GResource *
 g_static_resource_get_resource (GStaticResource *static_resource)
 {
   register_lazy_static_resources ();

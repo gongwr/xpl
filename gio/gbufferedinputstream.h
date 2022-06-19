@@ -29,48 +29,48 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_BUFFERED_INPUT_STREAM         (xbuffered_input_stream_get_type ())
-#define G_BUFFERED_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_BUFFERED_INPUT_STREAM, xbuffered_input_stream_t))
-#define G_BUFFERED_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_BUFFERED_INPUT_STREAM, xbuffered_input_stream_class_t))
-#define X_IS_BUFFERED_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_BUFFERED_INPUT_STREAM))
-#define X_IS_BUFFERED_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_BUFFERED_INPUT_STREAM))
-#define G_BUFFERED_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_BUFFERED_INPUT_STREAM, xbuffered_input_stream_class_t))
+#define G_TYPE_BUFFERED_INPUT_STREAM         (g_buffered_input_stream_get_type ())
+#define G_BUFFERED_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_BUFFERED_INPUT_STREAM, GBufferedInputStream))
+#define G_BUFFERED_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_BUFFERED_INPUT_STREAM, GBufferedInputStreamClass))
+#define G_IS_BUFFERED_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_BUFFERED_INPUT_STREAM))
+#define G_IS_BUFFERED_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_BUFFERED_INPUT_STREAM))
+#define G_BUFFERED_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_BUFFERED_INPUT_STREAM, GBufferedInputStreamClass))
 
 /**
- * xbuffered_input_stream_t:
+ * GBufferedInputStream:
  *
- * Implements #xfilter_input_stream_t with a sized input buffer.
+ * Implements #GFilterInputStream with a sized input buffer.
  **/
-typedef struct _GBufferedInputStreamClass    xbuffered_input_stream_class_t;
-typedef struct _GBufferedInputStreamPrivate  xbuffered_input_stream_private_t;
+typedef struct _GBufferedInputStreamClass    GBufferedInputStreamClass;
+typedef struct _GBufferedInputStreamPrivate  GBufferedInputStreamPrivate;
 
 struct _GBufferedInputStream
 {
-  xfilter_input_stream_t parent_instance;
+  GFilterInputStream parent_instance;
 
   /*< private >*/
-  xbuffered_input_stream_private_t *priv;
+  GBufferedInputStreamPrivate *priv;
 };
 
 struct _GBufferedInputStreamClass
 {
   GFilterInputStreamClass parent_class;
 
-  xssize_t   (* fill)        (xbuffered_input_stream_t *stream,
-			    xssize_t                count,
-			    xcancellable_t         *cancellable,
-			    xerror_t              **error);
+  gssize   (* fill)        (GBufferedInputStream *stream,
+			    gssize                count,
+			    GCancellable         *cancellable,
+			    GError              **error);
 
   /* Async ops: (optional in derived classes) */
-  void     (* fill_async)  (xbuffered_input_stream_t *stream,
-			    xssize_t                count,
+  void     (* fill_async)  (GBufferedInputStream *stream,
+			    gssize                count,
 			    int                   io_priority,
-			    xcancellable_t         *cancellable,
-			    xasync_ready_callback_t   callback,
-			    xpointer_t              user_data);
-  xssize_t   (* fill_finish) (xbuffered_input_stream_t *stream,
-			    xasync_result_t         *result,
-			    xerror_t              **error);
+			    GCancellable         *cancellable,
+			    GAsyncReadyCallback   callback,
+			    gpointer              user_data);
+  gssize   (* fill_finish) (GBufferedInputStream *stream,
+			    GAsyncResult         *result,
+			    GError              **error);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -82,51 +82,51 @@ struct _GBufferedInputStreamClass
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t         xbuffered_input_stream_get_type        (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t* xbuffered_input_stream_new             (xinput_stream_t          *base_stream);
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t* xbuffered_input_stream_new_sized       (xinput_stream_t          *base_stream,
-						       xsize_t                  size);
+GLIB_AVAILABLE_IN_ALL
+GType         g_buffered_input_stream_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GInputStream* g_buffered_input_stream_new             (GInputStream          *base_stream);
+GLIB_AVAILABLE_IN_ALL
+GInputStream* g_buffered_input_stream_new_sized       (GInputStream          *base_stream,
+						       gsize                  size);
 
-XPL_AVAILABLE_IN_ALL
-xsize_t         xbuffered_input_stream_get_buffer_size (xbuffered_input_stream_t  *stream);
-XPL_AVAILABLE_IN_ALL
-void          xbuffered_input_stream_set_buffer_size (xbuffered_input_stream_t  *stream,
-						       xsize_t                  size);
-XPL_AVAILABLE_IN_ALL
-xsize_t         xbuffered_input_stream_get_available   (xbuffered_input_stream_t  *stream);
-XPL_AVAILABLE_IN_ALL
-xsize_t         xbuffered_input_stream_peek            (xbuffered_input_stream_t  *stream,
+GLIB_AVAILABLE_IN_ALL
+gsize         g_buffered_input_stream_get_buffer_size (GBufferedInputStream  *stream);
+GLIB_AVAILABLE_IN_ALL
+void          g_buffered_input_stream_set_buffer_size (GBufferedInputStream  *stream,
+						       gsize                  size);
+GLIB_AVAILABLE_IN_ALL
+gsize         g_buffered_input_stream_get_available   (GBufferedInputStream  *stream);
+GLIB_AVAILABLE_IN_ALL
+gsize         g_buffered_input_stream_peek            (GBufferedInputStream  *stream,
 						       void                  *buffer,
-						       xsize_t                  offset,
-						       xsize_t                  count);
-XPL_AVAILABLE_IN_ALL
-const void*   xbuffered_input_stream_peek_buffer     (xbuffered_input_stream_t  *stream,
-						       xsize_t                 *count);
+						       gsize                  offset,
+						       gsize                  count);
+GLIB_AVAILABLE_IN_ALL
+const void*   g_buffered_input_stream_peek_buffer     (GBufferedInputStream  *stream,
+						       gsize                 *count);
 
-XPL_AVAILABLE_IN_ALL
-xssize_t        xbuffered_input_stream_fill            (xbuffered_input_stream_t  *stream,
-						       xssize_t                 count,
-						       xcancellable_t          *cancellable,
-						       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-void          xbuffered_input_stream_fill_async      (xbuffered_input_stream_t  *stream,
-						       xssize_t                 count,
+GLIB_AVAILABLE_IN_ALL
+gssize        g_buffered_input_stream_fill            (GBufferedInputStream  *stream,
+						       gssize                 count,
+						       GCancellable          *cancellable,
+						       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+void          g_buffered_input_stream_fill_async      (GBufferedInputStream  *stream,
+						       gssize                 count,
 						       int                    io_priority,
-						       xcancellable_t          *cancellable,
-						       xasync_ready_callback_t    callback,
-						       xpointer_t               user_data);
-XPL_AVAILABLE_IN_ALL
-xssize_t        xbuffered_input_stream_fill_finish     (xbuffered_input_stream_t  *stream,
-						       xasync_result_t          *result,
-						       xerror_t               **error);
+						       GCancellable          *cancellable,
+						       GAsyncReadyCallback    callback,
+						       gpointer               user_data);
+GLIB_AVAILABLE_IN_ALL
+gssize        g_buffered_input_stream_fill_finish     (GBufferedInputStream  *stream,
+						       GAsyncResult          *result,
+						       GError               **error);
 
-XPL_AVAILABLE_IN_ALL
-int           xbuffered_input_stream_read_byte       (xbuffered_input_stream_t  *stream,
-						       xcancellable_t          *cancellable,
-						       xerror_t               **error);
+GLIB_AVAILABLE_IN_ALL
+int           g_buffered_input_stream_read_byte       (GBufferedInputStream  *stream,
+						       GCancellable          *cancellable,
+						       GError               **error);
 
 G_END_DECLS
 

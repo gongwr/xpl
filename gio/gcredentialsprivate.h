@@ -25,14 +25,14 @@
 /*
  * G_CREDENTIALS_SUPPORTED:
  *
- * Defined to 1 if xcredentials_t works.
+ * Defined to 1 if GCredentials works.
  */
 #undef G_CREDENTIALS_SUPPORTED
 
 /*
  * G_CREDENTIALS_USE_LINUX_UCRED, etc.:
  *
- * Defined to 1 if xcredentials_t uses Linux `struct ucred`, etc.
+ * Defined to 1 if GCredentials uses Linux `struct ucred`, etc.
  */
 #undef G_CREDENTIALS_USE_LINUX_UCRED
 #undef G_CREDENTIALS_USE_FREEBSD_CMSGCRED
@@ -169,7 +169,7 @@
 #define G_CREDENTIALS_SPOOFING_SUPPORTED 1
 #define G_CREDENTIALS_HAS_PID 0
 
-void _xcredentials_set_local_peerid (xcredentials_t *credentials,
+void _g_credentials_set_local_peerid (GCredentials *credentials,
                                       pid_t         pid);
 
 #elif defined(_WIN32)

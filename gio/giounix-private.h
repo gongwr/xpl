@@ -21,6 +21,6 @@
 
 G_BEGIN_DECLS
 
-xboolean_t _g_fd_is_pollable (int fd);
+gboolean _g_fd_is_pollable (int fd);
 
 G_END_DECLS

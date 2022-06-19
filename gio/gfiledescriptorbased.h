@@ -18,21 +18,21 @@
  * Author: Christian Kellner <gicmo@gnome.org>
  */
 
-#ifndef __XFILE_DESCRIPTOR_BASED_H__
-#define __XFILE_DESCRIPTOR_BASED_H__
+#ifndef __G_FILE_DESCRIPTOR_BASED_H__
+#define __G_FILE_DESCRIPTOR_BASED_H__
 
 #include <gio/gio.h>
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE_DESCRIPTOR_BASED            (xfile_descriptor_based_get_type ())
-#define XFILE_DESCRIPTOR_BASED(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_FILE_DESCRIPTOR_BASED, xfile_descriptor_based))
-#define X_IS_FILE_DESCRIPTOR_BASED(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_FILE_DESCRIPTOR_BASED))
-#define XFILE_DESCRIPTOR_BASED_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_FILE_DESCRIPTOR_BASED, GFileDescriptorBasedIface))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(xfile_descriptor_based, xobject_unref)
+#define G_TYPE_FILE_DESCRIPTOR_BASED            (g_file_descriptor_based_get_type ())
+#define G_FILE_DESCRIPTOR_BASED(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_FILE_DESCRIPTOR_BASED, GFileDescriptorBased))
+#define G_IS_FILE_DESCRIPTOR_BASED(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_FILE_DESCRIPTOR_BASED))
+#define G_FILE_DESCRIPTOR_BASED_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_FILE_DESCRIPTOR_BASED, GFileDescriptorBasedIface))
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GFileDescriptorBased, g_object_unref)
 
 /**
- * xfile_descriptor_based_t:
+ * GFileDescriptorBased:
  *
  * An interface for file descriptor based io objects.
  **/
@@ -40,26 +40,26 @@ typedef struct _GFileDescriptorBasedIface   GFileDescriptorBasedIface;
 
 /**
  * GFileDescriptorBasedIface:
- * @x_iface: The parent interface.
+ * @g_iface: The parent interface.
  * @get_fd: Gets the underlying file descriptor.
  *
  * An interface for file descriptor based io objects.
  **/
 struct _GFileDescriptorBasedIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
-  int (*get_fd) (xfile_descriptor_based_t *fd_based);
+  int (*get_fd) (GFileDescriptorBased *fd_based);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xfile_descriptor_based_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_file_descriptor_based_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-int      xfile_descriptor_based_get_fd       (xfile_descriptor_based_t *fd_based);
+GLIB_AVAILABLE_IN_ALL
+int      g_file_descriptor_based_get_fd       (GFileDescriptorBased *fd_based);
 
 G_END_DECLS
 
 
-#endif /* __XFILE_DESCRIPTOR_BASED_H__ */
+#endif /* __G_FILE_DESCRIPTOR_BASED_H__ */

@@ -2254,7 +2254,7 @@ _GL_WARN_REAL_FLOATING_DECL (isinf);
 
 
 #if @GNULIB_ISNANF@
-/* test_t for NaN for 'float' numbers.  */
+/* Test for NaN for 'float' numbers.  */
 # if @HAVE_ISNANF@
 /* The original <math.h> included above provides a declaration of isnan macro
    or (older) isnanf function.  */
@@ -2267,7 +2267,7 @@ _GL_WARN_REAL_FLOATING_DECL (isinf);
 #   define isnanf(x) isnan ((float)(x))
 #  endif
 # else
-/* test_t whether X is a NaN.  */
+/* Test whether X is a NaN.  */
 #  undef isnanf
 #  define isnanf rpl_isnanf
 _GL_EXTERN_C int isnanf (float x);
@@ -2275,7 +2275,7 @@ _GL_EXTERN_C int isnanf (float x);
 #endif
 
 #if @GNULIB_ISNAND@
-/* test_t for NaN for 'double' numbers.
+/* Test for NaN for 'double' numbers.
    This function is a gnulib extension, unlike isnan() which applied only
    to 'double' numbers earlier but now is a type-generic macro.  */
 # if @HAVE_ISNAND@
@@ -2290,7 +2290,7 @@ _GL_EXTERN_C int isnanf (float x);
 #   define isnand(x) isnan ((double)(x))
 #  endif
 # else
-/* test_t whether X is a NaN.  */
+/* Test whether X is a NaN.  */
 #  undef isnand
 #  define isnand rpl_isnand
 _GL_EXTERN_C int isnand (double x);
@@ -2298,7 +2298,7 @@ _GL_EXTERN_C int isnand (double x);
 #endif
 
 #if @GNULIB_ISNANL@
-/* test_t for NaN for 'long double' numbers.  */
+/* Test for NaN for 'long double' numbers.  */
 # if @HAVE_ISNANL@
 /* The original <math.h> included above provides a declaration of isnan
    macro or (older) isnanl function.  */
@@ -2311,7 +2311,7 @@ _GL_EXTERN_C int isnand (double x);
 #   define isnanl(x) isnan ((long double)(x))
 #  endif
 # else
-/* test_t whether X is a NaN.  */
+/* Test whether X is a NaN.  */
 #  undef isnanl
 #  define isnanl rpl_isnanl
 _GL_EXTERN_C int isnanl (long double x) _GL_ATTRIBUTE_CONST;

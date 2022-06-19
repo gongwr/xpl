@@ -34,43 +34,43 @@
 /* --- prototypes --- */
 static int      main_selftest   (int    argc,
                                  char **argv);
-static void     parse_args      (xint_t           *argc_p,
-                                 xchar_t        ***argv_p);
+static void     parse_args      (gint           *argc_p,
+                                 gchar        ***argv_p);
 
 /* --- variables --- */
-static xio_channel_t  *ioc_report = NULL;
-static xboolean_t     gtester_quiet = FALSE;
-static xboolean_t     gtester_verbose = FALSE;
-static xboolean_t     gtester_list_tests = FALSE;
-static xboolean_t     gtester_selftest = FALSE;
-static xboolean_t     gtester_ignore_deprecation = FALSE;
-static xboolean_t     subtest_running = FALSE;
-static xint_t         subtest_exitstatus = 0;
-static xboolean_t     subtest_io_pending = FALSE;
-static xboolean_t     subtest_quiet = TRUE;
-static xboolean_t     subtest_verbose = FALSE;
-static xboolean_t     subtest_mode_fatal = TRUE;
-static xboolean_t     subtest_mode_perf = FALSE;
-static xboolean_t     subtest_mode_quick = TRUE;
-static xboolean_t     subtest_mode_undefined = TRUE;
-static const xchar_t *subtest_seedstr = NULL;
-static xchar_t       *subtest_last_seed = NULL;
-static xslist_t      *subtest_paths = NULL;
-static xslist_t      *skipped_paths = NULL;
-static xslist_t      *subtest_args = NULL;
-static xboolean_t     testcase_open = FALSE;
-static xuint_t        testcase_count = 0;
-static xuint_t        testcase_fail_count = 0;
-static const xchar_t *output_filename = NULL;
-static xuint_t        log_indent = 0;
-static xint_t         log_fd = -1;
+static GIOChannel  *ioc_report = NULL;
+static gboolean     gtester_quiet = FALSE;
+static gboolean     gtester_verbose = FALSE;
+static gboolean     gtester_list_tests = FALSE;
+static gboolean     gtester_selftest = FALSE;
+static gboolean     gtester_ignore_deprecation = FALSE;
+static gboolean     subtest_running = FALSE;
+static gint         subtest_exitstatus = 0;
+static gboolean     subtest_io_pending = FALSE;
+static gboolean     subtest_quiet = TRUE;
+static gboolean     subtest_verbose = FALSE;
+static gboolean     subtest_mode_fatal = TRUE;
+static gboolean     subtest_mode_perf = FALSE;
+static gboolean     subtest_mode_quick = TRUE;
+static gboolean     subtest_mode_undefined = TRUE;
+static const gchar *subtest_seedstr = NULL;
+static gchar       *subtest_last_seed = NULL;
+static GSList      *subtest_paths = NULL;
+static GSList      *skipped_paths = NULL;
+static GSList      *subtest_args = NULL;
+static gboolean     testcase_open = FALSE;
+static guint        testcase_count = 0;
+static guint        testcase_fail_count = 0;
+static const gchar *output_filename = NULL;
+static guint        log_indent = 0;
+static gint         log_fd = -1;
 
 /* --- functions --- */
 static const char*
-sindent (xuint_t n)
+sindent (guint n)
 {
   static const char spaces[] = "                                                                                                    ";
-  xsize_t l = sizeof (spaces) - 1;
+  gsize l = sizeof (spaces) - 1;
   n = MIN (n, l);
   return spaces + l - n;
 }
@@ -100,10 +100,10 @@ terminate (void)
 
 static void
 testcase_close (long double duration,
-                xint_t        exit_status,
-                xuint_t       n_forks)
+                gint        exit_status,
+                guint       n_forks)
 {
-  xboolean_t success;
+  gboolean success;
 
   g_return_if_fail (testcase_open > 0);
   test_log_printfe ("%s<duration>%.6Lf</duration>\n", sindent (log_indent), duration);
@@ -142,32 +142,32 @@ test_log_msg (GTestLogMsg *msg)
 {
   switch (msg->log_type)
     {
-      xuint_t i;
-      xchar_t **strv;
+      guint i;
+      gchar **strv;
     case G_TEST_LOG_NONE:
     case G_TEST_LOG_START_SUITE:
     case G_TEST_LOG_STOP_SUITE:
       break;
     case G_TEST_LOG_ERROR:
-      strv = xstrsplit (msg->strings[0], "\n", -1);
+      strv = g_strsplit (msg->strings[0], "\n", -1);
       for (i = 0; strv[i]; i++)
         test_log_printfe ("%s<error>%s</error>\n", sindent (log_indent), strv[i]);
-      xstrfreev (strv);
+      g_strfreev (strv);
       break;
     case G_TEST_LOG_START_BINARY:
       test_log_printfe ("%s<binary file=\"%s\"/>\n", sindent (log_indent), msg->strings[0]);
-      subtest_last_seed = xstrdup (msg->strings[1]);
+      subtest_last_seed = g_strdup (msg->strings[1]);
       test_log_printfe ("%s<random-seed>%s</random-seed>\n", sindent (log_indent), subtest_last_seed);
       break;
-    case G_TEST_LOXLIST_CASE:
+    case G_TEST_LOG_LIST_CASE:
       g_print ("%s\n", msg->strings[0]);
       break;
     case G_TEST_LOG_START_CASE:
       testcase_count++;
       if (gtester_verbose)
         {
-          xchar_t *sc = xstrconcat (msg->strings[0], ":", NULL);
-          xchar_t *sleft = xstrdup_printf ("%-68s", sc);
+          gchar *sc = g_strconcat (msg->strings[0], ":", NULL);
+          gchar *sleft = g_strdup_printf ("%-68s", sc);
           g_free (sc);
           g_print ("%70s ", sleft);
           g_free (sleft);
@@ -180,8 +180,8 @@ test_log_msg (GTestLogMsg *msg)
     case G_TEST_LOG_SKIP_CASE:
       if (FALSE && gtester_verbose) /* enable to debug test case skipping logic */
         {
-          xchar_t *sc = xstrconcat (msg->strings[0], ":", NULL);
-          xchar_t *sleft = xstrdup_printf ("%-68s", sc);
+          gchar *sc = g_strconcat (msg->strings[0], ":", NULL);
+          gchar *sleft = g_strdup_printf ("%-68s", sc);
           g_free (sc);
           g_print ("%70s SKIPPED\n", sleft);
           g_free (sleft);
@@ -204,20 +204,20 @@ test_log_msg (GTestLogMsg *msg)
     }
 }
 
-static xboolean_t
-child_report_cb (xio_channel_t  *source,
-                 xio_condition_t condition,
-                 xpointer_t     data)
+static gboolean
+child_report_cb (GIOChannel  *source,
+                 GIOCondition condition,
+                 gpointer     data)
 {
   GTestLogBuffer *tlb = data;
   GIOStatus status = G_IO_STATUS_NORMAL;
-  xboolean_t first_read_eof = FALSE, first_read = TRUE;
-  xsize_t length = 0;
+  gboolean first_read_eof = FALSE, first_read = TRUE;
+  gsize length = 0;
   do
     {
-      xuint8_t buffer[READ_BUFFER_SIZE];
-      xerror_t *error = NULL;
-      status = g_io_channel_read_chars (source, (xchar_t*) buffer, sizeof (buffer), &length, &error);
+      guint8 buffer[READ_BUFFER_SIZE];
+      GError *error = NULL;
+      status = g_io_channel_read_chars (source, (gchar*) buffer, sizeof (buffer), &length, &error);
       if (first_read && (condition & G_IO_IN))
         {
           /* on some unixes (MacOS) we need to detect non-blocking fd EOF
@@ -259,9 +259,9 @@ child_report_cb (xio_channel_t  *source,
 }
 
 static void
-child_watch_cb (xpid_t     pid,
-		xint_t     status,
-		xpointer_t data)
+child_watch_cb (GPid     pid,
+		gint     status,
+		gpointer data)
 {
   g_spawn_close_pid (pid);
   if (WIFEXITED (status)) /* normal exit */
@@ -271,16 +271,16 @@ child_watch_cb (xpid_t     pid,
   subtest_running = FALSE;
 }
 
-static xchar_t*
-queue_gfree (xslist_t **slistp,
-             xchar_t   *string)
+static gchar*
+queue_gfree (GSList **slistp,
+             gchar   *string)
 {
-  *slistp = xslist_prepend (*slistp, string);
+  *slistp = g_slist_prepend (*slistp, string);
   return string;
 }
 
 static void
-unset_cloexec_fdp (xpointer_t fdp_data)
+unset_cloexec_fdp (gpointer fdp_data)
 {
   int r, *fdp = fdp_data;
   do
@@ -288,25 +288,25 @@ unset_cloexec_fdp (xpointer_t fdp_data)
   while (r < 0 && errno == EINTR);
 }
 
-static xboolean_t
+static gboolean
 launch_test_binary (const char *binary,
-                    xuint_t       skip_tests)
+                    guint       skip_tests)
 {
   GTestLogBuffer *tlb;
-  xslist_t *slist, *free_list = NULL;
-  xerror_t *error = NULL;
+  GSList *slist, *free_list = NULL;
+  GError *error = NULL;
   int argc = 0;
-  const xchar_t **argv;
-  xpid_t pid = 0;
-  xint_t report_pipe[2] = { -1, -1 };
-  xuint_t child_report_cb_id = 0;
-  xboolean_t loop_pending;
-  xint_t i = 0;
+  const gchar **argv;
+  GPid pid = 0;
+  gint report_pipe[2] = { -1, -1 };
+  guint child_report_cb_id = 0;
+  gboolean loop_pending;
+  gint i = 0;
 
   if (!g_unix_open_pipe (report_pipe, FD_CLOEXEC, &error))
     {
       if (subtest_mode_fatal)
-        xerror ("Failed to open pipe for test binary: %s: %s", binary, error->message);
+        g_error ("Failed to open pipe for test binary: %s: %s", binary, error->message);
       else
         g_warning ("Failed to open pipe for test binary: %s: %s", binary, error->message);
       g_clear_error (&error);
@@ -342,10 +342,10 @@ launch_test_binary (const char *binary,
     argc++;
 
   /* setup argv */
-  argv = g_malloc ((argc + 2) * sizeof(xchar_t *));
+  argv = g_malloc ((argc + 2) * sizeof(gchar *));
   argv[i++] = binary;
   for (slist = subtest_args; slist; slist = slist->next)
-    argv[i++] = (xchar_t*) slist->data;
+    argv[i++] = (gchar*) slist->data;
   /* argv[i++] = "--debug-log"; */
   if (subtest_quiet)
     argv[i++] = "--quiet";
@@ -364,18 +364,18 @@ launch_test_binary (const char *binary,
   if (gtester_list_tests)
     argv[i++] = "-l";
   if (subtest_seedstr)
-    argv[i++] = queue_gfree (&free_list, xstrdup_printf ("--seed=%s", subtest_seedstr));
-  argv[i++] = queue_gfree (&free_list, xstrdup_printf ("--GTestLogFD=%u", report_pipe[1]));
+    argv[i++] = queue_gfree (&free_list, g_strdup_printf ("--seed=%s", subtest_seedstr));
+  argv[i++] = queue_gfree (&free_list, g_strdup_printf ("--GTestLogFD=%u", report_pipe[1]));
   if (skip_tests)
-    argv[i++] = queue_gfree (&free_list, xstrdup_printf ("--GTestSkipCount=%u", skip_tests));
+    argv[i++] = queue_gfree (&free_list, g_strdup_printf ("--GTestSkipCount=%u", skip_tests));
   for (slist = subtest_paths; slist; slist = slist->next)
-    argv[i++] = queue_gfree (&free_list, xstrdup_printf ("-p=%s", (xchar_t*) slist->data));
+    argv[i++] = queue_gfree (&free_list, g_strdup_printf ("-p=%s", (gchar*) slist->data));
   for (slist = skipped_paths; slist; slist = slist->next)
-    argv[i++] = queue_gfree (&free_list, xstrdup_printf ("-s=%s", (xchar_t*) slist->data));
+    argv[i++] = queue_gfree (&free_list, g_strdup_printf ("-s=%s", (gchar*) slist->data));
   argv[i++] = NULL;
 
   g_spawn_async_with_pipes (NULL, /* g_get_current_dir() */
-                            (xchar_t**) argv,
+                            (gchar**) argv,
                             NULL, /* envp */
                             G_SPAWN_DO_NOT_REAP_CHILD, /* G_SPAWN_SEARCH_PATH */
                             unset_cloexec_fdp, &report_pipe[1], /* pre-exec callback */
@@ -384,8 +384,8 @@ launch_test_binary (const char *binary,
                             NULL,       /* standard_output */
                             NULL,       /* standard_error */
                             &error);
-  xslist_foreach (free_list, (void(*)(void*,void*)) g_free, NULL);
-  xslist_free (free_list);
+  g_slist_foreach (free_list, (void(*)(void*,void*)) g_free, NULL);
+  g_slist_free (free_list);
   free_list = NULL;
   close (report_pipe[1]);
 
@@ -396,7 +396,7 @@ launch_test_binary (const char *binary,
     {
       close (report_pipe[0]);
       if (subtest_mode_fatal)
-        xerror ("Failed to execute test binary: %s: %s", argv[0], error->message);
+        g_error ("Failed to execute test binary: %s: %s", argv[0], error->message);
       else
         g_warning ("Failed to execute test binary: %s: %s", argv[0], error->message);
       g_clear_error (&error);
@@ -419,7 +419,7 @@ launch_test_binary (const char *binary,
     }
   g_child_watch_add_full (G_PRIORITY_DEFAULT + 1, pid, child_watch_cb, NULL, NULL);
 
-  loop_pending = xmain_context_pending (NULL);
+  loop_pending = g_main_context_pending (NULL);
   while (subtest_running ||     /* FALSE once child exits */
          subtest_io_pending ||  /* FALSE once ioc_report closes */
          loop_pending)          /* TRUE while idler, etc are running */
@@ -430,12 +430,12 @@ launch_test_binary (const char *binary,
           subtest_io_pending && /* no EOF detected on report_pipe */
           !loop_pending)        /* no IO events pending however */
         break;
-      xmain_context_iteration (NULL, TRUE);
-      loop_pending = xmain_context_pending (NULL);
+      g_main_context_iteration (NULL, TRUE);
+      loop_pending = g_main_context_pending (NULL);
     }
 
   if (subtest_io_pending)
-    xsource_remove (child_report_cb_id);
+    g_source_remove (child_report_cb_id);
 
   close (report_pipe[0]);
   g_test_log_buffer_free (tlb);
@@ -446,9 +446,9 @@ launch_test_binary (const char *binary,
 static void
 launch_test (const char *binary)
 {
-  xboolean_t success = TRUE;
-  xtimer_t *btimer = g_timer_new();
-  xboolean_t need_restart;
+  gboolean success = TRUE;
+  GTimer *btimer = g_timer_new();
+  gboolean need_restart;
 
   testcase_count = 0;
   if (!gtester_quiet)
@@ -488,11 +488,11 @@ launch_test (const char *binary)
 }
 
 static void
-usage (xboolean_t just_version)
+usage (gboolean just_version)
 {
   if (just_version)
     {
-      g_print ("gtester version %d.%d.%d\n", XPL_MAJOR_VERSION, XPL_MINOR_VERSION, XPL_MICRO_VERSION);
+      g_print ("gtester version %d.%d.%d\n", GLIB_MAJOR_VERSION, GLIB_MINOR_VERSION, GLIB_MICRO_VERSION);
       return;
     }
   g_print ("Usage:\n");
@@ -516,12 +516,12 @@ usage (xboolean_t just_version)
 }
 
 static void
-parse_args (xint_t    *argc_p,
-            xchar_t ***argv_p)
+parse_args (gint    *argc_p,
+            gchar ***argv_p)
 {
-  xuint_t argc = *argc_p;
-  xchar_t **argv = *argv_p;
-  xuint_t i, e;
+  guint argc = *argc_p;
+  gchar **argv = *argv_p;
+  guint i, e;
   /* parse known args */
   for (i = 1; i < argc; i++)
     {
@@ -558,43 +558,43 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("-p", argv[i]) == 0 || strncmp ("-p=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
+          gchar *equal = argv[i] + 2;
           if (*equal == '=')
-            subtest_paths = xslist_prepend (subtest_paths, equal + 1);
+            subtest_paths = g_slist_prepend (subtest_paths, equal + 1);
           else if (i + 1 < argc)
             {
               argv[i++] = NULL;
-              subtest_paths = xslist_prepend (subtest_paths, argv[i]);
+              subtest_paths = g_slist_prepend (subtest_paths, argv[i]);
             }
           argv[i] = NULL;
         }
       else if (strcmp ("-s", argv[i]) == 0 || strncmp ("-s=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
+          gchar *equal = argv[i] + 2;
           if (*equal == '=')
-            skipped_paths = xslist_prepend (skipped_paths, equal + 1);
+            skipped_paths = g_slist_prepend (skipped_paths, equal + 1);
           else if (i + 1 < argc)
             {
               argv[i++] = NULL;
-              skipped_paths = xslist_prepend (skipped_paths, argv[i]);
+              skipped_paths = g_slist_prepend (skipped_paths, argv[i]);
             }
           argv[i] = NULL;
         }
       else if (strcmp ("--test-arg", argv[i]) == 0 || strncmp ("--test-arg=", argv[i], 11) == 0)
         {
-          xchar_t *equal = argv[i] + 10;
+          gchar *equal = argv[i] + 10;
           if (*equal == '=')
-            subtest_args = xslist_prepend (subtest_args, equal + 1);
+            subtest_args = g_slist_prepend (subtest_args, equal + 1);
           else if (i + 1 < argc)
             {
               argv[i++] = NULL;
-              subtest_args = xslist_prepend (subtest_args, argv[i]);
+              subtest_args = g_slist_prepend (subtest_args, argv[i]);
             }
           argv[i] = NULL;
         }
       else if (strcmp ("-o", argv[i]) == 0 || strncmp ("-o=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
+          gchar *equal = argv[i] + 2;
           if (*equal == '=')
             output_filename = equal + 1;
           else if (i + 1 < argc)
@@ -606,8 +606,8 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("-m", argv[i]) == 0 || strncmp ("-m=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
-          const xchar_t *mode = "";
+          gchar *equal = argv[i] + 2;
+          const gchar *mode = "";
           if (*equal == '=')
             mode = equal + 1;
           else if (i + 1 < argc)
@@ -629,7 +629,7 @@ parse_args (xint_t    *argc_p,
           else if (strcmp (mode, "no-undefined") == 0)
             subtest_mode_undefined = FALSE;
           else
-            xerror ("unknown test mode: -m %s", mode);
+            g_error ("unknown test mode: -m %s", mode);
           argv[i] = NULL;
         }
       else if (strcmp ("-q", argv[i]) == 0 || strcmp ("--quiet", argv[i]) == 0)
@@ -651,7 +651,7 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("--seed", argv[i]) == 0 || strncmp ("--seed=", argv[i], 7) == 0)
         {
-          xchar_t *equal = argv[i] + 6;
+          gchar *equal = argv[i] + 6;
           if (*equal == '=')
             subtest_seedstr = equal + 1;
           else if (i + 1 < argc)
@@ -683,7 +683,7 @@ int
 main (int    argc,
       char **argv)
 {
-  xint_t ui;
+  gint ui;
 
   g_set_prgname (argv[0]);
   parse_args (&argc, &argv);
@@ -706,7 +706,7 @@ main (int    argc,
       log_fd = g_open (output_filename, O_WRONLY | O_CREAT | O_TRUNC, 0666);
       errsv = errno;
       if (log_fd < 0)
-        xerror ("Failed to open log file '%s': %s", output_filename, xstrerror (errsv));
+        g_error ("Failed to open log file '%s': %s", output_filename, g_strerror (errsv));
     }
 
   test_log_printfe ("<?xml version=\"1.0\"?>\n");
@@ -729,15 +729,15 @@ main (int    argc,
 }
 
 static void
-fixture_setup (xuint_t        *fix,
-               xconstpointer test_data)
+fixture_setup (guint        *fix,
+               gconstpointer test_data)
 {
   g_assert_cmphex (*fix, ==, 0);
   *fix = 0xdeadbeef;
 }
 static void
-fixture_test (xuint_t        *fix,
-              xconstpointer test_data)
+fixture_test (guint        *fix,
+              gconstpointer test_data)
 {
   g_assert_cmphex (*fix, ==, 0xdeadbeef);
   g_test_message ("This is a test message API test message.");
@@ -748,8 +748,8 @@ fixture_test (xuint_t        *fix,
   g_test_bug ("https://example.com/no-base-used");
 }
 static void
-fixture_teardown (xuint_t        *fix,
-                  xconstpointer test_data)
+fixture_teardown (guint        *fix,
+                  gconstpointer test_data)
 {
   g_assert_cmphex (*fix, ==, 0xdeadbeef);
 }
@@ -760,6 +760,6 @@ main_selftest (int    argc,
 {
   /* gtester main() for --gtester-selftest invocations */
   g_test_init (&argc, &argv, NULL);
-  g_test_add ("/gtester/fixture-test", xuint_t, NULL, fixture_setup, fixture_test, fixture_teardown);
+  g_test_add ("/gtester/fixture-test", guint, NULL, fixture_setup, fixture_test, fixture_teardown);
   return g_test_run();
 }

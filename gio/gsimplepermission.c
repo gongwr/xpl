@@ -25,11 +25,11 @@
 
 /**
  * SECTION:gsimplepermission
- * @title: xsimple_permission_t
- * @short_description: A xpermission_t that doesn't change value
+ * @title: GSimplePermission
+ * @short_description: A GPermission that doesn't change value
  * @include: gio/gio.h
  *
- * #xsimple_permission_t is a trivial implementation of #xpermission_t that
+ * #GSimplePermission is a trivial implementation of #GPermission that
  * represents a permission that is either always or never allowed.  The
  * value is given at construction and doesn't change.
  *
@@ -37,23 +37,23 @@
  **/
 
 /**
- * xsimple_permission_t:
+ * GSimplePermission:
  *
- * #xsimple_permission_t is an opaque data structure.  There are no methods
- * except for those defined by #xpermission_t.
+ * #GSimplePermission is an opaque data structure.  There are no methods
+ * except for those defined by #GPermission.
  **/
 
 typedef GPermissionClass GSimplePermissionClass;
 
 struct _GSimplePermission
 {
-  xpermission_t parent_instance;
+  GPermission parent_instance;
 };
 
-XDEFINE_TYPE (xsimple_permission, g_simple_permission, XTYPE_PERMISSION)
+G_DEFINE_TYPE (GSimplePermission, g_simple_permission, G_TYPE_PERMISSION)
 
 static void
-g_simple_permission_init (xsimple_permission_t *simple)
+g_simple_permission_init (GSimplePermission *simple)
 {
 }
 
@@ -66,17 +66,17 @@ g_simple_permission_class_init (GSimplePermissionClass *class)
  * g_simple_permission_new:
  * @allowed: %TRUE if the action is allowed
  *
- * Creates a new #xpermission_t instance that represents an action that is
+ * Creates a new #GPermission instance that represents an action that is
  * either always or never allowed.
  *
- * Returns: the #xsimple_permission_t, as a #xpermission_t
+ * Returns: the #GSimplePermission, as a #GPermission
  *
  * Since: 2.26
  **/
-xpermission_t *
-g_simple_permission_new (xboolean_t allowed)
+GPermission *
+g_simple_permission_new (gboolean allowed)
 {
-  xpermission_t *permission = xobject_new (XTYPE_SIMPLE_PERMISSION, NULL);
+  GPermission *permission = g_object_new (G_TYPE_SIMPLE_PERMISSION, NULL);
 
   g_permission_impl_update (permission, allowed, FALSE, FALSE);
 

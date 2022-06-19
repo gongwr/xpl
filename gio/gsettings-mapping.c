@@ -21,332 +21,332 @@
 
 #include "gsettings-mapping.h"
 
-static xvariant_t *
-g_settings_set_mapping_int (const xvalue_t       *value,
-                            const xvariant_type_t *expected_type)
+static GVariant *
+g_settings_set_mapping_int (const GValue       *value,
+                            const GVariantType *expected_type)
 {
-  xvariant_t *variant = NULL;
-  sint64_t l;
+  GVariant *variant = NULL;
+  gint64 l;
 
   if (G_VALUE_HOLDS_INT (value))
-    l = xvalue_get_int (value);
+    l = g_value_get_int (value);
   else if (G_VALUE_HOLDS_INT64 (value))
-    l = xvalue_get_int64 (value);
+    l = g_value_get_int64 (value);
   else
     return NULL;
 
-  if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
+  if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
     {
       if (G_MININT16 <= l && l <= G_MAXINT16)
-        variant = xvariant_new_int16 ((gint16) l);
+        variant = g_variant_new_int16 ((gint16) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT16))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT16))
     {
       if (0 <= l && l <= G_MAXUINT16)
-        variant = xvariant_new_uint16 ((xuint16_t) l);
+        variant = g_variant_new_uint16 ((guint16) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT32))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT32))
     {
       if (G_MININT32 <= l && l <= G_MAXINT32)
-        variant = xvariant_new_int32 ((xint_t) l);
+        variant = g_variant_new_int32 ((gint) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT32))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT32))
     {
       if (0 <= l && l <= G_MAXUINT32)
-        variant = xvariant_new_uint32 ((xuint_t) l);
+        variant = g_variant_new_uint32 ((guint) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
     {
       if (G_MININT64 <= l && l <= G_MAXINT64)
-        variant = xvariant_new_int64 ((sint64_t) l);
+        variant = g_variant_new_int64 ((gint64) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
     {
-      if (0 <= l && (xuint64_t) l <= G_MAXUINT64)
-        variant = xvariant_new_uint64 ((xuint64_t) l);
+      if (0 <= l && (guint64) l <= G_MAXUINT64)
+        variant = g_variant_new_uint64 ((guint64) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_HANDLE))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_HANDLE))
     {
       if (0 <= l && l <= G_MAXUINT32)
-        variant = xvariant_new_handle ((xuint_t) l);
+        variant = g_variant_new_handle ((guint) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_DOUBLE))
-    variant = xvariant_new_double ((xdouble_t) l);
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_DOUBLE))
+    variant = g_variant_new_double ((gdouble) l);
 
   return variant;
 }
 
-static xvariant_t *
-g_settings_set_mapping_float (const xvalue_t       *value,
-                              const xvariant_type_t *expected_type)
+static GVariant *
+g_settings_set_mapping_float (const GValue       *value,
+                              const GVariantType *expected_type)
 {
-  xvariant_t *variant = NULL;
-  xdouble_t d;
-  sint64_t l;
+  GVariant *variant = NULL;
+  gdouble d;
+  gint64 l;
 
   if (G_VALUE_HOLDS_DOUBLE (value))
-    d = xvalue_get_double (value);
+    d = g_value_get_double (value);
   else
     return NULL;
 
-  l = (sint64_t) d;
-  if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
+  l = (gint64) d;
+  if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
     {
       if (G_MININT16 <= l && l <= G_MAXINT16)
-        variant = xvariant_new_int16 ((gint16) l);
+        variant = g_variant_new_int16 ((gint16) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT16))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT16))
     {
       if (0 <= l && l <= G_MAXUINT16)
-        variant = xvariant_new_uint16 ((xuint16_t) l);
+        variant = g_variant_new_uint16 ((guint16) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT32))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT32))
     {
       if (G_MININT32 <= l && l <= G_MAXINT32)
-        variant = xvariant_new_int32 ((xint_t) l);
+        variant = g_variant_new_int32 ((gint) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT32))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT32))
     {
       if (0 <= l && l <= G_MAXUINT32)
-        variant = xvariant_new_uint32 ((xuint_t) l);
+        variant = g_variant_new_uint32 ((guint) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
     {
       if (G_MININT64 <= l && l <= G_MAXINT64)
-        variant = xvariant_new_int64 ((sint64_t) l);
+        variant = g_variant_new_int64 ((gint64) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
     {
-      if (0 <= l && (xuint64_t) l <= G_MAXUINT64)
-        variant = xvariant_new_uint64 ((xuint64_t) l);
+      if (0 <= l && (guint64) l <= G_MAXUINT64)
+        variant = g_variant_new_uint64 ((guint64) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_HANDLE))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_HANDLE))
     {
       if (0 <= l && l <= G_MAXUINT32)
-        variant = xvariant_new_handle ((xuint_t) l);
+        variant = g_variant_new_handle ((guint) l);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_DOUBLE))
-    variant = xvariant_new_double ((xdouble_t) d);
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_DOUBLE))
+    variant = g_variant_new_double ((gdouble) d);
 
   return variant;
 }
-static xvariant_t *
-g_settings_set_mapping_unsigned_int (const xvalue_t       *value,
-                                     const xvariant_type_t *expected_type)
+static GVariant *
+g_settings_set_mapping_unsigned_int (const GValue       *value,
+                                     const GVariantType *expected_type)
 {
-  xvariant_t *variant = NULL;
-  xuint64_t u;
+  GVariant *variant = NULL;
+  guint64 u;
 
   if (G_VALUE_HOLDS_UINT (value))
-    u = xvalue_get_uint (value);
+    u = g_value_get_uint (value);
   else if (G_VALUE_HOLDS_UINT64 (value))
-    u = xvalue_get_uint64 (value);
+    u = g_value_get_uint64 (value);
   else
     return NULL;
 
-  if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
+  if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT16))
     {
       if (u <= G_MAXINT16)
-        variant = xvariant_new_int16 ((gint16) u);
+        variant = g_variant_new_int16 ((gint16) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT16))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT16))
     {
       if (u <= G_MAXUINT16)
-        variant = xvariant_new_uint16 ((xuint16_t) u);
+        variant = g_variant_new_uint16 ((guint16) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT32))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT32))
     {
       if (u <= G_MAXINT32)
-        variant = xvariant_new_int32 ((xint_t) u);
+        variant = g_variant_new_int32 ((gint) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT32))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT32))
     {
       if (u <= G_MAXUINT32)
-        variant = xvariant_new_uint32 ((xuint_t) u);
+        variant = g_variant_new_uint32 ((guint) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_INT64))
     {
       if (u <= G_MAXINT64)
-        variant = xvariant_new_int64 ((sint64_t) u);
+        variant = g_variant_new_int64 ((gint64) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_UINT64))
     {
       if (u <= G_MAXUINT64)
-        variant = xvariant_new_uint64 ((xuint64_t) u);
+        variant = g_variant_new_uint64 ((guint64) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_HANDLE))
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_HANDLE))
     {
       if (u <= G_MAXUINT32)
-        variant = xvariant_new_handle ((xuint_t) u);
+        variant = g_variant_new_handle ((guint) u);
     }
-  else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_DOUBLE))
-    variant = xvariant_new_double ((xdouble_t) u);
+  else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_DOUBLE))
+    variant = g_variant_new_double ((gdouble) u);
 
   return variant;
 }
 
-static xboolean_t
-g_settings_get_mapping_int (xvalue_t   *value,
-                            xvariant_t *variant)
+static gboolean
+g_settings_get_mapping_int (GValue   *value,
+                            GVariant *variant)
 {
-  const xvariant_type_t *type;
-  sint64_t l;
+  const GVariantType *type;
+  gint64 l;
 
-  type = xvariant_get_type (variant);
+  type = g_variant_get_type (variant);
 
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_INT16))
-    l = xvariant_get_int16 (variant);
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT32))
-    l = xvariant_get_int32 (variant);
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT64))
-    l = xvariant_get_int64 (variant);
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_HANDLE))
-    l = xvariant_get_handle (variant);
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_INT16))
+    l = g_variant_get_int16 (variant);
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT32))
+    l = g_variant_get_int32 (variant);
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT64))
+    l = g_variant_get_int64 (variant);
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_HANDLE))
+    l = g_variant_get_handle (variant);
   else
     return FALSE;
 
   if (G_VALUE_HOLDS_INT (value))
     {
-      xvalue_set_int (value, l);
+      g_value_set_int (value, l);
       return (G_MININT32 <= l && l <= G_MAXINT32);
     }
   else if (G_VALUE_HOLDS_UINT (value))
     {
-      xvalue_set_uint (value, l);
+      g_value_set_uint (value, l);
       return (0 <= l && l <= G_MAXUINT32);
     }
   else if (G_VALUE_HOLDS_INT64 (value))
     {
-      xvalue_set_int64 (value, l);
+      g_value_set_int64 (value, l);
       return (G_MININT64 <= l && l <= G_MAXINT64);
     }
   else if (G_VALUE_HOLDS_UINT64 (value))
     {
-      xvalue_set_uint64 (value, l);
-      return (0 <= l && (xuint64_t) l <= G_MAXUINT64);
+      g_value_set_uint64 (value, l);
+      return (0 <= l && (guint64) l <= G_MAXUINT64);
     }
   else if (G_VALUE_HOLDS_DOUBLE (value))
     {
-      xvalue_set_double (value, l);
+      g_value_set_double (value, l);
       return TRUE;
     }
 
   return FALSE;
 }
 
-static xboolean_t
-g_settings_get_mapping_float (xvalue_t   *value,
-                              xvariant_t *variant)
+static gboolean
+g_settings_get_mapping_float (GValue   *value,
+                              GVariant *variant)
 {
-  const xvariant_type_t *type;
-  xdouble_t d;
-  sint64_t l;
+  const GVariantType *type;
+  gdouble d;
+  gint64 l;
 
-  type = xvariant_get_type (variant);
+  type = g_variant_get_type (variant);
 
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
-    d = xvariant_get_double (variant);
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
+    d = g_variant_get_double (variant);
   else
     return FALSE;
 
-  l = (sint64_t)d;
+  l = (gint64)d;
   if (G_VALUE_HOLDS_INT (value))
     {
-      xvalue_set_int (value, l);
+      g_value_set_int (value, l);
       return (G_MININT32 <= l && l <= G_MAXINT32);
     }
   else if (G_VALUE_HOLDS_UINT (value))
     {
-      xvalue_set_uint (value, l);
+      g_value_set_uint (value, l);
       return (0 <= l && l <= G_MAXUINT32);
     }
   else if (G_VALUE_HOLDS_INT64 (value))
     {
-      xvalue_set_int64 (value, l);
+      g_value_set_int64 (value, l);
       return (G_MININT64 <= l && l <= G_MAXINT64);
     }
   else if (G_VALUE_HOLDS_UINT64 (value))
     {
-      xvalue_set_uint64 (value, l);
-      return (0 <= l && (xuint64_t) l <= G_MAXUINT64);
+      g_value_set_uint64 (value, l);
+      return (0 <= l && (guint64) l <= G_MAXUINT64);
     }
   else if (G_VALUE_HOLDS_DOUBLE (value))
     {
-      xvalue_set_double (value, d);
+      g_value_set_double (value, d);
       return TRUE;
     }
 
   return FALSE;
 }
-static xboolean_t
-g_settings_get_mapping_unsigned_int (xvalue_t   *value,
-                                     xvariant_t *variant)
+static gboolean
+g_settings_get_mapping_unsigned_int (GValue   *value,
+                                     GVariant *variant)
 {
-  const xvariant_type_t *type;
-  xuint64_t u;
+  const GVariantType *type;
+  guint64 u;
 
-  type = xvariant_get_type (variant);
+  type = g_variant_get_type (variant);
 
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT16))
-    u = xvariant_get_uint16 (variant);
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT32))
-    u = xvariant_get_uint32 (variant);
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT64))
-    u = xvariant_get_uint64 (variant);
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT16))
+    u = g_variant_get_uint16 (variant);
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT32))
+    u = g_variant_get_uint32 (variant);
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT64))
+    u = g_variant_get_uint64 (variant);
   else
     return FALSE;
 
   if (G_VALUE_HOLDS_INT (value))
     {
-      xvalue_set_int (value, u);
+      g_value_set_int (value, u);
       return (u <= G_MAXINT32);
     }
   else if (G_VALUE_HOLDS_UINT (value))
     {
-      xvalue_set_uint (value, u);
+      g_value_set_uint (value, u);
       return (u <= G_MAXUINT32);
     }
   else if (G_VALUE_HOLDS_INT64 (value))
     {
-      xvalue_set_int64 (value, u);
+      g_value_set_int64 (value, u);
       return (u <= G_MAXINT64);
     }
   else if (G_VALUE_HOLDS_UINT64 (value))
     {
-      xvalue_set_uint64 (value, u);
+      g_value_set_uint64 (value, u);
       return (u <= G_MAXUINT64);
     }
   else if (G_VALUE_HOLDS_DOUBLE (value))
     {
-      xvalue_set_double (value, u);
+      g_value_set_double (value, u);
       return TRUE;
     }
 
   return FALSE;
 }
 
-xvariant_t *
-g_settings_set_mapping (const xvalue_t       *value,
-                        const xvariant_type_t *expected_type,
-                        xpointer_t            user_data)
+GVariant *
+g_settings_set_mapping (const GValue       *value,
+                        const GVariantType *expected_type,
+                        gpointer            user_data)
 {
-  xchar_t *type_string;
+  gchar *type_string;
 
   if (G_VALUE_HOLDS_BOOLEAN (value))
     {
-      if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_BOOLEAN))
-        return xvariant_new_boolean (xvalue_get_boolean (value));
+      if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_BOOLEAN))
+        return g_variant_new_boolean (g_value_get_boolean (value));
     }
 
   else if (G_VALUE_HOLDS_CHAR (value)  ||
            G_VALUE_HOLDS_UCHAR (value))
     {
-      if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_BYTE))
+      if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_BYTE))
         {
           if (G_VALUE_HOLDS_CHAR (value))
-            return xvariant_new_byte (xvalue_get_schar (value));
+            return g_variant_new_byte (g_value_get_schar (value));
           else
-            return xvariant_new_byte (xvalue_get_uchar (value));
+            return g_variant_new_byte (g_value_get_uchar (value));
         }
     }
 
@@ -363,230 +363,230 @@ g_settings_set_mapping (const xvalue_t       *value,
 
   else if (G_VALUE_HOLDS_STRING (value))
     {
-      if (xvalue_get_string (value) == NULL)
+      if (g_value_get_string (value) == NULL)
         return NULL;
-      else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_STRING))
-        return xvariant_new_string (xvalue_get_string (value));
-      else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_BYTESTRING))
-        return xvariant_new_bytestring (xvalue_get_string (value));
-      else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_OBJECT_PATH))
-        return xvariant_new_object_path (xvalue_get_string (value));
-      else if (xvariant_type_equal (expected_type, G_VARIANT_TYPE_SIGNATURE))
-        return xvariant_new_signature (xvalue_get_string (value));
+      else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_STRING))
+        return g_variant_new_string (g_value_get_string (value));
+      else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_BYTESTRING))
+        return g_variant_new_bytestring (g_value_get_string (value));
+      else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_OBJECT_PATH))
+        return g_variant_new_object_path (g_value_get_string (value));
+      else if (g_variant_type_equal (expected_type, G_VARIANT_TYPE_SIGNATURE))
+        return g_variant_new_signature (g_value_get_string (value));
     }
 
-  else if (G_VALUE_HOLDS (value, XTYPE_STRV))
+  else if (G_VALUE_HOLDS (value, G_TYPE_STRV))
     {
-      if (xvalue_get_boxed (value) == NULL)
+      if (g_value_get_boxed (value) == NULL)
         return NULL;
-      return xvariant_new_strv ((const xchar_t **) xvalue_get_boxed (value),
+      return g_variant_new_strv ((const gchar **) g_value_get_boxed (value),
                                  -1);
     }
 
   else if (G_VALUE_HOLDS_ENUM (value))
     {
-      xenum_value_t *enumval;
-      xenum_class_t *eclass;
+      GEnumValue *enumval;
+      GEnumClass *eclass;
 
       /* GParamSpecEnum holds a ref on the class so we just peek... */
-      eclass = xtype_class_peek (G_VALUE_TYPE (value));
-      enumval = xenum_get_value (eclass, xvalue_get_enum (value));
+      eclass = g_type_class_peek (G_VALUE_TYPE (value));
+      enumval = g_enum_get_value (eclass, g_value_get_enum (value));
 
       if (enumval)
-        return xvariant_new_string (enumval->value_nick);
+        return g_variant_new_string (enumval->value_nick);
       else
         return NULL;
     }
 
   else if (G_VALUE_HOLDS_FLAGS (value))
     {
-      xvariant_builder_t builder;
-      xflags_value_t *flagsval;
-      xflags_class_t *fclass;
-      xuint_t flags;
+      GVariantBuilder builder;
+      GFlagsValue *flagsval;
+      GFlagsClass *fclass;
+      guint flags;
 
-      fclass = xtype_class_peek (G_VALUE_TYPE (value));
-      flags = xvalue_get_flags (value);
+      fclass = g_type_class_peek (G_VALUE_TYPE (value));
+      flags = g_value_get_flags (value);
 
-      xvariant_builder_init (&builder, G_VARIANT_TYPE ("as"));
+      g_variant_builder_init (&builder, G_VARIANT_TYPE ("as"));
       while (flags)
         {
-          flagsval = xflags_get_first_value (fclass, flags);
+          flagsval = g_flags_get_first_value (fclass, flags);
 
           if (flagsval == NULL)
             {
-              xvariant_builder_clear (&builder);
+              g_variant_builder_clear (&builder);
               return NULL;
             }
 
-          xvariant_builder_add (&builder, "s", flagsval->value_nick);
+          g_variant_builder_add (&builder, "s", flagsval->value_nick);
           flags &= ~flagsval->value;
         }
 
-      return xvariant_builder_end (&builder);
+      return g_variant_builder_end (&builder);
     }
 
-  type_string = xvariant_type_dup_string (expected_type);
-  g_critical ("No xsettings_t bind handler for type \"%s\".", type_string);
+  type_string = g_variant_type_dup_string (expected_type);
+  g_critical ("No GSettings bind handler for type \"%s\".", type_string);
   g_free (type_string);
 
   return NULL;
 }
 
-xboolean_t
-g_settings_get_mapping (xvalue_t   *value,
-                        xvariant_t *variant,
-                        xpointer_t  user_data)
+gboolean
+g_settings_get_mapping (GValue   *value,
+                        GVariant *variant,
+                        gpointer  user_data)
 {
-  if (xvariant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
+  if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BOOLEAN))
     {
       if (!G_VALUE_HOLDS_BOOLEAN (value))
         return FALSE;
-      xvalue_set_boolean (value, xvariant_get_boolean (variant));
+      g_value_set_boolean (value, g_variant_get_boolean (variant));
       return TRUE;
     }
 
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_BYTE))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BYTE))
     {
       if (G_VALUE_HOLDS_UCHAR (value))
-        xvalue_set_uchar (value, xvariant_get_byte (variant));
+        g_value_set_uchar (value, g_variant_get_byte (variant));
       else if (G_VALUE_HOLDS_CHAR (value))
-        xvalue_set_schar (value, (gint8)xvariant_get_byte (variant));
+        g_value_set_schar (value, (gint8)g_variant_get_byte (variant));
       else
         return FALSE;
       return TRUE;
     }
 
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_INT16)  ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_INT32)  ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_INT64)  ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_HANDLE))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_INT16)  ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_INT32)  ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_INT64)  ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_HANDLE))
     return g_settings_get_mapping_int (value, variant);
 
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_DOUBLE))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_DOUBLE))
     return g_settings_get_mapping_float (value, variant);
 
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_UINT16) ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_UINT32) ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_UINT64))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_UINT16) ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_UINT32) ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_UINT64))
     return g_settings_get_mapping_unsigned_int (value, variant);
 
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_STRING)      ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_OBJECT_PATH) ||
-           xvariant_is_of_type (variant, G_VARIANT_TYPE_SIGNATURE))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_STRING)      ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_OBJECT_PATH) ||
+           g_variant_is_of_type (variant, G_VARIANT_TYPE_SIGNATURE))
     {
       if (G_VALUE_HOLDS_STRING (value))
         {
-          xvalue_set_string (value, xvariant_get_string (variant, NULL));
+          g_value_set_string (value, g_variant_get_string (variant, NULL));
           return TRUE;
         }
 
       else if (G_VALUE_HOLDS_ENUM (value))
         {
-          xenum_class_t *eclass;
-          xenum_value_t *evalue;
-          const xchar_t *nick;
+          GEnumClass *eclass;
+          GEnumValue *evalue;
+          const gchar *nick;
 
           /* GParamSpecEnum holds a ref on the class so we just peek... */
-          eclass = xtype_class_peek (G_VALUE_TYPE (value));
-          nick = xvariant_get_string (variant, NULL);
-          evalue = xenum_get_value_by_nick (eclass, nick);
+          eclass = g_type_class_peek (G_VALUE_TYPE (value));
+          nick = g_variant_get_string (variant, NULL);
+          evalue = g_enum_get_value_by_nick (eclass, nick);
 
           if (evalue)
             {
-             xvalue_set_enum (value, evalue->value);
+             g_value_set_enum (value, evalue->value);
              return TRUE;
             }
 
-          g_warning ("Unable to look up enum nick ‘%s’ via xtype_t", nick);
+          g_warning ("Unable to look up enum nick ‘%s’ via GType", nick);
           return FALSE;
         }
     }
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE ("as")))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE ("as")))
     {
-      if (G_VALUE_HOLDS (value, XTYPE_STRV))
+      if (G_VALUE_HOLDS (value, G_TYPE_STRV))
         {
-          xvalue_take_boxed (value, xvariant_dup_strv (variant, NULL));
+          g_value_take_boxed (value, g_variant_dup_strv (variant, NULL));
           return TRUE;
         }
 
       else if (G_VALUE_HOLDS_FLAGS (value))
         {
-          xflags_class_t *fclass;
-          xflags_value_t *fvalue;
-          const xchar_t *nick;
-          xvariant_iter_t iter;
-          xuint_t flags = 0;
+          GFlagsClass *fclass;
+          GFlagsValue *fvalue;
+          const gchar *nick;
+          GVariantIter iter;
+          guint flags = 0;
 
-          fclass = xtype_class_peek (G_VALUE_TYPE (value));
+          fclass = g_type_class_peek (G_VALUE_TYPE (value));
 
-          xvariant_iter_init (&iter, variant);
-          while (xvariant_iter_next (&iter, "&s", &nick))
+          g_variant_iter_init (&iter, variant);
+          while (g_variant_iter_next (&iter, "&s", &nick))
             {
-              fvalue = xflags_get_value_by_nick (fclass, nick);
+              fvalue = g_flags_get_value_by_nick (fclass, nick);
 
               if (fvalue)
                 flags |= fvalue->value;
 
               else
                 {
-                  g_warning ("Unable to lookup flags nick '%s' via xtype_t",
+                  g_warning ("Unable to lookup flags nick '%s' via GType",
                              nick);
                   return FALSE;
                 }
             }
 
-          xvalue_set_flags (value, flags);
+          g_value_set_flags (value, flags);
           return TRUE;
         }
     }
-  else if (xvariant_is_of_type (variant, G_VARIANT_TYPE_BYTESTRING))
+  else if (g_variant_is_of_type (variant, G_VARIANT_TYPE_BYTESTRING))
     {
-      xvalue_set_string (value, xvariant_get_bytestring (variant));
+      g_value_set_string (value, g_variant_get_bytestring (variant));
       return TRUE;
     }
 
-  g_critical ("No xsettings_t bind handler for type \"%s\".",
-              xvariant_get_type_string (variant));
+  g_critical ("No GSettings bind handler for type \"%s\".",
+              g_variant_get_type_string (variant));
 
   return FALSE;
 }
 
-xboolean_t
-g_settings_mapping_is_compatible (xtype_t               gvalue_type,
-                                  const xvariant_type_t *variant_type)
+gboolean
+g_settings_mapping_is_compatible (GType               gvalue_type,
+                                  const GVariantType *variant_type)
 {
-  xboolean_t ok = FALSE;
+  gboolean ok = FALSE;
 
-  if (gvalue_type == XTYPE_BOOLEAN)
-    ok = xvariant_type_equal (variant_type, G_VARIANT_TYPE_BOOLEAN);
-  else if (gvalue_type == XTYPE_CHAR  ||
-           gvalue_type == XTYPE_UCHAR)
-    ok = xvariant_type_equal (variant_type, G_VARIANT_TYPE_BYTE);
-  else if (gvalue_type == XTYPE_INT    ||
-           gvalue_type == XTYPE_UINT   ||
-           gvalue_type == XTYPE_INT64  ||
-           gvalue_type == XTYPE_UINT64 ||
-           gvalue_type == XTYPE_DOUBLE)
-    ok = (xvariant_type_equal (variant_type, G_VARIANT_TYPE_INT16)  ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_UINT16) ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_INT32)  ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_UINT32) ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_INT64)  ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_UINT64) ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_HANDLE) ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_DOUBLE));
-  else if (gvalue_type == XTYPE_STRING)
-    ok = (xvariant_type_equal (variant_type, G_VARIANT_TYPE_STRING)      ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE ("ay")) ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_OBJECT_PATH) ||
-          xvariant_type_equal (variant_type, G_VARIANT_TYPE_SIGNATURE));
-  else if (gvalue_type == XTYPE_STRV)
-    ok = xvariant_type_equal (variant_type, G_VARIANT_TYPE ("as"));
-  else if (XTYPE_IS_ENUM (gvalue_type))
-    ok = xvariant_type_equal (variant_type, G_VARIANT_TYPE_STRING);
-  else if (XTYPE_IS_FLAGS (gvalue_type))
-    ok = xvariant_type_equal (variant_type, G_VARIANT_TYPE ("as"));
+  if (gvalue_type == G_TYPE_BOOLEAN)
+    ok = g_variant_type_equal (variant_type, G_VARIANT_TYPE_BOOLEAN);
+  else if (gvalue_type == G_TYPE_CHAR  ||
+           gvalue_type == G_TYPE_UCHAR)
+    ok = g_variant_type_equal (variant_type, G_VARIANT_TYPE_BYTE);
+  else if (gvalue_type == G_TYPE_INT    ||
+           gvalue_type == G_TYPE_UINT   ||
+           gvalue_type == G_TYPE_INT64  ||
+           gvalue_type == G_TYPE_UINT64 ||
+           gvalue_type == G_TYPE_DOUBLE)
+    ok = (g_variant_type_equal (variant_type, G_VARIANT_TYPE_INT16)  ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_UINT16) ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_INT32)  ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_UINT32) ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_INT64)  ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_UINT64) ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_HANDLE) ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_DOUBLE));
+  else if (gvalue_type == G_TYPE_STRING)
+    ok = (g_variant_type_equal (variant_type, G_VARIANT_TYPE_STRING)      ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE ("ay")) ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_OBJECT_PATH) ||
+          g_variant_type_equal (variant_type, G_VARIANT_TYPE_SIGNATURE));
+  else if (gvalue_type == G_TYPE_STRV)
+    ok = g_variant_type_equal (variant_type, G_VARIANT_TYPE ("as"));
+  else if (G_TYPE_IS_ENUM (gvalue_type))
+    ok = g_variant_type_equal (variant_type, G_VARIANT_TYPE_STRING);
+  else if (G_TYPE_IS_FLAGS (gvalue_type))
+    ok = g_variant_type_equal (variant_type, G_VARIANT_TYPE ("as"));
 
   return ok;
 }

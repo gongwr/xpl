@@ -22,36 +22,36 @@
 #include <locale.h>
 
 
-/* Smoketest for construction of a #xmount_operation_t. */
+/* Smoketest for construction of a #GMountOperation. */
 static void
 test_construction (void)
 {
-  xmount_operation_t *op = NULL;
+  GMountOperation *op = NULL;
 
   op = g_mount_operation_new ();
   g_assert_nonnull (op);
-  g_assert_true (X_IS_MOUNT_OPERATION (op));
-  xobject_unref (op);
+  g_assert_true (G_IS_MOUNT_OPERATION (op));
+  g_object_unref (op);
 }
 
-/* test_t the property getters and setters on #xmount_operation_t work correctly. */
+/* Test the property getters and setters on #GMountOperation work correctly. */
 static void
 test_properties (void)
 {
-  xmount_operation_t *op = NULL;
-  xchar_t *username = NULL;
-  xchar_t *password = NULL;
-  xboolean_t anonymous;
-  xchar_t *domain = NULL;
+  GMountOperation *op = NULL;
+  gchar *username = NULL;
+  gchar *password = NULL;
+  gboolean anonymous;
+  gchar *domain = NULL;
   GPasswordSave password_save;
   int choice;
-  xboolean_t hidden_volume;
-  xboolean_t system_volume;
-  xuint_t pim;
+  gboolean hidden_volume;
+  gboolean system_volume;
+  guint pim;
 
   op = g_mount_operation_new ();
 
-  xobject_get (op,
+  g_object_get (op,
                 "username", &username,
                 "password", &password,
                 "anonymous", &anonymous,
@@ -100,7 +100,7 @@ test_properties (void)
   g_mount_operation_set_pim (op, 5);
   g_assert_cmpuint (g_mount_operation_get_pim (op), ==, 5);
 
-  xobject_set (op,
+  g_object_set (op,
                 "username", "other-username",
                 "password", "other-password",
                 "anonymous", FALSE,
@@ -115,7 +115,7 @@ test_properties (void)
   g_free (domain);
   g_free (password);
   g_free (username);
-  xobject_unref (op);
+  g_object_unref (op);
 }
 
 int

@@ -23,39 +23,39 @@
 #include <string.h>
 
 /* ---------------------------------------------------------------------------------------------------- */
-/* test_t that registered errors are properly mapped */
+/* Test that registered errors are properly mapped */
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-check_registered_error (const xchar_t *given_dbus_error_name,
-                        xquark       error_domain,
-                        xint_t         error_code)
+check_registered_error (const gchar *given_dbus_error_name,
+                        GQuark       error_domain,
+                        gint         error_code)
 {
-  xerror_t *error;
-  xchar_t *dbus_error_name;
+  GError *error;
+  gchar *dbus_error_name;
 
   error = g_dbus_error_new_for_dbus_error (given_dbus_error_name, "test message");
   g_assert_error (error, error_domain, error_code);
-  xassert (g_dbus_error_is_remote_error (error));
-  xassert (g_dbus_error_strip_remote_error (error));
+  g_assert (g_dbus_error_is_remote_error (error));
+  g_assert (g_dbus_error_strip_remote_error (error));
   g_assert_cmpstr (error->message, ==, "test message");
   dbus_error_name = g_dbus_error_get_remote_error (error);
   g_assert_cmpstr (dbus_error_name, ==, given_dbus_error_name);
   g_free (dbus_error_name);
-  xerror_free (error);
+  g_error_free (error);
 }
 
 static void
 test_registered_errors (void)
 {
-  /* Here we check that we are able to map to xerror_t and back for registered
+  /* Here we check that we are able to map to GError and back for registered
    * errors.
    *
    * For example, if "org.freedesktop.DBus.Error.AddressInUse" is
    * associated with (G_DBUS_ERROR, G_DBUS_ERROR_DBUS_FAILED), check
    * that
    *
-   *  - Creating a xerror_t for e.g. "org.freedesktop.DBus.Error.AddressInUse"
+   *  - Creating a GError for e.g. "org.freedesktop.DBus.Error.AddressInUse"
    *    has (error_domain, code) == (G_DBUS_ERROR, G_DBUS_ERROR_DBUS_FAILED)
    *
    *  - That it is possible to recover e.g. "org.freedesktop.DBus.Error.AddressInUse"
@@ -81,42 +81,42 @@ test_registered_errors (void)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-check_unregistered_error (const xchar_t *given_dbus_error_name)
+check_unregistered_error (const gchar *given_dbus_error_name)
 {
-  xerror_t *error;
-  xchar_t *dbus_error_name;
+  GError *error;
+  gchar *dbus_error_name;
 
   error = g_dbus_error_new_for_dbus_error (given_dbus_error_name, "test message");
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR);
-  xassert (g_dbus_error_is_remote_error (error));
+  g_assert (g_dbus_error_is_remote_error (error));
   dbus_error_name = g_dbus_error_get_remote_error (error);
   g_assert_cmpstr (dbus_error_name, ==, given_dbus_error_name);
   g_free (dbus_error_name);
 
   /* strip the message */
-  xassert (g_dbus_error_strip_remote_error (error));
+  g_assert (g_dbus_error_strip_remote_error (error));
   g_assert_cmpstr (error->message, ==, "test message");
 
   /* check that we can no longer recover the D-Bus error name */
-  xassert (g_dbus_error_get_remote_error (error) == NULL);
+  g_assert (g_dbus_error_get_remote_error (error) == NULL);
 
-  xerror_free (error);
+  g_error_free (error);
 
 }
 
 static void
 test_unregistered_errors (void)
 {
-  /* Here we check that we are able to map to xerror_t and back for unregistered
+  /* Here we check that we are able to map to GError and back for unregistered
    * errors.
    *
    * For example, if "com.example.Error.Failed" is not registered, then check
    *
-   *  - Creating a xerror_t for e.g. "com.example.Error.Failed" has (error_domain, code) ==
+   *  - Creating a GError for e.g. "com.example.Error.Failed" has (error_domain, code) ==
    *    (G_IO_ERROR, G_IO_ERROR_DBUS_ERROR)
    *
    *  - That it is possible to recover e.g. "com.example.Error.Failed" from that
-   *    xerror_t.
+   *    GError.
    *
    * We just check a couple of random errors.
    */
@@ -128,40 +128,40 @@ test_unregistered_errors (void)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-check_transparent_gerror (xquark error_domain,
-                          xint_t   error_code)
+check_transparent_gerror (GQuark error_domain,
+                          gint   error_code)
 {
-  xerror_t *error;
-  xchar_t *given_dbus_error_name;
-  xchar_t *dbus_error_name;
+  GError *error;
+  gchar *given_dbus_error_name;
+  gchar *dbus_error_name;
 
-  error = xerror_new (error_domain, error_code, "test message");
+  error = g_error_new (error_domain, error_code, "test message");
   given_dbus_error_name = g_dbus_error_encode_gerror (error);
-  xassert (xstr_has_prefix (given_dbus_error_name, "org.gtk.GDBus.UnmappedGError.Quark"));
-  xerror_free (error);
+  g_assert (g_str_has_prefix (given_dbus_error_name, "org.gtk.GDBus.UnmappedGError.Quark"));
+  g_error_free (error);
 
   error = g_dbus_error_new_for_dbus_error (given_dbus_error_name, "test message");
   g_assert_error (error, error_domain, error_code);
-  xassert (g_dbus_error_is_remote_error (error));
+  g_assert (g_dbus_error_is_remote_error (error));
   dbus_error_name = g_dbus_error_get_remote_error (error);
   g_assert_cmpstr (dbus_error_name, ==, given_dbus_error_name);
   g_free (dbus_error_name);
   g_free (given_dbus_error_name);
 
   /* strip the message */
-  xassert (g_dbus_error_strip_remote_error (error));
+  g_assert (g_dbus_error_strip_remote_error (error));
   g_assert_cmpstr (error->message, ==, "test message");
 
   /* check that we can no longer recover the D-Bus error name */
-  xassert (g_dbus_error_get_remote_error (error) == NULL);
+  g_assert (g_dbus_error_get_remote_error (error) == NULL);
 
-  xerror_free (error);
+  g_error_free (error);
 }
 
 static void
 test_transparent_gerror (void)
 {
-  /* Here we check that we are able to transparent pass unregistered xerror_t's
+  /* Here we check that we are able to transparent pass unregistered GError's
    * over the wire.
    *
    * For example, if G_IO_ERROR_FAILED is not registered, then check
@@ -172,7 +172,7 @@ test_transparent_gerror (void)
    *  - mapping back the D-Bus error name gives us G_IO_ERROR_FAILED
    *
    *  - That it is possible to recover the D-Bus error name from the
-   *    xerror_t.
+   *    GError.
    *
    * We just check a couple of random errors.
    */
@@ -187,7 +187,7 @@ typedef enum
   TEST_ERROR_BLA
 } TestError;
 
-xdbus_error_entry_t test_error_entries[] =
+GDBusErrorEntry test_error_entries[] =
 {
   { TEST_ERROR_FAILED, "org.gtk.test.Error.Failed" },
   { TEST_ERROR_BLA,    "org.gtk.test.Error.Bla"    }
@@ -196,10 +196,10 @@ xdbus_error_entry_t test_error_entries[] =
 static void
 test_register_error (void)
 {
-  xsize_t test_error_quark = 0;
-  xboolean_t res;
-  xchar_t *msg;
-  xerror_t *error;
+  gsize test_error_quark = 0;
+  gboolean res;
+  gchar *msg;
+  GError *error;
 
   g_dbus_error_register_error_domain ("test-error-quark",
                                       &test_error_quark,
@@ -211,10 +211,10 @@ test_register_error (void)
   g_assert_error (error, test_error_quark, TEST_ERROR_FAILED);
   res = g_dbus_error_is_remote_error (error);
   msg = g_dbus_error_get_remote_error (error);
-  xassert (res);
+  g_assert (res);
   g_assert_cmpstr (msg, ==, "org.gtk.test.Error.Failed");
   res = g_dbus_error_strip_remote_error (error);
-  xassert (res);
+  g_assert (res);
   g_assert_cmpstr (error->message, ==, "Failed");
   g_clear_error (&error);
   g_free (msg);
@@ -222,25 +222,25 @@ test_register_error (void)
   g_dbus_error_set_dbus_error (&error, "org.gtk.test.Error.Failed", "Failed again", "Prefix %d", 1);
   res = g_dbus_error_is_remote_error (error);
   msg = g_dbus_error_get_remote_error (error);
-  xassert (res);
+  g_assert (res);
   g_assert_cmpstr (msg, ==, "org.gtk.test.Error.Failed");
   res = g_dbus_error_strip_remote_error (error);
-  xassert (res);
+  g_assert (res);
   g_assert_cmpstr (error->message, ==, "Prefix 1: Failed again");
   g_clear_error (&error);
   g_free (msg);
 
-  error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_NOT_EMPTY, "Not Empty");
+  error = g_error_new_literal (G_IO_ERROR, G_IO_ERROR_NOT_EMPTY, "Not Empty");
   res = g_dbus_error_is_remote_error (error);
   msg = g_dbus_error_get_remote_error (error);
-  xassert (!res);
+  g_assert (!res);
   g_assert_cmpstr (msg, ==, NULL);
   res = g_dbus_error_strip_remote_error (error);
-  xassert (!res);
+  g_assert (!res);
   g_assert_cmpstr (error->message, ==, "Not Empty");
   g_clear_error (&error);
 
-  error = xerror_new_literal (test_error_quark, TEST_ERROR_BLA, "Bla");
+  error = g_error_new_literal (test_error_quark, TEST_ERROR_BLA, "Bla");
   msg = g_dbus_error_encode_gerror (error);
   g_assert_cmpstr (msg, ==, "org.gtk.test.Error.Bla");
   g_free (msg);
@@ -248,7 +248,7 @@ test_register_error (void)
 
   res = g_dbus_error_unregister_error (test_error_quark,
                                        TEST_ERROR_BLA, "org.gtk.test.Error.Bla");
-  xassert (res);
+  g_assert (res);
 }
 
 

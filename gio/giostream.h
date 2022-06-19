@@ -28,47 +28,47 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_IO_STREAM         (xio_stream_get_type ())
-#define XIO_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_IO_STREAM, xio_stream))
-#define XIO_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_IO_STREAM, xio_stream_class))
-#define X_IS_IO_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_IO_STREAM))
-#define X_IS_IO_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_IO_STREAM))
-#define XIO_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_IO_STREAM, xio_stream_class))
+#define G_TYPE_IO_STREAM         (g_io_stream_get_type ())
+#define G_IO_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_IO_STREAM, GIOStream))
+#define G_IO_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_IO_STREAM, GIOStreamClass))
+#define G_IS_IO_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_IO_STREAM))
+#define G_IS_IO_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_IO_STREAM))
+#define G_IO_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_IO_STREAM, GIOStreamClass))
 
-typedef struct _xio_stream_private                            xio_stream_private_t;
-typedef struct _xio_stream_class                              xio_stream_class_t;
+typedef struct _GIOStreamPrivate                            GIOStreamPrivate;
+typedef struct _GIOStreamClass                              GIOStreamClass;
 
 /**
- * xio_stream_t:
+ * GIOStream:
  *
  * Base class for read-write streams.
  **/
-struct _xio_stream
+struct _GIOStream
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
-  xio_stream_private_t *priv;
+  GIOStreamPrivate *priv;
 };
 
-struct _xio_stream_class
+struct _GIOStreamClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xinput_stream_t *  (*get_input_stream)  (xio_stream_t *stream);
-  xoutput_stream_t * (*get_output_stream) (xio_stream_t *stream);
+  GInputStream *  (*get_input_stream)  (GIOStream *stream);
+  GOutputStream * (*get_output_stream) (GIOStream *stream);
 
-  xboolean_t (* close_fn)	    (xio_stream_t           *stream,
-                             xcancellable_t        *cancellable,
-                             xerror_t             **error);
-  void     (* close_async)  (xio_stream_t           *stream,
+  gboolean (* close_fn)	    (GIOStream           *stream,
+                             GCancellable        *cancellable,
+                             GError             **error);
+  void     (* close_async)  (GIOStream           *stream,
                              int                  io_priority,
-                             xcancellable_t        *cancellable,
-                             xasync_ready_callback_t  callback,
-                             xpointer_t             user_data);
-  xboolean_t (* close_finish) (xio_stream_t           *stream,
-                             xasync_result_t        *result,
-                             xerror_t             **error);
+                             GCancellable        *cancellable,
+                             GAsyncReadyCallback  callback,
+                             gpointer             user_data);
+  gboolean (* close_finish) (GIOStream           *stream,
+                             GAsyncResult        *result,
+                             GError             **error);
   /*< private >*/
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -83,52 +83,52 @@ struct _xio_stream_class
   void (*_g_reserved10) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t          xio_stream_get_type          (void)  G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType          g_io_stream_get_type          (void)  G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t * g_io_stream_get_input_stream  (xio_stream_t            *stream);
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t *g_io_stream_get_output_stream (xio_stream_t            *stream);
+GLIB_AVAILABLE_IN_ALL
+GInputStream * g_io_stream_get_input_stream  (GIOStream            *stream);
+GLIB_AVAILABLE_IN_ALL
+GOutputStream *g_io_stream_get_output_stream (GIOStream            *stream);
 
-XPL_AVAILABLE_IN_ALL
-void           g_io_stream_splice_async      (xio_stream_t            *stream1,
-					      xio_stream_t            *stream2,
-					      xio_stream_splice_flags_t  flags,
+GLIB_AVAILABLE_IN_ALL
+void           g_io_stream_splice_async      (GIOStream            *stream1,
+					      GIOStream            *stream2,
+					      GIOStreamSpliceFlags  flags,
 					      int                   io_priority,
-					      xcancellable_t         *cancellable,
-					      xasync_ready_callback_t   callback,
-					      xpointer_t              user_data);
+					      GCancellable         *cancellable,
+					      GAsyncReadyCallback   callback,
+					      gpointer              user_data);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_io_stream_splice_finish     (xasync_result_t         *result,
-                                              xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_io_stream_splice_finish     (GAsyncResult         *result,
+                                              GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_io_stream_close             (xio_stream_t            *stream,
-					      xcancellable_t         *cancellable,
-					      xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_io_stream_close             (GIOStream            *stream,
+					      GCancellable         *cancellable,
+					      GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-void           g_io_stream_close_async       (xio_stream_t            *stream,
+GLIB_AVAILABLE_IN_ALL
+void           g_io_stream_close_async       (GIOStream            *stream,
 					      int                   io_priority,
-					      xcancellable_t         *cancellable,
-					      xasync_ready_callback_t   callback,
-					      xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_io_stream_close_finish      (xio_stream_t            *stream,
-					      xasync_result_t         *result,
-					      xerror_t              **error);
+					      GCancellable         *cancellable,
+					      GAsyncReadyCallback   callback,
+					      gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_io_stream_close_finish      (GIOStream            *stream,
+					      GAsyncResult         *result,
+					      GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_io_stream_is_closed         (xio_stream_t            *stream);
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_io_stream_has_pending       (xio_stream_t            *stream);
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_io_stream_set_pending       (xio_stream_t            *stream,
-					      xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void           g_io_stream_clear_pending     (xio_stream_t            *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_io_stream_is_closed         (GIOStream            *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_io_stream_has_pending       (GIOStream            *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_io_stream_set_pending       (GIOStream            *stream,
+					      GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void           g_io_stream_clear_pending     (GIOStream            *stream);
 
 G_END_DECLS
 

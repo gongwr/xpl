@@ -1,4 +1,4 @@
- /* XPL - Library of useful routines for C programming
+ /* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_QSORT_H__
 #define __G_QSORT_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,12 +33,12 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-void g_qsort_with_data (xconstpointer    pbase,
-			xint_t             total_elems,
-			xsize_t            size,
+GLIB_AVAILABLE_IN_ALL
+void g_qsort_with_data (gconstpointer    pbase,
+			gint             total_elems,
+			gsize            size,
 			GCompareDataFunc compare_func,
-			xpointer_t         user_data);
+			gpointer         user_data);
 
 G_END_DECLS
 

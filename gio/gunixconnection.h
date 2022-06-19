@@ -25,75 +25,75 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_UNIX_CONNECTION                              (g_unix_connection_get_type ())
-#define G_UNIX_CONNECTION(inst)                             (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_UNIX_CONNECTION, GUnixConnection))
-#define G_UNIX_CONNECTION_CLASS(class)                      (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_UNIX_CONNECTION, GUnixConnectionClass))
-#define X_IS_UNIX_CONNECTION(inst)                          (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_UNIX_CONNECTION))
-#define X_IS_UNIX_CONNECTION_CLASS(class)                   (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_UNIX_CONNECTION))
-#define G_UNIX_CONNECTION_GET_CLASS(inst)                   (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_UNIX_CONNECTION, GUnixConnectionClass))
+#define G_TYPE_UNIX_CONNECTION                              (g_unix_connection_get_type ())
+#define G_UNIX_CONNECTION(inst)                             (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_UNIX_CONNECTION, GUnixConnection))
+#define G_UNIX_CONNECTION_CLASS(class)                      (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_UNIX_CONNECTION, GUnixConnectionClass))
+#define G_IS_UNIX_CONNECTION(inst)                          (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_UNIX_CONNECTION))
+#define G_IS_UNIX_CONNECTION_CLASS(class)                   (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_UNIX_CONNECTION))
+#define G_UNIX_CONNECTION_GET_CLASS(inst)                   (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_UNIX_CONNECTION, GUnixConnectionClass))
 
 typedef struct _GUnixConnection                             GUnixConnection;
 typedef struct _GUnixConnectionPrivate                      GUnixConnectionPrivate;
 typedef struct _GUnixConnectionClass                        GUnixConnectionClass;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixConnection, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixConnection, g_object_unref)
 
 struct _GUnixConnectionClass
 {
-  xsocket_connection_class_t parent_class;
+  GSocketConnectionClass parent_class;
 };
 
 struct _GUnixConnection
 {
-  xsocket_connection_t parent_instance;
+  GSocketConnection parent_instance;
   GUnixConnectionPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   g_unix_connection_get_type                      (void);
+GLIB_AVAILABLE_IN_ALL
+GType                   g_unix_connection_get_type                      (void);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                g_unix_connection_send_fd                       (GUnixConnection      *connection,
-                                                                         xint_t                  fd,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xint_t                    g_unix_connection_receive_fd                    (GUnixConnection      *connection,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_unix_connection_send_fd                       (GUnixConnection      *connection,
+                                                                         gint                  fd,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gint                    g_unix_connection_receive_fd                    (GUnixConnection      *connection,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                g_unix_connection_send_credentials              (GUnixConnection      *connection,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_unix_connection_send_credentials              (GUnixConnection      *connection,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_2_32
 void                    g_unix_connection_send_credentials_async        (GUnixConnection      *connection,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_2_32
-xboolean_t                g_unix_connection_send_credentials_finish       (GUnixConnection      *connection,
-                                                                         xasync_result_t         *result,
-                                                                         xerror_t              **error);
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_2_32
+gboolean                g_unix_connection_send_credentials_finish       (GUnixConnection      *connection,
+                                                                         GAsyncResult         *result,
+                                                                         GError              **error);
 
-XPL_AVAILABLE_IN_2_32
-xcredentials_t           *g_unix_connection_receive_credentials           (GUnixConnection      *connection,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xerror_t              **error);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
+GCredentials           *g_unix_connection_receive_credentials           (GUnixConnection      *connection,
+                                                                         GCancellable         *cancellable,
+                                                                         GError              **error);
+GLIB_AVAILABLE_IN_2_32
 void                    g_unix_connection_receive_credentials_async     (GUnixConnection      *connection,
-                                                                         xcancellable_t         *cancellable,
-                                                                         xasync_ready_callback_t   callback,
-                                                                         xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xcredentials_t           *g_unix_connection_receive_credentials_finish    (GUnixConnection      *connection,
-                                                                         xasync_result_t         *result,
-                                                                         xerror_t              **error);
+                                                                         GCancellable         *cancellable,
+                                                                         GAsyncReadyCallback   callback,
+                                                                         gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GCredentials           *g_unix_connection_receive_credentials_finish    (GUnixConnection      *connection,
+                                                                         GAsyncResult         *result,
+                                                                         GError              **error);
 
 G_END_DECLS
 

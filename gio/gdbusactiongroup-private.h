@@ -25,11 +25,11 @@
 
 G_BEGIN_DECLS
 
-xboolean_t
-xdbus_action_group_sync (xdbus_action_group_t  *group,
-                          xcancellable_t      *cancellable,
-                          xerror_t           **error);
+gboolean
+g_dbus_action_group_sync (GDBusActionGroup  *group,
+                          GCancellable      *cancellable,
+                          GError           **error);
 
 G_END_DECLS
 
-#endif
+#endif 

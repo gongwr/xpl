@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XFILE_MONITOR_H__
-#define __XFILE_MONITOR_H__
+#ifndef __G_FILE_MONITOR_H__
+#define __G_FILE_MONITOR_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,41 +29,41 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE_MONITOR         (xfile_monitor_get_type ())
-#define XFILE_MONITOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_MONITOR, xfile_monitor))
-#define XFILE_MONITOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_MONITOR, xfile_monitor_class_t))
-#define X_IS_FILE_MONITOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_MONITOR))
-#define X_IS_FILE_MONITOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_MONITOR))
-#define XFILE_MONITOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_MONITOR, xfile_monitor_class_t))
+#define G_TYPE_FILE_MONITOR         (g_file_monitor_get_type ())
+#define G_FILE_MONITOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILE_MONITOR, GFileMonitor))
+#define G_FILE_MONITOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILE_MONITOR, GFileMonitorClass))
+#define G_IS_FILE_MONITOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILE_MONITOR))
+#define G_IS_FILE_MONITOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_FILE_MONITOR))
+#define G_FILE_MONITOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_FILE_MONITOR, GFileMonitorClass))
 
-typedef struct _GFileMonitorClass       xfile_monitor_class_t;
-typedef struct _GFileMonitorPrivate	xfile_monitor_private_t;
+typedef struct _GFileMonitorClass       GFileMonitorClass;
+typedef struct _GFileMonitorPrivate	GFileMonitorPrivate;
 
 /**
- * xfile_monitor_t:
+ * GFileMonitor:
  *
  * Watches for changes to a file.
  **/
 struct _GFileMonitor
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
-  xfile_monitor_private_t *priv;
+  GFileMonitorPrivate *priv;
 };
 
 struct _GFileMonitorClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* Signals */
-  void     (* changed) (xfile_monitor_t      *monitor,
-                        xfile_t             *file,
-                        xfile_t             *other_file,
-                        xfile_monitor_event_t  event_type);
+  void     (* changed) (GFileMonitor      *monitor,
+                        GFile             *file,
+                        GFile             *other_file,
+                        GFileMonitorEvent  event_type);
 
   /* Virtual Table */
-  xboolean_t (* cancel)  (xfile_monitor_t      *monitor);
+  gboolean (* cancel)  (GFileMonitor      *monitor);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -74,25 +74,25 @@ struct _GFileMonitorClass
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xfile_monitor_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_file_monitor_get_type       (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xfile_monitor_cancel         (xfile_monitor_t      *monitor);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xfile_monitor_is_cancelled   (xfile_monitor_t      *monitor);
-XPL_AVAILABLE_IN_ALL
-void     xfile_monitor_set_rate_limit (xfile_monitor_t      *monitor,
-                                        xint_t               limit_msecs);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_file_monitor_cancel         (GFileMonitor      *monitor);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_file_monitor_is_cancelled   (GFileMonitor      *monitor);
+GLIB_AVAILABLE_IN_ALL
+void     g_file_monitor_set_rate_limit (GFileMonitor      *monitor,
+                                        gint               limit_msecs);
 
 
 /* For implementations */
-XPL_AVAILABLE_IN_ALL
-void     xfile_monitor_emit_event     (xfile_monitor_t      *monitor,
-                                        xfile_t             *child,
-                                        xfile_t             *other_file,
-                                        xfile_monitor_event_t  event_type);
+GLIB_AVAILABLE_IN_ALL
+void     g_file_monitor_emit_event     (GFileMonitor      *monitor,
+                                        GFile             *child,
+                                        GFile             *other_file,
+                                        GFileMonitorEvent  event_type);
 
 G_END_DECLS
 
-#endif /* __XFILE_MONITOR_H__ */
+#endif /* __G_FILE_MONITOR_H__ */

@@ -32,8 +32,8 @@
 #include "gnetworkmonitor.h"
 #include "gdbusproxy.h"
 
-static void xnetwork_monitor_nm_iface_init (GNetworkMonitorInterface *iface);
-static void xnetwork_monitor_nm_initable_iface_init (xinitable_iface_t *iface);
+static void g_network_monitor_nm_iface_init (GNetworkMonitorInterface *iface);
+static void g_network_monitor_nm_initable_iface_init (GInitableIface *iface);
 
 enum
 {
@@ -67,53 +67,53 @@ typedef enum {
 
 struct _GNetworkMonitorNMPrivate
 {
-  xdbus_proxy_t *proxy;
-  xuint_t signal_id;
+  GDBusProxy *proxy;
+  guint signal_id;
 
   GNetworkConnectivity connectivity;
-  xboolean_t network_available;
-  xboolean_t network_metered;
+  gboolean network_available;
+  gboolean network_metered;
 };
 
-#define xnetwork_monitor_nm_get_type _xnetwork_monitor_nm_get_type
-G_DEFINE_TYPE_WITH_CODE (GNetworkMonitorNM, xnetwork_monitor_nm, XTYPE_NETWORK_MONITOR_NETLINK,
+#define g_network_monitor_nm_get_type _g_network_monitor_nm_get_type
+G_DEFINE_TYPE_WITH_CODE (GNetworkMonitorNM, g_network_monitor_nm, G_TYPE_NETWORK_MONITOR_NETLINK,
                          G_ADD_PRIVATE (GNetworkMonitorNM)
-                         G_IMPLEMENT_INTERFACE (XTYPE_NETWORK_MONITOR,
-                                                xnetwork_monitor_nm_iface_init)
-                         G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                xnetwork_monitor_nm_initable_iface_init)
-                         _xio_modules_ensure_extension_points_registered ();
+                         G_IMPLEMENT_INTERFACE (G_TYPE_NETWORK_MONITOR,
+                                                g_network_monitor_nm_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                g_network_monitor_nm_initable_iface_init)
+                         _g_io_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_NETWORK_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
                                                          "networkmanager",
                                                          30))
 
 static void
-xnetwork_monitor_nm_init (GNetworkMonitorNM *nm)
+g_network_monitor_nm_init (GNetworkMonitorNM *nm)
 {
-  nm->priv = xnetwork_monitor_nm_get_instance_private (nm);
+  nm->priv = g_network_monitor_nm_get_instance_private (nm);
 }
 
 static void
-xnetwork_monitor_nm_get_property (xobject_t    *object,
-                                   xuint_t       prop_id,
-                                   xvalue_t     *value,
-                                   xparam_spec_t *pspec)
+g_network_monitor_nm_get_property (GObject    *object,
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
 {
   GNetworkMonitorNM *nm = G_NETWORK_MONITOR_NM (object);
 
   switch (prop_id)
     {
     case PROP_NETWORK_AVAILABLE:
-      xvalue_set_boolean (value, nm->priv->network_available);
+      g_value_set_boolean (value, nm->priv->network_available);
       break;
 
     case PROP_NETWORK_METERED:
-      xvalue_set_boolean (value, nm->priv->network_metered);
+      g_value_set_boolean (value, nm->priv->network_metered);
       break;
 
     case PROP_CONNECTIVITY:
-      xvalue_set_enum (value, nm->priv->connectivity);
+      g_value_set_enum (value, nm->priv->connectivity);
       break;
 
     default:
@@ -143,8 +143,8 @@ nm_conn_to_g_conn (int nm_state)
     }
 }
 
-static xboolean_t
-nm_metered_to_bool (xuint_t nm_metered)
+static gboolean
+nm_metered_to_bool (guint nm_metered)
 {
   switch (nm_metered)
     {
@@ -166,28 +166,28 @@ nm_metered_to_bool (xuint_t nm_metered)
 
 static void
 sync_properties (GNetworkMonitorNM *nm,
-                 xboolean_t           emit_signals)
+                 gboolean           emit_signals)
 {
-  xvariant_t *v;
+  GVariant *v;
   NMState nm_state;
   NMConnectivityState nm_connectivity;
-  xboolean_t new_network_available;
-  xboolean_t new_network_metered;
+  gboolean new_network_available;
+  gboolean new_network_metered;
   GNetworkConnectivity new_connectivity;
 
-  v = xdbus_proxy_get_cached_property (nm->priv->proxy, "State");
+  v = g_dbus_proxy_get_cached_property (nm->priv->proxy, "State");
   if (!v)
     return;
 
-  nm_state = xvariant_get_uint32 (v);
-  xvariant_unref (v);
+  nm_state = g_variant_get_uint32 (v);
+  g_variant_unref (v);
 
-  v = xdbus_proxy_get_cached_property (nm->priv->proxy, "Connectivity");
+  v = g_dbus_proxy_get_cached_property (nm->priv->proxy, "Connectivity");
   if (!v)
     return;
 
-  nm_connectivity = xvariant_get_uint32 (v);
-  xvariant_unref (v);
+  nm_connectivity = g_variant_get_uint32 (v);
+  g_variant_unref (v);
 
   if (nm_state <= NM_STATE_CONNECTED_LOCAL)
     {
@@ -212,15 +212,15 @@ sync_properties (GNetworkMonitorNM *nm,
     {
 
       /* this is only available post NM 1.0 */
-      v = xdbus_proxy_get_cached_property (nm->priv->proxy, "Metered");
+      v = g_dbus_proxy_get_cached_property (nm->priv->proxy, "Metered");
       if (v == NULL)
         {
           new_network_metered = FALSE;
         }
       else
         {
-          new_network_metered = nm_metered_to_bool (xvariant_get_uint32 (v));
-          xvariant_unref (v);
+          new_network_metered = nm_metered_to_bool (g_variant_get_uint32 (v));
+          g_variant_unref (v);
         }
 
       new_network_available = TRUE;
@@ -238,61 +238,61 @@ sync_properties (GNetworkMonitorNM *nm,
   if (new_network_available != nm->priv->network_available)
     {
       nm->priv->network_available = new_network_available;
-      xobject_notify (G_OBJECT (nm), "network-available");
+      g_object_notify (G_OBJECT (nm), "network-available");
     }
   if (new_network_metered != nm->priv->network_metered)
     {
       nm->priv->network_metered = new_network_metered;
-      xobject_notify (G_OBJECT (nm), "network-metered");
+      g_object_notify (G_OBJECT (nm), "network-metered");
     }
   if (new_connectivity != nm->priv->connectivity)
     {
       nm->priv->connectivity = new_connectivity;
-      xobject_notify (G_OBJECT (nm), "connectivity");
+      g_object_notify (G_OBJECT (nm), "connectivity");
     }
 }
 
 static void
-proxy_properties_changed_cb (xdbus_proxy_t        *proxy,
-                             xvariant_t          *changed_properties,
-                             xstrv_t              invalidated_properties,
+proxy_properties_changed_cb (GDBusProxy        *proxy,
+                             GVariant          *changed_properties,
+                             GStrv              invalidated_properties,
                              GNetworkMonitorNM *nm)
 {
   sync_properties (nm, TRUE);
 }
 
-static xboolean_t
-has_property (xdbus_proxy_t *proxy,
+static gboolean
+has_property (GDBusProxy *proxy,
               const char *property_name)
 {
   char **props;
-  xboolean_t prop_found = FALSE;
+  gboolean prop_found = FALSE;
 
-  props = xdbus_proxy_get_cached_property_names (proxy);
+  props = g_dbus_proxy_get_cached_property_names (proxy);
 
   if (!props)
     return FALSE;
 
-  prop_found = xstrv_contains ((const xchar_t * const *) props, property_name);
-  xstrfreev (props);
+  prop_found = g_strv_contains ((const gchar * const *) props, property_name);
+  g_strfreev (props);
   return prop_found;
 }
 
-static xboolean_t
-xnetwork_monitor_nm_initable_init (xinitable_t     *initable,
-                                    xcancellable_t  *cancellable,
-                                    xerror_t       **error)
+static gboolean
+g_network_monitor_nm_initable_init (GInitable     *initable,
+                                    GCancellable  *cancellable,
+                                    GError       **error)
 {
   GNetworkMonitorNM *nm = G_NETWORK_MONITOR_NM (initable);
-  xdbus_proxy_t *proxy;
-  xinitable_iface_t *parent_iface;
-  xchar_t *name_owner = NULL;
+  GDBusProxy *proxy;
+  GInitableIface *parent_iface;
+  gchar *name_owner = NULL;
 
-  parent_iface = xtype_interface_peek_parent (G_NETWORK_MONITOR_NM_GET_INITABLE_IFACE (initable));
+  parent_iface = g_type_interface_peek_parent (G_NETWORK_MONITOR_NM_GET_INITABLE_IFACE (initable));
   if (!parent_iface->init (initable, cancellable, error))
     return FALSE;
 
-  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
+  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SYSTEM,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START | G_DBUS_PROXY_FLAGS_GET_INVALIDATED_PROPERTIES,
                                          NULL,
                                          "org.freedesktop.NetworkManager",
@@ -303,13 +303,13 @@ xnetwork_monitor_nm_initable_init (xinitable_t     *initable,
   if (!proxy)
     return FALSE;
 
-  name_owner = xdbus_proxy_get_name_owner (proxy);
+  name_owner = g_dbus_proxy_get_name_owner (proxy);
 
   if (!name_owner)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                    _("NetworkManager not running"));
-      xobject_unref (proxy);
+      g_object_unref (proxy);
       return FALSE;
     }
 
@@ -320,11 +320,11 @@ xnetwork_monitor_nm_initable_init (xinitable_t     *initable,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
                    _("NetworkManager version too old"));
-      xobject_unref (proxy);
+      g_object_unref (proxy);
       return FALSE;
     }
 
-  nm->priv->signal_id = xsignal_connect (G_OBJECT (proxy), "g-properties-changed",
+  nm->priv->signal_id = g_signal_connect (G_OBJECT (proxy), "g-properties-changed",
                                           G_CALLBACK (proxy_properties_changed_cb), nm);
   nm->priv->proxy = proxy;
   sync_properties (nm, FALSE);
@@ -333,42 +333,42 @@ xnetwork_monitor_nm_initable_init (xinitable_t     *initable,
 }
 
 static void
-xnetwork_monitor_nm_finalize (xobject_t *object)
+g_network_monitor_nm_finalize (GObject *object)
 {
   GNetworkMonitorNM *nm = G_NETWORK_MONITOR_NM (object);
 
   if (nm->priv->proxy != NULL &&
       nm->priv->signal_id != 0)
     {
-      xsignal_handler_disconnect (nm->priv->proxy,
+      g_signal_handler_disconnect (nm->priv->proxy,
                                    nm->priv->signal_id);
       nm->priv->signal_id = 0;
     }
   g_clear_object (&nm->priv->proxy);
 
-  XOBJECT_CLASS (xnetwork_monitor_nm_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_network_monitor_nm_parent_class)->finalize (object);
 }
 
 static void
-xnetwork_monitor_nm_class_init (GNetworkMonitorNMClass *nl_class)
+g_network_monitor_nm_class_init (GNetworkMonitorNMClass *nl_class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  xobject_class->finalize = xnetwork_monitor_nm_finalize;
-  xobject_class->get_property = xnetwork_monitor_nm_get_property;
+  gobject_class->finalize = g_network_monitor_nm_finalize;
+  gobject_class->get_property = g_network_monitor_nm_get_property;
 
-  xobject_class_override_property (xobject_class, PROP_NETWORK_AVAILABLE, "network-available");
-  xobject_class_override_property (xobject_class, PROP_NETWORK_METERED, "network-metered");
-  xobject_class_override_property (xobject_class, PROP_CONNECTIVITY, "connectivity");
+  g_object_class_override_property (gobject_class, PROP_NETWORK_AVAILABLE, "network-available");
+  g_object_class_override_property (gobject_class, PROP_NETWORK_METERED, "network-metered");
+  g_object_class_override_property (gobject_class, PROP_CONNECTIVITY, "connectivity");
 }
 
 static void
-xnetwork_monitor_nm_iface_init (GNetworkMonitorInterface *monitor_iface)
+g_network_monitor_nm_iface_init (GNetworkMonitorInterface *monitor_iface)
 {
 }
 
 static void
-xnetwork_monitor_nm_initable_iface_init (xinitable_iface_t *iface)
+g_network_monitor_nm_initable_iface_init (GInitableIface *iface)
 {
-  iface->init = xnetwork_monitor_nm_initable_init;
+  iface->init = g_network_monitor_nm_initable_init;
 }

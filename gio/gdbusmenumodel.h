@@ -24,21 +24,21 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_MENU_MODEL          (g_dbus_menu_model_get_type ())
-#define G_DBUS_MENU_MODEL(inst)         (XTYPE_CHECK_INSTANCE_CAST ((inst),   \
-                                         XTYPE_DBUS_MENU_MODEL, xdbus_menu_model_t)
-#define X_IS_DBUS_MENU_MODEL(inst)      (XTYPE_CHECK_INSTANCE_TYPE ((inst),   \
-                                         XTYPE_DBUS_MENU_MODEL))
+#define G_TYPE_DBUS_MENU_MODEL          (g_dbus_menu_model_get_type ())
+#define G_DBUS_MENU_MODEL(inst)         (G_TYPE_CHECK_INSTANCE_CAST ((inst),   \
+                                         G_TYPE_DBUS_MENU_MODEL, GDBusMenuModel))
+#define G_IS_DBUS_MENU_MODEL(inst)      (G_TYPE_CHECK_INSTANCE_TYPE ((inst),   \
+                                         G_TYPE_DBUS_MENU_MODEL))
 
-typedef struct _GDBusMenuModel xdbus_menu_model_t;
+typedef struct _GDBusMenuModel GDBusMenuModel;
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   g_dbus_menu_model_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                   g_dbus_menu_model_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xdbus_menu_model_t *        g_dbus_menu_model_get          (xdbus_connection_t *connection,
-                                                        const xchar_t     *bus_name,
-                                                        const xchar_t     *object_path);
+GLIB_AVAILABLE_IN_ALL
+GDBusMenuModel *        g_dbus_menu_model_get          (GDBusConnection *connection,
+                                                        const gchar     *bus_name,
+                                                        const gchar     *object_path);
 
 G_END_DECLS
 

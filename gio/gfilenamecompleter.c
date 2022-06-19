@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -33,11 +33,11 @@
  * SECTION:gfilenamecompleter
  * @short_description: Filename Completer
  * @include: gio/gio.h
- *
+ * 
  * Completes partial file and directory names given a partial string by
- * looking in the file system for clues. Can return a list of possible
+ * looking in the file system for clues. Can return a list of possible 
  * completion strings for widget implementations.
- *
+ * 
  **/
 
 enum {
@@ -45,86 +45,86 @@ enum {
   LAST_SIGNAL
 };
 
-static xuint_t signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 typedef struct {
-  xfilename_completer_t *completer;
-  xfile_enumerator_t *enumerator;
-  xcancellable_t *cancellable;
-  xboolean_t should_escape;
-  xfile_t *dir;
-  xlist_t *basenames;
-  xboolean_t dirs_only;
+  GFilenameCompleter *completer;
+  GFileEnumerator *enumerator;
+  GCancellable *cancellable;
+  gboolean should_escape;
+  GFile *dir;
+  GList *basenames;
+  gboolean dirs_only;
 } LoadBasenamesData;
 
-struct _xfilename_completer {
-  xobject_t parent;
+struct _GFilenameCompleter {
+  GObject parent;
 
-  xfile_t *basenames_dir;
-  xboolean_t basenames_are_escaped;
-  xboolean_t dirs_only;
-  xlist_t *basenames;
+  GFile *basenames_dir;
+  gboolean basenames_are_escaped;
+  gboolean dirs_only;
+  GList *basenames;
 
   LoadBasenamesData *basename_loader;
 };
 
-XDEFINE_TYPE (xfilename_completer, xfilename_completer, XTYPE_OBJECT)
+G_DEFINE_TYPE (GFilenameCompleter, g_filename_completer, G_TYPE_OBJECT)
 
-static void cancel_load_basenames (xfilename_completer_t *completer);
+static void cancel_load_basenames (GFilenameCompleter *completer);
 
 static void
-xfilename_completer_finalize (xobject_t *object)
+g_filename_completer_finalize (GObject *object)
 {
-  xfilename_completer_t *completer;
+  GFilenameCompleter *completer;
 
-  completer = XFILENAME_COMPLETER (object);
+  completer = G_FILENAME_COMPLETER (object);
 
   cancel_load_basenames (completer);
 
   if (completer->basenames_dir)
-    xobject_unref (completer->basenames_dir);
+    g_object_unref (completer->basenames_dir);
 
-  xlist_free_full (completer->basenames, g_free);
+  g_list_free_full (completer->basenames, g_free);
 
-  XOBJECT_CLASS (xfilename_completer_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_filename_completer_parent_class)->finalize (object);
 }
 
 static void
-xfilename_completer_class_init (xfilename_completer_class_t *klass)
+g_filename_completer_class_init (GFilenameCompleterClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
-
-  xobject_class->finalize = xfilename_completer_finalize;
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  
+  gobject_class->finalize = g_filename_completer_finalize;
   /**
-   * xfilename_completer_t::got-completion-data:
-   *
+   * GFilenameCompleter::got-completion-data:
+   * 
    * Emitted when the file name completion information comes available.
    **/
-  signals[GOT_COMPLETION_DATA] = xsignal_new (I_("got-completion-data"),
-					  XTYPE_FILENAME_COMPLETER,
+  signals[GOT_COMPLETION_DATA] = g_signal_new (I_("got-completion-data"),
+					  G_TYPE_FILENAME_COMPLETER,
 					  G_SIGNAL_RUN_LAST,
-					  G_STRUCT_OFFSET (xfilename_completer_class_t, got_completion_data),
+					  G_STRUCT_OFFSET (GFilenameCompleterClass, got_completion_data),
 					  NULL, NULL,
 					  NULL,
-					  XTYPE_NONE, 0);
+					  G_TYPE_NONE, 0);
 }
 
 static void
-xfilename_completer_init (xfilename_completer_t *completer)
+g_filename_completer_init (GFilenameCompleter *completer)
 {
 }
 
 /**
- * xfilename_completer_new:
- *
+ * g_filename_completer_new:
+ * 
  * Creates a new filename completer.
- *
- * Returns: a #xfilename_completer_t.
+ * 
+ * Returns: a #GFilenameCompleter.
  **/
-xfilename_completer_t *
-xfilename_completer_new (void)
+GFilenameCompleter *
+g_filename_completer_new (void)
 {
-  return xobject_new (XTYPE_FILENAME_COMPLETER, NULL);
+  return g_object_new (G_TYPE_FILENAME_COMPLETER, NULL);
 }
 
 static char *
@@ -134,39 +134,39 @@ longest_common_prefix (char *a, char *b)
 
   start = a;
 
-  while (xutf8_get_char (a) == xutf8_get_char (b))
+  while (g_utf8_get_char (a) == g_utf8_get_char (b))
     {
-      a = xutf8_next_char (a);
-      b = xutf8_next_char (b);
+      a = g_utf8_next_char (a);
+      b = g_utf8_next_char (b);
     }
 
-  return xstrndup (start, a - start);
+  return g_strndup (start, a - start);
 }
 
 static void
 load_basenames_data_free (LoadBasenamesData *data)
 {
   if (data->enumerator)
-    xobject_unref (data->enumerator);
-
-  xobject_unref (data->cancellable);
-  xobject_unref (data->dir);
-
-  xlist_free_full (data->basenames, g_free);
-
+    g_object_unref (data->enumerator);
+  
+  g_object_unref (data->cancellable);
+  g_object_unref (data->dir);
+  
+  g_list_free_full (data->basenames, g_free);
+  
   g_free (data);
 }
 
 static void
-got_more_files (xobject_t *source_object,
-		xasync_result_t *res,
-		xpointer_t user_data)
+got_more_files (GObject *source_object,
+		GAsyncResult *res,
+		gpointer user_data)
 {
   LoadBasenamesData *data = user_data;
-  xlist_t *infos, *l;
-  xfile_info_t *info;
+  GList *infos, *l;
+  GFileInfo *info;
   const char *name;
-  xboolean_t append_slash;
+  gboolean append_slash;
   char *t;
   char *basename;
 
@@ -177,57 +177,57 @@ got_more_files (xobject_t *source_object,
       return;
     }
 
-  infos = xfile_enumerator_next_files_finish (data->enumerator, res, NULL);
+  infos = g_file_enumerator_next_files_finish (data->enumerator, res, NULL);
 
   for (l = infos; l != NULL; l = l->next)
     {
       info = l->data;
 
       if (data->dirs_only &&
-	  xfile_info_get_file_type (info) != XFILE_TYPE_DIRECTORY)
+	  g_file_info_get_file_type (info) != G_FILE_TYPE_DIRECTORY)
 	{
-	  xobject_unref (info);
+	  g_object_unref (info);
 	  continue;
 	}
-
-      append_slash = xfile_info_get_file_type (info) == XFILE_TYPE_DIRECTORY;
-      name = xfile_info_get_name (info);
+      
+      append_slash = g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY;
+      name = g_file_info_get_name (info);
       if (name == NULL)
 	{
-	  xobject_unref (info);
+	  g_object_unref (info);
 	  continue;
 	}
 
-
+      
       if (data->should_escape)
-	basename = xuri_escape_string (name,
-					XURI_RESERVED_CHARS_ALLOWED_IN_PATH,
+	basename = g_uri_escape_string (name,
+					G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
 					TRUE);
       else
 	/* If not should_escape, must be a local filename, convert to utf8 */
-	basename = xfilename_to_utf8 (name, -1, NULL, NULL, NULL);
-
+	basename = g_filename_to_utf8 (name, -1, NULL, NULL, NULL);
+      
       if (basename)
 	{
 	  if (append_slash)
 	    {
 	      t = basename;
-	      basename = xstrconcat (basename, "/", NULL);
+	      basename = g_strconcat (basename, "/", NULL);
 	      g_free (t);
 	    }
-
-	  data->basenames = xlist_prepend (data->basenames, basename);
+	  
+	  data->basenames = g_list_prepend (data->basenames, basename);
 	}
-
-      xobject_unref (info);
+      
+      g_object_unref (info);
     }
-
-  xlist_free (infos);
-
+  
+  g_list_free (infos);
+  
   if (infos)
     {
       /* Not last, get more files */
-      xfile_enumerator_next_files_async (data->enumerator,
+      g_file_enumerator_next_files_async (data->enumerator,
 					  100,
 					  0,
 					  data->cancellable,
@@ -236,28 +236,28 @@ got_more_files (xobject_t *source_object,
   else
     {
       data->completer->basename_loader = NULL;
-
+      
       if (data->completer->basenames_dir)
-	xobject_unref (data->completer->basenames_dir);
-      xlist_free_full (data->completer->basenames, g_free);
-
-      data->completer->basenames_dir = xobject_ref (data->dir);
+	g_object_unref (data->completer->basenames_dir);
+      g_list_free_full (data->completer->basenames, g_free);
+      
+      data->completer->basenames_dir = g_object_ref (data->dir);
       data->completer->basenames = data->basenames;
       data->completer->basenames_are_escaped = data->should_escape;
       data->basenames = NULL;
+      
+      g_file_enumerator_close_async (data->enumerator, 0, NULL, NULL, NULL);
 
-      xfile_enumerator_close_async (data->enumerator, 0, NULL, NULL, NULL);
-
-      xsignal_emit (data->completer, signals[GOT_COMPLETION_DATA], 0);
+      g_signal_emit (data->completer, signals[GOT_COMPLETION_DATA], 0);
       load_basenames_data_free (data);
     }
 }
 
 
 static void
-got_enum (xobject_t *source_object,
-	  xasync_result_t *res,
-	  xpointer_t user_data)
+got_enum (GObject *source_object,
+	  GAsyncResult *res,
+	  gpointer user_data)
 {
   LoadBasenamesData *data = user_data;
 
@@ -267,27 +267,27 @@ got_enum (xobject_t *source_object,
       load_basenames_data_free (data);
       return;
     }
-
-  data->enumerator = xfile_enumerate_children_finish (XFILE (source_object), res, NULL);
-
+  
+  data->enumerator = g_file_enumerate_children_finish (G_FILE (source_object), res, NULL);
+  
   if (data->enumerator == NULL)
     {
       data->completer->basename_loader = NULL;
 
       if (data->completer->basenames_dir)
-	xobject_unref (data->completer->basenames_dir);
-      xlist_free_full (data->completer->basenames, g_free);
+	g_object_unref (data->completer->basenames_dir);
+      g_list_free_full (data->completer->basenames, g_free);
 
       /* Mark up-to-date with no basenames */
-      data->completer->basenames_dir = xobject_ref (data->dir);
+      data->completer->basenames_dir = g_object_ref (data->dir);
       data->completer->basenames = NULL;
       data->completer->basenames_are_escaped = data->should_escape;
-
+      
       load_basenames_data_free (data);
       return;
     }
-
-  xfile_enumerator_next_files_async (data->enumerator,
+  
+  g_file_enumerator_next_files_async (data->enumerator,
 				      100,
 				      0,
 				      data->cancellable,
@@ -295,9 +295,9 @@ got_enum (xobject_t *source_object,
 }
 
 static void
-schedule_load_basenames (xfilename_completer_t *completer,
-			 xfile_t *dir,
-			 xboolean_t should_escape)
+schedule_load_basenames (GFilenameCompleter *completer,
+			 GFile *dir,
+			 gboolean should_escape)
 {
   LoadBasenamesData *data;
 
@@ -305,89 +305,89 @@ schedule_load_basenames (xfilename_completer_t *completer,
 
   data = g_new0 (LoadBasenamesData, 1);
   data->completer = completer;
-  data->cancellable = xcancellable_new ();
-  data->dir = xobject_ref (dir);
+  data->cancellable = g_cancellable_new ();
+  data->dir = g_object_ref (dir);
   data->should_escape = should_escape;
   data->dirs_only = completer->dirs_only;
 
   completer->basename_loader = data;
-
-  xfile_enumerate_children_async (dir,
-				   XFILE_ATTRIBUTE_STANDARD_NAME "," XFILE_ATTRIBUTE_STANDARD_TYPE,
+  
+  g_file_enumerate_children_async (dir,
+				   G_FILE_ATTRIBUTE_STANDARD_NAME "," G_FILE_ATTRIBUTE_STANDARD_TYPE,
 				   0, 0,
 				   data->cancellable,
 				   got_enum, data);
 }
 
 static void
-cancel_load_basenames (xfilename_completer_t *completer)
+cancel_load_basenames (GFilenameCompleter *completer)
 {
   LoadBasenamesData *loader;
-
+  
   if (completer->basename_loader)
     {
-      loader = completer->basename_loader;
+      loader = completer->basename_loader; 
       loader->completer = NULL;
-
-      xcancellable_cancel (loader->cancellable);
-
+      
+      g_cancellable_cancel (loader->cancellable);
+      
       completer->basename_loader = NULL;
     }
 }
 
 
 /* Returns a list of possible matches and the basename to use for it */
-static xlist_t *
-init_completion (xfilename_completer_t *completer,
+static GList *
+init_completion (GFilenameCompleter *completer,
 		 const char *initial_text,
 		 char **basename_out)
 {
-  xboolean_t should_escape;
-  xfile_t *file, *parent;
+  gboolean should_escape;
+  GFile *file, *parent;
   char *basename;
   char *t;
   int len;
 
   *basename_out = NULL;
-
+  
   should_escape = ! (g_path_is_absolute (initial_text) || *initial_text == '~');
 
   len = strlen (initial_text);
-
+  
   if (len > 0 &&
       initial_text[len - 1] == '/')
     return NULL;
-
-  file = xfile_parse_name (initial_text);
-  parent = xfile_get_parent (file);
+  
+  file = g_file_parse_name (initial_text);
+  parent = g_file_get_parent (file);
   if (parent == NULL)
     {
-      xobject_unref (file);
+      g_object_unref (file);
       return NULL;
     }
 
   if (completer->basenames_dir == NULL ||
       completer->basenames_are_escaped != should_escape ||
-      !xfile_equal (parent, completer->basenames_dir))
+      !g_file_equal (parent, completer->basenames_dir))
     {
       schedule_load_basenames (completer, parent, should_escape);
-      xobject_unref (file);
+      g_object_unref (file);
       return NULL;
     }
-
-  basename = xfile_get_basename (file);
+  
+  basename = g_file_get_basename (file);
   if (should_escape)
     {
       t = basename;
-      basename = xuri_escape_string (basename, XURI_RESERVED_CHARS_ALLOWED_IN_PATH, TRUE);
+      basename = g_uri_escape_string (basename, G_URI_RESERVED_CHARS_ALLOWED_IN_PATH, TRUE);
       g_free (t);
     }
   else
     {
       t = basename;
-      basename = xfilename_to_utf8 (basename, -1, NULL, NULL, NULL);
+      basename = g_filename_to_utf8 (basename, -1, NULL, NULL, NULL);
       g_free (t);
-
+      
       if (basename == NULL)
 	return NULL;
     }
@@ -398,48 +398,48 @@ init_completion (xfilename_completer_t *completer,
 }
 
 /**
- * xfilename_completer_get_completion_suffix:
+ * g_filename_completer_get_completion_suffix:
  * @completer: the filename completer.
  * @initial_text: text to be completed.
  *
  * Obtains a completion for @initial_text from @completer.
- *
+ *  
  * Returns: (nullable) (transfer full): a completed string, or %NULL if no
  *     completion exists. This string is not owned by GIO, so remember to g_free()
  *     it when finished.
  **/
 char *
-xfilename_completer_get_completion_suffix (xfilename_completer_t *completer,
+g_filename_completer_get_completion_suffix (GFilenameCompleter *completer,
 					    const char *initial_text)
 {
-  xlist_t *possible_matches, *l;
+  GList *possible_matches, *l;
   char *prefix;
   char *suffix;
   char *possible_match;
   char *lcp;
 
-  xreturn_val_if_fail (X_IS_FILENAME_COMPLETER (completer), NULL);
-  xreturn_val_if_fail (initial_text != NULL, NULL);
+  g_return_val_if_fail (G_IS_FILENAME_COMPLETER (completer), NULL);
+  g_return_val_if_fail (initial_text != NULL, NULL);
 
   possible_matches = init_completion (completer, initial_text, &prefix);
 
   suffix = NULL;
-
+  
   for (l = possible_matches; l != NULL; l = l->next)
     {
       possible_match = l->data;
-
-      if (xstr_has_prefix (possible_match, prefix))
+      
+      if (g_str_has_prefix (possible_match, prefix))
 	{
 	  if (suffix == NULL)
-	    suffix = xstrdup (possible_match + strlen (prefix));
+	    suffix = g_strdup (possible_match + strlen (prefix));
 	  else
 	    {
 	      lcp = longest_common_prefix (suffix,
 					   possible_match + strlen (prefix));
 	      g_free (suffix);
 	      suffix = lcp;
-
+	      
 	      if (*suffix == 0)
 		break;
 	    }
@@ -447,64 +447,64 @@ xfilename_completer_get_completion_suffix (xfilename_completer_t *completer,
     }
 
   g_free (prefix);
-
+  
   return suffix;
 }
 
 /**
- * xfilename_completer_get_completions:
+ * g_filename_completer_get_completions:
  * @completer: the filename completer.
  * @initial_text: text to be completed.
- *
+ * 
  * Gets an array of completion strings for a given initial text.
- *
+ * 
  * Returns: (array zero-terminated=1) (transfer full): array of strings with possible completions for @initial_text.
- * This array must be freed by xstrfreev() when finished.
+ * This array must be freed by g_strfreev() when finished. 
  **/
 char **
-xfilename_completer_get_completions (xfilename_completer_t *completer,
+g_filename_completer_get_completions (GFilenameCompleter *completer,
 				      const char         *initial_text)
 {
-  xlist_t *possible_matches, *l;
+  GList *possible_matches, *l;
   char *prefix;
   char *possible_match;
-  xptr_array_t *res;
+  GPtrArray *res;
 
-  xreturn_val_if_fail (X_IS_FILENAME_COMPLETER (completer), NULL);
-  xreturn_val_if_fail (initial_text != NULL, NULL);
+  g_return_val_if_fail (G_IS_FILENAME_COMPLETER (completer), NULL);
+  g_return_val_if_fail (initial_text != NULL, NULL);
 
   possible_matches = init_completion (completer, initial_text, &prefix);
 
-  res = xptr_array_new ();
+  res = g_ptr_array_new ();
   for (l = possible_matches; l != NULL; l = l->next)
     {
       possible_match = l->data;
 
-      if (xstr_has_prefix (possible_match, prefix))
-	xptr_array_add (res,
-			 xstrconcat (initial_text, possible_match + strlen (prefix), NULL));
+      if (g_str_has_prefix (possible_match, prefix))
+	g_ptr_array_add (res,
+			 g_strconcat (initial_text, possible_match + strlen (prefix), NULL));
     }
 
   g_free (prefix);
 
-  xptr_array_add (res, NULL);
+  g_ptr_array_add (res, NULL);
 
-  return (char**)xptr_array_free (res, FALSE);
+  return (char**)g_ptr_array_free (res, FALSE);
 }
 
 /**
- * xfilename_completer_set_dirs_only:
+ * g_filename_completer_set_dirs_only:
  * @completer: the filename completer.
- * @dirs_only: a #xboolean_t.
- *
- * If @dirs_only is %TRUE, @completer will only
+ * @dirs_only: a #gboolean.
+ * 
+ * If @dirs_only is %TRUE, @completer will only 
  * complete directory names, and not file names.
  **/
 void
-xfilename_completer_set_dirs_only (xfilename_completer_t *completer,
-				    xboolean_t dirs_only)
+g_filename_completer_set_dirs_only (GFilenameCompleter *completer,
+				    gboolean dirs_only)
 {
-  g_return_if_fail (X_IS_FILENAME_COMPLETER (completer));
+  g_return_if_fail (G_IS_FILENAME_COMPLETER (completer));
 
   completer->dirs_only = dirs_only;
 }

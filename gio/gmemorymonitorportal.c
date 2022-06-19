@@ -25,61 +25,61 @@
 #include "xdp-dbus.h"
 #include "gportalsupport.h"
 
-#define G_MEMORY_MONITOR_PORTAL_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
+#define G_MEMORY_MONITOR_PORTAL_GET_INITABLE_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_INITABLE, GInitable))
 
-static void xmemory_monitor_portal_iface_init (GMemoryMonitorInterface *iface);
-static void xmemory_monitor_portal_initable_iface_init (xinitable_iface_t *iface);
+static void g_memory_monitor_portal_iface_init (GMemoryMonitorInterface *iface);
+static void g_memory_monitor_portal_initable_iface_init (GInitableIface *iface);
 
 struct _GMemoryMonitorPortal
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xdbus_proxy_t *proxy;
-  xulong_t signal_id;
+  GDBusProxy *proxy;
+  gulong signal_id;
 };
 
-G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorPortal, xmemory_monitor_portal, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                xmemory_monitor_portal_initable_iface_init)
-                         G_IMPLEMENT_INTERFACE (XTYPE_MEMORY_MONITOR,
-                                                xmemory_monitor_portal_iface_init)
-                         _xio_modules_ensure_extension_points_registered ();
+G_DEFINE_TYPE_WITH_CODE (GMemoryMonitorPortal, g_memory_monitor_portal, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                g_memory_monitor_portal_initable_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_MEMORY_MONITOR,
+                                                g_memory_monitor_portal_iface_init)
+                         _g_io_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_MEMORY_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
                                                          "portal",
                                                          40))
 
 static void
-xmemory_monitor_portal_init (GMemoryMonitorPortal *portal)
+g_memory_monitor_portal_init (GMemoryMonitorPortal *portal)
 {
 }
 
 static void
-proxy_signal (xdbus_proxy_t            *proxy,
+proxy_signal (GDBusProxy            *proxy,
               const char            *sender,
               const char            *signal,
-              xvariant_t              *parameters,
+              GVariant              *parameters,
               GMemoryMonitorPortal *portal)
 {
-  xuint8_t level;
+  guint8 level;
 
   if (strcmp (signal, "LowMemoryWarning") != 0)
     return;
   if (!parameters)
     return;
 
-  xvariant_get (parameters, "(y)", &level);
-  xsignal_emit_by_name (portal, "low-memory-warning", level);
+  g_variant_get (parameters, "(y)", &level);
+  g_signal_emit_by_name (portal, "low-memory-warning", level);
 }
 
-static xboolean_t
-xmemory_monitor_portal_initable_init (xinitable_t     *initable,
-                                        xcancellable_t  *cancellable,
-                                        xerror_t       **error)
+static gboolean
+g_memory_monitor_portal_initable_init (GInitable     *initable,
+                                        GCancellable  *cancellable,
+                                        GError       **error)
 {
   GMemoryMonitorPortal *portal = G_MEMORY_MONITOR_PORTAL (initable);
-  xdbus_proxy_t *proxy;
-  xchar_t *name_owner = NULL;
+  GDBusProxy *proxy;
+  gchar *name_owner = NULL;
 
   if (!glib_should_use_portal ())
     {
@@ -87,7 +87,7 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
       return FALSE;
     }
 
-  proxy = xdbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
+  proxy = g_dbus_proxy_new_for_bus_sync (G_BUS_TYPE_SESSION,
                                          G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                          NULL,
                                          "org.freedesktop.portal.Desktop",
@@ -98,11 +98,11 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
   if (!proxy)
     return FALSE;
 
-  name_owner = xdbus_proxy_get_name_owner (proxy);
+  name_owner = g_dbus_proxy_get_name_owner (proxy);
 
   if (name_owner == NULL)
     {
-      xobject_unref (proxy);
+      g_object_unref (proxy);
       g_set_error (error,
                    G_DBUS_ERROR,
                    G_DBUS_ERROR_NAME_HAS_NO_OWNER,
@@ -112,7 +112,7 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
 
   g_free (name_owner);
 
-  portal->signal_id = xsignal_connect (proxy, "g-signal",
+  portal->signal_id = g_signal_connect (proxy, "g-signal",
                                         G_CALLBACK (proxy_signal), portal);
 
   portal->proxy = proxy;
@@ -121,7 +121,7 @@ xmemory_monitor_portal_initable_init (xinitable_t     *initable,
 }
 
 static void
-xmemory_monitor_portal_finalize (xobject_t *object)
+g_memory_monitor_portal_finalize (GObject *object)
 {
   GMemoryMonitorPortal *portal = G_MEMORY_MONITOR_PORTAL (object);
 
@@ -129,24 +129,24 @@ xmemory_monitor_portal_finalize (xobject_t *object)
     g_clear_signal_handler (&portal->signal_id, portal->proxy);
   g_clear_object (&portal->proxy);
 
-  XOBJECT_CLASS (xmemory_monitor_portal_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_memory_monitor_portal_parent_class)->finalize (object);
 }
 
 static void
-xmemory_monitor_portal_class_init (GMemoryMonitorPortalClass *nl_class)
+g_memory_monitor_portal_class_init (GMemoryMonitorPortalClass *nl_class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  xobject_class->finalize  = xmemory_monitor_portal_finalize;
+  gobject_class->finalize  = g_memory_monitor_portal_finalize;
 }
 
 static void
-xmemory_monitor_portal_iface_init (GMemoryMonitorInterface *monitor_iface)
+g_memory_monitor_portal_iface_init (GMemoryMonitorInterface *monitor_iface)
 {
 }
 
 static void
-xmemory_monitor_portal_initable_iface_init (xinitable_iface_t *iface)
+g_memory_monitor_portal_initable_iface_init (GInitableIface *iface)
 {
-  iface->init = xmemory_monitor_portal_initable_init;
+  iface->init = g_memory_monitor_portal_initable_init;
 }

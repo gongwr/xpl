@@ -23,35 +23,35 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TLS_FILE_DATABASE                (xtls_file_database_get_type ())
-#define G_TLS_FILE_DATABASE(inst)               (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_TLS_FILE_DATABASE, xtls_file_database))
-#define X_IS_TLS_FILE_DATABASE(inst)            (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_TLS_FILE_DATABASE))
-#define G_TLS_FILE_DATABASE_GET_INTERFACE(inst) (XTYPE_INSTANCE_GET_INTERFACE ((inst), XTYPE_TLS_FILE_DATABASE, xtls_file_database_interface_t))
+#define G_TYPE_TLS_FILE_DATABASE                (g_tls_file_database_get_type ())
+#define G_TLS_FILE_DATABASE(inst)               (G_TYPE_CHECK_INSTANCE_CAST ((inst), G_TYPE_TLS_FILE_DATABASE, GTlsFileDatabase))
+#define G_IS_TLS_FILE_DATABASE(inst)            (G_TYPE_CHECK_INSTANCE_TYPE ((inst), G_TYPE_TLS_FILE_DATABASE))
+#define G_TLS_FILE_DATABASE_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), G_TYPE_TLS_FILE_DATABASE, GTlsFileDatabaseInterface))
 
-typedef struct _xtls_file_database_interface xtls_file_database_interface_t;
+typedef struct _GTlsFileDatabaseInterface GTlsFileDatabaseInterface;
 
 /**
- * xtls_file_database_interface_t:
- * @x_iface: The parent interface.
+ * GTlsFileDatabaseInterface:
+ * @g_iface: The parent interface.
  *
- * Provides an interface for #xtls_file_database_t implementations.
+ * Provides an interface for #GTlsFileDatabase implementations.
  *
  */
-struct _xtls_file_database_interface
+struct _GTlsFileDatabaseInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /*< private >*/
   /* Padding for future expansion */
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                        xtls_file_database_get_type              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                        g_tls_file_database_get_type              (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xtls_database_t*                xtls_file_database_new                   (const xchar_t  *anchors,
-                                                                        xerror_t      **error);
+GLIB_AVAILABLE_IN_ALL
+GTlsDatabase*                g_tls_file_database_new                   (const gchar  *anchors,
+                                                                        GError      **error);
 
 G_END_DECLS
 

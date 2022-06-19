@@ -22,13 +22,13 @@
 
 #include <glib-object.h>
 
-xvariant_t *              g_settings_set_mapping                          (const xvalue_t       *value,
-                                                                         const xvariant_type_t *expected_type,
-                                                                         xpointer_t            user_data);
-xboolean_t                g_settings_get_mapping                          (xvalue_t             *value,
-                                                                         xvariant_t           *variant,
-                                                                         xpointer_t            user_data);
-xboolean_t                g_settings_mapping_is_compatible                (xtype_t               gvalue_type,
-                                                                         const xvariant_type_t *variant_type);
+GVariant *              g_settings_set_mapping                          (const GValue       *value,
+                                                                         const GVariantType *expected_type,
+                                                                         gpointer            user_data);
+gboolean                g_settings_get_mapping                          (GValue             *value,
+                                                                         GVariant           *variant,
+                                                                         gpointer            user_data);
+gboolean                g_settings_mapping_is_compatible                (GType               gvalue_type,
+                                                                         const GVariantType *variant_type);
 
 #endif /* __G_SETTINGS_MAPPING_H__ */

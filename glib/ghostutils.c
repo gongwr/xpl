@@ -1,6 +1,6 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2008 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@
 #include "gstrfuncs.h"
 #include "glibintl.h"
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 #include <windows.h>
 #endif
 
@@ -70,11 +70,11 @@
 #define PUNYCODE_INITIAL_BIAS  72
 #define PUNYCODE_INITIAL_N   0x80
 
-#define PUNYCODE_IS_BASIC(cp) ((xuint_t)(cp) < 0x80)
+#define PUNYCODE_IS_BASIC(cp) ((guint)(cp) < 0x80)
 
 /* Encode/decode a single base-36 digit */
-static inline xchar_t
-encode_digit (xuint_t dig)
+static inline gchar
+encode_digit (guint dig)
 {
   if (dig < 26)
     return dig + 'a';
@@ -82,8 +82,8 @@ encode_digit (xuint_t dig)
     return dig - 26 + '0';
 }
 
-static inline xuint_t
-decode_digit (xchar_t dig)
+static inline guint
+decode_digit (gchar dig)
 {
   if (dig >= 'A' && dig <= 'Z')
     return dig - 'A';
@@ -96,12 +96,12 @@ decode_digit (xchar_t dig)
 }
 
 /* Punycode bias adaptation algorithm, RFC 3492 section 6.1 */
-static xuint_t
-adapt (xuint_t    delta,
-       xuint_t    numpoints,
-       xboolean_t firsttime)
+static guint
+adapt (guint    delta,
+       guint    numpoints,
+       gboolean firsttime)
 {
-  xuint_t k;
+  guint k;
 
   delta = firsttime ? delta / PUNYCODE_DAMP : delta / 2;
   delta += delta / numpoints;
@@ -121,36 +121,36 @@ adapt (xuint_t    delta,
  * sufficiently bizarre that it's not really worth trying to explain
  * here.
  */
-static xboolean_t
-punycode_encode (const xchar_t *input_utf8,
-                 xsize_t        input_utf8_length,
-		 xstring_t     *output)
+static gboolean
+punycode_encode (const gchar *input_utf8,
+                 gsize        input_utf8_length,
+		 GString     *output)
 {
-  xuint_t delta, handled_chars, num_basic_chars, bias, j, q, k, t, digit;
-  xunichar_t n, m, *input;
-  xlong_t written_chars;
-  xsize_t input_length;
-  xboolean_t success = FALSE;
+  guint delta, handled_chars, num_basic_chars, bias, j, q, k, t, digit;
+  gunichar n, m, *input;
+  glong written_chars;
+  gsize input_length;
+  gboolean success = FALSE;
 
   /* Convert from UTF-8 to Unicode code points */
-  input = xutf8_to_ucs4 (input_utf8, input_utf8_length, NULL,
+  input = g_utf8_to_ucs4 (input_utf8, input_utf8_length, NULL,
 			  &written_chars, NULL);
   if (!input)
     return FALSE;
 
-  input_length = (xsize_t) (written_chars > 0 ? written_chars : 0);
+  input_length = (gsize) (written_chars > 0 ? written_chars : 0);
 
   /* Copy basic chars */
   for (j = num_basic_chars = 0; j < input_length; j++)
     {
       if (PUNYCODE_IS_BASIC (input[j]))
 	{
-	  xstring_append_c (output, g_ascii_tolower (input[j]));
+	  g_string_append_c (output, g_ascii_tolower (input[j]));
 	  num_basic_chars++;
 	}
     }
   if (num_basic_chars)
-    xstring_append_c (output, '-');
+    g_string_append_c (output, '-');
 
   handled_chars = num_basic_chars;
 
@@ -193,11 +193,11 @@ punycode_encode (const xchar_t *input_utf8,
 		  if (q < t)
 		    break;
 		  digit = t + (q - t) % (PUNYCODE_BASE - t);
-		  xstring_append_c (output, encode_digit (digit));
+		  g_string_append_c (output, encode_digit (digit));
 		  q = (q - t) / (PUNYCODE_BASE - t);
 		}
 
-	      xstring_append_c (output, encode_digit (q));
+	      g_string_append_c (output, encode_digit (q));
 	      bias = adapt (delta, handled_chars + 1, handled_chars == num_basic_chars);
 	      delta = 0;
 	      handled_chars++;
@@ -221,86 +221,86 @@ punycode_encode (const xchar_t *input_utf8,
 /* Scan @str for "junk" and return a cleaned-up string if any junk
  * is found. Else return %NULL.
  */
-static xchar_t *
-remove_junk (const xchar_t *str,
-             xint_t         len)
+static gchar *
+remove_junk (const gchar *str,
+             gint         len)
 {
-  xstring_t *cleaned = NULL;
-  const xchar_t *p;
-  xunichar_t ch;
+  GString *cleaned = NULL;
+  const gchar *p;
+  gunichar ch;
 
-  for (p = str; len == -1 ? *p : p < str + len; p = xutf8_next_char (p))
+  for (p = str; len == -1 ? *p : p < str + len; p = g_utf8_next_char (p))
     {
-      ch = xutf8_get_char (p);
+      ch = g_utf8_get_char (p);
       if (idna_is_junk (ch))
 	{
 	  if (!cleaned)
 	    {
-	      cleaned = xstring_new (NULL);
-	      xstring_append_len (cleaned, str, p - str);
+	      cleaned = g_string_new (NULL);
+	      g_string_append_len (cleaned, str, p - str);
 	    }
 	}
       else if (cleaned)
-	xstring_append_unichar (cleaned, ch);
+	g_string_append_unichar (cleaned, ch);
     }
 
   if (cleaned)
-    return xstring_free (cleaned, FALSE);
+    return g_string_free (cleaned, FALSE);
   else
     return NULL;
 }
 
-static inline xboolean_t
-contains_uppercase_letters (const xchar_t *str,
-                            xint_t         len)
+static inline gboolean
+contains_uppercase_letters (const gchar *str,
+                            gint         len)
 {
-  const xchar_t *p;
+  const gchar *p;
 
-  for (p = str; len == -1 ? *p : p < str + len; p = xutf8_next_char (p))
+  for (p = str; len == -1 ? *p : p < str + len; p = g_utf8_next_char (p))
     {
-      if (xunichar_isupper (xutf8_get_char (p)))
+      if (g_unichar_isupper (g_utf8_get_char (p)))
 	return TRUE;
     }
   return FALSE;
 }
 
-static inline xboolean_t
-contains_non_ascii (const xchar_t *str,
-                    xint_t         len)
+static inline gboolean
+contains_non_ascii (const gchar *str,
+                    gint         len)
 {
-  const xchar_t *p;
+  const gchar *p;
 
   for (p = str; len == -1 ? *p : p < str + len; p++)
     {
-      if ((xuchar_t)*p > 0x80)
+      if ((guchar)*p > 0x80)
 	return TRUE;
     }
   return FALSE;
 }
 
 /* RFC 3454, Appendix C. ish. */
-static inline xboolean_t
-idna_is_prohibited (xunichar_t ch)
+static inline gboolean
+idna_is_prohibited (gunichar ch)
 {
-  switch (xunichar_type (ch))
+  switch (g_unichar_type (ch))
     {
-    case XUNICODE_CONTROL:
-    case XUNICODE_FORMAT:
-    case XUNICODE_UNASSIGNED:
-    case XUNICODE_PRIVATE_USE:
-    case XUNICODE_SURROGATE:
-    case XUNICODE_LINE_SEPARATOR:
-    case XUNICODE_PARAGRAPH_SEPARATOR:
-    case XUNICODE_SPACE_SEPARATOR:
+    case G_UNICODE_CONTROL:
+    case G_UNICODE_FORMAT:
+    case G_UNICODE_UNASSIGNED:
+    case G_UNICODE_PRIVATE_USE:
+    case G_UNICODE_SURROGATE:
+    case G_UNICODE_LINE_SEPARATOR:
+    case G_UNICODE_PARAGRAPH_SEPARATOR:
+    case G_UNICODE_SPACE_SEPARATOR:
       return TRUE;
 
-    case XUNICODE_OTHER_SYMBOL:
+    case G_UNICODE_OTHER_SYMBOL:
       if (ch == 0xFFFC || ch == 0xFFFD ||
 	  (ch >= 0x2FF0 && ch <= 0x2FFB))
 	return TRUE;
       return FALSE;
 
-    case XUNICODE_NON_SPACING_MARK:
+    case G_UNICODE_NON_SPACING_MARK:
       if (ch == 0x0340 || ch == 0x0341)
 	return TRUE;
       return FALSE;
@@ -311,18 +311,18 @@ idna_is_prohibited (xunichar_t ch)
 }
 
 /* RFC 3491 IDN cleanup algorithm. */
-static xchar_t *
-nameprep (const xchar_t *hostname,
-          xint_t         len,
-          xboolean_t    *is_unicode)
+static gchar *
+nameprep (const gchar *hostname,
+          gint         len,
+          gboolean    *is_unicode)
 {
-  xchar_t *name, *tmp = NULL, *p;
+  gchar *name, *tmp = NULL, *p;
 
   /* It would be nice if we could do this without repeatedly
    * allocating strings and converting back and forth between
    * gunichars and UTF-8... The code does at least avoid doing most of
    * the sub-operations when they would just be equivalent to a
-   * xstrdup().
+   * g_strdup().
    */
 
   /* Remove presentation-only characters */
@@ -333,12 +333,12 @@ nameprep (const xchar_t *hostname,
       len = -1;
     }
   else
-    name = (xchar_t *)hostname;
+    name = (gchar *)hostname;
 
   /* Convert to lowercase */
   if (contains_uppercase_letters (name, len))
     {
-      name = xutf8_strdown (name, len);
+      name = g_utf8_strdown (name, len);
       g_free (tmp);
       tmp = name;
       len = -1;
@@ -348,8 +348,8 @@ nameprep (const xchar_t *hostname,
   if (!contains_non_ascii (name, len))
     {
       *is_unicode = FALSE;
-      if (name == (xchar_t *)hostname)
-        return len == -1 ? xstrdup (hostname) : xstrndup (hostname, len);
+      if (name == (gchar *)hostname)
+        return len == -1 ? g_strdup (hostname) : g_strndup (hostname, len);
       else
         return name;
     }
@@ -357,7 +357,7 @@ nameprep (const xchar_t *hostname,
   *is_unicode = TRUE;
 
   /* Normalize */
-  name = xutf8_normalize (name, len, XNORMALIZE_NFKC);
+  name = g_utf8_normalize (name, len, G_NORMALIZE_NFKC);
   g_free (tmp);
   tmp = name;
 
@@ -373,15 +373,15 @@ nameprep (const xchar_t *hostname,
    */
   if (contains_uppercase_letters (name, -1))
     {
-      name = xutf8_strdown (name, -1);
+      name = g_utf8_strdown (name, -1);
       g_free (tmp);
       tmp = name;
     }
 
   /* Check for prohibited characters */
-  for (p = name; *p; p = xutf8_next_char (p))
+  for (p = name; *p; p = g_utf8_next_char (p))
     {
-      if (idna_is_prohibited (xutf8_get_char (p)))
+      if (idna_is_prohibited (g_utf8_get_char (p)))
 	{
 	  name = NULL;
           g_free (tmp);
@@ -401,15 +401,15 @@ nameprep (const xchar_t *hostname,
  * label-separating dots. @str must be '\0'-terminated.
  */
 #define idna_is_dot(str) ( \
-  ((xuchar_t)(str)[0] == '.') ||                                                 \
-  ((xuchar_t)(str)[0] == 0xE3 && (xuchar_t)(str)[1] == 0x80 && (xuchar_t)(str)[2] == 0x82) || \
-  ((xuchar_t)(str)[0] == 0xEF && (xuchar_t)(str)[1] == 0xBC && (xuchar_t)(str)[2] == 0x8E) || \
-  ((xuchar_t)(str)[0] == 0xEF && (xuchar_t)(str)[1] == 0xBD && (xuchar_t)(str)[2] == 0xA1) )
+  ((guchar)(str)[0] == '.') ||                                                 \
+  ((guchar)(str)[0] == 0xE3 && (guchar)(str)[1] == 0x80 && (guchar)(str)[2] == 0x82) || \
+  ((guchar)(str)[0] == 0xEF && (guchar)(str)[1] == 0xBC && (guchar)(str)[2] == 0x8E) || \
+  ((guchar)(str)[0] == 0xEF && (guchar)(str)[1] == 0xBD && (guchar)(str)[2] == 0xA1) )
 
-static const xchar_t *
-idna_end_of_label (const xchar_t *str)
+static const gchar *
+idna_end_of_label (const gchar *str)
 {
-  for (; *str; str = xutf8_next_char (str))
+  for (; *str; str = g_utf8_next_char (str))
     {
       if (idna_is_dot (str))
         return str;
@@ -417,16 +417,16 @@ idna_end_of_label (const xchar_t *str)
   return str;
 }
 
-static xsize_t
+static gsize
 get_hostname_max_length_bytes (void)
 {
 #if defined(G_OS_WIN32)
   wchar_t tmp[MAX_COMPUTERNAME_LENGTH];
   return sizeof (tmp) / sizeof (tmp[0]);
 #elif defined(_SC_HOST_NAME_MAX)
-  xlong_t max = sysconf (_SC_HOST_NAME_MAX);
+  glong max = sysconf (_SC_HOST_NAME_MAX);
   if (max > 0)
-    return (xsize_t) max;
+    return (gsize) max;
 
 #ifdef HOST_NAME_MAX
   return HOST_NAME_MAX;
@@ -443,11 +443,11 @@ get_hostname_max_length_bytes (void)
 /* Returns %TRUE if `strlen (str) > comparison_length`, but without actually
  * running `strlen(str)`, as that would take a very long time for long
  * (untrusted) input strings. */
-static xboolean_t
-strlen_greater_than (const xchar_t *str,
-                     xsize_t        comparison_length)
+static gboolean
+strlen_greater_than (const gchar *str,
+                     gsize        comparison_length)
 {
-  xsize_t i;
+  gsize i;
 
   for (i = 0; str[i] != '\0'; i++)
     if (i > comparison_length)
@@ -469,14 +469,14 @@ strlen_greater_than (const xchar_t *str,
  *
  * Since: 2.22
  **/
-xchar_t *
-g_hostname_to_ascii (const xchar_t *hostname)
+gchar *
+g_hostname_to_ascii (const gchar *hostname)
 {
-  xchar_t *name, *label, *p;
-  xstring_t *out;
-  xssize_t llen, oldlen;
-  xboolean_t unicode;
-  xsize_t hostname_max_length_bytes = get_hostname_max_length_bytes ();
+  gchar *name, *label, *p;
+  GString *out;
+  gssize llen, oldlen;
+  gboolean unicode;
+  gsize hostname_max_length_bytes = get_hostname_max_length_bytes ();
 
   /* Do an initial check on the hostname length, as overlong hostnames take a
    * long time in the IDN cleanup algorithm in nameprep(). The ultimate
@@ -507,14 +507,14 @@ g_hostname_to_ascii (const xchar_t *hostname)
   if (!name || !unicode)
     return name;
 
-  out = xstring_new (NULL);
+  out = g_string_new (NULL);
 
   do
     {
       unicode = FALSE;
       for (p = label; *p && !idna_is_dot (p); p++)
 	{
-	  if ((xuchar_t)*p > 0x80)
+	  if ((guchar)*p > 0x80)
 	    unicode = TRUE;
 	}
 
@@ -525,30 +525,30 @@ g_hostname_to_ascii (const xchar_t *hostname)
           if (!strncmp (label, IDNA_ACE_PREFIX, IDNA_ACE_PREFIX_LEN))
             goto fail;
 
-	  xstring_append (out, IDNA_ACE_PREFIX);
+	  g_string_append (out, IDNA_ACE_PREFIX);
 	  if (!punycode_encode (label, llen, out))
 	    goto fail;
 	}
       else
-        xstring_append_len (out, label, llen);
+        g_string_append_len (out, label, llen);
 
       if (out->len - oldlen > 63)
 	goto fail;
 
       label += llen;
       if (*label)
-        label = xutf8_next_char (label);
+        label = g_utf8_next_char (label);
       if (*label)
-        xstring_append_c (out, '.');
+        g_string_append_c (out, '.');
     }
   while (*label);
 
   g_free (name);
-  return xstring_free (out, FALSE);
+  return g_string_free (out, FALSE);
 
  fail:
   g_free (name);
-  xstring_free (out, TRUE);
+  g_string_free (out, TRUE);
   return NULL;
 }
 
@@ -568,8 +568,8 @@ g_hostname_to_ascii (const xchar_t *hostname)
  *
  * Since: 2.22
  **/
-xboolean_t
-g_hostname_is_non_ascii (const xchar_t *hostname)
+gboolean
+g_hostname_is_non_ascii (const gchar *hostname)
 {
   return contains_non_ascii (hostname, -1);
 }
@@ -577,16 +577,16 @@ g_hostname_is_non_ascii (const xchar_t *hostname)
 /* Punycode decoder, RFC 3492 section 6.2. As with punycode_encode(),
  * read the RFC if you want to understand what this is actually doing.
  */
-static xboolean_t
-punycode_decode (const xchar_t *input,
-                 xsize_t        input_length,
-                 xstring_t     *output)
+static gboolean
+punycode_decode (const gchar *input,
+                 gsize        input_length,
+                 GString     *output)
 {
-  xarray_t *output_chars;
-  xunichar_t n;
-  xuint_t i, bias;
-  xuint_t oldi, w, k, digit, t;
-  const xchar_t *split;
+  GArray *output_chars;
+  gunichar n;
+  guint i, bias;
+  guint oldi, w, k, digit, t;
+  const gchar *split;
 
   n = PUNYCODE_INITIAL_N;
   i = 0;
@@ -597,12 +597,12 @@ punycode_decode (const xchar_t *input,
     split--;
   if (split > input)
     {
-      output_chars = g_array_sized_new (FALSE, FALSE, sizeof (xunichar_t),
+      output_chars = g_array_sized_new (FALSE, FALSE, sizeof (gunichar),
 					split - input);
       input_length -= (split - input) + 1;
       while (input < split)
 	{
-	  xunichar_t ch = (xunichar_t)*input++;
+	  gunichar ch = (gunichar)*input++;
 	  if (!PUNYCODE_IS_BASIC (ch))
 	    goto fail;
 	  g_array_append_val (output_chars, ch);
@@ -610,7 +610,7 @@ punycode_decode (const xchar_t *input,
       input++;
     }
   else
-    output_chars = g_array_new (FALSE, FALSE, sizeof (xunichar_t));
+    output_chars = g_array_new (FALSE, FALSE, sizeof (gunichar));
 
   while (input_length)
     {
@@ -650,7 +650,7 @@ punycode_decode (const xchar_t *input,
     }
 
   for (i = 0; i < output_chars->len; i++)
-    xstring_append_unichar (output, g_array_index (output_chars, xunichar_t, i));
+    g_string_append_unichar (output, g_array_index (output_chars, gunichar, i));
   g_array_free (output_chars, TRUE);
   return TRUE;
 
@@ -676,19 +676,19 @@ punycode_decode (const xchar_t *input,
  *
  * Since: 2.22
  **/
-xchar_t *
-g_hostname_to_unicode (const xchar_t *hostname)
+gchar *
+g_hostname_to_unicode (const gchar *hostname)
 {
-  xstring_t *out;
-  xssize_t llen;
-  xsize_t hostname_max_length_bytes = get_hostname_max_length_bytes ();
+  GString *out;
+  gssize llen;
+  gsize hostname_max_length_bytes = get_hostname_max_length_bytes ();
 
   /* See the comment at the top of g_hostname_to_ascii(). */
   if (hostname_max_length_bytes <= G_MAXSIZE / 4 &&
       strlen_greater_than (hostname, 4 * MAX (255, hostname_max_length_bytes)))
     return NULL;
 
-  out = xstring_new (NULL);
+  out = g_string_new (NULL);
 
   do
     {
@@ -699,33 +699,33 @@ g_hostname_to_unicode (const xchar_t *hostname)
 	  llen -= IDNA_ACE_PREFIX_LEN;
 	  if (!punycode_decode (hostname, llen, out))
 	    {
-	      xstring_free (out, TRUE);
+	      g_string_free (out, TRUE);
 	      return NULL;
 	    }
 	}
       else
         {
-          xboolean_t unicode;
-          xchar_t *canonicalized = nameprep (hostname, llen, &unicode);
+          gboolean unicode;
+          gchar *canonicalized = nameprep (hostname, llen, &unicode);
 
           if (!canonicalized)
             {
-              xstring_free (out, TRUE);
+              g_string_free (out, TRUE);
               return NULL;
             }
-          xstring_append (out, canonicalized);
+          g_string_append (out, canonicalized);
           g_free (canonicalized);
         }
 
       hostname += llen;
       if (*hostname)
-        hostname = xutf8_next_char (hostname);
+        hostname = g_utf8_next_char (hostname);
       if (*hostname)
-        xstring_append_c (out, '.');
+        g_string_append_c (out, '.');
     }
   while (*hostname);
 
-  return xstring_free (out, FALSE);
+  return g_string_free (out, FALSE);
 }
 
 /**
@@ -746,8 +746,8 @@ g_hostname_to_unicode (const xchar_t *hostname)
  *
  * Since: 2.22
  **/
-xboolean_t
-g_hostname_is_ascii_encoded (const xchar_t *hostname)
+gboolean
+g_hostname_is_ascii_encoded (const gchar *hostname)
 {
   while (1)
     {
@@ -755,7 +755,7 @@ g_hostname_is_ascii_encoded (const xchar_t *hostname)
 	return TRUE;
       hostname = idna_end_of_label (hostname);
       if (*hostname)
-        hostname = xutf8_next_char (hostname);
+        hostname = g_utf8_next_char (hostname);
       if (!*hostname)
 	return FALSE;
     }
@@ -774,11 +774,11 @@ g_hostname_is_ascii_encoded (const xchar_t *hostname)
  *
  * Since: 2.22
  **/
-xboolean_t
-g_hostname_is_ip_address (const xchar_t *hostname)
+gboolean
+g_hostname_is_ip_address (const gchar *hostname)
 {
-  xchar_t *p, *end;
-  xint_t nsegments, octet;
+  gchar *p, *end;
+  gint nsegments, octet;
 
   /* On Linux we could implement this using inet_pton, but the Windows
    * equivalent of that requires linking against winsock, so we just
@@ -789,7 +789,7 @@ g_hostname_is_ip_address (const xchar_t *hostname)
 
   if (strchr (p, ':'))
     {
-      xboolean_t skipped;
+      gboolean skipped;
 
       /* If it contains a ':', it's an IPv6 address (assuming it's an
        * IP address at all). This consists of eight ':'-separated

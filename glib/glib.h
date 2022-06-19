@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_LIB_H__
 #define __G_LIB_H__
 
-#define __XPL_H_INSIDE__
+#define __GLIB_H_INSIDE__
 
 #include <glib/galloca.h>
 #include <glib/garray.h>
@@ -100,7 +100,7 @@
 #include <glib/gversion.h>
 #include <glib/gversionmacros.h>
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 #include <glib/gwin32.h>
 #endif
 
@@ -114,6 +114,6 @@
 #include <glib/glib-autocleanups.h>
 #include <glib/glib-typeof.h>
 
-#undef __XPL_H_INSIDE__
+#undef __GLIB_H_INSIDE__
 
 #endif /* __G_LIB_H__ */

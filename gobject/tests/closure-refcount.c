@@ -21,50 +21,50 @@
 #include <unistd.h>
 #endif
 
-#define TEST_POINTER1   ((xpointer_t) 47)
-#define TEST_POINTER2   ((xpointer_t) 49)
+#define TEST_POINTER1   ((gpointer) 47)
+#define TEST_POINTER2   ((gpointer) 49)
 #define TEST_INT1       (-77)
 #define TEST_INT2       (78)
 
-/* --- xtest_t class --- */
+/* --- GTest class --- */
 typedef struct {
-  xobject_t object;
-  xint_t value;
-  xpointer_t test_pointer1;
-  xpointer_t test_pointer2;
-} xtest_t;
+  GObject object;
+  gint value;
+  gpointer test_pointer1;
+  gpointer test_pointer2;
+} GTest;
 typedef struct {
-  xobject_class_t parent_class;
-  void (*test_signal1) (xtest_t * test, xint_t an_int);
-  void (*test_signal2) (xtest_t * test, xint_t an_int);
-} xtest_class_t;
+  GObjectClass parent_class;
+  void (*test_signal1) (GTest * test, gint an_int);
+  void (*test_signal2) (GTest * test, gint an_int);
+} GTestClass;
 
-#define XTYPE_TEST                (xtest_get_type ())
-#define XTEST(test)              (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, xtest_t))
-#define MY_IS_TEST(test)           (XTYPE_CHECK_INSTANCE_TYPE ((test), XTYPE_TEST))
-#define XTEST_CLASS(tclass)      (XTYPE_CHECK_CLASS_CAST ((tclass), XTYPE_TEST, xtest_class_t))
-#define MY_IS_TEST_CLASS(tclass)   (XTYPE_CHECK_CLASS_TYPE ((tclass), XTYPE_TEST))
-#define XTEST_GET_CLASS(test)    (XTYPE_INSTANCE_GET_CLASS ((test), XTYPE_TEST, xtest_class_t))
+#define G_TYPE_TEST                (my_test_get_type ())
+#define MY_TEST(test)              (G_TYPE_CHECK_INSTANCE_CAST ((test), G_TYPE_TEST, GTest))
+#define MY_IS_TEST(test)           (G_TYPE_CHECK_INSTANCE_TYPE ((test), G_TYPE_TEST))
+#define MY_TEST_CLASS(tclass)      (G_TYPE_CHECK_CLASS_CAST ((tclass), G_TYPE_TEST, GTestClass))
+#define MY_IS_TEST_CLASS(tclass)   (G_TYPE_CHECK_CLASS_TYPE ((tclass), G_TYPE_TEST))
+#define MY_TEST_GET_CLASS(test)    (G_TYPE_INSTANCE_GET_CLASS ((test), G_TYPE_TEST, GTestClass))
 
-static xtype_t xtest_get_type (void);
-XDEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
+static GType my_test_get_type (void);
+G_DEFINE_TYPE (GTest, my_test, G_TYPE_OBJECT)
 
-/* test_t state */
+/* Test state */
 typedef struct
 {
-  xclosure_t *closure;  /* (unowned) */
-  xboolean_t stopping;
-  xboolean_t seen_signal_handler;
-  xboolean_t seen_cleanup;
-  xboolean_t seen_test_int1;
-  xboolean_t seen_test_int2;
-  xboolean_t seen_thread1;
-  xboolean_t seen_thread2;
+  GClosure *closure;  /* (unowned) */
+  gboolean stopping;
+  gboolean seen_signal_handler;
+  gboolean seen_cleanup;
+  gboolean seen_test_int1;
+  gboolean seen_test_int2;
+  gboolean seen_thread1;
+  gboolean seen_thread2;
 } TestClosureRefcountData;
 
 /* --- functions --- */
 static void
-xtest_init (xtest_t * test)
+my_test_init (GTest * test)
 {
   g_test_message ("Init %p", test);
 
@@ -84,19 +84,19 @@ typedef enum
   SIGNAL_TEST_SIGNAL2,
 } MyTestSignal;
 
-static xuint_t signals[SIGNAL_TEST_SIGNAL2 + 1] = { 0, };
+static guint signals[SIGNAL_TEST_SIGNAL2 + 1] = { 0, };
 
 static void
-xtest_set_property (xobject_t      *object,
-                     xuint_t         prop_id,
-                     const xvalue_t *value,
-                     xparam_spec_t   *pspec)
+my_test_set_property (GObject      *object,
+                     guint         prop_id,
+                     const GValue *value,
+                     GParamSpec   *pspec)
 {
-  xtest_t *test = XTEST (object);
+  GTest *test = MY_TEST (object);
   switch (prop_id)
     {
     case PROP_TEST_PROP:
-      test->value = xvalue_get_int (value);
+      test->value = g_value_get_int (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -105,16 +105,16 @@ xtest_set_property (xobject_t      *object,
 }
 
 static void
-xtest_get_property (xobject_t    *object,
-                     xuint_t       prop_id,
-                     xvalue_t     *value,
-                     xparam_spec_t *pspec)
+my_test_get_property (GObject    *object,
+                     guint       prop_id,
+                     GValue     *value,
+                     GParamSpec *pspec)
 {
-  xtest_t *test = XTEST (object);
+  GTest *test = MY_TEST (object);
   switch (prop_id)
     {
     case PROP_TEST_PROP:
-      xvalue_set_int (value, test->value);
+      g_value_set_int (value, test->value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -123,65 +123,65 @@ xtest_get_property (xobject_t    *object,
 }
 
 static void
-xtest_test_signal2 (xtest_t *test,
-                      xint_t   an_int)
+my_test_test_signal2 (GTest *test,
+                      gint   an_int)
 {
 }
 
 static void
-xtest_emit_test_signal1 (xtest_t *test,
-                           xint_t   vint)
+my_test_emit_test_signal1 (GTest *test,
+                           gint   vint)
 {
-  xsignal_emit (G_OBJECT (test), signals[SIGNAL_TEST_SIGNAL1], 0, vint);
+  g_signal_emit (G_OBJECT (test), signals[SIGNAL_TEST_SIGNAL1], 0, vint);
 }
 
 static void
-xtest_emit_test_signal2 (xtest_t *test,
-                           xint_t   vint)
+my_test_emit_test_signal2 (GTest *test,
+                           gint   vint)
 {
-  xsignal_emit (G_OBJECT (test), signals[SIGNAL_TEST_SIGNAL2], 0, vint);
+  g_signal_emit (G_OBJECT (test), signals[SIGNAL_TEST_SIGNAL2], 0, vint);
 }
 
 static void
-xtest_class_init (xtest_class_t *klass)
+my_test_class_init (GTestClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->set_property = xtest_set_property;
-  xobject_class->get_property = xtest_get_property;
+  gobject_class->set_property = my_test_set_property;
+  gobject_class->get_property = my_test_get_property;
 
   signals[SIGNAL_TEST_SIGNAL1] =
-      xsignal_new ("test-signal1", XTYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-                    G_STRUCT_OFFSET (xtest_class_t, test_signal1), NULL, NULL,
-                    g_cclosure_marshal_VOID__INT, XTYPE_NONE, 1, XTYPE_INT);
+      g_signal_new ("test-signal1", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+                    G_STRUCT_OFFSET (GTestClass, test_signal1), NULL, NULL,
+                    g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
   signals[SIGNAL_TEST_SIGNAL2] =
-      xsignal_new ("test-signal2", XTYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-                    G_STRUCT_OFFSET (xtest_class_t, test_signal2), NULL, NULL,
-                    g_cclosure_marshal_VOID__INT, XTYPE_NONE, 1, XTYPE_INT);
+      g_signal_new ("test-signal2", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
+                    G_STRUCT_OFFSET (GTestClass, test_signal2), NULL, NULL,
+                    g_cclosure_marshal_VOID__INT, G_TYPE_NONE, 1, G_TYPE_INT);
 
-  xobject_class_install_property (XOBJECT_CLASS (klass), PROP_TEST_PROP,
-                                   xparam_spec_int ("test-prop", "test_t Prop", "test_t property",
-                                                     0, 1, 0, XPARAM_READWRITE));
-  klass->test_signal2 = xtest_test_signal2;
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_TEST_PROP,
+                                   g_param_spec_int ("test-prop", "Test Prop", "Test property",
+                                                     0, 1, 0, G_PARAM_READWRITE));
+  klass->test_signal2 = my_test_test_signal2;
 }
 
 static void
-test_closure (xclosure_t *closure)
+test_closure (GClosure *closure)
 {
   /* try to produce high contention in closure->ref_count */
-  xuint_t i = 0, n = g_random_int () % 199;
+  guint i = 0, n = g_random_int () % 199;
   for (i = 0; i < n; i++)
-    xclosure_ref (closure);
-  xclosure_sink (closure); /* NOP */
+    g_closure_ref (closure);
+  g_closure_sink (closure); /* NOP */
   for (i = 0; i < n; i++)
-    xclosure_unref (closure);
+    g_closure_unref (closure);
 }
 
-static xpointer_t
-thread1_main (xpointer_t user_data)
+static gpointer
+thread1_main (gpointer user_data)
 {
   TestClosureRefcountData *data = user_data;
-  xuint_t i = 0;
+  guint i = 0;
 
   for (i = 1; !g_atomic_int_get (&data->stopping); i++)
     {
@@ -189,18 +189,18 @@ thread1_main (xpointer_t user_data)
       if (i % 10000 == 0)
         {
           g_test_message ("Yielding from thread1");
-          xthread_yield (); /* force context switch */
+          g_thread_yield (); /* force context switch */
           g_atomic_int_set (&data->seen_thread1, TRUE);
         }
     }
   return NULL;
 }
 
-static xpointer_t
-thread2_main (xpointer_t user_data)
+static gpointer
+thread2_main (gpointer user_data)
 {
   TestClosureRefcountData *data = user_data;
-  xuint_t i = 0;
+  guint i = 0;
 
   for (i = 1; !g_atomic_int_get (&data->stopping); i++)
     {
@@ -208,7 +208,7 @@ thread2_main (xpointer_t user_data)
       if (i % 10000 == 0)
         {
           g_test_message ("Yielding from thread2");
-          xthread_yield (); /* force context switch */
+          g_thread_yield (); /* force context switch */
           g_atomic_int_set (&data->seen_thread2, TRUE);
         }
     }
@@ -216,9 +216,9 @@ thread2_main (xpointer_t user_data)
 }
 
 static void
-test_signal_handler (xtest_t   *test,
-                     xint_t     vint,
-                     xpointer_t user_data)
+test_signal_handler (GTest   *test,
+                     gint     vint,
+                     gpointer user_data)
 {
   TestClosureRefcountData *data = user_data;
 
@@ -230,8 +230,8 @@ test_signal_handler (xtest_t   *test,
 }
 
 static void
-destroy_data (xpointer_t  user_data,
-              xclosure_t *closure)
+destroy_data (gpointer  user_data,
+              GClosure *closure)
 {
   TestClosureRefcountData *data = user_data;
 
@@ -241,36 +241,36 @@ destroy_data (xpointer_t  user_data,
 }
 
 static void
-test_emissions (xtest_t *test)
+test_emissions (GTest *test)
 {
-  xtest_emit_test_signal1 (test, TEST_INT1);
-  xtest_emit_test_signal2 (test, TEST_INT2);
+  my_test_emit_test_signal1 (test, TEST_INT1);
+  my_test_emit_test_signal2 (test, TEST_INT2);
 }
 
-/* test_t that closure refcounting works even when high contested between three
+/* Test that closure refcounting works even when high contested between three
  * threads (the main thread, thread1 and thread2). Both child threads are
  * contesting refs/unrefs, while the main thread periodically emits signals
  * which also do refs/unrefs on closures. */
 static void
 test_closure_refcount (void)
 {
-  xthread_t *thread1, *thread2;
+  GThread *thread1, *thread2;
   TestClosureRefcountData test_data = { 0, };
-  xclosure_t *closure;
-  xtest_t *object;
-  xuint_t i, n_iterations;
+  GClosure *closure;
+  GTest *object;
+  guint i, n_iterations;
 
-  object = xobject_new (XTYPE_TEST, NULL);
+  object = g_object_new (G_TYPE_TEST, NULL);
   closure = g_cclosure_new (G_CALLBACK (test_signal_handler), &test_data, destroy_data);
 
-  xsignal_connect_closure (object, "test-signal1", closure, FALSE);
-  xsignal_connect_closure (object, "test-signal2", closure, FALSE);
+  g_signal_connect_closure (object, "test-signal1", closure, FALSE);
+  g_signal_connect_closure (object, "test-signal2", closure, FALSE);
 
   test_data.stopping = FALSE;
   test_data.closure = closure;
 
-  thread1 = xthread_new ("thread1", thread1_main, &test_data);
-  thread2 = xthread_new ("thread2", thread2_main, &test_data);
+  thread1 = g_thread_new ("thread1", thread1_main, &test_data);
+  thread2 = g_thread_new ("thread2", thread2_main, &test_data);
 
   /* The 16-bit compare-and-swap operations currently used for closure
    * refcounts are really slow on some ARM CPUs, notably Cortex-A57.
@@ -301,7 +301,7 @@ test_closure_refcount (void)
       if (i % 10000 == 0)
         {
           g_test_message ("Yielding from main thread");
-          xthread_yield (); /* force context switch */
+          g_thread_yield (); /* force context switch */
         }
     }
 
@@ -309,11 +309,11 @@ test_closure_refcount (void)
   g_test_message ("Stopping");
 
   /* wait for thread shutdown */
-  xthread_join (thread1);
-  xthread_join (thread2);
+  g_thread_join (thread1);
+  g_thread_join (thread2);
 
   /* finalize object, destroy signals, run cleanup code */
-  xobject_unref (object);
+  g_object_unref (object);
 
   g_test_message ("Stopped");
 

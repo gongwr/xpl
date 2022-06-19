@@ -31,14 +31,14 @@
 
 /**
  * SECTION:gnativesocketaddress
- * @short_description: Native xsocket_address_t
+ * @short_description: Native GSocketAddress
  * @include: gio/gio.h
  *
  * A socket address of some unknown native type.
  */
 
 /**
- * xnative_socket_address_t:
+ * GNativeSocketAddress:
  *
  * A socket address, corresponding to a general struct
  * sockadd address of a type not otherwise handled by glib.
@@ -51,55 +51,55 @@ struct _GNativeSocketAddressPrivate
     struct sockaddr_storage storage;
     struct sockaddr sa;
   } storage;
-  xsize_t sockaddr_len;
+  gsize sockaddr_len;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (xnative_socket_address_t, g_native_socket_address, XTYPE_SOCKET_ADDRESS)
+G_DEFINE_TYPE_WITH_PRIVATE (GNativeSocketAddress, g_native_socket_address, G_TYPE_SOCKET_ADDRESS)
 
 static void
-g_native_socket_address_dispose (xobject_t *object)
+g_native_socket_address_dispose (GObject *object)
 {
-  xnative_socket_address_t *address = G_NATIVE_SOCKET_ADDRESS (object);
+  GNativeSocketAddress *address = G_NATIVE_SOCKET_ADDRESS (object);
 
   if (address->priv->sockaddr != &address->priv->storage.sa)
     g_free (address->priv->sockaddr);
 
-  XOBJECT_CLASS (g_native_socket_address_parent_class)->dispose (object);
+  G_OBJECT_CLASS (g_native_socket_address_parent_class)->dispose (object);
 }
 
-static xsocket_family_t
-g_native_socket_address_get_family (xsocket_address_t *address)
+static GSocketFamily
+g_native_socket_address_get_family (GSocketAddress *address)
 {
-  xnative_socket_address_t *addr;
+  GNativeSocketAddress *addr;
 
-  xreturn_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), 0);
+  g_return_val_if_fail (G_IS_NATIVE_SOCKET_ADDRESS (address), 0);
 
   addr = G_NATIVE_SOCKET_ADDRESS (address);
 
   return addr->priv->sockaddr->sa_family;
 }
 
-static xssize_t
-g_native_socket_address_get_native_size (xsocket_address_t *address)
+static gssize
+g_native_socket_address_get_native_size (GSocketAddress *address)
 {
-  xnative_socket_address_t *addr;
+  GNativeSocketAddress *addr;
 
-  xreturn_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), 0);
+  g_return_val_if_fail (G_IS_NATIVE_SOCKET_ADDRESS (address), 0);
 
   addr = G_NATIVE_SOCKET_ADDRESS (address);
 
   return addr->priv->sockaddr_len;
 }
 
-static xboolean_t
-g_native_socket_address_to_native (xsocket_address_t  *address,
-                                   xpointer_t         dest,
-                                   xsize_t            destlen,
-                                   xerror_t         **error)
+static gboolean
+g_native_socket_address_to_native (GSocketAddress  *address,
+                                   gpointer         dest,
+                                   gsize            destlen,
+                                   GError         **error)
 {
-  xnative_socket_address_t *addr;
+  GNativeSocketAddress *addr;
 
-  xreturn_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), FALSE);
+  g_return_val_if_fail (G_IS_NATIVE_SOCKET_ADDRESS (address), FALSE);
 
   addr = G_NATIVE_SOCKET_ADDRESS (address);
 
@@ -117,10 +117,10 @@ g_native_socket_address_to_native (xsocket_address_t  *address,
 static void
 g_native_socket_address_class_init (GNativeSocketAddressClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
-  GSocketAddressClass *gsocketaddress_class = XSOCKET_ADDRESS_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GSocketAddressClass *gsocketaddress_class = G_SOCKET_ADDRESS_CLASS (klass);
 
-  xobject_class->dispose = g_native_socket_address_dispose;
+  gobject_class->dispose = g_native_socket_address_dispose;
 
   gsocketaddress_class->get_family = g_native_socket_address_get_family;
   gsocketaddress_class->to_native = g_native_socket_address_to_native;
@@ -128,7 +128,7 @@ g_native_socket_address_class_init (GNativeSocketAddressClass *klass)
 }
 
 static void
-g_native_socket_address_init (xnative_socket_address_t *address)
+g_native_socket_address_init (GNativeSocketAddress *address)
 {
   address->priv = g_native_socket_address_get_instance_private (address);
 }
@@ -138,19 +138,19 @@ g_native_socket_address_init (xnative_socket_address_t *address)
  * @native: a native address object
  * @len: the length of @native, in bytes
  *
- * Creates a new #xnative_socket_address_t for @native and @len.
+ * Creates a new #GNativeSocketAddress for @native and @len.
  *
- * Returns: a new #xnative_socket_address_t
+ * Returns: a new #GNativeSocketAddress
  *
  * Since: 2.46
  */
-xsocket_address_t *
-g_native_socket_address_new (xpointer_t        native,
-                             xsize_t           len)
+GSocketAddress *
+g_native_socket_address_new (gpointer        native,
+                             gsize           len)
 {
-  xnative_socket_address_t *addr;
+  GNativeSocketAddress *addr;
 
-  addr = xobject_new (XTYPE_NATIVE_SOCKET_ADDRESS, NULL);
+  addr = g_object_new (G_TYPE_NATIVE_SOCKET_ADDRESS, NULL);
 
   if (len <= sizeof(addr->priv->storage))
     addr->priv->sockaddr = &addr->priv->storage.sa;
@@ -159,5 +159,5 @@ g_native_socket_address_new (xpointer_t        native,
 
   memcpy (addr->priv->sockaddr, native, len);
   addr->priv->sockaddr_len = len;
-  return XSOCKET_ADDRESS (addr);
+  return G_SOCKET_ADDRESS (addr);
 }

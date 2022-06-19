@@ -7,9 +7,9 @@
 ]>
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
-    <title>xobject_t Reference Manual</title>
+    <title>GObject Reference Manual</title>
     <releaseinfo>
-      for xobject_t &version;
+      for GObject &version;
       The latest version of this documentation can be found on-line at
       <ulink role="online-location" url="https://developer.gnome.org/gobject/unstable/">https://developer.gnome.org/gobject/unstable/</ulink>.
     </releaseinfo>
@@ -43,7 +43,7 @@
 				</para></listitem>
 				<listitem><para>
 						A sample fundamental type implementation to base object hierarchies
-						upon - the xobject_t fundamental type.
+						upon - the GObject fundamental type.
 				</para></listitem>
 				<listitem><para>
 						A signal system that allows very flexible user customization of

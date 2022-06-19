@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,23 +25,23 @@
 #ifndef __G_ALLOCA_H__
 #define __G_ALLOCA_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
 #include <glib/gtypes.h>
 #include <string.h>
 
-#if defined(__BIONIC__) && defined (XPL_HAVE_ALLOCA_H)
+#if defined(__BIONIC__) && defined (GLIB_HAVE_ALLOCA_H)
 # include <alloca.h>
 #elif defined(__GNUC__)
 /* GCC does the right thing */
 # undef alloca
 # define alloca(size)   __builtin_alloca (size)
-#elif defined (XPL_HAVE_ALLOCA_H)
-/* a native and working alloca.h is there */
+#elif defined (GLIB_HAVE_ALLOCA_H)
+/* a native and working alloca.h is there */ 
 # include <alloca.h>
-#else /* !__GNUC__ && !XPL_HAVE_ALLOCA_H */
+#else /* !__GNUC__ && !GLIB_HAVE_ALLOCA_H */
 # if defined(_MSC_VER) || defined(__DMC__)
 #  include <malloc.h>
 #  define alloca _alloca
@@ -56,12 +56,12 @@ G_END_DECLS
 #   endif /* !alloca */
 #  endif /* !_AIX */
 # endif /* !_MSC_VER && !__DMC__ */
-#endif /* !__GNUC__ && !XPL_HAVE_ALLOCA_H */
+#endif /* !__GNUC__ && !GLIB_HAVE_ALLOCA_H */
 
 /**
  * g_alloca:
  * @size: number of bytes to allocate.
- *
+ * 
  * Allocates @size bytes on the stack; these bytes will be freed when the current
  * stack frame is cleaned up. This macro essentially just wraps the alloca()
  * function present on most UNIX variants.
@@ -91,7 +91,7 @@ G_END_DECLS
  *   Stack space allocated with alloca() in the same scope as a variable sized array
  *   will be freed together with the variable sized array upon exit of that scope, and
  *   not upon exit of the enclosing function scope.
- *
+ * 
  * Returns: space for @size bytes, allocated on the stack
  */
 #define g_alloca(size)		 alloca (size)
@@ -115,9 +115,9 @@ G_END_DECLS
  * g_newa:
  * @struct_type: Type of memory chunks to be allocated
  * @n_structs: Number of chunks to be allocated
- *
+ * 
  * Wraps g_alloca() in a more typesafe manner.
- *
+ * 
  * As mentioned in the documentation for g_alloca(), @n_structs must always be
  * entirely under the control of the program, or you may introduce a denial of
  * service vulnerability. In addition, the multiplication of @struct_type by
@@ -126,7 +126,7 @@ G_END_DECLS
  *
  * Returns: Pointer to stack space for @n_structs chunks of type @struct_type
  */
-#define g_newa(struct_type, n_structs)	((struct_type*) g_alloca (sizeof (struct_type) * (xsize_t) (n_structs)))
+#define g_newa(struct_type, n_structs)	((struct_type*) g_alloca (sizeof (struct_type) * (gsize) (n_structs)))
 
 /**
  * g_newa0:
@@ -140,6 +140,6 @@ G_END_DECLS
  *
  * Since: 2.72
  */
-#define g_newa0(struct_type, n_structs)  ((struct_type*) g_alloca0 (sizeof (struct_type) * (xsize_t) (n_structs)))
+#define g_newa0(struct_type, n_structs)  ((struct_type*) g_alloca0 (sizeof (struct_type) * (gsize) (n_structs)))
 
 #endif /* __G_ALLOCA_H__ */

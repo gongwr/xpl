@@ -25,28 +25,28 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_WIN32_NETWORK_MONITOR         (_g_win32_network_monitor_get_type ())
-#define G_WIN32_NETWORK_MONITOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WIN32_NETWORK_MONITOR, GWin32NetworkMonitor))
-#define G_WIN32_NETWORK_MONITOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WIN32_NETWORK_MONITOR, GWin32NetworkMonitorClass))
-#define X_IS_WIN32_NETWORK_MONITOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_WIN32_NETWORK_MONITOR))
-#define X_IS_WIN32_NETWORK_MONITOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_WIN32_NETWORK_MONITOR))
-#define G_WIN32_NETWORK_MONITOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_WIN32_NETWORK_MONITOR, GWin32NetworkMonitorClass))
+#define G_TYPE_WIN32_NETWORK_MONITOR         (_g_win32_network_monitor_get_type ())
+#define G_WIN32_NETWORK_MONITOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_WIN32_NETWORK_MONITOR, GWin32NetworkMonitor))
+#define G_WIN32_NETWORK_MONITOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_WIN32_NETWORK_MONITOR, GWin32NetworkMonitorClass))
+#define G_IS_WIN32_NETWORK_MONITOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_WIN32_NETWORK_MONITOR))
+#define G_IS_WIN32_NETWORK_MONITOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_WIN32_NETWORK_MONITOR))
+#define G_WIN32_NETWORK_MONITOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_WIN32_NETWORK_MONITOR, GWin32NetworkMonitorClass))
 
 typedef struct _GWin32NetworkMonitor        GWin32NetworkMonitor;
 typedef struct _GWin32NetworkMonitorClass   GWin32NetworkMonitorClass;
 typedef struct _GWin32NetworkMonitorPrivate GWin32NetworkMonitorPrivate;
 
 struct _GWin32NetworkMonitor {
-  xnetwork_monitor_base_t parent_instance;
+  GNetworkMonitorBase parent_instance;
 
   GWin32NetworkMonitorPrivate *priv;
 };
 
 struct _GWin32NetworkMonitorClass {
-  xnetwork_monitor_base_class_t parent_class;
+  GNetworkMonitorBaseClass parent_class;
 };
 
-xtype_t _g_win32_network_monitor_get_type (void);
+GType _g_win32_network_monitor_get_type (void);
 
 G_END_DECLS
 

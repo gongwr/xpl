@@ -33,20 +33,20 @@
 /**
  * SECTION:gsettingsschema
  * @short_description: Introspecting and controlling the loading
- *     of xsettings_t schemas
+ *     of GSettings schemas
  * @include: gio/gio.h
  *
- * The #xsettings_schema_source_t and #xsettings_schema_t APIs provide a
+ * The #GSettingsSchemaSource and #GSettingsSchema APIs provide a
  * mechanism for advanced control over the loading of schemas and a
  * mechanism for introspecting their content.
  *
  * Plugin loading systems that wish to provide plugins a way to access
  * settings face the problem of how to make the schemas for these
- * settings visible to xsettings_t.  Typically, a plugin will want to ship
+ * settings visible to GSettings.  Typically, a plugin will want to ship
  * the schema along with itself and it won't be installed into the
  * standard system directories for schemas.
  *
- * #xsettings_schema_source_t provides a mechanism for dealing with this by
+ * #GSettingsSchemaSource provides a mechanism for dealing with this by
  * allowing the creation of a new 'schema source' from which schemas can
  * be acquired.  This schema source can then become part of the metadata
  * associated with the plugin and queried whenever the plugin requires
@@ -58,12 +58,12 @@
  * typedef struct
  * {
  *    ...
- *    xsettings_schema_source_t *schema_source;
+ *    GSettingsSchemaSource *schema_source;
  *    ...
  * } Plugin;
  *
  * Plugin *
- * initialise_plugin (const xchar_t *dir)
+ * initialise_plugin (const gchar *dir)
  * {
  *   Plugin *plugin;
  *
@@ -80,11 +80,11 @@
  *
  * ...
  *
- * xsettings_t *
+ * GSettings *
  * plugin_get_settings (Plugin      *plugin,
- *                      const xchar_t *schema_id)
+ *                      const gchar *schema_id)
  * {
- *   xsettings_schema_t *schema;
+ *   GSettingsSchema *schema;
  *
  *   if (schema_id == NULL)
  *     schema_id = plugin->identifier;
@@ -113,8 +113,8 @@
  *
  * |[<!-- language="C" -->
  * {
- *   xsettings_t *settings;
- *   xint_t some_value;
+ *   GSettings *settings;
+ *   gint some_value;
  *
  *   settings = plugin_get_settings (self, NULL);
  *   some_value = g_settings_get_int (settings, "some-value");
@@ -131,14 +131,14 @@
  **/
 
 /**
- * xsettings_schema_key_t:
+ * GSettingsSchemaKey:
  *
- * #xsettings_schema_key_t is an opaque data structure and can only be accessed
+ * #GSettingsSchemaKey is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 /**
- * xsettings_schema_t:
+ * GSettingsSchema:
  *
  * This is an opaque structure type.  You may not access it directly.
  *
@@ -146,39 +146,39 @@
  **/
 struct _GSettingsSchema
 {
-  xsettings_schema_source_t *source;
-  const xchar_t *gettext_domain;
-  const xchar_t *path;
-  xquark *items;
-  xint_t n_items;
+  GSettingsSchemaSource *source;
+  const gchar *gettext_domain;
+  const gchar *path;
+  GQuark *items;
+  gint n_items;
   GvdbTable *table;
-  xchar_t *id;
+  gchar *id;
 
-  xsettings_schema_t *extends;
+  GSettingsSchema *extends;
 
-  xint_t ref_count;
+  gint ref_count;
 };
 
 /**
- * XTYPE_SETTINGS_SCHEMA_SOURCE:
+ * G_TYPE_SETTINGS_SCHEMA_SOURCE:
  *
- * A boxed #xtype_t corresponding to #xsettings_schema_source_t.
- *
- * Since: 2.32
- **/
-G_DEFINE_BOXED_TYPE (xsettings_schema_source_t, g_settings_schema_source, g_settings_schema_source_ref, g_settings_schema_source_unref)
-
-/**
- * XTYPE_SETTINGS_SCHEMA:
- *
- * A boxed #xtype_t corresponding to #xsettings_schema_t.
+ * A boxed #GType corresponding to #GSettingsSchemaSource.
  *
  * Since: 2.32
  **/
-G_DEFINE_BOXED_TYPE (xsettings_schema_t, g_settings_schema, g_settings_schema_ref, g_settings_schema_unref)
+G_DEFINE_BOXED_TYPE (GSettingsSchemaSource, g_settings_schema_source, g_settings_schema_source_ref, g_settings_schema_source_unref)
 
 /**
- * xsettings_schema_source_t:
+ * G_TYPE_SETTINGS_SCHEMA:
+ *
+ * A boxed #GType corresponding to #GSettingsSchema.
+ *
+ * Since: 2.32
+ **/
+G_DEFINE_BOXED_TYPE (GSettingsSchema, g_settings_schema, g_settings_schema_ref, g_settings_schema_unref)
+
+/**
+ * GSettingsSchemaSource:
  *
  * This is an opaque structure type.  You may not access it directly.
  *
@@ -186,19 +186,19 @@ G_DEFINE_BOXED_TYPE (xsettings_schema_t, g_settings_schema, g_settings_schema_re
  **/
 struct _GSettingsSchemaSource
 {
-  xsettings_schema_source_t *parent;
-  xchar_t *directory;
+  GSettingsSchemaSource *parent;
+  gchar *directory;
   GvdbTable *table;
-  xhashtable_t **text_tables;
+  GHashTable **text_tables;
 
-  xint_t ref_count;
+  gint ref_count;
 };
 
-static xsettings_schema_source_t *schema_sources;
+static GSettingsSchemaSource *schema_sources;
 
 /**
  * g_settings_schema_source_ref:
- * @source: a #xsettings_schema_source_t
+ * @source: a #GSettingsSchemaSource
  *
  * Increase the reference count of @source, returning a new reference.
  *
@@ -206,8 +206,8 @@ static xsettings_schema_source_t *schema_sources;
  *
  * Since: 2.32
  **/
-xsettings_schema_source_t *
-g_settings_schema_source_ref (xsettings_schema_source_t *source)
+GSettingsSchemaSource *
+g_settings_schema_source_ref (GSettingsSchemaSource *source)
 {
   g_atomic_int_inc (&source->ref_count);
 
@@ -216,19 +216,19 @@ g_settings_schema_source_ref (xsettings_schema_source_t *source)
 
 /**
  * g_settings_schema_source_unref:
- * @source: a #xsettings_schema_source_t
+ * @source: a #GSettingsSchemaSource
  *
  * Decrease the reference count of @source, possibly freeing it.
  *
  * Since: 2.32
  **/
 void
-g_settings_schema_source_unref (xsettings_schema_source_t *source)
+g_settings_schema_source_unref (GSettingsSchemaSource *source)
 {
   if (g_atomic_int_dec_and_test (&source->ref_count))
     {
       if (source == schema_sources)
-        xerror ("g_settings_schema_source_unref() called too many times on the default schema source");
+        g_error ("g_settings_schema_source_unref() called too many times on the default schema source");
 
       if (source->parent)
         g_settings_schema_source_unref (source->parent);
@@ -237,26 +237,26 @@ g_settings_schema_source_unref (xsettings_schema_source_t *source)
 
       if (source->text_tables)
         {
-          xhash_table_unref (source->text_tables[0]);
-          xhash_table_unref (source->text_tables[1]);
+          g_hash_table_unref (source->text_tables[0]);
+          g_hash_table_unref (source->text_tables[1]);
           g_free (source->text_tables);
         }
 
-      g_slice_free (xsettings_schema_source_t, source);
+      g_slice_free (GSettingsSchemaSource, source);
     }
 }
 
 /**
  * g_settings_schema_source_new_from_directory:
  * @directory: (type filename): the filename of a directory
- * @parent: (nullable): a #xsettings_schema_source_t, or %NULL
+ * @parent: (nullable): a #GSettingsSchemaSource, or %NULL
  * @trusted: %TRUE, if the directory is trusted
- * @error: a pointer to a #xerror_t pointer set to %NULL, or %NULL
+ * @error: a pointer to a #GError pointer set to %NULL, or %NULL
  *
  * Attempts to create a new schema source corresponding to the contents
  * of the given directory.
  *
- * This function is not required for normal uses of #xsettings_t but it
+ * This function is not required for normal uses of #GSettings but it
  * may be useful to authors of plugin management systems.
  *
  * The directory should contain a file called `gschemas.compiled` as
@@ -269,7 +269,7 @@ g_settings_schema_source_unref (xsettings_schema_source_t *source)
  * system and to %FALSE for files in the home directory.
  *
  * In either case, an empty file or some types of corruption in the file will
- * result in %XFILE_ERROR_INVAL being returned.
+ * result in %G_FILE_ERROR_INVAL being returned.
  *
  * If @parent is non-%NULL then there are two effects.
  *
@@ -287,15 +287,15 @@ g_settings_schema_source_unref (xsettings_schema_source_t *source)
  *
  * Since: 2.32
  **/
-xsettings_schema_source_t *
-g_settings_schema_source_new_from_directory (const xchar_t            *directory,
-                                             xsettings_schema_source_t  *parent,
-                                             xboolean_t                trusted,
-                                             xerror_t                **error)
+GSettingsSchemaSource *
+g_settings_schema_source_new_from_directory (const gchar            *directory,
+                                             GSettingsSchemaSource  *parent,
+                                             gboolean                trusted,
+                                             GError                **error)
 {
-  xsettings_schema_source_t *source;
+  GSettingsSchemaSource *source;
   GvdbTable *table;
-  xchar_t *filename;
+  gchar *filename;
 
   filename = g_build_filename (directory, "gschemas.compiled", NULL);
   table = gvdb_table_new (filename, trusted, error);
@@ -304,8 +304,8 @@ g_settings_schema_source_new_from_directory (const xchar_t            *directory
   if (table == NULL)
     return NULL;
 
-  source = g_slice_new (xsettings_schema_source_t);
-  source->directory = xstrdup (directory);
+  source = g_slice_new (GSettingsSchemaSource);
+  source->directory = g_strdup (directory);
   source->parent = parent ? g_settings_schema_source_ref (parent) : NULL;
   source->text_tables = NULL;
   source->table = table;
@@ -315,9 +315,9 @@ g_settings_schema_source_new_from_directory (const xchar_t            *directory
 }
 
 static void
-try_prepend_dir (const xchar_t *directory)
+try_prepend_dir (const gchar *directory)
 {
-  xsettings_schema_source_t *source;
+  GSettingsSchemaSource *source;
 
   source = g_settings_schema_source_new_from_directory (directory, schema_sources, TRUE, NULL);
 
@@ -327,9 +327,9 @@ try_prepend_dir (const xchar_t *directory)
 }
 
 static void
-try_prepend_data_dir (const xchar_t *directory)
+try_prepend_data_dir (const gchar *directory)
 {
-  xchar_t *dirname = g_build_filename (directory, "glib-2.0", "schemas", NULL);
+  gchar *dirname = g_build_filename (directory, "glib-2.0", "schemas", NULL);
   try_prepend_dir (dirname);
   g_free (dirname);
 }
@@ -337,18 +337,18 @@ try_prepend_data_dir (const xchar_t *directory)
 static void
 initialise_schema_sources (void)
 {
-  static xsize_t initialised;
+  static gsize initialised;
 
   /* need a separate variable because 'schema_sources' may legitimately
    * be null if we have zero valid schema sources
    */
   if G_UNLIKELY (g_once_init_enter (&initialised))
     {
-      xboolean_t is_setuid = XPL_PRIVATE_CALL (g_check_setuid) ();
-      const xchar_t * const *dirs;
-      const xchar_t *path;
-      xchar_t **extra_schema_dirs;
-      xint_t i;
+      gboolean is_setuid = GLIB_PRIVATE_CALL (g_check_setuid) ();
+      const gchar * const *dirs;
+      const gchar *path;
+      gchar **extra_schema_dirs;
+      gint i;
 
       /* iterate in reverse: count up, then count down */
       dirs = g_get_system_data_dirs ();
@@ -363,13 +363,13 @@ initialise_schema_sources (void)
        * allow reading privileged files. */
       if (!is_setuid && (path = g_getenv ("GSETTINGS_SCHEMA_DIR")) != NULL)
         {
-          extra_schema_dirs = xstrsplit (path, G_SEARCHPATH_SEPARATOR_S, 0);
+          extra_schema_dirs = g_strsplit (path, G_SEARCHPATH_SEPARATOR_S, 0);
           for (i = 0; extra_schema_dirs[i]; i++);
 
           while (i--)
             try_prepend_dir (extra_schema_dirs[i]);
 
-          xstrfreev (extra_schema_dirs);
+          g_strfreev (extra_schema_dirs);
         }
 
       g_once_init_leave (&initialised, TRUE);
@@ -381,7 +381,7 @@ initialise_schema_sources (void)
  *
  * Gets the default system schema source.
  *
- * This function is not required for normal uses of #xsettings_t but it
+ * This function is not required for normal uses of #GSettings but it
  * may be useful to authors of plugin management systems or to those who
  * want to introspect the content of schemas.
  *
@@ -397,7 +397,7 @@ initialise_schema_sources (void)
  *
  * Since: 2.32
  **/
-xsettings_schema_source_t *
+GSettingsSchemaSource *
 g_settings_schema_source_get_default (void)
 {
   initialise_schema_sources ();
@@ -407,13 +407,13 @@ g_settings_schema_source_get_default (void)
 
 /**
  * g_settings_schema_source_lookup:
- * @source: a #xsettings_schema_source_t
+ * @source: a #GSettingsSchemaSource
  * @schema_id: a schema ID
  * @recursive: %TRUE if the lookup should be recursive
  *
  * Looks up a schema with the identifier @schema_id in @source.
  *
- * This function is not required for normal uses of #xsettings_t but it
+ * This function is not required for normal uses of #GSettings but it
  * may be useful to authors of plugin management systems or to those who
  * want to introspect the content of schemas.
  *
@@ -422,21 +422,21 @@ g_settings_schema_source_get_default (void)
  *
  * If the schema isn't found, %NULL is returned.
  *
- * Returns: (nullable) (transfer full): a new #xsettings_schema_t
+ * Returns: (nullable) (transfer full): a new #GSettingsSchema
  *
  * Since: 2.32
  **/
-xsettings_schema_t *
-g_settings_schema_source_lookup (xsettings_schema_source_t *source,
-                                 const xchar_t           *schema_id,
-                                 xboolean_t               recursive)
+GSettingsSchema *
+g_settings_schema_source_lookup (GSettingsSchemaSource *source,
+                                 const gchar           *schema_id,
+                                 gboolean               recursive)
 {
-  xsettings_schema_t *schema;
+  GSettingsSchema *schema;
   GvdbTable *table;
-  const xchar_t *extends;
+  const gchar *extends;
 
-  xreturn_val_if_fail (source != NULL, NULL);
-  xreturn_val_if_fail (schema_id != NULL, NULL);
+  g_return_val_if_fail (source != NULL, NULL);
+  g_return_val_if_fail (schema_id != NULL, NULL);
 
   table = gvdb_table_get_table (source->table, schema_id);
 
@@ -448,10 +448,10 @@ g_settings_schema_source_lookup (xsettings_schema_source_t *source,
   if (table == NULL)
     return NULL;
 
-  schema = g_slice_new0 (xsettings_schema_t);
+  schema = g_slice_new0 (GSettingsSchema);
   schema->source = g_settings_schema_source_ref (source);
   schema->ref_count = 1;
-  schema->id = xstrdup (schema_id);
+  schema->id = g_strdup (schema_id);
   schema->table = table;
   schema->path = g_settings_schema_get_string (schema, ".path");
   schema->gettext_domain = g_settings_schema_get_string (schema, ".gettext-domain");
@@ -472,18 +472,18 @@ g_settings_schema_source_lookup (xsettings_schema_source_t *source,
 
 typedef struct
 {
-  xhashtable_t *summaries;
-  xhashtable_t *descriptions;
-  xslist_t     *gettext_domain;
-  xslist_t     *schema_id;
-  xslist_t     *key_name;
-  xstring_t    *string;
+  GHashTable *summaries;
+  GHashTable *descriptions;
+  GSList     *gettext_domain;
+  GSList     *schema_id;
+  GSList     *key_name;
+  GString    *string;
 } TextTableParseInfo;
 
-static const xchar_t *
-get_attribute_value (xslist_t *list)
+static const gchar *
+get_attribute_value (GSList *list)
 {
-  xslist_t *node;
+  GSList *node;
 
   for (node = list; node; node = node->next)
     if (node->data)
@@ -493,44 +493,44 @@ get_attribute_value (xslist_t *list)
 }
 
 static void
-pop_attribute_value (xslist_t **list)
+pop_attribute_value (GSList **list)
 {
-  xchar_t *top;
+  gchar *top;
 
   top = (*list)->data;
-  *list = xslist_remove (*list, top);
+  *list = g_slist_remove (*list, top);
 
   g_free (top);
 }
 
 static void
-push_attribute_value (xslist_t      **list,
-                      const xchar_t  *value)
+push_attribute_value (GSList      **list,
+                      const gchar  *value)
 {
-  *list = xslist_prepend (*list, xstrdup (value));
+  *list = g_slist_prepend (*list, g_strdup (value));
 }
 
 static void
-start_element (xmarkup_parse_context_t  *context,
-               const xchar_t          *element_name,
-               const xchar_t         **attribute_names,
-               const xchar_t         **attribute_values,
-               xpointer_t              user_data,
-               xerror_t              **error)
+start_element (GMarkupParseContext  *context,
+               const gchar          *element_name,
+               const gchar         **attribute_names,
+               const gchar         **attribute_values,
+               gpointer              user_data,
+               GError              **error)
 {
   TextTableParseInfo *info = user_data;
-  const xchar_t *gettext_domain = NULL;
-  const xchar_t *schema_id = NULL;
-  const xchar_t *key_name = NULL;
-  xint_t i;
+  const gchar *gettext_domain = NULL;
+  const gchar *schema_id = NULL;
+  const gchar *key_name = NULL;
+  gint i;
 
   for (i = 0; attribute_names[i]; i++)
     {
-      if (xstr_equal (attribute_names[i], "gettext-domain"))
+      if (g_str_equal (attribute_names[i], "gettext-domain"))
         gettext_domain = attribute_values[i];
-      else if (xstr_equal (attribute_names[i], "id"))
+      else if (g_str_equal (attribute_names[i], "id"))
         schema_id = attribute_values[i];
-      else if (xstr_equal (attribute_names[i], "name"))
+      else if (g_str_equal (attribute_names[i], "name"))
         key_name = attribute_values[i];
     }
 
@@ -540,16 +540,16 @@ start_element (xmarkup_parse_context_t  *context,
 
   if (info->string)
     {
-      xstring_free (info->string, TRUE);
+      g_string_free (info->string, TRUE);
       info->string = NULL;
     }
 
-  if (xstr_equal (element_name, "summary") || xstr_equal (element_name, "description"))
-    info->string = xstring_new (NULL);
+  if (g_str_equal (element_name, "summary") || g_str_equal (element_name, "description"))
+    info->string = g_string_new (NULL);
 }
 
-static xchar_t *
-normalise_whitespace (const xchar_t *orig)
+static gchar *
+normalise_whitespace (const gchar *orig)
 {
   /* We normalise by the same rules as in intltool:
    *
@@ -567,49 +567,49 @@ normalise_whitespace (const xchar_t *orig)
    * We aim for ease of implementation over efficiency -- this code is
    * not run in normal applications.
    */
-  static xregex_t *cleanup[3];
-  static xregex_t *splitter;
-  xchar_t **lines;
-  xchar_t *result;
-  xint_t i;
+  static GRegex *cleanup[3];
+  static GRegex *splitter;
+  gchar **lines;
+  gchar *result;
+  gint i;
 
   if (g_once_init_enter (&splitter))
     {
-      xregex_t *s;
+      GRegex *s;
 
-      cleanup[0] = xregex_new ("^\\s+", 0, 0, 0);
-      cleanup[1] = xregex_new ("\\s+$", 0, 0, 0);
-      cleanup[2] = xregex_new ("\\s+", 0, 0, 0);
-      s = xregex_new ("\\n\\s*\\n+", 0, 0, 0);
+      cleanup[0] = g_regex_new ("^\\s+", 0, 0, 0);
+      cleanup[1] = g_regex_new ("\\s+$", 0, 0, 0);
+      cleanup[2] = g_regex_new ("\\s+", 0, 0, 0);
+      s = g_regex_new ("\\n\\s*\\n+", 0, 0, 0);
 
       g_once_init_leave (&splitter, s);
     }
 
-  lines = xregex_split (splitter, orig, 0);
+  lines = g_regex_split (splitter, orig, 0);
   for (i = 0; lines[i]; i++)
     {
-      xchar_t *a, *b, *c;
+      gchar *a, *b, *c;
 
-      a = xregex_replace_literal (cleanup[0], lines[i], -1, 0, "", 0, 0);
-      b = xregex_replace_literal (cleanup[1], a, -1, 0, "", 0, 0);
-      c = xregex_replace_literal (cleanup[2], b, -1, 0, " ", 0, 0);
+      a = g_regex_replace_literal (cleanup[0], lines[i], -1, 0, "", 0, 0);
+      b = g_regex_replace_literal (cleanup[1], a, -1, 0, "", 0, 0);
+      c = g_regex_replace_literal (cleanup[2], b, -1, 0, " ", 0, 0);
       g_free (lines[i]);
       g_free (a);
       g_free (b);
       lines[i] = c;
     }
 
-  result = xstrjoinv ("\n\n", lines);
-  xstrfreev (lines);
+  result = g_strjoinv ("\n\n", lines);
+  g_strfreev (lines);
 
   return result;
 }
 
 static void
-end_element (xmarkup_parse_context_t *context,
-             const xchar_t *element_name,
-             xpointer_t user_data,
-             xerror_t **error)
+end_element (GMarkupParseContext *context,
+             const gchar *element_name,
+             gpointer user_data,
+             GError **error)
 {
   TextTableParseInfo *info = user_data;
 
@@ -619,97 +619,97 @@ end_element (xmarkup_parse_context_t *context,
 
   if (info->string)
     {
-      xhashtable_t *source_table = NULL;
-      const xchar_t *gettext_domain;
-      const xchar_t *schema_id;
-      const xchar_t *key_name;
+      GHashTable *source_table = NULL;
+      const gchar *gettext_domain;
+      const gchar *schema_id;
+      const gchar *key_name;
 
       gettext_domain = get_attribute_value (info->gettext_domain);
       schema_id = get_attribute_value (info->schema_id);
       key_name = get_attribute_value (info->key_name);
 
-      if (xstr_equal (element_name, "summary"))
+      if (g_str_equal (element_name, "summary"))
         source_table = info->summaries;
-      else if (xstr_equal (element_name, "description"))
+      else if (g_str_equal (element_name, "description"))
         source_table = info->descriptions;
 
       if (source_table && schema_id && key_name)
         {
-          xhashtable_t *schema_table;
-          xchar_t *normalised;
+          GHashTable *schema_table;
+          gchar *normalised;
 
-          schema_table = xhash_table_lookup (source_table, schema_id);
+          schema_table = g_hash_table_lookup (source_table, schema_id);
 
           if (schema_table == NULL)
             {
-              schema_table = xhash_table_new_full (xstr_hash, xstr_equal, g_free, g_free);
-              xhash_table_insert (source_table, xstrdup (schema_id), schema_table);
+              schema_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+              g_hash_table_insert (source_table, g_strdup (schema_id), schema_table);
             }
 
           normalised = normalise_whitespace (info->string->str);
 
           if (gettext_domain && normalised[0])
             {
-              xchar_t *translated;
+              gchar *translated;
 
-              translated = xstrdup (g_dgettext (gettext_domain, normalised));
+              translated = g_strdup (g_dgettext (gettext_domain, normalised));
               g_free (normalised);
               normalised = translated;
             }
 
-          xhash_table_insert (schema_table, xstrdup (key_name), normalised);
+          g_hash_table_insert (schema_table, g_strdup (key_name), normalised);
         }
 
-      xstring_free (info->string, TRUE);
+      g_string_free (info->string, TRUE);
       info->string = NULL;
     }
 }
 
 static void
-text (xmarkup_parse_context_t  *context,
-      const xchar_t          *text,
-      xsize_t                 text_len,
-      xpointer_t              user_data,
-      xerror_t              **error)
+text (GMarkupParseContext  *context,
+      const gchar          *text,
+      gsize                 text_len,
+      gpointer              user_data,
+      GError              **error)
 {
   TextTableParseInfo *info = user_data;
 
   if (info->string)
-    xstring_append_len (info->string, text, text_len);
+    g_string_append_len (info->string, text, text_len);
 }
 
 static void
-parse_into_text_tables (const xchar_t *directory,
-                        xhashtable_t  *summaries,
-                        xhashtable_t  *descriptions)
+parse_into_text_tables (const gchar *directory,
+                        GHashTable  *summaries,
+                        GHashTable  *descriptions)
 {
   GMarkupParser parser = { start_element, end_element, text, NULL, NULL };
   TextTableParseInfo info = { summaries, descriptions, NULL, NULL, NULL, NULL };
-  const xchar_t *basename;
-  xdir_t *dir;
+  const gchar *basename;
+  GDir *dir;
 
   dir = g_dir_open (directory, 0, NULL);
   while ((basename = g_dir_read_name (dir)))
     {
-      xchar_t *filename;
-      xchar_t *contents;
-      xsize_t size;
+      gchar *filename;
+      gchar *contents;
+      gsize size;
 
       filename = g_build_filename (directory, basename, NULL);
-      if (xfile_get_contents (filename, &contents, &size, NULL))
+      if (g_file_get_contents (filename, &contents, &size, NULL))
         {
-          xmarkup_parse_context_t *context;
+          GMarkupParseContext *context;
 
-          context = xmarkup_parse_context_new (&parser, G_MARKUP_TREAT_CDATA_AS_TEXT, &info, NULL);
+          context = g_markup_parse_context_new (&parser, G_MARKUP_TREAT_CDATA_AS_TEXT, &info, NULL);
           /* Ignore errors here, this is best effort only. */
-          if (xmarkup_parse_context_parse (context, contents, size, NULL))
-            (void) xmarkup_parse_context_end_parse (context, NULL);
-          xmarkup_parse_context_free (context);
+          if (g_markup_parse_context_parse (context, contents, size, NULL))
+            (void) g_markup_parse_context_end_parse (context, NULL);
+          g_markup_parse_context_free (context);
 
           /* Clean up dangling stuff in case there was an error. */
-          xslist_free_full (info.gettext_domain, g_free);
-          xslist_free_full (info.schema_id, g_free);
-          xslist_free_full (info.key_name, g_free);
+          g_slist_free_full (info.gettext_domain, g_free);
+          g_slist_free_full (info.schema_id, g_free);
+          g_slist_free_full (info.key_name, g_free);
 
           info.gettext_domain = NULL;
           info.schema_id = NULL;
@@ -717,7 +717,7 @@ parse_into_text_tables (const xchar_t *directory,
 
           if (info.string)
             {
-              xstring_free (info.string, TRUE);
+              g_string_free (info.string, TRUE);
               info.string = NULL;
             }
 
@@ -726,20 +726,20 @@ parse_into_text_tables (const xchar_t *directory,
 
       g_free (filename);
     }
-
+  
   g_dir_close (dir);
 }
 
-static xhashtable_t **
-g_settings_schema_source_get_text_tables (xsettings_schema_source_t *source)
+static GHashTable **
+g_settings_schema_source_get_text_tables (GSettingsSchemaSource *source)
 {
   if (g_once_init_enter (&source->text_tables))
     {
-      xhashtable_t **text_tables;
+      GHashTable **text_tables;
 
-      text_tables = g_new (xhashtable_t *, 2);
-      text_tables[0] = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xhash_table_unref);
-      text_tables[1] = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t) xhash_table_unref);
+      text_tables = g_new (GHashTable *, 2);
+      text_tables[0] = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_unref);
+      text_tables[1] = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) g_hash_table_unref);
 
       if (source->directory)
         parse_into_text_tables (source->directory, text_tables[0], text_tables[1]);
@@ -752,7 +752,7 @@ g_settings_schema_source_get_text_tables (xsettings_schema_source_t *source)
 
 /**
  * g_settings_schema_source_list_schemas:
- * @source: a #xsettings_schema_source_t
+ * @source: a #GSettingsSchemaSource
  * @recursive: if we should recurse
  * @non_relocatable: (out) (transfer full) (array zero-terminated=1): the
  *   list of non-relocatable schemas, in no defined order
@@ -775,24 +775,24 @@ g_settings_schema_source_get_text_tables (xsettings_schema_source_t *source)
  * Since: 2.40
  **/
 void
-g_settings_schema_source_list_schemas (xsettings_schema_source_t   *source,
-                                       xboolean_t                 recursive,
-                                       xchar_t                 ***non_relocatable,
-                                       xchar_t                 ***relocatable)
+g_settings_schema_source_list_schemas (GSettingsSchemaSource   *source,
+                                       gboolean                 recursive,
+                                       gchar                 ***non_relocatable,
+                                       gchar                 ***relocatable)
 {
-  xhashtable_t *single, *reloc;
-  xsettings_schema_source_t *s;
+  GHashTable *single, *reloc;
+  GSettingsSchemaSource *s;
 
   /* We use hash tables to avoid duplicate listings for schemas that
    * appear in more than one file.
    */
-  single = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
-  reloc = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
+  single = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  reloc = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   for (s = source; s; s = s->parent)
     {
-      xchar_t **list;
-      xint_t i;
+      gchar **list;
+      gint i;
 
       list = gvdb_table_list (s->table, "");
 
@@ -802,27 +802,27 @@ g_settings_schema_source_list_schemas (xsettings_schema_source_t   *source,
 
       for (i = 0; list[i]; i++)
         {
-          if (!xhash_table_contains (single, list[i]) &&
-              !xhash_table_contains (reloc, list[i]))
+          if (!g_hash_table_contains (single, list[i]) &&
+              !g_hash_table_contains (reloc, list[i]))
             {
-              xchar_t *schema;
+              gchar *schema;
               GvdbTable *table;
 
-              schema = xstrdup (list[i]);
+              schema = g_strdup (list[i]);
 
               table = gvdb_table_get_table (s->table, list[i]);
-              xassert (table != NULL);
+              g_assert (table != NULL);
 
               if (gvdb_table_has_value (table, ".path"))
-                xhash_table_add (single, schema);
+                g_hash_table_add (single, schema);
               else
-                xhash_table_add (reloc, schema);
+                g_hash_table_add (reloc, schema);
 
               gvdb_table_free (table);
             }
         }
 
-      xstrfreev (list);
+      g_strfreev (list);
 
       /* Only the first source if recursive not requested */
       if (!recursive)
@@ -831,23 +831,23 @@ g_settings_schema_source_list_schemas (xsettings_schema_source_t   *source,
 
   if (non_relocatable)
     {
-      *non_relocatable = (xchar_t **) xhash_table_get_keys_as_array (single, NULL);
-      xhash_table_steal_all (single);
+      *non_relocatable = (gchar **) g_hash_table_get_keys_as_array (single, NULL);
+      g_hash_table_steal_all (single);
     }
 
   if (relocatable)
     {
-      *relocatable = (xchar_t **) xhash_table_get_keys_as_array (reloc, NULL);
-      xhash_table_steal_all (reloc);
+      *relocatable = (gchar **) g_hash_table_get_keys_as_array (reloc, NULL);
+      g_hash_table_steal_all (reloc);
     }
 
-  xhash_table_unref (single);
-  xhash_table_unref (reloc);
+  g_hash_table_unref (single);
+  g_hash_table_unref (reloc);
 }
 
-static xchar_t **non_relocatable_schema_list;
-static xchar_t **relocatable_schema_list;
-static xsize_t schema_lists_initialised;
+static gchar **non_relocatable_schema_list;
+static gchar **relocatable_schema_list;
+static gsize schema_lists_initialised;
 
 static void
 ensure_schema_lists (void)
@@ -870,7 +870,7 @@ ensure_schema_lists (void)
  * Deprecated.
  *
  * Returns: (element-type utf8) (transfer none) (not nullable): a list of
- *   #xsettings_t schemas that are available, in no defined order.  The list
+ *   #GSettings schemas that are available, in no defined order.  The list
  *   must not be modified or freed.
  *
  * Since: 2.26
@@ -880,12 +880,12 @@ ensure_schema_lists (void)
  * a particular schema, use g_settings_schema_source_lookup() instead
  * of your whole loop.
  **/
-const xchar_t * const *
+const gchar * const *
 g_settings_list_schemas (void)
 {
   ensure_schema_lists ();
 
-  return (const xchar_t **) non_relocatable_schema_list;
+  return (const gchar **) non_relocatable_schema_list;
 }
 
 /**
@@ -894,24 +894,24 @@ g_settings_list_schemas (void)
  * Deprecated.
  *
  * Returns: (element-type utf8) (transfer none) (not nullable): a list of
- *   relocatable #xsettings_t schemas that are available, in no defined order.
+ *   relocatable #GSettings schemas that are available, in no defined order.
  *   The list must not be modified or freed.
  *
  * Since: 2.28
  *
  * Deprecated: 2.40: Use g_settings_schema_source_list_schemas() instead
  **/
-const xchar_t * const *
+const gchar * const *
 g_settings_list_relocatable_schemas (void)
 {
   ensure_schema_lists ();
 
-  return (const xchar_t **) relocatable_schema_list;
+  return (const gchar **) relocatable_schema_list;
 }
 
 /**
  * g_settings_schema_ref:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  *
  * Increase the reference count of @schema, returning a new reference.
  *
@@ -919,8 +919,8 @@ g_settings_list_relocatable_schemas (void)
  *
  * Since: 2.32
  **/
-xsettings_schema_t *
-g_settings_schema_ref (xsettings_schema_t *schema)
+GSettingsSchema *
+g_settings_schema_ref (GSettingsSchema *schema)
 {
   g_atomic_int_inc (&schema->ref_count);
 
@@ -929,14 +929,14 @@ g_settings_schema_ref (xsettings_schema_t *schema)
 
 /**
  * g_settings_schema_unref:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  *
  * Decrease the reference count of @schema, possibly freeing it.
  *
  * Since: 2.32
  **/
 void
-g_settings_schema_unref (xsettings_schema_t *schema)
+g_settings_schema_unref (GSettingsSchema *schema)
 {
   if (g_atomic_int_dec_and_test (&schema->ref_count))
     {
@@ -948,34 +948,34 @@ g_settings_schema_unref (xsettings_schema_t *schema)
       g_free (schema->items);
       g_free (schema->id);
 
-      g_slice_free (xsettings_schema_t, schema);
+      g_slice_free (GSettingsSchema, schema);
     }
 }
 
-const xchar_t *
-g_settings_schema_get_string (xsettings_schema_t *schema,
-                              const xchar_t     *key)
+const gchar *
+g_settings_schema_get_string (GSettingsSchema *schema,
+                              const gchar     *key)
 {
-  const xchar_t *result = NULL;
-  xvariant_t *value;
+  const gchar *result = NULL;
+  GVariant *value;
 
   if ((value = gvdb_table_get_raw_value (schema->table, key)))
     {
-      result = xvariant_get_string (value, NULL);
-      xvariant_unref (value);
+      result = g_variant_get_string (value, NULL);
+      g_variant_unref (value);
     }
 
   return result;
 }
 
-xsettings_schema_t *
-g_settings_schema_get_child_schema (xsettings_schema_t *schema,
-                                    const xchar_t     *name)
+GSettingsSchema *
+g_settings_schema_get_child_schema (GSettingsSchema *schema,
+                                    const gchar     *name)
 {
-  const xchar_t *child_id;
-  xchar_t *child_name;
+  const gchar *child_id;
+  gchar *child_name;
 
-  child_name = xstrconcat (name, "/", NULL);
+  child_name = g_strconcat (name, "/", NULL);
   child_id = g_settings_schema_get_string (schema, child_name);
 
   g_free (child_name);
@@ -986,32 +986,32 @@ g_settings_schema_get_child_schema (xsettings_schema_t *schema,
   return g_settings_schema_source_lookup (schema->source, child_id, TRUE);
 }
 
-xvariant_iter_t *
-g_settings_schema_get_value (xsettings_schema_t *schema,
-                             const xchar_t     *key)
+GVariantIter *
+g_settings_schema_get_value (GSettingsSchema *schema,
+                             const gchar     *key)
 {
-  xsettings_schema_t *s = schema;
-  xvariant_iter_t *iter;
-  xvariant_t *value = NULL;
+  GSettingsSchema *s = schema;
+  GVariantIter *iter;
+  GVariant *value = NULL;
 
-  xreturn_val_if_fail (schema != NULL, NULL);
+  g_return_val_if_fail (schema != NULL, NULL);
 
   for (s = schema; s; s = s->extends)
     if ((value = gvdb_table_get_raw_value (s->table, key)))
       break;
 
-  if G_UNLIKELY (value == NULL || !xvariant_is_of_type (value, G_VARIANT_TYPE_TUPLE))
-    xerror ("Settings schema '%s' does not contain a key named '%s'", schema->id, key);
+  if G_UNLIKELY (value == NULL || !g_variant_is_of_type (value, G_VARIANT_TYPE_TUPLE))
+    g_error ("Settings schema '%s' does not contain a key named '%s'", schema->id, key);
 
-  iter = xvariant_iter_new (value);
-  xvariant_unref (value);
+  iter = g_variant_iter_new (value);
+  g_variant_unref (value);
 
   return iter;
 }
 
 /**
  * g_settings_schema_get_path:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  *
  * Gets the path associated with @schema, or %NULL.
  *
@@ -1027,21 +1027,21 @@ g_settings_schema_get_value (xsettings_schema_t *schema,
  *
  * Since: 2.32
  **/
-const xchar_t *
-g_settings_schema_get_path (xsettings_schema_t *schema)
+const gchar *
+g_settings_schema_get_path (GSettingsSchema *schema)
 {
   return schema->path;
 }
 
-const xchar_t *
-g_settings_schema_get_gettext_domain (xsettings_schema_t *schema)
+const gchar *
+g_settings_schema_get_gettext_domain (GSettingsSchema *schema)
 {
   return schema->gettext_domain;
 }
 
 /**
  * g_settings_schema_has_key:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  * @name: the name of a key
  *
  * Checks if @schema has a key named @name.
@@ -1050,20 +1050,20 @@ g_settings_schema_get_gettext_domain (xsettings_schema_t *schema)
  *
  * Since: 2.40
  **/
-xboolean_t
-g_settings_schema_has_key (xsettings_schema_t *schema,
-                           const xchar_t     *key)
+gboolean
+g_settings_schema_has_key (GSettingsSchema *schema,
+                           const gchar     *key)
 {
   return gvdb_table_has_value (schema->table, key);
 }
 
 /**
  * g_settings_schema_list_children:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  *
  * Gets the list of children in @schema.
  *
- * You should free the return value with xstrfreev() when you are done
+ * You should free the return value with g_strfreev() when you are done
  * with it.
  *
  * Returns: (not nullable) (transfer full) (element-type utf8): a list of
@@ -1071,25 +1071,25 @@ g_settings_schema_has_key (xsettings_schema_t *schema,
  *
  * Since: 2.44
  */
-xchar_t **
-g_settings_schema_list_children (xsettings_schema_t *schema)
+gchar **
+g_settings_schema_list_children (GSettingsSchema *schema)
 {
-  const xquark *keys;
-  xchar_t **strv;
-  xint_t n_keys;
-  xint_t i, j;
+  const GQuark *keys;
+  gchar **strv;
+  gint n_keys;
+  gint i, j;
 
-  xreturn_val_if_fail (schema != NULL, NULL);
+  g_return_val_if_fail (schema != NULL, NULL);
 
   keys = g_settings_schema_list (schema, &n_keys);
-  strv = g_new (xchar_t *, n_keys + 1);
+  strv = g_new (gchar *, n_keys + 1);
   for (i = j = 0; i < n_keys; i++)
     {
-      const xchar_t *key = g_quark_to_string (keys[i]);
+      const gchar *key = g_quark_to_string (keys[i]);
 
-      if (xstr_has_suffix (key, "/"))
+      if (g_str_has_suffix (key, "/"))
         {
-          xsize_t length = strlen (key);
+          gsize length = strlen (key);
 
           strv[j] = g_memdup2 (key, length);
           strv[j][length - 1] = '\0';
@@ -1103,7 +1103,7 @@ g_settings_schema_list_children (xsettings_schema_t *schema)
 
 /**
  * g_settings_schema_list_keys:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  *
  * Introspects the list of keys on @schema.
  *
@@ -1116,55 +1116,55 @@ g_settings_schema_list_children (xsettings_schema_t *schema)
  *
  * Since: 2.46
  */
-xchar_t **
-g_settings_schema_list_keys (xsettings_schema_t *schema)
+gchar **
+g_settings_schema_list_keys (GSettingsSchema *schema)
 {
-  const xquark *keys;
-  xchar_t **strv;
-  xint_t n_keys;
-  xint_t i, j;
+  const GQuark *keys;
+  gchar **strv;
+  gint n_keys;
+  gint i, j;
 
-  xreturn_val_if_fail (schema != NULL, NULL);
+  g_return_val_if_fail (schema != NULL, NULL);
 
   keys = g_settings_schema_list (schema, &n_keys);
-  strv = g_new (xchar_t *, n_keys + 1);
+  strv = g_new (gchar *, n_keys + 1);
   for (i = j = 0; i < n_keys; i++)
     {
-      const xchar_t *key = g_quark_to_string (keys[i]);
+      const gchar *key = g_quark_to_string (keys[i]);
 
-      if (!xstr_has_suffix (key, "/"))
-        strv[j++] = xstrdup (key);
+      if (!g_str_has_suffix (key, "/"))
+        strv[j++] = g_strdup (key);
     }
   strv[j] = NULL;
 
   return strv;
 }
 
-const xquark *
-g_settings_schema_list (xsettings_schema_t *schema,
-                        xint_t            *n_items)
+const GQuark *
+g_settings_schema_list (GSettingsSchema *schema,
+                        gint            *n_items)
 {
   if (schema->items == NULL)
     {
-      xsettings_schema_t *s;
-      xhash_table_iter_t iter;
-      xhashtable_t *items;
-      xpointer_t name;
-      xint_t len;
-      xint_t i;
+      GSettingsSchema *s;
+      GHashTableIter iter;
+      GHashTable *items;
+      gpointer name;
+      gint len;
+      gint i;
 
-      items = xhash_table_new_full (xstr_hash, xstr_equal, g_free, NULL);
+      items = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
       for (s = schema; s; s = s->extends)
         {
-          xchar_t **list;
+          gchar **list;
 
           list = gvdb_table_list (s->table, "");
 
           if (list)
             {
               for (i = 0; list[i]; i++)
-                xhash_table_add (items, list[i]); /* transfer ownership */
+                g_hash_table_add (items, list[i]); /* transfer ownership */
 
               g_free (list); /* free container only */
             }
@@ -1174,12 +1174,12 @@ g_settings_schema_list (xsettings_schema_t *schema,
        * valid schemas (ie: ones that would crash us if we actually
        * tried to create them).
        */
-      xhash_table_iter_init (&iter, items);
-      while (xhash_table_iter_next (&iter, &name, NULL))
-        if (xstr_has_suffix (name, "/"))
+      g_hash_table_iter_init (&iter, items);
+      while (g_hash_table_iter_next (&iter, &name, NULL))
+        if (g_str_has_suffix (name, "/"))
           {
-            xsettings_schema_source_t *source;
-            xvariant_t *child_schema;
+            GSettingsSchemaSource *source;
+            GVariant *child_schema;
             GvdbTable *child_table;
 
             child_schema = gvdb_table_get_raw_value (schema->table, name);
@@ -1189,15 +1189,15 @@ g_settings_schema_list (xsettings_schema_t *schema,
             child_table = NULL;
 
             for (source = schema->source; source; source = source->parent)
-              if ((child_table = gvdb_table_get_table (source->table, xvariant_get_string (child_schema, NULL))))
+              if ((child_table = gvdb_table_get_table (source->table, g_variant_get_string (child_schema, NULL))))
                 break;
 
-            xvariant_unref (child_schema);
+            g_variant_unref (child_schema);
 
             /* Schema is not found -> remove it from the list */
             if (child_table == NULL)
               {
-                xhash_table_iter_remove (&iter);
+                g_hash_table_iter_remove (&iter);
                 continue;
               }
 
@@ -1206,38 +1206,38 @@ g_settings_schema_list (xsettings_schema_t *schema,
              */
             if (gvdb_table_has_value (child_table, ".path"))
               {
-                xvariant_t *path;
-                xchar_t *expected;
-                xboolean_t same;
+                GVariant *path;
+                gchar *expected;
+                gboolean same;
 
                 path = gvdb_table_get_raw_value (child_table, ".path");
-                expected = xstrconcat (schema->path, name, NULL);
-                same = xstr_equal (expected, xvariant_get_string (path, NULL));
-                xvariant_unref (path);
+                expected = g_strconcat (schema->path, name, NULL);
+                same = g_str_equal (expected, g_variant_get_string (path, NULL));
+                g_variant_unref (path);
                 g_free (expected);
 
                 /* Schema is non-relocatable and did not have the
                  * expected path -> remove it from the list
                  */
                 if (!same)
-                  xhash_table_iter_remove (&iter);
+                  g_hash_table_iter_remove (&iter);
               }
 
             gvdb_table_free (child_table);
           }
 
       /* Now create the list */
-      len = xhash_table_size (items);
-      schema->items = g_new (xquark, len);
+      len = g_hash_table_size (items);
+      schema->items = g_new (GQuark, len);
       i = 0;
-      xhash_table_iter_init (&iter, items);
+      g_hash_table_iter_init (&iter, items);
 
-      while (xhash_table_iter_next (&iter, &name, NULL))
+      while (g_hash_table_iter_next (&iter, &name, NULL))
         schema->items[i++] = g_quark_from_string (name);
       schema->n_items = i;
-      xassert (i == len);
+      g_assert (i == len);
 
-      xhash_table_unref (items);
+      g_hash_table_unref (items);
     }
 
   *n_items = schema->n_items;
@@ -1246,56 +1246,56 @@ g_settings_schema_list (xsettings_schema_t *schema,
 
 /**
  * g_settings_schema_get_id:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  *
  * Get the ID of @schema.
  *
  * Returns: (not nullable) (transfer none): the ID
  **/
-const xchar_t *
-g_settings_schema_get_id (xsettings_schema_t *schema)
+const gchar *
+g_settings_schema_get_id (GSettingsSchema *schema)
 {
   return schema->id;
 }
 
 static inline void
-endian_fixup (xvariant_t **value)
+endian_fixup (GVariant **value)
 {
 #if G_BYTE_ORDER == G_BIG_ENDIAN
-  xvariant_t *tmp;
+  GVariant *tmp;
 
-  tmp = xvariant_byteswap (*value);
-  xvariant_unref (*value);
+  tmp = g_variant_byteswap (*value);
+  g_variant_unref (*value);
   *value = tmp;
 #endif
 }
 
 void
-g_settings_schema_key_init (xsettings_schema_key_t *key,
-                            xsettings_schema_t    *schema,
-                            const xchar_t        *name)
+g_settings_schema_key_init (GSettingsSchemaKey *key,
+                            GSettingsSchema    *schema,
+                            const gchar        *name)
 {
-  xvariant_iter_t *iter;
-  xvariant_t *data;
-  xuchar_t code;
+  GVariantIter *iter;
+  GVariant *data;
+  guchar code;
 
   memset (key, 0, sizeof *key);
 
   iter = g_settings_schema_get_value (schema, name);
 
   key->schema = g_settings_schema_ref (schema);
-  key->default_value = xvariant_iter_next_value (iter);
+  key->default_value = g_variant_iter_next_value (iter);
   endian_fixup (&key->default_value);
-  key->type = xvariant_get_type (key->default_value);
+  key->type = g_variant_get_type (key->default_value);
   key->name = g_intern_string (name);
 
-  while (xvariant_iter_next (iter, "(y*)", &code, &data))
+  while (g_variant_iter_next (iter, "(y*)", &code, &data))
     {
       switch (code)
         {
         case 'l':
           /* translation requested */
-          xvariant_get (data, "(y&s)", &key->lc_char, &key->unparsed);
+          g_variant_get (data, "(y&s)", &key->lc_char, &key->unparsed);
           break;
 
         case 'e':
@@ -1310,17 +1310,17 @@ g_settings_schema_key_init (xsettings_schema_key_t *key,
 
         choice: case 'c':
           /* ..., choices, aliases */
-          key->strinfo = xvariant_get_fixed_array (data, &key->strinfo_length, sizeof (xuint32_t));
+          key->strinfo = g_variant_get_fixed_array (data, &key->strinfo_length, sizeof (guint32));
           break;
 
         case 'r':
-          xvariant_get (data, "(**)", &key->minimum, &key->maximum);
+          g_variant_get (data, "(**)", &key->minimum, &key->maximum);
           endian_fixup (&key->minimum);
           endian_fixup (&key->maximum);
           break;
 
         case 'd':
-          xvariant_get (data, "@a{sv}", &key->desktop_overrides);
+          g_variant_get (data, "@a{sv}", &key->desktop_overrides);
           endian_fixup (&key->desktop_overrides);
           break;
 
@@ -1329,91 +1329,91 @@ g_settings_schema_key_init (xsettings_schema_key_t *key,
           break;
         }
 
-      xvariant_unref (data);
+      g_variant_unref (data);
     }
 
-  xvariant_iter_free (iter);
+  g_variant_iter_free (iter);
 }
 
 void
-g_settings_schema_key_clear (xsettings_schema_key_t *key)
+g_settings_schema_key_clear (GSettingsSchemaKey *key)
 {
   if (key->minimum)
-    xvariant_unref (key->minimum);
+    g_variant_unref (key->minimum);
 
   if (key->maximum)
-    xvariant_unref (key->maximum);
+    g_variant_unref (key->maximum);
 
   if (key->desktop_overrides)
-    xvariant_unref (key->desktop_overrides);
+    g_variant_unref (key->desktop_overrides);
 
-  xvariant_unref (key->default_value);
+  g_variant_unref (key->default_value);
 
   g_settings_schema_unref (key->schema);
 }
 
-xboolean_t
-g_settings_schema_key_type_check (xsettings_schema_key_t *key,
-                                  xvariant_t           *value)
+gboolean
+g_settings_schema_key_type_check (GSettingsSchemaKey *key,
+                                  GVariant           *value)
 {
-  xreturn_val_if_fail (value != NULL, FALSE);
+  g_return_val_if_fail (value != NULL, FALSE);
 
-  return xvariant_is_of_type (value, key->type);
+  return g_variant_is_of_type (value, key->type);
 }
 
-xvariant_t *
-g_settings_schema_key_range_fixup (xsettings_schema_key_t *key,
-                                   xvariant_t           *value)
+GVariant *
+g_settings_schema_key_range_fixup (GSettingsSchemaKey *key,
+                                   GVariant           *value)
 {
-  const xchar_t *target;
+  const gchar *target;
 
   if (g_settings_schema_key_range_check (key, value))
-    return xvariant_ref (value);
+    return g_variant_ref (value);
 
   if (key->strinfo == NULL)
     return NULL;
 
-  if (xvariant_is_container (value))
+  if (g_variant_is_container (value))
     {
-      xvariant_builder_t builder;
-      xvariant_iter_t iter;
-      xvariant_t *child;
+      GVariantBuilder builder;
+      GVariantIter iter;
+      GVariant *child;
 
-      xvariant_iter_init (&iter, value);
-      xvariant_builder_init (&builder, xvariant_get_type (value));
+      g_variant_iter_init (&iter, value);
+      g_variant_builder_init (&builder, g_variant_get_type (value));
 
-      while ((child = xvariant_iter_next_value (&iter)))
+      while ((child = g_variant_iter_next_value (&iter)))
         {
-          xvariant_t *fixed;
+          GVariant *fixed;
 
           fixed = g_settings_schema_key_range_fixup (key, child);
-          xvariant_unref (child);
+          g_variant_unref (child);
 
           if (fixed == NULL)
             {
-              xvariant_builder_clear (&builder);
+              g_variant_builder_clear (&builder);
               return NULL;
             }
 
-          xvariant_builder_add_value (&builder, fixed);
-          xvariant_unref (fixed);
+          g_variant_builder_add_value (&builder, fixed);
+          g_variant_unref (fixed);
         }
 
-      return xvariant_ref_sink (xvariant_builder_end (&builder));
+      return g_variant_ref_sink (g_variant_builder_end (&builder));
     }
 
   target = strinfo_string_from_alias (key->strinfo, key->strinfo_length,
-                                      xvariant_get_string (value, NULL));
-  return target ? xvariant_ref_sink (xvariant_new_string (target)) : NULL;
+                                      g_variant_get_string (value, NULL));
+  return target ? g_variant_ref_sink (g_variant_new_string (target)) : NULL;
 }
 
-xvariant_t *
-g_settings_schema_key_get_translated_default (xsettings_schema_key_t *key)
+GVariant *
+g_settings_schema_key_get_translated_default (GSettingsSchemaKey *key)
 {
-  const xchar_t *translated;
-  xerror_t *error = NULL;
-  const xchar_t *domain;
-  xvariant_t *value;
+  const gchar *translated;
+  GError *error = NULL;
+  const gchar *domain;
+  GVariant *value;
 
   domain = g_settings_schema_get_gettext_domain (key->schema);
 
@@ -1431,7 +1431,7 @@ g_settings_schema_key_get_translated_default (xsettings_schema_key_t *key)
     return NULL;
 
   /* try to parse the translation of the unparsed default */
-  value = xvariant_parse (key->type, translated, NULL, NULL, &error);
+  value = g_variant_parse (key->type, translated, NULL, NULL, &error);
 
   if (value == NULL)
     {
@@ -1439,7 +1439,7 @@ g_settings_schema_key_get_translated_default (xsettings_schema_key_t *key)
                  "key '%s' in schema '%s': %s", translated, key->name,
                  g_settings_schema_get_id (key->schema), error->message);
       g_warning ("Using untranslated default instead.");
-      xerror_free (error);
+      g_error_free (error);
     }
 
   else if (!g_settings_schema_key_range_check (key, value))
@@ -1447,137 +1447,137 @@ g_settings_schema_key_get_translated_default (xsettings_schema_key_t *key)
       g_warning ("Translated default '%s' for key '%s' in schema '%s' "
                  "is outside of valid range", key->unparsed, key->name,
                  g_settings_schema_get_id (key->schema));
-      xvariant_unref (value);
+      g_variant_unref (value);
       value = NULL;
     }
 
   return value;
 }
 
-xvariant_t *
-g_settings_schema_key_get_per_desktop_default (xsettings_schema_key_t *key)
+GVariant *
+g_settings_schema_key_get_per_desktop_default (GSettingsSchemaKey *key)
 {
-  static const xchar_t * const *current_desktops;
-  xvariant_t *value = NULL;
-  xint_t i;
+  static const gchar * const *current_desktops;
+  GVariant *value = NULL;
+  gint i;
 
   if (!key->desktop_overrides)
     return NULL;
 
   if (g_once_init_enter (&current_desktops))
     {
-      const xchar_t *xdg_current_desktop = g_getenv ("XDG_CURRENT_DESKTOP");
-      xchar_t **tmp;
+      const gchar *xdg_current_desktop = g_getenv ("XDG_CURRENT_DESKTOP");
+      gchar **tmp;
 
       if (xdg_current_desktop != NULL && xdg_current_desktop[0] != '\0')
-        tmp = xstrsplit (xdg_current_desktop, G_SEARCHPATH_SEPARATOR_S, -1);
+        tmp = g_strsplit (xdg_current_desktop, G_SEARCHPATH_SEPARATOR_S, -1);
       else
-        tmp = g_new0 (xchar_t *, 0 + 1);
+        tmp = g_new0 (gchar *, 0 + 1);
 
-      g_once_init_leave (&current_desktops, (const xchar_t **) tmp);
+      g_once_init_leave (&current_desktops, (const gchar **) tmp);
     }
 
   for (i = 0; value == NULL && current_desktops[i] != NULL; i++)
-    value = xvariant_lookup_value (key->desktop_overrides, current_desktops[i], NULL);
+    value = g_variant_lookup_value (key->desktop_overrides, current_desktops[i], NULL);
 
   return value;
 }
 
-xint_t
-g_settings_schema_key_to_enum (xsettings_schema_key_t *key,
-                               xvariant_t           *value)
+gint
+g_settings_schema_key_to_enum (GSettingsSchemaKey *key,
+                               GVariant           *value)
 {
-  xboolean_t it_worked G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
-  xuint_t result;
+  gboolean it_worked G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
+  guint result;
 
   it_worked = strinfo_enum_from_string (key->strinfo, key->strinfo_length,
-                                        xvariant_get_string (value, NULL),
+                                        g_variant_get_string (value, NULL),
                                         &result);
 
   /* 'value' can only come from the backend after being filtered for validity,
    * from the translation after being filtered for validity, or from the schema
    * itself (which the schema compiler checks for validity).  If this assertion
-   * fails then it's really a bug in xsettings_t or the schema compiler...
+   * fails then it's really a bug in GSettings or the schema compiler...
    */
-  xassert (it_worked);
+  g_assert (it_worked);
 
   return result;
 }
 
-/* Returns a new floating #xvariant_t. */
-xvariant_t *
-g_settings_schema_key_from_enum (xsettings_schema_key_t *key,
-                                 xint_t                value)
+/* Returns a new floating #GVariant. */
+GVariant *
+g_settings_schema_key_from_enum (GSettingsSchemaKey *key,
+                                 gint                value)
 {
-  const xchar_t *string;
+  const gchar *string;
 
   string = strinfo_string_from_enum (key->strinfo, key->strinfo_length, value);
 
   if (string == NULL)
     return NULL;
 
-  return xvariant_new_string (string);
+  return g_variant_new_string (string);
 }
 
-xuint_t
-g_settings_schema_key_to_flags (xsettings_schema_key_t *key,
-                                xvariant_t           *value)
+guint
+g_settings_schema_key_to_flags (GSettingsSchemaKey *key,
+                                GVariant           *value)
 {
-  xvariant_iter_t iter;
-  const xchar_t *flag;
-  xuint_t result;
+  GVariantIter iter;
+  const gchar *flag;
+  guint result;
 
   result = 0;
-  xvariant_iter_init (&iter, value);
-  while (xvariant_iter_next (&iter, "&s", &flag))
+  g_variant_iter_init (&iter, value);
+  while (g_variant_iter_next (&iter, "&s", &flag))
     {
-      xboolean_t it_worked G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
-      xuint_t flaxvalue;
+      gboolean it_worked G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
+      guint flag_value;
 
-      it_worked = strinfo_enum_from_string (key->strinfo, key->strinfo_length, flag, &flaxvalue);
+      it_worked = strinfo_enum_from_string (key->strinfo, key->strinfo_length, flag, &flag_value);
       /* as in g_settings_to_enum() */
-      xassert (it_worked);
+      g_assert (it_worked);
 
-      result |= flaxvalue;
+      result |= flag_value;
     }
 
   return result;
 }
 
-/* Returns a new floating #xvariant_t. */
-xvariant_t *
-g_settings_schema_key_from_flags (xsettings_schema_key_t *key,
-                                  xuint_t               value)
+/* Returns a new floating #GVariant. */
+GVariant *
+g_settings_schema_key_from_flags (GSettingsSchemaKey *key,
+                                  guint               value)
 {
-  xvariant_builder_t builder;
-  xint_t i;
+  GVariantBuilder builder;
+  gint i;
 
-  xvariant_builder_init (&builder, G_VARIANT_TYPE ("as"));
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("as"));
 
   for (i = 0; i < 32; i++)
     if (value & (1u << i))
       {
-        const xchar_t *string;
+        const gchar *string;
 
         string = strinfo_string_from_enum (key->strinfo, key->strinfo_length, 1u << i);
 
         if (string == NULL)
           {
-            xvariant_builder_clear (&builder);
+            g_variant_builder_clear (&builder);
             return NULL;
           }
 
-        xvariant_builder_add (&builder, "s", string);
+        g_variant_builder_add (&builder, "s", string);
       }
 
-  return xvariant_builder_end (&builder);
+  return g_variant_builder_end (&builder);
 }
 
-G_DEFINE_BOXED_TYPE (xsettings_schema_key_t, g_settings_schema_key, g_settings_schema_key_ref, g_settings_schema_key_unref)
+G_DEFINE_BOXED_TYPE (GSettingsSchemaKey, g_settings_schema_key, g_settings_schema_key_ref, g_settings_schema_key_unref)
 
 /**
  * g_settings_schema_key_ref:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Increase the reference count of @key, returning a new reference.
  *
@@ -1585,10 +1585,10 @@ G_DEFINE_BOXED_TYPE (xsettings_schema_key_t, g_settings_schema_key, g_settings_s
  *
  * Since: 2.40
  **/
-xsettings_schema_key_t *
-g_settings_schema_key_ref (xsettings_schema_key_t *key)
+GSettingsSchemaKey *
+g_settings_schema_key_ref (GSettingsSchemaKey *key)
 {
-  xreturn_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (key != NULL, NULL);
 
   g_atomic_int_inc (&key->ref_count);
 
@@ -1597,14 +1597,14 @@ g_settings_schema_key_ref (xsettings_schema_key_t *key)
 
 /**
  * g_settings_schema_key_unref:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Decrease the reference count of @key, possibly freeing it.
  *
  * Since: 2.40
  **/
 void
-g_settings_schema_key_unref (xsettings_schema_key_t *key)
+g_settings_schema_key_unref (GSettingsSchemaKey *key)
 {
   g_return_if_fail (key != NULL);
 
@@ -1612,13 +1612,13 @@ g_settings_schema_key_unref (xsettings_schema_key_t *key)
     {
       g_settings_schema_key_clear (key);
 
-      g_slice_free (xsettings_schema_key_t, key);
+      g_slice_free (GSettingsSchemaKey, key);
     }
 }
 
 /**
  * g_settings_schema_get_key:
- * @schema: a #xsettings_schema_t
+ * @schema: a #GSettingsSchema
  * @name: the name of a key
  *
  * Gets the key named @name from @schema.
@@ -1626,20 +1626,20 @@ g_settings_schema_key_unref (xsettings_schema_key_t *key)
  * It is a programmer error to request a key that does not exist.  See
  * g_settings_schema_list_keys().
  *
- * Returns: (not nullable) (transfer full): the #xsettings_schema_key_t for @name
+ * Returns: (not nullable) (transfer full): the #GSettingsSchemaKey for @name
  *
  * Since: 2.40
  **/
-xsettings_schema_key_t *
-g_settings_schema_get_key (xsettings_schema_t *schema,
-                           const xchar_t     *name)
+GSettingsSchemaKey *
+g_settings_schema_get_key (GSettingsSchema *schema,
+                           const gchar     *name)
 {
-  xsettings_schema_key_t *key;
+  GSettingsSchemaKey *key;
 
-  xreturn_val_if_fail (schema != NULL, NULL);
-  xreturn_val_if_fail (name != NULL, NULL);
+  g_return_val_if_fail (schema != NULL, NULL);
+  g_return_val_if_fail (name != NULL, NULL);
 
-  key = g_slice_new (xsettings_schema_key_t);
+  key = g_slice_new (GSettingsSchemaKey);
   g_settings_schema_key_init (key, schema, name);
   key->ref_count = 1;
 
@@ -1648,7 +1648,7 @@ g_settings_schema_get_key (xsettings_schema_t *schema,
 
 /**
  * g_settings_schema_key_get_name:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Gets the name of @key.
  *
@@ -1656,17 +1656,17 @@ g_settings_schema_get_key (xsettings_schema_t *schema,
  *
  * Since: 2.44
  */
-const xchar_t *
-g_settings_schema_key_get_name (xsettings_schema_key_t *key)
+const gchar *
+g_settings_schema_key_get_name (GSettingsSchemaKey *key)
 {
-  xreturn_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (key != NULL, NULL);
 
   return key->name;
 }
 
 /**
  * g_settings_schema_key_get_summary:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Gets the summary for @key.
  *
@@ -1686,21 +1686,21 @@ g_settings_schema_key_get_name (xsettings_schema_key_t *key)
  *
  * Since: 2.34
  **/
-const xchar_t *
-g_settings_schema_key_get_summary (xsettings_schema_key_t *key)
+const gchar *
+g_settings_schema_key_get_summary (GSettingsSchemaKey *key)
 {
-  xhashtable_t **text_tables;
-  xhashtable_t *summaries;
+  GHashTable **text_tables;
+  GHashTable *summaries;
 
   text_tables = g_settings_schema_source_get_text_tables (key->schema->source);
-  summaries = xhash_table_lookup (text_tables[0], key->schema->id);
+  summaries = g_hash_table_lookup (text_tables[0], key->schema->id);
 
-  return summaries ? xhash_table_lookup (summaries, key->name) : NULL;
+  return summaries ? g_hash_table_lookup (summaries, key->name) : NULL;
 }
 
 /**
  * g_settings_schema_key_get_description:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Gets the description for @key.
  *
@@ -1721,39 +1721,39 @@ g_settings_schema_key_get_summary (xsettings_schema_key_t *key)
  *
  * Since: 2.34
  **/
-const xchar_t *
-g_settings_schema_key_get_description (xsettings_schema_key_t *key)
+const gchar *
+g_settings_schema_key_get_description (GSettingsSchemaKey *key)
 {
-  xhashtable_t **text_tables;
-  xhashtable_t *descriptions;
+  GHashTable **text_tables;
+  GHashTable *descriptions;
 
   text_tables = g_settings_schema_source_get_text_tables (key->schema->source);
-  descriptions = xhash_table_lookup (text_tables[1], key->schema->id);
+  descriptions = g_hash_table_lookup (text_tables[1], key->schema->id);
 
-  return descriptions ? xhash_table_lookup (descriptions, key->name) : NULL;
+  return descriptions ? g_hash_table_lookup (descriptions, key->name) : NULL;
 }
 
 /**
  * g_settings_schema_key_get_value_type:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
- * Gets the #xvariant_type_t of @key.
+ * Gets the #GVariantType of @key.
  *
  * Returns: (not nullable) (transfer none): the type of @key
  *
  * Since: 2.40
  **/
-const xvariant_type_t *
-g_settings_schema_key_get_value_type (xsettings_schema_key_t *key)
+const GVariantType *
+g_settings_schema_key_get_value_type (GSettingsSchemaKey *key)
 {
-  xreturn_val_if_fail (key, NULL);
+  g_return_val_if_fail (key, NULL);
 
   return key->type;
 }
 
 /**
  * g_settings_schema_key_get_default_value:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Gets the default value for @key.
  *
@@ -1764,12 +1764,12 @@ g_settings_schema_key_get_value_type (xsettings_schema_key_t *key)
  *
  * Since: 2.40
  **/
-xvariant_t *
-g_settings_schema_key_get_default_value (xsettings_schema_key_t *key)
+GVariant *
+g_settings_schema_key_get_default_value (GSettingsSchemaKey *key)
 {
-  xvariant_t *value;
+  GVariant *value;
 
-  xreturn_val_if_fail (key, NULL);
+  g_return_val_if_fail (key, NULL);
 
   value = g_settings_schema_key_get_translated_default (key);
 
@@ -1777,21 +1777,21 @@ g_settings_schema_key_get_default_value (xsettings_schema_key_t *key)
     value = g_settings_schema_key_get_per_desktop_default (key);
 
   if (!value)
-    value = xvariant_ref (key->default_value);
+    value = g_variant_ref (key->default_value);
 
   return value;
 }
 
 /**
  * g_settings_schema_key_get_range:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  *
  * Queries the range of a key.
  *
- * This function will return a #xvariant_t that fully describes the range
+ * This function will return a #GVariant that fully describes the range
  * of values that are valid for @key.
  *
- * The type of #xvariant_t returned is `(sv)`. The string describes
+ * The type of #GVariant returned is `(sv)`. The string describes
  * the type of range restriction in effect. The type and meaning of
  * the value contained in the variant depends on the string.
  *
@@ -1820,22 +1820,22 @@ g_settings_schema_key_get_default_value (xsettings_schema_key_t *key)
  * format may change in any way in the future -- but particularly, new
  * forms may be added to the possibilities described above.
  *
- * You should free the returned value with xvariant_unref() when it is
+ * You should free the returned value with g_variant_unref() when it is
  * no longer needed.
  *
- * Returns: (not nullable) (transfer full): a #xvariant_t describing the range
+ * Returns: (not nullable) (transfer full): a #GVariant describing the range
  *
  * Since: 2.40
  **/
-xvariant_t *
-g_settings_schema_key_get_range (xsettings_schema_key_t *key)
+GVariant *
+g_settings_schema_key_get_range (GSettingsSchemaKey *key)
 {
-  const xchar_t *type;
-  xvariant_t *range;
+  const gchar *type;
+  GVariant *range;
 
   if (key->minimum)
     {
-      range = xvariant_new ("(**)", key->minimum, key->maximum);
+      range = g_variant_new ("(**)", key->minimum, key->maximum);
       type = "range";
     }
   else if (key->strinfo)
@@ -1845,16 +1845,16 @@ g_settings_schema_key_get_range (xsettings_schema_key_t *key)
     }
   else
     {
-      range = xvariant_new_array (key->type, NULL, 0);
+      range = g_variant_new_array (key->type, NULL, 0);
       type = "type";
     }
 
-  return xvariant_ref_sink (xvariant_new ("(sv)", type, range));
+  return g_variant_ref_sink (g_variant_new ("(sv)", type, range));
 }
 
 /**
  * g_settings_schema_key_range_check:
- * @key: a #xsettings_schema_key_t
+ * @key: a #GSettingsSchemaKey
  * @value: the value to check
  *
  * Checks if the given @value is within the
@@ -1867,24 +1867,24 @@ g_settings_schema_key_get_range (xsettings_schema_key_t *key)
  *
  * Since: 2.40
  **/
-xboolean_t
-g_settings_schema_key_range_check (xsettings_schema_key_t *key,
-                                   xvariant_t           *value)
+gboolean
+g_settings_schema_key_range_check (GSettingsSchemaKey *key,
+                                   GVariant           *value)
 {
   if (key->minimum == NULL && key->strinfo == NULL)
     return TRUE;
 
-  if (xvariant_is_container (value))
+  if (g_variant_is_container (value))
     {
-      xboolean_t ok = TRUE;
-      xvariant_iter_t iter;
-      xvariant_t *child;
+      gboolean ok = TRUE;
+      GVariantIter iter;
+      GVariant *child;
 
-      xvariant_iter_init (&iter, value);
-      while (ok && (child = xvariant_iter_next_value (&iter)))
+      g_variant_iter_init (&iter, value);
+      while (ok && (child = g_variant_iter_next_value (&iter)))
         {
           ok = g_settings_schema_key_range_check (key, child);
-          xvariant_unref (child);
+          g_variant_unref (child);
         }
 
       return ok;
@@ -1892,10 +1892,10 @@ g_settings_schema_key_range_check (xsettings_schema_key_t *key,
 
   if (key->minimum)
     {
-      return xvariant_compare (key->minimum, value) <= 0 &&
-             xvariant_compare (value, key->maximum) <= 0;
+      return g_variant_compare (key->minimum, value) <= 0 &&
+             g_variant_compare (value, key->maximum) <= 0;
     }
 
   return strinfo_is_string_valid (key->strinfo, key->strinfo_length,
-                                  xvariant_get_string (value, NULL));
+                                  g_variant_get_string (value, NULL));
 }

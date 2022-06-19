@@ -152,7 +152,7 @@
       </listitem>
       <listitem>
         <para>
-          xregex_t uses the <ulink url="http://www.pcre.org/">PCRE library</ulink>
+          GRegex uses the <ulink url="http://www.pcre.org/">PCRE library</ulink>
           for regular expression matching. The system version of PCRE is used,
           unless not available (which is the case on Android), in which case a
           fallback subproject is used.
@@ -337,7 +337,7 @@
       <para>
         Enable the generation of coverage reports for the GLib tests.
         This requires the lcov frontend to gcov from the
-        <ulink url="http://ltp.sourceforge.net">Linux test_t Project</ulink>.
+        <ulink url="http://ltp.sourceforge.net">Linux Test Project</ulink>.
         To generate a coverage report, use
         <command>ninja coverage-html</command>. The report is placed in the
         <filename>meson-logs</filename> directory.

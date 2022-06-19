@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_STRINGCHUNK_H__
 #define __G_STRINGCHUNK_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,24 +33,24 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GStringChunk xstring_chunk_t;
+typedef struct _GStringChunk GStringChunk;
 
-XPL_AVAILABLE_IN_ALL
-xstring_chunk_t* xstring_chunk_new          (xsize_t size);
-XPL_AVAILABLE_IN_ALL
-void          xstring_chunk_free         (xstring_chunk_t *chunk);
-XPL_AVAILABLE_IN_ALL
-void          xstring_chunk_clear        (xstring_chunk_t *chunk);
-XPL_AVAILABLE_IN_ALL
-xchar_t*        xstring_chunk_insert       (xstring_chunk_t *chunk,
-                                           const xchar_t  *string);
-XPL_AVAILABLE_IN_ALL
-xchar_t*        xstring_chunk_insert_len   (xstring_chunk_t *chunk,
-                                           const xchar_t  *string,
-                                           xssize_t        len);
-XPL_AVAILABLE_IN_ALL
-xchar_t*        xstring_chunk_insert_const (xstring_chunk_t *chunk,
-                                           const xchar_t  *string);
+GLIB_AVAILABLE_IN_ALL
+GStringChunk* g_string_chunk_new          (gsize size);
+GLIB_AVAILABLE_IN_ALL
+void          g_string_chunk_free         (GStringChunk *chunk);
+GLIB_AVAILABLE_IN_ALL
+void          g_string_chunk_clear        (GStringChunk *chunk);
+GLIB_AVAILABLE_IN_ALL
+gchar*        g_string_chunk_insert       (GStringChunk *chunk,
+                                           const gchar  *string);
+GLIB_AVAILABLE_IN_ALL
+gchar*        g_string_chunk_insert_len   (GStringChunk *chunk,
+                                           const gchar  *string,
+                                           gssize        len);
+GLIB_AVAILABLE_IN_ALL
+gchar*        g_string_chunk_insert_const (GStringChunk *chunk,
+                                           const gchar  *string);
 
 G_END_DECLS
 

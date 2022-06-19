@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  *
  * Copyright (C) 2015-2022 Christian Hergert <christian@hergert.me>
  * Copyright (C) 2015 Garrett Regier <garrettregier@gmail.com>
@@ -29,11 +29,11 @@
 
 /**
  * SECTION:gsignalgroup
- * @Title: xsignal_group_t
- * @Short_description: Manage a collection of signals on a xobject_t
+ * @Title: GSignalGroup
+ * @Short_description: Manage a collection of signals on a GObject
  *
- * #xsignal_group_t manages to simplify the process of connecting
- * many signals to a #xobject_t as a group. As such there is no API
+ * #GSignalGroup manages to simplify the process of connecting
+ * many signals to a #GObject as a group. As such there is no API
  * to disconnect a signal from the group.
  *
  * In particular, this allows you to:
@@ -47,7 +47,7 @@
  * #GtkTextBuffer. Often times, you'll need to connect to many signals on
  * #GtkTextBuffer from a #GtkTextView subclass. This allows you to create a
  * signal group during instance construction, simply bind the
- * #GtkTextView:buffer property to #xsignal_group_t:target and connect
+ * #GtkTextView:buffer property to #GSignalGroup:target and connect
  * all the signals you need. When the #GtkTextView:buffer property changes
  * all of the signals will be transitioned correctly.
  *
@@ -56,43 +56,43 @@
 
 struct _GSignalGroup
 {
-  xobject_t     parent_instance;
+  GObject     parent_instance;
 
   GWeakRef    target_ref;
   GRecMutex   mutex;
-  xptr_array_t  *handlers;
-  xtype_t       target_type;
-  xssize_t      block_count;
+  GPtrArray  *handlers;
+  GType       target_type;
+  gssize      block_count;
 
-  xuint_t       has_bound_at_least_once : 1;
+  guint       has_bound_at_least_once : 1;
 };
 
-typedef struct _xsignal_group_class
+typedef struct _GSignalGroupClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  void (*bind) (xsignal_group_t *self,
-                xobject_t      *target);
-} xsignal_group_class_t;
+  void (*bind) (GSignalGroup *self,
+                GObject      *target);
+} GSignalGroupClass;
 
 typedef struct
 {
-  xsignal_group_t *group;
-  xulong_t             handler_id;
-  xclosure_t          *closure;
-  xuint_t              signal_id;
-  xquark             signal_detail;
-  xuint_t              connect_after : 1;
+  GSignalGroup *group;
+  gulong             handler_id;
+  GClosure          *closure;
+  guint              signal_id;
+  GQuark             signal_detail;
+  guint              connect_after : 1;
 } SignalHandler;
 
-XDEFINE_TYPE (xsignal_group, xsignal_group, XTYPE_OBJECT)
+G_DEFINE_TYPE (GSignalGroup, g_signal_group, G_TYPE_OBJECT)
 
 typedef enum
 {
   PROP_TARGET = 1,
   PROP_TARGET_TYPE,
   LAST_PROP
-} xsignal_group_property_t;
+} GSignalGroupProperty;
 
 enum
 {
@@ -101,39 +101,39 @@ enum
   LAST_SIGNAL
 };
 
-static xparam_spec_t *properties[LAST_PROP];
-static xuint_t signals[LAST_SIGNAL];
+static GParamSpec *properties[LAST_PROP];
+static guint signals[LAST_SIGNAL];
 
 static void
-xsignal_group_set_target_type (xsignal_group_t *self,
-                                xtype_t         target_type)
+g_signal_group_set_target_type (GSignalGroup *self,
+                                GType         target_type)
 {
-  xassert (X_IS_SIGNAL_GROUP (self));
-  xassert (xtype_is_a (target_type, XTYPE_OBJECT));
+  g_assert (G_IS_SIGNAL_GROUP (self));
+  g_assert (g_type_is_a (target_type, G_TYPE_OBJECT));
 
   self->target_type = target_type;
 
   /* The class must be created at least once for the signals
-   * to be registered, otherwise xsignal_parse_name() will fail
+   * to be registered, otherwise g_signal_parse_name() will fail
    */
-  if (XTYPE_IS_INTERFACE (target_type))
+  if (G_TYPE_IS_INTERFACE (target_type))
     {
-      if (xtype_default_interface_peek (target_type) == NULL)
-        xtype_default_interface_unref (xtype_default_interface_ref (target_type));
+      if (g_type_default_interface_peek (target_type) == NULL)
+        g_type_default_interface_unref (g_type_default_interface_ref (target_type));
     }
   else
     {
-      if (xtype_class_peek (target_type) == NULL)
-        xtype_class_unref (xtype_class_ref (target_type));
+      if (g_type_class_peek (target_type) == NULL)
+        g_type_class_unref (g_type_class_ref (target_type));
     }
 }
 
 static void
-xsignal_group_gc_handlers (xsignal_group_t *self)
+g_signal_group_gc_handlers (GSignalGroup *self)
 {
-  xuint_t i;
+  guint i;
 
-  xassert (X_IS_SIGNAL_GROUP (self));
+  g_assert (G_IS_SIGNAL_GROUP (self));
 
   /*
    * Remove any handlers for which the closures have become invalid. We do
@@ -143,25 +143,25 @@ xsignal_group_gc_handlers (xsignal_group_t *self)
 
   for (i = self->handlers->len; i > 0; i--)
     {
-      const SignalHandler *handler = xptr_array_index (self->handlers, i - 1);
+      const SignalHandler *handler = g_ptr_array_index (self->handlers, i - 1);
 
-      xassert (handler != NULL);
-      xassert (handler->closure != NULL);
+      g_assert (handler != NULL);
+      g_assert (handler->closure != NULL);
 
       if (handler->closure->is_invalid)
-        xptr_array_remove_index (self->handlers, i - 1);
+        g_ptr_array_remove_index (self->handlers, i - 1);
     }
 }
 
 static void
-xsignal_group__target_weak_notify (xpointer_t  data,
-                                    xobject_t  *where_object_was)
+g_signal_group__target_weak_notify (gpointer  data,
+                                    GObject  *where_object_was)
 {
-  xsignal_group_t *self = data;
-  xuint_t i;
+  GSignalGroup *self = data;
+  guint i;
 
-  xassert (X_IS_SIGNAL_GROUP (self));
-  xassert (where_object_was != NULL);
+  g_assert (G_IS_SIGNAL_GROUP (self));
+  g_assert (where_object_was != NULL);
 
   g_rec_mutex_lock (&self->mutex);
 
@@ -169,85 +169,85 @@ xsignal_group__target_weak_notify (xpointer_t  data,
 
   for (i = 0; i < self->handlers->len; i++)
     {
-      SignalHandler *handler = xptr_array_index (self->handlers, i);
+      SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
       handler->handler_id = 0;
     }
 
-  xsignal_emit (self, signals[UNBIND], 0);
-  xobject_notify_by_pspec (G_OBJECT (self), properties[PROP_TARGET]);
+  g_signal_emit (self, signals[UNBIND], 0);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TARGET]);
 
   g_rec_mutex_unlock (&self->mutex);
 }
 
 static void
-xsignal_group_bind_handler (xsignal_group_t  *self,
+g_signal_group_bind_handler (GSignalGroup  *self,
                              SignalHandler *handler,
-                             xobject_t       *target)
+                             GObject       *target)
 {
-  xssize_t i;
+  gssize i;
 
-  xassert (self != NULL);
-  xassert (X_IS_OBJECT (target));
-  xassert (handler != NULL);
-  xassert (handler->signal_id != 0);
-  xassert (handler->closure != NULL);
-  xassert (handler->closure->is_invalid == 0);
-  xassert (handler->handler_id == 0);
+  g_assert (self != NULL);
+  g_assert (G_IS_OBJECT (target));
+  g_assert (handler != NULL);
+  g_assert (handler->signal_id != 0);
+  g_assert (handler->closure != NULL);
+  g_assert (handler->closure->is_invalid == 0);
+  g_assert (handler->handler_id == 0);
 
-  handler->handler_id = xsignal_connect_closure_by_id (target,
+  handler->handler_id = g_signal_connect_closure_by_id (target,
                                                         handler->signal_id,
                                                         handler->signal_detail,
                                                         handler->closure,
                                                         handler->connect_after);
 
-  xassert (handler->handler_id != 0);
+  g_assert (handler->handler_id != 0);
 
   for (i = 0; i < self->block_count; i++)
-    xsignal_handler_block (target, handler->handler_id);
+    g_signal_handler_block (target, handler->handler_id);
 }
 
 static void
-xsignal_group_bind (xsignal_group_t *self,
-                     xobject_t      *target)
+g_signal_group_bind (GSignalGroup *self,
+                     GObject      *target)
 {
-  xobject_t *hold;
-  xuint_t i;
+  GObject *hold;
+  guint i;
 
-  xassert (X_IS_SIGNAL_GROUP (self));
-  xassert (!target || X_IS_OBJECT (target));
+  g_assert (G_IS_SIGNAL_GROUP (self));
+  g_assert (!target || G_IS_OBJECT (target));
 
   if (target == NULL)
     return;
 
   self->has_bound_at_least_once = TRUE;
 
-  hold = xobject_ref (target);
+  hold = g_object_ref (target);
 
   g_weak_ref_set (&self->target_ref, hold);
-  xobject_weak_ref (hold, xsignal_group__target_weak_notify, self);
+  g_object_weak_ref (hold, g_signal_group__target_weak_notify, self);
 
-  xsignal_group_gc_handlers (self);
+  g_signal_group_gc_handlers (self);
 
   for (i = 0; i < self->handlers->len; i++)
     {
-      SignalHandler *handler = xptr_array_index (self->handlers, i);
+      SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
-      xsignal_group_bind_handler (self, handler, hold);
+      g_signal_group_bind_handler (self, handler, hold);
     }
 
-  xsignal_emit (self, signals [BIND], 0, hold);
+  g_signal_emit (self, signals [BIND], 0, hold);
 
-  xobject_unref (hold);
+  g_object_unref (hold);
 }
 
 static void
-xsignal_group_unbind (xsignal_group_t *self)
+g_signal_group_unbind (GSignalGroup *self)
 {
-  xobject_t *target;
-  xuint_t i;
+  GObject *target;
+  guint i;
 
-  g_return_if_fail (X_IS_SIGNAL_GROUP (self));
+  g_return_if_fail (G_IS_SIGNAL_GROUP (self));
 
   target = g_weak_ref_get (&self->target_ref);
 
@@ -265,23 +265,23 @@ xsignal_group_unbind (xsignal_group_t *self)
        * Let go of our weak reference now that we have a full reference
        * for the life of this function.
        */
-      xobject_weak_unref (target,
-                           xsignal_group__target_weak_notify,
+      g_object_weak_unref (target,
+                           g_signal_group__target_weak_notify,
                            self);
     }
 
-  xsignal_group_gc_handlers (self);
+  g_signal_group_gc_handlers (self);
 
   for (i = 0; i < self->handlers->len; i++)
     {
       SignalHandler *handler;
-      xulong_t handler_id;
+      gulong handler_id;
 
-      handler = xptr_array_index (self->handlers, i);
+      handler = g_ptr_array_index (self->handlers, i);
 
-      xassert (handler != NULL);
-      xassert (handler->signal_id != 0);
-      xassert (handler->closure != NULL);
+      g_assert (handler != NULL);
+      g_assert (handler->signal_id != 0);
+      g_assert (handler->closure != NULL);
 
       handler_id = handler->handler_id;
       handler->handler_id = 0;
@@ -293,24 +293,24 @@ xsignal_group_unbind (xsignal_group_t *self)
        */
 
       if (target != NULL && handler_id != 0)
-        xsignal_handler_disconnect (target, handler_id);
+        g_signal_handler_disconnect (target, handler_id);
     }
 
-  xsignal_emit (self, signals [UNBIND], 0);
+  g_signal_emit (self, signals [UNBIND], 0);
 
   g_clear_object (&target);
 }
 
-static xboolean_t
-xsignal_group_check_target_type (xsignal_group_t *self,
-                                  xpointer_t      target)
+static gboolean
+g_signal_group_check_target_type (GSignalGroup *self,
+                                  gpointer      target)
 {
   if ((target != NULL) &&
-      !xtype_is_a (G_OBJECT_TYPE (target), self->target_type))
+      !g_type_is_a (G_OBJECT_TYPE (target), self->target_type))
     {
-      g_critical ("Failed to set xsignal_group_t of target type %s "
+      g_critical ("Failed to set GSignalGroup of target type %s "
                   "using target %p of type %s",
-                  xtype_name (self->target_type),
+                  g_type_name (self->target_type),
                   target, G_OBJECT_TYPE_NAME (target));
       return FALSE;
     }
@@ -319,8 +319,8 @@ xsignal_group_check_target_type (xsignal_group_t *self,
 }
 
 /**
- * xsignal_group_block:
- * @self: the #xsignal_group_t
+ * g_signal_group_block:
+ * @self: the #GSignalGroup
  *
  * Blocks all signal handlers managed by @self so they will not
  * be called during any signal emissions. Must be unblocked exactly
@@ -331,12 +331,12 @@ xsignal_group_check_target_type (xsignal_group_t *self,
  * Since: 2.72
  */
 void
-xsignal_group_block (xsignal_group_t *self)
+g_signal_group_block (GSignalGroup *self)
 {
-  xobject_t *target;
-  xuint_t i;
+  GObject *target;
+  guint i;
 
-  g_return_if_fail (X_IS_SIGNAL_GROUP (self));
+  g_return_if_fail (G_IS_SIGNAL_GROUP (self));
   g_return_if_fail (self->block_count >= 0);
 
   g_rec_mutex_lock (&self->mutex);
@@ -350,25 +350,25 @@ xsignal_group_block (xsignal_group_t *self)
 
   for (i = 0; i < self->handlers->len; i++)
     {
-      const SignalHandler *handler = xptr_array_index (self->handlers, i);
+      const SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
-      xassert (handler != NULL);
-      xassert (handler->signal_id != 0);
-      xassert (handler->closure != NULL);
-      xassert (handler->handler_id != 0);
+      g_assert (handler != NULL);
+      g_assert (handler->signal_id != 0);
+      g_assert (handler->closure != NULL);
+      g_assert (handler->handler_id != 0);
 
-      xsignal_handler_block (target, handler->handler_id);
+      g_signal_handler_block (target, handler->handler_id);
     }
 
-  xobject_unref (target);
+  g_object_unref (target);
 
 unlock:
   g_rec_mutex_unlock (&self->mutex);
 }
 
 /**
- * xsignal_group_unblock:
- * @self: the #xsignal_group_t
+ * g_signal_group_unblock:
+ * @self: the #GSignalGroup
  *
  * Unblocks all signal handlers managed by @self so they will be
  * called again during any signal emissions unless it is blocked
@@ -378,12 +378,12 @@ unlock:
  * Since: 2.72
  */
 void
-xsignal_group_unblock (xsignal_group_t *self)
+g_signal_group_unblock (GSignalGroup *self)
 {
-  xobject_t *target;
-  xuint_t i;
+  GObject *target;
+  guint i;
 
-  g_return_if_fail (X_IS_SIGNAL_GROUP (self));
+  g_return_if_fail (G_IS_SIGNAL_GROUP (self));
   g_return_if_fail (self->block_count > 0);
 
   g_rec_mutex_lock (&self->mutex);
@@ -396,38 +396,38 @@ xsignal_group_unblock (xsignal_group_t *self)
 
   for (i = 0; i < self->handlers->len; i++)
     {
-      const SignalHandler *handler = xptr_array_index (self->handlers, i);
+      const SignalHandler *handler = g_ptr_array_index (self->handlers, i);
 
-      xassert (handler != NULL);
-      xassert (handler->signal_id != 0);
-      xassert (handler->closure != NULL);
-      xassert (handler->handler_id != 0);
+      g_assert (handler != NULL);
+      g_assert (handler->signal_id != 0);
+      g_assert (handler->closure != NULL);
+      g_assert (handler->handler_id != 0);
 
-      xsignal_handler_unblock (target, handler->handler_id);
+      g_signal_handler_unblock (target, handler->handler_id);
     }
 
-  xobject_unref (target);
+  g_object_unref (target);
 
 unlock:
   g_rec_mutex_unlock (&self->mutex);
 }
 
 /**
- * xsignal_group_dup_target:
- * @self: the #xsignal_group_t
+ * g_signal_group_dup_target:
+ * @self: the #GSignalGroup
  *
  * Gets the target instance used when connecting signals.
  *
- * Returns: (nullable) (transfer full) (type xobject_t): The target instance
+ * Returns: (nullable) (transfer full) (type GObject): The target instance
  *
  * Since: 2.72
  */
-xpointer_t
-xsignal_group_dup_target (xsignal_group_t *self)
+gpointer
+g_signal_group_dup_target (GSignalGroup *self)
 {
-  xobject_t *target;
+  GObject *target;
 
-  xreturn_val_if_fail (X_IS_SIGNAL_GROUP (self), NULL);
+  g_return_val_if_fail (G_IS_SIGNAL_GROUP (self), NULL);
 
   g_rec_mutex_lock (&self->mutex);
   target = g_weak_ref_get (&self->target_ref);
@@ -437,13 +437,13 @@ xsignal_group_dup_target (xsignal_group_t *self)
 }
 
 /**
- * xsignal_group_set_target:
- * @self: the #xsignal_group_t.
- * @target: (nullable) (type xobject_t) (transfer none): The target instance used
+ * g_signal_group_set_target:
+ * @self: the #GSignalGroup.
+ * @target: (nullable) (type GObject) (transfer none): The target instance used
  *     when connecting signals.
  *
  * Sets the target instance used when connecting signals. Any signal
- * that has been registered with xsignal_group_connect_object() or
+ * that has been registered with g_signal_group_connect_object() or
  * similar functions will be connected to this object.
  *
  * If the target instance was previously set, signals will be
@@ -452,30 +452,30 @@ xsignal_group_dup_target (xsignal_group_t *self)
  * Since: 2.72
  */
 void
-xsignal_group_set_target (xsignal_group_t *self,
-                           xpointer_t      target)
+g_signal_group_set_target (GSignalGroup *self,
+                           gpointer      target)
 {
-  xobject_t *object;
+  GObject *object;
 
-  g_return_if_fail (X_IS_SIGNAL_GROUP (self));
+  g_return_if_fail (G_IS_SIGNAL_GROUP (self));
 
   g_rec_mutex_lock (&self->mutex);
 
   object = g_weak_ref_get (&self->target_ref);
 
-  if (object == (xobject_t *)target)
+  if (object == (GObject *)target)
     goto cleanup;
 
-  if (!xsignal_group_check_target_type (self, target))
+  if (!g_signal_group_check_target_type (self, target))
     goto cleanup;
 
   /* Only emit unbind if we've ever called bind */
   if (self->has_bound_at_least_once)
-    xsignal_group_unbind (self);
+    g_signal_group_unbind (self);
 
-  xsignal_group_bind (self, target);
+  g_signal_group_bind (self, target);
 
-  xobject_notify_by_pspec (G_OBJECT (self), properties[PROP_TARGET]);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TARGET]);
 
 cleanup:
   g_clear_object (&object);
@@ -483,33 +483,33 @@ cleanup:
 }
 
 static void
-signal_handler_free (xpointer_t data)
+signal_handler_free (gpointer data)
 {
   SignalHandler *handler = data;
 
   if (handler->closure != NULL)
-    xclosure_invalidate (handler->closure);
+    g_closure_invalidate (handler->closure);
 
   handler->handler_id = 0;
   handler->signal_id = 0;
   handler->signal_detail = 0;
-  g_clear_pointer (&handler->closure, xclosure_unref);
+  g_clear_pointer (&handler->closure, g_closure_unref);
   g_slice_free (SignalHandler, handler);
 }
 
 static void
-xsignal_group_constructed (xobject_t *object)
+g_signal_group_constructed (GObject *object)
 {
-  xsignal_group_t *self = (xsignal_group_t *)object;
-  xobject_t *target;
+  GSignalGroup *self = (GSignalGroup *)object;
+  GObject *target;
 
   g_rec_mutex_lock (&self->mutex);
 
   target = g_weak_ref_get (&self->target_ref);
-  if (!xsignal_group_check_target_type (self, target))
-    xsignal_group_set_target (self, NULL);
+  if (!g_signal_group_check_target_type (self, target))
+    g_signal_group_set_target (self, NULL);
 
-  XOBJECT_CLASS (xsignal_group_parent_class)->constructed (object);
+  G_OBJECT_CLASS (g_signal_group_parent_class)->constructed (object);
 
   g_clear_object (&target);
 
@@ -517,51 +517,51 @@ xsignal_group_constructed (xobject_t *object)
 }
 
 static void
-xsignal_group_dispose (xobject_t *object)
+g_signal_group_dispose (GObject *object)
 {
-  xsignal_group_t *self = (xsignal_group_t *)object;
+  GSignalGroup *self = (GSignalGroup *)object;
 
   g_rec_mutex_lock (&self->mutex);
 
-  xsignal_group_gc_handlers (self);
+  g_signal_group_gc_handlers (self);
 
   if (self->has_bound_at_least_once)
-    xsignal_group_unbind (self);
+    g_signal_group_unbind (self);
 
-  g_clear_pointer (&self->handlers, xptr_array_unref);
+  g_clear_pointer (&self->handlers, g_ptr_array_unref);
 
   g_rec_mutex_unlock (&self->mutex);
 
-  XOBJECT_CLASS (xsignal_group_parent_class)->dispose (object);
+  G_OBJECT_CLASS (g_signal_group_parent_class)->dispose (object);
 }
 
 static void
-xsignal_group_finalize (xobject_t *object)
+g_signal_group_finalize (GObject *object)
 {
-  xsignal_group_t *self = (xsignal_group_t *)object;
+  GSignalGroup *self = (GSignalGroup *)object;
 
   g_weak_ref_clear (&self->target_ref);
   g_rec_mutex_clear (&self->mutex);
 
-  XOBJECT_CLASS (xsignal_group_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_signal_group_parent_class)->finalize (object);
 }
 
 static void
-xsignal_group_get_property (xobject_t    *object,
-                             xuint_t       prop_id,
-                             xvalue_t     *value,
-                             xparam_spec_t *pspec)
+g_signal_group_get_property (GObject    *object,
+                             guint       prop_id,
+                             GValue     *value,
+                             GParamSpec *pspec)
 {
-  xsignal_group_t *self = G_SIGNAL_GROUP (object);
+  GSignalGroup *self = G_SIGNAL_GROUP (object);
 
-  switch ((xsignal_group_property_t) prop_id)
+  switch ((GSignalGroupProperty) prop_id)
     {
     case PROP_TARGET:
-      xvalue_take_object (value, xsignal_group_dup_target (self));
+      g_value_take_object (value, g_signal_group_dup_target (self));
       break;
 
     case PROP_TARGET_TYPE:
-      xvalue_set_gtype (value, self->target_type);
+      g_value_set_gtype (value, self->target_type);
       break;
 
     default:
@@ -570,21 +570,21 @@ xsignal_group_get_property (xobject_t    *object,
 }
 
 static void
-xsignal_group_set_property (xobject_t      *object,
-                             xuint_t         prop_id,
-                             const xvalue_t *value,
-                             xparam_spec_t   *pspec)
+g_signal_group_set_property (GObject      *object,
+                             guint         prop_id,
+                             const GValue *value,
+                             GParamSpec   *pspec)
 {
-  xsignal_group_t *self = G_SIGNAL_GROUP (object);
+  GSignalGroup *self = G_SIGNAL_GROUP (object);
 
-  switch ((xsignal_group_property_t) prop_id)
+  switch ((GSignalGroupProperty) prop_id)
     {
     case PROP_TARGET:
-      xsignal_group_set_target (self, xvalue_get_object (value));
+      g_signal_group_set_target (self, g_value_get_object (value));
       break;
 
     case PROP_TARGET_TYPE:
-      xsignal_group_set_target_type (self, xvalue_get_gtype (value));
+      g_signal_group_set_target_type (self, g_value_get_gtype (value));
       break;
 
     default:
@@ -593,74 +593,74 @@ xsignal_group_set_property (xobject_t      *object,
 }
 
 static void
-xsignal_group_class_init (xsignal_group_class_t *klass)
+g_signal_group_class_init (GSignalGroupClass *klass)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->constructed = xsignal_group_constructed;
-  object_class->dispose = xsignal_group_dispose;
-  object_class->finalize = xsignal_group_finalize;
-  object_class->get_property = xsignal_group_get_property;
-  object_class->set_property = xsignal_group_set_property;
+  object_class->constructed = g_signal_group_constructed;
+  object_class->dispose = g_signal_group_dispose;
+  object_class->finalize = g_signal_group_finalize;
+  object_class->get_property = g_signal_group_get_property;
+  object_class->set_property = g_signal_group_set_property;
 
   /**
-   * xsignal_group_t:target
+   * GSignalGroup:target
    *
    * The target instance used when connecting signals.
    *
    * Since: 2.72
    */
   properties[PROP_TARGET] =
-      xparam_spec_object ("target",
+      g_param_spec_object ("target",
                            "Target",
                            "The target instance used when connecting signals.",
-                           XTYPE_OBJECT,
-                           (XPARAM_READWRITE | XPARAM_EXPLICIT_NOTIFY | XPARAM_STATIC_STRINGS));
+                           G_TYPE_OBJECT,
+                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsignal_group_t:target-type
+   * GSignalGroup:target-type
    *
-   * The #xtype_t of the target property.
+   * The #GType of the target property.
    *
    * Since: 2.72
    */
   properties[PROP_TARGET_TYPE] =
-      xparam_spec_gtype ("target-type",
+      g_param_spec_gtype ("target-type",
                           "Target Type",
-                          "The xtype_t of the target property.",
-                          XTYPE_OBJECT,
-                          (XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_STRINGS));
+                          "The GType of the target property.",
+                          G_TYPE_OBJECT,
+                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_properties (object_class, LAST_PROP, properties);
+  g_object_class_install_properties (object_class, LAST_PROP, properties);
 
   /**
-   * xsignal_group_t::bind:
-   * @self: the #xsignal_group_t
-   * @instance: a #xobject_t containing the new value for #xsignal_group_t:target
+   * GSignalGroup::bind:
+   * @self: the #GSignalGroup
+   * @instance: a #GObject containing the new value for #GSignalGroup:target
    *
-   * This signal is emitted when #xsignal_group_t:target is set to a new value
-   * other than %NULL. It is similar to #xobject_t::notify on `target` except it
-   * will not emit when #xsignal_group_t:target is %NULL and also allows for
-   * receiving the #xobject_t without a data-race.
+   * This signal is emitted when #GSignalGroup:target is set to a new value
+   * other than %NULL. It is similar to #GObject::notify on `target` except it
+   * will not emit when #GSignalGroup:target is %NULL and also allows for
+   * receiving the #GObject without a data-race.
    *
    * Since: 2.72
    */
   signals[BIND] =
-      xsignal_new ("bind",
-                    XTYPE_FROM_CLASS (klass),
+      g_signal_new ("bind",
+                    G_TYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST,
                     0,
                     NULL, NULL, NULL,
-                    XTYPE_NONE,
+                    G_TYPE_NONE,
                     1,
-                    XTYPE_OBJECT);
+                    G_TYPE_OBJECT);
 
   /**
-   * xsignal_group_t::unbind:
-   * @self: a #xsignal_group_t
+   * GSignalGroup::unbind:
+   * @self: a #GSignalGroup
    *
    * This signal is emitted when the target instance of @self is set to a
-   * new #xobject_t.
+   * new #GObject.
    *
    * This signal will only be emitted if the previous target of @self is
    * non-%NULL.
@@ -668,64 +668,64 @@ xsignal_group_class_init (xsignal_group_class_t *klass)
    * Since: 2.72
    */
   signals[UNBIND] =
-      xsignal_new ("unbind",
-                    XTYPE_FROM_CLASS (klass),
+      g_signal_new ("unbind",
+                    G_TYPE_FROM_CLASS (klass),
                     G_SIGNAL_RUN_LAST,
                     0,
                     NULL, NULL, NULL,
-                    XTYPE_NONE,
+                    G_TYPE_NONE,
                     0);
 }
 
 static void
-xsignal_group_init (xsignal_group_t *self)
+g_signal_group_init (GSignalGroup *self)
 {
   g_rec_mutex_init (&self->mutex);
-  self->handlers = xptr_array_new_with_free_func (signal_handler_free);
-  self->target_type = XTYPE_OBJECT;
+  self->handlers = g_ptr_array_new_with_free_func (signal_handler_free);
+  self->target_type = G_TYPE_OBJECT;
 }
 
 /**
- * xsignal_group_new:
- * @target_type: the #xtype_t of the target instance.
+ * g_signal_group_new:
+ * @target_type: the #GType of the target instance.
  *
- * Creates a new #xsignal_group_t for target instances of @target_type.
+ * Creates a new #GSignalGroup for target instances of @target_type.
  *
- * Returns: (transfer full): a new #xsignal_group_t
+ * Returns: (transfer full): a new #GSignalGroup
  *
  * Since: 2.72
  */
-xsignal_group_t *
-xsignal_group_new (xtype_t target_type)
+GSignalGroup *
+g_signal_group_new (GType target_type)
 {
-  xreturn_val_if_fail (xtype_is_a (target_type, XTYPE_OBJECT), NULL);
+  g_return_val_if_fail (g_type_is_a (target_type, G_TYPE_OBJECT), NULL);
 
-  return xobject_new (XTYPE_SIGNAL_GROUP,
+  return g_object_new (G_TYPE_SIGNAL_GROUP,
                        "target-type", target_type,
                        NULL);
 }
 
 static void
-xsignal_group_connect_full (xsignal_group_t   *self,
-                             const xchar_t    *detailed_signal,
-                             xcallback_t       c_handler,
-                             xpointer_t        data,
-                             xclosure_notify_t  notify,
+g_signal_group_connect_full (GSignalGroup   *self,
+                             const gchar    *detailed_signal,
+                             GCallback       c_handler,
+                             gpointer        data,
+                             GClosureNotify  notify,
                              GConnectFlags   flags,
-                             xboolean_t        is_object)
+                             gboolean        is_object)
 {
-  xobject_t *target;
+  GObject *target;
   SignalHandler *handler;
-  xclosure_t *closure;
-  xuint_t signal_id;
-  xquark signal_detail;
+  GClosure *closure;
+  guint signal_id;
+  GQuark signal_detail;
 
-  g_return_if_fail (X_IS_SIGNAL_GROUP (self));
+  g_return_if_fail (G_IS_SIGNAL_GROUP (self));
   g_return_if_fail (detailed_signal != NULL);
-  g_return_if_fail (xsignal_parse_name (detailed_signal, self->target_type,
+  g_return_if_fail (g_signal_parse_name (detailed_signal, self->target_type,
                                          &signal_id, &signal_detail, TRUE) != 0);
   g_return_if_fail (c_handler != NULL);
-  g_return_if_fail (!is_object || X_IS_OBJECT (data));
+  g_return_if_fail (!is_object || G_IS_OBJECT (data));
 
   g_rec_mutex_lock (&self->mutex);
 
@@ -745,10 +745,10 @@ xsignal_group_connect_full (xsignal_group_t   *self,
   handler->group = self;
   handler->signal_id = signal_id;
   handler->signal_detail = signal_detail;
-  handler->closure = xclosure_ref (closure);
+  handler->closure = g_closure_ref (closure);
   handler->connect_after = ((flags & G_CONNECT_AFTER) != 0);
 
-  xclosure_sink (closure);
+  g_closure_sink (closure);
 
   if (is_object)
     {
@@ -756,61 +756,61 @@ xsignal_group_connect_full (xsignal_group_t   *self,
        * reconnecting in the future. However, we do a round of cleanup when ever we
        * connect a new object or the target changes to GC the old handlers.
        */
-      xobject_watch_closure (data, closure);
+      g_object_watch_closure (data, closure);
     }
 
-  xptr_array_add (self->handlers, handler);
+  g_ptr_array_add (self->handlers, handler);
 
   target = g_weak_ref_get (&self->target_ref);
 
   if (target != NULL)
     {
-      xsignal_group_bind_handler (self, handler, target);
-      xobject_unref (target);
+      g_signal_group_bind_handler (self, handler, target);
+      g_object_unref (target);
     }
 
   /* Lazily remove any old handlers on connect */
-  xsignal_group_gc_handlers (self);
+  g_signal_group_gc_handlers (self);
 
   g_rec_mutex_unlock (&self->mutex);
 }
 
 /**
- * xsignal_group_connect_object: (skip)
- * @self: a #xsignal_group_t
+ * g_signal_group_connect_object: (skip)
+ * @self: a #GSignalGroup
  * @detailed_signal: a string of the form `signal-name` with optional `::signal-detail`
- * @c_handler: (scope notified): the #xcallback_t to connect
- * @object: (not nullable) (transfer none): the #xobject_t to pass as data to @c_handler calls
+ * @c_handler: (scope notified): the #GCallback to connect
+ * @object: (not nullable) (transfer none): the #GObject to pass as data to @c_handler calls
  * @flags: #GConnectFlags for the signal connection
  *
- * Connects @c_handler to the signal @detailed_signal on #xsignal_group_t:target.
+ * Connects @c_handler to the signal @detailed_signal on #GSignalGroup:target.
  *
  * Ensures that the @object stays alive during the call to @c_handler
  * by temporarily adding a reference count. When the @object is destroyed
  * the signal handler will automatically be removed.
  *
- * You cannot connect a signal handler after #xsignal_group_t:target has been set.
+ * You cannot connect a signal handler after #GSignalGroup:target has been set.
  *
  * Since: 2.72
  */
 void
-xsignal_group_connect_object (xsignal_group_t  *self,
-                               const xchar_t   *detailed_signal,
-                               xcallback_t      c_handler,
-                               xpointer_t       object,
+g_signal_group_connect_object (GSignalGroup  *self,
+                               const gchar   *detailed_signal,
+                               GCallback      c_handler,
+                               gpointer       object,
                                GConnectFlags  flags)
 {
-  g_return_if_fail (X_IS_OBJECT (object));
+  g_return_if_fail (G_IS_OBJECT (object));
 
-  xsignal_group_connect_full (self, detailed_signal, c_handler, object, NULL,
+  g_signal_group_connect_full (self, detailed_signal, c_handler, object, NULL,
                                flags, TRUE);
 }
 
 /**
- * xsignal_group_connect_data:
- * @self: a #xsignal_group_t
+ * g_signal_group_connect_data:
+ * @self: a #GSignalGroup
  * @detailed_signal: a string of the form "signal-name::detail"
- * @c_handler: (scope notified) (closure data) (destroy notify): the #xcallback_t to connect
+ * @c_handler: (scope notified) (closure data) (destroy notify): the #GCallback to connect
  * @data: the data to pass to @c_handler calls
  * @notify: function to be called when disposing of @self
  * @flags: the flags used to create the signal connection
@@ -818,51 +818,51 @@ xsignal_group_connect_object (xsignal_group_t  *self,
  * Connects @c_handler to the signal @detailed_signal
  * on the target instance of @self.
  *
- * You cannot connect a signal handler after #xsignal_group_t:target has been set.
+ * You cannot connect a signal handler after #GSignalGroup:target has been set.
  *
  * Since: 2.72
  */
 void
-xsignal_group_connect_data (xsignal_group_t   *self,
-                             const xchar_t    *detailed_signal,
-                             xcallback_t       c_handler,
-                             xpointer_t        data,
-                             xclosure_notify_t  notify,
+g_signal_group_connect_data (GSignalGroup   *self,
+                             const gchar    *detailed_signal,
+                             GCallback       c_handler,
+                             gpointer        data,
+                             GClosureNotify  notify,
                              GConnectFlags   flags)
 {
-  xsignal_group_connect_full (self, detailed_signal, c_handler, data, notify,
+  g_signal_group_connect_full (self, detailed_signal, c_handler, data, notify,
                                flags, FALSE);
 }
 
 /**
- * xsignal_group_connect: (skip)
- * @self: a #xsignal_group_t
+ * g_signal_group_connect: (skip)
+ * @self: a #GSignalGroup
  * @detailed_signal: a string of the form "signal-name::detail"
- * @c_handler: (scope notified): the #xcallback_t to connect
+ * @c_handler: (scope notified): the #GCallback to connect
  * @data: the data to pass to @c_handler calls
  *
  * Connects @c_handler to the signal @detailed_signal
  * on the target instance of @self.
  *
- * You cannot connect a signal handler after #xsignal_group_t:target has been set.
+ * You cannot connect a signal handler after #GSignalGroup:target has been set.
  *
  * Since: 2.72
  */
 void
-xsignal_group_connect (xsignal_group_t *self,
-                        const xchar_t  *detailed_signal,
-                        xcallback_t     c_handler,
-                        xpointer_t      data)
+g_signal_group_connect (GSignalGroup *self,
+                        const gchar  *detailed_signal,
+                        GCallback     c_handler,
+                        gpointer      data)
 {
-  xsignal_group_connect_full (self, detailed_signal, c_handler, data, NULL,
+  g_signal_group_connect_full (self, detailed_signal, c_handler, data, NULL,
                                0, FALSE);
 }
 
 /**
- * xsignal_group_connect_after: (skip)
- * @self: a #xsignal_group_t
+ * g_signal_group_connect_after: (skip)
+ * @self: a #GSignalGroup
  * @detailed_signal: a string of the form "signal-name::detail"
- * @c_handler: (scope notified): the #xcallback_t to connect
+ * @c_handler: (scope notified): the #GCallback to connect
  * @data: the data to pass to @c_handler calls
  *
  * Connects @c_handler to the signal @detailed_signal
@@ -870,25 +870,25 @@ xsignal_group_connect (xsignal_group_t *self,
  *
  * The @c_handler will be called after the default handler of the signal.
  *
- * You cannot connect a signal handler after #xsignal_group_t:target has been set.
+ * You cannot connect a signal handler after #GSignalGroup:target has been set.
  *
  * Since: 2.72
  */
 void
-xsignal_group_connect_after (xsignal_group_t *self,
-                              const xchar_t  *detailed_signal,
-                              xcallback_t     c_handler,
-                              xpointer_t      data)
+g_signal_group_connect_after (GSignalGroup *self,
+                              const gchar  *detailed_signal,
+                              GCallback     c_handler,
+                              gpointer      data)
 {
-  xsignal_group_connect_full (self, detailed_signal, c_handler,
+  g_signal_group_connect_full (self, detailed_signal, c_handler,
                                data, NULL, G_CONNECT_AFTER, FALSE);
 }
 
 /**
- * xsignal_group_connect_swapped:
- * @self: a #xsignal_group_t
+ * g_signal_group_connect_swapped:
+ * @self: a #GSignalGroup
  * @detailed_signal: a string of the form "signal-name::detail"
- * @c_handler: (scope async): the #xcallback_t to connect
+ * @c_handler: (scope async): the #GCallback to connect
  * @data: the data to pass to @c_handler calls
  *
  * Connects @c_handler to the signal @detailed_signal
@@ -897,16 +897,16 @@ xsignal_group_connect_after (xsignal_group_t *self,
  * The instance on which the signal is emitted and @data
  * will be swapped when calling @c_handler.
  *
- * You cannot connect a signal handler after #xsignal_group_t:target has been set.
+ * You cannot connect a signal handler after #GSignalGroup:target has been set.
  *
  * Since: 2.72
  */
 void
-xsignal_group_connect_swapped (xsignal_group_t *self,
-                                const xchar_t  *detailed_signal,
-                                xcallback_t     c_handler,
-                                xpointer_t      data)
+g_signal_group_connect_swapped (GSignalGroup *self,
+                                const gchar  *detailed_signal,
+                                GCallback     c_handler,
+                                gpointer      data)
 {
-  xsignal_group_connect_full (self, detailed_signal, c_handler, data, NULL,
+  g_signal_group_connect_full (self, detailed_signal, c_handler, data, NULL,
                                G_CONNECT_SWAPPED, FALSE);
 }

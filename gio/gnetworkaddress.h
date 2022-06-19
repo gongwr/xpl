@@ -27,19 +27,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_ADDRESS         (g_network_address_get_type ())
-#define G_NETWORK_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_ADDRESS, xnetwork_address))
-#define G_NETWORK_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_ADDRESS, GNetworkAddressClass))
-#define X_IS_NETWORK_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_ADDRESS))
-#define X_IS_NETWORK_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_ADDRESS))
-#define G_NETWORK_ADDRESS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_ADDRESS, GNetworkAddressClass))
+#define G_TYPE_NETWORK_ADDRESS         (g_network_address_get_type ())
+#define G_NETWORK_ADDRESS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_ADDRESS, GNetworkAddress))
+#define G_NETWORK_ADDRESS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NETWORK_ADDRESS, GNetworkAddressClass))
+#define G_IS_NETWORK_ADDRESS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_ADDRESS))
+#define G_IS_NETWORK_ADDRESS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NETWORK_ADDRESS))
+#define G_NETWORK_ADDRESS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NETWORK_ADDRESS, GNetworkAddressClass))
 
 typedef struct _GNetworkAddressClass   GNetworkAddressClass;
 typedef struct _GNetworkAddressPrivate GNetworkAddressPrivate;
 
 struct _GNetworkAddress
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
   GNetworkAddressPrivate *priv;
@@ -47,32 +47,32 @@ struct _GNetworkAddress
 
 struct _GNetworkAddressClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t               g_network_address_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType               g_network_address_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_connectable_t *g_network_address_new          (const xchar_t      *hostname,
-						    xuint16_t           port);
-XPL_AVAILABLE_IN_2_44
-xsocket_connectable_t *g_network_address_new_loopback (xuint16_t           port);
-XPL_AVAILABLE_IN_ALL
-xsocket_connectable_t *g_network_address_parse        (const xchar_t      *host_and_port,
-						    xuint16_t           default_port,
-						    xerror_t          **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_connectable_t *g_network_address_parse_uri    (const xchar_t      *uri,
-    						    xuint16_t           default_port,
-						    xerror_t          **error);
-XPL_AVAILABLE_IN_ALL
-const xchar_t        *g_network_address_get_hostname (xnetwork_address_t  *addr);
-XPL_AVAILABLE_IN_ALL
-xuint16_t             g_network_address_get_port     (xnetwork_address_t  *addr);
-XPL_AVAILABLE_IN_ALL
-const xchar_t        *g_network_address_get_scheme   (xnetwork_address_t  *addr);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnectable *g_network_address_new          (const gchar      *hostname,
+						    guint16           port);
+GLIB_AVAILABLE_IN_2_44
+GSocketConnectable *g_network_address_new_loopback (guint16           port);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnectable *g_network_address_parse        (const gchar      *host_and_port,
+						    guint16           default_port,
+						    GError          **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnectable *g_network_address_parse_uri    (const gchar      *uri,
+    						    guint16           default_port,
+						    GError          **error);
+GLIB_AVAILABLE_IN_ALL
+const gchar        *g_network_address_get_hostname (GNetworkAddress  *addr);
+GLIB_AVAILABLE_IN_ALL
+guint16             g_network_address_get_port     (GNetworkAddress  *addr);
+GLIB_AVAILABLE_IN_ALL
+const gchar        *g_network_address_get_scheme   (GNetworkAddress  *addr);
 
 
 G_END_DECLS

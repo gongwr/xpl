@@ -4,10 +4,10 @@ dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 
-# test_t for the GNU C Library, version 2.1 or newer.
+# Test for the GNU C Library, version 2.1 or newer.
 # From Bruno Haible.
 
-AC_DEFUN([gl_XPLC21],
+AC_DEFUN([gl_GLIBC21],
   [
     AC_CACHE_CHECK(whether we are using the GNU C Library 2.1 or newer,
       ac_cv_gnu_library_2_1,
@@ -15,7 +15,7 @@ AC_DEFUN([gl_XPLC21],
 	[
 #include <features.h>
 #ifdef __GNU_LIBRARY__
- #if (__XPLC__ == 2 && __XPLC_MINOR__ >= 1) || (__XPLC__ > 2)
+ #if (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 1) || (__GLIBC__ > 2)
   Lucky GNU user
  #endif
 #endif
@@ -24,7 +24,7 @@ AC_DEFUN([gl_XPLC21],
 	ac_cv_gnu_library_2_1=no)
       ]
     )
-    AC_SUBST(XPLC21)
-    XPLC21="$ac_cv_gnu_library_2_1"
+    AC_SUBST(GLIBC21)
+    GLIBC21="$ac_cv_gnu_library_2_1"
   ]
 )

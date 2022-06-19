@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XFILE_INPUT_STREAM_H__
-#define __XFILE_INPUT_STREAM_H__
+#ifndef __G_FILE_INPUT_STREAM_H__
+#define __G_FILE_INPUT_STREAM_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,56 +29,56 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE_INPUT_STREAM         (xfile_input_stream_get_type ())
-#define XFILE_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_INPUT_STREAM, xfile_input_stream))
-#define XFILE_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_INPUT_STREAM, xfile_input_stream_class_t))
-#define X_IS_FILE_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_INPUT_STREAM))
-#define X_IS_FILE_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_INPUT_STREAM))
-#define XFILE_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_INPUT_STREAM, xfile_input_stream_class_t))
+#define G_TYPE_FILE_INPUT_STREAM         (g_file_input_stream_get_type ())
+#define G_FILE_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILE_INPUT_STREAM, GFileInputStream))
+#define G_FILE_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILE_INPUT_STREAM, GFileInputStreamClass))
+#define G_IS_FILE_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILE_INPUT_STREAM))
+#define G_IS_FILE_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_FILE_INPUT_STREAM))
+#define G_FILE_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_FILE_INPUT_STREAM, GFileInputStreamClass))
 
 /**
- * xfile_input_stream_t:
+ * GFileInputStream:
  *
- * A subclass of xinput_stream_t for opened files. This adds
+ * A subclass of GInputStream for opened files. This adds
  * a few file-specific operations and seeking.
  *
- * #xfile_input_stream_t implements #xseekable__t.
+ * #GFileInputStream implements #GSeekable.
  **/
-typedef struct _xfile_input_stream_class    xfile_input_stream_class_t;
+typedef struct _GFileInputStreamClass    GFileInputStreamClass;
 typedef struct _GFileInputStreamPrivate  GFileInputStreamPrivate;
 
-struct _xfile_input_stream
+struct _GFileInputStream
 {
-  xinput_stream_t parent_instance;
+  GInputStream parent_instance;
 
   /*< private >*/
   GFileInputStreamPrivate *priv;
 };
 
-struct _xfile_input_stream_class
+struct _GFileInputStreamClass
 {
-  xinput_stream_class_t parent_class;
+  GInputStreamClass parent_class;
 
-  xoffset_t     (* tell)              (xfile_input_stream_t     *stream);
-  xboolean_t    (* can_seek)          (xfile_input_stream_t     *stream);
-  xboolean_t    (* seek)	            (xfile_input_stream_t     *stream,
-                                     xoffset_t               offset,
-                                     xseek_type_t             type,
-                                     xcancellable_t         *cancellable,
-                                     xerror_t              **error);
-  xfile_info_t * (* query_info)        (xfile_input_stream_t     *stream,
+  goffset     (* tell)              (GFileInputStream     *stream);
+  gboolean    (* can_seek)          (GFileInputStream     *stream);
+  gboolean    (* seek)	            (GFileInputStream     *stream,
+                                     goffset               offset,
+                                     GSeekType             type,
+                                     GCancellable         *cancellable,
+                                     GError              **error);
+  GFileInfo * (* query_info)        (GFileInputStream     *stream,
                                      const char           *attributes,
-                                     xcancellable_t         *cancellable,
-                                     xerror_t              **error);
-  void        (* query_info_async)  (xfile_input_stream_t     *stream,
+                                     GCancellable         *cancellable,
+                                     GError              **error);
+  void        (* query_info_async)  (GFileInputStream     *stream,
                                      const char           *attributes,
                                      int                   io_priority,
-                                     xcancellable_t         *cancellable,
-                                     xasync_ready_callback_t   callback,
-                                     xpointer_t              user_data);
-  xfile_info_t * (* query_info_finish) (xfile_input_stream_t     *stream,
-                                     xasync_result_t         *result,
-                                     xerror_t              **error);
+                                     GCancellable         *cancellable,
+                                     GAsyncReadyCallback   callback,
+                                     gpointer              user_data);
+  GFileInfo * (* query_info_finish) (GFileInputStream     *stream,
+                                     GAsyncResult         *result,
+                                     GError              **error);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -89,26 +89,26 @@ struct _xfile_input_stream_class
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t      xfile_input_stream_get_type          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType      g_file_input_stream_get_type          (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xfile_info_t *xfile_input_stream_query_info        (xfile_input_stream_t     *stream,
+GLIB_AVAILABLE_IN_ALL
+GFileInfo *g_file_input_stream_query_info        (GFileInputStream     *stream,
 						  const char           *attributes,
-						  xcancellable_t         *cancellable,
-						  xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void       xfile_input_stream_query_info_async  (xfile_input_stream_t     *stream,
+						  GCancellable         *cancellable,
+						  GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void       g_file_input_stream_query_info_async  (GFileInputStream     *stream,
 						  const char           *attributes,
 						  int                   io_priority,
-						  xcancellable_t         *cancellable,
-						  xasync_ready_callback_t   callback,
-						  xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xfile_info_t *xfile_input_stream_query_info_finish (xfile_input_stream_t     *stream,
-						  xasync_result_t         *result,
-						  xerror_t              **error);
+						  GCancellable         *cancellable,
+						  GAsyncReadyCallback   callback,
+						  gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GFileInfo *g_file_input_stream_query_info_finish (GFileInputStream     *stream,
+						  GAsyncResult         *result,
+						  GError              **error);
 
 G_END_DECLS
 
-#endif /* __XFILE_FILE_INPUT_STREAM_H__ */
+#endif /* __G_FILE_FILE_INPUT_STREAM_H__ */

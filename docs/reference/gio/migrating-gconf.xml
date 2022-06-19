@@ -1,15 +1,15 @@
   <chapter>
-    <title>Migrating from GConf to xsettings_t</title>
+    <title>Migrating from GConf to GSettings</title>
 
     <section>
       <title>Before you start</title>
 
       <para>
         Converting individual applications and their settings from GConf to
-        xsettings_t can be done at will. But desktop-wide settings like font or
+        GSettings can be done at will. But desktop-wide settings like font or
         theme settings often have consumers in multiple modules. Therefore,
         some consideration has to go into making sure that all users of a setting
-        are converted to xsettings_t at the same time or that the program
+        are converted to GSettings at the same time or that the program
         responsible for configuring that setting continues to update the value in
         both places.
       </para>
@@ -23,7 +23,7 @@
       <title>Conceptual differences</title>
 
       <para>
-        Conceptually, GConf and xsettings_t are fairly similar. Both
+        Conceptually, GConf and GSettings are fairly similar. Both
         have a concept of pluggable backends. Both keep information
         about keys and their types in schemas. Both have a concept of
         mandatory values, which lets you implement lock-down.
@@ -32,21 +32,21 @@
         There are some differences in the approach to schemas. GConf
         installs the schemas into the database and has API to handle
         schema information (gconf_client_get_default_from_schema(),
-        gconf_value_get_schema(), etc). xsettings_t on the other hand
+        gconf_value_get_schema(), etc). GSettings on the other hand
         assumes that an application knows its own schemas, and does
         not provide API to handle schema information at runtime.
-        xsettings_t is also more strict about requiring a schema whenever
+        GSettings is also more strict about requiring a schema whenever
         you want to read or write a key. To deal with more free-form
         information that would appear in schema-less entries in GConf,
-        xsettings_t allows for schemas to be 'relocatable'.
+        GSettings allows for schemas to be 'relocatable'.
       </para>
       <para>
         One difference in the way applications interact with their
         settings is that with GConf you interact with a tree of
         settings (ie the keys you pass to functions when reading
         or writing values are actually paths with the actual name
-        of the key as the last element. With xsettings_t, you create
-        a xsettings_t object which has an implicit prefix that determines
+        of the key as the last element. With GSettings, you create
+        a GSettings object which has an implicit prefix that determines
         where the settings get stored in the global tree of settings,
         but the keys you pass when reading or writing values are just
         the key names, not the full path.
@@ -58,13 +58,13 @@
 
       <para>
         Most people use GConf via the high-level #GConfClient API.
-        The corresponding API is the #xsettings_t object. While not
-        every GConfClient function has a direct xsettings_t equivalent,
+        The corresponding API is the #GSettings object. While not
+        every GConfClient function has a direct GSettings equivalent,
         many do:
         <table id="gconf-client-vs-gsettings">
           <tgroup cols="2">
             <thead>
-              <row><entry>GConfClient</entry><entry>xsettings_t</entry></row>
+              <row><entry>GConfClient</entry><entry>GSettings</entry></row>
             </thead>
             <tbody>
               <row><entry>gconf_client_get_default()</entry><entry>no direct equivalent,
@@ -79,14 +79,14 @@
               <row><entry>gconf_client_set_float()</entry><entry>g_settings_set_double()</entry></row>
               <row><entry>gconf_client_get_string()</entry><entry>g_settings_get_string()</entry></row>
               <row><entry>gconf_client_set_string()</entry><entry>g_settings_set_string()</entry></row>
-              <row><entry>gconf_client_get_list()</entry><entry>for string lists, see g_settings_get_strv(), else see g_settings_get_value() and #xvariant_t API</entry></row>
-              <row><entry>gconf_client_set_list()</entry><entry>for string lists, see g_settings_set_strv(), else see g_settings_set_value() and #xvariant_t API</entry></row>
+              <row><entry>gconf_client_get_list()</entry><entry>for string lists, see g_settings_get_strv(), else see g_settings_get_value() and #GVariant API</entry></row>
+              <row><entry>gconf_client_set_list()</entry><entry>for string lists, see g_settings_set_strv(), else see g_settings_set_value() and #GVariant API</entry></row>
               <row><entry>gconf_entry_get_is_writable()</entry><entry>g_settings_is_writable()</entry></row>
-              <row><entry>gconf_client_notify_add()</entry><entry>not required, the #xsettings_t::changed signal is emitted automatically</entry></row>
-              <row><entry>gconf_client_add_dir()</entry><entry>not required, each xsettings_t instance automatically watches all keys in its path</entry></row>
+              <row><entry>gconf_client_notify_add()</entry><entry>not required, the #GSettings::changed signal is emitted automatically</entry></row>
+              <row><entry>gconf_client_add_dir()</entry><entry>not required, each GSettings instance automatically watches all keys in its path</entry></row>
               <row><entry>#GConfChangeSet</entry><entry>g_settings_delay(), g_settings_apply()</entry></row>
               <row><entry>gconf_client_get_default_from_schema()</entry><entry>no equivalent, applications are expected to know their schema</entry></row>
-              <row><entry>gconf_client_all_entries()</entry><entry>no equivalent, applications are expected to know their schema, and xsettings_t does not allow schema-less entries</entry></row>
+              <row><entry>gconf_client_all_entries()</entry><entry>no equivalent, applications are expected to know their schema, and GSettings does not allow schema-less entries</entry></row>
               <row><entry>gconf_client_get_without_default()</entry><entry>no equivalent</entry></row>
               <row><entry>gconf_bridge_bind_property()</entry><entry>g_settings_bind()</entry></row>
               <row><entry>gconf_bridge_bind_property_full()</entry><entry>g_settings_bind_with_mapping()</entry></row>
@@ -96,7 +96,7 @@
       </para>
       <para>
         GConfBridge was a third-party library that used GConf to bind an object property
-        to a particular configuration key. xsettings_t offers this service itself.
+        to a particular configuration key. GSettings offers this service itself.
       </para>
       <para>
         There is a pattern that is sometimes used for GConf, where a setting can have
@@ -104,9 +104,9 @@
         'use the system default' is sometimes implemented by unsetting the user value.
       </para>
       <para>
-        This is not possible in xsettings_t, since it does not have API to determine if a value
+        This is not possible in GSettings, since it does not have API to determine if a value
         is the default and does not let you unset values. The recommended way (and much
-        clearer) way in which this can be implemented in xsettings_t is to have a separate
+        clearer) way in which this can be implemented in GSettings is to have a separate
         'use-system-default' boolean setting.
       </para>
     </section>
@@ -117,18 +117,18 @@
       <para>
         GConf requires you to call gconf_client_add_dir() and
         gconf_client_notify_add() to get change notification. With
-        xsettings_t, this is not necessary; signals get emitted automatically
+        GSettings, this is not necessary; signals get emitted automatically
         for every change.
       </para>
       <para>
-        The #xsettings_t::changed signal is emitted for each changed key.
-        There is also a #xsettings_t::change-event signal that you can handle
+        The #GSettings::changed signal is emitted for each changed key.
+        There is also a #GSettings::change-event signal that you can handle
         if you need to see groups of keys that get changed at the same time.
       </para>
       <para>
-        xsettings_t also notifies you about changes in writability of keys,
-        with the #xsettings_t::writable-changed signal (and the
-        #xsettings_t::writable-change-event signal).
+        GSettings also notifies you about changes in writability of keys,
+        with the #GSettings::writable-changed signal (and the
+        #GSettings::writable-change-event signal).
       </para>
     </section>
 
@@ -139,17 +139,17 @@
         which is one of its shortcomings).
       </para>
       <para>
-        Instead of a separate object to represent a change set, xsettings_t has a
-        'delayed-apply' mode, which can be turned on for a xsettings_t object by
-        calling g_settings_delay(). In this mode, changes done to the xsettings_t
+        Instead of a separate object to represent a change set, GSettings has a
+        'delayed-apply' mode, which can be turned on for a GSettings object by
+        calling g_settings_delay(). In this mode, changes done to the GSettings
         object are not applied - they are still visible when calling g_settings_get()
-        <emphasis>on the same object</emphasis>, but not to other xsettings_t instances
+        <emphasis>on the same object</emphasis>, but not to other GSettings instances
         or even other processes.
       </para>
       <para>
-        To apply the pending changes all at once (xsettings_t <emphasis>does</emphasis>
+        To apply the pending changes all at once (GSettings <emphasis>does</emphasis>
         atomicity here), call g_settings_apply(). To revert the pending changes,
-        call g_settings_revert() or just drop the reference to the #xsettings_t object.
+        call g_settings_revert() or just drop the reference to the #GSettings object.
       </para>
     </section>
 
@@ -160,7 +160,7 @@
         If you are porting your application from GConf, most likely you already
         have a GConf schema. GConf comes with a commandline tool
         gsettings-schema-convert that can help with the task of converting
-        a GConf schema into an equivalent xsettings_t schema. The tool is not
+        a GConf schema into an equivalent GSettings schema. The tool is not
         perfect and may need assistance in some cases.
       </para>
       <example><title>An example for using gsettings-schema-convert</title>
@@ -203,7 +203,7 @@ produces a <filename>org.gnome.font-rendering.gschema.xml</filename> file with t
       </example>
 
       <para>
-       xsettings_t schemas are identified at runtime by their id (as specified
+       GSettings schemas are identified at runtime by their id (as specified
        in the XML source file). It is recommended to use a dotted name as schema
        id, similar in style to a D-Bus bus name, e.g. "org.gnome.SessionManager".
        In cases where the settings are general and not specific to one application,
@@ -216,9 +216,9 @@ produces a <filename>org.gnome.font-rendering.gschema.xml</filename> file with t
       </para>
 
       <para>
-        The XML source file for your xsettings_t schema needs to get installed
+        The XML source file for your GSettings schema needs to get installed
         into <filename>$datadir/glib-2.0/schemas</filename>, and needs to be
-        compiled into a binary form. At runtime, xsettings_t looks for compiled
+        compiled into a binary form. At runtime, GSettings looks for compiled
         schemas in the <filename>glib-2.0/schemas</filename> subdirectories
         of all <envar>XDG_DATA_DIRS</envar> directories, so if you install
         your schema in a different location, you need to set the
@@ -234,7 +234,7 @@ produces a <filename>org.gnome.font-rendering.gschema.xml</filename> file with t
         You can ignore all of this by using the provided m4 macros.  To
         do this, add to your <filename>configure.ac</filename>:
 <programlisting>
-XPL_GSETTINGS
+GLIB_GSETTINGS
 </programlisting>
         The corresponding <filename>Makefile.am</filename> fragment looks like
         this:
@@ -259,9 +259,9 @@ gsettings_SCHEMAS = my.app.gschema.xml
 
       <para>
         One possible pitfall in doing schema conversion is that the default
-        values in xsettings_t schemas are parsed by the #xvariant_t parser.
+        values in GSettings schemas are parsed by the #GVariant parser.
         This means that strings need to include quotes in the XML.  Also note
-        that the types are now specified as #xvariant_t type strings.
+        that the types are now specified as #GVariant type strings.
         <programlisting>
 <![CDATA[
 <type>string</type>
@@ -279,7 +279,7 @@ gsettings_SCHEMAS = my.app.gschema.xml
       </para>
       <para>
         Another possible complication is that GConf specifies full paths
-        for each key, while a xsettings_t schema has a 'path' attribute that
+        for each key, while a GSettings schema has a 'path' attribute that
         contains the prefix for all the keys in the schema, and individual
         keys just have a simple name. So
         <programlisting>
@@ -296,8 +296,8 @@ gsettings_SCHEMAS = my.app.gschema.xml
         </programlisting>
       </para>
       <para>
-        Default values can be localized in both GConf and xsettings_t schemas,
-        but xsettings_t uses gettext for the localization. You can specify
+        Default values can be localized in both GConf and GSettings schemas,
+        but GSettings uses gettext for the localization. You can specify
         the gettext domain to use in the <tag class="attribute">gettext-domain</tag>
         attribute. Therefore, when converting localized defaults in GConf,
         <programlisting>
@@ -324,7 +324,7 @@ gsettings_SCHEMAS = my.app.gschema.xml
         </programlisting>
       </para>
       <para>
-        xsettings_t uses gettext for translation of default values.
+        GSettings uses gettext for translation of default values.
         The string that is translated is exactly the string that appears
         inside of the <tag class='starttag'>default</tag> element.  This
         includes the quotation marks that appear around strings.
@@ -342,7 +342,7 @@ gsettings_SCHEMAS = my.app.gschema.xml
         syntactically valid; mistakes here will cause runtime errors.
       </para>
       <para>
-        xsettings_t schemas have optional <tag class="starttag">summary</tag> and
+        GSettings schemas have optional <tag class="starttag">summary</tag> and
         <tag class="starttag">description</tag> elements for each key which
         correspond to the <tag class="starttag">short</tag> and
         <tag class="starttag">long</tag> elements in the GConf schema and
@@ -364,14 +364,14 @@ gsettings_SCHEMAS = my.app.gschema.xml
         </programlisting>
       </para>
       <para>
-        xsettings_t is a bit more restrictive about key names than GConf. Key
-        names in xsettings_t can be at most 32 characters long, and must only
+        GSettings is a bit more restrictive about key names than GConf. Key
+        names in GSettings can be at most 32 characters long, and must only
         consist of lowercase characters, numbers and dashes, with no
         consecutive dashes. The first character must not be a number or dash,
         and the last character cannot be '-'.
       </para>
       <para>
-        If you are using the GConf backend for xsettings_t during the
+        If you are using the GConf backend for GSettings during the
         transition, you may want to keep your key names the same they
         were in GConf, so that existing settings in the users GConf
         database are preserved. You can achieve this by using the
@@ -380,15 +380,15 @@ gsettings_SCHEMAS = my.app.gschema.xml
         compiler. Note that this option is only meant
         to ease the process of porting your application, allowing parts
         of your application to continue to access GConf and parts to use
-        xsettings_t. By the time you have finished porting your application
+        GSettings. By the time you have finished porting your application
         you must ensure that all key names are valid.
       </para>
     </section>
 
     <section><title>Data conversion</title>
       <para>
-        GConf comes with a xsettings_t backend that can be used to
-        facility the transition to the xsettings_t API until you are
+        GConf comes with a GSettings backend that can be used to
+        facility the transition to the GSettings API until you are
         ready to make the jump to a different backend (most likely
         dconf). To use it, you need to set the <envar>GSETTINGS_BACKEND</envar>
         to 'gconf', e.g. by using
@@ -402,7 +402,7 @@ gsettings_SCHEMAS = my.app.gschema.xml
         GConf also comes with a utility called
         <command>gsettings-data-convert</command>, which is designed to help
         with the task of migrating user settings from GConf into another
-        xsettings_t backend. It can be run manually, but it is designed to be
+        GSettings backend. It can be run manually, but it is designed to be
         executed automatically, every time a user logs in. It keeps track of
         the data migrations that it has already done, and it is harmless to
         run it more than once.
@@ -410,7 +410,7 @@ gsettings_SCHEMAS = my.app.gschema.xml
       <para>
         To make use of this utility, you must install a keyfile in the
         directory <filename>/usr/share/GConf/gsettings</filename> which
-        lists the xsettings_t keys and GConf paths to map to each other, for
+        lists the GSettings keys and GConf paths to map to each other, for
         each schema that you want to migrate user data for.
       </para>
       <para>
@@ -428,9 +428,9 @@ some-odd-key1 = /apps/myapp/some_ODD-key1
 ]]>
         </programlisting>
         The last key demonstrates that it may be necessary to modify the key
-        name to comply with stricter xsettings_t key name rules. Of course,
+        name to comply with stricter GSettings key name rules. Of course,
         that means your application must use the new key names when looking
-        up settings in xsettings_t.
+        up settings in GSettings.
       </para>
       <para>
         The last group in the example also shows how to handle the case
@@ -470,18 +470,18 @@ some-odd-key1 = /apps/myapp/some_ODD-key1
         <programlisting>
 <![CDATA[
 static void
-ensure_migrated (const xchar_t *name)
+ensure_migrated (const gchar *name)
 {
-  xboolean_t needed = TRUE;
-  xkey_file_t *kf;
-  xchar_t **list;
-  xsize_t i, n;
+  gboolean needed = TRUE;
+  GKeyFile *kf;
+  gchar **list;
+  gsize i, n;
 
-  kf = xkey_file_new ();
+  kf = g_key_file_new ();
 
-  xkey_file_load_from_data_dirs (kf, "gsettings-data-convert",
+  g_key_file_load_from_data_dirs (kf, "gsettings-data-convert",
                                   NULL, G_KEY_FILE_NONE, NULL);
-  list = xkey_file_get_string_list (kf, "State", "converted", &n, NULL);
+  list = g_key_file_get_string_list (kf, "State", "converted", &n, NULL);
 
   if (list)
     {
@@ -492,10 +492,10 @@ ensure_migrated (const xchar_t *name)
             break;
           }
 
-      xstrfreev (list);
+      g_strfreev (list);
     }
 
-  xkey_file_free (kf);
+  g_key_file_free (kf);
 
   if (needed)
     g_spawn_command_line_sync ("gsettings-data-convert",

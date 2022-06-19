@@ -65,13 +65,13 @@ gio/gio-tool*				@oholy @alexl @pwithnall
 # Generic bits of GLib
 glib/	@ebassi @pwithnall @sdroege
 
-# xobject_t type system
+# GObject type system
 gobject/	@ebassi @pwithnall @sdroege
 
-# xvariant_t
+# GVariant
 glib/gvariant*	@pwithnall @sdroege
 
-# grefcount, GRcBox and xref_string_t
+# grefcount, GRcBox and GRefString
 glib/gref{count,string}.[ch]	@ebassi @pwithnall @sdroege
 glib/grc*.[ch]			@ebassi @pwithnall @sdroege
 glib/garc*.[ch]			@ebassi @pwithnall @sdroege

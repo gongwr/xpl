@@ -1,4 +1,4 @@
-/* test_t for NaN that does not need libm.
+/* Test for NaN that does not need libm.
    Copyright (C) 2007-2019 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -26,7 +26,7 @@
 #  define isnand(x) isnan ((double)(x))
 # endif
 #else
-/* test_t whether X is a NaN.  */
+/* Test whether X is a NaN.  */
 # undef isnand
 # define isnand rpl_isnand
 extern int isnand (double x);

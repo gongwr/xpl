@@ -46,12 +46,12 @@
 #include "dep-list.h"
 
 G_LOCK_DEFINE_STATIC (kq_lock);
-static xsource_t       *kq_source;
+static GSource       *kq_source;
 static int	      kq_queue = -1;
 
-#define XTYPE_KQUEUE_FILE_MONITOR	(g_kqueue_file_monitor_get_type ())
-#define G_KQUEUE_FILE_MONITOR(inst)	(XTYPE_CHECK_INSTANCE_CAST ((inst), \
-					XTYPE_KQUEUE_FILE_MONITOR, GKqueueFileMonitor))
+#define G_TYPE_KQUEUE_FILE_MONITOR	(g_kqueue_file_monitor_get_type ())
+#define G_KQUEUE_FILE_MONITOR(inst)	(G_TYPE_CHECK_INSTANCE_CAST ((inst), \
+					G_TYPE_KQUEUE_FILE_MONITOR, GKqueueFileMonitor))
 
 /* C11 allows type redefinition, but GLib is configured to use C89, which causes
  * clang to show warnings when we use a C11 feature. Since the C89 requirement
@@ -62,7 +62,7 @@ static int	      kq_queue = -1;
 #pragma clang diagnostic ignored "-Wtypedef-redefinition"
 #endif
 
-typedef xlocal_file_monitor_class_t GKqueueFileMonitorClass;
+typedef GLocalFileMonitorClass GKqueueFileMonitorClass;
 
 /* When the file we are monitoring is a directory, sub_dir is subscribed to the
  * directory itself and sub_file is NULL.
@@ -77,13 +77,13 @@ typedef xlocal_file_monitor_class_t GKqueueFileMonitorClass;
  * whether sub_file is NULL. */
 struct _GKqueueFileMonitor
 {
-  xlocal_file_monitor_t parent_instance;
+  GLocalFileMonitor parent_instance;
 
   kqueue_sub *sub_dir;
   kqueue_sub *sub_file;
 #ifndef O_EVTONLY
-  xfile_monitor_t *fallback;
-  xfile_t *fbfile;
+  GFileMonitor *fallback;
+  GFile *fbfile;
 #endif
 };
 
@@ -91,8 +91,8 @@ struct _GKqueueFileMonitor
 #pragma clang diagnostic pop
 #endif
 
-xtype_t g_kqueue_file_monitor_get_type (void);
-G_DEFINE_TYPE_WITH_CODE (GKqueueFileMonitor, g_kqueue_file_monitor, XTYPE_LOCAL_FILE_MONITOR,
+GType g_kqueue_file_monitor_get_type (void);
+G_DEFINE_TYPE_WITH_CODE (GKqueueFileMonitor, g_kqueue_file_monitor, G_TYPE_LOCAL_FILE_MONITOR,
 	g_io_extension_point_implement (G_LOCAL_FILE_MONITOR_EXTENSION_POINT_NAME,
 		g_define_type_id,
                 "kqueue",
@@ -117,25 +117,25 @@ note_all (void)
   return notes;
 }
 
-static xboolean_t g_kqueue_file_monitor_cancel (xfile_monitor_t* monitor);
-static xboolean_t g_kqueue_file_monitor_is_supported (void);
+static gboolean g_kqueue_file_monitor_cancel (GFileMonitor* monitor);
+static gboolean g_kqueue_file_monitor_is_supported (void);
 
-static kqueue_sub	*_kqsub_new (xchar_t *, xchar_t *, GKqueueFileMonitor *, GFileMonitorSource *);
+static kqueue_sub	*_kqsub_new (gchar *, gchar *, GKqueueFileMonitor *, GFileMonitorSource *);
 static void		 _kqsub_free (kqueue_sub *);
 static void		 _kqsub_cancel (kqueue_sub *);
 
 
 #ifndef O_EVTONLY
 static void
-_fallback_callback (xfile_monitor_t      *unused,
-                    xfile_t             *first,
-                    xfile_t             *second,
-                    xfile_monitor_event_t  event,
-                    xpointer_t           udata)
+_fallback_callback (GFileMonitor      *unused,
+                    GFile             *first,
+                    GFile             *second,
+                    GFileMonitorEvent  event,
+                    gpointer           udata)
 {
   GKqueueFileMonitor *kq_mon = G_KQUEUE_FILE_MONITOR (udata);
 
-  xfile_monitor_emit_event (XFILE_MONITOR (kq_mon), first, second, event);
+  g_file_monitor_emit_event (G_FILE_MONITOR (kq_mon), first, second, event);
 }
 
 /*
@@ -145,24 +145,24 @@ _fallback_callback (xfile_monitor_t      *unused,
  * Returns: TRUE if the file should be excluded from the kqueue-powered
  *      monitoring, FALSE otherwise.
  **/
-static xboolean_t
+static gboolean
 _ke_is_excluded (const char *full_path)
 {
-  xfile_t *f = NULL;
-  xmount_t *mount = NULL;
+  GFile *f = NULL;
+  GMount *mount = NULL;
 
-  f = xfile_new_for_path (full_path);
+  f = g_file_new_for_path (full_path);
 
   if (f != NULL) {
-    mount = xfile_find_enclosing_mount (f, NULL, NULL);
-    xobject_unref (f);
+    mount = g_file_find_enclosing_mount (f, NULL, NULL);
+    g_object_unref (f);
   }
 
-  if (mount != NULL && (xstr_has_prefix (full_path, "/media/") || xstr_has_prefix (full_path, "/run/media/")))
+  if (mount != NULL && (g_str_has_prefix (full_path, "/media/") || g_str_has_prefix (full_path, "/run/media/")))
   {
     g_warning ("Excluding %s from kernel notification, falling back to poll", full_path);
     if (mount)
-      xobject_unref (mount);
+      g_object_unref (mount);
     return TRUE;
   }
 
@@ -171,7 +171,7 @@ _ke_is_excluded (const char *full_path)
 #endif /* !O_EVTONLY */
 
 static void
-g_kqueue_file_monitor_finalize (xobject_t *object)
+g_kqueue_file_monitor_finalize (GObject *object)
 {
   GKqueueFileMonitor *kqueue_monitor = G_KQUEUE_FILE_MONITOR (object);
 
@@ -191,26 +191,26 @@ g_kqueue_file_monitor_finalize (xobject_t *object)
 
 #ifndef O_EVTONLY
   if (kqueue_monitor->fallback)
-    xobject_unref (kqueue_monitor->fallback);
+    g_object_unref (kqueue_monitor->fallback);
 
   if (kqueue_monitor->fbfile)
-    xobject_unref (kqueue_monitor->fbfile);
+    g_object_unref (kqueue_monitor->fbfile);
 #endif
 
-  if (XOBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize)
-    (*XOBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize) (object);
+  if (G_OBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize) (object);
 }
 
 static void
-g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
-                             const xchar_t *dirname,
-                             const xchar_t *basename,
-                             const xchar_t *filename,
+g_kqueue_file_monitor_start (GLocalFileMonitor *local_monitor,
+                             const gchar *dirname,
+                             const gchar *basename,
+                             const gchar *filename,
                              GFileMonitorSource *source)
 {
   GKqueueFileMonitor *kqueue_monitor = G_KQUEUE_FILE_MONITOR (local_monitor);
   kqueue_sub *sub_dir = NULL, *sub_file = NULL;
-  xchar_t *path_dir, *path_file, *file_basename;
+  gchar *path_dir, *path_file, *file_basename;
 
   /* There are three possible cases here:
    *
@@ -225,16 +225,16 @@ g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
   if (filename != NULL)
     {
       path_dir = g_path_get_dirname (filename);
-      path_file = xstrdup (filename);
+      path_file = g_strdup (filename);
       file_basename = g_path_get_basename (filename);
     }
   else
     {
-      path_dir = xstrdup (dirname);
+      path_dir = g_strdup (dirname);
       if (basename != NULL)
         {
           path_file = g_build_filename (dirname, basename, NULL);
-          file_basename = xstrdup (basename);
+          file_basename = g_strdup (basename);
         }
       else
         {
@@ -246,24 +246,24 @@ g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
 #ifndef O_EVTONLY
   if (_ke_is_excluded (path_dir))
     {
-      xfile_t *file;
+      GFile *file;
       if (path_file != NULL)
-        file = xfile_new_for_path (path_file);
+        file = g_file_new_for_path (path_file);
       else
-        file = xfile_new_for_path (path_dir);
+        file = g_file_new_for_path (path_dir);
       g_free (path_dir);
       g_free (path_file);
       g_free (file_basename);
       kqueue_monitor->fbfile = file;
-      kqueue_monitor->fallback = _xpoll_file_monitor_new (file);
-      xsignal_connect (kqueue_monitor->fallback, "changed",
+      kqueue_monitor->fallback = _g_poll_file_monitor_new (file);
+      g_signal_connect (kqueue_monitor->fallback, "changed",
 			G_CALLBACK (_fallback_callback), kqueue_monitor);
       return;
     }
 #endif
 
   /* For a directory monitor, create a subscription object anyway.
-   * It will be used for directory diff calculation routines.
+   * It will be used for directory diff calculation routines. 
    * Wait, directory diff in a GKqueueFileMonitor?
    * Yes, it is. When a file monitor is started on a non-existent
    * file, GIO uses a GKqueueFileMonitor object for that. If a directory
@@ -298,11 +298,11 @@ g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
 static void
 g_kqueue_file_monitor_class_init (GKqueueFileMonitorClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
-  xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
-  xlocal_file_monitor_class_t *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (klass);
+  GLocalFileMonitorClass *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
 
-  xobject_class->finalize = g_kqueue_file_monitor_finalize;
+  gobject_class->finalize = g_kqueue_file_monitor_finalize;
   file_monitor_class->cancel = g_kqueue_file_monitor_cancel;
 
   local_file_monitor_class->is_supported = g_kqueue_file_monitor_is_supported;
@@ -315,10 +315,10 @@ g_kqueue_file_monitor_init (GKqueueFileMonitor *monitor)
 {
 }
 
-static xboolean_t
-g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t user_data)
+static gboolean
+g_kqueue_file_monitor_callback (gint fd, GIOCondition condition, gpointer user_data)
 {
-  sint64_t now = xsource_get_time (kq_source);
+  gint64 now = g_source_get_time (kq_source);
   kqueue_sub *sub;
   GFileMonitorSource *source;
   struct kevent ev;
@@ -372,7 +372,7 @@ g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t
           }
 
         /* Here starts the long section of mapping kqueue events to
-         * xfile_monitor_event_t. Since kqueue can return multiple events in a
+         * GFileMonitorEvent. Since kqueue can return multiple events in a
          * single kevent struct, we must use 'if' instead of 'else if'. */
         if (ev.fflags & NOTE_DELETE)
           {
@@ -380,8 +380,8 @@ g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t
             if (fstat (sub->fd, &st) < 0)
               st.st_nlink = 0;
 
-            xfile_monitor_source_handle_event (source,
-                                                XFILE_MONITOR_EVENT_DELETED,
+            g_file_monitor_source_handle_event (source,
+                                                G_FILE_MONITOR_EVENT_DELETED,
                                                 sub->basename, NULL, NULL, now);
 
             /* If the last reference to the file was removed, delete the
@@ -397,16 +397,16 @@ g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t
           }
          if (ev.fflags & NOTE_REVOKE)
            {
-             xfile_monitor_source_handle_event (source,
-                                                 XFILE_MONITOR_EVENT_UNMOUNTED,
+             g_file_monitor_source_handle_event (source,
+                                                 G_FILE_MONITOR_EVENT_UNMOUNTED,
                                                  sub->basename, NULL, NULL, now);
              _kqsub_cancel (sub);
              _km_add_missing (sub);
            }
         if (ev.fflags & NOTE_ATTRIB)
           {
-            xfile_monitor_source_handle_event (source,
-                                                XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
+            g_file_monitor_source_handle_event (source,
+                                                G_FILE_MONITOR_EVENT_ATTRIBUTE_CHANGED,
                                                 sub->basename, NULL, NULL, now);
           }
 #ifdef NOTE_TRUNCATE
@@ -415,8 +415,8 @@ g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t
         if (ev.fflags & (NOTE_WRITE | NOTE_EXTEND))
 #endif
           {
-            xfile_monitor_source_handle_event (source,
-                                                XFILE_MONITOR_EVENT_CHANGED,
+            g_file_monitor_source_handle_event (source,
+                                                G_FILE_MONITOR_EVENT_CHANGED,
                                                 sub->basename, NULL, NULL, now);
           }
         if (ev.fflags & NOTE_RENAME)
@@ -424,15 +424,15 @@ g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t
             /* Since there’s apparently no way to get the new name of the
              * file out of kqueue(), all we can do is say that this one has
              * been deleted. */
-            xfile_monitor_source_handle_event (source,
-                                                XFILE_MONITOR_EVENT_DELETED,
+            g_file_monitor_source_handle_event (source,
+                                                G_FILE_MONITOR_EVENT_DELETED,
                                                 sub->basename, NULL, NULL, now);
           }
 #ifdef NOTE_CLOSE_WRITE
         if (ev.fflags & NOTE_CLOSE_WRITE)
           {
-            xfile_monitor_source_handle_event (source,
-                                                XFILE_MONITOR_EVENT_CHANGES_DONE_HINT,
+            g_file_monitor_source_handle_event (source,
+                                                G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT,
                                                 sub->basename, NULL, NULL, now);
           }
 #endif
@@ -449,7 +449,7 @@ g_kqueue_file_monitor_callback (xint_t fd, xio_condition_t condition, xpointer_t
   return TRUE;
 }
 
-static xboolean_t
+static gboolean
 g_kqueue_file_monitor_is_supported (void)
 {
   int errsv;
@@ -463,14 +463,14 @@ g_kqueue_file_monitor_is_supported (void)
 
       if (kq_queue == -1)
         {
-          g_warning ("Unable to create a kqueue: %s", xstrerror (errsv));
+          g_warning ("Unable to create a kqueue: %s", g_strerror (errsv));
           G_UNLOCK (kq_lock);
           return FALSE;
         }
 
       kq_source = g_unix_fd_source_new (kq_queue, G_IO_IN);
-      xsource_set_callback (kq_source, (xsource_func_t) g_kqueue_file_monitor_callback, NULL, NULL);
-      xsource_attach (kq_source, XPL_PRIVATE_CALL (g_get_worker_context) ());
+      g_source_set_callback (kq_source, (GSourceFunc) g_kqueue_file_monitor_callback, NULL, NULL);
+      g_source_attach (kq_source, GLIB_PRIVATE_CALL (g_get_worker_context) ());
     }
 
   G_UNLOCK (kq_lock);
@@ -478,8 +478,8 @@ g_kqueue_file_monitor_is_supported (void)
   return TRUE;
 }
 
-static xboolean_t
-g_kqueue_file_monitor_cancel (xfile_monitor_t *monitor)
+static gboolean
+g_kqueue_file_monitor_cancel (GFileMonitor *monitor)
 {
   GKqueueFileMonitor *kqueue_monitor = G_KQUEUE_FILE_MONITOR (monitor);
 
@@ -506,19 +506,19 @@ g_kqueue_file_monitor_cancel (xfile_monitor_t *monitor)
 #ifndef O_EVTONLY
   if (kqueue_monitor->fallback)
     {
-      xsignal_handlers_disconnect_by_func (kqueue_monitor->fallback, _fallback_callback, kqueue_monitor);
-      xfile_monitor_cancel (kqueue_monitor->fallback);
+      g_signal_handlers_disconnect_by_func (kqueue_monitor->fallback, _fallback_callback, kqueue_monitor);
+      g_file_monitor_cancel (kqueue_monitor->fallback);
     }
 #endif
 
-  if (XFILE_MONITOR_CLASS (g_kqueue_file_monitor_parent_class)->cancel)
-    (*XFILE_MONITOR_CLASS (g_kqueue_file_monitor_parent_class)->cancel) (monitor);
+  if (G_FILE_MONITOR_CLASS (g_kqueue_file_monitor_parent_class)->cancel)
+    (*G_FILE_MONITOR_CLASS (g_kqueue_file_monitor_parent_class)->cancel) (monitor);
 
   return TRUE;
 }
 
 static kqueue_sub *
-_kqsub_new (xchar_t *filename, xchar_t *basename, GKqueueFileMonitor *mon, GFileMonitorSource *source)
+_kqsub_new (gchar *filename, gchar *basename, GKqueueFileMonitor *mon, GFileMonitorSource *source)
 {
   kqueue_sub *sub;
 
@@ -526,7 +526,7 @@ _kqsub_new (xchar_t *filename, xchar_t *basename, GKqueueFileMonitor *mon, GFile
   sub->filename = filename;
   sub->basename = basename;
   sub->mon = mon;
-  xsource_ref ((xsource_t *) source);
+  g_source_ref ((GSource *) source);
   sub->source = source;
   sub->fd = -1;
   sub->deps = NULL;
@@ -538,10 +538,10 @@ _kqsub_new (xchar_t *filename, xchar_t *basename, GKqueueFileMonitor *mon, GFile
 static void
 _kqsub_free (kqueue_sub *sub)
 {
-  xassert (sub->deps == NULL);
-  xassert (sub->fd == -1);
+  g_assert (sub->deps == NULL);
+  g_assert (sub->fd == -1);
 
-  xsource_unref ((xsource_t *) sub->source);
+  g_source_unref ((GSource *) sub->source);
   g_free (sub->filename);
   g_free (sub->basename);
   g_slice_free (kqueue_sub, sub);
@@ -562,7 +562,7 @@ _kqsub_cancel (kqueue_sub *sub)
       EV_SET (&ev, sub->fd, EVFILT_VNODE, EV_DELETE, note_all (), 0, sub);
       if (kevent (kq_queue, &ev, 1, NULL, 0, NULL) == -1)
         {
-          g_warning ("Unable to remove event for %s: %s", sub->filename, xstrerror (errno));
+          g_warning ("Unable to remove event for %s: %s", sub->filename, g_strerror (errno));
         }
       close (sub->fd);
       sub->fd = -1;
@@ -577,7 +577,7 @@ _kqsub_cancel (kqueue_sub *sub)
     }
 }
 
-xboolean_t
+gboolean
 _kqsub_start_watching (kqueue_sub *sub)
 {
   struct stat st;
@@ -589,7 +589,7 @@ _kqsub_start_watching (kqueue_sub *sub)
 
   if (fstat (sub->fd, &st) == -1)
     {
-      g_warning ("fstat failed for %s: %s", sub->filename, xstrerror (errno));
+      g_warning ("fstat failed for %s: %s", sub->filename, g_strerror (errno));
       close (sub->fd);
       sub->fd = -1;
       return FALSE;
@@ -607,7 +607,7 @@ _kqsub_start_watching (kqueue_sub *sub)
   EV_SET (&ev, sub->fd, EVFILT_VNODE, EV_ADD | EV_CLEAR, note_all (), 0, sub);
   if (kevent (kq_queue, &ev, 1, NULL, 0, NULL) == -1)
     {
-      g_warning ("Unable to add event for %s: %s", sub->filename, xstrerror (errno));
+      g_warning ("Unable to add event for %s: %s", sub->filename, g_strerror (errno));
       close (sub->fd);
       sub->fd = -1;
       return FALSE;

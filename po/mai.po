@@ -165,37 +165,37 @@ msgstr "अवैध होस्ट-नाम"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:202
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "पूर्वाह्न"
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:204
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "अपराह्न"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A %d %b %Y %I:%M:%S %p %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%A %d %b %Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%I:%M:%S  %Z"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p %Z"
 
@@ -1460,11 +1460,11 @@ msgid "%s type"
 msgstr "%s प्रकार"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "xcredentials_t is not implemented on this OS"
+msgid "GCredentials is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:447
-msgid "There is no xcredentials_t support for your platform"
+msgid "There is no GCredentials support for your platform"
 msgstr ""
 
 #: ../gio/gdatainputstream.c:311
@@ -1630,7 +1630,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1159
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:266
@@ -1869,7 +1869,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:1517
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string '%s' from the D-Bus wire format"
+"Error deserializing GVariant with type string '%s' from the D-Bus wire format"
 msgstr ""
 
 #: ../gio/gdbusmessage.c:1705
@@ -1908,7 +1908,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:2163
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string '%s' to the D-Bus wire format"
+"Error serializing GVariant with type string '%s' to the D-Bus wire format"
 msgstr ""
 
 #: ../gio/gdbusmessage.c:2303
@@ -2277,27 +2277,27 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of xemblem_t encoding"
+msgid "Can't handle version %d of GEmblem encoding"
 msgstr ""
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:368
 #, c-format
-msgid "Can't handle version %d of xemblemed_icon_t encoding"
+msgid "Can't handle version %d of GEmblemedIcon encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:378
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
 msgstr ""
 
 #: ../gio/gemblemedicon.c:401
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "xemblem_t प्रत्याशित xemblemed_icon_t केँ लेल"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "GEmblem प्रत्याशित GEmblemedIcon केँ लेल"
 
 #: ../gio/gfile.c:871 ../gio/gfile.c:1102 ../gio/gfile.c:1237
 #: ../gio/gfile.c:1474 ../gio/gfile.c:1528 ../gio/gfile.c:1585
@@ -2391,12 +2391,12 @@ msgstr ""
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of xfile_icon_t encoding"
-msgstr "xfile_icon_t एन्कोडिंगकेँ %d संस्करणकेँ नियंत्रित नहि कए सकैत अछि"
+msgid "Can't handle version %d of GFileIcon encoding"
+msgstr "GFileIcon एन्कोडिंगकेँ %d संस्करणकेँ नियंत्रित नहि कए सकैत अछि"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
-msgstr "xfile_icon_t केँ लेल विरूपित इनपुट डेटा"
+msgid "Malformed input data for GFileIcon"
+msgstr "GFileIcon केँ लेल विरूपित इनपुट डेटा"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:420
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -2429,7 +2429,7 @@ msgstr ""
 
 #: ../gio/gicon.c:314
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
+msgid "Type %s does not implement the GIcon interface"
 msgstr ""
 
 #: ../gio/gicon.c:325
@@ -2444,7 +2444,7 @@ msgstr "विरूपित संस्करण संख्या: %s"
 
 #: ../gio/gicon.c:353
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
 msgstr ""
 
 #: ../gio/gicon.c:430
@@ -2542,7 +2542,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:958
 #, fuzzy, c-format
-msgid "invalid xvariant_t type string '%s'"
+msgid "invalid GVariant type string '%s'"
 msgstr "अमान्य गुण प्रकार (string expected)"
 
 #: ../gio/glib-compile-schemas.c:988
@@ -2713,7 +2713,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:1973
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3023,16 +3023,16 @@ msgid "Error removing old file: %s"
 msgstr "पुरान फाइल केँ पढ़बामे त्रुटि: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid xseek_type_t supplied"
-msgstr "अमान्य xseek_type_t कए आपूर्ति"
+msgid "Invalid GSeekType supplied"
+msgstr "अमान्य GSeekType कए आपूर्ति"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"
 msgstr "अमान्य प्राप्ति आग्रह"
 
 #: ../gio/gmemoryinputstream.c:520
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "xmemory_input_stream_t केँ काटि नहि सकल"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "GMemoryInputStream केँ काटि नहि सकल"
 
 #: ../gio/gmemoryoutputstream.c:496
 msgid "Memory output stream not resizable"
@@ -3364,7 +3364,7 @@ msgstr ""
 
 #: ../gio/gsocket.c:464
 #, fuzzy, c-format
-msgid "creating xsocket_t from fd: %s"
+msgid "creating GSocket from fd: %s"
 msgstr "फाइल पढबामे त्रुटि: %s"
 
 #: ../gio/gsocket.c:498 ../gio/gsocket.c:514
@@ -3452,7 +3452,7 @@ msgstr "फाइलकेँ खोलबामे त्रुटि: %s"
 
 #: ../gio/gsocket.c:3081
 #, fuzzy
-msgid "xsocket_control_message_t not supported on windows"
+msgid "GSocketControlMessage not supported on windows"
 msgstr "संयोजन परिवर्तन win32 पर समर्थित नहि अछि"
 
 #: ../gio/gsocket.c:3358 ../gio/gsocket.c:3494
@@ -3461,7 +3461,7 @@ msgid "Error receiving message: %s"
 msgstr "फाइल हटाबै मे त्रुटि: %s"
 
 #: ../gio/gsocket.c:3598
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
 
 #: ../gio/gsocketclient.c:798 ../gio/gsocketclient.c:1368
@@ -3577,8 +3577,8 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of xthemed_icon_t encoding"
-msgstr "%d संस्करण xthemed_icon_t एन्कोडिंगकेँ नियंत्रित नहि कए सकल"
+msgid "Can't handle version %d of GThemedIcon encoding"
+msgstr "%d संस्करण GThemedIcon एन्कोडिंगकेँ नियंत्रित नहि कए सकल"
 
 #: ../gio/gtlscertificate.c:226
 msgid "No PEM-encoded private key found"

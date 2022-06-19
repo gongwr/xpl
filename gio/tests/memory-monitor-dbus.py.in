@@ -32,7 +32,7 @@ try:
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     class TestLowMemoryMonitor(dbusmock.DBusTestCase):
-        '''test_t GMemoryMonitorDBus'''
+        '''Test GMemoryMonitorDBus'''
 
         @classmethod
         def setUpClass(klass):
@@ -45,7 +45,7 @@ try:
             except AttributeError:
                 raise unittest.SkipTest('Low memory monitor not in '
                                         'introspection data. Requires '
-                                        'xobject-Introspection ≥ 1.63.2')
+                                        'GObject-Introspection ≥ 1.63.2')
             try:
                 (self.p_mock, self.obj_lmm) = self.spawn_server_template(
                     'low_memory_monitor', {}, stdout=subprocess.PIPE)

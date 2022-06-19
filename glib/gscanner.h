@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_SCANNER_H__
 #define __G_SCANNER_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -34,15 +34,15 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GScanner	xscanner_t;
+typedef struct _GScanner	GScanner;
 typedef struct _GScannerConfig	GScannerConfig;
 typedef union  _GTokenValue     GTokenValue;
 
-typedef void		(*GScannerMsgFunc)	(xscanner_t      *scanner,
-						 xchar_t	       *message,
-						 xboolean_t	error);
+typedef void		(*GScannerMsgFunc)	(GScanner      *scanner,
+						 gchar	       *message,
+						 gboolean	error);
 
-/* xscanner_t: Flexible lexical scanner for general purpose.
+/* GScanner: Flexible lexical scanner for general purpose.
  */
 
 /* Character sets */
@@ -75,7 +75,7 @@ typedef enum
 typedef enum
 {
   G_TOKEN_EOF			=   0,
-
+  
   G_TOKEN_LEFT_PAREN		= '(',
   G_TOKEN_RIGHT_PAREN		= ')',
   G_TOKEN_LEFT_CURLY		= '{',
@@ -84,11 +84,11 @@ typedef enum
   G_TOKEN_RIGHT_BRACE		= ']',
   G_TOKEN_EQUAL_SIGN		= '=',
   G_TOKEN_COMMA			= ',',
-
+  
   G_TOKEN_NONE			= 256,
-
+  
   G_TOKEN_ERROR,
-
+  
   G_TOKEN_CHAR,
   G_TOKEN_BINARY,
   G_TOKEN_OCTAL,
@@ -96,11 +96,11 @@ typedef enum
   G_TOKEN_HEX,
   G_TOKEN_FLOAT,
   G_TOKEN_STRING,
-
+  
   G_TOKEN_SYMBOL,
   G_TOKEN_IDENTIFIER,
   G_TOKEN_IDENTIFIER_NULL,
-
+  
   G_TOKEN_COMMENT_SINGLE,
   G_TOKEN_COMMENT_MULTI,
 
@@ -110,189 +110,189 @@ typedef enum
 
 union	_GTokenValue
 {
-  xpointer_t	v_symbol;
-  xchar_t		*v_identifier;
-  xulong_t	v_binary;
-  xulong_t	v_octal;
-  xulong_t	v_int;
-  xuint64_t       v_int64;
-  xdouble_t	v_float;
-  xulong_t	v_hex;
-  xchar_t		*v_string;
-  xchar_t		*v_comment;
-  xuchar_t	v_char;
-  xuint_t		v_error;
+  gpointer	v_symbol;
+  gchar		*v_identifier;
+  gulong	v_binary;
+  gulong	v_octal;
+  gulong	v_int;
+  guint64       v_int64;
+  gdouble	v_float;
+  gulong	v_hex;
+  gchar		*v_string;
+  gchar		*v_comment;
+  guchar	v_char;
+  guint		v_error;
 };
 
 struct	_GScannerConfig
 {
   /* Character sets
    */
-  xchar_t		*cset_skip_characters;		/* default: " \t\n" */
-  xchar_t		*cset_identifier_first;
-  xchar_t		*cset_identifier_nth;
-  xchar_t		*cpair_comment_single;		/* default: "#\n" */
-
+  gchar		*cset_skip_characters;		/* default: " \t\n" */
+  gchar		*cset_identifier_first;
+  gchar		*cset_identifier_nth;
+  gchar		*cpair_comment_single;		/* default: "#\n" */
+  
   /* Should symbol lookup work case sensitive?
    */
-  xuint_t		case_sensitive : 1;
-
+  guint		case_sensitive : 1;
+  
   /* Boolean values to be adjusted "on the fly"
    * to configure scanning behaviour.
    */
-  xuint_t		skip_comment_multi : 1;		/* C like comment */
-  xuint_t		skip_comment_single : 1;	/* single line comment */
-  xuint_t		scan_comment_multi : 1;		/* scan multi line comments? */
-  xuint_t		scan_identifier : 1;
-  xuint_t		scan_identifier_1char : 1;
-  xuint_t		scan_identifier_NULL : 1;
-  xuint_t		scan_symbols : 1;
-  xuint_t		scan_binary : 1;
-  xuint_t		scan_octal : 1;
-  xuint_t		scan_float : 1;
-  xuint_t		scan_hex : 1;			/* '0x0ff0' */
-  xuint_t		scan_hex_dollar : 1;		/* '$0ff0' */
-  xuint_t		scan_string_sq : 1;		/* string: 'anything' */
-  xuint_t		scan_string_dq : 1;		/* string: "\\-escapes!\n" */
-  xuint_t		numbers_2_int : 1;		/* bin, octal, hex => int */
-  xuint_t		int_2_float : 1;		/* int => G_TOKEN_FLOAT? */
-  xuint_t		identifier_2_string : 1;
-  xuint_t		char_2_token : 1;		/* return G_TOKEN_CHAR? */
-  xuint_t		symbol_2_token : 1;
-  xuint_t		scope_0_fallback : 1;		/* try scope 0 on lookups? */
-  xuint_t		store_int64 : 1; 		/* use value.v_int64 rather than v_int */
+  guint		skip_comment_multi : 1;		/* C like comment */
+  guint		skip_comment_single : 1;	/* single line comment */
+  guint		scan_comment_multi : 1;		/* scan multi line comments? */
+  guint		scan_identifier : 1;
+  guint		scan_identifier_1char : 1;
+  guint		scan_identifier_NULL : 1;
+  guint		scan_symbols : 1;
+  guint		scan_binary : 1;
+  guint		scan_octal : 1;
+  guint		scan_float : 1;
+  guint		scan_hex : 1;			/* '0x0ff0' */
+  guint		scan_hex_dollar : 1;		/* '$0ff0' */
+  guint		scan_string_sq : 1;		/* string: 'anything' */
+  guint		scan_string_dq : 1;		/* string: "\\-escapes!\n" */
+  guint		numbers_2_int : 1;		/* bin, octal, hex => int */
+  guint		int_2_float : 1;		/* int => G_TOKEN_FLOAT? */
+  guint		identifier_2_string : 1;
+  guint		char_2_token : 1;		/* return G_TOKEN_CHAR? */
+  guint		symbol_2_token : 1;
+  guint		scope_0_fallback : 1;		/* try scope 0 on lookups? */
+  guint		store_int64 : 1; 		/* use value.v_int64 rather than v_int */
 
   /*< private >*/
-  xuint_t		padding_dummy;
+  guint		padding_dummy;
 };
 
 struct	_GScanner
 {
   /* unused fields */
-  xpointer_t		user_data;
-  xuint_t			max_parse_errors;
-
+  gpointer		user_data;
+  guint			max_parse_errors;
+  
   /* g_scanner_error() increments this field */
-  xuint_t			parse_errors;
-
+  guint			parse_errors;
+  
   /* name of input stream, featured by the default message handler */
-  const xchar_t		*input_name;
-
+  const gchar		*input_name;
+  
   /* quarked data */
   GData			*qdata;
-
+  
   /* link into the scanner configuration */
   GScannerConfig	*config;
-
+  
   /* fields filled in after g_scanner_get_next_token() */
   GTokenType		token;
   GTokenValue		value;
-  xuint_t			line;
-  xuint_t			position;
-
+  guint			line;
+  guint			position;
+  
   /* fields filled in after g_scanner_peek_next_token() */
   GTokenType		next_token;
   GTokenValue		next_value;
-  xuint_t			next_line;
-  xuint_t			next_position;
+  guint			next_line;
+  guint			next_position;
 
   /*< private >*/
   /* to be considered private */
-  xhashtable_t		*symbol_table;
-  xint_t			input_fd;
-  const xchar_t		*text;
-  const xchar_t		*text_end;
-  xchar_t			*buffer;
-  xuint_t			scope_id;
+  GHashTable		*symbol_table;
+  gint			input_fd;
+  const gchar		*text;
+  const gchar		*text_end;
+  gchar			*buffer;
+  guint			scope_id;
 
   /*< public >*/
   /* handler function for _warn and _error */
   GScannerMsgFunc	msg_handler;
 };
 
-XPL_AVAILABLE_IN_ALL
-xscanner_t*	g_scanner_new			(const GScannerConfig *config_templ);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_destroy		(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_input_file		(xscanner_t	*scanner,
-						 xint_t		input_fd);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_sync_file_offset	(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_input_text		(xscanner_t	*scanner,
-						 const	xchar_t	*text,
-						 xuint_t		text_len);
-XPL_AVAILABLE_IN_ALL
-GTokenType	g_scanner_get_next_token	(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-GTokenType	g_scanner_peek_next_token	(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-GTokenType	g_scanner_cur_token		(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-GTokenValue	g_scanner_cur_value		(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-xuint_t		g_scanner_cur_line		(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-xuint_t		g_scanner_cur_position		(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-xboolean_t	g_scanner_eof			(xscanner_t	*scanner);
-XPL_AVAILABLE_IN_ALL
-xuint_t		g_scanner_set_scope		(xscanner_t	*scanner,
-						 xuint_t		 scope_id);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_scope_add_symbol	(xscanner_t	*scanner,
-						 xuint_t		 scope_id,
-						 const xchar_t	*symbol,
-						 xpointer_t	value);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_scope_remove_symbol	(xscanner_t	*scanner,
-						 xuint_t		 scope_id,
-						 const xchar_t	*symbol);
-XPL_AVAILABLE_IN_ALL
-xpointer_t	g_scanner_scope_lookup_symbol	(xscanner_t	*scanner,
-						 xuint_t		 scope_id,
-						 const xchar_t	*symbol);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_scope_foreach_symbol	(xscanner_t	*scanner,
-						 xuint_t		 scope_id,
+GLIB_AVAILABLE_IN_ALL
+GScanner*	g_scanner_new			(const GScannerConfig *config_templ);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_destroy		(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_input_file		(GScanner	*scanner,
+						 gint		input_fd);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_sync_file_offset	(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_input_text		(GScanner	*scanner,
+						 const	gchar	*text,
+						 guint		text_len);
+GLIB_AVAILABLE_IN_ALL
+GTokenType	g_scanner_get_next_token	(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+GTokenType	g_scanner_peek_next_token	(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+GTokenType	g_scanner_cur_token		(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+GTokenValue	g_scanner_cur_value		(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+guint		g_scanner_cur_line		(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+guint		g_scanner_cur_position		(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+gboolean	g_scanner_eof			(GScanner	*scanner);
+GLIB_AVAILABLE_IN_ALL
+guint		g_scanner_set_scope		(GScanner	*scanner,
+						 guint		 scope_id);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_scope_add_symbol	(GScanner	*scanner,
+						 guint		 scope_id,
+						 const gchar	*symbol,
+						 gpointer	value);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_scope_remove_symbol	(GScanner	*scanner,
+						 guint		 scope_id,
+						 const gchar	*symbol);
+GLIB_AVAILABLE_IN_ALL
+gpointer	g_scanner_scope_lookup_symbol	(GScanner	*scanner,
+						 guint		 scope_id,
+						 const gchar	*symbol);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_scope_foreach_symbol	(GScanner	*scanner,
+						 guint		 scope_id,
 						 GHFunc		 func,
-						 xpointer_t	 user_data);
-XPL_AVAILABLE_IN_ALL
-xpointer_t	g_scanner_lookup_symbol		(xscanner_t	*scanner,
-						 const xchar_t	*symbol);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_unexp_token		(xscanner_t	*scanner,
+						 gpointer	 user_data);
+GLIB_AVAILABLE_IN_ALL
+gpointer	g_scanner_lookup_symbol		(GScanner	*scanner,
+						 const gchar	*symbol);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_unexp_token		(GScanner	*scanner,
 						 GTokenType	expected_token,
-						 const xchar_t	*identifier_spec,
-						 const xchar_t	*symbol_spec,
-						 const xchar_t	*symbol_name,
-						 const xchar_t	*message,
-						 xint_t		 is_error);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_error			(xscanner_t	*scanner,
-						 const xchar_t	*format,
+						 const gchar	*identifier_spec,
+						 const gchar	*symbol_spec,
+						 const gchar	*symbol_name,
+						 const gchar	*message,
+						 gint		 is_error);
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_error			(GScanner	*scanner,
+						 const gchar	*format,
 						 ...) G_GNUC_PRINTF (2,3);
-XPL_AVAILABLE_IN_ALL
-void		g_scanner_warn			(xscanner_t	*scanner,
-						 const xchar_t	*format,
+GLIB_AVAILABLE_IN_ALL
+void		g_scanner_warn			(GScanner	*scanner,
+						 const gchar	*format,
 						 ...) G_GNUC_PRINTF (2,3);
 
 /* keep downward source compatibility */
 #define		g_scanner_add_symbol( scanner, symbol, value )	G_STMT_START { \
   g_scanner_scope_add_symbol ((scanner), 0, (symbol), (value)); \
-} G_STMT_END XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_scanner_scope_add_symbol)
+} G_STMT_END GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_scanner_scope_add_symbol)
 #define		g_scanner_remove_symbol( scanner, symbol )	G_STMT_START { \
   g_scanner_scope_remove_symbol ((scanner), 0, (symbol)); \
-} G_STMT_END XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_scanner_scope_remove_symbol)
+} G_STMT_END GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_scanner_scope_remove_symbol)
 #define		g_scanner_foreach_symbol( scanner, func, data )	G_STMT_START { \
   g_scanner_scope_foreach_symbol ((scanner), 0, (func), (data)); \
-} G_STMT_END XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_scanner_scope_foreach_symbol)
+} G_STMT_END GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_scanner_scope_foreach_symbol)
 
 /* The following two functions are deprecated and will be removed in
  * the next major release. They do no good. */
-#define g_scanner_freeze_symbol_table(scanner) ((void)0) XPL_DEPRECATED_MACRO_IN_2_26
-#define g_scanner_thaw_symbol_table(scanner) ((void)0) XPL_DEPRECATED_MACRO_IN_2_26
+#define g_scanner_freeze_symbol_table(scanner) ((void)0) GLIB_DEPRECATED_MACRO_IN_2_26
+#define g_scanner_thaw_symbol_table(scanner) ((void)0) GLIB_DEPRECATED_MACRO_IN_2_26
 
 G_END_DECLS
 

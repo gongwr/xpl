@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  * Copyright (C) 2008 Hans Breuer
  *
@@ -79,39 +79,39 @@ DECLARE_INTERFACE_(IMyExtractIconW,IUnknown)
 
 
 struct _GWin32Mount {
-  xobject_t parent;
+  GObject parent;
 
-  xvolume_monitor_t   *volume_monitor;
+  GVolumeMonitor   *volume_monitor;
 
   GWin32Volume      *volume; /* owned by volume monitor */
   int   drive_type;
 
   /* why does all this stuff need to be duplicated? It is in volume already! */
   char *name;
-  xicon_t *icon;
-  xicon_t *symbolic_icon;
+  GIcon *icon;
+  GIcon *symbolic_icon;
   char *mount_path;
 
-  xboolean_t can_eject;
+  gboolean can_eject;
 };
 
 static void g_win32_mount_mount_iface_init (GMountIface *iface);
 
 #define g_win32_mount_get_type _g_win32_mount_get_type
-G_DEFINE_TYPE_WITH_CODE (GWin32Mount, g_win32_mount, XTYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (XTYPE_MOUNT,
+G_DEFINE_TYPE_WITH_CODE (GWin32Mount, g_win32_mount, G_TYPE_OBJECT,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_MOUNT,
 						g_win32_mount_mount_iface_init))
 
 
 static void
-g_win32_mount_finalize (xobject_t *object)
+g_win32_mount_finalize (GObject *object)
 {
   GWin32Mount *mount;
-
+  
   mount = G_WIN32_MOUNT (object);
 
   if (mount->volume_monitor != NULL)
-    xobject_unref (mount->volume_monitor);
+    g_object_unref (mount->volume_monitor);
 #if 0
   if (mount->volume)
     _g_win32_volume_unset_mount (mount->volume, mount);
@@ -119,23 +119,23 @@ g_win32_mount_finalize (xobject_t *object)
   /* TODO: g_warn_if_fail (volume->volume == NULL); */
 
   if (mount->icon != NULL)
-    xobject_unref (mount->icon);
+    g_object_unref (mount->icon);
   if (mount->symbolic_icon != NULL)
-    xobject_unref (mount->symbolic_icon);
+    g_object_unref (mount->symbolic_icon);
 
   g_free (mount->name);
   g_free (mount->mount_path);
-
-  if (XOBJECT_CLASS (g_win32_mount_parent_class)->finalize)
-    (*XOBJECT_CLASS (g_win32_mount_parent_class)->finalize) (object);
+  
+  if (G_OBJECT_CLASS (g_win32_mount_parent_class)->finalize)
+    (*G_OBJECT_CLASS (g_win32_mount_parent_class)->finalize) (object);
 }
 
 static void
 g_win32_mount_class_init (GWin32MountClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->finalize = g_win32_mount_finalize;
+  gobject_class->finalize = g_win32_mount_finalize;
 }
 
 static void
@@ -150,13 +150,13 @@ g_win32_mount_init (GWin32Mount *win32_mount)
    Returns the name on success (free with g_free),
    NULL otherwise.
  */
-static xchar_t *
-get_mount_display_name (xunichar2_t *wdrive)
+static gchar *
+get_mount_display_name (gunichar2 *wdrive)
 {
   IShellFolder *desktop;
   PIDLIST_RELATIVE volume;
   STRRET volume_name;
-  xchar_t *result = NULL;
+  gchar *result = NULL;
 
   /* Get the desktop folder object reference */
   if (!SUCCEEDED (SHGetDesktopFolder (&desktop)))
@@ -172,7 +172,7 @@ get_mount_display_name (xunichar2_t *wdrive)
 
           if (SUCCEEDED (StrRetToStrW (&volume_name, volume, &volume_name_wchar)))
             {
-              result = xutf16_to_utf8 (volume_name_wchar, -1, NULL, NULL, NULL);
+              result = g_utf16_to_utf8 (volume_name_wchar, -1, NULL, NULL, NULL);
               CoTaskMemFree (volume_name_wchar);
             }
         }
@@ -184,44 +184,44 @@ get_mount_display_name (xunichar2_t *wdrive)
   return result;
 }
 
-static xchar_t *
+static gchar *
 _win32_get_displayname (const char *drive)
 {
-  xunichar2_t *wdrive = xutf8_to_utf16 (drive, -1, NULL, NULL, NULL);
-  xchar_t *name = get_mount_display_name (wdrive);
+  gunichar2 *wdrive = g_utf8_to_utf16 (drive, -1, NULL, NULL, NULL);
+  gchar *name = get_mount_display_name (wdrive);
 
   g_free (wdrive);
-  return name ? name : xstrdup (drive);
+  return name ? name : g_strdup (drive);
 }
 
 /*
  * _g_win32_mount_new:
- * @volume_monitor: a #xvolume_monitor_t.
+ * @volume_monitor: a #GVolumeMonitor.
  * @path: a win32 path.
  * @volume: usually NULL
- *
+ * 
  * Returns: a #GWin32Mount for the given win32 path.
  **/
 GWin32Mount *
-_g_win32_mount_new (xvolume_monitor_t  *volume_monitor,
+_g_win32_mount_new (GVolumeMonitor  *volume_monitor,
                     const char      *path,
                     GWin32Volume    *volume)
 {
   GWin32Mount *mount;
-  const xchar_t *drive = path; //fixme
+  const gchar *drive = path; //fixme
   WCHAR *drive_utf16;
 
-  drive_utf16 = xutf8_to_utf16 (drive, -1, NULL, NULL, NULL);
+  drive_utf16 = g_utf8_to_utf16 (drive, -1, NULL, NULL, NULL);
 
-#if 0
+#if 0  
   /* No volume for mount: Ignore internal things */
   if (volume == NULL && !g_win32_mount_guess_should_display (mount_entry))
     return NULL;
 #endif
 
-  mount = xobject_new (XTYPE_WIN32_MOUNT, NULL);
-  mount->volume_monitor = volume_monitor != NULL ? xobject_ref (volume_monitor) : NULL;
-  mount->mount_path = xstrdup (path);
+  mount = g_object_new (G_TYPE_WIN32_MOUNT, NULL);
+  mount->volume_monitor = volume_monitor != NULL ? g_object_ref (volume_monitor) : NULL;
+  mount->mount_path = g_strdup (path);
   mount->drive_type = GetDriveTypeW (drive_utf16);
   mount->can_eject = FALSE; /* TODO */
   mount->name = _win32_get_displayname (drive);
@@ -247,8 +247,8 @@ _g_win32_mount_unmounted (GWin32Mount *mount)
       _g_win32_volume_unset_mount (mount->volume, mount);
 #endif
       mount->volume = NULL;
-      xsignal_emit_by_name (mount, "changed");
-      /* there's really no need to emit mount_changed on the volume monitor
+      g_signal_emit_by_name (mount, "changed");
+      /* there's really no need to emit mount_changed on the volume monitor 
        * as we're going to be deleted.. */
     }
 }
@@ -261,22 +261,22 @@ _g_win32_mount_unset_volume (GWin32Mount  *mount,
     {
       mount->volume = NULL;
       /* TODO: Emit changed in idle to avoid locking issues */
-      xsignal_emit_by_name (mount, "changed");
+      g_signal_emit_by_name (mount, "changed");
       if (mount->volume_monitor != NULL)
-        xsignal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
+        g_signal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
     }
 }
 
-static xfile_t *
-g_win32_mount_get_root (xmount_t *mount)
+static GFile *
+g_win32_mount_get_root (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
-  return xfile_new_for_path (win32_mount->mount_path);
+  return g_file_new_for_path (win32_mount->mount_path);
 }
 
 static const char *
-_win32_drive_type_to_icon (int type, xboolean_t use_symbolic)
+_win32_drive_type_to_icon (int type, gboolean use_symbolic)
 {
   switch (type)
   {
@@ -296,7 +296,7 @@ _win32_drive_type_to_icon (int type, xboolean_t use_symbolic)
    Returns TRUE when result_name is set (free with g_free),
    FALSE otherwise.
  */
-static xboolean_t
+static gboolean
 get_icon_name_index (wchar_t  *mount_path,
                      wchar_t **result_name,
                      int      *result_index)
@@ -309,9 +309,9 @@ get_icon_name_index (wchar_t  *mount_path,
   int icon_index;
   UINT icon_flags;
   wchar_t *name_buffer;
-  xsize_t name_buffer_size;
-  xsize_t arbitrary_reasonable_limit = 5000;
-  xboolean_t result = FALSE;
+  gsize name_buffer_size;
+  gsize arbitrary_reasonable_limit = 5000;
+  gboolean result = FALSE;
 
   *result_name = NULL;
 
@@ -328,7 +328,7 @@ get_icon_name_index (wchar_t  *mount_path,
           /* Get a reference to IExtractIcon object for the volume */
           if (SUCCEEDED (IShellFolder_GetUIObjectOf (volume_parent, NULL, 1, (LPCITEMIDLIST *) &volume_relative, &IID_IExtractIconW, NULL, (void **) &eicon)))
             {
-              xboolean_t keep_going = TRUE;
+              gboolean keep_going = TRUE;
               name_buffer = NULL;
               name_buffer_size = MAX_PATH / 2;
               while (keep_going)
@@ -345,7 +345,7 @@ get_icon_name_index (wchar_t  *mount_path,
                         {
                           if (name_buffer_size < arbitrary_reasonable_limit)
                             {
-                              /* buffer_t was too small, keep going */
+                              /* Buffer was too small, keep going */
                               keep_going = TRUE;
                               continue;
                             }
@@ -374,12 +374,12 @@ get_icon_name_index (wchar_t  *mount_path,
   return result;
 }
 
-static xicon_t *
-g_win32_mount_get_icon (xmount_t *mount)
+static GIcon *
+g_win32_mount_get_icon (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
-  xreturn_val_if_fail (win32_mount->mount_path != NULL, NULL);
+  g_return_val_if_fail (win32_mount->mount_path != NULL, NULL);
 
   /* lazy creation */
   if (!win32_mount->icon)
@@ -387,7 +387,7 @@ g_win32_mount_get_icon (xmount_t *mount)
       wchar_t *icon_path;
       int icon_index;
       wchar_t *p;
-      wchar_t *wfn = xutf8_to_utf16 (win32_mount->mount_path, -1, NULL, NULL, NULL);
+      wchar_t *wfn = g_utf8_to_utf16 (win32_mount->mount_path, -1, NULL, NULL, NULL);
 
       for (p = wfn; p != NULL && *p != 0; p++)
         if (*p == L'/')
@@ -395,7 +395,7 @@ g_win32_mount_get_icon (xmount_t *mount)
 
       if (get_icon_name_index (wfn, &icon_path, &icon_index))
         {
-	  xchar_t *id = xstrdup_printf ("%S,%i", icon_path, icon_index);
+	  gchar *id = g_strdup_printf ("%S,%i", icon_path, icon_index);
 	  g_free (icon_path);
 	  win32_mount->icon = g_themed_icon_new (id);
 	  g_free (id);
@@ -406,15 +406,15 @@ g_win32_mount_get_icon (xmount_t *mount)
 	}
     }
 
-  return xobject_ref (win32_mount->icon);
+  return g_object_ref (win32_mount->icon);
 }
 
-static xicon_t *
-g_win32_mount_get_symbolic_icon (xmount_t *mount)
+static GIcon *
+g_win32_mount_get_symbolic_icon (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
-  xreturn_val_if_fail (win32_mount->mount_path != NULL, NULL);
+  g_return_val_if_fail (win32_mount->mount_path != NULL, NULL);
 
   /* lazy creation */
   if (!win32_mount->symbolic_icon)
@@ -422,25 +422,25 @@ g_win32_mount_get_symbolic_icon (xmount_t *mount)
       win32_mount->symbolic_icon = g_themed_icon_new_with_default_fallbacks (_win32_drive_type_to_icon (win32_mount->drive_type, TRUE));
     }
 
-  return xobject_ref (win32_mount->symbolic_icon);
+  return g_object_ref (win32_mount->symbolic_icon);
 }
 
 static char *
-g_win32_mount_get_uuid (xmount_t *mount)
+g_win32_mount_get_uuid (GMount *mount)
 {
   return NULL;
 }
 
 static char *
-g_win32_mount_get_name (xmount_t *mount)
+g_win32_mount_get_name (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
-
-  return xstrdup (win32_mount->name);
+  
+  return g_strdup (win32_mount->name);
 }
 
-static xdrive_t *
-g_win32_mount_get_drive (xmount_t *mount)
+static GDrive *
+g_win32_mount_get_drive (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
@@ -450,25 +450,25 @@ g_win32_mount_get_drive (xmount_t *mount)
   return NULL;
 }
 
-static xvolume_t *
-g_win32_mount_get_volume (xmount_t *mount)
+static GVolume *
+g_win32_mount_get_volume (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
   if (win32_mount->volume)
-    return G_VOLUME (xobject_ref (win32_mount->volume));
-
+    return G_VOLUME (g_object_ref (win32_mount->volume));
+  
   return NULL;
 }
 
-static xboolean_t
-g_win32_mount_can_unmount (xmount_t *mount)
+static gboolean
+g_win32_mount_can_unmount (GMount *mount)
 {
   return FALSE;
 }
 
-static xboolean_t
-g_win32_mount_can_eject (xmount_t *mount)
+static gboolean
+g_win32_mount_can_eject (GMount *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
   return win32_mount->can_eject;
@@ -477,45 +477,45 @@ g_win32_mount_can_eject (xmount_t *mount)
 
 typedef struct {
   GWin32Mount *win32_mount;
-  xasync_ready_callback_t callback;
-  xpointer_t user_data;
-  xcancellable_t *cancellable;
+  GAsyncReadyCallback callback;
+  gpointer user_data;
+  GCancellable *cancellable;
   int error_fd;
-  xio_channel_t *error_channel;
-  xuint_t error_channel_source_id;
-  xstring_t *error_string;
+  GIOChannel *error_channel;
+  guint error_channel_source_id;
+  GString *error_string;
 } UnmountEjectOp;
 
 static void
-g_win32_mount_unmount (xmount_t              *mount,
-		       xmount_unmount_flags_t   flags,
-		       xcancellable_t        *cancellable,
-		       xasync_ready_callback_t  callback,
-		       xpointer_t             user_data)
+g_win32_mount_unmount (GMount              *mount,
+		       GMountUnmountFlags   flags,
+		       GCancellable        *cancellable,
+		       GAsyncReadyCallback  callback,
+		       gpointer             user_data)
 {
 }
 
-static xboolean_t
-g_win32_mount_unmount_finish (xmount_t        *mount,
-			      xasync_result_t  *result,
-			      xerror_t       **error)
+static gboolean
+g_win32_mount_unmount_finish (GMount        *mount,
+			      GAsyncResult  *result,
+			      GError       **error)
 {
   return FALSE;
 }
 
 static void
-g_win32_mount_eject (xmount_t              *mount,
-		     xmount_unmount_flags_t   flags,
-		     xcancellable_t        *cancellable,
-		     xasync_ready_callback_t  callback,
-		     xpointer_t             user_data)
+g_win32_mount_eject (GMount              *mount,
+		     GMountUnmountFlags   flags,
+		     GCancellable        *cancellable,
+		     GAsyncReadyCallback  callback,
+		     gpointer             user_data)
 {
 }
 
-static xboolean_t
-g_win32_mount_eject_finish (xmount_t        *mount,
-			    xasync_result_t  *result,
-			    xerror_t       **error)
+static gboolean
+g_win32_mount_eject_finish (GMount        *mount,
+			    GAsyncResult  *result,
+			    GError       **error)
 {
   return FALSE;
 }

@@ -10,14 +10,14 @@
 /*** END file-production ***/
 
 /*** BEGIN value-header ***/
-xtype_t
+GType
 @enum_name@_get_type (void)
 {
-  static xsize_t static_g_define_type_id = 0;
+  static gsize static_g_define_type_id = 0;
 
   if (g_once_init_enter (&static_g_define_type_id))
     {
-      static const @type@_value_t values[] = {
+      static const G@Type@Value values[] = {
 /*** END value-header ***/
 
 /*** BEGIN value-production ***/
@@ -27,8 +27,8 @@ xtype_t
 /*** BEGIN value-tail ***/
         { 0, NULL, NULL }
       };
-      xtype_t g_define_type_id =
-        @type@_register_static (g_intern_static_string ("@EnumName@"), values);
+      GType g_define_type_id =
+        g_@type@_register_static (g_intern_static_string ("@EnumName@"), values);
       g_once_init_leave (&static_g_define_type_id, g_define_type_id);
     }
 

@@ -30,100 +30,100 @@
 G_BEGIN_DECLS
 
 /**
- * XTYPE_RESOURCE:
+ * G_TYPE_RESOURCE:
  *
- * The #xtype_t for #xresource_t.
+ * The #GType for #GResource.
  */
-#define XTYPE_RESOURCE (g_resource_get_type ())
+#define G_TYPE_RESOURCE (g_resource_get_type ())
 
 
 /**
  * G_RESOURCE_ERROR:
  *
- * Error domain for #xresource_t. Errors in this domain will be from the
- * #GResourceError enumeration. See #xerror_t for more information on
+ * Error domain for #GResource. Errors in this domain will be from the
+ * #GResourceError enumeration. See #GError for more information on
  * error domains.
  */
 #define G_RESOURCE_ERROR (g_resource_error_quark ())
-XPL_AVAILABLE_IN_2_32
-xquark g_resource_error_quark (void);
+GLIB_AVAILABLE_IN_2_32
+GQuark g_resource_error_quark (void);
 
 typedef struct _GStaticResource GStaticResource;
 
 struct _GStaticResource {
   /*< private >*/
-  const xuint8_t *data;
-  xsize_t data_len;
-  xresource_t *resource;
+  const guint8 *data;
+  gsize data_len;
+  GResource *resource;
   GStaticResource *next;
-  xpointer_t padding;
+  gpointer padding;
 };
 
-XPL_AVAILABLE_IN_2_32
-xtype_t         g_resource_get_type            (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_32
-xresource_t *   g_resource_new_from_data       (xbytes_t                *data,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-xresource_t *   g_resource_ref                 (xresource_t             *resource);
-XPL_AVAILABLE_IN_2_32
-void          g_resource_unref               (xresource_t             *resource);
-XPL_AVAILABLE_IN_2_32
-xresource_t *   g_resource_load                (const xchar_t           *filename,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-xinput_stream_t *g_resource_open_stream         (xresource_t             *resource,
+GLIB_AVAILABLE_IN_2_32
+GType         g_resource_get_type            (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_32
+GResource *   g_resource_new_from_data       (GBytes                *data,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+GResource *   g_resource_ref                 (GResource             *resource);
+GLIB_AVAILABLE_IN_2_32
+void          g_resource_unref               (GResource             *resource);
+GLIB_AVAILABLE_IN_2_32
+GResource *   g_resource_load                (const gchar           *filename,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+GInputStream *g_resource_open_stream         (GResource             *resource,
 					      const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-xbytes_t *      g_resource_lookup_data         (xresource_t             *resource,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+GBytes *      g_resource_lookup_data         (GResource             *resource,
 					      const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-char **       g_resource_enumerate_children  (xresource_t             *resource,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+char **       g_resource_enumerate_children  (GResource             *resource,
 					      const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-xboolean_t      g_resource_get_info            (xresource_t             *resource,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean      g_resource_get_info            (GResource             *resource,
 					      const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xsize_t                 *size,
-					      xuint32_t               *flags,
-					      xerror_t               **error);
+					      gsize                 *size,
+					      guint32               *flags,
+					      GError               **error);
 
-XPL_AVAILABLE_IN_2_32
-void          g_resources_register           (xresource_t             *resource);
-XPL_AVAILABLE_IN_2_32
-void          g_resources_unregister         (xresource_t             *resource);
-XPL_AVAILABLE_IN_2_32
-xinput_stream_t *g_resources_open_stream        (const char            *path,
+GLIB_AVAILABLE_IN_2_32
+void          g_resources_register           (GResource             *resource);
+GLIB_AVAILABLE_IN_2_32
+void          g_resources_unregister         (GResource             *resource);
+GLIB_AVAILABLE_IN_2_32
+GInputStream *g_resources_open_stream        (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-xbytes_t *      g_resources_lookup_data        (const char            *path,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+GBytes *      g_resources_lookup_data        (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
 char **       g_resources_enumerate_children (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xerror_t               **error);
-XPL_AVAILABLE_IN_2_32
-xboolean_t      g_resources_get_info           (const char            *path,
+					      GError               **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean      g_resources_get_info           (const char            *path,
 					      GResourceLookupFlags   lookup_flags,
-					      xsize_t                 *size,
-					      xuint32_t               *flags,
-					      xerror_t               **error);
+					      gsize                 *size,
+					      guint32               *flags,
+					      GError               **error);
 
 
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void          g_static_resource_init          (GStaticResource *static_resource);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void          g_static_resource_fini          (GStaticResource *static_resource);
-XPL_AVAILABLE_IN_2_32
-xresource_t    *g_static_resource_get_resource  (GStaticResource *static_resource);
+GLIB_AVAILABLE_IN_2_32
+GResource    *g_static_resource_get_resource  (GStaticResource *static_resource);
 
 G_END_DECLS
 

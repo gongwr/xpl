@@ -38,24 +38,24 @@ typedef enum {
 } MountOpState;
 
 static int outstanding_mounts = 0;
-static xmain_loop_t *main_loop;
-static xvolume_monitor_t *volume_monitor;
+static GMainLoop *main_loop;
+static GVolumeMonitor *volume_monitor;
 
-static xboolean_t mount_mountable = FALSE;
-static xboolean_t mount_unmount = FALSE;
-static xboolean_t mount_eject = FALSE;
-static xboolean_t force = FALSE;
-static xboolean_t anonymous = FALSE;
-static xboolean_t mount_list = FALSE;
-static xboolean_t extra_detail = FALSE;
-static xboolean_t mount_monitor = FALSE;
-static xboolean_t tcrypt_hidden = FALSE;
-static xboolean_t tcrypt_system = FALSE;
-static xuint_t tcrypt_pim = 0;
+static gboolean mount_mountable = FALSE;
+static gboolean mount_unmount = FALSE;
+static gboolean mount_eject = FALSE;
+static gboolean force = FALSE;
+static gboolean anonymous = FALSE;
+static gboolean mount_list = FALSE;
+static gboolean extra_detail = FALSE;
+static gboolean mount_monitor = FALSE;
+static gboolean tcrypt_hidden = FALSE;
+static gboolean tcrypt_system = FALSE;
+static guint tcrypt_pim = 0;
 static const char *unmount_scheme = NULL;
 static const char *mount_id = NULL;
 static const char *stop_device_file = NULL;
-static xboolean_t success = TRUE;
+static gboolean success = TRUE;
 
 
 static const GOptionEntry entries[] =
@@ -79,12 +79,12 @@ static const GOptionEntry entries[] =
 };
 
 static char *
-prompt_for (const char *prompt, const char *default_value, xboolean_t echo)
+prompt_for (const char *prompt, const char *default_value, gboolean echo)
 {
 #ifdef HAVE_TERMIOS_H
   struct termios term_attr;
   int old_flags;
-  xboolean_t restore_flags;
+  gboolean restore_flags;
 #endif
   char data[256];
   int len;
@@ -133,12 +133,12 @@ prompt_for (const char *prompt, const char *default_value, xboolean_t echo)
     g_print ("\n");
 
   if (*data == 0 && default_value)
-    return xstrdup (default_value);
-  return xstrdup (data);
+    return g_strdup (default_value);
+  return g_strdup (data);
 }
 
 static void
-ask_password_cb (xmount_operation_t *op,
+ask_password_cb (GMountOperation *op,
                  const char      *message,
                  const char      *default_user,
                  const char      *default_domain,
@@ -193,14 +193,14 @@ ask_password_cb (xmount_operation_t *op,
 
   /* Only try anonymous access once. */
   if (anonymous &&
-      GPOINTER_TO_INT (xobject_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ASKED)
+      GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ASKED)
     {
-      xobject_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_ABORTED));
+      g_object_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_ABORTED));
       g_mount_operation_reply (op, G_MOUNT_OPERATION_ABORTED);
     }
   else
     {
-      xobject_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_ASKED));
+      g_object_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_ASKED));
       g_mount_operation_reply (op, G_MOUNT_OPERATION_HANDLED);
     }
 
@@ -211,10 +211,10 @@ error:
 }
 
 static void
-ask_question_cb (xmount_operation_t *op,
+ask_question_cb (GMountOperation *op,
                  char *message,
                  char **choices,
-                 xpointer_t user_data)
+                 gpointer user_data)
 {
   char **ptr = choices;
   char *s;
@@ -248,78 +248,78 @@ error:
 }
 
 static void
-mount_mountable_done_cb (xobject_t *object,
-                         xasync_result_t *res,
-                         xpointer_t user_data)
+mount_mountable_done_cb (GObject *object,
+                         GAsyncResult *res,
+                         gpointer user_data)
 {
-  xfile_t *target;
-  xerror_t *error = NULL;
-  xmount_operation_t *op = user_data;
+  GFile *target;
+  GError *error = NULL;
+  GMountOperation *op = user_data;
 
-  target = xfile_mount_mountable_finish (XFILE (object), res, &error);
+  target = g_file_mount_mountable_finish (G_FILE (object), res, &error);
 
   if (target == NULL)
     {
       success = FALSE;
-      if (GPOINTER_TO_INT (xobject_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ABORTED)
-        print_file_error (XFILE (object), _("Anonymous access denied"));
-      else if (!xerror_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED))
-        print_file_error (XFILE (object), error->message);
+      if (GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ABORTED)
+        print_file_error (G_FILE (object), _("Anonymous access denied"));
+      else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED))
+        print_file_error (G_FILE (object), error->message);
 
-      xerror_free (error);
+      g_error_free (error);
     }
   else
-    xobject_unref (target);
+    g_object_unref (target);
 
-  xobject_unref (op);
+  g_object_unref (op);
 
   outstanding_mounts--;
 
   if (outstanding_mounts == 0)
-    xmain_loop_quit (main_loop);
+    g_main_loop_quit (main_loop);
 }
 
 static void
-mount_done_cb (xobject_t *object,
-               xasync_result_t *res,
-               xpointer_t user_data)
+mount_done_cb (GObject *object,
+               GAsyncResult *res,
+               gpointer user_data)
 {
-  xboolean_t succeeded;
-  xerror_t *error = NULL;
-  xmount_operation_t *op = user_data;
+  gboolean succeeded;
+  GError *error = NULL;
+  GMountOperation *op = user_data;
 
-  succeeded = xfile_mount_enclosing_volume_finish (XFILE (object), res, &error);
+  succeeded = g_file_mount_enclosing_volume_finish (G_FILE (object), res, &error);
 
   if (!succeeded)
     {
       success = FALSE;
-      if (GPOINTER_TO_INT (xobject_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ABORTED)
-        print_file_error (XFILE (object), _("Anonymous access denied"));
-      else if (!xerror_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED))
-        print_file_error (XFILE (object), error->message);
+      if (GPOINTER_TO_INT (g_object_get_data (G_OBJECT (op), "state")) == MOUNT_OP_ABORTED)
+        print_file_error (G_FILE (object), _("Anonymous access denied"));
+      else if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_FAILED_HANDLED))
+        print_file_error (G_FILE (object), error->message);
 
-      xerror_free (error);
+      g_error_free (error);
     }
 
-  xobject_unref (op);
+  g_object_unref (op);
 
   outstanding_mounts--;
 
   if (outstanding_mounts == 0)
-    xmain_loop_quit (main_loop);
+    g_main_loop_quit (main_loop);
 }
 
-static xmount_operation_t *
+static GMountOperation *
 new_mount_op (void)
 {
-  xmount_operation_t *op;
+  GMountOperation *op;
 
   op = g_mount_operation_new ();
 
-  xobject_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_NONE));
+  g_object_set_data (G_OBJECT (op), "state", GINT_TO_POINTER (MOUNT_OP_NONE));
 
-  xsignal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
-  xsignal_connect (op, "ask_question", G_CALLBACK (ask_question_cb), NULL);
+  g_signal_connect (op, "ask_password", G_CALLBACK (ask_password_cb), NULL);
+  g_signal_connect (op, "ask_question", G_CALLBACK (ask_question_cb), NULL);
 
   /* TODO: we *should* also connect to the "aborted" signal but since the
    * main thread is blocked handling input we won't get that signal anyway...
@@ -330,9 +330,9 @@ new_mount_op (void)
 
 
 static void
-mount (xfile_t *file)
+mount (GFile *file)
 {
-  xmount_operation_t *op;
+  GMountOperation *op;
 
   if (file == NULL)
     return;
@@ -340,137 +340,137 @@ mount (xfile_t *file)
   op = new_mount_op ();
 
   if (mount_mountable)
-    xfile_mount_mountable (file, 0, op, NULL, mount_mountable_done_cb, op);
+    g_file_mount_mountable (file, 0, op, NULL, mount_mountable_done_cb, op);
   else
-    xfile_mount_enclosing_volume (file, 0, op, NULL, mount_done_cb, op);
+    g_file_mount_enclosing_volume (file, 0, op, NULL, mount_done_cb, op);
 
   outstanding_mounts++;
 }
 
 static void
-unmount_done_cb (xobject_t *object,
-                 xasync_result_t *res,
-                 xpointer_t user_data)
+unmount_done_cb (GObject *object,
+                 GAsyncResult *res,
+                 gpointer user_data)
 {
-  xboolean_t succeeded;
-  xerror_t *error = NULL;
-  xfile_t *file = XFILE (user_data);
+  gboolean succeeded;
+  GError *error = NULL;
+  GFile *file = G_FILE (user_data);
 
   succeeded = g_mount_unmount_with_operation_finish (G_MOUNT (object), res, &error);
 
-  xobject_unref (G_MOUNT (object));
+  g_object_unref (G_MOUNT (object));
 
   if (!succeeded)
     {
       print_file_error (file, error->message);
       success = FALSE;
-      xerror_free (error);
+      g_error_free (error);
     }
 
-  xobject_unref (file);
+  g_object_unref (file);
 
   outstanding_mounts--;
 
   if (outstanding_mounts == 0)
-    xmain_loop_quit (main_loop);
+    g_main_loop_quit (main_loop);
 }
 
 static void
-unmount (xfile_t *file)
+unmount (GFile *file)
 {
-  xmount_t *mount;
-  xerror_t *error = NULL;
-  xmount_operation_t *mount_op;
-  xmount_unmount_flags_t flags;
+  GMount *mount;
+  GError *error = NULL;
+  GMountOperation *mount_op;
+  GMountUnmountFlags flags;
 
   if (file == NULL)
     return;
 
-  mount = xfile_find_enclosing_mount (file, NULL, &error);
+  mount = g_file_find_enclosing_mount (file, NULL, &error);
   if (mount == NULL)
     {
       print_file_error (file, error->message);
       success = FALSE;
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
   mount_op = new_mount_op ();
   flags = force ? G_MOUNT_UNMOUNT_FORCE : G_MOUNT_UNMOUNT_NONE;
-  g_mount_unmount_with_operation (mount, flags, mount_op, NULL, unmount_done_cb, xobject_ref (file));
-  xobject_unref (mount_op);
+  g_mount_unmount_with_operation (mount, flags, mount_op, NULL, unmount_done_cb, g_object_ref (file));
+  g_object_unref (mount_op);
 
   outstanding_mounts++;
 }
 
 static void
-eject_done_cb (xobject_t *object,
-               xasync_result_t *res,
-               xpointer_t user_data)
+eject_done_cb (GObject *object,
+               GAsyncResult *res,
+               gpointer user_data)
 {
-  xboolean_t succeeded;
-  xerror_t *error = NULL;
-  xfile_t *file = XFILE (user_data);
+  gboolean succeeded;
+  GError *error = NULL;
+  GFile *file = G_FILE (user_data);
 
   succeeded = g_mount_eject_with_operation_finish (G_MOUNT (object), res, &error);
 
-  xobject_unref (G_MOUNT (object));
+  g_object_unref (G_MOUNT (object));
 
   if (!succeeded)
     {
       print_file_error (file, error->message);
       success = FALSE;
-      xerror_free (error);
+      g_error_free (error);
     }
 
-  xobject_unref (file);
+  g_object_unref (file);
 
   outstanding_mounts--;
 
   if (outstanding_mounts == 0)
-    xmain_loop_quit (main_loop);
+    g_main_loop_quit (main_loop);
 }
 
 static void
-eject (xfile_t *file)
+eject (GFile *file)
 {
-  xmount_t *mount;
-  xerror_t *error = NULL;
-  xmount_operation_t *mount_op;
-  xmount_unmount_flags_t flags;
+  GMount *mount;
+  GError *error = NULL;
+  GMountOperation *mount_op;
+  GMountUnmountFlags flags;
 
   if (file == NULL)
     return;
 
-  mount = xfile_find_enclosing_mount (file, NULL, &error);
+  mount = g_file_find_enclosing_mount (file, NULL, &error);
   if (mount == NULL)
     {
       print_file_error (file, error->message);
       success = FALSE;
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
   mount_op = new_mount_op ();
   flags = force ? G_MOUNT_UNMOUNT_FORCE : G_MOUNT_UNMOUNT_NONE;
-  g_mount_eject_with_operation (mount, flags, mount_op, NULL, eject_done_cb, xobject_ref (file));
-  xobject_unref (mount_op);
+  g_mount_eject_with_operation (mount, flags, mount_op, NULL, eject_done_cb, g_object_ref (file));
+  g_object_unref (mount_op);
 
   outstanding_mounts++;
 }
 
 static void
-stop_with_device_file_cb (xobject_t *object,
-                          xasync_result_t *res,
-                          xpointer_t user_data)
+stop_with_device_file_cb (GObject *object,
+                          GAsyncResult *res,
+                          gpointer user_data)
 {
-  xerror_t *error = NULL;
-  xchar_t *device_path = user_data;
+  GError *error = NULL;
+  gchar *device_path = user_data;
 
-  if (!xdrive_stop_finish (G_DRIVE (object), res, &error))
+  if (!g_drive_stop_finish (G_DRIVE (object), res, &error))
     {
       print_error ("%s: %s", device_path, error->message);
-      xerror_free (error);
+      g_error_free (error);
       success = FALSE;
     }
 
@@ -479,43 +479,43 @@ stop_with_device_file_cb (xobject_t *object,
   outstanding_mounts--;
 
   if (outstanding_mounts == 0)
-    xmain_loop_quit (main_loop);
+    g_main_loop_quit (main_loop);
 }
 
 static void
 stop_with_device_file (const char *device_file)
 {
-  xlist_t *drives;
-  xlist_t *l;
+  GList *drives;
+  GList *l;
 
   drives = g_volume_monitor_get_connected_drives (volume_monitor);
   for (l = drives; l != NULL; l = l->next)
     {
-      xdrive_t *drive = G_DRIVE (l->data);
-      xchar_t *id;
+      GDrive *drive = G_DRIVE (l->data);
+      gchar *id;
 
-      id = xdrive_get_identifier (drive, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
-      if (xstrcmp0 (id, device_file) == 0)
+      id = g_drive_get_identifier (drive, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
+      if (g_strcmp0 (id, device_file) == 0)
         {
-          xmount_operation_t *op;
-          xmount_unmount_flags_t flags;
+          GMountOperation *op;
+          GMountUnmountFlags flags;
 
           op = new_mount_op ();
           flags = force ? G_MOUNT_UNMOUNT_FORCE : G_MOUNT_UNMOUNT_NONE;
-          xdrive_stop (drive,
+          g_drive_stop (drive,
                         flags,
                         op,
                         NULL,
                         stop_with_device_file_cb,
                         g_steal_pointer (&id));
-          xobject_unref (op);
+          g_object_unref (op);
 
           outstanding_mounts++;
         }
 
       g_free (id);
     }
-  xlist_free_full (drives, xobject_unref);
+  g_list_free_full (drives, g_object_unref);
 
   if (outstanding_mounts == 0)
     {
@@ -524,10 +524,10 @@ stop_with_device_file (const char *device_file)
     }
 }
 
-static xboolean_t
-iterate_gmain_timeout_function (xpointer_t data)
+static gboolean
+iterate_gmain_timeout_function (gpointer data)
 {
-  xmain_loop_quit (main_loop);
+  g_main_loop_quit (main_loop);
   return FALSE;
 }
 
@@ -535,11 +535,11 @@ static void
 iterate_gmain(void)
 {
   g_timeout_add (500, iterate_gmain_timeout_function, NULL);
-  xmain_loop_run (main_loop);
+  g_main_loop_run (main_loop);
 }
 
 static void
-show_themed_icon_names (xthemed_icon_t *icon, xboolean_t symbolic, int indent)
+show_themed_icon_names (GThemedIcon *icon, gboolean symbolic, int indent)
 {
   char **names;
   char **iter;
@@ -548,92 +548,92 @@ show_themed_icon_names (xthemed_icon_t *icon, xboolean_t symbolic, int indent)
 
   names = NULL;
 
-  xobject_get (icon, "names", &names, NULL);
+  g_object_get (icon, "names", &names, NULL);
 
   for (iter = names; *iter; iter++)
     g_print ("  [%s]", *iter);
 
   g_print ("\n");
-  xstrfreev (names);
+  g_strfreev (names);
 }
 
 /* don't copy-paste this code */
 static char *
-get_type_name (xpointer_t object)
+get_type_name (gpointer object)
 {
   const char *type_name;
   char *ret;
 
-  type_name = xtype_name (XTYPE_FROM_INSTANCE (object));
+  type_name = g_type_name (G_TYPE_FROM_INSTANCE (object));
   if (strcmp ("GProxyDrive", type_name) == 0)
     {
-      ret = xstrdup_printf ("%s (%s)",
+      ret = g_strdup_printf ("%s (%s)",
                              type_name,
-                             (const char *) xobject_get_data (G_OBJECT (object),
+                             (const char *) g_object_get_data (G_OBJECT (object),
                                                                "g-proxy-drive-volume-monitor-name"));
     }
   else if (strcmp ("GProxyVolume", type_name) == 0)
     {
-      ret = xstrdup_printf ("%s (%s)",
+      ret = g_strdup_printf ("%s (%s)",
                              type_name,
-                             (const char *) xobject_get_data (G_OBJECT (object),
+                             (const char *) g_object_get_data (G_OBJECT (object),
                                                                "g-proxy-volume-volume-monitor-name"));
     }
   else if (strcmp ("GProxyMount", type_name) == 0)
     {
-      ret = xstrdup_printf ("%s (%s)",
+      ret = g_strdup_printf ("%s (%s)",
                              type_name,
-                             (const char *) xobject_get_data (G_OBJECT (object),
+                             (const char *) g_object_get_data (G_OBJECT (object),
                                                                "g-proxy-mount-volume-monitor-name"));
     }
   else if (strcmp ("GProxyShadowMount", type_name) == 0)
     {
-      ret = xstrdup_printf ("%s (%s)",
+      ret = g_strdup_printf ("%s (%s)",
                              type_name,
-                             (const char *) xobject_get_data (G_OBJECT (object),
+                             (const char *) g_object_get_data (G_OBJECT (object),
                                                                "g-proxy-shadow-mount-volume-monitor-name"));
     }
   else
     {
-      ret = xstrdup (type_name);
+      ret = g_strdup (type_name);
     }
 
   return ret;
 }
 
 static void
-list_mounts (xlist_t *mounts,
+list_mounts (GList *mounts,
              int indent,
-             xboolean_t only_with_no_volume)
+             gboolean only_with_no_volume)
 {
-  xlist_t *l;
+  GList *l;
   int c;
-  xmount_t *mount;
-  xvolume_t *volume;
+  GMount *mount;
+  GVolume *volume;
   char *name, *uuid, *uri;
-  xfile_t *root, *default_location;
-  xicon_t *icon;
+  GFile *root, *default_location;
+  GIcon *icon;
   char **x_content_types;
   char *type_name;
-  const xchar_t *sort_key;
+  const gchar *sort_key;
 
   for (c = 0, l = mounts; l != NULL; l = l->next, c++)
     {
-      mount = (xmount_t *) l->data;
+      mount = (GMount *) l->data;
 
       if (only_with_no_volume)
         {
           volume = g_mount_get_volume (mount);
           if (volume != NULL)
             {
-              xobject_unref (volume);
+              g_object_unref (volume);
               continue;
             }
         }
 
       name = g_mount_get_name (mount);
       root = g_mount_get_root (mount);
-      uri = xfile_get_uri (root);
+      uri = g_file_get_uri (root);
 
       g_print ("%*sMount(%d): %s -> %s\n", indent, "", c, name, uri);
 
@@ -650,32 +650,32 @@ list_mounts (xlist_t *mounts,
           default_location = g_mount_get_default_location (mount);
           if (default_location)
             {
-              char *loc_uri = xfile_get_uri (default_location);
+              char *loc_uri = g_file_get_uri (default_location);
               g_print ("%*sdefault_location=%s\n", indent + 2, "", loc_uri);
               g_free (loc_uri);
-              xobject_unref (default_location);
+              g_object_unref (default_location);
             }
 
           icon = g_mount_get_icon (mount);
           if (icon)
             {
-              if (X_IS_THEMED_ICON (icon))
+              if (G_IS_THEMED_ICON (icon))
                 show_themed_icon_names (G_THEMED_ICON (icon), FALSE, indent + 2);
 
-              xobject_unref (icon);
+              g_object_unref (icon);
             }
 
           icon = g_mount_get_symbolic_icon (mount);
           if (icon)
             {
-              if (X_IS_THEMED_ICON (icon))
+              if (G_IS_THEMED_ICON (icon))
                 show_themed_icon_names (G_THEMED_ICON (icon), TRUE, indent + 2);
 
-              xobject_unref (icon);
+              g_object_unref (icon);
             }
 
           x_content_types = g_mount_guess_content_type_sync (mount, FALSE, NULL, NULL);
-          if (x_content_types != NULL && xstrv_length (x_content_types) > 0)
+          if (x_content_types != NULL && g_strv_length (x_content_types) > 0)
             {
               int n;
               g_print ("%*sx_content_types:", indent + 2, "");
@@ -683,7 +683,7 @@ list_mounts (xlist_t *mounts,
                   g_print (" %s", x_content_types[n]);
               g_print ("\n");
             }
-          xstrfreev (x_content_types);
+          g_strfreev (x_content_types);
 
           g_print ("%*scan_unmount=%d\n", indent + 2, "", g_mount_can_unmount (mount));
           g_print ("%*scan_eject=%d\n", indent + 2, "", g_mount_can_eject (mount));
@@ -694,40 +694,40 @@ list_mounts (xlist_t *mounts,
           g_free (uuid);
         }
 
-      xobject_unref (root);
+      g_object_unref (root);
       g_free (name);
       g_free (uri);
     }
 }
 
 static void
-list_volumes (xlist_t *volumes,
+list_volumes (GList *volumes,
               int indent,
-              xboolean_t only_with_no_drive)
+              gboolean only_with_no_drive)
 {
-  xlist_t *l, *mounts;
+  GList *l, *mounts;
   int c, i;
-  xmount_t *mount;
-  xvolume_t *volume;
-  xdrive_t *drive;
+  GMount *mount;
+  GVolume *volume;
+  GDrive *drive;
   char *name;
   char *uuid;
-  xfile_t *activation_root;
+  GFile *activation_root;
   char **ids;
-  xicon_t *icon;
+  GIcon *icon;
   char *type_name;
-  const xchar_t *sort_key;
+  const gchar *sort_key;
 
   for (c = 0, l = volumes; l != NULL; l = l->next, c++)
     {
-      volume = (xvolume_t *) l->data;
+      volume = (GVolume *) l->data;
 
       if (only_with_no_drive)
         {
           drive = g_volume_get_drive (volume);
           if (drive != NULL)
             {
-              xobject_unref (drive);
+              g_object_unref (drive);
               continue;
             }
         }
@@ -755,7 +755,7 @@ list_volumes (xlist_t *volumes,
                   g_free (id);
                 }
             }
-          xstrfreev (ids);
+          g_strfreev (ids);
 
           uuid = g_volume_get_uuid (volume);
           if (uuid)
@@ -764,27 +764,27 @@ list_volumes (xlist_t *volumes,
           if (activation_root)
             {
               char *uri;
-              uri = xfile_get_uri (activation_root);
+              uri = g_file_get_uri (activation_root);
               g_print ("%*sactivation_root=%s\n", indent + 2, "", uri);
               g_free (uri);
-              xobject_unref (activation_root);
+              g_object_unref (activation_root);
             }
           icon = g_volume_get_icon (volume);
           if (icon)
             {
-              if (X_IS_THEMED_ICON (icon))
+              if (G_IS_THEMED_ICON (icon))
                 show_themed_icon_names (G_THEMED_ICON (icon), FALSE, indent + 2);
 
-              xobject_unref (icon);
+              g_object_unref (icon);
             }
 
           icon = g_volume_get_symbolic_icon (volume);
           if (icon)
             {
-              if (X_IS_THEMED_ICON (icon))
+              if (G_IS_THEMED_ICON (icon))
                 show_themed_icon_names (G_THEMED_ICON (icon), TRUE, indent + 2);
 
-              xobject_unref (icon);
+              g_object_unref (icon);
             }
 
           g_print ("%*scan_mount=%d\n", indent + 2, "", g_volume_can_mount (volume));
@@ -799,31 +799,31 @@ list_volumes (xlist_t *volumes,
       mount = g_volume_get_mount (volume);
       if (mount)
         {
-          mounts = xlist_prepend (NULL, mount);
+          mounts = g_list_prepend (NULL, mount);
           list_mounts (mounts, indent + 2, FALSE);
-          xlist_free (mounts);
-          xobject_unref (mount);
+          g_list_free (mounts);
+          g_object_unref (mount);
         }
     }
 }
 
 static void
-list_drives (xlist_t *drives,
+list_drives (GList *drives,
              int indent)
 {
-  xlist_t *volumes, *l;
+  GList *volumes, *l;
   int c, i;
-  xdrive_t *drive;
+  GDrive *drive;
   char *name;
   char **ids;
-  xicon_t *icon;
+  GIcon *icon;
   char *type_name;
-  const xchar_t *sort_key;
+  const gchar *sort_key;
 
   for (c = 0, l = drives; l != NULL; l = l->next, c++)
     {
-      drive = (xdrive_t *) l->data;
-      name = xdrive_get_name (drive);
+      drive = (GDrive *) l->data;
+      name = g_drive_get_name (drive);
 
       g_print ("%*sDrive(%d): %s\n", indent, "", c, name);
       g_free (name);
@@ -834,66 +834,66 @@ list_drives (xlist_t *drives,
 
       if (extra_detail)
         {
-          xenum_value_t *enum_value;
-          xpointer_t klass;
+          GEnumValue *enum_value;
+          gpointer klass;
 
-          ids = xdrive_enumerate_identifiers (drive);
+          ids = g_drive_enumerate_identifiers (drive);
           if (ids && ids[0] != NULL)
             {
               g_print ("%*sids:\n", indent+2, "");
               for (i = 0; ids[i] != NULL; i++)
                 {
-                  char *id = xdrive_get_identifier (drive,
+                  char *id = g_drive_get_identifier (drive,
                                                      ids[i]);
                   g_print ("%*s %s: '%s'\n", indent+2, "", ids[i], id);
                   g_free (id);
                 }
             }
-          xstrfreev (ids);
+          g_strfreev (ids);
 
-          icon = xdrive_get_icon (drive);
+          icon = g_drive_get_icon (drive);
           if (icon)
           {
-                  if (X_IS_THEMED_ICON (icon))
+                  if (G_IS_THEMED_ICON (icon))
                           show_themed_icon_names (G_THEMED_ICON (icon), FALSE, indent + 2);
-                  xobject_unref (icon);
+                  g_object_unref (icon);
           }
 
-          icon = xdrive_get_symbolic_icon (drive);
+          icon = g_drive_get_symbolic_icon (drive);
           if (icon)
             {
-              if (X_IS_THEMED_ICON (icon))
+              if (G_IS_THEMED_ICON (icon))
                 show_themed_icon_names (G_THEMED_ICON (icon), TRUE, indent + 2);
 
-              xobject_unref (icon);
+              g_object_unref (icon);
             }
 
-          g_print ("%*sis_removable=%d\n", indent + 2, "", xdrive_is_removable (drive));
-          g_print ("%*sis_media_removable=%d\n", indent + 2, "", xdrive_is_media_removable (drive));
-          g_print ("%*shas_media=%d\n", indent + 2, "", xdrive_has_media (drive));
-          g_print ("%*sis_media_check_automatic=%d\n", indent + 2, "", xdrive_is_media_check_automatic (drive));
-          g_print ("%*scan_poll_for_media=%d\n", indent + 2, "", xdrive_can_poll_for_media (drive));
-          g_print ("%*scan_eject=%d\n", indent + 2, "", xdrive_can_eject (drive));
-          g_print ("%*scan_start=%d\n", indent + 2, "", xdrive_can_start (drive));
-          g_print ("%*scan_stop=%d\n", indent + 2, "", xdrive_can_stop (drive));
+          g_print ("%*sis_removable=%d\n", indent + 2, "", g_drive_is_removable (drive));
+          g_print ("%*sis_media_removable=%d\n", indent + 2, "", g_drive_is_media_removable (drive));
+          g_print ("%*shas_media=%d\n", indent + 2, "", g_drive_has_media (drive));
+          g_print ("%*sis_media_check_automatic=%d\n", indent + 2, "", g_drive_is_media_check_automatic (drive));
+          g_print ("%*scan_poll_for_media=%d\n", indent + 2, "", g_drive_can_poll_for_media (drive));
+          g_print ("%*scan_eject=%d\n", indent + 2, "", g_drive_can_eject (drive));
+          g_print ("%*scan_start=%d\n", indent + 2, "", g_drive_can_start (drive));
+          g_print ("%*scan_stop=%d\n", indent + 2, "", g_drive_can_stop (drive));
 
           enum_value = NULL;
-          klass = xtype_class_ref (XTYPE_DRIVE_START_STOP_TYPE);
+          klass = g_type_class_ref (G_TYPE_DRIVE_START_STOP_TYPE);
           if (klass != NULL)
             {
-              enum_value = xenum_get_value (klass, xdrive_get_start_stop_type (drive));
+              enum_value = g_enum_get_value (klass, g_drive_get_start_stop_type (drive));
               g_print ("%*sstart_stop_type=%s\n", indent + 2, "",
                        enum_value != NULL ? enum_value->value_nick : "UNKNOWN");
-              xtype_class_unref (klass);
+              g_type_class_unref (klass);
             }
 
-          sort_key = xdrive_get_sort_key (drive);
+          sort_key = g_drive_get_sort_key (drive);
           if (sort_key != NULL)
             g_print ("%*ssort_key=%s\n", indent + 2, "", sort_key);
         }
-      volumes = xdrive_get_volumes (drive);
+      volumes = g_drive_get_volumes (drive);
       list_volumes (volumes, indent + 2, FALSE);
-      xlist_free_full (volumes, xobject_unref);
+      g_list_free_full (volumes, g_object_unref);
     }
 }
 
@@ -901,56 +901,56 @@ list_drives (xlist_t *drives,
 static void
 list_monitor_items (void)
 {
-  xlist_t *drives, *volumes, *mounts;
+  GList *drives, *volumes, *mounts;
 
   /* populate gvfs network mounts */
   iterate_gmain();
 
   drives = g_volume_monitor_get_connected_drives (volume_monitor);
   list_drives (drives, 0);
-  xlist_free_full (drives, xobject_unref);
+  g_list_free_full (drives, g_object_unref);
 
   volumes = g_volume_monitor_get_volumes (volume_monitor);
   list_volumes (volumes, 0, TRUE);
-  xlist_free_full (volumes, xobject_unref);
+  g_list_free_full (volumes, g_object_unref);
 
   mounts = g_volume_monitor_get_mounts (volume_monitor);
   list_mounts (mounts, 0, TRUE);
-  xlist_free_full (mounts, xobject_unref);
+  g_list_free_full (mounts, g_object_unref);
 }
 
 static void
 unmount_all_with_scheme (const char *scheme)
 {
-  xlist_t *mounts;
-  xlist_t *l;
+  GList *mounts;
+  GList *l;
 
   /* populate gvfs network mounts */
   iterate_gmain();
 
   mounts = g_volume_monitor_get_mounts (volume_monitor);
   for (l = mounts; l != NULL; l = l->next) {
-    xmount_t *mount = G_MOUNT (l->data);
-    xfile_t *root;
+    GMount *mount = G_MOUNT (l->data);
+    GFile *root;
 
     root = g_mount_get_root (mount);
-    if (xfile_has_uri_scheme (root, scheme)) {
+    if (g_file_has_uri_scheme (root, scheme)) {
             unmount (root);
     }
-    xobject_unref (root);
+    g_object_unref (root);
   }
-  xlist_free_full (mounts, xobject_unref);
+  g_list_free_full (mounts, g_object_unref);
 }
 
 static void
-mount_with_device_file_cb (xobject_t *object,
-                           xasync_result_t *res,
-                           xpointer_t user_data)
+mount_with_device_file_cb (GObject *object,
+                           GAsyncResult *res,
+                           gpointer user_data)
 {
-  xvolume_t *volume;
-  xboolean_t succeeded;
-  xerror_t *error = NULL;
-  xchar_t *id = (xchar_t *)user_data;
+  GVolume *volume;
+  gboolean succeeded;
+  GError *error = NULL;
+  gchar *id = (gchar *)user_data;
 
   volume = G_VOLUME (object);
 
@@ -959,7 +959,7 @@ mount_with_device_file_cb (xobject_t *object,
   if (!succeeded)
     {
       print_error ("%s: %s", id, error->message);
-      xerror_free (error);
+      g_error_free (error);
       success = FALSE;
     }
 
@@ -968,27 +968,27 @@ mount_with_device_file_cb (xobject_t *object,
   outstanding_mounts--;
 
   if (outstanding_mounts == 0)
-    xmain_loop_quit (main_loop);
+    g_main_loop_quit (main_loop);
 }
 
 static void
 mount_with_id (const char *id)
 {
-  xlist_t *volumes;
-  xlist_t *l;
+  GList *volumes;
+  GList *l;
 
   volumes = g_volume_monitor_get_volumes (volume_monitor);
   for (l = volumes; l != NULL; l = l->next)
     {
-      xvolume_t *volume = G_VOLUME (l->data);
-      xchar_t *device;
-      xchar_t *uuid;
+      GVolume *volume = G_VOLUME (l->data);
+      gchar *device;
+      gchar *uuid;
 
       device = g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
       uuid = g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UUID);
-      if (xstrcmp0 (device, id) == 0 || xstrcmp0 (uuid, id) == 0)
+      if (g_strcmp0 (device, id) == 0 || g_strcmp0 (uuid, id) == 0)
         {
-          xmount_operation_t *op;
+          GMountOperation *op;
 
           op = new_mount_op ();
 
@@ -997,9 +997,9 @@ mount_with_id (const char *id)
                           op,
                           NULL,
                           mount_with_device_file_cb,
-                          xstrdup (id));
+                          g_strdup (id));
 
-          xobject_unref (op);
+          g_object_unref (op);
 
           outstanding_mounts++;
         }
@@ -1007,7 +1007,7 @@ mount_with_id (const char *id)
       g_free (device);
       g_free (uuid);
     }
-  xlist_free_full (volumes, xobject_unref);
+  g_list_free_full (volumes, g_object_unref);
 
   if (outstanding_mounts == 0)
     {
@@ -1017,46 +1017,46 @@ mount_with_id (const char *id)
 }
 
 static void
-monitor_print_mount (xmount_t *mount)
+monitor_print_mount (GMount *mount)
 {
   if (extra_detail)
     {
-      xlist_t *l;
-      l = xlist_prepend (NULL, mount);
+      GList *l;
+      l = g_list_prepend (NULL, mount);
       list_mounts (l, 2, FALSE);
-      xlist_free (l);
+      g_list_free (l);
       g_print ("\n");
     }
 }
 
 static void
-monitor_print_volume (xvolume_t *volume)
+monitor_print_volume (GVolume *volume)
 {
   if (extra_detail)
     {
-      xlist_t *l;
-      l = xlist_prepend (NULL, volume);
+      GList *l;
+      l = g_list_prepend (NULL, volume);
       list_volumes (l, 2, FALSE);
-      xlist_free (l);
+      g_list_free (l);
       g_print ("\n");
     }
 }
 
 static void
-monitor_print_drive (xdrive_t *drive)
+monitor_print_drive (GDrive *drive)
 {
   if (extra_detail)
     {
-      xlist_t *l;
-      l = xlist_prepend (NULL, drive);
+      GList *l;
+      l = g_list_prepend (NULL, drive);
       list_drives (l, 2);
-      xlist_free (l);
+      g_list_free (l);
       g_print ("\n");
     }
 }
 
 static void
-monitor_mount_added (xvolume_monitor_t *volume_monitor, xmount_t *mount)
+monitor_mount_added (GVolumeMonitor *volume_monitor, GMount *mount)
 {
   char *name;
   name = g_mount_get_name (mount);
@@ -1066,7 +1066,7 @@ monitor_mount_added (xvolume_monitor_t *volume_monitor, xmount_t *mount)
 }
 
 static void
-monitor_mount_removed (xvolume_monitor_t *volume_monitor, xmount_t *mount)
+monitor_mount_removed (GVolumeMonitor *volume_monitor, GMount *mount)
 {
   char *name;
   name = g_mount_get_name (mount);
@@ -1076,7 +1076,7 @@ monitor_mount_removed (xvolume_monitor_t *volume_monitor, xmount_t *mount)
 }
 
 static void
-monitor_mount_changed (xvolume_monitor_t *volume_monitor, xmount_t *mount)
+monitor_mount_changed (GVolumeMonitor *volume_monitor, GMount *mount)
 {
   char *name;
   name = g_mount_get_name (mount);
@@ -1086,7 +1086,7 @@ monitor_mount_changed (xvolume_monitor_t *volume_monitor, xmount_t *mount)
 }
 
 static void
-monitor_mount_pre_unmount (xvolume_monitor_t *volume_monitor, xmount_t *mount)
+monitor_mount_pre_unmount (GVolumeMonitor *volume_monitor, GMount *mount)
 {
   char *name;
   name = g_mount_get_name (mount);
@@ -1096,7 +1096,7 @@ monitor_mount_pre_unmount (xvolume_monitor_t *volume_monitor, xmount_t *mount)
 }
 
 static void
-monitor_volume_added (xvolume_monitor_t *volume_monitor, xvolume_t *volume)
+monitor_volume_added (GVolumeMonitor *volume_monitor, GVolume *volume)
 {
   char *name;
   name = g_volume_get_name (volume);
@@ -1106,7 +1106,7 @@ monitor_volume_added (xvolume_monitor_t *volume_monitor, xvolume_t *volume)
 }
 
 static void
-monitor_volume_removed (xvolume_monitor_t *volume_monitor, xvolume_t *volume)
+monitor_volume_removed (GVolumeMonitor *volume_monitor, GVolume *volume)
 {
   char *name;
   name = g_volume_get_name (volume);
@@ -1116,7 +1116,7 @@ monitor_volume_removed (xvolume_monitor_t *volume_monitor, xvolume_t *volume)
 }
 
 static void
-monitor_volume_changed (xvolume_monitor_t *volume_monitor, xvolume_t *volume)
+monitor_volume_changed (GVolumeMonitor *volume_monitor, GVolume *volume)
 {
   char *name;
   name = g_volume_get_name (volume);
@@ -1126,40 +1126,40 @@ monitor_volume_changed (xvolume_monitor_t *volume_monitor, xvolume_t *volume)
 }
 
 static void
-monitor_drive_connected (xvolume_monitor_t *volume_monitor, xdrive_t *drive)
+monitor_drive_connected (GVolumeMonitor *volume_monitor, GDrive *drive)
 {
   char *name;
-  name = xdrive_get_name (drive);
+  name = g_drive_get_name (drive);
   g_print ("Drive connected:    '%s'\n", name);
   g_free (name);
   monitor_print_drive (drive);
 }
 
 static void
-monitor_drive_disconnected (xvolume_monitor_t *volume_monitor, xdrive_t *drive)
+monitor_drive_disconnected (GVolumeMonitor *volume_monitor, GDrive *drive)
 {
   char *name;
-  name = xdrive_get_name (drive);
+  name = g_drive_get_name (drive);
   g_print ("Drive disconnected: '%s'\n", name);
   g_free (name);
   monitor_print_drive (drive);
 }
 
 static void
-monitor_drive_changed (xvolume_monitor_t *volume_monitor, xdrive_t *drive)
+monitor_drive_changed (GVolumeMonitor *volume_monitor, GDrive *drive)
 {
   char *name;
-  name = xdrive_get_name (drive);
+  name = g_drive_get_name (drive);
   g_print ("Drive changed:      '%s'\n", name);
   g_free (name);
   monitor_print_drive (drive);
 }
 
 static void
-monitor_drive_eject_button (xvolume_monitor_t *volume_monitor, xdrive_t *drive)
+monitor_drive_eject_button (GVolumeMonitor *volume_monitor, GDrive *drive)
 {
   char *name;
-  name = xdrive_get_name (drive);
+  name = g_drive_get_name (drive);
   g_print ("Drive eject button: '%s'\n", name);
   g_free (name);
 }
@@ -1167,36 +1167,36 @@ monitor_drive_eject_button (xvolume_monitor_t *volume_monitor, xdrive_t *drive)
 static void
 monitor (void)
 {
-  xsignal_connect (volume_monitor, "mount-added", (xcallback_t) monitor_mount_added, NULL);
-  xsignal_connect (volume_monitor, "mount-removed", (xcallback_t) monitor_mount_removed, NULL);
-  xsignal_connect (volume_monitor, "mount-changed", (xcallback_t) monitor_mount_changed, NULL);
-  xsignal_connect (volume_monitor, "mount-pre-unmount", (xcallback_t) monitor_mount_pre_unmount, NULL);
-  xsignal_connect (volume_monitor, "volume-added", (xcallback_t) monitor_volume_added, NULL);
-  xsignal_connect (volume_monitor, "volume-removed", (xcallback_t) monitor_volume_removed, NULL);
-  xsignal_connect (volume_monitor, "volume-changed", (xcallback_t) monitor_volume_changed, NULL);
-  xsignal_connect (volume_monitor, "drive-connected", (xcallback_t) monitor_drive_connected, NULL);
-  xsignal_connect (volume_monitor, "drive-disconnected", (xcallback_t) monitor_drive_disconnected, NULL);
-  xsignal_connect (volume_monitor, "drive-changed", (xcallback_t) monitor_drive_changed, NULL);
-  xsignal_connect (volume_monitor, "drive-eject-button", (xcallback_t) monitor_drive_eject_button, NULL);
+  g_signal_connect (volume_monitor, "mount-added", (GCallback) monitor_mount_added, NULL);
+  g_signal_connect (volume_monitor, "mount-removed", (GCallback) monitor_mount_removed, NULL);
+  g_signal_connect (volume_monitor, "mount-changed", (GCallback) monitor_mount_changed, NULL);
+  g_signal_connect (volume_monitor, "mount-pre-unmount", (GCallback) monitor_mount_pre_unmount, NULL);
+  g_signal_connect (volume_monitor, "volume-added", (GCallback) monitor_volume_added, NULL);
+  g_signal_connect (volume_monitor, "volume-removed", (GCallback) monitor_volume_removed, NULL);
+  g_signal_connect (volume_monitor, "volume-changed", (GCallback) monitor_volume_changed, NULL);
+  g_signal_connect (volume_monitor, "drive-connected", (GCallback) monitor_drive_connected, NULL);
+  g_signal_connect (volume_monitor, "drive-disconnected", (GCallback) monitor_drive_disconnected, NULL);
+  g_signal_connect (volume_monitor, "drive-changed", (GCallback) monitor_drive_changed, NULL);
+  g_signal_connect (volume_monitor, "drive-eject-button", (GCallback) monitor_drive_eject_button, NULL);
 
   g_print ("Monitoring events. Press Ctrl+C to quit.\n");
 
-  xmain_loop_run (main_loop);
+  g_main_loop_run (main_loop);
 }
 
 int
-handle_mount (int argc, char *argv[], xboolean_t do_help)
+handle_mount (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xchar_t *param;
-  xerror_t *error = NULL;
-  xfile_t *file;
+  GOptionContext *context;
+  gchar *param;
+  GError *error = NULL;
+  GFile *file;
   int i;
 
   g_set_prgname ("gio mount");
 
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("[%s…]", _("LOCATION"));
+  param = g_strdup_printf ("[%s…]", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -1213,12 +1213,12 @@ handle_mount (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
 
-  main_loop = xmain_loop_new (NULL, FALSE);
+  main_loop = g_main_loop_new (NULL, FALSE);
   volume_monitor = g_volume_monitor_get ();
 
   if (mount_list)
@@ -1235,30 +1235,30 @@ handle_mount (int argc, char *argv[], xboolean_t do_help)
     {
       for (i = 1; i < argc; i++)
         {
-          file = xfile_new_for_commandline_arg (argv[i]);
+          file = g_file_new_for_commandline_arg (argv[i]);
           if (mount_unmount)
             unmount (file);
           else if (mount_eject)
             eject (file);
           else
             mount (file);
-          xobject_unref (file);
+          g_object_unref (file);
         }
     }
   else
     {
       show_help (context, _("No locations given"));
       g_option_context_free (context);
-      xobject_unref (volume_monitor);
+      g_object_unref (volume_monitor);
       return 1;
     }
 
   g_option_context_free (context);
 
   if (outstanding_mounts > 0)
-    xmain_loop_run (main_loop);
+    g_main_loop_run (main_loop);
 
-  xobject_unref (volume_monitor);
+  g_object_unref (volume_monitor);
 
   return success ? 0 : 2;
 }

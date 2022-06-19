@@ -3,28 +3,28 @@
 #include <string.h>
 
 static void
-activate (xapplication_t *application)
+activate (GApplication *application)
 {
   g_print ("activated\n");
 
   /* Note: when doing a longer-lasting action here that returns
-   * to the mainloop, you should use xapplication_hold() and
-   * xapplication_release() to keep the application alive until
+   * to the mainloop, you should use g_application_hold() and
+   * g_application_release() to keep the application alive until
    * the action is completed.
    */
 }
 
-typedef xapplication_t test_application_t;
-typedef xapplication_class_t test_application_class_t;
+typedef GApplication TestApplication;
+typedef GApplicationClass TestApplicationClass;
 
-static xtype_t test_application_get_type (void);
-XDEFINE_TYPE (test_application_t, test_application, XTYPE_APPLICATION)
+static GType test_application_get_type (void);
+G_DEFINE_TYPE (TestApplication, test_application, G_TYPE_APPLICATION)
 
-static xboolean_t
-test_application_dbus_register (xapplication_t    *application,
-                                xdbus_connection_t *connection,
-                                const xchar_t     *object_path,
-                                xerror_t         **error)
+static gboolean
+test_application_dbus_register (GApplication    *application,
+                                GDBusConnection *connection,
+                                const gchar     *object_path,
+                                GError         **error)
 {
   /* We must chain up to the parent class */
   if (!G_APPLICATION_CLASS (test_application_parent_class)->dbus_register (application,
@@ -38,9 +38,9 @@ test_application_dbus_register (xapplication_t    *application,
 }
 
 static void
-test_application_dbus_unregister (xapplication_t    *application,
-                                  xdbus_connection_t *connection,
-                                  const xchar_t     *object_path)
+test_application_dbus_unregister (GApplication    *application,
+                                  GDBusConnection *connection,
+                                  const gchar     *object_path)
 {
   /* Do our own stuff here, e.g. unexport any D-Bus objects we exported in the dbus_register
    * hook above. Be sure to check that we actually did export them, since the hook
@@ -54,26 +54,26 @@ test_application_dbus_unregister (xapplication_t    *application,
 }
 
 static void
-test_application_init (test_application_t *app)
+test_application_init (TestApplication *app)
 {
 }
 
 static void
-test_application_class_init (test_application_class_t *class)
+test_application_class_init (TestApplicationClass *class)
 {
-  xapplication_class_t *xapplication_class = G_APPLICATION_CLASS (class);
+  GApplicationClass *g_application_class = G_APPLICATION_CLASS (class);
 
-  xapplication_class->dbus_register = test_application_dbus_register;
-  xapplication_class->dbus_unregister = test_application_dbus_unregister;
+  g_application_class->dbus_register = test_application_dbus_register;
+  g_application_class->dbus_unregister = test_application_dbus_unregister;
 }
 
-static xapplication_t *
-test_application_new (const xchar_t       *application_id,
+static GApplication *
+test_application_new (const gchar       *application_id,
                       GApplicationFlags  flags)
 {
-  xreturn_val_if_fail (xapplication_id_is_valid (application_id), NULL);
+  g_return_val_if_fail (g_application_id_is_valid (application_id), NULL);
 
-  return xobject_new (test_application_get_type (),
+  return g_object_new (test_application_get_type (),
                        "application-id", application_id,
                        "flags", flags,
                        NULL);
@@ -82,16 +82,16 @@ test_application_new (const xchar_t       *application_id,
 int
 main (int argc, char **argv)
 {
-  xapplication_t *app;
+  GApplication *app;
   int status;
 
-  app = test_application_new ("org.gtk.test_application_t", 0);
-  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  xapplication_set_inactivity_timeout (app, 10000);
+  app = test_application_new ("org.gtk.TestApplication", 0);
+  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  g_application_set_inactivity_timeout (app, 10000);
 
-  status = xapplication_run (app, argc, argv);
+  status = g_application_run (app, argc, argv);
 
-  xobject_unref (app);
+  g_object_unref (app);
 
   return status;
 }

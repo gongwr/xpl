@@ -49,56 +49,56 @@
 /* A random value use to mark untouched integer variables. */
 #define UNTOUCHED -559038737
 
-static xint_t total;
+static gint total;
 
 typedef struct {
-  const xchar_t *pattern;
-  xregex_compile_flags_t compile_opts;
-  xregex_match_flags_t   match_opts;
-  xint_t expected_error;
-  xboolean_t check_flags;
-  xregex_compile_flags_t real_compile_opts;
-  xregex_match_flags_t real_match_opts;
+  const gchar *pattern;
+  GRegexCompileFlags compile_opts;
+  GRegexMatchFlags   match_opts;
+  gint expected_error;
+  gboolean check_flags;
+  GRegexCompileFlags real_compile_opts;
+  GRegexMatchFlags real_match_opts;
 } TestNewData;
 
 static void
-test_new (xconstpointer d)
+test_new (gconstpointer d)
 {
   const TestNewData *data = d;
-  xregex_t *regex;
-  xerror_t *error = NULL;
+  GRegex *regex;
+  GError *error = NULL;
 
-  regex = xregex_new (data->pattern, data->compile_opts, data->match_opts, &error);
-  xassert (regex != NULL);
+  regex = g_regex_new (data->pattern, data->compile_opts, data->match_opts, &error);
+  g_assert (regex != NULL);
   g_assert_no_error (error);
-  g_assert_cmpstr (data->pattern, ==, xregex_get_pattern (regex));
+  g_assert_cmpstr (data->pattern, ==, g_regex_get_pattern (regex));
 
   if (data->check_flags)
     {
-      g_assert_cmphex (xregex_get_compile_flags (regex), ==, data->real_compile_opts);
-      g_assert_cmphex (xregex_get_match_flags (regex), ==, data->real_match_opts);
+      g_assert_cmphex (g_regex_get_compile_flags (regex), ==, data->real_compile_opts);
+      g_assert_cmphex (g_regex_get_match_flags (regex), ==, data->real_match_opts);
     }
 
-  xregex_unref (regex);
+  g_regex_unref (regex);
 }
 
 #define TEST_NEW(_pattern, _compile_opts, _match_opts) {    \
   TestNewData *data;                                        \
-  xchar_t *path;                                              \
+  gchar *path;                                              \
   data = g_new0 (TestNewData, 1);                           \
   data->pattern = _pattern;                                 \
   data->compile_opts = _compile_opts;                       \
   data->match_opts = _match_opts;                           \
   data->expected_error = 0;                                 \
   data->check_flags = FALSE;                                \
-  path = xstrdup_printf ("/regex/new/%d", ++total);        \
+  path = g_strdup_printf ("/regex/new/%d", ++total);        \
   g_test_add_data_func_full (path, data, test_new, g_free); \
   g_free (path);                                            \
 }
 
 #define TEST_NEW_CHECK_FLAGS(_pattern, _compile_opts, _match_opts, _real_compile_opts, _real_match_opts) { \
   TestNewData *data;                                             \
-  xchar_t *path;                                                   \
+  gchar *path;                                                   \
   data = g_new0 (TestNewData, 1);                                \
   data->pattern = _pattern;                                      \
   data->compile_opts = _compile_opts;                            \
@@ -107,69 +107,69 @@ test_new (xconstpointer d)
   data->check_flags = TRUE;                                      \
   data->real_compile_opts = _real_compile_opts;                  \
   data->real_match_opts = _real_match_opts;                      \
-  path = xstrdup_printf ("/regex/new-check-flags/%d", ++total); \
+  path = g_strdup_printf ("/regex/new-check-flags/%d", ++total); \
   g_test_add_data_func_full (path, data, test_new, g_free);      \
   g_free (path);                                                 \
 }
 
 static void
-test_new_fail (xconstpointer d)
+test_new_fail (gconstpointer d)
 {
   const TestNewData *data = d;
-  xregex_t *regex;
-  xerror_t *error = NULL;
+  GRegex *regex;
+  GError *error = NULL;
 
-  regex = xregex_new (data->pattern, data->compile_opts, data->match_opts, &error);
+  regex = g_regex_new (data->pattern, data->compile_opts, data->match_opts, &error);
 
-  xassert (regex == NULL);
-  g_assert_error (error, XREGEX_ERROR, data->expected_error);
-  xerror_free (error);
+  g_assert (regex == NULL);
+  g_assert_error (error, G_REGEX_ERROR, data->expected_error);
+  g_error_free (error);
 }
 
 #define TEST_NEW_FAIL(_pattern, _compile_opts, _expected_error) { \
   TestNewData *data;                                              \
-  xchar_t *path;                                                    \
+  gchar *path;                                                    \
   data = g_new0 (TestNewData, 1);                                 \
   data->pattern = _pattern;                                       \
   data->compile_opts = _compile_opts;                             \
   data->match_opts = 0;                                           \
   data->expected_error = _expected_error;                         \
-  path = xstrdup_printf ("/regex/new-fail/%d", ++total);         \
+  path = g_strdup_printf ("/regex/new-fail/%d", ++total);         \
   g_test_add_data_func_full (path, data, test_new_fail, g_free);  \
   g_free (path);                                                  \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xregex_compile_flags_t compile_opts;
-  xregex_match_flags_t match_opts;
-  xboolean_t expected;
-  xssize_t string_len;
-  xint_t start_position;
-  xregex_match_flags_t match_opts2;
+  const gchar *pattern;
+  const gchar *string;
+  GRegexCompileFlags compile_opts;
+  GRegexMatchFlags match_opts;
+  gboolean expected;
+  gssize string_len;
+  gint start_position;
+  GRegexMatchFlags match_opts2;
 } TestMatchData;
 
 static void
-test_match_simple (xconstpointer d)
+test_match_simple (gconstpointer d)
 {
   const TestMatchData *data = d;
-  xboolean_t match;
+  gboolean match;
 
-  match = xregex_match_simple (data->pattern, data->string, data->compile_opts, data->match_opts);
+  match = g_regex_match_simple (data->pattern, data->string, data->compile_opts, data->match_opts);
   g_assert_cmpint (match, ==, data->expected);
 }
 
 #define TEST_MATCH_SIMPLE_NAMED(_name, _pattern, _string, _compile_opts, _match_opts, _expected) { \
   TestMatchData *data;                                                  \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchData, 1);                                     \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
   data->compile_opts = _compile_opts;                                   \
   data->match_opts = _match_opts;                                       \
   data->expected = _expected;                                           \
-  path = xstrdup_printf ("/regex/match-%s/%d", _name, ++total);        \
+  path = g_strdup_printf ("/regex/match-%s/%d", _name, ++total);        \
   g_test_add_data_func_full (path, data, test_match_simple, g_free);    \
   g_free (path);                                                        \
 }
@@ -177,29 +177,29 @@ test_match_simple (xconstpointer d)
 #define TEST_MATCH_SIMPLE(_pattern, _string, _compile_opts, _match_opts, _expected) \
   TEST_MATCH_SIMPLE_NAMED("simple", _pattern, _string, _compile_opts, _match_opts, _expected)
 #define TEST_MATCH_NOTEMPTY(_pattern, _string, _expected) \
-  TEST_MATCH_SIMPLE_NAMED("notempty", _pattern, _string, 0, XREGEX_MATCH_NOTEMPTY, _expected)
+  TEST_MATCH_SIMPLE_NAMED("notempty", _pattern, _string, 0, G_REGEX_MATCH_NOTEMPTY, _expected)
 #define TEST_MATCH_NOTEMPTY_ATSTART(_pattern, _string, _expected) \
-  TEST_MATCH_SIMPLE_NAMED("notempty-atstart", _pattern, _string, 0, XREGEX_MATCH_NOTEMPTY_ATSTART, _expected)
+  TEST_MATCH_SIMPLE_NAMED("notempty-atstart", _pattern, _string, 0, G_REGEX_MATCH_NOTEMPTY_ATSTART, _expected)
 
 static void
-test_match (xconstpointer d)
+test_match (gconstpointer d)
 {
   const TestMatchData *data = d;
-  xregex_t *regex;
-  xboolean_t match;
-  xerror_t *error = NULL;
+  GRegex *regex;
+  gboolean match;
+  GError *error = NULL;
 
-  regex = xregex_new (data->pattern, data->compile_opts, data->match_opts, &error);
-  xassert (regex != NULL);
+  regex = g_regex_new (data->pattern, data->compile_opts, data->match_opts, &error);
+  g_assert (regex != NULL);
   g_assert_no_error (error);
 
-  match = xregex_match_full (regex, data->string, data->string_len,
+  match = g_regex_match_full (regex, data->string, data->string_len,
                               data->start_position, data->match_opts2, NULL, NULL);
 
   if (data->expected)
     {
       if (!match)
-        xerror ("Regex '%s' (with compile options %u and "
+        g_error ("Regex '%s' (with compile options %u and "
             "match options %u) should have matched '%.*s' "
             "(of length %d, at position %d, with match options %u) but did not",
             data->pattern, data->compile_opts, data->match_opts,
@@ -213,7 +213,7 @@ test_match (xconstpointer d)
   else
     {
       if (match)
-        xerror ("Regex '%s' (with compile options %u and "
+        g_error ("Regex '%s' (with compile options %u and "
             "match options %u) should not have matched '%.*s' "
             "(of length %d, at position %d, with match options %u) but did",
             data->pattern, data->compile_opts, data->match_opts,
@@ -225,17 +225,17 @@ test_match (xconstpointer d)
 
   if (data->string_len == -1 && data->start_position == 0)
     {
-      match = xregex_match (regex, data->string, data->match_opts2, NULL);
+      match = g_regex_match (regex, data->string, data->match_opts2, NULL);
       g_assert_cmpint (match, ==, data->expected);
     }
 
-  xregex_unref (regex);
+  g_regex_unref (regex);
 }
 
 #define TEST_MATCH(_pattern, _compile_opts, _match_opts, _string, \
                    _string_len, _start_position, _match_opts2, _expected) { \
   TestMatchData *data;                                                  \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchData, 1);                                     \
   data->pattern = _pattern;                                             \
   data->compile_opts = _compile_opts;                                   \
@@ -245,20 +245,20 @@ test_match (xconstpointer d)
   data->start_position = _start_position;                               \
   data->match_opts2 = _match_opts2;                                     \
   data->expected = _expected;                                           \
-  path = xstrdup_printf ("/regex/match/%d", ++total);                  \
+  path = g_strdup_printf ("/regex/match/%d", ++total);                  \
   g_test_add_data_func_full (path, data, test_match, g_free);           \
   g_free (path);                                                        \
 }
 
 struct _Match
 {
-  xchar_t *string;
-  xint_t start, end;
+  gchar *string;
+  gint start, end;
 };
 typedef struct _Match Match;
 
 static void
-free_match (xpointer_t data)
+free_match (gpointer data)
 {
   Match *match = data;
   if (match == NULL)
@@ -268,45 +268,45 @@ free_match (xpointer_t data)
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xssize_t string_len;
-  xint_t start_position;
-  xslist_t *expected;
+  const gchar *pattern;
+  const gchar *string;
+  gssize string_len;
+  gint start_position;
+  GSList *expected;
 } TestMatchNextData;
 
 static void
-test_match_next (xconstpointer d)
+test_match_next (gconstpointer d)
 {
    const TestMatchNextData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xslist_t *matches;
-  xslist_t *l_exp, *l_match;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  GSList *matches;
+  GSList *l_exp, *l_match;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  xregex_match_full (regex, data->string, data->string_len,
+  g_regex_match_full (regex, data->string, data->string_len,
                       data->start_position, 0, &match_info, NULL);
   matches = NULL;
-  while (xmatch_info_matches (match_info))
+  while (g_match_info_matches (match_info))
     {
       Match *match = g_new0 (Match, 1);
-      match->string = xmatch_info_fetch (match_info, 0);
+      match->string = g_match_info_fetch (match_info, 0);
       match->start = UNTOUCHED;
       match->end = UNTOUCHED;
-      xmatch_info_fetch_pos (match_info, 0, &match->start, &match->end);
-      matches = xslist_prepend (matches, match);
-      xmatch_info_next (match_info, NULL);
+      g_match_info_fetch_pos (match_info, 0, &match->start, &match->end);
+      matches = g_slist_prepend (matches, match);
+      g_match_info_next (match_info, NULL);
     }
-  xassert (regex == xmatch_info_get_regex (match_info));
-  g_assert_cmpstr (data->string, ==, xmatch_info_get_string (match_info));
-  xmatch_info_free (match_info);
-  matches = xslist_reverse (matches);
+  g_assert (regex == g_match_info_get_regex (match_info));
+  g_assert_cmpstr (data->string, ==, g_match_info_get_string (match_info));
+  g_match_info_free (match_info);
+  matches = g_slist_reverse (matches);
 
-  g_assert_cmpint (xslist_length (matches), ==, xslist_length (data->expected));
+  g_assert_cmpint (g_slist_length (matches), ==, g_slist_length (data->expected));
 
   l_exp = data->expected;
   l_match = matches;
@@ -319,33 +319,33 @@ test_match_next (xconstpointer d)
       g_assert_cmpint (exp->start, ==, match->start);
       g_assert_cmpint (exp->end, ==, match->end);
 
-      l_exp = xslist_next (l_exp);
-      l_match = xslist_next (l_match);
+      l_exp = g_slist_next (l_exp);
+      l_match = g_slist_next (l_match);
     }
 
-  xregex_unref (regex);
-  xslist_free_full (matches, free_match);
+  g_regex_unref (regex);
+  g_slist_free_full (matches, free_match);
 }
 
 static void
-free_match_next_data (xpointer_t _data)
+free_match_next_data (gpointer _data)
 {
   TestMatchNextData *data = _data;
 
-  xslist_free_full (data->expected, g_free);
+  g_slist_free_full (data->expected, g_free);
   g_free (data);
 }
 
 #define TEST_MATCH_NEXT0(_pattern, _string, _string_len, _start_position) { \
   TestMatchNextData *data;                                              \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchNextData, 1);                                 \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
   data->string_len = _string_len;                                       \
   data->start_position = _start_position;                               \
   data->expected = NULL;                                                \
-  path = xstrdup_printf ("/regex/match/next0/%d", ++total);            \
+  path = g_strdup_printf ("/regex/match/next0/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_match_next, free_match_next_data); \
   g_free (path);                                                        \
 }
@@ -354,7 +354,7 @@ free_match_next_data (xpointer_t _data)
                          t1, s1, e1) {                                  \
   TestMatchNextData *data;                                              \
   Match *match;                                                         \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchNextData, 1);                                 \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
@@ -364,8 +364,8 @@ free_match_next_data (xpointer_t _data)
   match->string = t1;                                                   \
   match->start = s1;                                                    \
   match->end = e1;                                                      \
-  data->expected = xslist_append (NULL, match);                        \
-  path = xstrdup_printf ("/regex/match/next1/%d", ++total);            \
+  data->expected = g_slist_append (NULL, match);                        \
+  path = g_strdup_printf ("/regex/match/next1/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_match_next, free_match_next_data); \
   g_free (path);                                                        \
 }
@@ -374,7 +374,7 @@ free_match_next_data (xpointer_t _data)
                          t1, s1, e1, t2, s2, e2) {                      \
   TestMatchNextData *data;                                              \
   Match *match;                                                         \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchNextData, 1);                                 \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
@@ -384,13 +384,13 @@ free_match_next_data (xpointer_t _data)
   match->string = t1;                                                   \
   match->start = s1;                                                    \
   match->end = e1;                                                      \
-  data->expected = xslist_append (NULL, match);                        \
+  data->expected = g_slist_append (NULL, match);                        \
   match = g_new0 (Match, 1);                                            \
   match->string = t2;                                                   \
   match->start = s2;                                                    \
   match->end = e2;                                                      \
-  data->expected = xslist_append (data->expected, match);              \
-  path = xstrdup_printf ("/regex/match/next2/%d", ++total);            \
+  data->expected = g_slist_append (data->expected, match);              \
+  path = g_strdup_printf ("/regex/match/next2/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_match_next, free_match_next_data); \
   g_free (path);                                                        \
 }
@@ -399,7 +399,7 @@ free_match_next_data (xpointer_t _data)
                          t1, s1, e1, t2, s2, e2, t3, s3, e3) {          \
   TestMatchNextData *data;                                              \
   Match *match;                                                         \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchNextData, 1);                                 \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
@@ -409,18 +409,18 @@ free_match_next_data (xpointer_t _data)
   match->string = t1;                                                   \
   match->start = s1;                                                    \
   match->end = e1;                                                      \
-  data->expected = xslist_append (NULL, match);                        \
+  data->expected = g_slist_append (NULL, match);                        \
   match = g_new0 (Match, 1);                                            \
   match->string = t2;                                                   \
   match->start = s2;                                                    \
   match->end = e2;                                                      \
-  data->expected = xslist_append (data->expected, match);              \
+  data->expected = g_slist_append (data->expected, match);              \
   match = g_new0 (Match, 1);                                            \
   match->string = t3;                                                   \
   match->start = s3;                                                    \
   match->end = e3;                                                      \
-  data->expected = xslist_append (data->expected, match);              \
-  path = xstrdup_printf ("/regex/match/next3/%d", ++total);            \
+  data->expected = g_slist_append (data->expected, match);              \
+  path = g_strdup_printf ("/regex/match/next3/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_match_next, free_match_next_data); \
   g_free (path);                                                        \
 }
@@ -429,7 +429,7 @@ free_match_next_data (xpointer_t _data)
                          t1, s1, e1, t2, s2, e2, t3, s3, e3, t4, s4, e4) { \
   TestMatchNextData *data;                                              \
   Match *match;                                                         \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchNextData, 1);                                 \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
@@ -439,154 +439,154 @@ free_match_next_data (xpointer_t _data)
   match->string = t1;                                                   \
   match->start = s1;                                                    \
   match->end = e1;                                                      \
-  data->expected = xslist_append (NULL, match);                        \
+  data->expected = g_slist_append (NULL, match);                        \
   match = g_new0 (Match, 1);                                            \
   match->string = t2;                                                   \
   match->start = s2;                                                    \
   match->end = e2;                                                      \
-  data->expected = xslist_append (data->expected, match);              \
+  data->expected = g_slist_append (data->expected, match);              \
   match = g_new0 (Match, 1);                                            \
   match->string = t3;                                                   \
   match->start = s3;                                                    \
   match->end = e3;                                                      \
-  data->expected = xslist_append (data->expected, match);              \
+  data->expected = g_slist_append (data->expected, match);              \
   match = g_new0 (Match, 1);                                            \
   match->string = t4;                                                   \
   match->start = s4;                                                    \
   match->end = e4;                                                      \
-  data->expected = xslist_append (data->expected, match);              \
-  path = xstrdup_printf ("/regex/match/next4/%d", ++total);            \
+  data->expected = g_slist_append (data->expected, match);              \
+  path = g_strdup_printf ("/regex/match/next4/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_match_next, free_match_next_data); \
   g_free (path);                                                        \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xint_t start_position;
-  xregex_match_flags_t match_opts;
-  xint_t expected_count;
+  const gchar *pattern;
+  const gchar *string;
+  gint start_position;
+  GRegexMatchFlags match_opts;
+  gint expected_count;
 } TestMatchCountData;
 
 static void
-test_match_count (xconstpointer d)
+test_match_count (gconstpointer d)
 {
   const TestMatchCountData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xint_t count;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  gint count;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  xregex_match_full (regex, data->string, -1, data->start_position,
+  g_regex_match_full (regex, data->string, -1, data->start_position,
 		      data->match_opts, &match_info, NULL);
-  count = xmatch_info_get_match_count (match_info);
+  count = g_match_info_get_match_count (match_info);
 
   g_assert_cmpint (count, ==, data->expected_count);
 
-  xmatch_info_ref (match_info);
-  xmatch_info_unref (match_info);
-  xmatch_info_unref (match_info);
-  xregex_unref (regex);
+  g_match_info_ref (match_info);
+  g_match_info_unref (match_info);
+  g_match_info_unref (match_info);
+  g_regex_unref (regex);
 }
 
 #define TEST_MATCH_COUNT(_pattern, _string, _start_position, _match_opts, _expected_count) { \
   TestMatchCountData *data;                                             \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestMatchCountData, 1);                                \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
   data->start_position = _start_position;                               \
   data->match_opts = _match_opts;                                       \
   data->expected_count = _expected_count;                               \
-  path = xstrdup_printf ("/regex/match/count/%d", ++total);            \
+  path = g_strdup_printf ("/regex/match/count/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_match_count, g_free);     \
   g_free (path);                                                        \
 }
 
 static void
-test_partial (xconstpointer d)
+test_partial (gconstpointer d)
 {
   const TestMatchData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
+  GRegex *regex;
+  GMatchInfo *match_info;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  xregex_match (regex, data->string, data->match_opts, &match_info);
+  g_regex_match (regex, data->string, data->match_opts, &match_info);
 
-  g_assert_cmpint (data->expected, ==, xmatch_info_is_partial_match (match_info));
+  g_assert_cmpint (data->expected, ==, g_match_info_is_partial_match (match_info));
 
   if (data->expected)
     {
-      xassert (!xmatch_info_fetch_pos (match_info, 0, NULL, NULL));
-      xassert (!xmatch_info_fetch_pos (match_info, 1, NULL, NULL));
+      g_assert (!g_match_info_fetch_pos (match_info, 0, NULL, NULL));
+      g_assert (!g_match_info_fetch_pos (match_info, 1, NULL, NULL));
     }
 
-  xmatch_info_free (match_info);
-  xregex_unref (regex);
+  g_match_info_free (match_info);
+  g_regex_unref (regex);
 }
 
 #define TEST_PARTIAL_FULL(_pattern, _string, _match_opts, _expected) { \
   TestMatchData *data;                                          \
-  xchar_t *path;                                                  \
+  gchar *path;                                                  \
   data = g_new0 (TestMatchData, 1);                             \
   data->pattern = _pattern;                                     \
   data->string = _string;                                       \
   data->match_opts = _match_opts;                               \
   data->expected = _expected;                                   \
-  path = xstrdup_printf ("/regex/match/partial/%d", ++total);  \
+  path = g_strdup_printf ("/regex/match/partial/%d", ++total);  \
   g_test_add_data_func_full (path, data, test_partial, g_free); \
   g_free (path);                                                \
 }
 
-#define TEST_PARTIAL(_pattern, _string, _expected) TEST_PARTIAL_FULL(_pattern, _string, XREGEX_MATCH_PARTIAL, _expected)
+#define TEST_PARTIAL(_pattern, _string, _expected) TEST_PARTIAL_FULL(_pattern, _string, G_REGEX_MATCH_PARTIAL, _expected)
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xint_t         start_position;
-  xint_t         sub_n;
-  const xchar_t *expected_sub;
-  xint_t         expected_start;
-  xint_t         expected_end;
+  const gchar *pattern;
+  const gchar *string;
+  gint         start_position;
+  gint         sub_n;
+  const gchar *expected_sub;
+  gint         expected_start;
+  gint         expected_end;
 } TestSubData;
 
 static void
-test_sub_pattern (xconstpointer d)
+test_sub_pattern (gconstpointer d)
 {
   const TestSubData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xchar_t *sub_expr;
-  xint_t start = UNTOUCHED, end = UNTOUCHED;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  gchar *sub_expr;
+  gint start = UNTOUCHED, end = UNTOUCHED;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  xregex_match_full (regex, data->string, -1, data->start_position, 0, &match_info, NULL);
+  g_regex_match_full (regex, data->string, -1, data->start_position, 0, &match_info, NULL);
 
-  sub_expr = xmatch_info_fetch (match_info, data->sub_n);
+  sub_expr = g_match_info_fetch (match_info, data->sub_n);
   g_assert_cmpstr (sub_expr, ==, data->expected_sub);
   g_free (sub_expr);
 
-  xmatch_info_fetch_pos (match_info, data->sub_n, &start, &end);
+  g_match_info_fetch_pos (match_info, data->sub_n, &start, &end);
   g_assert_cmpint (start, ==, data->expected_start);
   g_assert_cmpint (end, ==, data->expected_end);
 
-  xmatch_info_free (match_info);
-  xregex_unref (regex);
+  g_match_info_free (match_info);
+  g_regex_unref (regex);
 }
 
 #define TEST_SUB_PATTERN(_pattern, _string, _start_position, _sub_n, _expected_sub, \
 			 _expected_start, _expected_end) {                       \
   TestSubData *data;                                                    \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestSubData, 1);                                       \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
@@ -595,52 +595,52 @@ test_sub_pattern (xconstpointer d)
   data->expected_sub = _expected_sub;                                   \
   data->expected_start = _expected_start;                               \
   data->expected_end = _expected_end;                                   \
-  path = xstrdup_printf ("/regex/match/subpattern/%d", ++total);       \
+  path = g_strdup_printf ("/regex/match/subpattern/%d", ++total);       \
   g_test_add_data_func_full (path, data, test_sub_pattern, g_free);     \
   g_free (path);                                                        \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  xregex_compile_flags_t flags;
-  const xchar_t *string;
-  xint_t         start_position;
-  const xchar_t *sub_name;
-  const xchar_t *expected_sub;
-  xint_t         expected_start;
-  xint_t         expected_end;
+  const gchar *pattern;
+  GRegexCompileFlags flags;
+  const gchar *string;
+  gint         start_position;
+  const gchar *sub_name;
+  const gchar *expected_sub;
+  gint         expected_start;
+  gint         expected_end;
 } TestNamedSubData;
 
 static void
-test_named_sub_pattern (xconstpointer d)
+test_named_sub_pattern (gconstpointer d)
 {
   const TestNamedSubData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xint_t start = UNTOUCHED, end = UNTOUCHED;
-  xchar_t *sub_expr;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  gint start = UNTOUCHED, end = UNTOUCHED;
+  gchar *sub_expr;
 
-  regex = xregex_new (data->pattern, data->flags, 0, NULL);
+  regex = g_regex_new (data->pattern, data->flags, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  xregex_match_full (regex, data->string, -1, data->start_position, 0, &match_info, NULL);
-  sub_expr = xmatch_info_fetch_named (match_info, data->sub_name);
+  g_regex_match_full (regex, data->string, -1, data->start_position, 0, &match_info, NULL);
+  sub_expr = g_match_info_fetch_named (match_info, data->sub_name);
   g_assert_cmpstr (sub_expr, ==, data->expected_sub);
   g_free (sub_expr);
 
-  xmatch_info_fetch_named_pos (match_info, data->sub_name, &start, &end);
+  g_match_info_fetch_named_pos (match_info, data->sub_name, &start, &end);
   g_assert_cmpint (start, ==, data->expected_start);
   g_assert_cmpint (end, ==, data->expected_end);
 
-  xmatch_info_free (match_info);
-  xregex_unref (regex);
+  g_match_info_free (match_info);
+  g_regex_unref (regex);
 }
 
 #define TEST_NAMED_SUB_PATTERN(_pattern, _string, _start_position, _sub_name, \
 			       _expected_sub, _expected_start, _expected_end) { \
   TestNamedSubData *data;                                                 \
-  xchar_t *path;                                                            \
+  gchar *path;                                                            \
   data = g_new0 (TestNamedSubData, 1);                                    \
   data->pattern = _pattern;                                               \
   data->string = _string;                                                 \
@@ -650,7 +650,7 @@ test_named_sub_pattern (xconstpointer d)
   data->expected_sub = _expected_sub;                                     \
   data->expected_start = _expected_start;                                 \
   data->expected_end = _expected_end;                                     \
-  path = xstrdup_printf ("/regex/match/named/subpattern/%d", ++total);   \
+  path = g_strdup_printf ("/regex/match/named/subpattern/%d", ++total);   \
   g_test_add_data_func_full (path, data, test_named_sub_pattern, g_free); \
   g_free (path);                                                          \
 }
@@ -658,273 +658,273 @@ test_named_sub_pattern (xconstpointer d)
 #define TEST_NAMED_SUB_PATTERN_DUPNAMES(_pattern, _string, _start_position, _sub_name, \
                                         _expected_sub, _expected_start, _expected_end) { \
   TestNamedSubData *data;                                                        \
-  xchar_t *path;                                                                   \
+  gchar *path;                                                                   \
   data = g_new0 (TestNamedSubData, 1);                                           \
   data->pattern = _pattern;                                                      \
   data->string = _string;                                                        \
-  data->flags = XREGEX_DUPNAMES;                                                \
+  data->flags = G_REGEX_DUPNAMES;                                                \
   data->start_position = _start_position;                                        \
   data->sub_name = _sub_name;                                                    \
   data->expected_sub = _expected_sub;                                            \
   data->expected_start = _expected_start;                                        \
   data->expected_end = _expected_end;                                            \
-  path = xstrdup_printf ("/regex/match/subpattern/named/dupnames/%d", ++total); \
+  path = g_strdup_printf ("/regex/match/subpattern/named/dupnames/%d", ++total); \
   g_test_add_data_func_full (path, data, test_named_sub_pattern, g_free);        \
   g_free (path);                                                                 \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xslist_t *expected;
-  xint_t start_position;
-  xint_t max_tokens;
+  const gchar *pattern;
+  const gchar *string;
+  GSList *expected;
+  gint start_position;
+  gint max_tokens;
 } TestFetchAllData;
 
 static void
-test_fetch_all (xconstpointer d)
+test_fetch_all (gconstpointer d)
 {
   const TestFetchAllData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xslist_t *l_exp;
-  xchar_t **matches;
-  xint_t match_count;
-  xint_t i;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  GSList *l_exp;
+  gchar **matches;
+  gint match_count;
+  gint i;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  xregex_match (regex, data->string, 0, &match_info);
-  matches = xmatch_info_fetch_all (match_info);
+  g_regex_match (regex, data->string, 0, &match_info);
+  matches = g_match_info_fetch_all (match_info);
   if (matches)
-    match_count = xstrv_length (matches);
+    match_count = g_strv_length (matches);
   else
     match_count = 0;
 
-  g_assert_cmpint (match_count, ==, xslist_length (data->expected));
+  g_assert_cmpint (match_count, ==, g_slist_length (data->expected));
 
   l_exp = data->expected;
-  for (i = 0; l_exp != NULL; i++, l_exp = xslist_next (l_exp))
+  for (i = 0; l_exp != NULL; i++, l_exp = g_slist_next (l_exp))
     {
       g_assert_nonnull (matches);
       g_assert_cmpstr (l_exp->data, ==, matches[i]);
     }
 
-  xmatch_info_free (match_info);
-  xregex_unref (regex);
-  xstrfreev (matches);
+  g_match_info_free (match_info);
+  g_regex_unref (regex);
+  g_strfreev (matches);
 }
 
 static void
-free_fetch_all_data (xpointer_t _data)
+free_fetch_all_data (gpointer _data)
 {
   TestFetchAllData *data = _data;
 
-  xslist_free (data->expected);
+  g_slist_free (data->expected);
   g_free (data);
 }
 
 #define TEST_FETCH_ALL0(_pattern, _string) {                                   \
   TestFetchAllData *data;                                                      \
-  xchar_t *path;                                                                 \
+  gchar *path;                                                                 \
   data = g_new0 (TestFetchAllData, 1);                                         \
   data->pattern = _pattern;                                                    \
   data->string = _string;                                                      \
   data->expected = NULL;                                                       \
-  path = xstrdup_printf ("/regex/fetch-all0/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/fetch-all0/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_fetch_all, free_fetch_all_data); \
   g_free (path);                                                               \
 }
 
 #define TEST_FETCH_ALL1(_pattern, _string, e1) {                               \
   TestFetchAllData *data;                                                      \
-  xchar_t *path;                                                                 \
+  gchar *path;                                                                 \
   data = g_new0 (TestFetchAllData, 1);                                         \
   data->pattern = _pattern;                                                    \
   data->string = _string;                                                      \
-  data->expected = xslist_append (NULL, e1);                                  \
-  path = xstrdup_printf ("/regex/fetch-all1/%d", ++total);                    \
+  data->expected = g_slist_append (NULL, e1);                                  \
+  path = g_strdup_printf ("/regex/fetch-all1/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_fetch_all, free_fetch_all_data); \
   g_free (path);                                                               \
 }
 
 #define TEST_FETCH_ALL2(_pattern, _string, e1, e2) {                           \
   TestFetchAllData *data;                                                      \
-  xchar_t *path;                                                                 \
+  gchar *path;                                                                 \
   data = g_new0 (TestFetchAllData, 1);                                         \
   data->pattern = _pattern;                                                    \
   data->string = _string;                                                      \
-  data->expected = xslist_append (NULL, e1);                                  \
-  data->expected = xslist_append (data->expected, e2);                        \
-  path = xstrdup_printf ("/regex/fetch-all2/%d", ++total);                    \
+  data->expected = g_slist_append (NULL, e1);                                  \
+  data->expected = g_slist_append (data->expected, e2);                        \
+  path = g_strdup_printf ("/regex/fetch-all2/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_fetch_all, free_fetch_all_data); \
   g_free (path);                                                               \
 }
 
 #define TEST_FETCH_ALL3(_pattern, _string, e1, e2, e3) {                       \
   TestFetchAllData *data;                                                      \
-  xchar_t *path;                                                                 \
+  gchar *path;                                                                 \
   data = g_new0 (TestFetchAllData, 1);                                         \
   data->pattern = _pattern;                                                    \
   data->string = _string;                                                      \
-  data->expected = xslist_append (NULL, e1);                                  \
-  data->expected = xslist_append (data->expected, e2);                        \
-  data->expected = xslist_append (data->expected, e3);                        \
-  path = xstrdup_printf ("/regex/fetch-all3/%d", ++total);                    \
+  data->expected = g_slist_append (NULL, e1);                                  \
+  data->expected = g_slist_append (data->expected, e2);                        \
+  data->expected = g_slist_append (data->expected, e3);                        \
+  path = g_strdup_printf ("/regex/fetch-all3/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_fetch_all, free_fetch_all_data); \
   g_free (path);                                                               \
 }
 
 static void
-test_split_simple (xconstpointer d)
+test_split_simple (gconstpointer d)
 {
   const TestFetchAllData *data = d;
-  xslist_t *l_exp;
-  xchar_t **tokens;
-  xint_t token_count;
-  xint_t i;
+  GSList *l_exp;
+  gchar **tokens;
+  gint token_count;
+  gint i;
 
-  tokens = xregex_split_simple (data->pattern, data->string, 0, 0);
+  tokens = g_regex_split_simple (data->pattern, data->string, 0, 0);
   if (tokens)
-    token_count = xstrv_length (tokens);
+    token_count = g_strv_length (tokens);
   else
     token_count = 0;
 
-  g_assert_cmpint (token_count, ==, xslist_length (data->expected));
+  g_assert_cmpint (token_count, ==, g_slist_length (data->expected));
 
   l_exp = data->expected;
-  for (i = 0; l_exp != NULL; i++, l_exp = xslist_next (l_exp))
+  for (i = 0; l_exp != NULL; i++, l_exp = g_slist_next (l_exp))
     {
       g_assert_nonnull (tokens);
       g_assert_cmpstr (l_exp->data, ==, tokens[i]);
     }
 
-  xstrfreev (tokens);
+  g_strfreev (tokens);
 }
 
 #define TEST_SPLIT_SIMPLE0(_pattern, _string) {                                   \
   TestFetchAllData *data;                                                         \
-  xchar_t *path;                                                                    \
+  gchar *path;                                                                    \
   data = g_new0 (TestFetchAllData, 1);                                            \
   data->pattern = _pattern;                                                       \
   data->string = _string;                                                         \
   data->expected = NULL;                                                          \
-  path = xstrdup_printf ("/regex/split/simple0/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/split/simple0/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_simple, free_fetch_all_data); \
   g_free (path);                                                                  \
 }
 
 #define TEST_SPLIT_SIMPLE1(_pattern, _string, e1) {                               \
   TestFetchAllData *data;                                                         \
-  xchar_t *path;                                                                    \
+  gchar *path;                                                                    \
   data = g_new0 (TestFetchAllData, 1);                                            \
   data->pattern = _pattern;                                                       \
   data->string = _string;                                                         \
-  data->expected = xslist_append (NULL, e1);                                     \
-  path = xstrdup_printf ("/regex/split/simple1/%d", ++total);                    \
+  data->expected = g_slist_append (NULL, e1);                                     \
+  path = g_strdup_printf ("/regex/split/simple1/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_simple, free_fetch_all_data); \
   g_free (path);                                                                  \
 }
 
 #define TEST_SPLIT_SIMPLE2(_pattern, _string, e1, e2) {                           \
   TestFetchAllData *data;                                                         \
-  xchar_t *path;                                                                    \
+  gchar *path;                                                                    \
   data = g_new0 (TestFetchAllData, 1);                                            \
   data->pattern = _pattern;                                                       \
   data->string = _string;                                                         \
-  data->expected = xslist_append (NULL, e1);                                     \
-  data->expected = xslist_append (data->expected, e2);                           \
-  path = xstrdup_printf ("/regex/split/simple2/%d", ++total);                    \
+  data->expected = g_slist_append (NULL, e1);                                     \
+  data->expected = g_slist_append (data->expected, e2);                           \
+  path = g_strdup_printf ("/regex/split/simple2/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_simple, free_fetch_all_data); \
   g_free (path);                                                                  \
 }
 
 #define TEST_SPLIT_SIMPLE3(_pattern, _string, e1, e2, e3) {                       \
   TestFetchAllData *data;                                                         \
-  xchar_t *path;                                                                    \
+  gchar *path;                                                                    \
   data = g_new0 (TestFetchAllData, 1);                                            \
   data->pattern = _pattern;                                                       \
   data->string = _string;                                                         \
-  data->expected = xslist_append (NULL, e1);                                     \
-  data->expected = xslist_append (data->expected, e2);                           \
-  data->expected = xslist_append (data->expected, e3);                           \
-  path = xstrdup_printf ("/regex/split/simple3/%d", ++total);                    \
+  data->expected = g_slist_append (NULL, e1);                                     \
+  data->expected = g_slist_append (data->expected, e2);                           \
+  data->expected = g_slist_append (data->expected, e3);                           \
+  path = g_strdup_printf ("/regex/split/simple3/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_simple, free_fetch_all_data); \
   g_free (path);                                                                  \
 }
 
 static void
-test_split_full (xconstpointer d)
+test_split_full (gconstpointer d)
 {
   const TestFetchAllData *data = d;
-  xregex_t *regex;
-  xslist_t *l_exp;
-  xchar_t **tokens;
-  xint_t token_count;
-  xint_t i;
+  GRegex *regex;
+  GSList *l_exp;
+  gchar **tokens;
+  gint token_count;
+  gint i;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  tokens = xregex_split_full (regex, data->string, -1, data->start_position,
+  tokens = g_regex_split_full (regex, data->string, -1, data->start_position,
 			       0, data->max_tokens, NULL);
   if (tokens)
-    token_count = xstrv_length (tokens);
+    token_count = g_strv_length (tokens);
   else
     token_count = 0;
 
-  g_assert_cmpint (token_count, ==, xslist_length (data->expected));
+  g_assert_cmpint (token_count, ==, g_slist_length (data->expected));
 
   l_exp = data->expected;
-  for (i = 0; l_exp != NULL; i++, l_exp = xslist_next (l_exp))
+  for (i = 0; l_exp != NULL; i++, l_exp = g_slist_next (l_exp))
     {
       g_assert_nonnull (tokens);
       g_assert_cmpstr (l_exp->data, ==, tokens[i]);
     }
 
-  xregex_unref (regex);
-  xstrfreev (tokens);
+  g_regex_unref (regex);
+  g_strfreev (tokens);
 }
 
 static void
-test_split (xconstpointer d)
+test_split (gconstpointer d)
 {
   const TestFetchAllData *data = d;
-  xregex_t *regex;
-  xslist_t *l_exp;
-  xchar_t **tokens;
-  xint_t token_count;
-  xint_t i;
+  GRegex *regex;
+  GSList *l_exp;
+  gchar **tokens;
+  gint token_count;
+  gint i;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
 
-  xassert (regex != NULL);
+  g_assert (regex != NULL);
 
-  tokens = xregex_split (regex, data->string, 0);
+  tokens = g_regex_split (regex, data->string, 0);
   if (tokens)
-    token_count = xstrv_length (tokens);
+    token_count = g_strv_length (tokens);
   else
     token_count = 0;
 
-  g_assert_cmpint (token_count, ==, xslist_length (data->expected));
+  g_assert_cmpint (token_count, ==, g_slist_length (data->expected));
 
   l_exp = data->expected;
-  for (i = 0; l_exp != NULL; i++, l_exp = xslist_next (l_exp))
+  for (i = 0; l_exp != NULL; i++, l_exp = g_slist_next (l_exp))
     {
       g_assert_nonnull (tokens);
       g_assert_cmpstr (l_exp->data, ==, tokens[i]);
     }
 
-  xregex_unref (regex);
-  xstrfreev (tokens);
+  g_regex_unref (regex);
+  g_strfreev (tokens);
 }
 
 #define TEST_SPLIT0(_pattern, _string, _start_position, _max_tokens) {          \
   TestFetchAllData *data;                                                       \
-  xchar_t *path;                                                                  \
+  gchar *path;                                                                  \
   data = g_new0 (TestFetchAllData, 1);                                          \
   data->pattern = _pattern;                                                     \
   data->string = _string;                                                       \
@@ -932,92 +932,92 @@ test_split (xconstpointer d)
   data->max_tokens = _max_tokens;                                               \
   data->expected = NULL;                                                        \
   if (_start_position == 0 && _max_tokens <= 0) {                               \
-    path = xstrdup_printf ("/regex/split0/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/split0/%d", ++total);                       \
     g_test_add_data_func (path, data, test_split);                              \
     g_free (path);                                                              \
   }                                                                             \
-  path = xstrdup_printf ("/regex/full-split0/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/full-split0/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_full, free_fetch_all_data); \
   g_free (path);                                                                \
 }
 
 #define TEST_SPLIT1(_pattern, _string, _start_position, _max_tokens, e1) {      \
   TestFetchAllData *data;                                                       \
-  xchar_t *path;                                                                  \
+  gchar *path;                                                                  \
   data = g_new0 (TestFetchAllData, 1);                                          \
   data->pattern = _pattern;                                                     \
   data->string = _string;                                                       \
   data->start_position = _start_position;                                       \
   data->max_tokens = _max_tokens;                                               \
   data->expected = NULL;                                                        \
-  data->expected = xslist_append (data->expected, e1);                         \
+  data->expected = g_slist_append (data->expected, e1);                         \
   if (_start_position == 0 && _max_tokens <= 0) {                               \
-    path = xstrdup_printf ("/regex/split1/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/split1/%d", ++total);                       \
     g_test_add_data_func (path, data, test_split);                              \
     g_free (path);                                                              \
   }                                                                             \
-  path = xstrdup_printf ("/regex/full-split1/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/full-split1/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_full, free_fetch_all_data); \
   g_free (path);                                                                \
 }
 
 #define TEST_SPLIT2(_pattern, _string, _start_position, _max_tokens, e1, e2) {  \
   TestFetchAllData *data;                                                       \
-  xchar_t *path;                                                                  \
+  gchar *path;                                                                  \
   data = g_new0 (TestFetchAllData, 1);                                          \
   data->pattern = _pattern;                                                     \
   data->string = _string;                                                       \
   data->start_position = _start_position;                                       \
   data->max_tokens = _max_tokens;                                               \
   data->expected = NULL;                                                        \
-  data->expected = xslist_append (data->expected, e1);                         \
-  data->expected = xslist_append (data->expected, e2);                         \
+  data->expected = g_slist_append (data->expected, e1);                         \
+  data->expected = g_slist_append (data->expected, e2);                         \
   if (_start_position == 0 && _max_tokens <= 0) {                               \
-    path = xstrdup_printf ("/regex/split2/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/split2/%d", ++total);                       \
     g_test_add_data_func (path, data, test_split);                              \
     g_free (path);                                                              \
   }                                                                             \
-  path = xstrdup_printf ("/regex/full-split2/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/full-split2/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_split_full, free_fetch_all_data); \
   g_free (path);                                                                \
 }
 
 #define TEST_SPLIT3(_pattern, _string, _start_position, _max_tokens, e1, e2, e3) { \
   TestFetchAllData *data;                                                          \
-  xchar_t *path;                                                                     \
+  gchar *path;                                                                     \
   data = g_new0 (TestFetchAllData, 1);                                             \
   data->pattern = _pattern;                                                        \
   data->string = _string;                                                          \
   data->start_position = _start_position;                                          \
   data->max_tokens = _max_tokens;                                                  \
   data->expected = NULL;                                                           \
-  data->expected = xslist_append (data->expected, e1);                            \
-  data->expected = xslist_append (data->expected, e2);                            \
-  data->expected = xslist_append (data->expected, e3);                            \
+  data->expected = g_slist_append (data->expected, e1);                            \
+  data->expected = g_slist_append (data->expected, e2);                            \
+  data->expected = g_slist_append (data->expected, e3);                            \
   if (_start_position == 0 && _max_tokens <= 0) {                                  \
-    path = xstrdup_printf ("/regex/split3/%d", ++total);                          \
+    path = g_strdup_printf ("/regex/split3/%d", ++total);                          \
     g_test_add_data_func (path, data, test_split);                                 \
     g_free (path);                                                                 \
   }                                                                                \
-  path = xstrdup_printf ("/regex/full-split3/%d", ++total);                       \
+  path = g_strdup_printf ("/regex/full-split3/%d", ++total);                       \
   g_test_add_data_func_full (path, data, test_split_full, free_fetch_all_data);    \
   g_free (path);                                                                   \
 }
 
 typedef struct {
-  const xchar_t *string_to_expand;
-  xboolean_t expected;
-  xboolean_t expected_refs;
+  const gchar *string_to_expand;
+  gboolean expected;
+  gboolean expected_refs;
 } TestCheckReplacementData;
 
 static void
-test_check_replacement (xconstpointer d)
+test_check_replacement (gconstpointer d)
 {
   const TestCheckReplacementData *data = d;
-  xboolean_t has_refs;
-  xboolean_t result;
+  gboolean has_refs;
+  gboolean result;
 
-  result = xregex_check_replacement (data->string_to_expand, &has_refs, NULL);
+  result = g_regex_check_replacement (data->string_to_expand, &has_refs, NULL);
   g_assert_cmpint (data->expected, ==, result);
 
   if (data->expected)
@@ -1026,176 +1026,176 @@ test_check_replacement (xconstpointer d)
 
 #define TEST_CHECK_REPLACEMENT(_string_to_expand, _expected, _expected_refs) { \
   TestCheckReplacementData *data;                                              \
-  xchar_t *path;                                                                 \
+  gchar *path;                                                                 \
   data = g_new0 (TestCheckReplacementData, 1);                                 \
   data->string_to_expand = _string_to_expand;                                  \
   data->expected = _expected;                                                  \
   data->expected_refs = _expected_refs;                                        \
-  path = xstrdup_printf ("/regex/check-repacement/%d", ++total);              \
+  path = g_strdup_printf ("/regex/check-repacement/%d", ++total);              \
   g_test_add_data_func_full (path, data, test_check_replacement, g_free);      \
   g_free (path);                                                               \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  const xchar_t *string_to_expand;
-  xboolean_t     raw;
-  const xchar_t *expected;
+  const gchar *pattern;
+  const gchar *string;
+  const gchar *string_to_expand;
+  gboolean     raw;
+  const gchar *expected;
 } TestExpandData;
 
 static void
-test_expand (xconstpointer d)
+test_expand (gconstpointer d)
 {
   const TestExpandData *data = d;
-  xregex_t *regex = NULL;
-  xmatch_info_t *match_info = NULL;
-  xchar_t *res;
-  xerror_t *error = NULL;
+  GRegex *regex = NULL;
+  GMatchInfo *match_info = NULL;
+  gchar *res;
+  GError *error = NULL;
 
   if (data->pattern)
     {
-      regex = xregex_new (data->pattern, data->raw ? XREGEX_RAW : 0, 0,
+      regex = g_regex_new (data->pattern, data->raw ? G_REGEX_RAW : 0, 0,
           &error);
       g_assert_no_error (error);
-      xregex_match (regex, data->string, 0, &match_info);
+      g_regex_match (regex, data->string, 0, &match_info);
     }
 
-  res = xmatch_info_expand_references (match_info, data->string_to_expand, NULL);
+  res = g_match_info_expand_references (match_info, data->string_to_expand, NULL);
   g_assert_cmpstr (res, ==, data->expected);
   g_free (res);
-  xmatch_info_free (match_info);
+  g_match_info_free (match_info);
   if (regex)
-    xregex_unref (regex);
+    g_regex_unref (regex);
 }
 
 #define TEST_EXPAND(_pattern, _string, _string_to_expand, _raw, _expected) { \
   TestExpandData *data;                                                      \
-  xchar_t *path;                                                               \
+  gchar *path;                                                               \
   data = g_new0 (TestExpandData, 1);                                         \
   data->pattern = _pattern;                                                  \
   data->string = _string;                                                    \
   data->string_to_expand = _string_to_expand;                                \
   data->raw = _raw;                                                          \
   data->expected = _expected;                                                \
-  path = xstrdup_printf ("/regex/expand/%d", ++total);                      \
+  path = g_strdup_printf ("/regex/expand/%d", ++total);                      \
   g_test_add_data_func_full (path, data, test_expand, g_free);               \
   g_free (path);                                                             \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xint_t         start_position;
-  const xchar_t *replacement;
-  const xchar_t *expected;
+  const gchar *pattern;
+  const gchar *string;
+  gint         start_position;
+  const gchar *replacement;
+  const gchar *expected;
 } TestReplaceData;
 
 static void
-test_replace (xconstpointer d)
+test_replace (gconstpointer d)
 {
   const TestReplaceData *data = d;
-  xregex_t *regex;
-  xchar_t *res;
+  GRegex *regex;
+  gchar *res;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
-  res = xregex_replace (regex, data->string, -1, data->start_position, data->replacement, 0, NULL);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
+  res = g_regex_replace (regex, data->string, -1, data->start_position, data->replacement, 0, NULL);
 
   g_assert_cmpstr (res, ==, data->expected);
 
   g_free (res);
-  xregex_unref (regex);
+  g_regex_unref (regex);
 }
 
 #define TEST_REPLACE(_pattern, _string, _start_position, _replacement, _expected) { \
   TestReplaceData *data;                                                \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestReplaceData, 1);                                   \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
   data->start_position = _start_position;                               \
   data->replacement = _replacement;                                     \
   data->expected = _expected;                                           \
-  path = xstrdup_printf ("/regex/replace/%d", ++total);                \
+  path = g_strdup_printf ("/regex/replace/%d", ++total);                \
   g_test_add_data_func_full (path, data, test_replace, g_free);         \
   g_free (path);                                                        \
 }
 
 static void
-test_replace_lit (xconstpointer d)
+test_replace_lit (gconstpointer d)
 {
   const TestReplaceData *data = d;
-  xregex_t *regex;
-  xchar_t *res;
+  GRegex *regex;
+  gchar *res;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
-  res = xregex_replace_literal (regex, data->string, -1, data->start_position,
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
+  res = g_regex_replace_literal (regex, data->string, -1, data->start_position,
                                  data->replacement, 0, NULL);
   g_assert_cmpstr (res, ==, data->expected);
 
   g_free (res);
-  xregex_unref (regex);
+  g_regex_unref (regex);
 }
 
 #define TEST_REPLACE_LIT(_pattern, _string, _start_position, _replacement, _expected) { \
   TestReplaceData *data;                                                \
-  xchar_t *path;                                                          \
+  gchar *path;                                                          \
   data = g_new0 (TestReplaceData, 1);                                   \
   data->pattern = _pattern;                                             \
   data->string = _string;                                               \
   data->start_position = _start_position;                               \
   data->replacement = _replacement;                                     \
   data->expected = _expected;                                           \
-  path = xstrdup_printf ("/regex/replace-literally/%d", ++total);      \
+  path = g_strdup_printf ("/regex/replace-literally/%d", ++total);      \
   g_test_add_data_func_full (path, data, test_replace_lit, g_free);     \
   g_free (path);                                                        \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *name;
-  xint_t         expected_num;
+  const gchar *pattern;
+  const gchar *name;
+  gint         expected_num;
 } TestStringNumData;
 
 static void
-test_get_string_number (xconstpointer d)
+test_get_string_number (gconstpointer d)
 {
   const TestStringNumData *data = d;
-  xregex_t *regex;
-  xint_t num;
+  GRegex *regex;
+  gint num;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
-  num = xregex_get_string_number (regex, data->name);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
+  num = g_regex_get_string_number (regex, data->name);
 
   g_assert_cmpint (num, ==, data->expected_num);
-  xregex_unref (regex);
+  g_regex_unref (regex);
 }
 
 #define TEST_GET_STRING_NUMBER(_pattern, _name, _expected_num) {          \
   TestStringNumData *data;                                                \
-  xchar_t *path;                                                            \
+  gchar *path;                                                            \
   data = g_new0 (TestStringNumData, 1);                                   \
   data->pattern = _pattern;                                               \
   data->name = _name;                                                     \
   data->expected_num = _expected_num;                                     \
-  path = xstrdup_printf ("/regex/string-number/%d", ++total);            \
+  path = g_strdup_printf ("/regex/string-number/%d", ++total);            \
   g_test_add_data_func_full (path, data, test_get_string_number, g_free); \
   g_free (path);                                                          \
 }
 
 typedef struct {
-  const xchar_t *string;
-  xint_t         length;
-  const xchar_t *expected;
+  const gchar *string;
+  gint         length;
+  const gchar *expected;
 } TestEscapeData;
 
 static void
-test_escape (xconstpointer d)
+test_escape (gconstpointer d)
 {
   const TestEscapeData *data = d;
-  xchar_t *escaped;
+  gchar *escaped;
 
-  escaped = xregex_escape_string (data->string, data->length);
+  escaped = g_regex_escape_string (data->string, data->length);
 
   g_assert_cmpstr (escaped, ==, data->expected);
 
@@ -1204,23 +1204,23 @@ test_escape (xconstpointer d)
 
 #define TEST_ESCAPE(_string, _length, _expected) {             \
   TestEscapeData *data;                                        \
-  xchar_t *path;                                                 \
+  gchar *path;                                                 \
   data = g_new0 (TestEscapeData, 1);                           \
   data->string = _string;                                      \
   data->length = _length;                                      \
   data->expected = _expected;                                  \
-  path = xstrdup_printf ("/regex/escape/%d", ++total);        \
+  path = g_strdup_printf ("/regex/escape/%d", ++total);        \
   g_test_add_data_func_full (path, data, test_escape, g_free); \
   g_free (path);                                               \
 }
 
 static void
-test_escape_nul (xconstpointer d)
+test_escape_nul (gconstpointer d)
 {
   const TestEscapeData *data = d;
-  xchar_t *escaped;
+  gchar *escaped;
 
-  escaped = xregex_escape_nul (data->string, data->length);
+  escaped = g_regex_escape_nul (data->string, data->length);
 
   g_assert_cmpstr (escaped, ==, data->expected);
 
@@ -1229,56 +1229,56 @@ test_escape_nul (xconstpointer d)
 
 #define TEST_ESCAPE_NUL(_string, _length, _expected) {             \
   TestEscapeData *data;                                            \
-  xchar_t *path;                                                     \
+  gchar *path;                                                     \
   data = g_new0 (TestEscapeData, 1);                               \
   data->string = _string;                                          \
   data->length = _length;                                          \
   data->expected = _expected;                                      \
-  path = xstrdup_printf ("/regex/escape_nul/%d", ++total);        \
+  path = g_strdup_printf ("/regex/escape_nul/%d", ++total);        \
   g_test_add_data_func_full (path, data, test_escape_nul, g_free); \
   g_free (path);                                                   \
 }
 
 typedef struct {
-  const xchar_t *pattern;
-  const xchar_t *string;
-  xssize_t       string_len;
-  xint_t         start_position;
-  xslist_t *expected;
+  const gchar *pattern;
+  const gchar *string;
+  gssize       string_len;
+  gint         start_position;
+  GSList *expected;
 } TestMatchAllData;
 
 static void
-test_match_all_full (xconstpointer d)
+test_match_all_full (gconstpointer d)
 {
   const TestMatchAllData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xslist_t *l_exp;
-  xboolean_t match_ok;
-  xint_t match_count;
-  xint_t i;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  GSList *l_exp;
+  gboolean match_ok;
+  gint match_count;
+  gint i;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
-  match_ok = xregex_match_all_full (regex, data->string, data->string_len, data->start_position,
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
+  match_ok = g_regex_match_all_full (regex, data->string, data->string_len, data->start_position,
                                      0, &match_info, NULL);
 
-  if (xslist_length (data->expected) == 0)
-    xassert (!match_ok);
+  if (g_slist_length (data->expected) == 0)
+    g_assert (!match_ok);
   else
-    xassert (match_ok);
+    g_assert (match_ok);
 
-  match_count = xmatch_info_get_match_count (match_info);
-  g_assert_cmpint (match_count, ==, xslist_length (data->expected));
+  match_count = g_match_info_get_match_count (match_info);
+  g_assert_cmpint (match_count, ==, g_slist_length (data->expected));
 
   l_exp = data->expected;
   for (i = 0; i < match_count; i++)
     {
-      xint_t start, end;
-      xchar_t *matched_string;
+      gint start, end;
+      gchar *matched_string;
       Match *exp = l_exp->data;
 
-      matched_string = xmatch_info_fetch (match_info, i);
-      xmatch_info_fetch_pos (match_info, i, &start, &end);
+      matched_string = g_match_info_fetch (match_info, i);
+      g_match_info_fetch_pos (match_info, i, &start, &end);
 
       g_assert_cmpstr (exp->string, ==, matched_string);
       g_assert_cmpint (exp->start, ==, start);
@@ -1286,35 +1286,35 @@ test_match_all_full (xconstpointer d)
 
       g_free (matched_string);
 
-      l_exp = xslist_next (l_exp);
+      l_exp = g_slist_next (l_exp);
     }
 
-  xmatch_info_free (match_info);
-  xregex_unref (regex);
+  g_match_info_free (match_info);
+  g_regex_unref (regex);
 }
 
 static void
-test_match_all (xconstpointer d)
+test_match_all (gconstpointer d)
 {
   const TestMatchAllData *data = d;
-  xregex_t *regex;
-  xmatch_info_t *match_info;
-  xslist_t *l_exp;
-  xboolean_t match_ok;
-  xuint_t i, match_count;
+  GRegex *regex;
+  GMatchInfo *match_info;
+  GSList *l_exp;
+  gboolean match_ok;
+  guint i, match_count;
 
-  regex = xregex_new (data->pattern, 0, 0, NULL);
-  match_ok = xregex_match_all (regex, data->string, 0, &match_info);
+  regex = g_regex_new (data->pattern, 0, 0, NULL);
+  match_ok = g_regex_match_all (regex, data->string, 0, &match_info);
 
-  if (xslist_length (data->expected) == 0)
-    xassert (!match_ok);
+  if (g_slist_length (data->expected) == 0)
+    g_assert (!match_ok);
   else
-    xassert (match_ok);
+    g_assert (match_ok);
 
-  match_count = xmatch_info_get_match_count (match_info);
+  match_count = g_match_info_get_match_count (match_info);
   g_assert_cmpint (match_count, >=, 0);
 
-  if (match_count != xslist_length (data->expected))
+  if (match_count != g_slist_length (data->expected))
     {
       g_message ("regex: %s", data->pattern);
       g_message ("string: %s", data->string);
@@ -1322,11 +1322,11 @@ test_match_all (xconstpointer d)
 
       for (i = 0; i < match_count; i++)
         {
-          xint_t start, end;
-          xchar_t *matched_string;
+          gint start, end;
+          gchar *matched_string;
 
-          matched_string = xmatch_info_fetch (match_info, i);
-          xmatch_info_fetch_pos (match_info, i, &start, &end);
+          matched_string = g_match_info_fetch (match_info, i);
+          g_match_info_fetch_pos (match_info, i, &start, &end);
           g_message ("%u. %d-%d '%s'", i, start, end, matched_string);
           g_free (matched_string);
         }
@@ -1342,19 +1342,19 @@ test_match_all (xconstpointer d)
           i++;
         }
 
-      xerror ("match_count not as expected: %u != %d",
-          match_count, xslist_length (data->expected));
+      g_error ("match_count not as expected: %u != %d",
+          match_count, g_slist_length (data->expected));
     }
 
   l_exp = data->expected;
   for (i = 0; i < match_count; i++)
     {
-      xint_t start, end;
-      xchar_t *matched_string;
+      gint start, end;
+      gchar *matched_string;
       Match *exp = l_exp->data;
 
-      matched_string = xmatch_info_fetch (match_info, i);
-      xmatch_info_fetch_pos (match_info, i, &start, &end);
+      matched_string = g_match_info_fetch (match_info, i);
+      g_match_info_fetch_pos (match_info, i, &start, &end);
 
       g_assert_cmpstr (exp->string, ==, matched_string);
       g_assert_cmpint (exp->start, ==, start);
@@ -1362,25 +1362,25 @@ test_match_all (xconstpointer d)
 
       g_free (matched_string);
 
-      l_exp = xslist_next (l_exp);
+      l_exp = g_slist_next (l_exp);
     }
 
-  xmatch_info_free (match_info);
-  xregex_unref (regex);
+  g_match_info_free (match_info);
+  g_regex_unref (regex);
 }
 
 static void
-free_match_all_data (xpointer_t _data)
+free_match_all_data (gpointer _data)
 {
   TestMatchAllData *data = _data;
 
-  xslist_free_full (data->expected, g_free);
+  g_slist_free_full (data->expected, g_free);
   g_free (data);
 }
 
 #define TEST_MATCH_ALL0(_pattern, _string, _string_len, _start_position) {          \
   TestMatchAllData *data;                                                           \
-  xchar_t *path;                                                                      \
+  gchar *path;                                                                      \
   data = g_new0 (TestMatchAllData, 1);                                              \
   data->pattern = _pattern;                                                         \
   data->string = _string;                                                           \
@@ -1388,11 +1388,11 @@ free_match_all_data (xpointer_t _data)
   data->start_position = _start_position;                                           \
   data->expected = NULL;                                                            \
   if (_string_len == -1 && _start_position == 0) {                                  \
-    path = xstrdup_printf ("/regex/match-all0/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/match-all0/%d", ++total);                       \
     g_test_add_data_func (path, data, test_match_all);                              \
     g_free (path);                                                                  \
   }                                                                                 \
-  path = xstrdup_printf ("/regex/match-all-full0/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/match-all-full0/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_match_all_full, free_match_all_data); \
   g_free (path);                                                                    \
 }
@@ -1401,7 +1401,7 @@ free_match_all_data (xpointer_t _data)
                         t1, s1, e1) {                                               \
   TestMatchAllData *data;                                                           \
   Match *match;                                                                     \
-  xchar_t *path;                                                                      \
+  gchar *path;                                                                      \
   data = g_new0 (TestMatchAllData, 1);                                              \
   data->pattern = _pattern;                                                         \
   data->string = _string;                                                           \
@@ -1412,13 +1412,13 @@ free_match_all_data (xpointer_t _data)
   match->string = t1;                                                               \
   match->start = s1;                                                                \
   match->end = e1;                                                                  \
-  data->expected = xslist_append (data->expected, match);                          \
+  data->expected = g_slist_append (data->expected, match);                          \
   if (_string_len == -1 && _start_position == 0) {                                  \
-    path = xstrdup_printf ("/regex/match-all1/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/match-all1/%d", ++total);                       \
     g_test_add_data_func (path, data, test_match_all);                              \
     g_free (path);                                                                  \
   }                                                                                 \
-  path = xstrdup_printf ("/regex/match-all-full1/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/match-all-full1/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_match_all_full, free_match_all_data); \
   g_free (path);                                                                    \
 }
@@ -1427,7 +1427,7 @@ free_match_all_data (xpointer_t _data)
                         t1, s1, e1, t2, s2, e2) {                                   \
   TestMatchAllData *data;                                                           \
   Match *match;                                                                     \
-  xchar_t *path;                                                                      \
+  gchar *path;                                                                      \
   data = g_new0 (TestMatchAllData, 1);                                              \
   data->pattern = _pattern;                                                         \
   data->string = _string;                                                           \
@@ -1438,18 +1438,18 @@ free_match_all_data (xpointer_t _data)
   match->string = t1;                                                               \
   match->start = s1;                                                                \
   match->end = e1;                                                                  \
-  data->expected = xslist_append (data->expected, match);                          \
+  data->expected = g_slist_append (data->expected, match);                          \
   match = g_new0 (Match, 1);                                                        \
   match->string = t2;                                                               \
   match->start = s2;                                                                \
   match->end = e2;                                                                  \
-  data->expected = xslist_append (data->expected, match);                          \
+  data->expected = g_slist_append (data->expected, match);                          \
   if (_string_len == -1 && _start_position == 0) {                                  \
-    path = xstrdup_printf ("/regex/match-all2/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/match-all2/%d", ++total);                       \
     g_test_add_data_func (path, data, test_match_all);                              \
     g_free (path);                                                                  \
   }                                                                                 \
-  path = xstrdup_printf ("/regex/match-all-full2/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/match-all-full2/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_match_all_full, free_match_all_data); \
   g_free (path);                                                                    \
 }
@@ -1458,7 +1458,7 @@ free_match_all_data (xpointer_t _data)
                         t1, s1, e1, t2, s2, e2, t3, s3, e3) {                       \
   TestMatchAllData *data;                                                           \
   Match *match;                                                                     \
-  xchar_t *path;                                                                      \
+  gchar *path;                                                                      \
   data = g_new0 (TestMatchAllData, 1);                                              \
   data->pattern = _pattern;                                                         \
   data->string = _string;                                                           \
@@ -1469,23 +1469,23 @@ free_match_all_data (xpointer_t _data)
   match->string = t1;                                                               \
   match->start = s1;                                                                \
   match->end = e1;                                                                  \
-  data->expected = xslist_append (data->expected, match);                          \
+  data->expected = g_slist_append (data->expected, match);                          \
   match = g_new0 (Match, 1);                                                        \
   match->string = t2;                                                               \
   match->start = s2;                                                                \
   match->end = e2;                                                                  \
-  data->expected = xslist_append (data->expected, match);                          \
+  data->expected = g_slist_append (data->expected, match);                          \
   match = g_new0 (Match, 1);                                                        \
   match->string = t3;                                                               \
   match->start = s3;                                                                \
   match->end = e3;                                                                  \
-  data->expected = xslist_append (data->expected, match);                          \
+  data->expected = g_slist_append (data->expected, match);                          \
   if (_string_len == -1 && _start_position == 0) {                                  \
-    path = xstrdup_printf ("/regex/match-all3/%d", ++total);                       \
+    path = g_strdup_printf ("/regex/match-all3/%d", ++total);                       \
     g_test_add_data_func (path, data, test_match_all);                              \
     g_free (path);                                                                  \
   }                                                                                 \
-  path = xstrdup_printf ("/regex/match-all-full3/%d", ++total);                    \
+  path = g_strdup_printf ("/regex/match-all-full3/%d", ++total);                    \
   g_test_add_data_func_full (path, data, test_match_all_full, free_match_all_data); \
   g_free (path);                                                                    \
 }
@@ -1493,646 +1493,646 @@ free_match_all_data (xpointer_t _data)
 static void
 test_properties (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xboolean_t res;
-  xmatch_info_t *match;
-  xchar_t *str;
+  GRegex *regex;
+  GError *error;
+  gboolean res;
+  GMatchInfo *match;
+  gchar *str;
 
   error = NULL;
-  regex = xregex_new ("\\p{L}\\p{Ll}\\p{Lu}\\p{L&}\\p{N}\\p{Nd}", XREGEX_OPTIMIZE, 0, &error);
-  res = xregex_match (regex, "ppPP01", 0, &match);
-  xassert (res);
-  str = xmatch_info_fetch (match, 0);
+  regex = g_regex_new ("\\p{L}\\p{Ll}\\p{Lu}\\p{L&}\\p{N}\\p{Nd}", G_REGEX_OPTIMIZE, 0, &error);
+  res = g_regex_match (regex, "ppPP01", 0, &match);
+  g_assert (res);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "ppPP01");
   g_free (str);
 
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 static void
 test_class (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xmatch_info_t *match;
-  xboolean_t res;
-  xchar_t *str;
+  GRegex *regex;
+  GError *error;
+  GMatchInfo *match;
+  gboolean res;
+  gchar *str;
 
   error = NULL;
-  regex = xregex_new ("[abc\\x{0B1E}\\p{Mn}\\x{0391}-\\x{03A9}]", XREGEX_OPTIMIZE, 0, &error);
-  res = xregex_match (regex, "a:b:\340\254\236:\333\253:\316\240", 0, &match);
-  xassert (res);
-  str = xmatch_info_fetch (match, 0);
+  regex = g_regex_new ("[abc\\x{0B1E}\\p{Mn}\\x{0391}-\\x{03A9}]", G_REGEX_OPTIMIZE, 0, &error);
+  res = g_regex_match (regex, "a:b:\340\254\236:\333\253:\316\240", 0, &match);
+  g_assert (res);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "a");
   g_free (str);
-  res = xmatch_info_next (match, NULL);
-  xassert (res);
-  str = xmatch_info_fetch (match, 0);
+  res = g_match_info_next (match, NULL);
+  g_assert (res);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "b");
   g_free (str);
-  res = xmatch_info_next (match, NULL);
-  xassert (res);
-  str = xmatch_info_fetch (match, 0);
+  res = g_match_info_next (match, NULL);
+  g_assert (res);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "\340\254\236");
   g_free (str);
-  res = xmatch_info_next (match, NULL);
-  xassert (res);
-  str = xmatch_info_fetch (match, 0);
+  res = g_match_info_next (match, NULL);
+  g_assert (res);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "\333\253");
   g_free (str);
-  res = xmatch_info_next (match, NULL);
-  xassert (res);
-  str = xmatch_info_fetch (match, 0);
+  res = g_match_info_next (match, NULL);
+  g_assert (res);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "\316\240");
   g_free (str);
 
-  res = xmatch_info_next (match, NULL);
-  xassert (!res);
+  res = g_match_info_next (match, NULL);
+  g_assert (!res);
 
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 /* examples for lookahead assertions taken from pcrepattern(3) */
 static void
 test_lookahead (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xmatch_info_t *match;
-  xboolean_t res;
-  xchar_t *str;
-  xint_t start, end;
+  GRegex *regex;
+  GError *error;
+  GMatchInfo *match;
+  gboolean res;
+  gchar *str;
+  gint start, end;
 
   error = NULL;
-  regex = xregex_new ("\\w+(?=;)", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("\\w+(?=;)", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "word1 word2: word3;", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
-  str = xmatch_info_fetch (match, 0);
+  res = g_regex_match (regex, "word1 word2: word3;", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 1);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "word3");
   g_free (str);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
   error = NULL;
-  regex = xregex_new ("foo(?!bar)", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("foo(?!bar)", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "foobar foobaz", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
-  res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  xassert (res);
+  res = g_regex_match (regex, "foobar foobaz", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 1);
+  res = g_match_info_fetch_pos (match, 0, &start, &end);
+  g_assert (res);
   g_assert_cmpint (start, ==, 7);
   g_assert_cmpint (end, ==, 10);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
   error = NULL;
-  regex = xregex_new ("(?!bar)foo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?!bar)foo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "foobar foobaz", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
-  res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  xassert (res);
+  res = g_regex_match (regex, "foobar foobaz", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 1);
+  res = g_match_info_fetch_pos (match, 0, &start, &end);
+  g_assert (res);
   g_assert_cmpint (start, ==, 0);
   g_assert_cmpint (end, ==, 3);
-  res = xmatch_info_next (match, &error);
-  xassert (res);
+  res = g_match_info_next (match, &error);
+  g_assert (res);
   g_assert_no_error (error);
-  res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  xassert (res);
+  res = g_match_info_fetch_pos (match, 0, &start, &end);
+  g_assert (res);
   g_assert_cmpint (start, ==, 7);
   g_assert_cmpint (end, ==, 10);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 /* examples for lookbehind assertions taken from pcrepattern(3) */
 static void
 test_lookbehind (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xmatch_info_t *match;
-  xboolean_t res;
-  xint_t start, end;
+  GRegex *regex;
+  GError *error;
+  GMatchInfo *match;
+  gboolean res;
+  gint start, end;
 
   error = NULL;
-  regex = xregex_new ("(?<!foo)bar", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<!foo)bar", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "foobar boobar", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
-  res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  xassert (res);
+  res = g_regex_match (regex, "foobar boobar", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 1);
+  res = g_match_info_fetch_pos (match, 0, &start, &end);
+  g_assert (res);
   g_assert_cmpint (start, ==, 10);
   g_assert_cmpint (end, ==, 13);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
   error = NULL;
-  regex = xregex_new ("(?<=bullock|donkey) poo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<=bullock|donkey) poo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "don poo, and bullock poo", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "don poo, and bullock poo", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 1);
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 20);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<!dogs?|cats?) x", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex == NULL);
-  g_assert_error (error, XREGEX_ERROR, XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
+  regex = g_regex_new ("(?<!dogs?|cats?) x", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex == NULL);
+  g_assert_error (error, G_REGEX_ERROR, G_REGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
   g_clear_error (&error);
 
-  regex = xregex_new ("(?<=ab(c|de)) foo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex == NULL);
-  g_assert_error (error, XREGEX_ERROR, XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
+  regex = g_regex_new ("(?<=ab(c|de)) foo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex == NULL);
+  g_assert_error (error, G_REGEX_ERROR, G_REGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
   g_clear_error (&error);
 
-  regex = xregex_new ("(?<=abc|abde)foo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<=abc|abde)foo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "abfoo, abdfoo, abcfoo", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "abfoo, abdfoo, abcfoo", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 18);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^.*+(?<=abcd)", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^.*+(?<=abcd)", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "abcabcabcabcabcabcabcabcabcd", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "abcabcabcabcabcabcabcabcabcd", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<=\\d{3})(?<!999)foo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<=\\d{3})(?<!999)foo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 20);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<=\\d{3}...)(?<!999)foo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<=\\d{3}...)(?<!999)foo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 13);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<=\\d{3}(?!999)...)foo", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<=\\d{3}(?!999)...)foo", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 13);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<=(?<!foo)bar)baz", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<=(?<!foo)bar)baz", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "foobarbaz barfoobaz barbarbaz", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "foobarbaz barfoobaz barbarbaz", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 26);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 /* examples for subpatterns taken from pcrepattern(3) */
 static void
 test_subpattern (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xmatch_info_t *match;
-  xboolean_t res;
-  xchar_t *str;
-  xint_t start;
+  GRegex *regex;
+  GError *error;
+  GMatchInfo *match;
+  gboolean res;
+  gchar *str;
+  gint start;
 
   error = NULL;
-  regex = xregex_new ("cat(aract|erpillar|)", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("cat(aract|erpillar|)", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  g_assert_cmpint (xregex_get_capture_count (regex), ==, 1);
-  g_assert_cmpint (xregex_get_max_backref (regex), ==, 0);
-  res = xregex_match_all (regex, "caterpillar", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 2);
-  str = xmatch_info_fetch (match, 0);
+  g_assert_cmpint (g_regex_get_capture_count (regex), ==, 1);
+  g_assert_cmpint (g_regex_get_max_backref (regex), ==, 0);
+  res = g_regex_match_all (regex, "caterpillar", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 2);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "caterpillar");
   g_free (str);
-  str = xmatch_info_fetch (match, 1);
+  str = g_match_info_fetch (match, 1);
   g_assert_cmpstr (str, ==, "cat");
   g_free (str);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("the ((red|white) (king|queen))", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("the ((red|white) (king|queen))", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  g_assert_cmpint (xregex_get_capture_count (regex), ==, 3);
-  g_assert_cmpint (xregex_get_max_backref (regex), ==, 0);
-  res = xregex_match (regex, "the red king", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 4);
-  str = xmatch_info_fetch (match, 0);
+  g_assert_cmpint (g_regex_get_capture_count (regex), ==, 3);
+  g_assert_cmpint (g_regex_get_max_backref (regex), ==, 0);
+  res = g_regex_match (regex, "the red king", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 4);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "the red king");
   g_free (str);
-  str = xmatch_info_fetch (match, 1);
+  str = g_match_info_fetch (match, 1);
   g_assert_cmpstr (str, ==, "red king");
   g_free (str);
-  str = xmatch_info_fetch (match, 2);
+  str = g_match_info_fetch (match, 2);
   g_assert_cmpstr (str, ==, "red");
   g_free (str);
-  str = xmatch_info_fetch (match, 3);
+  str = g_match_info_fetch (match, 3);
   g_assert_cmpstr (str, ==, "king");
   g_free (str);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("the ((?:red|white) (king|queen))", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("the ((?:red|white) (king|queen))", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "the white queen", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 3);
-  g_assert_cmpint (xregex_get_max_backref (regex), ==, 0);
-  str = xmatch_info_fetch (match, 0);
+  res = g_regex_match (regex, "the white queen", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 3);
+  g_assert_cmpint (g_regex_get_max_backref (regex), ==, 0);
+  str = g_match_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "the white queen");
   g_free (str);
-  str = xmatch_info_fetch (match, 1);
+  str = g_match_info_fetch (match, 1);
   g_assert_cmpstr (str, ==, "white queen");
   g_free (str);
-  str = xmatch_info_fetch (match, 2);
+  str = g_match_info_fetch (match, 2);
   g_assert_cmpstr (str, ==, "queen");
   g_free (str);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?|(Sat)(ur)|(Sun))day (morning|afternoon)", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?|(Sat)(ur)|(Sun))day (morning|afternoon)", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  g_assert_cmpint (xregex_get_capture_count (regex), ==, 3);
-  res = xregex_match (regex, "Saturday morning", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  g_assert_cmpint (xmatch_info_get_match_count (match), ==, 4);
-  str = xmatch_info_fetch (match, 1);
+  g_assert_cmpint (g_regex_get_capture_count (regex), ==, 3);
+  res = g_regex_match (regex, "Saturday morning", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_assert_cmpint (g_match_info_get_match_count (match), ==, 4);
+  str = g_match_info_fetch (match, 1);
   g_assert_cmpstr (str, ==, "Sat");
   g_free (str);
-  str = xmatch_info_fetch (match, 2);
+  str = g_match_info_fetch (match, 2);
   g_assert_cmpstr (str, ==, "ur");
   g_free (str);
-  str = xmatch_info_fetch (match, 3);
+  str = g_match_info_fetch (match, 3);
   g_assert_cmpstr (str, ==, "morning");
   g_free (str);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?|(abc)|(def))\\1", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?|(abc)|(def))\\1", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  g_assert_cmpint (xregex_get_max_backref (regex), ==, 1);
-  res = xregex_match (regex, "abcabc abcdef defabc defdef", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  g_assert_cmpint (g_regex_get_max_backref (regex), ==, 1);
+  res = g_regex_match (regex, "abcabc abcdef defabc defdef", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 0);
-  res = xmatch_info_next (match, &error);
-  xassert (res);
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_match_info_next (match, &error);
+  g_assert (res);
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 21);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?|(abc)|(def))(?1)", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?|(abc)|(def))(?1)", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "abcabc abcdef defabc defdef", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "abcabc abcdef defabc defdef", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 0);
-  res = xmatch_info_next (match, &error);
-  xassert (res);
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_match_info_next (match, &error);
+  g_assert (res);
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 14);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<DN>Mon|Fri|Sun)(?:day)?|(?<DN>Tue)(?:sday)?|(?<DN>Wed)(?:nesday)?|(?<DN>Thu)(?:rsday)?|(?<DN>Sat)(?:urday)?", XREGEX_OPTIMIZE|XREGEX_DUPNAMES, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("(?<DN>Mon|Fri|Sun)(?:day)?|(?<DN>Tue)(?:sday)?|(?<DN>Wed)(?:nesday)?|(?<DN>Thu)(?:rsday)?|(?<DN>Sat)(?:urday)?", G_REGEX_OPTIMIZE|G_REGEX_DUPNAMES, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "Mon Tuesday Wed Saturday", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  str = xmatch_info_fetch_named (match, "DN");
+  res = g_regex_match (regex, "Mon Tuesday Wed Saturday", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  str = g_match_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Mon");
   g_free (str);
-  res = xmatch_info_next (match, &error);
-  xassert (res);
-  str = xmatch_info_fetch_named (match, "DN");
+  res = g_match_info_next (match, &error);
+  g_assert (res);
+  str = g_match_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Tue");
   g_free (str);
-  res = xmatch_info_next (match, &error);
-  xassert (res);
-  str = xmatch_info_fetch_named (match, "DN");
+  res = g_match_info_next (match, &error);
+  g_assert (res);
+  str = g_match_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Wed");
   g_free (str);
-  res = xmatch_info_next (match, &error);
-  xassert (res);
-  str = xmatch_info_fetch_named (match, "DN");
+  res = g_match_info_next (match, &error);
+  g_assert (res);
+  str = g_match_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Sat");
   g_free (str);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^(a|b\\1)+$", XREGEX_OPTIMIZE|XREGEX_DUPNAMES, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^(a|b\\1)+$", G_REGEX_OPTIMIZE|G_REGEX_DUPNAMES, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "aaaaaaaaaaaaaaaa", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "ababbaa", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "aaaaaaaaaaaaaaaa", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "ababbaa", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 /* examples for conditions taken from pcrepattern(3) */
 static void
 test_condition (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xmatch_info_t *match;
-  xboolean_t res;
+  GRegex *regex;
+  GError *error;
+  GMatchInfo *match;
+  gboolean res;
 
   error = NULL;
-  regex = xregex_new ("^(a+)(\\()?[^()]+(?(-1)\\))(b+)$", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^(a+)(\\()?[^()]+(?(-1)\\))(b+)$", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "a(zzzzzz)b", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "aaazzzzzzbbb", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "a(zzzzzz)b", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "aaazzzzzzbbb", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
   error = NULL;
-  regex = xregex_new ("^(a+)(?<OPEN>\\()?[^()]+(?(<OPEN>)\\))(b+)$", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^(a+)(?<OPEN>\\()?[^()]+(?(<OPEN>)\\))(b+)$", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "a(zzzzzz)b", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "aaazzzzzzbbb", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "a(zzzzzz)b", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "aaazzzzzzbbb", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^(a+)(?(+1)\\[|\\<)?[^()]+(\\])?(b+)$", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^(a+)(?(+1)\\[|\\<)?[^()]+(\\])?(b+)$", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "a[zzzzzz]b", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "aaa<zzzzzzbbb", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "a[zzzzzz]b", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "aaa<zzzzzzbbb", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?(DEFINE) (?<byte> 2[0-4]\\d | 25[0-5] | 1\\d\\d | [1-9]?\\d) )"
+  regex = g_regex_new ("(?(DEFINE) (?<byte> 2[0-4]\\d | 25[0-5] | 1\\d\\d | [1-9]?\\d) )"
                        "\\b (?&byte) (\\.(?&byte)){3} \\b",
-                       XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  xassert (regex);
+                       G_REGEX_OPTIMIZE|G_REGEX_EXTENDED, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "128.0.0.1", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "192.168.1.1", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "209.132.180.167", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "128.0.0.1", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "192.168.1.1", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "209.132.180.167", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^(?(?=[^a-z]*[a-z])"
+  regex = g_regex_new ("^(?(?=[^a-z]*[a-z])"
                        "\\d{2}-[a-z]{3}-\\d{2} | \\d{2}-\\d{2}-\\d{2} )$",
-                       XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  xassert (regex);
+                       G_REGEX_OPTIMIZE|G_REGEX_EXTENDED, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "01-abc-24", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "01-23-45", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "01-uv-45", 0, &match);
-  xassert (!res);
-  xassert (!xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "01-234-45", 0, &match);
-  xassert (!res);
-  xassert (!xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "01-abc-24", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "01-23-45", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "01-uv-45", 0, &match);
+  g_assert (!res);
+  g_assert (!g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "01-234-45", 0, &match);
+  g_assert (!res);
+  g_assert (!g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 /* examples for recursion taken from pcrepattern(3) */
 static void
 test_recursion (void)
 {
-  xregex_t *regex;
-  xerror_t *error;
-  xmatch_info_t *match;
-  xboolean_t res;
-  xint_t start;
+  GRegex *regex;
+  GError *error;
+  GMatchInfo *match;
+  gboolean res;
+  gint start;
 
   error = NULL;
-  regex = xregex_new ("\\( ( [^()]++ | (?R) )* \\)", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("\\( ( [^()]++ | (?R) )* \\)", G_REGEX_OPTIMIZE|G_REGEX_EXTENDED, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "(middle)", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "((((((((((((((((middle))))))))))))))))", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "(((xxx(((", 0, &match);
-  xassert (!res);
-  xassert (!xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "(middle)", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "((((((((((((((((middle))))))))))))))))", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "(((xxx(((", 0, &match);
+  g_assert (!res);
+  g_assert (!g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^( \\( ( [^()]++ | (?1) )* \\) )$", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^( \\( ( [^()]++ | (?1) )* \\) )$", G_REGEX_OPTIMIZE|G_REGEX_EXTENDED, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "((((((((((((((((middle))))))))))))))))", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "(((xxx((()", 0, &match);
-  xassert (!res);
-  xassert (!xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "((((((((((((((((middle))))))))))))))))", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "(((xxx((()", 0, &match);
+  g_assert (!res);
+  g_assert (!g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^(?<pn> \\( ( [^()]++ | (?&pn) )* \\) )$", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^(?<pn> \\( ( [^()]++ | (?&pn) )* \\) )$", G_REGEX_OPTIMIZE|G_REGEX_EXTENDED, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  xregex_match (regex, "(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa()", 0, &match);
-  xassert (!res);
-  xassert (!xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_regex_match (regex, "(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa()", 0, &match);
+  g_assert (!res);
+  g_assert (!g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("< (?: (?(R) \\d++ | [^<>]*+) | (?R)) * >", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("< (?: (?(R) \\d++ | [^<>]*+) | (?R)) * >", G_REGEX_OPTIMIZE|G_REGEX_EXTENDED, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "<ab<01<23<4>>>>", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  res = g_regex_match (regex, "<ab<01<23<4>>>>", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, ==, 0);
-  xmatch_info_free (match);
-  res = xregex_match (regex, "<ab<01<xx<x>>>>", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  xassert (res);
+  g_match_info_free (match);
+  res = g_regex_match (regex, "<ab<01<xx<x>>>>", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  res = g_match_info_fetch_pos (match, 0, &start, NULL);
+  g_assert (res);
   g_assert_cmpint (start, >, 0);
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^((.)(?1)\\2|.)$", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^((.)(?1)\\2|.)$", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "abcdcba", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "abcddcba", 0, &match);
-  xassert (!res);
-  xassert (!xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "abcdcba", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "abcddcba", 0, &match);
+  g_assert (!res);
+  g_assert (!g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^(?:((.)(?1)\\2|)|((.)(?3)\\4|.))$", XREGEX_OPTIMIZE, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^(?:((.)(?1)\\2|)|((.)(?3)\\4|.))$", G_REGEX_OPTIMIZE, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "abcdcba", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "abcddcba", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "abcdcba", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "abcddcba", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("^\\W*+(?:((.)\\W*+(?1)\\W*+\\2|)|((.)\\W*+(?3)\\W*+\\4|\\W*+.\\W*+))\\W*+$", XREGEX_OPTIMIZE|XREGEX_CASELESS, 0, &error);
-  xassert (regex);
+  regex = g_regex_new ("^\\W*+(?:((.)\\W*+(?1)\\W*+\\2|)|((.)\\W*+(?3)\\W*+\\4|\\W*+.\\W*+))\\W*+$", G_REGEX_OPTIMIZE|G_REGEX_CASELESS, 0, &error);
+  g_assert (regex);
   g_assert_no_error (error);
-  res = xregex_match (regex, "abcdcba", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "A man, a plan, a canal: Panama!", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  res = xregex_match (regex, "Oozy rat in a sanitary zoo", 0, &match);
-  xassert (res);
-  xassert (xmatch_info_matches (match));
-  xmatch_info_free (match);
-  xregex_unref (regex);
+  res = g_regex_match (regex, "abcdcba", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "A man, a plan, a canal: Panama!", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  res = g_regex_match (regex, "Oozy rat in a sanitary zoo", 0, &match);
+  g_assert (res);
+  g_assert (g_match_info_matches (match));
+  g_match_info_free (match);
+  g_regex_unref (regex);
 }
 
 static void
 test_multiline (void)
 {
-  xregex_t *regex;
-  xmatch_info_t *info;
-  xint_t count;
+  GRegex *regex;
+  GMatchInfo *info;
+  gint count;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=640489");
 
-  regex = xregex_new ("^a$", XREGEX_MULTILINE|XREGEX_DOTALL, 0, NULL);
+  regex = g_regex_new ("^a$", G_REGEX_MULTILINE|G_REGEX_DOTALL, 0, NULL);
 
   count = 0;
-  xregex_match (regex, "a\nb\na", 0, &info);
-  while (xmatch_info_matches (info))
+  g_regex_match (regex, "a\nb\na", 0, &info);
+  while (g_match_info_matches (info))
     {
       count++;
-      xmatch_info_next (info, NULL);
+      g_match_info_next (info, NULL);
     }
-  xmatch_info_free (info);
-  xregex_unref (regex);
+  g_match_info_free (info);
+  g_regex_unref (regex);
 
   g_assert_cmpint (count, ==, 2);
 }
@@ -2140,44 +2140,44 @@ test_multiline (void)
 static void
 test_explicit_crlf (void)
 {
-  xregex_t *regex;
+  GRegex *regex;
 
-  regex = xregex_new ("[\r\n]a", 0, 0, NULL);
-  g_assert_cmpint (xregex_get_has_cr_or_lf (regex), ==, TRUE);
-  xregex_unref (regex);
+  regex = g_regex_new ("[\r\n]a", 0, 0, NULL);
+  g_assert_cmpint (g_regex_get_has_cr_or_lf (regex), ==, TRUE);
+  g_regex_unref (regex);
 }
 
 static void
 test_max_lookbehind (void)
 {
-  xregex_t *regex;
+  GRegex *regex;
 
-  regex = xregex_new ("abc", 0, 0, NULL);
-  g_assert_cmpint (xregex_get_max_lookbehind (regex), ==, 0);
-  xregex_unref (regex);
+  regex = g_regex_new ("abc", 0, 0, NULL);
+  g_assert_cmpint (g_regex_get_max_lookbehind (regex), ==, 0);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("\\babc", 0, 0, NULL);
-  g_assert_cmpint (xregex_get_max_lookbehind (regex), ==, 1);
-  xregex_unref (regex);
+  regex = g_regex_new ("\\babc", 0, 0, NULL);
+  g_assert_cmpint (g_regex_get_max_lookbehind (regex), ==, 1);
+  g_regex_unref (regex);
 
-  regex = xregex_new ("(?<=123)abc", 0, 0, NULL);
-  g_assert_cmpint (xregex_get_max_lookbehind (regex), ==, 3);
-  xregex_unref (regex);
+  regex = g_regex_new ("(?<=123)abc", 0, 0, NULL);
+  g_assert_cmpint (g_regex_get_max_lookbehind (regex), ==, 3);
+  g_regex_unref (regex);
 }
 
-static xboolean_t
-pcre_ge (xuint64_t major, xuint64_t minor)
+static gboolean
+pcre_ge (guint64 major, guint64 minor)
 {
     const char *version;
-    xchar_t *ptr;
-    xuint64_t pcre_major, pcre_minor;
+    gchar *ptr;
+    guint64 pcre_major, pcre_minor;
 
     /* e.g. 8.35 2014-04-04 */
     version = pcre_version ();
 
     pcre_major = g_ascii_strtoull (version, &ptr, 10);
     /* ptr points to ".MINOR (release date)" */
-    xassert (ptr[0] == '.');
+    g_assert (ptr[0] == '.');
     pcre_minor = g_ascii_strtoull (ptr + 1, NULL, 10);
 
     return (pcre_major > major) || (pcre_major == major && pcre_minor >= minor);
@@ -2202,18 +2202,18 @@ main (int argc, char *argv[])
   g_test_add_func ("/regex/max-lookbehind", test_max_lookbehind);
 
   /* TEST_NEW(pattern, compile_opts, match_opts) */
-  TEST_NEW("[A-Z]+", XREGEX_CASELESS | XREGEX_EXTENDED | XREGEX_OPTIMIZE, XREGEX_MATCH_NOTBOL | XREGEX_MATCH_PARTIAL);
+  TEST_NEW("[A-Z]+", G_REGEX_CASELESS | G_REGEX_EXTENDED | G_REGEX_OPTIMIZE, G_REGEX_MATCH_NOTBOL | G_REGEX_MATCH_PARTIAL);
   TEST_NEW("", 0, 0);
   TEST_NEW(".*", 0, 0);
-  TEST_NEW(".*", XREGEX_OPTIMIZE, 0);
-  TEST_NEW(".*", XREGEX_MULTILINE, 0);
-  TEST_NEW(".*", XREGEX_DOTALL, 0);
-  TEST_NEW(".*", XREGEX_DOTALL, XREGEX_MATCH_NOTBOL);
+  TEST_NEW(".*", G_REGEX_OPTIMIZE, 0);
+  TEST_NEW(".*", G_REGEX_MULTILINE, 0);
+  TEST_NEW(".*", G_REGEX_DOTALL, 0);
+  TEST_NEW(".*", G_REGEX_DOTALL, G_REGEX_MATCH_NOTBOL);
   TEST_NEW("(123\\d*)[a-zA-Z]+(?P<hello>.*)", 0, 0);
-  TEST_NEW("(123\\d*)[a-zA-Z]+(?P<hello>.*)", XREGEX_CASELESS, 0);
-  TEST_NEW("(123\\d*)[a-zA-Z]+(?P<hello>.*)", XREGEX_CASELESS | XREGEX_OPTIMIZE, 0);
-  TEST_NEW("(?P<A>x)|(?P<A>y)", XREGEX_DUPNAMES, 0);
-  TEST_NEW("(?P<A>x)|(?P<A>y)", XREGEX_DUPNAMES | XREGEX_OPTIMIZE, 0);
+  TEST_NEW("(123\\d*)[a-zA-Z]+(?P<hello>.*)", G_REGEX_CASELESS, 0);
+  TEST_NEW("(123\\d*)[a-zA-Z]+(?P<hello>.*)", G_REGEX_CASELESS | G_REGEX_OPTIMIZE, 0);
+  TEST_NEW("(?P<A>x)|(?P<A>y)", G_REGEX_DUPNAMES, 0);
+  TEST_NEW("(?P<A>x)|(?P<A>y)", G_REGEX_DUPNAMES | G_REGEX_OPTIMIZE, 0);
   /* This gives "internal error: code overflow" with pcre 6.0 */
   TEST_NEW("(?i)(?-i)", 0, 0);
   TEST_NEW ("(?i)a", 0, 0);
@@ -2224,110 +2224,110 @@ main (int argc, char *argv[])
   TEST_NEW ("(?U)[a-z]+", 0, 0);
 
   /* TEST_NEW_CHECK_FLAGS(pattern, compile_opts, match_ops, real_compile_opts, real_match_opts) */
-  TEST_NEW_CHECK_FLAGS ("a", XREGEX_OPTIMIZE, 0, XREGEX_OPTIMIZE, 0);
-  TEST_NEW_CHECK_FLAGS ("a", XREGEX_RAW, 0, XREGEX_RAW, 0);
-  TEST_NEW_CHECK_FLAGS ("(?X)a", 0, 0, 0 /* not exposed by xregex_t */, 0);
-  TEST_NEW_CHECK_FLAGS ("^.*", 0, 0, XREGEX_ANCHORED, 0);
-  TEST_NEW_CHECK_FLAGS ("(*UTF8)a", 0, 0, 0 /* this is the default in xregex_t */, 0);
-  TEST_NEW_CHECK_FLAGS ("(*UCP)a", 0, 0, 0 /* this always on in xregex_t */, 0);
-  TEST_NEW_CHECK_FLAGS ("(*CR)a", 0, 0, XREGEX_NEWLINE_CR, 0);
-  TEST_NEW_CHECK_FLAGS ("(*LF)a", 0, 0, XREGEX_NEWLINE_LF, 0);
-  TEST_NEW_CHECK_FLAGS ("(*CRLF)a", 0, 0, XREGEX_NEWLINE_CRLF, 0);
-  TEST_NEW_CHECK_FLAGS ("(*ANY)a", 0, 0, 0 /* this is the default in xregex_t */, 0);
-  TEST_NEW_CHECK_FLAGS ("(*ANYCRLF)a", 0, 0, XREGEX_NEWLINE_ANYCRLF, 0);
-  TEST_NEW_CHECK_FLAGS ("(*BSR_ANYCRLF)a", 0, 0, XREGEX_BSR_ANYCRLF, 0);
-  TEST_NEW_CHECK_FLAGS ("(*BSR_UNICODE)a", 0, 0, 0 /* this is the default in xregex_t */, 0);
-  TEST_NEW_CHECK_FLAGS ("(*NO_START_OPT)a", 0, 0, 0 /* not exposed in xregex_t */, 0);
+  TEST_NEW_CHECK_FLAGS ("a", G_REGEX_OPTIMIZE, 0, G_REGEX_OPTIMIZE, 0);
+  TEST_NEW_CHECK_FLAGS ("a", G_REGEX_RAW, 0, G_REGEX_RAW, 0);
+  TEST_NEW_CHECK_FLAGS ("(?X)a", 0, 0, 0 /* not exposed by GRegex */, 0);
+  TEST_NEW_CHECK_FLAGS ("^.*", 0, 0, G_REGEX_ANCHORED, 0);
+  TEST_NEW_CHECK_FLAGS ("(*UTF8)a", 0, 0, 0 /* this is the default in GRegex */, 0);
+  TEST_NEW_CHECK_FLAGS ("(*UCP)a", 0, 0, 0 /* this always on in GRegex */, 0);
+  TEST_NEW_CHECK_FLAGS ("(*CR)a", 0, 0, G_REGEX_NEWLINE_CR, 0);
+  TEST_NEW_CHECK_FLAGS ("(*LF)a", 0, 0, G_REGEX_NEWLINE_LF, 0);
+  TEST_NEW_CHECK_FLAGS ("(*CRLF)a", 0, 0, G_REGEX_NEWLINE_CRLF, 0);
+  TEST_NEW_CHECK_FLAGS ("(*ANY)a", 0, 0, 0 /* this is the default in GRegex */, 0);
+  TEST_NEW_CHECK_FLAGS ("(*ANYCRLF)a", 0, 0, G_REGEX_NEWLINE_ANYCRLF, 0);
+  TEST_NEW_CHECK_FLAGS ("(*BSR_ANYCRLF)a", 0, 0, G_REGEX_BSR_ANYCRLF, 0);
+  TEST_NEW_CHECK_FLAGS ("(*BSR_UNICODE)a", 0, 0, 0 /* this is the default in GRegex */, 0);
+  TEST_NEW_CHECK_FLAGS ("(*NO_START_OPT)a", 0, 0, 0 /* not exposed in GRegex */, 0);
 
   /* TEST_NEW_FAIL(pattern, compile_opts, expected_error) */
-  TEST_NEW_FAIL("(", 0, XREGEX_ERROR_UNMATCHED_PARENTHESIS);
-  TEST_NEW_FAIL(")", 0, XREGEX_ERROR_UNMATCHED_PARENTHESIS);
-  TEST_NEW_FAIL("[", 0, XREGEX_ERROR_UNTERMINATED_CHARACTER_CLASS);
-  TEST_NEW_FAIL("*", 0, XREGEX_ERROR_NOTHING_TO_REPEAT);
-  TEST_NEW_FAIL("?", 0, XREGEX_ERROR_NOTHING_TO_REPEAT);
-  TEST_NEW_FAIL("(?P<A>x)|(?P<A>y)", 0, XREGEX_ERROR_DUPLICATE_SUBPATTERN_NAME);
+  TEST_NEW_FAIL("(", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL(")", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL("[", 0, G_REGEX_ERROR_UNTERMINATED_CHARACTER_CLASS);
+  TEST_NEW_FAIL("*", 0, G_REGEX_ERROR_NOTHING_TO_REPEAT);
+  TEST_NEW_FAIL("?", 0, G_REGEX_ERROR_NOTHING_TO_REPEAT);
+  TEST_NEW_FAIL("(?P<A>x)|(?P<A>y)", 0, G_REGEX_ERROR_DUPLICATE_SUBPATTERN_NAME);
 
   /* Check all GRegexError codes */
-  TEST_NEW_FAIL ("a\\", 0, XREGEX_ERROR_STRAY_BACKSLASH);
-  TEST_NEW_FAIL ("a\\c", 0, XREGEX_ERROR_MISSING_CONTROL_CHAR);
-  TEST_NEW_FAIL ("a\\l", 0, XREGEX_ERROR_UNRECOGNIZED_ESCAPE);
-  TEST_NEW_FAIL ("a{4,2}", 0, XREGEX_ERROR_QUANTIFIERS_OUT_OF_ORDER);
-  TEST_NEW_FAIL ("a{999999,}", 0, XREGEX_ERROR_QUANTIFIER_TOO_BIG);
-  TEST_NEW_FAIL ("[a-z", 0, XREGEX_ERROR_UNTERMINATED_CHARACTER_CLASS);
-  TEST_NEW_FAIL ("(?X)[\\B]", 0, XREGEX_ERROR_INVALID_ESCAPE_IN_CHARACTER_CLASS);
-  TEST_NEW_FAIL ("[z-a]", 0, XREGEX_ERROR_RANGE_OUT_OF_ORDER);
-  TEST_NEW_FAIL ("{2,4}", 0, XREGEX_ERROR_NOTHING_TO_REPEAT);
-  TEST_NEW_FAIL ("a(?u)", 0, XREGEX_ERROR_UNRECOGNIZED_CHARACTER);
-  TEST_NEW_FAIL ("a(?<$foo)bar", 0, XREGEX_ERROR_UNRECOGNIZED_CHARACTER);
-  TEST_NEW_FAIL ("a[:alpha:]b", 0, XREGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS);
-  TEST_NEW_FAIL ("a(b", 0, XREGEX_ERROR_UNMATCHED_PARENTHESIS);
-  TEST_NEW_FAIL ("a)b", 0, XREGEX_ERROR_UNMATCHED_PARENTHESIS);
-  TEST_NEW_FAIL ("a(?R", 0, XREGEX_ERROR_UNMATCHED_PARENTHESIS);
-  TEST_NEW_FAIL ("a(?-54", 0, XREGEX_ERROR_UNMATCHED_PARENTHESIS);
-  TEST_NEW_FAIL ("(ab\\2)", 0, XREGEX_ERROR_INEXISTENT_SUBPATTERN_REFERENCE);
-  TEST_NEW_FAIL ("a(?#abc", 0, XREGEX_ERROR_UNTERMINATED_COMMENT);
-  TEST_NEW_FAIL ("(?<=a+)b", 0, XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
-  TEST_NEW_FAIL ("(?(1?)a|b)", 0, XREGEX_ERROR_MALFORMED_CONDITION);
-  TEST_NEW_FAIL ("(a)(?(1)a|b|c)", 0, XREGEX_ERROR_TOO_MANY_CONDITIONAL_BRANCHES);
-  TEST_NEW_FAIL ("(?(?i))", 0, XREGEX_ERROR_ASSERTION_EXPECTED);
-  TEST_NEW_FAIL ("a[[:fubar:]]b", 0, XREGEX_ERROR_UNKNOWN_POSIX_CLASS_NAME);
-  TEST_NEW_FAIL ("[[.ch.]]", 0, XREGEX_ERROR_POSIX_COLLATING_ELEMENTS_NOT_SUPPORTED);
-  TEST_NEW_FAIL ("\\x{110000}", 0, XREGEX_ERROR_HEX_CODE_TOO_LARGE);
-  TEST_NEW_FAIL ("^(?(0)f|b)oo", 0, XREGEX_ERROR_INVALID_CONDITION);
-  TEST_NEW_FAIL ("(?<=\\C)X", 0, XREGEX_ERROR_SINGLE_BYTE_MATCH_IN_LOOKBEHIND);
-  TEST_NEW_FAIL ("(?!\\w)(?R)", 0, XREGEX_ERROR_INFINITE_LOOP);
+  TEST_NEW_FAIL ("a\\", 0, G_REGEX_ERROR_STRAY_BACKSLASH);
+  TEST_NEW_FAIL ("a\\c", 0, G_REGEX_ERROR_MISSING_CONTROL_CHAR);
+  TEST_NEW_FAIL ("a\\l", 0, G_REGEX_ERROR_UNRECOGNIZED_ESCAPE);
+  TEST_NEW_FAIL ("a{4,2}", 0, G_REGEX_ERROR_QUANTIFIERS_OUT_OF_ORDER);
+  TEST_NEW_FAIL ("a{999999,}", 0, G_REGEX_ERROR_QUANTIFIER_TOO_BIG);
+  TEST_NEW_FAIL ("[a-z", 0, G_REGEX_ERROR_UNTERMINATED_CHARACTER_CLASS);
+  TEST_NEW_FAIL ("(?X)[\\B]", 0, G_REGEX_ERROR_INVALID_ESCAPE_IN_CHARACTER_CLASS);
+  TEST_NEW_FAIL ("[z-a]", 0, G_REGEX_ERROR_RANGE_OUT_OF_ORDER);
+  TEST_NEW_FAIL ("{2,4}", 0, G_REGEX_ERROR_NOTHING_TO_REPEAT);
+  TEST_NEW_FAIL ("a(?u)", 0, G_REGEX_ERROR_UNRECOGNIZED_CHARACTER);
+  TEST_NEW_FAIL ("a(?<$foo)bar", 0, G_REGEX_ERROR_UNRECOGNIZED_CHARACTER);
+  TEST_NEW_FAIL ("a[:alpha:]b", 0, G_REGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS);
+  TEST_NEW_FAIL ("a(b", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL ("a)b", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL ("a(?R", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL ("a(?-54", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL ("(ab\\2)", 0, G_REGEX_ERROR_INEXISTENT_SUBPATTERN_REFERENCE);
+  TEST_NEW_FAIL ("a(?#abc", 0, G_REGEX_ERROR_UNTERMINATED_COMMENT);
+  TEST_NEW_FAIL ("(?<=a+)b", 0, G_REGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
+  TEST_NEW_FAIL ("(?(1?)a|b)", 0, G_REGEX_ERROR_MALFORMED_CONDITION);
+  TEST_NEW_FAIL ("(a)(?(1)a|b|c)", 0, G_REGEX_ERROR_TOO_MANY_CONDITIONAL_BRANCHES);
+  TEST_NEW_FAIL ("(?(?i))", 0, G_REGEX_ERROR_ASSERTION_EXPECTED);
+  TEST_NEW_FAIL ("a[[:fubar:]]b", 0, G_REGEX_ERROR_UNKNOWN_POSIX_CLASS_NAME);
+  TEST_NEW_FAIL ("[[.ch.]]", 0, G_REGEX_ERROR_POSIX_COLLATING_ELEMENTS_NOT_SUPPORTED);
+  TEST_NEW_FAIL ("\\x{110000}", 0, G_REGEX_ERROR_HEX_CODE_TOO_LARGE);
+  TEST_NEW_FAIL ("^(?(0)f|b)oo", 0, G_REGEX_ERROR_INVALID_CONDITION);
+  TEST_NEW_FAIL ("(?<=\\C)X", 0, G_REGEX_ERROR_SINGLE_BYTE_MATCH_IN_LOOKBEHIND);
+  TEST_NEW_FAIL ("(?!\\w)(?R)", 0, G_REGEX_ERROR_INFINITE_LOOP);
   if (pcre_ge (8, 37))
     {
       /* The expected errors changed here. */
-      TEST_NEW_FAIL ("(?(?<ab))", 0, XREGEX_ERROR_ASSERTION_EXPECTED);
+      TEST_NEW_FAIL ("(?(?<ab))", 0, G_REGEX_ERROR_ASSERTION_EXPECTED);
     }
   else
     {
-      TEST_NEW_FAIL ("(?(?<ab))", 0, XREGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR);
+      TEST_NEW_FAIL ("(?(?<ab))", 0, G_REGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR);
     }
 
   if (pcre_ge (8, 35))
     {
       /* The expected errors changed here. */
-      TEST_NEW_FAIL ("(?P<sub>foo)\\g<sub", 0, XREGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR);
+      TEST_NEW_FAIL ("(?P<sub>foo)\\g<sub", 0, G_REGEX_ERROR_MISSING_SUBPATTERN_NAME_TERMINATOR);
     }
   else
     {
-      TEST_NEW_FAIL ("(?P<sub>foo)\\g<sub", 0, XREGEX_ERROR_MISSING_BACK_REFERENCE);
+      TEST_NEW_FAIL ("(?P<sub>foo)\\g<sub", 0, G_REGEX_ERROR_MISSING_BACK_REFERENCE);
     }
-  TEST_NEW_FAIL ("(?P<x>eks)(?P<x>eccs)", 0, XREGEX_ERROR_DUPLICATE_SUBPATTERN_NAME);
+  TEST_NEW_FAIL ("(?P<x>eks)(?P<x>eccs)", 0, G_REGEX_ERROR_DUPLICATE_SUBPATTERN_NAME);
 #if 0
-  TEST_NEW_FAIL (?, 0, XREGEX_ERROR_MALFORMED_PROPERTY);
-  TEST_NEW_FAIL (?, 0, XREGEX_ERROR_UNKNOWN_PROPERTY);
+  TEST_NEW_FAIL (?, 0, G_REGEX_ERROR_MALFORMED_PROPERTY);
+  TEST_NEW_FAIL (?, 0, G_REGEX_ERROR_UNKNOWN_PROPERTY);
 #endif
-  TEST_NEW_FAIL ("\\666", XREGEX_RAW, XREGEX_ERROR_INVALID_OCTAL_VALUE);
-  TEST_NEW_FAIL ("^(?(DEFINE) abc | xyz ) ", 0, XREGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE);
-  TEST_NEW_FAIL ("a", XREGEX_NEWLINE_CRLF | XREGEX_NEWLINE_ANYCRLF, XREGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS);
-  TEST_NEW_FAIL ("^(a)\\g{3", 0, XREGEX_ERROR_MISSING_BACK_REFERENCE);
-  TEST_NEW_FAIL ("^(a)\\g{0}", 0, XREGEX_ERROR_INVALID_RELATIVE_REFERENCE);
-  TEST_NEW_FAIL ("abc(*FAIL:123)xyz", 0, XREGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN);
-  TEST_NEW_FAIL ("a(*FOOBAR)b", 0, XREGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB);
-  TEST_NEW_FAIL ("(?i:A{1,}\\6666666666)", 0, XREGEX_ERROR_NUMBER_TOO_BIG);
-  TEST_NEW_FAIL ("(?<a>)(?&)", 0, XREGEX_ERROR_MISSING_SUBPATTERN_NAME);
-  TEST_NEW_FAIL ("(?+-a)", 0, XREGEX_ERROR_MISSING_DIGIT);
-  TEST_NEW_FAIL ("TA]", XREGEX_JAVASCRIPT_COMPAT, XREGEX_ERROR_INVALID_DATA_CHARACTER);
-  TEST_NEW_FAIL ("(?|(?<a>A)|(?<b>B))", 0, XREGEX_ERROR_EXTRA_SUBPATTERN_NAME);
-  TEST_NEW_FAIL ("a(*MARK)b", 0, XREGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED);
-  TEST_NEW_FAIL ("^\\c€", 0, XREGEX_ERROR_INVALID_CONTROL_CHAR);
-  TEST_NEW_FAIL ("\\k", 0, XREGEX_ERROR_MISSING_NAME);
-  TEST_NEW_FAIL ("a[\\NB]c", 0, XREGEX_ERROR_NOT_SUPPORTED_IN_CLASS);
-  TEST_NEW_FAIL ("(*:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEFG)XX", 0, XREGEX_ERROR_NAME_TOO_LONG);
-  TEST_NEW_FAIL ("\\u0100", XREGEX_RAW | XREGEX_JAVASCRIPT_COMPAT, XREGEX_ERROR_CHARACTER_VALUE_TOO_LARGE);
+  TEST_NEW_FAIL ("\\666", G_REGEX_RAW, G_REGEX_ERROR_INVALID_OCTAL_VALUE);
+  TEST_NEW_FAIL ("^(?(DEFINE) abc | xyz ) ", 0, G_REGEX_ERROR_TOO_MANY_BRANCHES_IN_DEFINE);
+  TEST_NEW_FAIL ("a", G_REGEX_NEWLINE_CRLF | G_REGEX_NEWLINE_ANYCRLF, G_REGEX_ERROR_INCONSISTENT_NEWLINE_OPTIONS);
+  TEST_NEW_FAIL ("^(a)\\g{3", 0, G_REGEX_ERROR_MISSING_BACK_REFERENCE);
+  TEST_NEW_FAIL ("^(a)\\g{0}", 0, G_REGEX_ERROR_INVALID_RELATIVE_REFERENCE);
+  TEST_NEW_FAIL ("abc(*FAIL:123)xyz", 0, G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_FORBIDDEN);
+  TEST_NEW_FAIL ("a(*FOOBAR)b", 0, G_REGEX_ERROR_UNKNOWN_BACKTRACKING_CONTROL_VERB);
+  TEST_NEW_FAIL ("(?i:A{1,}\\6666666666)", 0, G_REGEX_ERROR_NUMBER_TOO_BIG);
+  TEST_NEW_FAIL ("(?<a>)(?&)", 0, G_REGEX_ERROR_MISSING_SUBPATTERN_NAME);
+  TEST_NEW_FAIL ("(?+-a)", 0, G_REGEX_ERROR_MISSING_DIGIT);
+  TEST_NEW_FAIL ("TA]", G_REGEX_JAVASCRIPT_COMPAT, G_REGEX_ERROR_INVALID_DATA_CHARACTER);
+  TEST_NEW_FAIL ("(?|(?<a>A)|(?<b>B))", 0, G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME);
+  TEST_NEW_FAIL ("a(*MARK)b", 0, G_REGEX_ERROR_BACKTRACKING_CONTROL_VERB_ARGUMENT_REQUIRED);
+  TEST_NEW_FAIL ("^\\c€", 0, G_REGEX_ERROR_INVALID_CONTROL_CHAR);
+  TEST_NEW_FAIL ("\\k", 0, G_REGEX_ERROR_MISSING_NAME);
+  TEST_NEW_FAIL ("a[\\NB]c", 0, G_REGEX_ERROR_NOT_SUPPORTED_IN_CLASS);
+  TEST_NEW_FAIL ("(*:0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEFG)XX", 0, G_REGEX_ERROR_NAME_TOO_LONG);
+  TEST_NEW_FAIL ("\\u0100", G_REGEX_RAW | G_REGEX_JAVASCRIPT_COMPAT, G_REGEX_ERROR_CHARACTER_VALUE_TOO_LARGE);
 
   /* These errors can't really be tested easily:
-   * XREGEX_ERROR_EXPRESSION_TOO_LARGE
-   * XREGEX_ERROR_MEMORY_ERROR
-   * XREGEX_ERROR_SUBPATTERN_NAME_TOO_LONG
-   * XREGEX_ERROR_TOO_MANY_SUBPATTERNS
-   * XREGEX_ERROR_TOO_MANY_FORWARD_REFERENCES
+   * G_REGEX_ERROR_EXPRESSION_TOO_LARGE
+   * G_REGEX_ERROR_MEMORY_ERROR
+   * G_REGEX_ERROR_SUBPATTERN_NAME_TOO_LONG
+   * G_REGEX_ERROR_TOO_MANY_SUBPATTERNS
+   * G_REGEX_ERROR_TOO_MANY_FORWARD_REFERENCES
    *
    * These errors are obsolete and never raised by PCRE:
-   * XREGEX_ERROR_DEFINE_REPETION
+   * G_REGEX_ERROR_DEFINE_REPETION
    */
 
   /* TEST_MATCH_SIMPLE(pattern, string, compile_opts, match_opts, expected) */
@@ -2335,15 +2335,15 @@ main (int argc, char *argv[])
   TEST_MATCH_SIMPLE("a", "a", 0, 0, TRUE);
   TEST_MATCH_SIMPLE("a", "ba", 0, 0, TRUE);
   TEST_MATCH_SIMPLE("^a", "ba", 0, 0, FALSE);
-  TEST_MATCH_SIMPLE("a", "ba", XREGEX_ANCHORED, 0, FALSE);
-  TEST_MATCH_SIMPLE("a", "ba", 0, XREGEX_MATCH_ANCHORED, FALSE);
-  TEST_MATCH_SIMPLE("a", "ab", XREGEX_ANCHORED, 0, TRUE);
-  TEST_MATCH_SIMPLE("a", "ab", 0, XREGEX_MATCH_ANCHORED, TRUE);
-  TEST_MATCH_SIMPLE("a", "a", XREGEX_CASELESS, 0, TRUE);
-  TEST_MATCH_SIMPLE("a", "A", XREGEX_CASELESS, 0, TRUE);
+  TEST_MATCH_SIMPLE("a", "ba", G_REGEX_ANCHORED, 0, FALSE);
+  TEST_MATCH_SIMPLE("a", "ba", 0, G_REGEX_MATCH_ANCHORED, FALSE);
+  TEST_MATCH_SIMPLE("a", "ab", G_REGEX_ANCHORED, 0, TRUE);
+  TEST_MATCH_SIMPLE("a", "ab", 0, G_REGEX_MATCH_ANCHORED, TRUE);
+  TEST_MATCH_SIMPLE("a", "a", G_REGEX_CASELESS, 0, TRUE);
+  TEST_MATCH_SIMPLE("a", "A", G_REGEX_CASELESS, 0, TRUE);
   /* These are needed to test extended properties. */
-  TEST_MATCH_SIMPLE(AGRAVE, AGRAVE, XREGEX_CASELESS, 0, TRUE);
-  TEST_MATCH_SIMPLE(AGRAVE, AGRAVE_UPPER, XREGEX_CASELESS, 0, TRUE);
+  TEST_MATCH_SIMPLE(AGRAVE, AGRAVE, G_REGEX_CASELESS, 0, TRUE);
+  TEST_MATCH_SIMPLE(AGRAVE, AGRAVE_UPPER, G_REGEX_CASELESS, 0, TRUE);
   TEST_MATCH_SIMPLE("\\p{L}", "a", 0, 0, TRUE);
   TEST_MATCH_SIMPLE("\\p{L}", "1", 0, 0, FALSE);
   TEST_MATCH_SIMPLE("\\p{L}", AGRAVE, 0, 0, TRUE);
@@ -2407,28 +2407,28 @@ main (int argc, char *argv[])
    * 		string_len, start_position, match_opts2, expected) */
   TEST_MATCH("a", 0, 0, "a", -1, 0, 0, TRUE);
   TEST_MATCH("a", 0, 0, "A", -1, 0, 0, FALSE);
-  TEST_MATCH("a", XREGEX_CASELESS, 0, "A", -1, 0, 0, TRUE);
+  TEST_MATCH("a", G_REGEX_CASELESS, 0, "A", -1, 0, 0, TRUE);
   TEST_MATCH("a", 0, 0, "ab", -1, 1, 0, FALSE);
   TEST_MATCH("a", 0, 0, "ba", 1, 0, 0, FALSE);
   TEST_MATCH("a", 0, 0, "bab", -1, 0, 0, TRUE);
   TEST_MATCH("a", 0, 0, "b", -1, 0, 0, FALSE);
-  TEST_MATCH("a", 0, XREGEX_MATCH_ANCHORED, "a", -1, 0, 0, TRUE);
-  TEST_MATCH("a", 0, XREGEX_MATCH_ANCHORED, "ab", -1, 1, 0, FALSE);
-  TEST_MATCH("a", 0, XREGEX_MATCH_ANCHORED, "ba", 1, 0, 0, FALSE);
-  TEST_MATCH("a", 0, XREGEX_MATCH_ANCHORED, "bab", -1, 0, 0, FALSE);
-  TEST_MATCH("a", 0, XREGEX_MATCH_ANCHORED, "b", -1, 0, 0, FALSE);
-  TEST_MATCH("a", 0, 0, "a", -1, 0, XREGEX_MATCH_ANCHORED, TRUE);
-  TEST_MATCH("a", 0, 0, "ab", -1, 1, XREGEX_MATCH_ANCHORED, FALSE);
-  TEST_MATCH("a", 0, 0, "ba", 1, 0, XREGEX_MATCH_ANCHORED, FALSE);
-  TEST_MATCH("a", 0, 0, "bab", -1, 0, XREGEX_MATCH_ANCHORED, FALSE);
-  TEST_MATCH("a", 0, 0, "b", -1, 0, XREGEX_MATCH_ANCHORED, FALSE);
+  TEST_MATCH("a", 0, G_REGEX_MATCH_ANCHORED, "a", -1, 0, 0, TRUE);
+  TEST_MATCH("a", 0, G_REGEX_MATCH_ANCHORED, "ab", -1, 1, 0, FALSE);
+  TEST_MATCH("a", 0, G_REGEX_MATCH_ANCHORED, "ba", 1, 0, 0, FALSE);
+  TEST_MATCH("a", 0, G_REGEX_MATCH_ANCHORED, "bab", -1, 0, 0, FALSE);
+  TEST_MATCH("a", 0, G_REGEX_MATCH_ANCHORED, "b", -1, 0, 0, FALSE);
+  TEST_MATCH("a", 0, 0, "a", -1, 0, G_REGEX_MATCH_ANCHORED, TRUE);
+  TEST_MATCH("a", 0, 0, "ab", -1, 1, G_REGEX_MATCH_ANCHORED, FALSE);
+  TEST_MATCH("a", 0, 0, "ba", 1, 0, G_REGEX_MATCH_ANCHORED, FALSE);
+  TEST_MATCH("a", 0, 0, "bab", -1, 0, G_REGEX_MATCH_ANCHORED, FALSE);
+  TEST_MATCH("a", 0, 0, "b", -1, 0, G_REGEX_MATCH_ANCHORED, FALSE);
   TEST_MATCH("a|b", 0, 0, "a", -1, 0, 0, TRUE);
   TEST_MATCH("\\d", 0, 0, EURO, -1, 0, 0, FALSE);
   TEST_MATCH("^.$", 0, 0, EURO, -1, 0, 0, TRUE);
   TEST_MATCH("^.{3}$", 0, 0, EURO, -1, 0, 0, FALSE);
-  TEST_MATCH("^.$", XREGEX_RAW, 0, EURO, -1, 0, 0, FALSE);
-  TEST_MATCH("^.{3}$", XREGEX_RAW, 0, EURO, -1, 0, 0, TRUE);
-  TEST_MATCH(AGRAVE, XREGEX_CASELESS, 0, AGRAVE_UPPER, -1, 0, 0, TRUE);
+  TEST_MATCH("^.$", G_REGEX_RAW, 0, EURO, -1, 0, 0, FALSE);
+  TEST_MATCH("^.{3}$", G_REGEX_RAW, 0, EURO, -1, 0, 0, TRUE);
+  TEST_MATCH(AGRAVE, G_REGEX_CASELESS, 0, AGRAVE_UPPER, -1, 0, 0, TRUE);
 
   /* New lines handling. */
   TEST_MATCH("^a\\Rb$", 0, 0, "a\r\nb", -1, 0, 0, TRUE);
@@ -2440,56 +2440,56 @@ main (int argc, char *argv[])
   TEST_MATCH("^a\\r\\nb$", 0, 0, "a\r\nb", -1, 0, 0, TRUE);
 
   TEST_MATCH("^b$", 0, 0, "a\nb\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, 0, "a\nb\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, 0, "a\r\nb\r\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, 0, "a\rb\rc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, 0, "a\nb\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_LF, 0, "a\nb\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CRLF, 0, "a\nb\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, 0, "a\r\nb\r\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_LF, 0, "a\r\nb\r\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CRLF, 0, "a\r\nb\r\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, 0, "a\rb\rc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_LF, 0, "a\rb\rc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CRLF, 0, "a\rb\rc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_CR, "a\nb\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_LF, "a\nb\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_CRLF, "a\nb\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_CR, "a\r\nb\r\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_LF, "a\r\nb\r\nc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_CRLF, "a\r\nb\r\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_CR, "a\rb\rc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_LF, "a\rb\rc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE, XREGEX_MATCH_NEWLINE_CRLF, "a\rb\rc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, 0, "a\nb\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, 0, "a\r\nb\r\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, 0, "a\rb\rc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, 0, "a\nb\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_LF, 0, "a\nb\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CRLF, 0, "a\nb\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, 0, "a\r\nb\r\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_LF, 0, "a\r\nb\r\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CRLF, 0, "a\r\nb\r\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, 0, "a\rb\rc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_LF, 0, "a\rb\rc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CRLF, 0, "a\rb\rc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_CR, "a\nb\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_LF, "a\nb\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_CRLF, "a\nb\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_CR, "a\r\nb\r\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_LF, "a\r\nb\r\nc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_CRLF, "a\r\nb\r\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_CR, "a\rb\rc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_LF, "a\rb\rc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE, G_REGEX_MATCH_NEWLINE_CRLF, "a\rb\rc", -1, 0, 0, FALSE);
 
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_ANY, "a\nb\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_ANY, "a\rb\rc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_ANY, "a\r\nb\r\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_LF, "a\nb\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_LF, "a\rb\rc", -1, 0, 0, FALSE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_CRLF, "a\r\nb\r\nc", -1, 0, 0, TRUE);
-  TEST_MATCH("^b$", XREGEX_MULTILINE | XREGEX_NEWLINE_CR, XREGEX_MATCH_NEWLINE_CRLF, "a\rb\rc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_ANY, "a\nb\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_ANY, "a\rb\rc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_ANY, "a\r\nb\r\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_LF, "a\nb\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_LF, "a\rb\rc", -1, 0, 0, FALSE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_CRLF, "a\r\nb\r\nc", -1, 0, 0, TRUE);
+  TEST_MATCH("^b$", G_REGEX_MULTILINE | G_REGEX_NEWLINE_CR, G_REGEX_MATCH_NEWLINE_CRLF, "a\rb\rc", -1, 0, 0, FALSE);
 
-  TEST_MATCH("a#\nb", XREGEX_EXTENDED, 0, "a", -1, 0, 0, FALSE);
-  TEST_MATCH("a#\r\nb", XREGEX_EXTENDED, 0, "a", -1, 0, 0, FALSE);
-  TEST_MATCH("a#\rb", XREGEX_EXTENDED, 0, "a", -1, 0, 0, FALSE);
-  TEST_MATCH("a#\nb", XREGEX_EXTENDED, XREGEX_MATCH_NEWLINE_CR, "a", -1, 0, 0, FALSE);
-  TEST_MATCH("a#\nb", XREGEX_EXTENDED | XREGEX_NEWLINE_CR, 0, "a", -1, 0, 0, TRUE);
+  TEST_MATCH("a#\nb", G_REGEX_EXTENDED, 0, "a", -1, 0, 0, FALSE);
+  TEST_MATCH("a#\r\nb", G_REGEX_EXTENDED, 0, "a", -1, 0, 0, FALSE);
+  TEST_MATCH("a#\rb", G_REGEX_EXTENDED, 0, "a", -1, 0, 0, FALSE);
+  TEST_MATCH("a#\nb", G_REGEX_EXTENDED, G_REGEX_MATCH_NEWLINE_CR, "a", -1, 0, 0, FALSE);
+  TEST_MATCH("a#\nb", G_REGEX_EXTENDED | G_REGEX_NEWLINE_CR, 0, "a", -1, 0, 0, TRUE);
 
-  TEST_MATCH("line\nbreak", XREGEX_MULTILINE, 0, "this is a line\nbreak", -1, 0, 0, TRUE);
-  TEST_MATCH("line\nbreak", XREGEX_MULTILINE | XREGEX_FIRSTLINE, 0, "first line\na line\nbreak", -1, 0, 0, FALSE);
+  TEST_MATCH("line\nbreak", G_REGEX_MULTILINE, 0, "this is a line\nbreak", -1, 0, 0, TRUE);
+  TEST_MATCH("line\nbreak", G_REGEX_MULTILINE | G_REGEX_FIRSTLINE, 0, "first line\na line\nbreak", -1, 0, 0, FALSE);
 
   /* This failed with PCRE 7.2 (gnome bug #455640) */
   TEST_MATCH(".*$", 0, 0, "\xe1\xbb\x85", -1, 0, 0, TRUE);
 
-  /* test_t that othercasing in our pcre/glib integration is bug-for-bug compatible
+  /* Test that othercasing in our pcre/glib integration is bug-for-bug compatible
    * with pcre's internal tables. Bug #678273 */
-  TEST_MATCH("[Ǆ]", XREGEX_CASELESS, 0, "Ǆ", -1, 0, 0, TRUE);
-  TEST_MATCH("[Ǆ]", XREGEX_CASELESS, 0, "ǆ", -1, 0, 0, TRUE);
+  TEST_MATCH("[Ǆ]", G_REGEX_CASELESS, 0, "Ǆ", -1, 0, 0, TRUE);
+  TEST_MATCH("[Ǆ]", G_REGEX_CASELESS, 0, "ǆ", -1, 0, 0, TRUE);
 #if PCRE_MAJOR > 8 || (PCRE_MAJOR == 8 && PCRE_MINOR >= 32)
   /* This would incorrectly fail to match in pcre < 8.32, so only assert
    * this for known-good pcre. */
-  TEST_MATCH("[Ǆ]", XREGEX_CASELESS, 0, "ǅ", -1, 0, 0, TRUE);
+  TEST_MATCH("[Ǆ]", G_REGEX_CASELESS, 0, "ǅ", -1, 0, 0, TRUE);
 #endif
 
   /* TEST_MATCH_NEXT#(pattern, string, string_len, start_position, ...) */
@@ -2524,7 +2524,7 @@ main (int argc, char *argv[])
   TEST_MATCH_COUNT("(.)", EURO, 0, 0, 2);
   TEST_MATCH_COUNT("(?:.)", "a", 0, 0, 1);
   TEST_MATCH_COUNT("(?P<A>.)", "a", 0, 0, 2);
-  TEST_MATCH_COUNT("a$", "a", 0, XREGEX_MATCH_NOTEOL, 0);
+  TEST_MATCH_COUNT("a$", "a", 0, G_REGEX_MATCH_NOTEOL, 0);
   TEST_MATCH_COUNT("(a)?(b)", "b", 0, 0, 3);
   TEST_MATCH_COUNT("(a)?(b)", "ab", 0, 0, 3);
 
@@ -2537,9 +2537,9 @@ main (int argc, char *argv[])
   TEST_PARTIAL("(a)+b", "aa", TRUE);
   TEST_PARTIAL("a?b", "a", TRUE);
 
-  /* test_t soft vs. hard partial matching */
-  TEST_PARTIAL_FULL("cat(fish)?", "cat", XREGEX_MATCH_PARTIAL_SOFT, FALSE);
-  TEST_PARTIAL_FULL("cat(fish)?", "cat", XREGEX_MATCH_PARTIAL_HARD, TRUE);
+  /* Test soft vs. hard partial matching */
+  TEST_PARTIAL_FULL("cat(fish)?", "cat", G_REGEX_MATCH_PARTIAL_SOFT, FALSE);
+  TEST_PARTIAL_FULL("cat(fish)?", "cat", G_REGEX_MATCH_PARTIAL_HARD, TRUE);
 
   /* TEST_SUB_PATTERN(pattern, string, start_position, sub_n, expected_sub,
    * 		      expected_start, expected_end) */

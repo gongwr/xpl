@@ -18,31 +18,31 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XPOLL_FILE_MONITOR_H__
-#define __XPOLL_FILE_MONITOR_H__
+#ifndef __G_POLL_FILE_MONITOR_H__
+#define __G_POLL_FILE_MONITOR_H__
 
 #include <gio/gfilemonitor.h>
 
 G_BEGIN_DECLS
 
-#define XTYPE_POLL_FILE_MONITOR		(_xpoll_file_monitor_get_type ())
-#define XPOLL_FILE_MONITOR(o)			(XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_POLL_FILE_MONITOR, xpoll_file_monitor_t))
-#define XPOLL_FILE_MONITOR_CLASS(k)		(XTYPE_CHECK_CLASS_CAST ((k), XTYPE_POLL_FILE_MONITOR, xpoll_file_monitor_tClass))
-#define X_IS_POLL_FILE_MONITOR(o)		(XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_POLL_FILE_MONITOR))
-#define X_IS_POLL_FILE_MONITOR_CLASS(k)	(XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_POLL_FILE_MONITOR))
+#define G_TYPE_POLL_FILE_MONITOR		(_g_poll_file_monitor_get_type ())
+#define G_POLL_FILE_MONITOR(o)			(G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_POLL_FILE_MONITOR, GPollFileMonitor))
+#define G_POLL_FILE_MONITOR_CLASS(k)		(G_TYPE_CHECK_CLASS_CAST ((k), G_TYPE_POLL_FILE_MONITOR, GPollFileMonitorClass))
+#define G_IS_POLL_FILE_MONITOR(o)		(G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_POLL_FILE_MONITOR))
+#define G_IS_POLL_FILE_MONITOR_CLASS(k)	(G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_POLL_FILE_MONITOR))
 
-typedef struct _xpoll_file_monitor_t      xpoll_file_monitor_t;
-typedef struct _xpoll_file_monitor_tClass xpoll_file_monitor_tClass;
+typedef struct _GPollFileMonitor      GPollFileMonitor;
+typedef struct _GPollFileMonitorClass GPollFileMonitorClass;
 
-struct _xpoll_file_monitor_tClass
+struct _GPollFileMonitorClass
 {
-  xfile_monitor_class_t parent_class;
+  GFileMonitorClass parent_class;
 };
 
-xtype_t          _xpoll_file_monitor_get_type (void) G_GNUC_CONST;
+GType          _g_poll_file_monitor_get_type (void) G_GNUC_CONST;
 
-xfile_monitor_t * _xpoll_file_monitor_new      (xfile_t *file);
+GFileMonitor * _g_poll_file_monitor_new      (GFile *file);
 
 G_END_DECLS
 
-#endif /* __XPOLL_FILE_MONITOR_H__ */
+#endif /* __G_POLL_FILE_MONITOR_H__ */

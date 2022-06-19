@@ -25,80 +25,80 @@
 static void
 test_strvbuilder_empty (void)
 {
-  xstrv_builder_t *builder;
-  xstrv_t result;
+  GStrvBuilder *builder;
+  GStrv result;
 
-  builder = xstrv_builder_new ();
-  result = xstrv_builder_end (builder);
+  builder = g_strv_builder_new ();
+  result = g_strv_builder_end (builder);
   g_assert_nonnull (result);
-  g_assert_cmpint (xstrv_length (result), ==, 0);
+  g_assert_cmpint (g_strv_length (result), ==, 0);
 
-  xstrfreev (result);
-  xstrv_builder_unref (builder);
+  g_strfreev (result);
+  g_strv_builder_unref (builder);
 }
 
 static void
 test_strvbuilder_add (void)
 {
-  xstrv_builder_t *builder;
-  xstrv_t result;
-  const xchar_t *expected[] = { "one", "two", "three", NULL };
+  GStrvBuilder *builder;
+  GStrv result;
+  const gchar *expected[] = { "one", "two", "three", NULL };
 
-  builder = xstrv_builder_new ();
-  xstrv_builder_add (builder, "one");
-  xstrv_builder_add (builder, "two");
-  xstrv_builder_add (builder, "three");
-  result = xstrv_builder_end (builder);
+  builder = g_strv_builder_new ();
+  g_strv_builder_add (builder, "one");
+  g_strv_builder_add (builder, "two");
+  g_strv_builder_add (builder, "three");
+  result = g_strv_builder_end (builder);
   g_assert_nonnull (result);
-  g_assert_true (xstrv_equal ((const xchar_t *const *) result, expected));
+  g_assert_true (g_strv_equal ((const gchar *const *) result, expected));
 
-  xstrfreev (result);
-  xstrv_builder_unref (builder);
+  g_strfreev (result);
+  g_strv_builder_unref (builder);
 }
 
 static void
 test_strvbuilder_addv (void)
 {
-  xstrv_builder_t *builder;
-  xstrv_t result;
-  const xchar_t *expected[] = { "one", "two", "three", NULL };
+  GStrvBuilder *builder;
+  GStrv result;
+  const gchar *expected[] = { "one", "two", "three", NULL };
 
-  builder = xstrv_builder_new ();
-  xstrv_builder_addv (builder, expected);
-  result = xstrv_builder_end (builder);
+  builder = g_strv_builder_new ();
+  g_strv_builder_addv (builder, expected);
+  result = g_strv_builder_end (builder);
   g_assert_nonnull (result);
-  g_assert_cmpstrv ((const xchar_t *const *) result, expected);
+  g_assert_cmpstrv ((const gchar *const *) result, expected);
 
-  xstrfreev (result);
-  xstrv_builder_unref (builder);
+  g_strfreev (result);
+  g_strv_builder_unref (builder);
 }
 
 static void
 test_strvbuilder_add_many (void)
 {
-  xstrv_builder_t *builder;
-  xstrv_t result;
-  const xchar_t *expected[] = { "one", "two", "three", NULL };
+  GStrvBuilder *builder;
+  GStrv result;
+  const gchar *expected[] = { "one", "two", "three", NULL };
 
-  builder = xstrv_builder_new ();
-  xstrv_builder_add_many (builder, "one", "two", "three", NULL);
-  result = xstrv_builder_end (builder);
+  builder = g_strv_builder_new ();
+  g_strv_builder_add_many (builder, "one", "two", "three", NULL);
+  result = g_strv_builder_end (builder);
   g_assert_nonnull (result);
-  g_assert_cmpstrv ((const xchar_t *const *) result, expected);
+  g_assert_cmpstrv ((const gchar *const *) result, expected);
 
-  xstrfreev (result);
-  xstrv_builder_unref (builder);
+  g_strfreev (result);
+  g_strv_builder_unref (builder);
 }
 
 static void
 test_strvbuilder_ref (void)
 {
-  xstrv_builder_t *builder;
+  GStrvBuilder *builder;
 
-  builder = xstrv_builder_new ();
-  xstrv_builder_ref (builder);
-  xstrv_builder_unref (builder);
-  xstrv_builder_unref (builder);
+  builder = g_strv_builder_new ();
+  g_strv_builder_ref (builder);
+  g_strv_builder_unref (builder);
+  g_strv_builder_unref (builder);
 }
 
 int

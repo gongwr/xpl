@@ -29,15 +29,15 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_MOUNT_OPERATION         (g_mount_operation_get_type ())
-#define G_MOUNT_OPERATION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_MOUNT_OPERATION, xmount_operation))
-#define G_MOUNT_OPERATION_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_MOUNT_OPERATION, GMountOperationClass))
-#define X_IS_MOUNT_OPERATION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_MOUNT_OPERATION))
-#define X_IS_MOUNT_OPERATION_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_MOUNT_OPERATION))
-#define G_MOUNT_OPERATION_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_MOUNT_OPERATION, GMountOperationClass))
+#define G_TYPE_MOUNT_OPERATION         (g_mount_operation_get_type ())
+#define G_MOUNT_OPERATION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_MOUNT_OPERATION, GMountOperation))
+#define G_MOUNT_OPERATION_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_MOUNT_OPERATION, GMountOperationClass))
+#define G_IS_MOUNT_OPERATION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_MOUNT_OPERATION))
+#define G_IS_MOUNT_OPERATION_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_MOUNT_OPERATION))
+#define G_MOUNT_OPERATION_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_MOUNT_OPERATION, GMountOperationClass))
 
 /**
- * xmount_operation_t:
+ * GMountOperation:
  *
  * Class for providing authentication methods for mounting operations,
  * such as mounting a file locally, or authenticating with a server.
@@ -47,18 +47,18 @@ typedef struct _GMountOperationPrivate GMountOperationPrivate;
 
 struct _GMountOperation
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   GMountOperationPrivate *priv;
 };
 
 struct _GMountOperationClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* signals: */
 
-  void (* ask_password) (xmount_operation_t       *op,
+  void (* ask_password) (GMountOperation       *op,
 			 const char            *message,
 			 const char            *default_user,
 			 const char            *default_domain,
@@ -66,44 +66,44 @@ struct _GMountOperationClass
 
   /**
    * GMountOperationClass::ask_question:
-   * @op: a #xmount_operation_t
+   * @op: a #GMountOperation
    * @message: string containing a message to display to the user
    * @choices: (array zero-terminated=1) (element-type utf8): an array of
    *    strings for each possible choice
    *
-   * Virtual implementation of #xmount_operation_t::ask-question.
+   * Virtual implementation of #GMountOperation::ask-question.
    */
-  void (* ask_question) (xmount_operation_t       *op,
+  void (* ask_question) (GMountOperation       *op,
 			 const char            *message,
 			 const char            *choices[]);
 
-  void (* reply)        (xmount_operation_t       *op,
+  void (* reply)        (GMountOperation       *op,
 			 GMountOperationResult  result);
 
-  void (* aborted)      (xmount_operation_t       *op);
+  void (* aborted)      (GMountOperation       *op);
 
   /**
    * GMountOperationClass::show_processes:
-   * @op: a #xmount_operation_t
+   * @op: a #GMountOperation
    * @message: string containing a message to display to the user
-   * @processes: (element-type xpid_t): an array of #xpid_t for processes blocking
+   * @processes: (element-type GPid): an array of #GPid for processes blocking
    *    the operation
    * @choices: (array zero-terminated=1) (element-type utf8): an array of
    *    strings for each possible choice
    *
-   * Virtual implementation of #xmount_operation_t::show-processes.
+   * Virtual implementation of #GMountOperation::show-processes.
    *
    * Since: 2.22
    */
-  void (* show_processes) (xmount_operation_t      *op,
-                           const xchar_t          *message,
-                           xarray_t               *processes,
-                           const xchar_t          *choices[]);
+  void (* show_processes) (GMountOperation      *op,
+                           const gchar          *message,
+                           GArray               *processes,
+                           const gchar          *choices[]);
 
-  void (* show_unmount_progress) (xmount_operation_t *op,
-                                  const xchar_t     *message,
-                                  sint64_t           time_left,
-                                  sint64_t           bytes_left);
+  void (* show_unmount_progress) (GMountOperation *op,
+                                  const gchar     *message,
+                                  gint64           time_left,
+                                  gint64           bytes_left);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -118,59 +118,59 @@ struct _GMountOperationClass
   void (*_g_reserved9) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t             g_mount_operation_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xmount_operation_t * g_mount_operation_new           (void);
+GLIB_AVAILABLE_IN_ALL
+GType             g_mount_operation_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GMountOperation * g_mount_operation_new           (void);
 
-XPL_AVAILABLE_IN_ALL
-const char *  g_mount_operation_get_username      (xmount_operation_t *op);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_set_username      (xmount_operation_t *op,
+GLIB_AVAILABLE_IN_ALL
+const char *  g_mount_operation_get_username      (GMountOperation *op);
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_set_username      (GMountOperation *op,
 						   const char      *username);
-XPL_AVAILABLE_IN_ALL
-const char *  g_mount_operation_get_password      (xmount_operation_t *op);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_set_password      (xmount_operation_t *op,
+GLIB_AVAILABLE_IN_ALL
+const char *  g_mount_operation_get_password      (GMountOperation *op);
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_set_password      (GMountOperation *op,
 						   const char      *password);
-XPL_AVAILABLE_IN_ALL
-xboolean_t      g_mount_operation_get_anonymous     (xmount_operation_t *op);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_set_anonymous     (xmount_operation_t *op,
-						   xboolean_t         anonymous);
-XPL_AVAILABLE_IN_ALL
-const char *  g_mount_operation_get_domain        (xmount_operation_t *op);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_set_domain        (xmount_operation_t *op,
+GLIB_AVAILABLE_IN_ALL
+gboolean      g_mount_operation_get_anonymous     (GMountOperation *op);
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_set_anonymous     (GMountOperation *op,
+						   gboolean         anonymous);
+GLIB_AVAILABLE_IN_ALL
+const char *  g_mount_operation_get_domain        (GMountOperation *op);
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_set_domain        (GMountOperation *op,
 						   const char      *domain);
-XPL_AVAILABLE_IN_ALL
-GPasswordSave g_mount_operation_get_password_save (xmount_operation_t *op);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_set_password_save (xmount_operation_t *op,
+GLIB_AVAILABLE_IN_ALL
+GPasswordSave g_mount_operation_get_password_save (GMountOperation *op);
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_set_password_save (GMountOperation *op,
 						   GPasswordSave    save);
-XPL_AVAILABLE_IN_ALL
-int           g_mount_operation_get_choice        (xmount_operation_t *op);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_set_choice        (xmount_operation_t *op,
+GLIB_AVAILABLE_IN_ALL
+int           g_mount_operation_get_choice        (GMountOperation *op);
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_set_choice        (GMountOperation *op,
 						   int              choice);
-XPL_AVAILABLE_IN_ALL
-void          g_mount_operation_reply             (xmount_operation_t *op,
+GLIB_AVAILABLE_IN_ALL
+void          g_mount_operation_reply             (GMountOperation *op,
 						   GMountOperationResult result);
-XPL_AVAILABLE_IN_2_58
-xboolean_t      g_mount_operation_get_is_tcrypt_hidden_volume (xmount_operation_t *op);
-XPL_AVAILABLE_IN_2_58
-void          g_mount_operation_set_is_tcrypt_hidden_volume (xmount_operation_t *op,
-                                                             xboolean_t hidden_volume);
-XPL_AVAILABLE_IN_2_58
-xboolean_t      g_mount_operation_get_is_tcrypt_system_volume (xmount_operation_t *op);
-XPL_AVAILABLE_IN_2_58
-void          g_mount_operation_set_is_tcrypt_system_volume (xmount_operation_t *op,
-                                                             xboolean_t system_volume);
-XPL_AVAILABLE_IN_2_58
-xuint_t  g_mount_operation_get_pim           (xmount_operation_t *op);
-XPL_AVAILABLE_IN_2_58
-void          g_mount_operation_set_pim           (xmount_operation_t *op,
-                                                   xuint_t pim);
+GLIB_AVAILABLE_IN_2_58
+gboolean      g_mount_operation_get_is_tcrypt_hidden_volume (GMountOperation *op);
+GLIB_AVAILABLE_IN_2_58
+void          g_mount_operation_set_is_tcrypt_hidden_volume (GMountOperation *op,
+                                                             gboolean hidden_volume);
+GLIB_AVAILABLE_IN_2_58
+gboolean      g_mount_operation_get_is_tcrypt_system_volume (GMountOperation *op);
+GLIB_AVAILABLE_IN_2_58
+void          g_mount_operation_set_is_tcrypt_system_volume (GMountOperation *op,
+                                                             gboolean system_volume);
+GLIB_AVAILABLE_IN_2_58
+guint  g_mount_operation_get_pim           (GMountOperation *op);
+GLIB_AVAILABLE_IN_2_58
+void          g_mount_operation_set_pim           (GMountOperation *op,
+                                                   guint pim);
 
 G_END_DECLS
 

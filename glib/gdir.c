@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * gdir.c: Simplified wrapper around the DIRENT functions.
@@ -47,7 +47,7 @@
 #include "glib-private.h" /* g_dir_open_with_errno, g_dir_new_from_dirp */
 
 /**
- * xdir_t:
+ * GDir:
  *
  * An opaque structure representing an opened directory.
  */
@@ -62,7 +62,7 @@ struct _GDir
 #ifdef G_OS_WIN32
   /* maximum encoding of FILENAME_MAX UTF-8 characters, plus a nul terminator
    * (FILENAME_MAX is not guaranteed to include one) */
-  xchar_t utf8_buf[FILENAME_MAX*4 + 1];
+  gchar utf8_buf[FILENAME_MAX*4 + 1];
 #endif
 };
 
@@ -78,27 +78,27 @@ struct _GDir
  *
  * This is useful if you want to construct your own error message.
  *
- * Returns: a newly allocated #xdir_t on success, or %NULL on failure,
+ * Returns: a newly allocated #GDir on success, or %NULL on failure,
  *   with errno set accordingly.
  *
  * Since: 2.38
  */
-xdir_t *
-g_dir_open_with_errno (const xchar_t *path,
-                       xuint_t        flags)
+GDir *
+g_dir_open_with_errno (const gchar *path,
+                       guint        flags)
 {
-  xdir_t dir;
+  GDir dir;
 #ifdef G_OS_WIN32
-  xint_t saved_errno;
+  gint saved_errno;
   wchar_t *wpath;
 #endif
 
-  xreturn_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
 #ifdef G_OS_WIN32
-  wpath = xutf8_to_utf16 (path, -1, NULL, NULL, NULL);
+  wpath = g_utf8_to_utf16 (path, -1, NULL, NULL, NULL);
 
-  xreturn_val_if_fail (wpath != NULL, NULL);
+  g_return_val_if_fail (wpath != NULL, NULL);
 
   dir.wdirp = _wopendir (wpath);
   saved_errno = errno;
@@ -122,7 +122,7 @@ g_dir_open_with_errno (const xchar_t *path,
  * @path: the path to the directory you are interested in. On Unix
  *         in the on-disk encoding. On Windows in UTF-8
  * @flags: Currently must be set to 0. Reserved for future use.
- * @error: return location for a #xerror_t, or %NULL.
+ * @error: return location for a #GError, or %NULL.
  *         If non-%NULL, an error will be set if and only if
  *         g_dir_open() fails.
  *
@@ -130,30 +130,30 @@ g_dir_open_with_errno (const xchar_t *path,
  * directory can then be retrieved using g_dir_read_name().  Note
  * that the ordering is not defined.
  *
- * Returns: a newly allocated #xdir_t on success, %NULL on failure.
+ * Returns: a newly allocated #GDir on success, %NULL on failure.
  *   If non-%NULL, you must free the result with g_dir_close()
  *   when you are finished with it.
  **/
-xdir_t *
-g_dir_open (const xchar_t  *path,
-            xuint_t         flags,
-            xerror_t      **error)
+GDir *
+g_dir_open (const gchar  *path,
+            guint         flags,
+            GError      **error)
 {
-  xint_t saved_errno;
-  xdir_t *dir;
+  gint saved_errno;
+  GDir *dir;
 
   dir = g_dir_open_with_errno (path, flags);
 
   if (dir == NULL)
     {
-      xchar_t *utf8_path;
+      gchar *utf8_path;
 
       saved_errno = errno;
 
-      utf8_path = xfilename_to_utf8 (path, -1, NULL, NULL, NULL);
+      utf8_path = g_filename_to_utf8 (path, -1, NULL, NULL, NULL);
 
-      g_set_error (error, XFILE_ERROR, xfile_error_from_errno (saved_errno),
-                   _("Error opening directory “%s”: %s"), utf8_path, xstrerror (saved_errno));
+      g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (saved_errno),
+                   _("Error opening directory “%s”: %s"), utf8_path, g_strerror (saved_errno));
       g_free (utf8_path);
     }
 
@@ -164,28 +164,28 @@ g_dir_open (const xchar_t  *path,
  * g_dir_new_from_dirp:
  * @dirp: a #DIR* created by opendir() or fdopendir()
  *
- * Creates a #xdir_t object from the DIR object that is created using
- * opendir() or fdopendir().  The created #xdir_t assumes ownership of the
+ * Creates a #GDir object from the DIR object that is created using
+ * opendir() or fdopendir().  The created #GDir assumes ownership of the
  * passed-in #DIR pointer.
  *
  * @dirp must not be %NULL.
  *
  * This function never fails.
  *
- * Returns: a newly allocated #xdir_t, which should be closed using
+ * Returns: a newly allocated #GDir, which should be closed using
  *     g_dir_close().
  *
  * Since: 2.38
  **/
-xdir_t *
-g_dir_new_from_dirp (xpointer_t dirp)
+GDir *
+g_dir_new_from_dirp (gpointer dirp)
 {
 #ifdef G_OS_UNIX
-  xdir_t *dir;
+  GDir *dir;
 
-  xreturn_val_if_fail (dirp != NULL, NULL);
+  g_return_val_if_fail (dirp != NULL, NULL);
 
-  dir = g_new (xdir_t, 1);
+  dir = g_new (GDir, 1);
   dir->dirp = dirp;
 
   return dir;
@@ -198,7 +198,7 @@ g_dir_new_from_dirp (xpointer_t dirp)
 
 /**
  * g_dir_read_name:
- * @dir: a #xdir_t* created by g_dir_open()
+ * @dir: a #GDir* created by g_dir_open()
  *
  * Retrieves the name of another entry in the directory, or %NULL.
  * The order of entries returned from this function is not defined,
@@ -218,23 +218,23 @@ g_dir_new_from_dirp (xpointer_t dirp)
  *   more entries. The return value is owned by GLib and
  *   must not be modified or freed.
  **/
-const xchar_t *
-g_dir_read_name (xdir_t *dir)
+const gchar *
+g_dir_read_name (GDir *dir)
 {
 #ifdef G_OS_WIN32
-  xchar_t *utf8_name;
+  gchar *utf8_name;
   struct _wdirent *wentry;
 #else
   struct dirent *entry;
 #endif
 
-  xreturn_val_if_fail (dir != NULL, NULL);
+  g_return_val_if_fail (dir != NULL, NULL);
 
 #ifdef G_OS_WIN32
   while (1)
     {
       wentry = _wreaddir (dir->wdirp);
-      while (wentry
+      while (wentry 
 	     && (0 == wcscmp (wentry->d_name, L".") ||
 		 0 == wcscmp (wentry->d_name, L"..")))
 	wentry = _wreaddir (dir->wdirp);
@@ -242,7 +242,7 @@ g_dir_read_name (xdir_t *dir)
       if (wentry == NULL)
 	return NULL;
 
-      utf8_name = xutf16_to_utf8 (wentry->d_name, -1, NULL, NULL, NULL);
+      utf8_name = g_utf16_to_utf8 (wentry->d_name, -1, NULL, NULL, NULL);
 
       if (utf8_name == NULL)
 	continue;		/* Huh, impossible? Skip it anyway */
@@ -254,7 +254,7 @@ g_dir_read_name (xdir_t *dir)
     }
 #else
   entry = readdir (dir->dirp);
-  while (entry
+  while (entry 
          && (0 == strcmp (entry->d_name, ".") ||
              0 == strcmp (entry->d_name, "..")))
     entry = readdir (dir->dirp);
@@ -268,16 +268,16 @@ g_dir_read_name (xdir_t *dir)
 
 /**
  * g_dir_rewind:
- * @dir: a #xdir_t* created by g_dir_open()
+ * @dir: a #GDir* created by g_dir_open()
  *
  * Resets the given directory. The next call to g_dir_read_name()
  * will return the first entry again.
  **/
 void
-g_dir_rewind (xdir_t *dir)
+g_dir_rewind (GDir *dir)
 {
   g_return_if_fail (dir != NULL);
-
+  
 #ifdef G_OS_WIN32
   _wrewinddir (dir->wdirp);
 #else
@@ -287,12 +287,12 @@ g_dir_rewind (xdir_t *dir)
 
 /**
  * g_dir_close:
- * @dir: a #xdir_t* created by g_dir_open()
+ * @dir: a #GDir* created by g_dir_open()
  *
  * Closes the directory and deallocates all related resources.
  **/
 void
-g_dir_close (xdir_t *dir)
+g_dir_close (GDir *dir)
 {
   g_return_if_fail (dir != NULL);
 
@@ -308,21 +308,21 @@ g_dir_close (xdir_t *dir)
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN xdir_t        *g_dir_open_utf8      (const xchar_t  *path,
-                                                xuint_t         flags,
-                                                xerror_t      **error);
-_XPL_EXTERN const xchar_t *g_dir_read_name_utf8 (xdir_t         *dir);
+_GLIB_EXTERN GDir        *g_dir_open_utf8      (const gchar  *path,
+                                                guint         flags,
+                                                GError      **error);
+_GLIB_EXTERN const gchar *g_dir_read_name_utf8 (GDir         *dir);
 
-xdir_t *
-g_dir_open_utf8 (const xchar_t  *path,
-                 xuint_t         flags,
-                 xerror_t      **error)
+GDir *
+g_dir_open_utf8 (const gchar  *path,
+                 guint         flags,
+                 GError      **error)
 {
   return g_dir_open (path, flags, error);
 }
 
-const xchar_t *
-g_dir_read_name_utf8 (xdir_t *dir)
+const gchar *
+g_dir_read_name_utf8 (GDir *dir)
 {
   return g_dir_read_name (dir);
 }

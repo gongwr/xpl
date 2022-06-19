@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -93,7 +93,7 @@
 #define G_MSVC_CTOR(_func,_sym_prefix) \
   static void _func(void); \
   extern int (* _array ## _func)(void);              \
-  int _func ## _wrapper(void) { _func(); xslist_find (NULL,  _array ## _func); return 0; } \
+  int _func ## _wrapper(void) { _func(); g_slist_find (NULL,  _array ## _func); return 0; } \
   __pragma(comment(linker,"/include:" _sym_prefix # _func "_wrapper")) \
   __pragma(section(".CRT$XCU",read)) \
   __declspec(allocate(".CRT$XCU")) int (* _array ## _func)(void) = _func ## _wrapper;
@@ -101,7 +101,7 @@
 #define G_MSVC_DTOR(_func,_sym_prefix) \
   static void _func(void); \
   extern int (* _array ## _func)(void);              \
-  int _func ## _constructor(void) { atexit (_func); xslist_find (NULL,  _array ## _func); return 0; } \
+  int _func ## _constructor(void) { atexit (_func); g_slist_find (NULL,  _array ## _func); return 0; } \
    __pragma(comment(linker,"/include:" _sym_prefix # _func "_constructor")) \
   __pragma(section(".CRT$XCU",read)) \
   __declspec(allocate(".CRT$XCU")) int (* _array ## _func)(void) = _func ## _constructor;

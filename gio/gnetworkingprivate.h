@@ -23,12 +23,12 @@
 
 G_BEGIN_DECLS
 
-xuint64_t  g_resolver_get_serial             (xresolver_t        *resolver);
+guint64  g_resolver_get_serial             (GResolver        *resolver);
 
-xint_t g_socket (xint_t     domain,
-               xint_t     type,
-               xint_t     protocol,
-               xerror_t **error);
+gint g_socket (gint     domain,
+               gint     type,
+               gint     protocol,
+               GError **error);
 
 G_END_DECLS
 

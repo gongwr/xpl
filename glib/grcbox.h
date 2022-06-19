@@ -18,7 +18,7 @@
 
 #pragma once
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -27,41 +27,41 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_rc_box_alloc                  (xsize_t           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_rc_box_alloc0                 (xsize_t           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_rc_box_dup                    (xsize_t           block_size,
-                                                 xconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_rc_box_acquire                (xpointer_t        mem_block);
-XPL_AVAILABLE_IN_2_58
-void            g_rc_box_release                (xpointer_t        mem_block);
-XPL_AVAILABLE_IN_2_58
-void            g_rc_box_release_full           (xpointer_t        mem_block,
-                                                 xdestroy_notify_t  clear_func);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_rc_box_alloc                  (gsize           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_rc_box_alloc0                 (gsize           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_rc_box_dup                    (gsize           block_size,
+                                                 gconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_rc_box_acquire                (gpointer        mem_block);
+GLIB_AVAILABLE_IN_2_58
+void            g_rc_box_release                (gpointer        mem_block);
+GLIB_AVAILABLE_IN_2_58
+void            g_rc_box_release_full           (gpointer        mem_block,
+                                                 GDestroyNotify  clear_func);
 
-XPL_AVAILABLE_IN_2_58
-xsize_t           g_rc_box_get_size               (xpointer_t        mem_block);
+GLIB_AVAILABLE_IN_2_58
+gsize           g_rc_box_get_size               (gpointer        mem_block);
 
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_atomic_rc_box_alloc           (xsize_t           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_atomic_rc_box_alloc0          (xsize_t           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_atomic_rc_box_dup             (xsize_t           block_size,
-                                                 xconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
-XPL_AVAILABLE_IN_2_58
-xpointer_t        g_atomic_rc_box_acquire         (xpointer_t        mem_block);
-XPL_AVAILABLE_IN_2_58
-void            g_atomic_rc_box_release         (xpointer_t        mem_block);
-XPL_AVAILABLE_IN_2_58
-void            g_atomic_rc_box_release_full    (xpointer_t        mem_block,
-                                                 xdestroy_notify_t  clear_func);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_atomic_rc_box_alloc           (gsize           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_atomic_rc_box_alloc0          (gsize           block_size) G_GNUC_MALLOC G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_atomic_rc_box_dup             (gsize           block_size,
+                                                 gconstpointer   mem_block) G_GNUC_ALLOC_SIZE(1);
+GLIB_AVAILABLE_IN_2_58
+gpointer        g_atomic_rc_box_acquire         (gpointer        mem_block);
+GLIB_AVAILABLE_IN_2_58
+void            g_atomic_rc_box_release         (gpointer        mem_block);
+GLIB_AVAILABLE_IN_2_58
+void            g_atomic_rc_box_release_full    (gpointer        mem_block,
+                                                 GDestroyNotify  clear_func);
 
-XPL_AVAILABLE_IN_2_58
-xsize_t           g_atomic_rc_box_get_size        (xpointer_t        mem_block);
+GLIB_AVAILABLE_IN_2_58
+gsize           g_atomic_rc_box_get_size        (gpointer        mem_block);
 
 #define g_rc_box_new(type) \
   ((type *) g_rc_box_alloc (sizeof (type)))

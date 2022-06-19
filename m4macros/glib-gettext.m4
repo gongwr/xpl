@@ -14,13 +14,13 @@
 # Macro to add for using GNU gettext.
 # Ulrich Drepper <drepper@cygnus.com>, 1995, 1996
 #
-# Modified to never use included libintl.
+# Modified to never use included libintl. 
 # Owen Taylor <otaylor@redhat.com>, 12/15/1998
 #
 # Major rework to remove unused code
 # Owen Taylor <otaylor@redhat.com>, 12/11/2002
 #
-# Added better handling of ALL_LINGUAS from GNU gettext version
+# Added better handling of ALL_LINGUAS from GNU gettext version 
 # written by Bruno Haible, Owen Taylor <otaylor.redhat.com> 5/30/3002
 #
 # Modified to require ngettext
@@ -31,11 +31,11 @@
 
 # We need this here as well, since someone might use autoconf-2.5x
 # to configure GLib then an older version to configure a package
-# using AM_XPL_GNU_GETTEXT
+# using AM_GLIB_GNU_GETTEXT
 AC_PREREQ(2.53)
 
 dnl
-dnl We go to great lengths to make sure that aclocal won't
+dnl We go to great lengths to make sure that aclocal won't 
 dnl try to pull in the installed version of these macros
 dnl when running aclocal in the glib directory.
 dnl
@@ -46,9 +46,9 @@ dnl At the end, if we're not within glib, we'll define the public
 dnl definitions in terms of our private definitions.
 dnl
 
-# XPL_LC_MESSAGES
+# GLIB_LC_MESSAGES
 #--------------------
-glib_DEFUN([XPL_LC_MESSAGES],
+glib_DEFUN([GLIB_LC_MESSAGES],
   [AC_CHECK_HEADERS([locale.h])
     if test $ac_cv_header_locale_h = yes; then
     AC_CACHE_CHECK([for LC_MESSAGES], am_cv_val_LC_MESSAGES,
@@ -60,11 +60,11 @@ glib_DEFUN([XPL_LC_MESSAGES],
     fi
   fi])
 
-# XPL_PATH_PROG_WITH_TEST
+# GLIB_PATH_PROG_WITH_TEST
 #----------------------------
-dnl XPL_PATH_PROG_WITH_TEST(VARIABLE, PROG-TO-CHECK-FOR,
+dnl GLIB_PATH_PROG_WITH_TEST(VARIABLE, PROG-TO-CHECK-FOR,
 dnl   TEST-PERFORMED-ON-FOUND_PROGRAM [, VALUE-IF-NOT-FOUND [, PATH]])
-glib_DEFUN([XPL_PATH_PROG_WITH_TEST],
+glib_DEFUN([GLIB_PATH_PROG_WITH_TEST],
 [# Extract the first word of "$2", so it can be a program name with args.
 set dummy $2; ac_word=[$]2
 AC_MSG_CHECKING([for $ac_word])
@@ -145,9 +145,9 @@ glib_DEFUN([glib_gt_INTL_MACOSX],
   AC_SUBST([INTL_MACOSX_LIBS])
 ])
 
-# XPL_WITH_NLS
+# GLIB_WITH_NLS
 #-----------------
-glib_DEFUN([XPL_WITH_NLS],
+glib_DEFUN([GLIB_WITH_NLS],
   dnl NLS is obligatory
   [USE_NLS=yes
     AC_SUBST(USE_NLS)
@@ -175,7 +175,7 @@ glib_DEFUN([XPL_WITH_NLS],
 	  gt_cv_func_ngettext_libc=yes,
           gt_cv_func_ngettext_libc=no)
         ])
-
+  
       if test "$gt_cv_func_ngettext_libc" = "yes" ; then
 	      AC_CACHE_CHECK([for dgettext in libc], gt_cv_func_dgettext_libc,
         	[AC_TRY_LINK([
@@ -186,7 +186,7 @@ glib_DEFUN([XPL_WITH_NLS],
 	          gt_cv_func_dgettext_libc=no)
         	])
       fi
-
+  
       if test "$gt_cv_func_ngettext_libc" = "yes" ; then
         AC_CHECK_FUNCS(bind_textdomain_codeset)
       fi
@@ -197,7 +197,7 @@ glib_DEFUN([XPL_WITH_NLS],
       if test "$gt_cv_func_dgettext_libc" != "yes" \
 	 || test "$gt_cv_func_ngettext_libc" != "yes" \
          || test "$ac_cv_func_bind_textdomain_codeset" != "yes" ; then
-
+        
         AC_CHECK_LIB(intl, bindtextdomain,
 	    [AC_CHECK_LIB(intl, ngettext,
 		    [AC_CHECK_LIB(intl, dgettext,
@@ -241,15 +241,15 @@ glib_DEFUN([XPL_WITH_NLS],
 	|| test "$gt_cv_func_dgettext_libintl" = "yes"; then
         gt_cv_have_gettext=yes
       fi
-
+  
       if test "$gt_cv_func_dgettext_libintl" = "yes"; then
         INTLLIBS="-lintl $libintl_extra_libs $INTL_MACOSX_LIBS"
       fi
-
+  
       if test "$gt_cv_have_gettext" = "yes"; then
 	AC_DEFINE(HAVE_GETTEXT,1,
 	  [Define if the GNU gettext() function is already present or preinstalled.])
-	XPL_PATH_PROG_WITH_TEST(MSGFMT, msgfmt,
+	GLIB_PATH_PROG_WITH_TEST(MSGFMT, msgfmt,
 	  [test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], no)dnl
 	if test "$MSGFMT" != "no"; then
           glib_save_LIBS="$LIBS"
@@ -257,7 +257,7 @@ glib_DEFUN([XPL_WITH_NLS],
 	  AC_CHECK_FUNCS(dcgettext)
 	  MSGFMT_OPTS=
 	  AC_MSG_CHECKING([if msgfmt accepts -c])
-	  XPL_RUN_PROG([$MSGFMT -c -o /dev/null],[
+	  GLIB_RUN_PROG([$MSGFMT -c -o /dev/null],[
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -270,11 +270,11 @@ msgstr ""
 ], [MSGFMT_OPTS=-c; AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
 	  AC_SUBST(MSGFMT_OPTS)
 	  AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT)
-	  XPL_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
+	  GLIB_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
 	    [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
 	  AC_TRY_LINK(, [extern int _nl_msg_cat_cntr;
 			 return _nl_msg_cat_cntr],
-	    [CATOBJEXT=.gmo
+	    [CATOBJEXT=.gmo 
              DATADIRNAME=share],
 	    [case $host in
 	    *-*-solaris*)
@@ -284,7 +284,7 @@ msgstr ""
 	    dnl Hence, we'd like to go with DATADIRNAME=share and
 	    dnl and CATOBJEXT=.gmo in this case.
             AC_CHECK_FUNC(bind_textdomain_codeset,
-	      [CATOBJEXT=.gmo
+	      [CATOBJEXT=.gmo 
                DATADIRNAME=share],
 	      [CATOBJEXT=.mo
                DATADIRNAME=lib])
@@ -311,7 +311,7 @@ msgstr ""
         [always defined to indicate that i18n is enabled])
     fi
 
-    dnl test_t whether we really found GNU xgettext.
+    dnl Test whether we really found GNU xgettext.
     if test "$XGETTEXT" != ":"; then
       dnl If it is not GNU xgettext we define it as : so that the
       dnl Makefiles still can work.
@@ -328,7 +328,7 @@ msgstr ""
     POSUB=po
 
     AC_OUTPUT_COMMANDS(
-      [case "$CONFIXFILES" in *po/Makefile.in*)
+      [case "$CONFIG_FILES" in *po/Makefile.in*)
         sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile
       esac])
 
@@ -353,21 +353,21 @@ msgstr ""
     AC_SUBST(POSUB)
   ])
 
-# AM_XPL_GNU_GETTEXT
+# AM_GLIB_GNU_GETTEXT
 # -------------------
-# Do checks necessary for use of gettext. If a suitable implementation
+# Do checks necessary for use of gettext. If a suitable implementation 
 # of gettext is found in either in libintl or in the C library,
 # it will set INTLLIBS to the libraries needed for use of gettext
 # and AC_DEFINE() HAVE_GETTEXT and ENABLE_NLS. (The shell variable
 # gt_cv_have_gettext will be set to "yes".) It will also call AC_SUBST()
-# on various variables needed by the Makefile.in.in installed by
+# on various variables needed by the Makefile.in.in installed by 
 # glib-gettextize.
 dnl
-AU_DEFUN([XPL_GNU_GETTEXT],
+AU_DEFUN([GLIB_GNU_GETTEXT],
   [AC_REQUIRE([AC_PROG_CC])dnl
-
-   XPL_LC_MESSAGES
-   XPL_WITH_NLS
+   
+   GLIB_LC_MESSAGES
+   GLIB_WITH_NLS
 
    if test "$gt_cv_have_gettext" = "yes"; then
      if test "x$ALL_LINGUAS" = "x"; then
@@ -436,12 +436,12 @@ AU_DEFUN([XPL_GNU_GETTEXT],
   ],
   [[$0: This macro is deprecated. You should use upstream gettext instead.]])
 
-# AM_XPL_DEFINE_LOCALEDIR(VARIABLE)
+# AM_GLIB_DEFINE_LOCALEDIR(VARIABLE)
 # -------------------------------
 # Define VARIABLE to the location where catalog files will
 # be installed by po/Makefile.
-glib_DEFUN([XPL_DEFINE_LOCALEDIR],
-[glib_REQUIRE([XPL_GNU_GETTEXT])dnl
+glib_DEFUN([GLIB_DEFINE_LOCALEDIR],
+[glib_REQUIRE([GLIB_GNU_GETTEXT])dnl
 glib_save_prefix="$prefix"
 glib_save_exec_prefix="$exec_prefix"
 glib_save_datarootdir="$datarootdir"
@@ -464,16 +464,16 @@ dnl
 dnl Now the definitions that aclocal will find
 dnl
 ifdef(glib_configure_ac,[],[
-AC_DEFUN([AM_XPL_GNU_GETTEXT],[XPL_GNU_GETTEXT($@)])
-AC_DEFUN([AM_XPL_DEFINE_LOCALEDIR],[XPL_DEFINE_LOCALEDIR($@)])
+AC_DEFUN([AM_GLIB_GNU_GETTEXT],[GLIB_GNU_GETTEXT($@)])
+AC_DEFUN([AM_GLIB_DEFINE_LOCALEDIR],[GLIB_DEFINE_LOCALEDIR($@)])
 ])dnl
 
-# XPL_RUN_PROG(PROGRAM, TEST-FILE, [ACTION-IF-PASS], [ACTION-IF-FAIL])
-#
+# GLIB_RUN_PROG(PROGRAM, TEST-FILE, [ACTION-IF-PASS], [ACTION-IF-FAIL])
+# 
 # Create a temporary file with TEST-FILE as its contents and pass the
 # file name to PROGRAM.  Perform ACTION-IF-PASS if PROGRAM exits with
 # 0 and perform ACTION-IF-FAIL for any other exit status.
-AC_DEFUN([XPL_RUN_PROG],
+AC_DEFUN([GLIB_RUN_PROG],
 [cat >conftest.foo <<_ACEOF
 $2
 _ACEOF

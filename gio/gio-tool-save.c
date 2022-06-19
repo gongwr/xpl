@@ -37,12 +37,12 @@
 #include "gio-tool.h"
 
 static char *etag = NULL;
-static xboolean_t backup = FALSE;
-static xboolean_t create = FALSE;
-static xboolean_t append = FALSE;
-static xboolean_t priv = FALSE;
-static xboolean_t replace_dest = FALSE;
-static xboolean_t print_etag = FALSE;
+static gboolean backup = FALSE;
+static gboolean create = FALSE;
+static gboolean append = FALSE;
+static gboolean priv = FALSE;
+static gboolean replace_dest = FALSE;
+static gboolean print_etag = FALSE;
 
 static const GOptionEntry entries[] =
 {
@@ -59,34 +59,34 @@ static const GOptionEntry entries[] =
 };
 
 /* 256k minus malloc overhead */
-#define STREAM_BUFFER_SIZE (1024*256 - 2*sizeof(xpointer_t))
+#define STREAM_BUFFER_SIZE (1024*256 - 2*sizeof(gpointer))
 
-static xboolean_t
-save (xfile_t *file)
+static gboolean
+save (GFile *file)
 {
-  xoutput_stream_t *out;
-  xfile_create_flags_t flags;
+  GOutputStream *out;
+  GFileCreateFlags flags;
   char *buffer;
-  xssize_t res;
-  xboolean_t close_res;
-  xerror_t *error;
-  xboolean_t save_res;
+  gssize res;
+  gboolean close_res;
+  GError *error;
+  gboolean save_res;
 
   error = NULL;
 
-  flags = priv ? XFILE_CREATE_PRIVATE : XFILE_CREATE_NONE;
-  flags |= replace_dest ? XFILE_CREATE_REPLACE_DESTINATION : 0;
+  flags = priv ? G_FILE_CREATE_PRIVATE : G_FILE_CREATE_NONE;
+  flags |= replace_dest ? G_FILE_CREATE_REPLACE_DESTINATION : 0;
 
   if (create)
-    out = (xoutput_stream_t *)xfile_create (file, flags, NULL, &error);
+    out = (GOutputStream *)g_file_create (file, flags, NULL, &error);
   else if (append)
-    out = (xoutput_stream_t *)xfile_append_to (file, flags, NULL, &error);
+    out = (GOutputStream *)g_file_append_to (file, flags, NULL, &error);
   else
-    out = (xoutput_stream_t *)xfile_replace (file, etag, backup, flags, NULL, &error);
+    out = (GOutputStream *)g_file_replace (file, etag, backup, flags, NULL, &error);
   if (out == NULL)
     {
       print_file_error (file, error->message);
-      xerror_free (error);
+      g_error_free (error);
       return FALSE;
     }
 
@@ -98,7 +98,7 @@ save (xfile_t *file)
       res = read (STDIN_FILENO, buffer, STREAM_BUFFER_SIZE);
       if (res > 0)
 	{
-          xoutput_stream_write_all (out, buffer, res, NULL, NULL, &error);
+          g_output_stream_write_all (out, buffer, res, NULL, NULL, &error);
           if (error != NULL)
             {
               save_res = FALSE;
@@ -119,18 +119,18 @@ save (xfile_t *file)
 
  out:
 
-  close_res = xoutput_stream_close (out, NULL, &error);
+  close_res = g_output_stream_close (out, NULL, &error);
   if (!close_res)
     {
       save_res = FALSE;
       print_file_error (file, error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
 
   if (close_res && print_etag)
     {
       char *etag;
-      etag = xfile_output_stream_get_etag (XFILE_OUTPUT_STREAM (out));
+      etag = g_file_output_stream_get_etag (G_FILE_OUTPUT_STREAM (out));
 
       if (etag)
 	g_print ("Etag: %s\n", etag);
@@ -140,19 +140,19 @@ save (xfile_t *file)
       g_free (etag);
     }
 
-  xobject_unref (out);
+  g_object_unref (out);
   g_free (buffer);
 
   return save_res;
 }
 
 int
-handle_save (int argc, char *argv[], xboolean_t do_help)
+handle_save (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xerror_t *error = NULL;
-  xfile_t *file;
-  xboolean_t res;
+  GOptionContext *context;
+  GError *error = NULL;
+  GFile *file;
+  gboolean res;
 
   g_set_prgname ("gio save");
 
@@ -173,7 +173,7 @@ handle_save (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -194,9 +194,9 @@ handle_save (int argc, char *argv[], xboolean_t do_help)
 
   g_option_context_free (context);
 
-  file = xfile_new_for_commandline_arg (argv[1]);
+  file = g_file_new_for_commandline_arg (argv[1]);
   res = save (file);
-  xobject_unref (file);
+  g_object_unref (file);
 
   return res ? 0 : 2;
 }

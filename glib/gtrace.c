@@ -39,15 +39,15 @@
  * in some code.
  *
  * |[<!-- language="C" -->
- * sint64_t begin_time_nsec G_GNUC_UNUSED;
+ * gint64 begin_time_nsec G_GNUC_UNUSED;
  *
  * begin_time_nsec = G_TRACE_CURRENT_TIME;
  *
  * // some code which might take a while
  *
  * g_trace_mark (begin_time_nsec, G_TRACE_CURRENT_TIME - begin_time_nsec,
- *               "GLib", "xsource_t.dispatch",
- *               "%s ⇒ %s", xsource_get_name (source), need_destroy ? "destroy" : "keep");
+ *               "GLib", "GSource.dispatch",
+ *               "%s ⇒ %s", g_source_get_name (source), need_destroy ? "destroy" : "keep");
  * ]|
  *
  * The tracing API is currently internal to GLib.
@@ -81,11 +81,11 @@
  * Since: 2.66
  */
 void
-(g_trace_mark) (sint64_t       begin_time_nsec,
-                sint64_t       duration_nsec,
-                const xchar_t *group,
-                const xchar_t *name,
-                const xchar_t *message_format,
+(g_trace_mark) (gint64       begin_time_nsec,
+                gint64       duration_nsec,
+                const gchar *group,
+                const gchar *name,
+                const gchar *message_format,
                 ...)
 {
 #ifdef HAVE_SYSPROF
@@ -116,7 +116,7 @@ void
  *
  * Since: 2.68
  */
-xuint_t
+guint
 (g_trace_define_int64_counter) (const char *group,
                                 const char *name,
                                 const char *description)
@@ -128,21 +128,21 @@ xuint_t
 
   /* sysprof not enabled? */
   if (counter.id == 0)
-    return (xuint_t) -1;
+    return (guint) -1;
 
   counter.type = SYSPROF_CAPTURE_COUNTER_INT64;
   counter.value.v64 = 0;
-  xstrlcpy (counter.category, group, sizeof counter.category);
-  xstrlcpy (counter.name, name, sizeof counter.name);
-  xstrlcpy (counter.description, description, sizeof counter.description);
+  g_strlcpy (counter.category, group, sizeof counter.category);
+  g_strlcpy (counter.name, name, sizeof counter.name);
+  g_strlcpy (counter.description, description, sizeof counter.description);
 
   sysprof_collector_define_counters (&counter, 1);
 
-  xassert (counter.id != 0);
+  g_assert (counter.id != 0);
 
   return counter.id;
 #else
-  return (xuint_t) -1;
+  return (guint) -1;
 #endif
 }
 
@@ -159,8 +159,8 @@ xuint_t
  * Since: 2.68
  */
 void
-(g_trace_set_int64_counter) (xuint_t  id,
-                             sint64_t val)
+(g_trace_set_int64_counter) (guint  id,
+                             gint64 val)
 {
 #ifdef HAVE_SYSPROF
   SysprofCaptureCounterValue value;
@@ -168,7 +168,7 @@ void
   g_return_if_fail (id != 0);
 
   /* Ignore setting the counter if we failed to define it in the first place. */
-  if (id == (xuint_t) -1)
+  if (id == (guint) -1)
     return;
 
   value.v64 = val;

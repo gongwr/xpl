@@ -16,8 +16,8 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XSOCKET_CONNECTABLE_H__
-#define __XSOCKET_CONNECTABLE_H__
+#ifndef __G_SOCKET_CONNECTABLE_H__
+#define __G_SOCKET_CONNECTABLE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -27,55 +27,55 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_CONNECTABLE            (xsocket_connectable_get_type ())
-#define XSOCKET_CONNECTABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SOCKET_CONNECTABLE, xsocket_connectable))
-#define X_IS_SOCKET_CONNECTABLE(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SOCKET_CONNECTABLE))
-#define XSOCKET_CONNECTABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_SOCKET_CONNECTABLE, xsocket_connectable_iface_t))
+#define G_TYPE_SOCKET_CONNECTABLE            (g_socket_connectable_get_type ())
+#define G_SOCKET_CONNECTABLE(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_SOCKET_CONNECTABLE, GSocketConnectable))
+#define G_IS_SOCKET_CONNECTABLE(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_SOCKET_CONNECTABLE))
+#define G_SOCKET_CONNECTABLE_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_SOCKET_CONNECTABLE, GSocketConnectableIface))
 
 /**
- * xsocket_connectable_t:
+ * GSocketConnectable:
  *
- * Interface for objects that contain or generate a #xsocket_address_t.
+ * Interface for objects that contain or generate a #GSocketAddress.
  */
-typedef struct _GSocketConnectableIface xsocket_connectable_iface_t;
+typedef struct _GSocketConnectableIface GSocketConnectableIface;
 
 /**
- * xsocket_connectable_iface_t:
- * @x_iface: The parent interface.
- * @enumerate: Creates a #xsocket_address_enumerator_t
- * @proxy_enumerate: Creates a #xproxy_address_enumerator_t
+ * GSocketConnectableIface:
+ * @g_iface: The parent interface.
+ * @enumerate: Creates a #GSocketAddressEnumerator
+ * @proxy_enumerate: Creates a #GProxyAddressEnumerator
  * @to_string: Format the connectable’s address as a string for debugging.
  *    Implementing this is optional. (Since: 2.48)
  *
- * Provides an interface for returning a #xsocket_address_enumerator_t
- * and #xproxy_address_enumerator_t
+ * Provides an interface for returning a #GSocketAddressEnumerator
+ * and #GProxyAddressEnumerator
  */
 struct _GSocketConnectableIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xsocket_address_enumerator_t * (* enumerate)       (xsocket_connectable_t *connectable);
+  GSocketAddressEnumerator * (* enumerate)       (GSocketConnectable *connectable);
 
-  xsocket_address_enumerator_t * (* proxy_enumerate) (xsocket_connectable_t *connectable);
+  GSocketAddressEnumerator * (* proxy_enumerate) (GSocketConnectable *connectable);
 
-  xchar_t                    * (* to_string)       (xsocket_connectable_t *connectable);
+  gchar                    * (* to_string)       (GSocketConnectable *connectable);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                     xsocket_connectable_get_type  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                     g_socket_connectable_get_type  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_address_enumerator_t *xsocket_connectable_enumerate (xsocket_connectable_t *connectable);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddressEnumerator *g_socket_connectable_enumerate (GSocketConnectable *connectable);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_address_enumerator_t *xsocket_connectable_proxy_enumerate (xsocket_connectable_t *connectable);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddressEnumerator *g_socket_connectable_proxy_enumerate (GSocketConnectable *connectable);
 
-XPL_AVAILABLE_IN_2_48
-xchar_t                    *xsocket_connectable_to_string (xsocket_connectable_t *connectable);
+GLIB_AVAILABLE_IN_2_48
+gchar                    *g_socket_connectable_to_string (GSocketConnectable *connectable);
 
 G_END_DECLS
 
 
-#endif /* __XSOCKET_CONNECTABLE_H__ */
+#endif /* __G_SOCKET_CONNECTABLE_H__ */

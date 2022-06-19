@@ -2,8 +2,8 @@
 # functions, which they really were, if possible easy.
 
 <MACRO>
-<NAME>XPL_DISABLE_DEPRECATION_WARNINGS</NAME>
-#ifdef XPL_DISABLE_DEPRECATION_WARNINGS
+<NAME>GLIB_DISABLE_DEPRECATION_WARNINGS</NAME>
+#ifdef GLIB_DISABLE_DEPRECATION_WARNINGS
 </MACRO>
 
 <MACRO>
@@ -26,39 +26,39 @@
 # threads supported?
 
 <FUNCTION>
-<NAME>xthread_supported</NAME>
-<RETURNS>xboolean_t</RETURNS>
+<NAME>g_thread_supported</NAME>
+<RETURNS>gboolean</RETURNS>
 </FUNCTION>
 
-# xmutex_t
+# GMutex
 
 <FUNCTION>
 <NAME>g_mutex_new</NAME>
-<RETURNS>xmutex_t *</RETURNS>
+<RETURNS>GMutex *</RETURNS>
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_lock</NAME>
 <RETURNS>void</RETURNS>
-xmutex_t *mutex
+GMutex *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_trylock</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xmutex_t *mutex
+<RETURNS>gboolean</RETURNS>
+GMutex *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_unlock</NAME>
 <RETURNS>void</RETURNS>
-xmutex_t *mutex
+GMutex *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_mutex_free</NAME>
 <RETURNS>void</RETURNS>
-xmutex_t *mutex
+GMutex *mutex
 </FUNCTION>
 
 # GStaticMutex
@@ -80,7 +80,7 @@ GStaticMutex* mutex
 
 <FUNCTION>
 <NAME>g_static_mutex_trylock</NAME>
-<RETURNS>xboolean_t</RETURNS>
+<RETURNS>gboolean</RETURNS>
 GStaticMutex* mutex
 </FUNCTION>
 
@@ -92,31 +92,31 @@ GStaticMutex* mutex
 
 <FUNCTION>
 <NAME>g_static_mutex_get_mutex</NAME>
-<RETURNS>xmutex_t *</RETURNS>
+<RETURNS>GMutex *</RETURNS>
 GStaticMutex* mutex
 </FUNCTION>
 
-# xthread_t
+# GThread
 
 <FUNCTION>
-<NAME>xthread_yield</NAME>
+<NAME>g_thread_yield</NAME>
 <RETURNS>void</RETURNS>
 </FUNCTION>
 
 <FUNCTION>
-<NAME>xthread_create</NAME>
-<RETURNS>xthread_t *</RETURNS>
+<NAME>g_thread_create</NAME>
+<RETURNS>GThread *</RETURNS>
 GThreadFunc func
-xpointer_t data,
-xboolean_t joinable,
-xerror_t **error
+gpointer data,
+gboolean joinable,
+GError **error
 </FUNCTION>
 
 # G_LOCK_* macros
 
 <MACRO>
 <NAME>G_LOCK_DEFINE</NAME>
-#define G_LOCK_DEFINE(name)
+#define G_LOCK_DEFINE(name)    
 </MACRO>
 
 <MACRO>
@@ -126,7 +126,7 @@ xerror_t **error
 
 <MACRO>
 <NAME>G_LOCK_EXTERN</NAME>
-#define G_LOCK_EXTERN(name)
+#define G_LOCK_EXTERN(name)    
 </MACRO>
 
 <MACRO>
@@ -144,44 +144,44 @@ xerror_t **error
 #define G_TRYLOCK(name)
 </MACRO>
 
-# xcond_t
+# GCond
 
 <FUNCTION>
 <NAME>g_cond_new</NAME>
-<RETURNS>xcond_t*</RETURNS>
+<RETURNS>GCond*</RETURNS>
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_signal</NAME>
 <RETURNS>void</RETURNS>
-xcond_t *cond
+GCond *cond
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_broadcast</NAME>
 <RETURNS>void</RETURNS>
-xcond_t *cond
+GCond *cond
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_wait</NAME>
 <RETURNS>void</RETURNS>
-xcond_t *cond, xmutex_t *mutex
+GCond *cond, GMutex *mutex
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_timed_wait</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xcond_t *cond, xmutex_t *mutex, GTimeVal *abs_time
+<RETURNS>gboolean</RETURNS>
+GCond *cond, GMutex *mutex, GTimeVal *abs_time
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_cond_free</NAME>
 <RETURNS>void</RETURNS>
-xcond_t *cond
+GCond *cond
 </FUNCTION>
 
-# xprivate_t
+# GPrivate
 <MACRO>
 <NAME>G_PRIVATE_INIT</NAME>
 #define G_PRIVATE_INIT(notify)
@@ -191,7 +191,7 @@ xcond_t *cond
 
 <MACRO>
 <NAME>G_STATIC_PRIVATE_INIT</NAME>
-#define G_STATIC_PRIVATE_INIT
+#define G_STATIC_PRIVATE_INIT 
 </MACRO>
 
 # Definitions for different operating systems
@@ -210,68 +210,68 @@ xcond_t *cond
 
 <FUNCTION>
 <NAME>g_ascii_isalnum</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isalpha</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_iscntrl</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isdigit</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isgraph</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_islower</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isprint</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_ispunct</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isspace</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isupper</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_ascii_isxdigit</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xchar_t c
+<RETURNS>gboolean</RETURNS>
+gchar c
 </FUNCTION>
 
 # g_atomic
@@ -279,16 +279,16 @@ xchar_t c
 <FUNCTION>
 <NAME>g_atomic_int_inc</NAME>
 <RETURNS>void</RETURNS>
-xint_t *atomic
+gint *atomic
 </FUNCTION>
 
 <FUNCTION>
 <NAME>g_atomic_int_dec_and_test</NAME>
-<RETURNS>xboolean_t</RETURNS>
-xint_t *atomic
+<RETURNS>gboolean</RETURNS>
+gint *atomic
 </FUNCTION>
 
 <MACRO>
 <NAME>G_VA_COPY</NAME>
-#define G_VA_COPY(ap1,ap2)
+#define G_VA_COPY(ap1,ap2)    
 </MACRO>

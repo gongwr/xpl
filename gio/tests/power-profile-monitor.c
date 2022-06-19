@@ -21,41 +21,41 @@
 static void
 test_dup_default (void)
 {
-  xpower_profile_monitor_t *monitor;
+  GPowerProfileMonitor *monitor;
 
-  monitor = xpower_profile_monitor_dup_default ();
+  monitor = g_power_profile_monitor_dup_default ();
   g_assert_nonnull (monitor);
-  xobject_unref (monitor);
+  g_object_unref (monitor);
 }
 
 static void
-power_saver_enabled_cb (xpower_profile_monitor_t *monitor,
-                        xparam_spec_t           *pspec,
-                        xpointer_t              user_data)
+power_saver_enabled_cb (GPowerProfileMonitor *monitor,
+                        GParamSpec           *pspec,
+                        gpointer              user_data)
 {
-  xboolean_t enabled;
+  gboolean enabled;
 
-  enabled = xpower_profile_monitor_get_power_saver_enabled (monitor);
+  enabled = g_power_profile_monitor_get_power_saver_enabled (monitor);
   g_debug ("Power Saver %s (%d)", enabled ? "enabled" : "disabled", enabled);
 }
 
 static void
 do_watch_power_profile (void)
 {
-  xpower_profile_monitor_t *monitor;
-  xmain_loop_t *loop;
-  xulong_t signal_id;
+  GPowerProfileMonitor *monitor;
+  GMainLoop *loop;
+  gulong signal_id;
 
-  monitor = xpower_profile_monitor_dup_default ();
-  signal_id = xsignal_connect (G_OBJECT (monitor), "notify::power-saver-enabled",
+  monitor = g_power_profile_monitor_dup_default ();
+  signal_id = g_signal_connect (G_OBJECT (monitor), "notify::power-saver-enabled",
 		                G_CALLBACK (power_saver_enabled_cb), NULL);
 
-  loop = xmain_loop_new (NULL, TRUE);
-  xmain_loop_run (loop);
+  loop = g_main_loop_new (NULL, TRUE);
+  g_main_loop_run (loop);
 
-  xsignal_handler_disconnect (monitor, signal_id);
-  xobject_unref (monitor);
-  xmain_loop_unref (loop);
+  g_signal_handler_disconnect (monitor, signal_id);
+  g_object_unref (monitor);
+  g_main_loop_unref (loop);
 }
 
 int

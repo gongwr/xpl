@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  * Copyright (C) 2007 Sebastian Dröge.
  *
@@ -17,7 +17,7 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  *
  * Authors: Alexander Larsson <alexl@redhat.com>
- *          John McCutchan <john@johnmccutchan.com>
+ *          John McCutchan <john@johnmccutchan.com> 
  *          Sebastian Dröge <slomo@circular-chaos.org>
  */
 
@@ -32,20 +32,20 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INOTIFY_FILE_MONITOR		(g_inotify_file_monitor_get_type ())
-#define G_INOTIFY_FILE_MONITOR(o)		(XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INOTIFY_FILE_MONITOR, GInotifyFileMonitor))
-#define G_INOTIFY_FILE_MONITOR_CLASS(k)		(XTYPE_CHECK_CLASS_CAST ((k), XTYPE_INOTIFY_FILE_MONITOR, GInotifyFileMonitorClass))
-#define X_IS_INOTIFY_FILE_MONITOR(o)		(XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INOTIFY_FILE_MONITOR))
-#define X_IS_INOTIFY_FILE_MONITOR_CLASS(k)	(XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INOTIFY_FILE_MONITOR))
+#define G_TYPE_INOTIFY_FILE_MONITOR		(g_inotify_file_monitor_get_type ())
+#define G_INOTIFY_FILE_MONITOR(o)		(G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_INOTIFY_FILE_MONITOR, GInotifyFileMonitor))
+#define G_INOTIFY_FILE_MONITOR_CLASS(k)		(G_TYPE_CHECK_CLASS_CAST ((k), G_TYPE_INOTIFY_FILE_MONITOR, GInotifyFileMonitorClass))
+#define G_IS_INOTIFY_FILE_MONITOR(o)		(G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_INOTIFY_FILE_MONITOR))
+#define G_IS_INOTIFY_FILE_MONITOR_CLASS(k)	(G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_INOTIFY_FILE_MONITOR))
 
 typedef struct _GInotifyFileMonitor      GInotifyFileMonitor;
 typedef struct _GInotifyFileMonitorClass GInotifyFileMonitorClass;
 
 struct _GInotifyFileMonitorClass {
-  xlocal_file_monitor_class_t parent_class;
+  GLocalFileMonitorClass parent_class;
 };
 
-xtype_t g_inotify_file_monitor_get_type (void);
+GType g_inotify_file_monitor_get_type (void);
 
 G_END_DECLS
 

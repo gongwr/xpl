@@ -16,10 +16,10 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XFILEUTILS_H__
-#define __XFILEUTILS_H__
+#ifndef __G_FILEUTILS_H__
+#define __G_FILEUTILS_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -28,35 +28,35 @@
 
 G_BEGIN_DECLS
 
-#define XFILE_ERROR xfile_error_quark ()
+#define G_FILE_ERROR g_file_error_quark ()
 
 typedef enum
 {
-  XFILE_ERROR_EXIST,
-  XFILE_ERROR_ISDIR,
-  XFILE_ERROR_ACCES,
-  XFILE_ERROR_NAMETOOLONG,
-  XFILE_ERROR_NOENT,
-  XFILE_ERROR_NOTDIR,
-  XFILE_ERROR_NXIO,
-  XFILE_ERROR_NODEV,
-  XFILE_ERROR_ROFS,
-  XFILE_ERROR_TXTBSY,
-  XFILE_ERROR_FAULT,
-  XFILE_ERROR_LOOP,
-  XFILE_ERROR_NOSPC,
-  XFILE_ERROR_NOMEM,
-  XFILE_ERROR_MFILE,
-  XFILE_ERROR_NFILE,
-  XFILE_ERROR_BADF,
-  XFILE_ERROR_INVAL,
-  XFILE_ERROR_PIPE,
-  XFILE_ERROR_AGAIN,
-  XFILE_ERROR_INTR,
-  XFILE_ERROR_IO,
-  XFILE_ERROR_PERM,
-  XFILE_ERROR_NOSYS,
-  XFILE_ERROR_FAILED
+  G_FILE_ERROR_EXIST,
+  G_FILE_ERROR_ISDIR,
+  G_FILE_ERROR_ACCES,
+  G_FILE_ERROR_NAMETOOLONG,
+  G_FILE_ERROR_NOENT,
+  G_FILE_ERROR_NOTDIR,
+  G_FILE_ERROR_NXIO,
+  G_FILE_ERROR_NODEV,
+  G_FILE_ERROR_ROFS,
+  G_FILE_ERROR_TXTBSY,
+  G_FILE_ERROR_FAULT,
+  G_FILE_ERROR_LOOP,
+  G_FILE_ERROR_NOSPC,
+  G_FILE_ERROR_NOMEM,
+  G_FILE_ERROR_MFILE,
+  G_FILE_ERROR_NFILE,
+  G_FILE_ERROR_BADF,
+  G_FILE_ERROR_INVAL,
+  G_FILE_ERROR_PIPE,
+  G_FILE_ERROR_AGAIN,
+  G_FILE_ERROR_INTR,
+  G_FILE_ERROR_IO,
+  G_FILE_ERROR_PERM,
+  G_FILE_ERROR_NOSYS,
+  G_FILE_ERROR_FAILED
 } GFileError;
 
 /* For backward-compat reasons, these are synced to an old
@@ -65,122 +65,122 @@ typedef enum
  */
 typedef enum
 {
-  XFILE_TEST_IS_REGULAR    = 1 << 0,
-  XFILE_TEST_IS_SYMLINK    = 1 << 1,
-  XFILE_TEST_IS_DIR        = 1 << 2,
-  XFILE_TEST_IS_EXECUTABLE = 1 << 3,
-  XFILE_TEST_EXISTS        = 1 << 4
+  G_FILE_TEST_IS_REGULAR    = 1 << 0,
+  G_FILE_TEST_IS_SYMLINK    = 1 << 1,
+  G_FILE_TEST_IS_DIR        = 1 << 2,
+  G_FILE_TEST_IS_EXECUTABLE = 1 << 3,
+  G_FILE_TEST_EXISTS        = 1 << 4
 } GFileTest;
 
 /**
  * GFileSetContentsFlags:
- * @XFILE_SET_CONTENTS_NONE: No guarantees about file consistency or durability.
+ * @G_FILE_SET_CONTENTS_NONE: No guarantees about file consistency or durability.
  *   The most dangerous setting, which is slightly faster than other settings.
- * @XFILE_SET_CONTENTS_CONSISTENT: Guarantee file consistency: after a crash,
+ * @G_FILE_SET_CONTENTS_CONSISTENT: Guarantee file consistency: after a crash,
  *   either the old version of the file or the new version of the file will be
  *   available, but not a mixture. On Unix systems this equates to an `fsync()`
  *   on the file and use of an atomic `rename()` of the new version of the file
  *   over the old.
- * @XFILE_SET_CONTENTS_DURABLE: Guarantee file durability: after a crash, the
+ * @G_FILE_SET_CONTENTS_DURABLE: Guarantee file durability: after a crash, the
  *   new version of the file will be available. On Unix systems this equates to
- *   an `fsync()` on the file (if %XFILE_SET_CONTENTS_CONSISTENT is unset), or
- *   the effects of %XFILE_SET_CONTENTS_CONSISTENT plus an `fsync()` on the
+ *   an `fsync()` on the file (if %G_FILE_SET_CONTENTS_CONSISTENT is unset), or
+ *   the effects of %G_FILE_SET_CONTENTS_CONSISTENT plus an `fsync()` on the
  *   directory containing the file after calling `rename()`.
- * @XFILE_SET_CONTENTS_ONLY_EXISTING: Only apply consistency and durability
+ * @G_FILE_SET_CONTENTS_ONLY_EXISTING: Only apply consistency and durability
  *   guarantees if the file already exists. This may speed up file operations
  *   if the file doesn’t currently exist, but may result in a corrupted version
  *   of the new file if the system crashes while writing it.
  *
- * Flags to pass to xfile_set_contents_full() to affect its safety and
+ * Flags to pass to g_file_set_contents_full() to affect its safety and
  * performance.
  *
  * Since: 2.66
  */
 typedef enum
 {
-  XFILE_SET_CONTENTS_NONE = 0,
-  XFILE_SET_CONTENTS_CONSISTENT = 1 << 0,
-  XFILE_SET_CONTENTS_DURABLE = 1 << 1,
-  XFILE_SET_CONTENTS_ONLY_EXISTING = 1 << 2
+  G_FILE_SET_CONTENTS_NONE = 0,
+  G_FILE_SET_CONTENTS_CONSISTENT = 1 << 0,
+  G_FILE_SET_CONTENTS_DURABLE = 1 << 1,
+  G_FILE_SET_CONTENTS_ONLY_EXISTING = 1 << 2
 } GFileSetContentsFlags
-XPL_AVAILABLE_ENUMERATOR_IN_2_66;
+GLIB_AVAILABLE_ENUMERATOR_IN_2_66;
 
-XPL_AVAILABLE_IN_ALL
-xquark     xfile_error_quark      (void);
+GLIB_AVAILABLE_IN_ALL
+GQuark     g_file_error_quark      (void);
 /* So other code can generate a GFileError */
-XPL_AVAILABLE_IN_ALL
-GFileError xfile_error_from_errno (xint_t err_no);
+GLIB_AVAILABLE_IN_ALL
+GFileError g_file_error_from_errno (gint err_no);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xfile_test         (const xchar_t  *filename,
+GLIB_AVAILABLE_IN_ALL
+gboolean g_file_test         (const gchar  *filename,
                               GFileTest     test);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xfile_get_contents (const xchar_t  *filename,
-                              xchar_t       **contents,
-                              xsize_t        *length,
-                              xerror_t      **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xfile_set_contents (const xchar_t *filename,
-                              const xchar_t *contents,
-                              xssize_t         length,
-                              xerror_t       **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_file_get_contents (const gchar  *filename,
+                              gchar       **contents,
+                              gsize        *length,
+                              GError      **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_file_set_contents (const gchar *filename,
+                              const gchar *contents,
+                              gssize         length,
+                              GError       **error);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_IN_2_66
-xboolean_t xfile_set_contents_full (const xchar_t            *filename,
-                                   const xchar_t            *contents,
-                                   xssize_t                  length,
+GLIB_AVAILABLE_IN_2_66
+gboolean g_file_set_contents_full (const gchar            *filename,
+                                   const gchar            *contents,
+                                   gssize                  length,
                                    GFileSetContentsFlags   flags,
                                    int                     mode,
-                                   xerror_t                **error);
+                                   GError                **error);
 G_GNUC_END_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_IN_ALL
-xchar_t   *xfile_read_link    (const xchar_t  *filename,
-                              xerror_t      **error);
+GLIB_AVAILABLE_IN_ALL
+gchar   *g_file_read_link    (const gchar  *filename,
+                              GError      **error);
 
 /* Wrapper / workalike for mkdtemp() */
-XPL_AVAILABLE_IN_2_30
-xchar_t   *g_mkdtemp            (xchar_t        *tmpl);
-XPL_AVAILABLE_IN_2_30
-xchar_t   *g_mkdtemp_full       (xchar_t        *tmpl,
-                               xint_t          mode);
+GLIB_AVAILABLE_IN_2_30
+gchar   *g_mkdtemp            (gchar        *tmpl);
+GLIB_AVAILABLE_IN_2_30
+gchar   *g_mkdtemp_full       (gchar        *tmpl,
+                               gint          mode);
 
 /* Wrapper / workalike for mkstemp() */
-XPL_AVAILABLE_IN_ALL
-xint_t     g_mkstemp            (xchar_t        *tmpl);
-XPL_AVAILABLE_IN_ALL
-xint_t     g_mkstemp_full       (xchar_t        *tmpl,
-                               xint_t          flags,
-                               xint_t          mode);
+GLIB_AVAILABLE_IN_ALL
+gint     g_mkstemp            (gchar        *tmpl);
+GLIB_AVAILABLE_IN_ALL
+gint     g_mkstemp_full       (gchar        *tmpl,
+                               gint          flags,
+                               gint          mode);
 
 /* Wrappers for g_mkstemp and g_mkdtemp() */
-XPL_AVAILABLE_IN_ALL
-xint_t     xfile_open_tmp      (const xchar_t  *tmpl,
-                               xchar_t       **name_used,
-                               xerror_t      **error);
-XPL_AVAILABLE_IN_2_30
-xchar_t   *g_dir_make_tmp       (const xchar_t  *tmpl,
-                               xerror_t      **error);
+GLIB_AVAILABLE_IN_ALL
+gint     g_file_open_tmp      (const gchar  *tmpl,
+                               gchar       **name_used,
+                               GError      **error);
+GLIB_AVAILABLE_IN_2_30
+gchar   *g_dir_make_tmp       (const gchar  *tmpl,
+                               GError      **error);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t   *g_build_path         (const xchar_t *separator,
-                               const xchar_t *first_element,
+GLIB_AVAILABLE_IN_ALL
+gchar   *g_build_path         (const gchar *separator,
+                               const gchar *first_element,
                                ...) G_GNUC_MALLOC G_GNUC_NULL_TERMINATED;
-XPL_AVAILABLE_IN_ALL
-xchar_t   *g_build_pathv        (const xchar_t  *separator,
-                               xchar_t       **args) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_ALL
+gchar   *g_build_pathv        (const gchar  *separator,
+                               gchar       **args) G_GNUC_MALLOC;
 
-XPL_AVAILABLE_IN_ALL
-xchar_t   *g_build_filename     (const xchar_t *first_element,
+GLIB_AVAILABLE_IN_ALL
+gchar   *g_build_filename     (const gchar *first_element,
                                ...) G_GNUC_MALLOC G_GNUC_NULL_TERMINATED;
-XPL_AVAILABLE_IN_ALL
-xchar_t   *g_build_filenamev    (xchar_t      **args) G_GNUC_MALLOC;
-XPL_AVAILABLE_IN_2_56
-xchar_t   *g_build_filename_valist (const xchar_t  *first_element,
+GLIB_AVAILABLE_IN_ALL
+gchar   *g_build_filenamev    (gchar      **args) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_2_56
+gchar   *g_build_filename_valist (const gchar  *first_element,
                                   va_list      *args) G_GNUC_MALLOC;
 
-XPL_AVAILABLE_IN_ALL
-xint_t     g_mkdir_with_parents (const xchar_t *pathname,
-                               xint_t         mode);
+GLIB_AVAILABLE_IN_ALL
+gint     g_mkdir_with_parents (const gchar *pathname,
+                               gint         mode);
 
 #ifdef G_OS_WIN32
 
@@ -188,34 +188,34 @@ xint_t     g_mkdir_with_parents (const xchar_t *pathname,
  * the search path separator is the semicolon. Note that also the
  * (forward) slash works as directory separator.
  */
-#define X_IS_DIR_SEPARATOR(c) ((c) == G_DIR_SEPARATOR || (c) == '/')
+#define G_IS_DIR_SEPARATOR(c) ((c) == G_DIR_SEPARATOR || (c) == '/')
 
 #else  /* !G_OS_WIN32 */
 
-#define X_IS_DIR_SEPARATOR(c) ((c) == G_DIR_SEPARATOR)
+#define G_IS_DIR_SEPARATOR(c) ((c) == G_DIR_SEPARATOR)
 
 #endif /* !G_OS_WIN32 */
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t     g_path_is_absolute (const xchar_t *file_name);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_path_skip_root   (const xchar_t *file_name);
+GLIB_AVAILABLE_IN_ALL
+gboolean     g_path_is_absolute (const gchar *file_name);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_path_skip_root   (const gchar *file_name);
 
-XPL_DEPRECATED_FOR(g_path_get_basename)
-const xchar_t *g_basename         (const xchar_t *file_name);
-#define g_dirname g_path_get_dirname XPL_DEPRECATED_MACRO_IN_2_26_FOR(g_path_get_dirname)
+GLIB_DEPRECATED_FOR(g_path_get_basename)
+const gchar *g_basename         (const gchar *file_name);
+#define g_dirname g_path_get_dirname GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_path_get_dirname)
 
-XPL_AVAILABLE_IN_ALL
-xchar_t *g_get_current_dir   (void);
-XPL_AVAILABLE_IN_ALL
-xchar_t *g_path_get_basename (const xchar_t *file_name) G_GNUC_MALLOC;
-XPL_AVAILABLE_IN_ALL
-xchar_t *g_path_get_dirname  (const xchar_t *file_name) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_ALL
+gchar *g_get_current_dir   (void);
+GLIB_AVAILABLE_IN_ALL
+gchar *g_path_get_basename (const gchar *file_name) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_ALL
+gchar *g_path_get_dirname  (const gchar *file_name) G_GNUC_MALLOC;
 
-XPL_AVAILABLE_IN_2_58
-xchar_t *g_canonicalize_filename (const xchar_t *filename,
-                                const xchar_t *relative_to) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_2_58
+gchar *g_canonicalize_filename (const gchar *filename,
+                                const gchar *relative_to) G_GNUC_MALLOC;
 
 G_END_DECLS
 
-#endif /* __XFILEUTILS_H__ */
+#endif /* __G_FILEUTILS_H__ */

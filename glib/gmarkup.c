@@ -112,96 +112,96 @@ typedef struct
 {
   const char *prev_element;
   const GMarkupParser *prev_parser;
-  xpointer_t prev_user_data;
+  gpointer prev_user_data;
 } GMarkupRecursionTracker;
 
 struct _GMarkupParseContext
 {
   const GMarkupParser *parser;
 
-  xint_t ref_count;  /* (atomic) */
+  gint ref_count;  /* (atomic) */
 
   GMarkupParseFlags flags;
 
-  xint_t line_number;
-  xint_t char_number;
+  gint line_number;
+  gint char_number;
 
   GMarkupParseState state;
 
-  xpointer_t user_data;
-  xdestroy_notify_t dnotify;
+  gpointer user_data;
+  GDestroyNotify dnotify;
 
   /* A piece of character data or an element that
    * hasn't "ended" yet so we haven't yet called
    * the callback for it.
    */
-  xstring_t *partial_chunk;
-  xslist_t *spare_chunks;
+  GString *partial_chunk;
+  GSList *spare_chunks;
 
-  xslist_t *tag_stack;
-  xslist_t *tag_stack_gstr;
-  xslist_t *spare_list_nodes;
+  GSList *tag_stack;
+  GSList *tag_stack_gstr;
+  GSList *spare_list_nodes;
 
-  xstring_t **attr_names;
-  xstring_t **attr_values;
-  xint_t cur_attr;
-  xint_t alloc_attrs;
+  GString **attr_names;
+  GString **attr_values;
+  gint cur_attr;
+  gint alloc_attrs;
 
-  const xchar_t *current_text;
-  xssize_t       current_text_len;
-  const xchar_t *current_text_end;
+  const gchar *current_text;
+  gssize       current_text_len;
+  const gchar *current_text_end;
 
   /* used to save the start of the last interesting thingy */
-  const xchar_t *start;
+  const gchar *start;
 
-  const xchar_t *iter;
+  const gchar *iter;
 
-  xuint_t document_empty : 1;
-  xuint_t parsing : 1;
-  xuint_t awaiting_pop : 1;
-  xint_t balance;
+  guint document_empty : 1;
+  guint parsing : 1;
+  guint awaiting_pop : 1;
+  gint balance;
 
   /* subparser support */
-  xslist_t *subparser_stack; /* (GMarkupRecursionTracker *) */
+  GSList *subparser_stack; /* (GMarkupRecursionTracker *) */
   const char *subparser_element;
-  xpointer_t held_user_data;
+  gpointer held_user_data;
 };
 
 /*
  * Helpers to reduce our allocation overhead, we have
  * a well defined allocation lifecycle.
  */
-static xslist_t *
-get_list_node (xmarkup_parse_context_t *context, xpointer_t data)
+static GSList *
+get_list_node (GMarkupParseContext *context, gpointer data)
 {
-  xslist_t *node;
+  GSList *node;
   if (context->spare_list_nodes != NULL)
     {
       node = context->spare_list_nodes;
-      context->spare_list_nodes = xslist_remove_link (context->spare_list_nodes, node);
+      context->spare_list_nodes = g_slist_remove_link (context->spare_list_nodes, node);
     }
   else
-    node = xslist_alloc();
+    node = g_slist_alloc();
   node->data = data;
   return node;
 }
 
 static void
-free_list_node (xmarkup_parse_context_t *context, xslist_t *node)
+free_list_node (GMarkupParseContext *context, GSList *node)
 {
   node->data = NULL;
-  context->spare_list_nodes = xslist_concat (node, context->spare_list_nodes);
+  context->spare_list_nodes = g_slist_concat (node, context->spare_list_nodes);
 }
 
 static inline void
-string_blank (xstring_t *string)
+string_blank (GString *string)
 {
   string->str[0] = '\0';
   string->len = 0;
 }
 
 /**
- * xmarkup_parse_context_new:
+ * g_markup_parse_context_new:
  * @parser: a #GMarkupParser
  * @flags: one or more #GMarkupParseFlags
  * @user_data: user data to pass to #GMarkupParser functions
@@ -214,19 +214,19 @@ string_blank (xstring_t *string)
  * the parse context can't continue to parse text (you have to
  * free it and create a new parse context).
  *
- * Returns: a new #xmarkup_parse_context_t
+ * Returns: a new #GMarkupParseContext
  **/
-xmarkup_parse_context_t *
-xmarkup_parse_context_new (const GMarkupParser *parser,
+GMarkupParseContext *
+g_markup_parse_context_new (const GMarkupParser *parser,
                             GMarkupParseFlags    flags,
-                            xpointer_t             user_data,
-                            xdestroy_notify_t       user_data_dnotify)
+                            gpointer             user_data,
+                            GDestroyNotify       user_data_dnotify)
 {
-  xmarkup_parse_context_t *context;
+  GMarkupParseContext *context;
 
-  xreturn_val_if_fail (parser != NULL, NULL);
+  g_return_val_if_fail (parser != NULL, NULL);
 
-  context = g_new (xmarkup_parse_context_t, 1);
+  context = g_new (GMarkupParseContext, 1);
 
   context->ref_count = 1;
   context->parser = parser;
@@ -272,8 +272,8 @@ xmarkup_parse_context_new (const GMarkupParser *parser,
 }
 
 /**
- * xmarkup_parse_context_ref:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_ref:
+ * @context: a #GMarkupParseContext
  *
  * Increases the reference count of @context.
  *
@@ -281,11 +281,11 @@ xmarkup_parse_context_new (const GMarkupParser *parser,
  *
  * Since: 2.36
  **/
-xmarkup_parse_context_t *
-xmarkup_parse_context_ref (xmarkup_parse_context_t *context)
+GMarkupParseContext *
+g_markup_parse_context_ref (GMarkupParseContext *context)
 {
-  xreturn_val_if_fail (context != NULL, NULL);
-  xreturn_val_if_fail (context->ref_count > 0, NULL);
+  g_return_val_if_fail (context != NULL, NULL);
+  g_return_val_if_fail (context->ref_count > 0, NULL);
 
   g_atomic_int_inc (&context->ref_count);
 
@@ -293,8 +293,8 @@ xmarkup_parse_context_ref (xmarkup_parse_context_t *context)
 }
 
 /**
- * xmarkup_parse_context_unref:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_unref:
+ * @context: a #GMarkupParseContext
  *
  * Decreases the reference count of @context.  When its reference count
  * drops to 0, it is freed.
@@ -302,34 +302,34 @@ xmarkup_parse_context_ref (xmarkup_parse_context_t *context)
  * Since: 2.36
  **/
 void
-xmarkup_parse_context_unref (xmarkup_parse_context_t *context)
+g_markup_parse_context_unref (GMarkupParseContext *context)
 {
   g_return_if_fail (context != NULL);
   g_return_if_fail (context->ref_count > 0);
 
   if (g_atomic_int_dec_and_test (&context->ref_count))
-    xmarkup_parse_context_free (context);
+    g_markup_parse_context_free (context);
 }
 
 static void
-string_full_free (xpointer_t ptr)
+string_full_free (gpointer ptr)
 {
-  xstring_free (ptr, TRUE);
+  g_string_free (ptr, TRUE);
 }
 
-static void clear_attributes (xmarkup_parse_context_t *context);
+static void clear_attributes (GMarkupParseContext *context);
 
 /**
- * xmarkup_parse_context_free:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_free:
+ * @context: a #GMarkupParseContext
  *
- * Frees a #xmarkup_parse_context_t.
+ * Frees a #GMarkupParseContext.
  *
  * This function can't be called from inside one of the
  * #GMarkupParser functions or while a subparser is pushed.
  */
 void
-xmarkup_parse_context_free (xmarkup_parse_context_t *context)
+g_markup_parse_context_free (GMarkupParseContext *context)
 {
   g_return_if_fail (context != NULL);
   g_return_if_fail (!context->parsing);
@@ -343,23 +343,23 @@ xmarkup_parse_context_free (xmarkup_parse_context_t *context)
   g_free (context->attr_names);
   g_free (context->attr_values);
 
-  xslist_free_full (context->tag_stack_gstr, string_full_free);
-  xslist_free (context->tag_stack);
+  g_slist_free_full (context->tag_stack_gstr, string_full_free);
+  g_slist_free (context->tag_stack);
 
-  xslist_free_full (context->spare_chunks, string_full_free);
-  xslist_free (context->spare_list_nodes);
+  g_slist_free_full (context->spare_chunks, string_full_free);
+  g_slist_free (context->spare_list_nodes);
 
   if (context->partial_chunk)
-    xstring_free (context->partial_chunk, TRUE);
+    g_string_free (context->partial_chunk, TRUE);
 
   g_free (context);
 }
 
-static void pop_subparser_stack (xmarkup_parse_context_t *context);
+static void pop_subparser_stack (GMarkupParseContext *context);
 
 static void
-mark_error (xmarkup_parse_context_t *context,
-            xerror_t              *error)
+mark_error (GMarkupParseContext *context,
+            GError              *error)
 {
   context->state = STATE_ERROR;
 
@@ -378,21 +378,21 @@ mark_error (xmarkup_parse_context_t *context,
 }
 
 static void
-set_error (xmarkup_parse_context_t  *context,
-           xerror_t              **error,
+set_error (GMarkupParseContext  *context,
+           GError              **error,
            GMarkupError          code,
-           const xchar_t          *format,
+           const gchar          *format,
            ...) G_GNUC_PRINTF (4, 5);
 
 static void
-set_error_literal (xmarkup_parse_context_t  *context,
-                   xerror_t              **error,
+set_error_literal (GMarkupParseContext  *context,
+                   GError              **error,
                    GMarkupError          code,
-                   const xchar_t          *message)
+                   const gchar          *message)
 {
-  xerror_t *tmp_error;
+  GError *tmp_error;
 
-  tmp_error = xerror_new_literal (G_MARKUP_ERROR, code, message);
+  tmp_error = g_error_new_literal (G_MARKUP_ERROR, code, message);
 
   g_prefix_error (&tmp_error,
                   _("Error on line %d char %d: "),
@@ -406,24 +406,24 @@ set_error_literal (xmarkup_parse_context_t  *context,
 
 G_GNUC_PRINTF(4, 5)
 static void
-set_error (xmarkup_parse_context_t  *context,
-           xerror_t              **error,
+set_error (GMarkupParseContext  *context,
+           GError              **error,
            GMarkupError          code,
-           const xchar_t          *format,
+           const gchar          *format,
            ...)
 {
-  xchar_t *s;
-  xchar_t *s_valid;
+  gchar *s;
+  gchar *s_valid;
   va_list args;
 
   va_start (args, format);
-  s = xstrdup_vprintf (format, args);
+  s = g_strdup_vprintf (format, args);
   va_end (args);
 
-  /* Make sure that the xerror_t message is valid UTF-8
+  /* Make sure that the GError message is valid UTF-8
    * even if it is complaining about invalid UTF-8 in the markup
    */
-  s_valid = xutf8_make_valid (s, -1);
+  s_valid = g_utf8_make_valid (s, -1);
   set_error_literal (context, error, code, s);
 
   g_free (s);
@@ -431,9 +431,9 @@ set_error (xmarkup_parse_context_t  *context,
 }
 
 static void
-propagate_error (xmarkup_parse_context_t  *context,
-                 xerror_t              **dest,
-                 xerror_t               *src)
+propagate_error (GMarkupParseContext  *context,
+                 GError              **dest,
+                 GError               *src)
 {
   if (context->flags & G_MARKUP_PREFIX_ERROR_POSITION)
     g_prefix_error (&src,
@@ -449,14 +449,14 @@ propagate_error (xmarkup_parse_context_t  *context,
 #define IS_COMMON_NAME_END_CHAR(c) \
   ((c) == '=' || (c) == '/' || (c) == '>' || (c) == ' ')
 
-static xboolean_t
-slow_name_validate (xmarkup_parse_context_t  *context,
-                    const xchar_t          *name,
-                    xerror_t              **error)
+static gboolean
+slow_name_validate (GMarkupParseContext  *context,
+                    const gchar          *name,
+                    GError              **error)
 {
-  const xchar_t *p = name;
+  const gchar *p = name;
 
-  if (!xutf8_validate (name, -1, NULL))
+  if (!g_utf8_validate (name, -1, NULL))
     {
       set_error (context, error, G_MARKUP_ERROR_BAD_UTF8,
                  _("Invalid UTF-8 encoded text in name — not valid “%s”"), name);
@@ -467,14 +467,14 @@ slow_name_validate (xmarkup_parse_context_t  *context,
         (!IS_COMMON_NAME_END_CHAR (*p) &&
          (*p == '_' ||
           *p == ':' ||
-          xunichar_isalpha (xutf8_get_char (p))))))
+          g_unichar_isalpha (g_utf8_get_char (p))))))
     {
       set_error (context, error, G_MARKUP_ERROR_PARSE,
                  _("“%s” is not a valid name"), name);
       return FALSE;
     }
 
-  for (p = xutf8_next_char (name); *p != '\0'; p = xutf8_next_char (p))
+  for (p = g_utf8_next_char (name); *p != '\0'; p = g_utf8_next_char (p))
     {
       /* is_name_char */
       if (!(g_ascii_isalnum (*p) ||
@@ -483,7 +483,7 @@ slow_name_validate (xmarkup_parse_context_t  *context,
               *p == '-' ||
               *p == '_' ||
               *p == ':' ||
-              xunichar_isalpha (xutf8_get_char (p))))))
+              g_unichar_isalpha (g_utf8_get_char (p))))))
         {
           set_error (context, error, G_MARKUP_ERROR_PARSE,
                      _("“%s” is not a valid name: “%c”"), name, *p);
@@ -496,10 +496,10 @@ slow_name_validate (xmarkup_parse_context_t  *context,
 /*
  * Use me for elements, attributes etc.
  */
-static xboolean_t
-name_validate (xmarkup_parse_context_t  *context,
-               const xchar_t          *name,
-               xerror_t              **error)
+static gboolean
+name_validate (GMarkupParseContext  *context,
+               const gchar          *name,
+               GError              **error)
 {
   char mask;
   const char *p;
@@ -533,13 +533,13 @@ name_validate (xmarkup_parse_context_t  *context,
   return slow_name_validate (context, name, error);
 }
 
-static xboolean_t
-text_validate (xmarkup_parse_context_t  *context,
-               const xchar_t          *p,
-               xint_t                  len,
-               xerror_t              **error)
+static gboolean
+text_validate (GMarkupParseContext  *context,
+               const gchar          *p,
+               gint                  len,
+               GError              **error)
 {
-  if (!xutf8_validate_len (p, len, NULL))
+  if (!g_utf8_validate_len (p, len, NULL))
     {
       set_error (context, error, G_MARKUP_ERROR_BAD_UTF8,
                  _("Invalid UTF-8 encoded text in name — not valid “%s”"), p);
@@ -549,28 +549,28 @@ text_validate (xmarkup_parse_context_t  *context,
     return TRUE;
 }
 
-static xchar_t*
-char_str (xunichar_t c,
-          xchar_t   *buf)
+static gchar*
+char_str (gunichar c,
+          gchar   *buf)
 {
   memset (buf, 0, 8);
-  xunichar_to_utf8 (c, buf);
+  g_unichar_to_utf8 (c, buf);
   return buf;
 }
 
-/* Format the next UTF-8 character as a xchar_t* for printing in error output
+/* Format the next UTF-8 character as a gchar* for printing in error output
  * when we encounter a syntax error. This correctly handles invalid UTF-8,
  * emitting it as hex escapes. */
-static xchar_t*
-utf8_str (const xchar_t *utf8,
-          xsize_t        max_len,
-          xchar_t       *buf)
+static gchar*
+utf8_str (const gchar *utf8,
+          gsize        max_len,
+          gchar       *buf)
 {
-  xunichar_t c = xutf8_get_char_validated (utf8, max_len);
-  if (c == (xunichar_t) -1 || c == (xunichar_t) -2)
+  gunichar c = g_utf8_get_char_validated (utf8, max_len);
+  if (c == (gunichar) -1 || c == (gunichar) -2)
     {
-      xuchar_t ch = (max_len > 0) ? (xuchar_t) *utf8 : 0;
-      xchar_t *temp = xstrdup_printf ("\\x%02x", (xuint_t) ch);
+      guchar ch = (max_len > 0) ? (guchar) *utf8 : 0;
+      gchar *temp = g_strdup_printf ("\\x%02x", (guint) ch);
       memset (buf, 0, 8);
       memcpy (buf, temp, strlen (temp));
       g_free (temp);
@@ -582,18 +582,18 @@ utf8_str (const xchar_t *utf8,
 
 G_GNUC_PRINTF(5, 6)
 static void
-set_unescape_error (xmarkup_parse_context_t  *context,
-                    xerror_t              **error,
-                    const xchar_t          *remaining_text,
+set_unescape_error (GMarkupParseContext  *context,
+                    GError              **error,
+                    const gchar          *remaining_text,
                     GMarkupError          code,
-                    const xchar_t          *format,
+                    const gchar          *format,
                     ...)
 {
-  xerror_t *tmp_error;
-  xchar_t *s;
+  GError *tmp_error;
+  gchar *s;
   va_list args;
-  xint_t remaining_newlines;
-  const xchar_t *p;
+  gint remaining_newlines;
+  const gchar *p;
 
   remaining_newlines = 0;
   p = remaining_text;
@@ -605,10 +605,10 @@ set_unescape_error (xmarkup_parse_context_t  *context,
     }
 
   va_start (args, format);
-  s = xstrdup_vprintf (format, args);
+  s = g_strdup_vprintf (format, args);
   va_end (args);
 
-  tmp_error = xerror_new (G_MARKUP_ERROR,
+  tmp_error = g_error_new (G_MARKUP_ERROR,
                            code,
                            _("Error on line %d: %s"),
                            context->line_number - remaining_newlines,
@@ -622,18 +622,18 @@ set_unescape_error (xmarkup_parse_context_t  *context,
 }
 
 /*
- * re-write the xstring_t in-place, unescaping anything that escaped.
+ * re-write the GString in-place, unescaping anything that escaped.
  * most XML does not contain entities, or escaping.
  */
-static xboolean_t
-unescape_xstring_inplace (xmarkup_parse_context_t  *context,
-                          xstring_t              *string,
-                          xboolean_t             *is_ascii,
-                          xerror_t              **error)
+static gboolean
+unescape_gstring_inplace (GMarkupParseContext  *context,
+                          GString              *string,
+                          gboolean             *is_ascii,
+                          GError              **error)
 {
   char mask, *to;
   const char *from;
-  xboolean_t normalize_attribute;
+  gboolean normalize_attribute;
 
   *is_ascii = FALSE;
 
@@ -668,9 +668,9 @@ unescape_xstring_inplace (xmarkup_parse_context_t  *context,
           from++;
           if (*from == '#')
             {
-              xint_t base = 10;
-              xulong_t l;
-              xchar_t *end = NULL;
+              gint base = 10;
+              gulong l;
+              gchar *end = NULL;
 
               from++;
 
@@ -713,7 +713,7 @@ unescape_xstring_inplace (xmarkup_parse_context_t  *context,
                       (0xE000 <= l && l <= 0xFFFD) ||
                       (0x10000 <= l && l <= 0x10FFFF))
                     {
-                      xchar_t buf[8];
+                      gchar buf[8];
                       char_str (l, buf);
                       strcpy (to, buf);
                       to += strlen (buf) - 1;
@@ -786,17 +786,17 @@ unescape_xstring_inplace (xmarkup_parse_context_t  *context,
         }
     }
 
-  xassert (to - string->str <= (xssize_t) string->len);
-  if (to - string->str != (xssize_t) string->len)
-    xstring_truncate (string, to - string->str);
+  g_assert (to - string->str <= (gssize) string->len);
+  if (to - string->str != (gssize) string->len)
+    g_string_truncate (string, to - string->str);
 
   *is_ascii = !(mask & 0x80);
 
   return TRUE;
 }
 
-static inline xboolean_t
-advance_char (xmarkup_parse_context_t *context)
+static inline gboolean
+advance_char (GMarkupParseContext *context)
 {
   context->iter++;
   context->char_number++;
@@ -813,14 +813,14 @@ advance_char (xmarkup_parse_context_t *context)
   return TRUE;
 }
 
-static inline xboolean_t
+static inline gboolean
 xml_isspace (char c)
 {
   return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
 static void
-skip_spaces (xmarkup_parse_context_t *context)
+skip_spaces (GMarkupParseContext *context)
 {
   do
     {
@@ -831,7 +831,7 @@ skip_spaces (xmarkup_parse_context_t *context)
 }
 
 static void
-advance_to_name_end (xmarkup_parse_context_t *context)
+advance_to_name_end (GMarkupParseContext *context)
 {
   do
     {
@@ -844,64 +844,64 @@ advance_to_name_end (xmarkup_parse_context_t *context)
 }
 
 static void
-release_chunk (xmarkup_parse_context_t *context, xstring_t *str)
+release_chunk (GMarkupParseContext *context, GString *str)
 {
-  xslist_t *node;
+  GSList *node;
   if (!str)
     return;
   if (str->allocated_len > 256)
     { /* large strings are unusual and worth freeing */
-      xstring_free (str, TRUE);
+      g_string_free (str, TRUE);
       return;
     }
   string_blank (str);
   node = get_list_node (context, str);
-  context->spare_chunks = xslist_concat (node, context->spare_chunks);
+  context->spare_chunks = g_slist_concat (node, context->spare_chunks);
 }
 
 static void
-add_to_partial (xmarkup_parse_context_t *context,
-                const xchar_t         *text_start,
-                const xchar_t         *text_end)
+add_to_partial (GMarkupParseContext *context,
+                const gchar         *text_start,
+                const gchar         *text_end)
 {
   if (context->partial_chunk == NULL)
     { /* allocate a new chunk to parse into */
 
       if (context->spare_chunks != NULL)
         {
-          xslist_t *node = context->spare_chunks;
-          context->spare_chunks = xslist_remove_link (context->spare_chunks, node);
+          GSList *node = context->spare_chunks;
+          context->spare_chunks = g_slist_remove_link (context->spare_chunks, node);
           context->partial_chunk = node->data;
           free_list_node (context, node);
         }
       else
-        context->partial_chunk = xstring_sized_new (MAX (28, text_end - text_start));
+        context->partial_chunk = g_string_sized_new (MAX (28, text_end - text_start));
     }
 
   if (text_start != text_end)
-    xstring_insert_len (context->partial_chunk, -1,
+    g_string_insert_len (context->partial_chunk, -1,
                          text_start, text_end - text_start);
 }
 
 static inline void
-truncate_partial (xmarkup_parse_context_t *context)
+truncate_partial (GMarkupParseContext *context)
 {
   if (context->partial_chunk != NULL)
     string_blank (context->partial_chunk);
 }
 
-static inline const xchar_t*
-current_element (xmarkup_parse_context_t *context)
+static inline const gchar*
+current_element (GMarkupParseContext *context)
 {
   return context->tag_stack->data;
 }
 
 static void
-pop_subparser_stack (xmarkup_parse_context_t *context)
+pop_subparser_stack (GMarkupParseContext *context)
 {
   GMarkupRecursionTracker *tracker;
 
-  xassert (context->subparser_stack);
+  g_assert (context->subparser_stack);
 
   tracker = context->subparser_stack->data;
 
@@ -913,43 +913,43 @@ pop_subparser_stack (xmarkup_parse_context_t *context)
   context->subparser_element = tracker->prev_element;
   g_slice_free (GMarkupRecursionTracker, tracker);
 
-  context->subparser_stack = xslist_delete_link (context->subparser_stack,
+  context->subparser_stack = g_slist_delete_link (context->subparser_stack,
                                                   context->subparser_stack);
 }
 
 static void
-push_partial_as_tag (xmarkup_parse_context_t *context)
+push_partial_as_tag (GMarkupParseContext *context)
 {
-  xstring_t *str = context->partial_chunk;
+  GString *str = context->partial_chunk;
   /* sadly, this is exported by gmarkup_get_element_stack as-is */
-  context->tag_stack = xslist_concat (get_list_node (context, str->str), context->tag_stack);
-  context->tag_stack_gstr = xslist_concat (get_list_node (context, str), context->tag_stack_gstr);
+  context->tag_stack = g_slist_concat (get_list_node (context, str->str), context->tag_stack);
+  context->tag_stack_gstr = g_slist_concat (get_list_node (context, str), context->tag_stack_gstr);
   context->partial_chunk = NULL;
 }
 
 static void
-pop_tag (xmarkup_parse_context_t *context)
+pop_tag (GMarkupParseContext *context)
 {
-  xslist_t *nodea, *nodeb;
+  GSList *nodea, *nodeb;
 
   nodea = context->tag_stack;
   nodeb = context->tag_stack_gstr;
   release_chunk (context, nodeb->data);
-  context->tag_stack = xslist_remove_link (context->tag_stack, nodea);
-  context->tag_stack_gstr = xslist_remove_link (context->tag_stack_gstr, nodeb);
+  context->tag_stack = g_slist_remove_link (context->tag_stack, nodea);
+  context->tag_stack_gstr = g_slist_remove_link (context->tag_stack_gstr, nodeb);
   free_list_node (context, nodea);
   free_list_node (context, nodeb);
 }
 
 static void
-possibly_finish_subparser (xmarkup_parse_context_t *context)
+possibly_finish_subparser (GMarkupParseContext *context)
 {
   if (current_element (context) == context->subparser_element)
     pop_subparser_stack (context);
 }
 
 static void
-ensure_no_outstanding_subparser (xmarkup_parse_context_t *context)
+ensure_no_outstanding_subparser (GMarkupParseContext *context)
 {
   if (context->awaiting_pop)
     g_critical ("During the first end_element call after invoking a "
@@ -963,15 +963,15 @@ ensure_no_outstanding_subparser (xmarkup_parse_context_t *context)
   context->awaiting_pop = FALSE;
 }
 
-static const xchar_t*
-current_attribute (xmarkup_parse_context_t *context)
+static const gchar*
+current_attribute (GMarkupParseContext *context)
 {
-  xassert (context->cur_attr >= 0);
+  g_assert (context->cur_attr >= 0);
   return context->attr_names[context->cur_attr]->str;
 }
 
-static xboolean_t
-add_attribute (xmarkup_parse_context_t *context, xstring_t *str)
+static gboolean
+add_attribute (GMarkupParseContext *context, GString *str)
 {
   /* Sanity check on the number of attributes. */
   if (context->cur_attr >= 1000)
@@ -980,8 +980,8 @@ add_attribute (xmarkup_parse_context_t *context, xstring_t *str)
   if (context->cur_attr + 2 >= context->alloc_attrs)
     {
       context->alloc_attrs += 5; /* silly magic number */
-      context->attr_names = g_realloc (context->attr_names, sizeof(xstring_t*)*context->alloc_attrs);
-      context->attr_values = g_realloc (context->attr_values, sizeof(xstring_t*)*context->alloc_attrs);
+      context->attr_names = g_realloc (context->attr_names, sizeof(GString*)*context->alloc_attrs);
+      context->attr_values = g_realloc (context->attr_values, sizeof(GString*)*context->alloc_attrs);
     }
   context->cur_attr++;
   context->attr_names[context->cur_attr] = str;
@@ -993,7 +993,7 @@ add_attribute (xmarkup_parse_context_t *context, xstring_t *str)
 }
 
 static void
-clear_attributes (xmarkup_parse_context_t *context)
+clear_attributes (GMarkupParseContext *context)
 {
   /* Go ahead and free the attributes. */
   for (; context->cur_attr >= 0; context->cur_attr--)
@@ -1003,10 +1003,10 @@ clear_attributes (xmarkup_parse_context_t *context)
       release_chunk (context, context->attr_values[pos]);
       context->attr_names[pos] = context->attr_values[pos] = NULL;
     }
-  xassert (context->cur_attr == -1);
-  xassert (context->attr_names == NULL ||
+  g_assert (context->cur_attr == -1);
+  g_assert (context->attr_names == NULL ||
             context->attr_names[0] == NULL);
-  xassert (context->attr_values == NULL ||
+  g_assert (context->attr_values == NULL ||
             context->attr_values[0] == NULL);
 }
 
@@ -1015,14 +1015,14 @@ clear_attributes (xmarkup_parse_context_t *context)
  * with large documents
  */
 static inline void
-emit_start_element (xmarkup_parse_context_t  *context,
-                    xerror_t              **error)
+emit_start_element (GMarkupParseContext  *context,
+                    GError              **error)
 {
   int i, j = 0;
-  const xchar_t *start_name;
-  const xchar_t **attr_names;
-  const xchar_t **attr_values;
-  xerror_t *tmp_error;
+  const gchar *start_name;
+  const gchar **attr_names;
+  const gchar **attr_values;
+  GError *tmp_error;
 
   /* In case we want to ignore qualified tags and we see that we have
    * one here, we push a subparser.  This will ignore all tags inside of
@@ -1033,13 +1033,13 @@ emit_start_element (xmarkup_parse_context_t  *context,
   if ((context->flags & G_MARKUP_IGNORE_QUALIFIED) && strchr (current_element (context), ':'))
     {
       static const GMarkupParser ignore_parser = { 0 };
-      xmarkup_parse_context_push (context, &ignore_parser, NULL);
+      g_markup_parse_context_push (context, &ignore_parser, NULL);
       clear_attributes (context);
       return;
     }
 
-  attr_names = g_newa (const xchar_t *, context->cur_attr + 2);
-  attr_values = g_newa (const xchar_t *, context->cur_attr + 2);
+  attr_names = g_newa (const gchar *, context->cur_attr + 2);
+  attr_values = g_newa (const gchar *, context->cur_attr + 2);
   for (i = 0; i < context->cur_attr + 1; i++)
     {
       /* Possibly omit qualified attribute names from the list */
@@ -1063,8 +1063,8 @@ emit_start_element (xmarkup_parse_context_t  *context,
   if (context->parser->start_element)
     (* context->parser->start_element) (context,
                                         start_name,
-                                        (const xchar_t **)attr_names,
-                                        (const xchar_t **)attr_values,
+                                        (const gchar **)attr_names,
+                                        (const gchar **)attr_values,
                                         context->user_data,
                                         &tmp_error);
   clear_attributes (context);
@@ -1074,22 +1074,22 @@ emit_start_element (xmarkup_parse_context_t  *context,
 }
 
 static void
-emit_end_element (xmarkup_parse_context_t  *context,
-                  xerror_t              **error)
+emit_end_element (GMarkupParseContext  *context,
+                  GError              **error)
 {
   /* We need to pop the tag stack and call the end_element
    * function, since this is the close tag
    */
-  xerror_t *tmp_error = NULL;
+  GError *tmp_error = NULL;
 
-  xassert (context->tag_stack != NULL);
+  g_assert (context->tag_stack != NULL);
 
   possibly_finish_subparser (context);
 
   /* We might have just returned from our ignore subparser */
   if ((context->flags & G_MARKUP_IGNORE_QUALIFIED) && strchr (current_element (context), ':'))
     {
-      xmarkup_parse_context_pop (context);
+      g_markup_parse_context_pop (context);
       pop_tag (context);
       return;
     }
@@ -1113,13 +1113,13 @@ emit_end_element (xmarkup_parse_context_t  *context,
 }
 
 /**
- * xmarkup_parse_context_parse:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_parse:
+ * @context: a #GMarkupParseContext
  * @text: chunk of text to parse
  * @text_len: length of @text in bytes
- * @error: return location for a #xerror_t
+ * @error: return location for a #GError
  *
- * Feed some data to the #xmarkup_parse_context_t.
+ * Feed some data to the #GMarkupParseContext.
  *
  * The data need not be valid UTF-8; an error will be signaled if
  * it's invalid. The data need not be an entire document; you can
@@ -1127,21 +1127,21 @@ emit_end_element (xmarkup_parse_context_t  *context,
  * to this function. Typically, as you receive data from a network
  * connection or file, you feed each received chunk of data into this
  * function, aborting the process if an error occurs. Once an error
- * is reported, no further data may be fed to the #xmarkup_parse_context_t;
+ * is reported, no further data may be fed to the #GMarkupParseContext;
  * all errors are fatal.
  *
  * Returns: %FALSE if an error occurred, %TRUE on success
  */
-xboolean_t
-xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
-                              const xchar_t          *text,
-                              xssize_t                text_len,
-                              xerror_t              **error)
+gboolean
+g_markup_parse_context_parse (GMarkupParseContext  *context,
+                              const gchar          *text,
+                              gssize                text_len,
+                              GError              **error)
 {
-  xreturn_val_if_fail (context != NULL, FALSE);
-  xreturn_val_if_fail (text != NULL, FALSE);
-  xreturn_val_if_fail (context->state != STATE_ERROR, FALSE);
-  xreturn_val_if_fail (!context->parsing, FALSE);
+  g_return_val_if_fail (context != NULL, FALSE);
+  g_return_val_if_fail (text != NULL, FALSE);
+  g_return_val_if_fail (context->state != STATE_ERROR, FALSE);
+  g_return_val_if_fail (!context->parsing, FALSE);
 
   if (text_len < 0)
     text_len = strlen (text);
@@ -1165,7 +1165,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
         case STATE_START:
           /* Possible next state: AFTER_OPEN_ANGLE */
 
-          xassert (context->tag_stack == NULL);
+          g_assert (context->tag_stack == NULL);
 
           /* whitespace is ignored outside of any elements */
           skip_spaces (context);
@@ -1203,7 +1203,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
               *context->iter == '!')
             {
               /* include < in the passthrough */
-              const xchar_t *openangle = "<";
+              const gchar *openangle = "<";
               add_to_partial (context, openangle, openangle + 1);
               context->start = context->iter;
               context->balance = 1;
@@ -1225,7 +1225,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
             }
           else
             {
-              xchar_t buf[8];
+              gchar buf[8];
 
               set_error (context,
                          error,
@@ -1268,7 +1268,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
             }
           else
             {
-              xchar_t buf[8];
+              gchar buf[8];
 
               set_error (context,
                          error,
@@ -1358,7 +1358,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                 }
               else
                 {
-                  xchar_t buf[8];
+                  gchar buf[8];
 
                   set_error (context,
                              error,
@@ -1400,7 +1400,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                 }
               else
                 {
-                  xchar_t buf[8];
+                  gchar buf[8];
 
                   set_error (context,
                              error,
@@ -1445,7 +1445,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                 }
               else
                 {
-                  xchar_t buf[8];
+                  gchar buf[8];
 
                   set_error (context,
                              error,
@@ -1465,7 +1465,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
         case STATE_INSIDE_ATTRIBUTE_VALUE_DQ:
           /* Possible next states: BETWEEN_ATTRIBUTES */
           {
-            xchar_t delim;
+            gchar delim;
 
             if (context->state == STATE_INSIDE_ATTRIBUTE_VALUE_SQ)
               {
@@ -1492,16 +1492,16 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
             }
           else
             {
-              xboolean_t is_ascii;
+              gboolean is_ascii;
               /* The value has ended at the quote mark. Combine it
                * with the partial chunk if any; set it for the current
                * attribute.
                */
               add_to_partial (context, context->start, context->iter);
 
-              xassert (context->cur_attr >= 0);
+              g_assert (context->cur_attr >= 0);
 
-              if (unescape_xstring_inplace (context, context->partial_chunk, &is_ascii, error) &&
+              if (unescape_gstring_inplace (context, context->partial_chunk, &is_ascii, error) &&
                   (is_ascii || text_validate (context, context->partial_chunk->str,
                                               context->partial_chunk->len, error)))
                 {
@@ -1534,16 +1534,16 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
 
           if (context->iter != context->current_text_end)
             {
-              xboolean_t is_ascii;
+              gboolean is_ascii;
 
               /* The text has ended at the open angle. Call the text
                * callback.
                */
-              if (unescape_xstring_inplace (context, context->partial_chunk, &is_ascii, error) &&
+              if (unescape_gstring_inplace (context, context->partial_chunk, &is_ascii, error) &&
                   (is_ascii || text_validate (context, context->partial_chunk->str,
                                               context->partial_chunk->len, error)))
                 {
-                  xerror_t *tmp_error = NULL;
+                  GError *tmp_error = NULL;
 
                   if (context->parser->text)
                     (*context->parser->text) (context,
@@ -1579,7 +1579,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
             }
           else
             {
-              xchar_t buf[8];
+              gchar buf[8];
 
               set_error (context,
                          error,
@@ -1610,14 +1610,14 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
 
           if (context->iter != context->current_text_end)
             {
-              xstring_t *close_name;
+              GString *close_name;
 
               close_name = context->partial_chunk;
               context->partial_chunk = NULL;
 
               if (*context->iter != '>')
                 {
-                  xchar_t buf[8];
+                  gchar buf[8];
 
                   set_error (context,
                              error,
@@ -1669,8 +1669,8 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                 context->balance++;
               if (*context->iter == '>')
                 {
-                  xchar_t *str;
-                  xsize_t len;
+                  gchar *str;
+                  gsize len;
 
                   context->balance--;
                   add_to_partial (context, context->start, context->iter);
@@ -1708,7 +1708,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                * callback. Note that the open/close angles are
                * included in the text of the passthrough.
                */
-              xerror_t *tmp_error = NULL;
+              GError *tmp_error = NULL;
 
               advance_char (context); /* advance past close angle */
               add_to_partial (context, context->start, context->iter);
@@ -1767,29 +1767,29 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
 }
 
 /**
- * xmarkup_parse_context_end_parse:
- * @context: a #xmarkup_parse_context_t
- * @error: return location for a #xerror_t
+ * g_markup_parse_context_end_parse:
+ * @context: a #GMarkupParseContext
+ * @error: return location for a #GError
  *
- * Signals to the #xmarkup_parse_context_t that all data has been
- * fed into the parse context with xmarkup_parse_context_parse().
+ * Signals to the #GMarkupParseContext that all data has been
+ * fed into the parse context with g_markup_parse_context_parse().
  *
  * This function reports an error if the document isn't complete,
  * for example if elements are still open.
  *
  * Returns: %TRUE on success, %FALSE if an error was set
  */
-xboolean_t
-xmarkup_parse_context_end_parse (xmarkup_parse_context_t  *context,
-                                  xerror_t              **error)
+gboolean
+g_markup_parse_context_end_parse (GMarkupParseContext  *context,
+                                  GError              **error)
 {
-  xreturn_val_if_fail (context != NULL, FALSE);
-  xreturn_val_if_fail (!context->parsing, FALSE);
-  xreturn_val_if_fail (context->state != STATE_ERROR, FALSE);
+  g_return_val_if_fail (context != NULL, FALSE);
+  g_return_val_if_fail (!context->parsing, FALSE);
+  g_return_val_if_fail (context->state != STATE_ERROR, FALSE);
 
   if (context->partial_chunk != NULL)
     {
-      xstring_free (context->partial_chunk, TRUE);
+      g_string_free (context->partial_chunk, TRUE);
       context->partial_chunk = NULL;
     }
 
@@ -1861,7 +1861,7 @@ xmarkup_parse_context_end_parse (xmarkup_parse_context_t  *context,
       break;
 
     case STATE_INSIDE_TEXT:
-      xassert (context->tag_stack != NULL);
+      g_assert (context->tag_stack != NULL);
       set_error (context, error, G_MARKUP_ERROR_PARSE,
                  _("Document ended unexpectedly with elements still open — "
                    "“%s” was the last element opened"),
@@ -1899,23 +1899,23 @@ xmarkup_parse_context_end_parse (xmarkup_parse_context_t  *context,
 }
 
 /**
- * xmarkup_parse_context_get_element:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_get_element:
+ * @context: a #GMarkupParseContext
  *
  * Retrieves the name of the currently open element.
  *
  * If called from the start_element or end_element handlers this will
  * give the element_name as passed to those functions. For the parent
- * elements, see xmarkup_parse_context_get_element_stack().
+ * elements, see g_markup_parse_context_get_element_stack().
  *
  * Returns: the name of the currently open element, or %NULL
  *
  * Since: 2.2
  */
-const xchar_t *
-xmarkup_parse_context_get_element (xmarkup_parse_context_t *context)
+const gchar *
+g_markup_parse_context_get_element (GMarkupParseContext *context)
 {
-  xreturn_val_if_fail (context != NULL, NULL);
+  g_return_val_if_fail (context != NULL, NULL);
 
   if (context->tag_stack == NULL)
     return NULL;
@@ -1924,18 +1924,18 @@ xmarkup_parse_context_get_element (xmarkup_parse_context_t *context)
 }
 
 /**
- * xmarkup_parse_context_get_element_stack:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_get_element_stack:
+ * @context: a #GMarkupParseContext
  *
  * Retrieves the element stack from the internal state of the parser.
  *
- * The returned #xslist_t is a list of strings where the first item is
+ * The returned #GSList is a list of strings where the first item is
  * the currently open tag (as would be returned by
- * xmarkup_parse_context_get_element()) and the next item is its
+ * g_markup_parse_context_get_element()) and the next item is its
  * immediate parent.
  *
  * This function is intended to be used in the start_element and
- * end_element handlers where xmarkup_parse_context_get_element()
+ * end_element handlers where g_markup_parse_context_get_element()
  * would merely return the name of the element that is being
  * processed.
  *
@@ -1943,16 +1943,16 @@ xmarkup_parse_context_get_element (xmarkup_parse_context_t *context)
  *
  * Since: 2.16
  */
-const xslist_t *
-xmarkup_parse_context_get_element_stack (xmarkup_parse_context_t *context)
+const GSList *
+g_markup_parse_context_get_element_stack (GMarkupParseContext *context)
 {
-  xreturn_val_if_fail (context != NULL, NULL);
+  g_return_val_if_fail (context != NULL, NULL);
   return context->tag_stack;
 }
 
 /**
- * xmarkup_parse_context_get_position:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_get_position:
+ * @context: a #GMarkupParseContext
  * @line_number: (out) (optional): return location for a line number, or %NULL
  * @char_number: (out) (optional): return location for a char-on-line number, or %NULL
  *
@@ -1962,9 +1962,9 @@ xmarkup_parse_context_get_element_stack (xmarkup_parse_context_t *context)
  * "the best number we could come up with for error messages."
  */
 void
-xmarkup_parse_context_get_position (xmarkup_parse_context_t *context,
-                                     xint_t                *line_number,
-                                     xint_t                *char_number)
+g_markup_parse_context_get_position (GMarkupParseContext *context,
+                                     gint                *line_number,
+                                     gint                *char_number)
 {
   g_return_if_fail (context != NULL);
 
@@ -1976,30 +1976,30 @@ xmarkup_parse_context_get_position (xmarkup_parse_context_t *context,
 }
 
 /**
- * xmarkup_parse_context_get_user_data:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_get_user_data:
+ * @context: a #GMarkupParseContext
  *
  * Returns the user_data associated with @context.
  *
  * This will either be the user_data that was provided to
- * xmarkup_parse_context_new() or to the most recent call
- * of xmarkup_parse_context_push().
+ * g_markup_parse_context_new() or to the most recent call
+ * of g_markup_parse_context_push().
  *
  * Returns: the provided user_data. The returned data belongs to
  *     the markup context and will be freed when
- *     xmarkup_parse_context_free() is called.
+ *     g_markup_parse_context_free() is called.
  *
  * Since: 2.18
  */
-xpointer_t
-xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
+gpointer
+g_markup_parse_context_get_user_data (GMarkupParseContext *context)
 {
   return context->user_data;
 }
 
 /**
- * xmarkup_parse_context_push:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_push:
+ * @context: a #GMarkupParseContext
  * @parser: a #GMarkupParser
  * @user_data: user data to pass to #GMarkupParser functions
  *
@@ -2007,7 +2007,7 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  *
  * This function may only be called from the start_element handler of
  * a #GMarkupParser. It must be matched with a corresponding call to
- * xmarkup_parse_context_pop() in the matching end_element handler
+ * g_markup_parse_context_pop() in the matching end_element handler
  * (except in the case that the parser aborts due to an error).
  *
  * All tags, text and other data between the matching tags is
@@ -2018,10 +2018,10 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  *
  * The end tag matching the start tag for which this call was made is
  * handled by the previous parser (which is given its own user_data)
- * which is why xmarkup_parse_context_pop() is provided to allow "one
+ * which is why g_markup_parse_context_pop() is provided to allow "one
  * last access" to the @user_data provided to this function. In the
  * case of error, the @user_data provided here is passed directly to
- * the error callback of the subparser and xmarkup_parse_context_pop()
+ * the error callback of the subparser and g_markup_parse_context_pop()
  * should not be called. In either case, if @user_data was allocated
  * then it ought to be freed from both of these locations.
  *
@@ -2033,19 +2033,19 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  * As an example, see the following implementation of a simple
  * parser that counts the number of tags encountered.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * typedef struct
  * {
- *   xint_t tag_count;
+ *   gint tag_count;
  * } CounterData;
  *
  * static void
- * counter_start_element (xmarkup_parse_context_t  *context,
- *                        const xchar_t          *element_name,
- *                        const xchar_t         **attribute_names,
- *                        const xchar_t         **attribute_values,
- *                        xpointer_t              user_data,
- *                        xerror_t              **error)
+ * counter_start_element (GMarkupParseContext  *context,
+ *                        const gchar          *element_name,
+ *                        const gchar         **attribute_names,
+ *                        const gchar         **attribute_values,
+ *                        gpointer              user_data,
+ *                        GError              **error)
  * {
  *   CounterData *data = user_data;
  *
@@ -2053,9 +2053,9 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  * }
  *
  * static void
- * counter_error (xmarkup_parse_context_t *context,
- *                xerror_t              *error,
- *                xpointer_t             user_data)
+ * counter_error (GMarkupParseContext *context,
+ *                GError              *error,
+ *                gpointer             user_data)
  * {
  *   CounterData *data = user_data;
  *
@@ -2075,20 +2075,20 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  * In order to allow this parser to be easily used as a subparser, the
  * following interface is provided:
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * void
- * start_counting (xmarkup_parse_context_t *context)
+ * start_counting (GMarkupParseContext *context)
  * {
  *   CounterData *data = g_slice_new (CounterData);
  *
  *   data->tag_count = 0;
- *   xmarkup_parse_context_push (context, &counter_subparser, data);
+ *   g_markup_parse_context_push (context, &counter_subparser, data);
  * }
  *
- * xint_t
- * end_counting (xmarkup_parse_context_t *context)
+ * gint
+ * end_counting (GMarkupParseContext *context)
  * {
- *   CounterData *data = xmarkup_parse_context_pop (context);
+ *   CounterData *data = g_markup_parse_context_pop (context);
  *   int result;
  *
  *   result = data->tag_count;
@@ -2100,7 +2100,7 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  *
  * The subparser would then be used as follows:
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * static void start_element (context, element_name, ...)
  * {
  *   if (strcmp (element_name, "count-these") == 0)
@@ -2121,9 +2121,9 @@ xmarkup_parse_context_get_user_data (xmarkup_parse_context_t *context)
  * Since: 2.18
  **/
 void
-xmarkup_parse_context_push (xmarkup_parse_context_t *context,
+g_markup_parse_context_push (GMarkupParseContext *context,
                              const GMarkupParser *parser,
-                             xpointer_t             user_data)
+                             gpointer             user_data)
 {
   GMarkupRecursionTracker *tracker;
 
@@ -2136,20 +2136,20 @@ xmarkup_parse_context_push (xmarkup_parse_context_t *context,
   context->parser = parser;
   context->user_data = user_data;
 
-  context->subparser_stack = xslist_prepend (context->subparser_stack,
+  context->subparser_stack = g_slist_prepend (context->subparser_stack,
                                               tracker);
 }
 
 /**
- * xmarkup_parse_context_pop:
- * @context: a #xmarkup_parse_context_t
+ * g_markup_parse_context_pop:
+ * @context: a #GMarkupParseContext
  *
  * Completes the process of a temporary sub-parser redirection.
  *
  * This function exists to collect the user_data allocated by a
- * matching call to xmarkup_parse_context_push(). It must be called
+ * matching call to g_markup_parse_context_push(). It must be called
  * in the end_element handler corresponding to the start_element
- * handler during which xmarkup_parse_context_push() was called.
+ * handler during which g_markup_parse_context_push() was called.
  * You must not call this function from the error callback -- the
  * @user_data is provided directly to the callback in that case.
  *
@@ -2158,19 +2158,19 @@ xmarkup_parse_context_push (xmarkup_parse_context_t *context,
  * be used by the subparsers themselves to implement a higher-level
  * interface.
  *
- * Returns: the user data passed to xmarkup_parse_context_push()
+ * Returns: the user data passed to g_markup_parse_context_push()
  *
  * Since: 2.18
  */
-xpointer_t
-xmarkup_parse_context_pop (xmarkup_parse_context_t *context)
+gpointer
+g_markup_parse_context_pop (GMarkupParseContext *context)
 {
-  xpointer_t user_data;
+  gpointer user_data;
 
   if (!context->awaiting_pop)
     possibly_finish_subparser (context);
 
-  xassert (context->awaiting_pop);
+  g_assert (context->awaiting_pop);
 
   context->awaiting_pop = FALSE;
 
@@ -2184,7 +2184,7 @@ xmarkup_parse_context_pop (xmarkup_parse_context_t *context)
 #define APPEND_TEXT_AND_SEEK(_str, _start, _end)          \
   G_STMT_START {                                          \
     if (_end > _start)                                    \
-      xstring_append_len (_str, _start, _end - _start);  \
+      g_string_append_len (_str, _start, _end - _start);  \
     _start = ++_end;                                      \
   } G_STMT_END
 
@@ -2197,49 +2197,49 @@ xmarkup_parse_context_pop (xmarkup_parse_context_t *context)
  * 0xC286 - 0xC29F have to be escaped (excluding the surrogate blocks).
  * Corresponding Unicode code points are [0x7F-0x84] and [0x86-0x9F].
  *
- * So instead of using costly xutf8_next_char or similar UTF8 functions, it's
+ * So instead of using costly g_utf8_next_char or similar UTF8 functions, it's
  * better to read each byte, and make an exception for 0xC2XX.
  */
 static void
-append_escaped_text (xstring_t     *str,
-                     const xchar_t *text,
-                     xssize_t       length)
+append_escaped_text (GString     *str,
+                     const gchar *text,
+                     gssize       length)
 {
-  const xchar_t *p, *pending;
-  const xchar_t *end;
+  const gchar *p, *pending;
+  const gchar *end;
 
   p = pending = text;
   end = text + length;
 
   while (p < end && pending < end)
     {
-      xuchar_t c = (xuchar_t) *pending;
+      guchar c = (guchar) *pending;
 
       switch (c)
         {
         case '&':
           APPEND_TEXT_AND_SEEK (str, p, pending);
-          xstring_append (str, "&amp;");
+          g_string_append (str, "&amp;");
           break;
 
         case '<':
           APPEND_TEXT_AND_SEEK (str, p, pending);
-          xstring_append (str, "&lt;");
+          g_string_append (str, "&lt;");
           break;
 
         case '>':
           APPEND_TEXT_AND_SEEK (str, p, pending);
-          xstring_append (str, "&gt;");
+          g_string_append (str, "&gt;");
           break;
 
         case '\'':
           APPEND_TEXT_AND_SEEK (str, p, pending);
-          xstring_append (str, "&apos;");
+          g_string_append (str, "&apos;");
           break;
 
         case '"':
           APPEND_TEXT_AND_SEEK (str, p, pending);
-          xstring_append (str, "&quot;");
+          g_string_append (str, "&quot;");
           break;
 
         default:
@@ -2249,18 +2249,18 @@ append_escaped_text (xstring_t     *str,
               (c == 0x7f))
             {
               APPEND_TEXT_AND_SEEK (str, p, pending);
-              xstring_append_printf (str, "&#x%x;", c);
+              g_string_append_printf (str, "&#x%x;", c);
             }
           /* The utf-8 control characters to escape begins with 0xc2 byte */
           else if (c == 0xc2)
             {
-              xunichar_t u = xutf8_get_char (pending);
+              gunichar u = g_utf8_get_char (pending);
 
               if ((0x7f < u && u <= 0x84) ||
                   (0x86 <= u && u <= 0x9f))
                 {
                   APPEND_TEXT_AND_SEEK (str, p, pending);
-                  xstring_append_printf (str, "&#x%x;", u);
+                  g_string_append_printf (str, "&#x%x;", u);
 
                   /*
                    * We have appended a two byte character above, which
@@ -2279,7 +2279,7 @@ append_escaped_text (xstring_t     *str,
     }
 
   if (pending > p)
-    xstring_append_len (str, p, pending - p);
+    g_string_append_len (str, p, pending - p);
 }
 
 #undef APPEND_TEXT_AND_SEEK
@@ -2306,22 +2306,22 @@ append_escaped_text (xstring_t     *str,
  *
  * Returns: a newly allocated string with the escaped text
  */
-xchar_t*
-g_markup_escape_text (const xchar_t *text,
-                      xssize_t       length)
+gchar*
+g_markup_escape_text (const gchar *text,
+                      gssize       length)
 {
-  xstring_t *str;
+  GString *str;
 
-  xreturn_val_if_fail (text != NULL, NULL);
+  g_return_val_if_fail (text != NULL, NULL);
 
   if (length < 0)
     length = strlen (text);
 
   /* prealloc at least as long as original text */
-  str = xstring_sized_new (length);
+  str = g_string_sized_new (length);
   append_escaped_text (str, text, length);
 
-  return xstring_free (str, FALSE);
+  return g_string_free (str, FALSE);
 }
 
 /*
@@ -2362,7 +2362,7 @@ find_conversion (const char  *format,
       return NULL;
     }
 
-  /* test_t for positional argument.  */
+  /* Test for positional argument.  */
   if (*cp >= '0' && *cp <= '9')
     {
       const char *np;
@@ -2392,7 +2392,7 @@ find_conversion (const char  *format,
     {
       cp++;
 
-      /* test_t for positional argument.  */
+      /* Test for positional argument.  */
       if (*cp >= '0' && *cp <= '9')
         {
           const char *np;
@@ -2415,7 +2415,7 @@ find_conversion (const char  *format,
       cp++;
       if (*cp == '*')
         {
-          /* test_t for positional argument.  */
+          /* Test for positional argument.  */
           if (*cp >= '0' && *cp <= '9')
             {
               const char *np;
@@ -2467,22 +2467,22 @@ find_conversion (const char  *format,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
-xchar_t *
-g_markup_vprintf_escaped (const xchar_t *format,
+gchar *
+g_markup_vprintf_escaped (const gchar *format,
                           va_list      args)
 {
-  xstring_t *format1;
-  xstring_t *format2;
-  xstring_t *result = NULL;
-  xchar_t *output1 = NULL;
-  xchar_t *output2 = NULL;
+  GString *format1;
+  GString *format2;
+  GString *result = NULL;
+  gchar *output1 = NULL;
+  gchar *output2 = NULL;
   const char *p, *op1, *op2;
   va_list args2;
 
   /* The technique here, is that we make two format strings that
    * have the identical conversions in the identical order to the
    * original strings, but differ in the text in-between. We
-   * then use the normal xstrdup_vprintf() to format the arguments
+   * then use the normal g_strdup_vprintf() to format the arguments
    * with the two new format strings. By comparing the results,
    * we can figure out what segments of the output come from
    * the original format string, and what from the arguments,
@@ -2508,8 +2508,8 @@ g_markup_vprintf_escaped (const xchar_t *format,
 
   /* Create the two modified format strings
    */
-  format1 = xstring_new (NULL);
-  format2 = xstring_new (NULL);
+  format1 = g_string_new (NULL);
+  format2 = g_string_new (NULL);
   p = format;
   while (TRUE)
     {
@@ -2518,10 +2518,10 @@ g_markup_vprintf_escaped (const xchar_t *format,
       if (!conv)
         break;
 
-      xstring_append_len (format1, conv, after - conv);
-      xstring_append_c (format1, 'X');
-      xstring_append_len (format2, conv, after - conv);
-      xstring_append_c (format2, 'Y');
+      g_string_append_len (format1, conv, after - conv);
+      g_string_append_c (format1, 'X');
+      g_string_append_len (format2, conv, after - conv);
+      g_string_append_c (format2, 'Y');
 
       p = after;
     }
@@ -2530,7 +2530,7 @@ g_markup_vprintf_escaped (const xchar_t *format,
    */
   G_VA_COPY (args2, args);
 
-  output1 = xstrdup_vprintf (format1->str, args);
+  output1 = g_strdup_vprintf (format1->str, args);
 
   if (!output1)
     {
@@ -2538,11 +2538,11 @@ g_markup_vprintf_escaped (const xchar_t *format,
       goto cleanup;
     }
 
-  output2 = xstrdup_vprintf (format2->str, args2);
+  output2 = g_strdup_vprintf (format2->str, args2);
   va_end (args2);
   if (!output2)
     goto cleanup;
-  result = xstring_new (NULL);
+  result = g_string_new (NULL);
 
   /* Iterate through the original format string again,
    * copying the non-conversion portions and the escaped
@@ -2560,11 +2560,11 @@ g_markup_vprintf_escaped (const xchar_t *format,
 
       if (!conv)        /* The end, after points to the trailing \0 */
         {
-          xstring_append_len (result, p, after - p);
+          g_string_append_len (result, p, after - p);
           break;
         }
 
-      xstring_append_len (result, p, conv - p);
+      g_string_append_len (result, p, conv - p);
       output_start = op1;
       while (*op1 == *op2)
         {
@@ -2573,7 +2573,7 @@ g_markup_vprintf_escaped (const xchar_t *format,
         }
 
       escaped = g_markup_escape_text (output_start, op1 - output_start);
-      xstring_append (result, escaped);
+      g_string_append (result, escaped);
       g_free (escaped);
 
       p = after;
@@ -2582,13 +2582,13 @@ g_markup_vprintf_escaped (const xchar_t *format,
     }
 
  cleanup:
-  xstring_free (format1, TRUE);
-  xstring_free (format2, TRUE);
+  g_string_free (format1, TRUE);
+  g_string_free (format2, TRUE);
   g_free (output1);
   g_free (output2);
 
   if (result)
-    return xstring_free (result, FALSE);
+    return g_string_free (result, FALSE);
   else
     return NULL;
 }
@@ -2607,11 +2607,11 @@ g_markup_vprintf_escaped (const xchar_t *format,
  * output, without having to worry that the strings
  * might themselves contain markup.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * const char *store = "Fortnum & Mason";
  * const char *item = "Tea";
  * char *output;
- *
+ * 
  * output = g_markup_printf_escaped ("<purchase>"
  *                                   "<store>%s</store>"
  *                                   "<item>%s</item>"
@@ -2624,8 +2624,8 @@ g_markup_vprintf_escaped (const xchar_t *format,
  *
  * Since: 2.4
  */
-xchar_t *
-g_markup_printf_escaped (const xchar_t *format, ...)
+gchar *
+g_markup_printf_escaped (const gchar *format, ...)
 {
   char *result;
   va_list args;
@@ -2637,13 +2637,13 @@ g_markup_printf_escaped (const xchar_t *format, ...)
   return result;
 }
 
-static xboolean_t
+static gboolean
 g_markup_parse_boolean (const char  *string,
-                        xboolean_t    *value)
+                        gboolean    *value)
 {
   char const * const falses[] = { "false", "f", "no", "n", "0" };
   char const * const trues[] = { "true", "t", "yes", "y", "1" };
-  xsize_t i;
+  gsize i;
 
   for (i = 0; i < G_N_ELEMENTS (falses); i++)
     {
@@ -2679,9 +2679,9 @@ g_markup_parse_boolean (const char  *string,
  *     char **). If %G_MARKUP_COLLECT_OPTIONAL is specified and the
  *     attribute isn't present then the pointer will be set to %NULL
  * @G_MARKUP_COLLECT_STRDUP: as with %G_MARKUP_COLLECT_STRING, but
- *     expects a parameter of type (char **) and xstrdup()s the
+ *     expects a parameter of type (char **) and g_strdup()s the
  *     returned pointer. The pointer must be freed with g_free()
- * @G_MARKUP_COLLECT_BOOLEAN: expects a parameter of type (xboolean_t *)
+ * @G_MARKUP_COLLECT_BOOLEAN: expects a parameter of type (gboolean *)
  *     and parses the attribute value as a boolean. Sets %FALSE if the
  *     attribute isn't present. Valid boolean values consist of
  *     (case-insensitive) "false", "f", "no", "n", "0" and "true", "t",
@@ -2707,7 +2707,7 @@ g_markup_parse_boolean (const char  *string,
  * @element_name: the current tag name
  * @attribute_names: the attribute names
  * @attribute_values: the attribute values
- * @error: a pointer to a #xerror_t or %NULL
+ * @error: a pointer to a #GError or %NULL
  * @first_type: the #GMarkupCollectType of the first attribute
  * @first_attr: the name of the first attribute
  * @...: a pointer to the storage location of the first attribute
@@ -2751,18 +2751,18 @@ g_markup_parse_boolean (const char  *string,
  *
  * Since: 2.16
  **/
-xboolean_t
-g_markup_collect_attributes (const xchar_t         *element_name,
-                             const xchar_t        **attribute_names,
-                             const xchar_t        **attribute_values,
-                             xerror_t             **error,
+gboolean
+g_markup_collect_attributes (const gchar         *element_name,
+                             const gchar        **attribute_names,
+                             const gchar        **attribute_values,
+                             GError             **error,
                              GMarkupCollectType   first_type,
-                             const xchar_t         *first_attr,
+                             const gchar         *first_attr,
                              ...)
 {
   GMarkupCollectType type;
-  const xchar_t *attr;
-  xuint64_t collected;
+  const gchar *attr;
+  guint64 collected;
   int written;
   va_list ap;
   int i;
@@ -2775,8 +2775,8 @@ g_markup_collect_attributes (const xchar_t         *element_name,
   va_start (ap, first_attr);
   while (type != G_MARKUP_COLLECT_INVALID)
     {
-      xboolean_t mandatory;
-      const xchar_t *value;
+      gboolean mandatory;
+      const gchar *value;
 
       mandatory = !(type & G_MARKUP_COLLECT_OPTIONAL);
       type &= (G_MARKUP_COLLECT_OPTIONAL - 1);
@@ -2841,7 +2841,7 @@ g_markup_collect_attributes (const xchar_t         *element_name,
             str_ptr = va_arg (ap, char **);
 
             if (str_ptr != NULL)
-              *str_ptr = xstrdup (value);
+              *str_ptr = g_strdup (value);
           }
           break;
 
@@ -2849,9 +2849,9 @@ g_markup_collect_attributes (const xchar_t         *element_name,
         case G_MARKUP_COLLECT_TRISTATE:
           if (value == NULL)
             {
-              xboolean_t *bool_ptr;
+              gboolean *bool_ptr;
 
-              bool_ptr = va_arg (ap, xboolean_t *);
+              bool_ptr = va_arg (ap, gboolean *);
 
               if (bool_ptr != NULL)
                 {
@@ -2867,7 +2867,7 @@ g_markup_collect_attributes (const xchar_t         *element_name,
             }
           else
             {
-              if (!g_markup_parse_boolean (value, va_arg (ap, xboolean_t *)))
+              if (!g_markup_parse_boolean (value, va_arg (ap, gboolean *)))
                 {
                   g_set_error (error, G_MARKUP_ERROR,
                                G_MARKUP_ERROR_INVALID_CONTENT,
@@ -2935,9 +2935,9 @@ failure:
   va_start (ap, first_attr);
   while (type != G_MARKUP_COLLECT_INVALID)
     {
-      xpointer_t ptr;
+      gpointer ptr;
 
-      ptr = va_arg (ap, xpointer_t);
+      ptr = va_arg (ap, gpointer);
 
       if (ptr != NULL)
         {
@@ -2954,11 +2954,11 @@ failure:
               break;
 
             case G_MARKUP_COLLECT_BOOLEAN:
-              *(xboolean_t *) ptr = FALSE;
+              *(gboolean *) ptr = FALSE;
               break;
 
             case G_MARKUP_COLLECT_TRISTATE:
-              *(xboolean_t *) ptr = -1;
+              *(gboolean *) ptr = -1;
               break;
             }
         }

@@ -24,28 +24,28 @@
 
 typedef struct
 {
-  xhashtable_t *table;
-  xmutex_t      lock;
-  xcond_t       cond;
-  xboolean_t    requested_state;
-  xcallback_t   requested_func;
-  xboolean_t    effective_state;
-} xcontext_specific_group_t;
+  GHashTable *table;
+  GMutex      lock;
+  GCond       cond;
+  gboolean    requested_state;
+  GCallback   requested_func;
+  gboolean    effective_state;
+} GContextSpecificGroup;
 
-xpointer_t
-xcontext_specific_group_get (xcontext_specific_group_t *group,
-                              xtype_t                  type,
-                              xoffset_t                context_offset,
-                              xcallback_t              start_func);
-
-void
-xcontext_specific_group_remove (xcontext_specific_group_t *group,
-                                 xmain_context_t          *context,
-                                 xpointer_t               instance,
-                                 xcallback_t              stop_func);
+gpointer
+g_context_specific_group_get (GContextSpecificGroup *group,
+                              GType                  type,
+                              goffset                context_offset,
+                              GCallback              start_func);
 
 void
-xcontext_specific_group_emit (xcontext_specific_group_t *group,
-                               xuint_t                  signal_id);
+g_context_specific_group_remove (GContextSpecificGroup *group,
+                                 GMainContext          *context,
+                                 gpointer               instance,
+                                 GCallback              stop_func);
+
+void
+g_context_specific_group_emit (GContextSpecificGroup *group,
+                               guint                  signal_id);
 
 #endif /* __G_CONTEXT_SPECIFIC_GROUP_H__ */

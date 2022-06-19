@@ -29,76 +29,76 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INPUT_STREAM         (xinput_stream_get_type ())
-#define G_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INPUT_STREAM, xinput_stream))
-#define G_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INPUT_STREAM, xinput_stream_class_t))
-#define X_IS_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INPUT_STREAM))
-#define X_IS_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INPUT_STREAM))
-#define G_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INPUT_STREAM, xinput_stream_class_t))
+#define G_TYPE_INPUT_STREAM         (g_input_stream_get_type ())
+#define G_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_INPUT_STREAM, GInputStream))
+#define G_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_INPUT_STREAM, GInputStreamClass))
+#define G_IS_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_INPUT_STREAM))
+#define G_IS_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_INPUT_STREAM))
+#define G_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_INPUT_STREAM, GInputStreamClass))
 
 /**
- * xinput_stream_t:
+ * GInputStream:
  *
  * Base class for streaming input operations.
  **/
-typedef struct _xinput_stream_class    xinput_stream_class_t;
+typedef struct _GInputStreamClass    GInputStreamClass;
 typedef struct _GInputStreamPrivate  GInputStreamPrivate;
 
 struct _GInputStream
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
   GInputStreamPrivate *priv;
 };
 
-struct _xinput_stream_class
+struct _GInputStreamClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* Sync ops: */
 
-  xssize_t   (* read_fn)      (xinput_stream_t        *stream,
+  gssize   (* read_fn)      (GInputStream        *stream,
                              void                *buffer,
-                             xsize_t                count,
-                             xcancellable_t        *cancellable,
-                             xerror_t             **error);
-  xssize_t   (* skip)         (xinput_stream_t        *stream,
-                             xsize_t                count,
-                             xcancellable_t        *cancellable,
-                             xerror_t             **error);
-  xboolean_t (* close_fn)	    (xinput_stream_t        *stream,
-                             xcancellable_t        *cancellable,
-                             xerror_t             **error);
+                             gsize                count,
+                             GCancellable        *cancellable,
+                             GError             **error);
+  gssize   (* skip)         (GInputStream        *stream,
+                             gsize                count,
+                             GCancellable        *cancellable,
+                             GError             **error);
+  gboolean (* close_fn)	    (GInputStream        *stream,
+                             GCancellable        *cancellable,
+                             GError             **error);
 
   /* Async ops: (optional in derived classes) */
-  void     (* read_async)   (xinput_stream_t        *stream,
+  void     (* read_async)   (GInputStream        *stream,
                              void                *buffer,
-                             xsize_t                count,
+                             gsize                count,
                              int                  io_priority,
-                             xcancellable_t        *cancellable,
-                             xasync_ready_callback_t  callback,
-                             xpointer_t             user_data);
-  xssize_t   (* read_finish)  (xinput_stream_t        *stream,
-                             xasync_result_t        *result,
-                             xerror_t             **error);
-  void     (* skip_async)   (xinput_stream_t        *stream,
-                             xsize_t                count,
+                             GCancellable        *cancellable,
+                             GAsyncReadyCallback  callback,
+                             gpointer             user_data);
+  gssize   (* read_finish)  (GInputStream        *stream,
+                             GAsyncResult        *result,
+                             GError             **error);
+  void     (* skip_async)   (GInputStream        *stream,
+                             gsize                count,
                              int                  io_priority,
-                             xcancellable_t        *cancellable,
-                             xasync_ready_callback_t  callback,
-                             xpointer_t             user_data);
-  xssize_t   (* skip_finish)  (xinput_stream_t        *stream,
-                             xasync_result_t        *result,
-                             xerror_t             **error);
-  void     (* close_async)  (xinput_stream_t        *stream,
+                             GCancellable        *cancellable,
+                             GAsyncReadyCallback  callback,
+                             gpointer             user_data);
+  gssize   (* skip_finish)  (GInputStream        *stream,
+                             GAsyncResult        *result,
+                             GError             **error);
+  void     (* close_async)  (GInputStream        *stream,
                              int                  io_priority,
-                             xcancellable_t        *cancellable,
-                             xasync_ready_callback_t  callback,
-                             xpointer_t             user_data);
-  xboolean_t (* close_finish) (xinput_stream_t        *stream,
-                             xasync_result_t        *result,
-                             xerror_t             **error);
+                             GCancellable        *cancellable,
+                             GAsyncReadyCallback  callback,
+                             gpointer             user_data);
+  gboolean (* close_finish) (GInputStream        *stream,
+                             GAsyncResult        *result,
+                             GError             **error);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -109,107 +109,107 @@ struct _xinput_stream_class
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xinput_stream_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_input_stream_get_type      (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xssize_t   xinput_stream_read          (xinput_stream_t          *stream,
+GLIB_AVAILABLE_IN_ALL
+gssize   g_input_stream_read          (GInputStream          *stream,
 				       void                  *buffer,
-				       xsize_t                  count,
-				       xcancellable_t          *cancellable,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinput_stream_read_all      (xinput_stream_t          *stream,
+				       gsize                  count,
+				       GCancellable          *cancellable,
+				       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_input_stream_read_all      (GInputStream          *stream,
 				       void                  *buffer,
-				       xsize_t                  count,
-				       xsize_t                 *bytes_read,
-				       xcancellable_t          *cancellable,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_2_34
-xbytes_t  *xinput_stream_read_bytes    (xinput_stream_t          *stream,
-				       xsize_t                  count,
-				       xcancellable_t          *cancellable,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t   xinput_stream_skip          (xinput_stream_t          *stream,
-				       xsize_t                  count,
-				       xcancellable_t          *cancellable,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinput_stream_close         (xinput_stream_t          *stream,
-				       xcancellable_t          *cancellable,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-void     xinput_stream_read_async    (xinput_stream_t          *stream,
+				       gsize                  count,
+				       gsize                 *bytes_read,
+				       GCancellable          *cancellable,
+				       GError               **error);
+GLIB_AVAILABLE_IN_2_34
+GBytes  *g_input_stream_read_bytes    (GInputStream          *stream,
+				       gsize                  count,
+				       GCancellable          *cancellable,
+				       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gssize   g_input_stream_skip          (GInputStream          *stream,
+				       gsize                  count,
+				       GCancellable          *cancellable,
+				       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_input_stream_close         (GInputStream          *stream,
+				       GCancellable          *cancellable,
+				       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+void     g_input_stream_read_async    (GInputStream          *stream,
 				       void                  *buffer,
-				       xsize_t                  count,
+				       gsize                  count,
 				       int                    io_priority,
-				       xcancellable_t          *cancellable,
-				       xasync_ready_callback_t    callback,
-				       xpointer_t               user_data);
-XPL_AVAILABLE_IN_ALL
-xssize_t   xinput_stream_read_finish   (xinput_stream_t          *stream,
-				       xasync_result_t          *result,
-				       xerror_t               **error);
+				       GCancellable          *cancellable,
+				       GAsyncReadyCallback    callback,
+				       gpointer               user_data);
+GLIB_AVAILABLE_IN_ALL
+gssize   g_input_stream_read_finish   (GInputStream          *stream,
+				       GAsyncResult          *result,
+				       GError               **error);
 
-XPL_AVAILABLE_IN_2_44
-void     xinput_stream_read_all_async    (xinput_stream_t          *stream,
+GLIB_AVAILABLE_IN_2_44
+void     g_input_stream_read_all_async    (GInputStream          *stream,
                                            void                  *buffer,
-                                           xsize_t                  count,
+                                           gsize                  count,
                                            int                    io_priority,
-                                           xcancellable_t          *cancellable,
-                                           xasync_ready_callback_t    callback,
-                                           xpointer_t               user_data);
-XPL_AVAILABLE_IN_2_44
-xboolean_t xinput_stream_read_all_finish   (xinput_stream_t          *stream,
-                                           xasync_result_t          *result,
-                                           xsize_t                 *bytes_read,
-                                           xerror_t               **error);
+                                           GCancellable          *cancellable,
+                                           GAsyncReadyCallback    callback,
+                                           gpointer               user_data);
+GLIB_AVAILABLE_IN_2_44
+gboolean g_input_stream_read_all_finish   (GInputStream          *stream,
+                                           GAsyncResult          *result,
+                                           gsize                 *bytes_read,
+                                           GError               **error);
 
-XPL_AVAILABLE_IN_2_34
-void     xinput_stream_read_bytes_async  (xinput_stream_t          *stream,
-					   xsize_t                  count,
+GLIB_AVAILABLE_IN_2_34
+void     g_input_stream_read_bytes_async  (GInputStream          *stream,
+					   gsize                  count,
 					   int                    io_priority,
-					   xcancellable_t          *cancellable,
-					   xasync_ready_callback_t    callback,
-					   xpointer_t               user_data);
-XPL_AVAILABLE_IN_2_34
-xbytes_t  *xinput_stream_read_bytes_finish (xinput_stream_t          *stream,
-					   xasync_result_t          *result,
-					   xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-void     xinput_stream_skip_async    (xinput_stream_t          *stream,
-				       xsize_t                  count,
+					   GCancellable          *cancellable,
+					   GAsyncReadyCallback    callback,
+					   gpointer               user_data);
+GLIB_AVAILABLE_IN_2_34
+GBytes  *g_input_stream_read_bytes_finish (GInputStream          *stream,
+					   GAsyncResult          *result,
+					   GError               **error);
+GLIB_AVAILABLE_IN_ALL
+void     g_input_stream_skip_async    (GInputStream          *stream,
+				       gsize                  count,
 				       int                    io_priority,
-				       xcancellable_t          *cancellable,
-				       xasync_ready_callback_t    callback,
-				       xpointer_t               user_data);
-XPL_AVAILABLE_IN_ALL
-xssize_t   xinput_stream_skip_finish   (xinput_stream_t          *stream,
-				       xasync_result_t          *result,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-void     xinput_stream_close_async   (xinput_stream_t          *stream,
+				       GCancellable          *cancellable,
+				       GAsyncReadyCallback    callback,
+				       gpointer               user_data);
+GLIB_AVAILABLE_IN_ALL
+gssize   g_input_stream_skip_finish   (GInputStream          *stream,
+				       GAsyncResult          *result,
+				       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+void     g_input_stream_close_async   (GInputStream          *stream,
 				       int                    io_priority,
-				       xcancellable_t          *cancellable,
-				       xasync_ready_callback_t    callback,
-				       xpointer_t               user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinput_stream_close_finish  (xinput_stream_t          *stream,
-				       xasync_result_t          *result,
-				       xerror_t               **error);
+				       GCancellable          *cancellable,
+				       GAsyncReadyCallback    callback,
+				       gpointer               user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_input_stream_close_finish  (GInputStream          *stream,
+				       GAsyncResult          *result,
+				       GError               **error);
 
 /* For implementations: */
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinput_stream_is_closed     (xinput_stream_t          *stream);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinput_stream_has_pending   (xinput_stream_t          *stream);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xinput_stream_set_pending   (xinput_stream_t          *stream,
-				       xerror_t               **error);
-XPL_AVAILABLE_IN_ALL
-void     xinput_stream_clear_pending (xinput_stream_t          *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_input_stream_is_closed     (GInputStream          *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_input_stream_has_pending   (GInputStream          *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_input_stream_set_pending   (GInputStream          *stream,
+				       GError               **error);
+GLIB_AVAILABLE_IN_ALL
+void     g_input_stream_clear_pending (GInputStream          *stream);
 
 G_END_DECLS
 

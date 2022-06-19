@@ -159,37 +159,37 @@ msgstr "El nome del anfitrión ye non válidu"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:202
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr ""
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:204
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr ""
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:207
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:210
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:213
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%T"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:216
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr ""
 
@@ -1502,11 +1502,11 @@ msgid "%s type"
 msgstr "triba %s"
 
 #: ../gio/gcredentials.c:273 ../gio/gcredentials.c:495
-msgid "xcredentials_t is not implemented on this OS"
+msgid "GCredentials is not implemented on this OS"
 msgstr ""
 
 #: ../gio/gcredentials.c:447
-msgid "There is no xcredentials_t support for your platform"
+msgid "There is no GCredentials support for your platform"
 msgstr ""
 
 #: ../gio/gdatainputstream.c:311
@@ -1672,7 +1672,7 @@ msgid ""
 msgstr ""
 
 #: ../gio/gdbusauth.c:1159
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
 msgstr ""
 
 #: ../gio/gdbusauthmechanismsha1.c:266
@@ -1911,7 +1911,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:1517
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string '%s' from the D-Bus wire format"
+"Error deserializing GVariant with type string '%s' from the D-Bus wire format"
 msgstr ""
 
 #: ../gio/gdbusmessage.c:1705
@@ -1950,7 +1950,7 @@ msgstr ""
 #: ../gio/gdbusmessage.c:2163
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string '%s' to the D-Bus wire format"
+"Error serializing GVariant with type string '%s' to the D-Bus wire format"
 msgstr ""
 
 #: ../gio/gdbusmessage.c:2303
@@ -2321,27 +2321,27 @@ msgstr ""
 
 #: ../gio/gemblem.c:324
 #, c-format
-msgid "Can't handle version %d of xemblem_t encoding"
-msgstr "Nun puede manexase la versión %d de la codificación xemblem_t"
+msgid "Can't handle version %d of GEmblem encoding"
+msgstr "Nun puede manexase la versión %d de la codificación GEmblem"
 
 #: ../gio/gemblem.c:334
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Númberu de tokens (%d) mal formaos na codificación xemblem_t"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Númberu de tokens (%d) mal formaos na codificación GEmblem"
 
 #: ../gio/gemblemedicon.c:368
 #, c-format
-msgid "Can't handle version %d of xemblemed_icon_t encoding"
-msgstr "Nun puede manexase la versión %d de la codificación xemblemed_icon_t"
+msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgstr "Nun puede manexase la versión %d de la codificación GEmblemedIcon"
 
 #: ../gio/gemblemedicon.c:378
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Númberu de tokens (%d) mal formaos na codificación xemblemed_icon_t"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Númberu de tokens (%d) mal formaos na codificación GEmblemedIcon"
 
 #: ../gio/gemblemedicon.c:401
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Esperabase un xemblem_t pa xemblemed_icon_tjo"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Esperabase un GEmblem pa GEmblemedIconjo"
 
 #: ../gio/gfile.c:871 ../gio/gfile.c:1102 ../gio/gfile.c:1237
 #: ../gio/gfile.c:1474 ../gio/gfile.c:1528 ../gio/gfile.c:1585
@@ -2435,12 +2435,12 @@ msgstr "L'enumerador del ficheru ya ta zarráu"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can't handle version %d of xfile_icon_t encoding"
-msgstr "Nun puede remanase la versión %d de la codificación xfile_icon_t"
+msgid "Can't handle version %d of GFileIcon encoding"
+msgstr "Nun puede remanase la versión %d de la codificación GFileIcon"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Datos d'entrada mal formaos pa xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Datos d'entrada mal formaos pa GFileIcon"
 
 #: ../gio/gfileinputstream.c:154 ../gio/gfileinputstream.c:420
 #: ../gio/gfileiostream.c:170 ../gio/gfileoutputstream.c:169
@@ -2473,8 +2473,8 @@ msgstr "Non esiste la triba pa la clas de nome %s"
 
 #: ../gio/gicon.c:314
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "La triba %s non implementa la interface xicon_t"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "La triba %s non implementa la interface GIcon"
 
 #: ../gio/gicon.c:325
 #, c-format
@@ -2488,8 +2488,8 @@ msgstr "Númberu de versión mal formáu: %s"
 
 #: ../gio/gicon.c:353
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "La triba %s non implementa from_tokens() na interface xicon_t"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "La triba %s non implementa from_tokens() na interface GIcon"
 
 #: ../gio/gicon.c:430
 msgid "Can't handle the supplied version the icon encoding"
@@ -2586,7 +2586,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:958
 #, fuzzy, c-format
-msgid "invalid xvariant_t type string '%s'"
+msgid "invalid GVariant type string '%s'"
 msgstr "Triba d'atributu non válidu (esperabase una cadena)"
 
 #: ../gio/glib-compile-schemas.c:988
@@ -2757,7 +2757,7 @@ msgstr ""
 
 #: ../gio/glib-compile-schemas.c:1973
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
@@ -3071,16 +3071,16 @@ msgid "Error removing old file: %s"
 msgstr "Fallu al desaniciar el ficheru antiguu: %s"
 
 #: ../gio/gmemoryinputstream.c:486 ../gio/gmemoryoutputstream.c:746
-msgid "Invalid xseek_type_t supplied"
-msgstr "Proporcionóse un xseek_type_t non válidu"
+msgid "Invalid GSeekType supplied"
+msgstr "Proporcionóse un GSeekType non válidu"
 
 #: ../gio/gmemoryinputstream.c:496
 msgid "Invalid seek request"
 msgstr "Petición de gueta non válida"
 
 #: ../gio/gmemoryinputstream.c:520
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Nun puede truncase xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Nun puede truncase GMemoryInputStream"
 
 #: ../gio/gmemoryoutputstream.c:496
 msgid "Memory output stream not resizable"
@@ -3413,7 +3413,7 @@ msgstr ""
 
 #: ../gio/gsocket.c:464
 #, c-format
-msgid "creating xsocket_t from fd: %s"
+msgid "creating GSocket from fd: %s"
 msgstr "creando Gsocket de df: %s"
 
 #: ../gio/gsocket.c:498 ../gio/gsocket.c:514
@@ -3499,8 +3499,8 @@ msgid "Error sending message: %s"
 msgstr "Fallu al unviar mensax: %s"
 
 #: ../gio/gsocket.c:3081
-msgid "xsocket_control_message_t not supported on windows"
-msgstr "xsocket_control_message_t non sofitáu sobro ventanes"
+msgid "GSocketControlMessage not supported on windows"
+msgstr "GSocketControlMessage non sofitáu sobro ventanes"
 
 #: ../gio/gsocket.c:3358 ../gio/gsocket.c:3494
 #, c-format
@@ -3508,7 +3508,7 @@ msgid "Error receiving message: %s"
 msgstr "Fallu al recibir mensax: %s"
 
 #: ../gio/gsocket.c:3598
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
 
 #: ../gio/gsocketclient.c:798 ../gio/gsocketclient.c:1368
@@ -3622,8 +3622,8 @@ msgstr ""
 
 #: ../gio/gthemedicon.c:498
 #, c-format
-msgid "Can't handle version %d of xthemed_icon_t encoding"
-msgstr "Nun puede manexase la versión %d de la codificación xthemed_icon_t"
+msgid "Can't handle version %d of GThemedIcon encoding"
+msgstr "Nun puede manexase la versión %d de la codificación GThemedIcon"
 
 #: ../gio/gtlscertificate.c:226
 msgid "No PEM-encoded private key found"

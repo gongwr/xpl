@@ -20,8 +20,8 @@
  * Author: Tor Lillqvist <tml@novell.com>
  */
 
-#ifndef __XWINHTTP_VFS_H__
-#define __XWINHTTP_VFS_H__
+#ifndef __G_WINHTTP_VFS_H__
+#define __G_WINHTTP_VFS_H__
 
 #include <gio/giotypes.h>
 #include <gio/gvfs.h>
@@ -32,12 +32,12 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_WINHTTP_VFS                      (_g_winhttp_vfs_get_type ())
-#define XWINHTTP_VFS(obj)                      (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_WINHTTP_VFS, GWinHttpVfs))
-#define XWINHTTP_VFS_CLASS(klass)              (XTYPE_CHECK_CLASS_CAST ((klass), XTYPE_WINHTTP_VFS, GWinHttpVfsClass))
-#define X_IS_WINHTTP_VFS(obj)                   (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_WINHTTP_VFS))
-#define X_IS_WINHTTP_VFS_CLASS(klass)           (XTYPE_CHECK_CLASS_TYPE ((klass), XTYPE_WINHTTP_VFS))
-#define XWINHTTP_VFS_GET_CLASS(obj)            (XTYPE_INSTANCE_GET_CLASS ((obj), XTYPE_WINHTTP_VFS, GWinHttpVfsClass))
+#define G_TYPE_WINHTTP_VFS                      (_g_winhttp_vfs_get_type ())
+#define G_WINHTTP_VFS(obj)                      (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_WINHTTP_VFS, GWinHttpVfs))
+#define G_WINHTTP_VFS_CLASS(klass)              (G_TYPE_CHECK_CLASS_CAST ((klass), G_TYPE_WINHTTP_VFS, GWinHttpVfsClass))
+#define G_IS_WINHTTP_VFS(obj)                   (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_WINHTTP_VFS))
+#define G_IS_WINHTTP_VFS_CLASS(klass)           (G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_WINHTTP_VFS))
+#define G_WINHTTP_VFS_GET_CLASS(obj)            (G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_WINHTTP_VFS, GWinHttpVfsClass))
 
 typedef struct _GWinHttpVfs       GWinHttpVfs;
 typedef struct _GWinHttpDllFuncs  GWinHttpDllFuncs;
@@ -45,9 +45,9 @@ typedef struct _GWinHttpVfsClass  GWinHttpVfsClass;
 
 struct _GWinHttpVfs
 {
-  xvfs_t parent;
+  GVfs parent;
 
-  xvfs_t *wrapped_vfs;
+  GVfs *wrapped_vfs;
   HINTERNET session;
 };
 
@@ -69,7 +69,7 @@ struct _GWinHttpDllFuncs
 
 struct _GWinHttpVfsClass
 {
-  xvfs_class_t parent_class;
+  GVfsClass parent_class;
 
   /* As there is no import library for winhttp.dll in mingw, and
    * winhttp.dll isn't present on Windows 2000 anyway, we must look up
@@ -79,28 +79,28 @@ struct _GWinHttpVfsClass
 };
 
 
-xtype_t   _g_winhttp_vfs_get_type  (void) G_GNUC_CONST;
+GType   _g_winhttp_vfs_get_type  (void) G_GNUC_CONST;
 
-xvfs_t *_g_winhttp_vfs_new (void);
+GVfs *_g_winhttp_vfs_new (void);
 
 char *_g_winhttp_error_message (DWORD error_code);
 
-void _g_winhttp_set_error (xerror_t     **error,
+void _g_winhttp_set_error (GError     **error,
                            DWORD        error_code,
                            const char  *what);
 
-xboolean_t _g_winhttp_response (GWinHttpVfs *vfs,
+gboolean _g_winhttp_response (GWinHttpVfs *vfs,
                               HINTERNET    request,
-                              xerror_t     **error,
+                              GError     **error,
                               const char  *what);
 
-xboolean_t _g_winhttp_query_header (GWinHttpVfs *vfs,
+gboolean _g_winhttp_query_header (GWinHttpVfs *vfs,
                                   HINTERNET    request,
                                   const char  *request_description,
                                   DWORD        which_header,
                                   wchar_t    **header,
-                                  xerror_t     **error);
+                                  GError     **error);
 
 G_END_DECLS
 
-#endif /* __XWINHTTP_VFS_H__ */
+#endif /* __G_WINHTTP_VFS_H__ */

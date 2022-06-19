@@ -1,4 +1,4 @@
-/* GMODULE - XPL wrapper code for dynamic module loading
+/* GMODULE - GLIB wrapper code for dynamic module loading
  * Copyright (C) 1998, 2000 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -19,10 +19,10 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 #include "config.h"
@@ -37,7 +37,7 @@
  */
 #ifndef	G_MODULE_HAVE_DLERROR
 #  ifdef __NetBSD__
-#    define dlerror()	xstrerror (errno)
+#    define dlerror()	g_strerror (errno)
 #  else /* !__NetBSD__ */
 /* could we rely on errno's state here? */
 #    define dlerror()	"unknown dl-error"
@@ -110,10 +110,10 @@ unlock_dlerror (void)
 }
 
 /* This should be called with lock_dlerror() held */
-static const xchar_t *
-fetch_dlerror (xboolean_t replace_null)
+static const gchar *
+fetch_dlerror (gboolean replace_null)
 {
-  const xchar_t *msg = dlerror ();
+  const gchar *msg = dlerror ();
 
   /* make sure we always return an error message != NULL, if
    * expected to do so. */
@@ -124,35 +124,35 @@ fetch_dlerror (xboolean_t replace_null)
   return msg;
 }
 
-static xpointer_t
-_g_module_open (const xchar_t *file_name,
-		xboolean_t     bind_lazy,
-		xboolean_t     bind_local,
-                xerror_t     **error)
+static gpointer
+_g_module_open (const gchar *file_name,
+		gboolean     bind_lazy,
+		gboolean     bind_local,
+                GError     **error)
 {
-  xpointer_t handle;
-
+  gpointer handle;
+  
   lock_dlerror ();
   handle = dlopen (file_name,
 		   (bind_local ? 0 : RTLD_GLOBAL) | (bind_lazy ? RTLD_LAZY : RTLD_NOW));
   if (!handle)
     {
-      const xchar_t *message = fetch_dlerror (TRUE);
+      const gchar *message = fetch_dlerror (TRUE);
 
       g_module_set_error (message);
       g_set_error_literal (error, G_MODULE_ERROR, G_MODULE_ERROR_FAILED, message);
     }
 
   unlock_dlerror ();
-
+  
   return handle;
 }
 
-static xpointer_t
+static gpointer
 _g_module_self (void)
 {
-  xpointer_t handle;
-
+  gpointer handle;
+  
   /* to query symbols from the program itself, special link options
    * are required on some systems.
    */
@@ -161,7 +161,7 @@ _g_module_self (void)
    * does not work reliable and generally no symbols are found
    * at all. RTLD_DEFAULT works though.
    * On Android 64 bit, dlopen(NULL) seems to work but dlsym(handle)
-   * always returns 'undefined symbol'. Only if RTLD_DEFAULT or
+   * always returns 'undefined symbol'. Only if RTLD_DEFAULT or 
    * NULL is given, dlsym returns an appropriate pointer.
    */
   lock_dlerror ();
@@ -173,12 +173,12 @@ _g_module_self (void)
   if (!handle)
     g_module_set_error (fetch_dlerror (TRUE));
   unlock_dlerror ();
-
+  
   return handle;
 }
 
 static void
-_g_module_close (xpointer_t handle)
+_g_module_close (gpointer handle)
 {
 #if defined(__BIONIC__)
   if (handle != RTLD_DEFAULT)
@@ -191,12 +191,12 @@ _g_module_close (xpointer_t handle)
     }
 }
 
-static xpointer_t
-_g_module_symbol (xpointer_t     handle,
-		  const xchar_t *symbol_name)
+static gpointer
+_g_module_symbol (gpointer     handle,
+		  const gchar *symbol_name)
 {
-  xpointer_t p;
-  const xchar_t *msg;
+  gpointer p;
+  const gchar *msg;
 
   lock_dlerror ();
   fetch_dlerror (FALSE);
@@ -205,21 +205,21 @@ _g_module_symbol (xpointer_t     handle,
   if (msg)
     g_module_set_error (msg);
   unlock_dlerror ();
-
+  
   return p;
 }
 
-static xchar_t*
-_g_module_build_path (const xchar_t *directory,
-		      const xchar_t *module_name)
+static gchar*
+_g_module_build_path (const gchar *directory,
+		      const gchar *module_name)
 {
   if (directory && *directory) {
     if (strncmp (module_name, "lib", 3) == 0)
-      return xstrconcat (directory, "/", module_name, NULL);
+      return g_strconcat (directory, "/", module_name, NULL);
     else
-      return xstrconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
+      return g_strconcat (directory, "/lib", module_name, "." G_MODULE_SUFFIX, NULL);
   } else if (strncmp (module_name, "lib", 3) == 0)
-    return xstrdup (module_name);
+    return g_strdup (module_name);
   else
-    return xstrconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
+    return g_strconcat ("lib", module_name, "." G_MODULE_SUFFIX, NULL);
 }

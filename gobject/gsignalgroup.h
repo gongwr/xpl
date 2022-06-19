@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  *
  * Copyright (C) 2015-2022 Christian Hergert <christian@hergert.me>
  * Copyright (C) 2015 Garrett Regier <garrettregier@gmail.com>
@@ -22,7 +22,7 @@
 #ifndef __G_SIGNAL_GROUP_H__
 #define __G_SIGNAL_GROUP_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -32,61 +32,61 @@
 
 G_BEGIN_DECLS
 
-#define G_SIGNAL_GROUP(obj)    (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SIGNAL_GROUP, xsignal_group_t))
-#define X_IS_SIGNAL_GROUP(obj) (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SIGNAL_GROUP))
-#define XTYPE_SIGNAL_GROUP    (xsignal_group_get_type())
+#define G_SIGNAL_GROUP(obj)    (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_SIGNAL_GROUP, GSignalGroup))
+#define G_IS_SIGNAL_GROUP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_SIGNAL_GROUP))
+#define G_TYPE_SIGNAL_GROUP    (g_signal_group_get_type())
 
 /**
- * xsignal_group_t:
+ * GSignalGroup:
  *
- * #xsignal_group_t is an opaque structure whose members
+ * #GSignalGroup is an opaque structure whose members
  * cannot be accessed directly.
  *
  * Since: 2.72
  */
-typedef struct _GSignalGroup xsignal_group_t;
+typedef struct _GSignalGroup GSignalGroup;
 
-XPL_AVAILABLE_IN_2_72
-xtype_t         xsignal_group_get_type        (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_72
-xsignal_group_t *xsignal_group_new             (xtype_t           target_type);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_set_target      (xsignal_group_t   *self,
-                                              xpointer_t        target);
-XPL_AVAILABLE_IN_2_72
-xpointer_t      xsignal_group_dup_target      (xsignal_group_t   *self);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_block           (xsignal_group_t   *self);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_unblock         (xsignal_group_t   *self);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_connect_object  (xsignal_group_t   *self,
-                                              const xchar_t    *detailed_signal,
-                                              xcallback_t       c_handler,
-                                              xpointer_t        object,
+GLIB_AVAILABLE_IN_2_72
+GType         g_signal_group_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_72
+GSignalGroup *g_signal_group_new             (GType           target_type);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_set_target      (GSignalGroup   *self,
+                                              gpointer        target);
+GLIB_AVAILABLE_IN_2_72
+gpointer      g_signal_group_dup_target      (GSignalGroup   *self);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_block           (GSignalGroup   *self);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_unblock         (GSignalGroup   *self);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_connect_object  (GSignalGroup   *self,
+                                              const gchar    *detailed_signal,
+                                              GCallback       c_handler,
+                                              gpointer        object,
                                               GConnectFlags   flags);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_connect_data    (xsignal_group_t   *self,
-                                              const xchar_t    *detailed_signal,
-                                              xcallback_t       c_handler,
-                                              xpointer_t        data,
-                                              xclosure_notify_t  notify,
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_connect_data    (GSignalGroup   *self,
+                                              const gchar    *detailed_signal,
+                                              GCallback       c_handler,
+                                              gpointer        data,
+                                              GClosureNotify  notify,
                                               GConnectFlags   flags);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_connect         (xsignal_group_t   *self,
-                                              const xchar_t    *detailed_signal,
-                                              xcallback_t       c_handler,
-                                              xpointer_t        data);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_connect_after   (xsignal_group_t   *self,
-                                              const xchar_t    *detailed_signal,
-                                              xcallback_t       c_handler,
-                                              xpointer_t        data);
-XPL_AVAILABLE_IN_2_72
-void          xsignal_group_connect_swapped (xsignal_group_t   *self,
-                                              const xchar_t    *detailed_signal,
-                                              xcallback_t       c_handler,
-                                              xpointer_t        data);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_connect         (GSignalGroup   *self,
+                                              const gchar    *detailed_signal,
+                                              GCallback       c_handler,
+                                              gpointer        data);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_connect_after   (GSignalGroup   *self,
+                                              const gchar    *detailed_signal,
+                                              GCallback       c_handler,
+                                              gpointer        data);
+GLIB_AVAILABLE_IN_2_72
+void          g_signal_group_connect_swapped (GSignalGroup   *self,
+                                              const gchar    *detailed_signal,
+                                              GCallback       c_handler,
+                                              gpointer        data);
 
 G_END_DECLS
 

@@ -25,27 +25,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_UNIX_OUTPUT_STREAM         (g_unix_output_stream_get_type ())
-#define G_UNIX_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_OUTPUT_STREAM, GUnixOutputStream))
-#define G_UNIX_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_OUTPUT_STREAM, GUnixOutputStreamClass))
-#define X_IS_UNIX_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_OUTPUT_STREAM))
-#define X_IS_UNIX_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_OUTPUT_STREAM))
-#define G_UNIX_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_UNIX_OUTPUT_STREAM, GUnixOutputStreamClass))
+#define G_TYPE_UNIX_OUTPUT_STREAM         (g_unix_output_stream_get_type ())
+#define G_UNIX_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_UNIX_OUTPUT_STREAM, GUnixOutputStream))
+#define G_UNIX_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_UNIX_OUTPUT_STREAM, GUnixOutputStreamClass))
+#define G_IS_UNIX_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_UNIX_OUTPUT_STREAM))
+#define G_IS_UNIX_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_UNIX_OUTPUT_STREAM))
+#define G_UNIX_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_UNIX_OUTPUT_STREAM, GUnixOutputStreamClass))
 
 /**
  * GUnixOutputStream:
  *
- * Implements #xoutput_stream_t for outputting to selectable unix file descriptors
+ * Implements #GOutputStream for outputting to selectable unix file descriptors
  **/
 typedef struct _GUnixOutputStream         GUnixOutputStream;
 typedef struct _GUnixOutputStreamClass    GUnixOutputStreamClass;
 typedef struct _GUnixOutputStreamPrivate  GUnixOutputStreamPrivate;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixOutputStream, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixOutputStream, g_object_unref)
 
 struct _GUnixOutputStream
 {
-  xoutput_stream_t parent_instance;
+  GOutputStream parent_instance;
 
   /*< private >*/
   GUnixOutputStreamPrivate *priv;
@@ -53,7 +53,7 @@ struct _GUnixOutputStream
 
 struct _GUnixOutputStreamClass
 {
-  xoutput_stream_class_t parent_class;
+  GOutputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -64,19 +64,19 @@ struct _GUnixOutputStreamClass
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           g_unix_output_stream_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType           g_unix_output_stream_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t * g_unix_output_stream_new          (xint_t     fd,
-                                                   xboolean_t close_fd);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
+GOutputStream * g_unix_output_stream_new          (gint     fd,
+                                                   gboolean close_fd);
+GLIB_AVAILABLE_IN_ALL
 void            g_unix_output_stream_set_close_fd (GUnixOutputStream *stream,
-                                                   xboolean_t           close_fd);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_unix_output_stream_get_close_fd (GUnixOutputStream *stream);
-XPL_AVAILABLE_IN_ALL
-xint_t            g_unix_output_stream_get_fd       (GUnixOutputStream *stream);
+                                                   gboolean           close_fd);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_unix_output_stream_get_close_fd (GUnixOutputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+gint            g_unix_output_stream_get_fd       (GUnixOutputStream *stream);
 G_END_DECLS
 
 #endif /* __G_UNIX_OUTPUT_STREAM_H__ */

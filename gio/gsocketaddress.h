@@ -19,8 +19,8 @@
  *          Samuel Cormier-Iijima <sciyoshi@gmail.com>
  */
 
-#ifndef __XSOCKET_ADDRESS_H__
-#define __XSOCKET_ADDRESS_H__
+#ifndef __G_SOCKET_ADDRESS_H__
+#define __G_SOCKET_ADDRESS_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,53 +30,53 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_ADDRESS         (xsocket_address_get_type ())
-#define XSOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKET_ADDRESS, xsocket_address))
-#define XSOCKET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SOCKET_ADDRESS, GSocketAddressClass))
-#define X_IS_SOCKET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SOCKET_ADDRESS))
-#define X_IS_SOCKET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_SOCKET_ADDRESS))
-#define XSOCKET_ADDRESS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SOCKET_ADDRESS, GSocketAddressClass))
+#define G_TYPE_SOCKET_ADDRESS         (g_socket_address_get_type ())
+#define G_SOCKET_ADDRESS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_SOCKET_ADDRESS, GSocketAddress))
+#define G_SOCKET_ADDRESS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_SOCKET_ADDRESS, GSocketAddressClass))
+#define G_IS_SOCKET_ADDRESS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_SOCKET_ADDRESS))
+#define G_IS_SOCKET_ADDRESS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_SOCKET_ADDRESS))
+#define G_SOCKET_ADDRESS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_SOCKET_ADDRESS, GSocketAddressClass))
 
 typedef struct _GSocketAddressClass   GSocketAddressClass;
 
 struct _GSocketAddress
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 };
 
 struct _GSocketAddressClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xsocket_family_t  (*get_family)      (xsocket_address_t *address);
+  GSocketFamily  (*get_family)      (GSocketAddress *address);
 
-  xssize_t         (*get_native_size) (xsocket_address_t *address);
+  gssize         (*get_native_size) (GSocketAddress *address);
 
-  xboolean_t       (*to_native)       (xsocket_address_t *address,
-                                     xpointer_t        dest,
-                                     xsize_t           destlen,
-				     xerror_t        **error);
+  gboolean       (*to_native)       (GSocketAddress *address,
+                                     gpointer        dest,
+                                     gsize           destlen,
+				     GError        **error);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xsocket_address_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_socket_address_get_type        (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_family_t         xsocket_address_get_family      (xsocket_address_t *address);
+GLIB_AVAILABLE_IN_ALL
+GSocketFamily         g_socket_address_get_family      (GSocketAddress *address);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t *      xsocket_address_new_from_native (xpointer_t        native,
-                                                        xsize_t           len);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress *      g_socket_address_new_from_native (gpointer        native,
+                                                        gsize           len);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xsocket_address_to_native       (xsocket_address_t *address,
-                                                        xpointer_t        dest,
-                                                        xsize_t           destlen,
-							xerror_t        **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_socket_address_to_native       (GSocketAddress *address,
+                                                        gpointer        dest,
+                                                        gsize           destlen,
+							GError        **error);
 
-XPL_AVAILABLE_IN_ALL
-xssize_t                xsocket_address_get_native_size (xsocket_address_t *address);
+GLIB_AVAILABLE_IN_ALL
+gssize                g_socket_address_get_native_size (GSocketAddress *address);
 
 G_END_DECLS
 
-#endif /* __XSOCKET_ADDRESS_H__ */
+#endif /* __G_SOCKET_ADDRESS_H__ */

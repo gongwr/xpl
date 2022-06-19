@@ -677,7 +677,7 @@ def process_file(curfilename):
                 if flags:
                     prod = prod.replace('\u0040type\u0040', 'flags')
                 else:
-                    prod = prod.replace('\u0040type\u0040', 'xenum')
+                    prod = prod.replace('\u0040type\u0040', 'enum')
                 if flags:
                     prod = prod.replace('\u0040Type\u0040', 'Flags')
                 else:
@@ -685,7 +685,7 @@ def process_file(curfilename):
                 if flags:
                     prod = prod.replace('\u0040TYPE\u0040', 'FLAGS')
                 else:
-                    prod = prod.replace('\u0040TYPE\u0040', 'XENUM')
+                    prod = prod.replace('\u0040TYPE\u0040', 'ENUM')
                 prod = replace_specials(prod)
                 write_output(prod)
 
@@ -700,7 +700,7 @@ def process_file(curfilename):
                 if flags:
                     prod = prod.replace('\u0040type\u0040', 'flags')
                 else:
-                    prod = prod.replace('\u0040type\u0040', 'xenum')
+                    prod = prod.replace('\u0040type\u0040', 'enum')
                 if flags:
                     prod = prod.replace('\u0040Type\u0040', 'Flags')
                 else:
@@ -743,7 +743,7 @@ def process_file(curfilename):
                     if flags:
                         tmp_prod = tmp_prod.replace('\u0040type\u0040', 'flags')
                     else:
-                        tmp_prod = tmp_prod.replace('\u0040type\u0040', 'xenum')
+                        tmp_prod = tmp_prod.replace('\u0040type\u0040', 'enum')
                     if flags:
                         tmp_prod = tmp_prod.replace('\u0040Type\u0040', 'Flags')
                     else:
@@ -767,7 +767,7 @@ def process_file(curfilename):
                 if flags:
                     prod = prod.replace('\u0040type\u0040', 'flags')
                 else:
-                    prod = prod.replace('\u0040type\u0040', 'xenum')
+                    prod = prod.replace('\u0040type\u0040', 'enum')
                 if flags:
                     prod = prod.replace('\u0040Type\u0040', 'Flags')
                 else:

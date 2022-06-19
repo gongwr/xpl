@@ -291,7 +291,7 @@ decimal_point_char (void)
      multithread-safe on glibc systems and Mac OS X systems, but is not required
      to be multithread-safe by POSIX.  sprintf(), however, is multithread-safe.
      localeconv() is rarely multithread-safe.  */
-#  if HAVE_NL_LANGINFO && (__XPLC__ || defined __UCLIBC__ || (defined __APPLE__ && defined __MACH__))
+#  if HAVE_NL_LANGINFO && (__GLIBC__ || defined __UCLIBC__ || (defined __APPLE__ && defined __MACH__))
   point = nl_langinfo (RADIXCHAR);
 #  elif 1
   char pointbuf[5];
@@ -699,7 +699,7 @@ divide (mpn_t a, mpn_t b, mpn_t *q)
               {
                 /* Overflow, hence r[j+n]*beta+r[j+n-1] >= beta*b[n-1].  */
                 q_star = (mp_limb_t)~(mp_limb_t)0; /* q* = beta-1 */
-                /* test_t whether r[j+n]*beta+r[j+n-1] - (beta-1)*b[n-1] >= beta
+                /* Test whether r[j+n]*beta+r[j+n-1] - (beta-1)*b[n-1] >= beta
                    <==> r[j+n]*beta+r[j+n-1] + b[n-1] >= beta*b[n-1]+beta
                    <==> b[n-1] < floor((r[j+n]*beta+r[j+n-1]+b[n-1])/beta)
                         {<= beta !}.
@@ -4786,7 +4786,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
                   *fbp++ = ' ';
                 if (flags & FLAG_ALT)
                   *fbp++ = '#';
-#if __XPLC__ >= 2 && !defined __UCLIBC__
+#if __GLIBC__ >= 2 && !defined __UCLIBC__
                 if (flags & FLAG_LOCALIZED)
                   *fbp++ = 'I';
 #endif
@@ -4873,7 +4873,7 @@ VASNPRINTF (DCHAR_T *resultbuf, size_t *lengthp,
 #endif
                   *fbp = dp->conversion;
 #if USE_SNPRINTF
-# if ! (((__XPLC__ > 2 || (__XPLC__ == 2 && __XPLC_MINOR__ >= 3))        \
+# if ! (((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 3))        \
          && !defined __UCLIBC__)                                            \
         || (defined __APPLE__ && defined __MACH__)                          \
         || defined __ANDROID__                                              \

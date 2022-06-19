@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,10 +19,10 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 
@@ -74,19 +74,19 @@
  * function with an average cost of O(n log(n)) and a worst case
  * cost of O(n^2).
  *
- * Here is an example that stores integers in a #xarray_t:
+ * Here is an example that stores integers in a #GArray:
  * |[<!-- language="C" -->
- *   xarray_t *garray;
- *   xint_t i;
- *   // We create a new array to store xint_t values.
+ *   GArray *garray;
+ *   gint i;
+ *   // We create a new array to store gint values.
  *   // We don't want it zero-terminated or cleared to 0's.
- *   garray = g_array_new (FALSE, FALSE, sizeof (xint_t));
+ *   garray = g_array_new (FALSE, FALSE, sizeof (gint));
  *   for (i = 0; i < 10000; i++)
  *     g_array_append_val (garray, i);
  *   for (i = 0; i < 10000; i++)
- *     if (g_array_index (garray, xint_t, i) != i)
+ *     if (g_array_index (garray, gint, i) != i)
  *       g_print ("ERROR: got %d instead of %d\n",
- *                g_array_index (garray, xint_t, i), i);
+ *                g_array_index (garray, gint, i), i);
  *   g_array_free (garray, TRUE);
  * ]|
  */
@@ -96,38 +96,38 @@
 typedef struct _GRealArray  GRealArray;
 
 /**
- * xarray_t:
+ * GArray:
  * @data: a pointer to the element data. The data may be moved as
- *     elements are added to the #xarray_t.
- * @len: the number of elements in the #xarray_t not including the
+ *     elements are added to the #GArray.
+ * @len: the number of elements in the #GArray not including the
  *     possible terminating zero element.
  *
- * Contains the public fields of a xarray_t.
+ * Contains the public fields of a GArray.
  */
 struct _GRealArray
 {
-  xuint8_t *data;
-  xuint_t   len;
-  xuint_t   elt_capacity;
-  xuint_t   elt_size;
-  xuint_t   zero_terminated : 1;
-  xuint_t   clear : 1;
+  guint8 *data;
+  guint   len;
+  guint   elt_capacity;
+  guint   elt_size;
+  guint   zero_terminated : 1;
+  guint   clear : 1;
   gatomicrefcount ref_count;
-  xdestroy_notify_t clear_func;
+  GDestroyNotify clear_func;
 };
 
 /**
  * g_array_index:
- * @a: a #xarray_t
+ * @a: a #GArray
  * @t: the type of the elements
  * @i: the index of the element to return
  *
- * Returns the element of a #xarray_t at the given index. The return
+ * Returns the element of a #GArray at the given index. The return
  * value is cast to the given type. This is the main way to read or write an
- * element in a #xarray_t.
+ * element in a #GArray.
  *
  * Writing an element is typically done by reference, as in the following
- * example. This example gets a pointer to an element in a #xarray_t, and then
+ * example. This example gets a pointer to an element in a #GArray, and then
  * writes to a field in it:
  * |[<!-- language="C" -->
  *   EDayViewEvent *event;
@@ -139,19 +139,19 @@ struct _GRealArray
  *
  * This example reads from and writes to an array of integers:
  * |[<!-- language="C" -->
- *   x_autoptr(xarray) int_array = g_array_new (FALSE, FALSE, sizeof (xuint_t));
- *   for (xuint_t i = 0; i < 10; i++)
+ *   g_autoptr(GArray) int_array = g_array_new (FALSE, FALSE, sizeof (guint));
+ *   for (guint i = 0; i < 10; i++)
  *     g_array_append_val (int_array, i);
  *
- *   xuint_t *my_int = &g_array_index (int_array, xuint_t, 1);
+ *   guint *my_int = &g_array_index (int_array, guint, 1);
  *   g_print ("Int at index 1 is %u; decrementing it\n", *my_int);
  *   *my_int = *my_int - 1;
  * ]|
  *
- * Returns: the element of the #xarray_t at the index given by @i
+ * Returns: the element of the #GArray at the index given by @i
  */
 
-#define g_array_elt_len(array,i) ((xsize_t)(array)->elt_size * (i))
+#define g_array_elt_len(array,i) ((gsize)(array)->elt_size * (i))
 #define g_array_elt_pos(array,i) ((array)->data + g_array_elt_len((array),(i)))
 #define g_array_elt_zero(array, pos, len)                               \
   (memset (g_array_elt_pos ((array), pos), 0,  g_array_elt_len ((array), len)))
@@ -161,28 +161,28 @@ struct _GRealArray
 }G_STMT_END
 
 static void  g_array_maybe_expand (GRealArray *array,
-                                   xuint_t       len);
+                                   guint       len);
 
 /**
  * g_array_new:
  * @zero_terminated: %TRUE if the array should have an extra element at
  *     the end which is set to 0
- * @clear_: %TRUE if #xarray_t elements should be automatically cleared
+ * @clear_: %TRUE if #GArray elements should be automatically cleared
  *     to 0 when they are allocated
  * @element_size: the size of each element in bytes
  *
- * Creates a new #xarray_t with a reference count of 1.
+ * Creates a new #GArray with a reference count of 1.
  *
- * Returns: the new #xarray_t
+ * Returns: the new #GArray
  */
-xarray_t*
-g_array_new (xboolean_t zero_terminated,
-             xboolean_t clear,
-             xuint_t    elt_size)
+GArray*
+g_array_new (gboolean zero_terminated,
+             gboolean clear,
+             guint    elt_size)
 {
-  xreturn_val_if_fail (elt_size > 0, NULL);
-#if (UINT_WIDTH / 8) >= XPL_SIZEOF_SIZE_T
-  xreturn_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
+  g_return_val_if_fail (elt_size > 0, NULL);
+#if (UINT_WIDTH / 8) >= GLIB_SIZEOF_SIZE_T
+  g_return_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
 #endif
 
   return g_array_sized_new (zero_terminated, clear, elt_size, 0);
@@ -190,7 +190,7 @@ g_array_new (xboolean_t zero_terminated,
 
 /**
  * g_array_steal:
- * @array: a #xarray_t.
+ * @array: a #GArray.
  * @len: (optional) (out): pointer to retrieve the number of
  *    elements of the original array
  *
@@ -207,8 +207,8 @@ g_array_new (xboolean_t zero_terminated,
  * A short example of use:
  * |[<!-- language="C" -->
  * ...
- * xpointer_t data;
- * xsize_t data_len;
+ * gpointer data;
+ * gsize data_len;
  * data = g_array_steal (some_array, &data_len);
  * ...
  * ]|
@@ -218,17 +218,17 @@ g_array_new (xboolean_t zero_terminated,
  *
  * Since: 2.64
  */
-xpointer_t
-g_array_steal (xarray_t *array,
-               xsize_t *len)
+gpointer
+g_array_steal (GArray *array,
+               gsize *len)
 {
   GRealArray *rarray;
-  xpointer_t segment;
+  gpointer segment;
 
-  xreturn_val_if_fail (array != NULL, NULL);
+  g_return_val_if_fail (array != NULL, NULL);
 
   rarray = (GRealArray *) array;
-  segment = (xpointer_t) rarray->data;
+  segment = (gpointer) rarray->data;
 
   if (len != NULL)
     *len = rarray->len;
@@ -248,24 +248,24 @@ g_array_steal (xarray_t *array,
  * @element_size: size of each element in the array
  * @reserved_size: number of elements preallocated
  *
- * Creates a new #xarray_t with @reserved_size elements preallocated and
+ * Creates a new #GArray with @reserved_size elements preallocated and
  * a reference count of 1. This avoids frequent reallocation, if you
  * are going to add many elements to the array. Note however that the
  * size of the array is still 0.
  *
- * Returns: the new #xarray_t
+ * Returns: the new #GArray
  */
-xarray_t*
-g_array_sized_new (xboolean_t zero_terminated,
-                   xboolean_t clear,
-                   xuint_t    elt_size,
-                   xuint_t    reserved_size)
+GArray*
+g_array_sized_new (gboolean zero_terminated,
+                   gboolean clear,
+                   guint    elt_size,
+                   guint    reserved_size)
 {
   GRealArray *array;
-
-  xreturn_val_if_fail (elt_size > 0, NULL);
-#if (UINT_WIDTH / 8) >= XPL_SIZEOF_SIZE_T
-  xreturn_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
+  
+  g_return_val_if_fail (elt_size > 0, NULL);
+#if (UINT_WIDTH / 8) >= GLIB_SIZEOF_SIZE_T
+  g_return_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
 #endif
 
   array = g_slice_new (GRealArray);
@@ -286,12 +286,12 @@ g_array_sized_new (xboolean_t zero_terminated,
       g_array_zero_terminate(array);
     }
 
-  return (xarray_t*) array;
+  return (GArray*) array;
 }
 
 /**
  * g_array_set_clear_func:
- * @array: A #xarray_t
+ * @array: A #GArray
  * @clear_func: a function to clear an element of @array
  *
  * Sets a function to clear an element of @array.
@@ -301,15 +301,15 @@ g_array_sized_new (xboolean_t zero_terminated,
  * segment is deallocated as well. @clear_func will be passed a
  * pointer to the element to clear, rather than the element itself.
  *
- * Note that in contrast with other uses of #xdestroy_notify_t
+ * Note that in contrast with other uses of #GDestroyNotify
  * functions, @clear_func is expected to clear the contents of
  * the array element it is given, but not free the element itself.
  *
  * |[<!-- language="C" -->
  * typedef struct
  * {
- *   xchar_t *str;
- *   xobject_t *obj;
+ *   gchar *str;
+ *   GObject *obj;
  * } ArrayElement;
  *
  * static void
@@ -320,8 +320,8 @@ g_array_sized_new (xboolean_t zero_terminated,
  * }
  *
  * // main code
- * xarray_t *garray = g_array_new (FALSE, FALSE, sizeof (ArrayElement));
- * g_array_set_clear_func (garray, (xdestroy_notify_t) array_element_clear);
+ * GArray *garray = g_array_new (FALSE, FALSE, sizeof (ArrayElement));
+ * g_array_set_clear_func (garray, (GDestroyNotify) array_element_clear);
  * // assign data to the structure
  * g_array_free (garray, TRUE);
  * ]|
@@ -329,8 +329,8 @@ g_array_sized_new (xboolean_t zero_terminated,
  * Since: 2.32
  */
 void
-g_array_set_clear_func (xarray_t         *array,
-                        xdestroy_notify_t  clear_func)
+g_array_set_clear_func (GArray         *array,
+                        GDestroyNotify  clear_func)
 {
   GRealArray *rarray = (GRealArray *) array;
 
@@ -341,20 +341,20 @@ g_array_set_clear_func (xarray_t         *array,
 
 /**
  * g_array_ref:
- * @array: A #xarray_t
+ * @array: A #GArray
  *
  * Atomically increments the reference count of @array by one.
  * This function is thread-safe and may be called from any thread.
  *
- * Returns: The passed in #xarray_t
+ * Returns: The passed in #GArray
  *
  * Since: 2.22
  */
-xarray_t *
-g_array_ref (xarray_t *array)
+GArray *
+g_array_ref (GArray *array)
 {
   GRealArray *rarray = (GRealArray*) array;
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   g_atomic_ref_count_inc (&rarray->ref_count);
 
@@ -367,11 +367,11 @@ typedef enum
   PRESERVE_WRAPPER = 1 << 1
 } ArrayFreeFlags;
 
-static xchar_t *array_free (GRealArray *, ArrayFreeFlags);
+static gchar *array_free (GRealArray *, ArrayFreeFlags);
 
 /**
  * g_array_unref:
- * @array: A #xarray_t
+ * @array: A #GArray
  *
  * Atomically decrements the reference count of @array by one. If the
  * reference count drops to 0, all memory allocated by the array is
@@ -381,7 +381,7 @@ static xchar_t *array_free (GRealArray *, ArrayFreeFlags);
  * Since: 2.22
  */
 void
-g_array_unref (xarray_t *array)
+g_array_unref (GArray *array)
 {
   GRealArray *rarray = (GRealArray*) array;
   g_return_if_fail (array);
@@ -392,7 +392,7 @@ g_array_unref (xarray_t *array)
 
 /**
  * g_array_get_element_size:
- * @array: A #xarray_t
+ * @array: A #GArray
  *
  * Gets the size of the elements in @array.
  *
@@ -400,47 +400,47 @@ g_array_unref (xarray_t *array)
  *
  * Since: 2.22
  */
-xuint_t
-g_array_get_element_size (xarray_t *array)
+guint
+g_array_get_element_size (GArray *array)
 {
   GRealArray *rarray = (GRealArray*) array;
 
-  xreturn_val_if_fail (array, 0);
+  g_return_val_if_fail (array, 0);
 
   return rarray->elt_size;
 }
 
 /**
  * g_array_free:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @free_segment: if %TRUE the actual element data is freed as well
  *
- * Frees the memory allocated for the #xarray_t. If @free_segment is
+ * Frees the memory allocated for the #GArray. If @free_segment is
  * %TRUE it frees the memory block holding the elements as well. Pass
- * %FALSE if you want to free the #xarray_t wrapper but preserve the
+ * %FALSE if you want to free the #GArray wrapper but preserve the
  * underlying array for use elsewhere. If the reference count of
- * @array is greater than one, the #xarray_t wrapper is preserved but
+ * @array is greater than one, the #GArray wrapper is preserved but
  * the size of  @array will be set to zero.
  *
  * If array contents point to dynamically-allocated memory, they should
  * be freed separately if @free_seg is %TRUE and no @clear_func
  * function has been set for @array.
  *
- * This function is not thread-safe. If using a #xarray_t from multiple
+ * This function is not thread-safe. If using a #GArray from multiple
  * threads, use only the atomic g_array_ref() and g_array_unref()
  * functions.
  *
  * Returns: the element data if @free_segment is %FALSE, otherwise
  *     %NULL. The element data should be freed using g_free().
  */
-xchar_t*
-g_array_free (xarray_t   *farray,
-              xboolean_t  free_segment)
+gchar*
+g_array_free (GArray   *farray,
+              gboolean  free_segment)
 {
   GRealArray *array = (GRealArray*) farray;
   ArrayFreeFlags flags;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   flags = (free_segment ? FREE_SEGMENT : 0);
 
@@ -451,17 +451,17 @@ g_array_free (xarray_t   *farray,
   return array_free (array, flags);
 }
 
-static xchar_t *
+static gchar *
 array_free (GRealArray     *array,
             ArrayFreeFlags  flags)
 {
-  xchar_t *segment;
+  gchar *segment;
 
   if (flags & FREE_SEGMENT)
     {
       if (array->clear_func != NULL)
         {
-          xuint_t i;
+          guint i;
 
           for (i = 0; i < array->len; i++)
             array->clear_func (g_array_elt_pos (array, i));
@@ -471,7 +471,7 @@ array_free (GRealArray     *array,
       segment = NULL;
     }
   else
-    segment = (xchar_t*) array->data;
+    segment = (gchar*) array->data;
 
   if (flags & PRESERVE_WRAPPER)
     {
@@ -489,18 +489,18 @@ array_free (GRealArray     *array,
 
 /**
  * g_array_append_vals:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @data: (not nullable): a pointer to the elements to append to the end of the array
  * @len: the number of elements to append
  *
  * Adds @len elements onto the end of the array.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
 /**
  * g_array_append_val:
- * @a: a #xarray_t
- * @v: the value to append to the #xarray_t
+ * @a: a #GArray
+ * @v: the value to append to the #GArray
  *
  * Adds the value on to the end of the array. The array will grow in
  * size automatically if necessary.
@@ -509,23 +509,23 @@ array_free (GRealArray     *array,
  * parameter @v. This means that you cannot use it with literal values
  * such as "27". You must use variables.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
-xarray_t*
-g_array_append_vals (xarray_t       *farray,
-                     xconstpointer data,
-                     xuint_t         len)
+GArray*
+g_array_append_vals (GArray       *farray,
+                     gconstpointer data,
+                     guint         len)
 {
   GRealArray *array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   if (len == 0)
     return farray;
 
   g_array_maybe_expand (array, len);
 
-  memcpy (g_array_elt_pos (array, array->len), data,
+  memcpy (g_array_elt_pos (array, array->len), data, 
           g_array_elt_len (array, len));
 
   array->len += len;
@@ -537,7 +537,7 @@ g_array_append_vals (xarray_t       *farray,
 
 /**
  * g_array_prepend_vals:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @data: (nullable): a pointer to the elements to prepend to the start of the array
  * @len: the number of elements to prepend, which may be zero
  *
@@ -550,12 +550,12 @@ g_array_append_vals (xarray_t       *farray,
  * existing elements in the array have to be moved to make space for
  * the new elements.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
 /**
  * g_array_prepend_val:
- * @a: a #xarray_t
- * @v: the value to prepend to the #xarray_t
+ * @a: a #GArray
+ * @v: the value to prepend to the #GArray
  *
  * Adds the value on to the start of the array. The array will grow in
  * size automatically if necessary.
@@ -568,16 +568,16 @@ g_array_append_vals (xarray_t       *farray,
  * parameter @v. This means that you cannot use it with literal values
  * such as "27". You must use variables.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
-xarray_t*
-g_array_prepend_vals (xarray_t        *farray,
-                      xconstpointer  data,
-                      xuint_t          len)
+GArray*
+g_array_prepend_vals (GArray        *farray,
+                      gconstpointer  data,
+                      guint          len)
 {
   GRealArray *array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   if (len == 0)
     return farray;
@@ -598,12 +598,12 @@ g_array_prepend_vals (xarray_t        *farray,
 
 /**
  * g_array_insert_vals:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @index_: the index to place the elements at
  * @data: (nullable): a pointer to the elements to insert
  * @len: the number of elements to insert
  *
- * Inserts @len elements into a #xarray_t at the given index.
+ * Inserts @len elements into a #GArray at the given index.
  *
  * If @index_ is greater than the array’s current length, the array is expanded.
  * The elements between the old end of the array and the newly inserted elements
@@ -617,11 +617,11 @@ g_array_prepend_vals (xarray_t        *farray,
  * @data may be %NULL if (and only if) @len is zero. If @len is zero, this
  * function is a no-op.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
 /**
  * g_array_insert_val:
- * @a: a #xarray_t
+ * @a: a #GArray
  * @i: the index to place the element at
  * @v: the value to insert into the array
  *
@@ -631,17 +631,17 @@ g_array_prepend_vals (xarray_t        *farray,
  * parameter @v. This means that you cannot use it with literal values
  * such as "27". You must use variables.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
-xarray_t*
-g_array_insert_vals (xarray_t        *farray,
-                     xuint_t          index_,
-                     xconstpointer  data,
-                     xuint_t          len)
+GArray*
+g_array_insert_vals (GArray        *farray,
+                     guint          index_,
+                     gconstpointer  data,
+                     guint          len)
 {
   GRealArray *array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   if (len == 0)
     return farray;
@@ -671,58 +671,58 @@ g_array_insert_vals (xarray_t        *farray,
 
 /**
  * g_array_set_size:
- * @array: a #xarray_t
- * @length: the new size of the #xarray_t
+ * @array: a #GArray
+ * @length: the new size of the #GArray
  *
  * Sets the size of the array, expanding it if necessary. If the array
  * was created with @clear_ set to %TRUE, the new elements are set to 0.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
-xarray_t*
-g_array_set_size (xarray_t *farray,
-                  xuint_t   length)
+GArray*
+g_array_set_size (GArray *farray,
+                  guint   length)
 {
   GRealArray *array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   if (length > array->len)
     {
       g_array_maybe_expand (array, length - array->len);
-
+      
       if (array->clear)
         g_array_elt_zero (array, array->len, length - array->len);
     }
   else if (length < array->len)
     g_array_remove_range (farray, length, array->len - length);
-
+  
   array->len = length;
-
+  
   g_array_zero_terminate (array);
-
+  
   return farray;
 }
 
 /**
  * g_array_remove_index:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @index_: the index of the element to remove
  *
- * Removes the element at the given index from a #xarray_t. The following
+ * Removes the element at the given index from a #GArray. The following
  * elements are moved down one place.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
-xarray_t*
-g_array_remove_index (xarray_t *farray,
-                      xuint_t   index_)
+GArray*
+g_array_remove_index (GArray *farray,
+                      guint   index_)
 {
   GRealArray* array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
-  xreturn_val_if_fail (index_ < array->len, NULL);
+  g_return_val_if_fail (index_ < array->len, NULL);
 
   if (array->clear_func != NULL)
     array->clear_func (g_array_elt_pos (array, index_));
@@ -744,25 +744,25 @@ g_array_remove_index (xarray_t *farray,
 
 /**
  * g_array_remove_index_fast:
- * @array: a @xarray_t
+ * @array: a @GArray
  * @index_: the index of the element to remove
  *
- * Removes the element at the given index from a #xarray_t. The last
+ * Removes the element at the given index from a #GArray. The last
  * element in the array is used to fill in the space, so this function
- * does not preserve the order of the #xarray_t. But it is faster than
+ * does not preserve the order of the #GArray. But it is faster than
  * g_array_remove_index().
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  */
-xarray_t*
-g_array_remove_index_fast (xarray_t *farray,
-                           xuint_t   index_)
+GArray*
+g_array_remove_index_fast (GArray *farray,
+                           guint   index_)
 {
   GRealArray* array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
-  xreturn_val_if_fail (index_ < array->len, NULL);
+  g_return_val_if_fail (index_ < array->len, NULL);
 
   if (array->clear_func != NULL)
     array->clear_func (g_array_elt_pos (array, index_));
@@ -771,7 +771,7 @@ g_array_remove_index_fast (xarray_t *farray,
     memcpy (g_array_elt_pos (array, index_),
             g_array_elt_pos (array, array->len - 1),
             g_array_elt_len (array, 1));
-
+  
   array->len -= 1;
 
   if (G_UNLIKELY (g_mem_gc_friendly))
@@ -784,31 +784,31 @@ g_array_remove_index_fast (xarray_t *farray,
 
 /**
  * g_array_remove_range:
- * @array: a @xarray_t
+ * @array: a @GArray
  * @index_: the index of the first element to remove
  * @length: the number of elements to remove
  *
  * Removes the given number of elements starting at the given index
- * from a #xarray_t.  The following elements are moved to close the gap.
+ * from a #GArray.  The following elements are moved to close the gap.
  *
- * Returns: the #xarray_t
+ * Returns: the #GArray
  *
  * Since: 2.4
  */
-xarray_t*
-g_array_remove_range (xarray_t *farray,
-                      xuint_t   index_,
-                      xuint_t   length)
+GArray*
+g_array_remove_range (GArray *farray,
+                      guint   index_,
+                      guint   length)
 {
   GRealArray *array = (GRealArray*) farray;
 
-  xreturn_val_if_fail (array, NULL);
-  xreturn_val_if_fail (index_ <= array->len, NULL);
-  xreturn_val_if_fail (index_ + length <= array->len, NULL);
+  g_return_val_if_fail (array, NULL);
+  g_return_val_if_fail (index_ <= array->len, NULL);
+  g_return_val_if_fail (index_ + length <= array->len, NULL);
 
   if (array->clear_func != NULL)
     {
-      xuint_t i;
+      guint i;
 
       for (i = 0; i < length; i++)
         array->clear_func (g_array_elt_pos (array, index_ + i));
@@ -830,10 +830,10 @@ g_array_remove_range (xarray_t *farray,
 
 /**
  * g_array_sort:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @compare_func: comparison function
  *
- * Sorts a #xarray_t using @compare_func which should be a qsort()-style
+ * Sorts a #GArray using @compare_func which should be a qsort()-style
  * comparison function (returns less than zero for first arg is less
  * than second arg, zero for equal, greater zero if first arg is
  * greater than second arg).
@@ -841,7 +841,7 @@ g_array_remove_range (xarray_t *farray,
  * This is guaranteed to be a stable sort since version 2.32.
  */
 void
-g_array_sort (xarray_t       *farray,
+g_array_sort (GArray       *farray,
               GCompareFunc  compare_func)
 {
   GRealArray *array = (GRealArray*) farray;
@@ -859,7 +859,7 @@ g_array_sort (xarray_t       *farray,
 
 /**
  * g_array_sort_with_data:
- * @array: a #xarray_t
+ * @array: a #GArray
  * @compare_func: comparison function
  * @user_data: data to pass to @compare_func
  *
@@ -873,9 +873,9 @@ g_array_sort (xarray_t       *farray,
  * This did not actually work, so any such code should be removed.
  */
 void
-g_array_sort_with_data (xarray_t           *farray,
+g_array_sort_with_data (GArray           *farray,
                         GCompareDataFunc  compare_func,
-                        xpointer_t          user_data)
+                        gpointer          user_data)
 {
   GRealArray *array = (GRealArray*) farray;
 
@@ -891,7 +891,7 @@ g_array_sort_with_data (xarray_t           *farray,
 
 /**
  * g_array_binary_search:
- * @array: a #xarray_t.
+ * @array: a #GArray.
  * @target: a pointer to the item to look up.
  * @compare_func: A #GCompareFunc used to locate @target.
  * @out_match_index: (optional) (out): return location
@@ -907,20 +907,20 @@ g_array_sort_with_data (xarray_t           *farray,
  * search, so the @array must absolutely be sorted to return a correct
  * result (if not, the function may produce false-negative).
  *
- * This example defines a comparison function and search an element in a #xarray_t:
+ * This example defines a comparison function and search an element in a #GArray:
  * |[<!-- language="C" -->
- * static xint_t*
- * cmpint (xconstpointer a, xconstpointer b)
+ * static gint*
+ * cmpint (gconstpointer a, gconstpointer b)
  * {
- *   const xint_t *_a = a;
- *   const xint_t *_b = b;
+ *   const gint *_a = a;
+ *   const gint *_b = b;
  *
  *   return *_a - *_b;
  * }
  * ...
- * xint_t i = 424242;
- * xuint_t matched_index;
- * xboolean_t result = g_array_binary_search (garray, &i, cmpint, &matched_index);
+ * gint i = 424242;
+ * guint matched_index;
+ * gboolean result = g_array_binary_search (garray, &i, cmpint, &matched_index);
  * ...
  * ]|
  *
@@ -928,19 +928,19 @@ g_array_sort_with_data (xarray_t           *farray,
  *
  * Since: 2.62
  */
-xboolean_t
-g_array_binary_search (xarray_t        *array,
-                       xconstpointer  target,
+gboolean
+g_array_binary_search (GArray        *array,
+                       gconstpointer  target,
                        GCompareFunc   compare_func,
-                       xuint_t         *out_match_index)
+                       guint         *out_match_index)
 {
-  xboolean_t result = FALSE;
+  gboolean result = FALSE;
   GRealArray *_array = (GRealArray *) array;
-  xuint_t left, middle = 0, right;
-  xint_t val;
+  guint left, middle = 0, right;
+  gint val;
 
-  xreturn_val_if_fail (_array != NULL, FALSE);
-  xreturn_val_if_fail (compare_func != NULL, FALSE);
+  g_return_val_if_fail (_array != NULL, FALSE);
+  g_return_val_if_fail (compare_func != NULL, FALSE);
 
   if (G_LIKELY(_array->len))
     {
@@ -974,25 +974,25 @@ g_array_binary_search (xarray_t        *array,
 
 static void
 g_array_maybe_expand (GRealArray *array,
-                      xuint_t       len)
+                      guint       len)
 {
-  xuint_t max_len, want_len;
-
+  guint max_len, want_len;
+ 
   /* The maximum array length is derived from following constraints:
-   * - The number of bytes must fit into a xsize_t / 2.
-   * - The number of elements must fit into xuint_t.
+   * - The number of bytes must fit into a gsize / 2.
+   * - The number of elements must fit into guint.
    * - zero terminated arrays must leave space for the terminating element
    */
   max_len = MIN (G_MAXSIZE / 2 / array->elt_size, G_MAXUINT) - array->zero_terminated;
 
   /* Detect potential overflow */
   if G_UNLIKELY ((max_len - array->len) < len)
-    xerror ("adding %u to array would overflow", len);
+    g_error ("adding %u to array would overflow", len);
 
   want_len = array->len + len + array->zero_terminated;
   if (want_len > array->elt_capacity)
     {
-      xsize_t want_alloc = g_nearest_pow (g_array_elt_len (array, want_len));
+      gsize want_alloc = g_nearest_pow (g_array_elt_len (array, want_len));
       want_alloc = MAX (want_alloc, MIN_ARRAY_SIZE);
 
       array->data = g_realloc (array->data, want_alloc);
@@ -1020,43 +1020,43 @@ g_array_maybe_expand (GRealArray *array,
  * elements remaining the same. You should also be careful when deleting
  * elements while iterating over the array.
  *
- * To create a pointer array, use xptr_array_new().
+ * To create a pointer array, use g_ptr_array_new().
  *
- * To add elements to a pointer array, use xptr_array_add().
+ * To add elements to a pointer array, use g_ptr_array_add().
  *
- * To remove elements from a pointer array, use xptr_array_remove(),
- * xptr_array_remove_index() or xptr_array_remove_index_fast().
+ * To remove elements from a pointer array, use g_ptr_array_remove(),
+ * g_ptr_array_remove_index() or g_ptr_array_remove_index_fast().
  *
- * To access an element of a pointer array, use xptr_array_index().
+ * To access an element of a pointer array, use g_ptr_array_index().
  *
- * To set the size of a pointer array, use xptr_array_set_size().
+ * To set the size of a pointer array, use g_ptr_array_set_size().
  *
- * To free a pointer array, use xptr_array_free().
+ * To free a pointer array, use g_ptr_array_free().
  *
- * An example using a #xptr_array_t:
+ * An example using a #GPtrArray:
  * |[<!-- language="C" -->
- *   xptr_array_t *array;
- *   xchar_t *string1 = "one";
- *   xchar_t *string2 = "two";
- *   xchar_t *string3 = "three";
+ *   GPtrArray *array;
+ *   gchar *string1 = "one";
+ *   gchar *string2 = "two";
+ *   gchar *string3 = "three";
  *
- *   array = xptr_array_new ();
- *   xptr_array_add (array, (xpointer_t) string1);
- *   xptr_array_add (array, (xpointer_t) string2);
- *   xptr_array_add (array, (xpointer_t) string3);
+ *   array = g_ptr_array_new ();
+ *   g_ptr_array_add (array, (gpointer) string1);
+ *   g_ptr_array_add (array, (gpointer) string2);
+ *   g_ptr_array_add (array, (gpointer) string3);
  *
- *   if (xptr_array_index (array, 0) != (xpointer_t) string1)
+ *   if (g_ptr_array_index (array, 0) != (gpointer) string1)
  *     g_print ("ERROR: got %p instead of %p\n",
- *              xptr_array_index (array, 0), string1);
+ *              g_ptr_array_index (array, 0), string1);
  *
- *   xptr_array_free (array, TRUE);
+ *   g_ptr_array_free (array, TRUE);
  * ]|
  */
 
 typedef struct _GRealPtrArray  GRealPtrArray;
 
 /**
- * xptr_array_t:
+ * GPtrArray:
  * @pdata: points to the array of pointers, which may be moved when the
  *     array grows
  * @len: number of pointers in the array
@@ -1065,16 +1065,16 @@ typedef struct _GRealPtrArray  GRealPtrArray;
  */
 struct _GRealPtrArray
 {
-  xpointer_t       *pdata;
-  xuint_t           len;
-  xuint_t           alloc;
+  gpointer       *pdata;
+  guint           len;
+  guint           alloc;
   gatomicrefcount ref_count;
-  xdestroy_notify_t  element_free_func;
+  GDestroyNotify  element_free_func;
 };
 
 /**
- * xptr_array_index:
- * @array: a #xptr_array_t
+ * g_ptr_array_index:
+ * @array: a #GPtrArray
  * @index_: the index of the pointer to return
  *
  * Returns the pointer at the given index of the pointer array.
@@ -1085,12 +1085,12 @@ struct _GRealPtrArray
  * Returns: the pointer at the given index
  */
 
-static void xptr_array_maybe_expand (GRealPtrArray *array,
-                                      xuint_t          len);
+static void g_ptr_array_maybe_expand (GRealPtrArray *array,
+                                      guint          len);
 
-static xptr_array_t *
-ptr_array_new (xuint_t reserved_size,
-               xdestroy_notify_t element_free_func)
+static GPtrArray *
+ptr_array_new (guint reserved_size,
+               GDestroyNotify element_free_func)
 {
   GRealPtrArray *array;
 
@@ -1104,27 +1104,27 @@ ptr_array_new (xuint_t reserved_size,
   g_atomic_ref_count_init (&array->ref_count);
 
   if (reserved_size != 0)
-    xptr_array_maybe_expand (array, reserved_size);
+    g_ptr_array_maybe_expand (array, reserved_size);
 
-  return (xptr_array_t *) array;
+  return (GPtrArray *) array;
 }
 
 /**
- * xptr_array_new:
+ * g_ptr_array_new:
  *
- * Creates a new #xptr_array_t with a reference count of 1.
+ * Creates a new #GPtrArray with a reference count of 1.
  *
- * Returns: the new #xptr_array_t
+ * Returns: the new #GPtrArray
  */
-xptr_array_t*
-xptr_array_new (void)
+GPtrArray*
+g_ptr_array_new (void)
 {
   return ptr_array_new (0, NULL);
 }
 
 /**
- * xptr_array_steal:
- * @array: a #xptr_array_t.
+ * g_ptr_array_steal:
+ * @array: a #GPtrArray.
  * @len: (optional) (out): pointer to retrieve the number of
  *    elements of the original array
  *
@@ -1132,41 +1132,41 @@ xptr_array_new (void)
  * the underlying array is preserved for use elsewhere and returned
  * to the caller.
  *
- * Even if set, the #xdestroy_notify_t function will never be called
+ * Even if set, the #GDestroyNotify function will never be called
  * on the current contents of the array and the caller is
  * responsible for freeing the array elements.
  *
  * An example of use:
  * |[<!-- language="C" -->
- * x_autoptr(xptr_array) chunk_buffer = xptr_array_new_with_free_func (xbytes_unref);
+ * g_autoptr(GPtrArray) chunk_buffer = g_ptr_array_new_with_free_func (g_bytes_unref);
  *
  * // Some part of your application appends a number of chunks to the pointer array.
- * xptr_array_add (chunk_buffer, xbytes_new_static ("hello", 5));
- * xptr_array_add (chunk_buffer, xbytes_new_static ("world", 5));
+ * g_ptr_array_add (chunk_buffer, g_bytes_new_static ("hello", 5));
+ * g_ptr_array_add (chunk_buffer, g_bytes_new_static ("world", 5));
  *
  * …
  *
  * // Periodically, the chunks need to be sent as an array-and-length to some
  * // other part of the program.
- * xbytes_t **chunks;
- * xsize_t n_chunks;
+ * GBytes **chunks;
+ * gsize n_chunks;
  *
- * chunks = xptr_array_steal (chunk_buffer, &n_chunks);
- * for (xsize_t i = 0; i < n_chunks; i++)
+ * chunks = g_ptr_array_steal (chunk_buffer, &n_chunks);
+ * for (gsize i = 0; i < n_chunks; i++)
  *   {
  *     // Do something with each chunk here, and then free them, since
- *     // xptr_array_steal() transfers ownership of all the elements and the
+ *     // g_ptr_array_steal() transfers ownership of all the elements and the
  *     // array to the caller.
  *     …
  *
- *     xbytes_unref (chunks[i]);
+ *     g_bytes_unref (chunks[i]);
  *   }
  *
  * g_free (chunks);
  *
- * // After calling xptr_array_steal(), the pointer array can be reused for the
+ * // After calling g_ptr_array_steal(), the pointer array can be reused for the
  * // next set of chunks.
- * xassert (chunk_buffer->len == 0);
+ * g_assert (chunk_buffer->len == 0);
  * ]|
  *
  * Returns: (transfer full): the element data, which should be
@@ -1174,17 +1174,17 @@ xptr_array_new (void)
  *
  * Since: 2.64
  */
-xpointer_t *
-xptr_array_steal (xptr_array_t *array,
-                   xsize_t *len)
+gpointer *
+g_ptr_array_steal (GPtrArray *array,
+                   gsize *len)
 {
   GRealPtrArray *rarray;
-  xpointer_t *segment;
+  gpointer *segment;
 
-  xreturn_val_if_fail (array != NULL, NULL);
+  g_return_val_if_fail (array != NULL, NULL);
 
   rarray = (GRealPtrArray *) array;
-  segment = (xpointer_t *) rarray->pdata;
+  segment = (gpointer *) rarray->pdata;
 
   if (len != NULL)
     *len = rarray->len;
@@ -1196,12 +1196,12 @@ xptr_array_steal (xptr_array_t *array,
 }
 
 /**
- * xptr_array_copy:
- * @array: #xptr_array_t to duplicate
+ * g_ptr_array_copy:
+ * @array: #GPtrArray to duplicate
  * @func: (nullable): a copy function used to copy every element in the array
  * @user_data: user data passed to the copy function @func, or %NULL
  *
- * Makes a full (deep) copy of a #xptr_array_t.
+ * Makes a full (deep) copy of a #GPtrArray.
  *
  * @func, as a #GCopyFunc, takes two arguments, the data to be copied
  * and a @user_data pointer. On common processor architectures, it's safe to
@@ -1210,30 +1210,30 @@ xptr_array_steal (xptr_array_t *array,
  * `-Wcast-function-type` warning.
  *
  * If @func is %NULL, then only the pointers (and not what they are
- * pointing to) are copied to the new #xptr_array_t.
+ * pointing to) are copied to the new #GPtrArray.
  *
- * The copy of @array will have the same #xdestroy_notify_t for its elements as
+ * The copy of @array will have the same #GDestroyNotify for its elements as
  * @array.
  *
- * Returns: (transfer full): a deep copy of the initial #xptr_array_t.
+ * Returns: (transfer full): a deep copy of the initial #GPtrArray.
  *
  * Since: 2.62
  **/
-xptr_array_t *
-xptr_array_copy (xptr_array_t *array,
+GPtrArray *
+g_ptr_array_copy (GPtrArray *array,
                   GCopyFunc  func,
-                  xpointer_t   user_data)
+                  gpointer   user_data)
 {
-  xptr_array_t *new_array;
+  GPtrArray *new_array;
 
-  xreturn_val_if_fail (array != NULL, NULL);
+  g_return_val_if_fail (array != NULL, NULL);
 
   new_array = ptr_array_new (array->len,
                              ((GRealPtrArray *) array)->element_free_func);
 
   if (func != NULL)
     {
-      xuint_t i;
+      guint i;
 
       for (i = 0; i < array->len; i++)
         new_array->pdata[i] = func (array->pdata[i], user_data);
@@ -1250,40 +1250,40 @@ xptr_array_copy (xptr_array_t *array,
 }
 
 /**
- * xptr_array_sized_new:
+ * g_ptr_array_sized_new:
  * @reserved_size: number of pointers preallocated
  *
- * Creates a new #xptr_array_t with @reserved_size pointers preallocated
+ * Creates a new #GPtrArray with @reserved_size pointers preallocated
  * and a reference count of 1. This avoids frequent reallocation, if
  * you are going to add many pointers to the array. Note however that
  * the size of the array is still 0.
  *
- * Returns: the new #xptr_array_t
+ * Returns: the new #GPtrArray
  */
-xptr_array_t*
-xptr_array_sized_new (xuint_t reserved_size)
+GPtrArray*
+g_ptr_array_sized_new (guint reserved_size)
 {
   return ptr_array_new (reserved_size, NULL);
 }
 
 /**
  * g_array_copy:
- * @array: A #xarray_t.
+ * @array: A #GArray.
  *
- * Create a shallow copy of a #xarray_t. If the array elements consist of
+ * Create a shallow copy of a #GArray. If the array elements consist of
  * pointers to data, the pointers are copied but the actual data is not.
  *
  * Returns: (transfer container): A copy of @array.
  *
  * Since: 2.62
  **/
-xarray_t *
-g_array_copy (xarray_t *array)
+GArray *
+g_array_copy (GArray *array)
 {
   GRealArray *rarray = (GRealArray *) array;
   GRealArray *new_rarray;
 
-  xreturn_val_if_fail (rarray != NULL, NULL);
+  g_return_val_if_fail (rarray != NULL, NULL);
 
   new_rarray =
     (GRealArray *) g_array_sized_new (rarray->zero_terminated, rarray->clear,
@@ -1294,69 +1294,69 @@ g_array_copy (xarray_t *array)
 
   g_array_zero_terminate (new_rarray);
 
-  return (xarray_t *) new_rarray;
+  return (GArray *) new_rarray;
 }
 
 /**
- * xptr_array_new_with_free_func:
+ * g_ptr_array_new_with_free_func:
  * @element_free_func: (nullable): A function to free elements with
  *     destroy @array or %NULL
  *
- * Creates a new #xptr_array_t with a reference count of 1 and use
+ * Creates a new #GPtrArray with a reference count of 1 and use
  * @element_free_func for freeing each element when the array is destroyed
- * either via xptr_array_unref(), when xptr_array_free() is called with
+ * either via g_ptr_array_unref(), when g_ptr_array_free() is called with
  * @free_segment set to %TRUE or when removing elements.
  *
- * Returns: A new #xptr_array_t
+ * Returns: A new #GPtrArray
  *
  * Since: 2.22
  */
-xptr_array_t*
-xptr_array_new_with_free_func (xdestroy_notify_t element_free_func)
+GPtrArray*
+g_ptr_array_new_with_free_func (GDestroyNotify element_free_func)
 {
   return ptr_array_new (0, element_free_func);
 }
 
 /**
- * xptr_array_new_full:
+ * g_ptr_array_new_full:
  * @reserved_size: number of pointers preallocated
  * @element_free_func: (nullable): A function to free elements with
  *     destroy @array or %NULL
  *
- * Creates a new #xptr_array_t with @reserved_size pointers preallocated
+ * Creates a new #GPtrArray with @reserved_size pointers preallocated
  * and a reference count of 1. This avoids frequent reallocation, if
  * you are going to add many pointers to the array. Note however that
  * the size of the array is still 0. It also set @element_free_func
  * for freeing each element when the array is destroyed either via
- * xptr_array_unref(), when xptr_array_free() is called with
+ * g_ptr_array_unref(), when g_ptr_array_free() is called with
  * @free_segment set to %TRUE or when removing elements.
  *
- * Returns: A new #xptr_array_t
+ * Returns: A new #GPtrArray
  *
  * Since: 2.30
  */
-xptr_array_t*
-xptr_array_new_full (xuint_t          reserved_size,
-                      xdestroy_notify_t element_free_func)
+GPtrArray*
+g_ptr_array_new_full (guint          reserved_size,
+                      GDestroyNotify element_free_func)
 {
   return ptr_array_new (reserved_size, element_free_func);
 }
 
 /**
- * xptr_array_set_free_func:
- * @array: A #xptr_array_t
+ * g_ptr_array_set_free_func:
+ * @array: A #GPtrArray
  * @element_free_func: (nullable): A function to free elements with
  *     destroy @array or %NULL
  *
  * Sets a function for freeing each element when @array is destroyed
- * either via xptr_array_unref(), when xptr_array_free() is called
+ * either via g_ptr_array_unref(), when g_ptr_array_free() is called
  * with @free_segment set to %TRUE or when removing elements.
  *
  * Since: 2.22
  */
 void
-xptr_array_set_free_func (xptr_array_t      *array,
-                           xdestroy_notify_t  element_free_func)
+g_ptr_array_set_free_func (GPtrArray      *array,
+                           GDestroyNotify  element_free_func)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
 
@@ -1366,43 +1366,43 @@ xptr_array_set_free_func (xptr_array_t      *array,
 }
 
 /**
- * xptr_array_ref:
- * @array: a #xptr_array_t
+ * g_ptr_array_ref:
+ * @array: a #GPtrArray
  *
  * Atomically increments the reference count of @array by one.
  * This function is thread-safe and may be called from any thread.
  *
- * Returns: The passed in #xptr_array_t
+ * Returns: The passed in #GPtrArray
  *
  * Since: 2.22
  */
-xptr_array_t*
-xptr_array_ref (xptr_array_t *array)
+GPtrArray*
+g_ptr_array_ref (GPtrArray *array)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
 
-  xreturn_val_if_fail (array, NULL);
+  g_return_val_if_fail (array, NULL);
 
   g_atomic_ref_count_inc (&rarray->ref_count);
 
   return array;
 }
 
-static xpointer_t *ptr_array_free (xptr_array_t *, ArrayFreeFlags);
+static gpointer *ptr_array_free (GPtrArray *, ArrayFreeFlags);
 
 /**
- * xptr_array_unref:
- * @array: A #xptr_array_t
+ * g_ptr_array_unref:
+ * @array: A #GPtrArray
  *
  * Atomically decrements the reference count of @array by one. If the
  * reference count drops to 0, the effect is the same as calling
- * xptr_array_free() with @free_segment set to %TRUE. This function
+ * g_ptr_array_free() with @free_segment set to %TRUE. This function
  * is thread-safe and may be called from any thread.
  *
  * Since: 2.22
  */
 void
-xptr_array_unref (xptr_array_t *array)
+g_ptr_array_unref (GPtrArray *array)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
 
@@ -1413,36 +1413,36 @@ xptr_array_unref (xptr_array_t *array)
 }
 
 /**
- * xptr_array_free:
- * @array: a #xptr_array_t
+ * g_ptr_array_free:
+ * @array: a #GPtrArray
  * @free_seg: if %TRUE the actual pointer array is freed as well
  *
- * Frees the memory allocated for the #xptr_array_t. If @free_seg is %TRUE
+ * Frees the memory allocated for the #GPtrArray. If @free_seg is %TRUE
  * it frees the memory block holding the elements as well. Pass %FALSE
- * if you want to free the #xptr_array_t wrapper but preserve the
+ * if you want to free the #GPtrArray wrapper but preserve the
  * underlying array for use elsewhere. If the reference count of @array
- * is greater than one, the #xptr_array_t wrapper is preserved but the
+ * is greater than one, the #GPtrArray wrapper is preserved but the
  * size of @array will be set to zero.
  *
  * If array contents point to dynamically-allocated memory, they should
- * be freed separately if @free_seg is %TRUE and no #xdestroy_notify_t
+ * be freed separately if @free_seg is %TRUE and no #GDestroyNotify
  * function has been set for @array.
  *
- * This function is not thread-safe. If using a #xptr_array_t from multiple
- * threads, use only the atomic xptr_array_ref() and xptr_array_unref()
+ * This function is not thread-safe. If using a #GPtrArray from multiple
+ * threads, use only the atomic g_ptr_array_ref() and g_ptr_array_unref()
  * functions.
  *
  * Returns: (transfer full) (nullable): the pointer array if @free_seg is
  *     %FALSE, otherwise %NULL. The pointer array should be freed using g_free().
  */
-xpointer_t*
-xptr_array_free (xptr_array_t *array,
-                  xboolean_t   free_segment)
+gpointer*
+g_ptr_array_free (GPtrArray *array,
+                  gboolean   free_segment)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
   ArrayFreeFlags flags;
 
-  xreturn_val_if_fail (rarray, NULL);
+  g_return_val_if_fail (rarray, NULL);
 
   flags = (free_segment ? FREE_SEGMENT : 0);
 
@@ -1455,12 +1455,12 @@ xptr_array_free (xptr_array_t *array,
   return ptr_array_free (array, flags);
 }
 
-static xpointer_t *
-ptr_array_free (xptr_array_t      *array,
+static gpointer *
+ptr_array_free (GPtrArray      *array,
                 ArrayFreeFlags  flags)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
-  xpointer_t *segment;
+  gpointer *segment;
 
   if (flags & FREE_SEGMENT)
     {
@@ -1470,10 +1470,10 @@ ptr_array_free (xptr_array_t      *array,
        *
        * https://bugzilla.gnome.org/show_bug.cgi?id=769064
        */
-      xpointer_t *stolen_pdata = g_steal_pointer (&rarray->pdata);
+      gpointer *stolen_pdata = g_steal_pointer (&rarray->pdata);
       if (rarray->element_free_func != NULL)
         {
-          xuint_t i;
+          guint i;
 
           for (i = 0; i < rarray->len; ++i)
             rarray->element_free_func (stolen_pdata[i]);
@@ -1500,27 +1500,27 @@ ptr_array_free (xptr_array_t      *array,
 }
 
 static void
-xptr_array_maybe_expand (GRealPtrArray *array,
-                          xuint_t          len)
+g_ptr_array_maybe_expand (GRealPtrArray *array,
+                          guint          len)
 {
-  xuint_t max_len;
+  guint max_len;
 
   /* The maximum array length is derived from following constraints:
-   * - The number of bytes must fit into a xsize_t / 2.
-   * - The number of elements must fit into xuint_t.
+   * - The number of bytes must fit into a gsize / 2.
+   * - The number of elements must fit into guint.
    */
-  max_len = MIN (G_MAXSIZE / 2 / sizeof (xpointer_t), G_MAXUINT);
+  max_len = MIN (G_MAXSIZE / 2 / sizeof (gpointer), G_MAXUINT);
 
   /* Detect potential overflow */
   if G_UNLIKELY ((max_len - array->len) < len)
-    xerror ("adding %u to array would overflow", len);
+    g_error ("adding %u to array would overflow", len);
 
   if ((array->len + len) > array->alloc)
     {
-      xuint_t old_alloc = array->alloc;
-      xsize_t want_alloc = g_nearest_pow (sizeof (xpointer_t) * (array->len + len));
+      guint old_alloc = array->alloc;
+      gsize want_alloc = g_nearest_pow (sizeof (gpointer) * (array->len + len));
       want_alloc = MAX (want_alloc, MIN_ARRAY_SIZE);
-      array->alloc = MIN (want_alloc / sizeof (xpointer_t), G_MAXUINT);
+      array->alloc = MIN (want_alloc / sizeof (gpointer), G_MAXUINT);
       array->pdata = g_realloc (array->pdata, want_alloc);
       if (G_UNLIKELY (g_mem_gc_friendly))
         for ( ; old_alloc < array->alloc; old_alloc++)
@@ -1529,35 +1529,35 @@ xptr_array_maybe_expand (GRealPtrArray *array,
 }
 
 /**
- * xptr_array_set_size:
- * @array: a #xptr_array_t
+ * g_ptr_array_set_size:
+ * @array: a #GPtrArray
  * @length: the new length of the pointer array
  *
  * Sets the size of the array. When making the array larger,
  * newly-added elements will be set to %NULL. When making it smaller,
- * if @array has a non-%NULL #xdestroy_notify_t function then it will be
+ * if @array has a non-%NULL #GDestroyNotify function then it will be
  * called for the removed elements.
  */
 void
-xptr_array_set_size  (xptr_array_t *array,
-                       xint_t       length)
+g_ptr_array_set_size  (GPtrArray *array,
+                       gint       length)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
-  xuint_t length_unsigned;
+  guint length_unsigned;
 
   g_return_if_fail (rarray);
   g_return_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL));
   g_return_if_fail (length >= 0);
 
-  length_unsigned = (xuint_t) length;
+  length_unsigned = (guint) length;
 
   if (length_unsigned > rarray->len)
     {
-      xuint_t i;
-      xptr_array_maybe_expand (rarray, (length_unsigned - rarray->len));
-      /* This is not
+      guint i;
+      g_ptr_array_maybe_expand (rarray, (length_unsigned - rarray->len));
+      /* This is not 
        *     memset (array->pdata + array->len, 0,
-       *            sizeof (xpointer_t) * (length_unsigned - array->len));
+       *            sizeof (gpointer) * (length_unsigned - array->len));
        * to make it really portable. Remember (void*)NULL needn't be
        * bitwise zero. It of course is silly not to use memset (..,0,..).
        */
@@ -1565,24 +1565,24 @@ xptr_array_set_size  (xptr_array_t *array,
         rarray->pdata[i] = NULL;
     }
   else if (length_unsigned < rarray->len)
-    xptr_array_remove_range (array, length_unsigned, rarray->len - length_unsigned);
+    g_ptr_array_remove_range (array, length_unsigned, rarray->len - length_unsigned);
 
   rarray->len = length_unsigned;
 }
 
-static xpointer_t
-ptr_array_remove_index (xptr_array_t *array,
-                        xuint_t      index_,
-                        xboolean_t   fast,
-                        xboolean_t   free_element)
+static gpointer
+ptr_array_remove_index (GPtrArray *array,
+                        guint      index_,
+                        gboolean   fast,
+                        gboolean   free_element)
 {
   GRealPtrArray *rarray = (GRealPtrArray *) array;
-  xpointer_t result;
+  gpointer result;
 
-  xreturn_val_if_fail (rarray, NULL);
-  xreturn_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
+  g_return_val_if_fail (rarray, NULL);
+  g_return_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
 
-  xreturn_val_if_fail (index_ < rarray->len, NULL);
+  g_return_val_if_fail (index_ < rarray->len, NULL);
 
   result = rarray->pdata[index_];
 
@@ -1591,7 +1591,7 @@ ptr_array_remove_index (xptr_array_t *array,
 
   if (index_ != rarray->len - 1 && !fast)
     memmove (rarray->pdata + index_, rarray->pdata + index_ + 1,
-             sizeof (xpointer_t) * (rarray->len - index_ - 1));
+             sizeof (gpointer) * (rarray->len - index_ - 1));
   else if (index_ != rarray->len - 1)
     rarray->pdata[index_] = rarray->pdata[rarray->len - 1];
 
@@ -1604,116 +1604,116 @@ ptr_array_remove_index (xptr_array_t *array,
 }
 
 /**
- * xptr_array_remove_index:
- * @array: a #xptr_array_t
+ * g_ptr_array_remove_index:
+ * @array: a #GPtrArray
  * @index_: the index of the pointer to remove
  *
  * Removes the pointer at the given index from the pointer array.
  * The following elements are moved down one place. If @array has
- * a non-%NULL #xdestroy_notify_t function it is called for the removed
+ * a non-%NULL #GDestroyNotify function it is called for the removed
  * element. If so, the return value from this function will potentially point
- * to freed memory (depending on the #xdestroy_notify_t implementation).
+ * to freed memory (depending on the #GDestroyNotify implementation).
  *
  * Returns: (nullable): the pointer which was removed
  */
-xpointer_t
-xptr_array_remove_index (xptr_array_t *array,
-                          xuint_t      index_)
+gpointer
+g_ptr_array_remove_index (GPtrArray *array,
+                          guint      index_)
 {
   return ptr_array_remove_index (array, index_, FALSE, TRUE);
 }
 
 /**
- * xptr_array_remove_index_fast:
- * @array: a #xptr_array_t
+ * g_ptr_array_remove_index_fast:
+ * @array: a #GPtrArray
  * @index_: the index of the pointer to remove
  *
  * Removes the pointer at the given index from the pointer array.
  * The last element in the array is used to fill in the space, so
  * this function does not preserve the order of the array. But it
- * is faster than xptr_array_remove_index(). If @array has a non-%NULL
- * #xdestroy_notify_t function it is called for the removed element. If so, the
+ * is faster than g_ptr_array_remove_index(). If @array has a non-%NULL
+ * #GDestroyNotify function it is called for the removed element. If so, the
  * return value from this function will potentially point to freed memory
- * (depending on the #xdestroy_notify_t implementation).
+ * (depending on the #GDestroyNotify implementation).
  *
  * Returns: (nullable): the pointer which was removed
  */
-xpointer_t
-xptr_array_remove_index_fast (xptr_array_t *array,
-                               xuint_t      index_)
+gpointer
+g_ptr_array_remove_index_fast (GPtrArray *array,
+                               guint      index_)
 {
   return ptr_array_remove_index (array, index_, TRUE, TRUE);
 }
 
 /**
- * xptr_array_steal_index:
- * @array: a #xptr_array_t
+ * g_ptr_array_steal_index:
+ * @array: a #GPtrArray
  * @index_: the index of the pointer to steal
  *
  * Removes the pointer at the given index from the pointer array.
- * The following elements are moved down one place. The #xdestroy_notify_t for
+ * The following elements are moved down one place. The #GDestroyNotify for
  * @array is *not* called on the removed element; ownership is transferred to
  * the caller of this function.
  *
  * Returns: (transfer full) (nullable): the pointer which was removed
  * Since: 2.58
  */
-xpointer_t
-xptr_array_steal_index (xptr_array_t *array,
-                         xuint_t      index_)
+gpointer
+g_ptr_array_steal_index (GPtrArray *array,
+                         guint      index_)
 {
   return ptr_array_remove_index (array, index_, FALSE, FALSE);
 }
 
 /**
- * xptr_array_steal_index_fast:
- * @array: a #xptr_array_t
+ * g_ptr_array_steal_index_fast:
+ * @array: a #GPtrArray
  * @index_: the index of the pointer to steal
  *
  * Removes the pointer at the given index from the pointer array.
  * The last element in the array is used to fill in the space, so
  * this function does not preserve the order of the array. But it
- * is faster than xptr_array_steal_index(). The #xdestroy_notify_t for @array is
+ * is faster than g_ptr_array_steal_index(). The #GDestroyNotify for @array is
  * *not* called on the removed element; ownership is transferred to the caller
  * of this function.
  *
  * Returns: (transfer full) (nullable): the pointer which was removed
  * Since: 2.58
  */
-xpointer_t
-xptr_array_steal_index_fast (xptr_array_t *array,
-                              xuint_t      index_)
+gpointer
+g_ptr_array_steal_index_fast (GPtrArray *array,
+                              guint      index_)
 {
   return ptr_array_remove_index (array, index_, TRUE, FALSE);
 }
 
 /**
- * xptr_array_remove_range:
- * @array: a @xptr_array_t
+ * g_ptr_array_remove_range:
+ * @array: a @GPtrArray
  * @index_: the index of the first pointer to remove
  * @length: the number of pointers to remove
  *
  * Removes the given number of pointers starting at the given index
- * from a #xptr_array_t. The following elements are moved to close the
- * gap. If @array has a non-%NULL #xdestroy_notify_t function it is
+ * from a #GPtrArray. The following elements are moved to close the
+ * gap. If @array has a non-%NULL #GDestroyNotify function it is
  * called for the removed elements.
  *
  * Returns: the @array
  *
  * Since: 2.4
  */
-xptr_array_t*
-xptr_array_remove_range (xptr_array_t *array,
-                          xuint_t      index_,
-                          xuint_t      length)
+GPtrArray*
+g_ptr_array_remove_range (GPtrArray *array,
+                          guint      index_,
+                          guint      length)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
-  xuint_t i;
+  guint i;
 
-  xreturn_val_if_fail (rarray != NULL, NULL);
-  xreturn_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
-  xreturn_val_if_fail (index_ <= rarray->len, NULL);
-  xreturn_val_if_fail (index_ + length <= rarray->len, NULL);
+  g_return_val_if_fail (rarray != NULL, NULL);
+  g_return_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
+  g_return_val_if_fail (index_ <= rarray->len, NULL);
+  g_return_val_if_fail (index_ + length <= rarray->len, NULL);
 
   if (rarray->element_free_func != NULL)
     {
@@ -1725,7 +1725,7 @@ xptr_array_remove_range (xptr_array_t *array,
     {
       memmove (&rarray->pdata[index_],
                &rarray->pdata[index_ + length],
-               (rarray->len - (index_ + length)) * sizeof (xpointer_t));
+               (rarray->len - (index_ + length)) * sizeof (gpointer));
     }
 
   rarray->len -= length;
@@ -1739,13 +1739,13 @@ xptr_array_remove_range (xptr_array_t *array,
 }
 
 /**
- * xptr_array_remove:
- * @array: a #xptr_array_t
+ * g_ptr_array_remove:
+ * @array: a #GPtrArray
  * @data: the pointer to remove
  *
  * Removes the first occurrence of the given pointer from the pointer
  * array. The following elements are moved down one place. If @array
- * has a non-%NULL #xdestroy_notify_t function it is called for the
+ * has a non-%NULL #GDestroyNotify function it is called for the
  * removed element.
  *
  * It returns %TRUE if the pointer was removed, or %FALSE if the
@@ -1754,20 +1754,20 @@ xptr_array_remove_range (xptr_array_t *array,
  * Returns: %TRUE if the pointer is removed, %FALSE if the pointer
  *     is not found in the array
  */
-xboolean_t
-xptr_array_remove (xptr_array_t *array,
-                    xpointer_t   data)
+gboolean
+g_ptr_array_remove (GPtrArray *array,
+                    gpointer   data)
 {
-  xuint_t i;
+  guint i;
 
-  xreturn_val_if_fail (array, FALSE);
-  xreturn_val_if_fail (array->len == 0 || (array->len != 0 && array->pdata != NULL), FALSE);
+  g_return_val_if_fail (array, FALSE);
+  g_return_val_if_fail (array->len == 0 || (array->len != 0 && array->pdata != NULL), FALSE);
 
   for (i = 0; i < array->len; i += 1)
     {
       if (array->pdata[i] == data)
         {
-          xptr_array_remove_index (array, i);
+          g_ptr_array_remove_index (array, i);
           return TRUE;
         }
     }
@@ -1776,36 +1776,36 @@ xptr_array_remove (xptr_array_t *array,
 }
 
 /**
- * xptr_array_remove_fast:
- * @array: a #xptr_array_t
+ * g_ptr_array_remove_fast:
+ * @array: a #GPtrArray
  * @data: the pointer to remove
  *
  * Removes the first occurrence of the given pointer from the pointer
  * array. The last element in the array is used to fill in the space,
  * so this function does not preserve the order of the array. But it
- * is faster than xptr_array_remove(). If @array has a non-%NULL
- * #xdestroy_notify_t function it is called for the removed element.
+ * is faster than g_ptr_array_remove(). If @array has a non-%NULL
+ * #GDestroyNotify function it is called for the removed element.
  *
  * It returns %TRUE if the pointer was removed, or %FALSE if the
  * pointer was not found.
  *
  * Returns: %TRUE if the pointer was found in the array
  */
-xboolean_t
-xptr_array_remove_fast (xptr_array_t *array,
-                         xpointer_t   data)
+gboolean
+g_ptr_array_remove_fast (GPtrArray *array,
+                         gpointer   data)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
-  xuint_t i;
+  guint i;
 
-  xreturn_val_if_fail (rarray, FALSE);
-  xreturn_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), FALSE);
+  g_return_val_if_fail (rarray, FALSE);
+  g_return_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), FALSE);
 
   for (i = 0; i < rarray->len; i += 1)
     {
       if (rarray->pdata[i] == data)
         {
-          xptr_array_remove_index_fast (array, i);
+          g_ptr_array_remove_index_fast (array, i);
           return TRUE;
         }
     }
@@ -1814,31 +1814,31 @@ xptr_array_remove_fast (xptr_array_t *array,
 }
 
 /**
- * xptr_array_add:
- * @array: a #xptr_array_t
+ * g_ptr_array_add:
+ * @array: a #GPtrArray
  * @data: the pointer to add
  *
  * Adds a pointer to the end of the pointer array. The array will grow
  * in size automatically if necessary.
  */
 void
-xptr_array_add (xptr_array_t *array,
-                 xpointer_t   data)
+g_ptr_array_add (GPtrArray *array,
+                 gpointer   data)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
 
   g_return_if_fail (rarray);
   g_return_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL));
 
-  xptr_array_maybe_expand (rarray, 1);
+  g_ptr_array_maybe_expand (rarray, 1);
 
   rarray->pdata[rarray->len++] = data;
 }
 
 /**
- * xptr_array_extend:
- * @array_to_extend: a #xptr_array_t.
- * @array: (transfer none): a #xptr_array_t to add to the end of @array_to_extend.
+ * g_ptr_array_extend:
+ * @array_to_extend: a #GPtrArray.
+ * @array: (transfer none): a #GPtrArray to add to the end of @array_to_extend.
  * @func: (nullable): a copy function used to copy every element in the array
  * @user_data: user data passed to the copy function @func, or %NULL
  *
@@ -1853,26 +1853,26 @@ xptr_array_add (xptr_array_t *array,
  * `-Wcast-function-type` warning.
  *
  * If @func is %NULL, then only the pointers (and not what they are
- * pointing to) are copied to the new #xptr_array_t.
+ * pointing to) are copied to the new #GPtrArray.
  *
  * Since: 2.62
  **/
 void
-xptr_array_extend (xptr_array_t  *array_to_extend,
-                    xptr_array_t  *array,
+g_ptr_array_extend (GPtrArray  *array_to_extend,
+                    GPtrArray  *array,
                     GCopyFunc   func,
-                    xpointer_t    user_data)
+                    gpointer    user_data)
 {
   GRealPtrArray *rarray_to_extend = (GRealPtrArray *) array_to_extend;
 
   g_return_if_fail (array_to_extend != NULL);
   g_return_if_fail (array != NULL);
 
-  xptr_array_maybe_expand (rarray_to_extend, array->len);
+  g_ptr_array_maybe_expand (rarray_to_extend, array->len);
 
   if (func != NULL)
     {
-      xuint_t i;
+      guint i;
 
       for (i = 0; i < array->len; i++)
         rarray_to_extend->pdata[i + rarray_to_extend->len] =
@@ -1888,69 +1888,69 @@ xptr_array_extend (xptr_array_t  *array_to_extend,
 }
 
 /**
- * xptr_array_extend_and_steal:
- * @array_to_extend: (transfer none): a #xptr_array_t.
- * @array: (transfer container): a #xptr_array_t to add to the end of
+ * g_ptr_array_extend_and_steal:
+ * @array_to_extend: (transfer none): a #GPtrArray.
+ * @array: (transfer container): a #GPtrArray to add to the end of
  *     @array_to_extend.
  *
  * Adds all the pointers in @array to the end of @array_to_extend, transferring
  * ownership of each element from @array to @array_to_extend and modifying
  * @array_to_extend in-place. @array is then freed.
  *
- * As with xptr_array_free(), @array will be destroyed if its reference count
+ * As with g_ptr_array_free(), @array will be destroyed if its reference count
  * is 1. If its reference count is higher, it will be decremented and the
  * length of @array set to zero.
  *
  * Since: 2.62
  **/
 void
-xptr_array_extend_and_steal (xptr_array_t  *array_to_extend,
-                              xptr_array_t  *array)
+g_ptr_array_extend_and_steal (GPtrArray  *array_to_extend,
+                              GPtrArray  *array)
 {
-  xpointer_t *pdata;
+  gpointer *pdata;
 
-  xptr_array_extend (array_to_extend, array, NULL, NULL);
+  g_ptr_array_extend (array_to_extend, array, NULL, NULL);
 
-  /* Get rid of @array without triggering the xdestroy_notify_t attached
+  /* Get rid of @array without triggering the GDestroyNotify attached
    * to the elements moved from @array to @array_to_extend. */
   pdata = g_steal_pointer (&array->pdata);
   array->len = 0;
   ((GRealPtrArray *) array)->alloc = 0;
-  xptr_array_unref (array);
+  g_ptr_array_unref (array);
   g_free (pdata);
 }
 
 /**
- * xptr_array_insert:
- * @array: a #xptr_array_t
+ * g_ptr_array_insert:
+ * @array: a #GPtrArray
  * @index_: the index to place the new element at, or -1 to append
  * @data: the pointer to add.
  *
- * Inserts an element into the pointer array at the given index. The
+ * Inserts an element into the pointer array at the given index. The 
  * array will grow in size automatically if necessary.
  *
  * Since: 2.40
  */
 void
-xptr_array_insert (xptr_array_t *array,
-                    xint_t       index_,
-                    xpointer_t   data)
+g_ptr_array_insert (GPtrArray *array,
+                    gint       index_,
+                    gpointer   data)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
 
   g_return_if_fail (rarray);
   g_return_if_fail (index_ >= -1);
-  g_return_if_fail (index_ <= (xint_t)rarray->len);
+  g_return_if_fail (index_ <= (gint)rarray->len);
 
-  xptr_array_maybe_expand (rarray, 1);
+  g_ptr_array_maybe_expand (rarray, 1);
 
   if (index_ < 0)
     index_ = rarray->len;
 
-  if ((xuint_t) index_ < rarray->len)
+  if ((guint) index_ < rarray->len)
     memmove (&(rarray->pdata[index_ + 1]),
              &(rarray->pdata[index_]),
-             (rarray->len - index_) * sizeof (xpointer_t));
+             (rarray->len - index_) * sizeof (gpointer));
 
   rarray->len++;
   rarray->pdata[index_] = data;
@@ -1959,8 +1959,8 @@ xptr_array_insert (xptr_array_t *array,
 /* Please keep this doc-comment in sync with pointer_array_sort_example()
  * in glib/tests/array-test.c */
 /**
- * xptr_array_sort:
- * @array: a #xptr_array_t
+ * g_ptr_array_sort:
+ * @array: a #GPtrArray
  * @compare_func: comparison function
  *
  * Sorts the array, using @compare_func which should be a qsort()-style
@@ -1968,19 +1968,19 @@ xptr_array_insert (xptr_array_t *array,
  * than second arg, zero for equal, greater than zero if irst arg is
  * greater than second arg).
  *
- * Note that the comparison function for xptr_array_sort() doesn't
+ * Note that the comparison function for g_ptr_array_sort() doesn't
  * take the pointers from the array as arguments, it takes pointers to
  * the pointers in the array. Here is a full example of usage:
  *
  * |[<!-- language="C" -->
  * typedef struct
  * {
- *   xchar_t *name;
- *   xint_t size;
+ *   gchar *name;
+ *   gint size;
  * } FileListEntry;
  *
- * static xint_t
- * sort_filelist (xconstpointer a, xconstpointer b)
+ * static gint
+ * sort_filelist (gconstpointer a, gconstpointer b)
  * {
  *   const FileListEntry *entry1 = *((FileListEntry **) a);
  *   const FileListEntry *entry2 = *((FileListEntry **) b);
@@ -1989,18 +1989,18 @@ xptr_array_insert (xptr_array_t *array,
  * }
  *
  * …
- * x_autoptr (xptr_array) file_list = NULL;
+ * g_autoptr (GPtrArray) file_list = NULL;
  *
  * // initialize file_list array and load with many FileListEntry entries
  * ...
  * // now sort it with
- * xptr_array_sort (file_list, sort_filelist);
+ * g_ptr_array_sort (file_list, sort_filelist);
  * ]|
  *
  * This is guaranteed to be a stable sort since version 2.32.
  */
 void
-xptr_array_sort (xptr_array_t    *array,
+g_ptr_array_sort (GPtrArray    *array,
                   GCompareFunc  compare_func)
 {
   g_return_if_fail (array != NULL);
@@ -2009,7 +2009,7 @@ xptr_array_sort (xptr_array_t    *array,
   if (array->len > 0)
     g_qsort_with_data (array->pdata,
                        array->len,
-                       sizeof (xpointer_t),
+                       sizeof (gpointer),
                        (GCompareDataFunc)compare_func,
                        NULL);
 }
@@ -2017,15 +2017,15 @@ xptr_array_sort (xptr_array_t    *array,
 /* Please keep this doc-comment in sync with
  * pointer_array_sort_with_data_example() in glib/tests/array-test.c */
 /**
- * xptr_array_sort_with_data:
- * @array: a #xptr_array_t
+ * g_ptr_array_sort_with_data:
+ * @array: a #GPtrArray
  * @compare_func: comparison function
  * @user_data: data to pass to @compare_func
  *
- * Like xptr_array_sort(), but the comparison function has an extra
+ * Like g_ptr_array_sort(), but the comparison function has an extra
  * user data argument.
  *
- * Note that the comparison function for xptr_array_sort_with_data()
+ * Note that the comparison function for g_ptr_array_sort_with_data()
  * doesn't take the pointers from the array as arguments, it takes
  * pointers to the pointers in the array. Here is a full example of use:
  *
@@ -2034,14 +2034,14 @@ xptr_array_sort (xptr_array_t    *array,
  *
  * typedef struct
  * {
- *   xchar_t *name;
- *   xint_t size;
+ *   gchar *name;
+ *   gint size;
  * } FileListEntry;
  *
- * static xint_t
- * sort_filelist (xconstpointer a, xconstpointer b, xpointer_t user_data)
+ * static gint
+ * sort_filelist (gconstpointer a, gconstpointer b, gpointer user_data)
  * {
- *   xint_t order;
+ *   gint order;
  *   const SortMode sort_mode = GPOINTER_TO_INT (user_data);
  *   const FileListEntry *entry1 = *((FileListEntry **) a);
  *   const FileListEntry *entry2 = *((FileListEntry **) b);
@@ -2062,14 +2062,14 @@ xptr_array_sort (xptr_array_t    *array,
  * }
  *
  * ...
- * x_autoptr (xptr_array) file_list = NULL;
+ * g_autoptr (GPtrArray) file_list = NULL;
  * SortMode sort_mode;
  *
  * // initialize file_list array and load with many FileListEntry entries
  * ...
  * // now sort it with
  * sort_mode = SORT_NAME;
- * xptr_array_sort_with_data (file_list,
+ * g_ptr_array_sort_with_data (file_list,
  *                             sort_filelist,
  *                             GINT_TO_POINTER (sort_mode));
  * ]|
@@ -2077,37 +2077,37 @@ xptr_array_sort (xptr_array_t    *array,
  * This is guaranteed to be a stable sort since version 2.32.
  */
 void
-xptr_array_sort_with_data (xptr_array_t        *array,
+g_ptr_array_sort_with_data (GPtrArray        *array,
                             GCompareDataFunc  compare_func,
-                            xpointer_t          user_data)
+                            gpointer          user_data)
 {
   g_return_if_fail (array != NULL);
 
   if (array->len > 0)
     g_qsort_with_data (array->pdata,
                        array->len,
-                       sizeof (xpointer_t),
+                       sizeof (gpointer),
                        compare_func,
                        user_data);
 }
 
 /**
- * xptr_array_foreach:
- * @array: a #xptr_array_t
+ * g_ptr_array_foreach:
+ * @array: a #GPtrArray
  * @func: the function to call for each array element
  * @user_data: user data to pass to the function
- *
- * Calls a function for each element of a #xptr_array_t. @func must not
+ * 
+ * Calls a function for each element of a #GPtrArray. @func must not
  * add elements to or remove elements from the array.
  *
  * Since: 2.4
  */
 void
-xptr_array_foreach (xptr_array_t *array,
+g_ptr_array_foreach (GPtrArray *array,
                      GFunc      func,
-                     xpointer_t   user_data)
+                     gpointer   user_data)
 {
-  xuint_t i;
+  guint i;
 
   g_return_if_fail (array);
 
@@ -2116,7 +2116,7 @@ xptr_array_foreach (xptr_array_t *array,
 }
 
 /**
- * xptr_array_find: (skip)
+ * g_ptr_array_find: (skip)
  * @haystack: pointer array to be searched
  * @needle: pointer to look for
  * @index_: (optional) (out): return location for the index of
@@ -2128,21 +2128,21 @@ xptr_array_foreach (xptr_array_t *array,
  * multiple times in @haystack, the index of the first instance is returned.
  *
  * This does pointer comparisons only. If you want to use more complex equality
- * checks, such as string comparisons, use xptr_array_find_with_equal_func().
+ * checks, such as string comparisons, use g_ptr_array_find_with_equal_func().
  *
  * Returns: %TRUE if @needle is one of the elements of @haystack
  * Since: 2.54
  */
-xboolean_t
-xptr_array_find (xptr_array_t     *haystack,
-                  xconstpointer  needle,
-                  xuint_t         *index_)
+gboolean
+g_ptr_array_find (GPtrArray     *haystack,
+                  gconstpointer  needle,
+                  guint         *index_)
 {
-  return xptr_array_find_with_equal_func (haystack, needle, NULL, index_);
+  return g_ptr_array_find_with_equal_func (haystack, needle, NULL, index_);
 }
 
 /**
- * xptr_array_find_with_equal_func: (skip)
+ * g_ptr_array_find_with_equal_func: (skip)
  * @haystack: pointer array to be searched
  * @needle: pointer to look for
  * @equal_func: (nullable): the function to call for each element, which should
@@ -2164,22 +2164,22 @@ xptr_array_find (xptr_array_t     *haystack,
  * Returns: %TRUE if @needle is one of the elements of @haystack
  * Since: 2.54
  */
-xboolean_t
-xptr_array_find_with_equal_func (xptr_array_t     *haystack,
-                                  xconstpointer  needle,
+gboolean
+g_ptr_array_find_with_equal_func (GPtrArray     *haystack,
+                                  gconstpointer  needle,
                                   GEqualFunc     equal_func,
-                                  xuint_t         *index_)
+                                  guint         *index_)
 {
-  xuint_t i;
+  guint i;
 
-  xreturn_val_if_fail (haystack != NULL, FALSE);
+  g_return_val_if_fail (haystack != NULL, FALSE);
 
   if (equal_func == NULL)
     equal_func = g_direct_equal;
 
   for (i = 0; i < haystack->len; i++)
     {
-      if (equal_func (xptr_array_index (haystack, i), needle))
+      if (equal_func (g_ptr_array_index (haystack, i), needle))
         {
           if (index_ != NULL)
             *index_ = i;
@@ -2195,65 +2195,65 @@ xptr_array_find_with_equal_func (xptr_array_t     *haystack,
  * @title: Byte Arrays
  * @short_description: arrays of bytes
  *
- * #xbyte_array_t is a mutable array of bytes based on #xarray_t, to provide arrays
+ * #GByteArray is a mutable array of bytes based on #GArray, to provide arrays
  * of bytes which grow automatically as elements are added.
  *
- * To create a new #xbyte_array_t use xbyte_array_new(). To add elements to a
- * #xbyte_array_t, use xbyte_array_append(), and xbyte_array_prepend().
+ * To create a new #GByteArray use g_byte_array_new(). To add elements to a
+ * #GByteArray, use g_byte_array_append(), and g_byte_array_prepend().
  *
- * To set the size of a #xbyte_array_t, use xbyte_array_set_size().
+ * To set the size of a #GByteArray, use g_byte_array_set_size().
  *
- * To free a #xbyte_array_t, use xbyte_array_free().
+ * To free a #GByteArray, use g_byte_array_free().
  *
- * An example for using a #xbyte_array_t:
+ * An example for using a #GByteArray:
  * |[<!-- language="C" -->
- *   xbyte_array_t *gbarray;
- *   xint_t i;
+ *   GByteArray *gbarray;
+ *   gint i;
  *
- *   gbarray = xbyte_array_new ();
+ *   gbarray = g_byte_array_new ();
  *   for (i = 0; i < 10000; i++)
- *     xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
+ *     g_byte_array_append (gbarray, (guint8*) "abcd", 4);
  *
  *   for (i = 0; i < 10000; i++)
  *     {
- *       xassert (gbarray->data[4*i] == 'a');
- *       xassert (gbarray->data[4*i+1] == 'b');
- *       xassert (gbarray->data[4*i+2] == 'c');
- *       xassert (gbarray->data[4*i+3] == 'd');
+ *       g_assert (gbarray->data[4*i] == 'a');
+ *       g_assert (gbarray->data[4*i+1] == 'b');
+ *       g_assert (gbarray->data[4*i+2] == 'c');
+ *       g_assert (gbarray->data[4*i+3] == 'd');
  *     }
  *
- *   xbyte_array_free (gbarray, TRUE);
+ *   g_byte_array_free (gbarray, TRUE);
  * ]|
  *
- * See #xbytes_t if you are interested in an immutable object representing a
+ * See #GBytes if you are interested in an immutable object representing a
  * sequence of bytes.
  */
 
 /**
- * xbyte_array_t:
+ * GByteArray:
  * @data: a pointer to the element data. The data may be moved as
- *     elements are added to the #xbyte_array_t
- * @len: the number of elements in the #xbyte_array_t
+ *     elements are added to the #GByteArray
+ * @len: the number of elements in the #GByteArray
  *
- * Contains the public fields of a xbyte_array_t.
+ * Contains the public fields of a GByteArray.
  */
 
 /**
- * xbyte_array_new:
+ * g_byte_array_new:
  *
- * Creates a new #xbyte_array_t with a reference count of 1.
+ * Creates a new #GByteArray with a reference count of 1.
  *
- * Returns: (transfer full): the new #xbyte_array_t
+ * Returns: (transfer full): the new #GByteArray
  */
-xbyte_array_t*
-xbyte_array_new (void)
+GByteArray*
+g_byte_array_new (void)
 {
-  return (xbyte_array_t *)g_array_sized_new (FALSE, FALSE, 1, 0);
+  return (GByteArray *)g_array_sized_new (FALSE, FALSE, 1, 0);
 }
 
 /**
- * xbyte_array_steal:
- * @array: a #xbyte_array_t.
+ * g_byte_array_steal:
+ * @array: a #GByteArray.
  * @len: (optional) (out): pointer to retrieve the number of
  *    elements of the original array
  *
@@ -2266,41 +2266,41 @@ xbyte_array_new (void)
  *
  * Since: 2.64
  */
-xuint8_t *
-xbyte_array_steal (xbyte_array_t *array,
-                    xsize_t *len)
+guint8 *
+g_byte_array_steal (GByteArray *array,
+                    gsize *len)
 {
-  return (xuint8_t *) g_array_steal ((xarray_t *) array, len);
+  return (guint8 *) g_array_steal ((GArray *) array, len);
 }
 
 /**
- * xbyte_array_new_take:
+ * g_byte_array_new_take:
  * @data: (transfer full) (array length=len): byte data for the array
  * @len: length of @data
  *
  * Create byte array containing the data. The data will be owned by the array
- * and will be freed with g_free(), i.e. it could be allocated using xstrdup().
+ * and will be freed with g_free(), i.e. it could be allocated using g_strdup().
  *
- * Do not use it if @len is greater than %G_MAXUINT. #xbyte_array_t
- * stores the length of its data in #xuint_t, which may be shorter than
- * #xsize_t.
+ * Do not use it if @len is greater than %G_MAXUINT. #GByteArray
+ * stores the length of its data in #guint, which may be shorter than
+ * #gsize.
  *
  * Since: 2.32
  *
- * Returns: (transfer full): a new #xbyte_array_t
+ * Returns: (transfer full): a new #GByteArray
  */
-xbyte_array_t*
-xbyte_array_new_take (xuint8_t *data,
-                       xsize_t   len)
+GByteArray*
+g_byte_array_new_take (guint8 *data,
+                       gsize   len)
 {
-  xbyte_array_t *array;
+  GByteArray *array;
   GRealArray *real;
 
-  xreturn_val_if_fail (len <= G_MAXUINT, NULL);
-  array = xbyte_array_new ();
+  g_return_val_if_fail (len <= G_MAXUINT, NULL);
+  array = g_byte_array_new ();
   real = (GRealArray *)array;
-  xassert (real->data == NULL);
-  xassert (real->len == 0);
+  g_assert (real->data == NULL);
+  g_assert (real->len == 0);
 
   real->data = data;
   real->len = len;
@@ -2310,91 +2310,91 @@ xbyte_array_new_take (xuint8_t *data,
 }
 
 /**
- * xbyte_array_sized_new:
+ * g_byte_array_sized_new:
  * @reserved_size: number of bytes preallocated
  *
- * Creates a new #xbyte_array_t with @reserved_size bytes preallocated.
+ * Creates a new #GByteArray with @reserved_size bytes preallocated.
  * This avoids frequent reallocation, if you are going to add many
  * bytes to the array. Note however that the size of the array is still
  * 0.
  *
- * Returns: the new #xbyte_array_t
+ * Returns: the new #GByteArray
  */
-xbyte_array_t*
-xbyte_array_sized_new (xuint_t reserved_size)
+GByteArray*
+g_byte_array_sized_new (guint reserved_size)
 {
-  return (xbyte_array_t *)g_array_sized_new (FALSE, FALSE, 1, reserved_size);
+  return (GByteArray *)g_array_sized_new (FALSE, FALSE, 1, reserved_size);
 }
 
 /**
- * xbyte_array_free:
- * @array: a #xbyte_array_t
+ * g_byte_array_free:
+ * @array: a #GByteArray
  * @free_segment: if %TRUE the actual byte data is freed as well
  *
- * Frees the memory allocated by the #xbyte_array_t. If @free_segment is
+ * Frees the memory allocated by the #GByteArray. If @free_segment is
  * %TRUE it frees the actual byte data. If the reference count of
- * @array is greater than one, the #xbyte_array_t wrapper is preserved but
+ * @array is greater than one, the #GByteArray wrapper is preserved but
  * the size of @array will be set to zero.
  *
  * Returns: the element data if @free_segment is %FALSE, otherwise
  *          %NULL.  The element data should be freed using g_free().
  */
-xuint8_t*
-xbyte_array_free (xbyte_array_t *array,
-                   xboolean_t    free_segment)
+guint8*
+g_byte_array_free (GByteArray *array,
+                   gboolean    free_segment)
 {
-  return (xuint8_t *)g_array_free ((xarray_t *)array, free_segment);
+  return (guint8 *)g_array_free ((GArray *)array, free_segment);
 }
 
 /**
- * xbyte_array_free_to_bytes:
- * @array: (transfer full): a #xbyte_array_t
+ * g_byte_array_free_to_bytes:
+ * @array: (transfer full): a #GByteArray
  *
- * Transfers the data from the #xbyte_array_t into a new immutable #xbytes_t.
+ * Transfers the data from the #GByteArray into a new immutable #GBytes.
  *
- * The #xbyte_array_t is freed unless the reference count of @array is greater
- * than one, the #xbyte_array_t wrapper is preserved but the size of @array
+ * The #GByteArray is freed unless the reference count of @array is greater
+ * than one, the #GByteArray wrapper is preserved but the size of @array
  * will be set to zero.
  *
- * This is identical to using xbytes_new_take() and xbyte_array_free()
+ * This is identical to using g_bytes_new_take() and g_byte_array_free()
  * together.
  *
  * Since: 2.32
  *
- * Returns: (transfer full): a new immutable #xbytes_t representing same
+ * Returns: (transfer full): a new immutable #GBytes representing same
  *     byte data that was in the array
  */
-xbytes_t*
-xbyte_array_free_to_bytes (xbyte_array_t *array)
+GBytes*
+g_byte_array_free_to_bytes (GByteArray *array)
 {
-  xsize_t length;
+  gsize length;
 
-  xreturn_val_if_fail (array != NULL, NULL);
+  g_return_val_if_fail (array != NULL, NULL);
 
   length = array->len;
-  return xbytes_new_take (xbyte_array_free (array, FALSE), length);
+  return g_bytes_new_take (g_byte_array_free (array, FALSE), length);
 }
 
 /**
- * xbyte_array_ref:
- * @array: A #xbyte_array_t
+ * g_byte_array_ref:
+ * @array: A #GByteArray
  *
  * Atomically increments the reference count of @array by one.
  * This function is thread-safe and may be called from any thread.
  *
- * Returns: The passed in #xbyte_array_t
+ * Returns: The passed in #GByteArray
  *
  * Since: 2.22
  */
-xbyte_array_t*
-xbyte_array_ref (xbyte_array_t *array)
+GByteArray*
+g_byte_array_ref (GByteArray *array)
 {
-  return (xbyte_array_t *)g_array_ref ((xarray_t *)array);
+  return (GByteArray *)g_array_ref ((GArray *)array);
 }
 
 /**
- * xbyte_array_unref:
- * @array: A #xbyte_array_t
+ * g_byte_array_unref:
+ * @array: A #GByteArray
  *
  * Atomically decrements the reference count of @array by one. If the
  * reference count drops to 0, all memory allocated by the array is
@@ -2404,139 +2404,139 @@ xbyte_array_ref (xbyte_array_t *array)
  * Since: 2.22
  */
 void
-xbyte_array_unref (xbyte_array_t *array)
+g_byte_array_unref (GByteArray *array)
 {
-  g_array_unref ((xarray_t *)array);
+  g_array_unref ((GArray *)array);
 }
 
 /**
- * xbyte_array_append:
- * @array: a #xbyte_array_t
+ * g_byte_array_append:
+ * @array: a #GByteArray
  * @data: the byte data to be added
  * @len: the number of bytes to add
  *
- * Adds the given bytes to the end of the #xbyte_array_t.
+ * Adds the given bytes to the end of the #GByteArray.
  * The array will grow in size automatically if necessary.
  *
- * Returns: the #xbyte_array_t
+ * Returns: the #GByteArray
  */
-xbyte_array_t*
-xbyte_array_append (xbyte_array_t   *array,
-                     const xuint8_t *data,
-                     xuint_t         len)
+GByteArray*
+g_byte_array_append (GByteArray   *array,
+                     const guint8 *data,
+                     guint         len)
 {
-  g_array_append_vals ((xarray_t *)array, (xuint8_t *)data, len);
+  g_array_append_vals ((GArray *)array, (guint8 *)data, len);
 
   return array;
 }
 
 /**
- * xbyte_array_prepend:
- * @array: a #xbyte_array_t
+ * g_byte_array_prepend:
+ * @array: a #GByteArray
  * @data: the byte data to be added
  * @len: the number of bytes to add
  *
- * Adds the given data to the start of the #xbyte_array_t.
+ * Adds the given data to the start of the #GByteArray.
  * The array will grow in size automatically if necessary.
  *
- * Returns: the #xbyte_array_t
+ * Returns: the #GByteArray
  */
-xbyte_array_t*
-xbyte_array_prepend (xbyte_array_t   *array,
-                      const xuint8_t *data,
-                      xuint_t         len)
+GByteArray*
+g_byte_array_prepend (GByteArray   *array,
+                      const guint8 *data,
+                      guint         len)
 {
-  g_array_prepend_vals ((xarray_t *)array, (xuint8_t *)data, len);
+  g_array_prepend_vals ((GArray *)array, (guint8 *)data, len);
 
   return array;
 }
 
 /**
- * xbyte_array_set_size:
- * @array: a #xbyte_array_t
- * @length: the new size of the #xbyte_array_t
+ * g_byte_array_set_size:
+ * @array: a #GByteArray
+ * @length: the new size of the #GByteArray
  *
- * Sets the size of the #xbyte_array_t, expanding it if necessary.
+ * Sets the size of the #GByteArray, expanding it if necessary.
  *
- * Returns: the #xbyte_array_t
+ * Returns: the #GByteArray
  */
-xbyte_array_t*
-xbyte_array_set_size (xbyte_array_t *array,
-                       xuint_t       length)
+GByteArray*
+g_byte_array_set_size (GByteArray *array,
+                       guint       length)
 {
-  g_array_set_size ((xarray_t *)array, length);
+  g_array_set_size ((GArray *)array, length);
 
   return array;
 }
 
 /**
- * xbyte_array_remove_index:
- * @array: a #xbyte_array_t
+ * g_byte_array_remove_index:
+ * @array: a #GByteArray
  * @index_: the index of the byte to remove
  *
- * Removes the byte at the given index from a #xbyte_array_t.
+ * Removes the byte at the given index from a #GByteArray.
  * The following bytes are moved down one place.
  *
- * Returns: the #xbyte_array_t
+ * Returns: the #GByteArray
  **/
-xbyte_array_t*
-xbyte_array_remove_index (xbyte_array_t *array,
-                           xuint_t       index_)
+GByteArray*
+g_byte_array_remove_index (GByteArray *array,
+                           guint       index_)
 {
-  g_array_remove_index ((xarray_t *)array, index_);
+  g_array_remove_index ((GArray *)array, index_);
 
   return array;
 }
 
 /**
- * xbyte_array_remove_index_fast:
- * @array: a #xbyte_array_t
+ * g_byte_array_remove_index_fast:
+ * @array: a #GByteArray
  * @index_: the index of the byte to remove
  *
- * Removes the byte at the given index from a #xbyte_array_t. The last
+ * Removes the byte at the given index from a #GByteArray. The last
  * element in the array is used to fill in the space, so this function
- * does not preserve the order of the #xbyte_array_t. But it is faster
- * than xbyte_array_remove_index().
+ * does not preserve the order of the #GByteArray. But it is faster
+ * than g_byte_array_remove_index().
  *
- * Returns: the #xbyte_array_t
+ * Returns: the #GByteArray
  */
-xbyte_array_t*
-xbyte_array_remove_index_fast (xbyte_array_t *array,
-                                xuint_t       index_)
+GByteArray*
+g_byte_array_remove_index_fast (GByteArray *array,
+                                guint       index_)
 {
-  g_array_remove_index_fast ((xarray_t *)array, index_);
+  g_array_remove_index_fast ((GArray *)array, index_);
 
   return array;
 }
 
 /**
- * xbyte_array_remove_range:
- * @array: a @xbyte_array_t
+ * g_byte_array_remove_range:
+ * @array: a @GByteArray
  * @index_: the index of the first byte to remove
  * @length: the number of bytes to remove
  *
  * Removes the given number of bytes starting at the given index from a
- * #xbyte_array_t.  The following elements are moved to close the gap.
+ * #GByteArray.  The following elements are moved to close the gap.
  *
- * Returns: the #xbyte_array_t
+ * Returns: the #GByteArray
  *
  * Since: 2.4
  */
-xbyte_array_t*
-xbyte_array_remove_range (xbyte_array_t *array,
-                           xuint_t       index_,
-                           xuint_t       length)
+GByteArray*
+g_byte_array_remove_range (GByteArray *array,
+                           guint       index_,
+                           guint       length)
 {
-  xreturn_val_if_fail (array, NULL);
-  xreturn_val_if_fail (index_ <= array->len, NULL);
-  xreturn_val_if_fail (index_ + length <= array->len, NULL);
+  g_return_val_if_fail (array, NULL);
+  g_return_val_if_fail (index_ <= array->len, NULL);
+  g_return_val_if_fail (index_ + length <= array->len, NULL);
 
-  return (xbyte_array_t *)g_array_remove_range ((xarray_t *)array, index_, length);
+  return (GByteArray *)g_array_remove_range ((GArray *)array, index_, length);
 }
 
 /**
- * xbyte_array_sort:
- * @array: a #xbyte_array_t
+ * g_byte_array_sort:
+ * @array: a #GByteArray
  * @compare_func: comparison function
  *
  * Sorts a byte array, using @compare_func which should be a
@@ -2551,25 +2551,25 @@ xbyte_array_remove_range (xbyte_array_t *array,
  * their addresses.
  */
 void
-xbyte_array_sort (xbyte_array_t   *array,
+g_byte_array_sort (GByteArray   *array,
                    GCompareFunc  compare_func)
 {
-  g_array_sort ((xarray_t *)array, compare_func);
+  g_array_sort ((GArray *)array, compare_func);
 }
 
 /**
- * xbyte_array_sort_with_data:
- * @array: a #xbyte_array_t
+ * g_byte_array_sort_with_data:
+ * @array: a #GByteArray
  * @compare_func: comparison function
  * @user_data: data to pass to @compare_func
  *
- * Like xbyte_array_sort(), but the comparison function takes an extra
+ * Like g_byte_array_sort(), but the comparison function takes an extra
  * user data argument.
  */
 void
-xbyte_array_sort_with_data (xbyte_array_t       *array,
+g_byte_array_sort_with_data (GByteArray       *array,
                              GCompareDataFunc  compare_func,
-                             xpointer_t          user_data)
+                             gpointer          user_data)
 {
-  g_array_sort_with_data ((xarray_t *)array, compare_func, user_data);
+  g_array_sort_with_data ((GArray *)array, compare_func, user_data);
 }

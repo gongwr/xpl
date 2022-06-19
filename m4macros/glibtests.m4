@@ -1,10 +1,10 @@
 # Increment this whenever this file is changed.
 #serial 1
 
-dnl XPL_TESTS
+dnl GLIB_TESTS
 dnl
 
-AC_DEFUN([XPL_TESTS],
+AC_DEFUN([GLIB_TESTS],
 [
   AC_ARG_ENABLE(installed-tests,
                 AS_HELP_STRING([--enable-installed-tests],

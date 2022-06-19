@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2018-2019  Patrick Griffis, James Westman
  *
  * This library is free software; you can redistribute it and/or
@@ -21,12 +21,12 @@
 #include "gutils.h"
 #include "gstrfuncs.h"
 
-void load_user_special_dirs_macos (xchar_t **table);
+void load_user_special_dirs_macos (gchar **table);
 
-static xchar_t *
+static gchar *
 find_folder (NSSearchPathDirectory type)
 {
-  xchar_t *filename;
+  gchar *filename;
   NSString *path;
   NSArray *paths;
 
@@ -37,13 +37,13 @@ find_folder (NSSearchPathDirectory type)
       return NULL;
     }
 
-  filename = xstrdup ([path UTF8String]);
+  filename = g_strdup ([path UTF8String]);
 
   return filename;
 }
 
 void
-load_user_special_dirs_macos(xchar_t **table)
+load_user_special_dirs_macos(gchar **table)
 {
   table[G_USER_DIRECTORY_DESKTOP] = find_folder (NSDesktopDirectory);
   table[G_USER_DIRECTORY_DOCUMENTS] = find_folder (NSDocumentDirectory);

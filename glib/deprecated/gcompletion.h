@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_COMPLETION_H__
 #define __G_COMPLETION_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -35,47 +35,47 @@ G_BEGIN_DECLS
 
 typedef struct _GCompletion     GCompletion;
 
-typedef xchar_t*          (*GCompletionFunc)      (xpointer_t);
+typedef gchar*          (*GCompletionFunc)      (gpointer);
 
 /* GCompletion
  */
 
-typedef xint_t (*GCompletionStrncmpFunc) (const xchar_t *s1,
-                                        const xchar_t *s2,
-                                        xsize_t        n);
+typedef gint (*GCompletionStrncmpFunc) (const gchar *s1,
+                                        const gchar *s2,
+                                        gsize        n);
 
 struct _GCompletion
 {
-  xlist_t* items;
+  GList* items;
   GCompletionFunc func;
-
-  xchar_t* prefix;
-  xlist_t* cache;
+ 
+  gchar* prefix;
+  GList* cache;
   GCompletionStrncmpFunc strncmp_func;
 };
 
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 GCompletion* g_completion_new           (GCompletionFunc func);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 void         g_completion_add_items     (GCompletion*    cmp,
-                                         xlist_t*          items);
-XPL_DEPRECATED_IN_2_26
+                                         GList*          items);
+GLIB_DEPRECATED_IN_2_26
 void         g_completion_remove_items  (GCompletion*    cmp,
-                                         xlist_t*          items);
-XPL_DEPRECATED_IN_2_26
+                                         GList*          items);
+GLIB_DEPRECATED_IN_2_26
 void         g_completion_clear_items   (GCompletion*    cmp);
-XPL_DEPRECATED_IN_2_26
-xlist_t*       g_completion_complete      (GCompletion*    cmp,
-                                         const xchar_t*    prefix,
-                                         xchar_t**         new_prefix);
-XPL_DEPRECATED_IN_2_26
-xlist_t*       g_completion_complete_utf8 (GCompletion  *cmp,
-                                         const xchar_t*    prefix,
-                                         xchar_t**         new_prefix);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
+GList*       g_completion_complete      (GCompletion*    cmp,
+                                         const gchar*    prefix,
+                                         gchar**         new_prefix);
+GLIB_DEPRECATED_IN_2_26
+GList*       g_completion_complete_utf8 (GCompletion  *cmp,
+                                         const gchar*    prefix,
+                                         gchar**         new_prefix);
+GLIB_DEPRECATED_IN_2_26
 void         g_completion_set_compare   (GCompletion *cmp,
                                          GCompletionStrncmpFunc strncmp_func);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 void         g_completion_free          (GCompletion*    cmp);
 
 G_END_DECLS

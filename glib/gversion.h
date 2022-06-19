@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_VERSION_H__
 #define __G_VERSION_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,22 +33,22 @@
 
 G_BEGIN_DECLS
 
-XPL_VAR const xuint_t glib_major_version;
-XPL_VAR const xuint_t glib_minor_version;
-XPL_VAR const xuint_t glib_micro_version;
-XPL_VAR const xuint_t glib_interface_age;
-XPL_VAR const xuint_t glib_binary_age;
+GLIB_VAR const guint glib_major_version;
+GLIB_VAR const guint glib_minor_version;
+GLIB_VAR const guint glib_micro_version;
+GLIB_VAR const guint glib_interface_age;
+GLIB_VAR const guint glib_binary_age;
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t * glib_check_version (xuint_t required_major,
-                                  xuint_t required_minor,
-                                  xuint_t required_micro);
+GLIB_AVAILABLE_IN_ALL
+const gchar * glib_check_version (guint required_major,
+                                  guint required_minor,
+                                  guint required_micro);
 
-#define XPL_CHECK_VERSION(major,minor,micro)    \
-    (XPL_MAJOR_VERSION > (major) || \
-     (XPL_MAJOR_VERSION == (major) && XPL_MINOR_VERSION > (minor)) || \
-     (XPL_MAJOR_VERSION == (major) && XPL_MINOR_VERSION == (minor) && \
-      XPL_MICRO_VERSION >= (micro)))
+#define GLIB_CHECK_VERSION(major,minor,micro)    \
+    (GLIB_MAJOR_VERSION > (major) || \
+     (GLIB_MAJOR_VERSION == (major) && GLIB_MINOR_VERSION > (minor)) || \
+     (GLIB_MAJOR_VERSION == (major) && GLIB_MINOR_VERSION == (minor) && \
+      GLIB_MICRO_VERSION >= (micro)))
 
 G_END_DECLS
 

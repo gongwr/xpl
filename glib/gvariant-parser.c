@@ -43,22 +43,22 @@
 /**
  * G_VARIANT_PARSE_ERROR:
  *
- * Error domain for xvariant_t text format parsing.  Specific error codes
- * are not currently defined for this domain.  See #xerror_t for
+ * Error domain for GVariant text format parsing.  Specific error codes
+ * are not currently defined for this domain.  See #GError for
  * information on error domains.
  **/
 /**
  * GVariantParseError:
  * @G_VARIANT_PARSE_ERROR_FAILED: generic error (unused)
- * @G_VARIANT_PARSE_ERROR_BASIC_TYPE_EXPECTED: a non-basic #xvariant_type_t was given where a basic type was expected
- * @G_VARIANT_PARSE_ERROR_CANNOT_INFER_TYPE: cannot infer the #xvariant_type_t
- * @G_VARIANT_PARSE_ERROR_DEFINITE_TYPE_EXPECTED: an indefinite #xvariant_type_t was given where a definite type was expected
+ * @G_VARIANT_PARSE_ERROR_BASIC_TYPE_EXPECTED: a non-basic #GVariantType was given where a basic type was expected
+ * @G_VARIANT_PARSE_ERROR_CANNOT_INFER_TYPE: cannot infer the #GVariantType
+ * @G_VARIANT_PARSE_ERROR_DEFINITE_TYPE_EXPECTED: an indefinite #GVariantType was given where a definite type was expected
  * @G_VARIANT_PARSE_ERROR_INPUT_NOT_AT_END: extra data after parsing finished
  * @G_VARIANT_PARSE_ERROR_INVALID_CHARACTER: invalid character in number or unicode escape
- * @G_VARIANT_PARSE_ERROR_INVALID_FORMAT_STRING: not a valid #xvariant_t format string
+ * @G_VARIANT_PARSE_ERROR_INVALID_FORMAT_STRING: not a valid #GVariant format string
  * @G_VARIANT_PARSE_ERROR_INVALID_OBJECT_PATH: not a valid object path
  * @G_VARIANT_PARSE_ERROR_INVALID_SIGNATURE: not a valid type signature
- * @G_VARIANT_PARSE_ERROR_INVALID_TYPE_STRING: not a valid #xvariant_t type string
+ * @G_VARIANT_PARSE_ERROR_INVALID_TYPE_STRING: not a valid #GVariant type string
  * @G_VARIANT_PARSE_ERROR_NO_COMMON_TYPE: could not find a common type for array entries
  * @G_VARIANT_PARSE_ERROR_NUMBER_OUT_OF_RANGE: the numerical value is out of range of the given type
  * @G_VARIANT_PARSE_ERROR_NUMBER_TOO_BIG: the numerical value is out of range for any type
@@ -67,65 +67,65 @@
  * @G_VARIANT_PARSE_ERROR_UNKNOWN_KEYWORD: an unknown keyword was encountered
  * @G_VARIANT_PARSE_ERROR_UNTERMINATED_STRING_CONSTANT: unterminated string constant
  * @G_VARIANT_PARSE_ERROR_VALUE_EXPECTED: no value given
- * @G_VARIANT_PARSE_ERROR_RECURSION: variant was too deeply nested; #xvariant_t is only guaranteed to handle nesting up to 64 levels (Since: 2.64)
+ * @G_VARIANT_PARSE_ERROR_RECURSION: variant was too deeply nested; #GVariant is only guaranteed to handle nesting up to 64 levels (Since: 2.64)
  *
  * Error codes returned by parsing text-format GVariants.
  **/
-G_DEFINE_QUARK (g-variant-parse-error-quark, xvariant_parse_error)
+G_DEFINE_QUARK (g-variant-parse-error-quark, g_variant_parse_error)
 
 /**
- * xvariant_parser_get_error_quark:
+ * g_variant_parser_get_error_quark:
  *
- * Same as xvariant_error_quark().
+ * Same as g_variant_error_quark().
  *
- * Deprecated: Use xvariant_parse_error_quark() instead.
+ * Deprecated: Use g_variant_parse_error_quark() instead.
  */
-xquark
-xvariant_parser_get_error_quark (void)
+GQuark
+g_variant_parser_get_error_quark (void)
 {
-  return xvariant_parse_error_quark ();
+  return g_variant_parse_error_quark ();
 }
 
 typedef struct
 {
-  xint_t start, end;
+  gint start, end;
 } SourceRef;
 
 G_GNUC_PRINTF(5, 0)
 static void
-parser_set_error_va (xerror_t      **error,
+parser_set_error_va (GError      **error,
                      SourceRef    *location,
                      SourceRef    *other,
-                     xint_t          code,
-                     const xchar_t  *format,
+                     gint          code,
+                     const gchar  *format,
                      va_list       ap)
 {
-  xstring_t *msg = xstring_new (NULL);
+  GString *msg = g_string_new (NULL);
 
   if (location->start == location->end)
-    xstring_append_printf (msg, "%d", location->start);
+    g_string_append_printf (msg, "%d", location->start);
   else
-    xstring_append_printf (msg, "%d-%d", location->start, location->end);
+    g_string_append_printf (msg, "%d-%d", location->start, location->end);
 
   if (other != NULL)
     {
-      xassert (other->start != other->end);
-      xstring_append_printf (msg, ",%d-%d", other->start, other->end);
+      g_assert (other->start != other->end);
+      g_string_append_printf (msg, ",%d-%d", other->start, other->end);
     }
-  xstring_append_c (msg, ':');
+  g_string_append_c (msg, ':');
 
-  xstring_append_vprintf (msg, format, ap);
+  g_string_append_vprintf (msg, format, ap);
   g_set_error_literal (error, G_VARIANT_PARSE_ERROR, code, msg->str);
-  xstring_free (msg, TRUE);
+  g_string_free (msg, TRUE);
 }
 
 G_GNUC_PRINTF(5, 6)
 static void
-parser_set_error (xerror_t      **error,
+parser_set_error (GError      **error,
                   SourceRef    *location,
                   SourceRef    *other,
-                  xint_t          code,
-                  const xchar_t  *format,
+                  gint          code,
+                  const gchar  *format,
                   ...)
 {
   va_list ap;
@@ -137,21 +137,21 @@ parser_set_error (xerror_t      **error,
 
 typedef struct
 {
-  const xchar_t *start;
-  const xchar_t *stream;
-  const xchar_t *end;
+  const gchar *start;
+  const gchar *stream;
+  const gchar *end;
 
-  const xchar_t *this;
+  const gchar *this;
 } TokenStream;
 
 
 G_GNUC_PRINTF(5, 6)
 static void
 token_stream_set_error (TokenStream  *stream,
-                        xerror_t      **error,
-                        xboolean_t      this_token,
-                        xint_t          code,
-                        const xchar_t  *format,
+                        GError      **error,
+                        gboolean      this_token,
+                        gint          code,
+                        const gchar  *format,
                         ...)
 {
   SourceRef ref;
@@ -169,11 +169,11 @@ token_stream_set_error (TokenStream  *stream,
   va_end (ap);
 }
 
-static xboolean_t
+static gboolean
 token_stream_prepare (TokenStream *stream)
 {
-  xint_t brackets = 0;
-  const xchar_t *end;
+  gint brackets = 0;
+  const gchar *end;
 
   if (stream->this != NULL)
     return TRUE;
@@ -261,7 +261,7 @@ token_stream_prepare (TokenStream *stream)
   stream->stream = end;
 
   /* We must have at least one byte in a token. */
-  xassert (stream->stream - stream->this >= 1);
+  g_assert (stream->stream - stream->this >= 1);
 
   return TRUE;
 }
@@ -272,9 +272,9 @@ token_stream_next (TokenStream *stream)
   stream->this = NULL;
 }
 
-static xboolean_t
+static gboolean
 token_stream_peek (TokenStream *stream,
-                   xchar_t        first_char)
+                   gchar        first_char)
 {
   if (!token_stream_prepare (stream))
     return FALSE;
@@ -283,10 +283,10 @@ token_stream_peek (TokenStream *stream,
          stream->this[0] == first_char;
 }
 
-static xboolean_t
+static gboolean
 token_stream_peek2 (TokenStream *stream,
-                    xchar_t        first_char,
-                    xchar_t        second_char)
+                    gchar        first_char,
+                    gchar        second_char)
 {
   if (!token_stream_prepare (stream))
     return FALSE;
@@ -296,7 +296,7 @@ token_stream_peek2 (TokenStream *stream,
          stream->this[1] == second_char;
 }
 
-static xboolean_t
+static gboolean
 token_stream_is_keyword (TokenStream *stream)
 {
   if (!token_stream_prepare (stream))
@@ -307,7 +307,7 @@ token_stream_is_keyword (TokenStream *stream)
          g_ascii_isalpha (stream->this[1]);
 }
 
-static xboolean_t
+static gboolean
 token_stream_is_numeric (TokenStream *stream)
 {
   if (!token_stream_prepare (stream))
@@ -320,20 +320,20 @@ token_stream_is_numeric (TokenStream *stream)
            stream->this[0] == '.'));
 }
 
-static xboolean_t
+static gboolean
 token_stream_peek_string (TokenStream *stream,
-                          const xchar_t *token)
+                          const gchar *token)
 {
-  xint_t length = strlen (token);
+  gint length = strlen (token);
 
   return token_stream_prepare (stream) &&
          stream->stream - stream->this == length &&
          memcmp (stream->this, token, length) == 0;
 }
 
-static xboolean_t
+static gboolean
 token_stream_consume (TokenStream *stream,
-                      const xchar_t *token)
+                      const gchar *token)
 {
   if (!token_stream_peek_string (stream, token))
     return FALSE;
@@ -342,11 +342,11 @@ token_stream_consume (TokenStream *stream,
   return TRUE;
 }
 
-static xboolean_t
+static gboolean
 token_stream_require (TokenStream  *stream,
-                      const xchar_t  *token,
-                      const xchar_t  *purpose,
-                      xerror_t      **error)
+                      const gchar  *token,
+                      const gchar  *purpose,
+                      GError      **error)
 {
 
   if (!token_stream_consume (stream, token))
@@ -362,23 +362,23 @@ token_stream_require (TokenStream  *stream,
 
 static void
 token_stream_assert (TokenStream *stream,
-                     const xchar_t *token)
+                     const gchar *token)
 {
-  xboolean_t correct_token G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
+  gboolean correct_token G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
   correct_token = token_stream_consume (stream, token);
-  xassert (correct_token);
+  g_assert (correct_token);
 }
 
-static xchar_t *
+static gchar *
 token_stream_get (TokenStream *stream)
 {
-  xchar_t *result;
+  gchar *result;
 
   if (!token_stream_prepare (stream))
     return NULL;
 
-  result = xstrndup (stream->this, stream->stream - stream->this);
+  result = g_strndup (stream->this, stream->stream - stream->this);
 
   return result;
 }
@@ -399,10 +399,10 @@ token_stream_end_ref (TokenStream *stream,
 }
 
 static void
-pattern_copy (xchar_t       **out,
-              const xchar_t **in)
+pattern_copy (gchar       **out,
+              const gchar **in)
 {
-  xint_t brackets = 0;
+  gint brackets = 0;
 
   while (**in == 'a' || **in == 'm' || **in == 'M')
     *(*out)++ = *(*in)++;
@@ -422,12 +422,12 @@ pattern_copy (xchar_t       **out,
 
 /* Returns the most general pattern that is subpattern of left and subpattern
  * of right, or NULL if there is no such pattern. */
-static xchar_t *
-pattern_coalesce (const xchar_t *left,
-                  const xchar_t *right)
+static gchar *
+pattern_coalesce (const gchar *left,
+                  const gchar *right)
 {
-  xchar_t *result;
-  xchar_t *out;
+  gchar *result;
+  gchar *out;
 
   /* the length of the output is loosely bound by the sum of the input
    * lengths, not simply the greater of the two lengths.
@@ -448,7 +448,7 @@ pattern_coalesce (const xchar_t *left,
 
       else
         {
-          const xchar_t **one = &left, **the_other = &right;
+          const gchar **one = &left, **the_other = &right;
 
          again:
           if (**one == '*' && **the_other != ')')
@@ -502,26 +502,26 @@ pattern_coalesce (const xchar_t *left,
 }
 
 typedef struct _AST AST;
-typedef xchar_t *    (*get_pattern_func)    (AST                 *ast,
-                                           xerror_t             **error);
-typedef xvariant_t * (*get_value_func)      (AST                 *ast,
-                                           const xvariant_type_t  *type,
-                                           xerror_t             **error);
-typedef xvariant_t * (*get_base_value_func) (AST                 *ast,
-                                           const xvariant_type_t  *type,
-                                           xerror_t             **error);
+typedef gchar *    (*get_pattern_func)    (AST                 *ast,
+                                           GError             **error);
+typedef GVariant * (*get_value_func)      (AST                 *ast,
+                                           const GVariantType  *type,
+                                           GError             **error);
+typedef GVariant * (*get_base_value_func) (AST                 *ast,
+                                           const GVariantType  *type,
+                                           GError             **error);
 typedef void       (*free_func)           (AST                 *ast);
 
 typedef struct
 {
-  xchar_t *    (* get_pattern)    (AST                 *ast,
-                                 xerror_t             **error);
-  xvariant_t * (* get_value)      (AST                 *ast,
-                                 const xvariant_type_t  *type,
-                                 xerror_t             **error);
-  xvariant_t * (* get_base_value) (AST                 *ast,
-                                 const xvariant_type_t  *type,
-                                 xerror_t             **error);
+  gchar *    (* get_pattern)    (AST                 *ast,
+                                 GError             **error);
+  GVariant * (* get_value)      (AST                 *ast,
+                                 const GVariantType  *type,
+                                 GError             **error);
+  GVariant * (* get_base_value) (AST                 *ast,
+                                 const GVariantType  *type,
+                                 GError             **error);
   void       (* free)           (AST                 *ast);
 } ASTClass;
 
@@ -531,17 +531,17 @@ struct _AST
   SourceRef source_ref;
 };
 
-static xchar_t *
+static gchar *
 ast_get_pattern (AST     *ast,
-                 xerror_t **error)
+                 GError **error)
 {
   return ast->class->get_pattern (ast, error);
 }
 
-static xvariant_t *
+static GVariant *
 ast_get_value (AST                 *ast,
-               const xvariant_type_t  *type,
-               xerror_t             **error)
+               const GVariantType  *type,
+               GError             **error)
 {
   return ast->class->get_value (ast, type, error);
 }
@@ -555,10 +555,10 @@ ast_free (AST *ast)
 G_GNUC_PRINTF(5, 6)
 static void
 ast_set_error (AST          *ast,
-               xerror_t      **error,
+               GError      **error,
                AST          *other_ast,
-               xint_t          code,
-               const xchar_t  *format,
+               gint          code,
+               const gchar  *format,
                ...)
 {
   va_list ap;
@@ -571,14 +571,14 @@ ast_set_error (AST          *ast,
   va_end (ap);
 }
 
-static xvariant_t *
+static GVariant *
 ast_type_error (AST                 *ast,
-                const xvariant_type_t  *type,
-                xerror_t             **error)
+                const GVariantType  *type,
+                GError             **error)
 {
-  xchar_t *typestr;
+  gchar *typestr;
 
-  typestr = xvariant_type_dup_string (type);
+  typestr = g_variant_type_dup_string (type);
   ast_set_error (ast, error, NULL,
                  G_VARIANT_PARSE_ERROR_TYPE_ERROR,
                  "can not parse as value of type '%s'",
@@ -588,13 +588,13 @@ ast_type_error (AST                 *ast,
   return NULL;
 }
 
-static xvariant_t *
+static GVariant *
 ast_resolve (AST     *ast,
-             xerror_t **error)
+             GError **error)
 {
-  xvariant_t *value;
-  xchar_t *pattern;
-  xint_t i, j = 0;
+  GVariant *value;
+  gchar *pattern;
+  gint i, j = 0;
 
   pattern = ast_get_pattern (ast, error);
 
@@ -642,13 +642,13 @@ ast_resolve (AST     *ast,
 
 
 static AST *parse (TokenStream  *stream,
-                   xuint_t         max_depth,
+                   guint         max_depth,
                    va_list      *app,
-                   xerror_t      **error);
+                   GError      **error);
 
 static void
 ast_array_append (AST  ***array,
-                  xint_t   *n_items,
+                  gint   *n_items,
                   AST    *ast)
 {
   if ((*n_items & (*n_items - 1)) == 0)
@@ -659,22 +659,22 @@ ast_array_append (AST  ***array,
 
 static void
 ast_array_free (AST  **array,
-                xint_t   n_items)
+                gint   n_items)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < n_items; i++)
     ast_free (array[i]);
   g_free (array);
 }
 
-static xchar_t *
+static gchar *
 ast_array_get_pattern (AST    **array,
-                       xint_t     n_items,
-                       xerror_t **error)
+                       gint     n_items,
+                       GError **error)
 {
-  xchar_t *pattern;
-  xint_t i;
+  gchar *pattern;
+  gint i;
 
   /* Find the pattern which applies to all children in the array, by l-folding a
    * coalesce operation.
@@ -686,7 +686,7 @@ ast_array_get_pattern (AST    **array,
 
   for (i = 1; i < n_items; i++)
     {
-      xchar_t *tmp, *merged;
+      gchar *tmp, *merged;
 
       tmp = ast_get_pattern (array[i], error);
 
@@ -710,8 +710,8 @@ ast_array_get_pattern (AST    **array,
 
           while (TRUE)
             {
-              xchar_t *tmp2;
-              xchar_t *m;
+              gchar *tmp2;
+              gchar *m;
 
               /* if 'j' reaches 'i' then we didn't find the pair that failed
                * to coalesce. This shouldn't happen (see above), but just in
@@ -727,7 +727,7 @@ ast_array_get_pattern (AST    **array,
                 }
 
               tmp2 = ast_get_pattern (array[j], NULL);
-              xassert (tmp2 != NULL);
+              g_assert (tmp2 != NULL);
 
               m = pattern_coalesce (tmp, tmp2);
               g_free (tmp2);
@@ -764,43 +764,43 @@ typedef struct
   AST *child;
 } Maybe;
 
-static xchar_t *
+static gchar *
 maybe_get_pattern (AST     *ast,
-                   xerror_t **error)
+                   GError **error)
 {
   Maybe *maybe = (Maybe *) ast;
 
   if (maybe->child != NULL)
     {
-      xchar_t *child_pattern;
-      xchar_t *pattern;
+      gchar *child_pattern;
+      gchar *pattern;
 
       child_pattern = ast_get_pattern (maybe->child, error);
 
       if (child_pattern == NULL)
         return NULL;
 
-      pattern = xstrdup_printf ("m%s", child_pattern);
+      pattern = g_strdup_printf ("m%s", child_pattern);
       g_free (child_pattern);
 
       return pattern;
     }
 
-  return xstrdup ("m*");
+  return g_strdup ("m*");
 }
 
-static xvariant_t *
+static GVariant *
 maybe_get_value (AST                 *ast,
-                 const xvariant_type_t  *type,
-                 xerror_t             **error)
+                 const GVariantType  *type,
+                 GError             **error)
 {
   Maybe *maybe = (Maybe *) ast;
-  xvariant_t *value;
+  GVariant *value;
 
-  if (!xvariant_type_is_maybe (type))
+  if (!g_variant_type_is_maybe (type))
     return ast_type_error (ast, type, error);
 
-  type = xvariant_type_element (type);
+  type = g_variant_type_element (type);
 
   if (maybe->child)
     {
@@ -812,7 +812,7 @@ maybe_get_value (AST                 *ast,
   else
     value = NULL;
 
-  return xvariant_new_maybe (type, value);
+  return g_variant_new_maybe (type, value);
 }
 
 static void
@@ -828,9 +828,9 @@ maybe_free (AST *ast)
 
 static AST *
 maybe_parse (TokenStream  *stream,
-             xuint_t         max_depth,
+             guint         max_depth,
              va_list      *app,
-             xerror_t      **error)
+             GError      **error)
 {
   static const ASTClass maybe_class = {
     maybe_get_pattern,
@@ -862,18 +862,18 @@ maybe_parse (TokenStream  *stream,
   return (AST *) maybe;
 }
 
-static xvariant_t *
+static GVariant *
 maybe_wrapper (AST                 *ast,
-               const xvariant_type_t  *type,
-               xerror_t             **error)
+               const GVariantType  *type,
+               GError             **error)
 {
-  const xvariant_type_t *t;
-  xvariant_t *value;
+  const GVariantType *t;
+  GVariant *value;
   int depth;
 
   for (depth = 0, t = type;
-       xvariant_type_is_maybe (t);
-       depth++, t = xvariant_type_element (t));
+       g_variant_type_is_maybe (t);
+       depth++, t = g_variant_type_element (t));
 
   value = ast->class->get_base_value (ast, t, error);
 
@@ -881,7 +881,7 @@ maybe_wrapper (AST                 *ast,
     return NULL;
 
   while (depth--)
-    value = xvariant_new_maybe (NULL, value);
+    value = g_variant_new_maybe (NULL, value);
 
   return value;
 }
@@ -891,61 +891,61 @@ typedef struct
   AST ast;
 
   AST **children;
-  xint_t n_children;
+  gint n_children;
 } Array;
 
-static xchar_t *
+static gchar *
 array_get_pattern (AST     *ast,
-                   xerror_t **error)
+                   GError **error)
 {
   Array *array = (Array *) ast;
-  xchar_t *pattern;
-  xchar_t *result;
+  gchar *pattern;
+  gchar *result;
 
   if (array->n_children == 0)
-    return xstrdup ("Ma*");
+    return g_strdup ("Ma*");
 
   pattern = ast_array_get_pattern (array->children, array->n_children, error);
 
   if (pattern == NULL)
     return NULL;
 
-  result = xstrdup_printf ("Ma%s", pattern);
+  result = g_strdup_printf ("Ma%s", pattern);
   g_free (pattern);
 
   return result;
 }
 
-static xvariant_t *
+static GVariant *
 array_get_value (AST                 *ast,
-                 const xvariant_type_t  *type,
-                 xerror_t             **error)
+                 const GVariantType  *type,
+                 GError             **error)
 {
   Array *array = (Array *) ast;
-  const xvariant_type_t *childtype;
-  xvariant_builder_t builder;
-  xint_t i;
+  const GVariantType *childtype;
+  GVariantBuilder builder;
+  gint i;
 
-  if (!xvariant_type_is_array (type))
+  if (!g_variant_type_is_array (type))
     return ast_type_error (ast, type, error);
 
-  xvariant_builder_init (&builder, type);
-  childtype = xvariant_type_element (type);
+  g_variant_builder_init (&builder, type);
+  childtype = g_variant_type_element (type);
 
   for (i = 0; i < array->n_children; i++)
     {
-      xvariant_t *child;
+      GVariant *child;
 
       if (!(child = ast_get_value (array->children[i], childtype, error)))
         {
-          xvariant_builder_clear (&builder);
+          g_variant_builder_clear (&builder);
           return NULL;
         }
 
-      xvariant_builder_add_value (&builder, child);
+      g_variant_builder_add_value (&builder, child);
     }
 
-  return xvariant_builder_end (&builder);
+  return g_variant_builder_end (&builder);
 }
 
 static void
@@ -959,16 +959,16 @@ array_free (AST *ast)
 
 static AST *
 array_parse (TokenStream  *stream,
-             xuint_t         max_depth,
+             guint         max_depth,
              va_list      *app,
-             xerror_t      **error)
+             GError      **error)
 {
   static const ASTClass array_class = {
     array_get_pattern,
     maybe_wrapper, array_get_value,
     array_free
   };
-  xboolean_t need_comma = FALSE;
+  gboolean need_comma = FALSE;
   Array *array;
 
   array = g_slice_new (Array);
@@ -1010,29 +1010,29 @@ typedef struct
   AST ast;
 
   AST **children;
-  xint_t n_children;
+  gint n_children;
 } Tuple;
 
-static xchar_t *
+static gchar *
 tuple_get_pattern (AST     *ast,
-                   xerror_t **error)
+                   GError **error)
 {
   Tuple *tuple = (Tuple *) ast;
-  xchar_t *result = NULL;
-  xchar_t **parts;
-  xint_t i;
+  gchar *result = NULL;
+  gchar **parts;
+  gint i;
 
-  parts = g_new (xchar_t *, tuple->n_children + 4);
-  parts[tuple->n_children + 1] = (xchar_t *) ")";
+  parts = g_new (gchar *, tuple->n_children + 4);
+  parts[tuple->n_children + 1] = (gchar *) ")";
   parts[tuple->n_children + 2] = NULL;
-  parts[0] = (xchar_t *) "M(";
+  parts[0] = (gchar *) "M(";
 
   for (i = 0; i < tuple->n_children; i++)
     if (!(parts[i + 1] = ast_get_pattern (tuple->children[i], error)))
       break;
 
   if (i == tuple->n_children)
-    result = xstrjoinv ("", parts);
+    result = g_strjoinv ("", parts);
 
   /* parts[0] should not be freed */
   while (i)
@@ -1042,49 +1042,49 @@ tuple_get_pattern (AST     *ast,
   return result;
 }
 
-static xvariant_t *
+static GVariant *
 tuple_get_value (AST                 *ast,
-                 const xvariant_type_t  *type,
-                 xerror_t             **error)
+                 const GVariantType  *type,
+                 GError             **error)
 {
   Tuple *tuple = (Tuple *) ast;
-  const xvariant_type_t *childtype;
-  xvariant_builder_t builder;
-  xint_t i;
+  const GVariantType *childtype;
+  GVariantBuilder builder;
+  gint i;
 
-  if (!xvariant_type_is_tuple (type))
+  if (!g_variant_type_is_tuple (type))
     return ast_type_error (ast, type, error);
 
-  xvariant_builder_init (&builder, type);
-  childtype = xvariant_type_first (type);
+  g_variant_builder_init (&builder, type);
+  childtype = g_variant_type_first (type);
 
   for (i = 0; i < tuple->n_children; i++)
     {
-      xvariant_t *child;
+      GVariant *child;
 
       if (childtype == NULL)
         {
-          xvariant_builder_clear (&builder);
+          g_variant_builder_clear (&builder);
           return ast_type_error (ast, type, error);
         }
 
       if (!(child = ast_get_value (tuple->children[i], childtype, error)))
         {
-          xvariant_builder_clear (&builder);
+          g_variant_builder_clear (&builder);
           return FALSE;
         }
 
-      xvariant_builder_add_value (&builder, child);
-      childtype = xvariant_type_next (childtype);
+      g_variant_builder_add_value (&builder, child);
+      childtype = g_variant_type_next (childtype);
     }
 
   if (childtype != NULL)
     {
-      xvariant_builder_clear (&builder);
+      g_variant_builder_clear (&builder);
       return ast_type_error (ast, type, error);
     }
 
-  return xvariant_builder_end (&builder);
+  return g_variant_builder_end (&builder);
 }
 
 static void
@@ -1098,17 +1098,17 @@ tuple_free (AST *ast)
 
 static AST *
 tuple_parse (TokenStream  *stream,
-             xuint_t         max_depth,
+             guint         max_depth,
              va_list      *app,
-             xerror_t      **error)
+             GError      **error)
 {
   static const ASTClass tuple_class = {
     tuple_get_pattern,
     maybe_wrapper, tuple_get_value,
     tuple_free
   };
-  xboolean_t need_comma = FALSE;
-  xboolean_t first = TRUE;
+  gboolean need_comma = FALSE;
+  gboolean first = TRUE;
   Tuple *tuple;
 
   tuple = g_slice_new (Tuple);
@@ -1168,22 +1168,22 @@ typedef struct
   AST *value;
 } Variant;
 
-static xchar_t *
+static gchar *
 variant_get_pattern (AST     *ast,
-                     xerror_t **error)
+                     GError **error)
 {
-  return xstrdup ("Mv");
+  return g_strdup ("Mv");
 }
 
-static xvariant_t *
+static GVariant *
 variant_get_value (AST                 *ast,
-                   const xvariant_type_t  *type,
-                   xerror_t             **error)
+                   const GVariantType  *type,
+                   GError             **error)
 {
   Variant *variant = (Variant *) ast;
-  xvariant_t *child;
+  GVariant *child;
 
-  if (!xvariant_type_equal (type, G_VARIANT_TYPE_VARIANT))
+  if (!g_variant_type_equal (type, G_VARIANT_TYPE_VARIANT))
     return ast_type_error (ast, type, error);
 
   child = ast_resolve (variant->value, error);
@@ -1191,7 +1191,7 @@ variant_get_value (AST                 *ast,
   if (child == NULL)
     return NULL;
 
-  return xvariant_new_variant (child);
+  return g_variant_new_variant (child);
 }
 
 static void
@@ -1205,9 +1205,9 @@ variant_free (AST *ast)
 
 static AST *
 variant_parse (TokenStream  *stream,
-               xuint_t         max_depth,
+               guint         max_depth,
                va_list      *app,
-               xerror_t      **error)
+               GError      **error)
 {
   static const ASTClass variant_class = {
     variant_get_pattern,
@@ -1242,21 +1242,21 @@ typedef struct
 
   AST **keys;
   AST **values;
-  xint_t n_children;
+  gint n_children;
 } Dictionary;
 
-static xchar_t *
+static gchar *
 dictionary_get_pattern (AST     *ast,
-                        xerror_t **error)
+                        GError **error)
 {
   Dictionary *dict = (Dictionary *) ast;
-  xchar_t *value_pattern;
-  xchar_t *key_pattern;
-  xchar_t key_char;
-  xchar_t *result;
+  gchar *value_pattern;
+  gchar *key_pattern;
+  gchar key_char;
+  gchar *result;
 
   if (dict->n_children == 0)
-    return xstrdup ("Ma{**}");
+    return g_strdup ("Ma{**}");
 
   key_pattern = ast_array_get_pattern (dict->keys,
                                        abs (dict->n_children),
@@ -1289,7 +1289,7 @@ dictionary_get_pattern (AST     *ast,
   if (value_pattern == NULL)
     return NULL;
 
-  result = xstrdup_printf ("M%s{%c%s}",
+  result = g_strdup_printf ("M%s{%c%s}",
                             dict->n_children > 0 ? "a" : "",
                             key_char, value_pattern);
   g_free (value_pattern);
@@ -1297,80 +1297,80 @@ dictionary_get_pattern (AST     *ast,
   return result;
 }
 
-static xvariant_t *
+static GVariant *
 dictionary_get_value (AST                 *ast,
-                      const xvariant_type_t  *type,
-                      xerror_t             **error)
+                      const GVariantType  *type,
+                      GError             **error)
 {
   Dictionary *dict = (Dictionary *) ast;
 
   if (dict->n_children == -1)
     {
-      const xvariant_type_t *subtype;
-      xvariant_builder_t builder;
-      xvariant_t *subvalue;
+      const GVariantType *subtype;
+      GVariantBuilder builder;
+      GVariant *subvalue;
 
-      if (!xvariant_type_is_dict_entry (type))
+      if (!g_variant_type_is_dict_entry (type))
         return ast_type_error (ast, type, error);
 
-      xvariant_builder_init (&builder, type);
+      g_variant_builder_init (&builder, type);
 
-      subtype = xvariant_type_key (type);
+      subtype = g_variant_type_key (type);
       if (!(subvalue = ast_get_value (dict->keys[0], subtype, error)))
         {
-          xvariant_builder_clear (&builder);
+          g_variant_builder_clear (&builder);
           return NULL;
         }
-      xvariant_builder_add_value (&builder, subvalue);
+      g_variant_builder_add_value (&builder, subvalue);
 
-      subtype = xvariant_type_value (type);
+      subtype = g_variant_type_value (type);
       if (!(subvalue = ast_get_value (dict->values[0], subtype, error)))
         {
-          xvariant_builder_clear (&builder);
+          g_variant_builder_clear (&builder);
           return NULL;
         }
-      xvariant_builder_add_value (&builder, subvalue);
+      g_variant_builder_add_value (&builder, subvalue);
 
-      return xvariant_builder_end (&builder);
+      return g_variant_builder_end (&builder);
     }
   else
     {
-      const xvariant_type_t *entry, *key, *val;
-      xvariant_builder_t builder;
-      xint_t i;
+      const GVariantType *entry, *key, *val;
+      GVariantBuilder builder;
+      gint i;
 
-      if (!xvariant_type_is_subtype_of (type, G_VARIANT_TYPE_DICTIONARY))
+      if (!g_variant_type_is_subtype_of (type, G_VARIANT_TYPE_DICTIONARY))
         return ast_type_error (ast, type, error);
 
-      entry = xvariant_type_element (type);
-      key = xvariant_type_key (entry);
-      val = xvariant_type_value (entry);
+      entry = g_variant_type_element (type);
+      key = g_variant_type_key (entry);
+      val = g_variant_type_value (entry);
 
-      xvariant_builder_init (&builder, type);
+      g_variant_builder_init (&builder, type);
 
       for (i = 0; i < dict->n_children; i++)
         {
-          xvariant_t *subvalue;
+          GVariant *subvalue;
 
-          xvariant_builder_open (&builder, entry);
+          g_variant_builder_open (&builder, entry);
 
           if (!(subvalue = ast_get_value (dict->keys[i], key, error)))
             {
-              xvariant_builder_clear (&builder);
+              g_variant_builder_clear (&builder);
               return NULL;
             }
-          xvariant_builder_add_value (&builder, subvalue);
+          g_variant_builder_add_value (&builder, subvalue);
 
           if (!(subvalue = ast_get_value (dict->values[i], val, error)))
             {
-              xvariant_builder_clear (&builder);
+              g_variant_builder_clear (&builder);
               return NULL;
             }
-          xvariant_builder_add_value (&builder, subvalue);
-          xvariant_builder_close (&builder);
+          g_variant_builder_add_value (&builder, subvalue);
+          g_variant_builder_close (&builder);
         }
 
-      return xvariant_builder_end (&builder);
+      return g_variant_builder_end (&builder);
     }
 }
 
@@ -1378,7 +1378,7 @@ static void
 dictionary_free (AST *ast)
 {
   Dictionary *dict = (Dictionary *) ast;
-  xint_t n_children;
+  gint n_children;
 
   if (dict->n_children > -1)
     n_children = dict->n_children;
@@ -1392,17 +1392,17 @@ dictionary_free (AST *ast)
 
 static AST *
 dictionary_parse (TokenStream  *stream,
-                  xuint_t         max_depth,
+                  guint         max_depth,
                   va_list      *app,
-                  xerror_t      **error)
+                  GError      **error)
 {
   static const ASTClass dictionary_class = {
     dictionary_get_pattern,
     maybe_wrapper, dictionary_get_value,
     dictionary_free
   };
-  xint_t n_keys, n_values;
-  xboolean_t only_one;
+  gint n_keys, n_values;
+  gboolean only_one;
   Dictionary *dict;
   AST *first;
 
@@ -1443,7 +1443,7 @@ dictionary_parse (TokenStream  *stream,
                                  error))
         goto error;
 
-      xassert (n_keys == 1 && n_values == 1);
+      g_assert (n_keys == 1 && n_values == 1);
       dict->n_children = -1;
 
       return (AST *) dict;
@@ -1476,7 +1476,7 @@ dictionary_parse (TokenStream  *stream,
       ast_array_append (&dict->values, &n_values, child);
     }
 
-  xassert (n_keys == n_values);
+  g_assert (n_keys == n_values);
   dict->n_children = n_keys;
 
   return (AST *) dict;
@@ -1492,29 +1492,29 @@ dictionary_parse (TokenStream  *stream,
 typedef struct
 {
   AST ast;
-  xchar_t *string;
+  gchar *string;
 } String;
 
-static xchar_t *
+static gchar *
 string_get_pattern (AST     *ast,
-                    xerror_t **error)
+                    GError **error)
 {
-  return xstrdup ("MS");
+  return g_strdup ("MS");
 }
 
-static xvariant_t *
+static GVariant *
 string_get_value (AST                 *ast,
-                  const xvariant_type_t  *type,
-                  xerror_t             **error)
+                  const GVariantType  *type,
+                  GError             **error)
 {
   String *string = (String *) ast;
 
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_STRING))
-    return xvariant_new_string (string->string);
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_STRING))
+    return g_variant_new_string (string->string);
 
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_OBJECT_PATH))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_OBJECT_PATH))
     {
-      if (!xvariant_is_object_path (string->string))
+      if (!g_variant_is_object_path (string->string))
         {
           ast_set_error (ast, error, NULL,
                          G_VARIANT_PARSE_ERROR_INVALID_OBJECT_PATH,
@@ -1522,12 +1522,12 @@ string_get_value (AST                 *ast,
           return NULL;
         }
 
-      return xvariant_new_object_path (string->string);
+      return g_variant_new_object_path (string->string);
     }
 
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_SIGNATURE))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_SIGNATURE))
     {
-      if (!xvariant_is_signature (string->string))
+      if (!g_variant_is_signature (string->string))
         {
           ast_set_error (ast, error, NULL,
                          G_VARIANT_PARSE_ERROR_INVALID_SIGNATURE,
@@ -1535,7 +1535,7 @@ string_get_value (AST                 *ast,
           return NULL;
         }
 
-      return xvariant_new_signature (string->string);
+      return g_variant_new_signature (string->string);
     }
 
   else
@@ -1553,23 +1553,23 @@ string_free (AST *ast)
 
 /* Accepts exactly @length hexadecimal digits. No leading sign or `0x`/`0X` prefix allowed.
  * No leading/trailing space allowed. */
-static xboolean_t
-unicode_unescape (const xchar_t  *src,
-                  xint_t         *src_ofs,
-                  xchar_t        *dest,
-                  xint_t         *dest_ofs,
-                  xsize_t         length,
+static gboolean
+unicode_unescape (const gchar  *src,
+                  gint         *src_ofs,
+                  gchar        *dest,
+                  gint         *dest_ofs,
+                  gsize         length,
                   SourceRef    *ref,
-                  xerror_t      **error)
+                  GError      **error)
 {
-  xchar_t buffer[9];
-  xuint64_t value = 0;
-  xchar_t *end = NULL;
-  xsize_t n_valid_chars;
+  gchar buffer[9];
+  guint64 value = 0;
+  gchar *end = NULL;
+  gsize n_valid_chars;
 
   (*src_ofs)++;
 
-  xassert (length < sizeof (buffer));
+  g_assert (length < sizeof (buffer));
   strncpy (buffer, src + *src_ofs, length);
   buffer[length] = '\0';
 
@@ -1594,9 +1594,9 @@ unicode_unescape (const xchar_t  *src,
       return FALSE;
     }
 
-  xassert (value <= G_MAXUINT32);
+  g_assert (value <= G_MAXUINT32);
 
-  *dest_ofs += xunichar_to_utf8 (value, dest + *dest_ofs);
+  *dest_ofs += g_unichar_to_utf8 (value, dest + *dest_ofs);
   *src_ofs += length;
 
   return TRUE;
@@ -1605,7 +1605,7 @@ unicode_unescape (const xchar_t  *src,
 static AST *
 string_parse (TokenStream  *stream,
               va_list      *app,
-              xerror_t      **error)
+              GError      **error)
 {
   static const ASTClass string_class = {
     string_get_pattern,
@@ -1614,11 +1614,11 @@ string_parse (TokenStream  *stream,
   };
   String *string;
   SourceRef ref;
-  xchar_t *token;
-  xsize_t length;
-  xchar_t quote;
-  xchar_t *str;
-  xint_t i, j;
+  gchar *token;
+  gsize length;
+  gchar quote;
+  gchar *str;
+  gint i, j;
 
   token_stream_start_ref (stream, &ref);
   token = token_stream_get (stream);
@@ -1627,7 +1627,7 @@ string_parse (TokenStream  *stream,
   quote = token[0];
 
   str = g_malloc (length);
-  xassert (quote == '"' || quote == '\'');
+  g_assert (quote == '"' || quote == '\'');
   j = 0;
   i = 1;
   while (token[i] != quote)
@@ -1700,27 +1700,27 @@ string_parse (TokenStream  *stream,
 typedef struct
 {
   AST ast;
-  xchar_t *string;
+  gchar *string;
 } ByteString;
 
-static xchar_t *
+static gchar *
 bytestring_get_pattern (AST     *ast,
-                        xerror_t **error)
+                        GError **error)
 {
-  return xstrdup ("May");
+  return g_strdup ("May");
 }
 
-static xvariant_t *
+static GVariant *
 bytestring_get_value (AST                 *ast,
-                      const xvariant_type_t  *type,
-                      xerror_t             **error)
+                      const GVariantType  *type,
+                      GError             **error)
 {
   ByteString *string = (ByteString *) ast;
 
-  if (!xvariant_type_equal (type, G_VARIANT_TYPE_BYTESTRING))
+  if (!g_variant_type_equal (type, G_VARIANT_TYPE_BYTESTRING))
     return ast_type_error (ast, type, error);
 
-  return xvariant_new_bytestring (string->string);
+  return g_variant_new_bytestring (string->string);
 }
 
 static void
@@ -1735,7 +1735,7 @@ bytestring_free (AST *ast)
 static AST *
 bytestring_parse (TokenStream  *stream,
                   va_list      *app,
-                  xerror_t      **error)
+                  GError      **error)
 {
   static const ASTClass bytestring_class = {
     bytestring_get_pattern,
@@ -1744,21 +1744,21 @@ bytestring_parse (TokenStream  *stream,
   };
   ByteString *string;
   SourceRef ref;
-  xchar_t *token;
-  xsize_t length;
-  xchar_t quote;
-  xchar_t *str;
-  xint_t i, j;
+  gchar *token;
+  gsize length;
+  gchar quote;
+  gchar *str;
+  gint i, j;
 
   token_stream_start_ref (stream, &ref);
   token = token_stream_get (stream);
   token_stream_end_ref (stream, &ref);
-  xassert (token[0] == 'b');
+  g_assert (token[0] == 'b');
   length = strlen (token);
   quote = token[1];
 
   str = g_malloc (length);
-  xassert (quote == '"' || quote == '\'');
+  g_assert (quote == '"' || quote == '\'');
   j = 0;
   i = 2;
   while (token[i] != quote)
@@ -1787,7 +1787,7 @@ bytestring_parse (TokenStream  *stream,
           case '4': case '5': case '6': case '7':
             {
               /* up to 3 characters */
-              xuchar_t val = token[i++] - '0';
+              guchar val = token[i++] - '0';
 
               if ('0' <= token[i] && token[i] < '8')
                 val = (val << 3) | (token[i++] - '0');
@@ -1830,52 +1830,52 @@ typedef struct
 {
   AST ast;
 
-  xchar_t *token;
+  gchar *token;
 } Number;
 
-static xchar_t *
+static gchar *
 number_get_pattern (AST     *ast,
-                    xerror_t **error)
+                    GError **error)
 {
   Number *number = (Number *) ast;
 
   if (strchr (number->token, '.') ||
-      (!xstr_has_prefix (number->token, "0x") && strchr (number->token, 'e')) ||
+      (!g_str_has_prefix (number->token, "0x") && strchr (number->token, 'e')) ||
       strstr (number->token, "inf") ||
       strstr (number->token, "nan"))
-    return xstrdup ("Md");
+    return g_strdup ("Md");
 
-  return xstrdup ("MN");
+  return g_strdup ("MN");
 }
 
-static xvariant_t *
+static GVariant *
 number_overflow (AST                 *ast,
-                 const xvariant_type_t  *type,
-                 xerror_t             **error)
+                 const GVariantType  *type,
+                 GError             **error)
 {
   ast_set_error (ast, error, NULL,
                  G_VARIANT_PARSE_ERROR_NUMBER_OUT_OF_RANGE,
                  "number out of range for type '%c'",
-                 xvariant_type_peek_string (type)[0]);
+                 g_variant_type_peek_string (type)[0]);
   return NULL;
 }
 
-static xvariant_t *
+static GVariant *
 number_get_value (AST                 *ast,
-                  const xvariant_type_t  *type,
-                  xerror_t             **error)
+                  const GVariantType  *type,
+                  GError             **error)
 {
   Number *number = (Number *) ast;
-  const xchar_t *token;
-  xboolean_t negative;
-  xboolean_t floating;
-  xuint64_t abs_val;
-  xdouble_t dbl_val;
-  xchar_t *end;
+  const gchar *token;
+  gboolean negative;
+  gboolean floating;
+  guint64 abs_val;
+  gdouble dbl_val;
+  gchar *end;
 
   token = number->token;
 
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
     {
       floating = TRUE;
 
@@ -1932,60 +1932,60 @@ number_get_value (AST                 *ast,
      }
 
   if (floating)
-    return xvariant_new_double (dbl_val);
+    return g_variant_new_double (dbl_val);
 
-  switch (*xvariant_type_peek_string (type))
+  switch (*g_variant_type_peek_string (type))
     {
     case 'y':
       if (negative || abs_val > G_MAXUINT8)
         return number_overflow (ast, type, error);
-      return xvariant_new_byte (abs_val);
+      return g_variant_new_byte (abs_val);
 
     case 'n':
       if (abs_val - negative > G_MAXINT16)
         return number_overflow (ast, type, error);
       if (negative && abs_val > G_MAXINT16)
-        return xvariant_new_int16 (G_MININT16);
-      return xvariant_new_int16 (negative ?
+        return g_variant_new_int16 (G_MININT16);
+      return g_variant_new_int16 (negative ?
                                   -((gint16) abs_val) : ((gint16) abs_val));
 
     case 'q':
       if (negative || abs_val > G_MAXUINT16)
         return number_overflow (ast, type, error);
-      return xvariant_new_uint16 (abs_val);
+      return g_variant_new_uint16 (abs_val);
 
     case 'i':
       if (abs_val - negative > G_MAXINT32)
         return number_overflow (ast, type, error);
       if (negative && abs_val > G_MAXINT32)
-        return xvariant_new_int32 (G_MININT32);
-      return xvariant_new_int32 (negative ?
+        return g_variant_new_int32 (G_MININT32);
+      return g_variant_new_int32 (negative ?
                                   -((gint32) abs_val) : ((gint32) abs_val));
 
     case 'u':
       if (negative || abs_val > G_MAXUINT32)
         return number_overflow (ast, type, error);
-      return xvariant_new_uint32 (abs_val);
+      return g_variant_new_uint32 (abs_val);
 
     case 'x':
       if (abs_val - negative > G_MAXINT64)
         return number_overflow (ast, type, error);
       if (negative && abs_val > G_MAXINT64)
-        return xvariant_new_int64 (G_MININT64);
-      return xvariant_new_int64 (negative ?
-                                  -((sint64_t) abs_val) : ((sint64_t) abs_val));
+        return g_variant_new_int64 (G_MININT64);
+      return g_variant_new_int64 (negative ?
+                                  -((gint64) abs_val) : ((gint64) abs_val));
 
     case 't':
       if (negative)
         return number_overflow (ast, type, error);
-      return xvariant_new_uint64 (abs_val);
+      return g_variant_new_uint64 (abs_val);
 
     case 'h':
       if (abs_val - negative > G_MAXINT32)
         return number_overflow (ast, type, error);
       if (negative && abs_val > G_MAXINT32)
-        return xvariant_new_handle (G_MININT32);
-      return xvariant_new_handle (negative ?
+        return g_variant_new_handle (G_MININT32);
+      return g_variant_new_handle (negative ?
                                    -((gint32) abs_val) : ((gint32) abs_val));
 
     default:
@@ -2005,7 +2005,7 @@ number_free (AST *ast)
 static AST *
 number_parse (TokenStream  *stream,
               va_list      *app,
-              xerror_t      **error)
+              GError      **error)
 {
   static const ASTClass number_class = {
     number_get_pattern,
@@ -2025,27 +2025,27 @@ number_parse (TokenStream  *stream,
 typedef struct
 {
   AST ast;
-  xboolean_t value;
+  gboolean value;
 } Boolean;
 
-static xchar_t *
+static gchar *
 boolean_get_pattern (AST     *ast,
-                     xerror_t **error)
+                     GError **error)
 {
-  return xstrdup ("Mb");
+  return g_strdup ("Mb");
 }
 
-static xvariant_t *
+static GVariant *
 boolean_get_value (AST                 *ast,
-                   const xvariant_type_t  *type,
-                   xerror_t             **error)
+                   const GVariantType  *type,
+                   GError             **error)
 {
   Boolean *boolean = (Boolean *) ast;
 
-  if (!xvariant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
+  if (!g_variant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
     return ast_type_error (ast, type, error);
 
-  return xvariant_new_boolean (boolean->value);
+  return g_variant_new_boolean (boolean->value);
 }
 
 static void
@@ -2057,7 +2057,7 @@ boolean_free (AST *ast)
 }
 
 static AST *
-boolean_new (xboolean_t value)
+boolean_new (gboolean value)
 {
   static const ASTClass boolean_class = {
     boolean_get_pattern,
@@ -2077,29 +2077,29 @@ typedef struct
 {
   AST ast;
 
-  xvariant_t *value;
+  GVariant *value;
 } Positional;
 
-static xchar_t *
+static gchar *
 positional_get_pattern (AST     *ast,
-                        xerror_t **error)
+                        GError **error)
 {
   Positional *positional = (Positional *) ast;
 
-  return xstrdup (xvariant_get_type_string (positional->value));
+  return g_strdup (g_variant_get_type_string (positional->value));
 }
 
-static xvariant_t *
+static GVariant *
 positional_get_value (AST                 *ast,
-                      const xvariant_type_t  *type,
-                      xerror_t             **error)
+                      const GVariantType  *type,
+                      GError             **error)
 {
   Positional *positional = (Positional *) ast;
-  xvariant_t *value;
+  GVariant *value;
 
-  xassert (positional->value != NULL);
+  g_assert (positional->value != NULL);
 
-  if G_UNLIKELY (!xvariant_is_of_type (positional->value, type))
+  if G_UNLIKELY (!g_variant_is_of_type (positional->value, type))
     return ast_type_error (ast, type, error);
 
   /* NOTE: if _get is called more than once then
@@ -2107,7 +2107,7 @@ positional_get_value (AST                 *ast,
    *
    * fortunately, this function should only ever get called once.
    */
-  xassert (positional->value != NULL);
+  g_assert (positional->value != NULL);
   value = positional->value;
   positional->value = NULL;
 
@@ -2128,7 +2128,7 @@ positional_free (AST *ast)
 static AST *
 positional_parse (TokenStream  *stream,
                   va_list      *app,
-                  xerror_t      **error)
+                  GError      **error)
 {
   static const ASTClass positional_class = {
     positional_get_pattern,
@@ -2136,21 +2136,21 @@ positional_parse (TokenStream  *stream,
     positional_free
   };
   Positional *positional;
-  const xchar_t *endptr;
-  xchar_t *token;
+  const gchar *endptr;
+  gchar *token;
 
   token = token_stream_get (stream);
-  xassert (token[0] == '%');
+  g_assert (token[0] == '%');
 
   positional = g_slice_new (Positional);
   positional->ast.class = &positional_class;
-  positional->value = xvariant_new_va (token + 1, &endptr, app);
+  positional->value = g_variant_new_va (token + 1, &endptr, app);
 
   if (*endptr || positional->value == NULL)
     {
       token_stream_set_error (stream, error, TRUE,
                               G_VARIANT_PARSE_ERROR_INVALID_FORMAT_STRING,
-                              "invalid xvariant_t format string");
+                              "invalid GVariant format string");
       /* memory management doesn't matter in case of programmer error. */
       return NULL;
     }
@@ -2165,23 +2165,23 @@ typedef struct
 {
   AST ast;
 
-  xvariant_type_t *type;
+  GVariantType *type;
   AST *child;
 } TypeDecl;
 
-static xchar_t *
+static gchar *
 typedecl_get_pattern (AST     *ast,
-                      xerror_t **error)
+                      GError **error)
 {
   TypeDecl *decl = (TypeDecl *) ast;
 
-  return xvariant_type_dup_string (decl->type);
+  return g_variant_type_dup_string (decl->type);
 }
 
-static xvariant_t *
+static GVariant *
 typedecl_get_value (AST                 *ast,
-                    const xvariant_type_t  *type,
-                    xerror_t             **error)
+                    const GVariantType  *type,
+                    GError             **error)
 {
   TypeDecl *decl = (TypeDecl *) ast;
 
@@ -2194,32 +2194,32 @@ typedecl_free (AST *ast)
   TypeDecl *decl = (TypeDecl *) ast;
 
   ast_free (decl->child);
-  xvariant_type_free (decl->type);
+  g_variant_type_free (decl->type);
   g_slice_free (TypeDecl, decl);
 }
 
 static AST *
 typedecl_parse (TokenStream  *stream,
-                xuint_t         max_depth,
+                guint         max_depth,
                 va_list      *app,
-                xerror_t      **error)
+                GError      **error)
 {
   static const ASTClass typedecl_class = {
     typedecl_get_pattern,
     typedecl_get_value, NULL,
     typedecl_free
   };
-  xvariant_type_t *type;
+  GVariantType *type;
   TypeDecl *decl;
   AST *child;
 
   if (token_stream_peek (stream, '@'))
     {
-      xchar_t *token;
+      gchar *token;
 
       token = token_stream_get (stream);
 
-      if (!xvariant_type_string_is_valid (token + 1))
+      if (!g_variant_type_string_is_valid (token + 1))
         {
           token_stream_set_error (stream, error, TRUE,
                                   G_VARIANT_PARSE_ERROR_INVALID_TYPE_STRING,
@@ -2229,14 +2229,14 @@ typedecl_parse (TokenStream  *stream,
           return NULL;
         }
 
-      type = xvariant_type_new (token + 1);
+      type = g_variant_type_new (token + 1);
 
-      if (!xvariant_type_is_definite (type))
+      if (!g_variant_type_is_definite (type))
         {
           token_stream_set_error (stream, error, TRUE,
                                   G_VARIANT_PARSE_ERROR_DEFINITE_TYPE_EXPECTED,
                                   "type declarations must be definite");
-          xvariant_type_free (type);
+          g_variant_type_free (type);
           g_free (token);
 
           return NULL;
@@ -2248,43 +2248,43 @@ typedecl_parse (TokenStream  *stream,
   else
     {
       if (token_stream_consume (stream, "boolean"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_BOOLEAN);
+        type = g_variant_type_copy (G_VARIANT_TYPE_BOOLEAN);
 
       else if (token_stream_consume (stream, "byte"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_BYTE);
+        type = g_variant_type_copy (G_VARIANT_TYPE_BYTE);
 
       else if (token_stream_consume (stream, "int16"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_INT16);
+        type = g_variant_type_copy (G_VARIANT_TYPE_INT16);
 
       else if (token_stream_consume (stream, "uint16"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_UINT16);
+        type = g_variant_type_copy (G_VARIANT_TYPE_UINT16);
 
       else if (token_stream_consume (stream, "int32"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_INT32);
+        type = g_variant_type_copy (G_VARIANT_TYPE_INT32);
 
       else if (token_stream_consume (stream, "handle"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_HANDLE);
+        type = g_variant_type_copy (G_VARIANT_TYPE_HANDLE);
 
       else if (token_stream_consume (stream, "uint32"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_UINT32);
+        type = g_variant_type_copy (G_VARIANT_TYPE_UINT32);
 
       else if (token_stream_consume (stream, "int64"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_INT64);
+        type = g_variant_type_copy (G_VARIANT_TYPE_INT64);
 
       else if (token_stream_consume (stream, "uint64"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_UINT64);
+        type = g_variant_type_copy (G_VARIANT_TYPE_UINT64);
 
       else if (token_stream_consume (stream, "double"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_DOUBLE);
+        type = g_variant_type_copy (G_VARIANT_TYPE_DOUBLE);
 
       else if (token_stream_consume (stream, "string"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_STRING);
+        type = g_variant_type_copy (G_VARIANT_TYPE_STRING);
 
       else if (token_stream_consume (stream, "objectpath"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_OBJECT_PATH);
+        type = g_variant_type_copy (G_VARIANT_TYPE_OBJECT_PATH);
 
       else if (token_stream_consume (stream, "signature"))
-        type = xvariant_type_copy (G_VARIANT_TYPE_SIGNATURE);
+        type = g_variant_type_copy (G_VARIANT_TYPE_SIGNATURE);
 
       else
         {
@@ -2297,7 +2297,7 @@ typedecl_parse (TokenStream  *stream,
 
   if ((child = parse (stream, max_depth - 1, app, error)) == NULL)
     {
-      xvariant_type_free (type);
+      g_variant_type_free (type);
       return NULL;
     }
 
@@ -2311,9 +2311,9 @@ typedecl_parse (TokenStream  *stream,
 
 static AST *
 parse (TokenStream  *stream,
-       xuint_t         max_depth,
+       guint         max_depth,
        va_list      *app,
-       xerror_t      **error)
+       GError      **error)
 {
   SourceRef source_ref;
   AST *result;
@@ -2389,16 +2389,16 @@ parse (TokenStream  *stream,
 }
 
 /**
- * xvariant_parse:
- * @type: (nullable): a #xvariant_type_t, or %NULL
- * @text: a string containing a xvariant_t in text form
+ * g_variant_parse:
+ * @type: (nullable): a #GVariantType, or %NULL
+ * @text: a string containing a GVariant in text form
  * @limit: (nullable): a pointer to the end of @text, or %NULL
  * @endptr: (nullable): a location to store the end pointer, or %NULL
- * @error: (nullable): a pointer to a %NULL #xerror_t pointer, or %NULL
+ * @error: (nullable): a pointer to a %NULL #GError pointer, or %NULL
  *
- * Parses a #xvariant_t from a text representation.
+ * Parses a #GVariant from a text representation.
  *
- * A single #xvariant_t is parsed from the content of @text.
+ * A single #GVariant is parsed from the content of @text.
  *
  * The format is described [here][gvariant-text].
  *
@@ -2418,35 +2418,35 @@ parse (TokenStream  *stream,
  * errors (in the case that the type would have been ambiguous, such as
  * with empty arrays).
  *
- * In the event that the parsing is successful, the resulting #xvariant_t
+ * In the event that the parsing is successful, the resulting #GVariant
  * is returned. It is never floating, and must be freed with
- * xvariant_unref().
+ * g_variant_unref().
  *
  * In case of any error, %NULL will be returned.  If @error is non-%NULL
  * then it will be set to reflect the error that occurred.
  *
  * Officially, the language understood by the parser is "any string
- * produced by xvariant_print()".
+ * produced by g_variant_print()".
  *
  * There may be implementation specific restrictions on deeply nested values,
- * which would result in a %G_VARIANT_PARSE_ERROR_RECURSION error. #xvariant_t is
+ * which would result in a %G_VARIANT_PARSE_ERROR_RECURSION error. #GVariant is
  * guaranteed to handle nesting up to at least 64 levels.
  *
- * Returns: a non-floating reference to a #xvariant_t, or %NULL
+ * Returns: a non-floating reference to a #GVariant, or %NULL
  **/
-xvariant_t *
-xvariant_parse (const xvariant_type_t  *type,
-                 const xchar_t         *text,
-                 const xchar_t         *limit,
-                 const xchar_t        **endptr,
-                 xerror_t             **error)
+GVariant *
+g_variant_parse (const GVariantType  *type,
+                 const gchar         *text,
+                 const gchar         *limit,
+                 const gchar        **endptr,
+                 GError             **error)
 {
   TokenStream stream = { 0, };
-  xvariant_t *result = NULL;
+  GVariant *result = NULL;
   AST *ast;
 
-  xreturn_val_if_fail (text != NULL, NULL);
-  xreturn_val_if_fail (text == limit || text != NULL, NULL);
+  g_return_val_if_fail (text != NULL, NULL);
+  g_return_val_if_fail (text == limit || text != NULL, NULL);
 
   stream.start = text;
   stream.stream = text;
@@ -2461,7 +2461,7 @@ xvariant_parse (const xvariant_type_t  *type,
 
       if (result != NULL)
         {
-          xvariant_ref_sink (result);
+          g_variant_ref_sink (result);
 
           if (endptr == NULL)
             {
@@ -2477,7 +2477,7 @@ xvariant_parse (const xvariant_type_t  *type,
                   parser_set_error (error, &ref, NULL,
                                     G_VARIANT_PARSE_ERROR_INPUT_NOT_AT_END,
                                     "expected end of input");
-                  xvariant_unref (result);
+                  g_variant_unref (result);
 
                   result = NULL;
                 }
@@ -2493,45 +2493,45 @@ xvariant_parse (const xvariant_type_t  *type,
 }
 
 /**
- * xvariant_new_parsed_va:
- * @format: a text format #xvariant_t
+ * g_variant_new_parsed_va:
+ * @format: a text format #GVariant
  * @app: a pointer to a #va_list
  *
  * Parses @format and returns the result.
  *
- * This is the version of xvariant_new_parsed() intended to be used
+ * This is the version of g_variant_new_parsed() intended to be used
  * from libraries.
  *
- * The return value will be floating if it was a newly created xvariant_t
+ * The return value will be floating if it was a newly created GVariant
  * instance.  In the case that @format simply specified the collection
- * of a #xvariant_t pointer (eg: @format was "%*") then the collected
- * #xvariant_t pointer will be returned unmodified, without adding any
+ * of a #GVariant pointer (eg: @format was "%*") then the collected
+ * #GVariant pointer will be returned unmodified, without adding any
  * additional references.
  *
  * Note that the arguments in @app must be of the correct width for their types
  * specified in @format when collected into the #va_list. See
- * the [xvariant_t varargs documentation][gvariant-varargs].
+ * the [GVariant varargs documentation][gvariant-varargs].
  *
  * In order to behave correctly in all cases it is necessary for the
- * calling function to xvariant_ref_sink() the return result before
+ * calling function to g_variant_ref_sink() the return result before
  * returning control to the user that originally provided the pointer.
  * At this point, the caller will have their own full reference to the
  * result.  This can also be done by adding the result to a container,
- * or by passing it to another xvariant_new() call.
+ * or by passing it to another g_variant_new() call.
  *
- * Returns: a new, usually floating, #xvariant_t
+ * Returns: a new, usually floating, #GVariant
  **/
-xvariant_t *
-xvariant_new_parsed_va (const xchar_t *format,
+GVariant *
+g_variant_new_parsed_va (const gchar *format,
                          va_list     *app)
 {
   TokenStream stream = { 0, };
-  xvariant_t *result = NULL;
-  xerror_t *error = NULL;
+  GVariant *result = NULL;
+  GError *error = NULL;
   AST *ast;
 
-  xreturn_val_if_fail (format != NULL, NULL);
-  xreturn_val_if_fail (app != NULL, NULL);
+  g_return_val_if_fail (format != NULL, NULL);
+  g_return_val_if_fail (app != NULL, NULL);
 
   stream.start = format;
   stream.stream = format;
@@ -2544,10 +2544,10 @@ xvariant_new_parsed_va (const xchar_t *format,
     }
 
   if (error != NULL)
-    xerror ("xvariant_new_parsed: %s", error->message);
+    g_error ("g_variant_new_parsed: %s", error->message);
 
   if (*stream.stream)
-    xerror ("xvariant_new_parsed: trailing text after value");
+    g_error ("g_variant_new_parsed: trailing text after value");
 
   g_clear_error (&error);
 
@@ -2555,113 +2555,113 @@ xvariant_new_parsed_va (const xchar_t *format,
 }
 
 /**
- * xvariant_new_parsed:
- * @format: a text format #xvariant_t
+ * g_variant_new_parsed:
+ * @format: a text format #GVariant
  * @...: arguments as per @format
  *
  * Parses @format and returns the result.
  *
- * @format must be a text format #xvariant_t with one extension: at any
+ * @format must be a text format #GVariant with one extension: at any
  * point that a value may appear in the text, a '%' character followed
- * by a xvariant_t format string (as per xvariant_new()) may appear.  In
+ * by a GVariant format string (as per g_variant_new()) may appear.  In
  * that case, the same arguments are collected from the argument list as
- * xvariant_new() would have collected.
+ * g_variant_new() would have collected.
  *
  * Note that the arguments must be of the correct width for their types
  * specified in @format. This can be achieved by casting them. See
- * the [xvariant_t varargs documentation][gvariant-varargs].
+ * the [GVariant varargs documentation][gvariant-varargs].
  *
  * Consider this simple example:
- * |[<!-- language="C" -->
- *  xvariant_new_parsed ("[('one', 1), ('two', %i), (%s, 3)]", 2, "three");
+ * |[<!-- language="C" --> 
+ *  g_variant_new_parsed ("[('one', 1), ('two', %i), (%s, 3)]", 2, "three");
  * ]|
  *
  * In the example, the variable argument parameters are collected and
  * filled in as if they were part of the original string to produce the
  * result of
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * [('one', 1), ('two', 2), ('three', 3)]
  * ]|
  *
  * This function is intended only to be used with @format as a string
  * literal.  Any parse error is fatal to the calling process.  If you
- * want to parse data from untrusted sources, use xvariant_parse().
+ * want to parse data from untrusted sources, use g_variant_parse().
  *
  * You may not use this function to return, unmodified, a single
- * #xvariant_t pointer from the argument list.  ie: @format may not solely
+ * #GVariant pointer from the argument list.  ie: @format may not solely
  * be anything along the lines of "%*", "%?", "\%r", or anything starting
  * with "%@".
  *
- * Returns: a new floating #xvariant_t instance
+ * Returns: a new floating #GVariant instance
  **/
-xvariant_t *
-xvariant_new_parsed (const xchar_t *format,
+GVariant *
+g_variant_new_parsed (const gchar *format,
                       ...)
 {
-  xvariant_t *result;
+  GVariant *result;
   va_list ap;
 
   va_start (ap, format);
-  result = xvariant_new_parsed_va (format, &ap);
+  result = g_variant_new_parsed_va (format, &ap);
   va_end (ap);
 
   return result;
 }
 
 /**
- * xvariant_builder_add_parsed:
- * @builder: a #xvariant_builder_t
- * @format: a text format #xvariant_t
+ * g_variant_builder_add_parsed:
+ * @builder: a #GVariantBuilder
+ * @format: a text format #GVariant
  * @...: arguments as per @format
  *
- * Adds to a #xvariant_builder_t.
+ * Adds to a #GVariantBuilder.
  *
  * This call is a convenience wrapper that is exactly equivalent to
- * calling xvariant_new_parsed() followed by
- * xvariant_builder_add_value().
+ * calling g_variant_new_parsed() followed by
+ * g_variant_builder_add_value().
  *
  * Note that the arguments must be of the correct width for their types
  * specified in @format_string. This can be achieved by casting them. See
- * the [xvariant_t varargs documentation][gvariant-varargs].
+ * the [GVariant varargs documentation][gvariant-varargs].
  *
  * This function might be used as follows:
  *
- * |[<!-- language="C" -->
- * xvariant_t *
+ * |[<!-- language="C" --> 
+ * GVariant *
  * make_pointless_dictionary (void)
  * {
- *   xvariant_builder_t builder;
+ *   GVariantBuilder builder;
  *   int i;
  *
- *   xvariant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
- *   xvariant_builder_add_parsed (&builder, "{'width', <%i>}", 600);
- *   xvariant_builder_add_parsed (&builder, "{'title', <%s>}", "foo");
- *   xvariant_builder_add_parsed (&builder, "{'transparency', <0.5>}");
- *   return xvariant_builder_end (&builder);
+ *   g_variant_builder_init (&builder, G_VARIANT_TYPE_ARRAY);
+ *   g_variant_builder_add_parsed (&builder, "{'width', <%i>}", 600);
+ *   g_variant_builder_add_parsed (&builder, "{'title', <%s>}", "foo");
+ *   g_variant_builder_add_parsed (&builder, "{'transparency', <0.5>}");
+ *   return g_variant_builder_end (&builder);
  * }
  * ]|
  *
  * Since: 2.26
  */
 void
-xvariant_builder_add_parsed (xvariant_builder_t *builder,
-                              const xchar_t     *format,
+g_variant_builder_add_parsed (GVariantBuilder *builder,
+                              const gchar     *format,
                               ...)
 {
   va_list ap;
 
   va_start (ap, format);
-  xvariant_builder_add_value (builder, xvariant_new_parsed_va (format, &ap));
+  g_variant_builder_add_value (builder, g_variant_new_parsed_va (format, &ap));
   va_end (ap);
 }
 
-static xboolean_t
-parse_num (const xchar_t *num,
-           const xchar_t *limit,
-           xuint_t       *result)
+static gboolean
+parse_num (const gchar *num,
+           const gchar *limit,
+           guint       *result)
 {
-  xchar_t *endptr;
-  sint64_t bignum;
+  gchar *endptr;
+  gint64 bignum;
 
   bignum = g_ascii_strtoll (num, &endptr, 10);
 
@@ -2671,18 +2671,18 @@ parse_num (const xchar_t *num,
   if (bignum < 0 || bignum > G_MAXINT)
     return FALSE;
 
-  *result = (xuint_t) bignum;
+  *result = (guint) bignum;
 
   return TRUE;
 }
 
 static void
-add_last_line (xstring_t     *err,
-               const xchar_t *str)
+add_last_line (GString     *err,
+               const gchar *str)
 {
-  const xchar_t *last_nl;
-  xchar_t *chomped;
-  xint_t i;
+  const gchar *last_nl;
+  gchar *chomped;
+  gint i;
 
   /* This is an error at the end of input.  If we have a file
    * with newlines, that's probably the empty string after the
@@ -2691,7 +2691,7 @@ add_last_line (xstring_t     *err,
    * Instead, show the last line of non-whitespace that we have
    * and put the pointer at the end of it.
    */
-  chomped = xstrchomp (xstrdup (str));
+  chomped = g_strchomp (g_strdup (str));
   last_nl = strrchr (chomped, '\n');
   if (last_nl == NULL)
     last_nl = chomped;
@@ -2703,50 +2703,50 @@ add_last_line (xstring_t     *err,
    *   [1, 2, 3,
    *            ^
    */
-  xstring_append (err, "  ");
+  g_string_append (err, "  ");
   if (last_nl[0])
-    xstring_append (err, last_nl);
+    g_string_append (err, last_nl);
   else
-    xstring_append (err, "(empty input)");
-  xstring_append (err, "\n  ");
+    g_string_append (err, "(empty input)");
+  g_string_append (err, "\n  ");
   for (i = 0; last_nl[i]; i++)
-    xstring_append_c (err, ' ');
-  xstring_append (err, "^\n");
+    g_string_append_c (err, ' ');
+  g_string_append (err, "^\n");
   g_free (chomped);
 }
 
 static void
-add_lines_from_range (xstring_t     *err,
-                      const xchar_t *str,
-                      const xchar_t *start1,
-                      const xchar_t *end1,
-                      const xchar_t *start2,
-                      const xchar_t *end2)
+add_lines_from_range (GString     *err,
+                      const gchar *str,
+                      const gchar *start1,
+                      const gchar *end1,
+                      const gchar *start2,
+                      const gchar *end2)
 {
   while (str < end1 || str < end2)
     {
-      const xchar_t *nl;
+      const gchar *nl;
 
       nl = str + strcspn (str, "\n");
 
       if ((start1 < nl && str < end1) || (start2 < nl && str < end2))
         {
-          const xchar_t *s;
+          const gchar *s;
 
           /* We're going to print this line */
-          xstring_append (err, "  ");
-          xstring_append_len (err, str, nl - str);
-          xstring_append (err, "\n  ");
+          g_string_append (err, "  ");
+          g_string_append_len (err, str, nl - str);
+          g_string_append (err, "\n  ");
 
           /* And add underlines... */
           for (s = str; s < nl; s++)
             {
               if ((start1 <= s && s < end1) || (start2 <= s && s < end2))
-                xstring_append_c (err, '^');
+                g_string_append_c (err, '^');
               else
-                xstring_append_c (err, ' ');
+                g_string_append_c (err, ' ');
             }
-          xstring_append_c (err, '\n');
+          g_string_append_c (err, '\n');
         }
 
       if (!*nl)
@@ -2757,11 +2757,11 @@ add_lines_from_range (xstring_t     *err,
 }
 
 /**
- * xvariant_parse_error_print_context:
- * @error: a #xerror_t from the #GVariantParseError domain
+ * g_variant_parse_error_print_context:
+ * @error: a #GError from the #GVariantParseError domain
  * @source_str: the string that was given to the parser
  *
- * Pretty-prints a message showing the context of a #xvariant_t parse
+ * Pretty-prints a message showing the context of a #GVariant parse
  * error within the string for which parsing was attempted.
  *
  * The resulting string is suitable for output to the console or other
@@ -2785,25 +2785,25 @@ add_lines_from_range (xstring_t     *err,
  *
  * The format of the message may change in a future version.
  *
- * @error must have come from a failed attempt to xvariant_parse() and
+ * @error must have come from a failed attempt to g_variant_parse() and
  * @source_str must be exactly the same string that caused the error.
  * If @source_str was not nul-terminated when you passed it to
- * xvariant_parse() then you must add nul termination before using this
+ * g_variant_parse() then you must add nul termination before using this
  * function.
  *
  * Returns: (transfer full): the printed message
  *
  * Since: 2.40
  **/
-xchar_t *
-xvariant_parse_error_print_context (xerror_t      *error,
-                                     const xchar_t *source_str)
+gchar *
+g_variant_parse_error_print_context (GError      *error,
+                                     const gchar *source_str)
 {
-  const xchar_t *colon, *dash, *comma;
-  xboolean_t success = FALSE;
-  xstring_t *err;
+  const gchar *colon, *dash, *comma;
+  gboolean success = FALSE;
+  GString *err;
 
-  xreturn_val_if_fail (error->domain == G_VARIANT_PARSE_ERROR, FALSE);
+  g_return_val_if_fail (error->domain == G_VARIANT_PARSE_ERROR, FALSE);
 
   /* We can only have a limited number of possible types of ranges
    * emitted from the parser:
@@ -2822,12 +2822,12 @@ xvariant_parse_error_print_context (xerror_t      *error,
   if (!colon)
     return NULL;
 
-  err = xstring_new (colon + 1);
-  xstring_append (err, ":\n");
+  err = g_string_new (colon + 1);
+  g_string_append (err, ":\n");
 
   if (dash == NULL || colon < dash)
     {
-      xuint_t point;
+      guint point;
 
       /* we have a single point */
       if (!parse_num (error->message, colon, &point))
@@ -2845,8 +2845,8 @@ xvariant_parse_error_print_context (xerror_t      *error,
       /* We have one or two ranges... */
       if (comma && comma < colon)
         {
-          xuint_t start1, end1, start2, end2;
-          const xchar_t *dash2;
+          guint start1, end1, start2, end2;
+          const gchar *dash2;
 
           /* Two ranges */
           dash2 = strchr (comma, '-');
@@ -2861,7 +2861,7 @@ xvariant_parse_error_print_context (xerror_t      *error,
         }
       else
         {
-          xuint_t start, end;
+          guint start, end;
 
           /* One range */
           if (!parse_num (error->message, dash, &start) || !parse_num (dash + 1, colon, &end))
@@ -2874,5 +2874,5 @@ xvariant_parse_error_print_context (xerror_t      *error,
   success = TRUE;
 
 out:
-  return xstring_free (err, !success);
+  return g_string_free (err, !success);
 }

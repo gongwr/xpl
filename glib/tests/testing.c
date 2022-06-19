@@ -37,15 +37,15 @@
 static void
 test_assertions_bad_cmpvariant_types (void)
 {
-  xvariant_t *v1, *v2;
+  GVariant *v1, *v2;
 
-  v1 = xvariant_new_boolean (TRUE);
-  v2 = xvariant_new_string ("hello");
+  v1 = g_variant_new_boolean (TRUE);
+  v2 = g_variant_new_string ("hello");
 
   g_assert_cmpvariant (v1, v2);
 
-  xvariant_unref (v2);
-  xvariant_unref (v1);
+  g_variant_unref (v2);
+  g_variant_unref (v1);
 
   exit (0);
 }
@@ -53,15 +53,15 @@ test_assertions_bad_cmpvariant_types (void)
 static void
 test_assertions_bad_cmpvariant_values (void)
 {
-  xvariant_t *v1, *v2;
+  GVariant *v1, *v2;
 
-  v1 = xvariant_new_string ("goodbye");
-  v2 = xvariant_new_string ("hello");
+  v1 = g_variant_new_string ("goodbye");
+  v2 = g_variant_new_string ("hello");
 
   g_assert_cmpvariant (v1, v2);
 
-  xvariant_unref (v2);
-  xvariant_unref (v1);
+  g_variant_unref (v2);
+  g_variant_unref (v1);
 
   exit (0);
 }
@@ -168,8 +168,8 @@ test_assertions (void)
 {
   const char *strv1[] = { "one", "two", "three", NULL };
   const char *strv2[] = { "one", "two", "three", NULL };
-  xvariant_t *v1, *v2;
-  xchar_t *fuu;
+  GVariant *v1, *v2;
+  gchar *fuu;
 
   g_assert_cmpint (1, >, 0);
   g_assert_cmphex (2, ==, 2);
@@ -177,10 +177,10 @@ test_assertions (void)
   g_assert_cmpfloat (7, <=, 3 + 4);
   g_assert_cmpfloat_with_epsilon (3.14, 3.15, 0.01);
   g_assert_cmpfloat_with_epsilon (3.14159, 3.1416, 0.0001);
-  xassert (TRUE);
+  g_assert (TRUE);
   g_assert_true (TRUE);
   g_assert_cmpstr ("foo", !=, "faa");
-  fuu = xstrdup_printf ("f%s", "uu");
+  fuu = g_strdup_printf ("f%s", "uu");
   g_test_queue_free (fuu);
   g_assert_cmpstr ("foo", !=, fuu);
   g_assert_cmpstr ("fuu", ==, fuu);
@@ -199,14 +199,14 @@ test_assertions (void)
   g_assert_cmpstrv (NULL, NULL);
   g_assert_cmpstrv (strv1, strv2);
 
-  v1 = xvariant_new_parsed ("['hello', 'there']");
-  v2 = xvariant_new_parsed ("['hello', 'there']");
+  v1 = g_variant_new_parsed ("['hello', 'there']");
+  v2 = g_variant_new_parsed ("['hello', 'there']");
 
   g_assert_cmpvariant (v1, v1);
   g_assert_cmpvariant (v1, v2);
 
-  xvariant_unref (v2);
-  xvariant_unref (v1);
+  g_variant_unref (v2);
+  g_variant_unref (v1);
 
   g_test_trap_subprocess ("/misc/assertions/subprocess/bad_cmpvariant_types", 0, 0);
   g_test_trap_assert_failed ();
@@ -387,24 +387,24 @@ test_subprocess_timeout (void)
 
 /* run a test with fixture setup and teardown */
 typedef struct {
-  xuint_t  seed;
-  xuint_t  prime;
-  xchar_t *msg;
+  guint  seed;
+  guint  prime;
+  gchar *msg;
 } Fixturetest;
 static void
 fixturetest_setup (Fixturetest  *fix,
-                   xconstpointer test_data)
+                   gconstpointer test_data)
 {
   g_assert_true (test_data == (void*) 0xc0cac01a);
   fix->seed = 18;
   fix->prime = 19;
-  fix->msg = xstrdup_printf ("%d", fix->prime);
+  fix->msg = g_strdup_printf ("%d", fix->prime);
 }
 static void
 fixturetest_test (Fixturetest  *fix,
-                  xconstpointer test_data)
+                  gconstpointer test_data)
 {
-  xuint_t prime = g_spaced_primes_closest (fix->seed);
+  guint prime = g_spaced_primes_closest (fix->seed);
   g_assert_cmpint (prime, ==, fix->prime);
   prime = g_ascii_strtoull (fix->msg, NULL, 0);
   g_assert_cmpint (prime, ==, fix->prime);
@@ -412,7 +412,7 @@ fixturetest_test (Fixturetest  *fix,
 }
 static void
 fixturetest_teardown (Fixturetest  *fix,
-                      xconstpointer test_data)
+                      gconstpointer test_data)
 {
   g_assert_true (test_data == (void*) 0xc0cac01a);
   g_free (fix->msg);
@@ -455,7 +455,7 @@ test_rand2 (void)
 }
 
 static void
-test_data_test (xconstpointer test_data)
+test_data_test (gconstpointer test_data)
 {
   g_assert_true (test_data == (void*) 0xc0c0baba);
 }
@@ -465,18 +465,18 @@ test_random_conversions (void)
 {
   /* very simple conversion test using random numbers */
   int vint = g_test_rand_int();
-  char *err, *str = xstrdup_printf ("%d", vint);
-  sint64_t vint64 = g_ascii_strtoll (str, &err, 10);
+  char *err, *str = g_strdup_printf ("%d", vint);
+  gint64 vint64 = g_ascii_strtoll (str, &err, 10);
   g_assert_cmphex (vint, ==, vint64);
   g_assert_true (!err || *err == 0);
   g_free (str);
 }
 
-static xboolean_t
-fatal_handler (const xchar_t    *log_domain,
+static gboolean
+fatal_handler (const gchar    *log_domain,
                GLogLevelFlags  log_level,
-               const xchar_t    *message,
-               xpointer_t        user_data)
+               const gchar    *message,
+               gpointer        user_data)
 {
   return FALSE;
 }
@@ -485,23 +485,23 @@ static void
 test_fatal_log_handler_critical_pass (void)
 {
   g_test_log_set_fatal_handler (fatal_handler, NULL);
-  xstr_has_prefix (NULL, "file://");
-  g_critical ("test_t passing");
+  g_str_has_prefix (NULL, "file://");
+  g_critical ("Test passing");
   exit (0);
 }
 
 static void
 test_fatal_log_handler_error_fail (void)
 {
-  xerror ("test_t failing");
+  g_error ("Test failing");
   exit (0);
 }
 
 static void
 test_fatal_log_handler_critical_fail (void)
 {
-  xstr_has_prefix (NULL, "file://");
-  g_critical ("test_t passing");
+  g_str_has_prefix (NULL, "file://");
+  g_critical ("Test passing");
   exit (0);
 }
 
@@ -510,17 +510,17 @@ test_fatal_log_handler (void)
 {
   g_test_trap_subprocess ("/misc/fatal-log-handler/subprocess/critical-pass", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stderr ("*CRITICAL*xstr_has_prefix*");
-  g_test_trap_assert_stderr ("*CRITICAL*test_t passing*");
+  g_test_trap_assert_stderr ("*CRITICAL*g_str_has_prefix*");
+  g_test_trap_assert_stderr ("*CRITICAL*Test passing*");
 
   g_test_trap_subprocess ("/misc/fatal-log-handler/subprocess/error-fail", 0, 0);
   g_test_trap_assert_failed ();
-  g_test_trap_assert_stderr ("*ERROR*test_t failing*");
+  g_test_trap_assert_stderr ("*ERROR*Test failing*");
 
   g_test_trap_subprocess ("/misc/fatal-log-handler/subprocess/critical-fail", 0, 0);
   g_test_trap_assert_failed ();
-  g_test_trap_assert_stderr ("*CRITICAL*xstr_has_prefix*");
-  g_test_trap_assert_stderr_unmatched ("*CRITICAL*test_t passing*");
+  g_test_trap_assert_stderr ("*CRITICAL*g_str_has_prefix*");
+  g_test_trap_assert_stderr_unmatched ("*CRITICAL*Test passing*");
 }
 
 static void
@@ -571,7 +571,7 @@ test_expected_messages_null_domain (void)
 static void
 test_expected_messages_expect_error (void)
 {
-  /* make sure we can't try to expect a xerror() */
+  /* make sure we can't try to expect a g_error() */
   g_test_expect_message ("GLib", G_LOG_LEVEL_CRITICAL, "*G_LOG_LEVEL_ERROR*");
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR, "this won't work");
   g_test_assert_expected_messages ();
@@ -647,13 +647,13 @@ test_expected_messages (void)
 static void
 test_expected_messages_debug (void)
 {
-  g_test_expect_message ("test_t", G_LOG_LEVEL_WARNING, "warning message");
-  g_log ("test_t", G_LOG_LEVEL_DEBUG, "should be ignored");
-  g_log ("test_t", G_LOG_LEVEL_WARNING, "warning message");
+  g_test_expect_message ("Test", G_LOG_LEVEL_WARNING, "warning message");
+  g_log ("Test", G_LOG_LEVEL_DEBUG, "should be ignored");
+  g_log ("Test", G_LOG_LEVEL_WARNING, "warning message");
   g_test_assert_expected_messages ();
 
-  g_test_expect_message ("test_t", G_LOG_LEVEL_DEBUG, "debug message");
-  g_log ("test_t", G_LOG_LEVEL_DEBUG, "debug message");
+  g_test_expect_message ("Test", G_LOG_LEVEL_DEBUG, "debug message");
+  g_log ("Test", G_LOG_LEVEL_DEBUG, "debug message");
   g_test_assert_expected_messages ();
 }
 
@@ -663,7 +663,7 @@ test_dash_p_hidden (void)
   if (!g_test_subprocess ())
     g_assert_not_reached ();
 
-  g_print ("test_t /misc/dash-p/subprocess/hidden ran\n");
+  g_print ("Test /misc/dash-p/subprocess/hidden ran\n");
 }
 
 static void
@@ -672,7 +672,7 @@ test_dash_p_hidden_sub (void)
   if (!g_test_subprocess ())
     g_assert_not_reached ();
 
-  g_print ("test_t /misc/dash-p/subprocess/hidden/sub ran\n");
+  g_print ("Test /misc/dash-p/subprocess/hidden/sub ran\n");
 }
 
 /* The rest of the dash_p tests will get run by the toplevel test
@@ -685,7 +685,7 @@ test_dash_p_child (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("test_t /misc/dash-p/child ran\n");
+  g_print ("Test /misc/dash-p/child ran\n");
 }
 
 static void
@@ -694,7 +694,7 @@ test_dash_p_child_sub (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("test_t /misc/dash-p/child/sub ran\n");
+  g_print ("Test /misc/dash-p/child/sub ran\n");
 }
 
 static void
@@ -703,7 +703,7 @@ test_dash_p_child_sub2 (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("test_t /misc/dash-p/child/sub2 ran\n");
+  g_print ("Test /misc/dash-p/child/sub2 ran\n");
 }
 
 static void
@@ -712,7 +712,7 @@ test_dash_p_child_sub_child (void)
   if (!g_test_subprocess ())
     return;
 
-  g_print ("test_t /misc/dash-p/child/subprocess ran\n");
+  g_print ("Test /misc/dash-p/child/subprocess ran\n");
 }
 
 static void
@@ -720,35 +720,35 @@ test_dash_p (void)
 {
   g_test_trap_subprocess ("/misc/dash-p/subprocess/hidden", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*test_t /misc/dash-p/subprocess/hidden ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child*");
+  g_test_trap_assert_stdout ("*Test /misc/dash-p/subprocess/hidden ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child*");
 
   g_test_trap_subprocess ("/misc/dash-p/subprocess/hidden/sub", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*test_t /misc/dash-p/subprocess/hidden/sub ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child*");
+  g_test_trap_assert_stdout ("*Test /misc/dash-p/subprocess/hidden/sub ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child*");
 
   g_test_trap_subprocess ("/misc/dash-p/child", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child ran*");
-  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child/sub ran*");
-  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden*");
+  g_test_trap_assert_stdout ("*Test /misc/dash-p/child ran*");
+  g_test_trap_assert_stdout ("*Test /misc/dash-p/child/sub ran*");
+  g_test_trap_assert_stdout ("*Test /misc/dash-p/child/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden*");
 
   g_test_trap_subprocess ("/misc/dash-p/child/sub", 0, 0);
   g_test_trap_assert_passed ();
-  g_test_trap_assert_stdout ("*test_t /misc/dash-p/child/sub ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child/sub2 ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/child/subprocess ran*");
-  g_test_trap_assert_stdout_unmatched ("*test_t /misc/dash-p/subprocess/hidden*");
+  g_test_trap_assert_stdout ("*Test /misc/dash-p/child/sub ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child/sub2 ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/child/subprocess ran*");
+  g_test_trap_assert_stdout_unmatched ("*Test /misc/dash-p/subprocess/hidden*");
 }
 
 static void
@@ -860,17 +860,17 @@ static const char *argv0;
 static void
 test_combining (void)
 {
-  xptr_array_t *argv;
-  xerror_t *error = NULL;
+  GPtrArray *argv;
+  GError *error = NULL;
   int status;
 
   g_test_message ("single test case skipped -> overall status 77");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/skip");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/skip");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -883,16 +883,16 @@ test_combining (void)
   g_clear_error (&error);
 
   g_test_message ("each test case skipped -> overall status 77");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/skip");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/skip1");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/skip2");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/skip");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/skip1");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/skip2");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -905,12 +905,12 @@ test_combining (void)
   g_clear_error (&error);
 
   g_test_message ("single test case incomplete -> overall status 77");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/incomplete");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/incomplete");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -923,16 +923,16 @@ test_combining (void)
   g_clear_error (&error);
 
   g_test_message ("one pass and some skipped -> overall status 0");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/skip");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/pass");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/skip1");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/skip");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/pass");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/skip1");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -944,14 +944,14 @@ test_combining (void)
   g_assert_no_error (error);
 
   g_test_message ("one pass and some incomplete -> overall status 0");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/pass");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/incomplete");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/pass");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/incomplete");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -963,16 +963,16 @@ test_combining (void)
   g_assert_no_error (error);
 
   g_test_message ("one pass and mix of skipped and incomplete -> overall status 0");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/pass");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/skip1");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/incomplete");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/pass");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/skip1");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/incomplete");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -984,16 +984,16 @@ test_combining (void)
   g_assert_no_error (error);
 
   g_test_message ("one fail and some skipped -> overall status fail");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/skip");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/fail");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/skip1");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/skip");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/fail");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/skip1");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1006,14 +1006,14 @@ test_combining (void)
   g_clear_error (&error);
 
   g_test_message ("one fail and some incomplete -> overall status fail");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/fail");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/incomplete");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/fail");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/incomplete");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1026,16 +1026,16 @@ test_combining (void)
   g_clear_error (&error);
 
   g_test_message ("one fail and mix of skipped and incomplete -> overall status fail");
-  xptr_array_set_size (argv, 0);
-  xptr_array_add (argv, (char *) argv0);
-  xptr_array_add (argv, "--GTestSubprocess");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/fail");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/skip1");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/misc/combining/subprocess/incomplete");
-  xptr_array_add (argv, NULL);
+  g_ptr_array_set_size (argv, 0);
+  g_ptr_array_add (argv, (char *) argv0);
+  g_ptr_array_add (argv, "--GTestSubprocess");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/fail");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/skip1");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/misc/combining/subprocess/incomplete");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1047,27 +1047,27 @@ test_combining (void)
   g_assert_error (error, G_SPAWN_EXIT_ERROR, 1);
   g_clear_error (&error);
 
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 }
 
-/* test_t the TAP output when a test suite is run with --tap. */
+/* Test the TAP output when a test suite is run with --tap. */
 static void
 test_tap (void)
 {
   const char *testing_helper;
-  xptr_array_t *argv;
-  xerror_t *error = NULL;
+  GPtrArray *argv;
+  GError *error = NULL;
   int status;
-  xchar_t *output;
+  gchar *output;
 
   testing_helper = g_test_get_filename (G_TEST_BUILT, "testing-helper" EXEEXT, NULL);
 
   g_test_message ("pass");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "pass");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "pass");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1079,14 +1079,14 @@ test_tap (void)
   g_assert_no_error (error);
   g_assert_nonnull (strstr (output, "\nok 1 /pass\n"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("skip");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1098,14 +1098,14 @@ test_tap (void)
   g_assert_no_error (error);
   g_assert_nonnull (strstr (output, "\nok 1 /skip # SKIP not enough tea\n"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("skip with printf format");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-printf");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-printf");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1117,14 +1117,14 @@ test_tap (void)
   g_assert_no_error (error);
   g_assert_nonnull (strstr (output, "\nok 1 /skip-printf # SKIP not enough coffee\n"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("incomplete");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "incomplete");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "incomplete");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1136,14 +1136,14 @@ test_tap (void)
   g_assert_no_error (error);
   g_assert_nonnull (strstr (output, "\nnot ok 1 /incomplete # TODO mind reading not implemented yet\n"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("incomplete with printf format");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "incomplete-printf");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "incomplete-printf");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1155,14 +1155,14 @@ test_tap (void)
   g_assert_no_error (error);
   g_assert_nonnull (strstr (output, "\nnot ok 1 /incomplete-printf # TODO telekinesis not implemented yet\n"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("fail");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "fail");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "fail");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1175,14 +1175,14 @@ test_tap (void)
   g_assert_nonnull (strstr (output, "\nnot ok 1 /fail\n"));
   g_free (output);
   g_clear_error (&error);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("fail with message");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "fail-printf");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "fail-printf");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1195,14 +1195,14 @@ test_tap (void)
   g_assert_nonnull (strstr (output, "\nnot ok 1 /fail-printf - this test intentionally left failing\n"));
   g_free (output);
   g_clear_error (&error);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("all");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "all");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "all");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1213,14 +1213,14 @@ test_tap (void)
   g_spawn_check_wait_status (status, &error);
   g_assert_error (error, G_SPAWN_EXIT_ERROR, 1);
   g_clear_error (&error);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("all-non-failures");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "all-non-failures");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "all-non-failures");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1231,16 +1231,16 @@ test_tap (void)
   g_spawn_check_wait_status (status, &error);
   g_assert_no_error (error);
 
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--GTestSkipCount");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "--GTestSkipCount");
-  xptr_array_add (argv, "2");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "--GTestSkipCount");
+  g_ptr_array_add (argv, "2");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1263,16 +1263,16 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--GTestSkipCount=0 is the same as omitting it");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "--GTestSkipCount");
-  xptr_array_add (argv, "0");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "--GTestSkipCount");
+  g_ptr_array_add (argv, "0");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1295,16 +1295,16 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--GTestSkipCount > number of tests skips all");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "--GTestSkipCount");
-  xptr_array_add (argv, "11");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "--GTestSkipCount");
+  g_ptr_array_add (argv, "11");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1327,20 +1327,20 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("-p");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/b");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/b");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1358,20 +1358,20 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--run-prefix");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-r");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, "-r");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, "--run-prefix");
-  xptr_array_add (argv, "/b");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-r");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, "-r");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, "--run-prefix");
+  g_ptr_array_add (argv, "/b");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1390,18 +1390,18 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--run-prefix 2");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-r");
-  xptr_array_add (argv, "/pre");
-  xptr_array_add (argv, "--run-prefix");
-  xptr_array_add (argv, "/b/b");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-r");
+  g_ptr_array_add (argv, "/pre");
+  g_ptr_array_add (argv, "--run-prefix");
+  g_ptr_array_add (argv, "/b/b");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1416,20 +1416,20 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--run-prefix conflict");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-r");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, "--run-prefix");
-  xptr_array_add (argv, "/b");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-r");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, "--run-prefix");
+  g_ptr_array_add (argv, "/b");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1442,22 +1442,22 @@ test_tap (void)
   g_clear_error (&error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("-s");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-s");
-  xptr_array_add (argv, "/a");
-  xptr_array_add (argv, "-s");
-  xptr_array_add (argv, "/b");
-  xptr_array_add (argv, "-s");
-  xptr_array_add (argv, "/pre");
-  xptr_array_add (argv, "-s");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-s");
+  g_ptr_array_add (argv, "/a");
+  g_ptr_array_add (argv, "-s");
+  g_ptr_array_add (argv, "/b");
+  g_ptr_array_add (argv, "-s");
+  g_ptr_array_add (argv, "/pre");
+  g_ptr_array_add (argv, "-s");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1482,20 +1482,20 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--skip-prefix");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-x");
-  xptr_array_add (argv, "/a");
-  xptr_array_add (argv, "--skip-prefix");
-  xptr_array_add (argv, "/pre");
-  xptr_array_add (argv, "-x");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-x");
+  g_ptr_array_add (argv, "/a");
+  g_ptr_array_add (argv, "--skip-prefix");
+  g_ptr_array_add (argv, "/pre");
+  g_ptr_array_add (argv, "-x");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1519,20 +1519,20 @@ test_tap (void)
   g_assert_no_error (error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 
   g_test_message ("--skip-prefix conflict");
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "skip-options");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, "-s");
-  xptr_array_add (argv, "/a");
-  xptr_array_add (argv, "--skip-prefix");
-  xptr_array_add (argv, "/pre");
-  xptr_array_add (argv, "-x");
-  xptr_array_add (argv, "/c/a");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "skip-options");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, "-s");
+  g_ptr_array_add (argv, "/a");
+  g_ptr_array_add (argv, "--skip-prefix");
+  g_ptr_array_add (argv, "/pre");
+  g_ptr_array_add (argv, "-x");
+  g_ptr_array_add (argv, "/c/a");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1545,27 +1545,27 @@ test_tap (void)
   g_clear_error (&error);
 
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 }
 
 static void
 test_tap_summary (void)
 {
   const char *testing_helper;
-  xptr_array_t *argv;
-  xerror_t *error = NULL;
+  GPtrArray *argv;
+  GError *error = NULL;
   int status;
-  xchar_t *output;
+  gchar *output;
 
-  g_test_summary ("test_t the output of g_test_summary() from the TAP output of a test.");
+  g_test_summary ("Test the output of g_test_summary() from the TAP output of a test.");
 
   testing_helper = g_test_get_filename (G_TEST_BUILT, "testing-helper" EXEEXT, NULL);
 
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "summary");
-  xptr_array_add (argv, "--tap");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "summary");
+  g_ptr_array_add (argv, "--tap");
+  g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (char **) argv->pdata, NULL,
                 G_SPAWN_STDERR_TO_DEV_NULL,
@@ -1582,26 +1582,26 @@ test_tap_summary (void)
                                     "summary message in testing-helper, and "
                                     "checking for it in the TAP output later.\n"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 }
 
 static void
 test_init_no_argv0 (void)
 {
   const char *testing_helper;
-  xptr_array_t *argv;
-  xerror_t *error = NULL;
+  GPtrArray *argv;
+  GError *error = NULL;
   int status;
-  xchar_t *output;
+  gchar *output;
 
-  g_test_summary ("test_t that g_test_init() can be called safely with argc == 0.");
+  g_test_summary ("Test that g_test_init() can be called safely with argc == 0.");
 
   testing_helper = g_test_get_filename (G_TEST_BUILT, "testing-helper" EXEEXT, NULL);
 
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) testing_helper);
-  xptr_array_add (argv, "init-null-argv0");
-  xptr_array_add (argv, NULL);
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) testing_helper);
+  g_ptr_array_add (argv, "init-null-argv0");
+  g_ptr_array_add (argv, NULL);
 
   /* This has to be spawned manually and can’t be run with g_test_subprocess()
    * because the test helper can’t be run after `g_test_init()` has been called
@@ -1616,7 +1616,7 @@ test_init_no_argv0 (void)
   g_assert_no_error (error);
   g_assert_nonnull (strstr (output, "# random seed:"));
   g_free (output);
-  xptr_array_unref (argv);
+  g_ptr_array_unref (argv);
 }
 
 int

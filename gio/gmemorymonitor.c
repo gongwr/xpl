@@ -30,11 +30,11 @@
 
 /**
  * SECTION:gmemorymonitor
- * @title: xmemory_monitor_t
+ * @title: GMemoryMonitor
  * @short_description: Memory usage monitor
  * @include: gio/gio.h
  *
- * #xmemory_monitor_t will monitor system memory and suggest to the application
+ * #GMemoryMonitor will monitor system memory and suggest to the application
  * when to free memory so as to leave more room for other applications.
  * It is implemented on Linux using the [Low Memory Monitor](https://gitlab.freedesktop.org/hadess/low-memory-monitor/)
  * ([API documentation](https://hadess.pages.freedesktop.org/low-memory-monitor/)).
@@ -60,34 +60,34 @@
  *
  * |[<!-- language="C" -->
  * static void
- * warning_cb (xmemory_monitor_t *m, GMemoryMonitorWarningLevel level)
+ * warning_cb (GMemoryMonitor *m, GMemoryMonitorWarningLevel level)
  * {
  *   g_debug ("Warning level: %d", level);
  *   if (warning_level > G_MEMORY_MONITOR_WARNING_LEVEL_LOW)
  *     drop_caches ();
  * }
  *
- * static xmemory_monitor_t *
+ * static GMemoryMonitor *
  * monitor_low_memory (void)
  * {
- *   xmemory_monitor_t *m;
- *   m = xmemory_monitor_dup_default ();
- *   xsignal_connect (G_OBJECT (m), "low-memory-warning",
+ *   GMemoryMonitor *m;
+ *   m = g_memory_monitor_dup_default ();
+ *   g_signal_connect (G_OBJECT (m), "low-memory-warning",
  *                     G_CALLBACK (warning_cb), NULL);
  *   return m;
  * }
  * ]|
  *
- * Don't forget to disconnect the #xmemory_monitor_t::low-memory-warning
- * signal, and unref the #xmemory_monitor_t itself when exiting.
+ * Don't forget to disconnect the #GMemoryMonitor::low-memory-warning
+ * signal, and unref the #GMemoryMonitor itself when exiting.
  *
  * Since: 2.64
  */
 
 /**
- * xmemory_monitor_t:
+ * GMemoryMonitor:
  *
- * #xmemory_monitor_t monitors system memory and indicates when
+ * #GMemoryMonitor monitors system memory and indicates when
  * the system is low on memory.
  *
  * Since: 2.64
@@ -95,48 +95,48 @@
 
 /**
  * GMemoryMonitorInterface:
- * @x_iface: The parent interface.
+ * @g_iface: The parent interface.
  * @low_memory_warning: the virtual function pointer for the
- *  #xmemory_monitor_t::low-memory-warning signal.
+ *  #GMemoryMonitor::low-memory-warning signal.
  *
- * The virtual function table for #xmemory_monitor_t.
+ * The virtual function table for #GMemoryMonitor.
  *
  * Since: 2.64
  */
 
-G_DEFINE_INTERFACE_WITH_CODE (xmemory_monitor, xmemory_monitor, XTYPE_OBJECT,
-                              xtype_interface_add_prerequisite (g_define_type_id, XTYPE_INITABLE))
+G_DEFINE_INTERFACE_WITH_CODE (GMemoryMonitor, g_memory_monitor, G_TYPE_OBJECT,
+                              g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_INITABLE))
 
 enum {
   LOW_MEMORY_WARNING,
   LAST_SIGNAL
 };
 
-static xuint_t signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 /**
- * xmemory_monitor_dup_default:
+ * g_memory_monitor_dup_default:
  *
- * Gets a reference to the default #xmemory_monitor_t for the system.
+ * Gets a reference to the default #GMemoryMonitor for the system.
  *
- * Returns: (not nullable) (transfer full): a new reference to the default #xmemory_monitor_t
+ * Returns: (not nullable) (transfer full): a new reference to the default #GMemoryMonitor
  *
  * Since: 2.64
  */
-xmemory_monitor_t *
-xmemory_monitor_dup_default (void)
+GMemoryMonitor *
+g_memory_monitor_dup_default (void)
 {
-  return xobject_ref (_xio_module_get_default (G_MEMORY_MONITOR_EXTENSION_POINT_NAME,
+  return g_object_ref (_g_io_module_get_default (G_MEMORY_MONITOR_EXTENSION_POINT_NAME,
                                                  "GIO_USE_MEMORY_MONITOR",
                                                  NULL));
 }
 
 static void
-xmemory_monitor_default_init (GMemoryMonitorInterface *iface)
+g_memory_monitor_default_init (GMemoryMonitorInterface *iface)
 {
   /**
-   * xmemory_monitor_t::low-memory-warning:
-   * @monitor: a #xmemory_monitor_t
+   * GMemoryMonitor::low-memory-warning:
+   * @monitor: a #GMemoryMonitor
    * @level: the #GMemoryMonitorWarningLevel warning level
    *
    * Emitted when the system is running low on free memory. The signal
@@ -147,12 +147,12 @@ xmemory_monitor_default_init (GMemoryMonitorInterface *iface)
    * Since: 2.64
    */
   signals[LOW_MEMORY_WARNING] =
-    xsignal_new (I_("low-memory-warning"),
-                  XTYPE_MEMORY_MONITOR,
+    g_signal_new (I_("low-memory-warning"),
+                  G_TYPE_MEMORY_MONITOR,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GMemoryMonitorInterface, low_memory_warning),
                   NULL, NULL,
                   NULL,
-                  XTYPE_NONE, 1,
-                  XTYPE_MEMORY_MONITOR_WARNING_LEVEL);
+                  G_TYPE_NONE, 1,
+                  G_TYPE_MEMORY_MONITOR_WARNING_LEVEL);
 }

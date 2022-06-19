@@ -27,19 +27,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_SERVICE         (g_network_service_get_type ())
-#define G_NETWORK_SERVICE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_SERVICE, xnetwork_service))
-#define G_NETWORK_SERVICE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_SERVICE, GNetworkServiceClass))
-#define X_IS_NETWORK_SERVICE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_SERVICE))
-#define X_IS_NETWORK_SERVICE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_SERVICE))
-#define G_NETWORK_SERVICE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_SERVICE, GNetworkServiceClass))
+#define G_TYPE_NETWORK_SERVICE         (g_network_service_get_type ())
+#define G_NETWORK_SERVICE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_SERVICE, GNetworkService))
+#define G_NETWORK_SERVICE_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NETWORK_SERVICE, GNetworkServiceClass))
+#define G_IS_NETWORK_SERVICE(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_SERVICE))
+#define G_IS_NETWORK_SERVICE_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NETWORK_SERVICE))
+#define G_NETWORK_SERVICE_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NETWORK_SERVICE, GNetworkServiceClass))
 
 typedef struct _GNetworkServiceClass   GNetworkServiceClass;
 typedef struct _GNetworkServicePrivate GNetworkServicePrivate;
 
 struct _GNetworkService
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
   GNetworkServicePrivate *priv;
@@ -47,28 +47,28 @@ struct _GNetworkService
 
 struct _GNetworkServiceClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                g_network_service_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                g_network_service_get_type      (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_connectable_t  *g_network_service_new           (const xchar_t     *service,
-						      const xchar_t     *protocol,
-						      const xchar_t     *domain);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnectable  *g_network_service_new           (const gchar     *service,
+						      const gchar     *protocol,
+						      const gchar     *domain);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t         *g_network_service_get_service   (xnetwork_service_t *srv);
-XPL_AVAILABLE_IN_ALL
-const xchar_t         *g_network_service_get_protocol  (xnetwork_service_t *srv);
-XPL_AVAILABLE_IN_ALL
-const xchar_t         *g_network_service_get_domain    (xnetwork_service_t *srv);
-XPL_AVAILABLE_IN_ALL
-const xchar_t         *g_network_service_get_scheme    (xnetwork_service_t *srv);
-XPL_AVAILABLE_IN_ALL
-void                 g_network_service_set_scheme    (xnetwork_service_t *srv, const xchar_t *scheme);
+GLIB_AVAILABLE_IN_ALL
+const gchar         *g_network_service_get_service   (GNetworkService *srv);
+GLIB_AVAILABLE_IN_ALL
+const gchar         *g_network_service_get_protocol  (GNetworkService *srv);
+GLIB_AVAILABLE_IN_ALL
+const gchar         *g_network_service_get_domain    (GNetworkService *srv);
+GLIB_AVAILABLE_IN_ALL
+const gchar         *g_network_service_get_scheme    (GNetworkService *srv);
+GLIB_AVAILABLE_IN_ALL
+void                 g_network_service_set_scheme    (GNetworkService *srv, const gchar *scheme);
 
 G_END_DECLS
 

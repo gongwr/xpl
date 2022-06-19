@@ -29,24 +29,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_MEMORY_OUTPUT_STREAM         (g_memory_output_stream_get_type ())
-#define G_MEMORY_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_MEMORY_OUTPUT_STREAM, xmemory_output_stream))
-#define G_MEMORY_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_MEMORY_OUTPUT_STREAM, GMemoryOutputStreamClass))
-#define X_IS_MEMORY_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_MEMORY_OUTPUT_STREAM))
-#define X_IS_MEMORY_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_MEMORY_OUTPUT_STREAM))
-#define G_MEMORY_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_MEMORY_OUTPUT_STREAM, GMemoryOutputStreamClass))
+#define G_TYPE_MEMORY_OUTPUT_STREAM         (g_memory_output_stream_get_type ())
+#define G_MEMORY_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_MEMORY_OUTPUT_STREAM, GMemoryOutputStream))
+#define G_MEMORY_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_MEMORY_OUTPUT_STREAM, GMemoryOutputStreamClass))
+#define G_IS_MEMORY_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_MEMORY_OUTPUT_STREAM))
+#define G_IS_MEMORY_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_MEMORY_OUTPUT_STREAM))
+#define G_MEMORY_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_MEMORY_OUTPUT_STREAM, GMemoryOutputStreamClass))
 
 /**
- * xmemory_output_stream_t:
+ * GMemoryOutputStream:
  *
- * Implements #xoutput_stream_t for arbitrary memory chunks.
+ * Implements #GOutputStream for arbitrary memory chunks.
  **/
 typedef struct _GMemoryOutputStreamClass    GMemoryOutputStreamClass;
 typedef struct _GMemoryOutputStreamPrivate  GMemoryOutputStreamPrivate;
 
 struct _GMemoryOutputStream
 {
-  xoutput_stream_t parent_instance;
+  GOutputStream parent_instance;
 
   /*< private >*/
   GMemoryOutputStreamPrivate *priv;
@@ -54,7 +54,7 @@ struct _GMemoryOutputStream
 
 struct _GMemoryOutputStreamClass
 {
-  xoutput_stream_class_t parent_class;
+  GOutputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -77,30 +77,30 @@ struct _GMemoryOutputStreamClass
  *
  * Returns: a pointer to the reallocated memory
  */
-typedef xpointer_t (* GReallocFunc) (xpointer_t data,
-                                   xsize_t    size);
+typedef gpointer (* GReallocFunc) (gpointer data,
+                                   gsize    size);
 
-XPL_AVAILABLE_IN_ALL
-xtype_t          g_memory_output_stream_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType          g_memory_output_stream_get_type      (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t *g_memory_output_stream_new           (xpointer_t             data,
-                                                     xsize_t                size,
+GLIB_AVAILABLE_IN_ALL
+GOutputStream *g_memory_output_stream_new           (gpointer             data,
+                                                     gsize                size,
                                                      GReallocFunc         realloc_function,
-                                                     xdestroy_notify_t       destroy_function);
-XPL_AVAILABLE_IN_2_36
-xoutput_stream_t *g_memory_output_stream_new_resizable (void);
-XPL_AVAILABLE_IN_ALL
-xpointer_t       g_memory_output_stream_get_data      (xmemory_output_stream_t *ostream);
-XPL_AVAILABLE_IN_ALL
-xsize_t          g_memory_output_stream_get_size      (xmemory_output_stream_t *ostream);
-XPL_AVAILABLE_IN_ALL
-xsize_t          g_memory_output_stream_get_data_size (xmemory_output_stream_t *ostream);
-XPL_AVAILABLE_IN_ALL
-xpointer_t       g_memory_output_stream_steal_data    (xmemory_output_stream_t *ostream);
+                                                     GDestroyNotify       destroy_function);
+GLIB_AVAILABLE_IN_2_36
+GOutputStream *g_memory_output_stream_new_resizable (void);
+GLIB_AVAILABLE_IN_ALL
+gpointer       g_memory_output_stream_get_data      (GMemoryOutputStream *ostream);
+GLIB_AVAILABLE_IN_ALL
+gsize          g_memory_output_stream_get_size      (GMemoryOutputStream *ostream);
+GLIB_AVAILABLE_IN_ALL
+gsize          g_memory_output_stream_get_data_size (GMemoryOutputStream *ostream);
+GLIB_AVAILABLE_IN_ALL
+gpointer       g_memory_output_stream_steal_data    (GMemoryOutputStream *ostream);
 
-XPL_AVAILABLE_IN_2_34
-xbytes_t *       g_memory_output_stream_steal_as_bytes (xmemory_output_stream_t *ostream);
+GLIB_AVAILABLE_IN_2_34
+GBytes *       g_memory_output_stream_steal_as_bytes (GMemoryOutputStream *ostream);
 
 G_END_DECLS
 

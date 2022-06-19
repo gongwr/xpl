@@ -19,8 +19,8 @@
  *          Samuel Cormier-Iijima <sciyoshi@gmail.com>
  */
 
-#ifndef __XINET_ADDRESS_H__
-#define __XINET_ADDRESS_H__
+#ifndef __G_INET_ADDRESS_H__
+#define __G_INET_ADDRESS_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,19 +30,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_INET_ADDRESS         (xinet_address_get_type ())
-#define G_INET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_INET_ADDRESS, xinet_address))
-#define XINET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_INET_ADDRESS, GInetAddressClass))
-#define X_IS_INET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_INET_ADDRESS))
-#define X_IS_INET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_INET_ADDRESS))
-#define XINET_ADDRESS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_INET_ADDRESS, GInetAddressClass))
+#define G_TYPE_INET_ADDRESS         (g_inet_address_get_type ())
+#define G_INET_ADDRESS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_INET_ADDRESS, GInetAddress))
+#define G_INET_ADDRESS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_INET_ADDRESS, GInetAddressClass))
+#define G_IS_INET_ADDRESS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_INET_ADDRESS))
+#define G_IS_INET_ADDRESS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_INET_ADDRESS))
+#define G_INET_ADDRESS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_INET_ADDRESS, GInetAddressClass))
 
 typedef struct _GInetAddressClass   GInetAddressClass;
 typedef struct _GInetAddressPrivate GInetAddressPrivate;
 
 struct _GInetAddress
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
   GInetAddressPrivate *priv;
@@ -50,74 +50,74 @@ struct _GInetAddress
 
 struct _GInetAddressClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xchar_t *        (*to_string) (xinet_address_t *address);
-  const xuint8_t * (*to_bytes)  (xinet_address_t *address);
+  gchar *        (*to_string) (GInetAddress *address);
+  const guint8 * (*to_bytes)  (GInetAddress *address);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xinet_address_get_type             (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_inet_address_get_type             (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xinet_address_t *        xinet_address_new_from_string      (const xchar_t          *string);
+GLIB_AVAILABLE_IN_ALL
+GInetAddress *        g_inet_address_new_from_string      (const gchar          *string);
 
-XPL_AVAILABLE_IN_ALL
-xinet_address_t *        xinet_address_new_from_bytes       (const xuint8_t         *bytes,
-							   xsocket_family_t         family);
+GLIB_AVAILABLE_IN_ALL
+GInetAddress *        g_inet_address_new_from_bytes       (const guint8         *bytes,
+							   GSocketFamily         family);
 
-XPL_AVAILABLE_IN_ALL
-xinet_address_t *        xinet_address_new_loopback         (xsocket_family_t         family);
+GLIB_AVAILABLE_IN_ALL
+GInetAddress *        g_inet_address_new_loopback         (GSocketFamily         family);
 
-XPL_AVAILABLE_IN_ALL
-xinet_address_t *        xinet_address_new_any              (xsocket_family_t         family);
+GLIB_AVAILABLE_IN_ALL
+GInetAddress *        g_inet_address_new_any              (GSocketFamily         family);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_equal                (xinet_address_t         *address,
-                                                           xinet_address_t         *other_address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_equal                (GInetAddress         *address,
+                                                           GInetAddress         *other_address);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t *               xinet_address_to_string            (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gchar *               g_inet_address_to_string            (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-const xuint8_t *        xinet_address_to_bytes             (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+const guint8 *        g_inet_address_to_bytes             (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xsize_t                 xinet_address_get_native_size      (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gsize                 g_inet_address_get_native_size      (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_family_t         xinet_address_get_family           (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+GSocketFamily         g_inet_address_get_family           (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_any           (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_any           (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_loopback      (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_loopback      (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_link_local    (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_link_local    (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_site_local    (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_site_local    (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_multicast     (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_multicast     (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_mc_global     (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_mc_global     (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_mc_link_local (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_mc_link_local (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_mc_node_local (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_mc_node_local (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_mc_org_local  (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_mc_org_local  (GInetAddress         *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              xinet_address_get_is_mc_site_local (xinet_address_t         *address);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_inet_address_get_is_mc_site_local (GInetAddress         *address);
 
 G_END_DECLS
 
-#endif /* __XINET_ADDRESS_H__ */
+#endif /* __G_INET_ADDRESS_H__ */

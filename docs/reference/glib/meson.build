@@ -42,7 +42,7 @@ if get_option('gtk_doc')
 
   docpath = join_paths(glib_datadir, 'gtk-doc', 'html')
   version_conf = configuration_data()
-  version_conf.set('XPL_VERSION', meson.project_version())
+  version_conf.set('GLIB_VERSION', meson.project_version())
   configure_file(
     input: 'version.xml.in',
     output: 'version.xml',

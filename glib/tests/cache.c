@@ -15,75 +15,75 @@
  */
 
 /* We are testing some deprecated APIs here */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
 
-static xint_t value_create_count = 0;
-static xint_t value_destroy_count = 0;
+static gint value_create_count = 0;
+static gint value_destroy_count = 0;
 
-static xpointer_t
-value_create (xpointer_t key)
+static gpointer
+value_create (gpointer key)
 {
-  xint_t *value;
+  gint *value;
 
   value_create_count++;
 
-  value = g_new (xint_t, 1);
-  *value = *(xint_t*)key * 2;
+  value = g_new (gint, 1);
+  *value = *(gint*)key * 2;
 
   return value;
 }
 
 static void
-value_destroy (xpointer_t value)
+value_destroy (gpointer value)
 {
   value_destroy_count++;
   g_free (value);
 }
 
-static xpointer_t
-key_dup (xpointer_t key)
+static gpointer
+key_dup (gpointer key)
 {
-  xint_t *newkey;
+  gint *newkey;
 
-  newkey = g_new (xint_t, 1);
-  *newkey = *(xint_t*)key;
+  newkey = g_new (gint, 1);
+  *newkey = *(gint*)key;
 
   return newkey;
 }
 
 static void
-key_destroy (xpointer_t key)
+key_destroy (gpointer key)
 {
   g_free (key);
 }
 
-static xuint_t
-key_hash (xconstpointer key)
+static guint
+key_hash (gconstpointer key)
 {
-  return *(xuint_t*)key;
+  return *(guint*)key;
 }
 
-static xuint_t
-value_hash (xconstpointer value)
+static guint
+value_hash (gconstpointer value)
 {
-  return *(xuint_t*)value;
+  return *(guint*)value;
 }
 
-static xboolean_t
-key_equal (xconstpointer key1, xconstpointer key2)
+static gboolean
+key_equal (gconstpointer key1, gconstpointer key2)
 {
-  return *(xint_t*)key1 == *(xint_t*)key2;
+  return *(gint*)key1 == *(gint*)key2;
 }
 
 static void
-key_foreach (xpointer_t valuep, xpointer_t keyp, xpointer_t data)
+key_foreach (gpointer valuep, gpointer keyp, gpointer data)
 {
-  xint_t *count = data;
-  xint_t *key = keyp;
+  gint *count = data;
+  gint *key = keyp;
 
   (*count)++;
 
@@ -91,10 +91,10 @@ key_foreach (xpointer_t valuep, xpointer_t keyp, xpointer_t data)
 }
 
 static void
-value_foreach (xpointer_t keyp, xpointer_t nodep, xpointer_t data)
+value_foreach (gpointer keyp, gpointer nodep, gpointer data)
 {
-  xint_t *count = data;
-  xint_t *key = keyp;
+  gint *count = data;
+  gint *key = keyp;
 
   (*count)++;
 
@@ -105,9 +105,9 @@ static void
 test_cache_basic (void)
 {
   GCache *c;
-  xint_t *key;
-  xint_t *value;
-  xint_t count;
+  gint *key;
+  gint *value;
+  gint count;
 
   value_create_count = 0;
   value_destroy_count = 0;
@@ -116,7 +116,7 @@ test_cache_basic (void)
                    key_dup, key_destroy,
                    key_hash, value_hash, key_equal);
 
-  key = g_new (xint_t, 1);
+  key = g_new (gint, 1);
   *key = 2;
 
   value = g_cache_insert (c, key);

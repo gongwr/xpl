@@ -21,7 +21,7 @@
 
 import os
 
-builddir = os.environ.get("UNINSTALLED_XPL_BUILDDIR")
+builddir = os.environ.get("UNINSTALLED_GLIB_BUILDDIR")
 
 if builddir is not None:
     __path__.append(

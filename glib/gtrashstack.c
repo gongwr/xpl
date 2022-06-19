@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1998  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,14 +19,14 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #include "config.h"
 
 /* we know we are deprecated here, no need for warnings */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include "gtrashstack.h"
@@ -38,7 +38,7 @@
  *
  * A #GTrashStack is an efficient way to keep a stack of unused allocated
  * memory chunks. Each memory chunk is required to be large enough to hold
- * a #xpointer_t. This allows the stack to be maintained without any space
+ * a #gpointer. This allows the stack to be maintained without any space
  * overhead, since the stack pointers can be stored inside the memory chunks.
  *
  * There is no function to create a #GTrashStack. A %NULL #GTrashStack*
@@ -53,7 +53,7 @@
 /**
  * GTrashStack:
  * @next: pointer to the previous element of the stack,
- *     gets stored in the first `sizeof (xpointer_t)`
+ *     gets stored in the first `sizeof (gpointer)`
  *     bytes of the element
  *
  * Each piece of memory that is pushed onto the stack
@@ -72,7 +72,7 @@
  */
 void
 g_trash_stack_push (GTrashStack **stack_p,
-                    xpointer_t      data_p)
+                    gpointer      data_p)
 {
   GTrashStack *data = (GTrashStack *) data_p;
 
@@ -89,7 +89,7 @@ g_trash_stack_push (GTrashStack **stack_p,
  * Returns: the element at the top of the stack
  * Deprecated: 2.48: #GTrashStack is deprecated without replacement
  */
-xpointer_t
+gpointer
 g_trash_stack_pop (GTrashStack **stack_p)
 {
   GTrashStack *data;
@@ -117,7 +117,7 @@ g_trash_stack_pop (GTrashStack **stack_p)
  * Returns: the element at the top of the stack
  * Deprecated: 2.48: #GTrashStack is deprecated without replacement
  */
-xpointer_t
+gpointer
 g_trash_stack_peek (GTrashStack **stack_p)
 {
   GTrashStack *data;
@@ -139,11 +139,11 @@ g_trash_stack_peek (GTrashStack **stack_p)
  * Returns: the height of the stack
  * Deprecated: 2.48: #GTrashStack is deprecated without replacement
  */
-xuint_t
+guint
 g_trash_stack_height (GTrashStack **stack_p)
 {
   GTrashStack *data;
-  xuint_t i = 0;
+  guint i = 0;
 
   for (data = *stack_p; data; data = data->next)
     i++;

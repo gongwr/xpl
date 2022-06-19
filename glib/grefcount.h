@@ -19,7 +19,7 @@
 #ifndef __GREFCOUNT_H__
 #define __GREFCOUNT_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -28,25 +28,25 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_2_58
+GLIB_AVAILABLE_IN_2_58
 void            g_ref_count_init                (grefcount       *rc);
-XPL_AVAILABLE_IN_2_58
+GLIB_AVAILABLE_IN_2_58
 void            g_ref_count_inc                 (grefcount       *rc);
-XPL_AVAILABLE_IN_2_58
-xboolean_t        g_ref_count_dec                 (grefcount       *rc);
-XPL_AVAILABLE_IN_2_58
-xboolean_t        g_ref_count_compare             (grefcount       *rc,
-                                                 xint_t             val);
+GLIB_AVAILABLE_IN_2_58
+gboolean        g_ref_count_dec                 (grefcount       *rc);
+GLIB_AVAILABLE_IN_2_58
+gboolean        g_ref_count_compare             (grefcount       *rc,
+                                                 gint             val);
 
-XPL_AVAILABLE_IN_2_58
+GLIB_AVAILABLE_IN_2_58
 void            g_atomic_ref_count_init         (gatomicrefcount *arc);
-XPL_AVAILABLE_IN_2_58
+GLIB_AVAILABLE_IN_2_58
 void            g_atomic_ref_count_inc          (gatomicrefcount *arc);
-XPL_AVAILABLE_IN_2_58
-xboolean_t        g_atomic_ref_count_dec          (gatomicrefcount *arc);
-XPL_AVAILABLE_IN_2_58
-xboolean_t        g_atomic_ref_count_compare      (gatomicrefcount *arc,
-                                                 xint_t             val);
+GLIB_AVAILABLE_IN_2_58
+gboolean        g_atomic_ref_count_dec          (gatomicrefcount *arc);
+GLIB_AVAILABLE_IN_2_58
+gboolean        g_atomic_ref_count_compare      (gatomicrefcount *arc,
+                                                 gint             val);
 
 /* On GCC we can use __extension__ to inline the API without using
  * ancillary functions; we only do this when disabling checks, as
@@ -78,14 +78,14 @@ xboolean_t        g_atomic_ref_count_compare      (gatomicrefcount *arc,
     if (__rc == 0) ; else { \
       *(rc) = __rc; \
     } \
-    (xboolean_t) (__rc == 0); \
+    (gboolean) (__rc == 0); \
   }))
 
 # define g_ref_count_compare(rc,val) \
   (G_GNUC_EXTENSION ({ \
     G_STATIC_ASSERT (sizeof *(rc) == sizeof (grefcount)); \
     (void) (0 ? *(rc) ^ (val) : 1); \
-    (xboolean_t) (*(rc) == -(val)); \
+    (gboolean) (*(rc) == -(val)); \
   }))
 
 # define g_atomic_ref_count_init(rc) \
@@ -113,7 +113,7 @@ xboolean_t        g_atomic_ref_count_compare      (gatomicrefcount *arc,
   (G_GNUC_EXTENSION ({ \
     G_STATIC_ASSERT (sizeof *(rc) == sizeof (gatomicrefcount)); \
     (void) (0 ? *(rc) ^ (val) : 1); \
-    (xboolean_t) (g_atomic_int_get (rc) == (val)); \
+    (gboolean) (g_atomic_int_get (rc) == (val)); \
   }))
 
 #endif /* __GNUC__ && G_DISABLE_CHECKS */

@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -103,7 +103,7 @@ static const char *_resolve_dev_root (void);
  * @G_UNIX_MOUNT_TYPE_IPOD: iPod UNIX mount type.
  * @G_UNIX_MOUNT_TYPE_CAMERA: Digital camera UNIX mount type.
  * @G_UNIX_MOUNT_TYPE_HD: Hard drive UNIX mount type.
- *
+ * 
  * Types of UNIX mounts.
  **/
 typedef enum {
@@ -128,8 +128,8 @@ struct _GUnixMountEntry {
   char *root_path;
   char *filesystem_type;
   char *options;
-  xboolean_t is_read_only;
-  xboolean_t is_system_internal;
+  gboolean is_read_only;
+  gboolean is_system_internal;
 };
 
 G_DEFINE_BOXED_TYPE (GUnixMountEntry, g_unix_mount_entry,
@@ -140,23 +140,23 @@ struct _GUnixMountPoint {
   char *device_path;
   char *filesystem_type;
   char *options;
-  xboolean_t is_read_only;
-  xboolean_t is_user_mountable;
-  xboolean_t is_loopback;
+  gboolean is_read_only;
+  gboolean is_user_mountable;
+  gboolean is_loopback;
 };
 
 G_DEFINE_BOXED_TYPE (GUnixMountPoint, g_unix_mount_point,
                      g_unix_mount_point_copy, g_unix_mount_point_free)
 
-static xlist_t *_g_get_unix_mounts (void);
-static xlist_t *_g_get_unix_mount_points (void);
-static xboolean_t proc_mounts_watch_is_running (void);
+static GList *_g_get_unix_mounts (void);
+static GList *_g_get_unix_mount_points (void);
+static gboolean proc_mounts_watch_is_running (void);
 
 G_LOCK_DEFINE_STATIC (proc_mounts_source);
 
 /* Protected by proc_mounts_source lock */
-static xuint64_t mount_poller_time = 0;
-static xsource_t *proc_mounts_watch_source;
+static guint64 mount_poller_time = 0;
+static GSource *proc_mounts_watch_source;
 
 #ifdef HAVE_SYS_MNTTAB_H
 #define MNTOPT_RO	"ro"
@@ -202,7 +202,7 @@ static xsource_t *proc_mounts_watch_source;
 #define endmntent(f) fclose(f)
 #endif
 
-static xboolean_t
+static gboolean
 is_in (const char *value, const char *set[])
 {
   int i;
@@ -223,17 +223,17 @@ is_in (const char *value, const char *set[])
  * that only are used in the OS and has little to no relevance to the
  * casual user.
  *
- * Returns: %TRUE if @mount_path is considered an implementation detail
+ * Returns: %TRUE if @mount_path is considered an implementation detail 
  *     of the OS.
  **/
-xboolean_t
+gboolean
 g_unix_is_mount_path_system_internal (const char *mount_path)
 {
   const char *ignore_mountpoints[] = {
     /* Includes all FHS 2.3 toplevel dirs and other specialized
      * directories that we want to hide from the user.
      */
-    "/",              /* we already have "Filesystem root" in Nautilus */
+    "/",              /* we already have "Filesystem root" in Nautilus */ 
     "/bin",
     "/boot",
     "/compat/linux/proc",
@@ -278,13 +278,13 @@ g_unix_is_mount_path_system_internal (const char *mount_path)
 
   if (is_in (mount_path, ignore_mountpoints))
     return TRUE;
-
-  if (xstr_has_prefix (mount_path, "/dev/") ||
-      xstr_has_prefix (mount_path, "/proc/") ||
-      xstr_has_prefix (mount_path, "/sys/"))
+  
+  if (g_str_has_prefix (mount_path, "/dev/") ||
+      g_str_has_prefix (mount_path, "/proc/") ||
+      g_str_has_prefix (mount_path, "/sys/"))
     return TRUE;
 
-  if (xstr_has_suffix (mount_path, "/.gvfs"))
+  if (g_str_has_suffix (mount_path, "/.gvfs"))
     return TRUE;
 
   return FALSE;
@@ -305,7 +305,7 @@ g_unix_is_mount_path_system_internal (const char *mount_path)
  * Returns: %TRUE if @fs_type is considered an implementation detail of the OS.
  * Since: 2.56
  */
-xboolean_t
+gboolean
 g_unix_is_system_fs_type (const char *fs_type)
 {
   const char *ignore_fs[] = {
@@ -354,7 +354,7 @@ g_unix_is_system_fs_type (const char *fs_type)
     NULL
   };
 
-  xreturn_val_if_fail (fs_type != NULL && *fs_type != '\0', FALSE);
+  g_return_val_if_fail (fs_type != NULL && *fs_type != '\0', FALSE);
 
   return is_in (fs_type, ignore_fs);
 }
@@ -375,7 +375,7 @@ g_unix_is_system_fs_type (const char *fs_type)
  *    the OS.
  * Since: 2.56
  */
-xboolean_t
+gboolean
 g_unix_is_system_device_path (const char *device_path)
 {
   const char *ignore_devices[] = {
@@ -388,12 +388,12 @@ g_unix_is_system_device_path (const char *device_path)
     NULL
   };
 
-  xreturn_val_if_fail (device_path != NULL && *device_path != '\0', FALSE);
+  g_return_val_if_fail (device_path != NULL && *device_path != '\0', FALSE);
 
   return is_in (device_path, ignore_devices);
 }
 
-static xboolean_t
+static gboolean
 guess_system_internal (const char *mountpoint,
                        const char *fs,
                        const char *device,
@@ -401,7 +401,7 @@ guess_system_internal (const char *mountpoint,
 {
   if (g_unix_is_system_fs_type (fs))
     return TRUE;
-
+  
   if (g_unix_is_system_device_path (device))
     return TRUE;
 
@@ -427,7 +427,7 @@ guess_system_internal (const char *mountpoint,
    * comment in mntent-based _g_get_unix_mounts() implementation and the
    * https://gitlab.gnome.org/GNOME/glib/issues/1271 issue.
    */
-  if (root != NULL && xstrcmp0 (root, "/") != 0)
+  if (root != NULL && g_strcmp0 (root, "/") != 0)
     return TRUE;
 
   return FALSE;
@@ -441,16 +441,16 @@ create_unix_mount_entry (const char *device_path,
                          const char *root_path,
                          const char *filesystem_type,
                          const char *options,
-                         xboolean_t    is_read_only)
+                         gboolean    is_read_only)
 {
   GUnixMountEntry *mount_entry = NULL;
 
   mount_entry = g_new0 (GUnixMountEntry, 1);
-  mount_entry->device_path = xstrdup (device_path);
-  mount_entry->mount_path = xstrdup (mount_path);
-  mount_entry->root_path = xstrdup (root_path);
-  mount_entry->filesystem_type = xstrdup (filesystem_type);
-  mount_entry->options = xstrdup (options);
+  mount_entry->device_path = g_strdup (device_path);
+  mount_entry->mount_path = g_strdup (mount_path);
+  mount_entry->root_path = g_strdup (root_path);
+  mount_entry->filesystem_type = g_strdup (filesystem_type);
+  mount_entry->options = g_strdup (options);
   mount_entry->is_read_only = is_read_only;
 
   mount_entry->is_system_internal =
@@ -467,17 +467,17 @@ create_unix_mount_point (const char *device_path,
                          const char *mount_path,
                          const char *filesystem_type,
                          const char *options,
-                         xboolean_t    is_read_only,
-                         xboolean_t    is_user_mountable,
-                         xboolean_t    is_loopback)
+                         gboolean    is_read_only,
+                         gboolean    is_user_mountable,
+                         gboolean    is_loopback)
 {
   GUnixMountPoint *mount_point = NULL;
 
   mount_point = g_new0 (GUnixMountPoint, 1);
-  mount_point->device_path = xstrdup (device_path);
-  mount_point->mount_path = xstrdup (mount_path);
-  mount_point->filesystem_type = xstrdup (filesystem_type);
-  mount_point->options = xstrdup (options);
+  mount_point->device_path = g_strdup (device_path);
+  mount_point->mount_path = g_strdup (mount_path);
+  mount_point->filesystem_type = g_strdup (filesystem_type);
+  mount_point->options = g_strdup (options);
   mount_point->is_read_only = is_read_only;
   mount_point->is_user_mountable = is_user_mountable;
   mount_point->is_loopback = is_loopback;
@@ -495,14 +495,14 @@ create_unix_mount_point (const char *device_path,
  */
 #define PROC_MOUNTINFO_PATH "/proc/self/mountinfo"
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
   struct libmnt_table *table = NULL;
   struct libmnt_iter* iter = NULL;
   struct libmnt_fs *fs = NULL;
   GUnixMountEntry *mount_entry = NULL;
-  xlist_t *return_list = NULL;
+  GList *return_list = NULL;
 
   table = mnt_new_table ();
   if (mnt_table_parse_mtab (table, NULL) < 0)
@@ -514,10 +514,10 @@ _g_get_unix_mounts (void)
       const char *device_path = NULL;
       char *mount_options = NULL;
       unsigned long mount_flags = 0;
-      xboolean_t is_read_only = FALSE;
+      gboolean is_read_only = FALSE;
 
       device_path = mnt_fs_get_source (fs);
-      if (xstrcmp0 (device_path, "/dev/root") == 0)
+      if (g_strcmp0 (device_path, "/dev/root") == 0)
         device_path = _resolve_dev_root ();
 
       mount_options = mnt_fs_strdup_options (fs);
@@ -535,14 +535,14 @@ _g_get_unix_mounts (void)
                                              mnt_fs_get_options (fs),
                                              is_read_only);
 
-      return_list = xlist_prepend (return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
   mnt_free_iter (iter);
 
  out:
   mnt_free_table (table);
 
-  return xlist_reverse (return_list);
+  return g_list_reverse (return_list);
 }
 
 #else
@@ -565,7 +565,7 @@ get_mtab_read_file (void)
 G_LOCK_DEFINE_STATIC(getmntent);
 #endif
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
 #ifdef HAVE_GETMNTENT_R
@@ -576,9 +576,9 @@ _g_get_unix_mounts (void)
   FILE *file;
   const char *read_file;
   GUnixMountEntry *mount_entry;
-  xhashtable_t *mounts_hash;
-  xlist_t *return_list;
-
+  GHashTable *mounts_hash;
+  GList *return_list;
+  
   read_file = get_mtab_read_file ();
 
   file = setmntent (read_file, "r");
@@ -586,9 +586,9 @@ _g_get_unix_mounts (void)
     return NULL;
 
   return_list = NULL;
-
-  mounts_hash = xhash_table_new (xstr_hash, xstr_equal);
-
+  
+  mounts_hash = g_hash_table_new (g_str_hash, g_str_equal);
+  
 #ifdef HAVE_GETMNTENT_R
   while ((mntent = getmntent_r (file, &ent, buf, sizeof (buf))) != NULL)
 #else
@@ -597,7 +597,7 @@ _g_get_unix_mounts (void)
 #endif
     {
       const char *device_path = NULL;
-      xboolean_t is_read_only = FALSE;
+      gboolean is_read_only = FALSE;
 
       /* ignore any mnt_fsname that is repeated and begins with a '/'
        *
@@ -611,10 +611,10 @@ _g_get_unix_mounts (void)
        */
       if (mntent->mnt_fsname != NULL &&
 	  mntent->mnt_fsname[0] == '/' &&
-	  xhash_table_lookup (mounts_hash, mntent->mnt_fsname))
+	  g_hash_table_lookup (mounts_hash, mntent->mnt_fsname))
         continue;
 
-      if (xstrcmp0 (mntent->mnt_fsname, "/dev/root") == 0)
+      if (g_strcmp0 (mntent->mnt_fsname, "/dev/root") == 0)
         device_path = _resolve_dev_root ();
       else
         device_path = mntent->mnt_fsname;
@@ -631,21 +631,21 @@ _g_get_unix_mounts (void)
                                              mntent->mnt_opts,
                                              is_read_only);
 
-      xhash_table_insert (mounts_hash,
+      g_hash_table_insert (mounts_hash,
 			   mount_entry->device_path,
 			   mount_entry->device_path);
 
-      return_list = xlist_prepend (return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
-  xhash_table_destroy (mounts_hash);
-
+  g_hash_table_destroy (mounts_hash);
+  
   endmntent (file);
 
 #ifndef HAVE_GETMNTENT_R
   G_UNLOCK (getmntent);
 #endif
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 #endif /* HAVE_LIBMOUNT */
@@ -701,7 +701,7 @@ get_mtab_read_file (void)
 {
 #ifdef _PATH_MOUNTED
   return _PATH_MOUNTED;
-#else
+#else	
   return "/etc/mnttab";
 #endif
 }
@@ -712,27 +712,27 @@ get_mtab_monitor_file (void)
   return get_mtab_read_file ();
 }
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
   struct mnttab mntent;
   FILE *file;
   const char *read_file;
   GUnixMountEntry *mount_entry;
-  xlist_t *return_list;
-
+  GList *return_list;
+  
   read_file = get_mtab_read_file ();
-
+  
   file = setmntent (read_file, "r");
   if (file == NULL)
     return NULL;
-
+  
   return_list = NULL;
-
+  
   G_LOCK (getmntent);
   while (! getmntent (file, &mntent))
     {
-      xboolean_t is_read_only = FALSE;
+      gboolean is_read_only = FALSE;
 
 #if defined (HAVE_HASMNTOPT)
       if (hasmntopt (&mntent, MNTOPT_RO) != NULL)
@@ -746,14 +746,14 @@ _g_get_unix_mounts (void)
                                              mntent.mnt_opts,
                                              is_read_only);
 
-      return_list = xlist_prepend (return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
-
+  
   endmntent (file);
-
+  
   G_UNLOCK (getmntent);
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 /* mntctl.h (AIX) {{{2 */
@@ -765,7 +765,7 @@ get_mtab_monitor_file (void)
   return NULL;
 }
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
   struct vfs_ent *fs_info;
@@ -773,34 +773,34 @@ _g_get_unix_mounts (void)
   int vmount_number;
   unsigned int vmount_size;
   int current;
-  xlist_t *return_list;
-
+  GList *return_list;
+  
   if (mntctl (MCTL_QUERY, sizeof (vmount_size), &vmount_size) != 0)
     {
       g_warning ("Unable to know the number of mounted volumes");
-
+      
       return NULL;
     }
 
   vmount_info = (struct vmount*)g_malloc (vmount_size);
 
   vmount_number = mntctl (MCTL_QUERY, vmount_size, vmount_info);
-
+  
   if (vmount_info->vmt_revision != VMT_REVISION)
     g_warning ("Bad vmount structure revision number, want %d, got %d", VMT_REVISION, vmount_info->vmt_revision);
 
   if (vmount_number < 0)
     {
       g_warning ("Unable to recover mounted volumes information");
-
+      
       g_free (vmount_info);
       return NULL;
     }
-
+  
   return_list = NULL;
   while (vmount_number > 0)
     {
-      xboolean_t is_read_only = FALSE;
+      gboolean is_read_only = FALSE;
 
       fs_info = getvfsbytype (vmount_info->vmt_gfstype);
 
@@ -814,16 +814,16 @@ _g_get_unix_mounts (void)
                                              NULL,
                                              is_read_only);
 
-      return_list = xlist_prepend (return_list, mount_entry);
-
-      vmount_info = (struct vmount *)( (char*)vmount_info
+      return_list = g_list_prepend (return_list, mount_entry);
+      
+      vmount_info = (struct vmount *)( (char*)vmount_info 
 				       + vmount_info->vmt_length);
       vmount_number--;
     }
-
+  
   g_free (vmount_info);
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 /* sys/mount.h {{{2 */
@@ -835,7 +835,7 @@ get_mtab_monitor_file (void)
   return NULL;
 }
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
 #if defined(USE_STATVFS)
@@ -848,8 +848,8 @@ _g_get_unix_mounts (void)
   size_t bufsize;
   int num_mounts, i;
   GUnixMountEntry *mount_entry;
-  xlist_t *return_list;
-
+  GList *return_list;
+  
   /* Pass NOWAIT to avoid blocking trying to update NFS mounts. */
 #if defined(USE_STATVFS) && defined(HAVE_GETVFSSTAT)
   num_mounts = getvfsstat (NULL, 0, ST_NOWAIT);
@@ -868,12 +868,12 @@ _g_get_unix_mounts (void)
 #endif
   if (num_mounts == -1)
     return NULL;
-
+  
   return_list = NULL;
-
+  
   for (i = 0; i < num_mounts; i++)
     {
-      xboolean_t is_read_only = FALSE;
+      gboolean is_read_only = FALSE;
 
 #if defined(USE_STATVFS)
       if (mntent[i].f_flag & ST_RDONLY)
@@ -891,12 +891,12 @@ _g_get_unix_mounts (void)
                                              NULL,
                                              is_read_only);
 
-      return_list = xlist_prepend (return_list, mount_entry);
+      return_list = g_list_prepend (return_list, mount_entry);
     }
 
   g_free (mntent);
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 /* Interix {{{2 */
@@ -908,11 +908,11 @@ get_mtab_monitor_file (void)
   return NULL;
 }
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
   DIR *dirp;
-  xlist_t* return_list = NULL;
+  GList* return_list = NULL;
   char filename[9 + NAME_MAX];
 
   dirp = opendir ("/dev/fs");
@@ -927,30 +927,30 @@ _g_get_unix_mounts (void)
       struct statvfs statbuf;
       struct dirent entry;
       struct dirent* result;
-
+      
       if (readdir_r (dirp, &entry, &result) || result == NULL)
         break;
-
+      
       strcpy (filename, "/dev/fs/");
       strcat (filename, entry.d_name);
-
+      
       if (statvfs (filename, &statbuf) == 0)
         {
           GUnixMountEntry* mount_entry = g_new0(GUnixMountEntry, 1);
-
-          mount_entry->mount_path = xstrdup (statbuf.f_mntonname);
-          mount_entry->device_path = xstrdup (statbuf.f_mntfromname);
-          mount_entry->filesystem_type = xstrdup (statbuf.f_fstypename);
-
+          
+          mount_entry->mount_path = g_strdup (statbuf.f_mntonname);
+          mount_entry->device_path = g_strdup (statbuf.f_mntfromname);
+          mount_entry->filesystem_type = g_strdup (statbuf.f_fstypename);
+          
           if (statbuf.f_flag & ST_RDONLY)
             mount_entry->is_read_only = TRUE;
-
-          return_list = xlist_prepend(return_list, mount_entry);
+          
+          return_list = g_list_prepend(return_list, mount_entry);
         }
     }
-
-  return_list = xlist_reverse (return_list);
-
+  
+  return_list = g_list_reverse (return_list);
+  
   closedir (dirp);
 
   return return_list;
@@ -966,7 +966,7 @@ get_mtab_monitor_file (void)
   return NULL;
 }
 
-static xlist_t *
+static GList *
 _g_get_unix_mounts (void)
 {
   /* TODO: Not implemented */
@@ -1009,14 +1009,14 @@ get_fstab_file (void)
 
 #ifdef HAVE_LIBMOUNT
 
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
   struct libmnt_table *table = NULL;
   struct libmnt_iter* iter = NULL;
   struct libmnt_fs *fs = NULL;
   GUnixMountPoint *mount_point = NULL;
-  xlist_t *return_list = NULL;
+  GList *return_list = NULL;
 
   table = mnt_new_table ();
   if (mnt_table_parse_fstab (table, NULL) < 0)
@@ -1029,9 +1029,9 @@ _g_get_unix_mount_points (void)
       const char *mount_path = NULL;
       const char *mount_fstype = NULL;
       char *mount_options = NULL;
-      xboolean_t is_read_only = FALSE;
-      xboolean_t is_user_mountable = FALSE;
-      xboolean_t is_loopback = FALSE;
+      gboolean is_read_only = FALSE;
+      gboolean is_user_mountable = FALSE;
+      gboolean is_loopback = FALSE;
 
       mount_path = mnt_fs_get_target (fs);
       if ((strcmp (mount_path, "ignore") == 0) ||
@@ -1059,9 +1059,9 @@ _g_get_unix_mount_points (void)
           is_read_only = (mount_flags & MS_RDONLY) != 0;
           is_loopback = (userspace_flags & MNT_MS_LOOP) != 0;
 
-          if ((mount_fstype != NULL && xstrcmp0 ("supermount", mount_fstype) == 0) ||
+          if ((mount_fstype != NULL && g_strcmp0 ("supermount", mount_fstype) == 0) ||
               ((userspace_flags & MNT_MS_USER) &&
-               (xstrstr_len (mount_options, -1, "user_xattr") == NULL)) ||
+               (g_strstr_len (mount_options, -1, "user_xattr") == NULL)) ||
               (userspace_flags & MNT_MS_USERS) ||
               (userspace_flags & MNT_MS_OWNER))
             {
@@ -1070,7 +1070,7 @@ _g_get_unix_mount_points (void)
         }
 
       device_path = mnt_fs_get_source (fs);
-      if (xstrcmp0 (device_path, "/dev/root") == 0)
+      if (g_strcmp0 (device_path, "/dev/root") == 0)
         device_path = _resolve_dev_root ();
 
       mount_point = create_unix_mount_point (device_path,
@@ -1083,19 +1083,19 @@ _g_get_unix_mount_points (void)
       if (mount_options)
         g_free (mount_options);
 
-      return_list = xlist_prepend (return_list, mount_point);
+      return_list = g_list_prepend (return_list, mount_point);
     }
   mnt_free_iter (iter);
 
  out:
   mnt_free_table (table);
 
-  return xlist_reverse (return_list);
+  return g_list_reverse (return_list);
 }
 
 #else
 
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
 #ifdef HAVE_GETMNTENT_R
@@ -1106,16 +1106,16 @@ _g_get_unix_mount_points (void)
   FILE *file;
   char *read_file;
   GUnixMountPoint *mount_point;
-  xlist_t *return_list;
-
+  GList *return_list;
+  
   read_file = get_fstab_file ();
-
+  
   file = setmntent (read_file, "r");
   if (file == NULL)
     return NULL;
 
   return_list = NULL;
-
+  
 #ifdef HAVE_GETMNTENT_R
   while ((mntent = getmntent_r (file, &ent, buf, sizeof (buf))) != NULL)
 #else
@@ -1124,9 +1124,9 @@ _g_get_unix_mount_points (void)
 #endif
     {
       const char *device_path = NULL;
-      xboolean_t is_read_only = FALSE;
-      xboolean_t is_user_mountable = FALSE;
-      xboolean_t is_loopback = FALSE;
+      gboolean is_read_only = FALSE;
+      gboolean is_user_mountable = FALSE;
+      gboolean is_loopback = FALSE;
 
       if ((strcmp (mntent->mnt_dir, "ignore") == 0) ||
           (strcmp (mntent->mnt_dir, "swap") == 0) ||
@@ -1171,16 +1171,16 @@ _g_get_unix_mount_points (void)
                                              is_user_mountable,
                                              is_loopback);
 
-      return_list = xlist_prepend (return_list, mount_point);
+      return_list = g_list_prepend (return_list, mount_point);
     }
-
+  
   endmntent (file);
 
 #ifndef HAVE_GETMNTENT_R
   G_UNLOCK (getmntent);
 #endif
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 #endif /* HAVE_LIBMOUNT */
@@ -1188,29 +1188,29 @@ _g_get_unix_mount_points (void)
 /* mnttab.h {{{2 */
 #elif defined (HAVE_SYS_MNTTAB_H)
 
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
   struct mnttab mntent;
   FILE *file;
   char *read_file;
   GUnixMountPoint *mount_point;
-  xlist_t *return_list;
-
+  GList *return_list;
+  
   read_file = get_fstab_file ();
-
+  
   file = setmntent (read_file, "r");
   if (file == NULL)
     return NULL;
 
   return_list = NULL;
-
+  
   G_LOCK (getmntent);
   while (! getmntent (file, &mntent))
     {
-      xboolean_t is_read_only = FALSE;
-      xboolean_t is_user_mountable = FALSE;
-      xboolean_t is_loopback = FALSE;
+      gboolean is_read_only = FALSE;
+      gboolean is_user_mountable = FALSE;
+      gboolean is_loopback = FALSE;
 
       if ((strcmp (mntent.mnt_mountp, "ignore") == 0) ||
           (strcmp (mntent.mnt_mountp, "swap") == 0) ||
@@ -1243,13 +1243,13 @@ _g_get_unix_mount_points (void)
                                              is_user_mountable,
                                              is_loopback);
 
-      return_list = xlist_prepend (return_list, mount_point);
+      return_list = g_list_prepend (return_list, mount_point);
     }
-
+  
   endmntent (file);
   G_UNLOCK (getmntent);
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 /* mntctl.h (AIX) {{{2 */
@@ -1262,7 +1262,7 @@ static int
 aix_fs_getc (FILE *fd)
 {
   int c;
-
+  
   while ((c = getc (fd)) == '*')
     {
       while (((c = getc (fd)) != '\n') && (c != EOF))
@@ -1275,7 +1275,7 @@ static int
 aix_fs_ignorespace (FILE *fd)
 {
   int c;
-
+  
   while ((c = aix_fs_getc (fd)) != EOF)
     {
       if (!g_ascii_isspace (c))
@@ -1284,17 +1284,17 @@ aix_fs_ignorespace (FILE *fd)
 	  return c;
 	}
     }
-
+  
   return EOF;
 }
 
 /* read one word from file */
 static int
-aix_fs_getword (FILE *fd,
+aix_fs_getword (FILE *fd, 
                 char *word)
 {
   int c;
-
+  
   aix_fs_ignorespace (fd);
 
   while (((c = aix_fs_getc (fd)) != EOF) && !g_ascii_isspace (c))
@@ -1308,7 +1308,7 @@ aix_fs_getword (FILE *fd,
 	}
     }
   *word = 0;
-
+  
   return c;
 }
 
@@ -1321,12 +1321,12 @@ typedef struct {
 
 /* read mount points properties */
 static int
-aix_fs_get (FILE               *fd,
+aix_fs_get (FILE               *fd, 
             AixMountTableEntry *prop)
 {
   static char word[PATH_MAX] = { 0 };
   char value[PATH_MAX];
-
+  
   /* read stanza */
   if (word[0] == 0)
     {
@@ -1336,21 +1336,21 @@ aix_fs_get (FILE               *fd,
 
   word[strlen(word) - 1] = 0;
   strcpy (prop->mnt_mount, word);
-
+  
   /* read attributes and value */
-
+  
   while (aix_fs_getword (fd, word) != EOF)
     {
       /* test if is attribute or new stanza */
       if (word[strlen(word) - 1] == ':')
 	return 0;
-
+      
       /* read "=" */
       aix_fs_getword (fd, value);
-
+      
       /* read value */
       aix_fs_getword (fd, value);
-
+      
       if (strcmp (word, "dev") == 0)
 	strcpy (prop->mnt_special, value);
       else if (strcmp (word, "vfs") == 0)
@@ -1358,11 +1358,11 @@ aix_fs_get (FILE               *fd,
       else if (strcmp (word, "options") == 0)
 	strcpy(prop->mnt_options, value);
     }
-
+  
   return 0;
 }
 
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
   struct mntent *mntent;
@@ -1370,16 +1370,16 @@ _g_get_unix_mount_points (void)
   char *read_file;
   GUnixMountPoint *mount_point;
   AixMountTableEntry mntent;
-  xlist_t *return_list;
-
+  GList *return_list;
+  
   read_file = get_fstab_file ();
-
+  
   file = setmntent (read_file, "r");
   if (file == NULL)
     return NULL;
-
+  
   return_list = NULL;
-
+  
   while (!aix_fs_get (file, &mntent))
     {
       if (strcmp ("cdrfs", mntent.mnt_fstype) == 0)
@@ -1392,33 +1392,33 @@ _g_get_unix_mount_points (void)
                                                  TRUE,
                                                  FALSE);
 
-	  return_list = xlist_prepend (return_list, mount_point);
+	  return_list = g_list_prepend (return_list, mount_point);
 	}
     }
-
+	
   endmntent (file);
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 
 #elif (defined(HAVE_GETVFSSTAT) || defined(HAVE_GETFSSTAT)) && defined(HAVE_FSTAB_H) && defined(HAVE_SYS_MOUNT_H)
 
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
   struct fstab *fstab = NULL;
   GUnixMountPoint *mount_point;
-  xlist_t *return_list;
+  GList *return_list;
 #ifdef HAVE_SYS_SYSCTL_H
   int usermnt = 0;
   struct stat sb;
 #endif
-
+  
   if (!setfsent ())
     return NULL;
 
   return_list = NULL;
-
+  
 #ifdef HAVE_SYS_SYSCTL_H
 #if defined(HAVE_SYSCTLBYNAME)
   {
@@ -1430,7 +1430,7 @@ _g_get_unix_mount_points (void)
   {
     int mib[2];
     size_t len = sizeof(usermnt);
-
+    
     mib[0] = CTL_VFS;
     mib[1] = VFS_USERMOUNT;
     sysctl (mib, 2, &usermnt, &len, NULL, 0);
@@ -1439,18 +1439,18 @@ _g_get_unix_mount_points (void)
   {
     int mib[2];
     size_t len = sizeof(usermnt);
-
+    
     mib[0] = CTL_KERN;
     mib[1] = KERN_USERMOUNT;
     sysctl (mib, 2, &usermnt, &len, NULL, 0);
   }
 #endif
 #endif
-
+  
   while ((fstab = getfsent ()) != NULL)
     {
-      xboolean_t is_read_only = FALSE;
-      xboolean_t is_user_mountable = FALSE;
+      gboolean is_read_only = FALSE;
+      gboolean is_user_mountable = FALSE;
 
       if (strcmp (fstab->fs_vfstype, "swap") == 0)
 	continue;
@@ -1478,16 +1478,16 @@ _g_get_unix_mount_points (void)
                                              is_user_mountable,
                                              FALSE);
 
-      return_list = xlist_prepend (return_list, mount_point);
+      return_list = g_list_prepend (return_list, mount_point);
     }
-
+  
   endfsent ();
-
-  return xlist_reverse (return_list);
+  
+  return g_list_reverse (return_list);
 }
 /* Interix {{{2 */
 #elif defined(__INTERIX)
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
   return _g_get_unix_mounts ();
@@ -1495,7 +1495,7 @@ _g_get_unix_mount_points (void)
 
 /* QNX {{{2 */
 #elif defined (HAVE_QNX)
-static xlist_t *
+static GList *
 _g_get_unix_mount_points (void)
 {
   return _g_get_unix_mounts ();
@@ -1506,18 +1506,18 @@ _g_get_unix_mount_points (void)
 #error No g_get_mount_table() implementation for system
 #endif
 
-static xuint64_t
+static guint64
 get_mounts_timestamp (void)
 {
   const char *monitor_file;
   struct stat buf;
-  xuint64_t timestamp = 0;
+  guint64 timestamp = 0;
 
   G_LOCK (proc_mounts_source);
 
   monitor_file = get_mtab_monitor_file ();
   /* Don't return mtime for /proc/ files */
-  if (monitor_file && !xstr_has_prefix (monitor_file, "/proc/"))
+  if (monitor_file && !g_str_has_prefix (monitor_file, "/proc/"))
     {
       if (stat (monitor_file, &buf) == 0)
         timestamp = buf.st_mtime;
@@ -1542,7 +1542,7 @@ get_mounts_timestamp (void)
   return timestamp;
 }
 
-static xuint64_t
+static guint64
 get_mount_points_timestamp (void)
 {
   const char *monitor_file;
@@ -1552,25 +1552,25 @@ get_mount_points_timestamp (void)
   if (monitor_file)
     {
       if (stat (monitor_file, &buf) == 0)
-        return (xuint64_t)buf.st_mtime;
+        return (guint64)buf.st_mtime;
     }
   return 0;
 }
 
 /**
  * g_unix_mounts_get:
- * @time_read: (out) (optional): xuint64_t to contain a timestamp, or %NULL
+ * @time_read: (out) (optional): guint64 to contain a timestamp, or %NULL
  *
- * Gets a #xlist_t of #GUnixMountEntry containing the unix mounts.
+ * Gets a #GList of #GUnixMountEntry containing the unix mounts.
  * If @time_read is set, it will be filled with the mount
  * timestamp, allowing for checking if the mounts have changed
  * with g_unix_mounts_changed_since().
  *
  * Returns: (element-type GUnixMountEntry) (transfer full):
- *     a #xlist_t of the UNIX mounts.
+ *     a #GList of the UNIX mounts.
  **/
-xlist_t *
-g_unix_mounts_get (xuint64_t *time_read)
+GList *
+g_unix_mounts_get (guint64 *time_read)
 {
   if (time_read)
     *time_read = get_mounts_timestamp ();
@@ -1581,12 +1581,12 @@ g_unix_mounts_get (xuint64_t *time_read)
 /**
  * g_unix_mount_at:
  * @mount_path: (type filename): path for a possible unix mount.
- * @time_read: (out) (optional): xuint64_t to contain a timestamp.
- *
+ * @time_read: (out) (optional): guint64 to contain a timestamp.
+ * 
  * Gets a #GUnixMountEntry for a given mount path. If @time_read
  * is set, it will be filled with a unix timestamp for checking
  * if the mounts have changed since with g_unix_mounts_changed_since().
- *
+ * 
  * If more mounts have the same mount path, the last matching mount
  * is returned.
  *
@@ -1596,11 +1596,11 @@ g_unix_mounts_get (xuint64_t *time_read)
  **/
 GUnixMountEntry *
 g_unix_mount_at (const char *mount_path,
-		 xuint64_t    *time_read)
+		 guint64    *time_read)
 {
-  xlist_t *mounts, *l;
+  GList *mounts, *l;
   GUnixMountEntry *mount_entry, *found;
-
+  
   mounts = g_unix_mounts_get (time_read);
 
   found = NULL;
@@ -1618,7 +1618,7 @@ g_unix_mount_at (const char *mount_path,
       else
         g_unix_mount_free (mount_entry);
     }
-  xlist_free (mounts);
+  g_list_free (mounts);
 
   return found;
 }
@@ -1626,7 +1626,7 @@ g_unix_mount_at (const char *mount_path,
 /**
  * g_unix_mount_for:
  * @file_path: (type filename): file path on some unix mount.
- * @time_read: (out) (optional): xuint64_t to contain a timestamp.
+ * @time_read: (out) (optional): guint64 to contain a timestamp.
  *
  * Gets a #GUnixMountEntry for a given file path. If @time_read
  * is set, it will be filled with a unix timestamp for checking
@@ -1644,11 +1644,11 @@ g_unix_mount_at (const char *mount_path,
  **/
 GUnixMountEntry *
 g_unix_mount_for (const char *file_path,
-                  xuint64_t    *time_read)
+                  guint64    *time_read)
 {
   GUnixMountEntry *entry;
 
-  xreturn_val_if_fail (file_path != NULL, NULL);
+  g_return_val_if_fail (file_path != NULL, NULL);
 
   entry = g_unix_mount_at (file_path, time_read);
   if (entry == NULL)
@@ -1666,9 +1666,9 @@ g_unix_mount_for (const char *file_path,
   return entry;
 }
 
-static xpointer_t
-copy_mount_point_cb (xconstpointer src,
-                     xpointer_t      data)
+static gpointer
+copy_mount_point_cb (gconstpointer src,
+                     gpointer      data)
 {
   GUnixMountPoint *src_mount_point = (GUnixMountPoint *) src;
   return g_unix_mount_point_copy (src_mount_point);
@@ -1676,23 +1676,23 @@ copy_mount_point_cb (xconstpointer src,
 
 /**
  * g_unix_mount_points_get:
- * @time_read: (out) (optional): xuint64_t to contain a timestamp.
+ * @time_read: (out) (optional): guint64 to contain a timestamp.
  *
- * Gets a #xlist_t of #GUnixMountPoint containing the unix mount points.
+ * Gets a #GList of #GUnixMountPoint containing the unix mount points.
  * If @time_read is set, it will be filled with the mount timestamp,
  * allowing for checking if the mounts have changed with
  * g_unix_mount_points_changed_since().
  *
  * Returns: (element-type GUnixMountPoint) (transfer full):
- *     a #xlist_t of the UNIX mountpoints.
+ *     a #GList of the UNIX mountpoints.
  **/
-xlist_t *
-g_unix_mount_points_get (xuint64_t *time_read)
+GList *
+g_unix_mount_points_get (guint64 *time_read)
 {
-  static xlist_t *mnt_pts_last = NULL;
-  static xuint64_t time_read_last = 0;
-  xlist_t *mnt_pts = NULL;
-  xuint64_t time_read_now;
+  static GList *mnt_pts_last = NULL;
+  static guint64 time_read_last = 0;
+  GList *mnt_pts = NULL;
+  guint64 time_read_now;
   G_LOCK_DEFINE_STATIC (unix_mount_points);
 
   G_LOCK (unix_mount_points);
@@ -1701,10 +1701,10 @@ g_unix_mount_points_get (xuint64_t *time_read)
   if (time_read_now != time_read_last || mnt_pts_last == NULL)
     {
       time_read_last = time_read_now;
-      xlist_free_full (mnt_pts_last, (xdestroy_notify_t) g_unix_mount_point_free);
+      g_list_free_full (mnt_pts_last, (GDestroyNotify) g_unix_mount_point_free);
       mnt_pts_last = _g_get_unix_mount_points ();
     }
-  mnt_pts = xlist_copy_deep (mnt_pts_last, copy_mount_point_cb, NULL);
+  mnt_pts = g_list_copy_deep (mnt_pts_last, copy_mount_point_cb, NULL);
 
   G_UNLOCK (unix_mount_points);
 
@@ -1717,7 +1717,7 @@ g_unix_mount_points_get (xuint64_t *time_read)
 /**
  * g_unix_mount_point_at:
  * @mount_path: (type filename): path for a possible unix mount point.
- * @time_read: (out) (optional): xuint64_t to contain a timestamp.
+ * @time_read: (out) (optional): guint64 to contain a timestamp.
  *
  * Gets a #GUnixMountPoint for a given mount path. If @time_read is set, it
  * will be filled with a unix timestamp for checking if the mount points have
@@ -1733,9 +1733,9 @@ g_unix_mount_points_get (xuint64_t *time_read)
  **/
 GUnixMountPoint *
 g_unix_mount_point_at (const char *mount_path,
-                       xuint64_t    *time_read)
+                       guint64    *time_read)
 {
-  xlist_t *mount_points, *l;
+  GList *mount_points, *l;
   GUnixMountPoint *mount_point, *found;
 
   mount_points = g_unix_mount_points_get (time_read);
@@ -1755,40 +1755,40 @@ g_unix_mount_point_at (const char *mount_path,
       else
         g_unix_mount_point_free (mount_point);
     }
-  xlist_free (mount_points);
+  g_list_free (mount_points);
 
   return found;
 }
 
 /**
  * g_unix_mounts_changed_since:
- * @time: xuint64_t to contain a timestamp.
- *
+ * @time: guint64 to contain a timestamp.
+ * 
  * Checks if the unix mounts have changed since a given unix time.
- *
- * Returns: %TRUE if the mounts have changed since @time.
+ * 
+ * Returns: %TRUE if the mounts have changed since @time. 
  **/
-xboolean_t
-g_unix_mounts_changed_since (xuint64_t time)
+gboolean
+g_unix_mounts_changed_since (guint64 time)
 {
   return get_mounts_timestamp () != time;
 }
 
 /**
  * g_unix_mount_points_changed_since:
- * @time: xuint64_t to contain a timestamp.
- *
+ * @time: guint64 to contain a timestamp.
+ * 
  * Checks if the unix mount points have changed since a given unix time.
- *
- * Returns: %TRUE if the mount points have changed since @time.
+ * 
+ * Returns: %TRUE if the mount points have changed since @time. 
  **/
-xboolean_t
-g_unix_mount_points_changed_since (xuint64_t time)
+gboolean
+g_unix_mount_points_changed_since (guint64 time)
 {
   return get_mount_points_timestamp () != time;
 }
 
-/* xunix_mount_monitor_t {{{1 */
+/* GUnixMountMonitor {{{1 */
 
 enum {
   MOUNTS_CHANGED,
@@ -1796,121 +1796,121 @@ enum {
   LAST_SIGNAL
 };
 
-static xuint_t signals[LAST_SIGNAL];
+static guint signals[LAST_SIGNAL];
 
-struct _xunix_mount_monitor {
-  xobject_t parent;
+struct _GUnixMountMonitor {
+  GObject parent;
 
-  xmain_context_t *context;
+  GMainContext *context;
 };
 
-struct _xunix_mount_monitor_class {
-  xobject_class_t parent_class;
+struct _GUnixMountMonitorClass {
+  GObjectClass parent_class;
 };
 
 
-XDEFINE_TYPE (xunix_mount_monitor, xunix_mount_monitor, XTYPE_OBJECT)
+G_DEFINE_TYPE (GUnixMountMonitor, g_unix_mount_monitor, G_TYPE_OBJECT)
 
-static xcontext_specific_group_t  mount_monitor_group;
-static xfile_monitor_t          *fstab_monitor;
-static xfile_monitor_t          *mtab_monitor;
-static xlist_t                 *mount_poller_mounts;
-static xuint_t                  mtab_file_changed_id;
+static GContextSpecificGroup  mount_monitor_group;
+static GFileMonitor          *fstab_monitor;
+static GFileMonitor          *mtab_monitor;
+static GList                 *mount_poller_mounts;
+static guint                  mtab_file_changed_id;
 
 /* Called with proc_mounts_source lock held. */
-static xboolean_t
+static gboolean
 proc_mounts_watch_is_running (void)
 {
   return proc_mounts_watch_source != NULL &&
-         !xsource_is_destroyed (proc_mounts_watch_source);
+         !g_source_is_destroyed (proc_mounts_watch_source);
 }
 
 static void
-fstab_file_changed (xfile_monitor_t      *monitor,
-                    xfile_t             *file,
-                    xfile_t             *other_file,
-                    xfile_monitor_event_t  event_type,
-                    xpointer_t           user_data)
+fstab_file_changed (GFileMonitor      *monitor,
+                    GFile             *file,
+                    GFile             *other_file,
+                    GFileMonitorEvent  event_type,
+                    gpointer           user_data)
 {
-  if (event_type != XFILE_MONITOR_EVENT_CHANGED &&
-      event_type != XFILE_MONITOR_EVENT_CREATED &&
-      event_type != XFILE_MONITOR_EVENT_DELETED)
+  if (event_type != G_FILE_MONITOR_EVENT_CHANGED &&
+      event_type != G_FILE_MONITOR_EVENT_CREATED &&
+      event_type != G_FILE_MONITOR_EVENT_DELETED)
     return;
 
-  xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
+  g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
 }
 
-static xboolean_t
-mtab_file_changed_cb (xpointer_t user_data)
+static gboolean
+mtab_file_changed_cb (gpointer user_data)
 {
   mtab_file_changed_id = 0;
-  xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
+  g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
-mtab_file_changed (xfile_monitor_t      *monitor,
-                   xfile_t             *file,
-                   xfile_t             *other_file,
-                   xfile_monitor_event_t  event_type,
-                   xpointer_t           user_data)
+mtab_file_changed (GFileMonitor      *monitor,
+                   GFile             *file,
+                   GFile             *other_file,
+                   GFileMonitorEvent  event_type,
+                   gpointer           user_data)
 {
-  xmain_context_t *context;
-  xsource_t *source;
+  GMainContext *context;
+  GSource *source;
 
-  if (event_type != XFILE_MONITOR_EVENT_CHANGED &&
-      event_type != XFILE_MONITOR_EVENT_CREATED &&
-      event_type != XFILE_MONITOR_EVENT_DELETED)
+  if (event_type != G_FILE_MONITOR_EVENT_CHANGED &&
+      event_type != G_FILE_MONITOR_EVENT_CREATED &&
+      event_type != G_FILE_MONITOR_EVENT_DELETED)
     return;
 
   /* Skip accumulated events from file monitor which we are not able to handle
    * in a real time instead of emitting mounts_changed signal several times.
-   * This should behave equally to xio_channel_t based monitoring. See Bug 792235.
+   * This should behave equally to GIOChannel based monitoring. See Bug 792235.
    */
   if (mtab_file_changed_id > 0)
     return;
 
-  context = xmain_context_get_thread_default ();
+  context = g_main_context_get_thread_default ();
   if (!context)
-    context = xmain_context_default ();
+    context = g_main_context_default ();
 
   source = g_idle_source_new ();
-  xsource_set_priority (source, G_PRIORITY_DEFAULT);
-  xsource_set_callback (source, mtab_file_changed_cb, NULL, NULL);
-  xsource_set_static_name (source, "[gio] mtab_file_changed_cb");
-  xsource_attach (source, context);
-  xsource_unref (source);
+  g_source_set_priority (source, G_PRIORITY_DEFAULT);
+  g_source_set_callback (source, mtab_file_changed_cb, NULL, NULL);
+  g_source_set_static_name (source, "[gio] mtab_file_changed_cb");
+  g_source_attach (source, context);
+  g_source_unref (source);
 }
 
-static xboolean_t
-proc_mounts_changed (xio_channel_t   *channel,
-                     xio_condition_t  cond,
-                     xpointer_t      user_data)
+static gboolean
+proc_mounts_changed (GIOChannel   *channel,
+                     GIOCondition  cond,
+                     gpointer      user_data)
 {
   if (cond & G_IO_ERR)
     {
       G_LOCK (proc_mounts_source);
-      mount_poller_time = (xuint64_t) g_get_monotonic_time ();
+      mount_poller_time = (guint64) g_get_monotonic_time ();
       G_UNLOCK (proc_mounts_source);
 
-      xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
+      g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
     }
 
   return TRUE;
 }
 
-static xboolean_t
-mount_change_poller (xpointer_t user_data)
+static gboolean
+mount_change_poller (gpointer user_data)
 {
-  xlist_t *current_mounts, *new_it, *old_it;
-  xboolean_t has_changed = FALSE;
+  GList *current_mounts, *new_it, *old_it;
+  gboolean has_changed = FALSE;
 
   current_mounts = _g_get_unix_mounts ();
 
   for ( new_it = current_mounts, old_it = mount_poller_mounts;
         new_it != NULL && old_it != NULL;
-        new_it = xlist_next (new_it), old_it = xlist_next (old_it) )
+        new_it = g_list_next (new_it), old_it = g_list_next (old_it) )
     {
       if (g_unix_mount_compare (new_it->data, old_it->data) != 0)
         {
@@ -1921,17 +1921,17 @@ mount_change_poller (xpointer_t user_data)
   if (!(new_it == NULL && old_it == NULL))
     has_changed = TRUE;
 
-  xlist_free_full (mount_poller_mounts, (xdestroy_notify_t) g_unix_mount_free);
+  g_list_free_full (mount_poller_mounts, (GDestroyNotify) g_unix_mount_free);
 
   mount_poller_mounts = current_mounts;
 
   if (has_changed)
     {
       G_LOCK (proc_mounts_source);
-      mount_poller_time = (xuint64_t) g_get_monotonic_time ();
+      mount_poller_time = (guint64) g_get_monotonic_time ();
       G_UNLOCK (proc_mounts_source);
 
-      xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
+      g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
     }
 
   return TRUE;
@@ -1943,78 +1943,78 @@ mount_monitor_stop (void)
 {
   if (fstab_monitor)
     {
-      xfile_monitor_cancel (fstab_monitor);
-      xobject_unref (fstab_monitor);
+      g_file_monitor_cancel (fstab_monitor);
+      g_object_unref (fstab_monitor);
     }
 
   G_LOCK (proc_mounts_source);
   if (proc_mounts_watch_source != NULL)
     {
-      xsource_destroy (proc_mounts_watch_source);
+      g_source_destroy (proc_mounts_watch_source);
       proc_mounts_watch_source = NULL;
     }
   G_UNLOCK (proc_mounts_source);
 
   if (mtab_monitor)
     {
-      xfile_monitor_cancel (mtab_monitor);
-      xobject_unref (mtab_monitor);
+      g_file_monitor_cancel (mtab_monitor);
+      g_object_unref (mtab_monitor);
     }
 
   if (mtab_file_changed_id)
     {
-      xsource_remove (mtab_file_changed_id);
+      g_source_remove (mtab_file_changed_id);
       mtab_file_changed_id = 0;
     }
 
-  xlist_free_full (mount_poller_mounts, (xdestroy_notify_t) g_unix_mount_free);
+  g_list_free_full (mount_poller_mounts, (GDestroyNotify) g_unix_mount_free);
 }
 
 static void
 mount_monitor_start (void)
 {
-  xfile_t *file;
+  GFile *file;
 
   if (get_fstab_file () != NULL)
     {
-      file = xfile_new_for_path (get_fstab_file ());
-      fstab_monitor = xfile_monitor_file (file, 0, NULL, NULL);
-      xobject_unref (file);
+      file = g_file_new_for_path (get_fstab_file ());
+      fstab_monitor = g_file_monitor_file (file, 0, NULL, NULL);
+      g_object_unref (file);
 
-      xsignal_connect (fstab_monitor, "changed", (xcallback_t)fstab_file_changed, NULL);
+      g_signal_connect (fstab_monitor, "changed", (GCallback)fstab_file_changed, NULL);
     }
 
   if (get_mtab_monitor_file () != NULL)
     {
-      const xchar_t *mtab_path;
+      const gchar *mtab_path;
 
       mtab_path = get_mtab_monitor_file ();
-      /* Monitoring files in /proc/ is special - can't just use xfile_monitor_t.
+      /* Monitoring files in /proc/ is special - can't just use GFileMonitor.
        * See 'man proc' for more details.
        */
-      if (xstr_has_prefix (mtab_path, "/proc/"))
+      if (g_str_has_prefix (mtab_path, "/proc/"))
         {
-          xio_channel_t *proc_mounts_channel;
-          xerror_t *error = NULL;
+          GIOChannel *proc_mounts_channel;
+          GError *error = NULL;
           proc_mounts_channel = g_io_channel_new_file (mtab_path, "r", &error);
           if (proc_mounts_channel == NULL)
             {
               g_warning ("Error creating IO channel for %s: %s (%s, %d)", mtab_path,
                          error->message, g_quark_to_string (error->domain), error->code);
-              xerror_free (error);
+              g_error_free (error);
             }
           else
             {
               G_LOCK (proc_mounts_source);
 
               proc_mounts_watch_source = g_io_create_watch (proc_mounts_channel, G_IO_ERR);
-              mount_poller_time = (xuint64_t) g_get_monotonic_time ();
-              xsource_set_callback (proc_mounts_watch_source,
-                                     (xsource_func_t) proc_mounts_changed,
+              mount_poller_time = (guint64) g_get_monotonic_time ();
+              g_source_set_callback (proc_mounts_watch_source,
+                                     (GSourceFunc) proc_mounts_changed,
                                      NULL, NULL);
-              xsource_attach (proc_mounts_watch_source,
-                               xmain_context_get_thread_default ());
-              xsource_unref (proc_mounts_watch_source);
+              g_source_attach (proc_mounts_watch_source,
+                               g_main_context_get_thread_default ());
+              g_source_unref (proc_mounts_watch_source);
               g_io_channel_unref (proc_mounts_channel);
 
               G_UNLOCK (proc_mounts_source);
@@ -2022,10 +2022,10 @@ mount_monitor_start (void)
         }
       else
         {
-          file = xfile_new_for_path (mtab_path);
-          mtab_monitor = xfile_monitor_file (file, 0, NULL, NULL);
-          xobject_unref (file);
-          xsignal_connect (mtab_monitor, "changed", (xcallback_t)mtab_file_changed, NULL);
+          file = g_file_new_for_path (mtab_path);
+          mtab_monitor = g_file_monitor_file (file, 0, NULL, NULL);
+          g_object_unref (file);
+          g_signal_connect (mtab_monitor, "changed", (GCallback)mtab_file_changed, NULL);
         }
     }
   else
@@ -2034,76 +2034,76 @@ mount_monitor_start (void)
 
       proc_mounts_watch_source = g_timeout_source_new_seconds (3);
       mount_poller_mounts = _g_get_unix_mounts ();
-      mount_poller_time = (xuint64_t)g_get_monotonic_time ();
-      xsource_set_callback (proc_mounts_watch_source,
+      mount_poller_time = (guint64)g_get_monotonic_time ();
+      g_source_set_callback (proc_mounts_watch_source,
                              mount_change_poller,
                              NULL, NULL);
-      xsource_attach (proc_mounts_watch_source,
-                       xmain_context_get_thread_default ());
-      xsource_unref (proc_mounts_watch_source);
+      g_source_attach (proc_mounts_watch_source,
+                       g_main_context_get_thread_default ());
+      g_source_unref (proc_mounts_watch_source);
 
       G_UNLOCK (proc_mounts_source);
     }
 }
 
 static void
-xunix_mount_monitor_finalize (xobject_t *object)
+g_unix_mount_monitor_finalize (GObject *object)
 {
-  xunix_mount_monitor_t *monitor;
+  GUnixMountMonitor *monitor;
 
   monitor = G_UNIX_MOUNT_MONITOR (object);
 
-  xcontext_specific_group_remove (&mount_monitor_group, monitor->context, monitor, mount_monitor_stop);
+  g_context_specific_group_remove (&mount_monitor_group, monitor->context, monitor, mount_monitor_stop);
 
-  XOBJECT_CLASS (xunix_mount_monitor_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_unix_mount_monitor_parent_class)->finalize (object);
 }
 
 static void
-xunix_mount_monitor_class_init (xunix_mount_monitor_class_t *klass)
+g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->finalize = xunix_mount_monitor_finalize;
-
+  gobject_class->finalize = g_unix_mount_monitor_finalize;
+ 
   /**
-   * xunix_mount_monitor_t::mounts-changed:
+   * GUnixMountMonitor::mounts-changed:
    * @monitor: the object on which the signal is emitted
-   *
+   * 
    * Emitted when the unix mounts have changed.
-   */
+   */ 
   signals[MOUNTS_CHANGED] =
-    xsignal_new (I_("mounts-changed"),
-		  XTYPE_FROM_CLASS (klass),
+    g_signal_new (I_("mounts-changed"),
+		  G_TYPE_FROM_CLASS (klass),
 		  G_SIGNAL_RUN_LAST,
 		  0,
 		  NULL, NULL,
 		  NULL,
-		  XTYPE_NONE, 0);
+		  G_TYPE_NONE, 0);
 
   /**
-   * xunix_mount_monitor_t::mountpoints-changed:
+   * GUnixMountMonitor::mountpoints-changed:
    * @monitor: the object on which the signal is emitted
-   *
+   * 
    * Emitted when the unix mount points have changed.
    */
   signals[MOUNTPOINTS_CHANGED] =
-    xsignal_new (I_("mountpoints-changed"),
-		  XTYPE_FROM_CLASS (klass),
+    g_signal_new (I_("mountpoints-changed"),
+		  G_TYPE_FROM_CLASS (klass),
 		  G_SIGNAL_RUN_LAST,
 		  0,
 		  NULL, NULL,
 		  NULL,
-		  XTYPE_NONE, 0);
+		  G_TYPE_NONE, 0);
 }
 
 static void
-xunix_mount_monitor_init (xunix_mount_monitor_t *monitor)
+g_unix_mount_monitor_init (GUnixMountMonitor *monitor)
 {
 }
 
 /**
- * xunix_mount_monitor_set_rate_limit:
- * @mount_monitor: a #xunix_mount_monitor_t
+ * g_unix_mount_monitor_set_rate_limit:
+ * @mount_monitor: a #GUnixMountMonitor
  * @limit_msec: a integer with the limit in milliseconds to
  *     poll for changes.
  *
@@ -2120,60 +2120,60 @@ xunix_mount_monitor_init (xunix_mount_monitor_t *monitor)
  * Deprecated:2.44:This function does nothing.  Don't call it.
  */
 void
-xunix_mount_monitor_set_rate_limit (xunix_mount_monitor_t *mount_monitor,
-                                     xint_t               limit_msec)
+g_unix_mount_monitor_set_rate_limit (GUnixMountMonitor *mount_monitor,
+                                     gint               limit_msec)
 {
 }
 
 /**
- * xunix_mount_monitor_get:
+ * g_unix_mount_monitor_get:
  *
- * Gets the #xunix_mount_monitor_t for the current thread-default main
+ * Gets the #GUnixMountMonitor for the current thread-default main
  * context.
  *
  * The mount monitor can be used to monitor for changes to the list of
  * mounted filesystems as well as the list of mount points (ie: fstab
  * entries).
  *
- * You must only call xobject_unref() on the return value from under
+ * You must only call g_object_unref() on the return value from under
  * the same main context as you called this function.
  *
- * Returns: (transfer full): the #xunix_mount_monitor_t.
+ * Returns: (transfer full): the #GUnixMountMonitor.
  *
  * Since: 2.44
  **/
-xunix_mount_monitor_t *
-xunix_mount_monitor_get (void)
+GUnixMountMonitor *
+g_unix_mount_monitor_get (void)
 {
-  return xcontext_specific_group_get (&mount_monitor_group,
-                                       XTYPE_UNIX_MOUNT_MONITOR,
-                                       G_STRUCT_OFFSET(xunix_mount_monitor_t, context),
+  return g_context_specific_group_get (&mount_monitor_group,
+                                       G_TYPE_UNIX_MOUNT_MONITOR,
+                                       G_STRUCT_OFFSET(GUnixMountMonitor, context),
                                        mount_monitor_start);
 }
 
 /**
- * xunix_mount_monitor_new:
+ * g_unix_mount_monitor_new:
  *
- * Deprecated alias for xunix_mount_monitor_get().
+ * Deprecated alias for g_unix_mount_monitor_get().
  *
  * This function was never a true constructor, which is why it was
  * renamed.
  *
- * Returns: a #xunix_mount_monitor_t.
+ * Returns: a #GUnixMountMonitor.
  *
- * Deprecated:2.44:Use xunix_mount_monitor_get() instead.
+ * Deprecated:2.44:Use g_unix_mount_monitor_get() instead.
  */
-xunix_mount_monitor_t *
-xunix_mount_monitor_new (void)
+GUnixMountMonitor *
+g_unix_mount_monitor_new (void)
 {
-  return xunix_mount_monitor_get ();
+  return g_unix_mount_monitor_get ();
 }
 
 /* GUnixMount {{{1 */
 /**
  * g_unix_mount_free:
  * @mount_entry: a #GUnixMountEntry.
- *
+ * 
  * Frees a unix mount.
  */
 void
@@ -2204,14 +2204,14 @@ g_unix_mount_copy (GUnixMountEntry *mount_entry)
 {
   GUnixMountEntry *copy;
 
-  xreturn_val_if_fail (mount_entry != NULL, NULL);
+  g_return_val_if_fail (mount_entry != NULL, NULL);
 
   copy = g_new0 (GUnixMountEntry, 1);
-  copy->mount_path = xstrdup (mount_entry->mount_path);
-  copy->device_path = xstrdup (mount_entry->device_path);
-  copy->root_path = xstrdup (mount_entry->root_path);
-  copy->filesystem_type = xstrdup (mount_entry->filesystem_type);
-  copy->options = xstrdup (mount_entry->options);
+  copy->mount_path = g_strdup (mount_entry->mount_path);
+  copy->device_path = g_strdup (mount_entry->device_path);
+  copy->root_path = g_strdup (mount_entry->root_path);
+  copy->filesystem_type = g_strdup (mount_entry->filesystem_type);
+  copy->options = g_strdup (mount_entry->options);
   copy->is_read_only = mount_entry->is_read_only;
   copy->is_system_internal = mount_entry->is_system_internal;
 
@@ -2221,7 +2221,7 @@ g_unix_mount_copy (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_point_free:
  * @mount_point: unix mount point to free.
- *
+ * 
  * Frees a unix mount point.
  */
 void
@@ -2251,13 +2251,13 @@ g_unix_mount_point_copy (GUnixMountPoint *mount_point)
 {
   GUnixMountPoint *copy;
 
-  xreturn_val_if_fail (mount_point != NULL, NULL);
+  g_return_val_if_fail (mount_point != NULL, NULL);
 
   copy = g_new0 (GUnixMountPoint, 1);
-  copy->mount_path = xstrdup (mount_point->mount_path);
-  copy->device_path = xstrdup (mount_point->device_path);
-  copy->filesystem_type = xstrdup (mount_point->filesystem_type);
-  copy->options = xstrdup (mount_point->options);
+  copy->mount_path = g_strdup (mount_point->mount_path);
+  copy->device_path = g_strdup (mount_point->device_path);
+  copy->filesystem_type = g_strdup (mount_point->filesystem_type);
+  copy->options = g_strdup (mount_point->options);
   copy->is_read_only = mount_point->is_read_only;
   copy->is_user_mountable = mount_point->is_user_mountable;
   copy->is_loopback = mount_point->is_loopback;
@@ -2269,59 +2269,59 @@ g_unix_mount_point_copy (GUnixMountPoint *mount_point)
  * g_unix_mount_compare:
  * @mount1: first #GUnixMountEntry to compare.
  * @mount2: second #GUnixMountEntry to compare.
- *
+ * 
  * Compares two unix mounts.
- *
+ * 
  * Returns: 1, 0 or -1 if @mount1 is greater than, equal to,
- * or less than @mount2, respectively.
+ * or less than @mount2, respectively. 
  */
-xint_t
+gint
 g_unix_mount_compare (GUnixMountEntry *mount1,
 		      GUnixMountEntry *mount2)
 {
   int res;
 
-  xreturn_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
-
-  res = xstrcmp0 (mount1->mount_path, mount2->mount_path);
+  g_return_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
+  
+  res = g_strcmp0 (mount1->mount_path, mount2->mount_path);
+  if (res != 0)
+    return res;
+	
+  res = g_strcmp0 (mount1->device_path, mount2->device_path);
   if (res != 0)
     return res;
 
-  res = xstrcmp0 (mount1->device_path, mount2->device_path);
+  res = g_strcmp0 (mount1->root_path, mount2->root_path);
   if (res != 0)
     return res;
 
-  res = xstrcmp0 (mount1->root_path, mount2->root_path);
+  res = g_strcmp0 (mount1->filesystem_type, mount2->filesystem_type);
   if (res != 0)
     return res;
 
-  res = xstrcmp0 (mount1->filesystem_type, mount2->filesystem_type);
-  if (res != 0)
-    return res;
-
-  res = xstrcmp0 (mount1->options, mount2->options);
+  res = g_strcmp0 (mount1->options, mount2->options);
   if (res != 0)
     return res;
 
   res =  mount1->is_read_only - mount2->is_read_only;
   if (res != 0)
     return res;
-
+  
   return 0;
 }
 
 /**
  * g_unix_mount_get_mount_path:
  * @mount_entry: input #GUnixMountEntry to get the mount path for.
- *
+ * 
  * Gets the mount path for a unix mount.
- *
+ * 
  * Returns: (type filename): the mount path for @mount_entry.
  */
-const xchar_t *
+const gchar *
 g_unix_mount_get_mount_path (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, NULL);
+  g_return_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->mount_path;
 }
@@ -2329,15 +2329,15 @@ g_unix_mount_get_mount_path (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_get_device_path:
  * @mount_entry: a #GUnixMount.
- *
+ * 
  * Gets the device path for a unix mount.
- *
+ * 
  * Returns: (type filename): a string containing the device path.
  */
-const xchar_t *
+const gchar *
 g_unix_mount_get_device_path (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, NULL);
+  g_return_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->device_path;
 }
@@ -2345,10 +2345,10 @@ g_unix_mount_get_device_path (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_get_root_path:
  * @mount_entry: a #GUnixMountEntry.
- *
+ * 
  * Gets the root of the mount within the filesystem. This is useful e.g. for
  * mounts created by bind operation, or btrfs subvolumes.
- *
+ * 
  * For example, the root path is equal to "/" for mount created by
  * "mount /dev/sda1 /mnt/foo" and "/bar" for
  * "mount --bind /mnt/foo/bar /mnt/bar".
@@ -2357,10 +2357,10 @@ g_unix_mount_get_device_path (GUnixMountEntry *mount_entry)
  *
  * Since: 2.60
  */
-const xchar_t *
+const gchar *
 g_unix_mount_get_root_path (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, NULL);
+  g_return_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->root_path;
 }
@@ -2368,15 +2368,15 @@ g_unix_mount_get_root_path (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_get_fs_type:
  * @mount_entry: a #GUnixMount.
- *
+ * 
  * Gets the filesystem type for the unix mount.
- *
+ * 
  * Returns: a string containing the file system type.
  */
-const xchar_t *
+const gchar *
 g_unix_mount_get_fs_type (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, NULL);
+  g_return_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->filesystem_type;
 }
@@ -2384,22 +2384,22 @@ g_unix_mount_get_fs_type (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_get_options:
  * @mount_entry: a #GUnixMountEntry.
- *
+ * 
  * Gets a comma-separated list of mount options for the unix mount. For example,
  * `rw,relatime,seclabel,data=ordered`.
- *
+ * 
  * This is similar to g_unix_mount_point_get_options(), but it takes
  * a #GUnixMountEntry as an argument.
- *
+ * 
  * Returns: (nullable): a string containing the options, or %NULL if not
  * available.
- *
+ * 
  * Since: 2.58
  */
-const xchar_t *
+const gchar *
 g_unix_mount_get_options (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, NULL);
+  g_return_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->options;
 }
@@ -2407,15 +2407,15 @@ g_unix_mount_get_options (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_is_readonly:
  * @mount_entry: a #GUnixMount.
- *
+ * 
  * Checks if a unix mount is mounted read only.
- *
+ * 
  * Returns: %TRUE if @mount_entry is read only.
  */
-xboolean_t
+gboolean
 g_unix_mount_is_readonly (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, FALSE);
+  g_return_val_if_fail (mount_entry != NULL, FALSE);
 
   return mount_entry->is_read_only;
 }
@@ -2427,16 +2427,16 @@ g_unix_mount_is_readonly (GUnixMountEntry *mount_entry)
  * Checks if a Unix mount is a system mount. This is the Boolean OR of
  * g_unix_is_system_fs_type(), g_unix_is_system_device_path() and
  * g_unix_is_mount_path_system_internal() on @mount_entry’s properties.
- *
+ * 
  * The definition of what a ‘system’ mount entry is may change over time as new
  * file system types and device paths are ignored.
  *
  * Returns: %TRUE if the unix mount is for a system path.
  */
-xboolean_t
+gboolean
 g_unix_mount_is_system_internal (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, FALSE);
+  g_return_val_if_fail (mount_entry != NULL, FALSE);
 
   return mount_entry->is_system_internal;
 }
@@ -2446,63 +2446,63 @@ g_unix_mount_is_system_internal (GUnixMountEntry *mount_entry)
  * g_unix_mount_point_compare:
  * @mount1: a #GUnixMount.
  * @mount2: a #GUnixMount.
- *
+ * 
  * Compares two unix mount points.
- *
+ * 
  * Returns: 1, 0 or -1 if @mount1 is greater than, equal to,
  * or less than @mount2, respectively.
  */
-xint_t
+gint
 g_unix_mount_point_compare (GUnixMountPoint *mount1,
 			    GUnixMountPoint *mount2)
 {
   int res;
 
-  xreturn_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
+  g_return_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
 
-  res = xstrcmp0 (mount1->mount_path, mount2->mount_path);
-  if (res != 0)
+  res = g_strcmp0 (mount1->mount_path, mount2->mount_path);
+  if (res != 0) 
+    return res;
+	
+  res = g_strcmp0 (mount1->device_path, mount2->device_path);
+  if (res != 0) 
+    return res;
+	
+  res = g_strcmp0 (mount1->filesystem_type, mount2->filesystem_type);
+  if (res != 0) 
     return res;
 
-  res = xstrcmp0 (mount1->device_path, mount2->device_path);
-  if (res != 0)
-    return res;
-
-  res = xstrcmp0 (mount1->filesystem_type, mount2->filesystem_type);
-  if (res != 0)
-    return res;
-
-  res = xstrcmp0 (mount1->options, mount2->options);
-  if (res != 0)
+  res = g_strcmp0 (mount1->options, mount2->options);
+  if (res != 0) 
     return res;
 
   res =  mount1->is_read_only - mount2->is_read_only;
-  if (res != 0)
+  if (res != 0) 
     return res;
 
   res = mount1->is_user_mountable - mount2->is_user_mountable;
-  if (res != 0)
+  if (res != 0) 
     return res;
 
   res = mount1->is_loopback - mount2->is_loopback;
   if (res != 0)
     return res;
-
+  
   return 0;
 }
 
 /**
  * g_unix_mount_point_get_mount_path:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Gets the mount path for a unix mount point.
- *
+ * 
  * Returns: (type filename): a string containing the mount path.
  */
-const xchar_t *
+const gchar *
 g_unix_mount_point_get_mount_path (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, NULL);
+  g_return_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->mount_path;
 }
@@ -2510,15 +2510,15 @@ g_unix_mount_point_get_mount_path (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_get_device_path:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Gets the device path for a unix mount point.
- *
+ * 
  * Returns: (type filename): a string containing the device path.
  */
-const xchar_t *
+const gchar *
 g_unix_mount_point_get_device_path (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, NULL);
+  g_return_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->device_path;
 }
@@ -2526,15 +2526,15 @@ g_unix_mount_point_get_device_path (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_get_fs_type:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Gets the file system type for the mount point.
- *
+ * 
  * Returns: a string containing the file system type.
  */
-const xchar_t *
+const gchar *
 g_unix_mount_point_get_fs_type (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, NULL);
+  g_return_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->filesystem_type;
 }
@@ -2542,17 +2542,17 @@ g_unix_mount_point_get_fs_type (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_get_options:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Gets the options for the mount point.
- *
+ * 
  * Returns: (nullable): a string containing the options.
  *
  * Since: 2.32
  */
-const xchar_t *
+const gchar *
 g_unix_mount_point_get_options (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, NULL);
+  g_return_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->options;
 }
@@ -2560,15 +2560,15 @@ g_unix_mount_point_get_options (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_is_readonly:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Checks if a unix mount point is read only.
- *
+ * 
  * Returns: %TRUE if a mount point is read only.
  */
-xboolean_t
+gboolean
 g_unix_mount_point_is_readonly (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, FALSE);
+  g_return_val_if_fail (mount_point != NULL, FALSE);
 
   return mount_point->is_read_only;
 }
@@ -2576,15 +2576,15 @@ g_unix_mount_point_is_readonly (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_is_user_mountable:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Checks if a unix mount point is mountable by the user.
- *
+ * 
  * Returns: %TRUE if the mount point is user mountable.
  */
-xboolean_t
+gboolean
 g_unix_mount_point_is_user_mountable (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, FALSE);
+  g_return_val_if_fail (mount_point != NULL, FALSE);
 
   return mount_point->is_user_mountable;
 }
@@ -2592,15 +2592,15 @@ g_unix_mount_point_is_user_mountable (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_is_loopback:
  * @mount_point: a #GUnixMountPoint.
- *
+ * 
  * Checks if a unix mount point is a loopback device.
- *
- * Returns: %TRUE if the mount point is a loopback. %FALSE otherwise.
+ * 
+ * Returns: %TRUE if the mount point is a loopback. %FALSE otherwise. 
  */
-xboolean_t
+gboolean
 g_unix_mount_point_is_loopback (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, FALSE);
+  g_return_val_if_fail (mount_point != NULL, FALSE);
 
   return mount_point->is_loopback;
 }
@@ -2614,7 +2614,7 @@ guess_mount_type (const char *mount_path,
   char *basename;
 
   type = G_UNIX_MOUNT_TYPE_UNKNOWN;
-
+  
   if ((strcmp (filesystem_type, "udf") == 0) ||
       (strcmp (filesystem_type, "iso9660") == 0) ||
       (strcmp (filesystem_type, "cd9660") == 0))
@@ -2622,85 +2622,85 @@ guess_mount_type (const char *mount_path,
   else if ((strcmp (filesystem_type, "nfs") == 0) ||
            (strcmp (filesystem_type, "nfs4") == 0))
     type = G_UNIX_MOUNT_TYPE_NFS;
-  else if (xstr_has_prefix (device_path, "/vol/dev/diskette/") ||
-	   xstr_has_prefix (device_path, "/dev/fd") ||
-	   xstr_has_prefix (device_path, "/dev/floppy"))
+  else if (g_str_has_prefix (device_path, "/vol/dev/diskette/") ||
+	   g_str_has_prefix (device_path, "/dev/fd") ||
+	   g_str_has_prefix (device_path, "/dev/floppy"))
     type = G_UNIX_MOUNT_TYPE_FLOPPY;
-  else if (xstr_has_prefix (device_path, "/dev/cdrom") ||
-	   xstr_has_prefix (device_path, "/dev/acd") ||
-	   xstr_has_prefix (device_path, "/dev/cd"))
+  else if (g_str_has_prefix (device_path, "/dev/cdrom") ||
+	   g_str_has_prefix (device_path, "/dev/acd") ||
+	   g_str_has_prefix (device_path, "/dev/cd"))
     type = G_UNIX_MOUNT_TYPE_CDROM;
-  else if (xstr_has_prefix (device_path, "/vol/"))
+  else if (g_str_has_prefix (device_path, "/vol/"))
     {
       const char *name = mount_path + strlen ("/");
-
-      if (xstr_has_prefix (name, "cdrom"))
+      
+      if (g_str_has_prefix (name, "cdrom"))
 	type = G_UNIX_MOUNT_TYPE_CDROM;
-      else if (xstr_has_prefix (name, "floppy") ||
-	       xstr_has_prefix (device_path, "/vol/dev/diskette/"))
+      else if (g_str_has_prefix (name, "floppy") ||
+	       g_str_has_prefix (device_path, "/vol/dev/diskette/")) 
 	type = G_UNIX_MOUNT_TYPE_FLOPPY;
-      else if (xstr_has_prefix (name, "rmdisk"))
+      else if (g_str_has_prefix (name, "rmdisk")) 
 	type = G_UNIX_MOUNT_TYPE_ZIP;
-      else if (xstr_has_prefix (name, "jaz"))
+      else if (g_str_has_prefix (name, "jaz"))
 	type = G_UNIX_MOUNT_TYPE_JAZ;
-      else if (xstr_has_prefix (name, "memstick"))
+      else if (g_str_has_prefix (name, "memstick"))
 	type = G_UNIX_MOUNT_TYPE_MEMSTICK;
     }
   else
     {
       basename = g_path_get_basename (mount_path);
-
-      if (xstr_has_prefix (basename, "cdr") ||
-	  xstr_has_prefix (basename, "cdwriter") ||
-	  xstr_has_prefix (basename, "burn") ||
-	  xstr_has_prefix (basename, "dvdr"))
+      
+      if (g_str_has_prefix (basename, "cdr") ||
+	  g_str_has_prefix (basename, "cdwriter") ||
+	  g_str_has_prefix (basename, "burn") ||
+	  g_str_has_prefix (basename, "dvdr"))
 	type = G_UNIX_MOUNT_TYPE_CDROM;
-      else if (xstr_has_prefix (basename, "floppy"))
+      else if (g_str_has_prefix (basename, "floppy"))
 	type = G_UNIX_MOUNT_TYPE_FLOPPY;
-      else if (xstr_has_prefix (basename, "zip"))
+      else if (g_str_has_prefix (basename, "zip"))
 	type = G_UNIX_MOUNT_TYPE_ZIP;
-      else if (xstr_has_prefix (basename, "jaz"))
+      else if (g_str_has_prefix (basename, "jaz"))
 	type = G_UNIX_MOUNT_TYPE_JAZ;
-      else if (xstr_has_prefix (basename, "camera"))
+      else if (g_str_has_prefix (basename, "camera"))
 	type = G_UNIX_MOUNT_TYPE_CAMERA;
-      else if (xstr_has_prefix (basename, "memstick") ||
-	       xstr_has_prefix (basename, "memory_stick") ||
-	       xstr_has_prefix (basename, "ram"))
+      else if (g_str_has_prefix (basename, "memstick") ||
+	       g_str_has_prefix (basename, "memory_stick") ||
+	       g_str_has_prefix (basename, "ram"))
 	type = G_UNIX_MOUNT_TYPE_MEMSTICK;
-      else if (xstr_has_prefix (basename, "compact_flash"))
+      else if (g_str_has_prefix (basename, "compact_flash"))
 	type = G_UNIX_MOUNT_TYPE_CF;
-      else if (xstr_has_prefix (basename, "smart_media"))
+      else if (g_str_has_prefix (basename, "smart_media"))
 	type = G_UNIX_MOUNT_TYPE_SM;
-      else if (xstr_has_prefix (basename, "sd_mmc"))
+      else if (g_str_has_prefix (basename, "sd_mmc"))
 	type = G_UNIX_MOUNT_TYPE_SDMMC;
-      else if (xstr_has_prefix (basename, "ipod"))
+      else if (g_str_has_prefix (basename, "ipod"))
 	type = G_UNIX_MOUNT_TYPE_IPOD;
-
+      
       g_free (basename);
     }
-
+  
   if (type == G_UNIX_MOUNT_TYPE_UNKNOWN)
     type = G_UNIX_MOUNT_TYPE_HD;
-
+  
   return type;
 }
 
 /**
  * g_unix_mount_guess_type:
  * @mount_entry: a #GUnixMount.
- *
- * Guesses the type of a unix mount. If the mount type cannot be
+ * 
+ * Guesses the type of a unix mount. If the mount type cannot be 
  * determined, returns %G_UNIX_MOUNT_TYPE_UNKNOWN.
- *
- * Returns: a #GUnixMountType.
+ * 
+ * Returns: a #GUnixMountType. 
  */
 static GUnixMountType
 g_unix_mount_guess_type (GUnixMountEntry *mount_entry)
 {
-  xreturn_val_if_fail (mount_entry != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  xreturn_val_if_fail (mount_entry->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  xreturn_val_if_fail (mount_entry->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  xreturn_val_if_fail (mount_entry->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_entry != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_entry->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_entry->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_entry->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
 
   return guess_mount_type (mount_entry->mount_path,
 			   mount_entry->device_path,
@@ -2710,20 +2710,20 @@ g_unix_mount_guess_type (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_point_guess_type:
  * @mount_point: a #GUnixMountPoint.
- *
- * Guesses the type of a unix mount point.
- * If the mount type cannot be determined,
+ * 
+ * Guesses the type of a unix mount point. 
+ * If the mount type cannot be determined, 
  * returns %G_UNIX_MOUNT_TYPE_UNKNOWN.
- *
+ * 
  * Returns: a #GUnixMountType.
  */
 static GUnixMountType
 g_unix_mount_point_guess_type (GUnixMountPoint *mount_point)
 {
-  xreturn_val_if_fail (mount_point != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  xreturn_val_if_fail (mount_point->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  xreturn_val_if_fail (mount_point->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  xreturn_val_if_fail (mount_point->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_point != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_point->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_point->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  g_return_val_if_fail (mount_point->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
 
   return guess_mount_type (mount_point->mount_path,
 			   mount_point->device_path,
@@ -2731,10 +2731,10 @@ g_unix_mount_point_guess_type (GUnixMountPoint *mount_point)
 }
 
 static const char *
-type_to_icon (GUnixMountType type, xboolean_t is_mount_point, xboolean_t use_symbolic)
+type_to_icon (GUnixMountType type, gboolean is_mount_point, gboolean use_symbolic)
 {
   const char *icon_name;
-
+  
   switch (type)
     {
     case G_UNIX_MOUNT_TYPE_HD:
@@ -2793,22 +2793,22 @@ type_to_icon (GUnixMountType type, xboolean_t is_mount_point, xboolean_t use_sym
 /**
  * g_unix_mount_guess_name:
  * @mount_entry: a #GUnixMountEntry
- *
- * Guesses the name of a Unix mount.
+ * 
+ * Guesses the name of a Unix mount. 
  * The result is a translated string.
  *
  * Returns: A newly allocated string that must
  *     be freed with g_free()
  */
-xchar_t *
+gchar *
 g_unix_mount_guess_name (GUnixMountEntry *mount_entry)
 {
   char *name;
 
   if (strcmp (mount_entry->mount_path, "/") == 0)
-    name = xstrdup (_("Filesystem root"));
+    name = g_strdup (_("Filesystem root"));
   else
-    name = xfilename_display_basename (mount_entry->mount_path);
+    name = g_filename_display_basename (mount_entry->mount_path);
 
   return name;
 }
@@ -2816,12 +2816,12 @@ g_unix_mount_guess_name (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_guess_icon:
  * @mount_entry: a #GUnixMountEntry
+ * 
+ * Guesses the icon of a Unix mount. 
  *
- * Guesses the icon of a Unix mount.
- *
- * Returns: (transfer full): a #xicon_t
+ * Returns: (transfer full): a #GIcon
  */
-xicon_t *
+GIcon *
 g_unix_mount_guess_icon (GUnixMountEntry *mount_entry)
 {
   return g_themed_icon_new_with_default_fallbacks (type_to_icon (g_unix_mount_guess_type (mount_entry), FALSE, FALSE));
@@ -2833,11 +2833,11 @@ g_unix_mount_guess_icon (GUnixMountEntry *mount_entry)
  *
  * Guesses the symbolic icon of a Unix mount.
  *
- * Returns: (transfer full): a #xicon_t
+ * Returns: (transfer full): a #GIcon
  *
  * Since: 2.34
  */
-xicon_t *
+GIcon *
 g_unix_mount_guess_symbolic_icon (GUnixMountEntry *mount_entry)
 {
   return g_themed_icon_new_with_default_fallbacks (type_to_icon (g_unix_mount_guess_type (mount_entry), FALSE, TRUE));
@@ -2846,22 +2846,22 @@ g_unix_mount_guess_symbolic_icon (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_point_guess_name:
  * @mount_point: a #GUnixMountPoint
- *
- * Guesses the name of a Unix mount point.
+ * 
+ * Guesses the name of a Unix mount point. 
  * The result is a translated string.
  *
- * Returns: A newly allocated string that must
+ * Returns: A newly allocated string that must 
  *     be freed with g_free()
  */
-xchar_t *
+gchar *
 g_unix_mount_point_guess_name (GUnixMountPoint *mount_point)
 {
   char *name;
 
   if (strcmp (mount_point->mount_path, "/") == 0)
-    name = xstrdup (_("Filesystem root"));
+    name = g_strdup (_("Filesystem root"));
   else
-    name = xfilename_display_basename (mount_point->mount_path);
+    name = g_filename_display_basename (mount_point->mount_path);
 
   return name;
 }
@@ -2869,12 +2869,12 @@ g_unix_mount_point_guess_name (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_point_guess_icon:
  * @mount_point: a #GUnixMountPoint
+ * 
+ * Guesses the icon of a Unix mount point. 
  *
- * Guesses the icon of a Unix mount point.
- *
- * Returns: (transfer full): a #xicon_t
+ * Returns: (transfer full): a #GIcon
  */
-xicon_t *
+GIcon *
 g_unix_mount_point_guess_icon (GUnixMountPoint *mount_point)
 {
   return g_themed_icon_new_with_default_fallbacks (type_to_icon (g_unix_mount_point_guess_type (mount_point), TRUE, FALSE));
@@ -2886,11 +2886,11 @@ g_unix_mount_point_guess_icon (GUnixMountPoint *mount_point)
  *
  * Guesses the symbolic icon of a Unix mount point.
  *
- * Returns: (transfer full): a #xicon_t
+ * Returns: (transfer full): a #GIcon
  *
  * Since: 2.34
  */
-xicon_t *
+GIcon *
 g_unix_mount_point_guess_symbolic_icon (GUnixMountPoint *mount_point)
 {
   return g_themed_icon_new_with_default_fallbacks (type_to_icon (g_unix_mount_point_guess_type (mount_point), TRUE, TRUE));
@@ -2899,12 +2899,12 @@ g_unix_mount_point_guess_symbolic_icon (GUnixMountPoint *mount_point)
 /**
  * g_unix_mount_guess_can_eject:
  * @mount_entry: a #GUnixMountEntry
- *
+ * 
  * Guesses whether a Unix mount can be ejected.
  *
  * Returns: %TRUE if @mount_entry is deemed to be ejectable.
  */
-xboolean_t
+gboolean
 g_unix_mount_guess_can_eject (GUnixMountEntry *mount_entry)
 {
   GUnixMountType guessed_type;
@@ -2920,32 +2920,32 @@ g_unix_mount_guess_can_eject (GUnixMountEntry *mount_entry)
 /**
  * g_unix_mount_guess_should_display:
  * @mount_entry: a #GUnixMountEntry
- *
+ * 
  * Guesses whether a Unix mount should be displayed in the UI.
  *
  * Returns: %TRUE if @mount_entry is deemed to be displayable.
  */
-xboolean_t
+gboolean
 g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
 {
   const char *mount_path;
-  const xchar_t *user_name;
-  xsize_t user_name_len;
+  const gchar *user_name;
+  gsize user_name_len;
 
   /* Never display internal mountpoints */
   if (g_unix_mount_is_system_internal (mount_entry))
     return FALSE;
-
+  
   /* Only display things in /media (which are generally user mountable)
      and home dir (fuse stuff) and /run/media/$USER */
   mount_path = mount_entry->mount_path;
   if (mount_path != NULL)
     {
-      const xboolean_t running_as_root = (getuid () == 0);
-      xboolean_t is_in_runtime_dir = FALSE;
+      const gboolean running_as_root = (getuid () == 0);
+      gboolean is_in_runtime_dir = FALSE;
 
       /* Hide mounts within a dot path, suppose it was a purpose to hide this mount */
-      if (xstrstr_len (mount_path, -1, "/.") != NULL)
+      if (g_strstr_len (mount_path, -1, "/.") != NULL)
         return FALSE;
 
       /* Check /run/media/$USER/. If running as root, display any mounts below
@@ -2965,7 +2965,7 @@ g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
             is_in_runtime_dir = TRUE;
         }
 
-      if (is_in_runtime_dir || xstr_has_prefix (mount_path, "/media/"))
+      if (is_in_runtime_dir || g_str_has_prefix (mount_path, "/media/"))
         {
           char *path;
           /* Avoid displaying mounts that are not accessible to the user.
@@ -2975,9 +2975,9 @@ g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
            * block or fail stat()'ing, such as network mounts.
            */
           path = g_path_get_dirname (mount_path);
-          if (xstr_has_prefix (path, "/media/"))
+          if (g_str_has_prefix (path, "/media/"))
             {
-              if (g_access (path, R_OK|X_OK) != 0)
+              if (g_access (path, R_OK|X_OK) != 0) 
                 {
                   g_free (path);
                   return FALSE;
@@ -2995,24 +2995,24 @@ g_unix_mount_guess_should_display (GUnixMountEntry *mount_entry)
            }
           return TRUE;
         }
-
-      if (xstr_has_prefix (mount_path, g_get_home_dir ()) &&
+      
+      if (g_str_has_prefix (mount_path, g_get_home_dir ()) && 
           mount_path[strlen (g_get_home_dir())] == G_DIR_SEPARATOR)
         return TRUE;
     }
-
+  
   return FALSE;
 }
 
 /**
  * g_unix_mount_point_guess_can_eject:
  * @mount_point: a #GUnixMountPoint
- *
+ * 
  * Guesses whether a Unix mount point can be ejected.
  *
  * Returns: %TRUE if @mount_point is deemed to be ejectable.
  */
-xboolean_t
+gboolean
 g_unix_mount_point_guess_can_eject (GUnixMountPoint *mount_point)
 {
   GUnixMountType guessed_type;
@@ -3030,21 +3030,21 @@ g_unix_mount_point_guess_can_eject (GUnixMountPoint *mount_point)
 #ifdef HAVE_MNTENT_H
 /* borrowed from gtk/gtkfilesystemunix.c in GTK+ on 02/23/2006 */
 static void
-_canonicalize_filename (xchar_t *filename)
+_canonicalize_filename (gchar *filename)
 {
-  xchar_t *p, *q;
-  xboolean_t last_was_slash = FALSE;
-
+  gchar *p, *q;
+  gboolean last_was_slash = FALSE;
+  
   p = filename;
   q = filename;
-
+  
   while (*p)
     {
       if (*p == G_DIR_SEPARATOR)
         {
           if (!last_was_slash)
             *q++ = G_DIR_SEPARATOR;
-
+          
           last_was_slash = TRUE;
         }
       else
@@ -3056,7 +3056,7 @@ _canonicalize_filename (xchar_t *filename)
                 {
                   if (*(p + 1) == '\0')
                     break;
-
+                  
                   p += 1;
                 }
               else if (*(p + 1) == '.' &&
@@ -3070,10 +3070,10 @@ _canonicalize_filename (xchar_t *filename)
                              *(q - 1) != G_DIR_SEPARATOR)
                         q--;
                     }
-
+                  
                   if (*(p + 2) == '\0')
                     break;
-
+                  
                   p += 2;
                 }
               else
@@ -3088,46 +3088,46 @@ _canonicalize_filename (xchar_t *filename)
               last_was_slash = FALSE;
             }
         }
-
+      
       p++;
     }
-
+  
   if (q > filename + 1 && *(q - 1) == G_DIR_SEPARATOR)
     q--;
-
+  
   *q = '\0';
 }
 
 static char *
 _resolve_symlink (const char *file)
 {
-  xerror_t *error;
+  GError *error;
   char *dir;
   char *link;
   char *f;
   char *f1;
-
-  f = xstrdup (file);
-
-  while (xfile_test (f, XFILE_TEST_IS_SYMLINK))
+  
+  f = g_strdup (file);
+  
+  while (g_file_test (f, G_FILE_TEST_IS_SYMLINK)) 
     {
-      link = xfile_read_link (f, &error);
-      if (link == NULL)
+      link = g_file_read_link (f, &error);
+      if (link == NULL) 
         {
-          xerror_free (error);
+          g_error_free (error);
           g_free (f);
           f = NULL;
           goto out;
         }
-
+    
       dir = g_path_get_dirname (f);
-      f1 = xstrdup_printf ("%s/%s", dir, link);
+      f1 = g_strdup_printf ("%s/%s", dir, link);
       g_free (dir);
       g_free (link);
       g_free (f);
       f = f1;
     }
-
+  
  out:
   if (f != NULL)
     _canonicalize_filename (f);
@@ -3137,43 +3137,43 @@ _resolve_symlink (const char *file)
 static const char *
 _resolve_dev_root (void)
 {
-  static xboolean_t have_real_dev_root = FALSE;
+  static gboolean have_real_dev_root = FALSE;
   static char real_dev_root[256];
   struct stat statbuf;
-
+  
   /* see if it's cached already */
   if (have_real_dev_root)
     goto found;
-
+  
   /* otherwise we're going to find it right away.. */
   have_real_dev_root = TRUE;
-
-  if (stat ("/dev/root", &statbuf) == 0)
+  
+  if (stat ("/dev/root", &statbuf) == 0) 
     {
-      if (! S_ISLNK (statbuf.st_mode))
+      if (! S_ISLNK (statbuf.st_mode)) 
         {
           dev_t root_dev = statbuf.st_dev;
           FILE *f;
-
+      
           /* see if device with similar major:minor as /dev/root is mention
-           * in /etc/mtab (it usually is)
+           * in /etc/mtab (it usually is) 
            */
           f = fopen ("/etc/mtab", "r");
-          if (f != NULL)
+          if (f != NULL) 
             {
 	      struct mntent *entp;
-#ifdef HAVE_GETMNTENT_R
+#ifdef HAVE_GETMNTENT_R        
               struct mntent ent;
               char buf[1024];
-              while ((entp = getmntent_r (f, &ent, buf, sizeof (buf))) != NULL)
+              while ((entp = getmntent_r (f, &ent, buf, sizeof (buf))) != NULL) 
                 {
 #else
 	      G_LOCK (getmntent);
-	      while ((entp = getmntent (f)) != NULL)
-                {
-#endif
+	      while ((entp = getmntent (f)) != NULL) 
+                { 
+#endif          
                   if (stat (entp->mnt_fsname, &statbuf) == 0 &&
-                      statbuf.st_dev == root_dev)
+                      statbuf.st_dev == root_dev) 
                     {
                       strncpy (real_dev_root, entp->mnt_fsname, sizeof (real_dev_root) - 1);
                       real_dev_root[sizeof (real_dev_root) - 1] = '\0';
@@ -3187,12 +3187,12 @@ _resolve_dev_root (void)
 #ifndef HAVE_GETMNTENT_R
 	      G_UNLOCK (getmntent);
 #endif
-            }
-
+            }                                        
+      
           /* no, that didn't work.. next we could scan /dev ... but I digress.. */
-
-        }
-       else
+      
+        } 
+       else 
         {
           char *resolved;
           resolved = _resolve_symlink ("/dev/root");
@@ -3205,10 +3205,10 @@ _resolve_dev_root (void)
             }
         }
     }
-
+  
   /* bah sucks.. */
   strcpy (real_dev_root, "/dev/root");
-
+  
 found:
   return real_dev_root;
 }

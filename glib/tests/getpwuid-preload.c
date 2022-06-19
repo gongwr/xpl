@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  *
  * Copyright (C) 2020 Red Hat, Inc.
  *

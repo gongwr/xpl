@@ -1,15 +1,15 @@
-#ifndef __XPLINTL_H__
-#define __XPLINTL_H__
+#ifndef __GLIBINTL_H__
+#define __GLIBINTL_H__
 
 #ifndef SIZEOF_CHAR
 #error "config.h must be included prior to glibintl.h"
 #endif
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t * glib_gettext  (const xchar_t *str) G_GNUC_FORMAT(1);
-XPL_AVAILABLE_IN_ALL
-const xchar_t * glib_pgettext (const xchar_t *msgctxtid,
-                             xsize_t        msgidoffset) G_GNUC_FORMAT(1);
+GLIB_AVAILABLE_IN_ALL
+const gchar * glib_gettext  (const gchar *str) G_GNUC_FORMAT(1);
+GLIB_AVAILABLE_IN_ALL
+const gchar * glib_pgettext (const gchar *msgctxtid,
+                             gsize        msgidoffset) G_GNUC_FORMAT(1);
 
 #ifdef ENABLE_NLS
 
@@ -34,11 +34,11 @@ const xchar_t * glib_pgettext (const xchar_t *msgctxtid,
 #define dgettext(Domain,String) (String)
 #define dcgettext(Domain,String,Type) (String)
 #define dngettext(Domain,String1,String2,N) ((N) == 1 ? (String1) : (String2))
-#define bindtextdomain(Domain,Directory) (Domain)
+#define bindtextdomain(Domain,Directory) (Domain) 
 #define bind_textdomain_codeset(Domain,Codeset)
 #endif
 
 /* not really I18N-related, but also a string marker macro */
 #define I_(string) g_intern_static_string (string)
 
-#endif /* __XPLINTL_H__ */
+#endif /* __GLIBINTL_H__ */

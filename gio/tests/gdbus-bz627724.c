@@ -24,52 +24,52 @@
 
 #include "gdbus-tests.h"
 
-static xdbus_connection_t *the_connection = NULL;
+static GDBusConnection *the_connection = NULL;
 
 #define MY_TYPE_OBJECT   (my_object_get_type ())
-#define MY_OBJECT(o)     (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_OBJECT, xobject_t))
-#define MY_IS_OBJECT(o)  (XTYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_OBJECT))
+#define MY_OBJECT(o)     (G_TYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_OBJECT, MyObject))
+#define MY_IS_OBJECT(o)  (G_TYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_OBJECT))
 
 typedef struct {
-  xobject_t parent_instance;
-} xobject_t;
+  GObject parent_instance;
+} MyObject;
 
 typedef struct {
-  xobject_class_t parent_class;
-} xobject_class_t;
+  GObjectClass parent_class;
+} MyObjectClass;
 
-xtype_t my_object_get_type (void) G_GNUC_CONST;
+GType my_object_get_type (void) G_GNUC_CONST;
 
-XDEFINE_TYPE (xobject_t, my_object, XTYPE_OBJECT)
+G_DEFINE_TYPE (MyObject, my_object, G_TYPE_OBJECT)
 
 static void
-my_object_init (xobject_t *object)
+my_object_init (MyObject *object)
 {
 }
 
 static void
-my_object_class_init (xobject_class_t *klass)
+my_object_class_init (MyObjectClass *klass)
 {
-  xerror_t *error;
+  GError *error;
   error = NULL;
   the_connection = g_bus_get_sync (G_BUS_TYPE_SESSION,
-                                   NULL, /* xcancellable_t* */
+                                   NULL, /* GCancellable* */
                                    &error);
   g_assert_no_error (error);
-  xassert (X_IS_DBUS_CONNECTION (the_connection));
+  g_assert (G_IS_DBUS_CONNECTION (the_connection));
 }
 
 static void
 test_bz627724 (void)
 {
-  xobject_t *object;
+  MyObject *object;
 
   session_bus_up ();
-  xassert (the_connection == NULL);
-  object = xobject_new (MY_TYPE_OBJECT, NULL);
-  xassert (the_connection != NULL);
-  xobject_unref (the_connection);
-  xobject_unref (object);
+  g_assert (the_connection == NULL);
+  object = g_object_new (MY_TYPE_OBJECT, NULL);
+  g_assert (the_connection != NULL);
+  g_object_unref (the_connection);
+  g_object_unref (object);
   session_bus_down ();
 }
 

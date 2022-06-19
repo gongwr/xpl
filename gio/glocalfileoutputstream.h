@@ -25,12 +25,12 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LOCAL_FILE_OUTPUT_STREAM         (_g_local_file_output_stream_get_type ())
-#define G_LOCAL_FILE_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_LOCAL_FILE_OUTPUT_STREAM, GLocalFileOutputStream))
-#define G_LOCAL_FILE_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_LOCAL_FILE_OUTPUT_STREAM, GLocalFileOutputStreamClass))
-#define X_IS_LOCAL_FILE_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_LOCAL_FILE_OUTPUT_STREAM))
-#define X_IS_LOCAL_FILE_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_LOCAL_FILE_OUTPUT_STREAM))
-#define G_LOCAL_FILE_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_LOCAL_FILE_OUTPUT_STREAM, GLocalFileOutputStreamClass))
+#define G_TYPE_LOCAL_FILE_OUTPUT_STREAM         (_g_local_file_output_stream_get_type ())
+#define G_LOCAL_FILE_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_LOCAL_FILE_OUTPUT_STREAM, GLocalFileOutputStream))
+#define G_LOCAL_FILE_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_LOCAL_FILE_OUTPUT_STREAM, GLocalFileOutputStreamClass))
+#define G_IS_LOCAL_FILE_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_LOCAL_FILE_OUTPUT_STREAM))
+#define G_IS_LOCAL_FILE_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_LOCAL_FILE_OUTPUT_STREAM))
+#define G_LOCAL_FILE_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_LOCAL_FILE_OUTPUT_STREAM, GLocalFileOutputStreamClass))
 
 typedef struct _GLocalFileOutputStream         GLocalFileOutputStream;
 typedef struct _GLocalFileOutputStreamClass    GLocalFileOutputStreamClass;
@@ -38,7 +38,7 @@ typedef struct _GLocalFileOutputStreamPrivate  GLocalFileOutputStreamPrivate;
 
 struct _GLocalFileOutputStream
 {
-  xfile_output_stream_t parent_instance;
+  GFileOutputStream parent_instance;
 
   /*< private >*/
   GLocalFileOutputStreamPrivate *priv;
@@ -46,46 +46,46 @@ struct _GLocalFileOutputStream
 
 struct _GLocalFileOutputStreamClass
 {
-  xfile_output_stream_class_t parent_class;
+  GFileOutputStreamClass parent_class;
 };
 
-xtype_t               _g_local_file_output_stream_get_type (void) G_GNUC_CONST;
+GType               _g_local_file_output_stream_get_type (void) G_GNUC_CONST;
 
 void     _g_local_file_output_stream_set_do_close (GLocalFileOutputStream *out,
-						   xboolean_t do_close);
-xboolean_t _g_local_file_output_stream_really_close (GLocalFileOutputStream *out,
-						   xcancellable_t   *cancellable,
-						   xerror_t        **error);
+						   gboolean do_close);
+gboolean _g_local_file_output_stream_really_close (GLocalFileOutputStream *out,
+						   GCancellable   *cancellable,
+						   GError        **error);
 
-xfile_output_stream_t * _g_local_file_output_stream_new      (int               fd);
-xfile_output_stream_t * _g_local_file_output_stream_open     (const char       *filename,
-							  xboolean_t          readable,
-                                                          xcancellable_t     *cancellable,
-                                                          xerror_t          **error);
-xfile_output_stream_t * _g_local_file_output_stream_create   (const char       *filename,
-							  xboolean_t          readable,
-                                                          xfile_create_flags_t  flags,
-                                                          xfile_info_t        *reference_info,
-                                                          xcancellable_t     *cancellable,
-                                                          xerror_t          **error);
-xfile_output_stream_t * _g_local_file_output_stream_append   (const char       *filename,
-                                                          xfile_create_flags_t  flags,
-                                                          xcancellable_t     *cancellable,
-                                                          xerror_t          **error);
-xfile_output_stream_t * _g_local_file_output_stream_replace  (const char       *filename,
-							  xboolean_t          readable,
+GFileOutputStream * _g_local_file_output_stream_new      (int               fd);
+GFileOutputStream * _g_local_file_output_stream_open     (const char       *filename,
+							  gboolean          readable,
+                                                          GCancellable     *cancellable,
+                                                          GError          **error);
+GFileOutputStream * _g_local_file_output_stream_create   (const char       *filename,
+							  gboolean          readable,
+                                                          GFileCreateFlags  flags,
+                                                          GFileInfo        *reference_info,
+                                                          GCancellable     *cancellable,
+                                                          GError          **error);
+GFileOutputStream * _g_local_file_output_stream_append   (const char       *filename,
+                                                          GFileCreateFlags  flags,
+                                                          GCancellable     *cancellable,
+                                                          GError          **error);
+GFileOutputStream * _g_local_file_output_stream_replace  (const char       *filename,
+							  gboolean          readable,
                                                           const char       *etag,
-                                                          xboolean_t          create_backup,
-                                                          xfile_create_flags_t  flags,
-                                                          xfile_info_t        *reference_info,
-                                                          xcancellable_t     *cancellable,
-                                                          xerror_t          **error);
+                                                          gboolean          create_backup,
+                                                          GFileCreateFlags  flags,
+                                                          GFileInfo        *reference_info,
+                                                          GCancellable     *cancellable,
+                                                          GError          **error);
 
-/* Hack to get the fd since xfile_descriptor_based_t (which is how you
+/* Hack to get the fd since GFileDescriptorBased (which is how you
  * _should_ get the fd) is only available on UNIX but things like
  * win32 needs this as well
  */
-xint_t _g_local_file_output_stream_get_fd (GLocalFileOutputStream *output_stream);
+gint _g_local_file_output_stream_get_fd (GLocalFileOutputStream *output_stream);
 
 G_END_DECLS
 

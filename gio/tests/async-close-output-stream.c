@@ -28,42 +28,42 @@
 
 typedef struct
 {
-  xoutput_stream_t *conv_stream;
-  xoutput_stream_t *data_stream;
-  xchar_t *expected_output;
-  xsize_t expected_size;
-  xmain_loop_t *main_loop;
+  GOutputStream *conv_stream;
+  GOutputStream *data_stream;
+  gchar *expected_output;
+  gsize expected_size;
+  GMainLoop *main_loop;
 } SetupData;
 
 static void
 create_streams (SetupData *data)
 {
-  xconverter_t *converter;
+  GConverter *converter;
 
-  converter = XCONVERTER (g_zlib_compressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP, -1));
+  converter = G_CONVERTER (g_zlib_compressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP, -1));
 
   data->data_stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
-  data->conv_stream = xconverter_output_stream_new (data->data_stream,
+  data->conv_stream = g_converter_output_stream_new (data->data_stream,
                                                      converter);
 
-  xobject_unref (converter);
+  g_object_unref (converter);
 }
 
 static void
 destroy_streams (SetupData *data)
 {
-  xobject_unref (data->data_stream);
-  xobject_unref (data->conv_stream);
+  g_object_unref (data->data_stream);
+  g_object_unref (data->conv_stream);
 }
 
 static void
 write_data_to_stream (SetupData *data)
 {
-  xsize_t bytes_written;
-  xerror_t *error = NULL;
+  gsize bytes_written;
+  GError *error = NULL;
 
   /* just write the data synchronously */
-  xoutput_stream_write_all (data->conv_stream,
+  g_output_stream_write_all (data->conv_stream,
                              DATA_TO_WRITE,
                              sizeof (DATA_TO_WRITE),
                              &bytes_written,
@@ -76,18 +76,18 @@ write_data_to_stream (SetupData *data)
 
 static void
 setup_data (SetupData     *data,
-            xconstpointer  user_data)
+            gconstpointer  user_data)
 {
-  data->main_loop = xmain_loop_new (NULL, FALSE);
+  data->main_loop = g_main_loop_new (NULL, FALSE);
   create_streams (data);
 }
 
 static void
 teardown_data (SetupData     *data,
-               xconstpointer  user_data)
+               gconstpointer  user_data)
 {
   /* cleanup */
-  xmain_loop_unref (data->main_loop);
+  g_main_loop_unref (data->main_loop);
 
   destroy_streams (data);
 
@@ -97,8 +97,8 @@ teardown_data (SetupData     *data,
 static void
 compare_output (SetupData *data)
 {
-  xsize_t size;
-  xpointer_t written;
+  gsize size;
+  gpointer written;
 
   written = g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (data->data_stream));
   size = g_memory_output_stream_get_data_size (G_MEMORY_OUTPUT_STREAM (data->data_stream));
@@ -107,39 +107,39 @@ compare_output (SetupData *data)
 }
 
 static void
-async_close_ready (xoutput_stream_t *stream,
-                   xasync_result_t  *result,
+async_close_ready (GOutputStream *stream,
+                   GAsyncResult  *result,
                    SetupData     *data)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   /* finish the close */
-  xoutput_stream_close_finish (stream, result, &error);
+  g_output_stream_close_finish (stream, result, &error);
 
   g_assert_no_error (error);
 
   /* compare the output with the desired output */
   compare_output (data);
 
-  xmain_loop_quit (data->main_loop);
+  g_main_loop_quit (data->main_loop);
 }
 
 static void
 prepare_data (SetupData *data,
-              xboolean_t   manual_flush)
+              gboolean   manual_flush)
 {
-  xerror_t *error = NULL;
-  xpointer_t written;
+  GError *error = NULL;
+  gpointer written;
 
   write_data_to_stream (data);
 
   if (manual_flush)
     {
-      xoutput_stream_flush (data->conv_stream, NULL, &error);
+      g_output_stream_flush (data->conv_stream, NULL, &error);
       g_assert_no_error (error);
     }
 
-  xoutput_stream_close (data->conv_stream, NULL, &error);
+  g_output_stream_close (data->conv_stream, NULL, &error);
 
   g_assert_no_error (error);
 
@@ -160,80 +160,80 @@ prepare_data (SetupData *data,
 
 static void
 test_without_flush (SetupData     *data,
-                    xconstpointer  user_data)
+                    gconstpointer  user_data)
 {
   prepare_data (data, FALSE);
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=617937");
 
   /* just close asynchronously */
-  xoutput_stream_close_async (data->conv_stream,
+  g_output_stream_close_async (data->conv_stream,
                                G_PRIORITY_DEFAULT,
                                NULL,
-                               (xasync_ready_callback_t)async_close_ready,
+                               (GAsyncReadyCallback)async_close_ready,
                                data);
 
-  xmain_loop_run (data->main_loop);
+  g_main_loop_run (data->main_loop);
 }
 
 static void
-test_with_flush (SetupData *data, xconstpointer user_data)
+test_with_flush (SetupData *data, gconstpointer user_data)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=617937");
 
   prepare_data (data, TRUE);
 
-  xoutput_stream_flush (data->conv_stream, NULL, &error);
+  g_output_stream_flush (data->conv_stream, NULL, &error);
 
   g_assert_no_error (error);
 
   /* then close asynchronously */
-  xoutput_stream_close_async (data->conv_stream,
+  g_output_stream_close_async (data->conv_stream,
                                G_PRIORITY_DEFAULT,
                                NULL,
-                               (xasync_ready_callback_t)async_close_ready,
+                               (GAsyncReadyCallback)async_close_ready,
                                data);
 
-  xmain_loop_run (data->main_loop);
+  g_main_loop_run (data->main_loop);
 }
 
 static void
-async_flush_ready (xoutput_stream_t *stream,
-                   xasync_result_t  *result,
+async_flush_ready (GOutputStream *stream,
+                   GAsyncResult  *result,
                    SetupData     *data)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
-  xoutput_stream_flush_finish (stream, result, &error);
+  g_output_stream_flush_finish (stream, result, &error);
 
   g_assert_no_error (error);
 
   /* then close async after the flush */
-  xoutput_stream_close_async (data->conv_stream,
+  g_output_stream_close_async (data->conv_stream,
                                G_PRIORITY_DEFAULT,
                                NULL,
-                               (xasync_ready_callback_t)async_close_ready,
+                               (GAsyncReadyCallback)async_close_ready,
                                data);
 }
 
 static void
 test_with_async_flush (SetupData     *data,
-                       xconstpointer  user_data)
+                       gconstpointer  user_data)
 {
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=617937");
 
   prepare_data (data, TRUE);
 
   /* first flush async */
-  xoutput_stream_flush_async (data->conv_stream,
+  g_output_stream_flush_async (data->conv_stream,
                                G_PRIORITY_DEFAULT,
                                NULL,
-                               (xasync_ready_callback_t)async_flush_ready,
+                               (GAsyncReadyCallback)async_flush_ready,
                                data);
 
-  xmain_loop_run (data->main_loop);
+  g_main_loop_run (data->main_loop);
 }
 
 int

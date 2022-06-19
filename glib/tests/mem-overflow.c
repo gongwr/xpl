@@ -30,8 +30,8 @@
 #include "glib.h"
 #include <stdlib.h>
 
-static xsize_t a = G_MAXSIZE / 10 + 10;
-static xsize_t b = 10;
+static gsize a = G_MAXSIZE / 10 + 10;
+static gsize b = 10;
 typedef char X[10];
 
 #define MEM_OVERFLOW_TEST(name, code) MEM_OVERFLOW_TEST_FULL(name, code, g_free)
@@ -39,7 +39,7 @@ typedef char X[10];
 static void                           \
 mem_overflow_ ## name (void)          \
 {                                     \
-  xpointer_t p;                         \
+  gpointer p;                         \
   code;                               \
   free_func (p);                      \
   exit (0);                           \
@@ -78,31 +78,31 @@ MEM_OVERFLOW_TEST_FULL (aligned_alloc0_b, p = g_aligned_alloc0 (sizeof(X), b, 16
 static void
 mem_overflow_malloc_0 (void)
 {
-  xpointer_t p;
+  gpointer p;
 
   p = g_malloc (0);
-  xassert (p == NULL);
+  g_assert (p == NULL);
 }
 
 static void
 mem_overflow_realloc_0 (void)
 {
-  xpointer_t p;
+  gpointer p;
 
   p = g_malloc (10);
-  xassert (p != NULL);
+  g_assert (p != NULL);
   p = g_realloc (p, 0);
-  xassert (p == NULL);
+  g_assert (p == NULL);
 }
 
 static void
 mem_overflow (void)
 {
-  xpointer_t p, q;
+  gpointer p, q;
 
   /* "FAIL" here apparently means "fail to overflow"... */
-#define CHECK_PASS(P)	p = (P); xassert (p == NULL);
-#define CHECK_FAIL(P)	p = (P); xassert (p != NULL);
+#define CHECK_PASS(P)	p = (P); g_assert (p == NULL);
+#define CHECK_FAIL(P)	p = (P); g_assert (p != NULL);
 
   CHECK_PASS (g_try_malloc_n (a, a));
   CHECK_PASS (g_try_malloc_n (a, b));
@@ -197,7 +197,7 @@ empty_alloc_subprocess (void)
   Empty *empty;
 
   empty = g_new0 (Empty, 1);
-  xassert (empty == NULL);
+  g_assert (empty == NULL);
   exit (0);
 }
 

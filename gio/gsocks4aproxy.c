@@ -48,23 +48,23 @@
 #define SOCKS4_REP_NO_IDENT       92
 #define SOCKS4_REP_BAD_IDENT      93
 
-static void g_socks4a_proxy_iface_init (xproxy_interface_t *proxy_iface);
+static void g_socks4a_proxy_iface_init (GProxyInterface *proxy_iface);
 
 #define g_socks4a_proxy_get_type _g_socks4a_proxy_get_type
-G_DEFINE_TYPE_WITH_CODE (GSocks4aProxy, g_socks4a_proxy, XTYPE_OBJECT,
-			 G_IMPLEMENT_INTERFACE (XTYPE_PROXY,
+G_DEFINE_TYPE_WITH_CODE (GSocks4aProxy, g_socks4a_proxy, G_TYPE_OBJECT,
+			 G_IMPLEMENT_INTERFACE (G_TYPE_PROXY,
 						g_socks4a_proxy_iface_init)
-			 _xio_modules_ensure_extension_points_registered ();
+			 _g_io_modules_ensure_extension_points_registered ();
 			 g_io_extension_point_implement (G_PROXY_EXTENSION_POINT_NAME,
 							 g_define_type_id,
 							 "socks4a",
 							 0))
 
 static void
-g_socks4a_proxy_finalize (xobject_t *object)
+g_socks4a_proxy_finalize (GObject *object)
 {
   /* must chain up */
-  XOBJECT_CLASS (g_socks4a_proxy_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_socks4a_proxy_parent_class)->finalize (object);
 }
 
 static void
@@ -80,24 +80,24 @@ g_socks4a_proxy_init (GSocks4aProxy *proxy)
  *    1    1      2              4           variable       1    variable
  */
 #define SOCKS4_CONN_MSG_LEN	    (9 + SOCKS4_MAX_LEN * 2)
-static xint_t
-set_connect_msg (xuint8_t      *msg,
-		 const xchar_t *hostname,
-		 xuint16_t      port,
+static gint
+set_connect_msg (guint8      *msg,
+		 const gchar *hostname,
+		 guint16      port,
 		 const char  *username,
-		 xerror_t     **error)
+		 GError     **error)
 {
-  xinet_address_t *addr;
-  xuint_t len = 0;
-  xsize_t addr_len;
-  xboolean_t is_ip;
-  const xchar_t *ip;
+  GInetAddress *addr;
+  guint len = 0;
+  gsize addr_len;
+  gboolean is_ip;
+  const gchar *ip;
 
   msg[len++] = SOCKS4_VERSION;
   msg[len++] = SOCKS4_CMD_CONNECT;
 
     {
-      xuint16_t hp = g_htons (port);
+      guint16 hp = g_htons (port);
       memcpy (msg + len, &hp, 2);
       len += 2;
     }
@@ -108,27 +108,27 @@ set_connect_msg (xuint8_t      *msg,
     ip = hostname;
   else
     ip = "0.0.0.1";
-
-  addr = xinet_address_new_from_string (ip);
-  addr_len = xinet_address_get_native_size (addr);
+    
+  addr = g_inet_address_new_from_string (ip);
+  addr_len = g_inet_address_get_native_size (addr);
 
   if (addr_len != 4)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_PROXY_FAILED,
 		  _("SOCKSv4 does not support IPv6 address “%s”"),
 		  ip);
-      xobject_unref (addr);
+      g_object_unref (addr);
       return -1;
     }
 
-  memcpy (msg + len, xinet_address_to_bytes (addr), addr_len);
+  memcpy (msg + len, g_inet_address_to_bytes (addr), addr_len);
   len += addr_len;
 
-  xobject_unref (addr);
+  g_object_unref (addr);
 
   if (username)
     {
-      xsize_t user_len = strlen (username);
+      gsize user_len = strlen (username);
 
       if (user_len > SOCKS4_MAX_LEN)
 	{
@@ -145,7 +145,7 @@ set_connect_msg (xuint8_t      *msg,
 
   if (!is_ip)
     {
-      xsize_t host_len = strlen (hostname);
+      gsize host_len = strlen (hostname);
 
       if (host_len > SOCKS4_MAX_LEN)
 	{
@@ -170,8 +170,8 @@ set_connect_msg (xuint8_t      *msg,
  *    1    1      2              4
  */
 #define SOCKS4_CONN_REP_LEN	  8
-static xboolean_t
-parse_connect_reply (const xuint8_t *data, xerror_t **error)
+static gboolean
+parse_connect_reply (const guint8 *data, GError **error)
 {
   if (data[0] != SOCKS4_REP_VERSION)
     {
@@ -190,46 +190,46 @@ parse_connect_reply (const xuint8_t *data, xerror_t **error)
   return TRUE;
 }
 
-static xio_stream_t *
-g_socks4a_proxy_connect (xproxy_t            *proxy,
-			 xio_stream_t         *io_stream,
-			 xproxy_address_t     *proxy_address,
-			 xcancellable_t      *cancellable,
-			 xerror_t           **error)
+static GIOStream *
+g_socks4a_proxy_connect (GProxy            *proxy,
+			 GIOStream         *io_stream,
+			 GProxyAddress     *proxy_address,
+			 GCancellable      *cancellable,
+			 GError           **error)
 {
-  xinput_stream_t *in;
-  xoutput_stream_t *out;
-  const xchar_t *hostname;
-  xuint16_t port;
-  const xchar_t *username;
+  GInputStream *in;
+  GOutputStream *out;
+  const gchar *hostname;
+  guint16 port;
+  const gchar *username;
 
-  hostname = xproxy_address_get_destination_hostname (proxy_address);
-  port = xproxy_address_get_destination_port (proxy_address);
-  username = xproxy_address_get_username (proxy_address);
+  hostname = g_proxy_address_get_destination_hostname (proxy_address);
+  port = g_proxy_address_get_destination_port (proxy_address);
+  username = g_proxy_address_get_username (proxy_address);
 
   in = g_io_stream_get_input_stream (io_stream);
   out = g_io_stream_get_output_stream (io_stream);
 
   /* Send SOCKS4 connection request */
     {
-      xuint8_t msg[SOCKS4_CONN_MSG_LEN];
-      xint_t len;
-
+      guint8 msg[SOCKS4_CONN_MSG_LEN];
+      gint len;
+      
       len = set_connect_msg (msg, hostname, port, username, error);
 
       if (len < 0)
 	goto error;
 
-      if (!xoutput_stream_write_all (out, msg, len, NULL,
+      if (!g_output_stream_write_all (out, msg, len, NULL,
 				      cancellable, error))
 	goto error;
     }
 
   /* Read SOCKS4 response */
     {
-      xuint8_t data[SOCKS4_CONN_REP_LEN];
+      guint8 data[SOCKS4_CONN_REP_LEN];
 
-      if (!xinput_stream_read_all (in, data, SOCKS4_CONN_REP_LEN, NULL,
+      if (!g_input_stream_read_all (in, data, SOCKS4_CONN_REP_LEN, NULL,
 				    cancellable, error))
 	goto error;
 
@@ -237,7 +237,7 @@ g_socks4a_proxy_connect (xproxy_t            *proxy,
 	goto error;
     }
 
-  return xobject_ref (io_stream);
+  return g_object_ref (io_stream);
 
 error:
   return NULL;
@@ -246,82 +246,82 @@ error:
 
 typedef struct
 {
-  xio_stream_t *io_stream;
+  GIOStream *io_stream;
 
   /* For connecting */
-  xuint8_t *buffer;
-  xssize_t length;
-  xssize_t offset;
+  guint8 *buffer;
+  gssize length;
+  gssize offset;
 
 } ConnectAsyncData;
 
-static void connect_msg_write_cb      (xobject_t          *source,
-				       xasync_result_t     *result,
-				       xpointer_t          user_data);
-static void connect_reply_read_cb     (xobject_t          *source,
-				       xasync_result_t     *result,
-				       xpointer_t          user_data);
+static void connect_msg_write_cb      (GObject          *source,
+				       GAsyncResult     *result,
+				       gpointer          user_data);
+static void connect_reply_read_cb     (GObject          *source,
+				       GAsyncResult     *result,
+				       gpointer          user_data);
 
 static void
 free_connect_data (ConnectAsyncData *data)
 {
-  xobject_unref (data->io_stream);
+  g_object_unref (data->io_stream);
   g_slice_free (ConnectAsyncData, data);
 }
 
 static void
-do_read (xasync_ready_callback_t callback, xtask_t *task, ConnectAsyncData *data)
+do_read (GAsyncReadyCallback callback, GTask *task, ConnectAsyncData *data)
 {
-   xinput_stream_t *in;
+   GInputStream *in;
    in = g_io_stream_get_input_stream (data->io_stream);
-   xinput_stream_read_async (in,
+   g_input_stream_read_async (in,
 			      data->buffer + data->offset,
 			      data->length - data->offset,
-			      xtask_get_priority (task),
-			      xtask_get_cancellable (task),
+			      g_task_get_priority (task),
+			      g_task_get_cancellable (task),
 			      callback, task);
 }
 
 static void
-do_write (xasync_ready_callback_t callback, xtask_t *task, ConnectAsyncData *data)
+do_write (GAsyncReadyCallback callback, GTask *task, ConnectAsyncData *data)
 {
-  xoutput_stream_t *out;
+  GOutputStream *out;
   out = g_io_stream_get_output_stream (data->io_stream);
-  xoutput_stream_write_async (out,
+  g_output_stream_write_async (out,
 			       data->buffer + data->offset,
 			       data->length - data->offset,
-			       xtask_get_priority (task),
-			       xtask_get_cancellable (task),
+			       g_task_get_priority (task),
+			       g_task_get_cancellable (task),
 			       callback, task);
 }
 
 
 
 static void
-g_socks4a_proxy_connect_async (xproxy_t               *proxy,
-			       xio_stream_t            *io_stream,
-			       xproxy_address_t        *proxy_address,
-			       xcancellable_t         *cancellable,
-			       xasync_ready_callback_t   callback,
-			       xpointer_t              user_data)
+g_socks4a_proxy_connect_async (GProxy               *proxy,
+			       GIOStream            *io_stream,
+			       GProxyAddress        *proxy_address,
+			       GCancellable         *cancellable,
+			       GAsyncReadyCallback   callback,
+			       gpointer              user_data)
 {
-  xerror_t *error = NULL;
-  xtask_t *task;
+  GError *error = NULL;
+  GTask *task;
   ConnectAsyncData *data;
-  const xchar_t *hostname;
-  xuint16_t port;
-  const xchar_t *username;
+  const gchar *hostname;
+  guint16 port;
+  const gchar *username;
 
   data = g_slice_new0 (ConnectAsyncData);
-  data->io_stream = xobject_ref (io_stream);
+  data->io_stream = g_object_ref (io_stream);
 
-  task = xtask_new (proxy, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_socks4a_proxy_connect_async);
-  xtask_set_task_data (task, data, (xdestroy_notify_t) free_connect_data);
+  task = g_task_new (proxy, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_socks4a_proxy_connect_async);
+  g_task_set_task_data (task, data, (GDestroyNotify) free_connect_data);
 
-  hostname = xproxy_address_get_destination_hostname (proxy_address);
-  port = xproxy_address_get_destination_port (proxy_address);
-  username = xproxy_address_get_username (proxy_address);
+  hostname = g_proxy_address_get_destination_hostname (proxy_address);
+  port = g_proxy_address_get_destination_port (proxy_address);
+  username = g_proxy_address_get_username (proxy_address); 
 
   data->buffer = g_malloc0 (SOCKS4_CONN_MSG_LEN);
   data->length = set_connect_msg (data->buffer,
@@ -331,8 +331,8 @@ g_socks4a_proxy_connect_async (xproxy_t               *proxy,
 
   if (data->length < 0)
     {
-      xtask_return_error (task, error);
-      xobject_unref (task);
+      g_task_return_error (task, error);
+      g_object_unref (task);
     }
   else
     {
@@ -341,22 +341,22 @@ g_socks4a_proxy_connect_async (xproxy_t               *proxy,
 }
 
 static void
-connect_msg_write_cb (xobject_t      *source,
-		      xasync_result_t *result,
-		      xpointer_t      user_data)
+connect_msg_write_cb (GObject      *source,
+		      GAsyncResult *result,
+		      gpointer      user_data)
 {
-  xtask_t *task = user_data;
-  ConnectAsyncData *data = xtask_get_task_data (task);
-  xerror_t *error = NULL;
-  xssize_t written;
+  GTask *task = user_data;
+  ConnectAsyncData *data = g_task_get_task_data (task);
+  GError *error = NULL;
+  gssize written;
 
-  written = xoutput_stream_write_finish (G_OUTPUT_STREAM (source),
+  written = g_output_stream_write_finish (G_OUTPUT_STREAM (source),
 					  result, &error);
-
+  
   if (written < 0)
     {
-      xtask_return_error (task, error);
-      xobject_unref (task);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
 
@@ -379,22 +379,22 @@ connect_msg_write_cb (xobject_t      *source,
 }
 
 static void
-connect_reply_read_cb (xobject_t       *source,
-		       xasync_result_t  *result,
-		       xpointer_t       user_data)
+connect_reply_read_cb (GObject       *source,
+		       GAsyncResult  *result,
+		       gpointer       user_data)
 {
-  xtask_t *task = user_data;
-  ConnectAsyncData *data = xtask_get_task_data (task);
-  xerror_t *error = NULL;
-  xssize_t read;
+  GTask *task = user_data;
+  ConnectAsyncData *data = g_task_get_task_data (task);
+  GError *error = NULL;
+  gssize read;
 
-  read = xinput_stream_read_finish (G_INPUT_STREAM (source),
+  read = g_input_stream_read_finish (G_INPUT_STREAM (source),
 				     result, &error);
 
   if (read < 0)
     {
-      xtask_return_error (task, error);
-      xobject_unref (task);
+      g_task_return_error (task, error);
+      g_object_unref (task);
       return;
     }
 
@@ -404,14 +404,14 @@ connect_reply_read_cb (xobject_t       *source,
     {
       if (!parse_connect_reply (data->buffer, &error))
 	{
-	  xtask_return_error (task, error);
-	  xobject_unref (task);
+	  g_task_return_error (task, error);
+	  g_object_unref (task);
 	  return;
 	}
       else
 	{
-	  xtask_return_pointer (task, xobject_ref (data->io_stream), xobject_unref);
-	  xobject_unref (task);
+	  g_task_return_pointer (task, g_object_ref (data->io_stream), g_object_unref);
+	  g_object_unref (task);
 	  return;
 	}
     }
@@ -421,20 +421,20 @@ connect_reply_read_cb (xobject_t       *source,
     }
 }
 
-static xio_stream_t *g_socks4a_proxy_connect_finish (xproxy_t       *proxy,
-						  xasync_result_t *result,
-						  xerror_t      **error);
+static GIOStream *g_socks4a_proxy_connect_finish (GProxy       *proxy,
+						  GAsyncResult *result,
+						  GError      **error);
 
-static xio_stream_t *
-g_socks4a_proxy_connect_finish (xproxy_t       *proxy,
-			        xasync_result_t *result,
-			        xerror_t      **error)
+static GIOStream *
+g_socks4a_proxy_connect_finish (GProxy       *proxy,
+			        GAsyncResult *result,
+			        GError      **error)
 {
-  return xtask_propagate_pointer (XTASK (result), error);
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
-static xboolean_t
-g_socks4a_proxy_supports_hostname (xproxy_t *proxy)
+static gboolean
+g_socks4a_proxy_supports_hostname (GProxy *proxy)
 {
   return G_SOCKS4A_PROXY (proxy)->supports_hostname;
 }
@@ -442,14 +442,14 @@ g_socks4a_proxy_supports_hostname (xproxy_t *proxy)
 static void
 g_socks4a_proxy_class_init (GSocks4aProxyClass *class)
 {
-  xobject_class_t *object_class;
+  GObjectClass *object_class;
 
-  object_class = (xobject_class_t *) class;
+  object_class = (GObjectClass *) class;
   object_class->finalize = g_socks4a_proxy_finalize;
 }
 
 static void
-g_socks4a_proxy_iface_init (xproxy_interface_t *proxy_iface)
+g_socks4a_proxy_iface_init (GProxyInterface *proxy_iface)
 {
   proxy_iface->connect  = g_socks4a_proxy_connect;
   proxy_iface->connect_async = g_socks4a_proxy_connect_async;

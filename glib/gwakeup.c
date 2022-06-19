@@ -25,7 +25,7 @@
  * includes warnings.  We have to manually include its dependencies here
  * (and at all other use sites).
  */
-#ifdef XPL_COMPILATION
+#ifdef GLIB_COMPILATION
 #include "gtypes.h"
 #include "gpoll.h"
 #else
@@ -42,11 +42,11 @@
  * #GWakeup is a simple and portable way of signaling events between
  * different threads in a way that integrates nicely with g_poll().
  * GLib uses it internally for cross-thread signalling in the
- * implementation of #xmain_context_t and #xcancellable_t.
+ * implementation of #GMainContext and #GCancellable.
  *
  * You first create a #GWakeup with g_wakeup_new() and initialise a
- * #xpollfd_t from it using g_wakeup_get_pollfd().  Polling on the created
- * #xpollfd_t will block until g_wakeup_signal() is called, at which point
+ * #GPollFD from it using g_wakeup_get_pollfd().  Polling on the created
+ * #GPollFD will block until g_wakeup_signal() is called, at which point
  * it will immediately return.  Future attempts to poll will continue to
  * return until g_wakeup_acknowledge() is called.  g_wakeup_free() is
  * used to free a #GWakeup.
@@ -61,7 +61,7 @@
 
 #include <windows.h>
 
-#ifdef XPL_COMPILATION
+#ifdef GLIB_COMPILATION
 #include "gmessages.h"
 #include "giochannel.h"
 #include "gwin32.h"
@@ -75,7 +75,7 @@ g_wakeup_new (void)
   wakeup = CreateEvent (NULL, TRUE, FALSE, NULL);
 
   if (wakeup == NULL)
-    xerror ("Cannot create event for GWakeup: %s",
+    g_error ("Cannot create event for GWakeup: %s",
              g_win32_error_message (GetLastError ()));
 
   return (GWakeup *) wakeup;
@@ -83,7 +83,7 @@ g_wakeup_new (void)
 
 void
 g_wakeup_get_pollfd (GWakeup *wakeup,
-                     xpollfd_t *poll_fd)
+                     GPollFD *poll_fd)
 {
   poll_fd->fd = (gintptr) wakeup;
   poll_fd->events = G_IO_IN;
@@ -118,7 +118,7 @@ g_wakeup_free (GWakeup *wakeup)
 
 struct _GWakeup
 {
-  xint_t fds[2];
+  gint fds[2];
 };
 
 /**
@@ -135,7 +135,7 @@ struct _GWakeup
 GWakeup *
 g_wakeup_new (void)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
   GWakeup *wakeup;
 
   wakeup = g_slice_new (GWakeup);
@@ -158,11 +158,11 @@ g_wakeup_new (void)
 #endif
 
   if (!g_unix_open_pipe (wakeup->fds, FD_CLOEXEC, &error))
-    xerror ("Creating pipes for GWakeup: %s", error->message);
+    g_error ("Creating pipes for GWakeup: %s", error->message);
 
   if (!g_unix_set_fd_nonblocking (wakeup->fds[0], TRUE, &error) ||
       !g_unix_set_fd_nonblocking (wakeup->fds[1], TRUE, &error))
-    xerror ("Set pipes non-blocking for GWakeup: %s", error->message);
+    g_error ("Set pipes non-blocking for GWakeup: %s", error->message);
 
   return wakeup;
 }
@@ -170,7 +170,7 @@ g_wakeup_new (void)
 /**
  * g_wakeup_get_pollfd:
  * @wakeup: a #GWakeup
- * @poll_fd: a #xpollfd_t
+ * @poll_fd: a #GPollFD
  *
  * Prepares a @poll_fd such that polling on it will succeed when
  * g_wakeup_signal() has been called on @wakeup.
@@ -181,7 +181,7 @@ g_wakeup_new (void)
  **/
 void
 g_wakeup_get_pollfd (GWakeup *wakeup,
-                     xpollfd_t *poll_fd)
+                     GPollFD *poll_fd)
 {
   poll_fd->fd = wakeup->fds[0];
   poll_fd->events = G_IO_IN;
@@ -216,7 +216,7 @@ g_wakeup_acknowledge (GWakeup *wakeup)
  *
  * Signals @wakeup.
  *
- * Any future (or present) polling on the #xpollfd_t returned by
+ * Any future (or present) polling on the #GPollFD returned by
  * g_wakeup_get_pollfd() will immediately succeed until such a time as
  * g_wakeup_acknowledge() is called.
  *
@@ -231,7 +231,7 @@ g_wakeup_signal (GWakeup *wakeup)
 
   if (wakeup->fds[1] == -1)
     {
-      xuint64_t one = 1;
+      guint64 one = 1;
 
       /* eventfd() case. It requires a 64-bit counter increment value to be
        * written. */
@@ -241,7 +241,7 @@ g_wakeup_signal (GWakeup *wakeup)
     }
   else
     {
-      xuint8_t one = 1;
+      guint8 one = 1;
 
       /* Non-eventfd() case. Only a single byte needs to be written, and it can
        * have an arbitrary value. */
@@ -257,7 +257,7 @@ g_wakeup_signal (GWakeup *wakeup)
  *
  * Frees @wakeup.
  *
- * You must not currently be polling on the #xpollfd_t returned by
+ * You must not currently be polling on the #GPollFD returned by
  * g_wakeup_get_pollfd(), or the result is undefined.
  **/
 void

@@ -17,166 +17,166 @@
  * Author: Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XMENU_H__
-#define __XMENU_H__
+#ifndef __G_MENU_H__
+#define __G_MENU_H__
 
 #include <gio/gmenumodel.h>
 
 G_BEGIN_DECLS
 
-#define XTYPE_MENU          (xmenu_get_type ())
-#define XMENU(inst)         (XTYPE_CHECK_INSTANCE_CAST ((inst), \
-                              XTYPE_MENU, xmenu))
-#define X_IS_MENU(inst)      (XTYPE_CHECK_INSTANCE_TYPE ((inst), \
-                              XTYPE_MENU))
+#define G_TYPE_MENU          (g_menu_get_type ())
+#define G_MENU(inst)         (G_TYPE_CHECK_INSTANCE_CAST ((inst), \
+                              G_TYPE_MENU, GMenu))
+#define G_IS_MENU(inst)      (G_TYPE_CHECK_INSTANCE_TYPE ((inst), \
+                              G_TYPE_MENU))
 
-#define XTYPE_MENU_ITEM     (xmenu_item_get_type ())
-#define XMENU_ITEM(inst)    (XTYPE_CHECK_INSTANCE_CAST ((inst), \
-                              XTYPE_MENU_ITEM, xmenu_item))
-#define X_IS_MENU_ITEM(inst) (XTYPE_CHECK_INSTANCE_TYPE ((inst), \
-                              XTYPE_MENU_ITEM))
+#define G_TYPE_MENU_ITEM     (g_menu_item_get_type ())
+#define G_MENU_ITEM(inst)    (G_TYPE_CHECK_INSTANCE_CAST ((inst), \
+                              G_TYPE_MENU_ITEM, GMenuItem))
+#define G_IS_MENU_ITEM(inst) (G_TYPE_CHECK_INSTANCE_TYPE ((inst), \
+                              G_TYPE_MENU_ITEM))
 
-typedef struct _GMenuItem xmenu_item_t;
-typedef struct _GMenu     xmenu_t;
+typedef struct _GMenuItem GMenuItem;
+typedef struct _GMenu     GMenu;
 
-XPL_AVAILABLE_IN_2_32
-xtype_t       xmenu_get_type                         (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_32
-xmenu_t *     xmenu_new                              (void);
+GLIB_AVAILABLE_IN_2_32
+GType       g_menu_get_type                         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_32
+GMenu *     g_menu_new                              (void);
 
-XPL_AVAILABLE_IN_2_32
-void        xmenu_freeze                           (xmenu_t       *menu);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_freeze                           (GMenu       *menu);
 
-XPL_AVAILABLE_IN_2_32
-void        xmenu_insert_item                      (xmenu_t       *menu,
-                                                     xint_t         position,
-                                                     xmenu_item_t   *item);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_prepend_item                     (xmenu_t       *menu,
-                                                     xmenu_item_t   *item);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_append_item                      (xmenu_t       *menu,
-                                                     xmenu_item_t   *item);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_remove                           (xmenu_t       *menu,
-                                                     xint_t         position);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_insert_item                      (GMenu       *menu,
+                                                     gint         position,
+                                                     GMenuItem   *item);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_prepend_item                     (GMenu       *menu,
+                                                     GMenuItem   *item);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_append_item                      (GMenu       *menu,
+                                                     GMenuItem   *item);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_remove                           (GMenu       *menu,
+                                                     gint         position);
 
-XPL_AVAILABLE_IN_2_38
-void        xmenu_remove_all                       (xmenu_t       *menu);
+GLIB_AVAILABLE_IN_2_38
+void        g_menu_remove_all                       (GMenu       *menu);
 
-XPL_AVAILABLE_IN_2_32
-void        xmenu_insert                           (xmenu_t       *menu,
-                                                     xint_t         position,
-                                                     const xchar_t *label,
-                                                     const xchar_t *detailed_action);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_prepend                          (xmenu_t       *menu,
-                                                     const xchar_t *label,
-                                                     const xchar_t *detailed_action);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_append                           (xmenu_t       *menu,
-                                                     const xchar_t *label,
-                                                     const xchar_t *detailed_action);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_insert                           (GMenu       *menu,
+                                                     gint         position,
+                                                     const gchar *label,
+                                                     const gchar *detailed_action);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_prepend                          (GMenu       *menu,
+                                                     const gchar *label,
+                                                     const gchar *detailed_action);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_append                           (GMenu       *menu,
+                                                     const gchar *label,
+                                                     const gchar *detailed_action);
 
-XPL_AVAILABLE_IN_2_32
-void        xmenu_insert_section                   (xmenu_t       *menu,
-                                                     xint_t         position,
-                                                     const xchar_t *label,
-                                                     xmenu_model_t  *section);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_prepend_section                  (xmenu_t       *menu,
-                                                     const xchar_t *label,
-                                                     xmenu_model_t  *section);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_append_section                   (xmenu_t       *menu,
-                                                     const xchar_t *label,
-                                                     xmenu_model_t  *section);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_insert_section                   (GMenu       *menu,
+                                                     gint         position,
+                                                     const gchar *label,
+                                                     GMenuModel  *section);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_prepend_section                  (GMenu       *menu,
+                                                     const gchar *label,
+                                                     GMenuModel  *section);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_append_section                   (GMenu       *menu,
+                                                     const gchar *label,
+                                                     GMenuModel  *section);
 
-XPL_AVAILABLE_IN_2_32
-void        xmenu_insert_submenu                   (xmenu_t       *menu,
-                                                     xint_t        position,
-                                                     const xchar_t *label,
-                                                     xmenu_model_t  *submenu);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_prepend_submenu                  (xmenu_t       *menu,
-                                                     const xchar_t *label,
-                                                     xmenu_model_t  *submenu);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_append_submenu                   (xmenu_t       *menu,
-                                                     const xchar_t *label,
-                                                     xmenu_model_t  *submenu);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_insert_submenu                   (GMenu       *menu,
+                                                     gint        position,
+                                                     const gchar *label,
+                                                     GMenuModel  *submenu);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_prepend_submenu                  (GMenu       *menu,
+                                                     const gchar *label,
+                                                     GMenuModel  *submenu);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_append_submenu                   (GMenu       *menu,
+                                                     const gchar *label,
+                                                     GMenuModel  *submenu);
 
 
-XPL_AVAILABLE_IN_2_32
-xtype_t       xmenu_item_get_type                    (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_32
-xmenu_item_t * xmenu_item_new                         (const xchar_t *label,
-                                                     const xchar_t *detailed_action);
+GLIB_AVAILABLE_IN_2_32
+GType       g_menu_item_get_type                    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_32
+GMenuItem * g_menu_item_new                         (const gchar *label,
+                                                     const gchar *detailed_action);
 
-XPL_AVAILABLE_IN_2_34
-xmenu_item_t * xmenu_item_new_from_model              (xmenu_model_t  *model,
-                                                     xint_t         item_index);
+GLIB_AVAILABLE_IN_2_34
+GMenuItem * g_menu_item_new_from_model              (GMenuModel  *model,
+                                                     gint         item_index);
 
-XPL_AVAILABLE_IN_2_32
-xmenu_item_t * xmenu_item_new_submenu                 (const xchar_t *label,
-                                                     xmenu_model_t  *submenu);
+GLIB_AVAILABLE_IN_2_32
+GMenuItem * g_menu_item_new_submenu                 (const gchar *label,
+                                                     GMenuModel  *submenu);
 
-XPL_AVAILABLE_IN_2_32
-xmenu_item_t * xmenu_item_new_section                 (const xchar_t *label,
-                                                     xmenu_model_t  *section);
+GLIB_AVAILABLE_IN_2_32
+GMenuItem * g_menu_item_new_section                 (const gchar *label,
+                                                     GMenuModel  *section);
 
-XPL_AVAILABLE_IN_2_34
-xvariant_t *  xmenu_item_get_attribute_value         (xmenu_item_t   *menu_item,
-                                                     const xchar_t *attribute,
-                                                     const xvariant_type_t *expected_type);
-XPL_AVAILABLE_IN_2_34
-xboolean_t    xmenu_item_get_attribute               (xmenu_item_t   *menu_item,
-                                                     const xchar_t *attribute,
-                                                     const xchar_t *format_string,
+GLIB_AVAILABLE_IN_2_34
+GVariant *  g_menu_item_get_attribute_value         (GMenuItem   *menu_item,
+                                                     const gchar *attribute,
+                                                     const GVariantType *expected_type);
+GLIB_AVAILABLE_IN_2_34
+gboolean    g_menu_item_get_attribute               (GMenuItem   *menu_item,
+                                                     const gchar *attribute,
+                                                     const gchar *format_string,
                                                      ...);
-XPL_AVAILABLE_IN_2_34
-xmenu_model_t *xmenu_item_get_link                    (xmenu_item_t   *menu_item,
-                                                     const xchar_t *link);
+GLIB_AVAILABLE_IN_2_34
+GMenuModel *g_menu_item_get_link                    (GMenuItem   *menu_item,
+                                                     const gchar *link);
 
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_attribute_value         (xmenu_item_t   *menu_item,
-                                                     const xchar_t *attribute,
-                                                     xvariant_t    *value);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_attribute               (xmenu_item_t   *menu_item,
-                                                     const xchar_t *attribute,
-                                                     const xchar_t *format_string,
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_attribute_value         (GMenuItem   *menu_item,
+                                                     const gchar *attribute,
+                                                     GVariant    *value);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_attribute               (GMenuItem   *menu_item,
+                                                     const gchar *attribute,
+                                                     const gchar *format_string,
                                                      ...);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_link                    (xmenu_item_t   *menu_item,
-                                                     const xchar_t *link,
-                                                     xmenu_model_t  *model);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_label                   (xmenu_item_t   *menu_item,
-                                                     const xchar_t *label);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_submenu                 (xmenu_item_t   *menu_item,
-                                                     xmenu_model_t  *submenu);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_section                 (xmenu_item_t   *menu_item,
-                                                     xmenu_model_t  *section);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_action_and_target_value (xmenu_item_t   *menu_item,
-                                                     const xchar_t *action,
-                                                     xvariant_t    *target_value);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_action_and_target       (xmenu_item_t   *menu_item,
-                                                     const xchar_t *action,
-                                                     const xchar_t *format_string,
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_link                    (GMenuItem   *menu_item,
+                                                     const gchar *link,
+                                                     GMenuModel  *model);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_label                   (GMenuItem   *menu_item,
+                                                     const gchar *label);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_submenu                 (GMenuItem   *menu_item,
+                                                     GMenuModel  *submenu);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_section                 (GMenuItem   *menu_item,
+                                                     GMenuModel  *section);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_action_and_target_value (GMenuItem   *menu_item,
+                                                     const gchar *action,
+                                                     GVariant    *target_value);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_action_and_target       (GMenuItem   *menu_item,
+                                                     const gchar *action,
+                                                     const gchar *format_string,
                                                      ...);
-XPL_AVAILABLE_IN_2_32
-void        xmenu_item_set_detailed_action         (xmenu_item_t   *menu_item,
-                                                     const xchar_t *detailed_action);
+GLIB_AVAILABLE_IN_2_32
+void        g_menu_item_set_detailed_action         (GMenuItem   *menu_item,
+                                                     const gchar *detailed_action);
 
-XPL_AVAILABLE_IN_2_38
-void        xmenu_item_set_icon                    (xmenu_item_t   *menu_item,
-                                                     xicon_t       *icon);
+GLIB_AVAILABLE_IN_2_38
+void        g_menu_item_set_icon                    (GMenuItem   *menu_item,
+                                                     GIcon       *icon);
 
 G_END_DECLS
 
-#endif /* __XMENU_H__ */
+#endif /* __G_MENU_H__ */

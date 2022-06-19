@@ -5,13 +5,13 @@
 
 typedef struct
 {
-  const xchar_t *string;
-  const xchar_t *prefix;
-  const xchar_t *locale;
-  xboolean_t should_match;
+  const gchar *string;
+  const gchar *prefix;
+  const gchar *locale;
+  gboolean should_match;
 } SearchTest;
 
-/* test_t word separators and case */
+/* Test word separators and case */
 SearchTest basic[] = {
   { "Hello World", "he", "C", TRUE },
   { "Hello World", "wo", "C", TRUE },
@@ -22,7 +22,7 @@ SearchTest basic[] = {
   { NULL, NULL, NULL, FALSE }
 };
 
-/* test_t composed chars (accentued letters) */
+/* Test composed chars (accentued letters) */
 SearchTest composed[] = {
   { "Jörgen", "jor", "sv_SE.UTF-8", TRUE },
   { "Gaëtan", "gaetan", "fr_FR.UTF-8", TRUE },
@@ -32,7 +32,7 @@ SearchTest composed[] = {
   { NULL, NULL, NULL, FALSE }
 };
 
-/* test_t decomposed chars, they looks the same, but are actually
+/* Test decomposed chars, they looks the same, but are actually
  * composed of multiple unicodes */
 SearchTest decomposed[] = {
   { "Jorgen", "Jör", "sv_SE.UTF-8", FALSE },
@@ -47,7 +47,7 @@ SearchTest turkish[] = {
   { NULL, NULL, NULL, FALSE }
 };
 
-/* test_t unicode chars when no locale is available */
+/* Test unicode chars when no locale is available */
 SearchTest c_locale_unicode[] = {
   { "Jörgen", "jor", "C", TRUE },
   { "Jorgen", "Jör", "C", FALSE },
@@ -59,31 +59,31 @@ SearchTest c_locale_unicode[] = {
 SearchTest multi_words[] = {
   { "Xavier Claessens", "Xav Cla", "C", TRUE },
   { "Xavier Claessens", "Cla Xav", "C", TRUE },
-  { "foo_t Bar baz_t", "   b  ", "C", TRUE },
-  { "foo_t Bar baz_t", "bar bazz", "C", FALSE },
+  { "Foo Bar Baz", "   b  ", "C", TRUE },
+  { "Foo Bar Baz", "bar bazz", "C", FALSE },
   { NULL, NULL, NULL, FALSE }
 };
 
 static void
-test_search (xconstpointer d)
+test_search (gconstpointer d)
 {
   const SearchTest *tests = d;
-  xuint_t i;
-  xboolean_t all_skipped = TRUE;
+  guint i;
+  gboolean all_skipped = TRUE;
 
   g_debug ("Started");
 
   for (i = 0; tests[i].string != NULL; i++)
     {
-      xboolean_t match;
-      xboolean_t ok = FALSE;
-      xboolean_t skipped;
+      gboolean match;
+      gboolean ok = FALSE;
+      gboolean skipped;
 
       if (setlocale (LC_ALL, tests[i].locale))
         {
           skipped = FALSE;
           all_skipped = FALSE;
-          match = xstr_match_string (tests[i].prefix, tests[i].string, TRUE);
+          match = g_str_match_string (tests[i].prefix, tests[i].string, TRUE);
           ok = (match == tests[i].should_match);
         }
       else
@@ -96,7 +96,7 @@ test_search (xconstpointer d)
           tests[i].should_match ? "should match" : "should NOT match",
           skipped ? "SKIPPED" : ok ? "OK" : "FAILED");
 
-      xassert (skipped || ok);
+      g_assert (skipped || ok);
     }
 
   if (all_skipped)
@@ -107,7 +107,7 @@ int
 main (int argc,
       char **argv)
 {
-  xchar_t *user_locale;
+  gchar *user_locale;
 
   g_test_init (&argc, &argv, NULL);
 

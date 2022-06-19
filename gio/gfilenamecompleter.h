@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XFILENAME_COMPLETER_H__
-#define __XFILENAME_COMPLETER_H__
+#ifndef __G_FILENAME_COMPLETER_H__
+#define __G_FILENAME_COMPLETER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,27 +29,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILENAME_COMPLETER         (xfilename_completer_get_type ())
-#define XFILENAME_COMPLETER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILENAME_COMPLETER, xfilename_completer))
-#define XFILENAME_COMPLETER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILENAME_COMPLETER, xfilename_completer_class))
-#define XFILENAME_COMPLETER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILENAME_COMPLETER, xfilename_completer_class))
-#define X_IS_FILENAME_COMPLETER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILENAME_COMPLETER))
-#define X_IS_FILENAME_COMPLETER_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILENAME_COMPLETER))
+#define G_TYPE_FILENAME_COMPLETER         (g_filename_completer_get_type ())
+#define G_FILENAME_COMPLETER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILENAME_COMPLETER, GFilenameCompleter))
+#define G_FILENAME_COMPLETER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILENAME_COMPLETER, GFilenameCompleterClass))
+#define G_FILENAME_COMPLETER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_FILENAME_COMPLETER, GFilenameCompleterClass))
+#define G_IS_FILENAME_COMPLETER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILENAME_COMPLETER))
+#define G_IS_FILENAME_COMPLETER_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_FILENAME_COMPLETER))
 
 /**
- * xfilename_completer_t:
+ * GFilenameCompleter:
  *
  * Completes filenames based on files that exist within the file system.
  **/
-typedef struct _xfilename_completer_class xfilename_completer_class_t;
+typedef struct _GFilenameCompleterClass GFilenameCompleterClass;
 
-struct _xfilename_completer_class
+struct _GFilenameCompleterClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /*< public >*/
   /* signals */
-  void (* got_completion_data) (xfilename_completer_t *filename_completer);
+  void (* got_completion_data) (GFilenameCompleter *filename_completer);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -58,22 +58,22 @@ struct _xfilename_completer_class
   void (*_g_reserved3) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t               xfilename_completer_get_type              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType               g_filename_completer_get_type              (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xfilename_completer_t *xfilename_completer_new                   (void);
+GLIB_AVAILABLE_IN_ALL
+GFilenameCompleter *g_filename_completer_new                   (void);
 
-XPL_AVAILABLE_IN_ALL
-char *              xfilename_completer_get_completion_suffix (xfilename_completer_t *completer,
+GLIB_AVAILABLE_IN_ALL
+char *              g_filename_completer_get_completion_suffix (GFilenameCompleter *completer,
                                                                 const char *initial_text);
-XPL_AVAILABLE_IN_ALL
-char **             xfilename_completer_get_completions       (xfilename_completer_t *completer,
+GLIB_AVAILABLE_IN_ALL
+char **             g_filename_completer_get_completions       (GFilenameCompleter *completer,
                                                                 const char *initial_text);
-XPL_AVAILABLE_IN_ALL
-void                xfilename_completer_set_dirs_only         (xfilename_completer_t *completer,
-                                                                xboolean_t dirs_only);
+GLIB_AVAILABLE_IN_ALL
+void                g_filename_completer_set_dirs_only         (GFilenameCompleter *completer,
+                                                                gboolean dirs_only);
 
 G_END_DECLS
 
-#endif /* __XFILENAME_COMPLETER_H__ */
+#endif /* __G_FILENAME_COMPLETER_H__ */

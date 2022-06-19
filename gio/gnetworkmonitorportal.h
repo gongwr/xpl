@@ -23,13 +23,13 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_PORTAL         (xnetwork_monitor_portal_get_type ())
-#define G_NETWORK_MONITOR_PORTAL(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortal))
-#define G_NETWORK_MONITOR_PORTAL_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortalClass))
-#define X_IS_NETWORK_MONITOR_PORTAL(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_PORTAL))
-#define X_IS_NETWORK_MONITOR_PORTAL_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_MONITOR_PORTAL))
-#define G_NETWORK_MONITOR_PORTAL_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortalClass))
-#define G_NETWORK_MONITOR_PORTAL_GET_INITABLE_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_INITABLE, xinitable_t))
+#define G_TYPE_NETWORK_MONITOR_PORTAL         (g_network_monitor_portal_get_type ())
+#define G_NETWORK_MONITOR_PORTAL(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortal))
+#define G_NETWORK_MONITOR_PORTAL_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortalClass))
+#define G_IS_NETWORK_MONITOR_PORTAL(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_MONITOR_PORTAL))
+#define G_IS_NETWORK_MONITOR_PORTAL_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NETWORK_MONITOR_PORTAL))
+#define G_NETWORK_MONITOR_PORTAL_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NETWORK_MONITOR_PORTAL, GNetworkMonitorPortalClass))
+#define G_NETWORK_MONITOR_PORTAL_GET_INITABLE_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_INITABLE, GInitable))
 
 
 typedef struct _GNetworkMonitorPortal        GNetworkMonitorPortal;
@@ -37,16 +37,16 @@ typedef struct _GNetworkMonitorPortalClass   GNetworkMonitorPortalClass;
 typedef struct _GNetworkMonitorPortalPrivate GNetworkMonitorPortalPrivate;
 
 struct _GNetworkMonitorPortal {
-  xnetwork_monitor_base_t parent_instance;
+  GNetworkMonitorBase parent_instance;
 
   GNetworkMonitorPortalPrivate *priv;
 };
 
 struct _GNetworkMonitorPortalClass {
-  xnetwork_monitor_base_class_t parent_class;
+  GNetworkMonitorBaseClass parent_class;
 };
 
-xtype_t xnetwork_monitor_portal_get_type (void);
+GType g_network_monitor_portal_get_type (void);
 
 G_END_DECLS
 

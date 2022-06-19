@@ -10,29 +10,29 @@
  * See the included COPYING file for more information.
  */
 
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
 
 static GStaticPrivate sp;
-static xmutex_t *mutex;
-static xcond_t *cond;
-static xuint_t i;
+static GMutex *mutex;
+static GCond *cond;
+static guint i;
 
-static xint_t freed = 0;  /* (atomic) */
+static gint freed = 0;  /* (atomic) */
 
 static void
-notify (xpointer_t p)
+notify (gpointer p)
 {
   if (!g_atomic_int_compare_and_exchange (&freed, 0, 1))
     {
-      xerror ("someone already freed it after %u iterations", i);
+      g_error ("someone already freed it after %u iterations", i);
     }
 }
 
-static xpointer_t thread_func (xpointer_t nil)
+static gpointer thread_func (gpointer nil)
 {
   /* wait for main thread to reach its g_cond_wait call */
   g_mutex_lock (mutex);
@@ -58,7 +58,7 @@ testcase (void)
    * So if running without `-m slow`, try 100× less hard to reproduce the bug,
    * and rely on the fact that this is run under CI often enough to have a good
    * chance of reproducing the bug in 1% of CI runs. */
-  const xuint_t n_iterations = g_test_slow () ? 100000 : 1000;
+  const guint n_iterations = g_test_slow () ? 100000 : 1000;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=642026");
 
@@ -69,20 +69,20 @@ testcase (void)
 
   for (i = 0; i < n_iterations; i++)
     {
-      xthread_t *t1;
+      GThread *t1;
 
       g_static_private_init (&sp);
       g_atomic_int_set (&freed, 0);
 
-      t1 = xthread_create (thread_func, NULL, TRUE, NULL);
-      xassert (t1 != NULL);
+      t1 = g_thread_create (thread_func, NULL, TRUE, NULL);
+      g_assert (t1 != NULL);
 
       /* wait for t1 to set up its thread-private data */
       g_cond_wait (cond, mutex);
 
       /* exercise the bug, by racing with t1 to free the private data */
       g_static_private_free (&sp);
-      xthread_join (t1);
+      g_thread_join (t1);
     }
 
   g_cond_free (cond);

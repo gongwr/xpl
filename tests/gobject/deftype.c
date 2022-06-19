@@ -19,36 +19,36 @@
 /* see http://bugzilla.gnome.org/show_bug.cgi?id=337128 for the purpose of this test */
 
 #define MY_G_IMPLEMENT_INTERFACE(TYPE_IFACE, iface_init)       { \
-  const xinterface_info_t g_implement_interface_info = { \
+  const GInterfaceInfo g_implement_interface_info = { \
       (GInterfaceInitFunc) iface_init, \
       NULL, \
       NULL \
     }; \
-  xtype_add_interface_static (g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
+  g_type_add_interface_static (g_define_type_id, TYPE_IFACE, &g_implement_interface_info); \
 }
 
 #define MY_DEFINE_TYPE(TN, t_n, T_P) \
 	G_DEFINE_TYPE_WITH_CODE (TN, t_n, T_P, \
-				 MY_G_IMPLEMENT_INTERFACE (XTYPE_INTERFACE, NULL))
+				 MY_G_IMPLEMENT_INTERFACE (G_TYPE_INTERFACE, NULL))
 
-typedef struct _type_name {
-  xobject_t parent_instance;
+typedef struct _TypeName {
+  GObject parent_instance;
   const char *name;
-} type_name_t;
+} TypeName;
 
-typedef struct _type_name_class {
-  xobject_class_t parent_parent;
-} type_name_class_t;
+typedef struct _TypeNameClass {
+  GObjectClass parent_parent;
+} TypeNameClass;
 
-xtype_t           type_name_get_type          (void);
+GType           type_name_get_type          (void);
 
-MY_DEFINE_TYPE (type_name, type_name, XTYPE_OBJECT)
+MY_DEFINE_TYPE (TypeName, type_name, G_TYPE_OBJECT)
 
-static void     type_name_init              (type_name_t      *self)
+static void     type_name_init              (TypeName      *self)
 {
 }
 
-static void     type_name_class_init        (type_name_class_t *klass)
+static void     type_name_class_init        (TypeNameClass *klass)
 {
 }
 

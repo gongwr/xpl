@@ -26,17 +26,17 @@ msgstr ""
 "X-Project-Style: gnome\n"
 
 #: ../gio/gapplication.c:490
-msgid "xapplication_t options"
-msgstr "Opcions de la xapplication_t"
+msgid "GApplication options"
+msgstr "Opcions de la GApplication"
 
 #: ../gio/gapplication.c:490
-msgid "Show xapplication_t options"
-msgstr "Mostra les opcions de la xapplication_t"
+msgid "Show GApplication options"
+msgstr "Mostra les opcions de la GApplication"
 
 #: ../gio/gapplication.c:535
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
-"Introduïu un mode de servei xapplication_t (utilitzeu-lo des de fitxers de "
+"Introduïu un mode de servei GApplication (utilitzeu-lo des de fitxers de "
 "servei D-Bus)"
 
 #: ../gio/gapplication.c:547
@@ -145,8 +145,8 @@ msgid "PARAMETER"
 msgstr "PARÀMETRE"
 
 #: ../gio/gapplication-tool.c:74
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Paràmetre opcional per la invocació de l'acció, en format xvariant_t"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Paràmetre opcional per la invocació de l'acció, en format GVariant"
 
 #: ../gio/gapplication-tool.c:96 ../gio/gresource-tool.c:526
 #: ../gio/gsettings-tool.c:614
@@ -282,8 +282,8 @@ msgid "Seek not supported on base stream"
 msgstr "No està implementada la busca en el flux base"
 
 #: ../gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "No es pot truncar el xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "No es pot truncar el GBufferedInputStream"
 
 #: ../gio/gbufferedinputstream.c:982 ../gio/ginputstream.c:1208
 #: ../gio/giostream.c:300 ../gio/goutputstream.c:1660
@@ -356,17 +356,17 @@ msgid "%s filetype"
 msgstr "tipus de fitxer %s"
 
 #: ../gio/gcredentials.c:312 ../gio/gcredentials.c:571
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "Este sistema operatiu no implementa les xcredentials_t"
+msgid "GCredentials is not implemented on this OS"
+msgstr "Este sistema operatiu no implementa les GCredentials"
 
 #: ../gio/gcredentials.c:467
-msgid "There is no xcredentials_t support for your platform"
-msgstr "La vostra plataforma no implementa les xcredentials_t"
+msgid "There is no GCredentials support for your platform"
+msgstr "La vostra plataforma no implementa les GCredentials"
 
 #: ../gio/gcredentials.c:513
-msgid "xcredentials_t does not contain a process ID on this OS"
+msgid "GCredentials does not contain a process ID on this OS"
 msgstr ""
-"Les xcredentials_t no contenen cap identificador de procés en este sistema "
+"Les GCredentials no contenen cap identificador de procés en este sistema "
 "operatiu"
 
 #: ../gio/gcredentials.c:565
@@ -581,9 +581,9 @@ msgstr ""
 "%s) (hi ha disponibles: %s)"
 
 #: ../gio/gdbusauth.c:1174
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
 msgstr ""
-"S'ha cancel·lat a través de xdbus_auth_observer_t::authorize-authenticated-peer"
+"S'ha cancel·lat a través de GDBusAuthObserver::authorize-authenticated-peer"
 
 #: ../gio/gdbusauthmechanismsha1.c:262
 #, c-format
@@ -877,9 +877,9 @@ msgstr "El valor analitzat «%s» per variant no és una signatura D-Bus vàlida
 #: ../gio/gdbusmessage.c:1869
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"S'ha produït un error en convertir a estructura de dades la xvariant_t amb el "
+"S'ha produït un error en convertir a estructura de dades la GVariant amb el "
 "tipus de cadena «%s» del format de cable D-Bus"
 
 #: ../gio/gdbusmessage.c:2053
@@ -926,9 +926,9 @@ msgstr "No s'ha pogut tornar a convertir el missatge a estructura de dades: "
 #: ../gio/gdbusmessage.c:2517
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"No s'ha pogut convertir a seqüència de bits la xvariant_t de tipus cadena «%s» "
+"No s'ha pogut convertir a seqüència de bits la GVariant de tipus cadena «%s» "
 "al format de cable D-Bus"
 
 #: ../gio/gdbusmessage.c:2654
@@ -1385,31 +1385,31 @@ msgstr "El DTLS no està implementat"
 
 #: ../gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "No es pot gestionar la versió %d de la codificació del xemblem_t"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "No es pot gestionar la versió %d de la codificació del GEmblem"
 
 #: ../gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
 msgstr ""
-"Un nombre de testimonis (%d) de la codificació del xemblem_t no són formats "
+"Un nombre de testimonis (%d) de la codificació del GEmblem no són formats "
 "correctament"
 
 #: ../gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "No es pot gestionar la versió %d de la codificació del xemblemed_icon_t"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "No es pot gestionar la versió %d de la codificació del GEmblemedIcon"
 
 #: ../gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
 msgstr ""
-"Un nombre de testimonis (%d) en la codificació del xemblemed_icon_t no són "
+"Un nombre de testimonis (%d) en la codificació del GEmblemedIcon no són "
 "formats correctament"
 
 #: ../gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "S'esperava un xemblem_t per a un xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "S'esperava un GEmblem per a un GEmblemedIcon"
 
 #: ../gio/gfile.c:969 ../gio/gfile.c:1207 ../gio/gfile.c:1345
 #: ../gio/gfile.c:1583 ../gio/gfile.c:1638 ../gio/gfile.c:1696
@@ -1511,12 +1511,12 @@ msgstr "Ja està tancat l'enumerador de fitxer"
 
 #: ../gio/gfileicon.c:236
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "No es pot gestionar la versió %d de la codificació del xfile_icon_t"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "No es pot gestionar la versió %d de la codificació del GFileIcon"
 
 #: ../gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Les dades d'entrada pel xfile_icon_t no són formades correctament"
+msgid "Malformed input data for GFileIcon"
+msgstr "Les dades d'entrada pel GFileIcon no són formades correctament"
 
 #: ../gio/gfileinputstream.c:149 ../gio/gfileinputstream.c:394
 #: ../gio/gfileiostream.c:167 ../gio/gfileoutputstream.c:164
@@ -1579,8 +1579,8 @@ msgstr "El nom de classe %s no té tipus"
 
 #: ../gio/gicon.c:320
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "El tipus %s no implementa la interfície xicon_t"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "El tipus %s no implementa la interfície GIcon"
 
 #: ../gio/gicon.c:331
 #, c-format
@@ -1594,8 +1594,8 @@ msgstr "El número de versió no és format correctament: %s"
 
 #: ../gio/gicon.c:359
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "El tipus %s no implementa «from_tokens()» a la interfície xicon_t"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "El tipus %s no implementa «from_tokens()» a la interfície GIcon"
 
 #: ../gio/gicon.c:461
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2674,8 +2674,8 @@ msgstr "(encara) no s'ha definit <%s id='%s'>."
 
 #: ../gio/glib-compile-schemas.c:1004
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "El tipus de cadena xvariant_t «%s» no és vàlid"
+msgid "Invalid GVariant type string “%s”"
+msgstr "El tipus de cadena GVariant «%s» no és vàlid"
 
 #
 #: ../gio/glib-compile-schemas.c:1034
@@ -2868,11 +2868,11 @@ msgstr "No siguis estricte amb les restriccions dels noms de les claus"
 
 #: ../gio/glib-compile-schemas.c:2099
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Compila tots els fitxers d'esquema xsettings_t en una memòria cau d'esquemes.\n"
+"Compila tots els fitxers d'esquema GSettings en una memòria cau d'esquemes.\n"
 "Els fitxers d'esquema han de tindre l'extensió .gschema.xml\n"
 "i el fitxer de memòria cau es dirà gschemas.compiled."
 
@@ -3207,16 +3207,16 @@ msgid "Error removing old file: %s"
 msgstr "S'ha produït un error en suprimir el fitxer vell: %s"
 
 #: ../gio/gmemoryinputstream.c:474 ../gio/gmemoryoutputstream.c:772
-msgid "Invalid xseek_type_t supplied"
-msgstr "El xseek_type_t proporcionat no és vàlid"
+msgid "Invalid GSeekType supplied"
+msgstr "El GSeekType proporcionat no és vàlid"
 
 #: ../gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "La sol·licitud de busca és no vàlida"
 
 #: ../gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "No es pot truncar el xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "No es pot truncar el GMemoryInputStream"
 
 #: ../gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3746,8 +3746,8 @@ msgstr "S'ha excedit el temps d'espera d'entrada/eixida del sòcol"
 
 #: ../gio/gsocket.c:536
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "s'està creant un xsocket_t a partir del descriptor de fitxer: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "s'està creant un GSocket a partir del descriptor de fitxer: %s"
 
 #: ../gio/gsocket.c:565 ../gio/gsocket.c:619 ../gio/gsocket.c:626
 #, c-format
@@ -3854,8 +3854,8 @@ msgid "Error sending message: %s"
 msgstr "S'ha produït un error en enviar el missatge: %s"
 
 #: ../gio/gsocket.c:4398
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "El xsocket_control_message_t no està implementat a Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "El GSocketControlMessage no està implementat a Windows"
 
 #: ../gio/gsocket.c:4851 ../gio/gsocket.c:4924 ../gio/gsocket.c:5151
 #, c-format
@@ -3868,8 +3868,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "No s'han pogut llegir les credencials del sòcol: %s"
 
 #: ../gio/gsocket.c:5432
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "Este sistema operatiu no implementa el «xsocket_get_credentials»"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "Este sistema operatiu no implementa el «g_socket_get_credentials»"
 
 #: ../gio/gsocketclient.c:176
 #, c-format
@@ -4007,8 +4007,8 @@ msgstr "S'ha produït un error desconegut en el servidor intermediari SOCKSv5."
 
 #: ../gio/gthemedicon.c:518
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "No es pot gestionar la versió %d de la codificació del xthemed_icon_t"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "No es pot gestionar la versió %d de la codificació del GThemedIcon"
 
 #: ../gio/gthreadedresolver.c:118
 msgid "No valid addresses were found"
@@ -4342,25 +4342,25 @@ msgstr "El nom de camí «%s» no és un camí absolut"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: ../glib/gdatetime.c:202
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: ../glib/gdatetime.c:205
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: ../glib/gdatetime.c:208
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: ../glib/gdatetime.c:211
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4556,13 +4556,13 @@ msgstr "dg"
 
 #. Translators: 'before midday' indicator
 #: ../glib/gdatetime.c:354
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "A. M."
 
 #. Translators: 'after midday' indicator
 #: ../glib/gdatetime.c:357
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "P. M."
 

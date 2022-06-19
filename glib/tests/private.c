@@ -1,4 +1,4 @@
-/* Unit tests for xprivate_t and friends
+/* Unit tests for GPrivate and friends
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -21,8 +21,8 @@
  */
 
 /* We are testing some deprecated APIs here */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
@@ -34,11 +34,11 @@
 static void
 test_private1 (void)
 {
-  static xprivate_t private = G_PRIVATE_INIT (NULL);
-  xpointer_t value;
+  static GPrivate private = G_PRIVATE_INIT (NULL);
+  gpointer value;
 
   value = g_private_get (&private);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   g_private_set (&private, GINT_TO_POINTER(1));
   value = g_private_get (&private);
@@ -49,22 +49,22 @@ test_private1 (void)
   g_assert_cmpint (GPOINTER_TO_INT (value), ==, 2);
 }
 
-static xint_t private2_destroy_count;
+static gint private2_destroy_count;
 
 static void
-private2_destroy (xpointer_t data)
+private2_destroy (gpointer data)
 {
   g_atomic_int_inc (&private2_destroy_count);
 }
 
-static xprivate_t private2 = G_PRIVATE_INIT (private2_destroy);
+static GPrivate private2 = G_PRIVATE_INIT (private2_destroy);
 
-static xpointer_t
-private2_func (xpointer_t data)
+static gpointer
+private2_func (gpointer data)
 {
-  xint_t value = GPOINTER_TO_INT (data);
-  xint_t i;
-  xint_t v, v2;
+  gint value = GPOINTER_TO_INT (data);
+  gint i;
+  gint v, v2;
 
   for (i = 0; i < 1000; i++)
     {
@@ -76,7 +76,7 @@ private2_func (xpointer_t data)
     }
 
   if (value % 2 == 0)
-    xthread_exit (NULL);
+    g_thread_exit (NULL);
 
   return NULL;
 }
@@ -84,34 +84,34 @@ private2_func (xpointer_t data)
 /* test that
  * - threads do not interfere with each other
  * - destroy notifies are called for each thread exit
- * - destroy notifies are called for xthread_exit() too
+ * - destroy notifies are called for g_thread_exit() too
  * - destroy notifies are not called on g_private_set()
  * - destroy notifies are called on g_private_replace()
  */
 static void
 test_private2 (void)
 {
-  xthread_t *thread[10];
-  xint_t i;
+  GThread *thread[10];
+  gint i;
 
   g_private_set (&private2, GINT_TO_POINTER (234));
   g_private_replace (&private2, GINT_TO_POINTER (123));
 
   for (i = 0; i < 10; i++)
-    thread[i] = xthread_create (private2_func, GINT_TO_POINTER (i), TRUE, NULL);
+    thread[i] = g_thread_create (private2_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   for (i = 0; i < 10; i++)
-    xthread_join (thread[i]);
+    g_thread_join (thread[i]);
 
   g_assert_cmpint (private2_destroy_count, ==, 11);
 }
 
-static xboolean_t private3_freed;
+static gboolean private3_freed;
 
 static void
-private3_free (xpointer_t data)
+private3_free (gpointer data)
 {
-  xassert (data == (void*) 0x1234);
+  g_assert (data == (void*) 0x1234);
   private3_freed = TRUE;
 }
 
@@ -119,15 +119,15 @@ private3_free (xpointer_t data)
 #include <windows.h>
 #include <process.h>
 
-static xuint_t __stdcall
+static guint __stdcall
 #else
 #include <pthread.h>
 
-static xpointer_t
+static gpointer
 #endif
-private3_func (xpointer_t data)
+private3_func (gpointer data)
 {
-  static xprivate_t key = G_PRIVATE_INIT (private3_free);
+  static GPrivate key = G_PRIVATE_INIT (private3_free);
 
   g_private_set (&key, (void *) 0x1234);
 
@@ -137,12 +137,12 @@ private3_func (xpointer_t data)
 static void
 test_private3 (void)
 {
-  xassert (!private3_freed);
+  g_assert (!private3_freed);
 
 #ifdef G_OS_WIN32
   {
     HANDLE thread;
-    xuint_t ignore;
+    guint ignore;
     thread = (HANDLE) _beginthreadex (NULL, 0, private3_func, NULL, 0, &ignore);
     WaitForSingleObject (thread, INFINITE);
     CloseHandle (thread);
@@ -154,6 +154,11 @@ test_private3 (void)
      * functions (instead of TLS) as proposed in
      * https://gitlab.gnome.org/GNOME/glib/-/merge_requests/1655
      */
+    if (!private3_freed)
+      {
+        g_test_skip ("FIXME: GPrivate with native win32 thread");
+        return;
+      }
   }
 #else
   {
@@ -163,7 +168,7 @@ test_private3 (void)
     pthread_join (thread, NULL);
   }
 #endif
-  xassert (private3_freed);
+  g_assert (private3_freed);
 }
 
 /* test basics:
@@ -176,10 +181,10 @@ static GStaticPrivate sp1 = G_STATIC_PRIVATE_INIT;
 static void
 test_static_private1 (void)
 {
-  xpointer_t value;
+  gpointer value;
 
   value = g_static_private_get (&sp1);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   g_static_private_set (&sp1, GINT_TO_POINTER(1), NULL);
   value = g_static_private_get (&sp1);
@@ -192,21 +197,21 @@ test_static_private1 (void)
   g_static_private_free (&sp1);
 
   value = g_static_private_get (&sp1);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 }
 
-static xint_t sp2_destroy_count;
+static gint sp2_destroy_count;
 
 static void
-sp2_destroy (xpointer_t data)
+sp2_destroy (gpointer data)
 {
   sp2_destroy_count++;
 }
 
 static void
-sp2_destroy2 (xpointer_t data)
+sp2_destroy2 (gpointer data)
 {
-  xint_t value = GPOINTER_TO_INT (data);
+  gint value = GPOINTER_TO_INT (data);
 
   g_assert_cmpint (value, ==, 2);
 }
@@ -218,12 +223,12 @@ static void
 test_static_private2 (void)
 {
   GStaticPrivate sp2;
-  xpointer_t value;
+  gpointer value;
 
   g_static_private_init (&sp2);
 
   value = g_static_private_get (&sp2);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   g_static_private_set (&sp2, GINT_TO_POINTER(1), sp2_destroy);
   g_assert_cmpint (sp2_destroy_count, ==, 0);
@@ -243,7 +248,7 @@ test_static_private2 (void)
   g_static_private_free (&sp2);
 
   value = g_static_private_get (&sp2);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 }
 
 /* test that freeing and reinitializing a static private
@@ -253,12 +258,12 @@ static void
 test_static_private3 (void)
 {
   GStaticPrivate sp3;
-  xpointer_t value;
+  gpointer value;
 
   g_static_private_init (&sp3);
 
   value = g_static_private_get (&sp3);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   g_static_private_set (&sp3, GINT_TO_POINTER(1), NULL);
   value = g_static_private_get (&sp3);
@@ -268,7 +273,7 @@ test_static_private3 (void)
   g_static_private_init (&sp3);
 
   value = g_static_private_get (&sp3);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   g_static_private_set (&sp3, GINT_TO_POINTER(2), NULL);
   value = g_static_private_get (&sp3);
@@ -279,12 +284,12 @@ test_static_private3 (void)
 
 static GStaticPrivate sp4 = G_STATIC_PRIVATE_INIT;
 
-static xpointer_t
-sp4_func (xpointer_t data)
+static gpointer
+sp4_func (gpointer data)
 {
-  xint_t value = GPOINTER_TO_INT (data);
-  xint_t i;
-  xint_t v, v2;
+  gint value = GPOINTER_TO_INT (data);
+  gint i;
+  gint v, v2;
 
   for (i = 0; i < 1000; i++)
     {
@@ -296,7 +301,7 @@ sp4_func (xpointer_t data)
     }
 
   if (value % 2 == 0)
-    xthread_exit (NULL);
+    g_thread_exit (NULL);
 
   return NULL;
 }
@@ -306,32 +311,32 @@ sp4_func (xpointer_t data)
 static void
 test_static_private4 (void)
 {
-  xthread_t *thread[10];
-  xint_t i;
+  GThread *thread[10];
+  gint i;
 
   for (i = 0; i < 10; i++)
-    thread[i] = xthread_create (sp4_func, GINT_TO_POINTER (i), TRUE, NULL);
+    thread[i] = g_thread_create (sp4_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   for (i = 0; i < 10; i++)
-    xthread_join (thread[i]);
+    g_thread_join (thread[i]);
 
   g_static_private_free (&sp4);
 }
 
 static GStaticPrivate sp5 = G_STATIC_PRIVATE_INIT;
-static xmutex_t m5;
-static xcond_t c5a;
-static xcond_t c5b;
-static xint_t count5;
+static GMutex m5;
+static GCond c5a;
+static GCond c5b;
+static gint count5;
 
-static xpointer_t
-sp5_func (xpointer_t data)
+static gpointer
+sp5_func (gpointer data)
 {
-  xint_t v = GPOINTER_TO_INT (data);
-  xpointer_t value;
+  gint v = GPOINTER_TO_INT (data);
+  gpointer value;
 
   value = g_static_private_get (&sp5);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   g_static_private_set (&sp5, GINT_TO_POINTER (v), NULL);
   value = g_static_private_get (&sp5);
@@ -348,7 +353,7 @@ sp5_func (xpointer_t data)
   if (g_test_verbose ())
     g_printerr ("thread %d get sp5\n", v);
   value = g_static_private_get (&sp5);
-  xassert (value == NULL);
+  g_assert (value == NULL);
 
   return NULL;
 }
@@ -356,13 +361,13 @@ sp5_func (xpointer_t data)
 static void
 test_static_private5 (void)
 {
-  xthread_t *thread[10];
-  xint_t i;
+  GThread *thread[10];
+  gint i;
 
   g_atomic_int_set (&count5, 0);
 
   for (i = 0; i < 10; i++)
-    thread[i] = xthread_create (sp5_func, GINT_TO_POINTER (i), TRUE, NULL);
+    thread[i] = g_thread_create (sp5_func, GINT_TO_POINTER (i), TRUE, NULL);
 
   g_mutex_lock (&m5);
   while (g_atomic_int_get (&count5) < 10)
@@ -377,7 +382,7 @@ test_static_private5 (void)
   g_mutex_unlock (&m5);
 
   for (i = 0; i < 10; i++)
-    xthread_join (thread[i]);
+    g_thread_join (thread[i]);
 }
 
 int

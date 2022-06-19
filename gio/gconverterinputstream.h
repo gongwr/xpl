@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XCONVERTER_INPUT_STREAM_H__
-#define __XCONVERTER_INPUT_STREAM_H__
+#ifndef __G_CONVERTER_INPUT_STREAM_H__
+#define __G_CONVERTER_INPUT_STREAM_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,31 +30,31 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_CONVERTER_INPUT_STREAM         (xconverter_input_stream_get_type ())
-#define XCONVERTER_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream))
-#define XCONVERTER_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream_class_t))
-#define X_IS_CONVERTER_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CONVERTER_INPUT_STREAM))
-#define X_IS_CONVERTER_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CONVERTER_INPUT_STREAM))
-#define XCONVERTER_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream_class_t))
+#define G_TYPE_CONVERTER_INPUT_STREAM         (g_converter_input_stream_get_type ())
+#define G_CONVERTER_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_CONVERTER_INPUT_STREAM, GConverterInputStream))
+#define G_CONVERTER_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_CONVERTER_INPUT_STREAM, GConverterInputStreamClass))
+#define G_IS_CONVERTER_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_CONVERTER_INPUT_STREAM))
+#define G_IS_CONVERTER_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_CONVERTER_INPUT_STREAM))
+#define G_CONVERTER_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_CONVERTER_INPUT_STREAM, GConverterInputStreamClass))
 
 /**
- * xconverter_input_stream_t:
+ * GConverterInputStream:
  *
- * An implementation of #xfilter_input_stream_t that allows data
+ * An implementation of #GFilterInputStream that allows data
  * conversion.
  **/
-typedef struct _xconverter_input_stream_class    xconverter_input_stream_class_t;
+typedef struct _GConverterInputStreamClass    GConverterInputStreamClass;
 typedef struct _GConverterInputStreamPrivate  GConverterInputStreamPrivate;
 
 struct _GConverterInputStream
 {
-  xfilter_input_stream_t parent_instance;
+  GFilterInputStream parent_instance;
 
   /*< private >*/
   GConverterInputStreamPrivate *priv;
 };
 
-struct _xconverter_input_stream_class
+struct _GConverterInputStreamClass
 {
   GFilterInputStreamClass parent_class;
 
@@ -67,14 +67,14 @@ struct _xconverter_input_stream_class
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                  xconverter_input_stream_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t          *xconverter_input_stream_new           (xinput_stream_t          *base_stream,
-                                                               xconverter_t            *converter);
-XPL_AVAILABLE_IN_ALL
-xconverter_t            *xconverter_input_stream_get_converter (xconverter_input_stream_t *converter_stream);
+GLIB_AVAILABLE_IN_ALL
+GType                  g_converter_input_stream_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GInputStream          *g_converter_input_stream_new           (GInputStream          *base_stream,
+                                                               GConverter            *converter);
+GLIB_AVAILABLE_IN_ALL
+GConverter            *g_converter_input_stream_get_converter (GConverterInputStream *converter_stream);
 
 G_END_DECLS
 
-#endif /* __XCONVERTER_INPUT_STREAM_H__ */
+#endif /* __G_CONVERTER_INPUT_STREAM_H__ */

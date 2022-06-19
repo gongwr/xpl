@@ -26,14 +26,14 @@
 
 G_BEGIN_DECLS
 
-xboolean_t xinput_stream_async_read_is_via_threads (xinput_stream_t *stream);
-xboolean_t xinput_stream_async_close_is_via_threads (xinput_stream_t *stream);
-xboolean_t xoutput_stream_async_write_is_via_threads (xoutput_stream_t *stream);
-xboolean_t xoutput_stream_async_writev_is_via_threads (xoutput_stream_t *stream);
-xboolean_t xoutput_stream_async_close_is_via_threads (xoutput_stream_t *stream);
+gboolean g_input_stream_async_read_is_via_threads (GInputStream *stream);
+gboolean g_input_stream_async_close_is_via_threads (GInputStream *stream);
+gboolean g_output_stream_async_write_is_via_threads (GOutputStream *stream);
+gboolean g_output_stream_async_writev_is_via_threads (GOutputStream *stream);
+gboolean g_output_stream_async_close_is_via_threads (GOutputStream *stream);
 
-void xsocket_connection_set_cached_remote_address (xsocket_connection_t *connection,
-                                                    xsocket_address_t    *address);
+void g_socket_connection_set_cached_remote_address (GSocketConnection *connection,
+                                                    GSocketAddress    *address);
 
 /* POSIX defines IOV_MAX/UIO_MAXIOV as the maximum number of iovecs that can
  * be sent in one go. We define our own version of it here as there are two

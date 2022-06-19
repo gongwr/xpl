@@ -30,10 +30,10 @@
 G_BEGIN_DECLS
 
 #ifdef G_OS_WIN32
-xboolean_t _g_win32_overlap_wait_result (HANDLE           hfile,
+gboolean _g_win32_overlap_wait_result (HANDLE           hfile,
                                        OVERLAPPED      *overlap,
                                        DWORD           *transferred,
-                                       xcancellable_t    *cancellable);
+                                       GCancellable    *cancellable);
 #endif
 
 G_END_DECLS

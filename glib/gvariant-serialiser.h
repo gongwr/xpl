@@ -26,51 +26,51 @@
 typedef struct
 {
   GVariantTypeInfo *type_info;
-  xuchar_t           *data;
-  xsize_t             size;
-  xsize_t             depth;  /* same semantics as xvariant_t.depth */
+  guchar           *data;
+  gsize             size;
+  gsize             depth;  /* same semantics as GVariant.depth */
 } GVariantSerialised;
 
 /* deserialization */
-XPL_AVAILABLE_IN_ALL
-xsize_t                           xvariant_serialised_n_children         (GVariantSerialised        container);
-XPL_AVAILABLE_IN_ALL
-GVariantSerialised              xvariant_serialised_get_child          (GVariantSerialised        container,
-                                                                         xsize_t                     index);
+GLIB_AVAILABLE_IN_ALL
+gsize                           g_variant_serialised_n_children         (GVariantSerialised        container);
+GLIB_AVAILABLE_IN_ALL
+GVariantSerialised              g_variant_serialised_get_child          (GVariantSerialised        container,
+                                                                         gsize                     index);
 
 /* serialization */
 typedef void                  (*GVariantSerialisedFiller)               (GVariantSerialised       *serialised,
-                                                                         xpointer_t                  data);
+                                                                         gpointer                  data);
 
-XPL_AVAILABLE_IN_ALL
-xsize_t                           xvariant_serialiser_needed_size        (GVariantTypeInfo         *info,
+GLIB_AVAILABLE_IN_ALL
+gsize                           g_variant_serialiser_needed_size        (GVariantTypeInfo         *info,
                                                                          GVariantSerialisedFiller  gsv_filler,
-                                                                         const xpointer_t           *children,
-                                                                         xsize_t                     n_children);
+                                                                         const gpointer           *children,
+                                                                         gsize                     n_children);
 
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_serialiser_serialise          (GVariantSerialised        container,
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_serialiser_serialise          (GVariantSerialised        container,
                                                                          GVariantSerialisedFiller  gsv_filler,
-                                                                         const xpointer_t           *children,
-                                                                         xsize_t                     n_children);
+                                                                         const gpointer           *children,
+                                                                         gsize                     n_children);
 
 /* misc */
-XPL_AVAILABLE_IN_2_60
-xboolean_t                        xvariant_serialised_check              (GVariantSerialised        serialised);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_serialised_is_normal          (GVariantSerialised        value);
-XPL_AVAILABLE_IN_ALL
-void                            xvariant_serialised_byteswap           (GVariantSerialised        value);
+GLIB_AVAILABLE_IN_2_60
+gboolean                        g_variant_serialised_check              (GVariantSerialised        serialised);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_serialised_is_normal          (GVariantSerialised        value);
+GLIB_AVAILABLE_IN_ALL
+void                            g_variant_serialised_byteswap           (GVariantSerialised        value);
 
 /* validation of strings */
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_serialiser_is_string          (xconstpointer             data,
-                                                                         xsize_t                     size);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_serialiser_is_object_path     (xconstpointer             data,
-                                                                         xsize_t                     size);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_serialiser_is_signature       (xconstpointer             data,
-                                                                         xsize_t                     size);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_serialiser_is_string          (gconstpointer             data,
+                                                                         gsize                     size);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_serialiser_is_object_path     (gconstpointer             data,
+                                                                         gsize                     size);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_serialiser_is_signature       (gconstpointer             data,
+                                                                         gsize                     size);
 
 #endif /* __G_VARIANT_SERIALISER_H__ */

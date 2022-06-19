@@ -3,35 +3,35 @@
 #include <string.h>
 
 static void
-activate (xapplication_t *application)
+activate (GApplication *application)
 {
   g_print ("activated\n");
 
   /* Note: when doing a longer-lasting action here that returns
-   * to the mainloop, you should use xapplication_hold() and
-   * xapplication_release() to keep the application alive until
+   * to the mainloop, you should use g_application_hold() and
+   * g_application_release() to keep the application alive until
    * the action is completed.
    */
 }
 
 static void
-open (xapplication_t  *application,
-      xfile_t        **files,
-      xint_t           n_files,
-      const xchar_t   *hint)
+open (GApplication  *application,
+      GFile        **files,
+      gint           n_files,
+      const gchar   *hint)
 {
-  xint_t i;
+  gint i;
 
   for (i = 0; i < n_files; i++)
     {
-      xchar_t *uri = xfile_get_uri (files[i]);
+      gchar *uri = g_file_get_uri (files[i]);
       g_print ("open %s\n", uri);
       g_free (uri);
     }
 
   /* Note: when doing a longer-lasting action here that returns
-   * to the mainloop, you should use xapplication_hold() and
-   * xapplication_release() to keep the application alive until
+   * to the mainloop, you should use g_application_hold() and
+   * g_application_release() to keep the application alive until
    * the action is completed.
    */
 }
@@ -39,18 +39,18 @@ open (xapplication_t  *application,
 int
 main (int argc, char **argv)
 {
-  xapplication_t *app;
+  GApplication *app;
   int status;
 
-  app = xapplication_new ("org.gtk.test_application_t",
+  app = g_application_new ("org.gtk.TestApplication",
                            G_APPLICATION_HANDLES_OPEN);
-  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  xsignal_connect (app, "open", G_CALLBACK (open), NULL);
-  xapplication_set_inactivity_timeout (app, 10000);
+  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  g_signal_connect (app, "open", G_CALLBACK (open), NULL);
+  g_application_set_inactivity_timeout (app, 10000);
 
-  status = xapplication_run (app, argc, argv);
+  status = g_application_run (app, argc, argv);
 
-  xobject_unref (app);
+  g_object_unref (app);
 
   return status;
 }

@@ -38,7 +38,7 @@ int main()
 {
   int result = 0;
   volatile long double x;
-  /* test_t on finite numbers that fails on AIX 5.1.  */
+  /* Test on finite numbers that fails on AIX 5.1.  */
   x = 16.0L;
   {
     int exp = -9999;
@@ -46,7 +46,7 @@ int main()
     if (exp != 5)
       result |= 1;
   }
-  /* test_t on finite numbers that fails on Mac OS X 10.4, because its frexpl
+  /* Test on finite numbers that fails on Mac OS X 10.4, because its frexpl
      function returns an invalid (incorrectly normalized) value: it returns
                y = { 0x3fe028f5, 0xc28f5c28, 0x3c9eb851, 0xeb851eb8 }
      but the correct result is
@@ -58,7 +58,7 @@ int main()
     if (!(exp == 1 && y == 0.505L))
       result |= 2;
   }
-  /* test_t on large finite numbers.  This fails on BeOS at i = 16322, while
+  /* Test on large finite numbers.  This fails on BeOS at i = 16322, while
      LDBL_MAX_EXP = 16384.
      In the loop end test, we test x against Infinity, rather than comparing
      i with LDBL_MAX_EXP, because BeOS <float.h> has a wrong LDBL_MAX_EXP.  */
@@ -75,7 +75,7 @@ int main()
           }
       }
   }
-  /* test_t on denormalized numbers.  */
+  /* Test on denormalized numbers.  */
   {
     int i;
     for (i = 1, x = 1.0L; i >= LDBL_MIN_EXP; i--, x *= 0.5L)
@@ -90,7 +90,7 @@ int main()
           result |= 8;
       }
   }
-  /* test_t on infinite numbers.  */
+  /* Test on infinite numbers.  */
   /* The dance around 0.0L is an attempt to prevent MSVC from erroring out */
   x = 0.0L;
   x = 1.0L / x;

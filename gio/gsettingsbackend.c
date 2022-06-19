@@ -37,29 +37,29 @@ typedef struct _GSettingsBackendWatch   GSettingsBackendWatch;
 struct _GSettingsBackendPrivate
 {
   GSettingsBackendWatch *watches;
-  xmutex_t lock;
+  GMutex lock;
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xsettings_backend_t, g_settings_backend, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GSettingsBackend, g_settings_backend, G_TYPE_OBJECT)
 
 /* For g_settings_backend_sync_default(), we only want to actually do
  * the sync if the backend already exists.  This avoids us creating an
- * entire xsettings_backend_t in order to call a do-nothing sync()
+ * entire GSettingsBackend in order to call a do-nothing sync()
  * operation on it.  This variable lets us avoid that.
  */
-static xboolean_t g_settings_has_backend;
+static gboolean g_settings_has_backend;
 
 /**
  * SECTION:gsettingsbackend
- * @title: xsettings_backend_t
+ * @title: GSettingsBackend
  * @short_description: Interface for settings backend implementations
  * @include: gio/gsettingsbackend.h
- * @see_also: #xsettings_t, #xio_extension_point_t
+ * @see_also: #GSettings, #GIOExtensionPoint
  *
- * The #xsettings_backend_t interface defines a generic interface for
+ * The #GSettingsBackend interface defines a generic interface for
  * non-strictly-typed data that is stored in a hierarchy. To implement
- * an alternative storage backend for #xsettings_t, you need to implement
- * the #xsettings_backend_t interface and then make it implement the
+ * an alternative storage backend for #GSettings, you need to implement
+ * the #GSettingsBackend interface and then make it implement the
  * extension point %G_SETTINGS_BACKEND_EXTENSION_POINT_NAME.
  *
  * The interface defines methods for reading and writing values, a
@@ -70,52 +70,52 @@ static xboolean_t g_settings_has_backend;
  * implementations must carefully adhere to the expectations of
  * callers that are documented on each of the interface methods.
  *
- * Some of the #xsettings_backend_t functions accept or return a #xtree_t.
- * These trees always have strings as keys and #xvariant_t as values.
+ * Some of the #GSettingsBackend functions accept or return a #GTree.
+ * These trees always have strings as keys and #GVariant as values.
  * g_settings_backend_create_tree() is a convenience function to create
  * suitable trees.
  *
- * The #xsettings_backend_t API is exported to allow third-party
+ * The #GSettingsBackend API is exported to allow third-party
  * implementations, but does not carry the same stability guarantees
  * as the public GIO API. For this reason, you have to define the
  * C preprocessor symbol %G_SETTINGS_ENABLE_BACKEND before including
  * `gio/gsettingsbackend.h`.
  **/
 
-static xboolean_t
-is_key (const xchar_t *key)
+static gboolean
+is_key (const gchar *key)
 {
-  xint_t length;
-  xint_t i;
+  gint length;
+  gint i;
 
-  xreturn_val_if_fail (key != NULL, FALSE);
-  xreturn_val_if_fail (key[0] == '/', FALSE);
+  g_return_val_if_fail (key != NULL, FALSE);
+  g_return_val_if_fail (key[0] == '/', FALSE);
 
   for (i = 1; key[i]; i++)
-    xreturn_val_if_fail (key[i] != '/' || key[i + 1] != '/', FALSE);
+    g_return_val_if_fail (key[i] != '/' || key[i + 1] != '/', FALSE);
 
   length = i;
 
-  xreturn_val_if_fail (key[length - 1] != '/', FALSE);
+  g_return_val_if_fail (key[length - 1] != '/', FALSE);
 
   return TRUE;
 }
 
-static xboolean_t
-is_path (const xchar_t *path)
+static gboolean
+is_path (const gchar *path)
 {
-  xint_t length;
-  xint_t i;
+  gint length;
+  gint i;
 
-  xreturn_val_if_fail (path != NULL, FALSE);
-  xreturn_val_if_fail (path[0] == '/', FALSE);
+  g_return_val_if_fail (path != NULL, FALSE);
+  g_return_val_if_fail (path[0] == '/', FALSE);
 
   for (i = 1; path[i]; i++)
-    xreturn_val_if_fail (path[i] != '/' || path[i + 1] != '/', FALSE);
+    g_return_val_if_fail (path[i] != '/' || path[i + 1] != '/', FALSE);
 
   length = i;
 
-  xreturn_val_if_fail (path[length - 1] == '/', FALSE);
+  g_return_val_if_fail (path[length - 1] == '/', FALSE);
 
   return TRUE;
 }
@@ -128,33 +128,33 @@ struct _GSettingsBackendWatch
    * at which point the target might already be close to
    * destroyed. It's not safe to use it for anything anymore
    * at that point */
-  xobject_t                       *target_ptr;
+  GObject                       *target_ptr;
   const GSettingsListenerVTable *vtable;
-  xmain_context_t                  *context;
+  GMainContext                  *context;
   GSettingsBackendWatch         *next;
 };
 
 struct _GSettingsBackendClosure
 {
-  void (*function) (xobject_t           *target,
-                    xsettings_backend_t  *backend,
-                    const xchar_t       *name,
-                    xpointer_t           origin_tag,
-                    xchar_t            **names);
+  void (*function) (GObject           *target,
+                    GSettingsBackend  *backend,
+                    const gchar       *name,
+                    gpointer           origin_tag,
+                    gchar            **names);
 
-  xmain_context_t      *context;
-  xobject_t           *target;
-  xsettings_backend_t  *backend;
-  xchar_t             *name;
-  xpointer_t           origin_tag;
-  xchar_t            **names;
+  GMainContext      *context;
+  GObject           *target;
+  GSettingsBackend  *backend;
+  gchar             *name;
+  gpointer           origin_tag;
+  gchar            **names;
 };
 
 static void
-g_settings_backend_watch_weak_notify (xpointer_t  data,
-                                      xobject_t  *where_the_object_was)
+g_settings_backend_watch_weak_notify (gpointer  data,
+                                      GObject  *where_the_object_was)
 {
-  xsettings_backend_t *backend = data;
+  GSettingsBackend *backend = data;
   GSettingsBackendWatch **ptr;
 
   /* search and remove */
@@ -178,12 +178,12 @@ g_settings_backend_watch_weak_notify (xpointer_t  data,
 
 /*< private >
  * g_settings_backend_watch:
- * @backend: a #xsettings_backend_t
- * @target: the xobject_t (typically xsettings_t instance) to call back to
- * @context: (nullable): a #xmain_context_t, or %NULL
+ * @backend: a #GSettingsBackend
+ * @target: the GObject (typically GSettings instance) to call back to
+ * @context: (nullable): a #GMainContext, or %NULL
  * ...: callbacks...
  *
- * Registers a new watch on a #xsettings_backend_t.
+ * Registers a new watch on a #GSettingsBackend.
  *
  * note: %NULL @context does not mean "default main context" but rather,
  * "it is okay to dispatch in any context".  If the default main context
@@ -201,40 +201,40 @@ g_settings_backend_watch_weak_notify (xpointer_t  data,
  * value of @origin_tag given to any callbacks.
  **/
 void
-g_settings_backend_watch (xsettings_backend_t              *backend,
+g_settings_backend_watch (GSettingsBackend              *backend,
                           const GSettingsListenerVTable *vtable,
-                          xobject_t                       *target,
-                          xmain_context_t                  *context)
+                          GObject                       *target,
+                          GMainContext                  *context)
 {
   GSettingsBackendWatch *watch;
 
   /* For purposes of discussion, we assume that our target is a
-   * xsettings_t instance.
+   * GSettings instance.
    *
    * Our strategy to defend against the final reference dropping on the
-   * xsettings_t object in a thread other than the one that is doing the
+   * GSettings object in a thread other than the one that is doing the
    * dispatching is as follows:
    *
-   *  1) hold a strong reference on the xsettings_t during an outstanding
+   *  1) hold a strong reference on the GSettings during an outstanding
    *     dispatch.  This ensures that the delivery is always possible while
-   *     the xsettings_t object is alive, and if this was the last reference
+   *     the GSettings object is alive, and if this was the last reference
    *     then it will be dropped from the dispatch thread.
    *
-   *  2) hold a weak reference on the xsettings_t at other times.  This
+   *  2) hold a weak reference on the GSettings at other times.  This
    *     allows us to receive early notification of pending destruction
    *     of the object.  At this point, it is still safe to obtain a
-   *     reference on the xobject_t to keep it alive, so #1 will work up
+   *     reference on the GObject to keep it alive, so #1 will work up
    *     to that point.  After that point, we'll have been able to drop
    *     the watch from the list.
    *
    * Note, in particular, that it's not possible to simply have an
    * "unwatch" function that gets called from the finalize function of
-   * the xsettings_t instance because, by that point it is no longer
-   * possible to keep the object alive using xobject_ref() and we would
+   * the GSettings instance because, by that point it is no longer
+   * possible to keep the object alive using g_object_ref() and we would
    * have no way of knowing this.
    *
    * Note also that we need to hold a reference on the main context here
-   * since the xsettings_t instance may be finalized before the closure runs.
+   * since the GSettings instance may be finalized before the closure runs.
    *
    * All access to the list holds a mutex.  We have some strategies to
    * avoid some of the pain that would be associated with that.
@@ -245,7 +245,7 @@ g_settings_backend_watch (xsettings_backend_t              *backend,
   watch->vtable = vtable;
   g_weak_ref_init (&watch->target, target);
   watch->target_ptr = target;
-  xobject_weak_ref (target, g_settings_backend_watch_weak_notify, backend);
+  g_object_weak_ref (target, g_settings_backend_watch_weak_notify, backend);
 
   /* linked list prepend */
   g_mutex_lock (&backend->priv->lock);
@@ -255,18 +255,18 @@ g_settings_backend_watch (xsettings_backend_t              *backend,
 }
 
 void
-g_settings_backend_unwatch (xsettings_backend_t *backend,
-                            xobject_t          *target)
+g_settings_backend_unwatch (GSettingsBackend *backend,
+                            GObject          *target)
 {
   /* Our caller surely owns a reference on 'target', so the order of
    * these two calls is unimportant.
    */
-  xobject_weak_unref (target, g_settings_backend_watch_weak_notify, backend);
+  g_object_weak_unref (target, g_settings_backend_watch_weak_notify, backend);
   g_settings_backend_watch_weak_notify (backend, target);
 }
 
-static xboolean_t
-g_settings_backend_invoke_closure (xpointer_t user_data)
+static gboolean
+g_settings_backend_invoke_closure (gpointer user_data)
 {
   GSettingsBackendClosure *closure = user_data;
 
@@ -274,10 +274,10 @@ g_settings_backend_invoke_closure (xpointer_t user_data)
                      closure->origin_tag, closure->names);
 
   if (closure->context)
-    xmain_context_unref (closure->context);
-  xobject_unref (closure->backend);
-  xobject_unref (closure->target);
-  xstrfreev (closure->names);
+    g_main_context_unref (closure->context);
+  g_object_unref (closure->backend);
+  g_object_unref (closure->target);
+  g_strfreev (closure->names);
   g_free (closure->name);
 
   g_slice_free (GSettingsBackendClosure, closure);
@@ -286,14 +286,14 @@ g_settings_backend_invoke_closure (xpointer_t user_data)
 }
 
 static void
-g_settings_backend_dispatch_signal (xsettings_backend_t    *backend,
-                                    xsize_t                function_offset,
-                                    const xchar_t         *name,
-                                    xpointer_t             origin_tag,
-                                    const xchar_t * const *names)
+g_settings_backend_dispatch_signal (GSettingsBackend    *backend,
+                                    gsize                function_offset,
+                                    const gchar         *name,
+                                    gpointer             origin_tag,
+                                    const gchar * const *names)
 {
   GSettingsBackendWatch *watch;
-  xslist_t *closures = NULL;
+  GSList *closures = NULL;
 
   /* We're in a little bit of a tricky situation here.  We need to hold
    * a lock while traversing the list, but we don't want to hold the
@@ -307,7 +307,7 @@ g_settings_backend_dispatch_signal (xsettings_backend_t    *backend,
   for (watch = backend->priv->watches; watch; watch = watch->next)
     {
       GSettingsBackendClosure *closure;
-      xobject_t *target = g_weak_ref_get (&watch->target);
+      GObject *target = g_weak_ref_get (&watch->target);
 
       /* If the target was destroyed in the meantime, just skip it here */
       if (!target)
@@ -316,16 +316,16 @@ g_settings_backend_dispatch_signal (xsettings_backend_t    *backend,
       closure = g_slice_new (GSettingsBackendClosure);
       closure->context = watch->context;
       if (closure->context)
-        xmain_context_ref (closure->context);
-      closure->backend = xobject_ref (backend);
+        g_main_context_ref (closure->context);
+      closure->backend = g_object_ref (backend);
       closure->target = g_steal_pointer (&target);
       closure->function = G_STRUCT_MEMBER (void *, watch->vtable,
                                            function_offset);
-      closure->name = xstrdup (name);
+      closure->name = g_strdup (name);
       closure->origin_tag = origin_tag;
-      closure->names = xstrdupv ((xchar_t **) names);
+      closure->names = g_strdupv ((gchar **) names);
 
-      closures = xslist_prepend (closures, closure);
+      closures = g_slist_prepend (closures, closure);
     }
   g_mutex_unlock (&backend->priv->lock);
 
@@ -334,19 +334,19 @@ g_settings_backend_dispatch_signal (xsettings_backend_t    *backend,
       GSettingsBackendClosure *closure = closures->data;
 
       if (closure->context)
-        xmain_context_invoke (closure->context,
+        g_main_context_invoke (closure->context,
                                g_settings_backend_invoke_closure,
                                closure);
       else
         g_settings_backend_invoke_closure (closure);
 
-      closures = xslist_delete_link (closures, closures);
+      closures = g_slist_delete_link (closures, closures);
     }
 }
 
 /**
  * g_settings_backend_changed:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the name of the key
  * @origin_tag: the origin tag
  *
@@ -376,11 +376,11 @@ g_settings_backend_dispatch_signal (xsettings_backend_t    *backend,
  * Since: 2.26
  **/
 void
-g_settings_backend_changed (xsettings_backend_t *backend,
-                            const xchar_t      *key,
-                            xpointer_t          origin_tag)
+g_settings_backend_changed (GSettingsBackend *backend,
+                            const gchar      *key,
+                            gpointer          origin_tag)
 {
-  g_return_if_fail (X_IS_SETTINGS_BACKEND (backend));
+  g_return_if_fail (G_IS_SETTINGS_BACKEND (backend));
   g_return_if_fail (is_key (key));
 
   g_settings_backend_dispatch_signal (backend,
@@ -391,7 +391,7 @@ g_settings_backend_changed (xsettings_backend_t *backend,
 
 /**
  * g_settings_backend_keys_changed:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @path: the path containing the changes
  * @items: (array zero-terminated=1): the %NULL-terminated list of changed keys
  * @origin_tag: the origin tag
@@ -421,12 +421,12 @@ g_settings_backend_changed (xsettings_backend_t *backend,
  * Since: 2.26
  */
 void
-g_settings_backend_keys_changed (xsettings_backend_t    *backend,
-                                 const xchar_t         *path,
-                                 xchar_t const * const *items,
-                                 xpointer_t             origin_tag)
+g_settings_backend_keys_changed (GSettingsBackend    *backend,
+                                 const gchar         *path,
+                                 gchar const * const *items,
+                                 gpointer             origin_tag)
 {
-  g_return_if_fail (X_IS_SETTINGS_BACKEND (backend));
+  g_return_if_fail (G_IS_SETTINGS_BACKEND (backend));
   g_return_if_fail (is_path (path));
 
   /* XXX: should do stricter checking (ie: inspect each item) */
@@ -440,7 +440,7 @@ g_settings_backend_keys_changed (xsettings_backend_t    *backend,
 
 /**
  * g_settings_backend_path_changed:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @path: the path containing the changes
  * @origin_tag: the origin tag
  *
@@ -469,11 +469,11 @@ g_settings_backend_keys_changed (xsettings_backend_t    *backend,
  * Since: 2.26
  */
 void
-g_settings_backend_path_changed (xsettings_backend_t *backend,
-                                 const xchar_t      *path,
-                                 xpointer_t          origin_tag)
+g_settings_backend_path_changed (GSettingsBackend *backend,
+                                 const gchar      *path,
+                                 gpointer          origin_tag)
 {
-  g_return_if_fail (X_IS_SETTINGS_BACKEND (backend));
+  g_return_if_fail (G_IS_SETTINGS_BACKEND (backend));
   g_return_if_fail (is_path (path));
 
   g_settings_backend_dispatch_signal (backend,
@@ -484,21 +484,21 @@ g_settings_backend_path_changed (xsettings_backend_t *backend,
 
 /**
  * g_settings_backend_writable_changed:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the name of the key
  *
  * Signals that the writability of a single key has possibly changed.
  *
- * Since xsettings_t performs no locking operations for itself, this call
+ * Since GSettings performs no locking operations for itself, this call
  * will always be made in response to external events.
  *
  * Since: 2.26
  **/
 void
-g_settings_backend_writable_changed (xsettings_backend_t *backend,
-                                     const xchar_t      *key)
+g_settings_backend_writable_changed (GSettingsBackend *backend,
+                                     const gchar      *key)
 {
-  g_return_if_fail (X_IS_SETTINGS_BACKEND (backend));
+  g_return_if_fail (G_IS_SETTINGS_BACKEND (backend));
   g_return_if_fail (is_key (key));
 
   g_settings_backend_dispatch_signal (backend,
@@ -509,22 +509,22 @@ g_settings_backend_writable_changed (xsettings_backend_t *backend,
 
 /**
  * g_settings_backend_path_writable_changed:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @path: the name of the path
  *
  * Signals that the writability of all keys below a given path may have
  * changed.
  *
- * Since xsettings_t performs no locking operations for itself, this call
+ * Since GSettings performs no locking operations for itself, this call
  * will always be made in response to external events.
  *
  * Since: 2.26
  **/
 void
-g_settings_backend_path_writable_changed (xsettings_backend_t *backend,
-                                          const xchar_t      *path)
+g_settings_backend_path_writable_changed (GSettingsBackend *backend,
+                                          const gchar      *path)
 {
-  g_return_if_fail (X_IS_SETTINGS_BACKEND (backend));
+  g_return_if_fail (G_IS_SETTINGS_BACKEND (backend));
   g_return_if_fail (is_path (path));
 
   g_settings_backend_dispatch_signal (backend,
@@ -535,30 +535,30 @@ g_settings_backend_path_writable_changed (xsettings_backend_t *backend,
 
 typedef struct
 {
-  const xchar_t **keys;
-  xvariant_t **values;
-  xint_t prefix_len;
-  xchar_t *prefix;
+  const gchar **keys;
+  GVariant **values;
+  gint prefix_len;
+  gchar *prefix;
 } FlattenState;
 
-static xboolean_t
-g_settings_backend_flatten_one (xpointer_t key,
-                                xpointer_t value,
-                                xpointer_t user_data)
+static gboolean
+g_settings_backend_flatten_one (gpointer key,
+                                gpointer value,
+                                gpointer user_data)
 {
   FlattenState *state = user_data;
-  const xchar_t *skey = key;
-  xint_t i;
+  const gchar *skey = key;
+  gint i;
 
-  xreturn_val_if_fail (is_key (key), TRUE);
+  g_return_val_if_fail (is_key (key), TRUE);
 
   /* calculate longest common prefix */
   if (state->prefix == NULL)
     {
-      xchar_t *last_byte;
+      gchar *last_byte;
 
       /* first key?  just take the prefix up to the last '/' */
-      state->prefix = xstrdup (skey);
+      state->prefix = g_strdup (skey);
       last_byte = strrchr (state->prefix, '/') + 1;
       state->prefix_len = last_byte - state->prefix;
       *last_byte = '\0';
@@ -597,7 +597,7 @@ g_settings_backend_flatten_one (xpointer_t key,
 
 /**
  * g_settings_backend_flatten_tree:
- * @tree: a #xtree_t containing the changes
+ * @tree: a #GTree containing the changes
  * @path: (out): the location to save the path
  * @keys: (out) (transfer container) (array zero-terminated=1): the
  *        location to save the relative keys
@@ -615,26 +615,26 @@ g_settings_backend_flatten_one (xpointer_t key,
  * Since: 2.26
  **/
 void
-g_settings_backend_flatten_tree (xtree_t         *tree,
-                                 xchar_t        **path,
-                                 const xchar_t ***keys,
-                                 xvariant_t    ***values)
+g_settings_backend_flatten_tree (GTree         *tree,
+                                 gchar        **path,
+                                 const gchar ***keys,
+                                 GVariant    ***values)
 {
   FlattenState state = { 0, };
-  xsize_t nnodes;
+  gsize nnodes;
 
-  nnodes = xtree_nnodes (tree);
+  nnodes = g_tree_nnodes (tree);
 
-  *keys = state.keys = g_new (const xchar_t *, nnodes + 1);
+  *keys = state.keys = g_new (const gchar *, nnodes + 1);
   state.keys[nnodes] = NULL;
 
   if (values != NULL)
     {
-      *values = state.values = g_new (xvariant_t *, nnodes + 1);
+      *values = state.values = g_new (GVariant *, nnodes + 1);
       state.values[nnodes] = NULL;
     }
 
-  xtree_foreach (tree, g_settings_backend_flatten_one, &state);
+  g_tree_foreach (tree, g_settings_backend_flatten_one, &state);
   g_return_if_fail (*keys + nnodes == state.keys);
 
   *path = state.prefix;
@@ -644,8 +644,8 @@ g_settings_backend_flatten_tree (xtree_t         *tree,
 
 /**
  * g_settings_backend_changed_tree:
- * @backend: a #xsettings_backend_t implementation
- * @tree: a #xtree_t containing the changes
+ * @backend: a #GSettingsBackend implementation
+ * @tree: a #GTree containing the changes
  * @origin_tag: the origin tag
  *
  * This call is a convenience wrapper.  It gets the list of changes from
@@ -655,20 +655,20 @@ g_settings_backend_flatten_tree (xtree_t         *tree,
  * Since: 2.26
  **/
 void
-g_settings_backend_changed_tree (xsettings_backend_t *backend,
-                                 xtree_t            *tree,
-                                 xpointer_t          origin_tag)
+g_settings_backend_changed_tree (GSettingsBackend *backend,
+                                 GTree            *tree,
+                                 gpointer          origin_tag)
 {
-  const xchar_t **keys;
-  xchar_t *path;
+  const gchar **keys;
+  gchar *path;
 
-  g_return_if_fail (X_IS_SETTINGS_BACKEND (backend));
+  g_return_if_fail (G_IS_SETTINGS_BACKEND (backend));
 
   g_settings_backend_flatten_tree (tree, &path, &keys, NULL);
 
 #ifdef DEBUG_CHANGES
   {
-    xint_t i;
+    gint i;
 
     g_print ("----\n");
     g_print ("changed_tree(): prefix %s\n", path);
@@ -685,9 +685,9 @@ g_settings_backend_changed_tree (xsettings_backend_t *backend,
 
 /*< private >
  * g_settings_backend_read:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the key to read
- * @expected_type: a #xvariant_type_t
+ * @expected_type: a #GVariantType
  * @default_value: if the default value should be returned
  *
  * Reads a key. This call will never block.
@@ -705,23 +705,23 @@ g_settings_backend_changed_tree (xsettings_backend_t *backend,
  *
  * Returns: (nullable) (transfer full): the value that was read, or %NULL
  */
-xvariant_t *
-g_settings_backend_read (xsettings_backend_t   *backend,
-                         const xchar_t        *key,
-                         const xvariant_type_t *expected_type,
-                         xboolean_t            default_value)
+GVariant *
+g_settings_backend_read (GSettingsBackend   *backend,
+                         const gchar        *key,
+                         const GVariantType *expected_type,
+                         gboolean            default_value)
 {
-  xvariant_t *value;
+  GVariant *value;
 
   value = G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->read (backend, key, expected_type, default_value);
 
   if (value != NULL)
-    value = xvariant_take_ref (value);
+    value = g_variant_take_ref (value);
 
-  if G_UNLIKELY (value && !xvariant_is_of_type (value, expected_type))
+  if G_UNLIKELY (value && !g_variant_is_of_type (value, expected_type))
     {
-      xvariant_unref (value);
+      g_variant_unref (value);
       value = NULL;
     }
 
@@ -730,9 +730,9 @@ g_settings_backend_read (xsettings_backend_t   *backend,
 
 /*< private >
  * g_settings_backend_read_user_value:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the key to read
- * @expected_type: a #xvariant_type_t
+ * @expected_type: a #GVariantType
  *
  * Reads the 'user value' of a key.
  *
@@ -743,22 +743,22 @@ g_settings_backend_read (xsettings_backend_t   *backend,
  *
  * Returns: (nullable) (transfer full): the value that was read, or %NULL
  */
-xvariant_t *
-g_settings_backend_read_user_value (xsettings_backend_t   *backend,
-                                    const xchar_t        *key,
-                                    const xvariant_type_t *expected_type)
+GVariant *
+g_settings_backend_read_user_value (GSettingsBackend   *backend,
+                                    const gchar        *key,
+                                    const GVariantType *expected_type)
 {
-  xvariant_t *value;
+  GVariant *value;
 
   value = G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->read_user_value (backend, key, expected_type);
 
   if (value != NULL)
-    value = xvariant_take_ref (value);
+    value = g_variant_take_ref (value);
 
-  if G_UNLIKELY (value && !xvariant_is_of_type (value, expected_type))
+  if G_UNLIKELY (value && !g_variant_is_of_type (value, expected_type))
     {
-      xvariant_unref (value);
+      g_variant_unref (value);
       value = NULL;
     }
 
@@ -767,15 +767,15 @@ g_settings_backend_read_user_value (xsettings_backend_t   *backend,
 
 /*< private >
  * g_settings_backend_write:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the name of the key
- * @value: a #xvariant_t value to write to this key
+ * @value: a #GVariant value to write to this key
  * @origin_tag: the origin tag
  *
  * Writes exactly one key.
  *
  * This call does not fail.  During this call a
- * #xsettings_backend_t::changed signal will be emitted if the value of the
+ * #GSettingsBackend::changed signal will be emitted if the value of the
  * key has changed.  The updated key value will be visible to any signal
  * callbacks.
  *
@@ -788,37 +788,37 @@ g_settings_backend_read_user_value (xsettings_backend_t   *backend,
  *
  * Returns: %TRUE if the write succeeded, %FALSE if the key was not writable
  */
-xboolean_t
-g_settings_backend_write (xsettings_backend_t *backend,
-                          const xchar_t      *key,
-                          xvariant_t         *value,
-                          xpointer_t          origin_tag)
+gboolean
+g_settings_backend_write (GSettingsBackend *backend,
+                          const gchar      *key,
+                          GVariant         *value,
+                          gpointer          origin_tag)
 {
-  xboolean_t success;
+  gboolean success;
 
-  xvariant_ref_sink (value);
+  g_variant_ref_sink (value);
   success = G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->write (backend, key, value, origin_tag);
-  xvariant_unref (value);
+  g_variant_unref (value);
 
   return success;
 }
 
 /*< private >
  * g_settings_backend_write_tree:
- * @backend: a #xsettings_backend_t implementation
- * @tree: a #xtree_t containing key-value pairs to write
+ * @backend: a #GSettingsBackend implementation
+ * @tree: a #GTree containing key-value pairs to write
  * @origin_tag: the origin tag
  *
  * Writes one or more keys.  This call will never block.
  *
  * The key of each item in the tree is the key name to write to and the
- * value is a #xvariant_t to write.  The proper type of #xtree_t for this
+ * value is a #GVariant to write.  The proper type of #GTree for this
  * call can be created with g_settings_backend_create_tree().  This call
- * might take a reference to the tree; you must not modified the #xtree_t
+ * might take a reference to the tree; you must not modified the #GTree
  * after passing it to this call.
  *
- * This call does not fail.  During this call a #xsettings_backend_t::changed
+ * This call does not fail.  During this call a #GSettingsBackend::changed
  * signal will be emitted if any keys have been changed.  The new values of
  * all updated keys will be visible to any signal callbacks.
  *
@@ -827,10 +827,10 @@ g_settings_backend_write (xsettings_backend_t *backend,
  * to indicate that the affected keys have suddenly "changed back" to their
  * old values.
  */
-xboolean_t
-g_settings_backend_write_tree (xsettings_backend_t *backend,
-                               xtree_t            *tree,
-                               xpointer_t          origin_tag)
+gboolean
+g_settings_backend_write_tree (GSettingsBackend *backend,
+                               GTree            *tree,
+                               gpointer          origin_tag)
 {
   return G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->write_tree (backend, tree, origin_tag);
@@ -838,7 +838,7 @@ g_settings_backend_write_tree (xsettings_backend_t *backend,
 
 /*< private >
  * g_settings_backend_reset:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the name of a key
  * @origin_tag: the origin tag
  *
@@ -847,9 +847,9 @@ g_settings_backend_write_tree (xsettings_backend_t *backend,
  * unsets it.
  */
 void
-g_settings_backend_reset (xsettings_backend_t *backend,
-                          const xchar_t      *key,
-                          xpointer_t          origin_tag)
+g_settings_backend_reset (GSettingsBackend *backend,
+                          const gchar      *key,
+                          gpointer          origin_tag)
 {
   G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->reset (backend, key, origin_tag);
@@ -857,7 +857,7 @@ g_settings_backend_reset (xsettings_backend_t *backend,
 
 /*< private >
  * g_settings_backend_get_writable:
- * @backend: a #xsettings_backend_t implementation
+ * @backend: a #GSettingsBackend implementation
  * @key: the name of a key
  *
  * Finds out if a key is available for writing to.  This is the
@@ -869,9 +869,9 @@ g_settings_backend_reset (xsettings_backend_t *backend,
  *
  * Returns: %TRUE if the key is writable
  */
-xboolean_t
-g_settings_backend_get_writable (xsettings_backend_t *backend,
-                                 const xchar_t      *key)
+gboolean
+g_settings_backend_get_writable (GSettingsBackend *backend,
+                                 const gchar      *key)
 {
   return G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->get_writable (backend, key);
@@ -879,14 +879,14 @@ g_settings_backend_get_writable (xsettings_backend_t *backend,
 
 /*< private >
  * g_settings_backend_unsubscribe:
- * @backend: a #xsettings_backend_t
+ * @backend: a #GSettingsBackend
  * @name: a key or path to subscribe to
  *
  * Reverses the effect of a previous call to
  * g_settings_backend_subscribe().
  */
 void
-g_settings_backend_unsubscribe (xsettings_backend_t *backend,
+g_settings_backend_unsubscribe (GSettingsBackend *backend,
                                 const char       *name)
 {
   G_SETTINGS_BACKEND_GET_CLASS (backend)
@@ -895,96 +895,96 @@ g_settings_backend_unsubscribe (xsettings_backend_t *backend,
 
 /*< private >
  * g_settings_backend_subscribe:
- * @backend: a #xsettings_backend_t
+ * @backend: a #GSettingsBackend
  * @name: a key or path to subscribe to
  *
  * Requests that change signals be emitted for events on @name.
  */
 void
-g_settings_backend_subscribe (xsettings_backend_t *backend,
-                              const xchar_t      *name)
+g_settings_backend_subscribe (GSettingsBackend *backend,
+                              const gchar      *name)
 {
   G_SETTINGS_BACKEND_GET_CLASS (backend)
     ->subscribe (backend, name);
 }
 
 static void
-g_settings_backend_finalize (xobject_t *object)
+g_settings_backend_finalize (GObject *object)
 {
-  xsettings_backend_t *backend = G_SETTINGS_BACKEND (object);
+  GSettingsBackend *backend = G_SETTINGS_BACKEND (object);
 
   g_mutex_clear (&backend->priv->lock);
 
-  XOBJECT_CLASS (g_settings_backend_parent_class)
+  G_OBJECT_CLASS (g_settings_backend_parent_class)
     ->finalize (object);
 }
 
 static void
-ignore_subscription (xsettings_backend_t *backend,
-                     const xchar_t      *key)
+ignore_subscription (GSettingsBackend *backend,
+                     const gchar      *key)
 {
 }
 
-static xvariant_t *
-g_settings_backend_real_read_user_value (xsettings_backend_t   *backend,
-                                         const xchar_t        *key,
-                                         const xvariant_type_t *expected_type)
+static GVariant *
+g_settings_backend_real_read_user_value (GSettingsBackend   *backend,
+                                         const gchar        *key,
+                                         const GVariantType *expected_type)
 {
   return g_settings_backend_read (backend, key, expected_type, FALSE);
 }
 
 static void
-g_settings_backend_init (xsettings_backend_t *backend)
+g_settings_backend_init (GSettingsBackend *backend)
 {
   backend->priv = g_settings_backend_get_instance_private (backend);
   g_mutex_init (&backend->priv->lock);
 }
 
 static void
-g_settings_backend_class_init (xsettings_backend_class_t *class)
+g_settings_backend_class_init (GSettingsBackendClass *class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
 
   class->subscribe = ignore_subscription;
   class->unsubscribe = ignore_subscription;
 
   class->read_user_value = g_settings_backend_real_read_user_value;
 
-  xobject_class->finalize = g_settings_backend_finalize;
+  gobject_class->finalize = g_settings_backend_finalize;
 }
 
 static void
-g_settings_backend_variant_unref0 (xpointer_t data)
+g_settings_backend_variant_unref0 (gpointer data)
 {
   if (data != NULL)
-    xvariant_unref (data);
+    g_variant_unref (data);
 }
 
 /*< private >
  * g_settings_backend_create_tree:
  *
  * This is a convenience function for creating a tree that is compatible
- * with g_settings_backend_write().  It merely calls xtree_new_full()
- * with strcmp(), g_free() and xvariant_unref().
+ * with g_settings_backend_write().  It merely calls g_tree_new_full()
+ * with strcmp(), g_free() and g_variant_unref().
  *
- * Returns: a new #xtree_t
+ * Returns: a new #GTree
  */
-xtree_t *
+GTree *
 g_settings_backend_create_tree (void)
 {
-  return xtree_new_full ((GCompareDataFunc) strcmp, NULL,
+  return g_tree_new_full ((GCompareDataFunc) strcmp, NULL,
                           g_free, g_settings_backend_variant_unref0);
 }
 
-static xboolean_t
-g_settings_backend_verify (xpointer_t impl)
+static gboolean
+g_settings_backend_verify (gpointer impl)
 {
-  xsettings_backend_t *backend = impl;
+  GSettingsBackend *backend = impl;
 
-  if (strcmp (G_OBJECT_TYPE_NAME (backend), "xmemory_settings_backend_t") == 0 &&
-      xstrcmp0 (g_getenv ("GSETTINGS_BACKEND"), "memory") != 0)
+  if (strcmp (G_OBJECT_TYPE_NAME (backend), "GMemorySettingsBackend") == 0 &&
+      g_strcmp0 (g_getenv ("GSETTINGS_BACKEND"), "memory") != 0)
     {
-      g_message ("Using the 'memory' xsettings_t backend.  Your settings "
+      g_message ("Using the 'memory' GSettings backend.  Your settings "
 		 "will not be saved or shared with other applications.");
     }
 
@@ -992,63 +992,63 @@ g_settings_backend_verify (xpointer_t impl)
   return TRUE;
 }
 
-/* We need to cache the default #xsettings_backend_t for the entire process
- * lifetime, especially if the backend is #xmemory_settings_backend_t: it needs to
- * keep the in-memory settings around even while there are no #xsettings_t
+/* We need to cache the default #GSettingsBackend for the entire process
+ * lifetime, especially if the backend is #GMemorySettingsBackend: it needs to
+ * keep the in-memory settings around even while there are no #GSettings
  * instances alive. */
-static xsettings_backend_t *settings_backend_default_singleton = NULL;  /* (owned) (atomic) */
+static GSettingsBackend *settings_backend_default_singleton = NULL;  /* (owned) (atomic) */
 
 /**
  * g_settings_backend_get_default:
  *
- * Returns the default #xsettings_backend_t. It is possible to override
+ * Returns the default #GSettingsBackend. It is possible to override
  * the default by setting the `GSETTINGS_BACKEND` environment variable
  * to the name of a settings backend.
  *
  * The user gets a reference to the backend.
  *
- * Returns: (not nullable) (transfer full): the default #xsettings_backend_t,
+ * Returns: (not nullable) (transfer full): the default #GSettingsBackend,
  *     which will be a dummy (memory) settings backend if no other settings
  *     backend is available.
  *
  * Since: 2.28
  */
-xsettings_backend_t *
+GSettingsBackend *
 g_settings_backend_get_default (void)
 {
   if (g_once_init_enter (&settings_backend_default_singleton))
     {
-      xsettings_backend_t *singleton;
+      GSettingsBackend *singleton;
 
-      singleton = _xio_module_get_default (G_SETTINGS_BACKEND_EXTENSION_POINT_NAME,
+      singleton = _g_io_module_get_default (G_SETTINGS_BACKEND_EXTENSION_POINT_NAME,
                                             "GSETTINGS_BACKEND",
                                             g_settings_backend_verify);
 
       g_once_init_leave (&settings_backend_default_singleton, singleton);
     }
 
-  return xobject_ref (settings_backend_default_singleton);
+  return g_object_ref (settings_backend_default_singleton);
 }
 
 /*< private >
  * g_settings_backend_get_permission:
- * @backend: a #xsettings_backend_t
+ * @backend: a #GSettingsBackend
  * @path: a path
  *
  * Gets the permission object associated with writing to keys below
  * @path on @backend.
  *
  * If this is not implemented in the backend, then a %TRUE
- * #xsimple_permission_t is returned.
+ * #GSimplePermission is returned.
  *
- * Returns: (not nullable) (transfer full): a non-%NULL #xpermission_t.
- *     Free with xobject_unref()
+ * Returns: (not nullable) (transfer full): a non-%NULL #GPermission.
+ *     Free with g_object_unref()
  */
-xpermission_t *
-g_settings_backend_get_permission (xsettings_backend_t *backend,
-                                   const xchar_t      *path)
+GPermission *
+g_settings_backend_get_permission (GSettingsBackend *backend,
+                                   const gchar      *path)
 {
-  xsettings_backend_class_t *class = G_SETTINGS_BACKEND_GET_CLASS (backend);
+  GSettingsBackendClass *class = G_SETTINGS_BACKEND_GET_CLASS (backend);
 
   if (class->get_permission)
     return class->get_permission (backend, path);
@@ -1066,8 +1066,8 @@ g_settings_backend_sync_default (void)
 {
   if (g_settings_has_backend)
     {
-      xsettings_backend_class_t *class;
-      xsettings_backend_t *backend;
+      GSettingsBackendClass *class;
+      GSettingsBackend *backend;
 
       backend = g_settings_backend_get_default ();
       class = G_SETTINGS_BACKEND_GET_CLASS (backend);
@@ -1075,6 +1075,6 @@ g_settings_backend_sync_default (void)
       if (class->sync)
         class->sync (backend);
 
-      xobject_unref (backend);
+      g_object_unref (backend);
     }
 }

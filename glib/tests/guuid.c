@@ -42,7 +42,7 @@ test_guuid_string (void)
 static void
 test_guuid_random (void)
 {
-  xchar_t *str1, *str2;
+  gchar *str1, *str2;
 
   str1 = g_uuid_string_random ();
   g_assert_cmpuint (strlen (str1), ==, 36);

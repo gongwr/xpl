@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * gdataset-private.h: Internal macros for accessing dataset values
  * Copyright (C) 2005  Red Hat
  *
@@ -20,7 +20,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #ifndef __G_DATASETPRIVATE_H__
@@ -34,7 +34,7 @@ G_BEGIN_DECLS
  * barriers to take effect without acquiring the global dataset mutex.
  */
 #define G_DATALIST_GET_FLAGS(datalist)				\
-  ((xsize_t) g_atomic_pointer_get (datalist) & G_DATALIST_FLAGS_MASK)
+  ((gsize) g_atomic_pointer_get (datalist) & G_DATALIST_FLAGS_MASK)
 
 
 G_END_DECLS

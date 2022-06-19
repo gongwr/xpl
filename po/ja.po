@@ -38,16 +38,16 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: gio/gapplication.c:500
-msgid "xapplication_t options"
-msgstr "xapplication_t のオプション"
+msgid "GApplication options"
+msgstr "GApplication のオプション"
 
 #: gio/gapplication.c:500
-msgid "Show xapplication_t options"
-msgstr "xapplication_t のオプションを表示する"
+msgid "Show GApplication options"
+msgstr "GApplication のオプションを表示する"
 
 #: gio/gapplication.c:545
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
-msgstr "xapplication_t サービスモードに入る (D-Bus サービスファイル使用)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgstr "GApplication サービスモードに入る (D-Bus サービスファイル使用)"
 
 #: gio/gapplication.c:557
 msgid "Override the application’s ID"
@@ -156,8 +156,8 @@ msgid "PARAMETER"
 msgstr ""
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "アクションを呼び出す追加のパラメーター (xvariant_t 形式)"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "アクションを呼び出す追加のパラメーター (GVariant 形式)"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:664
 #, c-format
@@ -285,8 +285,8 @@ msgid "Seek not supported on base stream"
 msgstr "ベースストリームのシークはサポートしていません"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "xbuffered_input_stream_t を切りつめることはできません"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "GBufferedInputStream を切りつめることはできません"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -357,20 +357,20 @@ msgid "%s filetype"
 msgstr "%s (ファイルの種類)"
 
 #: gio/gcredentials.c:323
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t が不正なデータを含んでいます"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials が不正なデータを含んでいます"
 
 #: gio/gcredentials.c:383 gio/gcredentials.c:667
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "この OS では xcredentials_t は実装されていません"
+msgid "GCredentials is not implemented on this OS"
+msgstr "この OS では GCredentials は実装されていません"
 
 #: gio/gcredentials.c:538 gio/gcredentials.c:556
-msgid "There is no xcredentials_t support for your platform"
-msgstr "このプラットフォームは xcredentials_t をサポートしていません"
+msgid "There is no GCredentials support for your platform"
+msgstr "このプラットフォームは GCredentials をサポートしていません"
 
 #: gio/gcredentials.c:607
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t がこの OS のプロセス ID を含んでいません"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials がこの OS のプロセス ID を含んでいません"
 
 #: gio/gcredentials.c:661
 msgid "Credentials spoofing is not possible on this OS"
@@ -566,9 +566,9 @@ msgid "User IDs must be the same for peer and server"
 msgstr ""
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
 msgstr ""
-"xdbus_auth_observer_t::authorize-authenticated-peer 経由でキャンセルされました"
+"GDBusAuthObserver::authorize-authenticated-peer 経由でキャンセルされました"
 
 #: gio/gdbusauthmechanismsha1.c:298
 #, c-format
@@ -863,7 +863,7 @@ msgstr "Variant 型として解析した値“%s”は正しい D-Bus シグネ�
 #: gio/gdbusmessage.c:2031
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
 
 #: gio/gdbusmessage.c:2216
@@ -914,7 +914,7 @@ msgstr "メッセージをデシリアライズできません: "
 #: gio/gdbusmessage.c:2708
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
 
 #: gio/gdbusmessage.c:2845
@@ -1371,28 +1371,28 @@ msgstr "DTLS サポートは利用できません"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "バージョン %d の xemblem_t のエンコーディングはサポートしていません"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "バージョン %d の GEmblem のエンコーディングはサポートしていません"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "xemblem_t のエンコーディングにあるトークン数 (%d) が間違っています"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "GEmblem のエンコーディングにあるトークン数 (%d) が間違っています"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
 msgstr ""
-"バージョン %d の xemblemed_icon_t のエンコーディングはサポートしていません"
+"バージョン %d の GEmblemedIcon のエンコーディングはサポートしていません"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "xemblemed_icon_t のエンコーディングにあるトークン数 (%d) が間違っています"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "GEmblemedIcon のエンコーディングにあるトークン数 (%d) が間違っています"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "xemblemed_icon_t に対する xemblem_t を想定していました"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "GEmblemedIcon に対する GEmblem を想定していました"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1483,12 +1483,12 @@ msgstr "ファイルの Enumerator はすでに閉じています"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "バージョン %d の xfile_icon_t のエンコーディングはサポートしていません"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "バージョン %d の GFileIcon のエンコーディングはサポートしていません"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "xfile_icon_t の入力データが間違っています"
+msgid "Malformed input data for GFileIcon"
+msgstr "GFileIcon の入力データが間違っています"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1555,8 +1555,8 @@ msgstr "%s というクラス名の型がありません"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "%s という型は xicon_t のインターフェースを実装していません"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "%s という型は GIcon のインターフェースを実装していません"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1570,9 +1570,9 @@ msgstr "バージョン番号が間違っています: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
 msgstr ""
-"%s という型は xicon_t のインターフェースで from_tokens() を実装していません"
+"%s という型は GIcon のインターフェースで from_tokens() を実装していません"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2707,8 +2707,8 @@ msgstr "<%s id='%s'> は (まだ) 定義されていません。"
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "“%s”は不正な xvariant_t 型の文字列です"
+msgid "Invalid GVariant type string “%s”"
+msgstr "“%s”は不正な GVariant 型の文字列です"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2927,11 +2927,11 @@ msgstr "キー名の制約を強制しない"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"すべての xsettings_t スキーマファイルをコンパイルして、スキーマキャッシュを生成"
+"すべての GSettings スキーマファイルをコンパイルして、スキーマキャッシュを生成"
 "します。\n"
 "スキーマファイルの拡張子は .gschema.xml である必要があります。\n"
 "キャッシュファイルの名称は gschemas.compiled となります。"
@@ -3288,16 +3288,16 @@ msgid "Error removing old file: %s"
 msgstr "古いファイルの削除中にエラーが発生しました: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid xseek_type_t supplied"
-msgstr "不正な xseek_type_t が指定されました"
+msgid "Invalid GSeekType supplied"
+msgstr "不正な GSeekType が指定されました"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "不正なシーク要求です"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "xmemory_input_stream_t を切りつめられません"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "GMemoryInputStream を切りつめられません"
 
 #: gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3805,8 +3805,8 @@ msgstr "ソケット I/O がタイムアウトしました"
 
 #: gio/gsocket.c:578
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "ファイルディスクリプター xsocket_t を作成: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "ファイルディスクリプター GSocket を作成: %s"
 
 #: gio/gsocket.c:607 gio/gsocket.c:671 gio/gsocket.c:678
 #, c-format
@@ -3947,8 +3947,8 @@ msgid "Error sending message: %s"
 msgstr "メッセージの送信中にエラーが発生しました: %s"
 
 #: gio/gsocket.c:5026
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t は Windows ではサポートしていません"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage は Windows ではサポートしていません"
 
 #: gio/gsocket.c:5495 gio/gsocket.c:5571 gio/gsocket.c:5797
 #, c-format
@@ -3961,8 +3961,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr ""
 
 #: gio/gsocket.c:6136
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "この OS では xsocket_get_credentials は実装されていません"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "この OS では g_socket_get_credentials は実装されていません"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4093,8 +4093,8 @@ msgstr "このプラットフォームはパイプをサポートしていませ
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "バージョン %d の xthemed_icon_t のエンコーディングはサポートしていません"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "バージョン %d の GThemedIcon のエンコーディングはサポートしていません"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4143,7 +4143,7 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "PEM でエンコードされた証明書を解析できませんでした"
 
 #: gio/gtlscertificate.c:844
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
 msgstr ""
 
 #: gio/gtlspassword.c:111
@@ -4444,25 +4444,25 @@ msgstr "“%s”は絶対パスではありません"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%Y年%m月%d日 %H時%M分%S秒"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%Y/%m/%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%p%I時%M分%S秒"
 
@@ -4845,13 +4845,13 @@ msgstr "12月"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "午前"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "午後"
 
@@ -6207,11 +6207,11 @@ msgstr "%.1f EB"
 #~ msgid "File is empty"
 #~ msgstr "ファイルが空です"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "am"
 #~ msgstr "午前"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "pm"
 #~ msgstr "午後"
 

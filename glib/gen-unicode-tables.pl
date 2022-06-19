@@ -73,85 +73,85 @@ $FOLDING_MAPPING = 2;
 %mappings =
     (
      # Normative.
-     'Lu' => "XUNICODE_UPPERCASE_LETTER",
-     'Ll' => "XUNICODE_LOWERCASE_LETTER",
-     'Lt' => "XUNICODE_TITLECASE_LETTER",
-     'Mn' => "XUNICODE_NON_SPACING_MARK",
-     'Mc' => "XUNICODE_SPACING_MARK",
-     'Me' => "XUNICODE_ENCLOSING_MARK",
-     'Nd' => "XUNICODE_DECIMAL_NUMBER",
-     'Nl' => "XUNICODE_LETTER_NUMBER",
-     'No' => "XUNICODE_OTHER_NUMBER",
-     'Zs' => "XUNICODE_SPACE_SEPARATOR",
-     'Zl' => "XUNICODE_LINE_SEPARATOR",
-     'Zp' => "XUNICODE_PARAGRAPH_SEPARATOR",
-     'Cc' => "XUNICODE_CONTROL",
-     'Cf' => "XUNICODE_FORMAT",
-     'Cs' => "XUNICODE_SURROGATE",
-     'Co' => "XUNICODE_PRIVATE_USE",
-     'Cn' => "XUNICODE_UNASSIGNED",
+     'Lu' => "G_UNICODE_UPPERCASE_LETTER",
+     'Ll' => "G_UNICODE_LOWERCASE_LETTER",
+     'Lt' => "G_UNICODE_TITLECASE_LETTER",
+     'Mn' => "G_UNICODE_NON_SPACING_MARK",
+     'Mc' => "G_UNICODE_SPACING_MARK",
+     'Me' => "G_UNICODE_ENCLOSING_MARK",
+     'Nd' => "G_UNICODE_DECIMAL_NUMBER",
+     'Nl' => "G_UNICODE_LETTER_NUMBER",
+     'No' => "G_UNICODE_OTHER_NUMBER",
+     'Zs' => "G_UNICODE_SPACE_SEPARATOR",
+     'Zl' => "G_UNICODE_LINE_SEPARATOR",
+     'Zp' => "G_UNICODE_PARAGRAPH_SEPARATOR",
+     'Cc' => "G_UNICODE_CONTROL",
+     'Cf' => "G_UNICODE_FORMAT",
+     'Cs' => "G_UNICODE_SURROGATE",
+     'Co' => "G_UNICODE_PRIVATE_USE",
+     'Cn' => "G_UNICODE_UNASSIGNED",
 
      # Informative.
-     'Lm' => "XUNICODE_MODIFIER_LETTER",
-     'Lo' => "XUNICODE_OTHER_LETTER",
-     'Pc' => "XUNICODE_CONNECT_PUNCTUATION",
-     'Pd' => "XUNICODE_DASH_PUNCTUATION",
-     'Ps' => "XUNICODE_OPEN_PUNCTUATION",
-     'Pe' => "XUNICODE_CLOSE_PUNCTUATION",
-     'Pi' => "XUNICODE_INITIAL_PUNCTUATION",
-     'Pf' => "XUNICODE_FINAL_PUNCTUATION",
-     'Po' => "XUNICODE_OTHER_PUNCTUATION",
-     'Sm' => "XUNICODE_MATH_SYMBOL",
-     'Sc' => "XUNICODE_CURRENCY_SYMBOL",
-     'Sk' => "XUNICODE_MODIFIER_SYMBOL",
-     'So' => "XUNICODE_OTHER_SYMBOL"
+     'Lm' => "G_UNICODE_MODIFIER_LETTER",
+     'Lo' => "G_UNICODE_OTHER_LETTER",
+     'Pc' => "G_UNICODE_CONNECT_PUNCTUATION",
+     'Pd' => "G_UNICODE_DASH_PUNCTUATION",
+     'Ps' => "G_UNICODE_OPEN_PUNCTUATION",
+     'Pe' => "G_UNICODE_CLOSE_PUNCTUATION",
+     'Pi' => "G_UNICODE_INITIAL_PUNCTUATION",
+     'Pf' => "G_UNICODE_FINAL_PUNCTUATION",
+     'Po' => "G_UNICODE_OTHER_PUNCTUATION",
+     'Sm' => "G_UNICODE_MATH_SYMBOL",
+     'Sc' => "G_UNICODE_CURRENCY_SYMBOL",
+     'Sk' => "G_UNICODE_MODIFIER_SYMBOL",
+     'So' => "G_UNICODE_OTHER_SYMBOL"
      );
 
 %break_mappings =
     (
-     'AI' => "XUNICODE_BREAK_AMBIGUOUS",
-     'AL' => "XUNICODE_BREAK_ALPHABETIC",
-     'B2' => "XUNICODE_BREAK_BEFORE_AND_AFTER",
-     'BA' => "XUNICODE_BREAK_AFTER",
-     'BB' => "XUNICODE_BREAK_BEFORE",
-     'BK' => "XUNICODE_BREAK_MANDATORY",
-     'CB' => "XUNICODE_BREAK_CONTINGENT",
-     'CJ' => "XUNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER",
-     'CL' => "XUNICODE_BREAK_CLOSE_PUNCTUATION",
-     'CM' => "XUNICODE_BREAK_COMBINING_MARK",
-     'CP' => "XUNICODE_BREAK_CLOSE_PARENTHESIS",
-     'CR' => "XUNICODE_BREAK_CARRIAGE_RETURN",
-     'EB' => "XUNICODE_BREAK_EMOJI_BASE",
-     'EM' => "XUNICODE_BREAK_EMOJI_MODIFIER",
-     'EX' => "XUNICODE_BREAK_EXCLAMATION",
-     'GL' => "XUNICODE_BREAK_NON_BREAKING_GLUE",
-     'H2' => "XUNICODE_BREAK_HANGUL_LV_SYLLABLE",
-     'H3' => "XUNICODE_BREAK_HANGUL_LVT_SYLLABLE",
-     'HL' => "XUNICODE_BREAK_HEBREW_LETTER",
-     'HY' => "XUNICODE_BREAK_HYPHEN",
-     'ID' => "XUNICODE_BREAK_IDEOGRAPHIC",
-     'IN' => "XUNICODE_BREAK_INSEPARABLE",
-     'IS' => "XUNICODE_BREAK_INFIX_SEPARATOR",
-     'JL' => "XUNICODE_BREAK_HANGUL_L_JAMO",
-     'JT' => "XUNICODE_BREAK_HANGUL_T_JAMO",
-     'JV' => "XUNICODE_BREAK_HANGUL_V_JAMO",
-     'LF' => "XUNICODE_BREAK_LINE_FEED",
-     'NL' => "XUNICODE_BREAK_NEXT_LINE",
-     'NS' => "XUNICODE_BREAK_NON_STARTER",
-     'NU' => "XUNICODE_BREAK_NUMERIC",
-     'OP' => "XUNICODE_BREAK_OPEN_PUNCTUATION",
-     'PO' => "XUNICODE_BREAK_POSTFIX",
-     'PR' => "XUNICODE_BREAK_PREFIX",
-     'QU' => "XUNICODE_BREAK_QUOTATION",
-     'RI' => "XUNICODE_BREAK_REGIONAL_INDICATOR",
-     'SA' => "XUNICODE_BREAK_COMPLEX_CONTEXT",
-     'SG' => "XUNICODE_BREAK_SURROGATE",
-     'SP' => "XUNICODE_BREAK_SPACE",
-     'SY' => "XUNICODE_BREAK_SYMBOL",
-     'WJ' => "XUNICODE_BREAK_WORD_JOINER",
-     'XX' => "XUNICODE_BREAK_UNKNOWN",
-     'ZW' => "XUNICODE_BREAK_ZERO_WIDTH_SPACE",
-     'ZWJ' => "XUNICODE_BREAK_ZERO_WIDTH_JOINER"
+     'AI' => "G_UNICODE_BREAK_AMBIGUOUS",
+     'AL' => "G_UNICODE_BREAK_ALPHABETIC",
+     'B2' => "G_UNICODE_BREAK_BEFORE_AND_AFTER",
+     'BA' => "G_UNICODE_BREAK_AFTER",
+     'BB' => "G_UNICODE_BREAK_BEFORE",
+     'BK' => "G_UNICODE_BREAK_MANDATORY",
+     'CB' => "G_UNICODE_BREAK_CONTINGENT",
+     'CJ' => "G_UNICODE_BREAK_CONDITIONAL_JAPANESE_STARTER",
+     'CL' => "G_UNICODE_BREAK_CLOSE_PUNCTUATION",
+     'CM' => "G_UNICODE_BREAK_COMBINING_MARK",
+     'CP' => "G_UNICODE_BREAK_CLOSE_PARENTHESIS",
+     'CR' => "G_UNICODE_BREAK_CARRIAGE_RETURN",
+     'EB' => "G_UNICODE_BREAK_EMOJI_BASE",
+     'EM' => "G_UNICODE_BREAK_EMOJI_MODIFIER",
+     'EX' => "G_UNICODE_BREAK_EXCLAMATION",
+     'GL' => "G_UNICODE_BREAK_NON_BREAKING_GLUE",
+     'H2' => "G_UNICODE_BREAK_HANGUL_LV_SYLLABLE",
+     'H3' => "G_UNICODE_BREAK_HANGUL_LVT_SYLLABLE",
+     'HL' => "G_UNICODE_BREAK_HEBREW_LETTER",
+     'HY' => "G_UNICODE_BREAK_HYPHEN",
+     'ID' => "G_UNICODE_BREAK_IDEOGRAPHIC",
+     'IN' => "G_UNICODE_BREAK_INSEPARABLE",
+     'IS' => "G_UNICODE_BREAK_INFIX_SEPARATOR",
+     'JL' => "G_UNICODE_BREAK_HANGUL_L_JAMO",
+     'JT' => "G_UNICODE_BREAK_HANGUL_T_JAMO",
+     'JV' => "G_UNICODE_BREAK_HANGUL_V_JAMO",
+     'LF' => "G_UNICODE_BREAK_LINE_FEED",
+     'NL' => "G_UNICODE_BREAK_NEXT_LINE",
+     'NS' => "G_UNICODE_BREAK_NON_STARTER",
+     'NU' => "G_UNICODE_BREAK_NUMERIC",
+     'OP' => "G_UNICODE_BREAK_OPEN_PUNCTUATION",
+     'PO' => "G_UNICODE_BREAK_POSTFIX",
+     'PR' => "G_UNICODE_BREAK_PREFIX",
+     'QU' => "G_UNICODE_BREAK_QUOTATION",
+     'RI' => "G_UNICODE_BREAK_REGIONAL_INDICATOR",
+     'SA' => "G_UNICODE_BREAK_COMPLEX_CONTEXT",
+     'SG' => "G_UNICODE_BREAK_SURROGATE",
+     'SP' => "G_UNICODE_BREAK_SPACE",
+     'SY' => "G_UNICODE_BREAK_SYMBOL",
+     'WJ' => "G_UNICODE_BREAK_WORD_JOINER",
+     'XX' => "G_UNICODE_BREAK_UNKNOWN",
+     'ZW' => "G_UNICODE_BREAK_ZERO_WIDTH_SPACE",
+     'ZWJ' => "G_UNICODE_BREAK_ZERO_WIDTH_JOINER"
      );
 
 # Title case mappings.
@@ -317,14 +317,14 @@ $last_code = -1;
 while (<INPUT>)
 {
     my ($start_code, $end_code);
-
+    
     chop;
 
     next if /^#/;
     next if /^$/;
 
     s/\s*#.*//;
-
+    
     @fields = split (';', $_, 30);
     if ($#fields != 1)
     {
@@ -332,13 +332,13 @@ while (<INPUT>)
 	next;
     }
 
-    if ($fields[$CODE] =~ /([A-F0-9]{4,6})\.\.([A-F0-9]{4,6})/)
+    if ($fields[$CODE] =~ /([A-F0-9]{4,6})\.\.([A-F0-9]{4,6})/) 
     {
 	$start_code = hex ($1);
 	$end_code = hex ($2);
     } else {
 	$start_code = $end_code = hex ($fields[$CODE]);
-
+	
     }
 
     if ($start_code > $last_code + 1)
@@ -362,7 +362,7 @@ while (<INPUT>)
     {
 	$break_props[$last_code] = $fields[$BREAK_PROPERTY];
     }
-
+    
     $last_code = $end_code;
 }
 
@@ -390,7 +390,7 @@ open (INPUT, "< $specialcasingtxt") || exit 1;
 while (<INPUT>)
 {
     my $code;
-
+    
     chop;
 
     next if /^#/;
@@ -419,22 +419,22 @@ while (<INPUT>)
 	# Ignore conditional special cases - we'll handle them in code
 	next;
     }
-
-    if ($type[$code] eq 'Lu')
+    
+    if ($type[$code] eq 'Lu') 
     {
 	(hex $fields[$CASE_UPPER] == $code) || die "$raw_code is Lu and UCD_Upper($raw_code) != $raw_code";
 
 	&add_special_case ($code, $value[$code], $fields[$CASE_LOWER], $fields[$CASE_TITLE]);
-
-    } elsif ($type[$code] eq 'Lt')
+	
+    } elsif ($type[$code] eq 'Lt') 
     {
 	(hex $fields[$CASE_TITLE] == $code) || die "$raw_code is Lt and UCD_Title($raw_code) != $raw_code";
-
+	
 	&add_special_case ($code, undef, $fields[$CASE_LOWER], $fields[$CASE_UPPER]);
-    } elsif ($type[$code] eq 'Ll')
+    } elsif ($type[$code] eq 'Ll') 
     {
 	(hex $fields[$CASE_LOWER] == $code) || die "$raw_code is Ll and UCD_Lower($raw_code) != $raw_code";
-
+	
 	&add_special_case ($code, $value[$code], $fields[$CASE_UPPER], $fields[$CASE_TITLE]);
     } else {
 	printf STDERR "Special case for non-alphabetic code point: $raw_code\n";
@@ -448,11 +448,11 @@ open (INPUT, "< $casefoldingtxt") || exit 1;
 
 my $casefoldlen = 0;
 my @casefold;
-
+ 
 while (<INPUT>)
 {
     my $code;
-
+    
     chop;
 
     next if /^#/;
@@ -478,24 +478,24 @@ while (<INPUT>)
 
     # Check simple case
 
-    if (@values == 1 &&
+    if (@values == 1 && 
 	!(defined $value[$code] && $value[$code] >= 0x1000000) &&
 	defined $type[$code]) {
 
 	my $lower;
-	if ($type[$code] eq 'Ll')
+	if ($type[$code] eq 'Ll') 
 	{
 	    $lower = $code;
-	} elsif ($type[$code] eq 'Lt')
+	} elsif ($type[$code] eq 'Lt') 
 	{
 	    $lower = $title_to_lower{$code};
-	} elsif ($type[$code] eq 'Lu')
+	} elsif ($type[$code] eq 'Lu') 
 	{
 	    $lower = $value[$code];
 	} else {
 	    $lower = $code;
 	}
-
+	
 	if ($lower == $values[0]) {
 	    next;
 	}
@@ -539,7 +539,7 @@ open (INPUT, "< $derivedeastasianwidthtxt") || exit 1;
 while (<INPUT>)
 {
     my ($start_code, $end_code);
-
+    
     chop;
 
     s/#.*//;
@@ -641,15 +641,15 @@ sub print_tables
     print OUT "#ifndef CHARTABLES_H\n";
     print OUT "#define CHARTABLES_H\n\n";
 
-    print OUT "#define XUNICODE_DATA_VERSION \"$ARGV[0]\"\n\n";
+    print OUT "#define G_UNICODE_DATA_VERSION \"$ARGV[0]\"\n\n";
 
-    printf OUT "#define XUNICODE_LAST_CHAR 0x%04x\n\n", $last;
+    printf OUT "#define G_UNICODE_LAST_CHAR 0x%04x\n\n", $last;
 
-    printf OUT "#define XUNICODE_MAX_TABLE_INDEX 10000\n\n";
+    printf OUT "#define G_UNICODE_MAX_TABLE_INDEX 10000\n\n";
 
     my $last_part1 = ($pages_before_e0000 * 256) - 1;
-    printf OUT "#define XUNICODE_LAST_CHAR_PART1 0x%04X\n\n", $last_part1;
-    printf OUT "#define XUNICODE_LAST_PAGE_PART1 %d\n\n", $pages_before_e0000 - 1;
+    printf OUT "#define G_UNICODE_LAST_CHAR_PART1 0x%04X\n\n", $last_part1;
+    printf OUT "#define G_UNICODE_LAST_PAGE_PART1 %d\n\n", $pages_before_e0000 - 1;
 
     $table_index = 0;
     printf OUT "static const char type_data[][256] = {\n";
@@ -685,7 +685,7 @@ sub print_tables
     #
 
     $table_index = 0;
-    printf OUT "static const xunichar_t attr_data[][256] = {\n";
+    printf OUT "static const gunichar attr_data[][256] = {\n";
     for ($count = 0; $count <= $last; $count += 256)
     {
 	$row[$count / 256] = &print_row ($count, 4, \&fetch_attr);
@@ -716,7 +716,7 @@ sub print_tables
     # print title case table
     #
 
-    print OUT "static const xunichar_t title_table[][3] = {\n";
+    print OUT "static const gunichar title_table[][3] = {\n";
     my ($item);
     my ($first) = 1;
     foreach $item (sort keys %title_to_lower)
@@ -787,7 +787,7 @@ sub print_row
     }
     if ($flag)
     {
-	return $values[0] . " + XUNICODE_MAX_TABLE_INDEX";
+	return $values[0] . " + G_UNICODE_MAX_TABLE_INDEX";
     }
 
     printf OUT ",\n" if ($table_index != 0);
@@ -828,7 +828,7 @@ sub escape
 sub handle_decomp ($$$$)
 {
     my ($decomp, $decomp_offsets_ref, $decomp_string_ref, $decomp_string_offset_ref) = @_;
-    my $offset = "XUNICODE_NOT_PRESENT_OFFSET";
+    my $offset = "G_UNICODE_NOT_PRESENT_OFFSET";
 
     if (defined $decomp)
     {
@@ -864,20 +864,20 @@ sub print_decomp
     print OUT "#ifndef DECOMP_H\n";
     print OUT "#define DECOMP_H\n\n";
 
-    printf OUT "#define XUNICODE_LAST_CHAR 0x%04x\n\n", $last;
+    printf OUT "#define G_UNICODE_LAST_CHAR 0x%04x\n\n", $last;
 
-    printf OUT "#define XUNICODE_MAX_TABLE_INDEX (0x110000 / 256)\n\n";
+    printf OUT "#define G_UNICODE_MAX_TABLE_INDEX (0x110000 / 256)\n\n";
 
     my $last_part1 = ($pages_before_e0000 * 256) - 1;
-    printf OUT "#define XUNICODE_LAST_CHAR_PART1 0x%04X\n\n", $last_part1;
-    printf OUT "#define XUNICODE_LAST_PAGE_PART1 %d\n\n", $pages_before_e0000 - 1;
+    printf OUT "#define G_UNICODE_LAST_CHAR_PART1 0x%04X\n\n", $last_part1;
+    printf OUT "#define G_UNICODE_LAST_PAGE_PART1 %d\n\n", $pages_before_e0000 - 1;
 
     $NOT_PRESENT_OFFSET = 65535;
-    print OUT "#define XUNICODE_NOT_PRESENT_OFFSET $NOT_PRESENT_OFFSET\n\n";
+    print OUT "#define G_UNICODE_NOT_PRESENT_OFFSET $NOT_PRESENT_OFFSET\n\n";
 
     my ($count, @row);
     $table_index = 0;
-    printf OUT "static const xuchar_t cclass_data[][256] = {\n";
+    printf OUT "static const guchar cclass_data[][256] = {\n";
     for ($count = 0; $count <= $last; $count += 256)
     {
 	$row[$count / 256] = &print_row ($count, 1, \&fetch_cclass);
@@ -903,9 +903,9 @@ sub print_decomp
     print OUT "\n};\n\n";
 
     print OUT "typedef struct\n{\n";
-    print OUT "  xunichar_t ch;\n";
-    print OUT "  xuint16_t canon_offset;\n";
-    print OUT "  xuint16_t compat_offset;\n";
+    print OUT "  gunichar ch;\n";
+    print OUT "  guint16 canon_offset;\n";
+    print OUT "  guint16 compat_offset;\n";
     print OUT "} decomposition;\n\n";
 
     print OUT "static const decomposition decomp_table[] =\n{\n";
@@ -930,7 +930,7 @@ sub print_decomp
 	    $compat_decomp = make_decomp ($count, 1);
 
 	    if (defined $canon_decomp && $compat_decomp eq $canon_decomp) {
-		undef $compat_decomp;
+		undef $compat_decomp; 
 	    }
 
 	    my $canon_offset = handle_decomp ($canon_decomp, \%decomp_offsets, \$decomp_string, \$decomp_string_offset);
@@ -945,12 +945,12 @@ sub print_decomp
     print OUT "\n};\n\n";
     $bytes_out += $decomp_string_offset + 1;
 
-    printf OUT "static const xchar_t decomp_expansion_string[] = %s;\n\n", $decomp_string;
+    printf OUT "static const gchar decomp_expansion_string[] = %s;\n\n", $decomp_string;
 
     print OUT "typedef struct\n{\n";
-    print OUT "  xunichar_t ch;\n";
-    print OUT "  xunichar_t a;\n";
-    print OUT "  xunichar_t b;\n";
+    print OUT "  gunichar ch;\n";
+    print OUT "  gunichar a;\n";
+    print OUT "  gunichar b;\n";
     print OUT "} decomposition_step;\n\n";
 
     # There's lots of room to optimize the following table...
@@ -999,15 +999,15 @@ sub print_line_break
     print OUT "#include <glib/gtypes.h>\n";
     print OUT "#include <glib/gunicode.h>\n\n";
 
-    print OUT "#define XUNICODE_DATA_VERSION \"$ARGV[0]\"\n\n";
+    print OUT "#define G_UNICODE_DATA_VERSION \"$ARGV[0]\"\n\n";
 
-    printf OUT "#define XUNICODE_LAST_CHAR 0x%04X\n\n", $last;
+    printf OUT "#define G_UNICODE_LAST_CHAR 0x%04X\n\n", $last;
 
-    printf OUT "#define XUNICODE_MAX_TABLE_INDEX 10000\n\n";
+    printf OUT "#define G_UNICODE_MAX_TABLE_INDEX 10000\n\n";
 
     my $last_part1 = ($pages_before_e0000 * 256) - 1;
     printf OUT "/* the last code point that should be looked up in break_property_table_part1 */\n";
-    printf OUT "#define XUNICODE_LAST_CHAR_PART1 0x%04X\n\n", $last_part1;
+    printf OUT "#define G_UNICODE_LAST_CHAR_PART1 0x%04X\n\n", $last_part1;
 
     $table_index = 0;
     printf OUT "static const gint8 break_property_data[][256] = {\n";
@@ -1070,7 +1070,7 @@ sub expand_decomp
     foreach $iter (split (' ', $decompositions[$code]))
     {
 	$val = hex ($iter);
-	if (defined $decompositions[$val] &&
+	if (defined $decompositions[$val] && 
 	    ($compat || !$decompose_compat[$val]))
 	{
 	    push (@result, &expand_decomp ($val, $compat));
@@ -1111,7 +1111,7 @@ sub add_special_case
     for $value (@values) {
 	$result .= pack ("U", $value);  # to utf-8
     }
-
+    
     push @special_case_offsets, $special_case_offset;
 
     # We encode special cases up in the 0x1000000 space
@@ -1129,12 +1129,12 @@ sub output_special_case_table
     print $out <<EOT;
 
 /* Table of special cases for case conversion; each record contains
- * First, the best single character mapping to lowercase if Lu,
- * and to uppercase if Ll, followed by the output mapping for the two cases
+ * First, the best single character mapping to lowercase if Lu, 
+ * and to uppercase if Ll, followed by the output mapping for the two cases 
  * other than the case of the codepoint, in the order [Ll],[Lu],[Lt],
  * encoded in UTF-8, separated and terminated by a null character.
  */
-static const xchar_t special_case_table[] = {
+static const gchar special_case_table[] = {
 EOT
 
     my $i = 0;
@@ -1170,18 +1170,18 @@ sub enumerate_ordered
 sub output_composition_table
 {
     print STDERR "Generating composition table\n";
-
+    
     local ($bytes_out) = 0;
 
     my %first;
     my %second;
 
     # First we need to go through and remove decompositions
-    # starting with a non-starter, and single-character
+    # starting with a non-starter, and single-character 
     # decompositions. At the same time, record
     # the first and second character of each decomposition
-
-    for $code (keys %compositions)
+    
+    for $code (keys %compositions) 
     {
 	@values = map { hex ($_) } split /\s+/, $compositions{$code};
 
@@ -1255,11 +1255,11 @@ sub output_composition_table
     @second_singletons = sort { $a->[0] <=> $b->[0] } @second_singletons;
 
     my %vals;
-
+    
     open OUT, ">gunicomp.h" or die "Cannot open gunicomp.h: $!\n";
-
+    
     # Assign values in lookup table for all code points involved
-
+    
     my $total = 1;
     my $last = 0;
     printf OUT "#define COMPOSE_FIRST_START %d\n", $total;
@@ -1294,9 +1294,9 @@ sub output_composition_table
 
     # Output lookup table
 
-    my @row;
+    my @row;						  
     $table_index = 0;
-    printf OUT "static const xuint16_t compose_data[][256] = {\n";
+    printf OUT "static const guint16 compose_data[][256] = {\n";
     for (my $count = 0; $count <= $last; $count += 256)
     {
 	$row[$count / 256] = &print_row ($count, 2, sub { exists $vals{$_[0]} ? $vals{$_[0]} : 0; });
@@ -1314,34 +1314,34 @@ sub output_composition_table
 
     # Output first singletons
 
-    print OUT "static const xunichar_t compose_first_single[][2] = {\n";
-    $i = 0;
+    print OUT "static const gunichar compose_first_single[][2] = {\n";
+    $i = 0;				     
     for $record (@first_singletons) {
 	print OUT ",\n" if $i++ > 0;
 	printf OUT " { %#06x, %#06x }", $record->[1], $record->[2];
     }
     print OUT "\n};\n";
-
+				     
     $bytes_out += @first_singletons * 4;
-
+		  
     # Output second singletons
 
-    print OUT "static const xunichar_t compose_second_single[][2] = {\n";
-    $i = 0;
+    print OUT "static const gunichar compose_second_single[][2] = {\n";
+    $i = 0;				     
     for $record (@second_singletons) {
 	print OUT ",\n" if $i++ > 0;
 	printf OUT " { %#06x, %#06x }", $record->[1], $record->[2];
     }
     print OUT "\n};\n";
-
-    $bytes_out += @second_singletons * 4;
-
+				     
+    $bytes_out += @second_singletons * 4;				     
+		  
     # Output array of composition pairs
 
     print OUT <<EOT;
-static const xuint16_t compose_array[$n_first][$n_second] = {
+static const guint16 compose_array[$n_first][$n_second] = {
 EOT
-
+			
     for (my $i = 0; $i < $n_first; $i++) {
 	print OUT ",\n" if $i;
 	print OUT " { ";
@@ -1349,7 +1349,7 @@ EOT
 	    print OUT ", " if $j;
 	    if (exists $reverse{"$i|$j"}) {
                 if ($reverse{"$i|$j"} > 0xFFFF) {
-                    die "time to switch compose_array to xunichar_t" ;
+                    die "time to switch compose_array to gunichar" ;
                 }
 		printf OUT "0x%04x", $reverse{"$i|$j"};
 	    } else {
@@ -1365,7 +1365,7 @@ EOT
 EOT
 
     $bytes_out += $n_first * $n_second * 2;
-
+    
     printf STDERR "Generated %d bytes in compose tables\n", $bytes_out;
 }
 
@@ -1378,24 +1378,24 @@ sub output_casefold_table
 /* Table of casefolding cases that can't be derived by lowercasing
  */
 static const struct {
-  xuint16_t ch;
-  xchar_t data[$casefoldlen];
+  guint16 ch;
+  gchar data[$casefoldlen];
 } casefold_table[] = {
 EOT
 
-   @casefold = sort { $a->[0] <=> $b->[0] } @casefold;
-
-   for $case (@casefold)
+   @casefold = sort { $a->[0] <=> $b->[0] } @casefold; 
+    
+   for $case (@casefold) 
    {
        $code = $case->[0];
        $string = $case->[1];
 
        if ($code > 0xFFFF) {
-           die "time to switch casefold_table to xunichar_t" ;
+           die "time to switch casefold_table to gunichar" ;
        }
 
        print $out sprintf(qq(  { 0x%04x, "$string" },\n), $code);
-
+    
    }
 
     print $out <<EOT;
@@ -1415,7 +1415,7 @@ sub output_one_width_table
     my $wp;
     my $rex;
 
-    print $out "static const struct Interval xunicode_width_table_${name}[] = {\n";
+    print $out "static const struct Interval g_unicode_width_table_${name}[] = {\n";
 
     $rex = qr/$wpe/;
 
@@ -1432,7 +1432,7 @@ sub output_one_width_table
             $i++;
             $end = $eawidths[$i]->[1];
         }
-
+        
 	printf $out "{0x%04X, 0x%04X},\n", $start, $end;
     }
 
@@ -1449,7 +1449,7 @@ sub output_width_tables
 
 struct Interval
 {
-  xunichar_t start, end;
+  gunichar start, end;
 };
 
 EOT
@@ -1486,9 +1486,9 @@ EOT
     print OUT<<EOT;
 #define G_EASY_SCRIPTS_RANGE $easy_range
 
-static const xuchar_t g_script_easy_table[$easy_range] = {
+static const guchar g_script_easy_table[$easy_range] = {
 EOT
-
+        
     $i = 0;
     $end = -1;
 
@@ -1504,11 +1504,11 @@ EOT
             $script = $scripts[$i]->[2];
             $i++;
         }
-
+            
         if ($c < $start) {
-            printf OUT " XUNICODE_SCRIPT_UNKNOWN,";
+            printf OUT " G_UNICODE_SCRIPT_UNKNOWN,";
         } else {
-            printf OUT " XUNICODE_SCRIPT_%s,", $script;
+            printf OUT " G_UNICODE_SCRIPT_%s,", $script;
         }
     }
 
@@ -1522,10 +1522,10 @@ EOT
 };
 
 static const struct {
-    xunichar_t    start;
-    xuint16_t     chars;
-    xuint16_t     script;
-} g_script_table[] = {
+    gunichar    start;
+    guint16     chars;
+    guint16     script;
+} g_script_table[] = { 
 EOT
 
     for (; $i <= $#scripts; $i++) {
@@ -1539,7 +1539,7 @@ EOT
             $i++;
             $end = $scripts[$i]->[1];
         }
-        printf OUT " { %#06x, %5d, XUNICODE_SCRIPT_%s },\n", $start, $end - $start + 1, $script;
+        printf OUT " { %#06x, %5d, G_UNICODE_SCRIPT_%s },\n", $start, $end - $start + 1, $script;
     }
 
     printf OUT<<EOT;

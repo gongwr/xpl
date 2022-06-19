@@ -33,60 +33,60 @@
  * @short_description: DTLS server-side connection
  * @include: gio/gio.h
  *
- * #xdtls_server_connection_t is the server-side subclass of #xdtls_connection_t,
+ * #GDtlsServerConnection is the server-side subclass of #GDtlsConnection,
  * representing a server-side DTLS connection.
  *
  * Since: 2.48
  */
 
-G_DEFINE_INTERFACE (xdtls_server_connection, xdtls_server_connection,
-                    XTYPE_DTLS_CONNECTION)
+G_DEFINE_INTERFACE (GDtlsServerConnection, g_dtls_server_connection,
+                    G_TYPE_DTLS_CONNECTION)
 
 static void
-xdtls_server_connection_default_init (xdtls_server_connection_interface_t *iface)
+g_dtls_server_connection_default_init (GDtlsServerConnectionInterface *iface)
 {
   /**
-   * xdtls_server_connection_t:authentication-mode:
+   * GDtlsServerConnection:authentication-mode:
    *
    * The #GTlsAuthenticationMode for the server. This can be changed
-   * before calling xdtls_connection_handshake() if you want to
+   * before calling g_dtls_connection_handshake() if you want to
    * rehandshake with a different mode from the initial handshake.
    *
    * Since: 2.48
    */
-  xobject_interface_install_property (iface,
-                                       xparam_spec_enum ("authentication-mode",
+  g_object_interface_install_property (iface,
+                                       g_param_spec_enum ("authentication-mode",
                                                           P_("Authentication Mode"),
                                                           P_("The client authentication mode"),
-                                                          XTYPE_TLS_AUTHENTICATION_MODE,
+                                                          G_TYPE_TLS_AUTHENTICATION_MODE,
                                                           G_TLS_AUTHENTICATION_NONE,
-                                                          XPARAM_READWRITE |
-                                                          XPARAM_STATIC_STRINGS));
+                                                          G_PARAM_READWRITE |
+                                                          G_PARAM_STATIC_STRINGS));
 }
 
 /**
- * xdtls_server_connection_new:
- * @base_socket: the #xdatagram_based_t to wrap
+ * g_dtls_server_connection_new:
+ * @base_socket: the #GDatagramBased to wrap
  * @certificate: (nullable): the default server certificate, or %NULL
- * @error: #xerror_t for error reporting, or %NULL to ignore
+ * @error: #GError for error reporting, or %NULL to ignore
  *
- * Creates a new #xdtls_server_connection_t wrapping @base_socket.
+ * Creates a new #GDtlsServerConnection wrapping @base_socket.
  *
- * Returns: (transfer full) (type xdtls_server_connection_t): the new
- *   #xdtls_server_connection_t, or %NULL on error
+ * Returns: (transfer full) (type GDtlsServerConnection): the new
+ *   #GDtlsServerConnection, or %NULL on error
  *
  * Since: 2.48
  */
-xdatagram_based_t *
-xdtls_server_connection_new (xdatagram_based_t   *base_socket,
-                              xtls_certificate_t  *certificate,
-                              xerror_t          **error)
+GDatagramBased *
+g_dtls_server_connection_new (GDatagramBased   *base_socket,
+                              GTlsCertificate  *certificate,
+                              GError          **error)
 {
-  xobject_t *conn;
-  xtls_backend_t *backend;
+  GObject *conn;
+  GTlsBackend *backend;
 
-  backend = xtls_backend_get_default ();
-  conn = xinitable_new (xtls_backend_get_dtls_server_connection_type (backend),
+  backend = g_tls_backend_get_default ();
+  conn = g_initable_new (g_tls_backend_get_dtls_server_connection_type (backend),
                          NULL, error,
                          "base-socket", base_socket,
                          "certificate", certificate,

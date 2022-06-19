@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2012 Colin Walters <walters@verbum.org>
  *
  * This library is free software; you can redistribute it and/or
@@ -23,36 +23,36 @@
 
 G_BEGIN_DECLS
 
-struct _xsubprocess_launcher
+struct _GSubprocessLauncher
 {
-  xobject_t parent;
+  GObject parent;
 
-  xsubprocess_flags_t flags;
+  GSubprocessFlags flags;
   char **envp;
   char *cwd;
 
 #ifdef G_OS_UNIX
-  xint_t stdin_fd;
-  xchar_t *stdin_path;
+  gint stdin_fd;
+  gchar *stdin_path;
 
-  xint_t stdout_fd;
-  xchar_t *stdout_path;
+  gint stdout_fd;
+  gchar *stdout_path;
 
-  xint_t stderr_fd;
-  xchar_t *stderr_path;
+  gint stderr_fd;
+  gchar *stderr_path;
 
-  xarray_t *source_fds;  /* xsubprocess_launcher_t has ownership of the FD elements */
-  xarray_t *target_fds;  /* always the same length as source_fds; elements are just integers and not FDs in this process */
-  xboolean_t closed_fd;
+  GArray *source_fds;  /* GSubprocessLauncher has ownership of the FD elements */
+  GArray *target_fds;  /* always the same length as source_fds; elements are just integers and not FDs in this process */
+  gboolean closed_fd;
 
   GSpawnChildSetupFunc child_setup_func;
-  xpointer_t child_setup_user_data;
-  xdestroy_notify_t child_setup_destroy_notify;
+  gpointer child_setup_user_data;
+  GDestroyNotify child_setup_destroy_notify;
 #endif
 };
 
-void xsubprocess_set_launcher (xsubprocess_t         *subprocess,
-                                xsubprocess_launcher_t *launcher);
+void g_subprocess_set_launcher (GSubprocess         *subprocess,
+                                GSubprocessLauncher *launcher);
 
 G_END_DECLS
 

@@ -3,10 +3,10 @@
 static void
 test_dir_read (void)
 {
-  xdir_t *dir;
-  xerror_t *error;
-  xchar_t *first;
-  const xchar_t *name;
+  GDir *dir;
+  GError *error;
+  gchar *first;
+  const gchar *name;
 
   error = NULL;
   dir = g_dir_open (".", 0, &error);
@@ -16,7 +16,7 @@ test_dir_read (void)
   while ((name = g_dir_read_name (dir)) != NULL)
     {
       if (first == NULL)
-        first = xstrdup (name);
+        first = g_strdup (name);
       g_assert_cmpstr (name, !=, ".");
       g_assert_cmpstr (name, !=, "..");
     }
@@ -31,14 +31,14 @@ test_dir_read (void)
 static void
 test_dir_nonexisting (void)
 {
-  xdir_t *dir;
-  xerror_t *error;
+  GDir *dir;
+  GError *error;
 
   error = NULL;
   dir = g_dir_open ("/pfrkstrf", 0, &error);
-  xassert (dir == NULL);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
-  xerror_free (error);
+  g_assert (dir == NULL);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+  g_error_free (error);
 }
 
 int

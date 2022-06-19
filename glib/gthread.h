@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_THREAD_H__
 #define __G_THREAD_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -35,61 +35,61 @@
 
 G_BEGIN_DECLS
 
-#define G_THREAD_ERROR xthread_error_quark ()
-XPL_AVAILABLE_IN_ALL
-xquark xthread_error_quark (void);
+#define G_THREAD_ERROR g_thread_error_quark ()
+GLIB_AVAILABLE_IN_ALL
+GQuark g_thread_error_quark (void);
 
 typedef enum
 {
   G_THREAD_ERROR_AGAIN /* Resource temporarily unavailable */
 } GThreadError;
 
-typedef xpointer_t (*GThreadFunc) (xpointer_t data);
+typedef gpointer (*GThreadFunc) (gpointer data);
 
-typedef struct _GThread         xthread_t;
+typedef struct _GThread         GThread;
 
-typedef union  _GMutex          xmutex_t;
+typedef union  _GMutex          GMutex;
 typedef struct _GRecMutex       GRecMutex;
 typedef struct _GRWLock         GRWLock;
-typedef struct _GCond           xcond_t;
-typedef struct _GPrivate        xprivate_t;
+typedef struct _GCond           GCond;
+typedef struct _GPrivate        GPrivate;
 typedef struct _GOnce           GOnce;
 
 union _GMutex
 {
   /*< private >*/
-  xpointer_t p;
-  xuint_t i[2];
+  gpointer p;
+  guint i[2];
 };
 
 struct _GRWLock
 {
   /*< private >*/
-  xpointer_t p;
-  xuint_t i[2];
+  gpointer p;
+  guint i[2];
 };
 
 struct _GCond
 {
   /*< private >*/
-  xpointer_t p;
-  xuint_t i[2];
+  gpointer p;
+  guint i[2];
 };
 
 struct _GRecMutex
 {
   /*< private >*/
-  xpointer_t p;
-  xuint_t i[2];
+  gpointer p;
+  guint i[2];
 };
 
 #define G_PRIVATE_INIT(notify) { NULL, (notify), { NULL, NULL } }
 struct _GPrivate
 {
   /*< private >*/
-  xpointer_t       p;
-  xdestroy_notify_t notify;
-  xpointer_t future[2];
+  gpointer       p;
+  GDestroyNotify notify;
+  gpointer future[2];
 };
 
 typedef enum
@@ -103,13 +103,13 @@ typedef enum
 struct _GOnce
 {
   volatile GOnceStatus status;
-  volatile xpointer_t retval;
+  volatile gpointer retval;
 };
 
 #define G_LOCK_NAME(name)             g__ ## name ## _lock
 #define G_LOCK_DEFINE_STATIC(name)    static G_LOCK_DEFINE (name)
-#define G_LOCK_DEFINE(name)           xmutex_t G_LOCK_NAME (name)
-#define G_LOCK_EXTERN(name)           extern xmutex_t G_LOCK_NAME (name)
+#define G_LOCK_DEFINE(name)           GMutex G_LOCK_NAME (name)
+#define G_LOCK_EXTERN(name)           extern GMutex G_LOCK_NAME (name)
 
 #ifdef G_DEBUG_LOCKS
 #  define G_LOCK(name)                G_STMT_START{             \
@@ -137,102 +137,102 @@ struct _GOnce
 #  define G_TRYLOCK(name) g_mutex_trylock (&G_LOCK_NAME (name))
 #endif /* !G_DEBUG_LOCKS */
 
-XPL_AVAILABLE_IN_2_32
-xthread_t *       xthread_ref                    (xthread_t        *thread);
-XPL_AVAILABLE_IN_2_32
-void            xthread_unref                  (xthread_t        *thread);
-XPL_AVAILABLE_IN_2_32
-xthread_t *       xthread_new                    (const xchar_t    *name,
+GLIB_AVAILABLE_IN_2_32
+GThread *       g_thread_ref                    (GThread        *thread);
+GLIB_AVAILABLE_IN_2_32
+void            g_thread_unref                  (GThread        *thread);
+GLIB_AVAILABLE_IN_2_32
+GThread *       g_thread_new                    (const gchar    *name,
                                                  GThreadFunc     func,
-                                                 xpointer_t        data);
-XPL_AVAILABLE_IN_2_32
-xthread_t *       xthread_try_new                (const xchar_t    *name,
+                                                 gpointer        data);
+GLIB_AVAILABLE_IN_2_32
+GThread *       g_thread_try_new                (const gchar    *name,
                                                  GThreadFunc     func,
-                                                 xpointer_t        data,
-                                                 xerror_t        **error);
-XPL_AVAILABLE_IN_ALL
-xthread_t *       xthread_self                   (void);
-XPL_AVAILABLE_IN_ALL
-void            xthread_exit                   (xpointer_t        retval);
-XPL_AVAILABLE_IN_ALL
-xpointer_t        xthread_join                   (xthread_t        *thread);
-XPL_AVAILABLE_IN_ALL
-void            xthread_yield                  (void);
+                                                 gpointer        data,
+                                                 GError        **error);
+GLIB_AVAILABLE_IN_ALL
+GThread *       g_thread_self                   (void);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_exit                   (gpointer        retval);
+GLIB_AVAILABLE_IN_ALL
+gpointer        g_thread_join                   (GThread        *thread);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_yield                  (void);
 
 
-XPL_AVAILABLE_IN_2_32
-void            g_mutex_init                    (xmutex_t         *mutex);
-XPL_AVAILABLE_IN_2_32
-void            g_mutex_clear                   (xmutex_t         *mutex);
-XPL_AVAILABLE_IN_ALL
-void            g_mutex_lock                    (xmutex_t         *mutex);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_mutex_trylock                 (xmutex_t         *mutex);
-XPL_AVAILABLE_IN_ALL
-void            g_mutex_unlock                  (xmutex_t         *mutex);
+GLIB_AVAILABLE_IN_2_32
+void            g_mutex_init                    (GMutex         *mutex);
+GLIB_AVAILABLE_IN_2_32
+void            g_mutex_clear                   (GMutex         *mutex);
+GLIB_AVAILABLE_IN_ALL
+void            g_mutex_lock                    (GMutex         *mutex);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_mutex_trylock                 (GMutex         *mutex);
+GLIB_AVAILABLE_IN_ALL
+void            g_mutex_unlock                  (GMutex         *mutex);
 
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rw_lock_init                  (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rw_lock_clear                 (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rw_lock_writer_lock           (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
-xboolean_t        g_rw_lock_writer_trylock        (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
+gboolean        g_rw_lock_writer_trylock        (GRWLock        *rw_lock);
+GLIB_AVAILABLE_IN_2_32
 void            g_rw_lock_writer_unlock         (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rw_lock_reader_lock           (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
-xboolean_t        g_rw_lock_reader_trylock        (GRWLock        *rw_lock);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
+gboolean        g_rw_lock_reader_trylock        (GRWLock        *rw_lock);
+GLIB_AVAILABLE_IN_2_32
 void            g_rw_lock_reader_unlock         (GRWLock        *rw_lock);
 
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rec_mutex_init                (GRecMutex      *rec_mutex);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rec_mutex_clear               (GRecMutex      *rec_mutex);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
 void            g_rec_mutex_lock                (GRecMutex      *rec_mutex);
-XPL_AVAILABLE_IN_2_32
-xboolean_t        g_rec_mutex_trylock             (GRecMutex      *rec_mutex);
-XPL_AVAILABLE_IN_2_32
+GLIB_AVAILABLE_IN_2_32
+gboolean        g_rec_mutex_trylock             (GRecMutex      *rec_mutex);
+GLIB_AVAILABLE_IN_2_32
 void            g_rec_mutex_unlock              (GRecMutex      *rec_mutex);
 
-XPL_AVAILABLE_IN_2_32
-void            g_cond_init                     (xcond_t          *cond);
-XPL_AVAILABLE_IN_2_32
-void            g_cond_clear                    (xcond_t          *cond);
-XPL_AVAILABLE_IN_ALL
-void            g_cond_wait                     (xcond_t          *cond,
-                                                 xmutex_t         *mutex);
-XPL_AVAILABLE_IN_ALL
-void            g_cond_signal                   (xcond_t          *cond);
-XPL_AVAILABLE_IN_ALL
-void            g_cond_broadcast                (xcond_t          *cond);
-XPL_AVAILABLE_IN_2_32
-xboolean_t        g_cond_wait_until               (xcond_t          *cond,
-                                                 xmutex_t         *mutex,
-                                                 sint64_t          end_time);
+GLIB_AVAILABLE_IN_2_32
+void            g_cond_init                     (GCond          *cond);
+GLIB_AVAILABLE_IN_2_32
+void            g_cond_clear                    (GCond          *cond);
+GLIB_AVAILABLE_IN_ALL
+void            g_cond_wait                     (GCond          *cond,
+                                                 GMutex         *mutex);
+GLIB_AVAILABLE_IN_ALL
+void            g_cond_signal                   (GCond          *cond);
+GLIB_AVAILABLE_IN_ALL
+void            g_cond_broadcast                (GCond          *cond);
+GLIB_AVAILABLE_IN_2_32
+gboolean        g_cond_wait_until               (GCond          *cond,
+                                                 GMutex         *mutex,
+                                                 gint64          end_time);
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t        g_private_get                   (xprivate_t       *key);
-XPL_AVAILABLE_IN_ALL
-void            g_private_set                   (xprivate_t       *key,
-                                                 xpointer_t        value);
-XPL_AVAILABLE_IN_2_32
-void            g_private_replace               (xprivate_t       *key,
-                                                 xpointer_t        value);
+GLIB_AVAILABLE_IN_ALL
+gpointer        g_private_get                   (GPrivate       *key);
+GLIB_AVAILABLE_IN_ALL
+void            g_private_set                   (GPrivate       *key,
+                                                 gpointer        value);
+GLIB_AVAILABLE_IN_2_32
+void            g_private_replace               (GPrivate       *key,
+                                                 gpointer        value);
 
-XPL_AVAILABLE_IN_ALL
-xpointer_t        g_once_impl                     (GOnce          *once,
+GLIB_AVAILABLE_IN_ALL
+gpointer        g_once_impl                     (GOnce          *once,
                                                  GThreadFunc     func,
-                                                 xpointer_t        arg);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_once_init_enter               (volatile void  *location);
-XPL_AVAILABLE_IN_ALL
+                                                 gpointer        arg);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_once_init_enter               (volatile void  *location);
+GLIB_AVAILABLE_IN_ALL
 void            g_once_init_leave               (volatile void  *location,
-                                                 xsize_t           result);
+                                                 gsize           result);
 
 /* Use C11-style atomic extensions to check the fast path for status=ready. If
  * they are not available, fall back to using a mutex and condition variable in
@@ -255,60 +255,60 @@ void            g_once_init_leave               (volatile void  *location,
 #ifdef __GNUC__
 # define g_once_init_enter(location) \
   (G_GNUC_EXTENSION ({                                               \
-    G_STATIC_ASSERT (sizeof *(location) == sizeof (xpointer_t));       \
-    (void) (0 ? (xpointer_t) *(location) : NULL);                      \
+    G_STATIC_ASSERT (sizeof *(location) == sizeof (gpointer));       \
+    (void) (0 ? (gpointer) *(location) : NULL);                      \
     (!g_atomic_pointer_get (location) &&                             \
      g_once_init_enter (location));                                  \
   }))
 # define g_once_init_leave(location, result) \
   (G_GNUC_EXTENSION ({                                               \
-    G_STATIC_ASSERT (sizeof *(location) == sizeof (xpointer_t));       \
+    G_STATIC_ASSERT (sizeof *(location) == sizeof (gpointer));       \
     0 ? (void) (*(location) = (result)) : (void) 0;                  \
-    g_once_init_leave ((location), (xsize_t) (result));                \
+    g_once_init_leave ((location), (gsize) (result));                \
   }))
 #else
 # define g_once_init_enter(location) \
   (g_once_init_enter((location)))
 # define g_once_init_leave(location, result) \
-  (g_once_init_leave((location), (xsize_t) (result)))
+  (g_once_init_leave((location), (gsize) (result)))
 #endif
 
-XPL_AVAILABLE_IN_2_36
-xuint_t          g_get_num_processors (void);
+GLIB_AVAILABLE_IN_2_36
+guint          g_get_num_processors (void);
 
 /**
- * xmutex_locker_t:
+ * GMutexLocker:
  *
  * Opaque type. See g_mutex_locker_new() for details.
  * Since: 2.44
  */
-typedef void xmutex_locker_t;
+typedef void GMutexLocker;
 
 /**
  * g_mutex_locker_new:
  * @mutex: a mutex to lock
  *
- * Lock @mutex and return a new #xmutex_locker_t. Unlock with
+ * Lock @mutex and return a new #GMutexLocker. Unlock with
  * g_mutex_locker_free(). Using g_mutex_unlock() on @mutex
- * while a #xmutex_locker_t exists can lead to undefined behaviour.
+ * while a #GMutexLocker exists can lead to undefined behaviour.
  *
  * No allocation is performed, it is equivalent to a g_mutex_lock() call.
  *
- * This is intended to be used with x_autoptr().  Note that x_autoptr()
+ * This is intended to be used with g_autoptr().  Note that g_autoptr()
  * is only available when using GCC or clang, so the following example
  * will only work with those compilers:
  * |[
  * typedef struct
  * {
  *   ...
- *   xmutex_t mutex;
+ *   GMutex mutex;
  *   ...
- * } xobject_t;
+ * } MyObject;
  *
  * static void
- * my_object_do_stuff (xobject_t *self)
+ * my_object_do_stuff (MyObject *self)
  * {
- *   x_autoptr(xmutex_locker) locker = g_mutex_locker_new (&self->mutex);
+ *   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
  *
  *   // Code with mutex locked here
  *
@@ -323,20 +323,20 @@ typedef void xmutex_locker_t;
  * }
  * ]|
  *
- * Returns: a #xmutex_locker_t
+ * Returns: a #GMutexLocker
  * Since: 2.44
  */
-XPL_AVAILABLE_STATIC_INLINE_IN_2_44
-static inline xmutex_locker_t *
-g_mutex_locker_new (xmutex_t *mutex)
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_44
+static inline GMutexLocker *
+g_mutex_locker_new (GMutex *mutex)
 {
   g_mutex_lock (mutex);
-  return (xmutex_locker_t *) mutex;
+  return (GMutexLocker *) mutex;
 }
 
 /**
  * g_mutex_locker_free:
- * @locker: a xmutex_locker_t
+ * @locker: a GMutexLocker
  *
  * Unlock @locker's mutex. See g_mutex_locker_new() for details.
  *
@@ -344,32 +344,32 @@ g_mutex_locker_new (xmutex_t *mutex)
  *
  * Since: 2.44
  */
-XPL_AVAILABLE_STATIC_INLINE_IN_2_44
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_44
 static inline void
-g_mutex_locker_free (xmutex_locker_t *locker)
+g_mutex_locker_free (GMutexLocker *locker)
 {
-  g_mutex_unlock ((xmutex_t *) locker);
+  g_mutex_unlock ((GMutex *) locker);
 }
 
 /**
- * xrec_mutex_locker_t:
+ * GRecMutexLocker:
  *
  * Opaque type. See g_rec_mutex_locker_new() for details.
  * Since: 2.60
  */
-typedef void xrec_mutex_locker_t;
+typedef void GRecMutexLocker;
 
 /**
  * g_rec_mutex_locker_new:
  * @rec_mutex: a recursive mutex to lock
  *
- * Lock @rec_mutex and return a new #xrec_mutex_locker_t. Unlock with
+ * Lock @rec_mutex and return a new #GRecMutexLocker. Unlock with
  * g_rec_mutex_locker_free(). Using g_rec_mutex_unlock() on @rec_mutex
- * while a #xrec_mutex_locker_t exists can lead to undefined behaviour.
+ * while a #GRecMutexLocker exists can lead to undefined behaviour.
  *
  * No allocation is performed, it is equivalent to a g_rec_mutex_lock() call.
  *
- * This is intended to be used with x_autoptr().  Note that x_autoptr()
+ * This is intended to be used with g_autoptr().  Note that g_autoptr()
  * is only available when using GCC or clang, so the following example
  * will only work with those compilers:
  * |[
@@ -378,12 +378,12 @@ typedef void xrec_mutex_locker_t;
  *   ...
  *   GRecMutex rec_mutex;
  *   ...
- * } xobject_t;
+ * } MyObject;
  *
  * static void
- * my_object_do_stuff (xobject_t *self)
+ * my_object_do_stuff (MyObject *self)
  * {
- *   x_autoptr(xrec_mutex_locker) locker = g_rec_mutex_locker_new (&self->rec_mutex);
+ *   g_autoptr(GRecMutexLocker) locker = g_rec_mutex_locker_new (&self->rec_mutex);
  *
  *   // Code with rec_mutex locked here
  *
@@ -398,22 +398,22 @@ typedef void xrec_mutex_locker_t;
  * }
  * ]|
  *
- * Returns: a #xrec_mutex_locker_t
+ * Returns: a #GRecMutexLocker
  * Since: 2.60
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_STATIC_INLINE_IN_2_60
-static inline xrec_mutex_locker_t *
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_60
+static inline GRecMutexLocker *
 g_rec_mutex_locker_new (GRecMutex *rec_mutex)
 {
   g_rec_mutex_lock (rec_mutex);
-  return (xrec_mutex_locker_t *) rec_mutex;
+  return (GRecMutexLocker *) rec_mutex;
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_rec_mutex_locker_free:
- * @locker: a xrec_mutex_locker_t
+ * @locker: a GRecMutexLocker
  *
  * Unlock @locker's recursive mutex. See g_rec_mutex_locker_new() for details.
  *
@@ -422,34 +422,34 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.60
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_STATIC_INLINE_IN_2_60
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_60
 static inline void
-g_rec_mutex_locker_free (xrec_mutex_locker_t *locker)
+g_rec_mutex_locker_free (GRecMutexLocker *locker)
 {
   g_rec_mutex_unlock ((GRecMutex *) locker);
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * xrwlock_writer_locker_t:
+ * GRWLockWriterLocker:
  *
  * Opaque type. See g_rw_lock_writer_locker_new() for details.
  * Since: 2.62
  */
-typedef void xrwlock_writer_locker_t;
+typedef void GRWLockWriterLocker;
 
 /**
  * g_rw_lock_writer_locker_new:
  * @rw_lock: a #GRWLock
  *
- * Obtain a write lock on @rw_lock and return a new #xrwlock_writer_locker_t.
+ * Obtain a write lock on @rw_lock and return a new #GRWLockWriterLocker.
  * Unlock with g_rw_lock_writer_locker_free(). Using g_rw_lock_writer_unlock()
- * on @rw_lock while a #xrwlock_writer_locker_t exists can lead to undefined
+ * on @rw_lock while a #GRWLockWriterLocker exists can lead to undefined
  * behaviour.
  *
  * No allocation is performed, it is equivalent to a g_rw_lock_writer_lock() call.
  *
- * This is intended to be used with x_autoptr().  Note that x_autoptr()
+ * This is intended to be used with g_autoptr().  Note that g_autoptr()
  * is only available when using GCC or clang, so the following example
  * will only work with those compilers:
  * |[
@@ -457,14 +457,14 @@ typedef void xrwlock_writer_locker_t;
  * {
  *   ...
  *   GRWLock rw_lock;
- *   xptr_array_t *array;
+ *   GPtrArray *array;
  *   ...
- * } xobject_t;
+ * } MyObject;
  *
- * static xchar_t *
- * my_object_get_data (xobject_t *self, xuint_t index)
+ * static gchar *
+ * my_object_get_data (MyObject *self, guint index)
  * {
- *   x_autoptr(xrwlock_reader_locker) locker = g_rw_lock_reader_locker_new (&self->rw_lock);
+ *   g_autoptr(GRWLockReaderLocker) locker = g_rw_lock_reader_locker_new (&self->rw_lock);
  *
  *   // Code with a read lock obtained on rw_lock here
  *
@@ -474,7 +474,7 @@ typedef void xrwlock_writer_locker_t;
  *
  *   if (index < self->array->len)
  *     // No need to unlock
- *     return xptr_array_index (self->array, index);
+ *     return g_ptr_array_index (self->array, index);
  *
  *   // Optionally early unlock
  *   g_clear_pointer (&locker, g_rw_lock_reader_locker_free);
@@ -484,22 +484,22 @@ typedef void xrwlock_writer_locker_t;
  * }
  *
  * static void
- * my_object_set_data (xobject_t *self, xuint_t index, xpointer_t data)
+ * my_object_set_data (MyObject *self, guint index, gpointer data)
  * {
- *   x_autoptr(xrwlock_writer_locker) locker = g_rw_lock_writer_locker_new (&self->rw_lock);
+ *   g_autoptr(GRWLockWriterLocker) locker = g_rw_lock_writer_locker_new (&self->rw_lock);
  *
  *   // Code with a write lock obtained on rw_lock here
  *
  *   if (self->array == NULL)
- *     self->array = xptr_array_new ();
+ *     self->array = g_ptr_array_new ();
  *
  *   if (cond)
  *     // No need to unlock
  *     return;
  *
  *   if (index >= self->array->len)
- *     xptr_array_set_size (self->array, index+1);
- *   xptr_array_index (self->array, index) = data;
+ *     g_ptr_array_set_size (self->array, index+1);
+ *   g_ptr_array_index (self->array, index) = data;
  *
  *   // Optionally early unlock
  *   g_clear_pointer (&locker, g_rw_lock_writer_locker_free);
@@ -508,22 +508,22 @@ typedef void xrwlock_writer_locker_t;
  * }
  * ]|
  *
- * Returns: a #xrwlock_writer_locker_t
+ * Returns: a #GRWLockWriterLocker
  * Since: 2.62
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_STATIC_INLINE_IN_2_62
-static inline xrwlock_writer_locker_t *
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_62
+static inline GRWLockWriterLocker *
 g_rw_lock_writer_locker_new (GRWLock *rw_lock)
 {
   g_rw_lock_writer_lock (rw_lock);
-  return (xrwlock_writer_locker_t *) rw_lock;
+  return (GRWLockWriterLocker *) rw_lock;
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_rw_lock_writer_locker_free:
- * @locker: a xrwlock_writer_locker_t
+ * @locker: a GRWLockWriterLocker
  *
  * Release a write lock on @locker's read-write lock. See
  * g_rw_lock_writer_locker_new() for details.
@@ -533,52 +533,52 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.62
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_STATIC_INLINE_IN_2_62
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_62
 static inline void
-g_rw_lock_writer_locker_free (xrwlock_writer_locker_t *locker)
+g_rw_lock_writer_locker_free (GRWLockWriterLocker *locker)
 {
   g_rw_lock_writer_unlock ((GRWLock *) locker);
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * xrwlock_reader_locker_t:
+ * GRWLockReaderLocker:
  *
  * Opaque type. See g_rw_lock_reader_locker_new() for details.
  * Since: 2.62
  */
-typedef void xrwlock_reader_locker_t;
+typedef void GRWLockReaderLocker;
 
 /**
  * g_rw_lock_reader_locker_new:
  * @rw_lock: a #GRWLock
  *
- * Obtain a read lock on @rw_lock and return a new #xrwlock_reader_locker_t.
+ * Obtain a read lock on @rw_lock and return a new #GRWLockReaderLocker.
  * Unlock with g_rw_lock_reader_locker_free(). Using g_rw_lock_reader_unlock()
- * on @rw_lock while a #xrwlock_reader_locker_t exists can lead to undefined
+ * on @rw_lock while a #GRWLockReaderLocker exists can lead to undefined
  * behaviour.
  *
  * No allocation is performed, it is equivalent to a g_rw_lock_reader_lock() call.
  *
- * This is intended to be used with x_autoptr(). For a code sample, see
+ * This is intended to be used with g_autoptr(). For a code sample, see
  * g_rw_lock_writer_locker_new().
  *
- * Returns: a #xrwlock_reader_locker_t
+ * Returns: a #GRWLockReaderLocker
  * Since: 2.62
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_STATIC_INLINE_IN_2_62
-static inline xrwlock_reader_locker_t *
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_62
+static inline GRWLockReaderLocker *
 g_rw_lock_reader_locker_new (GRWLock *rw_lock)
 {
   g_rw_lock_reader_lock (rw_lock);
-  return (xrwlock_reader_locker_t *) rw_lock;
+  return (GRWLockReaderLocker *) rw_lock;
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_rw_lock_reader_locker_free:
- * @locker: a xrwlock_reader_locker_t
+ * @locker: a GRWLockReaderLocker
  *
  * Release a read lock on @locker's read-write lock. See
  * g_rw_lock_reader_locker_new() for details.
@@ -588,9 +588,9 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.62
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_AVAILABLE_STATIC_INLINE_IN_2_62
+GLIB_AVAILABLE_STATIC_INLINE_IN_2_62
 static inline void
-g_rw_lock_reader_locker_free (xrwlock_reader_locker_t *locker)
+g_rw_lock_reader_locker_free (GRWLockReaderLocker *locker)
 {
   g_rw_lock_reader_unlock ((GRWLock *) locker);
 }

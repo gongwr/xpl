@@ -1,4 +1,4 @@
-/* Unit tests for xtimer_t
+/* Unit tests for GTimer
  * Copyright (C) 2013 Red Hat, Inc.
  *
  * This work is provided "as is"; redistribution and modification
@@ -22,16 +22,16 @@
  */
 
 /* We test a few deprecated APIs here. */
-#define XPL_DISABLE_DEPRECATION_WARNINGS 1
+#define GLIB_DISABLE_DEPRECATION_WARNINGS 1
 
 #include "glib.h"
 
 static void
 test_timer_basic (void)
 {
-  xtimer_t *timer;
-  xdouble_t elapsed;
-  xulong_t micros;
+  GTimer *timer;
+  gdouble elapsed;
+  gulong micros;
 
   timer = g_timer_new ();
 
@@ -56,7 +56,7 @@ test_timer_basic (void)
   elapsed = g_timer_elapsed (timer, &micros);
 
   g_assert_cmpfloat (elapsed, <, 1.0);
-  g_assert_cmpuint (micros, ==, ((xuint64_t)(elapsed * 1e6)) % 1000000);
+  g_assert_cmpfloat_with_epsilon (elapsed, micros / 1e6,  0.001);
 
   g_timer_destroy (timer);
 }
@@ -64,8 +64,8 @@ test_timer_basic (void)
 static void
 test_timer_stop (void)
 {
-  xtimer_t *timer;
-  xdouble_t elapsed, elapsed2;
+  GTimer *timer;
+  gdouble elapsed, elapsed2;
 
   timer = g_timer_new ();
 
@@ -83,8 +83,8 @@ test_timer_stop (void)
 static void
 test_timer_continue (void)
 {
-  xtimer_t *timer;
-  xdouble_t elapsed, elapsed2;
+  GTimer *timer;
+  gdouble elapsed, elapsed2;
 
   timer = g_timer_new ();
 
@@ -116,8 +116,8 @@ test_timer_continue (void)
 static void
 test_timer_reset (void)
 {
-  xtimer_t *timer;
-  xdouble_t elapsed, elapsed2;
+  GTimer *timer;
+  gdouble elapsed, elapsed2;
 
   timer = g_timer_new ();
   g_usleep (100);
@@ -135,8 +135,8 @@ test_timer_reset (void)
 static void
 test_timer_is_active (void)
 {
-  xtimer_t *timer;
-  xboolean_t is_active;
+  GTimer *timer;
+  gboolean is_active;
 
   timer = g_timer_new ();
   is_active = g_timer_is_active (timer);
@@ -155,15 +155,15 @@ test_timeval_add (void)
 
   g_time_val_add (&time, 10);
 
-  g_assert_cmpint (time.tv_sec, ==, 1);
-  g_assert_cmpint (time.tv_usec, ==, 10);
+  g_assert_cmpint (time.tv_sec, ==, 1); 
+  g_assert_cmpint (time.tv_usec, ==, 10); 
 
   g_time_val_add (&time, -500);
-  g_assert_cmpint (time.tv_sec, ==, 0);
-  g_assert_cmpint (time.tv_usec, ==, G_USEC_PER_SEC - 490);
+  g_assert_cmpint (time.tv_sec, ==, 0); 
+  g_assert_cmpint (time.tv_usec, ==, G_USEC_PER_SEC - 490); 
 
   g_time_val_add (&time, 1000);
-  g_assert_cmpint (time.tv_sec, ==, 1);
+  g_assert_cmpint (time.tv_sec, ==, 1); 
   g_assert_cmpint (time.tv_usec, ==, 510);
 
   g_time_val_add (&time, 0);
@@ -176,15 +176,15 @@ test_timeval_add (void)
 }
 
 typedef struct {
-  xboolean_t success;
-  const xchar_t *in;
+  gboolean success;
+  const gchar *in;
   GTimeVal val;
 } TimeValParseTest;
 
 static void
 test_timeval_from_iso8601 (void)
 {
-  xchar_t *old_tz = xstrdup (g_getenv ("TZ"));
+  gchar *old_tz = g_strdup (g_getenv ("TZ"));
   TimeValParseTest tests[] = {
     { TRUE, "1990-11-01T10:21:17Z", { 657454877, 0 } },
     { TRUE, "19901101T102117Z", { 657454877, 0 } },
@@ -249,8 +249,8 @@ test_timeval_from_iso8601 (void)
     { TRUE, "1990-11-01T10:21:17     ", { 657454877, 0 } },
   };
   GTimeVal out;
-  xboolean_t success;
-  xsize_t i;
+  gboolean success;
+  gsize i;
 
   /* Always run in UTC so the comparisons of parsed values are valid. */
   if (!g_setenv ("TZ", "UTC", TRUE))
@@ -292,7 +292,7 @@ test_timeval_from_iso8601 (void)
 
 typedef struct {
   GTimeVal val;
-  const xchar_t *expected;
+  const gchar *expected;
 } TimeValFormatTest;
 
 static void
@@ -302,10 +302,10 @@ test_timeval_to_iso8601 (void)
     { { 657454877, 0 }, "1990-11-01T10:21:17Z" },
     { { 17, 123400 }, "1970-01-01T00:00:17.123400Z" }
   };
-  xsize_t i;
-  xchar_t *out;
+  gsize i;
+  gchar *out;
   GTimeVal val;
-  xboolean_t ret;
+  gboolean ret;
 
   g_unsetenv ("TZ");
 
@@ -315,21 +315,21 @@ test_timeval_to_iso8601 (void)
       g_assert_cmpstr (out, ==, tests[i].expected);
 
       ret = g_time_val_from_iso8601 (out, &val);
-      xassert (ret);
+      g_assert (ret);
       g_assert_cmpint (val.tv_sec, ==, tests[i].val.tv_sec);
       g_assert_cmpint (val.tv_usec, ==, tests[i].val.tv_usec);
       g_free (out);
     }
 }
 
-/* test_t error handling for g_time_val_to_iso8601() on dates which are too large. */
+/* Test error handling for g_time_val_to_iso8601() on dates which are too large. */
 static void
 test_timeval_to_iso8601_overflow (void)
 {
   GTimeVal val;
-  xchar_t *out = NULL;
+  gchar *out = NULL;
 
-  if ((xlong_t) G_MAXINT == G_MAXLONG)
+  if ((glong) G_MAXINT == G_MAXLONG)
     {
       g_test_skip ("G_MAXINT == G_MAXLONG - we can't make g_time_val_to_iso8601() overflow.");
       return;

@@ -23,40 +23,40 @@
 
 typedef struct ik_event_s {
   gint32 wd;
-  xuint32_t mask;
-  xuint32_t original_mask;
-  xuint32_t cookie;
-  xuint32_t len;
+  guint32 mask;
+  guint32 original_mask;
+  guint32 cookie;
+  guint32 len;
   char *  name;
   /* TRUE if this event is the last element of a pair
    * (e.g., MOVE_TO in a pair of MOVE_FROM, MOVE_TO events) */
-  xboolean_t is_second_in_pair;
+  gboolean is_second_in_pair;
   /* if event1 and event2 are two paired events
    * (e.g., MOVE_FROM and MOVE_TO events related to the same file move),
    * then event1->pair == event2 and event2->pair == NULL.
    * It will result also in event1->pair->is_second_in_pair == TRUE */
   struct ik_event_s *pair;
-  sint64_t timestamp; /* monotonic time that this was created */
+  gint64 timestamp; /* monotonic time that this was created */
 } ik_event_t;
 
-xboolean_t _ik_startup (xboolean_t (*cb) (ik_event_t *event));
+gboolean _ik_startup (gboolean (*cb) (ik_event_t *event));
 
 ik_event_t *_ik_event_new_dummy (const char *name,
 				 gint32      wd,
-				 xuint32_t     mask);
+				 guint32     mask);
 void        _ik_event_free      (ik_event_t *event);
 
 gint32      _ik_watch           (const char *path,
-				 xuint32_t     mask,
+				 guint32     mask,
 				 int        *err);
 int         _ik_ignore          (const char *path,
 				 gint32      wd);
 
 
 /* The miss count will probably be enflated */
-void        _ik_move_stats     (xuint32_t *matches,
-				xuint32_t *misses);
-const char *_ik_mask_to_string (xuint32_t  mask);
+void        _ik_move_stats     (guint32 *matches,
+				guint32 *misses);
+const char *_ik_mask_to_string (guint32  mask);
 
 
 #endif

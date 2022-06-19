@@ -26,27 +26,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_UNIX_FD_MESSAGE                              (g_unix_fd_message_get_type ())
-#define G_UNIX_FD_MESSAGE(inst)                             (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_UNIX_FD_MESSAGE, GUnixFDMessage))
-#define G_UNIX_FD_MESSAGE_CLASS(class)                      (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_UNIX_FD_MESSAGE, GUnixFDMessageClass))
-#define X_IS_UNIX_FD_MESSAGE(inst)                          (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_UNIX_FD_MESSAGE))
-#define X_IS_UNIX_FD_MESSAGE_CLASS(class)                   (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_UNIX_FD_MESSAGE))
-#define G_UNIX_FD_MESSAGE_GET_CLASS(inst)                   (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_UNIX_FD_MESSAGE, GUnixFDMessageClass))
+#define G_TYPE_UNIX_FD_MESSAGE                              (g_unix_fd_message_get_type ())
+#define G_UNIX_FD_MESSAGE(inst)                             (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_UNIX_FD_MESSAGE, GUnixFDMessage))
+#define G_UNIX_FD_MESSAGE_CLASS(class)                      (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_UNIX_FD_MESSAGE, GUnixFDMessageClass))
+#define G_IS_UNIX_FD_MESSAGE(inst)                          (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_UNIX_FD_MESSAGE))
+#define G_IS_UNIX_FD_MESSAGE_CLASS(class)                   (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_UNIX_FD_MESSAGE))
+#define G_UNIX_FD_MESSAGE_GET_CLASS(inst)                   (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_UNIX_FD_MESSAGE, GUnixFDMessageClass))
 
 typedef struct _GUnixFDMessagePrivate                       GUnixFDMessagePrivate;
 typedef struct _GUnixFDMessageClass                         GUnixFDMessageClass;
 typedef struct _GUnixFDMessage                              GUnixFDMessage;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixFDMessage, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixFDMessage, g_object_unref)
 
 struct _GUnixFDMessageClass
 {
-  xsocket_control_message_class_t parent_class;
+  GSocketControlMessageClass parent_class;
 
   /*< private >*/
 
@@ -57,27 +57,27 @@ struct _GUnixFDMessageClass
 
 struct _GUnixFDMessage
 {
-  xsocket_control_message_t parent_instance;
+  GSocketControlMessage parent_instance;
   GUnixFDMessagePrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   g_unix_fd_message_get_type                      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xsocket_control_message_t * g_unix_fd_message_new_with_fd_list              (xunix_fd_list_t     *fd_list);
-XPL_AVAILABLE_IN_ALL
-xsocket_control_message_t * g_unix_fd_message_new                           (void);
+GLIB_AVAILABLE_IN_ALL
+GType                   g_unix_fd_message_get_type                      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GSocketControlMessage * g_unix_fd_message_new_with_fd_list              (GUnixFDList     *fd_list);
+GLIB_AVAILABLE_IN_ALL
+GSocketControlMessage * g_unix_fd_message_new                           (void);
 
-XPL_AVAILABLE_IN_ALL
-xunix_fd_list_t *           g_unix_fd_message_get_fd_list                   (GUnixFDMessage  *message);
+GLIB_AVAILABLE_IN_ALL
+GUnixFDList *           g_unix_fd_message_get_fd_list                   (GUnixFDMessage  *message);
 
-XPL_AVAILABLE_IN_ALL
-xint_t *                  g_unix_fd_message_steal_fds                     (GUnixFDMessage  *message,
-                                                                         xint_t            *length);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                g_unix_fd_message_append_fd                     (GUnixFDMessage  *message,
-                                                                         xint_t             fd,
-                                                                         xerror_t         **error);
+GLIB_AVAILABLE_IN_ALL
+gint *                  g_unix_fd_message_steal_fds                     (GUnixFDMessage  *message,
+                                                                         gint            *length);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_unix_fd_message_append_fd                     (GUnixFDMessage  *message,
+                                                                         gint             fd,
+                                                                         GError         **error);
 
 G_END_DECLS
 

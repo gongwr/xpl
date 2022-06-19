@@ -25,15 +25,15 @@
 
 /* gvariant-core.c */
 
-xvariant_t *              xvariant_new_from_children                     (const xvariant_type_t  *type,
-                                                                         xvariant_t           **children,
-                                                                         xsize_t                n_children,
-                                                                         xboolean_t             trusted);
+GVariant *              g_variant_new_from_children                     (const GVariantType  *type,
+                                                                         GVariant           **children,
+                                                                         gsize                n_children,
+                                                                         gboolean             trusted);
 
-xboolean_t                xvariant_is_trusted                            (xvariant_t            *value);
+gboolean                g_variant_is_trusted                            (GVariant            *value);
 
-GVariantTypeInfo *      xvariant_get_type_info                         (xvariant_t            *value);
+GVariantTypeInfo *      g_variant_get_type_info                         (GVariant            *value);
 
-xsize_t                   xvariant_get_depth                             (xvariant_t            *value);
+gsize                   g_variant_get_depth                             (GVariant            *value);
 
 #endif /* __G_VARIANT_CORE_H__ */

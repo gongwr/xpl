@@ -38,57 +38,57 @@
  * @short_description: Asynchronous and cancellable network proxy resolver
  * @include: gio/gio.h
  *
- * #xproxy_resolver_t provides synchronous and asynchronous network proxy
- * resolution. #xproxy_resolver_t is used within #xsocket_client_t through
- * the method xsocket_connectable_proxy_enumerate().
+ * #GProxyResolver provides synchronous and asynchronous network proxy
+ * resolution. #GProxyResolver is used within #GSocketClient through
+ * the method g_socket_connectable_proxy_enumerate().
  *
- * Implementations of #xproxy_resolver_t based on libproxy and GNOME settings can
+ * Implementations of #GProxyResolver based on libproxy and GNOME settings can
  * be found in glib-networking. GIO comes with an implementation for use inside
  * Flatpak portals.
  */
 
 /**
- * xproxy_resolver_interface_t:
- * @x_iface: The parent interface.
- * @is_supported: the virtual function pointer for xproxy_resolver_is_supported()
- * @lookup: the virtual function pointer for xproxy_resolver_lookup()
+ * GProxyResolverInterface:
+ * @g_iface: The parent interface.
+ * @is_supported: the virtual function pointer for g_proxy_resolver_is_supported()
+ * @lookup: the virtual function pointer for g_proxy_resolver_lookup()
  * @lookup_async: the virtual function pointer for
- *  xproxy_resolver_lookup_async()
+ *  g_proxy_resolver_lookup_async()
  * @lookup_finish: the virtual function pointer for
- *  xproxy_resolver_lookup_finish()
+ *  g_proxy_resolver_lookup_finish()
  *
- * The virtual function table for #xproxy_resolver_t.
+ * The virtual function table for #GProxyResolver.
  */
 
-G_DEFINE_INTERFACE (xproxy_resolver, xproxy_resolver, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (GProxyResolver, g_proxy_resolver, G_TYPE_OBJECT)
 
 static void
-xproxy_resolver_default_init (xproxy_resolver_interface_t *iface)
+g_proxy_resolver_default_init (GProxyResolverInterface *iface)
 {
 }
 
-static xproxy_resolver_t *proxy_resolver_default_singleton = NULL;  /* (owned) (atomic) */
+static GProxyResolver *proxy_resolver_default_singleton = NULL;  /* (owned) (atomic) */
 
 /**
- * xproxy_resolver_get_default:
+ * g_proxy_resolver_get_default:
  *
- * Gets the default #xproxy_resolver_t for the system.
+ * Gets the default #GProxyResolver for the system.
  *
- * Returns: (not nullable) (transfer none): the default #xproxy_resolver_t, which
+ * Returns: (not nullable) (transfer none): the default #GProxyResolver, which
  *     will be a dummy object if no proxy resolver is available
  *
  * Since: 2.26
  */
-xproxy_resolver_t *
-xproxy_resolver_get_default (void)
+GProxyResolver *
+g_proxy_resolver_get_default (void)
 {
   if (g_once_init_enter (&proxy_resolver_default_singleton))
     {
-      xproxy_resolver_t *singleton;
+      GProxyResolver *singleton;
 
-      singleton = _xio_module_get_default (G_PROXY_RESOLVER_EXTENSION_POINT_NAME,
+      singleton = _g_io_module_get_default (G_PROXY_RESOLVER_EXTENSION_POINT_NAME,
                                             "GIO_USE_PROXY_RESOLVER",
-                                            (xio_module_verify_func_t) xproxy_resolver_is_supported);
+                                            (GIOModuleVerifyFunc) g_proxy_resolver_is_supported);
 
       g_once_init_leave (&proxy_resolver_default_singleton, singleton);
     }
@@ -97,23 +97,23 @@ xproxy_resolver_get_default (void)
 }
 
 /**
- * xproxy_resolver_is_supported:
- * @resolver: a #xproxy_resolver_t
+ * g_proxy_resolver_is_supported:
+ * @resolver: a #GProxyResolver
  *
  * Checks if @resolver can be used on this system. (This is used
- * internally; xproxy_resolver_get_default() will only return a proxy
+ * internally; g_proxy_resolver_get_default() will only return a proxy
  * resolver that returns %TRUE for this method.)
  *
  * Returns: %TRUE if @resolver is supported.
  *
  * Since: 2.26
  */
-xboolean_t
-xproxy_resolver_is_supported (xproxy_resolver_t *resolver)
+gboolean
+g_proxy_resolver_is_supported (GProxyResolver *resolver)
 {
-  xproxy_resolver_interface_t *iface;
+  GProxyResolverInterface *iface;
 
-  xreturn_val_if_fail (X_IS_PROXY_RESOLVER (resolver), FALSE);
+  g_return_val_if_fail (G_IS_PROXY_RESOLVER (resolver), FALSE);
 
   iface = G_PROXY_RESOLVER_GET_IFACE (resolver);
 
@@ -121,11 +121,11 @@ xproxy_resolver_is_supported (xproxy_resolver_t *resolver)
 }
 
 /**
- * xproxy_resolver_lookup:
- * @resolver: a #xproxy_resolver_t
+ * g_proxy_resolver_lookup:
+ * @resolver: a #GProxyResolver
  * @uri: a URI representing the destination to connect to
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: return location for a #xerror_t, or %NULL
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: return location for a #GError, or %NULL
  *
  * Looks into the system proxy configuration to determine what proxy,
  * if any, to use to connect to @uri. The returned proxy URIs are of
@@ -145,22 +145,22 @@ xproxy_resolver_is_supported (xproxy_resolver_t *resolver)
  *
  * Returns: (transfer full) (array zero-terminated=1): A
  *               NULL-terminated array of proxy URIs. Must be freed
- *               with xstrfreev().
+ *               with g_strfreev().
  *
  * Since: 2.26
  */
-xchar_t **
-xproxy_resolver_lookup (xproxy_resolver_t  *resolver,
-			 const xchar_t     *uri,
-			 xcancellable_t    *cancellable,
-			 xerror_t         **error)
+gchar **
+g_proxy_resolver_lookup (GProxyResolver  *resolver,
+			 const gchar     *uri,
+			 GCancellable    *cancellable,
+			 GError         **error)
 {
-  xproxy_resolver_interface_t *iface;
+  GProxyResolverInterface *iface;
 
-  xreturn_val_if_fail (X_IS_PROXY_RESOLVER (resolver), NULL);
-  xreturn_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (G_IS_PROXY_RESOLVER (resolver), NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
-  if (!xuri_is_valid (uri, XURI_FLAGS_NONE, NULL))
+  if (!g_uri_is_valid (uri, G_URI_FLAGS_NONE, NULL))
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                    "Invalid URI ‘%s’", uri);
@@ -173,37 +173,37 @@ xproxy_resolver_lookup (xproxy_resolver_t  *resolver,
 }
 
 /**
- * xproxy_resolver_lookup_async:
- * @resolver: a #xproxy_resolver_t
+ * g_proxy_resolver_lookup_async:
+ * @resolver: a #GProxyResolver
  * @uri: a URI representing the destination to connect to
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
+ * @cancellable: (nullable): a #GCancellable, or %NULL
  * @callback: (scope async): callback to call after resolution completes
  * @user_data: (closure): data for @callback
  *
- * Asynchronous lookup of proxy. See xproxy_resolver_lookup() for more
+ * Asynchronous lookup of proxy. See g_proxy_resolver_lookup() for more
  * details.
  *
  * Since: 2.26
  */
 void
-xproxy_resolver_lookup_async (xproxy_resolver_t      *resolver,
-			       const xchar_t         *uri,
-			       xcancellable_t        *cancellable,
-			       xasync_ready_callback_t  callback,
-			       xpointer_t             user_data)
+g_proxy_resolver_lookup_async (GProxyResolver      *resolver,
+			       const gchar         *uri,
+			       GCancellable        *cancellable,
+			       GAsyncReadyCallback  callback,
+			       gpointer             user_data)
 {
-  xproxy_resolver_interface_t *iface;
-  xerror_t *error = NULL;
+  GProxyResolverInterface *iface;
+  GError *error = NULL;
 
-  g_return_if_fail (X_IS_PROXY_RESOLVER (resolver));
+  g_return_if_fail (G_IS_PROXY_RESOLVER (resolver));
   g_return_if_fail (uri != NULL);
 
-  if (!xuri_is_valid (uri, XURI_FLAGS_NONE, NULL))
+  if (!g_uri_is_valid (uri, G_URI_FLAGS_NONE, NULL))
     {
       g_set_error (&error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
                    "Invalid URI ‘%s’", uri);
-      xtask_report_error (resolver, callback, user_data,
-                           xproxy_resolver_lookup_async,
+      g_task_report_error (resolver, callback, user_data,
+                           g_proxy_resolver_lookup_async,
                            g_steal_pointer (&error));
       return;
     }
@@ -214,29 +214,29 @@ xproxy_resolver_lookup_async (xproxy_resolver_t      *resolver,
 }
 
 /**
- * xproxy_resolver_lookup_finish:
- * @resolver: a #xproxy_resolver_t
- * @result: the result passed to your #xasync_ready_callback_t
- * @error: return location for a #xerror_t, or %NULL
+ * g_proxy_resolver_lookup_finish:
+ * @resolver: a #GProxyResolver
+ * @result: the result passed to your #GAsyncReadyCallback
+ * @error: return location for a #GError, or %NULL
  *
  * Call this function to obtain the array of proxy URIs when
- * xproxy_resolver_lookup_async() is complete. See
- * xproxy_resolver_lookup() for more details.
+ * g_proxy_resolver_lookup_async() is complete. See
+ * g_proxy_resolver_lookup() for more details.
  *
  * Returns: (transfer full) (array zero-terminated=1): A
  *               NULL-terminated array of proxy URIs. Must be freed
- *               with xstrfreev().
+ *               with g_strfreev().
  *
  * Since: 2.26
  */
-xchar_t **
-xproxy_resolver_lookup_finish (xproxy_resolver_t     *resolver,
-				xasync_result_t       *result,
-				xerror_t            **error)
+gchar **
+g_proxy_resolver_lookup_finish (GProxyResolver     *resolver,
+				GAsyncResult       *result,
+				GError            **error)
 {
-  xproxy_resolver_interface_t *iface;
+  GProxyResolverInterface *iface;
 
-  xreturn_val_if_fail (X_IS_PROXY_RESOLVER (resolver), NULL);
+  g_return_val_if_fail (G_IS_PROXY_RESOLVER (resolver), NULL);
 
   iface = G_PROXY_RESOLVER_GET_IFACE (resolver);
 

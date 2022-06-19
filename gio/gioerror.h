@@ -34,18 +34,18 @@ G_BEGIN_DECLS
  * G_IO_ERROR:
  *
  * Error domain for GIO. Errors in this domain will be from the #GIOErrorEnum enumeration.
- * See #xerror_t for more information on error domains.
+ * See #GError for more information on error domains.
  **/
 #define G_IO_ERROR g_io_error_quark()
 
-XPL_AVAILABLE_IN_ALL
-xquark       g_io_error_quark      (void);
-XPL_AVAILABLE_IN_ALL
-GIOErrorEnum g_io_error_from_errno (xint_t err_no);
+GLIB_AVAILABLE_IN_ALL
+GQuark       g_io_error_quark      (void);
+GLIB_AVAILABLE_IN_ALL
+GIOErrorEnum g_io_error_from_errno (gint err_no);
 
 #ifdef G_OS_WIN32
-XPL_AVAILABLE_IN_ALL
-GIOErrorEnum g_io_error_from_win32_error (xint_t error_code);
+GLIB_AVAILABLE_IN_ALL
+GIOErrorEnum g_io_error_from_win32_error (gint error_code);
 #endif
 
 G_END_DECLS

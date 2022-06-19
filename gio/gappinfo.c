@@ -46,13 +46,13 @@
  * SECTION:gappinfo
  * @short_description: Application information and launch contexts
  * @include: gio/gio.h
- * @see_also: #xapp_info_monitor_t
- *
- * #xapp_info_t and #xapp_launch_context_t are used for describing and launching
+ * @see_also: #GAppInfoMonitor
+ * 
+ * #GAppInfo and #GAppLaunchContext are used for describing and launching
  * applications installed on the system.
  *
  * As of GLib 2.20, URIs will always be converted to POSIX paths
- * (using xfile_get_path()) when using xapp_info_launch() even if
+ * (using g_file_get_path()) when using g_app_info_launch() even if
  * the application requested an URI and not a POSIX path. For example
  * for a desktop-file based application with Exec key `totem
  * %U` and a single URI, `sftp://foo/file.avi`, then
@@ -65,29 +65,29 @@
  * passed unmodified to the application.
  *
  * Specifically for gvfs 2.26 and later, the POSIX URI will be mapped
- * back to the GIO URI in the #xfile_t constructors (since gvfs
- * implements the #xvfs_t extension point). As such, if the application
- * needs to examine the URI, it needs to use xfile_get_uri() or
- * similar on #xfile_t. In other words, an application cannot assume
- * that the URI passed to e.g. xfile_new_for_commandline_arg() is
- * equal to the result of xfile_get_uri(). The following snippet
+ * back to the GIO URI in the #GFile constructors (since gvfs
+ * implements the #GVfs extension point). As such, if the application
+ * needs to examine the URI, it needs to use g_file_get_uri() or
+ * similar on #GFile. In other words, an application cannot assume
+ * that the URI passed to e.g. g_file_new_for_commandline_arg() is
+ * equal to the result of g_file_get_uri(). The following snippet
  * illustrates this:
  *
- * |[
- * xfile_t *f;
+ * |[ 
+ * GFile *f;
  * char *uri;
  *
- * file = xfile_new_for_commandline_arg (uri_from_commandline);
+ * file = g_file_new_for_commandline_arg (uri_from_commandline);
  *
- * uri = xfile_get_uri (file);
+ * uri = g_file_get_uri (file);
  * strcmp (uri, uri_from_commandline) == 0;
  * g_free (uri);
  *
- * if (xfile_has_uri_scheme (file, "cdda"))
+ * if (g_file_has_uri_scheme (file, "cdda"))
  *   {
  *     // do something special with uri
  *   }
- * xobject_unref (file);
+ * g_object_unref (file);
  * ]|
  *
  * This code will work when both `cdda://sr0/Track 1.wav` and
@@ -98,33 +98,33 @@
  * different ideas of what a given URI means.
  */
 
-struct _xapp_launch_context_private {
+struct _GAppLaunchContextPrivate {
   char **envp;
 };
 
-typedef xapp_info_iface_t xapp_info_interface_t;
-G_DEFINE_INTERFACE (xapp_info, xapp_info, XTYPE_OBJECT)
+typedef GAppInfoIface GAppInfoInterface;
+G_DEFINE_INTERFACE (GAppInfo, g_app_info, G_TYPE_OBJECT)
 
 static void
-xapp_info_default_init (xapp_info_interface_t *iface)
+g_app_info_default_init (GAppInfoInterface *iface)
 {
 }
 
 
 /**
- * xapp_info_dup:
- * @appinfo: a #xapp_info_t.
- *
- * Creates a duplicate of a #xapp_info_t.
+ * g_app_info_dup:
+ * @appinfo: a #GAppInfo.
+ * 
+ * Creates a duplicate of a #GAppInfo.
  *
  * Returns: (transfer full): a duplicate of @appinfo.
  **/
-xapp_info_t *
-xapp_info_dup (xapp_info_t *appinfo)
+GAppInfo *
+g_app_info_dup (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
+  GAppInfoIface *iface;
 
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -132,39 +132,39 @@ xapp_info_dup (xapp_info_t *appinfo)
 }
 
 /**
- * xapp_info_equal:
- * @appinfo1: the first #xapp_info_t.
- * @appinfo2: the second #xapp_info_t.
+ * g_app_info_equal:
+ * @appinfo1: the first #GAppInfo.
+ * @appinfo2: the second #GAppInfo.
  *
  * Checks if two #GAppInfos are equal.
  *
  * Note that the check *may not* compare each individual
- * field, and only does an identity check. In case detecting changes in the
+ * field, and only does an identity check. In case detecting changes in the 
  * contents is needed, program code must additionally compare relevant fields.
  *
  * Returns: %TRUE if @appinfo1 is equal to @appinfo2. %FALSE otherwise.
  **/
-xboolean_t
-xapp_info_equal (xapp_info_t *appinfo1,
-		  xapp_info_t *appinfo2)
+gboolean
+g_app_info_equal (GAppInfo *appinfo1,
+		  GAppInfo *appinfo2)
 {
-  xapp_info_iface_t *iface;
+  GAppInfoIface *iface;
 
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo1), FALSE);
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo2), FALSE);
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo1), FALSE);
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo2), FALSE);
 
-  if (XTYPE_FROM_INSTANCE (appinfo1) != XTYPE_FROM_INSTANCE (appinfo2))
+  if (G_TYPE_FROM_INSTANCE (appinfo1) != G_TYPE_FROM_INSTANCE (appinfo2))
     return FALSE;
-
+  
   iface = G_APP_INFO_GET_IFACE (appinfo1);
 
   return (* iface->equal) (appinfo1, appinfo2);
 }
 
 /**
- * xapp_info_get_id:
- * @appinfo: a #xapp_info_t.
- *
+ * g_app_info_get_id:
+ * @appinfo: a #GAppInfo.
+ * 
  * Gets the ID of an application. An id is a string that
  * identifies the application. The exact format of the id is
  * platform dependent. For instance, on Unix this is the
@@ -176,11 +176,11 @@ xapp_info_equal (xapp_info_t *appinfo1,
  * Returns: (nullable): a string containing the application's ID.
  **/
 const char *
-xapp_info_get_id (xapp_info_t *appinfo)
+g_app_info_get_id (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -188,19 +188,19 @@ xapp_info_get_id (xapp_info_t *appinfo)
 }
 
 /**
- * xapp_info_get_name:
- * @appinfo: a #xapp_info_t.
- *
- * Gets the installed name of the application.
+ * g_app_info_get_name:
+ * @appinfo: a #GAppInfo.
+ * 
+ * Gets the installed name of the application. 
  *
  * Returns: the name of the application for @appinfo.
  **/
 const char *
-xapp_info_get_name (xapp_info_t *appinfo)
+g_app_info_get_name (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -208,8 +208,8 @@ xapp_info_get_name (xapp_info_t *appinfo)
 }
 
 /**
- * xapp_info_get_display_name:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_get_display_name:
+ * @appinfo: a #GAppInfo.
  *
  * Gets the display name of the application. The display name is often more
  * descriptive to the user than the name itself.
@@ -220,11 +220,11 @@ xapp_info_get_name (xapp_info_t *appinfo)
  * Since: 2.24
  **/
 const char *
-xapp_info_get_display_name (xapp_info_t *appinfo)
+g_app_info_get_display_name (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
+  GAppInfoIface *iface;
 
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -235,20 +235,20 @@ xapp_info_get_display_name (xapp_info_t *appinfo)
 }
 
 /**
- * xapp_info_get_description:
- * @appinfo: a #xapp_info_t.
- *
+ * g_app_info_get_description:
+ * @appinfo: a #GAppInfo.
+ * 
  * Gets a human-readable description of an installed application.
  *
- * Returns: (nullable): a string containing a description of the
- * application @appinfo, or %NULL if none.
+ * Returns: (nullable): a string containing a description of the 
+ * application @appinfo, or %NULL if none. 
  **/
 const char *
-xapp_info_get_description (xapp_info_t *appinfo)
+g_app_info_get_description (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -256,20 +256,20 @@ xapp_info_get_description (xapp_info_t *appinfo)
 }
 
 /**
- * xapp_info_get_executable: (virtual get_executable)
- * @appinfo: a #xapp_info_t
- *
+ * g_app_info_get_executable: (virtual get_executable)
+ * @appinfo: a #GAppInfo
+ * 
  * Gets the executable's name for the installed application.
  *
  * Returns: (type filename): a string containing the @appinfo's application
  * binaries name
  **/
 const char *
-xapp_info_get_executable (xapp_info_t *appinfo)
+g_app_info_get_executable (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -278,11 +278,11 @@ xapp_info_get_executable (xapp_info_t *appinfo)
 
 
 /**
- * xapp_info_get_commandline: (virtual get_commandline)
- * @appinfo: a #xapp_info_t
- *
+ * g_app_info_get_commandline: (virtual get_commandline)
+ * @appinfo: a #GAppInfo
+ * 
  * Gets the commandline with which the application will be
- * started.
+ * started.  
  *
  * Returns: (nullable) (type filename): a string containing the @appinfo's commandline,
  *     or %NULL if this information is not available
@@ -290,39 +290,39 @@ xapp_info_get_executable (xapp_info_t *appinfo)
  * Since: 2.20
  **/
 const char *
-xapp_info_get_commandline (xapp_info_t *appinfo)
+g_app_info_get_commandline (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
   if (iface->get_commandline)
     return (* iface->get_commandline) (appinfo);
-
+ 
   return NULL;
 }
 
 /**
- * xapp_info_set_as_default_for_type:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_set_as_default_for_type:
+ * @appinfo: a #GAppInfo.
  * @content_type: the content type.
- * @error: a #xerror_t.
- *
+ * @error: a #GError.
+ * 
  * Sets the application as the default handler for a given type.
  *
  * Returns: %TRUE on success, %FALSE on error.
  **/
-xboolean_t
-xapp_info_set_as_default_for_type (xapp_info_t    *appinfo,
+gboolean
+g_app_info_set_as_default_for_type (GAppInfo    *appinfo,
 				    const char  *content_type,
-				    xerror_t     **error)
+				    GError     **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  xreturn_val_if_fail (content_type != NULL, FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -335,27 +335,27 @@ xapp_info_set_as_default_for_type (xapp_info_t    *appinfo,
 }
 
 /**
- * xapp_info_set_as_last_used_for_type:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_set_as_last_used_for_type:
+ * @appinfo: a #GAppInfo.
  * @content_type: the content type.
- * @error: a #xerror_t.
+ * @error: a #GError.
  *
  * Sets the application as the last used application for a given type.
  * This will make the application appear as first in the list returned
- * by xapp_info_get_recommended_for_type(), regardless of the default
+ * by g_app_info_get_recommended_for_type(), regardless of the default
  * application for that content type.
  *
  * Returns: %TRUE on success, %FALSE on error.
  **/
-xboolean_t
-xapp_info_set_as_last_used_for_type (xapp_info_t    *appinfo,
+gboolean
+g_app_info_set_as_last_used_for_type (GAppInfo    *appinfo,
                                       const char  *content_type,
-                                      xerror_t     **error)
+                                      GError     **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  xreturn_val_if_fail (content_type != NULL, FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -368,25 +368,25 @@ xapp_info_set_as_last_used_for_type (xapp_info_t    *appinfo,
 }
 
 /**
- * xapp_info_set_as_default_for_extension:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_set_as_default_for_extension:
+ * @appinfo: a #GAppInfo.
  * @extension: (type filename): a string containing the file extension
  *     (without the dot).
- * @error: a #xerror_t.
- *
+ * @error: a #GError.
+ * 
  * Sets the application as the default handler for the given file extension.
  *
  * Returns: %TRUE on success, %FALSE on error.
  **/
-xboolean_t
-xapp_info_set_as_default_for_extension (xapp_info_t    *appinfo,
+gboolean
+g_app_info_set_as_default_for_extension (GAppInfo    *appinfo,
 					 const char  *extension,
-					 xerror_t     **error)
+					 GError     **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  xreturn_val_if_fail (extension != NULL, FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (extension != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -394,60 +394,60 @@ xapp_info_set_as_default_for_extension (xapp_info_t    *appinfo,
     return (* iface->set_as_default_for_extension) (appinfo, extension, error);
 
   g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-                       "xapp_info_set_as_default_for_extension not supported yet");
+                       "g_app_info_set_as_default_for_extension not supported yet");
   return FALSE;
 }
 
 
 /**
- * xapp_info_add_supports_type:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_add_supports_type:
+ * @appinfo: a #GAppInfo.
  * @content_type: a string.
- * @error: a #xerror_t.
- *
- * Adds a content type to the application information to indicate the
+ * @error: a #GError.
+ * 
+ * Adds a content type to the application information to indicate the 
  * application is capable of opening files with the given content type.
  *
  * Returns: %TRUE on success, %FALSE on error.
  **/
-xboolean_t
-xapp_info_add_supports_type (xapp_info_t    *appinfo,
+gboolean
+g_app_info_add_supports_type (GAppInfo    *appinfo,
 			      const char  *content_type,
-			      xerror_t     **error)
+			      GError     **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  xreturn_val_if_fail (content_type != NULL, FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
   if (iface->add_supports_type)
     return (* iface->add_supports_type) (appinfo, content_type, error);
 
-  g_set_error_literal (error, G_IO_ERROR,
-                       G_IO_ERROR_NOT_SUPPORTED,
-                       "xapp_info_add_supports_type not supported yet");
+  g_set_error_literal (error, G_IO_ERROR, 
+                       G_IO_ERROR_NOT_SUPPORTED, 
+                       "g_app_info_add_supports_type not supported yet");
 
   return FALSE;
 }
 
 
 /**
- * xapp_info_can_remove_supports_type:
- * @appinfo: a #xapp_info_t.
- *
+ * g_app_info_can_remove_supports_type:
+ * @appinfo: a #GAppInfo.
+ * 
  * Checks if a supported content type can be removed from an application.
  *
- * Returns: %TRUE if it is possible to remove supported
+ * Returns: %TRUE if it is possible to remove supported 
  *     content types from a given @appinfo, %FALSE if not.
  **/
-xboolean_t
-xapp_info_can_remove_supports_type (xapp_info_t *appinfo)
+gboolean
+g_app_info_can_remove_supports_type (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -459,46 +459,46 @@ xapp_info_can_remove_supports_type (xapp_info_t *appinfo)
 
 
 /**
- * xapp_info_remove_supports_type:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_remove_supports_type:
+ * @appinfo: a #GAppInfo.
  * @content_type: a string.
- * @error: a #xerror_t.
+ * @error: a #GError.
  *
  * Removes a supported type from an application, if possible.
- *
+ * 
  * Returns: %TRUE on success, %FALSE on error.
  **/
-xboolean_t
-xapp_info_remove_supports_type (xapp_info_t    *appinfo,
+gboolean
+g_app_info_remove_supports_type (GAppInfo    *appinfo,
 				 const char  *content_type,
-				 xerror_t     **error)
+				 GError     **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  xreturn_val_if_fail (content_type != NULL, FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
   if (iface->remove_supports_type)
     return (* iface->remove_supports_type) (appinfo, content_type, error);
 
-  g_set_error_literal (error, G_IO_ERROR,
-                       G_IO_ERROR_NOT_SUPPORTED,
-                       "xapp_info_remove_supports_type not supported yet");
+  g_set_error_literal (error, G_IO_ERROR, 
+                       G_IO_ERROR_NOT_SUPPORTED, 
+                       "g_app_info_remove_supports_type not supported yet");
 
   return FALSE;
 }
 
 /**
- * xapp_info_get_supported_types:
- * @appinfo: a #xapp_info_t that can handle files
+ * g_app_info_get_supported_types:
+ * @appinfo: a #GAppInfo that can handle files
  *
  * Retrieves the list of content types that @app_info claims to support.
  * If this information is not provided by the environment, this function
  * will return %NULL.
  * This function does not take in consideration associations added with
- * xapp_info_add_supports_type(), but only those exported directly by
+ * g_app_info_add_supports_type(), but only those exported directly by
  * the application.
  *
  * Returns: (transfer none) (array zero-terminated=1) (element-type utf8):
@@ -507,11 +507,11 @@ xapp_info_remove_supports_type (xapp_info_t    *appinfo,
  * Since: 2.34
  */
 const char **
-xapp_info_get_supported_types (xapp_info_t *appinfo)
+g_app_info_get_supported_types (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
+  GAppInfoIface *iface;
 
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -523,20 +523,20 @@ xapp_info_get_supported_types (xapp_info_t *appinfo)
 
 
 /**
- * xapp_info_get_icon:
- * @appinfo: a #xapp_info_t.
- *
+ * g_app_info_get_icon:
+ * @appinfo: a #GAppInfo.
+ * 
  * Gets the icon for the application.
  *
- * Returns: (nullable) (transfer none): the default #xicon_t for @appinfo or %NULL
+ * Returns: (nullable) (transfer none): the default #GIcon for @appinfo or %NULL
  * if there is no default icon.
  **/
-xicon_t *
-xapp_info_get_icon (xapp_info_t *appinfo)
+GIcon *
+g_app_info_get_icon (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -545,12 +545,12 @@ xapp_info_get_icon (xapp_info_t *appinfo)
 
 
 /**
- * xapp_info_launch:
- * @appinfo: a #xapp_info_t
- * @files: (nullable) (element-type xfile_t): a #xlist_t of #xfile_t objects
- * @context: (nullable): a #xapp_launch_context_t or %NULL
- * @error: a #xerror_t
- *
+ * g_app_info_launch:
+ * @appinfo: a #GAppInfo
+ * @files: (nullable) (element-type GFile): a #GList of #GFile objects
+ * @context: (nullable): a #GAppLaunchContext or %NULL
+ * @error: a #GError
+ * 
  * Launches the application. Passes @files to the launched application
  * as arguments, using the optional @context to get information
  * about the details of the launcher (like what screen it is on).
@@ -562,14 +562,14 @@ xapp_info_get_icon (xapp_info_t *appinfo)
  * can fail to start if it runs into problems during startup. There is
  * no way to detect this.
  *
- * Some URIs can be changed when passed through a xfile_t (for instance
+ * Some URIs can be changed when passed through a GFile (for instance
  * unsupported URIs with strange formats like mailto:), so if you have
  * a textual URI you want to pass in as argument, consider using
- * xapp_info_launch_uris() instead.
+ * g_app_info_launch_uris() instead.
  *
  * The launched application inherits the environment of the launching
- * process, but it can be modified with xapp_launch_context_setenv()
- * and xapp_launch_context_unsetenv().
+ * process, but it can be modified with g_app_launch_context_setenv()
+ * and g_app_launch_context_unsetenv().
  *
  * On UNIX, this function sets the `GIO_LAUNCHED_DESKTOP_FILE`
  * environment variable with the path of the launched desktop file and
@@ -581,15 +581,15 @@ xapp_info_get_icon (xapp_info_t *appinfo)
  *
  * Returns: %TRUE on successful launch, %FALSE otherwise.
  **/
-xboolean_t
-xapp_info_launch (xapp_info_t           *appinfo,
-		   xlist_t              *files,
-		   xapp_launch_context_t  *launch_context,
-		   xerror_t            **error)
+gboolean
+g_app_info_launch (GAppInfo           *appinfo,
+		   GList              *files,
+		   GAppLaunchContext  *launch_context,
+		   GError            **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -598,19 +598,19 @@ xapp_info_launch (xapp_info_t           *appinfo,
 
 
 /**
- * xapp_info_supports_uris:
- * @appinfo: a #xapp_info_t.
- *
+ * g_app_info_supports_uris:
+ * @appinfo: a #GAppInfo.
+ * 
  * Checks if the application supports reading files and directories from URIs.
  *
  * Returns: %TRUE if the @appinfo supports URIs.
  **/
-xboolean_t
-xapp_info_supports_uris (xapp_info_t *appinfo)
+gboolean
+g_app_info_supports_uris (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -619,19 +619,19 @@ xapp_info_supports_uris (xapp_info_t *appinfo)
 
 
 /**
- * xapp_info_supports_files:
- * @appinfo: a #xapp_info_t.
- *
+ * g_app_info_supports_files:
+ * @appinfo: a #GAppInfo.
+ * 
  * Checks if the application accepts files as arguments.
  *
  * Returns: %TRUE if the @appinfo supports files.
  **/
-xboolean_t
-xapp_info_supports_files (xapp_info_t *appinfo)
+gboolean
+g_app_info_supports_files (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -640,12 +640,12 @@ xapp_info_supports_files (xapp_info_t *appinfo)
 
 
 /**
- * xapp_info_launch_uris:
- * @appinfo: a #xapp_info_t
- * @uris: (nullable) (element-type utf8): a #xlist_t containing URIs to launch.
- * @context: (nullable): a #xapp_launch_context_t or %NULL
- * @error: a #xerror_t
- *
+ * g_app_info_launch_uris:
+ * @appinfo: a #GAppInfo
+ * @uris: (nullable) (element-type utf8): a #GList containing URIs to launch.
+ * @context: (nullable): a #GAppLaunchContext or %NULL
+ * @error: a #GError
+ * 
  * Launches the application. This passes the @uris to the launched application
  * as arguments, using the optional @context to get information
  * about the details of the launcher (like what screen it is on).
@@ -659,15 +659,15 @@ xapp_info_supports_files (xapp_info_t *appinfo)
  *
  * Returns: %TRUE on successful launch, %FALSE otherwise.
  **/
-xboolean_t
-xapp_info_launch_uris (xapp_info_t           *appinfo,
-			xlist_t              *uris,
-			xapp_launch_context_t  *launch_context,
-			xerror_t            **error)
+gboolean
+g_app_info_launch_uris (GAppInfo           *appinfo,
+			GList              *uris,
+			GAppLaunchContext  *launch_context,
+			GError            **error)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -675,47 +675,47 @@ xapp_info_launch_uris (xapp_info_t           *appinfo,
 }
 
 /**
- * xapp_info_launch_uris_async:
- * @appinfo: a #xapp_info_t
- * @uris: (nullable) (element-type utf8): a #xlist_t containing URIs to launch.
- * @context: (nullable): a #xapp_launch_context_t or %NULL
- * @cancellable: (nullable): a #xcancellable_t
- * @callback: (nullable): a #xasync_ready_callback_t to call when the request is done
+ * g_app_info_launch_uris_async:
+ * @appinfo: a #GAppInfo
+ * @uris: (nullable) (element-type utf8): a #GList containing URIs to launch.
+ * @context: (nullable): a #GAppLaunchContext or %NULL
+ * @cancellable: (nullable): a #GCancellable
+ * @callback: (nullable): a #GAsyncReadyCallback to call when the request is done
  * @user_data: (nullable): data to pass to @callback
  *
- * Async version of xapp_info_launch_uris().
+ * Async version of g_app_info_launch_uris().
  *
  * The @callback is invoked immediately after the application launch, but it
  * waits for activation in case of D-Bus–activated applications and also provides
  * extended error information for sandboxed applications, see notes for
- * xapp_info_launch_default_for_uri_async().
+ * g_app_info_launch_default_for_uri_async().
  *
  * Since: 2.60
  **/
 void
-xapp_info_launch_uris_async (xapp_info_t           *appinfo,
-                              xlist_t              *uris,
-                              xapp_launch_context_t  *context,
-                              xcancellable_t       *cancellable,
-                              xasync_ready_callback_t callback,
-                              xpointer_t            user_data)
+g_app_info_launch_uris_async (GAppInfo           *appinfo,
+                              GList              *uris,
+                              GAppLaunchContext  *context,
+                              GCancellable       *cancellable,
+                              GAsyncReadyCallback callback,
+                              gpointer            user_data)
 {
-  xapp_info_iface_t *iface;
+  GAppInfoIface *iface;
 
-  g_return_if_fail (X_IS_APP_INFO (appinfo));
-  g_return_if_fail (context == NULL || X_IS_APP_LAUNCH_CONTEXT (context));
-  g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  g_return_if_fail (G_IS_APP_INFO (appinfo));
+  g_return_if_fail (context == NULL || G_IS_APP_LAUNCH_CONTEXT (context));
+  g_return_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable));
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
   if (iface->launch_uris_async == NULL)
     {
-      xtask_t *task;
+      GTask *task;
 
-      task = xtask_new (appinfo, cancellable, callback, user_data);
-      xtask_set_source_tag (task, xapp_info_launch_uris_async);
-      xtask_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+      task = g_task_new (appinfo, cancellable, callback, user_data);
+      g_task_set_source_tag (task, g_app_info_launch_uris_async);
+      g_task_return_new_error (task, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
                                "Operation not supported for the current backend.");
-      xobject_unref (task);
+      g_object_unref (task);
 
       return;
     }
@@ -724,25 +724,25 @@ xapp_info_launch_uris_async (xapp_info_t           *appinfo,
 }
 
 /**
- * xapp_info_launch_uris_finish:
- * @appinfo: a #xapp_info_t
- * @result: a #xasync_result_t
- * @error: (nullable): a #xerror_t
+ * g_app_info_launch_uris_finish:
+ * @appinfo: a #GAppInfo
+ * @result: a #GAsyncResult
+ * @error: (nullable): a #GError
  *
- * Finishes a xapp_info_launch_uris_async() operation.
+ * Finishes a g_app_info_launch_uris_async() operation.
  *
  * Returns: %TRUE on successful launch, %FALSE otherwise.
  *
  * Since: 2.60
  */
-xboolean_t
-xapp_info_launch_uris_finish (xapp_info_t     *appinfo,
-                               xasync_result_t *result,
-                               xerror_t      **error)
+gboolean
+g_app_info_launch_uris_finish (GAppInfo     *appinfo,
+                               GAsyncResult *result,
+                               GError      **error)
 {
-  xapp_info_iface_t *iface;
+  GAppInfoIface *iface;
 
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
   if (iface->launch_uris_finish == NULL)
@@ -756,20 +756,20 @@ xapp_info_launch_uris_finish (xapp_info_t     *appinfo,
 }
 
 /**
- * xapp_info_should_show:
- * @appinfo: a #xapp_info_t.
+ * g_app_info_should_show:
+ * @appinfo: a #GAppInfo.
  *
- * Checks if the application info should be shown in menus that
+ * Checks if the application info should be shown in menus that 
  * list available applications.
- *
+ * 
  * Returns: %TRUE if the @appinfo should be shown, %FALSE otherwise.
  **/
-xboolean_t
-xapp_info_should_show (xapp_info_t *appinfo)
+gboolean
+g_app_info_should_show (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -777,9 +777,9 @@ xapp_info_should_show (xapp_info_t *appinfo)
 }
 
 /**
- * xapp_info_launch_default_for_uri:
+ * g_app_info_launch_default_for_uri:
  * @uri: the uri to show
- * @context: (nullable): an optional #xapp_launch_context_t
+ * @context: (nullable): an optional #GAppLaunchContext
  * @error: (nullable): return location for an error, or %NULL
  *
  * Utility function that launches the default application
@@ -789,45 +789,45 @@ xapp_info_should_show (xapp_info_t *appinfo)
  *
  * The D-Bus–activated applications don't have to be started if your application
  * terminates too soon after this function. To prevent this, use
- * xapp_info_launch_default_for_uri_async() instead.
+ * g_app_info_launch_default_for_uri_async() instead.
  *
  * Returns: %TRUE on success, %FALSE on error.
  **/
-xboolean_t
-xapp_info_launch_default_for_uri (const char         *uri,
-                                   xapp_launch_context_t  *launch_context,
-                                   xerror_t            **error)
+gboolean
+g_app_info_launch_default_for_uri (const char         *uri,
+                                   GAppLaunchContext  *launch_context,
+                                   GError            **error)
 {
   char *uri_scheme;
-  xapp_info_t *app_info = NULL;
-  xboolean_t res = FALSE;
+  GAppInfo *app_info = NULL;
+  gboolean res = FALSE;
 
-  /* xfile_query_default_handler() calls
-   * xapp_info_get_default_for_uri_scheme() too, but we have to do it
-   * here anyway in case xfile_t can't parse @uri correctly.
+  /* g_file_query_default_handler() calls
+   * g_app_info_get_default_for_uri_scheme() too, but we have to do it
+   * here anyway in case GFile can't parse @uri correctly.
    */
-  uri_scheme = xuri_parse_scheme (uri);
+  uri_scheme = g_uri_parse_scheme (uri);
   if (uri_scheme && uri_scheme[0] != '\0')
-    app_info = xapp_info_get_default_for_uri_scheme (uri_scheme);
+    app_info = g_app_info_get_default_for_uri_scheme (uri_scheme);
   g_free (uri_scheme);
 
   if (!app_info)
     {
-      xfile_t *file;
+      GFile *file;
 
-      file = xfile_new_for_uri (uri);
-      app_info = xfile_query_default_handler (file, NULL, error);
-      xobject_unref (file);
+      file = g_file_new_for_uri (uri);
+      app_info = g_file_query_default_handler (file, NULL, error);
+      g_object_unref (file);
     }
 
   if (app_info)
     {
-      xlist_t l;
+      GList l;
 
       l.data = (char *)uri;
       l.next = l.prev = NULL;
-      res = xapp_info_launch_uris (app_info, &l, launch_context, error);
-      xobject_unref (app_info);
+      res = g_app_info_launch_uris (app_info, &l, launch_context, error);
+      g_object_unref (app_info);
     }
 
 #ifdef G_OS_UNIX
@@ -850,8 +850,8 @@ xapp_info_launch_default_for_uri (const char         *uri,
 
 typedef struct
 {
-  xchar_t *uri;
-  xapp_launch_context_t *context;
+  gchar *uri;
+  GAppLaunchContext *context;
 } LaunchDefaultForUriData;
 
 static void
@@ -864,34 +864,34 @@ launch_default_for_uri_data_free (LaunchDefaultForUriData *data)
 
 #ifdef G_OS_UNIX
 static void
-launch_default_for_uri_portal_open_uri_cb (xobject_t      *object,
-                                           xasync_result_t *result,
-                                           xpointer_t      user_data)
+launch_default_for_uri_portal_open_uri_cb (GObject      *object,
+                                           GAsyncResult *result,
+                                           gpointer      user_data)
 {
-  xtask_t *task = XTASK (user_data);
-  xerror_t *error = NULL;
+  GTask *task = G_TASK (user_data);
+  GError *error = NULL;
 
   if (g_openuri_portal_open_uri_finish (result, &error))
-    xtask_return_boolean (task, TRUE);
+    g_task_return_boolean (task, TRUE);
   else
-    xtask_return_error (task, g_steal_pointer (&error));
-  xobject_unref (task);
+    g_task_return_error (task, g_steal_pointer (&error));
+  g_object_unref (task);
 }
 #endif
 
 static void
-launch_default_for_uri_portal_open_uri (xtask_t *task, xerror_t *error)
+launch_default_for_uri_portal_open_uri (GTask *task, GError *error)
 {
 #ifdef G_OS_UNIX
-  LaunchDefaultForUriData *data = xtask_get_task_data (task);
-  xcancellable_t *cancellable = xtask_get_cancellable (task);
+  LaunchDefaultForUriData *data = g_task_get_task_data (task);
+  GCancellable *cancellable = g_task_get_cancellable (task);
 
   if (glib_should_use_portal ())
     {
       const char *parent_window = NULL;
 
       /* Reset any error previously set by launch_default_for_uri */
-      xerror_free (error);
+      g_error_free (error);
 
       if (data->context && data->context->priv->envp)
         parent_window = g_environ_getenv (data->context->priv->envp,
@@ -906,58 +906,58 @@ launch_default_for_uri_portal_open_uri (xtask_t *task, xerror_t *error)
     }
 #endif
 
-  xtask_return_error (task, g_steal_pointer (&error));
-  xobject_unref (task);
+  g_task_return_error (task, g_steal_pointer (&error));
+  g_object_unref (task);
 }
 
 static void
-launch_default_for_uri_launch_uris_cb (xobject_t      *object,
-                                       xasync_result_t *result,
-                                       xpointer_t      user_data)
+launch_default_for_uri_launch_uris_cb (GObject      *object,
+                                       GAsyncResult *result,
+                                       gpointer      user_data)
 {
-  xapp_info_t *app_info = G_APP_INFO (object);
-  xtask_t *task = XTASK (user_data);
-  xerror_t *error = NULL;
+  GAppInfo *app_info = G_APP_INFO (object);
+  GTask *task = G_TASK (user_data);
+  GError *error = NULL;
 
-  if (xapp_info_launch_uris_finish (app_info, result, &error))
+  if (g_app_info_launch_uris_finish (app_info, result, &error))
     {
-      xtask_return_boolean (task, TRUE);
-      xobject_unref (task);
+      g_task_return_boolean (task, TRUE);
+      g_object_unref (task);
     }
   else
     launch_default_for_uri_portal_open_uri (g_steal_pointer (&task), g_steal_pointer (&error));
 }
 
 static void
-launch_default_for_uri_launch_uris (xtask_t *task,
-                                    xapp_info_t *app_info)
+launch_default_for_uri_launch_uris (GTask *task,
+                                    GAppInfo *app_info)
 {
-  xcancellable_t *cancellable = xtask_get_cancellable (task);
-  xlist_t l;
-  LaunchDefaultForUriData *data = xtask_get_task_data (task);
+  GCancellable *cancellable = g_task_get_cancellable (task);
+  GList l;
+  LaunchDefaultForUriData *data = g_task_get_task_data (task);
 
   l.data = (char *)data->uri;
   l.next = l.prev = NULL;
-  xapp_info_launch_uris_async (app_info,
+  g_app_info_launch_uris_async (app_info,
                                 &l,
                                 data->context,
                                 cancellable,
                                 launch_default_for_uri_launch_uris_cb,
                                 g_steal_pointer (&task));
-  xobject_unref (app_info);
+  g_object_unref (app_info);
 }
 
 static void
-launch_default_for_uri_default_handler_cb (xobject_t      *object,
-                                           xasync_result_t *result,
-                                           xpointer_t      user_data)
+launch_default_for_uri_default_handler_cb (GObject      *object,
+                                           GAsyncResult *result,
+                                           gpointer      user_data)
 {
-  xfile_t *file = XFILE (object);
-  xtask_t *task = XTASK (user_data);
-  xapp_info_t *app_info = NULL;
-  xerror_t *error = NULL;
+  GFile *file = G_FILE (object);
+  GTask *task = G_TASK (user_data);
+  GAppInfo *app_info = NULL;
+  GError *error = NULL;
 
-  app_info = xfile_query_default_handler_finish (file, result, &error);
+  app_info = g_file_query_default_handler_finish (file, result, &error);
   if (app_info)
     launch_default_for_uri_launch_uris (g_steal_pointer (&task), g_steal_pointer (&app_info));
   else
@@ -965,14 +965,14 @@ launch_default_for_uri_default_handler_cb (xobject_t      *object,
 }
 
 /**
- * xapp_info_launch_default_for_uri_async:
+ * g_app_info_launch_default_for_uri_async:
  * @uri: the uri to show
- * @context: (nullable): an optional #xapp_launch_context_t
- * @cancellable: (nullable): a #xcancellable_t
- * @callback: (nullable): a #xasync_ready_callback_t to call when the request is done
+ * @context: (nullable): an optional #GAppLaunchContext
+ * @cancellable: (nullable): a #GCancellable
+ * @callback: (nullable): a #GAsyncReadyCallback to call when the request is done
  * @user_data: (nullable): data to pass to @callback
  *
- * Async version of xapp_info_launch_default_for_uri().
+ * Async version of g_app_info_launch_default_for_uri().
  *
  * This version is useful if you are interested in receiving
  * error information in the case where the application is
@@ -986,56 +986,56 @@ launch_default_for_uri_default_handler_cb (xobject_t      *object,
  * Since: 2.50
  */
 void
-xapp_info_launch_default_for_uri_async (const char          *uri,
-                                         xapp_launch_context_t   *context,
-                                         xcancellable_t        *cancellable,
-                                         xasync_ready_callback_t  callback,
-                                         xpointer_t             user_data)
+g_app_info_launch_default_for_uri_async (const char          *uri,
+                                         GAppLaunchContext   *context,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data)
 {
-  xtask_t *task;
+  GTask *task;
   char *uri_scheme;
-  xapp_info_t *app_info = NULL;
+  GAppInfo *app_info = NULL;
   LaunchDefaultForUriData *data;
 
   g_return_if_fail (uri != NULL);
 
-  task = xtask_new (NULL, cancellable, callback, user_data);
-  xtask_set_source_tag (task, xapp_info_launch_default_for_uri_async);
+  task = g_task_new (NULL, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_app_info_launch_default_for_uri_async);
 
   data = g_new (LaunchDefaultForUriData, 1);
-  data->uri = xstrdup (uri);
-  data->context = (context != NULL) ? xobject_ref (context) : NULL;
-  xtask_set_task_data (task, g_steal_pointer (&data), (xdestroy_notify_t) launch_default_for_uri_data_free);
+  data->uri = g_strdup (uri);
+  data->context = (context != NULL) ? g_object_ref (context) : NULL;
+  g_task_set_task_data (task, g_steal_pointer (&data), (GDestroyNotify) launch_default_for_uri_data_free);
 
-  /* xfile_query_default_handler_async() calls
-   * xapp_info_get_default_for_uri_scheme() too, but we have to do it
-   * here anyway in case xfile_t can't parse @uri correctly.
+  /* g_file_query_default_handler_async() calls
+   * g_app_info_get_default_for_uri_scheme() too, but we have to do it
+   * here anyway in case GFile can't parse @uri correctly.
    */
-  uri_scheme = xuri_parse_scheme (uri);
+  uri_scheme = g_uri_parse_scheme (uri);
   if (uri_scheme && uri_scheme[0] != '\0')
     /* FIXME: The following still uses blocking calls. */
-    app_info = xapp_info_get_default_for_uri_scheme (uri_scheme);
+    app_info = g_app_info_get_default_for_uri_scheme (uri_scheme);
   g_free (uri_scheme);
 
   if (!app_info)
     {
-      xfile_t *file;
+      GFile *file;
 
-      file = xfile_new_for_uri (uri);
-      xfile_query_default_handler_async (file,
+      file = g_file_new_for_uri (uri);
+      g_file_query_default_handler_async (file,
                                           G_PRIORITY_DEFAULT,
                                           cancellable,
                                           launch_default_for_uri_default_handler_cb,
                                           g_steal_pointer (&task));
-      xobject_unref (file);
+      g_object_unref (file);
     }
   else
     launch_default_for_uri_launch_uris (g_steal_pointer (&task), g_steal_pointer (&app_info));
 }
 
 /**
- * xapp_info_launch_default_for_uri_finish:
- * @result: a #xasync_result_t
+ * g_app_info_launch_default_for_uri_finish:
+ * @result: a #GAsyncResult
  * @error: (nullable): return location for an error, or %NULL
  *
  * Finishes an asynchronous launch-default-for-uri operation.
@@ -1044,70 +1044,70 @@ xapp_info_launch_default_for_uri_async (const char          *uri,
  *
  * Since: 2.50
  */
-xboolean_t
-xapp_info_launch_default_for_uri_finish (xasync_result_t  *result,
-                                          xerror_t       **error)
+gboolean
+g_app_info_launch_default_for_uri_finish (GAsyncResult  *result,
+                                          GError       **error)
 {
-  xreturn_val_if_fail (xtask_is_valid (result, NULL), FALSE);
+  g_return_val_if_fail (g_task_is_valid (result, NULL), FALSE);
 
-  return xtask_propagate_boolean (XTASK (result), error);
+  return g_task_propagate_boolean (G_TASK (result), error);
 }
 
 /**
- * xapp_info_can_delete:
- * @appinfo: a #xapp_info_t
+ * g_app_info_can_delete:
+ * @appinfo: a #GAppInfo
  *
- * Obtains the information whether the #xapp_info_t can be deleted.
- * See xapp_info_delete().
+ * Obtains the information whether the #GAppInfo can be deleted.
+ * See g_app_info_delete().
  *
  * Returns: %TRUE if @appinfo can be deleted
  *
  * Since: 2.20
  */
-xboolean_t
-xapp_info_can_delete (xapp_info_t *appinfo)
+gboolean
+g_app_info_can_delete (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
   if (iface->can_delete)
     return (* iface->can_delete) (appinfo);
-
-  return FALSE;
+ 
+  return FALSE; 
 }
 
 
 /**
- * xapp_info_delete:
- * @appinfo: a #xapp_info_t
+ * g_app_info_delete:
+ * @appinfo: a #GAppInfo
  *
- * Tries to delete a #xapp_info_t.
+ * Tries to delete a #GAppInfo.
  *
  * On some platforms, there may be a difference between user-defined
  * #GAppInfos which can be deleted, and system-wide ones which cannot.
- * See xapp_info_can_delete().
+ * See g_app_info_can_delete().
  *
  * Virtual: do_delete
  * Returns: %TRUE if @appinfo has been deleted
  *
  * Since: 2.20
  */
-xboolean_t
-xapp_info_delete (xapp_info_t *appinfo)
+gboolean
+g_app_info_delete (GAppInfo *appinfo)
 {
-  xapp_info_iface_t *iface;
-
-  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  GAppInfoIface *iface;
+  
+  g_return_val_if_fail (G_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
   if (iface->do_delete)
     return (* iface->do_delete) (appinfo);
-
-  return FALSE;
+ 
+  return FALSE; 
 }
 
 
@@ -1118,68 +1118,68 @@ enum {
   LAST_SIGNAL
 };
 
-static xuint_t signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (xapp_launch_context_t, xapp_launch_context, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GAppLaunchContext, g_app_launch_context, G_TYPE_OBJECT)
 
 /**
- * xapp_launch_context_new:
- *
+ * g_app_launch_context_new:
+ * 
  * Creates a new application launch context. This is not normally used,
  * instead you instantiate a subclass of this, such as #GdkAppLaunchContext.
  *
- * Returns: a #xapp_launch_context_t.
+ * Returns: a #GAppLaunchContext.
  **/
-xapp_launch_context_t *
-xapp_launch_context_new (void)
+GAppLaunchContext *
+g_app_launch_context_new (void)
 {
-  return xobject_new (XTYPE_APP_LAUNCH_CONTEXT, NULL);
+  return g_object_new (G_TYPE_APP_LAUNCH_CONTEXT, NULL);
 }
 
 static void
-xapp_launch_context_finalize (xobject_t *object)
+g_app_launch_context_finalize (GObject *object)
 {
-  xapp_launch_context_t *context = G_APP_LAUNCH_CONTEXT (object);
+  GAppLaunchContext *context = G_APP_LAUNCH_CONTEXT (object);
 
-  xstrfreev (context->priv->envp);
+  g_strfreev (context->priv->envp);
 
-  XOBJECT_CLASS (xapp_launch_context_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_app_launch_context_parent_class)->finalize (object);
 }
 
 static void
-xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
+g_app_launch_context_class_init (GAppLaunchContextClass *klass)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = xapp_launch_context_finalize;
+  object_class->finalize = g_app_launch_context_finalize;
 
   /**
-   * xapp_launch_context_t::launch-failed:
+   * GAppLaunchContext::launch-failed:
    * @context: the object emitting the signal
    * @startup_notify_id: the startup notification id for the failed launch
    *
-   * The #xapp_launch_context_t::launch-failed signal is emitted when a #xapp_info_t launch
+   * The #GAppLaunchContext::launch-failed signal is emitted when a #GAppInfo launch
    * fails. The startup notification id is provided, so that the launcher
    * can cancel the startup notification.
    *
    * Since: 2.36
    */
-  signals[LAUNCH_FAILED] = xsignal_new (I_("launch-failed"),
+  signals[LAUNCH_FAILED] = g_signal_new (I_("launch-failed"),
                                          G_OBJECT_CLASS_TYPE (object_class),
                                          G_SIGNAL_RUN_LAST,
-                                         G_STRUCT_OFFSET (xapp_launch_context_class_t, launch_failed),
+                                         G_STRUCT_OFFSET (GAppLaunchContextClass, launch_failed),
                                          NULL, NULL, NULL,
-                                         XTYPE_NONE, 1, XTYPE_STRING);
+                                         G_TYPE_NONE, 1, G_TYPE_STRING);
 
   /**
-   * xapp_launch_context_t::launch-started:
+   * GAppLaunchContext::launch-started:
    * @context: the object emitting the signal
-   * @info: the #xapp_info_t that is about to be launched
+   * @info: the #GAppInfo that is about to be launched
    * @platform_data: (nullable): additional platform-specific data for this launch
    *
-   * The #xapp_launch_context_t::launch-started signal is emitted when a #xapp_info_t is
+   * The #GAppLaunchContext::launch-started signal is emitted when a #GAppInfo is
    * about to be launched. If non-null the @platform_data is an
-   * xvariant_t dictionary mapping strings to variants (ie `a{sv}`), which
+   * GVariant dictionary mapping strings to variants (ie `a{sv}`), which
    * contains additional, platform-specific data about this launch. On
    * UNIX, at least the `startup-notification-id` keys will be
    * present.
@@ -1189,31 +1189,31 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
    * specification](https://specifications.freedesktop.org/startup-notification-spec/startup-notification-0.1.txt).
    * It allows tracking the progress of the launchee through startup.
    *
-   * It is guaranteed that this signal is followed by either a #xapp_launch_context_t::launched or
-   * #xapp_launch_context_t::launch-failed signal.
+   * It is guaranteed that this signal is followed by either a #GAppLaunchContext::launched or
+   * #GAppLaunchContext::launch-failed signal.
    *
    * Since: 2.72
    */
-  signals[LAUNCH_STARTED] = xsignal_new (I_("launch-started"),
+  signals[LAUNCH_STARTED] = g_signal_new (I_("launch-started"),
                                           G_OBJECT_CLASS_TYPE (object_class),
                                           G_SIGNAL_RUN_LAST,
-                                          G_STRUCT_OFFSET (xapp_launch_context_class_t, launch_started),
+                                          G_STRUCT_OFFSET (GAppLaunchContextClass, launch_started),
                                           NULL, NULL,
                                           _g_cclosure_marshal_VOID__OBJECT_VARIANT,
-                                          XTYPE_NONE, 2,
-                                          XTYPE_APP_INFO, XTYPE_VARIANT);
-  xsignal_set_va_marshaller (signals[LAUNCH_STARTED],
-                              XTYPE_FROM_CLASS (klass),
+                                          G_TYPE_NONE, 2,
+                                          G_TYPE_APP_INFO, G_TYPE_VARIANT);
+  g_signal_set_va_marshaller (signals[LAUNCH_STARTED],
+                              G_TYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_VARIANTv);
 
   /**
-   * xapp_launch_context_t::launched:
+   * GAppLaunchContext::launched:
    * @context: the object emitting the signal
-   * @info: the #xapp_info_t that was just launched
+   * @info: the #GAppInfo that was just launched
    * @platform_data: additional platform-specific data for this launch
    *
-   * The #xapp_launch_context_t::launched signal is emitted when a #xapp_info_t is successfully
-   * launched. The @platform_data is an xvariant_t dictionary mapping
+   * The #GAppLaunchContext::launched signal is emitted when a #GAppInfo is successfully
+   * launched. The @platform_data is an GVariant dictionary mapping
    * strings to variants (ie `a{sv}`), which contains additional,
    * platform-specific data about this launch. On UNIX, at least the
    * `pid` and `startup-notification-id` keys will be present.
@@ -1224,28 +1224,28 @@ xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
    *
    * Since: 2.36
    */
-  signals[LAUNCHED] = xsignal_new (I_("launched"),
+  signals[LAUNCHED] = g_signal_new (I_("launched"),
                                     G_OBJECT_CLASS_TYPE (object_class),
                                     G_SIGNAL_RUN_LAST,
-                                    G_STRUCT_OFFSET (xapp_launch_context_class_t, launched),
+                                    G_STRUCT_OFFSET (GAppLaunchContextClass, launched),
                                     NULL, NULL,
                                     _g_cclosure_marshal_VOID__OBJECT_VARIANT,
-                                    XTYPE_NONE, 2,
-                                    XTYPE_APP_INFO, XTYPE_VARIANT);
-  xsignal_set_va_marshaller (signals[LAUNCHED],
-                              XTYPE_FROM_CLASS (klass),
+                                    G_TYPE_NONE, 2,
+                                    G_TYPE_APP_INFO, G_TYPE_VARIANT);
+  g_signal_set_va_marshaller (signals[LAUNCHED],
+                              G_TYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_VOID__OBJECT_VARIANTv);
 }
 
 static void
-xapp_launch_context_init (xapp_launch_context_t *context)
+g_app_launch_context_init (GAppLaunchContext *context)
 {
-  context->priv = xapp_launch_context_get_instance_private (context);
+  context->priv = g_app_launch_context_get_instance_private (context);
 }
 
 /**
- * xapp_launch_context_setenv:
- * @context: a #xapp_launch_context_t
+ * g_app_launch_context_setenv:
+ * @context: a #GAppLaunchContext
  * @variable: (type filename): the environment variable to set
  * @value: (type filename): the value for to set the variable to.
  *
@@ -1255,11 +1255,11 @@ xapp_launch_context_init (xapp_launch_context_t *context)
  * Since: 2.32
  */
 void
-xapp_launch_context_setenv (xapp_launch_context_t *context,
+g_app_launch_context_setenv (GAppLaunchContext *context,
                              const char        *variable,
                              const char        *value)
 {
-  g_return_if_fail (X_IS_APP_LAUNCH_CONTEXT (context));
+  g_return_if_fail (G_IS_APP_LAUNCH_CONTEXT (context));
   g_return_if_fail (variable != NULL);
   g_return_if_fail (value != NULL);
 
@@ -1271,8 +1271,8 @@ xapp_launch_context_setenv (xapp_launch_context_t *context,
 }
 
 /**
- * xapp_launch_context_unsetenv:
- * @context: a #xapp_launch_context_t
+ * g_app_launch_context_unsetenv:
+ * @context: a #GAppLaunchContext
  * @variable: (type filename): the environment variable to remove
  *
  * Arranges for @variable to be unset in the child's environment
@@ -1281,10 +1281,10 @@ xapp_launch_context_setenv (xapp_launch_context_t *context,
  * Since: 2.32
  */
 void
-xapp_launch_context_unsetenv (xapp_launch_context_t *context,
+g_app_launch_context_unsetenv (GAppLaunchContext *context,
                                const char        *variable)
 {
-  g_return_if_fail (X_IS_APP_LAUNCH_CONTEXT (context));
+  g_return_if_fail (G_IS_APP_LAUNCH_CONTEXT (context));
   g_return_if_fail (variable != NULL);
 
   if (!context->priv->envp)
@@ -1295,8 +1295,8 @@ xapp_launch_context_unsetenv (xapp_launch_context_t *context,
 }
 
 /**
- * xapp_launch_context_get_environment:
- * @context: a #xapp_launch_context_t
+ * g_app_launch_context_get_environment:
+ * @context: a #GAppLaunchContext
  *
  * Gets the complete environment variable list to be passed to
  * the child process when @context is used to launch an application.
@@ -1309,21 +1309,21 @@ xapp_launch_context_unsetenv (xapp_launch_context_t *context,
  * Since: 2.32
  */
 char **
-xapp_launch_context_get_environment (xapp_launch_context_t *context)
+g_app_launch_context_get_environment (GAppLaunchContext *context)
 {
-  xreturn_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
+  g_return_val_if_fail (G_IS_APP_LAUNCH_CONTEXT (context), NULL);
 
   if (!context->priv->envp)
     context->priv->envp = g_get_environ ();
 
-  return xstrdupv (context->priv->envp);
+  return g_strdupv (context->priv->envp);
 }
 
 /**
- * xapp_launch_context_get_display:
- * @context: a #xapp_launch_context_t
- * @info: a #xapp_info_t
- * @files: (element-type xfile_t): a #xlist_t of #xfile_t objects
+ * g_app_launch_context_get_display:
+ * @context: a #GAppLaunchContext
+ * @info: a #GAppInfo
+ * @files: (element-type GFile): a #GList of #GFile objects
  *
  * Gets the display string for the @context. This is used to ensure new
  * applications are started on the same display as the launching
@@ -1332,14 +1332,14 @@ xapp_launch_context_get_environment (xapp_launch_context_t *context)
  * Returns: (nullable): a display string for the display.
  */
 char *
-xapp_launch_context_get_display (xapp_launch_context_t *context,
-				  xapp_info_t          *info,
-				  xlist_t             *files)
+g_app_launch_context_get_display (GAppLaunchContext *context,
+				  GAppInfo          *info,
+				  GList             *files)
 {
-  xapp_launch_context_class_t *class;
+  GAppLaunchContextClass *class;
 
-  xreturn_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
-  xreturn_val_if_fail (X_IS_APP_INFO (info), NULL);
+  g_return_val_if_fail (G_IS_APP_LAUNCH_CONTEXT (context), NULL);
+  g_return_val_if_fail (G_IS_APP_INFO (info), NULL);
 
   class = G_APP_LAUNCH_CONTEXT_GET_CLASS (context);
 
@@ -1350,29 +1350,29 @@ xapp_launch_context_get_display (xapp_launch_context_t *context,
 }
 
 /**
- * xapp_launch_context_get_startup_notify_id:
- * @context: a #xapp_launch_context_t
- * @info: a #xapp_info_t
- * @files: (element-type xfile_t): a #xlist_t of of #xfile_t objects
- *
+ * g_app_launch_context_get_startup_notify_id:
+ * @context: a #GAppLaunchContext
+ * @info: a #GAppInfo
+ * @files: (element-type GFile): a #GList of of #GFile objects
+ * 
  * Initiates startup notification for the application and returns the
  * `DESKTOP_STARTUP_ID` for the launched operation, if supported.
  *
- * Startup notification IDs are defined in the
+ * Startup notification IDs are defined in the 
  * [FreeDesktop.Org Startup Notifications standard](http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt).
  *
  * Returns: (nullable): a startup notification ID for the application, or %NULL if
  *     not supported.
  **/
 char *
-xapp_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
-					    xapp_info_t          *info,
-					    xlist_t             *files)
+g_app_launch_context_get_startup_notify_id (GAppLaunchContext *context,
+					    GAppInfo          *info,
+					    GList             *files)
 {
-  xapp_launch_context_class_t *class;
+  GAppLaunchContextClass *class;
 
-  xreturn_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
-  xreturn_val_if_fail (X_IS_APP_INFO (info), NULL);
+  g_return_val_if_fail (G_IS_APP_LAUNCH_CONTEXT (context), NULL);
+  g_return_val_if_fail (G_IS_APP_INFO (info), NULL);
 
   class = G_APP_LAUNCH_CONTEXT_GET_CLASS (context);
 
@@ -1384,22 +1384,22 @@ xapp_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
 
 
 /**
- * xapp_launch_context_launch_failed:
- * @context: a #xapp_launch_context_t.
- * @startup_notify_id: the startup notification id that was returned by xapp_launch_context_get_startup_notify_id().
+ * g_app_launch_context_launch_failed:
+ * @context: a #GAppLaunchContext.
+ * @startup_notify_id: the startup notification id that was returned by g_app_launch_context_get_startup_notify_id().
  *
  * Called when an application has failed to launch, so that it can cancel
- * the application startup notification started in xapp_launch_context_get_startup_notify_id().
- *
+ * the application startup notification started in g_app_launch_context_get_startup_notify_id().
+ * 
  **/
 void
-xapp_launch_context_launch_failed (xapp_launch_context_t *context,
+g_app_launch_context_launch_failed (GAppLaunchContext *context,
 				    const char        *startup_notify_id)
 {
-  g_return_if_fail (X_IS_APP_LAUNCH_CONTEXT (context));
+  g_return_if_fail (G_IS_APP_LAUNCH_CONTEXT (context));
   g_return_if_fail (startup_notify_id != NULL);
 
-  xsignal_emit (context, signals[LAUNCH_FAILED], 0, startup_notify_id);
+  g_signal_emit (context, signals[LAUNCH_FAILED], 0, startup_notify_id);
 }
 
 
@@ -1407,16 +1407,16 @@ xapp_launch_context_launch_failed (xapp_launch_context_t *context,
  * SECTION:gappinfomonitor
  * @short_description: Monitor application information for changes
  *
- * #xapp_info_monitor_t is a very simple object used for monitoring the app
+ * #GAppInfoMonitor is a very simple object used for monitoring the app
  * info database for changes (ie: newly installed or removed
  * applications).
  *
- * Call xapp_info_monitor_get() to get a #xapp_info_monitor_t and connect
+ * Call g_app_info_monitor_get() to get a #GAppInfoMonitor and connect
  * to the "changed" signal.
  *
  * In the usual case, applications should try to make note of the change
  * (doing things like invalidating caches) but not act on it.  In
- * particular, applications should avoid making calls to #xapp_info_t APIs
+ * particular, applications should avoid making calls to #GAppInfo APIs
  * in response to the change signal, deferring these until the time that
  * the data is actually required.  The exception to this case is when
  * application information is actually being displayed on the screen
@@ -1429,10 +1429,10 @@ xapp_launch_context_launch_failed (xapp_launch_context_t *context,
  **/
 
 /**
- * xapp_info_monitor_t:
+ * GAppInfoMonitor:
  *
  * The only thing you can do with this is to get it via
- * xapp_info_monitor_get() and connect to the "changed" signal.
+ * g_app_info_monitor_get() and connect to the "changed" signal.
  *
  * Since: 2.40
  **/
@@ -1441,80 +1441,80 @@ typedef struct _GAppInfoMonitorClass GAppInfoMonitorClass;
 
 struct _GAppInfoMonitor
 {
-  xobject_t parent_instance;
-  xmain_context_t *context;
+  GObject parent_instance;
+  GMainContext *context;
 };
 
 struct _GAppInfoMonitorClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-static xcontext_specific_group_t xapp_info_monitor_group;
-static xuint_t                 xapp_info_monitor_changed_signal;
+static GContextSpecificGroup g_app_info_monitor_group;
+static guint                 g_app_info_monitor_changed_signal;
 
-XDEFINE_TYPE (xapp_info_monitor, xapp_info_monitor, XTYPE_OBJECT)
+G_DEFINE_TYPE (GAppInfoMonitor, g_app_info_monitor, G_TYPE_OBJECT)
 
 static void
-xapp_info_monitor_finalize (xobject_t *object)
+g_app_info_monitor_finalize (GObject *object)
 {
-  xapp_info_monitor_t *monitor = G_APP_INFO_MONITOR (object);
+  GAppInfoMonitor *monitor = G_APP_INFO_MONITOR (object);
 
-  xcontext_specific_group_remove (&xapp_info_monitor_group, monitor->context, monitor, NULL);
+  g_context_specific_group_remove (&g_app_info_monitor_group, monitor->context, monitor, NULL);
 
-  XOBJECT_CLASS (xapp_info_monitor_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_app_info_monitor_parent_class)->finalize (object);
 }
 
 static void
-xapp_info_monitor_init (xapp_info_monitor_t *monitor)
+g_app_info_monitor_init (GAppInfoMonitor *monitor)
 {
 }
 
 static void
-xapp_info_monitor_class_init (GAppInfoMonitorClass *class)
+g_app_info_monitor_class_init (GAppInfoMonitorClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
   /**
-   * xapp_info_monitor_t::changed:
+   * GAppInfoMonitor::changed:
    *
    * Signal emitted when the app info database for changes (ie: newly installed
    * or removed applications).
    **/
-  xapp_info_monitor_changed_signal = xsignal_new (I_("changed"), XTYPE_APP_INFO_MONITOR, G_SIGNAL_RUN_FIRST,
-                                                    0, NULL, NULL, g_cclosure_marshal_VOID__VOID, XTYPE_NONE, 0);
+  g_app_info_monitor_changed_signal = g_signal_new (I_("changed"), G_TYPE_APP_INFO_MONITOR, G_SIGNAL_RUN_FIRST,
+                                                    0, NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-  object_class->finalize = xapp_info_monitor_finalize;
+  object_class->finalize = g_app_info_monitor_finalize;
 }
 
 /**
- * xapp_info_monitor_get:
+ * g_app_info_monitor_get:
  *
- * Gets the #xapp_info_monitor_t for the current thread-default main
+ * Gets the #GAppInfoMonitor for the current thread-default main
  * context.
  *
- * The #xapp_info_monitor_t will emit a "changed" signal in the
+ * The #GAppInfoMonitor will emit a "changed" signal in the
  * thread-default main context whenever the list of installed
- * applications (as reported by xapp_info_get_all()) may have changed.
+ * applications (as reported by g_app_info_get_all()) may have changed.
  *
- * You must only call xobject_unref() on the return value from under
+ * You must only call g_object_unref() on the return value from under
  * the same main context as you created it.
  *
- * Returns: (transfer full): a reference to a #xapp_info_monitor_t
+ * Returns: (transfer full): a reference to a #GAppInfoMonitor
  *
  * Since: 2.40
  **/
-xapp_info_monitor_t *
-xapp_info_monitor_get (void)
+GAppInfoMonitor *
+g_app_info_monitor_get (void)
 {
-  return xcontext_specific_group_get (&xapp_info_monitor_group,
-                                       XTYPE_APP_INFO_MONITOR,
-                                       G_STRUCT_OFFSET (xapp_info_monitor_t, context),
+  return g_context_specific_group_get (&g_app_info_monitor_group,
+                                       G_TYPE_APP_INFO_MONITOR,
+                                       G_STRUCT_OFFSET (GAppInfoMonitor, context),
                                        NULL);
 }
 
 void
-xapp_info_monitor_fire (void)
+g_app_info_monitor_fire (void)
 {
-  xcontext_specific_group_emit (&xapp_info_monitor_group, xapp_info_monitor_changed_signal);
+  g_context_specific_group_emit (&g_app_info_monitor_group, g_app_info_monitor_changed_signal);
 }

@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1997-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -33,44 +33,44 @@
  * SECTION:generic_values
  * @short_description: A polymorphic type that can hold values of any
  *     other type
- * @see_also: The fundamental types which all support #xvalue_t
+ * @see_also: The fundamental types which all support #GValue
  *     operations and thus can be used as a type initializer for
- *     xvalue_init() are defined by a separate interface.  See the
+ *     g_value_init() are defined by a separate interface.  See the
  *     [standard values API][gobject-Standard-Parameter-and-Value-Types]
  *     for details
  * @title: Generic values
  *
- * The #xvalue_t structure is basically a variable container that consists
+ * The #GValue structure is basically a variable container that consists
  * of a type identifier and a specific value of that type.
  *
- * The type identifier within a #xvalue_t structure always determines the
+ * The type identifier within a #GValue structure always determines the
  * type of the associated value.
  *
- * To create an undefined #xvalue_t structure, simply create a zero-filled
- * #xvalue_t structure. To initialize the #xvalue_t, use the xvalue_init()
- * function. A #xvalue_t cannot be used until it is initialized. Before
- * destruction you must always use xvalue_unset() to make sure allocated
+ * To create an undefined #GValue structure, simply create a zero-filled
+ * #GValue structure. To initialize the #GValue, use the g_value_init()
+ * function. A #GValue cannot be used until it is initialized. Before 
+ * destruction you must always use g_value_unset() to make sure allocated
  * memory is freed.
  *
  * The basic type operations (such as freeing and copying) are determined
- * by the #xtype_value_table_t associated with the type ID stored in the #xvalue_t.
- * Other #xvalue_t operations (such as converting values between types) are
+ * by the #GTypeValueTable associated with the type ID stored in the #GValue.
+ * Other #GValue operations (such as converting values between types) are
  * provided by this interface.
  *
- * The code in the example program below demonstrates #xvalue_t's
+ * The code in the example program below demonstrates #GValue's
  * features.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  * #include <glib-object.h>
  *
  * static void
- * int2string (const xvalue_t *src_value,
- *             xvalue_t       *dest_value)
+ * int2string (const GValue *src_value,
+ *             GValue       *dest_value)
  * {
- *   if (xvalue_get_int (src_value) == 42)
- *     xvalue_set_static_string (dest_value, "An important number");
+ *   if (g_value_get_int (src_value) == 42)
+ *     g_value_set_static_string (dest_value, "An important number");
  *   else
- *     xvalue_set_static_string (dest_value, "What's that?");
+ *     g_value_set_static_string (dest_value, "What's that?");
  * }
  *
  * int
@@ -78,47 +78,47 @@
  *       char *argv[])
  * {
  *   // GValues must be initialized
- *   xvalue_t a = G_VALUE_INIT;
- *   xvalue_t b = G_VALUE_INIT;
- *   const xchar_t *message;
+ *   GValue a = G_VALUE_INIT;
+ *   GValue b = G_VALUE_INIT;
+ *   const gchar *message;
  *
- *   // The xvalue_t starts empty
- *   xassert (!G_VALUE_HOLDS_STRING (&a));
+ *   // The GValue starts empty
+ *   g_assert (!G_VALUE_HOLDS_STRING (&a));
  *
  *   // Put a string in it
- *   xvalue_init (&a, XTYPE_STRING);
- *   xassert (G_VALUE_HOLDS_STRING (&a));
- *   xvalue_set_static_string (&a, "Hello, world!");
- *   g_printf ("%s\n", xvalue_get_string (&a));
+ *   g_value_init (&a, G_TYPE_STRING);
+ *   g_assert (G_VALUE_HOLDS_STRING (&a));
+ *   g_value_set_static_string (&a, "Hello, world!");
+ *   g_printf ("%s\n", g_value_get_string (&a));
  *
  *   // Reset it to its pristine state
- *   xvalue_unset (&a);
+ *   g_value_unset (&a);
  *
  *   // It can then be reused for another type
- *   xvalue_init (&a, XTYPE_INT);
- *   xvalue_set_int (&a, 42);
+ *   g_value_init (&a, G_TYPE_INT);
+ *   g_value_set_int (&a, 42);
  *
- *   // Attempt to transform it into a xvalue_t of type STRING
- *   xvalue_init (&b, XTYPE_STRING);
+ *   // Attempt to transform it into a GValue of type STRING
+ *   g_value_init (&b, G_TYPE_STRING);
  *
  *   // An INT is transformable to a STRING
- *   xassert (xvalue_type_transformable (XTYPE_INT, XTYPE_STRING));
+ *   g_assert (g_value_type_transformable (G_TYPE_INT, G_TYPE_STRING));
  *
- *   xvalue_transform (&a, &b);
- *   g_printf ("%s\n", xvalue_get_string (&b));
+ *   g_value_transform (&a, &b);
+ *   g_printf ("%s\n", g_value_get_string (&b));
  *
  *   // Attempt to transform it again using a custom transform function
- *   xvalue_register_transform_func (XTYPE_INT, XTYPE_STRING, int2string);
- *   xvalue_transform (&a, &b);
- *   g_printf ("%s\n", xvalue_get_string (&b));
+ *   g_value_register_transform_func (G_TYPE_INT, G_TYPE_STRING, int2string);
+ *   g_value_transform (&a, &b);
+ *   g_printf ("%s\n", g_value_get_string (&b));
  *   return 0;
  * }
  * ]|
  *
  * See also [gobject-Standard-Parameter-and-Value-Types] for more information on
- * validation of #xvalue_t.
+ * validation of #GValue.
  *
- * For letting a #xvalue_t own (and memory manage) arbitrary types or pointers,
+ * For letting a #GValue own (and memory manage) arbitrary types or pointers,
  * they need to become a [boxed type][gboxed]. The example below shows how
  * the pointer `mystruct` of type `MyStruct` is used as a [boxed type][gboxed].
  *
@@ -126,20 +126,20 @@
  * typedef struct { ... } MyStruct;
  * G_DEFINE_BOXED_TYPE (MyStruct, my_struct, my_struct_copy, my_struct_free)
  *
- * // These two lines normally go in a public header. By xobject_t convention,
+ * // These two lines normally go in a public header. By GObject convention,
  * // the naming scheme is NAMESPACE_TYPE_NAME:
  * #define MY_TYPE_STRUCT (my_struct_get_type ())
- * xtype_t my_struct_get_type (void);
+ * GType my_struct_get_type (void);
  *
  * void
  * foo ()
  * {
- *   xvalue_t *value = g_new0 (xvalue_t, 1);
- *   xvalue_init (value, MY_TYPE_STRUCT);
- *   xvalue_set_boxed (value, mystruct);
+ *   GValue *value = g_new0 (GValue, 1);
+ *   g_value_init (value, MY_TYPE_STRUCT);
+ *   g_value_set_boxed (value, mystruct);
  *   // [... your code ....]
- *   xvalue_unset (value);
- *   xvalue_free (value);
+ *   g_value_unset (value);
+ *   g_value_free (value);
  * }
  * ]|
  */
@@ -147,15 +147,15 @@
 
 /* --- typedefs & structures --- */
 typedef struct {
-  xtype_t src_type;
-  xtype_t dest_type;
+  GType src_type;
+  GType dest_type;
   GValueTransform func;
 } TransformEntry;
 
 
 /* --- prototypes --- */
-static xint_t	transform_entries_cmp	(xconstpointer bsearch_node1,
-					 xconstpointer bsearch_node2);
+static gint	transform_entries_cmp	(gconstpointer bsearch_node1,
+					 gconstpointer bsearch_node2);
 
 
 /* --- variables --- */
@@ -169,38 +169,38 @@ static GBSearchConfig transform_bconfig = {
 
 /* --- functions --- */
 void
-_xvalue_c_init (void)
+_g_value_c_init (void)
 {
   transform_array = g_bsearch_array_create (&transform_bconfig);
 }
 
 static inline void		/* keep this function in sync with gvaluecollector.h and gboxed.c */
-value_meminit (xvalue_t *value,
-	       xtype_t   value_type)
+value_meminit (GValue *value,
+	       GType   value_type)
 {
   value->g_type = value_type;
   memset (value->data, 0, sizeof (value->data));
 }
 
 /**
- * xvalue_init:
- * @value: A zero-filled (uninitialized) #xvalue_t structure.
- * @g_type: Type the #xvalue_t should hold values of.
+ * g_value_init:
+ * @value: A zero-filled (uninitialized) #GValue structure.
+ * @g_type: Type the #GValue should hold values of.
  *
  * Initializes @value with the default value of @type.
  *
- * Returns: (transfer none): the #xvalue_t structure that has been passed in
+ * Returns: (transfer none): the #GValue structure that has been passed in
  */
-xvalue_t*
-xvalue_init (xvalue_t *value,
-	      xtype_t   g_type)
+GValue*
+g_value_init (GValue *value,
+	      GType   g_type)
 {
-  xtype_value_table_t *value_table;
-  /* xreturn_val_if_fail (XTYPE_IS_VALUE (g_type), NULL);	be more elaborate below */
-  xreturn_val_if_fail (value != NULL, NULL);
-  /* xreturn_val_if_fail (G_VALUE_TYPE (value) == 0, NULL);	be more elaborate below */
+  GTypeValueTable *value_table;
+  /* g_return_val_if_fail (G_TYPE_IS_VALUE (g_type), NULL);	be more elaborate below */
+  g_return_val_if_fail (value != NULL, NULL);
+  /* g_return_val_if_fail (G_VALUE_TYPE (value) == 0, NULL);	be more elaborate below */
 
-  value_table = xtype_value_table_peek (g_type);
+  value_table = g_type_value_table_peek (g_type);
 
   if (value_table && G_VALUE_TYPE (value) == 0)
     {
@@ -209,37 +209,37 @@ xvalue_init (xvalue_t *value,
       value_table->value_init (value);
     }
   else if (G_VALUE_TYPE (value))
-    g_warning ("%s: cannot initialize xvalue_t with type '%s', the value has already been initialized as '%s'",
+    g_warning ("%s: cannot initialize GValue with type '%s', the value has already been initialized as '%s'",
 	       G_STRLOC,
-	       xtype_name (g_type),
-	       xtype_name (G_VALUE_TYPE (value)));
-  else /* !XTYPE_IS_VALUE (g_type) */
-    g_warning ("%s: cannot initialize xvalue_t with type '%s', %s",
+	       g_type_name (g_type),
+	       g_type_name (G_VALUE_TYPE (value)));
+  else /* !G_TYPE_IS_VALUE (g_type) */
+    g_warning ("%s: cannot initialize GValue with type '%s', %s",
                G_STRLOC,
-               xtype_name (g_type),
-               value_table ? "this type is abstract with regards to xvalue_t use, use a more specific (derived) type" : "this type has no xtype_value_table_t implementation");
+               g_type_name (g_type),
+               value_table ? "this type is abstract with regards to GValue use, use a more specific (derived) type" : "this type has no GTypeValueTable implementation");
   return value;
 }
 
 /**
- * xvalue_copy:
- * @src_value: An initialized #xvalue_t structure.
- * @dest_value: An initialized #xvalue_t structure of the same type as @src_value.
+ * g_value_copy:
+ * @src_value: An initialized #GValue structure.
+ * @dest_value: An initialized #GValue structure of the same type as @src_value.
  *
  * Copies the value of @src_value into @dest_value.
  */
 void
-xvalue_copy (const xvalue_t *src_value,
-	      xvalue_t       *dest_value)
+g_value_copy (const GValue *src_value,
+	      GValue       *dest_value)
 {
   g_return_if_fail (src_value);
   g_return_if_fail (dest_value);
-  g_return_if_fail (xvalue_type_compatible (G_VALUE_TYPE (src_value), G_VALUE_TYPE (dest_value)));
-
+  g_return_if_fail (g_value_type_compatible (G_VALUE_TYPE (src_value), G_VALUE_TYPE (dest_value)));
+  
   if (src_value != dest_value)
     {
-      xtype_t dest_type = G_VALUE_TYPE (dest_value);
-      xtype_value_table_t *value_table = xtype_value_table_peek (dest_type);
+      GType dest_type = G_VALUE_TYPE (dest_value);
+      GTypeValueTable *value_table = g_type_value_table_peek (dest_type);
 
       g_return_if_fail (value_table);
 
@@ -254,25 +254,25 @@ xvalue_copy (const xvalue_t *src_value,
 }
 
 /**
- * xvalue_reset:
- * @value: An initialized #xvalue_t structure.
+ * g_value_reset:
+ * @value: An initialized #GValue structure.
  *
  * Clears the current value in @value and resets it to the default value
  * (as if the value had just been initialized).
  *
- * Returns: the #xvalue_t structure that has been passed in
+ * Returns: the #GValue structure that has been passed in
  */
-xvalue_t*
-xvalue_reset (xvalue_t *value)
+GValue*
+g_value_reset (GValue *value)
 {
-  xtype_value_table_t *value_table;
-  xtype_t g_type;
+  GTypeValueTable *value_table;
+  GType g_type;
 
-  xreturn_val_if_fail (value, NULL);
+  g_return_val_if_fail (value, NULL);
   g_type = G_VALUE_TYPE (value);
 
-  value_table = xtype_value_table_peek (g_type);
-  xreturn_val_if_fail (value_table, NULL);
+  value_table = g_type_value_table_peek (g_type);
+  g_return_val_if_fail (value_table, NULL);
 
   /* make sure value's value is free()d */
   if (value_table->value_free)
@@ -286,25 +286,25 @@ xvalue_reset (xvalue_t *value)
 }
 
 /**
- * xvalue_unset:
- * @value: An initialized #xvalue_t structure.
+ * g_value_unset:
+ * @value: An initialized #GValue structure.
  *
  * Clears the current value in @value (if any) and "unsets" the type,
- * this releases all resources associated with this xvalue_t. An unset
- * value is the same as an uninitialized (zero-filled) #xvalue_t
+ * this releases all resources associated with this GValue. An unset
+ * value is the same as an uninitialized (zero-filled) #GValue
  * structure.
  */
 void
-xvalue_unset (xvalue_t *value)
+g_value_unset (GValue *value)
 {
-  xtype_value_table_t *value_table;
-
+  GTypeValueTable *value_table;
+  
   if (value->g_type == 0)
     return;
 
   g_return_if_fail (value);
 
-  value_table = xtype_value_table_peek (G_VALUE_TYPE (value));
+  value_table = g_type_value_table_peek (G_VALUE_TYPE (value));
   g_return_if_fail (value_table);
 
   if (value_table->value_free)
@@ -313,50 +313,50 @@ xvalue_unset (xvalue_t *value)
 }
 
 /**
- * xvalue_fits_pointer:
- * @value: An initialized #xvalue_t structure.
+ * g_value_fits_pointer:
+ * @value: An initialized #GValue structure.
  *
  * Determines if @value will fit inside the size of a pointer value.
  * This is an internal function introduced mainly for C marshallers.
  *
  * Returns: %TRUE if @value will fit inside a pointer value.
  */
-xboolean_t
-xvalue_fits_pointer (const xvalue_t *value)
+gboolean
+g_value_fits_pointer (const GValue *value)
 {
-  xtype_value_table_t *value_table;
+  GTypeValueTable *value_table;
 
-  xreturn_val_if_fail (value, FALSE);
+  g_return_val_if_fail (value, FALSE);
 
-  value_table = xtype_value_table_peek (G_VALUE_TYPE (value));
-  xreturn_val_if_fail (value_table, FALSE);
+  value_table = g_type_value_table_peek (G_VALUE_TYPE (value));
+  g_return_val_if_fail (value_table, FALSE);
 
   return value_table->value_peek_pointer != NULL;
 }
 
 /**
- * xvalue_peek_pointer:
- * @value: An initialized #xvalue_t structure
+ * g_value_peek_pointer:
+ * @value: An initialized #GValue structure
  *
  * Returns the value contents as pointer. This function asserts that
- * xvalue_fits_pointer() returned %TRUE for the passed in value.
+ * g_value_fits_pointer() returned %TRUE for the passed in value.
  * This is an internal function introduced mainly for C marshallers.
  *
  * Returns: (transfer none): the value contents as pointer
  */
-xpointer_t
-xvalue_peek_pointer (const xvalue_t *value)
+gpointer
+g_value_peek_pointer (const GValue *value)
 {
-  xtype_value_table_t *value_table;
+  GTypeValueTable *value_table;
 
-  xreturn_val_if_fail (value, NULL);
+  g_return_val_if_fail (value, NULL);
 
-  value_table = xtype_value_table_peek (G_VALUE_TYPE (value));
-  xreturn_val_if_fail (value_table, NULL);
+  value_table = g_type_value_table_peek (G_VALUE_TYPE (value));
+  g_return_val_if_fail (value_table, NULL);
 
   if (!value_table->value_peek_pointer)
     {
-      xreturn_val_if_fail (xvalue_fits_pointer (value) == TRUE, NULL);
+      g_return_val_if_fail (g_value_fits_pointer (value) == TRUE, NULL);
       return NULL;
     }
 
@@ -364,38 +364,38 @@ xvalue_peek_pointer (const xvalue_t *value)
 }
 
 /**
- * xvalue_set_instance:
- * @value: An initialized #xvalue_t structure.
+ * g_value_set_instance:
+ * @value: An initialized #GValue structure.
  * @instance: (nullable): the instance
  *
  * Sets @value from an instantiatable type via the
  * value_table's collect_value() function.
  */
 void
-xvalue_set_instance (xvalue_t  *value,
-		      xpointer_t instance)
+g_value_set_instance (GValue  *value,
+		      gpointer instance)
 {
-  xtype_t g_type;
-  xtype_value_table_t *value_table;
-  xtype_c_value_t cvalue;
-  xchar_t *error_msg;
+  GType g_type;
+  GTypeValueTable *value_table;
+  GTypeCValue cvalue;
+  gchar *error_msg;
 
   g_return_if_fail (value);
   g_type = G_VALUE_TYPE (value);
-  value_table = xtype_value_table_peek (g_type);
+  value_table = g_type_value_table_peek (g_type);
   g_return_if_fail (value_table);
 
   if (instance)
     {
-      g_return_if_fail (XTYPE_CHECK_INSTANCE (instance));
-      g_return_if_fail (xvalue_type_compatible (XTYPE_FROM_INSTANCE (instance), G_VALUE_TYPE (value)));
+      g_return_if_fail (G_TYPE_CHECK_INSTANCE (instance));
+      g_return_if_fail (g_value_type_compatible (G_TYPE_FROM_INSTANCE (instance), G_VALUE_TYPE (value)));
     }
-
+  
   g_return_if_fail (strcmp (value_table->collect_format, "p") == 0);
-
+  
   memset (&cvalue, 0, sizeof (cvalue));
   cvalue.v_pointer = instance;
-
+  
   /* make sure value's value is free()d */
   if (value_table->value_free)
     value_table->value_free (value);
@@ -407,7 +407,7 @@ xvalue_set_instance (xvalue_t  *value,
     {
       g_warning ("%s: %s", G_STRLOC, error_msg);
       g_free (error_msg);
-
+      
       /* we purposely leak the value here, it might not be
        * in a correct state if an error condition occurred
        */
@@ -417,47 +417,47 @@ xvalue_set_instance (xvalue_t  *value,
 }
 
 /**
- * xvalue_init_from_instance:
- * @value: An uninitialized #xvalue_t structure.
- * @instance: (type xobject_t.TypeInstance): the instance
+ * g_value_init_from_instance:
+ * @value: An uninitialized #GValue structure.
+ * @instance: (type GObject.TypeInstance): the instance
  *
  * Initializes and sets @value from an instantiatable type via the
  * value_table's collect_value() function.
  *
  * Note: The @value will be initialised with the exact type of
- * @instance.  If you wish to set the @value's type to a different xtype_t
- * (such as a parent class xtype_t), you need to manually call
- * xvalue_init() and xvalue_set_instance().
+ * @instance.  If you wish to set the @value's type to a different GType
+ * (such as a parent class GType), you need to manually call
+ * g_value_init() and g_value_set_instance().
  *
  * Since: 2.42
  */
 void
-xvalue_init_from_instance (xvalue_t  *value,
-                            xpointer_t instance)
+g_value_init_from_instance (GValue  *value,
+                            gpointer instance)
 {
   g_return_if_fail (value != NULL && G_VALUE_TYPE(value) == 0);
 
-  if (X_IS_OBJECT (instance))
+  if (G_IS_OBJECT (instance))
     {
       /* Fast-path.
-       * If X_IS_OBJECT() succeeds we know:
+       * If G_IS_OBJECT() succeeds we know:
        * * that instance is present and valid
-       * * that it is a xobject_t, and therefore we can directly
-       *   use the collect implementation (xobject_ref) */
-      value_meminit (value, XTYPE_FROM_INSTANCE (instance));
-      value->data[0].v_pointer = xobject_ref (instance);
+       * * that it is a GObject, and therefore we can directly
+       *   use the collect implementation (g_object_ref) */
+      value_meminit (value, G_TYPE_FROM_INSTANCE (instance));
+      value->data[0].v_pointer = g_object_ref (instance);
     }
   else
-    {
-      xtype_t g_type;
-      xtype_value_table_t *value_table;
-      xtype_c_value_t cvalue;
-      xchar_t *error_msg;
+    {  
+      GType g_type;
+      GTypeValueTable *value_table;
+      GTypeCValue cvalue;
+      gchar *error_msg;
 
-      g_return_if_fail (XTYPE_CHECK_INSTANCE (instance));
+      g_return_if_fail (G_TYPE_CHECK_INSTANCE (instance));
 
-      g_type = XTYPE_FROM_INSTANCE (instance);
-      value_table = xtype_value_table_peek (g_type);
+      g_type = G_TYPE_FROM_INSTANCE (instance);
+      value_table = g_type_value_table_peek (g_type);
       g_return_if_fail (strcmp (value_table->collect_format, "p") == 0);
 
       memset (&cvalue, 0, sizeof (cvalue));
@@ -481,18 +481,18 @@ xvalue_init_from_instance (xvalue_t  *value,
     }
 }
 
-static xtype_t
-transform_lookup_get_parent_type (xtype_t type)
+static GType
+transform_lookup_get_parent_type (GType type)
 {
-  if (xtype_fundamental (type) == XTYPE_INTERFACE)
-    return xtype_interface_instantiatable_prerequisite (type);
+  if (g_type_fundamental (type) == G_TYPE_INTERFACE)
+    return g_type_interface_instantiatable_prerequisite (type);
 
-  return xtype_parent (type);
+  return g_type_parent (type);
 }
 
 static GValueTransform
-transform_func_lookup (xtype_t src_type,
-		       xtype_t dest_type)
+transform_func_lookup (GType src_type,
+		       GType dest_type)
 {
   TransformEntry entry;
 
@@ -503,19 +503,19 @@ transform_func_lookup (xtype_t src_type,
       do
 	{
 	  TransformEntry *e;
-
+	  
 	  e = g_bsearch_array_lookup (transform_array, &transform_bconfig, &entry);
 	  if (e)
 	    {
 	      /* need to check that there hasn't been a change in value handling */
-	      if (xtype_value_table_peek (entry.dest_type) == xtype_value_table_peek (dest_type) &&
-		  xtype_value_table_peek (entry.src_type) == xtype_value_table_peek (src_type))
+	      if (g_type_value_table_peek (entry.dest_type) == g_type_value_table_peek (dest_type) &&
+		  g_type_value_table_peek (entry.src_type) == g_type_value_table_peek (src_type))
 		return e->func;
 	    }
 	  entry.dest_type = transform_lookup_get_parent_type (entry.dest_type);
 	}
       while (entry.dest_type);
-
+      
       entry.src_type = transform_lookup_get_parent_type (entry.src_type);
     }
   while (entry.src_type);
@@ -523,13 +523,13 @@ transform_func_lookup (xtype_t src_type,
   return NULL;
 }
 
-static xint_t
-transform_entries_cmp (xconstpointer bsearch_node1,
-		       xconstpointer bsearch_node2)
+static gint
+transform_entries_cmp (gconstpointer bsearch_node1,
+		       gconstpointer bsearch_node2)
 {
   const TransformEntry *e1 = bsearch_node1;
   const TransformEntry *e2 = bsearch_node2;
-  xint_t cmp = G_BSEARCH_ARRAY_CMP (e1->src_type, e2->src_type);
+  gint cmp = G_BSEARCH_ARRAY_CMP (e1->src_type, e2->src_type);
 
   if (cmp)
     return cmp;
@@ -538,26 +538,26 @@ transform_entries_cmp (xconstpointer bsearch_node1,
 }
 
 /**
- * xvalue_register_transform_func: (skip)
+ * g_value_register_transform_func: (skip)
  * @src_type: Source type.
  * @dest_type: Target type.
  * @transform_func: a function which transforms values of type @src_type
  *  into value of type @dest_type
  *
- * Registers a value transformation function for use in xvalue_transform().
+ * Registers a value transformation function for use in g_value_transform().
  * A previously registered transformation function for @src_type and @dest_type
  * will be replaced.
  */
 void
-xvalue_register_transform_func (xtype_t           src_type,
-				 xtype_t           dest_type,
+g_value_register_transform_func (GType           src_type,
+				 GType           dest_type,
 				 GValueTransform transform_func)
 {
   TransformEntry entry;
 
   /* these checks won't pass for dynamic types.
-   * g_return_if_fail (XTYPE_HAS_VALUE_TABLE (src_type));
-   * g_return_if_fail (XTYPE_HAS_VALUE_TABLE (dest_type));
+   * g_return_if_fail (G_TYPE_HAS_VALUE_TABLE (src_type));
+   * g_return_if_fail (G_TYPE_HAS_VALUE_TABLE (dest_type));
    */
   g_return_if_fail (transform_func != NULL);
 
@@ -568,8 +568,8 @@ xvalue_register_transform_func (xtype_t           src_type,
   if (g_bsearch_array_lookup (transform_array, &transform_bconfig, &entry))
     g_warning ("reregistering value transformation function (%p) for '%s' to '%s'",
 	       transform_func,
-	       xtype_name (src_type),
-	       xtype_name (dest_type));
+	       g_type_name (src_type),
+	       g_type_name (dest_type));
 #endif
 
   entry.func = transform_func;
@@ -577,61 +577,61 @@ xvalue_register_transform_func (xtype_t           src_type,
 }
 
 /**
- * xvalue_type_transformable:
+ * g_value_type_transformable:
  * @src_type: Source type.
  * @dest_type: Target type.
  *
- * Check whether xvalue_transform() is able to transform values
+ * Check whether g_value_transform() is able to transform values
  * of type @src_type into values of type @dest_type. Note that for
  * the types to be transformable, they must be compatible or a
  * transformation function must be registered.
  *
  * Returns: %TRUE if the transformation is possible, %FALSE otherwise.
  */
-xboolean_t
-xvalue_type_transformable (xtype_t src_type,
-			    xtype_t dest_type)
+gboolean
+g_value_type_transformable (GType src_type,
+			    GType dest_type)
 {
-  xreturn_val_if_fail (src_type, FALSE);
-  xreturn_val_if_fail (dest_type, FALSE);
+  g_return_val_if_fail (src_type, FALSE);
+  g_return_val_if_fail (dest_type, FALSE);
 
-  return (xvalue_type_compatible (src_type, dest_type) ||
+  return (g_value_type_compatible (src_type, dest_type) ||
 	  transform_func_lookup (src_type, dest_type) != NULL);
 }
 
 /**
- * xvalue_type_compatible:
+ * g_value_type_compatible:
  * @src_type: source type to be copied.
  * @dest_type: destination type for copying.
  *
- * Returns whether a #xvalue_t of type @src_type can be copied into
- * a #xvalue_t of type @dest_type.
+ * Returns whether a #GValue of type @src_type can be copied into
+ * a #GValue of type @dest_type.
  *
- * Returns: %TRUE if xvalue_copy() is possible with @src_type and @dest_type.
+ * Returns: %TRUE if g_value_copy() is possible with @src_type and @dest_type.
  */
-xboolean_t
-xvalue_type_compatible (xtype_t src_type,
-			 xtype_t dest_type)
+gboolean
+g_value_type_compatible (GType src_type,
+			 GType dest_type)
 {
-  xreturn_val_if_fail (src_type, FALSE);
-  xreturn_val_if_fail (dest_type, FALSE);
+  g_return_val_if_fail (src_type, FALSE);
+  g_return_val_if_fail (dest_type, FALSE);
 
   /* Fast path */
   if (src_type == dest_type)
     return TRUE;
 
-  return (xtype_is_a (src_type, dest_type) &&
-	  xtype_value_table_peek (dest_type) == xtype_value_table_peek (src_type));
+  return (g_type_is_a (src_type, dest_type) &&
+	  g_type_value_table_peek (dest_type) == g_type_value_table_peek (src_type));
 }
 
 /**
- * xvalue_transform:
+ * g_value_transform:
  * @src_value: Source value.
  * @dest_value: Target value.
  *
  * Tries to cast the contents of @src_value into a type appropriate
- * to store in @dest_value, e.g. to transform a %XTYPE_INT value
- * into a %XTYPE_FLOAT value. Performing transformations between
+ * to store in @dest_value, e.g. to transform a %G_TYPE_INT value
+ * into a %G_TYPE_FLOAT value. Performing transformations between
  * value types might incur precision lossage. Especially
  * transformations into strings might reveal seemingly arbitrary
  * results and shouldn't be relied upon for production code (such
@@ -640,20 +640,20 @@ xvalue_type_compatible (xtype_t src_type,
  * Returns: Whether a transformation rule was found and could be applied.
  *  Upon failing transformations, @dest_value is left untouched.
  */
-xboolean_t
-xvalue_transform (const xvalue_t *src_value,
-		   xvalue_t       *dest_value)
+gboolean
+g_value_transform (const GValue *src_value,
+		   GValue       *dest_value)
 {
-  xtype_t dest_type;
+  GType dest_type;
 
-  xreturn_val_if_fail (src_value, FALSE);
-  xreturn_val_if_fail (dest_value, FALSE);
+  g_return_val_if_fail (src_value, FALSE);
+  g_return_val_if_fail (dest_value, FALSE);
 
   dest_type = G_VALUE_TYPE (dest_value);
-  if (xvalue_type_compatible (G_VALUE_TYPE (src_value), dest_type))
+  if (g_value_type_compatible (G_VALUE_TYPE (src_value), dest_type))
     {
-      xvalue_copy (src_value, dest_value);
-
+      g_value_copy (src_value, dest_value);
+      
       return TRUE;
     }
   else
@@ -662,12 +662,12 @@ xvalue_transform (const xvalue_t *src_value,
 
       if (transform)
 	{
-	  xvalue_unset (dest_value);
-
+	  g_value_unset (dest_value);
+	  
 	  /* setup and transform */
 	  value_meminit (dest_value, dest_type);
 	  transform (src_value, dest_value);
-
+	  
 	  return TRUE;
 	}
     }

@@ -53,7 +53,7 @@ INCLUDES = -I.. -I$(top_srcdir)/intl
 
 COMPILE = $(CC) -c $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS)
 
-SOURCES =
+SOURCES = 
 POFILES = @POFILES@
 GMOFILES = @GMOFILES@
 DISTFILES = LINGUAS Makefile.in.in POTFILES.in $(GETTEXT_PACKAGE).pot \
@@ -105,10 +105,10 @@ $(srcdir)/$(GETTEXT_PACKAGE).pot: $(POTFILES)
 	  --flag=C_:2:pass-c-format \
 	  --flag=NC_:2:pass-c-format \
 	  --flag=g_dngettext:2:pass-c-format \
-	  --flag=xstrdup_printf:1:c-format \
-	  --flag=xstring_printf:2:c-format \
-	  --flag=xstring_append_printf:2:c-format \
-	  --flag=xerror_new:3:c-format \
+	  --flag=g_strdup_printf:1:c-format \
+	  --flag=g_string_printf:2:c-format \
+	  --flag=g_string_append_printf:2:c-format \
+	  --flag=g_error_new:3:c-format \
 	  --flag=g_set_error:4:c-format \
 	  --flag=g_markup_printf_escaped:1:c-format \
 	  --flag=g_log:3:c-format \

@@ -21,7 +21,7 @@
 
 #include <gio/gio.h>
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 
 typedef struct _GWin32FileSyncStream GWin32FileSyncStream;
 
@@ -30,15 +30,15 @@ struct _GWin32FileSyncStream
   IStream  self;
   ULONG    ref_count;
   HANDLE   file_handle;
-  xboolean_t owns_handle;
+  gboolean owns_handle;
   DWORD    stgm_mode;
 };
 
 IStream *g_win32_file_sync_stream_new (HANDLE    file_handle,
-                                       xboolean_t  owns_handle,
+                                       gboolean  owns_handle,
                                        DWORD     stgm_mode,
                                        HRESULT  *output_hresult);
 
-#endif /* XPLATFORM_WIN32 */
+#endif /* G_PLATFORM_WIN32 */
 
 #endif /* __G_WIN32_FILE_SYNC_STREAM_H__ */

@@ -26,26 +26,26 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_2_60
-void g_set_user_dirs (const xchar_t *first_dir_type,
+GLIB_AVAILABLE_IN_2_60
+void g_set_user_dirs (const gchar *first_dir_type,
                       ...) G_GNUC_NULL_TERMINATED;
 
 /* Returns the smallest power of 2 greater than or equal to n,
- * or 0 if such power does not fit in a xsize_t
+ * or 0 if such power does not fit in a gsize
  */
-static inline xsize_t
-g_nearest_pow (xsize_t num)
+static inline gsize
+g_nearest_pow (gsize num)
 {
-  xsize_t n = num - 1;
+  gsize n = num - 1;
 
-  xassert (num > 0 && num <= G_MAXSIZE / 2);
+  g_assert (num > 0 && num <= G_MAXSIZE / 2);
 
   n |= n >> 1;
   n |= n >> 2;
   n |= n >> 4;
   n |= n >> 8;
   n |= n >> 16;
-#if XPL_SIZEOF_SIZE_T == 8
+#if GLIB_SIZEOF_SIZE_T == 8
   n |= n >> 32;
 #endif
 

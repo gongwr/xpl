@@ -22,9 +22,9 @@
 
 G_BEGIN_DECLS
 
-xboolean_t glib_should_use_portal (void);
-xboolean_t glib_network_available_in_sandbox (void);
-xboolean_t glib_has_dconf_access_in_sandbox (void);
+gboolean glib_should_use_portal (void);
+gboolean glib_network_available_in_sandbox (void);
+gboolean glib_has_dconf_access_in_sandbox (void);
 
 G_END_DECLS
 

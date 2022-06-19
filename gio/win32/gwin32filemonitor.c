@@ -28,15 +28,15 @@
 
 #include <windows.h>
 
-G_DEFINE_TYPE_WITH_CODE (GWin32FileMonitor, g_win32_file_monitor, XTYPE_LOCAL_FILE_MONITOR,
+G_DEFINE_TYPE_WITH_CODE (GWin32FileMonitor, g_win32_file_monitor, G_TYPE_LOCAL_FILE_MONITOR,
                          g_io_extension_point_implement (G_LOCAL_FILE_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id, "win32filemonitor", 20))
 
 static void
-g_win32_file_monitor_start (xlocal_file_monitor_t  *monitor,
-                            const xchar_t        *dirname,
-                            const xchar_t        *basename,
-                            const xchar_t        *filename,
+g_win32_file_monitor_start (GLocalFileMonitor  *monitor,
+                            const gchar        *dirname,
+                            const gchar        *basename,
+                            const gchar        *filename,
                             GFileMonitorSource *source)
 {
   GWin32FileMonitor *win32_monitor = G_WIN32_FILE_MONITOR (monitor);
@@ -51,7 +51,7 @@ g_win32_file_monitor_start (xlocal_file_monitor_t  *monitor,
     g_win32_fs_monitor_init (win32_monitor->priv, NULL, filename, TRUE);
 }
 
-static xboolean_t
+static gboolean
 g_win32_file_monitor_is_supported (void)
 {
   return TRUE;
@@ -62,11 +62,11 @@ g_win32_file_monitor_init (GWin32FileMonitor *monitor)
 {
   monitor->priv = g_win32_fs_monitor_create (TRUE);
 
-  monitor->priv->self = XFILE_MONITOR (monitor);
+  monitor->priv->self = G_FILE_MONITOR (monitor);
 }
 
 static void
-g_win32_file_monitor_finalize (xobject_t *object)
+g_win32_file_monitor_finalize (GObject *object)
 {
   GWin32FileMonitor *monitor;
 
@@ -74,11 +74,11 @@ g_win32_file_monitor_finalize (xobject_t *object)
 
   g_win32_fs_monitor_finalize (monitor->priv);
 
-  XOBJECT_CLASS (g_win32_file_monitor_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_win32_file_monitor_parent_class)->finalize (object);
 }
 
-static xboolean_t
-g_win32_file_monitor_cancel (xfile_monitor_t* monitor)
+static gboolean
+g_win32_file_monitor_cancel (GFileMonitor* monitor)
 {
   GWin32FileMonitor *file_monitor;
 
@@ -92,11 +92,11 @@ g_win32_file_monitor_cancel (xfile_monitor_t* monitor)
 static void
 g_win32_file_monitor_class_init (GWin32FileMonitorClass *klass)
 {
-  xobject_class_t* xobject_class = XOBJECT_CLASS (klass);
-  xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
-  xlocal_file_monitor_class_t *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
+  GObjectClass* gobject_class = G_OBJECT_CLASS (klass);
+  GFileMonitorClass *file_monitor_class = G_FILE_MONITOR_CLASS (klass);
+  GLocalFileMonitorClass *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
 
-  xobject_class->finalize = g_win32_file_monitor_finalize;
+  gobject_class->finalize = g_win32_file_monitor_finalize;
   file_monitor_class->cancel = g_win32_file_monitor_cancel;
 
   local_file_monitor_class->is_supported = g_win32_file_monitor_is_supported;

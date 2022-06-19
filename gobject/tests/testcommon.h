@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2003 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,28 +23,28 @@ G_BEGIN_DECLS
 #define DEFINE_TYPE_FULL(name, prefix,				\
 		         class_init, base_init, instance_init,	\
 		         parent_type, interface_decl)		\
-xtype_t								\
+GType								\
 prefix ## _get_type (void)					\
 {								\
-  static xtype_t object_type = 0;					\
+  static GType object_type = 0;					\
 								\
   if (!object_type)						\
     {								\
-      static const xtype_info_t object_info =			\
+      static const GTypeInfo object_info =			\
 	{							\
-	  sizeof (name ## _class_t),				\
-	  (xbase_init_func_t) base_init,				\
-	  (xbase_finalize_func_t) NULL,				\
-	  (xclass_init_func_t) class_init,				\
-	  (xclass_finalize_func_t) NULL,				\
+	  sizeof (name ## Class),				\
+	  (GBaseInitFunc) base_init,				\
+	  (GBaseFinalizeFunc) NULL,				\
+	  (GClassInitFunc) class_init,				\
+	  (GClassFinalizeFunc) NULL,				\
 	  NULL,           /* class_data */			\
-	  sizeof (name ##_t),					\
+	  sizeof (name),					\
 	  0,             /* n_prelocs */			\
-	  (xinstance_init_func_t) instance_init,			\
-	  (const xtype_value_table_t *) NULL,			\
+	  (GInstanceInitFunc) instance_init,			\
+	  (const GTypeValueTable *) NULL,			\
 	};							\
 								\
-      object_type = xtype_register_static (parent_type,	\
+      object_type = g_type_register_static (parent_type,	\
 					    # name,		\
 					    &object_info, 0);	\
       interface_decl						\
@@ -60,28 +60,28 @@ prefix ## _get_type (void)					\
 		   instance_init, parent_type, {})
 
 #define DEFINE_IFACE(name, prefix, base_init, dflt_init)	\
-xtype_t								\
+GType								\
 prefix ## _get_type (void)					\
 {								\
-  static xtype_t iface_type = 0;					\
+  static GType iface_type = 0;					\
 								\
   if (!iface_type)						\
     {								\
-      static const xtype_info_t iface_info =			\
+      static const GTypeInfo iface_info =			\
       {								\
-	sizeof (name ## _class_t),					\
-	(xbase_init_func_t)	base_init,				\
-	(xbase_finalize_func_t) NULL,				\
-	(xclass_init_func_t) dflt_init,				\
-	(xclass_finalize_func_t) NULL,				\
-	(xconstpointer) NULL,					\
-	(xuint16_t) 0,						\
-	(xuint16_t) 0,						\
-	(xinstance_init_func_t) NULL,				\
-	(const xtype_value_table_t*) NULL,				\
+	sizeof (name ## Class),					\
+	(GBaseInitFunc)	base_init,				\
+	(GBaseFinalizeFunc) NULL,				\
+	(GClassInitFunc) dflt_init,				\
+	(GClassFinalizeFunc) NULL,				\
+	(gconstpointer) NULL,					\
+	(guint16) 0,						\
+	(guint16) 0,						\
+	(GInstanceInitFunc) NULL,				\
+	(const GTypeValueTable*) NULL,				\
       };							\
 								\
-      iface_type = xtype_register_static (XTYPE_INTERFACE,	\
+      iface_type = g_type_register_static (G_TYPE_INTERFACE,	\
 					    # name,		\
 					    &iface_info, 0);	\
     }								\
@@ -90,12 +90,12 @@ prefix ## _get_type (void)					\
 
 #define INTERFACE_FULL(type, init_func, iface_type)		\
 {								\
-  static xinterface_info_t const iface =				\
+  static GInterfaceInfo const iface =				\
     {								\
       (GInterfaceInitFunc) init_func, NULL, NULL		\
     };								\
 								\
-  xtype_add_interface_static (type, iface_type, &iface);	\
+  g_type_add_interface_static (type, iface_type, &iface);	\
 }
 #define INTERFACE(init_func, iface_type)	\
   INTERFACE_FULL(object_type, init_func, iface_type)

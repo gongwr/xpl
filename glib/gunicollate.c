@@ -43,10 +43,10 @@
 
 #ifdef _MSC_VER
 /* Workaround for bug in MSVCR80.DLL */
-static xsize_t
+static gsize
 msc_strxfrm_wrapper (char       *string1,
 		     const char *string2,
-		     xsize_t       count)
+		     gsize       count)
 {
   if (!string1 || count <= 0)
     {
@@ -60,43 +60,43 @@ msc_strxfrm_wrapper (char       *string1,
 #endif
 
 /**
- * xutf8_collate:
+ * g_utf8_collate:
  * @str1: a UTF-8 encoded string
  * @str2: a UTF-8 encoded string
- *
+ * 
  * Compares two strings for ordering using the linguistically
  * correct rules for the [current locale][setlocale].
- * When sorting a large number of strings, it will be significantly
- * faster to obtain collation keys with xutf8_collate_key() and
- * compare the keys with strcmp() when sorting instead of sorting
+ * When sorting a large number of strings, it will be significantly 
+ * faster to obtain collation keys with g_utf8_collate_key() and 
+ * compare the keys with strcmp() when sorting instead of sorting 
  * the original strings.
- *
+ * 
  * If the two strings are not comparable due to being in different collation
  * sequences, the result is undefined. This can happen if the strings are in
  * different language scripts, for example.
  *
- * Returns: < 0 if @str1 compares before @str2,
+ * Returns: < 0 if @str1 compares before @str2, 
  *   0 if they compare equal, > 0 if @str1 compares after @str2.
  **/
-xint_t
-xutf8_collate (const xchar_t *str1,
-		const xchar_t *str2)
+gint
+g_utf8_collate (const gchar *str1,
+		const gchar *str2)
 {
-  xint_t result;
+  gint result;
 
 #ifdef HAVE_CARBON
 
   UniChar *str1_utf16;
   UniChar *str2_utf16;
-  xlong_t len1;
-  xlong_t len2;
+  glong len1;
+  glong len2;
   SInt32 retval = 0;
 
-  xreturn_val_if_fail (str1 != NULL, 0);
-  xreturn_val_if_fail (str2 != NULL, 0);
+  g_return_val_if_fail (str1 != NULL, 0);
+  g_return_val_if_fail (str2 != NULL, 0);
 
-  str1_utf16 = xutf8_to_utf16 (str1, -1, NULL, &len1, NULL);
-  str2_utf16 = xutf8_to_utf16 (str2, -1, NULL, &len2, NULL);
+  str1_utf16 = g_utf8_to_utf16 (str1, -1, NULL, &len1, NULL);
+  str2_utf16 = g_utf8_to_utf16 (str2, -1, NULL, &len2, NULL);
 
   UCCompareTextDefault (kUCCollateStandardOptions,
                         str1_utf16, len1, str2_utf16, len2,
@@ -108,14 +108,14 @@ xutf8_collate (const xchar_t *str1,
 
 #elif defined(HAVE_WCHAR_H) && defined(GUNICHAR_EQUALS_WCHAR_T)
 
-  xunichar_t *str1_norm;
-  xunichar_t *str2_norm;
+  gunichar *str1_norm;
+  gunichar *str2_norm;
 
-  xreturn_val_if_fail (str1 != NULL, 0);
-  xreturn_val_if_fail (str2 != NULL, 0);
+  g_return_val_if_fail (str1 != NULL, 0);
+  g_return_val_if_fail (str2 != NULL, 0);
 
-  str1_norm = _xutf8_normalize_wc (str1, -1, XNORMALIZE_ALL_COMPOSE);
-  str2_norm = _xutf8_normalize_wc (str2, -1, XNORMALIZE_ALL_COMPOSE);
+  str1_norm = _g_utf8_normalize_wc (str1, -1, G_NORMALIZE_ALL_COMPOSE);
+  str2_norm = _g_utf8_normalize_wc (str2, -1, G_NORMALIZE_ALL_COMPOSE);
 
   result = wcscoll ((wchar_t *)str1_norm, (wchar_t *)str2_norm);
 
@@ -124,15 +124,15 @@ xutf8_collate (const xchar_t *str1,
 
 #else
 
-  const xchar_t *charset;
-  xchar_t *str1_norm;
-  xchar_t *str2_norm;
+  const gchar *charset;
+  gchar *str1_norm;
+  gchar *str2_norm;
 
-  xreturn_val_if_fail (str1 != NULL, 0);
-  xreturn_val_if_fail (str2 != NULL, 0);
+  g_return_val_if_fail (str1 != NULL, 0);
+  g_return_val_if_fail (str2 != NULL, 0);
 
-  str1_norm = xutf8_normalize (str1, -1, XNORMALIZE_ALL_COMPOSE);
-  str2_norm = xutf8_normalize (str2, -1, XNORMALIZE_ALL_COMPOSE);
+  str1_norm = g_utf8_normalize (str1, -1, G_NORMALIZE_ALL_COMPOSE);
+  str2_norm = g_utf8_normalize (str2, -1, G_NORMALIZE_ALL_COMPOSE);
 
   if (g_get_charset (&charset))
     {
@@ -140,8 +140,8 @@ xutf8_collate (const xchar_t *str1,
     }
   else
     {
-      xchar_t *str1_locale = g_convert (str1_norm, -1, charset, "UTF-8", NULL, NULL, NULL);
-      xchar_t *str2_locale = g_convert (str2_norm, -1, charset, "UTF-8", NULL, NULL, NULL);
+      gchar *str1_locale = g_convert (str1_norm, -1, charset, "UTF-8", NULL, NULL, NULL);
+      gchar *str2_locale = g_convert (str2_norm, -1, charset, "UTF-8", NULL, NULL, NULL);
 
       if (str1_locale && str2_locale)
 	result =  strcoll (str1_locale, str2_locale);
@@ -167,7 +167,7 @@ xutf8_collate (const xchar_t *str1,
 #if defined(HAVE_WCHAR_H) && defined(GUNICHAR_EQUALS_WCHAR_T)
 /* We need UTF-8 encoding of numbers to encode the weights if
  * we are using wcsxfrm. However, we aren't encoding Unicode
- * characters, so we can't simply use xunichar_to_utf8.
+ * characters, so we can't simply use g_unichar_to_utf8.
  *
  * The following routine is taken (with modification) from GNU
  * libc's strxfrm routine:
@@ -191,7 +191,7 @@ utf8_encode (char *buf, wchar_t val)
       int step;
 
       for (step = 2; step < 6; ++step)
-        if ((val & (~(xuint32_t)0 << (5 * step + 1))) == 0)
+        if ((val & (~(guint32)0 << (5 * step + 1))) == 0)
           break;
       retval = step;
 
@@ -215,12 +215,12 @@ utf8_encode (char *buf, wchar_t val)
 
 #ifdef HAVE_CARBON
 
-static xchar_t *
+static gchar *
 collate_key_to_string (UCCollationValue *key,
-                       xsize_t             key_len)
+                       gsize             key_len)
 {
-  xchar_t *result;
-  xsize_t result_len;
+  gchar *result;
+  gsize result_len;
   long *lkey = (long *) key;
 
   /* UCCollationValue format:
@@ -249,13 +249,13 @@ collate_key_to_string (UCCollationValue *key,
   return result;
 }
 
-static xchar_t *
-carbon_collate_key_with_collator (const xchar_t *str,
-                                  xssize_t       len,
+static gchar *
+carbon_collate_key_with_collator (const gchar *str,
+                                  gssize       len,
                                   CollatorRef  collator)
 {
   UniChar *str_utf16 = NULL;
-  xlong_t len_utf16;
+  glong len_utf16;
   OSStatus ret;
   UCCollationValue staticbuf[512];
   UCCollationValue *freeme = NULL;
@@ -263,9 +263,9 @@ carbon_collate_key_with_collator (const xchar_t *str,
   ItemCount buf_len;
   ItemCount key_len;
   ItemCount try_len;
-  xchar_t *result = NULL;
+  gchar *result = NULL;
 
-  str_utf16 = xutf8_to_utf16 (str, len, NULL, &len_utf16, NULL);
+  str_utf16 = g_utf8_to_utf16 (str, len, NULL, &len_utf16, NULL);
   try_len = len_utf16 * 5 + 2;
 
   if (try_len <= sizeof staticbuf)
@@ -295,16 +295,16 @@ carbon_collate_key_with_collator (const xchar_t *str,
   if (ret == 0)
     result = collate_key_to_string (buf, key_len);
   else
-    result = xstrdup ("");
+    result = g_strdup ("");
 
   g_free (freeme);
   g_free (str_utf16);
   return result;
 }
 
-static xchar_t *
-carbon_collate_key (const xchar_t *str,
-                    xssize_t       len)
+static gchar *
+carbon_collate_key (const gchar *str,
+                    gssize       len)
 {
   static CollatorRef collator;
 
@@ -314,20 +314,20 @@ carbon_collate_key (const xchar_t *str,
 
       if (!collator)
         {
-          static xboolean_t been_here;
+          static gboolean been_here;
           if (!been_here)
             g_warning ("%s: UCCreateCollator failed", G_STRLOC);
           been_here = TRUE;
-          return xstrdup ("");
+          return g_strdup ("");
         }
     }
 
   return carbon_collate_key_with_collator (str, len, collator);
 }
 
-static xchar_t *
-carbon_collate_key_for_filename (const xchar_t *str,
-                                 xssize_t       len)
+static gchar *
+carbon_collate_key_for_filename (const gchar *str,
+                                 gssize       len)
 {
   static CollatorRef collator;
 
@@ -340,16 +340,16 @@ carbon_collate_key_for_filename (const xchar_t *str,
                          | kUCCollateCaseInsensitiveMask
                          | kUCCollateDigitsOverrideMask
                          | kUCCollateDigitsAsNumberMask
-                         | kUCCollatePunctuationSignificantMask,
+                         | kUCCollatePunctuationSignificantMask, 
                         &collator);
 
       if (!collator)
         {
-          static xboolean_t been_here;
+          static gboolean been_here;
           if (!been_here)
             g_warning ("%s: UCCreateCollator failed", G_STRLOC);
           been_here = TRUE;
-          return xstrdup ("");
+          return g_strdup ("");
         }
     }
 
@@ -359,45 +359,45 @@ carbon_collate_key_for_filename (const xchar_t *str,
 #endif /* HAVE_CARBON */
 
 /**
- * xutf8_collate_key:
+ * g_utf8_collate_key:
  * @str: a UTF-8 encoded string.
  * @len: length of @str, in bytes, or -1 if @str is nul-terminated.
  *
  * Converts a string into a collation key that can be compared
- * with other collation keys produced by the same function using
- * strcmp().
+ * with other collation keys produced by the same function using 
+ * strcmp(). 
  *
- * The results of comparing the collation keys of two strings
- * with strcmp() will always be the same as comparing the two
- * original keys with xutf8_collate().
- *
+ * The results of comparing the collation keys of two strings 
+ * with strcmp() will always be the same as comparing the two 
+ * original keys with g_utf8_collate().
+ * 
  * Note that this function depends on the [current locale][setlocale].
- *
+ * 
  * Returns: a newly allocated string. This string should
  *   be freed with g_free() when you are done with it.
  **/
-xchar_t *
-xutf8_collate_key (const xchar_t *str,
-		    xssize_t       len)
+gchar *
+g_utf8_collate_key (const gchar *str,
+		    gssize       len)
 {
-  xchar_t *result;
+  gchar *result;
 
 #ifdef HAVE_CARBON
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
   result = carbon_collate_key (str, len);
 
 #elif defined(HAVE_WCHAR_H) && defined(GUNICHAR_EQUALS_WCHAR_T)
 
-  xsize_t xfrm_len;
-  xunichar_t *str_norm;
+  gsize xfrm_len;
+  gunichar *str_norm;
   wchar_t *result_wc;
-  xsize_t i;
-  xsize_t result_len = 0;
+  gsize i;
+  gsize result_len = 0;
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
-  str_norm = _xutf8_normalize_wc (str, len, XNORMALIZE_ALL_COMPOSE);
+  str_norm = _g_utf8_normalize_wc (str, len, G_NORMALIZE_ALL_COMPOSE);
 
   xfrm_len = wcsxfrm (NULL, (wchar_t *)str_norm, 0);
   result_wc = g_new (wchar_t, xfrm_len + 1);
@@ -419,13 +419,13 @@ xutf8_collate_key (const xchar_t *str,
   return result;
 #else
 
-  xsize_t xfrm_len = 0;
-  const xchar_t *charset;
-  xchar_t *str_norm;
+  gsize xfrm_len = 0;
+  const gchar *charset;
+  gchar *str_norm;
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
-  str_norm = xutf8_normalize (str, len, XNORMALIZE_ALL_COMPOSE);
+  str_norm = g_utf8_normalize (str, len, G_NORMALIZE_ALL_COMPOSE);
 
   result = NULL;
 
@@ -440,7 +440,7 @@ xutf8_collate_key (const xchar_t *str,
     }
   else
     {
-      xchar_t *str_locale = g_convert (str_norm, -1, charset, "UTF-8", NULL, NULL, NULL);
+      gchar *str_locale = g_convert (str_norm, -1, charset, "UTF-8", NULL, NULL, NULL);
 
       if (str_locale)
 	{
@@ -456,12 +456,12 @@ xutf8_collate_key (const xchar_t *str,
 	  result = g_malloc (xfrm_len + 2);
 	  result[0] = 'A';
 	  strxfrm (result + 1, str_locale, xfrm_len + 1);
-
+	  
 	  g_free (str_locale);
 	}
     }
-
-  if (!result)
+    
+  if (!result) 
     {
       xfrm_len = strlen (str_norm);
       result = g_malloc (xfrm_len + 2);
@@ -484,20 +484,20 @@ xutf8_collate_key (const xchar_t *str,
 #define COLLATION_SENTINEL "\1\1\1"
 
 /**
- * xutf8_collate_key_for_filename:
+ * g_utf8_collate_key_for_filename:
  * @str: a UTF-8 encoded string.
  * @len: length of @str, in bytes, or -1 if @str is nul-terminated.
  *
  * Converts a string into a collation key that can be compared
- * with other collation keys produced by the same function using strcmp().
- *
- * In order to sort filenames correctly, this function treats the dot '.'
+ * with other collation keys produced by the same function using strcmp(). 
+ * 
+ * In order to sort filenames correctly, this function treats the dot '.' 
  * as a special case. Most dictionary orderings seem to consider it
  * insignificant, thus producing the ordering "event.c" "eventgenerator.c"
  * "event.h" instead of "event.c" "event.h" "eventgenerator.c". Also, we
  * would like to treat numbers intelligently so that "file1" "file10" "file5"
  * is sorted as "file1" "file5" "file10".
- *
+ * 
  * Note that this function depends on the [current locale][setlocale].
  *
  * Returns: a newly allocated string. This string should
@@ -505,43 +505,43 @@ xutf8_collate_key (const xchar_t *str,
  *
  * Since: 2.8
  */
-xchar_t *
-xutf8_collate_key_for_filename (const xchar_t *str,
-				 xssize_t       len)
+gchar *
+g_utf8_collate_key_for_filename (const gchar *str,
+				 gssize       len)
 {
 #ifndef HAVE_CARBON
-  xstring_t *result;
-  xstring_t *append;
-  const xchar_t *p;
-  const xchar_t *prev;
-  const xchar_t *end;
-  xchar_t *collate_key;
-  xint_t digits;
-  xint_t leading_zeros;
+  GString *result;
+  GString *append;
+  const gchar *p;
+  const gchar *prev;
+  const gchar *end;
+  gchar *collate_key;
+  gint digits;
+  gint leading_zeros;
 
   /*
    * How it works:
    *
    * Split the filename into collatable substrings which do
-   * not contain [.0-9] and special-cased substrings. The collatable
-   * substrings are run through the normal xutf8_collate_key() and the
-   * resulting keys are concatenated with keys generated from the
+   * not contain [.0-9] and special-cased substrings. The collatable 
+   * substrings are run through the normal g_utf8_collate_key() and the 
+   * resulting keys are concatenated with keys generated from the 
    * special-cased substrings.
    *
-   * Special cases: Dots are handled by replacing them with '\1' which
-   * implies that short dot-delimited substrings are before long ones,
+   * Special cases: Dots are handled by replacing them with '\1' which 
+   * implies that short dot-delimited substrings are before long ones, 
    * e.g.
-   *
+   * 
    *   a\1a   (a.a)
    *   a-\1a  (a-.a)
    *   aa\1a  (aa.a)
-   *
-   * Numbers are handled by prepending to each number d-1 superdigits
-   * where d = number of digits in the number and SUPERDIGIT is a
-   * character with an integer value higher than any digit (for instance
-   * ':'). This ensures that single-digit numbers are sorted before
-   * double-digit numbers which in turn are sorted separately from
-   * triple-digit numbers, etc. To avoid strange side-effects when
+   * 
+   * Numbers are handled by prepending to each number d-1 superdigits 
+   * where d = number of digits in the number and SUPERDIGIT is a 
+   * character with an integer value higher than any digit (for instance 
+   * ':'). This ensures that single-digit numbers are sorted before 
+   * double-digit numbers which in turn are sorted separately from 
+   * triple-digit numbers, etc. To avoid strange side-effects when 
    * sorting strings that already contain SUPERDIGITs, a '\2'
    * is also prepended, like this
    *
@@ -551,7 +551,7 @@ xutf8_collate_key_for_filename (const xchar_t *str,
    *   file\2:26    (file26)
    *   file\2::100  (file100)
    *   file:foo     (file:foo)
-   *
+   * 
    * This has the side-effect of sorting numbers before everything else (except
    * dots), but this is probably OK.
    *
@@ -568,8 +568,8 @@ xutf8_collate_key_for_filename (const xchar_t *str,
   if (len < 0)
     len = strlen (str);
 
-  result = xstring_sized_new (len * 2);
-  append = xstring_sized_new (0);
+  result = g_string_sized_new (len * 2);
+  append = g_string_sized_new (0);
 
   end = str + len;
 
@@ -579,19 +579,19 @@ xutf8_collate_key_for_filename (const xchar_t *str,
       switch (*p)
 	{
 	case '.':
-	  if (prev != p)
+	  if (prev != p) 
 	    {
-	      collate_key = xutf8_collate_key (prev, p - prev);
-	      xstring_append (result, collate_key);
+	      collate_key = g_utf8_collate_key (prev, p - prev);
+	      g_string_append (result, collate_key);
 	      g_free (collate_key);
 	    }
-
-	  xstring_append (result, COLLATION_SENTINEL "\1");
-
+	  
+	  g_string_append (result, COLLATION_SENTINEL "\1");
+	  
 	  /* skip the dot */
 	  prev = p + 1;
 	  break;
-
+	  
 	case '0':
 	case '1':
 	case '2':
@@ -602,17 +602,17 @@ xutf8_collate_key_for_filename (const xchar_t *str,
 	case '7':
 	case '8':
 	case '9':
-	  if (prev != p)
+	  if (prev != p) 
 	    {
-	      collate_key = xutf8_collate_key (prev, p - prev);
-	      xstring_append (result, collate_key);
+	      collate_key = g_utf8_collate_key (prev, p - prev);
+	      g_string_append (result, collate_key);
 	      g_free (collate_key);
 	    }
-
-	  xstring_append (result, COLLATION_SENTINEL "\2");
-
+	  
+	  g_string_append (result, COLLATION_SENTINEL "\2");
+	  
 	  prev = p;
-
+	  
 	  /* write d-1 colons */
 	  if (*p == '0')
 	    {
@@ -624,7 +624,7 @@ xutf8_collate_key_for_filename (const xchar_t *str,
 	      leading_zeros = 0;
 	      digits = 1;
 	    }
-
+	  
 	  while (++p < end)
 	    {
 	      if (*p == '0' && !digits)
@@ -640,47 +640,47 @@ xutf8_collate_key_for_filename (const xchar_t *str,
                     {
                       ++digits;
                       --leading_zeros;
-                    }
+                    }        
 		  break;
                 }
 	    }
 
 	  while (digits > 1)
 	    {
-	      xstring_append_c (result, ':');
+	      g_string_append_c (result, ':');
 	      --digits;
 	    }
 
 	  if (leading_zeros > 0)
 	    {
-	      xstring_append_c (append, (char)leading_zeros);
+	      g_string_append_c (append, (char)leading_zeros);
 	      prev += leading_zeros;
 	    }
-
+	  
 	  /* write the number itself */
-	  xstring_append_len (result, prev, p - prev);
-
+	  g_string_append_len (result, prev, p - prev);
+	  
 	  prev = p;
 	  --p;	  /* go one step back to avoid disturbing outer loop */
 	  break;
-
+	  
 	default:
 	  /* other characters just accumulate */
 	  break;
 	}
     }
-
-  if (prev != p)
+  
+  if (prev != p) 
     {
-      collate_key = xutf8_collate_key (prev, p - prev);
-      xstring_append (result, collate_key);
+      collate_key = g_utf8_collate_key (prev, p - prev);
+      g_string_append (result, collate_key);
       g_free (collate_key);
     }
+  
+  g_string_append (result, append->str);
+  g_string_free (append, TRUE);
 
-  xstring_append (result, append->str);
-  xstring_free (append, TRUE);
-
-  return xstring_free (result, FALSE);
+  return g_string_free (result, FALSE);
 #else /* HAVE_CARBON */
   return carbon_collate_key_for_filename (str, len);
 #endif

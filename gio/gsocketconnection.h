@@ -21,8 +21,8 @@
  *          Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XSOCKET_CONNECTION_H__
-#define __XSOCKET_CONNECTION_H__
+#ifndef __G_SOCKET_CONNECTION_H__
+#define __G_SOCKET_CONNECTION_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -34,24 +34,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_CONNECTION                            (xsocket_connection_get_type ())
-#define XSOCKET_CONNECTION(inst)                           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection))
-#define XSOCKET_CONNECTION_CLASS(class)                    (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_class))
-#define X_IS_SOCKET_CONNECTION(inst)                        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET_CONNECTION))
-#define X_IS_SOCKET_CONNECTION_CLASS(class)                 (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET_CONNECTION))
-#define XSOCKET_CONNECTION_GET_CLASS(inst)                 (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_CONNECTION, xsocket_connection_class))
+#define G_TYPE_SOCKET_CONNECTION                            (g_socket_connection_get_type ())
+#define G_SOCKET_CONNECTION(inst)                           (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET_CONNECTION, GSocketConnection))
+#define G_SOCKET_CONNECTION_CLASS(class)                    (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET_CONNECTION, GSocketConnectionClass))
+#define G_IS_SOCKET_CONNECTION(inst)                        (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET_CONNECTION))
+#define G_IS_SOCKET_CONNECTION_CLASS(class)                 (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET_CONNECTION))
+#define G_SOCKET_CONNECTION_GET_CLASS(inst)                 (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET_CONNECTION, GSocketConnectionClass))
 
-typedef struct _xsocket_connection_private_t                    xsocket_connection_private_t;
-typedef struct _xsocket_connection_class                      xsocket_connection_class_t;
+typedef struct _GSocketConnectionPrivate                    GSocketConnectionPrivate;
+typedef struct _GSocketConnectionClass                      GSocketConnectionClass;
 
-struct _xsocket_connection_class
+struct _GSocketConnectionClass
 {
-  xio_stream_class_t parent_class;
+  GIOStreamClass parent_class;
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -62,54 +62,54 @@ struct _xsocket_connection_class
   void (*_g_reserved6) (void);
 };
 
-struct _xsocket_connection
+struct _GSocketConnection
 {
-  xio_stream_t parent_instance;
-  xsocket_connection_private_t *priv;
+  GIOStream parent_instance;
+  GSocketConnectionPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t              xsocket_connection_get_type                  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType              g_socket_connection_get_type                  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t           xsocket_connection_is_connected              (xsocket_connection_t  *connection);
-XPL_AVAILABLE_IN_2_32
-xboolean_t           xsocket_connection_connect                   (xsocket_connection_t  *connection,
-								  xsocket_address_t     *address,
-								  xcancellable_t       *cancellable,
-								  xerror_t            **error);
-XPL_AVAILABLE_IN_2_32
-void               xsocket_connection_connect_async             (xsocket_connection_t  *connection,
-								  xsocket_address_t     *address,
-								  xcancellable_t       *cancellable,
-								  xasync_ready_callback_t callback,
-								  xpointer_t            user_data);
-XPL_AVAILABLE_IN_2_32
-xboolean_t           xsocket_connection_connect_finish            (xsocket_connection_t  *connection,
-								  xasync_result_t       *result,
-								  xerror_t            **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean           g_socket_connection_is_connected              (GSocketConnection  *connection);
+GLIB_AVAILABLE_IN_2_32
+gboolean           g_socket_connection_connect                   (GSocketConnection  *connection,
+								  GSocketAddress     *address,
+								  GCancellable       *cancellable,
+								  GError            **error);
+GLIB_AVAILABLE_IN_2_32
+void               g_socket_connection_connect_async             (GSocketConnection  *connection,
+								  GSocketAddress     *address,
+								  GCancellable       *cancellable,
+								  GAsyncReadyCallback callback,
+								  gpointer            user_data);
+GLIB_AVAILABLE_IN_2_32
+gboolean           g_socket_connection_connect_finish            (GSocketConnection  *connection,
+								  GAsyncResult       *result,
+								  GError            **error);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_t           *xsocket_connection_get_socket                (xsocket_connection_t  *connection);
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t    *xsocket_connection_get_local_address         (xsocket_connection_t  *connection,
-								  xerror_t            **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t    *xsocket_connection_get_remote_address        (xsocket_connection_t  *connection,
-								  xerror_t            **error);
+GLIB_AVAILABLE_IN_ALL
+GSocket           *g_socket_connection_get_socket                (GSocketConnection  *connection);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress    *g_socket_connection_get_local_address         (GSocketConnection  *connection,
+								  GError            **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress    *g_socket_connection_get_remote_address        (GSocketConnection  *connection,
+								  GError            **error);
 
-XPL_AVAILABLE_IN_ALL
-void               xsocket_connection_factory_register_type     (xtype_t               g_type,
-								  xsocket_family_t       family,
-								  xsocket_type_t         type,
-								  xint_t                protocol);
-XPL_AVAILABLE_IN_ALL
-xtype_t              xsocket_connection_factory_lookup_type       (xsocket_family_t       family,
-								  xsocket_type_t         type,
-								  xint_t                protocol_id);
-XPL_AVAILABLE_IN_ALL
-xsocket_connection_t *xsocket_connection_factory_create_connection (xsocket_t            *socket);
+GLIB_AVAILABLE_IN_ALL
+void               g_socket_connection_factory_register_type     (GType               g_type,
+								  GSocketFamily       family,
+								  GSocketType         type,
+								  gint                protocol);
+GLIB_AVAILABLE_IN_ALL
+GType              g_socket_connection_factory_lookup_type       (GSocketFamily       family,
+								  GSocketType         type,
+								  gint                protocol_id);
+GLIB_AVAILABLE_IN_ALL
+GSocketConnection *g_socket_connection_factory_create_connection (GSocket            *socket);
 
 G_END_DECLS
 
-#endif /* __XSOCKET_CONNECTION_H__ */
+#endif /* __G_SOCKET_CONNECTION_H__ */

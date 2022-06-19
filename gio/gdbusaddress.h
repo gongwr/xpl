@@ -29,36 +29,36 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_2_36
-xchar_t *g_dbus_address_escape_value (const xchar_t *string);
+GLIB_AVAILABLE_IN_2_36
+gchar *g_dbus_address_escape_value (const gchar *string);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_dbus_is_address (const xchar_t *string);
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_dbus_is_supported_address (const xchar_t  *string,
-                                      xerror_t      **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_dbus_is_address (const gchar *string);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_dbus_is_supported_address (const gchar  *string,
+                                      GError      **error);
 
-XPL_AVAILABLE_IN_ALL
-void                 g_dbus_address_get_stream        (const xchar_t          *address,
-                                                       xcancellable_t         *cancellable,
-                                                       xasync_ready_callback_t   callback,
-                                                       xpointer_t              user_data);
+GLIB_AVAILABLE_IN_ALL
+void                 g_dbus_address_get_stream        (const gchar          *address,
+                                                       GCancellable         *cancellable,
+                                                       GAsyncReadyCallback   callback,
+                                                       gpointer              user_data);
 
-XPL_AVAILABLE_IN_ALL
-xio_stream_t           *g_dbus_address_get_stream_finish (xasync_result_t         *res,
-                                                       xchar_t               **out_guid,
-                                                       xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GIOStream           *g_dbus_address_get_stream_finish (GAsyncResult         *res,
+                                                       gchar               **out_guid,
+                                                       GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xio_stream_t           *g_dbus_address_get_stream_sync   (const xchar_t          *address,
-                                                       xchar_t               **out_guid,
-                                                       xcancellable_t         *cancellable,
-                                                       xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+GIOStream           *g_dbus_address_get_stream_sync   (const gchar          *address,
+                                                       gchar               **out_guid,
+                                                       GCancellable         *cancellable,
+                                                       GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xchar_t               *g_dbus_address_get_for_bus_sync  (xbus_type_t              bus_type,
-                                                       xcancellable_t  *cancellable,
-                                                       xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gchar               *g_dbus_address_get_for_bus_sync  (GBusType              bus_type,
+                                                       GCancellable  *cancellable,
+                                                       GError              **error);
 
 G_END_DECLS
 

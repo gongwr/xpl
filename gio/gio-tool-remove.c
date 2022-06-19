@@ -25,7 +25,7 @@
 #include "gio-tool.h"
 
 
-static xboolean_t force = FALSE;
+static gboolean force = FALSE;
 
 static const GOptionEntry entries[] = {
   {"force", 'f', 0, G_OPTION_ARG_NONE, &force, N_("Ignore nonexistent files, never prompt"), NULL},
@@ -33,19 +33,19 @@ static const GOptionEntry entries[] = {
 };
 
 int
-handle_remove (int argc, char *argv[], xboolean_t do_help)
+handle_remove (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xchar_t *param;
-  xerror_t *error = NULL;
-  xfile_t *file;
+  GOptionContext *context;
+  gchar *param;
+  GError *error = NULL;
+  GFile *file;
   int retval;
   int i;
 
   g_set_prgname ("gio remove");
 
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("%s…", _("LOCATION"));
+  param = g_strdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -62,7 +62,7 @@ handle_remove (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -79,18 +79,18 @@ handle_remove (int argc, char *argv[], xboolean_t do_help)
   retval = 0;
   for (i = 1; i < argc; i++)
     {
-      file = xfile_new_for_commandline_arg (argv[i]);
-      if (!xfile_delete (file, NULL, &error))
+      file = g_file_new_for_commandline_arg (argv[i]);
+      if (!g_file_delete (file, NULL, &error))
         {
           if (!force ||
-              !xerror_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+              !g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             {
               print_file_error (file, error->message);
               retval = 1;
             }
           g_clear_error (&error);
         }
-      xobject_unref (file);
+      g_object_unref (file);
     }
 
   return retval;

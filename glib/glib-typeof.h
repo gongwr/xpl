@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2021  Iain Lane, Xavier Claessens
  *
  * This library is free software; you can redistribute it and/or
@@ -15,10 +15,10 @@
  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XPL_TYPEOF_H__
-#define __XPL_TYPEOF_H__
+#ifndef __GLIB_TYPEOF_H__
+#define __GLIB_TYPEOF_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -34,10 +34,10 @@
 #undef glib_typeof
 #if !defined(__cplusplus) && (G_GNUC_CHECK_VERSION(4, 8) || defined(__clang__))
 #define glib_typeof(t) __typeof__ (t)
-#elif defined(__cplusplus) && __cplusplus >= 201103L && XPL_VERSION_MIN_REQUIRED >= XPL_VERSION_2_68
+#elif defined(__cplusplus) && __cplusplus >= 201103L && GLIB_VERSION_MIN_REQUIRED >= GLIB_VERSION_2_68
 /* C++11 decltype() is close enough for our usage */
 #include <type_traits>
 #define glib_typeof(t) typename std::remove_reference<decltype (t)>::type
 #endif
 
-#endif /* __XPL_TYPEOF_H__ */
+#endif /* __GLIB_TYPEOF_H__ */

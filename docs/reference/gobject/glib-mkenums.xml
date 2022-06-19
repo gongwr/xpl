@@ -2,7 +2,7 @@
 
 <refentryinfo>
   <title>gdbus</title>
-  <productname>xobject_t</productname>
+  <productname>GObject</productname>
   <authorgroup>
     <author>
       <contrib>Developer</contrib>
@@ -35,8 +35,8 @@
 <para><command>glib-mkenums</command> is a small utility that parses C code to
 extract enum definitions and produces enum descriptions based on text templates
 specified by the user. Typically, you can use this tool to generate enumeration
-types for the xtype_t type system, for xobject_t properties and signal marshalling;
-additionally, you can use it to generate enumeration values of xsettings_t schemas.
+types for the GType type system, for GObject properties and signal marshalling;
+additionally, you can use it to generate enumeration values of GSettings schemas.
 </para>
 
 <para><command>glib-mkenums</command> takes a list of valid C code files as
@@ -453,7 +453,7 @@ G_BEGIN_DECLS
 /*** END file-production ***/
 
 /*** BEGIN value-header ***/
-xtype_t @enum_name@_get_type (void) G_GNUC_CONST;
+GType @enum_name@_get_type (void) G_GNUC_CONST;
 #define @ENUMPREFIX@_TYPE_@ENUMSHORT@ (@enum_name@_get_type ())
 /*** END value-header ***/
 
@@ -477,14 +477,14 @@ A C source template file will typically look like this:
 /*** END file-production ***/
 
 /*** BEGIN value-header ***/
-xtype_t
+GType
 @enum_name@_get_type (void)
 {
-  static xsize_t static_g_@type@_type_id;
+  static gsize static_g_@type@_type_id;
 
   if (g_once_init_enter (&amp;static_g_@type@_type_id))
     {
-      static const @type@_value_t values[] = {
+      static const G@Type@Value values[] = {
 /*** END value-header ***/
 
 /*** BEGIN value-production ***/
@@ -495,8 +495,8 @@ xtype_t
             { 0, NULL, NULL }
       };
 
-      xtype_t g_@type@_type_id =
-        @type@_register_static (g_intern_static_string ("@EnumName@"), values);
+      GType g_@type@_type_id =
+        g_@type@_register_static (g_intern_static_string ("@EnumName@"), values);
 
       g_once_init_leave (&amp;static_g_@type@_type_id, g_@type@_type_id);
     }
@@ -602,7 +602,7 @@ the compiler and linker flags for GLib.
 <informalexample><programlisting>
 PKG_PROG_PKG_CONFIG([0.28])
 
-PKG_CHECK_VAR([XPL_MKENUMS], [glib-2.0], [glib_mkenums])
+PKG_CHECK_VAR([GLIB_MKENUMS], [glib-2.0], [glib_mkenums])
 </programlisting></informalexample>
 <para>
 In your <filename>Makefile.am</filename> file you will typically use rules
@@ -616,13 +616,13 @@ project_headers = \
         project-baz.h
 
 enum-types.h: $(project_headers) enum-types.h.in
-        $(AM_V_GEN)$(XPL_MKENUMS) \
+        $(AM_V_GEN)$(GLIB_MKENUMS) \
                 --template=enum-types.h.in \
                 --output=$@ \
                 $(project_headers)
 
 enum-types.c: $(project_headers) enum-types.c.in enum-types.h
-        $(AM_V_GEN)$(XPL_MKENUMS) \
+        $(AM_V_GEN)$(GLIB_MKENUMS) \
                 --template=enum-types.c.in \
                 --output=$@ \
                 $(project_headers)

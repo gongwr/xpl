@@ -148,9 +148,9 @@
         <listitem><para>
           Invokes a method on a remote object.  Each argument to pass to the
           method must be specified as a serialized
-          <link linkend="xvariant_t"><type>xvariant_t</type></link> except that strings do
+          <link linkend="GVariant"><type>GVariant</type></link> except that strings do
           not need explicit quotes. The return values are printed out as
-          serialized <link linkend="xvariant_t"><type>xvariant_t</type></link>
+          serialized <link linkend="GVariant"><type>GVariant</type></link>
           values.
         </para></listitem>
       </varlistentry>
@@ -158,7 +158,7 @@
         <term><option>emit</option></term>
         <listitem><para>
           Emits a signal. Each argument to include in the signal must be specified as a serialized
-          <link linkend="xvariant_t"><type>xvariant_t</type></link> except that strings do
+          <link linkend="GVariant"><type>GVariant</type></link> except that strings do
           not need explicit quotes.
         </para></listitem>
       </varlistentry>
@@ -247,7 +247,7 @@ node /org/freedesktop/NetworkManager/Devices/0 {
   The <option>--recurse</option> and <option>--only-properties</option> options can be useful when wanting to inspect all objects owned by a particular process:
 </para>
 <programlisting>
-$ gdbus introspect --system --dest org.freedesktop.UPower --object-path / --recurse  --only-properties
+$ gdbus introspect --system --dest org.freedesktop.UPower --object-path / --recurse  --only-properties 
 node / {
   node /org {
     node /org/freedesktop {
@@ -363,7 +363,7 @@ The name org.freedesktop.NetworkManager is owned by :1.5
   Emitting a signal:
 </para>
 <programlisting>
-$ gdbus emit --session --object-path /foo --signal org.bar.foo_t "['foo', 'bar', 'baz']"
+$ gdbus emit --session --object-path /foo --signal org.bar.Foo "['foo', 'bar', 'baz']"
 </programlisting>
 
 <para>
@@ -426,3 +426,4 @@ $ gdbus wait --session --timeout 30 org.bar.SomeName
 </refsect1>
 
 </refentry>
+

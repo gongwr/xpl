@@ -24,13 +24,13 @@
 #include <errno.h>
 
 /* We are testing some deprecated APIs here */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include <glib.h>
 
-/* test_t our stdio wrappers here; this disables redefining (e.g.) g_open() to open() */
+/* Test our stdio wrappers here; this disables redefining (e.g.) g_open() to open() */
 #define G_STDIO_WRAP_ON_UNIX
 #include <glib/gstdio.h>
 
@@ -60,7 +60,7 @@
 #define S G_DIR_SEPARATOR_S
 
 static void
-check_string (xchar_t *str, const xchar_t *expected)
+check_string (gchar *str, const gchar *expected)
 {
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, expected);
@@ -72,8 +72,8 @@ test_paths (void)
 {
   struct
   {
-    xchar_t *filename;
-    xchar_t *dirname;
+    gchar *filename;
+    gchar *dirname;
   } dirname_checks[] = {
     { "/", "/" },
     { "////", "/" },
@@ -101,11 +101,11 @@ test_paths (void)
     { "..", "." },
     { "", "." },
   };
-  const xuint_t n_dirname_checks = G_N_ELEMENTS (dirname_checks);
+  const guint n_dirname_checks = G_N_ELEMENTS (dirname_checks);
   struct
   {
-    xchar_t *filename;
-    xchar_t *without_root;
+    gchar *filename;
+    gchar *without_root;
   } skip_root_checks[] = {
     { "/", "" },
     { "//", "" },
@@ -125,12 +125,12 @@ test_paths (void)
     { ".", NULL },
     { "", NULL },
   };
-  const xuint_t n_skip_root_checks = G_N_ELEMENTS (skip_root_checks);
+  const guint n_skip_root_checks = G_N_ELEMENTS (skip_root_checks);
   struct
   {
-    xchar_t *cwd;
-    xchar_t *relative_path;
-    xchar_t *canonical_path;
+    gchar *cwd;
+    gchar *relative_path;
+    gchar *canonical_path;
   } canonicalize_filename_checks[] = {
 #ifndef G_OS_WIN32
     { "/etc", "../usr/share", "/usr/share" },
@@ -218,9 +218,9 @@ test_paths (void)
     { "\\", "\\\\\\usr\\..\\usr", "\\usr" },
 #endif
   };
-  const xuint_t n_canonicalize_filename_checks = G_N_ELEMENTS (canonicalize_filename_checks);
-  xchar_t *string;
-  xuint_t i;
+  const guint n_canonicalize_filename_checks = G_N_ELEMENTS (canonicalize_filename_checks);
+  gchar *string;
+  guint i;
 
   string = g_path_get_basename (G_DIR_SEPARATOR_S "foo" G_DIR_SEPARATOR_S "dir" G_DIR_SEPARATOR_S);
   g_assert_cmpstr (string, ==, "dir");
@@ -240,20 +240,20 @@ test_paths (void)
 
   for (i = 0; i < n_dirname_checks; i++)
     {
-      xchar_t *dirname = g_path_get_dirname (dirname_checks[i].filename);
+      gchar *dirname = g_path_get_dirname (dirname_checks[i].filename);
       g_assert_cmpstr (dirname, ==, dirname_checks[i].dirname);
       g_free (dirname);
     }
 
   for (i = 0; i < n_skip_root_checks; i++)
     {
-      const xchar_t *skipped = g_path_skip_root (skip_root_checks[i].filename);
+      const gchar *skipped = g_path_skip_root (skip_root_checks[i].filename);
       if ((skipped && !skip_root_checks[i].without_root) ||
           (!skipped && skip_root_checks[i].without_root) ||
           ((skipped && skip_root_checks[i].without_root) &&
            strcmp (skipped, skip_root_checks[i].without_root)))
         {
-          xerror ("failed for \"%s\"==\"%s\" (returned: \"%s\")",
+          g_error ("failed for \"%s\"==\"%s\" (returned: \"%s\")",
                    skip_root_checks[i].filename,
                    (skip_root_checks[i].without_root ? skip_root_checks[i].without_root : "<NULL>"),
                    (skipped ? skipped : "<NULL>"));
@@ -262,7 +262,7 @@ test_paths (void)
 
   for (i = 0; i < n_canonicalize_filename_checks; i++)
     {
-      xchar_t *canonical_path =
+      gchar *canonical_path =
           g_canonicalize_filename (canonicalize_filename_checks[i].relative_path,
                                    canonicalize_filename_checks[i].cwd);
       g_assert_cmpstr (canonical_path, ==,
@@ -271,9 +271,9 @@ test_paths (void)
     }
 
   {
-    const xchar_t *relative_path = "./";
-    xchar_t *canonical_path = g_canonicalize_filename (relative_path, NULL);
-    xchar_t *cwd = g_get_current_dir ();
+    const gchar *relative_path = "./";
+    gchar *canonical_path = g_canonicalize_filename (relative_path, NULL);
+    gchar *cwd = g_get_current_dir ();
     g_assert_cmpstr (canonical_path, ==, cwd);
     g_free (cwd);
     g_free (canonical_path);
@@ -355,7 +355,7 @@ test_build_path (void)
 static void
 test_build_pathv (void)
 {
-  xchar_t *args[10];
+  gchar *args[10];
 
   g_assert_null (g_build_pathv ("", NULL));
   args[0] = NULL;
@@ -501,7 +501,7 @@ test_build_filename (void)
 
 #ifdef G_OS_WIN32
 
-  /* test_t also using the slash as file name separator */
+  /* Test also using the slash as file name separator */
 #define Z "/"
   /* check_string (g_build_filename (NULL), ""); */
   check_string (g_build_filename (Z, NULL), Z);
@@ -540,7 +540,7 @@ test_build_filename (void)
 static void
 test_build_filenamev (void)
 {
-  xchar_t *args[10];
+  gchar *args[10];
 
   args[0] = NULL;
   check_string (g_build_filenamev (args), "");
@@ -591,7 +591,7 @@ test_build_filenamev (void)
 
 #ifdef G_OS_WIN32
 
-  /* test_t also using the slash as file name separator */
+  /* Test also using the slash as file name separator */
 #define Z "/"
   args[0] = NULL;
   check_string (g_build_filenamev (args), "");
@@ -657,7 +657,7 @@ test_build_filenamev (void)
 #undef S
 
 static void
-test_mkdir_with_parents_1 (const xchar_t *base)
+test_mkdir_with_parents_1 (const gchar *base)
 {
   char *p0 = g_build_filename (base, "fum", NULL);
   char *p1 = g_build_filename (p0, "tem", NULL);
@@ -668,48 +668,48 @@ test_mkdir_with_parents_1 (const xchar_t *base)
   g_remove (p1);
   g_remove (p0);
 
-  if (xfile_test (p0, XFILE_TEST_EXISTS))
-    xerror ("failed, %s exists, cannot test g_mkdir_with_parents", p0);
+  if (g_file_test (p0, G_FILE_TEST_EXISTS))
+    g_error ("failed, %s exists, cannot test g_mkdir_with_parents", p0);
 
-  if (xfile_test (p1, XFILE_TEST_EXISTS))
-    xerror ("failed, %s exists, cannot test g_mkdir_with_parents", p1);
+  if (g_file_test (p1, G_FILE_TEST_EXISTS))
+    g_error ("failed, %s exists, cannot test g_mkdir_with_parents", p1);
 
-  if (xfile_test (p2, XFILE_TEST_EXISTS))
-    xerror ("failed, %s exists, cannot test g_mkdir_with_parents", p2);
+  if (g_file_test (p2, G_FILE_TEST_EXISTS))
+    g_error ("failed, %s exists, cannot test g_mkdir_with_parents", p2);
 
   if (g_mkdir_with_parents (p2, 0777) == -1)
     {
       int errsv = errno;
-      xerror ("failed, g_mkdir_with_parents(%s) failed: %s", p2, xstrerror (errsv));
+      g_error ("failed, g_mkdir_with_parents(%s) failed: %s", p2, g_strerror (errsv));
     }
 
-  if (!xfile_test (p2, XFILE_TEST_IS_DIR))
-    xerror ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory", p2, p2);
+  if (!g_file_test (p2, G_FILE_TEST_IS_DIR))
+    g_error ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory", p2, p2);
 
-  if (!xfile_test (p1, XFILE_TEST_IS_DIR))
-    xerror ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory", p2, p1);
+  if (!g_file_test (p1, G_FILE_TEST_IS_DIR))
+    g_error ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory", p2, p1);
 
-  if (!xfile_test (p0, XFILE_TEST_IS_DIR))
-    xerror ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory", p2, p0);
+  if (!g_file_test (p0, G_FILE_TEST_IS_DIR))
+    g_error ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory", p2, p0);
 
   g_rmdir (p2);
-  if (xfile_test (p2, XFILE_TEST_EXISTS))
-    xerror ("failed, did g_rmdir(%s), but %s is still there", p2, p2);
+  if (g_file_test (p2, G_FILE_TEST_EXISTS))
+    g_error ("failed, did g_rmdir(%s), but %s is still there", p2, p2);
 
   g_rmdir (p1);
-  if (xfile_test (p1, XFILE_TEST_EXISTS))
-    xerror ("failed, did g_rmdir(%s), but %s is still there", p1, p1);
+  if (g_file_test (p1, G_FILE_TEST_EXISTS))
+    g_error ("failed, did g_rmdir(%s), but %s is still there", p1, p1);
 
   f = g_fopen (p1, "w");
   if (f == NULL)
-    xerror ("failed, couldn't create file %s", p1);
+    g_error ("failed, couldn't create file %s", p1);
   fclose (f);
 
   if (g_mkdir_with_parents (p1, 0666) == 0)
-    xerror ("failed, g_mkdir_with_parents(%s) succeeded, even if %s is a file", p1, p1);
+    g_error ("failed, g_mkdir_with_parents(%s) succeeded, even if %s is a file", p1, p1);
 
   if (g_mkdir_with_parents (p2, 0666) == 0)
-    xerror("failed, g_mkdir_with_parents(%s) succeeded, even if %s is a file", p2, p1);
+    g_error("failed, g_mkdir_with_parents(%s) succeeded, even if %s is a file", p2, p1);
 
   g_remove (p2);
   g_remove (p1);
@@ -723,7 +723,7 @@ test_mkdir_with_parents_1 (const xchar_t *base)
 static void
 test_mkdir_with_parents (void)
 {
-  xchar_t *cwd, *new_path;
+  gchar *cwd, *new_path;
   if (g_test_verbose())
     g_printerr ("checking g_mkdir_with_parents() in subdir ./hum/");
   test_mkdir_with_parents_1 ("hum");
@@ -785,21 +785,21 @@ test_mkdir_with_parents (void)
  * Returns: %TRUE if we have Linux `CAP_DAC_OVERRIDE` or equivalent
  *  privileges
  */
-static xboolean_t
+static gboolean
 check_cap_dac_override (const char *tmpdir)
 {
 #ifdef G_OS_UNIX
-  xchar_t *safe_tmpdir = NULL;
-  xchar_t *dac_denies_write;
-  xchar_t *inside;
-  xboolean_t have_cap;
+  gchar *safe_tmpdir = NULL;
+  gchar *dac_denies_write;
+  gchar *inside;
+  gboolean have_cap;
 
   if (tmpdir == NULL)
     {
       /* It's unsafe to write predictable filenames into g_get_tmp_dir(),
        * because it's usually a shared directory that can be subject to
        * symlink attacks, so use a subdirectory for this check. */
-      xerror_t *error = NULL;
+      GError *error = NULL;
 
       safe_tmpdir = g_dir_make_tmp (NULL, &error);
       g_assert_no_error (error);
@@ -852,14 +852,14 @@ static void
 test_mkdir_with_parents_permission (void)
 {
 #ifdef G_OS_UNIX
-  xchar_t *tmpdir;
-  xchar_t *subdir;
-  xchar_t *subdir2;
-  xchar_t *subdir3;
-  xerror_t *error = NULL;
+  gchar *tmpdir;
+  gchar *subdir;
+  gchar *subdir2;
+  gchar *subdir3;
+  GError *error = NULL;
   int result;
   int saved_errno;
-  xboolean_t have_cap_dac_override;
+  gboolean have_cap_dac_override;
 
   tmpdir = g_dir_make_tmp ("test-fileutils.XXXXXX", &error);
   g_assert_no_error (error);
@@ -980,86 +980,87 @@ test_format_size_for_display (void)
 static void
 test_file_errors (void)
 {
-  g_assert_cmpint (xfile_error_from_errno (-1), ==, XFILE_ERROR_FAILED);
+  g_assert_cmpint (g_file_error_from_errno (-1), ==, G_FILE_ERROR_FAILED);
 
 #ifdef EEXIST
-  g_assert_cmpint (xfile_error_from_errno (EEXIST), ==, XFILE_ERROR_EXIST);
+  g_assert_cmpint (g_file_error_from_errno (EEXIST), ==, G_FILE_ERROR_EXIST);
 #endif
 #ifdef EISDIR
-  g_assert_cmpint (xfile_error_from_errno (EISDIR), ==, XFILE_ERROR_ISDIR);
+  g_assert_cmpint (g_file_error_from_errno (EISDIR), ==, G_FILE_ERROR_ISDIR);
 #endif
 #ifdef EACCES
-  g_assert_cmpint (xfile_error_from_errno (EACCES), ==, XFILE_ERROR_ACCES);
+  g_assert_cmpint (g_file_error_from_errno (EACCES), ==, G_FILE_ERROR_ACCES);
 #endif
 #ifdef ENAMETOOLONG
-  g_assert_cmpint (xfile_error_from_errno (ENAMETOOLONG), ==, XFILE_ERROR_NAMETOOLONG);
+  g_assert_cmpint (g_file_error_from_errno (ENAMETOOLONG), ==, G_FILE_ERROR_NAMETOOLONG);
 #endif
 #ifdef ENOENT
-  g_assert_cmpint (xfile_error_from_errno (ENOENT), ==, XFILE_ERROR_NOENT);
+  g_assert_cmpint (g_file_error_from_errno (ENOENT), ==, G_FILE_ERROR_NOENT);
 #endif
 #ifdef ENOTDIR
-  g_assert_cmpint (xfile_error_from_errno (ENOTDIR), ==, XFILE_ERROR_NOTDIR);
+  g_assert_cmpint (g_file_error_from_errno (ENOTDIR), ==, G_FILE_ERROR_NOTDIR);
 #endif
 #ifdef ENXIO
-  g_assert_cmpint (xfile_error_from_errno (ENXIO), ==, XFILE_ERROR_NXIO);
+  g_assert_cmpint (g_file_error_from_errno (ENXIO), ==, G_FILE_ERROR_NXIO);
 #endif
 #ifdef ENODEV
-  g_assert_cmpint (xfile_error_from_errno (ENODEV), ==, XFILE_ERROR_NODEV);
+  g_assert_cmpint (g_file_error_from_errno (ENODEV), ==, G_FILE_ERROR_NODEV);
 #endif
 #ifdef EROFS
-  g_assert_cmpint (xfile_error_from_errno (EROFS), ==, XFILE_ERROR_ROFS);
+  g_assert_cmpint (g_file_error_from_errno (EROFS), ==, G_FILE_ERROR_ROFS);
 #endif
 #ifdef ETXTBSY
-  g_assert_cmpint (xfile_error_from_errno (ETXTBSY), ==, XFILE_ERROR_TXTBSY);
+  g_assert_cmpint (g_file_error_from_errno (ETXTBSY), ==, G_FILE_ERROR_TXTBSY);
 #endif
 #ifdef EFAULT
-  g_assert_cmpint (xfile_error_from_errno (EFAULT), ==, XFILE_ERROR_FAULT);
+  g_assert_cmpint (g_file_error_from_errno (EFAULT), ==, G_FILE_ERROR_FAULT);
 #endif
 #ifdef ELOOP
-  g_assert_cmpint (xfile_error_from_errno (ELOOP), ==, XFILE_ERROR_LOOP);
+  g_assert_cmpint (g_file_error_from_errno (ELOOP), ==, G_FILE_ERROR_LOOP);
 #endif
 #ifdef ENOSPC
-  g_assert_cmpint (xfile_error_from_errno (ENOSPC), ==, XFILE_ERROR_NOSPC);
+  g_assert_cmpint (g_file_error_from_errno (ENOSPC), ==, G_FILE_ERROR_NOSPC);
 #endif
 #ifdef ENOMEM
-  g_assert_cmpint (xfile_error_from_errno (ENOMEM), ==, XFILE_ERROR_NOMEM);
+  g_assert_cmpint (g_file_error_from_errno (ENOMEM), ==, G_FILE_ERROR_NOMEM);
 #endif
 #ifdef EMFILE
-  g_assert_cmpint (xfile_error_from_errno (EMFILE), ==, XFILE_ERROR_MFILE);
+  g_assert_cmpint (g_file_error_from_errno (EMFILE), ==, G_FILE_ERROR_MFILE);
 #endif
 #ifdef ENFILE
-  g_assert_cmpint (xfile_error_from_errno (ENFILE), ==, XFILE_ERROR_NFILE);
+  g_assert_cmpint (g_file_error_from_errno (ENFILE), ==, G_FILE_ERROR_NFILE);
 #endif
 #ifdef EBADF
-  g_assert_cmpint (xfile_error_from_errno (EBADF), ==, XFILE_ERROR_BADF);
+  g_assert_cmpint (g_file_error_from_errno (EBADF), ==, G_FILE_ERROR_BADF);
 #endif
 #ifdef EINVAL
-  g_assert_cmpint (xfile_error_from_errno (EINVAL), ==, XFILE_ERROR_INVAL);
+  g_assert_cmpint (g_file_error_from_errno (EINVAL), ==, G_FILE_ERROR_INVAL);
 #endif
 #ifdef EPIPE
-  g_assert_cmpint (xfile_error_from_errno (EPIPE), ==, XFILE_ERROR_PIPE);
+  g_assert_cmpint (g_file_error_from_errno (EPIPE), ==, G_FILE_ERROR_PIPE);
 #endif
 #ifdef EAGAIN
-  g_assert_cmpint (xfile_error_from_errno (EAGAIN), ==, XFILE_ERROR_AGAIN);
+  g_assert_cmpint (g_file_error_from_errno (EAGAIN), ==, G_FILE_ERROR_AGAIN);
 #endif
 #ifdef EINTR
-  g_assert_cmpint (xfile_error_from_errno (EINTR), ==, XFILE_ERROR_INTR);
+  g_assert_cmpint (g_file_error_from_errno (EINTR), ==, G_FILE_ERROR_INTR);
 #endif
 #ifdef EIO
-  g_assert_cmpint (xfile_error_from_errno (EIO), ==, XFILE_ERROR_IO);
+  g_assert_cmpint (g_file_error_from_errno (EIO), ==, G_FILE_ERROR_IO);
 #endif
 #ifdef EPERM
-  g_assert_cmpint (xfile_error_from_errno (EPERM), ==, XFILE_ERROR_PERM);
+  g_assert_cmpint (g_file_error_from_errno (EPERM), ==, G_FILE_ERROR_PERM);
 #endif
 #ifdef ENOSYS
-  g_assert_cmpint (xfile_error_from_errno (ENOSYS), ==, XFILE_ERROR_NOSYS);
+  g_assert_cmpint (g_file_error_from_errno (ENOSYS), ==, G_FILE_ERROR_NOSYS);
 #endif
 }
 
 static void
 test_basename (void)
 {
-  xchar_t *b;
+  const gchar *path = "/path/to/a/file/deep/down.sh";
+  const gchar *b;
 
   if (g_test_undefined ())
     {
@@ -1067,7 +1068,20 @@ test_basename (void)
                              "*assertion*!= NULL*");
       g_assert_null (g_basename (NULL));
       g_test_assert_expected_messages ();
+    }
 
+  b = g_basename (path);
+
+  g_assert_cmpstr (b, ==, "down.sh");
+}
+
+static void
+test_get_basename (void)
+{
+  gchar *b;
+
+  if (g_test_undefined ())
+    {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
       g_assert_null (g_path_get_basename (NULL));
@@ -1090,10 +1104,10 @@ test_basename (void)
 static void
 test_dirname (void)
 {
-  xsize_t i;
+  gsize i;
   struct {
-    const xchar_t *filename;
-    const xchar_t *dirname;
+    const gchar *filename;
+    const gchar *dirname;
   } dirname_checks[] = {
     { "/", "/" },
     { "////", "/" },
@@ -1148,7 +1162,7 @@ test_dirname (void)
 
   for (i = 0; i < G_N_ELEMENTS (dirname_checks); i++)
     {
-      xchar_t *dirname;
+      gchar *dirname;
 
       dirname = g_path_get_dirname (dirname_checks[i].filename);
       g_assert_cmpstr (dirname, ==, dirname_checks[i].dirname);
@@ -1159,31 +1173,31 @@ test_dirname (void)
 static void
 test_dir_make_tmp (void)
 {
-  xchar_t *name;
-  xerror_t *error = NULL;
-  xint_t ret;
+  gchar *name;
+  GError *error = NULL;
+  gint ret;
 
   name = g_dir_make_tmp ("testXXXXXXtest", &error);
   g_assert_no_error (error);
-  g_assert_true (xfile_test (name, XFILE_TEST_IS_DIR));
+  g_assert_true (g_file_test (name, G_FILE_TEST_IS_DIR));
   ret = g_rmdir (name);
   g_assert_cmpint (ret, ==, 0);
   g_free (name);
 
   name = g_dir_make_tmp (NULL, &error);
   g_assert_no_error (error);
-  g_assert_true (xfile_test (name, XFILE_TEST_IS_DIR));
+  g_assert_true (g_file_test (name, G_FILE_TEST_IS_DIR));
   ret = g_rmdir (name);
   g_assert_cmpint (ret, ==, 0);
   g_free (name);
 
   name = g_dir_make_tmp ("test/XXXXXX", &error);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_FAILED);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED);
   g_clear_error (&error);
   g_assert_null (name);
 
   name = g_dir_make_tmp ("XXXXxX", &error);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_FAILED);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED);
   g_clear_error (&error);
   g_assert_null (name);
 }
@@ -1191,11 +1205,11 @@ test_dir_make_tmp (void)
 static void
 test_file_open_tmp (void)
 {
-  xchar_t *name = NULL;
-  xerror_t *error = NULL;
-  xint_t fd;
+  gchar *name = NULL;
+  GError *error = NULL;
+  gint fd;
 
-  fd = xfile_open_tmp ("testXXXXXXtest", &name, &error);
+  fd = g_file_open_tmp ("testXXXXXXtest", &name, &error);
   g_assert_cmpint (fd, !=, -1);
   g_assert_no_error (error);
   g_assert_nonnull (name);
@@ -1203,7 +1217,7 @@ test_file_open_tmp (void)
   g_free (name);
   close (fd);
 
-  fd = xfile_open_tmp (NULL, &name, &error);
+  fd = g_file_open_tmp (NULL, &name, &error);
   g_assert_cmpint (fd, !=, -1);
   g_assert_no_error (error);
   g_assert_nonnull (name);
@@ -1212,21 +1226,21 @@ test_file_open_tmp (void)
   close (fd);
 
   name = NULL;
-  fd = xfile_open_tmp ("test/XXXXXX", &name, &error);
+  fd = g_file_open_tmp ("test/XXXXXX", &name, &error);
   g_assert_cmpint (fd, ==, -1);
   g_assert_null (name);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_FAILED);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED);
   g_clear_error (&error);
 
-  fd = xfile_open_tmp ("XXXXxX", &name, &error);
+  fd = g_file_open_tmp ("XXXXxX", &name, &error);
   g_assert_cmpint (fd, ==, -1);
   g_assert_null (name);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_FAILED);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_FAILED);
   g_clear_error (&error);
 
   error = NULL;
   name = NULL;
-  fd = xfile_open_tmp ("zap" G_DIR_SEPARATOR_S "barXXXXXX", &name, &error);
+  fd = g_file_open_tmp ("zap" G_DIR_SEPARATOR_S "barXXXXXX", &name, &error);
   g_assert_cmpint (fd, ==, -1);
 
   g_clear_error (&error);
@@ -1234,7 +1248,7 @@ test_file_open_tmp (void)
 
 #ifdef G_OS_WIN32
   name = NULL;
-  fd = xfile_open_tmp ("zap/barXXXXXX", &name, &error);
+  fd = g_file_open_tmp ("zap/barXXXXXX", &name, &error);
   g_assert_cmpint (fd, ==, -1);
 
   g_clear_error (&error);
@@ -1242,7 +1256,7 @@ test_file_open_tmp (void)
 #endif
 
   name = NULL;
-  fd = xfile_open_tmp ("zapXXXXXX", &name, &error);
+  fd = g_file_open_tmp ("zapXXXXXX", &name, &error);
   g_assert_cmpint (fd, !=, -1);
 
   close (fd);
@@ -1251,7 +1265,7 @@ test_file_open_tmp (void)
   g_free (name);
 
   name = NULL;
-  fd = xfile_open_tmp (NULL, &name, &error);
+  fd = g_file_open_tmp (NULL, &name, &error);
   g_assert_cmpint (fd, !=, -1);
 
   close (fd);
@@ -1263,13 +1277,13 @@ test_file_open_tmp (void)
 static void
 test_mkstemp (void)
 {
-  xint_t fd;
-  xint_t result;
-  xchar_t *name;
+  gint fd;
+  gint result;
+  gchar *name;
   char chars[62];
   char template[32];
   const char hello[] = "Hello, World";
-  const xsize_t hellolen = sizeof (hello) - 1;
+  const gsize hellolen = sizeof (hello) - 1;
 
   if (g_test_undefined ())
     {
@@ -1280,12 +1294,12 @@ test_mkstemp (void)
     }
 
   /* Expect to fail if no 'XXXXXX' is given */
-  name = xstrdup ("test");
+  name = g_strdup ("test");
   g_assert_cmpint (g_mkstemp (name), ==, -1);
   g_free (name);
 
-  /* test_t normal case */
-  name = xstrdup ("testXXXXXXtest"),
+  /* Test normal case */
+  name = g_strdup ("testXXXXXXtest"),
   fd = g_mkstemp (name);
   g_assert_cmpint (fd, !=, -1);
   g_assert_null (strstr (name, "XXXXXX"));
@@ -1331,19 +1345,19 @@ test_mkstemp (void)
 static void
 test_mkdtemp (void)
 {
-  xint_t fd;
-  xchar_t *ret;
-  xchar_t *name;
+  gint fd;
+  gchar *ret;
+  gchar *name;
   char template[32];
 
-  name = xstrdup ("testXXXXXXtest"),
+  name = g_strdup ("testXXXXXXtest"),
   ret = g_mkdtemp (name);
-  xassert (ret == name);
+  g_assert (ret == name);
   g_assert_null (strstr (name, "XXXXXX"));
   g_rmdir (name);
   g_free (name);
 
-  name = xstrdup ("testYYYYYYtest"),
+  name = g_strdup ("testYYYYYYtest"),
   ret = g_mkdtemp (name);
   g_assert_null (ret);
   g_free (name);
@@ -1358,14 +1372,14 @@ test_mkdtemp (void)
   ret = g_mkdtemp (template);
   g_assert_nonnull (ret);
   g_assert_true (ret == template);
-  g_assert_false (xfile_test (template, XFILE_TEST_IS_REGULAR));
-  g_assert_true (xfile_test (template, XFILE_TEST_IS_DIR));
+  g_assert_false (g_file_test (template, G_FILE_TEST_IS_REGULAR));
+  g_assert_true (g_file_test (template, G_FILE_TEST_IS_DIR));
 
   strcat (template, "/abc");
   fd = g_open (template, O_WRONLY | O_CREAT, 0600);
   g_assert_cmpint (fd, !=, -1);
   close (fd);
-  g_assert_true (xfile_test (template, XFILE_TEST_IS_REGULAR));
+  g_assert_true (g_file_test (template, G_FILE_TEST_IS_REGULAR));
   g_assert_cmpint (g_unlink (template), !=, -1);
 
   template[9] = '\0';
@@ -1373,7 +1387,7 @@ test_mkdtemp (void)
 
   strcpy (template, "fooXXXXXX.dir");
   g_assert_nonnull (g_mkdtemp (template));
-  g_assert_true (xfile_test (template, XFILE_TEST_IS_DIR));
+  g_assert_true (g_file_test (template, G_FILE_TEST_IS_DIR));
   g_rmdir (template);
 }
 
@@ -1381,11 +1395,11 @@ static void
 test_get_contents (void)
 {
   FILE *f;
-  xsize_t len;
-  xchar_t *contents;
-  xerror_t *error = NULL;
-  const xchar_t *text = "abcdefghijklmnopqrstuvwxyz";
-  const xchar_t *filename = "file-test-get-contents";
+  gsize len;
+  gchar *contents;
+  GError *error = NULL;
+  const gchar *text = "abcdefghijklmnopqrstuvwxyz";
+  const gchar *filename = "file-test-get-contents";
 
   f = g_fopen (filename, "w");
   fwrite (text, 1, strlen (text), f);
@@ -1395,18 +1409,18 @@ test_get_contents (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      g_assert_false (xfile_get_contents (NULL, &contents, &len, &error));
+      g_assert_false (g_file_get_contents (NULL, &contents, &len, &error));
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      g_assert_false (xfile_get_contents (filename, NULL, &len, &error));
+      g_assert_false (g_file_get_contents (filename, NULL, &len, &error));
       g_test_assert_expected_messages ();
     }
 
-  g_assert_true (xfile_test (filename, XFILE_TEST_IS_REGULAR));
+  g_assert_true (g_file_test (filename, G_FILE_TEST_IS_REGULAR));
 
-  g_assert_true (xfile_get_contents (filename, &contents, &len, &error));
+  g_assert_true (g_file_get_contents (filename, &contents, &len, &error));
   g_assert_cmpstr (text, ==, contents);
   g_assert_no_error (error);
 
@@ -1416,32 +1430,32 @@ test_get_contents (void)
 static void
 test_file_test (void)
 {
-  xerror_t *error = NULL;
-  xboolean_t result;
-  xchar_t *name;
-  xint_t fd;
+  GError *error = NULL;
+  gboolean result;
+  gchar *name;
+  gint fd;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xfile_test (NULL, XFILE_TEST_EXISTS);
+      result = g_file_test (NULL, G_FILE_TEST_EXISTS);
       g_assert_false (result);
       g_test_assert_expected_messages ();
     }
 
-  fd = xfile_open_tmp (NULL, &name, &error);
+  fd = g_file_open_tmp (NULL, &name, &error);
   g_assert_no_error (error);
   write (fd, "a", 1);
   g_assert_cmpint (g_fsync (fd), ==, 0);
   close (fd);
 
 #ifndef G_OS_WIN32
-  result = xfile_test (name, XFILE_TEST_IS_SYMLINK);
+  result = g_file_test (name, G_FILE_TEST_IS_SYMLINK);
   g_assert_false (result);
 
   symlink (name, "symlink");
-  result = xfile_test ("symlink", XFILE_TEST_IS_SYMLINK);
+  result = g_file_test ("symlink", G_FILE_TEST_IS_SYMLINK);
   g_assert_true (result);
   unlink ("symlink");
 #endif
@@ -1454,30 +1468,30 @@ test_file_test (void)
 static void
 test_set_contents (void)
 {
-  xerror_t *error = NULL;
-  xint_t fd;
-  xchar_t *name;
-  xchar_t *buf;
-  xsize_t len;
-  xboolean_t ret;
+  GError *error = NULL;
+  gint fd;
+  gchar *name;
+  gchar *buf;
+  gsize len;
+  gboolean ret;
 
-  fd = xfile_open_tmp (NULL, &name, &error);
+  fd = g_file_open_tmp (NULL, &name, &error);
   g_assert_no_error (error);
   write (fd, "a", 1);
   g_assert_cmpint (g_fsync (fd), ==, 0);
   close (fd);
 
-  ret = xfile_get_contents (name, &buf, &len, &error);
+  ret = g_file_get_contents (name, &buf, &len, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
   g_assert_cmpstr (buf, ==, "a");
   g_free (buf);
 
-  ret = xfile_set_contents (name, "b", 1, &error);
+  ret = g_file_set_contents (name, "b", 1, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
 
-  ret = xfile_get_contents (name, &buf, &len, &error);
+  ret = g_file_get_contents (name, &buf, &len, &error);
   g_assert_true (ret);
   g_assert_no_error (error);
   g_assert_cmpstr (buf, ==, "b");
@@ -1491,10 +1505,10 @@ static void
 test_set_contents_full (void)
 {
   GFileSetContentsFlags flags_mask =
-      XFILE_SET_CONTENTS_ONLY_EXISTING |
-      XFILE_SET_CONTENTS_DURABLE |
-      XFILE_SET_CONTENTS_CONSISTENT;
-  xint_t flags;
+      G_FILE_SET_CONTENTS_ONLY_EXISTING |
+      G_FILE_SET_CONTENTS_DURABLE |
+      G_FILE_SET_CONTENTS_CONSISTENT;
+  gint flags;
   const struct
     {
       enum
@@ -1508,10 +1522,10 @@ test_set_contents_full (void)
         }
       existing_file;
       int new_mode;  /* only relevant if @existing_file is %EXISTING_FILE_NONE */
-      xboolean_t use_strlen;
+      gboolean use_strlen;
 
-      xboolean_t expected_success;
-      xint_t expected_error;
+      gboolean expected_success;
+      gint expected_error;
     }
   tests[] =
     {
@@ -1521,26 +1535,26 @@ test_set_contents_full (void)
       { EXISTING_FILE_REGULAR, 0644, FALSE, TRUE, 0 },
 #ifndef G_OS_WIN32
       { EXISTING_FILE_SYMLINK, 0644, FALSE, TRUE, 0 },
-      { EXISTING_FILE_DIRECTORY, 0644, FALSE, FALSE, XFILE_ERROR_ISDIR },
+      { EXISTING_FILE_DIRECTORY, 0644, FALSE, FALSE, G_FILE_ERROR_ISDIR },
 #else
       /* on win32, _wopen returns EACCES if path is a directory */
-      { EXISTING_FILE_DIRECTORY, 0644, FALSE, FALSE, XFILE_ERROR_ACCES },
+      { EXISTING_FILE_DIRECTORY, 0644, FALSE, FALSE, G_FILE_ERROR_ACCES },
 #endif
     };
-  xsize_t i;
+  gsize i;
 
-  g_test_summary ("test_t xfile_set_contents_full() with various flags");
+  g_test_summary ("Test g_file_set_contents_full() with various flags");
 
-  for (flags = 0; flags < (xint_t) flags_mask; flags++)
+  for (flags = 0; flags < (gint) flags_mask; flags++)
     {
       for (i = 0; i < G_N_ELEMENTS (tests); i++)
         {
-          xerror_t *error = NULL;
-          xchar_t *file_name = NULL, *link_name = NULL, *dir_name = NULL;
-          const xchar_t *set_contents_name;
-          xchar_t *buf = NULL;
-          xsize_t len;
-          xboolean_t ret;
+          GError *error = NULL;
+          gchar *file_name = NULL, *link_name = NULL, *dir_name = NULL;
+          const gchar *set_contents_name;
+          gchar *buf = NULL;
+          gsize len;
+          gboolean ret;
           GStatBuf statbuf;
 
           g_test_message ("Flags %d and test %" G_GSIZE_FORMAT, flags, i);
@@ -1552,20 +1566,20 @@ test_set_contents_full (void)
             case EXISTING_FILE_SYMLINK:
 #endif
               {
-                xint_t fd;
+                gint fd;
 
-                fd = xfile_open_tmp (NULL, &file_name, &error);
+                fd = g_file_open_tmp (NULL, &file_name, &error);
                 g_assert_no_error (error);
                 write (fd, "a", 1);
                 g_assert_no_errno (g_fsync (fd));
                 close (fd);
 
 #ifndef G_OS_WIN32
-                /* Pass an existing symlink to xfile_set_contents_full() to see
+                /* Pass an existing symlink to g_file_set_contents_full() to see
                  * what it does. */
                 if (tests[i].existing_file == EXISTING_FILE_SYMLINK)
                   {
-                    link_name = xstrconcat (file_name, ".link", NULL);
+                    link_name = g_strconcat (file_name, ".link", NULL);
                     g_assert_no_errno (symlink (file_name, link_name));
 
                     set_contents_name = link_name;
@@ -1589,7 +1603,7 @@ test_set_contents_full (void)
               {
                 file_name = g_build_filename (g_get_tmp_dir (), "glib-file-set-contents-full-test", NULL);
                 g_remove (file_name);
-                g_assert_false (xfile_test (file_name, XFILE_TEST_EXISTS));
+                g_assert_false (g_file_test (file_name, G_FILE_TEST_EXISTS));
 
                 set_contents_name = file_name;
                 break;
@@ -1601,13 +1615,13 @@ test_set_contents_full (void)
             }
 
           /* Set the file contents */
-          ret = xfile_set_contents_full (set_contents_name, "b",
+          ret = g_file_set_contents_full (set_contents_name, "b",
                                           tests[i].use_strlen ? -1 : 1,
                                           flags, tests[i].new_mode, &error);
 
           if (!tests[i].expected_success)
             {
-              g_assert_error (error, XFILE_ERROR, tests[i].expected_error);
+              g_assert_error (error, G_FILE_ERROR, tests[i].expected_error);
               g_assert_false (ret);
               g_clear_error (&error);
             }
@@ -1618,7 +1632,7 @@ test_set_contents_full (void)
 
               /* Check the contents and mode were set correctly. The mode isn’t
                * changed on existing files. */
-              ret = xfile_get_contents (set_contents_name, &buf, &len, &error);
+              ret = g_file_get_contents (set_contents_name, &buf, &len, &error);
               g_assert_no_error (error);
               g_assert_true (ret);
               g_assert_cmpstr (buf, ==, "b");
@@ -1643,14 +1657,14 @@ test_set_contents_full (void)
 #ifndef G_OS_WIN32
               if (tests[i].existing_file == EXISTING_FILE_SYMLINK)
                 {
-                  xchar_t *target_contents = NULL;
+                  gchar *target_contents = NULL;
 
                   /* If the @set_contents_name was a symlink, it should now be a
                    * regular file, and the file it pointed to should not have
                    * changed. */
                   g_assert_cmpint (statbuf.st_mode & S_IFMT, ==, S_IFREG);
 
-                  xfile_get_contents (file_name, &target_contents, NULL, &error);
+                  g_file_get_contents (file_name, &target_contents, NULL, &error);
                   g_assert_no_error (error);
                   g_assert_cmpstr (target_contents, ==, "a");
 
@@ -1676,18 +1690,18 @@ test_set_contents_full (void)
 static void
 test_set_contents_full_read_only_file (void)
 {
-  xint_t fd;
-  xerror_t *error = NULL;
-  xchar_t *file_name = NULL;
-  xboolean_t ret;
-  xboolean_t can_override_dac = check_cap_dac_override (NULL);
+  gint fd;
+  GError *error = NULL;
+  gchar *file_name = NULL;
+  gboolean ret;
+  gboolean can_override_dac = check_cap_dac_override (NULL);
 
-  g_test_summary ("test_t xfile_set_contents_full() on a read-only file");
+  g_test_summary ("Test g_file_set_contents_full() on a read-only file");
 
   /* Can’t test this with different #GFileSetContentsFlags as they all have
    * different behaviours wrt replacing the file while noticing/ignoring the
    * existing file permissions. */
-  fd = xfile_open_tmp (NULL, &file_name, &error);
+  fd = g_file_open_tmp (NULL, &file_name, &error);
   g_assert_no_error (error);
   write (fd, "a", 1);
   g_assert_no_errno (g_fsync (fd));
@@ -1698,21 +1712,21 @@ test_set_contents_full_read_only_file (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      ret = xfile_set_contents_full (NULL, "b", 1,
-                                      XFILE_SET_CONTENTS_NONE, 0644, &error);
+      ret = g_file_set_contents_full (NULL, "b", 1,
+                                      G_FILE_SET_CONTENTS_NONE, 0644, &error);
       g_assert_false (ret);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      ret = xfile_set_contents_full (file_name, NULL, 1,
-                                      XFILE_SET_CONTENTS_NONE, 0644, &error);
+      ret = g_file_set_contents_full (file_name, NULL, 1,
+                                      G_FILE_SET_CONTENTS_NONE, 0644, &error);
       g_assert_false (ret);
       g_test_assert_expected_messages ();
     }
 
   /* Set the file contents */
-  ret = xfile_set_contents_full (file_name, "b", 1, XFILE_SET_CONTENTS_NONE, 0644, &error);
+  ret = g_file_set_contents_full (file_name, "b", 1, G_FILE_SET_CONTENTS_NONE, 0644, &error);
 
   if (can_override_dac)
     {
@@ -1721,7 +1735,7 @@ test_set_contents_full_read_only_file (void)
     }
   else
     {
-      g_assert_error (error, XFILE_ERROR, XFILE_ERROR_ACCES);
+      g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_ACCES);
       g_assert_false (ret);
     }
 
@@ -1738,21 +1752,21 @@ test_set_contents_full_read_only_directory (void)
 #ifndef G_OS_WIN32
 /* windows mostly ignores read-only flagged directories, chmod doesn't work */
   GFileSetContentsFlags flags_mask =
-      XFILE_SET_CONTENTS_ONLY_EXISTING |
-      XFILE_SET_CONTENTS_DURABLE |
-      XFILE_SET_CONTENTS_CONSISTENT;
-  xint_t flags;
+      G_FILE_SET_CONTENTS_ONLY_EXISTING |
+      G_FILE_SET_CONTENTS_DURABLE |
+      G_FILE_SET_CONTENTS_CONSISTENT;
+  gint flags;
 
-  g_test_summary ("test_t xfile_set_contents_full() on a file in a read-only directory");
+  g_test_summary ("Test g_file_set_contents_full() on a file in a read-only directory");
 
-  for (flags = 0; flags < (xint_t) flags_mask; flags++)
+  for (flags = 0; flags < (gint) flags_mask; flags++)
     {
-      xint_t fd;
-      xerror_t *error = NULL;
-      xchar_t *dir_name = NULL;
-      xchar_t *file_name = NULL;
-      xboolean_t ret;
-      xboolean_t can_override_dac;
+      gint fd;
+      GError *error = NULL;
+      gchar *dir_name = NULL;
+      gchar *file_name = NULL;
+      gboolean ret;
+      gboolean can_override_dac;
 
       g_test_message ("Flags %d", flags);
 
@@ -1770,7 +1784,7 @@ test_set_contents_full_read_only_directory (void)
       g_assert_no_errno (g_chmod (dir_name, 0));
 
       /* Set the file contents */
-      ret = xfile_set_contents_full (file_name, "b", 1, flags, 0644, &error);
+      ret = g_file_set_contents_full (file_name, "b", 1, flags, 0644, &error);
 
       if (can_override_dac)
         {
@@ -1779,7 +1793,7 @@ test_set_contents_full_read_only_directory (void)
         }
       else
         {
-          g_assert_error (error, XFILE_ERROR, XFILE_ERROR_ACCES);
+          g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_ACCES);
           g_assert_false (ret);
         }
 
@@ -1802,23 +1816,23 @@ test_read_link (void)
 #ifdef G_OS_UNIX
   int ret;
   FILE *file;
-  xchar_t *cwd;
-  xchar_t *data;
-  xchar_t *newpath;
-  xchar_t *badpath;
-  xchar_t *path;
-  xerror_t *error = NULL;
-  const xchar_t *oldpath;
-  const xchar_t *filename = "file-test-data";
-  const xchar_t *link1 = "file-test-link1";
-  const xchar_t *link2 = "file-test-link2";
-  const xchar_t *link3 = "file-test-link3";
+  gchar *cwd;
+  gchar *data;
+  gchar *newpath;
+  gchar *badpath;
+  gchar *path;
+  GError *error = NULL;
+  const gchar *oldpath;
+  const gchar *filename = "file-test-data";
+  const gchar *link1 = "file-test-link1";
+  const gchar *link2 = "file-test-link2";
+  const gchar *link3 = "file-test-link3";
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      newpath = xfile_read_link (NULL, &error);
+      newpath = g_file_read_link (NULL, &error);
       g_test_assert_expected_messages ();
     }
 
@@ -1830,7 +1844,7 @@ test_read_link (void)
   remove (newpath);
   ret = symlink (oldpath, newpath);
   g_assert_cmpint (ret, ==, 0);
-  path = xfile_read_link (newpath, &error);
+  path = g_file_read_link (newpath, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (path, ==, oldpath);
   g_free (path);
@@ -1838,15 +1852,15 @@ test_read_link (void)
   remove (newpath);
   ret = symlink (badpath, newpath);
   g_assert_cmpint (ret, ==, 0);
-  path = xfile_read_link (newpath, &error);
+  path = g_file_read_link (newpath, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (path, ==, badpath);
   g_free (path);
 
-  path = xfile_read_link (oldpath, &error);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_INVAL);
+  path = g_file_read_link (oldpath, &error);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL);
   g_assert_null (path);
-  xerror_free (error);
+  g_error_free (error);
 
   remove (newpath);
   g_free (cwd);
@@ -1861,30 +1875,30 @@ test_read_link (void)
   g_assert_cmpint (symlink (link1, link2), ==, 0);
 
   error = NULL;
-  data = xfile_read_link (link1, &error);
+  data = g_file_read_link (link1, &error);
   g_assert_nonnull (data);
   g_assert_cmpstr (data, ==, filename);
   g_assert_no_error (error);
   g_free (data);
 
   error = NULL;
-  data = xfile_read_link (link2, &error);
+  data = g_file_read_link (link2, &error);
   g_assert_nonnull (data);
   g_assert_cmpstr (data, ==, link1);
   g_assert_no_error (error);
   g_free (data);
 
   error = NULL;
-  data = xfile_read_link (link3, &error);
+  data = g_file_read_link (link3, &error);
   g_assert_null (data);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
-  xerror_free (error);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_NOENT);
+  g_error_free (error);
 
   error = NULL;
-  data = xfile_read_link (filename, &error);
+  data = g_file_read_link (filename, &error);
   g_assert_null (data);
-  g_assert_error (error, XFILE_ERROR, XFILE_ERROR_INVAL);
-  xerror_free (error);
+  g_assert_error (error, G_FILE_ERROR, G_FILE_ERROR_INVAL);
+  g_error_free (error);
 
   remove (filename);
   remove (link1);
@@ -1899,19 +1913,19 @@ static void
 test_stdio_wrappers (void)
 {
   GStatBuf buf;
-  xchar_t *cwd, *path;
-  xint_t ret;
+  gchar *cwd, *path;
+  gint ret;
   struct utimbuf ut;
-  xerror_t *error = NULL;
+  GError *error = NULL;
   GStatBuf path_statbuf, cwd_statbuf;
   time_t now;
 #ifdef G_OS_UNIX
-  xboolean_t have_cap_dac_override;
+  gboolean have_cap_dac_override;
 #endif
 
   g_remove ("mkdir-test/test-create");
   ret = g_rmdir ("mkdir-test");
-  xassert (ret == 0 || errno == ENOENT);
+  g_assert (ret == 0 || errno == ENOENT);
 
   ret = g_stat ("mkdir-test", &buf);
   g_assert_cmpint (ret, ==, -1);
@@ -2013,8 +2027,8 @@ static void
 test_fopen_modes (void)
 {
   char        *path = g_build_filename ("temp-fopen", NULL);
-  xsize_t        i;
-  const xchar_t *modes[] =
+  gsize        i;
+  const gchar *modes[] =
     {
       "w",
       "r",
@@ -2035,8 +2049,8 @@ test_fopen_modes (void)
 
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/merge_requests/119");
 
-  if (xfile_test (path, XFILE_TEST_EXISTS))
-    xerror ("failed, %s exists, cannot test g_fopen()", path);
+  if (g_file_test (path, G_FILE_TEST_EXISTS))
+    g_error ("failed, %s exists, cannot test g_fopen()", path);
 
   for (i = 0; i < G_N_ELEMENTS (modes); i++)
     {
@@ -2057,8 +2071,8 @@ test_fopen_modes (void)
 #include "../gstdio-private.c"
 
 static int
-g_wcscmp0 (const xunichar2_t *str1,
-           const xunichar2_t *str2)
+g_wcscmp0 (const gunichar2 *str1,
+           const gunichar2 *str2)
 {
   if (!str1)
     return -(str1 != str2);
@@ -2069,7 +2083,7 @@ g_wcscmp0 (const xunichar2_t *str1,
 
 #define g_assert_cmpwcs(s1, cmp, s2, s1u8, s2u8) \
 G_STMT_START { \
-  const xunichar2_t *__s1 = (s1), *__s2 = (s2); \
+  const gunichar2 *__s1 = (s1), *__s2 = (s2); \
   if (g_wcscmp0 (__s1, __s2) cmp 0) ; else \
     g_assertion_message_cmpstr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                 #s1u8 " " #cmp " " #s2u8, s1u8, #cmp, s2u8); \
@@ -2078,14 +2092,14 @@ G_STMT_START { \
 static void
 test_win32_pathstrip (void)
 {
-  xunichar2_t *buf;
-  xsize_t i;
+  gunichar2 *buf;
+  gsize i;
 #define IDENTITY_TEST(x) { x, x, FALSE }
   struct
   {
-    xunichar2_t *in;
-    xunichar2_t *out;
-    xboolean_t   result;
+    gunichar2 *in;
+    gunichar2 *out;
+    gboolean   result;
   } testcases[] = {
     IDENTITY_TEST (L"\\\\?\\V"),
     IDENTITY_TEST (L"\\\\?\\Vo"),
@@ -2129,15 +2143,15 @@ test_win32_pathstrip (void)
 
   for (i = 0; testcases[i].in; i++)
     {
-      xsize_t str_len = wcslen (testcases[i].in) + 1;
-      xchar_t *in_u8 = xutf16_to_utf8 (testcases[i].in, -1, NULL, NULL, NULL);
-      xchar_t *out_u8 = xutf16_to_utf8 (testcases[i].out, -1, NULL, NULL, NULL);
+      gsize str_len = wcslen (testcases[i].in) + 1;
+      gchar *in_u8 = g_utf16_to_utf8 (testcases[i].in, -1, NULL, NULL, NULL);
+      gchar *out_u8 = g_utf16_to_utf8 (testcases[i].out, -1, NULL, NULL, NULL);
 
       g_assert_nonnull (in_u8);
       g_assert_nonnull (out_u8);
 
-      buf = g_new0 (xunichar2_t, str_len);
-      memcpy (buf, testcases[i].in, str_len * sizeof (xunichar2_t));
+      buf = g_new0 (gunichar2, str_len);
+      memcpy (buf, testcases[i].in, str_len * sizeof (gunichar2));
       _g_win32_strip_extended_ntobjm_prefix (buf, &str_len);
       g_assert_cmpwcs (buf, ==, testcases[i].out, in_u8, out_u8);
       g_free (buf);
@@ -2147,16 +2161,16 @@ test_win32_pathstrip (void)
   /* Check for correct behaviour on non-NUL-terminated strings */
   for (i = 0; testcases[i].in; i++)
     {
-      xsize_t str_len = wcslen (testcases[i].in) + 1;
+      gsize str_len = wcslen (testcases[i].in) + 1;
       wchar_t old_endchar;
-      xchar_t *in_u8 = xutf16_to_utf8 (testcases[i].in, -1, NULL, NULL, NULL);
-      xchar_t *out_u8 = xutf16_to_utf8 (testcases[i].out, -1, NULL, NULL, NULL);
+      gchar *in_u8 = g_utf16_to_utf8 (testcases[i].in, -1, NULL, NULL, NULL);
+      gchar *out_u8 = g_utf16_to_utf8 (testcases[i].out, -1, NULL, NULL, NULL);
 
       g_assert_nonnull (in_u8);
       g_assert_nonnull (out_u8);
 
-      buf = g_new0 (xunichar2_t, str_len);
-      memcpy (buf, testcases[i].in, (str_len) * sizeof (xunichar2_t));
+      buf = g_new0 (gunichar2, str_len);
+      memcpy (buf, testcases[i].in, (str_len) * sizeof (gunichar2));
 
       old_endchar = buf[wcslen (testcases[i].out)];
       str_len -= 1;
@@ -2191,35 +2205,35 @@ G_STMT_START { \
                                 #m1hex " " #cmp " " #m2hex, m1hex, #cmp, m2hex); \
 } G_STMT_END
 
-static xchar_t *
-to_hex (const xuchar_t *buf,
-        xsize_t        len)
+static gchar *
+to_hex (const guchar *buf,
+        gsize        len)
 {
-  xsize_t i;
-  xstring_t *s = xstring_new (NULL);
+  gsize i;
+  GString *s = g_string_new (NULL);
   if (len > 0)
-    xstring_append_printf (s, "%02x", buf[0]);
+    g_string_append_printf (s, "%02x", buf[0]);
   for (i = 1; i < len; i++)
-    xstring_append_printf (s, " %02x", buf[i]);
-  return xstring_free (s, FALSE);
+    g_string_append_printf (s, " %02x", buf[i]);
+  return g_string_free (s, FALSE);
 }
 
 static void
 test_win32_zero_terminate_symlink (void)
 {
-  xsize_t i;
+  gsize i;
 #define TESTCASE(data, len_mod, use_buf, buf_size, terminate, reported_len, returned_string) \
- { (const xuchar_t *) data, wcslen (data) * 2 + len_mod, use_buf, buf_size, terminate, reported_len, (xuchar_t *) returned_string},
+ { (const guchar *) data, wcslen (data) * 2 + len_mod, use_buf, buf_size, terminate, reported_len, (guchar *) returned_string},
 
   struct
   {
-    const xuchar_t *data;
-    xsize_t         data_size;
-    xboolean_t      use_buf;
-    xsize_t         buf_size;
-    xboolean_t      terminate;
+    const guchar *data;
+    gsize         data_size;
+    gboolean      use_buf;
+    gsize         buf_size;
+    gboolean      terminate;
     int           reported_len;
-    const xuchar_t *returned_string;
+    const guchar *returned_string;
   } testcases[] = {
     TESTCASE (L"foobar", +2, TRUE, 12 + 4, FALSE, 12 + 2, "f\0o\0o\0b\0a\0r\0\0\0")
     TESTCASE (L"foobar", +2, TRUE, 12 + 3, FALSE, 12 + 2, "f\0o\0o\0b\0a\0r\0\0\0")
@@ -2377,9 +2391,9 @@ test_win32_zero_terminate_symlink (void)
 
   for (i = 0; testcases[i].data != NULL; i++)
     {
-      xunichar2_t *buf;
+      gunichar2 *buf;
       int result;
-      xchar_t *buf_hex, *expected_hex;
+      gchar *buf_hex, *expected_hex;
       if (testcases[i].use_buf)
         buf = g_malloc0 (testcases[i].buf_size + 1); /* +1 to ensure it succeeds with buf_size == 0 */
       else
@@ -2391,18 +2405,18 @@ test_win32_zero_terminate_symlink (void)
                                                   testcases[i].use_buf ? NULL : &buf,
                                                   testcases[i].terminate);
       if (testcases[i].reported_len != result)
-        xerror ("test_t %" G_GSIZE_FORMAT " failed, result %d != %d", i, result, testcases[i].reported_len);
+        g_error ("Test %" G_GSIZE_FORMAT " failed, result %d != %d", i, result, testcases[i].reported_len);
       if (buf == NULL && testcases[i].buf_size != 0)
-        xerror ("test_t %" G_GSIZE_FORMAT " failed, buf == NULL", i);
+        g_error ("Test %" G_GSIZE_FORMAT " failed, buf == NULL", i);
       g_assert_cmpint (testcases[i].reported_len, ==, result);
       if ((testcases[i].use_buf && testcases[i].buf_size != 0) ||
           (!testcases[i].use_buf && testcases[i].reported_len != 0))
         {
           g_assert_nonnull (buf);
-          buf_hex = to_hex ((const xuchar_t *) buf, result);
+          buf_hex = to_hex ((const guchar *) buf, result);
           expected_hex = to_hex (testcases[i].returned_string, testcases[i].reported_len);
           if (memcmp (buf, testcases[i].returned_string, result) != 0)
-            xerror ("test_t %" G_GSIZE_FORMAT " failed:\n%s !=\n%s", i, buf_hex, expected_hex);
+            g_error ("Test %" G_GSIZE_FORMAT " failed:\n%s !=\n%s", i, buf_hex, expected_hex);
           g_assert_memcmp (buf, ==, testcases[i].returned_string, testcases[i].reported_len, buf_hex, expected_hex, testcases[i].line);
           g_free (buf_hex);
           g_free (expected_hex);
@@ -2434,6 +2448,7 @@ main (int   argc,
   g_test_add_func ("/fileutils/format-size-for-display", test_format_size_for_display);
   g_test_add_func ("/fileutils/errors", test_file_errors);
   g_test_add_func ("/fileutils/basename", test_basename);
+  g_test_add_func ("/fileutils/get-basename", test_get_basename);
   g_test_add_func ("/fileutils/dirname", test_dirname);
   g_test_add_func ("/fileutils/dir-make-tmp", test_dir_make_tmp);
   g_test_add_func ("/fileutils/file-open-tmp", test_file_open_tmp);

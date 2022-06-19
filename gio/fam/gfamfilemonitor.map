@@ -1,8 +1,8 @@
 {
 global:
-  xio_module_load;
-  xio_module_unload;
-  xio_module_query;
+  g_io_module_load;
+  g_io_module_unload;
+  g_io_module_query;
 local:
   *;
 };

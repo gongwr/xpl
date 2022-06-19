@@ -132,7 +132,7 @@
   </interface>
 
   <!-- Empty -->
-  <interface name="org.project.baz_t">
+  <interface name="org.project.Baz">
   </interface>
 
   <!-- Outside D-Bus prefix -->
@@ -166,14 +166,14 @@
 
     <property name="Direction" type="(ddd)" access="read"/>
 
-    <!-- Check there's no conflict with the xtype_t iface_name_get_type() function -->
+    <!-- Check there's no conflict with the GType iface_name_get_type() function -->
     <property name="Type" type="s" access="read"/>
   </interface>
 
-  <!-- test_t interface for forcing use of xvariant_t -->
+  <!-- Test interface for forcing use of GVariant -->
   <interface name="org.project.Bat">
 
-    <!-- Forcing xvariant_t for types that would be mapped -->
+    <!-- Forcing GVariant for types that would be mapped -->
     <method name="ForceMethod">
       <arg name="force_in_i" type="i" direction="in">
         <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
@@ -231,14 +231,14 @@
 
   </interface> <!-- End org.project.Bat -->
 
-  <!-- test_t interface for g-authorized-method -->
+  <!-- Test interface for g-authorized-method -->
   <interface name="org.project.Authorize">
     <method name="CheckNotAuthorized"/>
     <method name="CheckAuthorized"/>
     <method name="CheckNotAuthorizedFromObject"/>
   </interface> <!-- End org.project.Authorize -->
 
-  <!-- test_t interfaces for handling methods in a thread -->
+  <!-- Test interfaces for handling methods in a thread -->
   <interface name="org.project.MethodThreads">
     <method name="GetSelf">
       <arg name="self_pointer" direction="out" type="s"/>
@@ -264,7 +264,7 @@
 
       Multi-paragraph.
 
-      test_t of inline links: The #org.project.Bar D-Bus interface,
+      Test of inline links: The #org.project.Bar D-Bus interface,
       org.project.Bar.HelloWorld() method, the
       #org.project.Bar::TestSignal, the
       #org.project.InlineDocs:Property3 property.
@@ -307,15 +307,15 @@
     -->
     <property name="Property3" type="s" access="read"/>
 
-    <!-- Property4:
-         First line. With trailing whitespace.
-         Second line (same paragraph).
+    <!-- Property4:  
+         First line. With trailing whitespace.  
+         Second line (same paragraph).  
     -->
     <property name="Property4" type="s" access="read"/>
 
-    <!-- Property5: foo_t
-         First line (second paragraph). With trailing whitespace.
-         Second line (same paragraph).
+    <!-- Property5: Foo  
+         First line (second paragraph). With trailing whitespace.  
+         Second line (same paragraph).  
 <programlisting>
 1 program listing
  2 should include indented space
@@ -439,7 +439,7 @@
   <interface name="OldieInterface">
     <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
 
-    <method name="foo_t">
+    <method name="Foo">
       <annotation name="org.freedesktop.DBus.Deprecated" value="true"/>
     </method>
 

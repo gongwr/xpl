@@ -1,25 +1,25 @@
 #include <gio/gio.h>
 
 static void
-on_bus_acquired (xdbus_connection_t *connection,
-                 const xchar_t     *name,
-                 xpointer_t         user_data)
+on_bus_acquired (GDBusConnection *connection,
+                 const gchar     *name,
+                 gpointer         user_data)
 {
   /* This is where we'd export some objects on the bus */
 }
 
 static void
-on_name_acquired (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  xpointer_t         user_data)
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
 {
   g_print ("Acquired the name %s on the session bus\n", name);
 }
 
 static void
-on_name_lost (xdbus_connection_t *connection,
-              const xchar_t     *name,
-              xpointer_t         user_data)
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
 {
   g_print ("Lost the name %s on the session bus\n", name);
 }
@@ -27,14 +27,14 @@ on_name_lost (xdbus_connection_t *connection,
 int
 main (int argc, char *argv[])
 {
-  xuint_t owner_id;
-  xmain_loop_t *loop;
+  guint owner_id;
+  GMainLoop *loop;
   GBusNameOwnerFlags flags;
-  xboolean_t opt_replace;
-  xboolean_t opt_allow_replacement;
-  xchar_t *opt_name;
-  xoption_context_t *opt_context;
-  xerror_t *error;
+  gboolean opt_replace;
+  gboolean opt_allow_replacement;
+  gchar *opt_name;
+  GOptionContext *opt_context;
+  GError *error;
   GOptionEntry opt_entries[] =
     {
       { "replace", 'r', 0, G_OPTION_ARG_NONE, &opt_replace, "Replace existing name if possible", NULL },
@@ -75,8 +75,8 @@ main (int argc, char *argv[])
                              NULL,
                              NULL);
 
-  loop = xmain_loop_new (NULL, FALSE);
-  xmain_loop_run (loop);
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
 
   g_bus_unown_name (owner_id);
 

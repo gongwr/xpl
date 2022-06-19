@@ -29,72 +29,72 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NOTIFICATION         (xnotification_get_type ())
-#define G_NOTIFICATION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NOTIFICATION, xnotification))
-#define X_IS_NOTIFICATION(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NOTIFICATION))
+#define G_TYPE_NOTIFICATION         (g_notification_get_type ())
+#define G_NOTIFICATION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NOTIFICATION, GNotification))
+#define G_IS_NOTIFICATION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NOTIFICATION))
 
-XPL_AVAILABLE_IN_2_40
-xtype_t                   xnotification_get_type                         (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_40
+GType                   g_notification_get_type                         (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_40
-xnotification_t *         xnotification_new                              (const xchar_t *title);
+GLIB_AVAILABLE_IN_2_40
+GNotification *         g_notification_new                              (const gchar *title);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_set_title                        (xnotification_t *notification,
-                                                                         const xchar_t   *title);
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_set_title                        (GNotification *notification,
+                                                                         const gchar   *title);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_set_body                         (xnotification_t *notification,
-                                                                         const xchar_t   *body);
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_set_body                         (GNotification *notification,
+                                                                         const gchar   *body);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_set_icon                         (xnotification_t *notification,
-                                                                         xicon_t         *icon);
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_set_icon                         (GNotification *notification,
+                                                                         GIcon         *icon);
 
-XPL_DEPRECATED_IN_2_42_FOR(xnotification_set_priority)
-void                    xnotification_set_urgent                       (xnotification_t *notification,
-                                                                         xboolean_t       urgent);
+GLIB_DEPRECATED_IN_2_42_FOR(g_notification_set_priority)
+void                    g_notification_set_urgent                       (GNotification *notification,
+                                                                         gboolean       urgent);
 
-XPL_AVAILABLE_IN_2_42
-void                    xnotification_set_priority                     (xnotification_t         *notification,
+GLIB_AVAILABLE_IN_2_42
+void                    g_notification_set_priority                     (GNotification         *notification,
                                                                          GNotificationPriority  priority);
 
-XPL_AVAILABLE_IN_2_70
-void                    xnotification_set_category                     (xnotification_t *notification,
-                                                                         const xchar_t   *category);
+GLIB_AVAILABLE_IN_2_70
+void                    g_notification_set_category                     (GNotification *notification,
+                                                                         const gchar   *category);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_add_button                       (xnotification_t *notification,
-                                                                         const xchar_t   *label,
-                                                                         const xchar_t   *detailed_action);
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_add_button                       (GNotification *notification,
+                                                                         const gchar   *label,
+                                                                         const gchar   *detailed_action);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_add_button_with_target           (xnotification_t *notification,
-                                                                         const xchar_t   *label,
-                                                                         const xchar_t   *action,
-                                                                         const xchar_t   *target_format,
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_add_button_with_target           (GNotification *notification,
+                                                                         const gchar   *label,
+                                                                         const gchar   *action,
+                                                                         const gchar   *target_format,
                                                                          ...);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_add_button_with_target_value     (xnotification_t *notification,
-                                                                         const xchar_t   *label,
-                                                                         const xchar_t   *action,
-                                                                         xvariant_t      *target);
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_add_button_with_target_value     (GNotification *notification,
+                                                                         const gchar   *label,
+                                                                         const gchar   *action,
+                                                                         GVariant      *target);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_set_default_action               (xnotification_t *notification,
-                                                                         const xchar_t   *detailed_action);
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_set_default_action               (GNotification *notification,
+                                                                         const gchar   *detailed_action);
 
-XPL_AVAILABLE_IN_2_40
-void                    xnotification_set_default_action_and_target    (xnotification_t *notification,
-                                                                         const xchar_t   *action,
-                                                                         const xchar_t   *target_format,
+GLIB_AVAILABLE_IN_2_40
+void                    g_notification_set_default_action_and_target    (GNotification *notification,
+                                                                         const gchar   *action,
+                                                                         const gchar   *target_format,
                                                                          ...);
 
-XPL_AVAILABLE_IN_2_40
-void                 xnotification_set_default_action_and_target_value (xnotification_t *notification,
-                                                                         const xchar_t   *action,
-                                                                         xvariant_t      *target);
+GLIB_AVAILABLE_IN_2_40
+void                 g_notification_set_default_action_and_target_value (GNotification *notification,
+                                                                         const gchar   *action,
+                                                                         GVariant      *target);
 
 G_END_DECLS
 

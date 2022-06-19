@@ -29,10 +29,10 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_PROXY_RESOLVER         (xproxy_resolver_get_type ())
-#define G_PROXY_RESOLVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_PROXY_RESOLVER, xproxy_resolver))
-#define X_IS_PROXY_RESOLVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_PROXY_RESOLVER))
-#define G_PROXY_RESOLVER_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_PROXY_RESOLVER, xproxy_resolver_interface_t))
+#define G_TYPE_PROXY_RESOLVER         (g_proxy_resolver_get_type ())
+#define G_PROXY_RESOLVER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_PROXY_RESOLVER, GProxyResolver))
+#define G_IS_PROXY_RESOLVER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_PROXY_RESOLVER))
+#define G_PROXY_RESOLVER_GET_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_PROXY_RESOLVER, GProxyResolverInterface))
 
 /**
  * G_PROXY_RESOLVER_EXTENSION_POINT_NAME:
@@ -42,52 +42,52 @@ G_BEGIN_DECLS
  */
 #define G_PROXY_RESOLVER_EXTENSION_POINT_NAME "gio-proxy-resolver"
 
-typedef struct _xproxy_resolver_interface_t xproxy_resolver_interface_t;
+typedef struct _GProxyResolverInterface GProxyResolverInterface;
 
-struct _xproxy_resolver_interface_t {
-  xtype_interface_t x_iface;
+struct _GProxyResolverInterface {
+  GTypeInterface g_iface;
 
   /* Virtual Table */
-  xboolean_t (* is_supported)  (xproxy_resolver_t       *resolver);
+  gboolean (* is_supported)  (GProxyResolver       *resolver);
 
-  xchar_t	** (* lookup)        (xproxy_resolver_t       *resolver,
-			      const xchar_t          *uri,
-			      xcancellable_t         *cancellable,
-			      xerror_t              **error);
+  gchar	** (* lookup)        (GProxyResolver       *resolver,
+			      const gchar          *uri,
+			      GCancellable         *cancellable,
+			      GError              **error);
 
-  void     (* lookup_async)  (xproxy_resolver_t       *resolver,
-			      const xchar_t          *uri,
-			      xcancellable_t         *cancellable,
-			      xasync_ready_callback_t   callback,
-			      xpointer_t              user_data);
+  void     (* lookup_async)  (GProxyResolver       *resolver,
+			      const gchar          *uri,
+			      GCancellable         *cancellable,
+			      GAsyncReadyCallback   callback,
+			      gpointer              user_data);
 
-  xchar_t	** (* lookup_finish) (xproxy_resolver_t       *resolver,
-			      xasync_result_t         *result,
-			      xerror_t              **error);
+  gchar	** (* lookup_finish) (GProxyResolver       *resolver,
+			      GAsyncResult         *result,
+			      GError              **error);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t		xproxy_resolver_get_type       (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xproxy_resolver_t *xproxy_resolver_get_default    (void);
+GLIB_AVAILABLE_IN_ALL
+GType		g_proxy_resolver_get_type       (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GProxyResolver *g_proxy_resolver_get_default    (void);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t        xproxy_resolver_is_supported   (xproxy_resolver_t       *resolver);
-XPL_AVAILABLE_IN_ALL
-xchar_t	      **xproxy_resolver_lookup		(xproxy_resolver_t       *resolver,
-						 const xchar_t          *uri,
-						 xcancellable_t         *cancellable,
-						 xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void		xproxy_resolver_lookup_async   (xproxy_resolver_t       *resolver,
-						 const xchar_t          *uri,
-						 xcancellable_t         *cancellable,
-						 xasync_ready_callback_t   callback,
-						 xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xchar_t	      **xproxy_resolver_lookup_finish  (xproxy_resolver_t       *resolver,
-						 xasync_result_t         *result,
-						 xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_proxy_resolver_is_supported   (GProxyResolver       *resolver);
+GLIB_AVAILABLE_IN_ALL
+gchar	      **g_proxy_resolver_lookup		(GProxyResolver       *resolver,
+						 const gchar          *uri,
+						 GCancellable         *cancellable,
+						 GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void		g_proxy_resolver_lookup_async   (GProxyResolver       *resolver,
+						 const gchar          *uri,
+						 GCancellable         *cancellable,
+						 GAsyncReadyCallback   callback,
+						 gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gchar	      **g_proxy_resolver_lookup_finish  (GProxyResolver       *resolver,
+						 GAsyncResult         *result,
+						 GError              **error);
 
 
 G_END_DECLS

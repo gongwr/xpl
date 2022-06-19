@@ -32,11 +32,11 @@
 static void
 test_small_writes (void)
 {
-  xio_channel_t *io;
+  GIOChannel *io;
   GIOStatus status = G_IO_STATUS_ERROR;
-  xuint_t bytes_remaining;
-  xchar_t tmp;
-  xerror_t *local_error = NULL;
+  guint bytes_remaining;
+  gchar tmp;
+  GError *local_error = NULL;
 
   io = g_io_channel_new_file ("iochannel-test-outfile", "w", &local_error);
   g_assert_no_error (local_error);
@@ -64,16 +64,16 @@ test_small_writes (void)
 static void
 test_read_write (void)
 {
-  xio_channel_t *gio_r, *gio_w ;
-  xerror_t *local_error = NULL;
-  xstring_t *buffer;
+  GIOChannel *gio_r, *gio_w ;
+  GError *local_error = NULL;
+  GString *buffer;
   char *filename;
-  xint_t rlength = 0;
-  xlong_t wlength = 0;
-  xsize_t length_out;
-  const xchar_t *encoding = "EUC-JP";
+  gint rlength = 0;
+  glong wlength = 0;
+  gsize length_out;
+  const gchar *encoding = "EUC-JP";
   GIOStatus status;
-  const xsize_t buffer_size_bytes = 1024;
+  const gsize buffer_size_bytes = 1024;
 
   filename = g_test_build_filename (G_TEST_DIST, "iochannel-test-infile", NULL);
 
@@ -97,7 +97,7 @@ test_read_write (void)
       g_assert_no_error (local_error);
       g_clear_error (&local_error);
     }
-  buffer = xstring_sized_new (buffer_size_bytes);
+  buffer = g_string_sized_new (buffer_size_bytes);
 
   while (TRUE)
     {
@@ -122,7 +122,7 @@ test_read_write (void)
       g_assert_cmpuint (length_out, ==, buffer->len);
 
       g_test_message ("%s", buffer->str);
-      xstring_truncate (buffer, 0);
+      g_string_truncate (buffer, 0);
     }
 
   switch (status)
@@ -158,31 +158,31 @@ test_read_write (void)
   test_small_writes ();
 
   g_free (filename);
-  xstring_free (buffer, TRUE);
+  g_string_free (buffer, TRUE);
 }
 
 static void
 test_read_line_embedded_nuls (void)
 {
-  const xuint8_t test_data[] = { 'H', 'i', '!', '\0', 'y', 'o', 'u', '\n', ':', ')', '\n' };
-  xint_t fd;
-  xchar_t *filename = NULL;
-  xio_channel_t *channel = NULL;
-  xerror_t *local_error = NULL;
-  xchar_t *line = NULL;
-  xsize_t line_length, terminator_pos;
+  const guint8 test_data[] = { 'H', 'i', '!', '\0', 'y', 'o', 'u', '\n', ':', ')', '\n' };
+  gint fd;
+  gchar *filename = NULL;
+  GIOChannel *channel = NULL;
+  GError *local_error = NULL;
+  gchar *line = NULL;
+  gsize line_length, terminator_pos;
   GIOStatus status;
 
-  g_test_summary ("test_t that reading a line containing embedded nuls works "
+  g_test_summary ("Test that reading a line containing embedded nuls works "
                   "when using non-standard line terminators.");
 
   /* Write out a temporary file. */
-  fd = xfile_open_tmp ("glib-test-io-channel-XXXXXX", &filename, &local_error);
+  fd = g_file_open_tmp ("glib-test-io-channel-XXXXXX", &filename, &local_error);
   g_assert_no_error (local_error);
   g_close (fd, NULL);
   fd = -1;
 
-  xfile_set_contents (filename, (const xchar_t *) test_data, sizeof (test_data), &local_error);
+  g_file_set_contents (filename, (const gchar *) test_data, sizeof (test_data), &local_error);
   g_assert_no_error (local_error);
 
   /* Create the channel. */

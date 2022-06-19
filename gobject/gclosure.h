@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 2000-2001 Red Hat, Inc.
  * Copyright (C) 2005 Imendio AB
  *
@@ -18,7 +18,7 @@
 #ifndef __G_CLOSURE_H__
 #define __G_CLOSURE_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -29,24 +29,24 @@ G_BEGIN_DECLS
 /* --- defines --- */
 /**
  * G_CLOSURE_NEEDS_MARSHAL:
- * @closure: a #xclosure_t
+ * @closure: a #GClosure
+ * 
+ * Check if the closure still needs a marshaller. See g_closure_set_marshal().
  *
- * Check if the closure still needs a marshaller. See xclosure_set_marshal().
- *
- * Returns: %TRUE if a #GClosureMarshal marshaller has not yet been set on
+ * Returns: %TRUE if a #GClosureMarshal marshaller has not yet been set on 
  * @closure.
  */
-#define	G_CLOSURE_NEEDS_MARSHAL(closure) (((xclosure_t*) (closure))->marshal == NULL)
+#define	G_CLOSURE_NEEDS_MARSHAL(closure) (((GClosure*) (closure))->marshal == NULL)
 /**
  * G_CLOSURE_N_NOTIFIERS:
- * @cl: a #xclosure_t
+ * @cl: a #GClosure
+ * 
+ * Get the total number of notifiers connected with the closure @cl. 
  *
- * Get the total number of notifiers connected with the closure @cl.
- *
- * The count includes the meta marshaller, the finalize and invalidate notifiers
- * and the marshal guards. Note that each guard counts as two notifiers.
- * See xclosure_set_meta_marshal(), xclosure_add_finalize_notifier(),
- * xclosure_add_invalidate_notifier() and xclosure_add_marshal_guards().
+ * The count includes the meta marshaller, the finalize and invalidate notifiers 
+ * and the marshal guards. Note that each guard counts as two notifiers. 
+ * See g_closure_set_meta_marshal(), g_closure_add_finalize_notifier(),
+ * g_closure_add_invalidate_notifier() and g_closure_add_marshal_guards().
  *
  * Returns: number of notifiers
  */
@@ -55,53 +55,53 @@ G_BEGIN_DECLS
 /**
  * G_CCLOSURE_SWAP_DATA:
  * @cclosure: a #GCClosure
- *
+ * 
  * Checks whether the user data of the #GCClosure should be passed as the
  * first parameter to the callback. See g_cclosure_new_swap().
  *
  * Returns: %TRUE if data has to be swapped.
  */
-#define	G_CCLOSURE_SWAP_DATA(cclosure)	 (((xclosure_t*) (cclosure))->derivative_flag)
+#define	G_CCLOSURE_SWAP_DATA(cclosure)	 (((GClosure*) (cclosure))->derivative_flag)
 /**
  * G_CALLBACK:
  * @f: a function pointer.
- *
- * Cast a function pointer to a #xcallback_t.
+ * 
+ * Cast a function pointer to a #GCallback.
  */
-#define	G_CALLBACK(f)			 ((xcallback_t) (f))
+#define	G_CALLBACK(f)			 ((GCallback) (f))
 
 
 /* -- typedefs --- */
-typedef struct _xclosure		 xclosure_t;
-typedef struct _xclosure_notify_data	 xclosure_notify_data_t;
+typedef struct _GClosure		 GClosure;
+typedef struct _GClosureNotifyData	 GClosureNotifyData;
 
 /**
- * xcallback_t:
- *
- * The type used for callback functions in structure definitions and function
+ * GCallback:
+ * 
+ * The type used for callback functions in structure definitions and function 
  * signatures.
  *
  * This doesn't mean that all callback functions must take no  parameters and
  * return void. The required signature of a callback function is determined by
  * the context in which is used (e.g. the signal to which it is connected).
  *
- * Use G_CALLBACK() to cast the callback function to a #xcallback_t.
+ * Use G_CALLBACK() to cast the callback function to a #GCallback. 
  */
-typedef void  (*xcallback_t)              (void);
+typedef void  (*GCallback)              (void);
 /**
- * xclosure_notify_t:
+ * GClosureNotify:
  * @data: data specified when registering the notification callback
- * @closure: the #xclosure_t on which the notification is emitted
- *
+ * @closure: the #GClosure on which the notification is emitted
+ * 
  * The type used for the various notification callbacks which can be registered
  * on closures.
  */
-typedef void  (*xclosure_notify_t)		(xpointer_t	 data,
-					 xclosure_t	*closure);
+typedef void  (*GClosureNotify)		(gpointer	 data,
+					 GClosure	*closure);
 /**
  * GClosureMarshal:
- * @closure: the #xclosure_t to which the marshaller belongs
- * @return_value: (nullable): a #xvalue_t to store the return
+ * @closure: the #GClosure to which the marshaller belongs
+ * @return_value: (nullable): a #GValue to store the return
  *  value. May be %NULL if the callback of @closure doesn't return a
  *  value.
  * @n_param_values: the length of the @param_values array
@@ -109,100 +109,100 @@ typedef void  (*xclosure_notify_t)		(xpointer_t	 data,
  *  #GValues holding the arguments on which to invoke the
  *  callback of @closure
  * @invocation_hint: (nullable): the invocation hint given as the
- *  last argument to xclosure_invoke()
+ *  last argument to g_closure_invoke()
  * @marshal_data: (nullable): additional data specified when
- *  registering the marshaller, see xclosure_set_marshal() and
- *  xclosure_set_meta_marshal()
- *
+ *  registering the marshaller, see g_closure_set_marshal() and
+ *  g_closure_set_meta_marshal()
+ * 
  * The type used for marshaller functions.
  */
-typedef void  (*GClosureMarshal)	(xclosure_t	*closure,
-					 xvalue_t         *return_value,
-					 xuint_t           n_param_values,
-					 const xvalue_t   *param_values,
-					 xpointer_t        invocation_hint,
-					 xpointer_t	 marshal_data);
+typedef void  (*GClosureMarshal)	(GClosure	*closure,
+					 GValue         *return_value,
+					 guint           n_param_values,
+					 const GValue   *param_values,
+					 gpointer        invocation_hint,
+					 gpointer	 marshal_data);
 
 /**
  * GVaClosureMarshal:
- * @closure: the #xclosure_t to which the marshaller belongs
- * @return_value: (nullable): a #xvalue_t to store the return
+ * @closure: the #GClosure to which the marshaller belongs
+ * @return_value: (nullable): a #GValue to store the return
  *  value. May be %NULL if the callback of @closure doesn't return a
  *  value.
- * @instance: (type xobject_t.TypeInstance): the instance on which the closure is
+ * @instance: (type GObject.TypeInstance): the instance on which the closure is
  *  invoked.
  * @args: va_list of arguments to be passed to the closure.
  * @marshal_data: (nullable): additional data specified when
- *  registering the marshaller, see xclosure_set_marshal() and
- *  xclosure_set_meta_marshal()
+ *  registering the marshaller, see g_closure_set_marshal() and
+ *  g_closure_set_meta_marshal()
  * @n_params: the length of the @param_types array
- * @param_types: (array length=n_params): the #xtype_t of each argument from
+ * @param_types: (array length=n_params): the #GType of each argument from
  *  @args.
  *
  * This is the signature of va_list marshaller functions, an optional
  * marshaller that can be used in some situations to avoid
  * marshalling the signal argument into GValues.
  */
-typedef void (* GVaClosureMarshal) (xclosure_t *closure,
-				    xvalue_t   *return_value,
-				    xpointer_t  instance,
+typedef void (* GVaClosureMarshal) (GClosure *closure,
+				    GValue   *return_value,
+				    gpointer  instance,
 				    va_list   args,
-				    xpointer_t  marshal_data,
+				    gpointer  marshal_data,
 				    int       n_params,
-				    xtype_t    *param_types);
+				    GType    *param_types);
 
 /**
  * GCClosure:
- * @closure: the #xclosure_t
+ * @closure: the #GClosure
  * @callback: the callback function
- *
- * A #GCClosure is a specialization of #xclosure_t for C function callbacks.
+ * 
+ * A #GCClosure is a specialization of #GClosure for C function callbacks.
  */
 typedef struct _GCClosure		 GCClosure;
 
 
 /* --- structures --- */
-struct _xclosure_notify_data
+struct _GClosureNotifyData
 {
-  xpointer_t       data;
-  xclosure_notify_t notify;
+  gpointer       data;
+  GClosureNotify notify;
 };
 /**
- * xclosure_t:
- * @in_marshal: Indicates whether the closure is currently being invoked with
- *  xclosure_invoke()
- * @is_invalid: Indicates whether the closure has been invalidated by
- *  xclosure_invalidate()
- *
- * A #xclosure_t represents a callback supplied by the programmer.
+ * GClosure:
+ * @in_marshal: Indicates whether the closure is currently being invoked with 
+ *  g_closure_invoke()
+ * @is_invalid: Indicates whether the closure has been invalidated by 
+ *  g_closure_invalidate()
+ * 
+ * A #GClosure represents a callback supplied by the programmer.
  */
-struct _xclosure
+struct _GClosure
 {
   /*< private >*/
-  xuint_t ref_count : 15;  /* (atomic) */
+  guint ref_count : 15;  /* (atomic) */
   /* meta_marshal is not used anymore but must be zero for historical reasons
      as it was exposed in the G_CLOSURE_N_NOTIFIERS macro */
-  xuint_t meta_marshal_nouse : 1;  /* (atomic) */
-  xuint_t n_guards : 1;  /* (atomic) */
-  xuint_t n_fnotifiers : 2;  /* finalization notifiers (atomic) */
-  xuint_t n_inotifiers : 8;  /* invalidation notifiers (atomic) */
-  xuint_t in_inotify : 1;  /* (atomic) */
-  xuint_t floating : 1;  /* (atomic) */
+  guint meta_marshal_nouse : 1;  /* (atomic) */
+  guint n_guards : 1;  /* (atomic) */
+  guint n_fnotifiers : 2;  /* finalization notifiers (atomic) */
+  guint n_inotifiers : 8;  /* invalidation notifiers (atomic) */
+  guint in_inotify : 1;  /* (atomic) */
+  guint floating : 1;  /* (atomic) */
   /*< protected >*/
-  xuint_t derivative_flag : 1;  /* (atomic) */
+  guint derivative_flag : 1;  /* (atomic) */
   /*< public >*/
-  xuint_t in_marshal : 1;  /* (atomic) */
-  xuint_t is_invalid : 1;  /* (atomic) */
+  guint in_marshal : 1;  /* (atomic) */
+  guint is_invalid : 1;  /* (atomic) */
 
-  /*< private >*/	void   (*marshal)  (xclosure_t       *closure,
-					    xvalue_t /*out*/ *return_value,
-					    xuint_t           n_param_values,
-					    const xvalue_t   *param_values,
-					    xpointer_t        invocation_hint,
-					    xpointer_t	    marshal_data);
-  /*< protected >*/	xpointer_t data;
+  /*< private >*/	void   (*marshal)  (GClosure       *closure,
+					    GValue /*out*/ *return_value,
+					    guint           n_param_values,
+					    const GValue   *param_values,
+					    gpointer        invocation_hint,
+					    gpointer	    marshal_data);
+  /*< protected >*/	gpointer data;
 
-  /*< private >*/	xclosure_notify_data_t *notifiers;
+  /*< private >*/	GClosureNotifyData *notifiers;
 
   /* invariants/constraints:
    * - ->marshal and ->data are _invalid_ as soon as ->is_invalid==TRUE
@@ -219,73 +219,73 @@ struct _xclosure
  */
 struct _GCClosure
 {
-  xclosure_t	closure;
-  xpointer_t	callback;
+  GClosure	closure;
+  gpointer	callback;
 };
 
 
 /* --- prototypes --- */
-XPL_AVAILABLE_IN_ALL
-xclosure_t* g_cclosure_new			(xcallback_t	callback_func,
-						 xpointer_t	user_data,
-						 xclosure_notify_t destroy_data);
-XPL_AVAILABLE_IN_ALL
-xclosure_t* g_cclosure_new_swap			(xcallback_t	callback_func,
-						 xpointer_t	user_data,
-						 xclosure_notify_t destroy_data);
-XPL_AVAILABLE_IN_ALL
-xclosure_t* xsignal_type_cclosure_new		(xtype_t          itype,
-						 xuint_t          struct_offset);
+GLIB_AVAILABLE_IN_ALL
+GClosure* g_cclosure_new			(GCallback	callback_func,
+						 gpointer	user_data,
+						 GClosureNotify destroy_data);
+GLIB_AVAILABLE_IN_ALL
+GClosure* g_cclosure_new_swap			(GCallback	callback_func,
+						 gpointer	user_data,
+						 GClosureNotify destroy_data);
+GLIB_AVAILABLE_IN_ALL
+GClosure* g_signal_type_cclosure_new		(GType          itype,
+						 guint          struct_offset);
 
 
 /* --- prototypes --- */
-XPL_AVAILABLE_IN_ALL
-xclosure_t* xclosure_ref				(xclosure_t	*closure);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_sink			(xclosure_t	*closure);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_unref			(xclosure_t	*closure);
+GLIB_AVAILABLE_IN_ALL
+GClosure* g_closure_ref				(GClosure	*closure);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_sink			(GClosure	*closure);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_unref			(GClosure	*closure);
 /* intimidating */
-XPL_AVAILABLE_IN_ALL
-xclosure_t* xclosure_new_simple			(xuint_t		 sizeof_closure,
-						 xpointer_t	 data);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_add_finalize_notifier	(xclosure_t       *closure,
-						 xpointer_t	 notify_data,
-						 xclosure_notify_t	 notify_func);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_remove_finalize_notifier	(xclosure_t       *closure,
-						 xpointer_t	 notify_data,
-						 xclosure_notify_t	 notify_func);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_add_invalidate_notifier	(xclosure_t       *closure,
-						 xpointer_t	 notify_data,
-						 xclosure_notify_t	 notify_func);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_remove_invalidate_notifier	(xclosure_t       *closure,
-						 xpointer_t	 notify_data,
-						 xclosure_notify_t	 notify_func);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_add_marshal_guards		(xclosure_t	*closure,
-						 xpointer_t        pre_marshal_data,
-						 xclosure_notify_t	 pre_marshal_notify,
-						 xpointer_t        post_marshal_data,
-						 xclosure_notify_t	 post_marshal_notify);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_set_marshal			(xclosure_t	*closure,
+GLIB_AVAILABLE_IN_ALL
+GClosure* g_closure_new_simple			(guint		 sizeof_closure,
+						 gpointer	 data);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_add_finalize_notifier	(GClosure       *closure,
+						 gpointer	 notify_data,
+						 GClosureNotify	 notify_func);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_remove_finalize_notifier	(GClosure       *closure,
+						 gpointer	 notify_data,
+						 GClosureNotify	 notify_func);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_add_invalidate_notifier	(GClosure       *closure,
+						 gpointer	 notify_data,
+						 GClosureNotify	 notify_func);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_remove_invalidate_notifier	(GClosure       *closure,
+						 gpointer	 notify_data,
+						 GClosureNotify	 notify_func);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_add_marshal_guards		(GClosure	*closure,
+						 gpointer        pre_marshal_data,
+						 GClosureNotify	 pre_marshal_notify,
+						 gpointer        post_marshal_data,
+						 GClosureNotify	 post_marshal_notify);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_set_marshal			(GClosure	*closure,
 						 GClosureMarshal marshal);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_set_meta_marshal		(xclosure_t       *closure,
-						 xpointer_t	 marshal_data,
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_set_meta_marshal		(GClosure       *closure,
+						 gpointer	 marshal_data,
 						 GClosureMarshal meta_marshal);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_invalidate			(xclosure_t	*closure);
-XPL_AVAILABLE_IN_ALL
-void	  xclosure_invoke			(xclosure_t 	*closure,
-						 xvalue_t	/*out*/	*return_value,
-						 xuint_t		 n_param_values,
-						 const xvalue_t	*param_values,
-						 xpointer_t	 invocation_hint);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_invalidate			(GClosure	*closure);
+GLIB_AVAILABLE_IN_ALL
+void	  g_closure_invoke			(GClosure 	*closure,
+						 GValue	/*out*/	*return_value,
+						 guint		 n_param_values,
+						 const GValue	*param_values,
+						 gpointer	 invocation_hint);
 
 /* FIXME:
    OK:  data_object::destroy		-> closure_invalidate();
@@ -298,22 +298,22 @@ void	  xclosure_invoke			(xclosure_t 	*closure,
    - provide marshaller collection, virtually covering anything out there
 */
 
-XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_generic (xclosure_t     *closure,
-                                 xvalue_t       *return_gvalue,
-                                 xuint_t         n_param_values,
-                                 const xvalue_t *param_values,
-                                 xpointer_t      invocation_hint,
-                                 xpointer_t      marshal_data);
+GLIB_AVAILABLE_IN_ALL
+void g_cclosure_marshal_generic (GClosure     *closure,
+                                 GValue       *return_gvalue,
+                                 guint         n_param_values,
+                                 const GValue *param_values,
+                                 gpointer      invocation_hint,
+                                 gpointer      marshal_data);
 
-XPL_AVAILABLE_IN_ALL
-void g_cclosure_marshal_generic_va (xclosure_t *closure,
-				    xvalue_t   *return_value,
-				    xpointer_t  instance,
+GLIB_AVAILABLE_IN_ALL
+void g_cclosure_marshal_generic_va (GClosure *closure,
+				    GValue   *return_value,
+				    gpointer  instance,
 				    va_list   args_list,
-				    xpointer_t  marshal_data,
+				    gpointer  marshal_data,
 				    int       n_params,
-				    xtype_t    *param_types);
+				    GType    *param_types);
 
 
 G_END_DECLS

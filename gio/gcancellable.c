@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -31,7 +31,7 @@
  * @short_description: Thread-safe Operation Cancellation Stack
  * @include: gio/gio.h
  *
- * xcancellable_t is a thread-safe operation cancellation stack used
+ * GCancellable is a thread-safe operation cancellation stack used 
  * throughout GIO to allow for cancellation of synchronous and
  * asynchronous operations.
  */
@@ -41,50 +41,50 @@ enum {
   LAST_SIGNAL
 };
 
-struct _xcancellable_private
+struct _GCancellablePrivate
 {
-  /* Atomic so that xcancellable_is_cancelled does not require holding the mutex. */
-  xboolean_t cancelled;
+  /* Atomic so that g_cancellable_is_cancelled does not require holding the mutex. */
+  gboolean cancelled;
   /* Access to fields below is protected by cancellable_mutex. */
-  xuint_t cancelled_running : 1;
-  xuint_t cancelled_running_waiting : 1;
+  guint cancelled_running : 1;
+  guint cancelled_running_waiting : 1;
 
-  xuint_t fd_refcount;
+  guint fd_refcount;
   GWakeup *wakeup;
 };
 
-static xuint_t signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (xcancellable, xcancellable, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GCancellable, g_cancellable, G_TYPE_OBJECT)
 
-static xprivate_t current_cancellable;
-static xmutex_t cancellable_mutex;
-static xcond_t cancellable_cond;
+static GPrivate current_cancellable;
+static GMutex cancellable_mutex;
+static GCond cancellable_cond;
 
 static void
-xcancellable_finalize (xobject_t *object)
+g_cancellable_finalize (GObject *object)
 {
-  xcancellable_t *cancellable = XCANCELLABLE (object);
+  GCancellable *cancellable = G_CANCELLABLE (object);
 
   if (cancellable->priv->wakeup)
-    XPL_PRIVATE_CALL (g_wakeup_free) (cancellable->priv->wakeup);
+    GLIB_PRIVATE_CALL (g_wakeup_free) (cancellable->priv->wakeup);
 
-  XOBJECT_CLASS (xcancellable_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_cancellable_parent_class)->finalize (object);
 }
 
 static void
-xcancellable_class_init (xcancellable_class_t *klass)
+g_cancellable_class_init (GCancellableClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->finalize = xcancellable_finalize;
+  gobject_class->finalize = g_cancellable_finalize;
 
   /**
-   * xcancellable_t::cancelled:
-   * @cancellable: a #xcancellable_t.
-   *
+   * GCancellable::cancelled:
+   * @cancellable: a #GCancellable.
+   * 
    * Emitted when the operation has been cancelled.
-   *
+   * 
    * Can be used by implementations of cancellable operations. If the
    * operation is cancelled from another thread, the signal will be
    * emitted in the thread that cancelled the operation, not the
@@ -93,23 +93,23 @@ xcancellable_class_init (xcancellable_class_t *klass)
    * Note that disconnecting from this signal (or any signal) in a
    * multi-threaded program is prone to race conditions. For instance
    * it is possible that a signal handler may be invoked even after
-   * a call to xsignal_handler_disconnect() for that handler has
+   * a call to g_signal_handler_disconnect() for that handler has
    * already returned.
-   *
+   * 
    * There is also a problem when cancellation happens right before
    * connecting to the signal. If this happens the signal will
    * unexpectedly not be emitted, and checking before connecting to
    * the signal leaves a race condition where this is still happening.
    *
    * In order to make it safe and easy to connect handlers there
-   * are two helper functions: xcancellable_connect() and
-   * xcancellable_disconnect() which protect against problems
+   * are two helper functions: g_cancellable_connect() and
+   * g_cancellable_disconnect() which protect against problems
    * like this.
    *
    * An example of how to us this:
    * |[<!-- language="C" -->
    *     // Make sure we don't do unnecessary work if already cancelled
-   *     if (xcancellable_set_error_if_cancelled (cancellable, error))
+   *     if (g_cancellable_set_error_if_cancelled (cancellable, error))
    *       return;
    *
    *     // Set up all the data needed to be able to handle cancellation
@@ -118,17 +118,17 @@ xcancellable_class_init (xcancellable_class_t *klass)
    *
    *     id = 0;
    *     if (cancellable)
-   *       id = xcancellable_connect (cancellable,
+   *       id = g_cancellable_connect (cancellable,
    *     			      G_CALLBACK (cancelled_handler)
    *     			      data, NULL);
    *
    *     // cancellable operation here...
    *
-   *     xcancellable_disconnect (cancellable, id);
+   *     g_cancellable_disconnect (cancellable, id);
    *
    *     // cancelled_handler is never called after this, it is now safe
    *     // to free the data
-   *     my_data_free (my_data);
+   *     my_data_free (my_data);  
    * ]|
    *
    * Note that the cancelled signal is emitted in the thread that
@@ -136,112 +136,112 @@ xcancellable_class_init (xcancellable_class_t *klass)
    * cancellable signal should not do something that can block.
    */
   signals[CANCELLED] =
-    xsignal_new (I_("cancelled"),
-		  XTYPE_FROM_CLASS (xobject_class),
+    g_signal_new (I_("cancelled"),
+		  G_TYPE_FROM_CLASS (gobject_class),
 		  G_SIGNAL_RUN_LAST,
-		  G_STRUCT_OFFSET (xcancellable_class_t, cancelled),
+		  G_STRUCT_OFFSET (GCancellableClass, cancelled),
 		  NULL, NULL,
 		  NULL,
-		  XTYPE_NONE, 0);
-
+		  G_TYPE_NONE, 0);
+  
 }
 
 static void
-xcancellable_init (xcancellable_t *cancellable)
+g_cancellable_init (GCancellable *cancellable)
 {
-  cancellable->priv = xcancellable_get_instance_private (cancellable);
+  cancellable->priv = g_cancellable_get_instance_private (cancellable);
 }
 
 /**
- * xcancellable_new:
- *
- * Creates a new #xcancellable_t object.
+ * g_cancellable_new:
+ * 
+ * Creates a new #GCancellable object.
  *
  * Applications that want to start one or more operations
- * that should be cancellable should create a #xcancellable_t
+ * that should be cancellable should create a #GCancellable
  * and pass it to the operations.
  *
- * One #xcancellable_t can be used in multiple consecutive
+ * One #GCancellable can be used in multiple consecutive
  * operations or in multiple concurrent operations.
- *
- * Returns: a #xcancellable_t.
+ *  
+ * Returns: a #GCancellable.
  **/
-xcancellable_t *
-xcancellable_new (void)
+GCancellable *
+g_cancellable_new (void)
 {
-  return xobject_new (XTYPE_CANCELLABLE, NULL);
+  return g_object_new (G_TYPE_CANCELLABLE, NULL);
 }
 
 /**
- * xcancellable_push_current:
- * @cancellable: a #xcancellable_t object
+ * g_cancellable_push_current:
+ * @cancellable: a #GCancellable object
  *
  * Pushes @cancellable onto the cancellable stack. The current
- * cancellable can then be received using xcancellable_get_current().
+ * cancellable can then be received using g_cancellable_get_current().
  *
  * This is useful when implementing cancellable operations in
  * code that does not allow you to pass down the cancellable object.
  *
- * This is typically called automatically by e.g. #xfile_t operations,
+ * This is typically called automatically by e.g. #GFile operations,
  * so you rarely have to call this yourself.
  **/
 void
-xcancellable_push_current (xcancellable_t *cancellable)
+g_cancellable_push_current (GCancellable *cancellable)
 {
-  xslist_t *l;
+  GSList *l;
 
   g_return_if_fail (cancellable != NULL);
 
   l = g_private_get (&current_cancellable);
-  l = xslist_prepend (l, cancellable);
+  l = g_slist_prepend (l, cancellable);
   g_private_set (&current_cancellable, l);
 }
 
 /**
- * xcancellable_pop_current:
- * @cancellable: a #xcancellable_t object
+ * g_cancellable_pop_current:
+ * @cancellable: a #GCancellable object
  *
  * Pops @cancellable off the cancellable stack (verifying that @cancellable
  * is on the top of the stack).
  **/
 void
-xcancellable_pop_current (xcancellable_t *cancellable)
+g_cancellable_pop_current (GCancellable *cancellable)
 {
-  xslist_t *l;
+  GSList *l;
 
   l = g_private_get (&current_cancellable);
 
   g_return_if_fail (l != NULL);
   g_return_if_fail (l->data == cancellable);
 
-  l = xslist_delete_link (l, l);
+  l = g_slist_delete_link (l, l);
   g_private_set (&current_cancellable, l);
 }
 
 /**
- * xcancellable_get_current:
+ * g_cancellable_get_current:
  *
  * Gets the top cancellable from the stack.
  *
- * Returns: (nullable) (transfer none): a #xcancellable_t from the top
+ * Returns: (nullable) (transfer none): a #GCancellable from the top
  * of the stack, or %NULL if the stack is empty.
  **/
-xcancellable_t *
-xcancellable_get_current  (void)
+GCancellable *
+g_cancellable_get_current  (void)
 {
-  xslist_t *l;
+  GSList *l;
 
   l = g_private_get (&current_cancellable);
   if (l == NULL)
     return NULL;
 
-  return XCANCELLABLE (l->data);
+  return G_CANCELLABLE (l->data);
 }
 
 /**
- * xcancellable_reset:
- * @cancellable: a #xcancellable_t object.
- *
+ * g_cancellable_reset:
+ * @cancellable: a #GCancellable object.
+ * 
  * Resets @cancellable to its uncancelled state.
  *
  * If cancellable is currently in use by any cancellable operation
@@ -254,12 +254,12 @@ xcancellable_get_current  (void)
  * and let it die with the outstanding async operations. You should
  * create a fresh cancellable for further async operations.
  **/
-void
-xcancellable_reset (xcancellable_t *cancellable)
+void 
+g_cancellable_reset (GCancellable *cancellable)
 {
-  _xcancellable_private *priv;
+  GCancellablePrivate *priv;
 
-  g_return_if_fail (X_IS_CANCELLABLE (cancellable));
+  g_return_if_fail (G_IS_CANCELLABLE (cancellable));
 
   g_mutex_lock (&cancellable_mutex);
 
@@ -274,7 +274,7 @@ xcancellable_reset (xcancellable_t *cancellable)
   if (g_atomic_int_get (&priv->cancelled))
     {
       if (priv->wakeup)
-        XPL_PRIVATE_CALL (g_wakeup_acknowledge) (priv->wakeup);
+        GLIB_PRIVATE_CALL (g_wakeup_acknowledge) (priv->wakeup);
 
       g_atomic_int_set (&priv->cancelled, FALSE);
     }
@@ -283,35 +283,35 @@ xcancellable_reset (xcancellable_t *cancellable)
 }
 
 /**
- * xcancellable_is_cancelled:
- * @cancellable: (nullable): a #xcancellable_t or %NULL
+ * g_cancellable_is_cancelled:
+ * @cancellable: (nullable): a #GCancellable or %NULL
  *
  * Checks if a cancellable job has been cancelled.
  *
  * Returns: %TRUE if @cancellable is cancelled,
  * FALSE if called with %NULL or if item is not cancelled.
  **/
-xboolean_t
-xcancellable_is_cancelled (xcancellable_t *cancellable)
+gboolean
+g_cancellable_is_cancelled (GCancellable *cancellable)
 {
   return cancellable != NULL && g_atomic_int_get (&cancellable->priv->cancelled);
 }
 
 /**
- * xcancellable_set_error_if_cancelled:
- * @cancellable: (nullable): a #xcancellable_t or %NULL
- * @error: #xerror_t to append error state to
+ * g_cancellable_set_error_if_cancelled:
+ * @cancellable: (nullable): a #GCancellable or %NULL
+ * @error: #GError to append error state to
  *
  * If the @cancellable is cancelled, sets the error to notify
  * that the operation was cancelled.
  *
  * Returns: %TRUE if @cancellable was cancelled, %FALSE if it was not
  */
-xboolean_t
-xcancellable_set_error_if_cancelled (xcancellable_t  *cancellable,
-                                      xerror_t       **error)
+gboolean
+g_cancellable_set_error_if_cancelled (GCancellable  *cancellable,
+                                      GError       **error)
 {
-  if (xcancellable_is_cancelled (cancellable))
+  if (g_cancellable_is_cancelled (cancellable))
     {
       g_set_error_literal (error,
                            G_IO_ERROR,
@@ -324,32 +324,32 @@ xcancellable_set_error_if_cancelled (xcancellable_t  *cancellable,
 }
 
 /**
- * xcancellable_get_fd:
- * @cancellable: a #xcancellable_t.
- *
+ * g_cancellable_get_fd:
+ * @cancellable: a #GCancellable.
+ * 
  * Gets the file descriptor for a cancellable job. This can be used to
  * implement cancellable operations on Unix systems. The returned fd will
  * turn readable when @cancellable is cancelled.
  *
  * You are not supposed to read from the fd yourself, just check for
  * readable status. Reading to unset the readable status is done
- * with xcancellable_reset().
- *
- * After a successful return from this function, you should use
- * xcancellable_release_fd() to free up resources allocated for
+ * with g_cancellable_reset().
+ * 
+ * After a successful return from this function, you should use 
+ * g_cancellable_release_fd() to free up resources allocated for 
  * the returned file descriptor.
  *
- * See also xcancellable_make_pollfd().
+ * See also g_cancellable_make_pollfd().
  *
  * Returns: A valid file descriptor. `-1` if the file descriptor
- * is not supported, or on errors.
+ * is not supported, or on errors. 
  **/
 int
-xcancellable_get_fd (xcancellable_t *cancellable)
+g_cancellable_get_fd (GCancellable *cancellable)
 {
-  xpollfd_t pollfd;
+  GPollFD pollfd;
 #ifndef G_OS_WIN32
-  xboolean_t retval G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
+  gboolean retval G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 #endif
 
   if (cancellable == NULL)
@@ -358,49 +358,49 @@ xcancellable_get_fd (xcancellable_t *cancellable)
 #ifdef G_OS_WIN32
   pollfd.fd = -1;
 #else
-  retval = xcancellable_make_pollfd (cancellable, &pollfd);
-  xassert (retval);
+  retval = g_cancellable_make_pollfd (cancellable, &pollfd);
+  g_assert (retval);
 #endif
 
   return pollfd.fd;
 }
 
 /**
- * xcancellable_make_pollfd:
- * @cancellable: (nullable): a #xcancellable_t or %NULL
- * @pollfd: a pointer to a #xpollfd_t
- *
- * Creates a #xpollfd_t corresponding to @cancellable; this can be passed
+ * g_cancellable_make_pollfd:
+ * @cancellable: (nullable): a #GCancellable or %NULL
+ * @pollfd: a pointer to a #GPollFD
+ * 
+ * Creates a #GPollFD corresponding to @cancellable; this can be passed
  * to g_poll() and used to poll for cancellation. This is useful both
  * for unix systems without a native poll and for portability to
  * windows.
  *
- * When this function returns %TRUE, you should use
- * xcancellable_release_fd() to free up resources allocated for the
- * @pollfd. After a %FALSE return, do not call xcancellable_release_fd().
+ * When this function returns %TRUE, you should use 
+ * g_cancellable_release_fd() to free up resources allocated for the 
+ * @pollfd. After a %FALSE return, do not call g_cancellable_release_fd().
  *
  * If this function returns %FALSE, either no @cancellable was given or
- * resource limits prevent this function from allocating the necessary
- * structures for polling. (On Linux, you will likely have reached
+ * resource limits prevent this function from allocating the necessary 
+ * structures for polling. (On Linux, you will likely have reached 
  * the maximum number of file descriptors.) The suggested way to handle
  * these cases is to ignore the @cancellable.
  *
  * You are not supposed to read from the fd yourself, just check for
  * readable status. Reading to unset the readable status is done
- * with xcancellable_reset().
+ * with g_cancellable_reset().
  *
- * Returns: %TRUE if @pollfd was successfully initialized, %FALSE on
+ * Returns: %TRUE if @pollfd was successfully initialized, %FALSE on 
  *          failure to prepare the cancellable.
- *
+ * 
  * Since: 2.22
  **/
-xboolean_t
-xcancellable_make_pollfd (xcancellable_t *cancellable, xpollfd_t *pollfd)
+gboolean
+g_cancellable_make_pollfd (GCancellable *cancellable, GPollFD *pollfd)
 {
-  xreturn_val_if_fail (pollfd != NULL, FALSE);
+  g_return_val_if_fail (pollfd != NULL, FALSE);
   if (cancellable == NULL)
     return FALSE;
-  xreturn_val_if_fail (X_IS_CANCELLABLE (cancellable), FALSE);
+  g_return_val_if_fail (G_IS_CANCELLABLE (cancellable), FALSE);
 
   g_mutex_lock (&cancellable_mutex);
 
@@ -408,13 +408,13 @@ xcancellable_make_pollfd (xcancellable_t *cancellable, xpollfd_t *pollfd)
 
   if (cancellable->priv->wakeup == NULL)
     {
-      cancellable->priv->wakeup = XPL_PRIVATE_CALL (g_wakeup_new) ();
+      cancellable->priv->wakeup = GLIB_PRIVATE_CALL (g_wakeup_new) ();
 
       if (g_atomic_int_get (&cancellable->priv->cancelled))
-        XPL_PRIVATE_CALL (g_wakeup_signal) (cancellable->priv->wakeup);
+        GLIB_PRIVATE_CALL (g_wakeup_signal) (cancellable->priv->wakeup);
     }
 
-  XPL_PRIVATE_CALL (g_wakeup_get_pollfd) (cancellable->priv->wakeup, pollfd);
+  GLIB_PRIVATE_CALL (g_wakeup_get_pollfd) (cancellable->priv->wakeup, pollfd);
 
   g_mutex_unlock (&cancellable_mutex);
 
@@ -422,40 +422,40 @@ xcancellable_make_pollfd (xcancellable_t *cancellable, xpollfd_t *pollfd)
 }
 
 /**
- * xcancellable_release_fd:
- * @cancellable: a #xcancellable_t
+ * g_cancellable_release_fd:
+ * @cancellable: a #GCancellable
  *
- * Releases a resources previously allocated by xcancellable_get_fd()
- * or xcancellable_make_pollfd().
+ * Releases a resources previously allocated by g_cancellable_get_fd()
+ * or g_cancellable_make_pollfd().
  *
- * For compatibility reasons with older releases, calling this function
+ * For compatibility reasons with older releases, calling this function 
  * is not strictly required, the resources will be automatically freed
  * when the @cancellable is finalized. However, the @cancellable will
  * block scarce file descriptors until it is finalized if this function
- * is not called. This can cause the application to run out of file
+ * is not called. This can cause the application to run out of file 
  * descriptors when many #GCancellables are used at the same time.
- *
+ * 
  * Since: 2.22
  **/
 void
-xcancellable_release_fd (xcancellable_t *cancellable)
+g_cancellable_release_fd (GCancellable *cancellable)
 {
-  _xcancellable_private *priv;
+  GCancellablePrivate *priv;
 
   if (cancellable == NULL)
     return;
 
-  g_return_if_fail (X_IS_CANCELLABLE (cancellable));
+  g_return_if_fail (G_IS_CANCELLABLE (cancellable));
 
   priv = cancellable->priv;
 
   g_mutex_lock (&cancellable_mutex);
-  xassert (priv->fd_refcount > 0);
+  g_assert (priv->fd_refcount > 0);
 
   priv->fd_refcount--;
   if (priv->fd_refcount == 0)
     {
-      XPL_PRIVATE_CALL (g_wakeup_free) (priv->wakeup);
+      GLIB_PRIVATE_CALL (g_wakeup_free) (priv->wakeup);
       priv->wakeup = NULL;
     }
 
@@ -463,11 +463,11 @@ xcancellable_release_fd (xcancellable_t *cancellable)
 }
 
 /**
- * xcancellable_cancel:
- * @cancellable: (nullable): a #xcancellable_t object.
- *
+ * g_cancellable_cancel:
+ * @cancellable: (nullable): a #GCancellable object.
+ * 
  * Will set @cancellable to cancelled, and will emit the
- * #xcancellable_t::cancelled signal. (However, see the warning about
+ * #GCancellable::cancelled signal. (However, see the warning about
  * race conditions in the documentation for that signal if you are
  * planning to connect to it.)
  *
@@ -480,15 +480,15 @@ xcancellable_release_fd (xcancellable_t *cancellable)
  * The convention within GIO is that cancelling an asynchronous
  * operation causes it to complete asynchronously. That is, if you
  * cancel the operation from the same thread in which it is running,
- * then the operation's #xasync_ready_callback_t will not be invoked until
+ * then the operation's #GAsyncReadyCallback will not be invoked until
  * the application returns to the main loop.
  **/
 void
-xcancellable_cancel (xcancellable_t *cancellable)
+g_cancellable_cancel (GCancellable *cancellable)
 {
-  _xcancellable_private *priv;
+  GCancellablePrivate *priv;
 
-  if (cancellable == NULL || xcancellable_is_cancelled (cancellable))
+  if (cancellable == NULL || g_cancellable_is_cancelled (cancellable))
     return;
 
   priv = cancellable->priv;
@@ -505,12 +505,12 @@ xcancellable_cancel (xcancellable_t *cancellable)
   priv->cancelled_running = TRUE;
 
   if (priv->wakeup)
-    XPL_PRIVATE_CALL (g_wakeup_signal) (priv->wakeup);
+    GLIB_PRIVATE_CALL (g_wakeup_signal) (priv->wakeup);
 
   g_mutex_unlock (&cancellable_mutex);
 
-  xobject_ref (cancellable);
-  xsignal_emit (cancellable, signals[CANCELLED], 0);
+  g_object_ref (cancellable);
+  g_signal_emit (cancellable, signals[CANCELLED], 0);
 
   g_mutex_lock (&cancellable_mutex);
 
@@ -521,17 +521,17 @@ xcancellable_cancel (xcancellable_t *cancellable)
 
   g_mutex_unlock (&cancellable_mutex);
 
-  xobject_unref (cancellable);
+  g_object_unref (cancellable);
 }
 
 /**
- * xcancellable_connect:
- * @cancellable: A #xcancellable_t.
- * @callback: The #xcallback_t to connect.
+ * g_cancellable_connect:
+ * @cancellable: A #GCancellable.
+ * @callback: The #GCallback to connect.
  * @data: Data to pass to @callback.
  * @data_destroy_func: (nullable): Free function for @data or %NULL.
  *
- * Convenience function to connect to the #xcancellable_t::cancelled
+ * Convenience function to connect to the #GCancellable::cancelled
  * signal. Also handles the race condition that may happen
  * if the cancellable is cancelled right before connecting.
  *
@@ -543,34 +543,34 @@ xcancellable_cancel (xcancellable_t *cancellable)
  * disconnected, or immediately if the cancellable is already
  * cancelled.
  *
- * See #xcancellable_t::cancelled for details on how to use this.
+ * See #GCancellable::cancelled for details on how to use this.
  *
  * Since GLib 2.40, the lock protecting @cancellable is not held when
  * @callback is invoked.  This lifts a restriction in place for
  * earlier GLib versions which now makes it easier to write cleanup
- * code that unconditionally invokes e.g. xcancellable_cancel().
+ * code that unconditionally invokes e.g. g_cancellable_cancel().
  *
  * Returns: The id of the signal handler or 0 if @cancellable has already
  *          been cancelled.
  *
  * Since: 2.22
  */
-xulong_t
-xcancellable_connect (xcancellable_t   *cancellable,
-		       xcallback_t       callback,
-		       xpointer_t        data,
-		       xdestroy_notify_t  data_destroy_func)
+gulong
+g_cancellable_connect (GCancellable   *cancellable,
+		       GCallback       callback,
+		       gpointer        data,
+		       GDestroyNotify  data_destroy_func)
 {
-  xulong_t id;
+  gulong id;
 
-  xreturn_val_if_fail (X_IS_CANCELLABLE (cancellable), 0);
+  g_return_val_if_fail (G_IS_CANCELLABLE (cancellable), 0);
 
   g_mutex_lock (&cancellable_mutex);
 
   if (g_atomic_int_get (&cancellable->priv->cancelled))
     {
-      void (*_callback) (xcancellable_t *cancellable,
-                         xpointer_t      user_data);
+      void (*_callback) (GCancellable *cancellable,
+                         gpointer      user_data);
 
       g_mutex_unlock (&cancellable_mutex);
 
@@ -584,9 +584,9 @@ xcancellable_connect (xcancellable_t   *cancellable,
     }
   else
     {
-      id = xsignal_connect_data (cancellable, "cancelled",
+      id = g_signal_connect_data (cancellable, "cancelled",
                                   callback, data,
-                                  (xclosure_notify_t) data_destroy_func,
+                                  (GClosureNotify) data_destroy_func,
                                   0);
 
       g_mutex_unlock (&cancellable_mutex);
@@ -597,20 +597,20 @@ xcancellable_connect (xcancellable_t   *cancellable,
 }
 
 /**
- * xcancellable_disconnect:
- * @cancellable: (nullable): A #xcancellable_t or %NULL.
+ * g_cancellable_disconnect:
+ * @cancellable: (nullable): A #GCancellable or %NULL.
  * @handler_id: Handler id of the handler to be disconnected, or `0`.
  *
  * Disconnects a handler from a cancellable instance similar to
- * xsignal_handler_disconnect().  Additionally, in the event that a
+ * g_signal_handler_disconnect().  Additionally, in the event that a
  * signal handler is currently running, this call will block until the
  * handler has finished.  Calling this function from a
- * #xcancellable_t::cancelled signal handler will therefore result in a
+ * #GCancellable::cancelled signal handler will therefore result in a
  * deadlock.
  *
  * This avoids a race condition where a thread cancels at the
  * same time as the cancellable operation is finished and the
- * signal handler is removed. See #xcancellable_t::cancelled for
+ * signal handler is removed. See #GCancellable::cancelled for
  * details on how to use this.
  *
  * If @cancellable is %NULL or @handler_id is `0` this function does
@@ -619,10 +619,10 @@ xcancellable_connect (xcancellable_t   *cancellable,
  * Since: 2.22
  */
 void
-xcancellable_disconnect (xcancellable_t  *cancellable,
-			  xulong_t         handler_id)
+g_cancellable_disconnect (GCancellable  *cancellable,
+			  gulong         handler_id)
 {
-  _xcancellable_private *priv;
+  GCancellablePrivate *priv;
 
   if (handler_id == 0 ||  cancellable == NULL)
     return;
@@ -637,36 +637,36 @@ xcancellable_disconnect (xcancellable_t  *cancellable,
       g_cond_wait (&cancellable_cond, &cancellable_mutex);
     }
 
-  xsignal_handler_disconnect (cancellable, handler_id);
+  g_signal_handler_disconnect (cancellable, handler_id);
 
   g_mutex_unlock (&cancellable_mutex);
 }
 
 typedef struct {
-  xsource_t       source;
+  GSource       source;
 
-  xcancellable_t *cancellable;
-  xulong_t        cancelled_handler;
+  GCancellable *cancellable;
+  gulong        cancelled_handler;
   /* Protected by cancellable_mutex: */
-  xboolean_t      resurrected_during_cancellation;
+  gboolean      resurrected_during_cancellation;
 } GCancellableSource;
 
 /*
- * The reference count of the xsource_t might be 0 at this point but it is not
+ * The reference count of the GSource might be 0 at this point but it is not
  * finalized yet and its dispose function did not run yet, or otherwise we
  * would have disconnected the signal handler already and due to the signal
  * emission lock it would be impossible to call the signal handler at that
- * point. That is: at this point we either have a fully valid xsource_t, or
+ * point. That is: at this point we either have a fully valid GSource, or
  * it's not disposed or finalized yet and we can still resurrect it as needed.
  *
- * As such we first ensure that we have a strong reference to the xsource_t in
- * here before calling any other xsource_t API.
+ * As such we first ensure that we have a strong reference to the GSource in
+ * here before calling any other GSource API.
  */
 static void
-cancellable_source_cancelled (xcancellable_t *cancellable,
-			      xpointer_t      user_data)
+cancellable_source_cancelled (GCancellable *cancellable,
+			      gpointer      user_data)
 {
-  xsource_t *source = user_data;
+  GSource *source = user_data;
   GCancellableSource *cancellable_source = (GCancellableSource *) source;
 
   g_mutex_lock (&cancellable_mutex);
@@ -679,30 +679,30 @@ cancellable_source_cancelled (xcancellable_t *cancellable,
     {
       cancellable_source->resurrected_during_cancellation = FALSE;
       g_mutex_unlock (&cancellable_mutex);
-      xsource_unref (source);
+      g_source_unref (source);
       return;
     }
 
-  xsource_ref (source);
+  g_source_ref (source);
   g_mutex_unlock (&cancellable_mutex);
-  xsource_set_ready_time (source, 0);
-  xsource_unref (source);
+  g_source_set_ready_time (source, 0);
+  g_source_unref (source);
 }
 
-static xboolean_t
-cancellable_source_dispatch (xsource_t     *source,
-			     xsource_func_t  callback,
-			     xpointer_t     user_data)
+static gboolean
+cancellable_source_dispatch (GSource     *source,
+			     GSourceFunc  callback,
+			     gpointer     user_data)
 {
-  xcancellable_source_func_t func = (xcancellable_source_func_t)callback;
+  GCancellableSourceFunc func = (GCancellableSourceFunc)callback;
   GCancellableSource *cancellable_source = (GCancellableSource *)source;
 
-  xsource_set_ready_time (source, -1);
+  g_source_set_ready_time (source, -1);
   return (*func) (cancellable_source->cancellable, user_data);
 }
 
 static void
-cancellable_source_dispose (xsource_t *source)
+cancellable_source_dispose (GSource *source)
 {
   GCancellableSource *cancellable_source = (GCancellableSource *)source;
 
@@ -713,21 +713,21 @@ cancellable_source_dispose (xsource_t *source)
       if (cancellable_source->cancellable->priv->cancelled_running)
         {
           /* There can be a race here: if thread A has called
-           * xcancellable_cancel() and has got as far as committing to call
+           * g_cancellable_cancel() and has got as far as committing to call
            * cancellable_source_cancelled(), then thread B drops the final
-           * ref on the GCancellableSource before xsource_ref() is called in
+           * ref on the GCancellableSource before g_source_ref() is called in
            * cancellable_source_cancelled(), then cancellable_source_dispose()
            * will run through and the GCancellableSource will be finalised
-           * before cancellable_source_cancelled() gets to xsource_ref(). It
+           * before cancellable_source_cancelled() gets to g_source_ref(). It
            * will then be left in a state where it’s committed to using a
            * dangling GCancellableSource pointer.
            *
-           * Eliminate that race by resurrecting the #xsource_t temporarily, and
+           * Eliminate that race by resurrecting the #GSource temporarily, and
            * then dropping that reference in cancellable_source_cancelled(),
            * which should be guaranteed to fire because we’re inside a
            * @cancelled_running block.
            */
-          xsource_ref (source);
+          g_source_ref (source);
           cancellable_source->resurrected_during_cancellation = TRUE;
         }
 
@@ -739,82 +739,82 @@ cancellable_source_dispose (xsource_t *source)
   g_mutex_unlock (&cancellable_mutex);
 }
 
-static xboolean_t
-cancellable_source_closure_callback (xcancellable_t *cancellable,
-				     xpointer_t      data)
+static gboolean
+cancellable_source_closure_callback (GCancellable *cancellable,
+				     gpointer      data)
 {
-  xclosure_t *closure = data;
+  GClosure *closure = data;
 
-  xvalue_t params = G_VALUE_INIT;
-  xvalue_t result_value = G_VALUE_INIT;
-  xboolean_t result;
+  GValue params = G_VALUE_INIT;
+  GValue result_value = G_VALUE_INIT;
+  gboolean result;
 
-  xvalue_init (&result_value, XTYPE_BOOLEAN);
+  g_value_init (&result_value, G_TYPE_BOOLEAN);
 
-  xvalue_init (&params, XTYPE_CANCELLABLE);
-  xvalue_set_object (&params, cancellable);
+  g_value_init (&params, G_TYPE_CANCELLABLE);
+  g_value_set_object (&params, cancellable);
 
-  xclosure_invoke (closure, &result_value, 1, &params, NULL);
+  g_closure_invoke (closure, &result_value, 1, &params, NULL);
 
-  result = xvalue_get_boolean (&result_value);
-  xvalue_unset (&result_value);
-  xvalue_unset (&params);
+  result = g_value_get_boolean (&result_value);
+  g_value_unset (&result_value);
+  g_value_unset (&params);
 
   return result;
 }
 
-static xsource_funcs_t cancellable_source_funcs =
+static GSourceFuncs cancellable_source_funcs =
 {
   NULL,
   NULL,
   cancellable_source_dispatch,
   NULL,
-  (xsource_func_t)cancellable_source_closure_callback,
+  (GSourceFunc)cancellable_source_closure_callback,
   NULL,
 };
 
 /**
- * xcancellable_source_new:
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
+ * g_cancellable_source_new:
+ * @cancellable: (nullable): a #GCancellable, or %NULL
  *
  * Creates a source that triggers if @cancellable is cancelled and
- * calls its callback of type #xcancellable_source_func_t. This is
+ * calls its callback of type #GCancellableSourceFunc. This is
  * primarily useful for attaching to another (non-cancellable) source
- * with xsource_add_child_source() to add cancellability to it.
+ * with g_source_add_child_source() to add cancellability to it.
  *
- * For convenience, you can call this with a %NULL #xcancellable_t,
+ * For convenience, you can call this with a %NULL #GCancellable,
  * in which case the source will never trigger.
  *
- * The new #xsource_t will hold a reference to the #xcancellable_t.
+ * The new #GSource will hold a reference to the #GCancellable.
  *
- * Returns: (transfer full): the new #xsource_t.
+ * Returns: (transfer full): the new #GSource.
  *
  * Since: 2.28
  */
-xsource_t *
-xcancellable_source_new (xcancellable_t *cancellable)
+GSource *
+g_cancellable_source_new (GCancellable *cancellable)
 {
-  xsource_t *source;
+  GSource *source;
   GCancellableSource *cancellable_source;
 
-  source = xsource_new (&cancellable_source_funcs, sizeof (GCancellableSource));
-  xsource_set_static_name (source, "xcancellable_t");
-  xsource_set_dispose_function (source, cancellable_source_dispose);
+  source = g_source_new (&cancellable_source_funcs, sizeof (GCancellableSource));
+  g_source_set_static_name (source, "GCancellable");
+  g_source_set_dispose_function (source, cancellable_source_dispose);
   cancellable_source = (GCancellableSource *)source;
 
   if (cancellable)
     {
-      cancellable_source->cancellable = xobject_ref (cancellable);
+      cancellable_source->cancellable = g_object_ref (cancellable);
 
-      /* We intentionally don't use xcancellable_connect() here,
+      /* We intentionally don't use g_cancellable_connect() here,
        * because we don't want the "at most once" behavior.
        */
       cancellable_source->cancelled_handler =
-        xsignal_connect (cancellable, "cancelled",
+        g_signal_connect (cancellable, "cancelled",
                           G_CALLBACK (cancellable_source_cancelled),
                           source);
-      if (xcancellable_is_cancelled (cancellable))
-        xsource_set_ready_time (source, 0);
+      if (g_cancellable_is_cancelled (cancellable))
+        g_source_set_ready_time (source, 0);
     }
 
   return source;

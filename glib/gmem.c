@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,10 +19,10 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 
@@ -79,9 +79,9 @@ static GMemVTable glib_mem_vtable = {
  * SECTION:memory
  * @Short_Description: general memory-handling
  * @Title: Memory Allocation
- *
+ * 
  * These functions provide support for allocating and freeing memory.
- *
+ * 
  * If any call to allocate memory using functions g_new(), g_new0(), g_renew(),
  * g_malloc(), g_malloc0(), g_malloc0_n(), g_realloc(), and g_realloc_n()
  * fails, the application is terminated. This also means that there is no
@@ -109,29 +109,29 @@ static GMemVTable glib_mem_vtable = {
 /**
  * g_malloc:
  * @n_bytes: the number of bytes to allocate
- *
+ * 
  * Allocates @n_bytes bytes of memory.
  * If @n_bytes is 0 it returns %NULL.
- *
+ * 
  * Returns: a pointer to the allocated memory
  */
-xpointer_t
-g_malloc (xsize_t n_bytes)
+gpointer
+g_malloc (gsize n_bytes)
 {
   if (G_LIKELY (n_bytes))
     {
-      xpointer_t mem;
+      gpointer mem;
 
       mem = malloc (n_bytes);
-      TRACE (XPL_MEM_ALLOC((void*) mem, (unsigned int) n_bytes, 0, 0));
+      TRACE (GLIB_MEM_ALLOC((void*) mem, (unsigned int) n_bytes, 0, 0));
       if (mem)
 	return mem;
 
-      xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_bytes);
     }
 
-  TRACE(XPL_MEM_ALLOC((void*) NULL, (int) n_bytes, 0, 0));
+  TRACE(GLIB_MEM_ALLOC((void*) NULL, (int) n_bytes, 0, 0));
 
   return NULL;
 }
@@ -139,29 +139,29 @@ g_malloc (xsize_t n_bytes)
 /**
  * g_malloc0:
  * @n_bytes: the number of bytes to allocate
- *
+ * 
  * Allocates @n_bytes bytes of memory, initialized to 0's.
  * If @n_bytes is 0 it returns %NULL.
- *
+ * 
  * Returns: a pointer to the allocated memory
  */
-xpointer_t
-g_malloc0 (xsize_t n_bytes)
+gpointer
+g_malloc0 (gsize n_bytes)
 {
   if (G_LIKELY (n_bytes))
     {
-      xpointer_t mem;
+      gpointer mem;
 
       mem = calloc (1, n_bytes);
-      TRACE (XPL_MEM_ALLOC((void*) mem, (unsigned int) n_bytes, 1, 0));
+      TRACE (GLIB_MEM_ALLOC((void*) mem, (unsigned int) n_bytes, 1, 0));
       if (mem)
 	return mem;
 
-      xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_bytes);
     }
 
-  TRACE(XPL_MEM_ALLOC((void*) NULL, (int) n_bytes, 1, 0));
+  TRACE(GLIB_MEM_ALLOC((void*) NULL, (int) n_bytes, 1, 0));
 
   return NULL;
 }
@@ -170,35 +170,35 @@ g_malloc0 (xsize_t n_bytes)
  * g_realloc:
  * @mem: (nullable): the memory to reallocate
  * @n_bytes: new size of the memory in bytes
- *
+ * 
  * Reallocates the memory pointed to by @mem, so that it now has space for
  * @n_bytes bytes of memory. It returns the new address of the memory, which may
  * have been moved. @mem may be %NULL, in which case it's considered to
  * have zero-length. @n_bytes may be 0, in which case %NULL will be returned
  * and @mem will be freed unless it is %NULL.
- *
+ * 
  * Returns: the new address of the allocated memory
  */
-xpointer_t
-g_realloc (xpointer_t mem,
-	   xsize_t    n_bytes)
+gpointer
+g_realloc (gpointer mem,
+	   gsize    n_bytes)
 {
-  xpointer_t newmem;
+  gpointer newmem;
 
   if (G_LIKELY (n_bytes))
     {
       newmem = realloc (mem, n_bytes);
-      TRACE (XPL_MEM_REALLOC((void*) newmem, (void*)mem, (unsigned int) n_bytes, 0));
+      TRACE (GLIB_MEM_REALLOC((void*) newmem, (void*)mem, (unsigned int) n_bytes, 0));
       if (newmem)
 	return newmem;
 
-      xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_bytes);
     }
 
   free (mem);
 
-  TRACE (XPL_MEM_REALLOC((void*) NULL, (void*)mem, 0, 0));
+  TRACE (GLIB_MEM_REALLOC((void*) NULL, (void*)mem, 0, 0));
 
   return NULL;
 }
@@ -206,24 +206,24 @@ g_realloc (xpointer_t mem,
 /**
  * g_free:
  * @mem: (nullable): the memory to free
- *
+ * 
  * Frees the memory pointed to by @mem.
  *
  * If @mem is %NULL it simply returns, so there is no need to check @mem
  * against %NULL before calling this function.
  */
 void
-g_free (xpointer_t mem)
+g_free (gpointer mem)
 {
   free (mem);
-  TRACE(XPL_MEM_FREE((void*) mem));
+  TRACE(GLIB_MEM_FREE((void*) mem));
 }
 
 /**
  * g_clear_pointer: (skip)
  * @pp: (not nullable): a pointer to a variable, struct member etc. holding a
  *    pointer
- * @destroy: a function to which a xpointer_t can be passed, to destroy *@pp
+ * @destroy: a function to which a gpointer can be passed, to destroy *@pp
  *
  * Clears a reference to a variable.
  *
@@ -236,7 +236,7 @@ g_free (xpointer_t mem)
  * A macro is also included that allows this function to be used without
  * pointer casts. This will mask any warnings about incompatible function types
  * or calling conventions, so you must ensure that your @destroy function is
- * compatible with being called as `xdestroy_notify_t` using the standard calling
+ * compatible with being called as `GDestroyNotify` using the standard calling
  * convention for the platform that GLib was compiled for; otherwise the program
  * will experience undefined behaviour.
  *
@@ -244,10 +244,10 @@ g_free (xpointer_t mem)
  **/
 #undef g_clear_pointer
 void
-g_clear_pointer (xpointer_t      *pp,
-                 xdestroy_notify_t destroy)
+g_clear_pointer (gpointer      *pp,
+                 GDestroyNotify destroy)
 {
-  xpointer_t _p;
+  gpointer _p;
 
   _p = *pp;
   if (_p)
@@ -260,23 +260,23 @@ g_clear_pointer (xpointer_t      *pp,
 /**
  * g_try_malloc:
  * @n_bytes: number of bytes to allocate.
- *
+ * 
  * Attempts to allocate @n_bytes, and returns %NULL on failure.
  * Contrast with g_malloc(), which aborts the program on failure.
- *
+ * 
  * Returns: the allocated memory, or %NULL.
  */
-xpointer_t
-g_try_malloc (xsize_t n_bytes)
+gpointer
+g_try_malloc (gsize n_bytes)
 {
-  xpointer_t mem;
+  gpointer mem;
 
   if (G_LIKELY (n_bytes))
     mem = malloc (n_bytes);
   else
     mem = NULL;
 
-  TRACE (XPL_MEM_ALLOC((void*) mem, (unsigned int) n_bytes, 0, 1));
+  TRACE (GLIB_MEM_ALLOC((void*) mem, (unsigned int) n_bytes, 0, 1));
 
   return mem;
 }
@@ -284,17 +284,17 @@ g_try_malloc (xsize_t n_bytes)
 /**
  * g_try_malloc0:
  * @n_bytes: number of bytes to allocate
- *
+ * 
  * Attempts to allocate @n_bytes, initialized to 0's, and returns %NULL on
  * failure. Contrast with g_malloc0(), which aborts the program on failure.
- *
+ * 
  * Since: 2.8
  * Returns: the allocated memory, or %NULL
  */
-xpointer_t
-g_try_malloc0 (xsize_t n_bytes)
+gpointer
+g_try_malloc0 (gsize n_bytes)
 {
-  xpointer_t mem;
+  gpointer mem;
 
   if (G_LIKELY (n_bytes))
     mem = calloc (1, n_bytes);
@@ -308,20 +308,20 @@ g_try_malloc0 (xsize_t n_bytes)
  * g_try_realloc:
  * @mem: (nullable): previously-allocated memory, or %NULL.
  * @n_bytes: number of bytes to allocate.
- *
+ * 
  * Attempts to realloc @mem to a new size, @n_bytes, and returns %NULL
  * on failure. Contrast with g_realloc(), which aborts the program
  * on failure.
  *
  * If @mem is %NULL, behaves the same as g_try_malloc().
- *
+ * 
  * Returns: the allocated memory, or %NULL.
  */
-xpointer_t
-g_try_realloc (xpointer_t mem,
-	       xsize_t    n_bytes)
+gpointer
+g_try_realloc (gpointer mem,
+	       gsize    n_bytes)
 {
-  xpointer_t newmem;
+  gpointer newmem;
 
   if (G_LIKELY (n_bytes))
     newmem = realloc (mem, n_bytes);
@@ -331,7 +331,7 @@ g_try_realloc (xpointer_t mem,
       free (mem);
     }
 
-  TRACE (XPL_MEM_REALLOC((void*) newmem, (void*)mem, (unsigned int) n_bytes, 1));
+  TRACE (GLIB_MEM_REALLOC((void*) newmem, (void*)mem, (unsigned int) n_bytes, 1));
 
   return newmem;
 }
@@ -343,20 +343,20 @@ g_try_realloc (xpointer_t mem,
  * g_malloc_n:
  * @n_blocks: the number of blocks to allocate
  * @n_block_bytes: the size of each block in bytes
- *
+ * 
  * This function is similar to g_malloc(), allocating (@n_blocks * @n_block_bytes) bytes,
  * but care is taken to detect possible overflow during multiplication.
- *
+ * 
  * Since: 2.24
  * Returns: a pointer to the allocated memory
  */
-xpointer_t
-g_malloc_n (xsize_t n_blocks,
-	    xsize_t n_block_bytes)
+gpointer
+g_malloc_n (gsize n_blocks,
+	    gsize n_block_bytes)
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -367,20 +367,20 @@ g_malloc_n (xsize_t n_blocks,
  * g_malloc0_n:
  * @n_blocks: the number of blocks to allocate
  * @n_block_bytes: the size of each block in bytes
- *
+ * 
  * This function is similar to g_malloc0(), allocating (@n_blocks * @n_block_bytes) bytes,
  * but care is taken to detect possible overflow during multiplication.
- *
+ * 
  * Since: 2.24
  * Returns: a pointer to the allocated memory
  */
-xpointer_t
-g_malloc0_n (xsize_t n_blocks,
-	     xsize_t n_block_bytes)
+gpointer
+g_malloc0_n (gsize n_blocks,
+	     gsize n_block_bytes)
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -392,21 +392,21 @@ g_malloc0_n (xsize_t n_blocks,
  * @mem: (nullable): the memory to reallocate
  * @n_blocks: the number of blocks to allocate
  * @n_block_bytes: the size of each block in bytes
- *
+ * 
  * This function is similar to g_realloc(), allocating (@n_blocks * @n_block_bytes) bytes,
  * but care is taken to detect possible overflow during multiplication.
- *
+ * 
  * Since: 2.24
  * Returns: the new address of the allocated memory
  */
-xpointer_t
-g_realloc_n (xpointer_t mem,
-	     xsize_t    n_blocks,
-	     xsize_t    n_block_bytes)
+gpointer
+g_realloc_n (gpointer mem,
+	     gsize    n_blocks,
+	     gsize    n_block_bytes)
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -417,16 +417,16 @@ g_realloc_n (xpointer_t mem,
  * g_try_malloc_n:
  * @n_blocks: the number of blocks to allocate
  * @n_block_bytes: the size of each block in bytes
- *
+ * 
  * This function is similar to g_try_malloc(), allocating (@n_blocks * @n_block_bytes) bytes,
  * but care is taken to detect possible overflow during multiplication.
- *
+ * 
  * Since: 2.24
  * Returns: the allocated memory, or %NULL.
  */
-xpointer_t
-g_try_malloc_n (xsize_t n_blocks,
-		xsize_t n_block_bytes)
+gpointer
+g_try_malloc_n (gsize n_blocks,
+		gsize n_block_bytes)
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     return NULL;
@@ -438,16 +438,16 @@ g_try_malloc_n (xsize_t n_blocks,
  * g_try_malloc0_n:
  * @n_blocks: the number of blocks to allocate
  * @n_block_bytes: the size of each block in bytes
- *
+ * 
  * This function is similar to g_try_malloc0(), allocating (@n_blocks * @n_block_bytes) bytes,
  * but care is taken to detect possible overflow during multiplication.
- *
+ * 
  * Since: 2.24
  * Returns: the allocated memory, or %NULL
  */
-xpointer_t
-g_try_malloc0_n (xsize_t n_blocks,
-		 xsize_t n_block_bytes)
+gpointer
+g_try_malloc0_n (gsize n_blocks,
+		 gsize n_block_bytes)
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     return NULL;
@@ -460,17 +460,17 @@ g_try_malloc0_n (xsize_t n_blocks,
  * @mem: (nullable): previously-allocated memory, or %NULL.
  * @n_blocks: the number of blocks to allocate
  * @n_block_bytes: the size of each block in bytes
- *
+ * 
  * This function is similar to g_try_realloc(), allocating (@n_blocks * @n_block_bytes) bytes,
  * but care is taken to detect possible overflow during multiplication.
- *
+ * 
  * Since: 2.24
  * Returns: the allocated memory, or %NULL.
  */
-xpointer_t
-g_try_realloc_n (xpointer_t mem,
-		 xsize_t    n_blocks,
-		 xsize_t    n_block_bytes)
+gpointer
+g_try_realloc_n (gpointer mem,
+		 gsize    n_blocks,
+		 gsize    n_block_bytes)
 {
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     return NULL;
@@ -480,7 +480,7 @@ g_try_realloc_n (xpointer_t mem,
 
 /**
  * g_mem_is_system_malloc:
- *
+ * 
  * Checks whether the allocator used by g_malloc() is the system's
  * malloc implementation. If it returns %TRUE memory allocated with
  * malloc() can be used interchangeably with memory allocated using g_malloc().
@@ -492,7 +492,7 @@ g_try_realloc_n (xpointer_t mem,
  * Deprecated: 2.46: GLib always uses the system malloc, so this function always
  * returns %TRUE.
  **/
-xboolean_t
+gboolean
 g_mem_is_system_malloc (void)
 {
   return TRUE;
@@ -501,7 +501,7 @@ g_mem_is_system_malloc (void)
 /**
  * g_mem_set_vtable:
  * @vtable: table of memory allocation routines.
- *
+ * 
  * This function used to let you override the memory allocation function.
  * However, its use was incompatible with the use of global constructors
  * in GLib and GIO, because those use the GLib allocators before main is
@@ -561,29 +561,29 @@ g_mem_profile (void)
  *
  * Since: 2.72
  */
-xpointer_t
-g_aligned_alloc (xsize_t n_blocks,
-                 xsize_t n_block_bytes,
-                 xsize_t alignment)
+gpointer
+g_aligned_alloc (gsize n_blocks,
+                 gsize n_block_bytes,
+                 gsize alignment)
 {
-  xpointer_t res = NULL;
-  xsize_t real_size;
+  gpointer res = NULL;
+  gsize real_size;
 
   if (G_UNLIKELY ((alignment == 0) || (alignment & (alignment - 1)) != 0))
     {
-      xerror ("%s: alignment %"G_GSIZE_FORMAT" must be a positive power of two",
+      g_error ("%s: alignment %"G_GSIZE_FORMAT" must be a positive power of two",
                G_STRLOC, alignment);
     }
 
   if (G_UNLIKELY ((alignment % sizeof (void *)) != 0))
     {
-      xerror ("%s: alignment %"G_GSIZE_FORMAT" must be a multiple of %"G_GSIZE_FORMAT,
+      g_error ("%s: alignment %"G_GSIZE_FORMAT" must be a multiple of %"G_GSIZE_FORMAT,
                G_STRLOC, alignment, sizeof (void *));
     }
 
   if (SIZE_OVERFLOWS (n_blocks, n_block_bytes))
     {
-      xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
+      g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"*%"G_GSIZE_FORMAT" bytes",
                G_STRLOC, n_blocks, n_block_bytes);
     }
 
@@ -591,7 +591,7 @@ g_aligned_alloc (xsize_t n_blocks,
 
   if (G_UNLIKELY (real_size == 0))
     {
-      TRACE(XPL_MEM_ALLOC((void*) NULL, (int) real_size, 0, 0));
+      TRACE(GLIB_MEM_ALLOC((void*) NULL, (int) real_size, 0, 0));
       return NULL;
     }
 
@@ -611,11 +611,11 @@ g_aligned_alloc (xsize_t n_blocks,
   /* real_size must be a multiple of alignment */
   if (real_size % alignment != 0)
     {
-      xsize_t offset = real_size % alignment;
+      gsize offset = real_size % alignment;
 
       if (G_MAXSIZE - real_size < (alignment - offset))
         {
-          xerror ("%s: overflow allocating %"G_GSIZE_FORMAT"+%"G_GSIZE_FORMAT" bytes",
+          g_error ("%s: overflow allocating %"G_GSIZE_FORMAT"+%"G_GSIZE_FORMAT" bytes",
                    G_STRLOC, real_size, (alignment - offset));
         }
 
@@ -629,11 +629,11 @@ g_aligned_alloc (xsize_t n_blocks,
 # error "This platform does not have an aligned memory allocator."
 #endif
 
-  TRACE (XPL_MEM_ALLOC((void*) res, (unsigned int) real_size, 0, 0));
+  TRACE (GLIB_MEM_ALLOC((void*) res, (unsigned int) real_size, 0, 0));
   if (res)
     return res;
 
-  xerror ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
+  g_error ("%s: failed to allocate %"G_GSIZE_FORMAT" bytes",
            G_STRLOC, real_size);
 
   return NULL;
@@ -653,12 +653,12 @@ g_aligned_alloc (xsize_t n_blocks,
  *
  * Since: 2.72
  */
-xpointer_t
-g_aligned_alloc0 (xsize_t n_blocks,
-                  xsize_t n_block_bytes,
-                  xsize_t alignment)
+gpointer
+g_aligned_alloc0 (gsize n_blocks,
+                  gsize n_block_bytes,
+                  gsize alignment)
 {
-  xpointer_t res = g_aligned_alloc (n_blocks, n_block_bytes, alignment);
+  gpointer res = g_aligned_alloc (n_blocks, n_block_bytes, alignment);
 
   if (G_LIKELY (res != NULL))
     memset (res, 0, n_blocks * n_block_bytes);
@@ -675,7 +675,7 @@ g_aligned_alloc0 (xsize_t n_blocks,
  * Since: 2.72
  */
 void
-g_aligned_free (xpointer_t mem)
+g_aligned_free (gpointer mem)
 {
   aligned_free (mem);
 }

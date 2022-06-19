@@ -15,8 +15,8 @@
  * along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XPL_PRIVATE_H__
-#define __XPL_PRIVATE_H__
+#ifndef __GLIB_PRIVATE_H__
+#define __GLIB_PRIVATE_H__
 
 #include <glib.h>
 #include "gwakeup.h"
@@ -33,11 +33,11 @@
 #if !defined(_MSC_VER) && (defined(__SANITIZE_ADDRESS__) || g_macro__has_feature(address_sanitizer))
 
 /*
- * %_XPL_ADDRESS_SANITIZER:
+ * %_GLIB_ADDRESS_SANITIZER:
  *
  * Private macro defined if the AddressSanitizer is in use.
  */
-#define _XPL_ADDRESS_SANITIZER
+#define _GLIB_ADDRESS_SANITIZER
 
 #include <sanitizer/lsan_interface.h>
 
@@ -53,9 +53,9 @@
  * going to be deallocated.
  */
 static inline void
-g_ignore_leak (xconstpointer p)
+g_ignore_leak (gconstpointer p)
 {
-#ifdef _XPL_ADDRESS_SANITIZER
+#ifdef _GLIB_ADDRESS_SANITIZER
   if (p != NULL)
     __lsan_ignore_object (p);
 #endif
@@ -69,10 +69,10 @@ g_ignore_leak (xconstpointer p)
  * and for each element of @strv.
  */
 static inline void
-g_ignore_strv_leak (xstrv_t strv)
+g_ignore_strv_leak (GStrv strv)
 {
-#ifdef _XPL_ADDRESS_SANITIZER
-  xchar_t **item;
+#ifdef _GLIB_ADDRESS_SANITIZER
+  gchar **item;
 
   if (strv)
     {
@@ -96,7 +96,7 @@ g_ignore_strv_leak (xstrv_t strv)
 static inline void
 g_begin_ignore_leaks (void)
 {
-#ifdef _XPL_ADDRESS_SANITIZER
+#ifdef _GLIB_ADDRESS_SANITIZER
   __lsan_disable ();
 #endif
 }
@@ -110,66 +110,66 @@ g_begin_ignore_leaks (void)
 static inline void
 g_end_ignore_leaks (void)
 {
-#ifdef _XPL_ADDRESS_SANITIZER
+#ifdef _GLIB_ADDRESS_SANITIZER
   __lsan_enable ();
 #endif
 }
 
-xmain_context_t *          g_get_worker_context            (void);
-xboolean_t                g_check_setuid                  (void);
-xmain_context_t *          xmain_context_new_with_next_id (xuint_t next_id);
+GMainContext *          g_get_worker_context            (void);
+gboolean                g_check_setuid                  (void);
+GMainContext *          g_main_context_new_with_next_id (guint next_id);
 
 #ifdef G_OS_WIN32
-XPL_AVAILABLE_IN_ALL
-xchar_t *_glib_get_locale_dir    (void);
+GLIB_AVAILABLE_IN_ALL
+gchar *_glib_get_locale_dir    (void);
 #endif
 
-xdir_t * g_dir_open_with_errno (const xchar_t *path, xuint_t flags);
-xdir_t * g_dir_new_from_dirp (xpointer_t dirp);
+GDir * g_dir_open_with_errno (const gchar *path, guint flags);
+GDir * g_dir_new_from_dirp (gpointer dirp);
 
-#define XPL_PRIVATE_CALL(symbol) (glib__private__()->symbol)
+#define GLIB_PRIVATE_CALL(symbol) (glib__private__()->symbol)
 
 typedef struct {
   /* See gwakeup.c */
   GWakeup *             (* g_wakeup_new)                (void);
   void                  (* g_wakeup_free)               (GWakeup *wakeup);
   void                  (* g_wakeup_get_pollfd)         (GWakeup *wakeup,
-                                                        xpollfd_t *poll_fd);
+                                                        GPollFD *poll_fd);
   void                  (* g_wakeup_signal)             (GWakeup *wakeup);
   void                  (* g_wakeup_acknowledge)        (GWakeup *wakeup);
 
   /* See gmain.c */
-  xmain_context_t *        (* g_get_worker_context)        (void);
+  GMainContext *        (* g_get_worker_context)        (void);
 
-  xboolean_t              (* g_check_setuid)              (void);
-  xmain_context_t *        (* xmain_context_new_with_next_id) (xuint_t next_id);
+  gboolean              (* g_check_setuid)              (void);
+  GMainContext *        (* g_main_context_new_with_next_id) (guint next_id);
 
-  xdir_t *                (* g_dir_open_with_errno)       (const xchar_t *path,
-                                                         xuint_t        flags);
-  xdir_t *                (* g_dir_new_from_dirp)         (xpointer_t dirp);
+  GDir *                (* g_dir_open_with_errno)       (const gchar *path,
+                                                         guint        flags);
+  GDir *                (* g_dir_new_from_dirp)         (gpointer dirp);
 
   /* See glib-init.c */
   void                  (* glib_init)                   (void);
 
   /* See gstdio.c */
 #ifdef G_OS_WIN32
-  int                   (* g_win32_stat_utf8)           (const xchar_t        *filename,
+  int                   (* g_win32_stat_utf8)           (const gchar        *filename,
                                                          GWin32PrivateStat  *buf);
 
-  int                   (* g_win32_lstat_utf8)          (const xchar_t        *filename,
+  int                   (* g_win32_lstat_utf8)          (const gchar        *filename,
                                                          GWin32PrivateStat  *buf);
 
-  int                   (* g_win32_readlink_utf8)       (const xchar_t        *filename,
-                                                         xchar_t              *buf,
-                                                         xsize_t               buf_size,
-                                                         xchar_t             **alloc_buf,
-                                                         xboolean_t            terminate);
+  int                   (* g_win32_readlink_utf8)       (const gchar        *filename,
+                                                         gchar              *buf,
+                                                         gsize               buf_size,
+                                                         gchar             **alloc_buf,
+                                                         gboolean            terminate);
 
   int                   (* g_win32_fstat)               (int                 fd,
                                                          GWin32PrivateStat  *buf);
 
   /* See gwin32.c */
-  xchar_t *(*g_win32_find_helper_executable_path) (const xchar_t *process_name,
+  gchar *(*g_win32_find_helper_executable_path) (const gchar *process_name,
                                                  void *dll_handle);
 #endif
 
@@ -177,7 +177,7 @@ typedef struct {
   /* Add other private functions here, initialize them in glib-private.c */
 } GLibPrivateVTable;
 
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 GLibPrivateVTable *glib__private__ (void);
 
 /* Please see following for the use of ".ACP" over ""
@@ -196,9 +196,9 @@ GLibPrivateVTable *glib__private__ (void);
  */
 
 #ifdef G_OS_WIN32
-# define XPL_DEFAULT_LOCALE ".ACP"
+# define GLIB_DEFAULT_LOCALE ".ACP"
 #else
-# define XPL_DEFAULT_LOCALE ""
+# define GLIB_DEFAULT_LOCALE ""
 #endif
 
-#endif /* __XPL_PRIVATE_H__ */
+#endif /* __GLIB_PRIVATE_H__ */

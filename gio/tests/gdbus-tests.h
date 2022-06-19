@@ -40,15 +40,15 @@ G_BEGIN_DECLS
 #define _g_assert_property_notify(object, property_name)                \
   do                                                                    \
     {                                                                   \
-      if (!X_IS_OBJECT (object))                                        \
+      if (!G_IS_OBJECT (object))                                        \
         {                                                               \
           g_assertion_message (G_LOG_DOMAIN,                            \
                                __FILE__,                                \
                                __LINE__,                                \
                                G_STRFUNC,                               \
-                               "Not a xobject_t instance");               \
+                               "Not a GObject instance");               \
         }                                                               \
-      if (xobject_class_find_property (G_OBJECT_GET_CLASS (object),    \
+      if (g_object_class_find_property (G_OBJECT_GET_CLASS (object),    \
                                         property_name) == NULL)         \
         {                                                               \
           g_assertion_message (G_LOG_DOMAIN,                            \
@@ -73,16 +73,16 @@ G_BEGIN_DECLS
 #define _g_assert_signal_received(object, signal_name)                  \
   do                                                                    \
     {                                                                   \
-      if (!X_IS_OBJECT (object))                                        \
+      if (!G_IS_OBJECT (object))                                        \
         {                                                               \
           g_assertion_message (G_LOG_DOMAIN,                            \
                                __FILE__,                                \
                                __LINE__,                                \
                                G_STRFUNC,                               \
-                               "Not a xobject_t instance");               \
+                               "Not a GObject instance");               \
         }                                                               \
-      if (xsignal_lookup (signal_name,                                 \
-                           XTYPE_FROM_INSTANCE (object)) == 0)         \
+      if (g_signal_lookup (signal_name,                                 \
+                           G_TYPE_FROM_INSTANCE (object)) == 0)         \
         {                                                               \
           g_assertion_message (G_LOG_DOMAIN,                            \
                                __FILE__,                                \
@@ -103,19 +103,19 @@ G_BEGIN_DECLS
     }                                                                   \
   while (FALSE)
 
-xboolean_t _g_assert_property_notify_run (xpointer_t     object,
-                                        const xchar_t *property_name);
+gboolean _g_assert_property_notify_run (gpointer     object,
+                                        const gchar *property_name);
 
 
-xboolean_t _g_assert_signal_received_run (xpointer_t     object,
-                                        const xchar_t *signal_name);
+gboolean _g_assert_signal_received_run (gpointer     object,
+                                        const gchar *signal_name);
 
-xdbus_connection_t *_g_bus_get_priv (xbus_type_t            bus_type,
-                                  xcancellable_t       *cancellable,
-                                  xerror_t            **error);
+GDBusConnection *_g_bus_get_priv (GBusType            bus_type,
+                                  GCancellable       *cancellable,
+                                  GError            **error);
 
-void ensure_gdbus_testserver_up (xdbus_connection_t *connection,
-                                 xmain_context_t    *context);
+void ensure_gdbus_testserver_up (GDBusConnection *connection,
+                                 GMainContext    *context);
 
 G_END_DECLS
 

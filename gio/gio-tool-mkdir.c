@@ -25,7 +25,7 @@
 #include "gio-tool.h"
 
 
-static xboolean_t parent = FALSE;
+static gboolean parent = FALSE;
 
 static const GOptionEntry entries[] = {
   { "parent", 'p', 0, G_OPTION_ARG_NONE, &parent, N_("Create parent directories"), NULL },
@@ -33,19 +33,19 @@ static const GOptionEntry entries[] = {
 };
 
 int
-handle_mkdir (int argc, char *argv[], xboolean_t do_help)
+handle_mkdir (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xchar_t *param;
-  xerror_t *error = NULL;
-  xfile_t *file;
+  GOptionContext *context;
+  gchar *param;
+  GError *error = NULL;
+  GFile *file;
   int retval = 0;
   int i;
 
   g_set_prgname ("gio mkdir");
 
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("%s…", _("LOCATION"));
+  param = g_strdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -66,7 +66,7 @@ handle_mkdir (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -82,26 +82,26 @@ handle_mkdir (int argc, char *argv[], xboolean_t do_help)
 
   for (i = 1; i < argc; i++)
     {
-      file = xfile_new_for_commandline_arg (argv[i]);
+      file = g_file_new_for_commandline_arg (argv[i]);
       error = NULL;
       if (parent)
         {
-          if (!xfile_make_directory_with_parents (file, NULL, &error))
+          if (!g_file_make_directory_with_parents (file, NULL, &error))
             {
               print_file_error (file, error->message);
-              xerror_free (error);
+              g_error_free (error);
               retval = 1;
             }
         }
       else
         {
-          if (!xfile_make_directory (file, NULL, &error))
+          if (!g_file_make_directory (file, NULL, &error))
             {
               print_file_error (file, error->message);
-              xerror_free (error);
+              g_error_free (error);
               retval = 1;
             }
-          xobject_unref (file);
+          g_object_unref (file);
         }
     }
 

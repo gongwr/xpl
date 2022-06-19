@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2012 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -27,16 +27,16 @@
 G_BEGIN_DECLS
 
 G_GNUC_INTERNAL
-xinput_stream_t *
-g_win32_input_stream_new_from_fd (xint_t      fd,
-				  xboolean_t  close_fd);
+GInputStream *
+g_win32_input_stream_new_from_fd (gint      fd,
+				  gboolean  close_fd);
 
-xoutput_stream_t *
-g_win32_output_stream_new_from_fd (xint_t      fd,
-				   xboolean_t  close_fd);
+GOutputStream *
+g_win32_output_stream_new_from_fd (gint      fd,
+				   gboolean  close_fd);
 
 void
-gio_win32_appinfo_init (xboolean_t do_wait);
+gio_win32_appinfo_init (gboolean do_wait);
 G_END_DECLS
 
 #endif /* __G_IO_MODULE_PRIV_H__ */

@@ -363,7 +363,7 @@ if use_pcre_static_flag
   pcre_static_args = ['-DPCRE_STATIC']
 endif
 
-glib_c_args = ['-DG_LOG_DOMAIN="GLib"', '-DXPL_COMPILATION'] + pcre_static_args + glib_hidden_visibility_args
+glib_c_args = ['-DG_LOG_DOMAIN="GLib"', '-DGLIB_COMPILATION'] + pcre_static_args + glib_hidden_visibility_args
 libglib = library('glib-2.0',
   glib_dtrace_obj, glib_dtrace_hdr,
   sources : [deprecated_sources, glib_sources],
@@ -440,7 +440,7 @@ else
 endif
 
 report_conf = configuration_data()
-report_conf.set('XPL_VERSION', glib_version)
+report_conf.set('GLIB_VERSION', glib_version)
 report_conf.set('PYTHON', python_name)
 configure_file(
   input: 'gtester-report.in',

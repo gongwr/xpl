@@ -2,187 +2,187 @@
 #include <string.h>
 
 static void
-new_activated (xsimple_action_t *action,
-               xvariant_t      *parameter,
-               xpointer_t       user_data)
+new_activated (GSimpleAction *action,
+               GVariant      *parameter,
+               gpointer       user_data)
 {
-  xapplication_t *app = user_data;
+  GApplication *app = user_data;
 
-  xapplication_activate (app);
+  g_application_activate (app);
 }
 
 static void
-quit_activated (xsimple_action_t *action,
-                xvariant_t      *parameter,
-                xpointer_t       user_data)
+quit_activated (GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data)
 {
-  xapplication_t *app = user_data;
+  GApplication *app = user_data;
 
-  xapplication_quit (app);
+  g_application_quit (app);
 }
 
 static void
-action1_activated (xsimple_action_t *action,
-                   xvariant_t      *parameter,
-                   xpointer_t       user_data)
+action1_activated (GSimpleAction *action,
+                   GVariant      *parameter,
+                   gpointer       user_data)
 {
   g_print ("activate action1\n");
 }
 
 static void
-action2_activated (xsimple_action_t *action,
-                   xvariant_t      *parameter,
-                   xpointer_t       user_data)
+action2_activated (GSimpleAction *action,
+                   GVariant      *parameter,
+                   gpointer       user_data)
 {
-  xvariant_t *state;
+  GVariant *state;
 
   state = g_action_get_state (G_ACTION (action));
-  g_action_change_state (G_ACTION (action), xvariant_new_boolean (!xvariant_get_boolean (state)));
-  g_print ("activate action2 %d\n", !xvariant_get_boolean (state));
-  xvariant_unref (state);
+  g_action_change_state (G_ACTION (action), g_variant_new_boolean (!g_variant_get_boolean (state)));
+  g_print ("activate action2 %d\n", !g_variant_get_boolean (state));
+  g_variant_unref (state);
 }
 
 static void
-change_action2 (xsimple_action_t *action,
-                xvariant_t      *state,
-                xpointer_t       user_data)
+change_action2 (GSimpleAction *action,
+                GVariant      *state,
+                gpointer       user_data)
 {
-  g_print ("change action2 %d\n", xvariant_get_boolean (state));
+  g_print ("change action2 %d\n", g_variant_get_boolean (state));
 }
 
 static void
-startup (xapplication_t *app)
+startup (GApplication *app)
 {
-  static xaction_entry_t actions[] = {
+  static GActionEntry actions[] = {
     { "new", new_activated, NULL, NULL, NULL, { 0 } },
     { "quit", quit_activated, NULL, NULL, NULL, { 0 } },
     { "action1", action1_activated, NULL, NULL, NULL, { 0 } },
     { "action2", action2_activated, "b", "false", change_action2, { 0 } }
   };
 
-  xaction_map_add_action_entries (G_ACTION_MAP (app),
+  g_action_map_add_action_entries (G_ACTION_MAP (app),
                                    actions, G_N_ELEMENTS (actions),
                                    app);
 }
 
 static void
-activate (xapplication_t *application)
+activate (GApplication *application)
 {
-  xapplication_hold (application);
+  g_application_hold (application);
   g_print ("activated\n");
-  xapplication_release (application);
+  g_application_release (application);
 }
 
 static void
-open (xapplication_t  *application,
-      xfile_t        **files,
-      xint_t           n_files,
-      const xchar_t   *hint)
+open (GApplication  *application,
+      GFile        **files,
+      gint           n_files,
+      const gchar   *hint)
 {
-  xint_t i;
+  gint i;
 
-  xapplication_hold (application);
+  g_application_hold (application);
 
   g_print ("open");
   for (i = 0; i < n_files; i++)
     {
-      xchar_t *uri = xfile_get_uri (files[i]);
+      gchar *uri = g_file_get_uri (files[i]);
       g_print (" %s", uri);
       g_free (uri);
     }
   g_print ("\n");
 
-  xapplication_release (application);
+  g_application_release (application);
 }
 
 static int
-command_line (xapplication_t            *application,
-              xapplication_command_line_t *cmdline)
+command_line (GApplication            *application,
+              GApplicationCommandLine *cmdline)
 {
-  xchar_t **argv;
-  xint_t argc;
-  xint_t i;
+  gchar **argv;
+  gint argc;
+  gint i;
 
-  xapplication_hold (application);
-  argv = xapplication_command_line_get_arguments (cmdline, &argc);
+  g_application_hold (application);
+  argv = g_application_command_line_get_arguments (cmdline, &argc);
 
   if (argc > 1)
     {
-      if (xstrcmp0 (argv[1], "echo") == 0)
+      if (g_strcmp0 (argv[1], "echo") == 0)
         {
           g_print ("cmdline");
           for (i = 0; i < argc; i++)
             g_print (" %s", argv[i]);
           g_print ("\n");
         }
-      else if (xstrcmp0 (argv[1], "env") == 0)
+      else if (g_strcmp0 (argv[1], "env") == 0)
         {
-          const xchar_t * const *env;
+          const gchar * const *env;
 
-          env = xapplication_command_line_get_environ (cmdline);
+          env = g_application_command_line_get_environ (cmdline);
           g_print ("environment");
           for (i = 0; env[i]; i++)
-            if (xstr_has_prefix (env[i], "TEST="))
-              g_print (" %s", env[i]);
+            if (g_str_has_prefix (env[i], "TEST="))
+              g_print (" %s", env[i]);      
           g_print ("\n");
         }
-      else if (xstrcmp0 (argv[1], "getenv") == 0)
+      else if (g_strcmp0 (argv[1], "getenv") == 0)
         {
-          g_print ("getenv TEST=%s\n", xapplication_command_line_getenv (cmdline, "TEST"));
+          g_print ("getenv TEST=%s\n", g_application_command_line_getenv (cmdline, "TEST"));
         }
-      else if (xstrcmp0 (argv[1], "print") == 0)
+      else if (g_strcmp0 (argv[1], "print") == 0)
         {
-          xapplication_command_line_print (cmdline, "print %s\n", argv[2]);
+          g_application_command_line_print (cmdline, "print %s\n", argv[2]);
         }
-      else if (xstrcmp0 (argv[1], "printerr") == 0)
+      else if (g_strcmp0 (argv[1], "printerr") == 0)
         {
-          xapplication_command_line_printerr (cmdline, "printerr %s\n", argv[2]);
+          g_application_command_line_printerr (cmdline, "printerr %s\n", argv[2]);
         }
-      else if (xstrcmp0 (argv[1], "file") == 0)
+      else if (g_strcmp0 (argv[1], "file") == 0)
         {
-          xfile_t *file;
+          GFile *file;
 
-          file = xapplication_command_line_create_file_for_arg (cmdline, argv[2]);
-          g_print ("file %s\n", xfile_get_path (file));
-          xobject_unref (file);
+          file = g_application_command_line_create_file_for_arg (cmdline, argv[2]);         
+          g_print ("file %s\n", g_file_get_path (file));
+          g_object_unref (file);
         }
-      else if (xstrcmp0 (argv[1], "properties") == 0)
+      else if (g_strcmp0 (argv[1], "properties") == 0)
         {
-          xboolean_t remote;
-          xvariant_t *data;
+          gboolean remote;
+          GVariant *data;
 
-          xobject_get (cmdline,
+          g_object_get (cmdline,
                         "is-remote", &remote,
                         NULL);
 
-          data = xapplication_command_line_get_platform_data (cmdline);
-          xassert (remote);
-          xassert (xvariant_is_of_type (data, G_VARIANT_TYPE ("a{sv}")));
-          xvariant_unref (data);
+          data = g_application_command_line_get_platform_data (cmdline);
+          g_assert (remote);
+          g_assert (g_variant_is_of_type (data, G_VARIANT_TYPE ("a{sv}")));
+          g_variant_unref (data);
           g_print ("properties ok\n");
         }
-      else if (xstrcmp0 (argv[1], "cwd") == 0)
+      else if (g_strcmp0 (argv[1], "cwd") == 0)
         {
-          g_print ("cwd %s\n", xapplication_command_line_get_cwd (cmdline));
+          g_print ("cwd %s\n", g_application_command_line_get_cwd (cmdline));
         }
-      else if (xstrcmp0 (argv[1], "busy") == 0)
+      else if (g_strcmp0 (argv[1], "busy") == 0)
         {
-          xapplication_mark_busy (xapplication_get_default ());
+          g_application_mark_busy (g_application_get_default ());
           g_print ("busy\n");
         }
-      else if (xstrcmp0 (argv[1], "idle") == 0)
+      else if (g_strcmp0 (argv[1], "idle") == 0)
         {
-          xapplication_unmark_busy (xapplication_get_default ());
+          g_application_unmark_busy (g_application_get_default ());
           g_print ("idle\n");
         }
-      else if (xstrcmp0 (argv[1], "stdin") == 0)
+      else if (g_strcmp0 (argv[1], "stdin") == 0)
         {
-          xinput_stream_t *stream;
+          GInputStream *stream;
 
-          stream = xapplication_command_line_get_stdin (cmdline);
+          stream = g_application_command_line_get_stdin (cmdline);
 
-          xassert (stream == NULL || X_IS_INPUT_STREAM (stream));
-          xobject_unref (stream);
+          g_assert (stream == NULL || G_IS_INPUT_STREAM (stream));
+          g_object_unref (stream);
 
           g_print ("stdin ok\n");
         }
@@ -190,83 +190,83 @@ command_line (xapplication_t            *application,
         g_print ("unexpected command: %s\n", argv[1]);
     }
   else
-    g_print ("got ./cmd %d\n", xapplication_command_line_get_is_remote (cmdline));
+    g_print ("got ./cmd %d\n", g_application_command_line_get_is_remote (cmdline));
 
-  xstrfreev (argv);
-  xapplication_release (application);
+  g_strfreev (argv);
+  g_application_release (application);
 
   return 0;
 }
 
-static xboolean_t
-action_cb (xpointer_t data)
+static gboolean
+action_cb (gpointer data)
 {
-  xchar_t **argv = data;
-  xapplication_t *app;
-  xchar_t **actions;
-  xint_t i;
+  gchar **argv = data;
+  GApplication *app;
+  gchar **actions;
+  gint i;
 
-  if (xstrcmp0 (argv[1], "./actions") == 0)
+  if (g_strcmp0 (argv[1], "./actions") == 0)
     {
-      app = xapplication_get_default ();
+      app = g_application_get_default ();
 
-      if (xstrcmp0 (argv[2], "list") == 0)
+      if (g_strcmp0 (argv[2], "list") == 0)
         {
           g_print ("actions");
-          actions = xaction_group_list_actions (XACTION_GROUP (app));
+          actions = g_action_group_list_actions (G_ACTION_GROUP (app));
           for (i = 0; actions[i]; i++)
             g_print (" %s", actions[i]);
           g_print ("\n");
-          xstrfreev (actions);
+          g_strfreev (actions);
         }
-      else if (xstrcmp0 (argv[2], "activate") == 0)
+      else if (g_strcmp0 (argv[2], "activate") == 0)
         {
-          xaction_group_activate_action (XACTION_GROUP (app),
+          g_action_group_activate_action (G_ACTION_GROUP (app),
                                           "action1", NULL);
         }
-      else if (xstrcmp0 (argv[2], "set-state") == 0)
+      else if (g_strcmp0 (argv[2], "set-state") == 0)
         {
-          xaction_group_change_action_state (XACTION_GROUP (app),
+          g_action_group_change_action_state (G_ACTION_GROUP (app),
                                               "action2",
-                                              xvariant_new_boolean (TRUE));
+                                              g_variant_new_boolean (TRUE));
         }
-      xapplication_release (app);
+      g_application_release (app);
     }
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 int
 main (int argc, char **argv)
 {
-  xapplication_t *app;
+  GApplication *app;
   int status;
 
-  app = xapplication_new ("org.gtk.test_application_t",
+  app = g_application_new ("org.gtk.TestApplication",
                            G_APPLICATION_SEND_ENVIRONMENT |
-                           (xstrcmp0 (argv[1], "./cmd") == 0
+                           (g_strcmp0 (argv[1], "./cmd") == 0
                              ? G_APPLICATION_HANDLES_COMMAND_LINE
                              : G_APPLICATION_HANDLES_OPEN));
-  xsignal_connect (app, "startup", G_CALLBACK (startup), NULL);
-  xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
-  xsignal_connect (app, "open", G_CALLBACK (open), NULL);
-  xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
+  g_signal_connect (app, "startup", G_CALLBACK (startup), NULL);
+  g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+  g_signal_connect (app, "open", G_CALLBACK (open), NULL);
+  g_signal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 #ifdef STANDALONE
-  xapplication_set_inactivity_timeout (app, 10000);
+  g_application_set_inactivity_timeout (app, 10000);
 #else
-  xapplication_set_inactivity_timeout (app, 1000);
+  g_application_set_inactivity_timeout (app, 1000);
 #endif
 
-  if (xstrcmp0 (argv[1], "./actions") == 0)
+  if (g_strcmp0 (argv[1], "./actions") == 0)
     {
-      xapplication_set_inactivity_timeout (app, 0);
-      xapplication_hold (app);
+      g_application_set_inactivity_timeout (app, 0);
+      g_application_hold (app);
       g_idle_add (action_cb, argv);
     }
 
-  status = xapplication_run (app, argc - 1, argv + 1);
+  status = g_application_run (app, argc - 1, argv + 1);
 
-  xobject_unref (app);
+  g_object_unref (app);
 
   g_print ("exit status: %d\n", status);
 

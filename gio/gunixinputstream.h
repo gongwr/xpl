@@ -25,27 +25,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_UNIX_INPUT_STREAM         (g_unix_input_stream_get_type ())
-#define G_UNIX_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_INPUT_STREAM, GUnixInputStream))
-#define G_UNIX_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_INPUT_STREAM, GUnixInputStreamClass))
-#define X_IS_UNIX_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_INPUT_STREAM))
-#define X_IS_UNIX_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_INPUT_STREAM))
-#define G_UNIX_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_UNIX_INPUT_STREAM, GUnixInputStreamClass))
+#define G_TYPE_UNIX_INPUT_STREAM         (g_unix_input_stream_get_type ())
+#define G_UNIX_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_UNIX_INPUT_STREAM, GUnixInputStream))
+#define G_UNIX_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_UNIX_INPUT_STREAM, GUnixInputStreamClass))
+#define G_IS_UNIX_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_UNIX_INPUT_STREAM))
+#define G_IS_UNIX_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_UNIX_INPUT_STREAM))
+#define G_UNIX_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_UNIX_INPUT_STREAM, GUnixInputStreamClass))
 
 /**
  * GUnixInputStream:
  *
- * Implements #xinput_stream_t for reading from selectable unix file descriptors
+ * Implements #GInputStream for reading from selectable unix file descriptors
  **/
 typedef struct _GUnixInputStream         GUnixInputStream;
 typedef struct _GUnixInputStreamClass    GUnixInputStreamClass;
 typedef struct _GUnixInputStreamPrivate  GUnixInputStreamPrivate;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixInputStream, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixInputStream, g_object_unref)
 
 struct _GUnixInputStream
 {
-  xinput_stream_t parent_instance;
+  GInputStream parent_instance;
 
   /*< private >*/
   GUnixInputStreamPrivate *priv;
@@ -53,7 +53,7 @@ struct _GUnixInputStream
 
 struct _GUnixInputStreamClass
 {
-  xinput_stream_class_t parent_class;
+  GInputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -64,19 +64,19 @@ struct _GUnixInputStreamClass
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t          g_unix_input_stream_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType          g_unix_input_stream_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xinput_stream_t * g_unix_input_stream_new          (xint_t              fd,
-                                                 xboolean_t          close_fd);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
+GInputStream * g_unix_input_stream_new          (gint              fd,
+                                                 gboolean          close_fd);
+GLIB_AVAILABLE_IN_ALL
 void           g_unix_input_stream_set_close_fd (GUnixInputStream *stream,
-                                                 xboolean_t          close_fd);
-XPL_AVAILABLE_IN_ALL
-xboolean_t       g_unix_input_stream_get_close_fd (GUnixInputStream *stream);
-XPL_AVAILABLE_IN_ALL
-xint_t           g_unix_input_stream_get_fd       (GUnixInputStream *stream);
+                                                 gboolean          close_fd);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_unix_input_stream_get_close_fd (GUnixInputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+gint           g_unix_input_stream_get_fd       (GUnixInputStream *stream);
 
 G_END_DECLS
 

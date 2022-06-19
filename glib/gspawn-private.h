@@ -24,8 +24,8 @@
 
 #include "gspawn.h"
 
-static inline xint_t
-_g_spawn_exec_err_to_xerror (xint_t en)
+static inline gint
+_g_spawn_exec_err_to_g_error (gint en)
 {
   switch (en)
     {

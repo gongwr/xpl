@@ -2,10 +2,10 @@
 
 <refentry id='gvariant-format-strings'>
  <refmeta>
-  <refentrytitle>xvariant_t Format Strings</refentrytitle>
+  <refentrytitle>GVariant Format Strings</refentrytitle>
  </refmeta>
  <refnamediv>
-  <refname>xvariant_t Format Strings</refname>
+  <refname>GVariant Format Strings</refname>
   <refpurpose>varargs conversion of GVariants</refpurpose>
  </refnamediv>
 
@@ -14,17 +14,17 @@
 
   <para>
    This page attempts to document how to perform variable argument
-   conversions with xvariant_t.
+   conversions with GVariant.
   </para>
   <para>
    Conversions occur according to format strings.  A format string is a two-way mapping between a single
-   <link linkend='xvariant_t'>xvariant_t</link> value and one or more C values.
+   <link linkend='GVariant'>GVariant</link> value and one or more C values.
   </para>
   <para>
-   A conversion from C values into a <link linkend='xvariant_t'>xvariant_t</link> value is made using the
-   <link linkend='g-variant-new'><function>xvariant_new()</function></link> function.  A conversion from a
-   <link linkend='xvariant_t'>xvariant_t</link> into C values is made using the
-   <link linkend='g-variant-get'><function>xvariant_get()</function></link> function.
+   A conversion from C values into a <link linkend='GVariant'>GVariant</link> value is made using the
+   <link linkend='g-variant-new'><function>g_variant_new()</function></link> function.  A conversion from a
+   <link linkend='GVariant'>GVariant</link> into C values is made using the
+   <link linkend='g-variant-get'><function>g_variant_get()</function></link> function.
   </para>
  </refsect1>
 
@@ -32,7 +32,7 @@
   <title>Syntax</title>
 
   <para>
-   This section exhaustively describes all possibilities for xvariant_t format strings.  There are no valid forms of
+   This section exhaustively describes all possibilities for GVariant format strings.  There are no valid forms of
    format strings other than those described here.  Please note that the format string syntax is likely to expand in the
    future.
   </para>
@@ -77,7 +77,7 @@
   <title>Symbols</title>
 
    <para>
-    The following table describes the rough meaning of symbols that may appear inside a xvariant_t format string.  Each
+    The following table describes the rough meaning of symbols that may appear inside a GVariant format string.  Each
     symbol is described in detail in its own section, including usage examples.
   </para>
 
@@ -221,17 +221,17 @@
       </entry>
       <entry colsep='1' rowsep='1'>
        <para>
-        Used as a prefix for a xvariant_t type string (not a prefix for a format string, so <literal>@as</literal> is
+        Used as a prefix for a GVariant type string (not a prefix for a format string, so <literal>@as</literal> is
         a valid format string but <literal>@^as</literal> is not).  Denotes that a pointer to a
-        <link linkend='xvariant_t'>xvariant_t</link> should be used in place of the normal C type or types.  For
-        <link linkend='g-variant-new'><function>xvariant_new()</function></link> this means that you must pass a
-        non-<link linkend='NULL:CAPS'><literal>NULL</literal></link> <code>(<link linkend='xvariant_t'>xvariant_t</link>
+        <link linkend='GVariant'>GVariant</link> should be used in place of the normal C type or types.  For
+        <link linkend='g-variant-new'><function>g_variant_new()</function></link> this means that you must pass a
+        non-<link linkend='NULL:CAPS'><literal>NULL</literal></link> <code>(<link linkend='GVariant'>GVariant</link>
         *)</code>; if it is a floating reference, ownership will be taken, as
-        if by using <link linkend="g-variant-ref-sink"><function>xvariant_ref_sink()</function></link>.
-        For <link linkend='g-variant-get'><function>xvariant_get()</function></link> this means that you
-        must pass a pointer to a <code>(<link linkend='xvariant_t'>xvariant_t</link> *)</code> for the value to be returned
+        if by using <link linkend="g-variant-ref-sink"><function>g_variant_ref_sink()</function></link>.
+        For <link linkend='g-variant-get'><function>g_variant_get()</function></link> this means that you
+        must pass a pointer to a <code>(<link linkend='GVariant'>GVariant</link> *)</code> for the value to be returned
         by reference or <link linkend='NULL:CAPS'><literal>NULL</literal></link> to ignore the value.  See
-        <link linkend='gvariant-format-strings-gvariant'><code>xvariant_t *</code></link> below.
+        <link linkend='gvariant-format-strings-gvariant'><code>GVariant *</code></link> below.
        </para>
       </entry>
      </row>
@@ -247,8 +247,8 @@
       <entry colsep='1' rowsep='1'>
        <para>
         Exactly equivalent to <literal>@*</literal>, <literal>@?</literal> and <literal>@r</literal>.  Provided only for
-        completeness so that all xvariant_t type strings can be used also as format strings.  See <link
-        linkend='gvariant-format-strings-gvariant'><code>xvariant_t *</code></link> below.
+        completeness so that all GVariant type strings can be used also as format strings.  See <link
+        linkend='gvariant-format-strings-gvariant'><code>GVariant *</code></link> below.
        </para>
       </entry>
      </row>
@@ -261,7 +261,7 @@
       </entry>
       <entry colsep='1' rowsep='1'>
        <para>
-        Used as a prefix for a xvariant_t type string (not a prefix for a format string, so <literal>&amp;s</literal> is
+        Used as a prefix for a GVariant type string (not a prefix for a format string, so <literal>&amp;s</literal> is
         a valid format string but <literal>&amp;@s</literal> is not).
         Denotes that a C pointer to serialized data
         should be used in place of the normal C type.  See
@@ -300,8 +300,8 @@
 
    <para>
     Variable argument conversions from numeric types work in the most obvious way possible.  Upon encountering one of
-    these characters, <link linkend='g-variant-new'><function>xvariant_new()</function></link> takes the equivalent C
-    type as an argument.  <link linkend='g-variant-get'><function>xvariant_get()</function></link> takes a pointer to
+    these characters, <link linkend='g-variant-new'><function>g_variant_new()</function></link> takes the equivalent C
+    type as an argument.  <link linkend='g-variant-get'><function>g_variant_get()</function></link> takes a pointer to
     the equivalent C type (or <link linkend='NULL:CAPS'><literal>NULL</literal></link> to ignore the value).
    </para>
 
@@ -335,7 +335,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='xboolean_t'><type>xboolean_t</type></link>
+         <link linkend='gboolean'><type>gboolean</type></link>
         </para>
        </entry>
       </row>
@@ -349,7 +349,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='xuchar_t'><type>xuchar_t</type></link>
+         <link linkend='guchar'><type>guchar</type></link>
         </para>
        </entry>
       </row>
@@ -377,7 +377,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='xuint16_t'><type>xuint16_t</type></link>
+         <link linkend='guint16'><type>guint16</type></link>
         </para>
        </entry>
       </row>
@@ -405,7 +405,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='xuint32_t'><type>xuint32_t</type></link>
+         <link linkend='guint32'><type>guint32</type></link>
         </para>
        </entry>
       </row>
@@ -419,7 +419,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='sint64_t'><type>sint64_t</type></link>
+         <link linkend='gint64'><type>gint64</type></link>
         </para>
        </entry>
       </row>
@@ -433,7 +433,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='xuint64_t'><type>xuint64_t</type></link>
+         <link linkend='guint64'><type>guint64</type></link>
         </para>
        </entry>
       </row>
@@ -461,7 +461,7 @@
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         <link linkend='xdouble_t'><type>xdouble_t</type></link>
+         <link linkend='gdouble'><type>gdouble</type></link>
         </para>
        </entry>
       </row>
@@ -472,10 +472,10 @@
    <anchor id='gvariant-varargs'/>
    <para>
     Note that in C, small integer types in variable argument lists are promoted up to <link
-    linkend='xint_t'><type>int</type></link> or <link linkend='xuint_t'><type>unsigned int</type></link> as appropriate, and
-    read back accordingly.  <link linkend='xint_t'><type>int</type></link> is 32 bits on every platform on which GLib is
-    currently supported.  This means that you can use C expressions of type <link linkend='xint_t'><type>int</type></link>
-    with <link linkend='g-variant-new'><function>xvariant_new()</function></link> and format characters
+    linkend='gint'><type>int</type></link> or <link linkend='guint'><type>unsigned int</type></link> as appropriate, and
+    read back accordingly.  <link linkend='gint'><type>int</type></link> is 32 bits on every platform on which GLib is
+    currently supported.  This means that you can use C expressions of type <link linkend='gint'><type>int</type></link>
+    with <link linkend='g-variant-new'><function>g_variant_new()</function></link> and format characters
     '<literal>b</literal>', '<literal>y</literal>', '<literal>n</literal>', '<literal>q</literal>',
     '<literal>i</literal>', '<literal>u</literal>' and '<literal>h</literal>'.  Specifically, you can use integer
     literals with these characters.
@@ -489,30 +489,30 @@
    </para>
 
    <para>
-    No type promotion occurs when using <link linkend='g-variant-get'><function>xvariant_get()</function></link> since
+    No type promotion occurs when using <link linkend='g-variant-get'><function>g_variant_get()</function></link> since
     it operates with pointers.  The pointers must always point to a memory region of exactly the correct size.
    </para>
 
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *value1, *value2, *value3, *value4;
+<![CDATA[GVariant *value1, *value2, *value3, *value4;
 
-value1 = xvariant_new ("y", 200);
-value2 = xvariant_new ("b", TRUE);
-value3 = xvariant_new ("d", 37.5):
-value4 = xvariant_new ("x", G_GINT64_CONSTANT (998877665544332211));
+value1 = g_variant_new ("y", 200);
+value2 = g_variant_new ("b", TRUE);
+value3 = g_variant_new ("d", 37.5):
+value4 = g_variant_new ("x", G_GINT64_CONSTANT (998877665544332211));
 
 {
-  xdouble_t floating;
-  xboolean_t truth;
-  sint64_t bignum;
+  gdouble floating;
+  gboolean truth;
+  gint64 bignum;
 
 
-  xvariant_get (value1, "y", NULL);      /* ignore the value. */
-  xvariant_get (value2, "b", &truth);
-  xvariant_get (value3, "d", &floating);
-  xvariant_get (value4, "x", &bignum);
+  g_variant_get (value1, "y", NULL);      /* ignore the value. */
+  g_variant_get (value2, "b", &truth);
+  g_variant_get (value3, "d", &floating);
+  g_variant_get (value4, "x", &bignum);
 }]]></programlisting></informalexample>
    </refsect3>
   </refsect2>
@@ -528,8 +528,8 @@ value4 = xvariant_new ("x", G_GINT64_CONSTANT (998877665544332211));
    <para>
     String conversions occur to and from standard nul-terminated C strings.  Upon encountering an
     '<literal>s</literal>', '<literal>o</literal>' or '<literal>g</literal>' in a format string,
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> takes a <code>(const
-    <link linkend='xchar_t'>xchar_t</link> *)</code> and makes a copy of it.
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> takes a <code>(const
+    <link linkend='gchar'>gchar</link> *)</code> and makes a copy of it.
     <link linkend='NULL:CAPS'><literal>NULL</literal></link> is not a valid string; use
     <link linkend='gvariant-format-strings-maybe-types'>maybe types</link> to encode that.  If the '<literal>o</literal>' or
     '<literal>g</literal>' characters are used, care must be taken to ensure that the passed string is a valid D-Bus
@@ -537,8 +537,8 @@ value4 = xvariant_new ("x", G_GINT64_CONSTANT (998877665544332211));
    </para>
    <para>
     Upon encounting '<literal>s</literal>', '<literal>o</literal>' or '<literal>g</literal>', <link
-    linkend='g-variant-get'><function>xvariant_get()</function></link> takes a pointer to a
-    <code>(<link linkend='xchar_t'>xchar_t</link> *)</code> (ie: <code>(<link linkend='xchar_t'>xchar_t</link> **)</code>) and
+    linkend='g-variant-get'><function>g_variant_get()</function></link> takes a pointer to a
+    <code>(<link linkend='gchar'>gchar</link> *)</code> (ie: <code>(<link linkend='gchar'>gchar</link> **)</code>) and
     sets it to a newly-allocated copy of the string.  It is appropriate to free this copy using
     <link linkend='g-free'><function>g_free()</function></link>.
     <link linkend='NULL:CAPS'><literal>NULL</literal></link> may also be passed to indicate that the value of the
@@ -548,20 +548,20 @@ value4 = xvariant_new ("x", G_GINT64_CONSTANT (998877665544332211));
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *value1, *value2, *value3;
+<![CDATA[GVariant *value1, *value2, *value3;
 
-value1 = xvariant_new ("s", "hello world!");
-value2 = xvariant_new ("o", "/must/be/a/valid/path");
-value3 = xvariant_new ("g", "iias");
+value1 = g_variant_new ("s", "hello world!");
+value2 = g_variant_new ("o", "/must/be/a/valid/path");
+value3 = g_variant_new ("g", "iias");
 
 #if 0
-  xvariant_new ("s", NULL);      /* not valid: NULL is not a string. */
+  g_variant_new ("s", NULL);      /* not valid: NULL is not a string. */
 #endif
 
 {
-  xchar_t *result;
+  gchar *result;
 
-  xvariant_get (value1, "s", &result);
+  g_variant_get (value1, "s", &result);
   g_print ("It was '%s'\n", result);
   g_free (result);
 }]]></programlisting></informalexample>
@@ -578,17 +578,17 @@ value3 = xvariant_new ("g", "iias");
 
    <para>
     Upon encountering a '<literal>v</literal>',
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> takes a <code>(<link
-    linkend='xvariant_t'>xvariant_t</link> *)</code>.  The value of the
-    <link linkend='xvariant_t'><type>xvariant_t</type></link> is used as the contents of the variant value.
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> takes a <code>(<link
+    linkend='GVariant'>GVariant</link> *)</code>.  The value of the
+    <link linkend='GVariant'><type>GVariant</type></link> is used as the contents of the variant value.
    </para>
    <para>
     Upon encountering a '<literal>v</literal>', <link
-    linkend='g-variant-get'><function>xvariant_get()</function></link> takes a pointer to a
-    <code>(<link linkend='xvariant_t'>xvariant_t</link> *)</code> (ie: <code>(<link linkend='xvariant_t'>xvariant_t</link> **)
-    </code>).  It is set to a new reference to a <link linkend='xvariant_t'><type>xvariant_t</type></link> instance
+    linkend='g-variant-get'><function>g_variant_get()</function></link> takes a pointer to a
+    <code>(<link linkend='GVariant'>GVariant</link> *)</code> (ie: <code>(<link linkend='GVariant'>GVariant</link> **)
+    </code>).  It is set to a new reference to a <link linkend='GVariant'><type>GVariant</type></link> instance
     containing the contents of the variant value.  It is appropriate to free this reference using
-    <link linkend='g-variant-unref'><function>xvariant_unref()</function></link>.
+    <link linkend='g-variant-unref'><function>g_variant_unref()</function></link>.
     <link linkend='NULL:CAPS'><literal>NULL</literal></link> may also be passed to indicate that the value should be
     ignored (in which case no new reference is created).
    </para>
@@ -596,15 +596,15 @@ value3 = xvariant_new ("g", "iias");
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *x, *y;
+<![CDATA[GVariant *x, *y;
 
 /* the following two lines are equivalent: */
-x = xvariant_new ("v", y);
-x = xvariant_new_variant (y);
+x = g_variant_new ("v", y);
+x = g_variant_new_variant (y);
 
 /* as are these: */
-xvariant_get (x, "v", &y);
-y = xvariant_get_variant (x);]]></programlisting></informalexample>
+g_variant_get (x, "v", &y);
+y = g_variant_get_variant (x);]]></programlisting></informalexample>
    </refsect3>
   </refsect2>
 
@@ -619,22 +619,22 @@ y = xvariant_get_variant (x);]]></programlisting></informalexample>
 
    <para>
     Upon encountering an '<literal>a</literal>' character followed by a type string,
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> will take a
-    <code>(<link linkend='xvariant_builder_t'>xvariant_builder_t</link> *)</code> that has been created as an array builder
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> will take a
+    <code>(<link linkend='GVariantBuilder'>GVariantBuilder</link> *)</code> that has been created as an array builder
     for an array of the type given in the type string.  The builder will have
-    <link linkend='g-variant-builder-end'><function>xvariant_builder_end()</function></link> called on it and the
+    <link linkend='g-variant-builder-end'><function>g_variant_builder_end()</function></link> called on it and the
     result will be used as the value.  As a special exception, if the given type string is a definite type, then
     <link linkend='NULL:CAPS'><literal>NULL</literal></link> may be given to mean an empty array of that type.
    </para>
 
    <para>
     Upon encountering an '<literal>a</literal>' character followed by a type string,
-    <link linkend='g-variant-get'><function>xvariant_get()</function></link> will take a pointer to a
-    <code>(<link linkend='xvariant_iter_t'>xvariant_iter_t</link> *)</code> (ie:
-    <code>(<link linkend='xvariant_iter_t'>xvariant_iter_t</link> **)</code>).
+    <link linkend='g-variant-get'><function>g_variant_get()</function></link> will take a pointer to a
+    <code>(<link linkend='GVariantIter'>GVariantIter</link> *)</code> (ie:
+    <code>(<link linkend='GVariantIter'>GVariantIter</link> **)</code>).
     A new heap-allocated iterator is created and returned, initialised for iterating over the elements of the array.
     This iterator should be freed when you are done with it, using
-    <link linkend='g-variant-iter-free'><function>xvariant_iter_free()</function></link>.
+    <link linkend='g-variant-iter-free'><function>g_variant_iter_free()</function></link>.
     <link linkend='NULL:CAPS'><literal>NULL</literal></link> may also be given to indicate that the value of the array
     should be ignored.
    </para>
@@ -642,29 +642,29 @@ y = xvariant_get_variant (x);]]></programlisting></informalexample>
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_builder_t *builder;
-xvariant_t *value;
+<![CDATA[GVariantBuilder *builder;
+GVariant *value;
 
-builder = xvariant_builder_new (G_VARIANT_TYPE ("as"));
-xvariant_builder_add (builder, "s", "when");
-xvariant_builder_add (builder, "s", "in");
-xvariant_builder_add (builder, "s", "the");
-xvariant_builder_add (builder, "s", "course");
-value = xvariant_new ("as", builder);
-xvariant_builder_unref (builder);
+builder = g_variant_builder_new (G_VARIANT_TYPE ("as"));
+g_variant_builder_add (builder, "s", "when");
+g_variant_builder_add (builder, "s", "in");
+g_variant_builder_add (builder, "s", "the");
+g_variant_builder_add (builder, "s", "course");
+value = g_variant_new ("as", builder);
+g_variant_builder_unref (builder);
 
 {
-  xvariant_iter_t *iter;
-  xchar_t *str;
+  GVariantIter *iter;
+  gchar *str;
 
-  xvariant_get (value, "as", &iter);
+  g_variant_get (value, "as", &iter);
   /* No need to free 'str' unless breaking out of the loop */
-  while (xvariant_iter_loop (iter, "s", &str))
+  while (g_variant_iter_loop (iter, "s", &str))
     g_print ("%s\n", str);
-  xvariant_iter_free (iter);
+  g_variant_iter_free (iter);
 }
 
-xvariant_unref (value);]]></programlisting></informalexample>
+g_variant_unref (value);]]></programlisting></informalexample>
    </refsect3>
   </refsect2>
 
@@ -686,9 +686,9 @@ xvariant_unref (value);]]></programlisting></informalexample>
     '<literal>o</literal>', '<literal>g</literal>', '<literal>v</literal>', '<literal>@</literal>',
     '<literal>*</literal>', '<literal>?</literal>', '<literal>r</literal>', '<literal>&amp;</literal>', or
     '<literal>^</literal>'.  In all of these cases, for non-maybe types,
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> takes a pointer to a
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> takes a pointer to a
     non-<link linkend='NULL:CAPS'><literal>NULL</literal></link> value and
-    <link linkend='g-variant-get'><function>xvariant_get()</function></link> returns (by reference) a
+    <link linkend='g-variant-get'><function>g_variant_get()</function></link> returns (by reference) a
     non-<link linkend='NULL:CAPS'><literal>NULL</literal></link> pointer.  When any of these format strings are
     prefixed with an '<literal>m</literal>', the type of arguments that are collected does not change in any way, but
     <link linkend='NULL:CAPS'><literal>NULL</literal></link> becomes a permissible value, to indicate the Nothing case.
@@ -700,26 +700,26 @@ xvariant_unref (value);]]></programlisting></informalexample>
    </para>
    <para>
     The second way is used with all other format strings.  For
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> an additional
-    <link linkend='xboolean_t'><type>xboolean_t</type></link> argument is collected and for
-    <link linkend='g-variant-get'><function>xvariant_get()</function></link> an additional
-    <code>(<link linkend='xboolean_t'>xboolean_t</link> *)</code>.  Following this argument, the arguments that are normally
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> an additional
+    <link linkend='gboolean'><type>gboolean</type></link> argument is collected and for
+    <link linkend='g-variant-get'><function>g_variant_get()</function></link> an additional
+    <code>(<link linkend='gboolean'>gboolean</link> *)</code>.  Following this argument, the arguments that are normally
     collected for the equivalent non-maybe type will be collected.
    </para>
    <para>
     If <link linkend='FALSE:CAPS'><literal>FALSE</literal></link> is given to
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> then the Nothing value is constructed and
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> then the Nothing value is constructed and
     the collected arguments are ignored.  Otherwise (if <link linkend='TRUE:CAPS'><literal>TRUE</literal></link> was
     given), the arguments are used in the normal way to create the Just value.
    </para>
    <para>
     If <link linkend='NULL:CAPS'><literal>NULL</literal></link> is given to
-    <link linkend='g-variant-get'><function>xvariant_get()</function></link> then the value is ignored.  If a
+    <link linkend='g-variant-get'><function>g_variant_get()</function></link> then the value is ignored.  If a
     non-<link linkend='NULL:CAPS'><literal>NULL</literal></link> pointer is given then it is used to return by reference
     whether the value was Just.  In the case that the value was Just, the
-    <link linkend='xboolean_t'><type>xboolean_t</type></link> will be set to
+    <link linkend='gboolean'><type>gboolean</type></link> will be set to
     <link linkend='TRUE:CAPS'><literal>TRUE</literal></link> and the value will be stored in the arguments in the usual
-    way.  In the case that the value was Nothing, the <link linkend='xboolean_t'><type>xboolean_t</type></link> will be set to
+    way.  In the case that the value was Nothing, the <link linkend='gboolean'><type>gboolean</type></link> will be set to
     <link linkend='FALSE:CAPS'><literal>FALSE</literal></link> and the arguments will be collected in the normal way
     but have their values set to binary zero.
    </para>
@@ -727,21 +727,21 @@ xvariant_unref (value);]]></programlisting></informalexample>
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *value1, *value2, *value3, *value4, *value5, *value6;
-value1 = xvariant_new ("ms", "Hello world");
-value2 = xvariant_new ("ms", NULL);
-value3 = xvariant_new ("(m(ii)s)", TRUE, 123, 456, "Done");
-value4 = xvariant_new ("(m(ii)s)", FALSE, -1, -1, "Done");          /* both '-1' are ignored. */
-value5 = xvariant_new ("(m@(ii)s)", NULL, "Done");
+<![CDATA[GVariant *value1, *value2, *value3, *value4, *value5, *value6;
+value1 = g_variant_new ("ms", "Hello world");
+value2 = g_variant_new ("ms", NULL);
+value3 = g_variant_new ("(m(ii)s)", TRUE, 123, 456, "Done");
+value4 = g_variant_new ("(m(ii)s)", FALSE, -1, -1, "Done");          /* both '-1' are ignored. */
+value5 = g_variant_new ("(m@(ii)s)", NULL, "Done");
 
 {
-  xvariant_t *contents;
-  const xchar_t *cstr;
-  xboolean_t just;
+  GVariant *contents;
+  const gchar *cstr;
+  gboolean just;
   gint32 x, y;
-  xchar_t *str;
+  gchar *str;
 
-  xvariant_get (value1, "ms", &str);
+  g_variant_get (value1, "ms", &str);
   if (str != NULL)
     g_print ("str: %s\n", str);
   else
@@ -749,7 +749,7 @@ value5 = xvariant_new ("(m@(ii)s)", NULL, "Done");
   g_free (str);
 
 
-  xvariant_get (value2, "m&s", &cstr);
+  g_variant_get (value2, "m&s", &cstr);
   if (cstr != NULL)
     g_print ("str: %s\n", cstr);
   else
@@ -757,13 +757,13 @@ value5 = xvariant_new ("(m@(ii)s)", NULL, "Done");
   /* don't free 'cstr' */
 
 
-  /* NULL passed for the xboolean_t *, but two 'gint32 *' still collected */
-  xvariant_get (value3, "(m(ii)s)", NULL, NULL, NULL, &str);
+  /* NULL passed for the gboolean *, but two 'gint32 *' still collected */
+  g_variant_get (value3, "(m(ii)s)", NULL, NULL, NULL, &str);
   g_print ("string is %s\n", str);
   g_free (str);
 
   /* note: &s used, so g_free() not needed */
-  xvariant_get (value4, "(m(ii)&s)", &just, &x, &y, &cstr);
+  g_variant_get (value4, "(m(ii)&s)", &just, &x, &y, &cstr);
   if (just)
     g_print ("it was (%d, %d)\n", x, y);
   else
@@ -772,12 +772,12 @@ value5 = xvariant_new ("(m@(ii)s)", NULL, "Done");
   /* don't free 'cstr' */
 
 
-  xvariant_get (value5, "(m*s)", &contents, NULL); /* ignore the string. */
+  g_variant_get (value5, "(m*s)", &contents, NULL); /* ignore the string. */
   if (contents != NULL)
     {
-      xvariant_get (contents, "(ii)", &x, &y);
+      g_variant_get (contents, "(ii)", &x, &y);
       g_print ("it was (%d, %d)\n", x, y);
-      xvariant_unref (contents);
+      g_variant_unref (contents);
     }
   else
     g_print ("it was null\n");
@@ -800,26 +800,26 @@ value5 = xvariant_new ("(m@(ii)s)", NULL, "Done");
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *value1, *value2;
+<![CDATA[GVariant *value1, *value2;
 
-value1 = xvariant_new ("(s(ii))", "Hello", 55, 77);
-value2 = xvariant_new ("()");
+value1 = g_variant_new ("(s(ii))", "Hello", 55, 77);
+value2 = g_variant_new ("()");
 
 {
-  xchar_t *string;
-  xint_t x, y;
+  gchar *string;
+  gint x, y;
 
-  xvariant_get (value1, "(s(ii))", &string, &x, &y);
+  g_variant_get (value1, "(s(ii))", &string, &x, &y);
   g_print ("%s, %d, %d\n", string, x, y);
   g_free (string);
 
-  xvariant_get (value2, "()");   /* do nothing... */
+  g_variant_get (value2, "()");   /* do nothing... */
 }]]></programlisting></informalexample>
    </refsect3>
   </refsect2>
 
   <refsect2 id='gvariant-format-strings-gvariant'>
-   <title>xvariant_t *</title>
+   <title>GVariant *</title>
    <para>
     <emphasis role='strong'>
      Characters: <literal>@</literal>, <literal>*</literal>, <literal>?</literal>, <literal>r</literal>
@@ -828,22 +828,22 @@ value2 = xvariant_new ("()");
    </para>
    <para>
     Upon encountering a '<literal>@</literal>' in front of a type string,
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> takes a
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> takes a
     non-<link linkend='NULL:CAPS'><literal>NULL</literal></link> pointer to a
-    <link linkend='xvariant_t'><type>xvariant_t</type></link> and uses its value directly instead of collecting arguments to
-    create the value.  The provided <link linkend='xvariant_t'><type>xvariant_t</type></link> must have a type that matches the
+    <link linkend='GVariant'><type>GVariant</type></link> and uses its value directly instead of collecting arguments to
+    create the value.  The provided <link linkend='GVariant'><type>GVariant</type></link> must have a type that matches the
     type string following the '<literal>@</literal>'.  '<literal>*</literal>' is
-    the same as '<literal>@*</literal>' (ie: take a <link linkend='xvariant_t'><type>xvariant_t</type></link> of any type).
+    the same as '<literal>@*</literal>' (ie: take a <link linkend='GVariant'><type>GVariant</type></link> of any type).
     '<literal>?</literal>' is the same as '<literal>@?</literal>' (ie: take a
-    <link linkend='xvariant_t'><type>xvariant_t</type></link> of any basic type).  '<literal>r</literal>' is the same as
-    '<literal>@r</literal>' (ie: take a <link linkend='xvariant_t'><type>xvariant_t</type></link> of any tuple type).
+    <link linkend='GVariant'><type>GVariant</type></link> of any basic type).  '<literal>r</literal>' is the same as
+    '<literal>@r</literal>' (ie: take a <link linkend='GVariant'><type>GVariant</type></link> of any tuple type).
    </para>
    <para>
     Upon encountering a '<literal>@</literal>' in front of a type string,
-    <link linkend='g-variant-get'><function>xvariant_get()</function></link>
-    takes a pointer to a <code>(<link linkend='xvariant_t'>xvariant_t</link> *)</code> (ie: a
-    <code>(<link linkend='xvariant_t'>xvariant_t</link> **)</code>) and sets it to a new reference to a
-    <link linkend='xvariant_t'><type>xvariant_t</type></link> containing the value (instead of deconstructing the value into
+    <link linkend='g-variant-get'><function>g_variant_get()</function></link>
+    takes a pointer to a <code>(<link linkend='GVariant'>GVariant</link> *)</code> (ie: a
+    <code>(<link linkend='GVariant'>GVariant</link> **)</code>) and sets it to a new reference to a
+    <link linkend='GVariant'><type>GVariant</type></link> containing the value (instead of deconstructing the value into
     C types in the usual way).  <link linkend='NULL:CAPS'><literal>NULL</literal></link> can be given to ignore the
     value.  '<literal>*</literal>', '<literal>?</literal>' and '<literal>r</literal>' are handled in a way analogous to
     what is stated above.
@@ -857,32 +857,32 @@ value2 = xvariant_new ("()");
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *value1, *value2;
+<![CDATA[GVariant *value1, *value2;
 
-value1 = xvariant_new ("(i@ii)", 44, xvariant_new_int32 (55), 66);
+value1 = g_variant_new ("(i@ii)", 44, g_variant_new_int32 (55), 66);
 
 /* note: consumes floating reference count on 'value1' */
-value2 = xvariant_new ("(@(iii)*)", value1, xvariant_new_string ("foo"));
+value2 = g_variant_new ("(@(iii)*)", value1, g_variant_new_string ("foo"));
 
 {
-  const xchar_t *string;
-  xvariant_t *tmp;
-  xsize_t length;
-  xint_t x, y, z;
+  const gchar *string;
+  GVariant *tmp;
+  gsize length;
+  gint x, y, z;
 
-  xvariant_get (value2, "((iii)*)", &x, &y, &z, &tmp);
-  string = xvariant_get_string (tmp, &length);
+  g_variant_get (value2, "((iii)*)", &x, &y, &z, &tmp);
+  string = g_variant_get_string (tmp, &length);
   g_print ("it is %d %d %d %s (length=%d)\n", x, y, z, string, (int) length);
-  xvariant_unref (tmp);
+  g_variant_unref (tmp);
 
   /* quick way to skip all the values in a tuple */
-  xvariant_get (value2, "(rs)", NULL, &string); /* or "(@(iii)s)" */
+  g_variant_get (value2, "(rs)", NULL, &string); /* or "(@(iii)s)" */
   g_print ("i only got the string: %s\n", string);
   g_free (string);
 }
 
 /* no need to free 'value1' as 'value2' has consumed its floating reference */
-xvariant_unref (value2);]]></programlisting></informalexample>
+g_variant_unref (value2);]]></programlisting></informalexample>
    </refsect3>
   </refsect2>
 
@@ -901,13 +901,13 @@ xvariant_unref (value2);]]></programlisting></informalexample>
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_builder_t *b;
-xvariant_t *dict;
+<![CDATA[GVariantBuilder *b;
+GVariant *dict;
 
-b = xvariant_builder_new (G_VARIANT_TYPE ("a{sv}"));
-xvariant_builder_add (b, "{sv}", "name", xvariant_new_string ("foo"));
-xvariant_builder_add (b, "{sv}", "timeout", xvariant_new_int32 (10));
-dict = xvariant_builder_end (b);]]></programlisting></informalexample>
+b = g_variant_builder_new (G_VARIANT_TYPE ("a{sv}"));
+g_variant_builder_add (b, "{sv}", "name", g_variant_new_string ("foo"));
+g_variant_builder_add (b, "{sv}", "timeout", g_variant_new_int32 (10));
+dict = g_variant_builder_end (b);]]></programlisting></informalexample>
    </refsect3>
 
    <para>
@@ -917,27 +917,27 @@ dict = xvariant_builder_end (b);]]></programlisting></informalexample>
    <refsect3>
     <title>Examples</title>
     <informalexample><programlisting>
-<![CDATA[xvariant_t *data;
-xint_t value = 1;
-xint_t max = 3;
+<![CDATA[GVariant *data;
+gint value = 1;
+gint max = 3;
 
 /* type (oa{sa{sv}}) */
-data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})",
+data = g_variant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})",
                              "/object/path", value, max);
 {
-  xvariant_t *params;
-  xvariant_t *p_brightness;
-  xchar_t *obj
-  xint_t p_max;
+  GVariant *params;
+  GVariant *p_brightness;
+  gchar *obj
+  gint p_max;
 
-  xvariant_get (data, "(o@a{?*})", &obj, &params);
+  g_variant_get (data, "(o@a{?*})", &obj, &params);
   g_print ("object_path: %s\n", obj);
   g_free (obj);
 
-  p_brightness = xvariant_lookup_value (params, "brightness", G_VARIANT_TYPE_VARDICT);
-  xvariant_lookup (p_brightness, "max", "i", &p_max);
+  p_brightness = g_variant_lookup_value (params, "brightness", G_VARIANT_TYPE_VARDICT);
+  g_variant_lookup (p_brightness, "max", "i", &p_max);
   g_print ("max: %d\n", p_max);
-  xvariant_unref (params);
+  g_variant_unref (params);
 }]]></programlisting></informalexample>
    </refsect3>
 
@@ -958,8 +958,8 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
    <para>
     Currently, the only use for this character is when it is applied to a string (ie: '<literal>&amp;s</literal>',
     '<literal>&amp;o</literal>' or '<code>&amp;g</code>').  For
-    <link linkend='g-variant-new'><function>xvariant_new()</function></link> this has absolutely no effect.  The string
-    is collected and duplicated normally.  For <link linkend='g-variant-get'><function>xvariant_get()</function></link>
+    <link linkend='g-variant-new'><function>g_variant_new()</function></link> this has absolutely no effect.  The string
+    is collected and duplicated normally.  For <link linkend='g-variant-get'><function>g_variant_get()</function></link>
     it means that instead of creating a newly allocated copy of the string, a pointer to the serialized data is
     returned.  This pointer should not be freed.  Validity checks are performed to ensure that the string data will
     always be properly nul-terminated.
@@ -969,11 +969,11 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
     <title>Examples</title>
     <informalexample><programlisting>
 <![CDATA[{
-  const xchar_t *str;
-  xvariant_t *value;
+  const gchar *str;
+  GVariant *value;
 
-  value = xvariant_new ("&s", "hello world");
-  xvariant_get (value, "&s", &str);
+  value = g_variant_new ("&s", "hello world");
+  g_variant_get (value, "&s", &str);
   g_print ("string is: %s\n", str);
   /* no need to free str */
 }]]></programlisting></informalexample>
@@ -994,10 +994,10 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
    </para>
 
    <para>
-    In all forms, when used with <link linkend='g-variant-new'><function>xvariant_new()</function></link> one
+    In all forms, when used with <link linkend='g-variant-new'><function>g_variant_new()</function></link> one
     pointer value is collected from the variable arguments and passed to a function (as given in the table below).
     The result of that function is used as the value for this position.  When used with
-    <link linkend='g-variant-get'><function>xvariant_get()</function></link> one pointer value is produced by using
+    <link linkend='g-variant-get'><function>g_variant_get()</function></link> one pointer value is produced by using
     the function (given in the table) and returned by reference.
    </para>
 
@@ -1017,14 +1017,14 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        <entry colsep='1' rowsep='1'>
         <para>
           <emphasis role='strong'>
-            Used with <link linkend='g-variant-new'><function>xvariant_new()</function></link>
+            Used with <link linkend='g-variant-new'><function>g_variant_new()</function></link>
           </emphasis>
         </para>
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
           <emphasis role='strong'>
-            Used with <link linkend='g-variant-get'><function>xvariant_get()</function></link>
+            Used with <link linkend='g-variant-get'><function>g_variant_get()</function></link>
           </emphasis>
         </para>
        </entry>
@@ -1040,12 +1040,12 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1' morerows='1'>
         <para>
-         equivalent to <link linkend='g-variant-new-strv'><function>xvariant_new_strv()</function></link>
+         equivalent to <link linkend='g-variant-new-strv'><function>g_variant_new_strv()</function></link>
         </para>
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-dup-strv'><function>xvariant_dup_strv()</function></link>
+         equivalent to <link linkend='g-variant-dup-strv'><function>g_variant_dup_strv()</function></link>
         </para>
        </entry>
       </row>
@@ -1060,7 +1060,7 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-get-strv'><function>xvariant_get_strv()</function></link>
+         equivalent to <link linkend='g-variant-get-strv'><function>g_variant_get_strv()</function></link>
         </para>
        </entry>
       </row>
@@ -1075,12 +1075,12 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1' morerows='1'>
         <para>
-         equivalent to <link linkend='g-variant-new-objv'><function>xvariant_new_objv()</function></link>
+         equivalent to <link linkend='g-variant-new-objv'><function>g_variant_new_objv()</function></link>
         </para>
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-dup-objv'><function>xvariant_dup_objv()</function></link>
+         equivalent to <link linkend='g-variant-dup-objv'><function>g_variant_dup_objv()</function></link>
         </para>
        </entry>
       </row>
@@ -1095,7 +1095,7 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-get-objv'><function>xvariant_get_objv()</function></link>
+         equivalent to <link linkend='g-variant-get-objv'><function>g_variant_get_objv()</function></link>
         </para>
        </entry>
       </row>
@@ -1110,12 +1110,12 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1' morerows='1'>
         <para>
-         equivalent to <link linkend='g-variant-new-bytestring'><function>xvariant_new_bytestring()</function></link>
+         equivalent to <link linkend='g-variant-new-bytestring'><function>g_variant_new_bytestring()</function></link>
         </para>
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-dup-bytestring'><function>xvariant_dup_bytestring()</function></link>
+         equivalent to <link linkend='g-variant-dup-bytestring'><function>g_variant_dup_bytestring()</function></link>
         </para>
        </entry>
       </row>
@@ -1130,7 +1130,7 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-get-bytestring'><function>xvariant_get_bytestring()</function></link>
+         equivalent to <link linkend='g-variant-get-bytestring'><function>g_variant_get_bytestring()</function></link>
         </para>
        </entry>
       </row>
@@ -1145,12 +1145,12 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1' morerows='1'>
         <para>
-         equivalent to <link linkend='g-variant-new-bytestring-array'><function>xvariant_new_bytestring_array()</function></link>
+         equivalent to <link linkend='g-variant-new-bytestring-array'><function>g_variant_new_bytestring_array()</function></link>
         </para>
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-dup-bytestring-array'><function>xvariant_dup_bytestring_array()</function></link>
+         equivalent to <link linkend='g-variant-dup-bytestring-array'><function>g_variant_dup_bytestring_array()</function></link>
         </para>
        </entry>
       </row>
@@ -1165,7 +1165,7 @@ data = xvariant_new_parsed ("(%o, {'brightness': {'value': <%i>, 'max': <%i>}})"
        </entry>
        <entry colsep='1' rowsep='1'>
         <para>
-         equivalent to <link linkend='g-variant-get-bytestring-array'><function>xvariant_get_bytestring_array()</function></link>
+         equivalent to <link linkend='g-variant-get-bytestring-array'><function>g_variant_get_bytestring_array()</function></link>
         </para>
        </entry>
       </row>

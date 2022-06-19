@@ -2,23 +2,23 @@
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
 
-static xboolean_t
-strv_equal (xchar_t **strv, ...)
+static gboolean
+strv_equal (gchar **strv, ...)
 {
-  xsize_t count;
+  gsize count;
   va_list list;
-  const xchar_t *str;
-  xboolean_t res;
+  const gchar *str;
+  gboolean res;
 
   res = TRUE;
   count = 0;
   va_start (list, strv);
   while (1)
     {
-      str = va_arg (list, const xchar_t *);
+      str = va_arg (list, const gchar *);
       if (str == NULL)
         break;
-      if (xstrcmp0 (str, strv[count]) != 0)
+      if (g_strcmp0 (str, strv[count]) != 0)
         {
           res = FALSE;
           break;
@@ -28,12 +28,12 @@ strv_equal (xchar_t **strv, ...)
   va_end (list);
 
   if (res)
-    res = xstrv_length (strv) == count;
+    res = g_strv_length (strv) == count;
 
   return res;
 }
 
-const xchar_t *myapp_data =
+const gchar *myapp_data =
   "[Desktop Entry]\n"
   "Encoding=UTF-8\n"
   "Version=1.0\n"
@@ -41,7 +41,7 @@ const xchar_t *myapp_data =
   "Exec=true %f\n"
   "Name=my app\n";
 
-const xchar_t *myapp2_data =
+const gchar *myapp2_data =
   "[Desktop Entry]\n"
   "Encoding=UTF-8\n"
   "Version=1.0\n"
@@ -49,7 +49,7 @@ const xchar_t *myapp2_data =
   "Exec=sleep %f\n"
   "Name=my app 2\n";
 
-const xchar_t *myapp3_data =
+const gchar *myapp3_data =
   "[Desktop Entry]\n"
   "Encoding=UTF-8\n"
   "Version=1.0\n"
@@ -58,7 +58,7 @@ const xchar_t *myapp3_data =
   "Name=my app 3\n"
   "MimeType=image/png;";
 
-const xchar_t *myapp4_data =
+const gchar *myapp4_data =
   "[Desktop Entry]\n"
   "Encoding=UTF-8\n"
   "Version=1.0\n"
@@ -67,7 +67,7 @@ const xchar_t *myapp4_data =
   "Name=my app 4\n"
   "MimeType=image/bmp;";
 
-const xchar_t *myapp5_data =
+const gchar *myapp5_data =
   "[Desktop Entry]\n"
   "Encoding=UTF-8\n"
   "Version=1.0\n"
@@ -76,7 +76,7 @@ const xchar_t *myapp5_data =
   "Name=my app 5\n"
   "MimeType=image/bmp;x-scheme-handler/ftp;";
 
-const xchar_t *nosuchapp_data =
+const gchar *nosuchapp_data =
   "[Desktop Entry]\n"
   "Encoding=UTF-8\n"
   "Version=1.0\n"
@@ -84,20 +84,20 @@ const xchar_t *nosuchapp_data =
   "Exec=no_such_application %f\n"
   "Name=no such app\n";
 
-const xchar_t *defaults_data =
+const gchar *defaults_data =
   "[Default Applications]\n"
   "image/bmp=myapp4.desktop;\n"
   "image/png=myapp3.desktop;\n"
   "x-scheme-handler/ftp=myapp5.desktop;\n";
 
-const xchar_t *mimecache_data =
+const gchar *mimecache_data =
   "[MIME Cache]\n"
   "image/bmp=myapp4.desktop;myapp5.desktop;\n"
   "image/png=myapp3.desktop;\n";
 
 typedef struct
 {
-  xchar_t *mimeapps_list_home;  /* (owned) */
+  gchar *mimeapps_list_home;  /* (owned) */
 } Fixture;
 
 /* Set up XDG_DATA_HOME and XDG_DATA_DIRS.
@@ -107,16 +107,16 @@ typedef struct
  */
 static void
 setup (Fixture       *fixture,
-       xconstpointer  test_data)
+       gconstpointer  test_data)
 {
-  const xchar_t *xdgdatahome;
-  const xchar_t * const *xdgdatadirs;
-  xchar_t *appdir;
-  xchar_t *apphome;
-  xchar_t *mimeapps;
-  xchar_t *name;
-  xint_t res;
-  xerror_t *error = NULL;
+  const gchar *xdgdatahome;
+  const gchar * const *xdgdatadirs;
+  gchar *appdir;
+  gchar *apphome;
+  gchar *mimeapps;
+  gchar *name;
+  gint res;
+  GError *error = NULL;
 
   /* These are already set to a temporary directory through our use of
    * %G_TEST_OPTION_ISOLATE_DIRS below. */
@@ -130,7 +130,7 @@ setup (Fixture       *fixture,
 
   name = g_build_filename (appdir, "mimeapps.list", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, defaults_data, -1, &error);
+  g_file_set_contents (name, defaults_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
@@ -141,37 +141,37 @@ setup (Fixture       *fixture,
 
   name = g_build_filename (apphome, "myapp.desktop", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, myapp_data, -1, &error);
+  g_file_set_contents (name, myapp_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
   name = g_build_filename (apphome, "myapp2.desktop", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, myapp2_data, -1, &error);
+  g_file_set_contents (name, myapp2_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
   name = g_build_filename (apphome, "myapp3.desktop", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, myapp3_data, -1, &error);
+  g_file_set_contents (name, myapp3_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
   name = g_build_filename (apphome, "myapp4.desktop", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, myapp4_data, -1, &error);
+  g_file_set_contents (name, myapp4_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
   name = g_build_filename (apphome, "myapp5.desktop", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, myapp5_data, -1, &error);
+  g_file_set_contents (name, myapp5_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
   name = g_build_filename (apphome, "nosuchapp.desktop", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, nosuchapp_data, -1, &error);
+  g_file_set_contents (name, nosuchapp_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
@@ -181,7 +181,7 @@ setup (Fixture       *fixture,
 
   name = g_build_filename (apphome, "mimeinfo.cache", NULL);
   g_test_message ("creating '%s'", name);
-  xfile_set_contents (name, mimecache_data, -1, &error);
+  g_file_set_contents (name, mimecache_data, -1, &error);
   g_assert_no_error (error);
   g_free (name);
 
@@ -195,94 +195,94 @@ setup (Fixture       *fixture,
 
 static void
 teardown (Fixture       *fixture,
-          xconstpointer  test_data)
+          gconstpointer  test_data)
 {
   g_free (fixture->mimeapps_list_home);
 }
 
 static void
 test_mime_api (Fixture       *fixture,
-               xconstpointer  test_data)
+               gconstpointer  test_data)
 {
-  xapp_info_t *appinfo;
-  xapp_info_t *appinfo2;
-  xerror_t *error = NULL;
-  xapp_info_t *def;
-  xlist_t *list;
-  const xchar_t *contenttype = "application/pdf";
+  GAppInfo *appinfo;
+  GAppInfo *appinfo2;
+  GError *error = NULL;
+  GAppInfo *def;
+  GList *list;
+  const gchar *contenttype = "application/pdf";
 
   /* clear things out */
-  xapp_info_reset_type_associations (contenttype);
+  g_app_info_reset_type_associations (contenttype);
 
-  appinfo = (xapp_info_t*)xdesktop_app_info_new ("myapp.desktop");
-  appinfo2 = (xapp_info_t*)xdesktop_app_info_new ("myapp2.desktop");
+  appinfo = (GAppInfo*)g_desktop_app_info_new ("myapp.desktop");
+  appinfo2 = (GAppInfo*)g_desktop_app_info_new ("myapp2.desktop");
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
   g_assert_null (def);
   g_assert_null (list);
 
   /* 1. add a non-default association */
-  xapp_info_add_supports_type (appinfo, contenttype, &error);
+  g_app_info_add_supports_type (appinfo, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo));
-  g_assert_cmpint (xlist_length (list), ==, 1);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo));
+  g_assert_cmpint (g_list_length (list), ==, 1);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 2. add another non-default association */
-  xapp_info_add_supports_type (appinfo2, contenttype, &error);
+  g_app_info_add_supports_type (appinfo2, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo2));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo2));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 3. make the first app the default */
-  xapp_info_set_as_default_for_type (appinfo, contenttype, &error);
+  g_app_info_set_as_default_for_type (appinfo, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo2));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo2));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 4. make the second app the last used one */
-  xapp_info_set_as_last_used_for_type (appinfo2, contenttype, &error);
+  g_app_info_set_as_last_used_for_type (appinfo2, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo2));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo2));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 5. reset everything */
-  xapp_info_reset_type_associations (contenttype);
+  g_app_info_reset_type_associations (contenttype);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
   g_assert_null (def);
   g_assert_null (list);
 
-  xobject_unref (appinfo);
-  xobject_unref (appinfo2);
+  g_object_unref (appinfo);
+  g_object_unref (appinfo2);
 }
 
 /* Repeat the same tests, this time checking that we handle
@@ -292,337 +292,337 @@ test_mime_api (Fixture       *fixture,
  */
 static void
 test_mime_file (Fixture       *fixture,
-                xconstpointer  test_data)
+                gconstpointer  test_data)
 {
-  xchar_t **assoc;
-  xapp_info_t *appinfo;
-  xapp_info_t *appinfo2;
-  xerror_t *error = NULL;
-  xkey_file_t *keyfile;
-  xchar_t *str;
-  xboolean_t res;
-  xapp_info_t *def;
-  xlist_t *list;
-  const xchar_t *contenttype = "application/pdf";
+  gchar **assoc;
+  GAppInfo *appinfo;
+  GAppInfo *appinfo2;
+  GError *error = NULL;
+  GKeyFile *keyfile;
+  gchar *str;
+  gboolean res;
+  GAppInfo *def;
+  GList *list;
+  const gchar *contenttype = "application/pdf";
 
   /* clear things out */
-  xapp_info_reset_type_associations (contenttype);
+  g_app_info_reset_type_associations (contenttype);
 
-  appinfo = (xapp_info_t*)xdesktop_app_info_new ("myapp.desktop");
-  appinfo2 = (xapp_info_t*)xdesktop_app_info_new ("myapp2.desktop");
+  appinfo = (GAppInfo*)g_desktop_app_info_new ("myapp.desktop");
+  appinfo2 = (GAppInfo*)g_desktop_app_info_new ("myapp2.desktop");
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
   g_assert_null (def);
   g_assert_null (list);
 
   /* 1. add a non-default association */
-  xapp_info_add_supports_type (appinfo, contenttype, &error);
+  g_app_info_add_supports_type (appinfo, contenttype, &error);
   g_assert_no_error (error);
 
-  keyfile = xkey_file_new ();
-  xkey_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
+  keyfile = g_key_file_new ();
+  g_key_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
-  assoc = xkey_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
+  assoc = g_key_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (strv_equal (assoc, "myapp.desktop", NULL));
-  xstrfreev (assoc);
+  g_strfreev (assoc);
 
   /* we've unset XDG_DATA_DIRS so there should be no default */
-  assoc = xkey_file_get_string_list (keyfile, "Default Applications", contenttype, NULL, &error);
+  assoc = g_key_file_get_string_list (keyfile, "Default Applications", contenttype, NULL, &error);
   g_assert_nonnull (error);
   g_clear_error (&error);
 
-  xkey_file_free (keyfile);
+  g_key_file_free (keyfile);
 
   /* 2. add another non-default association */
-  xapp_info_add_supports_type (appinfo2, contenttype, &error);
+  g_app_info_add_supports_type (appinfo2, contenttype, &error);
   g_assert_no_error (error);
 
-  keyfile = xkey_file_new ();
-  xkey_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
+  keyfile = g_key_file_new ();
+  g_key_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
-  assoc = xkey_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
+  assoc = g_key_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (strv_equal (assoc, "myapp.desktop", "myapp2.desktop", NULL));
-  xstrfreev (assoc);
+  g_strfreev (assoc);
 
-  assoc = xkey_file_get_string_list (keyfile, "Default Applications", contenttype, NULL, &error);
+  assoc = g_key_file_get_string_list (keyfile, "Default Applications", contenttype, NULL, &error);
   g_assert_nonnull (error);
   g_clear_error (&error);
 
-  xkey_file_free (keyfile);
+  g_key_file_free (keyfile);
 
   /* 3. make the first app the default */
-  xapp_info_set_as_default_for_type (appinfo, contenttype, &error);
+  g_app_info_set_as_default_for_type (appinfo, contenttype, &error);
   g_assert_no_error (error);
 
-  keyfile = xkey_file_new ();
-  xkey_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
+  keyfile = g_key_file_new ();
+  g_key_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
-  assoc = xkey_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
+  assoc = g_key_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (strv_equal (assoc, "myapp.desktop", "myapp2.desktop", NULL));
-  xstrfreev (assoc);
+  g_strfreev (assoc);
 
-  str = xkey_file_get_string (keyfile, "Default Applications", contenttype, &error);
+  str = g_key_file_get_string (keyfile, "Default Applications", contenttype, &error);
   g_assert_no_error (error);
   g_assert_cmpstr (str, ==, "myapp.desktop");
   g_free (str);
 
-  xkey_file_free (keyfile);
+  g_key_file_free (keyfile);
 
   /* 4. make the second app the last used one */
-  xapp_info_set_as_last_used_for_type (appinfo2, contenttype, &error);
+  g_app_info_set_as_last_used_for_type (appinfo2, contenttype, &error);
   g_assert_no_error (error);
 
-  keyfile = xkey_file_new ();
-  xkey_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
+  keyfile = g_key_file_new ();
+  g_key_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
-  assoc = xkey_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
+  assoc = g_key_file_get_string_list (keyfile, "Added Associations", contenttype, NULL, &error);
   g_assert_no_error (error);
   g_assert_true (strv_equal (assoc, "myapp2.desktop", "myapp.desktop", NULL));
-  xstrfreev (assoc);
+  g_strfreev (assoc);
 
-  xkey_file_free (keyfile);
+  g_key_file_free (keyfile);
 
   /* 5. reset everything */
-  xapp_info_reset_type_associations (contenttype);
+  g_app_info_reset_type_associations (contenttype);
 
-  keyfile = xkey_file_new ();
-  xkey_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
+  keyfile = g_key_file_new ();
+  g_key_file_load_from_file (keyfile, fixture->mimeapps_list_home, G_KEY_FILE_NONE, &error);
   g_assert_no_error (error);
 
-  res = xkey_file_has_key (keyfile, "Added Associations", contenttype, NULL);
+  res = g_key_file_has_key (keyfile, "Added Associations", contenttype, NULL);
   g_assert_false (res);
 
-  res = xkey_file_has_key (keyfile, "Default Applications", contenttype, NULL);
+  res = g_key_file_has_key (keyfile, "Default Applications", contenttype, NULL);
   g_assert_false (res);
 
-  xkey_file_free (keyfile);
+  g_key_file_free (keyfile);
 
-  xobject_unref (appinfo);
-  xobject_unref (appinfo2);
+  g_object_unref (appinfo);
+  g_object_unref (appinfo2);
 }
 
 /* test interaction between mimeapps.list at different levels */
 static void
 test_mime_default (Fixture       *fixture,
-                   xconstpointer  test_data)
+                   gconstpointer  test_data)
 {
-  xapp_info_t *appinfo;
-  xapp_info_t *appinfo2;
-  xapp_info_t *appinfo3;
-  xerror_t *error = NULL;
-  xapp_info_t *def;
-  xlist_t *list;
-  const xchar_t *contenttype = "image/png";
+  GAppInfo *appinfo;
+  GAppInfo *appinfo2;
+  GAppInfo *appinfo3;
+  GError *error = NULL;
+  GAppInfo *def;
+  GList *list;
+  const gchar *contenttype = "image/png";
 
   /* clear things out */
-  xapp_info_reset_type_associations (contenttype);
+  g_app_info_reset_type_associations (contenttype);
 
-  appinfo = (xapp_info_t*)xdesktop_app_info_new ("myapp.desktop");
-  appinfo2 = (xapp_info_t*)xdesktop_app_info_new ("myapp2.desktop");
-  appinfo3 = (xapp_info_t*)xdesktop_app_info_new ("myapp3.desktop");
+  appinfo = (GAppInfo*)g_desktop_app_info_new ("myapp.desktop");
+  appinfo2 = (GAppInfo*)g_desktop_app_info_new ("myapp2.desktop");
+  appinfo3 = (GAppInfo*)g_desktop_app_info_new ("myapp3.desktop");
 
   /* myapp3 is set as the default in defaults.list */
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo3));
-  g_assert_cmpint (xlist_length (list), ==, 1);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo3));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo3));
+  g_assert_cmpint (g_list_length (list), ==, 1);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo3));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 1. add a non-default association */
-  xapp_info_add_supports_type (appinfo, contenttype, &error);
+  g_app_info_add_supports_type (appinfo, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo3)); /* default is unaffected */
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo3));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo3)); /* default is unaffected */
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo3));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 2. add another non-default association */
-  xapp_info_add_supports_type (appinfo2, contenttype, &error);
+  g_app_info_add_supports_type (appinfo2, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo3));
-  g_assert_cmpint (xlist_length (list), ==, 3);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo2));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->next->data, appinfo3));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo3));
+  g_assert_cmpint (g_list_length (list), ==, 3);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo2));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->next->data, appinfo3));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 3. make the first app the default */
-  xapp_info_set_as_default_for_type (appinfo, contenttype, &error);
+  g_app_info_set_as_default_for_type (appinfo, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo));
-  g_assert_cmpint (xlist_length (list), ==, 3);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo2));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->next->data, appinfo3));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo));
+  g_assert_cmpint (g_list_length (list), ==, 3);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo2));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->next->data, appinfo3));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
-  xobject_unref (appinfo);
-  xobject_unref (appinfo2);
-  xobject_unref (appinfo3);
+  g_object_unref (appinfo);
+  g_object_unref (appinfo2);
+  g_object_unref (appinfo3);
 }
 
 /* test interaction between mimeinfo.cache, defaults.list and mimeapps.list
- * to ensure xapp_info_set_as_last_used_for_type doesn't incorrectly
+ * to ensure g_app_info_set_as_last_used_for_type doesn't incorrectly
  * change the default
  */
 static void
 test_mime_default_last_used (Fixture       *fixture,
-                             xconstpointer  test_data)
+                             gconstpointer  test_data)
 {
-  xapp_info_t *appinfo4;
-  xapp_info_t *appinfo5;
-  xerror_t *error = NULL;
-  xapp_info_t *def;
-  xlist_t *list;
-  const xchar_t *contenttype = "image/bmp";
+  GAppInfo *appinfo4;
+  GAppInfo *appinfo5;
+  GError *error = NULL;
+  GAppInfo *def;
+  GList *list;
+  const gchar *contenttype = "image/bmp";
 
   /* clear things out */
-  xapp_info_reset_type_associations (contenttype);
+  g_app_info_reset_type_associations (contenttype);
 
-  appinfo4 = (xapp_info_t*)xdesktop_app_info_new ("myapp4.desktop");
-  appinfo5 = (xapp_info_t*)xdesktop_app_info_new ("myapp5.desktop");
+  appinfo4 = (GAppInfo*)g_desktop_app_info_new ("myapp4.desktop");
+  appinfo5 = (GAppInfo*)g_desktop_app_info_new ("myapp5.desktop");
 
   /* myapp4 is set as the default in defaults.list */
   /* myapp4 and myapp5 can both handle image/bmp */
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo4));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo4));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo5));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo4));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo4));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo5));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 1. set default (myapp4) as last used */
-  xapp_info_set_as_last_used_for_type (appinfo4, contenttype, &error);
+  g_app_info_set_as_last_used_for_type (appinfo4, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo4)); /* default is unaffected */
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo4));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo5));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo4)); /* default is unaffected */
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo4));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo5));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 2. set other (myapp5) as last used */
-  xapp_info_set_as_last_used_for_type (appinfo5, contenttype, &error);
+  g_app_info_set_as_last_used_for_type (appinfo5, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo4));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo5));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo4));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo4));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo5));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo4));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 3. change the default to myapp5 */
-  xapp_info_set_as_default_for_type (appinfo5, contenttype, &error);
+  g_app_info_set_as_default_for_type (appinfo5, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo5));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo5));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo4));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo5));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo5));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo4));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 4. set myapp4 as last used */
-  xapp_info_set_as_last_used_for_type (appinfo4, contenttype, &error);
+  g_app_info_set_as_last_used_for_type (appinfo4, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo5));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo4));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo5));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo5));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo4));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo5));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
   /* 5. set myapp5 as last used again */
-  xapp_info_set_as_last_used_for_type (appinfo5, contenttype, &error);
+  g_app_info_set_as_last_used_for_type (appinfo5, contenttype, &error);
   g_assert_no_error (error);
 
-  def = xapp_info_get_default_for_type (contenttype, FALSE);
-  list = xapp_info_get_recommended_for_type (contenttype);
-  g_assert_true (xapp_info_equal (def, appinfo5));
-  g_assert_cmpint (xlist_length (list), ==, 2);
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->data, appinfo5));
-  g_assert_true (xapp_info_equal ((xapp_info_t*)list->next->data, appinfo4));
-  xobject_unref (def);
-  xlist_free_full (list, xobject_unref);
+  def = g_app_info_get_default_for_type (contenttype, FALSE);
+  list = g_app_info_get_recommended_for_type (contenttype);
+  g_assert_true (g_app_info_equal (def, appinfo5));
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->data, appinfo5));
+  g_assert_true (g_app_info_equal ((GAppInfo*)list->next->data, appinfo4));
+  g_object_unref (def);
+  g_list_free_full (list, g_object_unref);
 
-  xobject_unref (appinfo4);
-  xobject_unref (appinfo5);
+  g_object_unref (appinfo4);
+  g_object_unref (appinfo5);
 }
 
 static void
 test_scheme_handler (Fixture       *fixture,
-                     xconstpointer  test_data)
+                     gconstpointer  test_data)
 {
-  xapp_info_t *info, *info5;
+  GAppInfo *info, *info5;
 
-  info5 = (xapp_info_t*)xdesktop_app_info_new ("myapp5.desktop");
-  info = xapp_info_get_default_for_uri_scheme ("ftp");
-  g_assert_true (xapp_info_equal (info, info5));
+  info5 = (GAppInfo*)g_desktop_app_info_new ("myapp5.desktop");
+  info = g_app_info_get_default_for_uri_scheme ("ftp");
+  g_assert_true (g_app_info_equal (info, info5));
 
-  xobject_unref (info);
-  xobject_unref (info5);
+  g_object_unref (info);
+  g_object_unref (info5);
 }
 
-/* test that xapp_info_* ignores desktop files with nonexisting executables
+/* test that g_app_info_* ignores desktop files with nonexisting executables
  */
 static void
 test_mime_ignore_nonexisting (Fixture       *fixture,
-                              xconstpointer  test_data)
+                              gconstpointer  test_data)
 {
-  xapp_info_t *appinfo;
+  GAppInfo *appinfo;
 
-  appinfo = (xapp_info_t*)xdesktop_app_info_new ("nosuchapp.desktop");
+  appinfo = (GAppInfo*)g_desktop_app_info_new ("nosuchapp.desktop");
   g_assert_null (appinfo);
 }
 
 static void
 test_all (Fixture       *fixture,
-          xconstpointer  test_data)
+          gconstpointer  test_data)
 {
-  xlist_t *all, *l;
+  GList *all, *l;
 
-  all = xapp_info_get_all ();
+  all = g_app_info_get_all ();
 
   for (l = all; l; l = l->next)
-    g_assert_true (X_IS_APP_INFO (l->data));
+    g_assert_true (G_IS_APP_INFO (l->data));
 
-  xlist_free_full (all, xobject_unref);
+  g_list_free_full (all, g_object_unref);
 }
 
 int

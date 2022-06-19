@@ -26,25 +26,25 @@
 #include "gnativevolumemonitor.h"
 
 
-G_DEFINE_ABSTRACT_TYPE (xnative_volume_monitor_t, g_native_volume_monitor, XTYPE_VOLUME_MONITOR)
+G_DEFINE_ABSTRACT_TYPE (GNativeVolumeMonitor, g_native_volume_monitor, G_TYPE_VOLUME_MONITOR)
 
 static void
-g_native_volume_monitor_finalize (xobject_t *object)
+g_native_volume_monitor_finalize (GObject *object)
 {
-  XOBJECT_CLASS (g_native_volume_monitor_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_native_volume_monitor_parent_class)->finalize (object);
 }
 
 
 static void
 g_native_volume_monitor_class_init (GNativeVolumeMonitorClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
-
-  xobject_class->finalize = g_native_volume_monitor_finalize;
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  
+  gobject_class->finalize = g_native_volume_monitor_finalize;
 }
 
 
 static void
-g_native_volume_monitor_init (xnative_volume_monitor_t *native_monitor)
+g_native_volume_monitor_init (GNativeVolumeMonitor *native_monitor)
 {
 }

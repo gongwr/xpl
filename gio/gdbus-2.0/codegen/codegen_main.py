@@ -199,7 +199,7 @@ def codegen_main():
     arg_parser.add_argument(
         "--c-generate-object-manager",
         action="store_true",
-        help="Generate a xdbus_object_manager_client_t subclass when generating C code",
+        help="Generate a GDBusObjectManagerClient subclass when generating C code",
     )
     arg_parser.add_argument(
         "--c-generate-autocleanup",
@@ -266,12 +266,12 @@ def codegen_main():
     group.add_argument(
         "--interface-info-header",
         action="store_true",
-        help="Generate xdbus_interface_info_t C header",
+        help="Generate GDBusInterfaceInfo C header",
     )
     group.add_argument(
         "--interface-info-body",
         action="store_true",
-        help="Generate xdbus_interface_info_t C code",
+        help="Generate GDBusInterfaceInfo C code",
     )
 
     group = arg_parser.add_mutually_exclusive_group()

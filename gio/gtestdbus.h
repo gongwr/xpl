@@ -31,40 +31,40 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TEST_DBUS \
+#define G_TYPE_TEST_DBUS \
     (g_test_dbus_get_type ())
 #define G_TEST_DBUS(obj) \
-    (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_TEST_DBUS, \
-        xtest_dbus))
-#define X_IS_TEST_DBUS(obj) \
-    (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_TEST_DBUS))
+    (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_TEST_DBUS, \
+        GTestDBus))
+#define G_IS_TEST_DBUS(obj) \
+    (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_TEST_DBUS))
 
-XPL_AVAILABLE_IN_2_34
-xtype_t          g_test_dbus_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_34
+GType          g_test_dbus_get_type        (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_34
-xtest_dbus_t *    g_test_dbus_new             (GTestDBusFlags flags);
+GLIB_AVAILABLE_IN_2_34
+GTestDBus *    g_test_dbus_new             (GTestDBusFlags flags);
 
-XPL_AVAILABLE_IN_2_34
-GTestDBusFlags g_test_dbus_get_flags       (xtest_dbus_t     *self);
+GLIB_AVAILABLE_IN_2_34
+GTestDBusFlags g_test_dbus_get_flags       (GTestDBus     *self);
 
-XPL_AVAILABLE_IN_2_34
-const xchar_t *  g_test_dbus_get_bus_address (xtest_dbus_t     *self);
+GLIB_AVAILABLE_IN_2_34
+const gchar *  g_test_dbus_get_bus_address (GTestDBus     *self);
 
-XPL_AVAILABLE_IN_2_34
-void           g_test_dbus_add_service_dir (xtest_dbus_t     *self,
-                                            const xchar_t   *path);
+GLIB_AVAILABLE_IN_2_34
+void           g_test_dbus_add_service_dir (GTestDBus     *self,
+                                            const gchar   *path);
 
-XPL_AVAILABLE_IN_2_34
-void           g_test_dbus_up              (xtest_dbus_t     *self);
+GLIB_AVAILABLE_IN_2_34
+void           g_test_dbus_up              (GTestDBus     *self);
 
-XPL_AVAILABLE_IN_2_34
-void           g_test_dbus_stop            (xtest_dbus_t     *self);
+GLIB_AVAILABLE_IN_2_34
+void           g_test_dbus_stop            (GTestDBus     *self);
 
-XPL_AVAILABLE_IN_2_34
-void           g_test_dbus_down            (xtest_dbus_t     *self);
+GLIB_AVAILABLE_IN_2_34
+void           g_test_dbus_down            (GTestDBus     *self);
 
-XPL_AVAILABLE_IN_2_34
+GLIB_AVAILABLE_IN_2_34
 void           g_test_dbus_unset           (void);
 
 G_END_DECLS

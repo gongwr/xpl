@@ -39,57 +39,57 @@
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 
-static xinitable_iface_t *initable_parent_iface;
-static void xnetwork_monitor_netlink_iface_init (GNetworkMonitorInterface *iface);
-static void xnetwork_monitor_netlink_initable_iface_init (xinitable_iface_t *iface);
+static GInitableIface *initable_parent_iface;
+static void g_network_monitor_netlink_iface_init (GNetworkMonitorInterface *iface);
+static void g_network_monitor_netlink_initable_iface_init (GInitableIface *iface);
 
-struct _xnetwork_monitor_netlink_private
+struct _GNetworkMonitorNetlinkPrivate
 {
-  xsocket_t *sock;
-  xsource_t *source, *dump_source;
-  xmain_context_t *context;
+  GSocket *sock;
+  GSource *source, *dump_source;
+  GMainContext *context;
 
-  xptr_array_t *dump_networks;
+  GPtrArray *dump_networks;
 };
 
-static xboolean_t read_netlink_messages (xnetwork_monitor_netlink_t  *nl,
-                                       xerror_t                 **error);
-static xboolean_t read_netlink_messages_callback (xsocket_t             *socket,
-                                                xio_condition_t         condition,
-                                                xpointer_t             user_data);
-static xboolean_t request_dump (xnetwork_monitor_netlink_t  *nl,
-                              xerror_t                 **error);
+static gboolean read_netlink_messages (GNetworkMonitorNetlink  *nl,
+                                       GError                 **error);
+static gboolean read_netlink_messages_callback (GSocket             *socket,
+                                                GIOCondition         condition,
+                                                gpointer             user_data);
+static gboolean request_dump (GNetworkMonitorNetlink  *nl,
+                              GError                 **error);
 
-#define xnetwork_monitor_netlink_get_type _xnetwork_monitor_netlink_get_type
-G_DEFINE_TYPE_WITH_CODE (xnetwork_monitor_netlink, xnetwork_monitor_netlink, XTYPE_NETWORK_MONITOR_BASE,
-                         G_ADD_PRIVATE (xnetwork_monitor_netlink)
-                         G_IMPLEMENT_INTERFACE (XTYPE_NETWORK_MONITOR,
-                                                xnetwork_monitor_netlink_iface_init)
-                         G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
-                                                xnetwork_monitor_netlink_initable_iface_init)
-                         _xio_modules_ensure_extension_points_registered ();
+#define g_network_monitor_netlink_get_type _g_network_monitor_netlink_get_type
+G_DEFINE_TYPE_WITH_CODE (GNetworkMonitorNetlink, g_network_monitor_netlink, G_TYPE_NETWORK_MONITOR_BASE,
+                         G_ADD_PRIVATE (GNetworkMonitorNetlink)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_NETWORK_MONITOR,
+                                                g_network_monitor_netlink_iface_init)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE,
+                                                g_network_monitor_netlink_initable_iface_init)
+                         _g_io_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_NETWORK_MONITOR_EXTENSION_POINT_NAME,
                                                          g_define_type_id,
                                                          "netlink",
                                                          20))
 
 static void
-xnetwork_monitor_netlink_init (xnetwork_monitor_netlink_t *nl)
+g_network_monitor_netlink_init (GNetworkMonitorNetlink *nl)
 {
-  nl->priv = xnetwork_monitor_netlink_get_instance_private (nl);
+  nl->priv = g_network_monitor_netlink_get_instance_private (nl);
 }
 
-static xboolean_t
-xnetwork_monitor_netlink_initable_init (xinitable_t     *initable,
-                                         xcancellable_t  *cancellable,
-                                         xerror_t       **error)
+static gboolean
+g_network_monitor_netlink_initable_init (GInitable     *initable,
+                                         GCancellable  *cancellable,
+                                         GError       **error)
 {
-  xnetwork_monitor_netlink_t *nl = XNETWORK_MONITOR_NETLINK (initable);
-  xint_t sockfd;
+  GNetworkMonitorNetlink *nl = G_NETWORK_MONITOR_NETLINK (initable);
+  gint sockfd;
   struct sockaddr_nl snl;
 
   /* We create the socket the old-school way because sockaddr_netlink
-   * can't be represented as a xsocket_address_t
+   * can't be represented as a GSocketAddress
    */
   sockfd = g_socket (PF_NETLINK, SOCK_RAW, NETLINK_ROUTE, NULL);
   if (sockfd == -1)
@@ -97,7 +97,7 @@ xnetwork_monitor_netlink_initable_init (xinitable_t     *initable,
       int errsv = errno;
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errsv),
                    _("Could not create network monitor: %s"),
-                   xstrerror (errsv));
+                   g_strerror (errsv));
       return FALSE;
     }
 
@@ -109,12 +109,12 @@ xnetwork_monitor_netlink_initable_init (xinitable_t     *initable,
       int errsv = errno;
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errsv),
                    _("Could not create network monitor: %s"),
-                   xstrerror (errsv));
+                   g_strerror (errsv));
       (void) g_close (sockfd, NULL);
       return FALSE;
     }
 
-  nl->priv->sock = xsocket_new_from_fd (sockfd, error);
+  nl->priv->sock = g_socket_new_from_fd (sockfd, error);
   if (!nl->priv->sock)
     {
       g_prefix_error (error, "%s", _("Could not create network monitor: "));
@@ -122,13 +122,13 @@ xnetwork_monitor_netlink_initable_init (xinitable_t     *initable,
       return FALSE;
     }
 
-  if (!xsocket_set_option (nl->priv->sock, SOL_SOCKET, SO_PASSCRED,
+  if (!g_socket_set_option (nl->priv->sock, SOL_SOCKET, SO_PASSCRED,
 			    TRUE, NULL))
     {
       int errsv = errno;
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (errsv),
                    _("Could not create network monitor: %s"),
-                   xstrerror (errsv));
+                   g_strerror (errsv));
       return FALSE;
     }
 
@@ -141,7 +141,7 @@ xnetwork_monitor_netlink_initable_init (xinitable_t     *initable,
    */
   while (nl->priv->dump_networks)
     {
-      xerror_t *local_error = NULL;
+      GError *local_error = NULL;
       if (!read_netlink_messages (nl, &local_error))
         {
           g_warning ("%s", local_error->message);
@@ -150,23 +150,23 @@ xnetwork_monitor_netlink_initable_init (xinitable_t     *initable,
         }
     }
 
-  xsocket_set_blocking (nl->priv->sock, FALSE);
-  nl->priv->context = xmain_context_ref_thread_default ();
-  nl->priv->source = xsocket_create_source (nl->priv->sock, G_IO_IN, NULL);
-  xsource_set_callback (nl->priv->source,
-                         (xsource_func_t) read_netlink_messages_callback, nl, NULL);
-  xsource_attach (nl->priv->source, nl->priv->context);
+  g_socket_set_blocking (nl->priv->sock, FALSE);
+  nl->priv->context = g_main_context_ref_thread_default ();
+  nl->priv->source = g_socket_create_source (nl->priv->sock, G_IO_IN, NULL);
+  g_source_set_callback (nl->priv->source,
+                         (GSourceFunc) read_netlink_messages_callback, nl, NULL);
+  g_source_attach (nl->priv->source, nl->priv->context);
 
   return initable_parent_iface->init (initable, cancellable, error);
 }
 
-static xboolean_t
-request_dump (xnetwork_monitor_netlink_t  *nl,
-              xerror_t                 **error)
+static gboolean
+request_dump (GNetworkMonitorNetlink  *nl,
+              GError                 **error)
 {
   struct nlmsghdr *n;
   struct rtgenmsg *gen;
-  xchar_t buf[NLMSG_SPACE (sizeof (*gen))];
+  gchar buf[NLMSG_SPACE (sizeof (*gen))];
 
   memset (buf, 0, sizeof (buf));
   n = (struct nlmsghdr*) buf;
@@ -177,24 +177,24 @@ request_dump (xnetwork_monitor_netlink_t  *nl,
   gen = NLMSG_DATA (n);
   gen->rtgen_family = AF_UNSPEC;
 
-  if (xsocket_send (nl->priv->sock, buf, sizeof (buf),
+  if (g_socket_send (nl->priv->sock, buf, sizeof (buf),
                      NULL, error) < 0)
     {
       g_prefix_error (error, "%s", _("Could not get network status: "));
       return FALSE;
     }
 
-  nl->priv->dump_networks = xptr_array_new_with_free_func (xobject_unref);
+  nl->priv->dump_networks = g_ptr_array_new_with_free_func (g_object_unref);
   return TRUE;
 }
 
-static xboolean_t
-timeout_request_dump (xpointer_t user_data)
+static gboolean
+timeout_request_dump (gpointer user_data)
 {
-  xnetwork_monitor_netlink_t *nl = user_data;
+  GNetworkMonitorNetlink *nl = user_data;
 
-  xsource_destroy (nl->priv->dump_source);
-  xsource_unref (nl->priv->dump_source);
+  g_source_destroy (nl->priv->dump_source);
+  g_source_unref (nl->priv->dump_source);
   nl->priv->dump_source = NULL;
 
   request_dump (nl, NULL);
@@ -203,118 +203,118 @@ timeout_request_dump (xpointer_t user_data)
 }
 
 static void
-queue_request_dump (xnetwork_monitor_netlink_t *nl)
+queue_request_dump (GNetworkMonitorNetlink *nl)
 {
   if (nl->priv->dump_networks)
     return;
 
   if (nl->priv->dump_source)
     {
-      xsource_destroy (nl->priv->dump_source);
-      xsource_unref (nl->priv->dump_source);
+      g_source_destroy (nl->priv->dump_source);
+      g_source_unref (nl->priv->dump_source);
     }
 
   nl->priv->dump_source = g_timeout_source_new_seconds (1);
-  xsource_set_callback (nl->priv->dump_source,
-                         (xsource_func_t) timeout_request_dump, nl, NULL);
-  xsource_attach (nl->priv->dump_source, nl->priv->context);
+  g_source_set_callback (nl->priv->dump_source,
+                         (GSourceFunc) timeout_request_dump, nl, NULL);
+  g_source_attach (nl->priv->dump_source, nl->priv->context);
 }
 
-static xinet_address_mask_t *
-create_inet_address_mask (xsocket_family_t  family,
-                          const xuint8_t  *dest,
-                          xsize_t          dest_len)
+static GInetAddressMask *
+create_inet_address_mask (GSocketFamily  family,
+                          const guint8  *dest,
+                          gsize          dest_len)
 {
-  xinet_address_t *dest_addr;
-  xinet_address_mask_t *network;
+  GInetAddress *dest_addr;
+  GInetAddressMask *network;
 
   if (dest)
-    dest_addr = xinet_address_new_from_bytes (dest, family);
+    dest_addr = g_inet_address_new_from_bytes (dest, family);
   else
-    dest_addr = xinet_address_new_any (family);
-  network = xinet_address_mask_new (dest_addr, dest_len, NULL);
-  xobject_unref (dest_addr);
+    dest_addr = g_inet_address_new_any (family);
+  network = g_inet_address_mask_new (dest_addr, dest_len, NULL);
+  g_object_unref (dest_addr);
 
   return network;
 }
 
 static void
-add_network (xnetwork_monitor_netlink_t *nl,
-             xsocket_family_t           family,
-             const xuint8_t           *dest,
-             xsize_t                   dest_len)
+add_network (GNetworkMonitorNetlink *nl,
+             GSocketFamily           family,
+             const guint8           *dest,
+             gsize                   dest_len)
 {
-  xinet_address_mask_t *network = create_inet_address_mask (family, dest, dest_len);
+  GInetAddressMask *network = create_inet_address_mask (family, dest, dest_len);
   g_return_if_fail (network != NULL);
 
   if (nl->priv->dump_networks)
-    xptr_array_add (nl->priv->dump_networks, xobject_ref (network));
+    g_ptr_array_add (nl->priv->dump_networks, g_object_ref (network));
   else
-    xnetwork_monitor_base_add_network (G_NETWORK_MONITOR_BASE (nl), network);
+    g_network_monitor_base_add_network (G_NETWORK_MONITOR_BASE (nl), network);
 
-  xobject_unref (network);
+  g_object_unref (network);
 }
 
 static void
-remove_network (xnetwork_monitor_netlink_t *nl,
-                xsocket_family_t           family,
-                const xuint8_t           *dest,
-                xsize_t                   dest_len)
+remove_network (GNetworkMonitorNetlink *nl,
+                GSocketFamily           family,
+                const guint8           *dest,
+                gsize                   dest_len)
 {
-  xinet_address_mask_t *network = create_inet_address_mask (family, dest, dest_len);
+  GInetAddressMask *network = create_inet_address_mask (family, dest, dest_len);
   g_return_if_fail (network != NULL);
 
   if (nl->priv->dump_networks)
     {
-      xinet_address_mask_t **dump_networks = (xinet_address_mask_t **)nl->priv->dump_networks->pdata;
-      xuint_t i;
+      GInetAddressMask **dump_networks = (GInetAddressMask **)nl->priv->dump_networks->pdata;
+      guint i;
 
       for (i = 0; i < nl->priv->dump_networks->len; i++)
         {
-          if (xinet_address_mask_equal (network, dump_networks[i]))
-            xptr_array_remove_index_fast (nl->priv->dump_networks, i--);
+          if (g_inet_address_mask_equal (network, dump_networks[i]))
+            g_ptr_array_remove_index_fast (nl->priv->dump_networks, i--);
         }
     }
   else
     {
-      xnetwork_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (nl), network);
+      g_network_monitor_base_remove_network (G_NETWORK_MONITOR_BASE (nl), network);
     }
 
-  xobject_unref (network);
+  g_object_unref (network);
 }
 
 static void
-finish_dump (xnetwork_monitor_netlink_t *nl)
+finish_dump (GNetworkMonitorNetlink *nl)
 {
-  xnetwork_monitor_base_set_networks (G_NETWORK_MONITOR_BASE (nl),
-                                       (xinet_address_mask_t **)nl->priv->dump_networks->pdata,
+  g_network_monitor_base_set_networks (G_NETWORK_MONITOR_BASE (nl),
+                                       (GInetAddressMask **)nl->priv->dump_networks->pdata,
                                        nl->priv->dump_networks->len);
-  xptr_array_free (nl->priv->dump_networks, TRUE);
+  g_ptr_array_free (nl->priv->dump_networks, TRUE);
   nl->priv->dump_networks = NULL;
 }
 
-static xboolean_t
-read_netlink_messages (xnetwork_monitor_netlink_t  *nl,
-                       xerror_t                 **error)
+static gboolean
+read_netlink_messages (GNetworkMonitorNetlink  *nl,
+                       GError                 **error)
 {
-  xinput_vector_t iv;
-  xssize_t len;
-  xint_t flags;
-  xerror_t *local_error = NULL;
-  xsocket_address_t *addr = NULL;
+  GInputVector iv;
+  gssize len;
+  gint flags;
+  GError *local_error = NULL;
+  GSocketAddress *addr = NULL;
   struct nlmsghdr *msg;
   struct rtmsg *rtmsg;
   struct rtattr *attr;
   struct sockaddr_nl source_sockaddr;
-  xsize_t attrlen;
-  xuint8_t *dest, *gateway, *oif;
-  xboolean_t retval = TRUE;
+  gsize attrlen;
+  guint8 *dest, *gateway, *oif;
+  gboolean retval = TRUE;
 
   iv.buffer = NULL;
   iv.size = 0;
 
   flags = MSG_PEEK | MSG_TRUNC;
-  len = xsocket_receive_message (nl->priv->sock, NULL, &iv, 1,
+  len = g_socket_receive_message (nl->priv->sock, NULL, &iv, 1,
                                   NULL, NULL, &flags, NULL, &local_error);
   if (len < 0)
     {
@@ -324,7 +324,7 @@ read_netlink_messages (xnetwork_monitor_netlink_t  *nl,
 
   iv.buffer = g_malloc (len);
   iv.size = len;
-  len = xsocket_receive_message (nl->priv->sock, &addr, &iv, 1,
+  len = g_socket_receive_message (nl->priv->sock, &addr, &iv, 1,
                                   NULL, NULL, NULL, NULL, &local_error);
   if (len < 0)
     {
@@ -332,7 +332,7 @@ read_netlink_messages (xnetwork_monitor_netlink_t  *nl,
       goto done;
     }
 
-  if (!xsocket_address_to_native (addr, &source_sockaddr, sizeof (source_sockaddr), &local_error))
+  if (!g_socket_address_to_native (addr, &source_sockaddr, sizeof (source_sockaddr), &local_error))
     {
       retval = FALSE;
       goto done;
@@ -415,7 +415,7 @@ read_netlink_messages (xnetwork_monitor_netlink_t  *nl,
                          G_IO_ERROR,
                          g_io_error_from_errno (-e->error),
                          "netlink error: %s",
-                         xstrerror (-e->error));
+                         g_strerror (-e->error));
           }
           retval = FALSE;
           goto done;
@@ -445,41 +445,41 @@ read_netlink_messages (xnetwork_monitor_netlink_t  *nl,
 }
 
 static void
-xnetwork_monitor_netlink_finalize (xobject_t *object)
+g_network_monitor_netlink_finalize (GObject *object)
 {
-  xnetwork_monitor_netlink_t *nl = XNETWORK_MONITOR_NETLINK (object);
+  GNetworkMonitorNetlink *nl = G_NETWORK_MONITOR_NETLINK (object);
 
   if (nl->priv->source)
     {
-      xsource_destroy (nl->priv->source);
-      xsource_unref (nl->priv->source);
+      g_source_destroy (nl->priv->source);
+      g_source_unref (nl->priv->source);
     }
 
   if (nl->priv->dump_source)
     {
-      xsource_destroy (nl->priv->dump_source);
-      xsource_unref (nl->priv->dump_source);
+      g_source_destroy (nl->priv->dump_source);
+      g_source_unref (nl->priv->dump_source);
     }
 
   if (nl->priv->sock)
     {
-      xsocket_close (nl->priv->sock, NULL);
-      xobject_unref (nl->priv->sock);
+      g_socket_close (nl->priv->sock, NULL);
+      g_object_unref (nl->priv->sock);
     }
 
-  g_clear_pointer (&nl->priv->context, xmain_context_unref);
-  g_clear_pointer (&nl->priv->dump_networks, xptr_array_unref);
+  g_clear_pointer (&nl->priv->context, g_main_context_unref);
+  g_clear_pointer (&nl->priv->dump_networks, g_ptr_array_unref);
 
-  XOBJECT_CLASS (xnetwork_monitor_netlink_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_network_monitor_netlink_parent_class)->finalize (object);
 }
 
-static xboolean_t
-read_netlink_messages_callback (xsocket_t      *socket,
-                                xio_condition_t  condition,
-                                xpointer_t      user_data)
+static gboolean
+read_netlink_messages_callback (GSocket      *socket,
+                                GIOCondition  condition,
+                                gpointer      user_data)
 {
-  xerror_t *error = NULL;
-  xnetwork_monitor_netlink_t *nl = XNETWORK_MONITOR_NETLINK (user_data);
+  GError *error = NULL;
+  GNetworkMonitorNetlink *nl = G_NETWORK_MONITOR_NETLINK (user_data);
 
   if (!read_netlink_messages (nl, &error))
     {
@@ -492,22 +492,22 @@ read_netlink_messages_callback (xsocket_t      *socket,
 }
 
 static void
-xnetwork_monitor_netlink_class_init (xnetwork_monitor_netlink_class_t *nl_class)
+g_network_monitor_netlink_class_init (GNetworkMonitorNetlinkClass *nl_class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (nl_class);
 
-  xobject_class->finalize = xnetwork_monitor_netlink_finalize;
+  gobject_class->finalize = g_network_monitor_netlink_finalize;
 }
 
 static void
-xnetwork_monitor_netlink_iface_init (GNetworkMonitorInterface *monitor_iface)
+g_network_monitor_netlink_iface_init (GNetworkMonitorInterface *monitor_iface)
 {
 }
 
 static void
-xnetwork_monitor_netlink_initable_iface_init (xinitable_iface_t *iface)
+g_network_monitor_netlink_initable_iface_init (GInitableIface *iface)
 {
-  initable_parent_iface = xtype_interface_peek_parent (iface);
+  initable_parent_iface = g_type_interface_peek_parent (iface);
 
-  iface->init = xnetwork_monitor_netlink_initable_init;
+  iface->init = g_network_monitor_netlink_initable_init;
 }

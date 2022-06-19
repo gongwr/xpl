@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_GETTEXT_H__
 #define __G_GETTEXT_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,30 +33,30 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *xstrip_context (const xchar_t *msgid,
-                              const xchar_t *msgval) G_GNUC_FORMAT(1);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_strip_context (const gchar *msgid,
+                              const gchar *msgval) G_GNUC_FORMAT(1);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_dgettext      (const xchar_t *domain,
-                              const xchar_t *msgid) G_GNUC_FORMAT(2);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_dcgettext     (const xchar_t *domain,
-                              const xchar_t *msgid,
-                              xint_t         category) G_GNUC_FORMAT(2);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_dngettext     (const xchar_t *domain,
-                              const xchar_t *msgid,
-                              const xchar_t *msgid_plural,
-                              xulong_t       n) G_GNUC_FORMAT(3);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_dpgettext     (const xchar_t *domain,
-                              const xchar_t *msgctxtid,
-                              xsize_t        msgidoffset) G_GNUC_FORMAT(2);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_dpgettext2    (const xchar_t *domain,
-                              const xchar_t *context,
-                              const xchar_t *msgid) G_GNUC_FORMAT(3);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_dgettext      (const gchar *domain,
+                              const gchar *msgid) G_GNUC_FORMAT(2);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_dcgettext     (const gchar *domain,
+                              const gchar *msgid,
+                              gint         category) G_GNUC_FORMAT(2);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_dngettext     (const gchar *domain,
+                              const gchar *msgid,
+                              const gchar *msgid_plural,
+                              gulong       n) G_GNUC_FORMAT(3);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_dpgettext     (const gchar *domain,
+                              const gchar *msgctxtid,
+                              gsize        msgidoffset) G_GNUC_FORMAT(2);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_dpgettext2    (const gchar *domain,
+                              const gchar *context,
+                              const gchar *msgid) G_GNUC_FORMAT(3);
 
 G_END_DECLS
 

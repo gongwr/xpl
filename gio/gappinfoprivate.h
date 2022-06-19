@@ -21,6 +21,6 @@
 #ifndef __G_APP_INFO_PRIVATE_H__
 #define __G_APP_INFO_PRIVATE_H__
 
-void xapp_info_monitor_fire (void);
+void g_app_info_monitor_fire (void);
 
 #endif /* __G_APP_INFO_PRIVATE_H__ */

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1998  Peter Mattis, Spencer Kimball and Josh MacDonald
  * Copyright (C) 1998-1999  Tor Lillqvist
  *
@@ -20,10 +20,10 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe for the unix part, FIXME: make the win32 part MT safe as well.
  */
 
@@ -77,9 +77,9 @@
 
 #ifndef G_WITH_CYGWIN
 
-xint_t
-g_win32_ftruncate (xint_t  fd,
-		   xuint_t size)
+gint
+g_win32_ftruncate (gint  fd,
+		   guint size)
 {
   return _chsize (fd, size);
 }
@@ -104,19 +104,19 @@ g_win32_ftruncate (xint_t  fd,
 #define SUBLANG_SERBIAN_LATIN_BA 0x06
 #endif
 
-xchar_t *
+gchar *
 g_win32_getlocale (void)
 {
-  xchar_t *result;
+  gchar *result;
   LCID lcid;
   LANGID langid;
-  const xchar_t *ev;
-  xint_t primary, sub;
+  const gchar *ev;
+  gint primary, sub;
   WCHAR iso639[10];
-  xchar_t *iso639_utf8;
+  gchar *iso639_utf8;
   WCHAR iso3166[10];
-  xchar_t *iso3166_utf8;
-  const xchar_t *script = NULL;
+  gchar *iso3166_utf8;
+  const gchar *script = NULL;
 
   /* Let the user override the system settings through environment
    * variables, as on POSIX systems. Note that in GTK+ applications
@@ -126,14 +126,14 @@ g_win32_getlocale (void)
   if (((ev = g_getenv ("LC_ALL")) != NULL && ev[0] != '\0')
       || ((ev = g_getenv ("LC_MESSAGES")) != NULL && ev[0] != '\0')
       || ((ev = g_getenv ("LANG")) != NULL && ev[0] != '\0'))
-    return xstrdup (ev);
+    return g_strdup (ev);
 
   lcid = GetThreadLocale ();
 
   if (!GetLocaleInfoW (lcid, LOCALE_SISO639LANGNAME, iso639, sizeof (iso639)) ||
       !GetLocaleInfoW (lcid, LOCALE_SISO3166CTRYNAME, iso3166, sizeof (iso3166)))
-    return xstrdup ("C");
-
+    return g_strdup ("C");
+  
   /* Strip off the sorting rules, keep only the language part.  */
   langid = LANGIDFROMLCID (lcid);
 
@@ -177,10 +177,10 @@ g_win32_getlocale (void)
       break;
     }
 
-  iso639_utf8 = xutf16_to_utf8 (iso639, -1, NULL, NULL, NULL);
-  iso3166_utf8 = xutf16_to_utf8 (iso3166, -1, NULL, NULL, NULL);
+  iso639_utf8 = g_utf16_to_utf8 (iso639, -1, NULL, NULL, NULL);
+  iso3166_utf8 = g_utf16_to_utf8 (iso3166, -1, NULL, NULL, NULL);
 
-  result = xstrconcat (iso639_utf8, "_", iso3166_utf8, script, NULL);
+  result = g_strconcat (iso639_utf8, "_", iso3166_utf8, script, NULL);
 
   g_free (iso3166_utf8);
   g_free (iso639_utf8);
@@ -201,10 +201,10 @@ g_win32_getlocale (void)
  *
  * Returns: newly-allocated error message
  **/
-xchar_t *
-g_win32_error_message (xint_t error)
+gchar *
+g_win32_error_message (gint error)
 {
-  xchar_t *retval;
+  gchar *retval;
   wchar_t *msg = NULL;
   size_t nchars;
 
@@ -220,12 +220,12 @@ g_win32_error_message (xint_t error)
       if (nchars >= 2 && msg[nchars-1] == L'\n' && msg[nchars-2] == L'\r')
         msg[nchars-2] = L'\0';
 
-      retval = xutf16_to_utf8 (msg, -1, NULL, NULL, NULL);
+      retval = g_utf16_to_utf8 (msg, -1, NULL, NULL, NULL);
 
       LocalFree (msg);
     }
   else
-    retval = xstrdup ("");
+    retval = g_strdup ("");
 
   return retval;
 }
@@ -266,24 +266,24 @@ g_win32_error_message (xint_t error)
  *
  * Since: 2.16
  */
-xchar_t *
-g_win32_get_package_installation_directory_of_module (xpointer_t hmodule)
+gchar *
+g_win32_get_package_installation_directory_of_module (gpointer hmodule)
 {
-  xchar_t *filename;
-  xchar_t *retval;
-  xchar_t *p;
+  gchar *filename;
+  gchar *retval;
+  gchar *p;
   wchar_t wc_fn[MAX_PATH];
 
   /* NOTE: it relies that GetModuleFileNameW returns only canonical paths */
   if (!GetModuleFileNameW (hmodule, wc_fn, MAX_PATH))
     return NULL;
 
-  filename = xutf16_to_utf8 (wc_fn, -1, NULL, NULL, NULL);
+  filename = g_utf16_to_utf8 (wc_fn, -1, NULL, NULL, NULL);
 
   if ((p = strrchr (filename, G_DIR_SEPARATOR)) != NULL)
     *p = '\0';
 
-  retval = xstrdup (filename);
+  retval = g_strdup (filename);
 
   do
     {
@@ -310,41 +310,41 @@ g_win32_get_package_installation_directory_of_module (xpointer_t hmodule)
 #ifdef G_WITH_CYGWIN
   /* In Cygwin we need to have POSIX paths */
   {
-    xchar_t tmp[MAX_PATH];
+    gchar tmp[MAX_PATH];
 
     cygwin_conv_to_posix_path (retval, tmp);
     g_free (retval);
-    retval = xstrdup (tmp);
+    retval = g_strdup (tmp);
   }
 #endif
 
   return retval;
 }
 
-static xchar_t *
-get_package_directory_from_module (const xchar_t *module_name)
+static gchar *
+get_package_directory_from_module (const gchar *module_name)
 {
-  static xhashtable_t *module_dirs = NULL;
+  static GHashTable *module_dirs = NULL;
   G_LOCK_DEFINE_STATIC (module_dirs);
   HMODULE hmodule = NULL;
-  xchar_t *fn;
+  gchar *fn;
 
   G_LOCK (module_dirs);
 
   if (module_dirs == NULL)
-    module_dirs = xhash_table_new (xstr_hash, xstr_equal);
-
-  fn = xhash_table_lookup (module_dirs, module_name ? module_name : "");
-
+    module_dirs = g_hash_table_new (g_str_hash, g_str_equal);
+  
+  fn = g_hash_table_lookup (module_dirs, module_name ? module_name : "");
+      
   if (fn)
     {
       G_UNLOCK (module_dirs);
-      return xstrdup (fn);
+      return g_strdup (fn);
     }
 
   if (module_name)
     {
-      wchar_t *wc_module_name = xutf8_to_utf16 (module_name, -1, NULL, NULL, NULL);
+      wchar_t *wc_module_name = g_utf8_to_utf16 (module_name, -1, NULL, NULL, NULL);
       hmodule = GetModuleHandleW (wc_module_name);
       g_free (wc_module_name);
 
@@ -362,12 +362,12 @@ get_package_directory_from_module (const xchar_t *module_name)
       G_UNLOCK (module_dirs);
       return NULL;
     }
-
-  xhash_table_insert (module_dirs, module_name ? xstrdup (module_name) : "", fn);
+  
+  g_hash_table_insert (module_dirs, module_name ? g_strdup (module_name) : "", fn);
 
   G_UNLOCK (module_dirs);
 
-  return xstrdup (fn);
+  return g_strdup (fn);
 }
 
 /**
@@ -426,11 +426,11 @@ get_package_directory_from_module (const xchar_t *module_name)
  * g_win32_get_package_installation_directory_of_module() instead.
  **/
 
-xchar_t *
-g_win32_get_package_installation_directory (const xchar_t *package,
-                                            const xchar_t *dll_name)
+gchar *
+g_win32_get_package_installation_directory (const gchar *package,
+                                            const gchar *dll_name)
 {
-  xchar_t *result = NULL;
+  gchar *result = NULL;
 
   if (package != NULL)
       g_warning ("Passing a non-NULL package to g_win32_get_package_installation_directory() is deprecated and it is ignored.");
@@ -473,13 +473,13 @@ g_win32_get_package_installation_directory (const xchar_t *package,
  * then construct a subdirectory pathname with g_build_filename().
  **/
 
-xchar_t *
-g_win32_get_package_installation_subdirectory (const xchar_t *package,
-                                               const xchar_t *dll_name,
-                                               const xchar_t *subdir)
+gchar *
+g_win32_get_package_installation_subdirectory (const gchar *package,
+                                               const gchar *dll_name,
+                                               const gchar *subdir)
 {
-  xchar_t *prefix;
-  xchar_t *dirname;
+  gchar *prefix;
+  gchar *dirname;
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   prefix = g_win32_get_package_installation_directory (package, dll_name);
@@ -495,13 +495,13 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * private API to call Windows's RtlGetVersion(), which may need to be called
  * via GetProcAddress()
  */
-xboolean_t
+gboolean
 _g_win32_call_rtl_version (OSVERSIONINFOEXW *info)
 {
   static OSVERSIONINFOEXW result;
-  static xsize_t inited = 0;
+  static gsize inited = 0;
 
-  xreturn_val_if_fail (info != NULL, FALSE);
+  g_return_val_if_fail (info != NULL, FALSE);
 
   if (g_once_init_enter (&inited))
     {
@@ -511,10 +511,10 @@ _g_win32_call_rtl_version (OSVERSIONINFOEXW *info)
 
       fRtlGetVersion *RtlGetVersion;
       HMODULE hmodule = LoadLibraryW (L"ntdll.dll");
-      xreturn_val_if_fail (hmodule != NULL, FALSE);
+      g_return_val_if_fail (hmodule != NULL, FALSE);
 
       RtlGetVersion = (fRtlGetVersion *) GetProcAddress (hmodule, "RtlGetVersion");
-      xreturn_val_if_fail (RtlGetVersion != NULL, FALSE);
+      g_return_val_if_fail (RtlGetVersion != NULL, FALSE);
 #endif
 
       memset (&result, 0, sizeof (OSVERSIONINFOEXW));
@@ -558,23 +558,23 @@ _g_win32_call_rtl_version (OSVERSIONINFOEXW *info)
  *
  * Since: 2.44
  **/
-xboolean_t
-g_win32_check_windows_version (const xint_t major,
-                               const xint_t minor,
-                               const xint_t spver,
+gboolean
+g_win32_check_windows_version (const gint major,
+                               const gint minor,
+                               const gint spver,
                                const GWin32OSType os_type)
 {
   OSVERSIONINFOEXW osverinfo;
-  xboolean_t is_ver_checked = FALSE;
-  xboolean_t is_type_checked = FALSE;
+  gboolean is_ver_checked = FALSE;
+  gboolean is_type_checked = FALSE;
 
   /* We Only Support Checking for XP or later */
-  xreturn_val_if_fail (major >= 5 && (major <= 6 || major == 10), FALSE);
-  xreturn_val_if_fail ((major >= 5 && minor >= 1) || major >= 6, FALSE);
+  g_return_val_if_fail (major >= 5 && (major <= 6 || major == 10), FALSE);
+  g_return_val_if_fail ((major >= 5 && minor >= 1) || major >= 6, FALSE);
 
   /* Check for Service Pack Version >= 0 */
-  xreturn_val_if_fail (spver >= 0, FALSE);
-  xreturn_val_if_fail (_g_win32_call_rtl_version (&osverinfo), FALSE);
+  g_return_val_if_fail (spver >= 0, FALSE);
+  g_return_val_if_fail (_g_win32_call_rtl_version (&osverinfo), FALSE);
 
   /* check the OS and Service Pack Versions */
   if (osverinfo.dwMajorVersion > (DWORD) major)
@@ -639,10 +639,10 @@ g_win32_check_windows_version (const xint_t major,
  * MSDN stated that GetVersion(), which is used here, is subject to
  * further change or removal after Windows 8.1.
  **/
-xuint_t
+guint
 g_win32_get_windows_version (void)
 {
-  static xsize_t windows_version;
+  static gsize windows_version;
 
   if (g_once_init_enter (&windows_version))
     g_once_init_leave (&windows_version, GetVersion ());
@@ -655,7 +655,7 @@ g_win32_get_windows_version (void)
  * g_win32_locale_filename_from_utf8() is called during
  * gettext initialization.
  */
-static xchar_t *
+static gchar *
 special_wchar_to_locale_encoding (wchar_t *wstring)
 {
   int sizeof_output;
@@ -722,13 +722,13 @@ special_wchar_to_locale_encoding (wchar_t *wstring)
  *
  * Since: 2.8
  */
-xchar_t *
-g_win32_locale_filename_from_utf8 (const xchar_t *utf8filename)
+gchar *
+g_win32_locale_filename_from_utf8 (const gchar *utf8filename)
 {
-  xchar_t *retval;
+  gchar *retval;
   wchar_t *wname;
 
-  wname = xutf8_to_utf16 (utf8filename, -1, NULL, NULL, NULL);
+  wname = g_utf8_to_utf16 (utf8filename, -1, NULL, NULL, NULL);
 
   if (wname == NULL)
     return NULL;
@@ -773,32 +773,32 @@ g_win32_locale_filename_from_utf8 (const xchar_t *utf8filename)
  * is UTF-8 on Windows).
  *
  * The strings returned by this function are suitable for use with
- * functions such as g_open() and xfile_new_for_commandline_arg() but
+ * functions such as g_open() and g_file_new_for_commandline_arg() but
  * are not suitable for use with g_option_context_parse(), which assumes
  * that its input will be in the system codepage.  The return value is
  * suitable for use with g_option_context_parse_strv(), however, which
  * is a better match anyway because it won't leak memory.
  *
  * Unlike argv, the returned value is a normal strv and can (and should)
- * be freed with xstrfreev() when no longer needed.
+ * be freed with g_strfreev() when no longer needed.
  *
  * Returns: (transfer full): the commandline arguments in the GLib
  *   filename encoding (ie: UTF-8)
  *
  * Since: 2.40
  **/
-xchar_t **
+gchar **
 g_win32_get_command_line (void)
 {
-  xchar_t **result;
+  gchar **result;
   LPWSTR *args;
-  xint_t i, n;
+  gint i, n;
 
   args = CommandLineToArgvW (GetCommandLineW(), &n);
 
-  result = g_new (xchar_t *, n + 1);
+  result = g_new (gchar *, n + 1);
   for (i = 0; i < n; i++)
-    result[i] = xutf16_to_utf8 (args[i], -1, NULL, NULL, NULL);
+    result[i] = g_utf16_to_utf8 (args[i], -1, NULL, NULL, NULL);
   result[i] = NULL;
 
   LocalFree (args);
@@ -809,26 +809,26 @@ g_win32_get_command_line (void)
 
 /* Binary compatibility versions. Not for newly compiled code. */
 
-_XPL_EXTERN xchar_t *g_win32_get_package_installation_directory_utf8    (const xchar_t *package,
-                                                                        const xchar_t *dll_name);
+_GLIB_EXTERN gchar *g_win32_get_package_installation_directory_utf8    (const gchar *package,
+                                                                        const gchar *dll_name);
 
-_XPL_EXTERN xchar_t *g_win32_get_package_installation_subdirectory_utf8 (const xchar_t *package,
-                                                                        const xchar_t *dll_name,
-                                                                        const xchar_t *subdir);
+_GLIB_EXTERN gchar *g_win32_get_package_installation_subdirectory_utf8 (const gchar *package,
+                                                                        const gchar *dll_name,
+                                                                        const gchar *subdir);
 
-xchar_t *
-g_win32_get_package_installation_directory_utf8 (const xchar_t *package,
-                                                 const xchar_t *dll_name)
+gchar *
+g_win32_get_package_installation_directory_utf8 (const gchar *package,
+                                                 const gchar *dll_name)
 {
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   return g_win32_get_package_installation_directory (package, dll_name);
 G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
-xchar_t *
-g_win32_get_package_installation_subdirectory_utf8 (const xchar_t *package,
-                                                    const xchar_t *dll_name,
-                                                    const xchar_t *subdir)
+gchar *
+g_win32_get_package_installation_subdirectory_utf8 (const gchar *package,
+                                                    const gchar *dll_name,
+                                                    const gchar *subdir)
 {
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   return g_win32_get_package_installation_subdirectory (package,
@@ -862,12 +862,12 @@ g_console_win32_init (void)
 {
   struct
     {
-      xboolean_t     redirect;
+      gboolean     redirect;
       FILE        *stream;
-      const xchar_t *stream_name;
+      const gchar *stream_name;
       DWORD        std_handle_type;
       int          flags;
-      const xchar_t *mode;
+      const gchar *mode;
     }
   streams[] =
     {
@@ -876,9 +876,9 @@ g_console_win32_init (void)
       { FALSE, stderr, "stderr", STD_ERROR_HANDLE, 0, "wb" },
     };
 
-  const xchar_t  *attach_envvar;
-  xuint_t         i;
-  xchar_t       **attach_strs;
+  const gchar  *attach_envvar;
+  guint         i;
+  gchar       **attach_strs;
 
   /* Note: it's not a very good practice to use DllMain()
    * to call any functions not in Kernel32.dll.
@@ -887,7 +887,7 @@ g_console_win32_init (void)
    * to be called before CRT DllMain().
    */
 
-  if (xstrcmp0 (g_getenv ("G_WIN32_ALLOC_CONSOLE"), "1") == 0)
+  if (g_strcmp0 (g_getenv ("G_WIN32_ALLOC_CONSOLE"), "1") == 0)
     AllocConsole (); /* no error handling, fails if console already exists */
 
   attach_envvar = g_getenv ("G_WIN32_ATTACH_CONSOLE");
@@ -900,21 +900,21 @@ g_console_win32_init (void)
    */
   AttachConsole (ATTACH_PARENT_PROCESS);
 
-  attach_strs = xstrsplit (attach_envvar, ",", -1);
+  attach_strs = g_strsplit (attach_envvar, ",", -1);
 
   for (i = 0; attach_strs[i]; i++)
     {
-      if (xstrcmp0 (attach_strs[i], "stdout") == 0)
+      if (g_strcmp0 (attach_strs[i], "stdout") == 0)
         streams[1].redirect = TRUE;
-      else if (xstrcmp0 (attach_strs[i], "stderr") == 0)
+      else if (g_strcmp0 (attach_strs[i], "stderr") == 0)
         streams[2].redirect = TRUE;
-      else if (xstrcmp0 (attach_strs[i], "stdin") == 0)
+      else if (g_strcmp0 (attach_strs[i], "stdin") == 0)
         streams[0].redirect = TRUE;
       else
         g_warning ("Unrecognized stream name %s", attach_strs[i]);
     }
 
-  xstrfreev (attach_strs);
+  g_strfreev (attach_strs);
 
   for (i = 0; i < G_N_ELEMENTS (streams); i++)
     {
@@ -1061,7 +1061,7 @@ static void        *WinVEH_handle = NULL;
 /* This is the debugger that we'll run on crash */
 static wchar_t      debugger[DEBUGGER_BUFFER_SIZE];
 
-static xsize_t        number_of_exceptions_to_catch = 0;
+static gsize        number_of_exceptions_to_catch = 0;
 static DWORD       *exceptions_to_catch = NULL;
 
 static HANDLE       debugger_wakeup_event = 0;
@@ -1071,10 +1071,10 @@ static DWORD        debugger_spawn_flags = 0;
 
 static char *
 copy_chars (char       *buffer,
-            xsize_t      *buffer_size,
+            gsize      *buffer_size,
             const char *to_copy)
 {
-  xsize_t copy_count = MIN (strlen (to_copy), *buffer_size - 1);
+  gsize copy_count = MIN (strlen (to_copy), *buffer_size - 1);
   memset (buffer, 0x20, copy_count);
   strncpy_s (buffer, *buffer_size, to_copy, _TRUNCATE);
   *buffer_size -= copy_count;
@@ -1121,14 +1121,14 @@ static LONG __stdcall
 g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
 {
   EXCEPTION_RECORD    *er;
-  xsize_t                i;
+  gsize                i;
   STARTUPINFOW         si;
   PROCESS_INFORMATION  pi;
 #define ITOA_BUFFER_SIZE 100
   char                 itoa_buffer[ITOA_BUFFER_SIZE];
 #define DEBUG_STRING_SIZE 1024
-  xsize_t                dbgs = DEBUG_STRING_SIZE;
-  char                 debuxstring[DEBUG_STRING_SIZE];
+  gsize                dbgs = DEBUG_STRING_SIZE;
+  char                 debug_string[DEBUG_STRING_SIZE];
   char                *dbgp;
 
   if (ExceptionInfo == NULL ||
@@ -1173,7 +1173,7 @@ g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
        */
       WaitForSingleObject (debugger_wakeup_event, 60000);
 
-      dbgp = &debuxstring[0];
+      dbgp = &debug_string[0];
 
       dbgp = copy_chars (dbgp, &dbgs, "Exception code=0x");
       itoa_buffer[0] = 0;
@@ -1229,7 +1229,7 @@ g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
         }
 
       dbgp = copy_chars (dbgp, &dbgs, "\n");
-      OutputDebugStringA (debuxstring);
+      OutputDebugStringA (debug_string);
     }
 
   /* Now the debugger is present, and we can try
@@ -1242,14 +1242,14 @@ g_win32_veh_handler (PEXCEPTION_POINTERS ExceptionInfo)
   return EXCEPTION_CONTINUE_SEARCH;
 }
 
-static xsize_t
+static gsize
 parse_catch_list (const wchar_t *catch_buffer,
                   DWORD         *exceptions,
-                  xsize_t          num_exceptions)
+                  gsize          num_exceptions)
 {
   const wchar_t *catch_list = catch_buffer;
-  xsize_t          result = 0;
-  xsize_t          i = 0;
+  gsize          result = 0;
+  gsize          i = 0;
 
   while (catch_list != NULL &&
          catch_list[0] != 0)
@@ -1378,27 +1378,27 @@ g_crash_handler_win32_deinit (void)
  * path and name in the GLib filename encoding or NULL in case of error. It
  * should be deallocated with g_free().
  */
-xchar_t *
-g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_handle)
+gchar *
+g_win32_find_helper_executable_path (const gchar *executable_name, void *dll_handle)
 {
-  static const xchar_t *const subdirs[] = { "", "bin", "lib", "glib", "gio" };
-  static const xsize_t nb_subdirs = G_N_ELEMENTS (subdirs);
+  static const gchar *const subdirs[] = { "", "bin", "lib", "glib", "gio" };
+  static const gsize nb_subdirs = G_N_ELEMENTS (subdirs);
 
   DWORD module_path_len;
   wchar_t module_path[MAX_PATH + 2] = { 0 };
-  xchar_t *base_searching_path;
-  xchar_t *p;
-  xchar_t *executable_path;
-  xsize_t i;
+  gchar *base_searching_path;
+  gchar *p;
+  gchar *executable_path;
+  gsize i;
 
-  xreturn_val_if_fail (executable_name && *executable_name, NULL);
+  g_return_val_if_fail (executable_name && *executable_name, NULL);
 
   module_path_len = GetModuleFileNameW (dll_handle, module_path, MAX_PATH + 1);
   /* The > MAX_PATH check prevents truncated module path usage */
   if (module_path_len == 0 || module_path_len > MAX_PATH)
     return NULL;
 
-  base_searching_path = xutf16_to_utf8 (module_path, -1, NULL, NULL, NULL);
+  base_searching_path = g_utf16_to_utf8 (module_path, -1, NULL, NULL, NULL);
   if (base_searching_path == NULL)
     return NULL;
 
@@ -1424,8 +1424,8 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
            * one day someone tries to use this function on Linux or Mac.
            */
           executable_path = g_build_filename (base_searching_path, subdirs[i], executable_name, NULL);
-          xassert (g_path_is_absolute (executable_path));
-          if (xfile_test (executable_path, XFILE_TEST_IS_REGULAR))
+          g_assert (g_path_is_absolute (executable_path));
+          if (g_file_test (executable_path, G_FILE_TEST_IS_REGULAR))
             break;
 
           g_free (executable_path);
@@ -1449,7 +1449,7 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
       /* Search in system PATH */
       executable_path = g_find_program_in_path (executable_name);
       if (executable_path == NULL)
-        executable_path = xstrdup (executable_name);
+        executable_path = g_strdup (executable_name);
     }
 
   return executable_path;

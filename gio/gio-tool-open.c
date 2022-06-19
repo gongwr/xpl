@@ -30,21 +30,21 @@
 #include "gio-tool.h"
 
 static int n_outstanding = 0;
-static xboolean_t success = TRUE;
+static gboolean success = TRUE;
 
 static const GOptionEntry entries[] = {
   G_OPTION_ENTRY_NULL
 };
 
 static void
-launch_default_for_uri_cb (xobject_t *source_object,
-                           xasync_result_t *res,
-                           xpointer_t user_data)
+launch_default_for_uri_cb (GObject *source_object,
+                           GAsyncResult *res,
+                           gpointer user_data)
 {
-  xerror_t *error = NULL;
-  xchar_t *uri = user_data;
+  GError *error = NULL;
+  gchar *uri = user_data;
 
-  if (!xapp_info_launch_default_for_uri_finish (res, &error))
+  if (!g_app_info_launch_default_for_uri_finish (res, &error))
     {
        print_error ("%s: %s", uri, error->message);
        g_clear_error (&error);
@@ -57,17 +57,17 @@ launch_default_for_uri_cb (xobject_t *source_object,
 }
 
 int
-handle_open (int argc, char *argv[], xboolean_t do_help)
+handle_open (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xchar_t *param;
-  xerror_t *error = NULL;
+  GOptionContext *context;
+  gchar *param;
+  GError *error = NULL;
   int i;
 
   g_set_prgname ("gio open");
 
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("%s…", _("LOCATION"));
+  param = g_strdup_printf ("%s…", _("LOCATION"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -86,7 +86,7 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -106,27 +106,27 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
       char *uri_scheme;
 
       /* Workaround to handle non-URI locations. We still use the original
-       * location for other cases, because xfile_t might modify the URI in ways
+       * location for other cases, because GFile might modify the URI in ways
        * we don't want. See:
        * https://bugzilla.gnome.org/show_bug.cgi?id=779182 */
-      uri_scheme = xuri_parse_scheme (argv[i]);
+      uri_scheme = g_uri_parse_scheme (argv[i]);
       if (!uri_scheme || uri_scheme[0] == '\0')
         {
-          xfile_t *file;
+          GFile *file;
 
-          file = xfile_new_for_commandline_arg (argv[i]);
-          uri = xfile_get_uri (file);
-          xobject_unref (file);
+          file = g_file_new_for_commandline_arg (argv[i]);
+          uri = g_file_get_uri (file);
+          g_object_unref (file);
         }
       else
-        uri = xstrdup (argv[i]);
+        uri = g_strdup (argv[i]);
       g_free (uri_scheme);
 
-      xapp_info_launch_default_for_uri_async (uri,
+      g_app_info_launch_default_for_uri_async (uri,
                                                NULL,
                                                NULL,
                                                launch_default_for_uri_cb,
-                                               xstrdup (uri));
+                                               g_strdup (uri));
 
       n_outstanding++;
 
@@ -134,7 +134,7 @@ handle_open (int argc, char *argv[], xboolean_t do_help)
     }
 
   while (n_outstanding > 0)
-    xmain_context_iteration (NULL, TRUE);
+    g_main_context_iteration (NULL, TRUE);
 
   return success ? 0 : 2;
 }

@@ -25,69 +25,69 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_OBJECT_MANAGER         (g_dbus_object_manager_get_type())
-#define G_DBUS_OBJECT_MANAGER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_OBJECT_MANAGER, xdbus_object_manager))
-#define X_IS_DBUS_OBJECT_MANAGER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_OBJECT_MANAGER))
-#define G_DBUS_OBJECT_MANAGER_GET_IFACE(o) (XTYPE_INSTANCE_GET_INTERFACE((o), XTYPE_DBUS_OBJECT_MANAGER, xdbus_object_manager_iface_t))
+#define G_TYPE_DBUS_OBJECT_MANAGER         (g_dbus_object_manager_get_type())
+#define G_DBUS_OBJECT_MANAGER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_OBJECT_MANAGER, GDBusObjectManager))
+#define G_IS_DBUS_OBJECT_MANAGER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_OBJECT_MANAGER))
+#define G_DBUS_OBJECT_MANAGER_GET_IFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE((o), G_TYPE_DBUS_OBJECT_MANAGER, GDBusObjectManagerIface))
 
-typedef struct _xdbus_object_manager_iface xdbus_object_manager_iface_t;
+typedef struct _GDBusObjectManagerIface GDBusObjectManagerIface;
 
 /**
- * xdbus_object_manager_iface_t:
+ * GDBusObjectManagerIface:
  * @parent_iface: The parent interface.
  * @get_object_path: Virtual function for g_dbus_object_manager_get_object_path().
  * @get_objects: Virtual function for g_dbus_object_manager_get_objects().
  * @get_object: Virtual function for g_dbus_object_manager_get_object().
  * @get_interface: Virtual function for g_dbus_object_manager_get_interface().
- * @object_added: Signal handler for the #xdbus_object_manager_t::object-added signal.
- * @object_removed: Signal handler for the #xdbus_object_manager_t::object-removed signal.
- * @interface_added: Signal handler for the #xdbus_object_manager_t::interface-added signal.
- * @interface_removed: Signal handler for the #xdbus_object_manager_t::interface-removed signal.
+ * @object_added: Signal handler for the #GDBusObjectManager::object-added signal.
+ * @object_removed: Signal handler for the #GDBusObjectManager::object-removed signal.
+ * @interface_added: Signal handler for the #GDBusObjectManager::interface-added signal.
+ * @interface_removed: Signal handler for the #GDBusObjectManager::interface-removed signal.
  *
  * Base type for D-Bus object managers.
  *
  * Since: 2.30
  */
-struct _xdbus_object_manager_iface
+struct _GDBusObjectManagerIface
 {
-  xtype_interface_t parent_iface;
+  GTypeInterface parent_iface;
 
   /* Virtual Functions */
-  const xchar_t     *(*get_object_path) (xdbus_object_manager_t    *manager);
-  xlist_t           *(*get_objects)     (xdbus_object_manager_t    *manager);
-  xdbus_object_t     *(*get_object)      (xdbus_object_manager_t    *manager,
-                                       const xchar_t           *object_path);
-  xdbus_interface_t  *(*get_interface)   (xdbus_object_manager_t    *manager,
-                                       const xchar_t           *object_path,
-                                       const xchar_t           *interface_name);
+  const gchar     *(*get_object_path) (GDBusObjectManager    *manager);
+  GList           *(*get_objects)     (GDBusObjectManager    *manager);
+  GDBusObject     *(*get_object)      (GDBusObjectManager    *manager,
+                                       const gchar           *object_path);
+  GDBusInterface  *(*get_interface)   (GDBusObjectManager    *manager,
+                                       const gchar           *object_path,
+                                       const gchar           *interface_name);
 
   /* Signals */
-  void    (*object_added)                 (xdbus_object_manager_t   *manager,
-                                           xdbus_object_t          *object);
-  void    (*object_removed)               (xdbus_object_manager_t   *manager,
-                                           xdbus_object_t          *object);
+  void    (*object_added)                 (GDBusObjectManager   *manager,
+                                           GDBusObject          *object);
+  void    (*object_removed)               (GDBusObjectManager   *manager,
+                                           GDBusObject          *object);
 
-  void    (*interface_added)              (xdbus_object_manager_t   *manager,
-                                           xdbus_object_t          *object,
-                                           xdbus_interface_t       *interface_);
-  void    (*interface_removed)            (xdbus_object_manager_t   *manager,
-                                           xdbus_object_t          *object,
-                                           xdbus_interface_t       *interface_);
+  void    (*interface_added)              (GDBusObjectManager   *manager,
+                                           GDBusObject          *object,
+                                           GDBusInterface       *interface_);
+  void    (*interface_removed)            (GDBusObjectManager   *manager,
+                                           GDBusObject          *object,
+                                           GDBusInterface       *interface_);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t            g_dbus_object_manager_get_type        (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-const xchar_t     *g_dbus_object_manager_get_object_path (xdbus_object_manager_t    *manager);
-XPL_AVAILABLE_IN_ALL
-xlist_t           *g_dbus_object_manager_get_objects     (xdbus_object_manager_t    *manager);
-XPL_AVAILABLE_IN_ALL
-xdbus_object_t     *g_dbus_object_manager_get_object      (xdbus_object_manager_t    *manager,
-                                                        const xchar_t           *object_path);
-XPL_AVAILABLE_IN_ALL
-xdbus_interface_t  *g_dbus_object_manager_get_interface   (xdbus_object_manager_t    *manager,
-                                                        const xchar_t           *object_path,
-                                                        const xchar_t           *interface_name);
+GLIB_AVAILABLE_IN_ALL
+GType            g_dbus_object_manager_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+const gchar     *g_dbus_object_manager_get_object_path (GDBusObjectManager    *manager);
+GLIB_AVAILABLE_IN_ALL
+GList           *g_dbus_object_manager_get_objects     (GDBusObjectManager    *manager);
+GLIB_AVAILABLE_IN_ALL
+GDBusObject     *g_dbus_object_manager_get_object      (GDBusObjectManager    *manager,
+                                                        const gchar           *object_path);
+GLIB_AVAILABLE_IN_ALL
+GDBusInterface  *g_dbus_object_manager_get_interface   (GDBusObjectManager    *manager,
+                                                        const gchar           *object_path,
+                                                        const gchar           *interface_name);
 
 G_END_DECLS
 

@@ -21,18 +21,18 @@
 static void
 test_dup_default (void)
 {
-  xmemory_monitor_t *monitor;
+  GMemoryMonitor *monitor;
 
-  monitor = xmemory_monitor_dup_default ();
+  monitor = g_memory_monitor_dup_default ();
   g_assert_nonnull (monitor);
-  xobject_unref (monitor);
+  g_object_unref (monitor);
 }
 
 static void
-warning_cb (xmemory_monitor_t *m,
+warning_cb (GMemoryMonitor *m,
 	    GMemoryMonitorWarningLevel level)
 {
-  char *str = xenum_to_string (XTYPE_MEMORY_MONITOR_WARNING_LEVEL, level);
+  char *str = g_enum_to_string (G_TYPE_MEMORY_MONITOR_WARNING_LEVEL, level);
   g_message ("Warning level: %s (%d)", str , level);
   g_free (str);
 }
@@ -40,15 +40,15 @@ warning_cb (xmemory_monitor_t *m,
 static void
 do_watch_memory (void)
 {
-  xmemory_monitor_t *m;
-  xmain_loop_t *loop;
+  GMemoryMonitor *m;
+  GMainLoop *loop;
 
-  m = xmemory_monitor_dup_default ();
-  xsignal_connect (G_OBJECT (m), "low-memory-warning",
+  m = g_memory_monitor_dup_default ();
+  g_signal_connect (G_OBJECT (m), "low-memory-warning",
 		    G_CALLBACK (warning_cb), NULL);
 
-  loop = xmain_loop_new (NULL, TRUE);
-  xmain_loop_run (loop);
+  loop = g_main_loop_new (NULL, TRUE);
+  g_main_loop_run (loop);
 }
 
 int

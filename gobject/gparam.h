@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1997-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  *
- * gparam.h: xparam_spec_t base class implementation
+ * gparam.h: GParamSpec base class implementation
  */
-#ifndef __XPARAM_H__
-#define __XPARAM_H__
+#ifndef __G_PARAM_H__
+#define __G_PARAM_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -29,325 +29,325 @@ G_BEGIN_DECLS
 
 /* --- standard type macros --- */
 /**
- * XTYPE_IS_PARAM:
- * @type: a #xtype_t ID
- *
- * Checks whether @type "is a" %XTYPE_PARAM.
+ * G_TYPE_IS_PARAM:
+ * @type: a #GType ID
+ * 
+ * Checks whether @type "is a" %G_TYPE_PARAM.
  */
-#define XTYPE_IS_PARAM(type)		(XTYPE_FUNDAMENTAL (type) == XTYPE_PARAM)
+#define G_TYPE_IS_PARAM(type)		(G_TYPE_FUNDAMENTAL (type) == G_TYPE_PARAM)
 /**
- * XPARAM_SPEC:
- * @pspec: a valid #xparam_spec_t
- *
- * Casts a derived #xparam_spec_t object (e.g. of type #GParamSpecInt) into
- * a #xparam_spec_t object.
+ * G_PARAM_SPEC:
+ * @pspec: a valid #GParamSpec
+ * 
+ * Casts a derived #GParamSpec object (e.g. of type #GParamSpecInt) into
+ * a #GParamSpec object.
  */
-#define XPARAM_SPEC(pspec)		(XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM, xparam_spec_t))
+#define G_PARAM_SPEC(pspec)		(G_TYPE_CHECK_INSTANCE_CAST ((pspec), G_TYPE_PARAM, GParamSpec))
 /**
- * X_IS_PARAM_SPEC:
- * @pspec: a #xparam_spec_t
- *
- * Checks whether @pspec "is a" valid #xparam_spec_t structure of type %XTYPE_PARAM
+ * G_IS_PARAM_SPEC:
+ * @pspec: a #GParamSpec
+ * 
+ * Checks whether @pspec "is a" valid #GParamSpec structure of type %G_TYPE_PARAM
  * or derived.
  */
-#if XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_42
-#define X_IS_PARAM_SPEC(pspec)		(XTYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE ((pspec), XTYPE_PARAM))
+#if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_42
+#define G_IS_PARAM_SPEC(pspec)		(G_TYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE ((pspec), G_TYPE_PARAM))
 #else
-#define X_IS_PARAM_SPEC(pspec)		(XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM))
+#define G_IS_PARAM_SPEC(pspec)		(G_TYPE_CHECK_INSTANCE_TYPE ((pspec), G_TYPE_PARAM))
 #endif
 /**
- * XPARAM_SPEC_CLASS:
+ * G_PARAM_SPEC_CLASS:
  * @pclass: a valid #GParamSpecClass
- *
+ * 
  * Casts a derived #GParamSpecClass structure into a #GParamSpecClass structure.
  */
-#define XPARAM_SPEC_CLASS(pclass)      (XTYPE_CHECK_CLASS_CAST ((pclass), XTYPE_PARAM, GParamSpecClass))
+#define G_PARAM_SPEC_CLASS(pclass)      (G_TYPE_CHECK_CLASS_CAST ((pclass), G_TYPE_PARAM, GParamSpecClass))
 /**
- * X_IS_PARAM_SPEC_CLASS:
+ * G_IS_PARAM_SPEC_CLASS:
  * @pclass: a #GParamSpecClass
- *
- * Checks whether @pclass "is a" valid #GParamSpecClass structure of type
- * %XTYPE_PARAM or derived.
+ * 
+ * Checks whether @pclass "is a" valid #GParamSpecClass structure of type 
+ * %G_TYPE_PARAM or derived.
  */
-#define X_IS_PARAM_SPEC_CLASS(pclass)   (XTYPE_CHECK_CLASS_TYPE ((pclass), XTYPE_PARAM))
+#define G_IS_PARAM_SPEC_CLASS(pclass)   (G_TYPE_CHECK_CLASS_TYPE ((pclass), G_TYPE_PARAM))
 /**
- * XPARAM_SPEC_GET_CLASS:
- * @pspec: a valid #xparam_spec_t
- *
- * Retrieves the #GParamSpecClass of a #xparam_spec_t.
+ * G_PARAM_SPEC_GET_CLASS:
+ * @pspec: a valid #GParamSpec
+ * 
+ * Retrieves the #GParamSpecClass of a #GParamSpec.
  */
-#define XPARAM_SPEC_GET_CLASS(pspec)	(XTYPE_INSTANCE_GET_CLASS ((pspec), XTYPE_PARAM, GParamSpecClass))
+#define G_PARAM_SPEC_GET_CLASS(pspec)	(G_TYPE_INSTANCE_GET_CLASS ((pspec), G_TYPE_PARAM, GParamSpecClass))
 
 
 /* --- convenience macros --- */
 /**
- * XPARAM_SPEC_TYPE:
- * @pspec: a valid #xparam_spec_t
- *
- * Retrieves the #xtype_t of this @pspec.
+ * G_PARAM_SPEC_TYPE:
+ * @pspec: a valid #GParamSpec
+ * 
+ * Retrieves the #GType of this @pspec.
  */
-#define XPARAM_SPEC_TYPE(pspec)	(XTYPE_FROM_INSTANCE (pspec))
+#define G_PARAM_SPEC_TYPE(pspec)	(G_TYPE_FROM_INSTANCE (pspec))
 /**
- * XPARAM_SPEC_TYPE_NAME:
- * @pspec: a valid #xparam_spec_t
- *
- * Retrieves the #xtype_t name of this @pspec.
+ * G_PARAM_SPEC_TYPE_NAME:
+ * @pspec: a valid #GParamSpec
+ * 
+ * Retrieves the #GType name of this @pspec.
  */
-#define XPARAM_SPEC_TYPE_NAME(pspec)	(xtype_name (XPARAM_SPEC_TYPE (pspec)))
+#define G_PARAM_SPEC_TYPE_NAME(pspec)	(g_type_name (G_PARAM_SPEC_TYPE (pspec)))
 /**
- * XPARAM_SPEC_VALUE_TYPE:
- * @pspec: a valid #xparam_spec_t
- *
- * Retrieves the #xtype_t to initialize a #xvalue_t for this parameter.
+ * G_PARAM_SPEC_VALUE_TYPE:
+ * @pspec: a valid #GParamSpec
+ * 
+ * Retrieves the #GType to initialize a #GValue for this parameter.
  */
-#define	XPARAM_SPEC_VALUE_TYPE(pspec)	(XPARAM_SPEC (pspec)->value_type)
+#define	G_PARAM_SPEC_VALUE_TYPE(pspec)	(G_PARAM_SPEC (pspec)->value_type)
 /**
  * G_VALUE_HOLDS_PARAM:
- * @value: a valid #xvalue_t structure
- *
- * Checks whether the given #xvalue_t can hold values derived from type %XTYPE_PARAM.
- *
+ * @value: a valid #GValue structure
+ * 
+ * Checks whether the given #GValue can hold values derived from type %G_TYPE_PARAM.
+ * 
  * Returns: %TRUE on success.
  */
-#define G_VALUE_HOLDS_PARAM(value)	(XTYPE_CHECK_VALUE_TYPE ((value), XTYPE_PARAM))
-
+#define G_VALUE_HOLDS_PARAM(value)	(G_TYPE_CHECK_VALUE_TYPE ((value), G_TYPE_PARAM))
+       
 
 /* --- flags --- */
 /**
  * GParamFlags:
- * @XPARAM_READABLE: the parameter is readable
- * @XPARAM_WRITABLE: the parameter is writable
- * @XPARAM_READWRITE: alias for %XPARAM_READABLE | %XPARAM_WRITABLE
- * @XPARAM_CONSTRUCT: the parameter will be set upon object construction
- * @XPARAM_CONSTRUCT_ONLY: the parameter can only be set upon object construction
- * @XPARAM_LAX_VALIDATION: upon parameter conversion (see g_param_value_convert())
+ * @G_PARAM_READABLE: the parameter is readable
+ * @G_PARAM_WRITABLE: the parameter is writable
+ * @G_PARAM_READWRITE: alias for %G_PARAM_READABLE | %G_PARAM_WRITABLE
+ * @G_PARAM_CONSTRUCT: the parameter will be set upon object construction
+ * @G_PARAM_CONSTRUCT_ONLY: the parameter can only be set upon object construction
+ * @G_PARAM_LAX_VALIDATION: upon parameter conversion (see g_param_value_convert())
  *  strict validation is not required
- * @XPARAM_STATIC_NAME: the string used as name when constructing the
+ * @G_PARAM_STATIC_NAME: the string used as name when constructing the 
  *  parameter is guaranteed to remain valid and
- *  unmodified for the lifetime of the parameter.
+ *  unmodified for the lifetime of the parameter. 
  *  Since 2.8
- * @XPARAM_STATIC_NICK: the string used as nick when constructing the
+ * @G_PARAM_STATIC_NICK: the string used as nick when constructing the
  *  parameter is guaranteed to remain valid and
  *  unmmodified for the lifetime of the parameter.
  *  Since 2.8
- * @XPARAM_STATIC_BLURB: the string used as blurb when constructing the
- *  parameter is guaranteed to remain valid and
- *  unmodified for the lifetime of the parameter.
+ * @G_PARAM_STATIC_BLURB: the string used as blurb when constructing the 
+ *  parameter is guaranteed to remain valid and 
+ *  unmodified for the lifetime of the parameter. 
  *  Since 2.8
- * @XPARAM_EXPLICIT_NOTIFY: calls to xobject_set_property() for this
+ * @G_PARAM_EXPLICIT_NOTIFY: calls to g_object_set_property() for this
  *   property will not automatically result in a "notify" signal being
- *   emitted: the implementation must call xobject_notify() themselves
+ *   emitted: the implementation must call g_object_notify() themselves
  *   in case the property actually changes.  Since: 2.42.
- * @XPARAM_PRIVATE: internal
- * @XPARAM_DEPRECATED: the parameter is deprecated and will be removed
+ * @G_PARAM_PRIVATE: internal
+ * @G_PARAM_DEPRECATED: the parameter is deprecated and will be removed
  *  in a future version. A warning will be generated if it is used
  *  while running with G_ENABLE_DIAGNOSTIC=1.
  *  Since 2.26
- *
+ * 
  * Through the #GParamFlags flag values, certain aspects of parameters
  * can be configured.
  *
- * See also: %XPARAM_STATIC_STRINGS
+ * See also: %G_PARAM_STATIC_STRINGS
  */
 typedef enum
 {
-  XPARAM_READABLE            = 1 << 0,
-  XPARAM_WRITABLE            = 1 << 1,
-  XPARAM_READWRITE           = (XPARAM_READABLE | XPARAM_WRITABLE),
-  XPARAM_CONSTRUCT	      = 1 << 2,
-  XPARAM_CONSTRUCT_ONLY      = 1 << 3,
-  XPARAM_LAX_VALIDATION      = 1 << 4,
-  XPARAM_STATIC_NAME	      = 1 << 5,
-  XPARAM_PRIVATE XPL_DEPRECATED_ENUMERATOR_IN_2_26 = XPARAM_STATIC_NAME,
-  XPARAM_STATIC_NICK	      = 1 << 6,
-  XPARAM_STATIC_BLURB	      = 1 << 7,
+  G_PARAM_READABLE            = 1 << 0,
+  G_PARAM_WRITABLE            = 1 << 1,
+  G_PARAM_READWRITE           = (G_PARAM_READABLE | G_PARAM_WRITABLE),
+  G_PARAM_CONSTRUCT	      = 1 << 2,
+  G_PARAM_CONSTRUCT_ONLY      = 1 << 3,
+  G_PARAM_LAX_VALIDATION      = 1 << 4,
+  G_PARAM_STATIC_NAME	      = 1 << 5,
+  G_PARAM_PRIVATE GLIB_DEPRECATED_ENUMERATOR_IN_2_26 = G_PARAM_STATIC_NAME,
+  G_PARAM_STATIC_NICK	      = 1 << 6,
+  G_PARAM_STATIC_BLURB	      = 1 << 7,
   /* User defined flags go here */
-  XPARAM_EXPLICIT_NOTIFY     = 1 << 30,
+  G_PARAM_EXPLICIT_NOTIFY     = 1 << 30,
   /* Avoid warning with -Wpedantic for gcc6 */
-  XPARAM_DEPRECATED          = (xint_t)(1u << 31)
+  G_PARAM_DEPRECATED          = (gint)(1u << 31)
 } GParamFlags;
 
 /**
- * XPARAM_STATIC_STRINGS:
- *
- * #GParamFlags value alias for %XPARAM_STATIC_NAME | %XPARAM_STATIC_NICK | %XPARAM_STATIC_BLURB.
- *
+ * G_PARAM_STATIC_STRINGS:
+ * 
+ * #GParamFlags value alias for %G_PARAM_STATIC_NAME | %G_PARAM_STATIC_NICK | %G_PARAM_STATIC_BLURB.
+ * 
  * Since 2.13.0
  */
-#define	XPARAM_STATIC_STRINGS (XPARAM_STATIC_NAME | XPARAM_STATIC_NICK | XPARAM_STATIC_BLURB)
+#define	G_PARAM_STATIC_STRINGS (G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB)
 /* bits in the range 0xffffff00 are reserved for 3rd party usage */
 /**
- * XPARAM_MASK:
- *
- * Mask containing the bits of #xparam_spec_t.flags which are reserved for GLib.
+ * G_PARAM_MASK:
+ * 
+ * Mask containing the bits of #GParamSpec.flags which are reserved for GLib.
  */
-#define	XPARAM_MASK		(0x000000ff)
+#define	G_PARAM_MASK		(0x000000ff)
 /**
- * XPARAM_USER_SHIFT:
- *
+ * G_PARAM_USER_SHIFT:
+ * 
  * Minimum shift count to be used for user defined flags, to be stored in
- * #xparam_spec_t.flags. The maximum allowed is 10.
+ * #GParamSpec.flags. The maximum allowed is 10.
  */
-#define	XPARAM_USER_SHIFT	(8)
+#define	G_PARAM_USER_SHIFT	(8)
 
 /* --- typedefs & structures --- */
-typedef struct _GParamSpec      xparam_spec_t;
+typedef struct _GParamSpec      GParamSpec;
 typedef struct _GParamSpecClass GParamSpecClass;
-typedef struct _GParameter	GParameter XPL_DEPRECATED_TYPE_IN_2_54;
+typedef struct _GParameter	GParameter GLIB_DEPRECATED_TYPE_IN_2_54;
 typedef struct _GParamSpecPool  GParamSpecPool;
 /**
- * xparam_spec_t: (ref-func xparam_spec_ref_sink) (unref-func xparam_spec_unref) (set-value-func xvalue_set_param) (get-value-func xvalue_get_param)
- * @xtype_instance: private #GTypeInstance portion
+ * GParamSpec: (ref-func g_param_spec_ref_sink) (unref-func g_param_spec_unref) (set-value-func g_value_set_param) (get-value-func g_value_get_param)
+ * @g_type_instance: private #GTypeInstance portion
  * @name: name of this parameter: always an interned string
  * @flags: #GParamFlags flags for this parameter
- * @value_type: the #xvalue_t type for this parameter
- * @owner_type: #xtype_t type that uses (introduces) this parameter
- *
- * All other fields of the xparam_spec_t struct are private and
+ * @value_type: the #GValue type for this parameter
+ * @owner_type: #GType type that uses (introduces) this parameter
+ * 
+ * All other fields of the GParamSpec struct are private and
  * should not be used directly.
  */
 struct _GParamSpec
 {
-  GTypeInstance  xtype_instance;
+  GTypeInstance  g_type_instance;
 
-  const xchar_t   *name;          /* interned string */
+  const gchar   *name;          /* interned string */
   GParamFlags    flags;
-  xtype_t		 value_type;
-  xtype_t		 owner_type;	/* class or interface using this property */
+  GType		 value_type;
+  GType		 owner_type;	/* class or interface using this property */
 
   /*< private >*/
-  xchar_t         *_nick;
-  xchar_t         *_blurb;
+  gchar         *_nick;
+  gchar         *_blurb;
   GData		*qdata;
-  xuint_t          ref_count;
-  xuint_t		 param_id;	/* sort-criteria */
+  guint          ref_count;
+  guint		 param_id;	/* sort-criteria */
 };
 /**
  * GParamSpecClass:
- * @xtype_class: the parent class
- * @value_type: the #xvalue_t type for this parameter
- * @finalize: The instance finalization function (optional), should chain
+ * @g_type_class: the parent class
+ * @value_type: the #GValue type for this parameter
+ * @finalize: The instance finalization function (optional), should chain 
  *  up to the finalize method of the parent class.
  * @value_set_default: Resets a @value to the default value for this type
- *  (recommended, the default is xvalue_reset()), see
+ *  (recommended, the default is g_value_reset()), see 
  *  g_param_value_set_default().
- * @value_validate: Ensures that the contents of @value comply with the
- *  specifications set out by this type (optional), see
+ * @value_validate: Ensures that the contents of @value comply with the 
+ *  specifications set out by this type (optional), see 
  *  g_param_value_validate().
  * @values_cmp: Compares @value1 with @value2 according to this type
  *  (recommended, the default is memcmp()), see g_param_values_cmp().
- *
- * The class structure for the xparam_spec_t type.
- * Normally, xparam_spec_t classes are filled by
+ * 
+ * The class structure for the GParamSpec type.
+ * Normally, GParamSpec classes are filled by
  * g_param_type_register_static().
  */
 struct _GParamSpecClass
 {
-  xtype_class_t      xtype_class;
+  GTypeClass      g_type_class;
 
-  xtype_t		  value_type;
+  GType		  value_type;
 
-  void	        (*finalize)		(xparam_spec_t   *pspec);
+  void	        (*finalize)		(GParamSpec   *pspec);
 
   /* GParam methods */
-  void          (*value_set_default)    (xparam_spec_t   *pspec,
-					 xvalue_t       *value);
-  xboolean_t      (*value_validate)       (xparam_spec_t   *pspec,
-					 xvalue_t       *value);
-  xint_t          (*values_cmp)           (xparam_spec_t   *pspec,
-					 const xvalue_t *value1,
-					 const xvalue_t *value2);
+  void          (*value_set_default)    (GParamSpec   *pspec,
+					 GValue       *value);
+  gboolean      (*value_validate)       (GParamSpec   *pspec,
+					 GValue       *value);
+  gint          (*values_cmp)           (GParamSpec   *pspec,
+					 const GValue *value1,
+					 const GValue *value2);
   /*< private >*/
-  xpointer_t	  dummy[4];
+  gpointer	  dummy[4];
 };
 /**
  * GParameter:
  * @name: the parameter name
  * @value: the parameter value
- *
+ * 
  * The GParameter struct is an auxiliary structure used
- * to hand parameter name/value pairs to xobject_newv().
+ * to hand parameter name/value pairs to g_object_newv().
  *
  * Deprecated: 2.54: This type is not introspectable.
  */
 struct _GParameter /* auxiliary structure for _setv() variants */
 {
-  const xchar_t *name;
-  xvalue_t       value;
-} XPL_DEPRECATED_TYPE_IN_2_54;
+  const gchar *name;
+  GValue       value;
+} GLIB_DEPRECATED_TYPE_IN_2_54;
 
 
 /* --- prototypes --- */
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	xparam_spec_ref		(xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-void		xparam_spec_unref		(xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-void		xparam_spec_sink		(xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	xparam_spec_ref_sink   	(xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-xpointer_t        xparam_spec_get_qdata		(xparam_spec_t    *pspec,
-						 xquark         quark);
-XPL_AVAILABLE_IN_ALL
-void            xparam_spec_set_qdata		(xparam_spec_t    *pspec,
-						 xquark         quark,
-						 xpointer_t       data);
-XPL_AVAILABLE_IN_ALL
-void            xparam_spec_set_qdata_full	(xparam_spec_t    *pspec,
-						 xquark         quark,
-						 xpointer_t       data,
-						 xdestroy_notify_t destroy);
-XPL_AVAILABLE_IN_ALL
-xpointer_t        xparam_spec_steal_qdata	(xparam_spec_t    *pspec,
-						 xquark         quark);
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t*     xparam_spec_get_redirect_target (xparam_spec_t   *pspec);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec*	g_param_spec_ref		(GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+void		g_param_spec_unref		(GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+void		g_param_spec_sink		(GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec*	g_param_spec_ref_sink   	(GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+gpointer        g_param_spec_get_qdata		(GParamSpec    *pspec,
+						 GQuark         quark);
+GLIB_AVAILABLE_IN_ALL
+void            g_param_spec_set_qdata		(GParamSpec    *pspec,
+						 GQuark         quark,
+						 gpointer       data);
+GLIB_AVAILABLE_IN_ALL
+void            g_param_spec_set_qdata_full	(GParamSpec    *pspec,
+						 GQuark         quark,
+						 gpointer       data,
+						 GDestroyNotify destroy);
+GLIB_AVAILABLE_IN_ALL
+gpointer        g_param_spec_steal_qdata	(GParamSpec    *pspec,
+						 GQuark         quark);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec*     g_param_spec_get_redirect_target (GParamSpec   *pspec);
 
-XPL_AVAILABLE_IN_ALL
-void		g_param_value_set_default	(xparam_spec_t    *pspec,
-						 xvalue_t	       *value);
-XPL_AVAILABLE_IN_ALL
-xboolean_t	g_param_value_defaults		(xparam_spec_t    *pspec,
-						 const xvalue_t  *value);
-XPL_AVAILABLE_IN_ALL
-xboolean_t	g_param_value_validate		(xparam_spec_t    *pspec,
-						 xvalue_t	       *value);
-XPL_AVAILABLE_IN_ALL
-xboolean_t	g_param_value_convert		(xparam_spec_t    *pspec,
-						 const xvalue_t  *src_value,
-						 xvalue_t	       *dest_value,
-						 xboolean_t	strict_validation);
-XPL_AVAILABLE_IN_ALL
-xint_t		g_param_values_cmp		(xparam_spec_t    *pspec,
-						 const xvalue_t  *value1,
-						 const xvalue_t  *value2);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *   xparam_spec_get_name           (xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *   xparam_spec_get_nick           (xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *   xparam_spec_get_blurb          (xparam_spec_t    *pspec);
-XPL_AVAILABLE_IN_ALL
-void            xvalue_set_param               (xvalue_t	       *value,
-						 xparam_spec_t    *param);
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t*     xvalue_get_param               (const xvalue_t  *value);
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t*     xvalue_dup_param               (const xvalue_t  *value);
+GLIB_AVAILABLE_IN_ALL
+void		g_param_value_set_default	(GParamSpec    *pspec,
+						 GValue	       *value);
+GLIB_AVAILABLE_IN_ALL
+gboolean	g_param_value_defaults		(GParamSpec    *pspec,
+						 const GValue  *value);
+GLIB_AVAILABLE_IN_ALL
+gboolean	g_param_value_validate		(GParamSpec    *pspec,
+						 GValue	       *value);
+GLIB_AVAILABLE_IN_ALL
+gboolean	g_param_value_convert		(GParamSpec    *pspec,
+						 const GValue  *src_value,
+						 GValue	       *dest_value,
+						 gboolean	strict_validation);
+GLIB_AVAILABLE_IN_ALL
+gint		g_param_values_cmp		(GParamSpec    *pspec,
+						 const GValue  *value1,
+						 const GValue  *value2);
+GLIB_AVAILABLE_IN_ALL
+const gchar *   g_param_spec_get_name           (GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+const gchar *   g_param_spec_get_nick           (GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+const gchar *   g_param_spec_get_blurb          (GParamSpec    *pspec);
+GLIB_AVAILABLE_IN_ALL
+void            g_value_set_param               (GValue	       *value,
+						 GParamSpec    *param);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec*     g_value_get_param               (const GValue  *value);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec*     g_value_dup_param               (const GValue  *value);
 
 
-XPL_AVAILABLE_IN_ALL
-void           xvalue_take_param               (xvalue_t        *value,
-					         xparam_spec_t    *param);
-XPL_DEPRECATED_FOR(xvalue_take_param)
-void           xvalue_set_param_take_ownership (xvalue_t        *value,
-                                                 xparam_spec_t    *param);
-XPL_AVAILABLE_IN_2_36
-const xvalue_t *  xparam_spec_get_default_value  (xparam_spec_t    *pspec);
+GLIB_AVAILABLE_IN_ALL
+void           g_value_take_param               (GValue        *value,
+					         GParamSpec    *param);
+GLIB_DEPRECATED_FOR(g_value_take_param)
+void           g_value_set_param_take_ownership (GValue        *value,
+                                                 GParamSpec    *param);
+GLIB_AVAILABLE_IN_2_36
+const GValue *  g_param_spec_get_default_value  (GParamSpec    *pspec);
 
-XPL_AVAILABLE_IN_2_46
-xquark          xparam_spec_get_name_quark     (xparam_spec_t    *pspec);
+GLIB_AVAILABLE_IN_2_46
+GQuark          g_param_spec_get_name_quark     (GParamSpec    *pspec);
 
 /* --- convenience functions --- */
 typedef struct _GParamSpecTypeInfo GParamSpecTypeInfo;
@@ -356,103 +356,103 @@ typedef struct _GParamSpecTypeInfo GParamSpecTypeInfo;
  * @instance_size: Size of the instance (object) structure.
  * @n_preallocs: Prior to GLib 2.10, it specified the number of pre-allocated (cached) instances to reserve memory for (0 indicates no caching). Since GLib 2.10, it is ignored, since instances are allocated with the [slice allocator][glib-Memory-Slices] now.
  * @instance_init: Location of the instance initialization function (optional).
- * @value_type: The #xtype_t of values conforming to this #xparam_spec_t
+ * @value_type: The #GType of values conforming to this #GParamSpec
  * @finalize: The instance finalization function (optional).
- * @value_set_default: Resets a @value to the default value for @pspec
- *  (recommended, the default is xvalue_reset()), see
+ * @value_set_default: Resets a @value to the default value for @pspec 
+ *  (recommended, the default is g_value_reset()), see 
  *  g_param_value_set_default().
- * @value_validate: Ensures that the contents of @value comply with the
- *  specifications set out by @pspec (optional), see
+ * @value_validate: Ensures that the contents of @value comply with the 
+ *  specifications set out by @pspec (optional), see 
  *  g_param_value_validate().
- * @values_cmp: Compares @value1 with @value2 according to @pspec
+ * @values_cmp: Compares @value1 with @value2 according to @pspec 
  *  (recommended, the default is memcmp()), see g_param_values_cmp().
- *
+ * 
  * This structure is used to provide the type system with the information
  * required to initialize and destruct (finalize) a parameter's class and
  * instances thereof.
  *
- * The initialized structure is passed to the g_param_type_register_static()
- * The type system will perform a deep copy of this structure, so its memory
- * does not need to be persistent across invocation of
+ * The initialized structure is passed to the g_param_type_register_static() 
+ * The type system will perform a deep copy of this structure, so its memory 
+ * does not need to be persistent across invocation of 
  * g_param_type_register_static().
  */
 struct _GParamSpecTypeInfo
 {
   /* type system portion */
-  xuint16_t         instance_size;                               /* obligatory */
-  xuint16_t         n_preallocs;                                 /* optional */
-  void		(*instance_init)	(xparam_spec_t   *pspec); /* optional */
+  guint16         instance_size;                               /* obligatory */
+  guint16         n_preallocs;                                 /* optional */
+  void		(*instance_init)	(GParamSpec   *pspec); /* optional */
 
   /* class portion */
-  xtype_t           value_type;				       /* obligatory */
-  void          (*finalize)             (xparam_spec_t   *pspec); /* optional */
-  void          (*value_set_default)    (xparam_spec_t   *pspec,  /* recommended */
-					 xvalue_t       *value);
-  xboolean_t      (*value_validate)       (xparam_spec_t   *pspec,  /* optional */
-					 xvalue_t       *value);
-  xint_t          (*values_cmp)           (xparam_spec_t   *pspec,  /* recommended */
-					 const xvalue_t *value1,
-					 const xvalue_t *value2);
+  GType           value_type;				       /* obligatory */
+  void          (*finalize)             (GParamSpec   *pspec); /* optional */
+  void          (*value_set_default)    (GParamSpec   *pspec,  /* recommended */
+					 GValue       *value);
+  gboolean      (*value_validate)       (GParamSpec   *pspec,  /* optional */
+					 GValue       *value);
+  gint          (*values_cmp)           (GParamSpec   *pspec,  /* recommended */
+					 const GValue *value1,
+					 const GValue *value2);
 };
-XPL_AVAILABLE_IN_ALL
-xtype_t	g_param_type_register_static	(const xchar_t		  *name,
+GLIB_AVAILABLE_IN_ALL
+GType	g_param_type_register_static	(const gchar		  *name,
 					 const GParamSpecTypeInfo *pspec_info);
 
-XPL_AVAILABLE_IN_2_66
-xboolean_t xparam_spec_is_valid_name    (const xchar_t              *name);
+GLIB_AVAILABLE_IN_2_66
+gboolean g_param_spec_is_valid_name    (const gchar              *name);
 
 /* For registering builting types */
-xtype_t  _g_param_type_register_static_constant (const xchar_t              *name,
+GType  _g_param_type_register_static_constant (const gchar              *name,
 					       const GParamSpecTypeInfo *pspec_info,
-					       xtype_t                     opt_type);
+					       GType                     opt_type);
 
 
 /* --- protected --- */
-XPL_AVAILABLE_IN_ALL
-xpointer_t	xparam_spec_internal		(xtype_t	        param_type,
-						 const xchar_t   *name,
-						 const xchar_t   *nick,
-						 const xchar_t   *blurb,
+GLIB_AVAILABLE_IN_ALL
+gpointer	g_param_spec_internal		(GType	        param_type,
+						 const gchar   *name,
+						 const gchar   *nick,
+						 const gchar   *blurb,
 						 GParamFlags    flags);
-XPL_AVAILABLE_IN_ALL
-GParamSpecPool* xparam_spec_pool_new		(xboolean_t	type_prefixing);
-XPL_AVAILABLE_IN_ALL
-void		xparam_spec_pool_insert	(GParamSpecPool	*pool,
-						 xparam_spec_t	*pspec,
-						 xtype_t		 owner_type);
-XPL_AVAILABLE_IN_ALL
-void		xparam_spec_pool_remove	(GParamSpecPool	*pool,
-						 xparam_spec_t	*pspec);
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	xparam_spec_pool_lookup	(GParamSpecPool	*pool,
-						 const xchar_t	*param_name,
-						 xtype_t		 owner_type,
-						 xboolean_t	 walk_ancestors);
-XPL_AVAILABLE_IN_ALL
-xlist_t*		xparam_spec_pool_list_owned	(GParamSpecPool	*pool,
-						 xtype_t		 owner_type);
-XPL_AVAILABLE_IN_ALL
-xparam_spec_t**	xparam_spec_pool_list		(GParamSpecPool	*pool,
-						 xtype_t		 owner_type,
-						 xuint_t		*n_pspecs_p);
+GLIB_AVAILABLE_IN_ALL
+GParamSpecPool* g_param_spec_pool_new		(gboolean	type_prefixing);
+GLIB_AVAILABLE_IN_ALL
+void		g_param_spec_pool_insert	(GParamSpecPool	*pool,
+						 GParamSpec	*pspec,
+						 GType		 owner_type);
+GLIB_AVAILABLE_IN_ALL
+void		g_param_spec_pool_remove	(GParamSpecPool	*pool,
+						 GParamSpec	*pspec);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec*	g_param_spec_pool_lookup	(GParamSpecPool	*pool,
+						 const gchar	*param_name,
+						 GType		 owner_type,
+						 gboolean	 walk_ancestors);
+GLIB_AVAILABLE_IN_ALL
+GList*		g_param_spec_pool_list_owned	(GParamSpecPool	*pool,
+						 GType		 owner_type);
+GLIB_AVAILABLE_IN_ALL
+GParamSpec**	g_param_spec_pool_list		(GParamSpecPool	*pool,
+						 GType		 owner_type,
+						 guint		*n_pspecs_p);
 
 
 /* contracts:
  *
- * xboolean_t value_validate (xparam_spec_t *pspec,
- *                          xvalue_t     *value):
+ * gboolean value_validate (GParamSpec *pspec,
+ *                          GValue     *value):
  *	modify value contents in the least destructive way, so
  *	that it complies with pspec's requirements (i.e.
  *	according to minimum/maximum ranges etc...). return
  *	whether modification was necessary.
  *
- * xint_t values_cmp (xparam_spec_t   *pspec,
- *                  const xvalue_t *value1,
- *                  const xvalue_t *value2):
+ * gint values_cmp (GParamSpec   *pspec,
+ *                  const GValue *value1,
+ *                  const GValue *value2):
  *	return value1 - value2, i.e. (-1) if value1 < value2,
  *	(+1) if value1 > value2, and (0) otherwise (equality)
  */
 
 G_END_DECLS
 
-#endif /* __XPARAM_H__ */
+#endif /* __G_PARAM_H__ */

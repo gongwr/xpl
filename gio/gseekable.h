@@ -29,21 +29,21 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SEEKABLE            (xseekable_get_type ())
-#define G_SEEKABLE(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SEEKABLE, xseekable_))
-#define X_IS_SEEKABLE(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_SEEKABLE))
-#define G_SEEKABLE_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_SEEKABLE, xseekable_iface_t))
+#define G_TYPE_SEEKABLE            (g_seekable_get_type ())
+#define G_SEEKABLE(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_SEEKABLE, GSeekable))
+#define G_IS_SEEKABLE(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_SEEKABLE))
+#define G_SEEKABLE_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_SEEKABLE, GSeekableIface))
 
 /**
- * xseekable__t:
+ * GSeekable:
  *
  * Seek object for streaming operations.
  **/
-typedef struct _xseekable_iface   xseekable_iface_t;
+typedef struct _GSeekableIface   GSeekableIface;
 
 /**
- * xseekable_iface_t:
- * @x_iface: The parent interface.
+ * GSeekableIface:
+ * @g_iface: The parent interface.
  * @tell: Tells the current location within a stream.
  * @can_seek: Checks if seeking is supported by the stream.
  * @seek: Seeks to a location within a stream.
@@ -52,50 +52,50 @@ typedef struct _xseekable_iface   xseekable_iface_t;
  *
  * Provides an interface for implementing seekable functionality on I/O Streams.
  **/
-struct _xseekable_iface
+struct _GSeekableIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xoffset_t     (* tell)	         (xseekable__t    *seekable);
+  goffset     (* tell)	         (GSeekable    *seekable);
 
-  xboolean_t    (* can_seek)       (xseekable__t    *seekable);
-  xboolean_t    (* seek)	         (xseekable__t    *seekable,
-				  xoffset_t       offset,
-				  xseek_type_t     type,
-				  xcancellable_t *cancellable,
-				  xerror_t      **error);
+  gboolean    (* can_seek)       (GSeekable    *seekable);
+  gboolean    (* seek)	         (GSeekable    *seekable,
+				  goffset       offset,
+				  GSeekType     type,
+				  GCancellable *cancellable,
+				  GError      **error);
 
-  xboolean_t    (* can_truncate)   (xseekable__t    *seekable);
-  xboolean_t    (* truncate_fn)    (xseekable__t    *seekable,
-				  xoffset_t       offset,
-				  xcancellable_t *cancellable,
-				  xerror_t       **error);
+  gboolean    (* can_truncate)   (GSeekable    *seekable);
+  gboolean    (* truncate_fn)    (GSeekable    *seekable,
+				  goffset       offset,
+				  GCancellable *cancellable,
+				  GError       **error);
 
   /* TODO: Async seek/truncate */
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xseekable_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_seekable_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xoffset_t  xseekable_tell         (xseekable__t     *seekable);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xseekable_can_seek     (xseekable__t     *seekable);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xseekable_seek         (xseekable__t     *seekable,
-				  xoffset_t        offset,
-				  xseek_type_t      type,
-				  xcancellable_t  *cancellable,
-				  xerror_t       **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xseekable_can_truncate (xseekable__t     *seekable);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xseekable_truncate     (xseekable__t     *seekable,
-				  xoffset_t        offset,
-				  xcancellable_t  *cancellable,
-				  xerror_t       **error);
+GLIB_AVAILABLE_IN_ALL
+goffset  g_seekable_tell         (GSeekable     *seekable);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_seekable_can_seek     (GSeekable     *seekable);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_seekable_seek         (GSeekable     *seekable,
+				  goffset        offset,
+				  GSeekType      type,
+				  GCancellable  *cancellable,
+				  GError       **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_seekable_can_truncate (GSeekable     *seekable);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_seekable_truncate     (GSeekable     *seekable,
+				  goffset        offset,
+				  GCancellable  *cancellable,
+				  GError       **error);
 
 G_END_DECLS
 

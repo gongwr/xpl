@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * gdir.c: Simplified wrapper around the DIRENT functions.
@@ -22,7 +22,7 @@
 #ifndef __G_DIR_H__
 #define __G_DIR_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -34,18 +34,18 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GDir xdir_t;
+typedef struct _GDir GDir;
 
-XPL_AVAILABLE_IN_ALL
-xdir_t    *                g_dir_open           (const xchar_t  *path,
-					       xuint_t         flags,
-					       xerror_t      **error);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *            g_dir_read_name      (xdir_t         *dir);
-XPL_AVAILABLE_IN_ALL
-void                     g_dir_rewind         (xdir_t         *dir);
-XPL_AVAILABLE_IN_ALL
-void                     g_dir_close          (xdir_t         *dir);
+GLIB_AVAILABLE_IN_ALL
+GDir    *                g_dir_open           (const gchar  *path,
+					       guint         flags,
+					       GError      **error);
+GLIB_AVAILABLE_IN_ALL
+const gchar *            g_dir_read_name      (GDir         *dir);
+GLIB_AVAILABLE_IN_ALL
+void                     g_dir_rewind         (GDir         *dir);
+GLIB_AVAILABLE_IN_ALL
+void                     g_dir_close          (GDir         *dir);
 
 G_END_DECLS
 

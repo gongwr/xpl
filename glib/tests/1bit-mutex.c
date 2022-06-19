@@ -33,7 +33,7 @@
    */
 
   /* side-step some glib build stuff */
-  #define XPL_COMPILATION
+  #define GLIB_COMPILATION
 
   /* rebuild gbitlock.c without futex support,
      defining our own version of the g_bit_*lock symbols
@@ -56,20 +56,20 @@
 #pragma GCC diagnostic pop
 #endif
 
-volatile xthread_t *owners[LOCKS];
-volatile xint_t     locks[LOCKS];
-volatile xpointer_t ptrs[LOCKS];
-volatile xint_t     bits[LOCKS];
+volatile GThread *owners[LOCKS];
+volatile gint     locks[LOCKS];
+volatile gpointer ptrs[LOCKS];
+volatile gint     bits[LOCKS];
 
 static void
 acquire (int      nr,
-         xboolean_t use_pointers)
+         gboolean use_pointers)
 {
-  xthread_t *self;
+  GThread *self;
 
-  self = xthread_self ();
+  self = g_thread_self ();
 
-  g_assert_cmpint (((xsize_t) ptrs) % sizeof(xint_t), ==, 0);
+  g_assert_cmpint (((gsize) ptrs) % sizeof(gint), ==, 0);
 
   if (!(use_pointers ?
           g_pointer_bit_trylock (&ptrs[nr], bits[nr])
@@ -84,15 +84,15 @@ acquire (int      nr,
         g_bit_lock (&locks[nr], bits[nr]);
     }
 
-  xassert (owners[nr] == NULL);   /* hopefully nobody else is here */
+  g_assert (owners[nr] == NULL);   /* hopefully nobody else is here */
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
-  xthread_yield ();
-  xthread_yield ();
-  xthread_yield ();
+  g_thread_yield ();
+  g_thread_yield ();
+  g_thread_yield ();
 
-  xassert (owners[nr] == self);   /* hopefully this is still us... */
+  g_assert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
 
   if (use_pointers)
@@ -101,12 +101,12 @@ acquire (int      nr,
     g_bit_unlock (&locks[nr], bits[nr]);
 }
 
-static xpointer_t
-thread_func (xpointer_t data)
+static gpointer
+thread_func (gpointer data)
 {
-  xboolean_t use_pointers = GPOINTER_TO_INT (data);
-  xint_t i;
-  xrand_t *rand;
+  gboolean use_pointers = GPOINTER_TO_INT (data);
+  gint i;
+  GRand *rand;
 
   rand = g_rand_new ();
 
@@ -119,10 +119,10 @@ thread_func (xpointer_t data)
 }
 
 static void
-testcase (xconstpointer data)
+testcase (gconstpointer data)
 {
-  xboolean_t use_pointers = GPOINTER_TO_INT (data);
-  xthread_t *threads[THREADS];
+  gboolean use_pointers = GPOINTER_TO_INT (data);
+  GThread *threads[THREADS];
   int i;
 
 #ifdef TEST_EMULATED_FUTEX
@@ -131,7 +131,7 @@ testcase (xconstpointer data)
   /* ensure that we are using the emulated futex by checking
    * (at compile-time) for the existence of 'g_futex_address_list'
    */
-  xassert (g_futex_address_list == NULL);
+  g_assert (g_futex_address_list == NULL);
 #else
   #define SUFFIX ""
 #endif
@@ -140,16 +140,16 @@ testcase (xconstpointer data)
     bits[i] = g_random_int () % 32;
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = xthread_new ("foo", thread_func,
+    threads[i] = g_thread_new ("foo", thread_func,
                                GINT_TO_POINTER (use_pointers));
 
   for (i = 0; i < THREADS; i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   for (i = 0; i < LOCKS; i++)
     {
-      xassert (owners[i] == NULL);
-      xassert (locks[i] == 0);
+      g_assert (owners[i] == NULL);
+      g_assert (locks[i] == 0);
     }
 }
 
@@ -158,8 +158,8 @@ main (int argc, char **argv)
 {
   g_test_init (&argc, &argv, NULL);
 
-  g_test_add_data_func ("/glib/1bit-mutex" SUFFIX "/int", (xpointer_t) 0, testcase);
-  g_test_add_data_func ("/glib/1bit-mutex" SUFFIX "/pointer", (xpointer_t) 1, testcase);
+  g_test_add_data_func ("/glib/1bit-mutex" SUFFIX "/int", (gpointer) 0, testcase);
+  g_test_add_data_func ("/glib/1bit-mutex" SUFFIX "/pointer", (gpointer) 1, testcase);
 
   return g_test_run ();
 }

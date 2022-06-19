@@ -27,10 +27,10 @@
  * SECTION:gfiledescriptorbased
  * @short_description: Interface for file descriptor based IO
  * @include: gio/gfiledescriptorbased.h
- * @see_also: #xinput_stream_t, #xoutput_stream_t
+ * @see_also: #GInputStream, #GOutputStream
  *
- * #xfile_descriptor_based_t is implemented by streams (implementations of
- * #xinput_stream_t or #xoutput_stream_t) that are based on file descriptors.
+ * #GFileDescriptorBased is implemented by streams (implementations of
+ * #GInputStream or #GOutputStream) that are based on file descriptors.
  *
  * Note that `<gio/gfiledescriptorbased.h>` belongs to the UNIX-specific
  * GIO interfaces, thus you have to use the `gio-unix-2.0.pc` pkg-config
@@ -41,16 +41,16 @@
  **/
 
 typedef GFileDescriptorBasedIface GFileDescriptorBasedInterface;
-G_DEFINE_INTERFACE (xfile_descriptor_based, xfile_descriptor_based, XTYPE_OBJECT)
+G_DEFINE_INTERFACE (GFileDescriptorBased, g_file_descriptor_based, G_TYPE_OBJECT)
 
 static void
-xfile_descriptor_based_default_init (GFileDescriptorBasedInterface *iface)
+g_file_descriptor_based_default_init (GFileDescriptorBasedInterface *iface)
 {
 }
 
 /**
- * xfile_descriptor_based_get_fd:
- * @fd_based: a #xfile_descriptor_based_t.
+ * g_file_descriptor_based_get_fd:
+ * @fd_based: a #GFileDescriptorBased.
  *
  * Gets the underlying file descriptor.
  *
@@ -59,13 +59,13 @@ xfile_descriptor_based_default_init (GFileDescriptorBasedInterface *iface)
  * Since: 2.24
  **/
 int
-xfile_descriptor_based_get_fd (xfile_descriptor_based_t *fd_based)
+g_file_descriptor_based_get_fd (GFileDescriptorBased *fd_based)
 {
   GFileDescriptorBasedIface *iface;
 
-  xreturn_val_if_fail (X_IS_FILE_DESCRIPTOR_BASED (fd_based), 0);
+  g_return_val_if_fail (G_IS_FILE_DESCRIPTOR_BASED (fd_based), 0);
 
-  iface = XFILE_DESCRIPTOR_BASED_GET_IFACE (fd_based);
+  iface = G_FILE_DESCRIPTOR_BASED_GET_IFACE (fd_based);
 
   return (* iface->get_fd) (fd_based);
 }

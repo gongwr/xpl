@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XCONVERTER_H__
-#define __XCONVERTER_H__
+#ifndef __G_CONVERTER_H__
+#define __G_CONVERTER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,23 +29,23 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_CONVERTER            (xconverter_get_type ())
-#define XCONVERTER(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_CONVERTER, xconverter_t))
-#define X_IS_CONVERTER(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_CONVERTER))
-#define XCONVERTER_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_CONVERTER, xconverter_iface_t))
+#define G_TYPE_CONVERTER            (g_converter_get_type ())
+#define G_CONVERTER(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_CONVERTER, GConverter))
+#define G_IS_CONVERTER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_CONVERTER))
+#define G_CONVERTER_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_CONVERTER, GConverterIface))
 
 /**
- * xconverter_t:
+ * GConverter:
  *
  * Seek object for streaming operations.
  *
  * Since: 2.24
  **/
-typedef struct _xconverter_iface_t   xconverter_iface_t;
+typedef struct _GConverterIface   GConverterIface;
 
 /**
- * xconverter_iface_t:
- * @x_iface: The parent interface.
+ * GConverterIface:
+ * @g_iface: The parent interface.
  * @convert: Converts data.
  * @reset: Reverts the internal state of the converter to its initial state.
  *
@@ -55,42 +55,42 @@ typedef struct _xconverter_iface_t   xconverter_iface_t;
  *
  * Since: 2.24
  **/
-struct _xconverter_iface_t
+struct _GConverterIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xconverter_result_t (* convert) (xconverter_t *converter,
+  GConverterResult (* convert) (GConverter *converter,
 				const void *inbuf,
-				xsize_t       inbuf_size,
+				gsize       inbuf_size,
 				void       *outbuf,
-				xsize_t       outbuf_size,
-				xconverter_flags_t flags,
-				xsize_t      *bytes_read,
-				xsize_t      *bytes_written,
-				xerror_t    **error);
-  void  (* reset)   (xconverter_t *converter);
+				gsize       outbuf_size,
+				GConverterFlags flags,
+				gsize      *bytes_read,
+				gsize      *bytes_written,
+				GError    **error);
+  void  (* reset)   (GConverter *converter);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t            xconverter_get_type     (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType            g_converter_get_type     (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xconverter_result_t xconverter_convert (xconverter_t       *converter,
+GLIB_AVAILABLE_IN_ALL
+GConverterResult g_converter_convert (GConverter       *converter,
 				      const void       *inbuf,
-				      xsize_t             inbuf_size,
+				      gsize             inbuf_size,
 				      void             *outbuf,
-				      xsize_t             outbuf_size,
-				      xconverter_flags_t   flags,
-				      xsize_t            *bytes_read,
-				      xsize_t            *bytes_written,
-				      xerror_t          **error);
-XPL_AVAILABLE_IN_ALL
-void             xconverter_reset   (xconverter_t       *converter);
+				      gsize             outbuf_size,
+				      GConverterFlags   flags,
+				      gsize            *bytes_read,
+				      gsize            *bytes_written,
+				      GError          **error);
+GLIB_AVAILABLE_IN_ALL
+void             g_converter_reset   (GConverter       *converter);
 
 
 G_END_DECLS
 
 
-#endif /* __XCONVERTER_H__ */
+#endif /* __G_CONVERTER_H__ */

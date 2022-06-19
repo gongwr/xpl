@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  *
  * Copyright (C) 2015-2022 Christian Hergert <christian@hergert.me>
  * Copyright (C) 2015 Garrett Regier <garrettregier@gmail.com>
@@ -19,10 +19,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#ifndef __XBINDING_GROUP_H__
-#define __XBINDING_GROUP_H__
+#ifndef __G_BINDING_GROUP_H__
+#define __G_BINDING_GROUP_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -32,54 +32,54 @@
 
 G_BEGIN_DECLS
 
-#define XBINDING_GROUP(obj)    (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_BINDING_GROUP, xbinding_group_t))
-#define X_IS_BINDING_GROUP(obj) (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_BINDING_GROUP))
-#define XTYPE_BINDING_GROUP    (xbinding_group_get_type())
+#define G_BINDING_GROUP(obj)    (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_BINDING_GROUP, GBindingGroup))
+#define G_IS_BINDING_GROUP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_BINDING_GROUP))
+#define G_TYPE_BINDING_GROUP    (g_binding_group_get_type())
 
 /**
- * xbinding_group_t:
+ * GBindingGroup:
  *
- * xbinding_group_t is an opaque structure whose members
+ * GBindingGroup is an opaque structure whose members
  * cannot be accessed directly.
  *
  * Since: 2.72
  */
-typedef struct _xbinding_group xbinding_group_t;
+typedef struct _GBindingGroup GBindingGroup;
 
-XPL_AVAILABLE_IN_2_72
-xtype_t          xbinding_group_get_type           (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_2_72
-xbinding_group_t *xbinding_group_new                (void);
-XPL_AVAILABLE_IN_2_72
-xpointer_t       xbinding_group_dup_source         (xbinding_group_t         *self);
-XPL_AVAILABLE_IN_2_72
-void           xbinding_group_set_source         (xbinding_group_t         *self,
-                                                   xpointer_t               source);
-XPL_AVAILABLE_IN_2_72
-void           xbinding_group_bind               (xbinding_group_t         *self,
-                                                   const xchar_t           *source_property,
-                                                   xpointer_t               target,
-                                                   const xchar_t           *target_property,
-                                                   xbinding_flags_t          flags);
-XPL_AVAILABLE_IN_2_72
-void           xbinding_group_bind_full          (xbinding_group_t         *self,
-                                                   const xchar_t           *source_property,
-                                                   xpointer_t               target,
-                                                   const xchar_t           *target_property,
-                                                   xbinding_flags_t          flags,
-                                                   xbinding_transform_func  transform_to,
-                                                   xbinding_transform_func  transform_from,
-                                                   xpointer_t               user_data,
-                                                   xdestroy_notify_t         user_data_destroy);
-XPL_AVAILABLE_IN_2_72
-void           xbinding_group_bind_with_closures (xbinding_group_t         *self,
-                                                   const xchar_t           *source_property,
-                                                   xpointer_t               target,
-                                                   const xchar_t           *target_property,
-                                                   xbinding_flags_t          flags,
-                                                   xclosure_t              *transform_to,
-                                                   xclosure_t              *transform_from);
+GLIB_AVAILABLE_IN_2_72
+GType          g_binding_group_get_type           (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_72
+GBindingGroup *g_binding_group_new                (void);
+GLIB_AVAILABLE_IN_2_72
+gpointer       g_binding_group_dup_source         (GBindingGroup         *self);
+GLIB_AVAILABLE_IN_2_72
+void           g_binding_group_set_source         (GBindingGroup         *self,
+                                                   gpointer               source);
+GLIB_AVAILABLE_IN_2_72
+void           g_binding_group_bind               (GBindingGroup         *self,
+                                                   const gchar           *source_property,
+                                                   gpointer               target,
+                                                   const gchar           *target_property,
+                                                   GBindingFlags          flags);
+GLIB_AVAILABLE_IN_2_72
+void           g_binding_group_bind_full          (GBindingGroup         *self,
+                                                   const gchar           *source_property,
+                                                   gpointer               target,
+                                                   const gchar           *target_property,
+                                                   GBindingFlags          flags,
+                                                   GBindingTransformFunc  transform_to,
+                                                   GBindingTransformFunc  transform_from,
+                                                   gpointer               user_data,
+                                                   GDestroyNotify         user_data_destroy);
+GLIB_AVAILABLE_IN_2_72
+void           g_binding_group_bind_with_closures (GBindingGroup         *self,
+                                                   const gchar           *source_property,
+                                                   gpointer               target,
+                                                   const gchar           *target_property,
+                                                   GBindingFlags          flags,
+                                                   GClosure              *transform_to,
+                                                   GClosure              *transform_from);
 
 G_END_DECLS
 
-#endif /* __XBINDING_GROUP_H__ */
+#endif /* __G_BINDING_GROUP_H__ */

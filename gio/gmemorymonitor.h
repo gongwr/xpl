@@ -37,25 +37,25 @@ G_BEGIN_DECLS
  */
 #define G_MEMORY_MONITOR_EXTENSION_POINT_NAME "gio-memory-monitor"
 
-#define XTYPE_MEMORY_MONITOR             (xmemory_monitor_get_type ())
-XPL_AVAILABLE_IN_2_64
-G_DECLARE_INTERFACE(xmemory_monitor_t, xmemory_monitor, g, memory_monitor, xobject_t)
+#define G_TYPE_MEMORY_MONITOR             (g_memory_monitor_get_type ())
+GLIB_AVAILABLE_IN_2_64
+G_DECLARE_INTERFACE(GMemoryMonitor, g_memory_monitor, g, memory_monitor, GObject)
 
-#define G_MEMORY_MONITOR(o)               (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_MEMORY_MONITOR, xmemory_monitor))
-#define X_IS_MEMORY_MONITOR(o)            (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_MEMORY_MONITOR))
-#define G_MEMORY_MONITOR_GET_INTERFACE(o) (XTYPE_INSTANCE_GET_INTERFACE ((o), XTYPE_MEMORY_MONITOR, GMemoryMonitorInterface))
+#define G_MEMORY_MONITOR(o)               (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_MEMORY_MONITOR, GMemoryMonitor))
+#define G_IS_MEMORY_MONITOR(o)            (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_MEMORY_MONITOR))
+#define G_MEMORY_MONITOR_GET_INTERFACE(o) (G_TYPE_INSTANCE_GET_INTERFACE ((o), G_TYPE_MEMORY_MONITOR, GMemoryMonitorInterface))
 
 struct _GMemoryMonitorInterface {
   /*< private >*/
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /*< public >*/
-  void     (*low_memory_warning)  (xmemory_monitor_t             *monitor,
+  void     (*low_memory_warning)  (GMemoryMonitor             *monitor,
                                    GMemoryMonitorWarningLevel  level);
 };
 
-XPL_AVAILABLE_IN_2_64
-xmemory_monitor_t      *xmemory_monitor_dup_default           (void);
+GLIB_AVAILABLE_IN_2_64
+GMemoryMonitor      *g_memory_monitor_dup_default           (void);
 
 G_END_DECLS
 

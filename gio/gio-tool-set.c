@@ -27,7 +27,7 @@
 
 
 static char *attr_type = "string";
-static xboolean_t nofollow_symlinks = FALSE;
+static gboolean nofollow_symlinks = FALSE;
 
 static const GOptionEntry entries[] = {
   { "type", 't', 0, G_OPTION_ARG_STRING, &attr_type, N_("Type of the attribute"), N_("TYPE") },
@@ -68,25 +68,27 @@ hex_unescape (const char *str)
 }
 
 int
-handle_set (int argc, char *argv[], xboolean_t do_help)
+handle_set (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xerror_t *error = NULL;
-  xfile_t *file;
+  GOptionContext *context;
+  GError *error = NULL;
+  GFile *file;
   const char *attribute;
-  xfile_attribute_type_t type;
-  xpointer_t value;
-  xboolean_t b;
-  xuint32_t uint32;
+  GFileAttributeType type;
+  gpointer value;
+  gpointer value_allocated = NULL;
+  gboolean b;
+  guint32 uint32;
   gint32 int32;
-  xuint64_t uint64;
-  sint64_t int64;
-  xchar_t *param;
+  guint64 uint64;
+  gint64 int64;
+  gchar *param;
+  int retval = 0;
 
   g_set_prgname ("gio set");
 
   /* Translators: commandline placeholder */
-  param = xstrdup_printf ("%s %s %s…", _("LOCATION"), _("ATTRIBUTE"), _("VALUE"));
+  param = g_strdup_printf ("%s %s %s…", _("LOCATION"), _("ATTRIBUTE"), _("VALUE"));
   context = g_option_context_new (param);
   g_free (param);
   g_option_context_set_help_enabled (context, FALSE);
@@ -103,7 +105,7 @@ handle_set (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -125,14 +127,14 @@ handle_set (int argc, char *argv[], xboolean_t do_help)
   attribute = argv[2];
 
   type = attribute_type_from_string (attr_type);
-  if ((argc < 4) && (type != XFILE_ATTRIBUTE_TYPE_INVALID))
+  if ((argc < 4) && (type != G_FILE_ATTRIBUTE_TYPE_INVALID))
     {
       show_help (context, _("Value not specified"));
       g_option_context_free (context);
       return 1;
     }
 
-  if ((argc > 4) && (type != XFILE_ATTRIBUTE_TYPE_STRINGV))
+  if ((argc > 4) && (type != G_FILE_ATTRIBUTE_TYPE_STRINGV))
     {
       show_help (context, _("Too many arguments"));
       g_option_context_free (context);
@@ -143,62 +145,62 @@ handle_set (int argc, char *argv[], xboolean_t do_help)
 
   switch (type)
     {
-    case XFILE_ATTRIBUTE_TYPE_STRING:
+    case G_FILE_ATTRIBUTE_TYPE_STRING:
       value = argv[3];
       break;
-    case XFILE_ATTRIBUTE_TYPE_BYTE_STRING:
-      value = hex_unescape (argv[3]);
+    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+      value = value_allocated = hex_unescape (argv[3]);
       break;
-    case XFILE_ATTRIBUTE_TYPE_BOOLEAN:
+    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
       b = g_ascii_strcasecmp (argv[3], "true") == 0;
       value = &b;
       break;
-    case XFILE_ATTRIBUTE_TYPE_UINT32:
+    case G_FILE_ATTRIBUTE_TYPE_UINT32:
       uint32 = atol (argv[3]);
       value = &uint32;
       break;
-    case XFILE_ATTRIBUTE_TYPE_INT32:
+    case G_FILE_ATTRIBUTE_TYPE_INT32:
       int32 = atol (argv[3]);
       value = &int32;
       break;
-    case XFILE_ATTRIBUTE_TYPE_UINT64:
+    case G_FILE_ATTRIBUTE_TYPE_UINT64:
       uint64 = g_ascii_strtoull (argv[3], NULL, 10);
       value = &uint64;
       break;
-    case XFILE_ATTRIBUTE_TYPE_INT64:
+    case G_FILE_ATTRIBUTE_TYPE_INT64:
       int64 = g_ascii_strtoll (argv[3], NULL, 10);
       value = &int64;
       break;
-    case XFILE_ATTRIBUTE_TYPE_STRINGV:
+    case G_FILE_ATTRIBUTE_TYPE_STRINGV:
       value = &argv[3];
       break;
-    case XFILE_ATTRIBUTE_TYPE_INVALID:
+    case G_FILE_ATTRIBUTE_TYPE_INVALID:
       value = NULL;
       break;
-    case XFILE_ATTRIBUTE_TYPE_OBJECT:
+    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
     default:
       print_error (_("Invalid attribute type “%s”"), attr_type);
       return 1;
     }
 
-  file = xfile_new_for_commandline_arg (argv[1]);
+  file = g_file_new_for_commandline_arg (argv[1]);
 
-  if (!xfile_set_attribute (file,
+  if (!g_file_set_attribute (file,
 			     attribute,
 			     type,
 			     value,
                              nofollow_symlinks ?
-                               XFILE_QUERY_INFO_NOFOLLOW_SYMLINKS :
-                               XFILE_QUERY_INFO_NONE,
+                               G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS :
+                               G_FILE_QUERY_INFO_NONE,
                              NULL, &error))
     {
       print_error ("%s", error->message);
-      xerror_free (error);
-      xobject_unref (file);
-      return 1;
+      g_error_free (error);
+      retval = 1;
     }
 
-  xobject_unref (file);
+  g_clear_pointer (&value_allocated, g_free);
+  g_object_unref (file);
 
-  return 0;
+  return retval;
 }

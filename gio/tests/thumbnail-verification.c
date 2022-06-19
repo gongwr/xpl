@@ -30,10 +30,10 @@ test_validity (void)
 {
   struct
     {
-      const xchar_t *filename;  /* name of a file in the tests/thumbnails dir */
-      xuint64_t mtime;  /* asserted mtime of @filename */
-      xuint64_t size;  /* asserted size of @filename */
-      xboolean_t expected_validity;  /* should thumbnail_verify() succeed? */
+      const gchar *filename;  /* name of a file in the tests/thumbnails dir */
+      guint64 mtime;  /* asserted mtime of @filename */
+      guint64 size;  /* asserted size of @filename */
+      gboolean expected_validity;  /* should thumbnail_verify() succeed? */
     }
   tests[] =
     {
@@ -45,26 +45,26 @@ test_validity (void)
        * however, and that's all we care about.
        */
 
-      /* test_t that validation succeeds against a valid PNG file with URI,
+      /* Test that validation succeeds against a valid PNG file with URI,
        * mtime and size which match the expected values. */
       { "valid.png", 1382429848, 93654, TRUE },
-      /* test_t that validation succeeds with URI and mtime, but no size in the
+      /* Test that validation succeeds with URI and mtime, but no size in the
        * tEXt data. */
       { "valid-no-size.png", 1382429848, 93633, TRUE },
-      /* test_t that a missing file fails validation. */
+      /* Test that a missing file fails validation. */
       { "missing.png", 123456789, 12345, FALSE },
-      /* test_t that an existing file with no tEXt data fails validation. */
+      /* Test that an existing file with no tEXt data fails validation. */
       { "no-text-data.png", 123 /* invalid */, 26378, FALSE },
-      /* test_t that a URI mismatch fails validation. */
+      /* Test that a URI mismatch fails validation. */
       { "uri-mismatch.png" /* invalid */, 1382429848, 93654, FALSE },
-      /* test_t that an mtime mismatch fails validation. */
+      /* Test that an mtime mismatch fails validation. */
       { "valid.png", 123 /* invalid */, 93654, FALSE },
-      /* test_t that a valid URI and mtime, but a mismatched size, fails
+      /* Test that a valid URI and mtime, but a mismatched size, fails
        * validation. */
       { "valid.png", 1382429848, 123 /* invalid */, FALSE },
-      /* test_t that validation succeeds with an mtime of 0. */
+      /* Test that validation succeeds with an mtime of 0. */
       { "mtime-zero.png", 0, 93621, TRUE },
-      /* test_t that validation fails if the mtime is only a prefix match. */
+      /* Test that validation fails if the mtime is only a prefix match. */
       { "valid.png", 9848 /* invalid */, 93654, FALSE },
 
       /*
@@ -86,19 +86,19 @@ test_validity (void)
       /* Check that an over-long value fails (even if nul-terminated). */
       { "overlong-value.png", 1382429848, 93660, FALSE },
     };
-  xuint_t i;
+  guint i;
 
   /* Run all the tests. */
   for (i = 0; i < G_N_ELEMENTS (tests); i++)
     {
       GLocalFileStat stat_buf;
-      const xchar_t *thumbnail_path;
-      xchar_t *file_uri;
-      xboolean_t result;
+      const gchar *thumbnail_path;
+      gchar *file_uri;
+      gboolean result;
 
       thumbnail_path = g_test_get_filename (G_TEST_DIST, "thumbnails",
                                             tests[i].filename, NULL);
-      file_uri = xstrconcat ("file:///tmp/", tests[i].filename, NULL);
+      file_uri = g_strconcat ("file:///tmp/", tests[i].filename, NULL);
 #ifdef HAVE_STATX
       stat_buf.stx_mtime.tv_sec = tests[i].mtime;
       stat_buf.stx_size = tests[i].size;
@@ -115,7 +115,7 @@ test_validity (void)
 
       g_free (file_uri);
 
-      xassert (result == tests[i].expected_validity);
+      g_assert (result == tests[i].expected_validity);
     }
 }
 

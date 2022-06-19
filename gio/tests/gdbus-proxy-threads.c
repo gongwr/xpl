@@ -1,4 +1,4 @@
-/* test_t case for GNOME #651133
+/* Test case for GNOME #651133
  *
  * Copyright (C) 2008-2010 Red Hat, Inc.
  * Copyright (C) 2011 Nokia Corporation
@@ -38,14 +38,14 @@
 # define DBUS_RELEASE_NAME_REPLY_RELEASED 1
 #endif
 
-#define MY_NAME "com.example.test_t.Myself"
-/* This many threads create and destroy xdbus_proxy_t instances, in addition
+#define MY_NAME "com.example.Test.Myself"
+/* This many threads create and destroy GDBusProxy instances, in addition
  * to the main thread processing their NameOwnerChanged signals.
  * N_THREADS_MAX is used with "-m slow", N_THREADS otherwise.
  */
 #define N_THREADS_MAX 10
 #define N_THREADS 2
-/* This many xdbus_proxy_t instances are created by each thread. */
+/* This many GDBusProxy instances are created by each thread. */
 #define N_REPEATS 100
 /* The main thread requests/releases a name this many times as rapidly as
  * possible, before performing one "slow" cycle that waits for each method
@@ -55,87 +55,87 @@
  */
 #define N_RAPID_CYCLES 50
 
-static xmain_loop_t *loop;
+static GMainLoop *loop;
 
-static xpointer_t
-run_proxy_thread (xpointer_t data)
+static gpointer
+run_proxy_thread (gpointer data)
 {
-  xdbus_connection_t *connection = data;
+  GDBusConnection *connection = data;
   int i;
 
-  xassert (xmain_context_get_thread_default () == NULL);
+  g_assert (g_main_context_get_thread_default () == NULL);
 
   for (i = 0; i < N_REPEATS; i++)
     {
-      xdbus_proxy_t *proxy;
-      xerror_t *error = NULL;
-      xvariant_t *ret;
+      GDBusProxy *proxy;
+      GError *error = NULL;
+      GVariant *ret;
 
       if (g_test_verbose ())
         g_printerr (".");
 
-      proxy = xdbus_proxy_new_sync (connection,
+      proxy = g_dbus_proxy_new_sync (connection,
                                      G_DBUS_PROXY_FLAGS_DO_NOT_AUTO_START |
                                      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                      NULL,
                                      MY_NAME,
-                                     "/com/example/test_object_t",
+                                     "/com/example/TestObject",
                                      "com.example.Frob",
                                      NULL,
                                      &error);
       g_assert_no_error (error);
-      xassert (proxy != NULL);
-      xdbus_proxy_set_default_timeout (proxy, G_MAXINT);
+      g_assert (proxy != NULL);
+      g_dbus_proxy_set_default_timeout (proxy, G_MAXINT);
 
-      ret = xdbus_proxy_call_sync (proxy, "StupidMethod", NULL,
+      ret = g_dbus_proxy_call_sync (proxy, "StupidMethod", NULL,
                                     G_DBUS_CALL_FLAGS_NO_AUTO_START, -1,
                                     NULL, NULL);
       /*
        * we expect this to fail - if we have the name at the moment, we called
        * an unimplemented method, and if not, there was nothing to call
        */
-      xassert (ret == NULL);
+      g_assert (ret == NULL);
 
       /*
        * this races with the NameOwnerChanged signal being emitted in an
        * idle
        */
-      xobject_unref (proxy);
+      g_object_unref (proxy);
     }
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
   return NULL;
 }
 
-static void release_name (xdbus_connection_t *connection, xboolean_t wait);
+static void release_name (GDBusConnection *connection, gboolean wait);
 
 static void
-request_name_cb (xobject_t *source,
-                 xasync_result_t *res,
-                 xpointer_t user_data)
+request_name_cb (GObject *source,
+                 GAsyncResult *res,
+                 gpointer user_data)
 {
-  xdbus_connection_t *connection = G_DBUS_CONNECTION (source);
-  xerror_t *error = NULL;
-  xvariant_t *var;
+  GDBusConnection *connection = G_DBUS_CONNECTION (source);
+  GError *error = NULL;
+  GVariant *var;
 
-  var = xdbus_connection_call_finish (connection, res, &error);
+  var = g_dbus_connection_call_finish (connection, res, &error);
   g_assert_no_error (error);
-  g_assert_cmpuint (xvariant_get_uint32 (xvariant_get_child_value (var, 0)),
+  g_assert_cmpuint (g_variant_get_uint32 (g_variant_get_child_value (var, 0)),
                     ==, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
 
   release_name (connection, TRUE);
 }
 
 static void
-request_name (xdbus_connection_t *connection,
-              xboolean_t         wait)
+request_name (GDBusConnection *connection,
+              gboolean         wait)
 {
-  xdbus_connection_call (connection,
+  g_dbus_connection_call (connection,
                           DBUS_SERVICE_DBUS,
                           DBUS_PATH_DBUS,
                           DBUS_INTERFACE_DBUS,
                           "RequestName",
-                          xvariant_new ("(su)", MY_NAME, 0),
+                          g_variant_new ("(su)", MY_NAME, 0),
                           G_VARIANT_TYPE ("(u)"),
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -145,18 +145,18 @@ request_name (xdbus_connection_t *connection,
 }
 
 static void
-release_name_cb (xobject_t *source,
-                 xasync_result_t *res,
-                 xpointer_t user_data)
+release_name_cb (GObject *source,
+                 GAsyncResult *res,
+                 gpointer user_data)
 {
-  xdbus_connection_t *connection = G_DBUS_CONNECTION (source);
-  xerror_t *error = NULL;
-  xvariant_t *var;
+  GDBusConnection *connection = G_DBUS_CONNECTION (source);
+  GError *error = NULL;
+  GVariant *var;
   int i;
 
-  var = xdbus_connection_call_finish (connection, res, &error);
+  var = g_dbus_connection_call_finish (connection, res, &error);
   g_assert_no_error (error);
-  g_assert_cmpuint (xvariant_get_uint32 (xvariant_get_child_value (var, 0)),
+  g_assert_cmpuint (g_variant_get_uint32 (g_variant_get_child_value (var, 0)),
                     ==, DBUS_RELEASE_NAME_REPLY_RELEASED);
 
   /* generate some rapid NameOwnerChanged signals to try to trigger crashes */
@@ -171,15 +171,15 @@ release_name_cb (xobject_t *source,
 }
 
 static void
-release_name (xdbus_connection_t *connection,
-              xboolean_t         wait)
+release_name (GDBusConnection *connection,
+              gboolean         wait)
 {
-  xdbus_connection_call (connection,
+  g_dbus_connection_call (connection,
                           DBUS_SERVICE_DBUS,
                           DBUS_PATH_DBUS,
                           DBUS_INTERFACE_DBUS,
                           "ReleaseName",
-                          xvariant_new ("(s)", MY_NAME),
+                          g_variant_new ("(s)", MY_NAME),
                           G_VARIANT_TYPE ("(u)"),
                           G_DBUS_CALL_FLAGS_NONE,
                           -1,
@@ -191,9 +191,9 @@ release_name (xdbus_connection_t *connection,
 static void
 test_proxy (void)
 {
-  xdbus_connection_t *connection;
-  xerror_t *error = NULL;
-  xthread_t *proxy_threads[N_THREADS_MAX];
+  GDBusConnection *connection;
+  GError *error = NULL;
+  GThread *proxy_threads[N_THREADS_MAX];
   int i;
   int n_threads;
 
@@ -204,7 +204,7 @@ test_proxy (void)
 
   session_bus_up ();
 
-  loop = xmain_loop_new (NULL, TRUE);
+  loop = g_main_loop_new (NULL, TRUE);
 
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION,
                                NULL,
@@ -215,19 +215,19 @@ test_proxy (void)
 
   for (i = 0; i < n_threads; i++)
     {
-      proxy_threads[i] = xthread_new ("run-proxy",
+      proxy_threads[i] = g_thread_new ("run-proxy",
                                        run_proxy_thread, connection);
     }
 
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
 
   for (i = 0; i < n_threads; i++)
     {
-      xthread_join (proxy_threads[i]);
+      g_thread_join (proxy_threads[i]);
     }
 
-  xobject_unref (connection);
-  xmain_loop_unref (loop);
+  g_object_unref (connection);
+  g_main_loop_unref (loop);
 
   /* TODO: should call session_bus_down() but that requires waiting
    * for all the outstanding method calls to complete...

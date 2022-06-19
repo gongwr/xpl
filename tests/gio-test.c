@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 2000  Tor Lillqvist
  *
  * This library is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@
 #endif
 
 static int nrunning;
-static xmain_loop_t *main_loop;
+static GMainLoop *main_loop;
 
 #define BUFSIZE 5000		/* Larger than the circular buffer in
 				 * giowin32.c on purpose.
@@ -60,13 +60,13 @@ static struct {
 
 static GIOError
 read_all (int         fd,
-	  xio_channel_t *channel,
+	  GIOChannel *channel,
 	  char       *buffer,
-	  xuint_t       nbytes,
-	  xuint_t      *bytes_read)
+	  guint       nbytes,
+	  guint      *bytes_read)
 {
-  xuint_t left = nbytes;
-  xsize_t nb;
+  guint left = nbytes;
+  gsize nb;
   GIOError error = G_IO_ERROR_NONE;
   char *bufp = buffer;
 
@@ -77,7 +77,7 @@ read_all (int         fd,
   while (left)
     {
       error = g_io_channel_read (channel, bufp, left, &nb);
-
+      
       if (error != G_IO_ERROR_NONE)
 	{
 	  g_print ("gio-test: ...from %d: %d\n", fd, error);
@@ -95,23 +95,23 @@ read_all (int         fd,
 }
 
 static void
-shutdown_source (xpointer_t data)
+shutdown_source (gpointer data)
 {
-  if (xsource_remove (*(xuint_t *) data))
+  if (g_source_remove (*(guint *) data))
     {
       nrunning--;
       if (nrunning == 0)
-	xmain_loop_quit (main_loop);
+	g_main_loop_quit (main_loop);
     }
 }
 
-static xboolean_t
-recv_message (xio_channel_t  *channel,
-	      xio_condition_t cond,
-	      xpointer_t    data)
+static gboolean
+recv_message (GIOChannel  *channel,
+	      GIOCondition cond,
+	      gpointer    data)
 {
-  xint_t fd = g_io_channel_unix_get_fd (channel);
-  xboolean_t retval = TRUE;
+  gint fd = g_io_channel_unix_get_fd (channel);
+  gboolean retval = TRUE;
 
   g_debug ("gio-test: ...from %d:%s%s%s%s", fd,
 	   (cond & G_IO_ERR) ? " ERR" : "",
@@ -128,13 +128,13 @@ recv_message (xio_channel_t  *channel,
   if (cond & G_IO_IN)
     {
       char buf[BUFSIZE];
-      xuint_t nbytes = 0;
-      xuint_t nb;
-      xuint_t j;
+      guint nbytes = 0;
+      guint nb;
+      guint j;
       int i, seq;
       GIOError error;
-
-      error = read_all (fd, channel, (xchar_t *) &seq, sizeof (seq), &nb);
+      
+      error = read_all (fd, channel, (gchar *) &seq, sizeof (seq), &nb);
       if (error == G_IO_ERROR_NONE)
 	{
 	  if (nb == 0)
@@ -143,8 +143,8 @@ recv_message (xio_channel_t  *channel,
 	      shutdown_source (data);
 	      return FALSE;
 	    }
-
-	  xassert (nb == sizeof (nbytes));
+	  
+	  g_assert (nb == sizeof (nbytes));
 
 	  for (i = 0; i < nkiddies; i++)
 	    if (seqtab[i].fd == fd)
@@ -154,23 +154,23 @@ recv_message (xio_channel_t  *channel,
 		break;
 	      }
 
-	  error = read_all (fd, channel, (xchar_t *) &nbytes, sizeof (nbytes), &nb);
+	  error = read_all (fd, channel, (gchar *) &nbytes, sizeof (nbytes), &nb);
 	}
 
       if (error != G_IO_ERROR_NONE)
 	return FALSE;
-
+      
       if (nb == 0)
 	{
 	  g_debug ("gio-test: ...from %d: EOF", fd);
 	  shutdown_source (data);
 	  return FALSE;
 	}
-
-      xassert (nb == sizeof (nbytes));
+      
+      g_assert (nb == sizeof (nbytes));
 
       g_assert_cmpint (nbytes, <, BUFSIZE);
-      xassert (nbytes < BUFSIZE);
+      g_assert (nbytes < BUFSIZE);
       g_debug ("gio-test: ...from %d: %d bytes", fd, nbytes);
       if (nbytes > 0)
 	{
@@ -185,9 +185,9 @@ recv_message (xio_channel_t  *channel,
 	      shutdown_source (data);
 	      return FALSE;
 	    }
-
+      
 	  for (j = 0; j < nbytes; j++)
-            xassert (buf[j] == ' ' + (char) ((nbytes + j) % 95));
+            g_assert (buf[j] == ' ' + (char) ((nbytes + j) % 95));
 	  g_debug ("gio-test: ...from %d: OK", fd);
 	}
     }
@@ -196,19 +196,19 @@ recv_message (xio_channel_t  *channel,
 
 #ifdef G_OS_WIN32
 
-static xboolean_t
-recv_windows_message (xio_channel_t  *channel,
-		      xio_condition_t cond,
-		      xpointer_t    data)
+static gboolean
+recv_windows_message (GIOChannel  *channel,
+		      GIOCondition cond,
+		      gpointer    data)
 {
   GIOError error;
   MSG msg;
-  xsize_t nb;
-
+  gsize nb;
+  
   while (1)
     {
-      error = g_io_channel_read (channel, (xchar_t *) &msg, sizeof (MSG), &nb);
-
+      error = g_io_channel_read (channel, (gchar *) &msg, sizeof (MSG), &nb);
+      
       if (error != G_IO_ERROR_NONE)
 	{
 	  g_print ("gio-test: ...reading Windows message: G_IO_ERROR_%s\n",
@@ -232,7 +232,7 @@ LRESULT CALLBACK window_procedure (HWND   hwnd,
                                    WPARAM wparam,
                                    LPARAM lparam);
 
-LRESULT CALLBACK
+LRESULT CALLBACK 
 window_procedure (HWND hwnd,
 		  UINT message,
 		  WPARAM wparam,
@@ -252,18 +252,18 @@ main (int    argc,
   if (argc < 3)
     {
       /* Parent */
-
-      xio_channel_t *my_read_channel;
-      xchar_t *cmdline;
+      
+      GIOChannel *my_read_channel;
+      gchar *cmdline;
       int i;
 #ifdef G_OS_WIN32
       GTimeVal start, end;
-      xpollfd_t pollfd;
+      GPollFD pollfd;
       int pollresult;
       ATOM klass;
       static WNDCLASS wcl;
       HWND hwnd;
-      xio_channel_t *windows_messages_channel;
+      GIOChannel *windows_messages_channel;
 #endif
 
       nkiddies = (argc == 1 ? 1 : atoi(argv[1]));
@@ -297,44 +297,44 @@ main (int    argc,
 	  exit (1);
 	}
 
-      windows_messages_channel = g_io_channel_win32_new_messages ((xuint_t) (guintptr) hwnd);
+      windows_messages_channel = g_io_channel_win32_new_messages ((guint) (guintptr) hwnd);
       g_io_add_watch (windows_messages_channel, G_IO_IN, recv_windows_message, 0);
 #endif
 
       for (i = 0; i < nkiddies; i++)
 	{
 	  int pipe_to_sub[2], pipe_from_sub[2];
-	  xuint_t *id;
-
+	  guint *id;
+	  
 	  if (pipe (pipe_to_sub) == -1 ||
 	      pipe (pipe_from_sub) == -1)
 	    perror ("pipe"), exit (1);
-
+	  
 	  seqtab[i].fd = pipe_from_sub[0];
 	  seqtab[i].seq = 0;
 
 	  my_read_channel = g_io_channel_unix_new (pipe_from_sub[0]);
-
-	  id = g_new (xuint_t, 1);
+	  
+	  id = g_new (guint, 1);
 	  *id =
 	    g_io_add_watch_full (my_read_channel,
 				 G_PRIORITY_DEFAULT,
 				 G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_HUP,
 				 recv_message,
 				 id, g_free);
-
+	  
 	  nrunning++;
-
+	  
 #ifdef G_OS_WIN32
-	  cmdline = xstrdup_printf ("%d:%d:0x%p",
+	  cmdline = g_strdup_printf ("%d:%d:0x%p",
 				     pipe_to_sub[0],
 				     pipe_from_sub[1],
 				     hwnd);
 	  _spawnl (_P_NOWAIT, argv[0], argv[0], "--child", cmdline, NULL);
 #else
-	  cmdline = xstrdup_printf ("%s --child %d:%d &", argv[0],
+	  cmdline = g_strdup_printf ("%s --child %d:%d &", argv[0],
 				     pipe_to_sub[0], pipe_from_sub[1]);
-
+	  
 	  system (cmdline);
           g_free (cmdline);
 #endif
@@ -355,18 +355,18 @@ main (int    argc,
 #endif
           g_io_channel_unref (my_read_channel);
 	}
+      
+      main_loop = g_main_loop_new (NULL, FALSE);
+      
+      g_main_loop_run (main_loop);
 
-      main_loop = xmain_loop_new (NULL, FALSE);
-
-      xmain_loop_run (main_loop);
-
-      xmain_loop_unref (main_loop);
+      g_main_loop_unref (main_loop);
       g_free (seqtab);
     }
   else if (argc == 3)
     {
       /* Child */
-
+      
       int readfd, writefd;
 #ifdef G_OS_WIN32
       HWND hwnd;
@@ -376,17 +376,17 @@ main (int    argc,
       int buflen;
       GTimeVal tv;
       int n;
-
+  
       g_get_current_time (&tv);
-
+      
       sscanf (argv[2], "%d:%d%n", &readfd, &writefd, &n);
 
 #ifdef G_OS_WIN32
       sscanf (argv[2] + n, ":0x%p", &hwnd);
 #endif
-
+      
       srand (tv.tv_sec ^ (tv.tv_usec / 1000) ^ readfd ^ (writefd << 4));
-
+  
       for (i = 0; i < 20 + rand() % 20; i++)
 	{
 	  g_usleep (100 + (rand() % 10) * 5000);
@@ -416,6 +416,6 @@ main (int    argc,
     }
   else
     g_print ("Huh?\n");
-
+  
   return 0;
 }

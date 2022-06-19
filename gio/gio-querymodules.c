@@ -28,28 +28,28 @@
 
 #include "glib/glib-private.h"
 
-static xboolean_t
-is_valid_module_name (const xchar_t *basename)
+static gboolean
+is_valid_module_name (const gchar *basename)
 {
 #if !defined(G_OS_WIN32) && !defined(G_WITH_CYGWIN)
   return
-    xstr_has_prefix (basename, "lib") &&
-    xstr_has_suffix (basename, ".so");
+    g_str_has_prefix (basename, "lib") &&
+    g_str_has_suffix (basename, ".so");
 #else
-  return xstr_has_suffix (basename, ".dll");
+  return g_str_has_suffix (basename, ".dll");
 #endif
 }
 
 static void
 query_dir (const char *dirname)
 {
-  xstring_t *data;
-  xdir_t *dir;
-  xlist_t *list = NULL, *iterator = NULL;
+  GString *data;
+  GDir *dir;
+  GList *list = NULL, *iterator = NULL;
   const char *name;
   char *cachename;
   char **(* query)  (void);
-  xerror_t *error;
+  GError *error;
   int i;
 
   if (!g_module_supported ())
@@ -60,20 +60,20 @@ query_dir (const char *dirname)
   if (!dir)
     {
       g_printerr ("Unable to open directory %s: %s\n", dirname, error->message);
-      xerror_free (error);
+      g_error_free (error);
       return;
     }
 
-  data = xstring_new ("");
+  data = g_string_new ("");
 
   while ((name = g_dir_read_name (dir)))
-    list = xlist_prepend (list, xstrdup (name));
+    list = g_list_prepend (list, g_strdup (name));
 
-  list = xlist_sort (list, (GCompareFunc) xstrcmp0);
+  list = g_list_sort (list, (GCompareFunc) g_strcmp0);
   for (iterator = list; iterator; iterator = iterator->next)
     {
       GModule *module;
-      xchar_t     *path;
+      gchar     *path;
       char **extension_points;
 
       name = iterator->data;
@@ -86,19 +86,19 @@ query_dir (const char *dirname)
 
       if (module)
 	{
-	  xchar_t *modulename;
-	  xchar_t *symname;
+	  gchar *modulename;
+	  gchar *symname;
 
-	  modulename = _xio_module_extract_name (name);
-	  symname = xstrconcat ("g_io_", modulename, "_query", NULL);
-	  g_module_symbol (module, symname, (xpointer_t) &query);
+	  modulename = _g_io_module_extract_name (name);
+	  symname = g_strconcat ("g_io_", modulename, "_query", NULL);
+	  g_module_symbol (module, symname, (gpointer) &query);
 	  g_free (symname);
 	  g_free (modulename);
 
 	  if (!query)
 	    {
 	      /* Fallback to old name */
-	      g_module_symbol (module, "xio_module_query", (xpointer_t) &query);
+	      g_module_symbol (module, "g_io_module_query", (gpointer) &query);
 	    }
 
 	  if (query)
@@ -107,13 +107,13 @@ query_dir (const char *dirname)
 
 	      if (extension_points)
 		{
-		  xstring_append_printf (data, "%s: ", name);
+		  g_string_append_printf (data, "%s: ", name);
 
 		  for (i = 0; extension_points[i] != NULL; i++)
-		    xstring_append_printf (data, "%s%s", i == 0 ? "" : ",", extension_points[i]);
+		    g_string_append_printf (data, "%s%s", i == 0 ? "" : ",", extension_points[i]);
 
-		  xstring_append (data, "\n");
-		  xstrfreev (extension_points);
+		  g_string_append (data, "\n");
+		  g_strfreev (extension_points);
 		}
 	    }
 
@@ -128,7 +128,7 @@ query_dir (const char *dirname)
     }
 
   g_dir_close (dir);
-  xlist_free_full (list, g_free);
+  g_list_free_full (list, g_free);
 
   cachename = g_build_filename (dirname, "giomodule.cache", NULL);
 
@@ -136,10 +136,10 @@ query_dir (const char *dirname)
     {
       error = NULL;
 
-      if (!xfile_set_contents (cachename, data->str, data->len, &error))
+      if (!g_file_set_contents (cachename, data->str, data->len, &error))
         {
           g_printerr ("Unable to create %s: %s\n", cachename, error->message);
-          xerror_free (error);
+          g_error_free (error);
         }
     }
   else
@@ -147,17 +147,17 @@ query_dir (const char *dirname)
       if (g_unlink (cachename) != 0 && errno != ENOENT)
         {
           int errsv = errno;
-          g_printerr ("Unable to unlink %s: %s\n", cachename, xstrerror (errsv));
+          g_printerr ("Unable to unlink %s: %s\n", cachename, g_strerror (errsv));
         }
     }
 
   g_free (cachename);
-  xstring_free (data, TRUE);
+  g_string_free (data, TRUE);
 }
 
 int
-main (xint_t   argc,
-      xchar_t *argv[])
+main (gint   argc,
+      gchar *argv[])
 {
   int i;
 
@@ -168,10 +168,10 @@ main (xint_t   argc,
       return 1;
     }
 
-  setlocale (LC_ALL, XPL_DEFAULT_LOCALE);
+  setlocale (LC_ALL, GLIB_DEFAULT_LOCALE);
 
-  /* Be defensive and ensure we're linked to xobject_t */
-  xtype_ensure (XTYPE_OBJECT);
+  /* Be defensive and ensure we're linked to GObject */
+  g_type_ensure (G_TYPE_OBJECT);
 
   for (i = 1; i < argc; i++)
     query_dir (argv[i]);

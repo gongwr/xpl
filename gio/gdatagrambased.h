@@ -28,19 +28,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DATAGRAM_BASED             (g_datagram_based_get_type ())
-#define G_DATAGRAM_BASED(inst)            (XTYPE_CHECK_INSTANCE_CAST ((inst), \
-                                           XTYPE_DATAGRAM_BASED, xdatagram_based_t))
-#define X_IS_DATAGRAM_BASED(inst)         (XTYPE_CHECK_INSTANCE_TYPE ((inst), \
-                                           XTYPE_DATAGRAM_BASED))
-#define G_DATAGRAM_BASED_GET_IFACE(inst)  (XTYPE_INSTANCE_GET_INTERFACE ((inst), \
-                                           XTYPE_DATAGRAM_BASED, \
+#define G_TYPE_DATAGRAM_BASED             (g_datagram_based_get_type ())
+#define G_DATAGRAM_BASED(inst)            (G_TYPE_CHECK_INSTANCE_CAST ((inst), \
+                                           G_TYPE_DATAGRAM_BASED, GDatagramBased))
+#define G_IS_DATAGRAM_BASED(inst)         (G_TYPE_CHECK_INSTANCE_TYPE ((inst), \
+                                           G_TYPE_DATAGRAM_BASED))
+#define G_DATAGRAM_BASED_GET_IFACE(inst)  (G_TYPE_INSTANCE_GET_INTERFACE ((inst), \
+                                           G_TYPE_DATAGRAM_BASED, \
                                            GDatagramBasedInterface))
-#define XTYPE_IS_DATAGRAM_BASED(type)    (xtype_is_a ((type), \
-                                           XTYPE_DATAGRAM_BASED))
+#define G_TYPE_IS_DATAGRAM_BASED(type)    (g_type_is_a ((type), \
+                                           G_TYPE_DATAGRAM_BASED))
 
 /**
- * xdatagram_based_t:
+ * GDatagramBased:
  *
  * Interface for socket-like objects with datagram semantics.
  *
@@ -50,7 +50,7 @@ typedef struct _GDatagramBasedInterface GDatagramBasedInterface;
 
 /**
  * GDatagramBasedInterface:
- * @x_iface: The parent interface.
+ * @g_iface: The parent interface.
  * @receive_messages: Virtual method for g_datagram_based_receive_messages().
  * @send_messages: Virtual method for g_datagram_based_send_messages().
  * @create_source: Virtual method for g_datagram_based_create_source().
@@ -68,76 +68,76 @@ typedef struct _GDatagramBasedInterface GDatagramBasedInterface;
  */
 struct _GDatagramBasedInterface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual table */
-  xint_t          (*receive_messages)     (xdatagram_based_t       *datagram_based,
-                                         xinput_message_t        *messages,
-                                         xuint_t                 num_messages,
-                                         xint_t                  flags,
-                                         sint64_t                timeout,
-                                         xcancellable_t         *cancellable,
-                                         xerror_t              **error);
-  xint_t          (*send_messages)        (xdatagram_based_t       *datagram_based,
-                                         xoutput_message_t       *messages,
-                                         xuint_t                 num_messages,
-                                         xint_t                  flags,
-                                         sint64_t                timeout,
-                                         xcancellable_t         *cancellable,
-                                         xerror_t              **error);
+  gint          (*receive_messages)     (GDatagramBased       *datagram_based,
+                                         GInputMessage        *messages,
+                                         guint                 num_messages,
+                                         gint                  flags,
+                                         gint64                timeout,
+                                         GCancellable         *cancellable,
+                                         GError              **error);
+  gint          (*send_messages)        (GDatagramBased       *datagram_based,
+                                         GOutputMessage       *messages,
+                                         guint                 num_messages,
+                                         gint                  flags,
+                                         gint64                timeout,
+                                         GCancellable         *cancellable,
+                                         GError              **error);
 
-  xsource_t      *(*create_source)        (xdatagram_based_t       *datagram_based,
-                                         xio_condition_t          condition,
-                                         xcancellable_t         *cancellable);
-  xio_condition_t  (*condition_check)      (xdatagram_based_t       *datagram_based,
-                                         xio_condition_t          condition);
-  xboolean_t      (*condition_wait)       (xdatagram_based_t       *datagram_based,
-                                         xio_condition_t          condition,
-                                         sint64_t                timeout,
-                                         xcancellable_t         *cancellable,
-                                         xerror_t              **error);
+  GSource      *(*create_source)        (GDatagramBased       *datagram_based,
+                                         GIOCondition          condition,
+                                         GCancellable         *cancellable);
+  GIOCondition  (*condition_check)      (GDatagramBased       *datagram_based,
+                                         GIOCondition          condition);
+  gboolean      (*condition_wait)       (GDatagramBased       *datagram_based,
+                                         GIOCondition          condition,
+                                         gint64                timeout,
+                                         GCancellable         *cancellable,
+                                         GError              **error);
 };
 
-XPL_AVAILABLE_IN_2_48
-xtype_t
+GLIB_AVAILABLE_IN_2_48
+GType
 g_datagram_based_get_type             (void);
 
-XPL_AVAILABLE_IN_2_48
-xint_t
-g_datagram_based_receive_messages     (xdatagram_based_t       *datagram_based,
-                                       xinput_message_t        *messages,
-                                       xuint_t                 num_messages,
-                                       xint_t                  flags,
-                                       sint64_t                timeout,
-                                       xcancellable_t         *cancellable,
-                                       xerror_t              **error);
+GLIB_AVAILABLE_IN_2_48
+gint
+g_datagram_based_receive_messages     (GDatagramBased       *datagram_based,
+                                       GInputMessage        *messages,
+                                       guint                 num_messages,
+                                       gint                  flags,
+                                       gint64                timeout,
+                                       GCancellable         *cancellable,
+                                       GError              **error);
 
-XPL_AVAILABLE_IN_2_48
-xint_t
-g_datagram_based_send_messages        (xdatagram_based_t       *datagram_based,
-                                       xoutput_message_t       *messages,
-                                       xuint_t                 num_messages,
-                                       xint_t                  flags,
-                                       sint64_t                timeout,
-                                       xcancellable_t         *cancellable,
-                                       xerror_t              **error);
+GLIB_AVAILABLE_IN_2_48
+gint
+g_datagram_based_send_messages        (GDatagramBased       *datagram_based,
+                                       GOutputMessage       *messages,
+                                       guint                 num_messages,
+                                       gint                  flags,
+                                       gint64                timeout,
+                                       GCancellable         *cancellable,
+                                       GError              **error);
 
-XPL_AVAILABLE_IN_2_48
-xsource_t *
-g_datagram_based_create_source        (xdatagram_based_t       *datagram_based,
-                                       xio_condition_t          condition,
-                                       xcancellable_t         *cancellable);
-XPL_AVAILABLE_IN_2_48
-xio_condition_t
-g_datagram_based_condition_check      (xdatagram_based_t       *datagram_based,
-                                       xio_condition_t          condition);
-XPL_AVAILABLE_IN_2_48
-xboolean_t
-g_datagram_based_condition_wait       (xdatagram_based_t       *datagram_based,
-                                       xio_condition_t          condition,
-                                       sint64_t                timeout,
-                                       xcancellable_t         *cancellable,
-                                       xerror_t              **error);
+GLIB_AVAILABLE_IN_2_48
+GSource *
+g_datagram_based_create_source        (GDatagramBased       *datagram_based,
+                                       GIOCondition          condition,
+                                       GCancellable         *cancellable);
+GLIB_AVAILABLE_IN_2_48
+GIOCondition
+g_datagram_based_condition_check      (GDatagramBased       *datagram_based,
+                                       GIOCondition          condition);
+GLIB_AVAILABLE_IN_2_48
+gboolean
+g_datagram_based_condition_wait       (GDatagramBased       *datagram_based,
+                                       GIOCondition          condition,
+                                       gint64                timeout,
+                                       GCancellable         *cancellable,
+                                       GError              **error);
 
 G_END_DECLS
 

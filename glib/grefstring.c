@@ -35,12 +35,12 @@
  * PersonDetails *
  * person_details_from_data (const char *data)
  * {
- *   // Use x_autoptr() to simplify error cases
- *   x_autoptr(xref_string) full_name = NULL;
- *   x_autoptr(xref_string) address =  NULL;
- *   x_autoptr(xref_string) city = NULL;
- *   x_autoptr(xref_string) state = NULL;
- *   x_autoptr(xref_string) zip_code = NULL;
+ *   // Use g_autoptr() to simplify error cases
+ *   g_autoptr(GRefString) full_name = NULL;
+ *   g_autoptr(GRefString) address =  NULL;
+ *   g_autoptr(GRefString) city = NULL;
+ *   g_autoptr(GRefString) state = NULL;
+ *   g_autoptr(GRefString) zip_code = NULL;
  *
  *   // parse_person_details() is defined elsewhere; returns refcounted strings
  *   if (!parse_person_details (data, &full_name, &address, &city, &state, &zip_code))
@@ -101,7 +101,7 @@
  * are removed from the table
  */
 G_LOCK_DEFINE_STATIC (interned_ref_strings);
-static xhashtable_t *interned_ref_strings;
+static GHashTable *interned_ref_strings;
 
 /**
  * g_ref_string_new:
@@ -118,12 +118,12 @@ char *
 g_ref_string_new (const char *str)
 {
   char *res;
-  xsize_t len;
+  gsize len;
 
-  xreturn_val_if_fail (str != NULL, NULL);
-
+  g_return_val_if_fail (str != NULL, NULL);
+  
   len = strlen (str);
-
+  
   res = (char *) g_atomic_rc_box_dup (sizeof (char) * len + 1, str);
 
   return res;
@@ -145,33 +145,33 @@ g_ref_string_new (const char *str)
  * Since: 2.58
  */
 char *
-g_ref_string_new_len (const char *str, xssize_t len)
+g_ref_string_new_len (const char *str, gssize len)
 {
   char *res;
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   if (len < 0)
     return g_ref_string_new (str);
 
   /* allocate then copy as str[len] may not be readable */
-  res = (char *) g_atomic_rc_box_alloc ((xsize_t) len + 1);
+  res = (char *) g_atomic_rc_box_alloc ((gsize) len + 1);
   memcpy (res, str, len);
   res[len] = '\0';
 
   return res;
 }
 
-/* interned_str_equal: variant of xstr_equal() that compares
+/* interned_str_equal: variant of g_str_equal() that compares
  * pointers as well as contents; this avoids running strcmp()
  * on arbitrarily long strings, as it's more likely to have
  * g_ref_string_new_intern() being called on the same refcounted
  * string instance, than on a different string with the same
  * contents
  */
-static xboolean_t
-interned_str_equal (xconstpointer v1,
-                    xconstpointer v2)
+static gboolean
+interned_str_equal (gconstpointer v1,
+                    gconstpointer v2)
 {
   const char *str1 = v1;
   const char *str2 = v2;
@@ -203,14 +203,14 @@ g_ref_string_new_intern (const char *str)
 {
   char *res;
 
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   G_LOCK (interned_ref_strings);
 
   if (G_UNLIKELY (interned_ref_strings == NULL))
-    interned_ref_strings = xhash_table_new (xstr_hash, interned_str_equal);
+    interned_ref_strings = g_hash_table_new (g_str_hash, interned_str_equal);
 
-  res = xhash_table_lookup (interned_ref_strings, str);
+  res = g_hash_table_lookup (interned_ref_strings, str);
   if (res != NULL)
     {
       /* We acquire the reference while holding the lock, to
@@ -224,7 +224,7 @@ g_ref_string_new_intern (const char *str)
     }
 
   res = g_ref_string_new (str);
-  xhash_table_add (interned_ref_strings, res);
+  g_hash_table_add (interned_ref_strings, res);
   G_UNLOCK (interned_ref_strings);
 
   return res;
@@ -243,13 +243,13 @@ g_ref_string_new_intern (const char *str)
 char *
 g_ref_string_acquire (char *str)
 {
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   return g_atomic_rc_box_acquire (str);
 }
 
 static void
-remove_if_interned (xpointer_t data)
+remove_if_interned (gpointer data)
 {
   char *str = data;
 
@@ -257,10 +257,10 @@ remove_if_interned (xpointer_t data)
 
   if (G_LIKELY (interned_ref_strings != NULL))
     {
-      xhash_table_remove (interned_ref_strings, str);
+      g_hash_table_remove (interned_ref_strings, str);
 
-      if (xhash_table_size (interned_ref_strings) == 0)
-        g_clear_pointer (&interned_ref_strings, xhash_table_destroy);
+      if (g_hash_table_size (interned_ref_strings) == 0)
+        g_clear_pointer (&interned_ref_strings, g_hash_table_destroy);
     }
 
   G_UNLOCK (interned_ref_strings);
@@ -293,10 +293,10 @@ g_ref_string_release (char *str)
  *
  * Since: 2.58
  */
-xsize_t
+gsize
 g_ref_string_length (char *str)
 {
-  xreturn_val_if_fail (str != NULL, 0);
+  g_return_val_if_fail (str != NULL, 0);
 
   return g_atomic_rc_box_get_size (str) - 1;
 }

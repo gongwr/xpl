@@ -20,30 +20,30 @@
 #include <gio/gio.h>
 
 static void
-event_cb (xsocket_listener_t      *listener,
+event_cb (GSocketListener      *listener,
           GSocketListenerEvent  event,
-          xsocket_t              *socket,
-          xpointer_t              data)
+          GSocket              *socket,
+          gpointer              data)
 {
-  static GSocketListenerEvent expected_event = XSOCKET_LISTENER_BINDING;
-  xboolean_t *success = (xboolean_t *)data;
+  static GSocketListenerEvent expected_event = G_SOCKET_LISTENER_BINDING;
+  gboolean *success = (gboolean *)data;
 
-  xassert (X_IS_SOCKET_LISTENER (listener));
-  xassert (X_IS_SOCKET (socket));
-  xassert (event == expected_event);
+  g_assert (G_IS_SOCKET_LISTENER (listener));
+  g_assert (G_IS_SOCKET (socket));
+  g_assert (event == expected_event);
 
   switch (event)
     {
-      case XSOCKET_LISTENER_BINDING:
-        expected_event = XSOCKET_LISTENER_BOUND;
+      case G_SOCKET_LISTENER_BINDING:
+        expected_event = G_SOCKET_LISTENER_BOUND;
         break;
-      case XSOCKET_LISTENER_BOUND:
-        expected_event = XSOCKET_LISTENER_LISTENING;
+      case G_SOCKET_LISTENER_BOUND:
+        expected_event = G_SOCKET_LISTENER_LISTENING;
         break;
-      case XSOCKET_LISTENER_LISTENING:
-        expected_event = XSOCKET_LISTENER_LISTENED;
+      case G_SOCKET_LISTENER_LISTENING:
+        expected_event = G_SOCKET_LISTENER_LISTENED;
         break;
-      case XSOCKET_LISTENER_LISTENED:
+      case G_SOCKET_LISTENER_LISTENED:
         *success = TRUE;
         break;
     }
@@ -52,32 +52,32 @@ event_cb (xsocket_listener_t      *listener,
 static void
 test_event_signal (void)
 {
-  xboolean_t success = FALSE;
-  xinet_address_t *iaddr;
-  xsocket_address_t *saddr;
-  xsocket_listener_t *listener;
-  xerror_t *error = NULL;
+  gboolean success = FALSE;
+  GInetAddress *iaddr;
+  GSocketAddress *saddr;
+  GSocketListener *listener;
+  GError *error = NULL;
 
-  iaddr = xinet_address_new_loopback (XSOCKET_FAMILY_IPV4);
+  iaddr = g_inet_address_new_loopback (G_SOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (iaddr, 0);
-  xobject_unref (iaddr);
+  g_object_unref (iaddr);
 
-  listener = xsocket_listener_new ();
+  listener = g_socket_listener_new ();
 
-  xsignal_connect (listener, "event", G_CALLBACK (event_cb), &success);
+  g_signal_connect (listener, "event", G_CALLBACK (event_cb), &success);
 
-  xsocket_listener_add_address (listener,
+  g_socket_listener_add_address (listener,
                                  saddr,
-                                 XSOCKET_TYPE_STREAM,
-                                 XSOCKET_PROTOCOL_TCP,
+                                 G_SOCKET_TYPE_STREAM,
+                                 G_SOCKET_PROTOCOL_TCP,
                                  NULL,
                                  NULL,
                                  &error);
   g_assert_no_error (error);
   g_assert_true (success);
 
-  xobject_unref (saddr);
-  xobject_unref (listener);
+  g_object_unref (saddr);
+  g_object_unref (listener);
 }
 
 int

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_TRASH_STACK_H__
 #define __G_TRASH_STACK_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -35,21 +35,21 @@ G_BEGIN_DECLS
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
-typedef struct _GTrashStack GTrashStack XPL_DEPRECATED_TYPE_IN_2_48;
+typedef struct _GTrashStack GTrashStack GLIB_DEPRECATED_TYPE_IN_2_48;
 struct _GTrashStack
 {
   GTrashStack *next;
-} XPL_DEPRECATED_TYPE_IN_2_48;
+} GLIB_DEPRECATED_TYPE_IN_2_48;
 
-XPL_DEPRECATED_IN_2_48
+GLIB_DEPRECATED_IN_2_48
 void      g_trash_stack_push   (GTrashStack **stack_p,
-                                xpointer_t      data_p);
-XPL_DEPRECATED_IN_2_48
-xpointer_t  g_trash_stack_pop    (GTrashStack **stack_p);
-XPL_DEPRECATED_IN_2_48
-xpointer_t  g_trash_stack_peek   (GTrashStack **stack_p);
-XPL_DEPRECATED_IN_2_48
-xuint_t     g_trash_stack_height (GTrashStack **stack_p);
+                                gpointer      data_p);
+GLIB_DEPRECATED_IN_2_48
+gpointer  g_trash_stack_pop    (GTrashStack **stack_p);
+GLIB_DEPRECATED_IN_2_48
+gpointer  g_trash_stack_peek   (GTrashStack **stack_p);
+GLIB_DEPRECATED_IN_2_48
+guint     g_trash_stack_height (GTrashStack **stack_p);
 
 G_GNUC_END_IGNORE_DEPRECATIONS
 

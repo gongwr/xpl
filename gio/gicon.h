@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XICON_H__
-#define __XICON_H__
+#ifndef __G_ICON_H__
+#define __G_ICON_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,74 +29,74 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_ICON            (xicon_get_type ())
-#define XICON(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_ICON, xicon))
-#define X_IS_ICON(obj)	       (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_ICON))
-#define XICON_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_ICON, xicon_iface_t))
+#define G_TYPE_ICON            (g_icon_get_type ())
+#define G_ICON(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_ICON, GIcon))
+#define G_IS_ICON(obj)	       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_ICON))
+#define G_ICON_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_ICON, GIconIface))
 
 /**
- * xicon_t:
+ * GIcon:
  *
  * An abstract type that specifies an icon.
  **/
-typedef struct _GIconIface xicon_iface_t;
+typedef struct _GIconIface GIconIface;
 
 /**
- * xicon_iface_t:
- * @x_iface: The parent interface.
- * @hash: A hash for a given #xicon_t.
+ * GIconIface:
+ * @g_iface: The parent interface.
+ * @hash: A hash for a given #GIcon.
  * @equal: Checks if two #GIcons are equal.
- * @to_tokens: Serializes a #xicon_t into tokens. The tokens must not
- * contain any whitespace. Don't implement if the #xicon_t can't be
+ * @to_tokens: Serializes a #GIcon into tokens. The tokens must not
+ * contain any whitespace. Don't implement if the #GIcon can't be
  * serialized (Since 2.20).
- * @from_tokens: Constructs a #xicon_t from tokens. Set the #xerror_t if
- * the tokens are malformed. Don't implement if the #xicon_t can't be
+ * @from_tokens: Constructs a #GIcon from tokens. Set the #GError if
+ * the tokens are malformed. Don't implement if the #GIcon can't be
  * serialized (Since 2.20).
- * @serialize: Serializes a #xicon_t into a #xvariant_t. Since: 2.38
+ * @serialize: Serializes a #GIcon into a #GVariant. Since: 2.38
  *
- * xicon_iface_t is used to implement xicon_t types for various
- * different systems. See #xthemed_icon_t and #xloadable_icon_t for
+ * GIconIface is used to implement GIcon types for various
+ * different systems. See #GThemedIcon and #GLoadableIcon for
  * examples of how to implement this interface.
  */
 struct _GIconIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* Virtual Table */
 
-  xuint_t       (* hash)        (xicon_t   *icon);
-  xboolean_t    (* equal)       (xicon_t   *icon1,
-                               xicon_t   *icon2);
-  xboolean_t    (* to_tokens)   (xicon_t   *icon,
-			       xptr_array_t *tokens,
-                               xint_t    *out_version);
-  xicon_t *     (* from_tokens) (xchar_t  **tokens,
-                               xint_t     num_tokens,
-                               xint_t     version,
-                               xerror_t **error);
+  guint       (* hash)        (GIcon   *icon);
+  gboolean    (* equal)       (GIcon   *icon1,
+                               GIcon   *icon2);
+  gboolean    (* to_tokens)   (GIcon   *icon,
+			       GPtrArray *tokens,
+                               gint    *out_version);
+  GIcon *     (* from_tokens) (gchar  **tokens,
+                               gint     num_tokens,
+                               gint     version,
+                               GError **error);
 
-  xvariant_t *  (* serialize)   (xicon_t   *icon);
+  GVariant *  (* serialize)   (GIcon   *icon);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xicon_get_type  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_icon_get_type  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xuint_t    xicon_hash            (xconstpointer  icon);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xicon_equal           (xicon_t         *icon1,
-                                 xicon_t         *icon2);
-XPL_AVAILABLE_IN_ALL
-xchar_t   *xicon_to_string       (xicon_t         *icon);
-XPL_AVAILABLE_IN_ALL
-xicon_t   *xicon_new_for_string  (const xchar_t   *str,
-                                 xerror_t       **error);
+GLIB_AVAILABLE_IN_ALL
+guint    g_icon_hash            (gconstpointer  icon);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_icon_equal           (GIcon         *icon1,
+                                 GIcon         *icon2);
+GLIB_AVAILABLE_IN_ALL
+gchar   *g_icon_to_string       (GIcon         *icon);
+GLIB_AVAILABLE_IN_ALL
+GIcon   *g_icon_new_for_string  (const gchar   *str,
+                                 GError       **error);
 
-XPL_AVAILABLE_IN_2_38
-xvariant_t * xicon_serialize     (xicon_t         *icon);
-XPL_AVAILABLE_IN_2_38
-xicon_t *    xicon_deserialize   (xvariant_t      *value);
+GLIB_AVAILABLE_IN_2_38
+GVariant * g_icon_serialize     (GIcon         *icon);
+GLIB_AVAILABLE_IN_2_38
+GIcon *    g_icon_deserialize   (GVariant      *value);
 
 G_END_DECLS
 
-#endif /* __XICON_H__ */
+#endif /* __G_ICON_H__ */

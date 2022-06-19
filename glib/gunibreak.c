@@ -23,37 +23,37 @@
 #include "gunibreak.h"
 
 #define TPROP_PART1(Page, Char) \
-  ((break_property_table_part1[Page] >= XUNICODE_MAX_TABLE_INDEX) \
-   ? (break_property_table_part1[Page] - XUNICODE_MAX_TABLE_INDEX) \
+  ((break_property_table_part1[Page] >= G_UNICODE_MAX_TABLE_INDEX) \
+   ? (break_property_table_part1[Page] - G_UNICODE_MAX_TABLE_INDEX) \
    : (break_property_data[break_property_table_part1[Page]][Char]))
 
 #define TPROP_PART2(Page, Char) \
-  ((break_property_table_part2[Page] >= XUNICODE_MAX_TABLE_INDEX) \
-   ? (break_property_table_part2[Page] - XUNICODE_MAX_TABLE_INDEX) \
+  ((break_property_table_part2[Page] >= G_UNICODE_MAX_TABLE_INDEX) \
+   ? (break_property_table_part2[Page] - G_UNICODE_MAX_TABLE_INDEX) \
    : (break_property_data[break_property_table_part2[Page]][Char]))
 
 #define PROP(Char) \
-  (((Char) <= XUNICODE_LAST_CHAR_PART1) \
+  (((Char) <= G_UNICODE_LAST_CHAR_PART1) \
    ? TPROP_PART1 ((Char) >> 8, (Char) & 0xff) \
-   : (((Char) >= 0xe0000 && (Char) <= XUNICODE_LAST_CHAR) \
+   : (((Char) >= 0xe0000 && (Char) <= G_UNICODE_LAST_CHAR) \
       ? TPROP_PART2 (((Char) - 0xe0000) >> 8, (Char) & 0xff) \
-      : XUNICODE_BREAK_UNKNOWN))
+      : G_UNICODE_BREAK_UNKNOWN))
 
 /**
- * xunichar_break_type:
+ * g_unichar_break_type:
  * @c: a Unicode character
- *
+ * 
  * Determines the break type of @c. @c should be a Unicode character
  * (to derive a character from UTF-8 encoded text, use
- * xutf8_get_char()). The break type is used to find word and line
+ * g_utf8_get_char()). The break type is used to find word and line
  * breaks ("text boundaries"), Pango implements the Unicode boundary
  * resolution algorithms and normally you would use a function such
  * as pango_break() instead of caring about break types yourself.
- *
+ * 
  * Returns: the break type of @c
  **/
 GUnicodeBreakType
-xunichar_break_type (xunichar_t c)
+g_unichar_break_type (gunichar c)
 {
   return PROP (c);
 }

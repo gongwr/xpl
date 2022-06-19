@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -35,27 +35,27 @@
 
 struct _GLocalVfs
 {
-  xvfs_t parent;
+  GVfs parent;
 };
 
 struct _GLocalVfsClass
 {
-  xvfs_class_t parent_class;
-
+  GVfsClass parent_class;
+  
 };
 
 #define g_local_vfs_get_type _g_local_vfs_get_type
-G_DEFINE_TYPE_WITH_CODE (GLocalVfs, g_local_vfs, XTYPE_VFS,
-			 _xio_modules_ensure_extension_points_registered ();
-			 g_io_extension_point_implement (XVFS_EXTENSION_POINT_NAME,
+G_DEFINE_TYPE_WITH_CODE (GLocalVfs, g_local_vfs, G_TYPE_VFS,
+			 _g_io_modules_ensure_extension_points_registered ();
+			 g_io_extension_point_implement (G_VFS_EXTENSION_POINT_NAME,
 							 g_define_type_id,
 							 "local",
 							 0))
 static void
-g_local_vfs_finalize (xobject_t *object)
+g_local_vfs_finalize (GObject *object)
 {
   /* must chain up */
-  XOBJECT_CLASS (g_local_vfs_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_local_vfs_parent_class)->finalize (object);
 }
 
 static void
@@ -66,81 +66,81 @@ g_local_vfs_init (GLocalVfs *vfs)
 /**
  * g_local_vfs_new:
  *
- * Returns a new #xvfs_t handle for a local vfs.
+ * Returns a new #GVfs handle for a local vfs.
  *
- * Returns: a new #xvfs_t handle.
+ * Returns: a new #GVfs handle.
  **/
-xvfs_t *
+GVfs *
 _g_local_vfs_new (void)
 {
-  return xobject_new (XTYPE_LOCAL_VFS, NULL);
+  return g_object_new (G_TYPE_LOCAL_VFS, NULL);
 }
 
-static xfile_t *
-g_local_vfs_get_file_for_path (xvfs_t       *vfs,
+static GFile *
+g_local_vfs_get_file_for_path (GVfs       *vfs,
                                const char *path)
 {
   if (*path == '\0')
-    return _xdummy_file_new (path);
+    return _g_dummy_file_new (path);
   else
     return _g_local_file_new (path);
 }
 
-static xfile_t *
-g_local_vfs_get_file_for_uri (xvfs_t       *vfs,
+static GFile *
+g_local_vfs_get_file_for_uri (GVfs       *vfs,
                               const char *uri)
 {
   char *path;
-  xfile_t *file;
+  GFile *file;
   char *stripped_uri, *hash;
-
+  
   if (strchr (uri, '#') != NULL)
     {
-      stripped_uri = xstrdup (uri);
+      stripped_uri = g_strdup (uri);
       hash = strchr (stripped_uri, '#');
       *hash = 0;
     }
   else
     stripped_uri = (char *)uri;
-
-  path = xfilename_from_uri (stripped_uri, NULL, NULL);
+      
+  path = g_filename_from_uri (stripped_uri, NULL, NULL);
 
   if (stripped_uri != uri)
     g_free (stripped_uri);
-
+  
   if (path != NULL)
     file = _g_local_file_new (path);
   else
-    file = _xdummy_file_new (uri);
+    file = _g_dummy_file_new (uri);
 
   g_free (path);
 
   return file;
 }
 
-static const xchar_t * const *
-g_local_vfs_get_supported_uri_schemes (xvfs_t *vfs)
+static const gchar * const *
+g_local_vfs_get_supported_uri_schemes (GVfs *vfs)
 {
-  static const xchar_t * uri_schemes[] = { "file", NULL };
+  static const gchar * uri_schemes[] = { "file", NULL };
 
   return uri_schemes;
 }
 
-static xfile_t *
-g_local_vfs_parse_name (xvfs_t       *vfs,
+static GFile *
+g_local_vfs_parse_name (GVfs       *vfs,
                         const char *parse_name)
 {
-  xfile_t *file;
+  GFile *file;
   char *filename;
   char *user_prefix;
   const char *user_end;
   char *rest;
-
-  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
-  xreturn_val_if_fail (parse_name != NULL, NULL);
+  
+  g_return_val_if_fail (G_IS_VFS (vfs), NULL);
+  g_return_val_if_fail (parse_name != NULL, NULL);
 
   if (g_ascii_strncasecmp ("file:", parse_name, 5) == 0)
-    filename = xfilename_from_uri (parse_name, NULL, NULL);
+    filename = g_filename_from_uri (parse_name, NULL, NULL);
   else
     {
       if (*parse_name == '~')
@@ -150,59 +150,59 @@ g_local_vfs_parse_name (xvfs_t       *vfs,
 	  user_start = parse_name + 1;
 #endif
 	  parse_name ++;
-
+	  
 	  while (*parse_name != 0 && *parse_name != '/')
 	    parse_name++;
-
+	  
 	  user_end = parse_name;
 
 #ifdef G_OS_UNIX
 	  if (user_end == user_start)
-	    user_prefix = xstrdup (g_get_home_dir ());
+	    user_prefix = g_strdup (g_get_home_dir ());
 	  else
 	    {
               struct passwd *passwd_file_entry;
               char *user_name;
 
-              user_name = xstrndup (user_start, user_end - user_start);
+              user_name = g_strndup (user_start, user_end - user_start);
               passwd_file_entry = g_unix_get_passwd_entry (user_name, NULL);
               g_free (user_name);
 
               if (passwd_file_entry != NULL &&
                   passwd_file_entry->pw_dir != NULL)
-                user_prefix = xstrdup (passwd_file_entry->pw_dir);
+                user_prefix = g_strdup (passwd_file_entry->pw_dir);
               else
-                user_prefix = xstrdup (g_get_home_dir ());
+                user_prefix = g_strdup (g_get_home_dir ());
 
               g_free (passwd_file_entry);
 	    }
 #else
-	  user_prefix = xstrdup (g_get_home_dir ());
+	  user_prefix = g_strdup (g_get_home_dir ());
 #endif
 
 	  rest = NULL;
 	  if (*user_end != 0)
-	    rest = xfilename_from_utf8 (user_end, -1, NULL, NULL, NULL);
-
+	    rest = g_filename_from_utf8 (user_end, -1, NULL, NULL, NULL);
+	  
 	  filename = g_build_filename (user_prefix, rest, NULL);
 	  g_free (rest);
 	  g_free (user_prefix);
 	}
       else
-	filename = xfilename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
+	filename = g_filename_from_utf8 (parse_name, -1, NULL, NULL, NULL);
     }
-
+  
   if (filename == NULL)
-    filename = xstrdup (parse_name);
-
+    filename = g_strdup (parse_name);
+    
   file = _g_local_file_new (filename);
   g_free (filename);
 
   return file;
 }
 
-static xboolean_t
-g_local_vfs_is_active (xvfs_t *vfs)
+static gboolean
+g_local_vfs_is_active (GVfs *vfs)
 {
   return TRUE;
 }
@@ -210,14 +210,14 @@ g_local_vfs_is_active (xvfs_t *vfs)
 static void
 g_local_vfs_class_init (GLocalVfsClass *class)
 {
-  xobject_class_t *object_class;
-  xvfs_class_t *vfs_class;
-
-  object_class = (xobject_class_t *) class;
+  GObjectClass *object_class;
+  GVfsClass *vfs_class;
+  
+  object_class = (GObjectClass *) class;
 
   object_class->finalize = g_local_vfs_finalize;
 
-  vfs_class = XVFS_CLASS (class);
+  vfs_class = G_VFS_CLASS (class);
 
   vfs_class->is_active = g_local_vfs_is_active;
   vfs_class->get_file_for_path = g_local_vfs_get_file_for_path;

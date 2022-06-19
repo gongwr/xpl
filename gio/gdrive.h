@@ -19,8 +19,8 @@
  *         David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __XDRIVE_H__
-#define __XDRIVE_H__
+#ifndef __G_DRIVE_H__
+#define __G_DRIVE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,242 +31,242 @@
 G_BEGIN_DECLS
 
 /**
- * XDRIVE_IDENTIFIER_KIND_UNIX_DEVICE:
+ * G_DRIVE_IDENTIFIER_KIND_UNIX_DEVICE:
  *
- * The string used to obtain a Unix device path with xdrive_get_identifier().
+ * The string used to obtain a Unix device path with g_drive_get_identifier().
  *
  * Since: 2.58
  */
-#define XDRIVE_IDENTIFIER_KIND_UNIX_DEVICE "unix-device"
+#define G_DRIVE_IDENTIFIER_KIND_UNIX_DEVICE "unix-device"
 
-#define XTYPE_DRIVE           (xdrive_get_type ())
-#define G_DRIVE(obj)           (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_DRIVE, xdrive))
-#define X_IS_DRIVE(obj)        (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_DRIVE))
-#define XDRIVE_GET_IFACE(obj) (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_DRIVE, xdrive_iface_t))
+#define G_TYPE_DRIVE           (g_drive_get_type ())
+#define G_DRIVE(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_DRIVE, GDrive))
+#define G_IS_DRIVE(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_DRIVE))
+#define G_DRIVE_GET_IFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_DRIVE, GDriveIface))
 
 /**
- * xdrive_iface_t:
- * @x_iface: The parent interface.
+ * GDriveIface:
+ * @g_iface: The parent interface.
  * @changed: Signal emitted when the drive is changed.
- * @disconnected: The removed signal that is emitted when the #xdrive_t have been disconnected. If the recipient is holding references to the object they should release them so the object can be finalized.
+ * @disconnected: The removed signal that is emitted when the #GDrive have been disconnected. If the recipient is holding references to the object they should release them so the object can be finalized.
  * @eject_button: Signal emitted when the physical eject button (if any) of a drive have been pressed.
- * @get_name: Returns the name for the given #xdrive_t.
- * @get_icon: Returns a #xicon_t for the given #xdrive_t.
- * @has_volumes: Returns %TRUE if the #xdrive_t has mountable volumes.
- * @get_volumes: Returns a list #xlist_t of #xvolume_t for the #xdrive_t.
- * @is_removable: Returns %TRUE if the #xdrive_t and/or its media is considered removable by the user. Since 2.50.
- * @is_media_removable: Returns %TRUE if the #xdrive_t supports removal and insertion of media.
- * @has_media: Returns %TRUE if the #xdrive_t has media inserted.
- * @is_media_check_automatic: Returns %TRUE if the #xdrive_t is capable of automatically detecting media changes.
- * @can_poll_for_media: Returns %TRUE if the #xdrive_t is capable of manually polling for media change.
- * @can_eject: Returns %TRUE if the #xdrive_t can eject media.
- * @eject: Ejects a #xdrive_t.
+ * @get_name: Returns the name for the given #GDrive.
+ * @get_icon: Returns a #GIcon for the given #GDrive.
+ * @has_volumes: Returns %TRUE if the #GDrive has mountable volumes.
+ * @get_volumes: Returns a list #GList of #GVolume for the #GDrive.
+ * @is_removable: Returns %TRUE if the #GDrive and/or its media is considered removable by the user. Since 2.50.
+ * @is_media_removable: Returns %TRUE if the #GDrive supports removal and insertion of media.
+ * @has_media: Returns %TRUE if the #GDrive has media inserted.
+ * @is_media_check_automatic: Returns %TRUE if the #GDrive is capable of automatically detecting media changes.
+ * @can_poll_for_media: Returns %TRUE if the #GDrive is capable of manually polling for media change.
+ * @can_eject: Returns %TRUE if the #GDrive can eject media.
+ * @eject: Ejects a #GDrive.
  * @eject_finish: Finishes an eject operation.
- * @poll_for_media: Poll for media insertion/removal on a #xdrive_t.
+ * @poll_for_media: Poll for media insertion/removal on a #GDrive.
  * @poll_for_media_finish: Finishes a media poll operation.
  * @get_identifier: Returns the identifier of the given kind, or %NULL if
- *    the #xdrive_t doesn't have one.
+ *    the #GDrive doesn't have one.
  * @enumerate_identifiers: Returns an array strings listing the kinds
- *    of identifiers which the #xdrive_t has.
+ *    of identifiers which the #GDrive has.
  * @get_start_stop_type: Gets a #GDriveStartStopType with details about starting/stopping the drive. Since 2.22.
- * @can_stop: Returns %TRUE if a #xdrive_t can be stopped. Since 2.22.
- * @stop: Stops a #xdrive_t. Since 2.22.
+ * @can_stop: Returns %TRUE if a #GDrive can be stopped. Since 2.22.
+ * @stop: Stops a #GDrive. Since 2.22.
  * @stop_finish: Finishes a stop operation. Since 2.22.
- * @can_start: Returns %TRUE if a #xdrive_t can be started. Since 2.22.
- * @can_start_degraded: Returns %TRUE if a #xdrive_t can be started degraded. Since 2.22.
- * @start: Starts a #xdrive_t. Since 2.22.
+ * @can_start: Returns %TRUE if a #GDrive can be started. Since 2.22.
+ * @can_start_degraded: Returns %TRUE if a #GDrive can be started degraded. Since 2.22.
+ * @start: Starts a #GDrive. Since 2.22.
  * @start_finish: Finishes a start operation. Since 2.22.
  * @stop_button: Signal emitted when the physical stop button (if any) of a drive have been pressed. Since 2.22.
- * @eject_with_operation: Starts ejecting a #xdrive_t using a #xmount_operation_t. Since 2.22.
- * @eject_with_operation_finish: Finishes an eject operation using a #xmount_operation_t. Since 2.22.
- * @get_sort_key: Gets a key used for sorting #xdrive_t instances or %NULL if no such key exists. Since 2.32.
- * @get_symbolic_icon: Returns a symbolic #xicon_t for the given #xdrive_t. Since 2.34.
+ * @eject_with_operation: Starts ejecting a #GDrive using a #GMountOperation. Since 2.22.
+ * @eject_with_operation_finish: Finishes an eject operation using a #GMountOperation. Since 2.22.
+ * @get_sort_key: Gets a key used for sorting #GDrive instances or %NULL if no such key exists. Since 2.32.
+ * @get_symbolic_icon: Returns a symbolic #GIcon for the given #GDrive. Since 2.34.
  *
- * Interface for creating #xdrive_t implementations.
+ * Interface for creating #GDrive implementations.
  */
-typedef struct _xdrive_iface    xdrive_iface_t;
+typedef struct _GDriveIface    GDriveIface;
 
-struct _xdrive_iface
+struct _GDriveIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* signals */
-  void     (* changed)                  (xdrive_t              *drive);
-  void     (* disconnected)             (xdrive_t              *drive);
-  void     (* eject_button)             (xdrive_t              *drive);
+  void     (* changed)                  (GDrive              *drive);
+  void     (* disconnected)             (GDrive              *drive);
+  void     (* eject_button)             (GDrive              *drive);
 
   /* Virtual Table */
-  char *   (* get_name)                 (xdrive_t              *drive);
-  xicon_t *  (* get_icon)                 (xdrive_t              *drive);
-  xboolean_t (* has_volumes)              (xdrive_t              *drive);
-  xlist_t *  (* get_volumes)              (xdrive_t              *drive);
-  xboolean_t (* is_media_removable)       (xdrive_t              *drive);
-  xboolean_t (* has_media)                (xdrive_t              *drive);
-  xboolean_t (* is_media_check_automatic) (xdrive_t              *drive);
-  xboolean_t (* can_eject)                (xdrive_t              *drive);
-  xboolean_t (* can_poll_for_media)       (xdrive_t              *drive);
-  void     (* eject)                    (xdrive_t              *drive,
-                                         xmount_unmount_flags_t   flags,
-                                         xcancellable_t        *cancellable,
-                                         xasync_ready_callback_t  callback,
-                                         xpointer_t             user_data);
-  xboolean_t (* eject_finish)             (xdrive_t              *drive,
-                                         xasync_result_t        *result,
-                                         xerror_t             **error);
-  void     (* poll_for_media)           (xdrive_t              *drive,
-                                         xcancellable_t        *cancellable,
-                                         xasync_ready_callback_t  callback,
-                                         xpointer_t             user_data);
-  xboolean_t (* poll_for_media_finish)    (xdrive_t              *drive,
-                                         xasync_result_t        *result,
-                                         xerror_t             **error);
+  char *   (* get_name)                 (GDrive              *drive);
+  GIcon *  (* get_icon)                 (GDrive              *drive);
+  gboolean (* has_volumes)              (GDrive              *drive);
+  GList *  (* get_volumes)              (GDrive              *drive);
+  gboolean (* is_media_removable)       (GDrive              *drive);
+  gboolean (* has_media)                (GDrive              *drive);
+  gboolean (* is_media_check_automatic) (GDrive              *drive);
+  gboolean (* can_eject)                (GDrive              *drive);
+  gboolean (* can_poll_for_media)       (GDrive              *drive);
+  void     (* eject)                    (GDrive              *drive,
+                                         GMountUnmountFlags   flags,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data);
+  gboolean (* eject_finish)             (GDrive              *drive,
+                                         GAsyncResult        *result,
+                                         GError             **error);
+  void     (* poll_for_media)           (GDrive              *drive,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data);
+  gboolean (* poll_for_media_finish)    (GDrive              *drive,
+                                         GAsyncResult        *result,
+                                         GError             **error);
 
-  char *   (* get_identifier)           (xdrive_t              *drive,
+  char *   (* get_identifier)           (GDrive              *drive,
                                          const char          *kind);
-  char **  (* enumerate_identifiers)    (xdrive_t              *drive);
+  char **  (* enumerate_identifiers)    (GDrive              *drive);
 
-  GDriveStartStopType (* get_start_stop_type) (xdrive_t        *drive);
+  GDriveStartStopType (* get_start_stop_type) (GDrive        *drive);
 
-  xboolean_t (* can_start)                (xdrive_t              *drive);
-  xboolean_t (* can_start_degraded)       (xdrive_t              *drive);
-  void     (* start)                    (xdrive_t              *drive,
+  gboolean (* can_start)                (GDrive              *drive);
+  gboolean (* can_start_degraded)       (GDrive              *drive);
+  void     (* start)                    (GDrive              *drive,
                                          GDriveStartFlags     flags,
-                                         xmount_operation_t     *mount_operation,
-                                         xcancellable_t        *cancellable,
-                                         xasync_ready_callback_t  callback,
-                                         xpointer_t             user_data);
-  xboolean_t (* start_finish)             (xdrive_t              *drive,
-                                         xasync_result_t        *result,
-                                         xerror_t             **error);
+                                         GMountOperation     *mount_operation,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data);
+  gboolean (* start_finish)             (GDrive              *drive,
+                                         GAsyncResult        *result,
+                                         GError             **error);
 
-  xboolean_t (* can_stop)                 (xdrive_t              *drive);
-  void     (* stop)                     (xdrive_t              *drive,
-                                         xmount_unmount_flags_t   flags,
-                                         xmount_operation_t     *mount_operation,
-                                         xcancellable_t        *cancellable,
-                                         xasync_ready_callback_t  callback,
-                                         xpointer_t             user_data);
-  xboolean_t (* stop_finish)              (xdrive_t              *drive,
-                                         xasync_result_t        *result,
-                                         xerror_t             **error);
+  gboolean (* can_stop)                 (GDrive              *drive);
+  void     (* stop)                     (GDrive              *drive,
+                                         GMountUnmountFlags   flags,
+                                         GMountOperation     *mount_operation,
+                                         GCancellable        *cancellable,
+                                         GAsyncReadyCallback  callback,
+                                         gpointer             user_data);
+  gboolean (* stop_finish)              (GDrive              *drive,
+                                         GAsyncResult        *result,
+                                         GError             **error);
   /* signal, not VFunc */
-  void     (* stop_button)              (xdrive_t              *drive);
+  void     (* stop_button)              (GDrive              *drive);
 
-  void        (* eject_with_operation)      (xdrive_t              *drive,
-                                             xmount_unmount_flags_t   flags,
-                                             xmount_operation_t     *mount_operation,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xboolean_t    (* eject_with_operation_finish) (xdrive_t            *drive,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
+  void        (* eject_with_operation)      (GDrive              *drive,
+                                             GMountUnmountFlags   flags,
+                                             GMountOperation     *mount_operation,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gboolean    (* eject_with_operation_finish) (GDrive            *drive,
+                                             GAsyncResult        *result,
+                                             GError             **error);
 
-  const xchar_t * (* get_sort_key)        (xdrive_t              *drive);
-  xicon_t *       (* get_symbolic_icon)   (xdrive_t              *drive);
-  xboolean_t      (* is_removable)        (xdrive_t              *drive);
+  const gchar * (* get_sort_key)        (GDrive              *drive);
+  GIcon *       (* get_symbolic_icon)   (GDrive              *drive);
+  gboolean      (* is_removable)        (GDrive              *drive);
 
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    xdrive_get_type                 (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_drive_get_type                 (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-char *   xdrive_get_name                 (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xicon_t *  xdrive_get_icon                 (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xicon_t *  xdrive_get_symbolic_icon        (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_has_volumes              (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xlist_t *  xdrive_get_volumes              (xdrive_t               *drive);
-XPL_AVAILABLE_IN_2_50
-xboolean_t xdrive_is_removable             (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_is_media_removable       (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_has_media                (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_is_media_check_automatic (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_can_poll_for_media       (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_can_eject                (xdrive_t               *drive);
-XPL_DEPRECATED_FOR(xdrive_eject_with_operation)
-void     xdrive_eject                    (xdrive_t               *drive,
-                                           xmount_unmount_flags_t    flags,
-                                           xcancellable_t         *cancellable,
-                                           xasync_ready_callback_t   callback,
-                                           xpointer_t              user_data);
+GLIB_AVAILABLE_IN_ALL
+char *   g_drive_get_name                 (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+GIcon *  g_drive_get_icon                 (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+GIcon *  g_drive_get_symbolic_icon        (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_has_volumes              (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+GList *  g_drive_get_volumes              (GDrive               *drive);
+GLIB_AVAILABLE_IN_2_50
+gboolean g_drive_is_removable             (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_is_media_removable       (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_has_media                (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_is_media_check_automatic (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_can_poll_for_media       (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_can_eject                (GDrive               *drive);
+GLIB_DEPRECATED_FOR(g_drive_eject_with_operation)
+void     g_drive_eject                    (GDrive               *drive,
+                                           GMountUnmountFlags    flags,
+                                           GCancellable         *cancellable,
+                                           GAsyncReadyCallback   callback,
+                                           gpointer              user_data);
 
-XPL_DEPRECATED_FOR(xdrive_eject_with_operation_finish)
-xboolean_t xdrive_eject_finish             (xdrive_t               *drive,
-                                           xasync_result_t         *result,
-                                           xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void     xdrive_poll_for_media           (xdrive_t               *drive,
-                                           xcancellable_t         *cancellable,
-                                           xasync_ready_callback_t   callback,
-                                           xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_poll_for_media_finish    (xdrive_t               *drive,
-                                           xasync_result_t         *result,
-                                           xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-char *   xdrive_get_identifier           (xdrive_t              *drive,
+GLIB_DEPRECATED_FOR(g_drive_eject_with_operation_finish)
+gboolean g_drive_eject_finish             (GDrive               *drive,
+                                           GAsyncResult         *result,
+                                           GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void     g_drive_poll_for_media           (GDrive               *drive,
+                                           GCancellable         *cancellable,
+                                           GAsyncReadyCallback   callback,
+                                           gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_poll_for_media_finish    (GDrive               *drive,
+                                           GAsyncResult         *result,
+                                           GError              **error);
+GLIB_AVAILABLE_IN_ALL
+char *   g_drive_get_identifier           (GDrive              *drive,
                                            const char          *kind);
-XPL_AVAILABLE_IN_ALL
-char **  xdrive_enumerate_identifiers    (xdrive_t              *drive);
+GLIB_AVAILABLE_IN_ALL
+char **  g_drive_enumerate_identifiers    (GDrive              *drive);
 
-XPL_AVAILABLE_IN_ALL
-GDriveStartStopType xdrive_get_start_stop_type (xdrive_t        *drive);
+GLIB_AVAILABLE_IN_ALL
+GDriveStartStopType g_drive_get_start_stop_type (GDrive        *drive);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_can_start                (xdrive_t              *drive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_can_start_degraded       (xdrive_t              *drive);
-XPL_AVAILABLE_IN_ALL
-void     xdrive_start                    (xdrive_t              *drive,
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_can_start                (GDrive              *drive);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_can_start_degraded       (GDrive              *drive);
+GLIB_AVAILABLE_IN_ALL
+void     g_drive_start                    (GDrive              *drive,
                                            GDriveStartFlags     flags,
-                                           xmount_operation_t     *mount_operation,
-                                           xcancellable_t        *cancellable,
-                                           xasync_ready_callback_t  callback,
-                                           xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_start_finish             (xdrive_t               *drive,
-                                           xasync_result_t         *result,
-                                           xerror_t              **error);
+                                           GMountOperation     *mount_operation,
+                                           GCancellable        *cancellable,
+                                           GAsyncReadyCallback  callback,
+                                           gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_start_finish             (GDrive               *drive,
+                                           GAsyncResult         *result,
+                                           GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_can_stop                 (xdrive_t               *drive);
-XPL_AVAILABLE_IN_ALL
-void     xdrive_stop                     (xdrive_t               *drive,
-                                           xmount_unmount_flags_t    flags,
-                                           xmount_operation_t      *mount_operation,
-                                           xcancellable_t         *cancellable,
-                                           xasync_ready_callback_t   callback,
-                                           xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t xdrive_stop_finish              (xdrive_t               *drive,
-                                           xasync_result_t         *result,
-                                           xerror_t              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_can_stop                 (GDrive               *drive);
+GLIB_AVAILABLE_IN_ALL
+void     g_drive_stop                     (GDrive               *drive,
+                                           GMountUnmountFlags    flags,
+                                           GMountOperation      *mount_operation,
+                                           GCancellable         *cancellable,
+                                           GAsyncReadyCallback   callback,
+                                           gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_drive_stop_finish              (GDrive               *drive,
+                                           GAsyncResult         *result,
+                                           GError              **error);
 
-XPL_AVAILABLE_IN_ALL
-void        xdrive_eject_with_operation      (xdrive_t              *drive,
-                                               xmount_unmount_flags_t   flags,
-                                               xmount_operation_t     *mount_operation,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    xdrive_eject_with_operation_finish (xdrive_t            *drive,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+void        g_drive_eject_with_operation      (GDrive              *drive,
+                                               GMountUnmountFlags   flags,
+                                               GMountOperation     *mount_operation,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_drive_eject_with_operation_finish (GDrive            *drive,
+                                               GAsyncResult        *result,
+                                               GError             **error);
 
-XPL_AVAILABLE_IN_2_32
-const xchar_t *xdrive_get_sort_key         (xdrive_t               *drive);
+GLIB_AVAILABLE_IN_2_32
+const gchar *g_drive_get_sort_key         (GDrive               *drive);
 
 G_END_DECLS
 
-#endif /* __XDRIVE_H__ */
+#endif /* __G_DRIVE_H__ */

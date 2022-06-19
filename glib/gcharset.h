@@ -19,7 +19,7 @@
 #ifndef __G_CHARSET_H__
 #define __G_CHARSET_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -27,20 +27,20 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t              g_get_charset         (const char **charset);
-XPL_AVAILABLE_IN_ALL
-xchar_t *               g_get_codeset         (void);
-XPL_AVAILABLE_IN_2_62
-xboolean_t              g_get_console_charset (const char **charset);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_get_charset         (const char **charset);
+GLIB_AVAILABLE_IN_ALL
+gchar *               g_get_codeset         (void);
+GLIB_AVAILABLE_IN_2_62
+gboolean              g_get_console_charset (const char **charset);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t * const * g_get_language_names  (void);
-XPL_AVAILABLE_IN_2_58
-const xchar_t * const * g_get_language_names_with_category
-                                            (const xchar_t *category_name);
-XPL_AVAILABLE_IN_ALL
-xchar_t **              g_get_locale_variants (const xchar_t *locale);
+GLIB_AVAILABLE_IN_ALL
+const gchar * const * g_get_language_names  (void);
+GLIB_AVAILABLE_IN_2_58
+const gchar * const * g_get_language_names_with_category
+                                            (const gchar *category_name);
+GLIB_AVAILABLE_IN_ALL
+gchar **              g_get_locale_variants (const gchar *locale);
 
 G_END_DECLS
 

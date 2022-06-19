@@ -9,30 +9,30 @@
 #endif
 
 static void
-test_source (xsource_t *one, xcallback_t quit_callback)
+test_source (GSource *one, GCallback quit_callback)
 {
-  xclosure_t *closure;
-  xmain_loop_t *loop;
+  GClosure *closure;
+  GMainLoop *loop;
 
-  /* Callback with xmain_loop_t user_data */
-  loop = xmain_loop_new (NULL, FALSE);
+  /* Callback with GMainLoop user_data */
+  loop = g_main_loop_new (NULL, FALSE);
 
   closure = g_cclosure_new (quit_callback, loop, NULL);
-  xsource_set_closure (one, closure);
+  g_source_set_closure (one, closure);
 
-  xsource_attach (one, NULL);
-  xmain_loop_run (loop);
+  g_source_attach (one, NULL);
+  g_main_loop_run (loop);
 
-  xsource_destroy (one);
-  xmain_loop_unref (loop);
+  g_source_destroy (one);
+  g_main_loop_unref (loop);
 }
 
-static xboolean_t
-simple_quit_callback (xpointer_t user_data)
+static gboolean
+simple_quit_callback (gpointer user_data)
 {
-  xmain_loop_t *loop = user_data;
+  GMainLoop *loop = user_data;
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 
   return TRUE;
 }
@@ -40,31 +40,31 @@ simple_quit_callback (xpointer_t user_data)
 static void
 test_closure_idle (void)
 {
-  xsource_t *source;
+  GSource *source;
 
   source = g_idle_source_new ();
   test_source (source, G_CALLBACK (simple_quit_callback));
-  xsource_unref (source);
+  g_source_unref (source);
 }
 
 static void
 test_closure_timeout (void)
 {
-  xsource_t *source;
+  GSource *source;
 
   source = g_timeout_source_new (10);
   test_source (source, G_CALLBACK (simple_quit_callback));
-  xsource_unref (source);
+  g_source_unref (source);
 }
 
-static xboolean_t
-iochannel_quit_callback (xio_channel_t   *channel,
-                         xio_condition_t  cond,
-                         xpointer_t      user_data)
+static gboolean
+iochannel_quit_callback (GIOChannel   *channel,
+                         GIOCondition  cond,
+                         gpointer      user_data)
 {
-  xmain_loop_t *loop = user_data;
+  GMainLoop *loop = user_data;
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 
   return TRUE;
 }
@@ -72,13 +72,13 @@ iochannel_quit_callback (xio_channel_t   *channel,
 static void
 test_closure_iochannel (void)
 {
-  xio_channel_t *chan;
-  xsource_t *source;
+  GIOChannel *chan;
+  GSource *source;
   char *path;
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   if (g_path_is_absolute (g_get_prgname ()))
-    path = xstrdup (g_get_prgname ());
+    path = g_strdup (g_get_prgname ());
   else
     {
       path = g_test_build_filename (G_TEST_BUILT,
@@ -91,7 +91,7 @@ test_closure_iochannel (void)
 
   source = g_io_create_watch (chan, G_IO_IN);
   test_source (source, G_CALLBACK (iochannel_quit_callback));
-  xsource_unref (source);
+  g_source_unref (source);
 
   g_io_channel_unref (chan);
 }
@@ -99,16 +99,16 @@ test_closure_iochannel (void)
 static void
 test_closure_child (void)
 {
-  xsource_t *source;
-  xpid_t pid;
-  xerror_t *error = NULL;
-  xchar_t *argv[3];
+  GSource *source;
+  GPid pid;
+  GError *error = NULL;
+  gchar *argv[3];
 
-  xassert (g_getenv ("DO_NOT_ACCIDENTALLY_RECURSE") == NULL);
+  g_assert (g_getenv ("DO_NOT_ACCIDENTALLY_RECURSE") == NULL);
   g_setenv ("DO_NOT_ACCIDENTALLY_RECURSE", "1", TRUE);
 
   if (g_path_is_absolute (g_get_prgname ()))
-    argv[0] = xstrdup (g_get_prgname ());
+    argv[0] = g_strdup (g_get_prgname ());
   else
     {
       argv[0] = g_test_build_filename (G_TEST_BUILT,
@@ -130,18 +130,18 @@ test_closure_child (void)
 
   source = g_child_watch_source_new (pid);
   test_source (source, G_CALLBACK (iochannel_quit_callback));
-  xsource_unref (source);
+  g_source_unref (source);
 }
 
 #ifdef G_OS_UNIX
-static xboolean_t
-fd_quit_callback (xint_t         fd,
-                  xio_condition_t condition,
-                  xpointer_t     user_data)
+static gboolean
+fd_quit_callback (gint         fd,
+                  GIOCondition condition,
+                  gpointer     user_data)
 {
-  xmain_loop_t *loop = user_data;
+  GMainLoop *loop = user_data;
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 
   return TRUE;
 }
@@ -149,32 +149,32 @@ fd_quit_callback (xint_t         fd,
 static void
 test_closure_fd (void)
 {
-  xint_t fd;
-  xsource_t *source;
+  gint fd;
+  GSource *source;
 
   fd = open ("/dev/null", O_RDONLY);
-  xassert (fd != -1);
+  g_assert (fd != -1);
 
   source = g_unix_fd_source_new (fd, G_IO_IN);
   test_source (source, G_CALLBACK (fd_quit_callback));
-  xsource_unref (source);
+  g_source_unref (source);
 
   close (fd);
 }
 
-static xboolean_t
-send_usr1 (xpointer_t user_data)
+static gboolean
+send_usr1 (gpointer user_data)
 {
   kill (getpid (), SIGUSR1);
   return FALSE;
 }
 
-static xboolean_t
-closure_quit_callback (xpointer_t     user_data)
+static gboolean
+closure_quit_callback (gpointer     user_data)
 {
-  xmain_loop_t *loop = user_data;
+  GMainLoop *loop = user_data;
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 
   return TRUE;
 }
@@ -182,13 +182,13 @@ closure_quit_callback (xpointer_t     user_data)
 static void
 test_closure_signal (void)
 {
-  xsource_t *source;
+  GSource *source;
 
   g_idle_add_full (G_PRIORITY_LOW, send_usr1, NULL, NULL);
 
   source = g_unix_signal_source_new (SIGUSR1);
   test_source (source, G_CALLBACK (closure_quit_callback));
-  xsource_unref (source);
+  g_source_unref (source);
 }
 #endif
 

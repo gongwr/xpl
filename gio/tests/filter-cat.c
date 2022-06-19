@@ -38,13 +38,13 @@
 #endif
 #endif
 
-static xchar_t **locations = NULL;
+static gchar **locations = NULL;
 static char *from_charset = NULL;
 static char *to_charset = NULL;
-static xboolean_t decompress = FALSE;
-static xboolean_t compress = FALSE;
-static xboolean_t gzip = FALSE;
-static xboolean_t fallback = FALSE;
+static gboolean decompress = FALSE;
+static gboolean compress = FALSE;
+static gboolean gzip = FALSE;
+static gboolean fallback = FALSE;
 
 static GOptionEntry entries[] = {
   {"decompress", 0, 0, G_OPTION_ARG_NONE, &decompress, "decompress", NULL},
@@ -53,76 +53,76 @@ static GOptionEntry entries[] = {
   {"from-charset", 0, 0, G_OPTION_ARG_STRING, &from_charset, "from charset", NULL},
   {"to-charset", 0, 0, G_OPTION_ARG_STRING, &to_charset, "to charset", NULL},
   {"fallback", 0, 0, G_OPTION_ARG_NONE, &fallback, "use fallback", NULL},
-  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARXFILENAME_ARRAY, &locations, "locations", NULL},
+  {G_OPTION_REMAINING, 0, 0, G_OPTION_ARG_FILENAME_ARRAY, &locations, "locations", NULL},
   G_OPTION_ENTRY_NULL
 };
 
 static void
-decompressor_file_info_notify_cb (xzlib_decompressor_t *decompressor,
-                                  xparam_spec_t *pspec,
-                                  xpointer_t data)
+decompressor_file_info_notify_cb (GZlibDecompressor *decompressor,
+                                  GParamSpec *pspec,
+                                  gpointer data)
 {
-  xfile_info_t *file_info;
-  const xchar_t *filename;
+  GFileInfo *file_info;
+  const gchar *filename;
 
   file_info = g_zlib_decompressor_get_file_info (decompressor);
   if (file_info == NULL)
     return;
 
-  filename = xfile_info_get_name (file_info);
+  filename = g_file_info_get_name (file_info);
   if (filename)
     g_printerr ("Decompressor filename: %s\n", filename);
 }
 
 static void
-cat (xfile_t * file)
+cat (GFile * file)
 {
-  xinput_stream_t *in;
+  GInputStream *in;
   char buffer[1024 * 8 + 1];
   char *p;
-  xssize_t res;
-  xboolean_t close_res;
-  xerror_t *error;
-  xconverter_t *conv;
-  xcharset_converter_t *cconv = NULL;
+  gssize res;
+  gboolean close_res;
+  GError *error;
+  GConverter *conv;
+  GCharsetConverter *cconv = NULL;
 
   error = NULL;
-  in = (xinput_stream_t *) xfile_read (file, NULL, &error);
+  in = (GInputStream *) g_file_read (file, NULL, &error);
   if (in == NULL)
     {
       /* Translators: the first %s is the program name, the second one  */
       /* is the URI of the file, the third is the error message.        */
       g_printerr ("%s: %s: error opening file: %s\n",
-		  g_get_prgname (), xfile_get_uri (file), error->message);
-      xerror_free (error);
+		  g_get_prgname (), g_file_get_uri (file), error->message);
+      g_error_free (error);
       return;
     }
 
   if (decompress)
     {
-      xinput_stream_t *old;
-      conv = (xconverter_t *)g_zlib_decompressor_new (gzip?G_ZLIB_COMPRESSOR_FORMAT_GZIP:G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
+      GInputStream *old;
+      conv = (GConverter *)g_zlib_decompressor_new (gzip?G_ZLIB_COMPRESSOR_FORMAT_GZIP:G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
       old = in;
-      in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
-      xsignal_connect (conv, "notify::file-info", G_CALLBACK (decompressor_file_info_notify_cb), NULL);
-      xobject_unref (conv);
-      xobject_unref (old);
+      in = (GInputStream *) g_converter_input_stream_new (in, conv);
+      g_signal_connect (conv, "notify::file-info", G_CALLBACK (decompressor_file_info_notify_cb), NULL);
+      g_object_unref (conv);
+      g_object_unref (old);
     }
 
   if (from_charset && to_charset)
     {
-      cconv = xcharset_converter_new (to_charset, from_charset, &error);
-      conv = (xconverter_t *)cconv;
+      cconv = g_charset_converter_new (to_charset, from_charset, &error);
+      conv = (GConverter *)cconv;
       if (conv)
 	{
-	  xinput_stream_t *old;
+	  GInputStream *old;
 
-	  xcharset_converter_set_use_fallback (cconv, fallback);
+	  g_charset_converter_set_use_fallback (cconv, fallback);
 
 	  old = in;
-	  in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
-	  xobject_unref (conv);
-	  xobject_unref (old);
+	  in = (GInputStream *) g_converter_input_stream_new (in, conv);
+	  g_object_unref (conv);
+	  g_object_unref (old);
 	}
       else
 	{
@@ -133,39 +133,39 @@ cat (xfile_t * file)
 
   if (compress)
     {
-      xinput_stream_t *old;
-      xfile_info_t *in_file_info;
+      GInputStream *old;
+      GFileInfo *in_file_info;
 
-      in_file_info = xfile_query_info (file,
-                                        XFILE_ATTRIBUTE_STANDARD_NAME ","
-                                        XFILE_ATTRIBUTE_TIME_MODIFIED,
-                                        XFILE_QUERY_INFO_NONE,
+      in_file_info = g_file_query_info (file,
+                                        G_FILE_ATTRIBUTE_STANDARD_NAME ","
+                                        G_FILE_ATTRIBUTE_TIME_MODIFIED,
+                                        G_FILE_QUERY_INFO_NONE,
                                         NULL,
                                         &error);
       if (in_file_info == NULL)
         {
           g_printerr ("%s: %s: error reading file info: %s\n",
-                      g_get_prgname (), xfile_get_uri (file), error->message);
-          xerror_free (error);
+                      g_get_prgname (), g_file_get_uri (file), error->message);
+          g_error_free (error);
           return;
         }
 
-      conv = (xconverter_t *)g_zlib_compressor_new(gzip?G_ZLIB_COMPRESSOR_FORMAT_GZIP:G_ZLIB_COMPRESSOR_FORMAT_ZLIB, -1);
+      conv = (GConverter *)g_zlib_compressor_new(gzip?G_ZLIB_COMPRESSOR_FORMAT_GZIP:G_ZLIB_COMPRESSOR_FORMAT_ZLIB, -1);
       g_zlib_compressor_set_file_info (G_ZLIB_COMPRESSOR (conv), in_file_info);
       old = in;
-      in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
-      xobject_unref (conv);
-      xobject_unref (old);
-      xobject_unref (in_file_info);
+      in = (GInputStream *) g_converter_input_stream_new (in, conv);
+      g_object_unref (conv);
+      g_object_unref (old);
+      g_object_unref (in_file_info);
     }
 
   while (1)
     {
       res =
-	xinput_stream_read (in, buffer, sizeof (buffer) - 1, NULL, &error);
+	g_input_stream_read (in, buffer, sizeof (buffer) - 1, NULL, &error);
       if (res > 0)
 	{
-	  xssize_t written;
+	  gssize written;
 
 	  p = buffer;
 	  while (res > 0)
@@ -177,7 +177,7 @@ cat (xfile_t * file)
 		  /* Translators: the first %s is the program name, the */
 		  /* second one is the URI of the file.                 */
 		  g_printerr ("%s: %s, error writing to stdout",
-			      g_get_prgname (), xfile_get_uri (file));
+			      g_get_prgname (), g_file_get_uri (file));
 		  goto out;
 		}
 	      res -= written;
@@ -187,9 +187,9 @@ cat (xfile_t * file)
       else if (res < 0)
 	{
 	  g_printerr ("%s: %s: error reading: %s\n",
-		      g_get_prgname (), xfile_get_uri (file),
+		      g_get_prgname (), g_file_get_uri (file),
 		      error->message);
-	  xerror_free (error);
+	  g_error_free (error);
 	  error = NULL;
 	  break;
 	}
@@ -199,17 +199,17 @@ cat (xfile_t * file)
 
  out:
 
-  close_res = xinput_stream_close (in, NULL, &error);
+  close_res = g_input_stream_close (in, NULL, &error);
   if (!close_res)
     {
       g_printerr ("%s: %s:error closing: %s\n",
-		  g_get_prgname (), xfile_get_uri (file), error->message);
-      xerror_free (error);
+		  g_get_prgname (), g_file_get_uri (file), error->message);
+      g_error_free (error);
     }
 
   if (cconv != NULL && fallback)
     {
-      xuint_t num = xcharset_converter_get_num_fallbacks (cconv);
+      guint num = g_charset_converter_get_num_fallbacks (cconv);
       if (num > 0)
 	g_printerr ("Number of fallback errors: %u\n", num);
     }
@@ -218,9 +218,9 @@ cat (xfile_t * file)
 int
 main (int argc, char *argv[])
 {
-  xerror_t *error = NULL;
-  xoption_context_t *context = NULL;
-  xfile_t *file;
+  GError *error = NULL;
+  GOptionContext *context = NULL;
+  GFile *file;
   int i;
 
   context =
@@ -241,7 +241,7 @@ main (int argc, char *argv[])
       g_printerr ("Try \"%s --help\" for more information.",
 		  g_get_prgname ());
       g_printerr ("\n");
-      xerror_free(error);
+      g_error_free(error);
       return 1;
     }
 
@@ -259,9 +259,9 @@ main (int argc, char *argv[])
 
   do
     {
-      file = xfile_new_for_commandline_arg (locations[i]);
+      file = g_file_new_for_commandline_arg (locations[i]);
       cat (file);
-      xobject_unref (file);
+      g_object_unref (file);
     }
   while (locations[++i] != NULL);
 

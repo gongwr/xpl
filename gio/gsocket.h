@@ -20,8 +20,8 @@
  *          Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XSOCKET_H__
-#define __XSOCKET_H__
+#ifndef __G_SOCKET_H__
+#define __G_SOCKET_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,24 +31,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET                                       (xsocket_get_type ())
-#define G_SOCKET(inst)                                      (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET, xsocket))
-#define XSOCKET_CLASS(class)                               (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET, GSocketClass))
-#define X_IS_SOCKET(inst)                                   (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET))
-#define X_IS_SOCKET_CLASS(class)                            (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET))
-#define XSOCKET_GET_CLASS(inst)                            (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET, GSocketClass))
+#define G_TYPE_SOCKET                                       (g_socket_get_type ())
+#define G_SOCKET(inst)                                      (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET, GSocket))
+#define G_SOCKET_CLASS(class)                               (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET, GSocketClass))
+#define G_IS_SOCKET(inst)                                   (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET))
+#define G_IS_SOCKET_CLASS(class)                            (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET))
+#define G_SOCKET_GET_CLASS(inst)                            (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET, GSocketClass))
 
 typedef struct _GSocketPrivate                              GSocketPrivate;
 typedef struct _GSocketClass                                GSocketClass;
 
 struct _GSocketClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /*< private >*/
 
@@ -67,262 +67,262 @@ struct _GSocketClass
 
 struct _GSocket
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
   GSocketPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                  xsocket_get_type                (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xsocket_t *              xsocket_new                     (xsocket_family_t            family,
-							 xsocket_type_t              type,
+GLIB_AVAILABLE_IN_ALL
+GType                  g_socket_get_type                (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GSocket *              g_socket_new                     (GSocketFamily            family,
+							 GSocketType              type,
 							 GSocketProtocol          protocol,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_t *              xsocket_new_from_fd             (xint_t                     fd,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-int                    xsocket_get_fd                  (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xsocket_family_t          xsocket_get_family              (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xsocket_type_t            xsocket_get_socket_type         (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-GSocketProtocol        xsocket_get_protocol            (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t *       xsocket_get_local_address       (xsocket_t                 *socket,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t *       xsocket_get_remote_address      (xsocket_t                 *socket,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-void                   xsocket_set_blocking            (xsocket_t                 *socket,
-							 xboolean_t                 blocking);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_get_blocking            (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-void                   xsocket_set_keepalive           (xsocket_t                 *socket,
-							 xboolean_t                 keepalive);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_get_keepalive           (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xint_t                   xsocket_get_listen_backlog      (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-void                   xsocket_set_listen_backlog      (xsocket_t                 *socket,
-							 xint_t                     backlog);
-XPL_AVAILABLE_IN_ALL
-xuint_t                  xsocket_get_timeout             (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-void                   xsocket_set_timeout             (xsocket_t                 *socket,
-							 xuint_t                    timeout);
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+GSocket *              g_socket_new_from_fd             (gint                     fd,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+int                    g_socket_get_fd                  (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+GSocketFamily          g_socket_get_family              (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+GSocketType            g_socket_get_socket_type         (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+GSocketProtocol        g_socket_get_protocol            (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress *       g_socket_get_local_address       (GSocket                 *socket,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress *       g_socket_get_remote_address      (GSocket                 *socket,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+void                   g_socket_set_blocking            (GSocket                 *socket,
+							 gboolean                 blocking);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_get_blocking            (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+void                   g_socket_set_keepalive           (GSocket                 *socket,
+							 gboolean                 keepalive);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_get_keepalive           (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+gint                   g_socket_get_listen_backlog      (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+void                   g_socket_set_listen_backlog      (GSocket                 *socket,
+							 gint                     backlog);
+GLIB_AVAILABLE_IN_ALL
+guint                  g_socket_get_timeout             (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+void                   g_socket_set_timeout             (GSocket                 *socket,
+							 guint                    timeout);
 
-XPL_AVAILABLE_IN_2_32
-xuint_t                  xsocket_get_ttl                 (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_2_32
-void                   xsocket_set_ttl                 (xsocket_t                 *socket,
-                                                         xuint_t                    ttl);
+GLIB_AVAILABLE_IN_2_32
+guint                  g_socket_get_ttl                 (GSocket                 *socket);
+GLIB_AVAILABLE_IN_2_32
+void                   g_socket_set_ttl                 (GSocket                 *socket,
+                                                         guint                    ttl);
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t               xsocket_get_broadcast           (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_2_32
-void                   xsocket_set_broadcast           (xsocket_t                 *socket,
-                                                         xboolean_t		  broadcast);
+GLIB_AVAILABLE_IN_2_32
+gboolean               g_socket_get_broadcast           (GSocket                 *socket);
+GLIB_AVAILABLE_IN_2_32
+void                   g_socket_set_broadcast           (GSocket                 *socket,
+                                                         gboolean		  broadcast);
 
-XPL_AVAILABLE_IN_2_32
-xboolean_t               xsocket_get_multicast_loopback  (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_2_32
-void                   xsocket_set_multicast_loopback  (xsocket_t                 *socket,
-                                                         xboolean_t		  loopback);
-XPL_AVAILABLE_IN_2_32
-xuint_t                  xsocket_get_multicast_ttl       (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_2_32
-void                   xsocket_set_multicast_ttl       (xsocket_t                 *socket,
-                                                         xuint_t                    ttl);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_is_connected            (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_bind                    (xsocket_t                 *socket,
-							 xsocket_address_t          *address,
-							 xboolean_t                 allow_reuse,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_2_32
-xboolean_t               xsocket_join_multicast_group    (xsocket_t                 *socket,
-                                                         xinet_address_t            *group,
-                                                         xboolean_t                 source_specific,
-                                                         const xchar_t             *iface,
-                                                         xerror_t                 **error);
-XPL_AVAILABLE_IN_2_32
-xboolean_t               xsocket_leave_multicast_group   (xsocket_t                 *socket,
-                                                         xinet_address_t            *group,
-                                                         xboolean_t                 source_specific,
-                                                         const xchar_t             *iface,
-                                                         xerror_t                 **error);
-XPL_AVAILABLE_IN_2_56
-xboolean_t               xsocket_join_multicast_group_ssm    (xsocket_t                 *socket,
-                                                             xinet_address_t            *group,
-                                                             xinet_address_t            *source_specific,
-                                                             const xchar_t             *iface,
-                                                             xerror_t                 **error);
-XPL_AVAILABLE_IN_2_56
-xboolean_t               xsocket_leave_multicast_group_ssm   (xsocket_t                 *socket,
-                                                             xinet_address_t            *group,
-                                                             xinet_address_t            *source_specific,
-                                                             const xchar_t             *iface,
-                                                             xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_connect                 (xsocket_t                 *socket,
-							 xsocket_address_t          *address,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_check_connect_result    (xsocket_t                 *socket,
-							 xerror_t                 **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean               g_socket_get_multicast_loopback  (GSocket                 *socket);
+GLIB_AVAILABLE_IN_2_32
+void                   g_socket_set_multicast_loopback  (GSocket                 *socket,
+                                                         gboolean		  loopback);
+GLIB_AVAILABLE_IN_2_32
+guint                  g_socket_get_multicast_ttl       (GSocket                 *socket);
+GLIB_AVAILABLE_IN_2_32
+void                   g_socket_set_multicast_ttl       (GSocket                 *socket,
+                                                         guint                    ttl);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_is_connected            (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_bind                    (GSocket                 *socket,
+							 GSocketAddress          *address,
+							 gboolean                 allow_reuse,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean               g_socket_join_multicast_group    (GSocket                 *socket,
+                                                         GInetAddress            *group,
+                                                         gboolean                 source_specific,
+                                                         const gchar             *iface,
+                                                         GError                 **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean               g_socket_leave_multicast_group   (GSocket                 *socket,
+                                                         GInetAddress            *group,
+                                                         gboolean                 source_specific,
+                                                         const gchar             *iface,
+                                                         GError                 **error);
+GLIB_AVAILABLE_IN_2_56
+gboolean               g_socket_join_multicast_group_ssm    (GSocket                 *socket,
+                                                             GInetAddress            *group,
+                                                             GInetAddress            *source_specific,
+                                                             const gchar             *iface,
+                                                             GError                 **error);
+GLIB_AVAILABLE_IN_2_56
+gboolean               g_socket_leave_multicast_group_ssm   (GSocket                 *socket,
+                                                             GInetAddress            *group,
+                                                             GInetAddress            *source_specific,
+                                                             const gchar             *iface,
+                                                             GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_connect                 (GSocket                 *socket,
+							 GSocketAddress          *address,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_check_connect_result    (GSocket                 *socket,
+							 GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_get_available_bytes     (xsocket_t                 *socket);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_get_available_bytes     (GSocket                 *socket);
 
-XPL_AVAILABLE_IN_ALL
-xio_condition_t           xsocket_condition_check         (xsocket_t                 *socket,
-							 xio_condition_t             condition);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_condition_wait          (xsocket_t                 *socket,
-							 xio_condition_t             condition,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_2_32
-xboolean_t               xsocket_condition_timed_wait    (xsocket_t                 *socket,
-							 xio_condition_t             condition,
-							 sint64_t                   timeout_us,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xsocket_t *              xsocket_accept                  (xsocket_t                 *socket,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_listen                  (xsocket_t                 *socket,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_receive                 (xsocket_t                 *socket,
-							 xchar_t                   *buffer,
-							 xsize_t                    size,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_receive_from            (xsocket_t                 *socket,
-							 xsocket_address_t         **address,
-							 xchar_t                   *buffer,
-							 xsize_t                    size,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_send                    (xsocket_t                 *socket,
-							 const xchar_t             *buffer,
-							 xsize_t                    size,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_send_to                 (xsocket_t                 *socket,
-							 xsocket_address_t          *address,
-							 const xchar_t             *buffer,
-							 xsize_t                    size,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_receive_message         (xsocket_t                 *socket,
-							 xsocket_address_t         **address,
-							 xinput_vector_t            *vectors,
-							 xint_t                     num_vectors,
-							 xsocket_control_message_t ***messages,
-							 xint_t                    *num_messages,
-							 xint_t                    *flags,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_send_message            (xsocket_t                 *socket,
-							 xsocket_address_t          *address,
-							 xoutput_vector_t           *vectors,
-							 xint_t                     num_vectors,
-							 xsocket_control_message_t  **messages,
-							 xint_t                     num_messages,
-							 xint_t                     flags,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+GIOCondition           g_socket_condition_check         (GSocket                 *socket,
+							 GIOCondition             condition);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_condition_wait          (GSocket                 *socket,
+							 GIOCondition             condition,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_2_32
+gboolean               g_socket_condition_timed_wait    (GSocket                 *socket,
+							 GIOCondition             condition,
+							 gint64                   timeout_us,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+GSocket *              g_socket_accept                  (GSocket                 *socket,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_listen                  (GSocket                 *socket,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_receive                 (GSocket                 *socket,
+							 gchar                   *buffer,
+							 gsize                    size,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_receive_from            (GSocket                 *socket,
+							 GSocketAddress         **address,
+							 gchar                   *buffer,
+							 gsize                    size,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_send                    (GSocket                 *socket,
+							 const gchar             *buffer,
+							 gsize                    size,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_send_to                 (GSocket                 *socket,
+							 GSocketAddress          *address,
+							 const gchar             *buffer,
+							 gsize                    size,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_receive_message         (GSocket                 *socket,
+							 GSocketAddress         **address,
+							 GInputVector            *vectors,
+							 gint                     num_vectors,
+							 GSocketControlMessage ***messages,
+							 gint                    *num_messages,
+							 gint                    *flags,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_send_message            (GSocket                 *socket,
+							 GSocketAddress          *address,
+							 GOutputVector           *vectors,
+							 gint                     num_vectors,
+							 GSocketControlMessage  **messages,
+							 gint                     num_messages,
+							 gint                     flags,
+							 GCancellable            *cancellable,
+							 GError                 **error);
 
-XPL_AVAILABLE_IN_2_48
-xint_t                   xsocket_receive_messages        (xsocket_t                 *socket,
-                                                         xinput_message_t           *messages,
-                                                         xuint_t                    num_messages,
-                                                         xint_t                     flags,
-                                                         xcancellable_t            *cancellable,
-                                                         xerror_t                 **error);
-XPL_AVAILABLE_IN_2_44
-xint_t                   xsocket_send_messages           (xsocket_t                 *socket,
-							 xoutput_message_t          *messages,
-							 xuint_t                    num_messages,
-							 xint_t                     flags,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
+GLIB_AVAILABLE_IN_2_48
+gint                   g_socket_receive_messages        (GSocket                 *socket,
+                                                         GInputMessage           *messages,
+                                                         guint                    num_messages,
+                                                         gint                     flags,
+                                                         GCancellable            *cancellable,
+                                                         GError                 **error);
+GLIB_AVAILABLE_IN_2_44
+gint                   g_socket_send_messages           (GSocket                 *socket,
+							 GOutputMessage          *messages,
+							 guint                    num_messages,
+							 gint                     flags,
+							 GCancellable            *cancellable,
+							 GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_close                   (xsocket_t                 *socket,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_shutdown                (xsocket_t                 *socket,
-							 xboolean_t                 shutdown_read,
-							 xboolean_t                 shutdown_write,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_is_closed               (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xsource_t *              xsocket_create_source           (xsocket_t                 *socket,
-							 xio_condition_t             condition,
-							 xcancellable_t            *cancellable);
-XPL_AVAILABLE_IN_ALL
-xboolean_t               xsocket_speaks_ipv4             (xsocket_t                 *socket);
-XPL_AVAILABLE_IN_ALL
-xcredentials_t          *xsocket_get_credentials         (xsocket_t                 *socket,
-                                                         xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_close                   (GSocket                 *socket,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_shutdown                (GSocket                 *socket,
+							 gboolean                 shutdown_read,
+							 gboolean                 shutdown_write,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_is_closed               (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+GSource *              g_socket_create_source           (GSocket                 *socket,
+							 GIOCondition             condition,
+							 GCancellable            *cancellable);
+GLIB_AVAILABLE_IN_ALL
+gboolean               g_socket_speaks_ipv4             (GSocket                 *socket);
+GLIB_AVAILABLE_IN_ALL
+GCredentials          *g_socket_get_credentials         (GSocket                 *socket,
+                                                         GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_receive_with_blocking   (xsocket_t                 *socket,
-							 xchar_t                   *buffer,
-							 xsize_t                    size,
-							 xboolean_t                 blocking,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xssize_t                 xsocket_send_with_blocking      (xsocket_t                 *socket,
-							 const xchar_t             *buffer,
-							 xsize_t                    size,
-							 xboolean_t                 blocking,
-							 xcancellable_t            *cancellable,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_2_60
-GPollableReturn        xsocket_send_message_with_timeout (xsocket_t                *socket,
-							   xsocket_address_t         *address,
-							   const xoutput_vector_t    *vectors,
-							   xint_t                    num_vectors,
-							   xsocket_control_message_t **messages,
-							   xint_t                    num_messages,
-							   xint_t                    flags,
-							   sint64_t                  timeout_us,
-							   xsize_t                  *bytes_written,
-							   xcancellable_t           *cancellable,
-							   xerror_t                **error);
-XPL_AVAILABLE_IN_2_36
-xboolean_t               xsocket_get_option              (xsocket_t                 *socket,
-							 xint_t                     level,
-							 xint_t                     optname,
-							 xint_t                    *value,
-							 xerror_t                 **error);
-XPL_AVAILABLE_IN_2_36
-xboolean_t               xsocket_set_option              (xsocket_t                 *socket,
-							 xint_t                     level,
-							 xint_t                     optname,
-							 xint_t                     value,
-							 xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_receive_with_blocking   (GSocket                 *socket,
+							 gchar                   *buffer,
+							 gsize                    size,
+							 gboolean                 blocking,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gssize                 g_socket_send_with_blocking      (GSocket                 *socket,
+							 const gchar             *buffer,
+							 gsize                    size,
+							 gboolean                 blocking,
+							 GCancellable            *cancellable,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_2_60
+GPollableReturn        g_socket_send_message_with_timeout (GSocket                *socket,
+							   GSocketAddress         *address,
+							   const GOutputVector    *vectors,
+							   gint                    num_vectors,
+							   GSocketControlMessage **messages,
+							   gint                    num_messages,
+							   gint                    flags,
+							   gint64                  timeout_us,
+							   gsize                  *bytes_written,
+							   GCancellable           *cancellable,
+							   GError                **error);
+GLIB_AVAILABLE_IN_2_36
+gboolean               g_socket_get_option              (GSocket                 *socket,
+							 gint                     level,
+							 gint                     optname,
+							 gint                    *value,
+							 GError                 **error);
+GLIB_AVAILABLE_IN_2_36
+gboolean               g_socket_set_option              (GSocket                 *socket,
+							 gint                     level,
+							 gint                     optname,
+							 gint                     value,
+							 GError                 **error);
 
 G_END_DECLS
 
-#endif /* __XSOCKET_H__ */
+#endif /* __G_SOCKET_H__ */

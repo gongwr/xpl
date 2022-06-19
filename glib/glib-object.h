@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1998, 1999, 2000 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __XPL_GOBJECT_H__
-#define __XPL_GOBJECT_H__
+#ifndef __GLIB_GOBJECT_H__
+#define __GLIB_GOBJECT_H__
 
-#define __XPL_GOBJECT_H_INSIDE__
+#define __GLIB_GOBJECT_H_INSIDE__
 
 #include <gobject/gbinding.h>
 #include <gobject/gbindinggroup.h>
@@ -39,6 +39,6 @@
 
 #include <gobject/gobject-autocleanups.h>
 
-#undef __XPL_GOBJECT_H_INSIDE__
+#undef __GLIB_GOBJECT_H_INSIDE__
 
-#endif /* __XPL_GOBJECT_H__ */
+#endif /* __GLIB_GOBJECT_H__ */

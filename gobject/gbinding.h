@@ -18,10 +18,10 @@
  * Author: Emmanuele Bassi <ebassi@linux.intel.com>
  */
 
-#ifndef __XBINDING_H__
-#define __XBINDING_H__
+#ifndef __G_BINDING_H__
+#define __G_BINDING_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -30,27 +30,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_BINDING_FLAGS    (xbinding_flags_get_type ())
+#define G_TYPE_BINDING_FLAGS    (g_binding_flags_get_type ())
 
-#define XTYPE_BINDING          (xbinding_get_type ())
-#define G_BINDING(obj)          (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_BINDING, xbinding_t))
-#define X_IS_BINDING(obj)       (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_BINDING))
+#define G_TYPE_BINDING          (g_binding_get_type ())
+#define G_BINDING(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_BINDING, GBinding))
+#define G_IS_BINDING(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_BINDING))
 
 /**
- * xbinding_t:
+ * GBinding:
  *
- * xbinding_t is an opaque structure whose members
+ * GBinding is an opaque structure whose members
  * cannot be accessed directly.
  *
  * Since: 2.26
  */
-typedef struct _xbinding        xbinding_t;
+typedef struct _GBinding        GBinding;
 
 /**
- * xbinding_transform_func:
- * @binding: a #xbinding_t
- * @from_value: the #xvalue_t containing the value to transform
- * @to_value: the #xvalue_t in which to store the transformed value
+ * GBindingTransformFunc:
+ * @binding: a #GBinding
+ * @from_value: the #GValue containing the value to transform
+ * @to_value: the #GValue in which to store the transformed value
  * @user_data: data passed to the transform function
  *
  * A function to be called to transform @from_value to @to_value.
@@ -58,7 +58,7 @@ typedef struct _xbinding        xbinding_t;
  * If this is the @transform_to function of a binding, then @from_value
  * is the @source_property on the @source object, and @to_value is the
  * @target_property on the @target object. If this is the
- * @transform_from function of a %XBINDING_BIDIRECTIONAL binding,
+ * @transform_from function of a %G_BINDING_BIDIRECTIONAL binding,
  * then those roles are reversed.
  *
  * Returns: %TRUE if the transformation was successful, and %FALSE
@@ -66,89 +66,89 @@ typedef struct _xbinding        xbinding_t;
  *
  * Since: 2.26
  */
-typedef xboolean_t (* xbinding_transform_func) (xbinding_t     *binding,
-                                            const xvalue_t *from_value,
-                                            xvalue_t       *to_value,
-                                            xpointer_t      user_data);
+typedef gboolean (* GBindingTransformFunc) (GBinding     *binding,
+                                            const GValue *from_value,
+                                            GValue       *to_value,
+                                            gpointer      user_data);
 
 /**
- * xbinding_flags_t:
- * @XBINDING_DEFAULT: The default binding; if the source property
+ * GBindingFlags:
+ * @G_BINDING_DEFAULT: The default binding; if the source property
  *   changes, the target property is updated with its value.
- * @XBINDING_BIDIRECTIONAL: Bidirectional binding; if either the
+ * @G_BINDING_BIDIRECTIONAL: Bidirectional binding; if either the
  *   property of the source or the property of the target changes,
  *   the other is updated.
- * @XBINDING_SYNC_CREATE: Synchronize the values of the source and
+ * @G_BINDING_SYNC_CREATE: Synchronize the values of the source and
  *   target properties when creating the binding; the direction of
  *   the synchronization is always from the source to the target.
- * @XBINDING_INVERT_BOOLEAN: If the two properties being bound are
+ * @G_BINDING_INVERT_BOOLEAN: If the two properties being bound are
  *   booleans, setting one to %TRUE will result in the other being
  *   set to %FALSE and vice versa. This flag will only work for
  *   boolean properties, and cannot be used when passing custom
- *   transformation functions to xobject_bind_property_full().
+ *   transformation functions to g_object_bind_property_full().
  *
- * Flags to be passed to xobject_bind_property() or
- * xobject_bind_property_full().
+ * Flags to be passed to g_object_bind_property() or
+ * g_object_bind_property_full().
  *
  * This enumeration can be extended at later date.
  *
  * Since: 2.26
  */
 typedef enum { /*< prefix=G_BINDING >*/
-  XBINDING_DEFAULT        = 0,
+  G_BINDING_DEFAULT        = 0,
 
-  XBINDING_BIDIRECTIONAL  = 1 << 0,
-  XBINDING_SYNC_CREATE    = 1 << 1,
-  XBINDING_INVERT_BOOLEAN = 1 << 2
-} xbinding_flags_t;
+  G_BINDING_BIDIRECTIONAL  = 1 << 0,
+  G_BINDING_SYNC_CREATE    = 1 << 1,
+  G_BINDING_INVERT_BOOLEAN = 1 << 2
+} GBindingFlags;
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xbinding_flags_get_type      (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xtype_t                 xbinding_get_type            (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_binding_flags_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                 g_binding_get_type            (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xbinding_flags_t         xbinding_get_flags           (xbinding_t *binding);
-XPL_DEPRECATED_IN_2_68_FOR(xbinding_dup_source)
-xobject_t *             xbinding_get_source          (xbinding_t *binding);
-XPL_AVAILABLE_IN_2_68
-xobject_t *             xbinding_dup_source          (xbinding_t *binding);
-XPL_DEPRECATED_IN_2_68_FOR(xbinding_dup_target)
-xobject_t *             xbinding_get_target          (xbinding_t *binding);
-XPL_AVAILABLE_IN_2_68
-xobject_t *             xbinding_dup_target          (xbinding_t *binding);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         xbinding_get_source_property (xbinding_t *binding);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         xbinding_get_target_property (xbinding_t *binding);
-XPL_AVAILABLE_IN_2_38
-void                  xbinding_unbind              (xbinding_t *binding);
+GLIB_AVAILABLE_IN_ALL
+GBindingFlags         g_binding_get_flags           (GBinding *binding);
+GLIB_DEPRECATED_IN_2_68_FOR(g_binding_dup_source)
+GObject *             g_binding_get_source          (GBinding *binding);
+GLIB_AVAILABLE_IN_2_68
+GObject *             g_binding_dup_source          (GBinding *binding);
+GLIB_DEPRECATED_IN_2_68_FOR(g_binding_dup_target)
+GObject *             g_binding_get_target          (GBinding *binding);
+GLIB_AVAILABLE_IN_2_68
+GObject *             g_binding_dup_target          (GBinding *binding);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_binding_get_source_property (GBinding *binding);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_binding_get_target_property (GBinding *binding);
+GLIB_AVAILABLE_IN_2_38
+void                  g_binding_unbind              (GBinding *binding);
 
-XPL_AVAILABLE_IN_ALL
-xbinding_t *xobject_bind_property               (xpointer_t               source,
-                                                const xchar_t           *source_property,
-                                                xpointer_t               target,
-                                                const xchar_t           *target_property,
-                                                xbinding_flags_t          flags);
-XPL_AVAILABLE_IN_ALL
-xbinding_t *xobject_bind_property_full          (xpointer_t               source,
-                                                const xchar_t           *source_property,
-                                                xpointer_t               target,
-                                                const xchar_t           *target_property,
-                                                xbinding_flags_t          flags,
-                                                xbinding_transform_func  transform_to,
-                                                xbinding_transform_func  transform_from,
-                                                xpointer_t               user_data,
-                                                xdestroy_notify_t         notify);
-XPL_AVAILABLE_IN_ALL
-xbinding_t *xobject_bind_property_with_closures (xpointer_t               source,
-                                                const xchar_t           *source_property,
-                                                xpointer_t               target,
-                                                const xchar_t           *target_property,
-                                                xbinding_flags_t          flags,
-                                                xclosure_t              *transform_to,
-                                                xclosure_t              *transform_from);
+GLIB_AVAILABLE_IN_ALL
+GBinding *g_object_bind_property               (gpointer               source,
+                                                const gchar           *source_property,
+                                                gpointer               target,
+                                                const gchar           *target_property,
+                                                GBindingFlags          flags);
+GLIB_AVAILABLE_IN_ALL
+GBinding *g_object_bind_property_full          (gpointer               source,
+                                                const gchar           *source_property,
+                                                gpointer               target,
+                                                const gchar           *target_property,
+                                                GBindingFlags          flags,
+                                                GBindingTransformFunc  transform_to,
+                                                GBindingTransformFunc  transform_from,
+                                                gpointer               user_data,
+                                                GDestroyNotify         notify);
+GLIB_AVAILABLE_IN_ALL
+GBinding *g_object_bind_property_with_closures (gpointer               source,
+                                                const gchar           *source_property,
+                                                gpointer               target,
+                                                const gchar           *target_property,
+                                                GBindingFlags          flags,
+                                                GClosure              *transform_to,
+                                                GClosure              *transform_from);
 
 G_END_DECLS
 
-#endif /* __XBINDING_H__ */
+#endif /* __G_BINDING_H__ */

@@ -9,8 +9,8 @@ typedef struct _EscapeTest EscapeTest;
 
 struct _EscapeTest
 {
-  const xchar_t *original;
-  const xchar_t *expected;
+  const gchar *original;
+  const gchar *expected;
 };
 
 static EscapeTest escape_tests[] =
@@ -43,10 +43,10 @@ static EscapeTest escape_tests[] =
 };
 
 static void
-escape_test (xconstpointer d)
+escape_test (gconstpointer d)
 {
   const EscapeTest *test = d;
-  xchar_t *result;
+  gchar *result;
 
   result = g_markup_escape_text (test->original, -1);
 
@@ -59,8 +59,8 @@ typedef struct _UnicharTest UnicharTest;
 
 struct _UnicharTest
 {
-  xunichar_t c;
-  xboolean_t entity;
+  gunichar c;
+  gboolean entity;
 };
 
 static UnicharTest unichar_tests[] =
@@ -85,14 +85,14 @@ static UnicharTest unichar_tests[] =
 };
 
 static void
-unichar_test (xconstpointer d)
+unichar_test (gconstpointer d)
 {
   const UnicharTest *test = d;
   EscapeTest t;
-  xint_t len;
-  xchar_t outbuf[7], expected[12];
+  gint len;
+  gchar outbuf[7], expected[12];
 
-  len = xunichar_to_utf8 (test->c, outbuf);
+  len = g_unichar_to_utf8 (test->c, outbuf);
   outbuf[len] = 0;
 
   if (test->entity)
@@ -107,11 +107,11 @@ unichar_test (xconstpointer d)
 
 G_GNUC_PRINTF(1, 3)
 static void
-test_format (const xchar_t *format,
-	     const xchar_t *expected,
+test_format (const gchar *format,
+	     const gchar *expected,
 	     ...)
 {
-  xchar_t *result;
+  gchar *result;
   va_list args;
 
   va_start (args, expected);
@@ -144,21 +144,21 @@ format_test (void)
 
 int main (int argc, char **argv)
 {
-  xsize_t i;
-  xchar_t *path;
+  gsize i;
+  gchar *path;
 
   g_test_init (&argc, &argv, NULL);
 
   for (i = 0; i < G_N_ELEMENTS (escape_tests); i++)
     {
-      path = xstrdup_printf ("/markup/escape-text/%" G_GSIZE_FORMAT, i);
+      path = g_strdup_printf ("/markup/escape-text/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &escape_tests[i], escape_test);
       g_free (path);
     }
 
   for (i = 0; i < G_N_ELEMENTS (unichar_tests); i++)
     {
-      path = xstrdup_printf ("/markup/escape-unichar/%" G_GSIZE_FORMAT, i);
+      path = g_strdup_printf ("/markup/escape-unichar/%" G_GSIZE_FORMAT, i);
       g_test_add_data_func (path, &unichar_tests[i], unichar_test);
       g_free (path);
     }

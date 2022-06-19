@@ -1,5 +1,5 @@
 <schemalist>
-  <!-- from the xsettings_t docs.  Should work, I guess :) -->
+  <!-- from the GSettings docs.  Should work, I guess :) -->
 
   <enum id="myenum">
     <value nick="first" value="1"/>

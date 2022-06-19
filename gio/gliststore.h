@@ -20,8 +20,8 @@
  *     Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XLIST_STORE_H__
-#define __XLIST_STORE_H__
+#ifndef __G_LIST_STORE_H__
+#define __G_LIST_STORE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,58 +31,58 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LIST_STORE (xlist_store_get_type ())
-XPL_AVAILABLE_IN_2_44
-G_DECLARE_FINAL_TYPE(xlist_store_t, xlist_store, G, LIST_STORE, xobject_t)
+#define G_TYPE_LIST_STORE (g_list_store_get_type ())
+GLIB_AVAILABLE_IN_2_44
+G_DECLARE_FINAL_TYPE(GListStore, g_list_store, G, LIST_STORE, GObject)
 
-XPL_AVAILABLE_IN_2_44
-xlist_store_t *            xlist_store_new                                (xtype_t       item_type);
+GLIB_AVAILABLE_IN_2_44
+GListStore *            g_list_store_new                                (GType       item_type);
 
-XPL_AVAILABLE_IN_2_44
-void                    xlist_store_insert                             (xlist_store_t *store,
-                                                                         xuint_t       position,
-                                                                         xpointer_t    item);
+GLIB_AVAILABLE_IN_2_44
+void                    g_list_store_insert                             (GListStore *store,
+                                                                         guint       position,
+                                                                         gpointer    item);
 
-XPL_AVAILABLE_IN_2_44
-xuint_t                   xlist_store_insert_sorted                      (xlist_store_t       *store,
-                                                                         xpointer_t          item,
+GLIB_AVAILABLE_IN_2_44
+guint                   g_list_store_insert_sorted                      (GListStore       *store,
+                                                                         gpointer          item,
                                                                          GCompareDataFunc  compare_func,
-                                                                         xpointer_t          user_data);
+                                                                         gpointer          user_data);
 
-XPL_AVAILABLE_IN_2_46
-void                   xlist_store_sort                                (xlist_store_t       *store,
+GLIB_AVAILABLE_IN_2_46
+void                   g_list_store_sort                                (GListStore       *store,
                                                                          GCompareDataFunc  compare_func,
-                                                                         xpointer_t          user_data);
+                                                                         gpointer          user_data);
 
-XPL_AVAILABLE_IN_2_44
-void                    xlist_store_append                             (xlist_store_t *store,
-                                                                         xpointer_t    item);
+GLIB_AVAILABLE_IN_2_44
+void                    g_list_store_append                             (GListStore *store,
+                                                                         gpointer    item);
 
-XPL_AVAILABLE_IN_2_44
-void                    xlist_store_remove                             (xlist_store_t *store,
-                                                                         xuint_t       position);
+GLIB_AVAILABLE_IN_2_44
+void                    g_list_store_remove                             (GListStore *store,
+                                                                         guint       position);
 
-XPL_AVAILABLE_IN_2_44
-void                    xlist_store_remove_all                         (xlist_store_t *store);
+GLIB_AVAILABLE_IN_2_44
+void                    g_list_store_remove_all                         (GListStore *store);
 
-XPL_AVAILABLE_IN_2_44
-void                    xlist_store_splice                             (xlist_store_t *store,
-                                                                         xuint_t       position,
-                                                                         xuint_t       n_removals,
-                                                                         xpointer_t   *additions,
-                                                                         xuint_t       n_additions);
+GLIB_AVAILABLE_IN_2_44
+void                    g_list_store_splice                             (GListStore *store,
+                                                                         guint       position,
+                                                                         guint       n_removals,
+                                                                         gpointer   *additions,
+                                                                         guint       n_additions);
 
-XPL_AVAILABLE_IN_2_64
-xboolean_t                xlist_store_find                               (xlist_store_t *store,
-                                                                         xpointer_t    item,
-                                                                         xuint_t      *position);
+GLIB_AVAILABLE_IN_2_64
+gboolean                g_list_store_find                               (GListStore *store,
+                                                                         gpointer    item,
+                                                                         guint      *position);
 
-XPL_AVAILABLE_IN_2_64
-xboolean_t                xlist_store_find_with_equal_func               (xlist_store_t *store,
-                                                                         xpointer_t    item,
+GLIB_AVAILABLE_IN_2_64
+gboolean                g_list_store_find_with_equal_func               (GListStore *store,
+                                                                         gpointer    item,
                                                                          GEqualFunc  equal_func,
-                                                                         xuint_t      *position);
+                                                                         guint      *position);
 
 G_END_DECLS
 
-#endif /* __XLIST_STORE_H__ */
+#endif /* __G_LIST_STORE_H__ */

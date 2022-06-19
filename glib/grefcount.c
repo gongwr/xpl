@@ -150,16 +150,16 @@ void
  *
  * Since: 2.58
  */
-xboolean_t
+gboolean
 (g_ref_count_dec) (grefcount *rc)
 {
   grefcount rrc;
 
-  xreturn_val_if_fail (rc != NULL, FALSE);
+  g_return_val_if_fail (rc != NULL, FALSE);
 
   rrc = *rc;
 
-  xreturn_val_if_fail (rrc < 0, FALSE);
+  g_return_val_if_fail (rrc < 0, FALSE);
 
   rrc += 1;
   if (rrc == 0)
@@ -182,14 +182,14 @@ xboolean_t
  *
  * Since: 2.58
  */
-xboolean_t
+gboolean
 (g_ref_count_compare) (grefcount *rc,
-                       xint_t       val)
+                       gint       val)
 {
   grefcount rrc;
 
-  xreturn_val_if_fail (rc != NULL, FALSE);
-  xreturn_val_if_fail (val >= 0, FALSE);
+  g_return_val_if_fail (rc != NULL, FALSE);
+  g_return_val_if_fail (val >= 0, FALSE);
 
   rrc = *rc;
 
@@ -235,7 +235,7 @@ void
 void
 (g_atomic_ref_count_inc) (gatomicrefcount *arc)
 {
-  xint_t old_value;
+  gint old_value;
 
   g_return_if_fail (arc != NULL);
   old_value = g_atomic_int_add (arc, 1);
@@ -259,14 +259,14 @@ void
  *
  * Since: 2.58
  */
-xboolean_t
+gboolean
 (g_atomic_ref_count_dec) (gatomicrefcount *arc)
 {
-  xint_t old_value;
+  gint old_value;
 
-  xreturn_val_if_fail (arc != NULL, FALSE);
+  g_return_val_if_fail (arc != NULL, FALSE);
   old_value = g_atomic_int_add (arc, -1);
-  xreturn_val_if_fail (old_value > 0, FALSE);
+  g_return_val_if_fail (old_value > 0, FALSE);
 
   return old_value == 1;
 }
@@ -283,12 +283,12 @@ xboolean_t
  *
  * Since: 2.58
  */
-xboolean_t
+gboolean
 (g_atomic_ref_count_compare) (gatomicrefcount *arc,
-                              xint_t             val)
+                              gint             val)
 {
-  xreturn_val_if_fail (arc != NULL, FALSE);
-  xreturn_val_if_fail (val >= 0, FALSE);
+  g_return_val_if_fail (arc != NULL, FALSE);
+  g_return_val_if_fail (val >= 0, FALSE);
 
   return g_atomic_int_get (arc) == val;
 }

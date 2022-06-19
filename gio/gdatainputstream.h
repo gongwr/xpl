@@ -29,33 +29,33 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DATA_INPUT_STREAM         (xdata_input_stream_get_type ())
-#define G_DATA_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DATA_INPUT_STREAM, xdata_input_stream_t))
-#define G_DATA_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DATA_INPUT_STREAM, xdata_input_stream_class_t))
-#define X_IS_DATA_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DATA_INPUT_STREAM))
-#define X_IS_DATA_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DATA_INPUT_STREAM))
-#define G_DATA_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DATA_INPUT_STREAM, xdata_input_stream_class_t))
+#define G_TYPE_DATA_INPUT_STREAM         (g_data_input_stream_get_type ())
+#define G_DATA_INPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DATA_INPUT_STREAM, GDataInputStream))
+#define G_DATA_INPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_DATA_INPUT_STREAM, GDataInputStreamClass))
+#define G_IS_DATA_INPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DATA_INPUT_STREAM))
+#define G_IS_DATA_INPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_DATA_INPUT_STREAM))
+#define G_DATA_INPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_DATA_INPUT_STREAM, GDataInputStreamClass))
 
 /**
- * xdata_input_stream_t:
+ * GDataInputStream:
  *
- * An implementation of #xbuffered_input_stream_t that allows for high-level
+ * An implementation of #GBufferedInputStream that allows for high-level
  * data manipulation of arbitrary data (including binary operations).
  **/
-typedef struct _xdata_input_stream_class    xdata_input_stream_class_t;
-typedef struct _xdata_input_stream_private  xdata_input_stream_private_t;
+typedef struct _GDataInputStreamClass    GDataInputStreamClass;
+typedef struct _GDataInputStreamPrivate  GDataInputStreamPrivate;
 
 struct _GDataInputStream
 {
-  xbuffered_input_stream_t parent_instance;
+  GBufferedInputStream parent_instance;
 
   /*< private >*/
-  xdata_input_stream_private_t *priv;
+  GDataInputStreamPrivate *priv;
 };
 
-struct _xdata_input_stream_class
+struct _GDataInputStreamClass
 {
-  xbuffered_input_stream_class_t parent_class;
+  GBufferedInputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -66,114 +66,114 @@ struct _xdata_input_stream_class
   void (*_g_reserved5) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                  xdata_input_stream_get_type             (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xdata_input_stream_t *     xdata_input_stream_new                  (xinput_stream_t            *base_stream);
+GLIB_AVAILABLE_IN_ALL
+GType                  g_data_input_stream_get_type             (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GDataInputStream *     g_data_input_stream_new                  (GInputStream            *base_stream);
 
-XPL_AVAILABLE_IN_ALL
-void                   xdata_input_stream_set_byte_order       (xdata_input_stream_t        *stream,
-                                                                 xdata_stream_byte_order_t     order);
-XPL_AVAILABLE_IN_ALL
-xdata_stream_byte_order_t   xdata_input_stream_get_byte_order       (xdata_input_stream_t        *stream);
-XPL_AVAILABLE_IN_ALL
-void                   xdata_input_stream_set_newline_type     (xdata_input_stream_t        *stream,
-                                                                 xdata_stream_newline_type_t   type);
-XPL_AVAILABLE_IN_ALL
-xdata_stream_newline_type_t xdata_input_stream_get_newline_type     (xdata_input_stream_t        *stream);
-XPL_AVAILABLE_IN_ALL
-xuchar_t                 xdata_input_stream_read_byte            (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-gint16                 xdata_input_stream_read_int16           (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xuint16_t                xdata_input_stream_read_uint16          (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-gint32                 xdata_input_stream_read_int32           (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xuint32_t                xdata_input_stream_read_uint32          (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-sint64_t                 xdata_input_stream_read_int64           (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-xuint64_t                xdata_input_stream_read_uint64          (xdata_input_stream_t        *stream,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-char *                 xdata_input_stream_read_line            (xdata_input_stream_t        *stream,
-                                                                 xsize_t                   *length,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_2_30
-char *                 xdata_input_stream_read_line_utf8       (xdata_input_stream_t        *stream,
-								 xsize_t                   *length,
-								 xcancellable_t            *cancellable,
-								 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-void                   xdata_input_stream_read_line_async      (xdata_input_stream_t        *stream,
-                                                                 xint_t                     io_priority,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
-XPL_AVAILABLE_IN_ALL
-char *                 xdata_input_stream_read_line_finish     (xdata_input_stream_t        *stream,
-                                                                 xasync_result_t            *result,
-                                                                 xsize_t                   *length,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_2_30
-char *                 xdata_input_stream_read_line_finish_utf8(xdata_input_stream_t        *stream,
-                                                                 xasync_result_t            *result,
-                                                                 xsize_t                   *length,
-                                                                 xerror_t                 **error);
-XPL_DEPRECATED_IN_2_56_FOR (xdata_input_stream_read_upto)
-char *                 xdata_input_stream_read_until           (xdata_input_stream_t        *stream,
-                                                                 const xchar_t             *stop_chars,
-                                                                 xsize_t                   *length,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_DEPRECATED_IN_2_56_FOR (xdata_input_stream_read_upto_async)
-void                   xdata_input_stream_read_until_async     (xdata_input_stream_t        *stream,
-                                                                 const xchar_t             *stop_chars,
-                                                                 xint_t                     io_priority,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
-XPL_DEPRECATED_IN_2_56_FOR (xdata_input_stream_read_upto_finish)
-char *                 xdata_input_stream_read_until_finish    (xdata_input_stream_t        *stream,
-                                                                 xasync_result_t            *result,
-                                                                 xsize_t                   *length,
-                                                                 xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+void                   g_data_input_stream_set_byte_order       (GDataInputStream        *stream,
+                                                                 GDataStreamByteOrder     order);
+GLIB_AVAILABLE_IN_ALL
+GDataStreamByteOrder   g_data_input_stream_get_byte_order       (GDataInputStream        *stream);
+GLIB_AVAILABLE_IN_ALL
+void                   g_data_input_stream_set_newline_type     (GDataInputStream        *stream,
+                                                                 GDataStreamNewlineType   type);
+GLIB_AVAILABLE_IN_ALL
+GDataStreamNewlineType g_data_input_stream_get_newline_type     (GDataInputStream        *stream);
+GLIB_AVAILABLE_IN_ALL
+guchar                 g_data_input_stream_read_byte            (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gint16                 g_data_input_stream_read_int16           (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+guint16                g_data_input_stream_read_uint16          (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gint32                 g_data_input_stream_read_int32           (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+guint32                g_data_input_stream_read_uint32          (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+gint64                 g_data_input_stream_read_int64           (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+guint64                g_data_input_stream_read_uint64          (GDataInputStream        *stream,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+char *                 g_data_input_stream_read_line            (GDataInputStream        *stream,
+                                                                 gsize                   *length,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_2_30
+char *                 g_data_input_stream_read_line_utf8       (GDataInputStream        *stream,
+								 gsize                   *length,
+								 GCancellable            *cancellable,
+								 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+void                   g_data_input_stream_read_line_async      (GDataInputStream        *stream,
+                                                                 gint                     io_priority,
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
+GLIB_AVAILABLE_IN_ALL
+char *                 g_data_input_stream_read_line_finish     (GDataInputStream        *stream,
+                                                                 GAsyncResult            *result,
+                                                                 gsize                   *length,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_2_30
+char *                 g_data_input_stream_read_line_finish_utf8(GDataInputStream        *stream,
+                                                                 GAsyncResult            *result,
+                                                                 gsize                   *length,
+                                                                 GError                 **error);
+GLIB_DEPRECATED_IN_2_56_FOR (g_data_input_stream_read_upto)
+char *                 g_data_input_stream_read_until           (GDataInputStream        *stream,
+                                                                 const gchar             *stop_chars,
+                                                                 gsize                   *length,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_DEPRECATED_IN_2_56_FOR (g_data_input_stream_read_upto_async)
+void                   g_data_input_stream_read_until_async     (GDataInputStream        *stream,
+                                                                 const gchar             *stop_chars,
+                                                                 gint                     io_priority,
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
+GLIB_DEPRECATED_IN_2_56_FOR (g_data_input_stream_read_upto_finish)
+char *                 g_data_input_stream_read_until_finish    (GDataInputStream        *stream,
+                                                                 GAsyncResult            *result,
+                                                                 gsize                   *length,
+                                                                 GError                 **error);
 
-XPL_AVAILABLE_IN_ALL
-char *                 xdata_input_stream_read_upto            (xdata_input_stream_t        *stream,
-                                                                 const xchar_t             *stop_chars,
-                                                                 xssize_t                   stop_chars_len,
-                                                                 xsize_t                   *length,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xerror_t                 **error);
-XPL_AVAILABLE_IN_ALL
-void                   xdata_input_stream_read_upto_async      (xdata_input_stream_t        *stream,
-                                                                 const xchar_t             *stop_chars,
-                                                                 xssize_t                   stop_chars_len,
-                                                                 xint_t                     io_priority,
-                                                                 xcancellable_t            *cancellable,
-                                                                 xasync_ready_callback_t      callback,
-                                                                 xpointer_t                 user_data);
-XPL_AVAILABLE_IN_ALL
-char *                 xdata_input_stream_read_upto_finish     (xdata_input_stream_t        *stream,
-                                                                 xasync_result_t            *result,
-                                                                 xsize_t                   *length,
-                                                                 xerror_t                 **error);
+GLIB_AVAILABLE_IN_ALL
+char *                 g_data_input_stream_read_upto            (GDataInputStream        *stream,
+                                                                 const gchar             *stop_chars,
+                                                                 gssize                   stop_chars_len,
+                                                                 gsize                   *length,
+                                                                 GCancellable            *cancellable,
+                                                                 GError                 **error);
+GLIB_AVAILABLE_IN_ALL
+void                   g_data_input_stream_read_upto_async      (GDataInputStream        *stream,
+                                                                 const gchar             *stop_chars,
+                                                                 gssize                   stop_chars_len,
+                                                                 gint                     io_priority,
+                                                                 GCancellable            *cancellable,
+                                                                 GAsyncReadyCallback      callback,
+                                                                 gpointer                 user_data);
+GLIB_AVAILABLE_IN_ALL
+char *                 g_data_input_stream_read_upto_finish     (GDataInputStream        *stream,
+                                                                 GAsyncResult            *result,
+                                                                 gsize                   *length,
+                                                                 GError                 **error);
 
 G_END_DECLS
 

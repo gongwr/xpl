@@ -28,17 +28,17 @@
 
 #define SCAN_MISSING_TIME 4 /* 1/4 Hz */
 
-static xboolean_t km_debug_enabled = FALSE;
+static gboolean km_debug_enabled = FALSE;
 #define KM_W if (km_debug_enabled) g_warning
 
-static xslist_t *missing_subs_list = NULL;
+static GSList *missing_subs_list = NULL;
 G_LOCK_DEFINE_STATIC (missing_lock);
 
-static xboolean_t scan_missing_running = FALSE;  /* must be accessed under @missing_lock */
+static gboolean scan_missing_running = FALSE;  /* must be accessed under @missing_lock */
 
 
-static xboolean_t
-_km_scan_missing_cb (xpointer_t user_data)
+static gboolean
+_km_scan_missing_cb (gpointer user_data)
 {
   return _km_scan_missing (NULL);
 }
@@ -53,7 +53,7 @@ void
 _km_add_missing (kqueue_sub *sub)
 {
   G_LOCK (missing_lock);
-  if (xslist_find (missing_subs_list, sub))
+  if (g_slist_find (missing_subs_list, sub))
     {
       KM_W ("asked to add %s to missing list but it's already on the list!\n", sub->filename);
       G_UNLOCK (missing_lock);
@@ -61,16 +61,16 @@ _km_add_missing (kqueue_sub *sub)
     }
 
   KM_W ("adding %s to missing list\n", sub->filename);
-  missing_subs_list = xslist_prepend (missing_subs_list, sub);
+  missing_subs_list = g_slist_prepend (missing_subs_list, sub);
 
   if (!scan_missing_running)
     {
-      xsource_t *source;
+      GSource *source;
       scan_missing_running = TRUE;
       source = g_timeout_source_new_seconds (SCAN_MISSING_TIME);
-      xsource_set_callback (source, _km_scan_missing_cb, NULL, NULL);
-      xsource_attach (source, XPL_PRIVATE_CALL (g_get_worker_context) ());
-      xsource_unref (source);
+      g_source_set_callback (source, _km_scan_missing_cb, NULL, NULL);
+      g_source_attach (source, GLIB_PRIVATE_CALL (g_get_worker_context) ());
+      g_source_unref (source);
     }
 
   G_UNLOCK (missing_lock);
@@ -83,22 +83,22 @@ _km_add_missing (kqueue_sub *sub)
  * A callback function for kqueue-missing subsystem.
  *
  * Signals that a missing file has finally appeared in the filesystem.
- * Emits %XFILE_MONITOR_EVENT_CREATED.
+ * Emits %G_FILE_MONITOR_EVENT_CREATED.
  **/
 static void
 _kh_file_appeared_cb (kqueue_sub *sub)
 {
-  sint64_t now = g_get_monotonic_time ();
+  gint64 now = g_get_monotonic_time ();
 
-  xassert (sub != NULL);
-  xassert (sub->filename);
+  g_assert (sub != NULL);
+  g_assert (sub->filename);
 
-  if (!xfile_test (sub->filename, XFILE_TEST_EXISTS))
+  if (!g_file_test (sub->filename, G_FILE_TEST_EXISTS))
     return;
 
-  xfile_monitor_source_handle_event (sub->source, XFILE_MONITOR_EVENT_CREATED,
+  g_file_monitor_source_handle_event (sub->source, G_FILE_MONITOR_EVENT_CREATED,
                                       sub->basename, NULL, NULL, now);
-  xfile_monitor_source_handle_event (sub->source, XFILE_MONITOR_EVENT_CHANGES_DONE_HINT,
+  g_file_monitor_source_handle_event (sub->source, G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT,
                                       sub->basename, NULL, NULL, now);
 }
 
@@ -114,13 +114,13 @@ _kh_file_appeared_cb (kqueue_sub *sub)
  *
  * Returns: %FALSE if no missing files left, %TRUE otherwise.
  **/
-xboolean_t
+gboolean
 _km_scan_missing (kqueue_sub *check_this_sub_only)
 {
-  xslist_t *head;
-  xslist_t *not_missing = NULL;
-  xboolean_t retval = FALSE;
-
+  GSList *head;
+  GSList *not_missing = NULL;
+  gboolean retval = FALSE;
+  
   G_LOCK (missing_lock);
 
   if (missing_subs_list)
@@ -129,8 +129,8 @@ _km_scan_missing (kqueue_sub *check_this_sub_only)
   for (head = missing_subs_list; head; head = head->next)
     {
       kqueue_sub *sub = (kqueue_sub *) head->data;
-      xassert (sub != NULL);
-      xassert (sub->filename != NULL);
+      g_assert (sub != NULL);
+      g_assert (sub->filename != NULL);
 
       if (check_this_sub_only != NULL && sub != check_this_sub_only)
         continue;
@@ -140,16 +140,16 @@ _km_scan_missing (kqueue_sub *check_this_sub_only)
           KM_W ("file %s now exists, starting watching", sub->filename);
           if (check_this_sub_only == NULL)
             _kh_file_appeared_cb (sub);
-          not_missing = xslist_prepend (not_missing, head);
+          not_missing = g_slist_prepend (not_missing, head);
         }
     }
 
   for (head = not_missing; head; head = head->next)
     {
-      xslist_t *link = (xslist_t *) head->data;
-      missing_subs_list = xslist_remove_link (missing_subs_list, link);
+      GSList *link = (GSList *) head->data;
+      missing_subs_list = g_slist_remove_link (missing_subs_list, link);
     }
-  xslist_free (not_missing);
+  g_slist_free (not_missing);
 
   if (missing_subs_list == NULL)
     {
@@ -174,6 +174,6 @@ void
 _km_remove (kqueue_sub *sub)
 {
   G_LOCK (missing_lock);
-  missing_subs_list = xslist_remove (missing_subs_list, sub);
+  missing_subs_list = g_slist_remove (missing_subs_list, sub);
   G_UNLOCK (missing_lock);
 }

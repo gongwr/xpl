@@ -39,27 +39,27 @@
  * @short_description: High-level API for application settings
  * @include: gio/gio.h
  *
- * The #xsettings_t class provides a convenient API for storing and retrieving
+ * The #GSettings class provides a convenient API for storing and retrieving
  * application settings.
  *
  * Reads and writes can be considered to be non-blocking.  Reading
- * settings with #xsettings_t is typically extremely fast: on
+ * settings with #GSettings is typically extremely fast: on
  * approximately the same order of magnitude (but slower than) a
- * #xhashtable_t lookup.  Writing settings is also extremely fast in terms
+ * #GHashTable lookup.  Writing settings is also extremely fast in terms
  * of time to return to your application, but can be extremely expensive
  * for other threads and other processes.  Many settings backends
  * (including dconf) have lazy initialisation which means in the common
  * case of the user using their computer without modifying any settings
  * a lot of work can be avoided.  For dconf, the D-Bus service doesn't
  * even need to be started in this case.  For this reason, you should
- * only ever modify #xsettings_t keys in response to explicit user action.
+ * only ever modify #GSettings keys in response to explicit user action.
  * Particular care should be paid to ensure that modifications are not
  * made during startup -- for example, when setting the initial value
  * of preferences widgets.  The built-in g_settings_bind() functionality
  * is careful not to write settings in response to notify signals as a
  * result of modifications that it makes to widgets.
  *
- * When creating a xsettings_t instance, you have to specify a schema
+ * When creating a GSettings instance, you have to specify a schema
  * that describes the keys in your settings and their types and default
  * values, as well as some other information.
  *
@@ -78,14 +78,14 @@
  * Paths should not start with "/apps/", "/desktop/" or "/system/" as
  * they often did in GConf.
  *
- * Unlike other configuration systems (like GConf), xsettings_t does not
- * restrict keys to basic types like strings and numbers. xsettings_t stores
- * values as #xvariant_t, and allows any #xvariant_type_t for keys. Key names
+ * Unlike other configuration systems (like GConf), GSettings does not
+ * restrict keys to basic types like strings and numbers. GSettings stores
+ * values as #GVariant, and allows any #GVariantType for keys. Key names
  * are restricted to lowercase characters, numbers and '-'. Furthermore,
  * the names must begin with a lowercase character, must not end
  * with a '-', and must not contain consecutive dashes.
  *
- * Similar to GConf, the default values in xsettings_t schemas can be
+ * Similar to GConf, the default values in GSettings schemas can be
  * localized, but the localized values are stored in gettext catalogs
  * and looked up with the domain that is specified in the
  * `gettext-domain` attribute of the <schemalist> or <schema>
@@ -107,7 +107,7 @@
  * For example:
  * |[
  *  <!-- Translators: A list of words which are not allowed to be typed, in
- *       xvariant_t serialization syntax.
+ *       GVariant serialization syntax.
  *       See: https://developer.gnome.org/glib/stable/gvariant-text.html -->
  *  <default l10n='messages' context='Banned words'>['bad', 'words']</default>
  * ]|
@@ -116,7 +116,7 @@
  * #GVariants (e.g. retaining any surrounding quotation marks) or runtime
  * errors will occur.
  *
- * xsettings_t uses schemas in a compact binary form that is created
+ * GSettings uses schemas in a compact binary form that is created
  * by the [glib-compile-schemas][glib-compile-schemas]
  * utility. The input is a schema description in an XML format.
  *
@@ -135,7 +135,7 @@
  * associated with one named application, the id should not use
  * StudlyCaps, e.g. "org.gnome.font-rendering".
  *
- * In addition to #xvariant_t types, keys can have types that have
+ * In addition to #GVariant types, keys can have types that have
  * enumerated types. These can be described by a <choice>,
  * <enum> or <flags> element, as seen in the
  * [example][schema-enumerated]. The underlying type of such a key
@@ -146,7 +146,7 @@
  * An example for default value:
  * |[
  * <schemalist>
- *   <schema id="org.gtk.test_t" path="/org/gtk/test_t/" gettext-domain="test">
+ *   <schema id="org.gtk.Test" path="/org/gtk/Test/" gettext-domain="test">
  *
  *     <key name="greeting" type="s">
  *       <default l10n="messages">"Hello, earthlings"</default>
@@ -162,7 +162,7 @@
  *
  *     <key name="empty-string" type="s">
  *       <default>""</default>
- *       <summary>Empty strings have to be provided in xvariant_t form</summary>
+ *       <summary>Empty strings have to be provided in GVariant form</summary>
  *     </key>
  *
  *   </schema>
@@ -173,18 +173,18 @@
  * |[
  * <schemalist>
  *
- *   <enum id="org.gtk.test_t.myenum">
+ *   <enum id="org.gtk.Test.myenum">
  *     <value nick="first" value="1"/>
  *     <value nick="second" value="2"/>
  *   </enum>
  *
- *   <flags id="org.gtk.test_t.myflags">
+ *   <flags id="org.gtk.Test.myflags">
  *     <value nick="flag1" value="1"/>
  *     <value nick="flag2" value="2"/>
  *     <value nick="flag3" value="4"/>
  *   </flags>
  *
- *   <schema id="org.gtk.test_t">
+ *   <schema id="org.gtk.Test">
  *
  *     <key name="key-with-range" type="i">
  *       <range min="1" max="100"/>
@@ -204,11 +204,11 @@
  *       <default>'Joe'</default>
  *     </key>
  *
- *     <key name='enumerated-key' enum='org.gtk.test_t.myenum'>
+ *     <key name='enumerated-key' enum='org.gtk.Test.myenum'>
  *       <default>'first'</default>
  *     </key>
  *
- *     <key name='flags-key' flags='org.gtk.test_t.myflags'>
+ *     <key name='flags-key' flags='org.gtk.Test.myflags'>
  *       <default>["flag1","flag2"]</default>
  *     </key>
  *   </schema>
@@ -225,7 +225,7 @@
  * override' files. These are keyfiles in the same directory as the XML
  * schema sources which can override default values. The schema id serves
  * as the group name in the key file, and the values are expected in
- * serialized xvariant_t form, as in the following example:
+ * serialized GVariant form, as in the following example:
  * |[
  *     [org.gtk.Example]
  *     key1='string'
@@ -237,14 +237,14 @@
  *
  * ## Binding
  *
- * A very convenient feature of xsettings_t lets you bind #xobject_t properties
- * directly to settings, using g_settings_bind(). Once a xobject_t property
+ * A very convenient feature of GSettings lets you bind #GObject properties
+ * directly to settings, using g_settings_bind(). Once a GObject property
  * has been bound to a setting, changes on either side are automatically
- * propagated to the other side. xsettings_t handles details like mapping
- * between xobject_t and xvariant_t types, and preventing infinite cycles.
+ * propagated to the other side. GSettings handles details like mapping
+ * between GObject and GVariant types, and preventing infinite cycles.
  *
  * This makes it very easy to hook up a preferences dialog to the
- * underlying settings. To make this even more convenient, xsettings_t
+ * underlying settings. To make this even more convenient, GSettings
  * looks for a boolean property with the name "sensitivity" and
  * automatically binds it to the writability of the bound setting.
  * If this 'magic' gets in the way, it can be suppressed with the
@@ -253,11 +253,11 @@
  * ## Relocatable schemas # {#gsettings-relocatable}
  *
  * A relocatable schema is one with no `path` attribute specified on its
- * <schema> element. By using g_settings_new_with_path(), a #xsettings_t object
+ * <schema> element. By using g_settings_new_with_path(), a #GSettings object
  * can be instantiated for a relocatable schema, assigning a path to the
  * instance. Paths passed to g_settings_new_with_path() will typically be
  * constructed dynamically from a constant prefix plus some form of instance
- * identifier; but they must still be valid xsettings_t paths. Paths could also
+ * identifier; but they must still be valid GSettings paths. Paths could also
  * be constant and used with a globally installed schema originating from a
  * dependency library.
  *
@@ -275,11 +275,11 @@
  *
  * ## Build system integration # {#gsettings-build-system}
  *
- * xsettings_t comes with autotools integration to simplify compiling and
- * installing schemas. To add xsettings_t support to an application, add the
+ * GSettings comes with autotools integration to simplify compiling and
+ * installing schemas. To add GSettings support to an application, add the
  * following to your `configure.ac`:
  * |[
- * XPL_GSETTINGS
+ * GLIB_GSETTINGS
  * ]|
  *
  * In the appropriate `Makefile.am`, use the following snippet to compile and
@@ -304,13 +304,13 @@
  * [type: gettext/gsettings]data/org.foo.MyApp.gschema.xml
  * ]|
  *
- * xsettings_t will use gettext to look up translations for the <summary> and
+ * GSettings will use gettext to look up translations for the <summary> and
  * <description> elements, and also any <default> elements which have a `l10n`
  * attribute set. Translations must not be included in the `.gschema.xml` file
  * by the build system, for example by using intltool XML rules with a
  * `.gschema.xml.in` template.
  *
- * If an enumerated type defined in a C header file is to be used in a xsettings_t
+ * If an enumerated type defined in a C header file is to be used in a GSettings
  * schema, it can either be defined manually using an <enum> element in the
  * schema XML, or it can be extracted automatically from the C header. This
  * approach is preferred, as it ensures the two representations are always
@@ -329,20 +329,20 @@
  */
 
 /**
- * xsettings_t:
+ * GSettings:
  *
- * #xsettings_t is an opaque data structure and can only be accessed
+ * #GSettings is an opaque data structure and can only be accessed
  * using the following functions.
  **/
 
 struct _GSettingsPrivate
 {
   /* where the signals go... */
-  xmain_context_t *main_context;
+  GMainContext *main_context;
 
-  xsettings_backend_t *backend;
-  xsettings_schema_t *schema;
-  xchar_t *path;
+  GSettingsBackend *backend;
+  GSettingsSchema *schema;
+  gchar *path;
 };
 
 enum
@@ -365,67 +365,67 @@ enum
   N_SIGNALS
 };
 
-static xuint_t g_settings_signals[N_SIGNALS];
+static guint g_settings_signals[N_SIGNALS];
 
-G_DEFINE_TYPE_WITH_PRIVATE (xsettings_t, g_settings, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GSettings, g_settings, G_TYPE_OBJECT)
 
 /* Signals {{{1 */
-static xboolean_t
-g_settings_real_change_event (xsettings_t    *settings,
-                              const xquark *keys,
-                              xint_t          n_keys)
+static gboolean
+g_settings_real_change_event (GSettings    *settings,
+                              const GQuark *keys,
+                              gint          n_keys)
 {
-  xint_t i;
+  gint i;
 
   if (keys == NULL)
     keys = g_settings_schema_list (settings->priv->schema, &n_keys);
 
   for (i = 0; i < n_keys; i++)
     {
-      const xchar_t *key = g_quark_to_string (keys[i]);
+      const gchar *key = g_quark_to_string (keys[i]);
 
-      if (xstr_has_suffix (key, "/"))
+      if (g_str_has_suffix (key, "/"))
         continue;
 
-      xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGED], keys[i], key);
+      g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGED], keys[i], key);
     }
 
   return FALSE;
 }
 
-static xboolean_t
-g_settings_real_writable_change_event (xsettings_t *settings,
-                                       xquark     key)
+static gboolean
+g_settings_real_writable_change_event (GSettings *settings,
+                                       GQuark     key)
 {
-  const xquark *keys = &key;
-  xint_t n_keys = 1;
-  xint_t i;
+  const GQuark *keys = &key;
+  gint n_keys = 1;
+  gint i;
 
   if (key == 0)
     keys = g_settings_schema_list (settings->priv->schema, &n_keys);
 
   for (i = 0; i < n_keys; i++)
     {
-      const xchar_t *key = g_quark_to_string (keys[i]);
+      const gchar *key_name = g_quark_to_string (keys[i]);
 
-      if (xstr_has_suffix (key, "/"))
+      if (g_str_has_suffix (key_name, "/"))
         continue;
 
-      xsignal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGED], keys[i], key);
+      g_signal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGED], keys[i], key_name);
     }
 
   return FALSE;
 }
 
 static void
-settings_backend_changed (xobject_t             *target,
-                          xsettings_backend_t    *backend,
-                          const xchar_t         *key,
-                          xpointer_t             origin_tag)
+settings_backend_changed (GObject             *target,
+                          GSettingsBackend    *backend,
+                          const gchar         *key,
+                          gpointer             origin_tag)
 {
-  xsettings_t *settings = G_SETTINGS (target);
-  xboolean_t ignore_this;
-  xint_t i;
+  GSettings *settings = G_SETTINGS (target);
+  gboolean ignore_this;
+  gint i;
 
   /* We used to assert here:
    *
@@ -444,51 +444,51 @@ settings_backend_changed (xobject_t             *target,
   if (settings->priv->path[i] == '\0' &&
       g_settings_schema_has_key (settings->priv->schema, key + i))
     {
-      xquark quark;
+      GQuark quark;
 
       quark = g_quark_from_string (key + i);
-      xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
+      g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
                      0, &quark, 1, &ignore_this);
     }
 }
 
 static void
-settings_backend_path_changed (xobject_t          *target,
-                               xsettings_backend_t *backend,
-                               const xchar_t      *path,
-                               xpointer_t          origin_tag)
+settings_backend_path_changed (GObject          *target,
+                               GSettingsBackend *backend,
+                               const gchar      *path,
+                               gpointer          origin_tag)
 {
-  xsettings_t *settings = G_SETTINGS (target);
-  xboolean_t ignore_this;
+  GSettings *settings = G_SETTINGS (target);
+  gboolean ignore_this;
 
-  if (xstr_has_prefix (settings->priv->path, path))
-    xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
+  if (g_str_has_prefix (settings->priv->path, path))
+    g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
                    0, NULL, 0, &ignore_this);
 }
 
 static void
-settings_backend_keys_changed (xobject_t             *target,
-                               xsettings_backend_t    *backend,
-                               const xchar_t         *path,
-                               xpointer_t             origin_tag,
-                               const xchar_t * const *items)
+settings_backend_keys_changed (GObject             *target,
+                               GSettingsBackend    *backend,
+                               const gchar         *path,
+                               gpointer             origin_tag,
+                               const gchar * const *items)
 {
-  xsettings_t *settings = G_SETTINGS (target);
-  xboolean_t ignore_this;
-  xint_t i;
+  GSettings *settings = G_SETTINGS (target);
+  gboolean ignore_this;
+  gint i;
 
   for (i = 0; settings->priv->path[i] &&
               settings->priv->path[i] == path[i]; i++);
 
   if (path[i] == '\0')
     {
-      xquark quarks[256];
-      xint_t j, l = 0;
+      GQuark quarks[256];
+      gint j, l = 0;
 
       for (j = 0; items[j]; j++)
          {
-           const xchar_t *item = items[j];
-           xint_t k;
+           const gchar *item = items[j];
+           gint k;
 
            for (k = 0; item[k] == settings->priv->path[i + k]; k++);
 
@@ -499,61 +499,61 @@ settings_backend_keys_changed (xobject_t             *target,
            /* "256 quarks ought to be enough for anybody!"
             * If this bites you, I'm sorry.  Please file a bug.
             */
-           xassert (l < 256);
+           g_assert (l < 256);
          }
 
       if (l > 0)
-        xsignal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
+        g_signal_emit (settings, g_settings_signals[SIGNAL_CHANGE_EVENT],
                        0, quarks, l, &ignore_this);
     }
 }
 
 static void
-settings_backend_writable_changed (xobject_t          *target,
-                                   xsettings_backend_t *backend,
-                                   const xchar_t      *key)
+settings_backend_writable_changed (GObject          *target,
+                                   GSettingsBackend *backend,
+                                   const gchar      *key)
 {
-  xsettings_t *settings = G_SETTINGS (target);
-  xboolean_t ignore_this;
-  xint_t i;
+  GSettings *settings = G_SETTINGS (target);
+  gboolean ignore_this;
+  gint i;
 
   for (i = 0; key[i] == settings->priv->path[i]; i++);
 
   if (settings->priv->path[i] == '\0' &&
       g_settings_schema_has_key (settings->priv->schema, key + i))
-    xsignal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
+    g_signal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
                    0, g_quark_from_string (key + i), &ignore_this);
 }
 
 static void
-settings_backend_path_writable_changed (xobject_t          *target,
-                                        xsettings_backend_t *backend,
-                                        const xchar_t      *path)
+settings_backend_path_writable_changed (GObject          *target,
+                                        GSettingsBackend *backend,
+                                        const gchar      *path)
 {
-  xsettings_t *settings = G_SETTINGS (target);
-  xboolean_t ignore_this;
+  GSettings *settings = G_SETTINGS (target);
+  gboolean ignore_this;
 
-  if (xstr_has_prefix (settings->priv->path, path))
-    xsignal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
-                   0, (xquark) 0, &ignore_this);
+  if (g_str_has_prefix (settings->priv->path, path))
+    g_signal_emit (settings, g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
+                   0, (GQuark) 0, &ignore_this);
 }
 
 /* Properties, Construction, Destruction {{{1 */
 static void
-g_settings_set_property (xobject_t      *object,
-                         xuint_t         prop_id,
-                         const xvalue_t *value,
-                         xparam_spec_t   *pspec)
+g_settings_set_property (GObject      *object,
+                         guint         prop_id,
+                         const GValue *value,
+                         GParamSpec   *pspec)
 {
-  xsettings_t *settings = G_SETTINGS (object);
+  GSettings *settings = G_SETTINGS (object);
 
   switch (prop_id)
     {
     case PROP_SCHEMA:
       {
-        xsettings_schema_t *schema;
+        GSettingsSchema *schema;
 
-        schema = xvalue_dup_boxed (value);
+        schema = g_value_dup_boxed (value);
 
         /* we receive a set_property() call for "settings-schema" even
          * if it was not specified (ie: with NULL value).  ->schema
@@ -562,7 +562,7 @@ g_settings_set_property (xobject_t      *object,
          */
         if (schema != NULL)
           {
-            xassert (settings->priv->schema == NULL);
+            g_assert (settings->priv->schema == NULL);
             settings->priv->schema = schema;
           }
       }
@@ -570,9 +570,9 @@ g_settings_set_property (xobject_t      *object,
 
     case PROP_SCHEMA_ID:
       {
-        const xchar_t *schema_id;
+        const gchar *schema_id;
 
-        schema_id = xvalue_get_string (value);
+        schema_id = g_value_get_string (value);
 
         /* we receive a set_property() call for both "schema" and
          * "schema-id", even if they are not set.  Hopefully only one of
@@ -580,28 +580,28 @@ g_settings_set_property (xobject_t      *object,
          */
         if (schema_id != NULL)
           {
-            xsettings_schema_source_t *default_source;
+            GSettingsSchemaSource *default_source;
 
-            xassert (settings->priv->schema == NULL);
+            g_assert (settings->priv->schema == NULL);
             default_source = g_settings_schema_source_get_default ();
 
             if (default_source == NULL)
-              xerror ("No xsettings_t schemas are installed on the system");
+              g_error ("No GSettings schemas are installed on the system");
 
             settings->priv->schema = g_settings_schema_source_lookup (default_source, schema_id, TRUE);
 
             if (settings->priv->schema == NULL)
-              xerror ("Settings schema '%s' is not installed", schema_id);
+              g_error ("Settings schema '%s' is not installed", schema_id);
           }
       }
       break;
 
     case PROP_PATH:
-      settings->priv->path = xvalue_dup_string (value);
+      settings->priv->path = g_value_dup_string (value);
       break;
 
     case PROP_BACKEND:
-      settings->priv->backend = xvalue_dup_object (value);
+      settings->priv->backend = g_value_dup_object (value);
       break;
 
     default:
@@ -610,37 +610,37 @@ g_settings_set_property (xobject_t      *object,
 }
 
 static void
-g_settings_get_property (xobject_t    *object,
-                         xuint_t       prop_id,
-                         xvalue_t     *value,
-                         xparam_spec_t *pspec)
+g_settings_get_property (GObject    *object,
+                         guint       prop_id,
+                         GValue     *value,
+                         GParamSpec *pspec)
 {
-  xsettings_t *settings = G_SETTINGS (object);
+  GSettings *settings = G_SETTINGS (object);
 
   switch (prop_id)
     {
     case PROP_SCHEMA:
-      xvalue_set_boxed (value, settings->priv->schema);
+      g_value_set_boxed (value, settings->priv->schema);
       break;
 
      case PROP_SCHEMA_ID:
-      xvalue_set_string (value, g_settings_schema_get_id (settings->priv->schema));
+      g_value_set_string (value, g_settings_schema_get_id (settings->priv->schema));
       break;
 
      case PROP_BACKEND:
-      xvalue_set_object (value, settings->priv->backend);
+      g_value_set_object (value, settings->priv->backend);
       break;
 
      case PROP_PATH:
-      xvalue_set_string (value, settings->priv->path);
+      g_value_set_string (value, settings->priv->path);
       break;
 
      case PROP_HAS_UNAPPLIED:
-      xvalue_set_boolean (value, g_settings_get_has_unapplied (settings));
+      g_value_set_boolean (value, g_settings_get_has_unapplied (settings));
       break;
 
      case PROP_DELAY_APPLY:
-      xvalue_set_boolean (value, X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend));
+      g_value_set_boolean (value, G_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend));
       break;
 
      default:
@@ -657,24 +657,24 @@ static const GSettingsListenerVTable listener_vtable = {
 };
 
 static void
-g_settings_constructed (xobject_t *object)
+g_settings_constructed (GObject *object)
 {
-  xsettings_t *settings = G_SETTINGS (object);
-  const xchar_t *schema_path;
+  GSettings *settings = G_SETTINGS (object);
+  const gchar *schema_path;
 
   schema_path = g_settings_schema_get_path (settings->priv->schema);
 
   if (settings->priv->path && schema_path && strcmp (settings->priv->path, schema_path) != 0)
-    xerror ("settings object created with schema '%s' and path '%s', but path '%s' is specified by schema",
+    g_error ("settings object created with schema '%s' and path '%s', but path '%s' is specified by schema",
              g_settings_schema_get_id (settings->priv->schema), settings->priv->path, schema_path);
 
   if (settings->priv->path == NULL)
     {
       if (schema_path == NULL)
-        xerror ("attempting to create schema '%s' without a path",
+        g_error ("attempting to create schema '%s' without a path",
                  g_settings_schema_get_id (settings->priv->schema));
 
-      settings->priv->path = xstrdup (schema_path);
+      settings->priv->path = g_strdup (schema_path);
     }
 
   if (settings->priv->backend == NULL)
@@ -688,31 +688,31 @@ g_settings_constructed (xobject_t *object)
 }
 
 static void
-g_settings_finalize (xobject_t *object)
+g_settings_finalize (GObject *object)
 {
-  xsettings_t *settings = G_SETTINGS (object);
+  GSettings *settings = G_SETTINGS (object);
 
   g_settings_backend_unsubscribe (settings->priv->backend,
                                   settings->priv->path);
-  xmain_context_unref (settings->priv->main_context);
-  xobject_unref (settings->priv->backend);
+  g_main_context_unref (settings->priv->main_context);
+  g_object_unref (settings->priv->backend);
   g_settings_schema_unref (settings->priv->schema);
   g_free (settings->priv->path);
 
-  XOBJECT_CLASS (g_settings_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_settings_parent_class)->finalize (object);
 }
 
 static void
-g_settings_init (xsettings_t *settings)
+g_settings_init (GSettings *settings)
 {
   settings->priv = g_settings_get_instance_private (settings);
-  settings->priv->main_context = xmain_context_ref_thread_default ();
+  settings->priv->main_context = g_main_context_ref_thread_default ();
 }
 
 static void
 g_settings_class_init (GSettingsClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
   class->writable_change_event = g_settings_real_writable_change_event;
   class->change_event = g_settings_real_change_event;
@@ -723,7 +723,7 @@ g_settings_class_init (GSettingsClass *class)
   object_class->finalize = g_settings_finalize;
 
   /**
-   * xsettings_t::changed:
+   * GSettings::changed:
    * @settings: the object on which the signal was emitted
    * @key: the name of the key that changed
    *
@@ -739,16 +739,16 @@ g_settings_class_init (GSettingsClass *class)
    * least once while a signal handler was already connected for @key.
    */
   g_settings_signals[SIGNAL_CHANGED] =
-    xsignal_new (I_("changed"), XTYPE_SETTINGS,
+    g_signal_new (I_("changed"), G_TYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (GSettingsClass, changed),
-                  NULL, NULL, NULL, XTYPE_NONE,
-                  1, XTYPE_STRING | G_SIGNAL_TYPE_STATIC_SCOPE);
+                  NULL, NULL, NULL, G_TYPE_NONE,
+                  1, G_TYPE_STRING | G_SIGNAL_TYPE_STATIC_SCOPE);
 
   /**
-   * xsettings_t::change-event:
+   * GSettings::change-event:
    * @settings: the object on which the signal was emitted
-   * @keys: (array length=n_keys) (element-type xquark) (nullable):
+   * @keys: (array length=n_keys) (element-type GQuark) (nullable):
    *        an array of #GQuarks for the changed keys, or %NULL
    * @n_keys: the length of the @keys array, or 0
    *
@@ -759,8 +759,8 @@ g_settings_class_init (GSettingsClass *class)
    * For most use cases it is more appropriate to use the "changed" signal.
    *
    * In the event that the change event applies to one or more specified
-   * keys, @keys will be an array of #xquark of length @n_keys.  In the
-   * event that the change event applies to the #xsettings_t object as a
+   * keys, @keys will be an array of #GQuark of length @n_keys.  In the
+   * event that the change event applies to the #GSettings object as a
    * whole (ie: potentially every key has been changed) then @keys will
    * be %NULL and @n_keys will be 0.
    *
@@ -772,18 +772,18 @@ g_settings_class_init (GSettingsClass *class)
    *          event. FALSE to propagate the event further.
    */
   g_settings_signals[SIGNAL_CHANGE_EVENT] =
-    xsignal_new (I_("change-event"), XTYPE_SETTINGS,
+    g_signal_new (I_("change-event"), G_TYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSettingsClass, change_event),
-                  xsignal_accumulator_true_handled, NULL,
+                  g_signal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__POINTER_INT,
-                  XTYPE_BOOLEAN, 2, XTYPE_POINTER, XTYPE_INT);
-  xsignal_set_va_marshaller (g_settings_signals[SIGNAL_CHANGE_EVENT],
-                              XTYPE_FROM_CLASS (class),
+                  G_TYPE_BOOLEAN, 2, G_TYPE_POINTER, G_TYPE_INT);
+  g_signal_set_va_marshaller (g_settings_signals[SIGNAL_CHANGE_EVENT],
+                              G_TYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__POINTER_INTv);
 
   /**
-   * xsettings_t::writable-changed:
+   * GSettings::writable-changed:
    * @settings: the object on which the signal was emitted
    * @key: the key
    *
@@ -796,14 +796,14 @@ g_settings_class_init (GSettingsClass *class)
    * callbacks when the writability of "x" changes.
    */
   g_settings_signals[SIGNAL_WRITABLE_CHANGED] =
-    xsignal_new (I_("writable-changed"), XTYPE_SETTINGS,
+    g_signal_new (I_("writable-changed"), G_TYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
                   G_STRUCT_OFFSET (GSettingsClass, writable_changed),
-                  NULL, NULL, NULL, XTYPE_NONE,
-                  1, XTYPE_STRING | G_SIGNAL_TYPE_STATIC_SCOPE);
+                  NULL, NULL, NULL, G_TYPE_NONE,
+                  1, G_TYPE_STRING | G_SIGNAL_TYPE_STATIC_SCOPE);
 
   /**
-   * xsettings_t::writable-change-event:
+   * GSettings::writable-change-event:
    * @settings: the object on which the signal was emitted
    * @key: the quark of the key, or 0
    *
@@ -815,7 +815,7 @@ g_settings_class_init (GSettingsClass *class)
    * appropriate to use the "writable-changed" signal.
    *
    * In the event that the writability change applies only to a single
-   * key, @key will be set to the #xquark for that key.  In the event
+   * key, @key will be set to the #GQuark for that key.  In the event
    * that the writability change affects the entire settings object,
    * @key will be 0.
    *
@@ -830,125 +830,125 @@ g_settings_class_init (GSettingsClass *class)
    *          event. FALSE to propagate the event further.
    */
   g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT] =
-    xsignal_new (I_("writable-change-event"), XTYPE_SETTINGS,
+    g_signal_new (I_("writable-change-event"), G_TYPE_SETTINGS,
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSettingsClass, writable_change_event),
-                  xsignal_accumulator_true_handled, NULL,
+                  g_signal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__UINT,
-                  XTYPE_BOOLEAN, 1, XTYPE_UINT);
-  xsignal_set_va_marshaller (g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
-                              XTYPE_FROM_CLASS (class),
+                  G_TYPE_BOOLEAN, 1, G_TYPE_UINT);
+  g_signal_set_va_marshaller (g_settings_signals[SIGNAL_WRITABLE_CHANGE_EVENT],
+                              G_TYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__UINTv);
 
   /**
-   * xsettings_t:backend:
+   * GSettings:backend:
    *
    * The name of the context that the settings are stored in.
    */
-  xobject_class_install_property (object_class, PROP_BACKEND,
-    xparam_spec_object ("backend",
-                         P_("xsettings_backend_t"),
-                         P_("The xsettings_backend_t for this settings object"),
-                         XTYPE_SETTINGS_BACKEND, XPARAM_CONSTRUCT_ONLY |
-                         XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+  g_object_class_install_property (object_class, PROP_BACKEND,
+    g_param_spec_object ("backend",
+                         P_("GSettingsBackend"),
+                         P_("The GSettingsBackend for this settings object"),
+                         G_TYPE_SETTINGS_BACKEND, G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsettings_t:settings-schema:
+   * GSettings:settings-schema:
    *
-   * The #xsettings_schema_t describing the types of keys for this
-   * #xsettings_t object.
+   * The #GSettingsSchema describing the types of keys for this
+   * #GSettings object.
    *
-   * Ideally, this property would be called 'schema'.  #xsettings_schema_t
+   * Ideally, this property would be called 'schema'.  #GSettingsSchema
    * has only existed since version 2.32, however, and before then the
    * 'schema' property was used to refer to the ID of the schema rather
    * than the schema itself.  Take care.
    */
-  xobject_class_install_property (object_class, PROP_SCHEMA,
-    xparam_spec_boxed ("settings-schema",
+  g_object_class_install_property (object_class, PROP_SCHEMA,
+    g_param_spec_boxed ("settings-schema",
                         P_("schema"),
-                        P_("The xsettings_schema_t for this settings object"),
-                        XTYPE_SETTINGS_SCHEMA,
-                        XPARAM_CONSTRUCT_ONLY |
-                        XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+                        P_("The GSettingsSchema for this settings object"),
+                        G_TYPE_SETTINGS_SCHEMA,
+                        G_PARAM_CONSTRUCT_ONLY |
+                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsettings_t:schema:
+   * GSettings:schema:
    *
    * The name of the schema that describes the types of keys
-   * for this #xsettings_t object.
+   * for this #GSettings object.
    *
-   * The type of this property is *not* #xsettings_schema_t.
-   * #xsettings_schema_t has only existed since version 2.32 and
+   * The type of this property is *not* #GSettingsSchema.
+   * #GSettingsSchema has only existed since version 2.32 and
    * unfortunately this name was used in previous versions to refer to
    * the schema ID rather than the schema itself.  Take care to use the
    * 'settings-schema' property if you wish to pass in a
-   * #xsettings_schema_t.
+   * #GSettingsSchema.
    *
    * Deprecated:2.32:Use the 'schema-id' property instead.  In a future
-   * version, this property may instead refer to a #xsettings_schema_t.
+   * version, this property may instead refer to a #GSettingsSchema.
    */
-  xobject_class_install_property (object_class, PROP_SCHEMA_ID,
-    xparam_spec_string ("schema",
+  g_object_class_install_property (object_class, PROP_SCHEMA_ID,
+    g_param_spec_string ("schema",
                          P_("Schema name"),
                          P_("The name of the schema for this settings object"),
                          NULL,
-                         XPARAM_CONSTRUCT_ONLY |
-                         XPARAM_DEPRECATED | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_DEPRECATED | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   /**
-   * xsettings_t:schema-id:
+   * GSettings:schema-id:
    *
    * The name of the schema that describes the types of keys
-   * for this #xsettings_t object.
+   * for this #GSettings object.
    */
-  xobject_class_install_property (object_class, PROP_SCHEMA_ID,
-    xparam_spec_string ("schema-id",
+  g_object_class_install_property (object_class, PROP_SCHEMA_ID,
+    g_param_spec_string ("schema-id",
                          P_("Schema name"),
                          P_("The name of the schema for this settings object"),
                          NULL,
-                         XPARAM_CONSTRUCT_ONLY |
-                         XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
    /**
-    * xsettings_t:path:
+    * GSettings:path:
     *
     * The path within the backend where the settings are stored.
     */
-   xobject_class_install_property (object_class, PROP_PATH,
-     xparam_spec_string ("path",
+   g_object_class_install_property (object_class, PROP_PATH,
+     g_param_spec_string ("path",
                           P_("Base path"),
                           P_("The path within the backend where the settings are"),
                           NULL,
-                          XPARAM_CONSTRUCT_ONLY |
-                          XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
    /**
-    * xsettings_t:has-unapplied:
+    * GSettings:has-unapplied:
     *
-    * If this property is %TRUE, the #xsettings_t object has outstanding
+    * If this property is %TRUE, the #GSettings object has outstanding
     * changes that will be applied when g_settings_apply() is called.
     */
-   xobject_class_install_property (object_class, PROP_HAS_UNAPPLIED,
-     xparam_spec_boolean ("has-unapplied",
+   g_object_class_install_property (object_class, PROP_HAS_UNAPPLIED,
+     g_param_spec_boolean ("has-unapplied",
                            P_("Has unapplied changes"),
                            P_("TRUE if there are outstanding changes to apply()"),
                            FALSE,
-                           XPARAM_READABLE | XPARAM_STATIC_STRINGS));
+                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
    /**
-    * xsettings_t:delay-apply:
+    * GSettings:delay-apply:
     *
-    * Whether the #xsettings_t object is in 'delay-apply' mode. See
+    * Whether the #GSettings object is in 'delay-apply' mode. See
     * g_settings_delay() for details.
     *
     * Since: 2.28
     */
-   xobject_class_install_property (object_class, PROP_DELAY_APPLY,
-     xparam_spec_boolean ("delay-apply",
+   g_object_class_install_property (object_class, PROP_DELAY_APPLY,
+     g_param_spec_boolean ("delay-apply",
                            P_("Delay-apply mode"),
                            P_("Whether this settings object is in “delay-apply” mode"),
                            FALSE,
-                           XPARAM_READABLE | XPARAM_STATIC_STRINGS));
+                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 /* Construction (new, new_with_path, etc.) {{{1 */
@@ -956,7 +956,7 @@ g_settings_class_init (GSettingsClass *class)
  * g_settings_new:
  * @schema_id: the id of the schema
  *
- * Creates a new #xsettings_t object with the schema specified by
+ * Creates a new #GSettings object with the schema specified by
  * @schema_id.
  *
  * It is an error for the schema to not exist: schemas are an
@@ -965,27 +965,27 @@ g_settings_class_init (GSettingsClass *class)
  * optional runtime dependency), g_settings_schema_source_lookup()
  * can be used to test for their existence before loading them.
  *
- * Signals on the newly created #xsettings_t object will be dispatched
- * via the thread-default #xmain_context_t in effect at the time of the
- * call to g_settings_new().  The new #xsettings_t will hold a reference
- * on the context.  See xmain_context_push_thread_default().
+ * Signals on the newly created #GSettings object will be dispatched
+ * via the thread-default #GMainContext in effect at the time of the
+ * call to g_settings_new().  The new #GSettings will hold a reference
+ * on the context.  See g_main_context_push_thread_default().
  *
- * Returns: (not nullable) (transfer full): a new #xsettings_t object
+ * Returns: (not nullable) (transfer full): a new #GSettings object
  *
  * Since: 2.26
  */
-xsettings_t *
-g_settings_new (const xchar_t *schema_id)
+GSettings *
+g_settings_new (const gchar *schema_id)
 {
-  xreturn_val_if_fail (schema_id != NULL, NULL);
+  g_return_val_if_fail (schema_id != NULL, NULL);
 
-  return xobject_new (XTYPE_SETTINGS,
+  return g_object_new (G_TYPE_SETTINGS,
                        "schema-id", schema_id,
                        NULL);
 }
 
-static xboolean_t
-path_is_valid (const xchar_t *path)
+static gboolean
+path_is_valid (const gchar *path)
 {
   if (!path)
     return FALSE;
@@ -993,7 +993,7 @@ path_is_valid (const xchar_t *path)
   if (path[0] != '/')
     return FALSE;
 
-  if (!xstr_has_suffix (path, "/"))
+  if (!g_str_has_suffix (path, "/"))
     return FALSE;
 
   return strstr (path, "//") == NULL;
@@ -1004,7 +1004,7 @@ path_is_valid (const xchar_t *path)
  * @schema_id: the id of the schema
  * @path: the path to use
  *
- * Creates a new #xsettings_t object with the relocatable schema specified
+ * Creates a new #GSettings object with the relocatable schema specified
  * by @schema_id and a given path.
  *
  * You only need to do this if you want to directly create a settings
@@ -1018,18 +1018,18 @@ path_is_valid (const xchar_t *path)
  * begins and ends with '/' and does not contain two consecutive '/'
  * characters.
  *
- * Returns: (not nullable) (transfer full): a new #xsettings_t object
+ * Returns: (not nullable) (transfer full): a new #GSettings object
  *
  * Since: 2.26
  */
-xsettings_t *
-g_settings_new_with_path (const xchar_t *schema_id,
-                          const xchar_t *path)
+GSettings *
+g_settings_new_with_path (const gchar *schema_id,
+                          const gchar *path)
 {
-  xreturn_val_if_fail (schema_id != NULL, NULL);
-  xreturn_val_if_fail (path_is_valid (path), NULL);
+  g_return_val_if_fail (schema_id != NULL, NULL);
+  g_return_val_if_fail (path_is_valid (path), NULL);
 
-  return xobject_new (XTYPE_SETTINGS,
+  return g_object_new (G_TYPE_SETTINGS,
                        "schema-id", schema_id,
                        "path", path,
                        NULL);
@@ -1038,29 +1038,29 @@ g_settings_new_with_path (const xchar_t *schema_id,
 /**
  * g_settings_new_with_backend:
  * @schema_id: the id of the schema
- * @backend: the #xsettings_backend_t to use
+ * @backend: the #GSettingsBackend to use
  *
- * Creates a new #xsettings_t object with the schema specified by
- * @schema_id and a given #xsettings_backend_t.
+ * Creates a new #GSettings object with the schema specified by
+ * @schema_id and a given #GSettingsBackend.
  *
- * Creating a #xsettings_t object with a different backend allows accessing
+ * Creating a #GSettings object with a different backend allows accessing
  * settings from a database other than the usual one. For example, it may make
  * sense to pass a backend corresponding to the "defaults" settings database on
  * the system to get a settings object that modifies the system default
  * settings instead of the settings for this user.
  *
- * Returns: (not nullable) (transfer full): a new #xsettings_t object
+ * Returns: (not nullable) (transfer full): a new #GSettings object
  *
  * Since: 2.26
  */
-xsettings_t *
-g_settings_new_with_backend (const xchar_t      *schema_id,
-                             xsettings_backend_t *backend)
+GSettings *
+g_settings_new_with_backend (const gchar      *schema_id,
+                             GSettingsBackend *backend)
 {
-  xreturn_val_if_fail (schema_id != NULL, NULL);
-  xreturn_val_if_fail (X_IS_SETTINGS_BACKEND (backend), NULL);
+  g_return_val_if_fail (schema_id != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS_BACKEND (backend), NULL);
 
-  return xobject_new (XTYPE_SETTINGS,
+  return g_object_new (G_TYPE_SETTINGS,
                        "schema-id", schema_id,
                        "backend", backend,
                        NULL);
@@ -1069,29 +1069,29 @@ g_settings_new_with_backend (const xchar_t      *schema_id,
 /**
  * g_settings_new_with_backend_and_path:
  * @schema_id: the id of the schema
- * @backend: the #xsettings_backend_t to use
+ * @backend: the #GSettingsBackend to use
  * @path: the path to use
  *
- * Creates a new #xsettings_t object with the schema specified by
- * @schema_id and a given #xsettings_backend_t and path.
+ * Creates a new #GSettings object with the schema specified by
+ * @schema_id and a given #GSettingsBackend and path.
  *
  * This is a mix of g_settings_new_with_backend() and
  * g_settings_new_with_path().
  *
- * Returns: (not nullable) (transfer full): a new #xsettings_t object
+ * Returns: (not nullable) (transfer full): a new #GSettings object
  *
  * Since: 2.26
  */
-xsettings_t *
-g_settings_new_with_backend_and_path (const xchar_t      *schema_id,
-                                      xsettings_backend_t *backend,
-                                      const xchar_t      *path)
+GSettings *
+g_settings_new_with_backend_and_path (const gchar      *schema_id,
+                                      GSettingsBackend *backend,
+                                      const gchar      *path)
 {
-  xreturn_val_if_fail (schema_id != NULL, NULL);
-  xreturn_val_if_fail (X_IS_SETTINGS_BACKEND (backend), NULL);
-  xreturn_val_if_fail (path_is_valid (path), NULL);
+  g_return_val_if_fail (schema_id != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS_BACKEND (backend), NULL);
+  g_return_val_if_fail (path_is_valid (path), NULL);
 
-  return xobject_new (XTYPE_SETTINGS,
+  return g_object_new (G_TYPE_SETTINGS,
                        "schema-id", schema_id,
                        "backend", backend,
                        "path", path,
@@ -1100,11 +1100,11 @@ g_settings_new_with_backend_and_path (const xchar_t      *schema_id,
 
 /**
  * g_settings_new_full:
- * @schema: a #xsettings_schema_t
- * @backend: (nullable): a #xsettings_backend_t
+ * @schema: a #GSettingsSchema
+ * @backend: (nullable): a #GSettingsBackend
  * @path: (nullable): the path to use
  *
- * Creates a new #xsettings_t object with a given schema, backend and
+ * Creates a new #GSettings object with a given schema, backend and
  * path.
  *
  * It should be extremely rare that you ever want to use this function.
@@ -1112,12 +1112,12 @@ g_settings_new_with_backend_and_path (const xchar_t      *schema_id,
  * that want to provide access to schemas loaded from custom locations,
  * etc).
  *
- * At the most basic level, a #xsettings_t object is a pure composition of
- * 4 things: a #xsettings_schema_t, a #xsettings_backend_t, a path within that
- * backend, and a #xmain_context_t to which signals are dispatched.
+ * At the most basic level, a #GSettings object is a pure composition of
+ * 4 things: a #GSettingsSchema, a #GSettingsBackend, a path within that
+ * backend, and a #GMainContext to which signals are dispatched.
  *
  * This constructor therefore gives you full control over constructing
- * #xsettings_t instances.  The first 3 parameters are given directly as
+ * #GSettings instances.  The first 3 parameters are given directly as
  * @schema, @backend and @path, and the main context is taken from the
  * thread-default (as per g_settings_new()).
  *
@@ -1128,20 +1128,20 @@ g_settings_new_with_backend_and_path (const xchar_t      *schema_id,
  * @path is non-%NULL and not equal to the path that the schema does
  * have.
  *
- * Returns: (not nullable) (transfer full): a new #xsettings_t object
+ * Returns: (not nullable) (transfer full): a new #GSettings object
  *
  * Since: 2.32
  */
-xsettings_t *
-g_settings_new_full (xsettings_schema_t  *schema,
-                     xsettings_backend_t *backend,
-                     const xchar_t      *path)
+GSettings *
+g_settings_new_full (GSettingsSchema  *schema,
+                     GSettingsBackend *backend,
+                     const gchar      *path)
 {
-  xreturn_val_if_fail (schema != NULL, NULL);
-  xreturn_val_if_fail (backend == NULL || X_IS_SETTINGS_BACKEND (backend), NULL);
-  xreturn_val_if_fail (path == NULL || path_is_valid (path), NULL);
+  g_return_val_if_fail (schema != NULL, NULL);
+  g_return_val_if_fail (backend == NULL || G_IS_SETTINGS_BACKEND (backend), NULL);
+  g_return_val_if_fail (path == NULL || path_is_valid (path), NULL);
 
-  return xobject_new (XTYPE_SETTINGS,
+  return g_object_new (G_TYPE_SETTINGS,
                        "settings-schema", schema,
                        "backend", backend,
                        "path", path,
@@ -1151,32 +1151,32 @@ g_settings_new_full (xsettings_schema_t  *schema,
 /* Internal read/write utilities {{{1 */
 
 /* @value will be sunk */
-static xboolean_t
-g_settings_write_to_backend (xsettings_t          *settings,
-                             xsettings_schema_key_t *key,
-                             xvariant_t           *value)
+static gboolean
+g_settings_write_to_backend (GSettings          *settings,
+                             GSettingsSchemaKey *key,
+                             GVariant           *value)
 {
-  xboolean_t success;
-  xchar_t *path;
+  gboolean success;
+  gchar *path;
 
-  path = xstrconcat (settings->priv->path, key->name, NULL);
+  path = g_strconcat (settings->priv->path, key->name, NULL);
   success = g_settings_backend_write (settings->priv->backend, path, value, NULL);
   g_free (path);
 
   return success;
 }
 
-static xvariant_t *
-g_settings_read_from_backend (xsettings_t          *settings,
-                              xsettings_schema_key_t *key,
-                              xboolean_t            user_value_only,
-                              xboolean_t            default_value)
+static GVariant *
+g_settings_read_from_backend (GSettings          *settings,
+                              GSettingsSchemaKey *key,
+                              gboolean            user_value_only,
+                              gboolean            default_value)
 {
-  xvariant_t *value;
-  xvariant_t *fixup;
-  xchar_t *path;
+  GVariant *value;
+  GVariant *fixup;
+  gchar *path;
 
-  path = xstrconcat (settings->priv->path, key->name, NULL);
+  path = g_strconcat (settings->priv->path, key->name, NULL);
   if (user_value_only)
     value = g_settings_backend_read_user_value (settings->priv->backend, path, key->type);
   else
@@ -1186,7 +1186,7 @@ g_settings_read_from_backend (xsettings_t          *settings,
   if (value != NULL)
     {
       fixup = g_settings_schema_key_range_fixup (key, value);
-      xvariant_unref (value);
+      g_variant_unref (value);
     }
   else
     fixup = NULL;
@@ -1197,7 +1197,7 @@ g_settings_read_from_backend (xsettings_t          *settings,
 /* Public Get/Set API {{{1 (get, get_value, set, set_value, get_mapped) */
 /**
  * g_settings_get_value:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored in @settings for @key.
@@ -1205,19 +1205,19 @@ g_settings_read_from_backend (xsettings_t          *settings,
  * It is a programmer error to give a @key that isn't contained in the
  * schema for @settings.
  *
- * Returns: (not nullable) (transfer full): a new #xvariant_t
+ * Returns: (not nullable) (transfer full): a new #GVariant
  *
  * Since: 2.26
  */
-xvariant_t *
-g_settings_get_value (xsettings_t   *settings,
-                      const xchar_t *key)
+GVariant *
+g_settings_get_value (GSettings   *settings,
+                      const gchar *key)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *value;
+  GSettingsSchemaKey skey;
+  GVariant *value;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  xreturn_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   value = g_settings_read_from_backend (settings, &skey, FALSE, FALSE);
@@ -1232,7 +1232,7 @@ g_settings_get_value (xsettings_t   *settings,
 
 /**
  * g_settings_get_user_value:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the user value for
  *
  * Checks the "user value" of a key, if there is one.
@@ -1258,15 +1258,15 @@ g_settings_get_value (xsettings_t   *settings,
  *
  * Since: 2.40
  **/
-xvariant_t *
-g_settings_get_user_value (xsettings_t   *settings,
-                           const xchar_t *key)
+GVariant *
+g_settings_get_user_value (GSettings   *settings,
+                           const gchar *key)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *value;
+  GSettingsSchemaKey skey;
+  GVariant *value;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  xreturn_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   value = g_settings_read_from_backend (settings, &skey, TRUE, FALSE);
@@ -1277,7 +1277,7 @@ g_settings_get_user_value (xsettings_t   *settings,
 
 /**
  * g_settings_get_default_value:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the default value for
  *
  * Gets the "default value" of a key.
@@ -1306,15 +1306,15 @@ g_settings_get_user_value (xsettings_t   *settings,
  *
  * Since: 2.40
  **/
-xvariant_t *
-g_settings_get_default_value (xsettings_t   *settings,
-                              const xchar_t *key)
+GVariant *
+g_settings_get_default_value (GSettings   *settings,
+                              const gchar *key)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *value;
+  GSettingsSchemaKey skey;
+  GVariant *value;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  xreturn_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   value = g_settings_read_from_backend (settings, &skey, FALSE, TRUE);
@@ -1329,7 +1329,7 @@ g_settings_get_default_value (xsettings_t   *settings,
 
 /**
  * g_settings_get_enum:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored in @settings for @key and converts it
@@ -1349,16 +1349,16 @@ g_settings_get_default_value (xsettings_t   *settings,
  *
  * Since: 2.26
  **/
-xint_t
-g_settings_get_enum (xsettings_t   *settings,
-                     const xchar_t *key)
+gint
+g_settings_get_enum (GSettings   *settings,
+                     const gchar *key)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *value;
-  xint_t result;
+  GSettingsSchemaKey skey;
+  GVariant *value;
+  gint result;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), -1);
-  xreturn_val_if_fail (key != NULL, -1);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), -1);
+  g_return_val_if_fail (key != NULL, -1);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1377,14 +1377,14 @@ g_settings_get_enum (xsettings_t   *settings,
 
   result = g_settings_schema_key_to_enum (&skey, value);
   g_settings_schema_key_clear (&skey);
-  xvariant_unref (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_enum:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: a key, within @settings
  * @value: an enumerated value
  *
@@ -1401,17 +1401,17 @@ g_settings_get_enum (xsettings_t   *settings,
  *
  * Returns: %TRUE, if the set succeeds
  **/
-xboolean_t
-g_settings_set_enum (xsettings_t   *settings,
-                     const xchar_t *key,
-                     xint_t         value)
+gboolean
+g_settings_set_enum (GSettings   *settings,
+                     const gchar *key,
+                     gint         value)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *variant;
-  xboolean_t success;
+  GSettingsSchemaKey skey;
+  GVariant *variant;
+  gboolean success;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
-  xreturn_val_if_fail (key != NULL, FALSE);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), FALSE);
+  g_return_val_if_fail (key != NULL, FALSE);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1439,7 +1439,7 @@ g_settings_set_enum (xsettings_t   *settings,
 
 /**
  * g_settings_get_flags:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored in @settings for @key and converts it
@@ -1459,16 +1459,16 @@ g_settings_set_enum (xsettings_t   *settings,
  *
  * Since: 2.26
  **/
-xuint_t
-g_settings_get_flags (xsettings_t   *settings,
-                      const xchar_t *key)
+guint
+g_settings_get_flags (GSettings   *settings,
+                      const gchar *key)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *value;
-  xuint_t result;
+  GSettingsSchemaKey skey;
+  GVariant *value;
+  guint result;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), -1);
-  xreturn_val_if_fail (key != NULL, -1);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), -1);
+  g_return_val_if_fail (key != NULL, -1);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1487,14 +1487,14 @@ g_settings_get_flags (xsettings_t   *settings,
 
   result = g_settings_schema_key_to_flags (&skey, value);
   g_settings_schema_key_clear (&skey);
-  xvariant_unref (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_flags:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: a key, within @settings
  * @value: a flags value
  *
@@ -1512,17 +1512,17 @@ g_settings_get_flags (xsettings_t   *settings,
  *
  * Returns: %TRUE, if the set succeeds
  **/
-xboolean_t
-g_settings_set_flags (xsettings_t   *settings,
-                      const xchar_t *key,
-                      xuint_t        value)
+gboolean
+g_settings_set_flags (GSettings   *settings,
+                      const gchar *key,
+                      guint        value)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *variant;
-  xboolean_t success;
+  GSettingsSchemaKey skey;
+  GVariant *variant;
+  gboolean success;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
-  xreturn_val_if_fail (key != NULL, FALSE);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), FALSE);
+  g_return_val_if_fail (key != NULL, FALSE);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1550,9 +1550,9 @@ g_settings_set_flags (xsettings_t   *settings,
 
 /**
  * g_settings_set_value:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
- * @value: a #xvariant_t of the correct type
+ * @value: a #GVariant of the correct type
  *
  * Sets @key in @settings to @value.
  *
@@ -1567,27 +1567,27 @@ g_settings_set_flags (xsettings_t   *settings,
  *
  * Since: 2.26
  **/
-xboolean_t
-g_settings_set_value (xsettings_t   *settings,
-                      const xchar_t *key,
-                      xvariant_t    *value)
+gboolean
+g_settings_set_value (GSettings   *settings,
+                      const gchar *key,
+                      GVariant    *value)
 {
-  xsettings_schema_key_t skey;
-  xboolean_t success;
+  GSettingsSchemaKey skey;
+  gboolean success;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
-  xreturn_val_if_fail (key != NULL, FALSE);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), FALSE);
+  g_return_val_if_fail (key != NULL, FALSE);
 
-  xvariant_ref_sink (value);
+  g_variant_ref_sink (value);
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
   if (!g_settings_schema_key_type_check (&skey, value))
     {
-      g_critical ("g_settings_set_value: key '%s' in '%s' expects type '%s', but a xvariant_t of type '%s' was given",
+      g_critical ("g_settings_set_value: key '%s' in '%s' expects type '%s', but a GVariant of type '%s' was given",
                   key,
                   g_settings_schema_get_id (settings->priv->schema),
-                  xvariant_type_peek_string (skey.type),
-                  xvariant_get_type_string (value));
+                  g_variant_type_peek_string (skey.type),
+                  g_variant_get_type_string (value));
       success = FALSE;
     }
   else if (!g_settings_schema_key_range_check (&skey, value))
@@ -1604,36 +1604,36 @@ g_settings_set_value (xsettings_t   *settings,
     }
 
   g_settings_schema_key_clear (&skey);
-  xvariant_unref (value);
+  g_variant_unref (value);
 
   return success;
 }
 
 /**
  * g_settings_get:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
- * @format: a #xvariant_t format string
+ * @format: a #GVariant format string
  * @...: arguments as per @format
  *
  * Gets the value that is stored at @key in @settings.
  *
  * A convenience function that combines g_settings_get_value() with
- * xvariant_get().
+ * g_variant_get().
  *
  * It is a programmer error to give a @key that isn't contained in the
- * schema for @settings or for the #xvariant_type_t of @format to mismatch
+ * schema for @settings or for the #GVariantType of @format to mismatch
  * the type given in the schema.
  *
  * Since: 2.26
  */
 void
-g_settings_get (xsettings_t   *settings,
-                const xchar_t *key,
-                const xchar_t *format,
+g_settings_get (GSettings   *settings,
+                const gchar *key,
+                const gchar *format,
                 ...)
 {
-  xvariant_t *value;
+  GVariant *value;
   va_list ap;
 
   value = g_settings_get_value (settings, key);
@@ -1646,26 +1646,26 @@ g_settings_get (xsettings_t   *settings,
     }
 
   va_start (ap, format);
-  xvariant_get_va (value, format, NULL, &ap);
+  g_variant_get_va (value, format, NULL, &ap);
   va_end (ap);
 
-  xvariant_unref (value);
+  g_variant_unref (value);
 }
 
 /**
  * g_settings_set:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
- * @format: a #xvariant_t format string
+ * @format: a #GVariant format string
  * @...: arguments as per @format
  *
  * Sets @key in @settings to @value.
  *
  * A convenience function that combines g_settings_set_value() with
- * xvariant_new().
+ * g_variant_new().
  *
  * It is a programmer error to give a @key that isn't contained in the
- * schema for @settings or for the #xvariant_type_t of @format to mismatch
+ * schema for @settings or for the #GVariantType of @format to mismatch
  * the type given in the schema.
  *
  * Returns: %TRUE if setting the key succeeded,
@@ -1673,17 +1673,17 @@ g_settings_get (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_set (xsettings_t   *settings,
-                const xchar_t *key,
-                const xchar_t *format,
+gboolean
+g_settings_set (GSettings   *settings,
+                const gchar *key,
+                const gchar *format,
                 ...)
 {
-  xvariant_t *value;
+  GVariant *value;
   va_list ap;
 
   va_start (ap, format);
-  value = xvariant_new_va (format, NULL, &ap);
+  value = g_variant_new_va (format, NULL, &ap);
   va_end (ap);
 
   return g_settings_set_value (settings, key, g_steal_pointer (&value));
@@ -1691,7 +1691,7 @@ g_settings_set (xsettings_t   *settings,
 
 /**
  * g_settings_get_mapped:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  * @mapping: (scope call): the function to map the value in the
  *           settings database to the value used by the application
@@ -1720,48 +1720,48 @@ g_settings_set (xsettings_t   *settings,
  * the application will be aborted.
  *
  * The result parameter for the @mapping function is pointed to a
- * #xpointer_t which is initially set to %NULL.  The same pointer is given
- * to each invocation of @mapping.  The final value of that #xpointer_t is
+ * #gpointer which is initially set to %NULL.  The same pointer is given
+ * to each invocation of @mapping.  The final value of that #gpointer is
  * what is returned by this function.  %NULL is valid; it is returned
  * just as any other value would be.
  *
  * Returns: (nullable) (transfer full): the result, which may be %NULL
  **/
-xpointer_t
-g_settings_get_mapped (xsettings_t           *settings,
-                       const xchar_t         *key,
+gpointer
+g_settings_get_mapped (GSettings           *settings,
+                       const gchar         *key,
                        GSettingsGetMapping  mapping,
-                       xpointer_t             user_data)
+                       gpointer             user_data)
 {
-  xpointer_t result = NULL;
-  xsettings_schema_key_t skey;
-  xvariant_t *value;
-  xboolean_t okay;
+  gpointer result = NULL;
+  GSettingsSchemaKey skey;
+  GVariant *value;
+  gboolean okay;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  xreturn_val_if_fail (key != NULL, NULL);
-  xreturn_val_if_fail (mapping != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (mapping != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
   if ((value = g_settings_read_from_backend (settings, &skey, FALSE, FALSE)))
     {
       okay = mapping (value, &result, user_data);
-      xvariant_unref (value);
+      g_variant_unref (value);
       if (okay) goto okay;
     }
 
   if ((value = g_settings_schema_key_get_translated_default (&skey)))
     {
       okay = mapping (value, &result, user_data);
-      xvariant_unref (value);
+      g_variant_unref (value);
       if (okay) goto okay;
     }
 
   if ((value = g_settings_schema_key_get_per_desktop_default (&skey)))
     {
       okay = mapping (value, &result, user_data);
-      xvariant_unref (value);
+      g_variant_unref (value);
       if (okay) goto okay;
     }
 
@@ -1769,7 +1769,7 @@ g_settings_get_mapped (xsettings_t           *settings,
     goto okay;
 
   if (!mapping (NULL, &result, user_data))
-    xerror ("The mapping function given to g_settings_get_mapped() for key "
+    g_error ("The mapping function given to g_settings_get_mapped() for key "
              "'%s' in schema '%s' returned FALSE when given a NULL value.",
              key, g_settings_schema_get_id (settings->priv->schema));
 
@@ -1782,7 +1782,7 @@ g_settings_get_mapped (xsettings_t           *settings,
 /* Convenience API (get, set_string, int, double, boolean, strv) {{{1 */
 /**
  * g_settings_get_string:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -1796,23 +1796,23 @@ g_settings_get_mapped (xsettings_t           *settings,
  *
  * Since: 2.26
  */
-xchar_t *
-g_settings_get_string (xsettings_t   *settings,
-                       const xchar_t *key)
+gchar *
+g_settings_get_string (GSettings   *settings,
+                       const gchar *key)
 {
-  xvariant_t *value;
-  xchar_t *result;
+  GVariant *value;
+  gchar *result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_dup_string (value, NULL);
-  xvariant_unref (value);
+  result = g_variant_dup_string (value, NULL);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_string:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -1828,17 +1828,17 @@ g_settings_get_string (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_set_string (xsettings_t   *settings,
-                       const xchar_t *key,
-                       const xchar_t *value)
+gboolean
+g_settings_set_string (GSettings   *settings,
+                       const gchar *key,
+                       const gchar *value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_string (value));
+  return g_settings_set_value (settings, key, g_variant_new_string (value));
 }
 
 /**
  * g_settings_get_int:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -1852,23 +1852,23 @@ g_settings_set_string (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xint_t
-g_settings_get_int (xsettings_t   *settings,
-                    const xchar_t *key)
+gint
+g_settings_get_int (GSettings   *settings,
+                    const gchar *key)
 {
-  xvariant_t *value;
-  xint_t result;
+  GVariant *value;
+  gint result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_get_int32 (value);
-  xvariant_unref (value);
+  result = g_variant_get_int32 (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_int:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -1884,17 +1884,17 @@ g_settings_get_int (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_set_int (xsettings_t   *settings,
-                    const xchar_t *key,
-                    xint_t         value)
+gboolean
+g_settings_set_int (GSettings   *settings,
+                    const gchar *key,
+                    gint         value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_int32 (value));
+  return g_settings_set_value (settings, key, g_variant_new_int32 (value));
 }
 
 /**
  * g_settings_get_int64:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -1908,23 +1908,23 @@ g_settings_set_int (xsettings_t   *settings,
  *
  * Since: 2.50
  */
-sint64_t
-g_settings_get_int64 (xsettings_t   *settings,
-                      const xchar_t *key)
+gint64
+g_settings_get_int64 (GSettings   *settings,
+                      const gchar *key)
 {
-  xvariant_t *value;
-  sint64_t result;
+  GVariant *value;
+  gint64 result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_get_int64 (value);
-  xvariant_unref (value);
+  result = g_variant_get_int64 (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_int64:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -1940,17 +1940,17 @@ g_settings_get_int64 (xsettings_t   *settings,
  *
  * Since: 2.50
  */
-xboolean_t
-g_settings_set_int64 (xsettings_t   *settings,
-                      const xchar_t *key,
-                      sint64_t       value)
+gboolean
+g_settings_set_int64 (GSettings   *settings,
+                      const gchar *key,
+                      gint64       value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_int64 (value));
+  return g_settings_set_value (settings, key, g_variant_new_int64 (value));
 }
 
 /**
  * g_settings_get_uint:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -1965,23 +1965,23 @@ g_settings_set_int64 (xsettings_t   *settings,
  *
  * Since: 2.30
  */
-xuint_t
-g_settings_get_uint (xsettings_t   *settings,
-                     const xchar_t *key)
+guint
+g_settings_get_uint (GSettings   *settings,
+                     const gchar *key)
 {
-  xvariant_t *value;
-  xuint_t result;
+  GVariant *value;
+  guint result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_get_uint32 (value);
-  xvariant_unref (value);
+  result = g_variant_get_uint32 (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_uint:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -1998,17 +1998,17 @@ g_settings_get_uint (xsettings_t   *settings,
  *
  * Since: 2.30
  */
-xboolean_t
-g_settings_set_uint (xsettings_t   *settings,
-                     const xchar_t *key,
-                     xuint_t        value)
+gboolean
+g_settings_set_uint (GSettings   *settings,
+                     const gchar *key,
+                     guint        value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_uint32 (value));
+  return g_settings_set_value (settings, key, g_variant_new_uint32 (value));
 }
 
 /**
  * g_settings_get_uint64:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -2023,23 +2023,23 @@ g_settings_set_uint (xsettings_t   *settings,
  *
  * Since: 2.50
  */
-xuint64_t
-g_settings_get_uint64 (xsettings_t   *settings,
-                       const xchar_t *key)
+guint64
+g_settings_get_uint64 (GSettings   *settings,
+                       const gchar *key)
 {
-  xvariant_t *value;
-  xuint64_t result;
+  GVariant *value;
+  guint64 result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_get_uint64 (value);
-  xvariant_unref (value);
+  result = g_variant_get_uint64 (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_uint64:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -2056,17 +2056,17 @@ g_settings_get_uint64 (xsettings_t   *settings,
  *
  * Since: 2.50
  */
-xboolean_t
-g_settings_set_uint64 (xsettings_t   *settings,
-                       const xchar_t *key,
-                       xuint64_t      value)
+gboolean
+g_settings_set_uint64 (GSettings   *settings,
+                       const gchar *key,
+                       guint64      value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_uint64 (value));
+  return g_settings_set_value (settings, key, g_variant_new_uint64 (value));
 }
 
 /**
  * g_settings_get_double:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -2080,23 +2080,23 @@ g_settings_set_uint64 (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xdouble_t
-g_settings_get_double (xsettings_t   *settings,
-                       const xchar_t *key)
+gdouble
+g_settings_get_double (GSettings   *settings,
+                       const gchar *key)
 {
-  xvariant_t *value;
-  xdouble_t result;
+  GVariant *value;
+  gdouble result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_get_double (value);
-  xvariant_unref (value);
+  result = g_variant_get_double (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_double:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -2112,17 +2112,17 @@ g_settings_get_double (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_set_double (xsettings_t   *settings,
-                       const xchar_t *key,
-                       xdouble_t      value)
+gboolean
+g_settings_set_double (GSettings   *settings,
+                       const gchar *key,
+                       gdouble      value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_double (value));
+  return g_settings_set_value (settings, key, g_variant_new_double (value));
 }
 
 /**
  * g_settings_get_boolean:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * Gets the value that is stored at @key in @settings.
@@ -2136,23 +2136,23 @@ g_settings_set_double (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_get_boolean (xsettings_t  *settings,
-                       const xchar_t *key)
+gboolean
+g_settings_get_boolean (GSettings  *settings,
+                       const gchar *key)
 {
-  xvariant_t *value;
-  xboolean_t result;
+  GVariant *value;
+  gboolean result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_get_boolean (value);
-  xvariant_unref (value);
+  result = g_variant_get_boolean (value);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_boolean:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: the value to set it to
  *
@@ -2168,17 +2168,17 @@ g_settings_get_boolean (xsettings_t  *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_set_boolean (xsettings_t  *settings,
-                       const xchar_t *key,
-                       xboolean_t     value)
+gboolean
+g_settings_set_boolean (GSettings  *settings,
+                       const gchar *key,
+                       gboolean     value)
 {
-  return g_settings_set_value (settings, key, xvariant_new_boolean (value));
+  return g_settings_set_value (settings, key, g_variant_new_boolean (value));
 }
 
 /**
  * g_settings_get_strv:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to get the value for
  *
  * A convenience variant of g_settings_get() for string arrays.
@@ -2192,23 +2192,23 @@ g_settings_set_boolean (xsettings_t  *settings,
  *
  * Since: 2.26
  */
-xchar_t **
-g_settings_get_strv (xsettings_t   *settings,
-                     const xchar_t *key)
+gchar **
+g_settings_get_strv (GSettings   *settings,
+                     const gchar *key)
 {
-  xvariant_t *value;
-  xchar_t **result;
+  GVariant *value;
+  gchar **result;
 
   value = g_settings_get_value (settings, key);
-  result = xvariant_dup_strv (value, NULL);
-  xvariant_unref (value);
+  result = g_variant_dup_strv (value, NULL);
+  g_variant_unref (value);
 
   return result;
 }
 
 /**
  * g_settings_set_strv:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of the key to set
  * @value: (nullable) (array zero-terminated=1): the value to set it to, or %NULL
  *
@@ -2225,17 +2225,17 @@ g_settings_get_strv (xsettings_t   *settings,
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_set_strv (xsettings_t           *settings,
-                     const xchar_t         *key,
-                     const xchar_t * const *value)
+gboolean
+g_settings_set_strv (GSettings           *settings,
+                     const gchar         *key,
+                     const gchar * const *value)
 {
-  xvariant_t *array;
+  GVariant *array;
 
   if (value != NULL)
-    array = xvariant_new_strv (value, -1);
+    array = g_variant_new_strv (value, -1);
   else
-    array = xvariant_new_strv (NULL, 0);
+    array = g_variant_new_strv (NULL, 0);
 
   return g_settings_set_value (settings, key, array);
 }
@@ -2243,41 +2243,41 @@ g_settings_set_strv (xsettings_t           *settings,
 /* Delayed apply (delay, apply, revert, get_has_unapplied) {{{1 */
 /**
  * g_settings_delay:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  *
- * Changes the #xsettings_t object into 'delay-apply' mode. In this
+ * Changes the #GSettings object into 'delay-apply' mode. In this
  * mode, changes to @settings are not immediately propagated to the
  * backend, but kept locally until g_settings_apply() is called.
  *
  * Since: 2.26
  */
 void
-g_settings_delay (xsettings_t *settings)
+g_settings_delay (GSettings *settings)
 {
-  xdelayed_settings_backend_t *delayed = NULL;
+  GDelayedSettingsBackend *delayed = NULL;
 
-  g_return_if_fail (X_IS_SETTINGS (settings));
+  g_return_if_fail (G_IS_SETTINGS (settings));
 
-  if (X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
+  if (G_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
     return;
 
-  delayed = xdelayed_settings_backend_new (settings->priv->backend,
+  delayed = g_delayed_settings_backend_new (settings->priv->backend,
                                             settings,
                                             settings->priv->main_context);
   g_settings_backend_unwatch (settings->priv->backend, G_OBJECT (settings));
-  xobject_unref (settings->priv->backend);
+  g_object_unref (settings->priv->backend);
 
   settings->priv->backend = G_SETTINGS_BACKEND (delayed);
   g_settings_backend_watch (settings->priv->backend,
                             &listener_vtable, G_OBJECT (settings),
                             settings->priv->main_context);
 
-  xobject_notify (G_OBJECT (settings), "delay-apply");
+  g_object_notify (G_OBJECT (settings), "delay-apply");
 }
 
 /**
  * g_settings_apply:
- * @settings: a #xsettings_t instance
+ * @settings: a #GSettings instance
  *
  * Applies any changes that have been made to the settings.  This
  * function does nothing unless @settings is in 'delay-apply' mode;
@@ -2285,20 +2285,20 @@ g_settings_delay (xsettings_t *settings)
  * applied immediately.
  **/
 void
-g_settings_apply (xsettings_t *settings)
+g_settings_apply (GSettings *settings)
 {
-  if (X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
+  if (G_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
     {
-      xdelayed_settings_backend_t *delayed;
+      GDelayedSettingsBackend *delayed;
 
-      delayed = XDELAYED_SETTINGS_BACKEND (settings->priv->backend);
-      xdelayed_settings_backend_apply (delayed);
+      delayed = G_DELAYED_SETTINGS_BACKEND (settings->priv->backend);
+      g_delayed_settings_backend_apply (delayed);
     }
 }
 
 /**
  * g_settings_revert:
- * @settings: a #xsettings_t instance
+ * @settings: a #GSettings instance
  *
  * Reverts all non-applied changes to the settings.  This function
  * does nothing unless @settings is in 'delay-apply' mode; see
@@ -2308,42 +2308,42 @@ g_settings_apply (xsettings_t *settings)
  * Change notifications will be emitted for affected keys.
  **/
 void
-g_settings_revert (xsettings_t *settings)
+g_settings_revert (GSettings *settings)
 {
-  if (X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
+  if (G_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
     {
-      xdelayed_settings_backend_t *delayed;
+      GDelayedSettingsBackend *delayed;
 
-      delayed = XDELAYED_SETTINGS_BACKEND (settings->priv->backend);
-      xdelayed_settings_backend_revert (delayed);
+      delayed = G_DELAYED_SETTINGS_BACKEND (settings->priv->backend);
+      g_delayed_settings_backend_revert (delayed);
     }
 }
 
 /**
  * g_settings_get_has_unapplied:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  *
- * Returns whether the #xsettings_t object has any unapplied
+ * Returns whether the #GSettings object has any unapplied
  * changes.  This can only be the case if it is in 'delayed-apply' mode.
  *
  * Returns: %TRUE if @settings has unapplied changes
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_get_has_unapplied (xsettings_t *settings)
+gboolean
+g_settings_get_has_unapplied (GSettings *settings)
 {
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), FALSE);
 
-  return X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend) &&
-         xdelayed_settings_backend_get_has_unapplied (
-           XDELAYED_SETTINGS_BACKEND (settings->priv->backend));
+  return G_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend) &&
+         g_delayed_settings_backend_get_has_unapplied (
+           G_DELAYED_SETTINGS_BACKEND (settings->priv->backend));
 }
 
 /* Extra API (reset, sync, get_child, is_writable, list_*, ranges) {{{1 */
 /**
  * g_settings_reset:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the name of a key
  *
  * Resets @key to its default value.
@@ -2353,15 +2353,15 @@ g_settings_get_has_unapplied (xsettings_t *settings)
  * administrator.
  **/
 void
-g_settings_reset (xsettings_t *settings,
-                  const xchar_t *key)
+g_settings_reset (GSettings *settings,
+                  const gchar *key)
 {
-  xchar_t *path;
+  gchar *path;
 
-  g_return_if_fail (X_IS_SETTINGS (settings));
+  g_return_if_fail (G_IS_SETTINGS (settings));
   g_return_if_fail (key != NULL);
 
-  path = xstrconcat (settings->priv->path, key, NULL);
+  path = g_strconcat (settings->priv->path, key, NULL);
   g_settings_backend_reset (settings->priv->backend, path, NULL);
   g_free (path);
 }
@@ -2371,7 +2371,7 @@ g_settings_reset (xsettings_t *settings,
  *
  * Ensures that all pending operations are complete for the default backend.
  *
- * Writes made to a #xsettings_t are handled asynchronously.  For this
+ * Writes made to a #GSettings are handled asynchronously.  For this
  * reason, it is very unlikely that the changes have it to disk by the
  * time g_settings_set() returns.
  *
@@ -2388,7 +2388,7 @@ g_settings_sync (void)
 
 /**
  * g_settings_is_writable:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @name: the name of a key
  *
  * Finds out if a key can be written or not
@@ -2397,16 +2397,16 @@ g_settings_sync (void)
  *
  * Since: 2.26
  */
-xboolean_t
-g_settings_is_writable (xsettings_t   *settings,
-                        const xchar_t *name)
+gboolean
+g_settings_is_writable (GSettings   *settings,
+                        const gchar *name)
 {
-  xboolean_t writable;
-  xchar_t *path;
+  gboolean writable;
+  gchar *path;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), FALSE);
 
-  path = xstrconcat (settings->priv->path, name, NULL);
+  path = g_strconcat (settings->priv->path, name, NULL);
   writable = g_settings_backend_get_writable (settings->priv->backend, path);
   g_free (path);
 
@@ -2415,7 +2415,7 @@ g_settings_is_writable (xsettings_t   *settings,
 
 /**
  * g_settings_get_child:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @name: the name of the child schema
  *
  * Creates a child settings object which has a base path of
@@ -2425,30 +2425,30 @@ g_settings_is_writable (xsettings_t   *settings,
  * The schema for the child settings object must have been declared
  * in the schema of @settings using a `<child>` element.
  *
- * The created child settings object will inherit the #xsettings_t:delay-apply
+ * The created child settings object will inherit the #GSettings:delay-apply
  * mode from @settings.
  *
  * Returns: (not nullable) (transfer full): a 'child' settings object
  *
  * Since: 2.26
  */
-xsettings_t *
-g_settings_get_child (xsettings_t   *settings,
-                      const xchar_t *name)
+GSettings *
+g_settings_get_child (GSettings   *settings,
+                      const gchar *name)
 {
-  xsettings_schema_t *child_schema;
-  xchar_t *child_path;
-  xsettings_t *child;
+  GSettingsSchema *child_schema;
+  gchar *child_path;
+  GSettings *child;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), NULL);
 
   child_schema = g_settings_schema_get_child_schema (settings->priv->schema,
                                                      name);
   if (child_schema == NULL)
-    xerror ("Schema '%s' has no child '%s' or child schema not found",
+    g_error ("Schema '%s' has no child '%s' or child schema not found",
              g_settings_schema_get_id (settings->priv->schema), name);
 
-  child_path = xstrconcat (settings->priv->path, name, "/", NULL);
+  child_path = g_strconcat (settings->priv->path, name, "/", NULL);
   child = g_settings_new_full (child_schema,
                                settings->priv->backend,
                                child_path);
@@ -2460,7 +2460,7 @@ g_settings_get_child (xsettings_t   *settings,
 
 /**
  * g_settings_list_keys:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  *
  * Introspects the list of keys on @settings.
  *
@@ -2468,22 +2468,22 @@ g_settings_get_child (xsettings_t   *settings,
  * (since you should already know what keys are in your schema).  This
  * function is intended for introspection reasons.
  *
- * You should free the return value with xstrfreev() when you are done
+ * You should free the return value with g_strfreev() when you are done
  * with it.
  *
  * Returns: (not nullable) (transfer full) (element-type utf8): a list
  *    of the keys on @settings, in no defined order
  * Deprecated: 2.46: Use g_settings_schema_list_keys() instead.
  */
-xchar_t **
-g_settings_list_keys (xsettings_t *settings)
+gchar **
+g_settings_list_keys (GSettings *settings)
 {
   return g_settings_schema_list_keys (settings->priv->schema);
 }
 
 /**
  * g_settings_list_children:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  *
  * Gets the list of children on @settings.
  *
@@ -2494,21 +2494,21 @@ g_settings_list_keys (xsettings_t *settings)
  * you should already know what children are in your schema. This function
  * may still be useful there for introspection reasons, however.
  *
- * You should free the return value with xstrfreev() when you are done
+ * You should free the return value with g_strfreev() when you are done
  * with it.
  *
  * Returns: (not nullable) (transfer full) (element-type utf8): a list of the children
  *    on @settings, in no defined order
  */
-xchar_t **
-g_settings_list_children (xsettings_t *settings)
+gchar **
+g_settings_list_children (GSettings *settings)
 {
   return g_settings_schema_list_children (settings->priv->schema);
 }
 
 /**
  * g_settings_get_range:
- * @settings: a #xsettings_t
+ * @settings: a #GSettings
  * @key: the key to query the range of
  *
  * Queries the range of a key.
@@ -2517,12 +2517,12 @@ g_settings_list_children (xsettings_t *settings)
  *
  * Deprecated:2.40:Use g_settings_schema_key_get_range() instead.
  **/
-xvariant_t *
-g_settings_get_range (xsettings_t   *settings,
-                      const xchar_t *key)
+GVariant *
+g_settings_get_range (GSettings   *settings,
+                      const gchar *key)
 {
-  xsettings_schema_key_t skey;
-  xvariant_t *range;
+  GSettingsSchemaKey skey;
+  GVariant *range;
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   range = g_settings_schema_key_get_range (&skey);
@@ -2533,7 +2533,7 @@ g_settings_get_range (xsettings_t   *settings,
 
 /**
  * g_settings_range_check:
- * @settings: a #xsettings_t
+ * @settings: a #GSettings
  * @key: the key to check
  * @value: the value to check
  *
@@ -2546,13 +2546,13 @@ g_settings_get_range (xsettings_t   *settings,
  *
  * Deprecated:2.40:Use g_settings_schema_key_range_check() instead.
  **/
-xboolean_t
-g_settings_range_check (xsettings_t   *settings,
-                        const xchar_t *key,
-                        xvariant_t    *value)
+gboolean
+g_settings_range_check (GSettings   *settings,
+                        const gchar *key,
+                        GVariant    *value)
 {
-  xsettings_schema_key_t skey;
-  xboolean_t good;
+  GSettingsSchemaKey skey;
+  gboolean good;
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   good = g_settings_schema_key_range_check (&skey, value);
@@ -2564,42 +2564,42 @@ g_settings_range_check (xsettings_t   *settings,
 /* Binding {{{1 */
 typedef struct
 {
-  xsettings_schema_key_t key;
-  xsettings_t *settings;
-  xobject_t *object;
+  GSettingsSchemaKey key;
+  GSettings *settings;
+  GObject *object;
 
   GSettingsBindGetMapping get_mapping;
   GSettingsBindSetMapping set_mapping;
-  xpointer_t user_data;
-  xdestroy_notify_t destroy;
+  gpointer user_data;
+  GDestroyNotify destroy;
 
-  xuint_t writable_handler_id;
-  xuint_t property_handler_id;
-  const xparam_spec_t *property;
-  xuint_t key_handler_id;
+  guint writable_handler_id;
+  guint property_handler_id;
+  const GParamSpec *property;
+  guint key_handler_id;
 
   /* prevent recursion */
-  xboolean_t running;
+  gboolean running;
 } GSettingsBinding;
 
 static void
-g_settings_binding_free (xpointer_t data)
+g_settings_binding_free (gpointer data)
 {
   GSettingsBinding *binding = data;
 
-  xassert (!binding->running);
+  g_assert (!binding->running);
 
   if (binding->writable_handler_id)
-    xsignal_handler_disconnect (binding->settings,
+    g_signal_handler_disconnect (binding->settings,
                                  binding->writable_handler_id);
 
   if (binding->key_handler_id)
-    xsignal_handler_disconnect (binding->settings,
+    g_signal_handler_disconnect (binding->settings,
                                  binding->key_handler_id);
 
-  if (xsignal_handler_is_connected (binding->object,
+  if (g_signal_handler_is_connected (binding->object,
                                      binding->property_handler_id))
-  xsignal_handler_disconnect (binding->object,
+  g_signal_handler_disconnect (binding->object,
                                binding->property_handler_id);
 
   g_settings_schema_key_clear (&binding->key);
@@ -2607,18 +2607,18 @@ g_settings_binding_free (xpointer_t data)
   if (binding->destroy)
     binding->destroy (binding->user_data);
 
-  xobject_unref (binding->settings);
+  g_object_unref (binding->settings);
 
   g_slice_free (GSettingsBinding, binding);
 }
 
-static xquark
+static GQuark
 g_settings_binding_quark (const char *property)
 {
-  xquark quark;
-  xchar_t *tmp;
+  GQuark quark;
+  gchar *tmp;
 
-  tmp = xstrdup_printf ("gsettingsbinding-%s", property);
+  tmp = g_strdup_printf ("gsettingsbinding-%s", property);
   quark = g_quark_from_string (tmp);
   g_free (tmp);
 
@@ -2626,29 +2626,29 @@ g_settings_binding_quark (const char *property)
 }
 
 static void
-g_settings_binding_key_changed (xsettings_t   *settings,
-                                const xchar_t *key,
-                                xpointer_t     user_data)
+g_settings_binding_key_changed (GSettings   *settings,
+                                const gchar *key,
+                                gpointer     user_data)
 {
   GSettingsBinding *binding = user_data;
-  xvalue_t value = G_VALUE_INIT;
-  xvariant_t *variant;
+  GValue value = G_VALUE_INIT;
+  GVariant *variant;
 
-  xassert (settings == binding->settings);
-  xassert (key == binding->key.name);
+  g_assert (settings == binding->settings);
+  g_assert (key == binding->key.name);
 
   if (binding->running)
     return;
 
   binding->running = TRUE;
 
-  xvalue_init (&value, binding->property->value_type);
+  g_value_init (&value, binding->property->value_type);
 
   variant = g_settings_read_from_backend (binding->settings, &binding->key, FALSE, FALSE);
   if (variant && !binding->get_mapping (&value, variant, binding->user_data))
     {
       /* silently ignore errors in the user's config database */
-      xvariant_unref (variant);
+      g_variant_unref (variant);
       variant = NULL;
     }
 
@@ -2663,7 +2663,7 @@ g_settings_binding_key_changed (xsettings_t   *settings,
                      "was rejected by the binding mapping function",
                      binding->key.unparsed, binding->key.name,
                      g_settings_schema_get_id (binding->key.schema));
-          xvariant_unref (variant);
+          g_variant_unref (variant);
           variant = NULL;
         }
     }
@@ -2674,62 +2674,62 @@ g_settings_binding_key_changed (xsettings_t   *settings,
       if (variant &&
           !binding->get_mapping (&value, variant, binding->user_data))
         {
-          xerror ("Per-desktop default value for key '%s' in schema '%s' "
+          g_error ("Per-desktop default value for key '%s' in schema '%s' "
                    "was rejected by the binding mapping function.",
                    binding->key.name, g_settings_schema_get_id (binding->key.schema));
-          xvariant_unref (variant);
+          g_variant_unref (variant);
           variant = NULL;
         }
     }
 
   if (variant == NULL)
     {
-      variant = xvariant_ref (binding->key.default_value);
+      variant = g_variant_ref (binding->key.default_value);
       if (!binding->get_mapping (&value, variant, binding->user_data))
-        xerror ("The schema default value for key '%s' in schema '%s' "
+        g_error ("The schema default value for key '%s' in schema '%s' "
                  "was rejected by the binding mapping function.",
                  binding->key.name, g_settings_schema_get_id (binding->key.schema));
     }
 
-  xobject_set_property (binding->object, binding->property->name, &value);
-  xvariant_unref (variant);
-  xvalue_unset (&value);
+  g_object_set_property (binding->object, binding->property->name, &value);
+  g_variant_unref (variant);
+  g_value_unset (&value);
 
   binding->running = FALSE;
 }
 
 static void
-g_settings_binding_property_changed (xobject_t          *object,
-                                     const xparam_spec_t *pspec,
-                                     xpointer_t          user_data)
+g_settings_binding_property_changed (GObject          *object,
+                                     const GParamSpec *pspec,
+                                     gpointer          user_data)
 {
   GSettingsBinding *binding = user_data;
-  xvalue_t value = G_VALUE_INIT;
-  xvariant_t *variant;
-  xboolean_t valid = TRUE;
+  GValue value = G_VALUE_INIT;
+  GVariant *variant;
+  gboolean valid = TRUE;
 
-  xassert (object == binding->object);
-  xassert (pspec == binding->property);
+  g_assert (object == binding->object);
+  g_assert (pspec == binding->property);
 
   if (binding->running)
     return;
 
   binding->running = TRUE;
 
-  xvalue_init (&value, pspec->value_type);
-  xobject_get_property (object, pspec->name, &value);
+  g_value_init (&value, pspec->value_type);
+  g_object_get_property (object, pspec->name, &value);
   if ((variant = binding->set_mapping (&value, binding->key.type,
                                        binding->user_data)))
     {
-      xvariant_take_ref (variant);
+      g_variant_take_ref (variant);
 
       if (!g_settings_schema_key_type_check (&binding->key, variant))
         {
-          xchar_t *type_str;
-          type_str = xvariant_type_dup_string (binding->key.type);
+          gchar *type_str;
+          type_str = g_variant_type_dup_string (binding->key.type);
           g_critical ("binding mapping function for key '%s' returned "
-                      "xvariant_t of type '%s' when type '%s' was requested",
-                      binding->key.name, xvariant_get_type_string (variant),
+                      "GVariant of type '%s' when type '%s' was requested",
+                      binding->key.name, g_variant_get_type_string (variant),
                       type_str);
           g_free (type_str);
           valid = FALSE;
@@ -2737,11 +2737,11 @@ g_settings_binding_property_changed (xobject_t          *object,
 
       if (valid && !g_settings_schema_key_range_check (&binding->key, variant))
         {
-          xchar_t *variant_str;
-          variant_str = xvariant_print (variant, TRUE);
-          g_critical ("xobject_t property '%s' on a '%s' object is out of "
+          gchar *variant_str;
+          variant_str = g_variant_print (variant, TRUE);
+          g_critical ("GObject property '%s' on a '%s' object is out of "
                       "schema-specified range for key '%s' of '%s': %s",
-                      binding->property->name, xtype_name (binding->property->owner_type),
+                      binding->property->name, g_type_name (binding->property->owner_type),
                       binding->key.name, g_settings_schema_get_id (binding->key.schema),
                       variant_str);
           g_free (variant_str);
@@ -2752,35 +2752,35 @@ g_settings_binding_property_changed (xobject_t          *object,
         {
           g_settings_write_to_backend (binding->settings, &binding->key, variant);
         }
-      xvariant_unref (variant);
+      g_variant_unref (variant);
     }
-  xvalue_unset (&value);
+  g_value_unset (&value);
 
   binding->running = FALSE;
 }
 
-static xboolean_t
-g_settings_bind_invert_boolean_get_mapping (xvalue_t   *value,
-                                            xvariant_t *variant,
-                                            xpointer_t  user_data)
+static gboolean
+g_settings_bind_invert_boolean_get_mapping (GValue   *value,
+                                            GVariant *variant,
+                                            gpointer  user_data)
 {
-  xvalue_set_boolean (value, !xvariant_get_boolean (variant));
+  g_value_set_boolean (value, !g_variant_get_boolean (variant));
   return TRUE;
 }
 
-static xvariant_t *
-g_settings_bind_invert_boolean_set_mapping (const xvalue_t       *value,
-                                            const xvariant_type_t *expected_type,
-                                            xpointer_t            user_data)
+static GVariant *
+g_settings_bind_invert_boolean_set_mapping (const GValue       *value,
+                                            const GVariantType *expected_type,
+                                            gpointer            user_data)
 {
-  return xvariant_new_boolean (!xvalue_get_boolean (value));
+  return g_variant_new_boolean (!g_value_get_boolean (value));
 }
 
 /**
  * g_settings_bind:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to bind
- * @object: (type xobject_t.Object): a #xobject_t
+ * @object: (type GObject.Object): a #GObject
  * @property: the name of the property to bind
  * @flags: flags for the binding
  *
@@ -2808,10 +2808,10 @@ g_settings_bind_invert_boolean_set_mapping (const xvalue_t       *value,
  * Since: 2.26
  */
 void
-g_settings_bind (xsettings_t          *settings,
-                 const xchar_t        *key,
-                 xpointer_t            object,
-                 const xchar_t        *property,
+g_settings_bind (GSettings          *settings,
+                 const gchar        *key,
+                 gpointer            object,
+                 const gchar        *property,
                  GSettingsBindFlags  flags)
 {
   GSettingsBindGetMapping get_mapping = NULL;
@@ -2832,9 +2832,9 @@ g_settings_bind (xsettings_t          *settings,
 
 /**
  * g_settings_bind_with_mapping: (skip)
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to bind
- * @object: (type xobject_t.Object): a #xobject_t
+ * @object: (type GObject.Object): a #GObject
  * @property: the name of the property to bind
  * @flags: flags for the binding
  * @get_mapping: a function that gets called to convert values
@@ -2842,7 +2842,7 @@ g_settings_bind (xsettings_t          *settings,
  * @set_mapping: a function that gets called to convert values
  *     from @object to @settings, or %NULL to use the default GIO mapping
  * @user_data: data that gets passed to @get_mapping and @set_mapping
- * @destroy: #xdestroy_notify_t function for @user_data
+ * @destroy: #GDestroyNotify function for @user_data
  *
  * Create a binding between the @key in the @settings object
  * and the property @property of @object.
@@ -2858,24 +2858,24 @@ g_settings_bind (xsettings_t          *settings,
  * Since: 2.26
  */
 void
-g_settings_bind_with_mapping (xsettings_t               *settings,
-                              const xchar_t             *key,
-                              xpointer_t                 object,
-                              const xchar_t             *property,
+g_settings_bind_with_mapping (GSettings               *settings,
+                              const gchar             *key,
+                              gpointer                 object,
+                              const gchar             *property,
                               GSettingsBindFlags       flags,
                               GSettingsBindGetMapping  get_mapping,
                               GSettingsBindSetMapping  set_mapping,
-                              xpointer_t                 user_data,
-                              xdestroy_notify_t           destroy)
+                              gpointer                 user_data,
+                              GDestroyNotify           destroy)
 {
   GSettingsBinding *binding;
-  xobject_class_t *objectclass;
-  xchar_t *detailed_signal;
-  xquark binding_quark;
+  GObjectClass *objectclass;
+  gchar *detailed_signal;
+  GQuark binding_quark;
 
-  g_return_if_fail (X_IS_SETTINGS (settings));
+  g_return_if_fail (G_IS_SETTINGS (settings));
   g_return_if_fail (key != NULL);
-  g_return_if_fail (X_IS_OBJECT (object));
+  g_return_if_fail (G_IS_OBJECT (object));
   g_return_if_fail (property != NULL);
   g_return_if_fail (~flags & G_SETTINGS_BIND_INVERT_BOOLEAN);
 
@@ -2883,9 +2883,9 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
 
   binding = g_slice_new0 (GSettingsBinding);
   g_settings_schema_key_init (&binding->key, settings->priv->schema, key);
-  binding->settings = xobject_ref (settings);
+  binding->settings = g_object_ref (settings);
   binding->object = object;
-  binding->property = xobject_class_find_property (objectclass, property);
+  binding->property = g_object_class_find_property (objectclass, property);
   binding->user_data = user_data;
   binding->destroy = destroy;
   binding->get_mapping = get_mapping ? get_mapping : g_settings_get_mapping;
@@ -2902,14 +2902,14 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
     }
 
   if ((flags & G_SETTINGS_BIND_GET) &&
-      (binding->property->flags & XPARAM_WRITABLE) == 0)
+      (binding->property->flags & G_PARAM_WRITABLE) == 0)
     {
       g_critical ("g_settings_bind: property '%s' on class '%s' is not "
                   "writable", binding->property->name, G_OBJECT_TYPE_NAME (object));
       return;
     }
   if ((flags & G_SETTINGS_BIND_SET) &&
-      (binding->property->flags & XPARAM_READABLE) == 0)
+      (binding->property->flags & G_PARAM_READABLE) == 0)
     {
       g_critical ("g_settings_bind: property '%s' on class '%s' is not "
                   "readable", binding->property->name, G_OBJECT_TYPE_NAME (object));
@@ -2925,18 +2925,18 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
        * Ensure that both sides are boolean.
        */
 
-      if (binding->property->value_type != XTYPE_BOOLEAN)
+      if (binding->property->value_type != G_TYPE_BOOLEAN)
         {
           g_critical ("g_settings_bind: G_SETTINGS_BIND_INVERT_BOOLEAN "
                       "was specified, but property '%s' on type '%s' has "
                       "type '%s'", binding->property->name, G_OBJECT_TYPE_NAME (object),
-                      xtype_name ((binding->property->value_type)));
+                      g_type_name ((binding->property->value_type)));
           return;
         }
 
-      if (!xvariant_type_equal (binding->key.type, G_VARIANT_TYPE_BOOLEAN))
+      if (!g_variant_type_equal (binding->key.type, G_VARIANT_TYPE_BOOLEAN))
         {
-          xchar_t *type_string = xvariant_type_dup_string (binding->key.type);
+          gchar *type_string = g_variant_type_dup_string (binding->key.type);
           g_critical ("g_settings_bind: G_SETTINGS_BIND_INVERT_BOOLEAN "
                       "was specified, but key '%s' on schema '%s' has "
                       "type '%s'", key, g_settings_schema_get_id (settings->priv->schema),
@@ -2952,11 +2952,11 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
            !g_settings_mapping_is_compatible (binding->property->value_type,
                                               binding->key.type))
     {
-      xchar_t *type_string = xvariant_type_dup_string (binding->key.type);
+      gchar *type_string = g_variant_type_dup_string (binding->key.type);
       g_critical ("g_settings_bind: property '%s' on class '%s' has type "
                   "'%s' which is not compatible with type '%s' of key '%s' "
                   "on schema '%s'", binding->property->name, G_OBJECT_TYPE_NAME (object),
-                  xtype_name (binding->property->value_type),
+                  g_type_name (binding->property->value_type),
                   type_string, key,
                   g_settings_schema_get_id (settings->priv->schema));
       g_free (type_string);
@@ -2966,20 +2966,20 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
   if ((flags & G_SETTINGS_BIND_SET) &&
       (~flags & G_SETTINGS_BIND_NO_SENSITIVITY))
     {
-      xparam_spec_t *sensitive;
+      GParamSpec *sensitive;
 
-      sensitive = xobject_class_find_property (objectclass, "sensitive");
+      sensitive = g_object_class_find_property (objectclass, "sensitive");
 
-      if (sensitive && sensitive->value_type == XTYPE_BOOLEAN &&
-          (sensitive->flags & XPARAM_WRITABLE))
+      if (sensitive && sensitive->value_type == G_TYPE_BOOLEAN &&
+          (sensitive->flags & G_PARAM_WRITABLE))
         g_settings_bind_writable (settings, binding->key.name, object, "sensitive", FALSE);
     }
 
   if (flags & G_SETTINGS_BIND_SET)
     {
-      detailed_signal = xstrdup_printf ("notify::%s", binding->property->name);
+      detailed_signal = g_strdup_printf ("notify::%s", binding->property->name);
       binding->property_handler_id =
-        xsignal_connect (object, detailed_signal,
+        g_signal_connect (object, detailed_signal,
                           G_CALLBACK (g_settings_binding_property_changed),
                           binding);
       g_free (detailed_signal);
@@ -2994,9 +2994,9 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
     {
       if (~flags & G_SETTINGS_BIND_GET_NO_CHANGES)
         {
-          detailed_signal = xstrdup_printf ("changed::%s", key);
+          detailed_signal = g_strdup_printf ("changed::%s", key);
           binding->key_handler_id =
-            xsignal_connect (settings, detailed_signal,
+            g_signal_connect (settings, detailed_signal,
                               G_CALLBACK (g_settings_binding_key_changed),
                               binding);
           g_free (detailed_signal);
@@ -3006,55 +3006,55 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
     }
 
   binding_quark = g_settings_binding_quark (binding->property->name);
-  xobject_set_qdata_full (object, binding_quark,
+  g_object_set_qdata_full (object, binding_quark,
                            binding, g_settings_binding_free);
 }
 
 /* Writability binding {{{1 */
 typedef struct
 {
-  xsettings_t *settings;
-  xpointer_t object;
-  const xchar_t *key;
-  const xchar_t *property;
-  xboolean_t inverted;
-  xulong_t handler_id;
+  GSettings *settings;
+  gpointer object;
+  const gchar *key;
+  const gchar *property;
+  gboolean inverted;
+  gulong handler_id;
 } GSettingsWritableBinding;
 
 static void
-g_settings_writable_binding_free (xpointer_t data)
+g_settings_writable_binding_free (gpointer data)
 {
   GSettingsWritableBinding *binding = data;
 
-  xsignal_handler_disconnect (binding->settings, binding->handler_id);
-  xobject_unref (binding->settings);
+  g_signal_handler_disconnect (binding->settings, binding->handler_id);
+  g_object_unref (binding->settings);
   g_slice_free (GSettingsWritableBinding, binding);
 }
 
 static void
-g_settings_binding_writable_changed (xsettings_t   *settings,
-                                     const xchar_t *key,
-                                     xpointer_t     user_data)
+g_settings_binding_writable_changed (GSettings   *settings,
+                                     const gchar *key,
+                                     gpointer     user_data)
 {
   GSettingsWritableBinding *binding = user_data;
-  xboolean_t writable;
+  gboolean writable;
 
-  xassert (settings == binding->settings);
-  xassert (key == binding->key);
+  g_assert (settings == binding->settings);
+  g_assert (key == binding->key);
 
   writable = g_settings_is_writable (settings, key);
 
   if (binding->inverted)
     writable = !writable;
 
-  xobject_set (binding->object, binding->property, writable, NULL);
+  g_object_set (binding->object, binding->property, writable, NULL);
 }
 
 /**
  * g_settings_bind_writable:
- * @settings: a #xsettings_t object
+ * @settings: a #GSettings object
  * @key: the key to bind
- * @object: (type xobject_t.Object):a #xobject_t
+ * @object: (type GObject.Object):a #GObject
  * @property: the name of a boolean property to bind
  * @inverted: whether to 'invert' the value
  *
@@ -3079,26 +3079,26 @@ g_settings_binding_writable_changed (xsettings_t   *settings,
  * Since: 2.26
  */
 void
-g_settings_bind_writable (xsettings_t   *settings,
-                          const xchar_t *key,
-                          xpointer_t     object,
-                          const xchar_t *property,
-                          xboolean_t     inverted)
+g_settings_bind_writable (GSettings   *settings,
+                          const gchar *key,
+                          gpointer     object,
+                          const gchar *property,
+                          gboolean     inverted)
 {
   GSettingsWritableBinding *binding;
-  xchar_t *detailed_signal;
-  xparam_spec_t *pspec;
+  gchar *detailed_signal;
+  GParamSpec *pspec;
 
-  g_return_if_fail (X_IS_SETTINGS (settings));
+  g_return_if_fail (G_IS_SETTINGS (settings));
 
-  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (object), property);
+  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (object), property);
   if (pspec == NULL)
     {
       g_critical ("g_settings_bind_writable: no property '%s' on class '%s'",
                   property, G_OBJECT_TYPE_NAME (object));
       return;
     }
-  if ((pspec->flags & XPARAM_WRITABLE) == 0)
+  if ((pspec->flags & G_PARAM_WRITABLE) == 0)
     {
       g_critical ("g_settings_bind_writable: property '%s' on class '%s' is not writable",
                   property, G_OBJECT_TYPE_NAME (object));
@@ -3106,20 +3106,20 @@ g_settings_bind_writable (xsettings_t   *settings,
     }
 
   binding = g_slice_new (GSettingsWritableBinding);
-  binding->settings = xobject_ref (settings);
+  binding->settings = g_object_ref (settings);
   binding->object = object;
   binding->key = g_intern_string (key);
   binding->property = g_intern_string (property);
   binding->inverted = inverted;
 
-  detailed_signal = xstrdup_printf ("writable-changed::%s", key);
+  detailed_signal = g_strdup_printf ("writable-changed::%s", key);
   binding->handler_id =
-    xsignal_connect (settings, detailed_signal,
+    g_signal_connect (settings, detailed_signal,
                       G_CALLBACK (g_settings_binding_writable_changed),
                       binding);
   g_free (detailed_signal);
 
-  xobject_set_qdata_full (object, g_settings_binding_quark (property),
+  g_object_set_qdata_full (object, g_settings_binding_quark (property),
                            binding, g_settings_writable_binding_free);
 
   g_settings_binding_writable_changed (settings, binding->key, binding);
@@ -3127,7 +3127,7 @@ g_settings_bind_writable (xsettings_t   *settings,
 
 /**
  * g_settings_unbind:
- * @object: (type xobject_t.Object): the object
+ * @object: (type GObject.Object): the object
  * @property: the property whose binding is removed
  *
  * Removes an existing binding for @property on @object.
@@ -3139,31 +3139,31 @@ g_settings_bind_writable (xsettings_t   *settings,
  * Since: 2.26
  */
 void
-g_settings_unbind (xpointer_t     object,
-                   const xchar_t *property)
+g_settings_unbind (gpointer     object,
+                   const gchar *property)
 {
-  xquark binding_quark;
+  GQuark binding_quark;
 
   binding_quark = g_settings_binding_quark (property);
-  xobject_set_qdata (object, binding_quark, NULL);
+  g_object_set_qdata (object, binding_quark, NULL);
 }
 
-/* xaction_t {{{1 */
+/* GAction {{{1 */
 
 typedef struct
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xsettings_schema_key_t key;
-  xsettings_t *settings;
+  GSettingsSchemaKey key;
+  GSettings *settings;
 } GSettingsAction;
 
-typedef xobject_class_t GSettingsActionClass;
+typedef GObjectClass GSettingsActionClass;
 
-static xtype_t g_settings_action_get_type (void);
-static void g_settings_action_iface_init (xaction_interface_t *iface);
-G_DEFINE_TYPE_WITH_CODE (GSettingsAction, g_settings_action, XTYPE_OBJECT,
-                         G_IMPLEMENT_INTERFACE (XTYPE_ACTION, g_settings_action_iface_init))
+static GType g_settings_action_get_type (void);
+static void g_settings_action_iface_init (GActionInterface *iface);
+G_DEFINE_TYPE_WITH_CODE (GSettingsAction, g_settings_action, G_TYPE_OBJECT,
+                         G_IMPLEMENT_INTERFACE (G_TYPE_ACTION, g_settings_action_iface_init))
 
 enum
 {
@@ -3175,48 +3175,48 @@ enum
   ACTION_PROP_STATE
 };
 
-static const xchar_t *
-g_settings_action_get_name (xaction_t *action)
+static const gchar *
+g_settings_action_get_name (GAction *action)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
 
   return gsa->key.name;
 }
 
-static const xvariant_type_t *
-g_settings_action_get_parameter_type (xaction_t *action)
+static const GVariantType *
+g_settings_action_get_parameter_type (GAction *action)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
-  const xvariant_type_t *type;
+  const GVariantType *type;
 
-  type = xvariant_get_type (gsa->key.default_value);
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
+  type = g_variant_get_type (gsa->key.default_value);
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
     type = NULL;
 
   return type;
 }
 
-static xboolean_t
-g_settings_action_get_enabled (xaction_t *action)
+static gboolean
+g_settings_action_get_enabled (GAction *action)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
 
   return g_settings_is_writable (gsa->settings, gsa->key.name);
 }
 
-static const xvariant_type_t *
-g_settings_action_get_state_type (xaction_t *action)
+static const GVariantType *
+g_settings_action_get_state_type (GAction *action)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
 
-  return xvariant_get_type (gsa->key.default_value);
+  return g_variant_get_type (gsa->key.default_value);
 }
 
-static xvariant_t *
-g_settings_action_get_state (xaction_t *action)
+static GVariant *
+g_settings_action_get_state (GAction *action)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
-  xvariant_t *value;
+  GVariant *value;
 
   value = g_settings_read_from_backend (gsa->settings, &gsa->key, FALSE, FALSE);
 
@@ -3224,13 +3224,13 @@ g_settings_action_get_state (xaction_t *action)
     value = g_settings_schema_key_get_translated_default (&gsa->key);
 
   if (value == NULL)
-    value = xvariant_ref (gsa->key.default_value);
+    value = g_variant_ref (gsa->key.default_value);
 
   return value;
 }
 
-static xvariant_t *
-g_settings_action_get_state_hint (xaction_t *action)
+static GVariant *
+g_settings_action_get_state_hint (GAction *action)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
 
@@ -3239,8 +3239,8 @@ g_settings_action_get_state_hint (xaction_t *action)
 }
 
 static void
-g_settings_action_change_state (xaction_t  *action,
-                                xvariant_t *value)
+g_settings_action_change_state (GAction  *action,
+                                GVariant *value)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
 
@@ -3249,52 +3249,52 @@ g_settings_action_change_state (xaction_t  *action,
 }
 
 static void
-g_settings_action_activate (xaction_t  *action,
-                            xvariant_t *parameter)
+g_settings_action_activate (GAction  *action,
+                            GVariant *parameter)
 {
   GSettingsAction *gsa = (GSettingsAction *) action;
 
-  if (xvariant_is_of_type (gsa->key.default_value, G_VARIANT_TYPE_BOOLEAN))
+  if (g_variant_is_of_type (gsa->key.default_value, G_VARIANT_TYPE_BOOLEAN))
     {
-      xvariant_t *old;
+      GVariant *old;
 
       if (parameter != NULL)
         return;
 
       old = g_settings_action_get_state (action);
-      parameter = xvariant_new_boolean (!xvariant_get_boolean (old));
-      xvariant_unref (old);
+      parameter = g_variant_new_boolean (!g_variant_get_boolean (old));
+      g_variant_unref (old);
     }
 
   g_action_change_state (action, parameter);
 }
 
 static void
-g_settings_action_get_property (xobject_t *object, xuint_t prop_id,
-                                xvalue_t *value, xparam_spec_t *pspec)
+g_settings_action_get_property (GObject *object, guint prop_id,
+                                GValue *value, GParamSpec *pspec)
 {
-  xaction_t *action = G_ACTION (object);
+  GAction *action = G_ACTION (object);
 
   switch (prop_id)
     {
     case ACTION_PROP_NAME:
-      xvalue_set_string (value, g_settings_action_get_name (action));
+      g_value_set_string (value, g_settings_action_get_name (action));
       break;
 
     case ACTION_PROP_PARAMETER_TYPE:
-      xvalue_set_boxed (value, g_settings_action_get_parameter_type (action));
+      g_value_set_boxed (value, g_settings_action_get_parameter_type (action));
       break;
 
     case ACTION_PROP_ENABLED:
-      xvalue_set_boolean (value, g_settings_action_get_enabled (action));
+      g_value_set_boolean (value, g_settings_action_get_enabled (action));
       break;
 
     case ACTION_PROP_STATE_TYPE:
-      xvalue_set_boxed (value, g_settings_action_get_state_type (action));
+      g_value_set_boxed (value, g_settings_action_get_state_type (action));
       break;
 
     case ACTION_PROP_STATE:
-      xvalue_take_variant (value, g_settings_action_get_state (action));
+      g_value_take_variant (value, g_settings_action_get_state (action));
       break;
 
     default:
@@ -3303,15 +3303,15 @@ g_settings_action_get_property (xobject_t *object, xuint_t prop_id,
 }
 
 static void
-g_settings_action_finalize (xobject_t *object)
+g_settings_action_finalize (GObject *object)
 {
   GSettingsAction *gsa = (GSettingsAction *) object;
 
-  xsignal_handlers_disconnect_by_data (gsa->settings, gsa);
-  xobject_unref (gsa->settings);
+  g_signal_handlers_disconnect_by_data (gsa->settings, gsa);
+  g_object_unref (gsa->settings);
   g_settings_schema_key_clear (&gsa->key);
 
-  XOBJECT_CLASS (g_settings_action_parent_class)
+  G_OBJECT_CLASS (g_settings_action_parent_class)
     ->finalize (object);
 }
 
@@ -3321,7 +3321,7 @@ g_settings_action_init (GSettingsAction *gsa)
 }
 
 static void
-g_settings_action_iface_init (xaction_interface_t *iface)
+g_settings_action_iface_init (GActionInterface *iface)
 {
   iface->get_name = g_settings_action_get_name;
   iface->get_parameter_type = g_settings_action_get_parameter_type;
@@ -3339,35 +3339,35 @@ g_settings_action_class_init (GSettingsActionClass *class)
   class->get_property = g_settings_action_get_property;
   class->finalize = g_settings_action_finalize;
 
-  xobject_class_override_property (class, ACTION_PROP_NAME, "name");
-  xobject_class_override_property (class, ACTION_PROP_PARAMETER_TYPE, "parameter-type");
-  xobject_class_override_property (class, ACTION_PROP_ENABLED, "enabled");
-  xobject_class_override_property (class, ACTION_PROP_STATE_TYPE, "state-type");
-  xobject_class_override_property (class, ACTION_PROP_STATE, "state");
+  g_object_class_override_property (class, ACTION_PROP_NAME, "name");
+  g_object_class_override_property (class, ACTION_PROP_PARAMETER_TYPE, "parameter-type");
+  g_object_class_override_property (class, ACTION_PROP_ENABLED, "enabled");
+  g_object_class_override_property (class, ACTION_PROP_STATE_TYPE, "state-type");
+  g_object_class_override_property (class, ACTION_PROP_STATE, "state");
 }
 
 static void
-g_settings_action_changed (xsettings_t   *settings,
-                           const xchar_t *key,
-                           xpointer_t     user_data)
+g_settings_action_changed (GSettings   *settings,
+                           const gchar *key,
+                           gpointer     user_data)
 {
-  xobject_notify (user_data, "state");
+  g_object_notify (user_data, "state");
 }
 
 static void
-g_settings_action_enabled_changed (xsettings_t   *settings,
-                                   const xchar_t *key,
-                                   xpointer_t     user_data)
+g_settings_action_enabled_changed (GSettings   *settings,
+                                   const gchar *key,
+                                   gpointer     user_data)
 {
-  xobject_notify (user_data, "enabled");
+  g_object_notify (user_data, "enabled");
 }
 
 /**
  * g_settings_create_action:
- * @settings: a #xsettings_t
+ * @settings: a #GSettings
  * @key: the name of a key in @settings
  *
- * Creates a #xaction_t corresponding to a given #xsettings_t key.
+ * Creates a #GAction corresponding to a given #GSettings key.
  *
  * The action has the same name as the key.
  *
@@ -3382,29 +3382,29 @@ g_settings_action_enabled_changed (xsettings_t   *settings,
  * activations take the new value for the key (which must have the
  * correct type).
  *
- * Returns: (not nullable) (transfer full): a new #xaction_t
+ * Returns: (not nullable) (transfer full): a new #GAction
  *
  * Since: 2.32
  **/
-xaction_t *
-g_settings_create_action (xsettings_t   *settings,
-                          const xchar_t *key)
+GAction *
+g_settings_create_action (GSettings   *settings,
+                          const gchar *key)
 {
   GSettingsAction *gsa;
-  xchar_t *detailed_signal;
+  gchar *detailed_signal;
 
-  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  xreturn_val_if_fail (key != NULL, NULL);
+  g_return_val_if_fail (G_IS_SETTINGS (settings), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
 
-  gsa = xobject_new (g_settings_action_get_type (), NULL);
-  gsa->settings = xobject_ref (settings);
+  gsa = g_object_new (g_settings_action_get_type (), NULL);
+  gsa->settings = g_object_ref (settings);
   g_settings_schema_key_init (&gsa->key, settings->priv->schema, key);
 
-  detailed_signal = xstrdup_printf ("changed::%s", key);
-  xsignal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_changed), gsa);
+  detailed_signal = g_strdup_printf ("changed::%s", key);
+  g_signal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_changed), gsa);
   g_free (detailed_signal);
-  detailed_signal = xstrdup_printf ("writable-changed::%s", key);
-  xsignal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_enabled_changed), gsa);
+  detailed_signal = g_strdup_printf ("writable-changed::%s", key);
+  g_signal_connect (settings, detailed_signal, G_CALLBACK (g_settings_action_enabled_changed), gsa);
   g_free (detailed_signal);
 
   return G_ACTION (gsa);

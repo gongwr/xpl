@@ -31,87 +31,87 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SUBPROCESS_LAUNCHER         (xsubprocess_launcher_get_type ())
-#define G_SUBPROCESS_LAUNCHER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SUBPROCESS_LAUNCHER, xsubprocess_launcher))
-#define X_IS_SUBPROCESS_LAUNCHER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SUBPROCESS_LAUNCHER))
+#define G_TYPE_SUBPROCESS_LAUNCHER         (g_subprocess_launcher_get_type ())
+#define G_SUBPROCESS_LAUNCHER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_SUBPROCESS_LAUNCHER, GSubprocessLauncher))
+#define G_IS_SUBPROCESS_LAUNCHER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_SUBPROCESS_LAUNCHER))
 
-XPL_AVAILABLE_IN_2_40
-xtype_t                   xsubprocess_launcher_get_type                  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_40
+GType                   g_subprocess_launcher_get_type                  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_40
-xsubprocess_launcher_t *   xsubprocess_launcher_new                       (xsubprocess_flags_t       flags);
+GLIB_AVAILABLE_IN_2_40
+GSubprocessLauncher *   g_subprocess_launcher_new                       (GSubprocessFlags       flags);
 
-XPL_AVAILABLE_IN_2_40
-xsubprocess_t *           xsubprocess_launcher_spawn                     (xsubprocess_launcher_t   *self,
-                                                                         xerror_t               **error,
-                                                                         const xchar_t           *argv0,
+GLIB_AVAILABLE_IN_2_40
+GSubprocess *           g_subprocess_launcher_spawn                     (GSubprocessLauncher   *self,
+                                                                         GError               **error,
+                                                                         const gchar           *argv0,
                                                                          ...) G_GNUC_NULL_TERMINATED;
 
-XPL_AVAILABLE_IN_2_40
-xsubprocess_t *           xsubprocess_launcher_spawnv                    (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t * const   *argv,
-                                                                         xerror_t               **error);
+GLIB_AVAILABLE_IN_2_40
+GSubprocess *           g_subprocess_launcher_spawnv                    (GSubprocessLauncher   *self,
+                                                                         const gchar * const   *argv,
+                                                                         GError               **error);
 
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_environ               (xsubprocess_launcher_t   *self,
-                                                                         xchar_t                **env);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_environ               (GSubprocessLauncher   *self,
+                                                                         gchar                **env);
 
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_setenv                    (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t           *variable,
-                                                                         const xchar_t           *value,
-                                                                         xboolean_t               overwrite);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_setenv                    (GSubprocessLauncher   *self,
+                                                                         const gchar           *variable,
+                                                                         const gchar           *value,
+                                                                         gboolean               overwrite);
 
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_unsetenv                  (xsubprocess_launcher_t *self,
-                                                                         const xchar_t         *variable);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_unsetenv                  (GSubprocessLauncher *self,
+                                                                         const gchar         *variable);
 
-XPL_AVAILABLE_IN_2_40
-const xchar_t *           xsubprocess_launcher_getenv                    (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t           *variable);
+GLIB_AVAILABLE_IN_2_40
+const gchar *           g_subprocess_launcher_getenv                    (GSubprocessLauncher   *self,
+                                                                         const gchar           *variable);
 
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_cwd                   (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t           *cwd);
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_flags                 (xsubprocess_launcher_t   *self,
-                                                                         xsubprocess_flags_t       flags);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_cwd                   (GSubprocessLauncher   *self,
+                                                                         const gchar           *cwd);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_flags                 (GSubprocessLauncher   *self,
+                                                                         GSubprocessFlags       flags);
 
 /* Extended I/O control, only available on UNIX */
 #ifdef G_OS_UNIX
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_stdin_file_path       (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t           *path);
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_take_stdin_fd             (xsubprocess_launcher_t   *self,
-                                                                         xint_t                   fd);
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_stdout_file_path      (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t           *path);
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_take_stdout_fd            (xsubprocess_launcher_t   *self,
-                                                                         xint_t                   fd);
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_stderr_file_path      (xsubprocess_launcher_t   *self,
-                                                                         const xchar_t           *path);
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_take_stderr_fd            (xsubprocess_launcher_t   *self,
-                                                                         xint_t                   fd);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_stdin_file_path       (GSubprocessLauncher   *self,
+                                                                         const gchar           *path);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_take_stdin_fd             (GSubprocessLauncher   *self,
+                                                                         gint                   fd);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_stdout_file_path      (GSubprocessLauncher   *self,
+                                                                         const gchar           *path);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_take_stdout_fd            (GSubprocessLauncher   *self,
+                                                                         gint                   fd);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_stderr_file_path      (GSubprocessLauncher   *self,
+                                                                         const gchar           *path);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_take_stderr_fd            (GSubprocessLauncher   *self,
+                                                                         gint                   fd);
 
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_take_fd                   (xsubprocess_launcher_t   *self,
-                                                                         xint_t                   source_fd,
-                                                                         xint_t                   target_fd);
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_take_fd                   (GSubprocessLauncher   *self,
+                                                                         gint                   source_fd,
+                                                                         gint                   target_fd);
 
-XPL_AVAILABLE_IN_2_68
-void                    xsubprocess_launcher_close                     (xsubprocess_launcher_t      *self);
+GLIB_AVAILABLE_IN_2_68
+void                    g_subprocess_launcher_close                     (GSubprocessLauncher      *self);
 
 /* Child setup, only available on UNIX */
-XPL_AVAILABLE_IN_2_40
-void                    xsubprocess_launcher_set_child_setup           (xsubprocess_launcher_t   *self,
+GLIB_AVAILABLE_IN_2_40
+void                    g_subprocess_launcher_set_child_setup           (GSubprocessLauncher   *self,
                                                                          GSpawnChildSetupFunc   child_setup,
-                                                                         xpointer_t               user_data,
-                                                                         xdestroy_notify_t         destroy_notify);
+                                                                         gpointer               user_data,
+                                                                         GDestroyNotify         destroy_notify);
 #endif
 
 G_END_DECLS

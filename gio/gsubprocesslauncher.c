@@ -16,7 +16,7 @@
 
 /**
  * SECTION:gsubprocesslauncher
- * @title: xsubprocess_t Launcher
+ * @title: GSubprocess Launcher
  * @short_description: Environment options for launching a child process
  * @include: gio/gio.h
  *
@@ -24,7 +24,7 @@
  * such as where its standard input and output will be directed, the
  * argument list, the environment, and more.
  *
- * While the #xsubprocess_t class has high level functions covering
+ * While the #GSubprocess class has high level functions covering
  * popular cases, use of this class allows access to more advanced
  * options.  It can also be used to launch multiple subprocesses with
  * a similar configuration.
@@ -53,17 +53,17 @@
 #include <fcntl.h>
 #endif
 
-typedef xobject_class_t GSubprocessLauncherClass;
+typedef GObjectClass GSubprocessLauncherClass;
 
-XDEFINE_TYPE (xsubprocess_launcher, xsubprocess_launcher, XTYPE_OBJECT)
+G_DEFINE_TYPE (GSubprocessLauncher, g_subprocess_launcher, G_TYPE_OBJECT)
 
-static xboolean_t
-verify_disposition (const xchar_t      *stream_name,
-                    xsubprocess_flags_t  filtered_flags,
-                    xint_t              fd,
-                    const xchar_t      *filename)
+static gboolean
+verify_disposition (const gchar      *stream_name,
+                    GSubprocessFlags  filtered_flags,
+                    gint              fd,
+                    const gchar      *filename)
 {
-  xuint_t n_bits;
+  guint n_bits;
 
   if (!filtered_flags)
     n_bits = 0;
@@ -74,36 +74,36 @@ verify_disposition (const xchar_t      *stream_name,
 
   if (n_bits + (fd >= 0) + (filename != NULL) > 1)
     {
-      xstring_t *err;
+      GString *err;
 
-      err = xstring_new (NULL);
+      err = g_string_new (NULL);
       if (n_bits)
         {
-          xflags_class_t *class;
-          xuint_t i;
+          GFlagsClass *class;
+          guint i;
 
-          class = xtype_class_peek (XTYPE_SUBPROCESS_FLAGS);
+          class = g_type_class_peek (G_TYPE_SUBPROCESS_FLAGS);
 
           for (i = 0; i < class->n_values; i++)
             {
-              const xflags_value_t *value = &class->values[i];
+              const GFlagsValue *value = &class->values[i];
 
               if (filtered_flags & value->value)
-                xstring_append_printf (err, " %s", value->value_name);
+                g_string_append_printf (err, " %s", value->value_name);
             }
 
-          xtype_class_unref (class);
+          g_type_class_unref (class);
         }
 
       if (fd >= 0)
-        xstring_append_printf (err, " xsubprocess_launcher_take_%s_fd()", stream_name);
+        g_string_append_printf (err, " g_subprocess_launcher_take_%s_fd()", stream_name);
 
       if (filename)
-        xstring_append_printf (err, " xsubprocess_launcher_set_%s_file_path()", stream_name);
+        g_string_append_printf (err, " g_subprocess_launcher_set_%s_file_path()", stream_name);
 
       g_critical ("You may specify at most one disposition for the %s stream, but you specified:%s.",
                   stream_name, err->str);
-      xstring_free (err, TRUE);
+      g_string_free (err, TRUE);
 
       return FALSE;
     }
@@ -111,8 +111,8 @@ verify_disposition (const xchar_t      *stream_name,
   return TRUE;
 }
 
-static xboolean_t
-verify_flags (xsubprocess_flags_t flags)
+static gboolean
+verify_flags (GSubprocessFlags flags)
 {
   return verify_disposition ("stdin", flags & ALL_STDIN_FLAGS, -1, NULL) &&
          verify_disposition ("stdout", flags & ALL_STDOUT_FLAGS, -1, NULL) &&
@@ -120,28 +120,28 @@ verify_flags (xsubprocess_flags_t flags)
 }
 
 static void
-xsubprocess_launcher_set_property (xobject_t *object, xuint_t prop_id,
-                                    const xvalue_t *value, xparam_spec_t *pspec)
+g_subprocess_launcher_set_property (GObject *object, guint prop_id,
+                                    const GValue *value, GParamSpec *pspec)
 {
-  xsubprocess_launcher_t *launcher = G_SUBPROCESS_LAUNCHER (object);
+  GSubprocessLauncher *launcher = G_SUBPROCESS_LAUNCHER (object);
 
-  xassert (prop_id == 1);
+  g_assert (prop_id == 1);
 
-  if (verify_flags (xvalue_get_flags (value)))
-    launcher->flags = xvalue_get_flags (value);
+  if (verify_flags (g_value_get_flags (value)))
+    launcher->flags = g_value_get_flags (value);
 }
 
 static void
-xsubprocess_launcher_dispose (xobject_t *object)
+g_subprocess_launcher_dispose (GObject *object)
 {
-  xsubprocess_launcher_t *self = G_SUBPROCESS_LAUNCHER (object);
+  GSubprocessLauncher *self = G_SUBPROCESS_LAUNCHER (object);
 
 #ifdef G_OS_UNIX
   g_clear_pointer (&self->stdin_path, g_free);
   g_clear_pointer (&self->stdout_path, g_free);
   g_clear_pointer (&self->stderr_path, g_free);
 
-  xsubprocess_launcher_close (self);
+  g_subprocess_launcher_close (self);
 
   if (self->child_setup_destroy_notify)
     (* self->child_setup_destroy_notify) (self->child_setup_user_data);
@@ -149,14 +149,14 @@ xsubprocess_launcher_dispose (xobject_t *object)
   self->child_setup_user_data = NULL;
 #endif
 
-  g_clear_pointer (&self->envp, xstrfreev);
+  g_clear_pointer (&self->envp, g_strfreev);
   g_clear_pointer (&self->cwd, g_free);
 
-  XOBJECT_CLASS (xsubprocess_launcher_parent_class)->dispose (object);
+  G_OBJECT_CLASS (g_subprocess_launcher_parent_class)->dispose (object);
 }
 
 static void
-xsubprocess_launcher_init (xsubprocess_launcher_t  *self)
+g_subprocess_launcher_init (GSubprocessLauncher  *self)
 {
   self->envp = g_get_environ ();
 
@@ -170,24 +170,24 @@ xsubprocess_launcher_init (xsubprocess_launcher_t  *self)
 }
 
 static void
-xsubprocess_launcher_class_init (GSubprocessLauncherClass *class)
+g_subprocess_launcher_class_init (GSubprocessLauncherClass *class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
 
-  xobject_class->set_property = xsubprocess_launcher_set_property;
-  xobject_class->dispose = xsubprocess_launcher_dispose;
+  gobject_class->set_property = g_subprocess_launcher_set_property;
+  gobject_class->dispose = g_subprocess_launcher_dispose;
 
-  xobject_class_install_property (xobject_class, 1,
-                                   xparam_spec_flags ("flags", "Flags", "xsubprocess_flags_t for launched processes",
-                                                       XTYPE_SUBPROCESS_FLAGS, 0, XPARAM_WRITABLE |
-                                                       XPARAM_STATIC_STRINGS | XPARAM_CONSTRUCT_ONLY));
+  g_object_class_install_property (gobject_class, 1,
+                                   g_param_spec_flags ("flags", "Flags", "GSubprocessFlags for launched processes",
+                                                       G_TYPE_SUBPROCESS_FLAGS, 0, G_PARAM_WRITABLE |
+                                                       G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY));
 }
 
 /**
- * xsubprocess_launcher_new:
- * @flags: #xsubprocess_flags_t
+ * g_subprocess_launcher_new:
+ * @flags: #GSubprocessFlags
  *
- * Creates a new #xsubprocess_launcher_t.
+ * Creates a new #GSubprocessLauncher.
  *
  * The launcher is created with the default options.  A copy of the
  * environment of the calling process is made at the time of this call
@@ -195,20 +195,20 @@ xsubprocess_launcher_class_init (GSubprocessLauncherClass *class)
  *
  * Since: 2.40
  **/
-xsubprocess_launcher_t *
-xsubprocess_launcher_new (xsubprocess_flags_t flags)
+GSubprocessLauncher *
+g_subprocess_launcher_new (GSubprocessFlags flags)
 {
   if (!verify_flags (flags))
     return NULL;
 
-  return xobject_new (XTYPE_SUBPROCESS_LAUNCHER,
+  return g_object_new (G_TYPE_SUBPROCESS_LAUNCHER,
                        "flags", flags,
                        NULL);
 }
 
 /**
- * xsubprocess_launcher_set_environ:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_set_environ:
+ * @self: a #GSubprocessLauncher
  * @env: (array zero-terminated=1) (element-type filename) (transfer none):
  *     the replacement environment
  *
@@ -219,14 +219,14 @@ xsubprocess_launcher_new (xsubprocess_flags_t flags)
  * the process 'environ' and using the functions g_environ_setenv(),
  * g_environ_unsetenv(), etc.
  *
- * As an alternative, you can use xsubprocess_launcher_setenv(),
- * xsubprocess_launcher_unsetenv(), etc.
+ * As an alternative, you can use g_subprocess_launcher_setenv(),
+ * g_subprocess_launcher_unsetenv(), etc.
  *
  * Pass an empty array to set an empty environment. Pass %NULL to inherit the
  * parent process’ environment. As of GLib 2.54, the parent process’ environment
- * will be copied when xsubprocess_launcher_set_environ() is called.
+ * will be copied when g_subprocess_launcher_set_environ() is called.
  * Previously, it was copied when the subprocess was executed. This means the
- * copied environment may now be modified (using xsubprocess_launcher_setenv(),
+ * copied environment may now be modified (using g_subprocess_launcher_setenv(),
  * etc.) before launching the subprocess.
  *
  * On UNIX, all strings in this array can be arbitrary byte strings.
@@ -235,19 +235,19 @@ xsubprocess_launcher_new (xsubprocess_flags_t flags)
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_environ (xsubprocess_launcher_t  *self,
-                                   xchar_t               **env)
+g_subprocess_launcher_set_environ (GSubprocessLauncher  *self,
+                                   gchar               **env)
 {
-  xstrfreev (self->envp);
-  self->envp = xstrdupv (env);
+  g_strfreev (self->envp);
+  self->envp = g_strdupv (env);
 
   if (self->envp == NULL)
     self->envp = g_get_environ ();
 }
 
 /**
- * xsubprocess_launcher_setenv:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_setenv:
+ * @self: a #GSubprocessLauncher
  * @variable: (type filename): the environment variable to set,
  *     must not contain '='
  * @value: (type filename): the new value for the variable
@@ -263,17 +263,17 @@ xsubprocess_launcher_set_environ (xsubprocess_launcher_t  *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_setenv (xsubprocess_launcher_t *self,
-                              const xchar_t         *variable,
-                              const xchar_t         *value,
-                              xboolean_t             overwrite)
+g_subprocess_launcher_setenv (GSubprocessLauncher *self,
+                              const gchar         *variable,
+                              const gchar         *value,
+                              gboolean             overwrite)
 {
   self->envp = g_environ_setenv (self->envp, variable, value, overwrite);
 }
 
 /**
- * xsubprocess_launcher_unsetenv:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_unsetenv:
+ * @self: a #GSubprocessLauncher
  * @variable: (type filename): the environment variable to unset,
  *     must not contain '='
  *
@@ -286,15 +286,15 @@ xsubprocess_launcher_setenv (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_unsetenv (xsubprocess_launcher_t *self,
-                                const xchar_t         *variable)
+g_subprocess_launcher_unsetenv (GSubprocessLauncher *self,
+                                const gchar         *variable)
 {
   self->envp = g_environ_unsetenv (self->envp, variable);
 }
 
 /**
- * xsubprocess_launcher_getenv:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_getenv:
+ * @self: a #GSubprocessLauncher
  * @variable: (type filename): the environment variable to get
  *
  * Returns the value of the environment variable @variable in the
@@ -308,16 +308,16 @@ xsubprocess_launcher_unsetenv (xsubprocess_launcher_t *self,
  *
  * Since: 2.40
  **/
-const xchar_t *
-xsubprocess_launcher_getenv (xsubprocess_launcher_t *self,
-                              const xchar_t         *variable)
+const gchar *
+g_subprocess_launcher_getenv (GSubprocessLauncher *self,
+                              const gchar         *variable)
 {
   return g_environ_getenv (self->envp, variable);
 }
 
 /**
- * xsubprocess_launcher_set_cwd:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_set_cwd:
+ * @self: a #GSubprocessLauncher
  * @cwd: (type filename): the cwd for launched processes
  *
  * Sets the current working directory that processes will be launched
@@ -329,17 +329,17 @@ xsubprocess_launcher_getenv (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_cwd (xsubprocess_launcher_t *self,
-                               const xchar_t         *cwd)
+g_subprocess_launcher_set_cwd (GSubprocessLauncher *self,
+                               const gchar         *cwd)
 {
   g_free (self->cwd);
-  self->cwd = xstrdup (cwd);
+  self->cwd = g_strdup (cwd);
 }
 
 /**
- * xsubprocess_launcher_set_flags:
- * @self: a #xsubprocess_launcher_t
- * @flags: #xsubprocess_flags_t
+ * g_subprocess_launcher_set_flags:
+ * @self: a #GSubprocessLauncher
+ * @flags: #GSubprocessFlags
  *
  * Sets the flags on the launcher.
  *
@@ -351,17 +351,17 @@ xsubprocess_launcher_set_cwd (xsubprocess_launcher_t *self,
  * %G_SUBPROCESS_FLAGS_STDIN_INHERIT).
  *
  * You may also not set a flag that conflicts with a previous call to a
- * function like xsubprocess_launcher_set_stdin_file_path() or
- * xsubprocess_launcher_take_stdout_fd().
+ * function like g_subprocess_launcher_set_stdin_file_path() or
+ * g_subprocess_launcher_take_stdout_fd().
  *
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_flags (xsubprocess_launcher_t *self,
-                                 xsubprocess_flags_t     flags)
+g_subprocess_launcher_set_flags (GSubprocessLauncher *self,
+                                 GSubprocessFlags     flags)
 {
-  const xchar_t *stdin_path = NULL, *stdout_path = NULL, *stderr_path = NULL;
-  xint_t stdin_fd = -1, stdout_fd = -1, stderr_fd = -1;
+  const gchar *stdin_path = NULL, *stdout_path = NULL, *stderr_path = NULL;
+  gint stdin_fd = -1, stdout_fd = -1, stderr_fd = -1;
 
 #ifdef G_OS_UNIX
   stdin_fd = self->stdin_fd;
@@ -380,9 +380,9 @@ xsubprocess_launcher_set_flags (xsubprocess_launcher_t *self,
 
 #ifdef G_OS_UNIX
 static void
-assign_fd (xint_t *fd_ptr, xint_t fd)
+assign_fd (gint *fd_ptr, gint fd)
 {
-  xint_t flags;
+  gint flags;
 
   if (*fd_ptr != -1)
     close (*fd_ptr);
@@ -399,8 +399,8 @@ assign_fd (xint_t *fd_ptr, xint_t fd)
 }
 
 /**
- * xsubprocess_launcher_set_stdin_file_path:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_set_stdin_file_path:
+ * @self: a #GSubprocessLauncher
  * @path: (type filename) (nullable: a filename or %NULL
  *
  * Sets the file path to use as the stdin for spawned processes.
@@ -417,19 +417,19 @@ assign_fd (xint_t *fd_ptr, xint_t fd)
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_stdin_file_path (xsubprocess_launcher_t *self,
-                                           const xchar_t         *path)
+g_subprocess_launcher_set_stdin_file_path (GSubprocessLauncher *self,
+                                           const gchar         *path)
 {
   if (verify_disposition ("stdin", self->flags & ALL_STDIN_FLAGS, self->stdin_fd, path))
     {
       g_free (self->stdin_path);
-      self->stdin_path = xstrdup (path);
+      self->stdin_path = g_strdup (path);
     }
 }
 
 /**
- * xsubprocess_launcher_take_stdin_fd:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_take_stdin_fd:
+ * @self: a #GSubprocessLauncher
  * @fd: a file descriptor, or -1
  *
  * Sets the file descriptor to use as the stdin for spawned processes.
@@ -454,16 +454,16 @@ xsubprocess_launcher_set_stdin_file_path (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_take_stdin_fd (xsubprocess_launcher_t *self,
-                                     xint_t                 fd)
+g_subprocess_launcher_take_stdin_fd (GSubprocessLauncher *self,
+                                     gint                 fd)
 {
   if (verify_disposition ("stdin", self->flags & ALL_STDIN_FLAGS, fd, self->stdin_path))
     assign_fd (&self->stdin_fd, fd);
 }
 
 /**
- * xsubprocess_launcher_set_stdout_file_path:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_set_stdout_file_path:
+ * @self: a #GSubprocessLauncher
  * @path: (type filename) (nullable): a filename or %NULL
  *
  * Sets the file path to use as the stdout for spawned processes.
@@ -481,19 +481,19 @@ xsubprocess_launcher_take_stdin_fd (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_stdout_file_path (xsubprocess_launcher_t *self,
-                                            const xchar_t         *path)
+g_subprocess_launcher_set_stdout_file_path (GSubprocessLauncher *self,
+                                            const gchar         *path)
 {
   if (verify_disposition ("stdout", self->flags & ALL_STDOUT_FLAGS, self->stdout_fd, path))
     {
       g_free (self->stdout_path);
-      self->stdout_path = xstrdup (path);
+      self->stdout_path = g_strdup (path);
     }
 }
 
 /**
- * xsubprocess_launcher_take_stdout_fd:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_take_stdout_fd:
+ * @self: a #GSubprocessLauncher
  * @fd: a file descriptor, or -1
  *
  * Sets the file descriptor to use as the stdout for spawned processes.
@@ -517,16 +517,16 @@ xsubprocess_launcher_set_stdout_file_path (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_take_stdout_fd (xsubprocess_launcher_t *self,
-                                      xint_t                 fd)
+g_subprocess_launcher_take_stdout_fd (GSubprocessLauncher *self,
+                                      gint                 fd)
 {
   if (verify_disposition ("stdout", self->flags & ALL_STDOUT_FLAGS, fd, self->stdout_path))
     assign_fd (&self->stdout_fd, fd);
 }
 
 /**
- * xsubprocess_launcher_set_stderr_file_path:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_set_stderr_file_path:
+ * @self: a #GSubprocessLauncher
  * @path: (type filename) (nullable): a filename or %NULL
  *
  * Sets the file path to use as the stderr for spawned processes.
@@ -547,19 +547,19 @@ xsubprocess_launcher_take_stdout_fd (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_stderr_file_path (xsubprocess_launcher_t *self,
-                                            const xchar_t         *path)
+g_subprocess_launcher_set_stderr_file_path (GSubprocessLauncher *self,
+                                            const gchar         *path)
 {
   if (verify_disposition ("stderr", self->flags & ALL_STDERR_FLAGS, self->stderr_fd, path))
     {
       g_free (self->stderr_path);
-      self->stderr_path = xstrdup (path);
+      self->stderr_path = g_strdup (path);
     }
 }
 
 /**
- * xsubprocess_launcher_take_stderr_fd:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_take_stderr_fd:
+ * @self: a #GSubprocessLauncher
  * @fd: a file descriptor, or -1
  *
  * Sets the file descriptor to use as the stderr for spawned processes.
@@ -569,7 +569,7 @@ xsubprocess_launcher_set_stderr_file_path (xsubprocess_launcher_t *self,
  * Note that the default behaviour is to pass stderr through to the
  * stderr of the parent process.
  *
- * The passed @fd belongs to the #xsubprocess_launcher_t.  It will be
+ * The passed @fd belongs to the #GSubprocessLauncher.  It will be
  * automatically closed when the launcher is finalized.  The file
  * descriptor will also be closed on the child side when executing the
  * spawned process.
@@ -582,16 +582,16 @@ xsubprocess_launcher_set_stderr_file_path (xsubprocess_launcher_t *self,
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_take_stderr_fd (xsubprocess_launcher_t *self,
-                                     xint_t                 fd)
+g_subprocess_launcher_take_stderr_fd (GSubprocessLauncher *self,
+                                     gint                 fd)
 {
   if (verify_disposition ("stderr", self->flags & ALL_STDERR_FLAGS, fd, self->stderr_path))
     assign_fd (&self->stderr_fd, fd);
 }
 
 /**
- * xsubprocess_launcher_take_fd:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_take_fd:
+ * @self: a #GSubprocessLauncher
  * @source_fd: File descriptor in parent process
  * @target_fd: Target descriptor for child process
  *
@@ -609,9 +609,9 @@ xsubprocess_launcher_take_stderr_fd (xsubprocess_launcher_t *self,
  * the passphrase to be written.
  */
 void
-xsubprocess_launcher_take_fd (xsubprocess_launcher_t   *self,
-                               xint_t                   source_fd,
-                               xint_t                   target_fd)
+g_subprocess_launcher_take_fd (GSubprocessLauncher   *self,
+                               gint                   source_fd,
+                               gint                   target_fd)
 {
   if (self->source_fds != NULL && self->target_fds != NULL)
     {
@@ -621,28 +621,28 @@ xsubprocess_launcher_take_fd (xsubprocess_launcher_t   *self,
 }
 
 /**
- * xsubprocess_launcher_close:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_close:
+ * @self: a #GSubprocessLauncher
  *
  * Closes all the file descriptors previously passed to the object with
- * xsubprocess_launcher_take_fd(), xsubprocess_launcher_take_stderr_fd(), etc.
+ * g_subprocess_launcher_take_fd(), g_subprocess_launcher_take_stderr_fd(), etc.
  *
- * After calling this method, any subsequent calls to xsubprocess_launcher_spawn() or xsubprocess_launcher_spawnv() will
+ * After calling this method, any subsequent calls to g_subprocess_launcher_spawn() or g_subprocess_launcher_spawnv() will
  * return %G_IO_ERROR_CLOSED. This method is idempotent if
  * called more than once.
  *
- * This function is called automatically when the #xsubprocess_launcher_t
+ * This function is called automatically when the #GSubprocessLauncher
  * is disposed, but is provided separately so that garbage collected
  * language bindings can call it earlier to guarantee when FDs are closed.
  *
  * Since: 2.68
  */
 void
-xsubprocess_launcher_close (xsubprocess_launcher_t *self)
+g_subprocess_launcher_close (GSubprocessLauncher *self)
 {
-  xuint_t i;
+  guint i;
 
-  g_return_if_fail (X_IS_SUBPROCESS_LAUNCHER (self));
+  g_return_if_fail (G_IS_SUBPROCESS_LAUNCHER (self));
 
   if (self->stdin_fd != -1)
     close (self->stdin_fd);
@@ -658,8 +658,8 @@ xsubprocess_launcher_close (xsubprocess_launcher_t *self)
 
   if (self->source_fds)
     {
-      xassert (self->target_fds != NULL);
-      xassert (self->source_fds->len == self->target_fds->len);
+      g_assert (self->target_fds != NULL);
+      g_assert (self->source_fds->len == self->target_fds->len);
 
       /* Note: Don’t close the target_fds, as they’re only valid FDs in the
        * child process. This code never executes in the child process. */
@@ -674,11 +674,11 @@ xsubprocess_launcher_close (xsubprocess_launcher_t *self)
 }
 
 /**
- * xsubprocess_launcher_set_child_setup: (skip)
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_set_child_setup: (skip)
+ * @self: a #GSubprocessLauncher
  * @child_setup: a #GSpawnChildSetupFunc to use as the child setup function
  * @user_data: user data for @child_setup
- * @destroy_notify: a #xdestroy_notify_t for @user_data
+ * @destroy_notify: a #GDestroyNotify for @user_data
  *
  * Sets up a child setup function.
  *
@@ -687,7 +687,7 @@ xsubprocess_launcher_close (xsubprocess_launcher_t *self)
  *
  * @destroy_notify will not be automatically called on the child's side
  * of the fork().  It will only be called when the last reference on the
- * #xsubprocess_launcher_t is dropped or when a new child setup function is
+ * #GSubprocessLauncher is dropped or when a new child setup function is
  * given.
  *
  * %NULL can be given as @child_setup to disable the functionality.
@@ -697,10 +697,10 @@ xsubprocess_launcher_close (xsubprocess_launcher_t *self)
  * Since: 2.40
  **/
 void
-xsubprocess_launcher_set_child_setup (xsubprocess_launcher_t  *self,
+g_subprocess_launcher_set_child_setup (GSubprocessLauncher  *self,
                                        GSpawnChildSetupFunc  child_setup,
-                                       xpointer_t              user_data,
-                                       xdestroy_notify_t        destroy_notify)
+                                       gpointer              user_data,
+                                       GDestroyNotify        destroy_notify)
 {
   if (self->child_setup_destroy_notify)
     (* self->child_setup_destroy_notify) (self->child_setup_user_data);
@@ -712,68 +712,68 @@ xsubprocess_launcher_set_child_setup (xsubprocess_launcher_t  *self,
 #endif
 
 /**
- * xsubprocess_launcher_spawn:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_spawn:
+ * @self: a #GSubprocessLauncher
  * @error: Error
  * @argv0: Command line arguments
  * @...: Continued arguments, %NULL terminated
  *
- * Creates a #xsubprocess_t given a provided varargs list of arguments.
+ * Creates a #GSubprocess given a provided varargs list of arguments.
  *
  * Since: 2.40
- * Returns: (transfer full): A new #xsubprocess_t, or %NULL on error (and @error will be set)
+ * Returns: (transfer full): A new #GSubprocess, or %NULL on error (and @error will be set)
  **/
-xsubprocess_t *
-xsubprocess_launcher_spawn (xsubprocess_launcher_t  *launcher,
-                             xerror_t              **error,
-                             const xchar_t          *argv0,
+GSubprocess *
+g_subprocess_launcher_spawn (GSubprocessLauncher  *launcher,
+                             GError              **error,
+                             const gchar          *argv0,
                              ...)
 {
-  xsubprocess_t *result;
-  xptr_array_t *args;
-  const xchar_t *arg;
+  GSubprocess *result;
+  GPtrArray *args;
+  const gchar *arg;
   va_list ap;
 
-  xreturn_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
-  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  g_return_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  args = xptr_array_new ();
+  args = g_ptr_array_new ();
 
   va_start (ap, argv0);
-  xptr_array_add (args, (xchar_t *) argv0);
-  while ((arg = va_arg (ap, const xchar_t *)))
-    xptr_array_add (args, (xchar_t *) arg);
+  g_ptr_array_add (args, (gchar *) argv0);
+  while ((arg = va_arg (ap, const gchar *)))
+    g_ptr_array_add (args, (gchar *) arg);
 
-  xptr_array_add (args, NULL);
+  g_ptr_array_add (args, NULL);
   va_end (ap);
 
-  result = xsubprocess_launcher_spawnv (launcher, (const xchar_t * const *) args->pdata, error);
+  result = g_subprocess_launcher_spawnv (launcher, (const gchar * const *) args->pdata, error);
 
-  xptr_array_free (args, TRUE);
+  g_ptr_array_free (args, TRUE);
 
   return result;
 
 }
 
 /**
- * xsubprocess_launcher_spawnv:
- * @self: a #xsubprocess_launcher_t
+ * g_subprocess_launcher_spawnv:
+ * @self: a #GSubprocessLauncher
  * @argv: (array zero-terminated=1) (element-type filename): Command line arguments
  * @error: Error
  *
- * Creates a #xsubprocess_t given a provided array of arguments.
+ * Creates a #GSubprocess given a provided array of arguments.
  *
  * Since: 2.40
- * Returns: (transfer full): A new #xsubprocess_t, or %NULL on error (and @error will be set)
+ * Returns: (transfer full): A new #GSubprocess, or %NULL on error (and @error will be set)
  **/
-xsubprocess_t *
-xsubprocess_launcher_spawnv (xsubprocess_launcher_t  *launcher,
-                              const xchar_t * const  *argv,
-                              xerror_t              **error)
+GSubprocess *
+g_subprocess_launcher_spawnv (GSubprocessLauncher  *launcher,
+                              const gchar * const  *argv,
+                              GError              **error)
 {
-  xsubprocess_t *subprocess;
+  GSubprocess *subprocess;
 
-  xreturn_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
+  g_return_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
 
 #ifdef G_OS_UNIX
   if (launcher->closed_fd)
@@ -786,15 +786,15 @@ xsubprocess_launcher_spawnv (xsubprocess_launcher_t  *launcher,
     }
 #endif
 
-  subprocess = xobject_new (XTYPE_SUBPROCESS,
+  subprocess = g_object_new (G_TYPE_SUBPROCESS,
                              "argv", argv,
                              "flags", launcher->flags,
                              NULL);
-  xsubprocess_set_launcher (subprocess, launcher);
+  g_subprocess_set_launcher (subprocess, launcher);
 
-  if (!xinitable_init (XINITABLE (subprocess), NULL, error))
+  if (!g_initable_init (G_INITABLE (subprocess), NULL, error))
     {
-      xobject_unref (subprocess);
+      g_object_unref (subprocess);
       return NULL;
     }
 

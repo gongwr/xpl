@@ -67,7 +67,7 @@
  * to established concepts found in the other test frameworks (JUnit, NUnit,
  * RUnit), which in turn is based on smalltalk unit testing concepts.
  *
- * - test_t case: Tests (test methods) are grouped together with their
+ * - Test case: Tests (test methods) are grouped together with their
  *   fixture into test cases.
  *
  * - Fixture: A test fixture consists of fixture data and setup and
@@ -76,13 +76,13 @@
  *   up and torn down around each test invocation to avoid dependencies
  *   between tests.
  *
- * - test_t suite: test_t cases can be grouped into test suites, to allow
- *   subsets of the available tests to be run. test_t suites can be
+ * - Test suite: Test cases can be grouped into test suites, to allow
+ *   subsets of the available tests to be run. Test suites can be
  *   grouped into other test suites as well.
  *
  * The API is designed to handle creation and registration of test suites
  * and test cases implicitly. A simple call like
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  *   g_test_add_func ("/misc/assertions", test_assertions);
  * ]|
  * creates a test suite called "misc" with a single test case named
@@ -97,8 +97,8 @@
  * messages can be more elaborate, and include the values of the compared
  * entities.
  *
- * Note that xassert() should not be used in unit tests, since it is a no-op
- * when compiling with `G_DISABLE_ASSERT`. Use xassert() in production code,
+ * Note that g_assert() should not be used in unit tests, since it is a no-op
+ * when compiling with `G_DISABLE_ASSERT`. Use g_assert() in production code,
  * and g_assert_true() in unit tests.
  *
  * A full example of creating a test suite with two tests using fixtures:
@@ -107,13 +107,13 @@
  * #include <locale.h>
  *
  * typedef struct {
- *   xobject_t *obj;
+ *   MyObject *obj;
  *   OtherObject *helper;
  * } MyObjectFixture;
  *
  * static void
  * my_object_fixture_set_up (MyObjectFixture *fixture,
- *                           xconstpointer user_data)
+ *                           gconstpointer user_data)
  * {
  *   fixture->obj = my_object_new ();
  *   my_object_set_prop1 (fixture->obj, "some-value");
@@ -124,7 +124,7 @@
  *
  * static void
  * my_object_fixture_tear_down (MyObjectFixture *fixture,
- *                              xconstpointer user_data)
+ *                              gconstpointer user_data)
  * {
  *   g_clear_object (&fixture->helper);
  *   g_clear_object (&fixture->obj);
@@ -132,14 +132,14 @@
  *
  * static void
  * test_my_object_test1 (MyObjectFixture *fixture,
- *                       xconstpointer user_data)
+ *                       gconstpointer user_data)
  * {
  *   g_assert_cmpstr (my_object_get_property (fixture->obj), ==, "initial-value");
  * }
  *
  * static void
  * test_my_object_test2 (MyObjectFixture *fixture,
- *                       xconstpointer user_data)
+ *                       gconstpointer user_data)
  * {
  *   my_object_do_some_work_using_helper (fixture->obj, fixture->helper);
  *   g_assert_cmpstr (my_object_get_property (fixture->obj), ==, "updated-value");
@@ -164,7 +164,7 @@
  * }
  * ]|
  *
- * ### Integrating xtest_t in your project
+ * ### Integrating GTest in your project
  *
  * If you are using the [Meson](http://mesonbuild.com) build system, you will
  * typically use the provided `test()` primitive to call the test binaries,
@@ -346,9 +346,9 @@
  * g_test_queue_unref:
  * @gobject: the object to unref
  *
- * Enqueue an object to be released with xobject_unref() during
+ * Enqueue an object to be released with g_object_unref() during
  * the next teardown phase. This is equivalent to calling
- * g_test_queue_destroy() with a destroy callback of xobject_unref().
+ * g_test_queue_destroy() with a destroy callback of g_object_unref().
  *
  * Since: 2.16
  */
@@ -426,7 +426,7 @@
  *
  * This is sometimes used to test situations that are formally
  * considered to be undefined behaviour, like code that hits a
- * xassert() or xerror(). In these situations you should skip the
+ * g_assert() or g_error(). In these situations you should skip the
  * entire test, including the call to g_test_trap_subprocess(), unless
  * g_test_undefined() returns %TRUE to indicate that undefined
  * behaviour may be tested.
@@ -454,7 +454,7 @@
  */
 
 /**
- * xassert:
+ * g_assert:
  * @expr: the expression to check
  *
  * Debugging macro to terminate the application if the assertion
@@ -491,9 +491,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike xassert(), this macro is unaffected by whether
+ * Note that unlike g_assert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, xassert() should not be used in tests.
+ * conversely, g_assert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -510,9 +510,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike xassert(), this macro is unaffected by whether
+ * Note that unlike g_assert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, xassert() should not be used in tests.
+ * conversely, g_assert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -529,9 +529,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike xassert(), this macro is unaffected by whether
+ * Note that unlike g_assert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, xassert() should not be used in tests.
+ * conversely, g_assert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -548,9 +548,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike xassert(), this macro is unaffected by whether
+ * Note that unlike g_assert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, xassert() should not be used in tests.
+ * conversely, g_assert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -567,14 +567,14 @@
  * Debugging macro to compare two strings. If the comparison fails,
  * an error message is logged and the application is either terminated
  * or the testcase marked as failed.
- * The strings are compared using xstrcmp0().
+ * The strings are compared using g_strcmp0().
  *
  * The effect of `g_assert_cmpstr (s1, op, s2)` is
- * the same as `g_assert_true (xstrcmp0 (s1, s2) op 0)`.
+ * the same as `g_assert_true (g_strcmp0 (s1, s2) op 0)`.
  * The advantage of this macro is that it can produce a message that
  * includes the actual values of @s1 and @s2.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  *   g_assert_cmpstr (mystring, ==, "fubar");
  * ]|
  *
@@ -587,13 +587,13 @@
  * @strv2: (nullable): another string array (may be %NULL)
  *
  * Debugging macro to check if two %NULL-terminated string arrays (i.e. 2
- * #xstrv_t) are equal. If they are not equal, an error message is logged and the
+ * #GStrv) are equal. If they are not equal, an error message is logged and the
  * application is either terminated or the testcase marked as failed.
  * If both arrays are %NULL, the check passes. If one array is %NULL but the
  * other is not, an error message is logged.
  *
  * The effect of `g_assert_cmpstrv (strv1, strv2)` is the same as
- * `g_assert_true (xstrv_equal (strv1, strv2))` (if both arrays are not
+ * `g_assert_true (g_strv_equal (strv1, strv2))` (if both arrays are not
  * %NULL). The advantage of this macro is that it can produce a message that
  * includes how @strv1 and @strv2 are different.
  *
@@ -699,7 +699,7 @@
  * If the assertion fails (i.e. the @expr returns a negative value), an error
  * message is logged and the testcase is marked as failed. The error message
  * will contain the value of `errno` and its human-readable message from
- * xstrerror().
+ * g_strerror().
  *
  * This macro will clear the value of `errno` before executing @expr.
  *
@@ -733,16 +733,16 @@
 
 /**
  * g_assert_cmpvariant:
- * @v1: pointer to a #xvariant_t
- * @v2: pointer to another #xvariant_t
+ * @v1: pointer to a #GVariant
+ * @v2: pointer to another #GVariant
  *
  * Debugging macro to compare two #GVariants. If the comparison fails,
  * an error message is logged and the application is either terminated
  * or the testcase marked as failed. The variants are compared using
- * xvariant_equal().
+ * g_variant_equal().
  *
  * The effect of `g_assert_cmpvariant (v1, v2)` is the same as
- * `g_assert_true (xvariant_equal (v1, v2))`. The advantage of this macro is
+ * `g_assert_true (g_variant_equal (v1, v2))`. The advantage of this macro is
  * that it can produce a message that includes the actual values of @v1 and @v2.
  *
  * Since: 2.60
@@ -750,9 +750,9 @@
 
 /**
  * g_assert_no_error:
- * @err: a #xerror_t, possibly %NULL
+ * @err: a #GError, possibly %NULL
  *
- * Debugging macro to check that a #xerror_t is not set.
+ * Debugging macro to check that a #GError is not set.
  *
  * The effect of `g_assert_no_error (err)` is
  * the same as `g_assert_true (err == NULL)`. The advantage
@@ -764,12 +764,12 @@
 
 /**
  * g_assert_error:
- * @err: a #xerror_t, possibly %NULL
- * @dom: the expected error domain (a #xquark)
+ * @err: a #GError, possibly %NULL
+ * @dom: the expected error domain (a #GQuark)
  * @c: the expected error code
  *
  * Debugging macro to check that a method has returned
- * the correct #xerror_t.
+ * the correct #GError.
  *
  * The effect of `g_assert_error (err, dom, c)` is
  * the same as `g_assert_true (err != NULL && err->domain
@@ -802,7 +802,7 @@
  * analysis systems like Apport and ABRT to fish out assertion messages from
  * core dumps, instead of having to catch them on screen output.
  */
-XPL_VAR char *__glib_assert_msg;
+GLIB_VAR char *__glib_assert_msg;
 char *__glib_assert_msg = NULL;
 
 /* --- constants --- */
@@ -811,37 +811,37 @@ char *__glib_assert_msg = NULL;
 /* --- structures --- */
 struct GTestCase
 {
-  xchar_t  *name;
-  xuint_t   fixture_size;
-  void   (*fixture_setup)    (void*, xconstpointer);
-  void   (*fixture_test)     (void*, xconstpointer);
-  void   (*fixture_teardown) (void*, xconstpointer);
-  xpointer_t test_data;
+  gchar  *name;
+  guint   fixture_size;
+  void   (*fixture_setup)    (void*, gconstpointer);
+  void   (*fixture_test)     (void*, gconstpointer);
+  void   (*fixture_teardown) (void*, gconstpointer);
+  gpointer test_data;
 };
 struct GTestSuite
 {
-  xchar_t  *name;
-  xslist_t *suites;
-  xslist_t *cases;
+  gchar  *name;
+  GSList *suites;
+  GSList *cases;
 };
 typedef struct DestroyEntry DestroyEntry;
 struct DestroyEntry
 {
   DestroyEntry *next;
-  xdestroy_notify_t destroy_func;
-  xpointer_t       destroy_data;
+  GDestroyNotify destroy_func;
+  gpointer       destroy_data;
 };
 
 /* --- prototypes --- */
 static void     test_cleanup                    (void);
-static void     test_run_seed                   (const xchar_t *rseed);
+static void     test_run_seed                   (const gchar *rseed);
 static void     test_trap_clear                 (void);
-static xuint8_t*  g_test_log_dump                 (GTestLogMsg *msg,
-                                                 xuint_t       *len);
-static void     gtest_default_log_handler       (const xchar_t    *log_domain,
+static guint8*  g_test_log_dump                 (GTestLogMsg *msg,
+                                                 guint       *len);
+static void     gtest_default_log_handler       (const gchar    *log_domain,
                                                  GLogLevelFlags  log_level,
-                                                 const xchar_t    *message,
-                                                 xpointer_t        unused_data);
+                                                 const gchar    *message,
+                                                 gpointer        unused_data);
 
 
 static const char * const g_test_result_names[] = {
@@ -853,50 +853,50 @@ static const char * const g_test_result_names[] = {
 
 /* --- variables --- */
 static int         test_log_fd = -1;
-static xboolean_t    test_mode_fatal = TRUE;
-static xboolean_t    g_test_run_once = TRUE;
-static xboolean_t    test_isolate_dirs = FALSE;
-static xchar_t      *test_isolate_dirs_tmpdir = NULL;
-static const xchar_t *test_tmpdir = NULL;
-static xboolean_t    test_run_list = FALSE;
-static xchar_t      *test_run_seedstr = NULL;
+static gboolean    test_mode_fatal = TRUE;
+static gboolean    g_test_run_once = TRUE;
+static gboolean    test_isolate_dirs = FALSE;
+static gchar      *test_isolate_dirs_tmpdir = NULL;
+static const gchar *test_tmpdir = NULL;
+static gboolean    test_run_list = FALSE;
+static gchar      *test_run_seedstr = NULL;
 G_LOCK_DEFINE_STATIC (test_run_rand);
-static xrand_t      *test_run_rand = NULL;
-static xchar_t      *test_run_name = "";
-static xslist_t    **test_filename_free_list;
-static xuint_t       test_run_forks = 0;
-static xuint_t       test_run_count = 0;
-static xuint_t       test_count = 0;
-static xuint_t       test_skipped_count = 0;
+static GRand      *test_run_rand = NULL;
+static gchar      *test_run_name = "";
+static GSList    **test_filename_free_list;
+static guint       test_run_forks = 0;
+static guint       test_run_count = 0;
+static guint       test_count = 0;
+static guint       test_skipped_count = 0;
 static GTestResult test_run_success = G_TEST_RUN_FAILURE;
-static xchar_t      *test_run_msg = NULL;
-static xuint_t       test_startup_skip_count = 0;
-static xtimer_t     *test_user_timer = NULL;
+static gchar      *test_run_msg = NULL;
+static guint       test_startup_skip_count = 0;
+static GTimer     *test_user_timer = NULL;
 static double      test_user_stamp = 0;
-static xslist_t     *test_paths = NULL;
-static xboolean_t    test_prefix = FALSE;
-static xboolean_t    test_prefix_extended = FALSE;
-static xslist_t     *test_paths_skipped = NULL;
-static xboolean_t    test_prefix_skipped = FALSE;
-static xboolean_t    test_prefix_extended_skipped = FALSE;
+static GSList     *test_paths = NULL;
+static gboolean    test_prefix = FALSE;
+static gboolean    test_prefix_extended = FALSE;
+static GSList     *test_paths_skipped = NULL;
+static gboolean    test_prefix_skipped = FALSE;
+static gboolean    test_prefix_extended_skipped = FALSE;
 static GTestSuite *test_suite_root = NULL;
 static int         test_trap_last_status = 0;  /* unmodified platform-specific status */
-static xpid_t        test_trap_last_pid = 0;
+static GPid        test_trap_last_pid = 0;
 static char       *test_trap_last_subprocess = NULL;
 static char       *test_trap_last_stdout = NULL;
 static char       *test_trap_last_stderr = NULL;
 static char       *test_uri_base = NULL;
-static xboolean_t    test_debug_log = FALSE;
-static xboolean_t    test_tap_log = TRUE;  /* default to TAP as of GLib 2.62; see #1619; the non-TAP output mode is deprecated */
-static xboolean_t    test_nonfatal_assertions = FALSE;
+static gboolean    test_debug_log = FALSE;
+static gboolean    test_tap_log = TRUE;  /* default to TAP as of GLib 2.62; see #1619; the non-TAP output mode is deprecated */
+static gboolean    test_nonfatal_assertions = FALSE;
 static DestroyEntry *test_destroy_queue = NULL;
 static const char *test_argv0 = NULL;           /* (nullable), points into global argv */
 static char       *test_argv0_dirname = NULL;   /* owned by GLib */
 static const char *test_disted_files_dir;       /* points into test_argv0_dirname or an environment variable */
 static const char *test_built_files_dir;        /* points into test_argv0_dirname or an environment variable */
 static char       *test_initial_cwd = NULL;
-static xboolean_t    test_in_forked_child = FALSE;
-static xboolean_t    test_in_subprocess = FALSE;
+static gboolean    test_in_forked_child = FALSE;
+static gboolean    test_in_subprocess = FALSE;
 static GTestConfig mutable_test_config_vars = {
   FALSE,        /* test_initialized */
   TRUE,         /* test_quick */
@@ -906,18 +906,18 @@ static GTestConfig mutable_test_config_vars = {
   TRUE,         /* test_undefined */
 };
 const GTestConfig * const g_test_config_vars = &mutable_test_config_vars;
-static xboolean_t  no_g_set_prgname = FALSE;
+static gboolean  no_g_set_prgname = FALSE;
 
 /* --- functions --- */
 const char*
-g_test_loxtype_name (GTestLogType log_type)
+g_test_log_type_name (GTestLogType log_type)
 {
   switch (log_type)
     {
     case G_TEST_LOG_NONE:               return "none";
     case G_TEST_LOG_ERROR:              return "error";
     case G_TEST_LOG_START_BINARY:       return "binary";
-    case G_TEST_LOXLIST_CASE:          return "list";
+    case G_TEST_LOG_LIST_CASE:          return "list";
     case G_TEST_LOG_SKIP_CASE:          return "skip";
     case G_TEST_LOG_START_CASE:         return "start";
     case G_TEST_LOG_STOP_CASE:          return "stop";
@@ -931,8 +931,8 @@ g_test_loxtype_name (GTestLogType log_type)
 }
 
 static void
-g_test_log_send (xuint_t         n_bytes,
-                 const xuint8_t *buffer)
+g_test_log_send (guint         n_bytes,
+                 const guint8 *buffer)
 {
   if (test_log_fd >= 0)
     {
@@ -945,14 +945,14 @@ g_test_log_send (xuint_t         n_bytes,
     {
       GTestLogBuffer *lbuffer = g_test_log_buffer_new ();
       GTestLogMsg *msg;
-      xuint_t ui;
+      guint ui;
       g_test_log_buffer_push (lbuffer, n_bytes, buffer);
       msg = g_test_log_buffer_pop (lbuffer);
       g_warn_if_fail (msg != NULL);
       g_warn_if_fail (lbuffer->data->len == 0);
       g_test_log_buffer_free (lbuffer);
       /* print message */
-      g_printerr ("{*LOG(%s)", g_test_loxtype_name (msg->log_type));
+      g_printerr ("{*LOG(%s)", g_test_log_type_name (msg->log_type));
       for (ui = 0; ui < msg->n_strings; ui++)
         g_printerr (":{%s}", msg->strings[ui]);
       if (msg->n_nums)
@@ -974,17 +974,17 @@ g_test_log_send (xuint_t         n_bytes,
 
 static void
 g_test_log (GTestLogType lbit,
-            const xchar_t *string1,
-            const xchar_t *string2,
-            xuint_t        n_args,
+            const gchar *string1,
+            const gchar *string2,
+            guint        n_args,
             long double *largs)
 {
   GTestResult result;
-  xboolean_t fail;
+  gboolean fail;
   GTestLogMsg msg;
-  xchar_t *astrings[3] = { NULL, NULL, NULL };
-  xuint8_t *dbuffer;
-  xuint32_t dbufferlen;
+  gchar *astrings[3] = { NULL, NULL, NULL };
+  guint8 *dbuffer;
+  guint32 dbufferlen;
 
   switch (lbit)
     {
@@ -992,7 +992,7 @@ g_test_log (GTestLogType lbit,
       if (test_tap_log)
         g_print ("# random seed: %s\n", string2);
       else if (g_test_verbose ())
-        g_print ("xtest_t: random seed: %s\n", string2);
+        g_print ("GTest: random seed: %s\n", string2);
       break;
     case G_TEST_LOG_START_SUITE:
       if (test_tap_log)
@@ -1022,7 +1022,7 @@ g_test_log (GTestLogType lbit,
       fail = result == G_TEST_RUN_FAILURE;
       if (test_tap_log)
         {
-          const xchar_t *ok;
+          const gchar *ok;
 
           /* The TAP representation for an expected failure starts with
            * "not ok", even though it does not actually count as failing
@@ -1046,7 +1046,7 @@ g_test_log (GTestLogType lbit,
             g_print ("\n");
         }
       else if (g_test_verbose ())
-        g_print ("xtest_t: result: %s\n", g_test_result_names[result]);
+        g_print ("GTest: result: %s\n", g_test_result_names[result]);
       else if (!g_test_quiet ())
         g_print ("%s\n", g_test_result_names[result]);
       if (fail && test_mode_fatal)
@@ -1081,13 +1081,13 @@ g_test_log (GTestLogType lbit,
             g_print ("# %s\n", string1);
           else
             {
-              char **lines = xstrsplit (string1, "\n", -1);
-              xsize_t i;
+              char **lines = g_strsplit (string1, "\n", -1);
+              gsize i;
 
               for (i = 0; lines[i] != NULL; i++)
                 g_print ("# %s\n", lines[i]);
 
-              xstrfreev (lines);
+              g_strfreev (lines);
             }
         }
       else if (g_test_verbose ())
@@ -1105,8 +1105,8 @@ g_test_log (GTestLogType lbit,
   msg.log_type = lbit;
   msg.n_strings = (string1 != NULL) + (string1 && string2);
   msg.strings = astrings;
-  astrings[0] = (xchar_t*) string1;
-  astrings[1] = astrings[0] ? (xchar_t*) string2 : NULL;
+  astrings[0] = (gchar*) string1;
+  astrings[1] = astrings[0] ? (gchar*) string2 : NULL;
   msg.n_nums = n_args;
   msg.nums = largs;
   dbuffer = g_test_log_dump (&msg, &dbufferlen);
@@ -1119,7 +1119,7 @@ g_test_log (GTestLogType lbit,
       if (test_tap_log)
         ;
       else if (g_test_verbose ())
-        g_print ("xtest_t: run: %s\n", string1);
+        g_print ("GTest: run: %s\n", string1);
       else if (!g_test_quiet ())
         g_print ("%s: ", string1);
       break;
@@ -1127,16 +1127,16 @@ g_test_log (GTestLogType lbit,
     }
 }
 
-/* We intentionally parse the command line without xoption_context_t
+/* We intentionally parse the command line without GOptionContext
  * because otherwise you would never be able to test it.
  */
 static void
-parse_args (xint_t    *argc_p,
-            xchar_t ***argv_p)
+parse_args (gint    *argc_p,
+            gchar ***argv_p)
 {
-  xuint_t argc = *argc_p;
-  xchar_t **argv = *argv_p;
-  xuint_t i, e;
+  guint argc = *argc_p;
+  gchar **argv = *argv_p;
+  guint i, e;
 
   test_argv0 = argv[0];  /* will be NULL iff argc == 0 */
   test_initial_cwd = g_get_current_dir ();
@@ -1169,7 +1169,7 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("--GTestLogFD", argv[i]) == 0 || strncmp ("--GTestLogFD=", argv[i], 13) == 0)
         {
-          xchar_t *equal = argv[i] + 12;
+          gchar *equal = argv[i] + 12;
           if (*equal == '=')
             test_log_fd = g_ascii_strtoull (equal + 1, NULL, 0);
           else if (i + 1 < argc)
@@ -1184,7 +1184,7 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("--GTestSkipCount", argv[i]) == 0 || strncmp ("--GTestSkipCount=", argv[i], 17) == 0)
         {
-          xchar_t *equal = argv[i] + 16;
+          gchar *equal = argv[i] + 16;
           if (*equal == '=')
             test_startup_skip_count = g_ascii_strtoull (equal + 1, NULL, 0);
           else if (i + 1 < argc)
@@ -1215,13 +1215,13 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("-p", argv[i]) == 0 || strncmp ("-p=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
+          gchar *equal = argv[i] + 2;
           if (*equal == '=')
-            test_paths = xslist_prepend (test_paths, equal + 1);
+            test_paths = g_slist_prepend (test_paths, equal + 1);
           else if (i + 1 < argc)
             {
               argv[i++] = NULL;
-              test_paths = xslist_prepend (test_paths, argv[i]);
+              test_paths = g_slist_prepend (test_paths, argv[i]);
             }
           argv[i] = NULL;
           if (test_prefix_extended) {
@@ -1235,13 +1235,13 @@ parse_args (xint_t    *argc_p,
                strcmp ("--run-prefix", argv[i]) == 0 ||
                strncmp ("--run-prefix=", argv[i], 13) == 0)
         {
-            xchar_t *equal = argv[i] + 2;
+            gchar *equal = argv[i] + 2;
             if (*equal == '=')
-              test_paths = xslist_prepend (test_paths, equal + 1);
+              test_paths = g_slist_prepend (test_paths, equal + 1);
             else if (i + 1 < argc)
               {
                 argv[i++] = NULL;
-                test_paths = xslist_prepend (test_paths, argv[i]);
+                test_paths = g_slist_prepend (test_paths, argv[i]);
               }
             argv[i] = NULL;
             if (test_prefix) {
@@ -1252,13 +1252,13 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("-s", argv[i]) == 0 || strncmp ("-s=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
+          gchar *equal = argv[i] + 2;
           if (*equal == '=')
-            test_paths_skipped = xslist_prepend (test_paths_skipped, equal + 1);
+            test_paths_skipped = g_slist_prepend (test_paths_skipped, equal + 1);
           else if (i + 1 < argc)
             {
               argv[i++] = NULL;
-              test_paths_skipped = xslist_prepend (test_paths_skipped, argv[i]);
+              test_paths_skipped = g_slist_prepend (test_paths_skipped, argv[i]);
             }
           argv[i] = NULL;
           if (test_prefix_extended_skipped) {
@@ -1272,13 +1272,13 @@ parse_args (xint_t    *argc_p,
                strcmp ("--skip-prefix", argv[i]) == 0 ||
                strncmp ("--skip-prefix=", argv[i], 14) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
+          gchar *equal = argv[i] + 2;
           if (*equal == '=')
-            test_paths_skipped = xslist_prepend (test_paths_skipped, equal + 1);
+            test_paths_skipped = g_slist_prepend (test_paths_skipped, equal + 1);
           else if (i + 1 < argc)
             {
               argv[i++] = NULL;
-              test_paths_skipped = xslist_prepend (test_paths_skipped, argv[i]);
+              test_paths_skipped = g_slist_prepend (test_paths_skipped, argv[i]);
             }
           argv[i] = NULL;
           if (test_prefix_skipped) {
@@ -1289,8 +1289,8 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("-m", argv[i]) == 0 || strncmp ("-m=", argv[i], 3) == 0)
         {
-          xchar_t *equal = argv[i] + 2;
-          const xchar_t *mode = "";
+          gchar *equal = argv[i] + 2;
+          const gchar *mode = "";
           if (*equal == '=')
             mode = equal + 1;
           else if (i + 1 < argc)
@@ -1314,7 +1314,7 @@ parse_args (xint_t    *argc_p,
           else if (strcmp (mode, "no-undefined") == 0)
             mutable_test_config_vars.test_undefined = FALSE;
           else
-            xerror ("unknown test mode: -m %s", mode);
+            g_error ("unknown test mode: -m %s", mode);
           argv[i] = NULL;
         }
       else if (strcmp ("-q", argv[i]) == 0 || strcmp ("--quiet", argv[i]) == 0)
@@ -1336,7 +1336,7 @@ parse_args (xint_t    *argc_p,
         }
       else if (strcmp ("--seed", argv[i]) == 0 || strncmp ("--seed=", argv[i], 7) == 0)
         {
-          xchar_t *equal = argv[i] + 6;
+          gchar *equal = argv[i] + 6;
           if (*equal == '=')
             test_run_seedstr = equal + 1;
           else if (i + 1 < argc)
@@ -1354,7 +1354,7 @@ parse_args (xint_t    *argc_p,
                   "  %s [OPTION...]\n\n"
                   "Help Options:\n"
                   "  -h, --help                     Show help options\n\n"
-                  "test_t Options:\n"
+                  "Test Options:\n"
                   "  --g-fatal-warnings             Make all warnings fatal\n"
                   "  -l                             List test cases available in a test executable\n"
                   "  -m {perf|slow|thorough|quick}  Execute tests according to mode\n"
@@ -1379,7 +1379,7 @@ parse_args (xint_t    *argc_p,
 
   /* We've been prepending to test_paths, but its order matters, so
    * permute it */
-  test_paths = xslist_reverse (test_paths);
+  test_paths = g_slist_reverse (test_paths);
 
   /* collapse argv */
   e = 0;
@@ -1395,10 +1395,10 @@ parse_args (xint_t    *argc_p,
 
 /* A fairly naive `rm -rf` implementation to clean up after unit tests. */
 static void
-rm_rf (const xchar_t *path)
+rm_rf (const gchar *path)
 {
-  xdir_t *dir = NULL;
-  const xchar_t *entry;
+  GDir *dir = NULL;
+  const gchar *entry;
 
   dir = g_dir_open (path, 0, NULL);
   if (dir == NULL)
@@ -1410,7 +1410,7 @@ rm_rf (const xchar_t *path)
 
   while ((entry = g_dir_read_name (dir)) != NULL)
     {
-      xchar_t *sub_path = g_build_filename (path, entry, NULL);
+      gchar *sub_path = g_build_filename (path, entry, NULL);
       rm_rf (sub_path);
       g_free (sub_path);
     }
@@ -1429,14 +1429,14 @@ rm_rf (const xchar_t *path)
  * effect before g_test_run() is called in the unit test’s main(). Hence
  * references to XDG variables in main() will not be using the temporary
  * directory. */
-static xboolean_t
-test_do_isolate_dirs (xerror_t **error)
+static gboolean
+test_do_isolate_dirs (GError **error)
 {
-  xchar_t *subdir = NULL;
-  xchar_t *home_dir = NULL, *cache_dir = NULL, *config_dir = NULL;
-  xchar_t *state_dir = NULL, *data_dir = NULL, *runtime_dir = NULL;
-  xchar_t *config_dirs[3];
-  xchar_t *data_dirs[3];
+  gchar *subdir = NULL;
+  gchar *home_dir = NULL, *cache_dir = NULL, *config_dir = NULL;
+  gchar *state_dir = NULL, *data_dir = NULL, *runtime_dir = NULL;
+  gchar *config_dirs[3];
+  gchar *data_dirs[3];
 
   if (!test_isolate_dirs)
     return TRUE;
@@ -1458,10 +1458,10 @@ test_do_isolate_dirs (xerror_t **error)
   runtime_dir = g_build_filename (subdir, "runtime", NULL);
   if (g_mkdir_with_parents (runtime_dir, 0700) != 0)
     {
-      xint_t saved_errno = errno;
-      g_set_error (error, XFILE_ERROR, xfile_error_from_errno (saved_errno),
+      gint saved_errno = errno;
+      g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (saved_errno),
                    "Failed to create XDG_RUNTIME_DIR ‘%s’: %s",
-                  runtime_dir, xstrerror (saved_errno));
+                  runtime_dir, g_strerror (saved_errno));
       g_free (runtime_dir);
       g_free (subdir);
       return FALSE;
@@ -1512,7 +1512,7 @@ test_do_isolate_dirs (xerror_t **error)
 static void
 test_rm_isolate_dirs (void)
 {
-  xchar_t *subdir = NULL;
+  gchar *subdir = NULL;
 
   if (!test_isolate_dirs)
     return;
@@ -1572,7 +1572,7 @@ test_rm_isolate_dirs (void)
  *
  * Since 2.58, if tests are compiled with `G_DISABLE_ASSERT` defined,
  * g_test_init() will print an error and exit. This is to prevent no-op tests
- * from being executed, as xassert() is commonly (erroneously) used in unit
+ * from being executed, as g_assert() is commonly (erroneously) used in unit
  * tests, and is a no-op when compiled with `G_DISABLE_ASSERT`. Ensure your
  * tests are compiled without `G_DISABLE_ASSERT` defined.
  *
@@ -1585,7 +1585,7 @@ void
 {
   static char seedstr[4 + 4 * 8 + 1];
   va_list args;
-  xpointer_t option;
+  gpointer option;
   /* make warnings and criticals fatal for all test programs */
   GLogLevelFlags fatal_mask = (GLogLevelFlags) g_log_set_always_fatal ((GLogLevelFlags) G_LOG_FATAL_MASK);
 
@@ -1597,19 +1597,19 @@ void
   g_return_if_fail (g_test_config_vars->test_initialized == FALSE);
   mutable_test_config_vars.test_initialized = TRUE;
 
-#ifdef _XPL_ADDRESS_SANITIZER
+#ifdef _GLIB_ADDRESS_SANITIZER
   mutable_test_config_vars.test_undefined = FALSE;
 #endif
 
 #ifdef G_OS_WIN32
   // don't open a window for errors (like the "abort() was called one")
   _CrtSetReportMode (_CRT_ERROR, _CRTDBG_MODE_FILE);
-  _CrtSetReportFile (_CRT_ERROR, _CRTDBXFILE_STDERR);
-  // while gtest tests tend to use xassert and friends
+  _CrtSetReportFile (_CRT_ERROR, _CRTDBG_FILE_STDERR);
+  // while gtest tests tend to use g_assert and friends
   // if they do use the C standard assert macro we want to
   // output a message to stderr, not open a popup window
   _CrtSetReportMode (_CRT_ASSERT, _CRTDBG_MODE_FILE);
-  _CrtSetReportFile (_CRT_ASSERT, _CRTDBXFILE_STDERR);
+  _CrtSetReportFile (_CRT_ASSERT, _CRTDBG_FILE_STDERR);
   // in release mode abort() will pop up a windows error
   // reporting dialog, let's prevent that. Only msvcrxx and
   // the UCRT have this function, but there's no great way to
@@ -1623,9 +1623,9 @@ void
   va_start (args, argv);
   while ((option = va_arg (args, char *)))
     {
-      if (xstrcmp0 (option, "no_g_set_prgname") == 0)
+      if (g_strcmp0 (option, "no_g_set_prgname") == 0)
         no_g_set_prgname = TRUE;
-      else if (xstrcmp0 (option, G_TEST_OPTION_ISOLATE_DIRS) == 0)
+      else if (g_strcmp0 (option, G_TEST_OPTION_ISOLATE_DIRS) == 0)
         test_isolate_dirs = TRUE;
     }
   va_end (args);
@@ -1656,17 +1656,17 @@ void
     {
       if (g_getenv ("G_TEST_TMPDIR") == NULL)
         {
-          xchar_t *test_prgname = NULL;
-          xchar_t *tmpl = NULL;
-          xerror_t *local_error = NULL;
+          gchar *test_prgname = NULL;
+          gchar *tmpl = NULL;
+          GError *local_error = NULL;
 
           test_prgname = g_path_get_basename (g_get_prgname ());
           if (*test_prgname == '\0')
             {
               g_free (test_prgname);
-              test_prgname = xstrdup ("unknown");
+              test_prgname = g_strdup ("unknown");
             }
-          tmpl = xstrdup_printf ("test_%s_XXXXXX", test_prgname);
+          tmpl = g_strdup_printf ("test_%s_XXXXXX", test_prgname);
           g_free (test_prgname);
 
           test_isolate_dirs_tmpdir = g_dir_make_tmp (tmpl, &local_error);
@@ -1674,7 +1674,7 @@ void
             {
               g_printerr ("%s: Failed to create temporary directory: %s\n",
                           (*argv)[0], local_error->message);
-              xerror_free (local_error);
+              g_error_free (local_error);
               exit (1);
             }
           g_free (tmpl);
@@ -1693,7 +1693,7 @@ void
            * We set them to ‘/dev/null’ as that should fairly obviously not
            * accidentally work, and should be fairly greppable. */
             {
-              const xchar_t *overridden_environment_variables[] =
+              const gchar *overridden_environment_variables[] =
                 {
                   "HOME",
                   "XDG_CACHE_HOME",
@@ -1703,7 +1703,7 @@ void
                   "XDG_DATA_HOME",
                   "XDG_RUNTIME_DIR",
                 };
-              xsize_t i;
+              gsize i;
 
               for (i = 0; i < G_N_ELEMENTS (overridden_environment_variables); i++)
                 g_setenv (overridden_environment_variables[i], "/dev/null", TRUE);
@@ -1714,14 +1714,14 @@ void
       test_tmpdir = g_getenv ("G_TEST_TMPDIR");
     }
 
-  /* verify xrand_t reliability, needed for reliable seeds */
+  /* verify GRand reliability, needed for reliable seeds */
   if (1)
     {
-      xrand_t *rg = g_rand_new_with_seed (0xc8c49fb6);
-      xuint32_t t1 = g_rand_int (rg), t2 = g_rand_int (rg), t3 = g_rand_int (rg), t4 = g_rand_int (rg);
-      /* g_print ("xrand_t-current: 0x%x 0x%x 0x%x 0x%x\n", t1, t2, t3, t4); */
+      GRand *rg = g_rand_new_with_seed (0xc8c49fb6);
+      guint32 t1 = g_rand_int (rg), t2 = g_rand_int (rg), t3 = g_rand_int (rg), t4 = g_rand_int (rg);
+      /* g_print ("GRand-current: 0x%x 0x%x 0x%x 0x%x\n", t1, t2, t3, t4); */
       if (t1 != 0xfab39f9b || t2 != 0xb948fb0e || t3 != 0x3d31be26 || t4 != 0x43a19d66)
-        g_warning ("random numbers are not xrand_t-2.2 compatible, seeds may be broken (check $G_RANDOM_VERSION)");
+        g_warning ("random numbers are not GRand-2.2 compatible, seeds may be broken (check $G_RANDOM_VERSION)");
       g_rand_free (rg);
     }
 
@@ -1732,12 +1732,12 @@ void
   g_log_set_default_handler (gtest_default_log_handler, NULL);
   g_test_log (G_TEST_LOG_START_BINARY, g_get_prgname(), test_run_seedstr, 0, NULL);
 
-  test_argv0_dirname = (test_argv0 != NULL) ? g_path_get_dirname (test_argv0) : xstrdup (".");
+  test_argv0_dirname = (test_argv0 != NULL) ? g_path_get_dirname (test_argv0) : g_strdup (".");
 
   /* Make sure we get the real dirname that the test was run from */
-  if (xstr_has_suffix (test_argv0_dirname, "/.libs"))
+  if (g_str_has_suffix (test_argv0_dirname, "/.libs"))
     {
-      xchar_t *tmp;
+      gchar *tmp;
       tmp = g_path_get_dirname (test_argv0_dirname);
       g_free (test_argv0_dirname);
       test_argv0_dirname = tmp;
@@ -1765,21 +1765,21 @@ test_cleanup (void)
 }
 
 static void
-test_run_seed (const xchar_t *rseed)
+test_run_seed (const gchar *rseed)
 {
-  xuint_t seed_failed = 0;
+  guint seed_failed = 0;
   if (test_run_rand)
     g_rand_free (test_run_rand);
   test_run_rand = NULL;
   while (strchr (" \t\v\r\n\f", *rseed))
     rseed++;
-  if (strncmp (rseed, "R02S", 4) == 0)  /* seed for random generator 02 (xrand_t-2.2) */
+  if (strncmp (rseed, "R02S", 4) == 0)  /* seed for random generator 02 (GRand-2.2) */
     {
       const char *s = rseed + 4;
       if (strlen (s) >= 32)             /* require 4 * 8 chars */
         {
-          xuint32_t seedarray[4];
-          xchar_t *p, hexbuf[9] = { 0, };
+          guint32 seedarray[4];
+          gchar *p, hexbuf[9] = { 0, };
           memcpy (hexbuf, s + 0, 8);
           seedarray[0] = g_ascii_strtoull (hexbuf, &p, 16);
           seed_failed += p != NULL && *p != 0;
@@ -1799,7 +1799,7 @@ test_run_seed (const xchar_t *rseed)
             }
         }
     }
-  xerror ("Unknown or invalid random seed: %s", rseed);
+  g_error ("Unknown or invalid random seed: %s", rseed);
 }
 
 /**
@@ -1840,7 +1840,7 @@ g_test_rand_int (void)
  * see g_test_rand_int() for details on test case random numbers.
  *
  * Returns: a number with @begin <= number < @end.
- *
+ * 
  * Since: 2.16
  */
 gint32
@@ -1972,11 +1972,11 @@ g_test_minimized_result (double          minimized_quantity,
                          ...)
 {
   long double largs = minimized_quantity;
-  xchar_t *buffer;
+  gchar *buffer;
   va_list args;
 
   va_start (args, format);
-  buffer = xstrdup_vprintf (format, args);
+  buffer = g_strdup_vprintf (format, args);
   va_end (args);
 
   g_test_log (G_TEST_LOG_MIN_RESULT, buffer, NULL, 1, &largs);
@@ -2003,11 +2003,11 @@ g_test_maximized_result (double          maximized_quantity,
                          ...)
 {
   long double largs = maximized_quantity;
-  xchar_t *buffer;
+  gchar *buffer;
   va_list args;
 
   va_start (args, format);
-  buffer = xstrdup_vprintf (format, args);
+  buffer = g_strdup_vprintf (format, args);
   va_end (args);
 
   g_test_log (G_TEST_LOG_MAX_RESULT, buffer, NULL, 1, &largs);
@@ -2027,11 +2027,11 @@ void
 g_test_message (const char *format,
                 ...)
 {
-  xchar_t *buffer;
+  gchar *buffer;
   va_list args;
 
   va_start (args, format);
-  buffer = xstrdup_vprintf (format, args);
+  buffer = g_strdup_vprintf (format, args);
   va_end (args);
 
   g_test_log (G_TEST_LOG_MESSAGE, buffer, NULL, 0, NULL);
@@ -2063,38 +2063,38 @@ void
 g_test_bug_base (const char *uri_pattern)
 {
   g_free (test_uri_base);
-  test_uri_base = xstrdup (uri_pattern);
+  test_uri_base = g_strdup (uri_pattern);
 }
 
 /**
  * g_test_bug:
- * @buxuri_snippet: Bug specific bug tracker URI or URI portion.
+ * @bug_uri_snippet: Bug specific bug tracker URI or URI portion.
  *
  * This function adds a message to test reports that
  * associates a bug URI with a test case.
  *
  * Bug URIs are constructed from a base URI set with g_test_bug_base()
- * and @buxuri_snippet. If g_test_bug_base() has not been called, it is
+ * and @bug_uri_snippet. If g_test_bug_base() has not been called, it is
  * assumed to be the empty string, so a full URI can be provided to
  * g_test_bug() instead.
  *
- * Since GLib 2.70, the base URI is not prepended to @buxuri_snippet if it
+ * Since GLib 2.70, the base URI is not prepended to @bug_uri_snippet if it
  * is already a valid URI.
  *
  * Since: 2.16
  * See also: g_test_summary()
  */
 void
-g_test_bug (const char *buxuri_snippet)
+g_test_bug (const char *bug_uri_snippet)
 {
   const char *c = NULL;
 
-  g_return_if_fail (buxuri_snippet != NULL);
+  g_return_if_fail (bug_uri_snippet != NULL);
 
-  if (xstr_has_prefix (buxuri_snippet, "http:") ||
-      xstr_has_prefix (buxuri_snippet, "https:"))
+  if (g_str_has_prefix (bug_uri_snippet, "http:") ||
+      g_str_has_prefix (bug_uri_snippet, "https:"))
     {
-      g_test_message ("Bug Reference: %s", buxuri_snippet);
+      g_test_message ("Bug Reference: %s", bug_uri_snippet);
       return;
     }
 
@@ -2102,15 +2102,15 @@ g_test_bug (const char *buxuri_snippet)
     c = strstr (test_uri_base, "%s");
   if (c)
     {
-      char *b = xstrndup (test_uri_base, c - test_uri_base);
-      char *s = xstrconcat (b, buxuri_snippet, c + 2, NULL);
+      char *b = g_strndup (test_uri_base, c - test_uri_base);
+      char *s = g_strconcat (b, bug_uri_snippet, c + 2, NULL);
       g_free (b);
       g_test_message ("Bug Reference: %s", s);
       g_free (s);
     }
   else
     g_test_message ("Bug Reference: %s%s",
-                    test_uri_base ? test_uri_base : "", buxuri_snippet);
+                    test_uri_base ? test_uri_base : "", bug_uri_snippet);
 }
 
 /**
@@ -2130,7 +2130,7 @@ g_test_bug (const char *buxuri_snippet)
  * static void
  * test_array_sort (void)
  * {
- *   g_test_summary ("test_t my_array_sort() sorts the array correctly and stably, "
+ *   g_test_summary ("Test my_array_sort() sorts the array correctly and stably, "
  *                   "including testing zero length and one-element arrays.");
  *
  *   …
@@ -2166,7 +2166,7 @@ g_test_get_root (void)
     {
       test_suite_root = g_test_create_suite ("root");
       g_free (test_suite_root->name);
-      test_suite_root->name = xstrdup ("");
+      test_suite_root->name = g_strdup ("");
     }
 
   return test_suite_root;
@@ -2223,8 +2223,8 @@ g_test_run (void)
   if (atexit (test_cleanup) != 0)
     {
       int errsv = errno;
-      xerror ("Unable to register test cleanup to be run at exit: %s",
-               xstrerror (errsv));
+      g_error ("Unable to register test cleanup to be run at exit: %s",
+               g_strerror (errsv));
     }
 
   suite = g_test_get_root ();
@@ -2299,22 +2299,22 @@ out:
  */
 GTestCase*
 g_test_create_case (const char       *test_name,
-                    xsize_t             data_size,
-                    xconstpointer     test_data,
+                    gsize             data_size,
+                    gconstpointer     test_data,
                     GTestFixtureFunc  data_setup,
                     GTestFixtureFunc  data_test,
                     GTestFixtureFunc  data_teardown)
 {
   GTestCase *tc;
 
-  xreturn_val_if_fail (test_name != NULL, NULL);
-  xreturn_val_if_fail (strchr (test_name, '/') == NULL, NULL);
-  xreturn_val_if_fail (test_name[0] != 0, NULL);
-  xreturn_val_if_fail (data_test != NULL, NULL);
+  g_return_val_if_fail (test_name != NULL, NULL);
+  g_return_val_if_fail (strchr (test_name, '/') == NULL, NULL);
+  g_return_val_if_fail (test_name[0] != 0, NULL);
+  g_return_val_if_fail (data_test != NULL, NULL);
 
   tc = g_slice_new0 (GTestCase);
-  tc->name = xstrdup (test_name);
-  tc->test_data = (xpointer_t) test_data;
+  tc->name = g_strdup (test_name);
+  tc->test_data = (gpointer) test_data;
   tc->fixture_size = data_size;
   tc->fixture_setup = (void*) data_setup;
   tc->fixture_test = (void*) data_test;
@@ -2323,20 +2323,20 @@ g_test_create_case (const char       *test_name,
   return tc;
 }
 
-static xint_t
-find_suite (xconstpointer l, xconstpointer s)
+static gint
+find_suite (gconstpointer l, gconstpointer s)
 {
   const GTestSuite *suite = l;
-  const xchar_t *str = s;
+  const gchar *str = s;
 
   return strcmp (suite->name, str);
 }
 
-static xint_t
-find_case (xconstpointer l, xconstpointer s)
+static gint
+find_case (gconstpointer l, gconstpointer s)
 {
   const GTestCase *tc = l;
-  const xchar_t *str = s;
+  const gchar *str = s;
 
   return strcmp (tc->name, str);
 }
@@ -2361,14 +2361,14 @@ find_case (xconstpointer l, xconstpointer s)
  */
 void
 g_test_add_vtable (const char       *testpath,
-                   xsize_t             data_size,
-                   xconstpointer     test_data,
+                   gsize             data_size,
+                   gconstpointer     test_data,
                    GTestFixtureFunc  data_setup,
                    GTestFixtureFunc  fixture_test_func,
                    GTestFixtureFunc  data_teardown)
 {
-  xchar_t **segments;
-  xuint_t ui;
+  gchar **segments;
+  guint ui;
   GTestSuite *suite;
 
   g_return_if_fail (testpath != NULL);
@@ -2377,20 +2377,20 @@ g_test_add_vtable (const char       *testpath,
   g_return_if_fail (!test_isolate_dirs || strstr (testpath, "/.") == NULL);
 
   suite = g_test_get_root();
-  segments = xstrsplit (testpath, "/", -1);
+  segments = g_strsplit (testpath, "/", -1);
   for (ui = 0; segments[ui] != NULL; ui++)
     {
       const char *seg = segments[ui];
-      xboolean_t islast = segments[ui + 1] == NULL;
+      gboolean islast = segments[ui + 1] == NULL;
       if (islast && !seg[0])
-        xerror ("invalid test case path: %s", testpath);
+        g_error ("invalid test case path: %s", testpath);
       else if (!seg[0])
         continue;       /* initial or duplicate slash */
       else if (!islast)
         {
-          xslist_t *l;
+          GSList *l;
           GTestSuite *csuite;
-          l = xslist_find_custom (suite->suites, seg, find_suite);
+          l = g_slist_find_custom (suite->suites, seg, find_suite);
           if (l)
             {
               csuite = l->data;
@@ -2406,14 +2406,14 @@ g_test_add_vtable (const char       *testpath,
         {
           GTestCase *tc;
 
-          if (xslist_find_custom (suite->cases, seg, find_case))
-            xerror ("duplicate test case path: %s", testpath);
+          if (g_slist_find_custom (suite->cases, seg, find_case))
+            g_error ("duplicate test case path: %s", testpath);
 
           tc = g_test_create_case (seg, data_size, test_data, data_setup, fixture_test_func, data_teardown);
           g_test_suite_add (suite, tc);
         }
     }
-  xstrfreev (segments);
+  g_strfreev (segments);
 }
 
 /**
@@ -2422,7 +2422,7 @@ g_test_add_vtable (const char       *testpath,
  * Indicates that a test failed. This function can be called
  * multiple times from the same test. You can use this function
  * if your test failed in a recoverable way.
- *
+ * 
  * Do not use this function if the failure of a test could cause
  * other tests to malfunction.
  *
@@ -2467,7 +2467,7 @@ g_test_fail_printf (const char *format,
   test_run_success = G_TEST_RUN_FAILURE;
   va_start (args, format);
   g_free (test_run_msg);
-  test_run_msg = xstrdup_vprintf (format, args);
+  test_run_msg = g_strdup_vprintf (format, args);
   va_end (args);
 }
 
@@ -2489,11 +2489,11 @@ g_test_fail_printf (const char *format,
  * Since: 2.38
  */
 void
-g_test_incomplete (const xchar_t *msg)
+g_test_incomplete (const gchar *msg)
 {
   test_run_success = G_TEST_RUN_INCOMPLETE;
   g_free (test_run_msg);
-  test_run_msg = xstrdup (msg);
+  test_run_msg = g_strdup (msg);
 }
 
 /**
@@ -2502,7 +2502,7 @@ g_test_incomplete (const xchar_t *msg)
  * @...:    printf-like arguments to @format
  *
  * Equivalent to g_test_incomplete(), but the explanation is formatted
- * as if by xstrdup_printf().
+ * as if by g_strdup_printf().
  *
  * Since: 2.70
  */
@@ -2515,7 +2515,7 @@ g_test_incomplete_printf (const char *format,
   test_run_success = G_TEST_RUN_INCOMPLETE;
   va_start (args, format);
   g_free (test_run_msg);
-  test_run_msg = xstrdup_vprintf (format, args);
+  test_run_msg = g_strdup_vprintf (format, args);
   va_end (args);
 }
 
@@ -2535,11 +2535,11 @@ g_test_incomplete_printf (const char *format,
  * Since: 2.38
  */
 void
-g_test_skip (const xchar_t *msg)
+g_test_skip (const gchar *msg)
 {
   test_run_success = G_TEST_RUN_SKIPPED;
   g_free (test_run_msg);
-  test_run_msg = xstrdup (msg);
+  test_run_msg = g_strdup (msg);
 }
 
 /**
@@ -2548,7 +2548,7 @@ g_test_skip (const xchar_t *msg)
  * @...:    printf-like arguments to @format
  *
  * Equivalent to g_test_skip(), but the explanation is formatted
- * as if by xstrdup_printf().
+ * as if by g_strdup_printf().
  *
  * Since: 2.70
  */
@@ -2561,7 +2561,7 @@ g_test_skip_printf (const char *format,
   test_run_success = G_TEST_RUN_SKIPPED;
   va_start (args, format);
   g_free (test_run_msg);
-  test_run_msg = xstrdup_vprintf (format, args);
+  test_run_msg = g_strdup_vprintf (format, args);
   va_end (args);
 }
 
@@ -2583,7 +2583,7 @@ g_test_skip_printf (const char *format,
  *
  * Since: 2.38
  */
-xboolean_t
+gboolean
 g_test_failed (void)
 {
   return test_run_success != G_TEST_RUN_SUCCESS;
@@ -2599,7 +2599,7 @@ g_test_failed (void)
  * g_test_fail() so that it will not cause the test program to abort
  * after completing the failed test.)
  *
- * Note that the g_assert_not_reached() and xassert() macros are not
+ * Note that the g_assert_not_reached() and g_assert() macros are not
  * affected by this.
  *
  * This function can only be called after g_test_init().
@@ -2610,7 +2610,7 @@ void
 g_test_set_nonfatal_assertions (void)
 {
   if (!g_test_config_vars->test_initialized)
-    xerror ("g_test_set_nonfatal_assertions called without g_test_init");
+    g_error ("g_test_set_nonfatal_assertions called without g_test_init");
   test_nonfatal_assertions = TRUE;
   test_mode_fatal = FALSE;
 }
@@ -2666,7 +2666,7 @@ g_test_add_func (const char *testpath,
 /**
  * g_test_add_data_func:
  * @testpath:  /-separated test case path name for the test.
- * @test_data: test_t data argument for the test function.
+ * @test_data: Test data argument for the test function.
  * @test_func: (scope async): The test function to invoke for this test.
  *
  * Create a new test case, similar to g_test_create_case(). However
@@ -2687,7 +2687,7 @@ g_test_add_func (const char *testpath,
  */
 void
 g_test_add_data_func (const char     *testpath,
-                      xconstpointer   test_data,
+                      gconstpointer   test_data,
                       GTestDataFunc   test_func)
 {
   g_return_if_fail (testpath != NULL);
@@ -2700,9 +2700,9 @@ g_test_add_data_func (const char     *testpath,
 /**
  * g_test_add_data_func_full:
  * @testpath: /-separated test case path name for the test.
- * @test_data: test_t data argument for the test function.
+ * @test_data: Test data argument for the test function.
  * @test_func: The test function to invoke for this test.
- * @data_free_func: #xdestroy_notify_t for @test_data.
+ * @data_free_func: #GDestroyNotify for @test_data.
  *
  * Create a new test case, as with g_test_add_data_func(), but freeing
  * @test_data after the test run is complete.
@@ -2711,9 +2711,9 @@ g_test_add_data_func (const char     *testpath,
  */
 void
 g_test_add_data_func_full (const char     *testpath,
-                           xpointer_t        test_data,
+                           gpointer        test_data,
                            GTestDataFunc   test_func,
-                           xdestroy_notify_t  data_free_func)
+                           GDestroyNotify  data_free_func)
 {
   g_return_if_fail (testpath != NULL);
   g_return_if_fail (testpath[0] == '/');
@@ -2724,11 +2724,11 @@ g_test_add_data_func_full (const char     *testpath,
                      (GTestFixtureFunc) data_free_func);
 }
 
-static xboolean_t
+static gboolean
 g_test_suite_case_exists (GTestSuite *suite,
                           const char *test_path)
 {
-  xslist_t *iter;
+  GSList *iter;
   char *slash;
   GTestCase *tc;
 
@@ -2773,11 +2773,11 @@ GTestSuite*
 g_test_create_suite (const char *suite_name)
 {
   GTestSuite *ts;
-  xreturn_val_if_fail (suite_name != NULL, NULL);
-  xreturn_val_if_fail (strchr (suite_name, '/') == NULL, NULL);
-  xreturn_val_if_fail (suite_name[0] != 0, NULL);
+  g_return_val_if_fail (suite_name != NULL, NULL);
+  g_return_val_if_fail (strchr (suite_name, '/') == NULL, NULL);
+  g_return_val_if_fail (suite_name[0] != 0, NULL);
   ts = g_slice_new0 (GTestSuite);
-  ts->name = xstrdup (suite_name);
+  ts->name = g_strdup (suite_name);
   return ts;
 }
 
@@ -2797,7 +2797,7 @@ g_test_suite_add (GTestSuite     *suite,
   g_return_if_fail (suite != NULL);
   g_return_if_fail (test_case != NULL);
 
-  suite->cases = xslist_append (suite->cases, test_case);
+  suite->cases = g_slist_append (suite->cases, test_case);
 }
 
 /**
@@ -2816,7 +2816,7 @@ g_test_suite_add_suite (GTestSuite     *suite,
   g_return_if_fail (suite != NULL);
   g_return_if_fail (nestedsuite != NULL);
 
-  suite->suites = xslist_append (suite->suites, nestedsuite);
+  suite->suites = g_slist_append (suite->suites, nestedsuite);
 }
 
 /**
@@ -2830,7 +2830,7 @@ g_test_suite_add_suite (GTestSuite     *suite,
  * Since: 2.16
  */
 void
-g_test_queue_free (xpointer_t gfree_pointer)
+g_test_queue_free (gpointer gfree_pointer)
 {
   if (gfree_pointer)
     g_test_queue_destroy (g_free, gfree_pointer);
@@ -2851,8 +2851,8 @@ g_test_queue_free (xpointer_t gfree_pointer)
  * Since: 2.16
  */
 void
-g_test_queue_destroy (xdestroy_notify_t destroy_func,
-                      xpointer_t       destroy_data)
+g_test_queue_destroy (GDestroyNotify destroy_func,
+                      gpointer       destroy_data)
 {
   DestroyEntry *dentry;
 
@@ -2865,12 +2865,12 @@ g_test_queue_destroy (xdestroy_notify_t destroy_func,
   test_destroy_queue = dentry;
 }
 
-static xint_t
-test_has_prefix (xconstpointer a,
-                 xconstpointer b)
+static gint
+test_has_prefix (gconstpointer a,
+                 gconstpointer b)
 {
-    const xchar_t *test_path_skipped_local = (const xchar_t *)a;
-    const xchar_t* test_run_name_local = (const xchar_t*)b;
+    const gchar *test_path_skipped_local = (const gchar *)a;
+    const gchar* test_run_name_local = (const gchar*)b;
     if (test_prefix_extended_skipped)
       {
         /* If both are null, we consider that it doesn't match */
@@ -2878,15 +2878,15 @@ test_has_prefix (xconstpointer a,
           return FALSE;
         return strncmp (test_run_name_local, test_path_skipped_local, strlen (test_path_skipped_local));
       }
-    return xstrcmp0 (test_run_name_local, test_path_skipped_local);
+    return g_strcmp0 (test_run_name_local, test_path_skipped_local);
 }
 
-static xboolean_t
+static gboolean
 test_case_run (GTestCase *tc)
 {
-  xchar_t *old_base = xstrdup (test_uri_base);
-  xslist_t **old_free_list, *filename_free_list = NULL;
-  xboolean_t success = G_TEST_RUN_SUCCESS;
+  gchar *old_base = g_strdup (test_uri_base);
+  GSList **old_free_list, *filename_free_list = NULL;
+  gboolean success = G_TEST_RUN_SUCCESS;
 
   old_free_list = test_filename_free_list;
   test_filename_free_list = &filename_free_list;
@@ -2896,11 +2896,11 @@ test_case_run (GTestCase *tc)
   else if (test_run_list)
     {
       g_print ("%s\n", test_run_name);
-      g_test_log (G_TEST_LOXLIST_CASE, test_run_name, NULL, 0, NULL);
+      g_test_log (G_TEST_LOG_LIST_CASE, test_run_name, NULL, 0, NULL);
     }
   else
     {
-      xtimer_t *test_run_timer = g_timer_new();
+      GTimer *test_run_timer = g_timer_new();
       long double largs[3];
       void *fixture;
       g_test_log (G_TEST_LOG_START_CASE, test_run_name, NULL, 0, NULL);
@@ -2908,17 +2908,17 @@ test_case_run (GTestCase *tc)
       test_run_success = G_TEST_RUN_SUCCESS;
       g_clear_pointer (&test_run_msg, g_free);
       g_test_log_set_fatal_handler (NULL, NULL);
-      if (test_paths_skipped && xslist_find_custom (test_paths_skipped, test_run_name, (GCompareFunc)test_has_prefix))
+      if (test_paths_skipped && g_slist_find_custom (test_paths_skipped, test_run_name, (GCompareFunc)test_has_prefix))
         g_test_skip ("by request (-s option)");
       else
         {
-          xerror_t *local_error = NULL;
+          GError *local_error = NULL;
 
           if (!test_do_isolate_dirs (&local_error))
             {
               g_test_log (G_TEST_LOG_ERROR, local_error->message, NULL, 0, NULL);
               g_test_fail ();
-              xerror_free (local_error);
+              g_error_free (local_error);
             }
           else
             {
@@ -2955,7 +2955,7 @@ test_case_run (GTestCase *tc)
       g_timer_destroy (test_run_timer);
     }
 
-  xslist_free_full (filename_free_list, g_free);
+  g_slist_free_full (filename_free_list, g_free);
   test_filename_free_list = old_free_list;
   g_free (test_uri_base);
   test_uri_base = old_base;
@@ -2965,7 +2965,7 @@ test_case_run (GTestCase *tc)
           success == G_TEST_RUN_INCOMPLETE);
 }
 
-static xboolean_t
+static gboolean
 path_has_prefix (const char *path,
                  const char *prefix)
 {
@@ -2976,17 +2976,17 @@ path_has_prefix (const char *path,
            path[prefix_len] == '/'));
 }
 
-static xboolean_t
+static gboolean
 test_should_run (const char *test_path,
                  const char *cmp_path)
 {
   if (strstr (test_run_name, "/subprocess"))
     {
-      if (xstrcmp0 (test_path, cmp_path) == 0)
+      if (g_strcmp0 (test_path, cmp_path) == 0)
         return TRUE;
 
       if (g_test_verbose ())
-        g_print ("xtest_t: skipping: %s\n", test_run_name);
+        g_print ("GTest: skipping: %s\n", test_run_name);
       return FALSE;
     }
 
@@ -3000,11 +3000,11 @@ static int
 g_test_run_suite_internal (GTestSuite *suite,
                            const char *path)
 {
-  xuint_t n_bad = 0;
-  xchar_t *old_name = test_run_name;
-  xslist_t *iter;
+  guint n_bad = 0;
+  gchar *old_name = test_run_name;
+  GSList *iter;
 
-  xreturn_val_if_fail (suite != NULL, -1);
+  g_return_val_if_fail (suite != NULL, -1);
 
   g_test_log (G_TEST_LOG_START_SUITE, suite->name, NULL, 0, NULL);
 
@@ -3049,9 +3049,9 @@ static int
 g_test_suite_count (GTestSuite *suite)
 {
   int n = 0;
-  xslist_t *iter;
+  GSList *iter;
 
-  xreturn_val_if_fail (suite != NULL, -1);
+  g_return_val_if_fail (suite != NULL, -1);
 
   for (iter = suite->cases; iter; iter = iter->next)
     {
@@ -3094,16 +3094,16 @@ g_test_run_suite (GTestSuite *suite)
 {
   int n_bad = 0;
 
-  xreturn_val_if_fail (g_test_run_once == TRUE, -1);
+  g_return_val_if_fail (g_test_run_once == TRUE, -1);
 
   g_test_run_once = FALSE;
   test_count = g_test_suite_count (suite);
 
-  test_run_name = xstrdup_printf ("/%s", suite->name);
+  test_run_name = g_strdup_printf ("/%s", suite->name);
 
   if (test_paths)
     {
-      xslist_t *iter;
+      GSList *iter;
 
       for (iter = test_paths; iter; iter = iter->next)
         n_bad += g_test_run_suite_internal (suite, iter->data);
@@ -3143,25 +3143,25 @@ g_test_case_free (GTestCase *test_case)
 void
 g_test_suite_free (GTestSuite *suite)
 {
-  xslist_free_full (suite->cases, (xdestroy_notify_t)g_test_case_free);
+  g_slist_free_full (suite->cases, (GDestroyNotify)g_test_case_free);
 
   g_free (suite->name);
 
-  xslist_free_full (suite->suites, (xdestroy_notify_t)g_test_suite_free);
+  g_slist_free_full (suite->suites, (GDestroyNotify)g_test_suite_free);
 
   g_slice_free (GTestSuite, suite);
 }
 
 static void
-gtest_default_log_handler (const xchar_t    *log_domain,
+gtest_default_log_handler (const gchar    *log_domain,
                            GLogLevelFlags  log_level,
-                           const xchar_t    *message,
-                           xpointer_t        unused_data)
+                           const gchar    *message,
+                           gpointer        unused_data)
 {
-  const xchar_t *strv[16];
-  xboolean_t fatal = FALSE;
-  xchar_t *msg;
-  xuint_t i = 0;
+  const gchar *strv[16];
+  gboolean fatal = FALSE;
+  gchar *msg;
+  guint i = 0;
 
   if (log_domain)
     {
@@ -3191,7 +3191,7 @@ gtest_default_log_handler (const xchar_t    *log_domain,
   strv[i++] = message;
   strv[i++] = NULL;
 
-  msg = xstrjoinv ("", (xchar_t**) strv);
+  msg = g_strjoinv ("", (gchar**) strv);
   g_test_log (fatal ? G_TEST_LOG_ERROR : G_TEST_LOG_MESSAGE, msg, NULL, 0, NULL);
   g_log_default_handler (log_domain, log_level, message, unused_data);
 
@@ -3211,7 +3211,7 @@ g_assertion_message (const char     *domain,
   if (!message)
     message = "code should not be reached";
   g_snprintf (lstr, 32, "%d", line);
-  s = xstrconcat (domain ? domain : "", domain && domain[0] ? ":" : "",
+  s = g_strconcat (domain ? domain : "", domain && domain[0] ? ":" : "",
                    "ERROR:", file, ":", lstr, ":",
                    func, func[0] ? ":" : "",
                    " ", message, NULL);
@@ -3261,7 +3261,7 @@ g_assertion_message (const char     *domain,
  * @func: function containing the assertion
  * @expr: (nullable): expression which failed
  *
- * Internal function used to print messages from the public xassert() and
+ * Internal function used to print messages from the public g_assert() and
  * g_assert_not_reached() macros.
  */
 void
@@ -3273,9 +3273,9 @@ g_assertion_message_expr (const char     *domain,
 {
   char *s;
   if (!expr)
-    s = xstrdup ("code should not be reached");
+    s = g_strdup ("code should not be reached");
   else
-    s = xstrconcat ("assertion failed: (", expr, ")", NULL);
+    s = g_strconcat ("assertion failed: (", expr, ")", NULL);
   g_assertion_message (domain, file, line, func, s);
   g_free (s);
 
@@ -3304,9 +3304,9 @@ g_assertion_message_cmpnum (const char     *domain,
 
   switch (numtype)
     {
-    case 'i':   s = xstrdup_printf ("assertion failed (%s): (%" G_GINT64_MODIFIER "i %s %" G_GINT64_MODIFIER "i)", expr, (sint64_t) arg1, cmp, (sint64_t) arg2); break;
-    case 'x':   s = xstrdup_printf ("assertion failed (%s): (0x%08" G_GINT64_MODIFIER "x %s 0x%08" G_GINT64_MODIFIER "x)", expr, (xuint64_t) arg1, cmp, (xuint64_t) arg2); break;
-    case 'f':   s = xstrdup_printf ("assertion failed (%s): (%.9g %s %.9g)", expr, (double) arg1, cmp, (double) arg2); break;
+    case 'i':   s = g_strdup_printf ("assertion failed (%s): (%" G_GINT64_MODIFIER "i %s %" G_GINT64_MODIFIER "i)", expr, (gint64) arg1, cmp, (gint64) arg2); break;
+    case 'x':   s = g_strdup_printf ("assertion failed (%s): (0x%08" G_GINT64_MODIFIER "x %s 0x%08" G_GINT64_MODIFIER "x)", expr, (guint64) arg1, cmp, (guint64) arg2); break;
+    case 'f':   s = g_strdup_printf ("assertion failed (%s): (%.9g %s %.9g)", expr, (double) arg1, cmp, (double) arg2); break;
       /* ideally use: floats=%.7g double=%.17g */
     }
   g_assertion_message (domain, file, line, func, s);
@@ -3324,11 +3324,11 @@ g_assertion_message_cmpstr (const char     *domain,
                             const char     *arg2)
 {
   char *a1, *a2, *s, *t1 = NULL, *t2 = NULL;
-  a1 = arg1 ? xstrconcat ("\"", t1 = xstrescape (arg1, NULL), "\"", NULL) : xstrdup ("NULL");
-  a2 = arg2 ? xstrconcat ("\"", t2 = xstrescape (arg2, NULL), "\"", NULL) : xstrdup ("NULL");
+  a1 = arg1 ? g_strconcat ("\"", t1 = g_strescape (arg1, NULL), "\"", NULL) : g_strdup ("NULL");
+  a2 = arg2 ? g_strconcat ("\"", t2 = g_strescape (arg2, NULL), "\"", NULL) : g_strdup ("NULL");
   g_free (t1);
   g_free (t2);
-  s = xstrdup_printf ("assertion failed (%s): (%s %s %s)", expr, a1, cmp, a2);
+  s = g_strdup_printf ("assertion failed (%s): (%s %s %s)", expr, a1, cmp, a2);
   g_free (a1);
   g_free (a2);
   g_assertion_message (domain, file, line, func, s);
@@ -3343,16 +3343,16 @@ g_assertion_message_cmpstrv (const char         *domain,
                              const char         *expr,
                              const char * const *arg1,
                              const char * const *arg2,
-                             xsize_t               first_wrong_idx)
+                             gsize               first_wrong_idx)
 {
   const char *s1 = arg1[first_wrong_idx], *s2 = arg2[first_wrong_idx];
   char *a1, *a2, *s, *t1 = NULL, *t2 = NULL;
 
-  a1 = xstrconcat ("\"", t1 = xstrescape (s1, NULL), "\"", NULL);
-  a2 = xstrconcat ("\"", t2 = xstrescape (s2, NULL), "\"", NULL);
+  a1 = g_strconcat ("\"", t1 = g_strescape (s1, NULL), "\"", NULL);
+  a2 = g_strconcat ("\"", t2 = g_strescape (s2, NULL), "\"", NULL);
   g_free (t1);
   g_free (t2);
-  s = xstrdup_printf ("assertion failed (%s): first differing element at index %" G_GSIZE_FORMAT ": %s does not equal %s",
+  s = g_strdup_printf ("assertion failed (%s): first differing element at index %" G_GSIZE_FORMAT ": %s does not equal %s",
                        expr, first_wrong_idx, a1, a2);
   g_free (a1);
   g_free (a2);
@@ -3366,36 +3366,36 @@ g_assertion_message_error (const char     *domain,
 			   int             line,
 			   const char     *func,
 			   const char     *expr,
-			   const xerror_t   *error,
-			   xquark          error_domain,
+			   const GError   *error,
+			   GQuark          error_domain,
 			   int             error_code)
 {
-  xstring_t *xstring;
+  GString *gstring;
 
   /* This is used by both g_assert_error() and g_assert_no_error(), so there
    * are three cases: expected an error but got the wrong error, expected
    * an error but got no error, and expected no error but got an error.
    */
 
-  xstring = xstring_new ("assertion failed ");
+  gstring = g_string_new ("assertion failed ");
   if (error_domain)
-      xstring_append_printf (xstring, "(%s == (%s, %d)): ", expr,
+      g_string_append_printf (gstring, "(%s == (%s, %d)): ", expr,
 			      g_quark_to_string (error_domain), error_code);
   else
-    xstring_append_printf (xstring, "(%s == NULL): ", expr);
+    g_string_append_printf (gstring, "(%s == NULL): ", expr);
 
   if (error)
-      xstring_append_printf (xstring, "%s (%s, %d)", error->message,
+      g_string_append_printf (gstring, "%s (%s, %d)", error->message,
 			      g_quark_to_string (error->domain), error->code);
   else
-    xstring_append_printf (xstring, "%s is NULL", expr);
+    g_string_append_printf (gstring, "%s is NULL", expr);
 
-  g_assertion_message (domain, file, line, func, xstring->str);
-  xstring_free (xstring, TRUE);
+  g_assertion_message (domain, file, line, func, gstring->str);
+  g_string_free (gstring, TRUE);
 }
 
 /**
- * xstrcmp0:
+ * g_strcmp0:
  * @str1: (nullable): a C string or %NULL
  * @str2: (nullable): another C string or %NULL
  *
@@ -3408,7 +3408,7 @@ g_assertion_message_error (const char     *domain,
  * Since: 2.16
  */
 int
-xstrcmp0 (const char     *str1,
+g_strcmp0 (const char     *str1,
            const char     *str2)
 {
   if (!str1)
@@ -3444,41 +3444,41 @@ safe_dup2 (int fd1,
 #endif
 
 typedef struct {
-  xpid_t pid;
-  xmain_loop_t *loop;
+  GPid pid;
+  GMainLoop *loop;
   int child_status;  /* unmodified platform-specific status */
 
-  xio_channel_t *stdout_io;
-  xboolean_t echo_stdout;
-  xstring_t *stdout_str;
+  GIOChannel *stdout_io;
+  gboolean echo_stdout;
+  GString *stdout_str;
 
-  xio_channel_t *stderr_io;
-  xboolean_t echo_stderr;
-  xstring_t *stderr_str;
+  GIOChannel *stderr_io;
+  gboolean echo_stderr;
+  GString *stderr_str;
 } WaitForChildData;
 
 static void
 check_complete (WaitForChildData *data)
 {
   if (data->child_status != -1 && data->stdout_io == NULL && data->stderr_io == NULL)
-    xmain_loop_quit (data->loop);
+    g_main_loop_quit (data->loop);
 }
 
 static void
-child_exited (xpid_t     pid,
-              xint_t     status,
-              xpointer_t user_data)
+child_exited (GPid     pid,
+              gint     status,
+              gpointer user_data)
 {
   WaitForChildData *data = user_data;
 
-  xassert (status != -1);
+  g_assert (status != -1);
   data->child_status = status;
 
   check_complete (data);
 }
 
-static xboolean_t
-child_timeout (xpointer_t user_data)
+static gboolean
+child_timeout (gpointer user_data)
 {
   WaitForChildData *data = user_data;
 
@@ -3491,13 +3491,13 @@ child_timeout (xpointer_t user_data)
   return FALSE;
 }
 
-static xboolean_t
-child_read (xio_channel_t *io, xio_condition_t cond, xpointer_t user_data)
+static gboolean
+child_read (GIOChannel *io, GIOCondition cond, gpointer user_data)
 {
   WaitForChildData *data = user_data;
   GIOStatus status;
-  xsize_t nread, nwrote, total;
-  xchar_t buf[4096];
+  gsize nread, nwrote, total;
+  gchar buf[4096];
   FILE *echo_file = NULL;
 
   status = g_io_channel_read_chars (io, buf, sizeof (buf), &nread, NULL);
@@ -3517,13 +3517,13 @@ child_read (xio_channel_t *io, xio_condition_t cond, xpointer_t user_data)
 
   if (io == data->stdout_io)
     {
-      xstring_append_len (data->stdout_str, buf, nread);
+      g_string_append_len (data->stdout_str, buf, nread);
       if (data->echo_stdout)
         echo_file = stdout;
     }
   else
     {
-      xstring_append_len (data->stderr_str, buf, nread);
+      g_string_append_len (data->stderr_str, buf, nread);
       if (data->echo_stderr)
         echo_file = stderr;
     }
@@ -3537,7 +3537,7 @@ child_read (xio_channel_t *io, xio_condition_t cond, xpointer_t user_data)
           nwrote = fwrite (buf + total, 1, nread - total, echo_file);
           errsv = errno;
           if (nwrote == 0)
-            xerror ("write failed: %s", xstrerror (errsv));
+            g_error ("write failed: %s", g_strerror (errsv));
         }
     }
 
@@ -3545,65 +3545,65 @@ child_read (xio_channel_t *io, xio_condition_t cond, xpointer_t user_data)
 }
 
 static void
-wait_for_child (xpid_t pid,
-                int stdout_fd, xboolean_t echo_stdout,
-                int stderr_fd, xboolean_t echo_stderr,
-                xuint64_t timeout)
+wait_for_child (GPid pid,
+                int stdout_fd, gboolean echo_stdout,
+                int stderr_fd, gboolean echo_stderr,
+                guint64 timeout)
 {
   WaitForChildData data;
-  xmain_context_t *context;
-  xsource_t *source;
+  GMainContext *context;
+  GSource *source;
 
   data.pid = pid;
   data.child_status = -1;
 
-  context = xmain_context_new ();
-  data.loop = xmain_loop_new (context, FALSE);
+  context = g_main_context_new ();
+  data.loop = g_main_loop_new (context, FALSE);
 
   source = g_child_watch_source_new (pid);
-  xsource_set_callback (source, (xsource_func_t) child_exited, &data, NULL);
-  xsource_attach (source, context);
-  xsource_unref (source);
+  g_source_set_callback (source, (GSourceFunc) child_exited, &data, NULL);
+  g_source_attach (source, context);
+  g_source_unref (source);
 
   data.echo_stdout = echo_stdout;
-  data.stdout_str = xstring_new (NULL);
+  data.stdout_str = g_string_new (NULL);
   data.stdout_io = g_io_channel_unix_new (stdout_fd);
   g_io_channel_set_close_on_unref (data.stdout_io, TRUE);
   g_io_channel_set_encoding (data.stdout_io, NULL, NULL);
   g_io_channel_set_buffered (data.stdout_io, FALSE);
   source = g_io_create_watch (data.stdout_io, G_IO_IN | G_IO_ERR | G_IO_HUP);
-  xsource_set_callback (source, (xsource_func_t) child_read, &data, NULL);
-  xsource_attach (source, context);
-  xsource_unref (source);
+  g_source_set_callback (source, (GSourceFunc) child_read, &data, NULL);
+  g_source_attach (source, context);
+  g_source_unref (source);
 
   data.echo_stderr = echo_stderr;
-  data.stderr_str = xstring_new (NULL);
+  data.stderr_str = g_string_new (NULL);
   data.stderr_io = g_io_channel_unix_new (stderr_fd);
   g_io_channel_set_close_on_unref (data.stderr_io, TRUE);
   g_io_channel_set_encoding (data.stderr_io, NULL, NULL);
   g_io_channel_set_buffered (data.stderr_io, FALSE);
   source = g_io_create_watch (data.stderr_io, G_IO_IN | G_IO_ERR | G_IO_HUP);
-  xsource_set_callback (source, (xsource_func_t) child_read, &data, NULL);
-  xsource_attach (source, context);
-  xsource_unref (source);
+  g_source_set_callback (source, (GSourceFunc) child_read, &data, NULL);
+  g_source_attach (source, context);
+  g_source_unref (source);
 
   if (timeout)
     {
       source = g_timeout_source_new (0);
-      xsource_set_ready_time (source, g_get_monotonic_time () + timeout);
-      xsource_set_callback (source, (xsource_func_t) child_timeout, &data, NULL);
-      xsource_attach (source, context);
-      xsource_unref (source);
+      g_source_set_ready_time (source, g_get_monotonic_time () + timeout);
+      g_source_set_callback (source, (GSourceFunc) child_timeout, &data, NULL);
+      g_source_attach (source, context);
+      g_source_unref (source);
     }
 
-  xmain_loop_run (data.loop);
-  xmain_loop_unref (data.loop);
-  xmain_context_unref (context);
+  g_main_loop_run (data.loop);
+  g_main_loop_unref (data.loop);
+  g_main_context_unref (context);
 
   test_trap_last_pid = pid;
   test_trap_last_status = data.child_status;
-  test_trap_last_stdout = xstring_free (data.stdout_str, FALSE);
-  test_trap_last_stderr = xstring_free (data.stderr_str, FALSE);
+  test_trap_last_stdout = g_string_free (data.stdout_str, FALSE);
+  test_trap_last_stderr = g_string_free (data.stderr_str, FALSE);
 
   g_clear_pointer (&data.stdout_io, g_io_channel_unref);
   g_clear_pointer (&data.stderr_io, g_io_channel_unref);
@@ -3627,7 +3627,7 @@ wait_for_child (xpid_t pid,
  * The forking parent process then asserts successful child program
  * termination and validates child program outputs.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  *   static void
  *   test_fork_patterns (void)
  *   {
@@ -3652,8 +3652,8 @@ wait_for_child (xpid_t pid,
  * fork-without-exec. Use g_test_trap_subprocess() instead.
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-xboolean_t
-g_test_trap_fork (xuint64_t        usec_timeout,
+gboolean
+g_test_trap_fork (guint64        usec_timeout,
                   GTestTrapFlags test_trap_flags)
 {
 #ifdef G_OS_UNIX
@@ -3665,12 +3665,12 @@ g_test_trap_fork (xuint64_t        usec_timeout,
   if (pipe (stdout_pipe) < 0 || pipe (stderr_pipe) < 0)
     {
       errsv = errno;
-      xerror ("failed to create pipes to fork test program: %s", xstrerror (errsv));
+      g_error ("failed to create pipes to fork test program: %s", g_strerror (errsv));
     }
   test_trap_last_pid = fork ();
   errsv = errno;
   if (test_trap_last_pid < 0)
-    xerror ("failed to fork test program: %s", xstrerror (errsv));
+    g_error ("failed to fork test program: %s", g_strerror (errsv));
   if (test_trap_last_pid == 0)  /* child */
     {
       int fd0 = -1;
@@ -3681,12 +3681,12 @@ g_test_trap_fork (xuint64_t        usec_timeout,
         {
           fd0 = g_open ("/dev/null", O_RDONLY, 0);
           if (fd0 < 0)
-            xerror ("failed to open /dev/null for stdin redirection");
+            g_error ("failed to open /dev/null for stdin redirection");
         }
       if (safe_dup2 (stdout_pipe[1], 1) < 0 || safe_dup2 (stderr_pipe[1], 2) < 0 || (fd0 >= 0 && safe_dup2 (fd0, 0) < 0))
         {
           errsv = errno;
-          xerror ("failed to dup2() in forked test program: %s", xstrerror (errsv));
+          g_error ("failed to dup2() in forked test program: %s", g_strerror (errsv));
         }
       if (fd0 >= 3)
         close (fd0);
@@ -3730,7 +3730,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
  * g_test_trap_subprocess:
- * @test_path: (nullable): test_t to run in a subprocess
+ * @test_path: (nullable): Test to run in a subprocess
  * @usec_timeout: Timeout for the subprocess test in micro seconds.
  * @test_flags:   Flags to modify subprocess behaviour.
  *
@@ -3759,7 +3759,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * check the results of the subprocess. (But note that
  * g_test_trap_assert_stdout() and g_test_trap_assert_stderr()
  * cannot be used if @test_flags specifies that the child should
- * inherit the parent stdout/stderr.)
+ * inherit the parent stdout/stderr.) 
  *
  * If your `main ()` needs to behave differently in
  * the subprocess, you can call g_test_subprocess() (after calling
@@ -3769,7 +3769,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * `my_object_new(1000000)` will abort with an error
  * message.
  *
- * |[<!-- language="C" -->
+ * |[<!-- language="C" --> 
  *   static void
  *   test_create_large_object (void)
  *   {
@@ -3800,22 +3800,22 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  */
 void
 g_test_trap_subprocess (const char           *test_path,
-                        xuint64_t               usec_timeout,
+                        guint64               usec_timeout,
                         GTestSubprocessFlags  test_flags)
 {
-  xerror_t *error = NULL;
-  xptr_array_t *argv;
+  GError *error = NULL;
+  GPtrArray *argv;
   GSpawnFlags flags;
   int stdout_fd, stderr_fd;
-  xpid_t pid;
+  GPid pid;
 
   /* Sanity check that they used GTestSubprocessFlags, not GTestTrapFlags */
-  xassert ((test_flags & (G_TEST_TRAP_INHERIT_STDIN | G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR)) == 0);
+  g_assert ((test_flags & (G_TEST_TRAP_INHERIT_STDIN | G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR)) == 0);
 
   if (test_path)
     {
       if (!g_test_suite_case_exists (g_test_get_root (), test_path))
-        xerror ("g_test_trap_subprocess: test does not exist: %s", test_path);
+        g_error ("g_test_trap_subprocess: test does not exist: %s", test_path);
     }
   else
     {
@@ -3823,29 +3823,29 @@ g_test_trap_subprocess (const char           *test_path,
     }
 
   if (g_test_verbose ())
-    g_print ("xtest_t: subprocess: %s\n", test_path);
+    g_print ("GTest: subprocess: %s\n", test_path);
 
   test_trap_clear ();
-  test_trap_last_subprocess = xstrdup (test_path);
+  test_trap_last_subprocess = g_strdup (test_path);
 
   if (test_argv0 == NULL)
-    xerror ("g_test_trap_subprocess() requires argv0 to be passed to g_test_init()");
+    g_error ("g_test_trap_subprocess() requires argv0 to be passed to g_test_init()");
 
-  argv = xptr_array_new ();
-  xptr_array_add (argv, (char *) test_argv0);
-  xptr_array_add (argv, "-q");
-  xptr_array_add (argv, "-p");
-  xptr_array_add (argv, (char *)test_path);
-  xptr_array_add (argv, "--GTestSubprocess");
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, (char *) test_argv0);
+  g_ptr_array_add (argv, "-q");
+  g_ptr_array_add (argv, "-p");
+  g_ptr_array_add (argv, (char *)test_path);
+  g_ptr_array_add (argv, "--GTestSubprocess");
   if (test_log_fd != -1)
     {
       char log_fd_buf[128];
 
-      xptr_array_add (argv, "--GTestLogFD");
+      g_ptr_array_add (argv, "--GTestLogFD");
       g_snprintf (log_fd_buf, sizeof (log_fd_buf), "%d", test_log_fd);
-      xptr_array_add (argv, log_fd_buf);
+      g_ptr_array_add (argv, log_fd_buf);
     }
-  xptr_array_add (argv, NULL);
+  g_ptr_array_add (argv, NULL);
 
   flags = G_SPAWN_DO_NOT_REAP_CHILD;
   if (test_log_fd != -1)
@@ -3860,10 +3860,10 @@ g_test_trap_subprocess (const char           *test_path,
                                  &pid, NULL, &stdout_fd, &stderr_fd,
                                  &error))
     {
-      xerror ("g_test_trap_subprocess() failed: %s",
+      g_error ("g_test_trap_subprocess() failed: %s",
                error->message);
     }
-  xptr_array_free (argv, TRUE);
+  g_ptr_array_free (argv, TRUE);
 
   wait_for_child (pid,
                   stdout_fd, !!(test_flags & G_TEST_SUBPROCESS_INHERIT_STDOUT),
@@ -3882,7 +3882,7 @@ g_test_trap_subprocess (const char           *test_path,
  *
  * Since: 2.38
  */
-xboolean_t
+gboolean
 g_test_subprocess (void)
 {
   return test_in_subprocess;
@@ -3897,7 +3897,7 @@ g_test_subprocess (void)
  *
  * Since: 2.16
  */
-xboolean_t
+gboolean
 g_test_trap_has_passed (void)
 {
 #ifdef G_OS_UNIX
@@ -3917,7 +3917,7 @@ g_test_trap_has_passed (void)
  *
  * Since: 2.16
  */
-xboolean_t
+gboolean
 g_test_trap_reached_timeout (void)
 {
 #ifdef G_OS_UNIX
@@ -3928,10 +3928,10 @@ g_test_trap_reached_timeout (void)
 #endif
 }
 
-static xboolean_t
-log_child_output (const xchar_t *process_id)
+static gboolean
+log_child_output (const gchar *process_id)
 {
-  xchar_t *escaped;
+  gchar *escaped;
 
 #ifdef G_OS_UNIX
   if (WIFEXITED (test_trap_last_status)) /* normal exit */
@@ -3950,7 +3950,7 @@ log_child_output (const xchar_t *process_id)
     }
   else if (WIFSIGNALED (test_trap_last_status))
     {
-      const xchar_t *maybe_dumped_core = "";
+      const gchar *maybe_dumped_core = "";
 
 #ifdef WCOREDUMP
       if (WCOREDUMP (test_trap_last_status))
@@ -3959,7 +3959,7 @@ log_child_output (const xchar_t *process_id)
 
       g_test_message ("child process (%s) killed by signal %d (%s)%s",
           process_id, WTERMSIG (test_trap_last_status),
-          xstrsignal (WTERMSIG (test_trap_last_status)),
+          g_strsignal (WTERMSIG (test_trap_last_status)),
           maybe_dumped_core);
     }
   else
@@ -3976,11 +3976,11 @@ log_child_output (const xchar_t *process_id)
         process_id, test_trap_last_status);
 #endif
 
-  escaped = xstrescape (test_trap_last_stdout, NULL);
+  escaped = g_strescape (test_trap_last_stdout, NULL);
   g_test_message ("child process (%s) stdout: \"%s\"", process_id, escaped);
   g_free (escaped);
 
-  escaped = xstrescape (test_trap_last_stderr, NULL);
+  escaped = g_strescape (test_trap_last_stderr, NULL);
   g_test_message ("child process (%s) stderr: \"%s\"", process_id, escaped);
   g_free (escaped);
 
@@ -3994,13 +3994,13 @@ g_test_trap_assertions (const char     *domain,
                         const char     *file,
                         int             line,
                         const char     *func,
-                        xuint64_t         assertion_flags, /* 0-pass, 1-fail, 2-outpattern, 4-errpattern */
+                        guint64         assertion_flags, /* 0-pass, 1-fail, 2-outpattern, 4-errpattern */
                         const char     *pattern)
 {
-  xboolean_t must_pass = assertion_flags == 0;
-  xboolean_t must_fail = assertion_flags == 1;
-  xboolean_t match_result = 0 == (assertion_flags & 1);
-  xboolean_t logged_child_output = FALSE;
+  gboolean must_pass = assertion_flags == 0;
+  gboolean must_fail = assertion_flags == 1;
+  gboolean match_result = 0 == (assertion_flags & 1);
+  gboolean logged_child_output = FALSE;
   const char *stdout_pattern = (assertion_flags & 2) ? pattern : NULL;
   const char *stderr_pattern = (assertion_flags & 4) ? pattern : NULL;
   const char *match_error = match_result ? "failed to match" : "contains invalid match";
@@ -4009,17 +4009,17 @@ g_test_trap_assertions (const char     *domain,
 #ifdef G_OS_UNIX
   if (test_trap_last_subprocess != NULL)
     {
-      process_id = xstrdup_printf ("%s [%d]", test_trap_last_subprocess,
+      process_id = g_strdup_printf ("%s [%d]", test_trap_last_subprocess,
                                     test_trap_last_pid);
     }
   else if (test_trap_last_pid != 0)
-    process_id = xstrdup_printf ("%d", test_trap_last_pid);
+    process_id = g_strdup_printf ("%d", test_trap_last_pid);
 #else
   if (test_trap_last_subprocess != NULL)
-    process_id = xstrdup (test_trap_last_subprocess);
+    process_id = g_strdup (test_trap_last_subprocess);
 #endif
   else
-    xerror ("g_test_trap_ assertion with no trapped test");
+    g_error ("g_test_trap_ assertion with no trapped test");
 
   if (must_pass && !g_test_trap_has_passed())
     {
@@ -4027,7 +4027,7 @@ g_test_trap_assertions (const char     *domain,
 
       logged_child_output = logged_child_output || log_child_output (process_id);
 
-      msg = xstrdup_printf ("child process (%s) failed unexpectedly", process_id);
+      msg = g_strdup_printf ("child process (%s) failed unexpectedly", process_id);
       g_assertion_message (domain, file, line, func, msg);
       g_free (msg);
     }
@@ -4037,7 +4037,7 @@ g_test_trap_assertions (const char     *domain,
 
       logged_child_output = logged_child_output || log_child_output (process_id);
 
-      msg = xstrdup_printf ("child process (%s) did not fail as expected", process_id);
+      msg = g_strdup_printf ("child process (%s) did not fail as expected", process_id);
       g_assertion_message (domain, file, line, func, msg);
       g_free (msg);
     }
@@ -4047,7 +4047,7 @@ g_test_trap_assertions (const char     *domain,
 
       logged_child_output = logged_child_output || log_child_output (process_id);
 
-      msg = xstrdup_printf ("stdout of child process (%s) %s: %s\nstdout was:\n%s",
+      msg = g_strdup_printf ("stdout of child process (%s) %s: %s\nstdout was:\n%s",
                              process_id, match_error, stdout_pattern, test_trap_last_stdout);
       g_assertion_message (domain, file, line, func, msg);
       g_free (msg);
@@ -4058,7 +4058,7 @@ g_test_trap_assertions (const char     *domain,
 
       logged_child_output = logged_child_output || log_child_output (process_id);
 
-      msg = xstrdup_printf ("stderr of child process (%s) %s: %s\nstderr was:\n%s",
+      msg = g_strdup_printf ("stderr of child process (%s) %s: %s\nstderr was:\n%s",
                              process_id, match_error, stderr_pattern, test_trap_last_stderr);
       g_assertion_message (domain, file, line, func, msg);
       g_free (msg);
@@ -4070,82 +4070,82 @@ g_test_trap_assertions (const char     *domain,
 }
 
 static void
-xstring_overwrite_int (xstring_t *xstring,
-                       xuint_t    pos,
-                       xuint32_t  vuint)
+gstring_overwrite_int (GString *gstring,
+                       guint    pos,
+                       guint32  vuint)
 {
   vuint = g_htonl (vuint);
-  xstring_overwrite_len (xstring, pos, (const xchar_t*) &vuint, 4);
+  g_string_overwrite_len (gstring, pos, (const gchar*) &vuint, 4);
 }
 
 static void
-xstring_append_int (xstring_t *xstring,
-                    xuint32_t  vuint)
+gstring_append_int (GString *gstring,
+                    guint32  vuint)
 {
   vuint = g_htonl (vuint);
-  xstring_append_len (xstring, (const xchar_t*) &vuint, 4);
+  g_string_append_len (gstring, (const gchar*) &vuint, 4);
 }
 
 static void
-xstring_append_double (xstring_t *xstring,
+gstring_append_double (GString *gstring,
                        double   vdouble)
 {
-  union { double vdouble; xuint64_t vuint64; } u;
+  union { double vdouble; guint64 vuint64; } u;
   u.vdouble = vdouble;
   u.vuint64 = GUINT64_TO_BE (u.vuint64);
-  xstring_append_len (xstring, (const xchar_t*) &u.vuint64, 8);
+  g_string_append_len (gstring, (const gchar*) &u.vuint64, 8);
 }
 
-static xuint8_t*
+static guint8*
 g_test_log_dump (GTestLogMsg *msg,
-                 xuint_t       *len)
+                 guint       *len)
 {
-  xstring_t *xstring = xstring_sized_new (1024);
-  xuint_t ui;
-  xstring_append_int (xstring, 0);              /* message length */
-  xstring_append_int (xstring, msg->log_type);
-  xstring_append_int (xstring, msg->n_strings);
-  xstring_append_int (xstring, msg->n_nums);
-  xstring_append_int (xstring, 0);      /* reserved */
+  GString *gstring = g_string_sized_new (1024);
+  guint ui;
+  gstring_append_int (gstring, 0);              /* message length */
+  gstring_append_int (gstring, msg->log_type);
+  gstring_append_int (gstring, msg->n_strings);
+  gstring_append_int (gstring, msg->n_nums);
+  gstring_append_int (gstring, 0);      /* reserved */
   for (ui = 0; ui < msg->n_strings; ui++)
     {
-      xuint_t l = strlen (msg->strings[ui]);
-      xstring_append_int (xstring, l);
-      xstring_append_len (xstring, msg->strings[ui], l);
+      guint l = strlen (msg->strings[ui]);
+      gstring_append_int (gstring, l);
+      g_string_append_len (gstring, msg->strings[ui], l);
     }
   for (ui = 0; ui < msg->n_nums; ui++)
-    xstring_append_double (xstring, msg->nums[ui]);
-  *len = xstring->len;
-  xstring_overwrite_int (xstring, 0, *len);     /* message length */
-  return (xuint8_t*) xstring_free (xstring, FALSE);
+    gstring_append_double (gstring, msg->nums[ui]);
+  *len = gstring->len;
+  gstring_overwrite_int (gstring, 0, *len);     /* message length */
+  return (guint8*) g_string_free (gstring, FALSE);
 }
 
 static inline long double
-net_double (const xchar_t **ipointer)
+net_double (const gchar **ipointer)
 {
-  union { xuint64_t vuint64; double vdouble; } u;
-  xuint64_t aligned_int64;
+  union { guint64 vuint64; double vdouble; } u;
+  guint64 aligned_int64;
   memcpy (&aligned_int64, *ipointer, 8);
   *ipointer += 8;
   u.vuint64 = GUINT64_FROM_BE (aligned_int64);
   return u.vdouble;
 }
 
-static inline xuint32_t
-net_int (const xchar_t **ipointer)
+static inline guint32
+net_int (const gchar **ipointer)
 {
-  xuint32_t aligned_int;
+  guint32 aligned_int;
   memcpy (&aligned_int, *ipointer, 4);
   *ipointer += 4;
   return g_ntohl (aligned_int);
 }
 
-static xboolean_t
+static gboolean
 g_test_log_extract (GTestLogBuffer *tbuffer)
 {
-  const xchar_t *p = tbuffer->data->str;
+  const gchar *p = tbuffer->data->str;
   GTestLogMsg msg;
-  xuint_t mlength;
+  guint mlength;
   if (tbuffer->data->len < 4 * 5)
     return FALSE;
   mlength = net_int (&p);
@@ -4156,29 +4156,29 @@ g_test_log_extract (GTestLogBuffer *tbuffer)
   msg.n_nums = net_int (&p);
   if (net_int (&p) == 0)
     {
-      xuint_t ui;
-      msg.strings = g_new0 (xchar_t*, msg.n_strings + 1);
+      guint ui;
+      msg.strings = g_new0 (gchar*, msg.n_strings + 1);
       msg.nums = g_new0 (long double, msg.n_nums);
       for (ui = 0; ui < msg.n_strings; ui++)
         {
-          xuint_t sl = net_int (&p);
-          msg.strings[ui] = xstrndup (p, sl);
+          guint sl = net_int (&p);
+          msg.strings[ui] = g_strndup (p, sl);
           p += sl;
         }
       for (ui = 0; ui < msg.n_nums; ui++)
         msg.nums[ui] = net_double (&p);
       if (p <= tbuffer->data->str + mlength)
         {
-          xstring_erase (tbuffer->data, 0, mlength);
-          tbuffer->msgs = xslist_prepend (tbuffer->msgs, g_memdup2 (&msg, sizeof (msg)));
+          g_string_erase (tbuffer->data, 0, mlength);
+          tbuffer->msgs = g_slist_prepend (tbuffer->msgs, g_memdup2 (&msg, sizeof (msg)));
           return TRUE;
         }
 
       g_free (msg.nums);
-      xstrfreev (msg.strings);
+      g_strfreev (msg.strings);
     }
 
-  xerror ("corrupt log stream from test program");
+  g_error ("corrupt log stream from test program");
   return FALSE;
 }
 
@@ -4191,7 +4191,7 @@ GTestLogBuffer*
 g_test_log_buffer_new (void)
 {
   GTestLogBuffer *tb = g_new0 (GTestLogBuffer, 1);
-  tb->data = xstring_sized_new (1024);
+  tb->data = g_string_sized_new (1024);
   return tb;
 }
 
@@ -4206,7 +4206,7 @@ g_test_log_buffer_free (GTestLogBuffer *tbuffer)
   g_return_if_fail (tbuffer != NULL);
   while (tbuffer->msgs)
     g_test_log_msg_free (g_test_log_buffer_pop (tbuffer));
-  xstring_free (tbuffer->data, TRUE);
+  g_string_free (tbuffer->data, TRUE);
   g_free (tbuffer);
 }
 
@@ -4217,15 +4217,15 @@ g_test_log_buffer_free (GTestLogBuffer *tbuffer)
  */
 void
 g_test_log_buffer_push (GTestLogBuffer *tbuffer,
-                        xuint_t           n_bytes,
-                        const xuint8_t   *bytes)
+                        guint           n_bytes,
+                        const guint8   *bytes)
 {
   g_return_if_fail (tbuffer != NULL);
   if (n_bytes)
     {
-      xboolean_t more_messages;
+      gboolean more_messages;
       g_return_if_fail (bytes != NULL);
-      xstring_append_len (tbuffer->data, (const xchar_t*) bytes, n_bytes);
+      g_string_append_len (tbuffer->data, (const gchar*) bytes, n_bytes);
       do
         more_messages = g_test_log_extract (tbuffer);
       while (more_messages);
@@ -4241,12 +4241,12 @@ GTestLogMsg*
 g_test_log_buffer_pop (GTestLogBuffer *tbuffer)
 {
   GTestLogMsg *msg = NULL;
-  xreturn_val_if_fail (tbuffer != NULL, NULL);
+  g_return_val_if_fail (tbuffer != NULL, NULL);
   if (tbuffer->msgs)
     {
-      xslist_t *slist = xslist_last (tbuffer->msgs);
+      GSList *slist = g_slist_last (tbuffer->msgs);
       msg = slist->data;
-      tbuffer->msgs = xslist_delete_link (tbuffer->msgs, slist);
+      tbuffer->msgs = g_slist_delete_link (tbuffer->msgs, slist);
     }
   return msg;
 }
@@ -4260,18 +4260,18 @@ void
 g_test_log_msg_free (GTestLogMsg *tmsg)
 {
   g_return_if_fail (tmsg != NULL);
-  xstrfreev (tmsg->strings);
+  g_strfreev (tmsg->strings);
   g_free (tmsg->nums);
   g_free (tmsg);
 }
 
-static xchar_t *
+static gchar *
 g_test_build_filename_va (GTestFileType  file_type,
-                          const xchar_t   *first_path,
+                          const gchar   *first_path,
                           va_list        ap)
 {
-  const xchar_t *pathv[16];
-  xsize_t num_path_segments;
+  const gchar *pathv[16];
+  gsize num_path_segments;
 
   if (file_type == G_TEST_DIST)
     pathv[0] = test_disted_files_dir;
@@ -4291,7 +4291,7 @@ g_test_build_filename_va (GTestFileType  file_type,
 
   g_assert_cmpint (num_path_segments, <, G_N_ELEMENTS (pathv));
 
-  return g_build_filenamev ((xchar_t **) pathv);
+  return g_build_filenamev ((gchar **) pathv);
 }
 
 /**
@@ -4351,15 +4351,15 @@ g_test_build_filename_va (GTestFileType  file_type,
  *
  * Since: 2.38
  **/
-xchar_t *
+gchar *
 g_test_build_filename (GTestFileType  file_type,
-                       const xchar_t   *first_path,
+                       const gchar   *first_path,
                        ...)
 {
-  xchar_t *result;
+  gchar *result;
   va_list ap;
 
-  xassert (g_test_initialized ());
+  g_assert (g_test_initialized ());
 
   va_start (ap, first_path);
   result = g_test_build_filename_va (file_type, first_path, ap);
@@ -4382,10 +4382,10 @@ g_test_build_filename (GTestFileType  file_type,
  *
  * Since: 2.38
  **/
-const xchar_t *
+const gchar *
 g_test_get_dir (GTestFileType file_type)
 {
-  xassert (g_test_initialized ());
+  g_assert (g_test_initialized ());
 
   if (file_type == G_TEST_DIST)
     return test_disted_files_dir;
@@ -4418,24 +4418,24 @@ g_test_get_dir (GTestFileType file_type)
  *
  * Since: 2.38
  **/
-const xchar_t *
+const gchar *
 g_test_get_filename (GTestFileType  file_type,
-                     const xchar_t   *first_path,
+                     const gchar   *first_path,
                      ...)
 {
-  xchar_t *result;
-  xslist_t *node;
+  gchar *result;
+  GSList *node;
   va_list ap;
 
-  xassert (g_test_initialized ());
+  g_assert (g_test_initialized ());
   if (test_filename_free_list == NULL)
-    xerror ("g_test_get_filename() can only be used within testcase functions");
+    g_error ("g_test_get_filename() can only be used within testcase functions");
 
   va_start (ap, first_path);
   result = g_test_build_filename_va (file_type, first_path, ap);
   va_end (ap);
 
-  node = xslist_prepend (NULL, result);
+  node = g_slist_prepend (NULL, result);
   do
     node->next = *test_filename_free_list;
   while (!g_atomic_pointer_compare_and_exchange (test_filename_free_list, node->next, node));

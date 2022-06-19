@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * gmappedfile.h: Simplified wrapper around the mmap function
  *
  * Copyright 2005 Matthias Clasen
@@ -20,7 +20,7 @@
 #ifndef __G_MAPPED_FILE_H__
 #define __G_MAPPED_FILE_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -29,29 +29,29 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GMappedFile xmapped_file_t;
+typedef struct _GMappedFile GMappedFile;
 
-XPL_AVAILABLE_IN_ALL
-xmapped_file_t *xmapped_file_new          (const xchar_t  *filename,
-				         xboolean_t      writable,
-				         xerror_t      **error);
-XPL_AVAILABLE_IN_ALL
-xmapped_file_t *xmapped_file_new_from_fd  (xint_t          fd,
-					 xboolean_t      writable,
-					 xerror_t      **error);
-XPL_AVAILABLE_IN_ALL
-xsize_t        xmapped_file_get_length   (xmapped_file_t  *file);
-XPL_AVAILABLE_IN_ALL
-xchar_t       *xmapped_file_get_contents (xmapped_file_t  *file);
-XPL_AVAILABLE_IN_2_34
-xbytes_t *     xmapped_file_get_bytes    (xmapped_file_t  *file);
-XPL_AVAILABLE_IN_ALL
-xmapped_file_t *xmapped_file_ref          (xmapped_file_t  *file);
-XPL_AVAILABLE_IN_ALL
-void         xmapped_file_unref        (xmapped_file_t  *file);
+GLIB_AVAILABLE_IN_ALL
+GMappedFile *g_mapped_file_new          (const gchar  *filename,
+				         gboolean      writable,
+				         GError      **error);
+GLIB_AVAILABLE_IN_ALL
+GMappedFile *g_mapped_file_new_from_fd  (gint          fd,
+					 gboolean      writable,
+					 GError      **error);
+GLIB_AVAILABLE_IN_ALL
+gsize        g_mapped_file_get_length   (GMappedFile  *file);
+GLIB_AVAILABLE_IN_ALL
+gchar       *g_mapped_file_get_contents (GMappedFile  *file);
+GLIB_AVAILABLE_IN_2_34
+GBytes *     g_mapped_file_get_bytes    (GMappedFile  *file);
+GLIB_AVAILABLE_IN_ALL
+GMappedFile *g_mapped_file_ref          (GMappedFile  *file);
+GLIB_AVAILABLE_IN_ALL
+void         g_mapped_file_unref        (GMappedFile  *file);
 
-XPL_DEPRECATED_FOR(xmapped_file_unref)
-void         xmapped_file_free         (xmapped_file_t  *file);
+GLIB_DEPRECATED_FOR(g_mapped_file_unref)
+void         g_mapped_file_free         (GMappedFile  *file);
 
 G_END_DECLS
 

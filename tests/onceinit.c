@@ -23,8 +23,8 @@
 
 #define N_THREADS               (13)
 
-static xmutex_t       tmutex;
-static xcond_t        tcond;
+static GMutex       tmutex;
+static GCond        tcond;
 static int thread_call_count = 0;  /* (atomic) */
 static char         dummy_value = 'x';
 
@@ -34,7 +34,7 @@ assert_singleton_execution1 (void)
   static int seen_execution = 0;  /* (atomic) */
   int old_seen_execution = g_atomic_int_add (&seen_execution, 1);
   if (old_seen_execution != 0)
-    xerror ("%s: function executed more than once", G_STRFUNC);
+    g_error ("%s: function executed more than once", G_STRFUNC);
 }
 
 static void
@@ -43,7 +43,7 @@ assert_singleton_execution2 (void)
   static int seen_execution = 0;  /* (atomic) */
   int old_seen_execution = g_atomic_int_add (&seen_execution, 1);
   if (old_seen_execution != 0)
-    xerror ("%s: function executed more than once", G_STRFUNC);
+    g_error ("%s: function executed more than once", G_STRFUNC);
 }
 
 static void
@@ -52,30 +52,30 @@ assert_singleton_execution3 (void)
   static int seen_execution = 0;  /* (atomic) */
   int old_seen_execution = g_atomic_int_add (&seen_execution, 1);
   if (old_seen_execution != 0)
-    xerror ("%s: function executed more than once", G_STRFUNC);
+    g_error ("%s: function executed more than once", G_STRFUNC);
 }
 
 static void
 initializer1 (void)
 {
-  static xsize_t initialized = 0;
+  static gsize initialized = 0;
   if (g_once_init_enter (&initialized))
     {
-      xsize_t initval = 42;
+      gsize initval = 42;
       assert_singleton_execution1();
       g_once_init_leave (&initialized, initval);
     }
 }
 
-static xpointer_t
+static gpointer
 initializer2 (void)
 {
-  static xsize_t initialized = 0;
+  static gsize initialized = 0;
   if (g_once_init_enter (&initialized))
     {
       void *pointer_value = &dummy_value;
       assert_singleton_execution2();
-      g_once_init_leave (&initialized, (xsize_t) pointer_value);
+      g_once_init_leave (&initialized, (gsize) pointer_value);
     }
   return (void*) initialized;
 }
@@ -83,18 +83,18 @@ initializer2 (void)
 static void
 initializer3 (void)
 {
-  static xsize_t initialized = 0;
+  static gsize initialized = 0;
   if (g_once_init_enter (&initialized))
     {
-      xsize_t initval = 42;
+      gsize initval = 42;
       assert_singleton_execution3();
       g_usleep (25 * 1000);     /* waste time for multiple threads to wait */
       g_once_init_leave (&initialized, initval);
     }
 }
 
-static xpointer_t
-tmain_call_initializer3 (xpointer_t user_data)
+static gpointer
+tmain_call_initializer3 (gpointer user_data)
 {
   g_mutex_lock (&tmutex);
   g_cond_wait (&tcond, &tmutex);
@@ -112,7 +112,7 @@ int
 main (int   argc,
       char *argv[])
 {
-  G_GNUC_UNUSED xthread_t *threads[N_THREADS];
+  G_GNUC_UNUSED GThread *threads[N_THREADS];
   int i;
   void *p;
 
@@ -121,13 +121,13 @@ main (int   argc,
   initializer1();
   /* test pointer initializer */
   p = initializer2();
-  xassert (p == &dummy_value);
+  g_assert (p == &dummy_value);
   p = initializer2();
-  xassert (p == &dummy_value);
+  g_assert (p == &dummy_value);
   /* start multiple threads for initializer3() */
   g_mutex_lock (&tmutex);
   for (i = 0; i < N_THREADS; i++)
-    threads[i] = xthread_create (tmain_call_initializer3, 0, FALSE, NULL);
+    threads[i] = g_thread_create (tmain_call_initializer3, 0, FALSE, NULL);
   g_mutex_unlock (&tmutex);
   /* concurrently call initializer3() */
   g_cond_broadcast (&tcond);
@@ -135,7 +135,7 @@ main (int   argc,
   while (g_atomic_int_get (&thread_call_count) < i)
     {
       if (rand() % 2)
-        xthread_yield();   /* concurrent shuffling for single core */
+        g_thread_yield();   /* concurrent shuffling for single core */
       else
         g_usleep (1000);    /* concurrent shuffling for multi core */
       g_cond_broadcast (&tcond);
@@ -144,7 +144,7 @@ main (int   argc,
   g_mutex_lock (&tmutex);
   g_atomic_int_set (&thread_call_count, 0);
   for (i = 0; i < N_THREADS; i++)
-    xthread_create (stress_concurrent_initializers, 0, FALSE, NULL);
+    g_thread_create (stress_concurrent_initializers, 0, FALSE, NULL);
   g_mutex_unlock (&tmutex);
   while (g_atomic_int_get (&thread_call_count) < 256 * 4 * N_THREADS)
     g_usleep (50 * 1000);       /* wait for all 5 threads to complete */
@@ -163,12 +163,12 @@ main (int   argc,
       static void                                       \
       test_initializer_##N (void)                       \
       {                                                 \
-        static xsize_t initialized = 0;                   \
+        static gsize initialized = 0;                   \
         if (g_once_init_enter (&initialized))           \
           {                                             \
-            g_free (xstrdup_printf ("cpuhog%5d", 1));  \
-            g_free (xstrdup_printf ("cpuhog%6d", 2));  \
-            g_free (xstrdup_printf ("cpuhog%7d", 3));  \
+            g_free (g_strdup_printf ("cpuhog%5d", 1));  \
+            g_free (g_strdup_printf ("cpuhog%6d", 2));  \
+            g_free (g_strdup_printf ("cpuhog%7d", 3));  \
             g_once_init_leave (&initialized, 1);        \
           }                                             \
       }
@@ -259,7 +259,7 @@ stress_concurrent_initializers (void *user_data)
     LIST_256_TEST_INITIALIZERS (stress3),
     LIST_256_TEST_INITIALIZERS (stress4),
   };
-  xsize_t i;
+  gsize i;
   /* sync to main thread */
   g_mutex_lock (&tmutex);
   g_mutex_unlock (&tmutex);

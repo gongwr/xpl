@@ -5,107 +5,107 @@
 #include <unistd.h>
 #endif
 
-#define XTYPE_TEST               (xtest_get_type ())
-#define XTEST(test)              (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, xtest_t))
-#define MY_IS_TEST(test)           (XTYPE_CHECK_INSTANCE_TYPE ((test), XTYPE_TEST))
-#define XTEST_CLASS(tclass)      (XTYPE_CHECK_CLASS_CAST ((tclass), XTYPE_TEST, xtest_class_t))
-#define MY_IS_TEST_CLASS(tclass)   (XTYPE_CHECK_CLASS_TYPE ((tclass), XTYPE_TEST))
-#define XTEST_GET_CLASS(test)    (XTYPE_INSTANCE_GET_CLASS ((test), XTYPE_TEST, xtest_class_t))
+#define G_TYPE_TEST               (my_test_get_type ())
+#define MY_TEST(test)              (G_TYPE_CHECK_INSTANCE_CAST ((test), G_TYPE_TEST, GTest))
+#define MY_IS_TEST(test)           (G_TYPE_CHECK_INSTANCE_TYPE ((test), G_TYPE_TEST))
+#define MY_TEST_CLASS(tclass)      (G_TYPE_CHECK_CLASS_CAST ((tclass), G_TYPE_TEST, GTestClass))
+#define MY_IS_TEST_CLASS(tclass)   (G_TYPE_CHECK_CLASS_TYPE ((tclass), G_TYPE_TEST))
+#define MY_TEST_GET_CLASS(test)    (G_TYPE_INSTANCE_GET_CLASS ((test), G_TYPE_TEST, GTestClass))
 
-typedef struct _xtest xtest_t;
-typedef struct _xtest_class xtest_class_t;
+typedef struct _GTest GTest;
+typedef struct _GTestClass GTestClass;
 
-struct _xtest
+struct _GTest
 {
-  xobject_t object;
+  GObject object;
 };
 
-struct _xtest_class
+struct _GTestClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-static xtype_t xtest_get_type (void);
-static xint_t stopping;  /* (atomic) */
+static GType my_test_get_type (void);
+static gint stopping;  /* (atomic) */
 
-static void xtest_class_init (xtest_class_t * klass);
-static void xtest_init (xtest_t * test);
-static void xtest_dispose (xobject_t * object);
+static void my_test_class_init (GTestClass * klass);
+static void my_test_init (GTest * test);
+static void my_test_dispose (GObject * object);
 
-static xobject_class_t *parent_class = NULL;
+static GObjectClass *parent_class = NULL;
 
-static xtype_t
-xtest_get_type (void)
+static GType
+my_test_get_type (void)
 {
-  static xtype_t test_type = 0;
+  static GType test_type = 0;
 
   if (!test_type) {
-    const xtype_info_t test_info = {
-      sizeof (xtest_class_t),
+    const GTypeInfo test_info = {
+      sizeof (GTestClass),
       NULL,
       NULL,
-      (xclass_init_func_t) xtest_class_init,
+      (GClassInitFunc) my_test_class_init,
       NULL,
       NULL,
-      sizeof (xtest_t),
+      sizeof (GTest),
       0,
-      (xinstance_init_func_t) xtest_init,
+      (GInstanceInitFunc) my_test_init,
       NULL
     };
 
-    test_type = xtype_register_static (XTYPE_OBJECT, "xtest_t",
+    test_type = g_type_register_static (G_TYPE_OBJECT, "GTest",
         &test_info, 0);
   }
   return test_type;
 }
 
 static void
-xtest_class_init (xtest_class_t * klass)
+my_test_class_init (GTestClass * klass)
 {
-  xobject_class_t *xobject_class;
+  GObjectClass *gobject_class;
 
-  xobject_class = (xobject_class_t *) klass;
+  gobject_class = (GObjectClass *) klass;
 
-  parent_class = xtype_class_ref (XTYPE_OBJECT);
+  parent_class = g_type_class_ref (G_TYPE_OBJECT);
 
-  xobject_class->dispose = xtest_dispose;
+  gobject_class->dispose = my_test_dispose;
 }
 
 static void
-xtest_init (xtest_t * test)
+my_test_init (GTest * test)
 {
   g_print ("init %p\n", test);
 }
 
 static void
-xtest_dispose (xobject_t * object)
+my_test_dispose (GObject * object)
 {
-  xtest_t *test;
+  GTest *test;
 
-  test = XTEST (object);
+  test = MY_TEST (object);
 
   g_print ("dispose %p!\n", test);
 
-  XOBJECT_CLASS (parent_class)->dispose (object);
+  G_OBJECT_CLASS (parent_class)->dispose (object);
 }
 
 static void
-xtest_do_refcount (xtest_t * test)
+my_test_do_refcount (GTest * test)
 {
-  xobject_ref (test);
-  xobject_unref (test);
+  g_object_ref (test); 
+  g_object_unref (test); 
 }
 
-static xpointer_t
-run_thread (xtest_t * test)
+static gpointer
+run_thread (GTest * test)
 {
-  xint_t i = 1;
+  gint i = 1;
 
   while (!g_atomic_int_get (&stopping)) {
-    xtest_do_refcount (test);
+    my_test_do_refcount (test);
     if ((i++ % 10000) == 0) {
       g_print (".");
-      xthread_yield(); /* force context switch */
+      g_thread_yield(); /* force context switch */
     }
   }
 
@@ -115,28 +115,28 @@ run_thread (xtest_t * test)
 int
 main (int argc, char **argv)
 {
-  xuint_t i;
-  xtest_t *test1, *test2;
-  xarray_t *test_threads;
-  const xuint_t n_threads = 5;
+  guint i;
+  GTest *test1, *test2;
+  GArray *test_threads;
+  const guint n_threads = 5;
 
   g_print ("START: %s\n", argv[0]);
   g_log_set_always_fatal (G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL | g_log_set_always_fatal (G_LOG_FATAL_MASK));
 
-  test1 = xobject_new (XTYPE_TEST, NULL);
-  test2 = xobject_new (XTYPE_TEST, NULL);
+  test1 = g_object_new (G_TYPE_TEST, NULL);
+  test2 = g_object_new (G_TYPE_TEST, NULL);
 
-  test_threads = g_array_new (FALSE, FALSE, sizeof (xthread_t *));
+  test_threads = g_array_new (FALSE, FALSE, sizeof (GThread *));
 
   g_atomic_int_set (&stopping, 0);
 
   for (i = 0; i < n_threads; i++) {
-    xthread_t *thread;
+    GThread *thread;
 
-    thread = xthread_create ((GThreadFunc) run_thread, test1, TRUE, NULL);
+    thread = g_thread_create ((GThreadFunc) run_thread, test1, TRUE, NULL);
     g_array_append_val (test_threads, thread);
 
-    thread = xthread_create ((GThreadFunc) run_thread, test2, TRUE, NULL);
+    thread = g_thread_create ((GThreadFunc) run_thread, test2, TRUE, NULL);
     g_array_append_val (test_threads, thread);
   }
   g_usleep (5000000);
@@ -147,14 +147,14 @@ main (int argc, char **argv)
 
   /* join all threads */
   for (i = 0; i < 2 * n_threads; i++) {
-    xthread_t *thread;
+    GThread *thread;
 
-    thread = g_array_index (test_threads, xthread_t *, i);
-    xthread_join (thread);
+    thread = g_array_index (test_threads, GThread *, i);
+    g_thread_join (thread);
   }
 
-  xobject_unref (test1);
-  xobject_unref (test2);
+  g_object_unref (test1);
+  g_object_unref (test2);
   g_array_unref (test_threads);
 
   g_print ("stopped\n");

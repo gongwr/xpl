@@ -23,7 +23,7 @@
 #include <dlfcn.h>
 
 /* This is used in gsocketclient-slow.c used to test
- * and get coverage on how xsocket_client_t reacts to
+ * and get coverage on how GSocketClient reacts to
  * slow connections.
  */
 int

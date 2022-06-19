@@ -20,7 +20,7 @@
 #ifndef __G_TIME_ZONE_H__
 #define __G_TIME_ZONE_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -29,7 +29,7 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GTimeZone xtimezone_t;
+typedef struct _GTimeZone GTimeZone;
 
 /**
  * GTimeType:
@@ -53,43 +53,43 @@ typedef enum
   G_TIME_TYPE_UNIVERSAL
 } GTimeType;
 
-XPL_DEPRECATED_IN_2_68_FOR (xtime_zone_new_identifier)
-xtimezone_t *             xtime_zone_new                                 (const xchar_t *identifier);
-XPL_AVAILABLE_IN_2_68
-xtimezone_t *             xtime_zone_new_identifier                      (const xchar_t *identifier);
-XPL_AVAILABLE_IN_ALL
-xtimezone_t *             xtime_zone_new_utc                             (void);
-XPL_AVAILABLE_IN_ALL
-xtimezone_t *             xtime_zone_new_local                           (void);
-XPL_AVAILABLE_IN_2_58
-xtimezone_t *             xtime_zone_new_offset                          (gint32       seconds);
+GLIB_DEPRECATED_IN_2_68_FOR (g_time_zone_new_identifier)
+GTimeZone *             g_time_zone_new                                 (const gchar *identifier);
+GLIB_AVAILABLE_IN_2_68
+GTimeZone *             g_time_zone_new_identifier                      (const gchar *identifier);
+GLIB_AVAILABLE_IN_ALL
+GTimeZone *             g_time_zone_new_utc                             (void);
+GLIB_AVAILABLE_IN_ALL
+GTimeZone *             g_time_zone_new_local                           (void);
+GLIB_AVAILABLE_IN_2_58
+GTimeZone *             g_time_zone_new_offset                          (gint32       seconds);
 
-XPL_AVAILABLE_IN_ALL
-xtimezone_t *             xtime_zone_ref                                 (xtimezone_t   *tz);
-XPL_AVAILABLE_IN_ALL
-void                    xtime_zone_unref                               (xtimezone_t   *tz);
+GLIB_AVAILABLE_IN_ALL
+GTimeZone *             g_time_zone_ref                                 (GTimeZone   *tz);
+GLIB_AVAILABLE_IN_ALL
+void                    g_time_zone_unref                               (GTimeZone   *tz);
 
-XPL_AVAILABLE_IN_ALL
-xint_t                    xtime_zone_find_interval                       (xtimezone_t   *tz,
+GLIB_AVAILABLE_IN_ALL
+gint                    g_time_zone_find_interval                       (GTimeZone   *tz,
                                                                          GTimeType    type,
-                                                                         sint64_t       time_);
+                                                                         gint64       time_);
 
-XPL_AVAILABLE_IN_ALL
-xint_t                    xtime_zone_adjust_time                         (xtimezone_t   *tz,
+GLIB_AVAILABLE_IN_ALL
+gint                    g_time_zone_adjust_time                         (GTimeZone   *tz,
                                                                          GTimeType    type,
-                                                                         sint64_t      *time_);
+                                                                         gint64      *time_);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *           xtime_zone_get_abbreviation                    (xtimezone_t   *tz,
-                                                                         xint_t         interval);
-XPL_AVAILABLE_IN_ALL
-gint32                  xtime_zone_get_offset                          (xtimezone_t   *tz,
-                                                                         xint_t         interval);
-XPL_AVAILABLE_IN_ALL
-xboolean_t                xtime_zone_is_dst                              (xtimezone_t   *tz,
-                                                                         xint_t         interval);
-XPL_AVAILABLE_IN_2_58
-const xchar_t *           xtime_zone_get_identifier                      (xtimezone_t   *tz);
+GLIB_AVAILABLE_IN_ALL
+const gchar *           g_time_zone_get_abbreviation                    (GTimeZone   *tz,
+                                                                         gint         interval);
+GLIB_AVAILABLE_IN_ALL
+gint32                  g_time_zone_get_offset                          (GTimeZone   *tz,
+                                                                         gint         interval);
+GLIB_AVAILABLE_IN_ALL
+gboolean                g_time_zone_is_dst                              (GTimeZone   *tz,
+                                                                         gint         interval);
+GLIB_AVAILABLE_IN_2_58
+const gchar *           g_time_zone_get_identifier                      (GTimeZone   *tz);
 
 G_END_DECLS
 

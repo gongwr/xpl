@@ -29,22 +29,22 @@
 static void
 test_empty_address (void)
 {
-  xerror_t *error;
+  GError *error;
   error = NULL;
   g_dbus_address_get_stream_sync ("",
                                   NULL,
                                   NULL,
                                   &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
-  xerror_free (error);
+  g_error_free (error);
 }
 
-/* test_t that g_dbus_is_supported_address() returns FALSE for an unparsable
+/* Test that g_dbus_is_supported_address() returns FALSE for an unparsable
  * address. */
 static void
 test_unsupported_address (void)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   g_assert_false (g_dbus_is_supported_address (";", &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -52,9 +52,9 @@ test_unsupported_address (void)
 }
 
 static void
-assert_is_supported_address (const xchar_t *address)
+assert_is_supported_address (const gchar *address)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   g_assert_true (g_dbus_is_address (address));
 
@@ -64,9 +64,9 @@ assert_is_supported_address (const xchar_t *address)
 }
 
 static void
-assert_not_supported_address (const xchar_t *address)
+assert_not_supported_address (const gchar *address)
 {
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   g_assert_true (g_dbus_is_address (address));
 
@@ -76,7 +76,7 @@ assert_not_supported_address (const xchar_t *address)
   g_clear_error (&error);
 }
 
-/* test_t that g_dbus_is_address() returns FALSE for various differently invalid
+/* Test that g_dbus_is_address() returns FALSE for various differently invalid
  * input strings. */
 static void
 test_address_parsing (void)
@@ -192,11 +192,11 @@ static const struct { const char *before; const char *after; } escaping[] = {
 static void
 test_escape_address (void)
 {
-  xsize_t i;
+  gsize i;
 
   for (i = 0; escaping[i].before != NULL; i++)
     {
-      xchar_t *s = g_dbus_address_escape_value (escaping[i].before);
+      gchar *s = g_dbus_address_escape_value (escaping[i].before);
 
       g_assert_cmpstr (s, ==, escaping[i].after);
       g_free (s);

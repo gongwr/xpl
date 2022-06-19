@@ -32,18 +32,18 @@
 
 #define G_TEMP_FAILURE_RETRY(expression)      \
   ({                                          \
-    xssize_t __result;                          \
+    gssize __result;                          \
                                               \
     do                                        \
-      __result = (xssize_t) (expression);       \
+      __result = (gssize) (expression);       \
     while (__result == -1 && errno == EINTR); \
                                               \
     __result;                                 \
   })
 
-static xboolean_t g_fd_is_regular_file (int fd) G_GNUC_UNUSED;
+static gboolean g_fd_is_regular_file (int fd) G_GNUC_UNUSED;
 
-xboolean_t
+gboolean
 _g_fd_is_pollable (int fd)
 {
   /*
@@ -78,11 +78,11 @@ _g_fd_is_pollable (int fd)
 
   int efd;
   struct epoll_event ev = { 0, };
-  xboolean_t add_succeeded;
+  gboolean add_succeeded;
 
   efd = epoll_create (1);
   if (efd == -1)
-    xerror ("epoll_create () failed: %s", xstrerror (errno));
+    g_error ("epoll_create () failed: %s", g_strerror (errno));
 
   ev.events = EPOLLIN;
 
@@ -103,14 +103,14 @@ _g_fd_is_pollable (int fd)
 
   int kfd;
   struct kevent ev;
-  xboolean_t add_succeeded;
+  gboolean add_succeeded;
 
   if (g_fd_is_regular_file (fd))
     return FALSE;
 
   kfd = kqueue ();
   if (kfd == -1)
-    xerror ("kqueue () failed: %s", xstrerror (errno));
+    g_error ("kqueue () failed: %s", g_strerror (errno));
 
   EV_SET (&ev, fd, EVFILT_READ, EV_ADD, 0, 0, NULL);
 
@@ -133,7 +133,7 @@ _g_fd_is_pollable (int fd)
 #endif
 }
 
-static xboolean_t
+static gboolean
 g_fd_is_regular_file (int fd)
 {
   struct stat st;

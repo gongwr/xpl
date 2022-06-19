@@ -15,25 +15,25 @@
  *          Ryan Lortie <desrt@desrt.ca>
  */
 
-#ifndef __XSOCKET_OUTPUT_STREAM_H__
-#define __XSOCKET_OUTPUT_STREAM_H__
+#ifndef __G_SOCKET_OUTPUT_STREAM_H__
+#define __G_SOCKET_OUTPUT_STREAM_H__
 
 #include <gio/goutputstream.h>
 #include <gio/gsocket.h>
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_OUTPUT_STREAM                         (_xsocket_output_stream_get_type ())
-#define XSOCKET_OUTPUT_STREAM(inst)                        (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_OUTPUT_STREAM, GSocketOutputStream))
-#define XSOCKET_OUTPUT_STREAM_CLASS(class)                 (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_OUTPUT_STREAM, GSocketOutputStreamClass))
-#define X_IS_SOCKET_OUTPUT_STREAM(inst)                     (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET_OUTPUT_STREAM))
-#define X_IS_SOCKET_OUTPUT_STREAM_CLASS(class)              (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET_OUTPUT_STREAM))
-#define XSOCKET_OUTPUT_STREAM_GET_CLASS(inst)              (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_OUTPUT_STREAM, GSocketOutputStreamClass))
+#define G_TYPE_SOCKET_OUTPUT_STREAM                         (_g_socket_output_stream_get_type ())
+#define G_SOCKET_OUTPUT_STREAM(inst)                        (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET_OUTPUT_STREAM, GSocketOutputStream))
+#define G_SOCKET_OUTPUT_STREAM_CLASS(class)                 (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET_OUTPUT_STREAM, GSocketOutputStreamClass))
+#define G_IS_SOCKET_OUTPUT_STREAM(inst)                     (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET_OUTPUT_STREAM))
+#define G_IS_SOCKET_OUTPUT_STREAM_CLASS(class)              (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET_OUTPUT_STREAM))
+#define G_SOCKET_OUTPUT_STREAM_GET_CLASS(inst)              (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET_OUTPUT_STREAM, GSocketOutputStreamClass))
 
 typedef struct _GSocketOutputStreamPrivate                  GSocketOutputStreamPrivate;
 typedef struct _GSocketOutputStreamClass                    GSocketOutputStreamClass;
@@ -41,18 +41,18 @@ typedef struct _GSocketOutputStream                         GSocketOutputStream;
 
 struct _GSocketOutputStreamClass
 {
-  xoutput_stream_class_t parent_class;
+  GOutputStreamClass parent_class;
 };
 
 struct _GSocketOutputStream
 {
-  xoutput_stream_t parent_instance;
+  GOutputStream parent_instance;
   GSocketOutputStreamPrivate *priv;
 };
 
-xtype_t                   _xsocket_output_stream_get_type                 (void) G_GNUC_CONST;
-GSocketOutputStream *   _xsocket_output_stream_new                     (xsocket_t *socket);
+GType                   _g_socket_output_stream_get_type                 (void) G_GNUC_CONST;
+GSocketOutputStream *   _g_socket_output_stream_new                     (GSocket *socket);
 
 G_END_DECLS
 
-#endif /* __XSOCKET_OUTPUT_STREAM_H__ */
+#endif /* __G_SOCKET_OUTPUT_STREAM_H__ */

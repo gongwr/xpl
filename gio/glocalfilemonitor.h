@@ -26,79 +26,79 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_LOCAL_FILE_MONITOR		(g_local_file_monitor_get_type ())
-#define G_LOCAL_FILE_MONITOR(o)			(XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_LOCAL_FILE_MONITOR, xlocal_file_monitor))
-#define G_LOCAL_FILE_MONITOR_CLASS(k)		(XTYPE_CHECK_CLASS_CAST ((k), XTYPE_LOCAL_FILE_MONITOR, xlocal_file_monitor_class))
-#define X_IS_LOCAL_FILE_MONITOR(o)		(XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_LOCAL_FILE_MONITOR))
-#define X_IS_LOCAL_FILE_MONITOR_CLASS(k)	(XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_LOCAL_FILE_MONITOR))
-#define G_LOCAL_FILE_MONITOR_GET_CLASS(o)       (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_LOCAL_FILE_MONITOR, xlocal_file_monitor_class))
+#define G_TYPE_LOCAL_FILE_MONITOR		(g_local_file_monitor_get_type ())
+#define G_LOCAL_FILE_MONITOR(o)			(G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_LOCAL_FILE_MONITOR, GLocalFileMonitor))
+#define G_LOCAL_FILE_MONITOR_CLASS(k)		(G_TYPE_CHECK_CLASS_CAST ((k), G_TYPE_LOCAL_FILE_MONITOR, GLocalFileMonitorClass))
+#define G_IS_LOCAL_FILE_MONITOR(o)		(G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_LOCAL_FILE_MONITOR))
+#define G_IS_LOCAL_FILE_MONITOR_CLASS(k)	(G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_LOCAL_FILE_MONITOR))
+#define G_LOCAL_FILE_MONITOR_GET_CLASS(o)       (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_LOCAL_FILE_MONITOR, GLocalFileMonitorClass))
 
 #define G_LOCAL_FILE_MONITOR_EXTENSION_POINT_NAME "gio-local-file-monitor"
 #define G_NFS_FILE_MONITOR_EXTENSION_POINT_NAME   "gio-nfs-file-monitor"
 
-typedef struct _xlocal_file_monitor_t      xlocal_file_monitor_t;
-typedef struct _xlocal_file_monitor_class_t xlocal_file_monitor_class_t;
+typedef struct _GLocalFileMonitor      GLocalFileMonitor;
+typedef struct _GLocalFileMonitorClass GLocalFileMonitorClass;
 typedef struct _GFileMonitorSource     GFileMonitorSource;
 
-struct _xlocal_file_monitor_t
+struct _GLocalFileMonitor
 {
-  xfile_monitor_t parent_instance;
+  GFileMonitor parent_instance;
 
   GFileMonitorSource *source;
-  xunix_mount_monitor_t  *mount_monitor;
-  xboolean_t            was_mounted;
+  GUnixMountMonitor  *mount_monitor;
+  gboolean            was_mounted;
 };
 
-struct _xlocal_file_monitor_class_t
+struct _GLocalFileMonitorClass
 {
-  xfile_monitor_class_t parent_class;
+  GFileMonitorClass parent_class;
 
-  xboolean_t (* is_supported) (void);
-  void     (* start)        (xlocal_file_monitor_t *local_monitor,
-                             const xchar_t *dirname,
-                             const xchar_t *basename,
-                             const xchar_t *filename,
+  gboolean (* is_supported) (void);
+  void     (* start)        (GLocalFileMonitor *local_monitor,
+                             const gchar *dirname,
+                             const gchar *basename,
+                             const gchar *filename,
                              GFileMonitorSource *source);
 
-  xboolean_t mount_notify;
+  gboolean mount_notify;
 };
 
 #ifdef G_OS_UNIX
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 #endif
-xtype_t           g_local_file_monitor_get_type (void) G_GNUC_CONST;
+GType           g_local_file_monitor_get_type (void) G_GNUC_CONST;
 
 /* for glocalfile.c */
-xfile_monitor_t *
-g_local_file_monitor_new_for_path (const xchar_t        *pathname,
-                                   xboolean_t            is_directory,
-                                   xfile_monitor_flags_t   flags,
-                                   xerror_t            **error);
+GFileMonitor *
+g_local_file_monitor_new_for_path (const gchar        *pathname,
+                                   gboolean            is_directory,
+                                   GFileMonitorFlags   flags,
+                                   GError            **error);
 
 /* for various users in glib */
-typedef void (* GFileMonitorCallback) (xfile_monitor_t      *monitor,
-                                       xfile_t             *child,
-                                       xfile_t             *other,
-                                       xfile_monitor_event_t  event,
-                                       xpointer_t           user_data);
-xfile_monitor_t *
-g_local_file_monitor_new_in_worker (const xchar_t           *pathname,
-                                    xboolean_t               is_directory,
-                                    xfile_monitor_flags_t      flags,
+typedef void (* GFileMonitorCallback) (GFileMonitor      *monitor,
+                                       GFile             *child,
+                                       GFile             *other,
+                                       GFileMonitorEvent  event,
+                                       gpointer           user_data);
+GFileMonitor *
+g_local_file_monitor_new_in_worker (const gchar           *pathname,
+                                    gboolean               is_directory,
+                                    GFileMonitorFlags      flags,
                                     GFileMonitorCallback   callback,
-                                    xpointer_t               user_data,
-                                    xclosure_notify_t         destroy_user_data,
-                                    xerror_t               **error);
+                                    gpointer               user_data,
+                                    GClosureNotify         destroy_user_data,
+                                    GError               **error);
 
-/* for implementations of xlocal_file_monitor_t */
-XPL_AVAILABLE_IN_2_44
-xboolean_t
-xfile_monitor_source_handle_event (GFileMonitorSource *fms,
-                                    xfile_monitor_event_t   event_type,
-                                    const xchar_t        *child,
-                                    const xchar_t        *rename_to,
-                                    xfile_t              *other,
-                                    sint64_t              event_time);
+/* for implementations of GLocalFileMonitor */
+GLIB_AVAILABLE_IN_2_44
+gboolean
+g_file_monitor_source_handle_event (GFileMonitorSource *fms,
+                                    GFileMonitorEvent   event_type,
+                                    const gchar        *child,
+                                    const gchar        *rename_to,
+                                    GFile              *other,
+                                    gint64              event_time);
 
 
 G_END_DECLS

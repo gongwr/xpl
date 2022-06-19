@@ -35,27 +35,27 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_WIN32_FILE_MONITOR (g_win32_file_monitor_get_type ())
-#define G_WIN32_FILE_MONITOR(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_WIN32_FILE_MONITOR, GWin32FileMonitor))
-#define G_WIN32_FILE_MONITOR_CLASS(klass) (XTYPE_CHECK_CLASS_CAST ((klass), XTYPE_WIN32_FILE_MONITOR, GWin32FileMonitorClass))
-#define X_IS_WIN32_FILE_MONITOR(obj) (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_WIN32_FILE_MONITOR))
-#define X_IS_WIN32_FILE_MONITOR_CLASS(klass) (XTYPE_CHECK_CLASS_TYPE ((klass), XTYPE_WIN32_FILE_MONITOR))
-#define G_WIN32_FILE_MONITOR_GET_CLASS(obj) (XTYPE_INSTANCE_GET_CLASS ((obj), XTYPE_WIN32_FILE_MONITOR, GWin32FileMonitorClass))
+#define G_TYPE_WIN32_FILE_MONITOR (g_win32_file_monitor_get_type ())
+#define G_WIN32_FILE_MONITOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_WIN32_FILE_MONITOR, GWin32FileMonitor))
+#define G_WIN32_FILE_MONITOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), G_TYPE_WIN32_FILE_MONITOR, GWin32FileMonitorClass))
+#define G_IS_WIN32_FILE_MONITOR(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_WIN32_FILE_MONITOR))
+#define G_IS_WIN32_FILE_MONITOR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), G_TYPE_WIN32_FILE_MONITOR))
+#define G_WIN32_FILE_MONITOR_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), G_TYPE_WIN32_FILE_MONITOR, GWin32FileMonitorClass))
 
 typedef struct _GWin32FileMonitor GWin32FileMonitor;
 typedef struct _GWin32FileMonitorClass GWin32FileMonitorClass;
 typedef struct _GWin32FileMonitorPrivate GWin32FileMonitorPrivate;
 
 struct _GWin32FileMonitor {
-  xlocal_file_monitor_t parent_instance;
+  GLocalFileMonitor parent_instance;
   GWin32FSMonitorPrivate * priv;
 };
 struct _GWin32FileMonitorClass {
-  xlocal_file_monitor_class_t parent_class;
+  GLocalFileMonitorClass parent_class;
 };
 
-xtype_t g_win32_file_monitor_get_type (void);
-void g_win32_file_monitor_register (xio_module_t *module);
+GType g_win32_file_monitor_get_type (void);
+void g_win32_file_monitor_register (GIOModule *module);
 
 G_END_DECLS
 

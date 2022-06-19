@@ -8,10 +8,10 @@
 static void alarm (int sec) { }
 #endif
 
-static xboolean_t
+static gboolean
 check_signaled (GWakeup *wakeup)
 {
-  xpollfd_t fd;
+  GPollFD fd;
 
   g_wakeup_get_pollfd (wakeup, &fd);
   return g_poll (&fd, 1, 0);
@@ -20,7 +20,7 @@ check_signaled (GWakeup *wakeup)
 static void
 wait_for_signaled (GWakeup *wakeup)
 {
-  xpollfd_t fd;
+  GPollFD fd;
 
   g_wakeup_get_pollfd (wakeup, &fd);
   g_poll (&fd, 1, -1);
@@ -30,19 +30,19 @@ static void
 test_semantics (void)
 {
   GWakeup *wakeup;
-  xint_t i;
+  gint i;
 
   /* prevent the test from deadlocking */
   alarm (60);
 
   wakeup = g_wakeup_new ();
-  xassert (!check_signaled (wakeup));
+  g_assert (!check_signaled (wakeup));
 
   g_wakeup_signal (wakeup);
-  xassert (check_signaled (wakeup));
+  g_assert (check_signaled (wakeup));
 
   g_wakeup_acknowledge (wakeup);
-  xassert (!check_signaled (wakeup));
+  g_assert (!check_signaled (wakeup));
 
   g_wakeup_free (wakeup);
 
@@ -59,11 +59,11 @@ test_semantics (void)
   wakeup = g_wakeup_new ();
   for (i = 0; i < 1000000; i++)
     g_wakeup_signal (wakeup);
-  xassert (check_signaled (wakeup));
+  g_assert (check_signaled (wakeup));
 
   /* ensure a single acknowledgement is sufficient */
   g_wakeup_acknowledge (wakeup);
-  xassert (!check_signaled (wakeup));
+  g_assert (!check_signaled (wakeup));
 
   g_wakeup_free (wakeup);
 
@@ -73,16 +73,16 @@ test_semantics (void)
 
 struct token
 {
-  xpointer_t owner;
-  xint_t ttl;
+  gpointer owner;
+  gint ttl;
 };
 
 struct context
 {
-  xslist_t *pending_tokens;
-  xmutex_t lock;
+  GSList *pending_tokens;
+  GMutex lock;
   GWakeup *wakeup;
-  xboolean_t quit;
+  gboolean quit;
 };
 
 #define NUM_THREADS     50
@@ -90,9 +90,9 @@ struct context
 #define TOKEN_TTL   100000
 
 static struct context contexts[NUM_THREADS];
-static xthread_t *threads[NUM_THREADS];
+static GThread *threads[NUM_THREADS];
 static GWakeup *last_token_wakeup;
-static xint_t tokens_alive;  /* (atomic) */
+static gint tokens_alive;  /* (atomic) */
 
 static void
 context_init (struct context *ctx)
@@ -106,8 +106,8 @@ context_init (struct context *ctx)
 static void
 context_clear (struct context *ctx)
 {
-  xassert (ctx->pending_tokens == NULL);
-  xassert (ctx->quit);
+  g_assert (ctx->pending_tokens == NULL);
+  g_assert (ctx->quit);
 
   g_mutex_clear (&ctx->lock);
   g_wakeup_free (ctx->wakeup);
@@ -129,7 +129,7 @@ context_try_pop_token (struct context *ctx)
   if (ctx->pending_tokens != NULL)
     {
       token = ctx->pending_tokens->data;
-      ctx->pending_tokens = xslist_delete_link (ctx->pending_tokens,
+      ctx->pending_tokens = g_slist_delete_link (ctx->pending_tokens,
                                                  ctx->pending_tokens);
     }
   g_mutex_unlock (&ctx->lock);
@@ -141,10 +141,10 @@ static void
 context_push_token (struct context *ctx,
                     struct token   *token)
 {
-  xassert (token->owner == ctx);
+  g_assert (token->owner == ctx);
 
   g_mutex_lock (&ctx->lock);
-  ctx->pending_tokens = xslist_prepend (ctx->pending_tokens, token);
+  ctx->pending_tokens = g_slist_prepend (ctx->pending_tokens, token);
   g_mutex_unlock (&ctx->lock);
 
   g_wakeup_signal (ctx->wakeup);
@@ -156,7 +156,7 @@ dispatch_token (struct token *token)
   if (token->ttl > 0)
     {
       struct context *ctx;
-      xint_t next_ctx;
+      gint next_ctx;
 
       next_ctx = g_test_rand_int_range (0, NUM_THREADS);
       ctx = &contexts[next_ctx];
@@ -187,8 +187,8 @@ token_new (int ttl)
   return token;
 }
 
-static xpointer_t
-thread_func (xpointer_t data)
+static gpointer
+thread_func (gpointer data)
 {
   struct context *ctx = data;
   struct token *token;
@@ -200,7 +200,7 @@ thread_func (xpointer_t data)
 
       while ((token = context_try_pop_token (ctx)) != NULL)
         {
-          xassert (token->owner == ctx);
+          g_assert (token->owner == ctx);
           dispatch_token (token);
         }
     }
@@ -211,7 +211,7 @@ thread_func (xpointer_t data)
 static void
 test_threaded (void)
 {
-  xint_t i;
+  gint i;
 
   /* make sure we don't block forever */
   alarm (60);
@@ -233,7 +233,7 @@ test_threaded (void)
   for (i = 0; i < NUM_THREADS; i++)
     {
       context_init (&contexts[i]);
-      threads[i] = xthread_new ("test", thread_func, &contexts[i]);
+      threads[i] = g_thread_new ("test", thread_func, &contexts[i]);
     }
 
   /* dispatch tokens */
@@ -247,7 +247,7 @@ test_threaded (void)
   for (i = 0; i < NUM_THREADS; i++)
     {
       context_quit (&contexts[i]);
-      xthread_join (threads[i]);
+      g_thread_join (threads[i]);
       context_clear (&contexts[i]);
     }
 

@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1998-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Lesser General
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __XTYPE_PRIVATE_H__
-#define __XTYPE_PRIVATE_H__
+#ifndef __G_TYPE_PRIVATE_H__
+#define __G_TYPE_PRIVATE_H__
 
-#if !defined (__XPL_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
+#if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
 
@@ -30,13 +30,13 @@
  * @debug_type: Currently only OBJECTS and SIGNALS are supported.
  * @code_block: Custom debug code.
  *
- * A convenience macro for debugging xobject_t.
+ * A convenience macro for debugging GObject.
  * This macro is only used internally.
  */
 #ifdef G_ENABLE_DEBUG
 #define GOBJECT_IF_DEBUG(debug_type, code_block) \
 G_STMT_START { \
-    if (_xtype_debug_flags & XTYPE_DEBUG_ ## debug_type) \
+    if (_g_type_debug_flags & G_TYPE_DEBUG_ ## debug_type) \
       { code_block; } \
 } G_STMT_END
 #else   /* !G_ENABLE_DEBUG */
@@ -46,55 +46,55 @@ G_STMT_START { \
 G_BEGIN_DECLS
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-extern GTypeDebugFlags _xtype_debug_flags;
+extern GTypeDebugFlags _g_type_debug_flags;
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 typedef struct _GRealClosure  GRealClosure;
 struct _GRealClosure
 {
   GClosureMarshal meta_marshal;
-  xpointer_t meta_marshal_data;
+  gpointer meta_marshal_data;
   GVaClosureMarshal va_meta_marshal;
   GVaClosureMarshal va_marshal;
-  xclosure_t closure;
+  GClosure closure;
 };
 
 #define G_REAL_CLOSURE(_c) \
   ((GRealClosure *)G_STRUCT_MEMBER_P ((_c), -G_STRUCT_OFFSET (GRealClosure, closure)))
 
-void    _xvalue_c_init          (void); /* sync with gvalue.c */
-void    _xvalue_types_init      (void); /* sync with gvaluetypes.c */
-void    _xenum_types_init       (void); /* sync with genums.c */
+void    _g_value_c_init          (void); /* sync with gvalue.c */
+void    _g_value_types_init      (void); /* sync with gvaluetypes.c */
+void    _g_enum_types_init       (void); /* sync with genums.c */
 void    _g_param_type_init       (void); /* sync with gparam.c */
-void    _xboxed_type_init       (void); /* sync with gboxed.c */
-void    _xobject_type_init      (void); /* sync with gobject.c */
-void    _xparam_spec_types_init (void); /* sync with gparamspecs.c */
-void    _xvalue_transforms_init (void); /* sync with gvaluetransform.c */
-void    _xsignal_init           (void); /* sync with gsignal.c */
+void    _g_boxed_type_init       (void); /* sync with gboxed.c */
+void    _g_object_type_init      (void); /* sync with gobject.c */
+void    _g_param_spec_types_init (void); /* sync with gparamspecs.c */
+void    _g_value_transforms_init (void); /* sync with gvaluetransform.c */
+void    _g_signal_init           (void); /* sync with gsignal.c */
 
 /* for gboxed.c */
-xpointer_t        _xtype_boxed_copy      (xtype_t          type,
-                                         xpointer_t       value);
-void            _xtype_boxed_free      (xtype_t          type,
-                                         xpointer_t       value);
-void            _xtype_boxed_init      (xtype_t          type,
+gpointer        _g_type_boxed_copy      (GType          type,
+                                         gpointer       value);
+void            _g_type_boxed_free      (GType          type,
+                                         gpointer       value);
+void            _g_type_boxed_init      (GType          type,
                                          GBoxedCopyFunc copy_func,
                                          GBoxedFreeFunc free_func);
 
-xboolean_t    _xclosure_is_void (xclosure_t       *closure,
-				xpointer_t        instance);
-xboolean_t    _xclosure_supports_invoke_va (xclosure_t       *closure);
-void        _xclosure_set_va_marshal (xclosure_t       *closure,
+gboolean    _g_closure_is_void (GClosure       *closure,
+				gpointer        instance);
+gboolean    _g_closure_supports_invoke_va (GClosure       *closure);
+void        _g_closure_set_va_marshal (GClosure       *closure,
 				       GVaClosureMarshal marshal);
-void        _xclosure_invoke_va (xclosure_t       *closure,
-				  xvalue_t /*out*/ *return_value,
-				  xpointer_t        instance,
+void        _g_closure_invoke_va (GClosure       *closure,
+				  GValue /*out*/ *return_value,
+				  gpointer        instance,
 				  va_list         args,
 				  int             n_params,
-				  xtype_t          *param_types);
+				  GType          *param_types);
 
-xboolean_t    _xobject_has_signal_handler     (xobject_t     *object);
-void        _xobject_set_has_signal_handler (xobject_t     *object);
+gboolean    _g_object_has_signal_handler     (GObject     *object);
+void        _g_object_set_has_signal_handler (GObject     *object);
 
 /**
  * _G_DEFINE_TYPE_EXTENDED_WITH_PRELUDE:
@@ -110,4 +110,4 @@ void        _xobject_set_has_signal_handler (xobject_t     *object);
 
 G_END_DECLS
 
-#endif /* __XTYPE_PRIVATE_H__ */
+#endif /* __G_TYPE_PRIVATE_H__ */

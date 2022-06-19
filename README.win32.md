@@ -39,7 +39,7 @@ compilation related to Win32 in GLib-using code:
   Cygwin is supposed to behave like Unix. `G_OS_UNIX` *is* defined by a GLib
   for Cygwin.
 
-- `XPLATFORM_WIN32` is defined when either `G_OS_WIN32` or `G_WITH_CYGWIN`
+- `G_PLATFORM_WIN32` is defined when either `G_OS_WIN32` or `G_WITH_CYGWIN`
   is defined.
 
 These macros are defined in `glibconfig.h`, and are thus available in

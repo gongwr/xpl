@@ -47,10 +47,10 @@
     </signal>
 
     <!--
-        foo_t:
+        Foo:
         Property with no <quote>since</quote> annotation (should inherit the 2.30 from its containing interface).
       -->
-    <property name="foo_t" type="s" access="read"/>
+    <property name="Foo" type="s" access="read"/>
 
     <!--
         Bar:

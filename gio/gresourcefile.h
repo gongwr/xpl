@@ -18,32 +18,32 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XRESOURCE_FILE_H__
-#define __XRESOURCE_FILE_H__
+#ifndef __G_RESOURCE_FILE_H__
+#define __G_RESOURCE_FILE_H__
 
 #include <gio/giotypes.h>
 
 G_BEGIN_DECLS
 
-#define XTYPE_RESOURCE_FILE         (_xresource_file_get_type ())
-#define XRESOURCE_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_RESOURCE_FILE, xresource_file))
-#define XRESOURCE_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_RESOURCE_FILE, xresource_file_class))
-#define X_IS_RESOURCE_FILE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_RESOURCE_FILE))
-#define X_IS_RESOURCE_FILE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_RESOURCE_FILE))
-#define XRESOURCE_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_RESOURCE_FILE, xresource_file_class))
+#define G_TYPE_RESOURCE_FILE         (_g_resource_file_get_type ())
+#define G_RESOURCE_FILE(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_RESOURCE_FILE, GResourceFile))
+#define G_RESOURCE_FILE_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_RESOURCE_FILE, GResourceFileClass))
+#define G_IS_RESOURCE_FILE(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_RESOURCE_FILE))
+#define G_IS_RESOURCE_FILE_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_RESOURCE_FILE))
+#define G_RESOURCE_FILE_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_RESOURCE_FILE, GResourceFileClass))
 
-typedef struct _xresource_file        xresource_file_t;
-typedef struct _xresource_file_class   xresource_file_class_t;
+typedef struct _GResourceFile        GResourceFile;
+typedef struct _GResourceFileClass   GResourceFileClass;
 
-struct _xresource_file_class
+struct _GResourceFileClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-xtype_t   _xresource_file_get_type (void) G_GNUC_CONST;
+GType   _g_resource_file_get_type (void) G_GNUC_CONST;
 
-xfile_t * _xresource_file_new      (const char *uri);
+GFile * _g_resource_file_new      (const char *uri);
 
 G_END_DECLS
 
-#endif /* __XRESOURCE_FILE_H__ */
+#endif /* __G_RESOURCE_FILE_H__ */

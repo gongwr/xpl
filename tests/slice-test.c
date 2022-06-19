@@ -1,4 +1,4 @@
-/* XPL sliced memory - fast threaded memory chunk allocator
+/* GLIB sliced memory - fast threaded memory chunk allocator
  * Copyright (C) 2005 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -20,22 +20,22 @@
 #include <string.h>
 
 #define quick_rand32()  (rand_accu = 1664525 * rand_accu + 1013904223, rand_accu)
-static xuint_t    prime_size = 1021; /* 769; 509 */
-static xboolean_t clean_memchunks = FALSE;
-static xuint_t    number_of_blocks = 10000;          /* total number of blocks allocated */
-static xuint_t    number_of_repetitions = 10000;     /* number of alloc+free repetitions */
-static xboolean_t want_corruption = FALSE;
+static guint    prime_size = 1021; /* 769; 509 */
+static gboolean clean_memchunks = FALSE;
+static guint    number_of_blocks = 10000;          /* total number of blocks allocated */
+static guint    number_of_repetitions = 10000;     /* number of alloc+free repetitions */
+static gboolean want_corruption = FALSE;
 
 /* --- old memchunk prototypes (memchunks.c) --- */
-GMemChunk*      old_mem_chunk_new       (const xchar_t  *name,
-                                         xulong_t        atom_size,
-                                         xulong_t        area_size,
-                                         xint_t          type);
+GMemChunk*      old_mem_chunk_new       (const gchar  *name,
+                                         gulong        atom_size,
+                                         gulong        area_size,
+                                         gint          type);
 void            old_mem_chunk_destroy   (GMemChunk *mem_chunk);
-xpointer_t        old_mem_chunk_alloc     (GMemChunk *mem_chunk);
-xpointer_t        old_mem_chunk_alloc0    (GMemChunk *mem_chunk);
+gpointer        old_mem_chunk_alloc     (GMemChunk *mem_chunk);
+gpointer        old_mem_chunk_alloc0    (GMemChunk *mem_chunk);
 void            old_mem_chunk_free      (GMemChunk *mem_chunk,
-                                         xpointer_t   mem);
+                                         gpointer   mem);
 void            old_mem_chunk_clean     (GMemChunk *mem_chunk);
 void            old_mem_chunk_reset     (GMemChunk *mem_chunk);
 void            old_mem_chunk_print     (GMemChunk *mem_chunk);
@@ -51,15 +51,15 @@ corruption (void)
   if (G_UNLIKELY (want_corruption))
     {
       /* corruption per call likelyness is about 1:4000000 */
-      xuint32_t r = g_random_int() % 8000009;
+      guint32 r = g_random_int() % 8000009;
       return r == 277 ? +1 : r == 281 ? -1 : 0;
     }
   return 0;
 }
 
-static inline xpointer_t
+static inline gpointer
 memchunk_alloc (GMemChunk **memchunkp,
-                xuint_t       size)
+                guint       size)
 {
   size = MAX (size, 1);
   if (G_UNLIKELY (!*memchunkp))
@@ -69,24 +69,24 @@ memchunk_alloc (GMemChunk **memchunkp,
 
 static inline void
 memchunk_free (GMemChunk *memchunk,
-               xpointer_t   chunk)
+               gpointer   chunk)
 {
   old_mem_chunk_free (memchunk, chunk);
   if (clean_memchunks)
     old_mem_chunk_clean (memchunk);
 }
 
-static xpointer_t
-test_memchunk_thread (xpointer_t data)
+static gpointer
+test_memchunk_thread (gpointer data)
 {
   GMemChunk **memchunks;
-  xuint_t i, j;
-  xuint8_t **ps;
-  xuint_t   *ss;
-  xuint32_t rand_accu = 2147483563;
+  guint i, j;
+  guint8 **ps;
+  guint   *ss;
+  guint32 rand_accu = 2147483563;
   /* initialize random numbers */
   if (data)
-    rand_accu = *(xuint32_t*) data;
+    rand_accu = *(guint32*) data;
   else
     {
       GTimeVal rand_tv;
@@ -97,8 +97,8 @@ test_memchunk_thread (xpointer_t data)
   /* prepare for memchunk creation */
   memchunks = g_newa0 (GMemChunk*, prime_size);
 
-  ps = g_new (xuint8_t*, number_of_blocks);
-  ss = g_new (xuint_t, number_of_blocks);
+  ps = g_new (guint8*, number_of_blocks);
+  ss = g_new (guint, number_of_blocks);
   /* create number_of_blocks random sizes */
   for (i = 0; i < number_of_blocks; i++)
     ss[i] = quick_rand32() % prime_size;
@@ -123,8 +123,8 @@ test_memchunk_thread (xpointer_t data)
   /* alloc and free many equally sized chunks in a row */
   for (i = 0; i < number_of_repetitions; i++)
     {
-      xuint_t sz = quick_rand32() % prime_size;
-      xuint_t k = number_of_blocks / 100;
+      guint sz = quick_rand32() % prime_size;
+      guint k = number_of_blocks / 100;
       for (j = 0; j < k; j++)
         ps[j] = memchunk_alloc (&memchunks[sz], sz);
       for (j = 0; j < k; j++)
@@ -140,17 +140,17 @@ test_memchunk_thread (xpointer_t data)
   return NULL;
 }
 
-static xpointer_t
-test_sliced_mem_thread (xpointer_t data)
+static gpointer
+test_sliced_mem_thread (gpointer data)
 {
-  xuint32_t rand_accu = 2147483563;
-  xuint_t i, j;
-  xuint8_t **ps;
-  xuint_t   *ss;
+  guint32 rand_accu = 2147483563;
+  guint i, j;
+  guint8 **ps;
+  guint   *ss;
 
   /* initialize random numbers */
   if (data)
-    rand_accu = *(xuint32_t*) data;
+    rand_accu = *(guint32*) data;
   else
     {
       GTimeVal rand_tv;
@@ -158,8 +158,8 @@ test_sliced_mem_thread (xpointer_t data)
       rand_accu = rand_tv.tv_usec + (rand_tv.tv_sec << 16);
     }
 
-  ps = g_new (xuint8_t*, number_of_blocks);
-  ss = g_new (xuint_t, number_of_blocks);
+  ps = g_new (guint8*, number_of_blocks);
+  ss = g_new (guint, number_of_blocks);
   /* create number_of_blocks random sizes */
   for (i = 0; i < number_of_blocks; i++)
     ss[i] = quick_rand32() % prime_size;
@@ -184,8 +184,8 @@ test_sliced_mem_thread (xpointer_t data)
   /* alloc and free many equally sized chunks in a row */
   for (i = 0; i < number_of_repetitions; i++)
     {
-      xuint_t sz = quick_rand32() % prime_size;
-      xuint_t k = number_of_blocks / 100;
+      guint sz = quick_rand32() % prime_size;
+      guint k = number_of_blocks / 100;
       for (j = 0; j < k; j++)
         ps[j] = g_slice_alloc (sz + corruption());
       for (j = 0; j < k; j++)
@@ -207,15 +207,15 @@ int
 main (int   argc,
       char *argv[])
 {
-  xuint_t seed32, *seedp = NULL;
-  xboolean_t ccounters = FALSE, use_memchunks = FALSE;
-  xuint_t n_threads = 1;
-  const xchar_t *mode = "slab allocator + magazine cache", *emode = " ";
+  guint seed32, *seedp = NULL;
+  gboolean ccounters = FALSE, use_memchunks = FALSE;
+  guint n_threads = 1;
+  const gchar *mode = "slab allocator + magazine cache", *emode = " ";
   if (argc > 1)
     n_threads = g_ascii_strtoull (argv[1], NULL, 10);
   if (argc > 2)
     {
-      xuint_t i, l = strlen (argv[2]);
+      guint i, l = strlen (argv[2]);
       for (i = 0; i < l; i++)
         switch (argv[2][i])
           {
@@ -265,33 +265,33 @@ main (int   argc,
     usage();
 
   {
-    xchar_t strseed[64] = "<random>";
-    xthread_t **threads;
-    xuint_t i;
-
+    gchar strseed[64] = "<random>";
+    GThread **threads;
+    guint i;
+    
     if (seedp)
       g_snprintf (strseed, 64, "%u", *seedp);
     g_print ("Starting %d threads allocating random blocks <= %u bytes with seed=%s using %s%s\n", n_threads, prime_size, strseed, mode, emode);
-
-    threads = g_alloca (sizeof(xthread_t*) * n_threads);
+  
+    threads = g_alloca (sizeof(GThread*) * n_threads);
     if (!use_memchunks)
       for (i = 0; i < n_threads; i++)
-        threads[i] = xthread_create (test_sliced_mem_thread, seedp, TRUE, NULL);
+        threads[i] = g_thread_create (test_sliced_mem_thread, seedp, TRUE, NULL);
     else
       {
         for (i = 0; i < n_threads; i++)
-          threads[i] = xthread_create (test_memchunk_thread, seedp, TRUE, NULL);
+          threads[i] = g_thread_create (test_memchunk_thread, seedp, TRUE, NULL);
       }
     for (i = 0; i < n_threads; i++)
-      xthread_join (threads[i]);
-
+      g_thread_join (threads[i]);
+  
     if (ccounters)
       {
-        xuint_t n, n_chunks = g_slice_get_config (G_SLICE_CONFIG_CHUNK_SIZES);
+        guint n, n_chunks = g_slice_get_config (G_SLICE_CONFIG_CHUNK_SIZES);
         g_print ("    ChunkSize | MagazineSize | Contention\n");
         for (i = 0; i < n_chunks; i++)
           {
-            sint64_t *vals = g_slice_get_config_state (G_SLICE_CONFIG_CONTENTION_COUNTER, i, &n);
+            gint64 *vals = g_slice_get_config_state (G_SLICE_CONFIG_CONTENTION_COUNTER, i, &n);
             g_print ("  %9" G_GINT64_FORMAT "   |  %9" G_GINT64_FORMAT "   |  %9" G_GINT64_FORMAT "\n", vals[0], vals[2], vals[1]);
             g_free (vals);
           }

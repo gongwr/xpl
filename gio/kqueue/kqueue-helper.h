@@ -44,17 +44,17 @@ typedef struct
 {
   GKqueueFileMonitor  *mon;
   GFileMonitorSource  *source;
-  xchar_t*    filename;
-  xchar_t*    basename;
+  gchar*    filename;
+  gchar*    basename;
   int       fd;
   dep_list* deps;
   int       is_dir;
 } kqueue_sub;
 
-xboolean_t _kqsub_start_watching (kqueue_sub *sub);
-void _kh_dir_diff    (kqueue_sub *sub, xboolean_t handle_deleted);
+gboolean _kqsub_start_watching (kqueue_sub *sub);
+void _kh_dir_diff    (kqueue_sub *sub, gboolean handle_deleted);
 void _km_add_missing (kqueue_sub *sub);
-xboolean_t _km_scan_missing (kqueue_sub *check_this_sub_only);
+gboolean _km_scan_missing (kqueue_sub *check_this_sub_only);
 void _km_remove      (kqueue_sub *sub);
 
 #endif /* __KQUEUE_HELPER_H */

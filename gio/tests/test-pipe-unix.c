@@ -36,8 +36,8 @@
 
 /**
  * test_pipe:
- * @is: (out) (optional): used to return a #xinput_stream_t
- * @os: (out) (optional): used to return a #xoutput_stream_t
+ * @is: (out) (optional): used to return a #GInputStream
+ * @os: (out) (optional): used to return a #GOutputStream
  * @error: used to raise an error
  *
  * Return a "pipe to self" connecting @is to @os. This can be used
@@ -48,10 +48,10 @@
  *
  * Returns: %TRUE on success
  */
-xboolean_t
-test_pipe (xinput_stream_t  **is,
-           xoutput_stream_t **os,
-           xerror_t        **error)
+gboolean
+test_pipe (GInputStream  **is,
+           GOutputStream **os,
+           GError        **error)
 {
   int pipefd[2];
   int ret;
@@ -63,7 +63,7 @@ test_pipe (xinput_stream_t  **is,
       int e = errno;
 
       g_set_error (error, G_IO_ERROR, g_io_error_from_errno (e),
-                   "%s", xstrerror (e));
+                   "%s", g_strerror (e));
       return FALSE;
     }
 
@@ -82,8 +82,8 @@ test_pipe (xinput_stream_t  **is,
 
 /**
  * test_bidi_pipe:
- * @left: (out) (optional): used to return one #xio_stream_t
- * @right: (out) (optional): used to return the other #xio_stream_t
+ * @left: (out) (optional): used to return one #GIOStream
+ * @right: (out) (optional): used to return the other #GIOStream
  * @error: used to raise an error
  *
  * Return two #GIOStreams connected to each other with pipes.
@@ -95,16 +95,16 @@ test_pipe (xinput_stream_t  **is,
  *
  * Returns: %TRUE on success
  */
-xboolean_t
-test_bidi_pipe (xio_stream_t **left,
-                xio_stream_t **right,
-                xerror_t    **error)
+gboolean
+test_bidi_pipe (GIOStream **left,
+                GIOStream **right,
+                GError    **error)
 {
-  xinput_stream_t *left_in = NULL;
-  xoutput_stream_t *left_out = NULL;
-  xinput_stream_t *right_in = NULL;
-  xoutput_stream_t *right_out = NULL;
-  xboolean_t ret = FALSE;
+  GInputStream *left_in = NULL;
+  GOutputStream *left_out = NULL;
+  GInputStream *right_in = NULL;
+  GOutputStream *right_out = NULL;
+  gboolean ret = FALSE;
 
   if (!test_pipe (&left_in, &right_out, error))
     goto out;

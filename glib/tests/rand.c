@@ -26,7 +26,7 @@
  */
 
 /* Tests for a simple seed, first number is the seed */
-const xuint32_t first_numbers[] =
+const guint32 first_numbers[] = 
 {
   0x7a7a7a7a,
   0xfdcc2d54,
@@ -52,7 +52,7 @@ const xuint32_t first_numbers[] =
 };
 
 /* array seed */
-const xuint32_t seed_array[] =
+const guint32 seed_array[] =
 {
   0x6553375f,
   0xd6b8d43b,
@@ -61,7 +61,7 @@ const xuint32_t seed_array[] =
 };
 
 /* tests for the array seed */
-const xuint32_t array_outputs[] =
+const guint32 array_outputs[] =
 {
   0xc22b7dc3,
   0xfdecb8ae,
@@ -78,11 +78,11 @@ const xuint32_t array_outputs[] =
 static void
 test_rand (void)
 {
-  xuint_t n;
-  xuint_t ones;
+  guint n;
+  guint ones;
   double proportion;
-  xrand_t *rand;
-  xrand_t *copy;
+  GRand *rand;
+  GRand *copy;
 
   rand = g_rand_new_with_seed (first_numbers[0]);
 
@@ -102,13 +102,13 @@ test_rand (void)
   for (n = 1; n < 100000; n++)
     {
       gint32 i;
-      xdouble_t d;
-      xboolean_t b;
+      gdouble d;
+      gboolean b;
 
       i = g_rand_int_range (rand, 8,16);
       g_assert_cmpint (i, >=, 8);
       g_assert_cmpint (i, <, 16);
-
+      
       i = g_random_int_range (8,16);
       g_assert_cmpint (i, >=, 8);
       g_assert_cmpint (i, <, 16);
@@ -124,14 +124,14 @@ test_rand (void)
       d = g_rand_double_range (rand, -8, 32);
       g_assert_cmpfloat (d, >=, -8.0);
       g_assert_cmpfloat (d, <, 32.0);
-
+ 
       d = g_random_double_range (-8, 32);
       g_assert_cmpfloat (d, >=, -8.0);
       g_assert_cmpfloat (d, <, 32.0);
-
+ 
       b = g_random_boolean ();
       g_assert_true (b == TRUE || b  == FALSE);
-
+ 
       b = g_rand_boolean (rand);
       g_assert_true (b == TRUE || b  == FALSE);
     }
@@ -158,7 +158,7 @@ test_rand (void)
 static void
 test_double_range (void)
 {
-  xdouble_t d;
+  gdouble d;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=502560");
 

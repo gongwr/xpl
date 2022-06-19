@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_REL_H__
 #define __G_REL_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -38,7 +38,7 @@ typedef struct _GTuples         GTuples;
 
 struct _GTuples
 {
-  xuint_t len;
+  guint len;
 };
 
 /* GRelation
@@ -64,41 +64,41 @@ struct _GTuples
  * g_relation_count() counts ...
  */
 
-XPL_DEPRECATED_IN_2_26
-GRelation* g_relation_new     (xint_t         fields);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
+GRelation* g_relation_new     (gint         fields);
+GLIB_DEPRECATED_IN_2_26
 void       g_relation_destroy (GRelation   *relation);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 void       g_relation_index   (GRelation   *relation,
-                               xint_t         field,
+                               gint         field,
                                GHashFunc    hash_func,
                                GEqualFunc   key_equal_func);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 void       g_relation_insert  (GRelation   *relation,
                                ...);
-XPL_DEPRECATED_IN_2_26
-xint_t       g_relation_delete  (GRelation   *relation,
-                               xconstpointer  key,
-                               xint_t         field);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
+gint       g_relation_delete  (GRelation   *relation,
+                               gconstpointer  key,
+                               gint         field);
+GLIB_DEPRECATED_IN_2_26
 GTuples*   g_relation_select  (GRelation   *relation,
-                               xconstpointer  key,
-                               xint_t         field);
-XPL_DEPRECATED_IN_2_26
-xint_t       g_relation_count   (GRelation   *relation,
-                               xconstpointer  key,
-                               xint_t         field);
-XPL_DEPRECATED_IN_2_26
-xboolean_t   g_relation_exists  (GRelation   *relation,
+                               gconstpointer  key,
+                               gint         field);
+GLIB_DEPRECATED_IN_2_26
+gint       g_relation_count   (GRelation   *relation,
+                               gconstpointer  key,
+                               gint         field);
+GLIB_DEPRECATED_IN_2_26
+gboolean   g_relation_exists  (GRelation   *relation,
                                ...);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 void       g_relation_print   (GRelation   *relation);
-XPL_DEPRECATED_IN_2_26
+GLIB_DEPRECATED_IN_2_26
 void       g_tuples_destroy   (GTuples     *tuples);
-XPL_DEPRECATED_IN_2_26
-xpointer_t   g_tuples_index     (GTuples     *tuples,
-                               xint_t         index_,
-                               xint_t         field);
+GLIB_DEPRECATED_IN_2_26
+gpointer   g_tuples_index     (GTuples     *tuples,
+                               gint         index_,
+                               gint         field);
 
 G_END_DECLS
 

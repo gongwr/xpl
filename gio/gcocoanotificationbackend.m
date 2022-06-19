@@ -30,20 +30,20 @@
 #include "gfileicon.h"
 #include "gfile.h"
 
-#define XTYPE_COCOA_NOTIFICATION_BACKEND  (g_cocoa_notification_backend_get_type ())
-#define G_COCOA_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_COCOA_NOTIFICATION_BACKEND, xcocoa_notification_backend_t))
+#define G_TYPE_COCOA_NOTIFICATION_BACKEND  (g_cocoa_notification_backend_get_type ())
+#define G_COCOA_NOTIFICATION_BACKEND(o)    (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_COCOA_NOTIFICATION_BACKEND, GCocoaNotificationBackend))
 
-typedef struct _xcocoa_notification_backend xcocoa_notification_backend_t;
-typedef xnotification_backend_class_t            xcocoa_notification_backend_class_t;
-struct _xcocoa_notification_backend
+typedef struct _GCocoaNotificationBackend GCocoaNotificationBackend;
+typedef GNotificationBackendClass            GCocoaNotificationBackendClass;
+struct _GCocoaNotificationBackend
 {
-  xnotification_backend_t parent;
+  GNotificationBackend parent;
 };
 
-xtype_t g_cocoa_notification_backend_get_type (void);
+GType g_cocoa_notification_backend_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (xcocoa_notification_backend, xcocoa_notification_backend, XTYPE_NOTIFICATION_BACKEND,
-  _xio_modules_ensure_extension_points_registered ();
+G_DEFINE_TYPE_WITH_CODE (GCocoaNotificationBackend, g_cocoa_notification_backend, G_TYPE_NOTIFICATION_BACKEND,
+  _g_io_modules_ensure_extension_points_registered ();
   g_io_extension_point_implement (G_NOTIFICATION_BACKEND_EXTENSION_POINT_NAME, g_define_type_id, "cocoa", 200));
 
 static NSString *
@@ -56,16 +56,16 @@ nsstring_from_cstr (const char *cstr)
 }
 
 static NSImage*
-nsimage_from_gicon (xicon_t *icon)
+nsimage_from_gicon (GIcon *icon)
 {
-  if (X_IS_FILE_ICON (icon))
+  if (G_IS_FILE_ICON (icon))
     {
       NSImage *image = nil;
-      xfile_t *file;
+      GFile *file;
       char *path;
 
-      file = xfile_icon_get_file (XFILE_ICON (icon));
-      path = xfile_get_path (file);
+      file = g_file_icon_get_file (G_FILE_ICON (icon));
+      path = g_file_get_path (file);
       if (path)
         {
           NSString *str_path = nsstring_from_cstr (path);
@@ -87,20 +87,20 @@ static void
 activate_detailed_action (const char * action)
 {
   char *name;
-  xvariant_t *target;
+  GVariant *target;
 
-  if (!xstr_has_prefix (action, "app."))
+  if (!g_str_has_prefix (action, "app."))
     {
       g_warning ("Notification action does not have \"app.\" prefix");
       return;
     }
 
-  if (xaction_parse_detailed_name (action, &name, &target, NULL))
+  if (g_action_parse_detailed_name (action, &name, &target, NULL))
     {
-      xaction_group_activate_action (XACTION_GROUP (xapplication_get_default()), name + 4, target);
+      g_action_group_activate_action (G_ACTION_GROUP (g_application_get_default()), name + 4, target);
       g_free (name);
       if (target)
-        xvariant_unref (target);
+        g_variant_unref (target);
     }
 }
 
@@ -131,7 +131,7 @@ activate_detailed_action (const char * action)
 
 static GNotificationCenterDelegate *cocoa_notification_delegate;
 
-static xboolean_t
+static gboolean
 g_cocoa_notification_backend_is_supported (void)
 {
   NSBundle *bundle = [NSBundle mainBundle];
@@ -145,14 +145,14 @@ g_cocoa_notification_backend_is_supported (void)
 
 static void
 add_actions_to_notification (NSUserNotification   *userNotification,
-                             xnotification_t        *notification)
+                             GNotification        *notification)
 {
-  xuint_t n_buttons = xnotification_get_n_buttons (notification);
+  guint n_buttons = g_notification_get_n_buttons (notification);
   char *action = NULL, *label = NULL;
-  xvariant_t *target = NULL;
+  GVariant *target = NULL;
   NSMutableDictionary *user_info = nil;
 
-  if (xnotification_get_default_action (notification, &action, &target))
+  if (g_notification_get_default_action (notification, &action, &target))
     {
       char *detailed_name = g_action_print_detailed_name (action, target);
       NSString *action_name = nsstring_from_cstr (detailed_name);
@@ -163,12 +163,12 @@ add_actions_to_notification (NSUserNotification   *userNotification,
       [action_name release];
       g_free (detailed_name);
       g_clear_pointer (&action, g_free);
-      g_clear_pointer (&target, xvariant_unref);
+      g_clear_pointer (&target, g_variant_unref);
     }
 
   if (n_buttons)
     {
-      xnotification_get_button (notification, 0, &label, &action, &target);
+      g_notification_get_button (notification, 0, &label, &action, &target);
       if (label)
         {
           NSString *str_label = nsstring_from_cstr (label);
@@ -186,7 +186,7 @@ add_actions_to_notification (NSUserNotification   *userNotification,
           g_free (label);
           g_free (action);
           g_free (detailed_name);
-          g_clear_pointer (&target, xvariant_unref);
+          g_clear_pointer (&target, g_variant_unref);
         }
 
       if (n_buttons > 1)
@@ -198,24 +198,24 @@ add_actions_to_notification (NSUserNotification   *userNotification,
 }
 
 static void
-g_cocoa_notification_backend_send_notification (xnotification_backend_t *backend,
-                                                const xchar_t          *cstr_id,
-                                                xnotification_t        *notification)
+g_cocoa_notification_backend_send_notification (GNotificationBackend *backend,
+                                                const gchar          *cstr_id,
+                                                GNotification        *notification)
 {
   NSString *str_title = nil, *str_text = nil, *str_id = nil;
   NSImage *content = nil;
   const char *cstr;
-  xicon_t *icon;
+  GIcon *icon;
   NSUserNotification *userNotification;
   NSUserNotificationCenter *center;
 
-  if ((cstr = xnotification_get_title (notification)))
+  if ((cstr = g_notification_get_title (notification)))
     str_title = nsstring_from_cstr (cstr);
-  if ((cstr = xnotification_get_body (notification)))
+  if ((cstr = g_notification_get_body (notification)))
     str_text = nsstring_from_cstr (cstr);
   if (cstr_id != NULL)
     str_id = nsstring_from_cstr (cstr_id);
-  if ((icon = xnotification_get_icon (notification)))
+  if ((icon = g_notification_get_icon (notification)))
     content = nsimage_from_gicon (icon);
   /* NOTE: There is no priority */
 
@@ -242,8 +242,8 @@ g_cocoa_notification_backend_send_notification (xnotification_backend_t *backend
 }
 
 static void
-g_cocoa_notification_backend_withdraw_notification (xnotification_backend_t *backend,
-                                                    const xchar_t          *cstr_id)
+g_cocoa_notification_backend_withdraw_notification (GNotificationBackend *backend,
+                                                    const gchar          *cstr_id)
 {
   NSUserNotificationCenter *center = [NSUserNotificationCenter defaultUserNotificationCenter];
   NSArray *notifications = [center deliveredNotifications];
@@ -262,14 +262,14 @@ g_cocoa_notification_backend_withdraw_notification (xnotification_backend_t *bac
 }
 
 static void
-g_cocoa_notification_backend_init (xcocoa_notification_backend_t *backend)
+g_cocoa_notification_backend_init (GCocoaNotificationBackend *backend)
 {
 }
 
 static void
-g_cocoa_notification_backend_class_init (xcocoa_notification_backend_class_t *klass)
+g_cocoa_notification_backend_class_init (GCocoaNotificationBackendClass *klass)
 {
-  xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (klass);
+  GNotificationBackendClass *backend_class = G_NOTIFICATION_BACKEND_CLASS (klass);
 
   backend_class->is_supported = g_cocoa_notification_backend_is_supported;
   backend_class->send_notification = g_cocoa_notification_backend_send_notification;

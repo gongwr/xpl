@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_DEPRECATED_MAIN_H__
 #define __G_DEPRECATED_MAIN_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -41,56 +41,56 @@ G_BEGIN_DECLS
  *     is not very important since calling g_main_run() will set this
  *     to %TRUE anyway.
  *
- * Creates a new #xmain_loop_t for th default main context.
+ * Creates a new #GMainLoop for th default main context.
  *
- * Returns: a new #xmain_loop_t
+ * Returns: a new #GMainLoop
  *
- * Deprecated: 2.2: Use xmain_loop_new() instead
+ * Deprecated: 2.2: Use g_main_loop_new() instead
  */
-#define         g_main_new(is_running)  xmain_loop_new (NULL, is_running) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_loop_new)
+#define         g_main_new(is_running)  g_main_loop_new (NULL, is_running) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_loop_new)
 
 /**
  * g_main_run:
- * @loop: a #xmain_loop_t
+ * @loop: a #GMainLoop
  *
  * Runs a main loop until it stops running.
  *
- * Deprecated: 2.2: Use xmain_loop_run() instead
+ * Deprecated: 2.2: Use g_main_loop_run() instead
  */
-#define         g_main_run(loop)        xmain_loop_run(loop) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_loop_run)
+#define         g_main_run(loop)        g_main_loop_run(loop) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_loop_run)
 
 /**
  * g_main_quit:
- * @loop: a #xmain_loop_t
+ * @loop: a #GMainLoop
  *
- * Stops the #xmain_loop_t.
- * If g_main_run() was called to run the #xmain_loop_t, it will now return.
+ * Stops the #GMainLoop.
+ * If g_main_run() was called to run the #GMainLoop, it will now return.
  *
- * Deprecated: 2.2: Use xmain_loop_quit() instead
+ * Deprecated: 2.2: Use g_main_loop_quit() instead
  */
-#define g_main_quit(loop)       xmain_loop_quit(loop) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_loop_quit)
+#define g_main_quit(loop)       g_main_loop_quit(loop) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_loop_quit)
 
 /**
  * g_main_destroy:
- * @loop: a #xmain_loop_t
+ * @loop: a #GMainLoop
  *
- * Frees the memory allocated for the #xmain_loop_t.
+ * Frees the memory allocated for the #GMainLoop.
  *
- * Deprecated: 2.2: Use xmain_loop_unref() instead
+ * Deprecated: 2.2: Use g_main_loop_unref() instead
  */
-#define g_main_destroy(loop)    xmain_loop_unref(loop) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_loop_unref)
+#define g_main_destroy(loop)    g_main_loop_unref(loop) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_loop_unref)
 
 /**
  * g_main_is_running:
- * @loop: a #xmain_loop_t
+ * @loop: a #GMainLoop
  *
  * Checks if the main loop is running.
  *
  * Returns: %TRUE if the main loop is running
  *
- * Deprecated: 2.2: Use xmain_loop_is_running() instead
+ * Deprecated: 2.2: Use g_main_loop_is_running() instead
  */
-#define g_main_is_running(loop) xmain_loop_is_running(loop) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_loop_is_running)
+#define g_main_is_running(loop) g_main_loop_is_running(loop) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_loop_is_running)
 
 /**
  * g_main_iteration:
@@ -99,25 +99,25 @@ G_BEGIN_DECLS
  *     processed. If set to %FALSE it will return immediately if no event
  *     source is ready to be processed.
  *
- * Runs a single iteration for the default #xmain_context_t.
+ * Runs a single iteration for the default #GMainContext.
  *
  * Returns: %TRUE if more events are pending.
  *
- * Deprecated: 2.2: Use xmain_context_iteration() instead.
+ * Deprecated: 2.2: Use g_main_context_iteration() instead.
  */
-#define g_main_iteration(may_block) xmain_context_iteration (NULL, may_block) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_context_iteration)
+#define g_main_iteration(may_block) g_main_context_iteration (NULL, may_block) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_context_iteration)
 
 /**
  * g_main_pending:
  *
- * Checks if any events are pending for the default #xmain_context_t
+ * Checks if any events are pending for the default #GMainContext
  * (i.e. ready to be processed).
  *
  * Returns: %TRUE if any events are pending.
  *
- * Deprecated: 2.2: Use xmain_context_pending() instead.
+ * Deprecated: 2.2: Use g_main_context_pending() instead.
  */
-#define g_main_pending()            xmain_context_pending (NULL) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_context_pending)
+#define g_main_pending()            g_main_context_pending (NULL) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_context_pending)
 
 /**
  * g_main_set_poll_func:
@@ -126,9 +126,9 @@ G_BEGIN_DECLS
  * Sets the function to use for the handle polling of file descriptors
  * for the default main context.
  *
- * Deprecated: 2.2: Use xmain_context_set_poll_func() again
+ * Deprecated: 2.2: Use g_main_context_set_poll_func() again
  */
-#define g_main_set_poll_func(func)  xmain_context_set_poll_func (NULL, func) XPL_DEPRECATED_MACRO_IN_2_26_FOR(xmain_context_set_poll_func)
+#define g_main_set_poll_func(func)  g_main_context_set_poll_func (NULL, func) GLIB_DEPRECATED_MACRO_IN_2_26_FOR(g_main_context_set_poll_func)
 
 G_END_DECLS
 

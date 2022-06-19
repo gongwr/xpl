@@ -40,62 +40,62 @@
 static GRWLock additional_schemes_lock;
 
 typedef struct _GVfsPrivate {
-  xhashtable_t *additional_schemes;
+  GHashTable *additional_schemes;
   char const **supported_schemes;
 } GVfsPrivate;
 
 typedef struct {
-  xvfs_file_lookup_func_t uri_func;
-  xpointer_t uri_data;
-  xdestroy_notify_t uri_destroy;
+  GVfsFileLookupFunc uri_func;
+  gpointer uri_data;
+  GDestroyNotify uri_destroy;
 
-  xvfs_file_lookup_func_t parse_name_func;
-  xpointer_t parse_name_data;
-  xdestroy_notify_t parse_name_destroy;
+  GVfsFileLookupFunc parse_name_func;
+  gpointer parse_name_data;
+  GDestroyNotify parse_name_destroy;
 } GVfsURISchemeData;
 
-G_DEFINE_TYPE_WITH_PRIVATE (xvfs_t, g_vfs, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GVfs, g_vfs, G_TYPE_OBJECT)
 
 static void
-xvfs_dispose (xobject_t *object)
+g_vfs_dispose (GObject *object)
 {
-  xvfs_t *vfs = XVFS (object);
-  GVfsPrivate *priv = xvfs_get_instance_private (vfs);
+  GVfs *vfs = G_VFS (object);
+  GVfsPrivate *priv = g_vfs_get_instance_private (vfs);
 
-  g_clear_pointer (&priv->additional_schemes, xhash_table_destroy);
+  g_clear_pointer (&priv->additional_schemes, g_hash_table_destroy);
   g_clear_pointer (&priv->supported_schemes, g_free);
 
-  XOBJECT_CLASS (xvfs_parent_class)->dispose (object);
+  G_OBJECT_CLASS (g_vfs_parent_class)->dispose (object);
 }
 
 static void
-xvfs_class_init (xvfs_class_t *klass)
+g_vfs_class_init (GVfsClass *klass)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (klass);
-  object_class->dispose = xvfs_dispose;
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  object_class->dispose = g_vfs_dispose;
 }
 
-static xfile_t *
-resource_parse_name (xvfs_t       *vfs,
+static GFile *
+resource_parse_name (GVfs       *vfs,
                      const char *parse_name,
-                     xpointer_t    user_data)
+                     gpointer    user_data)
 {
-  if (xstr_has_prefix (parse_name, "resource:"))
-    return _xresource_file_new (parse_name);
+  if (g_str_has_prefix (parse_name, "resource:"))
+    return _g_resource_file_new (parse_name);
 
   return NULL;
 }
 
-static xfile_t *
-resource_get_file_for_uri (xvfs_t       *vfs,
+static GFile *
+resource_get_file_for_uri (GVfs       *vfs,
                            const char *uri,
-                           xpointer_t    user_data)
+                           gpointer    user_data)
 {
-  return _xresource_file_new (uri);
+  return _g_resource_file_new (uri);
 }
 
 static void
-xvfs_uri_lookup_func_closure_free (xpointer_t data)
+g_vfs_uri_lookup_func_closure_free (gpointer data)
 {
   GVfsURISchemeData *closure = data;
 
@@ -108,77 +108,77 @@ xvfs_uri_lookup_func_closure_free (xpointer_t data)
 }
 
 static void
-xvfs_init (xvfs_t *vfs)
+g_vfs_init (GVfs *vfs)
 {
-  GVfsPrivate *priv = xvfs_get_instance_private (vfs);
+  GVfsPrivate *priv = g_vfs_get_instance_private (vfs);
   priv->additional_schemes =
-    xhash_table_new_full (xstr_hash, xstr_equal,
-                           g_free, xvfs_uri_lookup_func_closure_free);
+    g_hash_table_new_full (g_str_hash, g_str_equal,
+                           g_free, g_vfs_uri_lookup_func_closure_free);
 
-  xvfs_register_uri_scheme (vfs, "resource",
+  g_vfs_register_uri_scheme (vfs, "resource",
                              resource_get_file_for_uri, NULL, NULL,
                              resource_parse_name, NULL, NULL);
 }
 
 /**
- * xvfs_is_active:
- * @vfs: a #xvfs_t.
+ * g_vfs_is_active:
+ * @vfs: a #GVfs.
  *
  * Checks if the VFS is active.
  *
  * Returns: %TRUE if construction of the @vfs was successful
  *     and it is now active.
  */
-xboolean_t
-xvfs_is_active (xvfs_t *vfs)
+gboolean
+g_vfs_is_active (GVfs *vfs)
 {
-  xvfs_class_t *class;
+  GVfsClass *class;
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), FALSE);
+  g_return_val_if_fail (G_IS_VFS (vfs), FALSE);
 
-  class = XVFS_GET_CLASS (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
   return (* class->is_active) (vfs);
 }
 
 
 /**
- * xvfs_get_file_for_path:
- * @vfs: a #xvfs_t.
+ * g_vfs_get_file_for_path:
+ * @vfs: a #GVfs.
  * @path: a string containing a VFS path.
  *
- * Gets a #xfile_t for @path.
+ * Gets a #GFile for @path.
  *
- * Returns: (transfer full): a #xfile_t.
- *     Free the returned object with xobject_unref().
+ * Returns: (transfer full): a #GFile.
+ *     Free the returned object with g_object_unref().
  */
-xfile_t *
-xvfs_get_file_for_path (xvfs_t       *vfs,
+GFile *
+g_vfs_get_file_for_path (GVfs       *vfs,
                          const char *path)
 {
-  xvfs_class_t *class;
+  GVfsClass *class;
+ 
+  g_return_val_if_fail (G_IS_VFS (vfs), NULL);
+  g_return_val_if_fail (path != NULL, NULL);
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
-  xreturn_val_if_fail (path != NULL, NULL);
-
-  class = XVFS_GET_CLASS (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
   return (* class->get_file_for_path) (vfs, path);
 }
 
-static xfile_t *
-parse_name_internal (xvfs_t       *vfs,
+static GFile *
+parse_name_internal (GVfs       *vfs,
                      const char *parse_name)
 {
-  GVfsPrivate *priv = xvfs_get_instance_private (vfs);
-  xhash_table_iter_t iter;
+  GVfsPrivate *priv = g_vfs_get_instance_private (vfs);
+  GHashTableIter iter;
   GVfsURISchemeData *closure;
-  xfile_t *ret = NULL;
+  GFile *ret = NULL;
 
   g_rw_lock_reader_lock (&additional_schemes_lock);
-  xhash_table_iter_init (&iter, priv->additional_schemes);
+  g_hash_table_iter_init (&iter, priv->additional_schemes);
 
-  while (xhash_table_iter_next (&iter, NULL, (xpointer_t *) &closure))
+  while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &closure))
     {
       ret = closure->parse_name_func (vfs, parse_name,
                                       closure->parse_name_data);
@@ -192,21 +192,21 @@ parse_name_internal (xvfs_t       *vfs,
   return ret;
 }
 
-static xfile_t *
-get_file_for_uri_internal (xvfs_t       *vfs,
+static GFile *
+get_file_for_uri_internal (GVfs       *vfs,
                            const char *uri)
 {
-  GVfsPrivate *priv = xvfs_get_instance_private (vfs);
-  xfile_t *ret = NULL;
+  GVfsPrivate *priv = g_vfs_get_instance_private (vfs);
+  GFile *ret = NULL;
   char *scheme;
   GVfsURISchemeData *closure;
 
-  scheme = xuri_parse_scheme (uri);
+  scheme = g_uri_parse_scheme (uri);
   if (scheme == NULL)
     return NULL;
 
   g_rw_lock_reader_lock (&additional_schemes_lock);
-  closure = xhash_table_lookup (priv->additional_schemes, scheme);
+  closure = g_hash_table_lookup (priv->additional_schemes, scheme);
 
   if (closure)
     ret = closure->uri_func (vfs, uri, closure->uri_data);
@@ -218,43 +218,43 @@ get_file_for_uri_internal (xvfs_t       *vfs,
 }
 
 /**
- * xvfs_get_file_for_uri:
- * @vfs: a#xvfs_t.
+ * g_vfs_get_file_for_uri:
+ * @vfs: a#GVfs.
  * @uri: a string containing a URI
  *
- * Gets a #xfile_t for @uri.
+ * Gets a #GFile for @uri.
  *
  * This operation never fails, but the returned object
  * might not support any I/O operation if the URI
  * is malformed or if the URI scheme is not supported.
  *
- * Returns: (transfer full): a #xfile_t.
- *     Free the returned object with xobject_unref().
+ * Returns: (transfer full): a #GFile.
+ *     Free the returned object with g_object_unref().
  */
-xfile_t *
-xvfs_get_file_for_uri (xvfs_t       *vfs,
+GFile *
+g_vfs_get_file_for_uri (GVfs       *vfs,
                         const char *uri)
 {
-  xvfs_class_t *class;
-  xfile_t *ret = NULL;
+  GVfsClass *class;
+  GFile *ret = NULL;
+ 
+  g_return_val_if_fail (G_IS_VFS (vfs), NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
-  xreturn_val_if_fail (uri != NULL, NULL);
-
-  class = XVFS_GET_CLASS (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
   ret = get_file_for_uri_internal (vfs, uri);
   if (!ret)
     ret = (* class->get_file_for_uri) (vfs, uri);
 
-  xassert (ret != NULL);
+  g_assert (ret != NULL);
 
   return g_steal_pointer (&ret);
 }
 
 /**
- * xvfs_get_supported_uri_schemes:
- * @vfs: a #xvfs_t.
+ * g_vfs_get_supported_uri_schemes:
+ * @vfs: a #GVfs.
  *
  * Gets a list of URI schemes supported by @vfs.
  *
@@ -262,73 +262,73 @@ xvfs_get_file_for_uri (xvfs_t       *vfs,
  *     The returned array belongs to GIO and must
  *     not be freed or modified.
  */
-const xchar_t * const *
-xvfs_get_supported_uri_schemes (xvfs_t *vfs)
+const gchar * const *
+g_vfs_get_supported_uri_schemes (GVfs *vfs)
 {
   GVfsPrivate *priv;
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
+  g_return_val_if_fail (G_IS_VFS (vfs), NULL);
 
-  priv = xvfs_get_instance_private (vfs);
+  priv = g_vfs_get_instance_private (vfs);
 
   if (!priv->supported_schemes)
     {
-      xvfs_class_t *class;
+      GVfsClass *class;
       const char * const *default_schemes;
       const char *additional_scheme;
-      xptr_array_t *supported_schemes;
-      xhash_table_iter_t iter;
+      GPtrArray *supported_schemes;
+      GHashTableIter iter;
 
-      class = XVFS_GET_CLASS (vfs);
+      class = G_VFS_GET_CLASS (vfs);
 
       default_schemes = (* class->get_supported_uri_schemes) (vfs);
-      supported_schemes = xptr_array_new ();
+      supported_schemes = g_ptr_array_new ();
 
       for (; default_schemes && *default_schemes; default_schemes++)
-        xptr_array_add (supported_schemes, (xpointer_t) *default_schemes);
+        g_ptr_array_add (supported_schemes, (gpointer) *default_schemes);
 
       g_rw_lock_reader_lock (&additional_schemes_lock);
-      xhash_table_iter_init (&iter, priv->additional_schemes);
+      g_hash_table_iter_init (&iter, priv->additional_schemes);
 
-      while (xhash_table_iter_next
-             (&iter, (xpointer_t *) &additional_scheme, NULL))
-        xptr_array_add (supported_schemes, (xpointer_t) additional_scheme);
+      while (g_hash_table_iter_next
+             (&iter, (gpointer *) &additional_scheme, NULL))
+        g_ptr_array_add (supported_schemes, (gpointer) additional_scheme);
 
       g_rw_lock_reader_unlock (&additional_schemes_lock);
 
-      xptr_array_add (supported_schemes, NULL);
+      g_ptr_array_add (supported_schemes, NULL);
 
       g_free (priv->supported_schemes);
       priv->supported_schemes =
-        (char const **) xptr_array_free (supported_schemes, FALSE);
+        (char const **) g_ptr_array_free (supported_schemes, FALSE);
     }
 
   return priv->supported_schemes;
 }
 
 /**
- * xvfs_parse_name:
- * @vfs: a #xvfs_t.
+ * g_vfs_parse_name:
+ * @vfs: a #GVfs.
  * @parse_name: a string to be parsed by the VFS module.
  *
  * This operation never fails, but the returned object might
  * not support any I/O operations if the @parse_name cannot
- * be parsed by the #xvfs_t module.
+ * be parsed by the #GVfs module.
  *
- * Returns: (transfer full): a #xfile_t for the given @parse_name.
- *     Free the returned object with xobject_unref().
+ * Returns: (transfer full): a #GFile for the given @parse_name.
+ *     Free the returned object with g_object_unref().
  */
-xfile_t *
-xvfs_parse_name (xvfs_t       *vfs,
+GFile *
+g_vfs_parse_name (GVfs       *vfs,
                   const char *parse_name)
 {
-  xvfs_class_t *class;
-  xfile_t *ret;
+  GVfsClass *class;
+  GFile *ret;
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
-  xreturn_val_if_fail (parse_name != NULL, NULL);
+  g_return_val_if_fail (G_IS_VFS (vfs), NULL);
+  g_return_val_if_fail (parse_name != NULL, NULL);
 
-  class = XVFS_GET_CLASS (vfs);
+  class = G_VFS_GET_CLASS (vfs);
 
   ret = parse_name_internal (vfs, parse_name);
   if (ret)
@@ -337,29 +337,29 @@ xvfs_parse_name (xvfs_t       *vfs,
   return (* class->parse_name) (vfs, parse_name);
 }
 
-static xvfs_t *vfs_default_singleton = NULL;  /* (owned) (atomic) */
+static GVfs *vfs_default_singleton = NULL;  /* (owned) (atomic) */
 
 /**
- * xvfs_get_default:
+ * g_vfs_get_default:
  *
- * Gets the default #xvfs_t for the system.
+ * Gets the default #GVfs for the system.
  *
- * Returns: (not nullable) (transfer none): a #xvfs_t, which will be the local
- *     file system #xvfs_t if no other implementation is available.
+ * Returns: (not nullable) (transfer none): a #GVfs, which will be the local
+ *     file system #GVfs if no other implementation is available.
  */
-xvfs_t *
-xvfs_get_default (void)
+GVfs *
+g_vfs_get_default (void)
 {
-  if (XPL_PRIVATE_CALL (g_check_setuid) ())
-    return xvfs_get_local ();
+  if (GLIB_PRIVATE_CALL (g_check_setuid) ())
+    return g_vfs_get_local ();
 
   if (g_once_init_enter (&vfs_default_singleton))
     {
-      xvfs_t *singleton;
+      GVfs *singleton;
 
-      singleton = _xio_module_get_default (XVFS_EXTENSION_POINT_NAME,
+      singleton = _g_io_module_get_default (G_VFS_EXTENSION_POINT_NAME,
                                             "GIO_USE_VFS",
-                                            (xio_module_verify_func_t) xvfs_is_active);
+                                            (GIOModuleVerifyFunc) g_vfs_is_active);
 
       g_once_init_leave (&vfs_default_singleton, singleton);
     }
@@ -368,85 +368,85 @@ xvfs_get_default (void)
 }
 
 /**
- * xvfs_get_local:
+ * g_vfs_get_local:
  *
- * Gets the local #xvfs_t for the system.
+ * Gets the local #GVfs for the system.
  *
- * Returns: (transfer none): a #xvfs_t.
+ * Returns: (transfer none): a #GVfs.
  */
-xvfs_t *
-xvfs_get_local (void)
+GVfs *
+g_vfs_get_local (void)
 {
-  static xsize_t vfs = 0;
+  static gsize vfs = 0;
 
   if (g_once_init_enter (&vfs))
-    g_once_init_leave (&vfs, (xsize_t)_g_local_vfs_new ());
+    g_once_init_leave (&vfs, (gsize)_g_local_vfs_new ());
 
-  return XVFS (vfs);
+  return G_VFS (vfs);
 }
 
 /**
- * xvfs_register_uri_scheme:
- * @vfs: a #xvfs_t
+ * g_vfs_register_uri_scheme:
+ * @vfs: a #GVfs
  * @scheme: an URI scheme, e.g. "http"
- * @uri_func: (scope notified) (nullable): a #xvfs_file_lookup_func_t
+ * @uri_func: (scope notified) (nullable): a #GVfsFileLookupFunc
  * @uri_data: (nullable): custom data passed to be passed to @uri_func, or %NULL
  * @uri_destroy: (nullable): function to be called when unregistering the
  *     URI scheme, or when @vfs is disposed, to free the resources used
  *     by the URI lookup function
- * @parse_name_func: (scope notified) (nullable): a #xvfs_file_lookup_func_t
+ * @parse_name_func: (scope notified) (nullable): a #GVfsFileLookupFunc
  * @parse_name_data: (nullable): custom data passed to be passed to
  *     @parse_name_func, or %NULL
  * @parse_name_destroy: (nullable): function to be called when unregistering the
  *     URI scheme, or when @vfs is disposed, to free the resources used
  *     by the parse name lookup function
  *
- * Registers @uri_func and @parse_name_func as the #xfile_t URI and parse name
+ * Registers @uri_func and @parse_name_func as the #GFile URI and parse name
  * lookup functions for URIs with a scheme matching @scheme.
  * Note that @scheme is registered only within the running application, as
- * opposed to desktop-wide as it happens with xvfs_t backends.
+ * opposed to desktop-wide as it happens with GVfs backends.
  *
- * When a #xfile_t is requested with an URI containing @scheme (e.g. through
- * xfile_new_for_uri()), @uri_func will be called to allow a custom
+ * When a #GFile is requested with an URI containing @scheme (e.g. through
+ * g_file_new_for_uri()), @uri_func will be called to allow a custom
  * constructor. The implementation of @uri_func should not be blocking, and
- * must not call xvfs_register_uri_scheme() or xvfs_unregister_uri_scheme().
+ * must not call g_vfs_register_uri_scheme() or g_vfs_unregister_uri_scheme().
  *
- * When xfile_parse_name() is called with a parse name obtained from such file,
- * @parse_name_func will be called to allow the #xfile_t to be created again. In
+ * When g_file_parse_name() is called with a parse name obtained from such file,
+ * @parse_name_func will be called to allow the #GFile to be created again. In
  * that case, it's responsibility of @parse_name_func to make sure the parse
- * name matches what the custom #xfile_t implementation returned when
- * xfile_get_parse_name() was previously called. The implementation of
+ * name matches what the custom #GFile implementation returned when
+ * g_file_get_parse_name() was previously called. The implementation of
  * @parse_name_func should not be blocking, and must not call
- * xvfs_register_uri_scheme() or xvfs_unregister_uri_scheme().
+ * g_vfs_register_uri_scheme() or g_vfs_unregister_uri_scheme().
  *
  * It's an error to call this function twice with the same scheme. To unregister
- * a custom URI scheme, use xvfs_unregister_uri_scheme().
+ * a custom URI scheme, use g_vfs_unregister_uri_scheme().
  *
  * Returns: %TRUE if @scheme was successfully registered, or %FALSE if a handler
  *     for @scheme already exists.
  *
  * Since: 2.50
  */
-xboolean_t
-xvfs_register_uri_scheme (xvfs_t              *vfs,
+gboolean
+g_vfs_register_uri_scheme (GVfs              *vfs,
                            const char        *scheme,
-                           xvfs_file_lookup_func_t uri_func,
-                           xpointer_t           uri_data,
-                           xdestroy_notify_t     uri_destroy,
-                           xvfs_file_lookup_func_t parse_name_func,
-                           xpointer_t           parse_name_data,
-                           xdestroy_notify_t     parse_name_destroy)
+                           GVfsFileLookupFunc uri_func,
+                           gpointer           uri_data,
+                           GDestroyNotify     uri_destroy,
+                           GVfsFileLookupFunc parse_name_func,
+                           gpointer           parse_name_data,
+                           GDestroyNotify     parse_name_destroy)
 {
   GVfsPrivate *priv;
   GVfsURISchemeData *closure;
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), FALSE);
-  xreturn_val_if_fail (scheme != NULL, FALSE);
+  g_return_val_if_fail (G_IS_VFS (vfs), FALSE);
+  g_return_val_if_fail (scheme != NULL, FALSE);
 
-  priv = xvfs_get_instance_private (vfs);
+  priv = g_vfs_get_instance_private (vfs);
 
   g_rw_lock_reader_lock (&additional_schemes_lock);
-  closure = xhash_table_lookup (priv->additional_schemes, scheme);
+  closure = g_hash_table_lookup (priv->additional_schemes, scheme);
   g_rw_lock_reader_unlock (&additional_schemes_lock);
 
   if (closure != NULL)
@@ -461,7 +461,7 @@ xvfs_register_uri_scheme (xvfs_t              *vfs,
   closure->parse_name_destroy = parse_name_destroy;
 
   g_rw_lock_writer_lock (&additional_schemes_lock);
-  xhash_table_insert (priv->additional_schemes, xstrdup (scheme), closure);
+  g_hash_table_insert (priv->additional_schemes, g_strdup (scheme), closure);
   g_rw_lock_writer_unlock (&additional_schemes_lock);
 
   /* Invalidate supported schemes */
@@ -471,32 +471,32 @@ xvfs_register_uri_scheme (xvfs_t              *vfs,
 }
 
 /**
- * xvfs_unregister_uri_scheme:
- * @vfs: a #xvfs_t
+ * g_vfs_unregister_uri_scheme:
+ * @vfs: a #GVfs
  * @scheme: an URI scheme, e.g. "http"
  *
  * Unregisters the URI handler for @scheme previously registered with
- * xvfs_register_uri_scheme().
+ * g_vfs_register_uri_scheme().
  *
  * Returns: %TRUE if @scheme was successfully unregistered, or %FALSE if a
  *     handler for @scheme does not exist.
  *
  * Since: 2.50
  */
-xboolean_t
-xvfs_unregister_uri_scheme (xvfs_t       *vfs,
+gboolean
+g_vfs_unregister_uri_scheme (GVfs       *vfs,
                              const char *scheme)
 {
   GVfsPrivate *priv;
-  xboolean_t res;
+  gboolean res;
 
-  xreturn_val_if_fail (X_IS_VFS (vfs), FALSE);
-  xreturn_val_if_fail (scheme != NULL, FALSE);
+  g_return_val_if_fail (G_IS_VFS (vfs), FALSE);
+  g_return_val_if_fail (scheme != NULL, FALSE);
 
-  priv = xvfs_get_instance_private (vfs);
+  priv = g_vfs_get_instance_private (vfs);
 
   g_rw_lock_writer_lock (&additional_schemes_lock);
-  res = xhash_table_remove (priv->additional_schemes, scheme);
+  res = g_hash_table_remove (priv->additional_schemes, scheme);
   g_rw_lock_writer_unlock (&additional_schemes_lock);
 
   if (res)

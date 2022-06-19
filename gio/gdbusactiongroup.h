@@ -29,25 +29,25 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_ACTION_GROUP                            (xdbus_action_group_get_type ())
-#define G_DBUS_ACTION_GROUP(inst)                           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_DBUS_ACTION_GROUP, xdbus_action_group_t))
-#define G_DBUS_ACTION_GROUP_CLASS(class)                    (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_DBUS_ACTION_GROUP, xdbus_action_group_class_t))
-#define X_IS_DBUS_ACTION_GROUP(inst)                        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_DBUS_ACTION_GROUP))
-#define X_IS_DBUS_ACTION_GROUP_CLASS(class)                 (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_DBUS_ACTION_GROUP))
-#define G_DBUS_ACTION_GROUP_GET_CLASS(inst)                 (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_DBUS_ACTION_GROUP, xdbus_action_group_class_t))
+#define G_TYPE_DBUS_ACTION_GROUP                            (g_dbus_action_group_get_type ())
+#define G_DBUS_ACTION_GROUP(inst)                           (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_DBUS_ACTION_GROUP, GDBusActionGroup))
+#define G_DBUS_ACTION_GROUP_CLASS(class)                    (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_DBUS_ACTION_GROUP, GDBusActionGroupClass))
+#define G_IS_DBUS_ACTION_GROUP(inst)                        (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_DBUS_ACTION_GROUP))
+#define G_IS_DBUS_ACTION_GROUP_CLASS(class)                 (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_DBUS_ACTION_GROUP))
+#define G_DBUS_ACTION_GROUP_GET_CLASS(inst)                 (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_DBUS_ACTION_GROUP, GDBusActionGroupClass))
 
-XPL_AVAILABLE_IN_ALL
-xtype_t                   xdbus_action_group_get_type                  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType                   g_dbus_action_group_get_type                  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_32
-xdbus_action_group_t *      xdbus_action_group_get                       (xdbus_connection_t        *connection,
-                                                                       const xchar_t            *bus_name,
-                                                                       const xchar_t            *object_path);
+GLIB_AVAILABLE_IN_2_32
+GDBusActionGroup *      g_dbus_action_group_get                       (GDBusConnection        *connection,
+                                                                       const gchar            *bus_name,
+                                                                       const gchar            *object_path);
 
 G_END_DECLS
 

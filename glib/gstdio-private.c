@@ -27,22 +27,22 @@
  * in @str size (if any).
  * Returns TRUE if @str was modified.
  */
-static xboolean_t
-_g_win32_strip_extended_ntobjm_prefix (xunichar2_t *str,
-                                       xsize_t     *str_size)
+static gboolean
+_g_win32_strip_extended_ntobjm_prefix (gunichar2 *str,
+                                       gsize     *str_size)
 {
   const wchar_t *extended_prefix = L"\\\\?\\";
-  const xsize_t    extended_prefix_len = wcslen (extended_prefix);
-  const xsize_t    extended_prefix_len_bytes = sizeof (xunichar2_t) * extended_prefix_len;
-  const xsize_t    extended_prefix_with_drive_len_bytes = sizeof (xunichar2_t) * (extended_prefix_len + 2);
+  const gsize    extended_prefix_len = wcslen (extended_prefix);
+  const gsize    extended_prefix_len_bytes = sizeof (gunichar2) * extended_prefix_len;
+  const gsize    extended_prefix_with_drive_len_bytes = sizeof (gunichar2) * (extended_prefix_len + 2);
   const wchar_t *ntobjm_prefix = L"\\??\\";
-  const xsize_t    ntobjm_prefix_len = wcslen (ntobjm_prefix);
-  const xsize_t    ntobjm_prefix_len_bytes = sizeof (xunichar2_t) * ntobjm_prefix_len;
-  const xsize_t    ntobjm_prefix_with_drive_len_bytes = sizeof (xunichar2_t) * (ntobjm_prefix_len + 2);
-  xboolean_t do_move = FALSE;
-  xsize_t move_shift = 0;
+  const gsize    ntobjm_prefix_len = wcslen (ntobjm_prefix);
+  const gsize    ntobjm_prefix_len_bytes = sizeof (gunichar2) * ntobjm_prefix_len;
+  const gsize    ntobjm_prefix_with_drive_len_bytes = sizeof (gunichar2) * (ntobjm_prefix_len + 2);
+  gboolean do_move = FALSE;
+  gsize move_shift = 0;
 
-  if ((*str_size) * sizeof (xunichar2_t) > extended_prefix_with_drive_len_bytes &&
+  if ((*str_size) * sizeof (gunichar2) > extended_prefix_with_drive_len_bytes &&
       memcmp (str,
               extended_prefix,
               extended_prefix_len_bytes) == 0 &&
@@ -53,7 +53,7 @@ _g_win32_strip_extended_ntobjm_prefix (xunichar2_t *str,
      do_move = TRUE;
      move_shift = extended_prefix_len;
    }
-  else if ((*str_size) * sizeof (xunichar2_t) > ntobjm_prefix_with_drive_len_bytes &&
+  else if ((*str_size) * sizeof (gunichar2) > ntobjm_prefix_with_drive_len_bytes &&
            memcmp (str,
                    ntobjm_prefix,
                    ntobjm_prefix_len_bytes) == 0 &&
@@ -70,27 +70,27 @@ _g_win32_strip_extended_ntobjm_prefix (xunichar2_t *str,
       *str_size -= move_shift;
       memmove (str,
                str + move_shift,
-               (*str_size) * sizeof (xunichar2_t));
+               (*str_size) * sizeof (gunichar2));
     }
 
   return do_move;
 }
 
 static int
-_g_win32_copy_and_maybe_terminate (const xuchar_t *data,
-                                   xsize_t         in_to_copy,
-                                   xunichar2_t    *buf,
-                                   xsize_t         buf_size,
-                                   xunichar2_t   **alloc_buf,
-                                   xboolean_t      terminate)
+_g_win32_copy_and_maybe_terminate (const guchar *data,
+                                   gsize         in_to_copy,
+                                   gunichar2    *buf,
+                                   gsize         buf_size,
+                                   gunichar2   **alloc_buf,
+                                   gboolean      terminate)
 {
-  xsize_t to_copy = in_to_copy;
+  gsize to_copy = in_to_copy;
   /* Number of bytes we can use to add extra zeroes for NUL-termination.
    * 0 means that we can destroy up to 2 bytes of data,
    * 1 means that we can destroy up to 1 byte of data,
    * 2 means that we do not perform destructive NUL-termination
    */
-  xsize_t extra_bytes = terminate ? 2 : 0;
+  gsize extra_bytes = terminate ? 2 : 0;
   char *buf_in_chars;
 
   if (to_copy == 0)
@@ -114,7 +114,7 @@ _g_win32_copy_and_maybe_terminate (const xuchar_t *data,
   else
     {
       /* Note that SubstituteNameLength is USHORT, so to_copy + 2, being
-       * xsize_t, never overflows.
+       * gsize, never overflows.
        */
       *alloc_buf = g_malloc (to_copy + extra_bytes);
       memcpy (*alloc_buf, data, to_copy);

@@ -30,8 +30,8 @@
 
 struct _GvdbItem
 {
-  xchar_t *key;
-  xuint32_t hash_value;
+  gchar *key;
+  guint32 hash_value;
   guint32_le assigned_index;
   GvdbItem *parent;
   GvdbItem *sibling;
@@ -40,38 +40,38 @@ struct _GvdbItem
   /* one of:
    * this:
    */
-  xvariant_t *value;
+  GVariant *value;
 
   /* this: */
-  xhashtable_t *table;
+  GHashTable *table;
 
   /* or this: */
   GvdbItem *child;
 };
 
 static void
-gvdb_item_free (xpointer_t data)
+gvdb_item_free (gpointer data)
 {
   GvdbItem *item = data;
 
   g_free (item->key);
 
   if (item->value)
-    xvariant_unref (item->value);
+    g_variant_unref (item->value);
 
   if (item->table)
-    xhash_table_unref (item->table);
+    g_hash_table_unref (item->table);
 
   g_slice_free (GvdbItem, item);
 }
 
-xhashtable_t *
-gvdb_hash_table_new (xhashtable_t  *parent,
-                     const xchar_t *name_in_parent)
+GHashTable *
+gvdb_hash_table_new (GHashTable  *parent,
+                     const gchar *name_in_parent)
 {
-  xhashtable_t *table;
+  GHashTable *table;
 
-  table = xhash_table_new_full (xstr_hash, xstr_equal,
+  table = g_hash_table_new_full (g_str_hash, g_str_equal,
                                  g_free, gvdb_item_free);
 
   if (parent)
@@ -85,10 +85,10 @@ gvdb_hash_table_new (xhashtable_t  *parent,
   return table;
 }
 
-static xuint32_t
-djb_hash (const xchar_t *key)
+static guint32
+djb_hash (const gchar *key)
 {
-  xuint32_t hash_value = 5381;
+  guint32 hash_value = 5381;
 
   while (*key)
     hash_value = hash_value * 33 + *(signed char *)key++;
@@ -97,47 +97,47 @@ djb_hash (const xchar_t *key)
 }
 
 GvdbItem *
-gvdb_hash_table_insert (xhashtable_t  *table,
-                        const xchar_t *key)
+gvdb_hash_table_insert (GHashTable  *table,
+                        const gchar *key)
 {
   GvdbItem *item;
 
   item = g_slice_new0 (GvdbItem);
-  item->key = xstrdup (key);
+  item->key = g_strdup (key);
   item->hash_value = djb_hash (key);
 
-  xhash_table_insert (table, xstrdup (key), item);
+  g_hash_table_insert (table, g_strdup (key), item);
 
   return item;
 }
 
 void
-gvdb_hash_table_insert_string (xhashtable_t  *table,
-                               const xchar_t *key,
-                               const xchar_t *value)
+gvdb_hash_table_insert_string (GHashTable  *table,
+                               const gchar *key,
+                               const gchar *value)
 {
   GvdbItem *item;
 
   item = gvdb_hash_table_insert (table, key);
-  gvdb_item_set_value (item, xvariant_new_string (value));
+  gvdb_item_set_value (item, g_variant_new_string (value));
 }
 
 void
 gvdb_item_set_value (GvdbItem *item,
-                     xvariant_t *value)
+                     GVariant *value)
 {
   g_return_if_fail (!item->value && !item->table && !item->child);
 
-  item->value = xvariant_ref_sink (value);
+  item->value = g_variant_ref_sink (value);
 }
 
 void
 gvdb_item_set_hash_table (GvdbItem   *item,
-                          xhashtable_t *table)
+                          GHashTable *table)
 {
   g_return_if_fail (!item->value && !item->table && !item->child);
 
-  item->table = xhash_table_ref (table);
+  item->table = g_hash_table_ref (table);
 }
 
 void
@@ -146,7 +146,7 @@ gvdb_item_set_parent (GvdbItem *item,
 {
   GvdbItem **node;
 
-  g_return_if_fail (xstr_has_prefix (item->key, parent->key));
+  g_return_if_fail (g_str_has_prefix (item->key, parent->key));
   g_return_if_fail (!parent->value && !parent->table);
   g_return_if_fail (!item->parent && !item->sibling);
 
@@ -162,11 +162,11 @@ gvdb_item_set_parent (GvdbItem *item,
 typedef struct
 {
   GvdbItem **buckets;
-  xint_t n_buckets;
+  gint n_buckets;
 } HashTable;
 
 static HashTable *
-hash_table_new (xint_t n_buckets)
+hash_table_new (gint n_buckets)
 {
   HashTable *table;
 
@@ -186,11 +186,11 @@ hash_table_free (HashTable *table)
 }
 
 static void
-hash_table_insert (xpointer_t key,
-                   xpointer_t value,
-                   xpointer_t data)
+hash_table_insert (gpointer key,
+                   gpointer value,
+                   gpointer data)
 {
-  xuint32_t hash_value, bucket;
+  guint32 hash_value, bucket;
   HashTable *table = data;
   GvdbItem *item = value;
 
@@ -206,27 +206,27 @@ item_to_index (GvdbItem *item)
   if (item != NULL)
     return item->assigned_index;
 
-  return guint32_to_le ((xuint32_t) -1);
+  return guint32_to_le ((guint32) -1);
 }
 
 typedef struct
 {
-  xqueue_t *chunks;
-  xuint64_t offset;
-  xboolean_t byteswap;
+  GQueue *chunks;
+  guint64 offset;
+  gboolean byteswap;
 } FileBuilder;
 
 typedef struct
 {
-  xsize_t offset;
-  xsize_t size;
-  xpointer_t data;
+  gsize offset;
+  gsize size;
+  gpointer data;
 } FileChunk;
 
-static xpointer_t
+static gpointer
 file_builder_allocate (FileBuilder         *fb,
-                       xuint_t                alignment,
-                       xsize_t                size,
+                       guint                alignment,
+                       gsize                size,
                        struct gvdb_pointer *pointer)
 {
   FileChunk *chunk;
@@ -234,7 +234,7 @@ file_builder_allocate (FileBuilder         *fb,
   if (size == 0)
     return NULL;
 
-  fb->offset += (xuint64_t) (-fb->offset) & (alignment - 1);
+  fb->offset += (guint64) (-fb->offset) & (alignment - 1);
   chunk = g_slice_new (FileChunk);
   chunk->offset = fb->offset;
   chunk->size = size;
@@ -251,39 +251,39 @@ file_builder_allocate (FileBuilder         *fb,
 
 static void
 file_builder_add_value (FileBuilder         *fb,
-                        xvariant_t            *value,
+                        GVariant            *value,
                         struct gvdb_pointer *pointer)
 {
-  xvariant_t *variant, *normal;
-  xpointer_t data;
-  xsize_t size;
+  GVariant *variant, *normal;
+  gpointer data;
+  gsize size;
 
   if (fb->byteswap)
     {
-      value = xvariant_byteswap (value);
-      variant = xvariant_new_variant (value);
-      xvariant_unref (value);
+      value = g_variant_byteswap (value);
+      variant = g_variant_new_variant (value);
+      g_variant_unref (value);
     }
   else
-    variant = xvariant_new_variant (value);
+    variant = g_variant_new_variant (value);
 
-  normal = xvariant_get_normal_form (variant);
-  xvariant_unref (variant);
+  normal = g_variant_get_normal_form (variant);
+  g_variant_unref (variant);
 
-  size = xvariant_get_size (normal);
+  size = g_variant_get_size (normal);
   data = file_builder_allocate (fb, 8, size, pointer);
-  xvariant_store (normal, data);
-  xvariant_unref (normal);
+  g_variant_store (normal, data);
+  g_variant_unref (normal);
 }
 
 static void
 file_builder_add_string (FileBuilder *fb,
-                         const xchar_t *string,
+                         const gchar *string,
                          guint32_le  *start,
                          guint16_le  *size)
 {
   FileChunk *chunk;
-  xsize_t length;
+  gsize length;
 
   length = strlen (string);
 
@@ -303,20 +303,20 @@ file_builder_add_string (FileBuilder *fb,
 
 static void
 file_builder_allocate_for_hash (FileBuilder            *fb,
-                                xsize_t                   n_buckets,
-                                xsize_t                   n_items,
-                                xuint_t                   bloom_shift,
-                                xsize_t                   n_bloom_words,
+                                gsize                   n_buckets,
+                                gsize                   n_items,
+                                guint                   bloom_shift,
+                                gsize                   n_bloom_words,
                                 guint32_le            **bloom_filter,
                                 guint32_le            **hash_buckets,
                                 struct gvdb_hash_item **hash_items,
                                 struct gvdb_pointer    *pointer)
 {
   guint32_le bloom_hdr, table_hdr;
-  xuchar_t *data;
-  xsize_t size;
+  guchar *data;
+  gsize size;
 
-  xassert (n_bloom_words < (1u << 27));
+  g_assert (n_bloom_words < (1u << 27));
 
   bloom_hdr = guint32_to_le (bloom_shift << 27 | n_bloom_words);
   table_hdr = guint32_to_le (n_buckets);
@@ -335,7 +335,7 @@ file_builder_allocate_for_hash (FileBuilder            *fb,
   *hash_buckets = (guint32_le *) chunk (n_buckets * sizeof (guint32_le));
   *hash_items = (struct gvdb_hash_item *) chunk (n_items *
                   sizeof (struct gvdb_hash_item));
-  xassert (size == 0);
+  g_assert (size == 0);
 #undef chunk
 
   memset (*bloom_filter, 0, n_bloom_words * sizeof (guint32_le));
@@ -352,18 +352,18 @@ file_builder_allocate_for_hash (FileBuilder            *fb,
 
 static void
 file_builder_add_hash (FileBuilder         *fb,
-                       xhashtable_t          *table,
+                       GHashTable          *table,
                        struct gvdb_pointer *pointer)
 {
   guint32_le *buckets, *bloom_filter;
   struct gvdb_hash_item *items;
   HashTable *mytable;
   GvdbItem *item;
-  xuint32_t index;
-  xint_t bucket;
+  guint32 index;
+  gint bucket;
 
-  mytable = hash_table_new (xhash_table_size (table));
-  xhash_table_foreach (table, hash_table_insert, mytable);
+  mytable = hash_table_new (g_hash_table_size (table));
+  g_hash_table_foreach (table, hash_table_insert, mytable);
   index = 0;
 
   for (bucket = 0; bucket < mytable->n_buckets; bucket++)
@@ -381,9 +381,9 @@ file_builder_add_hash (FileBuilder         *fb,
       for (item = mytable->buckets[bucket]; item; item = item->next)
         {
           struct gvdb_hash_item *entry = items++;
-          const xchar_t *basename;
+          const gchar *basename;
 
-          xassert (index == guint32_from_le (item->assigned_index));
+          g_assert (index == guint32_from_le (item->assigned_index));
           entry->hash_value = guint32_to_le (item->hash_value);
           entry->parent = item_to_index (item->parent);
           entry->unused = 0;
@@ -399,7 +399,7 @@ file_builder_add_hash (FileBuilder         *fb,
 
           if (item->value != NULL)
             {
-              xassert (item->child == NULL && item->table == NULL);
+              g_assert (item->child == NULL && item->table == NULL);
 
               file_builder_add_value (fb, item->value, &entry->value.pointer);
               entry->type = 'v';
@@ -407,11 +407,11 @@ file_builder_add_hash (FileBuilder         *fb,
 
           if (item->child != NULL)
             {
-              xuint32_t children = 0, i = 0;
+              guint32 children = 0, i = 0;
               guint32_le *offsets;
               GvdbItem *child;
 
-              xassert (item->table == NULL);
+              g_assert (item->table == NULL);
 
               for (child = item->child; child; child = child->sibling)
                 children++;
@@ -423,7 +423,7 @@ file_builder_add_hash (FileBuilder         *fb,
               for (child = item->child; child; child = child->sibling)
                 offsets[i++] = child->assigned_index;
 
-              xassert (children == i);
+              g_assert (children == i);
             }
 
           if (item->table != NULL)
@@ -440,7 +440,7 @@ file_builder_add_hash (FileBuilder         *fb,
 }
 
 static FileBuilder *
-file_builder_new (xboolean_t byteswap)
+file_builder_new (gboolean byteswap)
 {
   FileBuilder *builder;
 
@@ -459,12 +459,12 @@ file_builder_free (FileBuilder *fb)
   g_slice_free (FileBuilder, fb);
 }
 
-static xstring_t *
+static GString *
 file_builder_serialise (FileBuilder          *fb,
                         struct gvdb_pointer   root)
 {
   struct gvdb_header header = { { 0, 0 }, { 0 }, { 0 }, { { 0 }, { 0 } } };
-  xstring_t *result;
+  GString *result;
 
   memset (&header, 0, sizeof (header));
 
@@ -479,10 +479,10 @@ file_builder_serialise (FileBuilder          *fb,
       header.signature[1] = GVDB_SIGNATURE1;
     }
 
-  result = xstring_new (NULL);
+  result = g_string_new (NULL);
 
   header.root = root;
-  xstring_append_len (result, (xpointer_t) &header, sizeof header);
+  g_string_append_len (result, (gpointer) &header, sizeof header);
 
   while (!g_queue_is_empty (fb->chunks))
     {
@@ -490,16 +490,16 @@ file_builder_serialise (FileBuilder          *fb,
 
       if (result->len != chunk->offset)
         {
-          xchar_t zero[8] = { 0, };
+          gchar zero[8] = { 0, };
 
-          xassert (chunk->offset > result->len);
-          xassert (chunk->offset - result->len < 8);
+          g_assert (chunk->offset > result->len);
+          g_assert (chunk->offset - result->len < 8);
 
-          xstring_append_len (result, zero, chunk->offset - result->len);
-          xassert (result->len == chunk->offset);
+          g_string_append_len (result, zero, chunk->offset - result->len);
+          g_assert (result->len == chunk->offset);
         }
 
-      xstring_append_len (result, chunk->data, chunk->size);
+      g_string_append_len (result, chunk->data, chunk->size);
       g_free (chunk->data);
 
       g_slice_free (FileChunk, chunk);
@@ -508,46 +508,46 @@ file_builder_serialise (FileBuilder          *fb,
   return result;
 }
 
-xboolean_t
-gvdb_table_write_contents (xhashtable_t   *table,
-                           const xchar_t  *filename,
-                           xboolean_t      byteswap,
-                           xerror_t      **error)
+gboolean
+gvdb_table_write_contents (GHashTable   *table,
+                           const gchar  *filename,
+                           gboolean      byteswap,
+                           GError      **error)
 {
   struct gvdb_pointer root;
-  xboolean_t status;
+  gboolean status;
   FileBuilder *fb;
-  xstring_t *str;
+  GString *str;
 
-  xreturn_val_if_fail (table != NULL, FALSE);
-  xreturn_val_if_fail (filename != NULL, FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (table != NULL, FALSE);
+  g_return_val_if_fail (filename != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   fb = file_builder_new (byteswap);
   file_builder_add_hash (fb, table, &root);
   str = file_builder_serialise (fb, root);
   file_builder_free (fb);
 
-  status = xfile_set_contents (filename, str->str, str->len, error);
-  xstring_free (str, TRUE);
+  status = g_file_set_contents (filename, str->str, str->len, error);
+  g_string_free (str, TRUE);
 
   return status;
 }
 
 typedef struct {
-  xbytes_t *contents;  /* (owned) */
-  xfile_t  *file;      /* (owned) */
+  GBytes *contents;  /* (owned) */
+  GFile  *file;      /* (owned) */
 } WriteContentsData;
 
 static WriteContentsData *
-write_contents_data_new (xbytes_t *contents,
-                         xfile_t  *file)
+write_contents_data_new (GBytes *contents,
+                         GFile  *file)
 {
   WriteContentsData *data;
 
   data = g_slice_new (WriteContentsData);
-  data->contents = xbytes_ref (contents);
-  data->file = xobject_ref (file);
+  data->contents = g_bytes_ref (contents);
+  data->file = g_object_ref (file);
 
   return data;
 }
@@ -555,82 +555,82 @@ write_contents_data_new (xbytes_t *contents,
 static void
 write_contents_data_free (WriteContentsData *data)
 {
-  xbytes_unref (data->contents);
-  xobject_unref (data->file);
+  g_bytes_unref (data->contents);
+  g_object_unref (data->file);
   g_slice_free (WriteContentsData, data);
 }
 
 static void
-replace_contents_cb (xobject_t      *source_object,
-                     xasync_result_t *result,
-                     xpointer_t      user_data)
+replace_contents_cb (GObject      *source_object,
+                     GAsyncResult *result,
+                     gpointer      user_data)
 {
-  xtask_t *task = user_data;
-  WriteContentsData *data = xtask_get_task_data (task);
-  xerror_t *error = NULL;
+  GTask *task = user_data;
+  WriteContentsData *data = g_task_get_task_data (task);
+  GError *error = NULL;
 
-  g_return_if_fail (xtask_get_source_tag (task) == gvdb_table_write_contents_async);
+  g_return_if_fail (g_task_get_source_tag (task) == gvdb_table_write_contents_async);
 
-  if (!xfile_replace_contents_finish (data->file, result, NULL, &error))
-    xtask_return_error (task, g_steal_pointer (&error));
+  if (!g_file_replace_contents_finish (data->file, result, NULL, &error))
+    g_task_return_error (task, g_steal_pointer (&error));
   else
-    xtask_return_boolean (task, TRUE);
+    g_task_return_boolean (task, TRUE);
 
-  xobject_unref (task);
+  g_object_unref (task);
 }
 
 void
-gvdb_table_write_contents_async (xhashtable_t          *table,
-                                 const xchar_t         *filename,
-                                 xboolean_t             byteswap,
-                                 xcancellable_t        *cancellable,
-                                 xasync_ready_callback_t  callback,
-                                 xpointer_t             user_data)
+gvdb_table_write_contents_async (GHashTable          *table,
+                                 const gchar         *filename,
+                                 gboolean             byteswap,
+                                 GCancellable        *cancellable,
+                                 GAsyncReadyCallback  callback,
+                                 gpointer             user_data)
 {
   struct gvdb_pointer root;
   FileBuilder *fb;
   WriteContentsData *data;
-  xstring_t *str;
-  xbytes_t *bytes;
-  xfile_t *file;
-  xtask_t *task;
+  GString *str;
+  GBytes *bytes;
+  GFile *file;
+  GTask *task;
 
   g_return_if_fail (table != NULL);
   g_return_if_fail (filename != NULL);
-  g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  g_return_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable));
 
   fb = file_builder_new (byteswap);
   file_builder_add_hash (fb, table, &root);
   str = file_builder_serialise (fb, root);
-  bytes = xstring_free_to_bytes (str);
+  bytes = g_string_free_to_bytes (str);
   file_builder_free (fb);
 
-  file = xfile_new_for_path (filename);
+  file = g_file_new_for_path (filename);
   data = write_contents_data_new (bytes, file);
 
-  task = xtask_new (NULL, cancellable, callback, user_data);
-  xtask_set_task_data (task, data, (xdestroy_notify_t)write_contents_data_free);
-  xtask_set_source_tag (task, gvdb_table_write_contents_async);
+  task = g_task_new (NULL, cancellable, callback, user_data);
+  g_task_set_task_data (task, data, (GDestroyNotify)write_contents_data_free);
+  g_task_set_source_tag (task, gvdb_table_write_contents_async);
 
-  xfile_replace_contents_async (file,
-                                 xbytes_get_data (bytes, NULL),
-                                 xbytes_get_size (bytes),
+  g_file_replace_contents_async (file,
+                                 g_bytes_get_data (bytes, NULL),
+                                 g_bytes_get_size (bytes),
                                  NULL, FALSE,
-                                 XFILE_CREATE_PRIVATE,
+                                 G_FILE_CREATE_PRIVATE,
                                  cancellable, replace_contents_cb, g_steal_pointer (&task));
 
-  xbytes_unref (bytes);
-  xobject_unref (file);
+  g_bytes_unref (bytes);
+  g_object_unref (file);
 }
 
-xboolean_t
-gvdb_table_write_contents_finish (xhashtable_t    *table,
-                                  xasync_result_t  *result,
-                                  xerror_t       **error)
+gboolean
+gvdb_table_write_contents_finish (GHashTable    *table,
+                                  GAsyncResult  *result,
+                                  GError       **error)
 {
-  xreturn_val_if_fail (table != NULL, FALSE);
-  xreturn_val_if_fail (xtask_is_valid (result, NULL), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (table != NULL, FALSE);
+  g_return_val_if_fail (g_task_is_valid (result, NULL), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return xtask_propagate_boolean (XTASK (result), error);
+  return g_task_propagate_boolean (G_TASK (result), error);
 }

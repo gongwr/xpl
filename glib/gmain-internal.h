@@ -18,7 +18,7 @@
 #ifndef __G_MAIN_INTERNAL_H__
 #define __G_MAIN_INTERNAL_H__
 
-#if !defined (XPL_COMPILATION)
+#if !defined (GLIB_COMPILATION)
 #error "This is a private header"
 #endif
 
@@ -26,7 +26,7 @@
 
 G_BEGIN_DECLS
 
-xsource_t *_g_main_create_unix_signal_watch (int signum);
+GSource *_g_main_create_unix_signal_watch (int signum);
 
 G_END_DECLS
 

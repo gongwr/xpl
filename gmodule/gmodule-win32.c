@@ -1,4 +1,4 @@
-/* GMODULE - XPL wrapper code for dynamic module loading
+/* GMODULE - GLIB wrapper code for dynamic module loading
  * Copyright (C) 1998, 2000 Tim Janik
  *
  * Win32 GMODULE implementation
@@ -22,10 +22,10 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 #include "config.h"
@@ -41,22 +41,22 @@
 #endif
 
 static void G_GNUC_PRINTF (2, 3)
-set_error (xerror_t      **error,
-           const xchar_t  *format,
+set_error (GError      **error,
+           const gchar  *format,
            ...)
 {
-  xchar_t *win32_error;
-  xchar_t *detail;
-  xchar_t *message;
+  gchar *win32_error;
+  gchar *detail;
+  gchar *message;
   va_list args;
 
   win32_error = g_win32_error_message (GetLastError ());
 
   va_start (args, format);
-  detail = xstrdup_vprintf (format, args);
+  detail = g_strdup_vprintf (format, args);
   va_end (args);
 
-  message = xstrconcat (detail, win32_error, NULL);
+  message = g_strconcat (detail, win32_error, NULL);
 
   g_module_set_error (message);
   g_set_error_literal (error, G_MODULE_ERROR, G_MODULE_ERROR_FAILED, message);
@@ -67,23 +67,23 @@ set_error (xerror_t      **error,
 }
 
 /* --- functions --- */
-static xpointer_t
-_g_module_open (const xchar_t *file_name,
-		xboolean_t     bind_lazy,
-		xboolean_t     bind_local,
-                xerror_t     **error)
+static gpointer
+_g_module_open (const gchar *file_name,
+		gboolean     bind_lazy,
+		gboolean     bind_local,
+                GError     **error)
 {
   HINSTANCE handle;
   wchar_t *wfilename;
   DWORD old_mode;
   BOOL success;
 #ifdef G_WITH_CYGWIN
-  xchar_t tmp[MAX_PATH];
+  gchar tmp[MAX_PATH];
 
   cygwin_conv_to_win32_path(file_name, tmp);
   file_name = tmp;
 #endif
-  wfilename = xutf8_to_utf16 (file_name, -1, NULL, NULL, NULL);
+  wfilename = g_utf8_to_utf16 (file_name, -1, NULL, NULL, NULL);
 
   /* suppress error dialog */
   success = SetThreadErrorMode (SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS, &old_mode);
@@ -101,37 +101,37 @@ _g_module_open (const xchar_t *file_name,
   if (success)
     SetThreadErrorMode (old_mode, NULL);
   g_free (wfilename);
-
+      
   if (!handle)
     set_error (error, "'%s': ", file_name);
 
   return handle;
 }
 
-static xint_t dummy;
-static xpointer_t null_module_handle = &dummy;
-
-static xpointer_t
+static gint dummy;
+static gpointer null_module_handle = &dummy;
+  
+static gpointer
 _g_module_self (void)
 {
   return null_module_handle;
 }
 
 static void
-_g_module_close (xpointer_t handle)
+_g_module_close (gpointer handle)
 {
   if (handle != null_module_handle)
     if (!FreeLibrary (handle))
       set_error (NULL, "");
 }
 
-static xpointer_t
-find_in_any_module_using_toolhelp (const xchar_t *symbol_name)
+static gpointer
+find_in_any_module_using_toolhelp (const gchar *symbol_name)
 {
-  HANDLE snapshot;
+  HANDLE snapshot; 
   MODULEENTRY32 me32;
 
-  xpointer_t p = NULL;
+  gpointer p = NULL;
 
   /* Under UWP, Module32Next and Module32First are not available since we're
    * not allowed to search in the address space of arbitrary loaded DLLs */
@@ -143,7 +143,7 @@ find_in_any_module_using_toolhelp (const xchar_t *symbol_name)
       snapshot = CreateToolhelp32Snapshot (TH32CS_SNAPMODULE, 0);
       if (snapshot == INVALID_HANDLE_VALUE && GetLastError () == ERROR_BAD_LENGTH)
         {
-          xthread_yield ();
+          g_thread_yield ();
           continue;
         }
       break;
@@ -168,10 +168,10 @@ find_in_any_module_using_toolhelp (const xchar_t *symbol_name)
   return p;
 }
 
-static xpointer_t
-find_in_any_module (const xchar_t *symbol_name)
+static gpointer
+find_in_any_module (const gchar *symbol_name)
 {
-  xpointer_t result;
+  gpointer result;
 
   if ((result = find_in_any_module_using_toolhelp (symbol_name)) == NULL)
     return NULL;
@@ -179,12 +179,12 @@ find_in_any_module (const xchar_t *symbol_name)
     return result;
 }
 
-static xpointer_t
-_g_module_symbol (xpointer_t     handle,
-		  const xchar_t *symbol_name)
+static gpointer
+_g_module_symbol (gpointer     handle,
+		  const gchar *symbol_name)
 {
-  xpointer_t p;
-
+  gpointer p;
+  
   if (handle == null_module_handle)
     {
       if ((p = GetProcAddress (GetModuleHandle (NULL), symbol_name)) == NULL)
@@ -199,39 +199,39 @@ _g_module_symbol (xpointer_t     handle,
   return p;
 }
 
-static xchar_t*
-_g_module_build_path (const xchar_t *directory,
-		      const xchar_t *module_name)
+static gchar*
+_g_module_build_path (const gchar *directory,
+		      const gchar *module_name)
 {
-  xint_t k;
+  gint k;
 
   k = strlen (module_name);
-
+    
   if (directory && *directory)
     if (k > 4 && g_ascii_strcasecmp (module_name + k - 4, ".dll") == 0)
-      return xstrconcat (directory, G_DIR_SEPARATOR_S, module_name, NULL);
+      return g_strconcat (directory, G_DIR_SEPARATOR_S, module_name, NULL);
 #ifdef G_WITH_CYGWIN
     else if (strncmp (module_name, "lib", 3) == 0 || strncmp (module_name, "cyg", 3) == 0)
-      return xstrconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
+      return g_strconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
     else
-      return xstrconcat (directory, G_DIR_SEPARATOR_S, "cyg", module_name, ".dll", NULL);
+      return g_strconcat (directory, G_DIR_SEPARATOR_S, "cyg", module_name, ".dll", NULL);
 #else
     else if (strncmp (module_name, "lib", 3) == 0)
-      return xstrconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
+      return g_strconcat (directory, G_DIR_SEPARATOR_S, module_name, ".dll", NULL);
     else
-      return xstrconcat (directory, G_DIR_SEPARATOR_S, "lib", module_name, ".dll", NULL);
+      return g_strconcat (directory, G_DIR_SEPARATOR_S, "lib", module_name, ".dll", NULL);
 #endif
   else if (k > 4 && g_ascii_strcasecmp (module_name + k - 4, ".dll") == 0)
-    return xstrdup (module_name);
+    return g_strdup (module_name);
 #ifdef G_WITH_CYGWIN
   else if (strncmp (module_name, "lib", 3) == 0 || strncmp (module_name, "cyg", 3) == 0)
-    return xstrconcat (module_name, ".dll", NULL);
+    return g_strconcat (module_name, ".dll", NULL);
   else
-    return xstrconcat ("cyg", module_name, ".dll", NULL);
+    return g_strconcat ("cyg", module_name, ".dll", NULL);
 #else
   else if (strncmp (module_name, "lib", 3) == 0)
-    return xstrconcat (module_name, ".dll", NULL);
+    return g_strconcat (module_name, ".dll", NULL);
   else
-    return xstrconcat ("lib", module_name, ".dll", NULL);
+    return g_strconcat ("lib", module_name, ".dll", NULL);
 #endif
 }

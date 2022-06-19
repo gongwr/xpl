@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997, 2002  Peter Mattis, Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -24,32 +24,32 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_printf    (xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_printf    (gchar const *format,
                                    ...) G_GNUC_PRINTF (1, 2);
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_fprintf   (FILE        *file,
-				   xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_fprintf   (FILE        *file,
+				   gchar const *format,
 				   ...) G_GNUC_PRINTF (2, 3);
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_sprintf   (xchar_t       *string,
-				   xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_sprintf   (gchar       *string,
+				   gchar const *format,
 				   ...) G_GNUC_PRINTF (2, 3);
 
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_vprintf   (xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_vprintf   (gchar const *format,
                                    va_list      args) G_GNUC_PRINTF(1, 0);
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_vfprintf  (FILE        *file,
-				   xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_vfprintf  (FILE        *file,
+				   gchar const *format,
 				   va_list      args) G_GNUC_PRINTF(2, 0);
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_vsprintf  (xchar_t       *string,
-				   xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_vsprintf  (gchar       *string,
+				   gchar const *format,
 				   va_list      args) G_GNUC_PRINTF(2, 0);
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_vasprintf (xchar_t      **string,
-				   xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_vasprintf (gchar      **string,
+				   gchar const *format,
 				   va_list      args) G_GNUC_PRINTF(2, 0);
 
 G_END_DECLS

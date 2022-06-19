@@ -74,6 +74,14 @@ if host_system != 'windows'
     endif
   endif
 
+  # dn_comp()
+  if cc.links('''#include <resolv.h>
+                 int main (int argc, char ** argv) {
+                   return dn_comp(NULL, NULL, 0, NULL, NULL) == -1;
+                 } ''', args : network_args, name : 'dn_comp()')
+    glib_conf.set('HAVE_DN_COMP', 1)
+  endif
+
   # res_nclose()
   if cc.links('''#include <sys/types.h>
                  #include <netinet/in.h>
@@ -869,7 +877,7 @@ if host_system == 'windows'
     description : 'Windows specific headers for glib I/O library',
   )
   if meson.version().version_compare('>=0.54.0')
-    meson.override_dependency('gio-win32-2.0', libgio_dep)
+    meson.override_dependency('gio-windows-2.0', libgio_dep)
   endif
 else
   pkg.generate(requires : ['gobject-2.0', 'gio-2.0'],

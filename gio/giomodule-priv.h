@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,23 +25,23 @@
 
 G_BEGIN_DECLS
 
-void _xio_modules_ensure_extension_points_registered (void);
-void _xio_modules_ensure_loaded                      (void);
+void _g_io_modules_ensure_extension_points_registered (void);
+void _g_io_modules_ensure_loaded                      (void);
 
-typedef xboolean_t (*xio_module_verify_func_t) (xpointer_t);
-xpointer_t _xio_module_get_default (const xchar_t         *extension_point,
-				   const xchar_t         *envvar,
-				   xio_module_verify_func_t  verify_func);
+typedef gboolean (*GIOModuleVerifyFunc) (gpointer);
+gpointer _g_io_module_get_default (const gchar         *extension_point,
+				   const gchar         *envvar,
+				   GIOModuleVerifyFunc  verify_func);
 
-xtype_t    _xio_module_get_default_type (const xchar_t *extension_point,
-                                        const xchar_t *envvar,
-                                        xuint_t        is_supported_offset);
+GType    _g_io_module_get_default_type (const gchar *extension_point,
+                                        const gchar *envvar,
+                                        guint        is_supported_offset);
 
-#ifdef XPLATFORM_WIN32
-void *_xio_win32_get_module (void);
+#ifdef G_PLATFORM_WIN32
+void *_g_io_win32_get_module (void);
 #endif
 
-xchar_t *_xio_module_extract_name (const char *filename);
+gchar *_g_io_module_extract_name (const char *filename);
 
 
 G_END_DECLS

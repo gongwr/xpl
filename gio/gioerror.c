@@ -1,5 +1,5 @@
 /* GIO - GLib Input, Output and Streaming Library
- *
+ * 
  * Copyright (C) 2006-2007 Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -39,7 +39,7 @@
  *
  * Gets the GIO Error Quark.
  *
- * Returns: a #xquark.
+ * Returns: a #GQuark.
  **/
 G_DEFINE_QUARK (g-io-error-quark, g_io_error)
 
@@ -67,7 +67,7 @@ G_DEFINE_QUARK (g-io-error-quark, g_io_error)
  * Returns: #GIOErrorEnum value for the given errno.h error number.
  **/
 GIOErrorEnum
-g_io_error_from_errno (xint_t err_no)
+g_io_error_from_errno (gint err_no)
 {
   switch (err_no)
     {
@@ -136,7 +136,7 @@ g_io_error_from_errno (xint_t err_no)
       return G_IO_ERROR_NO_SPACE;
       break;
 #endif
-
+      
 #ifdef EINVAL
     case EINVAL:
       return G_IO_ERROR_INVALID_ARGUMENT;
@@ -303,7 +303,7 @@ g_io_error_from_errno (xint_t err_no)
  * specific value instead).
  *
  * You can use g_win32_error_message() to get a localized string
- * corresponding to @error_code. (But note that unlike xstrerror(),
+ * corresponding to @error_code. (But note that unlike g_strerror(),
  * g_win32_error_message() returns a string that must be freed.)
  *
  * Returns: #GIOErrorEnum value for the given error number.
@@ -311,7 +311,7 @@ g_io_error_from_errno (xint_t err_no)
  * Since: 2.26
  **/
 GIOErrorEnum
-g_io_error_from_win32_error (xint_t error_code)
+g_io_error_from_win32_error (gint error_code)
 {
   /* Note: Winsock errors are a subset of Win32 error codes as a
    * whole. (The fact that the Winsock API makes them look like they

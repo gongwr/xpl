@@ -29,31 +29,31 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILTER_OUTPUT_STREAM         (g_filter_output_stream_get_type ())
-#define G_FILTER_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILTER_OUTPUT_STREAM, xfilter_output_stream))
-#define G_FILTER_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILTER_OUTPUT_STREAM, xfilter_output_stream_class_t))
-#define X_IS_FILTER_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILTER_OUTPUT_STREAM))
-#define X_IS_FILTER_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILTER_OUTPUT_STREAM))
-#define G_FILTER_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILTER_OUTPUT_STREAM, xfilter_output_stream_class_t))
+#define G_TYPE_FILTER_OUTPUT_STREAM         (g_filter_output_stream_get_type ())
+#define G_FILTER_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILTER_OUTPUT_STREAM, GFilterOutputStream))
+#define G_FILTER_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILTER_OUTPUT_STREAM, GFilterOutputStreamClass))
+#define G_IS_FILTER_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILTER_OUTPUT_STREAM))
+#define G_IS_FILTER_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_FILTER_OUTPUT_STREAM))
+#define G_FILTER_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_FILTER_OUTPUT_STREAM, GFilterOutputStreamClass))
 
 /**
- * xfilter_output_stream_t:
+ * GFilterOutputStream:
  *
  * A base class for all output streams that work on an underlying stream.
  **/
-typedef struct _xfilter_output_stream_class_t    xfilter_output_stream_class_t;
+typedef struct _GFilterOutputStreamClass    GFilterOutputStreamClass;
 
 struct _GFilterOutputStream
 {
-  xoutput_stream_t parent_instance;
+  GOutputStream parent_instance;
 
   /*< protected >*/
-  xoutput_stream_t *base_stream;
+  GOutputStream *base_stream;
 };
 
-struct _xfilter_output_stream_class_t
+struct _GFilterOutputStreamClass
 {
-  xoutput_stream_class_t parent_class;
+  GOutputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -63,15 +63,15 @@ struct _xfilter_output_stream_class_t
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           g_filter_output_stream_get_type              (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t * g_filter_output_stream_get_base_stream       (xfilter_output_stream_t *stream);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_filter_output_stream_get_close_base_stream (xfilter_output_stream_t *stream);
-XPL_AVAILABLE_IN_ALL
-void            g_filter_output_stream_set_close_base_stream (xfilter_output_stream_t *stream,
-                                                              xboolean_t             close_base);
+GLIB_AVAILABLE_IN_ALL
+GType           g_filter_output_stream_get_type              (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GOutputStream * g_filter_output_stream_get_base_stream       (GFilterOutputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_filter_output_stream_get_close_base_stream (GFilterOutputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+void            g_filter_output_stream_set_close_base_stream (GFilterOutputStream *stream,
+                                                              gboolean             close_base);
 
 G_END_DECLS
 

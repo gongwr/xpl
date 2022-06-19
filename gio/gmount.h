@@ -30,246 +30,246 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_MOUNT            (g_mount_get_type ())
-#define G_MOUNT(obj)            (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_MOUNT, xmount))
-#define X_IS_MOUNT(obj)         (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_MOUNT))
-#define G_MOUNT_GET_IFACE(obj)  (XTYPE_INSTANCE_GET_INTERFACE ((obj), XTYPE_MOUNT, GMountIface))
+#define G_TYPE_MOUNT            (g_mount_get_type ())
+#define G_MOUNT(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_MOUNT, GMount))
+#define G_IS_MOUNT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), G_TYPE_MOUNT))
+#define G_MOUNT_GET_IFACE(obj)  (G_TYPE_INSTANCE_GET_INTERFACE ((obj), G_TYPE_MOUNT, GMountIface))
 
 typedef struct _GMountIface    GMountIface;
 
 /**
  * GMountIface:
- * @x_iface: The parent interface.
+ * @g_iface: The parent interface.
  * @changed: Changed signal that is emitted when the mount's state has changed.
- * @unmounted: The unmounted signal that is emitted when the #xmount_t have been unmounted. If the recipient is holding references to the object they should release them so the object can be finalized.
- * @pre_unmount: The ::pre-unmount signal that is emitted when the #xmount_t will soon be emitted. If the recipient is somehow holding the mount open by keeping an open file on it it should close the file.
- * @get_root: Gets a #xfile_t to the root directory of the #xmount_t.
- * @get_name: Gets a string containing the name of the #xmount_t.
- * @get_icon: Gets a #xicon_t for the #xmount_t.
- * @get_uuid: Gets the UUID for the #xmount_t. The reference is typically based on the file system UUID for the mount in question and should be considered an opaque string. Returns %NULL if there is no UUID available.
- * @get_volume: Gets a #xvolume_t the mount is located on. Returns %NULL if the #xmount_t is not associated with a #xvolume_t.
- * @get_drive: Gets a #xdrive_t the volume of the mount is located on. Returns %NULL if the #xmount_t is not associated with a #xdrive_t or a #xvolume_t. This is convenience method for getting the #xvolume_t and using that to get the #xdrive_t.
- * @can_unmount: Checks if a #xmount_t can be unmounted.
- * @can_eject: Checks if a #xmount_t can be ejected.
- * @unmount: Starts unmounting a #xmount_t.
+ * @unmounted: The unmounted signal that is emitted when the #GMount have been unmounted. If the recipient is holding references to the object they should release them so the object can be finalized.
+ * @pre_unmount: The ::pre-unmount signal that is emitted when the #GMount will soon be emitted. If the recipient is somehow holding the mount open by keeping an open file on it it should close the file.
+ * @get_root: Gets a #GFile to the root directory of the #GMount.
+ * @get_name: Gets a string containing the name of the #GMount.
+ * @get_icon: Gets a #GIcon for the #GMount.
+ * @get_uuid: Gets the UUID for the #GMount. The reference is typically based on the file system UUID for the mount in question and should be considered an opaque string. Returns %NULL if there is no UUID available.
+ * @get_volume: Gets a #GVolume the mount is located on. Returns %NULL if the #GMount is not associated with a #GVolume.
+ * @get_drive: Gets a #GDrive the volume of the mount is located on. Returns %NULL if the #GMount is not associated with a #GDrive or a #GVolume. This is convenience method for getting the #GVolume and using that to get the #GDrive.
+ * @can_unmount: Checks if a #GMount can be unmounted.
+ * @can_eject: Checks if a #GMount can be ejected.
+ * @unmount: Starts unmounting a #GMount.
  * @unmount_finish: Finishes an unmounting operation.
- * @eject: Starts ejecting a #xmount_t.
+ * @eject: Starts ejecting a #GMount.
  * @eject_finish: Finishes an eject operation.
- * @remount: Starts remounting a #xmount_t.
+ * @remount: Starts remounting a #GMount.
  * @remount_finish: Finishes a remounting operation.
- * @guess_content_type: Starts guessing the type of the content of a #xmount_t.
+ * @guess_content_type: Starts guessing the type of the content of a #GMount.
  *     See g_mount_guess_content_type() for more information on content
  *     type guessing. This operation was added in 2.18.
  * @guess_content_type_finish: Finishes a content type guessing operation. Added in 2.18.
  * @guess_content_type_sync: Synchronous variant of @guess_content_type. Added in 2.18
- * @unmount_with_operation: Starts unmounting a #xmount_t using a #xmount_operation_t. Since 2.22.
- * @unmount_with_operation_finish: Finishes an unmounting operation using a #xmount_operation_t. Since 2.22.
- * @eject_with_operation: Starts ejecting a #xmount_t using a #xmount_operation_t. Since 2.22.
- * @eject_with_operation_finish: Finishes an eject operation using a #xmount_operation_t. Since 2.22.
- * @get_default_location: Gets a #xfile_t indication a start location that can be use as the entry point for this mount. Since 2.24.
- * @get_sort_key: Gets a key used for sorting #xmount_t instance or %NULL if no such key exists. Since 2.32.
- * @get_symbolic_icon: Gets a symbolic #xicon_t for the #xmount_t. Since 2.34.
+ * @unmount_with_operation: Starts unmounting a #GMount using a #GMountOperation. Since 2.22.
+ * @unmount_with_operation_finish: Finishes an unmounting operation using a #GMountOperation. Since 2.22.
+ * @eject_with_operation: Starts ejecting a #GMount using a #GMountOperation. Since 2.22.
+ * @eject_with_operation_finish: Finishes an eject operation using a #GMountOperation. Since 2.22.
+ * @get_default_location: Gets a #GFile indication a start location that can be use as the entry point for this mount. Since 2.24.
+ * @get_sort_key: Gets a key used for sorting #GMount instance or %NULL if no such key exists. Since 2.32.
+ * @get_symbolic_icon: Gets a symbolic #GIcon for the #GMount. Since 2.34.
  *
  * Interface for implementing operations for mounts.
  **/
 struct _GMountIface
 {
-  xtype_interface_t x_iface;
+  GTypeInterface g_iface;
 
   /* signals */
 
-  void        (* changed)                   (xmount_t              *mount);
-  void        (* unmounted)                 (xmount_t              *mount);
+  void        (* changed)                   (GMount              *mount);
+  void        (* unmounted)                 (GMount              *mount);
 
   /* Virtual Table */
 
-  xfile_t     * (* get_root)                  (xmount_t              *mount);
-  char      * (* get_name)                  (xmount_t              *mount);
-  xicon_t     * (* get_icon)                  (xmount_t              *mount);
-  char      * (* get_uuid)                  (xmount_t              *mount);
-  xvolume_t   * (* get_volume)                (xmount_t              *mount);
-  xdrive_t    * (* get_drive)                 (xmount_t              *mount);
-  xboolean_t    (* can_unmount)               (xmount_t              *mount);
-  xboolean_t    (* can_eject)                 (xmount_t              *mount);
+  GFile     * (* get_root)                  (GMount              *mount);
+  char      * (* get_name)                  (GMount              *mount);
+  GIcon     * (* get_icon)                  (GMount              *mount);
+  char      * (* get_uuid)                  (GMount              *mount);
+  GVolume   * (* get_volume)                (GMount              *mount);
+  GDrive    * (* get_drive)                 (GMount              *mount);
+  gboolean    (* can_unmount)               (GMount              *mount);
+  gboolean    (* can_eject)                 (GMount              *mount);
 
-  void        (* unmount)                   (xmount_t              *mount,
-                                             xmount_unmount_flags_t   flags,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xboolean_t    (* unmount_finish)            (xmount_t              *mount,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
+  void        (* unmount)                   (GMount              *mount,
+                                             GMountUnmountFlags   flags,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gboolean    (* unmount_finish)            (GMount              *mount,
+                                             GAsyncResult        *result,
+                                             GError             **error);
 
-  void        (* eject)                     (xmount_t              *mount,
-                                             xmount_unmount_flags_t   flags,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xboolean_t    (* eject_finish)              (xmount_t              *mount,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
+  void        (* eject)                     (GMount              *mount,
+                                             GMountUnmountFlags   flags,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gboolean    (* eject_finish)              (GMount              *mount,
+                                             GAsyncResult        *result,
+                                             GError             **error);
 
-  void        (* remount)                   (xmount_t              *mount,
+  void        (* remount)                   (GMount              *mount,
                                              GMountMountFlags     flags,
-                                             xmount_operation_t     *mount_operation,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xboolean_t    (* remount_finish)            (xmount_t              *mount,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
+                                             GMountOperation     *mount_operation,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gboolean    (* remount_finish)            (GMount              *mount,
+                                             GAsyncResult        *result,
+                                             GError             **error);
 
-  void        (* guess_content_type)        (xmount_t              *mount,
-                                             xboolean_t             force_rescan,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xchar_t    ** (* guess_content_type_finish) (xmount_t              *mount,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
-  xchar_t    ** (* guess_content_type_sync)   (xmount_t              *mount,
-                                             xboolean_t             force_rescan,
-                                             xcancellable_t        *cancellable,
-                                             xerror_t             **error);
+  void        (* guess_content_type)        (GMount              *mount,
+                                             gboolean             force_rescan,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gchar    ** (* guess_content_type_finish) (GMount              *mount,
+                                             GAsyncResult        *result,
+                                             GError             **error);
+  gchar    ** (* guess_content_type_sync)   (GMount              *mount,
+                                             gboolean             force_rescan,
+                                             GCancellable        *cancellable,
+                                             GError             **error);
 
   /* Signal, not VFunc */
-  void        (* pre_unmount)               (xmount_t              *mount);
+  void        (* pre_unmount)               (GMount              *mount);
 
-  void        (* unmount_with_operation)    (xmount_t              *mount,
-                                             xmount_unmount_flags_t   flags,
-                                             xmount_operation_t     *mount_operation,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xboolean_t    (* unmount_with_operation_finish) (xmount_t          *mount,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
+  void        (* unmount_with_operation)    (GMount              *mount,
+                                             GMountUnmountFlags   flags,
+                                             GMountOperation     *mount_operation,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gboolean    (* unmount_with_operation_finish) (GMount          *mount,
+                                             GAsyncResult        *result,
+                                             GError             **error);
 
-  void        (* eject_with_operation)      (xmount_t              *mount,
-                                             xmount_unmount_flags_t   flags,
-                                             xmount_operation_t     *mount_operation,
-                                             xcancellable_t        *cancellable,
-                                             xasync_ready_callback_t  callback,
-                                             xpointer_t             user_data);
-  xboolean_t    (* eject_with_operation_finish) (xmount_t            *mount,
-                                             xasync_result_t        *result,
-                                             xerror_t             **error);
-  xfile_t     * (* get_default_location)      (xmount_t              *mount);
+  void        (* eject_with_operation)      (GMount              *mount,
+                                             GMountUnmountFlags   flags,
+                                             GMountOperation     *mount_operation,
+                                             GCancellable        *cancellable,
+                                             GAsyncReadyCallback  callback,
+                                             gpointer             user_data);
+  gboolean    (* eject_with_operation_finish) (GMount            *mount,
+                                             GAsyncResult        *result,
+                                             GError             **error);
+  GFile     * (* get_default_location)      (GMount              *mount);
 
-  const xchar_t * (* get_sort_key)            (xmount_t              *mount);
-  xicon_t       * (* get_symbolic_icon)       (xmount_t              *mount);
+  const gchar * (* get_sort_key)            (GMount              *mount);
+  GIcon       * (* get_symbolic_icon)       (GMount              *mount);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t       g_mount_get_type                  (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType       g_mount_get_type                  (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xfile_t     * g_mount_get_root                  (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xfile_t     * g_mount_get_default_location      (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-char      * g_mount_get_name                  (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xicon_t     * g_mount_get_icon                  (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xicon_t     * g_mount_get_symbolic_icon         (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-char      * g_mount_get_uuid                  (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xvolume_t   * g_mount_get_volume                (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xdrive_t    * g_mount_get_drive                 (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    g_mount_can_unmount               (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    g_mount_can_eject                 (xmount_t              *mount);
+GLIB_AVAILABLE_IN_ALL
+GFile     * g_mount_get_root                  (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+GFile     * g_mount_get_default_location      (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+char      * g_mount_get_name                  (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+GIcon     * g_mount_get_icon                  (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+GIcon     * g_mount_get_symbolic_icon         (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+char      * g_mount_get_uuid                  (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+GVolume   * g_mount_get_volume                (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+GDrive    * g_mount_get_drive                 (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_mount_can_unmount               (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_mount_can_eject                 (GMount              *mount);
 
-XPL_DEPRECATED_FOR(g_mount_unmount_with_operation)
-void        g_mount_unmount                   (xmount_t              *mount,
-                                               xmount_unmount_flags_t   flags,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
+GLIB_DEPRECATED_FOR(g_mount_unmount_with_operation)
+void        g_mount_unmount                   (GMount              *mount,
+                                               GMountUnmountFlags   flags,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
 
-XPL_DEPRECATED_FOR(g_mount_unmount_with_operation_finish)
-xboolean_t    g_mount_unmount_finish            (xmount_t              *mount,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
+GLIB_DEPRECATED_FOR(g_mount_unmount_with_operation_finish)
+gboolean    g_mount_unmount_finish            (GMount              *mount,
+                                               GAsyncResult        *result,
+                                               GError             **error);
 
-XPL_DEPRECATED_FOR(g_mount_eject_with_operation)
-void        g_mount_eject                     (xmount_t              *mount,
-                                               xmount_unmount_flags_t   flags,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
+GLIB_DEPRECATED_FOR(g_mount_eject_with_operation)
+void        g_mount_eject                     (GMount              *mount,
+                                               GMountUnmountFlags   flags,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
 
-XPL_DEPRECATED_FOR(g_mount_eject_with_operation_finish)
-xboolean_t    g_mount_eject_finish              (xmount_t              *mount,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
+GLIB_DEPRECATED_FOR(g_mount_eject_with_operation_finish)
+gboolean    g_mount_eject_finish              (GMount              *mount,
+                                               GAsyncResult        *result,
+                                               GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-void        g_mount_remount                   (xmount_t              *mount,
+GLIB_AVAILABLE_IN_ALL
+void        g_mount_remount                   (GMount              *mount,
                                                GMountMountFlags     flags,
-                                               xmount_operation_t     *mount_operation,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    g_mount_remount_finish            (xmount_t              *mount,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
+                                               GMountOperation     *mount_operation,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_mount_remount_finish            (GMount              *mount,
+                                               GAsyncResult        *result,
+                                               GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-void        g_mount_guess_content_type        (xmount_t              *mount,
-                                               xboolean_t             force_rescan,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xchar_t    ** g_mount_guess_content_type_finish (xmount_t              *mount,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
-XPL_AVAILABLE_IN_ALL
-xchar_t    ** g_mount_guess_content_type_sync   (xmount_t              *mount,
-                                               xboolean_t             force_rescan,
-                                               xcancellable_t        *cancellable,
-                                               xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+void        g_mount_guess_content_type        (GMount              *mount,
+                                               gboolean             force_rescan,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gchar    ** g_mount_guess_content_type_finish (GMount              *mount,
+                                               GAsyncResult        *result,
+                                               GError             **error);
+GLIB_AVAILABLE_IN_ALL
+gchar    ** g_mount_guess_content_type_sync   (GMount              *mount,
+                                               gboolean             force_rescan,
+                                               GCancellable        *cancellable,
+                                               GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t    g_mount_is_shadowed               (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-void        g_mount_shadow                    (xmount_t              *mount);
-XPL_AVAILABLE_IN_ALL
-void        g_mount_unshadow                  (xmount_t              *mount);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_mount_is_shadowed               (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+void        g_mount_shadow                    (GMount              *mount);
+GLIB_AVAILABLE_IN_ALL
+void        g_mount_unshadow                  (GMount              *mount);
 
-XPL_AVAILABLE_IN_ALL
-void        g_mount_unmount_with_operation    (xmount_t              *mount,
-                                               xmount_unmount_flags_t   flags,
-                                               xmount_operation_t     *mount_operation,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    g_mount_unmount_with_operation_finish (xmount_t          *mount,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+void        g_mount_unmount_with_operation    (GMount              *mount,
+                                               GMountUnmountFlags   flags,
+                                               GMountOperation     *mount_operation,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_mount_unmount_with_operation_finish (GMount          *mount,
+                                               GAsyncResult        *result,
+                                               GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-void        g_mount_eject_with_operation      (xmount_t              *mount,
-                                               xmount_unmount_flags_t   flags,
-                                               xmount_operation_t     *mount_operation,
-                                               xcancellable_t        *cancellable,
-                                               xasync_ready_callback_t  callback,
-                                               xpointer_t             user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t    g_mount_eject_with_operation_finish (xmount_t            *mount,
-                                               xasync_result_t        *result,
-                                               xerror_t             **error);
+GLIB_AVAILABLE_IN_ALL
+void        g_mount_eject_with_operation      (GMount              *mount,
+                                               GMountUnmountFlags   flags,
+                                               GMountOperation     *mount_operation,
+                                               GCancellable        *cancellable,
+                                               GAsyncReadyCallback  callback,
+                                               gpointer             user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean    g_mount_eject_with_operation_finish (GMount            *mount,
+                                               GAsyncResult        *result,
+                                               GError             **error);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *g_mount_get_sort_key             (xmount_t              *mount);
+GLIB_AVAILABLE_IN_ALL
+const gchar *g_mount_get_sort_key             (GMount              *mount);
 
 G_END_DECLS
 

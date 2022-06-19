@@ -24,12 +24,12 @@
 #include "glib.h"
 
 static void
-hook_func (xpointer_t data)
+hook_func (gpointer data)
 {
 }
 
 static void
-destroy (xpointer_t data)
+destroy (gpointer data)
 {
 }
 
@@ -38,7 +38,7 @@ test_hook1 (void)
 {
   GHookList *hl;
   GHook *hook;
-  xulong_t id;
+  gulong id;
   GHook *h;
 
   hl = g_new (GHookList, 1);
@@ -53,7 +53,7 @@ test_hook1 (void)
   id = hook->hook_id;
 
   h = g_hook_get (hl, id);
-  xassert (h == hook);
+  g_assert (h == hook);
 
   h = hook = g_hook_alloc (hl);
   hook->data = GINT_TO_POINTER(2);

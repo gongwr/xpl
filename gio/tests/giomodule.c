@@ -1,4 +1,4 @@
-/* Unit tests for xio_module_t
+/* Unit tests for GIOModule
  * Copyright (C) 2013 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -32,73 +32,73 @@
 static void
 test_extension_point (void)
 {
-  xio_extension_point_t *ep, *ep2;
-  xio_extension_t *ext;
-  xlist_t *list;
-  xtype_t req;
-  xtype_class_t *class;
+  GIOExtensionPoint *ep, *ep2;
+  GIOExtension *ext;
+  GList *list;
+  GType req;
+  GTypeClass *class;
 
   ep = g_io_extension_point_lookup ("test-extension-point");
   g_assert_null (ep);
   ep = g_io_extension_point_register ("test-extension-point");
   ep2 = g_io_extension_point_lookup ("test-extension-point");
-  xassert (ep2 == ep);
+  g_assert (ep2 == ep);
 
   req = g_io_extension_point_get_required_type (ep);
-  xassert (req == XTYPE_INVALID);
-  g_io_extension_point_set_required_type (ep, XTYPE_OBJECT);
+  g_assert (req == G_TYPE_INVALID);
+  g_io_extension_point_set_required_type (ep, G_TYPE_OBJECT);
   req = g_io_extension_point_get_required_type (ep);
-  xassert (req == XTYPE_OBJECT);
+  g_assert (req == G_TYPE_OBJECT);
 
   list = g_io_extension_point_get_extensions (ep);
   g_assert_null (list);
 
   g_io_extension_point_implement ("test-extension-point",
-                                  XTYPE_VFS,
+                                  G_TYPE_VFS,
                                   "extension1",
                                   10);
 
   g_io_extension_point_implement ("test-extension-point",
-                                  XTYPE_OBJECT,
+                                  G_TYPE_OBJECT,
                                   "extension2",
                                   20);
 
   list = g_io_extension_point_get_extensions (ep);
-  g_assert_cmpint (xlist_length (list), ==, 2);
-
+  g_assert_cmpint (g_list_length (list), ==, 2);
+  
   ext = list->data;
   g_assert_cmpstr (g_io_extension_get_name (ext), ==, "extension2");
-  xassert (g_io_extension_get_type (ext) == XTYPE_OBJECT);
-  xassert (g_io_extension_get_priority (ext) == 20);
+  g_assert (g_io_extension_get_type (ext) == G_TYPE_OBJECT);
+  g_assert (g_io_extension_get_priority (ext) == 20);
   class = g_io_extension_ref_class (ext);
-  xassert (class == xtype_class_peek (XTYPE_OBJECT));
-  xtype_class_unref (class);
+  g_assert (class == g_type_class_peek (G_TYPE_OBJECT));
+  g_type_class_unref (class);
 
   ext = list->next->data;
   g_assert_cmpstr (g_io_extension_get_name (ext), ==, "extension1");
-  xassert (g_io_extension_get_type (ext) == XTYPE_VFS);
-  xassert (g_io_extension_get_priority (ext) == 10);
+  g_assert (g_io_extension_get_type (ext) == G_TYPE_VFS);
+  g_assert (g_io_extension_get_priority (ext) == 10);
 }
 
 static void
 test_module_scan_all (void)
 {
-#ifdef XPL_STATIC_COMPILATION
+#ifdef GLIB_STATIC_COMPILATION
   /* The plugin module is statically linked with a separate copy
    * of GLib so g_io_extension_point_implement won't work. */
-  g_test_skip ("xio_extension_point_t with dynamic modules isn't supported in static builds.");
+  g_test_skip ("GIOExtensionPoint with dynamic modules isn't supported in static builds.");
   return;
 #endif
 
   if (g_test_subprocess ())
     {
-      xio_extension_point_t *ep;
-      xio_extension_t *ext;
-      xlist_t *list;
+      GIOExtensionPoint *ep;
+      GIOExtension *ext;
+      GList *list;
       ep = g_io_extension_point_register ("test-extension-point");
       g_io_modules_scan_all_in_directory (g_test_get_filename (G_TEST_BUILT, "modules", NULL));
       list = g_io_extension_point_get_extensions (ep);
-      g_assert_cmpint (xlist_length (list), ==, 2);
+      g_assert_cmpint (g_list_length (list), ==, 2);
       ext = list->data;
       g_assert_cmpstr (g_io_extension_get_name (ext), ==, "test-b");
       ext = list->next->data;
@@ -112,28 +112,28 @@ test_module_scan_all (void)
 static void
 test_module_scan_all_with_scope (void)
 {
-#ifdef XPL_STATIC_COMPILATION
+#ifdef GLIB_STATIC_COMPILATION
   /* Disabled for the same reason as test_module_scan_all. */
-  g_test_skip ("xio_extension_point_t with dynamic modules isn't supported in static builds.");
+  g_test_skip ("GIOExtensionPoint with dynamic modules isn't supported in static builds.");
   return;
 #endif
 
   if (g_test_subprocess ())
     {
-      xio_extension_point_t *ep;
+      GIOExtensionPoint *ep;
       GIOModuleScope *scope;
-      xio_extension_t *ext;
-      xlist_t *list;
+      GIOExtension *ext;
+      GList *list;
 
       ep = g_io_extension_point_register ("test-extension-point");
-      scope = xio_module_scope_new (G_IO_MODULE_SCOPE_BLOCK_DUPLICATES);
-      xio_module_scope_block (scope, MODULE_FILENAME_PREFIX "testmoduleb." G_MODULE_SUFFIX);
+      scope = g_io_module_scope_new (G_IO_MODULE_SCOPE_BLOCK_DUPLICATES);
+      g_io_module_scope_block (scope, MODULE_FILENAME_PREFIX "testmoduleb." G_MODULE_SUFFIX);
       g_io_modules_scan_all_in_directory_with_scope (g_test_get_filename (G_TEST_BUILT, "modules", NULL), scope);
       list = g_io_extension_point_get_extensions (ep);
-      g_assert_cmpint (xlist_length (list), ==, 1);
+      g_assert_cmpint (g_list_length (list), ==, 1);
       ext = list->data;
       g_assert_cmpstr (g_io_extension_get_name (ext), ==, "test-a");
-      xio_module_scope_free (scope);
+      g_io_module_scope_free (scope);
       return;
     }
   g_test_trap_subprocess (NULL, 0, 7);

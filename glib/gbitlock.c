@@ -36,8 +36,8 @@
 #endif
 
 #ifndef HAVE_FUTEX
-static xmutex_t g_futex_mutex;
-static xslist_t *g_futex_address_list = NULL;
+static GMutex g_futex_mutex;
+static GSList *g_futex_address_list = NULL;
 #endif
 
 #ifdef HAVE_FUTEX
@@ -76,10 +76,10 @@ static xslist_t *g_futex_address_list = NULL;
  * separate process.
  */
 static void
-g_futex_wait (const xint_t *address,
-              xint_t        value)
+g_futex_wait (const gint *address,
+              gint        value)
 {
-  syscall (__NR_futex, address, (xsize_t) FUTEX_WAIT_PRIVATE, (xsize_t) value, NULL);
+  syscall (__NR_futex, address, (gsize) FUTEX_WAIT_PRIVATE, (gsize) value, NULL);
 }
 
 /* < private >
@@ -94,9 +94,9 @@ g_futex_wait (const xint_t *address,
  * thread being woken up.
  */
 static void
-g_futex_wake (const xint_t *address)
+g_futex_wake (const gint *address)
 {
-  syscall (__NR_futex, address, (xsize_t) FUTEX_WAKE_PRIVATE, (xsize_t) 1, NULL);
+  syscall (__NR_futex, address, (gsize) FUTEX_WAKE_PRIVATE, (gsize) 1, NULL);
 }
 
 #else
@@ -104,15 +104,15 @@ g_futex_wake (const xint_t *address)
 /* emulate futex(2) */
 typedef struct
 {
-  const xint_t *address;
-  xint_t ref_count;
-  xcond_t wait_queue;
+  const gint *address;
+  gint ref_count;
+  GCond wait_queue;
 } WaitAddress;
 
 static WaitAddress *
-g_futex_find_address (const xint_t *address)
+g_futex_find_address (const gint *address)
 {
-  xslist_t *node;
+  GSList *node;
 
   for (node = g_futex_address_list; node; node = node->next)
     {
@@ -126,8 +126,8 @@ g_futex_find_address (const xint_t *address)
 }
 
 static void
-g_futex_wait (const xint_t *address,
-              xint_t        value)
+g_futex_wait (const gint *address,
+              gint        value)
 {
   g_mutex_lock (&g_futex_mutex);
   if G_LIKELY (g_atomic_int_get (address) == value)
@@ -141,7 +141,7 @@ g_futex_wait (const xint_t *address,
           g_cond_init (&waiter->wait_queue);
           waiter->ref_count = 0;
           g_futex_address_list =
-            xslist_prepend (g_futex_address_list, waiter);
+            g_slist_prepend (g_futex_address_list, waiter);
         }
 
       waiter->ref_count++;
@@ -150,7 +150,7 @@ g_futex_wait (const xint_t *address,
       if (!--waiter->ref_count)
         {
           g_futex_address_list =
-            xslist_remove (g_futex_address_list, waiter);
+            g_slist_remove (g_futex_address_list, waiter);
           g_cond_clear (&waiter->wait_queue);
           g_slice_free (WaitAddress, waiter);
         }
@@ -159,7 +159,7 @@ g_futex_wait (const xint_t *address,
 }
 
 static void
-g_futex_wake (const xint_t *address)
+g_futex_wake (const gint *address)
 {
   WaitAddress *waiter;
 
@@ -177,7 +177,7 @@ g_futex_wake (const xint_t *address)
 #endif
 
 #define CONTENTION_CLASSES 11
-static xint_t g_bit_lock_contended[CONTENTION_CLASSES];  /* (atomic) */
+static gint g_bit_lock_contended[CONTENTION_CLASSES];  /* (atomic) */
 
 #if (defined (i386) || defined (__amd64__))
   #if G_GNUC_CHECK_VERSION(4, 5)
@@ -208,10 +208,10 @@ static xint_t g_bit_lock_contended[CONTENTION_CLASSES];  /* (atomic) */
  * Since: 2.24
  **/
 void
-g_bit_lock (volatile xint_t *address,
-            xint_t           lock_bit)
+g_bit_lock (volatile gint *address,
+            gint           lock_bit)
 {
-  xint_t *address_nonvolatile = (xint_t *) address;
+  gint *address_nonvolatile = (gint *) address;
 
 #ifdef USE_ASM_GOTO
  retry:
@@ -225,13 +225,13 @@ g_bit_lock (volatile xint_t *address,
 
  contended:
   {
-    xuint_t mask = 1u << lock_bit;
-    xuint_t v;
+    guint mask = 1u << lock_bit;
+    guint v;
 
-    v = (xuint_t) g_atomic_int_get (address_nonvolatile);
+    v = (guint) g_atomic_int_get (address_nonvolatile);
     if (v & mask)
       {
-        xuint_t class = ((xsize_t) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
+        guint class = ((gsize) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
 
         g_atomic_int_add (&g_bit_lock_contended[class], +1);
         g_futex_wait (address_nonvolatile, v);
@@ -240,15 +240,15 @@ g_bit_lock (volatile xint_t *address,
   }
   goto retry;
 #else
-  xuint_t mask = 1u << lock_bit;
-  xuint_t v;
+  guint mask = 1u << lock_bit;
+  guint v;
 
  retry:
   v = g_atomic_int_or (address_nonvolatile, mask);
   if (v & mask)
     /* already locked */
     {
-      xuint_t class = ((xsize_t) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
+      guint class = ((gsize) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
 
       g_atomic_int_add (&g_bit_lock_contended[class], +1);
       g_futex_wait (address_nonvolatile, v);
@@ -282,12 +282,12 @@ g_bit_lock (volatile xint_t *address,
  *
  * Since: 2.24
  **/
-xboolean_t
-g_bit_trylock (volatile xint_t *address,
-               xint_t           lock_bit)
+gboolean
+g_bit_trylock (volatile gint *address,
+               gint           lock_bit)
 {
 #ifdef USE_ASM_GOTO
-  xboolean_t result;
+  gboolean result;
 
   __asm__ volatile ("lock bts %2, (%1)\n"
                     "setnc %%al\n"
@@ -298,9 +298,9 @@ g_bit_trylock (volatile xint_t *address,
 
   return result;
 #else
-  xint_t *address_nonvolatile = (xint_t *) address;
-  xuint_t mask = 1u << lock_bit;
-  xuint_t v;
+  gint *address_nonvolatile = (gint *) address;
+  guint mask = 1u << lock_bit;
+  guint v;
 
   v = g_atomic_int_or (address_nonvolatile, mask);
 
@@ -325,10 +325,10 @@ g_bit_trylock (volatile xint_t *address,
  * Since: 2.24
  **/
 void
-g_bit_unlock (volatile xint_t *address,
-              xint_t           lock_bit)
+g_bit_unlock (volatile gint *address,
+              gint           lock_bit)
 {
-  xint_t *address_nonvolatile = (xint_t *) address;
+  gint *address_nonvolatile = (gint *) address;
 
 #ifdef USE_ASM_GOTO
   __asm__ volatile ("lock btr %1, (%0)"
@@ -336,13 +336,13 @@ g_bit_unlock (volatile xint_t *address,
                     : "r" (address), "r" (lock_bit)
                     : "cc", "memory");
 #else
-  xuint_t mask = 1u << lock_bit;
+  guint mask = 1u << lock_bit;
 
   g_atomic_int_and (address_nonvolatile, ~mask);
 #endif
 
   {
-    xuint_t class = ((xsize_t) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
+    guint class = ((gsize) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
 
     if (g_atomic_int_get (&g_bit_lock_contended[class]))
       g_futex_wake (address_nonvolatile);
@@ -364,28 +364,28 @@ g_bit_unlock (volatile xint_t *address,
  * have a helper function that always does the right thing here.
  *
  * Since we always consider the low-order bits of the integer value, a
- * simple cast from (xsize_t) to (xuint_t) always takes care of that.
+ * simple cast from (gsize) to (guint) always takes care of that.
  *
  * After that, pointer-sized futex becomes as simple as:
  *
- *   g_futex_wait (g_futex_int_address (address), (xuint_t) value);
+ *   g_futex_wait (g_futex_int_address (address), (guint) value);
  *
  * and
  *
  *   g_futex_wake (g_futex_int_address (int_address));
  */
-static const xint_t *
+static const gint *
 g_futex_int_address (const void *address)
 {
-  const xint_t *int_address = address;
+  const gint *int_address = address;
 
   /* this implementation makes these (reasonable) assumptions: */
   G_STATIC_ASSERT (G_BYTE_ORDER == G_LITTLE_ENDIAN ||
       (G_BYTE_ORDER == G_BIG_ENDIAN &&
        sizeof (int) == 4 &&
-       (sizeof (xpointer_t) == 4 || sizeof (xpointer_t) == 8)));
+       (sizeof (gpointer) == 4 || sizeof (gpointer) == 8)));
 
-#if G_BYTE_ORDER == G_BIG_ENDIAN && XPL_SIZEOF_VOID_P == 8
+#if G_BYTE_ORDER == G_BIG_ENDIAN && GLIB_SIZEOF_VOID_P == 8
   int_address++;
 #endif
 
@@ -394,7 +394,7 @@ g_futex_int_address (const void *address)
 
 /**
  * g_pointer_bit_lock:
- * @address: (not nullable): a pointer to a #xpointer_t-sized value
+ * @address: (not nullable): a pointer to a #gpointer-sized value
  * @lock_bit: a bit value between 0 and 31
  *
  * This is equivalent to g_bit_lock, but working on pointers (or other
@@ -410,7 +410,7 @@ g_futex_int_address (const void *address)
  **/
 void
 (g_pointer_bit_lock) (volatile void *address,
-                      xint_t           lock_bit)
+                      gint           lock_bit)
 {
   void *address_nonvolatile = (void *) address;
 
@@ -422,21 +422,21 @@ void
     __asm__ volatile goto ("lock bts %1, (%0)\n"
                            "jc %l[contended]"
                            : /* no output */
-                           : "r" (address), "r" ((xsize_t) lock_bit)
+                           : "r" (address), "r" ((gsize) lock_bit)
                            : "cc", "memory"
                            : contended);
     return;
 
  contended:
     {
-      xsize_t *pointer_address = address_nonvolatile;
-      xsize_t mask = 1u << lock_bit;
-      xsize_t v;
+      gsize *pointer_address = address_nonvolatile;
+      gsize mask = 1u << lock_bit;
+      gsize v;
 
-      v = (xsize_t) g_atomic_pointer_get (pointer_address);
+      v = (gsize) g_atomic_pointer_get (pointer_address);
       if (v & mask)
         {
-          xuint_t class = ((xsize_t) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
+          guint class = ((gsize) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
 
           g_atomic_int_add (&g_bit_lock_contended[class], +1);
           g_futex_wait (g_futex_int_address (address_nonvolatile), v);
@@ -445,19 +445,19 @@ void
     }
     goto retry;
 #else
-  xsize_t *pointer_address = address_nonvolatile;
-  xsize_t mask = 1u << lock_bit;
-  xsize_t v;
+  gsize *pointer_address = address_nonvolatile;
+  gsize mask = 1u << lock_bit;
+  gsize v;
 
  retry:
   v = g_atomic_pointer_or (pointer_address, mask);
   if (v & mask)
     /* already locked */
     {
-      xuint_t class = ((xsize_t) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
+      guint class = ((gsize) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
 
       g_atomic_int_add (&g_bit_lock_contended[class], +1);
-      g_futex_wait (g_futex_int_address (address_nonvolatile), (xuint_t) v);
+      g_futex_wait (g_futex_int_address (address_nonvolatile), (guint) v);
       g_atomic_int_add (&g_bit_lock_contended[class], -1);
 
       goto retry;
@@ -468,7 +468,7 @@ void
 
 /**
  * g_pointer_bit_trylock:
- * @address: (not nullable): a pointer to a #xpointer_t-sized value
+ * @address: (not nullable): a pointer to a #gpointer-sized value
  * @lock_bit: a bit value between 0 and 31
  *
  * This is equivalent to g_bit_trylock(), but working on pointers (or
@@ -484,31 +484,31 @@ void
  *
  * Since: 2.30
  **/
-xboolean_t
+gboolean
 (g_pointer_bit_trylock) (volatile void *address,
-                         xint_t           lock_bit)
+                         gint           lock_bit)
 {
-  xreturn_val_if_fail (lock_bit < 32, FALSE);
+  g_return_val_if_fail (lock_bit < 32, FALSE);
 
   {
 #ifdef USE_ASM_GOTO
-    xboolean_t result;
+    gboolean result;
 
     __asm__ volatile ("lock bts %2, (%1)\n"
                       "setnc %%al\n"
                       "movzx %%al, %0"
                       : "=r" (result)
-                      : "r" (address), "r" ((xsize_t) lock_bit)
+                      : "r" (address), "r" ((gsize) lock_bit)
                       : "cc", "memory");
 
     return result;
 #else
     void *address_nonvolatile = (void *) address;
-    xsize_t *pointer_address = address_nonvolatile;
-    xsize_t mask = 1u << lock_bit;
-    xsize_t v;
+    gsize *pointer_address = address_nonvolatile;
+    gsize mask = 1u << lock_bit;
+    gsize v;
 
-    xreturn_val_if_fail (lock_bit < 32, FALSE);
+    g_return_val_if_fail (lock_bit < 32, FALSE);
 
     v = g_atomic_pointer_or (pointer_address, mask);
 
@@ -519,7 +519,7 @@ xboolean_t
 
 /**
  * g_pointer_bit_unlock:
- * @address: (not nullable): a pointer to a #xpointer_t-sized value
+ * @address: (not nullable): a pointer to a #gpointer-sized value
  * @lock_bit: a bit value between 0 and 31
  *
  * This is equivalent to g_bit_unlock, but working on pointers (or other
@@ -535,7 +535,7 @@ xboolean_t
  **/
 void
 (g_pointer_bit_unlock) (volatile void *address,
-                        xint_t           lock_bit)
+                        gint           lock_bit)
 {
   void *address_nonvolatile = (void *) address;
 
@@ -545,17 +545,17 @@ void
 #ifdef USE_ASM_GOTO
     __asm__ volatile ("lock btr %1, (%0)"
                       : /* no output */
-                      : "r" (address), "r" ((xsize_t) lock_bit)
+                      : "r" (address), "r" ((gsize) lock_bit)
                       : "cc", "memory");
 #else
-    xsize_t *pointer_address = address_nonvolatile;
-    xsize_t mask = 1u << lock_bit;
+    gsize *pointer_address = address_nonvolatile;
+    gsize mask = 1u << lock_bit;
 
     g_atomic_pointer_and (pointer_address, ~mask);
 #endif
 
     {
-      xuint_t class = ((xsize_t) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
+      guint class = ((gsize) address_nonvolatile) % G_N_ELEMENTS (g_bit_lock_contended);
       if (g_atomic_int_get (&g_bit_lock_contended[class]))
         g_futex_wake (g_futex_int_address (address_nonvolatile));
     }

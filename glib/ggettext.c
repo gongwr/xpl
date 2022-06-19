@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1998  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #include "config.h"
@@ -52,11 +52,11 @@
  * have to use system codepage as bindtextdomain() doesn't have a
  * UTF-8 interface.
  */
-xchar_t *
+gchar *
 _glib_get_locale_dir (void)
 {
-  xchar_t *install_dir = NULL, *locale_dir;
-  xchar_t *retval = NULL;
+  gchar *install_dir = NULL, *locale_dir;
+  gchar *retval = NULL;
 
   if (glib_dll != NULL)
     install_dir = g_win32_get_package_installation_directory_of_module (glib_dll);
@@ -67,7 +67,7 @@ _glib_get_locale_dir (void)
        * Append "/share/locale" or "/lib/locale" depending on whether
        * autoconfigury detected GNU gettext or not.
        */
-      const char *p = XPL_LOCALE_DIR + strlen (XPL_LOCALE_DIR);
+      const char *p = GLIB_LOCALE_DIR + strlen (GLIB_LOCALE_DIR);
       while (*--p != '/')
 	;
       while (*--p != '/')
@@ -84,10 +84,10 @@ _glib_get_locale_dir (void)
   if (retval)
     return retval;
   else
-    return xstrdup ("");
+    return g_strdup ("");
 }
 
-#undef XPL_LOCALE_DIR
+#undef GLIB_LOCALE_DIR
 
 #endif /* G_OS_WIN32 */
 
@@ -95,16 +95,16 @@ _glib_get_locale_dir (void)
 static void
 ensure_gettext_initialized (void)
 {
-  static xsize_t initialised;
+  static gsize initialised;
 
   if (g_once_init_enter (&initialised))
     {
 #ifdef G_OS_WIN32
-      xchar_t *tmp = _glib_get_locale_dir ();
+      gchar *tmp = _glib_get_locale_dir ();
       bindtextdomain (GETTEXT_PACKAGE, tmp);
       g_free (tmp);
 #else
-      bindtextdomain (GETTEXT_PACKAGE, XPL_LOCALE_DIR);
+      bindtextdomain (GETTEXT_PACKAGE, GLIB_LOCALE_DIR);
 #endif
 #    ifdef HAVE_BIND_TEXTDOMAIN_CODESET
       bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -123,8 +123,8 @@ ensure_gettext_initialized (void)
  *
  * Returns: the translation of @str to the current locale
  */
-const xchar_t *
-glib_gettext (const xchar_t *str)
+const gchar *
+glib_gettext (const gchar *str)
 {
   ensure_gettext_initialized ();
 
@@ -146,9 +146,9 @@ glib_gettext (const xchar_t *str)
  *
  * Returns: the translation of @str to the current locale
  */
-const xchar_t *
-glib_pgettext (const xchar_t *msgctxtid,
-               xsize_t        msgidoffset)
+const gchar *
+glib_pgettext (const gchar *msgctxtid,
+               gsize        msgidoffset)
 {
   ensure_gettext_initialized ();
 
@@ -156,7 +156,7 @@ glib_pgettext (const xchar_t *msgctxtid,
 }
 
 /**
- * xstrip_context:
+ * g_strip_context:
  * @msgid: a string
  * @msgval: another string
  *
@@ -168,9 +168,9 @@ glib_pgettext (const xchar_t *msgctxtid,
  *
  * Since: 2.4
  */
-const xchar_t *
-xstrip_context (const xchar_t *msgid,
-                 const xchar_t *msgval)
+const gchar *
+g_strip_context (const gchar *msgid,
+                 const gchar *msgval)
 {
   if (msgval == msgid)
     {
@@ -208,13 +208,13 @@ xstrip_context (const xchar_t *msgid,
  *
  * Since: 2.16
  */
-const xchar_t *
-g_dpgettext (const xchar_t *domain,
-             const xchar_t *msgctxtid,
-             xsize_t        msgidoffset)
+const gchar *
+g_dpgettext (const gchar *domain,
+             const gchar *msgctxtid,
+             gsize        msgidoffset)
 {
-  const xchar_t *translation;
-  xchar_t *sep;
+  const gchar *translation;
+  gchar *sep;
 
   translation = g_dgettext (domain, msgctxtid);
 
@@ -229,7 +229,7 @@ g_dpgettext (const xchar_t *domain,
           /* try with '\004' instead of '|', in case
            * xgettext -kQ_:1g was used
            */
-          xchar_t *tmp = g_alloca (strlen (msgctxtid) + 1);
+          gchar *tmp = g_alloca (strlen (msgctxtid) + 1);
           strcpy (tmp, msgctxtid);
           tmp[sep - msgctxtid] = '\004';
 
@@ -268,10 +268,10 @@ g_dpgettext (const xchar_t *domain,
  *
  * Since: 2.18
  */
-const xchar_t *
-g_dpgettext2 (const xchar_t *domain,
-              const xchar_t *msgctxt,
-              const xchar_t *msgid)
+const gchar *
+g_dpgettext2 (const gchar *domain,
+              const gchar *msgctxt,
+              const gchar *msgid)
 {
   size_t msgctxt_len = strlen (msgctxt) + 1;
   size_t msgid_len = strlen (msgid) + 1;
@@ -299,10 +299,10 @@ g_dpgettext2 (const xchar_t *domain,
   return translation;
 }
 
-static xboolean_t
+static gboolean
 _g_dgettext_should_translate (void)
 {
-  static xsize_t translate = 0;
+  static gsize translate = 0;
   enum {
     SHOULD_TRANSLATE = 1,
     SHOULD_NOT_TRANSLATE = 2
@@ -310,7 +310,7 @@ _g_dgettext_should_translate (void)
 
   if (G_UNLIKELY (g_once_init_enter (&translate)))
     {
-      xboolean_t should_translate = TRUE;
+      gboolean should_translate = TRUE;
 
       const char *default_domain     = textdomain (NULL);
       const char *translator_comment = gettext ("");
@@ -370,7 +370,7 @@ _g_dgettext_should_translate (void)
  *
  * This function disables translations if and only if upon its first
  * call all the following conditions hold:
- *
+ * 
  * - @domain is not %NULL
  *
  * - textdomain() has been called to set a default text domain
@@ -392,9 +392,9 @@ _g_dgettext_should_translate (void)
  *
  * Since: 2.18
  */
-const xchar_t *
-g_dgettext (const xchar_t *domain,
-            const xchar_t *msgid)
+const gchar *
+g_dgettext (const gchar *domain,
+            const gchar *msgid)
 {
   if (domain && G_UNLIKELY (!_g_dgettext_should_translate ()))
     return msgid;
@@ -418,10 +418,10 @@ g_dgettext (const xchar_t *domain,
  *
  * Since: 2.26
  */
-const xchar_t *
-g_dcgettext (const xchar_t *domain,
-             const xchar_t *msgid,
-             xint_t         category)
+const gchar *
+g_dcgettext (const gchar *domain,
+             const gchar *msgid,
+             gint         category)
 {
   if (domain && G_UNLIKELY (!_g_dgettext_should_translate ()))
     return msgid;
@@ -448,11 +448,11 @@ g_dcgettext (const xchar_t *domain,
  *
  * Since: 2.18
  */
-const xchar_t *
-g_dngettext (const xchar_t *domain,
-             const xchar_t *msgid,
-             const xchar_t *msgid_plural,
-             xulong_t       n)
+const gchar *
+g_dngettext (const gchar *domain,
+             const gchar *msgid,
+             const gchar *msgid_plural,
+             gulong       n)
 {
   if (domain && G_UNLIKELY (!_g_dgettext_should_translate ()))
     return n == 1 ? msgid : msgid_plural;

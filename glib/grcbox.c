@@ -76,7 +76,7 @@
  * void
  * add_person_to_database (Database *db, Person *p)
  * {
- *   db->persons = xlist_prepend (db->persons, g_rc_box_acquire (p));
+ *   db->persons = g_list_prepend (db->persons, g_rc_box_acquire (p));
  * }
  *
  * // Removes a Person from the Database; the reference acquired by
@@ -84,7 +84,7 @@
  * void
  * remove_person_from_database (Database *db, Person *p)
  * {
- *   db->persons = xlist_remove (db->persons, p);
+ *   db->persons = g_list_remove (db->persons, p);
  *   g_rc_box_release (p);
  * }
  * ]|
@@ -106,8 +106,8 @@
  * void
  * remove_person_from_database (Database *db, Person *p)
  * {
- *   db->persons = xlist_remove (db->persons, p);
- *   g_rc_box_release_full (p, (xdestroy_notify_t) person_clear);
+ *   db->persons = g_list_remove (db->persons, p);
+ *   g_rc_box_release_full (p, (GDestroyNotify) person_clear);
  * }
  * ]|
  *
@@ -137,7 +137,7 @@
  *
  * ## Automatic pointer clean up
  *
- * If you want to add x_autoptr() support to your plain old data type through
+ * If you want to add g_autoptr() support to your plain old data type through
  * reference counting, you can use the G_DEFINE_AUTOPTR_CLEANUP_FUNC() and
  * g_rc_box_release():
  *
@@ -153,7 +153,7 @@
  * my_data_struct_release (MyDataStruct *data)
  * {
  *   // my_data_struct_clear() is defined elsewhere
- *   g_rc_box_release_full (data, (xdestroy_notify_t) my_data_struct_clear);
+ *   g_rc_box_release_full (data, (GDestroyNotify) my_data_struct_clear);
  * }
  *
  * G_DEFINE_AUTOPTR_CLEANUP_FUNC (MyDataStruct, my_data_struct_release)
@@ -167,23 +167,23 @@
 
 #define G_RC_BOX(p)             (GRcBox *) (((char *) (p)) - G_RC_BOX_SIZE)
 
-xpointer_t
-g_rc_box_alloc_full (xsize_t    block_size,
-                     xsize_t    alignment,
-                     xboolean_t atomic,
-                     xboolean_t clear)
+gpointer
+g_rc_box_alloc_full (gsize    block_size,
+                     gsize    alignment,
+                     gboolean atomic,
+                     gboolean clear)
 {
   /* We don't do an (atomic ? G_ARC_BOX_SIZE : G_RC_BOX_SIZE) check, here
    * because we have a static assertion that sizeof(GArcBox) == sizeof(GRcBox)
    * inside grcboxprivate.h, and we don't want the compiler to unnecessarily
    * warn about both branches of the conditional yielding identical results
    */
-  xsize_t private_size = G_ARC_BOX_SIZE;
-  xsize_t private_offset = 0;
-  xsize_t real_size;
+  gsize private_size = G_ARC_BOX_SIZE;
+  gsize private_offset = 0;
+  gsize real_size;
   char *allocated;
 
-  xassert (alignment != 0);
+  g_assert (alignment != 0);
 
   /* We need to ensure that the private data is aligned */
   if (private_size % alignment != 0)
@@ -192,7 +192,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
       private_size += (alignment - private_offset);
     }
 
-  xassert (block_size < (G_MAXSIZE - private_size));
+  g_assert (block_size < (G_MAXSIZE - private_size));
   real_size = private_size + block_size;
 
   /* The real allocated size must be a multiple of @alignment, to
@@ -200,8 +200,8 @@ g_rc_box_alloc_full (xsize_t    block_size,
    */
   if (real_size % alignment != 0)
     {
-      xsize_t offset = real_size % alignment;
-      xassert (real_size < (G_MAXSIZE - (alignment - offset)));
+      gsize offset = real_size % alignment;
+      g_assert (real_size < (G_MAXSIZE - (alignment - offset)));
       real_size += (alignment - offset);
     }
 
@@ -214,17 +214,17 @@ g_rc_box_alloc_full (xsize_t    block_size,
        * Valgrind to keep track of the over-allocation and not be
        * confused when passing the pointer around
        */
-      xassert (private_size < (G_MAXSIZE - ALIGN_STRUCT (1)));
+      g_assert (private_size < (G_MAXSIZE - ALIGN_STRUCT (1)));
       private_size += ALIGN_STRUCT (1);
 
       if (clear)
-        allocated = g_malloc0 (real_size + sizeof (xpointer_t));
+        allocated = g_malloc0 (real_size + sizeof (gpointer));
       else
-        allocated = g_malloc (real_size + sizeof (xpointer_t));
+        allocated = g_malloc (real_size + sizeof (gpointer));
 
-      *(xpointer_t *) (allocated + private_size + block_size) = allocated + ALIGN_STRUCT (1);
+      *(gpointer *) (allocated + private_size + block_size) = allocated + ALIGN_STRUCT (1);
 
-      VALGRIND_MALLOCLIKE_BLOCK (allocated + private_size, block_size + sizeof (xpointer_t), 0, TRUE);
+      VALGRIND_MALLOCLIKE_BLOCK (allocated + private_size, block_size + sizeof (gpointer), 0, TRUE);
       VALGRIND_MALLOCLIKE_BLOCK (allocated + ALIGN_STRUCT (1), private_size - ALIGN_STRUCT (1), 0, TRUE);
     }
   else
@@ -275,7 +275,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
       g_ref_count_init (&real_box->ref_count);
     }
 
-  TRACE (XPL_RCBOX_ALLOC (allocated, block_size, atomic, clear));
+  TRACE (GLIB_RCBOX_ALLOC (allocated, block_size, atomic, clear));
 
   return allocated + private_size;
 }
@@ -297,10 +297,10 @@ g_rc_box_alloc_full (xsize_t    block_size,
  *
  * Since: 2.58
  */
-xpointer_t
-g_rc_box_alloc (xsize_t block_size)
+gpointer
+g_rc_box_alloc (gsize block_size)
 {
-  xreturn_val_if_fail (block_size > 0, NULL);
+  g_return_val_if_fail (block_size > 0, NULL);
 
   return g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, FALSE, FALSE);
 }
@@ -324,10 +324,10 @@ g_rc_box_alloc (xsize_t block_size)
  *
  * Since: 2.58
  */
-xpointer_t
-g_rc_box_alloc0 (xsize_t block_size)
+gpointer
+g_rc_box_alloc0 (gsize block_size)
 {
-  xreturn_val_if_fail (block_size > 0, NULL);
+  g_return_val_if_fail (block_size > 0, NULL);
 
   return g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, FALSE, TRUE);
 }
@@ -380,14 +380,14 @@ g_rc_box_alloc0 (xsize_t block_size)
  *
  * Since: 2.58
  */
-xpointer_t
-(g_rc_box_dup) (xsize_t         block_size,
-                xconstpointer mem_block)
+gpointer
+(g_rc_box_dup) (gsize         block_size,
+                gconstpointer mem_block)
 {
-  xpointer_t res;
+  gpointer res;
 
-  xreturn_val_if_fail (block_size > 0, NULL);
-  xreturn_val_if_fail (mem_block != NULL, NULL);
+  g_return_val_if_fail (block_size > 0, NULL);
+  g_return_val_if_fail (mem_block != NULL, NULL);
 
   res = g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, FALSE, FALSE);
   memcpy (res, mem_block, block_size);
@@ -406,19 +406,19 @@ xpointer_t
  *
  * Since: 2.58
  */
-xpointer_t
-(g_rc_box_acquire) (xpointer_t mem_block)
+gpointer
+(g_rc_box_acquire) (gpointer mem_block)
 {
   GRcBox *real_box = G_RC_BOX (mem_block);
 
-  xreturn_val_if_fail (mem_block != NULL, NULL);
+  g_return_val_if_fail (mem_block != NULL, NULL);
 #ifndef G_DISABLE_ASSERT
-  xreturn_val_if_fail (real_box->magic == G_BOX_MAGIC, NULL);
+  g_return_val_if_fail (real_box->magic == G_BOX_MAGIC, NULL);
 #endif
 
   g_ref_count_inc (&real_box->ref_count);
 
-  TRACE (XPL_RCBOX_ACQUIRE (mem_block, 0));
+  TRACE (GLIB_RCBOX_ACQUIRE (mem_block, 0));
 
   return mem_block;
 }
@@ -435,7 +435,7 @@ xpointer_t
  * Since: 2.58
  */
 void
-g_rc_box_release (xpointer_t mem_block)
+g_rc_box_release (gpointer mem_block)
 {
   g_rc_box_release_full (mem_block, NULL);
 }
@@ -454,8 +454,8 @@ g_rc_box_release (xpointer_t mem_block)
  * Since: 2.58
  */
 void
-g_rc_box_release_full (xpointer_t       mem_block,
-                       xdestroy_notify_t clear_func)
+g_rc_box_release_full (gpointer       mem_block,
+                       GDestroyNotify clear_func)
 {
   GRcBox *real_box = G_RC_BOX (mem_block);
 
@@ -468,12 +468,12 @@ g_rc_box_release_full (xpointer_t       mem_block,
     {
       char *real_mem = (char *) real_box - real_box->private_offset;
 
-      TRACE (XPL_RCBOX_RELEASE (mem_block, 0));
+      TRACE (GLIB_RCBOX_RELEASE (mem_block, 0));
 
       if (clear_func != NULL)
         clear_func (mem_block);
 
-      TRACE (XPL_RCBOX_FREE (mem_block));
+      TRACE (GLIB_RCBOX_FREE (mem_block));
       g_free (real_mem);
     }
 }
@@ -488,14 +488,14 @@ g_rc_box_release_full (xpointer_t       mem_block,
  *
  * Since: 2.58
  */
-xsize_t
-g_rc_box_get_size (xpointer_t mem_block)
+gsize
+g_rc_box_get_size (gpointer mem_block)
 {
   GRcBox *real_box = G_RC_BOX (mem_block);
 
-  xreturn_val_if_fail (mem_block != NULL, 0);
+  g_return_val_if_fail (mem_block != NULL, 0);
 #ifndef G_DISABLE_ASSERT
-  xreturn_val_if_fail (real_box->magic == G_BOX_MAGIC, 0);
+  g_return_val_if_fail (real_box->magic == G_BOX_MAGIC, 0);
 #endif
 
   return real_box->mem_size;

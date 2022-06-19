@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_THREADPOOL_H__
 #define __G_THREADPOOL_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -41,62 +41,62 @@ typedef struct _GThreadPool GThreadPool;
 struct _GThreadPool
 {
   GFunc func;
-  xpointer_t user_data;
-  xboolean_t exclusive;
+  gpointer user_data;
+  gboolean exclusive;
 };
 
-XPL_AVAILABLE_IN_ALL
-GThreadPool *   xthread_pool_new               (GFunc            func,
-                                                 xpointer_t         user_data,
-                                                 xint_t             max_threads,
-                                                 xboolean_t         exclusive,
-                                                 xerror_t         **error);
-XPL_AVAILABLE_IN_2_70
-GThreadPool *   xthread_pool_new_full          (GFunc            func,
-                                                 xpointer_t         user_data,
-                                                 xdestroy_notify_t   item_free_func,
-                                                 xint_t             max_threads,
-                                                 xboolean_t         exclusive,
-                                                 xerror_t         **error);
-XPL_AVAILABLE_IN_ALL
-void            xthread_pool_free              (GThreadPool     *pool,
-                                                 xboolean_t         immediate,
-                                                 xboolean_t         wait_);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        xthread_pool_push              (GThreadPool     *pool,
-                                                 xpointer_t         data,
-                                                 xerror_t         **error);
-XPL_AVAILABLE_IN_ALL
-xuint_t           xthread_pool_unprocessed       (GThreadPool     *pool);
-XPL_AVAILABLE_IN_ALL
-void            xthread_pool_set_sort_function (GThreadPool      *pool,
+GLIB_AVAILABLE_IN_ALL
+GThreadPool *   g_thread_pool_new               (GFunc            func,
+                                                 gpointer         user_data,
+                                                 gint             max_threads,
+                                                 gboolean         exclusive,
+                                                 GError         **error);
+GLIB_AVAILABLE_IN_2_70
+GThreadPool *   g_thread_pool_new_full          (GFunc            func,
+                                                 gpointer         user_data,
+                                                 GDestroyNotify   item_free_func,
+                                                 gint             max_threads,
+                                                 gboolean         exclusive,
+                                                 GError         **error);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_pool_free              (GThreadPool     *pool,
+                                                 gboolean         immediate,
+                                                 gboolean         wait_);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_thread_pool_push              (GThreadPool     *pool,
+                                                 gpointer         data,
+                                                 GError         **error);
+GLIB_AVAILABLE_IN_ALL
+guint           g_thread_pool_unprocessed       (GThreadPool     *pool);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_pool_set_sort_function (GThreadPool      *pool,
                                                  GCompareDataFunc  func,
-                                                 xpointer_t          user_data);
-XPL_AVAILABLE_IN_2_46
-xboolean_t        xthread_pool_move_to_front     (GThreadPool      *pool,
-                                                 xpointer_t          data);
+                                                 gpointer          user_data);
+GLIB_AVAILABLE_IN_2_46
+gboolean        g_thread_pool_move_to_front     (GThreadPool      *pool,
+                                                 gpointer          data);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t        xthread_pool_set_max_threads   (GThreadPool     *pool,
-                                                 xint_t             max_threads,
-                                                 xerror_t         **error);
-XPL_AVAILABLE_IN_ALL
-xint_t            xthread_pool_get_max_threads   (GThreadPool     *pool);
-XPL_AVAILABLE_IN_ALL
-xuint_t           xthread_pool_get_num_threads   (GThreadPool     *pool);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_thread_pool_set_max_threads   (GThreadPool     *pool,
+                                                 gint             max_threads,
+                                                 GError         **error);
+GLIB_AVAILABLE_IN_ALL
+gint            g_thread_pool_get_max_threads   (GThreadPool     *pool);
+GLIB_AVAILABLE_IN_ALL
+guint           g_thread_pool_get_num_threads   (GThreadPool     *pool);
 
-XPL_AVAILABLE_IN_ALL
-void            xthread_pool_set_max_unused_threads (xint_t  max_threads);
-XPL_AVAILABLE_IN_ALL
-xint_t            xthread_pool_get_max_unused_threads (void);
-XPL_AVAILABLE_IN_ALL
-xuint_t           xthread_pool_get_num_unused_threads (void);
-XPL_AVAILABLE_IN_ALL
-void            xthread_pool_stop_unused_threads    (void);
-XPL_AVAILABLE_IN_ALL
-void            xthread_pool_set_max_idle_time      (xuint_t interval);
-XPL_AVAILABLE_IN_ALL
-xuint_t           xthread_pool_get_max_idle_time      (void);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_pool_set_max_unused_threads (gint  max_threads);
+GLIB_AVAILABLE_IN_ALL
+gint            g_thread_pool_get_max_unused_threads (void);
+GLIB_AVAILABLE_IN_ALL
+guint           g_thread_pool_get_num_unused_threads (void);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_pool_stop_unused_threads    (void);
+GLIB_AVAILABLE_IN_ALL
+void            g_thread_pool_set_max_idle_time      (guint interval);
+GLIB_AVAILABLE_IN_ALL
+guint           g_thread_pool_get_max_idle_time      (void);
 
 G_END_DECLS
 

@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1997-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  * Copyright (C) 2010 Christian Persch
  *
@@ -24,8 +24,8 @@
 
 #include <string.h>
 
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include "gparamspecs.h"
@@ -38,22 +38,22 @@
 /**
  * SECTION:param_value_types
  * @short_description: Standard Parameter and Value Types
- * @see_also: #xparam_spec_t, #xvalue_t, xobject_class_install_property().
+ * @see_also: #GParamSpec, #GValue, g_object_class_install_property().
  * @title: Parameters and Values
  *
- * #xvalue_t provides an abstract container structure which can be
+ * #GValue provides an abstract container structure which can be
  * copied, transformed and compared while holding a value of any
- * (derived) type, which is registered as a #xtype_t with a
- * #xtype_value_table_t in its #xtype_info_t structure.  Parameter
- * specifications for most value types can be created as #xparam_spec_t
- * derived instances, to implement e.g. #xobject_t properties which
- * operate on #xvalue_t containers.
+ * (derived) type, which is registered as a #GType with a
+ * #GTypeValueTable in its #GTypeInfo structure.  Parameter
+ * specifications for most value types can be created as #GParamSpec
+ * derived instances, to implement e.g. #GObject properties which
+ * operate on #GValue containers.
  *
  * Parameter names need to start with a letter (a-z or A-Z). Subsequent
  * characters can be letters, numbers or a '-'.
  * All other characters are replaced by a '-' during construction.
  *
- * See also #xvalue_t for more information.
+ * See also #GValue for more information.
  *
  */
 
@@ -64,114 +64,114 @@
 
 /* --- param spec functions --- */
 static void
-param_char_init (xparam_spec_t *pspec)
+param_char_init (GParamSpec *pspec)
 {
-  GParamSpecChar *cspec = XPARAM_SPEC_CHAR (pspec);
-
+  GParamSpecChar *cspec = G_PARAM_SPEC_CHAR (pspec);
+  
   cspec->minimum = 0x7f;
   cspec->maximum = 0x80;
   cspec->default_value = 0;
 }
 
 static void
-param_char_set_default (xparam_spec_t *pspec,
-			xvalue_t	   *value)
+param_char_set_default (GParamSpec *pspec,
+			GValue	   *value)
 {
-  value->data[0].v_int = XPARAM_SPEC_CHAR (pspec)->default_value;
+  value->data[0].v_int = G_PARAM_SPEC_CHAR (pspec)->default_value;
 }
 
-static xboolean_t
-param_char_validate (xparam_spec_t *pspec,
-		     xvalue_t     *value)
+static gboolean
+param_char_validate (GParamSpec *pspec,
+		     GValue     *value)
 {
-  GParamSpecChar *cspec = XPARAM_SPEC_CHAR (pspec);
-  xint_t oval = value->data[0].v_int;
-
+  GParamSpecChar *cspec = G_PARAM_SPEC_CHAR (pspec);
+  gint oval = value->data[0].v_int;
+  
   value->data[0].v_int = CLAMP (value->data[0].v_int, cspec->minimum, cspec->maximum);
-
+  
   return value->data[0].v_int != oval;
 }
 
 static void
-param_uchar_init (xparam_spec_t *pspec)
+param_uchar_init (GParamSpec *pspec)
 {
-  GParamSpecUChar *uspec = XPARAM_SPEC_UCHAR (pspec);
-
+  GParamSpecUChar *uspec = G_PARAM_SPEC_UCHAR (pspec);
+  
   uspec->minimum = 0;
   uspec->maximum = 0xff;
   uspec->default_value = 0;
 }
 
 static void
-param_uchar_set_default (xparam_spec_t *pspec,
-			 xvalue_t	    *value)
+param_uchar_set_default (GParamSpec *pspec,
+			 GValue	    *value)
 {
-  value->data[0].v_uint = XPARAM_SPEC_UCHAR (pspec)->default_value;
+  value->data[0].v_uint = G_PARAM_SPEC_UCHAR (pspec)->default_value;
 }
 
-static xboolean_t
-param_uchar_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_uchar_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  GParamSpecUChar *uspec = XPARAM_SPEC_UCHAR (pspec);
-  xuint_t oval = value->data[0].v_uint;
-
+  GParamSpecUChar *uspec = G_PARAM_SPEC_UCHAR (pspec);
+  guint oval = value->data[0].v_uint;
+  
   value->data[0].v_uint = CLAMP (value->data[0].v_uint, uspec->minimum, uspec->maximum);
-
+  
   return value->data[0].v_uint != oval;
 }
 
 static void
-param_boolean_set_default (xparam_spec_t *pspec,
-			   xvalue_t     *value)
+param_boolean_set_default (GParamSpec *pspec,
+			   GValue     *value)
 {
-  value->data[0].v_int = XPARAM_SPEC_BOOLEAN (pspec)->default_value;
+  value->data[0].v_int = G_PARAM_SPEC_BOOLEAN (pspec)->default_value;
 }
 
-static xboolean_t
-param_boolean_validate (xparam_spec_t *pspec,
-			xvalue_t     *value)
+static gboolean
+param_boolean_validate (GParamSpec *pspec,
+			GValue     *value)
 {
-  xint_t oval = value->data[0].v_int;
-
+  gint oval = value->data[0].v_int;
+  
   value->data[0].v_int = value->data[0].v_int != FALSE;
-
+  
   return value->data[0].v_int != oval;
 }
 
 static void
-param_int_init (xparam_spec_t *pspec)
+param_int_init (GParamSpec *pspec)
 {
-  GParamSpecInt *ispec = XPARAM_SPEC_INT (pspec);
-
+  GParamSpecInt *ispec = G_PARAM_SPEC_INT (pspec);
+  
   ispec->minimum = 0x7fffffff;
   ispec->maximum = 0x80000000;
   ispec->default_value = 0;
 }
 
 static void
-param_int_set_default (xparam_spec_t *pspec,
-		       xvalue_t     *value)
+param_int_set_default (GParamSpec *pspec,
+		       GValue     *value)
 {
-  value->data[0].v_int = XPARAM_SPEC_INT (pspec)->default_value;
+  value->data[0].v_int = G_PARAM_SPEC_INT (pspec)->default_value;
 }
 
-static xboolean_t
-param_int_validate (xparam_spec_t *pspec,
-		    xvalue_t     *value)
+static gboolean
+param_int_validate (GParamSpec *pspec,
+		    GValue     *value)
 {
-  GParamSpecInt *ispec = XPARAM_SPEC_INT (pspec);
-  xint_t oval = value->data[0].v_int;
-
+  GParamSpecInt *ispec = G_PARAM_SPEC_INT (pspec);
+  gint oval = value->data[0].v_int;
+  
   value->data[0].v_int = CLAMP (value->data[0].v_int, ispec->minimum, ispec->maximum);
-
+  
   return value->data[0].v_int != oval;
 }
 
-static xint_t
-param_int_values_cmp (xparam_spec_t   *pspec,
-		      const xvalue_t *value1,
-		      const xvalue_t *value2)
+static gint
+param_int_values_cmp (GParamSpec   *pspec,
+		      const GValue *value1,
+		      const GValue *value2)
 {
   if (value1->data[0].v_int < value2->data[0].v_int)
     return -1;
@@ -180,38 +180,38 @@ param_int_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_uint_init (xparam_spec_t *pspec)
+param_uint_init (GParamSpec *pspec)
 {
-  GParamSpecUInt *uspec = XPARAM_SPEC_UINT (pspec);
-
+  GParamSpecUInt *uspec = G_PARAM_SPEC_UINT (pspec);
+  
   uspec->minimum = 0;
   uspec->maximum = 0xffffffff;
   uspec->default_value = 0;
 }
 
 static void
-param_uint_set_default (xparam_spec_t *pspec,
-			xvalue_t     *value)
+param_uint_set_default (GParamSpec *pspec,
+			GValue     *value)
 {
-  value->data[0].v_uint = XPARAM_SPEC_UINT (pspec)->default_value;
+  value->data[0].v_uint = G_PARAM_SPEC_UINT (pspec)->default_value;
 }
 
-static xboolean_t
-param_uint_validate (xparam_spec_t *pspec,
-		     xvalue_t     *value)
+static gboolean
+param_uint_validate (GParamSpec *pspec,
+		     GValue     *value)
 {
-  GParamSpecUInt *uspec = XPARAM_SPEC_UINT (pspec);
-  xuint_t oval = value->data[0].v_uint;
-
+  GParamSpecUInt *uspec = G_PARAM_SPEC_UINT (pspec);
+  guint oval = value->data[0].v_uint;
+  
   value->data[0].v_uint = CLAMP (value->data[0].v_uint, uspec->minimum, uspec->maximum);
-
+  
   return value->data[0].v_uint != oval;
 }
 
-static xint_t
-param_uint_values_cmp (xparam_spec_t   *pspec,
-		       const xvalue_t *value1,
-		       const xvalue_t *value2)
+static gint
+param_uint_values_cmp (GParamSpec   *pspec,
+		       const GValue *value1,
+		       const GValue *value2)
 {
   if (value1->data[0].v_uint < value2->data[0].v_uint)
     return -1;
@@ -220,10 +220,10 @@ param_uint_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_long_init (xparam_spec_t *pspec)
+param_long_init (GParamSpec *pspec)
 {
-  GParamSpecLong *lspec = XPARAM_SPEC_LONG (pspec);
-
+  GParamSpecLong *lspec = G_PARAM_SPEC_LONG (pspec);
+  
 #if SIZEOF_LONG == 4
   lspec->minimum = 0x7fffffff;
   lspec->maximum = 0x80000000;
@@ -235,28 +235,28 @@ param_long_init (xparam_spec_t *pspec)
 }
 
 static void
-param_long_set_default (xparam_spec_t *pspec,
-			xvalue_t     *value)
+param_long_set_default (GParamSpec *pspec,
+			GValue     *value)
 {
-  value->data[0].v_long = XPARAM_SPEC_LONG (pspec)->default_value;
+  value->data[0].v_long = G_PARAM_SPEC_LONG (pspec)->default_value;
 }
 
-static xboolean_t
-param_long_validate (xparam_spec_t *pspec,
-		     xvalue_t     *value)
+static gboolean
+param_long_validate (GParamSpec *pspec,
+		     GValue     *value)
 {
-  GParamSpecLong *lspec = XPARAM_SPEC_LONG (pspec);
-  xlong_t oval = value->data[0].v_long;
-
+  GParamSpecLong *lspec = G_PARAM_SPEC_LONG (pspec);
+  glong oval = value->data[0].v_long;
+  
   value->data[0].v_long = CLAMP (value->data[0].v_long, lspec->minimum, lspec->maximum);
-
+  
   return value->data[0].v_long != oval;
 }
 
-static xint_t
-param_lonxvalues_cmp (xparam_spec_t   *pspec,
-		       const xvalue_t *value1,
-		       const xvalue_t *value2)
+static gint
+param_long_values_cmp (GParamSpec   *pspec,
+		       const GValue *value1,
+		       const GValue *value2)
 {
   if (value1->data[0].v_long < value2->data[0].v_long)
     return -1;
@@ -265,10 +265,10 @@ param_lonxvalues_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_ulong_init (xparam_spec_t *pspec)
+param_ulong_init (GParamSpec *pspec)
 {
-  GParamSpecULong *uspec = XPARAM_SPEC_ULONG (pspec);
-
+  GParamSpecULong *uspec = G_PARAM_SPEC_ULONG (pspec);
+  
   uspec->minimum = 0;
 #if SIZEOF_LONG == 4
   uspec->maximum = 0xffffffff;
@@ -279,28 +279,28 @@ param_ulong_init (xparam_spec_t *pspec)
 }
 
 static void
-param_ulong_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_ulong_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
-  value->data[0].v_ulong = XPARAM_SPEC_ULONG (pspec)->default_value;
+  value->data[0].v_ulong = G_PARAM_SPEC_ULONG (pspec)->default_value;
 }
 
-static xboolean_t
-param_ulong_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_ulong_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  GParamSpecULong *uspec = XPARAM_SPEC_ULONG (pspec);
-  xulong_t oval = value->data[0].v_ulong;
-
+  GParamSpecULong *uspec = G_PARAM_SPEC_ULONG (pspec);
+  gulong oval = value->data[0].v_ulong;
+  
   value->data[0].v_ulong = CLAMP (value->data[0].v_ulong, uspec->minimum, uspec->maximum);
-
+  
   return value->data[0].v_ulong != oval;
 }
 
-static xint_t
-param_ulonxvalues_cmp (xparam_spec_t   *pspec,
-			const xvalue_t *value1,
-			const xvalue_t *value2)
+static gint
+param_ulong_values_cmp (GParamSpec   *pspec,
+			const GValue *value1,
+			const GValue *value2)
 {
   if (value1->data[0].v_ulong < value2->data[0].v_ulong)
     return -1;
@@ -309,38 +309,38 @@ param_ulonxvalues_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_int64_init (xparam_spec_t *pspec)
+param_int64_init (GParamSpec *pspec)
 {
-  GParamSpecInt64 *lspec = XPARAM_SPEC_INT64 (pspec);
-
+  GParamSpecInt64 *lspec = G_PARAM_SPEC_INT64 (pspec);
+  
   lspec->minimum = G_MININT64;
   lspec->maximum = G_MAXINT64;
   lspec->default_value = 0;
 }
 
 static void
-param_int64_set_default (xparam_spec_t *pspec,
-			xvalue_t     *value)
+param_int64_set_default (GParamSpec *pspec,
+			GValue     *value)
 {
-  value->data[0].v_int64 = XPARAM_SPEC_INT64 (pspec)->default_value;
+  value->data[0].v_int64 = G_PARAM_SPEC_INT64 (pspec)->default_value;
 }
 
-static xboolean_t
-param_int64_validate (xparam_spec_t *pspec,
-		     xvalue_t     *value)
+static gboolean
+param_int64_validate (GParamSpec *pspec,
+		     GValue     *value)
 {
-  GParamSpecInt64 *lspec = XPARAM_SPEC_INT64 (pspec);
-  sint64_t oval = value->data[0].v_int64;
-
+  GParamSpecInt64 *lspec = G_PARAM_SPEC_INT64 (pspec);
+  gint64 oval = value->data[0].v_int64;
+  
   value->data[0].v_int64 = CLAMP (value->data[0].v_int64, lspec->minimum, lspec->maximum);
-
+  
   return value->data[0].v_int64 != oval;
 }
 
-static xint_t
-param_int64_values_cmp (xparam_spec_t   *pspec,
-		       const xvalue_t *value1,
-		       const xvalue_t *value2)
+static gint
+param_int64_values_cmp (GParamSpec   *pspec,
+		       const GValue *value1,
+		       const GValue *value2)
 {
   if (value1->data[0].v_int64 < value2->data[0].v_int64)
     return -1;
@@ -349,38 +349,38 @@ param_int64_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_uint64_init (xparam_spec_t *pspec)
+param_uint64_init (GParamSpec *pspec)
 {
-  GParamSpecUInt64 *uspec = XPARAM_SPEC_UINT64 (pspec);
-
+  GParamSpecUInt64 *uspec = G_PARAM_SPEC_UINT64 (pspec);
+  
   uspec->minimum = 0;
   uspec->maximum = G_MAXUINT64;
   uspec->default_value = 0;
 }
 
 static void
-param_uint64_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_uint64_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
-  value->data[0].v_uint64 = XPARAM_SPEC_UINT64 (pspec)->default_value;
+  value->data[0].v_uint64 = G_PARAM_SPEC_UINT64 (pspec)->default_value;
 }
 
-static xboolean_t
-param_uint64_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_uint64_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  GParamSpecUInt64 *uspec = XPARAM_SPEC_UINT64 (pspec);
-  xuint64_t oval = value->data[0].v_uint64;
-
+  GParamSpecUInt64 *uspec = G_PARAM_SPEC_UINT64 (pspec);
+  guint64 oval = value->data[0].v_uint64;
+  
   value->data[0].v_uint64 = CLAMP (value->data[0].v_uint64, uspec->minimum, uspec->maximum);
-
+  
   return value->data[0].v_uint64 != oval;
 }
 
-static xint_t
-param_uint64_values_cmp (xparam_spec_t   *pspec,
-			const xvalue_t *value1,
-			const xvalue_t *value2)
+static gint
+param_uint64_values_cmp (GParamSpec   *pspec,
+			const GValue *value1,
+			const GValue *value2)
 {
   if (value1->data[0].v_uint64 < value2->data[0].v_uint64)
     return -1;
@@ -389,28 +389,28 @@ param_uint64_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_unichar_init (xparam_spec_t *pspec)
+param_unichar_init (GParamSpec *pspec)
 {
-  GParamSpecUnichar *uspec = XPARAM_SPEC_UNICHAR (pspec);
-
+  GParamSpecUnichar *uspec = G_PARAM_SPEC_UNICHAR (pspec);
+  
   uspec->default_value = 0;
 }
 
 static void
-param_unichar_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_unichar_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
-  value->data[0].v_uint = XPARAM_SPEC_UNICHAR (pspec)->default_value;
+  value->data[0].v_uint = G_PARAM_SPEC_UNICHAR (pspec)->default_value;
 }
 
-static xboolean_t
-param_unichar_validate (xparam_spec_t *pspec,
-		        xvalue_t     *value)
+static gboolean
+param_unichar_validate (GParamSpec *pspec,
+		        GValue     *value)
 {
-  xunichar_t oval = value->data[0].v_uint;
-  xboolean_t changed = FALSE;
+  gunichar oval = value->data[0].v_uint;
+  gboolean changed = FALSE;
 
-  if (!xunichar_validate (oval))
+  if (!g_unichar_validate (oval))
     {
       value->data[0].v_uint = 0;
       changed = TRUE;
@@ -419,10 +419,10 @@ param_unichar_validate (xparam_spec_t *pspec,
   return changed;
 }
 
-static xint_t
-param_unichar_values_cmp (xparam_spec_t   *pspec,
-			const xvalue_t *value1,
-			const xvalue_t *value2)
+static gint
+param_unichar_values_cmp (GParamSpec   *pspec,
+			const GValue *value1,
+			const GValue *value2)
 {
   if (value1->data[0].v_uint < value2->data[0].v_uint)
     return -1;
@@ -431,101 +431,101 @@ param_unichar_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_enum_init (xparam_spec_t *pspec)
+param_enum_init (GParamSpec *pspec)
 {
-  GParamSpecEnum *espec = XPARAM_SPEC_ENUM (pspec);
-
+  GParamSpecEnum *espec = G_PARAM_SPEC_ENUM (pspec);
+  
   espec->enum_class = NULL;
   espec->default_value = 0;
 }
 
 static void
-param_enum_finalize (xparam_spec_t *pspec)
+param_enum_finalize (GParamSpec *pspec)
 {
-  GParamSpecEnum *espec = XPARAM_SPEC_ENUM (pspec);
-  GParamSpecClass *parent_class = xtype_class_peek (xtype_parent (XTYPE_PARAM_ENUM));
-
+  GParamSpecEnum *espec = G_PARAM_SPEC_ENUM (pspec);
+  GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (G_TYPE_PARAM_ENUM));
+  
   if (espec->enum_class)
     {
-      xtype_class_unref (espec->enum_class);
+      g_type_class_unref (espec->enum_class);
       espec->enum_class = NULL;
     }
-
+  
   parent_class->finalize (pspec);
 }
 
 static void
-param_enum_set_default (xparam_spec_t *pspec,
-			xvalue_t     *value)
+param_enum_set_default (GParamSpec *pspec,
+			GValue     *value)
 {
-  value->data[0].v_long = XPARAM_SPEC_ENUM (pspec)->default_value;
+  value->data[0].v_long = G_PARAM_SPEC_ENUM (pspec)->default_value;
 }
 
-static xboolean_t
-param_enum_validate (xparam_spec_t *pspec,
-		     xvalue_t     *value)
+static gboolean
+param_enum_validate (GParamSpec *pspec,
+		     GValue     *value)
 {
-  GParamSpecEnum *espec = XPARAM_SPEC_ENUM (pspec);
-  xlong_t oval = value->data[0].v_long;
-
+  GParamSpecEnum *espec = G_PARAM_SPEC_ENUM (pspec);
+  glong oval = value->data[0].v_long;
+  
   if (!espec->enum_class ||
-      !xenum_get_value (espec->enum_class, value->data[0].v_long))
+      !g_enum_get_value (espec->enum_class, value->data[0].v_long))
     value->data[0].v_long = espec->default_value;
-
+  
   return value->data[0].v_long != oval;
 }
 
 static void
-param_flags_init (xparam_spec_t *pspec)
+param_flags_init (GParamSpec *pspec)
 {
-  GParamSpecFlags *fspec = XPARAM_SPEC_FLAGS (pspec);
-
+  GParamSpecFlags *fspec = G_PARAM_SPEC_FLAGS (pspec);
+  
   fspec->flags_class = NULL;
   fspec->default_value = 0;
 }
 
 static void
-param_flags_finalize (xparam_spec_t *pspec)
+param_flags_finalize (GParamSpec *pspec)
 {
-  GParamSpecFlags *fspec = XPARAM_SPEC_FLAGS (pspec);
-  GParamSpecClass *parent_class = xtype_class_peek (xtype_parent (XTYPE_PARAM_FLAGS));
-
+  GParamSpecFlags *fspec = G_PARAM_SPEC_FLAGS (pspec);
+  GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (G_TYPE_PARAM_FLAGS));
+  
   if (fspec->flags_class)
     {
-      xtype_class_unref (fspec->flags_class);
+      g_type_class_unref (fspec->flags_class);
       fspec->flags_class = NULL;
     }
-
+  
   parent_class->finalize (pspec);
 }
 
 static void
-param_flags_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_flags_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
-  value->data[0].v_ulong = XPARAM_SPEC_FLAGS (pspec)->default_value;
+  value->data[0].v_ulong = G_PARAM_SPEC_FLAGS (pspec)->default_value;
 }
 
-static xboolean_t
-param_flags_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_flags_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  GParamSpecFlags *fspec = XPARAM_SPEC_FLAGS (pspec);
-  xulong_t oval = value->data[0].v_ulong;
-
+  GParamSpecFlags *fspec = G_PARAM_SPEC_FLAGS (pspec);
+  gulong oval = value->data[0].v_ulong;
+  
   if (fspec->flags_class)
     value->data[0].v_ulong &= fspec->flags_class->mask;
   else
     value->data[0].v_ulong = fspec->default_value;
-
+  
   return value->data[0].v_ulong != oval;
 }
 
 static void
-param_float_init (xparam_spec_t *pspec)
+param_float_init (GParamSpec *pspec)
 {
-  GParamSpecFloat *fspec = XPARAM_SPEC_FLOAT (pspec);
-
+  GParamSpecFloat *fspec = G_PARAM_SPEC_FLOAT (pspec);
+  
   fspec->minimum = -G_MAXFLOAT;
   fspec->maximum = G_MAXFLOAT;
   fspec->default_value = 0;
@@ -533,31 +533,31 @@ param_float_init (xparam_spec_t *pspec)
 }
 
 static void
-param_float_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_float_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
-  value->data[0].v_float = XPARAM_SPEC_FLOAT (pspec)->default_value;
+  value->data[0].v_float = G_PARAM_SPEC_FLOAT (pspec)->default_value;
 }
 
-static xboolean_t
-param_float_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_float_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  GParamSpecFloat *fspec = XPARAM_SPEC_FLOAT (pspec);
+  GParamSpecFloat *fspec = G_PARAM_SPEC_FLOAT (pspec);
   gfloat oval = value->data[0].v_float;
-
+  
   value->data[0].v_float = CLAMP (value->data[0].v_float, fspec->minimum, fspec->maximum);
-
+  
   return value->data[0].v_float != oval;
 }
 
-static xint_t
-param_float_values_cmp (xparam_spec_t   *pspec,
-			const xvalue_t *value1,
-			const xvalue_t *value2)
+static gint
+param_float_values_cmp (GParamSpec   *pspec,
+			const GValue *value1,
+			const GValue *value2)
 {
-  gfloat epsilon = XPARAM_SPEC_FLOAT (pspec)->epsilon;
-
+  gfloat epsilon = G_PARAM_SPEC_FLOAT (pspec)->epsilon;
+  
   if (value1->data[0].v_float < value2->data[0].v_float)
     return - (value2->data[0].v_float - value1->data[0].v_float > epsilon);
   else
@@ -565,10 +565,10 @@ param_float_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_double_init (xparam_spec_t *pspec)
+param_double_init (GParamSpec *pspec)
 {
-  GParamSpecDouble *dspec = XPARAM_SPEC_DOUBLE (pspec);
-
+  GParamSpecDouble *dspec = G_PARAM_SPEC_DOUBLE (pspec);
+  
   dspec->minimum = -G_MAXDOUBLE;
   dspec->maximum = G_MAXDOUBLE;
   dspec->default_value = 0;
@@ -576,31 +576,31 @@ param_double_init (xparam_spec_t *pspec)
 }
 
 static void
-param_double_set_default (xparam_spec_t *pspec,
-			  xvalue_t     *value)
+param_double_set_default (GParamSpec *pspec,
+			  GValue     *value)
 {
-  value->data[0].v_double = XPARAM_SPEC_DOUBLE (pspec)->default_value;
+  value->data[0].v_double = G_PARAM_SPEC_DOUBLE (pspec)->default_value;
 }
 
-static xboolean_t
-param_double_validate (xparam_spec_t *pspec,
-		       xvalue_t     *value)
+static gboolean
+param_double_validate (GParamSpec *pspec,
+		       GValue     *value)
 {
-  GParamSpecDouble *dspec = XPARAM_SPEC_DOUBLE (pspec);
-  xdouble_t oval = value->data[0].v_double;
-
+  GParamSpecDouble *dspec = G_PARAM_SPEC_DOUBLE (pspec);
+  gdouble oval = value->data[0].v_double;
+  
   value->data[0].v_double = CLAMP (value->data[0].v_double, dspec->minimum, dspec->maximum);
-
+  
   return value->data[0].v_double != oval;
 }
 
-static xint_t
-param_double_values_cmp (xparam_spec_t   *pspec,
-			 const xvalue_t *value1,
-			 const xvalue_t *value2)
+static gint
+param_double_values_cmp (GParamSpec   *pspec,
+			 const GValue *value1,
+			 const GValue *value2)
 {
-  xdouble_t epsilon = XPARAM_SPEC_DOUBLE (pspec)->epsilon;
-
+  gdouble epsilon = G_PARAM_SPEC_DOUBLE (pspec)->epsilon;
+  
   if (value1->data[0].v_double < value2->data[0].v_double)
     return - (value2->data[0].v_double - value1->data[0].v_double > epsilon);
   else
@@ -608,10 +608,10 @@ param_double_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_string_init (xparam_spec_t *pspec)
+param_string_init (GParamSpec *pspec)
 {
-  GParamSpecString *sspec = XPARAM_SPEC_STRING (pspec);
-
+  GParamSpecString *sspec = G_PARAM_SPEC_STRING (pspec);
+  
   sspec->default_value = NULL;
   sspec->cset_first = NULL;
   sspec->cset_nth = NULL;
@@ -621,45 +621,45 @@ param_string_init (xparam_spec_t *pspec)
 }
 
 static void
-param_string_finalize (xparam_spec_t *pspec)
+param_string_finalize (GParamSpec *pspec)
 {
-  GParamSpecString *sspec = XPARAM_SPEC_STRING (pspec);
-  GParamSpecClass *parent_class = xtype_class_peek (xtype_parent (XTYPE_PARAM_STRING));
-
+  GParamSpecString *sspec = G_PARAM_SPEC_STRING (pspec);
+  GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (G_TYPE_PARAM_STRING));
+  
   g_free (sspec->default_value);
   g_free (sspec->cset_first);
   g_free (sspec->cset_nth);
   sspec->default_value = NULL;
   sspec->cset_first = NULL;
   sspec->cset_nth = NULL;
-
+  
   parent_class->finalize (pspec);
 }
 
 static void
-param_string_set_default (xparam_spec_t *pspec,
-			  xvalue_t     *value)
+param_string_set_default (GParamSpec *pspec,
+			  GValue     *value)
 {
-  value->data[0].v_pointer = xstrdup (XPARAM_SPEC_STRING (pspec)->default_value);
+  value->data[0].v_pointer = g_strdup (G_PARAM_SPEC_STRING (pspec)->default_value);
 }
 
-static xboolean_t
-param_string_validate (xparam_spec_t *pspec,
-		       xvalue_t     *value)
+static gboolean
+param_string_validate (GParamSpec *pspec,
+		       GValue     *value)
 {
-  GParamSpecString *sspec = XPARAM_SPEC_STRING (pspec);
-  xchar_t *string = value->data[0].v_pointer;
-  xuint_t changed = 0;
-
+  GParamSpecString *sspec = G_PARAM_SPEC_STRING (pspec);
+  gchar *string = value->data[0].v_pointer;
+  guint changed = 0;
+  
   if (string && string[0])
     {
-      xchar_t *s;
-
+      gchar *s;
+      
       if (sspec->cset_first && !strchr (sspec->cset_first, string[0]))
 	{
           if (value->data[1].v_uint & G_VALUE_NOCOPY_CONTENTS)
             {
-              value->data[0].v_pointer = xstrdup (string);
+              value->data[0].v_pointer = g_strdup (string);
               string = value->data[0].v_pointer;
               value->data[1].v_uint &= ~G_VALUE_NOCOPY_CONTENTS;
             }
@@ -672,8 +672,8 @@ param_string_validate (xparam_spec_t *pspec,
 	    {
               if (value->data[1].v_uint & G_VALUE_NOCOPY_CONTENTS)
                 {
-                  value->data[0].v_pointer = xstrdup (string);
-                  s = (xchar_t*) value->data[0].v_pointer + (s - string);
+                  value->data[0].v_pointer = g_strdup (string);
+                  s = (gchar*) value->data[0].v_pointer + (s - string);
                   string = value->data[0].v_pointer;
                   value->data[1].v_uint &= ~G_VALUE_NOCOPY_CONTENTS;
                 }
@@ -694,7 +694,7 @@ param_string_validate (xparam_spec_t *pspec,
   if (sspec->ensure_non_null && !string)
     {
       value->data[1].v_uint &= ~G_VALUE_NOCOPY_CONTENTS;
-      value->data[0].v_pointer = xstrdup ("");
+      value->data[0].v_pointer = g_strdup ("");
       changed++;
       string = value->data[0].v_pointer;
     }
@@ -702,10 +702,10 @@ param_string_validate (xparam_spec_t *pspec,
   return changed;
 }
 
-static xint_t
-param_strinxvalues_cmp (xparam_spec_t   *pspec,
-			 const xvalue_t *value1,
-			 const xvalue_t *value2)
+static gint
+param_string_values_cmp (GParamSpec   *pspec,
+			 const GValue *value1,
+			 const GValue *value2)
 {
   if (!value1->data[0].v_pointer)
     return value2->data[0].v_pointer != NULL ? -1 : 0;
@@ -716,68 +716,68 @@ param_strinxvalues_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_param_init (xparam_spec_t *pspec)
+param_param_init (GParamSpec *pspec)
 {
-  /* GParamSpecParam *spec = XPARAM_SPEC_PARAM (pspec); */
+  /* GParamSpecParam *spec = G_PARAM_SPEC_PARAM (pspec); */
 }
 
 static void
-param_param_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_param_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
   value->data[0].v_pointer = NULL;
 }
 
-static xboolean_t
-param_param_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_param_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  /* GParamSpecParam *spec = XPARAM_SPEC_PARAM (pspec); */
-  xparam_spec_t *param = value->data[0].v_pointer;
-  xuint_t changed = 0;
-
-  if (param && !xvalue_type_compatible (XPARAM_SPEC_TYPE (param), XPARAM_SPEC_VALUE_TYPE (pspec)))
+  /* GParamSpecParam *spec = G_PARAM_SPEC_PARAM (pspec); */
+  GParamSpec *param = value->data[0].v_pointer;
+  guint changed = 0;
+  
+  if (param && !g_value_type_compatible (G_PARAM_SPEC_TYPE (param), G_PARAM_SPEC_VALUE_TYPE (pspec)))
     {
-      xparam_spec_unref (param);
+      g_param_spec_unref (param);
       value->data[0].v_pointer = NULL;
       changed++;
     }
-
+  
   return changed;
 }
 
 static void
-param_boxed_init (xparam_spec_t *pspec)
+param_boxed_init (GParamSpec *pspec)
 {
-  /* GParamSpecBoxed *bspec = XPARAM_SPEC_BOXED (pspec); */
+  /* GParamSpecBoxed *bspec = G_PARAM_SPEC_BOXED (pspec); */
 }
 
 static void
-param_boxed_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_boxed_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
   value->data[0].v_pointer = NULL;
 }
 
-static xboolean_t
-param_boxed_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_boxed_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  /* GParamSpecBoxed *bspec = XPARAM_SPEC_BOXED (pspec); */
-  xuint_t changed = 0;
+  /* GParamSpecBoxed *bspec = G_PARAM_SPEC_BOXED (pspec); */
+  guint changed = 0;
 
   /* can't do a whole lot here since we haven't even G_BOXED_TYPE() */
-
+  
   return changed;
 }
 
-static xint_t
-param_boxed_values_cmp (xparam_spec_t    *pspec,
-			 const xvalue_t *value1,
-			 const xvalue_t *value2)
+static gint
+param_boxed_values_cmp (GParamSpec    *pspec,
+			 const GValue *value1,
+			 const GValue *value2)
 {
-  xuint8_t *p1 = value1->data[0].v_pointer;
-  xuint8_t *p2 = value2->data[0].v_pointer;
+  guint8 *p1 = value1->data[0].v_pointer;
+  guint8 *p2 = value2->data[0].v_pointer;
 
   /* not much to compare here, try to at least provide stable lesser/greater result */
 
@@ -785,35 +785,35 @@ param_boxed_values_cmp (xparam_spec_t    *pspec,
 }
 
 static void
-param_pointer_init (xparam_spec_t *pspec)
+param_pointer_init (GParamSpec *pspec)
 {
-  /* GParamSpecPointer *spec = XPARAM_SPEC_POINTER (pspec); */
+  /* GParamSpecPointer *spec = G_PARAM_SPEC_POINTER (pspec); */
 }
 
 static void
-param_pointer_set_default (xparam_spec_t *pspec,
-			   xvalue_t     *value)
+param_pointer_set_default (GParamSpec *pspec,
+			   GValue     *value)
 {
   value->data[0].v_pointer = NULL;
 }
 
-static xboolean_t
-param_pointer_validate (xparam_spec_t *pspec,
-			xvalue_t     *value)
+static gboolean
+param_pointer_validate (GParamSpec *pspec,
+			GValue     *value)
 {
-  /* GParamSpecPointer *spec = XPARAM_SPEC_POINTER (pspec); */
-  xuint_t changed = 0;
-
+  /* GParamSpecPointer *spec = G_PARAM_SPEC_POINTER (pspec); */
+  guint changed = 0;
+  
   return changed;
 }
 
-static xint_t
-param_pointer_values_cmp (xparam_spec_t   *pspec,
-			  const xvalue_t *value1,
-			  const xvalue_t *value2)
+static gint
+param_pointer_values_cmp (GParamSpec   *pspec,
+			  const GValue *value1,
+			  const GValue *value2)
 {
-  xuint8_t *p1 = value1->data[0].v_pointer;
-  xuint8_t *p2 = value2->data[0].v_pointer;
+  guint8 *p1 = value1->data[0].v_pointer;
+  guint8 *p2 = value2->data[0].v_pointer;
 
   /* not much to compare here, try to at least provide stable lesser/greater result */
 
@@ -821,30 +821,30 @@ param_pointer_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_value_array_init (xparam_spec_t *pspec)
+param_value_array_init (GParamSpec *pspec)
 {
-  GParamSpecValueArray *aspec = XPARAM_SPEC_VALUE_ARRAY (pspec);
+  GParamSpecValueArray *aspec = G_PARAM_SPEC_VALUE_ARRAY (pspec);
 
   aspec->element_spec = NULL;
   aspec->fixed_n_elements = 0; /* disable */
 }
 
-static inline xuint_t
-value_array_ensure_size (xvalue_array_t *value_array,
-			 xuint_t        fixed_n_elements)
+static inline guint
+value_array_ensure_size (GValueArray *value_array,
+			 guint        fixed_n_elements)
 {
-  xuint_t changed = 0;
+  guint changed = 0;
 
   if (fixed_n_elements)
     {
       while (value_array->n_values < fixed_n_elements)
 	{
-	  xvalue_array_append (value_array, NULL);
+	  g_value_array_append (value_array, NULL);
 	  changed++;
 	}
       while (value_array->n_values > fixed_n_elements)
 	{
-	  xvalue_array_remove (value_array, value_array->n_values - 1);
+	  g_value_array_remove (value_array, value_array->n_values - 1);
 	  changed++;
 	}
     }
@@ -852,14 +852,14 @@ value_array_ensure_size (xvalue_array_t *value_array,
 }
 
 static void
-param_value_array_finalize (xparam_spec_t *pspec)
+param_value_array_finalize (GParamSpec *pspec)
 {
-  GParamSpecValueArray *aspec = XPARAM_SPEC_VALUE_ARRAY (pspec);
-  GParamSpecClass *parent_class = xtype_class_peek (xtype_parent (XTYPE_PARAM_VALUE_ARRAY));
+  GParamSpecValueArray *aspec = G_PARAM_SPEC_VALUE_ARRAY (pspec);
+  GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (G_TYPE_PARAM_VALUE_ARRAY));
 
   if (aspec->element_spec)
     {
-      xparam_spec_unref (aspec->element_spec);
+      g_param_spec_unref (aspec->element_spec);
       aspec->element_spec = NULL;
     }
 
@@ -867,53 +867,53 @@ param_value_array_finalize (xparam_spec_t *pspec)
 }
 
 static void
-param_value_array_set_default (xparam_spec_t *pspec,
-			       xvalue_t     *value)
+param_value_array_set_default (GParamSpec *pspec,
+			       GValue     *value)
 {
-  GParamSpecValueArray *aspec = XPARAM_SPEC_VALUE_ARRAY (pspec);
+  GParamSpecValueArray *aspec = G_PARAM_SPEC_VALUE_ARRAY (pspec);
 
   if (!value->data[0].v_pointer && aspec->fixed_n_elements)
-    value->data[0].v_pointer = xvalue_array_new (aspec->fixed_n_elements);
+    value->data[0].v_pointer = g_value_array_new (aspec->fixed_n_elements);
 
   if (value->data[0].v_pointer)
     {
-      /* xvalue_reset (value);  already done */
+      /* g_value_reset (value);  already done */
       value_array_ensure_size (value->data[0].v_pointer, aspec->fixed_n_elements);
     }
 }
 
-static xboolean_t
-param_value_array_validate (xparam_spec_t *pspec,
-			    xvalue_t     *value)
+static gboolean
+param_value_array_validate (GParamSpec *pspec,
+			    GValue     *value)
 {
-  GParamSpecValueArray *aspec = XPARAM_SPEC_VALUE_ARRAY (pspec);
-  xvalue_array_t *value_array = value->data[0].v_pointer;
-  xuint_t changed = 0;
+  GParamSpecValueArray *aspec = G_PARAM_SPEC_VALUE_ARRAY (pspec);
+  GValueArray *value_array = value->data[0].v_pointer;
+  guint changed = 0;
 
   if (!value->data[0].v_pointer && aspec->fixed_n_elements)
-    value->data[0].v_pointer = xvalue_array_new (aspec->fixed_n_elements);
+    value->data[0].v_pointer = g_value_array_new (aspec->fixed_n_elements);
 
   if (value->data[0].v_pointer)
     {
       /* ensure array size validity */
       changed += value_array_ensure_size (value_array, aspec->fixed_n_elements);
-
+      
       /* ensure array values validity against a present element spec */
       if (aspec->element_spec)
 	{
-	  xparam_spec_t *element_spec = aspec->element_spec;
-	  xuint_t i;
-
+	  GParamSpec *element_spec = aspec->element_spec;
+	  guint i;
+	  
 	  for (i = 0; i < value_array->n_values; i++)
 	    {
-	      xvalue_t *element = value_array->values + i;
-
+	      GValue *element = value_array->values + i;
+	      
 	      /* need to fixup value type, or ensure that the array value is initialized at all */
-	      if (!xvalue_type_compatible (G_VALUE_TYPE (element), XPARAM_SPEC_VALUE_TYPE (element_spec)))
+	      if (!g_value_type_compatible (G_VALUE_TYPE (element), G_PARAM_SPEC_VALUE_TYPE (element_spec)))
 		{
 		  if (G_VALUE_TYPE (element) != 0)
-		    xvalue_unset (element);
-		  xvalue_init (element, XPARAM_SPEC_VALUE_TYPE (element_spec));
+		    g_value_unset (element);
+		  g_value_init (element, G_PARAM_SPEC_VALUE_TYPE (element_spec));
 		  g_param_value_set_default (element_spec, element);
 		  changed++;
 		}
@@ -929,14 +929,14 @@ param_value_array_validate (xparam_spec_t *pspec,
   return changed;
 }
 
-static xint_t
-param_value_array_values_cmp (xparam_spec_t   *pspec,
-			      const xvalue_t *value1,
-			      const xvalue_t *value2)
+static gint
+param_value_array_values_cmp (GParamSpec   *pspec,
+			      const GValue *value1,
+			      const GValue *value2)
 {
-  GParamSpecValueArray *aspec = XPARAM_SPEC_VALUE_ARRAY (pspec);
-  xvalue_array_t *value_array1 = value1->data[0].v_pointer;
-  xvalue_array_t *value_array2 = value2->data[0].v_pointer;
+  GParamSpecValueArray *aspec = G_PARAM_SPEC_VALUE_ARRAY (pspec);
+  GValueArray *value_array1 = value1->data[0].v_pointer;
+  GValueArray *value_array2 = value2->data[0].v_pointer;
 
   if (!value_array1 || !value_array2)
     return value_array2 ? -1 : value_array1 != value_array2;
@@ -952,13 +952,13 @@ param_value_array_values_cmp (xparam_spec_t   *pspec,
     }
   else /* value_array1->n_values == value_array2->n_values */
     {
-      xuint_t i;
+      guint i;
 
       for (i = 0; i < value_array1->n_values; i++)
 	{
-	  xvalue_t *element1 = value_array1->values + i;
-	  xvalue_t *element2 = value_array2->values + i;
-	  xint_t cmp;
+	  GValue *element1 = value_array1->values + i;
+	  GValue *element2 = value_array2->values + i;
+	  gint cmp;
 
 	  /* need corresponding element types, provide stable result otherwise */
 	  if (G_VALUE_TYPE (element1) != G_VALUE_TYPE (element2))
@@ -972,43 +972,43 @@ param_value_array_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_object_init (xparam_spec_t *pspec)
+param_object_init (GParamSpec *pspec)
 {
-  /* GParamSpecObject *ospec = XPARAM_SPEC_OBJECT (pspec); */
+  /* GParamSpecObject *ospec = G_PARAM_SPEC_OBJECT (pspec); */
 }
 
 static void
-param_object_set_default (xparam_spec_t *pspec,
-			  xvalue_t     *value)
+param_object_set_default (GParamSpec *pspec,
+			  GValue     *value)
 {
   value->data[0].v_pointer = NULL;
 }
 
-static xboolean_t
-param_object_validate (xparam_spec_t *pspec,
-		       xvalue_t     *value)
+static gboolean
+param_object_validate (GParamSpec *pspec,
+		       GValue     *value)
 {
-  GParamSpecObject *ospec = XPARAM_SPEC_OBJECT (pspec);
-  xobject_t *object = value->data[0].v_pointer;
-  xuint_t changed = 0;
-
-  if (object && !xvalue_type_compatible (G_OBJECT_TYPE (object), XPARAM_SPEC_VALUE_TYPE (ospec)))
+  GParamSpecObject *ospec = G_PARAM_SPEC_OBJECT (pspec);
+  GObject *object = value->data[0].v_pointer;
+  guint changed = 0;
+  
+  if (object && !g_value_type_compatible (G_OBJECT_TYPE (object), G_PARAM_SPEC_VALUE_TYPE (ospec)))
     {
-      xobject_unref (object);
+      g_object_unref (object);
       value->data[0].v_pointer = NULL;
       changed++;
     }
-
+  
   return changed;
 }
 
-static xint_t
-param_object_values_cmp (xparam_spec_t   *pspec,
-			 const xvalue_t *value1,
-			 const xvalue_t *value2)
+static gint
+param_object_values_cmp (GParamSpec   *pspec,
+			 const GValue *value1,
+			 const GValue *value2)
 {
-  xuint8_t *p1 = value1->data[0].v_pointer;
-  xuint8_t *p2 = value2->data[0].v_pointer;
+  guint8 *p1 = value1->data[0].v_pointer;
+  guint8 *p2 = value2->data[0].v_pointer;
 
   /* not much to compare here, try to at least provide stable lesser/greater result */
 
@@ -1016,92 +1016,92 @@ param_object_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_override_init (xparam_spec_t *pspec)
+param_override_init (GParamSpec *pspec)
 {
-  /* GParamSpecOverride *ospec = XPARAM_SPEC_OVERRIDE (pspec); */
+  /* GParamSpecOverride *ospec = G_PARAM_SPEC_OVERRIDE (pspec); */
 }
 
 static void
-param_override_finalize (xparam_spec_t *pspec)
+param_override_finalize (GParamSpec *pspec)
 {
-  GParamSpecOverride *ospec = XPARAM_SPEC_OVERRIDE (pspec);
-  GParamSpecClass *parent_class = xtype_class_peek (xtype_parent (XTYPE_PARAM_OVERRIDE));
-
+  GParamSpecOverride *ospec = G_PARAM_SPEC_OVERRIDE (pspec);
+  GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (G_TYPE_PARAM_OVERRIDE));
+  
   if (ospec->overridden)
     {
-      xparam_spec_unref (ospec->overridden);
+      g_param_spec_unref (ospec->overridden);
       ospec->overridden = NULL;
     }
-
+  
   parent_class->finalize (pspec);
 }
 
 static void
-param_override_set_default (xparam_spec_t *pspec,
-			    xvalue_t     *value)
+param_override_set_default (GParamSpec *pspec,
+			    GValue     *value)
 {
-  GParamSpecOverride *ospec = XPARAM_SPEC_OVERRIDE (pspec);
+  GParamSpecOverride *ospec = G_PARAM_SPEC_OVERRIDE (pspec);
 
   g_param_value_set_default (ospec->overridden, value);
 }
 
-static xboolean_t
-param_override_validate (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+static gboolean
+param_override_validate (GParamSpec *pspec,
+			 GValue     *value)
 {
-  GParamSpecOverride *ospec = XPARAM_SPEC_OVERRIDE (pspec);
-
+  GParamSpecOverride *ospec = G_PARAM_SPEC_OVERRIDE (pspec);
+  
   return g_param_value_validate (ospec->overridden, value);
 }
 
-static xint_t
-param_override_values_cmp (xparam_spec_t   *pspec,
-			   const xvalue_t *value1,
-			   const xvalue_t *value2)
+static gint
+param_override_values_cmp (GParamSpec   *pspec,
+			   const GValue *value1,
+			   const GValue *value2)
 {
-  GParamSpecOverride *ospec = XPARAM_SPEC_OVERRIDE (pspec);
+  GParamSpecOverride *ospec = G_PARAM_SPEC_OVERRIDE (pspec);
 
   return g_param_values_cmp (ospec->overridden, value1, value2);
 }
 
 static void
-param_gtype_init (xparam_spec_t *pspec)
+param_gtype_init (GParamSpec *pspec)
 {
 }
 
 static void
-param_gtype_set_default (xparam_spec_t *pspec,
-			 xvalue_t     *value)
+param_gtype_set_default (GParamSpec *pspec,
+			 GValue     *value)
 {
-  GParamSpecGType *tspec = XPARAM_SPEC_GTYPE (pspec);
+  GParamSpecGType *tspec = G_PARAM_SPEC_GTYPE (pspec);
 
   value->data[0].v_pointer = GSIZE_TO_POINTER (tspec->is_a_type);
 }
 
-static xboolean_t
-param_gtype_validate (xparam_spec_t *pspec,
-		      xvalue_t     *value)
+static gboolean
+param_gtype_validate (GParamSpec *pspec,
+		      GValue     *value)
 {
-  GParamSpecGType *tspec = XPARAM_SPEC_GTYPE (pspec);
-  xtype_t gtype = GPOINTER_TO_SIZE (value->data[0].v_pointer);
-  xuint_t changed = 0;
-
-  if (tspec->is_a_type != XTYPE_NONE && !xtype_is_a (gtype, tspec->is_a_type))
+  GParamSpecGType *tspec = G_PARAM_SPEC_GTYPE (pspec);
+  GType gtype = GPOINTER_TO_SIZE (value->data[0].v_pointer);
+  guint changed = 0;
+  
+  if (tspec->is_a_type != G_TYPE_NONE && !g_type_is_a (gtype, tspec->is_a_type))
     {
       value->data[0].v_pointer = GSIZE_TO_POINTER (tspec->is_a_type);
       changed++;
     }
-
+  
   return changed;
 }
 
-static xint_t
-param_gtype_values_cmp (xparam_spec_t   *pspec,
-			const xvalue_t *value1,
-			const xvalue_t *value2)
+static gint
+param_gtype_values_cmp (GParamSpec   *pspec,
+			const GValue *value1,
+			const GValue *value2)
 {
-  xtype_t p1 = GPOINTER_TO_SIZE (value1->data[0].v_pointer);
-  xtype_t p2 = GPOINTER_TO_SIZE (value2->data[0].v_pointer);
+  GType p1 = GPOINTER_TO_SIZE (value1->data[0].v_pointer);
+  GType p2 = GPOINTER_TO_SIZE (value2->data[0].v_pointer);
 
   /* not much to compare here, try to at least provide stable lesser/greater result */
 
@@ -1109,44 +1109,44 @@ param_gtype_values_cmp (xparam_spec_t   *pspec,
 }
 
 static void
-param_variant_init (xparam_spec_t *pspec)
+param_variant_init (GParamSpec *pspec)
 {
-  GParamSpecVariant *vspec = XPARAM_SPEC_VARIANT (pspec);
+  GParamSpecVariant *vspec = G_PARAM_SPEC_VARIANT (pspec);
 
   vspec->type = NULL;
   vspec->default_value = NULL;
 }
 
 static void
-param_variant_finalize (xparam_spec_t *pspec)
+param_variant_finalize (GParamSpec *pspec)
 {
-  GParamSpecVariant *vspec = XPARAM_SPEC_VARIANT (pspec);
-  GParamSpecClass *parent_class = xtype_class_peek (xtype_parent (XTYPE_PARAM_VARIANT));
+  GParamSpecVariant *vspec = G_PARAM_SPEC_VARIANT (pspec);
+  GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (G_TYPE_PARAM_VARIANT));
 
   if (vspec->default_value)
-    xvariant_unref (vspec->default_value);
-  xvariant_type_free (vspec->type);
+    g_variant_unref (vspec->default_value);
+  g_variant_type_free (vspec->type);
 
   parent_class->finalize (pspec);
 }
 
 static void
-param_variant_set_default (xparam_spec_t *pspec,
-                           xvalue_t     *value)
+param_variant_set_default (GParamSpec *pspec,
+                           GValue     *value)
 {
-  value->data[0].v_pointer = XPARAM_SPEC_VARIANT (pspec)->default_value;
+  value->data[0].v_pointer = G_PARAM_SPEC_VARIANT (pspec)->default_value;
   value->data[1].v_uint |= G_VALUE_NOCOPY_CONTENTS;
 }
 
-static xboolean_t
-param_variant_validate (xparam_spec_t *pspec,
-                        xvalue_t     *value)
+static gboolean
+param_variant_validate (GParamSpec *pspec,
+                        GValue     *value)
 {
-  GParamSpecVariant *vspec = XPARAM_SPEC_VARIANT (pspec);
-  xvariant_t *variant = value->data[0].v_pointer;
+  GParamSpecVariant *vspec = G_PARAM_SPEC_VARIANT (pspec);
+  GVariant *variant = value->data[0].v_pointer;
 
   if ((variant == NULL && vspec->default_value != NULL) ||
-      (variant != NULL && !xvariant_is_of_type (variant, vspec->type)))
+      (variant != NULL && !g_variant_is_of_type (variant, vspec->type)))
     {
       g_param_value_set_default (pspec, value);
       return TRUE;
@@ -1155,27 +1155,27 @@ param_variant_validate (xparam_spec_t *pspec,
   return FALSE;
 }
 
-/* xvariant_compare() can only be used with scalar types. */
-static xboolean_t
-variant_is_incomparable (xvariant_t *v)
+/* g_variant_compare() can only be used with scalar types. */
+static gboolean
+variant_is_incomparable (GVariant *v)
 {
-  xvariant_class_t v_class = xvariant_classify (v);
+  GVariantClass v_class = g_variant_classify (v);
 
-  return (v_class == XVARIANT_CLASS_HANDLE ||
-          v_class == XVARIANT_CLASS_VARIANT ||
-          v_class ==  XVARIANT_CLASS_MAYBE||
-          v_class == XVARIANT_CLASS_ARRAY ||
-          v_class ==  XVARIANT_CLASS_TUPLE ||
-          v_class == XVARIANT_CLASS_DICT_ENTRY);
+  return (v_class == G_VARIANT_CLASS_HANDLE ||
+          v_class == G_VARIANT_CLASS_VARIANT ||
+          v_class ==  G_VARIANT_CLASS_MAYBE||
+          v_class == G_VARIANT_CLASS_ARRAY ||
+          v_class ==  G_VARIANT_CLASS_TUPLE ||
+          v_class == G_VARIANT_CLASS_DICT_ENTRY);
 }
 
-static xint_t
-param_variant_values_cmp (xparam_spec_t   *pspec,
-                          const xvalue_t *value1,
-                          const xvalue_t *value2)
+static gint
+param_variant_values_cmp (GParamSpec   *pspec,
+                          const GValue *value1,
+                          const GValue *value2)
 {
-  xvariant_t *v1 = value1->data[0].v_pointer;
-  xvariant_t *v2 = value2->data[0].v_pointer;
+  GVariant *v1 = value1->data[0].v_pointer;
+  GVariant *v2 = value2->data[0].v_pointer;
 
   if (v1 == NULL && v2 == NULL)
     return 0;
@@ -1184,40 +1184,40 @@ param_variant_values_cmp (xparam_spec_t   *pspec,
   else if (v1 != NULL && v2 == NULL)
     return 1;
 
-  if (!xvariant_type_equal (xvariant_get_type (v1), xvariant_get_type (v2)) ||
+  if (!g_variant_type_equal (g_variant_get_type (v1), g_variant_get_type (v2)) ||
       variant_is_incomparable (v1) ||
       variant_is_incomparable (v2))
-    return xvariant_equal (v1, v2) ? 0 : (v1 < v2 ? -1 : 1);
+    return g_variant_equal (v1, v2) ? 0 : (v1 < v2 ? -1 : 1);
 
-  return xvariant_compare (v1, v2);
+  return g_variant_compare (v1, v2);
 }
 
 /* --- type initialization --- */
-xtype_t *xparam_spec_types = NULL;
+GType *g_param_spec_types = NULL;
 
 void
-_xparam_spec_types_init (void)
+_g_param_spec_types_init (void)	
 {
-  const xuint_t n_types = 23;
-  xtype_t type, *spec_types;
+  const guint n_types = 23;
+  GType type, *spec_types;
 #ifndef G_DISABLE_ASSERT
-  xtype_t *spec_types_bound;
+  GType *spec_types_bound;
 #endif
 
-  xparam_spec_types = g_new0 (xtype_t, n_types);
-  spec_types = xparam_spec_types;
+  g_param_spec_types = g_new0 (GType, n_types);
+  spec_types = g_param_spec_types;
 #ifndef G_DISABLE_ASSERT
-  spec_types_bound = xparam_spec_types + n_types;
+  spec_types_bound = g_param_spec_types + n_types;
 #endif
-
-  /* XTYPE_PARAM_CHAR
+  
+  /* G_TYPE_PARAM_CHAR
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecChar),	/* instance_size */
       16,			/* n_preallocs */
       param_char_init,		/* instance_init */
-      XTYPE_CHAR,		/* value_type */
+      G_TYPE_CHAR,		/* value_type */
       NULL,			/* finalize */
       param_char_set_default,	/* value_set_default */
       param_char_validate,	/* value_validate */
@@ -1225,17 +1225,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamChar"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_CHAR);
+    g_assert (type == G_TYPE_PARAM_CHAR);
   }
-
-  /* XTYPE_PARAM_UCHAR
+  
+  /* G_TYPE_PARAM_UCHAR
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecUChar), /* instance_size */
       16,                       /* n_preallocs */
       param_uchar_init,         /* instance_init */
-      XTYPE_UCHAR,		/* value_type */
+      G_TYPE_UCHAR,		/* value_type */
       NULL,			/* finalize */
       param_uchar_set_default,	/* value_set_default */
       param_uchar_validate,	/* value_validate */
@@ -1243,17 +1243,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamUChar"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_UCHAR);
+    g_assert (type == G_TYPE_PARAM_UCHAR);
   }
-
-  /* XTYPE_PARAM_BOOLEAN
+  
+  /* G_TYPE_PARAM_BOOLEAN
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecBoolean), /* instance_size */
       16,                         /* n_preallocs */
       NULL,			  /* instance_init */
-      XTYPE_BOOLEAN,             /* value_type */
+      G_TYPE_BOOLEAN,             /* value_type */
       NULL,                       /* finalize */
       param_boolean_set_default,  /* value_set_default */
       param_boolean_validate,     /* value_validate */
@@ -1261,17 +1261,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamBoolean"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_BOOLEAN);
+    g_assert (type == G_TYPE_PARAM_BOOLEAN);
   }
-
-  /* XTYPE_PARAM_INT
+  
+  /* G_TYPE_PARAM_INT
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecInt),   /* instance_size */
       16,                       /* n_preallocs */
       param_int_init,           /* instance_init */
-      XTYPE_INT,		/* value_type */
+      G_TYPE_INT,		/* value_type */
       NULL,			/* finalize */
       param_int_set_default,	/* value_set_default */
       param_int_validate,	/* value_validate */
@@ -1279,17 +1279,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamInt"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_INT);
+    g_assert (type == G_TYPE_PARAM_INT);
   }
-
-  /* XTYPE_PARAM_UINT
+  
+  /* G_TYPE_PARAM_UINT
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecUInt),  /* instance_size */
       16,                       /* n_preallocs */
       param_uint_init,          /* instance_init */
-      XTYPE_UINT,		/* value_type */
+      G_TYPE_UINT,		/* value_type */
       NULL,			/* finalize */
       param_uint_set_default,	/* value_set_default */
       param_uint_validate,	/* value_validate */
@@ -1297,53 +1297,53 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamUInt"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_UINT);
+    g_assert (type == G_TYPE_PARAM_UINT);
   }
-
-  /* XTYPE_PARAM_LONG
+  
+  /* G_TYPE_PARAM_LONG
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecLong),  /* instance_size */
       16,                       /* n_preallocs */
       param_long_init,          /* instance_init */
-      XTYPE_LONG,		/* value_type */
+      G_TYPE_LONG,		/* value_type */
       NULL,			/* finalize */
       param_long_set_default,	/* value_set_default */
       param_long_validate,	/* value_validate */
-      param_lonxvalues_cmp,	/* values_cmp */
+      param_long_values_cmp,	/* values_cmp */
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamLong"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_LONG);
+    g_assert (type == G_TYPE_PARAM_LONG);
   }
-
-  /* XTYPE_PARAM_ULONG
+  
+  /* G_TYPE_PARAM_ULONG
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecULong), /* instance_size */
       16,                       /* n_preallocs */
       param_ulong_init,         /* instance_init */
-      XTYPE_ULONG,		/* value_type */
+      G_TYPE_ULONG,		/* value_type */
       NULL,			/* finalize */
       param_ulong_set_default,	/* value_set_default */
       param_ulong_validate,	/* value_validate */
-      param_ulonxvalues_cmp,	/* values_cmp */
+      param_ulong_values_cmp,	/* values_cmp */
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamULong"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_ULONG);
+    g_assert (type == G_TYPE_PARAM_ULONG);
   }
 
-  /* XTYPE_PARAM_INT64
+  /* G_TYPE_PARAM_INT64
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecInt64),  /* instance_size */
       16,                       /* n_preallocs */
       param_int64_init,         /* instance_init */
-      XTYPE_INT64,		/* value_type */
+      G_TYPE_INT64,		/* value_type */
       NULL,			/* finalize */
       param_int64_set_default,	/* value_set_default */
       param_int64_validate,	/* value_validate */
@@ -1351,17 +1351,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamInt64"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_INT64);
+    g_assert (type == G_TYPE_PARAM_INT64);
   }
-
-  /* XTYPE_PARAM_UINT64
+  
+  /* G_TYPE_PARAM_UINT64
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecUInt64), /* instance_size */
       16,                       /* n_preallocs */
       param_uint64_init,        /* instance_init */
-      XTYPE_UINT64,		/* value_type */
+      G_TYPE_UINT64,		/* value_type */
       NULL,			/* finalize */
       param_uint64_set_default,	/* value_set_default */
       param_uint64_validate,	/* value_validate */
@@ -1369,17 +1369,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamUInt64"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_UINT64);
+    g_assert (type == G_TYPE_PARAM_UINT64);
   }
 
-  /* XTYPE_PARAM_UNICHAR
+  /* G_TYPE_PARAM_UNICHAR
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecUnichar), /* instance_size */
       16,                        /* n_preallocs */
       param_unichar_init,	 /* instance_init */
-      XTYPE_UINT,		 /* value_type */
+      G_TYPE_UINT,		 /* value_type */
       NULL,			 /* finalize */
       param_unichar_set_default, /* value_set_default */
       param_unichar_validate,	 /* value_validate */
@@ -1387,53 +1387,53 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamUnichar"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_UNICHAR);
+    g_assert (type == G_TYPE_PARAM_UNICHAR);
   }
 
- /* XTYPE_PARAM_ENUM
+ /* G_TYPE_PARAM_ENUM
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecEnum),  /* instance_size */
       16,                       /* n_preallocs */
       param_enum_init,          /* instance_init */
-      XTYPE_ENUM,		/* value_type */
+      G_TYPE_ENUM,		/* value_type */
       param_enum_finalize,	/* finalize */
       param_enum_set_default,	/* value_set_default */
       param_enum_validate,	/* value_validate */
-      param_lonxvalues_cmp,	/* values_cmp */
+      param_long_values_cmp,	/* values_cmp */
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamEnum"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_ENUM);
+    g_assert (type == G_TYPE_PARAM_ENUM);
   }
-
-  /* XTYPE_PARAM_FLAGS
+  
+  /* G_TYPE_PARAM_FLAGS
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecFlags),	/* instance_size */
       16,			/* n_preallocs */
       param_flags_init,		/* instance_init */
-      XTYPE_FLAGS,		/* value_type */
+      G_TYPE_FLAGS,		/* value_type */
       param_flags_finalize,	/* finalize */
       param_flags_set_default,	/* value_set_default */
       param_flags_validate,	/* value_validate */
-      param_ulonxvalues_cmp,	/* values_cmp */
+      param_ulong_values_cmp,	/* values_cmp */
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamFlags"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_FLAGS);
+    g_assert (type == G_TYPE_PARAM_FLAGS);
   }
-
-  /* XTYPE_PARAM_FLOAT
+  
+  /* G_TYPE_PARAM_FLOAT
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecFloat), /* instance_size */
       16,                       /* n_preallocs */
       param_float_init,         /* instance_init */
-      XTYPE_FLOAT,		/* value_type */
+      G_TYPE_FLOAT,		/* value_type */
       NULL,			/* finalize */
       param_float_set_default,	/* value_set_default */
       param_float_validate,	/* value_validate */
@@ -1441,17 +1441,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamFloat"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_FLOAT);
+    g_assert (type == G_TYPE_PARAM_FLOAT);
   }
-
-  /* XTYPE_PARAM_DOUBLE
+  
+  /* G_TYPE_PARAM_DOUBLE
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecDouble),	/* instance_size */
       16,				/* n_preallocs */
       param_double_init,		/* instance_init */
-      XTYPE_DOUBLE,			/* value_type */
+      G_TYPE_DOUBLE,			/* value_type */
       NULL,				/* finalize */
       param_double_set_default,		/* value_set_default */
       param_double_validate,		/* value_validate */
@@ -1459,35 +1459,35 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamDouble"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_DOUBLE);
+    g_assert (type == G_TYPE_PARAM_DOUBLE);
   }
-
-  /* XTYPE_PARAM_STRING
+  
+  /* G_TYPE_PARAM_STRING
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecString),	/* instance_size */
       16,				/* n_preallocs */
       param_string_init,		/* instance_init */
-      XTYPE_STRING,			/* value_type */
+      G_TYPE_STRING,			/* value_type */
       param_string_finalize,		/* finalize */
       param_string_set_default,		/* value_set_default */
       param_string_validate,		/* value_validate */
-      param_strinxvalues_cmp,		/* values_cmp */
+      param_string_values_cmp,		/* values_cmp */
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamString"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_STRING);
+    g_assert (type == G_TYPE_PARAM_STRING);
   }
-
-  /* XTYPE_PARAM_PARAM
+  
+  /* G_TYPE_PARAM_PARAM
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecParam),	/* instance_size */
       16,			/* n_preallocs */
       param_param_init,		/* instance_init */
-      XTYPE_PARAM,		/* value_type */
+      G_TYPE_PARAM,		/* value_type */
       NULL,			/* finalize */
       param_param_set_default,	/* value_set_default */
       param_param_validate,	/* value_validate */
@@ -1495,17 +1495,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamParam"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_PARAM);
+    g_assert (type == G_TYPE_PARAM_PARAM);
   }
-
-  /* XTYPE_PARAM_BOXED
+  
+  /* G_TYPE_PARAM_BOXED
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecBoxed),	/* instance_size */
       4,			/* n_preallocs */
       param_boxed_init,		/* instance_init */
-      XTYPE_BOXED,		/* value_type */
+      G_TYPE_BOXED,		/* value_type */
       NULL,			/* finalize */
       param_boxed_set_default,	/* value_set_default */
       param_boxed_validate,	/* value_validate */
@@ -1513,17 +1513,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamBoxed"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_BOXED);
+    g_assert (type == G_TYPE_PARAM_BOXED);
   }
 
-  /* XTYPE_PARAM_POINTER
+  /* G_TYPE_PARAM_POINTER
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecPointer),  /* instance_size */
       0,                           /* n_preallocs */
       param_pointer_init,	   /* instance_init */
-      XTYPE_POINTER,  		   /* value_type */
+      G_TYPE_POINTER,  		   /* value_type */
       NULL,			   /* finalize */
       param_pointer_set_default,   /* value_set_default */
       param_pointer_validate,	   /* value_validate */
@@ -1531,10 +1531,10 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamPointer"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_POINTER);
+    g_assert (type == G_TYPE_PARAM_POINTER);
   }
-
-  /* XTYPE_PARAM_VALUE_ARRAY
+  
+  /* G_TYPE_PARAM_VALUE_ARRAY
    */
   {
     /* const */ GParamSpecTypeInfo pspec_info = {
@@ -1547,20 +1547,20 @@ _xparam_spec_types_init (void)
       param_value_array_validate,	/* value_validate */
       param_value_array_values_cmp,	/* values_cmp */
     };
-    pspec_info.value_type = XTYPE_VALUE_ARRAY;
+    pspec_info.value_type = G_TYPE_VALUE_ARRAY;
     type = g_param_type_register_static (g_intern_static_string ("GParamValueArray"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_VALUE_ARRAY);
+    g_assert (type == G_TYPE_PARAM_VALUE_ARRAY);
   }
 
-  /* XTYPE_PARAM_OBJECT
+  /* G_TYPE_PARAM_OBJECT
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecObject), /* instance_size */
       16,                        /* n_preallocs */
       param_object_init,	 /* instance_init */
-      XTYPE_OBJECT,		 /* value_type */
+      G_TYPE_OBJECT,		 /* value_type */
       NULL,			 /* finalize */
       param_object_set_default,	 /* value_set_default */
       param_object_validate,	 /* value_validate */
@@ -1568,17 +1568,17 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamObject"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_OBJECT);
+    g_assert (type == G_TYPE_PARAM_OBJECT);
   }
 
-  /* XTYPE_PARAM_OVERRIDE
+  /* G_TYPE_PARAM_OVERRIDE
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecOverride), /* instance_size */
       16,                        /* n_preallocs */
       param_override_init,	 /* instance_init */
-      XTYPE_NONE,		 /* value_type */
+      G_TYPE_NONE,		 /* value_type */
       param_override_finalize,	 /* finalize */
       param_override_set_default, /* value_set_default */
       param_override_validate,	  /* value_validate */
@@ -1586,10 +1586,10 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamOverride"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_OVERRIDE);
+    g_assert (type == G_TYPE_PARAM_OVERRIDE);
   }
 
-  /* XTYPE_PARAM_GTYPE
+  /* G_TYPE_PARAM_GTYPE
    */
   {
     GParamSpecTypeInfo pspec_info = {
@@ -1602,20 +1602,20 @@ _xparam_spec_types_init (void)
       param_gtype_validate,	/* value_validate */
       param_gtype_values_cmp,	/* values_cmp */
     };
-    pspec_info.value_type = XTYPE_GTYPE;
+    pspec_info.value_type = G_TYPE_GTYPE;
     type = g_param_type_register_static (g_intern_static_string ("GParamGType"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_GTYPE);
+    g_assert (type == G_TYPE_PARAM_GTYPE);
   }
 
-  /* XTYPE_PARAM_VARIANT
+  /* G_TYPE_PARAM_VARIANT
    */
   {
     const GParamSpecTypeInfo pspec_info = {
       sizeof (GParamSpecVariant), /* instance_size */
       0,                          /* n_preallocs */
       param_variant_init,         /* instance_init */
-      XTYPE_VARIANT,             /* value_type */
+      G_TYPE_VARIANT,             /* value_type */
       param_variant_finalize,     /* finalize */
       param_variant_set_default,  /* value_set_default */
       param_variant_validate,     /* value_validate */
@@ -1623,16 +1623,16 @@ _xparam_spec_types_init (void)
     };
     type = g_param_type_register_static (g_intern_static_string ("GParamVariant"), &pspec_info);
     *spec_types++ = type;
-    xassert (type == XTYPE_PARAM_VARIANT);
+    g_assert (type == G_TYPE_PARAM_VARIANT);
   }
 
-  xassert (spec_types == spec_types_bound);
+  g_assert (spec_types == spec_types_bound);
 }
 
-/* --- xparam_spec_t initialization --- */
+/* --- GParamSpec initialization --- */
 
 /**
- * xparam_spec_char:
+ * g_param_spec_char:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1641,14 +1641,14 @@ _xparam_spec_types_init (void)
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecChar instance specifying a %XTYPE_CHAR property.
+ * Creates a new #GParamSpecChar instance specifying a %G_TYPE_CHAR property.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_char (const xchar_t *name,
-		   const xchar_t *nick,
-		   const xchar_t *blurb,
+GParamSpec*
+g_param_spec_char (const gchar *name,
+		   const gchar *nick,
+		   const gchar *blurb,
 		   gint8	minimum,
 		   gint8	maximum,
 		   gint8	default_value,
@@ -1656,25 +1656,25 @@ xparam_spec_char (const xchar_t *name,
 {
   GParamSpecChar *cspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  cspec = xparam_spec_internal (XTYPE_PARAM_CHAR,
+  cspec = g_param_spec_internal (G_TYPE_PARAM_CHAR,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (cspec == NULL)
     return NULL;
-
+  
   cspec->minimum = minimum;
   cspec->maximum = maximum;
   cspec->default_value = default_value;
-
-  return XPARAM_SPEC (cspec);
+  
+  return G_PARAM_SPEC (cspec);
 }
 
 /**
- * xparam_spec_uchar:
+ * g_param_spec_uchar:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1683,82 +1683,82 @@ xparam_spec_char (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecUChar instance specifying a %XTYPE_UCHAR property.
+ * Creates a new #GParamSpecUChar instance specifying a %G_TYPE_UCHAR property.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_uchar (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    xuint8_t	 minimum,
-		    xuint8_t	 maximum,
-		    xuint8_t	 default_value,
+GParamSpec*
+g_param_spec_uchar (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    guint8	 minimum,
+		    guint8	 maximum,
+		    guint8	 default_value,
 		    GParamFlags	 flags)
 {
   GParamSpecUChar *uspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  uspec = xparam_spec_internal (XTYPE_PARAM_UCHAR,
+  uspec = g_param_spec_internal (G_TYPE_PARAM_UCHAR,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (uspec == NULL)
     return NULL;
-
+  
   uspec->minimum = minimum;
   uspec->maximum = maximum;
   uspec->default_value = default_value;
-
-  return XPARAM_SPEC (uspec);
+  
+  return G_PARAM_SPEC (uspec);
 }
 
 /**
- * xparam_spec_boolean:
+ * g_param_spec_boolean:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecBoolean instance specifying a %XTYPE_BOOLEAN
+ * Creates a new #GParamSpecBoolean instance specifying a %G_TYPE_BOOLEAN
  * property. In many cases, it may be more appropriate to use an enum with
- * xparam_spec_enum(), both to improve code clarity by using explicitly named
+ * g_param_spec_enum(), both to improve code clarity by using explicitly named
  * values, and to allow for more values to be added in future without breaking
  * API.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_boolean (const xchar_t *name,
-		      const xchar_t *nick,
-		      const xchar_t *blurb,
-		      xboolean_t	   default_value,
+GParamSpec*
+g_param_spec_boolean (const gchar *name,
+		      const gchar *nick,
+		      const gchar *blurb,
+		      gboolean	   default_value,
 		      GParamFlags  flags)
 {
   GParamSpecBoolean *bspec;
 
-  xreturn_val_if_fail (default_value == TRUE || default_value == FALSE, NULL);
+  g_return_val_if_fail (default_value == TRUE || default_value == FALSE, NULL);
 
-  bspec = xparam_spec_internal (XTYPE_PARAM_BOOLEAN,
+  bspec = g_param_spec_internal (G_TYPE_PARAM_BOOLEAN,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (bspec == NULL)
     return NULL;
-
+  
   bspec->default_value = default_value;
-
-  return XPARAM_SPEC (bspec);
+  
+  return G_PARAM_SPEC (bspec);
 }
 
 /**
- * xparam_spec_int:
+ * g_param_spec_int:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1767,42 +1767,42 @@ xparam_spec_boolean (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecInt instance specifying a %XTYPE_INT property.
+ * Creates a new #GParamSpecInt instance specifying a %G_TYPE_INT property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_int (const xchar_t *name,
-		  const xchar_t *nick,
-		  const xchar_t *blurb,
-		  xint_t	       minimum,
-		  xint_t	       maximum,
-		  xint_t	       default_value,
+GParamSpec*
+g_param_spec_int (const gchar *name,
+		  const gchar *nick,
+		  const gchar *blurb,
+		  gint	       minimum,
+		  gint	       maximum,
+		  gint	       default_value,
 		  GParamFlags  flags)
 {
   GParamSpecInt *ispec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  ispec = xparam_spec_internal (XTYPE_PARAM_INT,
+  ispec = g_param_spec_internal (G_TYPE_PARAM_INT,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (ispec == NULL)
     return NULL;
-
+  
   ispec->minimum = minimum;
   ispec->maximum = maximum;
   ispec->default_value = default_value;
-
-  return XPARAM_SPEC (ispec);
+  
+  return G_PARAM_SPEC (ispec);
 }
 
 /**
- * xparam_spec_uint:
+ * g_param_spec_uint:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1811,42 +1811,42 @@ xparam_spec_int (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecUInt instance specifying a %XTYPE_UINT property.
+ * Creates a new #GParamSpecUInt instance specifying a %G_TYPE_UINT property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_uint (const xchar_t *name,
-		   const xchar_t *nick,
-		   const xchar_t *blurb,
-		   xuint_t	minimum,
-		   xuint_t	maximum,
-		   xuint_t	default_value,
+GParamSpec*
+g_param_spec_uint (const gchar *name,
+		   const gchar *nick,
+		   const gchar *blurb,
+		   guint	minimum,
+		   guint	maximum,
+		   guint	default_value,
 		   GParamFlags	flags)
 {
   GParamSpecUInt *uspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  uspec = xparam_spec_internal (XTYPE_PARAM_UINT,
+  uspec = g_param_spec_internal (G_TYPE_PARAM_UINT,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (uspec == NULL)
     return NULL;
-
+  
   uspec->minimum = minimum;
   uspec->maximum = maximum;
   uspec->default_value = default_value;
-
-  return XPARAM_SPEC (uspec);
+  
+  return G_PARAM_SPEC (uspec);
 }
 
 /**
- * xparam_spec_long:
+ * g_param_spec_long:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1855,42 +1855,42 @@ xparam_spec_uint (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecLong instance specifying a %XTYPE_LONG property.
+ * Creates a new #GParamSpecLong instance specifying a %G_TYPE_LONG property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_long (const xchar_t *name,
-		   const xchar_t *nick,
-		   const xchar_t *blurb,
-		   xlong_t	minimum,
-		   xlong_t	maximum,
-		   xlong_t	default_value,
+GParamSpec*
+g_param_spec_long (const gchar *name,
+		   const gchar *nick,
+		   const gchar *blurb,
+		   glong	minimum,
+		   glong	maximum,
+		   glong	default_value,
 		   GParamFlags	flags)
 {
   GParamSpecLong *lspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  lspec = xparam_spec_internal (XTYPE_PARAM_LONG,
+  lspec = g_param_spec_internal (G_TYPE_PARAM_LONG,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (lspec == NULL)
     return NULL;
-
+  
   lspec->minimum = minimum;
   lspec->maximum = maximum;
   lspec->default_value = default_value;
-
-  return XPARAM_SPEC (lspec);
+  
+  return G_PARAM_SPEC (lspec);
 }
 
 /**
- * xparam_spec_ulong:
+ * g_param_spec_ulong:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1899,43 +1899,43 @@ xparam_spec_long (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecULong instance specifying a %XTYPE_ULONG
+ * Creates a new #GParamSpecULong instance specifying a %G_TYPE_ULONG
  * property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_ulong (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    xulong_t	 minimum,
-		    xulong_t	 maximum,
-		    xulong_t	 default_value,
+GParamSpec*
+g_param_spec_ulong (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    gulong	 minimum,
+		    gulong	 maximum,
+		    gulong	 default_value,
 		    GParamFlags	 flags)
 {
   GParamSpecULong *uspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  uspec = xparam_spec_internal (XTYPE_PARAM_ULONG,
+  uspec = g_param_spec_internal (G_TYPE_PARAM_ULONG,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (uspec == NULL)
     return NULL;
-
+  
   uspec->minimum = minimum;
   uspec->maximum = maximum;
   uspec->default_value = default_value;
-
-  return XPARAM_SPEC (uspec);
+  
+  return G_PARAM_SPEC (uspec);
 }
 
 /**
- * xparam_spec_int64:
+ * g_param_spec_int64:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1944,42 +1944,42 @@ xparam_spec_ulong (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecInt64 instance specifying a %XTYPE_INT64 property.
+ * Creates a new #GParamSpecInt64 instance specifying a %G_TYPE_INT64 property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_int64 (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    sint64_t	 minimum,
-		    sint64_t	 maximum,
-		    sint64_t	 default_value,
+GParamSpec*
+g_param_spec_int64 (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    gint64	 minimum,
+		    gint64	 maximum,
+		    gint64	 default_value,
 		    GParamFlags	 flags)
 {
   GParamSpecInt64 *lspec;
+  
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
-
-  lspec = xparam_spec_internal (XTYPE_PARAM_INT64,
+  lspec = g_param_spec_internal (G_TYPE_PARAM_INT64,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (lspec == NULL)
     return NULL;
-
+  
   lspec->minimum = minimum;
   lspec->maximum = maximum;
   lspec->default_value = default_value;
-
-  return XPARAM_SPEC (lspec);
+  
+  return G_PARAM_SPEC (lspec);
 }
 
 /**
- * xparam_spec_uint64:
+ * g_param_spec_uint64:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -1988,183 +1988,183 @@ xparam_spec_int64 (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecUInt64 instance specifying a %XTYPE_UINT64
+ * Creates a new #GParamSpecUInt64 instance specifying a %G_TYPE_UINT64
  * property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_uint64 (const xchar_t *name,
-		     const xchar_t *nick,
-		     const xchar_t *blurb,
-		     xuint64_t	  minimum,
-		     xuint64_t	  maximum,
-		     xuint64_t	  default_value,
+GParamSpec*
+g_param_spec_uint64 (const gchar *name,
+		     const gchar *nick,
+		     const gchar *blurb,
+		     guint64	  minimum,
+		     guint64	  maximum,
+		     guint64	  default_value,
 		     GParamFlags  flags)
 {
   GParamSpecUInt64 *uspec;
-
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
-
-  uspec = xparam_spec_internal (XTYPE_PARAM_UINT64,
+  
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  
+  uspec = g_param_spec_internal (G_TYPE_PARAM_UINT64,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (uspec == NULL)
     return NULL;
-
+  
   uspec->minimum = minimum;
   uspec->maximum = maximum;
   uspec->default_value = default_value;
-
-  return XPARAM_SPEC (uspec);
+  
+  return G_PARAM_SPEC (uspec);
 }
 
 /**
- * xparam_spec_unichar:
+ * g_param_spec_unichar:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecUnichar instance specifying a %XTYPE_UINT
- * property. #xvalue_t structures for this property can be accessed with
- * xvalue_set_uint() and xvalue_get_uint().
+ * Creates a new #GParamSpecUnichar instance specifying a %G_TYPE_UINT
+ * property. #GValue structures for this property can be accessed with
+ * g_value_set_uint() and g_value_get_uint().
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_unichar (const xchar_t *name,
-		      const xchar_t *nick,
-		      const xchar_t *blurb,
-		      xunichar_t	   default_value,
+GParamSpec*
+g_param_spec_unichar (const gchar *name,
+		      const gchar *nick,
+		      const gchar *blurb,
+		      gunichar	   default_value,
 		      GParamFlags  flags)
 {
   GParamSpecUnichar *uspec;
 
-  uspec = xparam_spec_internal (XTYPE_PARAM_UNICHAR,
+  uspec = g_param_spec_internal (G_TYPE_PARAM_UNICHAR,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (uspec == NULL)
     return NULL;
-
+  
   uspec->default_value = default_value;
-
-  return XPARAM_SPEC (uspec);
+  
+  return G_PARAM_SPEC (uspec);
 }
 
 /**
- * xparam_spec_enum:
+ * g_param_spec_enum:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @enum_type: a #xtype_t derived from %XTYPE_ENUM
+ * @enum_type: a #GType derived from %G_TYPE_ENUM
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecEnum instance specifying a %XTYPE_ENUM
+ * Creates a new #GParamSpecEnum instance specifying a %G_TYPE_ENUM
  * property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_enum (const xchar_t *name,
-		   const xchar_t *nick,
-		   const xchar_t *blurb,
-		   xtype_t	enum_type,
-		   xint_t		default_value,
+GParamSpec*
+g_param_spec_enum (const gchar *name,
+		   const gchar *nick,
+		   const gchar *blurb,
+		   GType	enum_type,
+		   gint		default_value,
 		   GParamFlags	flags)
 {
   GParamSpecEnum *espec;
-  xenum_class_t *enum_class;
+  GEnumClass *enum_class;
+  
+  g_return_val_if_fail (G_TYPE_IS_ENUM (enum_type), NULL);
 
-  xreturn_val_if_fail (XTYPE_IS_ENUM (enum_type), NULL);
+  enum_class = g_type_class_ref (enum_type);
 
-  enum_class = xtype_class_ref (enum_type);
-
-  xreturn_val_if_fail (xenum_get_value (enum_class, default_value) != NULL, NULL);
-
-  espec = xparam_spec_internal (XTYPE_PARAM_ENUM,
+  g_return_val_if_fail (g_enum_get_value (enum_class, default_value) != NULL, NULL);
+  
+  espec = g_param_spec_internal (G_TYPE_PARAM_ENUM,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (espec == NULL)
     {
-      xtype_class_unref (enum_class);
+      g_type_class_unref (enum_class);
       return NULL;
     }
-
+  
   espec->enum_class = enum_class;
   espec->default_value = default_value;
-  XPARAM_SPEC (espec)->value_type = enum_type;
-
-  return XPARAM_SPEC (espec);
+  G_PARAM_SPEC (espec)->value_type = enum_type;
+  
+  return G_PARAM_SPEC (espec);
 }
 
 /**
- * xparam_spec_flags:
+ * g_param_spec_flags:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @flags_type: a #xtype_t derived from %XTYPE_FLAGS
+ * @flags_type: a #GType derived from %G_TYPE_FLAGS
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecFlags instance specifying a %XTYPE_FLAGS
+ * Creates a new #GParamSpecFlags instance specifying a %G_TYPE_FLAGS
  * property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_flags (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    xtype_t	 flags_type,
-		    xuint_t	 default_value,
+GParamSpec*
+g_param_spec_flags (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    GType	 flags_type,
+		    guint	 default_value,
 		    GParamFlags	 flags)
 {
   GParamSpecFlags *fspec;
-  xflags_class_t *flags_class;
+  GFlagsClass *flags_class;
+  
+  g_return_val_if_fail (G_TYPE_IS_FLAGS (flags_type), NULL);
 
-  xreturn_val_if_fail (XTYPE_IS_FLAGS (flags_type), NULL);
+  flags_class = g_type_class_ref (flags_type);
 
-  flags_class = xtype_class_ref (flags_type);
-
-  xreturn_val_if_fail ((default_value & flags_class->mask) == default_value, NULL);
-
-  fspec = xparam_spec_internal (XTYPE_PARAM_FLAGS,
+  g_return_val_if_fail ((default_value & flags_class->mask) == default_value, NULL);
+  
+  fspec = g_param_spec_internal (G_TYPE_PARAM_FLAGS,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (fspec == NULL)
     {
-      xtype_class_unref (flags_class);
+      g_type_class_unref (flags_class);
       return NULL;
     }
-
+  
   fspec->flags_class = flags_class;
   fspec->default_value = default_value;
-  XPARAM_SPEC (fspec)->value_type = flags_type;
-
-  return XPARAM_SPEC (fspec);
+  G_PARAM_SPEC (fspec)->value_type = flags_type;
+  
+  return G_PARAM_SPEC (fspec);
 }
 
 /**
- * xparam_spec_float:
+ * g_param_spec_float:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -2173,16 +2173,16 @@ xparam_spec_flags (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecFloat instance specifying a %XTYPE_FLOAT property.
+ * Creates a new #GParamSpecFloat instance specifying a %G_TYPE_FLOAT property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_float (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
+GParamSpec*
+g_param_spec_float (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
 		    gfloat	 minimum,
 		    gfloat	 maximum,
 		    gfloat	 default_value,
@@ -2190,25 +2190,25 @@ xparam_spec_float (const xchar_t *name,
 {
   GParamSpecFloat *fspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  fspec = xparam_spec_internal (XTYPE_PARAM_FLOAT,
+  fspec = g_param_spec_internal (G_TYPE_PARAM_FLOAT,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (fspec == NULL)
     return NULL;
-
+  
   fspec->minimum = minimum;
   fspec->maximum = maximum;
   fspec->default_value = default_value;
-
-  return XPARAM_SPEC (fspec);
+  
+  return G_PARAM_SPEC (fspec);
 }
 
 /**
- * xparam_spec_double:
+ * g_param_spec_double:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -2217,43 +2217,43 @@ xparam_spec_float (const xchar_t *name,
  * @default_value: default value for the property specified
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecDouble instance specifying a %XTYPE_DOUBLE
+ * Creates a new #GParamSpecDouble instance specifying a %G_TYPE_DOUBLE
  * property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_double (const xchar_t *name,
-		     const xchar_t *nick,
-		     const xchar_t *blurb,
-		     xdouble_t	  minimum,
-		     xdouble_t	  maximum,
-		     xdouble_t	  default_value,
+GParamSpec*
+g_param_spec_double (const gchar *name,
+		     const gchar *nick,
+		     const gchar *blurb,
+		     gdouble	  minimum,
+		     gdouble	  maximum,
+		     gdouble	  default_value,
 		     GParamFlags  flags)
 {
   GParamSpecDouble *dspec;
 
-  xreturn_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
+  g_return_val_if_fail (default_value >= minimum && default_value <= maximum, NULL);
 
-  dspec = xparam_spec_internal (XTYPE_PARAM_DOUBLE,
+  dspec = g_param_spec_internal (G_TYPE_PARAM_DOUBLE,
 				 name,
 				 nick,
 				 blurb,
 				 flags);
   if (dspec == NULL)
     return NULL;
-
+  
   dspec->minimum = minimum;
   dspec->maximum = maximum;
   dspec->default_value = default_value;
-
-  return XPARAM_SPEC (dspec);
+  
+  return G_PARAM_SPEC (dspec);
 }
 
 /**
- * xparam_spec_string:
+ * g_param_spec_string:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
@@ -2262,18 +2262,18 @@ xparam_spec_double (const xchar_t *name,
  *
  * Creates a new #GParamSpecString instance.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_string (const xchar_t *name,
-		     const xchar_t *nick,
-		     const xchar_t *blurb,
-		     const xchar_t *default_value,
+GParamSpec*
+g_param_spec_string (const gchar *name,
+		     const gchar *nick,
+		     const gchar *blurb,
+		     const gchar *default_value,
 		     GParamFlags  flags)
 {
-  GParamSpecString *sspec = xparam_spec_internal (XTYPE_PARAM_STRING,
+  GParamSpecString *sspec = g_param_spec_internal (G_TYPE_PARAM_STRING,
 						   name,
 						   nick,
 						   blurb,
@@ -2282,38 +2282,38 @@ xparam_spec_string (const xchar_t *name,
     return NULL;
 
   g_free (sspec->default_value);
-  sspec->default_value = xstrdup (default_value);
-
-  return XPARAM_SPEC (sspec);
+  sspec->default_value = g_strdup (default_value);
+  
+  return G_PARAM_SPEC (sspec);
 }
 
 /**
- * xparam_spec_param:
+ * g_param_spec_param:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @param_type: a #xtype_t derived from %XTYPE_PARAM
+ * @param_type: a #GType derived from %G_TYPE_PARAM
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecParam instance specifying a %XTYPE_PARAM
+ * Creates a new #GParamSpecParam instance specifying a %G_TYPE_PARAM
  * property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_param (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    xtype_t	 param_type,
+GParamSpec*
+g_param_spec_param (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    GType	 param_type,
 		    GParamFlags  flags)
 {
   GParamSpecParam *pspec;
-
-  xreturn_val_if_fail (XTYPE_IS_PARAM (param_type), NULL);
-
-  pspec = xparam_spec_internal (XTYPE_PARAM_PARAM,
+  
+  g_return_val_if_fail (G_TYPE_IS_PARAM (param_type), NULL);
+  
+  pspec = g_param_spec_internal (G_TYPE_PARAM_PARAM,
 				 name,
 				 nick,
 				 blurb,
@@ -2321,39 +2321,39 @@ xparam_spec_param (const xchar_t *name,
   if (pspec == NULL)
     return NULL;
 
-  XPARAM_SPEC (pspec)->value_type = param_type;
-
-  return XPARAM_SPEC (pspec);
+  G_PARAM_SPEC (pspec)->value_type = param_type;
+  
+  return G_PARAM_SPEC (pspec);
 }
 
 /**
- * xparam_spec_boxed:
+ * g_param_spec_boxed:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @boxed_type: %XTYPE_BOXED derived type of this property
+ * @boxed_type: %G_TYPE_BOXED derived type of this property
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecBoxed instance specifying a %XTYPE_BOXED
+ * Creates a new #GParamSpecBoxed instance specifying a %G_TYPE_BOXED
  * derived property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_boxed (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    xtype_t	 boxed_type,
+GParamSpec*
+g_param_spec_boxed (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    GType	 boxed_type,
 		    GParamFlags  flags)
 {
   GParamSpecBoxed *bspec;
-
-  xreturn_val_if_fail (XTYPE_IS_BOXED (boxed_type), NULL);
-  xreturn_val_if_fail (XTYPE_IS_VALUE_TYPE (boxed_type), NULL);
-
-  bspec = xparam_spec_internal (XTYPE_PARAM_BOXED,
+  
+  g_return_val_if_fail (G_TYPE_IS_BOXED (boxed_type), NULL);
+  g_return_val_if_fail (G_TYPE_IS_VALUE_TYPE (boxed_type), NULL);
+  
+  bspec = g_param_spec_internal (G_TYPE_PARAM_BOXED,
 				 name,
 				 nick,
 				 blurb,
@@ -2361,35 +2361,35 @@ xparam_spec_boxed (const xchar_t *name,
   if (bspec == NULL)
     return NULL;
 
-  XPARAM_SPEC (bspec)->value_type = boxed_type;
-
-  return XPARAM_SPEC (bspec);
+  G_PARAM_SPEC (bspec)->value_type = boxed_type;
+  
+  return G_PARAM_SPEC (bspec);
 }
 
 /**
- * xparam_spec_pointer:
+ * g_param_spec_pointer:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
  * @flags: flags for the property specified
  *
  * Creates a new #GParamSpecPointer instance specifying a pointer property.
- * Where possible, it is better to use xparam_spec_object() or
- * xparam_spec_boxed() to expose memory management information.
+ * Where possible, it is better to use g_param_spec_object() or
+ * g_param_spec_boxed() to expose memory management information.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_pointer (const xchar_t *name,
-		      const xchar_t *nick,
-		      const xchar_t *blurb,
+GParamSpec*
+g_param_spec_pointer (const gchar *name,
+		      const gchar *nick,
+		      const gchar *blurb,
 		      GParamFlags  flags)
 {
   GParamSpecPointer *pspec;
-
-  pspec = xparam_spec_internal (XTYPE_PARAM_POINTER,
+  
+  pspec = g_param_spec_internal (G_TYPE_PARAM_POINTER,
 				 name,
 				 nick,
 				 blurb,
@@ -2397,37 +2397,37 @@ xparam_spec_pointer (const xchar_t *name,
   if (pspec == NULL)
     return NULL;
 
-  return XPARAM_SPEC (pspec);
+  return G_PARAM_SPEC (pspec);
 }
 
 /**
- * xparam_spec_gtype:
+ * g_param_spec_gtype:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @is_a_type: a #xtype_t whose subtypes are allowed as values
- *  of the property (use %XTYPE_NONE for any type)
+ * @is_a_type: a #GType whose subtypes are allowed as values
+ *  of the property (use %G_TYPE_NONE for any type)
  * @flags: flags for the property specified
  *
  * Creates a new #GParamSpecGType instance specifying a
- * %XTYPE_GTYPE property.
+ * %G_TYPE_GTYPE property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Since: 2.10
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_gtype (const xchar_t *name,
-		    const xchar_t *nick,
-		    const xchar_t *blurb,
-		    xtype_t        is_a_type,
+GParamSpec*
+g_param_spec_gtype (const gchar *name,
+		    const gchar *nick,
+		    const gchar *blurb,
+		    GType        is_a_type,
 		    GParamFlags  flags)
 {
   GParamSpecGType *tspec;
-
-  tspec = xparam_spec_internal (XTYPE_PARAM_GTYPE,
+  
+  tspec = g_param_spec_internal (G_TYPE_PARAM_GTYPE,
 				 name,
 				 nick,
 				 blurb,
@@ -2437,40 +2437,40 @@ xparam_spec_gtype (const xchar_t *name,
 
   tspec->is_a_type = is_a_type;
 
-  return XPARAM_SPEC (tspec);
+  return G_PARAM_SPEC (tspec);
 }
 
 /**
- * xparam_spec_value_array: (skip)
+ * g_param_spec_value_array: (skip)
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @element_spec: a #xparam_spec_t describing the elements contained in
+ * @element_spec: a #GParamSpec describing the elements contained in
  *  arrays of this property, may be %NULL
  * @flags: flags for the property specified
  *
  * Creates a new #GParamSpecValueArray instance specifying a
- * %XTYPE_VALUE_ARRAY property. %XTYPE_VALUE_ARRAY is a
- * %XTYPE_BOXED type, as such, #xvalue_t structures for this property
- * can be accessed with xvalue_set_boxed() and xvalue_get_boxed().
+ * %G_TYPE_VALUE_ARRAY property. %G_TYPE_VALUE_ARRAY is a
+ * %G_TYPE_BOXED type, as such, #GValue structures for this property
+ * can be accessed with g_value_set_boxed() and g_value_get_boxed().
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_value_array (const xchar_t *name,
-			  const xchar_t *nick,
-			  const xchar_t *blurb,
-			  xparam_spec_t  *element_spec,
+GParamSpec*
+g_param_spec_value_array (const gchar *name,
+			  const gchar *nick,
+			  const gchar *blurb,
+			  GParamSpec  *element_spec,
 			  GParamFlags  flags)
 {
   GParamSpecValueArray *aspec;
-
+  
   if (element_spec)
-    xreturn_val_if_fail (X_IS_PARAM_SPEC (element_spec), NULL);
-
-  aspec = xparam_spec_internal (XTYPE_PARAM_VALUE_ARRAY,
+    g_return_val_if_fail (G_IS_PARAM_SPEC (element_spec), NULL);
+  
+  aspec = g_param_spec_internal (G_TYPE_PARAM_VALUE_ARRAY,
 				 name,
 				 nick,
 				 blurb,
@@ -2480,40 +2480,40 @@ xparam_spec_value_array (const xchar_t *name,
 
   if (element_spec)
     {
-      aspec->element_spec = xparam_spec_ref (element_spec);
-      xparam_spec_sink (element_spec);
+      aspec->element_spec = g_param_spec_ref (element_spec);
+      g_param_spec_sink (element_spec);
     }
 
-  return XPARAM_SPEC (aspec);
+  return G_PARAM_SPEC (aspec);
 }
 
 /**
- * xparam_spec_object:
+ * g_param_spec_object:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @object_type: %XTYPE_OBJECT derived type of this property
+ * @object_type: %G_TYPE_OBJECT derived type of this property
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecBoxed instance specifying a %XTYPE_OBJECT
+ * Creates a new #GParamSpecBoxed instance specifying a %G_TYPE_OBJECT
  * derived property.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
  * Returns: (transfer full): a newly created parameter specification
  */
-xparam_spec_t*
-xparam_spec_object (const xchar_t *name,
-		     const xchar_t *nick,
-		     const xchar_t *blurb,
-		     xtype_t	  object_type,
+GParamSpec*
+g_param_spec_object (const gchar *name,
+		     const gchar *nick,
+		     const gchar *blurb,
+		     GType	  object_type,
 		     GParamFlags  flags)
 {
   GParamSpecObject *ospec;
-
-  xreturn_val_if_fail (xtype_is_a (object_type, XTYPE_OBJECT), NULL);
-
-  ospec = xparam_spec_internal (XTYPE_PARAM_OBJECT,
+  
+  g_return_val_if_fail (g_type_is_a (object_type, G_TYPE_OBJECT), NULL);
+  
+  ospec = g_param_spec_internal (G_TYPE_PARAM_OBJECT,
 				 name,
 				 nick,
 				 blurb,
@@ -2521,92 +2521,92 @@ xparam_spec_object (const xchar_t *name,
   if (ospec == NULL)
     return NULL;
 
-  XPARAM_SPEC (ospec)->value_type = object_type;
-
-  return XPARAM_SPEC (ospec);
+  G_PARAM_SPEC (ospec)->value_type = object_type;
+  
+  return G_PARAM_SPEC (ospec);
 }
 
 /**
- * xparam_spec_override: (skip)
+ * g_param_spec_override: (skip)
  * @name: the name of the property.
  * @overridden: The property that is being overridden
  *
  * Creates a new property of type #GParamSpecOverride. This is used
  * to direct operations to another paramspec, and will not be directly
- * useful unless you are implementing a new base type similar to xobject_t.
+ * useful unless you are implementing a new base type similar to GObject.
  *
  * Since: 2.4
  *
- * Returns: the newly created #xparam_spec_t
+ * Returns: the newly created #GParamSpec
  */
-xparam_spec_t*
-xparam_spec_override (const xchar_t *name,
-		       xparam_spec_t  *overridden)
+GParamSpec*
+g_param_spec_override (const gchar *name,
+		       GParamSpec  *overridden)
 {
-  xparam_spec_t *pspec;
-
-  xreturn_val_if_fail (name != NULL, NULL);
-  xreturn_val_if_fail (X_IS_PARAM_SPEC (overridden), NULL);
-
+  GParamSpec *pspec;
+  
+  g_return_val_if_fail (name != NULL, NULL);
+  g_return_val_if_fail (G_IS_PARAM_SPEC (overridden), NULL);
+  
   /* Dereference further redirections for property that was passed in
    */
   while (TRUE)
     {
-      xparam_spec_t *indirect = xparam_spec_get_redirect_target (overridden);
+      GParamSpec *indirect = g_param_spec_get_redirect_target (overridden);
       if (indirect)
 	overridden = indirect;
       else
 	break;
     }
 
-  pspec = xparam_spec_internal (XTYPE_PARAM_OVERRIDE,
+  pspec = g_param_spec_internal (G_TYPE_PARAM_OVERRIDE,
 				 name, NULL, NULL,
 				 overridden->flags);
   if (pspec == NULL)
     return NULL;
-
-  pspec->value_type = XPARAM_SPEC_VALUE_TYPE (overridden);
-  XPARAM_SPEC_OVERRIDE (pspec)->overridden = xparam_spec_ref (overridden);
+  
+  pspec->value_type = G_PARAM_SPEC_VALUE_TYPE (overridden);
+  G_PARAM_SPEC_OVERRIDE (pspec)->overridden = g_param_spec_ref (overridden);
 
   return pspec;
 }
 
 /**
- * xparam_spec_variant:
+ * g_param_spec_variant:
  * @name: canonical name of the property specified
  * @nick: nick name for the property specified
  * @blurb: description of the property specified
- * @type: a #xvariant_type_t
- * @default_value: (nullable) (transfer full): a #xvariant_t of type @type to
+ * @type: a #GVariantType
+ * @default_value: (nullable) (transfer full): a #GVariant of type @type to
  *                 use as the default value, or %NULL
  * @flags: flags for the property specified
  *
- * Creates a new #GParamSpecVariant instance specifying a #xvariant_t
+ * Creates a new #GParamSpecVariant instance specifying a #GVariant
  * property.
  *
  * If @default_value is floating, it is consumed.
  *
- * See xparam_spec_internal() for details on property names.
+ * See g_param_spec_internal() for details on property names.
  *
- * Returns: (transfer full): the newly created #xparam_spec_t
+ * Returns: (transfer full): the newly created #GParamSpec
  *
  * Since: 2.26
  */
-xparam_spec_t*
-xparam_spec_variant (const xchar_t        *name,
-                      const xchar_t        *nick,
-                      const xchar_t        *blurb,
-                      const xvariant_type_t *type,
-                      xvariant_t           *default_value,
+GParamSpec*
+g_param_spec_variant (const gchar        *name,
+                      const gchar        *nick,
+                      const gchar        *blurb,
+                      const GVariantType *type,
+                      GVariant           *default_value,
                       GParamFlags         flags)
 {
   GParamSpecVariant *vspec;
 
-  xreturn_val_if_fail (type != NULL, NULL);
-  xreturn_val_if_fail (default_value == NULL ||
-                        xvariant_is_of_type (default_value, type), NULL);
+  g_return_val_if_fail (type != NULL, NULL);
+  g_return_val_if_fail (default_value == NULL ||
+                        g_variant_is_of_type (default_value, type), NULL);
 
-  vspec = xparam_spec_internal (XTYPE_PARAM_VARIANT,
+  vspec = g_param_spec_internal (G_TYPE_PARAM_VARIANT,
                                  name,
                                  nick,
                                  blurb,
@@ -2614,9 +2614,9 @@ xparam_spec_variant (const xchar_t        *name,
   if (vspec == NULL)
     return NULL;
 
-  vspec->type = xvariant_type_copy (type);
+  vspec->type = g_variant_type_copy (type);
   if (default_value)
-    vspec->default_value = xvariant_ref_sink (default_value);
+    vspec->default_value = g_variant_ref_sink (default_value);
 
-  return XPARAM_SPEC (vspec);
+  return G_PARAM_SPEC (vspec);
 }

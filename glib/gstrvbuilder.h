@@ -19,7 +19,7 @@
 #ifndef __G_STRVBUILDER_H__
 #define __G_STRVBUILDER_H__
 
-#if !defined(__XPL_H_INSIDE__) && !defined(XPL_COMPILATION)
+#if !defined(__GLIB_H_INSIDE__) && !defined(GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -29,38 +29,38 @@
 G_BEGIN_DECLS
 
 /**
- * xstrv_builder_t:
+ * GStrvBuilder:
  *
  * A helper object to build a %NULL-terminated string array
- * by appending. See xstrv_builder_new().
+ * by appending. See g_strv_builder_new().
  *
  * Since: 2.68
  */
-typedef struct _xstrv_builder xstrv_builder_t;
+typedef struct _GStrvBuilder GStrvBuilder;
 
-XPL_AVAILABLE_IN_2_68
-xstrv_builder_t *xstrv_builder_new (void);
+GLIB_AVAILABLE_IN_2_68
+GStrvBuilder *g_strv_builder_new (void);
 
-XPL_AVAILABLE_IN_2_68
-void xstrv_builder_unref (xstrv_builder_t *builder);
+GLIB_AVAILABLE_IN_2_68
+void g_strv_builder_unref (GStrvBuilder *builder);
 
-XPL_AVAILABLE_IN_2_68
-xstrv_builder_t *xstrv_builder_ref (xstrv_builder_t *builder);
+GLIB_AVAILABLE_IN_2_68
+GStrvBuilder *g_strv_builder_ref (GStrvBuilder *builder);
 
-XPL_AVAILABLE_IN_2_68
-void xstrv_builder_add (xstrv_builder_t *builder,
+GLIB_AVAILABLE_IN_2_68
+void g_strv_builder_add (GStrvBuilder *builder,
                          const char *value);
 
-XPL_AVAILABLE_IN_2_70
-void xstrv_builder_addv (xstrv_builder_t *builder,
+GLIB_AVAILABLE_IN_2_70
+void g_strv_builder_addv (GStrvBuilder *builder,
                           const char **value);
 
-XPL_AVAILABLE_IN_2_70
-void xstrv_builder_add_many (xstrv_builder_t *builder,
+GLIB_AVAILABLE_IN_2_70
+void g_strv_builder_add_many (GStrvBuilder *builder,
                               ...) G_GNUC_NULL_TERMINATED;
 
-XPL_AVAILABLE_IN_2_68
-xstrv_t xstrv_builder_end (xstrv_builder_t *builder);
+GLIB_AVAILABLE_IN_2_68
+GStrv g_strv_builder_end (GStrvBuilder *builder);
 
 G_END_DECLS
 

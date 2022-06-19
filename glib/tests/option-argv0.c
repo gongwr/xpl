@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2011 Red Hat, Inc.
  *
  * This work is provided "as is"; redistribution and modification
@@ -31,12 +31,12 @@
 static void
 test_platform_argv0 (void)
 {
-  xoption_context_t *context;
-  xboolean_t arg;
+  GOptionContext *context;
+  gboolean arg;
   GOptionEntry entries [] =
     { { "test", 't', 0, G_OPTION_ARG_STRING, &arg, NULL, NULL },
       G_OPTION_ENTRY_NULL };
-  const xchar_t * const expected_prgnames[] =
+  const gchar * const expected_prgnames[] =
     {
       "option-argv0",
 #ifdef G_OS_WIN32
@@ -44,8 +44,8 @@ test_platform_argv0 (void)
 #endif
       NULL,
     };
-  xboolean_t retval;
-  xboolean_t fatal_errors = TRUE;
+  gboolean retval;
+  gboolean fatal_errors = TRUE;
 
   /* This test must pass on platforms where platform_get_argv0()
    * is implemented. At the moment that means Linux/Cygwin,
@@ -69,23 +69,23 @@ test_platform_argv0 (void)
 
   context = g_option_context_new (NULL);
   g_option_context_add_main_entries (context, entries, NULL);
-
+  
   retval = g_option_context_parse (context, NULL, NULL, NULL);
   if (fatal_errors)
     {
       g_assert_true (retval);
-      g_assert_true (xstrv_contains (expected_prgnames, g_get_prgname ()));
+      g_assert_true (g_strv_contains (expected_prgnames, g_get_prgname ()));
     }
   else
     {
-      xboolean_t failed = FALSE;
+      gboolean failed = FALSE;
 
       if (!retval)
         {
           g_print ("g_option_context_parse() failed\n");
           failed = TRUE;
         }
-      else if (!xstrv_contains (expected_prgnames, g_get_prgname ()))
+      else if (!g_strv_contains (expected_prgnames, g_get_prgname ()))
         {
           g_print ("program name `%s' is neither `option-argv0', nor `lt-option-argv0'\n", g_get_prgname());
           failed = TRUE;

@@ -49,17 +49,17 @@
 
 G_LOCK_DEFINE_STATIC (aliases);
 
-static xhashtable_t *
+static GHashTable *
 get_alias_hash (void)
 {
-  static xhashtable_t *alias_hash = NULL;
+  static GHashTable *alias_hash = NULL;
   const char *aliases;
 
   G_LOCK (aliases);
 
   if (!alias_hash)
     {
-      alias_hash = xhash_table_new (xstr_hash, xstr_equal);
+      alias_hash = g_hash_table_new (g_str_hash, g_str_equal);
 
       aliases = _g_locale_get_charset_aliases ();
       while (*aliases != '\0')
@@ -74,7 +74,7 @@ get_alias_hash (void)
           canonical = aliases;
           aliases += strlen (aliases) + 1;
 
-          alias_array = xhash_table_lookup (alias_hash, canonical);
+          alias_array = g_hash_table_lookup (alias_hash, canonical);
           if (alias_array)
             {
               while (alias_array[count])
@@ -85,7 +85,7 @@ get_alias_hash (void)
           alias_array[count] = alias;
           alias_array[count + 1] = NULL;
 
-          xhash_table_insert (alias_hash, (char *)canonical, alias_array);
+          g_hash_table_insert (alias_hash, (char *)canonical, alias_array);
         }
     }
 
@@ -100,13 +100,13 @@ get_alias_hash (void)
 const char **
 _g_charset_get_aliases (const char *canonical_name)
 {
-  xhashtable_t *alias_hash = get_alias_hash ();
+  GHashTable *alias_hash = get_alias_hash ();
 
-  return xhash_table_lookup (alias_hash, canonical_name);
+  return g_hash_table_lookup (alias_hash, canonical_name);
 }
 
-static xboolean_t
-xutf8_get_charset_internal (const char  *raw_data,
+static gboolean
+g_utf8_get_charset_internal (const char  *raw_data,
                              const char **a)
 {
   /* Allow CHARSET to override the charset of any locale category. Users should
@@ -154,13 +154,13 @@ xutf8_get_charset_internal (const char  *raw_data,
 typedef struct _GCharsetCache GCharsetCache;
 
 struct _GCharsetCache {
-  xboolean_t is_utf8;
-  xchar_t *raw;
-  xchar_t *charset;
+  gboolean is_utf8;
+  gchar *raw;
+  gchar *charset;
 };
 
 static void
-charset_cache_free (xpointer_t data)
+charset_cache_free (gpointer data)
 {
   GCharsetCache *cache = data;
   g_free (cache->raw);
@@ -196,12 +196,12 @@ charset_cache_free (xpointer_t data)
  *
  * Returns: %TRUE if the returned charset is UTF-8
  */
-xboolean_t
+gboolean
 g_get_charset (const char **charset)
 {
-  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
-  const xchar_t *raw;
+  const gchar *raw;
 
   if (!cache)
     cache = g_private_set_alloc0 (&cache_private, sizeof (GCharsetCache));
@@ -212,13 +212,13 @@ g_get_charset (const char **charset)
 
   if (cache->raw == NULL || strcmp (cache->raw, raw) != 0)
     {
-      const xchar_t *new_charset;
+      const gchar *new_charset;
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = xstrdup (raw);
-      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
-      cache->charset = xstrdup (new_charset);
+      cache->raw = g_strdup (raw);
+      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
+      cache->charset = g_strdup (new_charset);
     }
 
   if (charset)
@@ -233,12 +233,12 @@ g_get_charset (const char **charset)
  *
  * Returns: %TRUE if the returned charset is UTF-8
  */
-xboolean_t
+gboolean
 _g_get_time_charset (const char **charset)
 {
-  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
-  const xchar_t *raw;
+  const gchar *raw;
 
   if (!cache)
     cache = g_private_set_alloc0 (&cache_private, sizeof (GCharsetCache));
@@ -253,13 +253,13 @@ _g_get_time_charset (const char **charset)
 
   if (cache->raw == NULL || strcmp (cache->raw, raw) != 0)
     {
-      const xchar_t *new_charset;
+      const gchar *new_charset;
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = xstrdup (raw);
-      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
-      cache->charset = xstrdup (new_charset);
+      cache->raw = g_strdup (raw);
+      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
+      cache->charset = g_strdup (new_charset);
     }
 
   if (charset)
@@ -273,12 +273,12 @@ _g_get_time_charset (const char **charset)
  *
  * Returns: %TRUE if the returned charset is UTF-8
  */
-xboolean_t
+gboolean
 _g_get_ctype_charset (const char **charset)
 {
-  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
-  const xchar_t *raw;
+  const gchar *raw;
 
   if (!cache)
     cache = g_private_set_alloc0 (&cache_private, sizeof (GCharsetCache));
@@ -293,13 +293,13 @@ _g_get_ctype_charset (const char **charset)
 
   if (cache->raw == NULL || strcmp (cache->raw, raw) != 0)
     {
-      const xchar_t *new_charset;
+      const gchar *new_charset;
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = xstrdup (raw);
-      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
-      cache->charset = xstrdup (new_charset);
+      cache->raw = g_strdup (raw);
+      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
+      cache->charset = g_strdup (new_charset);
     }
 
   if (charset)
@@ -316,14 +316,14 @@ _g_get_ctype_charset (const char **charset)
  * Returns: a newly allocated string containing the name
  *     of the character set. This string must be freed with g_free().
  */
-xchar_t *
+gchar *
 g_get_codeset (void)
 {
-  const xchar_t *charset;
+  const gchar *charset;
 
   g_get_charset (&charset);
 
-  return xstrdup (charset);
+  return g_strdup (charset);
 }
 
 /**
@@ -353,16 +353,16 @@ g_get_codeset (void)
  *
  * Since: 2.62
  */
-xboolean_t
+gboolean
 g_get_console_charset (const char **charset)
 {
 #ifdef G_OS_WIN32
-  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
-  const xchar_t *locale;
+  const gchar *locale;
   unsigned int cp;
   char buf[2 + 20 + 1]; /* "CP" + G_MAXUINT64 (to be safe) in decimal form (20 bytes) + "\0" */
-  const xchar_t *raw = NULL;
+  const gchar *raw = NULL;
 
   if (!cache)
     cache = g_private_set_alloc0 (&cache_private, sizeof (GCharsetCache));
@@ -383,7 +383,7 @@ g_get_console_charset (const char **charset)
           modifier = strchr (dot, '@');
           if (modifier == NULL)
             raw = dot;
-          else if ((xsize_t) (modifier - dot) < sizeof (buf))
+          else if ((gsize) (modifier - dot) < sizeof (buf))
             {
               memcpy (buf, dot, modifier - dot);
               buf[modifier - dot] = '\0';
@@ -402,7 +402,7 @@ g_get_console_charset (const char **charset)
         }
       else if (GetLastError () != ERROR_INVALID_HANDLE)
         {
-          xchar_t *emsg = g_win32_error_message (GetLastError ());
+          gchar *emsg = g_win32_error_message (GetLastError ());
           g_warning ("Failed to determine console output code page: %s. "
                      "Falling back to UTF-8", emsg);
           g_free (emsg);
@@ -414,13 +414,13 @@ g_get_console_charset (const char **charset)
 
   if (cache->raw == NULL || strcmp (cache->raw, raw) != 0)
     {
-      const xchar_t *new_charset;
+      const gchar *new_charset;
 
       g_free (cache->raw);
       g_free (cache->charset);
-      cache->raw = xstrdup (raw);
-      cache->is_utf8 = xutf8_get_charset_internal (raw, &new_charset);
-      cache->charset = xstrdup (new_charset);
+      cache->raw = g_strdup (raw);
+      cache->is_utf8 = g_utf8_get_charset_internal (raw, &new_charset);
+      cache->charset = g_strdup (new_charset);
     }
 
   if (charset)
@@ -437,8 +437,8 @@ g_get_console_charset (const char **charset)
 
 /* read an alias file for the locales */
 static void
-read_aliases (const xchar_t *file,
-              xhashtable_t  *alias_table)
+read_aliases (const gchar *file,
+              GHashTable  *alias_table)
 {
   FILE *fp;
   char buf[256];
@@ -450,7 +450,7 @@ read_aliases (const xchar_t *file,
     {
       char *p, *q;
 
-      xstrstrip (buf);
+      g_strstrip (buf);
 
       /* Line is a comment */
       if ((buf[0] == '#') || (buf[0] == '\0'))
@@ -480,8 +480,8 @@ read_aliases (const xchar_t *file,
       }
 
       /* Add to alias table if necessary */
-      if (!xhash_table_lookup (alias_table, buf)) {
-        xhash_table_insert (alias_table, xstrdup (buf), xstrdup (q));
+      if (!g_hash_table_lookup (alias_table, buf)) {
+        g_hash_table_insert (alias_table, g_strdup (buf), g_strdup (q));
       }
     }
   fclose (fp);
@@ -493,24 +493,24 @@ static char *
 unalias_lang (char *lang)
 {
 #ifndef G_OS_WIN32
-  static xhashtable_t *alias_table = NULL;
+  static GHashTable *alias_table = NULL;
   char *p;
   int i;
 
   if (g_once_init_enter (&alias_table))
     {
-      xhashtable_t *table = xhash_table_new (xstr_hash, xstr_equal);
+      GHashTable *table = g_hash_table_new (g_str_hash, g_str_equal);
       read_aliases ("/usr/share/locale/locale.alias", table);
       g_once_init_leave (&alias_table, table);
     }
 
   i = 0;
-  while ((p = xhash_table_lookup (alias_table, lang)) && (strcmp (p, lang) != 0))
+  while ((p = g_hash_table_lookup (alias_table, lang)) && (strcmp (p, lang) != 0))
     {
       lang = p;
       if (i++ == 30)
         {
-          static xboolean_t said_before = FALSE;
+          static gboolean said_before = FALSE;
           if (!said_before)
             g_warning ("Too many alias levels for a locale, "
                        "may indicate a loop");
@@ -534,18 +534,18 @@ enum
 
 /* Break an X/Open style locale specification into components
  */
-static xuint_t
-explode_locale (const xchar_t *locale,
-                xchar_t      **language,
-                xchar_t      **territory,
-                xchar_t      **codeset,
-                xchar_t      **modifier)
+static guint
+explode_locale (const gchar *locale,
+                gchar      **language,
+                gchar      **territory,
+                gchar      **codeset,
+                gchar      **modifier)
 {
-  const xchar_t *uscore_pos;
-  const xchar_t *at_pos;
-  const xchar_t *dot_pos;
+  const gchar *uscore_pos;
+  const gchar *at_pos;
+  const gchar *dot_pos;
 
-  xuint_t mask = 0;
+  guint mask = 0;
 
   uscore_pos = strchr (locale, '_');
   dot_pos = strchr (uscore_pos ? uscore_pos : locale, '.');
@@ -554,7 +554,7 @@ explode_locale (const xchar_t *locale,
   if (at_pos)
     {
       mask |= COMPONENT_MODIFIER;
-      *modifier = xstrdup (at_pos);
+      *modifier = g_strdup (at_pos);
     }
   else
     at_pos = locale + strlen (locale);
@@ -562,7 +562,7 @@ explode_locale (const xchar_t *locale,
   if (dot_pos)
     {
       mask |= COMPONENT_CODESET;
-      *codeset = xstrndup (dot_pos, at_pos - dot_pos);
+      *codeset = g_strndup (dot_pos, at_pos - dot_pos);
     }
   else
     dot_pos = at_pos;
@@ -570,12 +570,12 @@ explode_locale (const xchar_t *locale,
   if (uscore_pos)
     {
       mask |= COMPONENT_TERRITORY;
-      *territory = xstrndup (uscore_pos, dot_pos - uscore_pos);
+      *territory = g_strndup (uscore_pos, dot_pos - uscore_pos);
     }
   else
     uscore_pos = dot_pos;
 
-  *language = xstrndup (locale, uscore_pos - locale);
+  *language = g_strndup (locale, uscore_pos - locale);
 
   return mask;
 }
@@ -593,16 +593,16 @@ explode_locale (const xchar_t *locale,
  *       to do so when this should handle 99% of the time...
  */
 static void
-append_locale_variants (xptr_array_t *array,
-                        const xchar_t *locale)
+append_locale_variants (GPtrArray *array,
+                        const gchar *locale)
 {
-  xchar_t *language = NULL;
-  xchar_t *territory = NULL;
-  xchar_t *codeset = NULL;
-  xchar_t *modifier = NULL;
+  gchar *language = NULL;
+  gchar *territory = NULL;
+  gchar *codeset = NULL;
+  gchar *modifier = NULL;
 
-  xuint_t mask;
-  xuint_t i, j;
+  guint mask;
+  guint i, j;
 
   g_return_if_fail (locale != NULL);
 
@@ -617,12 +617,12 @@ append_locale_variants (xptr_array_t *array,
 
       if ((i & ~mask) == 0)
         {
-          xchar_t *val = xstrconcat (language,
+          gchar *val = g_strconcat (language,
                                     (i & COMPONENT_TERRITORY) ? territory : "",
                                     (i & COMPONENT_CODESET) ? codeset : "",
                                     (i & COMPONENT_MODIFIER) ? modifier : "",
                                     NULL);
-          xptr_array_add (array, val);
+          g_ptr_array_add (array, val);
         }
     }
 
@@ -657,31 +657,31 @@ append_locale_variants (xptr_array_t *array,
  *
  * Returns: (transfer full) (array zero-terminated=1) (element-type utf8): a newly
  *   allocated array of newly allocated strings with the locale variants. Free with
- *   xstrfreev().
+ *   g_strfreev().
  *
  * Since: 2.28
  */
-xchar_t **
-g_get_locale_variants (const xchar_t *locale)
+gchar **
+g_get_locale_variants (const gchar *locale)
 {
-  xptr_array_t *array;
+  GPtrArray *array;
 
-  xreturn_val_if_fail (locale != NULL, NULL);
+  g_return_val_if_fail (locale != NULL, NULL);
 
-  array = xptr_array_sized_new (8);
+  array = g_ptr_array_sized_new (8);
   append_locale_variants (array, locale);
-  xptr_array_add (array, NULL);
+  g_ptr_array_add (array, NULL);
 
-  return (xchar_t **) xptr_array_free (array, FALSE);
+  return (gchar **) g_ptr_array_free (array, FALSE);
 }
 
 /* The following is (partly) taken from the gettext package.
    Copyright (C) 1995, 1996, 1997, 1998 Free Software Foundation, Inc.  */
 
-static const xchar_t *
-guess_category_value (const xchar_t *category_name)
+static const gchar *
+guess_category_value (const gchar *category_name)
 {
-  const xchar_t *retval;
+  const gchar *retval;
 
   /* The highest priority value is the 'LANGUAGE' environment
      variable.  This is a GNU extension.  */
@@ -708,7 +708,7 @@ guess_category_value (const xchar_t *category_name)
   if ((retval != NULL) && (retval[0] != '\0'))
     return retval;
 
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
   /* g_win32_getlocale() first checks for LC_ALL, LC_MESSAGES and
    * LANG, which we already did above. Oh well. The main point of
    * calling g_win32_getlocale() is to get the thread's locale as used
@@ -729,16 +729,16 @@ guess_category_value (const xchar_t *category_name)
 typedef struct _GLanguageNamesCache GLanguageNamesCache;
 
 struct _GLanguageNamesCache {
-  xchar_t *languages;
-  xchar_t **language_names;
+  gchar *languages;
+  gchar **language_names;
 };
 
 static void
-language_names_cache_free (xpointer_t data)
+language_names_cache_free (gpointer data)
 {
   GLanguageNamesCache *cache = data;
   g_free (cache->languages);
-  xstrfreev (cache->language_names);
+  g_strfreev (cache->language_names);
   g_free (cache);
 }
 
@@ -762,7 +762,7 @@ language_names_cache_free (xpointer_t data)
  *
  * Since: 2.6
  */
-const xchar_t * const *
+const gchar * const *
 g_get_language_names (void)
 {
   return g_get_language_names_with_category ("LC_MESSAGES");
@@ -789,19 +789,19 @@ g_get_language_names (void)
  *
  * Since: 2.58
  */
-const xchar_t * const *
-g_get_language_names_with_category (const xchar_t *category_name)
+const gchar * const *
+g_get_language_names_with_category (const gchar *category_name)
 {
-  static xprivate_t cache_private = G_PRIVATE_INIT ((void (*)(xpointer_t)) xhash_table_unref);
-  xhashtable_t *cache = g_private_get (&cache_private);
-  const xchar_t *languages;
+  static GPrivate cache_private = G_PRIVATE_INIT ((void (*)(gpointer)) g_hash_table_unref);
+  GHashTable *cache = g_private_get (&cache_private);
+  const gchar *languages;
   GLanguageNamesCache *name_cache;
 
-  xreturn_val_if_fail (category_name != NULL, NULL);
+  g_return_val_if_fail (category_name != NULL, NULL);
 
   if (!cache)
     {
-      cache = xhash_table_new_full (xstr_hash, xstr_equal,
+      cache = g_hash_table_new_full (g_str_hash, g_str_equal,
                                      g_free, language_names_cache_free);
       g_private_set (&cache_private, cache);
     }
@@ -810,29 +810,29 @@ g_get_language_names_with_category (const xchar_t *category_name)
   if (!languages)
     languages = "C";
 
-  name_cache = (GLanguageNamesCache *) xhash_table_lookup (cache, category_name);
+  name_cache = (GLanguageNamesCache *) g_hash_table_lookup (cache, category_name);
   if (!(name_cache && name_cache->languages &&
         strcmp (name_cache->languages, languages) == 0))
     {
-      xptr_array_t *array;
-      xchar_t **alist, **a;
+      GPtrArray *array;
+      gchar **alist, **a;
 
-      xhash_table_remove (cache, category_name);
+      g_hash_table_remove (cache, category_name);
 
-      array = xptr_array_sized_new (8);
+      array = g_ptr_array_sized_new (8);
 
-      alist = xstrsplit (languages, ":", 0);
+      alist = g_strsplit (languages, ":", 0);
       for (a = alist; *a; a++)
         append_locale_variants (array, unalias_lang (*a));
-      xstrfreev (alist);
-      xptr_array_add (array, xstrdup ("C"));
-      xptr_array_add (array, NULL);
+      g_strfreev (alist);
+      g_ptr_array_add (array, g_strdup ("C"));
+      g_ptr_array_add (array, NULL);
 
       name_cache = g_new0 (GLanguageNamesCache, 1);
-      name_cache->languages = xstrdup (languages);
-      name_cache->language_names = (xchar_t **) xptr_array_free (array, FALSE);
-      xhash_table_insert (cache, xstrdup (category_name), name_cache);
+      name_cache->languages = g_strdup (languages);
+      name_cache->language_names = (gchar **) g_ptr_array_free (array, FALSE);
+      g_hash_table_insert (cache, g_strdup (category_name), name_cache);
     }
 
-  return (const xchar_t * const *) name_cache->language_names;
+  return (const gchar * const *) name_cache->language_names;
 }

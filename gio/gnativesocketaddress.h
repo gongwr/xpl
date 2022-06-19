@@ -30,19 +30,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NATIVE_SOCKET_ADDRESS         (g_native_socket_address_get_type ())
-#define G_NATIVE_SOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NATIVE_SOCKET_ADDRESS, xnative_socket_address))
-#define G_NATIVE_SOCKET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NATIVE_SOCKET_ADDRESS, GNativeSocketAddressClass))
-#define X_IS_NATIVE_SOCKET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NATIVE_SOCKET_ADDRESS))
-#define X_IS_NATIVE_SOCKET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NATIVE_SOCKET_ADDRESS))
-#define G_NATIVE_SOCKET_ADDRESS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NATIVE_SOCKET_ADDRESS, GNativeSocketAddressClass))
+#define G_TYPE_NATIVE_SOCKET_ADDRESS         (g_native_socket_address_get_type ())
+#define G_NATIVE_SOCKET_ADDRESS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NATIVE_SOCKET_ADDRESS, GNativeSocketAddress))
+#define G_NATIVE_SOCKET_ADDRESS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NATIVE_SOCKET_ADDRESS, GNativeSocketAddressClass))
+#define G_IS_NATIVE_SOCKET_ADDRESS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NATIVE_SOCKET_ADDRESS))
+#define G_IS_NATIVE_SOCKET_ADDRESS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NATIVE_SOCKET_ADDRESS))
+#define G_NATIVE_SOCKET_ADDRESS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NATIVE_SOCKET_ADDRESS, GNativeSocketAddressClass))
 
 typedef struct _GNativeSocketAddressClass   GNativeSocketAddressClass;
 typedef struct _GNativeSocketAddressPrivate GNativeSocketAddressPrivate;
 
 struct _GNativeSocketAddress
 {
-  xsocket_address_t parent_instance;
+  GSocketAddress parent_instance;
 
   /*< private >*/
   GNativeSocketAddressPrivate *priv;
@@ -53,12 +53,12 @@ struct _GNativeSocketAddressClass
   GSocketAddressClass parent_class;
 };
 
-XPL_AVAILABLE_IN_2_46
-xtype_t           g_native_socket_address_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_46
+GType           g_native_socket_address_get_type        (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_46
-xsocket_address_t *g_native_socket_address_new            (xpointer_t        native,
-                                                        xsize_t           len);
+GLIB_AVAILABLE_IN_2_46
+GSocketAddress *g_native_socket_address_new            (gpointer        native,
+                                                        gsize           len);
 
 G_END_DECLS
 

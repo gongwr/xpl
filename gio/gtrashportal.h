@@ -23,8 +23,8 @@
 
 G_BEGIN_DECLS
 
-xboolean_t g_trash_portal_trash_file (xfile_t   *file,
-                                    xerror_t **error);
+gboolean g_trash_portal_trash_file (GFile   *file,
+                                    GError **error);
 
 G_END_DECLS
 

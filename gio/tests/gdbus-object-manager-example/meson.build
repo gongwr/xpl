@@ -1,4 +1,4 @@
-# FIXME: set UNINSTALLED_XPL_{SRC|BUILD}DIR=top_{src|build}dir ?
+# FIXME: set UNINSTALLED_GLIB_{SRC|BUILD}DIR=top_{src|build}dir ?
 gdbus_example_objectmanager_xml = files('gdbus-example-objectmanager.xml')
 gdbus_example_objectmanager_generated = custom_target('objectmanager-gen',
   input  : gdbus_example_objectmanager_xml,
@@ -13,7 +13,7 @@ gdbus_example_objectmanager_generated = custom_target('objectmanager-gen',
              '--output-directory', '@OUTDIR@',
              '--generate-c-code', 'objectmanager-gen',
              '--generate-docbook', 'objectmanager-gen',
-             '--symbol-decorator', '_XPL_EXTERN',
+             '--symbol-decorator', '_GLIB_EXTERN',
              '--symbol-decorator-define', 'HAVE_CONFIG_H',
              '@INPUT@'])
 

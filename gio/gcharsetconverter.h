@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XCHARSET_CONVERTER_H__
-#define __XCHARSET_CONVERTER_H__
+#ifndef __G_CHARSET_CONVERTER_H__
+#define __G_CHARSET_CONVERTER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,35 +29,35 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_CHARSET_CONVERTER         (xcharset_converter_get_type ())
-#define XCHARSET_CONVERTER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CHARSET_CONVERTER, xcharset_converter_t))
-#define XCHARSET_CONVERTER_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CHARSET_CONVERTER, xcharset_converter_class_t))
-#define X_IS_CHARSET_CONVERTER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CHARSET_CONVERTER))
-#define X_IS_CHARSET_CONVERTER_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CHARSET_CONVERTER))
-#define XCHARSET_CONVERTER_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CHARSET_CONVERTER, xcharset_converter_class_t))
+#define G_TYPE_CHARSET_CONVERTER         (g_charset_converter_get_type ())
+#define G_CHARSET_CONVERTER(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_CHARSET_CONVERTER, GCharsetConverter))
+#define G_CHARSET_CONVERTER_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_CHARSET_CONVERTER, GCharsetConverterClass))
+#define G_IS_CHARSET_CONVERTER(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_CHARSET_CONVERTER))
+#define G_IS_CHARSET_CONVERTER_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_CHARSET_CONVERTER))
+#define G_CHARSET_CONVERTER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_CHARSET_CONVERTER, GCharsetConverterClass))
 
-typedef struct _xcharset_converter_class   xcharset_converter_class_t;
+typedef struct _GCharsetConverterClass   GCharsetConverterClass;
 
-struct _xcharset_converter_class
+struct _GCharsetConverterClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t              xcharset_converter_get_type      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType              g_charset_converter_get_type      (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xcharset_converter_t *xcharset_converter_new            (const xchar_t  *to_charset,
-						       const xchar_t  *from_charset,
-						       xerror_t **error);
-XPL_AVAILABLE_IN_ALL
-void               xcharset_converter_set_use_fallback (xcharset_converter_t *converter,
-							 xboolean_t use_fallback);
-XPL_AVAILABLE_IN_ALL
-xboolean_t           xcharset_converter_get_use_fallback (xcharset_converter_t *converter);
-XPL_AVAILABLE_IN_ALL
-xuint_t              xcharset_converter_get_num_fallbacks (xcharset_converter_t *converter);
+GLIB_AVAILABLE_IN_ALL
+GCharsetConverter *g_charset_converter_new            (const gchar  *to_charset,
+						       const gchar  *from_charset,
+						       GError **error);
+GLIB_AVAILABLE_IN_ALL
+void               g_charset_converter_set_use_fallback (GCharsetConverter *converter,
+							 gboolean use_fallback);
+GLIB_AVAILABLE_IN_ALL
+gboolean           g_charset_converter_get_use_fallback (GCharsetConverter *converter);
+GLIB_AVAILABLE_IN_ALL
+guint              g_charset_converter_get_num_fallbacks (GCharsetConverter *converter);
 
 G_END_DECLS
 
-#endif /* __XCHARSET_CONVERTER_H__ */
+#endif /* __G_CHARSET_CONVERTER_H__ */

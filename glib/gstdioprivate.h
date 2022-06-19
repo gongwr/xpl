@@ -24,25 +24,25 @@ G_BEGIN_DECLS
 #if defined (G_OS_WIN32)
 
 typedef struct _gtimespec {
-  xuint64_t tv_sec;
-  xuint32_t tv_nsec;
+  guint64 tv_sec;
+  guint32 tv_nsec;
 } gtimespec;
 
 struct _GWin32PrivateStat
 {
-  xuint32_t volume_serial;
-  xuint64_t file_index;
-  xuint64_t attributes;
-  xuint64_t allocated_size;
-  xuint32_t reparse_tag;
+  guint32 volume_serial;
+  guint64 file_index;
+  guint64 attributes;
+  guint64 allocated_size;
+  guint32 reparse_tag;
 
-  xuint32_t st_dev;
-  xuint32_t st_ino;
-  xuint16_t st_mode;
-  xuint16_t st_uid;
-  xuint16_t st_gid;
-  xuint32_t st_nlink;
-  xuint64_t st_size;
+  guint32 st_dev;
+  guint32 st_ino;
+  guint16 st_mode;
+  guint16 st_uid;
+  guint16 st_gid;
+  guint32 st_nlink;
+  guint64 st_size;
   gtimespec st_ctim;
   gtimespec st_atim;
   gtimespec st_mtim;
@@ -50,17 +50,17 @@ struct _GWin32PrivateStat
 
 typedef struct _GWin32PrivateStat GWin32PrivateStat;
 
-int g_win32_stat_utf8     (const xchar_t       *filename,
+int g_win32_stat_utf8     (const gchar       *filename,
                            GWin32PrivateStat *buf);
 
-int g_win32_lstat_utf8    (const xchar_t       *filename,
+int g_win32_lstat_utf8    (const gchar       *filename,
                            GWin32PrivateStat *buf);
 
-int g_win32_readlink_utf8 (const xchar_t       *filename,
-                           xchar_t             *buf,
-                           xsize_t              buf_size,
-                           xchar_t            **alloc_buf,
-                           xboolean_t           terminate);
+int g_win32_readlink_utf8 (const gchar       *filename,
+                           gchar             *buf,
+                           gsize              buf_size,
+                           gchar            **alloc_buf,
+                           gboolean           terminate);
 
 int g_win32_fstat         (int                fd,
                            GWin32PrivateStat *buf);

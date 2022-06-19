@@ -20,8 +20,8 @@
  *          Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XSOCKET_SERVICE_H__
-#define __XSOCKET_SERVICE_H__
+#ifndef __G_SOCKET_SERVICE_H__
+#define __G_SOCKET_SERVICE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,17 +31,17 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_SOCKET_SERVICE                               (xsocket_service_get_type ())
-#define XSOCKET_SERVICE(inst)                              (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_SOCKET_SERVICE, xsocket_service))
-#define XSOCKET_SERVICE_CLASS(class)                       (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SOCKET_SERVICE, GSocketServiceClass))
-#define X_IS_SOCKET_SERVICE(inst)                           (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_SOCKET_SERVICE))
-#define X_IS_SOCKET_SERVICE_CLASS(class)                    (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_SOCKET_SERVICE))
-#define XSOCKET_SERVICE_GET_CLASS(inst)                    (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SOCKET_SERVICE, GSocketServiceClass))
+#define G_TYPE_SOCKET_SERVICE                               (g_socket_service_get_type ())
+#define G_SOCKET_SERVICE(inst)                              (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_SOCKET_SERVICE, GSocketService))
+#define G_SOCKET_SERVICE_CLASS(class)                       (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_SOCKET_SERVICE, GSocketServiceClass))
+#define G_IS_SOCKET_SERVICE(inst)                           (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_SOCKET_SERVICE))
+#define G_IS_SOCKET_SERVICE_CLASS(class)                    (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_SOCKET_SERVICE))
+#define G_SOCKET_SERVICE_GET_CLASS(inst)                    (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_SOCKET_SERVICE, GSocketServiceClass))
 
 typedef struct _GSocketServicePrivate                       GSocketServicePrivate;
 typedef struct _GSocketServiceClass                         GSocketServiceClass;
@@ -50,15 +50,15 @@ typedef struct _GSocketServiceClass                         GSocketServiceClass;
  * GSocketServiceClass:
  * @incoming: signal emitted when new connections are accepted
  *
- * Class structure for #xsocket_service_t.
+ * Class structure for #GSocketService.
  */
 struct _GSocketServiceClass
 {
   GSocketListenerClass parent_class;
 
-  xboolean_t (* incoming) (xsocket_service_t    *service,
-                         xsocket_connection_t *connection,
-			 xobject_t           *source_object);
+  gboolean (* incoming) (GSocketService    *service,
+                         GSocketConnection *connection,
+			 GObject           *source_object);
 
   /* Padding for future expansion */
   void (*_g_reserved1) (void);
@@ -71,23 +71,23 @@ struct _GSocketServiceClass
 
 struct _GSocketService
 {
-  xsocket_listener_t parent_instance;
+  GSocketListener parent_instance;
   GSocketServicePrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           xsocket_service_get_type  (void);
+GLIB_AVAILABLE_IN_ALL
+GType           g_socket_service_get_type  (void);
 
-XPL_AVAILABLE_IN_ALL
-xsocket_service_t *xsocket_service_new       (void);
-XPL_AVAILABLE_IN_ALL
-void            xsocket_service_start     (xsocket_service_t *service);
-XPL_AVAILABLE_IN_ALL
-void            xsocket_service_stop      (xsocket_service_t *service);
-XPL_AVAILABLE_IN_ALL
-xboolean_t        xsocket_service_is_active (xsocket_service_t *service);
+GLIB_AVAILABLE_IN_ALL
+GSocketService *g_socket_service_new       (void);
+GLIB_AVAILABLE_IN_ALL
+void            g_socket_service_start     (GSocketService *service);
+GLIB_AVAILABLE_IN_ALL
+void            g_socket_service_stop      (GSocketService *service);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_socket_service_is_active (GSocketService *service);
 
 
 G_END_DECLS
 
-#endif /* __XSOCKET_SERVICE_H__ */
+#endif /* __G_SOCKET_SERVICE_H__ */

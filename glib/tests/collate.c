@@ -5,17 +5,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-static xboolean_t missing_locale = FALSE;
+static gboolean missing_locale = FALSE;
 
 typedef struct {
-  const xchar_t **input;
-  const xchar_t **sorted;
-  const xchar_t **file_sorted;
+  const gchar **input;
+  const gchar **sorted;
+  const gchar **file_sorted;
 } CollateTest;
 
 typedef struct {
-  xchar_t *key;
-  const xchar_t *str;
+  gchar *key;
+  const gchar *str;
 } Line;
 
 static void
@@ -30,7 +30,7 @@ compare_collate (const void *a, const void *b)
   const Line *line_a = a;
   const Line *line_b = b;
 
-  return xutf8_collate (line_a->str, line_b->str);
+  return g_utf8_collate (line_a->str, line_b->str);
 }
 
 static int
@@ -43,11 +43,11 @@ compare_key (const void *a, const void *b)
 }
 
 static void
-do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
+do_collate (gboolean for_file, gboolean use_key, const CollateTest *test)
 {
-  xarray_t *line_array;
+  GArray *line_array;
   Line line;
-  xint_t i;
+  gint i;
 
   if (missing_locale)
     {
@@ -56,15 +56,15 @@ do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
     }
 
   line_array = g_array_new (FALSE, FALSE, sizeof(Line));
-  g_array_set_clear_func (line_array, (xdestroy_notify_t)clear_line);
+  g_array_set_clear_func (line_array, (GDestroyNotify)clear_line);
 
   for (i = 0; test->input[i]; i++)
     {
       line.str = test->input[i];
       if (for_file)
-        line.key = xutf8_collate_key_for_filename (line.str, -1);
+        line.key = g_utf8_collate_key_for_filename (line.str, -1);
       else
-        line.key = xutf8_collate_key (line.str, -1);
+        line.key = g_utf8_collate_key (line.str, -1);
 
       g_array_append_val (line_array, line);
     }
@@ -73,7 +73,7 @@ do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
 
   for (i = 0; test->input[i]; i++)
     {
-      const xchar_t *str;
+      const gchar *str;
       str = g_array_index (line_array, Line, i).str;
       if (for_file)
         g_assert_cmpstr (str, ==, test->file_sorted[i]);
@@ -85,27 +85,27 @@ do_collate (xboolean_t for_file, xboolean_t use_key, const CollateTest *test)
 }
 
 static void
-test_collate (xconstpointer d)
+test_collate (gconstpointer d)
 {
   const CollateTest *test = d;
   do_collate (FALSE, FALSE, test);
 }
 
 static void
-test_collate_key (xconstpointer d)
+test_collate_key (gconstpointer d)
 {
   const CollateTest *test = d;
   do_collate (FALSE, TRUE, test);
 }
 
 static void
-test_collate_file (xconstpointer d)
+test_collate_file (gconstpointer d)
 {
   const CollateTest *test = d;
   do_collate (TRUE, TRUE, test);
 }
 
-const xchar_t *input0[] = {
+const gchar *input0[] = {
   "z",
   "c",
   "eer34",
@@ -119,7 +119,7 @@ const xchar_t *input0[] = {
   NULL
 };
 
-const xchar_t *sorted0[] = {
+const gchar *sorted0[] = {
   "223",
   "bar",
   "baz",
@@ -133,7 +133,7 @@ const xchar_t *sorted0[] = {
   NULL
 };
 
-const xchar_t *file_sorted0[] = {
+const gchar *file_sorted0[] = {
   "223",
   "bar",
   "baz",
@@ -147,7 +147,7 @@ const xchar_t *file_sorted0[] = {
   NULL
 };
 
-const xchar_t *input1[] = {
+const gchar *input1[] = {
   "file.txt",
   "file2.bla",
   "file.c",
@@ -164,7 +164,7 @@ const xchar_t *input1[] = {
   NULL
 };
 
-const xchar_t *sorted1[] = {
+const gchar *sorted1[] = {
   "bla001",
   "bla02",
   "bla03",
@@ -181,7 +181,7 @@ const xchar_t *sorted1[] = {
   NULL
 };
 
-const xchar_t *file_sorted1[] = {
+const gchar *file_sorted1[] = {
   "bla001",
   "bla02",
   "bla03",
@@ -198,7 +198,7 @@ const xchar_t *file_sorted1[] = {
   NULL
 };
 
-const xchar_t *input2[] = {
+const gchar *input2[] = {
   "file26",
   "file100",
   "file1",
@@ -215,7 +215,7 @@ const xchar_t *input2[] = {
   NULL
 };
 
-const xchar_t *sorted2[] = {
+const gchar *sorted2[] = {
   "a-.a",
   "a.a",
   "aa.a",
@@ -232,7 +232,7 @@ const xchar_t *sorted2[] = {
   NULL
 };
 
-const xchar_t *file_sorted2[] = {
+const gchar *file_sorted2[] = {
   /* Filename collation in OS X follows Finder style which gives
    * a slightly different order from usual Linux locales. */
 #ifdef HAVE_CARBON
@@ -270,9 +270,9 @@ const xchar_t *file_sorted2[] = {
 int
 main (int argc, char *argv[])
 {
-  xchar_t *path;
-  xuint_t i;
-  const xchar_t *locale;
+  gchar *path;
+  guint i;
+  const gchar *locale;
   CollateTest test[3];
 
   g_test_init (&argc, &argv, NULL);
@@ -299,13 +299,13 @@ main (int argc, char *argv[])
 
   for (i = 0; i < G_N_ELEMENTS (test); i++)
     {
-      path = xstrdup_printf ("/unicode/collate/%d", i);
+      path = g_strdup_printf ("/unicode/collate/%d", i);
       g_test_add_data_func (path, &test[i], test_collate);
       g_free (path);
-      path = xstrdup_printf ("/unicode/collate-key/%d", i);
+      path = g_strdup_printf ("/unicode/collate-key/%d", i);
       g_test_add_data_func (path, &test[i], test_collate_key);
       g_free (path);
-      path = xstrdup_printf ("/unicode/collate-filename/%d", i);
+      path = g_strdup_printf ("/unicode/collate-filename/%d", i);
       g_test_add_data_func (path, &test[i], test_collate_file);
       g_free (path);
     }

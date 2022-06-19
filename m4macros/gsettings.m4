@@ -1,12 +1,12 @@
 # Increment this whenever this file is changed.
 #serial 2
 
-dnl XPL_GSETTINGS
+dnl GLIB_GSETTINGS
 dnl Defines GSETTINGS_SCHEMAS_INSTALL which controls whether
 dnl the schema should be compiled
 dnl
 
-AC_DEFUN([XPL_GSETTINGS],
+AC_DEFUN([GLIB_GSETTINGS],
 [
   dnl We can't use PKG_PREREQ because that needs 0.29.
   m4_ifndef([PKG_PROG_PKG_CONFIG],
@@ -25,10 +25,10 @@ AC_DEFUN([XPL_GSETTINGS],
   PKG_PROG_PKG_CONFIG([0.16])
   AC_SUBST(gsettingsschemadir, [${datadir}/glib-2.0/schemas])
   AS_IF([test x$cross_compiling != xyes],
-        [PKG_CHECK_VAR([XPL_COMPILE_SCHEMAS], [gio-2.0], [glib_compile_schemas])],
-        [AC_PATH_PROG([XPL_COMPILE_SCHEMAS], [glib-compile-schemas])])
-  AC_SUBST(XPL_COMPILE_SCHEMAS)
-  if test "x$XPL_COMPILE_SCHEMAS" = "x"; then
+        [PKG_CHECK_VAR([GLIB_COMPILE_SCHEMAS], [gio-2.0], [glib_compile_schemas])],
+        [AC_PATH_PROG([GLIB_COMPILE_SCHEMAS], [glib-compile-schemas])])
+  AC_SUBST(GLIB_COMPILE_SCHEMAS)
+  if test "x$GLIB_COMPILE_SCHEMAS" = "x"; then
     ifelse([$2],,[AC_MSG_ERROR([glib-compile-schemas not found.])],[$2])
   else
     ifelse([$1],,[:],[$1])
@@ -42,7 +42,7 @@ mostlyclean-am: clean-gsettings-schemas
 gsettings__enum_file = $(addsuffix .enums.xml,$(gsettings_ENUM_NAMESPACE))
 
 %.gschema.valid: %.gschema.xml $(gsettings__enum_file)
-	$(AM_V_GEN) $(XPL_COMPILE_SCHEMAS) --strict --dry-run $(addprefix --schema-file=,$(gsettings__enum_file)) --schema-file=$< && mkdir -p [$](@D) && touch [$]@
+	$(AM_V_GEN) $(GLIB_COMPILE_SCHEMAS) --strict --dry-run $(addprefix --schema-file=,$(gsettings__enum_file)) --schema-file=$< && mkdir -p [$](@D) && touch [$]@
 
 all-am: $(gsettings_SCHEMAS:.xml=.valid)
 uninstall-am: uninstall-gsettings-schemas
@@ -55,7 +55,7 @@ install-gsettings-schemas: $(gsettings_SCHEMAS) $(gsettings__enum_file)
 	if test -n "$^"; then \
 		test -z "$(gsettingsschemadir)" || $(MKDIR_P) "$(DESTDIR)$(gsettingsschemadir)"; \
 		$(INSTALL_DATA) $^ "$(DESTDIR)$(gsettingsschemadir)"; \
-		test -n "$(GSETTINGS_DISABLE_SCHEMAS_COMPILE)$(DESTDIR)" || $(XPL_COMPILE_SCHEMAS) $(gsettingsschemadir); \
+		test -n "$(GSETTINGS_DISABLE_SCHEMAS_COMPILE)$(DESTDIR)" || $(GLIB_COMPILE_SCHEMAS) $(gsettingsschemadir); \
 	fi
 
 uninstall-gsettings-schemas:
@@ -65,7 +65,7 @@ uninstall-gsettings-schemas:
 	test -n "$$files" || exit 0; \
 	echo " ( cd '\''$(DESTDIR)$(gsettingsschemadir)'\'' && rm -f" $$files ")"; \
 	cd "$(DESTDIR)$(gsettingsschemadir)" && rm -f $$files
-	test -n "$(GSETTINGS_DISABLE_SCHEMAS_COMPILE)$(DESTDIR)" || $(XPL_COMPILE_SCHEMAS) $(gsettingsschemadir)
+	test -n "$(GSETTINGS_DISABLE_SCHEMAS_COMPILE)$(DESTDIR)" || $(GLIB_COMPILE_SCHEMAS) $(gsettingsschemadir)
 
 clean-gsettings-schemas:
 	rm -f $(gsettings_SCHEMAS:.xml=.valid) $(gsettings__enum_file)

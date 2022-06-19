@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * gthread.c: thread related functions
@@ -34,15 +34,15 @@
 #include <glib.h>
 
 void
-xthread_init (xpointer_t init)
+g_thread_init (gpointer init)
 {
   if (init != NULL)
-    g_warning ("xthread_t system no longer supports custom thread implementations.");
+    g_warning ("GThread system no longer supports custom thread implementations.");
 }
 
 void
-xthread_init_with_errorcheck_mutexes (xpointer_t vtable)
+g_thread_init_with_errorcheck_mutexes (gpointer vtable)
 {
-  xassert (vtable == NULL);
-  g_warning ("xthread_t system no longer supports errorcheck mutexes.");
+  g_assert (vtable == NULL);
+  g_warning ("GThread system no longer supports errorcheck mutexes.");
 }

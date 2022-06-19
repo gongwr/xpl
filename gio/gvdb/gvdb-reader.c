@@ -23,31 +23,31 @@
 #include <string.h>
 
 struct _GvdbTable {
-  xbytes_t *bytes;
+  GBytes *bytes;
 
-  const xchar_t *data;
-  xsize_t size;
+  const gchar *data;
+  gsize size;
 
-  xboolean_t byteswapped;
-  xboolean_t trusted;
+  gboolean byteswapped;
+  gboolean trusted;
 
   const guint32_le *bloom_words;
-  xuint32_t n_bloom_words;
-  xuint_t bloom_shift;
+  guint32 n_bloom_words;
+  guint bloom_shift;
 
   const guint32_le *hash_buckets;
-  xuint32_t n_buckets;
+  guint32 n_buckets;
 
   struct gvdb_hash_item *hash_items;
-  xuint32_t n_hash_items;
+  guint32 n_hash_items;
 };
 
-static const xchar_t *
+static const gchar *
 gvdb_table_item_get_key (GvdbTable                   *file,
                          const struct gvdb_hash_item *item,
-                         xsize_t                       *size)
+                         gsize                       *size)
 {
-  xuint32_t start, end;
+  guint32 start, end;
 
   start = guint32_from_le (item->key_start);
   *size = guint16_from_le (item->key_size);
@@ -59,13 +59,13 @@ gvdb_table_item_get_key (GvdbTable                   *file,
   return file->data + start;
 }
 
-static xconstpointer
+static gconstpointer
 gvdb_table_dereference (GvdbTable                 *file,
                         const struct gvdb_pointer *pointer,
-                        xint_t                       alignment,
-                        xsize_t                     *size)
+                        gint                       alignment,
+                        gsize                     *size)
 {
-  xuint32_t start, end;
+  guint32 start, end;
 
   start = guint32_from_le (pointer->start);
   end = guint32_from_le (pointer->end);
@@ -83,9 +83,9 @@ gvdb_table_setup_root (GvdbTable                 *file,
                        const struct gvdb_pointer *pointer)
 {
   const struct gvdb_hash_header *header;
-  xuint32_t n_bloom_words;
-  xuint32_t n_buckets;
-  xsize_t size;
+  guint32 n_bloom_words;
+  guint32 n_buckets;
+  gsize size;
 
   header = gvdb_table_dereference (file, pointer, 4, &size);
 
@@ -101,7 +101,7 @@ gvdb_table_setup_root (GvdbTable                 *file,
   if G_UNLIKELY (n_bloom_words * sizeof (guint32_le) > size)
     return;
 
-  file->bloom_words = (xpointer_t) (header + 1);
+  file->bloom_words = (gpointer) (header + 1);
   size -= n_bloom_words * sizeof (guint32_le);
   file->n_bloom_words = n_bloom_words;
 
@@ -116,20 +116,20 @@ gvdb_table_setup_root (GvdbTable                 *file,
   if G_UNLIKELY (size % sizeof (struct gvdb_hash_item))
     return;
 
-  file->hash_items = (xpointer_t) (file->hash_buckets + n_buckets);
+  file->hash_items = (gpointer) (file->hash_buckets + n_buckets);
   file->n_hash_items = size / sizeof (struct gvdb_hash_item);
 }
 
 /**
  * gvdb_table_new_from_bytes:
- * @bytes: the #xbytes_t with the data
+ * @bytes: the #GBytes with the data
  * @trusted: if the contents of @bytes are trusted
- * @error: %NULL, or a pointer to a %NULL #xerror_t
+ * @error: %NULL, or a pointer to a %NULL #GError
  *
  * Creates a new #GvdbTable from the contents of @bytes.
  *
  * This call can fail if the header contained in @bytes is invalid or if @bytes
- * is empty; if so, %XFILE_ERROR_INVAL will be returned.
+ * is empty; if so, %G_FILE_ERROR_INVAL will be returned.
  *
  * You should call gvdb_table_free() on the return result when you no
  * longer require it.
@@ -137,22 +137,22 @@ gvdb_table_setup_root (GvdbTable                 *file,
  * Returns: a new #GvdbTable
  **/
 GvdbTable *
-gvdb_table_new_from_bytes (xbytes_t    *bytes,
-                           xboolean_t   trusted,
-                           xerror_t   **error)
+gvdb_table_new_from_bytes (GBytes    *bytes,
+                           gboolean   trusted,
+                           GError   **error)
 {
   const struct gvdb_header *header;
   GvdbTable *file;
 
   file = g_slice_new0 (GvdbTable);
-  file->bytes = xbytes_ref (bytes);
-  file->data = xbytes_get_data (bytes, &file->size);
+  file->bytes = g_bytes_ref (bytes);
+  file->data = g_bytes_get_data (bytes, &file->size);
   file->trusted = trusted;
 
   if (file->size < sizeof (struct gvdb_header))
     goto invalid;
 
-  header = (xpointer_t) file->data;
+  header = (gpointer) file->data;
 
   if (header->signature[0] == GVDB_SIGNATURE0 &&
       header->signature[1] == GVDB_SIGNATURE1 &&
@@ -172,9 +172,9 @@ gvdb_table_new_from_bytes (xbytes_t    *bytes,
   return file;
 
 invalid:
-  g_set_error_literal (error, XFILE_ERROR, XFILE_ERROR_INVAL, "invalid gvdb header");
+  g_set_error_literal (error, G_FILE_ERROR, G_FILE_ERROR_INVAL, "invalid gvdb header");
 
-  xbytes_unref (file->bytes);
+  g_bytes_unref (file->bytes);
 
   g_slice_free (GvdbTable, file);
 
@@ -185,47 +185,47 @@ invalid:
  * gvdb_table_new:
  * @filename: a filename
  * @trusted: if the contents of @bytes are trusted
- * @error: %NULL, or a pointer to a %NULL #xerror_t
+ * @error: %NULL, or a pointer to a %NULL #GError
  *
- * Creates a new #GvdbTable using the #xmapped_file_t for @filename as the
- * #xbytes_t.
+ * Creates a new #GvdbTable using the #GMappedFile for @filename as the
+ * #GBytes.
  *
  * This function will fail if the file cannot be opened.
- * In that case, the #xerror_t that is returned will be an error from
- * xmapped_file_new().
+ * In that case, the #GError that is returned will be an error from
+ * g_mapped_file_new().
  *
- * An empty or corrupt file will result in %XFILE_ERROR_INVAL.
+ * An empty or corrupt file will result in %G_FILE_ERROR_INVAL.
  *
  * Returns: a new #GvdbTable
  **/
 GvdbTable *
-gvdb_table_new (const xchar_t  *filename,
-                xboolean_t      trusted,
-                xerror_t      **error)
+gvdb_table_new (const gchar  *filename,
+                gboolean      trusted,
+                GError      **error)
 {
-  xmapped_file_t *mapped;
+  GMappedFile *mapped;
   GvdbTable *table;
-  xbytes_t *bytes;
+  GBytes *bytes;
 
-  mapped = xmapped_file_new (filename, FALSE, error);
+  mapped = g_mapped_file_new (filename, FALSE, error);
   if (!mapped)
     return NULL;
 
-  bytes = xmapped_file_get_bytes (mapped);
+  bytes = g_mapped_file_get_bytes (mapped);
   table = gvdb_table_new_from_bytes (bytes, trusted, error);
-  xmapped_file_unref (mapped);
-  xbytes_unref (bytes);
+  g_mapped_file_unref (mapped);
+  g_bytes_unref (bytes);
 
   g_prefix_error (error, "%s: ", filename);
 
   return table;
 }
 
-static xboolean_t
+static gboolean
 gvdb_table_bloom_filter (GvdbTable *file,
-                          xuint32_t    hash_value)
+                          guint32    hash_value)
 {
-  xuint32_t word, mask;
+  guint32 word, mask;
 
   if (file->n_bloom_words == 0)
     return TRUE;
@@ -237,15 +237,15 @@ gvdb_table_bloom_filter (GvdbTable *file,
   return (guint32_from_le (file->bloom_words[word]) & mask) == mask;
 }
 
-static xboolean_t
+static gboolean
 gvdb_table_check_name (GvdbTable             *file,
                        struct gvdb_hash_item *item,
-                       const xchar_t           *key,
-                       xuint_t                  key_length)
+                       const gchar           *key,
+                       guint                  key_length)
 {
-  const xchar_t *this_key;
-  xsize_t this_size;
-  xuint32_t parent;
+  const gchar *this_key;
+  gsize this_size;
+  guint32 parent;
 
   this_key = gvdb_table_item_get_key (file, item, &this_size);
 
@@ -271,14 +271,14 @@ gvdb_table_check_name (GvdbTable             *file,
 
 static const struct gvdb_hash_item *
 gvdb_table_lookup (GvdbTable   *file,
-                   const xchar_t *key,
-                   xchar_t        type)
+                   const gchar *key,
+                   gchar        type)
 {
-  xuint32_t hash_value = 5381;
-  xuint_t key_length;
-  xuint32_t bucket;
-  xuint32_t lastno;
-  xuint32_t itemno;
+  guint32 hash_value = 5381;
+  guint key_length;
+  guint32 bucket;
+  guint32 lastno;
+  guint32 itemno;
 
   if G_UNLIKELY (file->n_buckets == 0 || file->n_hash_items == 0)
     return NULL;
@@ -311,13 +311,13 @@ gvdb_table_lookup (GvdbTable   *file,
   return NULL;
 }
 
-static xboolean_t
+static gboolean
 gvdb_table_list_from_item (GvdbTable                    *table,
                            const struct gvdb_hash_item  *item,
                            const guint32_le            **list,
-                           xuint_t                        *length)
+                           guint                        *length)
 {
-  xsize_t size;
+  gsize size;
 
   *list = gvdb_table_dereference (table, &item->value.pointer, 4, &size);
 
@@ -346,15 +346,15 @@ gvdb_table_list_from_item (GvdbTable                    *table,
  *
  * Returns: (array length=length): a %NULL-terminated list of strings, of length @length
  **/
-xchar_t **
+gchar **
 gvdb_table_get_names (GvdbTable *table,
-                      xsize_t     *length)
+                      gsize     *length)
 {
-  xchar_t **names;
-  xuint_t n_names;
-  xuint_t filled;
-  xuint_t total;
-  xuint_t i;
+  gchar **names;
+  guint n_names;
+  guint filled;
+  guint total;
+  guint i;
 
   /* We generally proceed by iterating over the list of items in the
    * hash table (in order of appearance) recording them into an array.
@@ -385,7 +385,7 @@ gvdb_table_get_names (GvdbTable *table,
    */
 
   n_names = table->n_hash_items;
-  names = g_new0 (xchar_t *, n_names + 1);
+  names = g_new0 (gchar *, n_names + 1);
 
   /* 'names' starts out all-NULL.  On each pass we record the number
    * of items changed from NULL to non-NULL in 'filled' so we know if we
@@ -403,9 +403,9 @@ gvdb_table_get_names (GvdbTable *table,
       for (i = 0; i < n_names; i++)
         {
           const struct gvdb_hash_item *item = &table->hash_items[i];
-          const xchar_t *name;
-          xsize_t name_length;
-          xuint32_t parent;
+          const gchar *name;
+          gsize name_length;
+          guint32 parent;
 
           /* already got it on a previous pass */
           if (names[i] != NULL)
@@ -420,7 +420,7 @@ gvdb_table_get_names (GvdbTable *table,
 
               if (name != NULL)
                 {
-                  names[i] = xstrndup (name, name_length);
+                  names[i] = g_strndup (name, name_length);
                   filled++;
                 }
             }
@@ -436,9 +436,9 @@ gvdb_table_get_names (GvdbTable *table,
 
               if (name != NULL)
                 {
-                  const xchar_t *parent_name = names[parent];
-                  xsize_t parent_length;
-                  xchar_t *fullname;
+                  const gchar *parent_name = names[parent];
+                  gsize parent_length;
+                  gchar *fullname;
 
                   parent_length = strlen (parent_name);
                   fullname = g_malloc (parent_length + name_length + 1);
@@ -460,17 +460,17 @@ gvdb_table_get_names (GvdbTable *table,
    */
   if G_UNLIKELY (total != n_names)
     {
-      xptr_array_t *fixed_names;
+      GPtrArray *fixed_names;
 
-      fixed_names = xptr_array_sized_new (n_names + 1  /* NULL terminator */);
+      fixed_names = g_ptr_array_sized_new (n_names + 1  /* NULL terminator */);
       for (i = 0; i < n_names; i++)
         if (names[i] != NULL)
-          xptr_array_add (fixed_names, names[i]);
+          g_ptr_array_add (fixed_names, names[i]);
 
       g_free (names);
       n_names = fixed_names->len;
-      xptr_array_add (fixed_names, NULL);
-      names = (xchar_t **) xptr_array_free (fixed_names, FALSE);
+      g_ptr_array_add (fixed_names, NULL);
+      names = (gchar **) g_ptr_array_free (fixed_names, FALSE);
     }
 
   if (length)
@@ -496,20 +496,20 @@ gvdb_table_get_names (GvdbTable *table,
  * itself a path, a value, or another hash table; you are expected to
  * know this for yourself.
  *
- * You should call xstrfreev() on the return result when you no longer
+ * You should call g_strfreev() on the return result when you no longer
  * require it.
  *
  * Returns: a %NULL-terminated string array
  **/
-xchar_t **
+gchar **
 gvdb_table_list (GvdbTable   *file,
-                 const xchar_t *key)
+                 const gchar *key)
 {
   const struct gvdb_hash_item *item;
   const guint32_le *list;
-  xchar_t **strv;
-  xuint_t length;
-  xuint_t i;
+  gchar **strv;
+  guint length;
+  guint i;
 
   if ((item = gvdb_table_lookup (file, key, 'L')) == NULL)
     return NULL;
@@ -517,23 +517,23 @@ gvdb_table_list (GvdbTable   *file,
   if (!gvdb_table_list_from_item (file, item, &list, &length))
     return NULL;
 
-  strv = g_new (xchar_t *, length + 1);
+  strv = g_new (gchar *, length + 1);
   for (i = 0; i < length; i++)
     {
-      xuint32_t itemno = guint32_from_le (list[i]);
+      guint32 itemno = guint32_from_le (list[i]);
 
       if (itemno < file->n_hash_items)
         {
           const struct gvdb_hash_item *item;
-          const xchar_t *string;
-          xsize_t strsize;
+          const gchar *string;
+          gsize strsize;
 
           item = file->hash_items + itemno;
 
           string = gvdb_table_item_get_key (file, item, &strsize);
 
           if (string != NULL)
-            strv[i] = xstrndup (string, strsize);
+            strv[i] = g_strndup (string, strsize);
           else
             strv[i] = g_malloc0 (1);
         }
@@ -558,12 +558,12 @@ gvdb_table_list (GvdbTable   *file,
  *
  * Returns: %TRUE if @key is in the table
  **/
-xboolean_t
+gboolean
 gvdb_table_has_value (GvdbTable    *file,
-                      const xchar_t  *key)
+                      const gchar  *key)
 {
   static const struct gvdb_hash_item *item;
-  xsize_t size;
+  gsize size;
 
   item = gvdb_table_lookup (file, key, 'v');
 
@@ -573,25 +573,25 @@ gvdb_table_has_value (GvdbTable    *file,
   return gvdb_table_dereference (file, &item->value.pointer, 8, &size) != NULL;
 }
 
-static xvariant_t *
+static GVariant *
 gvdb_table_value_from_item (GvdbTable                   *table,
                             const struct gvdb_hash_item *item)
 {
-  xvariant_t *variant, *value;
-  xconstpointer data;
-  xbytes_t *bytes;
-  xsize_t size;
+  GVariant *variant, *value;
+  gconstpointer data;
+  GBytes *bytes;
+  gsize size;
 
   data = gvdb_table_dereference (table, &item->value.pointer, 8, &size);
 
   if G_UNLIKELY (data == NULL)
     return NULL;
 
-  bytes = xbytes_new_from_bytes (table->bytes, ((xchar_t *) data) - table->data, size);
-  variant = xvariant_new_from_bytes (G_VARIANT_TYPE_VARIANT, bytes, table->trusted);
-  value = xvariant_get_variant (variant);
-  xvariant_unref (variant);
-  xbytes_unref (bytes);
+  bytes = g_bytes_new_from_bytes (table->bytes, ((gchar *) data) - table->data, size);
+  variant = g_variant_new_from_bytes (G_VARIANT_TYPE_VARIANT, bytes, table->trusted);
+  value = g_variant_get_variant (variant);
+  g_variant_unref (variant);
+  g_bytes_unref (bytes);
 
   return value;
 }
@@ -604,20 +604,20 @@ gvdb_table_value_from_item (GvdbTable                   *table,
  * Looks up a value named @key in @file.
  *
  * If the value is not found then %NULL is returned.  Otherwise, a new
- * #xvariant_t instance is returned.  The #xvariant_t does not depend on the
+ * #GVariant instance is returned.  The #GVariant does not depend on the
  * continued existence of @file.
  *
- * You should call xvariant_unref() on the return result when you no
+ * You should call g_variant_unref() on the return result when you no
  * longer require it.
  *
- * Returns: a #xvariant_t, or %NULL
+ * Returns: a #GVariant, or %NULL
  **/
-xvariant_t *
+GVariant *
 gvdb_table_get_value (GvdbTable    *file,
-                      const xchar_t  *key)
+                      const gchar  *key)
 {
   const struct gvdb_hash_item *item;
-  xvariant_t *value;
+  GVariant *value;
 
   if ((item = gvdb_table_lookup (file, key, 'v')) == NULL)
     return NULL;
@@ -626,10 +626,10 @@ gvdb_table_get_value (GvdbTable    *file,
 
   if (value && file->byteswapped)
     {
-      xvariant_t *tmp;
+      GVariant *tmp;
 
-      tmp = xvariant_byteswap (value);
-      xvariant_unref (value);
+      tmp = g_variant_byteswap (value);
+      g_variant_unref (value);
       value = tmp;
     }
 
@@ -646,11 +646,11 @@ gvdb_table_get_value (GvdbTable    *file,
  * This call is equivalent to gvdb_table_get_value() except that it
  * never byteswaps the value.
  *
- * Returns: a #xvariant_t, or %NULL
+ * Returns: a #GVariant, or %NULL
  **/
-xvariant_t *
+GVariant *
 gvdb_table_get_raw_value (GvdbTable   *table,
-                          const xchar_t *key)
+                          const gchar *key)
 {
   const struct gvdb_hash_item *item;
 
@@ -682,7 +682,7 @@ gvdb_table_get_raw_value (GvdbTable   *table,
  **/
 GvdbTable *
 gvdb_table_get_table (GvdbTable   *file,
-                      const xchar_t *key)
+                      const gchar *key)
 {
   const struct gvdb_hash_item *item;
   GvdbTable *new;
@@ -693,7 +693,7 @@ gvdb_table_get_table (GvdbTable   *file,
     return NULL;
 
   new = g_slice_new0 (GvdbTable);
-  new->bytes = xbytes_ref (file->bytes);
+  new->bytes = g_bytes_ref (file->bytes);
   new->byteswapped = file->byteswapped;
   new->trusted = file->trusted;
   new->data = file->data;
@@ -713,7 +713,7 @@ gvdb_table_get_table (GvdbTable   *file,
 void
 gvdb_table_free (GvdbTable *file)
 {
-  xbytes_unref (file->bytes);
+  g_bytes_unref (file->bytes);
   g_slice_free (GvdbTable, file);
 }
 
@@ -729,7 +729,7 @@ gvdb_table_free (GvdbTable *file)
  *
  * Returns: %TRUE if @table is still valid
  **/
-xboolean_t
+gboolean
 gvdb_table_is_valid (GvdbTable *table)
 {
   return !!*table->data;

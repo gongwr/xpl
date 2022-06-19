@@ -29,7 +29,7 @@
 
 /**
  * SECTION:gtlspassword
- * @title: xtls_password_t
+ * @title: GTlsPassword
  * @short_description: TLS Passwords for prompting
  * @include: gio/gio.h
  *
@@ -37,7 +37,7 @@
  */
 
 /**
- * xtls_password_t:
+ * GTlsPassword:
  *
  * An abstract interface representing a password used in TLS. Often used in
  * user interaction such as unlocking a key storage token.
@@ -55,25 +55,25 @@ enum
 
 struct _GTlsPasswordPrivate
 {
-  xuchar_t *value;
-  xsize_t length;
-  xdestroy_notify_t destroy;
+  guchar *value;
+  gsize length;
+  GDestroyNotify destroy;
   GTlsPasswordFlags flags;
-  xchar_t *description;
-  xchar_t *warning;
+  gchar *description;
+  gchar *warning;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (xtls_password_t, xtls_password, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (GTlsPassword, g_tls_password, G_TYPE_OBJECT)
 
 static void
-xtls_password_init (xtls_password_t *password)
+g_tls_password_init (GTlsPassword *password)
 {
-  password->priv = xtls_password_get_instance_private (password);
+  password->priv = g_tls_password_get_instance_private (password);
 }
 
-static const xuchar_t *
-xtls_password_real_get_value (xtls_password_t  *password,
-                               xsize_t         *length)
+static const guchar *
+g_tls_password_real_get_value (GTlsPassword  *password,
+                               gsize         *length)
 {
   if (length)
     *length = password->priv->length;
@@ -81,10 +81,10 @@ xtls_password_real_get_value (xtls_password_t  *password,
 }
 
 static void
-xtls_password_real_set_value (xtls_password_t   *password,
-                               xuchar_t         *value,
-                               xssize_t          length,
-                               xdestroy_notify_t  destroy)
+g_tls_password_real_set_value (GTlsPassword   *password,
+                               guchar         *value,
+                               gssize          length,
+                               GDestroyNotify  destroy)
 {
   if (password->priv->destroy)
       (password->priv->destroy) (password->priv->value);
@@ -93,19 +93,19 @@ xtls_password_real_set_value (xtls_password_t   *password,
   password->priv->length = 0;
 
   if (length < 0)
-    length = strlen ((xchar_t*) value);
+    length = strlen ((gchar*) value);
 
   password->priv->value = value;
   password->priv->length = length;
   password->priv->destroy = destroy;
 }
 
-static const xchar_t*
-xtls_password_real_get_default_warning (xtls_password_t  *password)
+static const gchar*
+g_tls_password_real_get_default_warning (GTlsPassword  *password)
 {
   GTlsPasswordFlags flags;
 
-  flags = xtls_password_get_flags (password);
+  flags = g_tls_password_get_flags (password);
 
   if (flags & G_TLS_PASSWORD_FINAL_TRY)
     return _("This is the last chance to enter the password correctly before your access is locked out.");
@@ -120,23 +120,23 @@ xtls_password_real_get_default_warning (xtls_password_t  *password)
 }
 
 static void
-xtls_password_get_property (xobject_t    *object,
-                             xuint_t       prop_id,
-                             xvalue_t     *value,
-                             xparam_spec_t *pspec)
+g_tls_password_get_property (GObject    *object,
+                             guint       prop_id,
+                             GValue     *value,
+                             GParamSpec *pspec)
 {
-  xtls_password_t *password = G_TLS_PASSWORD (object);
+  GTlsPassword *password = G_TLS_PASSWORD (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      xvalue_set_flags (value, xtls_password_get_flags (password));
+      g_value_set_flags (value, g_tls_password_get_flags (password));
       break;
     case PROP_WARNING:
-      xvalue_set_string (value, xtls_password_get_warning (password));
+      g_value_set_string (value, g_tls_password_get_warning (password));
       break;
     case PROP_DESCRIPTION:
-      xvalue_set_string (value, xtls_password_get_description (password));
+      g_value_set_string (value, g_tls_password_get_description (password));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -145,23 +145,23 @@ xtls_password_get_property (xobject_t    *object,
 }
 
 static void
-xtls_password_set_property (xobject_t      *object,
-                             xuint_t         prop_id,
-                             const xvalue_t *value,
-                             xparam_spec_t   *pspec)
+g_tls_password_set_property (GObject      *object,
+                             guint         prop_id,
+                             const GValue *value,
+                             GParamSpec   *pspec)
 {
-  xtls_password_t *password = G_TLS_PASSWORD (object);
+  GTlsPassword *password = G_TLS_PASSWORD (object);
 
   switch (prop_id)
     {
     case PROP_FLAGS:
-      xtls_password_set_flags (password, xvalue_get_flags (value));
+      g_tls_password_set_flags (password, g_value_get_flags (value));
       break;
     case PROP_WARNING:
-      xtls_password_set_warning (password, xvalue_get_string (value));
+      g_tls_password_set_warning (password, g_value_get_string (value));
       break;
     case PROP_DESCRIPTION:
-      xtls_password_set_description (password, xvalue_get_string (value));
+      g_tls_password_set_description (password, g_value_get_string (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -170,79 +170,79 @@ xtls_password_set_property (xobject_t      *object,
 }
 
 static void
-xtls_password_finalize (xobject_t *object)
+g_tls_password_finalize (GObject *object)
 {
-  xtls_password_t *password = G_TLS_PASSWORD (object);
+  GTlsPassword *password = G_TLS_PASSWORD (object);
 
-  xtls_password_real_set_value (password, NULL, 0, NULL);
+  g_tls_password_real_set_value (password, NULL, 0, NULL);
   g_free (password->priv->warning);
   g_free (password->priv->description);
 
-  XOBJECT_CLASS (xtls_password_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_tls_password_parent_class)->finalize (object);
 }
 
 static void
-xtls_password_class_init (GTlsPasswordClass *klass)
+g_tls_password_class_init (GTlsPasswordClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  klass->get_value = xtls_password_real_get_value;
-  klass->set_value = xtls_password_real_set_value;
-  klass->get_default_warning = xtls_password_real_get_default_warning;
+  klass->get_value = g_tls_password_real_get_value;
+  klass->set_value = g_tls_password_real_set_value;
+  klass->get_default_warning = g_tls_password_real_get_default_warning;
 
-  xobject_class->get_property = xtls_password_get_property;
-  xobject_class->set_property = xtls_password_set_property;
-  xobject_class->finalize = xtls_password_finalize;
+  gobject_class->get_property = g_tls_password_get_property;
+  gobject_class->set_property = g_tls_password_set_property;
+  gobject_class->finalize = g_tls_password_finalize;
 
-  xobject_class_install_property (xobject_class, PROP_FLAGS,
-				   xparam_spec_flags ("flags",
+  g_object_class_install_property (gobject_class, PROP_FLAGS,
+				   g_param_spec_flags ("flags",
 						       P_("Flags"),
 						       P_("Flags about the password"),
-						       XTYPE_TLS_PASSWORD_FLAGS,
+						       G_TYPE_TLS_PASSWORD_FLAGS,
 						       G_TLS_PASSWORD_NONE,
-						       XPARAM_READWRITE |
-						       XPARAM_STATIC_STRINGS));
+						       G_PARAM_READWRITE |
+						       G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_DESCRIPTION,
-				   xparam_spec_string ("description",
+  g_object_class_install_property (gobject_class, PROP_DESCRIPTION,
+				   g_param_spec_string ("description",
 							P_("Description"),
 							P_("Description of what the password is for"),
 							NULL,
-							XPARAM_READWRITE |
-							XPARAM_STATIC_STRINGS));
+							G_PARAM_READWRITE |
+							G_PARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (xobject_class, PROP_WARNING,
-				   xparam_spec_string ("warning",
+  g_object_class_install_property (gobject_class, PROP_WARNING,
+				   g_param_spec_string ("warning",
 							P_("Warning"),
 							P_("Warning about the password"),
 							NULL,
-							XPARAM_READWRITE |
-							XPARAM_STATIC_STRINGS));
+							G_PARAM_READWRITE |
+							G_PARAM_STATIC_STRINGS));
 
 }
 
 /**
- * xtls_password_new:
+ * g_tls_password_new:
  * @flags: the password flags
  * @description: description of what the password is for
  *
- * Create a new #xtls_password_t object.
+ * Create a new #GTlsPassword object.
  *
  * Returns: (transfer full): The newly allocated password object
  */
-xtls_password_t *
-xtls_password_new (GTlsPasswordFlags  flags,
-                    const xchar_t       *description)
+GTlsPassword *
+g_tls_password_new (GTlsPasswordFlags  flags,
+                    const gchar       *description)
 {
-  return xobject_new (XTYPE_TLS_PASSWORD,
+  return g_object_new (G_TYPE_TLS_PASSWORD,
                        "flags", flags,
                        "description", description,
                        NULL);
 }
 
 /**
- * xtls_password_get_value: (virtual get_value)
- * @password: a #xtls_password_t object
+ * g_tls_password_get_value: (virtual get_value)
+ * @password: a #GTlsPassword object
  * @length: (optional): location to place the length of the password.
  *
  * Get the password value. If @length is not %NULL then it will be
@@ -255,17 +255,17 @@ xtls_password_new (GTlsPasswordFlags  flags,
  *
  * Since: 2.30
  */
-const xuchar_t *
-xtls_password_get_value (xtls_password_t  *password,
-                          xsize_t         *length)
+const guchar *
+g_tls_password_get_value (GTlsPassword  *password,
+                          gsize         *length)
 {
-  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
+  g_return_val_if_fail (G_IS_TLS_PASSWORD (password), NULL);
   return G_TLS_PASSWORD_GET_CLASS (password)->get_value (password, length);
 }
 
 /**
- * xtls_password_set_value:
- * @password: a #xtls_password_t object
+ * g_tls_password_set_value:
+ * @password: a #GTlsPassword object
  * @value: (array length=length): the new password value
  * @length: the length of the password, or -1
  *
@@ -280,26 +280,26 @@ xtls_password_get_value (xtls_password_t  *password,
  * Since: 2.30
  */
 void
-xtls_password_set_value (xtls_password_t  *password,
-                          const xuchar_t  *value,
-                          xssize_t         length)
+g_tls_password_set_value (GTlsPassword  *password,
+                          const guchar  *value,
+                          gssize         length)
 {
-  g_return_if_fail (X_IS_TLS_PASSWORD (password));
+  g_return_if_fail (G_IS_TLS_PASSWORD (password));
 
   if (length < 0)
     {
-      /* FIXME: xtls_password_set_value_full() doesn’t support unsigned xsize_t */
-      xsize_t length_unsigned = strlen ((xchar_t *) value);
+      /* FIXME: g_tls_password_set_value_full() doesn’t support unsigned gsize */
+      gsize length_unsigned = strlen ((gchar *) value);
       g_return_if_fail (length_unsigned <= G_MAXSSIZE);
-      length = (xssize_t) length_unsigned;
+      length = (gssize) length_unsigned;
     }
 
-  xtls_password_set_value_full (password, g_memdup2 (value, (xsize_t) length), length, g_free);
+  g_tls_password_set_value_full (password, g_memdup2 (value, (gsize) length), length, g_free);
 }
 
 /**
- * xtls_password_set_value_full:
- * @password: a #xtls_password_t object
+ * g_tls_password_set_value_full:
+ * @password: a #GTlsPassword object
  * @value: (array length=length): the value for the password
  * @length: the length of the password, or -1
  * @destroy: (nullable): a function to use to free the password.
@@ -318,19 +318,19 @@ xtls_password_set_value (xtls_password_t  *password,
  * Since: 2.30
  */
 void
-xtls_password_set_value_full (xtls_password_t   *password,
-                               xuchar_t         *value,
-                               xssize_t          length,
-                               xdestroy_notify_t  destroy)
+g_tls_password_set_value_full (GTlsPassword   *password,
+                               guchar         *value,
+                               gssize          length,
+                               GDestroyNotify  destroy)
 {
-  g_return_if_fail (X_IS_TLS_PASSWORD (password));
+  g_return_if_fail (G_IS_TLS_PASSWORD (password));
   G_TLS_PASSWORD_GET_CLASS (password)->set_value (password, value,
                                                   length, destroy);
 }
 
 /**
- * xtls_password_get_flags:
- * @password: a #xtls_password_t object
+ * g_tls_password_get_flags:
+ * @password: a #GTlsPassword object
  *
  * Get flags about the password.
  *
@@ -339,15 +339,15 @@ xtls_password_set_value_full (xtls_password_t   *password,
  * Since: 2.30
  */
 GTlsPasswordFlags
-xtls_password_get_flags (xtls_password_t *password)
+g_tls_password_get_flags (GTlsPassword *password)
 {
-  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_PASSWORD_NONE);
+  g_return_val_if_fail (G_IS_TLS_PASSWORD (password), G_TLS_PASSWORD_NONE);
   return password->priv->flags;
 }
 
 /**
- * xtls_password_set_flags:
- * @password: a #xtls_password_t object
+ * g_tls_password_set_flags:
+ * @password: a #GTlsPassword object
  * @flags: The flags about the password
  *
  * Set flags about the password.
@@ -355,19 +355,19 @@ xtls_password_get_flags (xtls_password_t *password)
  * Since: 2.30
  */
 void
-xtls_password_set_flags (xtls_password_t      *password,
+g_tls_password_set_flags (GTlsPassword      *password,
                           GTlsPasswordFlags  flags)
 {
-  g_return_if_fail (X_IS_TLS_PASSWORD (password));
+  g_return_if_fail (G_IS_TLS_PASSWORD (password));
 
   password->priv->flags = flags;
 
-  xobject_notify (G_OBJECT (password), "flags");
+  g_object_notify (G_OBJECT (password), "flags");
 }
 
 /**
- * xtls_password_get_description:
- * @password: a #xtls_password_t object
+ * g_tls_password_get_description:
+ * @password: a #GTlsPassword object
  *
  * Get a description string about what the password will be used for.
  *
@@ -375,16 +375,16 @@ xtls_password_set_flags (xtls_password_t      *password,
  *
  * Since: 2.30
  */
-const xchar_t*
-xtls_password_get_description (xtls_password_t *password)
+const gchar*
+g_tls_password_get_description (GTlsPassword *password)
 {
-  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
+  g_return_val_if_fail (G_IS_TLS_PASSWORD (password), NULL);
   return password->priv->description;
 }
 
 /**
- * xtls_password_set_description:
- * @password: a #xtls_password_t object
+ * g_tls_password_set_description:
+ * @password: a #GTlsPassword object
  * @description: The description of the password
  *
  * Set a description string about what the password will be used for.
@@ -392,36 +392,36 @@ xtls_password_get_description (xtls_password_t *password)
  * Since: 2.30
  */
 void
-xtls_password_set_description (xtls_password_t      *password,
-                                const xchar_t       *description)
+g_tls_password_set_description (GTlsPassword      *password,
+                                const gchar       *description)
 {
-  xchar_t *copy;
+  gchar *copy;
 
-  g_return_if_fail (X_IS_TLS_PASSWORD (password));
+  g_return_if_fail (G_IS_TLS_PASSWORD (password));
 
-  copy = xstrdup (description);
+  copy = g_strdup (description);
   g_free (password->priv->description);
   password->priv->description = copy;
 
-  xobject_notify (G_OBJECT (password), "description");
+  g_object_notify (G_OBJECT (password), "description");
 }
 
 /**
- * xtls_password_get_warning:
- * @password: a #xtls_password_t object
+ * g_tls_password_get_warning:
+ * @password: a #GTlsPassword object
  *
  * Get a user readable translated warning. Usually this warning is a
  * representation of the password flags returned from
- * xtls_password_get_flags().
+ * g_tls_password_get_flags().
  *
  * Returns: The warning.
  *
  * Since: 2.30
  */
-const xchar_t *
-xtls_password_get_warning (xtls_password_t      *password)
+const gchar *
+g_tls_password_get_warning (GTlsPassword      *password)
 {
-  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
+  g_return_val_if_fail (G_IS_TLS_PASSWORD (password), NULL);
 
   if (password->priv->warning == NULL)
     return G_TLS_PASSWORD_GET_CLASS (password)->get_default_warning (password);
@@ -430,27 +430,27 @@ xtls_password_get_warning (xtls_password_t      *password)
 }
 
 /**
- * xtls_password_set_warning:
- * @password: a #xtls_password_t object
+ * g_tls_password_set_warning:
+ * @password: a #GTlsPassword object
  * @warning: The user readable warning
  *
  * Set a user readable translated warning. Usually this warning is a
  * representation of the password flags returned from
- * xtls_password_get_flags().
+ * g_tls_password_get_flags().
  *
  * Since: 2.30
  */
 void
-xtls_password_set_warning (xtls_password_t      *password,
-                            const xchar_t       *warning)
+g_tls_password_set_warning (GTlsPassword      *password,
+                            const gchar       *warning)
 {
-  xchar_t *copy;
+  gchar *copy;
 
-  g_return_if_fail (X_IS_TLS_PASSWORD (password));
+  g_return_if_fail (G_IS_TLS_PASSWORD (password));
 
-  copy = xstrdup (warning);
+  copy = g_strdup (warning);
   g_free (password->priv->warning);
   password->priv->warning = copy;
 
-  xobject_notify (G_OBJECT (password), "warning");
+  g_object_notify (G_OBJECT (password), "warning");
 }

@@ -38,7 +38,7 @@ int main()
   signal (SIGALRM, SIG_DFL);
   alarm (5);
 #endif
-  /* test_t on denormalized numbers.  */
+  /* Test on denormalized numbers.  */
   for (i = 1, x = 1.0; i >= DBL_MIN_EXP; i--, x *= 0.5)
     ;
   if (x > 0.0)
@@ -50,7 +50,7 @@ int main()
       if (y != 0.5)
         result |= 1;
     }
-  /* test_t on infinite numbers.  */
+  /* Test on infinite numbers.  */
   x = 1.0 / zero;
   {
     int exp;
@@ -58,7 +58,7 @@ int main()
     if (y != x)
       result |= 2;
   }
-  /* test_t on negative zero.  */
+  /* Test on negative zero.  */
   x = minus_zero;
   {
     int exp;

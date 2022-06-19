@@ -26,22 +26,22 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_UNIX_SOCKET_ADDRESS         (g_unix_socket_address_get_type ())
-#define G_UNIX_SOCKET_ADDRESS(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_SOCKET_ADDRESS, GUnixSocketAddress))
-#define G_UNIX_SOCKET_ADDRESS_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_SOCKET_ADDRESS, GUnixSocketAddressClass))
-#define X_IS_UNIX_SOCKET_ADDRESS(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_SOCKET_ADDRESS))
-#define X_IS_UNIX_SOCKET_ADDRESS_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_SOCKET_ADDRESS))
-#define G_UNIX_SOCKET_ADDRESS_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_UNIX_SOCKET_ADDRESS, GUnixSocketAddressClass))
+#define G_TYPE_UNIX_SOCKET_ADDRESS         (g_unix_socket_address_get_type ())
+#define G_UNIX_SOCKET_ADDRESS(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_UNIX_SOCKET_ADDRESS, GUnixSocketAddress))
+#define G_UNIX_SOCKET_ADDRESS_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_UNIX_SOCKET_ADDRESS, GUnixSocketAddressClass))
+#define G_IS_UNIX_SOCKET_ADDRESS(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_UNIX_SOCKET_ADDRESS))
+#define G_IS_UNIX_SOCKET_ADDRESS_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_UNIX_SOCKET_ADDRESS))
+#define G_UNIX_SOCKET_ADDRESS_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_UNIX_SOCKET_ADDRESS, GUnixSocketAddressClass))
 
 typedef struct _GUnixSocketAddress        GUnixSocketAddress;
 typedef struct _GUnixSocketAddressClass   GUnixSocketAddressClass;
 typedef struct _GUnixSocketAddressPrivate GUnixSocketAddressPrivate;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixSocketAddress, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixSocketAddress, g_object_unref)
 
 struct _GUnixSocketAddress
 {
-  xsocket_address_t parent_instance;
+  GSocketAddress parent_instance;
 
   /*< private >*/
   GUnixSocketAddressPrivate *priv;
@@ -52,29 +52,29 @@ struct _GUnixSocketAddressClass
   GSocketAddressClass parent_class;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t           g_unix_socket_address_get_type    (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType           g_unix_socket_address_get_type    (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t *g_unix_socket_address_new             (const xchar_t        *path);
-XPL_DEPRECATED_FOR(g_unix_socket_address_new_with_type)
-xsocket_address_t *g_unix_socket_address_new_abstract    (const xchar_t        *path,
-                                                       xint_t                path_len);
-XPL_AVAILABLE_IN_ALL
-xsocket_address_t *g_unix_socket_address_new_with_type   (const xchar_t            *path,
-                                                       xint_t                    path_len,
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress *g_unix_socket_address_new             (const gchar        *path);
+GLIB_DEPRECATED_FOR(g_unix_socket_address_new_with_type)
+GSocketAddress *g_unix_socket_address_new_abstract    (const gchar        *path,
+                                                       gint                path_len);
+GLIB_AVAILABLE_IN_ALL
+GSocketAddress *g_unix_socket_address_new_with_type   (const gchar            *path,
+                                                       gint                    path_len,
                                                        GUnixSocketAddressType  type);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 const char *    g_unix_socket_address_get_path        (GUnixSocketAddress *address);
-XPL_AVAILABLE_IN_ALL
-xsize_t           g_unix_socket_address_get_path_len    (GUnixSocketAddress *address);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
+gsize           g_unix_socket_address_get_path_len    (GUnixSocketAddress *address);
+GLIB_AVAILABLE_IN_ALL
 GUnixSocketAddressType g_unix_socket_address_get_address_type (GUnixSocketAddress *address);
-XPL_DEPRECATED
-xboolean_t        g_unix_socket_address_get_is_abstract (GUnixSocketAddress *address);
+GLIB_DEPRECATED
+gboolean        g_unix_socket_address_get_is_abstract (GUnixSocketAddress *address);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t        g_unix_socket_address_abstract_names_supported (void);
+GLIB_AVAILABLE_IN_ALL
+gboolean        g_unix_socket_address_abstract_names_supported (void);
 
 G_END_DECLS
 

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_UTILS_H__
 #define __G_UTILS_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -47,26 +47,26 @@ G_BEGIN_DECLS
 #  endif /* va_list is a pointer */
 #endif /* !G_VA_COPY */
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_user_name        (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_real_name        (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_home_dir         (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_tmp_dir          (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_host_name	     (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_prgname          (void);
-XPL_AVAILABLE_IN_ALL
-void                  g_set_prgname          (const xchar_t *prgname);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_application_name (void);
-XPL_AVAILABLE_IN_ALL
-void                  g_set_application_name (const xchar_t *application_name);
-XPL_AVAILABLE_IN_2_64
-xchar_t *               g_get_os_info          (const xchar_t *key_name);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_user_name        (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_real_name        (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_home_dir         (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_tmp_dir          (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_host_name	     (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_prgname          (void);
+GLIB_AVAILABLE_IN_ALL
+void                  g_set_prgname          (const gchar *prgname);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_application_name (void);
+GLIB_AVAILABLE_IN_ALL
+void                  g_set_application_name (const gchar *application_name);
+GLIB_AVAILABLE_IN_2_64
+gchar *               g_get_os_info          (const gchar *key_name);
 
 /**
  * G_OS_INFO_KEY_NAME:
@@ -76,29 +76,29 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_NAME \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "NAME"
 
 /**
  * G_OS_INFO_KEY_PRETTY_NAME:
  *
- * A key to get the name of the operating system in a format suitable for presentation to the user, e.g. "YoYoOS foo_t"
+ * A key to get the name of the operating system in a format suitable for presentation to the user, e.g. "YoYoOS Foo"
  *
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_PRETTY_NAME \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "PRETTY_NAME"
 
 /**
  * G_OS_INFO_KEY_VERSION:
  *
- * A key to get the operating system version suitable for presentation to the user, e.g. "42 (foo_t)"
+ * A key to get the operating system version suitable for presentation to the user, e.g. "42 (Foo)"
  *
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_VERSION \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "VERSION"
 
 /**
@@ -109,7 +109,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_VERSION_CODENAME \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "VERSION_CODENAME"
 
 /**
@@ -120,7 +120,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_VERSION_ID \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "VERSION_ID"
 
 /**
@@ -131,7 +131,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_ID \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "ID"
 
 /**
@@ -142,7 +142,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_HOME_URL \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "HOME_URL"
 
 /**
@@ -153,7 +153,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_DOCUMENTATION_URL \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "DOCUMENTATION_URL"
 
 /**
@@ -164,7 +164,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_SUPPORT_URL \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "SUPPORT_URL"
 
 /**
@@ -175,7 +175,7 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_BUG_REPORT_URL \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "BUG_REPORT_URL"
 
 /**
@@ -186,26 +186,26 @@ xchar_t *               g_get_os_info          (const xchar_t *key_name);
  * Since: 2.64
  */
 #define G_OS_INFO_KEY_PRIVACY_POLICY_URL \
-    XPL_AVAILABLE_MACRO_IN_2_64 \
+    GLIB_AVAILABLE_MACRO_IN_2_64 \
     "PRIVACY_POLICY_URL"
 
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 void      g_reload_user_special_dirs_cache     (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_user_data_dir      (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_user_config_dir    (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_get_user_cache_dir     (void);
-XPL_AVAILABLE_IN_2_72
-const xchar_t *         g_get_user_state_dir     (void);
-XPL_AVAILABLE_IN_ALL
-const xchar_t * const * g_get_system_data_dirs   (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_user_data_dir      (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_user_config_dir    (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_get_user_cache_dir     (void);
+GLIB_AVAILABLE_IN_2_72
+const gchar *         g_get_user_state_dir     (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar * const * g_get_system_data_dirs   (void);
 
 #ifdef G_OS_WIN32
 /* This function is not part of the public GLib API */
-XPL_AVAILABLE_IN_ALL
-const xchar_t * const * g_win32_get_system_data_dirs_for_module (void (*address_of_function)(void));
+GLIB_AVAILABLE_IN_ALL
+const gchar * const * g_win32_get_system_data_dirs_for_module (void (*address_of_function)(void));
 #endif
 
 #if defined (G_OS_WIN32) && defined (G_CAN_INLINE)
@@ -213,7 +213,7 @@ const xchar_t * const * g_win32_get_system_data_dirs_for_module (void (*address_
  * g_get_system_data_dirs() in your code, never mind that that is
  * actually a macro and you will in fact call this inline function.
  */
-static inline const xchar_t * const *
+static inline const gchar * const *
 _g_win32_get_system_data_dirs (void)
 {
   return g_win32_get_system_data_dirs_for_module ((void (*)(void)) &_g_win32_get_system_data_dirs);
@@ -221,11 +221,11 @@ _g_win32_get_system_data_dirs (void)
 #define g_get_system_data_dirs _g_win32_get_system_data_dirs
 #endif
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t * const * g_get_system_config_dirs (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar * const * g_get_system_config_dirs (void);
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t * g_get_user_runtime_dir (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar * g_get_user_runtime_dir (void);
 
 /**
  * GUserDirectory:
@@ -262,8 +262,8 @@ typedef enum {
   G_USER_N_DIRECTORIES
 } GUserDirectory;
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t * g_get_user_special_dir (GUserDirectory directory);
+GLIB_AVAILABLE_IN_ALL
+const gchar * g_get_user_special_dir (GUserDirectory directory);
 
 /**
  * GDebugKey:
@@ -271,36 +271,36 @@ const xchar_t * g_get_user_special_dir (GUserDirectory directory);
  * @value: the flag
  *
  * Associates a string with a bit flag.
- * Used in g_parse_debuxstring().
+ * Used in g_parse_debug_string().
  */
 typedef struct _GDebugKey GDebugKey;
 struct _GDebugKey
 {
-  const xchar_t *key;
-  xuint_t	       value;
+  const gchar *key;
+  guint	       value;
 };
 
 /* Miscellaneous utility functions
  */
-XPL_AVAILABLE_IN_ALL
-xuint_t                 g_parse_debuxstring (const xchar_t     *string,
+GLIB_AVAILABLE_IN_ALL
+guint                 g_parse_debug_string (const gchar     *string,
 					    const GDebugKey *keys,
-					    xuint_t            nkeys);
+					    guint            nkeys);
 
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_snprintf           (xchar_t       *string,
-					    xulong_t       n,
-					    xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_snprintf           (gchar       *string,
+					    gulong       n,
+					    gchar const *format,
 					    ...) G_GNUC_PRINTF (3, 4);
-XPL_AVAILABLE_IN_ALL
-xint_t                  g_vsnprintf          (xchar_t       *string,
-					    xulong_t       n,
-					    xchar_t const *format,
+GLIB_AVAILABLE_IN_ALL
+gint                  g_vsnprintf          (gchar       *string,
+					    gulong       n,
+					    gchar const *format,
 					    va_list      args)
 					    G_GNUC_PRINTF(3, 0);
 
-XPL_AVAILABLE_IN_ALL
-void                  g_nullify_pointer    (xpointer_t    *nullify_location);
+GLIB_AVAILABLE_IN_ALL
+void                  g_nullify_pointer    (gpointer    *nullify_location);
 
 typedef enum
 {
@@ -310,18 +310,18 @@ typedef enum
   G_FORMAT_SIZE_BITS        = 1 << 2
 } GFormatSizeFlags;
 
-XPL_AVAILABLE_IN_2_30
-xchar_t *g_format_size_full   (xuint64_t          size,
+GLIB_AVAILABLE_IN_2_30
+gchar *g_format_size_full   (guint64          size,
                              GFormatSizeFlags flags);
-XPL_AVAILABLE_IN_2_30
-xchar_t *g_format_size        (xuint64_t          size);
+GLIB_AVAILABLE_IN_2_30
+gchar *g_format_size        (guint64          size);
 
-XPL_DEPRECATED_IN_2_30_FOR(g_format_size)
-xchar_t *g_format_size_for_display (xoffset_t size);
+GLIB_DEPRECATED_IN_2_30_FOR(g_format_size)
+gchar *g_format_size_for_display (goffset size);
 
-#define g_ATEXIT(proc)	(atexit (proc)) XPL_DEPRECATED_MACRO_IN_2_32
+#define g_ATEXIT(proc)	(atexit (proc)) GLIB_DEPRECATED_MACRO_IN_2_32
 #define g_memmove(dest,src,len) \
-  G_STMT_START { memmove ((dest), (src), (len)); } G_STMT_END  XPL_DEPRECATED_MACRO_IN_2_40_FOR(memmove)
+  G_STMT_START { memmove ((dest), (src), (len)); } G_STMT_END  GLIB_DEPRECATED_MACRO_IN_2_40_FOR(memmove)
 
 /**
  * GVoidFunc:
@@ -330,11 +330,11 @@ xchar_t *g_format_size_for_display (xoffset_t size);
  * and has no return value. It is used to specify the type
  * function passed to g_atexit().
  */
-typedef void (*GVoidFunc) (void) XPL_DEPRECATED_TYPE_IN_2_32;
-#define ATEXIT(proc) g_ATEXIT(proc) XPL_DEPRECATED_MACRO_IN_2_32
+typedef void (*GVoidFunc) (void) GLIB_DEPRECATED_TYPE_IN_2_32;
+#define ATEXIT(proc) g_ATEXIT(proc) GLIB_DEPRECATED_MACRO_IN_2_32
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-XPL_DEPRECATED
+GLIB_DEPRECATED
 void	g_atexit		(GVoidFunc    func);
 G_GNUC_END_IGNORE_DEPRECATIONS
 
@@ -348,13 +348,13 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 #if (defined(__MINGW_H) && !defined(_STDLIB_H_)) || (defined(_MSC_VER) && !defined(_INC_STDLIB))
 int atexit (void (*)(void));
 #endif
-#define g_atexit(func) atexit(func) XPL_DEPRECATED_MACRO_IN_2_32
+#define g_atexit(func) atexit(func) GLIB_DEPRECATED_MACRO_IN_2_32
 #endif
 
 
 /* Look for an executable in PATH, following execvp() rules */
-XPL_AVAILABLE_IN_ALL
-xchar_t*  g_find_program_in_path  (const xchar_t *program);
+GLIB_AVAILABLE_IN_ALL
+gchar*  g_find_program_in_path  (const gchar *program);
 
 /* Bit tests
  *
@@ -371,22 +371,22 @@ xchar_t*  g_find_program_in_path  (const xchar_t *program);
 #define g_bit_nth_msf(mask, nth_bit) g_bit_nth_msf_impl(mask, nth_bit)
 #define g_bit_storage(number)        g_bit_storage_impl(number)
 
-XPL_AVAILABLE_IN_ALL
-xint_t    (g_bit_nth_lsf)         (xulong_t mask,
-                                 xint_t   nth_bit);
-XPL_AVAILABLE_IN_ALL
-xint_t    (g_bit_nth_msf)         (xulong_t mask,
-                                 xint_t   nth_bit);
-XPL_AVAILABLE_IN_ALL
-xuint_t   (g_bit_storage)         (xulong_t number);
+GLIB_AVAILABLE_IN_ALL
+gint    (g_bit_nth_lsf)         (gulong mask,
+                                 gint   nth_bit);
+GLIB_AVAILABLE_IN_ALL
+gint    (g_bit_nth_msf)         (gulong mask,
+                                 gint   nth_bit);
+GLIB_AVAILABLE_IN_ALL
+guint   (g_bit_storage)         (gulong number);
 
-static inline xint_t
-g_bit_nth_lsf_impl (xulong_t mask,
-                    xint_t   nth_bit)
+static inline gint
+g_bit_nth_lsf_impl (gulong mask,
+                    gint   nth_bit)
 {
   if (G_UNLIKELY (nth_bit < -1))
     nth_bit = -1;
-  while (nth_bit < ((XPL_SIZEOF_LONG * 8) - 1))
+  while (nth_bit < ((GLIB_SIZEOF_LONG * 8) - 1))
     {
       nth_bit++;
       if (mask & (1UL << nth_bit))
@@ -395,12 +395,12 @@ g_bit_nth_lsf_impl (xulong_t mask,
   return -1;
 }
 
-static inline xint_t
-g_bit_nth_msf_impl (xulong_t mask,
-                    xint_t   nth_bit)
+static inline gint
+g_bit_nth_msf_impl (gulong mask,
+                    gint   nth_bit)
 {
-  if (nth_bit < 0 || G_UNLIKELY (nth_bit > XPL_SIZEOF_LONG * 8))
-    nth_bit = XPL_SIZEOF_LONG * 8;
+  if (nth_bit < 0 || G_UNLIKELY (nth_bit > GLIB_SIZEOF_LONG * 8))
+    nth_bit = GLIB_SIZEOF_LONG * 8;
   while (nth_bit > 0)
     {
       nth_bit--;
@@ -410,14 +410,14 @@ g_bit_nth_msf_impl (xulong_t mask,
   return -1;
 }
 
-static inline xuint_t
-g_bit_storage_impl (xulong_t number)
+static inline guint
+g_bit_storage_impl (gulong number)
 {
 #if defined(__GNUC__) && (__GNUC__ >= 4) && defined(__OPTIMIZE__)
   return G_LIKELY (number) ?
-           ((XPL_SIZEOF_LONG * 8U - 1) ^ (xuint_t) __builtin_clzl(number)) + 1 : 1;
+           ((GLIB_SIZEOF_LONG * 8U - 1) ^ (guint) __builtin_clzl(number)) + 1 : 1;
 #else
-  xuint_t n_bits = 0;
+  guint n_bits = 0;
 
   do
     {
@@ -430,12 +430,12 @@ g_bit_storage_impl (xulong_t number)
 }
 
 /* Crashes the program. */
-#if XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_50
+#if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_50
 #ifndef G_OS_WIN32
 #  include <stdlib.h>
 #  define g_abort() abort ()
 #else
-XPL_AVAILABLE_IN_2_50
+GLIB_AVAILABLE_IN_2_50
 G_NORETURN void g_abort (void) G_ANALYZER_NORETURN;
 #endif
 #endif
@@ -457,8 +457,8 @@ G_NORETURN void g_abort (void) G_ANALYZER_NORETURN;
  * On non-Windows platforms, expands to nothing.
  */
 
-#ifndef XPLATFORM_WIN32
-# define G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name) XPL_DEPRECATED_MACRO_IN_2_26
+#ifndef G_PLATFORM_WIN32
+# define G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name) GLIB_DEPRECATED_MACRO_IN_2_26
 #else
 # define G_WIN32_DLLMAIN_FOR_DLL_NAME(static, dll_name)			\
 static char *dll_name;							\
@@ -474,15 +474,15 @@ DllMain (HINSTANCE hinstDLL,						\
     {									\
     case DLL_PROCESS_ATTACH:						\
       GetModuleFileNameW ((HMODULE) hinstDLL, wcbfr, G_N_ELEMENTS (wcbfr)); \
-      tem = xutf16_to_utf8 (wcbfr, -1, NULL, NULL, NULL);		\
+      tem = g_utf16_to_utf8 (wcbfr, -1, NULL, NULL, NULL);		\
       dll_name = g_path_get_basename (tem);				\
       g_free (tem);							\
       break;								\
     }									\
 									\
   return TRUE;								\
-} XPL_DEPRECATED_MACRO_IN_2_26
-#endif /* XPLATFORM_WIN32 */
+} GLIB_DEPRECATED_MACRO_IN_2_26
+#endif /* G_PLATFORM_WIN32 */
 
 G_END_DECLS
 

@@ -19,7 +19,7 @@
 #ifndef __G_ERROR_H__
 #define __G_ERROR_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -30,32 +30,32 @@
 G_BEGIN_DECLS
 
 /**
- * xerror_t:
- * @domain: error domain, e.g. %XFILE_ERROR
- * @code: error code, e.g. %XFILE_ERROR_NOENT
+ * GError:
+ * @domain: error domain, e.g. %G_FILE_ERROR
+ * @code: error code, e.g. %G_FILE_ERROR_NOENT
  * @message: human-readable informative error message
  *
- * The `xerror_t` structure contains information about
+ * The `GError` structure contains information about
  * an error that has occurred.
  */
-typedef struct _GError xerror_t;
+typedef struct _GError GError;
 
 struct _GError
 {
-  xquark       domain;
-  xint_t         code;
-  xchar_t       *message;
+  GQuark       domain;
+  gint         code;
+  gchar       *message;
 };
 
 /**
  * G_DEFINE_EXTENDED_ERROR:
- * @ErrorType: name to return a #xquark for
+ * @ErrorType: name to return a #GQuark for
  * @error_type: prefix for the function name
  *
  * A convenience macro which defines two functions. First, returning
- * the #xquark for the extended error type @ErrorType; it is called
+ * the #GQuark for the extended error type @ErrorType; it is called
  * `error_type_quark()`. Second, returning the private data from a
- * passed #xerror_t; it is called `error_type_get_private()`.
+ * passed #GError; it is called `error_type_get_private()`.
  *
  * For this macro to work, a type named `ErrorTypePrivate` should be
  * defined, `error_type_private_init()`, `error_type_private_copy()`
@@ -63,34 +63,34 @@ struct _GError
  * declared or defined. The functions should be similar to
  * #GErrorInitFunc, #GErrorCopyFunc and #GErrorClearFunc,
  * respectively, but they should receive the private data type instead
- * of #xerror_t.
+ * of #GError.
  *
- * See [Extended #xerror_t Domains][gerror-extended-domains] for an example.
+ * See [Extended #GError Domains][gerror-extended-domains] for an example.
  *
  * Since: 2.68
  */
 #define G_DEFINE_EXTENDED_ERROR(ErrorType, error_type)                  \
 static inline ErrorType ## Private *                                    \
-error_type ## _get_private (const xerror_t *error)                        \
+error_type ## _get_private (const GError *error)                        \
 {                                                                       \
   /* Copied from gtype.c (STRUCT_ALIGNMENT and ALIGN_STRUCT macros). */ \
-  const xsize_t sa = 2 * sizeof (xsize_t);                                  \
-  const xsize_t as = (sizeof (ErrorType ## Private) + (sa - 1)) & -sa;    \
-  xreturn_val_if_fail (error != NULL, NULL);                           \
-  xreturn_val_if_fail (error->domain == error_type ## _quark (), NULL); \
-  return (ErrorType ## Private *) (((xuint8_t *)error) - as); \
+  const gsize sa = 2 * sizeof (gsize);                                  \
+  const gsize as = (sizeof (ErrorType ## Private) + (sa - 1)) & -sa;    \
+  g_return_val_if_fail (error != NULL, NULL);                           \
+  g_return_val_if_fail (error->domain == error_type ## _quark (), NULL); \
+  return (ErrorType ## Private *) (((guint8 *)error) - as); \
 }                                                                       \
                                                                         \
 static void                                                             \
-xerror_with_ ## error_type ## _private_init (xerror_t *error)            \
+g_error_with_ ## error_type ## _private_init (GError *error)            \
 {                                                                       \
   ErrorType ## Private *priv = error_type ## _get_private (error);      \
   error_type ## _private_init (priv);                                   \
 }                                                                       \
                                                                         \
 static void                                                             \
-xerror_with_ ## error_type ## _private_copy (const xerror_t *src_error,  \
-                                              xerror_t       *dest_error) \
+g_error_with_ ## error_type ## _private_copy (const GError *src_error,  \
+                                              GError       *dest_error) \
 {                                                                       \
   const ErrorType ## Private *src_priv = error_type ## _get_private (src_error);  \
   ErrorType ## Private *dest_priv = error_type ## _get_private (dest_error); \
@@ -98,25 +98,25 @@ xerror_with_ ## error_type ## _private_copy (const xerror_t *src_error,  \
 }                                                                       \
                                                                         \
 static void                                                             \
-xerror_with_ ## error_type ## _private_clear (xerror_t *error)           \
+g_error_with_ ## error_type ## _private_clear (GError *error)           \
 {                                                                       \
   ErrorType ## Private *priv = error_type ## _get_private (error);      \
   error_type ## _private_clear (priv);                                  \
 }                                                                       \
                                                                         \
-xquark                                                                  \
+GQuark                                                                  \
 error_type ## _quark (void)                                             \
 {                                                                       \
-  static xquark q;                                                      \
-  static xsize_t initialized = 0;                                         \
+  static GQuark q;                                                      \
+  static gsize initialized = 0;                                         \
                                                                         \
   if (g_once_init_enter (&initialized))                                 \
     {                                                                   \
-      q = xerror_domain_register_static (#ErrorType,                   \
+      q = g_error_domain_register_static (#ErrorType,                   \
                                           sizeof (ErrorType ## Private), \
-                                          xerror_with_ ## error_type ## _private_init, \
-                                          xerror_with_ ## error_type ## _private_copy, \
-                                          xerror_with_ ## error_type ## _private_clear); \
+                                          g_error_with_ ## error_type ## _private_init, \
+                                          g_error_with_ ## error_type ## _private_copy, \
+                                          g_error_with_ ## error_type ## _private_clear); \
       g_once_init_leave (&initialized, 1);                              \
     }                                                                   \
                                                                         \
@@ -137,7 +137,7 @@ error_type ## _quark (void)                                             \
  *
  * Since: 2.68
  */
-typedef void (*GErrorInitFunc) (xerror_t *error);
+typedef void (*GErrorInitFunc) (GError *error);
 
 /**
  * GErrorCopyFunc:
@@ -155,7 +155,7 @@ typedef void (*GErrorInitFunc) (xerror_t *error);
  *
  * Since: 2.68
  */
-typedef void (*GErrorCopyFunc) (const xerror_t *src_error, xerror_t *dest_error);
+typedef void (*GErrorCopyFunc) (const GError *src_error, GError *dest_error);
 
 /**
  * GErrorClearFunc:
@@ -170,90 +170,90 @@ typedef void (*GErrorCopyFunc) (const xerror_t *src_error, xerror_t *dest_error)
  *
  * Since: 2.68
  */
-typedef void (*GErrorClearFunc) (xerror_t *error);
+typedef void (*GErrorClearFunc) (GError *error);
 
-XPL_AVAILABLE_IN_2_68
-xquark   xerror_domain_register_static (const char        *error_type_name,
-                                         xsize_t              error_type_private_size,
+GLIB_AVAILABLE_IN_2_68
+GQuark   g_error_domain_register_static (const char        *error_type_name,
+                                         gsize              error_type_private_size,
                                          GErrorInitFunc     error_type_init,
                                          GErrorCopyFunc     error_type_copy,
                                          GErrorClearFunc    error_type_clear);
 
-XPL_AVAILABLE_IN_2_68
-xquark   xerror_domain_register (const char        *error_type_name,
-                                  xsize_t              error_type_private_size,
+GLIB_AVAILABLE_IN_2_68
+GQuark   g_error_domain_register (const char        *error_type_name,
+                                  gsize              error_type_private_size,
                                   GErrorInitFunc     error_type_init,
                                   GErrorCopyFunc     error_type_copy,
                                   GErrorClearFunc    error_type_clear);
 
-XPL_AVAILABLE_IN_ALL
-xerror_t*  xerror_new           (xquark         domain,
-                                xint_t           code,
-                                const xchar_t   *format,
+GLIB_AVAILABLE_IN_ALL
+GError*  g_error_new           (GQuark         domain,
+                                gint           code,
+                                const gchar   *format,
                                 ...) G_GNUC_PRINTF (3, 4);
 
-XPL_AVAILABLE_IN_ALL
-xerror_t*  xerror_new_literal   (xquark         domain,
-                                xint_t           code,
-                                const xchar_t   *message);
-XPL_AVAILABLE_IN_ALL
-xerror_t*  xerror_new_valist    (xquark         domain,
-                                xint_t           code,
-                                const xchar_t   *format,
+GLIB_AVAILABLE_IN_ALL
+GError*  g_error_new_literal   (GQuark         domain,
+                                gint           code,
+                                const gchar   *message);
+GLIB_AVAILABLE_IN_ALL
+GError*  g_error_new_valist    (GQuark         domain,
+                                gint           code,
+                                const gchar   *format,
                                 va_list        args) G_GNUC_PRINTF(3, 0);
 
-XPL_AVAILABLE_IN_ALL
-void     xerror_free          (xerror_t        *error);
-XPL_AVAILABLE_IN_ALL
-xerror_t*  xerror_copy          (const xerror_t  *error);
+GLIB_AVAILABLE_IN_ALL
+void     g_error_free          (GError        *error);
+GLIB_AVAILABLE_IN_ALL
+GError*  g_error_copy          (const GError  *error);
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t xerror_matches       (const xerror_t  *error,
-                                xquark         domain,
-                                xint_t           code);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_error_matches       (const GError  *error,
+                                GQuark         domain,
+                                gint           code);
 
-/* if (err) *err = xerror_new(domain, code, format, ...), also has
+/* if (err) *err = g_error_new(domain, code, format, ...), also has
  * some sanity checks.
  */
-XPL_AVAILABLE_IN_ALL
-void     g_set_error           (xerror_t       **err,
-                                xquark         domain,
-                                xint_t           code,
-                                const xchar_t   *format,
+GLIB_AVAILABLE_IN_ALL
+void     g_set_error           (GError       **err,
+                                GQuark         domain,
+                                gint           code,
+                                const gchar   *format,
                                 ...) G_GNUC_PRINTF (4, 5);
 
-XPL_AVAILABLE_IN_ALL
-void     g_set_error_literal   (xerror_t       **err,
-                                xquark         domain,
-                                xint_t           code,
-                                const xchar_t   *message);
+GLIB_AVAILABLE_IN_ALL
+void     g_set_error_literal   (GError       **err,
+                                GQuark         domain,
+                                gint           code,
+                                const gchar   *message);
 
 /* if (dest) *dest = src; also has some sanity checks.
  */
-XPL_AVAILABLE_IN_ALL
-void     g_propagate_error     (xerror_t       **dest,
-				xerror_t        *src);
+GLIB_AVAILABLE_IN_ALL
+void     g_propagate_error     (GError       **dest,
+				GError        *src);
 
-/* if (err && *err) { xerror_free(*err); *err = NULL; } */
-XPL_AVAILABLE_IN_ALL
-void     g_clear_error         (xerror_t       **err);
+/* if (err && *err) { g_error_free(*err); *err = NULL; } */
+GLIB_AVAILABLE_IN_ALL
+void     g_clear_error         (GError       **err);
 
 /* if (err) prefix the formatted string to the ->message */
-XPL_AVAILABLE_IN_ALL
-void     g_prefix_error               (xerror_t       **err,
-                                       const xchar_t   *format,
+GLIB_AVAILABLE_IN_ALL
+void     g_prefix_error               (GError       **err,
+                                       const gchar   *format,
                                        ...) G_GNUC_PRINTF (2, 3);
 
 /* if (err) prefix the string to the ->message */
-XPL_AVAILABLE_IN_2_70
-void     g_prefix_error_literal       (xerror_t       **err,
-                                       const xchar_t   *prefix);
+GLIB_AVAILABLE_IN_2_70
+void     g_prefix_error_literal       (GError       **err,
+                                       const gchar   *prefix);
 
-/* g_propagate_error then xerror_prefix on dest */
-XPL_AVAILABLE_IN_ALL
-void     g_propagate_prefixed_error   (xerror_t       **dest,
-                                       xerror_t        *src,
-                                       const xchar_t   *format,
+/* g_propagate_error then g_error_prefix on dest */
+GLIB_AVAILABLE_IN_ALL
+void     g_propagate_prefixed_error   (GError       **dest,
+                                       GError        *src,
+                                       const gchar   *format,
                                        ...) G_GNUC_PRINTF (3, 4);
 
 G_END_DECLS

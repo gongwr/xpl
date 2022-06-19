@@ -28,19 +28,19 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_PROPERTY_ACTION                              (g_property_action_get_type ())
-#define G_PROPERTY_ACTION(inst)                             (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_PROPERTY_ACTION, xproperty_action))
-#define X_IS_PROPERTY_ACTION(inst)                          (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_PROPERTY_ACTION))
+#define G_TYPE_PROPERTY_ACTION                              (g_property_action_get_type ())
+#define G_PROPERTY_ACTION(inst)                             (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_PROPERTY_ACTION, GPropertyAction))
+#define G_IS_PROPERTY_ACTION(inst)                          (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_PROPERTY_ACTION))
 
-XPL_AVAILABLE_IN_2_38
-xtype_t                   g_property_action_get_type                      (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_2_38
+GType                   g_property_action_get_type                      (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_2_38
-xproperty_action_t *       g_property_action_new                           (const xchar_t *name,
-                                                                         xpointer_t     object,
-                                                                         const xchar_t *property_name);
+GLIB_AVAILABLE_IN_2_38
+GPropertyAction *       g_property_action_new                           (const gchar *name,
+                                                                         gpointer     object,
+                                                                         const gchar *property_name);
 
 G_END_DECLS
 

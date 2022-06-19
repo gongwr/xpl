@@ -70,7 +70,7 @@ glib_tests = {
   'overflow' : {},
   'overflow-fallback' : {
     'source' : 'overflow.c',
-    'c_args' : ['-D_XPL_TEST_OVERFLOW_FALLBACK'],
+    'c_args' : ['-D_GLIB_TEST_OVERFLOW_FALLBACK'],
   },
   'pattern' : {},
   'private' : {},
@@ -89,6 +89,7 @@ glib_tests = {
     'dependencies' : [pcre],
     'c_args' : use_pcre_static_flag ? ['-DPCRE_STATIC'] : [],
   },
+  'relation' : {},
   'rwlock' : {},
   'scannerapi' : {},
   'search-utils' : {},
@@ -97,6 +98,10 @@ glib_tests = {
   },
   'shell' : {},
   'slice' : {},
+  'slice-color' : {
+    'extra_sources' : ['memchunks.c'],
+  },
+  'slice-concurrent' : {},
   'slist' : {},
   'sort' : {},
   'spawn-multithreaded' : {},

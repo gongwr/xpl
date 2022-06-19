@@ -21,23 +21,23 @@
 
 #include <gio/gio.h>
 
-typedef xobject_class_t GNotificationServerClass;
+typedef GObjectClass GNotificationServerClass;
 
 struct _GNotificationServer
 {
-  xobject_t parent;
+  GObject parent;
 
-  xdbus_connection_t *connection;
-  xuint_t name_owner_id;
-  xuint_t object_id;
+  GDBusConnection *connection;
+  guint name_owner_id;
+  guint object_id;
 
-  xuint_t is_running;
+  guint is_running;
 
   /* app_ids -> hashtables of notification ids -> a{sv} */
-  xhashtable_t *applications;
+  GHashTable *applications;
 };
 
-XDEFINE_TYPE (GNotificationServer, xnotification_server, XTYPE_OBJECT)
+G_DEFINE_TYPE (GNotificationServer, g_notification_server, G_TYPE_OBJECT)
 
 enum
 {
@@ -45,15 +45,15 @@ enum
   PROP_IS_RUNNING
 };
 
-static xdbus_interface_info_t *
+static GDBusInterfaceInfo *
 org_gtk_Notifications_get_interface (void)
 {
-  static xdbus_interface_info_t *iface_info;
+  static GDBusInterfaceInfo *iface_info;
 
   if (iface_info == NULL)
     {
-      xdbus_node_info_t *info;
-      xerror_t *error = NULL;
+      GDBusNodeInfo *info;
+      GError *error = NULL;
 
       info = g_dbus_node_info_new_for_xml (
         "<node>"
@@ -71,10 +71,10 @@ org_gtk_Notifications_get_interface (void)
         "</node>", &error);
 
       if (info == NULL)
-        xerror ("%s", error->message);
+        g_error ("%s", error->message);
 
       iface_info = g_dbus_node_info_lookup_interface (info, "org.gtk.Notifications");
-      xassert (iface_info);
+      g_assert (iface_info);
 
       g_dbus_interface_info_ref (iface_info);
       g_dbus_node_info_unref (info);
@@ -84,108 +84,108 @@ org_gtk_Notifications_get_interface (void)
 }
 
 static void
-xnotification_server_notification_added (GNotificationServer *server,
-                                          const xchar_t         *app_id,
-                                          const xchar_t         *notification_id,
-                                          xvariant_t            *notification)
+g_notification_server_notification_added (GNotificationServer *server,
+                                          const gchar         *app_id,
+                                          const gchar         *notification_id,
+                                          GVariant            *notification)
 {
-  xhashtable_t *notifications;
+  GHashTable *notifications;
 
-  notifications = xhash_table_lookup (server->applications, app_id);
+  notifications = g_hash_table_lookup (server->applications, app_id);
   if (notifications == NULL)
     {
-      notifications = xhash_table_new_full (xstr_hash, xstr_equal,
-                                             g_free, (xdestroy_notify_t) xvariant_unref);
-      xhash_table_insert (server->applications, xstrdup (app_id), notifications);
+      notifications = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                             g_free, (GDestroyNotify) g_variant_unref);
+      g_hash_table_insert (server->applications, g_strdup (app_id), notifications);
     }
 
-  xhash_table_replace (notifications, xstrdup (notification_id), xvariant_ref (notification));
+  g_hash_table_replace (notifications, g_strdup (notification_id), g_variant_ref (notification));
 
-  xsignal_emit_by_name (server, "notification-received", app_id, notification_id, notification);
+  g_signal_emit_by_name (server, "notification-received", app_id, notification_id, notification);
 }
 
 static void
-xnotification_server_notification_removed (GNotificationServer *server,
-                                            const xchar_t         *app_id,
-                                            const xchar_t         *notification_id)
+g_notification_server_notification_removed (GNotificationServer *server,
+                                            const gchar         *app_id,
+                                            const gchar         *notification_id)
 {
-  xhashtable_t *notifications;
+  GHashTable *notifications;
 
-  notifications = xhash_table_lookup (server->applications, app_id);
+  notifications = g_hash_table_lookup (server->applications, app_id);
   if (notifications)
     {
-      xhash_table_remove (notifications, notification_id);
-      if (xhash_table_size (notifications) == 0)
-        xhash_table_remove (server->applications, app_id);
+      g_hash_table_remove (notifications, notification_id);
+      if (g_hash_table_size (notifications) == 0)
+        g_hash_table_remove (server->applications, app_id);
     }
 
-  xsignal_emit_by_name (server, "notification-removed", app_id, notification_id);
+  g_signal_emit_by_name (server, "notification-removed", app_id, notification_id);
 }
 
 static void
-org_gtk_Notifications_method_call (xdbus_connection_t       *connection,
-                                   const xchar_t           *sender,
-                                   const xchar_t           *object_path,
-                                   const xchar_t           *interface_name,
-                                   const xchar_t           *method_name,
-                                   xvariant_t              *parameters,
-                                   xdbus_method_invocation_t *invocation,
-                                   xpointer_t               user_data)
+org_gtk_Notifications_method_call (GDBusConnection       *connection,
+                                   const gchar           *sender,
+                                   const gchar           *object_path,
+                                   const gchar           *interface_name,
+                                   const gchar           *method_name,
+                                   GVariant              *parameters,
+                                   GDBusMethodInvocation *invocation,
+                                   gpointer               user_data)
 {
   GNotificationServer *server = user_data;
 
-  if (xstr_equal (method_name, "AddNotification"))
+  if (g_str_equal (method_name, "AddNotification"))
     {
-      const xchar_t *app_id;
-      const xchar_t *notification_id;
-      xvariant_t *notification;
+      const gchar *app_id;
+      const gchar *notification_id;
+      GVariant *notification;
 
-      xvariant_get (parameters, "(&s&s@a{sv})", &app_id, &notification_id, &notification);
-      xnotification_server_notification_added (server, app_id, notification_id, notification);
-      xdbus_method_invocation_return_value (invocation, NULL);
+      g_variant_get (parameters, "(&s&s@a{sv})", &app_id, &notification_id, &notification);
+      g_notification_server_notification_added (server, app_id, notification_id, notification);
+      g_dbus_method_invocation_return_value (invocation, NULL);
 
-      xvariant_unref (notification);
+      g_variant_unref (notification);
     }
-  else if (xstr_equal (method_name, "RemoveNotification"))
+  else if (g_str_equal (method_name, "RemoveNotification"))
     {
-      const xchar_t *app_id;
-      const xchar_t *notification_id;
+      const gchar *app_id;
+      const gchar *notification_id;
 
-      xvariant_get (parameters, "(&s&s)", &app_id, &notification_id);
-      xnotification_server_notification_removed (server, app_id, notification_id);
-      xdbus_method_invocation_return_value (invocation, NULL);
+      g_variant_get (parameters, "(&s&s)", &app_id, &notification_id);
+      g_notification_server_notification_removed (server, app_id, notification_id);
+      g_dbus_method_invocation_return_value (invocation, NULL);
     }
   else
     {
-      xdbus_method_invocation_return_dbus_error (invocation, "UnknownMethod", "No such method");
+      g_dbus_method_invocation_return_dbus_error (invocation, "UnknownMethod", "No such method");
     }
 }
 
 static void
-xnotification_server_dispose (xobject_t *object)
+g_notification_server_dispose (GObject *object)
 {
   GNotificationServer *server = G_NOTIFICATION_SERVER (object);
 
-  xnotification_server_stop (server);
+  g_notification_server_stop (server);
 
-  g_clear_pointer (&server->applications, xhash_table_unref);
+  g_clear_pointer (&server->applications, g_hash_table_unref);
   g_clear_object (&server->connection);
 
-  XOBJECT_CLASS (xnotification_server_parent_class)->dispose (object);
+  G_OBJECT_CLASS (g_notification_server_parent_class)->dispose (object);
 }
 
 static void
-xnotification_server_get_property (xobject_t    *object,
-                                    xuint_t       property_id,
-                                    xvalue_t     *value,
-                                    xparam_spec_t *pspec)
+g_notification_server_get_property (GObject    *object,
+                                    guint       property_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
   GNotificationServer *server = G_NOTIFICATION_SERVER (object);
 
   switch (property_id)
     {
     case PROP_IS_RUNNING:
-      xvalue_set_boolean (value, server->is_running);
+      g_value_set_boolean (value, server->is_running);
       break;
 
     default:
@@ -194,95 +194,95 @@ xnotification_server_get_property (xobject_t    *object,
 }
 
 static void
-xnotification_server_class_init (GNotificationServerClass *class)
+g_notification_server_class_init (GNotificationServerClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-  object_class->get_property = xnotification_server_get_property;
-  object_class->dispose = xnotification_server_dispose;
+  object_class->get_property = g_notification_server_get_property;
+  object_class->dispose = g_notification_server_dispose;
 
-  xobject_class_install_property (object_class, PROP_IS_RUNNING,
-                                   xparam_spec_boolean ("is-running", "", "", FALSE,
-                                                         XPARAM_READABLE | XPARAM_STATIC_STRINGS));
+  g_object_class_install_property (object_class, PROP_IS_RUNNING,
+                                   g_param_spec_boolean ("is-running", "", "", FALSE,
+                                                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
-  xsignal_new ("notification-received", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
-                0, NULL, NULL, g_cclosure_marshal_generic, XTYPE_NONE, 3,
-                XTYPE_STRING, XTYPE_STRING, XTYPE_VARIANT);
+  g_signal_new ("notification-received", G_TYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
+                0, NULL, NULL, g_cclosure_marshal_generic, G_TYPE_NONE, 3,
+                G_TYPE_STRING, G_TYPE_STRING, G_TYPE_VARIANT);
 
-  xsignal_new ("notification-removed", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
-                0, NULL, NULL, g_cclosure_marshal_generic, XTYPE_NONE, 2,
-                XTYPE_STRING, XTYPE_STRING);
+  g_signal_new ("notification-removed", G_TYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
+                0, NULL, NULL, g_cclosure_marshal_generic, G_TYPE_NONE, 2,
+                G_TYPE_STRING, G_TYPE_STRING);
 }
 
 static void
-xnotification_server_bus_acquired (xdbus_connection_t *connection,
-                                    const xchar_t     *name,
-                                    xpointer_t         user_data)
+g_notification_server_bus_acquired (GDBusConnection *connection,
+                                    const gchar     *name,
+                                    gpointer         user_data)
 {
-  const xdbus_interface_vtable_t vtable = {
+  const GDBusInterfaceVTable vtable = {
     org_gtk_Notifications_method_call, NULL, NULL, { 0 }
   };
   GNotificationServer *server = user_data;
 
-  server->object_id = xdbus_connection_register_object (connection, "/org/gtk/Notifications",
+  server->object_id = g_dbus_connection_register_object (connection, "/org/gtk/Notifications",
                                                          org_gtk_Notifications_get_interface (),
                                                          &vtable, server, NULL, NULL);
 
   /* register_object only fails if the same object is exported more than once */
-  xassert (server->object_id > 0);
+  g_assert (server->object_id > 0);
 
-  server->connection = xobject_ref (connection);
+  server->connection = g_object_ref (connection);
 }
 
 static void
-xnotification_server_name_acquired (xdbus_connection_t *connection,
-                                     const xchar_t     *name,
-                                     xpointer_t         user_data)
+g_notification_server_name_acquired (GDBusConnection *connection,
+                                     const gchar     *name,
+                                     gpointer         user_data)
 {
   GNotificationServer *server = user_data;
 
   server->is_running = TRUE;
-  xobject_notify (G_OBJECT (server), "is-running");
+  g_object_notify (G_OBJECT (server), "is-running");
 }
 
 static void
-xnotification_server_name_lost (xdbus_connection_t *connection,
-                                 const xchar_t     *name,
-                                 xpointer_t         user_data)
+g_notification_server_name_lost (GDBusConnection *connection,
+                                 const gchar     *name,
+                                 gpointer         user_data)
 {
   GNotificationServer *server = user_data;
 
-  xnotification_server_stop (server);
+  g_notification_server_stop (server);
 
   if (connection == NULL && server->connection)
     g_clear_object (&server->connection);
 }
 
 static void
-xnotification_server_init (GNotificationServer *server)
+g_notification_server_init (GNotificationServer *server)
 {
-  server->applications = xhash_table_new_full (xstr_hash, xstr_equal,
-                                                g_free, (xdestroy_notify_t) xhash_table_unref);
+  server->applications = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                g_free, (GDestroyNotify) g_hash_table_unref);
 
   server->name_owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                                           "org.gtk.Notifications",
                                           G_BUS_NAME_OWNER_FLAGS_NONE,
-                                          xnotification_server_bus_acquired,
-                                          xnotification_server_name_acquired,
-                                          xnotification_server_name_lost,
+                                          g_notification_server_bus_acquired,
+                                          g_notification_server_name_acquired,
+                                          g_notification_server_name_lost,
                                           server, NULL);
 }
 
 GNotificationServer *
-xnotification_server_new (void)
+g_notification_server_new (void)
 {
-  return xobject_new (XTYPE_NOTIFICATION_SERVER, NULL);
+  return g_object_new (G_TYPE_NOTIFICATION_SERVER, NULL);
 }
 
 void
-xnotification_server_stop (GNotificationServer *server)
+g_notification_server_stop (GNotificationServer *server)
 {
-  g_return_if_fail (X_IS_NOTIFICATION_SERVER (server));
+  g_return_if_fail (G_IS_NOTIFICATION_SERVER (server));
 
   if (server->name_owner_id)
     {
@@ -292,46 +292,46 @@ xnotification_server_stop (GNotificationServer *server)
 
   if (server->object_id && server->connection)
     {
-      xdbus_connection_unregister_object (server->connection, server->object_id);
+      g_dbus_connection_unregister_object (server->connection, server->object_id);
       server->object_id = 0;
     }
 
   if (server->is_running)
     {
       server->is_running = FALSE;
-      xobject_notify (G_OBJECT (server), "is-running");
+      g_object_notify (G_OBJECT (server), "is-running");
     }
 }
 
-xboolean_t
-xnotification_server_get_is_running (GNotificationServer *server)
+gboolean
+g_notification_server_get_is_running (GNotificationServer *server)
 {
-  xreturn_val_if_fail (X_IS_NOTIFICATION_SERVER (server), FALSE);
+  g_return_val_if_fail (G_IS_NOTIFICATION_SERVER (server), FALSE);
 
   return server->is_running;
 }
 
-xchar_t **
-xnotification_server_list_applications (GNotificationServer *server)
+gchar **
+g_notification_server_list_applications (GNotificationServer *server)
 {
-  xreturn_val_if_fail (X_IS_NOTIFICATION_SERVER (server), NULL);
+  g_return_val_if_fail (G_IS_NOTIFICATION_SERVER (server), NULL);
 
-  return (xchar_t **) xhash_table_get_keys_as_array (server->applications, NULL);
+  return (gchar **) g_hash_table_get_keys_as_array (server->applications, NULL);
 }
 
-xchar_t **
-xnotification_server_list_notifications (GNotificationServer *server,
-                                          const xchar_t         *app_id)
+gchar **
+g_notification_server_list_notifications (GNotificationServer *server,
+                                          const gchar         *app_id)
 {
-  xhashtable_t *notifications;
+  GHashTable *notifications;
 
-  xreturn_val_if_fail (X_IS_NOTIFICATION_SERVER (server), NULL);
-  xreturn_val_if_fail (app_id != NULL, NULL);
+  g_return_val_if_fail (G_IS_NOTIFICATION_SERVER (server), NULL);
+  g_return_val_if_fail (app_id != NULL, NULL);
 
-  notifications = xhash_table_lookup (server->applications, app_id);
+  notifications = g_hash_table_lookup (server->applications, app_id);
 
   if (notifications == NULL)
     return NULL;
 
-  return (xchar_t **) xhash_table_get_keys_as_array (notifications, NULL);
+  return (gchar **) g_hash_table_get_keys_as_array (notifications, NULL);
 }

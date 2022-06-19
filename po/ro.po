@@ -35,17 +35,17 @@ msgstr ""
 "Stabilirea aplicației ca ultima folosită pentru acest tip nu este suportată"
 
 #: gio/gapplication.c:497
-msgid "xapplication_t options"
-msgstr "Opțiuni xapplication_t"
+msgid "GApplication options"
+msgstr "Opțiuni GApplication"
 
 #: gio/gapplication.c:497
-msgid "Show xapplication_t options"
-msgstr "Arată opțiunile xapplication_t"
+msgid "Show GApplication options"
+msgstr "Arată opțiunile GApplication"
 
 #: gio/gapplication.c:542
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
-"Intră în modul de serviciu xapplication_t (utilizează de la fișierele de "
+"Intră în modul de serviciu GApplication (utilizează de la fișierele de "
 "serviciu D-Bus)"
 
 #: gio/gapplication.c:554
@@ -153,8 +153,8 @@ msgid "PARAMETER"
 msgstr "PARAMETRU"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Parametru opțional pentru invocarea acțiunii, în formatul xvariant_t"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Parametru opțional pentru invocarea acțiunii, în formatul GVariant"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
 #, c-format
@@ -282,8 +282,8 @@ msgid "Seek not supported on base stream"
 msgstr "Căutarea în fluxul de bază nu este suportată"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Nu se poate trunchia xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Nu se poate trunchia GBufferedInputStream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -354,20 +354,20 @@ msgid "%s filetype"
 msgstr "tip de fișier %s"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t conține date nevalide"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials conține date nevalide"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t nu este implementat pe acest SO"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials nu este implementat pe acest SO"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Nu există suport pentru xcredentials_t pe platforma dumneavoastră"
+msgid "There is no GCredentials support for your platform"
+msgstr "Nu există suport pentru GCredentials pe platforma dumneavoastră"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t nu conține un ID de proces pe acest SO"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials nu conține un ID de proces pe acest SO"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -570,8 +570,8 @@ msgstr ""
 "ID-urile utilizatorului trebuie să fie aceleași pentru client și server"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Anulat via xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Anulat via GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:299
 #, c-format
@@ -877,9 +877,9 @@ msgstr "Valoarea parsată „%s” pentru variantă nu este o semnătură D-Bus 
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Eroare la deserializarea xvariant_t cu șirul de tipul „%s” din formatul de "
+"Eroare la deserializarea GVariant cu șirul de tipul „%s” din formatul de "
 "rețea D-Bus"
 
 #: gio/gdbusmessage.c:2206
@@ -933,9 +933,9 @@ msgstr "Nu se poate deserializa mesajul: "
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"Eroare la serializarea xvariant_t cu șirul de tipul „%s” în formatul de rețea "
+"Eroare la serializarea GVariant cu șirul de tipul „%s” în formatul de rețea "
 "D-Bus"
 
 #: gio/gdbusmessage.c:2835
@@ -1417,27 +1417,27 @@ msgstr "Suportul DTLS nu este disponibil"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Nu se poate lucra cu versiunea %d a codării xemblem_t"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Nu se poate lucra cu versiunea %d a codării GEmblem"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Număr de jetoane formatat eronat (%d) în codarea xemblem_t"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Număr de jetoane formatat eronat (%d) în codarea GEmblem"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Nu se poate lucra cu versiunea %d a codării xemblemed_icon_t"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Nu se poate lucra cu versiunea %d a codării GEmblemedIcon"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Număr de jetoane formatat eronat (%d) în codarea xemblemed_icon_t"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Număr de jetoane formatat eronat (%d) în codarea GEmblemedIcon"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Se aștepta un xemblem_t pentru xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Se aștepta un GEmblem pentru GEmblemedIcon"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1532,12 +1532,12 @@ msgstr "Enumeratorul fișierului este deja închis"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Nu se poate lucra cu versiunea %d a codării xfile_icon_t"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Nu se poate lucra cu versiunea %d a codării GFileIcon"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Date de intrare eronate pentru xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Date de intrare eronate pentru GFileIcon"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1604,8 +1604,8 @@ msgstr "Niciun tip pentru numele clasei %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "Tipul %s nu implementează interfața xicon_t"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "Tipul %s nu implementează interfața GIcon"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1619,8 +1619,8 @@ msgstr "Număr de versiune eronat: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Tipul %s nu implementează from_tokens() în interfața xicon_t"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Tipul %s nu implementează from_tokens() în interfața GIcon"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2812,8 +2812,8 @@ msgstr "<%s id='%s'> nu este (încă) definit."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Șir de tip xvariant_t nevalid „%s”"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Șir de tip GVariant nevalid „%s”"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -3047,11 +3047,11 @@ msgstr "Nu impune restricții numelor cheilor"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Compilează toate fișierele-schemă xsettings_t într-un cache de schemă.\n"
+"Compilează toate fișierele-schemă GSettings într-un cache de schemă.\n"
 "Fișierele schemă trebuie să aibă extensia .gschema.xml,\n"
 "iar fișierul cache se numește gschemas.compiled."
 
@@ -3417,16 +3417,16 @@ msgid "Error removing old file: %s"
 msgstr "Eroare la ștergerea vechiului fișier: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
-msgstr "S-a primit un xseek_type_t nevalid"
+msgid "Invalid GSeekType supplied"
+msgstr "S-a primit un GSeekType nevalid"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Cerere de căutare nevalidă"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Nu se poate trunchia xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Nu se poate trunchia GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -3956,8 +3956,8 @@ msgstr "A expirat limita de timp la I/O pe socket"
 
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "se creează xsocket_t din fd: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "se creează GSocket din fd: %s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
 #, c-format
@@ -4102,8 +4102,8 @@ msgid "Error sending message: %s"
 msgstr "Eroare la trimiterea mesajului: %s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t nu este suportat pe Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage nu este suportat pe Windows"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -4116,9 +4116,9 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Nu se pot citi certificările soclului: %s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
-"xsocket_get_credentials nu este implementat pe acest sistem de operare"
+"g_socket_get_credentials nu este implementat pe acest sistem de operare"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4253,8 +4253,8 @@ msgstr "Conductele nu sunt suportate pe această platformă"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Nu se poate lucra cu versiunea %d a codării xthemed_icon_t"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Nu se poate lucra cu versiunea %d a codării GThemedIcon"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4307,8 +4307,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Backendul TLS curent nu suportă PKCS #12"
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "Acest xtls_backend_t nu suportă crearea de certificate PKCS #11"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "Acest GTlsBackend nu suportă crearea de certificate PKCS #11"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4619,25 +4619,25 @@ msgstr "Numele căii „%s” nu este o cale absolută"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %d %b %Y %T %z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -5020,13 +5020,13 @@ msgstr "Dec"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "PM"
 
@@ -6550,11 +6550,11 @@ msgstr "%.1f EB"
 #~ msgid "Association creation not supported on win32"
 #~ msgstr "Crearea asocierilor de fișiere nu este implementată în win32"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "am"
 #~ msgstr "am"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "pm"
 #~ msgstr "pm"
 
@@ -6602,13 +6602,13 @@ msgstr "%.1f EB"
 #~ "Arguments:\n"
 #~ "  SCHEMA      The id of the schema\n"
 #~ "  KEY         The name of the key\n"
-#~ "  VALUE       The value to set key to, as a serialized xvariant_t\n"
+#~ "  VALUE       The value to set key to, as a serialized GVariant\n"
 #~ msgstr ""
 #~ "Argumente:\n"
 #~ "  SCHEMĂ      Identificatorul schemei\n"
 #~ "  CHEIE       Numele cheii\n"
 #~ "  VALOARE     Valoarea la care se definește cheia, cum este serializată "
-#~ "de xvariant_t\n"
+#~ "de GVariant\n"
 
 #~ msgid ""
 #~ "Monitor KEY for changes and print the changed values.\n"

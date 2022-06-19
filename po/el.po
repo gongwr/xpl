@@ -27,17 +27,17 @@ msgstr ""
 "X-Project-Style: gnome\n"
 
 #: gio/gapplication.c:500
-msgid "xapplication_t options"
-msgstr "Επιλογές xapplication_t"
+msgid "GApplication options"
+msgstr "Επιλογές GApplication"
 
 #: gio/gapplication.c:500
-msgid "Show xapplication_t options"
-msgstr "Εμφάνιση επιλογών xapplication_t"
+msgid "Show GApplication options"
+msgstr "Εμφάνιση επιλογών GApplication"
 
 #: gio/gapplication.c:545
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
-"Εισαγωγή τρόπου λειτουργίας της εφαρμογής xapplication_t (χρήση από αρχεία "
+"Εισαγωγή τρόπου λειτουργίας της εφαρμογής GApplication (χρήση από αρχεία "
 "υπηρεσίας D-Bus)"
 
 #: gio/gapplication.c:557
@@ -149,8 +149,8 @@ msgid "PARAMETER"
 msgstr "ΠΑΡΑΜΕΤΡΟΣ"
 
 #: gio/gapplication-tool.c:74
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Προαιρετική παράμετρος στην κλήση ενέργειας, στη μορφή xvariant_t"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Προαιρετική παράμετρος στην κλήση ενέργειας, στη μορφή GVariant"
 
 #: gio/gapplication-tool.c:96 gio/gresource-tool.c:531 gio/gsettings-tool.c:659
 #, c-format
@@ -291,8 +291,8 @@ msgid "Seek not supported on base stream"
 msgstr "Δεν υποστηρίζεται η αναζήτηση στη βασική ροή"
 
 #: gio/gbufferedinputstream.c:937
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Αδυναμία περικοπής του xmemory_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Αδυναμία περικοπής του GMemoryInputStream"
 
 #: gio/gbufferedinputstream.c:982 gio/ginputstream.c:1208 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -366,21 +366,21 @@ msgid "%s filetype"
 msgstr "%s τύπος αρχείων"
 
 #: gio/gcredentials.c:323
-msgid "xcredentials_t contains invalid data"
-msgstr "Το xcredentials_t περιέχει μη έγκυρα δεδομένα"
+msgid "GCredentials contains invalid data"
+msgstr "Το GCredentials περιέχει μη έγκυρα δεδομένα"
 
 #: gio/gcredentials.c:383 gio/gcredentials.c:667
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "Το xcredentials_t δεν έχει υλοποιηθεί σε αυτό το λειτουργικό σύστημα"
+msgid "GCredentials is not implemented on this OS"
+msgstr "Το GCredentials δεν έχει υλοποιηθεί σε αυτό το λειτουργικό σύστημα"
 
 #: gio/gcredentials.c:538 gio/gcredentials.c:556
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Δεν υπάρχει υποστήριξη του xcredentials_t για το λογισμικό σας"
+msgid "There is no GCredentials support for your platform"
+msgstr "Δεν υπάρχει υποστήριξη του GCredentials για το λογισμικό σας"
 
 #: gio/gcredentials.c:607
-msgid "xcredentials_t does not contain a process ID on this OS"
+msgid "GCredentials does not contain a process ID on this OS"
 msgstr ""
-"Το xcredentials_t δεν περιέχει αναγνωριστικό διεργασίας σε αυτό το λειτουργικό "
+"Το GCredentials δεν περιέχει αναγνωριστικό διεργασίας σε αυτό το λειτουργικό "
 "σύστημα"
 
 #: gio/gcredentials.c:661
@@ -598,8 +598,8 @@ msgstr ""
 "(διαθέσιμο: %s)"
 
 #: gio/gdbusauth.c:1167
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Ακυρώθηκε μέσω του xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Ακυρώθηκε μέσω του GDBusAuthObserver::authorize-authenticated-peer"
 
 #
 #: gio/gdbusauthmechanismsha1.c:265
@@ -890,12 +890,12 @@ msgstr ""
 #: gio/gdbusmessage.c:1925
 #, fuzzy, c-format
 #| msgid ""
-#| "Error deserializing xvariant_t with type string '%s' from the D-Bus wire "
+#| "Error deserializing GVariant with type string '%s' from the D-Bus wire "
 #| "format"
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Σφάλμα αποσειριοποίησης xvariant_t με τον τύπο συμβολοσειράς '%s' από τη μορφή "
+"Σφάλμα αποσειριοποίησης GVariant με τον τύπο συμβολοσειράς '%s' από τη μορφή "
 "καλωδίου D-Bus"
 
 #: gio/gdbusmessage.c:2110
@@ -950,9 +950,9 @@ msgstr "Αδυναμία αποσειριοποίησης μηνύματος: "
 #: gio/gdbusmessage.c:2590
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
 msgstr ""
-"Σφάλμα στην σειριακή διάταξη xvariant_t με τύπο συμβολοσειράς «%s» στην μορφή "
+"Σφάλμα στην σειριακή διάταξη GVariant με τύπο συμβολοσειράς «%s» στην μορφή "
 "δικτυώματος D-Bus"
 
 #: gio/gdbusmessage.c:2727
@@ -1454,30 +1454,30 @@ msgstr "Η υποστήριξη DTLS δεν είναι διαθέσιμη"
 
 #: gio/gemblem.c:323
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of xemblem_t encoding"
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης xemblem_t"
+#| msgid "Can't handle version %d of GEmblem encoding"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης GEmblem"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Κακοδιατυπωμένος αριθμός κουπονιών (%d) στην κωδικοποίηση xemblem_t"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Κακοδιατυπωμένος αριθμός κουπονιών (%d) στην κωδικοποίηση GEmblem"
 
 #: gio/gemblemedicon.c:362
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of xemblemed_icon_t encoding"
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης xemblemed_icon_t"
+#| msgid "Can't handle version %d of GEmblemedIcon encoding"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης GEmblemedIcon"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
 msgstr ""
-"Κακοδιατυπωμένος αριθμός κουπονιών (%d) στην κωδικοποίηση xemblemed_icon_t"
+"Κακοδιατυπωμένος αριθμός κουπονιών (%d) στην κωδικοποίηση GEmblemedIcon"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Αναμενόταν xemblem_t για το xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Αναμενόταν GEmblem για το GEmblemedIcon"
 
 #: gio/gfile.c:1044 gio/gfile.c:1282 gio/gfile.c:1420 gio/gfile.c:1658
 #: gio/gfile.c:1713 gio/gfile.c:1771 gio/gfile.c:1855 gio/gfile.c:1912
@@ -1591,13 +1591,13 @@ msgstr "Ο μετρητής αρχείων έχει ήδη κλείσει"
 
 #: gio/gfileicon.c:236
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of xfile_icon_t encoding"
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης xfile_icon_t"
+#| msgid "Can't handle version %d of GFileIcon encoding"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης GFileIcon"
 
 #: gio/gfileicon.c:246
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Κακοδιατυπωμένη μορφή δεδομένων εισόδου του xfile_icon_t"
+msgid "Malformed input data for GFileIcon"
+msgstr "Κακοδιατυπωμένη μορφή δεδομένων εισόδου του GFileIcon"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1662,8 +1662,8 @@ msgstr "Χωρίς τύπο ονόματος κλάσης %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "Ο τύπος %s δεν υποστηρίζει τη διεπαφή xicon_t"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "Ο τύπος %s δεν υποστηρίζει τη διεπαφή GIcon"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1677,8 +1677,8 @@ msgstr "Κακοδιατυπωμένος αριθμός έκδοσης: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Ο τύπος %s δεν υποστηρίζει from_tokens() στη διεπαφή xicon_t"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Ο τύπος %s δεν υποστηρίζει from_tokens() στη διεπαφή GIcon"
 
 #: gio/gicon.c:469
 #, fuzzy
@@ -1764,9 +1764,9 @@ msgstr "Αντιγραφή ενός ή περισσοτέρων αρχείων"
 
 #: gio/gio-tool.c:231
 #, fuzzy
-#| msgid "Show xapplication_t options"
+#| msgid "Show GApplication options"
 msgid "Show information about locations"
-msgstr "Εμφάνιση επιλογών xapplication_t"
+msgstr "Εμφάνιση επιλογών GApplication"
 
 #: gio/gio-tool.c:232
 msgid "List the contents of locations"
@@ -2234,7 +2234,7 @@ msgid "The numeric PIM when unlocking a VeraCrypt volume"
 msgstr ""
 
 #: gio/gio-tool-mount.c:75
-#| msgctxt "xdatetime_t"
+#| msgctxt "GDateTime"
 #| msgid "PM"
 msgid "PIM"
 msgstr "PIM"
@@ -2812,8 +2812,8 @@ msgstr "<%s id='%s'> αδιευκρίνιστη (ακόμα)."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Μη έγκυρος τύπος συμβολοσειράς xvariant_t «%s»"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Μη έγκυρος τύπος συμβολοσειράς GVariant «%s»"
 
 #: gio/glib-compile-schemas.c:1047
 #, fuzzy
@@ -3081,11 +3081,11 @@ msgstr "Μην επιβάλετε περιορισμούς στο όνομα κ�
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Μεταγλώττιση όλων των αρχείων σχημάτων xsettings_t σε κρυφή μνήμη σχημάτων.\n"
+"Μεταγλώττιση όλων των αρχείων σχημάτων GSettings σε κρυφή μνήμη σχημάτων.\n"
 "Τα αρχεία σχημάτων απαιτείται να έχουν την επέκταση.gschema.xml\n"
 "και το αρχείο κρυφής μνήμης καλείται gschemas.compiled."
 
@@ -3492,16 +3492,16 @@ msgid "Error removing old file: %s"
 msgstr "Σφάλμα αφαίρεσης παλαιού αρχείου: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid xseek_type_t supplied"
-msgstr "Δόθηκε άκυρο xseek_type_t"
+msgid "Invalid GSeekType supplied"
+msgstr "Δόθηκε άκυρο GSeekType"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Άκυρη αίτηση αναζήτησης"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Αδυναμία περικοπής του xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Αδυναμία περικοπής του GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -4084,8 +4084,8 @@ msgstr "Η υποδοχή I/O έληξε"
 
 #: gio/gsocket.c:583
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "δημιουργία xsocket_t από fd: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "δημιουργία GSocket από fd: %s"
 
 # gconf/gconf-internals.c:2416
 #: gio/gsocket.c:612 gio/gsocket.c:666 gio/gsocket.c:673
@@ -4232,8 +4232,8 @@ msgid "Error sending message: %s"
 msgstr "Σφάλμα αποστολής μηνύματος: %s"
 
 #: gio/gsocket.c:4955
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "Το xsocket_control_message_t δεν υποστηρίζεται στα Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "Το GSocketControlMessage δεν υποστηρίζεται στα Windows"
 
 #: gio/gsocket.c:5424 gio/gsocket.c:5497 gio/gsocket.c:5723
 #, c-format
@@ -4247,9 +4247,9 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Αδύνατη η ανάγνωση διαπιστευτηρίων υποδοχής: %s"
 
 #: gio/gsocket.c:6052
-msgid "xsocket_get_credentials not implemented for this OS"
+msgid "g_socket_get_credentials not implemented for this OS"
 msgstr ""
-"το xsocket_get_credentials δεν έχει υλοποιηθεί για αυτό το λειτουργικό "
+"το g_socket_get_credentials δεν έχει υλοποιηθεί για αυτό το λειτουργικό "
 "σύστημα"
 
 #: gio/gsocketclient.c:182
@@ -4388,9 +4388,9 @@ msgstr "Άγνωστο σφάλμα του διαμεσολαβητή SOCKSv5."
 
 #: gio/gthemedicon.c:595
 #, fuzzy, c-format
-#| msgid "Can't handle version %d of xthemed_icon_t encoding"
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης xthemed_icon_t"
+#| msgid "Can't handle version %d of GThemedIcon encoding"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Αδυναμία χειρισμού της έκδοσης %d της κωδικοποίησης GThemedIcon"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4762,25 +4762,25 @@ msgstr "Το όνομα διαδρομής «%s» δεν είναι απόλυτ
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:220
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%a %e %b %Y %H:%M:%S"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:223
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d/%m/%y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -5163,13 +5163,13 @@ msgstr "Δεκ"
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:588
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "ΠΜ"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:591
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "ΜΜ"
 
@@ -6753,11 +6753,11 @@ msgstr "%.1f EB"
 #~ msgid "Error writing to unix: %s"
 #~ msgstr "Σφάλμα εγγραφής σε unix: %s"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "am"
 #~ msgstr "πμ"
 
-#~ msgctxt "xdatetime_t"
+#~ msgctxt "GDateTime"
 #~ msgid "pm"
 #~ msgstr "μμ"
 
@@ -6801,13 +6801,13 @@ msgstr "%.1f EB"
 #~ "Arguments:\n"
 #~ "  SCHEMA      The id of the schema\n"
 #~ "  KEY         The name of the key\n"
-#~ "  VALUE       The value to set key to, as a serialized xvariant_t\n"
+#~ "  VALUE       The value to set key to, as a serialized GVariant\n"
 #~ msgstr ""
 #~ "Ορίσματα:\n"
 #~ "  SCHEMA      Η ταυτότητα του σχήματος \n"
 #~ "  KEY         Το όνομα του κλειδιού \n"
 #~ "  VALUE       Η τιμή για να οριστεί το κλειδί, ως σειριακή διάταξη "
-#~ "xvariant_t\n"
+#~ "GVariant\n"
 
 #~ msgid ""
 #~ "Monitor KEY for changes and print the changed values.\n"

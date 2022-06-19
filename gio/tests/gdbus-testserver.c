@@ -1,11 +1,11 @@
 #include <gio/gio.h>
 #include <stdlib.h>
 
-static xdbus_node_info_t *introspection_data = NULL;
-static xmain_loop_t *loop = NULL;
-static xhashtable_t *properties = NULL;
+static GDBusNodeInfo *introspection_data = NULL;
+static GMainLoop *loop = NULL;
+static GHashTable *properties = NULL;
 
-static const xchar_t introspection_xml[] =
+static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='com.example.Frob'>"
   "    <method name='Quit'>"
@@ -196,84 +196,84 @@ static const xchar_t introspection_xml[] =
   "  </interface>"
   "</node>";
 
-static xboolean_t
-end_sleep (xpointer_t data)
+static gboolean
+end_sleep (gpointer data)
 {
-  xdbus_method_invocation_t *invocation = data;
+  GDBusMethodInvocation *invocation = data;
 
-  xdbus_method_invocation_return_value (invocation, NULL);
-  xobject_unref (invocation);
+  g_dbus_method_invocation_return_value (invocation, NULL);
+  g_object_unref (invocation);
 
-  return XSOURCE_REMOVE;
+  return G_SOURCE_REMOVE;
 }
 
 static void
-handle_method_call (xdbus_connection_t       *connection,
-                    const xchar_t           *sender,
-                    const xchar_t           *object_path,
-                    const xchar_t           *interface_name,
-                    const xchar_t           *method_name,
-                    xvariant_t              *parameters,
-                    xdbus_method_invocation_t *invocation,
-                    xpointer_t               user_data)
+handle_method_call (GDBusConnection       *connection,
+                    const gchar           *sender,
+                    const gchar           *object_path,
+                    const gchar           *interface_name,
+                    const gchar           *method_name,
+                    GVariant              *parameters,
+                    GDBusMethodInvocation *invocation,
+                    gpointer               user_data)
 {
-  if (xstrcmp0 (method_name, "HelloWorld") == 0)
+  if (g_strcmp0 (method_name, "HelloWorld") == 0)
     {
-      const xchar_t *greeting;
+      const gchar *greeting;
 
-      xvariant_get (parameters, "(&s)", &greeting);
-      if (xstrcmp0 (greeting, "Yo") == 0)
+      g_variant_get (parameters, "(&s)", &greeting);
+      if (g_strcmp0 (greeting, "Yo") == 0)
         {
-          xdbus_method_invocation_return_dbus_error (invocation,
+          g_dbus_method_invocation_return_dbus_error (invocation,
                                                       "com.example.TestException",
                                                       "Yo is not a proper greeting");
         }
       else
         {
-          xchar_t *response;
-          response = xstrdup_printf ("You greeted me with '%s'. Thanks!", greeting);
-          xdbus_method_invocation_return_value (invocation,
-                                                 xvariant_new ("(s)", response));
+          gchar *response;
+          response = g_strdup_printf ("You greeted me with '%s'. Thanks!", greeting);
+          g_dbus_method_invocation_return_value (invocation,
+                                                 g_variant_new ("(s)", response));
           g_free ( response);
         }
     }
-  else if (xstrcmp0 (method_name, "DoubleHelloWorld") == 0)
+  else if (g_strcmp0 (method_name, "DoubleHelloWorld") == 0)
     {
-      const xchar_t *hello1, *hello2;
-      xchar_t *reply1, *reply2;
+      const gchar *hello1, *hello2;
+      gchar *reply1, *reply2;
 
-      xvariant_get (parameters, "(&s&s)", &hello1, &hello2);
-      reply1 = xstrdup_printf ("You greeted me with '%s'. Thanks!", hello1);
-      reply2 = xstrdup_printf ("Yo dawg, you uttered '%s'. Thanks!", hello2);
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_new ("(ss)", reply1, reply2));
+      g_variant_get (parameters, "(&s&s)", &hello1, &hello2);
+      reply1 = g_strdup_printf ("You greeted me with '%s'. Thanks!", hello1);
+      reply2 = g_strdup_printf ("Yo dawg, you uttered '%s'. Thanks!", hello2);
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_new ("(ss)", reply1, reply2));
       g_free (reply1);
       g_free (reply2);
     }
-  else if (xstrcmp0 (method_name, "PairReturn") == 0)
+  else if (g_strcmp0 (method_name, "PairReturn") == 0)
     {
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_new ("(su)", "foo", 42));
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_new ("(su)", "foo", 42));
     }
-  else if (xstrcmp0 (method_name, "TestPrimitiveTypes") == 0)
+  else if (g_strcmp0 (method_name, "TestPrimitiveTypes") == 0)
     {
-      xuchar_t val_byte;
-      xboolean_t val_boolean;
+      guchar val_byte;
+      gboolean val_boolean;
       gint16 val_int16;
-      xuint16_t val_uint16;
+      guint16 val_uint16;
       gint32 val_int32;
-      xuint32_t val_uint32;
-      sint64_t val_int64;
-      xuint64_t val_uint64;
-      xdouble_t val_double;
-      const xchar_t *val_string;
-      const xchar_t *val_objpath;
-      const xchar_t *val_signature;
-      xchar_t *ret_string;
-      xchar_t *ret_objpath;
-      xchar_t *ret_signature;
+      guint32 val_uint32;
+      gint64 val_int64;
+      guint64 val_uint64;
+      gdouble val_double;
+      const gchar *val_string;
+      const gchar *val_objpath;
+      const gchar *val_signature;
+      gchar *ret_string;
+      gchar *ret_objpath;
+      gchar *ret_signature;
 
-      xvariant_get (parameters, "(ybnqiuxtd&s&o&g)",
+      g_variant_get (parameters, "(ybnqiuxtd&s&o&g)",
                      &val_byte,
                      &val_boolean,
                      &val_int16,
@@ -287,12 +287,12 @@ handle_method_call (xdbus_connection_t       *connection,
                      &val_objpath,
                      &val_signature);
 
-      ret_string = xstrconcat (val_string, val_string, NULL);
-      ret_objpath = xstrconcat (val_objpath, "/modified", NULL);
-      ret_signature = xstrconcat (val_signature, val_signature, NULL);
+      ret_string = g_strconcat (val_string, val_string, NULL);
+      ret_objpath = g_strconcat (val_objpath, "/modified", NULL);
+      ret_signature = g_strconcat (val_signature, val_signature, NULL);
 
-      xdbus_method_invocation_return_value (invocation,
-          xvariant_new ("(ybnqiuxtdsog)",
+      g_dbus_method_invocation_return_value (invocation,
+          g_variant_new ("(ybnqiuxtdsog)",
                          val_byte + 1,
                          !val_boolean,
                          val_int16 + 1,
@@ -310,355 +310,355 @@ handle_method_call (xdbus_connection_t       *connection,
       g_free (ret_objpath);
       g_free (ret_signature);
     }
-  else if (xstrcmp0 (method_name, "TestArrayOfPrimitiveTypes") == 0)
+  else if (g_strcmp0 (method_name, "TestArrayOfPrimitiveTypes") == 0)
     {
-      xvariant_t *v;
-      const xuchar_t *bytes;
+      GVariant *v;
+      const guchar *bytes;
       const gint16 *int16s;
-      const xuint16_t *uint16s;
+      const guint16 *uint16s;
       const gint32 *int32s;
-      const xuint32_t *uint32s;
-      const sint64_t *int64s;
-      const xuint64_t *uint64s;
-      const xdouble_t *doubles;
-      xsize_t n_elts;
-      xsize_t i, j;
-      xvariant_builder_t ret;
+      const guint32 *uint32s;
+      const gint64 *int64s;
+      const guint64 *uint64s;
+      const gdouble *doubles;
+      gsize n_elts;
+      gsize i, j;
+      GVariantBuilder ret;
 
-      xvariant_builder_init (&ret, G_VARIANT_TYPE ("(ayabanaqaiauaxatad)"));
+      g_variant_builder_init (&ret, G_VARIANT_TYPE ("(ayabanaqaiauaxatad)"));
 
-      v = xvariant_get_child_value (parameters, 0);
-      bytes = xvariant_get_fixed_array (v, &n_elts, 1);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ay"));
+      v = g_variant_get_child_value (parameters, 0);
+      bytes = g_variant_get_fixed_array (v, &n_elts, 1);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ay"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "y", bytes[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "y", bytes[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 1);
-      bytes = xvariant_get_fixed_array (v, &n_elts, 1);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ab"));
+      v = g_variant_get_child_value (parameters, 1);
+      bytes = g_variant_get_fixed_array (v, &n_elts, 1);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ab"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "b", (xboolean_t)bytes[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "b", (gboolean)bytes[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 2);
-      int16s = xvariant_get_fixed_array (v, &n_elts, 2);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("an"));
+      v = g_variant_get_child_value (parameters, 2);
+      int16s = g_variant_get_fixed_array (v, &n_elts, 2);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("an"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "n", int16s[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "n", int16s[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 3);
-      uint16s = xvariant_get_fixed_array (v, &n_elts, 2);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("aq"));
+      v = g_variant_get_child_value (parameters, 3);
+      uint16s = g_variant_get_fixed_array (v, &n_elts, 2);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("aq"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "q", uint16s[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "q", uint16s[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 4);
-      int32s = xvariant_get_fixed_array (v, &n_elts, 4);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ai"));
+      v = g_variant_get_child_value (parameters, 4);
+      int32s = g_variant_get_fixed_array (v, &n_elts, 4);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ai"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "i", int32s[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "i", int32s[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 5);
-      uint32s = xvariant_get_fixed_array (v, &n_elts, 4);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("au"));
+      v = g_variant_get_child_value (parameters, 5);
+      uint32s = g_variant_get_fixed_array (v, &n_elts, 4);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("au"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "u", uint32s[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "u", uint32s[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 6);
-      int64s = xvariant_get_fixed_array (v, &n_elts, 8);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ax"));
+      v = g_variant_get_child_value (parameters, 6);
+      int64s = g_variant_get_fixed_array (v, &n_elts, 8);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ax"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "x", int64s[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "x", int64s[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 7);
-      uint64s = xvariant_get_fixed_array (v, &n_elts, 8);
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("at"));
+      v = g_variant_get_child_value (parameters, 7);
+      uint64s = g_variant_get_fixed_array (v, &n_elts, 8);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("at"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "t", uint64s[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "t", uint64s[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      v = xvariant_get_child_value (parameters, 8);
-      doubles = xvariant_get_fixed_array (v, &n_elts, sizeof (xdouble_t));
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ad"));
+      v = g_variant_get_child_value (parameters, 8);
+      doubles = g_variant_get_fixed_array (v, &n_elts, sizeof (gdouble));
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ad"));
       for (j = 0; j < 2; j++)
         for (i = 0; i < n_elts; i++)
-          xvariant_builder_add (&ret, "d", doubles[i]);
-      xvariant_builder_close (&ret);
-      xvariant_unref (v);
+          g_variant_builder_add (&ret, "d", doubles[i]);
+      g_variant_builder_close (&ret);
+      g_variant_unref (v);
 
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_builder_end (&ret));
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_builder_end (&ret));
     }
-  else if (xstrcmp0 (method_name, "TestArrayOfStringTypes") == 0)
+  else if (g_strcmp0 (method_name, "TestArrayOfStringTypes") == 0)
     {
-      xvariant_iter_t *iter1;
-      xvariant_iter_t *iter2;
-      xvariant_iter_t *iter3;
-      xvariant_iter_t *iter;
-      xvariant_builder_t ret;
-      const xchar_t *s;
-      xint_t i;
+      GVariantIter *iter1;
+      GVariantIter *iter2;
+      GVariantIter *iter3;
+      GVariantIter *iter;
+      GVariantBuilder ret;
+      const gchar *s;
+      gint i;
 
-      xvariant_builder_init (&ret, G_VARIANT_TYPE ("(asaoag)"));
-      xvariant_get (parameters, "(asaoag)", &iter1, &iter2, &iter3);
+      g_variant_builder_init (&ret, G_VARIANT_TYPE ("(asaoag)"));
+      g_variant_get (parameters, "(asaoag)", &iter1, &iter2, &iter3);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("as"));
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("as"));
       for (i = 0; i < 2; i++)
         {
-          iter = xvariant_iter_copy (iter1);
-          while (xvariant_iter_loop (iter, "s", &s))
-            xvariant_builder_add (&ret, "s", s);
-          xvariant_iter_free (iter);
+          iter = g_variant_iter_copy (iter1);
+          while (g_variant_iter_loop (iter, "s", &s))
+            g_variant_builder_add (&ret, "s", s);
+          g_variant_iter_free (iter);
         }
-      xvariant_builder_close (&ret);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ao"));
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ao"));
       for (i = 0; i < 2; i++)
         {
-          iter = xvariant_iter_copy (iter1);
-          while (xvariant_iter_loop (iter, "o", &s))
-            xvariant_builder_add (&ret, "o", s);
-          xvariant_iter_free (iter);
+          iter = g_variant_iter_copy (iter1);
+          while (g_variant_iter_loop (iter, "o", &s))
+            g_variant_builder_add (&ret, "o", s);
+          g_variant_iter_free (iter);
         }
-      xvariant_builder_close (&ret);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("ag"));
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("ag"));
       for (i = 0; i < 2; i++)
         {
-          iter = xvariant_iter_copy (iter1);
-          while (xvariant_iter_loop (iter, "g", &s))
-            xvariant_builder_add (&ret, "g", s);
-          xvariant_iter_free (iter);
+          iter = g_variant_iter_copy (iter1);
+          while (g_variant_iter_loop (iter, "g", &s))
+            g_variant_builder_add (&ret, "g", s);
+          g_variant_iter_free (iter);
         }
-      xvariant_builder_close (&ret);
+      g_variant_builder_close (&ret);
 
-      xvariant_iter_free (iter1);
-      xvariant_iter_free (iter2);
-      xvariant_iter_free (iter3);
+      g_variant_iter_free (iter1);
+      g_variant_iter_free (iter2);
+      g_variant_iter_free (iter3);
 
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_builder_end (&ret));
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_builder_end (&ret));
     }
-  else if (xstrcmp0 (method_name, "TestHashTables") == 0)
+  else if (g_strcmp0 (method_name, "TestHashTables") == 0)
     {
-      xvariant_t *v;
-      xvariant_iter_t iter;
-      xvariant_builder_t ret;
-      xuint8_t y1, y2;
-      xboolean_t b1, b2;
+      GVariant *v;
+      GVariantIter iter;
+      GVariantBuilder ret;
+      guint8 y1, y2;
+      gboolean b1, b2;
       gint16 n1, n2;
-      xuint16_t q1, q2;
-      xint_t i1, i2;
-      xuint_t u1, u2;
-      sint64_t x1, x2;
-      xuint64_t t1, t2;
-      xdouble_t d1, d2;
-      xchar_t *s1, *s2;
+      guint16 q1, q2;
+      gint i1, i2;
+      guint u1, u2;
+      gint64 x1, x2;
+      guint64 t1, t2;
+      gdouble d1, d2;
+      gchar *s1, *s2;
 
-      xvariant_builder_init (&ret, G_VARIANT_TYPE ("(a{yy}a{bb}a{nn}a{qq}a{ii}a{uu}a{xx}a{tt}a{dd}a{ss}a{oo}a{gg})"));
+      g_variant_builder_init (&ret, G_VARIANT_TYPE ("(a{yy}a{bb}a{nn}a{qq}a{ii}a{uu}a{xx}a{tt}a{dd}a{ss}a{oo}a{gg})"));
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{yy}"));
-      v = xvariant_get_child_value (parameters, 0);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "yy", &y1, &y2))
-        xvariant_builder_add (&ret, "{yy}", y1 * 2, (y2 * 3) & 255);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{yy}"));
+      v = g_variant_get_child_value (parameters, 0);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "yy", &y1, &y2))
+        g_variant_builder_add (&ret, "{yy}", y1 * 2, (y2 * 3) & 255);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{bb}"));
-      v = xvariant_get_child_value (parameters, 1);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "bb", &b1, &b2))
-        xvariant_builder_add (&ret, "{bb}", b1, TRUE);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{bb}"));
+      v = g_variant_get_child_value (parameters, 1);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "bb", &b1, &b2))
+        g_variant_builder_add (&ret, "{bb}", b1, TRUE);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{nn}"));
-      v = xvariant_get_child_value (parameters, 2);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "nn", &n1, &n2))
-        xvariant_builder_add (&ret, "{nn}", n1 * 2, n2 * 3);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{nn}"));
+      v = g_variant_get_child_value (parameters, 2);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "nn", &n1, &n2))
+        g_variant_builder_add (&ret, "{nn}", n1 * 2, n2 * 3);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{qq}"));
-      v = xvariant_get_child_value (parameters, 3);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "qq", &q1, &q2))
-        xvariant_builder_add (&ret, "{qq}", q1 * 2, q2 * 3);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{qq}"));
+      v = g_variant_get_child_value (parameters, 3);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "qq", &q1, &q2))
+        g_variant_builder_add (&ret, "{qq}", q1 * 2, q2 * 3);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{ii}"));
-      v = xvariant_get_child_value (parameters, 4);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "ii", &i1, &i2))
-        xvariant_builder_add (&ret, "{ii}", i1 * 2, i2 * 3);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{ii}"));
+      v = g_variant_get_child_value (parameters, 4);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "ii", &i1, &i2))
+        g_variant_builder_add (&ret, "{ii}", i1 * 2, i2 * 3);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{uu}"));
-      v = xvariant_get_child_value (parameters, 5);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "uu", &u1, &u2))
-        xvariant_builder_add (&ret, "{uu}", u1 * 2, u2 * 3);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{uu}"));
+      v = g_variant_get_child_value (parameters, 5);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "uu", &u1, &u2))
+        g_variant_builder_add (&ret, "{uu}", u1 * 2, u2 * 3);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{xx}"));
-      v = xvariant_get_child_value (parameters, 6);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "xx", &x1, &x2))
-        xvariant_builder_add (&ret, "{xx}", x1 + 2, x2  + 1);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{xx}"));
+      v = g_variant_get_child_value (parameters, 6);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "xx", &x1, &x2))
+        g_variant_builder_add (&ret, "{xx}", x1 + 2, x2  + 1);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{tt}"));
-      v = xvariant_get_child_value (parameters, 7);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "tt", &t1, &t2))
-        xvariant_builder_add (&ret, "{tt}", t1 + 2, t2  + 1);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{tt}"));
+      v = g_variant_get_child_value (parameters, 7);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "tt", &t1, &t2))
+        g_variant_builder_add (&ret, "{tt}", t1 + 2, t2  + 1);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{dd}"));
-      v = xvariant_get_child_value (parameters, 8);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "dd", &d1, &d2))
-        xvariant_builder_add (&ret, "{dd}", d1 + 2.5, d2  + 5.0);
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{dd}"));
+      v = g_variant_get_child_value (parameters, 8);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "dd", &d1, &d2))
+        g_variant_builder_add (&ret, "{dd}", d1 + 2.5, d2  + 5.0);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{ss}"));
-      v = xvariant_get_child_value (parameters, 9);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "ss", &s1, &s2))
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{ss}"));
+      v = g_variant_get_child_value (parameters, 9);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "ss", &s1, &s2))
         {
-          xchar_t *tmp1, *tmp2;
-          tmp1 = xstrconcat (s1, "mod", NULL);
-          tmp2 = xstrconcat (s2, s2, NULL);
-          xvariant_builder_add (&ret, "{ss}", tmp1, tmp2);
+          gchar *tmp1, *tmp2;
+          tmp1 = g_strconcat (s1, "mod", NULL);
+          tmp2 = g_strconcat (s2, s2, NULL);
+          g_variant_builder_add (&ret, "{ss}", tmp1, tmp2);
           g_free (tmp1);
           g_free (tmp2);
         }
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{oo}"));
-      v = xvariant_get_child_value (parameters, 10);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "oo", &s1, &s2))
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{oo}"));
+      v = g_variant_get_child_value (parameters, 10);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "oo", &s1, &s2))
         {
-          xchar_t *tmp1, *tmp2;
-          tmp1 = xstrconcat (s1, "/mod", NULL);
-          tmp2 = xstrconcat (s2, "/mod2", NULL);
-          xvariant_builder_add (&ret, "{oo}", tmp1, tmp2);
+          gchar *tmp1, *tmp2;
+          tmp1 = g_strconcat (s1, "/mod", NULL);
+          tmp2 = g_strconcat (s2, "/mod2", NULL);
+          g_variant_builder_add (&ret, "{oo}", tmp1, tmp2);
           g_free (tmp1);
           g_free (tmp2);
         }
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xvariant_builder_open (&ret, G_VARIANT_TYPE ("a{gg}"));
-      v = xvariant_get_child_value (parameters, 11);
-      xvariant_iter_init (&iter, v);
-      while (xvariant_iter_loop (&iter, "gg", &s1, &s2))
+      g_variant_builder_open (&ret, G_VARIANT_TYPE ("a{gg}"));
+      v = g_variant_get_child_value (parameters, 11);
+      g_variant_iter_init (&iter, v);
+      while (g_variant_iter_loop (&iter, "gg", &s1, &s2))
         {
-          xchar_t *tmp1, *tmp2;
-          tmp1 = xstrconcat (s1, "assgit", NULL);
-          tmp2 = xstrconcat (s2, s2, NULL);
-          xvariant_builder_add (&ret, "{gg}", tmp1, tmp2);
+          gchar *tmp1, *tmp2;
+          tmp1 = g_strconcat (s1, "assgit", NULL);
+          tmp2 = g_strconcat (s2, s2, NULL);
+          g_variant_builder_add (&ret, "{gg}", tmp1, tmp2);
           g_free (tmp1);
           g_free (tmp2);
         }
-      xvariant_unref (v);
-      xvariant_builder_close (&ret);
+      g_variant_unref (v);
+      g_variant_builder_close (&ret);
 
-      xdbus_method_invocation_return_value (invocation,
-                                             xvariant_builder_end (&ret));
+      g_dbus_method_invocation_return_value (invocation,
+                                             g_variant_builder_end (&ret));
     }
-  else if (xstrcmp0 (method_name, "TestStructureTypes") == 0)
+  else if (g_strcmp0 (method_name, "TestStructureTypes") == 0)
     {
-      xint_t x, y, x1, y1;
-      const xchar_t *desc;
-      xvariant_iter_t *iter1, *iter2;
-      xchar_t *desc_ret;
-      xvariant_builder_t ret1, ret2;
-      xvariant_iter_t *iter;
-      xvariant_t *v;
-      xchar_t *s1, *s2;
+      gint x, y, x1, y1;
+      const gchar *desc;
+      GVariantIter *iter1, *iter2;
+      gchar *desc_ret;
+      GVariantBuilder ret1, ret2;
+      GVariantIter *iter;
+      GVariant *v;
+      gchar *s1, *s2;
 
-      xvariant_get (parameters, "((ii)(&s(ii)aya{ss}))",
+      g_variant_get (parameters, "((ii)(&s(ii)aya{ss}))",
                      &x, &y, &desc, &x1, &y1, &iter1, &iter2);
 
-      desc_ret = xstrconcat (desc, "... in bed!", NULL);
+      desc_ret = g_strconcat (desc, "... in bed!", NULL);
 
-      xvariant_builder_init (&ret1, G_VARIANT_TYPE ("ay"));
-      iter = xvariant_iter_copy (iter1);
-      while (xvariant_iter_loop (iter1, "y", &v))
-        xvariant_builder_add (&ret1, "y", v);
-      while (xvariant_iter_loop (iter, "y", &v))
-        xvariant_builder_add (&ret1, "y", v);
-      xvariant_iter_free (iter);
-      xvariant_iter_free (iter1);
+      g_variant_builder_init (&ret1, G_VARIANT_TYPE ("ay"));
+      iter = g_variant_iter_copy (iter1);
+      while (g_variant_iter_loop (iter1, "y", &v))
+        g_variant_builder_add (&ret1, "y", v);
+      while (g_variant_iter_loop (iter, "y", &v))
+        g_variant_builder_add (&ret1, "y", v);
+      g_variant_iter_free (iter);
+      g_variant_iter_free (iter1);
 
-      xvariant_builder_init (&ret2, G_VARIANT_TYPE ("a{ss}"));
-      while (xvariant_iter_loop (iter1, "ss", &s1, &s2))
+      g_variant_builder_init (&ret2, G_VARIANT_TYPE ("a{ss}"));
+      while (g_variant_iter_loop (iter1, "ss", &s1, &s2))
         {
-          xchar_t *tmp;
-          tmp = xstrconcat (s2, " ... in bed!", NULL);
-          xvariant_builder_add (&ret1, "{ss}", s1, tmp);
+          gchar *tmp;
+          tmp = g_strconcat (s2, " ... in bed!", NULL);
+          g_variant_builder_add (&ret1, "{ss}", s1, tmp);
           g_free (tmp);
         }
-      xvariant_iter_free (iter2);
+      g_variant_iter_free (iter2);
 
-      xdbus_method_invocation_return_value (invocation,
-           xvariant_new ("((ii)(&s(ii)aya{ss}))",
+      g_dbus_method_invocation_return_value (invocation,
+           g_variant_new ("((ii)(&s(ii)aya{ss}))",
                           x + 1, y + 1, desc_ret, x1 + 2, y1 + 2,
                           &ret1, &ret2));
 
       g_free (desc_ret);
     }
-  else if (xstrcmp0 (method_name, "TestVariant") == 0)
+  else if (g_strcmp0 (method_name, "TestVariant") == 0)
     {
-      xvariant_t *v;
-      xboolean_t modify;
-      xvariant_t *ret;
+      GVariant *v;
+      gboolean modify;
+      GVariant *ret;
 
-      xvariant_get (parameters, "(vb)", &v, &modify);
+      g_variant_get (parameters, "(vb)", &v, &modify);
 
       /* FIXME handle more cases */
       if (modify)
         {
-          if (xvariant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN))
+          if (g_variant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN))
             {
-              ret = xvariant_new_boolean (FALSE);
+              ret = g_variant_new_boolean (FALSE);
             }
-          else if (xvariant_is_of_type (v, G_VARIANT_TYPE_TUPLE))
+          else if (g_variant_is_of_type (v, G_VARIANT_TYPE_TUPLE))
             {
-              ret = xvariant_new ("(si)", "other struct", 100);
+              ret = g_variant_new ("(si)", "other struct", 100);
             }
           else
             g_assert_not_reached ();
@@ -666,111 +666,111 @@ handle_method_call (xdbus_connection_t       *connection,
       else
         ret = v;
 
-      xdbus_method_invocation_return_value (invocation, ret);
-      xvariant_unref (v);
+      g_dbus_method_invocation_return_value (invocation, ret);
+      g_variant_unref (v);
     }
-  else if (xstrcmp0 (method_name, "TestComplexArrays") == 0)
+  else if (g_strcmp0 (method_name, "TestComplexArrays") == 0)
     {
       /* FIXME */
-      xdbus_method_invocation_return_value (invocation, parameters);
+      g_dbus_method_invocation_return_value (invocation, parameters);
     }
-  else if (xstrcmp0 (method_name, "TestComplexHashTables") == 0)
+  else if (g_strcmp0 (method_name, "TestComplexHashTables") == 0)
     {
       /* FIXME */
-      xdbus_method_invocation_return_value (invocation, parameters);
+      g_dbus_method_invocation_return_value (invocation, parameters);
     }
-  else if (xstrcmp0 (method_name, "FrobSetProperty") == 0)
+  else if (g_strcmp0 (method_name, "FrobSetProperty") == 0)
     {
-      xchar_t *name;
-      xvariant_t *value;
-      xvariant_get (parameters, "(sv)", &name, &value);
-      xhash_table_replace (properties, name, value);
-      xdbus_connection_emit_signal (connection,
+      gchar *name;
+      GVariant *value;
+      g_variant_get (parameters, "(sv)", &name, &value);
+      g_hash_table_replace (properties, name, value);
+      g_dbus_connection_emit_signal (connection,
                                      NULL,
-                                     "/com/example/test_object_t",
+                                     "/com/example/TestObject",
                                      "org.freedesktop.DBus.Properties",
                                      "PropertiesChanged",
-                                     xvariant_new_parsed ("('com.example.Frob', [{%s, %v}], @as [])", name, value),
+                                     g_variant_new_parsed ("('com.example.Frob', [{%s, %v}], @as [])", name, value),
                                      NULL);
-      xdbus_method_invocation_return_value (invocation, NULL);
+      g_dbus_method_invocation_return_value (invocation, NULL);
     }
-  else if (xstrcmp0 (method_name, "FrobInvalidateProperty") == 0)
+  else if (g_strcmp0 (method_name, "FrobInvalidateProperty") == 0)
     {
-      const xchar_t *value;
-      xvariant_get (parameters, "(&s)", &value);
-      xhash_table_replace (properties, xstrdup ("PropertyThatWillBeInvalidated"), xvariant_ref_sink (xvariant_new_string (value)));
+      const gchar *value;
+      g_variant_get (parameters, "(&s)", &value);
+      g_hash_table_replace (properties, g_strdup ("PropertyThatWillBeInvalidated"), g_variant_ref_sink (g_variant_new_string (value)));
 
-      xdbus_connection_emit_signal (connection,
+      g_dbus_connection_emit_signal (connection,
                                      NULL,
-                                     "/com/example/test_object_t",
+                                     "/com/example/TestObject",
                                      "org.freedesktop.DBus.Properties",
                                      "PropertiesChanged",
-                                     xvariant_new_parsed ("('com.example.Frob', @a{sv} [], ['PropertyThatWillBeInvalidated'])"),
+                                     g_variant_new_parsed ("('com.example.Frob', @a{sv} [], ['PropertyThatWillBeInvalidated'])"),
                                      NULL);
-      xdbus_method_invocation_return_value (invocation, NULL);
+      g_dbus_method_invocation_return_value (invocation, NULL);
     }
-  else if (xstrcmp0 (method_name, "EmitSignal") == 0)
+  else if (g_strcmp0 (method_name, "EmitSignal") == 0)
     {
-      const xchar_t *str;
-      const xchar_t *path;
-      xchar_t *str_ret;
-      xchar_t *path_ret;
-      xvariant_get (parameters, "(&s&o)", &str, &path);
-      str_ret = xstrconcat (str, " .. in bed!", NULL);
-      path_ret = xstrconcat (path, "/in/bed", NULL);
-      xdbus_connection_emit_signal (connection,
+      const gchar *str;
+      const gchar *path;
+      gchar *str_ret;
+      gchar *path_ret;
+      g_variant_get (parameters, "(&s&o)", &str, &path);
+      str_ret = g_strconcat (str, " .. in bed!", NULL);
+      path_ret = g_strconcat (path, "/in/bed", NULL);
+      g_dbus_connection_emit_signal (connection,
                                      NULL,
-                                     "/com/example/test_object_t",
+                                     "/com/example/TestObject",
                                      "com.example.Frob",
                                      "TestSignal",
-                                     xvariant_new_parsed ("(%s, %o, <'a variant'>)", str_ret, path_ret),
+                                     g_variant_new_parsed ("(%s, %o, <'a variant'>)", str_ret, path_ret),
                                      NULL);
       g_free (str_ret);
       g_free (path_ret);
-      xdbus_method_invocation_return_value (invocation, NULL);
+      g_dbus_method_invocation_return_value (invocation, NULL);
     }
-  else if (xstrcmp0 (method_name, "EmitSignal2") == 0)
+  else if (g_strcmp0 (method_name, "EmitSignal2") == 0)
     {
-      xdbus_connection_emit_signal (connection,
+      g_dbus_connection_emit_signal (connection,
                                      NULL,
-                                     "/com/example/test_object_t",
+                                     "/com/example/TestObject",
                                      "com.example.Frob",
                                      "TestSignal2",
-                                     xvariant_new_parsed ("(42, )"),
+                                     g_variant_new_parsed ("(42, )"),
                                      NULL);
-      xdbus_method_invocation_return_value (invocation, NULL);
+      g_dbus_method_invocation_return_value (invocation, NULL);
     }
-  else if (xstrcmp0 (method_name, "Sleep") == 0)
+  else if (g_strcmp0 (method_name, "Sleep") == 0)
     {
-      xint_t msec;
+      gint msec;
 
-      xvariant_get (parameters, "(i)", &msec);
+      g_variant_get (parameters, "(i)", &msec);
 
-      g_timeout_add ((xuint_t)msec, end_sleep, xobject_ref (invocation));
+      g_timeout_add ((guint)msec, end_sleep, g_object_ref (invocation));
     }
-  else if (xstrcmp0 (method_name, "Quit") == 0)
+  else if (g_strcmp0 (method_name, "Quit") == 0)
     {
-      xdbus_method_invocation_return_value (invocation, NULL);
-      xmain_loop_quit (loop);
+      g_dbus_method_invocation_return_value (invocation, NULL);
+      g_main_loop_quit (loop);
     }
 }
 
-static xvariant_t *
-handle_get_property (xdbus_connection_t  *connection,
-                     const xchar_t      *sender,
-                     const xchar_t      *object_path,
-                     const xchar_t      *interface_name,
-                     const xchar_t      *property_name,
-                     xerror_t          **error,
-                     xpointer_t          user_data)
+static GVariant *
+handle_get_property (GDBusConnection  *connection,
+                     const gchar      *sender,
+                     const gchar      *object_path,
+                     const gchar      *interface_name,
+                     const gchar      *property_name,
+                     GError          **error,
+                     gpointer          user_data)
 {
-  xvariant_t *ret;
+  GVariant *ret;
 
-  ret = xhash_table_lookup (properties, property_name);
+  ret = g_hash_table_lookup (properties, property_name);
   if (ret)
     {
-      xassert (!xvariant_is_floating (ret));
-      xvariant_ref (ret);
+      g_assert (!g_variant_is_floating (ret));
+      g_variant_ref (ret);
     }
   else
     {
@@ -782,15 +782,15 @@ handle_get_property (xdbus_connection_t  *connection,
   return ret;
 }
 
-static xboolean_t
-handle_set_property (xdbus_connection_t  *connection,
-                     const xchar_t      *sender,
-                     const xchar_t      *object_path,
-                     const xchar_t      *interface_name,
-                     const xchar_t      *property_name,
-                     xvariant_t         *value,
-                     xerror_t          **error,
-                     xpointer_t          user_data)
+static gboolean
+handle_set_property (GDBusConnection  *connection,
+                     const gchar      *sender,
+                     const gchar      *object_path,
+                     const gchar      *interface_name,
+                     const gchar      *property_name,
+                     GVariant         *value,
+                     GError          **error,
+                     gpointer          user_data)
 {
   g_set_error (error,
                G_DBUS_ERROR, G_DBUS_ERROR_FAILED,
@@ -798,7 +798,7 @@ handle_set_property (xdbus_connection_t  *connection,
   return FALSE;
 }
 
-static const xdbus_interface_vtable_t interface_vtable =
+static const GDBusInterfaceVTable interface_vtable =
 {
   handle_method_call,
   handle_get_property,
@@ -807,33 +807,33 @@ static const xdbus_interface_vtable_t interface_vtable =
 };
 
 static void
-on_bus_acquired (xdbus_connection_t *connection,
-                 const xchar_t     *name,
-                 xpointer_t         user_data)
+on_bus_acquired (GDBusConnection *connection,
+                 const gchar     *name,
+                 gpointer         user_data)
 {
-  xuint_t id;
+  guint id;
 
-  id = xdbus_connection_register_object (connection,
-                                          "/com/example/test_object_t",
+  id = g_dbus_connection_register_object (connection,
+                                          "/com/example/TestObject",
                                           introspection_data->interfaces[0],
                                           &interface_vtable,
                                           NULL,
                                           NULL,
                                           NULL);
-  xassert (id > 0);
+  g_assert (id > 0);
 }
 
 static void
-on_name_acquired (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  xpointer_t         user_data)
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
 {
 }
 
 static void
-on_name_lost (xdbus_connection_t *connection,
-              const xchar_t     *name,
-              xpointer_t         user_data)
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
 {
   exit (1);
 }
@@ -841,34 +841,34 @@ on_name_lost (xdbus_connection_t *connection,
 int
 main (int argc, char *argv[])
 {
-  xuint_t owner_id;
+  guint owner_id;
 
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  properties = xhash_table_new_full (xstr_hash, xstr_equal, g_free, (xdestroy_notify_t)xvariant_unref);
-  xhash_table_insert (properties, xstrdup ("y"), xvariant_ref_sink (xvariant_new_byte (1)));
-  xhash_table_insert (properties, xstrdup ("b"), xvariant_ref_sink (xvariant_new_boolean (TRUE)));
-  xhash_table_insert (properties, xstrdup ("n"), xvariant_ref_sink (xvariant_new_int16 (2)));
-  xhash_table_insert (properties, xstrdup ("q"), xvariant_ref_sink (xvariant_new_uint16 (3)));
-  xhash_table_insert (properties, xstrdup ("i"), xvariant_ref_sink (xvariant_new_int32 (4)));
-  xhash_table_insert (properties, xstrdup ("u"), xvariant_ref_sink (xvariant_new_uint32 (5)));
-  xhash_table_insert (properties, xstrdup ("x"), xvariant_ref_sink (xvariant_new_int64 (6)));
-  xhash_table_insert (properties, xstrdup ("t"), xvariant_ref_sink (xvariant_new_uint64 (7)));
-  xhash_table_insert (properties, xstrdup ("d"), xvariant_ref_sink (xvariant_new_double (7.5)));
-  xhash_table_insert (properties, xstrdup ("s"), xvariant_ref_sink (xvariant_new_string ("a string")));
-  xhash_table_insert (properties, xstrdup ("o"), xvariant_ref_sink (xvariant_new_object_path ("/some/path")));
-  xhash_table_insert (properties, xstrdup ("ay"), xvariant_ref_sink (xvariant_new_parsed ("[@y 1, @y 11]")));
-  xhash_table_insert (properties, xstrdup ("ab"), xvariant_ref_sink (xvariant_new_parsed ("[true, false]")));
-  xhash_table_insert (properties, xstrdup ("an"), xvariant_ref_sink (xvariant_new_parsed ("[@n 2, @n 12]")));
-  xhash_table_insert (properties, xstrdup ("aq"), xvariant_ref_sink (xvariant_new_parsed ("[@q 3, @q 13]")));
-  xhash_table_insert (properties, xstrdup ("ai"), xvariant_ref_sink (xvariant_new_parsed ("[@i 4, @i 14]")));
-  xhash_table_insert (properties, xstrdup ("au"), xvariant_ref_sink (xvariant_new_parsed ("[@u 5, @u 15]")));
-  xhash_table_insert (properties, xstrdup ("ax"), xvariant_ref_sink (xvariant_new_parsed ("[@x 6, @x 16]")));
-  xhash_table_insert (properties, xstrdup ("at"), xvariant_ref_sink (xvariant_new_parsed ("[@t 7, @t 17]")));
-  xhash_table_insert (properties, xstrdup ("ad"), xvariant_ref_sink (xvariant_new_parsed ("[7.5, 17.5]")));
-  xhash_table_insert (properties, xstrdup ("as"), xvariant_ref_sink (xvariant_new_parsed ("['a string', 'another string']")));
-  xhash_table_insert (properties, xstrdup ("ao"), xvariant_ref_sink (xvariant_new_parsed ("[@o '/some/path', @o '/another/path']")));
-  xhash_table_insert (properties, xstrdup ("foo"), xvariant_ref_sink (xvariant_new_string ("a frobbed string")));
-  xhash_table_insert (properties, xstrdup ("PropertyThatWillBeInvalidated"), xvariant_ref_sink (xvariant_new_string ("InitialValue")));
+  properties = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_variant_unref);
+  g_hash_table_insert (properties, g_strdup ("y"), g_variant_ref_sink (g_variant_new_byte (1)));
+  g_hash_table_insert (properties, g_strdup ("b"), g_variant_ref_sink (g_variant_new_boolean (TRUE)));
+  g_hash_table_insert (properties, g_strdup ("n"), g_variant_ref_sink (g_variant_new_int16 (2)));
+  g_hash_table_insert (properties, g_strdup ("q"), g_variant_ref_sink (g_variant_new_uint16 (3)));
+  g_hash_table_insert (properties, g_strdup ("i"), g_variant_ref_sink (g_variant_new_int32 (4)));
+  g_hash_table_insert (properties, g_strdup ("u"), g_variant_ref_sink (g_variant_new_uint32 (5)));
+  g_hash_table_insert (properties, g_strdup ("x"), g_variant_ref_sink (g_variant_new_int64 (6)));
+  g_hash_table_insert (properties, g_strdup ("t"), g_variant_ref_sink (g_variant_new_uint64 (7)));
+  g_hash_table_insert (properties, g_strdup ("d"), g_variant_ref_sink (g_variant_new_double (7.5)));
+  g_hash_table_insert (properties, g_strdup ("s"), g_variant_ref_sink (g_variant_new_string ("a string")));
+  g_hash_table_insert (properties, g_strdup ("o"), g_variant_ref_sink (g_variant_new_object_path ("/some/path")));
+  g_hash_table_insert (properties, g_strdup ("ay"), g_variant_ref_sink (g_variant_new_parsed ("[@y 1, @y 11]")));
+  g_hash_table_insert (properties, g_strdup ("ab"), g_variant_ref_sink (g_variant_new_parsed ("[true, false]")));
+  g_hash_table_insert (properties, g_strdup ("an"), g_variant_ref_sink (g_variant_new_parsed ("[@n 2, @n 12]")));
+  g_hash_table_insert (properties, g_strdup ("aq"), g_variant_ref_sink (g_variant_new_parsed ("[@q 3, @q 13]")));
+  g_hash_table_insert (properties, g_strdup ("ai"), g_variant_ref_sink (g_variant_new_parsed ("[@i 4, @i 14]")));
+  g_hash_table_insert (properties, g_strdup ("au"), g_variant_ref_sink (g_variant_new_parsed ("[@u 5, @u 15]")));
+  g_hash_table_insert (properties, g_strdup ("ax"), g_variant_ref_sink (g_variant_new_parsed ("[@x 6, @x 16]")));
+  g_hash_table_insert (properties, g_strdup ("at"), g_variant_ref_sink (g_variant_new_parsed ("[@t 7, @t 17]")));
+  g_hash_table_insert (properties, g_strdup ("ad"), g_variant_ref_sink (g_variant_new_parsed ("[7.5, 17.5]")));
+  g_hash_table_insert (properties, g_strdup ("as"), g_variant_ref_sink (g_variant_new_parsed ("['a string', 'another string']")));
+  g_hash_table_insert (properties, g_strdup ("ao"), g_variant_ref_sink (g_variant_new_parsed ("[@o '/some/path', @o '/another/path']")));
+  g_hash_table_insert (properties, g_strdup ("foo"), g_variant_ref_sink (g_variant_new_string ("a frobbed string")));
+  g_hash_table_insert (properties, g_strdup ("PropertyThatWillBeInvalidated"), g_variant_ref_sink (g_variant_new_string ("InitialValue")));
 
   owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                              "com.example.TestService",
@@ -879,13 +879,13 @@ main (int argc, char *argv[])
                              NULL,
                              NULL);
 
-  loop = xmain_loop_new (NULL, FALSE);
-  xmain_loop_run (loop);
+  loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
 
   g_bus_unown_name (owner_id);
 
   g_dbus_node_info_unref (introspection_data);
-  xhash_table_unref (properties);
+  g_hash_table_unref (properties);
 
   return 0;
 }

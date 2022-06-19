@@ -19,23 +19,23 @@
 static void
 test_types (void)
 {
-  const xint_t *csp;
-  const xint_t * const *cspp;
-  xuint_t u, u2;
-  xint_t s, s2;
-  xpointer_t vp, vp2;
+  const gint *csp;
+  const gint * const *cspp;
+  guint u, u2;
+  gint s, s2;
+  gpointer vp, vp2;
   const char *vp_str;
   const char *volatile vp_str_vol;
   const char *str = "Hello";
   int *ip, *ip2;
-  xsize_t gs, gs2;
-  xboolean_t res;
+  gsize gs, gs2;
+  gboolean res;
 
   csp = &s;
   cspp = &csp;
 
   g_atomic_int_set (&u, 5);
-  u2 = (xuint_t) g_atomic_int_get (&u);
+  u2 = (guint) g_atomic_int_get (&u);
   g_assert_cmpint (u2, ==, 5);
   res = g_atomic_int_compare_and_exchange (&u, 6, 7);
   g_assert_false (res);
@@ -70,13 +70,13 @@ test_types (void)
   res = g_atomic_int_dec_and_test (&s);
   g_assert_false (res);
   g_assert_cmpint (s, ==, 6);
-  s2 = (xint_t) g_atomic_int_and (&s, 5);
+  s2 = (gint) g_atomic_int_and (&s, 5);
   g_assert_cmpint (s2, ==, 6);
   g_assert_cmpint (s, ==, 4);
-  s2 = (xint_t) g_atomic_int_or (&s, 8);
+  s2 = (gint) g_atomic_int_or (&s, 8);
   g_assert_cmpint (s2, ==, 4);
   g_assert_cmpint (s, ==, 12);
-  s2 = (xint_t) g_atomic_int_xor (&s, 4);
+  s2 = (gint) g_atomic_int_xor (&s, 4);
   g_assert_cmpint (s2, ==, 12);
   g_assert_cmpint (s, ==, 8);
 
@@ -112,13 +112,13 @@ test_types (void)
   g_assert_true (ip == 0);
 
   g_atomic_pointer_set (&gs, 0);
-  vp2 = (xpointer_t) g_atomic_pointer_get (&gs);
-  gs2 = (xsize_t) vp2;
+  vp2 = (gpointer) g_atomic_pointer_get (&gs);
+  gs2 = (gsize) vp2;
   g_assert_cmpuint (gs2, ==, 0);
-  res = g_atomic_pointer_compare_and_exchange (&gs, NULL, (xsize_t) NULL);
+  res = g_atomic_pointer_compare_and_exchange (&gs, NULL, (gsize) NULL);
   g_assert_true (res);
   g_assert_cmpuint (gs, ==, 0);
-  gs2 = (xsize_t) g_atomic_pointer_add (&gs, 5);
+  gs2 = (gsize) g_atomic_pointer_add (&gs, 5);
   g_assert_cmpuint (gs2, ==, 0);
   g_assert_cmpuint (gs, ==, 5);
   gs2 = g_atomic_pointer_and (&gs, 6);
@@ -132,7 +132,7 @@ test_types (void)
   g_assert_cmpuint (gs, ==, 8);
 
   g_assert_cmpint (g_atomic_int_get (csp), ==, s);
-  g_assert_true (g_atomic_pointer_get ((const xint_t **) cspp) == csp);
+  g_assert_true (g_atomic_pointer_get ((const gint **) cspp) == csp);
 
   /* repeat, without the macros */
 #undef g_atomic_int_set
@@ -152,17 +152,17 @@ test_types (void)
 #undef g_atomic_pointer_or
 #undef g_atomic_pointer_xor
 
-  g_atomic_int_set ((xint_t*)&u, 5);
-  u2 = (xuint_t) g_atomic_int_get ((xint_t*)&u);
+  g_atomic_int_set ((gint*)&u, 5);
+  u2 = (guint) g_atomic_int_get ((gint*)&u);
   g_assert_cmpint (u2, ==, 5);
-  res = g_atomic_int_compare_and_exchange ((xint_t*)&u, 6, 7);
+  res = g_atomic_int_compare_and_exchange ((gint*)&u, 6, 7);
   g_assert_false (res);
   g_assert_cmpint (u, ==, 5);
-  g_atomic_int_add ((xint_t*)&u, 1);
+  g_atomic_int_add ((gint*)&u, 1);
   g_assert_cmpint (u, ==, 6);
-  g_atomic_int_inc ((xint_t*)&u);
+  g_atomic_int_inc ((gint*)&u);
   g_assert_cmpint (u, ==, 7);
-  res = g_atomic_int_dec_and_test ((xint_t*)&u);
+  res = g_atomic_int_dec_and_test ((gint*)&u);
   g_assert_false (res);
   g_assert_cmpint (u, ==, 6);
   u2 = g_atomic_int_and (&u, 5);
@@ -187,17 +187,17 @@ test_types (void)
   res = g_atomic_int_dec_and_test (&s);
   g_assert_false (res);
   g_assert_cmpint (s, ==, 6);
-  s2 = (xint_t) g_atomic_int_and ((xuint_t*)&s, 5);
+  s2 = (gint) g_atomic_int_and ((guint*)&s, 5);
   g_assert_cmpint (s2, ==, 6);
   g_assert_cmpint (s, ==, 4);
-  s2 = (xint_t) g_atomic_int_or ((xuint_t*)&s, 8);
+  s2 = (gint) g_atomic_int_or ((guint*)&s, 8);
   g_assert_cmpint (s2, ==, 4);
   g_assert_cmpint (s, ==, 12);
-  s2 = (xint_t) g_atomic_int_xor ((xuint_t*)&s, 4);
+  s2 = (gint) g_atomic_int_xor ((guint*)&s, 4);
   g_assert_cmpint (s2, ==, 12);
   g_assert_cmpint (s, ==, 8);
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  s2 = g_atomic_int_exchange_and_add ((xint_t*)&s, 1);
+  s2 = g_atomic_int_exchange_and_add ((gint*)&s, 1);
 G_GNUC_END_IGNORE_DEPRECATIONS
   g_assert_cmpint (s2, ==, 8);
   g_assert_cmpint (s, ==, 9);
@@ -232,12 +232,12 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 
   g_atomic_pointer_set (&gs, 0);
   vp = g_atomic_pointer_get (&gs);
-  gs2 = (xsize_t) vp;
+  gs2 = (gsize) vp;
   g_assert_cmpuint (gs2, ==, 0);
   res = g_atomic_pointer_compare_and_exchange (&gs, NULL, NULL);
   g_assert_true (res);
   g_assert_cmpuint (gs, ==, 0);
-  gs2 = (xsize_t) g_atomic_pointer_add (&gs, 5);
+  gs2 = (gsize) g_atomic_pointer_add (&gs, 5);
   g_assert_cmpuint (gs2, ==, 0);
   g_assert_cmpuint (gs, ==, 5);
   gs2 = g_atomic_pointer_and (&gs, 6);
@@ -257,22 +257,22 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 #define THREADS 10
 #define ROUNDS 10000
 
-xint_t bucket[THREADS];  /* never contested by threads, not accessed atomically */
-xint_t atomic;  /* (atomic) */
+gint bucket[THREADS];  /* never contested by threads, not accessed atomically */
+gint atomic;  /* (atomic) */
 
-static xpointer_t
-thread_func (xpointer_t data)
+static gpointer
+thread_func (gpointer data)
 {
-  xint_t idx = GPOINTER_TO_INT (data);
-  xint_t i;
-  xint_t d;
+  gint idx = GPOINTER_TO_INT (data);
+  gint i;
+  gint d;
 
   for (i = 0; i < ROUNDS; i++)
     {
       d = g_random_int_range (-10, 100);
       bucket[idx] += d;
       g_atomic_int_add (&atomic, d);
-      xthread_yield ();
+      g_thread_yield ();
     }
 
   return NULL;
@@ -281,19 +281,19 @@ thread_func (xpointer_t data)
 static void
 test_threaded (void)
 {
-  xint_t sum;
-  xint_t i;
-  xthread_t *threads[THREADS];
+  gint sum;
+  gint i;
+  GThread *threads[THREADS];
 
   atomic = 0;
   for (i = 0; i < THREADS; i++)
     bucket[i] = 0;
 
   for (i = 0; i < THREADS; i++)
-    threads[i] = xthread_new ("atomic", thread_func, GINT_TO_POINTER (i));
+    threads[i] = g_thread_new ("atomic", thread_func, GINT_TO_POINTER (i));
 
   for (i = 0; i < THREADS; i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   sum = 0;
   for (i = 0; i < THREADS; i++)

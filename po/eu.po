@@ -29,16 +29,16 @@ msgid "Setting application as last used for type not supported yet"
 msgstr "Erabilitako azken aplikazioa motarako ezartzea ez dago onartuta oraindik"
 
 #: gio/gapplication.c:497
-msgid "xapplication_t options"
-msgstr "xapplication_t aplikazioaren aukerak"
+msgid "GApplication options"
+msgstr "GApplication aplikazioaren aukerak"
 
 #: gio/gapplication.c:497
-msgid "Show xapplication_t options"
-msgstr "Erakutsi xapplication_t-en aukerak"
+msgid "Show GApplication options"
+msgstr "Erakutsi GApplication-en aukerak"
 
 #: gio/gapplication.c:542
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
-msgstr "Sartu xapplication_t zerbitzu moduan (erabili D-Bus zerbitzuaren fitxategietatik)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
+msgstr "Sartu GApplication zerbitzu moduan (erabili D-Bus zerbitzuaren fitxategietatik)"
 
 #: gio/gapplication.c:554
 msgid "Override the application’s ID"
@@ -145,8 +145,8 @@ msgid "PARAMETER"
 msgstr "PARAMETROA"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Ekintza deitzean emango zaion parametroa, xvariant_t formatuan"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Ekintza deitzean emango zaion parametroa, GVariant formatuan"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:676
 #, c-format
@@ -268,8 +268,8 @@ msgid "Seek not supported on base stream"
 msgstr "Ez da bilaketarik onartzen oinarrizko korrontean"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Ezin da xbuffered_input_stream_t trunkatu"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Ezin da GBufferedInputStream trunkatu"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -340,20 +340,20 @@ msgid "%s filetype"
 msgstr "%s fitxategi mota"
 
 #: gio/gcredentials.c:335
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t-ek baliogabeko datuak ditu"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials-ek baliogabeko datuak ditu"
 
 #: gio/gcredentials.c:395 gio/gcredentials.c:686
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t ez dago inplementatuta SE honetan"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials ez dago inplementatuta SE honetan"
 
 #: gio/gcredentials.c:550 gio/gcredentials.c:568
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Ez dago xcredentials_t euskarririk plataforma honetan"
+msgid "There is no GCredentials support for your platform"
+msgstr "Ez dago GCredentials euskarririk plataforma honetan"
 
 #: gio/gcredentials.c:626
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t-ek ez dauka prozesuaren IDrik SE honetan"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials-ek ez dauka prozesuaren IDrik SE honetan"
 
 #: gio/gcredentials.c:680
 msgid "Credentials spoofing is not possible on this OS"
@@ -532,8 +532,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Erabiltzailearen IDak ID bera izan behar du parekoan eta zerbitzarian"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Bertan behera utzita xdbus_auth_observer_t::authorize-authenticated-peer erabiliz"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Bertan behera utzita GDBusAuthObserver::authorize-authenticated-peer erabiliz"
 
 #: gio/gdbusauthmechanismsha1.c:300
 #, c-format
@@ -806,8 +806,8 @@ msgstr "Analizatutako “%s” balioa aldagaiarentzat ez da baliozko D-Bus sinad
 #: gio/gdbusmessage.c:2021
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
-msgstr "Errorea xvariant_t deserializatzean “%s” kate motarekin D-Bus konexioko formatutik"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
+msgstr "Errorea GVariant deserializatzean “%s” kate motarekin D-Bus konexioko formatutik"
 
 #: gio/gdbusmessage.c:2206
 #, c-format
@@ -849,8 +849,8 @@ msgstr "Ezin da mezua deserializatu: "
 #: gio/gdbusmessage.c:2698
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
-msgstr "Errorea xvariant_t serializatzean “%s” kate motarekin D-Bus konexioaren formatura"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
+msgstr "Errorea GVariant serializatzean “%s” kate motarekin D-Bus konexioaren formatura"
 
 #: gio/gdbusmessage.c:2835
 #, c-format
@@ -1304,27 +1304,27 @@ msgstr "DTLS euskarria ez dago erabilgarri"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Ezin da xemblem_t kodeketaren %d bertsioa kudeatu"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Ezin da GEmblem kodeketaren %d bertsioa kudeatu"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Gaizki osatutako token kopurua (%d) xemblem_t kodeketan"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Gaizki osatutako token kopurua (%d) GEmblem kodeketan"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Ezin da xemblemed_icon_t kodeketaren %d bertsioa kudeatu"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Ezin da GEmblemedIcon kodeketaren %d bertsioa kudeatu"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Gaizki osatutako token kopurua (%d) xemblemed_icon_t kodeketan"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Gaizki osatutako token kopurua (%d) GEmblemedIcon kodeketan"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "GEmblen espero zen xemblemed_icon_t-entzako"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "GEmblen espero zen GEmblemedIcon-entzako"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1415,12 +1415,12 @@ msgstr "Fitxategiaren enumeratzailea itxita dago jadanik"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Ezin da xfile_icon_t kodeketaren %d bertsioa kudeatu"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Ezin da GFileIcon kodeketaren %d bertsioa kudeatu"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Gaizki osatutako sarrerako datuak xfile_icon_t-entzako"
+msgid "Malformed input data for GFileIcon"
+msgstr "Gaizki osatutako sarrerako datuak GFileIcon-entzako"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1488,8 +1488,8 @@ msgstr "Ez dago %s klasearen izen motarik"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "%s motak ez du xicon_t interfazea inplementatzen"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "%s motak ez du GIcon interfazea inplementatzen"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1503,8 +1503,8 @@ msgstr "Gaizko osatutako bertsio zenbakia: %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "%s motak ez du from_tokens() inplementatzen xicon_t interfazean"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "%s motak ez du from_tokens() inplementatzen GIcon interfazean"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2637,8 +2637,8 @@ msgstr "<%s id='%s'> ez dago (oraindik) definituta."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Baliogabeko xvariant_t motako “%s” katea"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Baliogabeko GVariant motako “%s” katea"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2839,10 +2839,10 @@ msgstr "Ez derrigortu gako-izenen murriztapenik"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
-msgstr "Konpilatu xsettings_t eskemen fitxategi guztiak eskema-cache batean.\n"
+msgstr "Konpilatu GSettings eskemen fitxategi guztiak eskema-cache batean.\n"
 "Eskemen fitxategiek .gschema.xml luzapena eduki behar dute,\n"
 "eta cache-ko fitxategia gschemas.compiled deitzen da."
 
@@ -3197,8 +3197,8 @@ msgid "Error removing old file: %s"
 msgstr "Errorea fitxategi zaharra kentzean: %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:762
-msgid "Invalid xseek_type_t supplied"
-msgstr "Baliogabeko xseek_type_t eman da"
+msgid "Invalid GSeekType supplied"
+msgstr "Baliogabeko GSeekType eman da"
 
 #
 #: gio/gmemoryinputstream.c:484
@@ -3206,8 +3206,8 @@ msgid "Invalid seek request"
 msgstr "Bilaketa-eskaera baliogabea"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Ezin da xmemory_input_stream_t trunkatu"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Ezin da GMemoryInputStream trunkatu"
 
 #: gio/gmemoryoutputstream.c:568
 msgid "Memory output stream not resizable"
@@ -3727,8 +3727,8 @@ msgstr "S/Iko socketaren denbora-muga gaindituta"
 
 #: gio/gsocket.c:582
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "xsocket_t sortzen fd-tik: %s"
+msgid "creating GSocket from fd: %s"
+msgstr "GSocket sortzen fd-tik: %s"
 
 #: gio/gsocket.c:611 gio/gsocket.c:675 gio/gsocket.c:682
 #, c-format
@@ -3869,8 +3869,8 @@ msgid "Error sending message: %s"
 msgstr "Errorea mezua bidaltzean: %s"
 
 #: gio/gsocket.c:5032
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t ez da Windows sisteman onartzen"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage ez da Windows sisteman onartzen"
 
 #: gio/gsocket.c:5505 gio/gsocket.c:5581 gio/gsocket.c:5807
 #, c-format
@@ -3883,8 +3883,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Ezin da socket-aren kredentzialik irakurri: %s"
 
 #: gio/gsocket.c:6173
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "xsocket_get_credentials ez dago S.E. honetan inplementatuta"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "g_socket_get_credentials ez dago S.E. honetan inplementatuta"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4014,8 +4014,8 @@ msgstr "Plataforma honetan ez dira kanalizazioak onartzen"
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Ezin da xthemed_icon_t kodeketaren %d bertsioa kudeatu"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Ezin da GThemedIcon kodeketaren %d bertsioa kudeatu"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4068,8 +4068,8 @@ msgid "The current TLS backend does not support PKCS #12"
 msgstr "Uneko TLS motorrak ez du PKCS #12 onartzen"
 
 #: gio/gtlscertificate.c:1013
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "xtls_backend_t honek ez du onartzen PKCS #11 ziurtagiriak sortzeak"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "GTlsBackend honek ez du onartzen PKCS #11 ziurtagiriak sortzeak"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4224,7 +4224,7 @@ msgstr "Helbidea entzuteko"
 
 #: gio/tests/gdbus-daemon.c:19
 msgid "Ignored, for compat with GTestDbus"
-msgstr "Ez ikusi egin xtest_dbus_t-ekin bateragarria izateko"
+msgstr "Ez ikusi egin GTestDBus-ekin bateragarria izateko"
 
 #: gio/tests/gdbus-daemon.c:20
 msgid "Print address"
@@ -4371,25 +4371,25 @@ msgstr "“%s” bide-izena ez da bide-izen absolutua"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%y-%m-%d %T %Z"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%y/%m/%d"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4772,13 +4772,13 @@ msgstr "Abe."
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "PM"
 

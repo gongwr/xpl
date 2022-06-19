@@ -26,71 +26,71 @@
 
 typedef struct
 {
-  void (* changed)               (xobject_t             *target,
-                                  xsettings_backend_t    *backend,
-                                  const xchar_t         *key,
-                                  xpointer_t             origin_tag);
-  void (* path_changed)          (xobject_t             *target,
-                                  xsettings_backend_t    *backend,
-                                  const xchar_t         *path,
-                                  xpointer_t             origin_tag);
-  void (* keys_changed)          (xobject_t             *target,
-                                  xsettings_backend_t    *backend,
-                                  const xchar_t         *prefix,
-                                  xpointer_t             origin_tag,
-                                  const xchar_t * const *names);
-  void (* writable_changed)      (xobject_t             *target,
-                                  xsettings_backend_t    *backend,
-                                  const xchar_t         *key);
-  void (* path_writable_changed) (xobject_t             *target,
-                                  xsettings_backend_t    *backend,
-                                  const xchar_t         *path);
+  void (* changed)               (GObject             *target,
+                                  GSettingsBackend    *backend,
+                                  const gchar         *key,
+                                  gpointer             origin_tag);
+  void (* path_changed)          (GObject             *target,
+                                  GSettingsBackend    *backend,
+                                  const gchar         *path,
+                                  gpointer             origin_tag);
+  void (* keys_changed)          (GObject             *target,
+                                  GSettingsBackend    *backend,
+                                  const gchar         *prefix,
+                                  gpointer             origin_tag,
+                                  const gchar * const *names);
+  void (* writable_changed)      (GObject             *target,
+                                  GSettingsBackend    *backend,
+                                  const gchar         *key);
+  void (* path_writable_changed) (GObject             *target,
+                                  GSettingsBackend    *backend,
+                                  const gchar         *path);
 } GSettingsListenerVTable;
 
-void                    g_settings_backend_watch                        (xsettings_backend_t               *backend,
+void                    g_settings_backend_watch                        (GSettingsBackend               *backend,
                                                                          const GSettingsListenerVTable  *vtable,
-                                                                         xobject_t                        *target,
-                                                                         xmain_context_t                   *context);
-void                    g_settings_backend_unwatch                      (xsettings_backend_t               *backend,
-                                                                         xobject_t                        *target);
+                                                                         GObject                        *target,
+                                                                         GMainContext                   *context);
+void                    g_settings_backend_unwatch                      (GSettingsBackend               *backend,
+                                                                         GObject                        *target);
 
-xtree_t *                 g_settings_backend_create_tree                  (void);
+GTree *                 g_settings_backend_create_tree                  (void);
 
-xvariant_t *              g_settings_backend_read                         (xsettings_backend_t               *backend,
-                                                                         const xchar_t                    *key,
-                                                                         const xvariant_type_t             *expected_type,
-                                                                         xboolean_t                        default_value);
-xvariant_t *              g_settings_backend_read_user_value              (xsettings_backend_t               *backend,
-                                                                         const xchar_t                    *key,
-                                                                         const xvariant_type_t             *expected_type);
-xboolean_t                g_settings_backend_write                        (xsettings_backend_t               *backend,
-                                                                         const xchar_t                    *key,
-                                                                         xvariant_t                       *value,
-                                                                         xpointer_t                        origin_tag);
-xboolean_t                g_settings_backend_write_tree                   (xsettings_backend_t               *backend,
-                                                                         xtree_t                          *tree,
-                                                                         xpointer_t                        origin_tag);
-void                    g_settings_backend_reset                        (xsettings_backend_t               *backend,
-                                                                         const xchar_t                    *key,
-                                                                         xpointer_t                        origin_tag);
-xboolean_t                g_settings_backend_get_writable                 (xsettings_backend_t               *backend,
+GVariant *              g_settings_backend_read                         (GSettingsBackend               *backend,
+                                                                         const gchar                    *key,
+                                                                         const GVariantType             *expected_type,
+                                                                         gboolean                        default_value);
+GVariant *              g_settings_backend_read_user_value              (GSettingsBackend               *backend,
+                                                                         const gchar                    *key,
+                                                                         const GVariantType             *expected_type);
+gboolean                g_settings_backend_write                        (GSettingsBackend               *backend,
+                                                                         const gchar                    *key,
+                                                                         GVariant                       *value,
+                                                                         gpointer                        origin_tag);
+gboolean                g_settings_backend_write_tree                   (GSettingsBackend               *backend,
+                                                                         GTree                          *tree,
+                                                                         gpointer                        origin_tag);
+void                    g_settings_backend_reset                        (GSettingsBackend               *backend,
+                                                                         const gchar                    *key,
+                                                                         gpointer                        origin_tag);
+gboolean                g_settings_backend_get_writable                 (GSettingsBackend               *backend,
                                                                          const char                     *key);
-void                    g_settings_backend_unsubscribe                  (xsettings_backend_t               *backend,
+void                    g_settings_backend_unsubscribe                  (GSettingsBackend               *backend,
                                                                          const char                     *name);
-void                    g_settings_backend_subscribe                    (xsettings_backend_t               *backend,
+void                    g_settings_backend_subscribe                    (GSettingsBackend               *backend,
                                                                          const char                     *name);
-xpermission_t *           g_settings_backend_get_permission               (xsettings_backend_t               *backend,
-                                                                         const xchar_t                    *path);
+GPermission *           g_settings_backend_get_permission               (GSettingsBackend               *backend,
+                                                                         const gchar                    *path);
 void                    g_settings_backend_sync_default                 (void);
 
-xtype_t                   g_null_settings_backend_get_type                (void);
+GType                   g_null_settings_backend_get_type                (void);
 
-xtype_t                   xmemory_settings_backend_get_type              (void);
+GType                   g_memory_settings_backend_get_type              (void);
 
-xtype_t                   xkeyfile_settings_backend_get_type             (void);
+GType                   g_keyfile_settings_backend_get_type             (void);
 
 #ifdef HAVE_COCOA
-xtype_t                   g_nextstep_settings_backend_get_type            (void);
+GType                   g_nextstep_settings_backend_get_type            (void);
 #endif
 
 #endif  /* __G_SETTINGS_BACKEND_INTERNAL_H__ */

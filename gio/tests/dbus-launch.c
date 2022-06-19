@@ -38,24 +38,24 @@ write_all (const void *ptr,
 
   while (len > 0)
     {
-      xssize_t done = write (STDOUT_FILENO, p, len);
+      gssize done = write (STDOUT_FILENO, p, len);
       int errsv = errno;
 
       if (done == 0)
         {
-          xerror ("%s: write: EOF", ME);
+          g_error ("%s: write: EOF", ME);
         }
       else if (done < 0)
         {
           if (errsv == EINTR)
             continue;
 
-          xerror ("%s: write: %s", ME, xstrerror (errsv));
+          g_error ("%s: write: %s", ME, g_strerror (errsv));
         }
       else
         {
           if (len < (size_t) done)
-            xerror ("%s: wrote too many bytes?", ME);
+            g_error ("%s: wrote too many bytes?", ME);
 
           len -= done;
           p += done;

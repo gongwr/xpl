@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# test_t whether the *printf family of functions supports the 'a' and 'A'
+# Test whether the *printf family of functions supports the 'a' and 'A'
 # conversion specifier for hexadecimal output of floating-point numbers.
 # (ISO C99, POSIX:2001)
 # Result is gl_cv_func_printf_directive_a.
@@ -69,7 +69,7 @@ int main ()
 glibc_printf_directive_a_test = '''
 #include <features.h>
 #ifdef __GNU_LIBRARY__
- #if ((__XPLC__ == 2 && __XPLC_MINOR__ >= 5) || (__XPLC__ > 2)) && !defined __UCLIBC__
+ #if ((__GLIBC__ == 2 && __GLIBC_MINOR__ >= 5) || (__GLIBC__ > 2)) && !defined __UCLIBC__
  #else
   #error Too old glibc
  #endif

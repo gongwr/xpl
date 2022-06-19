@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# test_t whether the *printf family of functions recovers gracefully in case
+# Test whether the *printf family of functions recovers gracefully in case
 # of an out-of-memory condition, or whether it crashes the entire program.
 # Result is gl_cv_func_printf_enomem.
 
@@ -64,9 +64,9 @@ else
   if (host_system == 'linux' or
       host_system == 'solaris' or
       host_system == 'sunos' or
-      host_system == 'aix' or
-      host_system == 'irix' or
-      host_system == 'beos' or
+      host_system == 'aix' or 
+      host_system == 'irix' or 
+      host_system == 'beos' or 
       host_system == 'haiku')
     gl_cv_func_printf_enomem = true
   endif

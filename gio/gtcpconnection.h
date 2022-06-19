@@ -29,40 +29,40 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_TCP_CONNECTION                               (g_tcp_connection_get_type ())
-#define G_TCP_CONNECTION(inst)                              (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_TCP_CONNECTION, xtcp_connection))
-#define G_TCP_CONNECTION_CLASS(class)                       (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_TCP_CONNECTION, GTcpConnectionClass))
-#define X_IS_TCP_CONNECTION(inst)                           (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
-                                                             XTYPE_TCP_CONNECTION))
-#define X_IS_TCP_CONNECTION_CLASS(class)                    (XTYPE_CHECK_CLASS_TYPE ((class),                       \
-                                                             XTYPE_TCP_CONNECTION))
-#define G_TCP_CONNECTION_GET_CLASS(inst)                    (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_TCP_CONNECTION, GTcpConnectionClass))
+#define G_TYPE_TCP_CONNECTION                               (g_tcp_connection_get_type ())
+#define G_TCP_CONNECTION(inst)                              (G_TYPE_CHECK_INSTANCE_CAST ((inst),                     \
+                                                             G_TYPE_TCP_CONNECTION, GTcpConnection))
+#define G_TCP_CONNECTION_CLASS(class)                       (G_TYPE_CHECK_CLASS_CAST ((class),                       \
+                                                             G_TYPE_TCP_CONNECTION, GTcpConnectionClass))
+#define G_IS_TCP_CONNECTION(inst)                           (G_TYPE_CHECK_INSTANCE_TYPE ((inst),                     \
+                                                             G_TYPE_TCP_CONNECTION))
+#define G_IS_TCP_CONNECTION_CLASS(class)                    (G_TYPE_CHECK_CLASS_TYPE ((class),                       \
+                                                             G_TYPE_TCP_CONNECTION))
+#define G_TCP_CONNECTION_GET_CLASS(inst)                    (G_TYPE_INSTANCE_GET_CLASS ((inst),                      \
+                                                             G_TYPE_TCP_CONNECTION, GTcpConnectionClass))
 
 typedef struct _GTcpConnectionPrivate                       GTcpConnectionPrivate;
 typedef struct _GTcpConnectionClass                         GTcpConnectionClass;
 
 struct _GTcpConnectionClass
 {
-  xsocket_connection_class_t parent_class;
+  GSocketConnectionClass parent_class;
 };
 
 struct _GTcpConnection
 {
-  xsocket_connection_t parent_instance;
+  GSocketConnection parent_instance;
   GTcpConnectionPrivate *priv;
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t    g_tcp_connection_get_type                (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType    g_tcp_connection_get_type                (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-void     g_tcp_connection_set_graceful_disconnect (xtcp_connection_t *connection,
-						   xboolean_t        graceful_disconnect);
-XPL_AVAILABLE_IN_ALL
-xboolean_t g_tcp_connection_get_graceful_disconnect (xtcp_connection_t *connection);
+GLIB_AVAILABLE_IN_ALL
+void     g_tcp_connection_set_graceful_disconnect (GTcpConnection *connection,
+						   gboolean        graceful_disconnect);
+GLIB_AVAILABLE_IN_ALL
+gboolean g_tcp_connection_get_graceful_disconnect (GTcpConnection *connection);
 
 G_END_DECLS
 

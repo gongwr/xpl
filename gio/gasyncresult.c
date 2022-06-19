@@ -28,54 +28,54 @@
  * SECTION:gasyncresult
  * @short_description: Asynchronous Function Results
  * @include: gio/gio.h
- * @see_also: #xtask_t
+ * @see_also: #GTask
  *
  * Provides a base class for implementing asynchronous function results.
  *
  * Asynchronous operations are broken up into two separate operations
- * which are chained together by a #xasync_ready_callback_t. To begin
- * an asynchronous operation, provide a #xasync_ready_callback_t to the
+ * which are chained together by a #GAsyncReadyCallback. To begin
+ * an asynchronous operation, provide a #GAsyncReadyCallback to the
  * asynchronous function. This callback will be triggered when the
  * operation has completed, and must be run in a later iteration of
  * the [thread-default main context][g-main-context-push-thread-default]
  * from where the operation was initiated. It will be passed a
- * #xasync_result_t instance filled with the details of the operation's
+ * #GAsyncResult instance filled with the details of the operation's
  * success or failure, the object the asynchronous function was
  * started for and any error codes returned. The asynchronous callback
  * function is then expected to call the corresponding "_finish()"
  * function, passing the object the function was called for, the
- * #xasync_result_t instance, and (optionally) an @error to grab any
+ * #GAsyncResult instance, and (optionally) an @error to grab any
  * error conditions that may have occurred.
  *
  * The "_finish()" function for an operation takes the generic result
- * (of type #xasync_result_t) and returns the specific result that the
- * operation in question yields (e.g. a #xfile_enumerator_t for a
+ * (of type #GAsyncResult) and returns the specific result that the
+ * operation in question yields (e.g. a #GFileEnumerator for a
  * "enumerate children" operation). If the result or error status of the
  * operation is not needed, there is no need to call the "_finish()"
  * function; GIO will take care of cleaning up the result and error
- * information after the #xasync_ready_callback_t returns. You can pass
- * %NULL for the #xasync_ready_callback_t if you don't need to take any
+ * information after the #GAsyncReadyCallback returns. You can pass
+ * %NULL for the #GAsyncReadyCallback if you don't need to take any
  * action at all after the operation completes. Applications may also
- * take a reference to the #xasync_result_t and call "_finish()" later;
+ * take a reference to the #GAsyncResult and call "_finish()" later;
  * however, the "_finish()" function may be called at most once.
  *
  * Example of a typical asynchronous operation flow:
  * |[<!-- language="C" -->
  * void _theoretical_frobnitz_async (Theoretical         *t,
- *                                   xcancellable_t        *c,
- *                                   xasync_ready_callback_t  cb,
- *                                   xpointer_t             u);
+ *                                   GCancellable        *c,
+ *                                   GAsyncReadyCallback  cb,
+ *                                   gpointer             u);
  *
- * xboolean_t _theoretical_frobnitz_finish (Theoretical   *t,
- *                                        xasync_result_t  *res,
- *                                        xerror_t       **e);
+ * gboolean _theoretical_frobnitz_finish (Theoretical   *t,
+ *                                        GAsyncResult  *res,
+ *                                        GError       **e);
  *
  * static void
- * frobnitz_result_func (xobject_t      *source_object,
- *			 xasync_result_t *res,
- *			 xpointer_t      user_data)
+ * frobnitz_result_func (GObject      *source_object,
+ *			 GAsyncResult *res,
+ *			 gpointer      user_data)
  * {
- *   xboolean_t success = FALSE;
+ *   gboolean success = FALSE;
  *
  *   success = _theoretical_frobnitz_finish (source_object, res, NULL);
  *
@@ -116,28 +116,28 @@
  * as a default.
  */
 
-typedef xasync_result_iface_t xasync_result_interface_t;
-G_DEFINE_INTERFACE (xasync_result, xasync_result, XTYPE_OBJECT)
+typedef GAsyncResultIface GAsyncResultInterface;
+G_DEFINE_INTERFACE (GAsyncResult, g_async_result, G_TYPE_OBJECT)
 
 static void
-xasync_result_default_init (xasync_result_interface_t *iface)
+g_async_result_default_init (GAsyncResultInterface *iface)
 {
 }
 
 /**
- * xasync_result_get_user_data:
- * @res: a #xasync_result_t.
+ * g_async_result_get_user_data:
+ * @res: a #GAsyncResult.
  *
- * Gets the user data from a #xasync_result_t.
+ * Gets the user data from a #GAsyncResult.
  *
  * Returns: (transfer full): the user data for @res.
  **/
-xpointer_t
-xasync_result_get_user_data (xasync_result_t *res)
+gpointer
+g_async_result_get_user_data (GAsyncResult *res)
 {
-  xasync_result_iface_t *iface;
+  GAsyncResultIface *iface;
 
-  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (res), NULL);
 
   iface = G_ASYNC_RESULT_GET_IFACE (res);
 
@@ -145,20 +145,20 @@ xasync_result_get_user_data (xasync_result_t *res)
 }
 
 /**
- * xasync_result_get_source_object:
- * @res: a #xasync_result_t
+ * g_async_result_get_source_object:
+ * @res: a #GAsyncResult
  *
- * Gets the source object from a #xasync_result_t.
+ * Gets the source object from a #GAsyncResult.
  *
  * Returns: (transfer full) (nullable): a new reference to the source
  *    object for the @res, or %NULL if there is none.
  */
-xobject_t *
-xasync_result_get_source_object (xasync_result_t *res)
+GObject *
+g_async_result_get_source_object (GAsyncResult *res)
 {
-  xasync_result_iface_t *iface;
+  GAsyncResultIface *iface;
 
-  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (res), NULL);
 
   iface = G_ASYNC_RESULT_GET_IFACE (res);
 
@@ -166,18 +166,18 @@ xasync_result_get_source_object (xasync_result_t *res)
 }
 
 /**
- * xasync_result_legacy_propagate_error:
- * @res: a #xasync_result_t
+ * g_async_result_legacy_propagate_error:
+ * @res: a #GAsyncResult
  * @error: (out): a location to propagate the error to.
  *
- * If @res is a #xsimple_async_result_t, this is equivalent to
- * xsimple_async_result_propagate_error(). Otherwise it returns
+ * If @res is a #GSimpleAsyncResult, this is equivalent to
+ * g_simple_async_result_propagate_error(). Otherwise it returns
  * %FALSE.
  *
  * This can be used for legacy error handling in async *_finish()
- * wrapper functions that traditionally handled #xsimple_async_result_t
+ * wrapper functions that traditionally handled #GSimpleAsyncResult
  * error returns themselves rather than calling into the virtual method.
- * This should not be used in new code; #xasync_result_t errors that are
+ * This should not be used in new code; #GAsyncResult errors that are
  * set by virtual methods should also be extracted by virtual methods,
  * to enable subclasses to chain up correctly.
  *
@@ -186,20 +186,20 @@ xasync_result_get_source_object (xasync_result_t *res)
  *
  * Since: 2.34
  **/
-xboolean_t
-xasync_result_legacy_propagate_error (xasync_result_t  *res,
-				       xerror_t       **error)
+gboolean
+g_async_result_legacy_propagate_error (GAsyncResult  *res,
+				       GError       **error)
 {
   /* This doesn't use a vmethod, because it's only for code that used
-   * to use xsimple_async_result_t. (But it's a xasync_result_t method so
-   * that callers don't need to worry about xsimple_async_result_t
+   * to use GSimpleAsyncResult. (But it's a GAsyncResult method so
+   * that callers don't need to worry about GSimpleAsyncResult
    * deprecation warnings in the future.)
    */
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  if (X_IS_SIMPLE_ASYNC_RESULT (res))
+  if (G_IS_SIMPLE_ASYNC_RESULT (res))
     {
-      return xsimple_async_result_propagate_error (XSIMPLE_ASYNC_RESULT (res),
+      return g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (res),
 						    error);
     }
   else
@@ -208,8 +208,8 @@ xasync_result_legacy_propagate_error (xasync_result_t  *res,
 }
 
 /**
- * xasync_result_is_tagged:
- * @res: a #xasync_result_t
+ * g_async_result_is_tagged:
+ * @res: a #GAsyncResult
  * @source_tag: an application-defined tag
  *
  * Checks if @res has the given @source_tag (generally a function
@@ -220,13 +220,13 @@ xasync_result_legacy_propagate_error (xasync_result_t  *res,
  *
  * Since: 2.34
  **/
-xboolean_t
-xasync_result_is_tagged (xasync_result_t  *res,
-			  xpointer_t       source_tag)
+gboolean
+g_async_result_is_tagged (GAsyncResult  *res,
+			  gpointer       source_tag)
 {
-  xasync_result_iface_t *iface;
+  GAsyncResultIface *iface;
 
-  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
+  g_return_val_if_fail (G_IS_ASYNC_RESULT (res), FALSE);
 
   iface = G_ASYNC_RESULT_GET_IFACE (res);
 

@@ -34,14 +34,14 @@ G_LOCK_DEFINE_STATIC (gio_xdgmime);
 
 /*< internal >
  * create_cfstring_from_cstr:
- * @cstr: a #xchar_t
+ * @cstr: a #gchar
  *
  * Converts a cstr to a utf8 cfstring
  * It must be CFReleased()'d.
  *
  */
 static CFStringRef
-create_cfstring_from_cstr (const xchar_t *cstr)
+create_cfstring_from_cstr (const gchar *cstr)
 {
   return CFStringCreateWithCString (NULL, cstr, kCFStringEncodingUTF8);
 }
@@ -55,14 +55,14 @@ create_cfstring_from_cstr (const xchar_t *cstr)
  * The returned string must be g_free()'d.
  *
  */
-static xchar_t *
+static gchar *
 create_cstr_from_cfstring (CFStringRef str)
 {
-  xreturn_val_if_fail (str != NULL, NULL);
+  g_return_val_if_fail (str != NULL, NULL);
 
   CFIndex length = CFStringGetLength (str);
   CFIndex maxlen = CFStringGetMaximumSizeForEncoding (length, kCFStringEncodingUTF8);
-  xchar_t *buffer = g_malloc (maxlen + 1);
+  gchar *buffer = g_malloc (maxlen + 1);
   Boolean success = CFStringGetCString (str, (char *) buffer, maxlen,
                                         kCFStringEncodingUTF8);
   CFRelease (str);
@@ -78,7 +78,7 @@ create_cstr_from_cfstring (CFStringRef str)
 /*< internal >
  * create_cstr_from_cfstring_with_fallback:
  * @str: a #CFStringRef
- * @fallback: a #xchar_t
+ * @fallback: a #gchar
  *
  * Tries to convert a cfstring to a utf8 cstring.
  * If @str is NULL or conversion fails @fallback is returned.
@@ -86,44 +86,44 @@ create_cstr_from_cfstring (CFStringRef str)
  * The returned string must be g_free()'d.
  *
  */
-static xchar_t *
+static gchar *
 create_cstr_from_cfstring_with_fallback (CFStringRef  str,
-                                         const xchar_t *fallback)
+                                         const gchar *fallback)
 {
-  xchar_t *cstr = NULL;
+  gchar *cstr = NULL;
 
   if (str)
     cstr = create_cstr_from_cfstring (str);
   if (!cstr)
-    return xstrdup (fallback);
+    return g_strdup (fallback);
 
   return cstr;
 }
 
 /*< private >*/
 void
-g_content_type_set_mime_dirs (const xchar_t * const *dirs)
+g_content_type_set_mime_dirs (const gchar * const *dirs)
 {
   /* noop on macOS */
 }
 
 /*< private >*/
-const xchar_t * const *
+const gchar * const *
 g_content_type_get_mime_dirs (void)
 {
-  const xchar_t * const *mime_dirs = { NULL };
+  const gchar * const *mime_dirs = { NULL };
   return mime_dirs;
 }
 
-xboolean_t
-g_content_type_equals (const xchar_t *type1,
-                       const xchar_t *type2)
+gboolean
+g_content_type_equals (const gchar *type1,
+                       const gchar *type2)
 {
   CFStringRef str1, str2;
-  xboolean_t ret;
+  gboolean ret;
 
-  xreturn_val_if_fail (type1 != NULL, FALSE);
-  xreturn_val_if_fail (type2 != NULL, FALSE);
+  g_return_val_if_fail (type1 != NULL, FALSE);
+  g_return_val_if_fail (type2 != NULL, FALSE);
 
   if (g_ascii_strcasecmp (type1, type2) == 0)
     return TRUE;
@@ -139,15 +139,15 @@ g_content_type_equals (const xchar_t *type1,
   return ret;
 }
 
-xboolean_t
-g_content_type_is_a (const xchar_t *ctype,
-                     const xchar_t *csupertype)
+gboolean
+g_content_type_is_a (const gchar *ctype,
+                     const gchar *csupertype)
 {
   CFStringRef type, supertype;
-  xboolean_t ret;
+  gboolean ret;
 
-  xreturn_val_if_fail (ctype != NULL, FALSE);
-  xreturn_val_if_fail (csupertype != NULL, FALSE);
+  g_return_val_if_fail (ctype != NULL, FALSE);
+  g_return_val_if_fail (csupertype != NULL, FALSE);
 
   type = create_cfstring_from_cstr (ctype);
   supertype = create_cfstring_from_cstr (csupertype);
@@ -160,15 +160,15 @@ g_content_type_is_a (const xchar_t *ctype,
   return ret;
 }
 
-xboolean_t
-g_content_type_is_mime_type (const xchar_t *type,
-                             const xchar_t *mime_type)
+gboolean
+g_content_type_is_mime_type (const gchar *type,
+                             const gchar *mime_type)
 {
-  xchar_t *content_type;
-  xboolean_t ret;
+  gchar *content_type;
+  gboolean ret;
 
-  xreturn_val_if_fail (type != NULL, FALSE);
-  xreturn_val_if_fail (mime_type != NULL, FALSE);
+  g_return_val_if_fail (type != NULL, FALSE);
+  g_return_val_if_fail (mime_type != NULL, FALSE);
 
   content_type = g_content_type_from_mime_type (mime_type);
   ret = g_content_type_is_a (type, content_type);
@@ -177,28 +177,28 @@ g_content_type_is_mime_type (const xchar_t *type,
   return ret;
 }
 
-xboolean_t
-g_content_type_is_unknown (const xchar_t *type)
+gboolean
+g_content_type_is_unknown (const gchar *type)
 {
-  xreturn_val_if_fail (type != NULL, FALSE);
+  g_return_val_if_fail (type != NULL, FALSE);
 
   /* Should dynamic types be considered "unknown"? */
-  if (xstr_has_prefix (type, "dyn."))
+  if (g_str_has_prefix (type, "dyn."))
     return TRUE;
   /* application/octet-stream */
-  else if (xstrcmp0 (type, "public.data") == 0)
+  else if (g_strcmp0 (type, "public.data") == 0)
     return TRUE;
 
   return FALSE;
 }
 
-xchar_t *
-g_content_type_get_description (const xchar_t *type)
+gchar *
+g_content_type_get_description (const gchar *type)
 {
   CFStringRef str;
   CFStringRef desc_str;
 
-  xreturn_val_if_fail (type != NULL, NULL);
+  g_return_val_if_fail (type != NULL, NULL);
 
   str = create_cfstring_from_cstr (type);
   desc_str = UTTypeCopyDescription (str);
@@ -228,21 +228,21 @@ g_content_type_get_description (const xchar_t *type)
  * From: https://specifications.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-0.18.html
  */
 
-static xchar_t *
-_get_generic_icon_name_from_mime_type (const xchar_t *mime_type)
+static gchar *
+_get_generic_icon_name_from_mime_type (const gchar *mime_type)
 {
-  const xchar_t *xdxicon_name;
-  xchar_t *icon_name;
+  const gchar *xdg_icon_name;
+  gchar *icon_name;
 
   G_LOCK (gio_xdgmime);
-  xdxicon_name = xdg_mime_get_generic_icon (mime_type);
+  xdg_icon_name = xdg_mime_get_generic_icon (mime_type);
   G_UNLOCK (gio_xdgmime);
 
-  if (xdxicon_name == NULL)
+  if (xdg_icon_name == NULL)
     {
       const char *p;
       const char *suffix = "-x-generic";
-      xsize_t prefix_len;
+      gsize prefix_len;
 
       p = strchr (mime_type, '/');
       if (p == NULL)
@@ -257,16 +257,16 @@ _get_generic_icon_name_from_mime_type (const xchar_t *mime_type)
     }
   else
     {
-      icon_name = xstrdup (xdxicon_name);
+      icon_name = g_strdup (xdg_icon_name);
     }
 
   return icon_name;
 }
 
 
-static xicon_t *
-g_content_type_get_icon_internal (const xchar_t *uti,
-                                  xboolean_t     symbolic)
+static GIcon *
+g_content_type_get_icon_internal (const gchar *uti,
+                                  gboolean     symbolic)
 {
   char *mimetype_icon;
   char *mime_type;
@@ -274,11 +274,11 @@ g_content_type_get_icon_internal (const xchar_t *uti,
   char *q;
   char *icon_names[6];
   int n = 0;
-  xicon_t *themed_icon;
+  GIcon *themed_icon;
   const char  *xdg_icon;
   int i;
 
-  xreturn_val_if_fail (uti != NULL, NULL);
+  g_return_val_if_fail (uti != NULL, NULL);
 
   mime_type = g_content_type_get_mime_type (uti);
 
@@ -287,9 +287,9 @@ g_content_type_get_icon_internal (const xchar_t *uti,
   G_UNLOCK (gio_xdgmime);
 
   if (xdg_icon)
-    icon_names[n++] = xstrdup (xdg_icon);
+    icon_names[n++] = g_strdup (xdg_icon);
 
-  mimetype_icon = xstrdup (mime_type);
+  mimetype_icon = g_strdup (mime_type);
   while ((q = strchr (mimetype_icon, '/')) != NULL)
     *q = '-';
 
@@ -305,47 +305,47 @@ g_content_type_get_icon_internal (const xchar_t *uti,
       for (i = 0; i < n; i++)
         {
           icon_names[n + i] = icon_names[i];
-          icon_names[i] = xstrconcat (icon_names[i], "-symbolic", NULL);
+          icon_names[i] = g_strconcat (icon_names[i], "-symbolic", NULL);
         }
 
       n += n;
     }
 
   themed_icon = g_themed_icon_new_from_names (icon_names, n);
-
+ 
   for (i = 0; i < n; i++)
     g_free (icon_names[i]);
-
+ 
   g_free(mime_type);
-
+ 
   return themed_icon;
 }
 
-xicon_t *
-g_content_type_get_icon (const xchar_t *type)
+GIcon *
+g_content_type_get_icon (const gchar *type)
 {
   return g_content_type_get_icon_internal (type, FALSE);
 }
 
-xicon_t *
-g_content_type_get_symbolic_icon (const xchar_t *type)
+GIcon *
+g_content_type_get_symbolic_icon (const gchar *type)
 {
   return g_content_type_get_icon_internal (type, TRUE);
 }
 
-xchar_t *
-g_content_type_get_generic_icon_name (const xchar_t *type)
+gchar *
+g_content_type_get_generic_icon_name (const gchar *type)
 {
   return NULL;
 }
 
-xboolean_t
-g_content_type_can_be_executable (const xchar_t *type)
+gboolean
+g_content_type_can_be_executable (const gchar *type)
 {
   CFStringRef uti;
-  xboolean_t ret = FALSE;
+  gboolean ret = FALSE;
 
-  xreturn_val_if_fail (type != NULL, FALSE);
+  g_return_val_if_fail (type != NULL, FALSE);
 
   uti = create_cfstring_from_cstr (type);
 
@@ -363,60 +363,60 @@ g_content_type_can_be_executable (const xchar_t *type)
   return ret;
 }
 
-xchar_t *
-g_content_type_from_mime_type (const xchar_t *mime_type)
+gchar *
+g_content_type_from_mime_type (const gchar *mime_type)
 {
   CFStringRef mime_str;
   CFStringRef uti_str;
 
-  xreturn_val_if_fail (mime_type != NULL, NULL);
+  g_return_val_if_fail (mime_type != NULL, NULL);
 
   /* Their api does not handle globs but they are common. */
-  if (xstr_has_suffix (mime_type, "*"))
+  if (g_str_has_suffix (mime_type, "*"))
     {
-      if (xstr_has_prefix (mime_type, "audio"))
-        return xstrdup ("public.audio");
-      if (xstr_has_prefix (mime_type, "image"))
-        return xstrdup ("public.image");
-      if (xstr_has_prefix (mime_type, "text"))
-        return xstrdup ("public.text");
-      if (xstr_has_prefix (mime_type, "video"))
-        return xstrdup ("public.movie");
+      if (g_str_has_prefix (mime_type, "audio"))
+        return g_strdup ("public.audio");
+      if (g_str_has_prefix (mime_type, "image"))
+        return g_strdup ("public.image");
+      if (g_str_has_prefix (mime_type, "text"))
+        return g_strdup ("public.text");
+      if (g_str_has_prefix (mime_type, "video"))
+        return g_strdup ("public.movie");
     }
 
   /* Some exceptions are needed for gdk-pixbuf.
    * This list is not exhaustive.
    */
-  if (xstr_has_prefix (mime_type, "image"))
+  if (g_str_has_prefix (mime_type, "image"))
     {
-      if (xstr_has_suffix (mime_type, "x-icns"))
-        return xstrdup ("com.apple.icns");
-      if (xstr_has_suffix (mime_type, "x-tga"))
-        return xstrdup ("com.truevision.tga-image");
-      if (xstr_has_suffix (mime_type, "x-ico"))
-        return xstrdup ("com.microsoft.ico ");
+      if (g_str_has_suffix (mime_type, "x-icns"))
+        return g_strdup ("com.apple.icns");
+      if (g_str_has_suffix (mime_type, "x-tga"))
+        return g_strdup ("com.truevision.tga-image");
+      if (g_str_has_suffix (mime_type, "x-ico"))
+        return g_strdup ("com.microsoft.ico ");
     }
 
   /* These are also not supported...
    * Used in glocalfileinfo.c
    */
-  if (xstr_has_prefix (mime_type, "inode"))
+  if (g_str_has_prefix (mime_type, "inode"))
     {
-      if (xstr_has_suffix (mime_type, "directory"))
-        return xstrdup ("public.folder");
-      if (xstr_has_suffix (mime_type, "symlink"))
-        return xstrdup ("public.symlink");
+      if (g_str_has_suffix (mime_type, "directory"))
+        return g_strdup ("public.folder");
+      if (g_str_has_suffix (mime_type, "symlink"))
+        return g_strdup ("public.symlink");
     }
 
   /* This is correct according to the Apple docs:
      https://developer.apple.com/library/content/documentation/Miscellaneous/Reference/UTIRef/Articles/System-DeclaredUniformTypeIdentifiers.html
   */
   if (strcmp (mime_type, "text/plain") == 0)
-    return xstrdup ("public.text");
+    return g_strdup ("public.text");
 
   /* Non standard type */
   if (strcmp (mime_type, "application/x-executable") == 0)
-    return xstrdup ("public.executable");
+    return g_strdup ("public.executable");
 
   mime_str = create_cfstring_from_cstr (mime_type);
   uti_str = UTTypeCreatePreferredIdentifierForTag (kUTTagClassMIMEType, mime_str, NULL);
@@ -425,33 +425,33 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
   return create_cstr_from_cfstring_with_fallback (uti_str, "public.data");
 }
 
-xchar_t *
-g_content_type_get_mime_type (const xchar_t *type)
+gchar *
+g_content_type_get_mime_type (const gchar *type)
 {
   CFStringRef uti_str;
   CFStringRef mime_str;
 
-  xreturn_val_if_fail (type != NULL, NULL);
+  g_return_val_if_fail (type != NULL, NULL);
 
   /* We must match the additions above
    * so conversions back and forth work.
    */
-  if (xstr_has_prefix (type, "public"))
+  if (g_str_has_prefix (type, "public"))
     {
-      if (xstr_has_suffix (type, ".image"))
-        return xstrdup ("image/*");
-      if (xstr_has_suffix (type, ".movie"))
-        return xstrdup ("video/*");
-      if (xstr_has_suffix (type, ".text"))
-        return xstrdup ("text/*");
-      if (xstr_has_suffix (type, ".audio"))
-        return xstrdup ("audio/*");
-      if (xstr_has_suffix (type, ".folder"))
-        return xstrdup ("inode/directory");
-      if (xstr_has_suffix (type, ".symlink"))
-        return xstrdup ("inode/symlink");
-      if (xstr_has_suffix (type, ".executable"))
-        return xstrdup ("application/x-executable");
+      if (g_str_has_suffix (type, ".image"))
+        return g_strdup ("image/*");
+      if (g_str_has_suffix (type, ".movie"))
+        return g_strdup ("video/*");
+      if (g_str_has_suffix (type, ".text"))
+        return g_strdup ("text/*");
+      if (g_str_has_suffix (type, ".audio"))
+        return g_strdup ("audio/*");
+      if (g_str_has_suffix (type, ".folder"))
+        return g_strdup ("inode/directory");
+      if (g_str_has_suffix (type, ".symlink"))
+        return g_strdup ("inode/symlink");
+      if (g_str_has_suffix (type, ".executable"))
+        return g_strdup ("application/x-executable");
     }
 
   uti_str = create_cfstring_from_cstr (type);
@@ -461,12 +461,12 @@ g_content_type_get_mime_type (const xchar_t *type)
   return create_cstr_from_cfstring_with_fallback (mime_str, "application/octet-stream");
 }
 
-static xboolean_t
-looks_like_text (const xuchar_t *data,
-                 xsize_t         data_size)
+static gboolean
+looks_like_text (const guchar *data,
+                 gsize         data_size)
 {
-  xsize_t i;
-  xuchar_t c;
+  gsize i;
+  guchar c;
 
   for (i = 0; i < data_size; i++)
     {
@@ -477,28 +477,28 @@ looks_like_text (const xuchar_t *data,
   return TRUE;
 }
 
-xchar_t *
-g_content_type_guess (const xchar_t  *filename,
-                      const xuchar_t *data,
-                      xsize_t         data_size,
-                      xboolean_t     *result_uncertain)
+gchar *
+g_content_type_guess (const gchar  *filename,
+                      const guchar *data,
+                      gsize         data_size,
+                      gboolean     *result_uncertain)
 {
   CFStringRef uti = NULL;
-  xchar_t *cextension;
+  gchar *cextension;
   CFStringRef extension;
   int uncertain = -1;
 
-  xreturn_val_if_fail (data_size != (xsize_t) -1, NULL);
+  g_return_val_if_fail (data_size != (gsize) -1, NULL);
 
   if (filename && *filename)
     {
-      xchar_t *basename = g_path_get_basename (filename);
-      xchar_t *dirname = g_path_get_dirname (filename);
-      xsize_t i = strlen (filename);
+      gchar *basename = g_path_get_basename (filename);
+      gchar *dirname = g_path_get_dirname (filename);
+      gsize i = strlen (filename);
 
       if (filename[i - 1] == '/')
         {
-          if (xstrcmp0 (dirname, "/Volumes") == 0)
+          if (g_strcmp0 (dirname, "/Volumes") == 0)
             {
               uti = CFStringCreateCopy (NULL, kUTTypeVolume);
             }
@@ -526,11 +526,11 @@ g_content_type_guess (const xchar_t  *filename,
       else
         {
           /* GTK needs this... */
-          if (xstr_has_suffix (basename, ".ui"))
+          if (g_str_has_suffix (basename, ".ui"))
             {
               uti = CFStringCreateCopy (NULL, kUTTypeXML);
             }
-          else if (xstr_has_suffix (basename, ".txt"))
+          else if (g_str_has_suffix (basename, ".txt"))
             {
               uti = CFStringCreateCopy (NULL, CFSTR ("public.text"));
             }
@@ -555,13 +555,13 @@ g_content_type_guess (const xchar_t  *filename,
       G_UNLOCK (gio_xdgmime);
       if (sniffed_mimetype != XDG_MIME_TYPE_UNKNOWN)
         {
-          xchar_t *uti_str = g_content_type_from_mime_type (sniffed_mimetype);
+          gchar *uti_str = g_content_type_from_mime_type (sniffed_mimetype);
           uti = create_cfstring_from_cstr (uti_str);
           g_free (uti_str);
         }
       if (!uti && looks_like_text (data, data_size))
         {
-          if (xstr_has_prefix ((const xchar_t*)data, "#!/"))
+          if (g_str_has_prefix ((const gchar*)data, "#!/"))
             uti = CFStringCreateCopy (NULL, CFSTR ("public.script"));
           else
             uti = CFStringCreateCopy (NULL, CFSTR ("public.text"));
@@ -583,15 +583,15 @@ g_content_type_guess (const xchar_t  *filename,
   return create_cstr_from_cfstring (uti);
 }
 
-xlist_t *
+GList *
 g_content_types_get_registered (void)
 {
   /* TODO: UTTypeCreateAllIdentifiersForTag? */
   return NULL;
 }
 
-xchar_t **
-g_content_type_guess_for_tree (xfile_t *root)
+gchar **
+g_content_type_guess_for_tree (GFile *root)
 {
   return NULL;
 }

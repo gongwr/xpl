@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_MESSAGES_H__
 #define __G_MESSAGES_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -39,8 +39,8 @@ G_BEGIN_DECLS
 
 /* calculate a string size, guaranteed to fit format + args.
  */
-XPL_AVAILABLE_IN_ALL
-xsize_t	g_printf_string_upper_bound (const xchar_t* format,
+GLIB_AVAILABLE_IN_ALL
+gsize	g_printf_string_upper_bound (const gchar* format,
 				     va_list	  args) G_GNUC_PRINTF(1, 0);
 
 /* Log level shift offset for user defined
@@ -70,49 +70,49 @@ typedef enum
 /* GLib log levels that are considered fatal by default */
 #define G_LOG_FATAL_MASK        (G_LOG_FLAG_RECURSION | G_LOG_LEVEL_ERROR)
 
-typedef void            (*GLogFunc)             (const xchar_t   *log_domain,
+typedef void            (*GLogFunc)             (const gchar   *log_domain,
                                                  GLogLevelFlags log_level,
-                                                 const xchar_t   *message,
-                                                 xpointer_t       user_data);
+                                                 const gchar   *message,
+                                                 gpointer       user_data);
 
 /* Logging mechanism
  */
-XPL_AVAILABLE_IN_ALL
-xuint_t           g_log_set_handler       (const xchar_t    *log_domain,
+GLIB_AVAILABLE_IN_ALL
+guint           g_log_set_handler       (const gchar    *log_domain,
                                          GLogLevelFlags  log_levels,
                                          GLogFunc        log_func,
-                                         xpointer_t        user_data);
-XPL_AVAILABLE_IN_2_46
-xuint_t           g_log_set_handler_full  (const xchar_t    *log_domain,
+                                         gpointer        user_data);
+GLIB_AVAILABLE_IN_2_46
+guint           g_log_set_handler_full  (const gchar    *log_domain,
                                          GLogLevelFlags  log_levels,
                                          GLogFunc        log_func,
-                                         xpointer_t        user_data,
-                                         xdestroy_notify_t  destroy);
-XPL_AVAILABLE_IN_ALL
-void            g_log_remove_handler    (const xchar_t    *log_domain,
-                                         xuint_t           handler_id);
-XPL_AVAILABLE_IN_ALL
-void            g_log_default_handler   (const xchar_t    *log_domain,
+                                         gpointer        user_data,
+                                         GDestroyNotify  destroy);
+GLIB_AVAILABLE_IN_ALL
+void            g_log_remove_handler    (const gchar    *log_domain,
+                                         guint           handler_id);
+GLIB_AVAILABLE_IN_ALL
+void            g_log_default_handler   (const gchar    *log_domain,
                                          GLogLevelFlags  log_level,
-                                         const xchar_t    *message,
-                                         xpointer_t        unused_data);
-XPL_AVAILABLE_IN_ALL
+                                         const gchar    *message,
+                                         gpointer        unused_data);
+GLIB_AVAILABLE_IN_ALL
 GLogFunc        g_log_set_default_handler (GLogFunc      log_func,
-					   xpointer_t      user_data);
-XPL_AVAILABLE_IN_ALL
-void            g_log                   (const xchar_t    *log_domain,
+					   gpointer      user_data);
+GLIB_AVAILABLE_IN_ALL
+void            g_log                   (const gchar    *log_domain,
                                          GLogLevelFlags  log_level,
-                                         const xchar_t    *format,
+                                         const gchar    *format,
                                          ...) G_GNUC_PRINTF (3, 4);
-XPL_AVAILABLE_IN_ALL
-void            g_logv                  (const xchar_t    *log_domain,
+GLIB_AVAILABLE_IN_ALL
+void            g_logv                  (const gchar    *log_domain,
                                          GLogLevelFlags  log_level,
-                                         const xchar_t    *format,
+                                         const gchar    *format,
                                          va_list         args) G_GNUC_PRINTF(3, 0);
-XPL_AVAILABLE_IN_ALL
-GLogLevelFlags  g_log_set_fatal_mask    (const xchar_t    *log_domain,
+GLIB_AVAILABLE_IN_ALL
+GLogLevelFlags  g_log_set_fatal_mask    (const gchar    *log_domain,
                                          GLogLevelFlags  fatal_mask);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 GLogLevelFlags  g_log_set_always_fatal  (GLogLevelFlags  fatal_mask);
 
 /* Structured logging mechanism. */
@@ -144,7 +144,7 @@ typedef enum
  * @length: length of @value, in bytes, or -1 if it is nul-terminated
  *
  * Structure representing a single field in a structured log entry. See
- * g_loxstructured() for details.
+ * g_log_structured() for details.
  *
  * Log fields may contain arbitrary values, including binary with embedded nul
  * bytes. If the field contains a string, the string must be UTF-8 encoded and
@@ -156,9 +156,9 @@ typedef enum
 typedef struct _GLogField GLogField;
 struct _GLogField
 {
-  const xchar_t *key;
-  xconstpointer value;
-  xssize_t length;
+  const gchar *key;
+  gconstpointer value;
+  gssize length;
 };
 
 /**
@@ -171,7 +171,7 @@ struct _GLogField
  * Writer function for log entries. A log entry is a collection of one or more
  * #GLogFields, using the standard [field names from journal
  * specification](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html).
- * See g_loxstructured() for more information.
+ * See g_log_structured() for more information.
  *
  * Writer functions must ignore fields which they do not recognise, unless they
  * can write arbitrary binary output, as field values may be arbitrary binary.
@@ -194,78 +194,78 @@ struct _GLogField
  */
 typedef GLogWriterOutput (*GLogWriterFunc)     (GLogLevelFlags   log_level,
                                                 const GLogField *fields,
-                                                xsize_t            n_fields,
-                                                xpointer_t         user_data);
+                                                gsize            n_fields,
+                                                gpointer         user_data);
 
-XPL_AVAILABLE_IN_2_50
-void             g_loxstructured              (const xchar_t     *log_domain,
+GLIB_AVAILABLE_IN_2_50
+void             g_log_structured              (const gchar     *log_domain,
                                                 GLogLevelFlags   log_level,
                                                 ...);
-XPL_AVAILABLE_IN_2_50
-void             g_loxstructured_array        (GLogLevelFlags   log_level,
+GLIB_AVAILABLE_IN_2_50
+void             g_log_structured_array        (GLogLevelFlags   log_level,
                                                 const GLogField *fields,
-                                                xsize_t            n_fields);
+                                                gsize            n_fields);
 
-XPL_AVAILABLE_IN_2_50
-void             g_log_variant                 (const xchar_t     *log_domain,
+GLIB_AVAILABLE_IN_2_50
+void             g_log_variant                 (const gchar     *log_domain,
                                                 GLogLevelFlags   log_level,
-                                                xvariant_t        *fields);
+                                                GVariant        *fields);
 
-XPL_AVAILABLE_IN_2_50
+GLIB_AVAILABLE_IN_2_50
 void             g_log_set_writer_func         (GLogWriterFunc   func,
-                                                xpointer_t         user_data,
-                                                xdestroy_notify_t   user_data_free);
+                                                gpointer         user_data,
+                                                GDestroyNotify   user_data_free);
 
-XPL_AVAILABLE_IN_2_50
-xboolean_t         g_log_writer_supports_color   (xint_t             output_fd);
-XPL_AVAILABLE_IN_2_50
-xboolean_t         g_log_writer_is_journald      (xint_t             output_fd);
+GLIB_AVAILABLE_IN_2_50
+gboolean         g_log_writer_supports_color   (gint             output_fd);
+GLIB_AVAILABLE_IN_2_50
+gboolean         g_log_writer_is_journald      (gint             output_fd);
 
-XPL_AVAILABLE_IN_2_50
-xchar_t           *g_log_writer_format_fields    (GLogLevelFlags   log_level,
+GLIB_AVAILABLE_IN_2_50
+gchar           *g_log_writer_format_fields    (GLogLevelFlags   log_level,
                                                 const GLogField *fields,
-                                                xsize_t            n_fields,
-                                                xboolean_t         use_color);
+                                                gsize            n_fields,
+                                                gboolean         use_color);
 
-XPL_AVAILABLE_IN_2_50
+GLIB_AVAILABLE_IN_2_50
 GLogWriterOutput g_log_writer_journald         (GLogLevelFlags   log_level,
                                                 const GLogField *fields,
-                                                xsize_t            n_fields,
-                                                xpointer_t         user_data);
-XPL_AVAILABLE_IN_2_50
+                                                gsize            n_fields,
+                                                gpointer         user_data);
+GLIB_AVAILABLE_IN_2_50
 GLogWriterOutput g_log_writer_standard_streams (GLogLevelFlags   log_level,
                                                 const GLogField *fields,
-                                                xsize_t            n_fields,
-                                                xpointer_t         user_data);
-XPL_AVAILABLE_IN_2_50
+                                                gsize            n_fields,
+                                                gpointer         user_data);
+GLIB_AVAILABLE_IN_2_50
 GLogWriterOutput g_log_writer_default          (GLogLevelFlags   log_level,
                                                 const GLogField *fields,
-                                                xsize_t            n_fields,
-                                                xpointer_t         user_data);
+                                                gsize            n_fields,
+                                                gpointer         user_data);
 
-XPL_AVAILABLE_IN_2_68
-void            g_log_writer_default_set_use_stderr (xboolean_t use_stderr);
-XPL_AVAILABLE_IN_2_68
-xboolean_t        g_log_writer_default_would_drop (GLogLevelFlags  log_level,
+GLIB_AVAILABLE_IN_2_68
+void            g_log_writer_default_set_use_stderr (gboolean use_stderr);
+GLIB_AVAILABLE_IN_2_68
+gboolean        g_log_writer_default_would_drop (GLogLevelFlags  log_level,
                                                  const char     *log_domain);
 
 /* G_MESSAGES_DEBUG enablement */
-XPL_AVAILABLE_IN_2_72
-xboolean_t         g_log_get_debug_enabled       (void);
-XPL_AVAILABLE_IN_2_72
-void             g_log_set_debug_enabled       (xboolean_t         enabled);
+GLIB_AVAILABLE_IN_2_72
+gboolean         g_log_get_debug_enabled       (void);
+GLIB_AVAILABLE_IN_2_72
+void             g_log_set_debug_enabled       (gboolean         enabled);
 
 /**
  * G_DEBUG_HERE:
  *
- * A convenience form of g_loxstructured(), recommended to be added to
+ * A convenience form of g_log_structured(), recommended to be added to
  * functions when debugging. It prints the current monotonic time and the code
  * location using %G_STRLOC.
  *
  * Since: 2.50
  */
 #define G_DEBUG_HERE()                                          \
-  g_loxstructured (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,            \
+  g_log_structured (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,            \
                     "CODE_FILE", __FILE__,                      \
                     "CODE_LINE", G_STRINGIFY (__LINE__),        \
                     "CODE_FUNC", G_STRFUNC,                      \
@@ -273,23 +273,23 @@ void             g_log_set_debug_enabled       (xboolean_t         enabled);
                     g_get_monotonic_time (), G_STRLOC)
 
 /* internal */
-void	_g_log_fallback_handler	(const xchar_t   *log_domain,
+void	_g_log_fallback_handler	(const gchar   *log_domain,
 						 GLogLevelFlags log_level,
-						 const xchar_t   *message,
-						 xpointer_t       unused_data);
+						 const gchar   *message,
+						 gpointer       unused_data);
 
 /* Internal functions, used to implement the following macros */
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 void g_return_if_fail_warning (const char *log_domain,
 			       const char *pretty_function,
 			       const char *expression) G_ANALYZER_NORETURN;
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 void g_warn_message           (const char     *domain,
                                const char     *file,
                                int             line,
                                const char     *func,
                                const char     *warnexpr) G_ANALYZER_NORETURN;
-XPL_DEPRECATED
+GLIB_DEPRECATED
 G_NORETURN
 void g_assert_warning         (const char *log_domain,
 			       const char *file,
@@ -297,47 +297,47 @@ void g_assert_warning         (const char *log_domain,
 		               const char *pretty_function,
 		               const char *expression);
 
-XPL_AVAILABLE_IN_2_56
-void g_loxstructured_standard (const xchar_t    *log_domain,
+GLIB_AVAILABLE_IN_2_56
+void g_log_structured_standard (const gchar    *log_domain,
                                 GLogLevelFlags  log_level,
-                                const xchar_t    *file,
-                                const xchar_t    *line,
-                                const xchar_t    *func,
-                                const xchar_t    *message_format,
+                                const gchar    *file,
+                                const gchar    *line,
+                                const gchar    *func,
+                                const gchar    *message_format,
                                 ...) G_GNUC_PRINTF (6, 7);
 
 #ifndef G_LOG_DOMAIN
-#define G_LOG_DOMAIN    ((xchar_t*) 0)
+#define G_LOG_DOMAIN    ((gchar*) 0)
 #endif  /* G_LOG_DOMAIN */
 
 #if defined(G_HAVE_ISO_VARARGS) && !G_ANALYZER_ANALYZING
-#if defined(G_LOG_USE_STRUCTURED) && XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_56
-#define xerror(...)  G_STMT_START {                                            \
-                        g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR, \
+#if defined(G_LOG_USE_STRUCTURED) && GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_56
+#define g_error(...)  G_STMT_START {                                            \
+                        g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR, \
                                                    __FILE__, G_STRINGIFY (__LINE__), \
                                                    G_STRFUNC, __VA_ARGS__); \
                         for (;;) ;                                              \
                       } G_STMT_END
-#define g_message(...)  g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, \
+#define g_message(...)  g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, \
                                                    __FILE__, G_STRINGIFY (__LINE__), \
                                                    G_STRFUNC, __VA_ARGS__)
-#define g_critical(...) g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
+#define g_critical(...) g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
                                                    __FILE__, G_STRINGIFY (__LINE__), \
                                                    G_STRFUNC, __VA_ARGS__)
-#define g_warning(...)  g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, \
+#define g_warning(...)  g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, \
                                                    __FILE__, G_STRINGIFY (__LINE__), \
                                                    G_STRFUNC, __VA_ARGS__)
-#define g_info(...)     g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, \
+#define g_info(...)     g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, \
                                                    __FILE__, G_STRINGIFY (__LINE__), \
                                                    G_STRFUNC, __VA_ARGS__)
-#define g_debug(...)    g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, \
+#define g_debug(...)    g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, \
                                                    __FILE__, G_STRINGIFY (__LINE__), \
                                                    G_STRFUNC, __VA_ARGS__)
 #else
-/* for(;;) ; so that GCC knows that control doesn't go past xerror().
+/* for(;;) ; so that GCC knows that control doesn't go past g_error().
  * Put space before ending semicolon to avoid C++ build warnings.
  */
-#define xerror(...)  G_STMT_START {                 \
+#define g_error(...)  G_STMT_START {                 \
                         g_log (G_LOG_DOMAIN,         \
                                G_LOG_LEVEL_ERROR,    \
                                __VA_ARGS__);         \
@@ -360,30 +360,30 @@ void g_loxstructured_standard (const xchar_t    *log_domain,
                                __VA_ARGS__)
 #endif
 #elif defined(G_HAVE_GNUC_VARARGS)  && !G_ANALYZER_ANALYZING
-#if defined(G_LOG_USE_STRUCTURED) && XPL_VERSION_MAX_ALLOWED >= XPL_VERSION_2_56
-#define xerror(format...)   G_STMT_START {                                          \
-                               g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR, \
+#if defined(G_LOG_USE_STRUCTURED) && GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_56
+#define g_error(format...)   G_STMT_START {                                          \
+                               g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_ERROR, \
                                                           __FILE__, G_STRINGIFY (__LINE__), \
                                                           G_STRFUNC, format); \
                                for (;;) ;                                            \
                              } G_STMT_END
-#define g_message(format...)  g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, \
+#define g_message(format...)  g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, \
                                                          __FILE__, G_STRINGIFY (__LINE__), \
                                                          G_STRFUNC, format)
-#define g_critical(format...) g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
+#define g_critical(format...) g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, \
                                                          __FILE__, G_STRINGIFY (__LINE__), \
                                                          G_STRFUNC, format)
-#define g_warning(format...)  g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, \
+#define g_warning(format...)  g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, \
                                                          __FILE__, G_STRINGIFY (__LINE__), \
                                                          G_STRFUNC, format)
-#define g_info(format...)     g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, \
+#define g_info(format...)     g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, \
                                                          __FILE__, G_STRINGIFY (__LINE__), \
                                                          G_STRFUNC, format)
-#define g_debug(format...)    g_loxstructured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, \
+#define g_debug(format...)    g_log_structured_standard (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, \
                                                          __FILE__, G_STRINGIFY (__LINE__), \
                                                          G_STRFUNC, format)
 #else
-#define xerror(format...)    G_STMT_START {                 \
+#define g_error(format...)    G_STMT_START {                 \
                                 g_log (G_LOG_DOMAIN,         \
                                        G_LOG_LEVEL_ERROR,    \
                                        format);              \
@@ -407,11 +407,11 @@ void g_loxstructured_standard (const xchar_t    *log_domain,
                                        format)
 #endif
 #else   /* no varargs macros */
-static G_NORETURN void xerror (const xchar_t *format, ...) G_ANALYZER_NORETURN;
-static void g_critical (const xchar_t *format, ...) G_ANALYZER_NORETURN;
+static G_NORETURN void g_error (const gchar *format, ...) G_ANALYZER_NORETURN;
+static void g_critical (const gchar *format, ...) G_ANALYZER_NORETURN;
 
 static inline void
-xerror (const xchar_t *format,
+g_error (const gchar *format,
          ...)
 {
   va_list args;
@@ -422,7 +422,7 @@ xerror (const xchar_t *format,
   for(;;) ;
 }
 static inline void
-g_message (const xchar_t *format,
+g_message (const gchar *format,
            ...)
 {
   va_list args;
@@ -431,7 +431,7 @@ g_message (const xchar_t *format,
   va_end (args);
 }
 static inline void
-g_critical (const xchar_t *format,
+g_critical (const gchar *format,
             ...)
 {
   va_list args;
@@ -440,7 +440,7 @@ g_critical (const xchar_t *format,
   va_end (args);
 }
 static inline void
-g_warning (const xchar_t *format,
+g_warning (const gchar *format,
            ...)
 {
   va_list args;
@@ -449,7 +449,7 @@ g_warning (const xchar_t *format,
   va_end (args);
 }
 static inline void
-g_info (const xchar_t *format,
+g_info (const gchar *format,
         ...)
 {
   va_list args;
@@ -458,7 +458,7 @@ g_info (const xchar_t *format,
   va_end (args);
 }
 static inline void
-g_debug (const xchar_t *format,
+g_debug (const gchar *format,
          ...)
 {
   va_list args;
@@ -491,7 +491,7 @@ g_debug (const xchar_t *format,
                                            0, 1)) \
       g_warning (__VA_ARGS__); \
   } G_STMT_END \
-  XPL_AVAILABLE_MACRO_IN_2_64
+  GLIB_AVAILABLE_MACRO_IN_2_64
 #elif defined(G_HAVE_GNUC_VARARGS)  && !G_ANALYZER_ANALYZING
 #define g_warning_once(format...) \
   G_STMT_START { \
@@ -500,7 +500,7 @@ g_debug (const xchar_t *format,
                                            0, 1)) \
       g_warning (format); \
   } G_STMT_END \
-  XPL_AVAILABLE_MACRO_IN_2_64
+  GLIB_AVAILABLE_MACRO_IN_2_64
 #else
 #define g_warning_once g_warning
 #endif
@@ -512,16 +512,16 @@ g_debug (const xchar_t *format,
  * Specifies the type of the print handler functions.
  * These are called with the complete formatted string to output.
  */
-typedef void    (*GPrintFunc)           (const xchar_t    *string);
-XPL_AVAILABLE_IN_ALL
-void            g_print                 (const xchar_t    *format,
+typedef void    (*GPrintFunc)           (const gchar    *string);
+GLIB_AVAILABLE_IN_ALL
+void            g_print                 (const gchar    *format,
                                          ...) G_GNUC_PRINTF (1, 2);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 GPrintFunc      g_set_print_handler     (GPrintFunc      func);
-XPL_AVAILABLE_IN_ALL
-void            g_printerr              (const xchar_t    *format,
+GLIB_AVAILABLE_IN_ALL
+void            g_printerr              (const gchar    *format,
                                          ...) G_GNUC_PRINTF (1, 2);
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
 
 /**
@@ -558,7 +558,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
  *
  * Verifies that the expression @expr, usually representing a precondition,
  * evaluates to %TRUE. If the function returns a value, use
- * xreturn_val_if_fail() instead.
+ * g_return_val_if_fail() instead.
  *
  * If @expr evaluates to %FALSE, the current function should be considered to
  * have undefined behaviour (a programmer error). The only correct solution
@@ -586,7 +586,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
 #define g_return_if_fail(expr) G_STMT_START{ (void)0; }G_STMT_END
 
 /**
- * xreturn_val_if_fail:
+ * g_return_val_if_fail:
  * @expr: the expression to check
  * @val: the value to return from the current function
  *       if the expression is not true
@@ -609,7 +609,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
  *
  * See g_return_if_fail() for guidance on how to debug failure of this check.
  */
-#define xreturn_val_if_fail(expr,val) G_STMT_START{ (void)0; }G_STMT_END
+#define g_return_val_if_fail(expr,val) G_STMT_START{ (void)0; }G_STMT_END
 
 /**
  * g_return_if_reached:
@@ -622,14 +622,14 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
 #define g_return_if_reached() G_STMT_START{ return; }G_STMT_END
 
 /**
- * xreturn_val_if_reached:
+ * g_return_val_if_reached:
  * @val: the value to return from the current function
  *
  * Logs a critical message and returns @val.
  *
  * See g_return_if_fail() for guidance on how to debug failure of this check.
  */
-#define xreturn_val_if_reached(val) G_STMT_START{ return (val); }G_STMT_END
+#define g_return_val_if_reached(val) G_STMT_START{ return (val); }G_STMT_END
 
 #else /* !G_DISABLE_CHECKS */
 
@@ -646,7 +646,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
       } \
   } G_STMT_END
 
-#define xreturn_val_if_fail(expr, val) \
+#define g_return_val_if_fail(expr, val) \
   G_STMT_START { \
     if (G_LIKELY (expr)) \
       { } \
@@ -670,7 +670,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
     return; \
   } G_STMT_END
 
-#define xreturn_val_if_reached(val) \
+#define g_return_val_if_reached(val) \
   G_STMT_START { \
     g_log (G_LOG_DOMAIN, \
            G_LOG_LEVEL_CRITICAL, \

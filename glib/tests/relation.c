@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -22,49 +22,42 @@
  * GLib at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#undef G_DISABLE_ASSERT
-#undef G_LOG_DOMAIN
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 
-#include <stdio.h>
-#include <string.h>
-#include "glib.h"
+#include <glib.h>
 
 int array[10000];
-xboolean_t failed = FALSE;
+gboolean failed = FALSE;
 
 #define	TEST(m,cond)	G_STMT_START { failed = !(cond); \
 if (failed) \
   { if (!m) \
       g_print ("\n(%s:%d) failed for: %s\n", __FILE__, __LINE__, ( # cond )); \
     else \
-      g_print ("\n(%s:%d) failed for: %s: (%s)\n", __FILE__, __LINE__, ( # cond ), (xchar_t*)m); \
+      g_print ("\n(%s:%d) failed for: %s: (%s)\n", __FILE__, __LINE__, ( # cond ), (gchar*)m); \
   } \
 else \
   g_print ("."); fflush (stdout); \
 } G_STMT_END
 
-#define	C2P(c)		((xpointer_t) ((long) (c)))
-#define	P2C(p)		((xchar_t) ((long) (p)))
+#define	C2P(c)		((gpointer) ((long) (c)))
+#define	P2C(p)		((gchar) ((long) (p)))
 
-#define XPL_TEST_STRING "el dorado "
-#define XPL_TEST_STRING_5 "el do"
+#define GLIB_TEST_STRING "el dorado "
+#define GLIB_TEST_STRING_5 "el do"
 
 typedef struct {
-	xuint_t age;
-	xchar_t name[40];
+  guint age;
+  gchar name[40];
 } GlibTestInfo;
 
-
-
-int
-main (int   argc,
-      char *argv[])
+static void
+test_relation (void)
 {
-  xint_t i;
+  gint i;
   GRelation *relation;
   GTuples *tuples;
-  xint_t data [1024];
-
+  gint data [1024];
 
   relation = g_relation_new (2);
 
@@ -82,55 +75,54 @@ main (int   argc,
 
   for (i = 2; i < 1022; i += 1)
     {
-      xassert (! g_relation_exists (relation, data + i, data + i));
-      xassert (! g_relation_exists (relation, data + i, data + i + 2));
-      xassert (! g_relation_exists (relation, data + i, data + i - 2));
+      g_assert_false (g_relation_exists (relation, data + i, data + i));
+      g_assert_false (g_relation_exists (relation, data + i, data + i + 2));
+      g_assert_false (g_relation_exists (relation, data + i, data + i - 2));
     }
 
   for (i = 1; i < 1023; i += 1)
     {
-      xassert (g_relation_exists (relation, data + i, data + i + 1));
-      xassert (g_relation_exists (relation, data + i, data + i - 1));
+      g_assert_true (g_relation_exists (relation, data + i, data + i + 1));
+      g_assert_true (g_relation_exists (relation, data + i, data + i - 1));
     }
 
   for (i = 2; i < 1022; i += 1)
     {
-      xassert (g_relation_count (relation, data + i, 0) == 2);
-      xassert (g_relation_count (relation, data + i, 1) == 2);
+      g_assert_cmpint (g_relation_count (relation, data + i, 0), ==, 2);
+      g_assert_cmpint (g_relation_count (relation, data + i, 1), ==, 2);
     }
 
-  xassert (g_relation_count (relation, data, 0) == 0);
+  g_assert_cmpint (g_relation_count (relation, data, 0), ==, 0);
 
-  xassert (g_relation_count (relation, data + 42, 0) == 2);
-  xassert (g_relation_count (relation, data + 43, 1) == 2);
-  xassert (g_relation_count (relation, data + 41, 1) == 2);
+  g_assert_cmpint (g_relation_count (relation, data + 42, 0), ==, 2);
+  g_assert_cmpint (g_relation_count (relation, data + 43, 1), ==, 2);
+  g_assert_cmpint (g_relation_count (relation, data + 41, 1), ==, 2);
+
   g_relation_delete (relation, data + 42, 0);
-  xassert (g_relation_count (relation, data + 42, 0) == 0);
-  xassert (g_relation_count (relation, data + 43, 1) == 1);
-  xassert (g_relation_count (relation, data + 41, 1) == 1);
+
+  g_assert_cmpint (g_relation_count (relation, data + 42, 0), ==, 0);
+  g_assert_cmpint (g_relation_count (relation, data + 43, 1), ==, 1);
+  g_assert_cmpint (g_relation_count (relation, data + 41, 1), ==, 1);
 
   tuples = g_relation_select (relation, data + 200, 0);
 
-  xassert (tuples->len == 2);
+  g_assert_cmpint (tuples->len, ==, 2);
 
-#if 0
-  for (i = 0; i < tuples->len; i += 1)
-    {
-      printf ("%d %d\n",
-	      *(xint_t*) g_tuples_index (tuples, i, 0),
-	      *(xint_t*) g_tuples_index (tuples, i, 1));
-    }
-#endif
-
-  xassert (g_relation_exists (relation, data + 300, data + 301));
+  g_assert_true (g_relation_exists (relation, data + 300, data + 301));
   g_relation_delete (relation, data + 300, 0);
-  xassert (!g_relation_exists (relation, data + 300, data + 301));
+  g_assert_false (g_relation_exists (relation, data + 300, data + 301));
 
   g_tuples_destroy (tuples);
-
   g_relation_destroy (relation);
+}
 
-  relation = NULL;
+int
+main (int   argc,
+      char *argv[])
+{
+  g_test_init (&argc, &argv, NULL);
 
-  return 0;
+  g_test_add_func ("/glib/relation", test_relation);
+
+  return g_test_run ();
 }

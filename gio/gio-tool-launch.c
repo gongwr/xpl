@@ -34,16 +34,16 @@ static const GOptionEntry entries[] = {
 };
 
 int
-handle_launch (int argc, char *argv[], xboolean_t do_help)
+handle_launch (int argc, char *argv[], gboolean do_help)
 {
-  xoption_context_t *context;
-  xerror_t *error = NULL;
+  GOptionContext *context;
+  GError *error = NULL;
 #if defined(G_OS_UNIX) && !defined(HAVE_COCOA)
   int i;
-  xapp_info_t *app = NULL;
-  xapp_launch_context_t *app_context = NULL;
-  xkey_file_t *keyfile = NULL;
-  xlist_t *args = NULL;
+  GAppInfo *app = NULL;
+  GAppLaunchContext *app_context = NULL;
+  GKeyFile *keyfile = NULL;
+  GList *args = NULL;
   char *desktop_file = NULL;
 #endif
   int retval;
@@ -67,7 +67,7 @@ handle_launch (int argc, char *argv[], xboolean_t do_help)
   if (!g_option_context_parse (context, &argc, &argv, &error))
     {
       show_help (context, error->message);
-      xerror_free (error);
+      g_error_free (error);
       g_option_context_free (context);
       return 1;
     }
@@ -92,8 +92,8 @@ handle_launch (int argc, char *argv[], xboolean_t do_help)
   *  - not existing file.
   *  - invalid keyfile format.
   */
-  keyfile = xkey_file_new ();
-  if (!xkey_file_load_from_file (keyfile, desktop_file, G_KEY_FILE_NONE, &error))
+  keyfile = g_key_file_new ();
+  if (!g_key_file_load_from_file (keyfile, desktop_file, G_KEY_FILE_NONE, &error))
     {
       print_error (_("Unable to load ‘%s‘: %s"), desktop_file, error->message);
       g_clear_error (&error);
@@ -101,7 +101,7 @@ handle_launch (int argc, char *argv[], xboolean_t do_help)
     }
   else
     {
-      app = (xapp_info_t*)xdesktop_app_info_new_from_keyfile (keyfile);
+      app = (GAppInfo*)g_desktop_app_info_new_from_keyfile (keyfile);
       if (!app)
         {
           print_error (_("Unable to load application information for ‘%s‘"), desktop_file);
@@ -111,21 +111,21 @@ handle_launch (int argc, char *argv[], xboolean_t do_help)
         {
           for (i = 2; i < argc; i++)
             {
-              args = xlist_append (args, xfile_new_for_commandline_arg (argv[i]));
+              args = g_list_append (args, g_file_new_for_commandline_arg (argv[i]));
             }
-          app_context = xapp_launch_context_new ();
-          if (!xapp_info_launch (app, args, app_context, &error))
+          app_context = g_app_launch_context_new ();
+          if (!g_app_info_launch (app, args, app_context, &error))
             {
               print_error (_("Unable to launch application ‘%s’: %s"), desktop_file, error->message);
               g_clear_error (&error);
               retval = 1;
             }
-          xlist_free_full (args, xobject_unref);
+          g_list_free_full (args, g_object_unref);
           g_clear_object (&app_context);
         }
       g_clear_object (&app);
     }
-  xkey_file_free (keyfile);
+  g_key_file_free (keyfile);
 #endif
   return retval;
 }

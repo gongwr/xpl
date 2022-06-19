@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __XFILE_ENUMERATOR_H__
-#define __XFILE_ENUMERATOR_H__
+#ifndef __G_FILE_ENUMERATOR_H__
+#define __G_FILE_ENUMERATOR_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,59 +29,59 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_FILE_ENUMERATOR         (xfile_enumerator_get_type ())
-#define XFILE_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_ENUMERATOR, xfile_enumerator))
-#define XFILE_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_ENUMERATOR, xfile_enumerator_class_t))
-#define X_IS_FILE_ENUMERATOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_ENUMERATOR))
-#define X_IS_FILE_ENUMERATOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_ENUMERATOR))
-#define XFILE_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_ENUMERATOR, xfile_enumerator_class_t))
+#define G_TYPE_FILE_ENUMERATOR         (g_file_enumerator_get_type ())
+#define G_FILE_ENUMERATOR(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_FILE_ENUMERATOR, GFileEnumerator))
+#define G_FILE_ENUMERATOR_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_FILE_ENUMERATOR, GFileEnumeratorClass))
+#define G_IS_FILE_ENUMERATOR(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_FILE_ENUMERATOR))
+#define G_IS_FILE_ENUMERATOR_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_FILE_ENUMERATOR))
+#define G_FILE_ENUMERATOR_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_FILE_ENUMERATOR, GFileEnumeratorClass))
 
 /**
- * xfile_enumerator_t:
+ * GFileEnumerator:
  *
  * A per matched file iterator.
  **/
-typedef struct _xfile_enumerator_class    xfile_enumerator_class_t;
-typedef struct _xfile_enumerator_private_t  xfile_enumerator_private_t;
+typedef struct _GFileEnumeratorClass    GFileEnumeratorClass;
+typedef struct _GFileEnumeratorPrivate  GFileEnumeratorPrivate;
 
 struct _GFileEnumerator
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
   /*< private >*/
-  xfile_enumerator_private_t *priv;
+  GFileEnumeratorPrivate *priv;
 };
 
-struct _xfile_enumerator_class
+struct _GFileEnumeratorClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
   /* Virtual Table */
 
-  xfile_info_t * (* next_file)         (xfile_enumerator_t      *enumerator,
-                                     xcancellable_t         *cancellable,
-                                     xerror_t              **error);
-  xboolean_t    (* close_fn)          (xfile_enumerator_t      *enumerator,
-                                     xcancellable_t         *cancellable,
-                                     xerror_t              **error);
+  GFileInfo * (* next_file)         (GFileEnumerator      *enumerator,
+                                     GCancellable         *cancellable,
+                                     GError              **error);
+  gboolean    (* close_fn)          (GFileEnumerator      *enumerator,
+                                     GCancellable         *cancellable,
+                                     GError              **error);
 
-  void        (* next_files_async)  (xfile_enumerator_t      *enumerator,
+  void        (* next_files_async)  (GFileEnumerator      *enumerator,
                                      int                   num_files,
                                      int                   io_priority,
-                                     xcancellable_t         *cancellable,
-                                     xasync_ready_callback_t   callback,
-                                     xpointer_t              user_data);
-  xlist_t *     (* next_files_finish) (xfile_enumerator_t      *enumerator,
-                                     xasync_result_t         *result,
-                                     xerror_t              **error);
-  void        (* close_async)       (xfile_enumerator_t      *enumerator,
+                                     GCancellable         *cancellable,
+                                     GAsyncReadyCallback   callback,
+                                     gpointer              user_data);
+  GList *     (* next_files_finish) (GFileEnumerator      *enumerator,
+                                     GAsyncResult         *result,
+                                     GError              **error);
+  void        (* close_async)       (GFileEnumerator      *enumerator,
                                      int                   io_priority,
-                                     xcancellable_t         *cancellable,
-                                     xasync_ready_callback_t   callback,
-                                     xpointer_t              user_data);
-  xboolean_t    (* close_finish)      (xfile_enumerator_t      *enumerator,
-                                     xasync_result_t         *result,
-                                     xerror_t              **error);
+                                     GCancellable         *cancellable,
+                                     GAsyncReadyCallback   callback,
+                                     gpointer              user_data);
+  gboolean    (* close_finish)      (GFileEnumerator      *enumerator,
+                                     GAsyncResult         *result,
+                                     GError              **error);
 
   /*< private >*/
   /* Padding for future expansion */
@@ -94,59 +94,59 @@ struct _xfile_enumerator_class
   void (*_g_reserved7) (void);
 };
 
-XPL_AVAILABLE_IN_ALL
-xtype_t      xfile_enumerator_get_type          (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GType      g_file_enumerator_get_type          (void) G_GNUC_CONST;
 
-XPL_AVAILABLE_IN_ALL
-xfile_info_t *xfile_enumerator_next_file         (xfile_enumerator_t      *enumerator,
-						xcancellable_t         *cancellable,
-						xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t   xfile_enumerator_close             (xfile_enumerator_t      *enumerator,
-						xcancellable_t         *cancellable,
-						xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void       xfile_enumerator_next_files_async  (xfile_enumerator_t      *enumerator,
+GLIB_AVAILABLE_IN_ALL
+GFileInfo *g_file_enumerator_next_file         (GFileEnumerator      *enumerator,
+						GCancellable         *cancellable,
+						GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean   g_file_enumerator_close             (GFileEnumerator      *enumerator,
+						GCancellable         *cancellable,
+						GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void       g_file_enumerator_next_files_async  (GFileEnumerator      *enumerator,
 						int                   num_files,
 						int                   io_priority,
-						xcancellable_t         *cancellable,
-						xasync_ready_callback_t   callback,
-						xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xlist_t *    xfile_enumerator_next_files_finish (xfile_enumerator_t      *enumerator,
-						xasync_result_t         *result,
-						xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-void       xfile_enumerator_close_async       (xfile_enumerator_t      *enumerator,
+						GCancellable         *cancellable,
+						GAsyncReadyCallback   callback,
+						gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+GList *    g_file_enumerator_next_files_finish (GFileEnumerator      *enumerator,
+						GAsyncResult         *result,
+						GError              **error);
+GLIB_AVAILABLE_IN_ALL
+void       g_file_enumerator_close_async       (GFileEnumerator      *enumerator,
 						int                   io_priority,
-						xcancellable_t         *cancellable,
-						xasync_ready_callback_t   callback,
-						xpointer_t              user_data);
-XPL_AVAILABLE_IN_ALL
-xboolean_t   xfile_enumerator_close_finish      (xfile_enumerator_t      *enumerator,
-						xasync_result_t         *result,
-						xerror_t              **error);
-XPL_AVAILABLE_IN_ALL
-xboolean_t   xfile_enumerator_is_closed         (xfile_enumerator_t      *enumerator);
-XPL_AVAILABLE_IN_ALL
-xboolean_t   xfile_enumerator_has_pending       (xfile_enumerator_t      *enumerator);
-XPL_AVAILABLE_IN_ALL
-void       xfile_enumerator_set_pending       (xfile_enumerator_t      *enumerator,
-						xboolean_t              pending);
-XPL_AVAILABLE_IN_ALL
-xfile_t *    xfile_enumerator_get_container     (xfile_enumerator_t *enumerator);
-XPL_AVAILABLE_IN_2_36
-xfile_t *    xfile_enumerator_get_child         (xfile_enumerator_t *enumerator,
-                                                xfile_info_t       *info);
+						GCancellable         *cancellable,
+						GAsyncReadyCallback   callback,
+						gpointer              user_data);
+GLIB_AVAILABLE_IN_ALL
+gboolean   g_file_enumerator_close_finish      (GFileEnumerator      *enumerator,
+						GAsyncResult         *result,
+						GError              **error);
+GLIB_AVAILABLE_IN_ALL
+gboolean   g_file_enumerator_is_closed         (GFileEnumerator      *enumerator);
+GLIB_AVAILABLE_IN_ALL
+gboolean   g_file_enumerator_has_pending       (GFileEnumerator      *enumerator);
+GLIB_AVAILABLE_IN_ALL
+void       g_file_enumerator_set_pending       (GFileEnumerator      *enumerator,
+						gboolean              pending);
+GLIB_AVAILABLE_IN_ALL
+GFile *    g_file_enumerator_get_container     (GFileEnumerator *enumerator);
+GLIB_AVAILABLE_IN_2_36
+GFile *    g_file_enumerator_get_child         (GFileEnumerator *enumerator,
+                                                GFileInfo       *info);
 
-XPL_AVAILABLE_IN_2_44
-xboolean_t   xfile_enumerator_iterate           (xfile_enumerator_t  *direnum,
-                                                xfile_info_t       **out_info,
-                                                xfile_t           **out_child,
-                                                xcancellable_t     *cancellable,
-                                                xerror_t          **error);
+GLIB_AVAILABLE_IN_2_44
+gboolean   g_file_enumerator_iterate           (GFileEnumerator  *direnum,
+                                                GFileInfo       **out_info,
+                                                GFile           **out_child,
+                                                GCancellable     *cancellable,
+                                                GError          **error);
 
 
 G_END_DECLS
 
-#endif /* __XFILE_ENUMERATOR_H__ */
+#endif /* __G_FILE_ENUMERATOR_H__ */

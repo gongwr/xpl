@@ -52,7 +52,7 @@
  *
  * Errors in this domain will be from the #GShellError enumeration.
  *
- * See #xerror_t for information on error domains.
+ * See #GError for information on error domains.
  **/
 
 /**
@@ -73,21 +73,21 @@ G_DEFINE_QUARK (g-shell-error-quark, g_shell_error)
  * Otherwise double quotes preserve things literally.
  */
 
-static xboolean_t
-unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
+static gboolean 
+unquote_string_inplace (gchar* str, gchar** end, GError** err)
 {
-  xchar_t* dest;
-  xchar_t* s;
-  xchar_t quote_char;
-
-  xreturn_val_if_fail(end != NULL, FALSE);
-  xreturn_val_if_fail(err == NULL || *err == NULL, FALSE);
-  xreturn_val_if_fail(str != NULL, FALSE);
-
+  gchar* dest;
+  gchar* s;
+  gchar quote_char;
+  
+  g_return_val_if_fail(end != NULL, FALSE);
+  g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
+  g_return_val_if_fail(str != NULL, FALSE);
+  
   dest = s = str;
 
   quote_char = *s;
-
+  
   if (!(*s == '"' || *s == '\''))
     {
       g_set_error_literal (err,
@@ -105,8 +105,8 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
     {
       while (*s)
         {
-          xassert(s > dest); /* loop invariant */
-
+          g_assert(s > dest); /* loop invariant */
+      
           switch (*s)
             {
             case '"':
@@ -148,15 +148,15 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
               break;
             }
 
-          xassert(s > dest); /* loop invariant */
+          g_assert(s > dest); /* loop invariant */
         }
     }
   else
     {
       while (*s)
         {
-          xassert(s > dest); /* loop invariant */
-
+          g_assert(s > dest); /* loop invariant */
+          
           if (*s == '\'')
             {
               /* End of the string, return now */
@@ -172,14 +172,14 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
               ++s;
             }
 
-          xassert(s > dest); /* loop invariant */
+          g_assert(s > dest); /* loop invariant */
         }
     }
-
+  
   /* If we reach here this means the close quote was never encountered */
 
   *dest = '\0';
-
+  
   g_set_error_literal (err,
                        G_SHELL_ERROR,
                        G_SHELL_ERROR_BAD_QUOTING,
@@ -191,7 +191,7 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
 /**
  * g_shell_quote:
  * @unquoted_string: (type filename): a literal string
- *
+ * 
  * Quotes a string so that the shell (/bin/sh) will interpret the
  * quoted string to mean @unquoted_string.
  *
@@ -202,23 +202,23 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
  *
  * The quoting style used is undefined (single or double quotes may be
  * used).
- *
+ * 
  * Returns: (type filename) (transfer full): quoted string
  **/
-xchar_t*
-g_shell_quote (const xchar_t *unquoted_string)
+gchar*
+g_shell_quote (const gchar *unquoted_string)
 {
   /* We always use single quotes, because the algorithm is cheesier.
    * We could use double if we felt like it, that might be more
    * human-readable.
    */
 
-  const xchar_t *p;
-  xstring_t *dest;
+  const gchar *p;
+  GString *dest;
 
-  xreturn_val_if_fail (unquoted_string != NULL, NULL);
-
-  dest = xstring_new ("'");
+  g_return_val_if_fail (unquoted_string != NULL, NULL);
+  
+  dest = g_string_new ("'");
 
   p = unquoted_string;
 
@@ -229,24 +229,24 @@ g_shell_quote (const xchar_t *unquoted_string)
     {
       /* Replace literal ' with a close ', a \', and an open ' */
       if (*p == '\'')
-        xstring_append (dest, "'\\''");
+        g_string_append (dest, "'\\''");
       else
-        xstring_append_c (dest, *p);
+        g_string_append_c (dest, *p);
 
       ++p;
     }
 
   /* close the quote */
-  xstring_append_c (dest, '\'');
-
-  return xstring_free (dest, FALSE);
+  g_string_append_c (dest, '\'');
+  
+  return g_string_free (dest, FALSE);
 }
 
 /**
  * g_shell_unquote:
  * @quoted_string: (type filename): shell-quoted string
  * @error: error return location or NULL
- *
+ * 
  * Unquotes a string as the shell (/bin/sh) would.
  *
  * This function only handles quotes; if a string contains file globs,
@@ -267,7 +267,7 @@ g_shell_quote (const xchar_t *unquoted_string)
  * The return value must be freed with g_free().
  *
  * Possible errors are in the %G_SHELL_ERROR domain.
- *
+ * 
  * Shell quoting rules are a bit strange. Single quotes preserve the
  * literal string exactly. escape sequences are not allowed; not even
  * `\'` - if you want a `'` in the quoted text, you have to do something
@@ -277,22 +277,22 @@ g_shell_quote (const xchar_t *unquoted_string)
  *
  * Returns: (type filename): an unquoted string
  **/
-xchar_t*
-g_shell_unquote (const xchar_t *quoted_string,
-                 xerror_t     **error)
+gchar*
+g_shell_unquote (const gchar *quoted_string,
+                 GError     **error)
 {
-  xchar_t *unquoted;
-  xchar_t *end;
-  xchar_t *start;
-  xstring_t *retval;
-
-  xreturn_val_if_fail (quoted_string != NULL, NULL);
-
-  unquoted = xstrdup (quoted_string);
+  gchar *unquoted;
+  gchar *end;
+  gchar *start;
+  GString *retval;
+  
+  g_return_val_if_fail (quoted_string != NULL, NULL);
+  
+  unquoted = g_strdup (quoted_string);
 
   start = unquoted;
   end = unquoted;
-  retval = xstring_new (NULL);
+  retval = g_string_new (NULL);
 
   /* The loop allows cases such as
    * "foo"blah blah'bar'woo foo"baz"la la la\'\''foo'
@@ -301,7 +301,7 @@ g_shell_unquote (const xchar_t *quoted_string,
     {
       /* Append all non-quoted chars, honoring backslash escape
        */
-
+      
       while (*start && !(*start == '"' || *start == '\''))
         {
           if (*start == '\\')
@@ -310,18 +310,18 @@ g_shell_unquote (const xchar_t *quoted_string,
                * except newline, which is removed if it follows
                * a backslash outside of quotes
                */
-
+              
               ++start;
               if (*start)
                 {
                   if (*start != '\n')
-                    xstring_append_c (retval, *start);
+                    g_string_append_c (retval, *start);
                   ++start;
                 }
             }
           else
             {
-              xstring_append_c (retval, *start);
+              g_string_append_c (retval, *start);
               ++start;
             }
         }
@@ -334,20 +334,20 @@ g_shell_unquote (const xchar_t *quoted_string,
             }
           else
             {
-              xstring_append (retval, start);
+              g_string_append (retval, start);
               start = end;
             }
         }
     }
 
   g_free (unquoted);
-  return xstring_free (retval, FALSE);
-
+  return g_string_free (retval, FALSE);
+  
  error:
-  xassert (error == NULL || *error != NULL);
-
+  g_assert (error == NULL || *error != NULL);
+  
   g_free (unquoted);
-  xstring_free (retval, TRUE);
+  g_string_free (retval, TRUE);
   return NULL;
 }
 
@@ -371,7 +371,7 @@ g_shell_unquote (const xchar_t *quoted_string,
  *
  *    Tokenization steps, from UNIX98 with operator stuff removed,
  *    are:
- *
+ * 
  *    1) "If the current character is backslash, single-quote or
  *        double-quote (\, ' or ") and it is not quoted, it will affect
  *        quoting for subsequent characters up to the end of the quoted
@@ -421,38 +421,38 @@ g_shell_unquote (const xchar_t *quoted_string,
  */
 
 static inline void
-ensure_token (xstring_t **token)
+ensure_token (GString **token)
 {
   if (*token == NULL)
-    *token = xstring_new (NULL);
+    *token = g_string_new (NULL);
 }
 
 static void
-delimit_token (xstring_t **token,
-               xslist_t **retval)
+delimit_token (GString **token,
+               GSList **retval)
 {
   if (*token == NULL)
     return;
 
-  *retval = xslist_prepend (*retval, xstring_free (*token, FALSE));
+  *retval = g_slist_prepend (*retval, g_string_free (*token, FALSE));
 
   *token = NULL;
 }
 
-static xslist_t*
-tokenize_command_line (const xchar_t *command_line,
-                       xerror_t **error)
+static GSList*
+tokenize_command_line (const gchar *command_line,
+                       GError **error)
 {
-  xchar_t current_quote;
-  const xchar_t *p;
-  xstring_t *current_token = NULL;
-  xslist_t *retval = NULL;
-  xboolean_t quoted;
+  gchar current_quote;
+  const gchar *p;
+  GString *current_token = NULL;
+  GSList *retval = NULL;
+  gboolean quoted;
 
   current_quote = '\0';
   quoted = FALSE;
   p = command_line;
-
+ 
   while (*p)
     {
       if (current_quote == '\\')
@@ -467,8 +467,8 @@ tokenize_command_line (const xchar_t *command_line,
                * to be interpreted later after tokenization
                */
               ensure_token (&current_token);
-              xstring_append_c (current_token, '\\');
-              xstring_append_c (current_token, *p);
+              g_string_append_c (current_token, '\\');
+              g_string_append_c (current_token, *p);
             }
 
           current_quote = '\0';
@@ -480,7 +480,7 @@ tokenize_command_line (const xchar_t *command_line,
             ++p;
 
           current_quote = '\0';
-
+          
           if (*p == '\0')
             break;
         }
@@ -499,7 +499,7 @@ tokenize_command_line (const xchar_t *command_line,
            */
 
           ensure_token (&current_token);
-          xstring_append_c (current_token, *p);
+          g_string_append_c (current_token, *p);
         }
       else
         {
@@ -520,7 +520,7 @@ tokenize_command_line (const xchar_t *command_line,
                 {
                   delimit_token (&current_token, &retval);
                 }
-
+              
               /* discard all unquoted blanks (don't add them to a token) */
               break;
 
@@ -529,11 +529,11 @@ tokenize_command_line (const xchar_t *command_line,
                * escapes are maybe appended next time through the loop,
                * comment chars are never appended.
                */
-
+              
             case '\'':
             case '"':
               ensure_token (&current_token);
-              xstring_append_c (current_token, *p);
+              g_string_append_c (current_token, *p);
 
               G_GNUC_FALLTHROUGH;
             case '\\':
@@ -555,7 +555,7 @@ tokenize_command_line (const xchar_t *command_line,
                     break;
                   default:
                     ensure_token (&current_token);
-                    xstring_append_c (current_token, *p);
+                    g_string_append_c (current_token, *p);
 		    break;
                 }
               break;
@@ -565,12 +565,12 @@ tokenize_command_line (const xchar_t *command_line,
                * otherwise create a new token.
                */
               ensure_token (&current_token);
-              xstring_append_c (current_token, *p);
+              g_string_append_c (current_token, *p);
               break;
             }
         }
 
-      /* We need to count consecutive backslashes mod 2,
+      /* We need to count consecutive backslashes mod 2, 
        * to detect escaped doublequotes.
        */
       if (*p != '\\')
@@ -599,7 +599,7 @@ tokenize_command_line (const xchar_t *command_line,
                      _("Text ended before matching quote was found for %c."
                        " (The text was “%s”)"),
                      current_quote, command_line);
-
+      
       goto error;
     }
 
@@ -612,16 +612,16 @@ tokenize_command_line (const xchar_t *command_line,
 
       goto error;
     }
-
+  
   /* we appended backward */
-  retval = xslist_reverse (retval);
+  retval = g_slist_reverse (retval);
 
   return retval;
 
  error:
-  xassert (error == NULL || *error != NULL);
+  g_assert (error == NULL || *error != NULL);
 
-  xslist_free_full (retval, g_free);
+  g_slist_free_full (retval, g_free);
 
   return NULL;
 }
@@ -633,7 +633,7 @@ tokenize_command_line (const xchar_t *command_line,
  * @argvp: (out) (optional) (array length=argcp zero-terminated=1) (element-type filename):
  *   return location for array of args
  * @error: (optional): return location for error
- *
+ * 
  * Parses a command line into an argument vector, in much the same way
  * the shell would, but without many of the expansions the shell would
  * perform (variable expansion, globs, operators, filename expansion,
@@ -651,24 +651,24 @@ tokenize_command_line (const xchar_t *command_line,
  * guaranteed that @argvp will be a non-empty array if this function returns
  * successfully.
  *
- * Free the returned vector with xstrfreev().
- *
+ * Free the returned vector with g_strfreev().
+ * 
  * Returns: %TRUE on success, %FALSE if error set
  **/
-xboolean_t
-g_shell_parse_argv (const xchar_t *command_line,
-                    xint_t        *argcp,
-                    xchar_t     ***argvp,
-                    xerror_t     **error)
+gboolean
+g_shell_parse_argv (const gchar *command_line,
+                    gint        *argcp,
+                    gchar     ***argvp,
+                    GError     **error)
 {
   /* Code based on poptParseArgvString() from libpopt */
-  xint_t argc = 0;
-  xchar_t **argv = NULL;
-  xslist_t *tokens = NULL;
-  xint_t i;
-  xslist_t *tmp_list;
-
-  xreturn_val_if_fail (command_line != NULL, FALSE);
+  gint argc = 0;
+  gchar **argv = NULL;
+  GSList *tokens = NULL;
+  gint i;
+  GSList *tmp_list;
+  
+  g_return_val_if_fail (command_line != NULL, FALSE);
 
   tokens = tokenize_command_line (command_line, error);
   if (tokens == NULL)
@@ -682,14 +682,14 @@ g_shell_parse_argv (const xchar_t *command_line,
    * remove any zero-length words that didn't contain quotes
    * originally; but since there's no expansion we know all words have
    * nonzero length, unless they contain quotes.
-   *
+   * 
    * So, we simply remove quotes, and don't do any field splitting or
    * empty word removal, since we know there was no way to introduce
    * such things.
    */
 
-  argc = xslist_length (tokens);
-  argv = g_new0 (xchar_t*, argc + 1);
+  argc = g_slist_length (tokens);
+  argv = g_new0 (gchar*, argc + 1);
   i = 0;
   tmp_list = tokens;
   while (tmp_list)
@@ -702,14 +702,14 @@ g_shell_parse_argv (const xchar_t *command_line,
       if (argv[i] == NULL)
         goto failed;
 
-      tmp_list = xslist_next (tmp_list);
+      tmp_list = g_slist_next (tmp_list);
       ++i;
     }
+  
+  g_slist_free_full (tokens, g_free);
 
-  xslist_free_full (tokens, g_free);
-
-  xassert (argc > 0);
-  xassert (argv != NULL && argv[0] != NULL);
+  g_assert (argc > 0);
+  g_assert (argv != NULL && argv[0] != NULL);
 
   if (argcp)
     *argcp = argc;
@@ -717,15 +717,15 @@ g_shell_parse_argv (const xchar_t *command_line,
   if (argvp)
     *argvp = argv;
   else
-    xstrfreev (argv);
+    g_strfreev (argv);
 
   return TRUE;
 
  failed:
 
-  xassert (error == NULL || *error != NULL);
-  xstrfreev (argv);
-  xslist_free_full (tokens, g_free);
-
+  g_assert (error == NULL || *error != NULL);
+  g_strfreev (argv);
+  g_slist_free_full (tokens, g_free);
+  
   return FALSE;
 }

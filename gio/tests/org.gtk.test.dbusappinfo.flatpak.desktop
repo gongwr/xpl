@@ -1,5 +1,5 @@
 [Desktop Entry]
 Type=Application
-Name=test_t
+Name=Test
 DBusActivatable=true
 X-Flatpak=org.gtk.test.dbusappinfo.flatpak

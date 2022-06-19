@@ -29,24 +29,24 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_BUFFERED_OUTPUT_STREAM         (xbuffered_output_stream_get_type ())
-#define G_BUFFERED_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_BUFFERED_OUTPUT_STREAM, xbuffered_output_stream_t))
-#define G_BUFFERED_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_BUFFERED_OUTPUT_STREAM, GBufferedOutputStreamClass))
-#define X_IS_BUFFERED_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_BUFFERED_OUTPUT_STREAM))
-#define X_IS_BUFFERED_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_BUFFERED_OUTPUT_STREAM))
-#define G_BUFFERED_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_BUFFERED_OUTPUT_STREAM, GBufferedOutputStreamClass))
+#define G_TYPE_BUFFERED_OUTPUT_STREAM         (g_buffered_output_stream_get_type ())
+#define G_BUFFERED_OUTPUT_STREAM(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_BUFFERED_OUTPUT_STREAM, GBufferedOutputStream))
+#define G_BUFFERED_OUTPUT_STREAM_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_BUFFERED_OUTPUT_STREAM, GBufferedOutputStreamClass))
+#define G_IS_BUFFERED_OUTPUT_STREAM(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_BUFFERED_OUTPUT_STREAM))
+#define G_IS_BUFFERED_OUTPUT_STREAM_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_BUFFERED_OUTPUT_STREAM))
+#define G_BUFFERED_OUTPUT_STREAM_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_BUFFERED_OUTPUT_STREAM, GBufferedOutputStreamClass))
 
 /**
- * xbuffered_output_stream_t:
+ * GBufferedOutputStream:
  *
- * An implementation of #xfilter_output_stream_t with a sized buffer.
+ * An implementation of #GFilterOutputStream with a sized buffer.
  **/
 typedef struct _GBufferedOutputStreamClass    GBufferedOutputStreamClass;
 typedef struct _GBufferedOutputStreamPrivate  GBufferedOutputStreamPrivate;
 
 struct _GBufferedOutputStream
 {
-  xfilter_output_stream_t parent_instance;
+  GFilterOutputStream parent_instance;
 
   /*< protected >*/
   GBufferedOutputStreamPrivate *priv;
@@ -54,7 +54,7 @@ struct _GBufferedOutputStream
 
 struct _GBufferedOutputStreamClass
 {
-  xfilter_output_stream_class_t parent_class;
+  GFilterOutputStreamClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -63,23 +63,23 @@ struct _GBufferedOutputStreamClass
 };
 
 
-XPL_AVAILABLE_IN_ALL
-xtype_t          xbuffered_output_stream_get_type        (void) G_GNUC_CONST;
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t* xbuffered_output_stream_new             (xoutput_stream_t         *base_stream);
-XPL_AVAILABLE_IN_ALL
-xoutput_stream_t* xbuffered_output_stream_new_sized       (xoutput_stream_t         *base_stream,
-							 xsize_t                  size);
-XPL_AVAILABLE_IN_ALL
-xsize_t          xbuffered_output_stream_get_buffer_size (xbuffered_output_stream_t *stream);
-XPL_AVAILABLE_IN_ALL
-void           xbuffered_output_stream_set_buffer_size (xbuffered_output_stream_t *stream,
-							 xsize_t                  size);
-XPL_AVAILABLE_IN_ALL
-xboolean_t       xbuffered_output_stream_get_auto_grow   (xbuffered_output_stream_t *stream);
-XPL_AVAILABLE_IN_ALL
-void           xbuffered_output_stream_set_auto_grow   (xbuffered_output_stream_t *stream,
-							 xboolean_t               auto_grow);
+GLIB_AVAILABLE_IN_ALL
+GType          g_buffered_output_stream_get_type        (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GOutputStream* g_buffered_output_stream_new             (GOutputStream         *base_stream);
+GLIB_AVAILABLE_IN_ALL
+GOutputStream* g_buffered_output_stream_new_sized       (GOutputStream         *base_stream,
+							 gsize                  size);
+GLIB_AVAILABLE_IN_ALL
+gsize          g_buffered_output_stream_get_buffer_size (GBufferedOutputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+void           g_buffered_output_stream_set_buffer_size (GBufferedOutputStream *stream,
+							 gsize                  size);
+GLIB_AVAILABLE_IN_ALL
+gboolean       g_buffered_output_stream_get_auto_grow   (GBufferedOutputStream *stream);
+GLIB_AVAILABLE_IN_ALL
+void           g_buffered_output_stream_set_auto_grow   (GBufferedOutputStream *stream,
+							 gboolean               auto_grow);
 
 G_END_DECLS
 

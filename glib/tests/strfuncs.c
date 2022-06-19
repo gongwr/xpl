@@ -19,8 +19,8 @@
  * if advised of the possibility of such damage.
  */
 
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #define _XOPEN_SOURCE 600
@@ -48,7 +48,7 @@ static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
 
 #endif
 
-#define XPL_TEST_STRING "el dorado "
+#define GLIB_TEST_STRING "el dorado "
 
 #define FOR_ALL_CTYPE(macro)	\
 	macro(isalnum)		\
@@ -71,8 +71,8 @@ static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
 	}
 
 #define DEFINE_CALL_G_ASCII_CTYPE(function)	\
-	static xboolean_t				\
-	call_g_ascii_##function (xchar_t c)	\
+	static gboolean				\
+	call_g_ascii_##function (gchar c)	\
 	{					\
 		return g_ascii_##function (c);	\
 	}
@@ -82,68 +82,68 @@ FOR_ALL_CTYPE (DEFINE_CALL_G_ASCII_CTYPE)
 
 static void
 test_is_function (const char *name,
-		  xboolean_t (* ascii_function) (xchar_t),
+		  gboolean (* ascii_function) (gchar),
 		  int (* c_library_function) (int),
-		  xboolean_t (* unicode_function) (xunichar_t))
+		  gboolean (* unicode_function) (gunichar))
 {
   int c;
 
   for (c = 0; c <= 0x7F; c++)
     {
-      xboolean_t ascii_result = ascii_function ((xchar_t)c);
-      xboolean_t c_library_result = c_library_function (c) != 0;
-      xboolean_t unicode_result = unicode_function ((xunichar_t) c);
+      gboolean ascii_result = ascii_function ((gchar)c);
+      gboolean c_library_result = c_library_function (c) != 0;
+      gboolean unicode_result = unicode_function ((gunichar) c);
       if (ascii_result != c_library_result && c != '\v')
         {
-	  xerror ("g_ascii_%s returned %d and %s returned %d for 0x%X",
+	  g_error ("g_ascii_%s returned %d and %s returned %d for 0x%X",
 		   name, ascii_result, name, c_library_result, c);
 	}
       if (ascii_result != unicode_result)
 	{
-	  xerror ("g_ascii_%s returned %d and xunichar_%s returned %d for 0x%X",
+	  g_error ("g_ascii_%s returned %d and g_unichar_%s returned %d for 0x%X",
 		   name, ascii_result, name, unicode_result, c);
 	}
     }
   for (c = 0x80; c <= 0xFF; c++)
     {
-      xboolean_t ascii_result = ascii_function ((xchar_t)c);
+      gboolean ascii_result = ascii_function ((gchar)c);
       if (ascii_result)
 	{
-	  xerror ("g_ascii_%s returned TRUE for 0x%X", name, c);
+	  g_error ("g_ascii_%s returned TRUE for 0x%X", name, c);
 	}
     }
 }
 
 static void
 test_to_function (const char *name,
-		  xchar_t (* ascii_function) (xchar_t),
+		  gchar (* ascii_function) (gchar),
 		  int (* c_library_function) (int),
-		  xunichar_t (* unicode_function) (xunichar_t))
+		  gunichar (* unicode_function) (gunichar))
 {
   int c;
 
   for (c = 0; c <= 0x7F; c++)
     {
-      int ascii_result = (xuchar_t) ascii_function ((xchar_t) c);
+      int ascii_result = (guchar) ascii_function ((gchar) c);
       int c_library_result = c_library_function (c);
-      int unicode_result = unicode_function ((xunichar_t) c);
+      int unicode_result = unicode_function ((gunichar) c);
       if (ascii_result != c_library_result)
 	{
-	  xerror ("g_ascii_%s returned 0x%X and %s returned 0x%X for 0x%X",
+	  g_error ("g_ascii_%s returned 0x%X and %s returned 0x%X for 0x%X",
 		   name, ascii_result, name, c_library_result, c);
 	}
       if (ascii_result != unicode_result)
 	{
-	  xerror ("g_ascii_%s returned 0x%X and xunichar_%s returned 0x%X for 0x%X",
+	  g_error ("g_ascii_%s returned 0x%X and g_unichar_%s returned 0x%X for 0x%X",
 		   name, ascii_result, name, unicode_result, c);
 	}
     }
   for (c = 0x80; c <= 0xFF; c++)
     {
-      int ascii_result = (xuchar_t) ascii_function ((xchar_t) c);
+      int ascii_result = (guchar) ascii_function ((gchar) c);
       if (ascii_result != c)
 	{
-	  xerror ("g_ascii_%s returned 0x%X for 0x%X",
+	  g_error ("g_ascii_%s returned 0x%X for 0x%X",
 		   name, ascii_result, c);
 	}
     }
@@ -151,27 +151,27 @@ test_to_function (const char *name,
 
 static void
 test_digit_function (const char *name,
-		     int (* ascii_function) (xchar_t),
-		     int (* unicode_function) (xunichar_t))
+		     int (* ascii_function) (gchar),
+		     int (* unicode_function) (gunichar))
 {
   int c;
 
   for (c = 0; c <= 0x7F; c++)
     {
-      int ascii_result = ascii_function ((xchar_t) c);
-      int unicode_result = unicode_function ((xunichar_t) c);
+      int ascii_result = ascii_function ((gchar) c);
+      int unicode_result = unicode_function ((gunichar) c);
       if (ascii_result != unicode_result)
 	{
-	  xerror ("g_ascii_%s_value returned %d and xunichar_%s_value returned %d for 0x%X",
+	  g_error ("g_ascii_%s_value returned %d and g_unichar_%s_value returned %d for 0x%X",
 		   name, ascii_result, name, unicode_result, c);
 	}
     }
   for (c = 0x80; c <= 0xFF; c++)
     {
-      int ascii_result = ascii_function ((xchar_t) c);
+      int ascii_result = ascii_function ((gchar) c);
       if (ascii_result != -1)
 	{
-	  xerror ("g_ascii_%s_value returned %d for 0x%X",
+	  g_error ("g_ascii_%s_value returned %d for 0x%X",
 		   name, ascii_result, c);
 	}
     }
@@ -180,20 +180,20 @@ test_digit_function (const char *name,
 static void
 test_is_to_digit (void)
 {
-  #define TEST_IS(name) test_is_function (#name, call_g_ascii_##name, call_##name, xunichar_##name);
+  #define TEST_IS(name) test_is_function (#name, call_g_ascii_##name, call_##name, g_unichar_##name);
 
   FOR_ALL_CTYPE(TEST_IS)
 
   #undef TEST_IS
 
-  #define TEST_TO(name) test_to_function (#name, g_ascii_##name, name, xunichar_##name)
+  #define TEST_TO(name) test_to_function (#name, g_ascii_##name, name, g_unichar_##name)
 
   TEST_TO (tolower);
   TEST_TO (toupper);
 
   #undef TEST_TO
 
-  #define TEST_DIGIT(name) test_digit_function (#name, g_ascii_##name##_value, xunichar_##name##_value)
+  #define TEST_DIGIT(name) test_digit_function (#name, g_ascii_##name##_value, g_unichar_##name##_value)
 
   TEST_DIGIT (digit);
   TEST_DIGIT (xdigit);
@@ -207,8 +207,8 @@ test_memdup (void)
 {
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
-  xchar_t *str_dup = NULL;
-  const xchar_t *str = "The quick brown fox jumps over the lazy dog";
+  gchar *str_dup = NULL;
+  const gchar *str = "The quick brown fox jumps over the lazy dog";
 
   /* Testing negative cases */
   g_assert_null (g_memdup (NULL, 1024));
@@ -229,8 +229,8 @@ test_memdup (void)
 static void
 test_memdup2 (void)
 {
-  xchar_t *str_dup = NULL;
-  const xchar_t *str = "The quick brown fox jumps over the lazy dog";
+  gchar *str_dup = NULL;
+  const gchar *str = "The quick brown fox jumps over the lazy dog";
 
   /* Testing negative cases */
   g_assert_null (g_memdup2 (NULL, 1024));
@@ -245,12 +245,12 @@ test_memdup2 (void)
   g_free (str_dup);
 }
 
-/* Testing xstrpcpy() function with various positive and negative cases */
+/* Testing g_strpcpy() function with various positive and negative cases */
 static void
 test_stpcpy (void)
 {
-  xchar_t *str = "The quick brown fox jumps over the lazy dog";
-  xchar_t str_cpy[45], *str_cpy_end = NULL;
+  gchar *str = "The quick brown fox jumps over the lazy dog";
+  gchar str_cpy[45], *str_cpy_end = NULL;
 
   if (g_test_undefined ())
     {
@@ -274,120 +274,120 @@ test_stpcpy (void)
   g_assert_cmpstr (str, ==, str_cpy_end - strlen (str));
 }
 
-/* Testing xstrlcpy() function with various positive and negative cases */
+/* Testing g_strlcpy() function with various positive and negative cases */
 static void
 test_strlcpy (void)
 {
-  xchar_t *str = "The quick brown fox jumps over the lazy dog";
-  xchar_t str_cpy[45];
-  xsize_t str_cpy_size = 0;
+  gchar *str = "The quick brown fox jumps over the lazy dog";
+  gchar str_cpy[45];
+  gsize str_cpy_size = 0;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_cpy_size = xstrlcpy (str_cpy, NULL, 0);
+      str_cpy_size = g_strlcpy (str_cpy, NULL, 0);
       g_test_assert_expected_messages ();
-      /* Returned 0 because xstrlcpy() failed */
+      /* Returned 0 because g_strlcpy() failed */
       g_assert_cmpint (str_cpy_size, ==, 0);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_cpy_size = xstrlcpy (NULL, str, 0);
+      str_cpy_size = g_strlcpy (NULL, str, 0);
       g_test_assert_expected_messages ();
-      /* Returned 0 because xstrlcpy() failed */
+      /* Returned 0 because g_strlcpy() failed */
       g_assert_cmpint (str_cpy_size, ==, 0);
     }
 
-  str_cpy_size = xstrlcpy (str_cpy, "", 0);
+  str_cpy_size = g_strlcpy (str_cpy, "", 0);
   g_assert_cmpint (str_cpy_size, ==, strlen (""));
 
   /* Testing normal usage cases.
-   * Note that the @dest_size argument to xstrlcpy() is normally meant to be
+   * Note that the @dest_size argument to g_strlcpy() is normally meant to be
    * set to `sizeof (dest)`. We set it to various values `≤ sizeof (str_cpy)`
    * for testing purposes.  */
-  str_cpy_size = xstrlcpy (str_cpy, str, strlen (str) + 1);
+  str_cpy_size = g_strlcpy (str_cpy, str, strlen (str) + 1);
   g_assert_nonnull (str_cpy);
   g_assert_cmpstr (str, ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 
-  str_cpy_size = xstrlcpy (str_cpy, str, strlen (str));
+  str_cpy_size = g_strlcpy (str_cpy, str, strlen (str));
   g_assert_nonnull (str_cpy);
   g_assert_cmpstr ("The quick brown fox jumps over the lazy do", ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 
-  str_cpy_size = xstrlcpy (str_cpy, str, strlen (str) - 15);
+  str_cpy_size = g_strlcpy (str_cpy, str, strlen (str) - 15);
   g_assert_nonnull (str_cpy);
   g_assert_cmpstr ("The quick brown fox jumps o", ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 
-  str_cpy_size = xstrlcpy (str_cpy, str, 0);
+  str_cpy_size = g_strlcpy (str_cpy, str, 0);
   g_assert_nonnull (str_cpy);
   g_assert_cmpstr ("The quick brown fox jumps o", ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 
-  str_cpy_size = xstrlcpy (str_cpy, str, strlen (str) + 15);
+  str_cpy_size = g_strlcpy (str_cpy, str, strlen (str) + 15);
   g_assert_nonnull (str_cpy);
   g_assert_cmpstr (str, ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 }
 
-/* Testing xstrlcat() function with various positive and negative cases */
+/* Testing g_strlcat() function with various positive and negative cases */
 static void
 test_strlcat (void)
 {
-  xchar_t *str = "The quick brown fox jumps over the lazy dog";
-  xchar_t str_cpy[60] = { 0 };
-  xsize_t str_cpy_size = 0;
+  gchar *str = "The quick brown fox jumps over the lazy dog";
+  gchar str_cpy[60] = { 0 };
+  gsize str_cpy_size = 0;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_cpy_size = xstrlcat (str_cpy, NULL, 0);
+      str_cpy_size = g_strlcat (str_cpy, NULL, 0);
       g_test_assert_expected_messages ();
-      /* Returned 0 because xstrlcpy() failed */
+      /* Returned 0 because g_strlcpy() failed */
       g_assert_cmpint (str_cpy_size, ==, 0);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str_cpy_size = xstrlcat (NULL, str, 0);
+      str_cpy_size = g_strlcat (NULL, str, 0);
       g_test_assert_expected_messages ();
-      /* Returned 0 because xstrlcpy() failed */
+      /* Returned 0 because g_strlcpy() failed */
       g_assert_cmpint (str_cpy_size, ==, 0);
     }
 
-  str_cpy_size = xstrlcat (str_cpy, "", 0);
+  str_cpy_size = g_strlcat (str_cpy, "", 0);
   g_assert_cmpint (str_cpy_size, ==, strlen (""));
 
   /* Testing normal usage cases.
-   * Note that the @dest_size argument to xstrlcat() is normally meant to be
+   * Note that the @dest_size argument to g_strlcat() is normally meant to be
    * set to `sizeof (dest)`. We set it to various values `≤ sizeof (str_cpy)`
    * for testing purposes. */
   g_assert_cmpuint (strlen (str) + 1, <=, sizeof (str_cpy));
-  str_cpy_size = xstrlcat (str_cpy, str, strlen (str) + 1);
+  str_cpy_size = g_strlcat (str_cpy, str, strlen (str) + 1);
   g_assert_cmpstr (str, ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 
   g_assert_cmpuint (strlen (str), <=, sizeof (str_cpy));
-  str_cpy_size = xstrlcat (str_cpy, str, strlen (str));
+  str_cpy_size = g_strlcat (str_cpy, str, strlen (str));
   g_assert_cmpstr (str, ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, 2 * strlen (str));
 
   g_assert_cmpuint (strlen (str) - 15, <=, sizeof (str_cpy));
-  str_cpy_size = xstrlcat (str_cpy, str, strlen (str) - 15);
+  str_cpy_size = g_strlcat (str_cpy, str, strlen (str) - 15);
   g_assert_cmpstr (str, ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, 2 * strlen (str) - 15);
 
   g_assert_cmpuint (0, <=, sizeof (str_cpy));
-  str_cpy_size = xstrlcat (str_cpy, str, 0);
+  str_cpy_size = g_strlcat (str_cpy, str, 0);
   g_assert_cmpstr (str, ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, strlen (str));
 
   g_assert_cmpuint (strlen (str) + 15, <=, sizeof (str_cpy));
-  str_cpy_size = xstrlcat (str_cpy, str, strlen (str) + 15);
+  str_cpy_size = g_strlcat (str_cpy, str, strlen (str) + 15);
   g_assert_cmpstr ("The quick brown fox jumps over the lazy dogThe quick brow",
                    ==, str_cpy);
   g_assert_cmpint (str_cpy_size, ==, 2 * strlen (str));
@@ -397,9 +397,9 @@ test_strlcat (void)
 static void
 test_ascii_strdown (void)
 {
-  const xchar_t *str_down = "the quick brown fox jumps over the lazy dog.";
-  const xchar_t *str_up = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.";
-  xchar_t* str;
+  const gchar *str_down = "the quick brown fox jumps over the lazy dog.";
+  const gchar *str_up = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.";
+  gchar* str;
 
   if (g_test_undefined ())
     {
@@ -446,9 +446,9 @@ test_ascii_strdown (void)
 static void
 test_ascii_strup (void)
 {
-  const xchar_t *str_down = "the quick brown fox jumps over the lazy dog.";
-  const xchar_t *str_up = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.";
-  xchar_t* str;
+  const gchar *str_down = "the quick brown fox jumps over the lazy dog.";
+  const gchar *str_up = "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG.";
+  gchar* str;
 
   if (g_test_undefined ())
     {
@@ -491,238 +491,238 @@ test_ascii_strup (void)
   g_free (str);
 }
 
-/* Testing xstrdup() function with various positive and negative cases */
+/* Testing g_strdup() function with various positive and negative cases */
 static void
 test_strdup (void)
 {
-  xchar_t *str;
+  gchar *str;
 
-  g_assert_null (xstrdup (NULL));
+  g_assert_null (g_strdup (NULL));
 
-  str = xstrdup (XPL_TEST_STRING);
+  str = g_strdup (GLIB_TEST_STRING);
   g_assert_nonnull (str);
-  g_assert_cmpstr (str, ==, XPL_TEST_STRING);
+  g_assert_cmpstr (str, ==, GLIB_TEST_STRING);
   g_free (str);
 }
 
-/* Testing xstrndup() function with various positive and negative cases */
+/* Testing g_strndup() function with various positive and negative cases */
 static void
 test_strndup (void)
 {
-  xchar_t *str;
+  gchar *str;
 
-  str = xstrndup (NULL, 3);
+  str = g_strndup (NULL, 3);
   g_assert_null (str);
 
-  str = xstrndup ("aaaa", 5);
+  str = g_strndup ("aaaa", 5);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "aaaa");
   g_free (str);
 
-  str = xstrndup ("aaaa", 2);
+  str = g_strndup ("aaaa", 2);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "aa");
   g_free (str);
 }
 
-/* Testing xstrdup_printf() function with various positive and negative cases */
+/* Testing g_strdup_printf() function with various positive and negative cases */
 static void
 test_strdup_printf (void)
 {
-  xchar_t *str;
+  gchar *str;
 
-  str = xstrdup_printf ("%05d %-5s", 21, "test");
+  str = g_strdup_printf ("%05d %-5s", 21, "test");
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "00021 test ");
   g_free (str);
 }
 
-/* Testing xstrdupv() function with various positive and negative cases */
+/* Testing g_strdupv() function with various positive and negative cases */
 static void
 test_strdupv (void)
 {
-  xchar_t *vec[] = { "foo_t", "Bar", NULL };
-  xchar_t **copy;
+  gchar *vec[] = { "Foo", "Bar", NULL };
+  gchar **copy;
 
-  copy = xstrdupv (NULL);
+  copy = g_strdupv (NULL);
   g_assert_null (copy);
 
-  copy = xstrdupv (vec);
+  copy = g_strdupv (vec);
   g_assert_nonnull (copy);
   g_assert_cmpstrv (copy, vec);
-  xstrfreev (copy);
+  g_strfreev (copy);
 }
 
-/* Testing xstrfill() function with various positive and negative cases */
+/* Testing g_strfill() function with various positive and negative cases */
 static void
 test_strnfill (void)
 {
-  xchar_t *str;
+  gchar *str;
 
-  str = xstrnfill (0, 'a');
+  str = g_strnfill (0, 'a');
   g_assert_nonnull (str);
   g_assert_true (*str == '\0');
   g_free (str);
 
-  str = xstrnfill (5, 'a');
+  str = g_strnfill (5, 'a');
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "aaaaa");
   g_free (str);
 }
 
-/* Testing xstrconcat() function with various positive and negative cases */
+/* Testing g_strconcat() function with various positive and negative cases */
 static void
 test_strconcat (void)
 {
-  xchar_t *str;
+  gchar *str;
 
-  str = xstrconcat (XPL_TEST_STRING, NULL);
+  str = g_strconcat (GLIB_TEST_STRING, NULL);
   g_assert_nonnull (str);
-  g_assert_cmpstr (str, ==, XPL_TEST_STRING);
+  g_assert_cmpstr (str, ==, GLIB_TEST_STRING);
   g_free (str);
 
-  str = xstrconcat (XPL_TEST_STRING,
-		     XPL_TEST_STRING,
-		     XPL_TEST_STRING,
+  str = g_strconcat (GLIB_TEST_STRING,
+		     GLIB_TEST_STRING,
+		     GLIB_TEST_STRING,
 		     NULL);
   g_assert_nonnull (str);
-  g_assert_cmpstr (str, ==, XPL_TEST_STRING XPL_TEST_STRING XPL_TEST_STRING);
+  g_assert_cmpstr (str, ==, GLIB_TEST_STRING GLIB_TEST_STRING GLIB_TEST_STRING);
   g_free (str);
 
-  g_assert_null (xstrconcat (NULL, "bla", NULL));
+  g_assert_null (g_strconcat (NULL, "bla", NULL));
 }
 
-/* Testing xstrjoinv() function with various positive and negative cases */
+/* Testing g_strjoinv() function with various positive and negative cases */
 static void
 test_strjoinv (void)
 {
-  xchar_t *strings[] = { "string1", "string2", NULL };
-  xchar_t *empty_strings[] = { NULL };
-  xchar_t *str;
+  gchar *strings[] = { "string1", "string2", NULL };
+  gchar *empty_strings[] = { NULL };
+  gchar *str;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str = xstrjoinv (NULL, NULL);
+      str = g_strjoinv (NULL, NULL);
       g_test_assert_expected_messages ();
     }
 
-  str = xstrjoinv (":", strings);
+  str = g_strjoinv (":", strings);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "string1:string2");
   g_free (str);
 
-  str = xstrjoinv (NULL, strings);
+  str = g_strjoinv (NULL, strings);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "string1string2");
   g_free (str);
 
-  str = xstrjoinv (NULL, empty_strings);
+  str = g_strjoinv (NULL, empty_strings);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "");
   g_free (str);
 }
 
-/* Testing xstrjoin() function with various positive and negative cases */
+/* Testing g_strjoin() function with various positive and negative cases */
 static void
 test_strjoin (void)
 {
-  xchar_t *str;
+  gchar *str;
 
-  str = xstrjoin (NULL, NULL);
+  str = g_strjoin (NULL, NULL);
   g_assert_nonnull (str);
   g_assert_true (*str == '\0');
   g_free (str);
 
-  str = xstrjoin (":", NULL);
+  str = g_strjoin (":", NULL);
   g_assert_nonnull (str);
   g_assert_true (*str == '\0');
   g_free (str);
 
-  str = xstrjoin (NULL, XPL_TEST_STRING, NULL);
+  str = g_strjoin (NULL, GLIB_TEST_STRING, NULL);
   g_assert_nonnull (str);
-  g_assert_cmpstr (str, ==, XPL_TEST_STRING);
+  g_assert_cmpstr (str, ==, GLIB_TEST_STRING);
   g_free (str);
 
-  str = xstrjoin (NULL,
-		   XPL_TEST_STRING,
-		   XPL_TEST_STRING,
-		   XPL_TEST_STRING,
+  str = g_strjoin (NULL,
+		   GLIB_TEST_STRING,
+		   GLIB_TEST_STRING,
+		   GLIB_TEST_STRING,
 		   NULL);
   g_assert_nonnull (str);
-  g_assert_cmpstr (str, ==, XPL_TEST_STRING XPL_TEST_STRING XPL_TEST_STRING);
+  g_assert_cmpstr (str, ==, GLIB_TEST_STRING GLIB_TEST_STRING GLIB_TEST_STRING);
   g_free (str);
 
-  str = xstrjoin (":",
-		   XPL_TEST_STRING,
-		   XPL_TEST_STRING,
-		   XPL_TEST_STRING,
+  str = g_strjoin (":",
+		   GLIB_TEST_STRING,
+		   GLIB_TEST_STRING,
+		   GLIB_TEST_STRING,
 		   NULL);
   g_assert_nonnull (str);
-  g_assert_cmpstr (str, ==, XPL_TEST_STRING ":" XPL_TEST_STRING ":" XPL_TEST_STRING);
+  g_assert_cmpstr (str, ==, GLIB_TEST_STRING ":" GLIB_TEST_STRING ":" GLIB_TEST_STRING);
   g_free (str);
 }
 
-/* Testing xstrcanon() function with various positive and negative cases */
+/* Testing g_strcanon() function with various positive and negative cases */
 static void
 test_strcanon (void)
 {
-  xchar_t *str;
+  gchar *str;
 
   if (g_test_undefined ())
     {
-      xchar_t *ret;
+      gchar *ret;
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str = xstrcanon (NULL, "ab", 'y');
+      str = g_strcanon (NULL, "ab", 'y');
       g_test_assert_expected_messages ();
       g_assert_null (str);
 
-      str = xstrdup ("abxabxab");
+      str = g_strdup ("abxabxab");
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      ret = xstrcanon (str, NULL, 'y');
+      ret = g_strcanon (str, NULL, 'y');
       g_test_assert_expected_messages ();
       g_assert_null (ret);
       g_free (str);
     }
 
-  str = xstrdup ("abxabxab");
-  str = xstrcanon (str, "ab", 'y');
+  str = g_strdup ("abxabxab");
+  str = g_strcanon (str, "ab", 'y');
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "abyabyab");
   g_free (str);
 }
 
-/* Testing xstrcompress() and xstrescape() functions with various cases */
+/* Testing g_strcompress() and g_strescape() functions with various cases */
 static void
 test_strcompress_strescape (void)
 {
-  xchar_t *str;
-  xchar_t *tmp;
+  gchar *str;
+  gchar *tmp;
 
   /* test compress */
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str = xstrcompress (NULL);
+      str = g_strcompress (NULL);
       g_test_assert_expected_messages ();
       g_assert_null (str);
 
       /* trailing slashes are not allowed */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
                              "*trailing \\*");
-      str = xstrcompress ("abc\\");
+      str = g_strcompress ("abc\\");
       g_test_assert_expected_messages ();
       g_assert_cmpstr (str, ==, "abc");
       g_free (str);
     }
 
-  str = xstrcompress ("abc\\\\\\\"\\b\\f\\n\\r\\t\\v\\003\\177\\234\\313\\12345z");
+  str = g_strcompress ("abc\\\\\\\"\\b\\f\\n\\r\\t\\v\\003\\177\\234\\313\\12345z");
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "abc\\\"\b\f\n\r\t\v\003\177\234\313\12345z");
   g_free (str);
@@ -732,42 +732,42 @@ test_strcompress_strescape (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str = xstrescape (NULL, NULL);
+      str = g_strescape (NULL, NULL);
       g_test_assert_expected_messages ();
       g_assert_null (str);
     }
 
-  str = xstrescape ("abc\\\"\b\f\n\r\t\v\003\177\234\313", NULL);
+  str = g_strescape ("abc\\\"\b\f\n\r\t\v\003\177\234\313", NULL);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "abc\\\\\\\"\\b\\f\\n\\r\\t\\v\\003\\177\\234\\313");
   g_free (str);
 
-  str = xstrescape ("abc\\\"\b\f\n\r\t\v\003\177\234\313",
+  str = g_strescape ("abc\\\"\b\f\n\r\t\v\003\177\234\313",
 		     "\b\f\001\002\003\004");
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "abc\\\\\\\"\b\f\\n\\r\\t\\v\003\\177\\234\\313");
   g_free (str);
 
   /* round trip */
-  tmp = xstrescape ("abc\\\"\b\f\n\r\t\v\003\177\234\313", NULL);
-  str = xstrcompress (tmp);
+  tmp = g_strescape ("abc\\\"\b\f\n\r\t\v\003\177\234\313", NULL);
+  str = g_strcompress (tmp);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "abc\\\"\b\f\n\r\t\v\003\177\234\313");
   g_free (str);
   g_free (tmp);
 
   /* Unicode round trip */
-  str = xstrescape ("héllø there⸘", NULL);
+  str = g_strescape ("héllø there⸘", NULL);
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "h\\303\\251ll\\303\\270 there\\342\\270\\230");
-  tmp = xstrcompress (str);
+  tmp = g_strcompress (str);
   g_assert_nonnull (tmp);
   g_assert_cmpstr (tmp, ==, "héllø there⸘");
   g_free (tmp);
   g_free (str);
 
-  /* test_t expanding invalid escapes */
-  str = xstrcompress ("\\11/ \\118 \\8aa \\19");
+  /* Test expanding invalid escapes */
+  str = g_strcompress ("\\11/ \\118 \\8aa \\19");
   g_assert_nonnull (str);
   g_assert_cmpstr (str, ==, "\t/ \t8 8aa \0019");
   g_free (str);
@@ -777,7 +777,7 @@ test_strcompress_strescape (void)
 static void
 test_ascii_strcasecmp (void)
 {
-  xboolean_t res;
+  gboolean res;
 
   if (g_test_undefined ())
     {
@@ -869,21 +869,21 @@ test_ascii_strcasecmp (void)
 }
 
 static void
-do_test_strchug (const xchar_t *str, const xchar_t *expected)
+do_test_strchug (const gchar *str, const gchar *expected)
 {
-  xchar_t *tmp;
-  xboolean_t res;
+  gchar *tmp;
+  gboolean res;
 
-  tmp = xstrdup (str);
+  tmp = g_strdup (str);
 
-  xstrchug (tmp);
+  g_strchug (tmp);
   res = (strcmp (tmp, expected) == 0);
   g_free (tmp);
 
   g_assert_cmpint (res, ==, TRUE);
 }
 
-/* Testing xstrchug() function with various positive and negative cases */
+/* Testing g_strchug() function with various positive and negative cases */
 static void
 test_strchug (void)
 {
@@ -891,7 +891,7 @@ test_strchug (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      xstrchug (NULL);
+      g_strchug (NULL);
       g_test_assert_expected_messages ();
     }
 
@@ -905,21 +905,21 @@ test_strchug (void)
 }
 
 static void
-do_test_strchomp (const xchar_t *str, const xchar_t *expected)
+do_test_strchomp (const gchar *str, const gchar *expected)
 {
-  xchar_t *tmp;
-  xboolean_t res;
+  gchar *tmp;
+  gboolean res;
 
-  tmp = xstrdup (str);
+  tmp = g_strdup (str);
 
-  xstrchomp (tmp);
+  g_strchomp (tmp);
   res = (strcmp (tmp, expected) == 0);
   g_free (tmp);
 
   g_assert_cmpint (res, ==, TRUE);
 }
 
-/* Testing xstrchomp() function with various positive and negative cases */
+/* Testing g_strchomp() function with various positive and negative cases */
 static void
 test_strchomp (void)
 {
@@ -927,7 +927,7 @@ test_strchomp (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      xstrchomp (NULL);
+      g_strchomp (NULL);
       g_test_assert_expected_messages ();
     }
 
@@ -940,15 +940,15 @@ test_strchomp (void)
   do_test_strchomp ("a a ", "a a");
 }
 
-/* Testing xstr_tokenize_and_fold() functions */
+/* Testing g_str_tokenize_and_fold() functions */
 static void
 test_str_tokenize_and_fold (void)
 {
-  const xchar_t *local_str = "en_GB";
-  const xchar_t *sample  = "The quick brown fox¸ jumps over the lazy dog.";
-  const xchar_t *special_cases = "quıck QUİCK QUİı QUıİ İıck ıİCK àìøş";
-  xchar_t **tokens, **alternates;
-  xchar_t
+  const gchar *local_str = "en_GB";
+  const gchar *sample  = "The quick brown fox¸ jumps over the lazy dog.";
+  const gchar *special_cases = "quıck QUİCK QUİı QUıİ İıck ıİCK àìøş";
+  gchar **tokens, **alternates;
+  gchar
     *expected_tokens[] =     \
     {"the", "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog", NULL},
     *expected_tokens_alt[] = \
@@ -959,112 +959,112 @@ test_str_tokenize_and_fold (void)
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      tokens = xstr_tokenize_and_fold (NULL, local_str, NULL);
+      tokens = g_str_tokenize_and_fold (NULL, local_str, NULL);
       g_test_assert_expected_messages ();
     }
 
-  tokens = xstr_tokenize_and_fold (special_cases, local_str, &alternates);
-  g_assert_cmpint (xstrv_length (tokens), ==,
-                   xstrv_length (expected_tokens_alt));
-  g_assert_true (xstrv_equal ((const xchar_t * const *) tokens,
-                               (const xchar_t * const *) expected_tokens_alt));
-  xstrfreev (tokens);
-  xstrfreev (alternates);
+  tokens = g_str_tokenize_and_fold (special_cases, local_str, &alternates);
+  g_assert_cmpint (g_strv_length (tokens), ==,
+                   g_strv_length (expected_tokens_alt));
+  g_assert_true (g_strv_equal ((const gchar * const *) tokens,
+                               (const gchar * const *) expected_tokens_alt));
+  g_strfreev (tokens);
+  g_strfreev (alternates);
 
-  tokens = xstr_tokenize_and_fold (sample, local_str, &alternates);
-  g_assert_cmpint (xstrv_length (tokens), ==, xstrv_length (expected_tokens));
-  g_assert_true (xstrv_equal ((const xchar_t * const *) tokens,
-                               (const xchar_t * const *) expected_tokens));
-  xstrfreev (tokens);
-  xstrfreev (alternates);
+  tokens = g_str_tokenize_and_fold (sample, local_str, &alternates);
+  g_assert_cmpint (g_strv_length (tokens), ==, g_strv_length (expected_tokens));
+  g_assert_true (g_strv_equal ((const gchar * const *) tokens,
+                               (const gchar * const *) expected_tokens));
+  g_strfreev (tokens);
+  g_strfreev (alternates);
 
-  tokens = xstr_tokenize_and_fold (sample, local_str, NULL);
-  g_assert_cmpint (xstrv_length (tokens), ==, xstrv_length (expected_tokens));
-  g_assert_true (xstrv_equal ((const xchar_t * const *) tokens,
-                               (const xchar_t * const *) expected_tokens));
-  xstrfreev (tokens);
+  tokens = g_str_tokenize_and_fold (sample, local_str, NULL);
+  g_assert_cmpint (g_strv_length (tokens), ==, g_strv_length (expected_tokens));
+  g_assert_true (g_strv_equal ((const gchar * const *) tokens,
+                               (const gchar * const *) expected_tokens));
+  g_strfreev (tokens);
 
-  tokens = xstr_tokenize_and_fold (sample, NULL, &alternates);
-  g_assert_cmpint (xstrv_length (tokens), ==, xstrv_length (expected_tokens));
-  g_assert_true (xstrv_equal ((const xchar_t * const *) tokens,
-                               (const xchar_t * const *) expected_tokens));
-  xstrfreev (tokens);
-  xstrfreev (alternates);
+  tokens = g_str_tokenize_and_fold (sample, NULL, &alternates);
+  g_assert_cmpint (g_strv_length (tokens), ==, g_strv_length (expected_tokens));
+  g_assert_true (g_strv_equal ((const gchar * const *) tokens,
+                               (const gchar * const *) expected_tokens));
+  g_strfreev (tokens);
+  g_strfreev (alternates);
 }
 
-/* Testing xstrreverse() function with various positive and negative cases */
+/* Testing g_strreverse() function with various positive and negative cases */
 static void
 test_strreverse (void)
 {
-  xchar_t *str;
-  xchar_t *p;
+  gchar *str;
+  gchar *p;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      str = xstrreverse (NULL);
+      str = g_strreverse (NULL);
       g_test_assert_expected_messages ();
       g_assert_null (str);
     }
 
-  str = p = xstrdup ("abcde");
-  str = xstrreverse (str);
+  str = p = g_strdup ("abcde");
+  str = g_strreverse (str);
   g_assert_nonnull (str);
   g_assert_true (p == str);
   g_assert_cmpstr (str, ==, "edcba");
   g_free (str);
 }
 
-/* Testing xstrncasecmp() functions */
+/* Testing g_strncasecmp() functions */
 static void
 test_strncasecmp (void)
 {
-  g_assert_cmpint (xstrncasecmp ("abc1", "ABC2", 3), ==, 0);
-  g_assert_cmpint (xstrncasecmp ("abc1", "ABC2", 4), !=, 0);
+  g_assert_cmpint (g_strncasecmp ("abc1", "ABC2", 3), ==, 0);
+  g_assert_cmpint (g_strncasecmp ("abc1", "ABC2", 4), !=, 0);
 }
 
 static void
 test_strstr (void)
 {
-  xchar_t *haystack;
-  xchar_t *res;
+  gchar *haystack;
+  gchar *res;
 
-  haystack = xstrdup ("FooBarFooBarFoo");
+  haystack = g_strdup ("FooBarFooBarFoo");
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstrstr_len (NULL, 0, "xxx");
+      res = g_strstr_len (NULL, 0, "xxx");
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstrstr_len ("xxx", 0, NULL);
+      res = g_strstr_len ("xxx", 0, NULL);
       g_test_assert_expected_messages ();
     }
 
   /* strstr_len */
-  res = xstrstr_len (haystack, 6, "xxx");
+  res = g_strstr_len (haystack, 6, "xxx");
   g_assert_null (res);
 
-  res = xstrstr_len (haystack, 6, "FooBarFooBarFooBar");
+  res = g_strstr_len (haystack, 6, "FooBarFooBarFooBar");
   g_assert_null (res);
 
-  res = xstrstr_len (haystack, 3, "Bar");
+  res = g_strstr_len (haystack, 3, "Bar");
   g_assert_null (res);
 
-  res = xstrstr_len (haystack, 6, "");
+  res = g_strstr_len (haystack, 6, "");
   g_assert_true (res == haystack);
   g_assert_cmpstr (res, ==, "FooBarFooBarFoo");
 
-  res = xstrstr_len (haystack, 6, "Bar");
+  res = g_strstr_len (haystack, 6, "Bar");
   g_assert_true (res == haystack + 3);
   g_assert_cmpstr (res, ==, "BarFooBarFoo");
 
-  res = xstrstr_len (haystack, -1, "Bar");
+  res = g_strstr_len (haystack, -1, "Bar");
   g_assert_true (res == haystack + 3);
   g_assert_cmpstr (res, ==, "BarFooBarFoo");
 
@@ -1073,26 +1073,26 @@ test_strstr (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstrrstr (NULL, "xxx");
+      res = g_strrstr (NULL, "xxx");
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstrrstr ("xxx", NULL);
+      res = g_strrstr ("xxx", NULL);
       g_test_assert_expected_messages ();
     }
 
-  res = xstrrstr (haystack, "xxx");
+  res = g_strrstr (haystack, "xxx");
   g_assert_null (res);
 
-  res = xstrrstr (haystack, "FooBarFooBarFooBar");
+  res = g_strrstr (haystack, "FooBarFooBarFooBar");
   g_assert_null (res);
 
-  res = xstrrstr (haystack, "");
+  res = g_strrstr (haystack, "");
   g_assert_true (res == haystack);
   g_assert_cmpstr (res, ==, "FooBarFooBarFoo");
 
-  res = xstrrstr (haystack, "Bar");
+  res = g_strrstr (haystack, "Bar");
   g_assert_true (res == haystack + 9);
   g_assert_cmpstr (res, ==, "BarFoo");
 
@@ -1101,201 +1101,201 @@ test_strstr (void)
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstrrstr_len (NULL, 14, "xxx");
+      res = g_strrstr_len (NULL, 14, "xxx");
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstrrstr_len ("xxx", 14, NULL);
+      res = g_strrstr_len ("xxx", 14, NULL);
       g_test_assert_expected_messages ();
     }
 
-  res = xstrrstr_len (haystack, 14, "xxx");
+  res = g_strrstr_len (haystack, 14, "xxx");
   g_assert_null (res);
 
-  res = xstrrstr_len (haystack, 14, "FooBarFooBarFooBar");
+  res = g_strrstr_len (haystack, 14, "FooBarFooBarFooBar");
   g_assert_null (res);
 
-  res = xstrrstr_len (haystack, 3, "Bar");
+  res = g_strrstr_len (haystack, 3, "Bar");
   g_assert_null (res);
 
-  res = xstrrstr_len (haystack, 14, "BarFoo");
+  res = g_strrstr_len (haystack, 14, "BarFoo");
   g_assert_true (res == haystack + 3);
   g_assert_cmpstr (res, ==, "BarFooBarFoo");
 
-  res = xstrrstr_len (haystack, 15, "BarFoo");
+  res = g_strrstr_len (haystack, 15, "BarFoo");
   g_assert_true (res == haystack + 9);
   g_assert_cmpstr (res, ==, "BarFoo");
 
-  res = xstrrstr_len (haystack, -1, "BarFoo");
+  res = g_strrstr_len (haystack, -1, "BarFoo");
   g_assert_true (res == haystack + 9);
   g_assert_cmpstr (res, ==, "BarFoo");
 
   /* test case for strings with \0 in the middle */
   *(haystack + 7) = '\0';
-  res = xstrstr_len (haystack, 15, "BarFoo");
+  res = g_strstr_len (haystack, 15, "BarFoo");
   g_assert_null (res);
 
   g_free (haystack);
 }
 
-/* Testing xstrtod() function with various positive and negative cases */
+/* Testing g_strtod() function with various positive and negative cases */
 static void
 test_strtod (void)
 {
-  xchar_t *str_end = NULL;
+  gchar *str_end = NULL;
   double value = 0.0;
   const double gold_ratio = 1.61803398874989484;
-  const xchar_t *gold_ratio_str = "1.61803398874989484";
-  const xchar_t *minus_gold_ratio_str = "-1.61803398874989484";
+  const gchar *gold_ratio_str = "1.61803398874989484";
+  const gchar *minus_gold_ratio_str = "-1.61803398874989484";
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      value = xstrtod (NULL, NULL);
+      value = g_strtod (NULL, NULL);
       g_test_assert_expected_messages ();
       g_assert_cmpfloat (value, ==, 0.0);
     }
 
-  g_assert_cmpfloat (xstrtod ("\x00\x00\x00\x00", NULL), ==, 0.0);
-  g_assert_cmpfloat (xstrtod ("\x00\x00\x00\x00", &str_end), ==, 0.0);
+  g_assert_cmpfloat (g_strtod ("\x00\x00\x00\x00", NULL), ==, 0.0);
+  g_assert_cmpfloat (g_strtod ("\x00\x00\x00\x00", &str_end), ==, 0.0);
   g_assert_cmpstr (str_end, ==, "");
-  g_assert_cmpfloat (xstrtod ("\xff\xff\xff\xff", NULL), ==, 0.0);
-  g_assert_cmpfloat (xstrtod ("\xff\xff\xff\xff", &str_end), ==, 0.0);
+  g_assert_cmpfloat (g_strtod ("\xff\xff\xff\xff", NULL), ==, 0.0);
+  g_assert_cmpfloat (g_strtod ("\xff\xff\xff\xff", &str_end), ==, 0.0);
   g_assert_cmpstr (str_end, ==, "\xff\xff\xff\xff");
 
   /* Testing normal usage cases */
-  g_assert_cmpfloat (xstrtod (gold_ratio_str, NULL), ==, gold_ratio);
-  g_assert_cmpfloat (xstrtod (gold_ratio_str, &str_end), ==, gold_ratio);
+  g_assert_cmpfloat (g_strtod (gold_ratio_str, NULL), ==, gold_ratio);
+  g_assert_cmpfloat (g_strtod (gold_ratio_str, &str_end), ==, gold_ratio);
   g_assert_true (str_end == gold_ratio_str + strlen (gold_ratio_str));
-  g_assert_cmpfloat (xstrtod (minus_gold_ratio_str, NULL), ==, -gold_ratio);
-  g_assert_cmpfloat (xstrtod (minus_gold_ratio_str, &str_end), ==, -gold_ratio);
+  g_assert_cmpfloat (g_strtod (minus_gold_ratio_str, NULL), ==, -gold_ratio);
+  g_assert_cmpfloat (g_strtod (minus_gold_ratio_str, &str_end), ==, -gold_ratio);
   g_assert_true (str_end == minus_gold_ratio_str + strlen (minus_gold_ratio_str));
 }
 
-/* Testing xstrdelimit() function */
+/* Testing g_strdelimit() function */
 static void
 test_strdelimit (void)
 {
-  const xchar_t *const_string = "ABCDE<*>Q";
-  xchar_t *string;
+  const gchar *const_string = "ABCDE<*>Q";
+  gchar *string;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      string = xstrdelimit (NULL, "ABCDE", 'N');
+      string = g_strdelimit (NULL, "ABCDE", 'N');
       g_test_assert_expected_messages ();
     }
 
-  string = xstrdelimit (xstrdup (const_string), "<>", '?');
+  string = g_strdelimit (g_strdup (const_string), "<>", '?');
   g_assert_cmpstr (string, ==, "ABCDE?*?Q");
   g_free (string);
 
-  string = xstrdelimit (xstrdup (const_string), NULL, '?');
+  string = g_strdelimit (g_strdup (const_string), NULL, '?');
   g_assert_cmpstr (string, ==, "ABCDE?*?Q");
   g_free (string);
 }
 
-/* Testing xstr_has_prefix() */
+/* Testing g_str_has_prefix() */
 static void
 test_has_prefix (void)
 {
-  xboolean_t res;
+  gboolean res;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstr_has_prefix ("foo", NULL);
+      res = g_str_has_prefix ("foo", NULL);
       g_test_assert_expected_messages ();
       g_assert_false (res);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstr_has_prefix (NULL, "foo");
+      res = g_str_has_prefix (NULL, "foo");
       g_test_assert_expected_messages ();
       g_assert_false (res);
     }
 
-  res = xstr_has_prefix ("foo", "bar");
+  res = g_str_has_prefix ("foo", "bar");
   g_assert_cmpint (res, ==, FALSE);
 
-  res = xstr_has_prefix ("foo", "foobar");
+  res = g_str_has_prefix ("foo", "foobar");
   g_assert_cmpint (res, ==, FALSE);
 
-  res = xstr_has_prefix ("foobar", "bar");
+  res = g_str_has_prefix ("foobar", "bar");
   g_assert_cmpint (res, ==, FALSE);
 
-  res = xstr_has_prefix ("foobar", "foo");
+  res = g_str_has_prefix ("foobar", "foo");
   g_assert_cmpint (res, ==, TRUE);
 
-  res = xstr_has_prefix ("foo", "");
+  res = g_str_has_prefix ("foo", "");
   g_assert_cmpint (res, ==, TRUE);
 
-  res = xstr_has_prefix ("foo", "foo");
+  res = g_str_has_prefix ("foo", "foo");
   g_assert_cmpint (res, ==, TRUE);
 
-  res = xstr_has_prefix ("", "");
+  res = g_str_has_prefix ("", "");
   g_assert_cmpint (res, ==, TRUE);
 }
 
 static void
 test_has_suffix (void)
 {
-  xboolean_t res;
+  gboolean res;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstr_has_suffix ("foo", NULL);
+      res = g_str_has_suffix ("foo", NULL);
       g_test_assert_expected_messages ();
       g_assert_false (res);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      res = xstr_has_suffix (NULL, "foo");
+      res = g_str_has_suffix (NULL, "foo");
       g_test_assert_expected_messages ();
       g_assert_false (res);
     }
 
-  res = xstr_has_suffix ("foo", "bar");
+  res = g_str_has_suffix ("foo", "bar");
   g_assert_false (res);
 
-  res = xstr_has_suffix ("bar", "foobar");
+  res = g_str_has_suffix ("bar", "foobar");
   g_assert_false (res);
 
-  res = xstr_has_suffix ("foobar", "foo");
+  res = g_str_has_suffix ("foobar", "foo");
   g_assert_false (res);
 
-  res = xstr_has_suffix ("foobar", "bar");
+  res = g_str_has_suffix ("foobar", "bar");
   g_assert_true (res);
 
-  res = xstr_has_suffix ("foo", "");
+  res = g_str_has_suffix ("foo", "");
   g_assert_true (res);
 
-  res = xstr_has_suffix ("foo", "foo");
+  res = g_str_has_suffix ("foo", "foo");
   g_assert_true (res);
 
-  res = xstr_has_suffix ("", "");
+  res = g_str_has_suffix ("", "");
   g_assert_true (res);
 }
 
 static void
-strv_check (xchar_t **strv, ...)
+strv_check (gchar **strv, ...)
 {
-  xboolean_t ok = TRUE;
-  xint_t i = 0;
+  gboolean ok = TRUE;
+  gint i = 0;
   va_list list;
 
   va_start (list, strv);
   while (ok)
     {
-      const xchar_t *str = va_arg (list, const char *);
+      const gchar *str = va_arg (list, const char *);
       if (strv[i] == NULL)
 	{
 	  g_assert_null (str);
@@ -1313,210 +1313,210 @@ strv_check (xchar_t **strv, ...)
     }
   va_end (list);
 
-  xstrfreev (strv);
+  g_strfreev (strv);
 }
 
-/* Testing xstrsplit() function with various positive and negative cases */
+/* Testing g_strsplit() function with various positive and negative cases */
 static void
 test_strsplit (void)
 {
-  xchar_t **string = NULL;
+  gchar **string = NULL;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      string = xstrsplit (NULL, ",", 0);
+      string = g_strsplit (NULL, ",", 0);
       g_test_assert_expected_messages ();
       g_assert_null (string);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      string = xstrsplit ("x", NULL, 0);
+      string = g_strsplit ("x", NULL, 0);
       g_test_assert_expected_messages ();
       g_assert_null (string);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion \'delimiter[0] != \'\\0\'*");
-      string = xstrsplit ("x", "", 0);
+      string = g_strsplit ("x", "", 0);
       g_test_assert_expected_messages ();
       g_assert_null (string);
     }
 
-  strv_check (xstrsplit ("", ",", 0), NULL);
-  strv_check (xstrsplit ("x", ",", 0), "x", NULL);
-  strv_check (xstrsplit ("x,y", ",", 0), "x", "y", NULL);
-  strv_check (xstrsplit ("x,y,", ",", 0), "x", "y", "", NULL);
-  strv_check (xstrsplit (",x,y", ",", 0), "", "x", "y", NULL);
-  strv_check (xstrsplit (",x,y,", ",", 0), "", "x", "y", "", NULL);
-  strv_check (xstrsplit ("x,y,z", ",", 0), "x", "y", "z", NULL);
-  strv_check (xstrsplit ("x,y,z,", ",", 0), "x", "y", "z", "", NULL);
-  strv_check (xstrsplit (",x,y,z", ",", 0), "", "x", "y", "z", NULL);
-  strv_check (xstrsplit (",x,y,z,", ",", 0), "", "x", "y", "z", "", NULL);
-  strv_check (xstrsplit (",,x,,y,,z,,", ",", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
-  strv_check (xstrsplit (",,x,,y,,z,,", ",,", 0), "", "x", "y", "z", "", NULL);
+  strv_check (g_strsplit ("", ",", 0), NULL);
+  strv_check (g_strsplit ("x", ",", 0), "x", NULL);
+  strv_check (g_strsplit ("x,y", ",", 0), "x", "y", NULL);
+  strv_check (g_strsplit ("x,y,", ",", 0), "x", "y", "", NULL);
+  strv_check (g_strsplit (",x,y", ",", 0), "", "x", "y", NULL);
+  strv_check (g_strsplit (",x,y,", ",", 0), "", "x", "y", "", NULL);
+  strv_check (g_strsplit ("x,y,z", ",", 0), "x", "y", "z", NULL);
+  strv_check (g_strsplit ("x,y,z,", ",", 0), "x", "y", "z", "", NULL);
+  strv_check (g_strsplit (",x,y,z", ",", 0), "", "x", "y", "z", NULL);
+  strv_check (g_strsplit (",x,y,z,", ",", 0), "", "x", "y", "z", "", NULL);
+  strv_check (g_strsplit (",,x,,y,,z,,", ",", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
+  strv_check (g_strsplit (",,x,,y,,z,,", ",,", 0), "", "x", "y", "z", "", NULL);
 
-  strv_check (xstrsplit ("", ",", 1), NULL);
-  strv_check (xstrsplit ("x", ",", 1), "x", NULL);
-  strv_check (xstrsplit ("x,y", ",", 1), "x,y", NULL);
-  strv_check (xstrsplit ("x,y,", ",", 1), "x,y,", NULL);
-  strv_check (xstrsplit (",x,y", ",", 1), ",x,y", NULL);
-  strv_check (xstrsplit (",x,y,", ",", 1), ",x,y,", NULL);
-  strv_check (xstrsplit ("x,y,z", ",", 1), "x,y,z", NULL);
-  strv_check (xstrsplit ("x,y,z,", ",", 1), "x,y,z,", NULL);
-  strv_check (xstrsplit (",x,y,z", ",", 1), ",x,y,z", NULL);
-  strv_check (xstrsplit (",x,y,z,", ",", 1), ",x,y,z,", NULL);
-  strv_check (xstrsplit (",,x,,y,,z,,", ",", 1), ",,x,,y,,z,,", NULL);
-  strv_check (xstrsplit (",,x,,y,,z,,", ",,", 1), ",,x,,y,,z,,", NULL);
+  strv_check (g_strsplit ("", ",", 1), NULL);
+  strv_check (g_strsplit ("x", ",", 1), "x", NULL);
+  strv_check (g_strsplit ("x,y", ",", 1), "x,y", NULL);
+  strv_check (g_strsplit ("x,y,", ",", 1), "x,y,", NULL);
+  strv_check (g_strsplit (",x,y", ",", 1), ",x,y", NULL);
+  strv_check (g_strsplit (",x,y,", ",", 1), ",x,y,", NULL);
+  strv_check (g_strsplit ("x,y,z", ",", 1), "x,y,z", NULL);
+  strv_check (g_strsplit ("x,y,z,", ",", 1), "x,y,z,", NULL);
+  strv_check (g_strsplit (",x,y,z", ",", 1), ",x,y,z", NULL);
+  strv_check (g_strsplit (",x,y,z,", ",", 1), ",x,y,z,", NULL);
+  strv_check (g_strsplit (",,x,,y,,z,,", ",", 1), ",,x,,y,,z,,", NULL);
+  strv_check (g_strsplit (",,x,,y,,z,,", ",,", 1), ",,x,,y,,z,,", NULL);
 
-  strv_check (xstrsplit ("", ",", 2), NULL);
-  strv_check (xstrsplit ("x", ",", 2), "x", NULL);
-  strv_check (xstrsplit ("x,y", ",", 2), "x", "y", NULL);
-  strv_check (xstrsplit ("x,y,", ",", 2), "x", "y,", NULL);
-  strv_check (xstrsplit (",x,y", ",", 2), "", "x,y", NULL);
-  strv_check (xstrsplit (",x,y,", ",", 2), "", "x,y,", NULL);
-  strv_check (xstrsplit ("x,y,z", ",", 2), "x", "y,z", NULL);
-  strv_check (xstrsplit ("x,y,z,", ",", 2), "x", "y,z,", NULL);
-  strv_check (xstrsplit (",x,y,z", ",", 2), "", "x,y,z", NULL);
-  strv_check (xstrsplit (",x,y,z,", ",", 2), "", "x,y,z,", NULL);
-  strv_check (xstrsplit (",,x,,y,,z,,", ",", 2), "", ",x,,y,,z,,", NULL);
-  strv_check (xstrsplit (",,x,,y,,z,,", ",,", 2), "", "x,,y,,z,,", NULL);
+  strv_check (g_strsplit ("", ",", 2), NULL);
+  strv_check (g_strsplit ("x", ",", 2), "x", NULL);
+  strv_check (g_strsplit ("x,y", ",", 2), "x", "y", NULL);
+  strv_check (g_strsplit ("x,y,", ",", 2), "x", "y,", NULL);
+  strv_check (g_strsplit (",x,y", ",", 2), "", "x,y", NULL);
+  strv_check (g_strsplit (",x,y,", ",", 2), "", "x,y,", NULL);
+  strv_check (g_strsplit ("x,y,z", ",", 2), "x", "y,z", NULL);
+  strv_check (g_strsplit ("x,y,z,", ",", 2), "x", "y,z,", NULL);
+  strv_check (g_strsplit (",x,y,z", ",", 2), "", "x,y,z", NULL);
+  strv_check (g_strsplit (",x,y,z,", ",", 2), "", "x,y,z,", NULL);
+  strv_check (g_strsplit (",,x,,y,,z,,", ",", 2), "", ",x,,y,,z,,", NULL);
+  strv_check (g_strsplit (",,x,,y,,z,,", ",,", 2), "", "x,,y,,z,,", NULL);
 }
 
-/* Testing function xstrsplit_set() */
+/* Testing function g_strsplit_set() */
 static void
 test_strsplit_set (void)
 {
-  xchar_t **string = NULL;
+  gchar **string = NULL;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      string = xstrsplit_set (NULL, ",/", 0);
+      string = g_strsplit_set (NULL, ",/", 0);
       g_test_assert_expected_messages ();
       g_assert_null (string);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      string = xstrsplit_set ("", NULL, 0);
+      string = g_strsplit_set ("", NULL, 0);
       g_test_assert_expected_messages ();
       g_assert_null (string);
     }
 
-  strv_check (xstrsplit_set ("", ",/", 0), NULL);
-  strv_check (xstrsplit_set (":def/ghi:", ":/", -1), "", "def", "ghi", "", NULL);
-  strv_check (xstrsplit_set ("abc:def/ghi", ":/", -1), "abc", "def", "ghi", NULL);
-  strv_check (xstrsplit_set (",;,;,;,;", ",;", -1), "", "", "", "", "", "", "", "", "", NULL);
-  strv_check (xstrsplit_set (",,abc.def", ".,", -1), "", "", "abc", "def", NULL);
+  strv_check (g_strsplit_set ("", ",/", 0), NULL);
+  strv_check (g_strsplit_set (":def/ghi:", ":/", -1), "", "def", "ghi", "", NULL);
+  strv_check (g_strsplit_set ("abc:def/ghi", ":/", -1), "abc", "def", "ghi", NULL);
+  strv_check (g_strsplit_set (",;,;,;,;", ",;", -1), "", "", "", "", "", "", "", "", "", NULL);
+  strv_check (g_strsplit_set (",,abc.def", ".,", -1), "", "", "abc", "def", NULL);
 
-  strv_check (xstrsplit_set (",x.y", ",.", 0), "", "x", "y", NULL);
-  strv_check (xstrsplit_set (".x,y,", ",.", 0), "", "x", "y", "", NULL);
-  strv_check (xstrsplit_set ("x,y.z", ",.", 0), "x", "y", "z", NULL);
-  strv_check (xstrsplit_set ("x.y,z,", ",.", 0), "x", "y", "z", "", NULL);
-  strv_check (xstrsplit_set (",x.y,z", ",.", 0), "", "x", "y", "z", NULL);
-  strv_check (xstrsplit_set (",x,y,z,", ",.", 0), "", "x", "y", "z", "", NULL);
-  strv_check (xstrsplit_set (",.x,,y,;z..", ".,;", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
-  strv_check (xstrsplit_set (",,x,,y,,z,,", ",,", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
+  strv_check (g_strsplit_set (",x.y", ",.", 0), "", "x", "y", NULL);
+  strv_check (g_strsplit_set (".x,y,", ",.", 0), "", "x", "y", "", NULL);
+  strv_check (g_strsplit_set ("x,y.z", ",.", 0), "x", "y", "z", NULL);
+  strv_check (g_strsplit_set ("x.y,z,", ",.", 0), "x", "y", "z", "", NULL);
+  strv_check (g_strsplit_set (",x.y,z", ",.", 0), "", "x", "y", "z", NULL);
+  strv_check (g_strsplit_set (",x,y,z,", ",.", 0), "", "x", "y", "z", "", NULL);
+  strv_check (g_strsplit_set (",.x,,y,;z..", ".,;", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
+  strv_check (g_strsplit_set (",,x,,y,,z,,", ",,", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
 
-  strv_check (xstrsplit_set ("x,y.z", ",.", 1), "x,y.z", NULL);
-  strv_check (xstrsplit_set ("x.y,z,", ",.", 1), "x.y,z,", NULL);
-  strv_check (xstrsplit_set (",x,y,z", ",.", 1), ",x,y,z", NULL);
-  strv_check (xstrsplit_set (",x,y.z,", ",.", 1), ",x,y.z,", NULL);
-  strv_check (xstrsplit_set (",,x,.y,,z,,", ",.", 1), ",,x,.y,,z,,", NULL);
-  strv_check (xstrsplit_set (",.x,,y,,z,,", ",,..", 1), ",.x,,y,,z,,", NULL);
+  strv_check (g_strsplit_set ("x,y.z", ",.", 1), "x,y.z", NULL);
+  strv_check (g_strsplit_set ("x.y,z,", ",.", 1), "x.y,z,", NULL);
+  strv_check (g_strsplit_set (",x,y,z", ",.", 1), ",x,y,z", NULL);
+  strv_check (g_strsplit_set (",x,y.z,", ",.", 1), ",x,y.z,", NULL);
+  strv_check (g_strsplit_set (",,x,.y,,z,,", ",.", 1), ",,x,.y,,z,,", NULL);
+  strv_check (g_strsplit_set (",.x,,y,,z,,", ",,..", 1), ",.x,,y,,z,,", NULL);
 
-  strv_check (xstrsplit_set ("", ",", 0), NULL);
-  strv_check (xstrsplit_set ("x", ",", 0), "x", NULL);
-  strv_check (xstrsplit_set ("x,y", ",", 0), "x", "y", NULL);
-  strv_check (xstrsplit_set ("x,y,", ",", 0), "x", "y", "", NULL);
-  strv_check (xstrsplit_set (",x,y", ",", 0), "", "x", "y", NULL);
-  strv_check (xstrsplit_set (",x,y,", ",", 0), "", "x", "y", "", NULL);
-  strv_check (xstrsplit_set ("x,y,z", ",", 0), "x", "y", "z", NULL);
-  strv_check (xstrsplit_set ("x,y,z,", ",", 0), "x", "y", "z", "", NULL);
-  strv_check (xstrsplit_set (",x,y,z", ",", 0), "", "x", "y", "z", NULL);
-  strv_check (xstrsplit_set (",x,y,z,", ",", 0), "", "x", "y", "z", "", NULL);
-  strv_check (xstrsplit_set (",,x,,y,,z,,", ",", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
+  strv_check (g_strsplit_set ("", ",", 0), NULL);
+  strv_check (g_strsplit_set ("x", ",", 0), "x", NULL);
+  strv_check (g_strsplit_set ("x,y", ",", 0), "x", "y", NULL);
+  strv_check (g_strsplit_set ("x,y,", ",", 0), "x", "y", "", NULL);
+  strv_check (g_strsplit_set (",x,y", ",", 0), "", "x", "y", NULL);
+  strv_check (g_strsplit_set (",x,y,", ",", 0), "", "x", "y", "", NULL);
+  strv_check (g_strsplit_set ("x,y,z", ",", 0), "x", "y", "z", NULL);
+  strv_check (g_strsplit_set ("x,y,z,", ",", 0), "x", "y", "z", "", NULL);
+  strv_check (g_strsplit_set (",x,y,z", ",", 0), "", "x", "y", "z", NULL);
+  strv_check (g_strsplit_set (",x,y,z,", ",", 0), "", "x", "y", "z", "", NULL);
+  strv_check (g_strsplit_set (",,x,,y,,z,,", ",", 0), "", "", "x", "", "y", "", "z", "", "", NULL);
 
-  strv_check (xstrsplit_set ("", ",", 1), NULL);
-  strv_check (xstrsplit_set ("x", ",", 1), "x", NULL);
-  strv_check (xstrsplit_set ("x,y", ",", 1), "x,y", NULL);
-  strv_check (xstrsplit_set ("x,y,", ",", 1), "x,y,", NULL);
-  strv_check (xstrsplit_set (",x,y", ",", 1), ",x,y", NULL);
-  strv_check (xstrsplit_set (",x,y,", ",", 1), ",x,y,", NULL);
-  strv_check (xstrsplit_set ("x,y,z", ",", 1), "x,y,z", NULL);
-  strv_check (xstrsplit_set ("x,y,z,", ",", 1), "x,y,z,", NULL);
-  strv_check (xstrsplit_set (",x,y,z", ",", 1), ",x,y,z", NULL);
-  strv_check (xstrsplit_set (",x,y,z,", ",", 1), ",x,y,z,", NULL);
-  strv_check (xstrsplit_set (",,x,,y,,z,,", ",", 1), ",,x,,y,,z,,", NULL);
-  strv_check (xstrsplit_set (",,x,,y,,z,,", ",,", 1), ",,x,,y,,z,,", NULL);
+  strv_check (g_strsplit_set ("", ",", 1), NULL);
+  strv_check (g_strsplit_set ("x", ",", 1), "x", NULL);
+  strv_check (g_strsplit_set ("x,y", ",", 1), "x,y", NULL);
+  strv_check (g_strsplit_set ("x,y,", ",", 1), "x,y,", NULL);
+  strv_check (g_strsplit_set (",x,y", ",", 1), ",x,y", NULL);
+  strv_check (g_strsplit_set (",x,y,", ",", 1), ",x,y,", NULL);
+  strv_check (g_strsplit_set ("x,y,z", ",", 1), "x,y,z", NULL);
+  strv_check (g_strsplit_set ("x,y,z,", ",", 1), "x,y,z,", NULL);
+  strv_check (g_strsplit_set (",x,y,z", ",", 1), ",x,y,z", NULL);
+  strv_check (g_strsplit_set (",x,y,z,", ",", 1), ",x,y,z,", NULL);
+  strv_check (g_strsplit_set (",,x,,y,,z,,", ",", 1), ",,x,,y,,z,,", NULL);
+  strv_check (g_strsplit_set (",,x,,y,,z,,", ",,", 1), ",,x,,y,,z,,", NULL);
 
-  strv_check (xstrsplit_set ("", ",", 2), NULL);
-  strv_check (xstrsplit_set ("x", ",", 2), "x", NULL);
-  strv_check (xstrsplit_set ("x,y", ",", 2), "x", "y", NULL);
-  strv_check (xstrsplit_set ("x,y,", ",", 2), "x", "y,", NULL);
-  strv_check (xstrsplit_set (",x,y", ",", 2), "", "x,y", NULL);
-  strv_check (xstrsplit_set (",x,y,", ",", 2), "", "x,y,", NULL);
-  strv_check (xstrsplit_set ("x,y,z", ",", 2), "x", "y,z", NULL);
-  strv_check (xstrsplit_set ("x,y,z,", ",", 2), "x", "y,z,", NULL);
-  strv_check (xstrsplit_set (",x,y,z", ",", 2), "", "x,y,z", NULL);
-  strv_check (xstrsplit_set (",x,y,z,", ",", 2), "", "x,y,z,", NULL);
-  strv_check (xstrsplit_set (",,x,,y,,z,,", ",", 2), "", ",x,,y,,z,,", NULL);
+  strv_check (g_strsplit_set ("", ",", 2), NULL);
+  strv_check (g_strsplit_set ("x", ",", 2), "x", NULL);
+  strv_check (g_strsplit_set ("x,y", ",", 2), "x", "y", NULL);
+  strv_check (g_strsplit_set ("x,y,", ",", 2), "x", "y,", NULL);
+  strv_check (g_strsplit_set (",x,y", ",", 2), "", "x,y", NULL);
+  strv_check (g_strsplit_set (",x,y,", ",", 2), "", "x,y,", NULL);
+  strv_check (g_strsplit_set ("x,y,z", ",", 2), "x", "y,z", NULL);
+  strv_check (g_strsplit_set ("x,y,z,", ",", 2), "x", "y,z,", NULL);
+  strv_check (g_strsplit_set (",x,y,z", ",", 2), "", "x,y,z", NULL);
+  strv_check (g_strsplit_set (",x,y,z,", ",", 2), "", "x,y,z,", NULL);
+  strv_check (g_strsplit_set (",,x,,y,,z,,", ",", 2), "", ",x,,y,,z,,", NULL);
 
-  strv_check (xstrsplit_set (",,x,.y,..z,,", ",.", 3), "", "", "x,.y,..z,,", NULL);
+  strv_check (g_strsplit_set (",,x,.y,..z,,", ",.", 3), "", "", "x,.y,..z,,", NULL);
 }
 
-/* Testing xstrv_length() function with various positive and negative cases */
+/* Testing g_strv_length() function with various positive and negative cases */
 static void
 test_strv_length (void)
 {
-  xchar_t **strv;
-  xuint_t l;
+  gchar **strv;
+  guint l;
 
   if (g_test_undefined ())
     {
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      l = xstrv_length (NULL);
+      l = g_strv_length (NULL);
       g_test_assert_expected_messages ();
       g_assert_cmpint (l, ==, 0);
     }
 
-  strv = xstrsplit ("1,2,3,4", ",", -1);
-  l = xstrv_length (strv);
+  strv = g_strsplit ("1,2,3,4", ",", -1);
+  l = g_strv_length (strv);
   g_assert_cmpuint (l, ==, 4);
-  xstrfreev (strv);
+  g_strfreev (strv);
 }
 
 static char *locales[] = {"sv_SE", "en_US", "fa_IR", "C", "ru_RU"};
 
 static void
-check_strtod_string (xchar_t    *number,
+check_strtod_string (gchar    *number,
 		     double    res,
-		     xboolean_t  check_end,
-		     xsize_t      correct_len)
+		     gboolean  check_end,
+		     gsize      correct_len)
 {
   double d;
-  xsize_t l;
-  xchar_t *dummy;
+  gsize l;
+  gchar *dummy;
 
   /* we try a copy of number, with some free space for malloc before that.
    * This is supposed to smash the some wrong pointer calculations. */
 
   dummy = g_malloc (100000);
-  number = xstrdup (number);
+  number = g_strdup (number);
   g_free (dummy);
 
   for (l = 0; l < G_N_ELEMENTS (locales); l++)
     {
-      xchar_t *end = "(unset)";
+      gchar *end = "(unset)";
 
       setlocale (LC_NUMERIC, locales[l]);
       d = g_ascii_strtod (number, &end);
       g_assert_true (isnan (res) ? isnan (d) : (d == res));
-      g_assert_true ((xsize_t) (end - number) ==
+      g_assert_true ((gsize) (end - number) ==
                      (check_end ? correct_len : strlen (number)));
     }
 
@@ -1524,10 +1524,10 @@ check_strtod_string (xchar_t    *number,
 }
 
 static void
-check_strtod_number (xdouble_t num, xchar_t *fmt, xchar_t *str)
+check_strtod_number (gdouble num, gchar *fmt, gchar *str)
 {
-  xsize_t l;
-  xchar_t buf[G_ASCII_DTOSTR_BUF_SIZE];
+  gsize l;
+  gchar buf[G_ASCII_DTOSTR_BUF_SIZE];
 
   for (l = 0; l < G_N_ELEMENTS (locales); l++)
     {
@@ -1541,7 +1541,7 @@ check_strtod_number (xdouble_t num, xchar_t *fmt, xchar_t *str)
 static void
 test_ascii_strtod (void)
 {
-  xdouble_t d, our_nan, our_inf;
+  gdouble d, our_nan, our_inf;
   char buffer[G_ASCII_DTOSTR_BUF_SIZE];
 
 #ifdef NAN
@@ -1635,15 +1635,15 @@ test_ascii_strtod (void)
 }
 
 static void
-check_uint64 (const xchar_t *str,
-	      const xchar_t *end,
-	      xint_t         base,
-	      xuint64_t      result,
-	      xint_t         error)
+check_uint64 (const gchar *str,
+	      const gchar *end,
+	      gint         base,
+	      guint64      result,
+	      gint         error)
 {
-  xuint64_t actual;
-  xchar_t *endptr = NULL;
-  xint_t err;
+  guint64 actual;
+  gchar *endptr = NULL;
+  gint err;
 
   errno = 0;
   actual = g_ascii_strtoull (str, &endptr, base);
@@ -1655,15 +1655,15 @@ check_uint64 (const xchar_t *str,
 }
 
 static void
-check_int64 (const xchar_t *str,
-	     const xchar_t *end,
-	     xint_t         base,
-	     sint64_t       result,
-	     xint_t         error)
+check_int64 (const gchar *str,
+	     const gchar *end,
+	     gint         base,
+	     gint64       result,
+	     gint         error)
 {
-  sint64_t actual;
-  xchar_t *endptr = NULL;
-  xint_t err;
+  gint64 actual;
+  gchar *endptr = NULL;
+  gint err;
 
   errno = 0;
   actual = g_ascii_strtoll (str, &endptr, base);
@@ -1684,7 +1684,7 @@ test_strtoll (void)
   check_uint64 ("18446744073709551616", "", 10, G_MAXUINT64, ERANGE);
   check_uint64 ("20xyz", "xyz", 10, 20, 0);
   check_uint64 ("-1", "", 10, G_MAXUINT64, 0);
-  check_uint64 ("-FF4", "", 16, -((xuint64_t) 0xFF4), 0);
+  check_uint64 ("-FF4", "", 16, -((guint64) 0xFF4), 0);
 
   check_int64 ("0", "", 10, 0, 0);
   check_int64 ("9223372036854775807", "", 10, G_MAXINT64, 0);
@@ -1697,38 +1697,38 @@ test_strtoll (void)
   check_int64 ("-001", "", 10, -1, 0);
 }
 
-/* Testing xstr_match_string() function with various cases */
+/* Testing g_str_match_string() function with various cases */
 static void
 test_str_match_string (void)
 {
-  xboolean_t result = TRUE;
-  const xchar_t *str = "The quick brown fox¸ jumps over the lazy dog.";
+  gboolean result = TRUE;
+  const gchar *str = "The quick brown fox¸ jumps over the lazy dog.";
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xstr_match_string (NULL, "AAA", TRUE);
+      result = g_str_match_string (NULL, "AAA", TRUE);
       g_test_assert_expected_messages ();
       g_assert_false (result);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xstr_match_string (str, NULL, TRUE);
+      result = g_str_match_string (str, NULL, TRUE);
       g_test_assert_expected_messages ();
       g_assert_false (result);
     }
 
-  g_assert_false (xstr_match_string (str, "AAA", TRUE));
-  g_assert_false (xstr_match_string (str, "AAA", FALSE));
+  g_assert_false (g_str_match_string (str, "AAA", TRUE));
+  g_assert_false (g_str_match_string (str, "AAA", FALSE));
 }
 
 /* Testing functions bounds */
 static void
 test_bounds (void)
 {
-  xmapped_file_t *file, *before, *after;
+  GMappedFile *file, *before, *after;
   char buffer[4097];
   char *tmp, *tmp2;
   char **array;
@@ -1740,20 +1740,20 @@ test_bounds (void)
    * other two, then hopefully we end up with unmapped memory on either
    * side.
    */
-  before = xmapped_file_new ("4096-random-bytes", TRUE, NULL);
+  before = g_mapped_file_new ("4096-random-bytes", TRUE, NULL);
 
   /* quick workaround until #549783 can be fixed */
   if (before == NULL)
     return;
 
-  file = xmapped_file_new ("4096-random-bytes", TRUE, NULL);
-  after = xmapped_file_new ("4096-random-bytes", TRUE, NULL);
-  xmapped_file_unref (before);
-  xmapped_file_unref (after);
+  file = g_mapped_file_new ("4096-random-bytes", TRUE, NULL);
+  after = g_mapped_file_new ("4096-random-bytes", TRUE, NULL);
+  g_mapped_file_unref (before);
+  g_mapped_file_unref (after);
 
   g_assert_nonnull (file);
-  g_assert_cmpint (xmapped_file_get_length (file), ==, 4096);
-  string = xmapped_file_get_contents (file);
+  g_assert_cmpint (g_mapped_file_get_length (file), ==, 4096);
+  string = g_mapped_file_get_contents (file);
 
   /* ensure they're all non-nul */
   g_assert_null (memchr (string, '\0', 4096));
@@ -1763,20 +1763,20 @@ test_bounds (void)
    *
    * we try to test all of the 'n' functions here.
    */
-  tmp = xstrndup (string, 4096);
+  tmp = g_strndup (string, 4096);
   g_assert_cmpint (strlen (tmp), ==, 4096);
   g_free (tmp);
 
   /* found no bugs in gnome, i hope :) */
-  g_assert_null (xstrstr_len (string, 4096, "BUGS"));
-  xstrstr_len (string, 4096, "B");
-  xstrstr_len (string, 4096, ".");
-  xstrstr_len (string, 4096, "");
+  g_assert_null (g_strstr_len (string, 4096, "BUGS"));
+  g_strstr_len (string, 4096, "B");
+  g_strstr_len (string, 4096, ".");
+  g_strstr_len (string, 4096, "");
 
-  xstrrstr_len (string, 4096, "BUGS");
-  xstrrstr_len (string, 4096, "B");
-  xstrrstr_len (string, 4096, ".");
-  xstrrstr_len (string, 4096, "");
+  g_strrstr_len (string, 4096, "BUGS");
+  g_strrstr_len (string, 4096, "B");
+  g_strrstr_len (string, 4096, ".");
+  g_strrstr_len (string, 4096, "");
 
   tmp = g_ascii_strup (string, 4096);
   tmp2 = g_ascii_strup (tmp, 4096);
@@ -1802,46 +1802,46 @@ test_bounds (void)
   g_assert_cmpint (string[4095], ==, '\n');
   string[4095] = '\0';
 
-  tmp = xstrdup (string);
+  tmp = g_strdup (string);
   g_assert_cmpint (strlen (tmp), ==, 4095);
   g_free (tmp);
 
-  tmp = xstrndup (string, 10000);
+  tmp = g_strndup (string, 10000);
   g_assert_cmpint (strlen (tmp), ==, 4095);
   g_free (tmp);
 
   g_stpcpy (buffer, string);
   g_assert_cmpint (strlen (buffer), ==, 4095);
 
-  xstrstr_len (string, 10000, "BUGS");
-  xstrstr_len (string, 10000, "B");
-  xstrstr_len (string, 10000, ".");
-  xstrstr_len (string, 10000, "");
+  g_strstr_len (string, 10000, "BUGS");
+  g_strstr_len (string, 10000, "B");
+  g_strstr_len (string, 10000, ".");
+  g_strstr_len (string, 10000, "");
 
-  xstrrstr (string, "BUGS");
-  xstrrstr (string, "B");
-  xstrrstr (string, ".");
-  xstrrstr (string, "");
+  g_strrstr (string, "BUGS");
+  g_strrstr (string, "B");
+  g_strrstr (string, ".");
+  g_strrstr (string, "");
 
-  xstrrstr_len (string, 10000, "BUGS");
-  xstrrstr_len (string, 10000, "B");
-  xstrrstr_len (string, 10000, ".");
-  xstrrstr_len (string, 10000, "");
+  g_strrstr_len (string, 10000, "BUGS");
+  g_strrstr_len (string, 10000, "B");
+  g_strrstr_len (string, 10000, ".");
+  g_strrstr_len (string, 10000, "");
 
-  xstr_has_prefix (string, "this won't do very much...");
-  xstr_has_suffix (string, "but maybe this will...");
-  xstr_has_suffix (string, "HMMMM.");
-  xstr_has_suffix (string, "MMMM.");
-  xstr_has_suffix (string, "M.");
+  g_str_has_prefix (string, "this won't do very much...");
+  g_str_has_suffix (string, "but maybe this will...");
+  g_str_has_suffix (string, "HMMMM.");
+  g_str_has_suffix (string, "MMMM.");
+  g_str_has_suffix (string, "M.");
 
-  xstrlcpy (buffer, string, sizeof buffer);
+  g_strlcpy (buffer, string, sizeof buffer);
   g_assert_cmpint (strlen (buffer), ==, 4095);
-  xstrlcpy (buffer, string, sizeof buffer);
+  g_strlcpy (buffer, string, sizeof buffer);
   buffer[0] = '\0';
-  xstrlcat (buffer, string, sizeof buffer);
+  g_strlcat (buffer, string, sizeof buffer);
   g_assert_cmpint (strlen (buffer), ==, 4095);
 
-  tmp = xstrdup_printf ("<%s>", string);
+  tmp = g_strdup_printf ("<%s>", string);
   g_assert_cmpint (strlen (tmp), ==, 4095 + 2);
   g_free (tmp);
 
@@ -1868,37 +1868,37 @@ test_bounds (void)
   g_ascii_strcasecmp (string, string);
   g_ascii_strncasecmp (string, string, 10000);
 
-  xstrreverse (string);
-  xstrreverse (string);
-  xstrchug (string);
-  xstrchomp (string);
-  xstrstrip (string);
+  g_strreverse (string);
+  g_strreverse (string);
+  g_strchug (string);
+  g_strchomp (string);
+  g_strstrip (string);
   g_assert_cmpint (strlen (string), ==, 4095);
 
-  xstrdelimit (string, "M", 'N');
-  xstrcanon (string, " N.", ':');
+  g_strdelimit (string, "M", 'N');
+  g_strcanon (string, " N.", ':');
   g_assert_cmpint (strlen (string), ==, 4095);
 
-  array = xstrsplit (string, ".", -1);
-  tmp = xstrjoinv (".", array);
-  xstrfreev (array);
+  array = g_strsplit (string, ".", -1);
+  tmp = g_strjoinv (".", array);
+  g_strfreev (array);
 
   g_assert_cmpmem (tmp, strlen (tmp), string, 4095);
   g_free (tmp);
 
-  tmp = xstrjoinv ("/", (char **) strjoinv_0);
+  tmp = g_strjoinv ("/", (char **) strjoinv_0);
   g_assert_cmpstr (tmp, ==, "");
   g_free (tmp);
 
-  tmp = xstrjoinv ("/", (char **) strjoinv_1);
+  tmp = g_strjoinv ("/", (char **) strjoinv_1);
   g_assert_cmpstr (tmp, ==, "foo");
   g_free (tmp);
 
-  tmp = xstrconcat (string, string, string, NULL);
+  tmp = g_strconcat (string, string, string, NULL);
   g_assert_cmpint (strlen (tmp), ==, 4095 * 3);
   g_free (tmp);
 
-  tmp = xstrjoin ("!", string, string, NULL);
+  tmp = g_strjoin ("!", string, string, NULL);
   g_assert_cmpint (strlen (tmp), ==, 4095 + 1 + 4095);
   g_free (tmp);
 
@@ -1908,198 +1908,198 @@ test_bounds (void)
   tmp = g_markup_printf_escaped ("%s", string);
   g_free (tmp);
 
-  tmp = xstrescape (string, NULL);
-  tmp2 = xstrcompress (tmp);
+  tmp = g_strescape (string, NULL);
+  tmp2 = g_strcompress (tmp);
   g_assert_cmpstr (string, ==, tmp2);
   g_free (tmp2);
   g_free (tmp);
 
-  xmapped_file_unref (file);
+  g_mapped_file_unref (file);
 }
 
-/* Testing xstrip_context() function with various cases */
+/* Testing g_strip_context() function with various cases */
 static void
 test_strip_context (void)
 {
-  const xchar_t *msgid;
-  const xchar_t *msgval;
-  const xchar_t *s;
+  const gchar *msgid;
+  const gchar *msgval;
+  const gchar *s;
 
   msgid = "blabla";
   msgval = "bla";
-  s = xstrip_context (msgid, msgval);
+  s = g_strip_context (msgid, msgval);
   g_assert_true (s == msgval);
 
   msgid = msgval = "blabla";
-  s = xstrip_context (msgid, msgval);
+  s = g_strip_context (msgid, msgval);
   g_assert_true (s == msgval);
 
   msgid = msgval = "blabla|foo";
-  s = xstrip_context (msgid, msgval);
+  s = g_strip_context (msgid, msgval);
   g_assert_true (s == msgval + 7);
 
   msgid = msgval = "blabla||bar";
-  s = xstrip_context (msgid, msgval);
+  s = g_strip_context (msgid, msgval);
   g_assert_true (s == msgval + 7);
 }
 
-/* test_t the strings returned by xstrerror() are valid and unique. On Windows,
+/* Test the strings returned by g_strerror() are valid and unique. On Windows,
  * fewer than 200 error numbers are used, so we expect some strings to
  * return a generic ‘unknown error code’ message. */
 static void
 test_strerror (void)
 {
-  xhashtable_t *strs;
-  xint_t i;
-  const xchar_t *str, *unknown_str;
+  GHashTable *strs;
+  gint i;
+  const gchar *str, *unknown_str;
 
   setlocale (LC_ALL, "C");
 
-  unknown_str = xstrerror (-1);
-  strs = xhash_table_new (xstr_hash, xstr_equal);
+  unknown_str = g_strerror (-1);
+  strs = g_hash_table_new (g_str_hash, g_str_equal);
   for (i = 1; i < 200; i++)
     {
-      xboolean_t is_unknown;
-      str = xstrerror (i);
+      gboolean is_unknown;
+      str = g_strerror (i);
       is_unknown = (strcmp (str, unknown_str) == 0);
       g_assert_nonnull (str);
-      g_assert_true (xutf8_validate (str, -1, NULL));
-      g_assert_true (!xhash_table_contains (strs, str) || is_unknown);
-      xhash_table_add (strs, (xpointer_t) str);
+      g_assert_true (g_utf8_validate (str, -1, NULL));
+      g_assert_true (!g_hash_table_contains (strs, str) || is_unknown);
+      g_hash_table_add (strs, (gpointer) str);
     }
 
-  xhash_table_unref (strs);
+  g_hash_table_unref (strs);
 }
 
-/* Testing xstrsignal() function with various cases */
+/* Testing g_strsignal() function with various cases */
 static void
 test_strsignal (void)
 {
-  xint_t i;
-  const xchar_t *str;
+  gint i;
+  const gchar *str;
 
   for (i = 1; i < 20; i++)
     {
-      str = xstrsignal (i);
+      str = g_strsignal (i);
       g_assert_nonnull (str);
-      g_assert_true (xutf8_validate (str, -1, NULL));
+      g_assert_true (g_utf8_validate (str, -1, NULL));
     }
 }
 
-/* Testing xstrup(), xstrdown() and xstrcasecmp() */
+/* Testing g_strup(), g_strdown() and g_strcasecmp() */
 static void
 test_strup (void)
 {
-  xchar_t *s = NULL;
+  gchar *s = NULL;
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      s = xstrup (NULL);
+      s = g_strup (NULL);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      s = xstrdown (NULL);
+      s = g_strdown (NULL);
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      xstrcasecmp (NULL, "ABCD");
+      g_strcasecmp (NULL, "ABCD");
       g_test_assert_expected_messages ();
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      xstrcasecmp ("abcd", NULL);
+      g_strcasecmp ("abcd", NULL);
       g_test_assert_expected_messages ();
     }
 
-  s = xstrdup ("lower UPPER");
-  g_assert_cmpstr (xstrup (s), ==, "LOWER UPPER");
-  g_assert_cmpstr (xstrdown (s), ==, "lower upper");
-  g_assert_true (xstrcasecmp ("lower", "LOWER") == 0);
+  s = g_strdup ("lower UPPER");
+  g_assert_cmpstr (g_strup (s), ==, "LOWER UPPER");
+  g_assert_cmpstr (g_strdown (s), ==, "lower upper");
+  g_assert_true (g_strcasecmp ("lower", "LOWER") == 0);
   g_free (s);
 }
 
-/* Testing xstr_to_ascii() function with various cases */
+/* Testing g_str_to_ascii() function with various cases */
 static void
 test_transliteration (void)
 {
-  xchar_t *out;
+  gchar *out;
 
   /* ...to test the defaults */
   setlocale (LC_ALL, "C");
 
-  /* test_t something trivial */
-  out = xstr_to_ascii ("hello", NULL);
+  /* Test something trivial */
+  out = g_str_to_ascii ("hello", NULL);
   g_assert_cmpstr (out, ==, "hello");
   g_free (out);
 
-  /* test_t something above 0xffff */
-  out = xstr_to_ascii ("𝐀𝐀𝐀", NULL);
+  /* Test something above 0xffff */
+  out = g_str_to_ascii ("𝐀𝐀𝐀", NULL);
   g_assert_cmpstr (out, ==, "AAA");
   g_free (out);
 
-  /* test_t something with no good match */
-  out = xstr_to_ascii ("a ∧ ¬a", NULL);
+  /* Test something with no good match */
+  out = g_str_to_ascii ("a ∧ ¬a", NULL);
   g_assert_cmpstr (out, ==, "a ? ?a");
   g_free (out);
 
   /* Make sure 'ö' is handled differently per locale */
-  out = xstr_to_ascii ("ö", NULL);
+  out = g_str_to_ascii ("ö", NULL);
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "sv");
+  out = g_str_to_ascii ("ö", "sv");
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "de");
+  out = g_str_to_ascii ("ö", "de");
   g_assert_cmpstr (out, ==, "oe");
   g_free (out);
 
   /* Make sure we can find a locale by a wide range of names */
-  out = xstr_to_ascii ("ö", "de_DE");
+  out = g_str_to_ascii ("ö", "de_DE");
   g_assert_cmpstr (out, ==, "oe");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "de_DE.UTF-8");
+  out = g_str_to_ascii ("ö", "de_DE.UTF-8");
   g_assert_cmpstr (out, ==, "oe");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "de_DE.UTF-8@euro");
+  out = g_str_to_ascii ("ö", "de_DE.UTF-8@euro");
   g_assert_cmpstr (out, ==, "oe");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "de@euro");
+  out = g_str_to_ascii ("ö", "de@euro");
   g_assert_cmpstr (out, ==, "oe");
   g_free (out);
 
-  /* test_t some invalid locale names */
-  out = xstr_to_ascii ("ö", "de_DE@euro.UTF-8");
+  /* Test some invalid locale names */
+  out = g_str_to_ascii ("ö", "de_DE@euro.UTF-8");
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "de@DE@euro");
+  out = g_str_to_ascii ("ö", "de@DE@euro");
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "doesnotexist");
+  out = g_str_to_ascii ("ö", "doesnotexist");
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
 
-  out = xstr_to_ascii ("ö", "thislocalenameistoolong");
+  out = g_str_to_ascii ("ö", "thislocalenameistoolong");
   g_assert_cmpstr (out, ==, "o");
   g_free (out);
 
   /* Try a lookup of a locale with a variant */
-  out = xstr_to_ascii ("б", "sr_RS");
+  out = g_str_to_ascii ("б", "sr_RS");
   g_assert_cmpstr (out, ==, "b");
   g_free (out);
 
-  out = xstr_to_ascii ("б", "sr_RS@latin");
+  out = g_str_to_ascii ("б", "sr_RS@latin");
   g_assert_cmpstr (out, ==, "?");
   g_free (out);
 
@@ -2107,108 +2107,108 @@ test_transliteration (void)
    * Try a string that contains one ('зг') along with a partial
    * sequence ('з') at the end.
    */
-  out = xstr_to_ascii ("Зліва направо, згори вниз", "uk");
+  out = g_str_to_ascii ("Зліва направо, згори вниз", "uk");
   g_assert_cmpstr (out, ==, "Zliva napravo, zghory vnyz");
   g_free (out);
 
   /* Try out the other combinations */
-  out = xstr_to_ascii ("Зг", "uk");
+  out = g_str_to_ascii ("Зг", "uk");
   g_assert_cmpstr (out, ==, "Zgh");
   g_free (out);
 
-  out = xstr_to_ascii ("зГ", "uk");
+  out = g_str_to_ascii ("зГ", "uk");
   g_assert_cmpstr (out, ==, "zGH");
   g_free (out);
 
-  out = xstr_to_ascii ("ЗГ", "uk");
+  out = g_str_to_ascii ("ЗГ", "uk");
   g_assert_cmpstr (out, ==, "ZGH");
   g_free (out);
 
   /* And a non-combination */
-  out = xstr_to_ascii ("зя", "uk");
+  out = g_str_to_ascii ("зя", "uk");
   g_assert_cmpstr (out, ==, "zya");
   g_free (out);
 }
 
-/* Testing xstrv_contains() function with various cases */
+/* Testing g_strv_contains() function with various cases */
 static void
 test_strv_contains (void)
 {
-  xboolean_t result = TRUE;
-  const xchar_t *strv_simple[] = { "hello", "there", NULL };
-  const xchar_t *strv_dupe[] = { "dupe", "dupe", NULL };
-  const xchar_t *strv_empty[] = { NULL };
+  gboolean result = TRUE;
+  const gchar *strv_simple[] = { "hello", "there", NULL };
+  const gchar *strv_dupe[] = { "dupe", "dupe", NULL };
+  const gchar *strv_empty[] = { NULL };
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xstrv_contains (NULL, "hello");
+      result = g_strv_contains (NULL, "hello");
       g_test_assert_expected_messages ();
       g_assert_false (result);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xstrv_contains (strv_simple, NULL);
+      result = g_strv_contains (strv_simple, NULL);
       g_test_assert_expected_messages ();
       g_assert_false (result);
     }
 
-  g_assert_true (xstrv_contains (strv_simple, "hello"));
-  g_assert_true (xstrv_contains (strv_simple, "there"));
-  g_assert_false (xstrv_contains (strv_simple, "non-existent"));
-  g_assert_false (xstrv_contains (strv_simple, ""));
+  g_assert_true (g_strv_contains (strv_simple, "hello"));
+  g_assert_true (g_strv_contains (strv_simple, "there"));
+  g_assert_false (g_strv_contains (strv_simple, "non-existent"));
+  g_assert_false (g_strv_contains (strv_simple, ""));
 
-  g_assert_true (xstrv_contains (strv_dupe, "dupe"));
+  g_assert_true (g_strv_contains (strv_dupe, "dupe"));
 
-  g_assert_false (xstrv_contains (strv_empty, "empty!"));
-  g_assert_false (xstrv_contains (strv_empty, ""));
+  g_assert_false (g_strv_contains (strv_empty, "empty!"));
+  g_assert_false (g_strv_contains (strv_empty, ""));
 }
 
-/* test_t xstrv_equal() works for various inputs. */
+/* Test g_strv_equal() works for various inputs. */
 static void
 test_strv_equal (void)
 {
-  xboolean_t result = TRUE;
-  const xchar_t *strv_empty[] = { NULL };
-  const xchar_t *strv_empty2[] = { NULL };
-  const xchar_t *strv_simple[] = { "hello", "you", NULL };
-  const xchar_t *strv_simple2[] = { "hello", "you", NULL };
-  const xchar_t *strv_simple_reordered[] = { "you", "hello", NULL };
-  const xchar_t *strv_simple_superset[] = { "hello", "you", "again", NULL };
-  const xchar_t *strv_another[] = { "not", "a", "coded", "message", NULL };
+  gboolean result = TRUE;
+  const gchar *strv_empty[] = { NULL };
+  const gchar *strv_empty2[] = { NULL };
+  const gchar *strv_simple[] = { "hello", "you", NULL };
+  const gchar *strv_simple2[] = { "hello", "you", NULL };
+  const gchar *strv_simple_reordered[] = { "you", "hello", NULL };
+  const gchar *strv_simple_superset[] = { "hello", "you", "again", NULL };
+  const gchar *strv_another[] = { "not", "a", "coded", "message", NULL };
 
   if (g_test_undefined ())
     {
       /* Testing degenerated cases */
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xstrv_equal (NULL, strv_simple2);
+      result = g_strv_equal (NULL, strv_simple2);
       g_test_assert_expected_messages ();
       g_assert_false (result);
 
       g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL,
                              "*assertion*!= NULL*");
-      result = xstrv_equal (strv_simple, NULL);
+      result = g_strv_equal (strv_simple, NULL);
       g_test_assert_expected_messages ();
       g_assert_false (result);
     }
 
-  g_assert_true (xstrv_equal (strv_empty, strv_empty));
-  g_assert_true (xstrv_equal (strv_empty, strv_empty2));
-  g_assert_true (xstrv_equal (strv_empty2, strv_empty));
-  g_assert_false (xstrv_equal (strv_empty, strv_simple));
-  g_assert_false (xstrv_equal (strv_simple, strv_empty));
-  g_assert_true (xstrv_equal (strv_simple, strv_simple));
-  g_assert_true (xstrv_equal (strv_simple, strv_simple2));
-  g_assert_true (xstrv_equal (strv_simple2, strv_simple));
-  g_assert_false (xstrv_equal (strv_simple, strv_simple_reordered));
-  g_assert_false (xstrv_equal (strv_simple_reordered, strv_simple));
-  g_assert_false (xstrv_equal (strv_simple, strv_simple_superset));
-  g_assert_false (xstrv_equal (strv_simple_superset, strv_simple));
-  g_assert_false (xstrv_equal (strv_simple, strv_another));
-  g_assert_false (xstrv_equal (strv_another, strv_simple));
+  g_assert_true (g_strv_equal (strv_empty, strv_empty));
+  g_assert_true (g_strv_equal (strv_empty, strv_empty2));
+  g_assert_true (g_strv_equal (strv_empty2, strv_empty));
+  g_assert_false (g_strv_equal (strv_empty, strv_simple));
+  g_assert_false (g_strv_equal (strv_simple, strv_empty));
+  g_assert_true (g_strv_equal (strv_simple, strv_simple));
+  g_assert_true (g_strv_equal (strv_simple, strv_simple2));
+  g_assert_true (g_strv_equal (strv_simple2, strv_simple));
+  g_assert_false (g_strv_equal (strv_simple, strv_simple_reordered));
+  g_assert_false (g_strv_equal (strv_simple_reordered, strv_simple));
+  g_assert_false (g_strv_equal (strv_simple, strv_simple_superset));
+  g_assert_false (g_strv_equal (strv_simple_superset, strv_simple));
+  g_assert_false (g_strv_equal (strv_simple, strv_another));
+  g_assert_false (g_strv_equal (strv_another, strv_simple));
 }
 
 typedef enum
@@ -2219,13 +2219,13 @@ typedef enum
 
 typedef struct
 {
-  const xchar_t *str;
+  const gchar *str;
   SignType sign_type;
-  xuint_t base;
-  xint_t min;
-  xint_t max;
-  xint_t expected;
-  xboolean_t should_fail;
+  guint base;
+  gint min;
+  gint max;
+  gint expected;
+  gboolean should_fail;
   GNumberParserError error_code;
 } TestData;
 
@@ -2301,13 +2301,13 @@ const TestData test_data[] = {
 static void
 test_ascii_string_to_number_usual (void)
 {
-  xsize_t idx;
-  xboolean_t result;
-  xerror_t *error = NULL;
+  gsize idx;
+  gboolean result;
+  GError *error = NULL;
   const TestData *data;
-  xint_t value;
-  sint64_t value64 = 0;
-  xuint64_t valueu64 = 0;
+  gint value;
+  gint64 value64 = 0;
+  guint64 valueu64 = 0;
 
   /*** g_ascii_string_to_signed() ***/
   data = &test_data[0]; /* Setting data to signed data */
@@ -2458,7 +2458,7 @@ test_ascii_string_to_number_usual (void)
       if (data->should_fail)
         {
           g_assert_false (result);
-          g_assert_error (error, G_NUMBER_PARSER_ERROR, (xint_t) data->error_code);
+          g_assert_error (error, G_NUMBER_PARSER_ERROR, (gint) data->error_code);
           g_clear_error (&error);
         }
       else
@@ -2474,14 +2474,14 @@ test_ascii_string_to_number_usual (void)
 static void
 test_ascii_string_to_number_pathological (void)
 {
-  xerror_t *error = NULL;
-  const xchar_t *crazy_high = "999999999999999999999999999999999999";
-  const xchar_t *crazy_low = "-999999999999999999999999999999999999";
-  const xchar_t *max_uint64 = "18446744073709551615";
-  const xchar_t *max_int64 = "9223372036854775807";
-  const xchar_t *min_int64 = "-9223372036854775808";
-  xuint64_t uvalue = 0;
-  sint64_t svalue = 0;
+  GError *error = NULL;
+  const gchar *crazy_high = "999999999999999999999999999999999999";
+  const gchar *crazy_low = "-999999999999999999999999999999999999";
+  const gchar *max_uint64 = "18446744073709551615";
+  const gchar *max_int64 = "9223372036854775807";
+  const gchar *min_int64 = "-9223372036854775808";
+  guint64 uvalue = 0;
+  gint64 svalue = 0;
 
   g_assert_false (g_ascii_string_to_unsigned (crazy_high,
                                               10,

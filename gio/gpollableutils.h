@@ -27,37 +27,37 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xsource_t *g_pollable_source_new       (xobject_t        *pollable_stream);
+GLIB_AVAILABLE_IN_ALL
+GSource *g_pollable_source_new       (GObject        *pollable_stream);
 
-XPL_AVAILABLE_IN_2_34
-xsource_t *g_pollable_source_new_full  (xpointer_t        pollable_stream,
-				      xsource_t        *child_source,
-				      xcancellable_t   *cancellable);
+GLIB_AVAILABLE_IN_2_34
+GSource *g_pollable_source_new_full  (gpointer        pollable_stream,
+				      GSource        *child_source,
+				      GCancellable   *cancellable);
 
-XPL_AVAILABLE_IN_2_34
-xssize_t   g_pollable_stream_read      (xinput_stream_t   *stream,
+GLIB_AVAILABLE_IN_2_34
+gssize   g_pollable_stream_read      (GInputStream   *stream,
 				      void           *buffer,
-				      xsize_t           count,
-				      xboolean_t        blocking,
-				      xcancellable_t   *cancellable,
-				      xerror_t        **error);
+				      gsize           count,
+				      gboolean        blocking,
+				      GCancellable   *cancellable,
+				      GError        **error);
 
-XPL_AVAILABLE_IN_2_34
-xssize_t   g_pollable_stream_write     (xoutput_stream_t  *stream,
+GLIB_AVAILABLE_IN_2_34
+gssize   g_pollable_stream_write     (GOutputStream  *stream,
 				      const void     *buffer,
-				      xsize_t           count,
-				      xboolean_t        blocking,
-				      xcancellable_t   *cancellable,
-				      xerror_t        **error);
-XPL_AVAILABLE_IN_2_34
-xboolean_t g_pollable_stream_write_all (xoutput_stream_t  *stream,
+				      gsize           count,
+				      gboolean        blocking,
+				      GCancellable   *cancellable,
+				      GError        **error);
+GLIB_AVAILABLE_IN_2_34
+gboolean g_pollable_stream_write_all (GOutputStream  *stream,
 				      const void     *buffer,
-				      xsize_t           count,
-				      xboolean_t        blocking,
-				      xsize_t          *bytes_written,
-				      xcancellable_t   *cancellable,
-				      xerror_t        **error);
+				      gsize           count,
+				      gboolean        blocking,
+				      gsize          *bytes_written,
+				      GCancellable   *cancellable,
+				      GError        **error);
 
 G_END_DECLS
 

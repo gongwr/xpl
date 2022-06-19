@@ -26,10 +26,10 @@
 
 #include "fake-document-portal-generated.h"
 
-static xboolean_t
+static gboolean
 on_handle_get_mount_point (FakeDocuments         *object,
-                           xdbus_method_invocation_t *invocation,
-                           xpointer_t               user_data)
+                           GDBusMethodInvocation *invocation,
+                           gpointer               user_data)
 {
   fake_documents_complete_get_mount_point (object,
                                            invocation,
@@ -37,30 +37,30 @@ on_handle_get_mount_point (FakeDocuments         *object,
   return TRUE;
 }
 
-static xboolean_t
+static gboolean
 on_handle_add_full (FakeDocuments         *object,
-                    xdbus_method_invocation_t *invocation,
-                    xunix_fd_list_t           *o_path_fds,
-                    xuint_t                  flags,
-                    const xchar_t           *app_id,
-                    const xchar_t * const   *permissions,
-                    xpointer_t               user_data)
+                    GDBusMethodInvocation *invocation,
+                    GUnixFDList           *o_path_fds,
+                    guint                  flags,
+                    const gchar           *app_id,
+                    const gchar * const   *permissions,
+                    gpointer               user_data)
 {
-  const xchar_t **doc_ids = NULL;
-  xvariant_t *extra_out = NULL;
-  xsize_t length, i;
+  const gchar **doc_ids = NULL;
+  GVariant *extra_out = NULL;
+  gsize length, i;
 
   if (o_path_fds != NULL)
     length = g_unix_fd_list_get_length (o_path_fds);
   else
     length = 0;
 
-  doc_ids = g_new0 (const xchar_t *, length + 1  /* NULL terminator */);
+  doc_ids = g_new0 (const gchar *, length + 1  /* NULL terminator */);
   for (i = 0; i < length; i++)
     {
       doc_ids[i] = "document-id";
     }
-  extra_out = xvariant_new_array (G_VARIANT_TYPE ("{sv}"), NULL, 0);
+  extra_out = g_variant_new_array (G_VARIANT_TYPE ("{sv}"), NULL, 0);
 
   fake_documents_complete_add_full (object,
                                     invocation,
@@ -74,21 +74,21 @@ on_handle_add_full (FakeDocuments         *object,
 }
 
 static void
-on_bus_acquired (xdbus_connection_t *connection,
-                 const xchar_t     *name,
-                 xpointer_t         user_data)
+on_bus_acquired (GDBusConnection *connection,
+                 const gchar     *name,
+                 gpointer         user_data)
 {
   FakeDocuments *interface;
-  xerror_t *error = NULL;
+  GError *error = NULL;
 
   g_test_message ("Acquired a message bus connection");
 
   interface = fake_documents_skeleton_new ();
-  xsignal_connect (interface,
+  g_signal_connect (interface,
                     "handle-get-mount-point",
                     G_CALLBACK (on_handle_get_mount_point),
                     NULL);
-  xsignal_connect (interface,
+  g_signal_connect (interface,
                     "handle-add-full",
                     G_CALLBACK (on_handle_add_full),
                     NULL);
@@ -101,29 +101,29 @@ on_bus_acquired (xdbus_connection_t *connection,
 }
 
 static void
-on_name_acquired (xdbus_connection_t *connection,
-                  const xchar_t     *name,
-                  xpointer_t         user_data)
+on_name_acquired (GDBusConnection *connection,
+                  const gchar     *name,
+                  gpointer         user_data)
 {
   g_test_message ("Acquired the name %s", name);
 }
 
 static void
-on_name_lost (xdbus_connection_t *connection,
-              const xchar_t     *name,
-              xpointer_t         user_data)
+on_name_lost (GDBusConnection *connection,
+              const gchar     *name,
+              gpointer         user_data)
 {
   g_test_message ("Lost the name %s", name);
 }
 
 
-xint_t
-main (xint_t argc, xchar_t *argv[])
+gint
+main (gint argc, gchar *argv[])
 {
-  xmain_loop_t *loop;
-  xuint_t id;
+  GMainLoop *loop;
+  guint id;
 
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
 
   id = g_bus_own_name (G_BUS_TYPE_SESSION,
                        "org.freedesktop.portal.Documents",
@@ -135,10 +135,10 @@ main (xint_t argc, xchar_t *argv[])
                        loop,
                        NULL);
 
-  xmain_loop_run (loop);
+  g_main_loop_run (loop);
 
   g_bus_unown_name (id);
-  xmain_loop_unref (loop);
+  g_main_loop_unref (loop);
 
   return 0;
 }

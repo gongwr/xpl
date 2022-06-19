@@ -30,10 +30,10 @@
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-hexdump (const xuchar_t *str, xsize_t len)
+hexdump (const guchar *str, gsize len)
 {
-  const xuchar_t *data = (const xuchar_t *) str;
-  xuint_t n, m;
+  const guchar *data = (const guchar *) str;
+  guint n, m;
 
   for (n = 0; n < len; n += 16)
     {
@@ -60,106 +60,106 @@ hexdump (const xuchar_t *str, xsize_t len)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static xboolean_t
+static gboolean
 append_gv_to_dbus_iter (DBusMessageIter  *iter,
-                        xvariant_t         *value,
-                        xerror_t          **error)
+                        GVariant         *value,
+                        GError          **error)
 {
-  const xvariant_type_t *type;
+  const GVariantType *type;
 
-  type = xvariant_get_type (value);
-  if (xvariant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
+  type = g_variant_get_type (value);
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_BOOLEAN))
     {
-      dbus_bool_t v = xvariant_get_boolean (value);
+      dbus_bool_t v = g_variant_get_boolean (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_BOOLEAN, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_BYTE))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_BYTE))
     {
-      xuint8_t v = xvariant_get_byte (value);
+      guint8 v = g_variant_get_byte (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_BYTE, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT16))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT16))
     {
-      gint16 v = xvariant_get_int16 (value);
+      gint16 v = g_variant_get_int16 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_INT16, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT16))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT16))
     {
-      xuint16_t v = xvariant_get_uint16 (value);
+      guint16 v = g_variant_get_uint16 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_UINT16, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT32))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT32))
     {
-      gint32 v = xvariant_get_int32 (value);
+      gint32 v = g_variant_get_int32 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_INT32, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT32))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT32))
     {
-      xuint32_t v = xvariant_get_uint32 (value);
+      guint32 v = g_variant_get_uint32 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_UINT32, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_INT64))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_INT64))
     {
-      sint64_t v = xvariant_get_int64 (value);
+      gint64 v = g_variant_get_int64 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_INT64, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_UINT64))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_UINT64))
     {
-      xuint64_t v = xvariant_get_uint64 (value);
+      guint64 v = g_variant_get_uint64 (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_UINT64, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
     {
-      xdouble_t v = xvariant_get_double (value);
+      gdouble v = g_variant_get_double (value);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_DOUBLE, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_STRING))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_STRING))
     {
-      const xchar_t *v = xvariant_get_string (value, NULL);
+      const gchar *v = g_variant_get_string (value, NULL);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_STRING, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_OBJECT_PATH))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_OBJECT_PATH))
     {
-      const xchar_t *v = xvariant_get_string (value, NULL);
+      const gchar *v = g_variant_get_string (value, NULL);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_OBJECT_PATH, &v);
     }
-  else if (xvariant_type_equal (type, G_VARIANT_TYPE_SIGNATURE))
+  else if (g_variant_type_equal (type, G_VARIANT_TYPE_SIGNATURE))
     {
-      const xchar_t *v = xvariant_get_string (value, NULL);
+      const gchar *v = g_variant_get_string (value, NULL);
       dbus_message_iter_append_basic (iter, DBUS_TYPE_SIGNATURE, &v);
     }
-  else if (xvariant_type_is_variant (type))
+  else if (g_variant_type_is_variant (type))
     {
       DBusMessageIter sub;
-      xvariant_t *child;
+      GVariant *child;
 
-      child = xvariant_get_child_value (value, 0);
+      child = g_variant_get_child_value (value, 0);
       dbus_message_iter_open_container (iter, DBUS_TYPE_VARIANT,
-                                        xvariant_get_type_string (child),
+                                        g_variant_get_type_string (child),
                                         &sub);
       if (!append_gv_to_dbus_iter (&sub, child, error))
         {
-            xvariant_unref (child);
+            g_variant_unref (child);
             goto fail;
         }
       dbus_message_iter_close_container (iter, &sub);
-      xvariant_unref (child);
+      g_variant_unref (child);
     }
-  else if (xvariant_type_is_array (type))
+  else if (g_variant_type_is_array (type))
     {
       DBusMessageIter dbus_iter;
-      const xchar_t *type_string;
-      xvariant_iter_t gv_iter;
-      xvariant_t *item;
+      const gchar *type_string;
+      GVariantIter gv_iter;
+      GVariant *item;
 
-      type_string = xvariant_get_type_string (value);
+      type_string = g_variant_get_type_string (value);
       type_string++; /* skip the 'a' */
 
       dbus_message_iter_open_container (iter, DBUS_TYPE_ARRAY,
                                         type_string, &dbus_iter);
-      xvariant_iter_init (&gv_iter, value);
+      g_variant_iter_init (&gv_iter, value);
 
-      while ((item = xvariant_iter_next_value (&gv_iter)))
+      while ((item = g_variant_iter_next_value (&gv_iter)))
         {
           if (!append_gv_to_dbus_iter (&dbus_iter, item, error))
             {
@@ -169,17 +169,17 @@ append_gv_to_dbus_iter (DBusMessageIter  *iter,
 
       dbus_message_iter_close_container (iter, &dbus_iter);
     }
-  else if (xvariant_type_is_tuple (type))
+  else if (g_variant_type_is_tuple (type))
     {
       DBusMessageIter dbus_iter;
-      xvariant_iter_t gv_iter;
-      xvariant_t *item;
+      GVariantIter gv_iter;
+      GVariant *item;
 
       dbus_message_iter_open_container (iter, DBUS_TYPE_STRUCT,
                                         NULL, &dbus_iter);
-      xvariant_iter_init (&gv_iter, value);
+      g_variant_iter_init (&gv_iter, value);
 
-      while ((item = xvariant_iter_next_value (&gv_iter)))
+      while ((item = g_variant_iter_next_value (&gv_iter)))
         {
           if (!append_gv_to_dbus_iter (&dbus_iter, item, error))
             goto fail;
@@ -187,28 +187,28 @@ append_gv_to_dbus_iter (DBusMessageIter  *iter,
 
       dbus_message_iter_close_container (iter, &dbus_iter);
     }
-  else if (xvariant_type_is_dict_entry (type))
+  else if (g_variant_type_is_dict_entry (type))
     {
       DBusMessageIter dbus_iter;
-      xvariant_t *key, *val;
+      GVariant *key, *val;
 
       dbus_message_iter_open_container (iter, DBUS_TYPE_DICT_ENTRY,
                                         NULL, &dbus_iter);
-      key = xvariant_get_child_value (value, 0);
+      key = g_variant_get_child_value (value, 0);
       if (!append_gv_to_dbus_iter (&dbus_iter, key, error))
         {
-          xvariant_unref (key);
+          g_variant_unref (key);
           goto fail;
         }
-      xvariant_unref (key);
+      g_variant_unref (key);
 
-      val = xvariant_get_child_value (value, 1);
+      val = g_variant_get_child_value (value, 1);
       if (!append_gv_to_dbus_iter (&dbus_iter, val, error))
         {
-          xvariant_unref (val);
+          g_variant_unref (val);
           goto fail;
         }
-      xvariant_unref (val);
+      g_variant_unref (val);
 
       dbus_message_iter_close_container (iter, &dbus_iter);
     }
@@ -217,8 +217,8 @@ append_gv_to_dbus_iter (DBusMessageIter  *iter,
       g_set_error (error,
                    G_IO_ERROR,
                    G_IO_ERROR_INVALID_ARGUMENT,
-                   "Error serializing xvariant_t with type-string '%s' to a D-Bus message",
-                   xvariant_get_type_string (value));
+                   "Error serializing GVariant with type-string '%s' to a D-Bus message",
+                   g_variant_get_type_string (value));
       goto fail;
     }
 
@@ -228,27 +228,27 @@ append_gv_to_dbus_iter (DBusMessageIter  *iter,
   return FALSE;
 }
 
-static xboolean_t
+static gboolean
 append_gv_to_dbus_message (DBusMessage  *message,
-                           xvariant_t     *value,
-                           xerror_t      **error)
+                           GVariant     *value,
+                           GError      **error)
 {
-  xboolean_t ret;
-  xuint_t n;
+  gboolean ret;
+  guint n;
 
   ret = FALSE;
 
   if (value != NULL)
     {
       DBusMessageIter iter;
-      xvariant_iter_t gv_iter;
-      xvariant_t *item;
+      GVariantIter gv_iter;
+      GVariant *item;
 
       dbus_message_iter_init_append (message, &iter);
 
-      xvariant_iter_init (&gv_iter, value);
+      g_variant_iter_init (&gv_iter, value);
       n = 0;
-      while ((item = xvariant_iter_next_value (&gv_iter)))
+      while ((item = g_variant_iter_next_value (&gv_iter)))
         {
           if (!append_gv_to_dbus_iter (&iter, item, error))
             {
@@ -268,12 +268,12 @@ append_gv_to_dbus_message (DBusMessage  *message,
 }
 
 static void
-print_gv_dbus_message (xvariant_t *value)
+print_gv_dbus_message (GVariant *value)
 {
   DBusMessage *message;
   char *blob;
   int blob_len;
-  xerror_t *error;
+  GError *error;
 
   message = dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_CALL);
   dbus_message_set_serial (message, 0x41);
@@ -283,14 +283,14 @@ print_gv_dbus_message (xvariant_t *value)
   error = NULL;
   if (!append_gv_to_dbus_message (message, value, &error))
     {
-      g_printerr ("Error printing xvariant_t as DBusMessage: %s", error->message);
-      xerror_free (error);
+      g_printerr ("Error printing GVariant as DBusMessage: %s", error->message);
+      g_error_free (error);
       goto out;
     }
 
   dbus_message_marshal (message, &blob, &blob_len);
   g_printerr ("\n");
-  hexdump ((xuchar_t *) blob, blob_len);
+  hexdump ((guchar *) blob, blob_len);
  out:
   dbus_message_unref (message);
 }
@@ -298,14 +298,14 @@ print_gv_dbus_message (xvariant_t *value)
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-dbus_1_message_append (xstring_t *s,
-                       xuint_t indent,
+dbus_1_message_append (GString *s,
+                       guint indent,
                        DBusMessageIter *iter)
 {
-  xint_t arg_type;
+  gint arg_type;
   DBusMessageIter sub;
 
-  xstring_append_printf (s, "%*s", indent, "");
+  g_string_append_printf (s, "%*s", indent, "");
 
   arg_type = dbus_message_iter_get_arg_type (iter);
   switch (arg_type)
@@ -314,15 +314,15 @@ dbus_1_message_append (xstring_t *s,
       {
         dbus_bool_t value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "bool: %s\n", value ? "true" : "false");
+        g_string_append_printf (s, "bool: %s\n", value ? "true" : "false");
         break;
       }
 
      case DBUS_TYPE_BYTE:
       {
-        xuchar_t value;
+        guchar value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "byte: 0x%02x\n", (xuint_t) value);
+        g_string_append_printf (s, "byte: 0x%02x\n", (guint) value);
         break;
       }
 
@@ -330,15 +330,15 @@ dbus_1_message_append (xstring_t *s,
       {
         gint16 value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "int16: %" G_GINT16_FORMAT "\n", value);
+        g_string_append_printf (s, "int16: %" G_GINT16_FORMAT "\n", value);
         break;
       }
 
      case DBUS_TYPE_UINT16:
       {
-        xuint16_t value;
+        guint16 value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "uint16: %" G_GUINT16_FORMAT "\n", value);
+        g_string_append_printf (s, "uint16: %" G_GUINT16_FORMAT "\n", value);
         break;
       }
 
@@ -346,63 +346,63 @@ dbus_1_message_append (xstring_t *s,
       {
         gint32 value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "int32: %" G_GINT32_FORMAT "\n", value);
+        g_string_append_printf (s, "int32: %" G_GINT32_FORMAT "\n", value);
         break;
       }
 
      case DBUS_TYPE_UINT32:
       {
-        xuint32_t value;
+        guint32 value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "uint32: %" G_GUINT32_FORMAT "\n", value);
+        g_string_append_printf (s, "uint32: %" G_GUINT32_FORMAT "\n", value);
         break;
       }
 
      case DBUS_TYPE_INT64:
       {
-        sint64_t value;
+        gint64 value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "int64: %" G_GINT64_FORMAT "\n", value);
+        g_string_append_printf (s, "int64: %" G_GINT64_FORMAT "\n", value);
         break;
       }
 
      case DBUS_TYPE_UINT64:
       {
-        xuint64_t value;
+        guint64 value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "uint64: %" G_GUINT64_FORMAT "\n", value);
+        g_string_append_printf (s, "uint64: %" G_GUINT64_FORMAT "\n", value);
         break;
       }
 
      case DBUS_TYPE_DOUBLE:
       {
-        xdouble_t value;
+        gdouble value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "double: %f\n", value);
+        g_string_append_printf (s, "double: %f\n", value);
         break;
       }
 
      case DBUS_TYPE_STRING:
       {
-        const xchar_t *value;
+        const gchar *value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "string: '%s'\n", value);
+        g_string_append_printf (s, "string: '%s'\n", value);
         break;
       }
 
      case DBUS_TYPE_OBJECT_PATH:
       {
-        const xchar_t *value;
+        const gchar *value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "object_path: '%s'\n", value);
+        g_string_append_printf (s, "object_path: '%s'\n", value);
         break;
       }
 
      case DBUS_TYPE_SIGNATURE:
       {
-        const xchar_t *value;
+        const gchar *value;
         dbus_message_iter_get_basic (iter, &value);
-        xstring_append_printf (s, "signature: '%s'\n", value);
+        g_string_append_printf (s, "signature: '%s'\n", value);
         break;
       }
 
@@ -413,13 +413,13 @@ dbus_1_message_append (xstring_t *s,
          * protocol value, since dbus_message_iter_get_basic() wants
          * to be 'helpful' and dup the fd for the user...
          */
-        xstring_append (s, "unix-fd: (not extracted)\n");
+        g_string_append (s, "unix-fd: (not extracted)\n");
         break;
       }
 #endif
 
      case DBUS_TYPE_VARIANT:
-       xstring_append_printf (s, "variant:\n");
+       g_string_append_printf (s, "variant:\n");
        dbus_message_iter_recurse (iter, &sub);
        while (dbus_message_iter_get_arg_type (&sub))
          {
@@ -429,7 +429,7 @@ dbus_1_message_append (xstring_t *s,
        break;
 
      case DBUS_TYPE_ARRAY:
-       xstring_append_printf (s, "array:\n");
+       g_string_append_printf (s, "array:\n");
        dbus_message_iter_recurse (iter, &sub);
        while (dbus_message_iter_get_arg_type (&sub))
          {
@@ -439,7 +439,7 @@ dbus_1_message_append (xstring_t *s,
        break;
 
      case DBUS_TYPE_STRUCT:
-       xstring_append_printf (s, "struct:\n");
+       g_string_append_printf (s, "struct:\n");
        dbus_message_iter_recurse (iter, &sub);
        while (dbus_message_iter_get_arg_type (&sub))
          {
@@ -449,7 +449,7 @@ dbus_1_message_append (xstring_t *s,
        break;
 
      case DBUS_TYPE_DICT_ENTRY:
-       xstring_append_printf (s, "dict_entry:\n");
+       g_string_append_printf (s, "dict_entry:\n");
        dbus_message_iter_recurse (iter, &sub);
        while (dbus_message_iter_get_arg_type (&sub))
          {
@@ -459,7 +459,7 @@ dbus_1_message_append (xstring_t *s,
        break;
 
      default:
-       g_printerr ("Error serializing D-Bus message to xvariant_t. Unsupported arg type '%c' (%d)",
+       g_printerr ("Error serializing D-Bus message to GVariant. Unsupported arg type '%c' (%d)",
                    arg_type,
                    arg_type);
        g_assert_not_reached ();
@@ -467,75 +467,75 @@ dbus_1_message_append (xstring_t *s,
     }
 }
 
-static xchar_t *
+static gchar *
 dbus_1_message_print (DBusMessage *message)
 {
-  xstring_t *s;
-  xuint_t n;
+  GString *s;
+  guint n;
   DBusMessageIter iter;
 
-  s = xstring_new (NULL);
+  s = g_string_new (NULL);
   n = 0;
   dbus_message_iter_init (message, &iter);
   while (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_INVALID)
     {
-      xstring_append_printf (s, "value %d: ", n);
+      g_string_append_printf (s, "value %d: ", n);
       dbus_1_message_append (s, 2, &iter);
       dbus_message_iter_next (&iter);
       n++;
     }
 
-  return xstring_free (s, FALSE);
+  return g_string_free (s, FALSE);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static xchar_t *
-get_body_signature (xvariant_t *value)
+static gchar *
+get_body_signature (GVariant *value)
 {
-  const xchar_t *s;
-  xsize_t len;
-  xchar_t *ret;
+  const gchar *s;
+  gsize len;
+  gchar *ret;
 
   if (value == NULL)
     {
-      ret = xstrdup ("");
+      ret = g_strdup ("");
       goto out;
     }
 
-  s = xvariant_get_type_string (value);
+  s = g_variant_get_type_string (value);
   len = strlen (s);
-  xassert (len >= 2);
+  g_assert (len >= 2);
 
-  ret = xstrndup (s + 1, len - 2);
+  ret = g_strndup (s + 1, len - 2);
 
  out:
   return ret;
 }
 
 /* If @value is floating, this assumes ownership. */
-static xchar_t *
-get_and_check_serialization (xvariant_t *value)
+static gchar *
+get_and_check_serialization (GVariant *value)
 {
-  xuchar_t *blob;
-  xsize_t blob_size;
+  guchar *blob;
+  gsize blob_size;
   DBusMessage *dbus_1_message;
-  xdbus_message_t *message;
-  xdbus_message_t *recovered_message;
-  xerror_t *error;
+  GDBusMessage *message;
+  GDBusMessage *recovered_message;
+  GError *error;
   DBusError dbus_error;
-  xchar_t *last_serialization = NULL;
-  xchar_t *s = NULL;
-  xuint_t n;
+  gchar *last_serialization = NULL;
+  gchar *s = NULL;
+  guint n;
 
-  message = xdbus_message_new ();
-  xdbus_message_set_body (message, value);
-  xdbus_message_set_message_type (message, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
-  xdbus_message_set_serial (message, 0x41);
+  message = g_dbus_message_new ();
+  g_dbus_message_set_body (message, value);
+  g_dbus_message_set_message_type (message, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
+  g_dbus_message_set_serial (message, 0x41);
   s = get_body_signature (value);
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH, xvariant_new_object_path ("/foo/bar"));
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER, xvariant_new_string ("Member"));
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE, xvariant_new_signature (s));
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH, g_variant_new_object_path ("/foo/bar"));
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER, g_variant_new_string ("Member"));
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE, g_variant_new_signature (s));
   g_free (s);
 
   /* First check that the serialization to the D-Bus wire format is correct - do this for both byte orders */
@@ -554,15 +554,15 @@ get_and_check_serialization (xvariant_t *value)
           g_assert_not_reached ();
           break;
         }
-      xdbus_message_set_byte_order (message, byte_order);
+      g_dbus_message_set_byte_order (message, byte_order);
 
       error = NULL;
-      blob = xdbus_message_to_blob (message,
+      blob = g_dbus_message_to_blob (message,
                                      &blob_size,
                                      G_DBUS_CAPABILITY_FLAGS_NONE,
                                      &error);
       g_assert_no_error (error);
-      xassert (blob != NULL);
+      g_assert (blob != NULL);
 
       switch (byte_order)
         {
@@ -584,8 +584,8 @@ get_and_check_serialization (xvariant_t *value)
           hexdump (blob, blob_size);
           dbus_error_free (&dbus_error);
 
-          s = xvariant_print (value, TRUE);
-          g_printerr ("\nThe blob was generated from the following xvariant_t value:\n%s\n\n", s);
+          s = g_variant_print (value, TRUE);
+          g_printerr ("\nThe blob was generated from the following GVariant value:\n%s\n\n", s);
           g_free (s);
 
           g_printerr ("If the blob was encoded using DBusMessageIter, the payload would have been:\n");
@@ -600,23 +600,23 @@ get_and_check_serialization (xvariant_t *value)
       /* Then serialize back and check that the body is identical */
 
       error = NULL;
-      recovered_message = xdbus_message_new_from_blob (blob,
+      recovered_message = g_dbus_message_new_from_blob (blob,
                                                         blob_size,
                                                         G_DBUS_CAPABILITY_FLAGS_NONE,
                                                         &error);
       g_assert_no_error (error);
-      xassert (recovered_message != NULL);
+      g_assert (recovered_message != NULL);
 
       if (value == NULL)
         {
-          xassert (xdbus_message_get_body (recovered_message) == NULL);
+          g_assert (g_dbus_message_get_body (recovered_message) == NULL);
         }
       else
         {
-          xassert (xdbus_message_get_body (recovered_message) != NULL);
-          g_assert_cmpvariant (xdbus_message_get_body (recovered_message), value);
+          g_assert (g_dbus_message_get_body (recovered_message) != NULL);
+          g_assert_cmpvariant (g_dbus_message_get_body (recovered_message), value);
         }
-      xobject_unref (recovered_message);
+      g_object_unref (recovered_message);
       g_free (blob);
 
       if (last_serialization != NULL)
@@ -628,17 +628,17 @@ get_and_check_serialization (xvariant_t *value)
       last_serialization = g_steal_pointer (&s);
     }
 
-  xobject_unref (message);
+  g_object_unref (message);
 
   return g_steal_pointer (&last_serialization);
 }
 
 /* If @value is floating, this assumes ownership. */
 static void
-check_serialization (xvariant_t *value,
-                     const xchar_t *expected_dbus_1_output)
+check_serialization (GVariant *value,
+                     const gchar *expected_dbus_1_output)
 {
-  xchar_t *s = get_and_check_serialization (value);
+  gchar *s = get_and_check_serialization (value);
   g_assert_cmpstr (s, ==, expected_dbus_1_output);
   g_free (s);
 }
@@ -648,7 +648,7 @@ test_message_serialize_basic (void)
 {
   check_serialization (NULL, "");
 
-  check_serialization (xvariant_new ("(sogybnqiuxtd)",
+  check_serialization (g_variant_new ("(sogybnqiuxtd)",
                                       "this is a string",
                                       "/this/is/a/path",
                                       "sad",
@@ -680,18 +680,18 @@ test_message_serialize_basic (void)
 static void
 test_message_serialize_complex (void)
 {
-  xerror_t *error;
-  xvariant_t *value;
-  xuint_t i;
-  xchar_t *serialization = NULL;
+  GError *error;
+  GVariant *value;
+  guint i;
+  gchar *serialization = NULL;
 
   error = NULL;
 
-  value = xvariant_parse (G_VARIANT_TYPE ("(aia{ss})"),
+  value = g_variant_parse (G_VARIANT_TYPE ("(aia{ss})"),
                            "([1, 2, 3], {'one': 'white', 'two': 'black'})",
                            NULL, NULL, &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
+  g_assert (value != NULL);
   check_serialization (value,
                        "value 0:   array:\n"
                        "    int32: 1\n"
@@ -704,22 +704,22 @@ test_message_serialize_complex (void)
                        "    dict_entry:\n"
                        "      string: 'two'\n"
                        "      string: 'black'\n");
-  xvariant_unref (value);
+  g_variant_unref (value);
 
-  value = xvariant_parse (G_VARIANT_TYPE ("(sa{sv}as)"),
+  value = g_variant_parse (G_VARIANT_TYPE ("(sa{sv}as)"),
                            "('01234567890123456', {}, ['Something'])",
                            NULL, NULL, &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
+  g_assert (value != NULL);
   check_serialization (value,
                        "value 0:   string: '01234567890123456'\n"
                        "value 1:   array:\n"
                        "value 2:   array:\n"
                        "    string: 'Something'\n");
-  xvariant_unref (value);
+  g_variant_unref (value);
 
   /* https://bugzilla.gnome.org/show_bug.cgi?id=621838 */
-  check_serialization (xvariant_new_parsed ("(@aay [], {'cwd': <'/home/davidz/Hacking/glib/gio/tests'>})"),
+  check_serialization (g_variant_new_parsed ("(@aay [], {'cwd': <'/home/davidz/Hacking/glib/gio/tests'>})"),
                        "value 0:   array:\n"
                        "value 1:   array:\n"
                        "    dict_entry:\n"
@@ -728,11 +728,11 @@ test_message_serialize_complex (void)
                        "        string: '/home/davidz/Hacking/glib/gio/tests'\n");
 
 #ifdef DBUS_TYPE_UNIX_FD
-  value = xvariant_parse (G_VARIANT_TYPE ("(hah)"),
+  value = g_variant_parse (G_VARIANT_TYPE ("(hah)"),
                            "(42, [43, 44])",
                            NULL, NULL, &error);
   g_assert_no_error (error);
-  xassert (value != NULL);
+  g_assert (value != NULL);
   /* about (not extracted), see comment in DBUS_TYPE_UNIX_FD case in
    * dbus_1_message_append() above.
    */
@@ -741,18 +741,18 @@ test_message_serialize_complex (void)
                        "value 1:   array:\n"
                        "    unix-fd: (not extracted)\n"
                        "    unix-fd: (not extracted)\n");
-  xvariant_unref (value);
+  g_variant_unref (value);
 #endif
 
   /* Deep nesting of variants (just below the recursion limit). */
-  value = xvariant_new_string ("buried");
+  value = g_variant_new_string ("buried");
   for (i = 0; i < 64; i++)
-    value = xvariant_new_variant (value);
-  value = xvariant_new_tuple (&value, 1);
+    value = g_variant_new_variant (value);
+  value = g_variant_new_tuple (&value, 1);
 
   serialization = get_and_check_serialization (value);
   g_assert_nonnull (serialization);
-  g_assert_true (xstr_has_prefix (serialization,
+  g_assert_true (g_str_has_prefix (serialization,
                                    "value 0:   variant:\n"
                                    "    variant:\n"
                                    "      variant:\n"));
@@ -760,16 +760,16 @@ test_message_serialize_complex (void)
 
   /* Deep nesting of arrays and structs (just below the recursion limit).
    * See https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-marshaling-signature */
-  value = xvariant_new_string ("hello");
+  value = g_variant_new_string ("hello");
   for (i = 0; i < 32; i++)
-    value = xvariant_new_tuple (&value, 1);
+    value = g_variant_new_tuple (&value, 1);
   for (i = 0; i < 32; i++)
-    value = xvariant_new_array (NULL, &value, 1);
-  value = xvariant_new_tuple (&value, 1);
+    value = g_variant_new_array (NULL, &value, 1);
+  value = g_variant_new_tuple (&value, 1);
 
   serialization = get_and_check_serialization (value);
   g_assert_nonnull (serialization);
-  g_assert_true (xstr_has_prefix (serialization,
+  g_assert_true (g_str_has_prefix (serialization,
                                    "value 0:   array:\n"
                                    "    array:\n"
                                    "      array:\n"));
@@ -781,12 +781,12 @@ test_message_serialize_complex (void)
 
 static void
 replace (char       *blob,
-         xsize_t       len,
+         gsize       len,
 	 const char *before,
 	 const char *after)
 {
-  xsize_t i;
-  xsize_t slen = strlen (before) + 1;
+  gsize i;
+  gsize slen = strlen (before) + 1;
 
   g_assert_cmpuint (strlen (before), ==, strlen (after));
   g_assert_cmpuint (len, >=, slen);
@@ -801,7 +801,7 @@ replace (char       *blob,
 static void
 test_message_serialize_invalid (void)
 {
-  xuint_t n;
+  guint n;
 
   /* Other things we could check (note that GDBus _does_ check for all
    * these things - we just don't have test-suit coverage for it)
@@ -823,18 +823,18 @@ test_message_serialize_invalid (void)
 
   for (n = 0; n < 3; n++)
     {
-      xdbus_message_t *message;
-      xerror_t *error;
+      GDBusMessage *message;
+      GError *error;
       DBusMessage *dbus_message;
       char *blob;
       int blob_len;
       /* these are in pairs with matching length */
-      const xchar_t *valid_utf8_str = "this is valid...";
-      const xchar_t *invalid_utf8_str = "this is invalid\xff";
-      const xchar_t *valid_signature = "a{sv}a{sv}a{sv}aiai";
-      const xchar_t *invalid_signature = "not valid signature";
-      const xchar_t *valid_object_path = "/this/is/a/valid/dbus/object/path";
-      const xchar_t *invalid_object_path = "/this/is/not a valid object path!";
+      const gchar *valid_utf8_str = "this is valid...";
+      const gchar *invalid_utf8_str = "this is invalid\xff";
+      const gchar *valid_signature = "a{sv}a{sv}a{sv}aiai";
+      const gchar *invalid_signature = "not valid signature";
+      const gchar *valid_object_path = "/this/is/a/valid/dbus/object/path";
+      const gchar *invalid_object_path = "/this/is/not a valid object path!";
 
       dbus_message = dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_CALL);
       dbus_message_set_serial (dbus_message, 0x41);
@@ -875,13 +875,13 @@ test_message_serialize_invalid (void)
       replace (blob, blob_len, valid_signature, invalid_signature);
 
       error = NULL;
-      message = xdbus_message_new_from_blob ((xuchar_t *) blob,
+      message = g_dbus_message_new_from_blob ((guchar *) blob,
                                               blob_len,
                                               G_DBUS_CAPABILITY_FLAGS_NONE,
                                               &error);
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
-      xerror_free (error);
-      xassert (message == NULL);
+      g_error_free (error);
+      g_assert (message == NULL);
 
       dbus_free (blob);
       dbus_message_unref (dbus_message);
@@ -894,29 +894,29 @@ test_message_serialize_invalid (void)
 static void
 test_message_serialize_header_checks (void)
 {
-  xdbus_message_t *message;
-  xdbus_message_t *reply;
-  xerror_t *error = NULL;
-  xuchar_t *blob;
-  xsize_t blob_size;
+  GDBusMessage *message;
+  GDBusMessage *reply;
+  GError *error = NULL;
+  guchar *blob;
+  gsize blob_size;
 
   /*
    * check we can't serialize messages with INVALID type
    */
-  message = xdbus_message_new ();
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  message = g_dbus_message_new ();
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: type is INVALID");
   g_clear_error (&error);
   g_assert_null (blob);
-  xobject_unref (message);
+  g_object_unref (message);
 
   /*
    * check that we can't serialize messages with SIGNATURE set to a non-signature-typed value
    */
-  message = xdbus_message_new_signal ("/the/path", "The.Interface", "TheMember");
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE, xvariant_new_boolean (FALSE));
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  message = g_dbus_message_new_signal ("/the/path", "The.Interface", "TheMember");
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE, g_variant_new_boolean (FALSE));
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
 
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Signature header found but is not of type signature");
@@ -928,119 +928,119 @@ test_message_serialize_header_checks (void)
   /*
    * check we can't serialize signal messages with INTERFACE, PATH or MEMBER unset / set to reserved value
    */
-  message = xdbus_message_new_signal ("/the/path", "The.Interface", "TheMember");
+  message = g_dbus_message_new_signal ("/the/path", "The.Interface", "TheMember");
   /* ----- */
   /* interface NULL => error */
-  xdbus_message_set_interface (message, NULL);
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_interface (message, NULL);
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: SIGNAL message: PATH, INTERFACE or MEMBER header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
   /* interface reserved value => error */
-  xdbus_message_set_interface (message, "org.freedesktop.DBus.Local");
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_interface (message, "org.freedesktop.DBus.Local");
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: SIGNAL message: The INTERFACE header field is using the reserved value org.freedesktop.DBus.Local");
   g_clear_error (&error);
   g_assert_null (blob);
   /* reset interface */
-  xdbus_message_set_interface (message, "The.Interface");
+  g_dbus_message_set_interface (message, "The.Interface");
   /* ----- */
   /* path NULL => error */
-  xdbus_message_set_path (message, NULL);
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_path (message, NULL);
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: SIGNAL message: PATH, INTERFACE or MEMBER header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
   /* path reserved value => error */
-  xdbus_message_set_path (message, "/org/freedesktop/DBus/Local");
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_path (message, "/org/freedesktop/DBus/Local");
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: SIGNAL message: The PATH header field is using the reserved value /org/freedesktop/DBus/Local");
   g_clear_error (&error);
   g_assert_null (blob);
   /* reset path */
-  xdbus_message_set_path (message, "/the/path");
+  g_dbus_message_set_path (message, "/the/path");
   /* ----- */
   /* member NULL => error */
-  xdbus_message_set_member (message, NULL);
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_member (message, NULL);
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: SIGNAL message: PATH, INTERFACE or MEMBER header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
   /* reset member */
-  xdbus_message_set_member (message, "TheMember");
+  g_dbus_message_set_member (message, "TheMember");
   /* ----- */
   /* done */
-  xobject_unref (message);
+  g_object_unref (message);
 
   /*
    * check that we can't serialize method call messages with PATH or MEMBER unset
    */
-  message = xdbus_message_new_method_call (NULL, "/the/path", NULL, "TheMember");
+  message = g_dbus_message_new_method_call (NULL, "/the/path", NULL, "TheMember");
   /* ----- */
   /* path NULL => error */
-  xdbus_message_set_path (message, NULL);
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_path (message, NULL);
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: METHOD_CALL message: PATH or MEMBER header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
   /* reset path */
-  xdbus_message_set_path (message, "/the/path");
+  g_dbus_message_set_path (message, "/the/path");
   /* ----- */
   /* member NULL => error */
-  xdbus_message_set_member (message, NULL);
-  blob = xdbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_member (message, NULL);
+  blob = g_dbus_message_to_blob (message, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: METHOD_CALL message: PATH or MEMBER header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
   /* reset member */
-  xdbus_message_set_member (message, "TheMember");
+  g_dbus_message_set_member (message, "TheMember");
   /* ----- */
   /* done */
-  xobject_unref (message);
+  g_object_unref (message);
 
   /*
    * check that we can't serialize method reply messages with REPLY_SERIAL unset
    */
-  message = xdbus_message_new_method_call (NULL, "/the/path", NULL, "TheMember");
-  xdbus_message_set_serial (message, 42);
+  message = g_dbus_message_new_method_call (NULL, "/the/path", NULL, "TheMember");
+  g_dbus_message_set_serial (message, 42);
   /* method reply */
-  reply = xdbus_message_new_method_reply (message);
-  g_assert_cmpint (xdbus_message_get_reply_serial (reply), ==, 42);
-  xdbus_message_set_header (reply, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL, NULL);
-  blob = xdbus_message_to_blob (reply, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  reply = g_dbus_message_new_method_reply (message);
+  g_assert_cmpint (g_dbus_message_get_reply_serial (reply), ==, 42);
+  g_dbus_message_set_header (reply, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL, NULL);
+  blob = g_dbus_message_to_blob (reply, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: METHOD_RETURN message: REPLY_SERIAL header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
-  xobject_unref (reply);
+  g_object_unref (reply);
   /* method error - first nuke ERROR_NAME, then REPLY_SERIAL */
-  reply = xdbus_message_new_method_error (message, "Some.Error.Name", "the message");
-  g_assert_cmpint (xdbus_message_get_reply_serial (reply), ==, 42);
+  reply = g_dbus_message_new_method_error (message, "Some.Error.Name", "the message");
+  g_assert_cmpint (g_dbus_message_get_reply_serial (reply), ==, 42);
   /* nuke ERROR_NAME */
-  xdbus_message_set_error_name (reply, NULL);
-  blob = xdbus_message_to_blob (reply, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_error_name (reply, NULL);
+  blob = g_dbus_message_to_blob (reply, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: ERROR message: REPLY_SERIAL or ERROR_NAME header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
   /* reset ERROR_NAME */
-  xdbus_message_set_error_name (reply, "Some.Error.Name");
+  g_dbus_message_set_error_name (reply, "Some.Error.Name");
   /* nuke REPLY_SERIAL */
-  xdbus_message_set_header (reply, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL, NULL);
-  blob = xdbus_message_to_blob (reply, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  g_dbus_message_set_header (reply, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL, NULL);
+  blob = g_dbus_message_to_blob (reply, &blob_size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (error->message, ==, "Cannot serialize message: ERROR message: REPLY_SERIAL or ERROR_NAME header field is missing");
   g_clear_error (&error);
   g_assert_null (blob);
-  xobject_unref (reply);
-  xobject_unref (message);
+  g_object_unref (reply);
+  g_object_unref (message);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1048,8 +1048,8 @@ test_message_serialize_header_checks (void)
 static void
 test_message_parse_empty_arrays_of_arrays (void)
 {
-  xvariant_t *body;
-  xerror_t *error = NULL;
+  GVariant *body;
+  GError *error = NULL;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=673612");
   /* These three-element array of empty arrays were previously read back as a
@@ -1057,7 +1057,7 @@ test_message_parse_empty_arrays_of_arrays (void)
    * four bytes to align for the eight-byte-aligned grandchild types (x and
    * dict_entry).
    */
-  body = xvariant_parse (G_VARIANT_TYPE ("(aaax)"),
+  body = g_variant_parse (G_VARIANT_TYPE ("(aaax)"),
       "([@aax [], [], []],)", NULL, NULL, &error);
   g_assert_no_error (error);
   check_serialization (body,
@@ -1065,9 +1065,9 @@ test_message_parse_empty_arrays_of_arrays (void)
       "    array:\n"
       "    array:\n"
       "    array:\n");
-  xvariant_unref (body);
+  g_variant_unref (body);
 
-  body = xvariant_parse (G_VARIANT_TYPE ("(aaa{uu})"),
+  body = g_variant_parse (G_VARIANT_TYPE ("(aaa{uu})"),
       "([@aa{uu} [], [], []],)", NULL, NULL, &error);
   g_assert_no_error (error);
   check_serialization (body,
@@ -1075,12 +1075,12 @@ test_message_parse_empty_arrays_of_arrays (void)
       "    array:\n"
       "    array:\n"
       "    array:\n");
-  xvariant_unref (body);
+  g_variant_unref (body);
 
-  /* Due to the same bug, xdbus_message_new_from_blob() would fail for this
+  /* Due to the same bug, g_dbus_message_new_from_blob() would fail for this
    * message because it would try to read past the end of the string. Hence,
    * sending this to an application would make it fall off the bus. */
-  body = xvariant_parse (G_VARIANT_TYPE ("(a(aa{sv}as))"),
+  body = g_variant_parse (G_VARIANT_TYPE ("(a(aa{sv}as))"),
       "([ ([], []),"
       "   ([], []),"
       "   ([], [])],)", NULL, NULL, &error);
@@ -1096,7 +1096,7 @@ test_message_parse_empty_arrays_of_arrays (void)
       "    struct:\n"
       "      array:\n"
       "      array:\n");
-  xvariant_unref (body);
+  g_variant_unref (body);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1104,17 +1104,17 @@ test_message_parse_empty_arrays_of_arrays (void)
 static void
 test_message_serialize_double_array (void)
 {
-  xvariant_builder_t builder;
-  xvariant_t *body;
+  GVariantBuilder builder;
+  GVariant *body;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=732754");
 
-  xvariant_builder_init (&builder, G_VARIANT_TYPE ("ad"));
-  xvariant_builder_add (&builder, "d", (xdouble_t)0.0);
-  xvariant_builder_add (&builder, "d", (xdouble_t)8.0);
-  xvariant_builder_add (&builder, "d", (xdouble_t)22.0);
-  xvariant_builder_add (&builder, "d", (xdouble_t)0.0);
-  body = xvariant_new ("(@ad)", xvariant_builder_end (&builder));
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("ad"));
+  g_variant_builder_add (&builder, "d", (gdouble)0.0);
+  g_variant_builder_add (&builder, "d", (gdouble)8.0);
+  g_variant_builder_add (&builder, "d", (gdouble)22.0);
+  g_variant_builder_add (&builder, "d", (gdouble)0.0);
+  body = g_variant_new ("(@ad)", g_variant_builder_end (&builder));
   check_serialization (body,
       "value 0:   array:\n"
       "    double: 0.000000\n"
@@ -1125,13 +1125,13 @@ test_message_serialize_double_array (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* test_t that an invalid header in a D-Bus message (specifically, with a type
+/* Test that an invalid header in a D-Bus message (specifically, with a type
  * which doesn’t match what’s expected for the given header) is gracefully
  * handled with an error rather than a crash. */
 static void
 test_message_parse_non_signature_header (void)
 {
-  const xuint8_t data[] = {
+  const guint8 data[] = {
     'l',  /* little-endian byte order */
     0x02,  /* message type (method return) */
     0x00,  /* message flags (none) */
@@ -1159,11 +1159,11 @@ test_message_parse_non_signature_header (void)
       0x00, 0x01, 0x02, 0x03,
     /* (message body is zero-length) */
   };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1174,13 +1174,13 @@ test_message_parse_non_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* test_t that an invalid header in a D-Bus message (specifically, containing a
+/* Test that an invalid header in a D-Bus message (specifically, containing a
  * variant with an empty type signature) is gracefully handled with an error
  * rather than a crash. */
 static void
 test_message_parse_empty_signature_header (void)
 {
-  const xuint8_t data[] = {
+  const guint8 data[] = {
     'l',  /* little-endian byte order */
     0x02,  /* message type (method return) */
     0x00,  /* message flags (none) */
@@ -1207,11 +1207,11 @@ test_message_parse_empty_signature_header (void)
       0x00, 0x01, 0x02, 0x03,
     /* (message body is zero-length) */
   };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1222,13 +1222,13 @@ test_message_parse_empty_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* test_t that an invalid header in a D-Bus message (specifically, containing a
+/* Test that an invalid header in a D-Bus message (specifically, containing a
  * variant with a type signature containing multiple complete types) is
  * gracefully handled with an error rather than a crash. */
 static void
 test_message_parse_multiple_signature_header (void)
 {
-  const xuint8_t data[] = {
+  const guint8 data[] = {
     'l',  /* little-endian byte order */
     0x02,  /* message type (method return) */
     0x00,  /* message flags (none) */
@@ -1256,11 +1256,11 @@ test_message_parse_multiple_signature_header (void)
       0x00, 0x01, 0x02, 0x03,
     /* (message body is zero-length) */
   };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1271,14 +1271,14 @@ test_message_parse_multiple_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* test_t that an invalid header in a D-Bus message (specifically, containing a
+/* Test that an invalid header in a D-Bus message (specifically, containing a
  * variant with a valid type signature that is too long to be a valid
- * #xvariant_type_t due to exceeding the array nesting limits) is gracefully
+ * #GVariantType due to exceeding the array nesting limits) is gracefully
  * handled with an error rather than a crash. */
 static void
 test_message_parse_over_long_signature_header (void)
 {
-  const xuint8_t data[] = {
+  const guint8 data[] = {
     'l',  /* little-endian byte order */
     0x02,  /* message type (method return) */
     0x00,  /* message flags (none) */
@@ -1321,11 +1321,11 @@ test_message_parse_over_long_signature_header (void)
       0x00, 0x01, 0x02, 0x03,
     /* (message body is zero-length) */
   };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1336,13 +1336,13 @@ test_message_parse_over_long_signature_header (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* test_t that an invalid header in a D-Bus message (specifically, containing too
+/* Test that an invalid header in a D-Bus message (specifically, containing too
  * many levels of nested variant) is gracefully handled with an error rather
  * than a crash. */
 static void
 test_message_parse_deep_header_nesting (void)
 {
-  const xuint8_t data[] = {
+  const guint8 data[] = {
     'l',  /* little-endian byte order */
     0x02,  /* message type (method return) */
     0x00,  /* message flags (none) */
@@ -1389,11 +1389,11 @@ test_message_parse_deep_header_nesting (void)
       0x00, 0x01, 0x02, 0x03,
     /* (message body is zero-length) */
   };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1404,14 +1404,14 @@ test_message_parse_deep_header_nesting (void)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-/* test_t that an invalid body in a D-Bus message (specifically, containing too
+/* Test that an invalid body in a D-Bus message (specifically, containing too
  * many levels of nested variant) is gracefully handled with an error rather
  * than a crash. The set of bytes here are a modified version of the bytes from
  * test_message_parse_deep_header_nesting(). */
 static void
 test_message_parse_deep_body_nesting (void)
 {
-  const xuint8_t data[] = {
+  const guint8 data[] = {
     'l',  /* little-endian byte order */
     0x02,  /* message type (method return) */
     0x00,  /* message flags (none) */
@@ -1457,11 +1457,11 @@ test_message_parse_deep_body_nesting (void)
     /* Some arbitrary valid content inside the innermost variant: */
     0x01, 'y', 0x00, 0xcc,
   };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1475,55 +1475,55 @@ test_message_parse_deep_body_nesting (void)
 static void
 test_message_parse_truncated (void)
 {
-  xdbus_message_t *message = NULL;
-  xdbus_message_t *message2 = NULL;
-  xvariant_builder_t builder;
-  xuchar_t *blob = NULL;
-  xsize_t size = 0;
-  xerror_t *error = NULL;
+  GDBusMessage *message = NULL;
+  GDBusMessage *message2 = NULL;
+  GVariantBuilder builder;
+  guchar *blob = NULL;
+  gsize size = 0;
+  GError *error = NULL;
 
-  g_test_summary ("test_t that truncated messages are properly rejected.");
+  g_test_summary ("Test that truncated messages are properly rejected.");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2528");
 
-  message = xdbus_message_new ();
-  xvariant_builder_init (&builder, G_VARIANT_TYPE ("(asbynqiuxtd)"));
-  xvariant_builder_open (&builder, G_VARIANT_TYPE ("as"));
-  xvariant_builder_add (&builder, "s", "fourtytwo");
-  xvariant_builder_close (&builder);
-  xvariant_builder_add (&builder, "b", TRUE);
-  xvariant_builder_add (&builder, "y", 42);
-  xvariant_builder_add (&builder, "n", 42);
-  xvariant_builder_add (&builder, "q", 42);
-  xvariant_builder_add (&builder, "i", 42);
-  xvariant_builder_add (&builder, "u", 42);
-  xvariant_builder_add (&builder, "x", 42);
-  xvariant_builder_add (&builder, "t", 42);
-  xvariant_builder_add (&builder, "d", (xdouble_t) 42);
+  message = g_dbus_message_new ();
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("(asbynqiuxtd)"));
+  g_variant_builder_open (&builder, G_VARIANT_TYPE ("as"));
+  g_variant_builder_add (&builder, "s", "fourtytwo");
+  g_variant_builder_close (&builder);
+  g_variant_builder_add (&builder, "b", TRUE);
+  g_variant_builder_add (&builder, "y", 42);
+  g_variant_builder_add (&builder, "n", 42);
+  g_variant_builder_add (&builder, "q", 42);
+  g_variant_builder_add (&builder, "i", 42);
+  g_variant_builder_add (&builder, "u", 42);
+  g_variant_builder_add (&builder, "x", 42);
+  g_variant_builder_add (&builder, "t", 42);
+  g_variant_builder_add (&builder, "d", (gdouble) 42);
 
-  xdbus_message_set_message_type (message, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH,
-                             xvariant_new_object_path ("/foo/bar"));
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER,
-                             xvariant_new_string ("Member"));
-  xdbus_message_set_body (message, xvariant_builder_end (&builder));
+  g_dbus_message_set_message_type (message, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH,
+                             g_variant_new_object_path ("/foo/bar"));
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER,
+                             g_variant_new_string ("Member"));
+  g_dbus_message_set_body (message, g_variant_builder_end (&builder));
 
-  blob = xdbus_message_to_blob (message, &size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  blob = g_dbus_message_to_blob (message, &size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_no_error (error);
 
   g_clear_object (&message);
 
   /* Try parsing all possible prefixes of the full @blob. */
-  for (xsize_t i = 0; i < size; i++)
+  for (gsize i = 0; i < size; i++)
     {
-      message2 = xdbus_message_new_from_blob (blob, i, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+      message2 = g_dbus_message_new_from_blob (blob, i, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
       g_assert_null (message2);
       g_clear_error (&error);
     }
 
-  message2 = xdbus_message_new_from_blob (blob, size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
+  message2 = g_dbus_message_new_from_blob (blob, size, G_DBUS_CAPABILITY_FLAGS_NONE, &error);
   g_assert_no_error (error);
-  g_assert_true (X_IS_DBUS_MESSAGE (message2));
+  g_assert_true (G_IS_DBUS_MESSAGE (message2));
   g_clear_object (&message2);
 
   g_free (blob);
@@ -1532,7 +1532,7 @@ test_message_parse_truncated (void)
 static void
 test_message_parse_empty_structure (void)
 {
-  const xuint8_t data[] =
+  const guint8 data[] =
     {
       'l',  /* little-endian byte order */
       0x02,  /* message type (method return) */
@@ -1565,14 +1565,14 @@ test_message_parse_empty_structure (void)
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* array data */
         0x00
     };
-  xsize_t size = sizeof (data);
-  xdbus_message_t *message = NULL;
-  xerror_t *local_error = NULL;
+  gsize size = sizeof (data);
+  GDBusMessage *message = NULL;
+  GError *local_error = NULL;
 
-  g_test_summary ("test_t that empty structures are rejected when parsing.");
+  g_test_summary ("Test that empty structures are rejected when parsing.");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2557");
 
-  message = xdbus_message_new_from_blob ((xuchar_t *) data, size,
+  message = g_dbus_message_new_from_blob ((guchar *) data, size,
                                           G_DBUS_CAPABILITY_FLAGS_NONE,
                                           &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
@@ -1585,27 +1585,27 @@ test_message_parse_empty_structure (void)
 static void
 test_message_serialize_empty_structure (void)
 {
-  xdbus_message_t *message;
-  xvariant_builder_t builder;
-  xsize_t size = 0;
-  xerror_t *local_error = NULL;
+  GDBusMessage *message;
+  GVariantBuilder builder;
+  gsize size = 0;
+  GError *local_error = NULL;
 
-  g_test_summary ("test_t that empty structures are rejected when serializing.");
+  g_test_summary ("Test that empty structures are rejected when serializing.");
   g_test_bug ("https://gitlab.gnome.org/GNOME/glib/-/issues/2557");
 
-  message = xdbus_message_new ();
-  xvariant_builder_init (&builder, G_VARIANT_TYPE ("(a())"));
-  xvariant_builder_open (&builder, G_VARIANT_TYPE ("a()"));
-  xvariant_builder_add (&builder, "()");
-  xvariant_builder_close (&builder);
-  xdbus_message_set_message_type (message, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH,
-                             xvariant_new_object_path ("/path"));
-  xdbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER,
-                             xvariant_new_string ("Member"));
-  xdbus_message_set_body (message, xvariant_builder_end (&builder));
+  message = g_dbus_message_new ();
+  g_variant_builder_init (&builder, G_VARIANT_TYPE ("(a())"));
+  g_variant_builder_open (&builder, G_VARIANT_TYPE ("a()"));
+  g_variant_builder_add (&builder, "()");
+  g_variant_builder_close (&builder);
+  g_dbus_message_set_message_type (message, G_DBUS_MESSAGE_TYPE_METHOD_CALL);
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH,
+                             g_variant_new_object_path ("/path"));
+  g_dbus_message_set_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER,
+                             g_variant_new_string ("Member"));
+  g_dbus_message_set_body (message, g_variant_builder_end (&builder));
 
-  xdbus_message_to_blob (message, &size, G_DBUS_CAPABILITY_FLAGS_NONE, &local_error);
+  g_dbus_message_to_blob (message, &size, G_DBUS_CAPABILITY_FLAGS_NONE, &local_error);
   g_assert_error (local_error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_assert_cmpstr (local_error->message, ==, "Empty structures (tuples) are not allowed in D-Bus");
 

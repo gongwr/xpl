@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_QUARK_H__
 #define __G_QUARK_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -33,24 +33,24 @@
 
 G_BEGIN_DECLS
 
-typedef xuint32_t xquark;
+typedef guint32 GQuark;
 
 /* Quarks (string<->id association)
  */
-XPL_AVAILABLE_IN_ALL
-xquark                g_quark_try_string         (const xchar_t *string);
-XPL_AVAILABLE_IN_ALL
-xquark                g_quark_from_static_string (const xchar_t *string);
-XPL_AVAILABLE_IN_ALL
-xquark                g_quark_from_string        (const xchar_t *string);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_quark_to_string          (xquark       quark) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+GQuark                g_quark_try_string         (const gchar *string);
+GLIB_AVAILABLE_IN_ALL
+GQuark                g_quark_from_static_string (const gchar *string);
+GLIB_AVAILABLE_IN_ALL
+GQuark                g_quark_from_string        (const gchar *string);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_quark_to_string          (GQuark       quark) G_GNUC_CONST;
 
 #define G_DEFINE_QUARK(QN, q_n)                                         \
-xquark                                                                  \
+GQuark                                                                  \
 q_n##_quark (void)                                                      \
 {                                                                       \
-  static xquark q;                                                      \
+  static GQuark q;                                                      \
                                                                         \
   if G_UNLIKELY (q == 0)                                                \
     q = g_quark_from_static_string (#QN);                               \
@@ -58,10 +58,10 @@ q_n##_quark (void)                                                      \
   return q;                                                             \
 }
 
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_intern_string            (const xchar_t *string);
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_intern_static_string     (const xchar_t *string);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_intern_string            (const gchar *string);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_intern_static_string     (const gchar *string);
 
 G_END_DECLS
 

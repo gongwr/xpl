@@ -20,14 +20,14 @@
 
 
 /* The purpose of this header is to allow certain internal symbols of
- * xvariant_t to be put under test cases.
+ * GVariant to be put under test cases.
  */
 
 #ifndef __G_VARIANT_INTERNAL_H__
 #define __G_VARIANT_INTERNAL_H__
 
 /* Hack */
-#define __XPL_H_INSIDE__
+#define __GLIB_H_INSIDE__
 
 #include <glib/gvarianttype.h>
 #include <glib/gtypes.h>
@@ -35,24 +35,24 @@
 #include "gvariant-serialiser.h"
 #include "gvarianttypeinfo.h"
 
-#undef __XPL_H_INSIDE__
+#undef __GLIB_H_INSIDE__
 
-XPL_AVAILABLE_IN_ALL
-xboolean_t                        xvariant_format_string_scan            (const xchar_t          *string,
-                                                                         const xchar_t          *limit,
-                                                                         const xchar_t         **endptr);
+GLIB_AVAILABLE_IN_ALL
+gboolean                        g_variant_format_string_scan            (const gchar          *string,
+                                                                         const gchar          *limit,
+                                                                         const gchar         **endptr);
 
-XPL_AVAILABLE_IN_ALL
-xvariant_type_t *                  xvariant_format_string_scan_type       (const xchar_t          *string,
-                                                                         const xchar_t          *limit,
-                                                                         const xchar_t         **endptr);
+GLIB_AVAILABLE_IN_ALL
+GVariantType *                  g_variant_format_string_scan_type       (const gchar          *string,
+                                                                         const gchar          *limit,
+                                                                         const gchar         **endptr);
 
 /* The maximum number of levels of nested container which this implementation
- * of #xvariant_t will handle.
+ * of #GVariant will handle.
  *
  * The limit must be at least 64 + 1, to allow D-Bus messages to be wrapped in
- * a top-level #xvariant_t. This comes from the D-Bus specification (§(Valid
- * Signatures)), but also seems generally reasonable. #xdbus_message_t wraps its
+ * a top-level #GVariant. This comes from the D-Bus specification (§(Valid
+ * Signatures)), but also seems generally reasonable. #GDBusMessage wraps its
  * payload in a top-level tuple.
  *
  * The limit is actually set to be a lot greater than 64, to allow much greater
@@ -63,6 +63,6 @@ xvariant_type_t *                  xvariant_format_string_scan_type       (const
  * only restrictions on it from the API are that it has to be greater than 64
  * (due to D-Bus).
 */
-#define G_VARIANT_MAX_RECURSION_DEPTH ((xsize_t) 128)
+#define G_VARIANT_MAX_RECURSION_DEPTH ((gsize) 128)
 
 #endif /* __G_VARIANT_INTERNAL_H__ */

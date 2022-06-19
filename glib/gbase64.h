@@ -19,7 +19,7 @@
 #ifndef __G_BASE64_H__
 #define __G_BASE64_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -27,33 +27,33 @@
 
 G_BEGIN_DECLS
 
-XPL_AVAILABLE_IN_ALL
-xsize_t   g_base64_encode_step    (const xuchar_t *in,
-                                 xsize_t         len,
-                                 xboolean_t      break_lines,
-                                 xchar_t        *out,
-                                 xint_t         *state,
-                                 xint_t         *save);
-XPL_AVAILABLE_IN_ALL
-xsize_t   g_base64_encode_close   (xboolean_t      break_lines,
-                                 xchar_t        *out,
-                                 xint_t         *state,
-                                 xint_t         *save);
-XPL_AVAILABLE_IN_ALL
-xchar_t*  g_base64_encode         (const xuchar_t *data,
-                                 xsize_t         len) G_GNUC_MALLOC;
-XPL_AVAILABLE_IN_ALL
-xsize_t   g_base64_decode_step    (const xchar_t  *in,
-                                 xsize_t         len,
-                                 xuchar_t       *out,
-                                 xint_t         *state,
-                                 xuint_t        *save);
-XPL_AVAILABLE_IN_ALL
-xuchar_t *g_base64_decode         (const xchar_t  *text,
-                                 xsize_t        *out_len) G_GNUC_MALLOC;
-XPL_AVAILABLE_IN_ALL
-xuchar_t *g_base64_decode_inplace (xchar_t        *text,
-                                 xsize_t        *out_len);
+GLIB_AVAILABLE_IN_ALL
+gsize   g_base64_encode_step    (const guchar *in,
+                                 gsize         len,
+                                 gboolean      break_lines,
+                                 gchar        *out,
+                                 gint         *state,
+                                 gint         *save);
+GLIB_AVAILABLE_IN_ALL
+gsize   g_base64_encode_close   (gboolean      break_lines,
+                                 gchar        *out,
+                                 gint         *state,
+                                 gint         *save);
+GLIB_AVAILABLE_IN_ALL
+gchar*  g_base64_encode         (const guchar *data,
+                                 gsize         len) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_ALL
+gsize   g_base64_decode_step    (const gchar  *in,
+                                 gsize         len,
+                                 guchar       *out,
+                                 gint         *state,
+                                 guint        *save);
+GLIB_AVAILABLE_IN_ALL
+guchar *g_base64_decode         (const gchar  *text,
+                                 gsize        *out_len) G_GNUC_MALLOC;
+GLIB_AVAILABLE_IN_ALL
+guchar *g_base64_decode_inplace (gchar        *text,
+                                 gsize        *out_len);
 
 
 G_END_DECLS

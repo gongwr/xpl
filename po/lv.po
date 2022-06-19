@@ -22,17 +22,17 @@ msgstr ""
 " 2);\n"
 
 #: gio/gapplication.c:500
-msgid "xapplication_t options"
-msgstr "xapplication_t opcijas"
+msgid "GApplication options"
+msgstr "GApplication opcijas"
 
 #: gio/gapplication.c:500
-msgid "Show xapplication_t options"
-msgstr "Parādīt xapplication_t opcijas"
+msgid "Show GApplication options"
+msgstr "Parādīt GApplication opcijas"
 
 #: gio/gapplication.c:545
-msgid "Enter xapplication_t service mode (use from D-Bus service files)"
+msgid "Enter GApplication service mode (use from D-Bus service files)"
 msgstr ""
-"Ievadiet xapplication_t servisa režīmu (izmantot no D-Bus servisa datnēm)"
+"Ievadiet GApplication servisa režīmu (izmantot no D-Bus servisa datnēm)"
 
 #: gio/gapplication.c:557
 msgid "Override the application’s ID"
@@ -141,8 +141,8 @@ msgid "PARAMETER"
 msgstr "PARAMETRS"
 
 #: gio/gapplication-tool.c:76
-msgid "Optional parameter to the action invocation, in xvariant_t format"
-msgstr "Neobligāts parametrs darbības izsaukšanai, xvariant_t formātā"
+msgid "Optional parameter to the action invocation, in GVariant format"
+msgstr "Neobligāts parametrs darbības izsaukšanai, GVariant formātā"
 
 #: gio/gapplication-tool.c:98 gio/gresource-tool.c:532 gio/gsettings-tool.c:664
 #, c-format
@@ -269,8 +269,8 @@ msgid "Seek not supported on base stream"
 msgstr "Uz bāzes plūsmas meklēšana netiek atbalstīta"
 
 #: gio/gbufferedinputstream.c:938
-msgid "Cannot truncate xbuffered_input_stream_t"
-msgstr "Nevar apraut xbuffered_input_stream_t"
+msgid "Cannot truncate GBufferedInputStream"
+msgstr "Nevar apraut GBufferedInputStream"
 
 #: gio/gbufferedinputstream.c:983 gio/ginputstream.c:1239 gio/giostream.c:300
 #: gio/goutputstream.c:2198
@@ -341,20 +341,20 @@ msgid "%s filetype"
 msgstr "%s datnes tips"
 
 #: gio/gcredentials.c:323
-msgid "xcredentials_t contains invalid data"
-msgstr "xcredentials_t satur nederīgus datus"
+msgid "GCredentials contains invalid data"
+msgstr "GCredentials satur nederīgus datus"
 
 #: gio/gcredentials.c:383 gio/gcredentials.c:667
-msgid "xcredentials_t is not implemented on this OS"
-msgstr "xcredentials_t nav implementēti šajā OS"
+msgid "GCredentials is not implemented on this OS"
+msgstr "GCredentials nav implementēti šajā OS"
 
 #: gio/gcredentials.c:538 gio/gcredentials.c:556
-msgid "There is no xcredentials_t support for your platform"
-msgstr "Šajā platformā nav xcredentials_t atbalsta"
+msgid "There is no GCredentials support for your platform"
+msgstr "Šajā platformā nav GCredentials atbalsta"
 
 #: gio/gcredentials.c:607
-msgid "xcredentials_t does not contain a process ID on this OS"
-msgstr "xcredentials_t nesatur procesa ID šajā OS"
+msgid "GCredentials does not contain a process ID on this OS"
+msgstr "GCredentials nesatur procesa ID šajā OS"
 
 #: gio/gcredentials.c:661
 msgid "Credentials spoofing is not possible on this OS"
@@ -549,8 +549,8 @@ msgid "User IDs must be the same for peer and server"
 msgstr "Lietotāja ID ir jābūt vienādiem gan biedram, gan serverim"
 
 #: gio/gdbusauth.c:1183
-msgid "Cancelled via xdbus_auth_observer_t::authorize-authenticated-peer"
-msgstr "Atcelts caur xdbus_auth_observer_t::authorize-authenticated-peer"
+msgid "Cancelled via GDBusAuthObserver::authorize-authenticated-peer"
+msgstr "Atcelts caur GDBusAuthObserver::authorize-authenticated-peer"
 
 #: gio/gdbusauthmechanismsha1.c:298
 #, c-format
@@ -844,9 +844,9 @@ msgstr "Parsētā vērtība “%s” variantam nav derīgs D-Bus paraksts"
 #: gio/gdbusmessage.c:1936
 #, c-format
 msgid ""
-"Error deserializing xvariant_t with type string “%s” from the D-Bus wire format"
+"Error deserializing GVariant with type string “%s” from the D-Bus wire format"
 msgstr ""
-"Kļūda, deserializējot xvariant_t ar tipa virkni “%s” no D-Bus vadu formāta"
+"Kļūda, deserializējot GVariant ar tipa virkni “%s” no D-Bus vadu formāta"
 
 #: gio/gdbusmessage.c:2121
 #, c-format
@@ -895,8 +895,8 @@ msgstr "Nevar deserializēt ziņojumu: "
 #: gio/gdbusmessage.c:2601
 #, c-format
 msgid ""
-"Error serializing xvariant_t with type string “%s” to the D-Bus wire format"
-msgstr "Kļūda, serializējot xvariant_t ar tipa virkni “%s” uz D-Bus vadu formātu"
+"Error serializing GVariant with type string “%s” to the D-Bus wire format"
+msgstr "Kļūda, serializējot GVariant ar tipa virkni “%s” uz D-Bus vadu formātu"
 
 #: gio/gdbusmessage.c:2738
 #, c-format
@@ -1353,27 +1353,27 @@ msgstr "DTLS atbalsts nav pieejams"
 
 #: gio/gemblem.c:323
 #, c-format
-msgid "Can’t handle version %d of xemblem_t encoding"
-msgstr "Nevar apstrādāt xemblem_t versijas %d kodējumu"
+msgid "Can’t handle version %d of GEmblem encoding"
+msgstr "Nevar apstrādāt GEmblem versijas %d kodējumu"
 
 #: gio/gemblem.c:333
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblem_t encoding"
-msgstr "Vairāki slikti formēti marķieri (%d) xemblem_t kodējumā"
+msgid "Malformed number of tokens (%d) in GEmblem encoding"
+msgstr "Vairāki slikti formēti marķieri (%d) GEmblem kodējumā"
 
 #: gio/gemblemedicon.c:362
 #, c-format
-msgid "Can’t handle version %d of xemblemed_icon_t encoding"
-msgstr "Nevar apstrādāt xemblemed_icon_t versijas %d kodējumu"
+msgid "Can’t handle version %d of GEmblemedIcon encoding"
+msgstr "Nevar apstrādāt GEmblemedIcon versijas %d kodējumu"
 
 #: gio/gemblemedicon.c:372
 #, c-format
-msgid "Malformed number of tokens (%d) in xemblemed_icon_t encoding"
-msgstr "Vairāki slikti formēti marķieri (%d) xemblemed_icon_t kodējumā"
+msgid "Malformed number of tokens (%d) in GEmblemedIcon encoding"
+msgstr "Vairāki slikti formēti marķieri (%d) GEmblemedIcon kodējumā"
 
 #: gio/gemblemedicon.c:395
-msgid "Expected a xemblem_t for xemblemed_icon_t"
-msgstr "Gaidīja xemblem_t priekš xemblemed_icon_t"
+msgid "Expected a GEmblem for GEmblemedIcon"
+msgstr "Gaidīja GEmblem priekš GEmblemedIcon"
 
 #. Translators: This is an error message when
 #. * trying to find the enclosing (user visible)
@@ -1464,12 +1464,12 @@ msgstr "Datņu skaitītājs jau ir aizvērts"
 
 #: gio/gfileicon.c:250
 #, c-format
-msgid "Can’t handle version %d of xfile_icon_t encoding"
-msgstr "Nevar apstrādāt xfile_icon_t versijas %d kodējumu"
+msgid "Can’t handle version %d of GFileIcon encoding"
+msgstr "Nevar apstrādāt GFileIcon versijas %d kodējumu"
 
 #: gio/gfileicon.c:260
-msgid "Malformed input data for xfile_icon_t"
-msgstr "Slikti formēti xfile_icon_t ievades dati"
+msgid "Malformed input data for GFileIcon"
+msgstr "Slikti formēti GFileIcon ievades dati"
 
 #: gio/gfileinputstream.c:149 gio/gfileinputstream.c:394
 #: gio/gfileiostream.c:167 gio/gfileoutputstream.c:164
@@ -1536,8 +1536,8 @@ msgstr "Nav tips klases nosaukumam %s"
 
 #: gio/gicon.c:328
 #, c-format
-msgid "Type %s does not implement the xicon_t interface"
-msgstr "Tips %s nav realizējis xicon_t saskarni"
+msgid "Type %s does not implement the GIcon interface"
+msgstr "Tips %s nav realizējis GIcon saskarni"
 
 #: gio/gicon.c:339
 #, c-format
@@ -1551,8 +1551,8 @@ msgstr "Slikti formēts versijas numurs — %s"
 
 #: gio/gicon.c:367
 #, c-format
-msgid "Type %s does not implement from_tokens() on the xicon_t interface"
-msgstr "Tips %s nerealizē from_tokens() uz xicon_t saskarnes"
+msgid "Type %s does not implement from_tokens() on the GIcon interface"
+msgstr "Tips %s nerealizē from_tokens() uz GIcon saskarnes"
 
 #: gio/gicon.c:469
 msgid "Can’t handle the supplied version of the icon encoding"
@@ -2722,8 +2722,8 @@ msgstr "<%s id='%s'> (vēl) nav definēts."
 
 #: gio/glib-compile-schemas.c:1017
 #, c-format
-msgid "Invalid xvariant_t type string “%s”"
-msgstr "Nederīga xvariant_t tipa virkne “%s”"
+msgid "Invalid GVariant type string “%s”"
+msgstr "Nederīga GVariant tipa virkne “%s”"
 
 #: gio/glib-compile-schemas.c:1047
 msgid "<override> given but schema isn’t extending anything"
@@ -2949,11 +2949,11 @@ msgstr "Neuzspiest atslēgu nosaukumu ierobežojumus"
 
 #: gio/glib-compile-schemas.c:2205
 msgid ""
-"Compile all xsettings_t schema files into a schema cache.\n"
+"Compile all GSettings schema files into a schema cache.\n"
 "Schema files are required to have the extension .gschema.xml,\n"
 "and the cache file is called gschemas.compiled."
 msgstr ""
-"Kompilēt visas xsettings_t shēmas datnes uz shēmas kešu.\n"
+"Kompilēt visas GSettings shēmas datnes uz shēmas kešu.\n"
 "Shēmu datņu nosaukumiem ir jābūt ar paplašinājumu .gschema.xml,\n"
 "un keša datnēm ir jāsaucas gschemas.compiled."
 
@@ -3306,16 +3306,16 @@ msgid "Error removing old file: %s"
 msgstr "Kļūda, dzēšot veco datni — %s"
 
 #: gio/gmemoryinputstream.c:474 gio/gmemoryoutputstream.c:772
-msgid "Invalid xseek_type_t supplied"
-msgstr "Piegādāts nederīgs xseek_type_t"
+msgid "Invalid GSeekType supplied"
+msgstr "Piegādāts nederīgs GSeekType"
 
 #: gio/gmemoryinputstream.c:484
 msgid "Invalid seek request"
 msgstr "Nederīgs meklēšanas pieprasījums"
 
 #: gio/gmemoryinputstream.c:508
-msgid "Cannot truncate xmemory_input_stream_t"
-msgstr "Nevar apraut xmemory_input_stream_t"
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "Nevar apraut GMemoryInputStream"
 
 #: gio/gmemoryoutputstream.c:567
 msgid "Memory output stream not resizable"
@@ -3845,8 +3845,8 @@ msgstr "Ligzdai I/O iestājās noildze"
 
 #: gio/gsocket.c:578
 #, c-format
-msgid "creating xsocket_t from fd: %s"
-msgstr "izveido xsocket_t no fd — %s"
+msgid "creating GSocket from fd: %s"
+msgstr "izveido GSocket no fd — %s"
 
 #: gio/gsocket.c:607 gio/gsocket.c:671 gio/gsocket.c:678
 #, c-format
@@ -3987,8 +3987,8 @@ msgid "Error sending message: %s"
 msgstr "Kļūda, sūtot ziņojumu — %s"
 
 #: gio/gsocket.c:5026
-msgid "xsocket_control_message_t not supported on Windows"
-msgstr "xsocket_control_message_t nav atbalstīts uz Windows"
+msgid "GSocketControlMessage not supported on Windows"
+msgstr "GSocketControlMessage nav atbalstīts uz Windows"
 
 #: gio/gsocket.c:5495 gio/gsocket.c:5571 gio/gsocket.c:5797
 #, c-format
@@ -4001,8 +4001,8 @@ msgid "Unable to read socket credentials: %s"
 msgstr "Nevar nolasīt ligzdas datus — %s"
 
 #: gio/gsocket.c:6136
-msgid "xsocket_get_credentials not implemented for this OS"
-msgstr "xsocket_get_credentials nav implementēts šai OS"
+msgid "g_socket_get_credentials not implemented for this OS"
+msgstr "g_socket_get_credentials nav implementēts šai OS"
 
 #: gio/gsocketclient.c:191
 #, c-format
@@ -4124,8 +4124,8 @@ msgstr "Nezināma SOCKSv5 starpnieka kļūda."
 
 #: gio/gthemedicon.c:595
 #, c-format
-msgid "Can’t handle version %d of xthemed_icon_t encoding"
-msgstr "Nevar apstrādāt xthemed_icon_t versijas %d kodējumu"
+msgid "Can’t handle version %d of GThemedIcon encoding"
+msgstr "Nevar apstrādāt GThemedIcon versijas %d kodējumu"
 
 #: gio/gthreadedresolver.c:152
 msgid "No valid addresses were found"
@@ -4174,8 +4174,8 @@ msgid "Could not parse PEM-encoded certificate"
 msgstr "Nevarēja parsēt PEM-iekodētu sertifikātu"
 
 #: gio/gtlscertificate.c:832
-msgid "This xtls_backend_t does not support creating PKCS #11 certificates"
-msgstr "Šis xtls_backend_t neatbalsta PKCS #11 sertifikātu izveidošanu"
+msgid "This GTlsBackend does not support creating PKCS #11 certificates"
+msgstr "Šis GTlsBackend neatbalsta PKCS #11 sertifikātu izveidošanu"
 
 #: gio/gtlspassword.c:111
 msgid ""
@@ -4475,25 +4475,25 @@ msgstr "Ceļa nosaukums “%s” nav absolūts ceļš"
 
 #. Translators: this is the preferred format for expressing the date and the time
 #: glib/gdatetime.c:226
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%a %b %e %H:%M:%S %Y"
 msgstr "%A, %Y. gada %e. %B, plkst. %H un %M"
 
 #. Translators: this is the preferred format for expressing the date
 #: glib/gdatetime.c:229
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%m/%d/%y"
 msgstr "%d.%m.%Y"
 
 #. Translators: this is the preferred format for expressing the time
 #: glib/gdatetime.c:232
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
 #. Translators: this is the preferred format for expressing 12 hour time
 #: glib/gdatetime.c:235
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "%I:%M:%S %p"
 msgstr "%I:%M:%S %p"
 
@@ -4876,13 +4876,13 @@ msgstr "dec."
 
 #. Translators: 'before midday' indicator
 #: glib/gdatetime.c:594
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "AM"
 msgstr "AM"
 
 #. Translators: 'after midday' indicator
 #: glib/gdatetime.c:597
-msgctxt "xdatetime_t"
+msgctxt "GDateTime"
 msgid "PM"
 msgstr "PM"
 

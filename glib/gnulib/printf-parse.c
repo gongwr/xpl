@@ -152,7 +152,7 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
           dp->precision_arg_index = ARG_NONE;
           dp->arg_index = ARG_NONE;
 
-          /* test_t for positional argument.  */
+          /* Test for positional argument.  */
           if (*cp >= '0' && *cp <= '9')
             {
               const CHAR_T *np;
@@ -209,7 +209,7 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
                   dp->flags |= FLAG_ZERO;
                   cp++;
                 }
-#if __XPLC__ >= 2 && !defined __UCLIBC__
+#if __GLIBC__ >= 2 && !defined __UCLIBC__
               else if (*cp == 'I')
                 {
                   dp->flags |= FLAG_LOCALIZED;
@@ -229,7 +229,7 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
               if (max_width_length < 1)
                 max_width_length = 1;
 
-              /* test_t for positional argument.  */
+              /* Test for positional argument.  */
               if (*cp >= '0' && *cp <= '9')
                 {
                   const CHAR_T *np;
@@ -286,7 +286,7 @@ PRINTF_PARSE (const CHAR_T *format, DIRECTIVES *d, arguments *a)
                   if (max_precision_length < 2)
                     max_precision_length = 2;
 
-                  /* test_t for positional argument.  */
+                  /* Test for positional argument.  */
                   if (*cp >= '0' && *cp <= '9')
                     {
                       const CHAR_T *np;

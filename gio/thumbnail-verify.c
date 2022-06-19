@@ -29,9 +29,9 @@
  */
 typedef struct
 {
-  const xchar_t *uri;
-  xuint64_t      mtime;
-  xuint64_t      size;
+  const gchar *uri;
+  guint64      mtime;
+  guint64      size;
 } ExpectedInfo;
 
 /* We *require* matches on URI and MTime, but the Size field is optional
@@ -43,10 +43,10 @@ typedef struct
 #define MATCHED_MTIME  (1u << 1)
 #define MATCHED_ALL    (MATCHED_URI | MATCHED_MTIME)
 
-static xboolean_t
-check_integer_match (xuint64_t      expected,
-                     const xchar_t *value,
-                     xuint32_t      value_size)
+static gboolean
+check_integer_match (guint64      expected,
+                     const gchar *value,
+                     guint32      value_size)
 {
   /* Would be nice to g_ascii_strtoll here, but we don't have a variant
    * that works on strings that are not nul-terminated.
@@ -60,7 +60,7 @@ check_integer_match (xuint64_t      expected,
   while (expected && value_size)
     {
       /* Check the low-order digit */
-      if (value[value_size - 1] != (xchar_t) ((expected % 10) + '0'))
+      if (value[value_size - 1] != (gchar) ((expected % 10) + '0'))
         return FALSE;
 
       /* Move on... */
@@ -72,17 +72,17 @@ check_integer_match (xuint64_t      expected,
   return !expected && !value_size;
 }
 
-static xboolean_t
+static gboolean
 check_png_info_chunk (ExpectedInfo *expected_info,
-                      const xchar_t  *key,
-                      xuint32_t       key_size,
-                      const xchar_t  *value,
-                      xuint32_t       value_size,
-                      xuint_t        *required_matches)
+                      const gchar  *key,
+                      guint32       key_size,
+                      const gchar  *value,
+                      guint32       value_size,
+                      guint        *required_matches)
 {
   if (key_size == 10 && memcmp (key, "Thumb::URI", 10) == 0)
     {
-      xsize_t expected_size;
+      gsize expected_size;
 
       expected_size = strlen (expected_info->uri);
 
@@ -116,12 +116,12 @@ check_png_info_chunk (ExpectedInfo *expected_info,
   return TRUE;
 }
 
-static xboolean_t
+static gboolean
 check_thumbnail_validity (ExpectedInfo *expected_info,
-                          const xchar_t  *contents,
-                          xsize_t         size)
+                          const gchar  *contents,
+                          gsize         size)
 {
-  xuint_t required_matches = 0;
+  guint required_matches = 0;
 
   /* Reference: http://www.w3.org/TR/PNG/ */
   if (size < 8)
@@ -135,8 +135,8 @@ check_thumbnail_validity (ExpectedInfo *expected_info,
   /* We need at least 12 bytes to have a chunk... */
   while (size >= 12)
     {
-      xuint32_t chunk_size_be;
-      xuint32_t chunk_size;
+      guint32 chunk_size_be;
+      guint32 chunk_size;
 
       /* PNG is not an aligned file format so we have to be careful
        * about reading integers...
@@ -159,8 +159,8 @@ check_thumbnail_validity (ExpectedInfo *expected_info,
       /* We are only interested in tEXt fields */
       if (memcmp (contents, "tEXt", 4) == 0)
         {
-          const xchar_t *key = contents + 4;
-          xuint32_t key_size;
+          const gchar *key = contents + 4;
+          guint32 key_size;
 
           /* We need to find the nul separator character that splits the
            * key/value.  The value is not terminated.
@@ -174,8 +174,8 @@ check_thumbnail_validity (ExpectedInfo *expected_info,
             {
               if (key[key_size] == '\0')
                 {
-                  const xchar_t *value;
-                  xuint32_t value_size;
+                  const gchar *value;
+                  guint32 value_size;
 
                   /* Since key_size < chunk_size, value_size is
                    * definitely non-negative.
@@ -219,33 +219,33 @@ out:
   return required_matches == MATCHED_ALL;
 }
 
-xboolean_t
+gboolean
 thumbnail_verify (const char     *thumbnail_path,
-                  const xchar_t    *file_uri,
+                  const gchar    *file_uri,
                   const GLocalFileStat *file_stat_buf)
 {
-  xboolean_t thumbnail_is_valid = FALSE;
+  gboolean thumbnail_is_valid = FALSE;
   ExpectedInfo expected_info;
-  xmapped_file_t *file;
+  GMappedFile *file;
 
   if (file_stat_buf == NULL)
     return FALSE;
 
   expected_info.uri = file_uri;
 #ifdef G_OS_WIN32
-  expected_info.mtime = (xuint64_t) file_stat_buf->st_mtim.tv_sec;
+  expected_info.mtime = (guint64) file_stat_buf->st_mtim.tv_sec;
 #else
   expected_info.mtime = _g_stat_mtime (file_stat_buf);
 #endif
   expected_info.size = _g_stat_size (file_stat_buf);
 
-  file = xmapped_file_new (thumbnail_path, FALSE, NULL);
+  file = g_mapped_file_new (thumbnail_path, FALSE, NULL);
   if (file)
     {
       thumbnail_is_valid = check_thumbnail_validity (&expected_info,
-                                                     xmapped_file_get_contents (file),
-                                                     xmapped_file_get_length (file));
-      xmapped_file_unref (file);
+                                                     g_mapped_file_get_contents (file),
+                                                     g_mapped_file_get_length (file));
+      g_mapped_file_unref (file);
     }
 
   return thumbnail_is_valid;

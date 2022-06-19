@@ -1,4 +1,4 @@
-/* GMODULE - XPL wrapper code for dynamic module loading
+/* GMODULE - GLIB wrapper code for dynamic module loading
  * Copyright (C) 1998 Tim Janik
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
 #ifndef __GMODULE_H__
@@ -33,13 +33,13 @@ G_BEGIN_DECLS
  * to feature Windows dll stubs.
  */
 #define	G_MODULE_IMPORT		extern
-#ifdef XPLATFORM_WIN32
+#ifdef G_PLATFORM_WIN32
 #  define	G_MODULE_EXPORT		__declspec(dllexport)
 #elif __GNUC__ >= 4
 #  define	G_MODULE_EXPORT		__attribute__((visibility("default")))
-#else /* !XPLATFORM_WIN32 && __GNUC__ < 4 */
+#else /* !G_PLATFORM_WIN32 && __GNUC__ < 4 */
 #  define	G_MODULE_EXPORT
-#endif /* !XPLATFORM_WIN32 */
+#endif /* !G_PLATFORM_WIN32 */
 
 /**
  * GModuleFlags:
@@ -63,12 +63,12 @@ typedef enum
 } GModuleFlags;
 
 typedef	struct _GModule			 GModule;
-typedef const xchar_t* (*GModuleCheckInit) (GModule	*module);
+typedef const gchar* (*GModuleCheckInit) (GModule	*module);
 typedef void	     (*GModuleUnload)	 (GModule	*module);
 
-#define G_MODULE_ERROR g_module_error_quark () XPL_AVAILABLE_MACRO_IN_2_70
-XPL_AVAILABLE_IN_2_70
-xquark g_module_error_quark (void);
+#define G_MODULE_ERROR g_module_error_quark () GLIB_AVAILABLE_MACRO_IN_2_70
+GLIB_AVAILABLE_IN_2_70
+GQuark g_module_error_quark (void);
 
 /**
  * GModuleError:
@@ -84,43 +84,43 @@ typedef enum
   G_MODULE_ERROR_FAILED,
   G_MODULE_ERROR_CHECK_FAILED,
 } GModuleError
-XPL_AVAILABLE_ENUMERATOR_IN_2_70;
+GLIB_AVAILABLE_ENUMERATOR_IN_2_70;
 
 /* return TRUE if dynamic module loading is supported */
-XPL_AVAILABLE_IN_ALL
-xboolean_t	g_module_supported	   (void) G_GNUC_CONST;
+GLIB_AVAILABLE_IN_ALL
+gboolean	g_module_supported	   (void) G_GNUC_CONST;
 
 /* open a module 'file_name' and return handle, which is NULL on error */
-XPL_AVAILABLE_IN_ALL
-GModule*              g_module_open          (const xchar_t  *file_name,
+GLIB_AVAILABLE_IN_ALL
+GModule*              g_module_open          (const gchar  *file_name,
 					      GModuleFlags  flags);
 
-XPL_AVAILABLE_IN_2_70
-GModule              *g_module_open_full     (const xchar_t   *file_name,
+GLIB_AVAILABLE_IN_2_70
+GModule              *g_module_open_full     (const gchar   *file_name,
                                               GModuleFlags   flags,
-                                              xerror_t       **error);
+                                              GError       **error);
 
 /* close a previously opened module, returns TRUE on success */
-XPL_AVAILABLE_IN_ALL
-xboolean_t              g_module_close         (GModule      *module);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_module_close         (GModule      *module);
 
 /* make a module resident so g_module_close on it will be ignored */
-XPL_AVAILABLE_IN_ALL
+GLIB_AVAILABLE_IN_ALL
 void                  g_module_make_resident (GModule      *module);
 
 /* query the last module error as a string */
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_module_error         (void);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_module_error         (void);
 
 /* retrieve a symbol pointer from 'module', returns TRUE on success */
-XPL_AVAILABLE_IN_ALL
-xboolean_t              g_module_symbol        (GModule      *module,
-					      const xchar_t  *symbol_name,
-					      xpointer_t     *symbol);
+GLIB_AVAILABLE_IN_ALL
+gboolean              g_module_symbol        (GModule      *module,
+					      const gchar  *symbol_name,
+					      gpointer     *symbol);
 
 /* retrieve the file name from an existing module */
-XPL_AVAILABLE_IN_ALL
-const xchar_t *         g_module_name          (GModule      *module);
+GLIB_AVAILABLE_IN_ALL
+const gchar *         g_module_name          (GModule      *module);
 
 /* Build the actual file name containing a module. 'directory' is the
  * directory where the module file is supposed to be, or NULL or empty
@@ -133,9 +133,9 @@ const xchar_t *         g_module_name          (GModule      *module);
  *
  * No checks are made that the file exists, or is of correct type.
  */
-XPL_AVAILABLE_IN_ALL
-xchar_t*                g_module_build_path    (const xchar_t  *directory,
-					      const xchar_t  *module_name);
+GLIB_AVAILABLE_IN_ALL
+gchar*                g_module_build_path    (const gchar  *directory,
+					      const gchar  *module_name);
 
 G_END_DECLS
 

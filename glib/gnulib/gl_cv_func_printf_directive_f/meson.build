@@ -3,7 +3,7 @@
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
-# test_t whether the *printf family of functions supports the %F format
+# Test whether the *printf family of functions supports the %F format
 # directive. (ISO C99, POSIX:2001)
 # Result is gl_cv_func_printf_directive_f.
 

@@ -25,38 +25,38 @@
 #include "gdbus-tests.h"
 
 /* all tests rely on a shared mainloop */
-static xmain_loop_t *loop = NULL;
+static GMainLoop *loop = NULL;
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-proxy_new_cb (xobject_t       *source_object,
-              xasync_result_t  *res,
-              xpointer_t       user_data)
+proxy_new_cb (GObject       *source_object,
+              GAsyncResult  *res,
+              gpointer       user_data)
 {
-  xdbus_proxy_t **ret = user_data;
-  xerror_t *error;
+  GDBusProxy **ret = user_data;
+  GError *error;
 
   error = NULL;
-  *ret = xdbus_proxy_new_finish (res, &error);
+  *ret = g_dbus_proxy_new_finish (res, &error);
   g_assert_no_error (error);
   g_assert_nonnull (ret);
 
-  xmain_loop_quit (loop);
+  g_main_loop_quit (loop);
 }
 
 static void
 test_proxy_unique_name (void)
 {
-  xdbus_proxy_t *wp;
-  xdbus_proxy_t *p;
-  xdbus_proxy_t *ap;
-  xdbus_connection_t *c;
-  xerror_t *error;
-  xchar_t *name_owner;
-  xchar_t **property_names;
-  xvariant_t *variant;
-  xvariant_t *result;
+  GDBusProxy *wp;
+  GDBusProxy *p;
+  GDBusProxy *ap;
+  GDBusConnection *c;
+  GError *error;
+  gchar *name_owner;
+  gchar **property_names;
+  GVariant *variant;
+  GVariant *result;
   char *unique_name;
 
   session_bus_up ();
@@ -67,13 +67,13 @@ test_proxy_unique_name (void)
   g_assert_nonnull (c);
 
   /* use a proxy to the well-known name to set things up */
-  wp = xdbus_proxy_new_sync (c,
+  wp = g_dbus_proxy_new_sync (c,
                               G_DBUS_PROXY_FLAGS_NONE,
-                              NULL,                      /* xdbus_interface_info_t* */
+                              NULL,                      /* GDBusInterfaceInfo* */
                               "com.example.TestService", /* name */
-                              "/com/example/test_object_t", /* object path */
+                              "/com/example/TestObject", /* object path */
                               "com.example.Frob",        /* interface name */
-                              NULL,                      /* xcancellable_t */
+                              NULL,                      /* GCancellable */
                               &error);
   g_assert_no_error (error);
 
@@ -84,86 +84,86 @@ test_proxy_unique_name (void)
   _g_assert_property_notify (wp, "g-name-owner");
 
   /* now get the unique name of testserver's connection */
-  unique_name = xdbus_proxy_get_name_owner (wp);
+  unique_name = g_dbus_proxy_get_name_owner (wp);
 
   /* if we create another a proxy with the service being available, check that
    * it has a name owner and properties
    */
   error = NULL;
-  p = xdbus_proxy_new_sync (c,
+  p = g_dbus_proxy_new_sync (c,
                               G_DBUS_PROXY_FLAGS_NONE,
-                              NULL,                      /* xdbus_interface_info_t* */
+                              NULL,                      /* GDBusInterfaceInfo* */
                               unique_name,               /* name */
-                              "/com/example/test_object_t", /* object path */
+                              "/com/example/TestObject", /* object path */
                               "com.example.Frob",        /* interface name */
-                              NULL,                      /* xcancellable_t */
+                              NULL,                      /* GCancellable */
                               &error);
   g_assert_no_error (error);
-  name_owner = xdbus_proxy_get_name_owner (p);
-  property_names = xdbus_proxy_get_cached_property_names (p);
+  name_owner = g_dbus_proxy_get_name_owner (p);
+  property_names = g_dbus_proxy_get_cached_property_names (p);
   g_assert_true (g_dbus_is_unique_name (name_owner));
   g_assert_nonnull (property_names);
-  g_assert_cmpint (xstrv_length (property_names), >, 0);
+  g_assert_cmpint (g_strv_length (property_names), >, 0);
   g_free (name_owner);
-  xstrfreev (property_names);
+  g_strfreev (property_names);
 
   /* also for async: we should have a name owner and cached properties */
-  xdbus_proxy_new (c,
+  g_dbus_proxy_new (c,
                     G_DBUS_PROXY_FLAGS_NONE,
-                    NULL,                      /* xdbus_interface_info_t* */
+                    NULL,                      /* GDBusInterfaceInfo* */
                     unique_name,               /* name */
-                    "/com/example/test_object_t", /* object path */
+                    "/com/example/TestObject", /* object path */
                     "com.example.Frob",        /* interface name */
-                    NULL,                      /* xcancellable_t */
-                    (xasync_ready_callback_t) proxy_new_cb,
+                    NULL,                      /* GCancellable */
+                    (GAsyncReadyCallback) proxy_new_cb,
                     &ap);
-  xmain_loop_run (loop);
-  name_owner = xdbus_proxy_get_name_owner (ap);
-  property_names = xdbus_proxy_get_cached_property_names (ap);
+  g_main_loop_run (loop);
+  name_owner = g_dbus_proxy_get_name_owner (ap);
+  property_names = g_dbus_proxy_get_cached_property_names (ap);
   g_assert_true (g_dbus_is_unique_name (name_owner));
   g_assert_nonnull (property_names);
-  g_assert_cmpint (xstrv_length (property_names), >, 0);
+  g_assert_cmpint (g_strv_length (property_names), >, 0);
   g_free (name_owner);
-  xstrfreev (property_names);
+  g_strfreev (property_names);
 
   /* Check property value is the initial value */
-  variant = xdbus_proxy_get_cached_property (p, "y");
+  variant = g_dbus_proxy_get_cached_property (p, "y");
   g_assert_nonnull (variant);
-  g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
-  xvariant_unref (variant);
-  variant = xdbus_proxy_get_cached_property (ap, "y");
+  g_assert_cmpint (g_variant_get_byte (variant), ==, 1);
+  g_variant_unref (variant);
+  variant = g_dbus_proxy_get_cached_property (ap, "y");
   g_assert_nonnull (variant);
-  g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
-  xvariant_unref (variant);
+  g_assert_cmpint (g_variant_get_byte (variant), ==, 1);
+  g_variant_unref (variant);
 
   /* Check that properties are updated on p */
-  result = xdbus_proxy_call_sync (p,
+  result = g_dbus_proxy_call_sync (p,
                                    "FrobSetProperty",
-                                   xvariant_new ("(sv)",
+                                   g_variant_new ("(sv)",
                                                   "y",
-                                                  xvariant_new_byte (42)),
+                                                  g_variant_new_byte (42)),
                                    G_DBUS_CALL_FLAGS_NONE,
                                    -1,
                                    NULL,
                                    &error);
   g_assert_no_error (error);
   g_assert_nonnull (result);
-  g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
-  xvariant_unref (result);
+  g_assert_cmpstr (g_variant_get_type_string (result), ==, "()");
+  g_variant_unref (result);
   _g_assert_signal_received (p, "g-properties-changed");
-  variant = xdbus_proxy_get_cached_property (p, "y");
+  variant = g_dbus_proxy_get_cached_property (p, "y");
   g_assert_nonnull (variant);
-  g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
-  xvariant_unref (variant);
-  variant = xdbus_proxy_get_cached_property (ap, "y");
+  g_assert_cmpint (g_variant_get_byte (variant), ==, 42);
+  g_variant_unref (variant);
+  variant = g_dbus_proxy_get_cached_property (ap, "y");
   g_assert_nonnull (variant);
-  g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
-  xvariant_unref (variant);
+  g_assert_cmpint (g_variant_get_byte (variant), ==, 42);
+  g_variant_unref (variant);
 
   /* Nuke the service and check that we get the signal and then don't
    * have a name owner nor any cached properties
    */
-  result = xdbus_proxy_call_sync (p,
+  result = g_dbus_proxy_call_sync (p,
                                    "Quit",
                                    NULL,
                                    G_DBUS_CALL_FLAGS_NONE,
@@ -172,22 +172,22 @@ test_proxy_unique_name (void)
                                    &error);
   g_assert_no_error (error);
   g_assert_nonnull (result);
-  g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
-  xvariant_unref (result);
+  g_assert_cmpstr (g_variant_get_type_string (result), ==, "()");
+  g_variant_unref (result);
   /* and wait... */
   _g_assert_property_notify (p, "g-name-owner");
   /* now we shouldn't have a name owner nor any cached properties */
-  g_assert_cmpstr (xdbus_proxy_get_name_owner (p), ==, NULL);
-  g_assert_null (xdbus_proxy_get_cached_property_names (p));
-  g_assert_null (xdbus_proxy_get_cached_property (p, "y"));
+  g_assert_cmpstr (g_dbus_proxy_get_name_owner (p), ==, NULL);
+  g_assert_null (g_dbus_proxy_get_cached_property_names (p));
+  g_assert_null (g_dbus_proxy_get_cached_property (p, "y"));
 
-  xobject_unref (p);
-  xobject_unref (ap);
+  g_object_unref (p);
+  g_object_unref (ap);
 
-  xobject_unref (wp);
+  g_object_unref (wp);
   g_free (unique_name);
 
-  xobject_unref (c);
+  g_object_unref (c);
 
   /* tear down bus */
   session_bus_down ();
@@ -199,12 +199,12 @@ int
 main (int   argc,
       char *argv[])
 {
-  xint_t ret;
+  gint ret;
 
   g_test_init (&argc, &argv, NULL);
 
   /* all the tests rely on a shared main loop */
-  loop = xmain_loop_new (NULL, FALSE);
+  loop = g_main_loop_new (NULL, FALSE);
 
   g_test_dbus_unset ();
 

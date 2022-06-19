@@ -1,4 +1,4 @@
-/* xobject_t - GLib Type, Object, Parameter and Signal Library
+/* GObject - GLib Type, Object, Parameter and Signal Library
  * Copyright (C) 1998-1999, 2000-2001 Tim Janik and Red Hat, Inc.
  *
  * This library is free software; you can redistribute it and/or
@@ -33,59 +33,59 @@ G_BEGIN_DECLS
 
 /* --- typedefs --- */
 typedef struct _GObjectNotifyContext          GObjectNotifyContext;
-typedef struct _xobject_notify_queue            xobject_notify_queue_t;
-typedef void (*xobject_notify_queue_dispatcher_t) (xobject_t     *object,
-					      xuint_t        n_pspecs,
-					      xparam_spec_t **pspecs);
+typedef struct _GObjectNotifyQueue            GObjectNotifyQueue;
+typedef void (*GObjectNotifyQueueDispatcher) (GObject     *object,
+					      guint        n_pspecs,
+					      GParamSpec **pspecs);
 
 
 /* --- structures --- */
 struct _GObjectNotifyContext
 {
-  xquark                       quark_notify_queue;
-  xobject_notify_queue_dispatcher_t dispatcher;
+  GQuark                       quark_notify_queue;
+  GObjectNotifyQueueDispatcher dispatcher;
   GTrashStack                 *_nqueue_trash; /* unused */
 };
-struct _xobject_notify_queue
+struct _GObjectNotifyQueue
 {
   GObjectNotifyContext *context;
-  xslist_t               *pspecs;
-  xuint16_t               n_pspecs;
-  xuint16_t               freeze_count;
+  GSList               *pspecs;
+  guint16               n_pspecs;
+  guint16               freeze_count;
 };
 
 G_LOCK_DEFINE_STATIC(notify_lock);
 
 /* --- functions --- */
 static void
-xobject_notify_queue_free (xpointer_t data)
+g_object_notify_queue_free (gpointer data)
 {
-  xobject_notify_queue_t *nqueue = data;
+  GObjectNotifyQueue *nqueue = data;
 
-  xslist_free (nqueue->pspecs);
-  g_slice_free (xobject_notify_queue_t, nqueue);
+  g_slist_free (nqueue->pspecs);
+  g_slice_free (GObjectNotifyQueue, nqueue);
 }
 
-static inline xobject_notify_queue_t*
-xobject_notify_queue_freeze (xobject_t		   *object,
+static inline GObjectNotifyQueue*
+g_object_notify_queue_freeze (GObject		   *object,
 			      GObjectNotifyContext *context)
 {
-  xobject_notify_queue_t *nqueue;
+  GObjectNotifyQueue *nqueue;
 
   G_LOCK(notify_lock);
   nqueue = g_datalist_id_get_data (&object->qdata, context->quark_notify_queue);
   if (!nqueue)
     {
-      nqueue = g_slice_new0 (xobject_notify_queue_t);
+      nqueue = g_slice_new0 (GObjectNotifyQueue);
       nqueue->context = context;
       g_datalist_id_set_data_full (&object->qdata, context->quark_notify_queue,
-				   nqueue, xobject_notify_queue_free);
+				   nqueue, g_object_notify_queue_free);
     }
 
   if (nqueue->freeze_count >= 65535)
     g_critical("Free queue for %s (%p) is larger than 65535,"
-               " called xobject_freeze_notify() too often."
-               " Forgot to call xobject_thaw_notify() or infinite loop",
+               " called g_object_freeze_notify() too often."
+               " Forgot to call g_object_thaw_notify() or infinite loop",
                G_OBJECT_TYPE_NAME (object), object);
   else
     nqueue->freeze_count++;
@@ -95,13 +95,13 @@ xobject_notify_queue_freeze (xobject_t		   *object,
 }
 
 static inline void
-xobject_notify_queue_thaw (xobject_t            *object,
-			    xobject_notify_queue_t *nqueue)
+g_object_notify_queue_thaw (GObject            *object,
+			    GObjectNotifyQueue *nqueue)
 {
   GObjectNotifyContext *context = nqueue->context;
-  xparam_spec_t *pspecs_mem[16], **pspecs, **free_me = NULL;
-  xslist_t *slist;
-  xuint_t n_pspecs = 0;
+  GParamSpec *pspecs_mem[16], **pspecs, **free_me = NULL;
+  GSList *slist;
+  guint n_pspecs = 0;
 
   g_return_if_fail (nqueue->freeze_count > 0);
   g_return_if_fail (g_atomic_int_get(&object->ref_count) > 0);
@@ -122,7 +122,7 @@ xobject_notify_queue_thaw (xobject_t            *object,
     return;
   }
 
-  pspecs = nqueue->n_pspecs > 16 ? free_me = g_new (xparam_spec_t*, nqueue->n_pspecs) : pspecs_mem;
+  pspecs = nqueue->n_pspecs > 16 ? free_me = g_new (GParamSpec*, nqueue->n_pspecs) : pspecs_mem;
 
   for (slist = nqueue->pspecs; slist; slist = slist->next)
     {
@@ -138,14 +138,14 @@ xobject_notify_queue_thaw (xobject_t            *object,
 }
 
 static inline void
-xobject_notify_queue_clear (xobject_t            *object,
-			     xobject_notify_queue_t *nqueue)
+g_object_notify_queue_clear (GObject            *object,
+			     GObjectNotifyQueue *nqueue)
 {
   g_return_if_fail (nqueue->freeze_count > 0);
 
   G_LOCK(notify_lock);
 
-  xslist_free (nqueue->pspecs);
+  g_slist_free (nqueue->pspecs);
   nqueue->pspecs = NULL;
   nqueue->n_pspecs = 0;
 
@@ -153,26 +153,26 @@ xobject_notify_queue_clear (xobject_t            *object,
 }
 
 static inline void
-xobject_notify_queue_add (xobject_t            *object,
-			   xobject_notify_queue_t *nqueue,
-			   xparam_spec_t	      *pspec)
+g_object_notify_queue_add (GObject            *object,
+			   GObjectNotifyQueue *nqueue,
+			   GParamSpec	      *pspec)
 {
-  if (pspec->flags & XPARAM_READABLE)
+  if (pspec->flags & G_PARAM_READABLE)
     {
-      xparam_spec_t *redirect;
+      GParamSpec *redirect;
 
       G_LOCK(notify_lock);
 
       g_return_if_fail (nqueue->n_pspecs < 65535);
 
-      redirect = xparam_spec_get_redirect_target (pspec);
+      redirect = g_param_spec_get_redirect_target (pspec);
       if (redirect)
 	pspec = redirect;
-
+	    
       /* we do the deduping in _thaw */
-      if (xslist_find (nqueue->pspecs, pspec) == NULL)
+      if (g_slist_find (nqueue->pspecs, pspec) == NULL)
         {
-          nqueue->pspecs = xslist_prepend (nqueue->pspecs, pspec);
+          nqueue->pspecs = g_slist_prepend (nqueue->pspecs, pspec);
           nqueue->n_pspecs++;
         }
 
@@ -182,11 +182,11 @@ xobject_notify_queue_add (xobject_t            *object,
 
 /* NB: This function is not threadsafe, do not ever use it if
  * you need a threadsafe notify queue.
- * Use xobject_notify_queue_freeze() to acquire the queue and
- * xobject_notify_queue_thaw() after you are done instead.
+ * Use g_object_notify_queue_freeze() to acquire the queue and
+ * g_object_notify_queue_thaw() after you are done instead.
  */
-static inline xobject_notify_queue_t*
-xobject_notify_queue_from_object (xobject_t              *object,
+static inline GObjectNotifyQueue*
+g_object_notify_queue_from_object (GObject              *object,
                                    GObjectNotifyContext *context)
 {
   return g_datalist_id_get_data (&object->qdata, context->quark_notify_queue);

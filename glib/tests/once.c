@@ -23,16 +23,16 @@
 
 #include <glib.h>
 
-#if XPL_SIZEOF_VOID_P > 4
+#if GLIB_SIZEOF_VOID_P > 4
 #define THREADS 1000
 #else
 #define THREADS 100
 #endif
 
-static xpointer_t
-do_once (xpointer_t data)
+static gpointer
+do_once (gpointer data)
 {
-  static xint_t i = 0;
+  static gint i = 0;
 
   i++;
 
@@ -43,31 +43,31 @@ static void
 test_once_single_threaded (void)
 {
   GOnce once = G_ONCE_INIT;
-  xpointer_t res;
+  gpointer res;
 
-  g_test_summary ("test_t g_once() usage from a single thread");
+  g_test_summary ("Test g_once() usage from a single thread");
 
-  xassert (once.status == G_ONCE_STATUS_NOTCALLED);
+  g_assert (once.status == G_ONCE_STATUS_NOTCALLED);
 
   res = g_once (&once, do_once, NULL);
   g_assert_cmpint (GPOINTER_TO_INT (res), ==, 1);
 
-  xassert (once.status == G_ONCE_STATUS_READY);
+  g_assert (once.status == G_ONCE_STATUS_READY);
 
   res = g_once (&once, do_once, NULL);
   g_assert_cmpint (GPOINTER_TO_INT (res), ==, 1);
 }
 
 static GOnce once_multi_threaded = G_ONCE_INIT;
-static xint_t once_multi_threaded_counter = 0;
-static xcond_t once_multi_threaded_cond;
-static xmutex_t once_multi_threaded_mutex;
-static xuint_t once_multi_threaded_n_threads_waiting = 0;
+static gint once_multi_threaded_counter = 0;
+static GCond once_multi_threaded_cond;
+static GMutex once_multi_threaded_mutex;
+static guint once_multi_threaded_n_threads_waiting = 0;
 
-static xpointer_t
-do_once_multi_threaded (xpointer_t data)
+static gpointer
+do_once_multi_threaded (gpointer data)
 {
-  xint_t old_value;
+  gint old_value;
 
   /* While this function should only ever be executed once, by one thread,
    * we should use atomics to ensure that if there were a bug, writes to
@@ -78,11 +78,11 @@ do_once_multi_threaded (xpointer_t data)
   return GINT_TO_POINTER (old_value + 1);
 }
 
-static xpointer_t
-once_thread_func (xpointer_t data)
+static gpointer
+once_thread_func (gpointer data)
 {
-  xpointer_t res;
-  xuint_t n_threads_expected = GPOINTER_TO_UINT (data);
+  gpointer res;
+  guint n_threads_expected = GPOINTER_TO_UINT (data);
 
   /* Don’t immediately call g_once(), otherwise the first thread to be created
    * will end up calling the once-function, and there will be very little
@@ -106,13 +106,13 @@ once_thread_func (xpointer_t data)
 static void
 test_once_multi_threaded (void)
 {
-  xuint_t i;
-  xthread_t *threads[THREADS];
+  guint i;
+  GThread *threads[THREADS];
 
-  g_test_summary ("test_t g_once() usage from multiple threads");
+  g_test_summary ("Test g_once() usage from multiple threads");
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    threads[i] = xthread_new ("once-multi-threaded",
+    threads[i] = g_thread_new ("once-multi-threaded",
                                once_thread_func,
                                GUINT_TO_POINTER (G_N_ELEMENTS (threads)));
 
@@ -120,7 +120,7 @@ test_once_multi_threaded (void)
   g_cond_broadcast (&once_multi_threaded_cond);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   g_assert_cmpint (g_atomic_int_get (&once_multi_threaded_counter), ==, 1);
 }
@@ -128,13 +128,13 @@ test_once_multi_threaded (void)
 static void
 test_once_init_single_threaded (void)
 {
-  static xsize_t init = 0;
+  static gsize init = 0;
 
-  g_test_summary ("test_t g_once_init_{enter,leave}() usage from a single thread");
+  g_test_summary ("Test g_once_init_{enter,leave}() usage from a single thread");
 
   if (g_once_init_enter (&init))
     {
-      xassert (TRUE);
+      g_assert (TRUE);
       g_once_init_leave (&init, 1);
     }
 
@@ -147,12 +147,12 @@ test_once_init_single_threaded (void)
   g_assert_cmpint (init, ==, 1);
 }
 
-static sint64_t shared;
+static gint64 shared;
 
 static void
 init_shared (void)
 {
-  static xsize_t init = 0;
+  static gsize init = 0;
 
   if (g_once_init_enter (&init))
     {
@@ -162,8 +162,8 @@ init_shared (void)
     }
 }
 
-static xpointer_t
-thread_func (xpointer_t data)
+static gpointer
+thread_func (gpointer data)
 {
   init_shared ();
 
@@ -173,18 +173,18 @@ thread_func (xpointer_t data)
 static void
 test_once_init_multi_threaded (void)
 {
-  xsize_t i;
-  xthread_t *threads[THREADS];
+  gsize i;
+  GThread *threads[THREADS];
 
-  g_test_summary ("test_t g_once_init_{enter,leave}() usage from multiple threads");
+  g_test_summary ("Test g_once_init_{enter,leave}() usage from multiple threads");
 
   shared = 0;
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    threads[i] = xthread_new ("once-init-multi-threaded", thread_func, NULL);
+    threads[i] = g_thread_new ("once-init-multi-threaded", thread_func, NULL);
 
   for (i = 0; i < G_N_ELEMENTS (threads); i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 
   g_assert_cmpint (shared, ==, 42);
 }
@@ -192,9 +192,9 @@ test_once_init_multi_threaded (void)
 static void
 test_once_init_string (void)
 {
-  static xchar_t *val;
+  static gchar *val;
 
-  g_test_summary ("test_t g_once_init_{enter,leave}() usage with a string");
+  g_test_summary ("Test g_once_init_{enter,leave}() usage with a string");
 
   if (g_once_init_enter (&val))
     g_once_init_leave (&val, "foo");

@@ -26,12 +26,12 @@
 
 /**
  * SECTION:gmenumodel
- * @title: xmenu_model_t
+ * @title: GMenuModel
  * @short_description: An abstract class representing the contents of a menu
  * @include: gio/gio.h
- * @see_also: #xaction_group_t
+ * @see_also: #GActionGroup
  *
- * #xmenu_model_t represents the contents of a menu -- an ordered list of
+ * #GMenuModel represents the contents of a menu -- an ordered list of
  * menu items. The items are associated with actions, which can be
  * activated through them. Items can be grouped in sections, and may
  * have submenus associated with them. Both items and sections usually
@@ -39,10 +39,10 @@
  * the associated action (ie whether it is stateful, and what kind of
  * state it has) can influence the representation of the item.
  *
- * The conceptual model of menus in #xmenu_model_t is hierarchical:
+ * The conceptual model of menus in #GMenuModel is hierarchical:
  * sections and submenus are again represented by #GMenuModels.
  * Menus themselves do not define their own roles. Rather, the role
- * of a particular #xmenu_model_t is defined by the item that references
+ * of a particular #GMenuModel is defined by the item that references
  * it (or, in the case of the 'root' menu, is defined by the context
  * in which it is used).
  *
@@ -85,23 +85,23 @@
  * outside the application. Examples include global menus, jumplists,
  * dash boards, etc. To support such uses, it is necessary to 'export'
  * information about actions and their representation in menus, which
- * is exactly what the [xaction_group_t exporter][gio-xaction_group_t-exporter]
- * and the [xmenu_model_t exporter][gio-xmenu_model_t-exporter] do for
- * #xaction_group_t and #xmenu_model_t. The client-side counterparts to
- * make use of the exported information are #xdbus_action_group_t and
- * #xdbus_menu_model_t.
+ * is exactly what the [GActionGroup exporter][gio-GActionGroup-exporter]
+ * and the [GMenuModel exporter][gio-GMenuModel-exporter] do for
+ * #GActionGroup and #GMenuModel. The client-side counterparts to
+ * make use of the exported information are #GDBusActionGroup and
+ * #GDBusMenuModel.
  *
- * The API of #xmenu_model_t is very generic, with iterators for the
- * attributes and links of an item, see xmenu_model_iterate_item_attributes()
- * and xmenu_model_iterate_item_links(). The 'standard' attributes and
- * link types have predefined names: %XMENU_ATTRIBUTE_LABEL,
- * %XMENU_ATTRIBUTE_ACTION, %XMENU_ATTRIBUTE_TARGET, %XMENU_LINK_SECTION
- * and %XMENU_LINK_SUBMENU.
+ * The API of #GMenuModel is very generic, with iterators for the
+ * attributes and links of an item, see g_menu_model_iterate_item_attributes()
+ * and g_menu_model_iterate_item_links(). The 'standard' attributes and
+ * link types have predefined names: %G_MENU_ATTRIBUTE_LABEL,
+ * %G_MENU_ATTRIBUTE_ACTION, %G_MENU_ATTRIBUTE_TARGET, %G_MENU_LINK_SECTION
+ * and %G_MENU_LINK_SUBMENU.
  *
- * Items in a #xmenu_model_t represent active controls if they refer to
+ * Items in a #GMenuModel represent active controls if they refer to
  * an action that can get activated when the user interacts with the
  * menu item. The reference to the action is encoded by the string id
- * in the %XMENU_ATTRIBUTE_ACTION attribute. An action id uniquely
+ * in the %G_MENU_ATTRIBUTE_ACTION attribute. An action id uniquely
  * identifies an action in an action group. Which action group(s) provide
  * actions depends on the context in which the menu model is used.
  * E.g. when the model is exported as the application menu of a
@@ -117,7 +117,7 @@
  * - an action with no parameter type and boolean state
  * - an action with string parameter type and string state
  *
- * ## Stateless
+ * ## Stateless 
  *
  * A stateless action typically corresponds to an ordinary menu item.
  *
@@ -147,27 +147,27 @@
  */
 
 /**
- * xmenu_model_t:
+ * GMenuModel:
  *
- * #xmenu_model_t is an opaque structure type.  You must access it using the
+ * #GMenuModel is an opaque structure type.  You must access it using the
  * functions below.
  *
  * Since: 2.32
  */
 
 /**
- * xmenu_attribute_iter_t:
+ * GMenuAttributeIter:
  *
- * #xmenu_attribute_iter_t is an opaque structure type.  You must access it
+ * #GMenuAttributeIter is an opaque structure type.  You must access it
  * using the functions below.
  *
  * Since: 2.32
  */
 
 /**
- * xmenu_link_iter_t:
+ * GMenuLinkIter:
  *
- * #xmenu_link_iter_t is an opaque structure type.  You must access it using
+ * #GMenuLinkIter is an opaque structure type.  You must access it using
  * the functions below.
  *
  * Since: 2.32
@@ -175,171 +175,171 @@
 
 typedef struct
 {
-  xmenu_link_iter_t parent_instance;
-  xhash_table_iter_t iter;
-  xhashtable_t *table;
-} xmenu_link_hash_iter_t;
+  GMenuLinkIter parent_instance;
+  GHashTableIter iter;
+  GHashTable *table;
+} GMenuLinkHashIter;
 
-typedef xmenu_link_iter_class_t xmenu_link_hash_iter_class_t;
+typedef GMenuLinkIterClass GMenuLinkHashIterClass;
 
-static xtype_t xmenu_link_hash_iter_get_type (void);
+static GType g_menu_link_hash_iter_get_type (void);
 
-XDEFINE_TYPE (xmenu_link_hash_iter, xmenu_link_hash_iter, XTYPE_MENU_LINK_ITER)
+G_DEFINE_TYPE (GMenuLinkHashIter, g_menu_link_hash_iter, G_TYPE_MENU_LINK_ITER)
 
-static xboolean_t
-xmenu_link_hash_iter_get_next (xmenu_link_iter_t  *link_iter,
-                                const xchar_t   **out_name,
-                                xmenu_model_t    **value)
+static gboolean
+g_menu_link_hash_iter_get_next (GMenuLinkIter  *link_iter,
+                                const gchar   **out_name,
+                                GMenuModel    **value)
 {
-  xmenu_link_hash_iter_t *iter = (xmenu_link_hash_iter_t *) link_iter;
-  xpointer_t keyptr, valueptr;
+  GMenuLinkHashIter *iter = (GMenuLinkHashIter *) link_iter;
+  gpointer keyptr, valueptr;
 
-  if (!xhash_table_iter_next (&iter->iter, &keyptr, &valueptr))
+  if (!g_hash_table_iter_next (&iter->iter, &keyptr, &valueptr))
     return FALSE;
 
   *out_name = keyptr;
-  *value = xobject_ref (valueptr);
+  *value = g_object_ref (valueptr);
 
   return TRUE;
 }
 
 static void
-xmenu_link_hash_iter_finalize (xobject_t *object)
+g_menu_link_hash_iter_finalize (GObject *object)
 {
-  xmenu_link_hash_iter_t *iter = (xmenu_link_hash_iter_t *) object;
+  GMenuLinkHashIter *iter = (GMenuLinkHashIter *) object;
 
-  xhash_table_unref (iter->table);
+  g_hash_table_unref (iter->table);
 
-  XOBJECT_CLASS (xmenu_link_hash_iter_parent_class)
+  G_OBJECT_CLASS (g_menu_link_hash_iter_parent_class)
     ->finalize (object);
 }
 
 static void
-xmenu_link_hash_iter_init (xmenu_link_hash_iter_t *iter)
+g_menu_link_hash_iter_init (GMenuLinkHashIter *iter)
 {
 }
 
 static void
-xmenu_link_hash_iter_class_init (xmenu_link_hash_iter_class_t *class)
+g_menu_link_hash_iter_class_init (GMenuLinkHashIterClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-  object_class->finalize = xmenu_link_hash_iter_finalize;
-  class->get_next = xmenu_link_hash_iter_get_next;
+  object_class->finalize = g_menu_link_hash_iter_finalize;
+  class->get_next = g_menu_link_hash_iter_get_next;
 }
 
 
 typedef struct
 {
-  xmenu_attribute_iter_t parent_instance;
-  xhash_table_iter_t iter;
-  xhashtable_t *table;
-} xmenu_attribute_hash_iter_t;
+  GMenuAttributeIter parent_instance;
+  GHashTableIter iter;
+  GHashTable *table;
+} GMenuAttributeHashIter;
 
-typedef xmenu_attribute_iter_class_t xmenu_attribute_hash_iter_class_t;
+typedef GMenuAttributeIterClass GMenuAttributeHashIterClass;
 
-static xtype_t xmenu_attribute_hash_iter_get_type (void);
+static GType g_menu_attribute_hash_iter_get_type (void);
 
-XDEFINE_TYPE (xmenu_attribute_hash_iter, xmenu_attribute_hash_iter, XTYPE_MENU_ATTRIBUTE_ITER)
+G_DEFINE_TYPE (GMenuAttributeHashIter, g_menu_attribute_hash_iter, G_TYPE_MENU_ATTRIBUTE_ITER)
 
-static xboolean_t
-xmenu_attribute_hash_iter_get_next (xmenu_attribute_iter_t  *attr_iter,
-                                     const xchar_t        **name,
-                                     xvariant_t           **value)
+static gboolean
+g_menu_attribute_hash_iter_get_next (GMenuAttributeIter  *attr_iter,
+                                     const gchar        **name,
+                                     GVariant           **value)
 {
-  xmenu_attribute_hash_iter_t *iter = (xmenu_attribute_hash_iter_t *) attr_iter;
-  xpointer_t keyptr, valueptr;
+  GMenuAttributeHashIter *iter = (GMenuAttributeHashIter *) attr_iter;
+  gpointer keyptr, valueptr;
 
-  if (!xhash_table_iter_next (&iter->iter, &keyptr, &valueptr))
+  if (!g_hash_table_iter_next (&iter->iter, &keyptr, &valueptr))
     return FALSE;
 
   *name = keyptr;
 
-  *value = xvariant_ref (valueptr);
+  *value = g_variant_ref (valueptr);
 
   return TRUE;
 }
 
 static void
-xmenu_attribute_hash_iter_finalize (xobject_t *object)
+g_menu_attribute_hash_iter_finalize (GObject *object)
 {
-  xmenu_attribute_hash_iter_t *iter = (xmenu_attribute_hash_iter_t *) object;
+  GMenuAttributeHashIter *iter = (GMenuAttributeHashIter *) object;
 
-  xhash_table_unref (iter->table);
+  g_hash_table_unref (iter->table);
 
-  XOBJECT_CLASS (xmenu_attribute_hash_iter_parent_class)
+  G_OBJECT_CLASS (g_menu_attribute_hash_iter_parent_class)
     ->finalize (object);
 }
 
 static void
-xmenu_attribute_hash_iter_init (xmenu_attribute_hash_iter_t *iter)
+g_menu_attribute_hash_iter_init (GMenuAttributeHashIter *iter)
 {
 }
 
 static void
-xmenu_attribute_hash_iter_class_init (xmenu_attribute_hash_iter_class_t *class)
+g_menu_attribute_hash_iter_class_init (GMenuAttributeHashIterClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-  object_class->finalize = xmenu_attribute_hash_iter_finalize;
-  class->get_next = xmenu_attribute_hash_iter_get_next;
+  object_class->finalize = g_menu_attribute_hash_iter_finalize;
+  class->get_next = g_menu_attribute_hash_iter_get_next;
 }
 
-G_DEFINE_ABSTRACT_TYPE (xmenu_model, xmenu_model, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (GMenuModel, g_menu_model, G_TYPE_OBJECT)
 
 
-static xuint_t xmenu_model_items_changed_signal;
+static guint g_menu_model_items_changed_signal;
 
-static xmenu_attribute_iter_t *
-xmenu_model_real_iterate_item_attributes (xmenu_model_t *model,
-                                           xint_t        item_index)
+static GMenuAttributeIter *
+g_menu_model_real_iterate_item_attributes (GMenuModel *model,
+                                           gint        item_index)
 {
-  xhashtable_t *table = NULL;
-  xmenu_attribute_iter_t *result;
+  GHashTable *table = NULL;
+  GMenuAttributeIter *result;
 
-  XMENU_MODEL_GET_CLASS (model)->get_item_attributes (model, item_index, &table);
+  G_MENU_MODEL_GET_CLASS (model)->get_item_attributes (model, item_index, &table);
 
   if (table)
     {
-      xmenu_attribute_hash_iter_t *iter = xobject_new (xmenu_attribute_hash_iter_get_type (), NULL);
-      xhash_table_iter_init (&iter->iter, table);
-      iter->table = xhash_table_ref (table);
-      result = XMENU_ATTRIBUTE_ITER (iter);
+      GMenuAttributeHashIter *iter = g_object_new (g_menu_attribute_hash_iter_get_type (), NULL);
+      g_hash_table_iter_init (&iter->iter, table);
+      iter->table = g_hash_table_ref (table);
+      result = G_MENU_ATTRIBUTE_ITER (iter);
     }
   else
     {
-      g_critical ("xmenu_model_t implementation '%s' doesn't override iterate_item_attributes() "
+      g_critical ("GMenuModel implementation '%s' doesn't override iterate_item_attributes() "
                   "and fails to return valid values from get_item_attributes()",
                   G_OBJECT_TYPE_NAME (model));
       result = NULL;
     }
 
   if (table != NULL)
-    xhash_table_unref (table);
+    g_hash_table_unref (table);
 
   return result;
 }
 
-static xvariant_t *
-xmenu_model_real_get_item_attribute_value (xmenu_model_t         *model,
-                                            xint_t                item_index,
-                                            const xchar_t        *attribute,
-                                            const xvariant_type_t *expected_type)
+static GVariant *
+g_menu_model_real_get_item_attribute_value (GMenuModel         *model,
+                                            gint                item_index,
+                                            const gchar        *attribute,
+                                            const GVariantType *expected_type)
 {
-  xhashtable_t *table = NULL;
-  xvariant_t *value = NULL;
+  GHashTable *table = NULL;
+  GVariant *value = NULL;
 
-  XMENU_MODEL_GET_CLASS (model)
+  G_MENU_MODEL_GET_CLASS (model)
     ->get_item_attributes (model, item_index, &table);
 
   if (table != NULL)
     {
-      value = xhash_table_lookup (table, attribute);
+      value = g_hash_table_lookup (table, attribute);
 
       if (value != NULL)
         {
-          if (expected_type == NULL || xvariant_is_of_type (value, expected_type))
-            value = xvariant_ref (value);
+          if (expected_type == NULL || g_variant_is_of_type (value, expected_type))
+            value = g_variant_ref (value);
           else
             value = NULL;
         }
@@ -348,83 +348,83 @@ xmenu_model_real_get_item_attribute_value (xmenu_model_t         *model,
     g_assert_not_reached ();
 
   if (table != NULL)
-    xhash_table_unref (table);
+    g_hash_table_unref (table);
 
   return value;
 }
 
-static xmenu_link_iter_t *
-xmenu_model_real_iterate_item_links (xmenu_model_t *model,
-                                      xint_t        item_index)
+static GMenuLinkIter *
+g_menu_model_real_iterate_item_links (GMenuModel *model,
+                                      gint        item_index)
 {
-  xhashtable_t *table = NULL;
-  xmenu_link_iter_t *result;
+  GHashTable *table = NULL;
+  GMenuLinkIter *result;
 
-  XMENU_MODEL_GET_CLASS (model)
+  G_MENU_MODEL_GET_CLASS (model)
     ->get_item_links (model, item_index, &table);
 
   if (table)
     {
-      xmenu_link_hash_iter_t *iter = xobject_new (xmenu_link_hash_iter_get_type (), NULL);
-      xhash_table_iter_init (&iter->iter, table);
-      iter->table = xhash_table_ref (table);
-      result = XMENU_LINK_ITER (iter);
+      GMenuLinkHashIter *iter = g_object_new (g_menu_link_hash_iter_get_type (), NULL);
+      g_hash_table_iter_init (&iter->iter, table);
+      iter->table = g_hash_table_ref (table);
+      result = G_MENU_LINK_ITER (iter);
     }
   else
     {
-      g_critical ("xmenu_model_t implementation '%s' doesn't override iterate_item_links() "
+      g_critical ("GMenuModel implementation '%s' doesn't override iterate_item_links() "
                   "and fails to return valid values from get_item_links()",
                   G_OBJECT_TYPE_NAME (model));
       result = NULL;
     }
 
   if (table != NULL)
-    xhash_table_unref (table);
+    g_hash_table_unref (table);
 
   return result;
 }
 
-static xmenu_model_t *
-xmenu_model_real_get_item_link (xmenu_model_t  *model,
-                                 xint_t         item_index,
-                                 const xchar_t *link)
+static GMenuModel *
+g_menu_model_real_get_item_link (GMenuModel  *model,
+                                 gint         item_index,
+                                 const gchar *link)
 {
-  xhashtable_t *table = NULL;
-  xmenu_model_t *value = NULL;
+  GHashTable *table = NULL;
+  GMenuModel *value = NULL;
 
-  XMENU_MODEL_GET_CLASS (model)
+  G_MENU_MODEL_GET_CLASS (model)
     ->get_item_links (model, item_index, &table);
 
   if (table != NULL)
-    value = xhash_table_lookup (table, link);
+    value = g_hash_table_lookup (table, link);
   else
     g_assert_not_reached ();
 
   if (value != NULL)
-    xobject_ref (value);
+    g_object_ref (value);
 
   if (table != NULL)
-    xhash_table_unref (table);
+    g_hash_table_unref (table);
 
   return value;
 }
 
 static void
-xmenu_model_init (xmenu_model_t *model)
+g_menu_model_init (GMenuModel *model)
 {
 }
 
 static void
-xmenu_model_class_init (xmenu_model_class_t *class)
+g_menu_model_class_init (GMenuModelClass *class)
 {
-  class->iterate_item_attributes = xmenu_model_real_iterate_item_attributes;
-  class->get_item_attribute_value = xmenu_model_real_get_item_attribute_value;
-  class->iterate_item_links = xmenu_model_real_iterate_item_links;
-  class->get_item_link = xmenu_model_real_get_item_link;
+  class->iterate_item_attributes = g_menu_model_real_iterate_item_attributes;
+  class->get_item_attribute_value = g_menu_model_real_get_item_attribute_value;
+  class->iterate_item_links = g_menu_model_real_iterate_item_links;
+  class->get_item_link = g_menu_model_real_get_item_link;
 
   /**
-   * xmenu_model_t::items-changed:
-   * @model: the #xmenu_model_t that is changing
+   * GMenuModel::items-changed:
+   * @model: the #GMenuModel that is changing
    * @position: the position of the change
    * @removed: the number of items removed
    * @added: the number of items added
@@ -450,24 +450,24 @@ xmenu_model_class_init (xmenu_model_class_t *class)
    * and expect to see the results of the modification that is being
    * reported.  The signal is emitted after the modification.
    **/
-  xmenu_model_items_changed_signal =
-    xsignal_new (I_("items-changed"), XTYPE_MENU_MODEL,
+  g_menu_model_items_changed_signal =
+    g_signal_new (I_("items-changed"), G_TYPE_MENU_MODEL,
                   G_SIGNAL_RUN_LAST, 0, NULL, NULL,
                   _g_cclosure_marshal_VOID__INT_INT_INT,
-                  XTYPE_NONE,
-                  3, XTYPE_INT, XTYPE_INT, XTYPE_INT);
-  xsignal_set_va_marshaller (xmenu_model_items_changed_signal,
-                              XTYPE_FROM_CLASS (class),
+                  G_TYPE_NONE,
+                  3, G_TYPE_INT, G_TYPE_INT, G_TYPE_INT);
+  g_signal_set_va_marshaller (g_menu_model_items_changed_signal,
+                              G_TYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_VOID__INT_INT_INTv);
 }
 
 /**
- * xmenu_model_is_mutable:
- * @model: a #xmenu_model_t
+ * g_menu_model_is_mutable:
+ * @model: a #GMenuModel
  *
  * Queries if @model is mutable.
  *
- * An immutable #xmenu_model_t will never emit the #xmenu_model_t::items-changed
+ * An immutable #GMenuModel will never emit the #GMenuModel::items-changed
  * signal. Consumers of the model may make optimisations accordingly.
  *
  * Returns: %TRUE if the model is mutable (ie: "items-changed" may be
@@ -475,16 +475,16 @@ xmenu_model_class_init (xmenu_model_class_t *class)
  *
  * Since: 2.32
  */
-xboolean_t
-xmenu_model_is_mutable (xmenu_model_t *model)
+gboolean
+g_menu_model_is_mutable (GMenuModel *model)
 {
-  return XMENU_MODEL_GET_CLASS (model)
+  return G_MENU_MODEL_GET_CLASS (model)
     ->is_mutable (model);
 }
 
 /**
- * xmenu_model_get_n_items:
- * @model: a #xmenu_model_t
+ * g_menu_model_get_n_items:
+ * @model: a #GMenuModel
  *
  * Query the number of items in @model.
  *
@@ -492,38 +492,38 @@ xmenu_model_is_mutable (xmenu_model_t *model)
  *
  * Since: 2.32
  */
-xint_t
-xmenu_model_get_n_items (xmenu_model_t *model)
+gint
+g_menu_model_get_n_items (GMenuModel *model)
 {
-  return XMENU_MODEL_GET_CLASS (model)
+  return G_MENU_MODEL_GET_CLASS (model)
     ->get_n_items (model);
 }
 
 /**
- * xmenu_model_iterate_item_attributes:
- * @model: a #xmenu_model_t
+ * g_menu_model_iterate_item_attributes:
+ * @model: a #GMenuModel
  * @item_index: the index of the item
  *
- * Creates a #xmenu_attribute_iter_t to iterate over the attributes of
+ * Creates a #GMenuAttributeIter to iterate over the attributes of
  * the item at position @item_index in @model.
  *
- * You must free the iterator with xobject_unref() when you are done.
+ * You must free the iterator with g_object_unref() when you are done.
  *
- * Returns: (transfer full): a new #xmenu_attribute_iter_t
+ * Returns: (transfer full): a new #GMenuAttributeIter
  *
  * Since: 2.32
  */
-xmenu_attribute_iter_t *
-xmenu_model_iterate_item_attributes (xmenu_model_t *model,
-                                      xint_t        item_index)
+GMenuAttributeIter *
+g_menu_model_iterate_item_attributes (GMenuModel *model,
+                                      gint        item_index)
 {
-  return XMENU_MODEL_GET_CLASS (model)
+  return G_MENU_MODEL_GET_CLASS (model)
     ->iterate_item_attributes (model, item_index);
 }
 
 /**
- * xmenu_model_get_item_attribute_value:
- * @model: a #xmenu_model_t
+ * g_menu_model_get_item_attribute_value:
+ * @model: a #GMenuModel
  * @item_index: the index of the item
  * @attribute: the attribute to query
  * @expected_type: (nullable): the expected type of the attribute, or
@@ -545,28 +545,28 @@ xmenu_model_iterate_item_attributes (xmenu_model_t *model,
  *
  * Since: 2.32
  */
-xvariant_t *
-xmenu_model_get_item_attribute_value (xmenu_model_t         *model,
-                                       xint_t                item_index,
-                                       const xchar_t        *attribute,
-                                       const xvariant_type_t *expected_type)
+GVariant *
+g_menu_model_get_item_attribute_value (GMenuModel         *model,
+                                       gint                item_index,
+                                       const gchar        *attribute,
+                                       const GVariantType *expected_type)
 {
-  return XMENU_MODEL_GET_CLASS (model)
+  return G_MENU_MODEL_GET_CLASS (model)
     ->get_item_attribute_value (model, item_index, attribute, expected_type);
 }
 
 /**
- * xmenu_model_get_item_attribute:
- * @model: a #xmenu_model_t
+ * g_menu_model_get_item_attribute:
+ * @model: a #GMenuModel
  * @item_index: the index of the item
  * @attribute: the attribute to query
- * @format_string: a #xvariant_t format string
+ * @format_string: a #GVariant format string
  * @...: positional parameters, as per @format_string
  *
  * Queries item at position @item_index in @model for the attribute
  * specified by @attribute.
  *
- * If the attribute exists and matches the #xvariant_type_t corresponding
+ * If the attribute exists and matches the #GVariantType corresponding
  * to @format_string then @format_string is used to deconstruct the
  * value into the positional parameters and %TRUE is returned.
  *
@@ -574,10 +574,10 @@ xmenu_model_get_item_attribute_value (xmenu_model_t         *model,
  * type, then the positional parameters are ignored and %FALSE is
  * returned.
  *
- * This function is a mix of xmenu_model_get_item_attribute_value() and
- * xvariant_get(), followed by a xvariant_unref().  As such,
+ * This function is a mix of g_menu_model_get_item_attribute_value() and
+ * g_variant_get(), followed by a g_variant_unref().  As such,
  * @format_string must make a complete copy of the data (since the
- * #xvariant_t may go away after the call to xvariant_unref()).  In
+ * #GVariant may go away after the call to g_variant_unref()).  In
  * particular, no '&' characters are allowed in @format_string.
  *
  * Returns: %TRUE if the named attribute was found with the expected
@@ -585,92 +585,92 @@ xmenu_model_get_item_attribute_value (xmenu_model_t         *model,
  *
  * Since: 2.32
  */
-xboolean_t
-xmenu_model_get_item_attribute (xmenu_model_t  *model,
-                                 xint_t         item_index,
-                                 const xchar_t *attribute,
-                                 const xchar_t *format_string,
+gboolean
+g_menu_model_get_item_attribute (GMenuModel  *model,
+                                 gint         item_index,
+                                 const gchar *attribute,
+                                 const gchar *format_string,
                                  ...)
 {
-  xvariant_t *value;
+  GVariant *value;
   va_list ap;
 
-  value = xmenu_model_get_item_attribute_value (model, item_index, attribute, NULL);
+  value = g_menu_model_get_item_attribute_value (model, item_index, attribute, NULL);
 
   if (value == NULL)
     return FALSE;
 
-  if (!xvariant_check_format_string (value, format_string, TRUE))
+  if (!g_variant_check_format_string (value, format_string, TRUE))
     {
-      xvariant_unref (value);
+      g_variant_unref (value);
       return FALSE;
     }
 
   va_start (ap, format_string);
-  xvariant_get_va (value, format_string, NULL, &ap);
-  xvariant_unref (value);
+  g_variant_get_va (value, format_string, NULL, &ap);
+  g_variant_unref (value);
   va_end (ap);
 
   return TRUE;
 }
 
 /**
- * xmenu_model_iterate_item_links:
- * @model: a #xmenu_model_t
+ * g_menu_model_iterate_item_links:
+ * @model: a #GMenuModel
  * @item_index: the index of the item
  *
- * Creates a #xmenu_link_iter_t to iterate over the links of the item at
+ * Creates a #GMenuLinkIter to iterate over the links of the item at
  * position @item_index in @model.
  *
- * You must free the iterator with xobject_unref() when you are done.
+ * You must free the iterator with g_object_unref() when you are done.
  *
- * Returns: (transfer full): a new #xmenu_link_iter_t
+ * Returns: (transfer full): a new #GMenuLinkIter
  *
  * Since: 2.32
  */
-xmenu_link_iter_t *
-xmenu_model_iterate_item_links (xmenu_model_t *model,
-                                 xint_t        item_index)
+GMenuLinkIter *
+g_menu_model_iterate_item_links (GMenuModel *model,
+                                 gint        item_index)
 {
-  return XMENU_MODEL_GET_CLASS (model)
+  return G_MENU_MODEL_GET_CLASS (model)
     ->iterate_item_links (model, item_index);
 }
 
 /**
- * xmenu_model_get_item_link:
- * @model: a #xmenu_model_t
+ * g_menu_model_get_item_link:
+ * @model: a #GMenuModel
  * @item_index: the index of the item
  * @link: the link to query
  *
  * Queries the item at position @item_index in @model for the link
  * specified by @link.
  *
- * If the link exists, the linked #xmenu_model_t is returned.  If the link
+ * If the link exists, the linked #GMenuModel is returned.  If the link
  * does not exist, %NULL is returned.
  *
- * Returns: (nullable) (transfer full): the linked #xmenu_model_t, or %NULL
+ * Returns: (nullable) (transfer full): the linked #GMenuModel, or %NULL
  *
  * Since: 2.32
  */
-xmenu_model_t *
-xmenu_model_get_item_link (xmenu_model_t *model,
-                            xint_t        item_index,
-                            const xchar_t *link)
+GMenuModel *
+g_menu_model_get_item_link (GMenuModel *model,
+                            gint        item_index,
+                            const gchar *link)
 {
-  return XMENU_MODEL_GET_CLASS (model)
+  return G_MENU_MODEL_GET_CLASS (model)
     ->get_item_link (model, item_index, link);
 }
 
 /**
- * xmenu_model_items_changed:
- * @model: a #xmenu_model_t
+ * g_menu_model_items_changed:
+ * @model: a #GMenuModel
  * @position: the position of the change
  * @removed: the number of items removed
  * @added: the number of items added
  *
- * Requests emission of the #xmenu_model_t::items-changed signal on @model.
+ * Requests emission of the #GMenuModel::items-changed signal on @model.
  *
- * This function should never be called except by #xmenu_model_t
+ * This function should never be called except by #GMenuModel
  * subclasses.  Any other calls to this function will very likely lead
  * to a violation of the interface of the model.
  *
@@ -681,37 +681,37 @@ xmenu_model_get_item_link (xmenu_model_t *model,
  *
  * The implementation must dispatch this call directly from a mainloop
  * entry and not in response to calls -- particularly those from the
- * #xmenu_model_t API.  Said another way: the menu must not change while
+ * #GMenuModel API.  Said another way: the menu must not change while
  * user code is running without returning to the mainloop.
  *
  * Since: 2.32
  */
 void
-xmenu_model_items_changed (xmenu_model_t *model,
-                            xint_t        position,
-                            xint_t        removed,
-                            xint_t        added)
+g_menu_model_items_changed (GMenuModel *model,
+                            gint        position,
+                            gint        removed,
+                            gint        added)
 {
-  xsignal_emit (model, xmenu_model_items_changed_signal, 0, position, removed, added);
+  g_signal_emit (model, g_menu_model_items_changed_signal, 0, position, removed, added);
 }
 
 struct _GMenuAttributeIterPrivate
 {
-  xquark name;
-  xvariant_t *value;
-  xboolean_t valid;
+  GQuark name;
+  GVariant *value;
+  gboolean valid;
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xmenu_attribute_iter_t, xmenu_attribute_iter, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GMenuAttributeIter, g_menu_attribute_iter, G_TYPE_OBJECT)
 
 /**
- * xmenu_attribute_iter_get_next:
- * @iter: a #xmenu_attribute_iter_t
+ * g_menu_attribute_iter_get_next:
+ * @iter: a #GMenuAttributeIter
  * @out_name: (out) (optional) (transfer none): the type of the attribute
  * @value: (out) (optional) (transfer full): the attribute value
  *
- * This function combines xmenu_attribute_iter_next() with
- * xmenu_attribute_iter_get_name() and xmenu_attribute_iter_get_value().
+ * This function combines g_menu_attribute_iter_next() with
+ * g_menu_attribute_iter_get_name() and g_menu_attribute_iter_get_value().
  *
  * First the iterator is advanced to the next (possibly first) attribute.
  * If that fails, then %FALSE is returned and there are no other
@@ -719,32 +719,32 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xmenu_attribute_iter_t, xmenu_attribute_ite
  *
  * If successful, @name and @value are set to the name and value of the
  * attribute that has just been advanced to.  At this point,
- * xmenu_attribute_iter_get_name() and xmenu_attribute_iter_get_value() will
+ * g_menu_attribute_iter_get_name() and g_menu_attribute_iter_get_value() will
  * return the same values again.
  *
  * The value returned in @name remains valid for as long as the iterator
  * remains at the current position.  The value returned in @value must
- * be unreffed using xvariant_unref() when it is no longer in use.
+ * be unreffed using g_variant_unref() when it is no longer in use.
  *
  * Returns: %TRUE on success, or %FALSE if there is no additional
  *     attribute
  *
  * Since: 2.32
  */
-xboolean_t
-xmenu_attribute_iter_get_next (xmenu_attribute_iter_t  *iter,
-                                const xchar_t        **out_name,
-                                xvariant_t           **value)
+gboolean
+g_menu_attribute_iter_get_next (GMenuAttributeIter  *iter,
+                                const gchar        **out_name,
+                                GVariant           **value)
 {
-  const xchar_t *name;
+  const gchar *name;
 
   if (iter->priv->value)
     {
-      xvariant_unref (iter->priv->value);
+      g_variant_unref (iter->priv->value);
       iter->priv->value = NULL;
     }
 
-  iter->priv->valid = XMENU_ATTRIBUTE_ITER_GET_CLASS (iter)
+  iter->priv->valid = G_MENU_ATTRIBUTE_ITER_GET_CLASS (iter)
     ->get_next (iter, &name, &iter->priv->value);
 
   if (iter->priv->valid)
@@ -754,15 +754,15 @@ xmenu_attribute_iter_get_next (xmenu_attribute_iter_t  *iter,
         *out_name = g_quark_to_string (iter->priv->name);
 
       if (value)
-        *value = xvariant_ref (iter->priv->value);
+        *value = g_variant_ref (iter->priv->value);
     }
 
   return iter->priv->valid;
 }
 
 /**
- * xmenu_attribute_iter_next:
- * @iter: a #xmenu_attribute_iter_t
+ * g_menu_attribute_iter_next:
+ * @iter: a #GMenuAttributeIter
  *
  * Attempts to advance the iterator to the next (possibly first)
  * attribute.
@@ -778,15 +778,15 @@ xmenu_attribute_iter_get_next (xmenu_attribute_iter_t  *iter,
  *
  * Since: 2.32
  */
-xboolean_t
-xmenu_attribute_iter_next (xmenu_attribute_iter_t *iter)
+gboolean
+g_menu_attribute_iter_next (GMenuAttributeIter *iter)
 {
-  return xmenu_attribute_iter_get_next (iter, NULL, NULL);
+  return g_menu_attribute_iter_get_next (iter, NULL, NULL);
 }
 
 /**
- * xmenu_attribute_iter_get_name:
- * @iter: a #xmenu_attribute_iter_t
+ * g_menu_attribute_iter_get_name:
+ * @iter: a #GMenuAttributeIter
  *
  * Gets the name of the attribute at the current iterator position, as
  * a string.
@@ -797,17 +797,17 @@ xmenu_attribute_iter_next (xmenu_attribute_iter_t *iter)
  *
  * Since: 2.32
  */
-const xchar_t *
-xmenu_attribute_iter_get_name (xmenu_attribute_iter_t *iter)
+const gchar *
+g_menu_attribute_iter_get_name (GMenuAttributeIter *iter)
 {
-  xreturn_val_if_fail (iter->priv->valid, 0);
+  g_return_val_if_fail (iter->priv->valid, 0);
 
   return g_quark_to_string (iter->priv->name);
 }
 
 /**
- * xmenu_attribute_iter_get_value:
- * @iter: a #xmenu_attribute_iter_t
+ * g_menu_attribute_iter_get_value:
+ * @iter: a #GMenuAttributeIter
  *
  * Gets the value of the attribute at the current iterator position.
  *
@@ -817,108 +817,108 @@ xmenu_attribute_iter_get_name (xmenu_attribute_iter_t *iter)
  *
  * Since: 2.32
  */
-xvariant_t *
-xmenu_attribute_iter_get_value (xmenu_attribute_iter_t *iter)
+GVariant *
+g_menu_attribute_iter_get_value (GMenuAttributeIter *iter)
 {
-  xreturn_val_if_fail (iter->priv->valid, NULL);
+  g_return_val_if_fail (iter->priv->valid, NULL);
 
-  return xvariant_ref (iter->priv->value);
+  return g_variant_ref (iter->priv->value);
 }
 
 static void
-xmenu_attribute_iter_finalize (xobject_t *object)
+g_menu_attribute_iter_finalize (GObject *object)
 {
-  xmenu_attribute_iter_t *iter = XMENU_ATTRIBUTE_ITER (object);
+  GMenuAttributeIter *iter = G_MENU_ATTRIBUTE_ITER (object);
 
   if (iter->priv->value)
-    xvariant_unref (iter->priv->value);
+    g_variant_unref (iter->priv->value);
 
-  XOBJECT_CLASS (xmenu_attribute_iter_parent_class)
+  G_OBJECT_CLASS (g_menu_attribute_iter_parent_class)
     ->finalize (object);
 }
 
 static void
-xmenu_attribute_iter_init (xmenu_attribute_iter_t *iter)
+g_menu_attribute_iter_init (GMenuAttributeIter *iter)
 {
-  iter->priv = xmenu_attribute_iter_get_instance_private (iter);
+  iter->priv = g_menu_attribute_iter_get_instance_private (iter);
 }
 
 static void
-xmenu_attribute_iter_class_init (xmenu_attribute_iter_class_t *class)
+g_menu_attribute_iter_class_init (GMenuAttributeIterClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-  object_class->finalize = xmenu_attribute_iter_finalize;
+  object_class->finalize = g_menu_attribute_iter_finalize;
 }
 
 struct _GMenuLinkIterPrivate
 {
-  xquark name;
-  xmenu_model_t *value;
-  xboolean_t valid;
+  GQuark name;
+  GMenuModel *value;
+  gboolean valid;
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (xmenu_link_iter_t, xmenu_link_iter, XTYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (GMenuLinkIter, g_menu_link_iter, G_TYPE_OBJECT)
 
 /**
- * xmenu_link_iter_get_next:
- * @iter: a #xmenu_link_iter_t
+ * g_menu_link_iter_get_next:
+ * @iter: a #GMenuLinkIter
  * @out_link: (out) (optional) (transfer none): the name of the link
- * @value: (out) (optional) (transfer full): the linked #xmenu_model_t
+ * @value: (out) (optional) (transfer full): the linked #GMenuModel
  *
- * This function combines xmenu_link_iter_next() with
- * xmenu_link_iter_get_name() and xmenu_link_iter_get_value().
+ * This function combines g_menu_link_iter_next() with
+ * g_menu_link_iter_get_name() and g_menu_link_iter_get_value().
  *
  * First the iterator is advanced to the next (possibly first) link.
  * If that fails, then %FALSE is returned and there are no other effects.
  *
- * If successful, @out_link and @value are set to the name and #xmenu_model_t
+ * If successful, @out_link and @value are set to the name and #GMenuModel
  * of the link that has just been advanced to.  At this point,
- * xmenu_link_iter_get_name() and xmenu_link_iter_get_value() will return the
+ * g_menu_link_iter_get_name() and g_menu_link_iter_get_value() will return the
  * same values again.
  *
  * The value returned in @out_link remains valid for as long as the iterator
  * remains at the current position.  The value returned in @value must
- * be unreffed using xobject_unref() when it is no longer in use.
+ * be unreffed using g_object_unref() when it is no longer in use.
  *
  * Returns: %TRUE on success, or %FALSE if there is no additional link
  *
  * Since: 2.32
  */
-xboolean_t
-xmenu_link_iter_get_next (xmenu_link_iter_t  *iter,
-                           const xchar_t   **out_link,
-                           xmenu_model_t    **value)
+gboolean
+g_menu_link_iter_get_next (GMenuLinkIter  *iter,
+                           const gchar   **out_link,
+                           GMenuModel    **value)
 {
-  const xchar_t *name;
+  const gchar *name;
 
   if (iter->priv->value)
     {
-      xobject_unref (iter->priv->value);
+      g_object_unref (iter->priv->value);
       iter->priv->value = NULL;
     }
 
-  iter->priv->valid = XMENU_LINK_ITER_GET_CLASS (iter)
+  iter->priv->valid = G_MENU_LINK_ITER_GET_CLASS (iter)
     ->get_next (iter, &name, &iter->priv->value);
 
   if (iter->priv->valid)
     {
-      xassert (name != NULL);
+      g_assert (name != NULL);
 
       iter->priv->name = g_quark_from_string (name);
       if (out_link)
         *out_link = g_quark_to_string (iter->priv->name);
 
       if (value)
-        *value = xobject_ref (iter->priv->value);
+        *value = g_object_ref (iter->priv->value);
     }
 
   return iter->priv->valid;
 }
 
 /**
- * xmenu_link_iter_next:
- * @iter: a #xmenu_link_iter_t
+ * g_menu_link_iter_next:
+ * @iter: a #GMenuLinkIter
  *
  * Attempts to advance the iterator to the next (possibly first)
  * link.
@@ -933,15 +933,15 @@ xmenu_link_iter_get_next (xmenu_link_iter_t  *iter,
  *
  * Since: 2.32
  */
-xboolean_t
-xmenu_link_iter_next (xmenu_link_iter_t *iter)
+gboolean
+g_menu_link_iter_next (GMenuLinkIter *iter)
 {
-  return xmenu_link_iter_get_next (iter, NULL, NULL);
+  return g_menu_link_iter_get_next (iter, NULL, NULL);
 }
 
 /**
- * xmenu_link_iter_get_name:
- * @iter: a #xmenu_link_iter_t
+ * g_menu_link_iter_get_name:
+ * @iter: a #GMenuLinkIter
  *
  * Gets the name of the link at the current iterator position.
  *
@@ -951,56 +951,56 @@ xmenu_link_iter_next (xmenu_link_iter_t *iter)
  *
  * Since: 2.32
  */
-const xchar_t *
-xmenu_link_iter_get_name (xmenu_link_iter_t *iter)
+const gchar *
+g_menu_link_iter_get_name (GMenuLinkIter *iter)
 {
-  xreturn_val_if_fail (iter->priv->valid, 0);
+  g_return_val_if_fail (iter->priv->valid, 0);
 
   return g_quark_to_string (iter->priv->name);
 }
 
 /**
- * xmenu_link_iter_get_value:
- * @iter: a #xmenu_link_iter_t
+ * g_menu_link_iter_get_value:
+ * @iter: a #GMenuLinkIter
  *
- * Gets the linked #xmenu_model_t at the current iterator position.
+ * Gets the linked #GMenuModel at the current iterator position.
  *
  * The iterator is not advanced.
  *
- * Returns: (transfer full): the #xmenu_model_t that is linked to
+ * Returns: (transfer full): the #GMenuModel that is linked to
  *
  * Since: 2.32
  */
-xmenu_model_t *
-xmenu_link_iter_get_value (xmenu_link_iter_t *iter)
+GMenuModel *
+g_menu_link_iter_get_value (GMenuLinkIter *iter)
 {
-  xreturn_val_if_fail (iter->priv->valid, NULL);
+  g_return_val_if_fail (iter->priv->valid, NULL);
 
-  return xobject_ref (iter->priv->value);
+  return g_object_ref (iter->priv->value);
 }
 
 static void
-xmenu_link_iter_finalize (xobject_t *object)
+g_menu_link_iter_finalize (GObject *object)
 {
-  xmenu_link_iter_t *iter = XMENU_LINK_ITER (object);
+  GMenuLinkIter *iter = G_MENU_LINK_ITER (object);
 
   if (iter->priv->value)
-    xobject_unref (iter->priv->value);
+    g_object_unref (iter->priv->value);
 
-  XOBJECT_CLASS (xmenu_link_iter_parent_class)
+  G_OBJECT_CLASS (g_menu_link_iter_parent_class)
     ->finalize (object);
 }
 
 static void
-xmenu_link_iter_init (xmenu_link_iter_t *iter)
+g_menu_link_iter_init (GMenuLinkIter *iter)
 {
-  iter->priv = xmenu_link_iter_get_instance_private (iter);
+  iter->priv = g_menu_link_iter_get_instance_private (iter);
 }
 
 static void
-xmenu_link_iter_class_init (xmenu_link_iter_class_t *class)
+g_menu_link_iter_class_init (GMenuLinkIterClass *class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (class);
+  GObjectClass *object_class = G_OBJECT_CLASS (class);
 
-  object_class->finalize = xmenu_link_iter_finalize;
+  object_class->finalize = g_menu_link_iter_finalize;
 }

@@ -16,40 +16,40 @@
  * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __XNETWORK_MONITOR_NETLINK_H__
-#define __XNETWORK_MONITOR_NETLINK_H__
+#ifndef __G_NETWORK_MONITOR_NETLINK_H__
+#define __G_NETWORK_MONITOR_NETLINK_H__
 
 #include "gnetworkmonitorbase.h"
 
 G_BEGIN_DECLS
 
-#define XTYPE_NETWORK_MONITOR_NETLINK         (_xnetwork_monitor_netlink_get_type ())
-#define XNETWORK_MONITOR_NETLINK(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink))
-#define XNETWORK_MONITOR_NETLINK_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_class))
-#define X_IS_NETWORK_MONITOR_NETLINK(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NETWORK_MONITOR_NETLINK))
-#define X_IS_NETWORK_MONITOR_NETLINK_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_NETWORK_MONITOR_NETLINK))
-#define XNETWORK_MONITOR_NETLINK_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NETWORK_MONITOR_NETLINK, xnetwork_monitor_netlink_class))
+#define G_TYPE_NETWORK_MONITOR_NETLINK         (_g_network_monitor_netlink_get_type ())
+#define G_NETWORK_MONITOR_NETLINK(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NETWORK_MONITOR_NETLINK, GNetworkMonitorNetlink))
+#define G_NETWORK_MONITOR_NETLINK_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST((k), G_TYPE_NETWORK_MONITOR_NETLINK, GNetworkMonitorNetlinkClass))
+#define G_IS_NETWORK_MONITOR_NETLINK(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NETWORK_MONITOR_NETLINK))
+#define G_IS_NETWORK_MONITOR_NETLINK_CLASS(k)  (G_TYPE_CHECK_CLASS_TYPE ((k), G_TYPE_NETWORK_MONITOR_NETLINK))
+#define G_NETWORK_MONITOR_NETLINK_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NETWORK_MONITOR_NETLINK, GNetworkMonitorNetlinkClass))
 
-typedef struct _xnetwork_monitor_netlink        xnetwork_monitor_netlink_t;
-typedef struct _xnetwork_monitor_netlink_class   xnetwork_monitor_netlink_class_t;
-typedef struct _xnetwork_monitor_netlink_private xnetwork_monitor_netlink_private_t;
+typedef struct _GNetworkMonitorNetlink        GNetworkMonitorNetlink;
+typedef struct _GNetworkMonitorNetlinkClass   GNetworkMonitorNetlinkClass;
+typedef struct _GNetworkMonitorNetlinkPrivate GNetworkMonitorNetlinkPrivate;
 
-struct _xnetwork_monitor_netlink {
-  xnetwork_monitor_base_t parent_instance;
+struct _GNetworkMonitorNetlink {
+  GNetworkMonitorBase parent_instance;
 
-  xnetwork_monitor_netlink_private_t *priv;
+  GNetworkMonitorNetlinkPrivate *priv;
 };
 
-struct _xnetwork_monitor_netlink_class {
-  xnetwork_monitor_base_class_t parent_class;
+struct _GNetworkMonitorNetlinkClass {
+  GNetworkMonitorBaseClass parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
-  xpointer_t padding[8];
+  gpointer padding[8];
 };
 
-xtype_t _xnetwork_monitor_netlink_get_type (void);
+GType _g_network_monitor_netlink_get_type (void);
 
 G_END_DECLS
 
-#endif /* __XNETWORK_MONITOR_NETLINK_H__ */
+#endif /* __G_NETWORK_MONITOR_NETLINK_H__ */

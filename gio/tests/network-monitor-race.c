@@ -20,54 +20,54 @@
 
 #define MAX_RUNS 20
 
-static xboolean_t
-quit_loop (xpointer_t user_data)
+static gboolean
+quit_loop (gpointer user_data)
 {
-  xmain_loop_quit (user_data);
+  g_main_loop_quit (user_data);
 
   return FALSE;
 }
 
-static xpointer_t
-thread_func (xpointer_t user_data)
+static gpointer
+thread_func (gpointer user_data)
 {
-  xnetwork_monitor_get_default ();
+  g_network_monitor_get_default ();
   g_timeout_add (100, quit_loop, user_data);
 
   return NULL;
 }
 
-static xboolean_t
-call_func (xpointer_t user_data)
+static gboolean
+call_func (gpointer user_data)
 {
-  xthread_t *thread;
+  GThread *thread;
 
-  thread = xthread_new (NULL, thread_func, user_data);
-  xthread_unref (thread);
+  thread = g_thread_new (NULL, thread_func, user_data);
+  g_thread_unref (thread);
 
   return FALSE;
 }
 
-/* test_t that calling xnetwork_monitor_get_default() in a thread doesn’t cause
+/* Test that calling g_network_monitor_get_default() in a thread doesn’t cause
  * a crash. This is a probabilistic test; since it’s testing a race condition,
  * it can’t deterministically reproduce the problem. The threading has to
- * happen in subprocesses, since the result of xnetwork_monitor_get_default()
+ * happen in subprocesses, since the result of g_network_monitor_get_default()
  * is unavoidably cached once created. */
 static void
 test_network_monitor (void)
 {
-  xuint_t ii;
+  guint ii;
 
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=793727");
 
   if (g_test_subprocess ())
     {
-       xmain_loop_t *main_loop;
+       GMainLoop *main_loop;
 
-       main_loop = xmain_loop_new (NULL, FALSE);
+       main_loop = g_main_loop_new (NULL, FALSE);
        g_timeout_add (1, call_func, main_loop);
-       xmain_loop_run (main_loop);
-       xmain_loop_unref (main_loop);
+       g_main_loop_run (main_loop);
+       g_main_loop_unref (main_loop);
 
        return;
     }

@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -20,18 +20,18 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 
 #include "config.h"
 
 /* we know we are deprecated here, no need for warnings */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include "grel.h"
@@ -103,13 +103,13 @@ typedef struct _GRealTuples        GRealTuples;
  **/
 struct _GRelation
 {
-  xint_t fields;
-  xint_t current_field;
-
-  xhashtable_t   *all_tuples;
-  xhashtable_t  **hashed_tuple_tables;
-
-  xint_t count;
+  gint fields;
+  gint current_field;
+  
+  GHashTable   *all_tuples;
+  GHashTable  **hashed_tuple_tables;
+  
+  gint count;
 };
 
 /**
@@ -123,64 +123,64 @@ struct _GRelation
  **/
 struct _GRealTuples
 {
-  xint_t      len;
-  xint_t      width;
-  xpointer_t *data;
+  gint      len;
+  gint      width;
+  gpointer *data;
 };
 
-static xboolean_t
-tuple_equal_2 (xconstpointer v_a,
-	       xconstpointer v_b)
+static gboolean
+tuple_equal_2 (gconstpointer v_a,
+	       gconstpointer v_b)
 {
-  xpointer_t* a = (xpointer_t*) v_a;
-  xpointer_t* b = (xpointer_t*) v_b;
-
+  gpointer* a = (gpointer*) v_a;
+  gpointer* b = (gpointer*) v_b;
+  
   return a[0] == b[0] && a[1] == b[1];
 }
 
-static xuint_t
-tuple_hash_2 (xconstpointer v_a)
+static guint
+tuple_hash_2 (gconstpointer v_a)
 {
-#if XPL_SIZEOF_VOID_P > XPL_SIZEOF_LONG
+#if GLIB_SIZEOF_VOID_P > GLIB_SIZEOF_LONG
   /* In practise this snippet has been written for 64-bit Windows
    * where ints are 32 bits, pointers 64 bits. More exotic platforms
    * need more tweaks.
    */
-  xuint_t* a = (xuint_t*) v_a;
+  guint* a = (guint*) v_a;
 
   return (a[0] ^ a[1] ^ a[2] ^ a[3]);
 #else
-  xpointer_t* a = (xpointer_t*) v_a;
-
-  return (xulong_t)a[0] ^ (xulong_t)a[1];
+  gpointer* a = (gpointer*) v_a;
+  
+  return (gulong)a[0] ^ (gulong)a[1];
 #endif
 }
 
 static GHashFunc
-tuple_hash (xint_t fields)
+tuple_hash (gint fields)
 {
   switch (fields)
     {
     case 2:
       return tuple_hash_2;
     default:
-      xerror ("no tuple hash for %d", fields);
+      g_error ("no tuple hash for %d", fields);
     }
-
+  
   return NULL;
 }
 
 static GEqualFunc
-tuple_equal (xint_t fields)
+tuple_equal (gint fields)
 {
   switch (fields)
     {
     case 2:
       return tuple_equal_2;
     default:
-      xerror ("no tuple equal for %d", fields);
+      g_error ("no tuple equal for %d", fields);
     }
-
+  
   return NULL;
 }
 
@@ -196,31 +196,31 @@ tuple_equal (xint_t fields)
  * Deprecated: 2.26: Rarely used API
  **/
 GRelation*
-g_relation_new (xint_t fields)
+g_relation_new (gint fields)
 {
   GRelation* rel = g_new0 (GRelation, 1);
-
+  
   rel->fields = fields;
-  rel->all_tuples = xhash_table_new (tuple_hash (fields), tuple_equal (fields));
-  rel->hashed_tuple_tables = g_new0 (xhashtable_t*, fields);
-
+  rel->all_tuples = g_hash_table_new (tuple_hash (fields), tuple_equal (fields));
+  rel->hashed_tuple_tables = g_new0 (GHashTable*, fields);
+  
   return rel;
 }
 
 static void
-relation_delete_value_tuple (xpointer_t tuple_key,
-                             xpointer_t tuple_value,
-                             xpointer_t user_data)
+relation_delete_value_tuple (gpointer tuple_key,
+                             gpointer tuple_value,
+                             gpointer user_data)
 {
   GRelation *relation = user_data;
-  xpointer_t *tuple = tuple_value;
-  g_slice_free1 (relation->fields * sizeof (xpointer_t), tuple);
+  gpointer *tuple = tuple_value;
+  g_slice_free1 (relation->fields * sizeof (gpointer), tuple);
 }
 
 static void
-g_relation_free_array (xpointer_t key, xpointer_t value, xpointer_t user_data)
+g_relation_free_array (gpointer key, gpointer value, gpointer user_data)
 {
-  xhash_table_destroy ((xhashtable_t*) value);
+  g_hash_table_destroy ((GHashTable*) value);
 }
 
 /**
@@ -236,22 +236,22 @@ g_relation_free_array (xpointer_t key, xpointer_t value, xpointer_t user_data)
 void
 g_relation_destroy (GRelation *relation)
 {
-  xint_t i;
-
+  gint i;
+  
   if (relation)
     {
       for (i = 0; i < relation->fields; i += 1)
 	{
 	  if (relation->hashed_tuple_tables[i])
 	    {
-	      xhash_table_foreach (relation->hashed_tuple_tables[i], g_relation_free_array, NULL);
-	      xhash_table_destroy (relation->hashed_tuple_tables[i]);
+	      g_hash_table_foreach (relation->hashed_tuple_tables[i], g_relation_free_array, NULL);
+	      g_hash_table_destroy (relation->hashed_tuple_tables[i]);
 	    }
 	}
 
-      xhash_table_foreach (relation->all_tuples, relation_delete_value_tuple, relation);
-      xhash_table_destroy (relation->all_tuples);
-
+      g_hash_table_foreach (relation->all_tuples, relation_delete_value_tuple, relation);
+      g_hash_table_destroy (relation->all_tuples);
+      
       g_free (relation->hashed_tuple_tables);
       g_free (relation);
     }
@@ -271,23 +271,23 @@ g_relation_destroy (GRelation *relation)
  **/
 void
 g_relation_index (GRelation   *relation,
-		  xint_t         field,
+		  gint         field,
 		  GHashFunc    hash_func,
 		  GEqualFunc   key_equal_func)
 {
   g_return_if_fail (relation != NULL);
-
+  
   g_return_if_fail (relation->count == 0 && relation->hashed_tuple_tables[field] == NULL);
-
-  relation->hashed_tuple_tables[field] = xhash_table_new (hash_func, key_equal_func);
+  
+  relation->hashed_tuple_tables[field] = g_hash_table_new (hash_func, key_equal_func);
 }
 
 /**
  * g_relation_insert:
  * @relation: a #GRelation.
  * @...: the fields of the record to add. These must match the
- *       number of fields in the #GRelation, and of type #xpointer_t
- *       or #xconstpointer.
+ *       number of fields in the #GRelation, and of type #gpointer
+ *       or #gconstpointer.
  *
  * Inserts a record into a #GRelation.
  *
@@ -297,79 +297,79 @@ void
 g_relation_insert (GRelation   *relation,
 		   ...)
 {
-  xpointer_t* tuple = g_slice_alloc (relation->fields * sizeof (xpointer_t));
+  gpointer* tuple = g_slice_alloc (relation->fields * sizeof (gpointer));
   va_list args;
-  xint_t i;
-
+  gint i;
+  
   va_start (args, relation);
-
+  
   for (i = 0; i < relation->fields; i += 1)
-    tuple[i] = va_arg (args, xpointer_t);
-
+    tuple[i] = va_arg (args, gpointer);
+  
   va_end (args);
-
-  xhash_table_insert (relation->all_tuples, tuple, tuple);
-
+  
+  g_hash_table_insert (relation->all_tuples, tuple, tuple);
+  
   relation->count += 1;
-
+  
   for (i = 0; i < relation->fields; i += 1)
     {
-      xhashtable_t *table;
-      xpointer_t    key;
-      xhashtable_t *per_key_table;
-
+      GHashTable *table;
+      gpointer    key;
+      GHashTable *per_key_table;
+      
       table = relation->hashed_tuple_tables[i];
-
+      
       if (table == NULL)
 	continue;
-
+      
       key = tuple[i];
-      per_key_table = xhash_table_lookup (table, key);
-
+      per_key_table = g_hash_table_lookup (table, key);
+      
       if (per_key_table == NULL)
 	{
-	  per_key_table = xhash_table_new (tuple_hash (relation->fields), tuple_equal (relation->fields));
-	  xhash_table_insert (table, key, per_key_table);
+	  per_key_table = g_hash_table_new (tuple_hash (relation->fields), tuple_equal (relation->fields));
+	  g_hash_table_insert (table, key, per_key_table);
 	}
-
-      xhash_table_insert (per_key_table, tuple, tuple);
+      
+      g_hash_table_insert (per_key_table, tuple, tuple);
     }
 }
 
 static void
-g_relation_delete_tuple (xpointer_t tuple_key,
-			 xpointer_t tuple_value,
-			 xpointer_t user_data)
+g_relation_delete_tuple (gpointer tuple_key,
+			 gpointer tuple_value,
+			 gpointer user_data)
 {
-  xpointer_t      *tuple = (xpointer_t*) tuple_value;
+  gpointer      *tuple = (gpointer*) tuple_value;
   GRelation     *relation = (GRelation *) user_data;
-  xint_t           j;
-
-  xassert (tuple_key == tuple_value);
-
+  gint           j;
+  
+  g_assert (tuple_key == tuple_value);
+  
   for (j = 0; j < relation->fields; j += 1)
     {
-      xhashtable_t *one_table = relation->hashed_tuple_tables[j];
-      xpointer_t    one_key;
-      xhashtable_t *per_key_table;
-
+      GHashTable *one_table = relation->hashed_tuple_tables[j];
+      gpointer    one_key;
+      GHashTable *per_key_table;
+      
       if (one_table == NULL)
 	continue;
-
+      
       if (j == relation->current_field)
 	/* can't delete from the table we're foreaching in */
 	continue;
-
+      
       one_key = tuple[j];
-
-      per_key_table = xhash_table_lookup (one_table, one_key);
-
-      xhash_table_remove (per_key_table, tuple);
+      
+      per_key_table = g_hash_table_lookup (one_table, one_key);
+      
+      g_hash_table_remove (per_key_table, tuple);
     }
-
-  if (xhash_table_remove (relation->all_tuples, tuple))
-    g_slice_free1 (relation->fields * sizeof (xpointer_t), tuple);
-
+  
+  if (g_hash_table_remove (relation->all_tuples, tuple))
+    g_slice_free1 (relation->fields * sizeof (gpointer), tuple);
+  
   relation->count -= 1;
 }
 
@@ -386,55 +386,55 @@ g_relation_delete_tuple (xpointer_t tuple_key,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-xint_t
+gint
 g_relation_delete  (GRelation     *relation,
-		    xconstpointer  key,
-		    xint_t           field)
+		    gconstpointer  key,
+		    gint           field)
 {
-  xhashtable_t *table;
-  xhashtable_t *key_table;
-  xint_t        count;
-
-  xreturn_val_if_fail (relation != NULL, 0);
+  GHashTable *table; 
+  GHashTable *key_table;
+  gint        count;
+  
+  g_return_val_if_fail (relation != NULL, 0);
 
   table = relation->hashed_tuple_tables[field];
   count = relation->count;
 
-  xreturn_val_if_fail (table != NULL, 0);
-
-  key_table = xhash_table_lookup (table, key);
-
+  g_return_val_if_fail (table != NULL, 0);
+  
+  key_table = g_hash_table_lookup (table, key);
+  
   if (!key_table)
     return 0;
-
+  
   relation->current_field = field;
-
-  xhash_table_foreach (key_table, g_relation_delete_tuple, relation);
-
-  xhash_table_remove (table, key);
-
-  xhash_table_destroy (key_table);
-
+  
+  g_hash_table_foreach (key_table, g_relation_delete_tuple, relation);
+  
+  g_hash_table_remove (table, key);
+  
+  g_hash_table_destroy (key_table);
+  
   /* @@@ FIXME: Remove empty hash tables. */
-
+  
   return count - relation->count;
 }
 
 static void
-g_relation_select_tuple (xpointer_t tuple_key,
-			 xpointer_t tuple_value,
-			 xpointer_t user_data)
+g_relation_select_tuple (gpointer tuple_key,
+			 gpointer tuple_value,
+			 gpointer user_data)
 {
-  xpointer_t    *tuple = (xpointer_t*) tuple_value;
+  gpointer    *tuple = (gpointer*) tuple_value;
   GRealTuples *tuples = (GRealTuples*) user_data;
-  xint_t stride = sizeof (xpointer_t) * tuples->width;
-
-  xassert (tuple_key == tuple_value);
-
+  gint stride = sizeof (gpointer) * tuples->width;
+  
+  g_assert (tuple_key == tuple_value);
+  
   memcpy (tuples->data + (tuples->len * tuples->width),
 	  tuple,
 	  stride);
-
+  
   tuples->len += 1;
 }
 
@@ -454,35 +454,35 @@ g_relation_select_tuple (xpointer_t tuple_key,
  **/
 GTuples*
 g_relation_select (GRelation     *relation,
-		   xconstpointer  key,
-		   xint_t           field)
+		   gconstpointer  key,
+		   gint           field)
 {
-  xhashtable_t  *table;
-  xhashtable_t  *key_table;
-  GRealTuples *tuples;
-  xint_t count;
-
-  xreturn_val_if_fail (relation != NULL, NULL);
+  GHashTable  *table;
+  GHashTable  *key_table;
+  GRealTuples *tuples; 
+  gint count;
+  
+  g_return_val_if_fail (relation != NULL, NULL);
 
   table = relation->hashed_tuple_tables[field];
 
-  xreturn_val_if_fail (table != NULL, NULL);
-
+  g_return_val_if_fail (table != NULL, NULL);
+  
   tuples = g_new0 (GRealTuples, 1);
-  key_table = xhash_table_lookup (table, key);
-
+  key_table = g_hash_table_lookup (table, key);
+  
   if (!key_table)
     return (GTuples*)tuples;
-
+  
   count = g_relation_count (relation, key, field);
-
-  tuples->data = g_malloc (sizeof (xpointer_t) * relation->fields * count);
+  
+  tuples->data = g_malloc (sizeof (gpointer) * relation->fields * count);
   tuples->width = relation->fields;
-
-  xhash_table_foreach (key_table, g_relation_select_tuple, tuples);
-
-  xassert (count == tuples->len);
-
+  
+  g_hash_table_foreach (key_table, g_relation_select_tuple, tuples);
+  
+  g_assert (count == tuples->len);
+  
   return (GTuples*)tuples;
 }
 
@@ -499,26 +499,26 @@ g_relation_select (GRelation     *relation,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-xint_t
+gint
 g_relation_count (GRelation     *relation,
-		  xconstpointer  key,
-		  xint_t           field)
+		  gconstpointer  key,
+		  gint           field)
 {
-  xhashtable_t  *table;
-  xhashtable_t  *key_table;
-
-  xreturn_val_if_fail (relation != NULL, 0);
+  GHashTable  *table;
+  GHashTable  *key_table;
+  
+  g_return_val_if_fail (relation != NULL, 0);
 
   table = relation->hashed_tuple_tables[field];
 
-  xreturn_val_if_fail (table != NULL, 0);
-
-  key_table = xhash_table_lookup (table, key);
-
+  g_return_val_if_fail (table != NULL, 0);
+  
+  key_table = g_hash_table_lookup (table, key);
+  
   if (!key_table)
     return 0;
-
-  return xhash_table_size (key_table);
+  
+  return g_hash_table_size (key_table);
 }
 
 /**
@@ -535,25 +535,25 @@ g_relation_count (GRelation     *relation,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-xboolean_t
+gboolean
 g_relation_exists (GRelation   *relation, ...)
 {
-  xpointer_t *tuple = g_slice_alloc (relation->fields * sizeof (xpointer_t));
+  gpointer *tuple = g_slice_alloc (relation->fields * sizeof (gpointer));
   va_list args;
-  xint_t i;
-  xboolean_t result;
-
+  gint i;
+  gboolean result;
+  
   va_start(args, relation);
-
+  
   for (i = 0; i < relation->fields; i += 1)
-    tuple[i] = va_arg(args, xpointer_t);
-
+    tuple[i] = va_arg(args, gpointer);
+  
   va_end(args);
-
-  result = xhash_table_lookup (relation->all_tuples, tuple) != NULL;
-
-  g_slice_free1 (relation->fields * sizeof (xpointer_t), tuple);
-
+  
+  result = g_hash_table_lookup (relation->all_tuples, tuple) != NULL;
+  
+  g_slice_free1 (relation->fields * sizeof (gpointer), tuple);
+  
   return result;
 }
 
@@ -572,7 +572,7 @@ void
 g_tuples_destroy (GTuples *tuples0)
 {
   GRealTuples *tuples = (GRealTuples*) tuples0;
-
+  
   if (tuples)
     {
       g_free (tuples->data);
@@ -594,16 +594,16 @@ g_tuples_destroy (GTuples *tuples0)
  *
  * Deprecated: 2.26: Rarely used API
  **/
-xpointer_t
+gpointer
 g_tuples_index (GTuples     *tuples0,
-		xint_t         index,
-		xint_t         field)
+		gint         index,
+		gint         field)
 {
   GRealTuples *tuples = (GRealTuples*) tuples0;
-
-  xreturn_val_if_fail (tuples0 != NULL, NULL);
-  xreturn_val_if_fail (field < tuples->width, NULL);
-
+  
+  g_return_val_if_fail (tuples0 != NULL, NULL);
+  g_return_val_if_fail (field < tuples->width, NULL);
+  
   return tuples->data[index * tuples->width + field];
 }
 
@@ -611,41 +611,41 @@ g_tuples_index (GTuples     *tuples0,
  */
 
 static void
-g_relation_print_one (xpointer_t tuple_key,
-		      xpointer_t tuple_value,
-		      xpointer_t user_data)
+g_relation_print_one (gpointer tuple_key,
+		      gpointer tuple_value,
+		      gpointer user_data)
 {
-  xint_t i;
-  xstring_t *xstring;
+  gint i;
+  GString *gstring;
   GRelation* rel = (GRelation*) user_data;
-  xpointer_t* tuples = (xpointer_t*) tuple_value;
+  gpointer* tuples = (gpointer*) tuple_value;
 
-  xstring = xstring_new ("[");
-
+  gstring = g_string_new ("[");
+  
   for (i = 0; i < rel->fields; i += 1)
     {
-      xstring_append_printf (xstring, "%p", tuples[i]);
-
+      g_string_append_printf (gstring, "%p", tuples[i]);
+      
       if (i < (rel->fields - 1))
-	xstring_append (xstring, ",");
+	g_string_append (gstring, ",");
     }
-
-  xstring_append (xstring, "]");
-  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "%s", xstring->str);
-  xstring_free (xstring, TRUE);
+  
+  g_string_append (gstring, "]");
+  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "%s", gstring->str);
+  g_string_free (gstring, TRUE);
 }
 
 static void
-g_relation_print_index (xpointer_t tuple_key,
-			xpointer_t tuple_value,
-			xpointer_t user_data)
+g_relation_print_index (gpointer tuple_key,
+			gpointer tuple_value,
+			gpointer user_data)
 {
   GRelation* rel = (GRelation*) user_data;
-  xhashtable_t* table = (xhashtable_t*) tuple_value;
-
+  GHashTable* table = (GHashTable*) tuple_value;
+  
   g_log (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "*** key %p", tuple_key);
-
-  xhash_table_foreach (table,
+  
+  g_hash_table_foreach (table,
 			g_relation_print_one,
 			rel);
 }
@@ -662,24 +662,24 @@ g_relation_print_index (xpointer_t tuple_key,
 void
 g_relation_print (GRelation *relation)
 {
-  xint_t i;
-
+  gint i;
+  
   g_log (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "*** all tuples (%d)", relation->count);
-
-  xhash_table_foreach (relation->all_tuples,
+  
+  g_hash_table_foreach (relation->all_tuples,
 			g_relation_print_one,
 			relation);
-
+  
   for (i = 0; i < relation->fields; i += 1)
     {
       if (relation->hashed_tuple_tables[i] == NULL)
 	continue;
-
+      
       g_log (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, "*** index %d", i);
-
-      xhash_table_foreach (relation->hashed_tuple_tables[i],
+      
+      g_hash_table_foreach (relation->hashed_tuple_tables[i],
 			    g_relation_print_index,
 			    relation);
     }
-
+  
 }

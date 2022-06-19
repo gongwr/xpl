@@ -8,21 +8,21 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static void
 test_slice_nodebug (void)
 {
-  const xchar_t *oldval;
+  const gchar *oldval;
 
   oldval = g_getenv ("G_SLICE");
   g_unsetenv ("G_SLICE");
 
   if (g_test_subprocess ())
     {
-      xpointer_t p, q;
+      gpointer p, q;
 
       p = g_slice_alloc (237);
       q = g_slice_alloc (259);
       g_slice_free1 (237, p);
       g_slice_free1 (259, q);
 
-      g_slice_debuxtree_statistics ();
+      g_slice_debug_tree_statistics ();
       return;
     }
   g_test_trap_subprocess (NULL, 1000000, 0);
@@ -36,21 +36,21 @@ test_slice_nodebug (void)
 static void
 test_slice_debug (void)
 {
-  const xchar_t *oldval;
+  const gchar *oldval;
 
   oldval = g_getenv ("G_SLICE");
   g_setenv ("G_SLICE", "debug-blocks:always-malloc", TRUE);
 
   if (g_test_subprocess ())
     {
-      xpointer_t p, q;
+      gpointer p, q;
 
       p = g_slice_alloc (237);
       q = g_slice_alloc (259);
       g_slice_free1 (237, p);
       g_slice_free1 (259, q);
 
-      g_slice_debuxtree_statistics ();
+      g_slice_debug_tree_statistics ();
       return;
     }
   g_test_trap_subprocess (NULL, 1000000, 0);
@@ -67,20 +67,20 @@ test_slice_debug (void)
 static void
 test_slice_copy (void)
 {
-  const xchar_t *block = "0123456789ABCDEF";
-  xpointer_t p;
+  const gchar *block = "0123456789ABCDEF";
+  gpointer p;
 
   p = g_slice_copy (12, block);
-  xassert (memcmp (p, block, 12) == 0);
+  g_assert (memcmp (p, block, 12) == 0);
   g_slice_free1 (12, p);
 }
 
 typedef struct {
-  xint_t int1;
-  xint_t int2;
-  xchar_t byte;
-  xpointer_t next;
-  sint64_t more;
+  gint int1;
+  gint int2;
+  gchar byte;
+  gpointer next;
+  gint64 more;
 } TestStruct;
 
 static void
@@ -98,16 +98,16 @@ test_chain (void)
   g_slice_free_chain (TestStruct, head, next);
 }
 
-static xpointer_t chunks[4096][30];
+static gpointer chunks[4096][30];
 
-static xpointer_t
-thread_allocate (xpointer_t data)
+static gpointer
+thread_allocate (gpointer data)
 {
-  xint_t i;
-  xint_t b;
-  xint_t size;
-  xpointer_t p;
-  xpointer_t *loc;  /* (atomic) */
+  gint i;
+  gint b;
+  gint size;
+  gpointer p;
+  gpointer *loc;  /* (atomic) */
 
   for (i = 0; i < 10000; i++)
     {
@@ -135,19 +135,19 @@ thread_allocate (xpointer_t data)
 static void
 test_allocate (void)
 {
-  xthread_t *threads[30];
-  xint_t size;
-  xsize_t i;
+  GThread *threads[30];
+  gint size;
+  gsize i;
 
   for (i = 0; i < 30; i++)
     for (size = 1; size <= 4096; size++)
       chunks[size - 1][i] = NULL;
 
   for (i = 0; i < G_N_ELEMENTS(threads); i++)
-    threads[i] = xthread_create (thread_allocate, NULL, TRUE, NULL);
+    threads[i] = g_thread_create (thread_allocate, NULL, TRUE, NULL);
 
   for (i = 0; i < G_N_ELEMENTS(threads); i++)
-    xthread_join (threads[i]);
+    g_thread_join (threads[i]);
 }
 
 int

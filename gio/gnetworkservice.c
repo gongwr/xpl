@@ -42,31 +42,31 @@
 
 /**
  * SECTION:gnetworkservice
- * @short_description: A xsocket_connectable_t for resolving SRV records
+ * @short_description: A GSocketConnectable for resolving SRV records
  * @include: gio/gio.h
  *
- * Like #xnetwork_address_t does with hostnames, #xnetwork_service_t
+ * Like #GNetworkAddress does with hostnames, #GNetworkService
  * provides an easy way to resolve a SRV record, and then attempt to
  * connect to one of the hosts that implements that service, handling
  * service priority/weighting, multiple IP addresses, and multiple
  * address families.
  *
- * See #xsrv_target_t for more information about SRV records, and see
- * #xsocket_connectable_t for an example of using the connectable
+ * See #GSrvTarget for more information about SRV records, and see
+ * #GSocketConnectable for an example of using the connectable
  * interface.
  */
 
 /**
- * xnetwork_service_t:
+ * GNetworkService:
  *
- * A #xsocket_connectable_t for resolving a SRV record and connecting to
+ * A #GSocketConnectable for resolving a SRV record and connecting to
  * that service.
  */
 
 struct _GNetworkServicePrivate
 {
-  xchar_t *service, *protocol, *domain, *scheme;
-  xlist_t *targets;
+  gchar *service, *protocol, *domain, *scheme;
+  GList *targets;
 };
 
 enum {
@@ -77,29 +77,29 @@ enum {
   PROP_SCHEME
 };
 
-static void g_network_service_set_property (xobject_t      *object,
-                                            xuint_t         prop_id,
-                                            const xvalue_t *value,
-                                            xparam_spec_t   *pspec);
-static void g_network_service_get_property (xobject_t      *object,
-                                            xuint_t         prop_id,
-                                            xvalue_t       *value,
-                                            xparam_spec_t   *pspec);
+static void g_network_service_set_property (GObject      *object,
+                                            guint         prop_id,
+                                            const GValue *value,
+                                            GParamSpec   *pspec);
+static void g_network_service_get_property (GObject      *object,
+                                            guint         prop_id,
+                                            GValue       *value,
+                                            GParamSpec   *pspec);
 
-static void                      g_network_service_connectable_iface_init       (xsocket_connectable_iface_t *iface);
-static xsocket_address_enumerator_t *g_network_service_connectable_enumerate        (xsocket_connectable_t      *connectable);
-static xsocket_address_enumerator_t *g_network_service_connectable_proxy_enumerate  (xsocket_connectable_t      *connectable);
-static xchar_t                    *g_network_service_connectable_to_string        (xsocket_connectable_t      *connectable);
+static void                      g_network_service_connectable_iface_init       (GSocketConnectableIface *iface);
+static GSocketAddressEnumerator *g_network_service_connectable_enumerate        (GSocketConnectable      *connectable);
+static GSocketAddressEnumerator *g_network_service_connectable_proxy_enumerate  (GSocketConnectable      *connectable);
+static gchar                    *g_network_service_connectable_to_string        (GSocketConnectable      *connectable);
 
-G_DEFINE_TYPE_WITH_CODE (xnetwork_service, g_network_service, XTYPE_OBJECT,
-                         G_ADD_PRIVATE (xnetwork_service_t)
-                         G_IMPLEMENT_INTERFACE (XTYPE_SOCKET_CONNECTABLE,
+G_DEFINE_TYPE_WITH_CODE (GNetworkService, g_network_service, G_TYPE_OBJECT,
+                         G_ADD_PRIVATE (GNetworkService)
+                         G_IMPLEMENT_INTERFACE (G_TYPE_SOCKET_CONNECTABLE,
                                                 g_network_service_connectable_iface_init))
 
 static void
-g_network_service_finalize (xobject_t *object)
+g_network_service_finalize (GObject *object)
 {
-  xnetwork_service_t *srv = G_NETWORK_SERVICE (object);
+  GNetworkService *srv = G_NETWORK_SERVICE (object);
 
   g_free (srv->priv->service);
   g_free (srv->priv->protocol);
@@ -109,54 +109,54 @@ g_network_service_finalize (xobject_t *object)
   if (srv->priv->targets)
     g_resolver_free_targets (srv->priv->targets);
 
-  XOBJECT_CLASS (g_network_service_parent_class)->finalize (object);
+  G_OBJECT_CLASS (g_network_service_parent_class)->finalize (object);
 }
 
 static void
 g_network_service_class_init (GNetworkServiceClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->set_property = g_network_service_set_property;
-  xobject_class->get_property = g_network_service_get_property;
-  xobject_class->finalize = g_network_service_finalize;
+  gobject_class->set_property = g_network_service_set_property;
+  gobject_class->get_property = g_network_service_get_property;
+  gobject_class->finalize = g_network_service_finalize;
 
-  xobject_class_install_property (xobject_class, PROP_SERVICE,
-                                   xparam_spec_string ("service",
+  g_object_class_install_property (gobject_class, PROP_SERVICE,
+                                   g_param_spec_string ("service",
                                                         P_("Service"),
                                                         P_("Service name, eg \"ldap\""),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
-  xobject_class_install_property (xobject_class, PROP_PROTOCOL,
-                                   xparam_spec_string ("protocol",
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_PROTOCOL,
+                                   g_param_spec_string ("protocol",
                                                         P_("Protocol"),
                                                         P_("Network protocol, eg \"tcp\""),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
-  xobject_class_install_property (xobject_class, PROP_DOMAIN,
-                                   xparam_spec_string ("domain",
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_DOMAIN,
+                                   g_param_spec_string ("domain",
                                                         P_("Domain"),
                                                         P_("Network domain, eg, \"example.com\""),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_CONSTRUCT_ONLY |
-                                                        XPARAM_STATIC_STRINGS));
-  xobject_class_install_property (xobject_class, PROP_DOMAIN,
-                                   xparam_spec_string ("scheme",
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_CONSTRUCT_ONLY |
+                                                        G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_DOMAIN,
+                                   g_param_spec_string ("scheme",
                                                         P_("Scheme"),
                                                         P_("Network scheme (default is to use service)"),
                                                         NULL,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
 
 }
 
 static void
-g_network_service_connectable_iface_init (xsocket_connectable_iface_t *connectable_iface)
+g_network_service_connectable_iface_init (GSocketConnectableIface *connectable_iface)
 {
   connectable_iface->enumerate = g_network_service_connectable_enumerate;
   connectable_iface->proxy_enumerate = g_network_service_connectable_proxy_enumerate;
@@ -164,35 +164,35 @@ g_network_service_connectable_iface_init (xsocket_connectable_iface_t *connectab
 }
 
 static void
-g_network_service_init (xnetwork_service_t *srv)
+g_network_service_init (GNetworkService *srv)
 {
   srv->priv = g_network_service_get_instance_private (srv);
 }
 
 static void
-g_network_service_set_property (xobject_t      *object,
-                                xuint_t         prop_id,
-                                const xvalue_t *value,
-                                xparam_spec_t   *pspec)
+g_network_service_set_property (GObject      *object,
+                                guint         prop_id,
+                                const GValue *value,
+                                GParamSpec   *pspec)
 {
-  xnetwork_service_t *srv = G_NETWORK_SERVICE (object);
+  GNetworkService *srv = G_NETWORK_SERVICE (object);
 
   switch (prop_id)
     {
     case PROP_SERVICE:
-      srv->priv->service = xvalue_dup_string (value);
+      srv->priv->service = g_value_dup_string (value);
       break;
 
     case PROP_PROTOCOL:
-      srv->priv->protocol = xvalue_dup_string (value);
+      srv->priv->protocol = g_value_dup_string (value);
       break;
 
     case PROP_DOMAIN:
-      srv->priv->domain = xvalue_dup_string (value);
+      srv->priv->domain = g_value_dup_string (value);
       break;
 
     case PROP_SCHEME:
-      g_network_service_set_scheme (srv, xvalue_get_string (value));
+      g_network_service_set_scheme (srv, g_value_get_string (value));
       break;
 
     default:
@@ -202,29 +202,29 @@ g_network_service_set_property (xobject_t      *object,
 }
 
 static void
-g_network_service_get_property (xobject_t    *object,
-                                xuint_t       prop_id,
-                                xvalue_t     *value,
-                                xparam_spec_t *pspec)
+g_network_service_get_property (GObject    *object,
+                                guint       prop_id,
+                                GValue     *value,
+                                GParamSpec *pspec)
 {
-  xnetwork_service_t *srv = G_NETWORK_SERVICE (object);
+  GNetworkService *srv = G_NETWORK_SERVICE (object);
 
   switch (prop_id)
     {
     case PROP_SERVICE:
-      xvalue_set_string (value, g_network_service_get_service (srv));
+      g_value_set_string (value, g_network_service_get_service (srv));
       break;
 
     case PROP_PROTOCOL:
-      xvalue_set_string (value, g_network_service_get_protocol (srv));
+      g_value_set_string (value, g_network_service_get_protocol (srv));
       break;
 
     case PROP_DOMAIN:
-      xvalue_set_string (value, g_network_service_get_domain (srv));
+      g_value_set_string (value, g_network_service_get_domain (srv));
       break;
 
     case PROP_SCHEME:
-      xvalue_set_string (value, g_network_service_get_scheme (srv));
+      g_value_set_string (value, g_network_service_get_scheme (srv));
       break;
 
     default:
@@ -239,20 +239,20 @@ g_network_service_get_property (xobject_t    *object,
  * @protocol: the networking protocol to use for @service (eg, "tcp")
  * @domain: the DNS domain to look up the service in
  *
- * Creates a new #xnetwork_service_t representing the given @service,
+ * Creates a new #GNetworkService representing the given @service,
  * @protocol, and @domain. This will initially be unresolved; use the
- * #xsocket_connectable_t interface to resolve it.
+ * #GSocketConnectable interface to resolve it.
  *
- * Returns: (transfer full) (type xnetwork_service_t): a new #xnetwork_service_t
+ * Returns: (transfer full) (type GNetworkService): a new #GNetworkService
  *
  * Since: 2.22
  */
-xsocket_connectable_t *
-g_network_service_new (const xchar_t *service,
-                       const xchar_t *protocol,
-                       const xchar_t *domain)
+GSocketConnectable *
+g_network_service_new (const gchar *service,
+                       const gchar *protocol,
+                       const gchar *domain)
 {
-  return xobject_new (XTYPE_NETWORK_SERVICE,
+  return g_object_new (G_TYPE_NETWORK_SERVICE,
                        "service", service,
                        "protocol", protocol,
                        "domain", domain,
@@ -261,7 +261,7 @@ g_network_service_new (const xchar_t *service,
 
 /**
  * g_network_service_get_service:
- * @srv: a #xnetwork_service_t
+ * @srv: a #GNetworkService
  *
  * Gets @srv's service name (eg, "ldap").
  *
@@ -269,17 +269,17 @@ g_network_service_new (const xchar_t *service,
  *
  * Since: 2.22
  */
-const xchar_t *
-g_network_service_get_service (xnetwork_service_t *srv)
+const gchar *
+g_network_service_get_service (GNetworkService *srv)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  g_return_val_if_fail (G_IS_NETWORK_SERVICE (srv), NULL);
 
   return srv->priv->service;
 }
 
 /**
  * g_network_service_get_protocol:
- * @srv: a #xnetwork_service_t
+ * @srv: a #GNetworkService
  *
  * Gets @srv's protocol name (eg, "tcp").
  *
@@ -287,17 +287,17 @@ g_network_service_get_service (xnetwork_service_t *srv)
  *
  * Since: 2.22
  */
-const xchar_t *
-g_network_service_get_protocol (xnetwork_service_t *srv)
+const gchar *
+g_network_service_get_protocol (GNetworkService *srv)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  g_return_val_if_fail (G_IS_NETWORK_SERVICE (srv), NULL);
 
   return srv->priv->protocol;
 }
 
 /**
  * g_network_service_get_domain:
- * @srv: a #xnetwork_service_t
+ * @srv: a #GNetworkService
  *
  * Gets the domain that @srv serves. This might be either UTF-8 or
  * ASCII-encoded, depending on what @srv was created with.
@@ -306,17 +306,17 @@ g_network_service_get_protocol (xnetwork_service_t *srv)
  *
  * Since: 2.22
  */
-const xchar_t *
-g_network_service_get_domain (xnetwork_service_t *srv)
+const gchar *
+g_network_service_get_domain (GNetworkService *srv)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  g_return_val_if_fail (G_IS_NETWORK_SERVICE (srv), NULL);
 
   return srv->priv->domain;
 }
 
 /**
  * g_network_service_get_scheme:
- * @srv: a #xnetwork_service_t
+ * @srv: a #GNetworkService
  *
  * Gets the URI scheme used to resolve proxies. By default, the service name
  * is used as scheme.
@@ -325,10 +325,10 @@ g_network_service_get_domain (xnetwork_service_t *srv)
  *
  * Since: 2.26
  */
-const xchar_t *
-g_network_service_get_scheme (xnetwork_service_t *srv)
+const gchar *
+g_network_service_get_scheme (GNetworkService *srv)
 {
-  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  g_return_val_if_fail (G_IS_NETWORK_SERVICE (srv), NULL);
 
   if (srv->priv->scheme)
     return srv->priv->scheme;
@@ -338,7 +338,7 @@ g_network_service_get_scheme (xnetwork_service_t *srv)
 
 /**
  * g_network_service_set_scheme:
- * @srv: a #xnetwork_service_t
+ * @srv: a #GNetworkService
  * @scheme: a URI scheme
  *
  * Set's the URI scheme used to resolve proxies. By default, the service name
@@ -347,23 +347,23 @@ g_network_service_get_scheme (xnetwork_service_t *srv)
  * Since: 2.26
  */
 void
-g_network_service_set_scheme (xnetwork_service_t *srv,
-                              const xchar_t     *scheme)
+g_network_service_set_scheme (GNetworkService *srv,
+                              const gchar     *scheme)
 {
-  g_return_if_fail (X_IS_NETWORK_SERVICE (srv));
+  g_return_if_fail (G_IS_NETWORK_SERVICE (srv));
 
   g_free (srv->priv->scheme);
-  srv->priv->scheme = xstrdup (scheme);
+  srv->priv->scheme = g_strdup (scheme);
 
-  xobject_notify (G_OBJECT (srv), "scheme");
+  g_object_notify (G_OBJECT (srv), "scheme");
 }
 
-static xlist_t *
-g_network_service_fallback_targets (xnetwork_service_t *srv)
+static GList *
+g_network_service_fallback_targets (GNetworkService *srv)
 {
-  xsrv_target_t *target;
+  GSrvTarget *target;
   struct servent *entry;
-  xuint16_t port;
+  guint16 port;
 
   entry = getservbyname (srv->priv->service, "tcp");
   port = entry ? g_ntohs (entry->s_port) : 0;
@@ -375,54 +375,54 @@ g_network_service_fallback_targets (xnetwork_service_t *srv)
       return NULL;
 
   target = g_srv_target_new (srv->priv->domain, port, 0, 0);
-  return xlist_append (NULL, target);
+  return g_list_append (NULL, target);
 }
 
-#define XTYPE_NETWORK_SERVICE_ADDRESS_ENUMERATOR (xnetwork_service_address_enumerator_get_type ())
-#define G_NETWORK_SERVICE_ADDRESS_ENUMERATOR(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_NETWORK_SERVICE_ADDRESS_ENUMERATOR, xnetwork_service_address_enumerator))
+#define G_TYPE_NETWORK_SERVICE_ADDRESS_ENUMERATOR (_g_network_service_address_enumerator_get_type ())
+#define G_NETWORK_SERVICE_ADDRESS_ENUMERATOR(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), G_TYPE_NETWORK_SERVICE_ADDRESS_ENUMERATOR, GNetworkServiceAddressEnumerator))
 
 typedef struct {
-  xsocket_address_enumerator_t parent_instance;
+  GSocketAddressEnumerator parent_instance;
 
-  xresolver_t *resolver;
-  xnetwork_service_t *srv;
-  xsocket_address_enumerator_t *addr_enum;
-  xlist_t *t;
-  xboolean_t use_proxy;
+  GResolver *resolver;
+  GNetworkService *srv;
+  GSocketAddressEnumerator *addr_enum;
+  GList *t;
+  gboolean use_proxy;
 
-  xerror_t *error;
+  GError *error;
 
-} xnetwork_service_address_enumerator_t;
+} GNetworkServiceAddressEnumerator;
 
 typedef struct {
-  xsocket_address_enumerator_class_t parent_class;
+  GSocketAddressEnumeratorClass parent_class;
 
-} xnetwork_service_address_enumerator_class_t;
+} GNetworkServiceAddressEnumeratorClass;
 
-static xtype_t xnetwork_service_address_enumerator_get_type (void);
-XDEFINE_TYPE (xnetwork_service_address_enumerator, xnetwork_service_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
+static GType _g_network_service_address_enumerator_get_type (void);
+G_DEFINE_TYPE (GNetworkServiceAddressEnumerator, _g_network_service_address_enumerator, G_TYPE_SOCKET_ADDRESS_ENUMERATOR)
 
-static xsocket_address_t *
-g_network_service_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
-                                           xcancellable_t              *cancellable,
-                                           xerror_t                   **error)
+static GSocketAddress *
+g_network_service_address_enumerator_next (GSocketAddressEnumerator  *enumerator,
+                                           GCancellable              *cancellable,
+                                           GError                   **error)
 {
-  xnetwork_service_address_enumerator_t *srv_enum =
+  GNetworkServiceAddressEnumerator *srv_enum =
     G_NETWORK_SERVICE_ADDRESS_ENUMERATOR (enumerator);
-  xsocket_address_t *ret = NULL;
+  GSocketAddress *ret = NULL;
 
   /* If we haven't yet resolved srv, do that */
   if (!srv_enum->srv->priv->targets)
     {
-      xlist_t *targets;
-      xerror_t *my_error = NULL;
+      GList *targets;
+      GError *my_error = NULL;
 
       targets = g_resolver_lookup_service (srv_enum->resolver,
                                            srv_enum->srv->priv->service,
                                            srv_enum->srv->priv->protocol,
                                            srv_enum->srv->priv->domain,
                                            cancellable, &my_error);
-      if (!targets && xerror_matches (my_error, G_RESOLVER_ERROR,
+      if (!targets && g_error_matches (my_error, G_RESOLVER_ERROR,
                                        G_RESOLVER_ERROR_NOT_FOUND))
         {
           targets = g_network_service_fallback_targets (srv_enum->srv);
@@ -440,18 +440,18 @@ g_network_service_address_enumerator_next (xsocket_address_enumerator_t  *enumer
       srv_enum->t = srv_enum->srv->priv->targets;
     }
 
-  /* Delegate to xnetwork_address_t */
+  /* Delegate to GNetworkAddress */
   do
     {
       if (srv_enum->addr_enum == NULL && srv_enum->t)
         {
-          xerror_t *error = NULL;
-          xchar_t *uri;
-          xchar_t *hostname;
-          xsocket_connectable_t *addr;
-          xsrv_target_t *target = srv_enum->t->data;
+          GError *my_error = NULL;
+          gchar *uri;
+          gchar *hostname;
+          GSocketConnectable *addr;
+          GSrvTarget *target = srv_enum->t->data;
 
-          srv_enum->t = xlist_next (srv_enum->t);
+          srv_enum->t = g_list_next (srv_enum->t);
 
           hostname = g_hostname_to_ascii (g_srv_target_get_hostname (target));
 
@@ -459,13 +459,13 @@ g_network_service_address_enumerator_next (xsocket_address_enumerator_t  *enumer
             {
               if (srv_enum->error == NULL)
                 srv_enum->error =
-                  xerror_new (G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
-                               "Received invalid hostname '%s' from xsrv_target_t",
+                  g_error_new (G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
+                               "Received invalid hostname '%s' from GSrvTarget",
                                g_srv_target_get_hostname (target));
               continue;
             }
 
-          uri = xuri_join (XURI_FLAGS_NONE,
+          uri = g_uri_join (G_URI_FLAGS_NONE,
                             g_network_service_get_scheme (srv_enum->srv),
                             NULL,
                             hostname,
@@ -477,44 +477,44 @@ g_network_service_address_enumerator_next (xsocket_address_enumerator_t  *enumer
 
           addr = g_network_address_parse_uri (uri,
                                               g_srv_target_get_port (target),
-                                              &error);
+                                              &my_error);
           g_free (uri);
 
           if (addr == NULL)
             {
               if (srv_enum->error == NULL)
-                srv_enum->error = error;
+                srv_enum->error = my_error;
               else
-                xerror_free (error);
+                g_error_free (my_error);
               continue;
             }
 
           if (srv_enum->use_proxy)
-            srv_enum->addr_enum = xsocket_connectable_proxy_enumerate (addr);
+            srv_enum->addr_enum = g_socket_connectable_proxy_enumerate (addr);
           else
-            srv_enum->addr_enum = xsocket_connectable_enumerate (addr);
-          xobject_unref (addr);
+            srv_enum->addr_enum = g_socket_connectable_enumerate (addr);
+          g_object_unref (addr);
         }
 
       if (srv_enum->addr_enum)
         {
-          xerror_t *error = NULL;
+          GError *my_error = NULL;
 
-          ret = xsocket_address_enumerator_next (srv_enum->addr_enum,
+          ret = g_socket_address_enumerator_next (srv_enum->addr_enum,
                                                   cancellable,
-                                                  &error);
+                                                  &my_error);
 
-          if (error)
+          if (my_error)
             {
               if (srv_enum->error == NULL)
-                srv_enum->error = error;
+                srv_enum->error = my_error;
               else
-                xerror_free (error);
+                g_error_free (my_error);
             }
 
           if (!ret)
             {
-              xobject_unref (srv_enum->addr_enum);
+              g_object_unref (srv_enum->addr_enum);
               srv_enum->addr_enum = NULL;
             }
         }
@@ -530,26 +530,26 @@ g_network_service_address_enumerator_next (xsocket_address_enumerator_t  *enumer
   return ret;
 }
 
-static void next_async_resolved_targets   (xobject_t      *source_object,
-                                           xasync_result_t *result,
-                                           xpointer_t      user_data);
-static void next_async_have_targets       (xtask_t        *srv_enum);
-static void next_async_have_address       (xobject_t      *source_object,
-                                           xasync_result_t *result,
-                                           xpointer_t      user_data);
+static void next_async_resolved_targets   (GObject      *source_object,
+                                           GAsyncResult *result,
+                                           gpointer      user_data);
+static void next_async_have_targets       (GTask        *srv_enum);
+static void next_async_have_address       (GObject      *source_object,
+                                           GAsyncResult *result,
+                                           gpointer      user_data);
 
 static void
-g_network_service_address_enumerator_next_async (xsocket_address_enumerator_t  *enumerator,
-                                                 xcancellable_t              *cancellable,
-                                                 xasync_ready_callback_t        callback,
-                                                 xpointer_t                   user_data)
+g_network_service_address_enumerator_next_async (GSocketAddressEnumerator  *enumerator,
+                                                 GCancellable              *cancellable,
+                                                 GAsyncReadyCallback        callback,
+                                                 gpointer                   user_data)
 {
-  xnetwork_service_address_enumerator_t *srv_enum =
+  GNetworkServiceAddressEnumerator *srv_enum =
     G_NETWORK_SERVICE_ADDRESS_ENUMERATOR (enumerator);
-  xtask_t *task;
+  GTask *task;
 
-  task = xtask_new (enumerator, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_network_service_address_enumerator_next_async);
+  task = g_task_new (enumerator, cancellable, callback, user_data);
+  g_task_set_source_tag (task, g_network_service_address_enumerator_next_async);
 
   /* If we haven't yet resolved srv, do that */
   if (!srv_enum->srv->priv->targets)
@@ -567,19 +567,19 @@ g_network_service_address_enumerator_next_async (xsocket_address_enumerator_t  *
 }
 
 static void
-next_async_resolved_targets (xobject_t      *source_object,
-                             xasync_result_t *result,
-                             xpointer_t      user_data)
+next_async_resolved_targets (GObject      *source_object,
+                             GAsyncResult *result,
+                             gpointer      user_data)
 {
-  xtask_t *task = user_data;
-  xnetwork_service_address_enumerator_t *srv_enum = xtask_get_source_object (task);
-  xerror_t *error = NULL;
-  xlist_t *targets;
+  GTask *task = user_data;
+  GNetworkServiceAddressEnumerator *srv_enum = g_task_get_source_object (task);
+  GError *error = NULL;
+  GList *targets;
 
   targets = g_resolver_lookup_service_finish (srv_enum->resolver,
                                               result, &error);
 
-  if (!targets && xerror_matches (error, G_RESOLVER_ERROR,
+  if (!targets && g_error_matches (error, G_RESOLVER_ERROR,
                                    G_RESOLVER_ERROR_NOT_FOUND))
     {
       targets = g_network_service_fallback_targets (srv_enum->srv);
@@ -589,8 +589,8 @@ next_async_resolved_targets (xobject_t      *source_object,
 
   if (error)
     {
-      xtask_return_error (task, error);
-      xobject_unref (task);
+      g_task_return_error (task, error);
+      g_object_unref (task);
     }
   else
     {
@@ -600,32 +600,32 @@ next_async_resolved_targets (xobject_t      *source_object,
 }
 
 static void
-next_async_have_targets (xtask_t *task)
+next_async_have_targets (GTask *task)
 {
-  xnetwork_service_address_enumerator_t *srv_enum = xtask_get_source_object (task);
+  GNetworkServiceAddressEnumerator *srv_enum = g_task_get_source_object (task);
 
-  /* Delegate to xnetwork_address_t */
+  /* Delegate to GNetworkAddress */
   if (srv_enum->addr_enum == NULL && srv_enum->t)
     {
-      xsocket_connectable_t *addr;
-      xsrv_target_t *target = srv_enum->t->data;
+      GSocketConnectable *addr;
+      GSrvTarget *target = srv_enum->t->data;
 
-      srv_enum->t = xlist_next (srv_enum->t);
+      srv_enum->t = g_list_next (srv_enum->t);
       addr = g_network_address_new (g_srv_target_get_hostname (target),
-                                    (xuint16_t) g_srv_target_get_port (target));
+                                    (guint16) g_srv_target_get_port (target));
 
       if (srv_enum->use_proxy)
-        srv_enum->addr_enum = xsocket_connectable_proxy_enumerate (addr);
+        srv_enum->addr_enum = g_socket_connectable_proxy_enumerate (addr);
       else
-        srv_enum->addr_enum = xsocket_connectable_enumerate (addr);
+        srv_enum->addr_enum = g_socket_connectable_enumerate (addr);
 
-      xobject_unref (addr);
+      g_object_unref (addr);
     }
 
   if (srv_enum->addr_enum)
     {
-      xsocket_address_enumerator_next_async (srv_enum->addr_enum,
-                                              xtask_get_cancellable (task),
+      g_socket_address_enumerator_next_async (srv_enum->addr_enum,
+                                              g_task_get_cancellable (task),
                                               next_async_have_address,
                                               task);
     }
@@ -633,27 +633,27 @@ next_async_have_targets (xtask_t *task)
     {
       if (srv_enum->error)
         {
-          xtask_return_error (task, srv_enum->error);
+          g_task_return_error (task, srv_enum->error);
           srv_enum->error = NULL;
         }
       else
-        xtask_return_pointer (task, NULL, NULL);
+        g_task_return_pointer (task, NULL, NULL);
 
-      xobject_unref (task);
+      g_object_unref (task);
     }
 }
 
 static void
-next_async_have_address (xobject_t      *source_object,
-                         xasync_result_t *result,
-                         xpointer_t      user_data)
+next_async_have_address (GObject      *source_object,
+                         GAsyncResult *result,
+                         gpointer      user_data)
 {
-  xtask_t *task = user_data;
-  xnetwork_service_address_enumerator_t *srv_enum = xtask_get_source_object (task);
-  xsocket_address_t *address;
-  xerror_t *error = NULL;
-
-  address = xsocket_address_enumerator_next_finish (srv_enum->addr_enum,
+  GTask *task = user_data;
+  GNetworkServiceAddressEnumerator *srv_enum = g_task_get_source_object (task);
+  GSocketAddress *address;
+  GError *error = NULL;
+  
+  address = g_socket_address_enumerator_next_finish (srv_enum->addr_enum,
                                                      result,
                                                      &error);
 
@@ -662,63 +662,63 @@ next_async_have_address (xobject_t      *source_object,
       if (srv_enum->error == NULL)
         srv_enum->error = error;
       else
-        xerror_free (error);
+        g_error_free (error);
     }
 
   if (!address)
     {
-      xobject_unref (srv_enum->addr_enum);
+      g_object_unref (srv_enum->addr_enum);
       srv_enum->addr_enum = NULL;
 
       next_async_have_targets (task);
     }
   else
     {
-      xtask_return_pointer (task, address, xobject_unref);
-      xobject_unref (task);
+      g_task_return_pointer (task, address, g_object_unref);
+      g_object_unref (task);
     }
 }
 
-static xsocket_address_t *
-g_network_service_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerator,
-                                                  xasync_result_t              *result,
-                                                  xerror_t                   **error)
+static GSocketAddress *
+g_network_service_address_enumerator_next_finish (GSocketAddressEnumerator  *enumerator,
+                                                  GAsyncResult              *result,
+                                                  GError                   **error)
 {
-  return xtask_propagate_pointer (XTASK (result), error);
+  return g_task_propagate_pointer (G_TASK (result), error);
 }
 
 static void
-xnetwork_service_address_enumerator_init (xnetwork_service_address_enumerator_t *enumerator)
+_g_network_service_address_enumerator_init (GNetworkServiceAddressEnumerator *enumerator)
 {
 }
 
 static void
-g_network_service_address_enumerator_finalize (xobject_t *object)
+g_network_service_address_enumerator_finalize (GObject *object)
 {
-  xnetwork_service_address_enumerator_t *srv_enum =
+  GNetworkServiceAddressEnumerator *srv_enum =
     G_NETWORK_SERVICE_ADDRESS_ENUMERATOR (object);
 
   if (srv_enum->srv)
-    xobject_unref (srv_enum->srv);
+    g_object_unref (srv_enum->srv);
 
   if (srv_enum->addr_enum)
-    xobject_unref (srv_enum->addr_enum);
+    g_object_unref (srv_enum->addr_enum);
 
   if (srv_enum->resolver)
-    xobject_unref (srv_enum->resolver);
+    g_object_unref (srv_enum->resolver);
 
   if (srv_enum->error)
-    xerror_free (srv_enum->error);
+    g_error_free (srv_enum->error);
 
-  XOBJECT_CLASS (xnetwork_service_address_enumerator_parent_class)->finalize (object);
+  G_OBJECT_CLASS (_g_network_service_address_enumerator_parent_class)->finalize (object);
 }
 
 static void
-xnetwork_service_address_enumerator_class_init (xnetwork_service_address_enumerator_class_t *srvenum_class)
+_g_network_service_address_enumerator_class_init (GNetworkServiceAddressEnumeratorClass *srvenum_class)
 {
-  xobject_class_t *object_class = XOBJECT_CLASS (srvenum_class);
-  xsocket_address_enumerator_class_t *enumerator_class =
-    XSOCKET_ADDRESS_ENUMERATOR_CLASS (srvenum_class);
+  GObjectClass *object_class = G_OBJECT_CLASS (srvenum_class);
+  GSocketAddressEnumeratorClass *enumerator_class =
+    G_SOCKET_ADDRESS_ENUMERATOR_CLASS (srvenum_class);
 
   enumerator_class->next        = g_network_service_address_enumerator_next;
   enumerator_class->next_async  = g_network_service_address_enumerator_next_async;
@@ -727,24 +727,24 @@ xnetwork_service_address_enumerator_class_init (xnetwork_service_address_enumera
   object_class->finalize = g_network_service_address_enumerator_finalize;
 }
 
-static xsocket_address_enumerator_t *
-g_network_service_connectable_enumerate (xsocket_connectable_t *connectable)
+static GSocketAddressEnumerator *
+g_network_service_connectable_enumerate (GSocketConnectable *connectable)
 {
-  xnetwork_service_address_enumerator_t *srv_enum;
+  GNetworkServiceAddressEnumerator *srv_enum;
 
-  srv_enum = xobject_new (XTYPE_NETWORK_SERVICE_ADDRESS_ENUMERATOR, NULL);
-  srv_enum->srv = xobject_ref (G_NETWORK_SERVICE (connectable));
+  srv_enum = g_object_new (G_TYPE_NETWORK_SERVICE_ADDRESS_ENUMERATOR, NULL);
+  srv_enum->srv = g_object_ref (G_NETWORK_SERVICE (connectable));
   srv_enum->resolver = g_resolver_get_default ();
   srv_enum->use_proxy = FALSE;
 
-  return XSOCKET_ADDRESS_ENUMERATOR (srv_enum);
+  return G_SOCKET_ADDRESS_ENUMERATOR (srv_enum);
 }
 
-static xsocket_address_enumerator_t *
-g_network_service_connectable_proxy_enumerate (xsocket_connectable_t *connectable)
+static GSocketAddressEnumerator *
+g_network_service_connectable_proxy_enumerate (GSocketConnectable *connectable)
 {
-  xsocket_address_enumerator_t *addr_enum;
-  xnetwork_service_address_enumerator_t *srv_enum;
+  GSocketAddressEnumerator *addr_enum;
+  GNetworkServiceAddressEnumerator *srv_enum;
 
   addr_enum = g_network_service_connectable_enumerate (connectable);
   srv_enum = G_NETWORK_SERVICE_ADDRESS_ENUMERATOR (addr_enum);
@@ -753,14 +753,14 @@ g_network_service_connectable_proxy_enumerate (xsocket_connectable_t *connectabl
   return addr_enum;
 }
 
-static xchar_t *
-g_network_service_connectable_to_string (xsocket_connectable_t *connectable)
+static gchar *
+g_network_service_connectable_to_string (GSocketConnectable *connectable)
 {
-  xnetwork_service_t *service;
+  GNetworkService *service;
 
   service = G_NETWORK_SERVICE (connectable);
 
-  return xstrdup_printf ("(%s, %s, %s, %s)", service->priv->service,
+  return g_strdup_printf ("(%s, %s, %s, %s)", service->priv->service,
                           service->priv->protocol, service->priv->domain,
                           service->priv->scheme);
 }

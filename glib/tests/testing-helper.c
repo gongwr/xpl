@@ -93,7 +93,7 @@ main (int   argc,
   setmode (fileno (stdout), O_BINARY);
 #endif
 
-  xreturn_val_if_fail (argc > 1, 1);
+  g_return_val_if_fail (argc > 1, 1);
   argv1 = argv[1];
 
   if (argc > 2)
@@ -102,13 +102,13 @@ main (int   argc,
   argc -= 1;
   argv[argc] = NULL;
 
-  if (xstrcmp0 (argv1, "init-null-argv0") == 0)
+  if (g_strcmp0 (argv1, "init-null-argv0") == 0)
     {
       int test_argc = 0;
       char *test_argva[1] = { NULL };
       char **test_argv = test_argva;
 
-      /* test_t that `g_test_init()` can handle being called with an empty argv
+      /* Test that `g_test_init()` can handle being called with an empty argv
        * and argc == 0. While this isn’t recommended, it is possible for another
        * process to use execve() to call a gtest process this way, so we’d
        * better handle it gracefully.
@@ -123,48 +123,48 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
   g_test_set_nonfatal_assertions ();
 
-  if (xstrcmp0 (argv1, "pass") == 0)
+  if (g_strcmp0 (argv1, "pass") == 0)
     {
       g_test_add_func ("/pass", test_pass);
     }
-  else if (xstrcmp0 (argv1, "skip") == 0)
+  else if (g_strcmp0 (argv1, "skip") == 0)
     {
       g_test_add_func ("/skip", test_skip);
     }
-  else if (xstrcmp0 (argv1, "skip-printf") == 0)
+  else if (g_strcmp0 (argv1, "skip-printf") == 0)
     {
       g_test_add_func ("/skip-printf", test_skip_printf);
     }
-  else if (xstrcmp0 (argv1, "incomplete") == 0)
+  else if (g_strcmp0 (argv1, "incomplete") == 0)
     {
       g_test_add_func ("/incomplete", test_incomplete);
     }
-  else if (xstrcmp0 (argv1, "incomplete-printf") == 0)
+  else if (g_strcmp0 (argv1, "incomplete-printf") == 0)
     {
       g_test_add_func ("/incomplete-printf", test_incomplete_printf);
     }
-  else if (xstrcmp0 (argv1, "fail") == 0)
+  else if (g_strcmp0 (argv1, "fail") == 0)
     {
       g_test_add_func ("/fail", test_fail);
     }
-  else if (xstrcmp0 (argv1, "fail-printf") == 0)
+  else if (g_strcmp0 (argv1, "fail-printf") == 0)
     {
       g_test_add_func ("/fail-printf", test_fail_printf);
     }
-  else if (xstrcmp0 (argv1, "all-non-failures") == 0)
+  else if (g_strcmp0 (argv1, "all-non-failures") == 0)
     {
       g_test_add_func ("/pass", test_pass);
       g_test_add_func ("/skip", test_skip);
       g_test_add_func ("/incomplete", test_incomplete);
     }
-  else if (xstrcmp0 (argv1, "all") == 0)
+  else if (g_strcmp0 (argv1, "all") == 0)
     {
       g_test_add_func ("/pass", test_pass);
       g_test_add_func ("/skip", test_skip);
       g_test_add_func ("/incomplete", test_incomplete);
       g_test_add_func ("/fail", test_fail);
     }
-  else if (xstrcmp0 (argv1, "skip-options") == 0)
+  else if (g_strcmp0 (argv1, "skip-options") == 0)
     {
       /* The caller is expected to skip some of these with
        * -p/-r, -s/-x and/or --GTestSkipCount */
@@ -179,7 +179,7 @@ main (int   argc,
       g_test_add_func ("/c/a", test_pass);
       g_test_add_func ("/d/a", test_pass);
     }
-  else if (xstrcmp0 (argv1, "summary") == 0)
+  else if (g_strcmp0 (argv1, "summary") == 0)
     {
       g_test_add_func ("/summary", test_summary);
     }

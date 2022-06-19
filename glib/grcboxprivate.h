@@ -26,25 +26,25 @@ G_BEGIN_DECLS
 typedef struct {
   grefcount ref_count;
 
-  xsize_t mem_size;
-  xsize_t private_offset;
+  gsize mem_size;
+  gsize private_offset;
 
 #ifndef G_DISABLE_ASSERT
   /* A "magic" number, used to perform additional integrity
    * checks on the allocated data
    */
-  xuint32_t magic;
+  guint32 magic;
 #endif
 } GRcBox;
 
 typedef struct {
   gatomicrefcount ref_count;
 
-  xsize_t mem_size;
-  xsize_t private_offset;
+  gsize mem_size;
+  gsize private_offset;
 
 #ifndef G_DISABLE_ASSERT
-  xuint32_t magic;
+  guint32 magic;
 #endif
 } GArcBox;
 
@@ -58,14 +58,14 @@ G_STATIC_ASSERT (sizeof (GRcBox) == sizeof (GArcBox));
  * guaranteed by the malloc() in GNU's libc and by the GSlice
  * allocator
  */
-#define STRUCT_ALIGNMENT (2 * sizeof (xsize_t))
+#define STRUCT_ALIGNMENT (2 * sizeof (gsize))
 
 #define G_RC_BOX_SIZE sizeof (GRcBox)
 #define G_ARC_BOX_SIZE sizeof (GArcBox)
 
-xpointer_t        g_rc_box_alloc_full     (xsize_t    block_size,
-                                         xsize_t    alignment,
-                                         xboolean_t atomic,
-                                         xboolean_t clear);
+gpointer        g_rc_box_alloc_full     (gsize    block_size,
+                                         gsize    alignment,
+                                         gboolean atomic,
+                                         gboolean clear);
 
 G_END_DECLS

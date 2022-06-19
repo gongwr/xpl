@@ -22,32 +22,32 @@
 
 /**
  * SECTION:gsocketservice
- * @title: xsocket_service_t
+ * @title: GSocketService
  * @short_description: Make it easy to implement a network service
  * @include: gio/gio.h
- * @see_also: #xthreaded_socket_service_t, #xsocket_listener_t.
+ * @see_also: #GThreadedSocketService, #GSocketListener.
  *
- * A #xsocket_service_t is an object that represents a service that
+ * A #GSocketService is an object that represents a service that
  * is provided to the network or over local sockets.  When a new
- * connection is made to the service the #xsocket_service_t::incoming
+ * connection is made to the service the #GSocketService::incoming
  * signal is emitted.
  *
- * A #xsocket_service_t is a subclass of #xsocket_listener_t and you need
+ * A #GSocketService is a subclass of #GSocketListener and you need
  * to add the addresses you want to accept connections on with the
- * #xsocket_listener_t APIs.
+ * #GSocketListener APIs.
  *
  * There are two options for implementing a network service based on
- * #xsocket_service_t. The first is to create the service using
- * xsocket_service_new() and to connect to the #xsocket_service_t::incoming
- * signal. The second is to subclass #xsocket_service_t and override the
+ * #GSocketService. The first is to create the service using
+ * g_socket_service_new() and to connect to the #GSocketService::incoming
+ * signal. The second is to subclass #GSocketService and override the
  * default signal handler implementation.
  *
  * In either case, the handler must immediately return, or else it
  * will block additional incoming connections from being serviced.
  * If you are interested in writing connection handlers that contain
- * blocking code then see #xthreaded_socket_service_t.
+ * blocking code then see #GThreadedSocketService.
  *
- * The socket service runs on the main loop of the
+ * The socket service runs on the main loop of the 
  * [thread-default context][g-main-context-push-thread-default-context]
  * of the thread it is created in, and is not
  * threadsafe in general. However, the calls to start and stop the
@@ -68,16 +68,16 @@
 
 struct _GSocketServicePrivate
 {
-  xcancellable_t *cancellable;
-  xuint_t active : 1;
-  xuint_t outstanding_accept : 1;
+  GCancellable *cancellable;
+  guint active : 1;
+  guint outstanding_accept : 1;
 };
 
-static xuint_t xsocket_service_incoming_signal;
+static guint g_socket_service_incoming_signal;
 
 G_LOCK_DEFINE_STATIC(active);
 
-G_DEFINE_TYPE_WITH_PRIVATE (xsocket_service_t, xsocket_service, XTYPE_SOCKET_LISTENER)
+G_DEFINE_TYPE_WITH_PRIVATE (GSocketService, g_socket_service, G_TYPE_SOCKET_LISTENER)
 
 enum
 {
@@ -85,50 +85,50 @@ enum
   PROP_ACTIVE
 };
 
-static void xsocket_service_ready (xobject_t      *object,
-				    xasync_result_t *result,
-				    xpointer_t      user_data);
+static void g_socket_service_ready (GObject      *object,
+				    GAsyncResult *result,
+				    gpointer      user_data);
 
-static xboolean_t
-xsocket_service_real_incoming (xsocket_service_t    *service,
-                                xsocket_connection_t *connection,
-                                xobject_t           *source_object)
+static gboolean
+g_socket_service_real_incoming (GSocketService    *service,
+                                GSocketConnection *connection,
+                                GObject           *source_object)
 {
   return FALSE;
 }
 
 static void
-xsocket_service_init (xsocket_service_t *service)
+g_socket_service_init (GSocketService *service)
 {
-  service->priv = xsocket_service_get_instance_private (service);
-  service->priv->cancellable = xcancellable_new ();
+  service->priv = g_socket_service_get_instance_private (service);
+  service->priv->cancellable = g_cancellable_new ();
   service->priv->active = TRUE;
 }
 
 static void
-xsocket_service_finalize (xobject_t *object)
+g_socket_service_finalize (GObject *object)
 {
-  xsocket_service_t *service = XSOCKET_SERVICE (object);
+  GSocketService *service = G_SOCKET_SERVICE (object);
 
-  xobject_unref (service->priv->cancellable);
+  g_object_unref (service->priv->cancellable);
 
-  XOBJECT_CLASS (xsocket_service_parent_class)
+  G_OBJECT_CLASS (g_socket_service_parent_class)
     ->finalize (object);
 }
 
 static void
-do_accept (xsocket_service_t  *service)
+do_accept (GSocketService  *service)
 {
-  xsocket_listener_accept_async (XSOCKET_LISTENER (service),
+  g_socket_listener_accept_async (G_SOCKET_LISTENER (service),
 				  service->priv->cancellable,
-				  xsocket_service_ready, NULL);
+				  g_socket_service_ready, NULL);
   service->priv->outstanding_accept = TRUE;
 }
 
-static xboolean_t
-get_active (xsocket_service_t *service)
+static gboolean
+get_active (GSocketService *service)
 {
-  xboolean_t active;
+  gboolean active;
 
   G_LOCK (active);
   active = service->priv->active;
@@ -138,9 +138,9 @@ get_active (xsocket_service_t *service)
 }
 
 static void
-set_active (xsocket_service_t *service, xboolean_t active)
+set_active (GSocketService *service, gboolean active)
 {
-  xboolean_t notify = FALSE;
+  gboolean notify = FALSE;
 
   active = !!active;
 
@@ -154,35 +154,35 @@ set_active (xsocket_service_t *service, xboolean_t active)
       if (active)
         {
           if (service->priv->outstanding_accept)
-            xcancellable_cancel (service->priv->cancellable);
+            g_cancellable_cancel (service->priv->cancellable);
           else
             do_accept (service);
         }
       else
         {
           if (service->priv->outstanding_accept)
-            xcancellable_cancel (service->priv->cancellable);
+            g_cancellable_cancel (service->priv->cancellable);
         }
     }
 
   G_UNLOCK (active);
 
   if (notify)
-    xobject_notify (G_OBJECT (service), "active");
+    g_object_notify (G_OBJECT (service), "active");
 }
 
 static void
-xsocket_service_get_property (xobject_t    *object,
-                               xuint_t       prop_id,
-                               xvalue_t     *value,
-                               xparam_spec_t *pspec)
+g_socket_service_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
 {
-  xsocket_service_t *service = XSOCKET_SERVICE (object);
+  GSocketService *service = G_SOCKET_SERVICE (object);
 
   switch (prop_id)
     {
     case PROP_ACTIVE:
-      xvalue_set_boolean (value, get_active (service));
+      g_value_set_boolean (value, get_active (service));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -191,17 +191,17 @@ xsocket_service_get_property (xobject_t    *object,
 }
 
 static void
-xsocket_service_set_property (xobject_t      *object,
-                               xuint_t         prop_id,
-                               const xvalue_t *value,
-                               xparam_spec_t   *pspec)
+g_socket_service_set_property (GObject      *object,
+                               guint         prop_id,
+                               const GValue *value,
+                               GParamSpec   *pspec)
 {
-  xsocket_service_t *service = XSOCKET_SERVICE (object);
+  GSocketService *service = G_SOCKET_SERVICE (object);
 
   switch (prop_id)
     {
     case PROP_ACTIVE:
-      set_active (service, xvalue_get_boolean (value));
+      set_active (service, g_value_get_boolean (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -210,16 +210,16 @@ xsocket_service_set_property (xobject_t      *object,
 }
 
 static void
-xsocket_service_changed (xsocket_listener_t *listener)
+g_socket_service_changed (GSocketListener *listener)
 {
-  xsocket_service_t  *service = XSOCKET_SERVICE (listener);
+  GSocketService  *service = G_SOCKET_SERVICE (listener);
 
   G_LOCK (active);
 
   if (service->priv->active)
     {
       if (service->priv->outstanding_accept)
-	xcancellable_cancel (service->priv->cancellable);
+	g_cancellable_cancel (service->priv->cancellable);
       else
 	do_accept (service);
     }
@@ -228,8 +228,8 @@ xsocket_service_changed (xsocket_listener_t *listener)
 }
 
 /**
- * xsocket_service_is_active:
- * @service: a #xsocket_service_t
+ * g_socket_service_is_active:
+ * @service: a #GSocketService
  *
  * Check whether the service is active or not. An active
  * service will accept new clients that connect, while
@@ -240,22 +240,22 @@ xsocket_service_changed (xsocket_listener_t *listener)
  *
  * Since: 2.22
  */
-xboolean_t
-xsocket_service_is_active (xsocket_service_t *service)
+gboolean
+g_socket_service_is_active (GSocketService *service)
 {
-  xreturn_val_if_fail (X_IS_SOCKET_SERVICE (service), FALSE);
+  g_return_val_if_fail (G_IS_SOCKET_SERVICE (service), FALSE);
 
   return get_active (service);
 }
 
 /**
- * xsocket_service_start:
- * @service: a #xsocket_service_t
+ * g_socket_service_start:
+ * @service: a #GSocketService
  *
  * Restarts the service, i.e. start accepting connections
  * from the added sockets when the mainloop runs. This only needs
  * to be called after the service has been stopped from
- * xsocket_service_stop().
+ * g_socket_service_stop().
  *
  * This call is thread-safe, so it may be called from a thread
  * handling an incoming client request.
@@ -263,16 +263,16 @@ xsocket_service_is_active (xsocket_service_t *service)
  * Since: 2.22
  */
 void
-xsocket_service_start (xsocket_service_t *service)
+g_socket_service_start (GSocketService *service)
 {
-  g_return_if_fail (X_IS_SOCKET_SERVICE (service));
+  g_return_if_fail (G_IS_SOCKET_SERVICE (service));
 
   set_active (service, TRUE);
 }
 
 /**
- * xsocket_service_stop:
- * @service: a #xsocket_service_t
+ * g_socket_service_stop:
+ * @service: a #GSocketService
  *
  * Stops the service, i.e. stops accepting connections
  * from the added sockets when the mainloop runs.
@@ -282,54 +282,54 @@ xsocket_service_start (xsocket_service_t *service)
  *
  * Note that this only stops accepting new connections; it does not
  * close the listening sockets, and you can call
- * xsocket_service_start() again later to begin listening again. To
- * close the listening sockets, call xsocket_listener_close(). (This
- * will happen automatically when the #xsocket_service_t is finalized.)
+ * g_socket_service_start() again later to begin listening again. To
+ * close the listening sockets, call g_socket_listener_close(). (This
+ * will happen automatically when the #GSocketService is finalized.)
  *
- * This must be called before calling xsocket_listener_close() as
+ * This must be called before calling g_socket_listener_close() as
  * the socket service will start accepting connections immediately
  * when a new socket is added.
  *
  * Since: 2.22
  */
 void
-xsocket_service_stop (xsocket_service_t *service)
+g_socket_service_stop (GSocketService *service)
 {
-  g_return_if_fail (X_IS_SOCKET_SERVICE (service));
+  g_return_if_fail (G_IS_SOCKET_SERVICE (service));
 
   set_active (service, FALSE);
 }
 
-static xboolean_t
-xsocket_service_incoming (xsocket_service_t    *service,
-                           xsocket_connection_t *connection,
-                           xobject_t           *source_object)
+static gboolean
+g_socket_service_incoming (GSocketService    *service,
+                           GSocketConnection *connection,
+                           GObject           *source_object)
 {
-  xboolean_t result;
+  gboolean result;
 
-  xsignal_emit (service, xsocket_service_incoming_signal,
+  g_signal_emit (service, g_socket_service_incoming_signal,
                  0, connection, source_object, &result);
   return result;
 }
 
 static void
-xsocket_service_class_init (GSocketServiceClass *class)
+g_socket_service_class_init (GSocketServiceClass *class)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
-  GSocketListenerClass *listener_class = XSOCKET_LISTENER_CLASS (class);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
+  GSocketListenerClass *listener_class = G_SOCKET_LISTENER_CLASS (class);
 
-  xobject_class->finalize = xsocket_service_finalize;
-  xobject_class->set_property = xsocket_service_set_property;
-  xobject_class->get_property = xsocket_service_get_property;
-  listener_class->changed = xsocket_service_changed;
-  class->incoming = xsocket_service_real_incoming;
+  gobject_class->finalize = g_socket_service_finalize;
+  gobject_class->set_property = g_socket_service_set_property;
+  gobject_class->get_property = g_socket_service_get_property;
+  listener_class->changed = g_socket_service_changed;
+  class->incoming = g_socket_service_real_incoming;
 
   /**
-   * xsocket_service_t::incoming:
-   * @service: the #xsocket_service_t
-   * @connection: a new #xsocket_connection_t object
+   * GSocketService::incoming:
+   * @service: the #GSocketService
+   * @connection: a new #GSocketConnection object
    * @source_object: (nullable): the source_object passed to
-   *     xsocket_listener_add_address()
+   *     g_socket_listener_add_address()
    *
    * The ::incoming signal is emitted when a new incoming connection
    * to @service needs to be handled. The handler must initiate the
@@ -343,59 +343,59 @@ xsocket_service_class_init (GSocketServiceClass *class)
    *
    * Since: 2.22
    */
-  xsocket_service_incoming_signal =
-    xsignal_new (I_("incoming"), XTYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
+  g_socket_service_incoming_signal =
+    g_signal_new (I_("incoming"), G_TYPE_FROM_CLASS (class), G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSocketServiceClass, incoming),
-                  xsignal_accumulator_true_handled, NULL,
+                  g_signal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECT,
-                  XTYPE_BOOLEAN,
-                  2, XTYPE_SOCKET_CONNECTION, XTYPE_OBJECT);
-  xsignal_set_va_marshaller (xsocket_service_incoming_signal,
-                              XTYPE_FROM_CLASS (class),
+                  G_TYPE_BOOLEAN,
+                  2, G_TYPE_SOCKET_CONNECTION, G_TYPE_OBJECT);
+  g_signal_set_va_marshaller (g_socket_service_incoming_signal,
+                              G_TYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 
   /**
-   * xsocket_service_t:active:
+   * GSocketService:active:
    *
    * Whether the service is currently accepting connections.
    *
    * Since: 2.46
    */
-  xobject_class_install_property (xobject_class, PROP_ACTIVE,
-                                   xparam_spec_boolean ("active",
+  g_object_class_install_property (gobject_class, PROP_ACTIVE,
+                                   g_param_spec_boolean ("active",
                                                          P_("Active"),
                                                          P_("Whether the service is currently accepting connections"),
                                                          TRUE,
-                                                         XPARAM_CONSTRUCT | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
+                                                         G_PARAM_CONSTRUCT | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
-xsocket_service_ready (xobject_t      *object,
-                        xasync_result_t *result,
-                        xpointer_t      user_data)
+g_socket_service_ready (GObject      *object,
+                        GAsyncResult *result,
+                        gpointer      user_data)
 {
-  xsocket_listener_t *listener = XSOCKET_LISTENER (object);
-  xsocket_service_t *service = XSOCKET_SERVICE (object);
-  xsocket_connection_t *connection;
-  xobject_t *source_object;
-  xerror_t *error = NULL;
+  GSocketListener *listener = G_SOCKET_LISTENER (object);
+  GSocketService *service = G_SOCKET_SERVICE (object);
+  GSocketConnection *connection;
+  GObject *source_object;
+  GError *error = NULL;
 
-  connection = xsocket_listener_accept_finish (listener, result, &source_object, &error);
+  connection = g_socket_listener_accept_finish (listener, result, &source_object, &error);
   if (error)
     {
-      if (!xerror_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+      if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
 	g_warning ("fail: %s", error->message);
-      xerror_free (error);
+      g_error_free (error);
     }
   else
     {
-      xsocket_service_incoming (service, connection, source_object);
-      xobject_unref (connection);
+      g_socket_service_incoming (service, connection, source_object);
+      g_object_unref (connection);
     }
 
   G_LOCK (active);
 
-  xcancellable_reset (service->priv->cancellable);
+  g_cancellable_reset (service->priv->cancellable);
 
   /* requeue */
   service->priv->outstanding_accept = FALSE;
@@ -406,22 +406,22 @@ xsocket_service_ready (xobject_t      *object,
 }
 
 /**
- * xsocket_service_new:
+ * g_socket_service_new:
  *
- * Creates a new #xsocket_service_t with no sockets to listen for.
- * New listeners can be added with e.g. xsocket_listener_add_address()
- * or xsocket_listener_add_inet_port().
+ * Creates a new #GSocketService with no sockets to listen for.
+ * New listeners can be added with e.g. g_socket_listener_add_address()
+ * or g_socket_listener_add_inet_port().
  *
  * New services are created active, there is no need to call
- * xsocket_service_start(), unless xsocket_service_stop() has been
+ * g_socket_service_start(), unless g_socket_service_stop() has been
  * called before.
  *
- * Returns: a new #xsocket_service_t.
+ * Returns: a new #GSocketService.
  *
  * Since: 2.22
  */
-xsocket_service_t *
-xsocket_service_new (void)
+GSocketService *
+g_socket_service_new (void)
 {
-  return xobject_new (XTYPE_SOCKET_SERVICE, NULL);
+  return g_object_new (G_TYPE_SOCKET_SERVICE, NULL);
 }

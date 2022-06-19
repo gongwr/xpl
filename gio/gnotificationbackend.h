@@ -24,49 +24,49 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_NOTIFICATION_BACKEND         (xnotification_backend_get_type ())
-#define G_NOTIFICATION_BACKEND(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_NOTIFICATION_BACKEND, xnotification_backend))
-#define X_IS_NOTIFICATION_BACKEND(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_NOTIFICATION_BACKEND))
-#define G_NOTIFICATION_BACKEND_CLASS(k)     (XTYPE_CHECK_CLASS_CAST ((k), XTYPE_NOTIFICATION_BACKEND, xnotification_backend_class))
-#define G_NOTIFICATION_BACKEND_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_NOTIFICATION_BACKEND, xnotification_backend_class))
+#define G_TYPE_NOTIFICATION_BACKEND         (g_notification_backend_get_type ())
+#define G_NOTIFICATION_BACKEND(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_NOTIFICATION_BACKEND, GNotificationBackend))
+#define G_IS_NOTIFICATION_BACKEND(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_NOTIFICATION_BACKEND))
+#define G_NOTIFICATION_BACKEND_CLASS(k)     (G_TYPE_CHECK_CLASS_CAST ((k), G_TYPE_NOTIFICATION_BACKEND, GNotificationBackendClass))
+#define G_NOTIFICATION_BACKEND_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS ((o), G_TYPE_NOTIFICATION_BACKEND, GNotificationBackendClass))
 
 #define G_NOTIFICATION_BACKEND_EXTENSION_POINT_NAME "gnotification-backend"
 
-typedef struct _GNotificationBackend      xnotification_backend_t;
-typedef struct _GNotificationBackendClass xnotification_backend_class_t;
+typedef struct _GNotificationBackend      GNotificationBackend;
+typedef struct _GNotificationBackendClass GNotificationBackendClass;
 
 struct _GNotificationBackend
 {
-  xobject_t parent_instance;
+  GObject parent_instance;
 
-  xapplication_t    *application;
-  xdbus_connection_t *dbus_connection;
+  GApplication    *application;
+  GDBusConnection *dbus_connection;
 };
 
 struct _GNotificationBackendClass
 {
-  xobject_class_t parent_class;
+  GObjectClass parent_class;
 
-  xboolean_t  (*is_supported)             (void);
+  gboolean  (*is_supported)             (void);
 
-  void      (*send_notification)        (xnotification_backend_t *backend,
-                                         const xchar_t          *id,
-                                         xnotification_t        *notification);
+  void      (*send_notification)        (GNotificationBackend *backend,
+                                         const gchar          *id,
+                                         GNotification        *notification);
 
-  void      (*withdraw_notification)    (xnotification_backend_t *backend,
-                                         const xchar_t          *id);
+  void      (*withdraw_notification)    (GNotificationBackend *backend,
+                                         const gchar          *id);
 };
 
-xtype_t                   xnotification_backend_get_type                 (void);
+GType                   g_notification_backend_get_type                 (void);
 
-xnotification_backend_t *  xnotification_backend_new_default              (xapplication_t         *application);
+GNotificationBackend *  g_notification_backend_new_default              (GApplication         *application);
 
-void                    xnotification_backend_send_notification        (xnotification_backend_t *backend,
-                                                                         const xchar_t          *id,
-                                                                         xnotification_t        *notification);
+void                    g_notification_backend_send_notification        (GNotificationBackend *backend,
+                                                                         const gchar          *id,
+                                                                         GNotification        *notification);
 
-void                    xnotification_backend_withdraw_notification    (xnotification_backend_t *backend,
-                                                                         const xchar_t          *id);
+void                    g_notification_backend_withdraw_notification    (GNotificationBackend *backend,
+                                                                         const gchar          *id);
 
 G_END_DECLS
 

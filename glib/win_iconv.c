@@ -200,7 +200,7 @@ static struct {
     {12001, "UCS4BE"},
     {12001, "UCS-4BE"},
 
-#ifndef XPL_COMPILATION
+#ifndef GLIB_COMPILATION
     /*
      * Default is big endian.
      * See rfc2781 4.3 Interpreting text labelled as UTF-16.

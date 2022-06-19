@@ -54,7 +54,7 @@ excellent book on this topic,
 
 <para>
 When it comes to GLib and its associated libraries, GLib and
-xobject_t are generally fine to use in code that runs with elevated
+GObject are generally fine to use in code that runs with elevated
 privileges; they don't load modules (executable code in shared objects)
 or run other programs 'behind your back'. GIO has to be used
 carefully in privileged programs, see the <ulink url="http://developer.gnome.org/gio/stable/ch02.html">GIO documentation</ulink> for details.

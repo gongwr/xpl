@@ -36,35 +36,35 @@
  * @short_description: TLS connection type
  * @include: gio/gio.h
  *
- * #xtls_connection_t is the base TLS connection class type, which wraps
- * a #xio_stream_t and provides TLS encryption on top of it. Its
- * subclasses, #xtls_client_connection_t and #xtls_server_connection_t,
+ * #GTlsConnection is the base TLS connection class type, which wraps
+ * a #GIOStream and provides TLS encryption on top of it. Its
+ * subclasses, #GTlsClientConnection and #GTlsServerConnection,
  * implement client-side and server-side TLS, respectively.
  *
- * For DTLS (Datagram TLS) support, see #xdtls_connection_t.
+ * For DTLS (Datagram TLS) support, see #GDtlsConnection.
  *
  * Since: 2.28
  */
 
 /**
- * xtls_connection_t:
+ * GTlsConnection:
  *
- * Abstract base class for the backend-specific #xtls_client_connection_t
- * and #xtls_server_connection_t types.
+ * Abstract base class for the backend-specific #GTlsClientConnection
+ * and #GTlsServerConnection types.
  *
  * Since: 2.28
  */
 
-G_DEFINE_ABSTRACT_TYPE (xtls_connection_t, xtls_connection, XTYPE_IO_STREAM)
+G_DEFINE_ABSTRACT_TYPE (GTlsConnection, g_tls_connection, G_TYPE_IO_STREAM)
 
-static void xtls_connection_get_property (xobject_t    *object,
-					   xuint_t       prop_id,
-					   xvalue_t     *value,
-					   xparam_spec_t *pspec);
-static void xtls_connection_set_property (xobject_t      *object,
-					   xuint_t         prop_id,
-					   const xvalue_t *value,
-					   xparam_spec_t   *pspec);
+static void g_tls_connection_get_property (GObject    *object,
+					   guint       prop_id,
+					   GValue     *value,
+					   GParamSpec *pspec);
+static void g_tls_connection_set_property (GObject      *object,
+					   guint         prop_id,
+					   const GValue *value,
+					   GParamSpec   *pspec);
 
 enum {
   ACCEPT_CERTIFICATE,
@@ -72,7 +72,7 @@ enum {
   LAST_SIGNAL
 };
 
-static xuint_t signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 enum {
   PROP_0,
@@ -92,173 +92,173 @@ enum {
 };
 
 static void
-xtls_connection_class_init (GTlsConnectionClass *klass)
+g_tls_connection_class_init (GTlsConnectionClass *klass)
 {
-  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  xobject_class->get_property = xtls_connection_get_property;
-  xobject_class->set_property = xtls_connection_set_property;
+  gobject_class->get_property = g_tls_connection_get_property;
+  gobject_class->set_property = g_tls_connection_set_property;
 
   /**
-   * xtls_connection_t:base-io-stream:
+   * GTlsConnection:base-io-stream:
    *
-   * The #xio_stream_t that the connection wraps. The connection holds a reference
+   * The #GIOStream that the connection wraps. The connection holds a reference
    * to this stream, and may run operations on the stream from other threads
-   * throughout its lifetime. Consequently, after the #xio_stream_t has been
+   * throughout its lifetime. Consequently, after the #GIOStream has been
    * constructed, application code may only run its own operations on this
-   * stream when no #xio_stream_t operations are running.
+   * stream when no #GIOStream operations are running.
    *
    * Since: 2.28
    */
-  xobject_class_install_property (xobject_class, PROP_BASE_IO_STREAM,
-				   xparam_spec_object ("base-io-stream",
+  g_object_class_install_property (gobject_class, PROP_BASE_IO_STREAM,
+				   g_param_spec_object ("base-io-stream",
 							P_("Base IOStream"),
-							P_("The xio_stream_t that the connection wraps"),
-							XTYPE_IO_STREAM,
-							XPARAM_READWRITE |
-							XPARAM_CONSTRUCT_ONLY |
-							XPARAM_STATIC_STRINGS));
+							P_("The GIOStream that the connection wraps"),
+							G_TYPE_IO_STREAM,
+							G_PARAM_READWRITE |
+							G_PARAM_CONSTRUCT_ONLY |
+							G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:use-system-certdb:
+   * GTlsConnection:use-system-certdb:
    *
    * Whether or not the system certificate database will be used to
    * verify peer certificates. See
-   * xtls_connection_set_use_system_certdb().
+   * g_tls_connection_set_use_system_certdb().
    *
-   * Deprecated: 2.30: Use xtls_connection_t:database instead
+   * Deprecated: 2.30: Use GTlsConnection:database instead
    */
-  xobject_class_install_property (xobject_class, PROP_USE_SYSTEM_CERTDB,
-				   xparam_spec_boolean ("use-system-certdb",
+  g_object_class_install_property (gobject_class, PROP_USE_SYSTEM_CERTDB,
+				   g_param_spec_boolean ("use-system-certdb",
 							 P_("Use system certificate database"),
 							 P_("Whether to verify peer certificates against the system certificate database"),
 							 TRUE,
-							 XPARAM_READWRITE |
-							 XPARAM_CONSTRUCT |
-							 XPARAM_STATIC_STRINGS |
-							 XPARAM_DEPRECATED));
+							 G_PARAM_READWRITE |
+							 G_PARAM_CONSTRUCT |
+							 G_PARAM_STATIC_STRINGS |
+							 G_PARAM_DEPRECATED));
   /**
-   * xtls_connection_t:database: (nullable)
+   * GTlsConnection:database: (nullable)
    *
    * The certificate database to use when verifying this TLS connection.
    * If no certificate database is set, then the default database will be
-   * used. See xtls_backend_get_default_database().
+   * used. See g_tls_backend_get_default_database().
    *
-   * When using a non-default database, #xtls_connection_t must fall back to using
-   * the #xtls_database_t to perform certificate verification using
-   * xtls_database_verify_chain(), which means certificate verification will
+   * When using a non-default database, #GTlsConnection must fall back to using
+   * the #GTlsDatabase to perform certificate verification using
+   * g_tls_database_verify_chain(), which means certificate verification will
    * not be able to make use of TLS session context. This may be less secure.
-   * For example, if you create your own #xtls_database_t that just wraps the
-   * default #xtls_database_t, you might expect that you have not changed anything,
+   * For example, if you create your own #GTlsDatabase that just wraps the
+   * default #GTlsDatabase, you might expect that you have not changed anything,
    * but this is not true because you may have altered the behavior of
-   * #xtls_connection_t by causing it to use xtls_database_verify_chain(). See the
-   * documentation of xtls_database_verify_chain() for more details on specific
+   * #GTlsConnection by causing it to use g_tls_database_verify_chain(). See the
+   * documentation of g_tls_database_verify_chain() for more details on specific
    * security checks that may not be performed. Accordingly, setting a
    * non-default database is discouraged except for specialty applications with
    * unusual security requirements.
    *
    * Since: 2.30
    */
-  xobject_class_install_property (xobject_class, PROP_DATABASE,
-				   xparam_spec_object ("database",
+  g_object_class_install_property (gobject_class, PROP_DATABASE,
+				   g_param_spec_object ("database",
 							 P_("Database"),
 							 P_("Certificate database to use for looking up or verifying certificates"),
-							 XTYPE_TLS_DATABASE,
-							 XPARAM_READWRITE |
-							 XPARAM_STATIC_STRINGS));
+							 G_TYPE_TLS_DATABASE,
+							 G_PARAM_READWRITE |
+							 G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:interaction: (nullable)
+   * GTlsConnection:interaction: (nullable)
    *
-   * A #xtls_interaction_t object to be used when the connection or certificate
+   * A #GTlsInteraction object to be used when the connection or certificate
    * database need to interact with the user. This will be used to prompt the
    * user for passwords where necessary.
    *
    * Since: 2.30
    */
-  xobject_class_install_property (xobject_class, PROP_INTERACTION,
-                                   xparam_spec_object ("interaction",
+  g_object_class_install_property (gobject_class, PROP_INTERACTION,
+                                   g_param_spec_object ("interaction",
                                                         P_("Interaction"),
                                                         P_("Optional object for user interaction"),
-                                                        XTYPE_TLS_INTERACTION,
-                                                        XPARAM_READWRITE |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_TYPE_TLS_INTERACTION,
+                                                        G_PARAM_READWRITE |
+                                                        G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:require-close-notify:
+   * GTlsConnection:require-close-notify:
    *
    * Whether or not proper TLS close notification is required.
-   * See xtls_connection_set_require_close_notify().
+   * See g_tls_connection_set_require_close_notify().
    *
    * Since: 2.28
    */
-  xobject_class_install_property (xobject_class, PROP_REQUIRE_CLOSE_NOTIFY,
-				   xparam_spec_boolean ("require-close-notify",
+  g_object_class_install_property (gobject_class, PROP_REQUIRE_CLOSE_NOTIFY,
+				   g_param_spec_boolean ("require-close-notify",
 							 P_("Require close notify"),
 							 P_("Whether to require proper TLS close notification"),
 							 TRUE,
-							 XPARAM_READWRITE |
-							 XPARAM_CONSTRUCT |
-							 XPARAM_STATIC_STRINGS));
+							 G_PARAM_READWRITE |
+							 G_PARAM_CONSTRUCT |
+							 G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:rehandshake-mode:
+   * GTlsConnection:rehandshake-mode:
    *
    * The rehandshaking mode. See
-   * xtls_connection_set_rehandshake_mode().
+   * g_tls_connection_set_rehandshake_mode().
    *
    * Since: 2.28
    *
    * Deprecated: 2.60: The rehandshake mode is ignored.
    */
-  xobject_class_install_property (xobject_class, PROP_REHANDSHAKE_MODE,
-				   xparam_spec_enum ("rehandshake-mode",
+  g_object_class_install_property (gobject_class, PROP_REHANDSHAKE_MODE,
+				   g_param_spec_enum ("rehandshake-mode",
 						      P_("Rehandshake mode"),
 						      P_("When to allow rehandshaking"),
-						      XTYPE_TLS_REHANDSHAKE_MODE,
+						      G_TYPE_TLS_REHANDSHAKE_MODE,
 						      G_TLS_REHANDSHAKE_SAFELY,
-						      XPARAM_READWRITE |
-						      XPARAM_CONSTRUCT |
-						      XPARAM_STATIC_STRINGS |
-						      XPARAM_DEPRECATED));
+						      G_PARAM_READWRITE |
+						      G_PARAM_CONSTRUCT |
+						      G_PARAM_STATIC_STRINGS |
+						      G_PARAM_DEPRECATED));
   /**
-   * xtls_connection_t:certificate:
+   * GTlsConnection:certificate:
    *
    * The connection's certificate; see
-   * xtls_connection_set_certificate().
+   * g_tls_connection_set_certificate().
    *
    * Since: 2.28
    */
-  xobject_class_install_property (xobject_class, PROP_CERTIFICATE,
-				   xparam_spec_object ("certificate",
+  g_object_class_install_property (gobject_class, PROP_CERTIFICATE,
+				   g_param_spec_object ("certificate",
 							P_("Certificate"),
 							P_("The connection’s certificate"),
-							XTYPE_TLS_CERTIFICATE,
-							XPARAM_READWRITE |
-							XPARAM_STATIC_STRINGS));
+							G_TYPE_TLS_CERTIFICATE,
+							G_PARAM_READWRITE |
+							G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:peer-certificate: (nullable)
+   * GTlsConnection:peer-certificate: (nullable)
    *
    * The connection's peer's certificate, after the TLS handshake has
    * completed or failed. Note in particular that this is not yet set
-   * during the emission of #xtls_connection_t::accept-certificate.
+   * during the emission of #GTlsConnection::accept-certificate.
    *
-   * (You can watch for a #xobject_t::notify signal on this property to
+   * (You can watch for a #GObject::notify signal on this property to
    * detect when a handshake has occurred.)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (xobject_class, PROP_PEER_CERTIFICATE,
-				   xparam_spec_object ("peer-certificate",
+  g_object_class_install_property (gobject_class, PROP_PEER_CERTIFICATE,
+				   g_param_spec_object ("peer-certificate",
 							P_("Peer Certificate"),
 							P_("The connection’s peer’s certificate"),
-							XTYPE_TLS_CERTIFICATE,
-							XPARAM_READABLE |
-							XPARAM_STATIC_STRINGS));
+							G_TYPE_TLS_CERTIFICATE,
+							G_PARAM_READABLE |
+							G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:peer-certificate-errors:
+   * GTlsConnection:peer-certificate-errors:
    *
    * The errors noticed while verifying
-   * #xtls_connection_t:peer-certificate. Normally this should be 0, but
-   * it may not be if #xtls_client_connection_t:validation-flags is not
+   * #GTlsConnection:peer-certificate. Normally this should be 0, but
+   * it may not be if #GTlsClientConnection:validation-flags is not
    * %G_TLS_CERTIFICATE_VALIDATE_ALL, or if
-   * #xtls_connection_t::accept-certificate overrode the default
+   * #GTlsConnection::accept-certificate overrode the default
    * behavior.
    *
    * GLib guarantees that if certificate verification fails, at least
@@ -271,91 +271,91 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (xobject_class, PROP_PEER_CERTIFICATE_ERRORS,
-				   xparam_spec_flags ("peer-certificate-errors",
+  g_object_class_install_property (gobject_class, PROP_PEER_CERTIFICATE_ERRORS,
+				   g_param_spec_flags ("peer-certificate-errors",
 						       P_("Peer Certificate Errors"),
 						       P_("Errors found with the peer’s certificate"),
-						       XTYPE_TLS_CERTIFICATE_FLAGS,
+						       G_TYPE_TLS_CERTIFICATE_FLAGS,
 						       0,
-						       XPARAM_READABLE |
-						       XPARAM_STATIC_STRINGS));
+						       G_PARAM_READABLE |
+						       G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:advertised-protocols: (nullable)
+   * GTlsConnection:advertised-protocols: (nullable)
    *
    * The list of application-layer protocols that the connection
    * advertises that it is willing to speak. See
-   * xtls_connection_set_advertised_protocols().
+   * g_tls_connection_set_advertised_protocols().
    *
    * Since: 2.60
    */
-  xobject_class_install_property (xobject_class, PROP_ADVERTISED_PROTOCOLS,
-                                   xparam_spec_boxed ("advertised-protocols",
+  g_object_class_install_property (gobject_class, PROP_ADVERTISED_PROTOCOLS,
+                                   g_param_spec_boxed ("advertised-protocols",
                                                        P_("Advertised Protocols"),
                                                        P_("Application-layer protocols available on this connection"),
-                                                       XTYPE_STRV,
-                                                       XPARAM_READWRITE |
-                                                       XPARAM_STATIC_STRINGS));
+                                                       G_TYPE_STRV,
+                                                       G_PARAM_READWRITE |
+                                                       G_PARAM_STATIC_STRINGS));
   /**
-   * xtls_connection_t:negotiated-protocol:
+   * GTlsConnection:negotiated-protocol:
    *
    * The application-layer protocol negotiated during the TLS
-   * handshake. See xtls_connection_get_negotiated_protocol().
+   * handshake. See g_tls_connection_get_negotiated_protocol().
    *
    * Since: 2.60
    */
-  xobject_class_install_property (xobject_class, PROP_NEGOTIATED_PROTOCOL,
-                                   xparam_spec_string ("negotiated-protocol",
+  g_object_class_install_property (gobject_class, PROP_NEGOTIATED_PROTOCOL,
+                                   g_param_spec_string ("negotiated-protocol",
                                                         P_("Negotiated Protocol"),
                                                         P_("Application-layer protocol negotiated for this connection"),
                                                         NULL,
-                                                        XPARAM_READABLE |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READABLE |
+                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * xtls_connection_t:protocol-version:
+   * GTlsConnection:protocol-version:
    *
-   * The TLS protocol version in use. See xtls_connection_get_protocol_version().
+   * The TLS protocol version in use. See g_tls_connection_get_protocol_version().
    *
    * Since: 2.70
    */
-  xobject_class_install_property (xobject_class, PROP_PROTOCOL_VERSION,
-                                   xparam_spec_enum ("protocol-version",
+  g_object_class_install_property (gobject_class, PROP_PROTOCOL_VERSION,
+                                   g_param_spec_enum ("protocol-version",
                                                       P_("Protocol Version"),
                                                       P_("TLS protocol version negotiated for this connection"),
-                                                      XTYPE_TLS_PROTOCOL_VERSION,
+                                                      G_TYPE_TLS_PROTOCOL_VERSION,
                                                       G_TLS_PROTOCOL_VERSION_UNKNOWN,
-                                                      XPARAM_READABLE |
-                                                      XPARAM_STATIC_STRINGS));
+                                                      G_PARAM_READABLE |
+                                                      G_PARAM_STATIC_STRINGS));
 
   /**
-   * xtls_connection_t:ciphersuite-name: (nullable)
+   * GTlsConnection:ciphersuite-name: (nullable)
    *
-   * The name of the TLS ciphersuite in use. See xtls_connection_get_ciphersuite_name().
+   * The name of the TLS ciphersuite in use. See g_tls_connection_get_ciphersuite_name().
    *
    * Since: 2.70
    */
-  xobject_class_install_property (xobject_class, PROP_CIPHERSUITE_NAME,
-                                   xparam_spec_string ("ciphersuite-name",
+  g_object_class_install_property (gobject_class, PROP_CIPHERSUITE_NAME,
+                                   g_param_spec_string ("ciphersuite-name",
                                                         P_("Ciphersuite Name"),
                                                         P_("Name of ciphersuite negotiated for this connection"),
                                                         NULL,
-                                                        XPARAM_READABLE |
-                                                        XPARAM_STATIC_STRINGS));
+                                                        G_PARAM_READABLE |
+                                                        G_PARAM_STATIC_STRINGS));
 
   /**
-   * xtls_connection_t::accept-certificate:
-   * @conn: a #xtls_connection_t
-   * @peer_cert: the peer's #xtls_certificate_t
+   * GTlsConnection::accept-certificate:
+   * @conn: a #GTlsConnection
+   * @peer_cert: the peer's #GTlsCertificate
    * @errors: the problems with @peer_cert.
    *
    * Emitted during the TLS handshake after the peer certificate has
    * been received. You can examine @peer_cert's certification path by
-   * calling xtls_certificate_get_issuer() on it.
+   * calling g_tls_certificate_get_issuer() on it.
    *
    * For a client-side connection, @peer_cert is the server's
    * certificate, and the signal will only be emitted if the
    * certificate was not acceptable according to @conn's
-   * #xtls_client_connection_t:validation_flags. If you would like the
+   * #GTlsClientConnection:validation_flags. If you would like the
    * certificate to be accepted despite @errors, return %TRUE from the
    * signal handler. Otherwise, if no handler accepts the certificate,
    * the handshake will fail with %G_TLS_ERROR_BAD_CERTIFICATE.
@@ -371,7 +371,7 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * For a server-side connection, @peer_cert is the certificate
    * presented by the client, if this was requested via the server's
-   * #xtls_server_connection_t:authentication_mode. On the server side,
+   * #GTlsServerConnection:authentication_mode. On the server side,
    * the signal is always emitted when the client presents a
    * certificate, and the certificate will only be accepted if a
    * handler returns %TRUE.
@@ -399,213 +399,213 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    * Since: 2.28
    */
   signals[ACCEPT_CERTIFICATE] =
-    xsignal_new (I_("accept-certificate"),
-		  XTYPE_TLS_CONNECTION,
+    g_signal_new (I_("accept-certificate"),
+		  G_TYPE_TLS_CONNECTION,
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GTlsConnectionClass, accept_certificate),
-		  xsignal_accumulator_true_handled, NULL,
+		  g_signal_accumulator_true_handled, NULL,
 		  _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGS,
-		  XTYPE_BOOLEAN, 2,
-		  XTYPE_TLS_CERTIFICATE,
-		  XTYPE_TLS_CERTIFICATE_FLAGS);
-  xsignal_set_va_marshaller (signals[ACCEPT_CERTIFICATE],
-                              XTYPE_FROM_CLASS (klass),
+		  G_TYPE_BOOLEAN, 2,
+		  G_TYPE_TLS_CERTIFICATE,
+		  G_TYPE_TLS_CERTIFICATE_FLAGS);
+  g_signal_set_va_marshaller (signals[ACCEPT_CERTIFICATE],
+                              G_TYPE_FROM_CLASS (klass),
                               _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGSv);
 }
 
 static void
-xtls_connection_init (xtls_connection_t *conn)
+g_tls_connection_init (GTlsConnection *conn)
 {
 }
 
 static void
-xtls_connection_get_property (xobject_t    *object,
-			       xuint_t       prop_id,
-			       xvalue_t     *value,
-			       xparam_spec_t *pspec)
+g_tls_connection_get_property (GObject    *object,
+			       guint       prop_id,
+			       GValue     *value,
+			       GParamSpec *pspec)
 {
   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 }
 
 static void
-xtls_connection_set_property (xobject_t      *object,
-			       xuint_t         prop_id,
-			       const xvalue_t *value,
-			       xparam_spec_t   *pspec)
+g_tls_connection_set_property (GObject      *object,
+			       guint         prop_id,
+			       const GValue *value,
+			       GParamSpec   *pspec)
 {
   G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
 }
 
 /**
- * xtls_connection_set_use_system_certdb:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_set_use_system_certdb:
+ * @conn: a #GTlsConnection
  * @use_system_certdb: whether to use the system certificate database
  *
  * Sets whether @conn uses the system certificate database to verify
  * peer certificates. This is %TRUE by default. If set to %FALSE, then
  * peer certificate validation will always set the
  * %G_TLS_CERTIFICATE_UNKNOWN_CA error (meaning
- * #xtls_connection_t::accept-certificate will always be emitted on
+ * #GTlsConnection::accept-certificate will always be emitted on
  * client-side connections, unless that bit is not set in
- * #xtls_client_connection_t:validation-flags).
+ * #GTlsClientConnection:validation-flags).
  *
- * Deprecated: 2.30: Use xtls_connection_set_database() instead
+ * Deprecated: 2.30: Use g_tls_connection_set_database() instead
  */
 void
-xtls_connection_set_use_system_certdb (xtls_connection_t *conn,
-					xboolean_t        use_system_certdb)
+g_tls_connection_set_use_system_certdb (GTlsConnection *conn,
+					gboolean        use_system_certdb)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
 
-  xobject_set (G_OBJECT (conn),
+  g_object_set (G_OBJECT (conn),
 		"use-system-certdb", use_system_certdb,
 		NULL);
 }
 
 /**
- * xtls_connection_get_use_system_certdb:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_use_system_certdb:
+ * @conn: a #GTlsConnection
  *
  * Gets whether @conn uses the system certificate database to verify
- * peer certificates. See xtls_connection_set_use_system_certdb().
+ * peer certificates. See g_tls_connection_set_use_system_certdb().
  *
  * Returns: whether @conn uses the system certificate database
  *
- * Deprecated: 2.30: Use xtls_connection_get_database() instead
+ * Deprecated: 2.30: Use g_tls_connection_get_database() instead
  */
-xboolean_t
-xtls_connection_get_use_system_certdb (xtls_connection_t *conn)
+gboolean
+g_tls_connection_get_use_system_certdb (GTlsConnection *conn)
 {
-  xboolean_t use_system_certdb;
+  gboolean use_system_certdb;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), TRUE);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), TRUE);
 
-  xobject_get (G_OBJECT (conn),
+  g_object_get (G_OBJECT (conn),
 		"use-system-certdb", &use_system_certdb,
 		NULL);
   return use_system_certdb;
 }
 
 /**
- * xtls_connection_set_database:
- * @conn: a #xtls_connection_t
- * @database: (nullable): a #xtls_database_t
+ * g_tls_connection_set_database:
+ * @conn: a #GTlsConnection
+ * @database: (nullable): a #GTlsDatabase
  *
  * Sets the certificate database that is used to verify peer certificates.
  * This is set to the default database by default. See
- * xtls_backend_get_default_database(). If set to %NULL, then
+ * g_tls_backend_get_default_database(). If set to %NULL, then
  * peer certificate validation will always set the
  * %G_TLS_CERTIFICATE_UNKNOWN_CA error (meaning
- * #xtls_connection_t::accept-certificate will always be emitted on
+ * #GTlsConnection::accept-certificate will always be emitted on
  * client-side connections, unless that bit is not set in
- * #xtls_client_connection_t:validation-flags).
+ * #GTlsClientConnection:validation-flags).
  *
  * There are nonintuitive security implications when using a non-default
- * database. See #xtls_connection_t:database for details.
+ * database. See #GTlsConnection:database for details.
  *
  * Since: 2.30
  */
 void
-xtls_connection_set_database (xtls_connection_t *conn,
-                               xtls_database_t   *database)
+g_tls_connection_set_database (GTlsConnection *conn,
+                               GTlsDatabase   *database)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
-  g_return_if_fail (database == NULL || X_IS_TLS_DATABASE (database));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (database == NULL || G_IS_TLS_DATABASE (database));
 
-  xobject_set (G_OBJECT (conn),
+  g_object_set (G_OBJECT (conn),
 		"database", database,
 		NULL);
 }
 
 /**
- * xtls_connection_get_database:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_database:
+ * @conn: a #GTlsConnection
  *
  * Gets the certificate database that @conn uses to verify
- * peer certificates. See xtls_connection_set_database().
+ * peer certificates. See g_tls_connection_set_database().
  *
  * Returns: (transfer none) (nullable): the certificate database that @conn uses or %NULL
  *
  * Since: 2.30
  */
-xtls_database_t*
-xtls_connection_get_database (xtls_connection_t *conn)
+GTlsDatabase*
+g_tls_connection_get_database (GTlsConnection *conn)
 {
-  xtls_database_t *database = NULL;
+  GTlsDatabase *database = NULL;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), NULL);
 
-  xobject_get (G_OBJECT (conn),
+  g_object_get (G_OBJECT (conn),
 		"database", &database,
 		NULL);
   if (database)
-    xobject_unref (database);
+    g_object_unref (database);
   return database;
 }
 
 /**
- * xtls_connection_set_certificate:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_set_certificate:
+ * @conn: a #GTlsConnection
  * @certificate: the certificate to use for @conn
  *
  * This sets the certificate that @conn will present to its peer
- * during the TLS handshake. For a #xtls_server_connection_t, it is
+ * during the TLS handshake. For a #GTlsServerConnection, it is
  * mandatory to set this, and that will normally be done at construct
  * time.
  *
- * For a #xtls_client_connection_t, this is optional. If a handshake fails
+ * For a #GTlsClientConnection, this is optional. If a handshake fails
  * with %G_TLS_ERROR_CERTIFICATE_REQUIRED, that means that the server
  * requires a certificate, and if you try connecting again, you should
  * call this method first. You can call
- * xtls_client_connection_get_accepted_cas() on the failed connection
+ * g_tls_client_connection_get_accepted_cas() on the failed connection
  * to get a list of Certificate Authorities that the server will
  * accept certificates from.
  *
  * (It is also possible that a server will allow the connection with
  * or without a certificate; in that case, if you don't provide a
  * certificate, you can tell that the server requested one by the fact
- * that xtls_client_connection_get_accepted_cas() will return
+ * that g_tls_client_connection_get_accepted_cas() will return
  * non-%NULL.)
  *
  * Since: 2.28
  */
 void
-xtls_connection_set_certificate (xtls_connection_t  *conn,
-				  xtls_certificate_t *certificate)
+g_tls_connection_set_certificate (GTlsConnection  *conn,
+				  GTlsCertificate *certificate)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
-  g_return_if_fail (X_IS_TLS_CERTIFICATE (certificate));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (G_IS_TLS_CERTIFICATE (certificate));
 
-  xobject_set (G_OBJECT (conn), "certificate", certificate, NULL);
+  g_object_set (G_OBJECT (conn), "certificate", certificate, NULL);
 }
 
 /**
- * xtls_connection_get_certificate:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_certificate:
+ * @conn: a #GTlsConnection
  *
  * Gets @conn's certificate, as set by
- * xtls_connection_set_certificate().
+ * g_tls_connection_set_certificate().
  *
  * Returns: (transfer none) (nullable): @conn's certificate, or %NULL
  *
  * Since: 2.28
  */
-xtls_certificate_t *
-xtls_connection_get_certificate (xtls_connection_t *conn)
+GTlsCertificate *
+g_tls_connection_get_certificate (GTlsConnection *conn)
 {
-  xtls_certificate_t *certificate;
+  GTlsCertificate *certificate;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), NULL);
 
-  xobject_get (G_OBJECT (conn), "certificate", &certificate, NULL);
+  g_object_get (G_OBJECT (conn), "certificate", &certificate, NULL);
   if (certificate)
-    xobject_unref (certificate);
+    g_object_unref (certificate);
 
   return certificate;
 }
 
 /**
- * xtls_connection_set_interaction:
+ * g_tls_connection_set_interaction:
  * @conn: a connection
  * @interaction: (nullable): an interaction object, or %NULL
  *
@@ -613,23 +613,23 @@ xtls_connection_get_certificate (xtls_connection_t *conn)
  * for things like prompting the user for passwords.
  *
  * The @interaction argument will normally be a derived subclass of
- * #xtls_interaction_t. %NULL can also be provided if no user interaction
+ * #GTlsInteraction. %NULL can also be provided if no user interaction
  * should occur for this connection.
  *
  * Since: 2.30
  */
 void
-xtls_connection_set_interaction (xtls_connection_t       *conn,
-                                  xtls_interaction_t      *interaction)
+g_tls_connection_set_interaction (GTlsConnection       *conn,
+                                  GTlsInteraction      *interaction)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
-  g_return_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (interaction == NULL || G_IS_TLS_INTERACTION (interaction));
 
-  xobject_set (G_OBJECT (conn), "interaction", interaction, NULL);
+  g_object_set (G_OBJECT (conn), "interaction", interaction, NULL);
 }
 
 /**
- * xtls_connection_get_interaction:
+ * g_tls_connection_get_interaction:
  * @conn: a connection
  *
  * Get the object that will be used to interact with the user. It will be used
@@ -640,74 +640,74 @@ xtls_connection_set_interaction (xtls_connection_t       *conn,
  *
  * Since: 2.30
  */
-xtls_interaction_t *
-xtls_connection_get_interaction (xtls_connection_t       *conn)
+GTlsInteraction *
+g_tls_connection_get_interaction (GTlsConnection       *conn)
 {
-  xtls_interaction_t *interaction = NULL;
+  GTlsInteraction *interaction = NULL;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), NULL);
 
-  xobject_get (G_OBJECT (conn), "interaction", &interaction, NULL);
+  g_object_get (G_OBJECT (conn), "interaction", &interaction, NULL);
   if (interaction)
-    xobject_unref (interaction);
+    g_object_unref (interaction);
 
   return interaction;
 }
 
 /**
- * xtls_connection_get_peer_certificate:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_peer_certificate:
+ * @conn: a #GTlsConnection
  *
  * Gets @conn's peer's certificate after the handshake has completed
  * or failed. (It is not set during the emission of
- * #xtls_connection_t::accept-certificate.)
+ * #GTlsConnection::accept-certificate.)
  *
  * Returns: (transfer none) (nullable): @conn's peer's certificate, or %NULL
  *
  * Since: 2.28
  */
-xtls_certificate_t *
-xtls_connection_get_peer_certificate (xtls_connection_t *conn)
+GTlsCertificate *
+g_tls_connection_get_peer_certificate (GTlsConnection *conn)
 {
-  xtls_certificate_t *peer_certificate;
+  GTlsCertificate *peer_certificate;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), NULL);
 
-  xobject_get (G_OBJECT (conn), "peer-certificate", &peer_certificate, NULL);
+  g_object_get (G_OBJECT (conn), "peer-certificate", &peer_certificate, NULL);
   if (peer_certificate)
-    xobject_unref (peer_certificate);
+    g_object_unref (peer_certificate);
 
   return peer_certificate;
 }
 
 /**
- * xtls_connection_get_peer_certificate_errors:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_peer_certificate_errors:
+ * @conn: a #GTlsConnection
  *
  * Gets the errors associated with validating @conn's peer's
  * certificate, after the handshake has completed or failed. (It is
- * not set during the emission of #xtls_connection_t::accept-certificate.)
+ * not set during the emission of #GTlsConnection::accept-certificate.)
  *
- * See #xtls_connection_t:peer-certificate-errors for more information.
+ * See #GTlsConnection:peer-certificate-errors for more information.
  *
  * Returns: @conn's peer's certificate errors
  *
  * Since: 2.28
  */
-xtls_certificate_flags_t
-xtls_connection_get_peer_certificate_errors (xtls_connection_t *conn)
+GTlsCertificateFlags
+g_tls_connection_get_peer_certificate_errors (GTlsConnection *conn)
 {
-  xtls_certificate_flags_t errors;
+  GTlsCertificateFlags errors;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), 0);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), 0);
 
-  xobject_get (G_OBJECT (conn), "peer-certificate-errors", &errors, NULL);
+  g_object_get (G_OBJECT (conn), "peer-certificate-errors", &errors, NULL);
   return errors;
 }
 
 /**
- * xtls_connection_set_require_close_notify:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_set_require_close_notify:
+ * @conn: a #GTlsConnection
  * @require_close_notify: whether or not to require close notification
  *
  * Sets whether or not @conn expects a proper TLS close notification
@@ -724,62 +724,62 @@ xtls_connection_get_peer_certificate_errors (xtls_connection_t *conn)
  * somehow self-delimiting); in this case, the close notify is
  * redundant and sometimes omitted. (TLS 1.1 explicitly allows this;
  * in TLS 1.0 it is technically an error, but often done anyway.) You
- * can use xtls_connection_set_require_close_notify() to tell @conn
+ * can use g_tls_connection_set_require_close_notify() to tell @conn
  * to allow an "unannounced" connection close, in which case the close
  * will show up as a 0-length read, as in a non-TLS
- * #xsocket_connection_t, and it is up to the application to check that
+ * #GSocketConnection, and it is up to the application to check that
  * the data has been fully received.
  *
  * Note that this only affects the behavior when the peer closes the
  * connection; when the application calls g_io_stream_close() itself
  * on @conn, this will send a close notification regardless of the
  * setting of this property. If you explicitly want to do an unclean
- * close, you can close @conn's #xtls_connection_t:base-io-stream rather
+ * close, you can close @conn's #GTlsConnection:base-io-stream rather
  * than closing @conn itself, but note that this may only be done when no other
  * operations are pending on @conn or the base I/O stream.
  *
  * Since: 2.28
  */
 void
-xtls_connection_set_require_close_notify (xtls_connection_t *conn,
-					   xboolean_t        require_close_notify)
+g_tls_connection_set_require_close_notify (GTlsConnection *conn,
+					   gboolean        require_close_notify)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
 
-  xobject_set (G_OBJECT (conn),
+  g_object_set (G_OBJECT (conn),
 		"require-close-notify", require_close_notify,
 		NULL);
 }
 
 /**
- * xtls_connection_get_require_close_notify:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_require_close_notify:
+ * @conn: a #GTlsConnection
  *
  * Tests whether or not @conn expects a proper TLS close notification
  * when the connection is closed. See
- * xtls_connection_set_require_close_notify() for details.
+ * g_tls_connection_set_require_close_notify() for details.
  *
  * Returns: %TRUE if @conn requires a proper TLS close
  * notification.
  *
  * Since: 2.28
  */
-xboolean_t
-xtls_connection_get_require_close_notify (xtls_connection_t *conn)
+gboolean
+g_tls_connection_get_require_close_notify (GTlsConnection *conn)
 {
-  xboolean_t require_close_notify;
+  gboolean require_close_notify;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), TRUE);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), TRUE);
 
-  xobject_get (G_OBJECT (conn),
+  g_object_get (G_OBJECT (conn),
 		"require-close-notify", &require_close_notify,
 		NULL);
   return require_close_notify;
 }
 
 /**
- * xtls_connection_set_rehandshake_mode:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_set_rehandshake_mode:
+ * @conn: a #GTlsConnection
  * @mode: the rehandshaking mode
  *
  * Since GLib 2.64, changing the rehandshake mode is no longer supported
@@ -795,23 +795,23 @@ xtls_connection_get_require_close_notify (xtls_connection_t *conn)
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
-xtls_connection_set_rehandshake_mode (xtls_connection_t       *conn,
+g_tls_connection_set_rehandshake_mode (GTlsConnection       *conn,
 				       GTlsRehandshakeMode   mode)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
 
-  xobject_set (G_OBJECT (conn),
+  g_object_set (G_OBJECT (conn),
 		"rehandshake-mode", G_TLS_REHANDSHAKE_SAFELY,
 		NULL);
 }
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * xtls_connection_get_rehandshake_mode:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_rehandshake_mode:
+ * @conn: a #GTlsConnection
  *
  * Gets @conn rehandshaking mode. See
- * xtls_connection_set_rehandshake_mode() for details.
+ * g_tls_connection_set_rehandshake_mode() for details.
  *
  * Returns: %G_TLS_REHANDSHAKE_SAFELY
  *
@@ -823,16 +823,16 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 GTlsRehandshakeMode
-xtls_connection_get_rehandshake_mode (xtls_connection_t       *conn)
+g_tls_connection_get_rehandshake_mode (GTlsConnection       *conn)
 {
   GTlsRehandshakeMode mode;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), G_TLS_REHANDSHAKE_SAFELY);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), G_TLS_REHANDSHAKE_SAFELY);
 
-  /* Continue to call xobject_get(), even though the return value is
+  /* Continue to call g_object_get(), even though the return value is
    * ignored, so that behavior doesn’t change for derived classes.
    */
-  xobject_get (G_OBJECT (conn),
+  g_object_get (G_OBJECT (conn),
 		"rehandshake-mode", &mode,
 		NULL);
   return G_TLS_REHANDSHAKE_SAFELY;
@@ -840,8 +840,8 @@ xtls_connection_get_rehandshake_mode (xtls_connection_t       *conn)
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * xtls_connection_set_advertised_protocols:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_set_advertised_protocols:
+ * @conn: a #GTlsConnection
  * @protocols: (array zero-terminated=1) (nullable): a %NULL-terminated
  *   array of ALPN protocol names (eg, "http/1.1", "h2"), or %NULL
  *
@@ -849,7 +849,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * caller is willing to speak on this connection. The
  * Application-Layer Protocol Negotiation (ALPN) extension will be
  * used to negotiate a compatible protocol with the peer; use
- * xtls_connection_get_negotiated_protocol() to find the negotiated
+ * g_tls_connection_get_negotiated_protocol() to find the negotiated
  * protocol after the handshake.  Specifying %NULL for the the value
  * of @protocols will disable ALPN negotiation.
  *
@@ -859,19 +859,19 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.60
  */
 void
-xtls_connection_set_advertised_protocols (xtls_connection_t      *conn,
-                                           const xchar_t * const *protocols)
+g_tls_connection_set_advertised_protocols (GTlsConnection      *conn,
+                                           const gchar * const *protocols)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
 
-  xobject_set (G_OBJECT (conn),
+  g_object_set (G_OBJECT (conn),
                 "advertised-protocols", protocols,
                 NULL);
 }
 
 /**
- * xtls_connection_get_negotiated_protocol:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_negotiated_protocol:
+ * @conn: a #GTlsConnection
  *
  * Gets the name of the application-layer protocol negotiated during
  * the handshake.
@@ -879,18 +879,18 @@ xtls_connection_set_advertised_protocols (xtls_connection_t      *conn,
  * If the peer did not use the ALPN extension, or did not advertise a
  * protocol that matched one of @conn's protocols, or the TLS backend
  * does not support ALPN, then this will be %NULL. See
- * xtls_connection_set_advertised_protocols().
+ * g_tls_connection_set_advertised_protocols().
  *
  * Returns: (nullable): the negotiated protocol, or %NULL
  *
  * Since: 2.60
  */
-const xchar_t *
-xtls_connection_get_negotiated_protocol (xtls_connection_t *conn)
+const gchar *
+g_tls_connection_get_negotiated_protocol (GTlsConnection *conn)
 {
   GTlsConnectionClass *class;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), NULL);
 
   class = G_TLS_CONNECTION_GET_CLASS (conn);
   if (class->get_negotiated_protocol == NULL)
@@ -900,23 +900,23 @@ xtls_connection_get_negotiated_protocol (xtls_connection_t *conn)
 }
 
 /**
- * xtls_channel_bindinxerror_quark:
+ * g_tls_channel_binding_error_quark:
  *
  * Gets the TLS channel binding error quark.
  *
- * Returns: a #xquark.
+ * Returns: a #GQuark.
  *
  * Since: 2.66
  */
-G_DEFINE_QUARK (g-tls-channel-binding-error-quark, xtls_channel_bindinxerror)
+G_DEFINE_QUARK (g-tls-channel-binding-error-quark, g_tls_channel_binding_error)
 
 /**
- * xtls_connection_get_channel_binding_data:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_channel_binding_data:
+ * @conn: a #GTlsConnection
  * @type: #GTlsChannelBindingType type of data to fetch
- * @data: (out callee-allocates)(optional)(transfer none): #xbyte_array_t is
+ * @data: (out callee-allocates)(optional)(transfer none): #GByteArray is
  *        filled with the binding data, or %NULL
- * @error: a #xerror_t pointer, or %NULL
+ * @error: a #GError pointer, or %NULL
  *
  * Query the TLS backend for TLS channel binding data of @type for @conn.
  *
@@ -924,8 +924,8 @@ G_DEFINE_QUARK (g-tls-channel-binding-error-quark, xtls_channel_bindinxerror)
  * [5056](https://tools.ietf.org/html/rfc5056), RFC
  * [5929](https://tools.ietf.org/html/rfc5929), and related RFCs.  The
  * binding data is returned in @data.  The @data is resized by the callee
- * using #xbyte_array_t buffer management and will be freed when the @data
- * is destroyed by xbyte_array_unref(). If @data is %NULL, it will only
+ * using #GByteArray buffer management and will be freed when the @data
+ * is destroyed by g_byte_array_unref(). If @data is %NULL, it will only
  * check whether TLS backend is able to fetch the data (e.g. whether @type
  * is supported by the TLS backend). It does not guarantee that the data
  * will be available though.  That could happen if TLS connection does not
@@ -936,16 +936,16 @@ G_DEFINE_QUARK (g-tls-channel-binding-error-quark, xtls_channel_bindinxerror)
  *
  * Since: 2.66
  */
-xboolean_t
-xtls_connection_get_channel_binding_data (xtls_connection_t          *conn,
+gboolean
+g_tls_connection_get_channel_binding_data (GTlsConnection          *conn,
                                            GTlsChannelBindingType   type,
-                                           xbyte_array_t              *data,
-                                           xerror_t                 **error)
+                                           GByteArray              *data,
+                                           GError                 **error)
 {
   GTlsConnectionClass *class;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
-  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   class = G_TLS_CONNECTION_GET_CLASS (conn);
   if (class->get_binding_data == NULL)
@@ -960,19 +960,19 @@ xtls_connection_get_channel_binding_data (xtls_connection_t          *conn,
 }
 
 /**
- * xtls_connection_handshake:
- * @conn: a #xtls_connection_t
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
- * @error: a #xerror_t, or %NULL
+ * g_tls_connection_handshake:
+ * @conn: a #GTlsConnection
+ * @cancellable: (nullable): a #GCancellable, or %NULL
+ * @error: a #GError, or %NULL
  *
  * Attempts a TLS handshake on @conn.
  *
  * On the client side, it is never necessary to call this method;
  * although the connection needs to perform a handshake after
  * connecting (or after sending a "STARTTLS"-type command),
- * #xtls_connection_t will handle this for you automatically when you try
+ * #GTlsConnection will handle this for you automatically when you try
  * to send or receive data on the connection. You can call
- * xtls_connection_handshake() manually if you want to know whether
+ * g_tls_connection_handshake() manually if you want to know whether
  * the initial handshake succeeded or failed (as opposed to just
  * immediately trying to use @conn to read or write, in which case,
  * if it fails, it may not be possible to tell if it failed before or
@@ -984,54 +984,54 @@ xtls_connection_get_channel_binding_data (xtls_connection_t          *conn,
  * the beginning of the communication, you do not need to call this
  * function explicitly unless you want clearer error reporting.
  *
- * Previously, calling xtls_connection_handshake() after the initial
+ * Previously, calling g_tls_connection_handshake() after the initial
  * handshake would trigger a rehandshake; however, this usage was
  * deprecated in GLib 2.60 because rehandshaking was removed from the
  * TLS protocol in TLS 1.3. Since GLib 2.64, calling this function after
  * the initial handshake will no longer do anything.
  *
- * When using a #xtls_connection_t created by #xsocket_client_t, the
- * #xsocket_client_t performs the initial handshake, so calling this
+ * When using a #GTlsConnection created by #GSocketClient, the
+ * #GSocketClient performs the initial handshake, so calling this
  * function manually is not recommended.
  *
- * #xtls_connection_t::accept_certificate may be emitted during the
+ * #GTlsConnection::accept_certificate may be emitted during the
  * handshake.
  *
  * Returns: success or failure
  *
  * Since: 2.28
  */
-xboolean_t
-xtls_connection_handshake (xtls_connection_t   *conn,
-			    xcancellable_t     *cancellable,
-			    xerror_t          **error)
+gboolean
+g_tls_connection_handshake (GTlsConnection   *conn,
+			    GCancellable     *cancellable,
+			    GError          **error)
 {
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), FALSE);
 
   return G_TLS_CONNECTION_GET_CLASS (conn)->handshake (conn, cancellable, error);
 }
 
 /**
- * xtls_connection_handshake_async:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_handshake_async:
+ * @conn: a #GTlsConnection
  * @io_priority: the [I/O priority][io-priority] of the request
- * @cancellable: (nullable): a #xcancellable_t, or %NULL
+ * @cancellable: (nullable): a #GCancellable, or %NULL
  * @callback: callback to call when the handshake is complete
  * @user_data: the data to pass to the callback function
  *
  * Asynchronously performs a TLS handshake on @conn. See
- * xtls_connection_handshake() for more information.
+ * g_tls_connection_handshake() for more information.
  *
  * Since: 2.28
  */
 void
-xtls_connection_handshake_async (xtls_connection_t       *conn,
+g_tls_connection_handshake_async (GTlsConnection       *conn,
 				  int                   io_priority,
-				  xcancellable_t         *cancellable,
-				  xasync_ready_callback_t   callback,
-				  xpointer_t              user_data)
+				  GCancellable         *cancellable,
+				  GAsyncReadyCallback   callback,
+				  gpointer              user_data)
 {
-  g_return_if_fail (X_IS_TLS_CONNECTION (conn));
+  g_return_if_fail (G_IS_TLS_CONNECTION (conn));
 
   G_TLS_CONNECTION_GET_CLASS (conn)->handshake_async (conn, io_priority,
 						      cancellable,
@@ -1039,32 +1039,32 @@ xtls_connection_handshake_async (xtls_connection_t       *conn,
 }
 
 /**
- * xtls_connection_handshake_finish:
- * @conn: a #xtls_connection_t
- * @result: a #xasync_result_t.
- * @error: a #xerror_t pointer, or %NULL
+ * g_tls_connection_handshake_finish:
+ * @conn: a #GTlsConnection
+ * @result: a #GAsyncResult.
+ * @error: a #GError pointer, or %NULL
  *
  * Finish an asynchronous TLS handshake operation. See
- * xtls_connection_handshake() for more information.
+ * g_tls_connection_handshake() for more information.
  *
  * Returns: %TRUE on success, %FALSE on failure, in which
  * case @error will be set.
  *
  * Since: 2.28
  */
-xboolean_t
-xtls_connection_handshake_finish (xtls_connection_t  *conn,
-				   xasync_result_t    *result,
-				   xerror_t         **error)
+gboolean
+g_tls_connection_handshake_finish (GTlsConnection  *conn,
+				   GAsyncResult    *result,
+				   GError         **error)
 {
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), FALSE);
 
   return G_TLS_CONNECTION_GET_CLASS (conn)->handshake_finish (conn, result, error);
 }
 
 /**
- * xtls_connection_get_protocol_version:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_protocol_version:
+ * @conn: a #GTlsConnection
  *
  * Returns the current TLS protocol version, which may be
  * %G_TLS_PROTOCOL_VERSION_UNKNOWN if the connection has not handshaked, or
@@ -1076,27 +1076,27 @@ xtls_connection_handshake_finish (xtls_connection_t  *conn,
  * Since: 2.70
  */
 GTlsProtocolVersion
-xtls_connection_get_protocol_version (xtls_connection_t *conn)
+g_tls_connection_get_protocol_version (GTlsConnection *conn)
 {
   GTlsProtocolVersion protocol_version;
-  xenum_class_t *enum_class;
-  xenum_value_t *enum_value;
+  GEnumClass *enum_class;
+  GEnumValue *enum_value;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), G_TLS_PROTOCOL_VERSION_UNKNOWN);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), G_TLS_PROTOCOL_VERSION_UNKNOWN);
 
-  xobject_get (G_OBJECT (conn),
+  g_object_get (G_OBJECT (conn),
                 "protocol-version", &protocol_version,
                 NULL);
 
   /* Convert unknown values to G_TLS_PROTOCOL_VERSION_UNKNOWN. */
-  enum_class = xtype_class_peek_static (XTYPE_TLS_PROTOCOL_VERSION);
-  enum_value = xenum_get_value (enum_class, protocol_version);
+  enum_class = g_type_class_peek_static (G_TYPE_TLS_PROTOCOL_VERSION);
+  enum_value = g_enum_get_value (enum_class, protocol_version);
   return enum_value ? protocol_version : G_TLS_PROTOCOL_VERSION_UNKNOWN;
 }
 
 /**
- * xtls_connection_get_ciphersuite_name:
- * @conn: a #xtls_connection_t
+ * g_tls_connection_get_ciphersuite_name:
+ * @conn: a #GTlsConnection
  *
  * Returns the name of the current TLS ciphersuite, or %NULL if the
  * connection has not handshaked or has been closed. Beware that the TLS
@@ -1111,14 +1111,14 @@ xtls_connection_get_protocol_version (xtls_connection_t *conn)
  *
  * Since: 2.70
  */
-xchar_t *
-xtls_connection_get_ciphersuite_name (xtls_connection_t *conn)
+gchar *
+g_tls_connection_get_ciphersuite_name (GTlsConnection *conn)
 {
-  xchar_t *ciphersuite_name;
+  gchar *ciphersuite_name;
 
-  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  g_return_val_if_fail (G_IS_TLS_CONNECTION (conn), NULL);
 
-  xobject_get (G_OBJECT (conn),
+  g_object_get (G_OBJECT (conn),
                 "ciphersuite-name", &ciphersuite_name,
                 NULL);
 
@@ -1126,38 +1126,38 @@ xtls_connection_get_ciphersuite_name (xtls_connection_t *conn)
 }
 
 /**
- * xtls_error_quark:
+ * g_tls_error_quark:
  *
  * Gets the TLS error quark.
  *
- * Returns: a #xquark.
+ * Returns: a #GQuark.
  *
  * Since: 2.28
  */
-G_DEFINE_QUARK (g-tls-error-quark, xtls_error)
+G_DEFINE_QUARK (g-tls-error-quark, g_tls_error)
 
 /**
- * xtls_connection_emit_accept_certificate:
- * @conn: a #xtls_connection_t
- * @peer_cert: the peer's #xtls_certificate_t
+ * g_tls_connection_emit_accept_certificate:
+ * @conn: a #GTlsConnection
+ * @peer_cert: the peer's #GTlsCertificate
  * @errors: the problems with @peer_cert
  *
- * Used by #xtls_connection_t implementations to emit the
- * #xtls_connection_t::accept-certificate signal.
+ * Used by #GTlsConnection implementations to emit the
+ * #GTlsConnection::accept-certificate signal.
  *
  * Returns: %TRUE if one of the signal handlers has returned
  *     %TRUE to accept @peer_cert
  *
  * Since: 2.28
  */
-xboolean_t
-xtls_connection_emit_accept_certificate (xtls_connection_t       *conn,
-					  xtls_certificate_t      *peer_cert,
-					  xtls_certificate_flags_t  errors)
+gboolean
+g_tls_connection_emit_accept_certificate (GTlsConnection       *conn,
+					  GTlsCertificate      *peer_cert,
+					  GTlsCertificateFlags  errors)
 {
-  xboolean_t accept = FALSE;
+  gboolean accept = FALSE;
 
-  xsignal_emit (conn, signals[ACCEPT_CERTIFICATE], 0,
+  g_signal_emit (conn, signals[ACCEPT_CERTIFICATE], 0,
 		 peer_cert, errors, &accept);
   return accept;
 }

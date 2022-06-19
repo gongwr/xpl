@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -19,18 +19,18 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/.
+ * GLib at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
-/*
+/* 
  * MT safe
  */
 
 #include "config.h"
 
 /* we know we are deprecated here, no need for warnings */
-#ifndef XPL_DISABLE_DEPRECATION_WARNINGS
-#define XPL_DISABLE_DEPRECATION_WARNINGS
+#ifndef GLIB_DISABLE_DEPRECATION_WARNINGS
+#define GLIB_DISABLE_DEPRECATION_WARNINGS
 #endif
 
 #include "gcompletion.h"
@@ -111,7 +111,7 @@
  **/
 
 static void completion_check_cache (GCompletion* cmp,
-				    xchar_t**	 new_prefix);
+				    gchar**	 new_prefix);
 
 /**
  * g_completion_new:
@@ -123,11 +123,11 @@ static void completion_check_cache (GCompletion* cmp,
  *
  * Returns: the new #GCompletion.
  **/
-GCompletion*
+GCompletion* 
 g_completion_new (GCompletionFunc func)
 {
   GCompletion* gcomp;
-
+  
   gcomp = g_new (GCompletion, 1);
   gcomp->items = NULL;
   gcomp->cache = NULL;
@@ -147,18 +147,18 @@ g_completion_new (GCompletionFunc func)
  *
  * Deprecated: 2.26: Rarely used API
  **/
-void
+void 
 g_completion_add_items (GCompletion* cmp,
-			xlist_t*	     items)
+			GList*	     items)
 {
-  xlist_t* it;
-
+  GList* it;
+  
   g_return_if_fail (cmp != NULL);
-
+  
   /* optimize adding to cache? */
   if (cmp->cache)
     {
-      xlist_free (cmp->cache);
+      g_list_free (cmp->cache);
       cmp->cache = NULL;
     }
 
@@ -167,11 +167,11 @@ g_completion_add_items (GCompletion* cmp,
       g_free (cmp->prefix);
       cmp->prefix = NULL;
     }
-
+  
   it = items;
   while (it)
     {
-      cmp->items = xlist_prepend (cmp->items, it->data);
+      cmp->items = g_list_prepend (cmp->items, it->data);
       it = it->next;
     }
 }
@@ -182,30 +182,30 @@ g_completion_add_items (GCompletion* cmp,
  * @items: (transfer none): the items to remove.
  *
  * Removes items from a #GCompletion. The items are not freed, so if the memory
- * was dynamically allocated, free @items with xlist_free_full() after calling
+ * was dynamically allocated, free @items with g_list_free_full() after calling
  * this function.
  *
  * Deprecated: 2.26: Rarely used API
  **/
-void
+void 
 g_completion_remove_items (GCompletion* cmp,
-			   xlist_t*	items)
+			   GList*	items)
 {
-  xlist_t* it;
-
+  GList* it;
+  
   g_return_if_fail (cmp != NULL);
-
+  
   it = items;
   while (cmp->items && it)
     {
-      cmp->items = xlist_remove (cmp->items, it->data);
+      cmp->items = g_list_remove (cmp->items, it->data);
       it = it->next;
     }
 
   it = items;
   while (cmp->cache && it)
     {
-      cmp->cache = xlist_remove(cmp->cache, it->data);
+      cmp->cache = g_list_remove(cmp->cache, it->data);
       it = it->next;
     }
 }
@@ -220,30 +220,30 @@ g_completion_remove_items (GCompletion* cmp,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-void
+void 
 g_completion_clear_items (GCompletion* cmp)
 {
   g_return_if_fail (cmp != NULL);
-
-  xlist_free (cmp->items);
+  
+  g_list_free (cmp->items);
   cmp->items = NULL;
-  xlist_free (cmp->cache);
+  g_list_free (cmp->cache);
   cmp->cache = NULL;
   g_free (cmp->prefix);
   cmp->prefix = NULL;
 }
 
-static void
+static void   
 completion_check_cache (GCompletion* cmp,
-			xchar_t**	     new_prefix)
+			gchar**	     new_prefix)
 {
-  xlist_t* list;
-  xsize_t len;
-  xsize_t i;
-  xsize_t plen;
-  xchar_t* postfix;
-  xchar_t* s;
-
+  GList* list;
+  gsize len;
+  gsize i;
+  gsize plen;
+  gchar* postfix;
+  gchar* s;
+  
   if (!new_prefix)
     return;
   if (!cmp->cache)
@@ -251,17 +251,17 @@ completion_check_cache (GCompletion* cmp,
       *new_prefix = NULL;
       return;
     }
-
+  
   len = strlen(cmp->prefix);
   list = cmp->cache;
-  s = cmp->func ? cmp->func (list->data) : (xchar_t*) list->data;
+  s = cmp->func ? cmp->func (list->data) : (gchar*) list->data;
   postfix = s + len;
   plen = strlen (postfix);
   list = list->next;
-
+  
   while (list && plen)
     {
-      s = cmp->func ? cmp->func (list->data) : (xchar_t*) list->data;
+      s = cmp->func ? cmp->func (list->data) : (gchar*) list->data;
       s += len;
       for (i = 0; i < plen; ++i)
 	{
@@ -271,8 +271,8 @@ completion_check_cache (GCompletion* cmp,
       plen = i;
       list = list->next;
     }
-
-  *new_prefix = g_new0 (xchar_t, len + plen + 1);
+  
+  *new_prefix = g_new0 (gchar, len + plen + 1);
   strncpy (*new_prefix, cmp->prefix, len);
   strncpy (*new_prefix + len, postfix, plen);
 }
@@ -288,10 +288,10 @@ completion_check_cache (GCompletion* cmp,
  *
  * Attempts to complete the string @prefix using the #GCompletion target items.
  * In contrast to g_completion_complete(), this function returns the largest common
- * prefix that is a valid UTF-8 string, omitting a possible common partial
+ * prefix that is a valid UTF-8 string, omitting a possible common partial 
  * character.
  *
- * You should use this function instead of g_completion_complete() if your
+ * You should use this function instead of g_completion_complete() if your 
  * items are UTF-8 strings.
  *
  * Returns: (element-type utf8) (transfer none): the list of items whose strings begin with @prefix. This should
@@ -301,25 +301,25 @@ completion_check_cache (GCompletion* cmp,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-xlist_t*
+GList*
 g_completion_complete_utf8 (GCompletion  *cmp,
-			    const xchar_t  *prefix,
-			    xchar_t       **new_prefix)
+			    const gchar  *prefix,
+			    gchar       **new_prefix)
 {
-  xlist_t *list;
-  xchar_t *p, *q;
+  GList *list;
+  gchar *p, *q;
 
   list = g_completion_complete (cmp, prefix, new_prefix);
 
   if (new_prefix && *new_prefix)
     {
       p = *new_prefix + strlen (*new_prefix);
-      q = xutf8_find_prev_char (*new_prefix, p);
-
-      switch (xutf8_get_char_validated (q, p - q))
+      q = g_utf8_find_prev_char (*new_prefix, p);
+      
+      switch (g_utf8_get_char_validated (q, p - q))
 	{
-	case (xunichar_t)-2:
-	case (xunichar_t)-1:
+	case (gunichar)-2:
+	case (gunichar)-1:
 	  *q = 0;
 	  break;
 	default: ;
@@ -348,53 +348,53 @@ g_completion_complete_utf8 (GCompletion  *cmp,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-xlist_t*
+GList* 
 g_completion_complete (GCompletion* cmp,
-		       const xchar_t* prefix,
-		       xchar_t**	    new_prefix)
+		       const gchar* prefix,
+		       gchar**	    new_prefix)
 {
-  xsize_t plen, len;
-  xboolean_t done = FALSE;
-  xlist_t* list;
-
-  xreturn_val_if_fail (cmp != NULL, NULL);
-  xreturn_val_if_fail (prefix != NULL, NULL);
-
+  gsize plen, len;
+  gboolean done = FALSE;
+  GList* list;
+  
+  g_return_val_if_fail (cmp != NULL, NULL);
+  g_return_val_if_fail (prefix != NULL, NULL);
+  
   len = strlen (prefix);
   if (cmp->prefix && cmp->cache)
     {
       plen = strlen (cmp->prefix);
       if (plen <= len && ! cmp->strncmp_func (prefix, cmp->prefix, plen))
-	{
+	{ 
 	  /* use the cache */
 	  list = cmp->cache;
 	  while (list)
 	    {
-	      xlist_t *next = list->next;
-
+	      GList *next = list->next;
+	      
 	      if (cmp->strncmp_func (prefix,
-				     cmp->func ? cmp->func (list->data) : (xchar_t*) list->data,
+				     cmp->func ? cmp->func (list->data) : (gchar*) list->data,
 				     len))
-		cmp->cache = xlist_delete_link (cmp->cache, list);
+		cmp->cache = g_list_delete_link (cmp->cache, list);
 
 	      list = next;
 	    }
 	  done = TRUE;
 	}
     }
-
+  
   if (!done)
     {
       /* normal code */
-      xlist_free (cmp->cache);
+      g_list_free (cmp->cache);
       cmp->cache = NULL;
       list = cmp->items;
       while (*prefix && list)
 	{
 	  if (!cmp->strncmp_func (prefix,
-			cmp->func ? cmp->func (list->data) : (xchar_t*) list->data,
+			cmp->func ? cmp->func (list->data) : (gchar*) list->data,
 			len))
-	    cmp->cache = xlist_prepend (cmp->cache, list->data);
+	    cmp->cache = g_list_prepend (cmp->cache, list->data);
 	  list = list->next;
 	}
     }
@@ -404,9 +404,9 @@ g_completion_complete (GCompletion* cmp,
       cmp->prefix = NULL;
     }
   if (cmp->cache)
-    cmp->prefix = xstrdup (prefix);
+    cmp->prefix = g_strdup (prefix);
   completion_check_cache (cmp, new_prefix);
-
+  
   return *prefix ? cmp->cache : cmp->items;
 }
 
@@ -420,11 +420,11 @@ g_completion_complete (GCompletion* cmp,
  *
  * Deprecated: 2.26: Rarely used API
  **/
-void
+void 
 g_completion_free (GCompletion* cmp)
 {
   g_return_if_fail (cmp != NULL);
-
+  
   g_completion_clear_items (cmp);
   g_free (cmp);
 }
@@ -453,51 +453,51 @@ main (int   argc,
       char* argv[])
 {
   FILE *file;
-  xchar_t buf[1024];
-  xlist_t *list;
-  xlist_t *result;
-  xlist_t *tmp;
+  gchar buf[1024];
+  GList *list;
+  GList *result;
+  GList *tmp;
   GCompletion *cmp;
-  xint_t i;
-  xchar_t *longp = NULL;
-
+  gint i;
+  gchar *longp = NULL;
+  
   if (argc < 3)
     {
       g_warning ("Usage: %s filename prefix1 [prefix2 ...]",
                  (argc > 0) ? argv[0] : "gcompletion");
       return 1;
     }
-
+  
   file = fopen (argv[1], "r");
   if (!file)
     {
       g_warning ("Cannot open %s", argv[1]);
       return 1;
     }
-
+  
   cmp = g_completion_new (NULL);
-  list = xlist_alloc ();
+  list = g_list_alloc ();
   while (fgets (buf, 1024, file))
     {
-      list->data = xstrdup (buf);
+      list->data = g_strdup (buf);
       g_completion_add_items (cmp, list);
     }
   fclose (file);
-
+  
   for (i = 2; i < argc; ++i)
     {
       printf ("COMPLETING: %s\n", argv[i]);
       result = g_completion_complete (cmp, argv[i], &longp);
-      xlist_foreach (result, (GFunc) printf, NULL);
+      g_list_foreach (result, (GFunc) printf, NULL);
       printf ("LONG MATCH: %s\n", longp);
       g_free (longp);
       longp = NULL;
     }
-
-  xlist_foreach (cmp->items, (GFunc) g_free, NULL);
+  
+  g_list_foreach (cmp->items, (GFunc) g_free, NULL);
   g_completion_free (cmp);
-  xlist_free (list);
-
+  g_list_free (list);
+  
   return 0;
 }
 #endif

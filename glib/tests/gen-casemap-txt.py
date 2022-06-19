@@ -172,7 +172,7 @@ def main(argv):
 def print_tests(version, upper, title, lower):
     print(
         """\
-# test_t cases generated from Unicode {} data
+# Test cases generated from Unicode {} data
 # by gen-casemap-txt.py. Do not edit.
 #
 # Some special hand crafted tests
@@ -183,7 +183,7 @@ tr_TR\tI\u0307\ti\tI\u0307\tI\u0307\t# I => LATIN SMALL LETTER DOTLESS I
 tr_TR.UTF-8\ti\ti\t\u0130\t\u0130\t# i => LATIN CAPITAL LETTER I WITH DOT ABOVE
 tr_TR.UTF-8\tI\t\u0131\tI\tI\t# I => LATIN SMALL LETTER DOTLESS I
 tr_TR.UTF-8\tI\u0307\ti\tI\u0307\tI\u0307\t# I => LATIN SMALL LETTER DOTLESS I
-# test_t reordering of YPOGEGRAMMENI across other accents
+# Test reordering of YPOGEGRAMMENI across other accents
 \t\u03b1\u0345\u0314\t\u03b1\u0345\u0314\t\u0391\u0345\u0314\t\u0391\u0314\u0399\t
 \t\u03b1\u0314\u0345\t\u03b1\u0314\u0345\t\u0391\u0314\u0345\t\u0391\u0314\u0399\t
 # Handling of final and nonfinal sigma

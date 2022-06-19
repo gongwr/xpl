@@ -28,12 +28,12 @@
 G_BEGIN_DECLS
 
 SID      * _g_win32_process_get_access_token_sid         (DWORD    process_id,
-                                                          xerror_t **error);
+                                                          GError **error);
 
-xchar_t    * _g_win32_sid_to_string                        (SID     *sid,
-                                                          xerror_t **error);
+gchar    * _g_win32_sid_to_string                        (SID     *sid,
+                                                          GError **error);
 
-xchar_t    * _g_win32_current_process_sid_string           (xerror_t **error);
+gchar    * _g_win32_current_process_sid_string           (GError **error);
 
 G_END_DECLS
 

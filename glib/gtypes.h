@@ -1,4 +1,4 @@
-/* XPL - Library of useful routines for C programming
+/* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #ifndef __G_TYPES_H__
 #define __G_TYPES_H__
 
-#if !defined (__XPL_H_INSIDE__) && !defined (XPL_COMPILATION)
+#if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
 
@@ -43,19 +43,19 @@ G_BEGIN_DECLS
  *  4 bytes (32 bits) on all platforms.
  */
 
-typedef char   xchar_t;
+typedef char   gchar;
 typedef short  gshort;
-typedef long   xlong_t;
-typedef int    xint_t;
-typedef xint_t   xboolean_t;
+typedef long   glong;
+typedef int    gint;
+typedef gint   gboolean;
 
-typedef unsigned char   xuchar_t;
+typedef unsigned char   guchar;
 typedef unsigned short  gushort;
-typedef unsigned long   xulong_t;
-typedef unsigned int    xuint_t;
+typedef unsigned long   gulong;
+typedef unsigned int    guint;
 
 typedef float   gfloat;
-typedef double  xdouble_t;
+typedef double  gdouble;
 
 /* Define min and max constants for the fixed size numerical types */
 /**
@@ -67,7 +67,7 @@ typedef double  xdouble_t;
  */
 #define G_MININT8	((gint8) (-G_MAXINT8 - 1))
 #define G_MAXINT8	((gint8)  0x7f)
-#define G_MAXUINT8	((xuint8_t) 0xff)
+#define G_MAXUINT8	((guint8) 0xff)
 
 /**
  * G_MININT16: (value -32768)
@@ -78,7 +78,7 @@ typedef double  xdouble_t;
  */
 #define G_MININT16	((gint16) (-G_MAXINT16 - 1))
 #define G_MAXINT16	((gint16)  0x7fff)
-#define G_MAXUINT16	((xuint16_t) 0xffff)
+#define G_MAXUINT16	((guint16) 0xffff)
 
 /**
  * G_MININT32: (value -2147483648)
@@ -89,34 +89,34 @@ typedef double  xdouble_t;
  */
 #define G_MININT32	((gint32) (-G_MAXINT32 - 1))
 #define G_MAXINT32	((gint32)  0x7fffffff)
-#define G_MAXUINT32	((xuint32_t) 0xffffffff)
+#define G_MAXUINT32	((guint32) 0xffffffff)
 
 /**
  * G_MININT64: (value -9223372036854775808)
  *
- * The minimum value which can be held in a #sint64_t.
+ * The minimum value which can be held in a #gint64.
  */
-#define G_MININT64	((sint64_t) (-G_MAXINT64 - G_GINT64_CONSTANT(1)))
+#define G_MININT64	((gint64) (-G_MAXINT64 - G_GINT64_CONSTANT(1)))
 #define G_MAXINT64	G_GINT64_CONSTANT(0x7fffffffffffffff)
 #define G_MAXUINT64	G_GUINT64_CONSTANT(0xffffffffffffffff)
 
-typedef void* xpointer_t;
-typedef const void *xconstpointer;
+typedef void* gpointer;
+typedef const void *gconstpointer;
 
-typedef xint_t            (*GCompareFunc)         (xconstpointer  a,
-                                                 xconstpointer  b);
-typedef xint_t            (*GCompareDataFunc)     (xconstpointer  a,
-                                                 xconstpointer  b,
-						 xpointer_t       user_data);
-typedef xboolean_t        (*GEqualFunc)           (xconstpointer  a,
-                                                 xconstpointer  b);
-typedef void            (*xdestroy_notify_t)       (xpointer_t       data);
-typedef void            (*GFunc)                (xpointer_t       data,
-                                                 xpointer_t       user_data);
-typedef xuint_t           (*GHashFunc)            (xconstpointer  key);
-typedef void            (*GHFunc)               (xpointer_t       key,
-                                                 xpointer_t       value,
-                                                 xpointer_t       user_data);
+typedef gint            (*GCompareFunc)         (gconstpointer  a,
+                                                 gconstpointer  b);
+typedef gint            (*GCompareDataFunc)     (gconstpointer  a,
+                                                 gconstpointer  b,
+						 gpointer       user_data);
+typedef gboolean        (*GEqualFunc)           (gconstpointer  a,
+                                                 gconstpointer  b);
+typedef void            (*GDestroyNotify)       (gpointer       data);
+typedef void            (*GFunc)                (gpointer       data,
+                                                 gpointer       user_data);
+typedef guint           (*GHashFunc)            (gconstpointer  key);
+typedef void            (*GHFunc)               (gpointer       key,
+                                                 gpointer       value,
+                                                 gpointer       user_data);
 
 /**
  * GCopyFunc:
@@ -130,8 +130,8 @@ typedef void            (*GHFunc)               (xpointer_t       key,
  *
  * Since: 2.4
  */
-typedef xpointer_t	(*GCopyFunc)            (xconstpointer  src,
-                                                 xpointer_t       data);
+typedef gpointer	(*GCopyFunc)            (gconstpointer  src,
+                                                 gpointer       data);
 /**
  * GFreeFunc:
  * @data: a data pointer
@@ -140,22 +140,22 @@ typedef xpointer_t	(*GCopyFunc)            (xconstpointer  src,
  * data pointer argument and has no return value. It is
  * not currently used in GLib or GTK+.
  */
-typedef void            (*GFreeFunc)            (xpointer_t       data);
+typedef void            (*GFreeFunc)            (gpointer       data);
 
 /**
  * GTranslateFunc:
  * @str: the untranslated string
  * @data: user data specified when installing the function, e.g.
- *  in xoption_group_set_translate_func()
- *
+ *  in g_option_group_set_translate_func()
+ * 
  * The type of functions which are used to translate user-visible
  * strings, for <option>--help</option> output.
- *
+ * 
  * Returns: a translation of the string for the current locale.
  *  The returned string is owned by GLib and must not be freed.
  */
-typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
-						 xpointer_t       data);
+typedef const gchar *   (*GTranslateFunc)       (const gchar   *str,
+						 gpointer       data);
 
 
 /* Define some mathematical constants that aren't available
@@ -183,52 +183,52 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
  */
 #define G_LITTLE_ENDIAN 1234
 #define G_BIG_ENDIAN    4321
-#define G_PDP_ENDIAN    3412		/* unused, need specific PDP check */
+#define G_PDP_ENDIAN    3412		/* unused, need specific PDP check */	
 
 
 /* Basic bit swapping functions
  */
-#define GUINT16_SWAP_LE_BE_CONSTANT(val)	((xuint16_t) ( \
-    (xuint16_t) ((xuint16_t) (val) >> 8) |	\
-    (xuint16_t) ((xuint16_t) (val) << 8)))
+#define GUINT16_SWAP_LE_BE_CONSTANT(val)	((guint16) ( \
+    (guint16) ((guint16) (val) >> 8) |	\
+    (guint16) ((guint16) (val) << 8)))
 
-#define GUINT32_SWAP_LE_BE_CONSTANT(val)	((xuint32_t) ( \
-    (((xuint32_t) (val) & (xuint32_t) 0x000000ffU) << 24) | \
-    (((xuint32_t) (val) & (xuint32_t) 0x0000ff00U) <<  8) | \
-    (((xuint32_t) (val) & (xuint32_t) 0x00ff0000U) >>  8) | \
-    (((xuint32_t) (val) & (xuint32_t) 0xff000000U) >> 24)))
+#define GUINT32_SWAP_LE_BE_CONSTANT(val)	((guint32) ( \
+    (((guint32) (val) & (guint32) 0x000000ffU) << 24) | \
+    (((guint32) (val) & (guint32) 0x0000ff00U) <<  8) | \
+    (((guint32) (val) & (guint32) 0x00ff0000U) >>  8) | \
+    (((guint32) (val) & (guint32) 0xff000000U) >> 24)))
 
-#define GUINT64_SWAP_LE_BE_CONSTANT(val)	((xuint64_t) ( \
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x00000000000000ffU)) << 56) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x000000000000ff00U)) << 40) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x0000000000ff0000U)) << 24) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x00000000ff000000U)) <<  8) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x000000ff00000000U)) >>  8) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x0000ff0000000000U)) >> 24) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0x00ff000000000000U)) >> 40) |	\
-      (((xuint64_t) (val) &						\
-	(xuint64_t) G_GINT64_CONSTANT (0xff00000000000000U)) >> 56)))
+#define GUINT64_SWAP_LE_BE_CONSTANT(val)	((guint64) ( \
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x00000000000000ffU)) << 56) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x000000000000ff00U)) << 40) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x0000000000ff0000U)) << 24) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x00000000ff000000U)) <<  8) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x000000ff00000000U)) >>  8) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x0000ff0000000000U)) >> 24) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0x00ff000000000000U)) >> 40) |	\
+      (((guint64) (val) &						\
+	(guint64) G_GINT64_CONSTANT (0xff00000000000000U)) >> 56)))
 
 /* Arch specific stuff for speed
  */
 #if defined (__GNUC__) && (__GNUC__ >= 2) && defined (__OPTIMIZE__)
 
 #  if __GNUC__ >= 4 && defined (__GNUC_MINOR__) && __GNUC_MINOR__ >= 3
-#    define GUINT32_SWAP_LE_BE(val) ((xuint32_t) __builtin_bswap32 ((xuint32_t) (val)))
-#    define GUINT64_SWAP_LE_BE(val) ((xuint64_t) __builtin_bswap64 ((xuint64_t) (val)))
+#    define GUINT32_SWAP_LE_BE(val) ((guint32) __builtin_bswap32 ((guint32) (val)))
+#    define GUINT64_SWAP_LE_BE(val) ((guint64) __builtin_bswap64 ((guint64) (val)))
 #  endif
 
 #  if defined (__i386__)
 #    define GUINT16_SWAP_LE_BE_IA32(val) \
        (G_GNUC_EXTENSION					\
-	({ xuint16_t __v, __x = ((xuint16_t) (val));		\
+	({ guint16 __v, __x = ((guint16) (val));		\
 	   if (__builtin_constant_p (__x))			\
 	     __v = GUINT16_SWAP_LE_BE_CONSTANT (__x);		\
 	   else							\
@@ -242,7 +242,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 	&& !defined (__pentiumpro__) && !defined (__pentium4__)
 #       define GUINT32_SWAP_LE_BE_IA32(val) \
 	  (G_GNUC_EXTENSION					\
-	   ({ xuint32_t __v, __x = ((xuint32_t) (val));		\
+	   ({ guint32 __v, __x = ((guint32) (val));		\
 	      if (__builtin_constant_p (__x))			\
 		__v = GUINT32_SWAP_LE_BE_CONSTANT (__x);	\
 	      else						\
@@ -256,7 +256,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 #    else /* 486 and higher has bswap */
 #       define GUINT32_SWAP_LE_BE_IA32(val) \
 	  (G_GNUC_EXTENSION					\
-	   ({ xuint32_t __v, __x = ((xuint32_t) (val));		\
+	   ({ guint32 __v, __x = ((guint32) (val));		\
 	      if (__builtin_constant_p (__x))			\
 		__v = GUINT32_SWAP_LE_BE_CONSTANT (__x);	\
 	      else						\
@@ -267,9 +267,9 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 #    endif /* processor specific 32-bit stuff */
 #    define GUINT64_SWAP_LE_BE_IA32(val) \
        (G_GNUC_EXTENSION						\
-	({ union { xuint64_t __ll;					\
-		   xuint32_t __l[2]; } __w, __r;				\
-	   __w.__ll = ((xuint64_t) (val));				\
+	({ union { guint64 __ll;					\
+		   guint32 __l[2]; } __w, __r;				\
+	   __w.__ll = ((guint64) (val));				\
 	   if (__builtin_constant_p (__w.__ll))				\
 	     __r.__ll = GUINT64_SWAP_LE_BE_CONSTANT (__w.__ll);		\
 	   else								\
@@ -289,7 +289,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 #  elif defined (__ia64__)
 #    define GUINT16_SWAP_LE_BE_IA64(val) \
        (G_GNUC_EXTENSION					\
-	({ xuint16_t __v, __x = ((xuint16_t) (val));		\
+	({ guint16 __v, __x = ((guint16) (val));		\
 	   if (__builtin_constant_p (__x))			\
 	     __v = GUINT16_SWAP_LE_BE_CONSTANT (__x);		\
 	   else							\
@@ -300,7 +300,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 	    __v; }))
 #    define GUINT32_SWAP_LE_BE_IA64(val) \
        (G_GNUC_EXTENSION					\
-	 ({ xuint32_t __v, __x = ((xuint32_t) (val));		\
+	 ({ guint32 __v, __x = ((guint32) (val));		\
 	    if (__builtin_constant_p (__x))			\
 	      __v = GUINT32_SWAP_LE_BE_CONSTANT (__x);		\
 	    else						\
@@ -311,7 +311,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 	    __v; }))
 #    define GUINT64_SWAP_LE_BE_IA64(val) \
        (G_GNUC_EXTENSION					\
-	({ xuint64_t __v, __x = ((xuint64_t) (val));		\
+	({ guint64 __v, __x = ((guint64) (val));		\
 	   if (__builtin_constant_p (__x))			\
 	     __v = GUINT64_SWAP_LE_BE_CONSTANT (__x);		\
 	   else							\
@@ -329,7 +329,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 #  elif defined (__x86_64__)
 #    define GUINT32_SWAP_LE_BE_X86_64(val) \
        (G_GNUC_EXTENSION					\
-	 ({ xuint32_t __v, __x = ((xuint32_t) (val));		\
+	 ({ guint32 __v, __x = ((guint32) (val));		\
 	    if (__builtin_constant_p (__x))			\
 	      __v = GUINT32_SWAP_LE_BE_CONSTANT (__x);		\
 	    else						\
@@ -339,7 +339,7 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 	    __v; }))
 #    define GUINT64_SWAP_LE_BE_X86_64(val) \
        (G_GNUC_EXTENSION					\
-	({ xuint64_t __v, __x = ((xuint64_t) (val));		\
+	({ guint64 __v, __x = ((guint64) (val));		\
 	   if (__builtin_constant_p (__x))			\
 	     __v = GUINT64_SWAP_LE_BE_CONSTANT (__x);		\
 	   else							\
@@ -370,14 +370,14 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 #  define GUINT64_SWAP_LE_BE(val) (GUINT64_SWAP_LE_BE_CONSTANT (val))
 #endif /* generic */
 
-#define GUINT16_SWAP_LE_PDP(val)	((xuint16_t) (val))
+#define GUINT16_SWAP_LE_PDP(val)	((guint16) (val))
 #define GUINT16_SWAP_BE_PDP(val)	(GUINT16_SWAP_LE_BE (val))
-#define GUINT32_SWAP_LE_PDP(val)	((xuint32_t) ( \
-    (((xuint32_t) (val) & (xuint32_t) 0x0000ffffU) << 16) | \
-    (((xuint32_t) (val) & (xuint32_t) 0xffff0000U) >> 16)))
-#define GUINT32_SWAP_BE_PDP(val)	((xuint32_t) ( \
-    (((xuint32_t) (val) & (xuint32_t) 0x00ff00ffU) << 8) | \
-    (((xuint32_t) (val) & (xuint32_t) 0xff00ff00U) >> 8)))
+#define GUINT32_SWAP_LE_PDP(val)	((guint32) ( \
+    (((guint32) (val) & (guint32) 0x0000ffffU) << 16) | \
+    (((guint32) (val) & (guint32) 0xffff0000U) >> 16)))
+#define GUINT32_SWAP_BE_PDP(val)	((guint32) ( \
+    (((guint32) (val) & (guint32) 0x00ff00ffU) << 8) | \
+    (((guint32) (val) & (guint32) 0xff00ff00U) >> 8)))
 
 /* The G*_TO_?E() macros are defined in glibconfig.h.
  * The transformation is symmetric, so the FROM just maps to the TO.
@@ -420,16 +420,16 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 
 /* Overflow-checked unsigned integer arithmetic
  */
-#ifndef _XPL_TEST_OVERFLOW_FALLBACK
+#ifndef _GLIB_TEST_OVERFLOW_FALLBACK
 /* https://bugzilla.gnome.org/show_bug.cgi?id=769104 */
 #if __GNUC__ >= 5 && !defined(__INTEL_COMPILER)
-#define _XPL_HAVE_BUILTIN_OVERFLOW_CHECKS
+#define _GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS
 #elif g_macro__has_builtin(__builtin_add_overflow)
-#define _XPL_HAVE_BUILTIN_OVERFLOW_CHECKS
+#define _GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS
 #endif
 #endif
 
-#ifdef _XPL_HAVE_BUILTIN_OVERFLOW_CHECKS
+#ifdef _GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS
 
 #define g_uint_checked_add(dest, a, b) \
     (!__builtin_add_overflow(a, b, dest))
@@ -446,40 +446,40 @@ typedef const xchar_t *   (*GTranslateFunc)       (const xchar_t   *str,
 #define g_size_checked_mul(dest, a, b) \
     (!__builtin_mul_overflow(a, b, dest))
 
-#else  /* !_XPL_HAVE_BUILTIN_OVERFLOW_CHECKS */
+#else  /* !_GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS */
 
 /* The names of the following inlines are private.  Use the macro
  * definitions above.
  */
-static inline xboolean_t _XPL_CHECKED_ADD_UINT (xuint_t *dest, xuint_t a, xuint_t b) {
+static inline gboolean _GLIB_CHECKED_ADD_UINT (guint *dest, guint a, guint b) {
   *dest = a + b; return *dest >= a; }
-static inline xboolean_t _XPL_CHECKED_MUL_UINT (xuint_t *dest, xuint_t a, xuint_t b) {
+static inline gboolean _GLIB_CHECKED_MUL_UINT (guint *dest, guint a, guint b) {
   *dest = a * b; return !a || *dest / a == b; }
-static inline xboolean_t _XPL_CHECKED_ADD_UINT64 (xuint64_t *dest, xuint64_t a, xuint64_t b) {
+static inline gboolean _GLIB_CHECKED_ADD_UINT64 (guint64 *dest, guint64 a, guint64 b) {
   *dest = a + b; return *dest >= a; }
-static inline xboolean_t _XPL_CHECKED_MUL_UINT64 (xuint64_t *dest, xuint64_t a, xuint64_t b) {
+static inline gboolean _GLIB_CHECKED_MUL_UINT64 (guint64 *dest, guint64 a, guint64 b) {
   *dest = a * b; return !a || *dest / a == b; }
-static inline xboolean_t _XPL_CHECKED_ADD_SIZE (xsize_t *dest, xsize_t a, xsize_t b) {
+static inline gboolean _GLIB_CHECKED_ADD_SIZE (gsize *dest, gsize a, gsize b) {
   *dest = a + b; return *dest >= a; }
-static inline xboolean_t _XPL_CHECKED_MUL_SIZE (xsize_t *dest, xsize_t a, xsize_t b) {
+static inline gboolean _GLIB_CHECKED_MUL_SIZE (gsize *dest, gsize a, gsize b) {
   *dest = a * b; return !a || *dest / a == b; }
 
 #define g_uint_checked_add(dest, a, b) \
-    _XPL_CHECKED_ADD_UINT(dest, a, b)
+    _GLIB_CHECKED_ADD_UINT(dest, a, b)
 #define g_uint_checked_mul(dest, a, b) \
-    _XPL_CHECKED_MUL_UINT(dest, a, b)
+    _GLIB_CHECKED_MUL_UINT(dest, a, b)
 
 #define g_uint64_checked_add(dest, a, b) \
-    _XPL_CHECKED_ADD_UINT64(dest, a, b)
+    _GLIB_CHECKED_ADD_UINT64(dest, a, b)
 #define g_uint64_checked_mul(dest, a, b) \
-    _XPL_CHECKED_MUL_UINT64(dest, a, b)
+    _GLIB_CHECKED_MUL_UINT64(dest, a, b)
 
 #define g_size_checked_add(dest, a, b) \
-    _XPL_CHECKED_ADD_SIZE(dest, a, b)
+    _GLIB_CHECKED_ADD_SIZE(dest, a, b)
 #define g_size_checked_mul(dest, a, b) \
-    _XPL_CHECKED_MUL_SIZE(dest, a, b)
+    _GLIB_CHECKED_MUL_SIZE(dest, a, b)
 
-#endif  /* !_XPL_HAVE_BUILTIN_OVERFLOW_CHECKS */
+#endif  /* !_GLIB_HAVE_BUILTIN_OVERFLOW_CHECKS */
 
 /* IEEE Standard 754 Single Precision Storage Format (gfloat):
  *
@@ -489,7 +489,7 @@ static inline xboolean_t _XPL_CHECKED_MUL_SIZE (xsize_t *dest, xsize_t a, xsize_
  * +--------+---------------+---------------+
  * B0------------------->B1------->B2-->B3-->
  *
- * IEEE Standard 754 Double Precision Storage Format (xdouble_t):
+ * IEEE Standard 754 Double Precision Storage Format (gdouble):
  *
  *        63 62            52 51            32   31            0
  * +--------+----------------+----------------+ +---------------+
@@ -509,19 +509,19 @@ union _GFloatIEEE754
 {
   gfloat v_float;
   struct {
-    xuint_t mantissa : 23;
-    xuint_t biased_exponent : 8;
-    xuint_t sign : 1;
+    guint mantissa : 23;
+    guint biased_exponent : 8;
+    guint sign : 1;
   } mpn;
 };
 union _GDoubleIEEE754
 {
-  xdouble_t v_double;
+  gdouble v_double;
   struct {
-    xuint_t mantissa_low : 32;
-    xuint_t mantissa_high : 20;
-    xuint_t biased_exponent : 11;
-    xuint_t sign : 1;
+    guint mantissa_low : 32;
+    guint mantissa_high : 20;
+    guint biased_exponent : 11;
+    guint sign : 1;
   } mpn;
 };
 #elif G_BYTE_ORDER == G_BIG_ENDIAN
@@ -529,59 +529,59 @@ union _GFloatIEEE754
 {
   gfloat v_float;
   struct {
-    xuint_t sign : 1;
-    xuint_t biased_exponent : 8;
-    xuint_t mantissa : 23;
+    guint sign : 1;
+    guint biased_exponent : 8;
+    guint mantissa : 23;
   } mpn;
 };
 union _GDoubleIEEE754
 {
-  xdouble_t v_double;
+  gdouble v_double;
   struct {
-    xuint_t sign : 1;
-    xuint_t biased_exponent : 11;
-    xuint_t mantissa_high : 20;
-    xuint_t mantissa_low : 32;
+    guint sign : 1;
+    guint biased_exponent : 11;
+    guint mantissa_high : 20;
+    guint mantissa_low : 32;
   } mpn;
 };
 #else /* !G_LITTLE_ENDIAN && !G_BIG_ENDIAN */
 #error unknown ENDIAN type
 #endif /* !G_LITTLE_ENDIAN && !G_BIG_ENDIAN */
 
-typedef struct _GTimeVal GTimeVal XPL_DEPRECATED_TYPE_IN_2_62_FOR(xdatetime_t);
+typedef struct _GTimeVal GTimeVal GLIB_DEPRECATED_TYPE_IN_2_62_FOR(GDateTime);
 
 struct _GTimeVal
 {
-  xlong_t tv_sec;
-  xlong_t tv_usec;
-} XPL_DEPRECATED_TYPE_IN_2_62_FOR(xdatetime_t);
+  glong tv_sec;
+  glong tv_usec;
+} GLIB_DEPRECATED_TYPE_IN_2_62_FOR(GDateTime);
 
-typedef xint_t grefcount;
-typedef xint_t gatomicrefcount;  /* should be accessed only using atomics */
+typedef gint grefcount;
+typedef gint gatomicrefcount;  /* should be accessed only using atomics */
 
 G_END_DECLS
 
 /* We prefix variable declarations so they can
  * properly get exported in Windows DLLs.
  */
-#ifndef XPL_VAR
-#  ifdef XPLATFORM_WIN32
-#    ifdef XPL_STATIC_COMPILATION
-#      define XPL_VAR extern
-#    else /* !XPL_STATIC_COMPILATION */
-#      ifdef XPL_COMPILATION
+#ifndef GLIB_VAR
+#  ifdef G_PLATFORM_WIN32
+#    ifdef GLIB_STATIC_COMPILATION
+#      define GLIB_VAR extern
+#    else /* !GLIB_STATIC_COMPILATION */
+#      ifdef GLIB_COMPILATION
 #        ifdef DLL_EXPORT
-#          define XPL_VAR extern __declspec(dllexport)
+#          define GLIB_VAR extern __declspec(dllexport)
 #        else /* !DLL_EXPORT */
-#          define XPL_VAR extern
+#          define GLIB_VAR extern
 #        endif /* !DLL_EXPORT */
-#      else /* !XPL_COMPILATION */
-#        define XPL_VAR extern __declspec(dllimport)
-#      endif /* !XPL_COMPILATION */
-#    endif /* !XPL_STATIC_COMPILATION */
-#  else /* !XPLATFORM_WIN32 */
-#    define XPL_VAR _XPL_EXTERN
-#  endif /* !XPLATFORM_WIN32 */
-#endif /* XPL_VAR */
+#      else /* !GLIB_COMPILATION */
+#        define GLIB_VAR extern __declspec(dllimport)
+#      endif /* !GLIB_COMPILATION */
+#    endif /* !GLIB_STATIC_COMPILATION */
+#  else /* !G_PLATFORM_WIN32 */
+#    define GLIB_VAR _GLIB_EXTERN
+#  endif /* !G_PLATFORM_WIN32 */
+#endif /* GLIB_VAR */
 
 #endif /* __G_TYPES_H__ */
