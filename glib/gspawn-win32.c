@@ -236,7 +236,7 @@ g_spawn_async (const xchar_t          *working_directory,
                xpid_t                 *child_pid,
                xerror_t              **error)
 {
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
 
   return g_spawn_async_with_pipes (working_directory,
                                    argv, envp,
@@ -460,7 +460,7 @@ do_spawn_directly (xint_t                 *exit_status,
   xint_t conv_error_index;
   wchar_t *wargv0, **wargv, **wenvp;
 
-  g_assert (argv != NULL && argv[0] != NULL);
+  xassert (argv != NULL && argv[0] != NULL);
 
   new_argv = (flags & G_SPAWN_FILE_AND_ARGV_ZERO) ? protected_argv + 1 : protected_argv;
 
@@ -546,7 +546,7 @@ might_be_console_process (void)
   // we should always fail to attach ourself to a console (because we're
   // either already attached, or we do not have a console)
   xboolean_t attached_to_self = AttachConsole (GetCurrentProcessId ());
-  g_return_val_if_fail (!attached_to_self, TRUE);
+  xreturn_val_if_fail (!attached_to_self, TRUE);
 
   switch (GetLastError ())
     {
@@ -559,7 +559,7 @@ might_be_console_process (void)
     // we should not get ERROR_INVALID_PARAMETER
     }
 
-  g_return_val_if_reached (FALSE);
+  xreturn_val_if_reached (FALSE);
 }
 
 static xboolean_t
@@ -603,10 +603,10 @@ fork_exec (xint_t                  *exit_status,
   int stdout_pipe[2] = { -1, -1 };
   int stderr_pipe[2] = { -1, -1 };
 
-  g_assert (argv != NULL && argv[0] != NULL);
-  g_assert (stdin_pipe_out == NULL || stdin_fd < 0);
-  g_assert (stdout_pipe_out == NULL || stdout_fd < 0);
-  g_assert (stderr_pipe_out == NULL || stderr_fd < 0);
+  xassert (argv != NULL && argv[0] != NULL);
+  xassert (stdin_pipe_out == NULL || stdin_fd < 0);
+  xassert (stdout_pipe_out == NULL || stdout_fd < 0);
+  xassert (stderr_pipe_out == NULL || stderr_fd < 0);
 
   if (child_setup && !warned_about_child_setup)
     {
@@ -876,7 +876,7 @@ fork_exec (xint_t                  *exit_status,
        * which takes care of reading it after the grandchild has
        * finished.
        */
-      g_assert (err_report != NULL);
+      xassert (err_report != NULL);
       *err_report = child_err_report_pipe[0];
       write (helper_sync_pipe[1], " ", 1);
       close_and_invalidate (&helper_sync_pipe[1]);
@@ -999,11 +999,11 @@ g_spawn_sync (const xchar_t          *working_directory,
   xboolean_t failed;
   xint_t status;
 
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
-  g_return_val_if_fail (!(flags & G_SPAWN_DO_NOT_REAP_CHILD), FALSE);
-  g_return_val_if_fail (standard_output == NULL ||
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
+  xreturn_val_if_fail (!(flags & G_SPAWN_DO_NOT_REAP_CHILD), FALSE);
+  xreturn_val_if_fail (standard_output == NULL ||
                         !(flags & G_SPAWN_STDOUT_TO_DEV_NULL), FALSE);
-  g_return_val_if_fail (standard_error == NULL ||
+  xreturn_val_if_fail (standard_error == NULL ||
                         !(flags & G_SPAWN_STDERR_TO_DEV_NULL), FALSE);
 
   /* Just to ensure segfaults if callers try to use
@@ -1231,13 +1231,13 @@ g_spawn_async_with_pipes (const xchar_t          *working_directory,
                           xint_t                 *standard_error,
                           xerror_t              **error)
 {
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
-  g_return_val_if_fail (standard_output == NULL ||
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
+  xreturn_val_if_fail (standard_output == NULL ||
                         !(flags & G_SPAWN_STDOUT_TO_DEV_NULL), FALSE);
-  g_return_val_if_fail (standard_error == NULL ||
+  xreturn_val_if_fail (standard_error == NULL ||
                         !(flags & G_SPAWN_STDERR_TO_DEV_NULL), FALSE);
   /* can't inherit stdin if we have an input pipe. */
-  g_return_val_if_fail (standard_input == NULL ||
+  xreturn_val_if_fail (standard_input == NULL ||
                         !(flags & G_SPAWN_CHILD_INHERITS_STDIN), FALSE);
 
   return fork_exec (NULL,
@@ -1273,13 +1273,13 @@ g_spawn_async_with_fds (const xchar_t          *working_directory,
                         xint_t                  stderr_fd,
                         xerror_t              **error)
 {
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
-  g_return_val_if_fail (stdin_fd == -1 ||
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
+  xreturn_val_if_fail (stdin_fd == -1 ||
                         !(flags & G_SPAWN_STDOUT_TO_DEV_NULL), FALSE);
-  g_return_val_if_fail (stderr_fd == -1 ||
+  xreturn_val_if_fail (stderr_fd == -1 ||
                         !(flags & G_SPAWN_STDERR_TO_DEV_NULL), FALSE);
   /* can't inherit stdin if we have an input pipe. */
-  g_return_val_if_fail (stdin_fd == -1 ||
+  xreturn_val_if_fail (stdin_fd == -1 ||
                         !(flags & G_SPAWN_CHILD_INHERITS_STDIN), FALSE);
 
   return fork_exec (NULL,
@@ -1322,18 +1322,18 @@ g_spawn_async_with_pipes_and_fds (const xchar_t           *working_directory,
                                   xint_t                  *stderr_pipe_out,
                                   xerror_t               **error)
 {
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
-  g_return_val_if_fail (stdout_pipe_out == NULL ||
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL, FALSE);
+  xreturn_val_if_fail (stdout_pipe_out == NULL ||
                         !(flags & G_SPAWN_STDOUT_TO_DEV_NULL), FALSE);
-  g_return_val_if_fail (stderr_pipe_out == NULL ||
+  xreturn_val_if_fail (stderr_pipe_out == NULL ||
                         !(flags & G_SPAWN_STDERR_TO_DEV_NULL), FALSE);
   /* can't inherit stdin if we have an input pipe. */
-  g_return_val_if_fail (stdin_pipe_out == NULL ||
+  xreturn_val_if_fail (stdin_pipe_out == NULL ||
                         !(flags & G_SPAWN_CHILD_INHERITS_STDIN), FALSE);
   /* can’t use pipes and stdin/stdout/stderr FDs */
-  g_return_val_if_fail (stdin_pipe_out == NULL || stdin_fd < 0, FALSE);
-  g_return_val_if_fail (stdout_pipe_out == NULL || stdout_fd < 0, FALSE);
-  g_return_val_if_fail (stderr_pipe_out == NULL || stderr_fd < 0, FALSE);
+  xreturn_val_if_fail (stdin_pipe_out == NULL || stdin_fd < 0, FALSE);
+  xreturn_val_if_fail (stdout_pipe_out == NULL || stdout_fd < 0, FALSE);
+  xreturn_val_if_fail (stderr_pipe_out == NULL || stderr_fd < 0, FALSE);
 
   return fork_exec (NULL,
                     (flags & G_SPAWN_DO_NOT_REAP_CHILD),
@@ -1367,7 +1367,7 @@ g_spawn_command_line_sync (const xchar_t  *command_line,
   xboolean_t retval;
   xchar_t **argv = 0;
 
-  g_return_val_if_fail (command_line != NULL, FALSE);
+  xreturn_val_if_fail (command_line != NULL, FALSE);
 
   /* This will return a runtime error if @command_line is the empty string. */
   if (!g_shell_parse_argv (command_line,
@@ -1397,7 +1397,7 @@ g_spawn_command_line_async (const xchar_t *command_line,
   xboolean_t retval;
   xchar_t **argv = 0;
 
-  g_return_val_if_fail (command_line != NULL, FALSE);
+  xreturn_val_if_fail (command_line != NULL, FALSE);
 
   /* This will return a runtime error if @command_line is the empty string. */
   if (!g_shell_parse_argv (command_line,

@@ -1601,7 +1601,7 @@ class CodeGenerator:
             "_xvalue_equal (const xvalue_t *a, const xvalue_t *b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
-            "  g_assert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
+            "  xassert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
             "  switch (G_VALUE_TYPE (a))\n"
             "    {\n"
             "      case XTYPE_BOOLEAN:\n"
@@ -2210,97 +2210,97 @@ class CodeGenerator:
                 self.outfile.write("  xobject_interface_install_property (iface,\n")
                 if p.arg.gtype == "XTYPE_VARIANT":
                     s = (
-                        'g_param_spec_variant ("%s", "%s", "%s", G_VARIANT_TYPE ("%s"), NULL'
+                        'xparam_spec_variant ("%s", "%s", "%s", G_VARIANT_TYPE ("%s"), NULL'
                         % (p.name_hyphen, p.name, p.name, p.arg.signature)
                     )
                 elif p.arg.signature == "b":
-                    s = 'g_param_spec_boolean ("%s", "%s", "%s", FALSE' % (
+                    s = 'xparam_spec_boolean ("%s", "%s", "%s", FALSE' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "y":
-                    s = 'g_param_spec_uchar ("%s", "%s", "%s", 0, 255, 0' % (
+                    s = 'xparam_spec_uchar ("%s", "%s", "%s", 0, 255, 0' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "n":
                     s = (
-                        'g_param_spec_int ("%s", "%s", "%s", G_MININT16, G_MAXINT16, 0'
+                        'xparam_spec_int ("%s", "%s", "%s", G_MININT16, G_MAXINT16, 0'
                         % (p.name_hyphen, p.name, p.name)
                     )
                 elif p.arg.signature == "q":
-                    s = 'g_param_spec_uint ("%s", "%s", "%s", 0, G_MAXUINT16, 0' % (
+                    s = 'xparam_spec_uint ("%s", "%s", "%s", 0, G_MAXUINT16, 0' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "i":
                     s = (
-                        'g_param_spec_int ("%s", "%s", "%s", G_MININT32, G_MAXINT32, 0'
+                        'xparam_spec_int ("%s", "%s", "%s", G_MININT32, G_MAXINT32, 0'
                         % (p.name_hyphen, p.name, p.name)
                     )
                 elif p.arg.signature == "u":
-                    s = 'g_param_spec_uint ("%s", "%s", "%s", 0, G_MAXUINT32, 0' % (
+                    s = 'xparam_spec_uint ("%s", "%s", "%s", 0, G_MAXUINT32, 0' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "x":
                     s = (
-                        'g_param_spec_int64 ("%s", "%s", "%s", G_MININT64, G_MAXINT64, 0'
+                        'xparam_spec_int64 ("%s", "%s", "%s", G_MININT64, G_MAXINT64, 0'
                         % (p.name_hyphen, p.name, p.name)
                     )
                 elif p.arg.signature == "t":
-                    s = 'g_param_spec_uint64 ("%s", "%s", "%s", 0, G_MAXUINT64, 0' % (
+                    s = 'xparam_spec_uint64 ("%s", "%s", "%s", 0, G_MAXUINT64, 0' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "d":
                     s = (
-                        'g_param_spec_double ("%s", "%s", "%s", -G_MAXDOUBLE, G_MAXDOUBLE, 0.0'
+                        'xparam_spec_double ("%s", "%s", "%s", -G_MAXDOUBLE, G_MAXDOUBLE, 0.0'
                         % (p.name_hyphen, p.name, p.name)
                     )
                 elif p.arg.signature == "s":
-                    s = 'g_param_spec_string ("%s", "%s", "%s", NULL' % (
+                    s = 'xparam_spec_string ("%s", "%s", "%s", NULL' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "o":
-                    s = 'g_param_spec_string ("%s", "%s", "%s", NULL' % (
+                    s = 'xparam_spec_string ("%s", "%s", "%s", NULL' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "g":
-                    s = 'g_param_spec_string ("%s", "%s", "%s", NULL' % (
+                    s = 'xparam_spec_string ("%s", "%s", "%s", NULL' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "ay":
-                    s = 'g_param_spec_string ("%s", "%s", "%s", NULL' % (
+                    s = 'xparam_spec_string ("%s", "%s", "%s", NULL' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "as":
-                    s = 'g_param_spec_boxed ("%s", "%s", "%s", XTYPE_STRV' % (
+                    s = 'xparam_spec_boxed ("%s", "%s", "%s", XTYPE_STRV' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "ao":
-                    s = 'g_param_spec_boxed ("%s", "%s", "%s", XTYPE_STRV' % (
+                    s = 'xparam_spec_boxed ("%s", "%s", "%s", XTYPE_STRV' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
                     )
                 elif p.arg.signature == "aay":
-                    s = 'g_param_spec_boxed ("%s", "%s", "%s", XTYPE_STRV' % (
+                    s = 'xparam_spec_boxed ("%s", "%s", "%s", XTYPE_STRV' % (
                         p.name_hyphen,
                         p.name,
                         p.name,
@@ -2309,9 +2309,9 @@ class CodeGenerator:
                     print_error(
                         'Unsupported gtype "{}" for xparam_spec_t'.format(p.arg.gtype)
                     )
-                flags = "G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS"
+                flags = "XPARAM_READWRITE | XPARAM_STATIC_STRINGS"
                 if p.deprecated:
-                    flags = "G_PARAM_DEPRECATED | " + flags
+                    flags = "XPARAM_DEPRECATED | " + flags
                 self.outfile.write("    %s, %s));" % (s, flags))
                 self.outfile.write("\n")
 
@@ -2898,7 +2898,7 @@ class CodeGenerator:
         )
         self.outfile.write("  g_datalist_clear (&proxy->priv->qdata);\n")
         self.outfile.write(
-            "  G_OBJECT_CLASS (%s_proxy_parent_class)->finalize (object);\n"
+            "  XOBJECT_CLASS (%s_proxy_parent_class)->finalize (object);\n"
             "}\n"
             "\n" % (i.name_lower)
         )
@@ -2927,7 +2927,7 @@ class CodeGenerator:
             self.outfile.write(
                 "  const _ExtendedGDBusPropertyInfo *info;\n"
                 "  xvariant_t *variant;\n"
-                "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
+                "  xassert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  info = (const _ExtendedGDBusPropertyInfo *) _%s_property_info_pointers[prop_id - 1];\n"
                 "  variant = xdbus_proxy_get_cached_property (G_DBUS_PROXY (object), info->parent_struct.name);\n"
                 "  if (info->use_gvariant)\n"
@@ -2990,7 +2990,7 @@ class CodeGenerator:
             self.outfile.write(
                 "  const _ExtendedGDBusPropertyInfo *info;\n"
                 "  xvariant_t *variant;\n"
-                "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
+                "  xassert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  info = (const _ExtendedGDBusPropertyInfo *) _%s_property_info_pointers[prop_id - 1];\n"
                 "  variant = g_dbus_gvalue_to_gvariant (value, G_VARIANT_TYPE (info->parent_struct.signature));\n"
                 "  xdbus_proxy_call (G_DBUS_PROXY (object),\n"
@@ -3203,13 +3203,13 @@ class CodeGenerator:
             "static void\n"
             "%s_proxy_class_init (%sProxyClass *klass)\n"
             "{\n"
-            "  xobject_class_t *gobject_class;\n"
+            "  xobject_class_t *xobject_class;\n"
             "  GDBusProxyClass *proxy_class;\n"
             "\n"
-            "  gobject_class = G_OBJECT_CLASS (klass);\n"
-            "  gobject_class->finalize     = %s_proxy_finalize;\n"
-            "  gobject_class->get_property = %s_proxy_get_property;\n"
-            "  gobject_class->set_property = %s_proxy_set_property;\n"
+            "  xobject_class = XOBJECT_CLASS (klass);\n"
+            "  xobject_class->finalize     = %s_proxy_finalize;\n"
+            "  xobject_class->get_property = %s_proxy_get_property;\n"
+            "  xobject_class->set_property = %s_proxy_set_property;\n"
             "\n"
             "  proxy_class = G_DBUS_PROXY_CLASS (klass);\n"
             "  proxy_class->g_signal = %s_proxy_g_signal;\n"
@@ -3227,7 +3227,7 @@ class CodeGenerator:
         )
         if len(i.properties) > 0:
             self.outfile.write(
-                "  %s_override_properties (gobject_class, 1);\n\n" % (i.name_lower)
+                "  %s_override_properties (xobject_class, 1);\n\n" % (i.name_lower)
             )
         self.outfile.write(
             "#if XPL_VERSION_MAX_ALLOWED < XPL_VERSION_2_38\n"
@@ -3567,7 +3567,7 @@ class CodeGenerator:
         )
         self.outfile.write(
             "  info = (_ExtendedGDBusMethodInfo *) xdbus_method_invocation_get_method_info (invocation);\n"
-            "  g_assert (info != NULL);\n"
+            "  xassert (info != NULL);\n"
         )
         self.outfile.write(
             "  num_params = xvariant_n_children (parameters);\n"
@@ -3643,7 +3643,7 @@ class CodeGenerator:
         self.outfile.write(
             "  ret = NULL;\n"
             "  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, property_name);\n"
-            "  g_assert (info != NULL);\n"
+            "  xassert (info != NULL);\n"
             "  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);\n"
             "  if (pspec == NULL)\n"
             "    {\n"
@@ -3682,7 +3682,7 @@ class CodeGenerator:
         self.outfile.write(
             "  ret = FALSE;\n"
             "  info = (_ExtendedGDBusPropertyInfo *) g_dbus_interface_info_lookup_property ((xdbus_interface_info_t *) &_%s_interface_info.parent_struct, property_name);\n"
-            "  g_assert (info != NULL);\n"
+            "  xassert (info != NULL);\n"
             "  pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (skeleton), info->hyphen_name);\n"
             "  if (pspec == NULL)\n"
             "    {\n"
@@ -3900,7 +3900,7 @@ class CodeGenerator:
         self.outfile.write("  xmain_context_unref (skeleton->priv->context);\n")
         self.outfile.write("  g_mutex_clear (&skeleton->priv->lock);\n")
         self.outfile.write(
-            "  G_OBJECT_CLASS (%s_skeleton_parent_class)->finalize (object);\n"
+            "  XOBJECT_CLASS (%s_skeleton_parent_class)->finalize (object);\n"
             "}\n"
             "\n" % (i.name_lower)
         )
@@ -3917,7 +3917,7 @@ class CodeGenerator:
             )
             self.outfile.write(
                 "  %sSkeleton *skeleton = %s%s_SKELETON (object);\n"
-                "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
+                "  xassert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
                 "  xvalue_copy (&skeleton->priv->properties[prop_id - 1], value);\n"
                 "  g_mutex_unlock (&skeleton->priv->lock);\n"
@@ -4082,7 +4082,7 @@ class CodeGenerator:
             self.outfile.write(
                 "  const _ExtendedGDBusPropertyInfo *info;\n"
                 "  %sSkeleton *skeleton = %s%s_SKELETON (object);\n"
-                "  g_assert (prop_id != 0 && prop_id - 1 < %d);\n"
+                "  xassert (prop_id != 0 && prop_id - 1 < %d);\n"
                 "  info = (const _ExtendedGDBusPropertyInfo *) _%s_property_info_pointers[prop_id - 1];\n"
                 "  g_mutex_lock (&skeleton->priv->lock);\n"
                 "  xobject_freeze_notify (object);\n"
@@ -4171,22 +4171,22 @@ class CodeGenerator:
             "static void\n"
             "%s_skeleton_class_init (%sSkeletonClass *klass)\n"
             "{\n"
-            "  xobject_class_t *gobject_class;\n"
+            "  xobject_class_t *xobject_class;\n"
             "  GDBusInterfaceSkeletonClass *skeleton_class;\n"
             "\n"
-            "  gobject_class = G_OBJECT_CLASS (klass);\n"
-            "  gobject_class->finalize = %s_skeleton_finalize;\n"
+            "  xobject_class = XOBJECT_CLASS (klass);\n"
+            "  xobject_class->finalize = %s_skeleton_finalize;\n"
             % (i.name_lower, i.camel_name, i.name_lower)
         )
         if len(i.properties) > 0:
             self.outfile.write(
-                "  gobject_class->get_property = %s_skeleton_get_property;\n"
-                "  gobject_class->set_property = %s_skeleton_set_property;\n"
-                "  gobject_class->notify       = %s_skeleton_notify;\n"
+                "  xobject_class->get_property = %s_skeleton_get_property;\n"
+                "  xobject_class->set_property = %s_skeleton_set_property;\n"
+                "  xobject_class->notify       = %s_skeleton_notify;\n"
                 "\n" % (i.name_lower, i.name_lower, i.name_lower)
             )
             self.outfile.write(
-                "\n" "  %s_override_properties (gobject_class, 1);\n" % (i.name_lower)
+                "\n" "  %s_override_properties (xobject_class, 1);\n" % (i.name_lower)
             )
         self.outfile.write(
             "\n" "  skeleton_class = G_DBUS_INTERFACE_SKELETON_CLASS (klass);\n"
@@ -4354,11 +4354,11 @@ class CodeGenerator:
                 )
             )
             self.write_gtkdoc_deprecated_and_since_and_close(i, self.outfile, 2)
-            flags = "G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS"
+            flags = "XPARAM_READWRITE | XPARAM_STATIC_STRINGS"
             if i.deprecated:
-                flags = "G_PARAM_DEPRECATED | " + flags
+                flags = "XPARAM_DEPRECATED | " + flags
             self.outfile.write(
-                '  xobject_interface_install_property (iface, g_param_spec_object ("%s", "%s", "%s", %sTYPE_%s, %s));\n'
+                '  xobject_interface_install_property (iface, xparam_spec_object ("%s", "%s", "%s", %sTYPE_%s, %s));\n'
                 "\n"
                 % (
                     i.name_hyphen,
@@ -4574,16 +4574,16 @@ class CodeGenerator:
             "static void\n"
             "%sobject_proxy_class_init (%sObjectProxyClass *klass)\n"
             "{\n"
-            "  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);\n"
+            "  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);\n"
             "\n"
-            "  gobject_class->set_property = %sobject_proxy_set_property;\n"
-            "  gobject_class->get_property = %sobject_proxy_get_property;\n"
+            "  xobject_class->set_property = %sobject_proxy_set_property;\n"
+            "  xobject_class->get_property = %sobject_proxy_get_property;\n"
             "\n" % (self.ns_lower, self.namespace, self.ns_lower, self.ns_lower)
         )
         n = 1
         for i in self.ifaces:
             self.outfile.write(
-                '  xobject_class_override_property (gobject_class, %d, "%s");'
+                '  xobject_class_override_property (xobject_class, %d, "%s");'
                 "\n" % (n, i.name_hyphen)
             )
             n += 1
@@ -4608,8 +4608,8 @@ class CodeGenerator:
             "%sobject_proxy_new (xdbus_connection_t *connection,\n"
             "  const xchar_t *object_path)\n"
             "{\n"
-            "  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);\n"
-            "  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);\n"
+            "  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);\n"
+            "  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);\n"
             '  return %sOBJECT_PROXY (xobject_new (%sTYPE_OBJECT_PROXY, "g-connection", connection, "g-object-path", object_path, NULL));\n'
             "}\n"
             "\n" % (self.namespace, self.ns_lower, self.ns_upper, self.ns_upper)
@@ -4754,16 +4754,16 @@ class CodeGenerator:
             "static void\n"
             "%sobject_skeleton_class_init (%sObjectSkeletonClass *klass)\n"
             "{\n"
-            "  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);\n"
+            "  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);\n"
             "\n"
-            "  gobject_class->set_property = %sobject_skeleton_set_property;\n"
-            "  gobject_class->get_property = %sobject_skeleton_get_property;\n"
+            "  xobject_class->set_property = %sobject_skeleton_set_property;\n"
+            "  xobject_class->get_property = %sobject_skeleton_get_property;\n"
             "\n" % (self.ns_lower, self.namespace, self.ns_lower, self.ns_lower)
         )
         n = 1
         for i in self.ifaces:
             self.outfile.write(
-                '  xobject_class_override_property (gobject_class, %d, "%s");'
+                '  xobject_class_override_property (xobject_class, %d, "%s");'
                 "\n" % (n, i.name_hyphen)
             )
             n += 1
@@ -4785,7 +4785,7 @@ class CodeGenerator:
             "%sObjectSkeleton *\n"
             "%sobject_skeleton_new (const xchar_t *object_path)\n"
             "{\n"
-            "  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);\n"
+            "  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);\n"
             '  return %sOBJECT_SKELETON (xobject_new (%sTYPE_OBJECT_SKELETON, "g-object-path", object_path, NULL));\n'
             "}\n"
             "\n" % (self.namespace, self.ns_lower, self.ns_upper, self.ns_upper)
@@ -4875,7 +4875,7 @@ class CodeGenerator:
 
         # class boilerplate
         self.outfile.write(
-            "G_DEFINE_TYPE (%sObjectManagerClient, %sobject_manager_client, XTYPE_DBUS_OBJECT_MANAGER_CLIENT)\n"
+            "XDEFINE_TYPE (%sObjectManagerClient, %sobject_manager_client, XTYPE_DBUS_OBJECT_MANAGER_CLIENT)\n"
             "\n" % (self.namespace, self.ns_lower)
         )
 

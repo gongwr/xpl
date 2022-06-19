@@ -75,11 +75,11 @@ name_lost_handler (xdbus_connection_t *connection,
   OwnNameData *data = user_data;
   if (data->expect_null_connection)
     {
-      g_assert (connection == NULL);
+      xassert (connection == NULL);
     }
   else
     {
-      g_assert (connection != NULL);
+      xassert (connection != NULL);
       xdbus_connection_set_exit_on_close (connection, FALSE);
     }
   data->num_lost += 1;
@@ -176,8 +176,8 @@ test_bus_own_name (void)
    * Check that the name was actually acquired.
    */
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
-  g_assert (c != NULL);
-  g_assert (!xdbus_connection_is_closed (c));
+  xassert (c != NULL);
+  xassert (!xdbus_connection_is_closed (c));
   result = xdbus_connection_call_sync (c,
                                         "org.freedesktop.DBus",  /* bus name */
                                         "/org/freedesktop/DBus", /* object path */
@@ -190,9 +190,9 @@ test_bus_own_name (void)
                                         NULL,
                                         &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   xvariant_get (result, "(b)", &name_has_owner_reply);
-  g_assert (name_has_owner_reply);
+  xassert (name_has_owner_reply);
   xvariant_unref (result);
 
   /*
@@ -218,9 +218,9 @@ test_bus_own_name (void)
                                         NULL,
                                         &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   xvariant_get (result, "(b)", &name_has_owner_reply);
-  g_assert (!name_has_owner_reply);
+  xassert (!name_has_owner_reply);
   xvariant_unref (result);
 
   /* Now try owning the name and then immediately decide to unown the name */
@@ -340,8 +340,8 @@ test_bus_own_name (void)
    * didn't specify ALLOW_REPLACEMENT.
    */
   c2 = _g_bus_get_priv (G_BUS_TYPE_SESSION, NULL, NULL);
-  g_assert (c2 != NULL);
-  g_assert (!xdbus_connection_is_closed (c2));
+  xassert (c2 != NULL);
+  xassert (!xdbus_connection_is_closed (c2));
   /* first without _REPLACE */
   data2.num_bus_acquired = 0;
   data2.num_acquired = 0;
@@ -621,11 +621,11 @@ name_appeared_handler (xdbus_connection_t *connection,
 
   if (data->expect_null_connection)
     {
-      g_assert (connection == NULL);
+      xassert (connection == NULL);
     }
   else
     {
-      g_assert (connection != NULL);
+      xassert (connection != NULL);
       xdbus_connection_set_exit_on_close (connection, FALSE);
     }
   data->num_appeared += 1;
@@ -641,11 +641,11 @@ name_vanished_handler (xdbus_connection_t *connection,
 
   if (data->expect_null_connection)
     {
-      g_assert (connection == NULL);
+      xassert (connection == NULL);
     }
   else
     {
-      g_assert (connection != NULL);
+      xassert (connection != NULL);
       xdbus_connection_set_exit_on_close (connection, FALSE);
     }
   data->num_vanished += 1;
@@ -809,7 +809,7 @@ test_bus_watch_name (xconstpointer d)
   g_assert_cmpint (own_data.num_lost, ==, 0);
 
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
-  g_assert (connection != NULL);
+  xassert (connection != NULL);
 
   /* now watch the name */
   data.num_appeared = 0;
@@ -1153,7 +1153,7 @@ watch_with_different_context (xboolean_t unwatch_early)
   session_bus_up ();
 
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
-  g_assert (connection != NULL);
+  xassert (connection != NULL);
 
   g_mutex_init (&thread_data.mutex);
   g_mutex_init (&thread_data.cond_mutex);
@@ -1265,24 +1265,24 @@ test_validate_names (void)
   for (n = 0; n < G_N_ELEMENTS (names); n++)
     {
       if (names[n].name)
-        g_assert (g_dbus_is_name (names[n].string));
+        xassert (g_dbus_is_name (names[n].string));
       else
-        g_assert (!g_dbus_is_name (names[n].string));
+        xassert (!g_dbus_is_name (names[n].string));
 
       if (names[n].unique)
-        g_assert (g_dbus_is_unique_name (names[n].string));
+        xassert (g_dbus_is_unique_name (names[n].string));
       else
-        g_assert (!g_dbus_is_unique_name (names[n].string));
+        xassert (!g_dbus_is_unique_name (names[n].string));
 
       if (names[n].interface)
         {
-          g_assert (g_dbus_is_interface_name (names[n].string));
-          g_assert (g_dbus_is_error_name (names[n].string));
+          xassert (g_dbus_is_interface_name (names[n].string));
+          xassert (g_dbus_is_error_name (names[n].string));
         }
       else
         {
-          g_assert (!g_dbus_is_interface_name (names[n].string));
-          g_assert (!g_dbus_is_error_name (names[n].string));
+          xassert (!g_dbus_is_interface_name (names[n].string));
+          xassert (!g_dbus_is_error_name (names[n].string));
         }
     }
 }

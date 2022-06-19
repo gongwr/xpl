@@ -121,7 +121,7 @@ xinitable_init (xinitable_t     *initable,
 {
   xinitable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_INITABLE (initable), FALSE);
+  xreturn_val_if_fail (X_IS_INITABLE (initable), FALSE);
 
   iface = XINITABLE_GET_IFACE (initable);
 
@@ -197,7 +197,7 @@ xinitable_newv (xtype_t          object_type,
 {
   xobject_t *obj;
 
-  g_return_val_if_fail (XTYPE_IS_INITABLE (object_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_INITABLE (object_type), NULL);
 
   obj = xobject_newv (object_type, n_parameters, parameters);
 
@@ -239,7 +239,7 @@ xinitable_new_valist (xtype_t          object_type,
 {
   xobject_t *obj;
 
-  g_return_val_if_fail (XTYPE_IS_INITABLE (object_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_INITABLE (object_type), NULL);
 
   obj = xobject_new_valist (object_type,
 			     first_property_name,

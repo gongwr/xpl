@@ -205,7 +205,7 @@ test_GDateTime_invalid (void)
   g_test_bug ("http://bugzilla.gnome.org/702674");
 
   dt = xdate_time_new_utc (2013, -2147483647, 31, 17, 15, 48);
-  g_assert (dt == NULL);
+  xassert (dt == NULL);
 }
 
 static void
@@ -245,13 +245,13 @@ test_GDateTime_equal (void)
 
   dt1 = xdate_time_new_local (2009, 10, 19, 0, 0, 0);
   dt2 = xdate_time_new_local (2009, 10, 19, 0, 0, 0);
-  g_assert (xdate_time_equal (dt1, dt2));
+  xassert (xdate_time_equal (dt1, dt2));
   xdate_time_unref (dt1);
   xdate_time_unref (dt2);
 
   dt1 = xdate_time_new_local (2009, 10, 18, 0, 0, 0);
   dt2 = xdate_time_new_local (2009, 10, 19, 0, 0, 0);
-  g_assert (!xdate_time_equal (dt1, dt2));
+  xassert (!xdate_time_equal (dt1, dt2));
   xdate_time_unref (dt1);
   xdate_time_unref (dt2);
 
@@ -265,7 +265,7 @@ test_GDateTime_equal (void)
   dt2 = xdate_time_new_utc (2010, 5, 24, 11, 0, 0);
   g_assert_cmpint (xdate_time_get_utc_offset (dt2), ==, 0);
 
-  g_assert (xdate_time_equal (dt1, dt2));
+  xassert (xdate_time_equal (dt1, dt2));
   xdate_time_unref (dt1);
 
   /* America/Recife is in UTC-0300 */
@@ -278,7 +278,7 @@ test_GDateTime_equal (void)
   dt1 = xdate_time_new (tz, 2010, 5, 24,  8, 0, 0);
   xtime_zone_unref (tz);
   g_assert_cmpint (xdate_time_get_utc_offset (dt1) / G_USEC_PER_SEC, ==, (-3 * 3600));
-  g_assert (xdate_time_equal (dt1, dt2));
+  xassert (xdate_time_equal (dt1, dt2));
   xdate_time_unref (dt1);
   xdate_time_unref (dt2);
 }
@@ -1261,7 +1261,7 @@ test_GDateTime_new_full (void)
                    xtime_zone_get_identifier (dt_tz));
   SetThreadUILanguage (currLangId);
 #endif
-  g_assert (!xdate_time_is_daylight_savings (dt));
+  xassert (!xdate_time_is_daylight_savings (dt));
   xdate_time_unref (dt);
   xtime_zone_unref (tz);
 
@@ -1397,15 +1397,15 @@ test_GDateTime_new_from_unix_utc (void)
 
 #if 0
   dt = xdate_time_new_from_unix_utc (t);
-  g_assert (dt == NULL);
+  xassert (dt == NULL);
 #endif
 
   t = t / 1e6;  /* oops, this was microseconds */
 
   dt = xdate_time_new_from_unix_utc (t);
-  g_assert (dt != NULL);
+  xassert (dt != NULL);
 
-  g_assert (dt == xdate_time_ref (dt));
+  xassert (dt == xdate_time_ref (dt));
   xdate_time_unref (dt);
   g_assert_cmpint (xdate_time_to_unix (dt), ==, t);
   xdate_time_unref (dt);
@@ -1641,7 +1641,7 @@ xdatetime_t *__dt = xdate_time_new_local (2009, 10, 24, 0, 0, 0);\
 #ifdef G_OS_UNIX
   TEST_PRINTF ("%Z", dst);
 #elif defined G_OS_WIN32
-  g_assert (GetDynamicTimeZoneInformation (&dtz_info) != TIME_ZONE_ID_INVALID);
+  xassert (GetDynamicTimeZoneInformation (&dtz_info) != TIME_ZONE_ID_INVALID);
   if (wcscmp (dtz_info.StandardName, L"") != 0)
     current_tz = xutf16_to_utf8 (dtz_info.StandardName, -1, NULL, NULL, NULL);
   else
@@ -1999,13 +1999,13 @@ test_GDateTime_dst (void)
 #endif
   g_assert_nonnull (tz);
   dt1 = xdate_time_new (tz, 2009, 8, 15, 3, 0, 1);
-  g_assert (xdate_time_is_daylight_savings (dt1));
+  xassert (xdate_time_is_daylight_savings (dt1));
   g_assert_cmpint (xdate_time_get_utc_offset (dt1) / G_USEC_PER_SEC, ==, 3600);
   g_assert_cmpint (xdate_time_get_hour (dt1), ==, 3);
 
   /* add 6 months to clear the DST flag but keep the same time */
   dt2 = xdate_time_add_months (dt1, 6);
-  g_assert (!xdate_time_is_daylight_savings (dt2));
+  xassert (!xdate_time_is_daylight_savings (dt2));
   g_assert_cmpint (xdate_time_get_utc_offset (dt2) / G_USEC_PER_SEC, ==, 0);
   g_assert_cmpint (xdate_time_get_hour (dt2), ==, 3);
 
@@ -2014,11 +2014,11 @@ test_GDateTime_dst (void)
 
   /* now do the reverse: start with a non-DST state and move to DST */
   dt1 = xdate_time_new (tz, 2009, 2, 15, 2, 0, 1);
-  g_assert (!xdate_time_is_daylight_savings (dt1));
+  xassert (!xdate_time_is_daylight_savings (dt1));
   g_assert_cmpint (xdate_time_get_hour (dt1), ==, 2);
 
   dt2 = xdate_time_add_months (dt1, 6);
-  g_assert (xdate_time_is_daylight_savings (dt2));
+  xassert (xdate_time_is_daylight_savings (dt2));
   g_assert_cmpint (xdate_time_get_hour (dt2), ==, 2);
 
   xdate_time_unref (dt2);
@@ -2029,7 +2029,7 @@ test_GDateTime_dst (void)
 static inline xboolean_t
 is_leap_year (xint_t year)
 {
-  g_assert (1 <= year && year <= 9999);
+  xassert (1 <= year && year <= 9999);
 
   return year % 400 == 0 || (year % 4 == 0 && year % 100 != 0);
 }
@@ -2042,7 +2042,7 @@ days_in_month (xint_t year, xint_t month)
     {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
   };
 
-  g_assert (1 <= month && month <= 12);
+  xassert (1 <= month && month <= 12);
 
   return table[is_leap_year (year)][month];
 }
@@ -2558,7 +2558,7 @@ test_adjust_time (void)
   i2 = xtime_zone_adjust_time (tz, G_TIME_TYPE_DAYLIGHT, &u2);
 
   g_assert_cmpint (i1, ==, i2);
-  g_assert (u == u2);
+  xassert (u == u2);
 
   xdate_time_unref (dt);
 
@@ -2572,7 +2572,7 @@ test_adjust_time (void)
 
   i1 = xtime_zone_adjust_time (tz, G_TIME_TYPE_DAYLIGHT, &u2);
   g_assert_cmpint (i1, >=, 0);
-  g_assert (u == u2);
+  xassert (u == u2);
 
   xtime_zone_unref (tz);
 }
@@ -2589,7 +2589,7 @@ test_no_header (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "UTC");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "UTC");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, 0);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
 
   xtime_zone_unref (tz);
 }
@@ -2617,7 +2617,7 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "UTC");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "UTC");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, 0);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   xtime_zone_unref (tz);
 
   /* An existent zone name should not fall back to UTC. */
@@ -2627,7 +2627,7 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "PST8");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "PST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, - 8 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   xtime_zone_unref (tz);
 
 /* This fails rules_from_identifier on Unix (though not on Windows)
@@ -2638,10 +2638,10 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "PST8PDT");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "PST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, - 8 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 1), ==, "PDT");
   g_assert_cmpint (xtime_zone_get_offset (tz, 1), ==,- 7 * 3600);
-  g_assert (xtime_zone_is_dst (tz, 1));
+  xassert (xtime_zone_is_dst (tz, 1));
   xtime_zone_unref (tz);
 
   tz = xtime_zone_new_identifier ("PST8PDT6:32:15");
@@ -2650,15 +2650,15 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "PST8PDT6:32:15");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "PST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, - 8 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 1), ==, "PDT");
   g_assert_cmpint (xtime_zone_get_offset (tz, 1), ==, - 6 * 3600 - 32 *60 - 15);
-  g_assert (xtime_zone_is_dst (tz, 1));
+  xassert (xtime_zone_is_dst (tz, 1));
   gdt1 = xdate_time_new (tz, 2012, 12, 6, 11, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 6, 6, 11, 15, 23.0);
-  g_assert (!xdate_time_is_daylight_savings (gdt1));
+  xassert (!xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) /  1000000, ==, -28800);
-  g_assert (xdate_time_is_daylight_savings (gdt2));
+  xassert (xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, -23535);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
@@ -2672,23 +2672,23 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "NZST-12:00:00NZDT-13:00:00,M10.1.0,M3.3.0");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "NZST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, 12 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 1), ==, "NZDT");
   g_assert_cmpint (xtime_zone_get_offset (tz, 1), ==, 13 * 3600);
-  g_assert (xtime_zone_is_dst (tz, 1));
+  xassert (xtime_zone_is_dst (tz, 1));
   gdt1 = xdate_time_new (tz, 2012, 3, 18, 0, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 3, 18, 3, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 2012, 10, 7, 3, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 10, 7, 1, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
@@ -2699,23 +2699,23 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "NZST-12:00:00NZDT-13:00:00,279,76");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "NZST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, 12 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 1), ==, "NZDT");
   g_assert_cmpint (xtime_zone_get_offset (tz, 1), ==, 13 * 3600);
-  g_assert (xtime_zone_is_dst (tz, 1));
+  xassert (xtime_zone_is_dst (tz, 1));
   gdt1 = xdate_time_new (tz, 2012, 3, 18, 0, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 3, 18, 3, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 2012, 10, 7, 3, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 10, 7, 1, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
@@ -2726,23 +2726,23 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "NZST-12:00:00NZDT-13:00:00,J279,J76");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "NZST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, 12 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 1), ==, "NZDT");
   g_assert_cmpint (xtime_zone_get_offset (tz, 1), ==, 13 * 3600);
-  g_assert (xtime_zone_is_dst (tz, 1));
+  xassert (xtime_zone_is_dst (tz, 1));
   gdt1 = xdate_time_new (tz, 2012, 3, 18, 0, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 3, 18, 3, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 2012, 10, 7, 3, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 10, 7, 1, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
@@ -2753,47 +2753,47 @@ test_posix_parse (void)
   g_assert_cmpstr (xtime_zone_get_identifier (tz), ==, "NZST-12:00:00NZDT-13:00:00,M10.1.0/07:00,M3.3.0/07:00");
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 0), ==, "NZST");
   g_assert_cmpint (xtime_zone_get_offset (tz, 0), ==, 12 * 3600);
-  g_assert (!xtime_zone_is_dst (tz, 0));
+  xassert (!xtime_zone_is_dst (tz, 0));
   g_assert_cmpstr (xtime_zone_get_abbreviation (tz, 1), ==, "NZDT");
   g_assert_cmpint (xtime_zone_get_offset (tz, 1), ==, 13 * 3600);
-  g_assert (xtime_zone_is_dst (tz, 1));
+  xassert (xtime_zone_is_dst (tz, 1));
   gdt1 = xdate_time_new (tz, 2012, 3, 18, 5, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 3, 18, 8, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 2012, 10, 7, 8, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2012, 10, 7, 6, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 1902, 10, 7, 8, 15, 23.0);
   gdt2 = xdate_time_new (tz, 1902, 10, 7, 6, 15, 23.0);
-  g_assert (!xdate_time_is_daylight_savings (gdt1));
+  xassert (!xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 43200);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 2142, 10, 7, 8, 15, 23.0);
   gdt2 = xdate_time_new (tz, 2142, 10, 7, 6, 15, 23.0);
-  g_assert (xdate_time_is_daylight_savings (gdt1));
+  xassert (xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 46800);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);
   gdt1 = xdate_time_new (tz, 3212, 10, 7, 8, 15, 23.0);
   gdt2 = xdate_time_new (tz, 3212, 10, 7, 6, 15, 23.0);
-  g_assert (!xdate_time_is_daylight_savings (gdt1));
+  xassert (!xdate_time_is_daylight_savings (gdt1));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt1) / 1000000, ==, 43200);
-  g_assert (!xdate_time_is_daylight_savings (gdt2));
+  xassert (!xdate_time_is_daylight_savings (gdt2));
   g_assert_cmpint (xdate_time_get_utc_offset (gdt2) / 1000000, ==, 43200);
   xdate_time_unref (gdt1);
   xdate_time_unref (gdt2);

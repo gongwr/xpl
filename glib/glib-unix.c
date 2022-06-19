@@ -95,7 +95,7 @@ g_unix_open_pipe (int     *fds,
   int ecode;
 
   /* We only support FD_CLOEXEC */
-  g_return_val_if_fail ((flags & (FD_CLOEXEC)) == flags, FALSE);
+  xreturn_val_if_fail ((flags & (FD_CLOEXEC)) == flags, FALSE);
 
 #ifdef HAVE_PIPE2
   {
@@ -223,7 +223,7 @@ g_unix_set_fd_nonblocking (xint_t       fd,
 xsource_t *
 g_unix_signal_source_new (int signum)
 {
-  g_return_val_if_fail (signum == SIGHUP || signum == SIGINT || signum == SIGTERM ||
+  xreturn_val_if_fail (signum == SIGHUP || signum == SIGINT || signum == SIGTERM ||
                         signum == SIGUSR1 || signum == SIGUSR2 || signum == SIGWINCH,
                         NULL);
 
@@ -382,7 +382,7 @@ g_unix_fd_add_full (xint_t              priority,
   xsource_t *source;
   xuint_t id;
 
-  g_return_val_if_fail (function != NULL, 0);
+  xreturn_val_if_fail (function != NULL, 0);
 
   source = g_unix_fd_source_new (fd, condition);
 
@@ -464,8 +464,8 @@ g_unix_get_passwd_entry (const xchar_t  *user_name,
   xsize_t string_buffer_size = 0;
   xerror_t *local_error = NULL;
 
-  g_return_val_if_fail (user_name != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (user_name != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
 #ifdef _SC_GETPW_R_SIZE_MAX
     {
@@ -532,7 +532,7 @@ g_unix_get_passwd_entry (const xchar_t  *user_name,
     }
   while (passwd_file_entry == NULL);
 
-  g_assert (passwd_file_entry == NULL ||
+  xassert (passwd_file_entry == NULL ||
             (xpointer_t) passwd_file_entry == (xpointer_t) buffer);
 
   /* Success or error. */

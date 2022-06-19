@@ -354,7 +354,7 @@ g_unix_is_system_fs_type (const char *fs_type)
     NULL
   };
 
-  g_return_val_if_fail (fs_type != NULL && *fs_type != '\0', FALSE);
+  xreturn_val_if_fail (fs_type != NULL && *fs_type != '\0', FALSE);
 
   return is_in (fs_type, ignore_fs);
 }
@@ -388,7 +388,7 @@ g_unix_is_system_device_path (const char *device_path)
     NULL
   };
 
-  g_return_val_if_fail (device_path != NULL && *device_path != '\0', FALSE);
+  xreturn_val_if_fail (device_path != NULL && *device_path != '\0', FALSE);
 
   return is_in (device_path, ignore_devices);
 }
@@ -1648,7 +1648,7 @@ g_unix_mount_for (const char *file_path,
 {
   GUnixMountEntry *entry;
 
-  g_return_val_if_fail (file_path != NULL, NULL);
+  xreturn_val_if_fail (file_path != NULL, NULL);
 
   entry = g_unix_mount_at (file_path, time_read);
   if (entry == NULL)
@@ -1788,7 +1788,7 @@ g_unix_mount_points_changed_since (xuint64_t time)
   return get_mount_points_timestamp () != time;
 }
 
-/* GUnixMountMonitor {{{1 */
+/* xunix_mount_monitor_t {{{1 */
 
 enum {
   MOUNTS_CHANGED,
@@ -1798,20 +1798,20 @@ enum {
 
 static xuint_t signals[LAST_SIGNAL];
 
-struct _GUnixMountMonitor {
+struct _xunix_mount_monitor {
   xobject_t parent;
 
   xmain_context_t *context;
 };
 
-struct _GUnixMountMonitorClass {
+struct _xunix_mount_monitor_class {
   xobject_class_t parent_class;
 };
 
 
-G_DEFINE_TYPE (GUnixMountMonitor, g_unix_mount_monitor, XTYPE_OBJECT)
+XDEFINE_TYPE (xunix_mount_monitor, xunix_mount_monitor, XTYPE_OBJECT)
 
-static GContextSpecificGroup  mount_monitor_group;
+static xcontext_specific_group_t  mount_monitor_group;
 static xfile_monitor_t          *fstab_monitor;
 static xfile_monitor_t          *mtab_monitor;
 static xlist_t                 *mount_poller_mounts;
@@ -1837,16 +1837,16 @@ fstab_file_changed (xfile_monitor_t      *monitor,
       event_type != XFILE_MONITOR_EVENT_DELETED)
     return;
 
-  g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
+  xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
 }
 
 static xboolean_t
 mtab_file_changed_cb (xpointer_t user_data)
 {
   mtab_file_changed_id = 0;
-  g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
+  xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1894,7 +1894,7 @@ proc_mounts_changed (xio_channel_t   *channel,
       mount_poller_time = (xuint64_t) g_get_monotonic_time ();
       G_UNLOCK (proc_mounts_source);
 
-      g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
+      xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTS_CHANGED]);
     }
 
   return TRUE;
@@ -1931,7 +1931,7 @@ mount_change_poller (xpointer_t user_data)
       mount_poller_time = (xuint64_t) g_get_monotonic_time ();
       G_UNLOCK (proc_mounts_source);
 
-      g_context_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
+      xcontext_specific_group_emit (&mount_monitor_group, signals[MOUNTPOINTS_CHANGED]);
     }
 
   return TRUE;
@@ -2047,26 +2047,26 @@ mount_monitor_start (void)
 }
 
 static void
-g_unix_mount_monitor_finalize (xobject_t *object)
+xunix_mount_monitor_finalize (xobject_t *object)
 {
-  GUnixMountMonitor *monitor;
+  xunix_mount_monitor_t *monitor;
 
   monitor = G_UNIX_MOUNT_MONITOR (object);
 
-  g_context_specific_group_remove (&mount_monitor_group, monitor->context, monitor, mount_monitor_stop);
+  xcontext_specific_group_remove (&mount_monitor_group, monitor->context, monitor, mount_monitor_stop);
 
-  G_OBJECT_CLASS (g_unix_mount_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (xunix_mount_monitor_parent_class)->finalize (object);
 }
 
 static void
-g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
+xunix_mount_monitor_class_init (xunix_mount_monitor_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_unix_mount_monitor_finalize;
+  xobject_class->finalize = xunix_mount_monitor_finalize;
 
   /**
-   * GUnixMountMonitor::mounts-changed:
+   * xunix_mount_monitor_t::mounts-changed:
    * @monitor: the object on which the signal is emitted
    *
    * Emitted when the unix mounts have changed.
@@ -2081,7 +2081,7 @@ g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
 		  XTYPE_NONE, 0);
 
   /**
-   * GUnixMountMonitor::mountpoints-changed:
+   * xunix_mount_monitor_t::mountpoints-changed:
    * @monitor: the object on which the signal is emitted
    *
    * Emitted when the unix mount points have changed.
@@ -2097,13 +2097,13 @@ g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
 }
 
 static void
-g_unix_mount_monitor_init (GUnixMountMonitor *monitor)
+xunix_mount_monitor_init (xunix_mount_monitor_t *monitor)
 {
 }
 
 /**
- * g_unix_mount_monitor_set_rate_limit:
- * @mount_monitor: a #GUnixMountMonitor
+ * xunix_mount_monitor_set_rate_limit:
+ * @mount_monitor: a #xunix_mount_monitor_t
  * @limit_msec: a integer with the limit in milliseconds to
  *     poll for changes.
  *
@@ -2120,15 +2120,15 @@ g_unix_mount_monitor_init (GUnixMountMonitor *monitor)
  * Deprecated:2.44:This function does nothing.  Don't call it.
  */
 void
-g_unix_mount_monitor_set_rate_limit (GUnixMountMonitor *mount_monitor,
+xunix_mount_monitor_set_rate_limit (xunix_mount_monitor_t *mount_monitor,
                                      xint_t               limit_msec)
 {
 }
 
 /**
- * g_unix_mount_monitor_get:
+ * xunix_mount_monitor_get:
  *
- * Gets the #GUnixMountMonitor for the current thread-default main
+ * Gets the #xunix_mount_monitor_t for the current thread-default main
  * context.
  *
  * The mount monitor can be used to monitor for changes to the list of
@@ -2138,35 +2138,35 @@ g_unix_mount_monitor_set_rate_limit (GUnixMountMonitor *mount_monitor,
  * You must only call xobject_unref() on the return value from under
  * the same main context as you called this function.
  *
- * Returns: (transfer full): the #GUnixMountMonitor.
+ * Returns: (transfer full): the #xunix_mount_monitor_t.
  *
  * Since: 2.44
  **/
-GUnixMountMonitor *
-g_unix_mount_monitor_get (void)
+xunix_mount_monitor_t *
+xunix_mount_monitor_get (void)
 {
-  return g_context_specific_group_get (&mount_monitor_group,
+  return xcontext_specific_group_get (&mount_monitor_group,
                                        XTYPE_UNIX_MOUNT_MONITOR,
-                                       G_STRUCT_OFFSET(GUnixMountMonitor, context),
+                                       G_STRUCT_OFFSET(xunix_mount_monitor_t, context),
                                        mount_monitor_start);
 }
 
 /**
- * g_unix_mount_monitor_new:
+ * xunix_mount_monitor_new:
  *
- * Deprecated alias for g_unix_mount_monitor_get().
+ * Deprecated alias for xunix_mount_monitor_get().
  *
  * This function was never a true constructor, which is why it was
  * renamed.
  *
- * Returns: a #GUnixMountMonitor.
+ * Returns: a #xunix_mount_monitor_t.
  *
- * Deprecated:2.44:Use g_unix_mount_monitor_get() instead.
+ * Deprecated:2.44:Use xunix_mount_monitor_get() instead.
  */
-GUnixMountMonitor *
-g_unix_mount_monitor_new (void)
+xunix_mount_monitor_t *
+xunix_mount_monitor_new (void)
 {
-  return g_unix_mount_monitor_get ();
+  return xunix_mount_monitor_get ();
 }
 
 /* GUnixMount {{{1 */
@@ -2204,7 +2204,7 @@ g_unix_mount_copy (GUnixMountEntry *mount_entry)
 {
   GUnixMountEntry *copy;
 
-  g_return_val_if_fail (mount_entry != NULL, NULL);
+  xreturn_val_if_fail (mount_entry != NULL, NULL);
 
   copy = g_new0 (GUnixMountEntry, 1);
   copy->mount_path = xstrdup (mount_entry->mount_path);
@@ -2251,7 +2251,7 @@ g_unix_mount_point_copy (GUnixMountPoint *mount_point)
 {
   GUnixMountPoint *copy;
 
-  g_return_val_if_fail (mount_point != NULL, NULL);
+  xreturn_val_if_fail (mount_point != NULL, NULL);
 
   copy = g_new0 (GUnixMountPoint, 1);
   copy->mount_path = xstrdup (mount_point->mount_path);
@@ -2281,7 +2281,7 @@ g_unix_mount_compare (GUnixMountEntry *mount1,
 {
   int res;
 
-  g_return_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
+  xreturn_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
 
   res = xstrcmp0 (mount1->mount_path, mount2->mount_path);
   if (res != 0)
@@ -2321,7 +2321,7 @@ g_unix_mount_compare (GUnixMountEntry *mount1,
 const xchar_t *
 g_unix_mount_get_mount_path (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, NULL);
+  xreturn_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->mount_path;
 }
@@ -2337,7 +2337,7 @@ g_unix_mount_get_mount_path (GUnixMountEntry *mount_entry)
 const xchar_t *
 g_unix_mount_get_device_path (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, NULL);
+  xreturn_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->device_path;
 }
@@ -2360,7 +2360,7 @@ g_unix_mount_get_device_path (GUnixMountEntry *mount_entry)
 const xchar_t *
 g_unix_mount_get_root_path (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, NULL);
+  xreturn_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->root_path;
 }
@@ -2376,7 +2376,7 @@ g_unix_mount_get_root_path (GUnixMountEntry *mount_entry)
 const xchar_t *
 g_unix_mount_get_fs_type (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, NULL);
+  xreturn_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->filesystem_type;
 }
@@ -2399,7 +2399,7 @@ g_unix_mount_get_fs_type (GUnixMountEntry *mount_entry)
 const xchar_t *
 g_unix_mount_get_options (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, NULL);
+  xreturn_val_if_fail (mount_entry != NULL, NULL);
 
   return mount_entry->options;
 }
@@ -2415,7 +2415,7 @@ g_unix_mount_get_options (GUnixMountEntry *mount_entry)
 xboolean_t
 g_unix_mount_is_readonly (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, FALSE);
+  xreturn_val_if_fail (mount_entry != NULL, FALSE);
 
   return mount_entry->is_read_only;
 }
@@ -2436,7 +2436,7 @@ g_unix_mount_is_readonly (GUnixMountEntry *mount_entry)
 xboolean_t
 g_unix_mount_is_system_internal (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, FALSE);
+  xreturn_val_if_fail (mount_entry != NULL, FALSE);
 
   return mount_entry->is_system_internal;
 }
@@ -2458,7 +2458,7 @@ g_unix_mount_point_compare (GUnixMountPoint *mount1,
 {
   int res;
 
-  g_return_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
+  xreturn_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
 
   res = xstrcmp0 (mount1->mount_path, mount2->mount_path);
   if (res != 0)
@@ -2502,7 +2502,7 @@ g_unix_mount_point_compare (GUnixMountPoint *mount1,
 const xchar_t *
 g_unix_mount_point_get_mount_path (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, NULL);
+  xreturn_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->mount_path;
 }
@@ -2518,7 +2518,7 @@ g_unix_mount_point_get_mount_path (GUnixMountPoint *mount_point)
 const xchar_t *
 g_unix_mount_point_get_device_path (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, NULL);
+  xreturn_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->device_path;
 }
@@ -2534,7 +2534,7 @@ g_unix_mount_point_get_device_path (GUnixMountPoint *mount_point)
 const xchar_t *
 g_unix_mount_point_get_fs_type (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, NULL);
+  xreturn_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->filesystem_type;
 }
@@ -2552,7 +2552,7 @@ g_unix_mount_point_get_fs_type (GUnixMountPoint *mount_point)
 const xchar_t *
 g_unix_mount_point_get_options (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, NULL);
+  xreturn_val_if_fail (mount_point != NULL, NULL);
 
   return mount_point->options;
 }
@@ -2568,7 +2568,7 @@ g_unix_mount_point_get_options (GUnixMountPoint *mount_point)
 xboolean_t
 g_unix_mount_point_is_readonly (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, FALSE);
+  xreturn_val_if_fail (mount_point != NULL, FALSE);
 
   return mount_point->is_read_only;
 }
@@ -2584,7 +2584,7 @@ g_unix_mount_point_is_readonly (GUnixMountPoint *mount_point)
 xboolean_t
 g_unix_mount_point_is_user_mountable (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, FALSE);
+  xreturn_val_if_fail (mount_point != NULL, FALSE);
 
   return mount_point->is_user_mountable;
 }
@@ -2600,7 +2600,7 @@ g_unix_mount_point_is_user_mountable (GUnixMountPoint *mount_point)
 xboolean_t
 g_unix_mount_point_is_loopback (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, FALSE);
+  xreturn_val_if_fail (mount_point != NULL, FALSE);
 
   return mount_point->is_loopback;
 }
@@ -2697,10 +2697,10 @@ guess_mount_type (const char *mount_path,
 static GUnixMountType
 g_unix_mount_guess_type (GUnixMountEntry *mount_entry)
 {
-  g_return_val_if_fail (mount_entry != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  g_return_val_if_fail (mount_entry->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  g_return_val_if_fail (mount_entry->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  g_return_val_if_fail (mount_entry->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_entry != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_entry->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_entry->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_entry->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
 
   return guess_mount_type (mount_entry->mount_path,
 			   mount_entry->device_path,
@@ -2720,10 +2720,10 @@ g_unix_mount_guess_type (GUnixMountEntry *mount_entry)
 static GUnixMountType
 g_unix_mount_point_guess_type (GUnixMountPoint *mount_point)
 {
-  g_return_val_if_fail (mount_point != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  g_return_val_if_fail (mount_point->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  g_return_val_if_fail (mount_point->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
-  g_return_val_if_fail (mount_point->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_point != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_point->mount_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_point->device_path != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
+  xreturn_val_if_fail (mount_point->filesystem_type != NULL, G_UNIX_MOUNT_TYPE_UNKNOWN);
 
   return guess_mount_type (mount_point->mount_path,
 			   mount_point->device_path,

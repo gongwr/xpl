@@ -95,8 +95,8 @@ g_unix_connection_send_fd (GUnixConnection  *connection,
   xsocket_control_message_t *scm;
   xsocket_t *socket;
 
-  g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (fd >= 0, FALSE);
+  xreturn_val_if_fail (X_IS_UNIX_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (fd >= 0, FALSE);
 
   scm = g_unix_fd_message_new ();
 
@@ -156,7 +156,7 @@ g_unix_connection_receive_fd (GUnixConnection  *connection,
   GUnixFDMessage *fdmsg;
   xsocket_t *socket;
 
-  g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), -1);
+  xreturn_val_if_fail (X_IS_UNIX_CONNECTION (connection), -1);
 
   xobject_get (connection, "socket", &socket, NULL);
   if (xsocket_receive_message (socket, NULL, NULL, 0,
@@ -345,8 +345,8 @@ g_unix_connection_send_credentials (GUnixConnection      *connection,
   xuchar_t nul_byte[1] = {'\0'};
   xint_t num_messages;
 
-  g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_UNIX_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
 
@@ -456,7 +456,7 @@ g_unix_connection_send_credentials_finish (GUnixConnection *connection,
                                            xasync_result_t    *result,
                                            xerror_t         **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, connection), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, connection), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -506,8 +506,8 @@ g_unix_connection_receive_credentials (GUnixConnection      *connection,
   xboolean_t turn_off_so_passcreds;
 #endif
 
-  g_return_val_if_fail (X_IS_UNIX_CONNECTION (connection), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_UNIX_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   ret = NULL;
   scms = NULL;
@@ -729,7 +729,7 @@ g_unix_connection_receive_credentials_finish (GUnixConnection *connection,
                                               xasync_result_t    *result,
                                               xerror_t         **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, connection), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, connection), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }

@@ -57,21 +57,21 @@ get_dtls_channel_binding (void)
   g_assert_nonnull (backend);
 
   /* repeat for the dtls now */
-  dtls = G_DTLS_CONNECTION (xobject_new (
+  dtls = XDTLS_CONNECTION (xobject_new (
           xtls_backend_get_dtls_client_connection_type (backend), NULL));
   g_assert_nonnull (dtls);
 
-  g_assert_false (g_dtls_connection_get_channel_binding_data (dtls,
+  g_assert_false (xdtls_connection_get_channel_binding_data (dtls,
           G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, NULL));
 
-  g_assert_false (g_dtls_connection_get_channel_binding_data (dtls,
+  g_assert_false (xdtls_connection_get_channel_binding_data (dtls,
           G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, &error));
   g_assert_error (error, G_TLS_CHANNEL_BINDING_ERROR,
                          G_TLS_CHANNEL_BINDING_ERROR_NOT_IMPLEMENTED);
   g_clear_error (&error);
 
   if (g_test_subprocess ())
-    g_assert_false (g_dtls_connection_get_channel_binding_data (dtls,
+    g_assert_false (xdtls_connection_get_channel_binding_data (dtls,
             G_TLS_CHANNEL_BINDING_TLS_UNIQUE, NULL, (xerror_t **)&not_null));
 
   xobject_unref (dtls);

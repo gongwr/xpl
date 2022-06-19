@@ -694,7 +694,7 @@ g_dataset_id_remove_no_notify (xconstpointer  dataset_location,
 {
   xpointer_t ret_data = NULL;
 
-  g_return_val_if_fail (dataset_location != NULL, NULL);
+  xreturn_val_if_fail (dataset_location != NULL, NULL);
 
   G_LOCK (g_dataset_global);
   if (key_id && g_dataset_location_ht)
@@ -734,7 +734,7 @@ g_datalist_id_remove_no_notify (GData	**datalist,
 {
   xpointer_t ret_data = NULL;
 
-  g_return_val_if_fail (datalist != NULL, NULL);
+  xreturn_val_if_fail (datalist != NULL, NULL);
 
   if (key_id)
     ret_data = g_data_set_internal (datalist, key_id, NULL, (xdestroy_notify_t) 42, NULL);
@@ -768,7 +768,7 @@ g_dataset_id_get_data (xconstpointer  dataset_location,
 {
   xpointer_t retval = NULL;
 
-  g_return_val_if_fail (dataset_location != NULL, NULL);
+  xreturn_val_if_fail (dataset_location != NULL, NULL);
 
   G_LOCK (g_dataset_global);
   if (key_id && g_dataset_location_ht)
@@ -922,8 +922,8 @@ g_datalist_id_replace_data (GData          **datalist,
   GData *d;
   GDataElt *data, *data_end;
 
-  g_return_val_if_fail (datalist != NULL, FALSE);
-  g_return_val_if_fail (key_id != 0, FALSE);
+  xreturn_val_if_fail (datalist != NULL, FALSE);
+  xreturn_val_if_fail (key_id != 0, FALSE);
 
   if (old_destroy)
     *old_destroy = NULL;
@@ -1021,7 +1021,7 @@ g_datalist_get_data (GData	 **datalist,
   GData *d;
   GDataElt *data, *data_end;
 
-  g_return_val_if_fail (datalist != NULL, NULL);
+  xreturn_val_if_fail (datalist != NULL, NULL);
 
   g_datalist_lock (datalist);
 
@@ -1235,7 +1235,7 @@ g_datalist_unset_flags (GData **datalist,
 xuint_t
 g_datalist_get_flags (GData **datalist)
 {
-  g_return_val_if_fail (datalist != NULL, 0);
+  xreturn_val_if_fail (datalist != NULL, 0);
 
   return G_DATALIST_GET_FLAGS (datalist); /* atomic macro */
 }

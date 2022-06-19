@@ -100,10 +100,10 @@ g_base64_encode_step (const xuchar_t *in,
   char *outptr;
   const xuchar_t *inptr;
 
-  g_return_val_if_fail (in != NULL || len == 0, 0);
-  g_return_val_if_fail (out != NULL, 0);
-  g_return_val_if_fail (state != NULL, 0);
-  g_return_val_if_fail (save != NULL, 0);
+  xreturn_val_if_fail (in != NULL || len == 0, 0);
+  xreturn_val_if_fail (out != NULL, 0);
+  xreturn_val_if_fail (state != NULL, 0);
+  xreturn_val_if_fail (save != NULL, 0);
 
   if (len == 0)
     return 0;
@@ -160,7 +160,7 @@ g_base64_encode_step (const xuchar_t *in,
       *state = already;
     }
 
-  g_assert (len == 0 || len == 1 || len == 2);
+  xassert (len == 0 || len == 1 || len == 2);
 
     {
       char *saveout;
@@ -211,9 +211,9 @@ g_base64_encode_close (xboolean_t  break_lines,
   int c1, c2;
   char *outptr = out;
 
-  g_return_val_if_fail (out != NULL, 0);
-  g_return_val_if_fail (state != NULL, 0);
-  g_return_val_if_fail (save != NULL, 0);
+  xreturn_val_if_fail (out != NULL, 0);
+  xreturn_val_if_fail (state != NULL, 0);
+  xreturn_val_if_fail (save != NULL, 0);
 
   c1 = ((unsigned char *) save) [1];
   c2 = ((unsigned char *) save) [2];
@@ -222,7 +222,7 @@ g_base64_encode_close (xboolean_t  break_lines,
     {
     case 2:
       outptr [2] = base64_alphabet[ ( (c2 &0x0f) << 2 ) ];
-      g_assert (outptr [2] != 0);
+      xassert (outptr [2] != 0);
       goto skip;
     case 1:
       outptr[2] = '=';
@@ -265,11 +265,11 @@ g_base64_encode (const xuchar_t *data,
   xint_t state = 0, outlen;
   xint_t save = 0;
 
-  g_return_val_if_fail (data != NULL || len == 0, NULL);
+  xreturn_val_if_fail (data != NULL || len == 0, NULL);
 
   /* We can use a smaller limit here, since we know the saved state is 0,
      +1 is needed for trailing \0, also check for unlikely integer overflow */
-  g_return_val_if_fail (len < ((G_MAXSIZE - 1) / 4 - 1) * 3, NULL);
+  xreturn_val_if_fail (len < ((G_MAXSIZE - 1) / 4 - 1) * 3, NULL);
 
   out = g_malloc ((len / 3 + 1) * 4 + 1);
 
@@ -335,10 +335,10 @@ g_base64_decode_step (const xchar_t  *in,
   unsigned int v;
   int i;
 
-  g_return_val_if_fail (in != NULL || len == 0, 0);
-  g_return_val_if_fail (out != NULL, 0);
-  g_return_val_if_fail (state != NULL, 0);
-  g_return_val_if_fail (save != NULL, 0);
+  xreturn_val_if_fail (in != NULL || len == 0, 0);
+  xreturn_val_if_fail (out != NULL, 0);
+  xreturn_val_if_fail (state != NULL, 0);
+  xreturn_val_if_fail (save != NULL, 0);
 
   if (len == 0)
     return 0;
@@ -414,8 +414,8 @@ g_base64_decode (const xchar_t *text,
   xint_t state = 0;
   xuint_t save = 0;
 
-  g_return_val_if_fail (text != NULL, NULL);
-  g_return_val_if_fail (out_len != NULL, NULL);
+  xreturn_val_if_fail (text != NULL, NULL);
+  xreturn_val_if_fail (out_len != NULL, NULL);
 
   input_length = strlen (text);
 
@@ -449,12 +449,12 @@ g_base64_decode_inplace (xchar_t *text,
   xint_t input_length, state = 0;
   xuint_t save = 0;
 
-  g_return_val_if_fail (text != NULL, NULL);
-  g_return_val_if_fail (out_len != NULL, NULL);
+  xreturn_val_if_fail (text != NULL, NULL);
+  xreturn_val_if_fail (out_len != NULL, NULL);
 
   input_length = strlen (text);
 
-  g_return_val_if_fail (input_length > 1, NULL);
+  xreturn_val_if_fail (input_length > 1, NULL);
 
   *out_len = g_base64_decode_step (text, input_length, (xuchar_t *) text, &state, &save);
 

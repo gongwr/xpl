@@ -45,7 +45,7 @@ prepare_fds (SOCKET  sockets[],
   for (i = 0; i < num_pollees; i++)
     {
       fds[i].fd = (gintptr) WSACreateEvent ();
-      g_assert (WSAEventSelect (sockets[i], (HANDLE) fds[i].fd, FD_READ | FD_CLOSE) == 0);
+      xassert (WSAEventSelect (sockets[i], (HANDLE) fds[i].fd, FD_READ | FD_CLOSE) == 0);
     }
 }
 
@@ -84,7 +84,7 @@ check_fds (SOCKET  sockets[],
       if (fds[i].revents != 0)
         {
           WSANETWORKEVENTS events;
-          g_assert (WSAEnumNetworkEvents (sockets[i], 0, &events) == 0);
+          xassert (WSAEnumNetworkEvents (sockets[i], 0, &events) == 0);
 
           fds[i].revents = 0;
           if (events.lNetworkEvents & (FD_READ | FD_ACCEPT))
@@ -125,7 +125,7 @@ prepare_sockets (SOCKET  sockets[],
   int r;
 
   server = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-  g_assert (server != INVALID_SOCKET);
+  xassert (server != INVALID_SOCKET);
 
   memset(&sa, 0, sizeof sa);
 
@@ -134,22 +134,22 @@ prepare_sockets (SOCKET  sockets[],
   sa.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
   sa_size = sizeof (sa);
 
-  g_assert (bind (server, (const struct sockaddr *) &sa, sa_size) == 0);
-  g_assert (getsockname (server, (struct sockaddr *) &sa, &sa_size) == 0);
-  g_assert (listen (server, 1) == 0);
+  xassert (bind (server, (const struct sockaddr *) &sa, sa_size) == 0);
+  xassert (getsockname (server, (struct sockaddr *) &sa, &sa_size) == 0);
+  xassert (listen (server, 1) == 0);
 
   for (i = 0; i < num_pollees; i++)
     {
       opp_sockets[i] = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
-      g_assert (opp_sockets[i] != INVALID_SOCKET);
-      g_assert (ioctlsocket (opp_sockets[i], FIONBIO, &ul) == 0);
+      xassert (opp_sockets[i] != INVALID_SOCKET);
+      xassert (ioctlsocket (opp_sockets[i], FIONBIO, &ul) == 0);
 
       r = connect (opp_sockets[i], (const struct sockaddr *) &sa, sizeof (sa));
-      g_assert (ASYNC_CONNECT_OK (r));
+      xassert (ASYNC_CONNECT_OK (r));
 
       sockets[i] = accept (server, NULL, NULL);
-      g_assert (sockets[i] != INVALID_SOCKET);
-      g_assert (ioctlsocket (sockets[i], FIONBIO, &ul) == 0);
+      xassert (sockets[i] != INVALID_SOCKET);
+      xassert (ioctlsocket (sockets[i], FIONBIO, &ul) == 0);
     }
 
   closesocket (server);
@@ -268,7 +268,7 @@ test_gpoll (void)
       times[i][0] = g_get_monotonic_time ();
       r = g_poll (fds, NUM_POLLFDS, 0);
       times[i][1] = g_get_monotonic_time ();
-      g_assert (r == 0);
+      xassert (r == 0);
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
         times_min = diff;
@@ -299,7 +299,7 @@ test_gpoll (void)
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       s = send (opp_sockets[activatable], (const char *) &t, 1, 0);
-      g_assert (PostMessage (NULL, WM_APP, 1, 2));
+      xassert (PostMessage (NULL, WM_APP, 1, 2));
       /* This is to ensure that all sockets catch up, otherwise some might not poll active */
       g_usleep (G_USEC_PER_SEC / 1000);
 
@@ -313,16 +313,16 @@ test_gpoll (void)
       while (!found_app && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
         if (msg.message == WM_APP && msg.wParam == 1 && msg.lParam == 2)
           found_app = TRUE;
-      g_assert (s == 1);
-      g_assert (r == 2);
-      g_assert (v == 1);
-      g_assert (found_app);
+      xassert (s == 1);
+      xassert (r == 2);
+      xassert (v == 1);
+      xassert (found_app);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      g_assert (r == 0);
+      xassert (r == 0);
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
         times_min = diff;
@@ -361,15 +361,15 @@ test_gpoll (void)
 
       check_fds (sockets, fds, NUM_POLLEES);
       v = recv (sockets[activatable], (char *) &t, 1, 0);
-      g_assert (s == 1);
-      g_assert (r == 1);
-      g_assert (v == 1);
+      xassert (s == 1);
+      xassert (r == 1);
+      xassert (v == 1);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      g_assert (r == 0);
+      xassert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -411,15 +411,15 @@ test_gpoll (void)
       check_fds (sockets, fds, NUM_POLLEES);
       for (j = 0; j < NUM_POLLEES / 2; j++)
         v += recv (sockets[j], (char *) &t, 1, 0) == 1 ? 1 : 0;
-      g_assert (s == NUM_POLLEES / 2);
-      g_assert (r == NUM_POLLEES / 2);
-      g_assert (v == NUM_POLLEES / 2);
+      xassert (s == NUM_POLLEES / 2);
+      xassert (r == NUM_POLLEES / 2);
+      xassert (v == NUM_POLLEES / 2);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      g_assert (r == 0);
+      xassert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -453,7 +453,7 @@ test_gpoll (void)
 
       for (j = 0; j < NUM_POLLEES / 2; j++)
         s += send (opp_sockets[j], (const char *) &t, 1, 0) == 1 ? 1 : 0;
-      g_assert (PostMessage (NULL, WM_APP, 1, 2));
+      xassert (PostMessage (NULL, WM_APP, 1, 2));
 
       /* This is to ensure that all sockets catch up, otherwise some might not poll active */
       g_usleep (G_USEC_PER_SEC / 1000);
@@ -468,16 +468,16 @@ test_gpoll (void)
       while (!found_app && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
         if (msg.message == WM_APP && msg.wParam == 1 && msg.lParam == 2)
           found_app = TRUE;
-      g_assert (s == NUM_POLLEES / 2);
-      g_assert (r == NUM_POLLEES / 2 + 1);
-      g_assert (v == NUM_POLLEES / 2);
-      g_assert (found_app);
+      xassert (s == NUM_POLLEES / 2);
+      xassert (r == NUM_POLLEES / 2 + 1);
+      xassert (v == NUM_POLLEES / 2);
+      xassert (found_app);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      g_assert (r == 0);
+      xassert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -518,15 +518,15 @@ test_gpoll (void)
       check_fds (sockets, fds, NUM_POLLEES);
       for (j = 0; j < NUM_POLLEES; j++)
         v += recv (sockets[j], (char *) &t, 1, 0) == 1 ? 1 : 0;
-      g_assert (s == NUM_POLLEES);
-      g_assert (r == NUM_POLLEES);
-      g_assert (v == NUM_POLLEES);
+      xassert (s == NUM_POLLEES);
+      xassert (r == NUM_POLLEES);
+      xassert (v == NUM_POLLEES);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      g_assert (r == 0);
+      xassert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)
@@ -561,7 +561,7 @@ test_gpoll (void)
 
       for (j = 0; j < activatable; j++)
         s += send (opp_sockets[j], (const char *) &t, 1, 0) == 1 ? 1 : 0;
-      g_assert (PostMessage (NULL, WM_APP, 1, 2));
+      xassert (PostMessage (NULL, WM_APP, 1, 2));
 
       g_usleep (G_USEC_PER_SEC / 1000);
 
@@ -575,16 +575,16 @@ test_gpoll (void)
       while (!found_app && PeekMessage (&msg, NULL, 0, 0, PM_REMOVE))
         if (msg.message == WM_APP && msg.wParam == 1 && msg.lParam == 2)
           found_app = TRUE;
-      g_assert (s == activatable);
-      g_assert (r == activatable + 1);
-      g_assert (v == activatable);
-      g_assert (found_app);
+      xassert (s == activatable);
+      xassert (r == activatable + 1);
+      xassert (v == activatable);
+      xassert (found_app);
 
       reset_fds (fds, NUM_POLLEES);
       reset_fds_msg (fds, NUM_POLLFDS);
       r = g_poll (fds, NUM_POLLFDS, 0);
       check_fds (sockets, fds, NUM_POLLEES);
-      g_assert (r == 0);
+      xassert (r == 0);
 
       diff = times[i][1] - times[i][0];
       if (times_min > diff)

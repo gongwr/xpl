@@ -76,8 +76,8 @@ xdbus_object_proxy_finalize (xobject_t *object)
 
   g_mutex_clear (&proxy->priv->lock);
 
-  if (G_OBJECT_CLASS (xdbus_object_proxy_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (xdbus_object_proxy_parent_class)->finalize (object);
+  if (XOBJECT_CLASS (xdbus_object_proxy_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (xdbus_object_proxy_parent_class)->finalize (object);
 }
 
 static void
@@ -137,11 +137,11 @@ xdbus_object_proxy_set_property (xobject_t       *object,
 static void
 xdbus_object_proxy_class_init (xdbus_object_proxy_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize     = xdbus_object_proxy_finalize;
-  gobject_class->set_property = xdbus_object_proxy_set_property;
-  gobject_class->get_property = xdbus_object_proxy_get_property;
+  xobject_class->finalize     = xdbus_object_proxy_finalize;
+  xobject_class->set_property = xdbus_object_proxy_set_property;
+  xobject_class->get_property = xdbus_object_proxy_get_property;
 
   /**
    * xdbus_object_proxy_t:g-object-path:
@@ -150,15 +150,15 @@ xdbus_object_proxy_class_init (xdbus_object_proxy_class_t *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_OBJECT_PATH,
-                                   g_param_spec_string ("g-object-path",
+                                   xparam_spec_string ("g-object-path",
                                                         "Object Path",
                                                         "The object path of the proxy",
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_proxy_t:g-connection:
@@ -167,15 +167,15 @@ xdbus_object_proxy_class_init (xdbus_object_proxy_class_t *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_CONNECTION,
-                                   g_param_spec_object ("g-connection",
+                                   xparam_spec_object ("g-connection",
                                                         "Connection",
                                                         "The connection of the proxy",
                                                         XTYPE_DBUS_CONNECTION,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -215,7 +215,7 @@ xdbus_connection_t *
 xdbus_object_proxy_get_connection (xdbus_object_proxy_t *proxy)
 {
   xdbus_connection_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
   g_mutex_lock (&proxy->priv->lock);
   ret = proxy->priv->connection;
   g_mutex_unlock (&proxy->priv->lock);
@@ -229,8 +229,8 @@ xdbus_object_proxy_get_interface (xdbus_object_t *object,
   xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
   xdbus_proxy_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
 
   g_mutex_lock (&proxy->priv->lock);
   ret = xhash_table_lookup (proxy->priv->map_name_to_iface, interface_name);
@@ -247,7 +247,7 @@ xdbus_object_proxy_get_interfaces (xdbus_object_t *object)
   xdbus_object_proxy_t *proxy = G_DBUS_OBJECT_PROXY (object);
   xlist_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_PROXY (proxy), NULL);
 
   ret = NULL;
 
@@ -277,8 +277,8 @@ xdbus_object_proxy_t *
 xdbus_object_proxy_new (xdbus_connection_t *connection,
                          const xchar_t     *object_path)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
   return G_DBUS_OBJECT_PROXY (xobject_new (XTYPE_DBUS_OBJECT_PROXY,
                                             "g-object-path", object_path,
                                             "g-connection", connection,

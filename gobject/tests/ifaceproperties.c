@@ -113,31 +113,31 @@ static xparam_spec_t *inherited_spec1, *inherited_spec2, *inherited_spec3, *inhe
 static void
 test_iface_default_init (test_iface_class_t *iface_vtable)
 {
-  inherited_spec1 = iface_spec1 = g_param_spec_int ("prop1",
+  inherited_spec1 = iface_spec1 = xparam_spec_int ("prop1",
                                                     "Prop1",
                                                     "Property 1",
                                                     G_MININT, /* min */
                                                     0xFFFF,  /* max */
                                                     42,       /* default */
-                                                    G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+                                                    XPARAM_READWRITE | XPARAM_CONSTRUCT);
   xobject_interface_install_property (iface_vtable, iface_spec1);
 
-  iface_spec2 = g_param_spec_int ("prop2",
+  iface_spec2 = xparam_spec_int ("prop2",
                                   "Prop2",
                                   "Property 2",
                                   G_MININT, /* min */
                                   G_MAXINT, /* max */
                                   0,           /* default */
-                                  G_PARAM_WRITABLE);
+                                  XPARAM_WRITABLE);
   xobject_interface_install_property (iface_vtable, iface_spec2);
 
-  inherited_spec3 = iface_spec3 = g_param_spec_int ("prop3",
+  inherited_spec3 = iface_spec3 = xparam_spec_int ("prop3",
                                                     "Prop3",
                                                     "Property 3",
                                                     G_MININT, /* min */
                                                     G_MAXINT, /* max */
                                                     0,         /* default */
-                                                    G_PARAM_READWRITE);
+                                                    XPARAM_READWRITE);
   xobject_interface_install_property (iface_vtable, iface_spec3);
 }
 
@@ -156,21 +156,21 @@ base_object_constructor (xtype_t                  type,
   xvalue_t value2 = G_VALUE_INIT;
   xparam_spec_t *pspec;
 
-  g_assert (n_construct_properties == 1);
+  xassert (n_construct_properties == 1);
 
   pspec = construct_properties->pspec;
 
   /* Check we got the param spec we expected
    */
-  g_assert (X_IS_PARAM_SPEC_OVERRIDE (pspec));
-  g_assert (pspec->param_id == BASE_PROP1);
-  g_assert (strcmp (g_param_spec_get_name (pspec), "prop1") == 0);
-  g_assert (g_param_spec_get_redirect_target (pspec) == iface_spec1);
+  xassert (X_IS_PARAM_SPEC_OVERRIDE (pspec));
+  xassert (pspec->param_id == BASE_PROP1);
+  xassert (strcmp (xparam_spec_get_name (pspec), "prop1") == 0);
+  xassert (xparam_spec_get_redirect_target (pspec) == iface_spec1);
 
   /* test_t redirection of the nick and blurb to the redirect target
    */
-  g_assert (strcmp (g_param_spec_get_nick (pspec), "Prop1") == 0);
-  g_assert (strcmp (g_param_spec_get_blurb (pspec), "Property 1") == 0);
+  xassert (strcmp (xparam_spec_get_nick (pspec), "Prop1") == 0);
+  xassert (strcmp (xparam_spec_get_blurb (pspec), "Property 1") == 0);
 
   /* test_t forwarding of the various xparam_spec_t methods to the redirect target
    */
@@ -178,19 +178,19 @@ base_object_constructor (xtype_t                  type,
   xvalue_init (&value2, XTYPE_INT);
 
   g_param_value_set_default (pspec, &value1);
-  g_assert (xvalue_get_int (&value1) == 42);
+  xassert (xvalue_get_int (&value1) == 42);
 
   xvalue_reset (&value1);
   xvalue_set_int (&value1, 0x10000);
-  g_assert (g_param_value_validate (pspec, &value1));
-  g_assert (xvalue_get_int (&value1) == 0xFFFF);
-  g_assert (!g_param_value_validate (pspec, &value1));
+  xassert (g_param_value_validate (pspec, &value1));
+  xassert (xvalue_get_int (&value1) == 0xFFFF);
+  xassert (!g_param_value_validate (pspec, &value1));
 
   xvalue_reset (&value1);
   xvalue_set_int (&value1, 1);
   xvalue_set_int (&value2, 2);
-  g_assert (g_param_values_cmp (pspec, &value1, &value2) < 0);
-  g_assert (g_param_values_cmp (pspec, &value2, &value1) > 0);
+  xassert (g_param_values_cmp (pspec, &value1, &value2) < 0);
+  xassert (g_param_values_cmp (pspec, &value2, &value1) > 0);
 
   xvalue_unset (&value1);
   xvalue_unset (&value2);
@@ -211,11 +211,11 @@ base_object_set_property (xobject_t      *object,
   switch (prop_id)
     {
     case BASE_PROP1:
-      g_assert (pspec == inherited_spec1);
+      xassert (pspec == inherited_spec1);
       base_object->val1 = xvalue_get_int (value);
       break;
     case BASE_PROP2:
-      g_assert (pspec == inherited_spec2);
+      xassert (pspec == inherited_spec2);
       base_object->val2 = xvalue_get_int (value);
       break;
     case BASE_PROP3:
@@ -241,11 +241,11 @@ base_object_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case BASE_PROP1:
-      g_assert (pspec == inherited_spec1);
+      xassert (pspec == inherited_spec1);
       xvalue_set_int (value, base_object->val1);
       break;
     case BASE_PROP2:
-      g_assert (pspec == inherited_spec2);
+      xassert (pspec == inherited_spec2);
       xvalue_set_int (value, base_object->val2);
       break;
     case BASE_PROP3:
@@ -267,7 +267,7 @@ base_object_notify (xobject_t    *object,
   /* The property passed to notify is the redirect target, not the
    * GParamSpecOverride
    */
-  g_assert (pspec == inherited_spec1 ||
+  xassert (pspec == inherited_spec1 ||
             pspec == inherited_spec2 ||
             pspec == inherited_spec3 ||
             pspec == inherited_spec4);
@@ -276,7 +276,7 @@ base_object_notify (xobject_t    *object,
 static void
 base_object_class_init (base_object_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   base_parent_class= xtype_class_peek_parent (class);
 
@@ -291,24 +291,24 @@ base_object_class_init (base_object_class_t *class)
    * We change the flags from READONLY to READWRITE to show that we
    * can make the flags less restrictive
    */
-  inherited_spec2 = g_param_spec_int ("prop2",
+  inherited_spec2 = xparam_spec_int ("prop2",
                                       "Prop2",
                                       "Property 2",
                                       G_MININT, /* min */
                                       G_MAXINT, /* max */
                                       0,        /* default */
-                                      G_PARAM_READWRITE);
+                                      XPARAM_READWRITE);
   xobject_class_install_property (object_class, BASE_PROP2, inherited_spec2);
 
   xobject_class_override_property (object_class, BASE_PROP3, "prop3");
 
-  inherited_spec4 = g_param_spec_int ("prop4",
+  inherited_spec4 = xparam_spec_int ("prop4",
                                       "Prop4",
                                       "Property 4",
                                       G_MININT, /* min */
                                       G_MAXINT, /* max */
                                       0,        /* default */
-                                      G_PARAM_READWRITE);
+                                      XPARAM_READWRITE);
   xobject_class_install_property (object_class, BASE_PROP4, inherited_spec4);
 }
 
@@ -334,11 +334,11 @@ derived_object_set_property (xobject_t      *object,
   switch (prop_id)
     {
     case DERIVED_PROP3:
-      g_assert (pspec == inherited_spec3);
+      xassert (pspec == inherited_spec3);
       base_object->val3 = xvalue_get_int (value);
       break;
     case DERIVED_PROP4:
-      g_assert (pspec == inherited_spec4);
+      xassert (pspec == inherited_spec4);
       base_object->val4 = xvalue_get_int (value);
       break;
     default:
@@ -358,11 +358,11 @@ derived_object_get_property (xobject_t    *object,
   switch (prop_id)
     {
     case DERIVED_PROP3:
-      g_assert (pspec == inherited_spec3);
+      xassert (pspec == inherited_spec3);
       xvalue_set_int (value, base_object->val3);
       break;
     case DERIVED_PROP4:
-      g_assert (pspec == inherited_spec4);
+      xassert (pspec == inherited_spec4);
       xvalue_set_int (value, base_object->val4);
       break;
     default:
@@ -374,7 +374,7 @@ derived_object_get_property (xobject_t    *object,
 static void
 derived_object_class_init (derived_object_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->set_property = derived_object_set_property;
   object_class->get_property = derived_object_get_property;
@@ -405,7 +405,7 @@ assert_in_properties (xparam_spec_t  *param_spec,
         found = TRUE;
     }
 
-  g_assert (found);
+  xassert (found);
 }
 
 /* test_t setting and getting the properties */
@@ -430,10 +430,10 @@ test_set (void)
                 "prop4", &val4,
                 NULL);
 
-  g_assert (val1 == 0x0101);
-  g_assert (val2 == 0x0202);
-  g_assert (val3 == 0x0303);
-  g_assert (val4 == 0x0404);
+  xassert (val1 == 0x0101);
+  xassert (val2 == 0x0202);
+  xassert (val3 == 0x0303);
+  xassert (val4 == 0x0404);
 
   xobject_unref (object);
 }
@@ -464,10 +464,10 @@ test_find_overridden (void)
 
   object_class = xtype_class_peek (DERIVED_TYPE_OBJECT);
 
-  g_assert (xobject_class_find_property (object_class, "prop1") == inherited_spec1);
-  g_assert (xobject_class_find_property (object_class, "prop2") == inherited_spec2);
-  g_assert (xobject_class_find_property (object_class, "prop3") == inherited_spec3);
-  g_assert (xobject_class_find_property (object_class, "prop4") == inherited_spec4);
+  xassert (xobject_class_find_property (object_class, "prop1") == inherited_spec1);
+  xassert (xobject_class_find_property (object_class, "prop2") == inherited_spec2);
+  xassert (xobject_class_find_property (object_class, "prop3") == inherited_spec3);
+  xassert (xobject_class_find_property (object_class, "prop4") == inherited_spec4);
 }
 
 /* test_t xobject_class_list_properties() for overridden properties */
@@ -481,7 +481,7 @@ test_list_overridden (void)
   object_class = xtype_class_peek (DERIVED_TYPE_OBJECT);
 
   properties = xobject_class_list_properties (object_class, &n_properties);
-  g_assert (n_properties == 4);
+  xassert (n_properties == 4);
   assert_in_properties (inherited_spec1, properties, n_properties);
   assert_in_properties (inherited_spec2, properties, n_properties);
   assert_in_properties (inherited_spec3, properties, n_properties);
@@ -497,9 +497,9 @@ test_find_interface (void)
 
   iface = xtype_default_interface_peek (TEST_TYPE_IFACE);
 
-  g_assert (xobject_interface_find_property (iface, "prop1") == iface_spec1);
-  g_assert (xobject_interface_find_property (iface, "prop2") == iface_spec2);
-  g_assert (xobject_interface_find_property (iface, "prop3") == iface_spec3);
+  xassert (xobject_interface_find_property (iface, "prop1") == iface_spec1);
+  xassert (xobject_interface_find_property (iface, "prop2") == iface_spec2);
+  xassert (xobject_interface_find_property (iface, "prop3") == iface_spec3);
 }
 
 /* test_t xobject_interface_list_properties() */
@@ -513,7 +513,7 @@ test_list_interface (void)
   iface = xtype_default_interface_peek (TEST_TYPE_IFACE);
 
   properties = xobject_interface_list_properties (iface, &n_properties);
-  g_assert (n_properties == 3);
+  xassert (n_properties == 3);
   assert_in_properties (iface_spec1, properties, n_properties);
   assert_in_properties (iface_spec2, properties, n_properties);
   assert_in_properties (iface_spec3, properties, n_properties);
@@ -596,7 +596,7 @@ base2_object_set_property (xobject_t      *object,
 static void
 base2_object_class_init (base2_object_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->set_property = base2_object_set_property;
   object_class->get_property = base2_object_get_property;

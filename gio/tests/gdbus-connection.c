@@ -935,7 +935,7 @@ test_connection_filter_on_timeout (xpointer_t user_data)
 {
   g_printerr ("Timeout waiting 30 sec on service\n");
   g_assert_not_reached ();
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1211,7 +1211,7 @@ test_connection_basic (void)
 {
   xdbus_connection_t *connection;
   xerror_t *error;
-  GDBusCapabilityFlags flags;
+  xdbus_capability_flags_t flags;
   GDBusConnectionFlags connection_flags;
   xchar_t *guid;
   xchar_t *name;

@@ -63,7 +63,7 @@ run_proxy_thread (xpointer_t data)
   xdbus_connection_t *connection = data;
   int i;
 
-  g_assert (xmain_context_get_thread_default () == NULL);
+  xassert (xmain_context_get_thread_default () == NULL);
 
   for (i = 0; i < N_REPEATS; i++)
     {
@@ -84,7 +84,7 @@ run_proxy_thread (xpointer_t data)
                                      NULL,
                                      &error);
       g_assert_no_error (error);
-      g_assert (proxy != NULL);
+      xassert (proxy != NULL);
       xdbus_proxy_set_default_timeout (proxy, G_MAXINT);
 
       ret = xdbus_proxy_call_sync (proxy, "StupidMethod", NULL,
@@ -94,7 +94,7 @@ run_proxy_thread (xpointer_t data)
        * we expect this to fail - if we have the name at the moment, we called
        * an unimplemented method, and if not, there was nothing to call
        */
-      g_assert (ret == NULL);
+      xassert (ret == NULL);
 
       /*
        * this races with the NameOwnerChanged signal being emitted in an

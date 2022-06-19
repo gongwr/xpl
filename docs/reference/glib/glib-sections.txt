@@ -838,7 +838,7 @@ G_PRIORITY_LOW
 
 <SUBSECTION>
 G_SOURCE_CONTINUE
-G_SOURCE_REMOVE
+XSOURCE_REMOVE
 
 <SUBSECTION>
 xmain_context_t
@@ -1073,7 +1073,7 @@ g_cond_signal
 g_cond_broadcast
 
 <SUBSECTION>
-GPrivate
+xprivate_t
 G_PRIVATE_INIT
 g_private_get
 g_private_set
@@ -1426,9 +1426,9 @@ g_set_printerr_handler
 
 <SUBSECTION>
 g_return_if_fail
-g_return_val_if_fail
+xreturn_val_if_fail
 g_return_if_reached
-g_return_val_if_reached
+xreturn_val_if_reached
 g_warn_if_fail
 g_warn_if_reached
 
@@ -3641,7 +3641,7 @@ g_test_rand_int_range
 g_test_rand_double
 g_test_rand_double_range
 
-g_assert
+xassert
 g_assert_not_reached
 
 g_assert_cmpstr

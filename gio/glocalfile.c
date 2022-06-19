@@ -125,16 +125,16 @@ g_local_file_finalize (xobject_t *object)
 
   g_free (local->filename);
 
-  G_OBJECT_CLASS (g_local_file_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_local_file_parent_class)->finalize (object);
 }
 
 static void
 g_local_file_class_init (GLocalFileClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xfile_attribute_info_list_t *list;
 
-  gobject_class->finalize = g_local_file_finalize;
+  xobject_class->finalize = g_local_file_finalize;
 
   /* Set up attribute lists */
 
@@ -238,8 +238,8 @@ g_local_file_new_from_dirname_and_basename (const xchar_t *dirname,
 {
   GLocalFile *local;
 
-  g_return_val_if_fail (dirname != NULL, NULL);
-  g_return_val_if_fail (basename && basename[0] && !strchr (basename, '/'), NULL);
+  xreturn_val_if_fail (dirname != NULL, NULL);
+  xreturn_val_if_fail (basename && basename[0] && !strchr (basename, '/'), NULL);
 
   local = xobject_new (XTYPE_LOCAL_FILE, NULL);
   local->filename = g_build_filename (dirname, basename, NULL);
@@ -417,7 +417,7 @@ g_local_file_get_parent (xfile_t *file)
   /* Check for root; local->filename is guaranteed to be absolute, so
    * g_path_skip_root() should never return NULL. */
   non_root = g_path_skip_root (local->filename);
-  g_assert (non_root != NULL);
+  xassert (non_root != NULL);
 
   if (*non_root == 0)
     return NULL;
@@ -2888,7 +2888,7 @@ g_local_file_measure_size_of_contents (xint_t           fd,
     dirp = fdopendir (fd);
     saved_errno = errno;
     dir = dirp ? XPL_PRIVATE_CALL(g_dir_new_from_dirp) (dirp) : NULL;
-    g_assert ((dirp == NULL) == (dir == NULL));
+    xassert ((dirp == NULL) == (dir == NULL));
   }
 #else
   dir = XPL_PRIVATE_CALL(g_dir_open_with_errno) (dir_name->data, 0);

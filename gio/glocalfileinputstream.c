@@ -97,7 +97,7 @@ static void
 g_local_file_input_stream_class_init (GLocalFileInputStreamClass *klass)
 {
   xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
-  GFileInputStreamClass *file_stream_class = XFILE_INPUT_STREAM_CLASS (klass);
+  xfile_input_stream_class_t *file_stream_class = XFILE_INPUT_STREAM_CLASS (klass);
 
   stream_class->read_fn = g_local_file_input_stream_read;
   stream_class->close_fn = g_local_file_input_stream_close;

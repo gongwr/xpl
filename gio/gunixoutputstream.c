@@ -114,11 +114,11 @@ static GPollableReturn g_unix_output_stream_pollable_writev_nonblocking (xpollab
 static void
 g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xoutput_stream_class_t *stream_class = G_OUTPUT_STREAM_CLASS (klass);
 
-  gobject_class->get_property = g_unix_output_stream_get_property;
-  gobject_class->set_property = g_unix_output_stream_set_property;
+  xobject_class->get_property = g_unix_output_stream_get_property;
+  xobject_class->set_property = g_unix_output_stream_set_property;
 
   stream_class->write_fn = g_unix_output_stream_write;
   stream_class->writev_fn = g_unix_output_stream_writev;
@@ -131,13 +131,13 @@ g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
    *
    * Since: 2.20
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_FD,
-				   g_param_spec_int ("fd",
+				   xparam_spec_int ("fd",
 						     P_("File descriptor"),
 						     P_("The file descriptor to write to"),
 						     G_MININT, G_MAXINT, -1,
-						     G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB));
+						     XPARAM_READABLE | XPARAM_WRITABLE | XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_NAME | XPARAM_STATIC_NICK | XPARAM_STATIC_BLURB));
 
   /**
    * GUnixOutputStream:close-fd:
@@ -146,13 +146,13 @@ g_unix_output_stream_class_init (GUnixOutputStreamClass *klass)
    *
    * Since: 2.20
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_CLOSE_FD,
-				   g_param_spec_boolean ("close-fd",
+				   xparam_spec_boolean ("close-fd",
 							 P_("Close file descriptor"),
 							 P_("Whether to close the file descriptor when the stream is closed"),
 							 TRUE,
-							 G_PARAM_READABLE | G_PARAM_WRITABLE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_NICK | G_PARAM_STATIC_BLURB));
+							 XPARAM_READABLE | XPARAM_WRITABLE | XPARAM_STATIC_NAME | XPARAM_STATIC_NICK | XPARAM_STATIC_BLURB));
 }
 
 static void
@@ -244,7 +244,7 @@ g_unix_output_stream_new (xint_t     fd,
 {
   GUnixOutputStream *stream;
 
-  g_return_val_if_fail (fd != -1, NULL);
+  xreturn_val_if_fail (fd != -1, NULL);
 
   stream = xobject_new (XTYPE_UNIX_OUTPUT_STREAM,
 			 "fd", fd,
@@ -292,7 +292,7 @@ g_unix_output_stream_set_close_fd (GUnixOutputStream *stream,
 xboolean_t
 g_unix_output_stream_get_close_fd (GUnixOutputStream *stream)
 {
-  g_return_val_if_fail (X_IS_UNIX_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_UNIX_OUTPUT_STREAM (stream), FALSE);
 
   return stream->priv->close_fd;
 }
@@ -310,7 +310,7 @@ g_unix_output_stream_get_close_fd (GUnixOutputStream *stream)
 xint_t
 g_unix_output_stream_get_fd (GUnixOutputStream *stream)
 {
-  g_return_val_if_fail (X_IS_UNIX_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_UNIX_OUTPUT_STREAM (stream), -1);
 
   return stream->priv->fd;
 }

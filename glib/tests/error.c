@@ -52,7 +52,7 @@ test_prefix (void)
 
   error = NULL;
   g_prefix_error (&error, "foo %d %s: ", 1, "two");
-  g_assert (error == NULL);
+  xassert (error == NULL);
 
   error = xerror_new_literal (G_MARKUP_ERROR, G_MARKUP_ERROR_EMPTY, "bla");
   g_prefix_error (&error, "foo %d %s: ", 1, "two");

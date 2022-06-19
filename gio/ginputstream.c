@@ -98,16 +98,16 @@ xinput_stream_dispose (xobject_t *object)
   if (!stream->priv->closed)
     xinput_stream_close (stream, NULL, NULL);
 
-  G_OBJECT_CLASS (xinput_stream_parent_class)->dispose (object);
+  XOBJECT_CLASS (xinput_stream_parent_class)->dispose (object);
 }
 
 
 static void
 xinput_stream_class_init (xinput_stream_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = xinput_stream_dispose;
+  xobject_class->dispose = xinput_stream_dispose;
 
   klass->skip = xinput_stream_real_skip;
   klass->read_async = xinput_stream_real_read_async;
@@ -167,8 +167,8 @@ xinput_stream_read  (xinput_stream_t  *stream,
   xinput_stream_class_t *class;
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
-  g_return_val_if_fail (buffer != NULL, 0);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (buffer != NULL, 0);
 
   if (count == 0)
     return 0;
@@ -248,8 +248,8 @@ xinput_stream_read_all (xinput_stream_t  *stream,
   xsize_t _bytes_read;
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (buffer != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (buffer != NULL, FALSE);
 
   _bytes_read = 0;
   while (_bytes_read < count)
@@ -368,7 +368,7 @@ xinput_stream_skip (xinput_stream_t  *stream,
   xinput_stream_class_t *class;
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
 
   if (count == 0)
     return 0;
@@ -427,8 +427,8 @@ xinput_stream_real_skip (xinput_stream_t  *stream,
                            NULL))
         {
           end = xseekable_tell (seekable);
-          g_assert (start >= 0);
-          g_assert (end >= start);
+          xassert (start >= 0);
+          xassert (end >= start);
           if (start > (xoffset_t) (G_MAXOFFSET - count) ||
               (xoffset_t) (start + count) > end)
             {
@@ -523,7 +523,7 @@ xinput_stream_close (xinput_stream_t  *stream,
   xinput_stream_class_t *class;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
@@ -683,8 +683,8 @@ xinput_stream_read_finish (xinput_stream_t  *stream,
 {
   xinput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return -1;
@@ -860,8 +860,8 @@ xinput_stream_read_all_finish (xinput_stream_t  *stream,
 {
   xtask_t *task;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   task = XTASK (result);
 
@@ -979,8 +979,8 @@ xinput_stream_read_bytes_finish (xinput_stream_t  *stream,
 				  xasync_result_t  *result,
 				  xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), NULL);
-  g_return_val_if_fail (xtask_is_valid (result, stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -1085,8 +1085,8 @@ xinput_stream_skip_finish (xinput_stream_t  *stream,
 {
   xinput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return -1;
@@ -1172,8 +1172,8 @@ xinput_stream_close_finish (xinput_stream_t  *stream,
 {
   xinput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -1195,7 +1195,7 @@ xinput_stream_close_finish (xinput_stream_t  *stream,
 xboolean_t
 xinput_stream_is_closed (xinput_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), TRUE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), TRUE);
 
   return stream->priv->closed;
 }
@@ -1211,7 +1211,7 @@ xinput_stream_is_closed (xinput_stream_t *stream)
 xboolean_t
 xinput_stream_has_pending (xinput_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), TRUE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), TRUE);
 
   return stream->priv->pending;
 }
@@ -1231,7 +1231,7 @@ xinput_stream_has_pending (xinput_stream_t *stream)
 xboolean_t
 xinput_stream_set_pending (xinput_stream_t *stream, xerror_t **error)
 {
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
   if (stream->priv->closed)
     {
@@ -1281,7 +1281,7 @@ xinput_stream_async_read_is_via_threads (xinput_stream_t *stream)
 {
   xinput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
@@ -1303,7 +1303,7 @@ xinput_stream_async_close_is_via_threads (xinput_stream_t *stream)
 {
   xinput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (stream), FALSE);
 
   class = G_INPUT_STREAM_GET_CLASS (stream);
 
@@ -1430,7 +1430,7 @@ xinput_stream_real_read_finish (xinput_stream_t  *stream,
 				 xasync_result_t  *result,
 				 xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -1558,7 +1558,7 @@ xinput_stream_real_skip_finish (xinput_stream_t  *stream,
 				 xasync_result_t  *result,
 				 xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -1613,7 +1613,7 @@ xinput_stream_real_close_finish (xinput_stream_t  *stream,
 				  xasync_result_t  *result,
 				  xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

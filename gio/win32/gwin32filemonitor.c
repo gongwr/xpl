@@ -74,7 +74,7 @@ g_win32_file_monitor_finalize (xobject_t *object)
 
   g_win32_fs_monitor_finalize (monitor->priv);
 
-  G_OBJECT_CLASS (g_win32_file_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_win32_file_monitor_parent_class)->finalize (object);
 }
 
 static xboolean_t
@@ -92,11 +92,11 @@ g_win32_file_monitor_cancel (xfile_monitor_t* monitor)
 static void
 g_win32_file_monitor_class_init (GWin32FileMonitorClass *klass)
 {
-  xobject_class_t* gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t* xobject_class = XOBJECT_CLASS (klass);
   xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
   xlocal_file_monitor_class_t *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
 
-  gobject_class->finalize = g_win32_file_monitor_finalize;
+  xobject_class->finalize = g_win32_file_monitor_finalize;
   file_monitor_class->cancel = g_win32_file_monitor_cancel;
 
   local_file_monitor_class->is_supported = g_win32_file_monitor_is_supported;

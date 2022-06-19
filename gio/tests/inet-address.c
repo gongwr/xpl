@@ -31,43 +31,43 @@ test_parse (void)
   xinet_address_t *addr;
 
   addr = xinet_address_new_from_string ("0:0:0:0:0:0:0:0");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("1:0:0:0:0:0:0:8");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("0:0:0:0:0:FFFF:204.152.189.116");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("::1");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("::");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("::FFFF:204.152.189.116");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("204.152.189.116");
-  g_assert (addr != NULL);
+  xassert (addr != NULL);
   xobject_unref (addr);
 
   addr = xinet_address_new_from_string ("::1::2");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("2001:1:2:3:4:5:6:7]");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("[2001:1:2:3:4:5:6:7");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("[2001:1:2:3:4:5:6:7]");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("[2001:1:2:3:4:5:6:7]:80");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("0:1:2:3:4:5:6:7:8:9");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("::FFFFFFF");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
   addr = xinet_address_new_from_string ("204.152.189.116:80");
-  g_assert (addr == NULL);
+  xassert (addr == NULL);
 }
 
 static void
@@ -82,18 +82,18 @@ test_any (void)
     {
       addr = xinet_address_new_any (family[i]);
 
-      g_assert (xinet_address_get_is_any (addr));
-      g_assert (xinet_address_get_family (addr) == family[i]);
-      g_assert (xinet_address_get_native_size (addr) == size[i]);
-      g_assert (!xinet_address_get_is_loopback (addr));
-      g_assert (!xinet_address_get_is_link_local (addr));
-      g_assert (!xinet_address_get_is_site_local (addr));
-      g_assert (!xinet_address_get_is_multicast (addr));
-      g_assert (!xinet_address_get_is_mc_global (addr));
-      g_assert (!xinet_address_get_is_mc_link_local (addr));
-      g_assert (!xinet_address_get_is_mc_node_local (addr));
-      g_assert (!xinet_address_get_is_mc_org_local (addr));
-      g_assert (!xinet_address_get_is_mc_site_local (addr));
+      xassert (xinet_address_get_is_any (addr));
+      xassert (xinet_address_get_family (addr) == family[i]);
+      xassert (xinet_address_get_native_size (addr) == size[i]);
+      xassert (!xinet_address_get_is_loopback (addr));
+      xassert (!xinet_address_get_is_link_local (addr));
+      xassert (!xinet_address_get_is_site_local (addr));
+      xassert (!xinet_address_get_is_multicast (addr));
+      xassert (!xinet_address_get_is_mc_global (addr));
+      xassert (!xinet_address_get_is_mc_link_local (addr));
+      xassert (!xinet_address_get_is_mc_node_local (addr));
+      xassert (!xinet_address_get_is_mc_org_local (addr));
+      xassert (!xinet_address_get_is_mc_site_local (addr));
 
       xobject_unref (addr);
    }
@@ -105,13 +105,13 @@ test_loopback (void)
   xinet_address_t *addr;
 
   addr = xinet_address_new_from_string ("::1");
-  g_assert (xinet_address_get_family (addr) == XSOCKET_FAMILY_IPV6);
-  g_assert (xinet_address_get_is_loopback (addr));
+  xassert (xinet_address_get_family (addr) == XSOCKET_FAMILY_IPV6);
+  xassert (xinet_address_get_is_loopback (addr));
   xobject_unref (addr);
 
   addr = xinet_address_new_from_string ("127.0.0.0");
-  g_assert (xinet_address_get_family (addr) == XSOCKET_FAMILY_IPV4);
-  g_assert (xinet_address_get_is_loopback (addr));
+  xassert (xinet_address_get_family (addr) == XSOCKET_FAMILY_IPV4);
+  xassert (xinet_address_get_is_loopback (addr));
   xobject_unref (addr);
 }
 
@@ -126,8 +126,8 @@ test_bytes (void)
   bytes = xinet_address_to_bytes (addr1);
   addr3 = xinet_address_new_from_bytes (bytes, XSOCKET_FAMILY_IPV4);
 
-  g_assert (!xinet_address_equal (addr1, addr2));
-  g_assert (xinet_address_equal (addr1, addr3));
+  xassert (!xinet_address_equal (addr1, addr2));
+  xassert (xinet_address_equal (addr1, addr3));
 
   xobject_unref (addr1);
   xobject_unref (addr2);
@@ -167,17 +167,17 @@ test_property (void)
                 "is-mc-site-local", &mc_site_local,
                 NULL);
 
-  g_assert (family == XSOCKET_FAMILY_IPV6);
-  g_assert (!any);
-  g_assert (!loopback);
-  g_assert (!link_local);
-  g_assert (!site_local);
-  g_assert (multicast);
-  g_assert (!mc_global);
-  g_assert (!mc_link_local);
-  g_assert (!mc_node_local);
-  g_assert (!mc_org_local);
-  g_assert (mc_site_local);
+  xassert (family == XSOCKET_FAMILY_IPV6);
+  xassert (!any);
+  xassert (!loopback);
+  xassert (!link_local);
+  xassert (!site_local);
+  xassert (multicast);
+  xassert (!mc_global);
+  xassert (!mc_link_local);
+  xassert (!mc_node_local);
+  xassert (!mc_org_local);
+  xassert (mc_site_local);
 
   xobject_unref (addr);
 }
@@ -195,12 +195,12 @@ test_socket_address (void)
   addr = xinet_address_new_from_string ("::ffff:125.1.15.5");
   saddr = G_INET_SOCKET_ADDRESS (g_inet_socket_address_new (addr, 308));
 
-  g_assert (xinet_address_equal (addr, g_inet_socket_address_get_address (saddr)));
+  xassert (xinet_address_equal (addr, g_inet_socket_address_get_address (saddr)));
   xobject_unref (addr);
 
-  g_assert (g_inet_socket_address_get_port (saddr) == 308);
-  g_assert (g_inet_socket_address_get_flowinfo (saddr) == 0);
-  g_assert (g_inet_socket_address_get_scope_id (saddr) == 0);
+  xassert (g_inet_socket_address_get_port (saddr) == 308);
+  xassert (g_inet_socket_address_get_flowinfo (saddr) == 0);
+  xassert (g_inet_socket_address_get_scope_id (saddr) == 0);
 
   xobject_unref (saddr);
 
@@ -213,9 +213,9 @@ test_socket_address (void)
                                                NULL));
   xobject_unref (addr);
 
-  g_assert (g_inet_socket_address_get_port (saddr) == 308);
-  g_assert (g_inet_socket_address_get_flowinfo (saddr) == 10);
-  g_assert (g_inet_socket_address_get_scope_id (saddr) == 25);
+  xassert (g_inet_socket_address_get_port (saddr) == 308);
+  xassert (g_inet_socket_address_get_flowinfo (saddr) == 10);
+  xassert (g_inet_socket_address_get_scope_id (saddr) == 25);
 
   xobject_get (saddr,
                 "family", &family,
@@ -225,11 +225,11 @@ test_socket_address (void)
                 "scope-id", &scope_id,
                 NULL);
 
-  g_assert (family == XSOCKET_FAMILY_IPV6);
-  g_assert (addr != NULL);
-  g_assert (port == 308);
-  g_assert (flowinfo == 10);
-  g_assert (scope_id == 25);
+  xassert (family == XSOCKET_FAMILY_IPV6);
+  xassert (addr != NULL);
+  xassert (port == 308);
+  xassert (flowinfo == 10);
+  xassert (scope_id == 25);
 
   xobject_unref (addr);
   xobject_unref (saddr);
@@ -292,27 +292,27 @@ test_mask_parse (void)
 
   mask = xinet_address_mask_new_from_string ("10.0.0.0/8", &error);
   g_assert_no_error (error);
-  g_assert (mask != NULL);
+  xassert (mask != NULL);
   xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("fe80::/10", &error);
   g_assert_no_error (error);
-  g_assert (mask != NULL);
+  xassert (mask != NULL);
   xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("::", &error);
   g_assert_no_error (error);
-  g_assert (mask != NULL);
+  xassert (mask != NULL);
   xobject_unref (mask);
 
   mask = xinet_address_mask_new_from_string ("::/abc", &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
-  g_assert (mask == NULL);
+  xassert (mask == NULL);
   g_clear_error (&error);
 
   mask = xinet_address_mask_new_from_string ("127.0.0.1/128", &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
-  g_assert (mask == NULL);
+  xassert (mask == NULL);
   g_clear_error (&error);
 }
 
@@ -326,9 +326,9 @@ test_mask_property (void)
 
   addr = xinet_address_new_from_string ("fe80::");
   mask = xinet_address_mask_new_from_string ("fe80::/10", NULL);
-  g_assert (xinet_address_mask_get_family (mask) == XSOCKET_FAMILY_IPV6);
-  g_assert (xinet_address_equal (addr, xinet_address_mask_get_address (mask)));
-  g_assert (xinet_address_mask_get_length (mask) == 10);
+  xassert (xinet_address_mask_get_family (mask) == XSOCKET_FAMILY_IPV6);
+  xassert (xinet_address_equal (addr, xinet_address_mask_get_address (mask)));
+  xassert (xinet_address_mask_get_length (mask) == 10);
   xobject_unref (addr);
 
   xobject_get (mask,
@@ -336,9 +336,9 @@ test_mask_property (void)
                 "address", &addr,
                 "length", &len,
                 NULL);
-  g_assert (family == XSOCKET_FAMILY_IPV6);
-  g_assert (addr != NULL);
-  g_assert (len == 10);
+  xassert (family == XSOCKET_FAMILY_IPV6);
+  xassert (addr != NULL);
+  xassert (len == 10);
   xobject_unref (addr);
 
   xobject_unref (mask);
@@ -355,16 +355,16 @@ test_mask_equal (void)
   str = xinet_address_mask_to_string (mask);
   g_assert_cmpstr (str, ==, "fe80::/10");
   mask2 = xinet_address_mask_new_from_string (str, NULL);
-  g_assert (xinet_address_mask_equal (mask, mask2));
+  xassert (xinet_address_mask_equal (mask, mask2));
   xobject_unref (mask2);
   g_free (str);
 
   mask2 = xinet_address_mask_new_from_string ("fe80::/12", NULL);
-  g_assert (!xinet_address_mask_equal (mask, mask2));
+  xassert (!xinet_address_mask_equal (mask, mask2));
   xobject_unref (mask2);
 
   mask2 = xinet_address_mask_new_from_string ("ff80::/10", NULL);
-  g_assert (!xinet_address_mask_equal (mask, mask2));
+  xassert (!xinet_address_mask_equal (mask, mask2));
   xobject_unref (mask2);
 
   xobject_unref (mask);
@@ -379,13 +379,13 @@ test_mask_match (void)
   mask = xinet_address_mask_new_from_string ("1.2.0.0/16", NULL);
 
   addr = xinet_address_new_from_string ("1.2.0.0");
-  g_assert (xinet_address_mask_matches (mask, addr));
+  xassert (xinet_address_mask_matches (mask, addr));
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.2.3.4");
-  g_assert (xinet_address_mask_matches (mask, addr));
+  xassert (xinet_address_mask_matches (mask, addr));
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.3.1.1");
-  g_assert (!xinet_address_mask_matches (mask, addr));
+  xassert (!xinet_address_mask_matches (mask, addr));
   xobject_unref (addr);
 
   xobject_unref (mask);
@@ -393,13 +393,13 @@ test_mask_match (void)
   mask = xinet_address_mask_new_from_string ("1.2.0.0/24", NULL);
 
   addr = xinet_address_new_from_string ("1.2.0.0");
-  g_assert (xinet_address_mask_matches (mask, addr));
+  xassert (xinet_address_mask_matches (mask, addr));
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.2.3.4");
-  g_assert (!xinet_address_mask_matches (mask, addr));
+  xassert (!xinet_address_mask_matches (mask, addr));
   xobject_unref (addr);
   addr = xinet_address_new_from_string ("1.2.0.24");
-  g_assert (xinet_address_mask_matches (mask, addr));
+  xassert (xinet_address_mask_matches (mask, addr));
   xobject_unref (addr);
 
   xobject_unref (mask);

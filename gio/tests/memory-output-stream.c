@@ -36,7 +36,7 @@ test_truncate (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=540423");
 
   mo = g_memory_output_stream_new_resizable ();
-  g_assert (xseekable_can_truncate (G_SEEKABLE (mo)));
+  xassert (xseekable_can_truncate (G_SEEKABLE (mo)));
   o = xdata_output_stream_new (mo);
   for (i = 0; i < 1000; i++)
     {
@@ -87,39 +87,39 @@ test_seek_fixed (void)
 
   mo = g_memory_output_stream_new (g_new (xchar_t, 100), 100, NULL, g_free);
 
-  g_assert (X_IS_SEEKABLE (mo));
-  g_assert (xseekable_can_seek (G_SEEKABLE (mo)));
+  xassert (X_IS_SEEKABLE (mo));
+  xassert (xseekable_can_seek (G_SEEKABLE (mo)));
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
   error = NULL;
-  g_assert (!xseekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
+  xassert (!xseekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 26);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
   g_assert_no_error (error);
 
-  g_assert (!xseekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
+  xassert (!xseekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
 
-  g_assert (!xseekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
+  xassert (!xseekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 100);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 99);
 
@@ -131,37 +131,37 @@ test_seek_resizable_stream (xoutput_stream_t *mo)
 {
   xerror_t *error;
 
-  g_assert (X_IS_SEEKABLE (mo));
-  g_assert (xseekable_can_seek (G_SEEKABLE (mo)));
+  xassert (X_IS_SEEKABLE (mo));
+  xassert (xseekable_can_seek (G_SEEKABLE (mo)));
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
   error = NULL;
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 222, G_SEEK_CUR, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 222);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 26, G_SEEK_SET, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 26);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 20, G_SEEK_CUR, NULL, &error));
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 46);
   g_assert_no_error (error);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 200, G_SEEK_CUR, NULL, &error));
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 246);
   g_assert_no_error (error);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 1, G_SEEK_END, NULL, &error));
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 1);
   g_assert_no_error (error);
 
-  g_assert (xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
+  xassert (xseekable_seek (G_SEEKABLE (mo), 0, G_SEEK_END, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
 
   /* The 'end' is still zero, so this should fail */
-  g_assert (!xseekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
+  xassert (!xseekable_seek (G_SEEKABLE (mo), -1, G_SEEK_END, NULL, &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   g_clear_error (&error);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (mo)), ==, 0);
@@ -262,9 +262,9 @@ test_properties (void)
   g_assert_cmphex (GPOINTER_TO_SIZE (data_fun), ==, GPOINTER_TO_SIZE (data_prop));
 
   xobject_get (mo, "realloc-function", &func, NULL);
-  g_assert (func == g_realloc);
+  xassert (func == g_realloc);
   xobject_get (mo, "destroy-function", &func, NULL);
-  g_assert (func == g_free);
+  xassert (func == g_free);
 
   data_size_fun = g_memory_output_stream_get_size (G_MEMORY_OUTPUT_STREAM (mo));
   xobject_get (mo, "size", &data_size_prop, NULL);
@@ -294,7 +294,7 @@ test_write_bytes (void)
 
   bytes2 = g_memory_output_stream_steal_as_bytes (G_MEMORY_OUTPUT_STREAM (mo));
   xobject_unref (mo);
-  g_assert (xbytes_equal (bytes, bytes2));
+  xassert (xbytes_equal (bytes, bytes2));
 
   xbytes_unref (bytes);
   xbytes_unref (bytes2);

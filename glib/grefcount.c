@@ -155,11 +155,11 @@ xboolean_t
 {
   grefcount rrc;
 
-  g_return_val_if_fail (rc != NULL, FALSE);
+  xreturn_val_if_fail (rc != NULL, FALSE);
 
   rrc = *rc;
 
-  g_return_val_if_fail (rrc < 0, FALSE);
+  xreturn_val_if_fail (rrc < 0, FALSE);
 
   rrc += 1;
   if (rrc == 0)
@@ -188,8 +188,8 @@ xboolean_t
 {
   grefcount rrc;
 
-  g_return_val_if_fail (rc != NULL, FALSE);
-  g_return_val_if_fail (val >= 0, FALSE);
+  xreturn_val_if_fail (rc != NULL, FALSE);
+  xreturn_val_if_fail (val >= 0, FALSE);
 
   rrc = *rc;
 
@@ -264,9 +264,9 @@ xboolean_t
 {
   xint_t old_value;
 
-  g_return_val_if_fail (arc != NULL, FALSE);
+  xreturn_val_if_fail (arc != NULL, FALSE);
   old_value = g_atomic_int_add (arc, -1);
-  g_return_val_if_fail (old_value > 0, FALSE);
+  xreturn_val_if_fail (old_value > 0, FALSE);
 
   return old_value == 1;
 }
@@ -287,8 +287,8 @@ xboolean_t
 (g_atomic_ref_count_compare) (gatomicrefcount *arc,
                               xint_t             val)
 {
-  g_return_val_if_fail (arc != NULL, FALSE);
-  g_return_val_if_fail (val >= 0, FALSE);
+  xreturn_val_if_fail (arc != NULL, FALSE);
+  xreturn_val_if_fail (val >= 0, FALSE);
 
   return g_atomic_int_get (arc) == val;
 }

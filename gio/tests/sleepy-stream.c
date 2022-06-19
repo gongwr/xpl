@@ -87,7 +87,7 @@ typedef xinput_stream_class_t SleepyStreamClass;
 
 xtype_t sleepy_stream_get_type (void);
 
-G_DEFINE_TYPE (SleepyStream, sleepy_stream, XTYPE_INPUT_STREAM)
+XDEFINE_TYPE (SleepyStream, sleepy_stream, XTYPE_INPUT_STREAM)
 
 static xssize_t
 sleepy_stream_read (xinput_stream_t  *stream,
@@ -138,14 +138,14 @@ sleepy_stream_finalize (xobject_t *object)
   SleepyStream *sleepy = (SleepyStream *) object;
 
   xstrfreev (sleepy->pieces);
-  G_OBJECT_CLASS (sleepy_stream_parent_class)
+  XOBJECT_CLASS (sleepy_stream_parent_class)
     ->finalize (object);
 }
 
 static void
 sleepy_stream_class_init (SleepyStreamClass *class)
 {
-  G_OBJECT_CLASS (class)->finalize = sleepy_stream_finalize;
+  XOBJECT_CLASS (class)->finalize = sleepy_stream_finalize;
   class->read_fn = sleepy_stream_read;
 
   /* no read_async implementation.
@@ -168,13 +168,13 @@ read_line (xdata_input_stream_t  *stream,
   xsize_t length;
   char *str;
 
-  str = g_data_input_stream_read_line (stream, &length, NULL, error);
+  str = xdata_input_stream_read_line (stream, &length, NULL, error);
 
   if (str == NULL)
     return FALSE;
 
-  g_assert (strstr (str, eol) == NULL);
-  g_assert (strlen (str) == length);
+  xassert (strstr (str, eol) == NULL);
+  xassert (strlen (str) == length);
 
   xstring_append (string, str);
   xstring_append (string, eol);
@@ -210,8 +210,8 @@ test (void)
   one = xstring_new (NULL);
   two = xstring_new (NULL);
 
-  data = g_data_input_stream_new (G_INPUT_STREAM (stream));
-  g_data_input_stream_set_newline_type (data, G_DATA_STREAM_NEWLINE_TYPE_LF);
+  data = xdata_input_stream_new (G_INPUT_STREAM (stream));
+  xdata_input_stream_set_newline_type (data, G_DATA_STREAM_NEWLINE_TYPE_LF);
   build_comparison (one, stream);
 
   while (read_line (data, two, "\n", &error));
@@ -237,9 +237,9 @@ asynch_ready (xobject_t      *object,
   xsize_t length;
   xchar_t *str;
 
-  g_assert (data == G_DATA_INPUT_STREAM (object));
+  xassert (data == G_DATA_INPUT_STREAM (object));
 
-  str = g_data_input_stream_read_line_finish (data, result, &length, &error);
+  str = xdata_input_stream_read_line_finish (data, result, &length, &error);
 
   if (str == NULL)
     {
@@ -249,13 +249,13 @@ asynch_ready (xobject_t      *object,
     }
   else
     {
-      g_assert (length == strlen (str));
+      xassert (length == strlen (str));
       xstring_append (two, str);
       xstring_append (two, eol);
       g_free (str);
 
       /* MOAR!! */
-      g_data_input_stream_read_line_async (data, 0, NULL, asynch_ready, NULL);
+      xdata_input_stream_read_line_async (data, 0, NULL, asynch_ready, NULL);
     }
 }
 
@@ -265,13 +265,13 @@ asynch (void)
 {
   SleepyStream *sleepy = sleepy_stream_new ();
 
-  data = g_data_input_stream_new (G_INPUT_STREAM (sleepy));
+  data = xdata_input_stream_new (G_INPUT_STREAM (sleepy));
   one = xstring_new (NULL);
   two = xstring_new (NULL);
   eol = "\n";
 
   build_comparison (one, sleepy);
-  g_data_input_stream_read_line_async (data, 0, NULL, asynch_ready, NULL);
+  xdata_input_stream_read_line_async (data, 0, NULL, asynch_ready, NULL);
   xmain_loop_run (loop = xmain_loop_new (NULL, FALSE));
 
   g_assert_cmpstr (one->str, ==, two->str);

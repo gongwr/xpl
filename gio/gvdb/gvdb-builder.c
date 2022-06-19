@@ -316,7 +316,7 @@ file_builder_allocate_for_hash (FileBuilder            *fb,
   xuchar_t *data;
   xsize_t size;
 
-  g_assert (n_bloom_words < (1u << 27));
+  xassert (n_bloom_words < (1u << 27));
 
   bloom_hdr = guint32_to_le (bloom_shift << 27 | n_bloom_words);
   table_hdr = guint32_to_le (n_buckets);
@@ -335,7 +335,7 @@ file_builder_allocate_for_hash (FileBuilder            *fb,
   *hash_buckets = (guint32_le *) chunk (n_buckets * sizeof (guint32_le));
   *hash_items = (struct gvdb_hash_item *) chunk (n_items *
                   sizeof (struct gvdb_hash_item));
-  g_assert (size == 0);
+  xassert (size == 0);
 #undef chunk
 
   memset (*bloom_filter, 0, n_bloom_words * sizeof (guint32_le));
@@ -383,7 +383,7 @@ file_builder_add_hash (FileBuilder         *fb,
           struct gvdb_hash_item *entry = items++;
           const xchar_t *basename;
 
-          g_assert (index == guint32_from_le (item->assigned_index));
+          xassert (index == guint32_from_le (item->assigned_index));
           entry->hash_value = guint32_to_le (item->hash_value);
           entry->parent = item_to_index (item->parent);
           entry->unused = 0;
@@ -399,7 +399,7 @@ file_builder_add_hash (FileBuilder         *fb,
 
           if (item->value != NULL)
             {
-              g_assert (item->child == NULL && item->table == NULL);
+              xassert (item->child == NULL && item->table == NULL);
 
               file_builder_add_value (fb, item->value, &entry->value.pointer);
               entry->type = 'v';
@@ -411,7 +411,7 @@ file_builder_add_hash (FileBuilder         *fb,
               guint32_le *offsets;
               GvdbItem *child;
 
-              g_assert (item->table == NULL);
+              xassert (item->table == NULL);
 
               for (child = item->child; child; child = child->sibling)
                 children++;
@@ -423,7 +423,7 @@ file_builder_add_hash (FileBuilder         *fb,
               for (child = item->child; child; child = child->sibling)
                 offsets[i++] = child->assigned_index;
 
-              g_assert (children == i);
+              xassert (children == i);
             }
 
           if (item->table != NULL)
@@ -492,11 +492,11 @@ file_builder_serialise (FileBuilder          *fb,
         {
           xchar_t zero[8] = { 0, };
 
-          g_assert (chunk->offset > result->len);
-          g_assert (chunk->offset - result->len < 8);
+          xassert (chunk->offset > result->len);
+          xassert (chunk->offset - result->len < 8);
 
           xstring_append_len (result, zero, chunk->offset - result->len);
-          g_assert (result->len == chunk->offset);
+          xassert (result->len == chunk->offset);
         }
 
       xstring_append_len (result, chunk->data, chunk->size);
@@ -519,9 +519,9 @@ gvdb_table_write_contents (xhashtable_t   *table,
   FileBuilder *fb;
   xstring_t *str;
 
-  g_return_val_if_fail (table != NULL, FALSE);
-  g_return_val_if_fail (filename != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (table != NULL, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   fb = file_builder_new (byteswap);
   file_builder_add_hash (fb, table, &root);
@@ -628,9 +628,9 @@ gvdb_table_write_contents_finish (xhashtable_t    *table,
                                   xasync_result_t  *result,
                                   xerror_t       **error)
 {
-  g_return_val_if_fail (table != NULL, FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, NULL), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (table != NULL, FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, NULL), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

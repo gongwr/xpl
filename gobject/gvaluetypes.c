@@ -56,7 +56,7 @@ value_lcopy_char (const xvalue_t *value,
 {
   gint8 *int8_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (int8_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (int8_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *int8_p = value->data[0].v_int;
 
@@ -71,7 +71,7 @@ value_lcopy_boolean (const xvalue_t *value,
 {
   xboolean_t *bool_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (bool_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (bool_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *bool_p = value->data[0].v_int;
 
@@ -97,7 +97,7 @@ value_lcopy_int (const xvalue_t *value,
 {
   xint_t *int_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (int_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (int_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *int_p = value->data[0].v_int;
 
@@ -123,7 +123,7 @@ value_lcopy_long (const xvalue_t *value,
 {
   xlong_t *long_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (long_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (long_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *long_p = value->data[0].v_long;
 
@@ -162,7 +162,7 @@ value_lcopy_int64 (const xvalue_t *value,
 {
   sint64_t *int64_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (int64_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (int64_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *int64_p = value->data[0].v_int64;
 
@@ -201,7 +201,7 @@ value_lcopy_float (const xvalue_t *value,
 {
   gfloat *float_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (float_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (float_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *float_p = value->data[0].v_float;
 
@@ -240,7 +240,7 @@ value_lcopy_double (const xvalue_t *value,
 {
   xdouble_t *double_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (double_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (double_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *double_p = value->data[0].v_double;
 
@@ -303,7 +303,7 @@ value_lcopy_string (const xvalue_t *value,
 {
   xchar_t **string_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (string_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (string_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   if (!value->data[0].v_pointer)
     *string_p = NULL;
@@ -353,7 +353,7 @@ value_lcopy_pointer (const xvalue_t *value,
 {
   xpointer_t *pointer_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (pointer_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (pointer_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *pointer_p = value->data[0].v_pointer;
 
@@ -405,7 +405,7 @@ value_lcopy_variant (const xvalue_t *value,
 {
   xvariant_t **variant_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (variant_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (variant_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   if (!value->data[0].v_pointer)
     *variant_p = NULL;
@@ -451,9 +451,9 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_CHAR, g_intern_static_string ("xchar_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_CHAR);
+    xassert (type == XTYPE_CHAR);
     type = xtype_register_fundamental (XTYPE_UCHAR, g_intern_static_string ("xuchar_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_UCHAR);
+    xassert (type == XTYPE_UCHAR);
   }
 
   /* XTYPE_BOOLEAN
@@ -471,7 +471,7 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_BOOLEAN, g_intern_static_string ("xboolean_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_BOOLEAN);
+    xassert (type == XTYPE_BOOLEAN);
   }
 
   /* XTYPE_INT / XTYPE_UINT
@@ -489,9 +489,9 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_INT, g_intern_static_string ("xint_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_INT);
+    xassert (type == XTYPE_INT);
     type = xtype_register_fundamental (XTYPE_UINT, g_intern_static_string ("xuint_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_UINT);
+    xassert (type == XTYPE_UINT);
   }
 
   /* XTYPE_LONG / XTYPE_ULONG
@@ -509,9 +509,9 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_LONG, g_intern_static_string ("xlong_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_LONG);
+    xassert (type == XTYPE_LONG);
     type = xtype_register_fundamental (XTYPE_ULONG, g_intern_static_string ("xulong_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_ULONG);
+    xassert (type == XTYPE_ULONG);
   }
 
   /* XTYPE_INT64 / XTYPE_UINT64
@@ -529,9 +529,9 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_INT64, g_intern_static_string ("sint64_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_INT64);
+    xassert (type == XTYPE_INT64);
     type = xtype_register_fundamental (XTYPE_UINT64, g_intern_static_string ("xuint64_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_UINT64);
+    xassert (type == XTYPE_UINT64);
   }
 
   /* XTYPE_FLOAT
@@ -549,7 +549,7 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_FLOAT, g_intern_static_string ("gfloat"), &info, &finfo, 0);
-    g_assert (type == XTYPE_FLOAT);
+    xassert (type == XTYPE_FLOAT);
   }
 
   /* XTYPE_DOUBLE
@@ -567,7 +567,7 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_DOUBLE, g_intern_static_string ("xdouble_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_DOUBLE);
+    xassert (type == XTYPE_DOUBLE);
   }
 
   /* XTYPE_STRING
@@ -585,7 +585,7 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_STRING, g_intern_static_string ("gchararray"), &info, &finfo, 0);
-    g_assert (type == XTYPE_STRING);
+    xassert (type == XTYPE_STRING);
   }
 
   /* XTYPE_POINTER
@@ -603,7 +603,7 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_POINTER, g_intern_static_string ("xpointer_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_POINTER);
+    xassert (type == XTYPE_POINTER);
   }
 
   /* XTYPE_VARIANT
@@ -621,7 +621,7 @@ _xvalue_types_init (void)
     };
     info.value_table = &value_table;
     type = xtype_register_fundamental (XTYPE_VARIANT, g_intern_static_string ("xvariant_t"), &info, &finfo, 0);
-    g_assert (type == XTYPE_VARIANT);
+    xassert (type == XTYPE_VARIANT);
   }
 }
 
@@ -659,7 +659,7 @@ xvalue_set_char (xvalue_t *value,
 xchar_t
 xvalue_get_char (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_CHAR (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_CHAR (value), 0);
 
   return value->data[0].v_int;
 }
@@ -694,7 +694,7 @@ xvalue_set_schar (xvalue_t *value,
 gint8
 xvalue_get_schar (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_CHAR (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_CHAR (value), 0);
 
   return value->data[0].v_int;
 }
@@ -726,7 +726,7 @@ xvalue_set_uchar (xvalue_t *value,
 xuchar_t
 xvalue_get_uchar (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_UCHAR (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_UCHAR (value), 0);
 
   return value->data[0].v_uint;
 }
@@ -758,7 +758,7 @@ xvalue_set_boolean (xvalue_t  *value,
 xboolean_t
 xvalue_get_boolean (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_BOOLEAN (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_BOOLEAN (value), 0);
 
   return value->data[0].v_int;
 }
@@ -790,7 +790,7 @@ xvalue_set_int (xvalue_t *value,
 xint_t
 xvalue_get_int (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_INT (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_INT (value), 0);
 
   return value->data[0].v_int;
 }
@@ -822,7 +822,7 @@ xvalue_set_uint (xvalue_t *value,
 xuint_t
 xvalue_get_uint (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_UINT (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_UINT (value), 0);
 
   return value->data[0].v_uint;
 }
@@ -854,7 +854,7 @@ xvalue_set_long (xvalue_t *value,
 xlong_t
 xvalue_get_long (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_LONG (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_LONG (value), 0);
 
   return value->data[0].v_long;
 }
@@ -886,7 +886,7 @@ xvalue_set_ulong (xvalue_t *value,
 xulong_t
 xvalue_get_ulong (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_ULONG (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_ULONG (value), 0);
 
   return value->data[0].v_ulong;
 }
@@ -918,7 +918,7 @@ xvalue_set_int64 (xvalue_t *value,
 sint64_t
 xvalue_get_int64 (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_INT64 (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_INT64 (value), 0);
 
   return value->data[0].v_int64;
 }
@@ -950,7 +950,7 @@ xvalue_set_uint64 (xvalue_t *value,
 xuint64_t
 xvalue_get_uint64 (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_UINT64 (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_UINT64 (value), 0);
 
   return value->data[0].v_uint64;
 }
@@ -982,7 +982,7 @@ xvalue_set_float (xvalue_t *value,
 gfloat
 xvalue_get_float (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_FLOAT (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_FLOAT (value), 0);
 
   return value->data[0].v_float;
 }
@@ -1014,7 +1014,7 @@ xvalue_set_double (xvalue_t *value,
 xdouble_t
 xvalue_get_double (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_DOUBLE (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_DOUBLE (value), 0);
 
   return value->data[0].v_double;
 }
@@ -1140,7 +1140,7 @@ xvalue_take_string (xvalue_t *value,
 const xchar_t*
 xvalue_get_string (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_STRING (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_STRING (value), NULL);
 
   return value->data[0].v_pointer;
 }
@@ -1156,7 +1156,7 @@ xvalue_get_string (const xvalue_t *value)
 xchar_t*
 xvalue_dup_string (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_STRING (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_STRING (value), NULL);
 
   return xstrdup (value->data[0].v_pointer);
 }
@@ -1188,7 +1188,7 @@ xvalue_set_pointer (xvalue_t  *value,
 xpointer_t
 xvalue_get_pointer (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_POINTER (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_POINTER (value), NULL);
 
   return value->data[0].v_pointer;
 }
@@ -1227,7 +1227,7 @@ xvalue_set_gtype (xvalue_t *value,
 xtype_t
 xvalue_get_gtype (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_GTYPE (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_GTYPE (value), 0);
 
   return GPOINTER_TO_SIZE (value->data[0].v_pointer);
 }
@@ -1313,7 +1313,7 @@ xvalue_take_variant (xvalue_t   *value,
 xvariant_t*
 xvalue_get_variant (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_VARIANT (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_VARIANT (value), NULL);
 
   return value->data[0].v_pointer;
 }
@@ -1335,7 +1335,7 @@ xvalue_dup_variant (const xvalue_t *value)
 {
   xvariant_t *variant;
 
-  g_return_val_if_fail (G_VALUE_HOLDS_VARIANT (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_VARIANT (value), NULL);
 
   variant = value->data[0].v_pointer;
   if (variant)
@@ -1361,7 +1361,7 @@ xstrdup_value_contents (const xvalue_t *value)
   const xchar_t *src;
   xchar_t *contents;
 
-  g_return_val_if_fail (X_IS_VALUE (value), NULL);
+  xreturn_val_if_fail (X_IS_VALUE (value), NULL);
 
   if (G_VALUE_HOLDS_STRING (value))
     {
@@ -1403,7 +1403,7 @@ xstrdup_value_contents (const xvalue_t *value)
       else if (G_VALUE_HOLDS_OBJECT (value))
 	contents = xstrdup_printf ("((%s*) %p)", G_OBJECT_TYPE_NAME (p), p);
       else if (G_VALUE_HOLDS_PARAM (value))
-	contents = xstrdup_printf ("((%s*) %p)", G_PARAM_SPEC_TYPE_NAME (p), p);
+	contents = xstrdup_printf ("((%s*) %p)", XPARAM_SPEC_TYPE_NAME (p), p);
       else if (G_VALUE_HOLDS (value, XTYPE_STRV))
         {
           xstrv_t strv = xvalue_get_boxed (value);
@@ -1462,8 +1462,8 @@ g_pointer_type_register_static (const xchar_t *name)
   };
   xtype_t type;
 
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (xtype_from_name (name) == 0, 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (xtype_from_name (name) == 0, 0);
 
   type = xtype_register_static (XTYPE_POINTER, name, &type_info, 0);
 

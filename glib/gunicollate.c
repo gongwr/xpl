@@ -92,8 +92,8 @@ xutf8_collate (const xchar_t *str1,
   xlong_t len2;
   SInt32 retval = 0;
 
-  g_return_val_if_fail (str1 != NULL, 0);
-  g_return_val_if_fail (str2 != NULL, 0);
+  xreturn_val_if_fail (str1 != NULL, 0);
+  xreturn_val_if_fail (str2 != NULL, 0);
 
   str1_utf16 = xutf8_to_utf16 (str1, -1, NULL, &len1, NULL);
   str2_utf16 = xutf8_to_utf16 (str2, -1, NULL, &len2, NULL);
@@ -111,8 +111,8 @@ xutf8_collate (const xchar_t *str1,
   xunichar_t *str1_norm;
   xunichar_t *str2_norm;
 
-  g_return_val_if_fail (str1 != NULL, 0);
-  g_return_val_if_fail (str2 != NULL, 0);
+  xreturn_val_if_fail (str1 != NULL, 0);
+  xreturn_val_if_fail (str2 != NULL, 0);
 
   str1_norm = _xutf8_normalize_wc (str1, -1, XNORMALIZE_ALL_COMPOSE);
   str2_norm = _xutf8_normalize_wc (str2, -1, XNORMALIZE_ALL_COMPOSE);
@@ -128,8 +128,8 @@ xutf8_collate (const xchar_t *str1,
   xchar_t *str1_norm;
   xchar_t *str2_norm;
 
-  g_return_val_if_fail (str1 != NULL, 0);
-  g_return_val_if_fail (str2 != NULL, 0);
+  xreturn_val_if_fail (str1 != NULL, 0);
+  xreturn_val_if_fail (str2 != NULL, 0);
 
   str1_norm = xutf8_normalize (str1, -1, XNORMALIZE_ALL_COMPOSE);
   str2_norm = xutf8_normalize (str2, -1, XNORMALIZE_ALL_COMPOSE);
@@ -384,7 +384,7 @@ xutf8_collate_key (const xchar_t *str,
 
 #ifdef HAVE_CARBON
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
   result = carbon_collate_key (str, len);
 
 #elif defined(HAVE_WCHAR_H) && defined(GUNICHAR_EQUALS_WCHAR_T)
@@ -395,7 +395,7 @@ xutf8_collate_key (const xchar_t *str,
   xsize_t i;
   xsize_t result_len = 0;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   str_norm = _xutf8_normalize_wc (str, len, XNORMALIZE_ALL_COMPOSE);
 
@@ -423,7 +423,7 @@ xutf8_collate_key (const xchar_t *str,
   const xchar_t *charset;
   xchar_t *str_norm;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   str_norm = xutf8_normalize (str, len, XNORMALIZE_ALL_COMPOSE);
 

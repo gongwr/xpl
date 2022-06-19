@@ -55,7 +55,7 @@
 
 typedef xobject_class_t GSubprocessLauncherClass;
 
-G_DEFINE_TYPE (xsubprocess_launcher, xsubprocess_launcher, XTYPE_OBJECT)
+XDEFINE_TYPE (xsubprocess_launcher, xsubprocess_launcher, XTYPE_OBJECT)
 
 static xboolean_t
 verify_disposition (const xchar_t      *stream_name,
@@ -125,7 +125,7 @@ xsubprocess_launcher_set_property (xobject_t *object, xuint_t prop_id,
 {
   xsubprocess_launcher_t *launcher = G_SUBPROCESS_LAUNCHER (object);
 
-  g_assert (prop_id == 1);
+  xassert (prop_id == 1);
 
   if (verify_flags (xvalue_get_flags (value)))
     launcher->flags = xvalue_get_flags (value);
@@ -152,7 +152,7 @@ xsubprocess_launcher_dispose (xobject_t *object)
   g_clear_pointer (&self->envp, xstrfreev);
   g_clear_pointer (&self->cwd, g_free);
 
-  G_OBJECT_CLASS (xsubprocess_launcher_parent_class)->dispose (object);
+  XOBJECT_CLASS (xsubprocess_launcher_parent_class)->dispose (object);
 }
 
 static void
@@ -172,15 +172,15 @@ xsubprocess_launcher_init (xsubprocess_launcher_t  *self)
 static void
 xsubprocess_launcher_class_init (GSubprocessLauncherClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->set_property = xsubprocess_launcher_set_property;
-  gobject_class->dispose = xsubprocess_launcher_dispose;
+  xobject_class->set_property = xsubprocess_launcher_set_property;
+  xobject_class->dispose = xsubprocess_launcher_dispose;
 
-  xobject_class_install_property (gobject_class, 1,
-                                   g_param_spec_flags ("flags", "Flags", "xsubprocess_flags_t for launched processes",
-                                                       XTYPE_SUBPROCESS_FLAGS, 0, G_PARAM_WRITABLE |
-                                                       G_PARAM_STATIC_STRINGS | G_PARAM_CONSTRUCT_ONLY));
+  xobject_class_install_property (xobject_class, 1,
+                                   xparam_spec_flags ("flags", "Flags", "xsubprocess_flags_t for launched processes",
+                                                       XTYPE_SUBPROCESS_FLAGS, 0, XPARAM_WRITABLE |
+                                                       XPARAM_STATIC_STRINGS | XPARAM_CONSTRUCT_ONLY));
 }
 
 /**
@@ -658,8 +658,8 @@ xsubprocess_launcher_close (xsubprocess_launcher_t *self)
 
   if (self->source_fds)
     {
-      g_assert (self->target_fds != NULL);
-      g_assert (self->source_fds->len == self->target_fds->len);
+      xassert (self->target_fds != NULL);
+      xassert (self->source_fds->len == self->target_fds->len);
 
       /* Note: Don’t close the target_fds, as they’re only valid FDs in the
        * child process. This code never executes in the child process. */
@@ -734,8 +734,8 @@ xsubprocess_launcher_spawn (xsubprocess_launcher_t  *launcher,
   const xchar_t *arg;
   va_list ap;
 
-  g_return_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   args = xptr_array_new ();
 
@@ -773,7 +773,7 @@ xsubprocess_launcher_spawnv (xsubprocess_launcher_t  *launcher,
 {
   xsubprocess_t *subprocess;
 
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
 
 #ifdef G_OS_UNIX
   if (launcher->closed_fd)

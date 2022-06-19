@@ -122,7 +122,7 @@ g_io_stream_dispose (xobject_t *object)
   if (!stream->priv->closed)
     g_io_stream_close (stream, NULL, NULL);
 
-  G_OBJECT_CLASS (g_io_stream_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_io_stream_parent_class)->dispose (object);
 }
 
 static void
@@ -161,34 +161,34 @@ g_io_stream_get_property (xobject_t    *object,
 static void
 g_io_stream_class_init (xio_stream_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_io_stream_dispose;
-  gobject_class->get_property = g_io_stream_get_property;
+  xobject_class->dispose = g_io_stream_dispose;
+  xobject_class->get_property = g_io_stream_get_property;
 
   klass->close_fn = g_io_stream_real_close;
   klass->close_async = g_io_stream_real_close_async;
   klass->close_finish = g_io_stream_real_close_finish;
 
-  xobject_class_install_property (gobject_class, PROP_CLOSED,
-                                   g_param_spec_boolean ("closed",
+  xobject_class_install_property (xobject_class, PROP_CLOSED,
+                                   xparam_spec_boolean ("closed",
                                                          P_("Closed"),
                                                          P_("Is the stream closed"),
                                                          FALSE,
-                                                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_INPUT_STREAM,
-				   g_param_spec_object ("input-stream",
+  xobject_class_install_property (xobject_class, PROP_INPUT_STREAM,
+				   xparam_spec_object ("input-stream",
 							P_("Input stream"),
 							P_("The xinput_stream_t to read from"),
 							XTYPE_INPUT_STREAM,
-							G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_OUTPUT_STREAM,
-				   g_param_spec_object ("output-stream",
+							XPARAM_READABLE | XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_OUTPUT_STREAM,
+				   xparam_spec_object ("output-stream",
 							P_("Output stream"),
 							P_("The xoutput_stream_t to write to"),
 							XTYPE_OUTPUT_STREAM,
-							G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+							XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -204,7 +204,7 @@ g_io_stream_class_init (xio_stream_class_t *klass)
 xboolean_t
 g_io_stream_is_closed (xio_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), TRUE);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), TRUE);
 
   return stream->priv->closed;
 }
@@ -228,7 +228,7 @@ g_io_stream_get_input_stream (xio_stream_t *stream)
 
   klass = XIO_STREAM_GET_CLASS (stream);
 
-  g_assert (klass->get_input_stream != NULL);
+  xassert (klass->get_input_stream != NULL);
 
   return klass->get_input_stream (stream);
 }
@@ -252,7 +252,7 @@ g_io_stream_get_output_stream (xio_stream_t *stream)
 
   klass = XIO_STREAM_GET_CLASS (stream);
 
-  g_assert (klass->get_output_stream != NULL);
+  xassert (klass->get_output_stream != NULL);
   return klass->get_output_stream (stream);
 }
 
@@ -269,7 +269,7 @@ g_io_stream_get_output_stream (xio_stream_t *stream)
 xboolean_t
 g_io_stream_has_pending (xio_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
 
   return stream->priv->pending;
 }
@@ -292,7 +292,7 @@ xboolean_t
 g_io_stream_set_pending (xio_stream_t  *stream,
 			 xerror_t    **error)
 {
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
 
   if (stream->priv->closed)
     {
@@ -404,7 +404,7 @@ g_io_stream_close (xio_stream_t     *stream,
   xio_stream_class_t *class;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
 
   class = XIO_STREAM_GET_CLASS (stream);
 
@@ -532,8 +532,8 @@ g_io_stream_close_finish (xio_stream_t     *stream,
 			  xasync_result_t  *result,
 			  xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -663,7 +663,7 @@ g_io_stream_real_close_finish (xio_stream_t     *stream,
 			       xasync_result_t  *result,
 			       xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -914,7 +914,7 @@ xboolean_t
 g_io_stream_splice_finish (xasync_result_t  *result,
                            xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, NULL), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, NULL), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

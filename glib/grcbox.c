@@ -183,7 +183,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
   xsize_t real_size;
   char *allocated;
 
-  g_assert (alignment != 0);
+  xassert (alignment != 0);
 
   /* We need to ensure that the private data is aligned */
   if (private_size % alignment != 0)
@@ -192,7 +192,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
       private_size += (alignment - private_offset);
     }
 
-  g_assert (block_size < (G_MAXSIZE - private_size));
+  xassert (block_size < (G_MAXSIZE - private_size));
   real_size = private_size + block_size;
 
   /* The real allocated size must be a multiple of @alignment, to
@@ -201,7 +201,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
   if (real_size % alignment != 0)
     {
       xsize_t offset = real_size % alignment;
-      g_assert (real_size < (G_MAXSIZE - (alignment - offset)));
+      xassert (real_size < (G_MAXSIZE - (alignment - offset)));
       real_size += (alignment - offset);
     }
 
@@ -214,7 +214,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
        * Valgrind to keep track of the over-allocation and not be
        * confused when passing the pointer around
        */
-      g_assert (private_size < (G_MAXSIZE - ALIGN_STRUCT (1)));
+      xassert (private_size < (G_MAXSIZE - ALIGN_STRUCT (1)));
       private_size += ALIGN_STRUCT (1);
 
       if (clear)
@@ -300,7 +300,7 @@ g_rc_box_alloc_full (xsize_t    block_size,
 xpointer_t
 g_rc_box_alloc (xsize_t block_size)
 {
-  g_return_val_if_fail (block_size > 0, NULL);
+  xreturn_val_if_fail (block_size > 0, NULL);
 
   return g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, FALSE, FALSE);
 }
@@ -327,7 +327,7 @@ g_rc_box_alloc (xsize_t block_size)
 xpointer_t
 g_rc_box_alloc0 (xsize_t block_size)
 {
-  g_return_val_if_fail (block_size > 0, NULL);
+  xreturn_val_if_fail (block_size > 0, NULL);
 
   return g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, FALSE, TRUE);
 }
@@ -386,8 +386,8 @@ xpointer_t
 {
   xpointer_t res;
 
-  g_return_val_if_fail (block_size > 0, NULL);
-  g_return_val_if_fail (mem_block != NULL, NULL);
+  xreturn_val_if_fail (block_size > 0, NULL);
+  xreturn_val_if_fail (mem_block != NULL, NULL);
 
   res = g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, FALSE, FALSE);
   memcpy (res, mem_block, block_size);
@@ -411,9 +411,9 @@ xpointer_t
 {
   GRcBox *real_box = G_RC_BOX (mem_block);
 
-  g_return_val_if_fail (mem_block != NULL, NULL);
+  xreturn_val_if_fail (mem_block != NULL, NULL);
 #ifndef G_DISABLE_ASSERT
-  g_return_val_if_fail (real_box->magic == G_BOX_MAGIC, NULL);
+  xreturn_val_if_fail (real_box->magic == G_BOX_MAGIC, NULL);
 #endif
 
   g_ref_count_inc (&real_box->ref_count);
@@ -493,9 +493,9 @@ g_rc_box_get_size (xpointer_t mem_block)
 {
   GRcBox *real_box = G_RC_BOX (mem_block);
 
-  g_return_val_if_fail (mem_block != NULL, 0);
+  xreturn_val_if_fail (mem_block != NULL, 0);
 #ifndef G_DISABLE_ASSERT
-  g_return_val_if_fail (real_box->magic == G_BOX_MAGIC, 0);
+  xreturn_val_if_fail (real_box->magic == G_BOX_MAGIC, 0);
 #endif
 
   return real_box->mem_size;

@@ -204,7 +204,7 @@ end_sleep (xpointer_t data)
   xdbus_method_invocation_return_value (invocation, NULL);
   xobject_unref (invocation);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -769,7 +769,7 @@ handle_get_property (xdbus_connection_t  *connection,
   ret = xhash_table_lookup (properties, property_name);
   if (ret)
     {
-      g_assert (!xvariant_is_floating (ret));
+      xassert (!xvariant_is_floating (ret));
       xvariant_ref (ret);
     }
   else
@@ -820,7 +820,7 @@ on_bus_acquired (xdbus_connection_t *connection,
                                           NULL,
                                           NULL,
                                           NULL);
-  g_assert (id > 0);
+  xassert (id > 0);
 }
 
 static void

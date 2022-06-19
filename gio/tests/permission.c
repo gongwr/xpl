@@ -33,7 +33,7 @@ acquired (xobject_t      *source,
   xboolean_t ret;
 
   ret = g_permission_acquire_finish (p, res, &error);
-  g_assert (!ret);
+  xassert (!ret);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 
@@ -51,7 +51,7 @@ released (xobject_t      *source,
   xboolean_t ret;
 
   ret = g_permission_release_finish (p, res, &error);
-  g_assert (!ret);
+  xassert (!ret);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 
@@ -71,9 +71,9 @@ test_simple (void)
 
   p = g_simple_permission_new (TRUE);
 
-  g_assert (g_permission_get_allowed (p));
-  g_assert (!g_permission_get_can_acquire (p));
-  g_assert (!g_permission_get_can_release (p));
+  xassert (g_permission_get_allowed (p));
+  xassert (!g_permission_get_can_acquire (p));
+  xassert (!g_permission_get_can_release (p));
 
   xobject_get (p,
                 "allowed", &allowed,
@@ -81,17 +81,17 @@ test_simple (void)
                 "can-release", &can_release,
                 NULL);
 
-  g_assert (allowed);
-  g_assert (!can_acquire);
-  g_assert (!can_release);
+  xassert (allowed);
+  xassert (!can_acquire);
+  xassert (!can_release);
 
   ret = g_permission_acquire (p, NULL, &error);
-  g_assert (!ret);
+  xassert (!ret);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 
   ret = g_permission_release (p, NULL, &error);
-  g_assert (!ret);
+  xassert (!ret);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
   g_clear_error (&error);
 

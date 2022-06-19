@@ -49,7 +49,7 @@ main (int   argc,
                                       NULL, /* xcancellable_t* */
                                       &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
   /* and now exit immediately! */
   return 0;

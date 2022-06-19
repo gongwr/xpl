@@ -46,27 +46,27 @@ test_retval_and_trunc (void)
 
   res = g_snprintf (buf, 1, "abc");
   g_assert_cmpint (res, ==, 3);
-  g_assert (buf[0] == '\0');
+  xassert (buf[0] == '\0');
   g_assert_cmpstr (buf, ==, "");
 
   res = g_snprintf (buf, 2, "abc");
   g_assert_cmpint (res, ==, 3);
-  g_assert (buf[1] == '\0');
+  xassert (buf[1] == '\0');
   g_assert_cmpstr (buf, ==, "a");
 
   res = g_snprintf (buf, 3, "abc");
   g_assert_cmpint (res, ==, 3);
-  g_assert (buf[2] == '\0');
+  xassert (buf[2] == '\0');
   g_assert_cmpstr (buf, ==, "ab");
 
   res = g_snprintf (buf, 4, "abc");
   g_assert_cmpint (res, ==, 3);
-  g_assert (buf[3] == '\0');
+  xassert (buf[3] == '\0');
   g_assert_cmpstr (buf, ==, "abc");
 
   res = g_snprintf (buf, 5, "abc");
   g_assert_cmpint (res, ==, 3);
-  g_assert (buf[3] == '\0');
+  xassert (buf[3] == '\0');
   g_assert_cmpstr (buf, ==, "abc");
 }
 
@@ -417,11 +417,11 @@ test_f (void)
 
   res = g_snprintf (buf, 128, "%f", G_PI);
   g_assert_cmpint (res, ==, 8);
-  g_assert (0 == strncmp (buf, "3.14159", 7));
+  xassert (0 == strncmp (buf, "3.14159", 7));
 
   res = g_snprintf (buf, 128, "%.8f", G_PI);
   g_assert_cmpint (res, ==, 10);
-  g_assert (0 == strncmp (buf, "3.1415926", 9));
+  xassert (0 == strncmp (buf, "3.1415926", 9));
 
   res = g_snprintf (buf, 128, "%.0f", G_PI);
   g_assert_cmpint (res, ==, 1);
@@ -439,11 +439,11 @@ test_f (void)
 
   res = g_snprintf (buf, 128, "%+f", G_PI);
   g_assert_cmpint (res, ==, 9);
-  g_assert (0 == strncmp (buf, "+3.14159", 8));
+  xassert (0 == strncmp (buf, "+3.14159", 8));
 
   res = g_snprintf (buf, 128, "% f", G_PI);
   g_assert_cmpint (res, ==, 9);
-  g_assert (0 == strncmp (buf, " 3.14159", 8));
+  xassert (0 == strncmp (buf, " 3.14159", 8));
 
   res = g_snprintf (buf, 128, "%#.0f", G_PI);
   g_assert_cmpint (res, ==, 2);
@@ -482,45 +482,45 @@ test_e (void)
 
   res = g_snprintf (buf, 128, "%e", G_PI);
   g_assert_cmpint (res, >=, 12);
-  g_assert (same_value (buf, "3.141593e+00"));
+  xassert (same_value (buf, "3.141593e+00"));
 
   res = g_snprintf (buf, 128, "%.8e", G_PI);
   g_assert_cmpint (res, >=, 14);
-  g_assert (same_value (buf, "3.14159265e+00"));
+  xassert (same_value (buf, "3.14159265e+00"));
 
   res = g_snprintf (buf, 128, "%.0e", G_PI);
   g_assert_cmpint (res, >=, 5);
-  g_assert (same_value (buf, "3e+00"));
+  xassert (same_value (buf, "3e+00"));
 
   res = g_snprintf (buf, 128, "%.1e", 0.0);
   g_assert_cmpint (res, >=, 7);
-  g_assert (same_value (buf, "0.0e+00"));
+  xassert (same_value (buf, "0.0e+00"));
 
   res = g_snprintf (buf, 128, "%.1e", 0.00001);
   g_assert_cmpint (res, >=, 7);
-  g_assert (same_value (buf, "1.0e-05"));
+  xassert (same_value (buf, "1.0e-05"));
 
   res = g_snprintf (buf, 128, "%.1e", 10000.0);
   g_assert_cmpint (res, >=, 7);
-  g_assert (same_value (buf, "1.0e+04"));
+  xassert (same_value (buf, "1.0e+04"));
 
   /* %e, flags */
 
   res = g_snprintf (buf, 128, "%+e", G_PI);
   g_assert_cmpint (res, >=, 13);
-  g_assert (same_value (buf, "+3.141593e+00"));
+  xassert (same_value (buf, "+3.141593e+00"));
 
   res = g_snprintf (buf, 128, "% e", G_PI);
   g_assert_cmpint (res, >=, 13);
-  g_assert (same_value (buf, " 3.141593e+00"));
+  xassert (same_value (buf, " 3.141593e+00"));
 
   res = g_snprintf (buf, 128, "%#.0e", G_PI);
   g_assert_cmpint (res, >=, 6);
-  g_assert (same_value (buf, "3.e+00"));
+  xassert (same_value (buf, "3.e+00"));
 
   res = g_snprintf (buf, 128, "%09.2e", G_PI);
   g_assert_cmpint (res, >=, 9);
-  g_assert (same_value (buf, "03.14e+00"));
+  xassert (same_value (buf, "03.14e+00"));
 }
 
 static void

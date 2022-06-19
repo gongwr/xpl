@@ -303,7 +303,7 @@ test_ip_async_connected (xsocket_t      *client,
    */
   g_assert_cmpint (cond, ==, G_IO_OUT);
 
-  g_assert (xsocket_is_connected (client));
+  xassert (xsocket_is_connected (client));
 
   /* This adds 1 second to "make check", so let's just only do it once. */
   if (data->family == XSOCKET_FAMILY_IPV4)
@@ -481,7 +481,7 @@ test_ip_sync (xsocket_family_t family)
 
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
-  g_assert (xsocket_is_connected (client));
+  xassert (xsocket_is_connected (client));
   xobject_unref (addr);
 
   /* This adds 1 second to "make check", so let's just only do it once. */
@@ -699,7 +699,7 @@ test_ip_sync_dgram (xsocket_family_t family)
     g_assert_no_error (error);
     /* v[0].size + v[1].size + v[2].size + v[3].size + v[4].size + v[5].size */
     g_assert_cmpint (len, ==, 17);
-    g_assert (memcmp (testbuf2, buf, 17) == 0);
+    xassert (memcmp (testbuf2, buf, 17) == 0);
 
     memset (buf, 0, sizeof (buf));
     len = xsocket_receive_from (client, NULL, buf, sizeof (buf), NULL, &error);
@@ -997,7 +997,7 @@ test_close_graceful (void)
 
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
-  g_assert (xsocket_is_connected (client));
+  xassert (xsocket_is_connected (client));
   xobject_unref (addr);
 
   server = xthread_join (data->thread);
@@ -1105,7 +1105,7 @@ test_ipv6_v4mapped (void)
 
   xsocket_connect (client, v4addr, NULL, &error);
   g_assert_no_error (error);
-  g_assert (xsocket_is_connected (client));
+  xassert (xsocket_is_connected (client));
 
   xthread_join (data->thread);
 
@@ -1245,7 +1245,7 @@ test_fd_reuse (void)
 
   xsocket_connect (client, addr, NULL, &error);
   g_assert_no_error (error);
-  g_assert (xsocket_is_connected (client));
+  xassert (xsocket_is_connected (client));
   xobject_unref (addr);
 
   /* we have to dup otherwise the fd gets closed twice on unref */
@@ -1311,12 +1311,12 @@ test_sockaddr (void)
   sin6.sin6_flowinfo = 1729;
 
   saddr = xsocket_address_new_from_native (&sin6, sizeof (sin6));
-  g_assert (X_IS_INET_SOCKET_ADDRESS (saddr));
+  xassert (X_IS_INET_SOCKET_ADDRESS (saddr));
 
   isaddr = G_INET_SOCKET_ADDRESS (saddr);
   iaddr = g_inet_socket_address_get_address (isaddr);
   g_assert_cmpint (xinet_address_get_family (iaddr), ==, XSOCKET_FAMILY_IPV6);
-  g_assert (xinet_address_get_is_loopback (iaddr));
+  xassert (xinet_address_get_is_loopback (iaddr));
 
   g_assert_cmpint (g_inet_socket_address_get_port (isaddr), ==, 42);
   g_assert_cmpint (g_inet_socket_address_get_scope_id (isaddr), ==, 17);
@@ -1325,7 +1325,7 @@ test_sockaddr (void)
   xsocket_address_to_native (saddr, &gsin6, sizeof (gsin6), &error);
   g_assert_no_error (error);
 
-  g_assert (memcmp (&sin6.sin6_addr, &gsin6.sin6_addr, sizeof (struct in6_addr)) == 0);
+  xassert (memcmp (&sin6.sin6_addr, &gsin6.sin6_addr, sizeof (struct in6_addr)) == 0);
   g_assert_cmpint (sin6.sin6_port, ==, gsin6.sin6_port);
   g_assert_cmpint (sin6.sin6_scope_id, ==, gsin6.sin6_scope_id);
   g_assert_cmpint (sin6.sin6_flowinfo, ==, gsin6.sin6_flowinfo);
@@ -1388,7 +1388,7 @@ test_unix_connection (void)
   s = xsocket_new_from_fd (fd, &error);
   g_assert_no_error (error);
   c = xsocket_connection_factory_create_connection (s);
-  g_assert (X_IS_UNIX_CONNECTION (c));
+  xassert (X_IS_UNIX_CONNECTION (c));
   xobject_unref (c);
   xobject_unref (s);
 }
@@ -1403,9 +1403,9 @@ create_connection_for_fd (int fd)
 
   socket = xsocket_new_from_fd (fd, &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (socket));
+  xassert (X_IS_SOCKET (socket));
   connection = xsocket_connection_factory_create_connection (socket);
-  g_assert (X_IS_UNIX_CONNECTION (connection));
+  xassert (X_IS_UNIX_CONNECTION (connection));
   xobject_unref (socket);
   return connection;
 }
@@ -1485,7 +1485,7 @@ test_unix_connection_ancillary_data (void)
       g_assert_cmpstr (buffer, ==, TEST_DATA);
 
       waitpid (pid, &status, 0);
-      g_assert (WIFEXITED (status));
+      xassert (WIFEXITED (status));
       g_assert_cmpint (WEXITSTATUS (status), ==, 0);
     }
 
@@ -1535,8 +1535,8 @@ test_source_postmortem (void)
   /* test_t that, after a socket is closed, its source callback should be called
    * exactly once. */
   xmain_context_iteration (context, FALSE);
-  g_assert (callback_visited);
-  g_assert (!xmain_context_pending (context));
+  xassert (callback_visited);
+  xassert (!xmain_context_pending (context));
 
   xmain_context_unref (context);
 }
@@ -1636,14 +1636,14 @@ test_get_available (xconstpointer user_data)
                            XSOCKET_PROTOCOL_DEFAULT,
                            &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (listener));
+  xassert (X_IS_SOCKET (listener));
 
   client = xsocket_new (XSOCKET_FAMILY_IPV4,
                          socket_type,
                          XSOCKET_PROTOCOL_DEFAULT,
                          &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (client));
+  xassert (X_IS_SOCKET (client));
 
   if (socket_type == XSOCKET_TYPE_STREAM)
     {
@@ -1841,14 +1841,14 @@ test_read_write (xconstpointer user_data)
                            XSOCKET_PROTOCOL_DEFAULT,
                            &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (listener));
+  xassert (X_IS_SOCKET (listener));
 
   client = xsocket_new (XSOCKET_FAMILY_IPV4,
                          XSOCKET_TYPE_STREAM,
                          XSOCKET_PROTOCOL_DEFAULT,
                          &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (client));
+  xassert (X_IS_SOCKET (client));
 
   addr = xinet_address_new_any (XSOCKET_FAMILY_IPV4);
   saddr = g_inet_socket_address_new (addr, 0);
@@ -2127,7 +2127,7 @@ _g_win32_socketpair (xint_t            domain,
   int tmpfd, rv = -1;
   u_long arg, br;
 
-  g_return_val_if_fail (sv != NULL, -1);
+  xreturn_val_if_fail (sv != NULL, -1);
 
   addr.sun_family = AF_UNIX;
   socklen = sizeof (addr);

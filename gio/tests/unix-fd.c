@@ -72,16 +72,16 @@ test_fds (void)
   message = G_UNIX_FD_MESSAGE (g_unix_fd_message_new_with_fd_list (list));
   xobject_unref (list);
 
-  g_assert (g_unix_fd_message_get_fd_list (message) == list);
+  xassert (g_unix_fd_message_get_fd_list (message) == list);
   xobject_get (message, "fd-list", &l2, NULL);
-  g_assert (l2 == list);
+  xassert (l2 == list);
   g_assert_cmpint (g_unix_fd_list_get_length (list), ==, 2);
 
   peek = g_unix_fd_list_peek_fds (list, &s);
   g_assert_cmpint (s, ==, 2);
   stolen = g_unix_fd_message_steal_fds (message, &s);
   g_assert_cmpint (s, ==, 2);
-  g_assert (stolen == peek);
+  xassert (stolen == peek);
 
   g_assert_cmpint (stolen[0], ==, sv[0]);
   g_assert_cmpint (stolen[1], ==, sv[1]);
@@ -147,19 +147,19 @@ test_fds (void)
 
   sockets[0] = xsocket_new_from_fd (sv[0], &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (sockets[0]));
+  xassert (X_IS_SOCKET (sockets[0]));
   sockets[1] = xsocket_new_from_fd (sv[1], &err);
   g_assert_no_error (err);
-  g_assert (X_IS_SOCKET (sockets[1]));
+  xassert (X_IS_SOCKET (sockets[1]));
 
   addr = xsocket_get_local_address (sockets[0], &err);
   g_assert_no_error (err);
-  g_assert (X_IS_UNIX_SOCKET_ADDRESS (addr));
+  xassert (X_IS_UNIX_SOCKET_ADDRESS (addr));
   g_assert_cmpint (g_unix_socket_address_get_address_type (G_UNIX_SOCKET_ADDRESS (addr)), ==, G_UNIX_SOCKET_ADDRESS_ANONYMOUS);
   g_assert_cmpint (g_unix_socket_address_get_path_len (G_UNIX_SOCKET_ADDRESS (addr)), ==, 0);
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-  g_assert (!g_unix_socket_address_get_is_abstract (G_UNIX_SOCKET_ADDRESS (addr)));
+  xassert (!g_unix_socket_address_get_is_abstract (G_UNIX_SOCKET_ADDRESS (addr)));
 G_GNUC_END_IGNORE_DEPRECATIONS
 
   xobject_get (addr,
@@ -170,8 +170,8 @@ G_GNUC_END_IGNORE_DEPRECATIONS
                 NULL);
   g_assert_cmpstr (path, ==, "");
   g_assert_cmpint (array->len, ==, 0);
-  g_assert (!abstract);
-  g_assert (type == G_UNIX_SOCKET_ADDRESS_ANONYMOUS);
+  xassert (!abstract);
+  xassert (type == G_UNIX_SOCKET_ADDRESS_ANONYMOUS);
   g_free (path);
   xbyte_array_free (array, TRUE);
 
@@ -204,7 +204,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
   message = mv[0];
   g_free (mv);
 
-  g_assert (X_IS_UNIX_FD_MESSAGE (message));
+  xassert (X_IS_UNIX_FD_MESSAGE (message));
   list = xobject_ref (g_unix_fd_message_get_fd_list (message));
   xobject_unref (message);
 

@@ -94,10 +94,10 @@ enum {
 static void
 xtls_connection_class_init (GTlsConnectionClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xtls_connection_get_property;
-  gobject_class->set_property = xtls_connection_set_property;
+  xobject_class->get_property = xtls_connection_get_property;
+  xobject_class->set_property = xtls_connection_set_property;
 
   /**
    * xtls_connection_t:base-io-stream:
@@ -110,14 +110,14 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_BASE_IO_STREAM,
-				   g_param_spec_object ("base-io-stream",
+  xobject_class_install_property (xobject_class, PROP_BASE_IO_STREAM,
+				   xparam_spec_object ("base-io-stream",
 							P_("Base IOStream"),
 							P_("The xio_stream_t that the connection wraps"),
 							XTYPE_IO_STREAM,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:use-system-certdb:
    *
@@ -127,15 +127,15 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Deprecated: 2.30: Use xtls_connection_t:database instead
    */
-  xobject_class_install_property (gobject_class, PROP_USE_SYSTEM_CERTDB,
-				   g_param_spec_boolean ("use-system-certdb",
+  xobject_class_install_property (xobject_class, PROP_USE_SYSTEM_CERTDB,
+				   xparam_spec_boolean ("use-system-certdb",
 							 P_("Use system certificate database"),
 							 P_("Whether to verify peer certificates against the system certificate database"),
 							 TRUE,
-							 G_PARAM_READWRITE |
-							 G_PARAM_CONSTRUCT |
-							 G_PARAM_STATIC_STRINGS |
-							 G_PARAM_DEPRECATED));
+							 XPARAM_READWRITE |
+							 XPARAM_CONSTRUCT |
+							 XPARAM_STATIC_STRINGS |
+							 XPARAM_DEPRECATED));
   /**
    * xtls_connection_t:database: (nullable)
    *
@@ -158,13 +158,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class, PROP_DATABASE,
-				   g_param_spec_object ("database",
+  xobject_class_install_property (xobject_class, PROP_DATABASE,
+				   xparam_spec_object ("database",
 							 P_("Database"),
 							 P_("Certificate database to use for looking up or verifying certificates"),
 							 XTYPE_TLS_DATABASE,
-							 G_PARAM_READWRITE |
-							 G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE |
+							 XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:interaction: (nullable)
    *
@@ -174,13 +174,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class, PROP_INTERACTION,
-                                   g_param_spec_object ("interaction",
+  xobject_class_install_property (xobject_class, PROP_INTERACTION,
+                                   xparam_spec_object ("interaction",
                                                         P_("Interaction"),
                                                         P_("Optional object for user interaction"),
                                                         XTYPE_TLS_INTERACTION,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:require-close-notify:
    *
@@ -189,14 +189,14 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_REQUIRE_CLOSE_NOTIFY,
-				   g_param_spec_boolean ("require-close-notify",
+  xobject_class_install_property (xobject_class, PROP_REQUIRE_CLOSE_NOTIFY,
+				   xparam_spec_boolean ("require-close-notify",
 							 P_("Require close notify"),
 							 P_("Whether to require proper TLS close notification"),
 							 TRUE,
-							 G_PARAM_READWRITE |
-							 G_PARAM_CONSTRUCT |
-							 G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE |
+							 XPARAM_CONSTRUCT |
+							 XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:rehandshake-mode:
    *
@@ -207,16 +207,16 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Deprecated: 2.60: The rehandshake mode is ignored.
    */
-  xobject_class_install_property (gobject_class, PROP_REHANDSHAKE_MODE,
-				   g_param_spec_enum ("rehandshake-mode",
+  xobject_class_install_property (xobject_class, PROP_REHANDSHAKE_MODE,
+				   xparam_spec_enum ("rehandshake-mode",
 						      P_("Rehandshake mode"),
 						      P_("When to allow rehandshaking"),
 						      XTYPE_TLS_REHANDSHAKE_MODE,
 						      G_TLS_REHANDSHAKE_SAFELY,
-						      G_PARAM_READWRITE |
-						      G_PARAM_CONSTRUCT |
-						      G_PARAM_STATIC_STRINGS |
-						      G_PARAM_DEPRECATED));
+						      XPARAM_READWRITE |
+						      XPARAM_CONSTRUCT |
+						      XPARAM_STATIC_STRINGS |
+						      XPARAM_DEPRECATED));
   /**
    * xtls_connection_t:certificate:
    *
@@ -225,13 +225,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_CERTIFICATE,
-				   g_param_spec_object ("certificate",
+  xobject_class_install_property (xobject_class, PROP_CERTIFICATE,
+				   xparam_spec_object ("certificate",
 							P_("Certificate"),
 							P_("The connection’s certificate"),
 							XTYPE_TLS_CERTIFICATE,
-							G_PARAM_READWRITE |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:peer-certificate: (nullable)
    *
@@ -244,13 +244,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_PEER_CERTIFICATE,
-				   g_param_spec_object ("peer-certificate",
+  xobject_class_install_property (xobject_class, PROP_PEER_CERTIFICATE,
+				   xparam_spec_object ("peer-certificate",
 							P_("Peer Certificate"),
 							P_("The connection’s peer’s certificate"),
 							XTYPE_TLS_CERTIFICATE,
-							G_PARAM_READABLE |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READABLE |
+							XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:peer-certificate-errors:
    *
@@ -271,14 +271,14 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_PEER_CERTIFICATE_ERRORS,
-				   g_param_spec_flags ("peer-certificate-errors",
+  xobject_class_install_property (xobject_class, PROP_PEER_CERTIFICATE_ERRORS,
+				   xparam_spec_flags ("peer-certificate-errors",
 						       P_("Peer Certificate Errors"),
 						       P_("Errors found with the peer’s certificate"),
 						       XTYPE_TLS_CERTIFICATE_FLAGS,
 						       0,
-						       G_PARAM_READABLE |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READABLE |
+						       XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:advertised-protocols: (nullable)
    *
@@ -288,13 +288,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.60
    */
-  xobject_class_install_property (gobject_class, PROP_ADVERTISED_PROTOCOLS,
-                                   g_param_spec_boxed ("advertised-protocols",
+  xobject_class_install_property (xobject_class, PROP_ADVERTISED_PROTOCOLS,
+                                   xparam_spec_boxed ("advertised-protocols",
                                                        P_("Advertised Protocols"),
                                                        P_("Application-layer protocols available on this connection"),
                                                        XTYPE_STRV,
-                                                       G_PARAM_READWRITE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READWRITE |
+                                                       XPARAM_STATIC_STRINGS));
   /**
    * xtls_connection_t:negotiated-protocol:
    *
@@ -303,13 +303,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.60
    */
-  xobject_class_install_property (gobject_class, PROP_NEGOTIATED_PROTOCOL,
-                                   g_param_spec_string ("negotiated-protocol",
+  xobject_class_install_property (xobject_class, PROP_NEGOTIATED_PROTOCOL,
+                                   xparam_spec_string ("negotiated-protocol",
                                                         P_("Negotiated Protocol"),
                                                         P_("Application-layer protocol negotiated for this connection"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_connection_t:protocol-version:
@@ -318,14 +318,14 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_PROTOCOL_VERSION,
-                                   g_param_spec_enum ("protocol-version",
+  xobject_class_install_property (xobject_class, PROP_PROTOCOL_VERSION,
+                                   xparam_spec_enum ("protocol-version",
                                                       P_("Protocol Version"),
                                                       P_("TLS protocol version negotiated for this connection"),
                                                       XTYPE_TLS_PROTOCOL_VERSION,
                                                       G_TLS_PROTOCOL_VERSION_UNKNOWN,
-                                                      G_PARAM_READABLE |
-                                                      G_PARAM_STATIC_STRINGS));
+                                                      XPARAM_READABLE |
+                                                      XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_connection_t:ciphersuite-name: (nullable)
@@ -334,13 +334,13 @@ xtls_connection_class_init (GTlsConnectionClass *klass)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_CIPHERSUITE_NAME,
-                                   g_param_spec_string ("ciphersuite-name",
+  xobject_class_install_property (xobject_class, PROP_CIPHERSUITE_NAME,
+                                   xparam_spec_string ("ciphersuite-name",
                                                         P_("Ciphersuite Name"),
                                                         P_("Name of ciphersuite negotiated for this connection"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_connection_t::accept-certificate:
@@ -478,7 +478,7 @@ xtls_connection_get_use_system_certdb (xtls_connection_t *conn)
 {
   xboolean_t use_system_certdb;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), TRUE);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), TRUE);
 
   xobject_get (G_OBJECT (conn),
 		"use-system-certdb", &use_system_certdb,
@@ -533,7 +533,7 @@ xtls_connection_get_database (xtls_connection_t *conn)
 {
   xtls_database_t *database = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn),
 		"database", &database,
@@ -595,7 +595,7 @@ xtls_connection_get_certificate (xtls_connection_t *conn)
 {
   xtls_certificate_t *certificate;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "certificate", &certificate, NULL);
   if (certificate)
@@ -645,7 +645,7 @@ xtls_connection_get_interaction (xtls_connection_t       *conn)
 {
   xtls_interaction_t *interaction = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "interaction", &interaction, NULL);
   if (interaction)
@@ -671,7 +671,7 @@ xtls_connection_get_peer_certificate (xtls_connection_t *conn)
 {
   xtls_certificate_t *peer_certificate;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "peer-certificate", &peer_certificate, NULL);
   if (peer_certificate)
@@ -694,12 +694,12 @@ xtls_connection_get_peer_certificate (xtls_connection_t *conn)
  *
  * Since: 2.28
  */
-GTlsCertificateFlags
+xtls_certificate_flags_t
 xtls_connection_get_peer_certificate_errors (xtls_connection_t *conn)
 {
-  GTlsCertificateFlags errors;
+  xtls_certificate_flags_t errors;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "peer-certificate-errors", &errors, NULL);
   return errors;
@@ -769,7 +769,7 @@ xtls_connection_get_require_close_notify (xtls_connection_t *conn)
 {
   xboolean_t require_close_notify;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), TRUE);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), TRUE);
 
   xobject_get (G_OBJECT (conn),
 		"require-close-notify", &require_close_notify,
@@ -827,7 +827,7 @@ xtls_connection_get_rehandshake_mode (xtls_connection_t       *conn)
 {
   GTlsRehandshakeMode mode;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), G_TLS_REHANDSHAKE_SAFELY);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), G_TLS_REHANDSHAKE_SAFELY);
 
   /* Continue to call xobject_get(), even though the return value is
    * ignored, so that behavior doesn’t change for derived classes.
@@ -890,7 +890,7 @@ xtls_connection_get_negotiated_protocol (xtls_connection_t *conn)
 {
   GTlsConnectionClass *class;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
 
   class = G_TLS_CONNECTION_GET_CLASS (conn);
   if (class->get_negotiated_protocol == NULL)
@@ -944,8 +944,8 @@ xtls_connection_get_channel_binding_data (xtls_connection_t          *conn,
 {
   GTlsConnectionClass *class;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   class = G_TLS_CONNECTION_GET_CLASS (conn);
   if (class->get_binding_data == NULL)
@@ -1006,7 +1006,7 @@ xtls_connection_handshake (xtls_connection_t   *conn,
 			    xcancellable_t     *cancellable,
 			    xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
 
   return G_TLS_CONNECTION_GET_CLASS (conn)->handshake (conn, cancellable, error);
 }
@@ -1057,7 +1057,7 @@ xtls_connection_handshake_finish (xtls_connection_t  *conn,
 				   xasync_result_t    *result,
 				   xerror_t         **error)
 {
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), FALSE);
 
   return G_TLS_CONNECTION_GET_CLASS (conn)->handshake_finish (conn, result, error);
 }
@@ -1082,7 +1082,7 @@ xtls_connection_get_protocol_version (xtls_connection_t *conn)
   xenum_class_t *enum_class;
   xenum_value_t *enum_value;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), G_TLS_PROTOCOL_VERSION_UNKNOWN);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), G_TLS_PROTOCOL_VERSION_UNKNOWN);
 
   xobject_get (G_OBJECT (conn),
                 "protocol-version", &protocol_version,
@@ -1116,7 +1116,7 @@ xtls_connection_get_ciphersuite_name (xtls_connection_t *conn)
 {
   xchar_t *ciphersuite_name;
 
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn),
                 "ciphersuite-name", &ciphersuite_name,
@@ -1153,7 +1153,7 @@ G_DEFINE_QUARK (g-tls-error-quark, xtls_error)
 xboolean_t
 xtls_connection_emit_accept_certificate (xtls_connection_t       *conn,
 					  xtls_certificate_t      *peer_cert,
-					  GTlsCertificateFlags  errors)
+					  xtls_certificate_flags_t  errors)
 {
   xboolean_t accept = FALSE;
 

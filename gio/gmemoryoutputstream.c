@@ -129,12 +129,12 @@ static void
 g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
 {
   xoutput_stream_class_t *ostream_class;
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->set_property = g_memory_output_stream_set_property;
-  gobject_class->get_property = g_memory_output_stream_get_property;
-  gobject_class->finalize     = g_memory_output_stream_finalize;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->set_property = g_memory_output_stream_set_property;
+  xobject_class->get_property = g_memory_output_stream_get_property;
+  xobject_class->finalize     = g_memory_output_stream_finalize;
 
   ostream_class = G_OUTPUT_STREAM_CLASS (klass);
 
@@ -150,13 +150,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
    *
    * Since: 2.24
    **/
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_DATA,
-                                   g_param_spec_pointer ("data",
+                                   xparam_spec_pointer ("data",
                                                          P_("Data buffer_t"),
                                                          P_("Pointer to buffer where data will be written."),
-                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xmemory_output_stream_t:size:
@@ -165,14 +165,14 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
    *
    * Since: 2.24
    **/
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_SIZE,
-                                   g_param_spec_ulong ("size",
+                                   xparam_spec_ulong ("size",
                                                        P_("Data buffer_t Size"),
                                                        P_("Current size of the data buffer."),
                                                        0, G_MAXULONG, 0,
-                                                       G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xmemory_output_stream_t:data-size:
@@ -181,14 +181,14 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
    *
    * Since: 2.24
    **/
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_DATA_SIZE,
-                                   g_param_spec_ulong ("data-size",
+                                   xparam_spec_ulong ("data-size",
                                                        P_("Data Size"),
                                                        P_("Size of data written to the buffer."),
                                                        0, G_MAXULONG, 0,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xmemory_output_stream_t:realloc-function: (skip)
@@ -197,13 +197,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
    *
    * Since: 2.24
    **/
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_REALLOC_FUNCTION,
-                                   g_param_spec_pointer ("realloc-function",
+                                   xparam_spec_pointer ("realloc-function",
                                                          P_("Memory Reallocation Function"),
                                                          P_("Function with realloc semantics called to enlarge the buffer."),
-                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xmemory_output_stream_t:destroy-function: (skip)
@@ -212,13 +212,13 @@ g_memory_output_stream_class_init (GMemoryOutputStreamClass *klass)
    *
    * Since: 2.24
    **/
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_DESTROY_FUNCTION,
-                                   g_param_spec_pointer ("destroy-function",
+                                   xparam_spec_pointer ("destroy-function",
                                                          P_("Destroy Notification Function"),
                                                          P_("Function called with the buffer as argument when the stream is destroyed."),
-                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -307,7 +307,7 @@ g_memory_output_stream_finalize (xobject_t *object)
   if (priv->destroy)
     priv->destroy (priv->data);
 
-  G_OBJECT_CLASS (g_memory_output_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_memory_output_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -429,7 +429,7 @@ g_memory_output_stream_new_resizable (void)
 xpointer_t
 g_memory_output_stream_get_data (xmemory_output_stream_t *ostream)
 {
-  g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
+  xreturn_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
 
   return ostream->priv->data;
 }
@@ -459,7 +459,7 @@ g_memory_output_stream_get_data (xmemory_output_stream_t *ostream)
 xsize_t
 g_memory_output_stream_get_size (xmemory_output_stream_t *ostream)
 {
-  g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
+  xreturn_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
 
   return ostream->priv->len;
 }
@@ -478,7 +478,7 @@ g_memory_output_stream_get_size (xmemory_output_stream_t *ostream)
 xsize_t
 g_memory_output_stream_get_data_size (xmemory_output_stream_t *ostream)
 {
-  g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
+  xreturn_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
 
   return ostream->priv->valid_len;
 }
@@ -504,8 +504,8 @@ g_memory_output_stream_steal_data (xmemory_output_stream_t *ostream)
 {
   xpointer_t data;
 
-  g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
-  g_return_val_if_fail (xoutput_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
+  xreturn_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
+  xreturn_val_if_fail (xoutput_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
 
   data = ostream->priv->data;
   ostream->priv->data = NULL;
@@ -529,8 +529,8 @@ g_memory_output_stream_steal_as_bytes (xmemory_output_stream_t *ostream)
 {
   xbytes_t *result;
 
-  g_return_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
-  g_return_val_if_fail (xoutput_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
+  xreturn_val_if_fail (X_IS_MEMORY_OUTPUT_STREAM (ostream), NULL);
+  xreturn_val_if_fail (xoutput_stream_is_closed (G_OUTPUT_STREAM (ostream)), NULL);
 
   result = xbytes_new_with_free_func (ostream->priv->data,
                                        ostream->priv->valid_len,
@@ -697,7 +697,7 @@ g_memory_output_stream_close_finish (xoutput_stream_t  *stream,
                                      xasync_result_t   *result,
                                      xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

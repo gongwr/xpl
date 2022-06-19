@@ -113,7 +113,7 @@ XPL_AVAILABLE_IN_ALL
 void             xdbus_connection_set_exit_on_close          (xdbus_connection_t    *connection,
                                                                xboolean_t            exit_on_close);
 XPL_AVAILABLE_IN_ALL
-GDBusCapabilityFlags  xdbus_connection_get_capabilities      (xdbus_connection_t    *connection);
+xdbus_capability_flags_t  xdbus_connection_get_capabilities      (xdbus_connection_t    *connection);
 XPL_AVAILABLE_IN_2_60
 GDBusConnectionFlags  xdbus_connection_get_flags             (xdbus_connection_t    *connection);
 
@@ -653,7 +653,7 @@ void             xdbus_connection_signal_unsubscribe         (xdbus_connection_t
  * descriptors, not compatible with @connection), then a warning is
  * logged to standard error. Applications can
  * check this ahead of time using xdbus_message_to_blob() passing a
- * #GDBusCapabilityFlags value obtained from @connection.
+ * #xdbus_capability_flags_t value obtained from @connection.
  *
  * Returns: (transfer full) (nullable): A #xdbus_message_t that will be freed with
  * xobject_unref() or %NULL to drop the message. Passive filter

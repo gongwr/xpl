@@ -106,15 +106,15 @@ test_local (void)
   xchar_t **schemes;
 
   vfs = xvfs_get_local ();
-  g_assert (xvfs_is_active (vfs));
+  xassert (xvfs_is_active (vfs));
 
   file = xvfs_get_file_for_uri (vfs, "not a good uri");
-  g_assert (X_IS_FILE (file));
+  xassert (X_IS_FILE (file));
   xobject_unref (file);
 
   schemes = (xchar_t **)xvfs_get_supported_uri_schemes (vfs);
 
-  g_assert (xstrv_length (schemes) > 0);
+  xassert (xstrv_length (schemes) > 0);
   g_assert_cmpstr (schemes[0], ==, "file");
 }
 

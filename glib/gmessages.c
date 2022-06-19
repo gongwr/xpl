@@ -34,8 +34,8 @@
  * These functions provide support for outputting messages.
  *
  * The g_return family of macros (g_return_if_fail(),
- * g_return_val_if_fail(), g_return_if_reached(),
- * g_return_val_if_reached()) should only be used for programming
+ * xreturn_val_if_fail(), g_return_if_reached(),
+ * xreturn_val_if_reached()) should only be used for programming
  * errors, a typical use case is checking for invalid parameters at
  * the beginning of a public function. They should not be used if
  * you just mean "if (error) return", they should only be used if
@@ -296,11 +296,11 @@ myInvalidParameterHandler(const wchar_t *expression,
  * @G_LOG_FLAG_RECURSION: internal flag
  * @G_LOG_FLAG_FATAL: internal flag
  * @G_LOG_LEVEL_ERROR: log level for errors, see xerror().
- *     This level is also used for messages produced by g_assert().
+ *     This level is also used for messages produced by xassert().
  * @G_LOG_LEVEL_CRITICAL: log level for critical warning messages, see
  *     g_critical().
  *     This level is also used for messages produced by g_return_if_fail()
- *     and g_return_val_if_fail().
+ *     and xreturn_val_if_fail().
  * @G_LOG_LEVEL_WARNING: log level for warnings, see g_warning()
  * @G_LOG_LEVEL_MESSAGE: log level for messages, see g_message()
  * @G_LOG_LEVEL_INFO: log level for informational messages, see g_info()
@@ -390,8 +390,8 @@ myInvalidParameterHandler(const wchar_t *expression,
  * Logging of a critical error is by definition an indication of a bug
  * somewhere in the current program (or its libraries).
  *
- * g_return_if_fail(), g_return_val_if_fail(), g_return_if_reached() and
- * g_return_val_if_reached() log at %G_LOG_LEVEL_CRITICAL.
+ * g_return_if_fail(), xreturn_val_if_fail(), g_return_if_reached() and
+ * xreturn_val_if_reached() log at %G_LOG_LEVEL_CRITICAL.
  *
  * You can make critical warnings fatal at runtime by
  * setting the `G_DEBUG` environment variable (see
@@ -516,8 +516,8 @@ static xmutex_t         g_messages_lock;
 static GLogDomain    *g_log_domains = NULL;
 static GPrintFunc     glib_print_func = NULL;
 static GPrintFunc     glib_printerr_func = NULL;
-static GPrivate       g_log_depth;
-static GPrivate       g_loxstructured_depth;
+static xprivate_t       g_log_depth;
+static xprivate_t       g_loxstructured_depth;
 static GLogFunc       default_log_func = g_log_default_handler;
 static xpointer_t       default_log_data = NULL;
 static GTestLogFatalFunc fatal_log_func = NULL;
@@ -881,8 +881,8 @@ g_log_set_handler_full (const xchar_t    *log_domain,
   GLogDomain *domain;
   GLogHandler *handler;
 
-  g_return_val_if_fail ((log_levels & G_LOG_LEVEL_MASK) != 0, 0);
-  g_return_val_if_fail (log_func != NULL, 0);
+  xreturn_val_if_fail ((log_levels & G_LOG_LEVEL_MASK) != 0, 0);
+  xreturn_val_if_fail (log_func != NULL, 0);
 
   if (!log_domain)
     log_domain = "";
@@ -1132,7 +1132,7 @@ format_unsigned (xchar_t  *buf,
 
   i = n;
 
-  /* Again we can't use g_assert; actually this check should _never_ fail. */
+  /* Again we can't use xassert; actually this check should _never_ fail. */
   if (n > FORMAT_UNSIGNED_BUFSIZE - 3)
     {
       *buf = '\000';
@@ -1969,7 +1969,7 @@ g_loxstructured_array (GLogLevelFlags   log_level,
   /* Write the log entry. */
   g_private_set (&g_loxstructured_depth, GUINT_TO_POINTER (++depth));
 
-  g_assert (writer_func != NULL);
+  xassert (writer_func != NULL);
   writer_func (log_level, fields, n_fields, writer_user_data);
 
   g_private_set (&g_loxstructured_depth, GUINT_TO_POINTER (--depth));
@@ -2089,7 +2089,7 @@ g_log_writer_supports_color (xint_t output_fd)
 
 #endif
 
-  g_return_val_if_fail (output_fd >= 0, FALSE);
+  xreturn_val_if_fail (output_fd >= 0, FALSE);
 
   /* FIXME: This check could easily be expanded in future to be more robust
    * against different types of terminal, which still vary in their color
@@ -2493,8 +2493,8 @@ g_log_writer_journald (GLogLevelFlags   log_level,
   char *buf;
   xint_t retval;
 
-  g_return_val_if_fail (fields != NULL, G_LOG_WRITER_UNHANDLED);
-  g_return_val_if_fail (n_fields > 0, G_LOG_WRITER_UNHANDLED);
+  xreturn_val_if_fail (fields != NULL, G_LOG_WRITER_UNHANDLED);
+  xreturn_val_if_fail (n_fields > 0, G_LOG_WRITER_UNHANDLED);
 
   /* According to systemd.journal-fields(7), the journal allows fields in any
    * format (including arbitrary binary), but expects text fields to be UTF-8.
@@ -2604,8 +2604,8 @@ g_log_writer_standard_streams (GLogLevelFlags   log_level,
   FILE *stream;
   xchar_t *out = NULL;  /* in the current locale’s character set */
 
-  g_return_val_if_fail (fields != NULL, G_LOG_WRITER_UNHANDLED);
-  g_return_val_if_fail (n_fields > 0, G_LOG_WRITER_UNHANDLED);
+  xreturn_val_if_fail (fields != NULL, G_LOG_WRITER_UNHANDLED);
+  xreturn_val_if_fail (n_fields > 0, G_LOG_WRITER_UNHANDLED);
 
   stream = log_level_to_file (log_level);
   if (!stream || fileno (stream) < 0)
@@ -2770,8 +2770,8 @@ g_log_writer_default (GLogLevelFlags   log_level,
   static xsize_t initialized = 0;
   static xboolean_t stderr_is_journal = FALSE;
 
-  g_return_val_if_fail (fields != NULL, G_LOG_WRITER_UNHANDLED);
-  g_return_val_if_fail (n_fields > 0, G_LOG_WRITER_UNHANDLED);
+  xreturn_val_if_fail (fields != NULL, G_LOG_WRITER_UNHANDLED);
+  xreturn_val_if_fail (n_fields > 0, G_LOG_WRITER_UNHANDLED);
 
   if (should_drop_message (log_level, NULL, fields, n_fields))
     return G_LOG_WRITER_HANDLED;
@@ -2932,7 +2932,7 @@ g_log_set_debug_enabled (xboolean_t enabled)
  * @expression: (nullable): expression which failed
  *
  * Internal function used to print messages from the public g_return_if_fail()
- * and g_return_val_if_fail() macros.
+ * and xreturn_val_if_fail() macros.
  */
 void
 g_return_if_fail_warning (const char *log_domain,

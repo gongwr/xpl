@@ -163,7 +163,7 @@ on_new_connection (xdbus_server_t *server,
                                                        NULL,  /* user_data */
                                                        NULL,  /* user_data_free_func */
                                                        NULL); /* xerror_t** */
-  g_assert (registration_id > 0);
+  xassert (registration_id > 0);
 
   return TRUE;
 }
@@ -286,7 +286,7 @@ main (int argc, char *argv[])
    * them from XML.
    */
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
 
   if (opt_server)
     {

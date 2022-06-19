@@ -81,7 +81,7 @@ g_loadable_icon_load (xloadable_icon_t  *icon,
 {
   xloadable_icon_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
+  xreturn_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
 
   iface = G_LOADABLE_ICON_GET_IFACE (icon);
 
@@ -138,8 +138,8 @@ g_loadable_icon_load_finish (xloadable_icon_t  *icon,
 {
   xloadable_icon_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_LOADABLE_ICON (icon), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -217,7 +217,7 @@ g_loadable_icon_real_load_finish (xloadable_icon_t        *icon,
   LoadData *data;
   xinput_stream_t *stream;
 
-  g_return_val_if_fail (xtask_is_valid (res, icon), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, icon), NULL);
 
   task = XTASK (res);
   data = xtask_get_task_data (task);

@@ -37,22 +37,22 @@
 #include "gportalsupport.h"
 
 
-#define XTYPE_KEYFILE_SETTINGS_BACKEND      (g_keyfile_settings_backend_get_type ())
-#define G_KEYFILE_SETTINGS_BACKEND(inst)     (XTYPE_CHECK_INSTANCE_CAST ((inst),      \
+#define XTYPE_KEYFILE_SETTINGS_BACKEND      (xkeyfile_settings_backend_get_type ())
+#define XKEYFILE_SETTINGS_BACKEND(inst)     (XTYPE_CHECK_INSTANCE_CAST ((inst),      \
                                               XTYPE_KEYFILE_SETTINGS_BACKEND,         \
-                                              GKeyfileSettingsBackend))
+                                              xkeyfile_settings_backend_t))
 #define X_IS_KEYFILE_SETTINGS_BACKEND(inst)  (XTYPE_CHECK_INSTANCE_TYPE ((inst),      \
                                               XTYPE_KEYFILE_SETTINGS_BACKEND))
 
 
-typedef GSettingsBackendClass GKeyfileSettingsBackendClass;
+typedef xsettings_backend_class_t xkeyfile_settings_backend_class_t;
 
 typedef enum {
   PROP_FILENAME = 1,
   PROP_ROOT_PATH,
   PROP_ROOT_GROUP,
   PROP_DEFAULTS_DIR
-} GKeyfileSettingsBackendProperty;
+} xkeyfile_settings_backend_property_t;
 
 typedef struct
 {
@@ -75,7 +75,7 @@ typedef struct
   xuint8_t             digest[32];
   xfile_t             *dir;
   xfile_monitor_t      *dir_monitor;
-} GKeyfileSettingsBackend;
+} xkeyfile_settings_backend_t;
 
 #ifdef G_OS_WIN32
 #define EXTENSION_PRIORITY 10
@@ -83,8 +83,8 @@ typedef struct
 #define EXTENSION_PRIORITY (glib_should_use_portal () && !glib_has_dconf_access_in_sandbox () ? 110 : 10)
 #endif
 
-G_DEFINE_TYPE_WITH_CODE (GKeyfileSettingsBackend,
-                         g_keyfile_settings_backend,
+G_DEFINE_TYPE_WITH_CODE (xkeyfile_settings_backend_t,
+                         xkeyfile_settings_backend,
                          XTYPE_SETTINGS_BACKEND,
                          _xio_modules_ensure_extension_points_registered ();
                          g_io_extension_point_implement (G_SETTINGS_BACKEND_EXTENSION_POINT_NAME,
@@ -102,11 +102,11 @@ compute_checksum (xuint8_t        *digest,
   xchecksum_update (checksum, contents, length);
   xchecksum_get_digest (checksum, digest, &len);
   xchecksum_free (checksum);
-  g_assert (len == 32);
+  xassert (len == 32);
 }
 
 static xboolean_t
-g_keyfile_settings_backend_keyfile_write (GKeyfileSettingsBackend  *kfsb,
+xkeyfile_settings_backend_keyfile_write (xkeyfile_settings_backend_t  *kfsb,
                                           xerror_t                  **error)
 {
   xchar_t *contents;
@@ -144,7 +144,7 @@ group_name_matches (const xchar_t *group_name,
 }
 
 static xboolean_t
-convert_path (GKeyfileSettingsBackend  *kfsb,
+convert_path (xkeyfile_settings_backend_t  *kfsb,
               const xchar_t              *key,
               xchar_t                   **group,
               xchar_t                   **basename)
@@ -208,14 +208,14 @@ convert_path (GKeyfileSettingsBackend  *kfsb,
 }
 
 static xboolean_t
-path_is_valid (GKeyfileSettingsBackend *kfsb,
+path_is_valid (xkeyfile_settings_backend_t *kfsb,
                const xchar_t             *path)
 {
   return convert_path (kfsb, path, NULL, NULL);
 }
 
 static xvariant_t *
-get_from_keyfile (GKeyfileSettingsBackend *kfsb,
+get_from_keyfile (xkeyfile_settings_backend_t *kfsb,
                   const xvariant_type_t      *type,
                   const xchar_t             *key)
 {
@@ -227,7 +227,7 @@ get_from_keyfile (GKeyfileSettingsBackend *kfsb,
       xchar_t *str;
       xchar_t *sysstr;
 
-      g_assert (*name);
+      xassert (*name);
 
       sysstr = xkey_file_get_value (kfsb->system_keyfile, group, name, NULL);
       str = xkey_file_get_value (kfsb->keyfile, group, name, NULL);
@@ -278,7 +278,7 @@ get_from_keyfile (GKeyfileSettingsBackend *kfsb,
 }
 
 static xboolean_t
-set_to_keyfile (GKeyfileSettingsBackend *kfsb,
+set_to_keyfile (xkeyfile_settings_backend_t *kfsb,
                 const xchar_t             *key,
                 xvariant_t                *value)
 {
@@ -325,12 +325,12 @@ set_to_keyfile (GKeyfileSettingsBackend *kfsb,
 }
 
 static xvariant_t *
-g_keyfile_settings_backend_read (xsettings_backend_t   *backend,
+xkeyfile_settings_backend_read (xsettings_backend_t   *backend,
                                  const xchar_t        *key,
                                  const xvariant_type_t *expected_type,
                                  xboolean_t            default_value)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (backend);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (backend);
 
   if (default_value)
     return NULL;
@@ -340,12 +340,12 @@ g_keyfile_settings_backend_read (xsettings_backend_t   *backend,
 
 typedef struct
 {
-  GKeyfileSettingsBackend *kfsb;
+  xkeyfile_settings_backend_t *kfsb;
   xboolean_t failed;
 } WriteManyData;
 
 static xboolean_t
-g_keyfile_settings_backend_write_one (xpointer_t key,
+xkeyfile_settings_backend_write_one (xpointer_t key,
                                       xpointer_t value,
                                       xpointer_t user_data)
 {
@@ -353,13 +353,13 @@ g_keyfile_settings_backend_write_one (xpointer_t key,
   xboolean_t success G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
   success = set_to_keyfile (data->kfsb, key, value);
-  g_assert (success);
+  xassert (success);
 
   return FALSE;
 }
 
 static xboolean_t
-g_keyfile_settings_backend_check_one (xpointer_t key,
+xkeyfile_settings_backend_check_one (xpointer_t key,
                                       xpointer_t value,
                                       xpointer_t user_data)
 {
@@ -370,24 +370,24 @@ g_keyfile_settings_backend_check_one (xpointer_t key,
 }
 
 static xboolean_t
-g_keyfile_settings_backend_write_tree (xsettings_backend_t *backend,
+xkeyfile_settings_backend_write_tree (xsettings_backend_t *backend,
                                        xtree_t            *tree,
                                        xpointer_t          origin_tag)
 {
-  WriteManyData data = { G_KEYFILE_SETTINGS_BACKEND (backend), 0 };
+  WriteManyData data = { XKEYFILE_SETTINGS_BACKEND (backend), 0 };
   xboolean_t success;
   xerror_t *error = NULL;
 
   if (!data.kfsb->writable)
     return FALSE;
 
-  xtree_foreach (tree, g_keyfile_settings_backend_check_one, &data);
+  xtree_foreach (tree, xkeyfile_settings_backend_check_one, &data);
 
   if (data.failed)
     return FALSE;
 
-  xtree_foreach (tree, g_keyfile_settings_backend_write_one, &data);
-  success = g_keyfile_settings_backend_keyfile_write (data.kfsb, &error);
+  xtree_foreach (tree, xkeyfile_settings_backend_write_one, &data);
+  success = xkeyfile_settings_backend_keyfile_write (data.kfsb, &error);
   if (error)
     {
       g_warning ("Failed to write keyfile to %s: %s", xfile_peek_path (data.kfsb->file), error->message);
@@ -400,12 +400,12 @@ g_keyfile_settings_backend_write_tree (xsettings_backend_t *backend,
 }
 
 static xboolean_t
-g_keyfile_settings_backend_write (xsettings_backend_t *backend,
+xkeyfile_settings_backend_write (xsettings_backend_t *backend,
                                   const xchar_t      *key,
                                   xvariant_t         *value,
                                   xpointer_t          origin_tag)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (backend);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (backend);
   xboolean_t success;
   xerror_t *error = NULL;
 
@@ -417,7 +417,7 @@ g_keyfile_settings_backend_write (xsettings_backend_t *backend,
   if (success)
     {
       g_settings_backend_changed (backend, key, origin_tag);
-      success = g_keyfile_settings_backend_keyfile_write (kfsb, &error);
+      success = xkeyfile_settings_backend_keyfile_write (kfsb, &error);
       if (error)
         {
           g_warning ("Failed to write keyfile to %s: %s", xfile_peek_path (kfsb->file), error->message);
@@ -429,16 +429,16 @@ g_keyfile_settings_backend_write (xsettings_backend_t *backend,
 }
 
 static void
-g_keyfile_settings_backend_reset (xsettings_backend_t *backend,
+xkeyfile_settings_backend_reset (xsettings_backend_t *backend,
                                   const xchar_t      *key,
                                   xpointer_t          origin_tag)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (backend);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (backend);
   xerror_t *error = NULL;
 
   if (set_to_keyfile (kfsb, key, NULL))
     {
-      g_keyfile_settings_backend_keyfile_write (kfsb, &error);
+      xkeyfile_settings_backend_keyfile_write (kfsb, &error);
       if (error)
         {
           g_warning ("Failed to write keyfile to %s: %s", xfile_peek_path (kfsb->file), error->message);
@@ -450,10 +450,10 @@ g_keyfile_settings_backend_reset (xsettings_backend_t *backend,
 }
 
 static xboolean_t
-g_keyfile_settings_backend_get_writable (xsettings_backend_t *backend,
+xkeyfile_settings_backend_get_writable (xsettings_backend_t *backend,
                                          const xchar_t      *name)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (backend);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (backend);
 
   return kfsb->writable &&
          !xhash_table_contains (kfsb->system_locks, name) &&
@@ -461,16 +461,16 @@ g_keyfile_settings_backend_get_writable (xsettings_backend_t *backend,
 }
 
 static xpermission_t *
-g_keyfile_settings_backend_get_permission (xsettings_backend_t *backend,
+xkeyfile_settings_backend_get_permission (xsettings_backend_t *backend,
                                            const xchar_t      *path)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (backend);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (backend);
 
   return xobject_ref (kfsb->permission);
 }
 
 static void
-keyfile_to_tree (GKeyfileSettingsBackend *kfsb,
+keyfile_to_tree (xkeyfile_settings_backend_t *kfsb,
                  xtree_t                   *tree,
                  xkey_file_t                *keyfile,
                  xboolean_t                 dup_check)
@@ -494,7 +494,7 @@ keyfile_to_tree (GKeyfileSettingsBackend *kfsb,
         continue;
 
       keys = xkey_file_get_keys (keyfile, groups[i], NULL, NULL);
-      g_assert (keys != NULL);
+      xassert (keys != NULL);
 
       for (j = 0; keys[j]; j++)
         {
@@ -527,7 +527,7 @@ keyfile_to_tree (GKeyfileSettingsBackend *kfsb,
 }
 
 static void
-g_keyfile_settings_backend_keyfile_reload (GKeyfileSettingsBackend *kfsb)
+xkeyfile_settings_backend_keyfile_reload (xkeyfile_settings_backend_t *kfsb)
 {
   xuint8_t digest[32];
   xchar_t *contents;
@@ -572,7 +572,7 @@ g_keyfile_settings_backend_keyfile_reload (GKeyfileSettingsBackend *kfsb)
 }
 
 static void
-g_keyfile_settings_backend_keyfile_writable (GKeyfileSettingsBackend *kfsb)
+xkeyfile_settings_backend_keyfile_writable (xkeyfile_settings_backend_t *kfsb)
 {
   xfile_info_t *fileinfo;
   xboolean_t writable;
@@ -597,9 +597,9 @@ g_keyfile_settings_backend_keyfile_writable (GKeyfileSettingsBackend *kfsb)
 }
 
 static void
-g_keyfile_settings_backend_finalize (xobject_t *object)
+xkeyfile_settings_backend_finalize (xobject_t *object)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (object);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (object);
 
   xkey_file_free (kfsb->keyfile);
   xobject_unref (kfsb->permission);
@@ -624,11 +624,11 @@ g_keyfile_settings_backend_finalize (xobject_t *object)
   g_free (kfsb->root_group);
   g_free (kfsb->prefix);
 
-  G_OBJECT_CLASS (g_keyfile_settings_backend_parent_class)->finalize (object);
+  XOBJECT_CLASS (xkeyfile_settings_backend_parent_class)->finalize (object);
 }
 
 static void
-g_keyfile_settings_backend_init (GKeyfileSettingsBackend *kfsb)
+xkeyfile_settings_backend_init (xkeyfile_settings_backend_t *kfsb)
 {
 }
 
@@ -639,11 +639,11 @@ file_changed (xfile_monitor_t      *monitor,
               xfile_monitor_event_t  event_type,
               xpointer_t           user_data)
 {
-  GKeyfileSettingsBackend *kfsb = user_data;
+  xkeyfile_settings_backend_t *kfsb = user_data;
 
   /* Ignore file deletions, let the xkey_file_t content remain in tact. */
   if (event_type != XFILE_MONITOR_EVENT_DELETED)
-    g_keyfile_settings_backend_keyfile_reload (kfsb);
+    xkeyfile_settings_backend_keyfile_reload (kfsb);
 }
 
 static void
@@ -653,13 +653,13 @@ dir_changed (xfile_monitor_t       *monitor,
               xfile_monitor_event_t  event_type,
               xpointer_t           user_data)
 {
-  GKeyfileSettingsBackend *kfsb = user_data;
+  xkeyfile_settings_backend_t *kfsb = user_data;
 
-  g_keyfile_settings_backend_keyfile_writable (kfsb);
+  xkeyfile_settings_backend_keyfile_writable (kfsb);
 }
 
 static void
-load_system_settings (GKeyfileSettingsBackend *kfsb)
+load_system_settings (xkeyfile_settings_backend_t *kfsb)
 {
   xerror_t *error = NULL;
   const char *dir = "/etc/glib-2.0/settings";
@@ -728,9 +728,9 @@ load_system_settings (GKeyfileSettingsBackend *kfsb)
 }
 
 static void
-g_keyfile_settings_backend_constructed (xobject_t *object)
+xkeyfile_settings_backend_constructed (xobject_t *object)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (object);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (object);
   xerror_t *error = NULL;
   const char *path;
 
@@ -783,32 +783,32 @@ g_keyfile_settings_backend_constructed (xobject_t *object)
 
   compute_checksum (kfsb->digest, NULL, 0);
 
-  g_keyfile_settings_backend_keyfile_writable (kfsb);
-  g_keyfile_settings_backend_keyfile_reload (kfsb);
+  xkeyfile_settings_backend_keyfile_writable (kfsb);
+  xkeyfile_settings_backend_keyfile_reload (kfsb);
 
   load_system_settings (kfsb);
 }
 
 static void
-g_keyfile_settings_backend_set_property (xobject_t      *object,
+xkeyfile_settings_backend_set_property (xobject_t      *object,
                                          xuint_t         prop_id,
                                          const xvalue_t *value,
                                          xparam_spec_t   *pspec)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (object);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (object);
 
-  switch ((GKeyfileSettingsBackendProperty)prop_id)
+  switch ((xkeyfile_settings_backend_property_t)prop_id)
     {
     case PROP_FILENAME:
       /* Construct only. */
-      g_assert (kfsb->file == NULL);
+      xassert (kfsb->file == NULL);
       if (xvalue_get_string (value))
         kfsb->file = xfile_new_for_path (xvalue_get_string (value));
       break;
 
     case PROP_ROOT_PATH:
       /* Construct only. */
-      g_assert (kfsb->prefix == NULL);
+      xassert (kfsb->prefix == NULL);
       kfsb->prefix = xvalue_dup_string (value);
       if (kfsb->prefix)
         kfsb->prefix_len = strlen (kfsb->prefix);
@@ -816,7 +816,7 @@ g_keyfile_settings_backend_set_property (xobject_t      *object,
 
     case PROP_ROOT_GROUP:
       /* Construct only. */
-      g_assert (kfsb->root_group == NULL);
+      xassert (kfsb->root_group == NULL);
       kfsb->root_group = xvalue_dup_string (value);
       if (kfsb->root_group)
         kfsb->root_group_len = strlen (kfsb->root_group);
@@ -824,7 +824,7 @@ g_keyfile_settings_backend_set_property (xobject_t      *object,
 
     case PROP_DEFAULTS_DIR:
       /* Construct only. */
-      g_assert (kfsb->defaults_dir == NULL);
+      xassert (kfsb->defaults_dir == NULL);
       kfsb->defaults_dir = xvalue_dup_string (value);
       break;
 
@@ -835,14 +835,14 @@ g_keyfile_settings_backend_set_property (xobject_t      *object,
 }
 
 static void
-g_keyfile_settings_backend_get_property (xobject_t    *object,
+xkeyfile_settings_backend_get_property (xobject_t    *object,
                                          xuint_t       prop_id,
                                          xvalue_t     *value,
                                          xparam_spec_t *pspec)
 {
-  GKeyfileSettingsBackend *kfsb = G_KEYFILE_SETTINGS_BACKEND (object);
+  xkeyfile_settings_backend_t *kfsb = XKEYFILE_SETTINGS_BACKEND (object);
 
-  switch ((GKeyfileSettingsBackendProperty)prop_id)
+  switch ((xkeyfile_settings_backend_property_t)prop_id)
     {
     case PROP_FILENAME:
       xvalue_set_string (value, xfile_peek_path (kfsb->file));
@@ -867,28 +867,28 @@ g_keyfile_settings_backend_get_property (xobject_t    *object,
 }
 
 static void
-g_keyfile_settings_backend_class_init (GKeyfileSettingsBackendClass *class)
+xkeyfile_settings_backend_class_init (xkeyfile_settings_backend_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
-  object_class->finalize = g_keyfile_settings_backend_finalize;
-  object_class->constructed = g_keyfile_settings_backend_constructed;
-  object_class->get_property = g_keyfile_settings_backend_get_property;
-  object_class->set_property = g_keyfile_settings_backend_set_property;
+  object_class->finalize = xkeyfile_settings_backend_finalize;
+  object_class->constructed = xkeyfile_settings_backend_constructed;
+  object_class->get_property = xkeyfile_settings_backend_get_property;
+  object_class->set_property = xkeyfile_settings_backend_set_property;
 
-  class->read = g_keyfile_settings_backend_read;
-  class->write = g_keyfile_settings_backend_write;
-  class->write_tree = g_keyfile_settings_backend_write_tree;
-  class->reset = g_keyfile_settings_backend_reset;
-  class->get_writable = g_keyfile_settings_backend_get_writable;
-  class->get_permission = g_keyfile_settings_backend_get_permission;
+  class->read = xkeyfile_settings_backend_read;
+  class->write = xkeyfile_settings_backend_write;
+  class->write_tree = xkeyfile_settings_backend_write_tree;
+  class->reset = xkeyfile_settings_backend_reset;
+  class->get_writable = xkeyfile_settings_backend_get_writable;
+  class->get_permission = xkeyfile_settings_backend_get_permission;
   /* No need to implement subscribed/unsubscribe: the only point would be to
    * stop monitoring the file when there's no xsettings_t anymore, which is no
    * big win.
    */
 
   /**
-   * GKeyfileSettingsBackend:filename:
+   * xkeyfile_settings_backend_t:filename:
    *
    * The location where the settings are stored on disk.
    *
@@ -896,15 +896,15 @@ g_keyfile_settings_backend_class_init (GKeyfileSettingsBackendClass *class)
    */
   xobject_class_install_property (object_class,
                                    PROP_FILENAME,
-                                   g_param_spec_string ("filename",
+                                   xparam_spec_string ("filename",
                                                         P_("Filename"),
                                                         P_("The filename"),
                                                         NULL,
-                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
-   * GKeyfileSettingsBackend:root-path:
+   * xkeyfile_settings_backend_t:root-path:
    *
    * All settings read to or written from the backend must fall under the
    * path given in @root_path (which must start and end with a slash and
@@ -914,15 +914,15 @@ g_keyfile_settings_backend_class_init (GKeyfileSettingsBackendClass *class)
    */
   xobject_class_install_property (object_class,
                                    PROP_ROOT_PATH,
-                                   g_param_spec_string ("root-path",
+                                   xparam_spec_string ("root-path",
                                                         P_("Root path"),
                                                         P_("The root path"),
                                                         NULL,
-                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
-   * GKeyfileSettingsBackend:root-group:
+   * xkeyfile_settings_backend_t:root-group:
    *
    * If @root_group is non-%NULL then it specifies the name of the keyfile
    * group used for keys that are written directly below the root path.
@@ -931,15 +931,15 @@ g_keyfile_settings_backend_class_init (GKeyfileSettingsBackendClass *class)
    */
   xobject_class_install_property (object_class,
                                    PROP_ROOT_GROUP,
-                                   g_param_spec_string ("root-group",
+                                   xparam_spec_string ("root-group",
                                                         P_("Root group"),
                                                         P_("The root group"),
                                                         NULL,
-                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
-   * GKeyfileSettingsBackend:default-dir:
+   * xkeyfile_settings_backend_t:default-dir:
    *
    * The directory where the system defaults and locks are located.
    *
@@ -947,16 +947,16 @@ g_keyfile_settings_backend_class_init (GKeyfileSettingsBackendClass *class)
    */
   xobject_class_install_property (object_class,
                                    PROP_DEFAULTS_DIR,
-                                   g_param_spec_string ("defaults-dir",
+                                   xparam_spec_string ("defaults-dir",
                                                         P_("Default dir"),
                                                         P_("Defaults dir"),
                                                         NULL,
-                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 }
 
 /**
- * g_keyfile_settings_backend_new:
+ * xkeyfile_settings_backend_new:
  * @filename: the filename of the keyfile
  * @root_path: the path under which all settings keys appear
  * @root_group: (nullable): the group name corresponding to
@@ -1008,22 +1008,22 @@ g_keyfile_settings_backend_class_init (GKeyfileSettingsBackendClass *class)
  * trouble.
  *
  * The backend reads default values from a keyfile called `defaults` in
- * the directory specified by the #GKeyfileSettingsBackend:defaults-dir property,
+ * the directory specified by the #xkeyfile_settings_backend_t:defaults-dir property,
  * and a list of locked keys from a text file with the name `locks` in
  * the same location.
  *
  * Returns: (transfer full): a keyfile-backed #xsettings_backend_t
  **/
 xsettings_backend_t *
-g_keyfile_settings_backend_new (const xchar_t *filename,
+xkeyfile_settings_backend_new (const xchar_t *filename,
                                 const xchar_t *root_path,
                                 const xchar_t *root_group)
 {
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (root_path != NULL, NULL);
-  g_return_val_if_fail (xstr_has_prefix (root_path, "/"), NULL);
-  g_return_val_if_fail (xstr_has_suffix (root_path, "/"), NULL);
-  g_return_val_if_fail (strstr (root_path, "//") == NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (root_path != NULL, NULL);
+  xreturn_val_if_fail (xstr_has_prefix (root_path, "/"), NULL);
+  xreturn_val_if_fail (xstr_has_suffix (root_path, "/"), NULL);
+  xreturn_val_if_fail (strstr (root_path, "//") == NULL, NULL);
 
   return G_SETTINGS_BACKEND (xobject_new (XTYPE_KEYFILE_SETTINGS_BACKEND,
                                            "filename", filename,

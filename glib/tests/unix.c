@@ -37,7 +37,7 @@ test_pipe (void)
   xboolean_t res;
 
   res = g_unix_open_pipe (pipefd, FD_CLOEXEC, &error);
-  g_assert (res);
+  xassert (res);
   g_assert_no_error (error);
 
   write (pipefd[1], "hello", sizeof ("hello"));
@@ -49,7 +49,7 @@ test_pipe (void)
   close (pipefd[0]);
   close (pipefd[1]);
 
-  g_assert (xstr_has_prefix (buf, "hello"));
+  xassert (xstr_has_prefix (buf, "hello"));
 }
 
 static void
@@ -60,7 +60,7 @@ test_error (void)
 
   res = g_unix_set_fd_nonblocking (123456, TRUE, &error);
   g_assert_cmpint (errno, ==, EBADF);
-  g_assert (!res);
+  xassert (!res);
   g_assert_error (error, G_UNIX_ERROR, 0);
   g_clear_error (&error);
 }
@@ -74,24 +74,24 @@ test_nonblocking (void)
   int flags;
 
   res = g_unix_open_pipe (pipefd, FD_CLOEXEC, &error);
-  g_assert (res);
+  xassert (res);
   g_assert_no_error (error);
 
   res = g_unix_set_fd_nonblocking (pipefd[0], TRUE, &error);
-  g_assert (res);
+  xassert (res);
   g_assert_no_error (error);
 
   flags = fcntl (pipefd[0], F_GETFL);
   g_assert_cmpint (flags, !=, -1);
-  g_assert (flags & O_NONBLOCK);
+  xassert (flags & O_NONBLOCK);
 
   res = g_unix_set_fd_nonblocking (pipefd[0], FALSE, &error);
-  g_assert (res);
+  xassert (res);
   g_assert_no_error (error);
 
   flags = fcntl (pipefd[0], F_GETFL);
   g_assert_cmpint (flags, !=, -1);
-  g_assert (!(flags & O_NONBLOCK));
+  xassert (!(flags & O_NONBLOCK));
 
   close (pipefd[0]);
   close (pipefd[1]);
@@ -108,7 +108,7 @@ on_sig_received (xpointer_t user_data)
   xmain_loop_quit (loop);
   sig_received = TRUE;
   sig_counter ++;
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -117,7 +117,7 @@ on_sig_timeout (xpointer_t data)
   xmain_loop_t *loop = data;
   xmain_loop_quit (loop);
   sig_timeout = TRUE;
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -125,7 +125,7 @@ exit_mainloop (xpointer_t data)
 {
   xmain_loop_t *loop = data;
   xmain_loop_quit (loop);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -136,7 +136,7 @@ on_sig_received_2 (xpointer_t data)
   sig_counter ++;
   if (sig_counter == 2)
     xmain_loop_quit (loop);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -151,17 +151,17 @@ test_signal (int signum)
   sig_counter = 0;
   g_unix_signal_add (signum, on_sig_received, mainloop);
   kill (getpid (), signum);
-  g_assert (!sig_received);
+  xassert (!sig_received);
   id = g_timeout_add (5000, on_sig_timeout, mainloop);
   xmain_loop_run (mainloop);
-  g_assert (sig_received);
+  xassert (sig_received);
   sig_received = FALSE;
   xsource_remove (id);
 
   /* Ensure we don't get double delivery */
   g_timeout_add (500, exit_mainloop, mainloop);
   xmain_loop_run (mainloop);
-  g_assert (!sig_received);
+  xassert (!sig_received);
 
   /* Ensure that two sources for the same signal get it */
   sig_counter = 0;
@@ -200,7 +200,7 @@ test_sighup_add_remove (void)
   xsource_remove (id);
 
   sigaction (SIGHUP, NULL, &action);
-  g_assert (action.sa_handler == SIG_DFL);
+  xassert (action.sa_handler == SIG_DFL);
 }
 
 static xboolean_t
@@ -225,7 +225,7 @@ nested_idle (xpointer_t data)
   xmain_loop_unref (nested);
   xmain_context_unref (context);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void

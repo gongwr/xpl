@@ -156,8 +156,8 @@ command_line (xapplication_t            *application,
                         NULL);
 
           data = xapplication_command_line_get_platform_data (cmdline);
-          g_assert (remote);
-          g_assert (xvariant_is_of_type (data, G_VARIANT_TYPE ("a{sv}")));
+          xassert (remote);
+          xassert (xvariant_is_of_type (data, G_VARIANT_TYPE ("a{sv}")));
           xvariant_unref (data);
           g_print ("properties ok\n");
         }
@@ -181,7 +181,7 @@ command_line (xapplication_t            *application,
 
           stream = xapplication_command_line_get_stdin (cmdline);
 
-          g_assert (stream == NULL || X_IS_INPUT_STREAM (stream));
+          xassert (stream == NULL || X_IS_INPUT_STREAM (stream));
           xobject_unref (stream);
 
           g_print ("stdin ok\n");
@@ -233,7 +233,7 @@ action_cb (xpointer_t data)
       xapplication_release (app);
     }
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 int
@@ -242,7 +242,7 @@ main (int argc, char **argv)
   xapplication_t *app;
   int status;
 
-  app = xapplication_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.test_application_t",
                            G_APPLICATION_SEND_ENVIRONMENT |
                            (xstrcmp0 (argv[1], "./cmd") == 0
                              ? G_APPLICATION_HANDLES_COMMAND_LINE

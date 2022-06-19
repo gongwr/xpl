@@ -125,7 +125,7 @@ G_DEFINE_TYPE_WITH_CODE (GTestTlsCertificate, g_test_tls_certificate, XTYPE_TLS_
 			 G_IMPLEMENT_INTERFACE (XTYPE_INITABLE,
 						g_test_tls_certificate_initable_iface_init))
 
-static GTlsCertificateFlags
+static xtls_certificate_flags_t
 g_test_tls_certificate_verify (xtls_certificate_t     *cert,
                                xsocket_connectable_t  *identity,
                                xtls_certificate_t     *trusted_ca)
@@ -238,34 +238,34 @@ g_test_tls_certificate_finalize (xobject_t *object)
   g_free (cert->private_key_pkcs11_uri);
   g_clear_object (&cert->issuer);
 
-  G_OBJECT_CLASS (g_test_tls_certificate_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_test_tls_certificate_parent_class)->finalize (object);
 }
 
 static void
 g_test_tls_certificate_class_init (GTestTlsCertificateClass *test_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (test_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (test_class);
   GTlsCertificateClass *certificate_class = G_TLS_CERTIFICATE_CLASS (test_class);
 
-  gobject_class->get_property = g_test_tls_certificate_get_property;
-  gobject_class->set_property = g_test_tls_certificate_set_property;
-  gobject_class->finalize = g_test_tls_certificate_finalize;
+  xobject_class->get_property = g_test_tls_certificate_get_property;
+  xobject_class->set_property = g_test_tls_certificate_set_property;
+  xobject_class->finalize = g_test_tls_certificate_finalize;
 
   certificate_class->verify = g_test_tls_certificate_verify;
 
-  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE, "certificate");
-  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
-  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
-  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
-  xobject_class_override_property (gobject_class, PROP_CERT_ISSUER, "issuer");
-  xobject_class_override_property (gobject_class, PROP_CERT_PKCS11_URI, "pkcs11-uri");
-  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PKCS11_URI, "private-key-pkcs11-uri");
-  xobject_class_override_property (gobject_class, PROP_CERT_NOT_VALID_BEFORE, "not-valid-before");
-  xobject_class_override_property (gobject_class, PROP_CERT_NOT_VALID_AFTER, "not-valid-after");
-  xobject_class_override_property (gobject_class, PROP_CERT_SUBJECT_NAME, "subject-name");
-  xobject_class_override_property (gobject_class, PROP_CERT_ISSUER_NAME, "issuer-name");
-  xobject_class_override_property (gobject_class, PROP_CERT_DNS_NAMES, "dns-names");
-  xobject_class_override_property (gobject_class, PROP_CERT_IP_ADDRESSES, "ip-addresses");
+  xobject_class_override_property (xobject_class, PROP_CERT_CERTIFICATE, "certificate");
+  xobject_class_override_property (xobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
+  xobject_class_override_property (xobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
+  xobject_class_override_property (xobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
+  xobject_class_override_property (xobject_class, PROP_CERT_ISSUER, "issuer");
+  xobject_class_override_property (xobject_class, PROP_CERT_PKCS11_URI, "pkcs11-uri");
+  xobject_class_override_property (xobject_class, PROP_CERT_PRIVATE_KEY_PKCS11_URI, "private-key-pkcs11-uri");
+  xobject_class_override_property (xobject_class, PROP_CERT_NOT_VALID_BEFORE, "not-valid-before");
+  xobject_class_override_property (xobject_class, PROP_CERT_NOT_VALID_AFTER, "not-valid-after");
+  xobject_class_override_property (xobject_class, PROP_CERT_SUBJECT_NAME, "subject-name");
+  xobject_class_override_property (xobject_class, PROP_CERT_ISSUER_NAME, "issuer-name");
+  xobject_class_override_property (xobject_class, PROP_CERT_DNS_NAMES, "dns-names");
+  xobject_class_override_property (xobject_class, PROP_CERT_IP_ADDRESSES, "ip-addresses");
 }
 
 static void
@@ -358,11 +358,11 @@ g_test_tls_connection_close (xio_stream_t     *stream,
 static void
 g_test_tls_connection_class_init (GTestTlsConnectionClass *connection_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (connection_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (connection_class);
   xio_stream_class_t *io_stream_class = XIO_STREAM_CLASS (connection_class);
 
-  gobject_class->get_property = g_test_tls_connection_get_property;
-  gobject_class->set_property = g_test_tls_connection_set_property;
+  xobject_class->get_property = g_test_tls_connection_get_property;
+  xobject_class->set_property = g_test_tls_connection_set_property;
 
   /* Need to override this because when initable_init fails it will
    * dispose the connection, which will close it, which would
@@ -371,19 +371,19 @@ g_test_tls_connection_class_init (GTestTlsConnectionClass *connection_class)
    */
   io_stream_class->close_fn = g_test_tls_connection_close;
 
-  xobject_class_override_property (gobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
-  xobject_class_override_property (gobject_class, PROP_CONN_BASE_SOCKET, "base-socket");
-  xobject_class_override_property (gobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
-  xobject_class_override_property (gobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
-  xobject_class_override_property (gobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
-  xobject_class_override_property (gobject_class, PROP_CONN_CERTIFICATE, "certificate");
-  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
-  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
-  xobject_class_override_property (gobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
-  xobject_class_override_property (gobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
-  xobject_class_override_property (gobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
-  xobject_class_override_property (gobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
-  xobject_class_override_property (gobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
+  xobject_class_override_property (xobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
+  xobject_class_override_property (xobject_class, PROP_CONN_BASE_SOCKET, "base-socket");
+  xobject_class_override_property (xobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
+  xobject_class_override_property (xobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
+  xobject_class_override_property (xobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
+  xobject_class_override_property (xobject_class, PROP_CONN_CERTIFICATE, "certificate");
+  xobject_class_override_property (xobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
+  xobject_class_override_property (xobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
+  xobject_class_override_property (xobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
+  xobject_class_override_property (xobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
+  xobject_class_override_property (xobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
+  xobject_class_override_property (xobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
+  xobject_class_override_property (xobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
 }
 
 static void
@@ -482,19 +482,19 @@ g_test_tls_database_finalize (xobject_t *object)
 
   g_free (db->anchors);
 
-  G_OBJECT_CLASS (g_test_tls_database_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_test_tls_database_parent_class)->finalize (object);
 }
 
 static void
 g_test_tls_database_class_init (GTestTlsDatabaseClass *test_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (test_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (test_class);
 
-  gobject_class->get_property = g_test_tls_database_get_property;
-  gobject_class->set_property = g_test_tls_database_set_property;
-  gobject_class->finalize = g_test_tls_database_finalize;
+  xobject_class->get_property = g_test_tls_database_get_property;
+  xobject_class->set_property = g_test_tls_database_set_property;
+  xobject_class->finalize = g_test_tls_database_finalize;
 
-  xobject_class_override_property (gobject_class, PROP_DATABASE_ANCHORS, "anchors");
+  xobject_class_override_property (xobject_class, PROP_DATABASE_ANCHORS, "anchors");
 }
 
 static void

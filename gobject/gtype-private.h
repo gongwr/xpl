@@ -68,7 +68,7 @@ void    _xenum_types_init       (void); /* sync with genums.c */
 void    _g_param_type_init       (void); /* sync with gparam.c */
 void    _xboxed_type_init       (void); /* sync with gboxed.c */
 void    _xobject_type_init      (void); /* sync with gobject.c */
-void    _g_param_spec_types_init (void); /* sync with gparamspecs.c */
+void    _xparam_spec_types_init (void); /* sync with gparamspecs.c */
 void    _xvalue_transforms_init (void); /* sync with gvaluetransform.c */
 void    _xsignal_init           (void); /* sync with gsignal.c */
 

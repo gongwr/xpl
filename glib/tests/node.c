@@ -201,11 +201,11 @@ traversal_test (void)
   node_E = node_D->next;
 
   n = g_node_last_sibling (node_C);
-  g_assert (n == node_E);
+  xassert (n == node_E);
   n = g_node_last_sibling (node_D);
-  g_assert (n == node_E);
+  xassert (n == node_E);
   n = g_node_last_sibling (node_E);
-  g_assert (n == node_E);
+  xassert (n == node_E);
 
   data.s = xstring_new ("");
   for (i = 0; i < G_N_ELEMENTS (orders); i++)
@@ -265,7 +265,7 @@ construct_test (void)
 
   node_B = g_node_new (GINT_TO_POINTER ('B'));
   g_node_append (root, node_B);
-  g_assert (root->children == node_B);
+  xassert (root->children == node_B);
 
   g_node_append_data (node_B, GINT_TO_POINTER ('E'));
   g_node_prepend_data (node_B, GINT_TO_POINTER ('C'));
@@ -274,7 +274,7 @@ construct_test (void)
 
   node_F = g_node_new (GINT_TO_POINTER ('F'));
   g_node_append (root, node_F);
-  g_assert (root->children->next == node_F);
+  xassert (root->children->next == node_F);
 
   node_G = g_node_new (GINT_TO_POINTER ('G'));
   g_node_append (node_F, node_G);
@@ -301,11 +301,11 @@ construct_test (void)
   g_assert_cmpint (g_node_n_nodes (root, G_TRAVERSE_ALL), ==, 11);
   g_assert_cmpint (g_node_max_height (node_F), ==, 3);
   g_assert_cmpint (g_node_n_children (node_G), ==, 4);
-  g_assert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('F')) == node_F);
-  g_assert (g_node_find_child (node_G, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('H')) == node_H);
-  g_assert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('H')) == NULL);
-  g_assert (g_node_find (root, G_LEVEL_ORDER, G_TRAVERSE_NON_LEAFS, GINT_TO_POINTER ('I')) == NULL);
-  g_assert (g_node_find (root, G_IN_ORDER, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('J')) == node_J);
+  xassert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('F')) == node_F);
+  xassert (g_node_find_child (node_G, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('H')) == node_H);
+  xassert (g_node_find_child (root, G_TRAVERSE_ALL, GINT_TO_POINTER ('H')) == NULL);
+  xassert (g_node_find (root, G_LEVEL_ORDER, G_TRAVERSE_NON_LEAFS, GINT_TO_POINTER ('I')) == NULL);
+  xassert (g_node_find (root, G_IN_ORDER, G_TRAVERSE_LEAFS, GINT_TO_POINTER ('J')) == node_J);
 
   for (i = 0; i < g_node_n_children (node_B); i++)
     {
@@ -362,13 +362,13 @@ misc_test (void)
   node_E = g_node_new (GINT_TO_POINTER ('E'));
   g_node_append (node_C, node_E);
 
-  g_assert (g_node_get_root (node_E) == root);
-  g_assert (g_node_is_ancestor (root, node_B));
-  g_assert (g_node_is_ancestor (root, node_E));
-  g_assert (!g_node_is_ancestor (node_B, node_D));
-  g_assert (g_node_first_sibling (node_D) == node_B);
-  g_assert (g_node_first_sibling (node_E) == node_E);
-  g_assert (g_node_first_sibling (root) == root);
+  xassert (g_node_get_root (node_E) == root);
+  xassert (g_node_is_ancestor (root, node_B));
+  xassert (g_node_is_ancestor (root, node_E));
+  xassert (!g_node_is_ancestor (node_B, node_D));
+  xassert (g_node_first_sibling (node_D) == node_B);
+  xassert (g_node_first_sibling (node_E) == node_E);
+  xassert (g_node_first_sibling (root) == root);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('B')), ==, 0);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('C')), ==, 1);
   g_assert_cmpint (g_node_child_index (root, GINT_TO_POINTER ('D')), ==, 2);

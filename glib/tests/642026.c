@@ -75,7 +75,7 @@ testcase (void)
       g_atomic_int_set (&freed, 0);
 
       t1 = xthread_create (thread_func, NULL, TRUE, NULL);
-      g_assert (t1 != NULL);
+      xassert (t1 != NULL);
 
       /* wait for t1 to set up its thread-private data */
       g_cond_wait (cond, mutex);

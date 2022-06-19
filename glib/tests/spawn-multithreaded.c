@@ -306,7 +306,7 @@ on_child_exited (xpid_t     pid,
   if (data->child_exited && data->stdout_done)
     xmain_loop_quit (data->loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -426,9 +426,9 @@ main (int   argc,
   sleep_prog_path = g_build_filename (dirname, "test-spawn-sleep" EXEEXT, NULL);
   g_free (dirname);
 
-  g_assert (xfile_test (echo_prog_path, XFILE_TEST_EXISTS));
+  xassert (xfile_test (echo_prog_path, XFILE_TEST_EXISTS));
 #ifdef G_OS_WIN32
-  g_assert (xfile_test (sleep_prog_path, XFILE_TEST_EXISTS));
+  xassert (xfile_test (sleep_prog_path, XFILE_TEST_EXISTS));
 #endif
 
   g_test_add_func ("/gthread/spawn-childs", test_spawn_childs);

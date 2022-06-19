@@ -137,14 +137,14 @@ static void
 dynamic_object_class_init (dynamic_object_class_t *class)
 {
   class->val = 42;
-  g_assert (loaded == FALSE);
+  xassert (loaded == FALSE);
   loaded = TRUE;
 }
 
 static void
 dynamic_object_class_finalize (dynamic_object_class_t *class)
 {
-  g_assert (loaded == TRUE);
+  xassert (loaded == TRUE);
   loaded = FALSE;
 }
 
@@ -200,12 +200,12 @@ test_multithreaded_dynamic_type_init (void)
   xuint_t i;
 
   module = test_module_new (module_register);
-  g_assert (module != NULL);
+  xassert (module != NULL);
 
   /* Not loaded until we call ref for the first time */
   class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
-  g_assert (class == NULL);
-  g_assert (!loaded);
+  xassert (class == NULL);
+  xassert (!loaded);
 
   /* pause newly created threads */
   g_mutex_lock (&sync_mutex);
@@ -264,7 +264,7 @@ static void
 dyn_iface_default_init (dyn_iface_interface_t *iface)
 {
   xobject_interface_install_property (iface,
-    g_param_spec_int ("foo", NULL, NULL, 0, 100, 0, G_PARAM_READWRITE));
+    xparam_spec_int ("foo", NULL, NULL, 0, 100, 0, XPARAM_READWRITE));
 }
 
 static void
@@ -319,7 +319,7 @@ get_prop (xobject_t    *object,
 static void
 dyn_obj_class_init (dyn_obj_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->set_property = set_prop;
   object_class->get_property = get_prop;
@@ -346,7 +346,7 @@ test_dynamic_interface_properties (void)
   xint_t val;
 
   module = test_module_new (mod_register);
-  g_assert (module != NULL);
+  xassert (module != NULL);
 
   obj = xobject_new (dyn_obj_get_type (), "foo", 1, NULL);
   xobject_get (obj, "foo", &val, NULL);

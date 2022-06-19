@@ -192,7 +192,7 @@ compare_items (xconstpointer a_p,
   xchar_t *a = xobject_get_data (a_o, "key");
   xchar_t *b = xobject_get_data (b_o, "key");
 
-  g_assert (user_data == GUINT_TO_POINTER(0x1234u));
+  xassert (user_data == GUINT_TO_POINTER(0x1234u));
 
   return strcmp (a, b);
 }
@@ -237,19 +237,19 @@ test_store_sorted (void)
       a = list_model_get (XLIST_MODEL (store), i * 2);
       b = list_model_get (XLIST_MODEL (store), i * 2 + 1);
 
-      g_assert (compare_items (a, b, GUINT_TO_POINTER(0x1234)) == 0);
-      g_assert (a != b);
+      xassert (compare_items (a, b, GUINT_TO_POINTER(0x1234)) == 0);
+      xassert (a != b);
 
       if (i)
         {
           xobject_t *c;
 
           c = list_model_get (XLIST_MODEL (store), i * 2 - 1);
-          g_assert (c != a);
-          g_assert (c != b);
+          xassert (c != a);
+          xassert (c != b);
 
-          g_assert (compare_items (b, c, GUINT_TO_POINTER(0x1234)) > 0);
-          g_assert (compare_items (a, c, GUINT_TO_POINTER(0x1234)) > 0);
+          xassert (compare_items (b, c, GUINT_TO_POINTER(0x1234)) > 0);
+          xassert (compare_items (a, c, GUINT_TO_POINTER(0x1234)) > 0);
 
           xobject_unref (c);
         }
@@ -516,7 +516,7 @@ test_store_item_type (void)
 
   store = xlist_store_new (XTYPE_SIMPLE_ACTION);
   gtype = xlist_model_get_item_type (XLIST_MODEL (store));
-  g_assert (gtype == XTYPE_SIMPLE_ACTION);
+  xassert (gtype == XTYPE_SIMPLE_ACTION);
 
   xobject_unref (store);
 }
@@ -638,30 +638,30 @@ test_store_get_item_cache (void)
 
   /* Access the same position twice */
   temp = list_model_get (model, 1);
-  g_assert (temp == item2);
+  xassert (temp == item2);
   xobject_unref (temp);
   temp = list_model_get (model, 1);
-  g_assert (temp == item2);
+  xassert (temp == item2);
   xobject_unref (temp);
 
   g_assert_null (list_model_get (model, 42));
 
   /* Access forwards */
   temp = list_model_get (model, 0);
-  g_assert (temp == item1);
+  xassert (temp == item1);
   xobject_unref (temp);
   temp = list_model_get (model, 1);
-  g_assert (temp == item2);
+  xassert (temp == item2);
   xobject_unref (temp);
 
   g_assert_null (list_model_get (model, 42));
 
   /* Access backwards */
   temp = list_model_get (model, 1);
-  g_assert (temp == item2);
+  xassert (temp == item2);
   xobject_unref (temp);
   temp = list_model_get (model, 0);
-  g_assert (temp == item1);
+  xassert (temp == item1);
   xobject_unref (temp);
 
   xobject_unref (item1);

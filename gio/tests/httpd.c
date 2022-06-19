@@ -45,11 +45,11 @@ handler (xthreaded_socket_service_t *service,
   in = g_io_stream_get_input_stream (XIO_STREAM (connection));
   out = g_io_stream_get_output_stream (XIO_STREAM (connection));
 
-  data = g_data_input_stream_new (in);
+  data = xdata_input_stream_new (in);
   /* Be tolerant of input */
-  g_data_input_stream_set_newline_type (data, G_DATA_STREAM_NEWLINE_TYPE_ANY);
+  xdata_input_stream_set_newline_type (data, G_DATA_STREAM_NEWLINE_TYPE_ANY);
 
-  line = g_data_input_stream_read_line (data, NULL, NULL, NULL);
+  line = xdata_input_stream_read_line (data, NULL, NULL, NULL);
 
   if (line == NULL)
     {

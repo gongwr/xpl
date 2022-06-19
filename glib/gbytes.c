@@ -93,7 +93,7 @@ xbytes_t *
 xbytes_new (xconstpointer data,
              xsize_t         size)
 {
-  g_return_val_if_fail (data != NULL || size == 0, NULL);
+  xreturn_val_if_fail (data != NULL || size == 0, NULL);
 
   return xbytes_new_take (g_memdup2 (data, size), size);
 }
@@ -181,7 +181,7 @@ xbytes_new_with_free_func (xconstpointer  data,
 {
   xbytes_t *bytes;
 
-  g_return_val_if_fail (data != NULL || size == 0, NULL);
+  xreturn_val_if_fail (data != NULL || size == 0, NULL);
 
   bytes = g_slice_new (xbytes_t);
   bytes->data = data;
@@ -223,9 +223,9 @@ xbytes_new_from_bytes (xbytes_t  *bytes,
   xchar_t *base;
 
   /* Note that length may be 0. */
-  g_return_val_if_fail (bytes != NULL, NULL);
-  g_return_val_if_fail (offset <= bytes->size, NULL);
-  g_return_val_if_fail (offset + length <= bytes->size, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (offset <= bytes->size, NULL);
+  xreturn_val_if_fail (offset + length <= bytes->size, NULL);
 
   /* Avoid an extra xbytes_t if all bytes were requested */
   if (offset == 0 && length == bytes->size)
@@ -239,10 +239,10 @@ xbytes_new_from_bytes (xbytes_t  *bytes,
   while (bytes->free_func == (xpointer_t)xbytes_unref)
     bytes = bytes->user_data;
 
-  g_return_val_if_fail (bytes != NULL, NULL);
-  g_return_val_if_fail (base >= (xchar_t *)bytes->data, NULL);
-  g_return_val_if_fail (base <= (xchar_t *)bytes->data + bytes->size, NULL);
-  g_return_val_if_fail (base + length <= (xchar_t *)bytes->data + bytes->size, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (base >= (xchar_t *)bytes->data, NULL);
+  xreturn_val_if_fail (base <= (xchar_t *)bytes->data + bytes->size, NULL);
+  xreturn_val_if_fail (base + length <= (xchar_t *)bytes->data + bytes->size, NULL);
 
   return xbytes_new_with_free_func (base, length,
                                      (xdestroy_notify_t)xbytes_unref, xbytes_ref (bytes));
@@ -270,7 +270,7 @@ xconstpointer
 xbytes_get_data (xbytes_t *bytes,
                   xsize_t *size)
 {
-  g_return_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
   if (size)
     *size = bytes->size;
   return bytes->data;
@@ -291,7 +291,7 @@ xbytes_get_data (xbytes_t *bytes,
 xsize_t
 xbytes_get_size (xbytes_t *bytes)
 {
-  g_return_val_if_fail (bytes != NULL, 0);
+  xreturn_val_if_fail (bytes != NULL, 0);
   return bytes->size;
 }
 
@@ -309,7 +309,7 @@ xbytes_get_size (xbytes_t *bytes)
 xbytes_t *
 xbytes_ref (xbytes_t *bytes)
 {
-  g_return_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
 
   g_atomic_ref_count_inc (&bytes->ref_count);
 
@@ -361,8 +361,8 @@ xbytes_equal (xconstpointer bytes1,
   const xbytes_t *b1 = bytes1;
   const xbytes_t *b2 = bytes2;
 
-  g_return_val_if_fail (bytes1 != NULL, FALSE);
-  g_return_val_if_fail (bytes2 != NULL, FALSE);
+  xreturn_val_if_fail (bytes1 != NULL, FALSE);
+  xreturn_val_if_fail (bytes2 != NULL, FALSE);
 
   return b1->size == b2->size &&
          (b1->size == 0 || memcmp (b1->data, b2->data, b1->size) == 0);
@@ -388,7 +388,7 @@ xbytes_hash (xconstpointer bytes)
   const signed char *p, *e;
   xuint32_t h = 5381;
 
-  g_return_val_if_fail (bytes != NULL, 0);
+  xreturn_val_if_fail (bytes != NULL, 0);
 
   for (p = (signed char *)a->data, e = (signed char *)a->data + a->size; p != e; p++)
     h = (h << 5) + h + *p;
@@ -426,8 +426,8 @@ xbytes_compare (xconstpointer bytes1,
   const xbytes_t *b2 = bytes2;
   xint_t ret;
 
-  g_return_val_if_fail (bytes1 != NULL, 0);
-  g_return_val_if_fail (bytes2 != NULL, 0);
+  xreturn_val_if_fail (bytes1 != NULL, 0);
+  xreturn_val_if_fail (bytes2 != NULL, 0);
 
   ret = memcmp (b1->data, b2->data, MIN (b1->size, b2->size));
   if (ret == 0 && b1->size != b2->size)
@@ -484,8 +484,8 @@ xbytes_unref_to_data (xbytes_t *bytes,
 {
   xpointer_t result;
 
-  g_return_val_if_fail (bytes != NULL, NULL);
-  g_return_val_if_fail (size != NULL, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (size != NULL, NULL);
 
   /*
    * Optimal path: if this is was the last reference, then we can return
@@ -533,7 +533,7 @@ xbytes_unref_to_array (xbytes_t *bytes)
   xpointer_t data;
   xsize_t size;
 
-  g_return_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
 
   data = xbytes_unref_to_data (bytes, &size);
   return xbyte_array_new_take (data, size);
@@ -580,7 +580,7 @@ xbytes_get_region (xbytes_t *bytes,
   xsize_t total_size;
   xsize_t end_offset;
 
-  g_return_val_if_fail (element_size > 0, NULL);
+  xreturn_val_if_fail (element_size > 0, NULL);
 
   /* No other assertion checks here.  If something is wrong then we will
    * simply crash (via NULL dereference or divide-by-zero).

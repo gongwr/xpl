@@ -388,7 +388,7 @@ array_remove_index (xconstpointer test_data)
   for (i = 0; i < garray->len; i++)
     {
       cur = g_array_index (garray, xint_t, i);
-      g_assert (cur != 1 &&  cur != 4 && cur != 23 && cur != 60);
+      xassert (cur != 1 &&  cur != 4 && cur != 23 && cur != 60);
       g_assert_cmpint (prev, <, cur);
       prev = cur;
     }
@@ -425,7 +425,7 @@ array_remove_index_fast (xconstpointer test_data)
   for (i = 0; i < garray->len; i++)
     {
       cur = g_array_index (garray, xint_t, i);
-      g_assert (cur != 1 &&  cur != 3 && cur != 21 && cur != 57);
+      xassert (cur != 1 &&  cur != 3 && cur != 21 && cur != 57);
       if (cur < 96)
         {
           g_assert_cmpint (prev, <, cur);
@@ -462,7 +462,7 @@ array_remove_range (xconstpointer test_data)
   for (i = 0; i < garray->len; i++)
     {
       cur = g_array_index (garray, xint_t, i);
-      g_assert (cur < 31 || cur > 34);
+      xassert (cur < 31 || cur > 34);
       g_assert_cmpint (prev, <, cur);
       prev = cur;
     }
@@ -495,7 +495,7 @@ array_ref_count (void)
 
   /* check we can ref, unref and still access the array */
   garray2 = g_array_ref (garray);
-  g_assert (garray == garray2);
+  xassert (garray == garray2);
   g_array_unref (garray2);
   for (i = 0; i < 100; i++)
     g_assert_cmpint (g_array_index (garray, xint_t, i), ==, (100 - i - 1));
@@ -941,14 +941,14 @@ pointer_array_add (void)
     xptr_array_add (gparray, GINT_TO_POINTER (i));
 
   for (i = 0; i < 10000; i++)
-    g_assert (xptr_array_index (gparray, i) == GINT_TO_POINTER (i));
+    xassert (xptr_array_index (gparray, i) == GINT_TO_POINTER (i));
 
   xptr_array_foreach (gparray, sum_up, &sum);
-  g_assert (sum == 49995000);
+  xassert (sum == 49995000);
 
   segment = xptr_array_free (gparray, FALSE);
   for (i = 0; i < 10000; i++)
-    g_assert (segment[i] == GINT_TO_POINTER (i));
+    xassert (segment[i] == GINT_TO_POINTER (i));
   g_free (segment);
 }
 
@@ -969,7 +969,7 @@ pointer_array_insert (void)
     }
 
   xptr_array_foreach (gparray, sum_up, &sum);
-  g_assert (sum == 49995000);
+  xassert (sum == 49995000);
 
   xptr_array_free (gparray, TRUE);
 }
@@ -988,13 +988,13 @@ pointer_array_ref_count (void)
 
   /* check we can ref, unref and still access the array */
   gparray2 = xptr_array_ref (gparray);
-  g_assert (gparray == gparray2);
+  xassert (gparray == gparray2);
   xptr_array_unref (gparray2);
   for (i = 0; i < 10000; i++)
-    g_assert (xptr_array_index (gparray, i) == GINT_TO_POINTER (i));
+    xassert (xptr_array_index (gparray, i) == GINT_TO_POINTER (i));
 
   xptr_array_foreach (gparray, sum_up, &sum);
-  g_assert (sum == 49995000);
+  xassert (sum == 49995000);
 
   /* gparray2 should be an empty valid xptr_array_t wrapper */
   gparray2 = xptr_array_ref (gparray);
@@ -1041,9 +1041,9 @@ pointer_array_free_func (void)
   g_assert_cmpint (num_free_func_invocations, ==, 2);
   s = xstrdup ("frob");
   xptr_array_add (gparray, s);
-  g_assert (xptr_array_remove (gparray, s));
-  g_assert (!xptr_array_remove (gparray, "nuun"));
-  g_assert (!xptr_array_remove_fast (gparray, "mlo"));
+  xassert (xptr_array_remove (gparray, s));
+  xassert (!xptr_array_remove (gparray, "nuun"));
+  xassert (!xptr_array_remove_fast (gparray, "mlo"));
   g_assert_cmpint (num_free_func_invocations, ==, 3);
   s = xstrdup ("frob");
   xptr_array_add (gparray, s);
@@ -1750,20 +1750,20 @@ byte_array_append (void)
 
   for (i = 0; i < 10000; i++)
     {
-      g_assert (gbarray->data[4*i] == 'a');
-      g_assert (gbarray->data[4*i+1] == 'b');
-      g_assert (gbarray->data[4*i+2] == 'c');
-      g_assert (gbarray->data[4*i+3] == 'd');
+      xassert (gbarray->data[4*i] == 'a');
+      xassert (gbarray->data[4*i+1] == 'b');
+      xassert (gbarray->data[4*i+2] == 'c');
+      xassert (gbarray->data[4*i+3] == 'd');
     }
 
   segment = xbyte_array_free (gbarray, FALSE);
 
   for (i = 0; i < 10000; i++)
     {
-      g_assert (segment[4*i] == 'a');
-      g_assert (segment[4*i+1] == 'b');
-      g_assert (segment[4*i+2] == 'c');
-      g_assert (segment[4*i+3] == 'd');
+      xassert (segment[4*i] == 'a');
+      xassert (segment[4*i+1] == 'b');
+      xassert (segment[4*i+2] == 'c');
+      xassert (segment[4*i+3] == 'd');
     }
 
   g_free (segment);
@@ -1783,10 +1783,10 @@ byte_array_prepend (void)
 
   for (i = 0; i < 10000; i++)
     {
-      g_assert (gbarray->data[4*i] == 'a');
-      g_assert (gbarray->data[4*i+1] == 'b');
-      g_assert (gbarray->data[4*i+2] == 'c');
-      g_assert (gbarray->data[4*i+3] == 'd');
+      xassert (gbarray->data[4*i] == 'a');
+      xassert (gbarray->data[4*i+1] == 'b');
+      xassert (gbarray->data[4*i+2] == 'c');
+      xassert (gbarray->data[4*i+3] == 'd');
     }
 
   xbyte_array_free (gbarray, TRUE);
@@ -1804,18 +1804,18 @@ byte_array_ref_count (void)
     xbyte_array_append (gbarray, (xuint8_t*) "abcd", 4);
 
   gbarray2 = xbyte_array_ref (gbarray);
-  g_assert (gbarray2 == gbarray);
+  xassert (gbarray2 == gbarray);
   xbyte_array_unref (gbarray2);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (gbarray->data[4*i] == 'a');
-      g_assert (gbarray->data[4*i+1] == 'b');
-      g_assert (gbarray->data[4*i+2] == 'c');
-      g_assert (gbarray->data[4*i+3] == 'd');
+      xassert (gbarray->data[4*i] == 'a');
+      xassert (gbarray->data[4*i+1] == 'b');
+      xassert (gbarray->data[4*i+2] == 'c');
+      xassert (gbarray->data[4*i+3] == 'd');
     }
 
   gbarray2 = xbyte_array_ref (gbarray);
-  g_assert (gbarray2 == gbarray);
+  xassert (gbarray2 == gbarray);
   xbyte_array_free (gbarray, TRUE);
   g_assert_cmpint (gbarray2->len, ==, 0);
   xbyte_array_unref (gbarray2);
@@ -1842,10 +1842,10 @@ byte_array_remove (void)
 
   for (i = 0; i < 99; i++)
     {
-      g_assert (gbarray->data[4*i] == 'a');
-      g_assert (gbarray->data[4*i+1] == 'b');
-      g_assert (gbarray->data[4*i+2] == 'c');
-      g_assert (gbarray->data[4*i+3] == 'd');
+      xassert (gbarray->data[4*i] == 'a');
+      xassert (gbarray->data[4*i+1] == 'b');
+      xassert (gbarray->data[4*i+2] == 'c');
+      xassert (gbarray->data[4*i+3] == 'd');
     }
 
   xbyte_array_free (gbarray, TRUE);
@@ -1872,10 +1872,10 @@ byte_array_remove_fast (void)
 
   for (i = 0; i < 99; i++)
     {
-      g_assert (gbarray->data[4*i] == 'a');
-      g_assert (gbarray->data[4*i+1] == 'b');
-      g_assert (gbarray->data[4*i+2] == 'c');
-      g_assert (gbarray->data[4*i+3] == 'd');
+      xassert (gbarray->data[4*i] == 'a');
+      xassert (gbarray->data[4*i+1] == 'b');
+      xassert (gbarray->data[4*i+2] == 'c');
+      xassert (gbarray->data[4*i+3] == 'd');
     }
 
   xbyte_array_free (gbarray, TRUE);
@@ -1899,10 +1899,10 @@ byte_array_remove_range (void)
 
   for (i = 0; i < 99; i++)
     {
-      g_assert (gbarray->data[4*i] == 'a');
-      g_assert (gbarray->data[4*i+1] == 'b');
-      g_assert (gbarray->data[4*i+2] == 'c');
-      g_assert (gbarray->data[4*i+3] == 'd');
+      xassert (gbarray->data[4*i] == 'a');
+      xassert (gbarray->data[4*i+1] == 'b');
+      xassert (gbarray->data[4*i+2] == 'c');
+      xassert (gbarray->data[4*i+3] == 'd');
     }
 
   /* Ensure the entire array can be cleared, even when empty. */
@@ -1994,7 +1994,7 @@ byte_array_new_take (void)
 
   data = g_memdup2 ("woooweeewow", 11);
   gbarray = xbyte_array_new_take (data, 11);
-  g_assert (gbarray->data == data);
+  xassert (gbarray->data == data);
   g_assert_cmpuint (gbarray->len, ==, 11);
   xbyte_array_free (gbarray, TRUE);
 }
@@ -2012,9 +2012,9 @@ byte_array_free_to_bytes (void)
   memory = gbarray->data;
 
   bytes = xbyte_array_free_to_bytes (gbarray);
-  g_assert (bytes != NULL);
+  xassert (bytes != NULL);
   g_assert_cmpuint (xbytes_get_size (bytes), ==, 11);
-  g_assert (xbytes_get_data (bytes, &size) == memory);
+  xassert (xbytes_get_data (bytes, &size) == memory);
   g_assert_cmpuint (size, ==, 11);
 
   xbytes_unref (bytes);

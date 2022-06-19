@@ -44,7 +44,7 @@ writer_thread (xpointer_t user_data)
   xerror_t *err = NULL;
   HANDLE out_handle;
 
-  g_assert (DuplicateHandle (GetCurrentProcess (),
+  xassert (DuplicateHandle (GetCurrentProcess (),
 			     (HANDLE) (gintptr) _get_osfhandle (writer_pipe[1]),
 			     GetCurrentProcess (),
 			     &out_handle,
@@ -68,7 +68,7 @@ writer_thread (xpointer_t user_data)
 	  offset += nwrote;
 	}
 
-      g_assert (nwrote > 0 || err != NULL);
+      xassert (nwrote > 0 || err != NULL);
     }
   while (err == NULL);
 
@@ -92,7 +92,7 @@ reader_thread (xpointer_t user_data)
   char buf[sizeof (DATA)];
   HANDLE in_handle;
 
-  g_assert (DuplicateHandle (GetCurrentProcess (),
+  xassert (DuplicateHandle (GetCurrentProcess (),
 			     (HANDLE) (gintptr) _get_osfhandle (reader_pipe[0]),
 			     GetCurrentProcess (),
 			     &in_handle,
@@ -119,14 +119,14 @@ reader_thread (xpointer_t user_data)
 
       if (nread == 0)
 	{
-	  g_assert (err == NULL);
+	  xassert (err == NULL);
 	  /* pipe closed */
 	  xobject_unref (in);
 	  return NULL;
 	}
 
       g_assert_cmpstr (buf, ==, DATA);
-      g_assert (!xcancellable_is_cancelled (reader_cancel));
+      xassert (!xcancellable_is_cancelled (reader_cancel));
     }
   while (err == NULL);
 
@@ -162,7 +162,7 @@ readable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
       return;
     }
 
-  g_assert (err == NULL);
+  xassert (err == NULL);
 
   main_offset = 0;
   xoutput_stream_write_async (out, main_buf, main_len,
@@ -186,7 +186,7 @@ writable (xobject_t *source, xasync_result_t *res, xpointer_t user_data)
       return;
     }
 
-  g_assert (err == NULL);
+  xassert (err == NULL);
   g_assert_cmpint (nwrote, <=, main_len - main_offset);
 
   main_offset += nwrote;
@@ -230,7 +230,7 @@ test_pipe_io (void)
    * the reader thread, causing the read op to fail.
    */
 
-  g_assert (_pipe (writer_pipe, 10, _O_BINARY) == 0 && _pipe (reader_pipe, 10, _O_BINARY) == 0);
+  xassert (_pipe (writer_pipe, 10, _O_BINARY) == 0 && _pipe (reader_pipe, 10, _O_BINARY) == 0);
 
   writer_cancel = xcancellable_new ();
   reader_cancel = xcancellable_new ();
@@ -239,7 +239,7 @@ test_pipe_io (void)
   writer = xthread_new ("writer", writer_thread, NULL);
   reader = xthread_new ("reader", reader_thread, NULL);
 
-  g_assert (DuplicateHandle (GetCurrentProcess (),
+  xassert (DuplicateHandle (GetCurrentProcess (),
 			     (HANDLE) (gintptr) _get_osfhandle (writer_pipe[0]),
 			     GetCurrentProcess (),
 			     &in_handle,
@@ -247,7 +247,7 @@ test_pipe_io (void)
 			     DUPLICATE_SAME_ACCESS));
   close (writer_pipe[0]);
 
-  g_assert (DuplicateHandle (GetCurrentProcess (),
+  xassert (DuplicateHandle (GetCurrentProcess (),
 			     (HANDLE) (gintptr) _get_osfhandle (reader_pipe[1]),
 			     GetCurrentProcess (),
 			     &out_handle,
@@ -345,10 +345,10 @@ test_pipe_io_overlap (void)
                             PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
                             PIPE_READMODE_BYTE | PIPE_WAIT,
                             1, 0, 0, 0, NULL);
-  g_assert (server != INVALID_HANDLE_VALUE);
+  xassert (server != INVALID_HANDLE_VALUE);
 
   client = CreateFile (name, GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL);
-  g_assert (client != INVALID_HANDLE_VALUE);
+  xassert (client != INVALID_HANDLE_VALUE);
 
   out_server = g_win32_output_stream_new (server, TRUE);
   writer_server = xthread_new ("writer_server", pipe_io_overlap_writer_thread, out_server);
@@ -424,11 +424,11 @@ test_pipe_io_concurrent (void)
                             PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
                             PIPE_READMODE_BYTE | PIPE_WAIT,
                             1, 0, 0, 0, NULL);
-  g_assert (server != INVALID_HANDLE_VALUE);
-  g_assert (_pipe (writer_pipe, 10, _O_BINARY) == 0);
+  xassert (server != INVALID_HANDLE_VALUE);
+  xassert (_pipe (writer_pipe, 10, _O_BINARY) == 0);
 
   client = CreateFile (name, GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-  g_assert (client != INVALID_HANDLE_VALUE);
+  xassert (client != INVALID_HANDLE_VALUE);
 
   rc1.in = g_win32_input_stream_new (client, TRUE);
   rc1.success = FALSE;
@@ -449,7 +449,7 @@ test_pipe_io_concurrent (void)
 
   read (writer_pipe[0], &c, 1);
 
-  g_assert (rc1.success ^ rc2.success);
+  xassert (rc1.success ^ rc2.success);
 
   xcancellable_cancel (rc1.cancellable);
   xcancellable_cancel (rc2.cancellable);
@@ -496,10 +496,10 @@ test_pipe_io_cancel (void)
                                PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
                                PIPE_READMODE_BYTE | PIPE_WAIT,
                                1, 0, 0, 0, NULL);
-  g_assert (in_handle != INVALID_HANDLE_VALUE);
+  xassert (in_handle != INVALID_HANDLE_VALUE);
 
   out_handle = CreateFile (name, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-  g_assert (out_handle != INVALID_HANDLE_VALUE);
+  xassert (out_handle != INVALID_HANDLE_VALUE);
 
   in = g_win32_input_stream_new (in_handle, TRUE);
   out = g_win32_output_stream_new (out_handle, TRUE);

@@ -42,7 +42,7 @@ main (int argc, char **argv)
   xapplication_t *app;
   int status;
 
-  app = xapplication_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.test_application_t",
                            G_APPLICATION_HANDLES_OPEN);
   xsignal_connect (app, "activate", G_CALLBACK (activate), NULL);
   xsignal_connect (app, "open", G_CALLBACK (open), NULL);

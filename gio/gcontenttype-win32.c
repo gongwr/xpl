@@ -105,8 +105,8 @@ g_content_type_equals (const xchar_t *type1,
   char *progid1, *progid2;
   xboolean_t res;
 
-  g_return_val_if_fail (type1 != NULL, FALSE);
-  g_return_val_if_fail (type2 != NULL, FALSE);
+  xreturn_val_if_fail (type1 != NULL, FALSE);
+  xreturn_val_if_fail (type2 != NULL, FALSE);
 
   if (g_ascii_strcasecmp (type1, type2) == 0)
     return TRUE;
@@ -130,8 +130,8 @@ g_content_type_is_a (const xchar_t *type,
   xboolean_t res;
   char *value_utf8;
 
-  g_return_val_if_fail (type != NULL, FALSE);
-  g_return_val_if_fail (supertype != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (supertype != NULL, FALSE);
 
   if (g_content_type_equals (type, supertype))
     return TRUE;
@@ -152,8 +152,8 @@ g_content_type_is_mime_type (const xchar_t *type,
   xchar_t *content_type;
   xboolean_t ret;
 
-  g_return_val_if_fail (type != NULL, FALSE);
-  g_return_val_if_fail (mime_type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (mime_type != NULL, FALSE);
 
   content_type = g_content_type_from_mime_type (mime_type);
   ret = g_content_type_is_a (type, content_type);
@@ -165,7 +165,7 @@ g_content_type_is_mime_type (const xchar_t *type,
 xboolean_t
 g_content_type_is_unknown (const xchar_t *type)
 {
-  g_return_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
 
   return strcmp ("*", type) == 0;
 }
@@ -176,7 +176,7 @@ g_content_type_get_description (const xchar_t *type)
   char *progid;
   char *description;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   progid = get_registry_classes_key (type, NULL);
   if (progid)
@@ -199,7 +199,7 @@ g_content_type_get_mime_type (const xchar_t *type)
 {
   char *mime;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   mime = get_registry_classes_key (type, L"Content Type");
   if (mime)
@@ -224,7 +224,7 @@ g_content_type_get_icon (const xchar_t *type)
   xicon_t *themed_icon;
   char *name = NULL;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   /* In the Registry icons are the default value of
      HKEY_CLASSES_ROOT\<progid>\DefaultIcon with typical values like:
@@ -291,7 +291,7 @@ g_content_type_get_generic_icon_name (const xchar_t *type)
 xboolean_t
 g_content_type_can_be_executable (const xchar_t *type)
 {
-  g_return_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
 
   if (strcmp (type, ".exe") == 0 ||
       strcmp (type, ".com") == 0 ||
@@ -332,7 +332,7 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
 {
   char *key, *content_type;
 
-  g_return_val_if_fail (mime_type != NULL, NULL);
+  xreturn_val_if_fail (mime_type != NULL, NULL);
 
   /* This is a hack to allow directories to have icons in filechooser */
   if (strcmp ("inode/directory", mime_type) == 0)
@@ -362,7 +362,7 @@ g_content_type_guess (const xchar_t  *filename,
 
   /* our test suite and potentially other code used -1 in the past, which is
    * not documented and not allowed; guard against that */
-  g_return_val_if_fail (data_size != (xsize_t) -1, xstrdup ("*"));
+  xreturn_val_if_fail (data_size != (xsize_t) -1, xstrdup ("*"));
 
   if (filename)
     {

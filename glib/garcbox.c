@@ -178,7 +178,7 @@
 xpointer_t
 g_atomic_rc_box_alloc (xsize_t block_size)
 {
-  g_return_val_if_fail (block_size > 0, NULL);
+  xreturn_val_if_fail (block_size > 0, NULL);
 
   return g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, TRUE, FALSE);
 }
@@ -205,7 +205,7 @@ g_atomic_rc_box_alloc (xsize_t block_size)
 xpointer_t
 g_atomic_rc_box_alloc0 (xsize_t block_size)
 {
-  g_return_val_if_fail (block_size > 0, NULL);
+  xreturn_val_if_fail (block_size > 0, NULL);
 
   return g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, TRUE, TRUE);
 }
@@ -265,8 +265,8 @@ xpointer_t
 {
   xpointer_t res;
 
-  g_return_val_if_fail (block_size > 0, NULL);
-  g_return_val_if_fail (mem_block != NULL, NULL);
+  xreturn_val_if_fail (block_size > 0, NULL);
+  xreturn_val_if_fail (mem_block != NULL, NULL);
 
   res = g_rc_box_alloc_full (block_size, STRUCT_ALIGNMENT, TRUE, FALSE);
   memcpy (res, mem_block, block_size);
@@ -290,9 +290,9 @@ xpointer_t
 {
   GArcBox *real_box = G_ARC_BOX (mem_block);
 
-  g_return_val_if_fail (mem_block != NULL, NULL);
+  xreturn_val_if_fail (mem_block != NULL, NULL);
 #ifndef G_DISABLE_ASSERT
-  g_return_val_if_fail (real_box->magic == G_BOX_MAGIC, NULL);
+  xreturn_val_if_fail (real_box->magic == G_BOX_MAGIC, NULL);
 #endif
 
   g_atomic_ref_count_inc (&real_box->ref_count);
@@ -372,9 +372,9 @@ g_atomic_rc_box_get_size (xpointer_t mem_block)
 {
   GArcBox *real_box = G_ARC_BOX (mem_block);
 
-  g_return_val_if_fail (mem_block != NULL, 0);
+  xreturn_val_if_fail (mem_block != NULL, 0);
 #ifndef G_DISABLE_ASSERT
-  g_return_val_if_fail (real_box->magic == G_BOX_MAGIC, 0);
+  xreturn_val_if_fail (real_box->magic == G_BOX_MAGIC, 0);
 #endif
 
   return real_box->mem_size;

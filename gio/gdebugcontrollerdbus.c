@@ -369,7 +369,7 @@ authorize_cb (xobject_t      *object,
 
   /* The xtask_t will stay alive for a bit longer as the worker thread is
    * potentially still in the process of dropping its reference to it. */
-  g_assert (priv->pending_authorize_tasks != NULL && priv->pending_authorize_tasks->len > 0);
+  xassert (priv->pending_authorize_tasks != NULL && priv->pending_authorize_tasks->len > 0);
 }
 
 /* Called in the #xmain_context_t which was default when the #xdebug_controller_dbus_t
@@ -451,7 +451,7 @@ xdebug_controller_dbus_initable_init (xinitable_t     *initable,
       if G_UNLIKELY (info == NULL)
         xerror ("%s", local_error->message);
       org_gtk_Debugging = g_dbus_node_info_lookup_interface (info, "org.gtk.Debugging");
-      g_assert (org_gtk_Debugging != NULL);
+      xassert (org_gtk_Debugging != NULL);
       g_dbus_interface_info_ref (org_gtk_Debugging);
       g_dbus_node_info_unref (info);
     }
@@ -502,7 +502,7 @@ xdebug_controller_dbus_set_property (xobject_t      *object,
     {
     case PROP_CONNECTION:
       /* Construct only */
-      g_assert (priv->connection == NULL);
+      xassert (priv->connection == NULL);
       priv->connection = xvalue_dup_object (value);
       break;
     case PROP_DEBUG_ENABLED:
@@ -521,11 +521,11 @@ xdebug_controller_dbus_dispose (xobject_t *object)
   xdebug_controller_dbus_private_t *priv = xdebug_controller_dbus_get_instance_private (self);
 
   xdebug_controller_dbus_stop (self);
-  g_assert (priv->pending_authorize_tasks == NULL);
+  xassert (priv->pending_authorize_tasks == NULL);
   g_clear_object (&priv->connection);
   g_clear_object (&priv->cancellable);
 
-  G_OBJECT_CLASS (xdebug_controller_dbus_parent_class)->dispose (object);
+  XOBJECT_CLASS (xdebug_controller_dbus_parent_class)->dispose (object);
 }
 
 static xboolean_t
@@ -538,11 +538,11 @@ xdebug_controller_dbus_authorize_default (xdebug_controller_dbus_t  *self,
 static void
 xdebug_controller_dbus_class_init (xdebug_controller_tDBusClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xdebug_controller_dbus_get_property;
-  gobject_class->set_property = xdebug_controller_dbus_set_property;
-  gobject_class->dispose = xdebug_controller_dbus_dispose;
+  xobject_class->get_property = xdebug_controller_dbus_get_property;
+  xobject_class->set_property = xdebug_controller_dbus_set_property;
+  xobject_class->dispose = xdebug_controller_dbus_dispose;
 
   klass->authorize = xdebug_controller_dbus_authorize_default;
 
@@ -558,16 +558,16 @@ xdebug_controller_dbus_class_init (xdebug_controller_tDBusClass *klass)
    * Since: 2.72
    */
   props[PROP_CONNECTION] =
-      g_param_spec_object ("connection", "D-Bus Connection",
+      xparam_spec_object ("connection", "D-Bus Connection",
                            "The D-Bus connection to expose the debugging interface on.",
                            XTYPE_DBUS_CONNECTION,
-                           G_PARAM_READWRITE |
-                           G_PARAM_CONSTRUCT_ONLY |
-                           G_PARAM_STATIC_STRINGS);
+                           XPARAM_READWRITE |
+                           XPARAM_CONSTRUCT_ONLY |
+                           XPARAM_STATIC_STRINGS);
 
-  xobject_class_install_properties (gobject_class, G_N_ELEMENTS (props), props);
+  xobject_class_install_properties (xobject_class, G_N_ELEMENTS (props), props);
 
-  xobject_class_override_property (gobject_class, PROP_DEBUG_ENABLED, "debug-enabled");
+  xobject_class_override_property (xobject_class, PROP_DEBUG_ENABLED, "debug-enabled");
 
   /**
    * xdebug_controller_dbus_t::authorize:
@@ -646,9 +646,9 @@ xdebug_controller_dbus_new (xdbus_connection_t  *connection,
                              xcancellable_t     *cancellable,
                              xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   return xinitable_new (XTYPE_DEBUG_CONTROLLER_DBUS,
                          cancellable,

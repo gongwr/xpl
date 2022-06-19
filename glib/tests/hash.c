@@ -63,7 +63,7 @@ verify_result_array (int array[10000])
   int i;
 
   for (i = 0; i < 10000; i++)
-    g_assert (array[i] == i);
+    xassert (array[i] == i);
 }
 
 static void
@@ -71,12 +71,12 @@ handle_pair (xpointer_t key, xpointer_t value, int result_array[10000])
 {
   int n;
 
-  g_assert (key == value);
+  xassert (key == value);
 
   n = *((int *) value);
 
-  g_assert (n >= 0 && n < 10000);
-  g_assert (result_array[n] == -1);
+  xassert (n >= 0 && n < 10000);
+  xassert (result_array[n] == -1);
 
   result_array[n] = n;
 }
@@ -184,8 +184,8 @@ honeyman_hash (xconstpointer key)
   xsize_t size;
   xuint_t sum = 0;
 
-  g_assert (name != NULL);
-  g_assert (*name != 0);
+  xassert (name != NULL);
+  xassert (*name != 0);
 
   size = strlen (name);
 
@@ -221,18 +221,18 @@ not_even_foreach (xpointer_t key,
   int i;
   char val [20];
 
-  g_assert (_key != NULL);
-  g_assert (*_key != 0);
-  g_assert (_value != NULL);
-  g_assert (*_value != 0);
+  xassert (_key != NULL);
+  xassert (*_key != 0);
+  xassert (_value != NULL);
+  xassert (*_value != 0);
 
   i = atoi (_key);
 
   sprintf (val, "%d value", i);
-  g_assert (strcmp (_value, val) == 0);
+  xassert (strcmp (_value, val) == 0);
 
-  g_assert ((i % 2) != 0);
-  g_assert (i != 3);
+  xassert ((i % 2) != 0);
+  xassert (i != 3);
 }
 
 static xboolean_t
@@ -245,15 +245,15 @@ remove_even_foreach (xpointer_t key,
   int i;
   char val [20];
 
-  g_assert (_key != NULL);
-  g_assert (*_key != 0);
-  g_assert (_value != NULL);
-  g_assert (*_value != 0);
+  xassert (_key != NULL);
+  xassert (*_key != 0);
+  xassert (_value != NULL);
+  xassert (*_value != 0);
 
   i = atoi (_key);
 
   sprintf (val, "%d value", i);
-  g_assert (strcmp (_value, val) == 0);
+  xassert (strcmp (_value, val) == 0);
 
   return ((i % 2) == 0) ? TRUE : FALSE;
 }
@@ -276,46 +276,46 @@ second_hash_test (xconstpointer d)
   h = xhash_table_new_full (simple_hash ? one_hash : honeyman_hash,
                              second_hash_cmp,
                              g_free, g_free);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       sprintf (key, "%d", i);
-      g_assert (atoi (key) == i);
+      xassert (atoi (key) == i);
 
       sprintf (val, "%d value", i);
-      g_assert (atoi (val) == i);
+      xassert (atoi (val) == i);
 
       xhash_table_insert (h, xstrdup (key), xstrdup (val));
     }
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
       sprintf (key, "%d", i);
-      g_assert (atoi(key) == i);
+      xassert (atoi(key) == i);
 
       v = (char *) xhash_table_lookup (h, key);
 
-      g_assert (v != NULL);
-      g_assert (*v != 0);
-      g_assert (atoi (v) == i);
+      xassert (v != NULL);
+      xassert (*v != 0);
+      xassert (atoi (v) == i);
     }
 
   sprintf (key, "%d", 3);
   xhash_table_remove (h, key);
-  g_assert (xhash_table_size (h) == 19);
+  xassert (xhash_table_size (h) == 19);
   xhash_table_foreach_remove (h, remove_even_foreach, NULL);
-  g_assert (xhash_table_size (h) == 9);
+  xassert (xhash_table_size (h) == 9);
   xhash_table_foreach (h, not_even_foreach, NULL);
 
   for (i = 0; i < 20; i++)
     {
       sprintf (key, "%d", i);
-      g_assert (atoi(key) == i);
+      xassert (atoi(key) == i);
 
       sprintf (val, "%d value", i);
-      g_assert (atoi (val) == i);
+      xassert (atoi (val) == i);
 
       orig_key = orig_val = NULL;
       found = xhash_table_lookup_extended (h, key,
@@ -323,17 +323,17 @@ second_hash_test (xconstpointer d)
                                             (xpointer_t)&orig_val);
       if ((i % 2) == 0 || i == 3)
         {
-          g_assert (!found);
+          xassert (!found);
           continue;
         }
 
-      g_assert (found);
+      xassert (found);
 
-      g_assert (orig_key != NULL);
-      g_assert (strcmp (key, orig_key) == 0);
+      xassert (orig_key != NULL);
+      xassert (strcmp (key, orig_key) == 0);
 
-      g_assert (orig_val != NULL);
-      g_assert (strcmp (val, orig_val) == 0);
+      xassert (orig_val != NULL);
+      xassert (strcmp (val, orig_val) == 0);
     }
 
   xhash_table_destroy (h);
@@ -356,19 +356,19 @@ direct_hash_test (void)
   xhashtable_t     *h;
 
   h = xhash_table_new (NULL, NULL);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 1; i <= 20; i++)
     xhash_table_insert (h, GINT_TO_POINTER (i),
                          GINT_TO_POINTER (i + 42));
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   for (i = 1; i <= 20; i++)
     {
       rc = GPOINTER_TO_INT (xhash_table_lookup (h, GINT_TO_POINTER (i)));
 
-      g_assert (rc != 0);
-      g_assert ((rc - 42) == i);
+      xassert (rc != 0);
+      xassert ((rc - 42) == i);
     }
 
   xhash_table_destroy (h);
@@ -381,19 +381,19 @@ direct_hash_test2 (void)
   xhashtable_t     *h;
 
   h = xhash_table_new (g_direct_hash, g_direct_equal);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 1; i <= 20; i++)
     xhash_table_insert (h, GINT_TO_POINTER (i),
                          GINT_TO_POINTER (i + 42));
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   for (i = 1; i <= 20; i++)
     {
       rc = GPOINTER_TO_INT (xhash_table_lookup (h, GINT_TO_POINTER (i)));
 
-      g_assert (rc != 0);
-      g_assert ((rc - 42) == i);
+      xassert (rc != 0);
+      xassert ((rc - 42) == i);
     }
 
   xhash_table_destroy (h);
@@ -408,14 +408,14 @@ int_hash_test (void)
   xint_t key;
 
   h = xhash_table_new (g_int_hash, g_int_equal);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       values[i] = i + 42;
       xhash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
@@ -437,14 +437,14 @@ int64_hash_test (void)
   sint64_t key;
 
   h = xhash_table_new (g_int64_hash, g_int64_equal);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       values[i] = i + 42;
       xhash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
@@ -466,14 +466,14 @@ double_hash_test (void)
   xdouble_t key;
 
   h = xhash_table_new (g_double_hash, g_double_equal);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       values[i] = i + 42.5;
       xhash_table_insert (h, &values[i], GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   for (i = 0; i < 20; i++)
     {
@@ -502,7 +502,7 @@ string_hash_test (void)
   xstring_t *s;
 
   h = xhash_table_new_full ((GHashFunc)xstring_hash, (GEqualFunc)xstring_equal, string_free, NULL);
-  g_assert (h != NULL);
+  xassert (h != NULL);
   for (i = 0; i < 20; i++)
     {
       s = xstring_new ("");
@@ -512,7 +512,7 @@ string_hash_test (void)
       xhash_table_insert (h, s, GINT_TO_POINTER (i + 42));
     }
 
-  g_assert (xhash_table_size (h) == 20);
+  xassert (xhash_table_size (h) == 20);
 
   s = xstring_new ("");
   for (i = 0; i < 20; i++)
@@ -554,25 +554,25 @@ set_hash_test (void)
   for (i = 2; i < 5000; i += 7)
     {
       char *s = xstrdup_printf ("%d", i);
-      g_assert (xhash_table_add (hash_table, s));
+      xassert (xhash_table_add (hash_table, s));
     }
 
-  g_assert (!xhash_table_add (hash_table, xstrdup_printf ("%d", 2)));
+  xassert (!xhash_table_add (hash_table, xstrdup_printf ("%d", 2)));
 
   i = 0;
   xhash_table_foreach (hash_table, set_check, &i);
   g_assert_cmpint (i, ==, xhash_table_size (hash_table));
 
-  g_assert (xhash_table_contains (hash_table, "2"));
-  g_assert (xhash_table_contains (hash_table, "9"));
-  g_assert (!xhash_table_contains (hash_table, "a"));
+  xassert (xhash_table_contains (hash_table, "2"));
+  xassert (xhash_table_contains (hash_table, "9"));
+  xassert (!xhash_table_contains (hash_table, "a"));
 
   /* this will cause the hash table to loose set nature */
-  g_assert (xhash_table_insert (hash_table, xstrdup ("a"), "b"));
-  g_assert (!xhash_table_insert (hash_table, xstrdup ("a"), "b"));
+  xassert (xhash_table_insert (hash_table, xstrdup ("a"), "b"));
+  xassert (!xhash_table_insert (hash_table, xstrdup ("a"), "b"));
 
-  g_assert (xhash_table_replace (hash_table, xstrdup ("c"), "d"));
-  g_assert (!xhash_table_replace (hash_table, xstrdup ("c"), "d"));
+  xassert (xhash_table_replace (hash_table, xstrdup ("c"), "d"));
+  xassert (!xhash_table_replace (hash_table, xstrdup ("c"), "d"));
 
   g_assert_cmpstr (xhash_table_lookup (hash_table, "2"), ==, "2");
   g_assert_cmpstr (xhash_table_lookup (hash_table, "a"), ==, "b");
@@ -621,15 +621,15 @@ test_hash_misc (void)
   xhash_table_iter_init (&iter, hash_table);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (xhash_table_iter_next (&iter, &ikey, &ivalue));
+      xassert (xhash_table_iter_next (&iter, &ikey, &ivalue));
 
       handle_pair (ikey, ivalue, result_array);
 
       if (i % 2)
         xhash_table_iter_remove (&iter);
     }
-  g_assert (! xhash_table_iter_next (&iter, &ikey, &ivalue));
-  g_assert (xhash_table_size (hash_table) == 5000);
+  xassert (! xhash_table_iter_next (&iter, &ikey, &ivalue));
+  xassert (xhash_table_size (hash_table) == 5000);
   verify_result_array (result_array);
 
   fill_hash_table_and_array (hash_table);
@@ -658,16 +658,16 @@ test_hash_misc (void)
   xhash_table_iter_init (&iter, hash_table);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (xhash_table_iter_next (&iter, &ikey, &ivalue));
+      xassert (xhash_table_iter_next (&iter, &ikey, &ivalue));
       xhash_table_iter_replace (&iter, &n_array[0]);
     }
 
   xhash_table_iter_init (&iter, hash_table);
   for (i = 0; i < 10000; i++)
     {
-      g_assert (xhash_table_iter_next (&iter, &ikey, &ivalue));
+      xassert (xhash_table_iter_next (&iter, &ikey, &ivalue));
 
-      g_assert (ivalue == &n_array[0]);
+      xassert (ivalue == &n_array[0]);
     }
 
   xhash_table_destroy (hash_table);
@@ -721,8 +721,8 @@ test_hash_ref (void)
     }
   g_assert_cmpint (destroy_counter, ==, 0);
 
-  g_assert (xhash_table_iter_get_hash_table (&iter) == h);
-  g_assert (abc_seen && cde_seen && xyz_seen);
+  xassert (xhash_table_iter_get_hash_table (&iter) == h);
+  xassert (abc_seen && cde_seen && xyz_seen);
   g_assert_cmpint (xhash_table_size (h), == , 2);
 
   xhash_table_ref (h);
@@ -763,12 +763,12 @@ test_lookup_null_key (void)
   xhash_table_insert (h, "abc", "ABC");
 
   res = xhash_table_lookup_extended (h, NULL, &key, &value);
-  g_assert (!res);
+  xassert (!res);
 
   xhash_table_insert (h, NULL, "NULL");
 
   res = xhash_table_lookup_extended (h, NULL, &key, &value);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpstr (value, ==, "NULL");
 
   xhash_table_unref (h);
@@ -811,12 +811,12 @@ test_remove_all (void)
   xhash_table_insert (h, "xyz", "XYZ");
 
   res = xhash_table_steal (h, "nosuchkey");
-  g_assert (!res);
+  xassert (!res);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
   res = xhash_table_steal (h, "xyz");
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (destroy_counter, ==, 0);
   g_assert_cmpint (destroy_key_counter, ==, 0);
 
@@ -904,7 +904,7 @@ key_unref (xpointer_t data)
 {
   RefCountedKey *key = data;
 
-  g_assert (key->ref_count > 0);
+  xassert (key->ref_count > 0);
 
   key->ref_count -= 1;
 
@@ -989,7 +989,7 @@ fake_free (xpointer_t dead)
 
       if (ffd->string == (xchar_t *) dead)
         {
-          g_assert (!ffd->freed);
+          xassert (!ffd->freed);
           ffd->freed = TRUE;
           return;
         }
@@ -1053,7 +1053,7 @@ test_destroy_modify (void)
     {
       ffd = xptr_array_index (fake_free_data, i);
 
-      g_assert (ffd->freed);
+      xassert (ffd->freed);
       g_free (ffd->string);
       g_free (ffd);
     }
@@ -1106,7 +1106,7 @@ test_find (void)
   g_assert_cmpstr (value, ==, "F");
 
   value = xhash_table_find (hash, find_str, "0");
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   xhash_table_unref (hash);
 }
@@ -1140,7 +1140,7 @@ test_foreach (void)
   xhash_table_foreach (hash, foreach_func, NULL);
 
   for (i = 0; i < 6; i++)
-    g_assert (seen_key[i]);
+    xassert (seen_key[i]);
 
   xhash_table_unref (hash);
 }
@@ -1537,7 +1537,7 @@ static void
 my_key_free (xpointer_t v)
 {
   xchar_t *s = v;
-  g_assert (s[0] != 'x');
+  xassert (s[0] != 'x');
   s[0] = 'x';
   g_free (v);
 }
@@ -1546,7 +1546,7 @@ static void
 my_value_free (xpointer_t v)
 {
   xchar_t *s = v;
-  g_assert (s[0] != 'y');
+  xassert (s[0] != 'y');
   s[0] = 'y';
   g_free (v);
 }
@@ -1572,7 +1572,7 @@ test_iter_replace (void)
   while (xhash_table_iter_next (&iter, &k, &v))
     {
        s = (xchar_t*)v;
-       g_assert (g_ascii_islower (s[0]));
+       xassert (g_ascii_islower (s[0]));
        xhash_table_iter_replace (&iter, xstrdup (k));
     }
 
@@ -1599,7 +1599,7 @@ test_set_insert_corruption (void)
   g_test_bug ("https://bugzilla.gnome.org/show_bug.cgi?id=692815");
 
   xhash_table_insert (hash_table, a, a);
-  g_assert (xhash_table_contains (hash_table, "foo"));
+  xassert (xhash_table_contains (hash_table, "foo"));
 
   xhash_table_insert (hash_table, b, b);
 
@@ -1611,8 +1611,8 @@ test_set_insert_corruption (void)
   /* per the documentation to xhash_table_insert(), 'b' has now been freed,
    * and the sole key in 'hash_table' should be 'a'.
    */
-  g_assert (key != b);
-  g_assert (key == a);
+  xassert (key != b);
+  xassert (key == a);
 
   g_assert_cmpstr (b, ==, "boo");
 
@@ -1620,10 +1620,10 @@ test_set_insert_corruption (void)
    * which is probably not what the caller intended but is precisely what they
    * asked for.
    */
-  g_assert (value == b);
+  xassert (value == b);
 
   /* even though the hash has now been de-set-ified: */
-  g_assert (xhash_table_contains (hash_table, "foo"));
+  xassert (xhash_table_contains (hash_table, "foo"));
 
   xhash_table_unref (hash_table);
 }
@@ -1688,7 +1688,7 @@ test_primes (void)
   while (1) {
     p = q;
     q = g_spaced_primes_closest (p);
-    g_assert (is_prime (q));
+    xassert (is_prime (q));
     if (p == 1) continue;
     if (q == p) break;
     r = q / (xdouble_t) p;

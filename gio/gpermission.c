@@ -106,7 +106,7 @@ g_permission_acquire (xpermission_t   *permission,
                       xcancellable_t  *cancellable,
                       xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return G_PERMISSION_GET_CLASS (permission)
     ->acquire (permission, cancellable, error);
 }
@@ -157,7 +157,7 @@ g_permission_acquire_finish (xpermission_t   *permission,
                              xasync_result_t  *result,
                              xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return G_PERMISSION_GET_CLASS (permission)
     ->acquire_finish (permission, result, error);
 }
@@ -193,7 +193,7 @@ g_permission_release (xpermission_t   *permission,
                       xcancellable_t  *cancellable,
                       xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return G_PERMISSION_GET_CLASS (permission)
     ->release (permission, cancellable, error);
 }
@@ -244,7 +244,7 @@ g_permission_release_finish (xpermission_t   *permission,
                              xasync_result_t  *result,
                              xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return G_PERMISSION_GET_CLASS (permission)
     ->release_finish (permission, result, error);
 }
@@ -264,7 +264,7 @@ g_permission_release_finish (xpermission_t   *permission,
 xboolean_t
 g_permission_get_allowed (xpermission_t *permission)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return permission->priv->allowed;
 }
 
@@ -283,7 +283,7 @@ g_permission_get_allowed (xpermission_t *permission)
 xboolean_t
 g_permission_get_can_acquire (xpermission_t *permission)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return permission->priv->can_acquire;
 }
 
@@ -302,7 +302,7 @@ g_permission_get_can_acquire (xpermission_t *permission)
 xboolean_t
 g_permission_get_can_release (xpermission_t *permission)
 {
-  g_return_val_if_fail (X_IS_PERMISSION (permission), FALSE);
+  xreturn_val_if_fail (X_IS_PERMISSION (permission), FALSE);
   return permission->priv->can_release;
 }
 
@@ -424,7 +424,7 @@ acquire_or_release_finish (xpermission_t   *permission,
 static void
 g_permission_class_init (GPermissionClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->get_property = g_permission_get_property;
 
@@ -442,11 +442,11 @@ g_permission_class_init (GPermissionClass *class)
    * @permission represents the permission to perform.
    */
    xobject_class_install_property (object_class, PROP_ALLOWED,
-     g_param_spec_boolean ("allowed",
+     xparam_spec_boolean ("allowed",
                            P_("Is allowed"),
                            P_("If the caller is allowed to perform the action"),
                            FALSE,
-                           G_PARAM_STATIC_STRINGS | G_PARAM_READABLE));
+                           XPARAM_STATIC_STRINGS | XPARAM_READABLE));
 
   /**
    * xpermission_t:can-acquire:
@@ -455,11 +455,11 @@ g_permission_class_init (GPermissionClass *class)
    * g_permission_acquire().
    */
    xobject_class_install_property (object_class, PROP_CAN_ACQUIRE,
-     g_param_spec_boolean ("can-acquire",
+     xparam_spec_boolean ("can-acquire",
                            P_("Can acquire"),
                            P_("If calling g_permission_acquire() makes sense"),
                            FALSE,
-                           G_PARAM_STATIC_STRINGS | G_PARAM_READABLE));
+                           XPARAM_STATIC_STRINGS | XPARAM_READABLE));
 
   /**
    * xpermission_t:can-release:
@@ -468,9 +468,9 @@ g_permission_class_init (GPermissionClass *class)
    * g_permission_release().
    */
    xobject_class_install_property (object_class, PROP_CAN_RELEASE,
-     g_param_spec_boolean ("can-release",
+     xparam_spec_boolean ("can-release",
                            P_("Can release"),
                            P_("If calling g_permission_release() makes sense"),
                            FALSE,
-                           G_PARAM_STATIC_STRINGS | G_PARAM_READABLE));
+                           XPARAM_STATIC_STRINGS | XPARAM_READABLE));
 }

@@ -42,7 +42,7 @@ static GOptionEntry cmd_entries[] = {
 static xboolean_t
 accept_certificate (xtls_client_connection_t *conn,
 		    xtls_certificate_t      *cert,
-		    GTlsCertificateFlags  errors,
+		    xtls_certificate_flags_t  errors,
 		    xpointer_t              user_data)
 {
   g_print ("Certificate would have been rejected ( ");

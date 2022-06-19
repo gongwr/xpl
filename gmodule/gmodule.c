@@ -222,7 +222,7 @@ static inline GModule*	g_module_find_by_name	(const xchar_t	*name);
 /* --- variables --- */
 static GModule	     *modules = NULL;
 static GModule	     *main_module = NULL;
-static GPrivate       module_error_private = G_PRIVATE_INIT (g_free);
+static xprivate_t       module_error_private = G_PRIVATE_INIT (g_free);
 static xboolean_t	      module_debug_initialized = FALSE;
 static xuint_t	      module_debug_flags = 0;
 
@@ -498,7 +498,7 @@ g_module_open_full (const xchar_t   *file_name,
 
   SUPPORT_OR_RETURN (NULL);
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   g_rec_mutex_lock (&g_module_global_lock);
 
@@ -584,7 +584,7 @@ g_module_open_full (const xchar_t   *file_name,
     }
 
   /* ok, try loading the module */
-  g_assert (name != NULL);
+  xassert (name != NULL);
 
   /* if it's a libtool archive, figure library file to load */
   if (xstr_has_suffix (name, ".la")) /* libtool archive? */
@@ -699,8 +699,8 @@ g_module_close (GModule *module)
 {
   SUPPORT_OR_RETURN (FALSE);
 
-  g_return_val_if_fail (module != NULL, FALSE);
-  g_return_val_if_fail (module->ref_count > 0, FALSE);
+  xreturn_val_if_fail (module != NULL, FALSE);
+  xreturn_val_if_fail (module->ref_count > 0, FALSE);
 
   g_rec_mutex_lock (&g_module_global_lock);
 
@@ -797,9 +797,9 @@ g_module_symbol (GModule     *module,
     *symbol = NULL;
   SUPPORT_OR_RETURN (FALSE);
 
-  g_return_val_if_fail (module != NULL, FALSE);
-  g_return_val_if_fail (symbol_name != NULL, FALSE);
-  g_return_val_if_fail (symbol != NULL, FALSE);
+  xreturn_val_if_fail (module != NULL, FALSE);
+  xreturn_val_if_fail (symbol_name != NULL, FALSE);
+  xreturn_val_if_fail (symbol != NULL, FALSE);
 
   g_rec_mutex_lock (&g_module_global_lock);
 
@@ -843,7 +843,7 @@ g_module_symbol (GModule     *module,
 const xchar_t *
 g_module_name (GModule *module)
 {
-  g_return_val_if_fail (module != NULL, NULL);
+  xreturn_val_if_fail (module != NULL, NULL);
 
   if (module == main_module)
     return "main";
@@ -879,7 +879,7 @@ xchar_t *
 g_module_build_path (const xchar_t *directory,
                      const xchar_t *module_name)
 {
-  g_return_val_if_fail (module_name != NULL, NULL);
+  xreturn_val_if_fail (module_name != NULL, NULL);
 
   return _g_module_build_path (directory, module_name);
 }

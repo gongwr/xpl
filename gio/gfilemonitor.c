@@ -122,7 +122,7 @@ xfile_monitor_dispose (xobject_t *object)
   /* Make sure we cancel on last unref */
   xfile_monitor_cancel (monitor);
 
-  G_OBJECT_CLASS (xfile_monitor_parent_class)->dispose (object);
+  XOBJECT_CLASS (xfile_monitor_parent_class)->dispose (object);
 }
 
 static void
@@ -136,7 +136,7 @@ xfile_monitor_class_init (xfile_monitor_class_t *klass)
 {
   xobject_class_t *object_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->dispose = xfile_monitor_dispose;
   object_class->get_property = xfile_monitor_get_property;
   object_class->set_property = xfile_monitor_set_property;
@@ -190,17 +190,17 @@ xfile_monitor_class_init (xfile_monitor_class_t *klass)
                               _g_cclosure_marshal_VOID__OBJECT_OBJECT_ENUMv);
 
   xobject_class_install_property (object_class, PROP_RATE_LIMIT,
-                                   g_param_spec_int ("rate-limit",
+                                   xparam_spec_int ("rate-limit",
                                                      P_("Rate limit"),
                                                      P_("The limit of the monitor to watch for changes, in milliseconds"),
-                                                     0, G_MAXINT, DEFAULT_RATE_LIMIT_MSECS, G_PARAM_READWRITE |
-                                                     G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                                                     0, G_MAXINT, DEFAULT_RATE_LIMIT_MSECS, XPARAM_READWRITE |
+                                                     XPARAM_EXPLICIT_NOTIFY | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_CANCELLED,
-                                   g_param_spec_boolean ("cancelled",
+                                   xparam_spec_boolean ("cancelled",
                                                          P_("Cancelled"),
                                                          P_("Whether the monitor has been cancelled"),
-                                                         FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                                                         FALSE, XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -216,7 +216,7 @@ xfile_monitor_is_cancelled (xfile_monitor_t *monitor)
 {
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_FILE_MONITOR (monitor), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_MONITOR (monitor), FALSE);
 
   res = monitor->priv->cancelled;
 
@@ -234,7 +234,7 @@ xfile_monitor_is_cancelled (xfile_monitor_t *monitor)
 xboolean_t
 xfile_monitor_cancel (xfile_monitor_t *monitor)
 {
-  g_return_val_if_fail (X_IS_FILE_MONITOR (monitor), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_MONITOR (monitor), FALSE);
 
   if (!monitor->priv->cancelled)
     {

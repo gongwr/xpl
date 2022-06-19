@@ -175,7 +175,7 @@ g_unix_credentials_message_finalize (xobject_t *object)
   if (message->priv->credentials != NULL)
     xobject_unref (message->priv->credentials);
 
-  G_OBJECT_CLASS (g_unix_credentials_message_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_unix_credentials_message_parent_class)->finalize (object);
 }
 
 static void
@@ -232,21 +232,21 @@ g_unix_credentials_message_constructed (xobject_t *object)
   if (message->priv->credentials == NULL)
     message->priv->credentials = xcredentials_new ();
 
-  if (G_OBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed != NULL)
-    G_OBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed (object);
+  if (XOBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed != NULL)
+    XOBJECT_CLASS (g_unix_credentials_message_parent_class)->constructed (object);
 }
 
 static void
 g_unix_credentials_message_class_init (GUnixCredentialsMessageClass *class)
 {
   xsocket_control_message_class_t *scm_class;
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (class);
-  gobject_class->get_property = g_unix_credentials_message_get_property;
-  gobject_class->set_property = g_unix_credentials_message_set_property;
-  gobject_class->finalize = g_unix_credentials_message_finalize;
-  gobject_class->constructed = g_unix_credentials_message_constructed;
+  xobject_class = XOBJECT_CLASS (class);
+  xobject_class->get_property = g_unix_credentials_message_get_property;
+  xobject_class->set_property = g_unix_credentials_message_set_property;
+  xobject_class->finalize = g_unix_credentials_message_finalize;
+  xobject_class->constructed = g_unix_credentials_message_constructed;
 
   scm_class = XSOCKET_CONTROL_MESSAGE_CLASS (class);
   scm_class->get_size = g_unix_credentials_message_get_size;
@@ -262,18 +262,18 @@ g_unix_credentials_message_class_init (GUnixCredentialsMessageClass *class)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_CREDENTIALS,
-                                   g_param_spec_object ("credentials",
+                                   xparam_spec_object ("credentials",
                                                         P_("Credentials"),
                                                         P_("The credentials stored in the message"),
                                                         XTYPE_CREDENTIALS,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
 }
 
@@ -312,7 +312,7 @@ g_unix_credentials_message_is_supported (void)
 xsocket_control_message_t *
 g_unix_credentials_message_new (void)
 {
-  g_return_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
+  xreturn_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
   return xobject_new (XTYPE_UNIX_CREDENTIALS_MESSAGE,
                        NULL);
 }
@@ -330,8 +330,8 @@ g_unix_credentials_message_new (void)
 xsocket_control_message_t *
 g_unix_credentials_message_new_with_credentials (xcredentials_t *credentials)
 {
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
-  g_return_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
+  xreturn_val_if_fail (g_unix_credentials_message_is_supported (), NULL);
   return xobject_new (XTYPE_UNIX_CREDENTIALS_MESSAGE,
                        "credentials", credentials,
                        NULL);
@@ -350,6 +350,6 @@ g_unix_credentials_message_new_with_credentials (xcredentials_t *credentials)
 xcredentials_t *
 g_unix_credentials_message_get_credentials (xunix_credentials_message_t *message)
 {
-  g_return_val_if_fail (X_IS_UNIX_CREDENTIALS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_UNIX_CREDENTIALS_MESSAGE (message), NULL);
   return message->priv->credentials;
 }

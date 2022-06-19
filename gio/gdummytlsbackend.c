@@ -75,13 +75,13 @@ xdummy_tls_backend_finalize (xobject_t *object)
 
   g_clear_object (&dummy->database);
 
-  G_OBJECT_CLASS (xdummy_tls_backend_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdummy_tls_backend_parent_class)->finalize (object);
 }
 
 static void
 xdummy_tls_backend_class_init (GDummyTlsBackendClass *backend_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (backend_class);
+  xobject_class_t *object_class = XOBJECT_CLASS (backend_class);
 
   object_class->finalize = xdummy_tls_backend_finalize;
 }
@@ -169,16 +169,16 @@ xdummy_tls_certificate_set_property (xobject_t      *object,
 static void
 xdummy_tls_certificate_class_init (GDummyTlsCertificateClass *certificate_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (certificate_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (certificate_class);
 
-  gobject_class->get_property = xdummy_tls_certificate_get_property;
-  gobject_class->set_property = xdummy_tls_certificate_set_property;
+  xobject_class->get_property = xdummy_tls_certificate_get_property;
+  xobject_class->set_property = xdummy_tls_certificate_set_property;
 
-  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE, "certificate");
-  xobject_class_override_property (gobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
-  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
-  xobject_class_override_property (gobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
-  xobject_class_override_property (gobject_class, PROP_CERT_ISSUER, "issuer");
+  xobject_class_override_property (xobject_class, PROP_CERT_CERTIFICATE, "certificate");
+  xobject_class_override_property (xobject_class, PROP_CERT_CERTIFICATE_PEM, "certificate-pem");
+  xobject_class_override_property (xobject_class, PROP_CERT_PRIVATE_KEY, "private-key");
+  xobject_class_override_property (xobject_class, PROP_CERT_PRIVATE_KEY_PEM, "private-key-pem");
+  xobject_class_override_property (xobject_class, PROP_CERT_ISSUER, "issuer");
 }
 
 static void
@@ -276,11 +276,11 @@ xdummy_tls_connection_close (xio_stream_t     *stream,
 static void
 xdummy_tls_connection_class_init (GDummyTlsConnectionClass *connection_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (connection_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (connection_class);
   xio_stream_class_t *io_stream_class = XIO_STREAM_CLASS (connection_class);
 
-  gobject_class->get_property = xdummy_tls_connection_get_property;
-  gobject_class->set_property = xdummy_tls_connection_set_property;
+  xobject_class->get_property = xdummy_tls_connection_get_property;
+  xobject_class->set_property = xdummy_tls_connection_set_property;
 
   /* Need to override this because when initable_init fails it will
    * dispose the connection, which will close it, which would
@@ -289,22 +289,22 @@ xdummy_tls_connection_class_init (GDummyTlsConnectionClass *connection_class)
    */
   io_stream_class->close_fn = xdummy_tls_connection_close;
 
-  xobject_class_override_property (gobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
-  xobject_class_override_property (gobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
-  xobject_class_override_property (gobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
-  xobject_class_override_property (gobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
-  xobject_class_override_property (gobject_class, PROP_CONN_CERTIFICATE, "certificate");
-  xobject_class_override_property (gobject_class, PROP_CONN_DATABASE, "database");
-  xobject_class_override_property (gobject_class, PROP_CONN_INTERACTION, "interaction");
-  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
-  xobject_class_override_property (gobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
-  xobject_class_override_property (gobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
-  xobject_class_override_property (gobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
-  xobject_class_override_property (gobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
-  xobject_class_override_property (gobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
-  xobject_class_override_property (gobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
-  xobject_class_override_property (gobject_class, PROP_CONN_ADVERTISED_PROTOCOLS, "advertised-protocols");
-  xobject_class_override_property (gobject_class, PROP_CONN_NEGOTIATED_PROTOCOL, "negotiated-protocol");
+  xobject_class_override_property (xobject_class, PROP_CONN_BASE_IO_STREAM, "base-io-stream");
+  xobject_class_override_property (xobject_class, PROP_CONN_USE_SYSTEM_CERTDB, "use-system-certdb");
+  xobject_class_override_property (xobject_class, PROP_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
+  xobject_class_override_property (xobject_class, PROP_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
+  xobject_class_override_property (xobject_class, PROP_CONN_CERTIFICATE, "certificate");
+  xobject_class_override_property (xobject_class, PROP_CONN_DATABASE, "database");
+  xobject_class_override_property (xobject_class, PROP_CONN_INTERACTION, "interaction");
+  xobject_class_override_property (xobject_class, PROP_CONN_PEER_CERTIFICATE, "peer-certificate");
+  xobject_class_override_property (xobject_class, PROP_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
+  xobject_class_override_property (xobject_class, PROP_CONN_VALIDATION_FLAGS, "validation-flags");
+  xobject_class_override_property (xobject_class, PROP_CONN_SERVER_IDENTITY, "server-identity");
+  xobject_class_override_property (xobject_class, PROP_CONN_USE_SSL3, "use-ssl3");
+  xobject_class_override_property (xobject_class, PROP_CONN_ACCEPTED_CAS, "accepted-cas");
+  xobject_class_override_property (xobject_class, PROP_CONN_AUTHENTICATION_MODE, "authentication-mode");
+  xobject_class_override_property (xobject_class, PROP_CONN_ADVERTISED_PROTOCOLS, "advertised-protocols");
+  xobject_class_override_property (xobject_class, PROP_CONN_NEGOTIATED_PROTOCOL, "negotiated-protocol");
 }
 
 static void
@@ -390,23 +390,23 @@ g_dummy_dtls_connection_set_property (xobject_t      *object,
 static void
 g_dummy_dtls_connection_class_init (GDummyDtlsConnectionClass *connection_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (connection_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (connection_class);
 
-  gobject_class->get_property = g_dummy_dtls_connection_get_property;
-  gobject_class->set_property = g_dummy_dtls_connection_set_property;
+  xobject_class->get_property = g_dummy_dtls_connection_get_property;
+  xobject_class->set_property = g_dummy_dtls_connection_set_property;
 
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_BASE_SOCKET, "base-socket");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_CERTIFICATE, "certificate");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_DATABASE, "database");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_INTERACTION, "interaction");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE, "peer-certificate");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_VALIDATION_FLAGS, "validation-flags");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_SERVER_IDENTITY, "server-identity");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_ACCEPTED_CAS, "accepted-cas");
-  xobject_class_override_property (gobject_class, PROP_DTLS_CONN_AUTHENTICATION_MODE, "authentication-mode");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_BASE_SOCKET, "base-socket");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_REQUIRE_CLOSE_NOTIFY, "require-close-notify");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_REHANDSHAKE_MODE, "rehandshake-mode");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_CERTIFICATE, "certificate");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_DATABASE, "database");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_INTERACTION, "interaction");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE, "peer-certificate");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_PEER_CERTIFICATE_ERRORS, "peer-certificate-errors");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_VALIDATION_FLAGS, "validation-flags");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_SERVER_IDENTITY, "server-identity");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_ACCEPTED_CAS, "accepted-cas");
+  xobject_class_override_property (xobject_class, PROP_DTLS_CONN_AUTHENTICATION_MODE, "authentication-mode");
 }
 
 static void
@@ -486,12 +486,12 @@ xdummy_tls_database_set_property (xobject_t      *object,
 static void
 xdummy_tls_database_class_init (GDummyTlsDatabaseClass *database_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (database_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (database_class);
 
-  gobject_class->get_property = xdummy_tls_database_get_property;
-  gobject_class->set_property = xdummy_tls_database_set_property;
+  xobject_class->get_property = xdummy_tls_database_get_property;
+  xobject_class->set_property = xdummy_tls_database_set_property;
 
-  xobject_class_override_property (gobject_class, PROP_ANCHORS, "anchors");
+  xobject_class_override_property (xobject_class, PROP_ANCHORS, "anchors");
 }
 
 static void

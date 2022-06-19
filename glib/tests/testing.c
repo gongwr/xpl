@@ -177,7 +177,7 @@ test_assertions (void)
   g_assert_cmpfloat (7, <=, 3 + 4);
   g_assert_cmpfloat_with_epsilon (3.14, 3.15, 0.01);
   g_assert_cmpfloat_with_epsilon (3.14159, 3.1416, 0.0001);
-  g_assert (TRUE);
+  xassert (TRUE);
   g_assert_true (TRUE);
   g_assert_cmpstr ("foo", !=, "faa");
   fuu = xstrdup_printf ("f%s", "uu");

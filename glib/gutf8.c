@@ -234,7 +234,7 @@ xutf8_strlen (const xchar_t *p,
 {
   xlong_t len = 0;
   const xchar_t *start = p;
-  g_return_val_if_fail (p != NULL || max == 0, 0);
+  xreturn_val_if_fail (p != NULL || max == 0, 0);
 
   if (max < 0)
     {
@@ -292,7 +292,7 @@ xutf8_substring (const xchar_t *str,
 {
   xchar_t *start, *end, *out;
 
-  g_return_val_if_fail (end_pos >= start_pos || end_pos == -1, NULL);
+  xreturn_val_if_fail (end_pos >= start_pos || end_pos == -1, NULL);
 
   start = xutf8_offset_to_pointer (str, start_pos);
 
@@ -742,7 +742,7 @@ xutf8_to_ucs4_fast (const xchar_t *str,
   xint_t n_chars, i;
   const xchar_t *p;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   p = str;
   n_chars = 0;
@@ -1044,7 +1044,7 @@ xutf16_to_utf8 (const xunichar2_t  *str,
   xint_t n_bytes;
   xunichar_t high_surrogate;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   n_bytes = 0;
   in = str;
@@ -1185,7 +1185,7 @@ xutf16_to_ucs4 (const xunichar2_t  *str,
   xint_t n_bytes;
   xunichar_t high_surrogate;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   n_bytes = 0;
   in = str;
@@ -1322,7 +1322,7 @@ xutf8_to_utf16 (const xchar_t *str,
   const xchar_t *in;
   xint_t i;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   in = str;
   n16 = 0;
@@ -1583,7 +1583,7 @@ fast_validate_len (const char *str,
 {
   const xchar_t *p;
 
-  g_assert (max_len >= 0);
+  xassert (max_len >= 0);
 
   for (p = str; ((p - str) < max_len) && *p; p++)
     {
@@ -1795,7 +1795,7 @@ xutf8_strreverse (const xchar_t *str,
     {
       xchar_t *m, skip = xutf8_skip[*(xuchar_t*) p];
       r -= skip;
-      g_assert (r >= result);
+      xassert (r >= result);
       for (m = r; skip; skip--)
         *m++ = *p++;
     }
@@ -1832,7 +1832,7 @@ xutf8_make_valid (const xchar_t *str,
   const xchar_t *remainder, *invalid;
   xsize_t remaininxbytes, valid_bytes;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   if (len < 0)
     len = strlen (str);
@@ -1864,7 +1864,7 @@ xutf8_make_valid (const xchar_t *str,
   xstring_append_len (string, remainder, remaininxbytes);
   xstring_append_c (string, '\0');
 
-  g_assert (xutf8_validate (string->str, -1, NULL));
+  xassert (xutf8_validate (string->str, -1, NULL));
 
   return xstring_free (string, FALSE);
 }

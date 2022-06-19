@@ -72,7 +72,7 @@ enum
   PROP_OUTPUT_STREAM
 };
 
-G_DEFINE_TYPE (xsimple_io_stream, g_simple_io_stream, XTYPE_IO_STREAM)
+XDEFINE_TYPE (xsimple_io_stream, g_simple_io_stream, XTYPE_IO_STREAM)
 
 static void
 g_simple_io_stream_finalize (xobject_t *object)
@@ -85,7 +85,7 @@ g_simple_io_stream_finalize (xobject_t *object)
   if (stream->output_stream)
     xobject_unref (stream->output_stream);
 
-  G_OBJECT_CLASS (g_simple_io_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_simple_io_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -155,12 +155,12 @@ g_simple_io_stream_get_output_stream (xio_stream_t *stream)
 static void
 g_simple_io_stream_class_init (GSimpleIOStreamClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
   xio_stream_class_t *io_class = XIO_STREAM_CLASS (class);
 
-  gobject_class->finalize = g_simple_io_stream_finalize;
-  gobject_class->get_property = g_simple_io_stream_get_property;
-  gobject_class->set_property = g_simple_io_stream_set_property;
+  xobject_class->finalize = g_simple_io_stream_finalize;
+  xobject_class->get_property = g_simple_io_stream_get_property;
+  xobject_class->set_property = g_simple_io_stream_set_property;
 
   io_class->get_input_stream = g_simple_io_stream_get_input_stream;
   io_class->get_output_stream = g_simple_io_stream_get_output_stream;
@@ -170,28 +170,28 @@ g_simple_io_stream_class_init (GSimpleIOStreamClass *class)
    *
    * Since: 2.44
    */
-  xobject_class_install_property (gobject_class, PROP_INPUT_STREAM,
-                                   g_param_spec_object ("input-stream",
+  xobject_class_install_property (xobject_class, PROP_INPUT_STREAM,
+                                   xparam_spec_object ("input-stream",
                                                         P_("Input stream"),
                                                         P_("The xinput_stream_t to read from"),
                                                         XTYPE_INPUT_STREAM,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS |
-                                                        G_PARAM_CONSTRUCT_ONLY));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS |
+                                                        XPARAM_CONSTRUCT_ONLY));
 
   /**
    * xsimple_io_stream_t:output-stream:
    *
    * Since: 2.44
    */
-  xobject_class_install_property (gobject_class, PROP_OUTPUT_STREAM,
-                                   g_param_spec_object ("output-stream",
+  xobject_class_install_property (xobject_class, PROP_OUTPUT_STREAM,
+                                   xparam_spec_object ("output-stream",
                                                         P_("Output stream"),
                                                         P_("The xoutput_stream_t to write to"),
                                                         XTYPE_OUTPUT_STREAM,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS |
-                                                        G_PARAM_CONSTRUCT_ONLY));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS |
+                                                        XPARAM_CONSTRUCT_ONLY));
 }
 
 static void

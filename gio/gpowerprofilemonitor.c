@@ -133,9 +133,9 @@ xpower_profile_monitor_default_init (xpower_profile_monitor_tInterface *iface)
    * Since: 2.70
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_boolean ("power-saver-enabled",
+                                       xparam_spec_boolean ("power-saver-enabled",
                                                              "power-saver-enabled",
                                                              "Power Saver Enabled",
                                                              FALSE,
-                                                             G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY));
+                                                             XPARAM_READABLE | XPARAM_STATIC_STRINGS | XPARAM_EXPLICIT_NOTIFY));
 }

@@ -227,7 +227,7 @@ test_exit1_cancel_idle_quit_cb (xpointer_t user_data)
 {
   xmain_loop_t *loop = user_data;
   xmain_loop_quit (loop);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -924,7 +924,7 @@ on_test_communicate_cancelled_idle (xpointer_t user_data)
 
   xbytes_unref (input);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 /* test_t xsubprocess_communicate() can be cancelled correctly */
@@ -1763,8 +1763,8 @@ do_test_pass_fd (xsubprocess_flags_t     flags,
   g_free (needdup_fd_str);
 
   child_input = g_unix_input_stream_new (basic_pipefds[0], TRUE);
-  child_datainput = g_data_input_stream_new (child_input);
-  buf = g_data_input_stream_read_line_utf8 (child_datainput, &len, NULL, error);
+  child_datainput = xdata_input_stream_new (child_input);
+  buf = xdata_input_stream_read_line_utf8 (child_datainput, &len, NULL, error);
   g_assert_no_error (local_error);
   g_assert_cmpstr (buf, ==, "hello world");
   xobject_unref (child_datainput);
@@ -1772,8 +1772,8 @@ do_test_pass_fd (xsubprocess_flags_t     flags,
   g_free (buf);
 
   child_input = g_unix_input_stream_new (needdup_pipefds[0], TRUE);
-  child_datainput = g_data_input_stream_new (child_input);
-  buf = g_data_input_stream_read_line_utf8 (child_datainput, &len, NULL, error);
+  child_datainput = xdata_input_stream_new (child_input);
+  buf = xdata_input_stream_read_line_utf8 (child_datainput, &len, NULL, error);
   g_assert_no_error (local_error);
   g_assert_cmpstr (buf, ==, "hello world");
   g_free (buf);

@@ -46,7 +46,7 @@ struct _GLocalFileOutputStream
 
 struct _GLocalFileOutputStreamClass
 {
-  GFileOutputStreamClass parent_class;
+  xfile_output_stream_class_t parent_class;
 };
 
 xtype_t               _g_local_file_output_stream_get_type (void) G_GNUC_CONST;

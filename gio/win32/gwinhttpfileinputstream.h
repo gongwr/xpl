@@ -20,8 +20,8 @@
  * Author: Tor Lillqvist <tml@novell.com>
  */
 
-#ifndef __G_WINHTTP_FILE_INPUT_STREAM_H__
-#define __G_WINHTTP_FILE_INPUT_STREAM_H__
+#ifndef __XWINHTTP_FILE_INPUT_STREAM_H__
+#define __XWINHTTP_FILE_INPUT_STREAM_H__
 
 #include <gio/gfileinputstream.h>
 
@@ -30,21 +30,21 @@
 G_BEGIN_DECLS
 
 #define XTYPE_WINHTTP_FILE_INPUT_STREAM         (_g_winhttp_file_input_stream_get_type ())
-#define G_WINHTTP_FILE_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WINHTTP_FILE_INPUT_STREAM, GWinHttpFileInputStream))
-#define G_WINHTTP_FILE_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WINHTTP_FILE_INPUT_STREAM, GWinHttpFileInputStreamClass))
+#define XWINHTTP_FILE_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WINHTTP_FILE_INPUT_STREAM, GWinHttpFileInputStream))
+#define XWINHTTP_FILE_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WINHTTP_FILE_INPUT_STREAM, GWinHttpFileInputStreamClass))
 #define X_IS_WINHTTP_FILE_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_WINHTTP_FILE_INPUT_STREAM))
 #define X_IS_WINHTTP_FILE_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_WINHTTP_FILE_INPUT_STREAM))
-#define G_WINHTTP_FILE_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_WINHTTP_FILE_INPUT_STREAM, GWinHttpFileInputStreamClass))
+#define XWINHTTP_FILE_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_WINHTTP_FILE_INPUT_STREAM, GWinHttpFileInputStreamClass))
 
 typedef struct _GWinHttpFileInputStream         GWinHttpFileInputStream;
 typedef struct _GWinHttpFileInputStreamClass    GWinHttpFileInputStreamClass;
 
 xtype_t _g_winhttp_file_input_stream_get_type (void) G_GNUC_CONST;
 
-xfile_input_stream_t *_g_winhttp_file_input_stream_new (GWinHttpFile *file,
+xfile_input_stream_t *_g_winhttp_file_input_stream_new (xwin_http_file_t *file,
                                                     HINTERNET     connection,
                                                     HINTERNET     request);
 
 G_END_DECLS
 
-#endif /* __G_WINHTTP_FILE_INPUT_STREAM_H__ */
+#endif /* __XWINHTTP_FILE_INPUT_STREAM_H__ */

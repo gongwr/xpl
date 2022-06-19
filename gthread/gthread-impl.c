@@ -43,6 +43,6 @@ xthread_init (xpointer_t init)
 void
 xthread_init_with_errorcheck_mutexes (xpointer_t vtable)
 {
-  g_assert (vtable == NULL);
+  xassert (vtable == NULL);
   g_warning ("xthread_t system no longer supports errorcheck mutexes.");
 }

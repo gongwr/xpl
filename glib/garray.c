@@ -180,9 +180,9 @@ g_array_new (xboolean_t zero_terminated,
              xboolean_t clear,
              xuint_t    elt_size)
 {
-  g_return_val_if_fail (elt_size > 0, NULL);
+  xreturn_val_if_fail (elt_size > 0, NULL);
 #if (UINT_WIDTH / 8) >= XPL_SIZEOF_SIZE_T
-  g_return_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
+  xreturn_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
 #endif
 
   return g_array_sized_new (zero_terminated, clear, elt_size, 0);
@@ -225,7 +225,7 @@ g_array_steal (xarray_t *array,
   GRealArray *rarray;
   xpointer_t segment;
 
-  g_return_val_if_fail (array != NULL, NULL);
+  xreturn_val_if_fail (array != NULL, NULL);
 
   rarray = (GRealArray *) array;
   segment = (xpointer_t) rarray->data;
@@ -263,9 +263,9 @@ g_array_sized_new (xboolean_t zero_terminated,
 {
   GRealArray *array;
 
-  g_return_val_if_fail (elt_size > 0, NULL);
+  xreturn_val_if_fail (elt_size > 0, NULL);
 #if (UINT_WIDTH / 8) >= XPL_SIZEOF_SIZE_T
-  g_return_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
+  xreturn_val_if_fail (elt_size <= G_MAXSIZE / 2 - 1, NULL);
 #endif
 
   array = g_slice_new (GRealArray);
@@ -354,7 +354,7 @@ xarray_t *
 g_array_ref (xarray_t *array)
 {
   GRealArray *rarray = (GRealArray*) array;
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   g_atomic_ref_count_inc (&rarray->ref_count);
 
@@ -405,7 +405,7 @@ g_array_get_element_size (xarray_t *array)
 {
   GRealArray *rarray = (GRealArray*) array;
 
-  g_return_val_if_fail (array, 0);
+  xreturn_val_if_fail (array, 0);
 
   return rarray->elt_size;
 }
@@ -440,7 +440,7 @@ g_array_free (xarray_t   *farray,
   GRealArray *array = (GRealArray*) farray;
   ArrayFreeFlags flags;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   flags = (free_segment ? FREE_SEGMENT : 0);
 
@@ -518,7 +518,7 @@ g_array_append_vals (xarray_t       *farray,
 {
   GRealArray *array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   if (len == 0)
     return farray;
@@ -577,7 +577,7 @@ g_array_prepend_vals (xarray_t        *farray,
 {
   GRealArray *array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   if (len == 0)
     return farray;
@@ -641,7 +641,7 @@ g_array_insert_vals (xarray_t        *farray,
 {
   GRealArray *array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   if (len == 0)
     return farray;
@@ -685,7 +685,7 @@ g_array_set_size (xarray_t *farray,
 {
   GRealArray *array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   if (length > array->len)
     {
@@ -720,9 +720,9 @@ g_array_remove_index (xarray_t *farray,
 {
   GRealArray* array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
-  g_return_val_if_fail (index_ < array->len, NULL);
+  xreturn_val_if_fail (index_ < array->len, NULL);
 
   if (array->clear_func != NULL)
     array->clear_func (g_array_elt_pos (array, index_));
@@ -760,9 +760,9 @@ g_array_remove_index_fast (xarray_t *farray,
 {
   GRealArray* array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
-  g_return_val_if_fail (index_ < array->len, NULL);
+  xreturn_val_if_fail (index_ < array->len, NULL);
 
   if (array->clear_func != NULL)
     array->clear_func (g_array_elt_pos (array, index_));
@@ -802,9 +802,9 @@ g_array_remove_range (xarray_t *farray,
 {
   GRealArray *array = (GRealArray*) farray;
 
-  g_return_val_if_fail (array, NULL);
-  g_return_val_if_fail (index_ <= array->len, NULL);
-  g_return_val_if_fail (index_ + length <= array->len, NULL);
+  xreturn_val_if_fail (array, NULL);
+  xreturn_val_if_fail (index_ <= array->len, NULL);
+  xreturn_val_if_fail (index_ + length <= array->len, NULL);
 
   if (array->clear_func != NULL)
     {
@@ -939,8 +939,8 @@ g_array_binary_search (xarray_t        *array,
   xuint_t left, middle = 0, right;
   xint_t val;
 
-  g_return_val_if_fail (_array != NULL, FALSE);
-  g_return_val_if_fail (compare_func != NULL, FALSE);
+  xreturn_val_if_fail (_array != NULL, FALSE);
+  xreturn_val_if_fail (compare_func != NULL, FALSE);
 
   if (G_LIKELY(_array->len))
     {
@@ -1166,7 +1166,7 @@ xptr_array_new (void)
  *
  * // After calling xptr_array_steal(), the pointer array can be reused for the
  * // next set of chunks.
- * g_assert (chunk_buffer->len == 0);
+ * xassert (chunk_buffer->len == 0);
  * ]|
  *
  * Returns: (transfer full): the element data, which should be
@@ -1181,7 +1181,7 @@ xptr_array_steal (xptr_array_t *array,
   GRealPtrArray *rarray;
   xpointer_t *segment;
 
-  g_return_val_if_fail (array != NULL, NULL);
+  xreturn_val_if_fail (array != NULL, NULL);
 
   rarray = (GRealPtrArray *) array;
   segment = (xpointer_t *) rarray->pdata;
@@ -1226,7 +1226,7 @@ xptr_array_copy (xptr_array_t *array,
 {
   xptr_array_t *new_array;
 
-  g_return_val_if_fail (array != NULL, NULL);
+  xreturn_val_if_fail (array != NULL, NULL);
 
   new_array = ptr_array_new (array->len,
                              ((GRealPtrArray *) array)->element_free_func);
@@ -1283,7 +1283,7 @@ g_array_copy (xarray_t *array)
   GRealArray *rarray = (GRealArray *) array;
   GRealArray *new_rarray;
 
-  g_return_val_if_fail (rarray != NULL, NULL);
+  xreturn_val_if_fail (rarray != NULL, NULL);
 
   new_rarray =
     (GRealArray *) g_array_sized_new (rarray->zero_terminated, rarray->clear,
@@ -1381,7 +1381,7 @@ xptr_array_ref (xptr_array_t *array)
 {
   GRealPtrArray *rarray = (GRealPtrArray *)array;
 
-  g_return_val_if_fail (array, NULL);
+  xreturn_val_if_fail (array, NULL);
 
   g_atomic_ref_count_inc (&rarray->ref_count);
 
@@ -1442,7 +1442,7 @@ xptr_array_free (xptr_array_t *array,
   GRealPtrArray *rarray = (GRealPtrArray *)array;
   ArrayFreeFlags flags;
 
-  g_return_val_if_fail (rarray, NULL);
+  xreturn_val_if_fail (rarray, NULL);
 
   flags = (free_segment ? FREE_SEGMENT : 0);
 
@@ -1579,10 +1579,10 @@ ptr_array_remove_index (xptr_array_t *array,
   GRealPtrArray *rarray = (GRealPtrArray *) array;
   xpointer_t result;
 
-  g_return_val_if_fail (rarray, NULL);
-  g_return_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
+  xreturn_val_if_fail (rarray, NULL);
+  xreturn_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
 
-  g_return_val_if_fail (index_ < rarray->len, NULL);
+  xreturn_val_if_fail (index_ < rarray->len, NULL);
 
   result = rarray->pdata[index_];
 
@@ -1710,10 +1710,10 @@ xptr_array_remove_range (xptr_array_t *array,
   GRealPtrArray *rarray = (GRealPtrArray *)array;
   xuint_t i;
 
-  g_return_val_if_fail (rarray != NULL, NULL);
-  g_return_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
-  g_return_val_if_fail (index_ <= rarray->len, NULL);
-  g_return_val_if_fail (index_ + length <= rarray->len, NULL);
+  xreturn_val_if_fail (rarray != NULL, NULL);
+  xreturn_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), NULL);
+  xreturn_val_if_fail (index_ <= rarray->len, NULL);
+  xreturn_val_if_fail (index_ + length <= rarray->len, NULL);
 
   if (rarray->element_free_func != NULL)
     {
@@ -1760,8 +1760,8 @@ xptr_array_remove (xptr_array_t *array,
 {
   xuint_t i;
 
-  g_return_val_if_fail (array, FALSE);
-  g_return_val_if_fail (array->len == 0 || (array->len != 0 && array->pdata != NULL), FALSE);
+  xreturn_val_if_fail (array, FALSE);
+  xreturn_val_if_fail (array->len == 0 || (array->len != 0 && array->pdata != NULL), FALSE);
 
   for (i = 0; i < array->len; i += 1)
     {
@@ -1798,8 +1798,8 @@ xptr_array_remove_fast (xptr_array_t *array,
   GRealPtrArray *rarray = (GRealPtrArray *)array;
   xuint_t i;
 
-  g_return_val_if_fail (rarray, FALSE);
-  g_return_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), FALSE);
+  xreturn_val_if_fail (rarray, FALSE);
+  xreturn_val_if_fail (rarray->len == 0 || (rarray->len != 0 && rarray->pdata != NULL), FALSE);
 
   for (i = 0; i < rarray->len; i += 1)
     {
@@ -2172,7 +2172,7 @@ xptr_array_find_with_equal_func (xptr_array_t     *haystack,
 {
   xuint_t i;
 
-  g_return_val_if_fail (haystack != NULL, FALSE);
+  xreturn_val_if_fail (haystack != NULL, FALSE);
 
   if (equal_func == NULL)
     equal_func = g_direct_equal;
@@ -2216,10 +2216,10 @@ xptr_array_find_with_equal_func (xptr_array_t     *haystack,
  *
  *   for (i = 0; i < 10000; i++)
  *     {
- *       g_assert (gbarray->data[4*i] == 'a');
- *       g_assert (gbarray->data[4*i+1] == 'b');
- *       g_assert (gbarray->data[4*i+2] == 'c');
- *       g_assert (gbarray->data[4*i+3] == 'd');
+ *       xassert (gbarray->data[4*i] == 'a');
+ *       xassert (gbarray->data[4*i+1] == 'b');
+ *       xassert (gbarray->data[4*i+2] == 'c');
+ *       xassert (gbarray->data[4*i+3] == 'd');
  *     }
  *
  *   xbyte_array_free (gbarray, TRUE);
@@ -2296,11 +2296,11 @@ xbyte_array_new_take (xuint8_t *data,
   xbyte_array_t *array;
   GRealArray *real;
 
-  g_return_val_if_fail (len <= G_MAXUINT, NULL);
+  xreturn_val_if_fail (len <= G_MAXUINT, NULL);
   array = xbyte_array_new ();
   real = (GRealArray *)array;
-  g_assert (real->data == NULL);
-  g_assert (real->len == 0);
+  xassert (real->data == NULL);
+  xassert (real->len == 0);
 
   real->data = data;
   real->len = len;
@@ -2369,7 +2369,7 @@ xbyte_array_free_to_bytes (xbyte_array_t *array)
 {
   xsize_t length;
 
-  g_return_val_if_fail (array != NULL, NULL);
+  xreturn_val_if_fail (array != NULL, NULL);
 
   length = array->len;
   return xbytes_new_take (xbyte_array_free (array, FALSE), length);
@@ -2527,9 +2527,9 @@ xbyte_array_remove_range (xbyte_array_t *array,
                            xuint_t       index_,
                            xuint_t       length)
 {
-  g_return_val_if_fail (array, NULL);
-  g_return_val_if_fail (index_ <= array->len, NULL);
-  g_return_val_if_fail (index_ + length <= array->len, NULL);
+  xreturn_val_if_fail (array, NULL);
+  xreturn_val_if_fail (index_ <= array->len, NULL);
+  xreturn_val_if_fail (index_ + length <= array->len, NULL);
 
   return (xbyte_array_t *)g_array_remove_range ((xarray_t *)array, index_, length);
 }

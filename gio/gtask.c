@@ -151,7 +151,7 @@
  *                             xasync_result_t  *result,
  *                             xerror_t       **error)
  *     {
- *       g_return_val_if_fail (xtask_is_valid (result, self), NULL);
+ *       xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
  *
  *       return xtask_propagate_pointer (XTASK (result), error);
  *     }
@@ -218,7 +218,7 @@
  *                            xtask_get_cancellable (task),
  *                            decorated_cb, task);
  *
- *       return G_SOURCE_REMOVE;
+ *       return XSOURCE_REMOVE;
  *     }
  *
  *     static void
@@ -290,7 +290,7 @@
  *                             xasync_result_t  *result,
  *                             xerror_t       **error)
  *     {
- *       g_return_val_if_fail (xtask_is_valid (result, self), NULL);
+ *       xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
  *
  *       return xtask_propagate_pointer (XTASK (result), error);
  *     }
@@ -369,7 +369,7 @@
  *                             xasync_result_t  *result,
  *                             xerror_t       **error)
  *     {
- *       g_return_val_if_fail (xtask_is_valid (result, self), NULL);
+ *       xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
  *
  *       return xtask_propagate_pointer (XTASK (result), error);
  *     }
@@ -618,7 +618,7 @@ G_DEFINE_TYPE_WITH_CODE (xtask, xtask, XTYPE_OBJECT,
 
 static GThreadPool *task_pool;
 static xmutex_t task_pool_mutex;
-static GPrivate task_private = G_PRIVATE_INIT (NULL);
+static xprivate_t task_private = G_PRIVATE_INIT (NULL);
 static xsource_t *task_pool_manager;
 static xuint64_t task_wait_time;
 static xint_t tasks_running;
@@ -678,7 +678,7 @@ xtask_finalize (xobject_t *object)
       g_cond_clear (&task->cond);
     }
 
-  G_OBJECT_CLASS (xtask_parent_class)->finalize (object);
+  XOBJECT_CLASS (xtask_parent_class)->finalize (object);
 }
 
 /**
@@ -949,8 +949,8 @@ xboolean_t
 xtask_set_return_on_cancel (xtask_t    *task,
                              xboolean_t  return_on_cancel)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
-  g_return_val_if_fail (task->check_cancellable || !return_on_cancel, FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (task->check_cancellable || !return_on_cancel, FALSE);
 
   if (!XTASK_IS_THREADED (task))
     {
@@ -1052,7 +1052,7 @@ xtask_set_name (xtask_t       *task,
 xpointer_t
 xtask_get_source_object (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   return task->source_object;
 }
@@ -1081,7 +1081,7 @@ xtask_ref_source_object (xasync_result_t *res)
 xpointer_t
 xtask_get_task_data (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   return task->task_data;
 }
@@ -1099,7 +1099,7 @@ xtask_get_task_data (xtask_t *task)
 xint_t
 xtask_get_priority (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), G_PRIORITY_DEFAULT);
+  xreturn_val_if_fail (X_IS_TASK (task), G_PRIORITY_DEFAULT);
 
   return task->priority;
 }
@@ -1123,7 +1123,7 @@ xtask_get_priority (xtask_t *task)
 xmain_context_t *
 xtask_get_context (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   return task->context;
 }
@@ -1141,7 +1141,7 @@ xtask_get_context (xtask_t *task)
 xcancellable_t *
 xtask_get_cancellable (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   return task->cancellable;
 }
@@ -1158,7 +1158,7 @@ xtask_get_cancellable (xtask_t *task)
 xboolean_t
 xtask_get_check_cancellable (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
 
   /* Convert from a bit field to a boolean. */
   return task->check_cancellable ? TRUE : FALSE;
@@ -1176,7 +1176,7 @@ xtask_get_check_cancellable (xtask_t *task)
 xboolean_t
 xtask_get_return_on_cancel (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
 
   /* Convert from a bit field to a boolean. */
   return task->return_on_cancel ? TRUE : FALSE;
@@ -1195,7 +1195,7 @@ xtask_get_return_on_cancel (xtask_t *task)
 xpointer_t
 xtask_get_source_tag (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   return task->source_tag;
 }
@@ -1212,7 +1212,7 @@ xtask_get_source_tag (xtask_t *task)
 const xchar_t *
 xtask_get_name (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   return task->name;
 }
@@ -1742,12 +1742,12 @@ xpointer_t
 xtask_propagate_pointer (xtask_t   *task,
                           xerror_t **error)
 {
-  g_return_val_if_fail (X_IS_TASK (task), NULL);
+  xreturn_val_if_fail (X_IS_TASK (task), NULL);
 
   if (xtask_propagate_error (task, error))
     return NULL;
 
-  g_return_val_if_fail (task->result_set, NULL);
+  xreturn_val_if_fail (task->result_set, NULL);
 
   task->result_destroy = NULL;
   task->result_set = FALSE;
@@ -1798,12 +1798,12 @@ xssize_t
 xtask_propagate_int (xtask_t   *task,
                       xerror_t **error)
 {
-  g_return_val_if_fail (X_IS_TASK (task), -1);
+  xreturn_val_if_fail (X_IS_TASK (task), -1);
 
   if (xtask_propagate_error (task, error))
     return -1;
 
-  g_return_val_if_fail (task->result_set, -1);
+  xreturn_val_if_fail (task->result_set, -1);
 
   task->result_set = FALSE;
   return task->result.size;
@@ -1853,12 +1853,12 @@ xboolean_t
 xtask_propagate_boolean (xtask_t   *task,
                           xerror_t **error)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
 
   if (xtask_propagate_error (task, error))
     return FALSE;
 
-  g_return_val_if_fail (task->result_set, FALSE);
+  xreturn_val_if_fail (task->result_set, FALSE);
 
   task->result_set = FALSE;
   return task->result.boolean;
@@ -1948,8 +1948,8 @@ xtask_return_error_if_cancelled (xtask_t *task)
 {
   xerror_t *error = NULL;
 
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
-  g_return_val_if_fail (!task->ever_returned, FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (!task->ever_returned, FALSE);
 
   if (xcancellable_set_error_if_cancelled (task->cancellable, &error))
     {
@@ -1979,7 +1979,7 @@ xtask_return_error_if_cancelled (xtask_t *task)
 xboolean_t
 xtask_had_error (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
 
   if (task->error != NULL || task->had_error)
     return TRUE;
@@ -2065,15 +2065,15 @@ xtask_propagate_value (xtask_t   *task,
                         xvalue_t  *value,
                         xerror_t **error)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
-  g_return_val_if_fail (value != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (value != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (xtask_propagate_error (task, error))
     return FALSE;
 
-  g_return_val_if_fail (task->result_set, FALSE);
-  g_return_val_if_fail (task->result_destroy == value_free, FALSE);
+  xreturn_val_if_fail (task->result_set, FALSE);
+  xreturn_val_if_fail (task->result_destroy == value_free, FALSE);
 
   memcpy (value, task->result.pointer, sizeof (xvalue_t));
   g_free (task->result.pointer);
@@ -2099,7 +2099,7 @@ xtask_propagate_value (xtask_t   *task,
 xboolean_t
 xtask_get_completed (xtask_t *task)
 {
-  g_return_val_if_fail (X_IS_TASK (task), FALSE);
+  xreturn_val_if_fail (X_IS_TASK (task), FALSE);
 
   /* Convert from a bit field to a boolean. */
   return task->completed ? TRUE : FALSE;
@@ -2183,7 +2183,7 @@ xtask_thread_pool_init (void)
 {
   task_pool = xthread_pool_new (xtask_thread_pool_thread, NULL,
                                  XTASK_POOL_SIZE, FALSE, NULL);
-  g_assert (task_pool != NULL);
+  xassert (task_pool != NULL);
 
   xthread_pool_set_sort_function (task_pool, xtask_compare_priority, NULL);
 
@@ -2215,10 +2215,10 @@ xtask_get_property (xobject_t    *object,
 static void
 xtask_class_init (xtask_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xtask_get_property;
-  gobject_class->finalize = xtask_finalize;
+  xobject_class->get_property = xtask_get_property;
+  xobject_class->finalize = xtask_finalize;
 
   /**
    * xtask_t:completed:
@@ -2235,11 +2235,11 @@ xtask_class_init (xtask_class_t *klass)
    *
    * Since: 2.44
    */
-  xobject_class_install_property (gobject_class, PROP_COMPLETED,
-    g_param_spec_boolean ("completed",
+  xobject_class_install_property (xobject_class, PROP_COMPLETED,
+    xparam_spec_boolean ("completed",
                           P_("Task completed"),
                           P_("Whether the task has completed yet"),
-                          FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                          FALSE, XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
   if (G_UNLIKELY (task_pool_max_counter == 0))
     {

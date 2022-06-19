@@ -39,7 +39,7 @@ typedef struct _GCancellable                  xcancellable_t;
 typedef struct _GCharsetConverter             xcharset_converter_t;
 typedef struct _GConverter                    xconverter_t;
 typedef struct _GConverterInputStream         xconverter_input_stream_t;
-typedef struct _GConverterOutputStream        xconverter_output_stream_t;
+typedef struct _xconverter_output_stream        xconverter_output_stream_t;
 typedef struct _GDatagramBased                xdatagram_based_t;
 typedef struct _GDataInputStream              xdata_input_stream_t;
 typedef struct _GSimplePermission             xsimple_permission_t;
@@ -93,7 +93,7 @@ typedef struct _GFileAttributeMatcher         xfile_attribute_matcher_t;
 typedef struct _GFileAttributeInfo            xfile_attribute_info_t;
 typedef struct _GFileAttributeInfoList        xfile_attribute_info_list_t;
 typedef struct _GFileDescriptorBased          xfile_descriptor_based_t;
-typedef struct _GFileInputStream              xfile_input_stream_t;
+typedef struct _xfile_input_stream              xfile_input_stream_t;
 typedef struct _GFileOutputStream             xfile_output_stream_t;
 typedef struct _GFileIOStream                 xfile_io_stream_t;
 typedef struct _GFileIcon                     xfile_icon_t;
@@ -412,7 +412,7 @@ typedef xboolean_t (*xsocket_source_func_t) (xsocket_t *socket,
  * This is the function type of the callback used for the #xsource_t
  * returned by g_datagram_based_create_source().
  *
- * Returns: %G_SOURCE_REMOVE if the source should be removed,
+ * Returns: %XSOURCE_REMOVE if the source should be removed,
  *   %G_SOURCE_CONTINUE otherwise
  *
  * Since: 2.48

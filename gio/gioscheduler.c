@@ -246,8 +246,8 @@ g_io_scheduler_job_send_to_mainloop (xio_scheduler_job_t *job,
   MainLoopProxy *proxy;
   xboolean_t ret_val;
 
-  g_return_val_if_fail (job != NULL, FALSE);
-  g_return_val_if_fail (func != NULL, FALSE);
+  xreturn_val_if_fail (job != NULL, FALSE);
+  xreturn_val_if_fail (func != NULL, FALSE);
 
   proxy = g_new0 (MainLoopProxy, 1);
   proxy->func = func;

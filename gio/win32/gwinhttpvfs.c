@@ -105,16 +105,16 @@ g_winhttp_vfs_finalize (xobject_t *object)
 {
   GWinHttpVfs *vfs;
 
-  vfs = G_WINHTTP_VFS (object);
+  vfs = XWINHTTP_VFS (object);
 
-  (G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpCloseHandle) (vfs->session);
+  (XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpCloseHandle) (vfs->session);
   vfs->session = NULL;
 
   if (vfs->wrapped_vfs)
     xobject_unref (vfs->wrapped_vfs);
   vfs->wrapped_vfs = NULL;
 
-  G_OBJECT_CLASS (g_winhttp_vfs_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_winhttp_vfs_parent_class)->finalize (object);
 }
 
 static void
@@ -130,7 +130,7 @@ g_winhttp_vfs_init (GWinHttpVfs *vfs)
   else
     wagent = xutf8_to_utf16 ("GWinHttpVfs", -1, NULL, NULL, NULL);
 
-  vfs->session = (G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpOpen)
+  vfs->session = (XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpOpen)
     (wagent,
      WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
      WINHTTP_NO_PROXY_NAME,
@@ -157,14 +157,14 @@ static xfile_t *
 g_winhttp_vfs_get_file_for_path (xvfs_t       *vfs,
                                  const char *path)
 {
-  return xvfs_get_file_for_path (G_WINHTTP_VFS (vfs)->wrapped_vfs, path);
+  return xvfs_get_file_for_path (XWINHTTP_VFS (vfs)->wrapped_vfs, path);
 }
 
 static xfile_t *
 g_winhttp_vfs_get_file_for_uri (xvfs_t       *vfs,
                                 const char *uri)
 {
-  GWinHttpVfs *winhttp_vfs = G_WINHTTP_VFS (vfs);
+  GWinHttpVfs *winhttp_vfs = XWINHTTP_VFS (vfs);
   xsize_t i;
   xfile_t *ret = NULL;
 
@@ -182,7 +182,7 @@ g_winhttp_vfs_get_file_for_uri (xvfs_t       *vfs,
   if (ret == NULL)
     ret = xvfs_get_file_for_uri (winhttp_vfs->wrapped_vfs, uri);
 
-  g_assert (ret != NULL);
+  xassert (ret != NULL);
 
   return g_steal_pointer (&ret);
 }
@@ -190,7 +190,7 @@ g_winhttp_vfs_get_file_for_uri (xvfs_t       *vfs,
 static const xchar_t * const *
 g_winhttp_vfs_get_supported_uri_schemes (xvfs_t *vfs)
 {
-  GWinHttpVfs *winhttp_vfs = G_WINHTTP_VFS (vfs);
+  GWinHttpVfs *winhttp_vfs = XWINHTTP_VFS (vfs);
   const xchar_t * const *wrapped_vfs_uri_schemes = xvfs_get_supported_uri_schemes (winhttp_vfs->wrapped_vfs);
   xsize_t i, n;
   const xchar_t **retval;
@@ -222,10 +222,10 @@ static xfile_t *
 g_winhttp_vfs_parse_name (xvfs_t       *vfs,
                           const char *parse_name)
 {
-  GWinHttpVfs *winhttp_vfs = G_WINHTTP_VFS (vfs);
+  GWinHttpVfs *winhttp_vfs = XWINHTTP_VFS (vfs);
 
-  g_return_val_if_fail (X_IS_VFS (vfs), NULL);
-  g_return_val_if_fail (parse_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
+  xreturn_val_if_fail (parse_name != NULL, NULL);
 
   /* For plain file paths fallback to the wrapped xvfs_t */
   if (g_path_is_absolute (parse_name))
@@ -354,7 +354,7 @@ _g_winhttp_response (GWinHttpVfs *vfs,
   wchar_t *status_code;
   DWORD status_code_len;
 
-  if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpReceiveResponse (request, NULL))
+  if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpReceiveResponse (request, NULL))
     {
       _g_winhttp_set_error (error, GetLastError (), what);
 
@@ -362,7 +362,7 @@ _g_winhttp_response (GWinHttpVfs *vfs,
     }
 
   status_code_len = 0;
-  if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
+  if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
       (request,
        WINHTTP_QUERY_STATUS_CODE,
        NULL,
@@ -378,7 +378,7 @@ _g_winhttp_response (GWinHttpVfs *vfs,
 
   status_code = g_malloc (status_code_len);
 
-  if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
+  if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
       (request,
        WINHTTP_QUERY_STATUS_CODE,
        NULL,
@@ -397,7 +397,7 @@ _g_winhttp_response (GWinHttpVfs *vfs,
       wchar_t *status_text = NULL;
       DWORD status_text_len;
 
-      if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
+      if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
           (request,
            WINHTTP_QUERY_STATUS_TEXT,
            NULL,
@@ -408,7 +408,7 @@ _g_winhttp_response (GWinHttpVfs *vfs,
         {
           status_text = g_malloc (status_text_len);
 
-          if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
+          if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
               (request,
                WINHTTP_QUERY_STATUS_TEXT,
                NULL,
@@ -445,7 +445,7 @@ _g_winhttp_query_header (GWinHttpVfs *vfs,
 {
   DWORD header_len = 0;
 
-  if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
+  if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
       (request,
        which_header,
        NULL,
@@ -460,7 +460,7 @@ _g_winhttp_query_header (GWinHttpVfs *vfs,
     }
 
   *header = g_malloc (header_len);
-  if (!G_WINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
+  if (!XWINHTTP_VFS_GET_CLASS (vfs)->funcs->pWinHttpQueryHeaders
       (request,
        which_header,
        NULL,

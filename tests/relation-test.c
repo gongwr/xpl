@@ -82,36 +82,36 @@ main (int   argc,
 
   for (i = 2; i < 1022; i += 1)
     {
-      g_assert (! g_relation_exists (relation, data + i, data + i));
-      g_assert (! g_relation_exists (relation, data + i, data + i + 2));
-      g_assert (! g_relation_exists (relation, data + i, data + i - 2));
+      xassert (! g_relation_exists (relation, data + i, data + i));
+      xassert (! g_relation_exists (relation, data + i, data + i + 2));
+      xassert (! g_relation_exists (relation, data + i, data + i - 2));
     }
 
   for (i = 1; i < 1023; i += 1)
     {
-      g_assert (g_relation_exists (relation, data + i, data + i + 1));
-      g_assert (g_relation_exists (relation, data + i, data + i - 1));
+      xassert (g_relation_exists (relation, data + i, data + i + 1));
+      xassert (g_relation_exists (relation, data + i, data + i - 1));
     }
 
   for (i = 2; i < 1022; i += 1)
     {
-      g_assert (g_relation_count (relation, data + i, 0) == 2);
-      g_assert (g_relation_count (relation, data + i, 1) == 2);
+      xassert (g_relation_count (relation, data + i, 0) == 2);
+      xassert (g_relation_count (relation, data + i, 1) == 2);
     }
 
-  g_assert (g_relation_count (relation, data, 0) == 0);
+  xassert (g_relation_count (relation, data, 0) == 0);
 
-  g_assert (g_relation_count (relation, data + 42, 0) == 2);
-  g_assert (g_relation_count (relation, data + 43, 1) == 2);
-  g_assert (g_relation_count (relation, data + 41, 1) == 2);
+  xassert (g_relation_count (relation, data + 42, 0) == 2);
+  xassert (g_relation_count (relation, data + 43, 1) == 2);
+  xassert (g_relation_count (relation, data + 41, 1) == 2);
   g_relation_delete (relation, data + 42, 0);
-  g_assert (g_relation_count (relation, data + 42, 0) == 0);
-  g_assert (g_relation_count (relation, data + 43, 1) == 1);
-  g_assert (g_relation_count (relation, data + 41, 1) == 1);
+  xassert (g_relation_count (relation, data + 42, 0) == 0);
+  xassert (g_relation_count (relation, data + 43, 1) == 1);
+  xassert (g_relation_count (relation, data + 41, 1) == 1);
 
   tuples = g_relation_select (relation, data + 200, 0);
 
-  g_assert (tuples->len == 2);
+  xassert (tuples->len == 2);
 
 #if 0
   for (i = 0; i < tuples->len; i += 1)
@@ -122,9 +122,9 @@ main (int   argc,
     }
 #endif
 
-  g_assert (g_relation_exists (relation, data + 300, data + 301));
+  xassert (g_relation_exists (relation, data + 300, data + 301));
   g_relation_delete (relation, data + 300, 0);
-  g_assert (!g_relation_exists (relation, data + 300, data + 301));
+  xassert (!g_relation_exists (relation, data + 300, data + 301));
 
   g_tuples_destroy (tuples);
 

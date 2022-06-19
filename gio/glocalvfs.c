@@ -55,7 +55,7 @@ static void
 g_local_vfs_finalize (xobject_t *object)
 {
   /* must chain up */
-  G_OBJECT_CLASS (g_local_vfs_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_local_vfs_parent_class)->finalize (object);
 }
 
 static void
@@ -136,8 +136,8 @@ g_local_vfs_parse_name (xvfs_t       *vfs,
   const char *user_end;
   char *rest;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), NULL);
-  g_return_val_if_fail (parse_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
+  xreturn_val_if_fail (parse_name != NULL, NULL);
 
   if (g_ascii_strncasecmp ("file:", parse_name, 5) == 0)
     filename = xfilename_from_uri (parse_name, NULL, NULL);

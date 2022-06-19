@@ -47,7 +47,7 @@ struct _GTlsCertificateClass
 {
   xobject_class_t parent_class;
 
-  GTlsCertificateFlags  (* verify) (xtls_certificate_t     *cert,
+  xtls_certificate_flags_t  (* verify) (xtls_certificate_t     *cert,
 				    xsocket_connectable_t  *identity,
 				    xtls_certificate_t     *trusted_ca);
 
@@ -92,7 +92,7 @@ XPL_AVAILABLE_IN_ALL
 xtls_certificate_t      *xtls_certificate_get_issuer         (xtls_certificate_t     *cert);
 
 XPL_AVAILABLE_IN_ALL
-GTlsCertificateFlags  xtls_certificate_verify             (xtls_certificate_t     *cert,
+xtls_certificate_flags_t  xtls_certificate_verify             (xtls_certificate_t     *cert,
 							    xsocket_connectable_t  *identity,
 							    xtls_certificate_t     *trusted_ca);
 

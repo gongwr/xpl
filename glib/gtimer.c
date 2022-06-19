@@ -221,7 +221,7 @@ g_timer_elapsed (xtimer_t *timer,
   xdouble_t total;
   sint64_t elapsed;
 
-  g_return_val_if_fail (timer != NULL, 0);
+  xreturn_val_if_fail (timer != NULL, 0);
 
   if (timer->active)
     timer->end = g_get_monotonic_time ();
@@ -248,7 +248,7 @@ g_timer_elapsed (xtimer_t *timer,
 xboolean_t
 g_timer_is_active (xtimer_t *timer)
 {
-  g_return_val_if_fail (timer != NULL, FALSE);
+  xreturn_val_if_fail (timer != NULL, FALSE);
 
   return timer->active;
 }
@@ -395,8 +395,8 @@ g_time_val_from_iso8601 (const xchar_t *iso_date,
   long mday, mon, year;
   long hour, min, sec;
 
-  g_return_val_if_fail (iso_date != NULL, FALSE);
-  g_return_val_if_fail (time_ != NULL, FALSE);
+  xreturn_val_if_fail (iso_date != NULL, FALSE);
+  xreturn_val_if_fail (time_ != NULL, FALSE);
 
   /* Ensure that the first character is a digit, the first digit
    * of the date, otherwise we don't have an ISO 8601 date
@@ -605,7 +605,7 @@ g_time_val_to_iso8601 (GTimeVal *time_)
 #endif
   time_t secs;
 
-  g_return_val_if_fail (time_ != NULL &&
+  xreturn_val_if_fail (time_ != NULL &&
                         time_->tv_usec >= 0 &&
                         time_->tv_usec < G_USEC_PER_SEC, NULL);
 

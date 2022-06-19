@@ -137,15 +137,15 @@ xoutput_stream_dispose (xobject_t *object)
   if (!stream->priv->closed)
     xoutput_stream_close (stream, NULL, NULL);
 
-  G_OBJECT_CLASS (xoutput_stream_parent_class)->dispose (object);
+  XOBJECT_CLASS (xoutput_stream_parent_class)->dispose (object);
 }
 
 static void
 xoutput_stream_class_init (xoutput_stream_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = xoutput_stream_dispose;
+  xobject_class->dispose = xoutput_stream_dispose;
 
   klass->splice = xoutput_stream_real_splice;
 
@@ -211,8 +211,8 @@ xoutput_stream_write (xoutput_stream_t  *stream,
   xoutput_stream_class_t *class;
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
-  g_return_val_if_fail (buffer != NULL, 0);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (buffer != NULL, 0);
 
   if (count == 0)
     return 0;
@@ -292,8 +292,8 @@ xoutput_stream_write_all (xoutput_stream_t  *stream,
   xsize_t _bytes_written;
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (buffer != NULL || count == 0, FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (buffer != NULL || count == 0, FALSE);
 
   _bytes_written = 0;
   while (_bytes_written < count)
@@ -306,7 +306,7 @@ xoutput_stream_write_all (xoutput_stream_t  *stream,
 	    *bytes_written = _bytes_written;
 	  return FALSE;
 	}
-      g_return_val_if_fail (res > 0, FALSE);
+      xreturn_val_if_fail (res > 0, FALSE);
 
       _bytes_written += res;
     }
@@ -372,17 +372,17 @@ xoutput_stream_writev (xoutput_stream_t        *stream,
   if (bytes_written)
     *bytes_written = 0;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (vectors != NULL || n_vectors == 0, FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (vectors != NULL || n_vectors == 0, FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (n_vectors == 0)
     return TRUE;
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
-  g_return_val_if_fail (class->writev_fn != NULL, FALSE);
+  xreturn_val_if_fail (class->writev_fn != NULL, FALSE);
 
   if (!xoutput_stream_set_pending (stream, error))
     return FALSE;
@@ -457,10 +457,10 @@ xoutput_stream_writev_all (xoutput_stream_t  *stream,
   if (bytes_written)
     *bytes_written = 0;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (vectors != NULL || n_vectors == 0, FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (vectors != NULL || n_vectors == 0, FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   /* We can't write more than G_MAXSIZE bytes overall, otherwise we
    * would overflow the bytes_written counter */
@@ -490,7 +490,7 @@ xoutput_stream_writev_all (xoutput_stream_t  *stream,
           return FALSE;
         }
 
-      g_return_val_if_fail (n_written > 0, FALSE);
+      xreturn_val_if_fail (n_written > 0, FALSE);
       _bytes_written += n_written;
 
       /* skip vectors that have been written in full */
@@ -598,10 +598,10 @@ xoutput_stream_vprintf (xoutput_stream_t  *stream,
   xchar_t    *text;
   xboolean_t  success;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail (format != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (format != NULL, FALSE);
 
   text = xstrdup_vprintf (format, args);
   success = xoutput_stream_write_all (stream,
@@ -676,7 +676,7 @@ xoutput_stream_flush (xoutput_stream_t  *stream,
   xoutput_stream_class_t *class;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   if (!xoutput_stream_set_pending (stream, error))
     return FALSE;
@@ -727,8 +727,8 @@ xoutput_stream_splice (xoutput_stream_t             *stream,
   xoutput_stream_class_t *class;
   xssize_t bytes_copied;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
-  g_return_val_if_fail (X_IS_INPUT_STREAM (source), -1);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (source), -1);
 
   if (xinput_stream_is_closed (source))
     {
@@ -927,7 +927,7 @@ xoutput_stream_close (xoutput_stream_t  *stream,
 {
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   if (stream->priv->closed)
     return TRUE;
@@ -1081,9 +1081,9 @@ xoutput_stream_write_finish (xoutput_stream_t  *stream,
                               xasync_result_t   *result,
                               xerror_t        **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_write_async), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_write_async), FALSE);
 
   /* @result is always the xtask_t created by xoutput_stream_write_async();
    * we called class->write_finish() from async_ready_write_callback_wrapper.
@@ -1259,8 +1259,8 @@ xoutput_stream_write_all_finish (xoutput_stream_t  *stream,
 {
   xtask_t *task;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   task = XTASK (result);
 
@@ -1363,12 +1363,12 @@ xoutput_stream_writev_finish (xoutput_stream_t  *stream,
   xboolean_t res;
   xsize_t _bytes_written = 0;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
-  g_return_val_if_fail (class->writev_finish != NULL, FALSE);
+  xreturn_val_if_fail (class->writev_finish != NULL, FALSE);
 
   res = class->writev_finish (stream, result, &_bytes_written, error);
 
@@ -1581,9 +1581,9 @@ xoutput_stream_writev_all_finish (xoutput_stream_t  *stream,
 {
   xtask_t *task;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   task = XTASK (result);
 
@@ -1681,8 +1681,8 @@ xoutput_stream_write_bytes_finish (xoutput_stream_t  *stream,
 				    xasync_result_t   *result,
 				    xerror_t        **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
-  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -1795,9 +1795,9 @@ xoutput_stream_splice_finish (xoutput_stream_t  *stream,
 			       xasync_result_t   *result,
 			       xerror_t        **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_splice_async), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_splice_async), FALSE);
 
   /* @result is always the xtask_t created by xoutput_stream_splice_async();
    * we called class->splice_finish() from async_ready_splice_callback_wrapper.
@@ -1903,9 +1903,9 @@ xoutput_stream_flush_finish (xoutput_stream_t  *stream,
                               xasync_result_t   *result,
                               xerror_t        **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_flush_async), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_flush_async), FALSE);
 
   /* @result is always the xtask_t created by xoutput_stream_flush_async();
    * we called class->flush_finish() from async_ready_flush_callback_wrapper.
@@ -2088,9 +2088,9 @@ xoutput_stream_internal_close_finish (xoutput_stream_t  *stream,
                                        xasync_result_t   *result,
                                        xerror_t        **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_internal_close_async), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_internal_close_async), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -2111,9 +2111,9 @@ xoutput_stream_close_finish (xoutput_stream_t  *stream,
                               xasync_result_t   *result,
                               xerror_t        **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_close_async), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_close_async), FALSE);
 
   /* @result is always the xtask_t created by xoutput_stream_close_async();
    * we called class->close_finish() from async_ready_close_callback_wrapper.
@@ -2132,7 +2132,7 @@ xoutput_stream_close_finish (xoutput_stream_t  *stream,
 xboolean_t
 xoutput_stream_is_closed (xoutput_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), TRUE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), TRUE);
 
   return stream->priv->closed;
 }
@@ -2153,7 +2153,7 @@ xoutput_stream_is_closed (xoutput_stream_t *stream)
 xboolean_t
 xoutput_stream_is_closing (xoutput_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), TRUE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), TRUE);
 
   return stream->priv->closing;
 }
@@ -2169,7 +2169,7 @@ xoutput_stream_is_closing (xoutput_stream_t *stream)
 xboolean_t
 xoutput_stream_has_pending (xoutput_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   return stream->priv->pending;
 }
@@ -2190,7 +2190,7 @@ xboolean_t
 xoutput_stream_set_pending (xoutput_stream_t *stream,
 			     xerror_t **error)
 {
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   if (stream->priv->closed)
     {
@@ -2240,7 +2240,7 @@ xoutput_stream_async_write_is_via_threads (xoutput_stream_t *stream)
 {
   xoutput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
@@ -2262,7 +2262,7 @@ xoutput_stream_async_writev_is_via_threads (xoutput_stream_t *stream)
 {
   xoutput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
@@ -2284,7 +2284,7 @@ xoutput_stream_async_close_is_via_threads (xoutput_stream_t *stream)
 {
   xoutput_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (stream), FALSE);
 
   class = G_OUTPUT_STREAM_GET_CLASS (stream);
 
@@ -2469,7 +2469,7 @@ xoutput_stream_real_write_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -2521,7 +2521,7 @@ writev_async_pollable_ready (xpollable_output_stream_t *stream,
   xtask_t *task = user_data;
 
   writev_async_pollable (stream, task);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -2623,8 +2623,8 @@ xoutput_stream_real_writev_finish (xoutput_stream_t   *stream,
 {
   xtask_t *task;
 
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
-  g_return_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_writev_async), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xasync_result_is_tagged (result, xoutput_stream_writev_async), FALSE);
 
   xoutput_stream_clear_pending (stream);
 
@@ -2882,7 +2882,7 @@ xoutput_stream_real_splice_finish (xoutput_stream_t  *stream,
                                     xasync_result_t   *result,
                                     xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -2930,7 +2930,7 @@ xoutput_stream_real_flush_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -2998,7 +2998,7 @@ xoutput_stream_real_close_finish (xoutput_stream_t  *stream,
                                    xasync_result_t   *result,
                                    xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

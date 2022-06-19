@@ -65,22 +65,22 @@ test_static_iface (void)
 
   /* Not loaded until we call ref for the first time */
   static_iface = xtype_default_interface_peek (TEST_TYPE_STATIC_IFACE);
-  g_assert (static_iface == NULL);
+  xassert (static_iface == NULL);
 
   /* Ref loads */
   static_iface = xtype_default_interface_ref (TEST_TYPE_STATIC_IFACE);
-  g_assert (static_iface && static_iface->val == 42);
+  xassert (static_iface && static_iface->val == 42);
 
   /* Peek then works */
   static_iface = xtype_default_interface_peek (TEST_TYPE_STATIC_IFACE);
-  g_assert (static_iface && static_iface->val == 42);
+  xassert (static_iface && static_iface->val == 42);
 
   /* Unref does nothing */
   xtype_default_interface_unref (static_iface);
 
   /* And peek still works */
   static_iface = xtype_default_interface_peek (TEST_TYPE_STATIC_IFACE);
-  g_assert (static_iface && static_iface->val == 42);
+  xassert (static_iface && static_iface->val == 42);
 }
 
 /**********************************************************************
@@ -149,38 +149,38 @@ test_dynamic_iface (void)
 
   /* Not loaded until we call ref for the first time */
   dynamic_iface = xtype_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
-  g_assert (dynamic_iface == NULL);
+  xassert (dynamic_iface == NULL);
 
   /* Ref loads */
   dynamic_iface = xtype_default_interface_ref (TEST_TYPE_DYNAMIC_IFACE);
-  g_assert (dynamic_iface_init);
-  g_assert (dynamic_iface && dynamic_iface->val == 42);
+  xassert (dynamic_iface_init);
+  xassert (dynamic_iface && dynamic_iface->val == 42);
 
   /* Peek then works */
   dynamic_iface = xtype_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
-  g_assert (dynamic_iface && dynamic_iface->val == 42);
+  xassert (dynamic_iface && dynamic_iface->val == 42);
 
   /* Unref causes finalize */
   xtype_default_interface_unref (dynamic_iface);
 #if 0
-  g_assert (!dynamic_iface_init);
+  xassert (!dynamic_iface_init);
 #endif
 
   /* Peek returns NULL */
   dynamic_iface = xtype_default_interface_peek (TEST_TYPE_DYNAMIC_IFACE);
 #if 0
-  g_assert (dynamic_iface == NULL);
+  xassert (dynamic_iface == NULL);
 #endif
 
   /* Ref reloads */
   dynamic_iface = xtype_default_interface_ref (TEST_TYPE_DYNAMIC_IFACE);
-  g_assert (dynamic_iface_init);
-  g_assert (dynamic_iface && dynamic_iface->val == 42);
+  xassert (dynamic_iface_init);
+  xassert (dynamic_iface && dynamic_iface->val == 42);
 
   /* And Unref causes finalize once more*/
   xtype_default_interface_unref (dynamic_iface);
 #if 0
-  g_assert (!dynamic_iface_init);
+  xassert (!dynamic_iface_init);
 #endif
 }
 

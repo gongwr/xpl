@@ -144,7 +144,7 @@ recv_message (xio_channel_t  *channel,
 	      return FALSE;
 	    }
 
-	  g_assert (nb == sizeof (nbytes));
+	  xassert (nb == sizeof (nbytes));
 
 	  for (i = 0; i < nkiddies; i++)
 	    if (seqtab[i].fd == fd)
@@ -167,10 +167,10 @@ recv_message (xio_channel_t  *channel,
 	  return FALSE;
 	}
 
-      g_assert (nb == sizeof (nbytes));
+      xassert (nb == sizeof (nbytes));
 
       g_assert_cmpint (nbytes, <, BUFSIZE);
-      g_assert (nbytes < BUFSIZE);
+      xassert (nbytes < BUFSIZE);
       g_debug ("gio-test: ...from %d: %d bytes", fd, nbytes);
       if (nbytes > 0)
 	{
@@ -187,7 +187,7 @@ recv_message (xio_channel_t  *channel,
 	    }
 
 	  for (j = 0; j < nbytes; j++)
-            g_assert (buf[j] == ' ' + (char) ((nbytes + j) % 95));
+            xassert (buf[j] == ' ' + (char) ((nbytes + j) % 95));
 	  g_debug ("gio-test: ...from %d: OK", fd);
 	}
     }

@@ -336,7 +336,7 @@ g_simple_action_finalize (xobject_t *object)
   if (simple->state_hint)
     xvariant_unref (simple->state_hint);
 
-  G_OBJECT_CLASS (g_simple_action_parent_class)
+  XOBJECT_CLASS (g_simple_action_parent_class)
     ->finalize (object);
 }
 
@@ -362,7 +362,7 @@ g_simple_action_iface_init (xaction_interface_t *iface)
 void
 g_simple_action_class_init (GSimpleActionClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->set_property = g_simple_action_set_property;
   object_class->get_property = g_simple_action_get_property;
@@ -458,13 +458,13 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.28
    **/
   xobject_class_install_property (object_class, PROP_NAME,
-                                   g_param_spec_string ("name",
+                                   xparam_spec_string ("name",
                                                         P_("Action Name"),
                                                         P_("The name used to invoke the action"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xsimple_action_t:parameter-type:
@@ -475,13 +475,13 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.28
    **/
   xobject_class_install_property (object_class, PROP_PARAMETER_TYPE,
-                                   g_param_spec_boxed ("parameter-type",
+                                   xparam_spec_boxed ("parameter-type",
                                                        P_("Parameter Type"),
                                                        P_("The type of xvariant_t passed to activate()"),
                                                        XTYPE_VARIANT_TYPE,
-                                                       G_PARAM_READWRITE |
-                                                       G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READWRITE |
+                                                       XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xsimple_action_t:enabled:
@@ -494,12 +494,12 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.28
    **/
   xobject_class_install_property (object_class, PROP_ENABLED,
-                                   g_param_spec_boolean ("enabled",
+                                   xparam_spec_boolean ("enabled",
                                                          P_("Enabled"),
                                                          P_("If the action can be activated"),
                                                          TRUE,
-                                                         G_PARAM_READWRITE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READWRITE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xsimple_action_t:state-type:
@@ -510,12 +510,12 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.28
    **/
   xobject_class_install_property (object_class, PROP_STATE_TYPE,
-                                   g_param_spec_boxed ("state-type",
+                                   xparam_spec_boxed ("state-type",
                                                        P_("State Type"),
                                                        P_("The type of the state kept by the action"),
                                                        XTYPE_VARIANT_TYPE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xsimple_action_t:state:
@@ -525,13 +525,13 @@ g_simple_action_class_init (GSimpleActionClass *class)
    * Since: 2.28
    **/
   xobject_class_install_property (object_class, PROP_STATE,
-                                   g_param_spec_variant ("state",
+                                   xparam_spec_variant ("state",
                                                          P_("State"),
                                                          P_("The state the action is in"),
                                                          G_VARIANT_TYPE_ANY,
                                                          NULL,
-                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READWRITE | XPARAM_CONSTRUCT |
+                                                         XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -611,7 +611,7 @@ xsimple_action_t *
 g_simple_action_new (const xchar_t        *name,
                      const xvariant_type_t *parameter_type)
 {
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   return xobject_new (XTYPE_SIMPLE_ACTION,
                        "name", name,

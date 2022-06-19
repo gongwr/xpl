@@ -36,7 +36,7 @@ G_BEGIN_DECLS
  *
  * The #xtype_t of #GParamSpecChar.
  */
-#define	XTYPE_PARAM_CHAR		   (g_param_spec_types[0])
+#define	XTYPE_PARAM_CHAR		   (xparam_spec_types[0])
 /**
  * X_IS_PARAM_SPEC_CHAR:
  * @pspec: a valid #xparam_spec_t instance
@@ -47,19 +47,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_CHAR(pspec)        (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_CHAR))
 /**
- * G_PARAM_SPEC_CHAR:
+ * XPARAM_SPEC_CHAR:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecChar.
  */
-#define G_PARAM_SPEC_CHAR(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_CHAR, GParamSpecChar))
+#define XPARAM_SPEC_CHAR(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_CHAR, GParamSpecChar))
 
 /**
  * XTYPE_PARAM_UCHAR:
  *
  * The #xtype_t of #GParamSpecUChar.
  */
-#define	XTYPE_PARAM_UCHAR		   (g_param_spec_types[1])
+#define	XTYPE_PARAM_UCHAR		   (xparam_spec_types[1])
 /**
  * X_IS_PARAM_SPEC_UCHAR:
  * @pspec: a valid #xparam_spec_t instance
@@ -70,19 +70,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_UCHAR(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_UCHAR))
 /**
- * G_PARAM_SPEC_UCHAR:
+ * XPARAM_SPEC_UCHAR:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecUChar.
  */
-#define G_PARAM_SPEC_UCHAR(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UCHAR, GParamSpecUChar))
+#define XPARAM_SPEC_UCHAR(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UCHAR, GParamSpecUChar))
 
 /**
  * XTYPE_PARAM_BOOLEAN:
  *
  * The #xtype_t of #GParamSpecBoolean.
  */
-#define	XTYPE_PARAM_BOOLEAN		   (g_param_spec_types[2])
+#define	XTYPE_PARAM_BOOLEAN		   (xparam_spec_types[2])
 /**
  * X_IS_PARAM_SPEC_BOOLEAN:
  * @pspec: a valid #xparam_spec_t instance
@@ -93,19 +93,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_BOOLEAN(pspec)     (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_BOOLEAN))
 /**
- * G_PARAM_SPEC_BOOLEAN:
+ * XPARAM_SPEC_BOOLEAN:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecBoolean.
  */
-#define G_PARAM_SPEC_BOOLEAN(pspec)        (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_BOOLEAN, GParamSpecBoolean))
+#define XPARAM_SPEC_BOOLEAN(pspec)        (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_BOOLEAN, GParamSpecBoolean))
 
 /**
  * XTYPE_PARAM_INT:
  *
  * The #xtype_t of #GParamSpecInt.
  */
-#define	XTYPE_PARAM_INT		   (g_param_spec_types[3])
+#define	XTYPE_PARAM_INT		   (xparam_spec_types[3])
 /**
  * X_IS_PARAM_SPEC_INT:
  * @pspec: a valid #xparam_spec_t instance
@@ -116,19 +116,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_INT(pspec)         (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_INT))
 /**
- * G_PARAM_SPEC_INT:
+ * XPARAM_SPEC_INT:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecInt.
  */
-#define G_PARAM_SPEC_INT(pspec)            (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_INT, GParamSpecInt))
+#define XPARAM_SPEC_INT(pspec)            (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_INT, GParamSpecInt))
 
 /**
  * XTYPE_PARAM_UINT:
  *
  * The #xtype_t of #GParamSpecUInt.
  */
-#define	XTYPE_PARAM_UINT		   (g_param_spec_types[4])
+#define	XTYPE_PARAM_UINT		   (xparam_spec_types[4])
 /**
  * X_IS_PARAM_SPEC_UINT:
  * @pspec: a valid #xparam_spec_t instance
@@ -139,19 +139,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_UINT(pspec)        (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_UINT))
 /**
- * G_PARAM_SPEC_UINT:
+ * XPARAM_SPEC_UINT:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecUInt.
  */
-#define G_PARAM_SPEC_UINT(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UINT, GParamSpecUInt))
+#define XPARAM_SPEC_UINT(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UINT, GParamSpecUInt))
 
 /**
  * XTYPE_PARAM_LONG:
  *
  * The #xtype_t of #GParamSpecLong.
  */
-#define	XTYPE_PARAM_LONG		   (g_param_spec_types[5])
+#define	XTYPE_PARAM_LONG		   (xparam_spec_types[5])
 /**
  * X_IS_PARAM_SPEC_LONG:
  * @pspec: a valid #xparam_spec_t instance
@@ -162,19 +162,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_LONG(pspec)        (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_LONG))
 /**
- * G_PARAM_SPEC_LONG:
+ * XPARAM_SPEC_LONG:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecLong.
  */
-#define G_PARAM_SPEC_LONG(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_LONG, GParamSpecLong))
+#define XPARAM_SPEC_LONG(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_LONG, GParamSpecLong))
 
 /**
  * XTYPE_PARAM_ULONG:
  *
  * The #xtype_t of #GParamSpecULong.
  */
-#define	XTYPE_PARAM_ULONG		   (g_param_spec_types[6])
+#define	XTYPE_PARAM_ULONG		   (xparam_spec_types[6])
 /**
  * X_IS_PARAM_SPEC_ULONG:
  * @pspec: a valid #xparam_spec_t instance
@@ -185,19 +185,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_ULONG(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_ULONG))
 /**
- * G_PARAM_SPEC_ULONG:
+ * XPARAM_SPEC_ULONG:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecULong.
  */
-#define G_PARAM_SPEC_ULONG(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_ULONG, GParamSpecULong))
+#define XPARAM_SPEC_ULONG(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_ULONG, GParamSpecULong))
 
 /**
  * XTYPE_PARAM_INT64:
  *
  * The #xtype_t of #GParamSpecInt64.
  */
-#define	XTYPE_PARAM_INT64		   (g_param_spec_types[7])
+#define	XTYPE_PARAM_INT64		   (xparam_spec_types[7])
 /**
  * X_IS_PARAM_SPEC_INT64:
  * @pspec: a valid #xparam_spec_t instance
@@ -208,19 +208,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_INT64(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_INT64))
 /**
- * G_PARAM_SPEC_INT64:
+ * XPARAM_SPEC_INT64:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecInt64.
  */
-#define G_PARAM_SPEC_INT64(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_INT64, GParamSpecInt64))
+#define XPARAM_SPEC_INT64(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_INT64, GParamSpecInt64))
 
 /**
  * XTYPE_PARAM_UINT64:
  *
  * The #xtype_t of #GParamSpecUInt64.
  */
-#define	XTYPE_PARAM_UINT64		   (g_param_spec_types[8])
+#define	XTYPE_PARAM_UINT64		   (xparam_spec_types[8])
 /**
  * X_IS_PARAM_SPEC_UINT64:
  * @pspec: a valid #xparam_spec_t instance
@@ -231,26 +231,26 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_UINT64(pspec)      (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_UINT64))
 /**
- * G_PARAM_SPEC_UINT64:
+ * XPARAM_SPEC_UINT64:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecUInt64.
  */
-#define G_PARAM_SPEC_UINT64(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UINT64, GParamSpecUInt64))
+#define XPARAM_SPEC_UINT64(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UINT64, GParamSpecUInt64))
 
 /**
  * XTYPE_PARAM_UNICHAR:
  *
  * The #xtype_t of #GParamSpecUnichar.
  */
-#define	XTYPE_PARAM_UNICHAR		   (g_param_spec_types[9])
+#define	XTYPE_PARAM_UNICHAR		   (xparam_spec_types[9])
 /**
- * G_PARAM_SPEC_UNICHAR:
+ * XPARAM_SPEC_UNICHAR:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecUnichar.
  */
-#define G_PARAM_SPEC_UNICHAR(pspec)        (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UNICHAR, GParamSpecUnichar))
+#define XPARAM_SPEC_UNICHAR(pspec)        (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_UNICHAR, GParamSpecUnichar))
 /**
  * X_IS_PARAM_SPEC_UNICHAR:
  * @pspec: a valid #xparam_spec_t instance
@@ -266,7 +266,7 @@ G_BEGIN_DECLS
  *
  * The #xtype_t of #GParamSpecEnum.
  */
-#define	XTYPE_PARAM_ENUM		   (g_param_spec_types[10])
+#define	XTYPE_PARAM_ENUM		   (xparam_spec_types[10])
 /**
  * X_IS_PARAM_SPEC_ENUM:
  * @pspec: a valid #xparam_spec_t instance
@@ -277,19 +277,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_ENUM(pspec)        (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_ENUM))
 /**
- * G_PARAM_SPEC_ENUM:
+ * XPARAM_SPEC_ENUM:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecEnum.
  */
-#define G_PARAM_SPEC_ENUM(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_ENUM, GParamSpecEnum))
+#define XPARAM_SPEC_ENUM(pspec)           (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_ENUM, GParamSpecEnum))
 
 /**
  * XTYPE_PARAM_FLAGS:
  *
  * The #xtype_t of #GParamSpecFlags.
  */
-#define	XTYPE_PARAM_FLAGS		   (g_param_spec_types[11])
+#define	XTYPE_PARAM_FLAGS		   (xparam_spec_types[11])
 /**
  * X_IS_PARAM_SPEC_FLAGS:
  * @pspec: a valid #xparam_spec_t instance
@@ -300,19 +300,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_FLAGS(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_FLAGS))
 /**
- * G_PARAM_SPEC_FLAGS:
+ * XPARAM_SPEC_FLAGS:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecFlags.
  */
-#define G_PARAM_SPEC_FLAGS(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_FLAGS, GParamSpecFlags))
+#define XPARAM_SPEC_FLAGS(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_FLAGS, GParamSpecFlags))
 
 /**
  * XTYPE_PARAM_FLOAT:
  *
  * The #xtype_t of #GParamSpecFloat.
  */
-#define	XTYPE_PARAM_FLOAT		   (g_param_spec_types[12])
+#define	XTYPE_PARAM_FLOAT		   (xparam_spec_types[12])
 /**
  * X_IS_PARAM_SPEC_FLOAT:
  * @pspec: a valid #xparam_spec_t instance
@@ -323,19 +323,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_FLOAT(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_FLOAT))
 /**
- * G_PARAM_SPEC_FLOAT:
+ * XPARAM_SPEC_FLOAT:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecFloat.
  */
-#define G_PARAM_SPEC_FLOAT(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_FLOAT, GParamSpecFloat))
+#define XPARAM_SPEC_FLOAT(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_FLOAT, GParamSpecFloat))
 
 /**
  * XTYPE_PARAM_DOUBLE:
  *
  * The #xtype_t of #GParamSpecDouble.
  */
-#define	XTYPE_PARAM_DOUBLE		   (g_param_spec_types[13])
+#define	XTYPE_PARAM_DOUBLE		   (xparam_spec_types[13])
 /**
  * X_IS_PARAM_SPEC_DOUBLE:
  * @pspec: a valid #xparam_spec_t instance
@@ -346,19 +346,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_DOUBLE(pspec)      (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_DOUBLE))
 /**
- * G_PARAM_SPEC_DOUBLE:
+ * XPARAM_SPEC_DOUBLE:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecDouble.
  */
-#define G_PARAM_SPEC_DOUBLE(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_DOUBLE, GParamSpecDouble))
+#define XPARAM_SPEC_DOUBLE(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_DOUBLE, GParamSpecDouble))
 
 /**
  * XTYPE_PARAM_STRING:
  *
  * The #xtype_t of #GParamSpecString.
  */
-#define	XTYPE_PARAM_STRING		   (g_param_spec_types[14])
+#define	XTYPE_PARAM_STRING		   (xparam_spec_types[14])
 /**
  * X_IS_PARAM_SPEC_STRING:
  * @pspec: a valid #xparam_spec_t instance
@@ -369,19 +369,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_STRING(pspec)      (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_STRING))
 /**
- * G_PARAM_SPEC_STRING:
+ * XPARAM_SPEC_STRING:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Casts a #xparam_spec_t instance into a #GParamSpecString.
  */
-#define G_PARAM_SPEC_STRING(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_STRING, GParamSpecString))
+#define XPARAM_SPEC_STRING(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_STRING, GParamSpecString))
 
 /**
  * XTYPE_PARAM_PARAM:
  *
  * The #xtype_t of #GParamSpecParam.
  */
-#define	XTYPE_PARAM_PARAM		   (g_param_spec_types[15])
+#define	XTYPE_PARAM_PARAM		   (xparam_spec_types[15])
 /**
  * X_IS_PARAM_SPEC_PARAM:
  * @pspec: a valid #xparam_spec_t instance
@@ -392,19 +392,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_PARAM(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_PARAM))
 /**
- * G_PARAM_SPEC_PARAM:
+ * XPARAM_SPEC_PARAM:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Casts a #xparam_spec_t instance into a #GParamSpecParam.
  */
-#define G_PARAM_SPEC_PARAM(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_PARAM, GParamSpecParam))
+#define XPARAM_SPEC_PARAM(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_PARAM, GParamSpecParam))
 
 /**
  * XTYPE_PARAM_BOXED:
  *
  * The #xtype_t of #GParamSpecBoxed.
  */
-#define	XTYPE_PARAM_BOXED		   (g_param_spec_types[16])
+#define	XTYPE_PARAM_BOXED		   (xparam_spec_types[16])
 /**
  * X_IS_PARAM_SPEC_BOXED:
  * @pspec: a valid #xparam_spec_t instance
@@ -415,19 +415,19 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_BOXED(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_BOXED))
 /**
- * G_PARAM_SPEC_BOXED:
+ * XPARAM_SPEC_BOXED:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecBoxed.
  */
-#define G_PARAM_SPEC_BOXED(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_BOXED, GParamSpecBoxed))
+#define XPARAM_SPEC_BOXED(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_BOXED, GParamSpecBoxed))
 
 /**
  * XTYPE_PARAM_POINTER:
  *
  * The #xtype_t of #GParamSpecPointer.
  */
-#define	XTYPE_PARAM_POINTER		   (g_param_spec_types[17])
+#define	XTYPE_PARAM_POINTER		   (xparam_spec_types[17])
 /**
  * X_IS_PARAM_SPEC_POINTER:
  * @pspec: a valid #xparam_spec_t instance
@@ -438,12 +438,12 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_POINTER(pspec)     (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_POINTER))
 /**
- * G_PARAM_SPEC_POINTER:
+ * XPARAM_SPEC_POINTER:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Casts a #xparam_spec_t instance into a #GParamSpecPointer.
  */
-#define G_PARAM_SPEC_POINTER(pspec)        (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_POINTER, GParamSpecPointer))
+#define XPARAM_SPEC_POINTER(pspec)        (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_POINTER, GParamSpecPointer))
 
 /**
  * XTYPE_PARAM_VALUE_ARRAY:
@@ -452,7 +452,7 @@ G_BEGIN_DECLS
  *
  * Deprecated: 2.32: Use #xarray_t instead of #xvalue_array_t
  */
-#define	XTYPE_PARAM_VALUE_ARRAY	   (g_param_spec_types[18]) XPL_DEPRECATED_MACRO_IN_2_32
+#define	XTYPE_PARAM_VALUE_ARRAY	   (xparam_spec_types[18]) XPL_DEPRECATED_MACRO_IN_2_32
 /**
  * X_IS_PARAM_SPEC_VALUE_ARRAY:
  * @pspec: a valid #xparam_spec_t instance
@@ -465,21 +465,21 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_VALUE_ARRAY(pspec) (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_VALUE_ARRAY)) XPL_DEPRECATED_MACRO_IN_2_32
 /**
- * G_PARAM_SPEC_VALUE_ARRAY:
+ * XPARAM_SPEC_VALUE_ARRAY:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Cast a #xparam_spec_t instance into a #GParamSpecValueArray.
  *
  * Deprecated: 2.32: Use #xarray_t instead of #xvalue_array_t
  */
-#define G_PARAM_SPEC_VALUE_ARRAY(pspec)    (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_VALUE_ARRAY, GParamSpecValueArray)) XPL_DEPRECATED_MACRO_IN_2_32
+#define XPARAM_SPEC_VALUE_ARRAY(pspec)    (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_VALUE_ARRAY, GParamSpecValueArray)) XPL_DEPRECATED_MACRO_IN_2_32
 
 /**
  * XTYPE_PARAM_OBJECT:
  *
  * The #xtype_t of #GParamSpecObject.
  */
-#define	XTYPE_PARAM_OBJECT		   (g_param_spec_types[19])
+#define	XTYPE_PARAM_OBJECT		   (xparam_spec_types[19])
 /**
  * X_IS_PARAM_SPEC_OBJECT:
  * @pspec: a valid #xparam_spec_t instance
@@ -490,12 +490,12 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_OBJECT(pspec)      (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_OBJECT))
 /**
- * G_PARAM_SPEC_OBJECT:
+ * XPARAM_SPEC_OBJECT:
  * @pspec: a valid #xparam_spec_t instance
  *
  * Casts a #xparam_spec_t instance into a #GParamSpecObject.
  */
-#define G_PARAM_SPEC_OBJECT(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_OBJECT, GParamSpecObject))
+#define XPARAM_SPEC_OBJECT(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_OBJECT, GParamSpecObject))
 
 /**
  * XTYPE_PARAM_OVERRIDE:
@@ -504,7 +504,7 @@ G_BEGIN_DECLS
  *
  * Since: 2.4
  */
-#define	XTYPE_PARAM_OVERRIDE		   (g_param_spec_types[20])
+#define	XTYPE_PARAM_OVERRIDE		   (xparam_spec_types[20])
 /**
  * X_IS_PARAM_SPEC_OVERRIDE:
  * @pspec: a #xparam_spec_t
@@ -516,14 +516,14 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_OVERRIDE(pspec)    (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_OVERRIDE))
 /**
- * G_PARAM_SPEC_OVERRIDE:
+ * XPARAM_SPEC_OVERRIDE:
  * @pspec: a #xparam_spec_t
  *
  * Casts a #xparam_spec_t into a #GParamSpecOverride.
  *
  * Since: 2.4
  */
-#define G_PARAM_SPEC_OVERRIDE(pspec)       (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_OVERRIDE, GParamSpecOverride))
+#define XPARAM_SPEC_OVERRIDE(pspec)       (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_OVERRIDE, GParamSpecOverride))
 
 /**
  * XTYPE_PARAM_GTYPE:
@@ -532,7 +532,7 @@ G_BEGIN_DECLS
  *
  * Since: 2.10
  */
-#define	XTYPE_PARAM_GTYPE		   (g_param_spec_types[21])
+#define	XTYPE_PARAM_GTYPE		   (xparam_spec_types[21])
 /**
  * X_IS_PARAM_SPEC_GTYPE:
  * @pspec: a #xparam_spec_t
@@ -544,14 +544,14 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_GTYPE(pspec)       (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_GTYPE))
 /**
- * G_PARAM_SPEC_GTYPE:
+ * XPARAM_SPEC_GTYPE:
  * @pspec: a #xparam_spec_t
  *
  * Casts a #xparam_spec_t into a #GParamSpecGType.
  *
  * Since: 2.10
  */
-#define G_PARAM_SPEC_GTYPE(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_GTYPE, GParamSpecGType))
+#define XPARAM_SPEC_GTYPE(pspec)          (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_GTYPE, GParamSpecGType))
 
 /**
  * XTYPE_PARAM_VARIANT:
@@ -560,7 +560,7 @@ G_BEGIN_DECLS
  *
  * Since: 2.26
  */
-#define XTYPE_PARAM_VARIANT                (g_param_spec_types[22])
+#define XTYPE_PARAM_VARIANT                (xparam_spec_types[22])
 /**
  * X_IS_PARAM_SPEC_VARIANT:
  * @pspec: a #xparam_spec_t
@@ -573,14 +573,14 @@ G_BEGIN_DECLS
  */
 #define X_IS_PARAM_SPEC_VARIANT(pspec)      (XTYPE_CHECK_INSTANCE_TYPE ((pspec), XTYPE_PARAM_VARIANT))
 /**
- * G_PARAM_SPEC_VARIANT:
+ * XPARAM_SPEC_VARIANT:
  * @pspec: a #xparam_spec_t
  *
  * Casts a #xparam_spec_t into a #GParamSpecVariant.
  *
  * Since: 2.26
  */
-#define G_PARAM_SPEC_VARIANT(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_VARIANT, GParamSpecVariant))
+#define XPARAM_SPEC_VARIANT(pspec)         (XTYPE_CHECK_INSTANCE_CAST ((pspec), XTYPE_PARAM_VARIANT, GParamSpecVariant))
 
 /* --- typedefs & structures --- */
 typedef struct _GParamSpecChar       GParamSpecChar;
@@ -930,7 +930,7 @@ struct _GParamSpecObject
  * including accessing the nick and blurb, validating a value, and so
  * forth.
  *
- * See g_param_spec_get_redirect_target() for retrieving the overridden
+ * See xparam_spec_get_redirect_target() for retrieving the overridden
  * property. #GParamSpecOverride is used in implementing
  * xobject_class_override_property(), and will not be directly useful
  * unless you are implementing a new base type similar to xobject_t.
@@ -985,7 +985,7 @@ struct _GParamSpecVariant
 
 /* --- xparam_spec_t prototypes --- */
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_char	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_char	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  gint8		  minimum,
@@ -993,7 +993,7 @@ xparam_spec_t*	g_param_spec_char	 (const xchar_t	 *name,
 					  gint8		  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_uchar	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_uchar	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xuint8_t	  minimum,
@@ -1001,13 +1001,13 @@ xparam_spec_t*	g_param_spec_uchar	 (const xchar_t	 *name,
 					  xuint8_t	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_boolean	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_boolean	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xboolean_t	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_int	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_int	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xint_t		  minimum,
@@ -1015,7 +1015,7 @@ xparam_spec_t*	g_param_spec_int	 (const xchar_t	 *name,
 					  xint_t		  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_uint	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_uint	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xuint_t		  minimum,
@@ -1023,7 +1023,7 @@ xparam_spec_t*	g_param_spec_uint	 (const xchar_t	 *name,
 					  xuint_t		  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_long	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_long	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xlong_t		  minimum,
@@ -1031,7 +1031,7 @@ xparam_spec_t*	g_param_spec_long	 (const xchar_t	 *name,
 					  xlong_t		  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_ulong	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_ulong	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xulong_t	  minimum,
@@ -1039,7 +1039,7 @@ xparam_spec_t*	g_param_spec_ulong	 (const xchar_t	 *name,
 					  xulong_t	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_int64	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_int64	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  sint64_t       	  minimum,
@@ -1047,7 +1047,7 @@ xparam_spec_t*	g_param_spec_int64	 (const xchar_t	 *name,
 					  sint64_t       	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_uint64	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_uint64	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xuint64_t	  minimum,
@@ -1055,27 +1055,27 @@ xparam_spec_t*	g_param_spec_uint64	 (const xchar_t	 *name,
 					  xuint64_t	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_unichar      (const xchar_t    *name,
+xparam_spec_t*	xparam_spec_unichar      (const xchar_t    *name,
 				          const xchar_t    *nick,
 				          const xchar_t    *blurb,
 				          xunichar_t	  default_value,
 				          GParamFlags     flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_enum	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_enum	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xtype_t		  enum_type,
 					  xint_t		  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_flags	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_flags	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xtype_t		  flags_type,
 					  xuint_t		  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_float	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_float	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  gfloat	  minimum,
@@ -1083,7 +1083,7 @@ xparam_spec_t*	g_param_spec_float	 (const xchar_t	 *name,
 					  gfloat	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_double	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_double	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xdouble_t	  minimum,
@@ -1091,51 +1091,51 @@ xparam_spec_t*	g_param_spec_double	 (const xchar_t	 *name,
 					  xdouble_t	  default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_string	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_string	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  const xchar_t	 *default_value,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_param	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_param	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xtype_t		  param_type,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_boxed	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_boxed	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xtype_t		  boxed_type,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_pointer	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_pointer	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_value_array (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_value_array (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xparam_spec_t	 *element_spec,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_object	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_object	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xtype_t		  object_type,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_override    (const xchar_t    *name,
+xparam_spec_t*	xparam_spec_override    (const xchar_t    *name,
 					  xparam_spec_t     *overridden);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_gtype	 (const xchar_t	 *name,
+xparam_spec_t*	xparam_spec_gtype	 (const xchar_t	 *name,
 					  const xchar_t	 *nick,
 					  const xchar_t	 *blurb,
 					  xtype_t           is_a_type,
 					  GParamFlags	  flags);
 XPL_AVAILABLE_IN_ALL
-xparam_spec_t*	g_param_spec_variant	 (const xchar_t        *name,
+xparam_spec_t*	xparam_spec_variant	 (const xchar_t        *name,
 					  const xchar_t        *nick,
 					  const xchar_t	     *blurb,
 					  const xvariant_type_t *type,
@@ -1166,7 +1166,7 @@ xparam_spec_t*	g_param_spec_variant	 (const xchar_t        *name,
 #  endif /* !XPLATFORM_WIN32 */
 #endif /* GOBJECT_VAR */
 
-GOBJECT_VAR xtype_t *g_param_spec_types;
+GOBJECT_VAR xtype_t *xparam_spec_types;
 
 G_END_DECLS
 

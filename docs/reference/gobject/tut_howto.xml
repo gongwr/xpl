@@ -217,7 +217,7 @@ struct _ViewerFile
     </para>
 
     <para>
-      Call the <function>G_DEFINE_TYPE</function> macro (or
+      Call the <function>XDEFINE_TYPE</function> macro (or
       <function>G_DEFINE_TYPE_WITH_PRIVATE</function> if your class needs
       private data — final types do <emphasis>not</emphasis> need private data)
       using the name
@@ -239,7 +239,7 @@ struct _ViewerFile
       <function>G_DECLARE_FINAL_TYPE</function> (see
       <xref linkend="howto-gobject-header"/>), private data should be placed in
       the instance structure, <type>viewer_file_t</type>, and
-      <function>G_DEFINE_TYPE</function> should be used instead of
+      <function>XDEFINE_TYPE</function> should be used instead of
       <function>G_DEFINE_TYPE_WITH_PRIVATE</function>. The instance structure
       for a final class is not exposed publicly, and is not embedded in the
       instance structures of any derived classes (because the class is final);
@@ -249,7 +249,7 @@ struct _ViewerFile
       <function>G_DEFINE_TYPE_WITH_PRIVATE</function> must be used.
 
 <informalexample><programlisting>
-G_DEFINE_TYPE (viewer_file_t, viewer_file, XTYPE_OBJECT)
+XDEFINE_TYPE (viewer_file, viewer_file, XTYPE_OBJECT)
 </programlisting></informalexample>
 or
 <informalexample><programlisting>
@@ -324,7 +324,7 @@ viewer_file_init (viewer_file_t *self)
 
     <para>
       If you need special construction properties (with
-      <link linkend="G-PARAM-CONSTRUCT-ONLY:CAPS"><function>G_PARAM_CONSTRUCT_ONLY</function></link>
+      <link linkend="G-PARAM-CONSTRUCT-ONLY:CAPS"><function>XPARAM_CONSTRUCT_ONLY</function></link>
       set), install the properties in
       the <function>class_init()</function> function, override the <function>set_property()</function>
       and <function>get_property()</function> methods of the xobject_t class,
@@ -347,26 +347,26 @@ static xparam_spec_t *obj_properties[N_PROPERTIES] = { NULL, };
 static void
 viewer_file_class_init (ViewerFileClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->set_property = viewer_file_set_property;
   object_class->get_property = viewer_file_get_property;
 
   obj_properties[PROP_FILENAME] =
-    g_param_spec_string ("filename",
+    xparam_spec_string ("filename",
                          "Filename",
                          "Name of the file to load and display from.",
                          NULL  /* default value */,
-                         G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE);
+                         XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE);
 
   obj_properties[PROP_ZOOM_LEVEL] =
-    g_param_spec_uint ("zoom-level",
+    xparam_spec_uint ("zoom-level",
                        "Zoom level",
                        "Zoom level to view the file at.",
                        0  /* minimum value */,
                        10 /* maximum value */,
                        2  /* default value */,
-                       G_PARAM_READWRITE);
+                       XPARAM_READWRITE);
 
   xobject_class_install_properties (object_class,
                                      N_PROPERTIES,
@@ -386,8 +386,8 @@ viewer_file_class_init (ViewerFileClass *klass)
       more simply, using the <function>constructed()</function> class method.
       Note that the <function>constructed()</function>
       virtual function will only be invoked after the properties marked as
-      <function>G_PARAM_CONSTRUCT_ONLY</function> or
-      <function>G_PARAM_CONSTRUCT</function> have been consumed, but
+      <function>XPARAM_CONSTRUCT_ONLY</function> or
+      <function>XPARAM_CONSTRUCT</function> have been consumed, but
       before the regular properties passed to <function>xobject_new()</function>
       have been set.
     </para>
@@ -443,7 +443,7 @@ viewer_file_dispose (xobject_t *gobject)
    * the parent class implements the dispose() virtual function: it is
    * always guaranteed to do so
    */
-  G_OBJECT_CLASS (viewer_file_parent_class)->dispose (gobject);
+  XOBJECT_CLASS (viewer_file_parent_class)->dispose (gobject);
 }
 
 static void
@@ -456,13 +456,13 @@ viewer_file_finalize (xobject_t *gobject)
   /* Always chain up to the parent class; as with dispose(), finalize()
    * is guaranteed to exist on the parent's class virtual function table
    */
-  G_OBJECT_CLASS (viewer_file_parent_class)->finalize (gobject);
+  XOBJECT_CLASS (viewer_file_parent_class)->finalize (gobject);
 }
 
 static void
 viewer_file_class_init (ViewerFileClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->dispose = viewer_file_dispose;
   object_class->finalize = viewer_file_finalize;
@@ -821,7 +821,7 @@ viewer_audio_file_class_init (viewer_audio_file_class_t *klass)
     <para>
       Use the <function>parent_class</function> pointer created and initialized
       by the
-      <link linkend="G-DEFINE-TYPE:CAPS"><function>G_DEFINE_TYPE</function></link>
+      <link linkend="G-DEFINE-TYPE:CAPS"><function>XDEFINE_TYPE</function></link>
       family of macros, for instance:
 <informalexample><programlisting>
 static void
@@ -1008,7 +1008,7 @@ viewer_editable_redo (ViewerEditable *self,
       and
       <function><link linkend="G-IMPLEMENT-INTERFACE:CAPS">G_IMPLEMENT_INTERFACE</link></function>
       instead of
-      <function><link linkend="G-DEFINE-TYPE:CAPS">G_DEFINE_TYPE</link></function>:
+      <function><link linkend="G-DEFINE-TYPE:CAPS">XDEFINE_TYPE</link></function>:
 <informalexample><programlisting>
 static void viewer_file_editable_interface_init (ViewerEditableInterface *iface);
 
@@ -1219,14 +1219,14 @@ static void
 viewer_editable_default_init (ViewerEditableInterface *iface)
 {
   xobject_interface_install_property (iface,
-                                       g_param_spec_double ("autosave-frequency",
+                                       xparam_spec_double ("autosave-frequency",
                                                             "Autosave frequency",
                                                             "Frequency (in per-seconds) to autosave backups of the editable content at. "
                                                             "Or zero to disable autosaves.",
                                                             0.0,  /* minimum */
                                                             G_MAXDOUBLE,  /* maximum */
                                                             0.0,  /* default */
-                                                            G_PARAM_READWRITE));
+                                                            XPARAM_READWRITE));
 }
 </programlisting></informalexample>
     </para>
@@ -1305,7 +1305,7 @@ viewer_file_get_property (xobject_t    *object,
 static void
 viewer_file_class_init (ViewerFileClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->set_property = viewer_file_set_property;
   object_class->get_property = viewer_file_get_property;

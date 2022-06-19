@@ -333,7 +333,7 @@ xstr_to_ascii (const xchar_t *str,
   xstring_t *result;
   xuint_t item_id;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   if (xstr_is_ascii (str))
     return xstrdup (str);

@@ -284,7 +284,7 @@ test_copying (void)
     xvalue_set_long (&value, G_MAXLONG);
     error = lcopy (&value, &c);
     g_assert_null (error);
-    g_assert (c == G_MAXLONG);
+    xassert (c == G_MAXLONG);
   }
 
   {
@@ -295,7 +295,7 @@ test_copying (void)
     xvalue_set_ulong (&value, G_MAXULONG);
     error = lcopy (&value, &c);
     g_assert_null (error);
-    g_assert (c == G_MAXULONG);
+    xassert (c == G_MAXULONG);
   }
 
   {
@@ -306,7 +306,7 @@ test_copying (void)
     xvalue_set_int64 (&value, G_MAXINT64);
     error = lcopy (&value, &c);
     g_assert_null (error);
-    g_assert (c == G_MAXINT64);
+    xassert (c == G_MAXINT64);
   }
 
   {
@@ -317,7 +317,7 @@ test_copying (void)
     xvalue_set_uint64 (&value, G_MAXUINT64);
     error = lcopy (&value, &c);
     g_assert_null (error);
-    g_assert (c == G_MAXUINT64);
+    xassert (c == G_MAXUINT64);
   }
 
   {
@@ -328,7 +328,7 @@ test_copying (void)
     xvalue_set_float (&value, G_MAXFLOAT);
     error = lcopy (&value, &c);
     g_assert_null (error);
-    g_assert (c == G_MAXFLOAT);
+    xassert (c == G_MAXFLOAT);
   }
 
   {
@@ -339,7 +339,7 @@ test_copying (void)
     xvalue_set_double (&value, G_MAXDOUBLE);
     error = lcopy (&value, &c);
     g_assert_null (error);
-    g_assert (c == G_MAXDOUBLE);
+    xassert (c == G_MAXDOUBLE);
   }
 
   {
@@ -374,7 +374,7 @@ test_copying (void)
     error = lcopy (&value, &c);
     g_assert_null (error);
     g_assert_nonnull (c);
-    g_assert (xvariant_is_of_type (c, G_VARIANT_TYPE ("u")));
+    xassert (xvariant_is_of_type (c, G_VARIANT_TYPE ("u")));
     g_assert_cmpuint (xvariant_get_uint32 (c), ==, 42);
     xvariant_unref (c);
     xvalue_unset (&value);
@@ -661,7 +661,7 @@ static void test_interface_default_init (test_interface_interface_t *iface) { }
 
 static xtype_t test_object_a_get_type (void);
 typedef xobject_t test_object_a_t; typedef xobject_class_t test_object_a_class_t;
-G_DEFINE_TYPE (test_object_a, test_object_a, XTYPE_OBJECT)
+XDEFINE_TYPE (test_object_a, test_object_a, XTYPE_OBJECT)
 static void test_object_a_class_init (test_object_a_class_t *class) { }
 static void test_object_a_init (test_object_a_t *a) { }
 
@@ -675,7 +675,7 @@ static void test_object_b_init (test_object_b_t *b) { }
 
 static xtype_t test_object_a1_get_type (void);
 typedef xobject_t test_object_a1_t; typedef xobject_class_t test_object_a1_class_t;
-G_DEFINE_TYPE (test_object_a1, test_object_a1, test_object_a_get_type ())
+XDEFINE_TYPE (test_object_a1, test_object_a1, test_object_a_get_type ())
 static void test_object_a1_class_init (test_object_a1_class_t *class) { }
 static void test_object_a1_init (test_object_a1_t *c) { }
 

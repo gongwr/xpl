@@ -1,4 +1,4 @@
-/* Unit tests for GPrivate and friends
+/* Unit tests for xprivate_t and friends
  * Copyright (C) 2011 Red Hat, Inc
  * Author: Matthias Clasen
  *
@@ -34,11 +34,11 @@
 static void
 test_private1 (void)
 {
-  static GPrivate private = G_PRIVATE_INIT (NULL);
+  static xprivate_t private = G_PRIVATE_INIT (NULL);
   xpointer_t value;
 
   value = g_private_get (&private);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   g_private_set (&private, GINT_TO_POINTER(1));
   value = g_private_get (&private);
@@ -57,7 +57,7 @@ private2_destroy (xpointer_t data)
   g_atomic_int_inc (&private2_destroy_count);
 }
 
-static GPrivate private2 = G_PRIVATE_INIT (private2_destroy);
+static xprivate_t private2 = G_PRIVATE_INIT (private2_destroy);
 
 static xpointer_t
 private2_func (xpointer_t data)
@@ -111,7 +111,7 @@ static xboolean_t private3_freed;
 static void
 private3_free (xpointer_t data)
 {
-  g_assert (data == (void*) 0x1234);
+  xassert (data == (void*) 0x1234);
   private3_freed = TRUE;
 }
 
@@ -127,7 +127,7 @@ static xpointer_t
 #endif
 private3_func (xpointer_t data)
 {
-  static GPrivate key = G_PRIVATE_INIT (private3_free);
+  static xprivate_t key = G_PRIVATE_INIT (private3_free);
 
   g_private_set (&key, (void *) 0x1234);
 
@@ -137,7 +137,7 @@ private3_func (xpointer_t data)
 static void
 test_private3 (void)
 {
-  g_assert (!private3_freed);
+  xassert (!private3_freed);
 
 #ifdef G_OS_WIN32
   {
@@ -163,7 +163,7 @@ test_private3 (void)
     pthread_join (thread, NULL);
   }
 #endif
-  g_assert (private3_freed);
+  xassert (private3_freed);
 }
 
 /* test basics:
@@ -179,7 +179,7 @@ test_static_private1 (void)
   xpointer_t value;
 
   value = g_static_private_get (&sp1);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   g_static_private_set (&sp1, GINT_TO_POINTER(1), NULL);
   value = g_static_private_get (&sp1);
@@ -192,7 +192,7 @@ test_static_private1 (void)
   g_static_private_free (&sp1);
 
   value = g_static_private_get (&sp1);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 }
 
 static xint_t sp2_destroy_count;
@@ -223,7 +223,7 @@ test_static_private2 (void)
   g_static_private_init (&sp2);
 
   value = g_static_private_get (&sp2);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   g_static_private_set (&sp2, GINT_TO_POINTER(1), sp2_destroy);
   g_assert_cmpint (sp2_destroy_count, ==, 0);
@@ -243,7 +243,7 @@ test_static_private2 (void)
   g_static_private_free (&sp2);
 
   value = g_static_private_get (&sp2);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 }
 
 /* test that freeing and reinitializing a static private
@@ -258,7 +258,7 @@ test_static_private3 (void)
   g_static_private_init (&sp3);
 
   value = g_static_private_get (&sp3);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   g_static_private_set (&sp3, GINT_TO_POINTER(1), NULL);
   value = g_static_private_get (&sp3);
@@ -268,7 +268,7 @@ test_static_private3 (void)
   g_static_private_init (&sp3);
 
   value = g_static_private_get (&sp3);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   g_static_private_set (&sp3, GINT_TO_POINTER(2), NULL);
   value = g_static_private_get (&sp3);
@@ -331,7 +331,7 @@ sp5_func (xpointer_t data)
   xpointer_t value;
 
   value = g_static_private_get (&sp5);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   g_static_private_set (&sp5, GINT_TO_POINTER (v), NULL);
   value = g_static_private_get (&sp5);
@@ -348,7 +348,7 @@ sp5_func (xpointer_t data)
   if (g_test_verbose ())
     g_printerr ("thread %d get sp5\n", v);
   value = g_static_private_get (&sp5);
-  g_assert (value == NULL);
+  xassert (value == NULL);
 
   return NULL;
 }

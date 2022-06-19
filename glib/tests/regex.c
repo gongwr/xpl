@@ -69,7 +69,7 @@ test_new (xconstpointer d)
   xerror_t *error = NULL;
 
   regex = xregex_new (data->pattern, data->compile_opts, data->match_opts, &error);
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
   g_assert_no_error (error);
   g_assert_cmpstr (data->pattern, ==, xregex_get_pattern (regex));
 
@@ -121,7 +121,7 @@ test_new_fail (xconstpointer d)
 
   regex = xregex_new (data->pattern, data->compile_opts, data->match_opts, &error);
 
-  g_assert (regex == NULL);
+  xassert (regex == NULL);
   g_assert_error (error, XREGEX_ERROR, data->expected_error);
   xerror_free (error);
 }
@@ -190,7 +190,7 @@ test_match (xconstpointer d)
   xerror_t *error = NULL;
 
   regex = xregex_new (data->pattern, data->compile_opts, data->match_opts, &error);
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
   g_assert_no_error (error);
 
   match = xregex_match_full (regex, data->string, data->string_len,
@@ -286,7 +286,7 @@ test_match_next (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   xregex_match_full (regex, data->string, data->string_len,
                       data->start_position, 0, &match_info, NULL);
@@ -301,7 +301,7 @@ test_match_next (xconstpointer d)
       matches = xslist_prepend (matches, match);
       xmatch_info_next (match_info, NULL);
     }
-  g_assert (regex == xmatch_info_get_regex (match_info));
+  xassert (regex == xmatch_info_get_regex (match_info));
   g_assert_cmpstr (data->string, ==, xmatch_info_get_string (match_info));
   xmatch_info_free (match_info);
   matches = xslist_reverse (matches);
@@ -478,7 +478,7 @@ test_match_count (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   xregex_match_full (regex, data->string, -1, data->start_position,
 		      data->match_opts, &match_info, NULL);
@@ -515,7 +515,7 @@ test_partial (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   xregex_match (regex, data->string, data->match_opts, &match_info);
 
@@ -523,8 +523,8 @@ test_partial (xconstpointer d)
 
   if (data->expected)
     {
-      g_assert (!xmatch_info_fetch_pos (match_info, 0, NULL, NULL));
-      g_assert (!xmatch_info_fetch_pos (match_info, 1, NULL, NULL));
+      xassert (!xmatch_info_fetch_pos (match_info, 0, NULL, NULL));
+      xassert (!xmatch_info_fetch_pos (match_info, 1, NULL, NULL));
     }
 
   xmatch_info_free (match_info);
@@ -567,7 +567,7 @@ test_sub_pattern (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   xregex_match_full (regex, data->string, -1, data->start_position, 0, &match_info, NULL);
 
@@ -622,7 +622,7 @@ test_named_sub_pattern (xconstpointer d)
 
   regex = xregex_new (data->pattern, data->flags, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   xregex_match_full (regex, data->string, -1, data->start_position, 0, &match_info, NULL);
   sub_expr = xmatch_info_fetch_named (match_info, data->sub_name);
@@ -694,7 +694,7 @@ test_fetch_all (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   xregex_match (regex, data->string, 0, &match_info);
   matches = xmatch_info_fetch_all (match_info);
@@ -867,7 +867,7 @@ test_split_full (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   tokens = xregex_split_full (regex, data->string, -1, data->start_position,
 			       0, data->max_tokens, NULL);
@@ -901,7 +901,7 @@ test_split (xconstpointer d)
 
   regex = xregex_new (data->pattern, 0, 0, NULL);
 
-  g_assert (regex != NULL);
+  xassert (regex != NULL);
 
   tokens = xregex_split (regex, data->string, 0);
   if (tokens)
@@ -1263,9 +1263,9 @@ test_match_all_full (xconstpointer d)
                                      0, &match_info, NULL);
 
   if (xslist_length (data->expected) == 0)
-    g_assert (!match_ok);
+    xassert (!match_ok);
   else
-    g_assert (match_ok);
+    xassert (match_ok);
 
   match_count = xmatch_info_get_match_count (match_info);
   g_assert_cmpint (match_count, ==, xslist_length (data->expected));
@@ -1307,9 +1307,9 @@ test_match_all (xconstpointer d)
   match_ok = xregex_match_all (regex, data->string, 0, &match_info);
 
   if (xslist_length (data->expected) == 0)
-    g_assert (!match_ok);
+    xassert (!match_ok);
   else
-    g_assert (match_ok);
+    xassert (match_ok);
 
   match_count = xmatch_info_get_match_count (match_info);
   g_assert_cmpint (match_count, >=, 0);
@@ -1502,7 +1502,7 @@ test_properties (void)
   error = NULL;
   regex = xregex_new ("\\p{L}\\p{Ll}\\p{Lu}\\p{L&}\\p{N}\\p{Nd}", XREGEX_OPTIMIZE, 0, &error);
   res = xregex_match (regex, "ppPP01", 0, &match);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "ppPP01");
   g_free (str);
@@ -1523,33 +1523,33 @@ test_class (void)
   error = NULL;
   regex = xregex_new ("[abc\\x{0B1E}\\p{Mn}\\x{0391}-\\x{03A9}]", XREGEX_OPTIMIZE, 0, &error);
   res = xregex_match (regex, "a:b:\340\254\236:\333\253:\316\240", 0, &match);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "a");
   g_free (str);
   res = xmatch_info_next (match, NULL);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "b");
   g_free (str);
   res = xmatch_info_next (match, NULL);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "\340\254\236");
   g_free (str);
   res = xmatch_info_next (match, NULL);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "\333\253");
   g_free (str);
   res = xmatch_info_next (match, NULL);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "\316\240");
   g_free (str);
 
   res = xmatch_info_next (match, NULL);
-  g_assert (!res);
+  xassert (!res);
 
   xmatch_info_free (match);
   xregex_unref (regex);
@@ -1568,11 +1568,11 @@ test_lookahead (void)
 
   error = NULL;
   regex = xregex_new ("\\w+(?=;)", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "word1 word2: word3;", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "word3");
@@ -1582,14 +1582,14 @@ test_lookahead (void)
 
   error = NULL;
   regex = xregex_new ("foo(?!bar)", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "foobar foobaz", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
   res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 7);
   g_assert_cmpint (end, ==, 10);
   xmatch_info_free (match);
@@ -1597,21 +1597,21 @@ test_lookahead (void)
 
   error = NULL;
   regex = xregex_new ("(?!bar)foo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "foobar foobaz", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
   res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 0);
   g_assert_cmpint (end, ==, 3);
   res = xmatch_info_next (match, &error);
-  g_assert (res);
+  xassert (res);
   g_assert_no_error (error);
   res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 7);
   g_assert_cmpint (end, ==, 10);
   xmatch_info_free (match);
@@ -1630,14 +1630,14 @@ test_lookbehind (void)
 
   error = NULL;
   regex = xregex_new ("(?<!foo)bar", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "foobar boobar", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
   res = xmatch_info_fetch_pos (match, 0, &start, &end);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 10);
   g_assert_cmpint (end, ==, 13);
   xmatch_info_free (match);
@@ -1645,93 +1645,93 @@ test_lookbehind (void)
 
   error = NULL;
   regex = xregex_new ("(?<=bullock|donkey) poo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "don poo, and bullock poo", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 1);
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 20);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?<!dogs?|cats?) x", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex == NULL);
+  xassert (regex == NULL);
   g_assert_error (error, XREGEX_ERROR, XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
   g_clear_error (&error);
 
   regex = xregex_new ("(?<=ab(c|de)) foo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex == NULL);
+  xassert (regex == NULL);
   g_assert_error (error, XREGEX_ERROR, XREGEX_ERROR_VARIABLE_LENGTH_LOOKBEHIND);
   g_clear_error (&error);
 
   regex = xregex_new ("(?<=abc|abde)foo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "abfoo, abdfoo, abcfoo", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 18);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^.*+(?<=abcd)", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "abcabcabcabcabcabcabcabcabcd", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?<=\\d{3})(?<!999)foo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 20);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?<=\\d{3}...)(?<!999)foo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 13);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?<=\\d{3}(?!999)...)foo", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "999foo 123abcfoo 123foo", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 13);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?<=(?<!foo)bar)baz", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "foobarbaz barfoobaz barbarbaz", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 26);
   xmatch_info_free (match);
   xregex_unref (regex);
@@ -1750,13 +1750,13 @@ test_subpattern (void)
 
   error = NULL;
   regex = xregex_new ("cat(aract|erpillar|)", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   g_assert_cmpint (xregex_get_capture_count (regex), ==, 1);
   g_assert_cmpint (xregex_get_max_backref (regex), ==, 0);
   res = xregex_match_all (regex, "caterpillar", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 2);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "caterpillar");
@@ -1768,13 +1768,13 @@ test_subpattern (void)
   xregex_unref (regex);
 
   regex = xregex_new ("the ((red|white) (king|queen))", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   g_assert_cmpint (xregex_get_capture_count (regex), ==, 3);
   g_assert_cmpint (xregex_get_max_backref (regex), ==, 0);
   res = xregex_match (regex, "the red king", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 4);
   str = xmatch_info_fetch (match, 0);
   g_assert_cmpstr (str, ==, "the red king");
@@ -1792,11 +1792,11 @@ test_subpattern (void)
   xregex_unref (regex);
 
   regex = xregex_new ("the ((?:red|white) (king|queen))", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "the white queen", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 3);
   g_assert_cmpint (xregex_get_max_backref (regex), ==, 0);
   str = xmatch_info_fetch (match, 0);
@@ -1812,12 +1812,12 @@ test_subpattern (void)
   xregex_unref (regex);
 
   regex = xregex_new ("(?|(Sat)(ur)|(Sun))day (morning|afternoon)", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   g_assert_cmpint (xregex_get_capture_count (regex), ==, 3);
   res = xregex_match (regex, "Saturday morning", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   g_assert_cmpint (xmatch_info_get_match_count (match), ==, 4);
   str = xmatch_info_fetch (match, 1);
   g_assert_cmpstr (str, ==, "Sat");
@@ -1832,61 +1832,61 @@ test_subpattern (void)
   xregex_unref (regex);
 
   regex = xregex_new ("(?|(abc)|(def))\\1", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   g_assert_cmpint (xregex_get_max_backref (regex), ==, 1);
   res = xregex_match (regex, "abcabc abcdef defabc defdef", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 0);
   res = xmatch_info_next (match, &error);
-  g_assert (res);
+  xassert (res);
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 21);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?|(abc)|(def))(?1)", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "abcabc abcdef defabc defdef", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 0);
   res = xmatch_info_next (match, &error);
-  g_assert (res);
+  xassert (res);
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 14);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?<DN>Mon|Fri|Sun)(?:day)?|(?<DN>Tue)(?:sday)?|(?<DN>Wed)(?:nesday)?|(?<DN>Thu)(?:rsday)?|(?<DN>Sat)(?:urday)?", XREGEX_OPTIMIZE|XREGEX_DUPNAMES, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "Mon Tuesday Wed Saturday", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   str = xmatch_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Mon");
   g_free (str);
   res = xmatch_info_next (match, &error);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Tue");
   g_free (str);
   res = xmatch_info_next (match, &error);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Wed");
   g_free (str);
   res = xmatch_info_next (match, &error);
-  g_assert (res);
+  xassert (res);
   str = xmatch_info_fetch_named (match, "DN");
   g_assert_cmpstr (str, ==, "Sat");
   g_free (str);
@@ -1894,15 +1894,15 @@ test_subpattern (void)
   xregex_unref (regex);
 
   regex = xregex_new ("^(a|b\\1)+$", XREGEX_OPTIMIZE|XREGEX_DUPNAMES, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "aaaaaaaaaaaaaaaa", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "ababbaa", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 }
@@ -1918,84 +1918,84 @@ test_condition (void)
 
   error = NULL;
   regex = xregex_new ("^(a+)(\\()?[^()]+(?(-1)\\))(b+)$", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "a(zzzzzz)b", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "aaazzzzzzbbb", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   error = NULL;
   regex = xregex_new ("^(a+)(?<OPEN>\\()?[^()]+(?(<OPEN>)\\))(b+)$", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "a(zzzzzz)b", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "aaazzzzzzbbb", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^(a+)(?(+1)\\[|\\<)?[^()]+(\\])?(b+)$", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "a[zzzzzz]b", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "aaa<zzzzzzbbb", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("(?(DEFINE) (?<byte> 2[0-4]\\d | 25[0-5] | 1\\d\\d | [1-9]?\\d) )"
                        "\\b (?&byte) (\\.(?&byte)){3} \\b",
                        XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "128.0.0.1", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "192.168.1.1", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "209.132.180.167", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^(?(?=[^a-z]*[a-z])"
                        "\\d{2}-[a-z]{3}-\\d{2} | \\d{2}-\\d{2}-\\d{2} )$",
                        XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "01-abc-24", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "01-23-45", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "01-uv-45", 0, &match);
-  g_assert (!res);
-  g_assert (!xmatch_info_matches (match));
+  xassert (!res);
+  xassert (!xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "01-234-45", 0, &match);
-  g_assert (!res);
-  g_assert (!xmatch_info_matches (match));
+  xassert (!res);
+  xassert (!xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 }
@@ -2012,103 +2012,103 @@ test_recursion (void)
 
   error = NULL;
   regex = xregex_new ("\\( ( [^()]++ | (?R) )* \\)", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "(middle)", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "((((((((((((((((middle))))))))))))))))", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "(((xxx(((", 0, &match);
-  g_assert (!res);
-  g_assert (!xmatch_info_matches (match));
+  xassert (!res);
+  xassert (!xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^( \\( ( [^()]++ | (?1) )* \\) )$", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "((((((((((((((((middle))))))))))))))))", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "(((xxx((()", 0, &match);
-  g_assert (!res);
-  g_assert (!xmatch_info_matches (match));
+  xassert (!res);
+  xassert (!xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^(?<pn> \\( ( [^()]++ | (?&pn) )* \\) )$", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   xregex_match (regex, "(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa()", 0, &match);
-  g_assert (!res);
-  g_assert (!xmatch_info_matches (match));
+  xassert (!res);
+  xassert (!xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("< (?: (?(R) \\d++ | [^<>]*+) | (?R)) * >", XREGEX_OPTIMIZE|XREGEX_EXTENDED, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "<ab<01<23<4>>>>", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, ==, 0);
   xmatch_info_free (match);
   res = xregex_match (regex, "<ab<01<xx<x>>>>", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   res = xmatch_info_fetch_pos (match, 0, &start, NULL);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpint (start, >, 0);
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^((.)(?1)\\2|.)$", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "abcdcba", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "abcddcba", 0, &match);
-  g_assert (!res);
-  g_assert (!xmatch_info_matches (match));
+  xassert (!res);
+  xassert (!xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^(?:((.)(?1)\\2|)|((.)(?3)\\4|.))$", XREGEX_OPTIMIZE, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "abcdcba", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "abcddcba", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 
   regex = xregex_new ("^\\W*+(?:((.)\\W*+(?1)\\W*+\\2|)|((.)\\W*+(?3)\\W*+\\4|\\W*+.\\W*+))\\W*+$", XREGEX_OPTIMIZE|XREGEX_CASELESS, 0, &error);
-  g_assert (regex);
+  xassert (regex);
   g_assert_no_error (error);
   res = xregex_match (regex, "abcdcba", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "A man, a plan, a canal: Panama!", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   res = xregex_match (regex, "Oozy rat in a sanitary zoo", 0, &match);
-  g_assert (res);
-  g_assert (xmatch_info_matches (match));
+  xassert (res);
+  xassert (xmatch_info_matches (match));
   xmatch_info_free (match);
   xregex_unref (regex);
 }
@@ -2177,7 +2177,7 @@ pcre_ge (xuint64_t major, xuint64_t minor)
 
     pcre_major = g_ascii_strtoull (version, &ptr, 10);
     /* ptr points to ".MINOR (release date)" */
-    g_assert (ptr[0] == '.');
+    xassert (ptr[0] == '.');
     pcre_minor = g_ascii_strtoull (ptr + 1, NULL, 10);
 
     return (pcre_major > major) || (pcre_major == major && pcre_minor >= minor);

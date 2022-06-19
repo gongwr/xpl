@@ -150,7 +150,7 @@ g_fam_file_monitor_cancel (xfile_monitor_t *monitor)
 
   g_mutex_lock (&fam_lock);
 
-  g_assert (fam_initialised);
+  xassert (fam_initialised);
 
   FAMCancelMonitor (&fam_connection, &gffm->request);
 
@@ -170,7 +170,7 @@ g_fam_file_monitor_start (xlocal_file_monitor_t  *local_monitor,
 
   g_mutex_lock (&fam_lock);
 
-  g_assert (fam_initialised);
+  xassert (fam_initialised);
 
   xsource_ref ((xsource_t *) source);
 

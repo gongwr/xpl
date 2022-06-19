@@ -137,7 +137,7 @@ xasync_result_get_user_data (xasync_result_t *res)
 {
   xasync_result_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   iface = G_ASYNC_RESULT_GET_IFACE (res);
 
@@ -158,7 +158,7 @@ xasync_result_get_source_object (xasync_result_t *res)
 {
   xasync_result_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   iface = G_ASYNC_RESULT_GET_IFACE (res);
 
@@ -226,7 +226,7 @@ xasync_result_is_tagged (xasync_result_t  *res,
 {
   xasync_result_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
 
   iface = G_ASYNC_RESULT_GET_IFACE (res);
 

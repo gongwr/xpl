@@ -29,71 +29,71 @@
 #include "gwinhttpfileoutputstream.h"
 #include "glibintl.h"
 
-struct _GWinHttpFileOutputStream
+struct _xwin_http_file_output_stream
 {
   xfile_output_stream_t parent_instance;
 
-  GWinHttpFile *file;
+  xwin_http_file_t *file;
   HINTERNET connection;
   xoffset_t offset;
 };
 
-struct _GWinHttpFileOutputStreamClass
+struct _xwin_http_file_output_stream_class
 {
-  GFileOutputStreamClass parent_class;
+  xfile_output_stream_class_t parent_class;
 };
 
-#define g_winhttp_file_output_stream_get_type _g_winhttp_file_output_stream_get_type
-G_DEFINE_TYPE (GWinHttpFileOutputStream, g_winhttp_file_output_stream, XTYPE_FILE_OUTPUT_STREAM)
+#define xwinhttp_file_output_stream_get_type _xwinhttp_file_output_stream_get_type
+XDEFINE_TYPE (xwin_http_file_output_stream, xwinhttp_file_output_stream, XTYPE_FILE_OUTPUT_STREAM)
 
-static xssize_t     g_winhttp_file_output_stream_write      (xoutput_stream_t     *stream,
+static xssize_t     xwinhttp_file_output_stream_write      (xoutput_stream_t     *stream,
                                                            const void        *buffer,
                                                            xsize_t              count,
                                                            xcancellable_t      *cancellable,
                                                            xerror_t           **error);
 
 static void
-g_winhttp_file_output_stream_finalize (xobject_t *object)
+xwinhttp_file_output_stream_finalize (xobject_t *object)
 {
-  GWinHttpFileOutputStream *winhttp_stream;
+  xwin_http_file_output_stream_t *winhttp_stream;
 
-  winhttp_stream = G_WINHTTP_FILE_OUTPUT_STREAM (object);
+  winhttp_stream = XWINHTTP_FILE_OUTPUT_STREAM (object);
 
   if (winhttp_stream->connection != NULL)
-    G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (winhttp_stream->connection);
+    XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (winhttp_stream->connection);
 
-  G_OBJECT_CLASS (g_winhttp_file_output_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xwinhttp_file_output_stream_parent_class)->finalize (object);
 }
 
 static void
-g_winhttp_file_output_stream_class_init (GWinHttpFileOutputStreamClass *klass)
+xwinhttp_file_output_stream_class_init (xwin_http_file_output_stream_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xoutput_stream_class_t *stream_class = G_OUTPUT_STREAM_CLASS (klass);
 
-  gobject_class->finalize = g_winhttp_file_output_stream_finalize;
+  xobject_class->finalize = xwinhttp_file_output_stream_finalize;
 
-  stream_class->write_fn = g_winhttp_file_output_stream_write;
+  stream_class->write_fn = xwinhttp_file_output_stream_write;
 }
 
 static void
-g_winhttp_file_output_stream_init (GWinHttpFileOutputStream *info)
+xwinhttp_file_output_stream_init (xwin_http_file_output_stream_t *info)
 {
 }
 
 /*
- * g_winhttp_file_output_stream_new:
- * @file: the GWinHttpFile being read
+ * xwinhttp_file_output_stream_new:
+ * @file: the xwin_http_file_t being read
  * @connection: handle to the HTTP connection, as from WinHttpConnect()
  * @request: handle to the HTTP request, as from WinHttpOpenRequest
  *
  * Returns: #xfile_output_stream_t for the given request
  */
 xfile_output_stream_t *
-_g_winhttp_file_output_stream_new (GWinHttpFile *file,
+_xwinhttp_file_output_stream_new (xwin_http_file_t *file,
                                    HINTERNET     connection)
 {
-  GWinHttpFileOutputStream *stream;
+  xwin_http_file_output_stream_t *stream;
 
   stream = xobject_new (XTYPE_WINHTTP_FILE_OUTPUT_STREAM, NULL);
 
@@ -105,19 +105,19 @@ _g_winhttp_file_output_stream_new (GWinHttpFile *file,
 }
 
 static xssize_t
-g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
+xwinhttp_file_output_stream_write (xoutput_stream_t  *stream,
                                     const void     *buffer,
                                     xsize_t           count,
                                     xcancellable_t   *cancellable,
                                     xerror_t        **error)
 {
-  GWinHttpFileOutputStream *winhttp_stream = G_WINHTTP_FILE_OUTPUT_STREAM (stream);
+  xwin_http_file_output_stream_t *winhttp_stream = XWINHTTP_FILE_OUTPUT_STREAM (stream);
   HINTERNET request;
   char *headers;
   wchar_t *wheaders;
   DWORD bytes_written;
 
-  request = G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpOpenRequest
+  request = XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpOpenRequest
     (winhttp_stream->connection,
      L"PUT",
      winhttp_stream->file->url.lpszUrlPath,
@@ -138,7 +138,7 @@ g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
   wheaders = xutf8_to_utf16 (headers, -1, NULL, NULL, NULL);
   g_free (headers);
 
-  if (!G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpSendRequest
+  if (!XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpSendRequest
       (request,
        wheaders, -1,
        NULL, 0,
@@ -147,7 +147,7 @@ g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
     {
       _g_winhttp_set_error (error, GetLastError (), "PUT request");
 
-      G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
+      XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
       g_free (wheaders);
 
       return -1;
@@ -155,12 +155,12 @@ g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
 
   g_free (wheaders);
 
-  if (!G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpWriteData
+  if (!XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpWriteData
       (request, buffer, count, &bytes_written))
     {
       _g_winhttp_set_error (error, GetLastError (), "PUT request");
 
-      G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
+      XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
 
       return -1;
     }
@@ -172,12 +172,12 @@ g_winhttp_file_output_stream_write (xoutput_stream_t  *stream,
                             error,
                             "PUT request"))
     {
-      G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
+      XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
 
       return -1;
     }
 
-  G_WINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
+  XWINHTTP_VFS_GET_CLASS (winhttp_stream->file->vfs)->funcs->pWinHttpCloseHandle (request);
 
   return bytes_written;
 }

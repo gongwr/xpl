@@ -271,7 +271,7 @@ xsubprocess_exited (xpid_t     pid,
   xsubprocess_t *self = user_data;
   xslist_t *tasks;
 
-  g_assert (self->pid == pid);
+  xassert (self->pid == pid);
 
   g_mutex_lock (&self->pending_waits_lock);
   self->status = status;
@@ -414,7 +414,7 @@ initable_init (xinitable_t     *initable,
                                               &self->pid,
                                               pipe_ptrs[0], pipe_ptrs[1], pipe_ptrs[2],
                                               error);
-  g_assert (success == (self->pid != 0));
+  xassert (success == (self->pid != 0));
 
   {
     xuint64_t identifier;
@@ -427,7 +427,7 @@ initable_init (xinitable_t     *initable,
 #endif
 
     s = g_snprintf (self->identifier, sizeof self->identifier, "%"G_GUINT64_FORMAT, identifier);
-    g_assert (0 < s && (xsize_t) s < sizeof self->identifier);
+    xassert (0 < s && (xsize_t) s < sizeof self->identifier);
   }
 
   /* Start attempting to reap the child immediately */
@@ -465,8 +465,8 @@ xsubprocess_finalize (xobject_t *object)
 {
   xsubprocess_t *self = G_SUBPROCESS (object);
 
-  g_assert (self->pending_waits == NULL);
-  g_assert (self->pid == 0);
+  xassert (self->pending_waits == NULL);
+  xassert (self->pid == 0);
 
   g_clear_object (&self->stdin_pipe);
   g_clear_object (&self->stdout_pipe);
@@ -475,7 +475,7 @@ xsubprocess_finalize (xobject_t *object)
 
   g_mutex_clear (&self->pending_waits_lock);
 
-  G_OBJECT_CLASS (xsubprocess_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsubprocess_parent_class)->finalize (object);
 }
 
 static void
@@ -493,19 +493,19 @@ initable_iface_init (xinitable_iface_t *initable_iface)
 static void
 xsubprocess_class_init (GSubprocessClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->finalize = xsubprocess_finalize;
-  gobject_class->set_property = xsubprocess_set_property;
+  xobject_class->finalize = xsubprocess_finalize;
+  xobject_class->set_property = xsubprocess_set_property;
 
-  xobject_class_install_property (gobject_class, PROP_FLAGS,
-                                   g_param_spec_flags ("flags", P_("Flags"), P_("Subprocess flags"),
-                                                       XTYPE_SUBPROCESS_FLAGS, 0, G_PARAM_WRITABLE |
-                                                       G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_ARGV,
-                                   g_param_spec_boxed ("argv", P_("Arguments"), P_("Argument vector"),
-                                                       XTYPE_STRV, G_PARAM_WRITABLE |
-                                                       G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_FLAGS,
+                                   xparam_spec_flags ("flags", P_("Flags"), P_("Subprocess flags"),
+                                                       XTYPE_SUBPROCESS_FLAGS, 0, XPARAM_WRITABLE |
+                                                       XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_ARGV,
+                                   xparam_spec_boxed ("argv", P_("Arguments"), P_("Argument vector"),
+                                                       XTYPE_STRV, XPARAM_WRITABLE |
+                                                       XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -539,8 +539,8 @@ xsubprocess_new (xsubprocess_flags_t   flags,
   const xchar_t *arg;
   va_list ap;
 
-  g_return_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (argv0 != NULL && argv0[0] != '\0', NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   args = xptr_array_new ();
 
@@ -578,7 +578,7 @@ xsubprocess_newv (const xchar_t * const  *argv,
                    xsubprocess_flags_t      flags,
                    xerror_t              **error)
 {
-  g_return_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
+  xreturn_val_if_fail (argv != NULL && argv[0] != NULL && argv[0][0] != '\0', NULL);
 
   return xinitable_new (XTYPE_SUBPROCESS, NULL, error,
                          "argv", argv,
@@ -601,7 +601,7 @@ xsubprocess_newv (const xchar_t * const  *argv,
 const xchar_t *
 xsubprocess_get_identifier (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
   if (subprocess->pid)
     return subprocess->identifier;
@@ -626,7 +626,7 @@ xsubprocess_get_identifier (xsubprocess_t *subprocess)
 xoutput_stream_t *
 xsubprocess_get_stdin_pipe (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
   return subprocess->stdin_pipe;
 }
@@ -648,7 +648,7 @@ xsubprocess_get_stdin_pipe (xsubprocess_t *subprocess)
 xinput_stream_t *
 xsubprocess_get_stdout_pipe (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
   return subprocess->stdout_pipe;
 }
@@ -670,7 +670,7 @@ xsubprocess_get_stdout_pipe (xsubprocess_t *subprocess)
 xinput_stream_t *
 xsubprocess_get_stderr_pipe (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), NULL);
 
   return subprocess->stderr_pipe;
 }
@@ -851,7 +851,7 @@ xsubprocess_wait (xsubprocess_t   *subprocess,
   xasync_result_t *result = NULL;
   xboolean_t success;
 
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
 
   /* Synchronous waits are actually the 'more difficult' case because we
    * need to deal with the possibility of cancellation.  That more or
@@ -1071,8 +1071,8 @@ xsubprocess_force_exit (xsubprocess_t *subprocess)
 xint_t
 xsubprocess_get_status (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (subprocess->pid == 0, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (subprocess->pid == 0, FALSE);
 
   return subprocess->status;
 }
@@ -1095,8 +1095,8 @@ xsubprocess_get_status (xsubprocess_t *subprocess)
 xboolean_t
 xsubprocess_get_successful (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (subprocess->pid == 0, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (subprocess->pid == 0, FALSE);
 
 #ifdef G_OS_UNIX
   return WIFEXITED (subprocess->status) && WEXITSTATUS (subprocess->status) == 0;
@@ -1124,8 +1124,8 @@ xsubprocess_get_successful (xsubprocess_t *subprocess)
 xboolean_t
 xsubprocess_get_if_exited (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (subprocess->pid == 0, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (subprocess->pid == 0, FALSE);
 
 #ifdef G_OS_UNIX
   return WIFEXITED (subprocess->status);
@@ -1154,11 +1154,11 @@ xsubprocess_get_if_exited (xsubprocess_t *subprocess)
 xint_t
 xsubprocess_get_exit_status (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), 1);
-  g_return_val_if_fail (subprocess->pid == 0, 1);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), 1);
+  xreturn_val_if_fail (subprocess->pid == 0, 1);
 
 #ifdef G_OS_UNIX
-  g_return_val_if_fail (WIFEXITED (subprocess->status), 1);
+  xreturn_val_if_fail (WIFEXITED (subprocess->status), 1);
 
   return WEXITSTATUS (subprocess->status);
 #else
@@ -1184,8 +1184,8 @@ xsubprocess_get_exit_status (xsubprocess_t *subprocess)
 xboolean_t
 xsubprocess_get_if_signaled (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (subprocess->pid == 0, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (subprocess->pid == 0, FALSE);
 
 #ifdef G_OS_UNIX
   return WIFSIGNALED (subprocess->status);
@@ -1213,11 +1213,11 @@ xsubprocess_get_if_signaled (xsubprocess_t *subprocess)
 xint_t
 xsubprocess_get_term_sig (xsubprocess_t *subprocess)
 {
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), 0);
-  g_return_val_if_fail (subprocess->pid == 0, 0);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), 0);
+  xreturn_val_if_fail (subprocess->pid == 0, 0);
 
 #ifdef G_OS_UNIX
-  g_return_val_if_fail (WIFSIGNALED (subprocess->status), 0);
+  xreturn_val_if_fail (WIFSIGNALED (subprocess->status), 0);
 
   return WTERMSIG (subprocess->status);
 #else
@@ -1306,7 +1306,7 @@ xsubprocess_communicate_made_progress (xobject_t      *source_object,
   xpointer_t source;
   xtask_t *task;
 
-  g_assert (source_object != NULL);
+  xassert (source_object != NULL);
 
   task = user_data;
   subprocess = xtask_get_source_object (task);
@@ -1434,7 +1434,7 @@ xsubprocess_communicate_internal (xsubprocess_t         *subprocess,
 
   if (subprocess->stdin_pipe)
     {
-      g_assert (stdin_buf != NULL);
+      xassert (stdin_buf != NULL);
 
 #ifdef G_OS_UNIX
       /* We're doing async writes to the pipe, and the async write mechanism assumes
@@ -1554,10 +1554,10 @@ xsubprocess_communicate (xsubprocess_t   *subprocess,
   xasync_result_t *result = NULL;
   xboolean_t success;
 
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (stdin_buf == NULL || (subprocess->flags & G_SUBPROCESS_FLAGS_STDIN_PIPE), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (stdin_buf == NULL || (subprocess->flags & G_SUBPROCESS_FLAGS_STDIN_PIPE), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   xsubprocess_sync_setup ();
   xsubprocess_communicate_internal (subprocess, FALSE, stdin_buf, cancellable,
@@ -1614,9 +1614,9 @@ xsubprocess_communicate_finish (xsubprocess_t   *subprocess,
   xboolean_t success;
   CommunicateState *state;
 
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, subprocess), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, subprocess), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   xobject_ref (result);
 
@@ -1663,10 +1663,10 @@ xsubprocess_communicate_utf8 (xsubprocess_t   *subprocess,
   xbytes_t *stdin_bytes;
   size_t stdin_buf_len = 0;
 
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (stdin_buf == NULL || (subprocess->flags & G_SUBPROCESS_FLAGS_STDIN_PIPE), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (stdin_buf == NULL || (subprocess->flags & G_SUBPROCESS_FLAGS_STDIN_PIPE), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (stdin_buf != NULL)
     stdin_buf_len = strlen (stdin_buf);
@@ -1768,9 +1768,9 @@ xsubprocess_communicate_utf8_finish (xsubprocess_t   *subprocess,
   CommunicateState *state;
   xchar_t *local_stdout_buf = NULL, *local_stderr_buf = NULL;
 
-  g_return_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, subprocess), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SUBPROCESS (subprocess), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, subprocess), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   xobject_ref (result);
 

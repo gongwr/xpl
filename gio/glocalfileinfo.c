@@ -123,7 +123,7 @@ _g_local_file_info_create_etag (GLocalFileStat *statbuf)
 {
   xlong_t sec, usec;
 
-  g_return_val_if_fail (_g_stat_has_field (statbuf, G_LOCAL_FILE_STAT_FIELD_MTIME), NULL);
+  xreturn_val_if_fail (_g_stat_has_field (statbuf, G_LOCAL_FILE_STAT_FIELD_MTIME), NULL);
 
 #if defined (G_OS_WIN32)
   sec = statbuf->st_mtim.tv_sec;
@@ -1578,7 +1578,7 @@ remove_from_hidden_cache (xpointer_t user_data)
   if (xhash_table_size (hidden_cache) == 0)
     {
       g_clear_pointer (&hidden_cache_source, xsource_unref);
-      retval = G_SOURCE_REMOVE;
+      retval = XSOURCE_REMOVE;
     }
   else
     retval = G_SOURCE_CONTINUE;
@@ -2453,8 +2453,8 @@ _g_win32_unix_time_to_filetime (sint64_t     ut,
    */
   const sint64_t max_systemtime = 0x7fff35f4f06c58f0;
 
-  g_return_val_if_fail (ft != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (ft != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (nsec < 0)
     {

@@ -101,7 +101,7 @@ g_environ_getenv (xchar_t       **envp,
 {
   xint_t index;
 
-  g_return_val_if_fail (variable != NULL, NULL);
+  xreturn_val_if_fail (variable != NULL, NULL);
 
   index = g_environ_find (envp, variable);
   if (index != -1)
@@ -137,9 +137,9 @@ g_environ_setenv (xchar_t       **envp,
 {
   xint_t index;
 
-  g_return_val_if_fail (variable != NULL, NULL);
-  g_return_val_if_fail (strchr (variable, '=') == NULL, NULL);
-  g_return_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (variable != NULL, NULL);
+  xreturn_val_if_fail (strchr (variable, '=') == NULL, NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
 
   index = g_environ_find (envp, variable);
   if (index != -1)
@@ -218,8 +218,8 @@ xchar_t **
 g_environ_unsetenv (xchar_t       **envp,
                     const xchar_t  *variable)
 {
-  g_return_val_if_fail (variable != NULL, NULL);
-  g_return_val_if_fail (strchr (variable, '=') == NULL, NULL);
+  xreturn_val_if_fail (variable != NULL, NULL);
+  xreturn_val_if_fail (strchr (variable, '=') == NULL, NULL);
 
   if (envp == NULL)
     return NULL;
@@ -250,7 +250,7 @@ g_environ_unsetenv (xchar_t       **envp,
 const xchar_t *
 g_getenv (const xchar_t *variable)
 {
-  g_return_val_if_fail (variable != NULL, NULL);
+  xreturn_val_if_fail (variable != NULL, NULL);
 
   return getenv (variable);
 }
@@ -296,9 +296,9 @@ g_setenv (const xchar_t *variable,
   xchar_t *string;
 #endif
 
-  g_return_val_if_fail (variable != NULL, FALSE);
-  g_return_val_if_fail (strchr (variable, '=') == NULL, FALSE);
-  g_return_val_if_fail (value != NULL, FALSE);
+  xreturn_val_if_fail (variable != NULL, FALSE);
+  xreturn_val_if_fail (strchr (variable, '=') == NULL, FALSE);
+  xreturn_val_if_fail (value != NULL, FALSE);
 
 #ifndef G_DISABLE_CHECKS
   /* FIXME: This will be upgraded to a g_warning() in a future release of GLib.
@@ -456,8 +456,8 @@ g_getenv (const xchar_t *variable)
   wchar_t dummy[2], *wname, *wvalue;
   DWORD len;
 
-  g_return_val_if_fail (variable != NULL, NULL);
-  g_return_val_if_fail (xutf8_validate (variable, -1, NULL), NULL);
+  xreturn_val_if_fail (variable != NULL, NULL);
+  xreturn_val_if_fail (xutf8_validate (variable, -1, NULL), NULL);
 
   /* On Windows NT, it is relatively typical that environment
    * variables contain references to other environment variables. If
@@ -534,11 +534,11 @@ g_setenv (const xchar_t *variable,
   wchar_t *wname, *wvalue, *wassignment;
   xchar_t *tem;
 
-  g_return_val_if_fail (variable != NULL, FALSE);
-  g_return_val_if_fail (strchr (variable, '=') == NULL, FALSE);
-  g_return_val_if_fail (value != NULL, FALSE);
-  g_return_val_if_fail (xutf8_validate (variable, -1, NULL), FALSE);
-  g_return_val_if_fail (xutf8_validate (value, -1, NULL), FALSE);
+  xreturn_val_if_fail (variable != NULL, FALSE);
+  xreturn_val_if_fail (strchr (variable, '=') == NULL, FALSE);
+  xreturn_val_if_fail (value != NULL, FALSE);
+  xreturn_val_if_fail (xutf8_validate (variable, -1, NULL), FALSE);
+  xreturn_val_if_fail (xutf8_validate (value, -1, NULL), FALSE);
 
   if (!overwrite && g_getenv (variable) != NULL)
     return TRUE;

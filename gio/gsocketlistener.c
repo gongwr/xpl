@@ -105,7 +105,7 @@ xsocket_listener_finalize (xobject_t *object)
    */
   xptr_array_free (listener->priv->sockets, TRUE);
 
-  G_OBJECT_CLASS (xsocket_listener_parent_class)
+  XOBJECT_CLASS (xsocket_listener_parent_class)
     ->finalize (object);
 }
 
@@ -150,19 +150,19 @@ xsocket_listener_set_property (xobject_t      *object,
 static void
 xsocket_listener_class_init (GSocketListenerClass *klass)
 {
-  xobject_class_t *gobject_class G_GNUC_UNUSED = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class G_GNUC_UNUSED = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xsocket_listener_finalize;
-  gobject_class->set_property = xsocket_listener_set_property;
-  gobject_class->get_property = xsocket_listener_get_property;
-  xobject_class_install_property (gobject_class, PROP_LISTEN_BACKLOG,
-                                   g_param_spec_int ("listen-backlog",
+  xobject_class->finalize = xsocket_listener_finalize;
+  xobject_class->set_property = xsocket_listener_set_property;
+  xobject_class->get_property = xsocket_listener_get_property;
+  xobject_class_install_property (xobject_class, PROP_LISTEN_BACKLOG,
+                                   xparam_spec_int ("listen-backlog",
                                                      P_("Listen backlog"),
                                                      P_("outstanding connections in the listen queue"),
                                                      0,
                                                      2000,
                                                      10,
-                                                     G_PARAM_CONSTRUCT | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                                                     XPARAM_CONSTRUCT | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_listener_t::event:
@@ -179,7 +179,7 @@ xsocket_listener_class_init (GSocketListenerClass *klass)
    */
   signals[EVENT] =
     xsignal_new (I_("event"),
-                  XTYPE_FROM_CLASS (gobject_class),
+                  XTYPE_FROM_CLASS (xobject_class),
                   G_SIGNAL_RUN_LAST,
                   G_STRUCT_OFFSET (GSocketListenerClass, event),
                   NULL, NULL,
@@ -188,7 +188,7 @@ xsocket_listener_class_init (GSocketListenerClass *klass)
                   XTYPE_SOCKET_LISTENER_EVENT,
                   XTYPE_SOCKET);
   xsignal_set_va_marshaller (signals[EVENT],
-                              XTYPE_FROM_CLASS (gobject_class),
+                              XTYPE_FROM_CLASS (xobject_class),
                               _g_cclosure_marshal_VOID__ENUM_OBJECTv);
 
   source_quark = g_quark_from_static_string ("g-socket-listener-source");
@@ -438,8 +438,8 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
   xsocket_t *socket4 = NULL;
   xsocket_t *socket6;
 
-  g_return_val_if_fail (listener != NULL, FALSE);
-  g_return_val_if_fail (port != 0, FALSE);
+  xreturn_val_if_fail (listener != NULL, FALSE);
+  xreturn_val_if_fail (port != 0, FALSE);
 
   if (!check_listener (listener, error))
     return FALSE;
@@ -582,7 +582,7 @@ xsocket_listener_add_inet_port (xsocket_listener_t  *listener,
         }
     }
 
-  g_assert (socket6 != NULL || socket4 != NULL);
+  xassert (socket6 != NULL || socket4 != NULL);
 
   if (socket6 != NULL)
     xptr_array_add (listener->priv->sockets, socket6);
@@ -690,7 +690,7 @@ xsocket_listener_accept_socket (xsocket_listener_t  *listener,
 {
   xsocket_t *accept_socket, *socket;
 
-  g_return_val_if_fail (X_IS_SOCKET_LISTENER (listener), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_LISTENER (listener), NULL);
 
   if (!check_listener (listener, error))
     return NULL;
@@ -805,7 +805,7 @@ accept_ready (xsocket_t      *accept_socket,
   /* Don’t call xtask_return_*() multiple times if we have multiple incoming
    * connections in the same #xmain_context_t iteration. */
   if (data->returned_yet)
-    return G_SOURCE_REMOVE;
+    return XSOURCE_REMOVE;
 
   socket = xsocket_accept (accept_socket, xtask_get_cancellable (task), &error);
   if (socket)
@@ -825,7 +825,7 @@ accept_ready (xsocket_t      *accept_socket,
   data->returned_yet = TRUE;
   xobject_unref (task);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 /**
@@ -894,8 +894,8 @@ xsocket_listener_accept_socket_finish (xsocket_listener_t  *listener,
 					xobject_t         **source_object,
 					xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET_LISTENER (listener), NULL);
-  g_return_val_if_fail (xtask_is_valid (result, listener), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_LISTENER (listener), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, listener), NULL);
 
   if (source_object)
     *source_object = xobject_get_qdata (G_OBJECT (result), source_quark);
@@ -1076,7 +1076,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
       xsocket_address_t *address;
       xboolean_t result;
 
-      g_assert (socket6 == NULL);
+      xassert (socket6 == NULL);
       socket6 = xsocket_new (XSOCKET_FAMILY_IPV6,
                               XSOCKET_TYPE_STREAM,
                               XSOCKET_PROTOCOL_DEFAULT,
@@ -1105,17 +1105,17 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
           xsignal_emit (listener, signals[EVENT], 0,
                          XSOCKET_LISTENER_BOUND, socket6);
 
-          g_assert (X_IS_INET_SOCKET_ADDRESS (address));
+          xassert (X_IS_INET_SOCKET_ADDRESS (address));
           candidate_port =
             g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (address));
-          g_assert (candidate_port != 0);
+          xassert (candidate_port != 0);
           xobject_unref (address);
 
           if (xsocket_speaks_ipv4 (socket6))
             break;
         }
 
-      g_assert (socket4 == NULL);
+      xassert (socket4 == NULL);
       socket4 = xsocket_new (XSOCKET_FAMILY_IPV4,
                               XSOCKET_TYPE_STREAM,
                               XSOCKET_PROTOCOL_DEFAULT,
@@ -1158,7 +1158,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
 
       if (candidate_port)
         {
-          g_assert (socket6 != NULL);
+          xassert (socket6 != NULL);
 
           if (result)
             /* got our candidate port successfully */
@@ -1186,7 +1186,7 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
          *  - if we succeeded, then we need to find out the port number.
          */
         {
-          g_assert (socket6 == NULL);
+          xassert (socket6 == NULL);
 
           if (!result ||
               !(address = xsocket_get_local_address (socket4, error)))
@@ -1199,17 +1199,17 @@ xsocket_listener_add_any_inet_port (xsocket_listener_t  *listener,
             xsignal_emit (listener, signals[EVENT], 0,
                            XSOCKET_LISTENER_BOUND, socket4);
 
-            g_assert (X_IS_INET_SOCKET_ADDRESS (address));
+            xassert (X_IS_INET_SOCKET_ADDRESS (address));
             candidate_port =
               g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (address));
-            g_assert (candidate_port != 0);
+            xassert (candidate_port != 0);
             xobject_unref (address);
             break;
         }
     }
 
   /* should only be non-zero if we have a socket */
-  g_assert ((candidate_port != 0) == (socket4 || socket6));
+  xassert ((candidate_port != 0) == (socket4 || socket6));
 
   while (sockets_to_close)
     {

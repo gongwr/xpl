@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_CONVERTER_OUTPUT_STREAM_H__
-#define __G_CONVERTER_OUTPUT_STREAM_H__
+#ifndef __XCONVERTER_OUTPUT_STREAM_H__
+#define __XCONVERTER_OUTPUT_STREAM_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,11 +31,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CONVERTER_OUTPUT_STREAM         (xconverter_output_stream_get_type ())
-#define G_CONVERTER_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_OUTPUT_STREAM, xconverter_output_stream))
-#define G_CONVERTER_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_OUTPUT_STREAM, GConverterOutputStreamClass))
+#define XCONVERTER_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_OUTPUT_STREAM, xconverter_output_stream))
+#define XCONVERTER_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_OUTPUT_STREAM, xconverter_output_stream_class_t))
 #define X_IS_CONVERTER_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CONVERTER_OUTPUT_STREAM))
 #define X_IS_CONVERTER_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CONVERTER_OUTPUT_STREAM))
-#define G_CONVERTER_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CONVERTER_OUTPUT_STREAM, GConverterOutputStreamClass))
+#define XCONVERTER_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CONVERTER_OUTPUT_STREAM, xconverter_output_stream_class_t))
 
 /**
  * xconverter_output_stream_t:
@@ -43,20 +43,20 @@ G_BEGIN_DECLS
  * An implementation of #xfilter_output_stream_t that allows data
  * conversion.
  **/
-typedef struct _GConverterOutputStreamClass    GConverterOutputStreamClass;
-typedef struct _GConverterOutputStreamPrivate  GConverterOutputStreamPrivate;
+typedef struct _xconverter_output_stream_class    xconverter_output_stream_class_t;
+typedef struct _xconverter_output_stream_private  xconverter_output_stream_private_t;
 
-struct _GConverterOutputStream
+struct _xconverter_output_stream
 {
   xfilter_output_stream_t parent_instance;
 
   /*< private >*/
-  GConverterOutputStreamPrivate *priv;
+  xconverter_output_stream_private_t *priv;
 };
 
-struct _GConverterOutputStreamClass
+struct _xconverter_output_stream_class
 {
-  GFilterOutputStreamClass parent_class;
+  xfilter_output_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -77,4 +77,4 @@ xconverter_t             *xconverter_output_stream_get_converter (xconverter_out
 
 G_END_DECLS
 
-#endif /* __G_CONVERTER_OUTPUT_STREAM_H__ */
+#endif /* __XCONVERTER_OUTPUT_STREAM_H__ */

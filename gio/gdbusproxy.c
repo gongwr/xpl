@@ -222,7 +222,7 @@ xdbus_proxy_finalize (xobject_t *object)
   if (proxy->priv->object != NULL)
     xobject_remove_weak_pointer (G_OBJECT (proxy->priv->object), (xpointer_t *) &proxy->priv->object);
 
-  G_OBJECT_CLASS (xdbus_proxy_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdbus_proxy_parent_class)->finalize (object);
 }
 
 static void
@@ -324,11 +324,11 @@ xdbus_proxy_set_property (xobject_t      *object,
 static void
 xdbus_proxy_class_init (GDBusProxyClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize     = xdbus_proxy_finalize;
-  gobject_class->set_property = xdbus_proxy_set_property;
-  gobject_class->get_property = xdbus_proxy_get_property;
+  xobject_class->finalize     = xdbus_proxy_finalize;
+  xobject_class->set_property = xdbus_proxy_set_property;
+  xobject_class->get_property = xdbus_proxy_get_property;
 
   /* Note that all property names are prefixed to avoid collisions with D-Bus property names
    * in derived classes */
@@ -363,17 +363,17 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_INTERFACE_INFO,
-                                   g_param_spec_boxed ("g-interface-info",
+                                   xparam_spec_boxed ("g-interface-info",
                                                        P_("Interface Information"),
                                                        P_("Interface Information"),
                                                        XTYPE_DBUS_INTERFACE_INFO,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_WRITABLE |
-                                                       G_PARAM_STATIC_NAME |
-                                                       G_PARAM_STATIC_BLURB |
-                                                       G_PARAM_STATIC_NICK));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_WRITABLE |
+                                                       XPARAM_STATIC_NAME |
+                                                       XPARAM_STATIC_BLURB |
+                                                       XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-connection:
@@ -382,18 +382,18 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_CONNECTION,
-                                   g_param_spec_object ("g-connection",
+                                   xparam_spec_object ("g-connection",
                                                         P_("g-connection"),
                                                         P_("The connection the proxy is for"),
                                                         XTYPE_DBUS_CONNECTION,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-bus-type:
@@ -405,18 +405,18 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_BUS_TYPE,
-                                   g_param_spec_enum ("g-bus-type",
+                                   xparam_spec_enum ("g-bus-type",
                                                       P_("Bus Type"),
                                                       P_("The bus to connect to, if any"),
                                                       XTYPE_BUS_TYPE,
                                                       G_BUS_TYPE_NONE,
-                                                      G_PARAM_WRITABLE |
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_STATIC_NAME |
-                                                      G_PARAM_STATIC_BLURB |
-                                                      G_PARAM_STATIC_NICK));
+                                                      XPARAM_WRITABLE |
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_STATIC_NAME |
+                                                      XPARAM_STATIC_BLURB |
+                                                      XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-flags:
@@ -425,19 +425,19 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_FLAGS,
-                                   g_param_spec_flags ("g-flags",
+                                   xparam_spec_flags ("g-flags",
                                                        P_("g-flags"),
                                                        P_("Flags for the proxy"),
                                                        XTYPE_DBUS_PROXY_FLAGS,
                                                        G_DBUS_PROXY_FLAGS_NONE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_WRITABLE |
-                                                       G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_STATIC_NAME |
-                                                       G_PARAM_STATIC_BLURB |
-                                                       G_PARAM_STATIC_NICK));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_WRITABLE |
+                                                       XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_STATIC_NAME |
+                                                       XPARAM_STATIC_BLURB |
+                                                       XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-name:
@@ -446,18 +446,18 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_NAME,
-                                   g_param_spec_string ("g-name",
+                                   xparam_spec_string ("g-name",
                                                         P_("g-name"),
                                                         P_("The well-known or unique name that the proxy is for"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-name-owner:
@@ -468,16 +468,16 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_NAME_OWNER,
-                                   g_param_spec_string ("g-name-owner",
+                                   xparam_spec_string ("g-name-owner",
                                                         P_("g-name-owner"),
                                                         P_("The unique name for the owner"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-object-path:
@@ -486,18 +486,18 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_OBJECT_PATH,
-                                   g_param_spec_string ("g-object-path",
+                                   xparam_spec_string ("g-object-path",
                                                         P_("g-object-path"),
                                                         P_("The object path the proxy is for"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-interface-name:
@@ -506,18 +506,18 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_INTERFACE_NAME,
-                                   g_param_spec_string ("g-interface-name",
+                                   xparam_spec_string ("g-interface-name",
                                                         P_("g-interface-name"),
                                                         P_("The D-Bus interface name the proxy is for"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t:g-default-timeout:
@@ -533,20 +533,20 @@ xdbus_proxy_class_init (GDBusProxyClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_DEFAULT_TIMEOUT,
-                                   g_param_spec_int ("g-default-timeout",
+                                   xparam_spec_int ("g-default-timeout",
                                                      P_("Default Timeout"),
                                                      P_("Timeout for remote method invocation"),
                                                      -1,
                                                      G_MAXINT,
                                                      -1,
-                                                     G_PARAM_READABLE |
-                                                     G_PARAM_WRITABLE |
-                                                     G_PARAM_CONSTRUCT |
-                                                     G_PARAM_STATIC_NAME |
-                                                     G_PARAM_STATIC_BLURB |
-                                                     G_PARAM_STATIC_NICK));
+                                                     XPARAM_READABLE |
+                                                     XPARAM_WRITABLE |
+                                                     XPARAM_CONSTRUCT |
+                                                     XPARAM_STATIC_NAME |
+                                                     XPARAM_STATIC_BLURB |
+                                                     XPARAM_STATIC_NICK));
 
   /**
    * xdbus_proxy_t::g-properties-changed:
@@ -657,7 +657,7 @@ xdbus_proxy_get_cached_property_names (xdbus_proxy_t  *proxy)
   xhash_table_iter_t iter;
   const xchar_t *key;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
 
   G_LOCK (properties_lock);
 
@@ -723,8 +723,8 @@ xdbus_proxy_get_cached_property (xdbus_proxy_t   *proxy,
   const xdbus_property_info_t *info;
   xvariant_t *value;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
-  g_return_val_if_fail (property_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (property_name != NULL, NULL);
 
   G_LOCK (properties_lock);
 
@@ -1342,7 +1342,7 @@ on_name_owner_changed (xdbus_connection_t *connection,
            * signal suddenly happens
            */
 
-          g_assert (proxy->priv->get_all_cancellable == NULL);
+          xassert (proxy->priv->get_all_cancellable == NULL);
           proxy->priv->get_all_cancellable = xcancellable_new ();
           data = g_new0 (load_properties_on_name_owner_changed_data_t, 1);
           data->proxy = xobject_ref (proxy);
@@ -1823,7 +1823,7 @@ async_initable_init_async (xasync_initable_t      *initable,
 
   if (proxy->priv->bus_type != G_BUS_TYPE_NONE)
     {
-      g_assert (proxy->priv->connection == NULL);
+      xassert (proxy->priv->connection == NULL);
 
       g_bus_get (proxy->priv->bus_type,
                  cancellable,
@@ -1893,7 +1893,7 @@ initable_init (xinitable_t     *initable,
 
   if (proxy->priv->bus_type != G_BUS_TYPE_NONE)
     {
-      g_assert (proxy->priv->connection == NULL);
+      xassert (proxy->priv->connection == NULL);
       proxy->priv->connection = g_bus_get_sync (proxy->priv->bus_type,
                                                 cancellable,
                                                 error);
@@ -2035,7 +2035,7 @@ xdbus_proxy_new_finish (xasync_result_t  *res,
   xobject_t *source_object;
 
   source_object = xasync_result_get_source_object (res);
-  g_assert (source_object != NULL);
+  xassert (source_object != NULL);
 
   object = xasync_initable_new_finish (XASYNC_INITABLE (source_object),
                                         res,
@@ -2099,11 +2099,11 @@ xdbus_proxy_new_sync (xdbus_connection_t     *connection,
 {
   xinitable_t *initable;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
                         g_dbus_is_name (name), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
 
   initable = xinitable_new (XTYPE_DBUS_PROXY,
                              cancellable,
@@ -2226,9 +2226,9 @@ xdbus_proxy_new_for_bus_sync (xbus_type_t             bus_type,
 
   _g_dbus_initialize ();
 
-  g_return_val_if_fail (g_dbus_is_name (name), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (g_dbus_is_name (name), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
 
   initable = xinitable_new (XTYPE_DBUS_PROXY,
                              cancellable,
@@ -2261,7 +2261,7 @@ xdbus_proxy_new_for_bus_sync (xbus_type_t             bus_type,
 xdbus_connection_t *
 xdbus_proxy_get_connection (xdbus_proxy_t *proxy)
 {
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->connection;
 }
 
@@ -2278,7 +2278,7 @@ xdbus_proxy_get_connection (xdbus_proxy_t *proxy)
 xdbus_proxy_flags_t
 xdbus_proxy_get_flags (xdbus_proxy_t *proxy)
 {
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), 0);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), 0);
   return proxy->priv->flags;
 }
 
@@ -2299,7 +2299,7 @@ xdbus_proxy_get_flags (xdbus_proxy_t *proxy)
 const xchar_t *
 xdbus_proxy_get_name (xdbus_proxy_t *proxy)
 {
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->name;
 }
 
@@ -2322,7 +2322,7 @@ xdbus_proxy_get_name_owner (xdbus_proxy_t *proxy)
 {
   xchar_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
 
   G_LOCK (properties_lock);
   ret = xstrdup (proxy->priv->name_owner);
@@ -2343,7 +2343,7 @@ xdbus_proxy_get_name_owner (xdbus_proxy_t *proxy)
 const xchar_t *
 xdbus_proxy_get_object_path (xdbus_proxy_t *proxy)
 {
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->object_path;
 }
 
@@ -2360,7 +2360,7 @@ xdbus_proxy_get_object_path (xdbus_proxy_t *proxy)
 const xchar_t *
 xdbus_proxy_get_interface_name (xdbus_proxy_t *proxy)
 {
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
   return proxy->priv->interface_name;
 }
 
@@ -2383,7 +2383,7 @@ xdbus_proxy_get_default_timeout (xdbus_proxy_t *proxy)
 {
   xint_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), -1);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), -1);
 
   G_LOCK (properties_lock);
   ret = proxy->priv->timeout_msec;
@@ -2444,7 +2444,7 @@ xdbus_proxy_get_interface_info (xdbus_proxy_t *proxy)
 {
   xdbus_interface_info_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
 
   G_LOCK (properties_lock);
   ret = proxy->priv->expected_interface;
@@ -2496,8 +2496,8 @@ maybe_split_method_name (const xchar_t  *method_name,
   xboolean_t was_split;
 
   was_split = FALSE;
-  g_assert (out_interface_name != NULL);
-  g_assert (out_method_name != NULL);
+  xassert (out_interface_name != NULL);
+  xassert (out_method_name != NULL);
   *out_interface_name = NULL;
   *out_method_name = NULL;
 
@@ -2761,9 +2761,9 @@ xdbus_proxy_call_finish_internal (xdbus_proxy_t    *proxy,
   xvariant_t *value;
   ReplyData *data;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
-  g_return_val_if_fail (xtask_is_valid (res, proxy), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, proxy), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   value = NULL;
 
@@ -2802,16 +2802,16 @@ xdbus_proxy_call_sync_internal (xdbus_proxy_t      *proxy,
   xchar_t *destination;
   xvariant_type_t *reply_type;
 
-  g_return_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
-  g_return_val_if_fail (g_dbus_is_member_name (method_name) || g_dbus_is_interface_name (method_name), NULL);
-  g_return_val_if_fail (parameters == NULL || xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), NULL);
-  g_return_val_if_fail (timeout_msec == -1 || timeout_msec >= 0, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (g_dbus_is_member_name (method_name) || g_dbus_is_interface_name (method_name), NULL);
+  xreturn_val_if_fail (parameters == NULL || xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), NULL);
+  xreturn_val_if_fail (timeout_msec == -1 || timeout_msec >= 0, NULL);
 #ifdef G_OS_UNIX
-  g_return_val_if_fail (fd_list == NULL || X_IS_UNIX_FD_LIST (fd_list), NULL);
+  xreturn_val_if_fail (fd_list == NULL || X_IS_UNIX_FD_LIST (fd_list), NULL);
 #else
-  g_return_val_if_fail (fd_list == NULL, NULL);
+  xreturn_val_if_fail (fd_list == NULL, NULL);
 #endif
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   reply_type = NULL;
 

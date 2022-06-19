@@ -158,13 +158,13 @@ g_resolver_finalize (xobject_t *object)
   g_mutex_clear (&resolver->priv->mutex);
 #endif
 
-  G_OBJECT_CLASS (g_resolver_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_resolver_parent_class)->finalize (object);
 }
 
 static void
 g_resolver_class_init (GResolverClass *resolver_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (resolver_class);
+  xobject_class_t *object_class = XOBJECT_CLASS (resolver_class);
 
   object_class->finalize = g_resolver_finalize;
 
@@ -440,10 +440,10 @@ lookup_by_name_real (xresolver_t                 *resolver,
   xlist_t *addrs;
   xchar_t *ascii_hostname = NULL;
 
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
-  g_return_val_if_fail (hostname != NULL, NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (hostname != NULL, NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   /* Check if @hostname is just an IP address */
   if (handle_ip_address_or_localhost (hostname, &addrs, flags, error))
@@ -653,9 +653,9 @@ lookup_by_name_finish_real (xresolver_t     *resolver,
 {
   xlist_t *addrs;
 
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -667,7 +667,7 @@ lookup_by_name_finish_real (xresolver_t     *resolver,
 
   if (with_flags)
     {
-      g_assert (G_RESOLVER_GET_CLASS (resolver)->lookup_by_name_with_flags_finish != NULL);
+      xassert (G_RESOLVER_GET_CLASS (resolver)->lookup_by_name_with_flags_finish != NULL);
       addrs = G_RESOLVER_GET_CLASS (resolver)->
         lookup_by_name_with_flags_finish (resolver, result, error);
     }
@@ -851,8 +851,8 @@ g_resolver_lookup_by_address (xresolver_t     *resolver,
                               xcancellable_t  *cancellable,
                               xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
-  g_return_val_if_fail (X_IS_INET_ADDRESS (address), NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS (address), NULL);
 
   maybe_emit_reload (resolver);
   return G_RESOLVER_GET_CLASS (resolver)->
@@ -911,7 +911,7 @@ g_resolver_lookup_by_address_finish (xresolver_t     *resolver,
                                      xasync_result_t  *result,
                                      xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -987,10 +987,10 @@ g_resolver_lookup_service (xresolver_t     *resolver,
   xlist_t *targets;
   xchar_t *rrname;
 
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
-  g_return_val_if_fail (service != NULL, NULL);
-  g_return_val_if_fail (protocol != NULL, NULL);
-  g_return_val_if_fail (domain != NULL, NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (service != NULL, NULL);
+  xreturn_val_if_fail (protocol != NULL, NULL);
+  xreturn_val_if_fail (domain != NULL, NULL);
 
   rrname = g_resolver_get_service_rrname (service, protocol, domain);
   if (!rrname)
@@ -1083,7 +1083,7 @@ g_resolver_lookup_service_finish (xresolver_t     *resolver,
                                   xasync_result_t  *result,
                                   xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -1148,8 +1148,8 @@ g_resolver_lookup_records (xresolver_t            *resolver,
 {
   xlist_t *records;
 
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
-  g_return_val_if_fail (rrname != NULL, NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (rrname != NULL, NULL);
 
   maybe_emit_reload (resolver);
   records = G_RESOLVER_GET_CLASS (resolver)->
@@ -1217,7 +1217,7 @@ g_resolver_lookup_records_finish (xresolver_t     *resolver,
                                   xasync_result_t  *result,
                                   xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), NULL);
   return G_RESOLVER_GET_CLASS (resolver)->
     lookup_records_finish (resolver, result, error);
 }
@@ -1227,7 +1227,7 @@ g_resolver_get_serial (xresolver_t *resolver)
 {
   xuint64_t result;
 
-  g_return_val_if_fail (X_IS_RESOLVER (resolver), 0);
+  xreturn_val_if_fail (X_IS_RESOLVER (resolver), 0);
 
   maybe_emit_reload (resolver);
 

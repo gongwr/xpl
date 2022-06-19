@@ -212,7 +212,7 @@ g_io_channel_init (xio_channel_t *channel)
 xio_channel_t *
 g_io_channel_ref (xio_channel_t *channel)
 {
-  g_return_val_if_fail (channel != NULL, NULL);
+  xreturn_val_if_fail (channel != NULL, NULL);
 
   g_atomic_int_inc (&channel->ref_count);
 
@@ -268,7 +268,7 @@ g_io_error_get_from_xerror (GIOStatus  status,
       case G_IO_STATUS_AGAIN:
         return G_IO_ERROR_AGAIN;
       case G_IO_STATUS_ERROR:
-	g_return_val_if_fail (err != NULL, G_IO_ERROR_UNKNOWN);
+	xreturn_val_if_fail (err != NULL, G_IO_ERROR_UNKNOWN);
 
         if (err->domain != G_IO_CHANNEL_ERROR)
           return G_IO_ERROR_UNKNOWN;
@@ -308,8 +308,8 @@ g_io_channel_read (xio_channel_t *channel,
   GIOError error;
   GIOStatus status;
 
-  g_return_val_if_fail (channel != NULL, G_IO_ERROR_UNKNOWN);
-  g_return_val_if_fail (bytes_read != NULL, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (channel != NULL, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (bytes_read != NULL, G_IO_ERROR_UNKNOWN);
 
   if (count == 0)
     {
@@ -318,7 +318,7 @@ g_io_channel_read (xio_channel_t *channel,
       return G_IO_ERROR_NONE;
     }
 
-  g_return_val_if_fail (buf != NULL, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (buf != NULL, G_IO_ERROR_UNKNOWN);
 
   status = channel->funcs->io_read (channel, buf, count, bytes_read, &err);
 
@@ -353,8 +353,8 @@ g_io_channel_write (xio_channel_t  *channel,
   GIOError error;
   GIOStatus status;
 
-  g_return_val_if_fail (channel != NULL, G_IO_ERROR_UNKNOWN);
-  g_return_val_if_fail (bytes_written != NULL, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (channel != NULL, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (bytes_written != NULL, G_IO_ERROR_UNKNOWN);
 
   status = channel->funcs->io_write (channel, buf, count, bytes_written, &err);
 
@@ -391,8 +391,8 @@ g_io_channel_seek (xio_channel_t *channel,
   GIOError error;
   GIOStatus status;
 
-  g_return_val_if_fail (channel != NULL, G_IO_ERROR_UNKNOWN);
-  g_return_val_if_fail (channel->is_seekable, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (channel != NULL, G_IO_ERROR_UNKNOWN);
+  xreturn_val_if_fail (channel->is_seekable, G_IO_ERROR_UNKNOWN);
 
   switch (type)
     {
@@ -488,8 +488,8 @@ g_io_channel_shutdown (xio_channel_t  *channel,
   GIOStatus status, result;
   xerror_t *tmperr = NULL;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail (err == NULL || *err == NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (err == NULL || *err == NULL, G_IO_STATUS_ERROR);
 
   if (channel->write_buf && channel->write_buf->len > 0)
     {
@@ -613,7 +613,7 @@ xsource_t *
 g_io_create_watch (xio_channel_t   *channel,
 		   xio_condition_t  condition)
 {
-  g_return_val_if_fail (channel != NULL, NULL);
+  xreturn_val_if_fail (channel != NULL, NULL);
 
   return channel->funcs->io_create_watch (channel, condition);
 }
@@ -647,7 +647,7 @@ g_io_add_watch_full (xio_channel_t    *channel,
   xsource_t *source;
   xuint_t id;
 
-  g_return_val_if_fail (channel != NULL, 0);
+  xreturn_val_if_fail (channel != NULL, 0);
 
   source = g_io_create_watch (channel, condition);
 
@@ -753,7 +753,7 @@ GIOChannelError
 g_io_channel_error_from_errno (xint_t en)
 {
 #ifdef EAGAIN
-  g_return_val_if_fail (en != EAGAIN, G_IO_CHANNEL_ERROR_FAILED);
+  xreturn_val_if_fail (en != EAGAIN, G_IO_CHANNEL_ERROR_FAILED);
 #endif
 
   switch (en)
@@ -862,7 +862,7 @@ g_io_channel_set_buffer_size (xio_channel_t *channel,
 xsize_t
 g_io_channel_get_buffer_size (xio_channel_t *channel)
 {
-  g_return_val_if_fail (channel != NULL, 0);
+  xreturn_val_if_fail (channel != NULL, 0);
 
   return channel->buf_size;
 }
@@ -924,7 +924,7 @@ const xchar_t *
 g_io_channel_get_line_term (xio_channel_t *channel,
 			    xint_t       *length)
 {
-  g_return_val_if_fail (channel != NULL, NULL);
+  xreturn_val_if_fail (channel != NULL, NULL);
 
   if (length)
     *length = channel->line_term_len;
@@ -974,8 +974,8 @@ g_io_channel_set_flags (xio_channel_t  *channel,
                         GIOFlags     flags,
                         xerror_t     **error)
 {
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
 
   return (*channel->funcs->io_set_flags) (channel,
@@ -1004,7 +1004,7 @@ g_io_channel_get_flags (xio_channel_t *channel)
 {
   GIOFlags flags;
 
-  g_return_val_if_fail (channel != NULL, 0);
+  xreturn_val_if_fail (channel != NULL, 0);
 
   flags = (* channel->funcs->io_get_flags) (channel);
 
@@ -1056,7 +1056,7 @@ g_io_channel_set_close_on_unref	(xio_channel_t *channel,
 xboolean_t
 g_io_channel_get_close_on_unref	(xio_channel_t *channel)
 {
-  g_return_val_if_fail (channel != NULL, FALSE);
+  xreturn_val_if_fail (channel != NULL, FALSE);
 
   return channel->close_on_unref;
 }
@@ -1096,10 +1096,10 @@ g_io_channel_seek_position (xio_channel_t  *channel,
    * For sockets, both can contain data.
    */
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_seekable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_seekable, G_IO_STATUS_ERROR);
 
   switch (type)
     {
@@ -1117,7 +1117,7 @@ g_io_channel_seek_position (xio_channel_t  *channel,
             offset -= channel->read_buf->len;
           if (channel->encoded_read_buf)
             {
-              g_assert (channel->encoded_read_buf->len == 0 || !channel->do_encode);
+              xassert (channel->encoded_read_buf->len == 0 || !channel->do_encode);
 
               /* If there's anything here, it's because the encoding is UTF-8,
                * so we can just subtract the buffer length, the same as for
@@ -1158,7 +1158,7 @@ g_io_channel_seek_position (xio_channel_t  *channel,
 
       if (channel->encoded_read_buf)
         {
-          g_assert (channel->encoded_read_buf->len == 0 || !channel->do_encode);
+          xassert (channel->encoded_read_buf->len == 0 || !channel->do_encode);
           xstring_truncate (channel->encoded_read_buf, 0);
         }
 
@@ -1190,15 +1190,15 @@ g_io_channel_flush (xio_channel_t	*channel,
   GIOStatus status;
   xsize_t this_time = 1, bytes_written = 0;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL), G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL), G_IO_STATUS_ERROR);
 
   if (channel->write_buf == NULL || channel->write_buf->len == 0)
     return G_IO_STATUS_NORMAL;
 
   do
     {
-      g_assert (this_time > 0);
+      xassert (this_time > 0);
 
       status = channel->funcs->io_write (channel,
 					 channel->write_buf->str + bytes_written,
@@ -1269,7 +1269,7 @@ g_io_channel_set_buffered (xio_channel_t *channel,
 xboolean_t
 g_io_channel_get_buffered (xio_channel_t *channel)
 {
-  g_return_val_if_fail (channel != NULL, FALSE);
+  xreturn_val_if_fail (channel != NULL, FALSE);
 
   return channel->use_buffer;
 }
@@ -1327,12 +1327,12 @@ g_io_channel_set_encoding (xio_channel_t	*channel,
   xboolean_t did_encode;
 #endif
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL), G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL), G_IO_STATUS_ERROR);
 
   /* Make sure the encoded buffers are empty */
 
-  g_return_val_if_fail (!channel->do_encode || !channel->encoded_read_buf ||
+  xreturn_val_if_fail (!channel->do_encode || !channel->encoded_read_buf ||
 			channel->encoded_read_buf->len == 0, G_IO_STATUS_ERROR);
 
   if (!channel->use_buffer)
@@ -1393,8 +1393,8 @@ g_io_channel_set_encoding (xio_channel_t	*channel,
 
       if (err != 0)
         {
-          g_assert (from_enc);
-          g_assert (to_enc);
+          xassert (from_enc);
+          xassert (to_enc);
 
           if (err == EINVAL)
             g_set_error (error, G_CONVERT_ERROR, G_CONVERT_ERROR_NO_CONVERSION,
@@ -1425,7 +1425,7 @@ g_io_channel_set_encoding (xio_channel_t	*channel,
 
   if (channel->encoded_read_buf && channel->encoded_read_buf->len > 0)
     {
-      g_assert (!did_encode); /* Encoding UTF-8, NULL doesn't use encoded_read_buf */
+      xassert (!did_encode); /* Encoding UTF-8, NULL doesn't use encoded_read_buf */
 
       /* This is just validated UTF-8, so we can copy it back into read_buf
        * so it can be encoded in whatever the new encoding is.
@@ -1459,7 +1459,7 @@ g_io_channel_set_encoding (xio_channel_t	*channel,
 const xchar_t *
 g_io_channel_get_encoding (xio_channel_t *channel)
 {
-  g_return_val_if_fail (channel != NULL, NULL);
+  xreturn_val_if_fail (channel != NULL, NULL);
 
   return channel->encoding;
 }
@@ -1493,7 +1493,7 @@ g_io_channel_fill_buffer (xio_channel_t  *channel,
   status = channel->funcs->io_read (channel, channel->read_buf->str + cur_len,
                                     channel->buf_size, &read_size, err);
 
-  g_assert ((status == G_IO_STATUS_NORMAL) || (read_size == 0));
+  xassert ((status == G_IO_STATUS_NORMAL) || (read_size == 0));
 
   xstring_truncate (channel->read_buf, read_size + cur_len);
 
@@ -1501,7 +1501,7 @@ g_io_channel_fill_buffer (xio_channel_t  *channel,
       ((status != G_IO_STATUS_EOF) || (channel->read_buf->len == 0)))
     return status;
 
-  g_assert (channel->read_buf->len > 0);
+  xassert (channel->read_buf->len > 0);
 
   if (channel->encoded_read_buf)
     oldlen = channel->encoded_read_buf->len;
@@ -1518,7 +1518,7 @@ g_io_channel_fill_buffer (xio_channel_t  *channel,
       xchar_t *inbuf, *outbuf;
       int errval;
 
-      g_assert (channel->encoded_read_buf);
+      xassert (channel->encoded_read_buf);
 
 reencode:
 
@@ -1538,9 +1538,9 @@ reencode:
 			&outbuf, &outbytes_left);
       errval = errno;
 
-      g_assert (inbuf + inbytes_left == channel->read_buf->str
+      xassert (inbuf + inbytes_left == channel->read_buf->str
                 + channel->read_buf->len);
-      g_assert (outbuf + outbytes_left == channel->encoded_read_buf->str
+      xassert (outbuf + outbytes_left == channel->encoded_read_buf->str
                 + channel->encoded_read_buf->len);
 
       xstring_erase (channel->read_buf, 0,
@@ -1561,7 +1561,7 @@ reencode:
                 break;
               case E2BIG:
                 /* buffer_t size at least 6, wrote at least on character */
-                g_assert (inbuf != channel->read_buf->str);
+                xassert (inbuf != channel->read_buf->str);
                 goto reencode;
               case EILSEQ:
                 if (oldlen < channel->encoded_read_buf->len)
@@ -1575,20 +1575,20 @@ reencode:
                   }
                 break;
               default:
-                g_assert (errval != EBADF); /* The converter should be open */
+                xassert (errval != EBADF); /* The converter should be open */
                 g_set_error (err, G_CONVERT_ERROR, G_CONVERT_ERROR_FAILED,
                   _("Error during conversion: %s"), xstrerror (errval));
                 return G_IO_STATUS_ERROR;
             }
         }
-      g_assert ((status != G_IO_STATUS_NORMAL)
+      xassert ((status != G_IO_STATUS_NORMAL)
                || (channel->encoded_read_buf->len > 0));
     }
   else if (channel->encoding) /* UTF-8 */
     {
       xchar_t *nextchar, *lastchar;
 
-      g_assert (channel->encoded_read_buf);
+      xassert (channel->encoded_read_buf);
 
       nextchar = channel->read_buf->str;
       lastchar = channel->read_buf->str + channel->read_buf->len;
@@ -1665,11 +1665,11 @@ g_io_channel_read_line (xio_channel_t  *channel,
   GIOStatus status;
   xsize_t got_length;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail (str_return != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (str_return != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
 
   status = g_io_channel_read_line_backend (channel, &got_length, terminator_pos, error);
 
@@ -1684,7 +1684,7 @@ g_io_channel_read_line (xio_channel_t  *channel,
        * `USE_BUF (channel)->str` is guaranteed to be nul-terminated as it’s a
        * #xstring_t, so it’s safe to call g_memdup2() with +1 length to allocate
        * a nul-terminator. */
-      g_assert (USE_BUF (channel));
+      xassert (USE_BUF (channel));
       line = g_memdup2 (USE_BUF (channel)->str, got_length + 1);
       line[got_length] = '\0';
       *str_return = g_steal_pointer (&line);
@@ -1719,11 +1719,11 @@ g_io_channel_read_line_string (xio_channel_t  *channel,
   xsize_t length;
   GIOStatus status;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail (buffer != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (buffer != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
 
   if (buffer->len > 0)
     xstring_truncate (buffer, 0); /* clear out the buffer */
@@ -1732,7 +1732,7 @@ g_io_channel_read_line_string (xio_channel_t  *channel,
 
   if (status == G_IO_STATUS_NORMAL)
     {
-      g_assert (USE_BUF (channel));
+      xassert (USE_BUF (channel));
       xstring_append_len (buffer, USE_BUF (channel)->str, length);
       xstring_erase (USE_BUF (channel), 0, length);
     }
@@ -1817,7 +1817,7 @@ read_again:
             }
         }
 
-      g_assert (BUF_LEN (USE_BUF (channel)) != 0);
+      xassert (BUF_LEN (USE_BUF (channel)) != 0);
 
       use_buf = USE_BUF (channel); /* The buffer has been created by this point */
 
@@ -1874,7 +1874,7 @@ read_again:
         }
 
       /* If encoding != NULL, valid UTF-8, didn't overshoot */
-      g_assert (nextchar == lastchar);
+      xassert (nextchar == lastchar);
 
       /* Check for EOF */
 
@@ -1933,10 +1933,10 @@ g_io_channel_read_to_end (xio_channel_t  *channel,
 {
   GIOStatus status;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
     G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
 
   if (str_return)
     *str_return = NULL;
@@ -2018,9 +2018,9 @@ g_io_channel_read_chars (xio_channel_t  *channel,
   GIOStatus status;
   xsize_t got_bytes;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL), G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL), G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
 
   if (count == 0)
     {
@@ -2028,13 +2028,13 @@ g_io_channel_read_chars (xio_channel_t  *channel,
         *bytes_read = 0;
       return G_IO_STATUS_NORMAL;
     }
-  g_return_val_if_fail (buf != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (buf != NULL, G_IO_STATUS_ERROR);
 
   if (!channel->use_buffer)
     {
       xsize_t tmp_bytes;
 
-      g_assert (!channel->read_buf || channel->read_buf->len == 0);
+      xassert (!channel->read_buf || channel->read_buf->len == 0);
 
       status = channel->funcs->io_read (channel, buf, count, &tmp_bytes, error);
 
@@ -2053,7 +2053,7 @@ g_io_channel_read_chars (xio_channel_t  *channel,
 
   if (BUF_LEN (USE_BUF (channel)) == 0)
     {
-      g_assert (status != G_IO_STATUS_NORMAL);
+      xassert (status != G_IO_STATUS_NORMAL);
 
       if (status == G_IO_STATUS_EOF && channel->encoding
           && BUF_LEN (channel->read_buf) > 0)
@@ -2075,14 +2075,14 @@ g_io_channel_read_chars (xio_channel_t  *channel,
 
   got_bytes = MIN (count, BUF_LEN (USE_BUF (channel)));
 
-  g_assert (got_bytes > 0);
+  xassert (got_bytes > 0);
 
   if (channel->encoding)
     /* Don't validate for NULL encoding, binary safe */
     {
       xchar_t *nextchar, *prevchar;
 
-      g_assert (USE_BUF (channel) == channel->encoded_read_buf);
+      xassert (USE_BUF (channel) == channel->encoded_read_buf);
 
       nextchar = channel->encoded_read_buf->str;
 
@@ -2090,14 +2090,14 @@ g_io_channel_read_chars (xio_channel_t  *channel,
         {
           prevchar = nextchar;
           nextchar = xutf8_next_char (nextchar);
-          g_assert (nextchar != prevchar); /* Possible for *prevchar of -1 or -2 */
+          xassert (nextchar != prevchar); /* Possible for *prevchar of -1 or -2 */
         }
       while (nextchar < channel->encoded_read_buf->str + got_bytes);
 
       if (nextchar > channel->encoded_read_buf->str + got_bytes)
         got_bytes = prevchar - channel->encoded_read_buf->str;
 
-      g_assert (got_bytes > 0 || count < 6);
+      xassert (got_bytes > 0 || count < 6);
     }
 
   memcpy (buf, USE_BUF (channel)->str, got_bytes);
@@ -2128,11 +2128,11 @@ g_io_channel_read_unichar (xio_channel_t  *channel,
 {
   GIOStatus status = G_IO_STATUS_NORMAL;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->encoding != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->encoding != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_readable, G_IO_STATUS_ERROR);
 
   while (BUF_LEN (channel->encoded_read_buf) == 0 && status == G_IO_STATUS_NORMAL)
     status = g_io_channel_fill_buffer (channel, error);
@@ -2141,7 +2141,7 @@ g_io_channel_read_unichar (xio_channel_t  *channel,
 
   if (BUF_LEN (USE_BUF (channel)) == 0)
     {
-      g_assert (status != G_IO_STATUS_NORMAL);
+      xassert (status != G_IO_STATUS_NORMAL);
 
       if (status == G_IO_STATUS_EOF && BUF_LEN (channel->read_buf) > 0)
         {
@@ -2204,10 +2204,10 @@ g_io_channel_write_chars (xio_channel_t   *channel,
   GIOStatus status;
   xssize_t wrote_bytes = 0;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_writeable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_writeable, G_IO_STATUS_ERROR);
 
   if ((count < 0) && buf)
     count = strlen (buf);
@@ -2220,8 +2220,8 @@ g_io_channel_write_chars (xio_channel_t   *channel,
       return G_IO_STATUS_NORMAL;
     }
 
-  g_return_val_if_fail (buf != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail (count_unsigned > 0, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (buf != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (count_unsigned > 0, G_IO_STATUS_ERROR);
 
   /* Raw write case */
 
@@ -2229,8 +2229,8 @@ g_io_channel_write_chars (xio_channel_t   *channel,
     {
       xsize_t tmp_bytes;
 
-      g_assert (!channel->write_buf || channel->write_buf->len == 0);
-      g_assert (channel->partial_write_buf[0] == '\0');
+      xassert (!channel->write_buf || channel->write_buf->len == 0);
+      xassert (channel->partial_write_buf[0] == '\0');
 
       status = channel->funcs->io_write (channel, buf, count_unsigned,
                                          &tmp_bytes, error);
@@ -2305,7 +2305,7 @@ g_io_channel_write_chars (xio_channel_t   *channel,
       /* This is only true because g_io_channel_set_buffer_size ()
        * ensures that channel->buf_size >= MAX_CHAR_SIZE.
        */
-      g_assert (space_in_buf >= MAX_CHAR_SIZE);
+      xassert (space_in_buf >= MAX_CHAR_SIZE);
 
       if (!channel->encoding)
         {
@@ -2324,11 +2324,11 @@ g_io_channel_write_chars (xio_channel_t   *channel,
 
           if (channel->partial_write_buf[0] != '\0')
             {
-              g_assert (wrote_bytes == 0);
+              xassert (wrote_bytes == 0);
 
               from_buf = channel->partial_write_buf;
               from_buf_old_len = strlen (channel->partial_write_buf);
-              g_assert (from_buf_old_len > 0);
+              xassert (from_buf_old_len > 0);
               from_buf_len = MIN (6, from_buf_old_len + count_unsigned);
 
               memcpy (channel->partial_write_buf + from_buf_old_len, buf,
@@ -2362,7 +2362,7 @@ reconvert:
                   switch (try_char)
                     {
                       case -2:
-                        g_assert (incomplete_len < 6);
+                        xassert (incomplete_len < 6);
                         if (try_len == from_buf_len)
                           {
                             errnum = EINVAL;
@@ -2418,7 +2418,7 @@ reconvert:
               switch (errnum)
         	{
                   case EINVAL:
-                    g_assert (left_len < 6);
+                    xassert (left_len < 6);
 
                     if (from_buf_old_len == 0)
                       {
@@ -2439,7 +2439,7 @@ reconvert:
                          * less than a full character
                          */
 
-                        g_assert (count_unsigned == from_buf_len - from_buf_old_len);
+                        xassert (count_unsigned == from_buf_len - from_buf_old_len);
 
                         channel->partial_write_buf[from_buf_len] = '\0';
 
@@ -2449,7 +2449,7 @@ reconvert:
                         return G_IO_STATUS_NORMAL;
                       }
 
-                    g_assert (from_buf_len - left_len >= from_buf_old_len);
+                    xassert (from_buf_len - left_len >= from_buf_old_len);
 
                     /* We converted all the old data. This is fine */
 
@@ -2489,7 +2489,7 @@ reconvert:
                 }
             }
 
-          g_assert (from_buf_len - left_len >= from_buf_old_len);
+          xassert (from_buf_len - left_len >= from_buf_old_len);
 
           wrote_bytes += from_buf_len - left_len - from_buf_old_len;
 
@@ -2532,11 +2532,11 @@ g_io_channel_write_unichar (xio_channel_t  *channel,
   xchar_t static_buf[6];
   xsize_t char_len, wrote_len;
 
-  g_return_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->encoding != NULL, G_IO_STATUS_ERROR);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL),
+  xreturn_val_if_fail (channel != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->encoding != NULL, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL),
 			G_IO_STATUS_ERROR);
-  g_return_val_if_fail (channel->is_writeable, G_IO_STATUS_ERROR);
+  xreturn_val_if_fail (channel->is_writeable, G_IO_STATUS_ERROR);
 
   char_len = xunichar_to_utf8 (thechar, static_buf);
 
@@ -2551,7 +2551,7 @@ g_io_channel_write_unichar (xio_channel_t  *channel,
 
   /* We validate UTF-8, so we can't get a partial write */
 
-  g_assert (wrote_len == char_len || status != G_IO_STATUS_NORMAL);
+  xassert (wrote_len == char_len || status != G_IO_STATUS_NORMAL);
 
   return status;
 }

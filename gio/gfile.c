@@ -437,7 +437,7 @@ xfile_is_native (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -464,8 +464,8 @@ xfile_has_uri_scheme (xfile_t      *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (uri_scheme != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (uri_scheme != NULL, FALSE);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -498,7 +498,7 @@ xfile_get_uri_scheme (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -533,7 +533,7 @@ xfile_get_basename (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -558,7 +558,7 @@ xfile_get_path (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -652,7 +652,7 @@ xfile_get_uri (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -687,7 +687,7 @@ xfile_get_parse_name (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -717,7 +717,7 @@ xfile_dup (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -743,7 +743,7 @@ xfile_hash (xconstpointer file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), 0);
+  xreturn_val_if_fail (X_IS_FILE (file), 0);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -771,8 +771,8 @@ xfile_equal (xfile_t *file1,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file1), FALSE);
-  g_return_val_if_fail (X_IS_FILE (file2), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file1), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file2), FALSE);
 
   if (file1 == file2)
     return TRUE;
@@ -805,7 +805,7 @@ xfile_get_parent (xfile_t *file)
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -835,8 +835,8 @@ xfile_has_parent (xfile_t *file,
   xfile_t *actual_parent;
   xboolean_t result;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (parent == NULL || X_IS_FILE (parent), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (parent == NULL || X_IS_FILE (parent), FALSE);
 
   actual_parent = xfile_get_parent (file);
 
@@ -875,9 +875,9 @@ xfile_t *
 xfile_get_child (xfile_t      *file,
                   const char *name)
 {
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (name != NULL, NULL);
-  g_return_val_if_fail (!g_path_is_absolute (name), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (!g_path_is_absolute (name), NULL);
 
   return xfile_resolve_relative_path (file, name);
 }
@@ -908,8 +908,8 @@ xfile_get_child_for_display_name (xfile_t      *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (display_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (display_name != NULL, NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -946,8 +946,8 @@ xfile_has_prefix (xfile_t *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_FILE (prefix), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (prefix), FALSE);
 
   if (XTYPE_FROM_INSTANCE (file) != XTYPE_FROM_INSTANCE (prefix))
     return FALSE;
@@ -980,8 +980,8 @@ xfile_get_relative_path (xfile_t *parent,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (parent), NULL);
-  g_return_val_if_fail (X_IS_FILE (descendant), NULL);
+  xreturn_val_if_fail (X_IS_FILE (parent), NULL);
+  xreturn_val_if_fail (X_IS_FILE (descendant), NULL);
 
   if (XTYPE_FROM_INSTANCE (parent) != XTYPE_FROM_INSTANCE (descendant))
     return NULL;
@@ -1011,8 +1011,8 @@ xfile_resolve_relative_path (xfile_t      *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (relative_path != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (relative_path != NULL, NULL);
 
   iface = XFILE_GET_IFACE (file);
 
@@ -1066,7 +1066,7 @@ xfile_enumerate_children (xfile_t                *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1151,8 +1151,8 @@ xfile_enumerate_children_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -1199,7 +1199,7 @@ xfile_query_exists (xfile_t        *file,
 {
   xfile_info_t *info;
 
-  g_return_val_if_fail (X_IS_FILE(file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE(file), FALSE);
 
   info = xfile_query_info (file, XFILE_ATTRIBUTE_STANDARD_TYPE,
                             XFILE_QUERY_INFO_NONE, cancellable, NULL);
@@ -1238,7 +1238,7 @@ xfile_query_file_type (xfile_t               *file,
   xfile_info_t *info;
   xfile_type_t file_type;
 
-  g_return_val_if_fail (X_IS_FILE(file), XFILE_TYPE_UNKNOWN);
+  xreturn_val_if_fail (X_IS_FILE(file), XFILE_TYPE_UNKNOWN);
   info = xfile_query_info (file, XFILE_ATTRIBUTE_STANDARD_TYPE, flags,
                             cancellable, NULL);
   if (info != NULL)
@@ -1304,7 +1304,7 @@ xfile_query_info (xfile_t                *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1387,8 +1387,8 @@ xfile_query_info_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -1442,7 +1442,7 @@ xfile_query_filesystem_info (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1524,8 +1524,8 @@ xfile_query_filesystem_info_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -1562,7 +1562,7 @@ xfile_find_enclosing_mount (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1640,8 +1640,8 @@ xfile_find_enclosing_mount_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -1680,7 +1680,7 @@ xfile_read (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1735,7 +1735,7 @@ xfile_append_to (xfile_t             *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1793,7 +1793,7 @@ xfile_create (xfile_t             *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1877,7 +1877,7 @@ xfile_replace (xfile_t             *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1934,7 +1934,7 @@ xfile_open_readwrite (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -1998,7 +1998,7 @@ xfile_create_readwrite (xfile_t             *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -2053,7 +2053,7 @@ xfile_replace_readwrite (xfile_t             *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -2128,8 +2128,8 @@ xfile_read_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2199,8 +2199,8 @@ xfile_append_to_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2270,8 +2270,8 @@ xfile_create_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2348,8 +2348,8 @@ xfile_replace_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2419,8 +2419,8 @@ xfile_open_readwrite_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2494,8 +2494,8 @@ xfile_create_readwrite_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2577,8 +2577,8 @@ xfile_replace_readwrite_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -2768,9 +2768,9 @@ xfile_build_attribute_list_for_copy (xfile_t                  *file,
   xboolean_t copy_all_attributes;
   xboolean_t skip_perms;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   copy_all_attributes = flags & XFILE_COPY_ALL_METADATA;
   skip_perms = (flags & XFILE_COPY_TARGET_DEFAULT_PERMS) != 0;
@@ -3064,7 +3064,7 @@ splice_stream_with_progress (xinput_stream_t           *in,
         }
     }
 
-  g_assert (buffer_size > 0);
+  xassert (buffer_size > 0);
 
   total_size = -1;
   /* avoid performance impact of querying total size when it's not needed */
@@ -3508,8 +3508,8 @@ xfile_copy (xfile_t                  *source,
   xerror_t *my_error;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_FILE (source), FALSE);
-  g_return_val_if_fail (X_IS_FILE (destination), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (source), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (destination), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -3638,8 +3638,8 @@ xfile_copy_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return FALSE;
@@ -3710,8 +3710,8 @@ xfile_move (xfile_t                  *source,
   xerror_t *my_error;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_FILE (source), FALSE);
-  g_return_val_if_fail (X_IS_FILE (destination), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (source), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (destination), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -3859,9 +3859,9 @@ xfile_move_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   iface = XFILE_GET_IFACE (file);
   return (* iface->move_finish) (file, result, error);
@@ -3898,7 +3898,7 @@ xfile_make_directory (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -3970,8 +3970,8 @@ xfile_make_directory_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   iface = XFILE_GET_IFACE (file);
   return (* iface->make_directory_finish) (file, result, error);
@@ -4012,7 +4012,7 @@ xfile_make_directory_with_parents (xfile_t         *file,
   xlist_t *list = NULL, *l;
   xerror_t *my_error = NULL;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -4125,8 +4125,8 @@ xfile_make_symbolic_link (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (symlink_value != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (symlink_value != NULL, FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -4191,7 +4191,7 @@ xfile_delete (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -4264,8 +4264,8 @@ xfile_delete_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -4302,7 +4302,7 @@ xfile_trash (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -4374,8 +4374,8 @@ xfile_trash_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   iface = XFILE_GET_IFACE (file);
   return (* iface->trash_finish) (file, result, error);
@@ -4417,8 +4417,8 @@ xfile_set_display_name (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (display_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (display_name != NULL, NULL);
 
   if (strchr (display_name, G_DIR_SEPARATOR) != NULL)
     {
@@ -4498,8 +4498,8 @@ xfile_set_display_name_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return NULL;
@@ -4539,7 +4539,7 @@ xfile_query_settable_attributes (xfile_t         *file,
   xerror_t *my_error;
   xfile_attribute_info_list_t *list;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -4594,7 +4594,7 @@ xfile_query_writable_namespaces (xfile_t         *file,
   xerror_t *my_error;
   xfile_attribute_info_list_t *list;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -4660,8 +4660,8 @@ xfile_set_attribute (xfile_t                *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -4712,8 +4712,8 @@ xfile_set_attributes_from_info (xfile_t                *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
@@ -4833,8 +4833,8 @@ xfile_set_attributes_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   /* No standard handling of errors here, as we must set info even
    * on errors
@@ -5116,8 +5116,8 @@ xfile_mount_mountable_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -5203,8 +5203,8 @@ xfile_unmount_mountable_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -5301,8 +5301,8 @@ xfile_unmount_mountable_with_operation_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -5388,8 +5388,8 @@ xfile_eject_mountable_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -5482,8 +5482,8 @@ xfile_eject_mountable_with_operation_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -5531,8 +5531,8 @@ xfile_monitor_directory (xfile_t              *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (~flags & XFILE_MONITOR_WATCH_HARD_LINKS, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (~flags & XFILE_MONITOR_WATCH_HARD_LINKS, NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -5586,7 +5586,7 @@ xfile_monitor_file (xfile_t              *file,
   xfile_iface_t *iface;
   xfile_monitor_t *monitor;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -5600,7 +5600,7 @@ xfile_monitor_file (xfile_t              *file,
 
   /* Fallback to polling */
   if (monitor == NULL)
-    monitor = _g_poll_file_monitor_new (file);
+    monitor = _xpoll_file_monitor_new (file);
 
   return monitor;
 }
@@ -5702,7 +5702,7 @@ xfile_real_query_info_finish (xfile_t         *file,
                                xasync_result_t  *res,
                                xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -5747,7 +5747,7 @@ xfile_real_query_filesystem_info_finish (xfile_t         *file,
                                           xasync_result_t  *res,
                                           xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -5798,7 +5798,7 @@ xfile_real_enumerate_children_finish (xfile_t         *file,
                                        xasync_result_t  *res,
                                        xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -5840,7 +5840,7 @@ xfile_real_read_finish (xfile_t         *file,
                          xasync_result_t  *res,
                          xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -5890,7 +5890,7 @@ xfile_real_append_to_finish (xfile_t         *file,
                               xasync_result_t  *res,
                               xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -5940,7 +5940,7 @@ xfile_real_create_finish (xfile_t         *file,
                            xasync_result_t  *res,
                            xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6016,7 +6016,7 @@ xfile_real_replace_finish (xfile_t         *file,
                             xasync_result_t  *res,
                             xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6056,7 +6056,7 @@ xfile_real_delete_finish (xfile_t         *file,
                            xasync_result_t  *res,
                            xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -6096,7 +6096,7 @@ xfile_real_trash_finish (xfile_t         *file,
                           xasync_result_t  *res,
                           xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -6134,7 +6134,7 @@ move_async_progress_in_main (xpointer_t user_data)
                      progress->total_num_bytes,
                      data->progress_cb_data);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -6215,7 +6215,7 @@ xfile_real_move_finish (xfile_t        *file,
                          xasync_result_t *result,
                          xerror_t      **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, file), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -6255,7 +6255,7 @@ xfile_real_make_directory_finish (xfile_t         *file,
                                    xasync_result_t  *res,
                                    xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -6299,7 +6299,7 @@ xfile_real_open_readwrite_finish (xfile_t         *file,
                                    xasync_result_t  *res,
                                    xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6350,7 +6350,7 @@ xfile_real_create_readwrite_finish (xfile_t         *file,
                                      xasync_result_t  *res,
                                      xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6423,7 +6423,7 @@ xfile_real_replace_readwrite_finish (xfile_t         *file,
                                       xasync_result_t  *res,
                                       xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6470,7 +6470,7 @@ xfile_real_set_display_name_finish (xfile_t         *file,
                                      xasync_result_t  *res,
                                      xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6541,7 +6541,7 @@ xfile_real_set_attributes_finish (xfile_t         *file,
 {
   SetInfoAsyncData *data;
 
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
 
   data = xtask_get_task_data (XTASK (res));
 
@@ -6593,7 +6593,7 @@ xfile_real_find_enclosing_mount_finish (xfile_t         *file,
                                          xasync_result_t  *res,
                                          xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, file), NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -6712,7 +6712,7 @@ xfile_real_copy_finish (xfile_t        *file,
                          xasync_result_t *res,
                          xerror_t      **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -6737,7 +6737,7 @@ xfile_real_copy_finish (xfile_t        *file,
 xfile_t *
 xfile_new_for_path (const char *path)
 {
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
   return xvfs_get_file_for_path (xvfs_get_default (), path);
 }
@@ -6757,7 +6757,7 @@ xfile_new_for_path (const char *path)
 xfile_t *
 xfile_new_for_uri (const char *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return xvfs_get_file_for_uri (xvfs_get_default (), uri);
 }
@@ -6795,7 +6795,7 @@ xfile_new_tmp (const char     *tmpl,
   xfile_t *file;
   xfile_output_stream_t *output;
 
-  g_return_val_if_fail (iostream != NULL, NULL);
+  xreturn_val_if_fail (iostream != NULL, NULL);
 
   fd = xfile_open_tmp (tmpl, &path, error);
   if (fd == -1)
@@ -6826,7 +6826,7 @@ xfile_new_tmp (const char     *tmpl,
 xfile_t *
 xfile_parse_name (const char *parse_name)
 {
-  g_return_val_if_fail (parse_name != NULL, NULL);
+  xreturn_val_if_fail (parse_name != NULL, NULL);
 
   return xvfs_parse_name (xvfs_get_default (), parse_name);
 }
@@ -6854,7 +6854,7 @@ xfile_new_build_filename (const xchar_t *first_element,
   xfile_t *file;
   va_list args;
 
-  g_return_val_if_fail (first_element != NULL, NULL);
+  xreturn_val_if_fail (first_element != NULL, NULL);
 
   va_start (args, first_element);
   str = g_build_filename_valist (first_element, &args);
@@ -6947,7 +6947,7 @@ new_for_cmdline_arg (const xchar_t *arg,
 xfile_t *
 xfile_new_for_commandline_arg (const char *arg)
 {
-  g_return_val_if_fail (arg != NULL, NULL);
+  xreturn_val_if_fail (arg != NULL, NULL);
 
   return new_for_cmdline_arg (arg, NULL);
 }
@@ -6977,8 +6977,8 @@ xfile_t *
 xfile_new_for_commandline_arg_and_cwd (const xchar_t *arg,
                                         const xchar_t *cwd)
 {
-  g_return_val_if_fail (arg != NULL, NULL);
-  g_return_val_if_fail (cwd != NULL, NULL);
+  xreturn_val_if_fail (arg != NULL, NULL);
+  xreturn_val_if_fail (cwd != NULL, NULL);
 
   return new_for_cmdline_arg (arg, cwd);
 }
@@ -7052,8 +7052,8 @@ xfile_mount_enclosing_volume_finish (xfile_t         *location,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (location), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (location), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -7264,8 +7264,8 @@ xfile_query_default_handler_finish (xfile_t        *file,
                                      xasync_result_t *result,
                                      xerror_t      **error)
 {
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (xtask_is_valid (result, file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, file), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -7309,8 +7309,8 @@ xfile_load_contents (xfile_t         *file,
   xssize_t res;
   xfile_info_t *info;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (contents != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (contents != NULL, FALSE);
 
   in = xfile_read (file, cancellable, error);
   if (in == NULL)
@@ -7591,9 +7591,9 @@ xfile_load_partial_contents_finish (xfile_t         *file,
   xtask_t *task;
   LoadContentsData *data;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
-  g_return_val_if_fail (contents != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (contents != NULL, FALSE);
 
   task = XTASK (res);
 
@@ -7745,8 +7745,8 @@ xfile_replace_contents (xfile_t             *file,
   xssize_t res;
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (contents != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (contents != NULL, FALSE);
 
   out = xfile_replace (file, etag, make_backup, flags, cancellable, error);
   if (out == NULL)
@@ -8031,8 +8031,8 @@ xfile_replace_contents_finish (xfile_t         *file,
   xtask_t *task;
   ReplaceContentsData *data;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (xtask_is_valid (res, file), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, file), FALSE);
 
   task = XTASK (res);
 
@@ -8184,7 +8184,7 @@ xfile_real_measure_disk_usage_finish (xfile_t         *file,
 {
   MeasureResult *measure_result;
 
-  g_return_val_if_fail (xtask_is_valid (result, file), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, file), FALSE);
 
   measure_result = xtask_propagate_pointer (XTASK (result), error);
 
@@ -8252,9 +8252,9 @@ xfile_measure_disk_usage (xfile_t                         *file,
                            xuint64_t                       *num_files,
                            xerror_t                       **error)
 {
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return XFILE_GET_IFACE (file)->measure_disk_usage (file, flags, cancellable,
                                                       progress_callback, progress_data,
@@ -8324,8 +8324,8 @@ xfile_measure_disk_usage_finish (xfile_t         *file,
                                   xuint64_t       *num_files,
                                   xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return XFILE_GET_IFACE (file)->measure_disk_usage_finish (file, result, disk_usage, num_dirs, num_files, error);
 }
@@ -8407,8 +8407,8 @@ xfile_start_mountable_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -8497,8 +8497,8 @@ xfile_stop_mountable_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -8579,8 +8579,8 @@ xfile_poll_mountable_finish (xfile_t         *file,
 {
   xfile_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_FILE (file), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE (file), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -8609,7 +8609,7 @@ xfile_supports_thread_contexts (xfile_t *file)
 {
  xfile_iface_t *iface;
 
- g_return_val_if_fail (X_IS_FILE (file), FALSE);
+ xreturn_val_if_fail (X_IS_FILE (file), FALSE);
 
  iface = XFILE_GET_IFACE (file);
  return iface->supports_thread_contexts;
@@ -8648,9 +8648,9 @@ xfile_load_bytes (xfile_t         *file,
   xchar_t *contents;
   xsize_t len;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (etag_out != NULL)
     *etag_out = NULL;
@@ -8790,10 +8790,10 @@ xfile_load_bytes_finish (xfile_t         *file,
 {
   xbytes_t *bytes;
 
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
-  g_return_val_if_fail (X_IS_TASK (result), NULL);
-  g_return_val_if_fail (xtask_is_valid (XTASK (result), file), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_TASK (result), NULL);
+  xreturn_val_if_fail (xtask_is_valid (XTASK (result), file), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   bytes = xtask_propagate_pointer (XTASK (result), error);
 

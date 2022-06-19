@@ -177,27 +177,27 @@ g_datagram_based_receive_messages (xdatagram_based_t  *datagram_based,
   xint_t retval;
   xerror_t *child_error = NULL;
 
-  g_return_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), -1);
-  g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
-  g_return_val_if_fail (cancellable == NULL ||
+  xreturn_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), -1);
+  xreturn_val_if_fail (num_messages == 0 || messages != NULL, -1);
+  xreturn_val_if_fail (cancellable == NULL ||
                         X_IS_CANCELLABLE (cancellable), -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   iface = G_DATAGRAM_BASED_GET_IFACE (datagram_based);
-  g_assert (iface->receive_messages != NULL);
+  xassert (iface->receive_messages != NULL);
 
   retval = iface->receive_messages (datagram_based, messages, num_messages,
                                     flags, timeout, cancellable, &child_error);
 
   /* Postconditions. */
-  g_return_val_if_fail ((retval < 0) == (child_error != NULL), -1);
-  g_return_val_if_fail (timeout == 0 ||
+  xreturn_val_if_fail ((retval < 0) == (child_error != NULL), -1);
+  xreturn_val_if_fail (timeout == 0 ||
                         !xerror_matches (child_error, G_IO_ERROR,
                                           G_IO_ERROR_WOULD_BLOCK), -1);
-  g_return_val_if_fail (timeout > 0 ||
+  xreturn_val_if_fail (timeout > 0 ||
                         !xerror_matches (child_error, G_IO_ERROR,
                                           G_IO_ERROR_TIMED_OUT), -1);
-  g_return_val_if_fail (retval < 0 || (xuint_t) retval <= num_messages, -1);
+  xreturn_val_if_fail (retval < 0 || (xuint_t) retval <= num_messages, -1);
 
   if (child_error != NULL)
       g_propagate_error (error, child_error);
@@ -278,28 +278,28 @@ g_datagram_based_send_messages (xdatagram_based_t   *datagram_based,
   xint_t retval;
   xerror_t *child_error = NULL;
 
-  g_return_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), -1);
-  g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
-  g_return_val_if_fail (cancellable == NULL ||
+  xreturn_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), -1);
+  xreturn_val_if_fail (num_messages == 0 || messages != NULL, -1);
+  xreturn_val_if_fail (cancellable == NULL ||
                         X_IS_CANCELLABLE (cancellable), -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   iface = G_DATAGRAM_BASED_GET_IFACE (datagram_based);
-  g_assert (iface->send_messages != NULL);
+  xassert (iface->send_messages != NULL);
 
   retval = iface->send_messages (datagram_based, messages, num_messages, flags,
                                  timeout, cancellable, &child_error);
 
   /* Postconditions. */
-  g_return_val_if_fail ((retval < 0) == (child_error != NULL), -1);
-  g_return_val_if_fail (timeout == 0 ||
+  xreturn_val_if_fail ((retval < 0) == (child_error != NULL), -1);
+  xreturn_val_if_fail (timeout == 0 ||
                         !xerror_matches (child_error, G_IO_ERROR,
                                           G_IO_ERROR_WOULD_BLOCK), -1);
-  g_return_val_if_fail (timeout > 0 ||
+  xreturn_val_if_fail (timeout > 0 ||
                         !xerror_matches (child_error, G_IO_ERROR,
                                           G_IO_ERROR_TIMED_OUT), -1);
-  g_return_val_if_fail (retval < 0 || (xuint_t) retval <= num_messages, -1);
-  g_return_val_if_fail (!(timeout < 0 && num_messages > 0) || retval != 0, -1);
+  xreturn_val_if_fail (retval < 0 || (xuint_t) retval <= num_messages, -1);
+  xreturn_val_if_fail (!(timeout < 0 && num_messages > 0) || retval != 0, -1);
 
   if (child_error != NULL)
       g_propagate_error (error, child_error);
@@ -339,12 +339,12 @@ g_datagram_based_create_source (xdatagram_based_t *datagram_based,
 {
   GDatagramBasedInterface *iface;
 
-  g_return_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), NULL);
-  g_return_val_if_fail (cancellable == NULL ||
+  xreturn_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), NULL);
+  xreturn_val_if_fail (cancellable == NULL ||
                         X_IS_CANCELLABLE (cancellable), NULL);
 
   iface = G_DATAGRAM_BASED_GET_IFACE (datagram_based);
-  g_assert (iface->create_source != NULL);
+  xassert (iface->create_source != NULL);
 
   return iface->create_source (datagram_based, condition, cancellable);
 }
@@ -402,21 +402,21 @@ g_datagram_based_condition_check (xdatagram_based_t *datagram_based,
   GDatagramBasedInterface *iface;
   xio_condition_t out;
 
-  g_return_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), 0);
+  xreturn_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), 0);
 
   iface = G_DATAGRAM_BASED_GET_IFACE (datagram_based);
-  g_assert (iface->condition_check != NULL);
+  xassert (iface->condition_check != NULL);
 
   out = iface->condition_check (datagram_based, condition);
 
   /* Postconditions. G_IO_OUT and G_IO_HUP are mutually exclusive. G_IO_IN and
    * G_IO_HUP are mutually exclusive. The return value must be a subset of
    * (condition | G_IO_ERR | G_IO_HUP). */
-  g_return_val_if_fail ((out & (G_IO_OUT | G_IO_HUP)) != (G_IO_OUT | G_IO_HUP),
+  xreturn_val_if_fail ((out & (G_IO_OUT | G_IO_HUP)) != (G_IO_OUT | G_IO_HUP),
                         out & ~G_IO_OUT);
-  g_return_val_if_fail ((out & (G_IO_IN | G_IO_HUP)) != (G_IO_IN | G_IO_HUP),
+  xreturn_val_if_fail ((out & (G_IO_IN | G_IO_HUP)) != (G_IO_IN | G_IO_HUP),
                         out & ~G_IO_IN);
-  g_return_val_if_fail ((out & ~(condition | G_IO_ERR | G_IO_HUP)) == 0,
+  xreturn_val_if_fail ((out & ~(condition | G_IO_ERR | G_IO_HUP)) == 0,
                         out & (condition | G_IO_ERR | G_IO_HUP));
 
   return out;
@@ -453,19 +453,19 @@ g_datagram_based_condition_wait (xdatagram_based_t  *datagram_based,
   xboolean_t out;
   xerror_t *child_error = NULL;
 
-  g_return_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable),
+  xreturn_val_if_fail (X_IS_DATAGRAM_BASED (datagram_based), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable),
                         FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   iface = G_DATAGRAM_BASED_GET_IFACE (datagram_based);
-  g_assert (iface->condition_wait != NULL);
+  xassert (iface->condition_wait != NULL);
 
   out = iface->condition_wait (datagram_based, condition, timeout,
                                cancellable, &child_error);
 
   /* Postconditions. */
-  g_return_val_if_fail (out == (child_error == NULL), FALSE);
+  xreturn_val_if_fail (out == (child_error == NULL), FALSE);
 
   if (child_error != NULL)
     g_propagate_error (error, child_error);

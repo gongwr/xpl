@@ -55,8 +55,8 @@ test_copy_chunks_splice_cb (xobject_t *source_object,
   received_data = g_memory_output_stream_get_data (ostream);
   g_assert_cmpstr (received_data, ==, data->data1);
 
-  g_assert (g_io_stream_is_closed (data->iostream1));
-  g_assert (g_io_stream_is_closed (data->iostream2));
+  xassert (g_io_stream_is_closed (data->iostream1));
+  xassert (g_io_stream_is_closed (data->iostream2));
 
   xmain_loop_quit (data->main_loop);
 }
@@ -120,7 +120,7 @@ test_close_file (void)
   file = xfile_new_for_path ("/dev/null");
   fios = xfile_open_readwrite (file, NULL, NULL);
   xobject_unref (file);
-  g_assert (fios);
+  xassert (fios);
 
   io = g_simple_io_stream_new (g_io_stream_get_input_stream (XIO_STREAM (fios)),
                                g_io_stream_get_output_stream (XIO_STREAM (fios)));

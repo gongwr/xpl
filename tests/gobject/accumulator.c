@@ -164,7 +164,7 @@ test_signal3_accumulator (xsignal_invocation_hint_t *ihint,
   xvariant_t *variant;
 
   variant = xvalue_get_variant (handler_return);
-  g_assert (!xvariant_is_floating (variant));
+  xassert (!xvariant_is_floating (variant));
 
   xvalue_set_variant (return_accu, variant);
 
@@ -269,7 +269,7 @@ main (int   argc,
 			  G_CALLBACK (test_object_signal1_callback_after), NULL);
 
   xsignal_emit_by_name (object, "test-signal1", 0, &string_result);
-  g_assert (strcmp (string_result, "<before><default><after>") == 0);
+  xassert (strcmp (string_result, "<before><default><after>") == 0);
   g_free (string_result);
 
   xsignal_connect (object, "test-signal2",
@@ -279,27 +279,27 @@ main (int   argc,
 
   bool_result = FALSE;
   xsignal_emit_by_name (object, "test-signal2", 1, &bool_result);
-  g_assert (bool_result == TRUE);
+  xassert (bool_result == TRUE);
   bool_result = FALSE;
   xsignal_emit_by_name (object, "test-signal2", 2, &bool_result);
-  g_assert (bool_result == TRUE);
+  xassert (bool_result == TRUE);
   bool_result = FALSE;
   xsignal_emit_by_name (object, "test-signal2", 3, &bool_result);
-  g_assert (bool_result == TRUE);
+  xassert (bool_result == TRUE);
   bool_result = TRUE;
   xsignal_emit_by_name (object, "test-signal2", 4, &bool_result);
-  g_assert (bool_result == FALSE);
+  xassert (bool_result == FALSE);
 
   variant_finalised = FALSE;
   variant_result = NULL;
   xsignal_emit_by_name (object, "test-signal3", &variant_finalised, &variant_result);
-  g_assert (variant_result != NULL);
-  g_assert (!xvariant_is_floating (variant_result));
+  xassert (variant_result != NULL);
+  xassert (!xvariant_is_floating (variant_result));
 
   /* test_t that variant_result had refcount 1 */
-  g_assert (!variant_finalised);
+  xassert (!variant_finalised);
   xvariant_unref (variant_result);
-  g_assert (variant_finalised);
+  xassert (variant_finalised);
 
   xobject_unref (object);
 

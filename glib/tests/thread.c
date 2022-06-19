@@ -85,11 +85,11 @@ test_thread2 (void)
 
   thread = xthread_new ("test", thread2_func, NULL);
 
-  g_assert (xthread_self () != thread);
+  xassert (xthread_self () != thread);
 
   result = xthread_join (thread);
 
-  g_assert (result == thread);
+  xassert (result == thread);
 }
 
 static xpointer_t
@@ -166,7 +166,7 @@ test_thread4 (void)
     }
   else
     {
-      g_assert (thread == NULL);
+      xassert (thread == NULL);
       g_assert_error (error, G_THREAD_ERROR, G_THREAD_ERROR_AGAIN);
       xerror_free (error);
     }

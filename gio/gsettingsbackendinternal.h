@@ -87,7 +87,7 @@ xtype_t                   g_null_settings_backend_get_type                (void)
 
 xtype_t                   xmemory_settings_backend_get_type              (void);
 
-xtype_t                   g_keyfile_settings_backend_get_type             (void);
+xtype_t                   xkeyfile_settings_backend_get_type             (void);
 
 #ifdef HAVE_COCOA
 xtype_t                   g_nextstep_settings_backend_get_type            (void);

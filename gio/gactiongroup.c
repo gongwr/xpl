@@ -357,7 +357,7 @@ xaction_group_default_init (xaction_group_interface_t *iface)
 xchar_t **
 xaction_group_list_actions (xaction_group_t *action_group)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->list_actions (action_group);
@@ -378,7 +378,7 @@ xboolean_t
 xaction_group_has_action (xaction_group_t *action_group,
                            const xchar_t  *action_name)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), FALSE);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), FALSE);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->has_action (action_group, action_name);
@@ -411,7 +411,7 @@ const xvariant_type_t *
 xaction_group_get_action_parameter_type (xaction_group_t *action_group,
                                           const xchar_t  *action_name)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->get_action_parameter_type (action_group, action_name);
@@ -447,7 +447,7 @@ const xvariant_type_t *
 xaction_group_get_action_state_type (xaction_group_t *action_group,
                                       const xchar_t  *action_name)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->get_action_state_type (action_group, action_name);
@@ -485,7 +485,7 @@ xvariant_t *
 xaction_group_get_action_state_hint (xaction_group_t *action_group,
                                       const xchar_t  *action_name)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->get_action_state_hint (action_group, action_name);
@@ -509,7 +509,7 @@ xboolean_t
 xaction_group_get_action_enabled (xaction_group_t *action_group,
                                    const xchar_t  *action_name)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), FALSE);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), FALSE);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->get_action_enabled (action_group, action_name);
@@ -537,7 +537,7 @@ xvariant_t *
 xaction_group_get_action_state (xaction_group_t *action_group,
                                  const xchar_t  *action_name)
 {
-  g_return_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
+  xreturn_val_if_fail (X_IS_ACTION_GROUP (action_group), NULL);
 
   return XACTION_GROUP_GET_IFACE (action_group)
     ->get_action_state (action_group, action_name);

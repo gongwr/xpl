@@ -78,12 +78,12 @@ liststore_is_a_run (xpointer_t data)
 
   for (i = 0; i < 1000; i++)
     {
-      g_assert (xtype_is_a (liststore, liststore_interfaces[0]));
-      g_assert (xtype_is_a (liststore, liststore_interfaces[1]));
-      g_assert (xtype_is_a (liststore, liststore_interfaces[2]));
-      g_assert (xtype_is_a (liststore, liststore_interfaces[3]));
-      g_assert (xtype_is_a (liststore, liststore_interfaces[4]));
-      g_assert (!xtype_is_a (liststore, liststore_interfaces[5]));
+      xassert (xtype_is_a (liststore, liststore_interfaces[0]));
+      xassert (xtype_is_a (liststore, liststore_interfaces[1]));
+      xassert (xtype_is_a (liststore, liststore_interfaces[2]));
+      xassert (xtype_is_a (liststore, liststore_interfaces[3]));
+      xassert (xtype_is_a (liststore, liststore_interfaces[4]));
+      xassert (!xtype_is_a (liststore, liststore_interfaces[5]));
     }
 }
 
@@ -103,15 +103,15 @@ liststore_interface_peek_run (xpointer_t klass)
   for (i = 0; i < 1000; i++)
     {
       iface = xtype_interface_peek (klass, liststore_interfaces[0]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[1]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[2]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[3]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[4]);
-      g_assert (iface);
+      xassert (iface);
     }
 }
 
@@ -124,15 +124,15 @@ liststore_interface_peek_same_run (xpointer_t klass)
   for (i = 0; i < 1000; i++)
     {
       iface = xtype_interface_peek (klass, liststore_interfaces[0]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[0]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[0]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[0]);
-      g_assert (iface);
+      xassert (iface);
       iface = xtype_interface_peek (klass, liststore_interfaces[0]);
-      g_assert (iface);
+      xassert (iface);
     }
 }
 
@@ -301,7 +301,7 @@ run_test (const PerformanceTest *test)
     threads = g_new (xthread_t *, n_threads);
     for (i = 0; i < n_threads; i++) {
       threads[i] = xthread_create (run_test_thread, (xpointer_t) test, TRUE, NULL);
-      g_assert (threads[i] != NULL);
+      xassert (threads[i] != NULL);
     }
 
     results = g_array_new (FALSE, FALSE, sizeof (double));

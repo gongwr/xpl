@@ -69,7 +69,7 @@ watch_handler (xpointer_t user_data)
   xsignal_emit_by_name (win32, "low-memory-warning",
                          G_MEMORY_MONITOR_WARNING_LEVEL_LOW);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 /* Thread which watches for win32 memory resource events */
@@ -238,15 +238,15 @@ xmemory_monitor_win32_finalize (xobject_t *object)
   if (win32->mem)
     CloseHandle (win32->mem);
 
-  G_OBJECT_CLASS (xmemory_monitor_win32_parent_class)->finalize (object);
+  XOBJECT_CLASS (xmemory_monitor_win32_parent_class)->finalize (object);
 }
 
 static void
 xmemory_monitor_win32_class_init (GMemoryMonitorWin32Class *nl_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
 
-  gobject_class->finalize = xmemory_monitor_win32_finalize;
+  xobject_class->finalize = xmemory_monitor_win32_finalize;
 }
 
 static void

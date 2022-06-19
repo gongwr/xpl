@@ -37,7 +37,7 @@ g_mem_chunk_new (const xchar_t *name,
 {
   GMemChunk *mem_chunk;
 
-  g_return_val_if_fail (atom_size > 0, NULL);
+  xreturn_val_if_fail (atom_size > 0, NULL);
 
   mem_chunk = g_slice_new (GMemChunk);
   mem_chunk->alloc_size = atom_size;
@@ -56,7 +56,7 @@ g_mem_chunk_destroy (GMemChunk *mem_chunk)
 xpointer_t
 g_mem_chunk_alloc (GMemChunk *mem_chunk)
 {
-  g_return_val_if_fail (mem_chunk != NULL, NULL);
+  xreturn_val_if_fail (mem_chunk != NULL, NULL);
 
   return g_slice_alloc (mem_chunk->alloc_size);
 }
@@ -64,7 +64,7 @@ g_mem_chunk_alloc (GMemChunk *mem_chunk)
 xpointer_t
 g_mem_chunk_alloc0 (GMemChunk *mem_chunk)
 {
-  g_return_val_if_fail (mem_chunk != NULL, NULL);
+  xreturn_val_if_fail (mem_chunk != NULL, NULL);
 
   return g_slice_alloc0 (mem_chunk->alloc_size);
 }

@@ -30,67 +30,70 @@ struct _GDBusAuthMechanismAnonPrivate
 {
   xboolean_t is_client;
   xboolean_t is_server;
-  GDBusAuthMechanismState state;
+  xdbus_auth_mechanism_state_t
+ state;
 };
 
 static xint_t                     mechanism_get_priority              (void);
 static const xchar_t             *mechanism_get_name                  (void);
 
-static xboolean_t                 mechanism_is_supported              (GDBusAuthMechanism   *mechanism);
-static xchar_t                   *mechanism_encode_data               (GDBusAuthMechanism   *mechanism,
+static xboolean_t                 mechanism_is_supported              (xdbus_auth_mechanism_t   *mechanism);
+static xchar_t                   *mechanism_encode_data               (xdbus_auth_mechanism_t   *mechanism,
                                                                      const xchar_t          *data,
                                                                      xsize_t                 data_len,
                                                                      xsize_t                *out_data_len);
-static xchar_t                   *mechanism_decode_data               (GDBusAuthMechanism   *mechanism,
+static xchar_t                   *mechanism_decode_data               (xdbus_auth_mechanism_t   *mechanism,
                                                                      const xchar_t          *data,
                                                                      xsize_t                 data_len,
                                                                      xsize_t                *out_data_len);
-static GDBusAuthMechanismState  mechanism_server_get_state          (GDBusAuthMechanism   *mechanism);
-static void                     mechanism_server_initiate           (GDBusAuthMechanism   *mechanism,
+static xdbus_auth_mechanism_state_t
+  mechanism_server_get_state          (xdbus_auth_mechanism_t   *mechanism);
+static void                     mechanism_server_initiate           (xdbus_auth_mechanism_t   *mechanism,
                                                                      const xchar_t          *initial_response,
                                                                      xsize_t                 initial_response_len);
-static void                     mechanism_server_data_receive       (GDBusAuthMechanism   *mechanism,
+static void                     mechanism_server_data_receive       (xdbus_auth_mechanism_t   *mechanism,
                                                                      const xchar_t          *data,
                                                                      xsize_t                 data_len);
-static xchar_t                   *mechanism_server_data_send          (GDBusAuthMechanism   *mechanism,
+static xchar_t                   *mechanism_server_data_send          (xdbus_auth_mechanism_t   *mechanism,
                                                                      xsize_t                *out_data_len);
-static xchar_t                   *mechanism_server_get_reject_reason  (GDBusAuthMechanism   *mechanism);
-static void                     mechanism_server_shutdown           (GDBusAuthMechanism   *mechanism);
-static GDBusAuthMechanismState  mechanism_client_get_state          (GDBusAuthMechanism   *mechanism);
-static xchar_t                   *mechanism_client_initiate           (GDBusAuthMechanism   *mechanism,
+static xchar_t                   *mechanism_server_get_reject_reason  (xdbus_auth_mechanism_t   *mechanism);
+static void                     mechanism_server_shutdown           (xdbus_auth_mechanism_t   *mechanism);
+static xdbus_auth_mechanism_state_t
+  mechanism_client_get_state          (xdbus_auth_mechanism_t   *mechanism);
+static xchar_t                   *mechanism_client_initiate           (xdbus_auth_mechanism_t   *mechanism,
                                                                      xsize_t                *out_initial_response_len);
-static void                     mechanism_client_data_receive       (GDBusAuthMechanism   *mechanism,
+static void                     mechanism_client_data_receive       (xdbus_auth_mechanism_t   *mechanism,
                                                                      const xchar_t          *data,
                                                                      xsize_t                 data_len);
-static xchar_t                   *mechanism_client_data_send          (GDBusAuthMechanism   *mechanism,
+static xchar_t                   *mechanism_client_data_send          (xdbus_auth_mechanism_t   *mechanism,
                                                                      xsize_t                *out_data_len);
-static void                     mechanism_client_shutdown           (GDBusAuthMechanism   *mechanism);
+static void                     mechanism_client_shutdown           (xdbus_auth_mechanism_t   *mechanism);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-G_DEFINE_TYPE_WITH_PRIVATE (GDBusAuthMechanismAnon, _g_dbus_auth_mechanism_anon, XTYPE_DBUS_AUTH_MECHANISM)
+G_DEFINE_TYPE_WITH_PRIVATE (GDBusAuthMechanismAnon, _xdbus_auth_mechanism_anon, XTYPE_DBUS_AUTH_MECHANISM)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
-_g_dbus_auth_mechanism_anon_finalize (xobject_t *object)
+_xdbus_auth_mechanism_anon_finalize (xobject_t *object)
 {
-  //GDBusAuthMechanismAnon *mechanism = G_DBUS_AUTH_MECHANISM_ANON (object);
+  //GDBusAuthMechanismAnon *mechanism = XDBUS_AUTH_MECHANISM_ANON (object);
 
-  if (G_OBJECT_CLASS (_g_dbus_auth_mechanism_anon_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (_g_dbus_auth_mechanism_anon_parent_class)->finalize (object);
+  if (XOBJECT_CLASS (_xdbus_auth_mechanism_anon_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (_xdbus_auth_mechanism_anon_parent_class)->finalize (object);
 }
 
 static void
-_g_dbus_auth_mechanism_anon_class_init (GDBusAuthMechanismAnonClass *klass)
+_xdbus_auth_mechanism_anon_class_init (GDBusAuthMechanismAnonClass *klass)
 {
-  xobject_class_t *gobject_class;
-  GDBusAuthMechanismClass *mechanism_class;
+  xobject_class_t *xobject_class;
+  xdbus_auth_mechanism_class_t *mechanism_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = _g_dbus_auth_mechanism_anon_finalize;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize = _xdbus_auth_mechanism_anon_finalize;
 
-  mechanism_class = G_DBUS_AUTH_MECHANISM_CLASS (klass);
+  mechanism_class = XDBUS_AUTH_MECHANISM_CLASS (klass);
   mechanism_class->get_priority              = mechanism_get_priority;
   mechanism_class->get_name                  = mechanism_get_name;
   mechanism_class->is_supported              = mechanism_is_supported;
@@ -110,9 +113,9 @@ _g_dbus_auth_mechanism_anon_class_init (GDBusAuthMechanismAnonClass *klass)
 }
 
 static void
-_g_dbus_auth_mechanism_anon_init (GDBusAuthMechanismAnon *mechanism)
+_xdbus_auth_mechanism_anon_init (GDBusAuthMechanismAnon *mechanism)
 {
-  mechanism->priv = _g_dbus_auth_mechanism_anon_get_instance_private (mechanism);
+  mechanism->priv = _xdbus_auth_mechanism_anon_get_instance_private (mechanism);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -133,14 +136,14 @@ mechanism_get_name (void)
 }
 
 static xboolean_t
-mechanism_is_supported (GDBusAuthMechanism *mechanism)
+mechanism_is_supported (xdbus_auth_mechanism_t *mechanism)
 {
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), FALSE);
   return TRUE;
 }
 
 static xchar_t *
-mechanism_encode_data (GDBusAuthMechanism   *mechanism,
+mechanism_encode_data (xdbus_auth_mechanism_t   *mechanism,
                        const xchar_t          *data,
                        xsize_t                 data_len,
                        xsize_t                *out_data_len)
@@ -150,7 +153,7 @@ mechanism_encode_data (GDBusAuthMechanism   *mechanism,
 
 
 static xchar_t *
-mechanism_decode_data (GDBusAuthMechanism   *mechanism,
+mechanism_decode_data (xdbus_auth_mechanism_t   *mechanism,
                        const xchar_t          *data,
                        xsize_t                 data_len,
                        xsize_t                *out_data_len)
@@ -160,23 +163,24 @@ mechanism_decode_data (GDBusAuthMechanism   *mechanism,
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GDBusAuthMechanismState
-mechanism_server_get_state (GDBusAuthMechanism   *mechanism)
-{
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+static xdbus_auth_mechanism_state_t
 
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), G_DBUS_AUTH_MECHANISM_STATE_INVALID);
-  g_return_val_if_fail (m->priv->is_server && !m->priv->is_client, G_DBUS_AUTH_MECHANISM_STATE_INVALID);
+mechanism_server_get_state (xdbus_auth_mechanism_t   *mechanism)
+{
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
+
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), XDBUS_AUTH_MECHANISM_STATE_INVALID);
+  xreturn_val_if_fail (m->priv->is_server && !m->priv->is_client, XDBUS_AUTH_MECHANISM_STATE_INVALID);
 
   return m->priv->state;
 }
 
 static void
-mechanism_server_initiate (GDBusAuthMechanism   *mechanism,
+mechanism_server_initiate (xdbus_auth_mechanism_t   *mechanism,
                            const xchar_t          *initial_response,
                            xsize_t                 initial_response_len)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
   g_return_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism));
   g_return_if_fail (!m->priv->is_server && !m->priv->is_client);
@@ -184,33 +188,33 @@ mechanism_server_initiate (GDBusAuthMechanism   *mechanism,
   //g_debug ("ANONYMOUS: initial_response was '%s'", initial_response);
 
   m->priv->is_server = TRUE;
-  m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED;
+  m->priv->state = XDBUS_AUTH_MECHANISM_STATE_ACCEPTED;
 }
 
 static void
-mechanism_server_data_receive (GDBusAuthMechanism   *mechanism,
+mechanism_server_data_receive (xdbus_auth_mechanism_t   *mechanism,
                                const xchar_t          *data,
                                xsize_t                 data_len)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
   g_return_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism));
   g_return_if_fail (m->priv->is_server && !m->priv->is_client);
-  g_return_if_fail (m->priv->state == G_DBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA);
+  g_return_if_fail (m->priv->state == XDBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA);
 
   /* can never end up here because we are never in the WAITING_FOR_DATA state */
   g_assert_not_reached ();
 }
 
 static xchar_t *
-mechanism_server_data_send (GDBusAuthMechanism   *mechanism,
+mechanism_server_data_send (xdbus_auth_mechanism_t   *mechanism,
                             xsize_t                *out_data_len)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
-  g_return_val_if_fail (m->priv->is_server && !m->priv->is_client, NULL);
-  g_return_val_if_fail (m->priv->state == G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
+  xreturn_val_if_fail (m->priv->is_server && !m->priv->is_client, NULL);
+  xreturn_val_if_fail (m->priv->state == XDBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND, NULL);
 
   /* can never end up here because we are never in the HAVE_DATA_TO_SEND state */
   g_assert_not_reached ();
@@ -219,13 +223,13 @@ mechanism_server_data_send (GDBusAuthMechanism   *mechanism,
 }
 
 static xchar_t *
-mechanism_server_get_reject_reason (GDBusAuthMechanism   *mechanism)
+mechanism_server_get_reject_reason (xdbus_auth_mechanism_t   *mechanism)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
-  g_return_val_if_fail (m->priv->is_server && !m->priv->is_client, NULL);
-  g_return_val_if_fail (m->priv->state == G_DBUS_AUTH_MECHANISM_STATE_REJECTED, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
+  xreturn_val_if_fail (m->priv->is_server && !m->priv->is_client, NULL);
+  xreturn_val_if_fail (m->priv->state == XDBUS_AUTH_MECHANISM_STATE_REJECTED, NULL);
 
   /* can never end up here because we are never in the REJECTED state */
   g_assert_not_reached ();
@@ -234,9 +238,9 @@ mechanism_server_get_reject_reason (GDBusAuthMechanism   *mechanism)
 }
 
 static void
-mechanism_server_shutdown (GDBusAuthMechanism   *mechanism)
+mechanism_server_shutdown (xdbus_auth_mechanism_t   *mechanism)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
   g_return_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism));
   g_return_if_fail (m->priv->is_server && !m->priv->is_client);
@@ -246,29 +250,30 @@ mechanism_server_shutdown (GDBusAuthMechanism   *mechanism)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-static GDBusAuthMechanismState
-mechanism_client_get_state (GDBusAuthMechanism   *mechanism)
-{
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+static xdbus_auth_mechanism_state_t
 
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), G_DBUS_AUTH_MECHANISM_STATE_INVALID);
-  g_return_val_if_fail (m->priv->is_client && !m->priv->is_server, G_DBUS_AUTH_MECHANISM_STATE_INVALID);
+mechanism_client_get_state (xdbus_auth_mechanism_t   *mechanism)
+{
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
+
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), XDBUS_AUTH_MECHANISM_STATE_INVALID);
+  xreturn_val_if_fail (m->priv->is_client && !m->priv->is_server, XDBUS_AUTH_MECHANISM_STATE_INVALID);
 
   return m->priv->state;
 }
 
 static xchar_t *
-mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
+mechanism_client_initiate (xdbus_auth_mechanism_t   *mechanism,
                            xsize_t                *out_initial_response_len)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
   xchar_t *result;
 
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
-  g_return_val_if_fail (!m->priv->is_server && !m->priv->is_client, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
+  xreturn_val_if_fail (!m->priv->is_server && !m->priv->is_client, NULL);
 
   m->priv->is_client = TRUE;
-  m->priv->state = G_DBUS_AUTH_MECHANISM_STATE_ACCEPTED;
+  m->priv->state = XDBUS_AUTH_MECHANISM_STATE_ACCEPTED;
 
   /* just return our library name and version */
   result = xstrdup ("GDBus 0.1");
@@ -278,29 +283,29 @@ mechanism_client_initiate (GDBusAuthMechanism   *mechanism,
 }
 
 static void
-mechanism_client_data_receive (GDBusAuthMechanism   *mechanism,
+mechanism_client_data_receive (xdbus_auth_mechanism_t   *mechanism,
                                const xchar_t          *data,
                                xsize_t                 data_len)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
   g_return_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism));
   g_return_if_fail (m->priv->is_client && !m->priv->is_server);
-  g_return_if_fail (m->priv->state == G_DBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA);
+  g_return_if_fail (m->priv->state == XDBUS_AUTH_MECHANISM_STATE_WAITING_FOR_DATA);
 
   /* can never end up here because we are never in the WAITING_FOR_DATA state */
   g_assert_not_reached ();
 }
 
 static xchar_t *
-mechanism_client_data_send (GDBusAuthMechanism   *mechanism,
+mechanism_client_data_send (xdbus_auth_mechanism_t   *mechanism,
                             xsize_t                *out_data_len)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
-  g_return_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
-  g_return_val_if_fail (m->priv->is_client && !m->priv->is_server, NULL);
-  g_return_val_if_fail (m->priv->state == G_DBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism), NULL);
+  xreturn_val_if_fail (m->priv->is_client && !m->priv->is_server, NULL);
+  xreturn_val_if_fail (m->priv->state == XDBUS_AUTH_MECHANISM_STATE_HAVE_DATA_TO_SEND, NULL);
 
   /* can never end up here because we are never in the HAVE_DATA_TO_SEND state */
   g_assert_not_reached ();
@@ -309,9 +314,9 @@ mechanism_client_data_send (GDBusAuthMechanism   *mechanism,
 }
 
 static void
-mechanism_client_shutdown (GDBusAuthMechanism   *mechanism)
+mechanism_client_shutdown (xdbus_auth_mechanism_t   *mechanism)
 {
-  GDBusAuthMechanismAnon *m = G_DBUS_AUTH_MECHANISM_ANON (mechanism);
+  GDBusAuthMechanismAnon *m = XDBUS_AUTH_MECHANISM_ANON (mechanism);
 
   g_return_if_fail (X_IS_DBUS_AUTH_MECHANISM_ANON (mechanism));
   g_return_if_fail (m->priv->is_client && !m->priv->is_server);

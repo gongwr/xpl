@@ -15,14 +15,14 @@ LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
   g_path_is_absolute ((const xchar_t *) nul_terminated_data);
 
   skipped_root = g_path_skip_root ((const xchar_t *) nul_terminated_data);
-  g_assert (skipped_root == NULL || skipped_root >= (const xchar_t *) nul_terminated_data);
-  g_assert (skipped_root == NULL || skipped_root <= (const xchar_t *) nul_terminated_data + size);
+  xassert (skipped_root == NULL || skipped_root >= (const xchar_t *) nul_terminated_data);
+  xassert (skipped_root == NULL || skipped_root <= (const xchar_t *) nul_terminated_data + size);
 
   basename = g_path_get_basename ((const xchar_t *) nul_terminated_data);
-  g_assert (strcmp (basename, ".") == 0 || strlen (basename) <= size);
+  xassert (strcmp (basename, ".") == 0 || strlen (basename) <= size);
 
   dirname = g_path_get_dirname ((const xchar_t *) nul_terminated_data);
-  g_assert (strcmp (dirname, ".") == 0 || strlen (dirname) <= size);
+  xassert (strcmp (dirname, ".") == 0 || strlen (dirname) <= size);
 
   g_free (nul_terminated_data);
   g_free (dirname);

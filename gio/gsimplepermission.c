@@ -50,7 +50,7 @@ struct _GSimplePermission
   xpermission_t parent_instance;
 };
 
-G_DEFINE_TYPE (xsimple_permission, g_simple_permission, XTYPE_PERMISSION)
+XDEFINE_TYPE (xsimple_permission, g_simple_permission, XTYPE_PERMISSION)
 
 static void
 g_simple_permission_init (xsimple_permission_t *simple)

@@ -122,7 +122,7 @@ typedef struct _GSourceCallbackFuncs    xsource_callback_funcs_t;
  *     connected to a callback using xsource_set_callback(). The @dispatch
  *     function should call the callback function with @user_data and whatever
  *     additional parameters are needed for this type of event source. The
- *     return value of the @dispatch function should be %G_SOURCE_REMOVE if the
+ *     return value of the @dispatch function should be %XSOURCE_REMOVE if the
  *     source should be removed or %G_SOURCE_CONTINUE to keep it.
  * @finalize: Called when the source is finalized. At this point, the source
  *     will have been destroyed, had its callback cleared, and have been removed
@@ -188,7 +188,7 @@ typedef struct _GSourceFuncs            xsource_funcs_t;
  * incompatible function types.
  *
  * Returns: %FALSE if the source should be removed. %G_SOURCE_CONTINUE and
- * %G_SOURCE_REMOVE are more memorable names for the return value.
+ * %XSOURCE_REMOVE are more memorable names for the return value.
  */
 typedef xboolean_t (*xsource_func_t)       (xpointer_t user_data);
 
@@ -355,14 +355,14 @@ struct _GSourceFuncs
 #define G_PRIORITY_LOW              300
 
 /**
- * G_SOURCE_REMOVE:
+ * XSOURCE_REMOVE:
  *
  * Use this macro as the return value of a #xsource_func_t to remove
  * the #xsource_t from the main loop.
  *
  * Since: 2.32
  */
-#define G_SOURCE_REMOVE         FALSE
+#define XSOURCE_REMOVE         FALSE
 
 /**
  * G_SOURCE_CONTINUE:

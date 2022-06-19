@@ -48,7 +48,7 @@ enum {
  * decompresses data compressed with zlib.
  */
 
-static void g_zlib_decompressor_iface_init          (GConverterIface *iface);
+static void g_zlib_decompressor_iface_init          (xconverter_iface_t *iface);
 
 typedef struct {
   gz_header gzheader;
@@ -119,7 +119,7 @@ g_zlib_decompressor_finalize (xobject_t *object)
       g_free (decompressor->header_data);
     }
 
-  G_OBJECT_CLASS (g_zlib_decompressor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_zlib_decompressor_parent_class)->finalize (object);
 }
 
 
@@ -213,22 +213,22 @@ g_zlib_decompressor_constructed (xobject_t *object)
 static void
 g_zlib_decompressor_class_init (GZlibDecompressorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_zlib_decompressor_finalize;
-  gobject_class->constructed = g_zlib_decompressor_constructed;
-  gobject_class->get_property = g_zlib_decompressor_get_property;
-  gobject_class->set_property = g_zlib_decompressor_set_property;
+  xobject_class->finalize = g_zlib_decompressor_finalize;
+  xobject_class->constructed = g_zlib_decompressor_constructed;
+  xobject_class->get_property = g_zlib_decompressor_get_property;
+  xobject_class->set_property = g_zlib_decompressor_set_property;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_FORMAT,
-				   g_param_spec_enum ("format",
+				   xparam_spec_enum ("format",
 						      P_("compression format"),
 						      P_("The format of the compressed data"),
 						      XTYPE_ZLIB_COMPRESSOR_FORMAT,
 						      G_ZLIB_COMPRESSOR_FORMAT_ZLIB,
-						      G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+						      XPARAM_STATIC_STRINGS));
 
   /**
    * xzlib_decompressor_t:file-info:
@@ -240,14 +240,14 @@ g_zlib_decompressor_class_init (GZlibDecompressorClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_FILE_INFO,
-                                   g_param_spec_object ("file-info",
+                                   xparam_spec_object ("file-info",
                                                        P_("file info"),
                                                        P_("File info"),
                                                        XTYPE_FILE_INFO,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -289,7 +289,7 @@ g_zlib_decompressor_new (GZlibCompressorFormat format)
 xfile_info_t *
 g_zlib_decompressor_get_file_info (xzlib_decompressor_t *decompressor)
 {
-  g_return_val_if_fail (X_IS_ZLIB_DECOMPRESSOR (decompressor), NULL);
+  xreturn_val_if_fail (X_IS_ZLIB_DECOMPRESSOR (decompressor), NULL);
 
   if (decompressor->header_data)
     return decompressor->header_data->file_info;
@@ -310,13 +310,13 @@ g_zlib_decompressor_reset (xconverter_t *converter)
   g_zlib_decompressor_set_gzheader (decompressor);
 }
 
-static GConverterResult
+static xconverter_result_t
 g_zlib_decompressor_convert (xconverter_t *converter,
 			     const void *inbuf,
 			     xsize_t       inbuf_size,
 			     void       *outbuf,
 			     xsize_t       outbuf_size,
-			     GConverterFlags flags,
+			     xconverter_flags_t flags,
 			     xsize_t      *bytes_read,
 			     xsize_t      *bytes_written,
 			     xerror_t    **error)
@@ -338,27 +338,27 @@ g_zlib_decompressor_convert (xconverter_t *converter,
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_INVALID_DATA,
 			   _("Invalid compressed data"));
-      return G_CONVERTER_ERROR;
+      return XCONVERTER_ERROR;
     }
 
   if (res == Z_MEM_ERROR)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   _("Not enough memory"));
-      return G_CONVERTER_ERROR;
+      return XCONVERTER_ERROR;
     }
 
     if (res == Z_STREAM_ERROR)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Internal error: %s"), decompressor->zstream.msg);
-      return G_CONVERTER_ERROR;
+      return XCONVERTER_ERROR;
     }
 
     if (res == Z_BUF_ERROR)
       {
-	if (flags & G_CONVERTER_FLUSH)
-	  return G_CONVERTER_FLUSHED;
+	if (flags & XCONVERTER_FLUSH)
+	  return XCONVERTER_FLUSHED;
 
 	/* Z_FINISH not set, so this means no progress could be made */
 	/* We do have output space, so this should only happen if we
@@ -366,10 +366,10 @@ g_zlib_decompressor_convert (xconverter_t *converter,
 
 	g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PARTIAL_INPUT,
 			     _("Need more input"));
-	return G_CONVERTER_ERROR;
+	return XCONVERTER_ERROR;
       }
 
-  g_assert (res == Z_OK || res == Z_STREAM_END);
+  xassert (res == Z_OK || res == Z_STREAM_END);
 
   *bytes_read = inbuf_size - decompressor->zstream.avail_in;
   *bytes_written = outbuf_size - decompressor->zstream.avail_out;
@@ -401,12 +401,12 @@ g_zlib_decompressor_convert (xconverter_t *converter,
 #endif /* !G_OS_WIN32 || ZLIB >= 1.2.4 */
 
   if (res == Z_STREAM_END)
-    return G_CONVERTER_FINISHED;
-  return G_CONVERTER_CONVERTED;
+    return XCONVERTER_FINISHED;
+  return XCONVERTER_CONVERTED;
 }
 
 static void
-g_zlib_decompressor_iface_init (GConverterIface *iface)
+g_zlib_decompressor_iface_init (xconverter_iface_t *iface)
 {
   iface->convert = g_zlib_decompressor_convert;
   iface->reset = g_zlib_decompressor_reset;

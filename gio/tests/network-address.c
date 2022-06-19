@@ -559,7 +559,7 @@ on_delayed_get_addr (xpointer_t user_data)
   AsyncData *data = user_data;
   xsocket_address_enumerator_next_async (data->enumerator, NULL,
                                           got_addr, user_data);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void

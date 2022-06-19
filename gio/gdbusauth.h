@@ -18,8 +18,8 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __G_DBUS_AUTH_H__
-#define __G_DBUS_AUTH_H__
+#ifndef __XDBUS_AUTH_H__
+#define __XDBUS_AUTH_H__
 
 #if !defined (GIO_COMPILATION)
 #error "gdbusauth.h is a private header file."
@@ -29,31 +29,31 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_AUTH         (_g_dbus_auth_get_type ())
-#define G_DBUS_AUTH(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH, GDBusAuth))
-#define G_DBUS_AUTH_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_AUTH, GDBusAuthClass))
-#define G_DBUS_AUTH_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_AUTH, GDBusAuthClass))
+#define XTYPE_DBUS_AUTH         (_xdbus_auth_get_type ())
+#define XDBUS_AUTH(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH, xdbus_auth_t))
+#define XDBUS_AUTH_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_AUTH, xdbus_auth_class_t))
+#define XDBUS_AUTH_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_AUTH, xdbus_auth_class_t))
 #define X_IS_DBUS_AUTH(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_AUTH))
 #define X_IS_DBUS_AUTH_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DBUS_AUTH))
 
-typedef struct _GDBusAuth        GDBusAuth;
-typedef struct _GDBusAuthClass   GDBusAuthClass;
-typedef struct _GDBusAuthPrivate GDBusAuthPrivate;
+typedef struct _xdbus_auth        xdbus_auth_t;
+typedef struct _xdbus_auth_class   xdbus_auth_class_t;
+typedef struct _xdbus_auth_private xdbus_auth_private_t;
 
-struct _GDBusAuthClass
+struct _xdbus_auth_class
 {
   /*< private >*/
   xobject_class_t parent_class;
 };
 
-struct _GDBusAuth
+struct _xdbus_auth
 {
   xobject_t parent_instance;
-  GDBusAuthPrivate *priv;
+  xdbus_auth_private_t *priv;
 };
 
-xtype_t       _g_dbus_auth_get_type (void) G_GNUC_CONST;
-GDBusAuth  *_g_dbus_auth_new      (xio_stream_t *stream);
+xtype_t       _xdbus_auth_get_type (void) G_GNUC_CONST;
+xdbus_auth_t  *_xdbus_auth_new      (xio_stream_t *stream);
 
 /* TODO: need a way to set allowed authentication mechanisms */
 
@@ -63,24 +63,24 @@ GDBusAuth  *_g_dbus_auth_new      (xio_stream_t *stream);
 
 /* TODO: need to expose encode()/decode() from the AuthMechanism (and whether it is needed at all) */
 
-xboolean_t    _g_dbus_auth_run_server (GDBusAuth             *auth,
+xboolean_t    _xdbus_auth_run_server (xdbus_auth_t             *auth,
                                      xdbus_auth_observer_t     *observer,
                                      const xchar_t           *guid,
                                      xboolean_t               allow_anonymous,
                                      xboolean_t               require_same_user,
-                                     GDBusCapabilityFlags   offered_capabilities,
-                                     GDBusCapabilityFlags  *out_negotiated_capabilities,
+                                     xdbus_capability_flags_t   offered_capabilities,
+                                     xdbus_capability_flags_t  *out_negotiated_capabilities,
                                      xcredentials_t         **out_received_credentials,
                                      xcancellable_t          *cancellable,
                                      xerror_t               **error);
 
-xchar_t      *_g_dbus_auth_run_client (GDBusAuth     *auth,
+xchar_t      *_xdbus_auth_run_client (xdbus_auth_t     *auth,
                                      xdbus_auth_observer_t     *observer,
-                                     GDBusCapabilityFlags offered_capabilities,
-                                     GDBusCapabilityFlags *out_negotiated_capabilities,
+                                     xdbus_capability_flags_t offered_capabilities,
+                                     xdbus_capability_flags_t *out_negotiated_capabilities,
                                      xcancellable_t  *cancellable,
                                      xerror_t       **error);
 
 G_END_DECLS
 
-#endif /* __G_DBUS_AUTH_H__ */
+#endif /* __XDBUS_AUTH_H__ */

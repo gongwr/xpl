@@ -136,10 +136,10 @@ write_to_fds (int argc, char **argv)
       const char buf[] = "hello world\n";
       size_t bytes_written;
 
-      g_assert (f != NULL);
+      xassert (f != NULL);
 
       bytes_written = fwrite (buf, 1, sizeof (buf), f);
-      g_assert (bytes_written == sizeof (buf));
+      xassert (bytes_written == sizeof (buf));
 
       if (fclose (f) == -1)
         g_assert_not_reached ();

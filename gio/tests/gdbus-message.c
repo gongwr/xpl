@@ -44,12 +44,12 @@ message_lock (void)
                     "notify::locked",
                     G_CALLBACK (on_notify_locked),
                     &count);
-  g_assert (!xdbus_message_get_locked (m));
+  xassert (!xdbus_message_get_locked (m));
   xdbus_message_lock (m);
-  g_assert (xdbus_message_get_locked (m));
+  xassert (xdbus_message_get_locked (m));
   g_assert_cmpint (count, ==, 1);
   xdbus_message_lock (m);
-  g_assert (xdbus_message_get_locked (m));
+  xassert (xdbus_message_get_locked (m));
   g_assert_cmpint (count, ==, 1);
 
   g_test_expect_message (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING,
@@ -107,8 +107,8 @@ message_copy (void)
   error = NULL;
   copy = xdbus_message_copy (m, &error);
   g_assert_no_error (error);
-  g_assert (X_IS_DBUS_MESSAGE (copy));
-  g_assert (m != copy);
+  xassert (X_IS_DBUS_MESSAGE (copy));
+  xassert (m != copy);
   g_assert_cmpint (G_OBJECT (m)->ref_count, ==, 1);
   g_assert_cmpint (G_OBJECT (copy)->ref_count, ==, 1);
 
@@ -118,16 +118,16 @@ message_copy (void)
   g_assert_cmpint (xdbus_message_get_message_type (copy), ==, xdbus_message_get_message_type (m));
   m_headers = xdbus_message_get_header_fields (m);
   copy_headers = xdbus_message_get_header_fields (copy);
-  g_assert (m_headers != NULL);
-  g_assert (copy_headers != NULL);
+  xassert (m_headers != NULL);
+  xassert (copy_headers != NULL);
   for (n = 0; m_headers[n] != 0; n++)
     {
       xvariant_t *m_val;
       xvariant_t *copy_val;
       m_val = xdbus_message_get_header (m, m_headers[n]);
       copy_val = xdbus_message_get_header (m, m_headers[n]);
-      g_assert (m_val != NULL);
-      g_assert (copy_val != NULL);
+      xassert (m_val != NULL);
+      xassert (copy_val != NULL);
       g_assert_cmpvariant (m_val, copy_val);
     }
   g_assert_cmpint (n, >, 0); /* make sure we actually compared headers etc. */

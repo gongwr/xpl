@@ -127,7 +127,7 @@ xfile_enumerator_dispose (xobject_t *object)
     enumerator->priv->container = NULL;
   }
 
-  G_OBJECT_CLASS (xfile_enumerator_parent_class)->dispose (object);
+  XOBJECT_CLASS (xfile_enumerator_parent_class)->dispose (object);
 }
 
 static void
@@ -140,17 +140,17 @@ xfile_enumerator_finalize (xobject_t *object)
   if (!enumerator->priv->closed)
     xfile_enumerator_close (enumerator, NULL, NULL);
 
-  G_OBJECT_CLASS (xfile_enumerator_parent_class)->finalize (object);
+  XOBJECT_CLASS (xfile_enumerator_parent_class)->finalize (object);
 }
 
 static void
 xfile_enumerator_class_init (xfile_enumerator_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = xfile_enumerator_set_property;
-  gobject_class->dispose = xfile_enumerator_dispose;
-  gobject_class->finalize = xfile_enumerator_finalize;
+  xobject_class->set_property = xfile_enumerator_set_property;
+  xobject_class->dispose = xfile_enumerator_dispose;
+  xobject_class->finalize = xfile_enumerator_finalize;
 
   klass->next_files_async = xfile_enumerator_real_next_files_async;
   klass->next_files_finish = xfile_enumerator_real_next_files_finish;
@@ -158,13 +158,13 @@ xfile_enumerator_class_init (xfile_enumerator_class_t *klass)
   klass->close_finish = xfile_enumerator_real_close_finish;
 
   xobject_class_install_property
-    (gobject_class, PROP_CONTAINER,
-     g_param_spec_object ("container", P_("Container"),
+    (xobject_class, PROP_CONTAINER,
+     xparam_spec_object ("container", P_("Container"),
                           P_("The container that is being enumerated"),
                           XTYPE_FILE,
-                          G_PARAM_WRITABLE |
-                          G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS));
+                          XPARAM_WRITABLE |
+                          XPARAM_CONSTRUCT_ONLY |
+                          XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -203,8 +203,8 @@ xfile_enumerator_next_file (xfile_enumerator_t *enumerator,
   xfile_enumerator_class_t *class;
   xfile_info_t *info;
 
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
-  g_return_val_if_fail (enumerator != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
+  xreturn_val_if_fail (enumerator != NULL, NULL);
 
   if (enumerator->priv->closed)
     {
@@ -264,8 +264,8 @@ xfile_enumerator_close (xfile_enumerator_t  *enumerator,
 {
   xfile_enumerator_class_t *class;
 
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), FALSE);
-  g_return_val_if_fail (enumerator != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), FALSE);
+  xreturn_val_if_fail (enumerator != NULL, FALSE);
 
   class = XFILE_ENUMERATOR_GET_CLASS (enumerator);
 
@@ -407,8 +407,8 @@ xfile_enumerator_next_files_finish (xfile_enumerator_t  *enumerator,
 {
   xfile_enumerator_class_t *class;
 
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -513,8 +513,8 @@ xfile_enumerator_close_finish (xfile_enumerator_t  *enumerator,
 {
   xfile_enumerator_class_t *class;
 
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -536,7 +536,7 @@ xfile_enumerator_close_finish (xfile_enumerator_t  *enumerator,
 xboolean_t
 xfile_enumerator_is_closed (xfile_enumerator_t *enumerator)
 {
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), TRUE);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), TRUE);
 
   return enumerator->priv->closed;
 }
@@ -552,7 +552,7 @@ xfile_enumerator_is_closed (xfile_enumerator_t *enumerator)
 xboolean_t
 xfile_enumerator_has_pending (xfile_enumerator_t *enumerator)
 {
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), TRUE);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), TRUE);
 
   return enumerator->priv->pending;
 }
@@ -638,8 +638,8 @@ xfile_enumerator_iterate (xfile_enumerator_t  *direnum,
   static xquark cached_child_quark;
   static xsize_t quarks_initialized;
 
-  g_return_val_if_fail (direnum != NULL, FALSE);
-  g_return_val_if_fail (out_info != NULL || out_child != NULL, FALSE);
+  xreturn_val_if_fail (direnum != NULL, FALSE);
+  xreturn_val_if_fail (out_info != NULL || out_child != NULL, FALSE);
 
   if (g_once_init_enter (&quarks_initialized))
     {
@@ -664,7 +664,7 @@ xfile_enumerator_iterate (xfile_enumerator_t  *direnum,
           if (G_UNLIKELY (name == NULL))
             {
               g_critical ("xfile_enumerator_iterate() created without standard::name");
-              g_return_val_if_reached (FALSE);
+              xreturn_val_if_reached (FALSE);
             }
           else
             {
@@ -706,7 +706,7 @@ xfile_enumerator_iterate (xfile_enumerator_t  *direnum,
 xfile_t *
 xfile_enumerator_get_container (xfile_enumerator_t *enumerator)
 {
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
 
   return enumerator->priv->container;
 }
@@ -741,15 +741,15 @@ xfile_enumerator_get_child (xfile_enumerator_t *enumerator,
 {
   const xchar_t *name;
 
-  g_return_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_ENUMERATOR (enumerator), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   name = xfile_info_get_name (info);
 
   if (G_UNLIKELY (name == NULL))
     {
       g_critical ("xfile_enumerator_t created without standard::name");
-      g_return_val_if_reached (NULL);
+      xreturn_val_if_reached (NULL);
     }
 
   return xfile_get_child (enumerator->priv->container, name);
@@ -835,7 +835,7 @@ xfile_enumerator_real_next_files_finish (xfile_enumerator_t                *enum
 					  xasync_result_t                   *result,
 					  xerror_t                        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -881,7 +881,7 @@ xfile_enumerator_real_close_finish (xfile_enumerator_t  *enumerator,
                                      xasync_result_t     *result,
                                      xerror_t          **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, enumerator), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, enumerator), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

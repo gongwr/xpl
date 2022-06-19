@@ -84,7 +84,7 @@ XPL_AVAILABLE_IN_2_28
 xboolean_t                g_action_name_is_valid                          (const xchar_t        *action_name);
 
 XPL_AVAILABLE_IN_2_38
-xboolean_t                g_action_parse_detailed_name                    (const xchar_t        *detailed_name,
+xboolean_t                xaction_parse_detailed_name                    (const xchar_t        *detailed_name,
                                                                          xchar_t             **action_name,
                                                                          xvariant_t          **target_value,
                                                                          xerror_t            **error);

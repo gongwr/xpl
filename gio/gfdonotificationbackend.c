@@ -189,7 +189,7 @@ notify_signal (xdbus_connection_t *connection,
           xchar_t *name;
           xvariant_t *target;
 
-          if (g_action_parse_detailed_name (action, &name, &target, NULL))
+          if (xaction_parse_detailed_name (action, &name, &target, NULL))
             {
               activate_action (backend, name, target);
               g_free (name);
@@ -416,7 +416,7 @@ g_fdo_notification_backend_dispose (xobject_t *object)
       backend->notifications = NULL;
     }
 
-  G_OBJECT_CLASS (g_fdo_notification_backend_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_fdo_notification_backend_parent_class)->dispose (object);
 }
 
 static xboolean_t
@@ -502,7 +502,7 @@ g_fdo_notification_backend_init (GFdoNotificationBackend *backend)
 static void
 g_fdo_notification_backend_class_init (GFdoNotificationBackendClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
   xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (class);
 
   object_class->dispose = g_fdo_notification_backend_dispose;

@@ -345,7 +345,7 @@ g_relation_delete_tuple (xpointer_t tuple_key,
   GRelation     *relation = (GRelation *) user_data;
   xint_t           j;
 
-  g_assert (tuple_key == tuple_value);
+  xassert (tuple_key == tuple_value);
 
   for (j = 0; j < relation->fields; j += 1)
     {
@@ -395,12 +395,12 @@ g_relation_delete  (GRelation     *relation,
   xhashtable_t *key_table;
   xint_t        count;
 
-  g_return_val_if_fail (relation != NULL, 0);
+  xreturn_val_if_fail (relation != NULL, 0);
 
   table = relation->hashed_tuple_tables[field];
   count = relation->count;
 
-  g_return_val_if_fail (table != NULL, 0);
+  xreturn_val_if_fail (table != NULL, 0);
 
   key_table = xhash_table_lookup (table, key);
 
@@ -429,7 +429,7 @@ g_relation_select_tuple (xpointer_t tuple_key,
   GRealTuples *tuples = (GRealTuples*) user_data;
   xint_t stride = sizeof (xpointer_t) * tuples->width;
 
-  g_assert (tuple_key == tuple_value);
+  xassert (tuple_key == tuple_value);
 
   memcpy (tuples->data + (tuples->len * tuples->width),
 	  tuple,
@@ -462,11 +462,11 @@ g_relation_select (GRelation     *relation,
   GRealTuples *tuples;
   xint_t count;
 
-  g_return_val_if_fail (relation != NULL, NULL);
+  xreturn_val_if_fail (relation != NULL, NULL);
 
   table = relation->hashed_tuple_tables[field];
 
-  g_return_val_if_fail (table != NULL, NULL);
+  xreturn_val_if_fail (table != NULL, NULL);
 
   tuples = g_new0 (GRealTuples, 1);
   key_table = xhash_table_lookup (table, key);
@@ -481,7 +481,7 @@ g_relation_select (GRelation     *relation,
 
   xhash_table_foreach (key_table, g_relation_select_tuple, tuples);
 
-  g_assert (count == tuples->len);
+  xassert (count == tuples->len);
 
   return (GTuples*)tuples;
 }
@@ -507,11 +507,11 @@ g_relation_count (GRelation     *relation,
   xhashtable_t  *table;
   xhashtable_t  *key_table;
 
-  g_return_val_if_fail (relation != NULL, 0);
+  xreturn_val_if_fail (relation != NULL, 0);
 
   table = relation->hashed_tuple_tables[field];
 
-  g_return_val_if_fail (table != NULL, 0);
+  xreturn_val_if_fail (table != NULL, 0);
 
   key_table = xhash_table_lookup (table, key);
 
@@ -601,8 +601,8 @@ g_tuples_index (GTuples     *tuples0,
 {
   GRealTuples *tuples = (GRealTuples*) tuples0;
 
-  g_return_val_if_fail (tuples0 != NULL, NULL);
-  g_return_val_if_fail (field < tuples->width, NULL);
+  xreturn_val_if_fail (tuples0 != NULL, NULL);
+  xreturn_val_if_fail (field < tuples->width, NULL);
 
   return tuples->data[index * tuples->width + field];
 }

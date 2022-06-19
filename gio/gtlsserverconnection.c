@@ -53,13 +53,13 @@ xtls_server_connection_default_init (xtls_server_connection_interface_t *iface)
    * Since: 2.28
    */
   xobject_interface_install_property (iface,
-				       g_param_spec_enum ("authentication-mode",
+				       xparam_spec_enum ("authentication-mode",
 							  P_("Authentication Mode"),
 							  P_("The client authentication mode"),
 							  XTYPE_TLS_AUTHENTICATION_MODE,
 							  G_TLS_AUTHENTICATION_NONE,
-							  G_PARAM_READWRITE |
-							  G_PARAM_STATIC_STRINGS));
+							  XPARAM_READWRITE |
+							  XPARAM_STATIC_STRINGS));
 }
 
 /**

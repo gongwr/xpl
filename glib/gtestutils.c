@@ -97,8 +97,8 @@
  * messages can be more elaborate, and include the values of the compared
  * entities.
  *
- * Note that g_assert() should not be used in unit tests, since it is a no-op
- * when compiling with `G_DISABLE_ASSERT`. Use g_assert() in production code,
+ * Note that xassert() should not be used in unit tests, since it is a no-op
+ * when compiling with `G_DISABLE_ASSERT`. Use xassert() in production code,
  * and g_assert_true() in unit tests.
  *
  * A full example of creating a test suite with two tests using fixtures:
@@ -426,7 +426,7 @@
  *
  * This is sometimes used to test situations that are formally
  * considered to be undefined behaviour, like code that hits a
- * g_assert() or xerror(). In these situations you should skip the
+ * xassert() or xerror(). In these situations you should skip the
  * entire test, including the call to g_test_trap_subprocess(), unless
  * g_test_undefined() returns %TRUE to indicate that undefined
  * behaviour may be tested.
@@ -454,7 +454,7 @@
  */
 
 /**
- * g_assert:
+ * xassert:
  * @expr: the expression to check
  *
  * Debugging macro to terminate the application if the assertion
@@ -491,9 +491,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike g_assert(), this macro is unaffected by whether
+ * Note that unlike xassert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, g_assert() should not be used in tests.
+ * conversely, xassert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -510,9 +510,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike g_assert(), this macro is unaffected by whether
+ * Note that unlike xassert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, g_assert() should not be used in tests.
+ * conversely, xassert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -529,9 +529,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike g_assert(), this macro is unaffected by whether
+ * Note that unlike xassert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, g_assert() should not be used in tests.
+ * conversely, xassert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -548,9 +548,9 @@
  * an error message is logged and the application is either
  * terminated or the testcase marked as failed.
  *
- * Note that unlike g_assert(), this macro is unaffected by whether
+ * Note that unlike xassert(), this macro is unaffected by whether
  * `G_DISABLE_ASSERT` is defined. Hence it should only be used in tests and,
- * conversely, g_assert() should not be used in tests.
+ * conversely, xassert() should not be used in tests.
  *
  * See g_test_set_nonfatal_assertions().
  *
@@ -1572,7 +1572,7 @@ test_rm_isolate_dirs (void)
  *
  * Since 2.58, if tests are compiled with `G_DISABLE_ASSERT` defined,
  * g_test_init() will print an error and exit. This is to prevent no-op tests
- * from being executed, as g_assert() is commonly (erroneously) used in unit
+ * from being executed, as xassert() is commonly (erroneously) used in unit
  * tests, and is a no-op when compiled with `G_DISABLE_ASSERT`. Ensure your
  * tests are compiled without `G_DISABLE_ASSERT` defined.
  *
@@ -1605,7 +1605,7 @@ void
   // don't open a window for errors (like the "abort() was called one")
   _CrtSetReportMode (_CRT_ERROR, _CRTDBG_MODE_FILE);
   _CrtSetReportFile (_CRT_ERROR, _CRTDBXFILE_STDERR);
-  // while gtest tests tend to use g_assert and friends
+  // while gtest tests tend to use xassert and friends
   // if they do use the C standard assert macro we want to
   // output a message to stderr, not open a popup window
   _CrtSetReportMode (_CRT_ASSERT, _CRTDBG_MODE_FILE);
@@ -2307,10 +2307,10 @@ g_test_create_case (const char       *test_name,
 {
   GTestCase *tc;
 
-  g_return_val_if_fail (test_name != NULL, NULL);
-  g_return_val_if_fail (strchr (test_name, '/') == NULL, NULL);
-  g_return_val_if_fail (test_name[0] != 0, NULL);
-  g_return_val_if_fail (data_test != NULL, NULL);
+  xreturn_val_if_fail (test_name != NULL, NULL);
+  xreturn_val_if_fail (strchr (test_name, '/') == NULL, NULL);
+  xreturn_val_if_fail (test_name[0] != 0, NULL);
+  xreturn_val_if_fail (data_test != NULL, NULL);
 
   tc = g_slice_new0 (GTestCase);
   tc->name = xstrdup (test_name);
@@ -2599,7 +2599,7 @@ g_test_failed (void)
  * g_test_fail() so that it will not cause the test program to abort
  * after completing the failed test.)
  *
- * Note that the g_assert_not_reached() and g_assert() macros are not
+ * Note that the g_assert_not_reached() and xassert() macros are not
  * affected by this.
  *
  * This function can only be called after g_test_init().
@@ -2773,9 +2773,9 @@ GTestSuite*
 g_test_create_suite (const char *suite_name)
 {
   GTestSuite *ts;
-  g_return_val_if_fail (suite_name != NULL, NULL);
-  g_return_val_if_fail (strchr (suite_name, '/') == NULL, NULL);
-  g_return_val_if_fail (suite_name[0] != 0, NULL);
+  xreturn_val_if_fail (suite_name != NULL, NULL);
+  xreturn_val_if_fail (strchr (suite_name, '/') == NULL, NULL);
+  xreturn_val_if_fail (suite_name[0] != 0, NULL);
   ts = g_slice_new0 (GTestSuite);
   ts->name = xstrdup (suite_name);
   return ts;
@@ -3004,7 +3004,7 @@ g_test_run_suite_internal (GTestSuite *suite,
   xchar_t *old_name = test_run_name;
   xslist_t *iter;
 
-  g_return_val_if_fail (suite != NULL, -1);
+  xreturn_val_if_fail (suite != NULL, -1);
 
   g_test_log (G_TEST_LOG_START_SUITE, suite->name, NULL, 0, NULL);
 
@@ -3051,7 +3051,7 @@ g_test_suite_count (GTestSuite *suite)
   int n = 0;
   xslist_t *iter;
 
-  g_return_val_if_fail (suite != NULL, -1);
+  xreturn_val_if_fail (suite != NULL, -1);
 
   for (iter = suite->cases; iter; iter = iter->next)
     {
@@ -3094,7 +3094,7 @@ g_test_run_suite (GTestSuite *suite)
 {
   int n_bad = 0;
 
-  g_return_val_if_fail (g_test_run_once == TRUE, -1);
+  xreturn_val_if_fail (g_test_run_once == TRUE, -1);
 
   g_test_run_once = FALSE;
   test_count = g_test_suite_count (suite);
@@ -3261,7 +3261,7 @@ g_assertion_message (const char     *domain,
  * @func: function containing the assertion
  * @expr: (nullable): expression which failed
  *
- * Internal function used to print messages from the public g_assert() and
+ * Internal function used to print messages from the public xassert() and
  * g_assert_not_reached() macros.
  */
 void
@@ -3471,7 +3471,7 @@ child_exited (xpid_t     pid,
 {
   WaitForChildData *data = user_data;
 
-  g_assert (status != -1);
+  xassert (status != -1);
   data->child_status = status;
 
   check_complete (data);
@@ -3810,7 +3810,7 @@ g_test_trap_subprocess (const char           *test_path,
   xpid_t pid;
 
   /* Sanity check that they used GTestSubprocessFlags, not GTestTrapFlags */
-  g_assert ((test_flags & (G_TEST_TRAP_INHERIT_STDIN | G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR)) == 0);
+  xassert ((test_flags & (G_TEST_TRAP_INHERIT_STDIN | G_TEST_TRAP_SILENCE_STDOUT | G_TEST_TRAP_SILENCE_STDERR)) == 0);
 
   if (test_path)
     {
@@ -4241,7 +4241,7 @@ GTestLogMsg*
 g_test_log_buffer_pop (GTestLogBuffer *tbuffer)
 {
   GTestLogMsg *msg = NULL;
-  g_return_val_if_fail (tbuffer != NULL, NULL);
+  xreturn_val_if_fail (tbuffer != NULL, NULL);
   if (tbuffer->msgs)
     {
       xslist_t *slist = xslist_last (tbuffer->msgs);
@@ -4359,7 +4359,7 @@ g_test_build_filename (GTestFileType  file_type,
   xchar_t *result;
   va_list ap;
 
-  g_assert (g_test_initialized ());
+  xassert (g_test_initialized ());
 
   va_start (ap, first_path);
   result = g_test_build_filename_va (file_type, first_path, ap);
@@ -4385,7 +4385,7 @@ g_test_build_filename (GTestFileType  file_type,
 const xchar_t *
 g_test_get_dir (GTestFileType file_type)
 {
-  g_assert (g_test_initialized ());
+  xassert (g_test_initialized ());
 
   if (file_type == G_TEST_DIST)
     return test_disted_files_dir;
@@ -4427,7 +4427,7 @@ g_test_get_filename (GTestFileType  file_type,
   xslist_t *node;
   va_list ap;
 
-  g_assert (g_test_initialized ());
+  xassert (g_test_initialized ());
   if (test_filename_free_list == NULL)
     xerror ("g_test_get_filename() can only be used within testcase functions");
 

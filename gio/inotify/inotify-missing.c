@@ -117,8 +117,8 @@ im_scan_missing (xpointer_t user_data)
       xboolean_t not_m = FALSE;
 
       IM_W ("checking %p\n", sub);
-      g_assert (sub);
-      g_assert (sub->dirname);
+      xassert (sub);
+      xassert (sub->dirname);
       not_m = _ip_start_watching (sub);
 
       if (not_m)

@@ -178,46 +178,46 @@ xtls_password_finalize (xobject_t *object)
   g_free (password->priv->warning);
   g_free (password->priv->description);
 
-  G_OBJECT_CLASS (xtls_password_parent_class)->finalize (object);
+  XOBJECT_CLASS (xtls_password_parent_class)->finalize (object);
 }
 
 static void
 xtls_password_class_init (GTlsPasswordClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
   klass->get_value = xtls_password_real_get_value;
   klass->set_value = xtls_password_real_set_value;
   klass->get_default_warning = xtls_password_real_get_default_warning;
 
-  gobject_class->get_property = xtls_password_get_property;
-  gobject_class->set_property = xtls_password_set_property;
-  gobject_class->finalize = xtls_password_finalize;
+  xobject_class->get_property = xtls_password_get_property;
+  xobject_class->set_property = xtls_password_set_property;
+  xobject_class->finalize = xtls_password_finalize;
 
-  xobject_class_install_property (gobject_class, PROP_FLAGS,
-				   g_param_spec_flags ("flags",
+  xobject_class_install_property (xobject_class, PROP_FLAGS,
+				   xparam_spec_flags ("flags",
 						       P_("Flags"),
 						       P_("Flags about the password"),
 						       XTYPE_TLS_PASSWORD_FLAGS,
 						       G_TLS_PASSWORD_NONE,
-						       G_PARAM_READWRITE |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_DESCRIPTION,
-				   g_param_spec_string ("description",
+  xobject_class_install_property (xobject_class, PROP_DESCRIPTION,
+				   xparam_spec_string ("description",
 							P_("Description"),
 							P_("Description of what the password is for"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_WARNING,
-				   g_param_spec_string ("warning",
+  xobject_class_install_property (xobject_class, PROP_WARNING,
+				   xparam_spec_string ("warning",
 							P_("Warning"),
 							P_("Warning about the password"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_STATIC_STRINGS));
 
 }
 
@@ -259,7 +259,7 @@ const xuchar_t *
 xtls_password_get_value (xtls_password_t  *password,
                           xsize_t         *length)
 {
-  g_return_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
+  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
   return G_TLS_PASSWORD_GET_CLASS (password)->get_value (password, length);
 }
 
@@ -341,7 +341,7 @@ xtls_password_set_value_full (xtls_password_t   *password,
 GTlsPasswordFlags
 xtls_password_get_flags (xtls_password_t *password)
 {
-  g_return_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_PASSWORD_NONE);
+  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_PASSWORD_NONE);
   return password->priv->flags;
 }
 
@@ -378,7 +378,7 @@ xtls_password_set_flags (xtls_password_t      *password,
 const xchar_t*
 xtls_password_get_description (xtls_password_t *password)
 {
-  g_return_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
+  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
   return password->priv->description;
 }
 
@@ -421,7 +421,7 @@ xtls_password_set_description (xtls_password_t      *password,
 const xchar_t *
 xtls_password_get_warning (xtls_password_t      *password)
 {
-  g_return_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
+  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), NULL);
 
   if (password->priv->warning == NULL)
     return G_TLS_PASSWORD_GET_CLASS (password)->get_default_warning (password);

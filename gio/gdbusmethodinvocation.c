@@ -92,7 +92,7 @@ struct _GDBusMethodInvocation
   xpointer_t         user_data;
 };
 
-G_DEFINE_TYPE (xdbus_method_invocation_t, xdbus_method_invocation, XTYPE_OBJECT)
+XDEFINE_TYPE (xdbus_method_invocation, xdbus_method_invocation, XTYPE_OBJECT)
 
 static void
 xdbus_method_invocation_finalize (xobject_t *object)
@@ -111,15 +111,15 @@ xdbus_method_invocation_finalize (xobject_t *object)
   xobject_unref (invocation->message);
   xvariant_unref (invocation->parameters);
 
-  G_OBJECT_CLASS (xdbus_method_invocation_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdbus_method_invocation_parent_class)->finalize (object);
 }
 
 static void
 xdbus_method_invocation_class_init (GDBusMethodInvocationClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xdbus_method_invocation_finalize;
+  xobject_class->finalize = xdbus_method_invocation_finalize;
 }
 
 static void
@@ -140,7 +140,7 @@ xdbus_method_invocation_init (xdbus_method_invocation_t *invocation)
 const xchar_t *
 xdbus_method_invocation_get_sender (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->sender;
 }
 
@@ -157,7 +157,7 @@ xdbus_method_invocation_get_sender (xdbus_method_invocation_t *invocation)
 const xchar_t *
 xdbus_method_invocation_get_object_path (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->object_path;
 }
 
@@ -179,7 +179,7 @@ xdbus_method_invocation_get_object_path (xdbus_method_invocation_t *invocation)
 const xchar_t *
 xdbus_method_invocation_get_interface_name (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->interface_name;
 }
 
@@ -201,7 +201,7 @@ xdbus_method_invocation_get_interface_name (xdbus_method_invocation_t *invocatio
 const xdbus_method_info_t *
 xdbus_method_invocation_get_method_info (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->method_info;
 }
 
@@ -228,7 +228,7 @@ xdbus_method_invocation_get_method_info (xdbus_method_invocation_t *invocation)
 const xdbus_property_info_t *
 xdbus_method_invocation_get_property_info (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->property_info;
 }
 
@@ -245,7 +245,7 @@ xdbus_method_invocation_get_property_info (xdbus_method_invocation_t *invocation
 const xchar_t *
 xdbus_method_invocation_get_method_name (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->method_name;
 }
 
@@ -262,7 +262,7 @@ xdbus_method_invocation_get_method_name (xdbus_method_invocation_t *invocation)
 xdbus_connection_t *
 xdbus_method_invocation_get_connection (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->connection;
 }
 
@@ -286,7 +286,7 @@ xdbus_method_invocation_get_connection (xdbus_method_invocation_t *invocation)
 xdbus_message_t *
 xdbus_method_invocation_get_message (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->message;
 }
 
@@ -304,7 +304,7 @@ xdbus_method_invocation_get_message (xdbus_method_invocation_t *invocation)
 xvariant_t *
 xdbus_method_invocation_get_parameters (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->parameters;
 }
 
@@ -321,7 +321,7 @@ xdbus_method_invocation_get_parameters (xdbus_method_invocation_t *invocation)
 xpointer_t
 xdbus_method_invocation_get_user_data (xdbus_method_invocation_t *invocation)
 {
-  g_return_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_METHOD_INVOCATION (invocation), NULL);
   return invocation->user_data;
 }
 
@@ -358,13 +358,13 @@ _xdbus_method_invocation_new (const xchar_t             *sender,
 {
   xdbus_method_invocation_t *invocation;
 
-  g_return_val_if_fail (sender == NULL || g_dbus_is_name (sender), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (interface_name == NULL || g_dbus_is_interface_name (interface_name), NULL);
-  g_return_val_if_fail (g_dbus_is_member_name (method_name), NULL);
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
-  g_return_val_if_fail (xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), NULL);
+  xreturn_val_if_fail (sender == NULL || g_dbus_is_name (sender), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (interface_name == NULL || g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (g_dbus_is_member_name (method_name), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), NULL);
 
   invocation = G_DBUS_METHOD_INVOCATION (xobject_new (XTYPE_DBUS_METHOD_INVOCATION, NULL));
   invocation->sender = xstrdup (sender);

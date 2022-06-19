@@ -832,7 +832,7 @@ gvs_variable_sized_array_is_normal (GVariantSerialised value)
       offset = this_end;
     }
 
-  g_assert (offset == last_end);
+  xassert (offset == last_end);
 
   return TRUE;
 }
@@ -890,7 +890,7 @@ gvs_tuple_get_child (GVariantSerialised value,
       /* this can only happen in fixed-sized tuples,
        * so the child must also be fixed sized.
        */
-      g_assert (child.size != 0);
+      xassert (child.size != 0);
       child.data = NULL;
 
       return child;
@@ -1134,8 +1134,8 @@ gvs_tuple_is_normal (GVariantSerialised value)
 
     if (fixed_size)
       {
-        g_assert (fixed_size == value.size);
-        g_assert (offset_ptr == value.size);
+        xassert (fixed_size == value.size);
+        xassert (offset_ptr == value.size);
 
         if (i == 0)
           {
@@ -1149,7 +1149,7 @@ gvs_tuple_is_normal (GVariantSerialised value)
                 return FALSE;
           }
 
-        g_assert (offset == value.size);
+        xassert (offset == value.size);
       }
   }
 
@@ -1357,7 +1357,7 @@ gvs_variant_is_normal (GVariantSerialised value)
 xsize_t
 xvariant_serialised_n_children (GVariantSerialised serialised)
 {
-  g_assert (xvariant_serialised_check (serialised));
+  xassert (xvariant_serialised_check (serialised));
 
   DISPATCH_CASES (serialised.type_info,
 
@@ -1394,15 +1394,15 @@ xvariant_serialised_get_child (GVariantSerialised serialised,
 {
   GVariantSerialised child;
 
-  g_assert (xvariant_serialised_check (serialised));
+  xassert (xvariant_serialised_check (serialised));
 
   if G_LIKELY (index_ < xvariant_serialised_n_children (serialised))
     {
       DISPATCH_CASES (serialised.type_info,
 
                       child = gvs_/**/,/**/_get_child (serialised, index_);
-                      g_assert (child.size || child.data == NULL);
-                      g_assert (xvariant_serialised_check (child));
+                      xassert (child.size || child.data == NULL);
+                      xassert (xvariant_serialised_check (child));
                       return child;
 
                      )
@@ -1443,7 +1443,7 @@ xvariant_serialiser_serialise (GVariantSerialised        serialised,
                                 const xpointer_t           *children,
                                 xsize_t                     n_children)
 {
-  g_assert (xvariant_serialised_check (serialised));
+  xassert (xvariant_serialised_check (serialised));
 
   DISPATCH_CASES (serialised.type_info,
 
@@ -1498,7 +1498,7 @@ xvariant_serialised_byteswap (GVariantSerialised serialised)
   xsize_t fixed_size;
   xuint_t alignment;
 
-  g_assert (xvariant_serialised_check (serialised));
+  xassert (xvariant_serialised_check (serialised));
 
   if (!serialised.data)
     return;

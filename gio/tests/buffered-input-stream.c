@@ -77,7 +77,7 @@ test_peek_buffer (void)
   nfill = xbuffered_input_stream_fill (G_BUFFERED_INPUT_STREAM (in), strlen ("abcdefghijk"), NULL, NULL);
   buffer = (char *) xbuffered_input_stream_peek_buffer (G_BUFFERED_INPUT_STREAM (in), &bufsize);
   g_assert_cmpint (nfill, ==, bufsize);
-  g_assert (0 == strncmp ("abcdefghijk", buffer, bufsize));
+  xassert (0 == strncmp ("abcdefghijk", buffer, bufsize));
 
   xobject_unref (in);
   xobject_unref (base);
@@ -149,7 +149,7 @@ test_read_byte (void)
   g_assert_cmpint (xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error), ==, -1);
   g_assert_no_error (error);
 
-  g_assert (xinput_stream_close (in, NULL, &error));
+  xassert (xinput_stream_close (in, NULL, &error));
   g_assert_no_error (error);
   g_assert_cmpint (xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error), ==, -1);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED);
@@ -422,12 +422,12 @@ test_close (void)
   base = g_memory_input_stream_new_from_data ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXYZ", -1, NULL);
   in = xbuffered_input_stream_new (base);
 
-  g_assert (g_filter_input_stream_get_close_base_stream (G_FILTER_INPUT_STREAM (in)));
+  xassert (g_filter_input_stream_get_close_base_stream (G_FILTER_INPUT_STREAM (in)));
 
   error = NULL;
-  g_assert (xinput_stream_close (in, NULL, &error));
+  xassert (xinput_stream_close (in, NULL, &error));
   g_assert_no_error (error);
-  g_assert (xinput_stream_is_closed (base));
+  xassert (xinput_stream_is_closed (base));
 
   xobject_unref (in);
   xobject_unref (base);
@@ -438,9 +438,9 @@ test_close (void)
   g_filter_input_stream_set_close_base_stream (G_FILTER_INPUT_STREAM (in), FALSE);
 
   error = NULL;
-  g_assert (xinput_stream_close (in, NULL, &error));
+  xassert (xinput_stream_close (in, NULL, &error));
   g_assert_no_error (error);
-  g_assert (!xinput_stream_is_closed (base));
+  xassert (!xinput_stream_is_closed (base));
 
   xobject_unref (in);
   xobject_unref (base);
@@ -469,7 +469,7 @@ test_seek (void)
   /* Seek forward (in buffer) */
   ret = xseekable_seek (G_SEEKABLE (in), 1, G_SEEK_CUR, NULL, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (in)), ==, 2);
   byte = xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error);
   g_assert_no_error (error);
@@ -479,7 +479,7 @@ test_seek (void)
   /* Seek backward (in buffer) */
   ret = xseekable_seek (G_SEEKABLE (in), -2, G_SEEK_CUR, NULL, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (in)), ==, 1);
   byte = xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error);
   g_assert_no_error (error);
@@ -489,7 +489,7 @@ test_seek (void)
   /* Seek forward (outside buffer) */
   ret = xseekable_seek (G_SEEKABLE (in), 6, G_SEEK_CUR, NULL, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (in)), ==, 8);
   byte = xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error);
   g_assert_no_error (error);
@@ -499,7 +499,7 @@ test_seek (void)
   /* Seek backward (outside buffer) */
   ret = xseekable_seek (G_SEEKABLE (in), -6, G_SEEK_CUR, NULL, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (in)), ==, 3);
   byte = xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error);
   g_assert_no_error (error);
@@ -509,7 +509,7 @@ test_seek (void)
   /* Seek from beginning */
   ret = xseekable_seek (G_SEEKABLE (in), 8, G_SEEK_SET, NULL, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (in)), ==, 8);
   byte = xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error);
   g_assert_no_error (error);
@@ -519,7 +519,7 @@ test_seek (void)
   /* Seek from end */
   ret = xseekable_seek (G_SEEKABLE (in), -1, G_SEEK_END, NULL, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (in)), ==, 50);
   byte = xbuffered_input_stream_read_byte (G_BUFFERED_INPUT_STREAM (in), NULL, &error);
   g_assert_no_error (error);

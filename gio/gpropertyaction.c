@@ -298,8 +298,8 @@ g_property_action_notify (xobject_t    *object,
 {
   xproperty_action_t *paction = user_data;
 
-  g_assert (object == paction->object);
-  g_assert (pspec == paction->pspec);
+  xassert (object == paction->object);
+  xassert (pspec == paction->pspec);
 
   xobject_notify (G_OBJECT (paction), "state");
 }
@@ -320,7 +320,7 @@ g_property_action_set_property_name (xproperty_action_t *paction,
       return;
     }
 
-  if (~pspec->flags & G_PARAM_READABLE || ~pspec->flags & G_PARAM_WRITABLE || pspec->flags & G_PARAM_CONSTRUCT_ONLY)
+  if (~pspec->flags & XPARAM_READABLE || ~pspec->flags & XPARAM_WRITABLE || pspec->flags & XPARAM_CONSTRUCT_ONLY)
     {
       g_critical ("Property '%s::%s' used with xproperty_action_t must be readable, writable, and not construct-only",
                   G_OBJECT_TYPE_NAME (paction->object), property_name);
@@ -414,7 +414,7 @@ g_property_action_finalize (xobject_t *object)
   xobject_unref (paction->object);
   g_free (paction->name);
 
-  G_OBJECT_CLASS (g_property_action_parent_class)
+  XOBJECT_CLASS (g_property_action_parent_class)
     ->finalize (object);
 }
 
@@ -439,7 +439,7 @@ g_property_action_iface_init (xaction_interface_t *iface)
 void
 g_property_action_class_init (GPropertyActionClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->set_property = g_property_action_set_property;
   object_class->get_property = g_property_action_get_property;
@@ -454,13 +454,13 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_NAME,
-                                   g_param_spec_string ("name",
+                                   xparam_spec_string ("name",
                                                         P_("Action Name"),
                                                         P_("The name used to invoke the action"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:parameter-type:
@@ -471,12 +471,12 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_PARAMETER_TYPE,
-                                   g_param_spec_boxed ("parameter-type",
+                                   xparam_spec_boxed ("parameter-type",
                                                        P_("Parameter Type"),
                                                        P_("The type of xvariant_t passed to activate()"),
                                                        XTYPE_VARIANT_TYPE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:enabled:
@@ -489,12 +489,12 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_ENABLED,
-                                   g_param_spec_boolean ("enabled",
+                                   xparam_spec_boolean ("enabled",
                                                          P_("Enabled"),
                                                          P_("If the action can be activated"),
                                                          TRUE,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:state-type:
@@ -505,12 +505,12 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_STATE_TYPE,
-                                   g_param_spec_boxed ("state-type",
+                                   xparam_spec_boxed ("state-type",
                                                        P_("State Type"),
                                                        P_("The type of the state kept by the action"),
                                                        XTYPE_VARIANT_TYPE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:state:
@@ -520,13 +520,13 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_STATE,
-                                   g_param_spec_variant ("state",
+                                   xparam_spec_variant ("state",
                                                          P_("State"),
                                                          P_("The state the action is in"),
                                                          G_VARIANT_TYPE_ANY,
                                                          NULL,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:object:
@@ -538,13 +538,13 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_OBJECT,
-                                   g_param_spec_object ("object",
+                                   xparam_spec_object ("object",
                                                         P_("Object"),
                                                         P_("The object with the property to wrap"),
                                                         XTYPE_OBJECT,
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:property-name:
@@ -557,13 +557,13 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.38
    **/
   xobject_class_install_property (object_class, PROP_PROPERTY_NAME,
-                                   g_param_spec_string ("property-name",
+                                   xparam_spec_string ("property-name",
                                                         P_("Property name"),
                                                         P_("The name of the property to wrap"),
                                                         NULL,
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xproperty_action_t:invert-boolean:
@@ -574,13 +574,13 @@ g_property_action_class_init (GPropertyActionClass *class)
    * Since: 2.46
    */
   xobject_class_install_property (object_class, PROP_INVERT_BOOLEAN,
-                                   g_param_spec_boolean ("invert-boolean",
+                                   xparam_spec_boolean ("invert-boolean",
                                                          P_("Invert boolean"),
                                                          P_("Whether to invert the value of a boolean property"),
                                                          FALSE,
-                                                         G_PARAM_READWRITE |
-                                                         G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READWRITE |
+                                                         XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -608,9 +608,9 @@ g_property_action_new (const xchar_t *name,
                        xpointer_t     object,
                        const xchar_t *property_name)
 {
-  g_return_val_if_fail (name != NULL, NULL);
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (property_name != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (property_name != NULL, NULL);
 
   return xobject_new (XTYPE_PROPERTY_ACTION,
                        "name", name,

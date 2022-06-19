@@ -67,7 +67,7 @@ my_cmdline_handler (xpointer_t data)
   /* we are done handling this commandline */
   xobject_unref (cmdline);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static int
@@ -93,7 +93,7 @@ main (int argc, char **argv)
   xapplication_t *app;
   int status;
 
-  app = xapplication_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.test_application_t",
                            G_APPLICATION_HANDLES_COMMAND_LINE);
   xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
   xapplication_set_inactivity_timeout (app, 10000);

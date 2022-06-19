@@ -20,8 +20,8 @@
  * Author: Tor Lillqvist <tml@novell.com>
  */
 
-#ifndef __G_WINHTTP_FILE_H__
-#define __G_WINHTTP_FILE_H__
+#ifndef __XWINHTTP_FILE_H__
+#define __XWINHTTP_FILE_H__
 
 #include <gio/giotypes.h>
 
@@ -30,16 +30,16 @@
 G_BEGIN_DECLS
 
 #define XTYPE_WINHTTP_FILE         (_g_winhttp_file_get_type ())
-#define G_WINHTTP_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WINHTTP_FILE, GWinHttpFile))
-#define G_WINHTTP_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WINHTTP_FILE, GWinHttpFileClass))
+#define XWINHTTP_FILE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_WINHTTP_FILE, xwin_http_file_t))
+#define XWINHTTP_FILE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_WINHTTP_FILE, xwin_http_file_class_t))
 #define X_IS_WINHTTP_FILE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_WINHTTP_FILE))
 #define X_IS_WINHTTP_FILE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_WINHTTP_FILE))
-#define G_WINHTTP_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_WINHTTP_FILE, GWinHttpFileClass))
+#define XWINHTTP_FILE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_WINHTTP_FILE, xwin_http_file_class_t))
 
-typedef struct _GWinHttpFile        GWinHttpFile;
-typedef struct _GWinHttpFileClass   GWinHttpFileClass;
+typedef struct _xwin_http_file        xwin_http_file_t;
+typedef struct _xwin_http_file_class   xwin_http_file_class_t;
 
-struct _GWinHttpFile
+struct _xwin_http_file
 {
   xobject_t parent_instance;
 
@@ -48,7 +48,7 @@ struct _GWinHttpFile
   URL_COMPONENTS url;
 };
 
-struct _GWinHttpFileClass
+struct _xwin_http_file_class
 {
   xobject_class_t parent_class;
 };
@@ -59,4 +59,4 @@ xfile_t * _g_winhttp_file_new (GWinHttpVfs *vfs, const char *uri);
 
 G_END_DECLS
 
-#endif /* __G_WINHTTP_FILE_H__ */
+#endif /* __XWINHTTP_FILE_H__ */

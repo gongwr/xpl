@@ -184,7 +184,7 @@ typedef xmenu_link_iter_class_t xmenu_link_hash_iter_class_t;
 
 static xtype_t xmenu_link_hash_iter_get_type (void);
 
-G_DEFINE_TYPE (xmenu_link_hash_iter, xmenu_link_hash_iter, XTYPE_MENU_LINK_ITER)
+XDEFINE_TYPE (xmenu_link_hash_iter, xmenu_link_hash_iter, XTYPE_MENU_LINK_ITER)
 
 static xboolean_t
 xmenu_link_hash_iter_get_next (xmenu_link_iter_t  *link_iter,
@@ -210,7 +210,7 @@ xmenu_link_hash_iter_finalize (xobject_t *object)
 
   xhash_table_unref (iter->table);
 
-  G_OBJECT_CLASS (xmenu_link_hash_iter_parent_class)
+  XOBJECT_CLASS (xmenu_link_hash_iter_parent_class)
     ->finalize (object);
 }
 
@@ -222,7 +222,7 @@ xmenu_link_hash_iter_init (xmenu_link_hash_iter_t *iter)
 static void
 xmenu_link_hash_iter_class_init (xmenu_link_hash_iter_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xmenu_link_hash_iter_finalize;
   class->get_next = xmenu_link_hash_iter_get_next;
@@ -240,7 +240,7 @@ typedef xmenu_attribute_iter_class_t xmenu_attribute_hash_iter_class_t;
 
 static xtype_t xmenu_attribute_hash_iter_get_type (void);
 
-G_DEFINE_TYPE (xmenu_attribute_hash_iter_t, xmenu_attribute_hash_iter, XTYPE_MENU_ATTRIBUTE_ITER)
+XDEFINE_TYPE (xmenu_attribute_hash_iter, xmenu_attribute_hash_iter, XTYPE_MENU_ATTRIBUTE_ITER)
 
 static xboolean_t
 xmenu_attribute_hash_iter_get_next (xmenu_attribute_iter_t  *attr_iter,
@@ -267,7 +267,7 @@ xmenu_attribute_hash_iter_finalize (xobject_t *object)
 
   xhash_table_unref (iter->table);
 
-  G_OBJECT_CLASS (xmenu_attribute_hash_iter_parent_class)
+  XOBJECT_CLASS (xmenu_attribute_hash_iter_parent_class)
     ->finalize (object);
 }
 
@@ -279,7 +279,7 @@ xmenu_attribute_hash_iter_init (xmenu_attribute_hash_iter_t *iter)
 static void
 xmenu_attribute_hash_iter_class_init (xmenu_attribute_hash_iter_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xmenu_attribute_hash_iter_finalize;
   class->get_next = xmenu_attribute_hash_iter_get_next;
@@ -800,7 +800,7 @@ xmenu_attribute_iter_next (xmenu_attribute_iter_t *iter)
 const xchar_t *
 xmenu_attribute_iter_get_name (xmenu_attribute_iter_t *iter)
 {
-  g_return_val_if_fail (iter->priv->valid, 0);
+  xreturn_val_if_fail (iter->priv->valid, 0);
 
   return g_quark_to_string (iter->priv->name);
 }
@@ -820,7 +820,7 @@ xmenu_attribute_iter_get_name (xmenu_attribute_iter_t *iter)
 xvariant_t *
 xmenu_attribute_iter_get_value (xmenu_attribute_iter_t *iter)
 {
-  g_return_val_if_fail (iter->priv->valid, NULL);
+  xreturn_val_if_fail (iter->priv->valid, NULL);
 
   return xvariant_ref (iter->priv->value);
 }
@@ -833,7 +833,7 @@ xmenu_attribute_iter_finalize (xobject_t *object)
   if (iter->priv->value)
     xvariant_unref (iter->priv->value);
 
-  G_OBJECT_CLASS (xmenu_attribute_iter_parent_class)
+  XOBJECT_CLASS (xmenu_attribute_iter_parent_class)
     ->finalize (object);
 }
 
@@ -846,7 +846,7 @@ xmenu_attribute_iter_init (xmenu_attribute_iter_t *iter)
 static void
 xmenu_attribute_iter_class_init (xmenu_attribute_iter_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xmenu_attribute_iter_finalize;
 }
@@ -903,7 +903,7 @@ xmenu_link_iter_get_next (xmenu_link_iter_t  *iter,
 
   if (iter->priv->valid)
     {
-      g_assert (name != NULL);
+      xassert (name != NULL);
 
       iter->priv->name = g_quark_from_string (name);
       if (out_link)
@@ -954,7 +954,7 @@ xmenu_link_iter_next (xmenu_link_iter_t *iter)
 const xchar_t *
 xmenu_link_iter_get_name (xmenu_link_iter_t *iter)
 {
-  g_return_val_if_fail (iter->priv->valid, 0);
+  xreturn_val_if_fail (iter->priv->valid, 0);
 
   return g_quark_to_string (iter->priv->name);
 }
@@ -974,7 +974,7 @@ xmenu_link_iter_get_name (xmenu_link_iter_t *iter)
 xmenu_model_t *
 xmenu_link_iter_get_value (xmenu_link_iter_t *iter)
 {
-  g_return_val_if_fail (iter->priv->valid, NULL);
+  xreturn_val_if_fail (iter->priv->valid, NULL);
 
   return xobject_ref (iter->priv->value);
 }
@@ -987,7 +987,7 @@ xmenu_link_iter_finalize (xobject_t *object)
   if (iter->priv->value)
     xobject_unref (iter->priv->value);
 
-  G_OBJECT_CLASS (xmenu_link_iter_parent_class)
+  XOBJECT_CLASS (xmenu_link_iter_parent_class)
     ->finalize (object);
 }
 
@@ -1000,7 +1000,7 @@ xmenu_link_iter_init (xmenu_link_iter_t *iter)
 static void
 xmenu_link_iter_class_init (xmenu_link_iter_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xmenu_link_iter_finalize;
 }

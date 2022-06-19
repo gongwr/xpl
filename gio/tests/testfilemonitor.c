@@ -333,7 +333,7 @@ atomic_replace_step (xpointer_t user_data)
     case 3:
       record_event (data, -1, NULL, NULL, 3);
       xmain_loop_quit (data->loop);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
 
   data->step++;
@@ -435,7 +435,7 @@ change_step (xpointer_t user_data)
     case 4:
       record_event (data, -1, NULL, NULL, 4);
       xmain_loop_quit (data->loop);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
 
   data->step++;
@@ -554,7 +554,7 @@ dir_step (xpointer_t user_data)
     case 6:
       record_event (data, -1, NULL, NULL, 6);
       xmain_loop_quit (data->loop);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
 
   data->step++;
@@ -651,7 +651,7 @@ nodir_step (xpointer_t user_data)
     case 4:
       record_event (data, -1, NULL, NULL, 4);
       xmain_loop_quit (data->loop);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
 
   data->step++;
@@ -752,7 +752,7 @@ cross_dir_step (xpointer_t user_data)
       record_event (&data[0], -1, NULL, NULL, 3);
       record_event (&data[1], -1, NULL, NULL, 3);
       xmain_loop_quit (data->loop);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
 
   data->step++;
@@ -914,11 +914,11 @@ file_hard_links_step (xpointer_t user_data)
     case 6:
       record_event (data, -1, NULL, NULL, 6);
       xmain_loop_quit (data->loop);
-      retval = G_SOURCE_REMOVE;
+      retval = XSOURCE_REMOVE;
       break;
     }
 
-  if (retval != G_SOURCE_REMOVE)
+  if (retval != XSOURCE_REMOVE)
     data->step++;
 
   xobject_unref (hard_link_file);

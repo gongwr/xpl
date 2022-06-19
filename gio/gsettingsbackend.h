@@ -36,13 +36,13 @@ G_BEGIN_DECLS
 #define G_SETTINGS_BACKEND(inst)                            (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
                                                              XTYPE_SETTINGS_BACKEND, xsettings_backend))
 #define G_SETTINGS_BACKEND_CLASS(class)                     (XTYPE_CHECK_CLASS_CAST ((class),                       \
-                                                             XTYPE_SETTINGS_BACKEND, GSettingsBackendClass))
+                                                             XTYPE_SETTINGS_BACKEND, xsettings_backend_class_t))
 #define X_IS_SETTINGS_BACKEND(inst)                         (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \
                                                              XTYPE_SETTINGS_BACKEND))
 #define X_IS_SETTINGS_BACKEND_CLASS(class)                  (XTYPE_CHECK_CLASS_TYPE ((class),                       \
                                                              XTYPE_SETTINGS_BACKEND))
 #define G_SETTINGS_BACKEND_GET_CLASS(inst)                  (XTYPE_INSTANCE_GET_CLASS ((inst),                      \
-                                                             XTYPE_SETTINGS_BACKEND, GSettingsBackendClass))
+                                                             XTYPE_SETTINGS_BACKEND, xsettings_backend_class_t))
 
 /**
  * G_SETTINGS_BACKEND_EXTENSION_POINT_NAME:
@@ -57,10 +57,10 @@ G_BEGIN_DECLS
  * An implementation of a settings storage repository.
  **/
 typedef struct _GSettingsBackendPrivate                     GSettingsBackendPrivate;
-typedef struct _GSettingsBackendClass                       GSettingsBackendClass;
+typedef struct _xsettings_backend_class                       xsettings_backend_class_t;
 
 /**
- * GSettingsBackendClass:
+ * xsettings_backend_class_t:
  * @read: virtual method to read a key's value
  * @get_writable: virtual method to get if a key is writable
  * @write: virtual method to change key's value
@@ -74,7 +74,7 @@ typedef struct _GSettingsBackendClass                       GSettingsBackendClas
  *
  * Class structure for #xsettings_backend_t.
  */
-struct _GSettingsBackendClass
+struct _xsettings_backend_class
 {
   xobject_class_t parent_class;
 
@@ -159,7 +159,7 @@ XPL_AVAILABLE_IN_ALL
 xsettings_backend_t *      g_settings_backend_get_default                  (void);
 
 XPL_AVAILABLE_IN_ALL
-xsettings_backend_t *      g_keyfile_settings_backend_new                  (const xchar_t         *filename,
+xsettings_backend_t *      xkeyfile_settings_backend_new                  (const xchar_t         *filename,
                                                                          const xchar_t         *root_path,
                                                                          const xchar_t         *root_group);
 

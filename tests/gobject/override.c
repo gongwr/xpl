@@ -46,7 +46,7 @@ static void  record (const xchar_t *str);
 
 #define TEST_TYPE_I (test_i_get_type ())
 
-typedef struct _TestI TestI;
+typedef struct _TestI test_i_t;
 typedef struct _TestIClass TestIClass;
 
 struct _TestIClass
@@ -55,9 +55,9 @@ struct _TestIClass
 };
 
 static void
-test_i_foo (TestI *self)
+test_i_foo (test_i_t *self)
 {
-  record ("TestI::foo");
+  record ("test_i_t::foo");
 }
 
 static void
@@ -73,11 +73,11 @@ test_i_default_init (xpointer_t g_class)
 				 XTYPE_NONE, 0, NULL);
 }
 
-static DEFINE_IFACE (TestI, test_i, NULL, test_i_default_init)
+static DEFINE_IFACE (test_i, test_i, NULL, test_i_default_init)
 
 #define TEST_TYPE_A (test_a_get_type())
 
-     typedef struct _TestA TestA;
+     typedef struct _TestA test_a_t;
      typedef struct _TestAClass TestAClass;
 
 struct _TestA {
@@ -86,42 +86,42 @@ struct _TestA {
 struct _TestAClass {
   xobject_class_t parent_class;
 
-  void (* bar) (TestA *self);
+  void (* bar) (test_a_t *self);
 };
 
 static void
-test_a_foo (TestI *self)
+test_a_foo (test_i_t *self)
 {
   xvalue_t args[1] = { G_VALUE_INIT };
 
-  record ("TestA::foo");
+  record ("test_a_t::foo");
 
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
+  xassert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
   xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
 
 static void
-test_a_bar (TestA *self)
+test_a_bar (test_a_t *self)
 {
-  record ("TestA::bar");
+  record ("test_a_t::bar");
 }
 
 static xchar_t *
-test_a_baz (TestA    *self,
+test_a_baz (test_a_t    *self,
             xobject_t  *object,
             xpointer_t  pointer)
 {
-  record ("TestA::baz");
+  record ("test_a_t::baz");
 
-  g_assert (object == G_OBJECT (self));
-  g_assert (GPOINTER_TO_INT (pointer) == 23);
+  xassert (object == G_OBJECT (self));
+  xassert (GPOINTER_TO_INT (pointer) == 23);
 
-  return xstrdup ("TestA::baz");
+  return xstrdup ("test_a_t::baz");
 }
 
 static void
@@ -157,72 +157,72 @@ test_a_interface_init (TestIClass *iface)
 						   NULL, NULL));
 }
 
-static DEFINE_TYPE_FULL (TestA, test_a,
+static DEFINE_TYPE_FULL (test_a, test_a,
 			 test_a_class_init, NULL, NULL,
 			 XTYPE_OBJECT,
 			 INTERFACE (test_a_interface_init, TEST_TYPE_I))
 
 #define TEST_TYPE_B (test_b_get_type())
 
-typedef struct _TestB TestB;
+typedef struct _TestB test_b_t;
 typedef struct _TestBClass TestBClass;
 
 struct _TestB {
-  TestA parent;
+  test_a_t parent;
 };
 struct _TestBClass {
   TestAClass parent_class;
 };
 
 static void
-test_b_foo (TestI *self)
+test_b_foo (test_i_t *self)
 {
   xvalue_t args[1] = { G_VALUE_INIT };
 
-  record ("TestB::foo");
+  record ("test_b_t::foo");
 
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
+  xassert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
   xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
 
 static void
-test_b_bar (TestA *self)
+test_b_bar (test_a_t *self)
 {
   xvalue_t args[1] = { G_VALUE_INIT };
 
-  record ("TestB::bar");
+  record ("test_b_t::bar");
 
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (xsignal_get_invocation_hint (self)->signal_id == bar_signal_id);
+  xassert (xsignal_get_invocation_hint (self)->signal_id == bar_signal_id);
   xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
 
 static xchar_t *
-test_b_baz (TestA    *self,
+test_b_baz (test_a_t    *self,
             xobject_t  *object,
             xpointer_t  pointer)
 {
   xchar_t *retval = NULL;
 
-  record ("TestB::baz");
+  record ("test_b_t::baz");
 
-  g_assert (object == G_OBJECT (self));
-  g_assert (GPOINTER_TO_INT (pointer) == 23);
+  xassert (object == G_OBJECT (self));
+  xassert (GPOINTER_TO_INT (pointer) == 23);
 
   xsignal_chain_from_overridden_handler (self, object, pointer, &retval);
 
   if (retval)
     {
-      xchar_t *tmp = xstrconcat (retval , ",TestB::baz", NULL);
+      xchar_t *tmp = xstrconcat (retval , ",test_b_t::baz", NULL);
       g_free (retval);
       retval = tmp;
     }
@@ -246,71 +246,71 @@ test_b_class_init (TestBClass *class)
 				   G_CALLBACK (test_b_baz));
 }
 
-static DEFINE_TYPE (TestB, test_b,
+static DEFINE_TYPE (test_b, test_b,
 		    test_b_class_init, NULL, NULL,
 		    TEST_TYPE_A)
 
 #define TEST_TYPE_C (test_c_get_type())
 
-typedef struct _TestC TestC;
+typedef struct _TestC test_c_t;
 typedef struct _TestCClass TestCClass;
 
 struct _TestC {
-  TestB parent;
+  test_b_t parent;
 };
 struct _TestCClass {
   TestBClass parent_class;
 };
 
 static void
-test_c_foo (TestI *self)
+test_c_foo (test_i_t *self)
 {
   xvalue_t args[1] = { G_VALUE_INIT };
 
-  record ("TestC::foo");
+  record ("test_c_t::foo");
 
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
+  xassert (xsignal_get_invocation_hint (self)->signal_id == foo_signal_id);
   xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
 
 static void
-test_c_bar (TestA *self)
+test_c_bar (test_a_t *self)
 {
   xvalue_t args[1] = { G_VALUE_INIT };
 
-  record ("TestC::bar");
+  record ("test_c_t::bar");
 
   xvalue_init (&args[0], TEST_TYPE_A);
   xvalue_set_object (&args[0], self);
 
-  g_assert (xsignal_get_invocation_hint (self)->signal_id == bar_signal_id);
+  xassert (xsignal_get_invocation_hint (self)->signal_id == bar_signal_id);
   xsignal_chain_from_overridden (args, NULL);
 
   xvalue_unset (&args[0]);
 }
 
 static xchar_t *
-test_c_baz (TestA    *self,
+test_c_baz (test_a_t    *self,
             xobject_t  *object,
             xpointer_t  pointer)
 {
   xchar_t *retval = NULL;
 
-  record ("TestC::baz");
+  record ("test_c_t::baz");
 
-  g_assert (object == G_OBJECT (self));
-  g_assert (GPOINTER_TO_INT (pointer) == 23);
+  xassert (object == G_OBJECT (self));
+  xassert (GPOINTER_TO_INT (pointer) == 23);
 
   xsignal_chain_from_overridden_handler (self, object, pointer, &retval);
 
   if (retval)
     {
-      xchar_t *tmp = xstrconcat (retval , ",TestC::baz", NULL);
+      xchar_t *tmp = xstrconcat (retval , ",test_c_t::baz", NULL);
       g_free (retval);
       retval = tmp;
     }
@@ -335,7 +335,7 @@ test_c_class_init (TestBClass *class)
 }
 
 
-static DEFINE_TYPE (TestC, test_c,
+static DEFINE_TYPE (test_c, test_c,
 		    test_c_class_init, NULL, NULL,
 		    TEST_TYPE_B)
 
@@ -402,17 +402,17 @@ main (int argc, char **argv)
 			  G_LOG_LEVEL_WARNING |
 			  G_LOG_LEVEL_CRITICAL);
 
-  test (TEST_TYPE_A, "foo", "TestA::foo,TestI::foo", NULL);
-  test (TEST_TYPE_A, "bar", "TestA::bar", NULL);
-  test (TEST_TYPE_A, "baz", "TestA::baz", "TestA::baz");
+  test (TEST_TYPE_A, "foo", "test_a_t::foo,test_i_t::foo", NULL);
+  test (TEST_TYPE_A, "bar", "test_a_t::bar", NULL);
+  test (TEST_TYPE_A, "baz", "test_a_t::baz", "test_a_t::baz");
 
-  test (TEST_TYPE_B, "foo", "TestB::foo,TestA::foo,TestI::foo", NULL);
-  test (TEST_TYPE_B, "bar", "TestB::bar,TestA::bar", NULL);
-  test (TEST_TYPE_B, "baz", "TestB::baz,TestA::baz", "TestA::baz,TestB::baz");
+  test (TEST_TYPE_B, "foo", "test_b_t::foo,test_a_t::foo,test_i_t::foo", NULL);
+  test (TEST_TYPE_B, "bar", "test_b_t::bar,test_a_t::bar", NULL);
+  test (TEST_TYPE_B, "baz", "test_b_t::baz,test_a_t::baz", "test_a_t::baz,test_b_t::baz");
 
-  test (TEST_TYPE_C, "foo", "TestC::foo,TestB::foo,TestA::foo,TestI::foo", NULL);
-  test (TEST_TYPE_C, "bar", "TestC::bar,TestB::bar,TestA::bar", NULL);
-  test (TEST_TYPE_C, "baz", "TestC::baz,TestB::baz,TestA::baz", "TestA::baz,TestB::baz,TestC::baz");
+  test (TEST_TYPE_C, "foo", "test_c_t::foo,test_b_t::foo,test_a_t::foo,test_i_t::foo", NULL);
+  test (TEST_TYPE_C, "bar", "test_c_t::bar,test_b_t::bar,test_a_t::bar", NULL);
+  test (TEST_TYPE_C, "baz", "test_c_t::baz,test_b_t::baz,test_a_t::baz", "test_a_t::baz,test_b_t::baz,test_c_t::baz");
 
   return failed ? 1 : 0;
 }

@@ -648,7 +648,7 @@ key_state_serialise (KeyState *state)
           xboolean_t checked G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
           checked = key_state_check (state, NULL);
-          g_assert (checked);
+          xassert (checked);
 
           xvariant_builder_init (&builder, G_VARIANT_TYPE_TUPLE);
 
@@ -1116,7 +1116,7 @@ is_subclass (const xchar_t *class_name,
     return TRUE;
 
   class = xhash_table_lookup (schema_table, class_name);
-  g_assert (class != NULL);
+  xassert (class != NULL);
 
   return class->extends_name &&
          is_subclass (class->extends_name, possible_parent, schema_table);
@@ -1945,7 +1945,7 @@ set_overrides (xhashtable_t  *schema_table,
             }
 
           keys = xkey_file_get_keys (key_file, group, NULL, NULL);
-          g_assert (keys != NULL);
+          xassert (keys != NULL);
 
           for (j = 0; keys[j]; j++)
             {
@@ -2014,7 +2014,7 @@ set_overrides (xhashtable_t  *schema_table,
                 }
 
               string = xkey_file_get_value (key_file, group, key, NULL);
-              g_assert (string != NULL);
+              xassert (string != NULL);
 
               value = xvariant_parse (state->type, string,
                                        NULL, NULL, &error);

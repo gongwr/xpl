@@ -28,7 +28,7 @@
 
 typedef struct _TestB {
   xobject_t parent;
-} TestB;
+} test_b_t;
 
 typedef struct _TestBClass {
   xobject_class_t parent_class;
@@ -36,7 +36,7 @@ typedef struct _TestBClass {
 
 xtype_t test_b_get_type (void);
 
-G_DEFINE_TYPE (TestB, test_b, XTYPE_OBJECT)
+XDEFINE_TYPE (test_b_t, test_b, XTYPE_OBJECT)
 
 static void
 test_b_class_init (TestBClass *class)
@@ -44,7 +44,7 @@ test_b_class_init (TestBClass *class)
 }
 
 static void
-test_b_init (TestB *self)
+test_b_init (test_b_t *self)
 {
 }
 

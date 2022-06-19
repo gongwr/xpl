@@ -74,7 +74,7 @@ g_emblemed_icon_finalize (xobject_t *object)
   g_clear_object (&emblemed->priv->icon);
   xlist_free_full (emblemed->priv->emblems, xobject_unref);
 
-  (*G_OBJECT_CLASS (g_emblemed_icon_parent_class)->finalize) (object);
+  (*XOBJECT_CLASS (g_emblemed_icon_parent_class)->finalize) (object);
 }
 
 static void
@@ -116,22 +116,22 @@ g_emblemed_icon_get_property (xobject_t  *object,
 }
 
 static void
-g_emblemed_icon_class_init (xemblemed_icon_tClass *klass)
+g_emblemed_icon_class_init (xemblemed_icon_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_emblemed_icon_finalize;
-  gobject_class->set_property = g_emblemed_icon_set_property;
-  gobject_class->get_property = g_emblemed_icon_get_property;
+  xobject_class->finalize = g_emblemed_icon_finalize;
+  xobject_class->set_property = g_emblemed_icon_set_property;
+  xobject_class->get_property = g_emblemed_icon_get_property;
 
   properties[PROP_GICON] =
-    g_param_spec_object ("gicon",
+    xparam_spec_object ("gicon",
                          P_("The base xicon_t"),
                          P_("The xicon_t to attach emblems to"),
                          XTYPE_ICON,
-                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS);
+                         XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_STRINGS);
 
-  xobject_class_install_properties (gobject_class, NUM_PROPERTIES, properties);
+  xobject_class_install_properties (xobject_class, NUM_PROPERTIES, properties);
 }
 
 static void
@@ -157,8 +157,8 @@ g_emblemed_icon_new (xicon_t   *icon,
 {
   xemblemed_icon_t *emblemed;
 
-  g_return_val_if_fail (X_IS_ICON (icon), NULL);
-  g_return_val_if_fail (!X_IS_EMBLEM (icon), NULL);
+  xreturn_val_if_fail (X_IS_ICON (icon), NULL);
+  xreturn_val_if_fail (!X_IS_EMBLEM (icon), NULL);
 
   emblemed = G_EMBLEMED_ICON (xobject_new (XTYPE_EMBLEMED_ICON,
                                             "gicon", icon,
@@ -184,7 +184,7 @@ g_emblemed_icon_new (xicon_t   *icon,
 xicon_t *
 g_emblemed_icon_get_icon (xemblemed_icon_t *emblemed)
 {
-  g_return_val_if_fail (X_IS_EMBLEMED_ICON (emblemed), NULL);
+  xreturn_val_if_fail (X_IS_EMBLEMED_ICON (emblemed), NULL);
 
   return emblemed->priv->icon;
 }
@@ -204,7 +204,7 @@ g_emblemed_icon_get_icon (xemblemed_icon_t *emblemed)
 xlist_t *
 g_emblemed_icon_get_emblems (xemblemed_icon_t *emblemed)
 {
-  g_return_val_if_fail (X_IS_EMBLEMED_ICON (emblemed), NULL);
+  xreturn_val_if_fail (X_IS_EMBLEMED_ICON (emblemed), NULL);
 
   return emblemed->priv->emblems;
 }
@@ -319,7 +319,7 @@ g_emblemed_icon_to_tokens (xicon_t *icon,
    *   <encoded_icon> [<encoded_emblem_icon>]*
    */
 
-  g_return_val_if_fail (out_version != NULL, FALSE);
+  xreturn_val_if_fail (out_version != NULL, FALSE);
 
   *out_version = 0;
 

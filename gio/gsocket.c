@@ -498,7 +498,7 @@ xsocket_details_from_fd (xsocket_t *socket)
 
   if (addrlen > 0)
     {
-      g_assert (G_STRUCT_OFFSET (struct sockaddr, sa_family) +
+      xassert (G_STRUCT_OFFSET (struct sockaddr, sa_family) +
 		sizeof address.storage.ss_family <= addrlen);
       family = address.storage.ss_family;
     }
@@ -896,7 +896,7 @@ xsocket_finalize (xobject_t *object)
       socket->priv->event = WSA_INVALID_EVENT;
     }
 
-  g_assert (socket->priv->requested_conditions == NULL);
+  xassert (socket->priv->requested_conditions == NULL);
   g_mutex_clear (&socket->priv->win32_source_lock);
   g_cond_clear (&socket->priv->win32_source_cond);
 #endif
@@ -910,14 +910,14 @@ xsocket_finalize (xobject_t *object)
         }
     }
 
-  if (G_OBJECT_CLASS (xsocket_parent_class)->finalize)
-    (*G_OBJECT_CLASS (xsocket_parent_class)->finalize) (object);
+  if (XOBJECT_CLASS (xsocket_parent_class)->finalize)
+    (*XOBJECT_CLASS (xsocket_parent_class)->finalize) (object);
 }
 
 static void
 xsocket_class_init (GSocketClass *klass)
 {
-  xobject_class_t *gobject_class G_GNUC_UNUSED = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class G_GNUC_UNUSED = XOBJECT_CLASS (klass);
 
 #ifdef SIGPIPE
   /* There is no portable, thread-safe way to avoid having the process
@@ -932,93 +932,93 @@ xsocket_class_init (GSocketClass *klass)
   signal (SIGPIPE, SIG_IGN);
 #endif
 
-  gobject_class->finalize = xsocket_finalize;
-  gobject_class->constructed = xsocket_constructed;
-  gobject_class->set_property = xsocket_set_property;
-  gobject_class->get_property = xsocket_get_property;
+  xobject_class->finalize = xsocket_finalize;
+  xobject_class->constructed = xsocket_constructed;
+  xobject_class->set_property = xsocket_set_property;
+  xobject_class->get_property = xsocket_get_property;
 
-  xobject_class_install_property (gobject_class, PROP_FAMILY,
-				   g_param_spec_enum ("family",
+  xobject_class_install_property (xobject_class, PROP_FAMILY,
+				   xparam_spec_enum ("family",
 						      P_("Socket family"),
 						      P_("The sockets address family"),
 						      XTYPE_SOCKET_FAMILY,
 						      XSOCKET_FAMILY_INVALID,
-						      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_TYPE,
-				   g_param_spec_enum ("type",
+  xobject_class_install_property (xobject_class, PROP_TYPE,
+				   xparam_spec_enum ("type",
 						      P_("Socket type"),
 						      P_("The sockets type"),
 						      XTYPE_SOCKET_TYPE,
 						      XSOCKET_TYPE_STREAM,
-						      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_PROTOCOL,
-				   g_param_spec_enum ("protocol",
+  xobject_class_install_property (xobject_class, PROP_PROTOCOL,
+				   xparam_spec_enum ("protocol",
 						      P_("Socket protocol"),
 						      P_("The id of the protocol to use, or -1 for unknown"),
 						      XTYPE_SOCKET_PROTOCOL,
 						      XSOCKET_PROTOCOL_UNKNOWN,
-						      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_FD,
-				   g_param_spec_int ("fd",
+  xobject_class_install_property (xobject_class, PROP_FD,
+				   xparam_spec_int ("fd",
 						     P_("File descriptor"),
 						     P_("The sockets file descriptor"),
 						     G_MININT,
 						     G_MAXINT,
 						     -1,
-						     G_PARAM_CONSTRUCT_ONLY |
-                                                     G_PARAM_READWRITE |
-                                                     G_PARAM_STATIC_STRINGS));
+						     XPARAM_CONSTRUCT_ONLY |
+                                                     XPARAM_READWRITE |
+                                                     XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_BLOCKING,
-				   g_param_spec_boolean ("blocking",
+  xobject_class_install_property (xobject_class, PROP_BLOCKING,
+				   xparam_spec_boolean ("blocking",
 							 P_("blocking"),
 							 P_("Whether or not I/O on this socket is blocking"),
 							 TRUE,
-							 G_PARAM_READWRITE |
-                                                         G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE |
+                                                         XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_LISTEN_BACKLOG,
-				   g_param_spec_int ("listen-backlog",
+  xobject_class_install_property (xobject_class, PROP_LISTEN_BACKLOG,
+				   xparam_spec_int ("listen-backlog",
 						     P_("Listen backlog"),
 						     P_("Outstanding connections in the listen queue"),
 						     0,
 						     SOMAXCONN,
 						     10,
-						     G_PARAM_READWRITE |
-                                                     G_PARAM_STATIC_STRINGS));
+						     XPARAM_READWRITE |
+                                                     XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_KEEPALIVE,
-				   g_param_spec_boolean ("keepalive",
+  xobject_class_install_property (xobject_class, PROP_KEEPALIVE,
+				   xparam_spec_boolean ("keepalive",
 							 P_("Keep connection alive"),
 							 P_("Keep connection alive by sending periodic pings"),
 							 FALSE,
-							 G_PARAM_READWRITE |
-                                                         G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE |
+                                                         XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_LOCAL_ADDRESS,
-				   g_param_spec_object ("local-address",
+  xobject_class_install_property (xobject_class, PROP_LOCAL_ADDRESS,
+				   xparam_spec_object ("local-address",
 							P_("Local address"),
 							P_("The local address the socket is bound to"),
 							XTYPE_SOCKET_ADDRESS,
-							G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+							XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_REMOTE_ADDRESS,
-				   g_param_spec_object ("remote-address",
+  xobject_class_install_property (xobject_class, PROP_REMOTE_ADDRESS,
+				   xparam_spec_object ("remote-address",
 							P_("Remote address"),
 							P_("The remote address the socket is connected to"),
 							XTYPE_SOCKET_ADDRESS,
-							G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+							XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_t:timeout:
@@ -1027,15 +1027,15 @@ xsocket_class_init (GSocketClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class, PROP_TIMEOUT,
-				   g_param_spec_uint ("timeout",
+  xobject_class_install_property (xobject_class, PROP_TIMEOUT,
+				   xparam_spec_uint ("timeout",
 						      P_("Timeout"),
 						      P_("The timeout in seconds on socket I/O"),
 						      0,
 						      G_MAXUINT,
 						      0,
-						      G_PARAM_READWRITE |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE |
+						      XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_t:broadcast:
@@ -1044,13 +1044,13 @@ xsocket_class_init (GSocketClass *klass)
    *
    * Since: 2.32
    */
-  xobject_class_install_property (gobject_class, PROP_BROADCAST,
-				   g_param_spec_boolean ("broadcast",
+  xobject_class_install_property (xobject_class, PROP_BROADCAST,
+				   xparam_spec_boolean ("broadcast",
 							 P_("Broadcast"),
 							 P_("Whether to allow sending to broadcast addresses"),
 							 FALSE,
-							 G_PARAM_READWRITE |
-                                                         G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_t:ttl:
@@ -1059,13 +1059,13 @@ xsocket_class_init (GSocketClass *klass)
    *
    * Since: 2.32
    */
-  xobject_class_install_property (gobject_class, PROP_TTL,
-				   g_param_spec_uint ("ttl",
+  xobject_class_install_property (xobject_class, PROP_TTL,
+				   xparam_spec_uint ("ttl",
 						      P_("TTL"),
 						      P_("Time-to-live of outgoing unicast packets"),
 						      0, G_MAXUINT, 0,
-						      G_PARAM_READWRITE |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE |
+						      XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_t:multicast-loopback:
@@ -1074,13 +1074,13 @@ xsocket_class_init (GSocketClass *klass)
    *
    * Since: 2.32
    */
-  xobject_class_install_property (gobject_class, PROP_MULTICAST_LOOPBACK,
-				   g_param_spec_boolean ("multicast-loopback",
+  xobject_class_install_property (xobject_class, PROP_MULTICAST_LOOPBACK,
+				   xparam_spec_boolean ("multicast-loopback",
 							 P_("Multicast loopback"),
 							 P_("Whether outgoing multicast packets loop back to the local host"),
 							 TRUE,
-							 G_PARAM_READWRITE |
-                                                         G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_t:multicast-ttl:
@@ -1089,13 +1089,13 @@ xsocket_class_init (GSocketClass *klass)
    *
    * Since: 2.32
    */
-  xobject_class_install_property (gobject_class, PROP_MULTICAST_TTL,
-				   g_param_spec_uint ("multicast-ttl",
+  xobject_class_install_property (xobject_class, PROP_MULTICAST_TTL,
+				   xparam_spec_uint ("multicast-ttl",
 						      P_("Multicast TTL"),
 						      P_("Time-to-live of outgoing multicast packets"),
 						      0, G_MAXUINT, 1,
-						      G_PARAM_READWRITE |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE |
+						      XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -1137,7 +1137,7 @@ xsocket_initable_init (xinitable_t *initable,
 {
   xsocket_t  *socket;
 
-  g_return_val_if_fail (X_IS_SOCKET (initable), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (initable), FALSE);
 
   socket = G_SOCKET (initable);
 
@@ -1384,7 +1384,7 @@ xsocket_set_blocking (xsocket_t  *socket,
 xboolean_t
 xsocket_get_blocking (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   return socket->priv->blocking;
 }
@@ -1450,7 +1450,7 @@ xsocket_set_keepalive (xsocket_t  *socket,
 xboolean_t
 xsocket_get_keepalive (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   return socket->priv->keepalive;
 }
@@ -1469,7 +1469,7 @@ xsocket_get_keepalive (xsocket_t *socket)
 xint_t
 xsocket_get_listen_backlog  (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), 0);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
 
   return socket->priv->listen_backlog;
 }
@@ -1517,7 +1517,7 @@ xsocket_set_listen_backlog (xsocket_t *socket,
 xuint_t
 xsocket_get_timeout (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), 0);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
 
   return socket->priv->timeout;
 }
@@ -1580,7 +1580,7 @@ xsocket_get_ttl (xsocket_t *socket)
   xerror_t *error = NULL;
   xint_t value;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), 0);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
 
   if (socket->priv->family == XSOCKET_FAMILY_IPV4)
     {
@@ -1593,7 +1593,7 @@ xsocket_get_ttl (xsocket_t *socket)
 			   &value, &error);
     }
   else
-    g_return_val_if_reached (0);
+    xreturn_val_if_reached (0);
 
   if (error)
     {
@@ -1666,7 +1666,7 @@ xsocket_get_broadcast (xsocket_t *socket)
   xerror_t *error = NULL;
   xint_t value;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   if (!xsocket_get_option (socket, SOL_SOCKET, SO_BROADCAST,
 			    &value, &error))
@@ -1729,7 +1729,7 @@ xsocket_get_multicast_loopback (xsocket_t *socket)
   xerror_t *error = NULL;
   xint_t value;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   if (socket->priv->family == XSOCKET_FAMILY_IPV4)
     {
@@ -1742,7 +1742,7 @@ xsocket_get_multicast_loopback (xsocket_t *socket)
 			   &value, &error);
     }
   else
-    g_return_val_if_reached (FALSE);
+    xreturn_val_if_reached (FALSE);
 
   if (error)
     {
@@ -1818,7 +1818,7 @@ xsocket_get_multicast_ttl (xsocket_t *socket)
   xerror_t *error = NULL;
   xint_t value;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), 0);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
 
   if (socket->priv->family == XSOCKET_FAMILY_IPV4)
     {
@@ -1831,7 +1831,7 @@ xsocket_get_multicast_ttl (xsocket_t *socket)
 			   &value, &error);
     }
   else
-    g_return_val_if_reached (FALSE);
+    xreturn_val_if_reached (FALSE);
 
   if (error)
     {
@@ -1900,7 +1900,7 @@ xsocket_set_multicast_ttl (xsocket_t  *socket,
 xsocket_family_t
 xsocket_get_family (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), XSOCKET_FAMILY_INVALID);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), XSOCKET_FAMILY_INVALID);
 
   return socket->priv->family;
 }
@@ -1918,7 +1918,7 @@ xsocket_get_family (xsocket_t *socket)
 xsocket_type_t
 xsocket_get_socket_type (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), XSOCKET_TYPE_INVALID);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), XSOCKET_TYPE_INVALID);
 
   return socket->priv->type;
 }
@@ -1937,7 +1937,7 @@ xsocket_get_socket_type (xsocket_t *socket)
 GSocketProtocol
 xsocket_get_protocol (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
 
   return socket->priv->protocol;
 }
@@ -1959,7 +1959,7 @@ xsocket_get_protocol (xsocket_t *socket)
 int
 xsocket_get_fd (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
 
   return socket->priv->fd;
 }
@@ -1988,7 +1988,7 @@ xsocket_get_local_address (xsocket_t  *socket,
   } buffer;
   xuint_t len = sizeof (buffer);
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
 
   if (getsockname (socket->priv->fd, &buffer.sa, &len) < 0)
     {
@@ -2024,7 +2024,7 @@ xsocket_get_remote_address (xsocket_t  *socket,
   } buffer;
   xuint_t len = sizeof (buffer);
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
 
   if (socket->priv->connect_pending)
     {
@@ -2069,7 +2069,7 @@ xsocket_get_remote_address (xsocket_t  *socket,
 xboolean_t
 xsocket_is_connected (xsocket_t *socket)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   return (socket->priv->connected_read || socket->priv->connected_write);
 }
@@ -2096,7 +2096,7 @@ xboolean_t
 xsocket_listen (xsocket_t  *socket,
 		 xerror_t  **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -2165,7 +2165,7 @@ xsocket_bind (xsocket_t         *socket,
   xboolean_t so_reuseport;
 #endif
 
-  g_return_val_if_fail (X_IS_SOCKET (socket) && X_IS_SOCKET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket) && X_IS_SOCKET_ADDRESS (address), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -2346,9 +2346,9 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
   const xuint8_t *native_addr;
   xint_t optname, result;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
-  g_return_val_if_fail (socket->priv->type == XSOCKET_TYPE_DATAGRAM, FALSE);
-  g_return_val_if_fail (X_IS_INET_ADDRESS (group), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (socket->priv->type == XSOCKET_TYPE_DATAGRAM, FALSE);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS (group), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -2415,7 +2415,7 @@ xsocket_multicast_group_operation (xsocket_t       *socket,
 			   &mc_req_ipv6, sizeof (mc_req_ipv6));
     }
   else
-    g_return_val_if_reached (FALSE);
+    xreturn_val_if_reached (FALSE);
 
   if (result < 0)
     {
@@ -2511,11 +2511,11 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
 {
   xint_t result;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
-  g_return_val_if_fail (socket->priv->type == XSOCKET_TYPE_DATAGRAM, FALSE);
-  g_return_val_if_fail (X_IS_INET_ADDRESS (group), FALSE);
-  g_return_val_if_fail (iface == NULL || *iface != '\0', FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (socket->priv->type == XSOCKET_TYPE_DATAGRAM, FALSE);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS (group), FALSE);
+  xreturn_val_if_fail (iface == NULL || *iface != '\0', FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (!source_specific)
     {
@@ -2688,7 +2688,7 @@ xsocket_multicast_group_operation_ssm (xsocket_t       *socket,
       break;
 
     default:
-      g_return_val_if_reached (FALSE);
+      xreturn_val_if_reached (FALSE);
     }
 
   if (result < 0)
@@ -2854,7 +2854,7 @@ xsocket_accept (xsocket_t       *socket,
   xsocket_t *new_socket;
   xint_t ret;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
 
   if (!check_socket (socket, error))
     return NULL;
@@ -2975,7 +2975,7 @@ xsocket_connect (xsocket_t         *socket,
     struct sockaddr sa;
   } buffer;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket) && X_IS_SOCKET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket) && X_IS_SOCKET_ADDRESS (address), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -3057,7 +3057,7 @@ xsocket_check_connect_result (xsocket_t  *socket,
 {
   int value;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -3124,7 +3124,7 @@ xsocket_get_available_bytes (xsocket_t *socket)
   xint_t avail;
 #endif
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
 
   if (!check_socket (socket, NULL))
     return -1;
@@ -3180,7 +3180,7 @@ block_on_timeout (xsocket_t       *socket,
 {
   sint64_t wait_timeout = -1;
 
-  g_return_val_if_fail (timeout_us != 0, TRUE);
+  xreturn_val_if_fail (timeout_us != 0, TRUE);
 
   /* check if we've timed out or how much time to wait at most */
   if (timeout_us >= 0)
@@ -3213,7 +3213,7 @@ xsocket_receive_with_timeout (xsocket_t       *socket,
   xssize_t ret;
   sint64_t start_time;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -3412,7 +3412,7 @@ xsocket_send_with_timeout (xsocket_t       *socket,
   xssize_t ret;
   sint64_t start_time;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket) && buffer != NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -3611,7 +3611,7 @@ xsocket_shutdown (xsocket_t   *socket,
 {
   int how;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), TRUE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), TRUE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -3697,7 +3697,7 @@ xsocket_close (xsocket_t  *socket,
 {
   int res;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), TRUE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), TRUE);
 
   if (socket->priv->closed)
     return TRUE; /* Multiple close not an error */
@@ -3838,7 +3838,7 @@ add_condition_watch (xsocket_t      *socket,
 		     xio_condition_t *condition)
 {
   g_mutex_lock (&socket->priv->win32_source_lock);
-  g_assert (xlist_find (socket->priv->requested_conditions, condition) == NULL);
+  xassert (xlist_find (socket->priv->requested_conditions, condition) == NULL);
 
   socket->priv->requested_conditions =
     xlist_prepend (socket->priv->requested_conditions, condition);
@@ -3852,7 +3852,7 @@ remove_condition_watch (xsocket_t      *socket,
 			xio_condition_t *condition)
 {
   g_mutex_lock (&socket->priv->win32_source_lock);
-  g_assert (xlist_find (socket->priv->requested_conditions, condition) != NULL);
+  xassert (xlist_find (socket->priv->requested_conditions, condition) != NULL);
 
   socket->priv->requested_conditions =
     xlist_remove (socket->priv->requested_conditions, condition);
@@ -4191,7 +4191,7 @@ xsocket_create_source (xsocket_t      *socket,
 			xio_condition_t  condition,
 			xcancellable_t *cancellable)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket) && (cancellable == NULL || X_IS_CANCELLABLE (cancellable)), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET (socket) && (cancellable == NULL || X_IS_CANCELLABLE (cancellable)), NULL);
 
   return socket_source_new (socket, condition, cancellable);
 }
@@ -4227,7 +4227,7 @@ xio_condition_t
 xsocket_condition_check (xsocket_t      *socket,
 			  xio_condition_t  condition)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), 0);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), 0);
 
   if (!check_socket (socket, NULL))
     return 0;
@@ -4288,7 +4288,7 @@ xsocket_condition_wait (xsocket_t       *socket,
 			 xcancellable_t  *cancellable,
 			 xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   return xsocket_condition_timed_wait (socket, condition, -1,
 					cancellable, error);
@@ -4333,7 +4333,7 @@ xsocket_condition_timed_wait (xsocket_t       *socket,
   sint64_t start_time;
   sint64_t timeout_ms;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   if (!check_socket (socket, error))
     return FALSE;
@@ -4590,7 +4590,7 @@ G_STMT_START { \
                                             CMSG_DATA (cmsg)); \
         cmsg = CMSG_NXTHDR (_msg, cmsg); \
       } \
-    g_assert (cmsg == NULL); \
+    xassert (cmsg == NULL); \
   } \
 } G_STMT_END
 
@@ -4674,7 +4674,7 @@ input_message_from_msghdr (const struct msghdr  *msg,
 
     if (msg->msg_controllen >= sizeof (struct cmsghdr))
       {
-        g_assert (message->control_messages != NULL);
+        xassert (message->control_messages != NULL);
         for (cmsg = CMSG_FIRSTHDR (msg);
              cmsg != NULL;
              cmsg = CMSG_NXTHDR ((struct msghdr *) msg, cmsg))
@@ -4713,7 +4713,7 @@ input_message_from_msghdr (const struct msghdr  *msg,
       }
     else
       {
-        g_assert (my_messages == NULL);
+        xassert (my_messages == NULL);
       }
   }
 
@@ -4848,7 +4848,7 @@ xsocket_send_message (xsocket_t                *socket,
                                             &bytes_written,
                                             cancellable, error);
 
-  g_assert (res != G_POLLABLE_RETURN_OK || bytes_written <= G_MAXSSIZE);
+  xassert (res != G_POLLABLE_RETURN_OK || bytes_written <= G_MAXSSIZE);
 
   if (res == G_POLLABLE_RETURN_WOULD_BLOCK)
     {
@@ -4912,12 +4912,12 @@ xsocket_send_message_with_timeout (xsocket_t                *socket,
   if (bytes_written)
     *bytes_written = 0;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (address == NULL || X_IS_SOCKET_ADDRESS (address), G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (num_vectors == 0 || vectors != NULL, G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (num_messages == 0 || messages != NULL, G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (address == NULL || X_IS_SOCKET_ADDRESS (address), G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (num_vectors == 0 || vectors != NULL, G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (num_messages == 0 || messages != NULL, G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
 
   start_time = g_get_monotonic_time ();
 
@@ -5177,10 +5177,10 @@ xsocket_send_messages_with_timeout (xsocket_t        *socket,
 {
   sint64_t start_time;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
-  g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (num_messages == 0 || messages != NULL, -1);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -5418,7 +5418,7 @@ xsocket_receive_message_with_timeout (xsocket_t                 *socket,
   char one_byte;
   sint64_t start_time;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -5702,11 +5702,11 @@ xsocket_receive_messages_with_timeout (xsocket_t        *socket,
 {
   sint64_t start_time;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
-  g_return_val_if_fail (num_messages == 0 || messages != NULL, -1);
-  g_return_val_if_fail (cancellable == NULL ||
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (num_messages == 0 || messages != NULL, -1);
+  xreturn_val_if_fail (cancellable == NULL ||
                         X_IS_CANCELLABLE (cancellable), -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   start_time = g_get_monotonic_time ();
 
@@ -6021,8 +6021,8 @@ xsocket_get_credentials (xsocket_t   *socket,
 {
   xcredentials_t *ret;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!check_socket (socket, error))
     return NULL;
@@ -6213,7 +6213,7 @@ xsocket_get_option (xsocket_t  *socket,
 {
   xuint_t size;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   /* xsocket_get_option() is called during socket init, so skip the init checks
    * in check_socket() */
@@ -6281,7 +6281,7 @@ xsocket_set_option (xsocket_t  *socket,
 {
   xint_t errsv;
 
-  g_return_val_if_fail (X_IS_SOCKET (socket), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), FALSE);
 
   /* xsocket_set_option() is called during socket init, so skip the init checks
    * in check_socket() */

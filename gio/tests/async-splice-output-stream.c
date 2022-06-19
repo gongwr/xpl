@@ -87,8 +87,8 @@ test_copy_chunks_splice_cb (xobject_t      *source,
       g_assert_cmpstr (received_data, ==, data->data);
     }
 
-  g_assert (xinput_stream_is_closed (data->istream));
-  g_assert (xoutput_stream_is_closed (data->ostream));
+  xassert (xinput_stream_is_closed (data->istream));
+  xassert (xoutput_stream_is_closed (data->ostream));
 
   if (data->flags & TEST_THREADED_ISTREAM)
     {

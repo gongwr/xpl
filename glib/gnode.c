@@ -247,9 +247,9 @@ g_node_insert (xnode_t *parent,
 	       xint_t   position,
 	       xnode_t *node)
 {
-  g_return_val_if_fail (parent != NULL, node);
-  g_return_val_if_fail (node != NULL, node);
-  g_return_val_if_fail (G_NODE_IS_ROOT (node), node);
+  xreturn_val_if_fail (parent != NULL, node);
+  xreturn_val_if_fail (node != NULL, node);
+  xreturn_val_if_fail (G_NODE_IS_ROOT (node), node);
 
   if (position > 0)
     return g_node_insert_before (parent,
@@ -277,11 +277,11 @@ g_node_insert_before (xnode_t *parent,
 		      xnode_t *sibling,
 		      xnode_t *node)
 {
-  g_return_val_if_fail (parent != NULL, node);
-  g_return_val_if_fail (node != NULL, node);
-  g_return_val_if_fail (G_NODE_IS_ROOT (node), node);
+  xreturn_val_if_fail (parent != NULL, node);
+  xreturn_val_if_fail (node != NULL, node);
+  xreturn_val_if_fail (G_NODE_IS_ROOT (node), node);
   if (sibling)
-    g_return_val_if_fail (sibling->parent == parent, node);
+    xreturn_val_if_fail (sibling->parent == parent, node);
 
   node->parent = parent;
 
@@ -334,11 +334,11 @@ g_node_insert_after (xnode_t *parent,
 		     xnode_t *sibling,
 		     xnode_t *node)
 {
-  g_return_val_if_fail (parent != NULL, node);
-  g_return_val_if_fail (node != NULL, node);
-  g_return_val_if_fail (G_NODE_IS_ROOT (node), node);
+  xreturn_val_if_fail (parent != NULL, node);
+  xreturn_val_if_fail (node != NULL, node);
+  xreturn_val_if_fail (G_NODE_IS_ROOT (node), node);
   if (sibling)
-    g_return_val_if_fail (sibling->parent == parent, node);
+    xreturn_val_if_fail (sibling->parent == parent, node);
 
   node->parent = parent;
 
@@ -378,7 +378,7 @@ xnode_t*
 g_node_prepend (xnode_t *parent,
 		xnode_t *node)
 {
-  g_return_val_if_fail (parent != NULL, node);
+  xreturn_val_if_fail (parent != NULL, node);
 
   return g_node_insert_before (parent, parent->children, node);
 }
@@ -394,7 +394,7 @@ g_node_prepend (xnode_t *parent,
 xnode_t*
 g_node_get_root (xnode_t *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   while (node->parent)
     node = node->parent;
@@ -417,8 +417,8 @@ xboolean_t
 g_node_is_ancestor (xnode_t *node,
 		    xnode_t *descendant)
 {
-  g_return_val_if_fail (node != NULL, FALSE);
-  g_return_val_if_fail (descendant != NULL, FALSE);
+  xreturn_val_if_fail (node != NULL, FALSE);
+  xreturn_val_if_fail (descendant != NULL, FALSE);
 
   while (descendant)
     {
@@ -950,9 +950,9 @@ g_node_find (xnode_t	    *root,
 {
   xpointer_t d[2];
 
-  g_return_val_if_fail (root != NULL, NULL);
-  g_return_val_if_fail (order <= G_LEVEL_ORDER, NULL);
-  g_return_val_if_fail (flags <= G_TRAVERSE_MASK, NULL);
+  xreturn_val_if_fail (root != NULL, NULL);
+  xreturn_val_if_fail (order <= G_LEVEL_ORDER, NULL);
+  xreturn_val_if_fail (flags <= G_TRAVERSE_MASK, NULL);
 
   d[0] = data;
   d[1] = NULL;
@@ -1001,8 +1001,8 @@ g_node_n_nodes (xnode_t	       *root,
 {
   xuint_t n = 0;
 
-  g_return_val_if_fail (root != NULL, 0);
-  g_return_val_if_fail (flags <= G_TRAVERSE_MASK, 0);
+  xreturn_val_if_fail (root != NULL, 0);
+  xreturn_val_if_fail (flags <= G_TRAVERSE_MASK, 0);
 
   g_node_count_func (root, flags, &n);
 
@@ -1020,7 +1020,7 @@ g_node_n_nodes (xnode_t	       *root,
 xnode_t*
 g_node_last_child (xnode_t *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   node = node->children;
   if (node)
@@ -1045,7 +1045,7 @@ xnode_t*
 g_node_nth_child (xnode_t *node,
 		  xuint_t	 n)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   node = node->children;
   if (node)
@@ -1068,7 +1068,7 @@ g_node_n_children (xnode_t *node)
 {
   xuint_t n = 0;
 
-  g_return_val_if_fail (node != NULL, 0);
+  xreturn_val_if_fail (node != NULL, 0);
 
   node = node->children;
   while (node)
@@ -1096,8 +1096,8 @@ g_node_find_child (xnode_t	  *node,
 		   GTraverseFlags  flags,
 		   xpointer_t	   data)
 {
-  g_return_val_if_fail (node != NULL, NULL);
-  g_return_val_if_fail (flags <= G_TRAVERSE_MASK, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (flags <= G_TRAVERSE_MASK, NULL);
 
   node = node->children;
   while (node)
@@ -1138,9 +1138,9 @@ g_node_child_position (xnode_t *node,
 {
   xuint_t n = 0;
 
-  g_return_val_if_fail (node != NULL, -1);
-  g_return_val_if_fail (child != NULL, -1);
-  g_return_val_if_fail (child->parent == node, -1);
+  xreturn_val_if_fail (node != NULL, -1);
+  xreturn_val_if_fail (child != NULL, -1);
+  xreturn_val_if_fail (child->parent == node, -1);
 
   node = node->children;
   while (node)
@@ -1171,7 +1171,7 @@ g_node_child_index (xnode_t    *node,
 {
   xuint_t n = 0;
 
-  g_return_val_if_fail (node != NULL, -1);
+  xreturn_val_if_fail (node != NULL, -1);
 
   node = node->children;
   while (node)
@@ -1197,7 +1197,7 @@ g_node_child_index (xnode_t    *node,
 xnode_t*
 g_node_first_sibling (xnode_t *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   if (node->parent)
     return node->parent->children;
@@ -1220,7 +1220,7 @@ g_node_first_sibling (xnode_t *node)
 xnode_t*
 g_node_last_sibling (xnode_t *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   while (node->next)
     node = node->next;

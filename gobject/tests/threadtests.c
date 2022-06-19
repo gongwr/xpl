@@ -153,7 +153,7 @@ typedef struct {
 } prop_tester_t;
 typedef xobject_class_t    prop_tester_class_t;
 static xtype_t prop_tester_get_type (void);
-G_DEFINE_TYPE (prop_tester, prop_tester, XTYPE_OBJECT)
+XDEFINE_TYPE (prop_tester, prop_tester, XTYPE_OBJECT)
 #define PROP_NAME 1
 static void
 prop_tester_init (prop_tester_t* t)
@@ -172,9 +172,9 @@ prop_tester_class_init (prop_tester_class_t *c)
 {
   int i;
   xparam_spec_t *param;
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (c);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (c);
 
-  gobject_class->set_property = prop_tester_set_property; /* silence xobject_t checks */
+  xobject_class->set_property = prop_tester_set_property; /* silence xobject_t checks */
 
   g_mutex_lock (&sync_mutex);
   g_cond_signal (&sync_cond);
@@ -184,13 +184,13 @@ prop_tester_class_init (prop_tester_class_t *c)
     xthread_yield();
 
   call_counter_init (c);
-  param = g_param_spec_string ("name", "name_i18n",
+  param = xparam_spec_string ("name", "name_i18n",
 			       "yet-more-wasteful-i18n",
 			       NULL,
-			       G_PARAM_CONSTRUCT_ONLY | G_PARAM_WRITABLE |
-			       G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB |
-			       G_PARAM_STATIC_NICK);
-  xobject_class_install_property (gobject_class, PROP_NAME, param);
+			       XPARAM_CONSTRUCT_ONLY | XPARAM_WRITABLE |
+			       XPARAM_STATIC_NAME | XPARAM_STATIC_BLURB |
+			       XPARAM_STATIC_NICK);
+  xobject_class_install_property (xobject_class, PROP_NAME, param);
 }
 
 static xpointer_t
@@ -314,7 +314,7 @@ test_threaded_weak_ref (void)
 #endif
 
       if (strengthened != NULL)
-        g_assert (X_IS_OBJECT (strengthened));
+        xassert (X_IS_OBJECT (strengthened));
 
       /* Wait for the thread to run */
       xthread_join (thread);
@@ -322,7 +322,7 @@ test_threaded_weak_ref (void)
       if (strengthened != NULL)
         {
           get_wins++;
-          g_assert (X_IS_OBJECT (strengthened));
+          xassert (X_IS_OBJECT (strengthened));
           xobject_unref (strengthened);
         }
       else

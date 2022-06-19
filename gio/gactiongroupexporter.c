@@ -162,7 +162,7 @@ xaction_group_exporter_dispatch_events (xpointer_t user_data)
       /* Adds and removes are incompatible with enabled or state
        * changes, but we must report at least one event.
        */
-      g_assert (((events & (ACTION_ENABLED_CHANGED_EVENT | ACTION_STATE_CHANGED_EVENT)) == 0) !=
+      xassert (((events & (ACTION_ENABLED_CHANGED_EVENT | ACTION_STATE_CHANGED_EVENT)) == 0) !=
                 ((events & (ACTION_REMOVED_EVENT | ACTION_ADDED_EVENT)) == 0));
 
       if (events & ACTION_REMOVED_EVENT)
@@ -215,7 +215,7 @@ xaction_group_exporter_flush_queue (GActionGroupExporter *exporter)
     {
       xsource_destroy (exporter->pendinxsource);
       xaction_group_exporter_dispatch_events (exporter);
-      g_assert (exporter->pendinxsource == NULL);
+      xassert (exporter->pendinxsource == NULL);
     }
 }
 
@@ -274,7 +274,7 @@ xaction_group_exporter_action_added (xaction_group_t *action_group,
   /* The action is new, so we should not have any pending
    * enabled-changed or state-changed signals for it.
    */
-  g_assert (~event_mask & (ACTION_STATE_CHANGED_EVENT |
+  xassert (~event_mask & (ACTION_STATE_CHANGED_EVENT |
                            ACTION_ENABLED_CHANGED_EVENT));
 
   event_mask |= ACTION_ADDED_EVENT;
@@ -300,7 +300,7 @@ xaction_group_exporter_action_removed (xaction_group_t *action_group,
    */
   if (event_mask & ACTION_ADDED_EVENT)
     {
-      g_assert (~event_mask & ~(ACTION_STATE_CHANGED_EVENT | ACTION_ENABLED_CHANGED_EVENT));
+      xassert (~event_mask & ~(ACTION_STATE_CHANGED_EVENT | ACTION_ENABLED_CHANGED_EVENT));
       event_mask &= ~ACTION_ADDED_EVENT;
     }
 
@@ -329,7 +329,7 @@ xaction_group_exporter_action_state_changed (xaction_group_t *action_group,
   /* If it was removed, it must have been added back.  Otherwise, why
    * are we hearing about changes?
    */
-  g_assert (~event_mask & ACTION_REMOVED_EVENT ||
+  xassert (~event_mask & ACTION_REMOVED_EVENT ||
             event_mask & ACTION_ADDED_EVENT);
 
   /* If it is freshly added, don't also bother with the state change
@@ -354,7 +354,7 @@ xaction_group_exporter_action_enabled_changed (xaction_group_t *action_group,
   event_mask = xaction_group_exporter_get_events (exporter, action_name);
 
   /* Reasoning as above. */
-  g_assert (~event_mask & ACTION_REMOVED_EVENT ||
+  xassert (~event_mask & ACTION_REMOVED_EVENT ||
             event_mask & ACTION_ADDED_EVENT);
 
   if (~event_mask & ACTION_ADDED_EVENT)
@@ -552,7 +552,7 @@ xdbus_connection_export_action_group (xdbus_connection_t  *connection,
       if G_UNLIKELY (info == NULL)
         xerror ("%s", error->message);
       org_gtk_Actions = g_dbus_node_info_lookup_interface (info, "org.gtk.Actions");
-      g_assert (org_gtk_Actions != NULL);
+      xassert (org_gtk_Actions != NULL);
       g_dbus_interface_info_ref (org_gtk_Actions);
       g_dbus_node_info_unref (info);
     }

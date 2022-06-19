@@ -317,7 +317,7 @@ g_rand_copy (xrand_t *rand)
 {
   xrand_t* new_rand;
 
-  g_return_val_if_fail (rand != NULL, NULL);
+  xreturn_val_if_fail (rand != NULL, NULL);
 
   new_rand = g_new0 (xrand_t, 1);
   memcpy (new_rand, rand, sizeof (xrand_t));
@@ -454,7 +454,7 @@ g_rand_int (xrand_t *rand)
   static const xuint32_t mag01[2]={0x0, MATRIX_A};
   /* mag01[x] = x * MATRIX_A  for x=0,1 */
 
-  g_return_val_if_fail (rand != NULL, 0);
+  xreturn_val_if_fail (rand != NULL, 0);
 
   if (rand->mti >= N) { /* generate N words at one time */
     int kk;
@@ -504,8 +504,8 @@ g_rand_int_range (xrand_t  *rand,
   xuint32_t dist = end - begin;
   xuint32_t random = 0;
 
-  g_return_val_if_fail (rand != NULL, begin);
-  g_return_val_if_fail (end > begin, begin);
+  xreturn_val_if_fail (rand != NULL, begin);
+  xreturn_val_if_fail (end > begin, begin);
 
   switch (get_random_version ())
     {

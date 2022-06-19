@@ -1539,7 +1539,7 @@ xchecksum_copy (const xchecksum_t *checksum)
 {
   xchecksum_t *copy;
 
-  g_return_val_if_fail (checksum != NULL, NULL);
+  xreturn_val_if_fail (checksum != NULL, NULL);
 
   copy = g_slice_new (xchecksum_t);
   *copy = *checksum;
@@ -1642,7 +1642,7 @@ xchecksum_get_string (xchecksum_t *checksum)
 {
   xchar_t *str = NULL;
 
-  g_return_val_if_fail (checksum != NULL, NULL);
+  xreturn_val_if_fail (checksum != NULL, NULL);
 
   if (checksum->digest_str)
     return checksum->digest_str;
@@ -1790,7 +1790,7 @@ g_compute_checksum_for_data (GChecksumType  checksum_type,
   xchecksum_t *checksum;
   xchar_t *retval;
 
-  g_return_val_if_fail (length == 0 || data != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || data != NULL, NULL);
 
   checksum = xchecksum_new (checksum_type);
   if (!checksum)
@@ -1824,7 +1824,7 @@ g_compute_checksum_for_string (GChecksumType  checksum_type,
                                const xchar_t   *str,
                                xssize_t         length)
 {
-  g_return_val_if_fail (length == 0 || str != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || str != NULL, NULL);
 
   if (length < 0)
     length = strlen (str);
@@ -1857,7 +1857,7 @@ g_compute_checksum_for_bytes (GChecksumType  checksum_type,
   xconstpointer byte_data;
   xsize_t length;
 
-  g_return_val_if_fail (data != NULL, NULL);
+  xreturn_val_if_fail (data != NULL, NULL);
 
   byte_data = xbytes_get_data (data, &length);
   return g_compute_checksum_for_data (checksum_type, byte_data, length);

@@ -461,9 +461,9 @@ g_io_channel_new_file (const xchar_t *filename,
   } mode_num;
   struct stat buffer;
 
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (mode != NULL, NULL);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL), NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (mode != NULL, NULL);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL), NULL);
 
   switch (mode[0])
     {

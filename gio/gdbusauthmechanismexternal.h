@@ -18,8 +18,8 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __G_DBUS_AUTH_MECHANISM_EXTERNAL_H__
-#define __G_DBUS_AUTH_MECHANISM_EXTERNAL_H__
+#ifndef __XDBUS_AUTH_MECHANISM_EXTERNAL_H__
+#define __XDBUS_AUTH_MECHANISM_EXTERNAL_H__
 
 #if !defined (GIO_COMPILATION)
 #error "gdbusauthmechanismexternal.h is a private header file."
@@ -30,10 +30,10 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL         (_g_dbus_auth_mechanism_external_get_type ())
-#define G_DBUS_AUTH_MECHANISM_EXTERNAL(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL, GDBusAuthMechanismExternal))
-#define G_DBUS_AUTH_MECHANISM_EXTERNAL_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL, GDBusAuthMechanismExternalClass))
-#define G_DBUS_AUTH_MECHANISM_EXTERNAL_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL, GDBusAuthMechanismExternalClass))
+#define XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL         (_xdbus_auth_mechanism_external_get_type ())
+#define XDBUS_AUTH_MECHANISM_EXTERNAL(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL, GDBusAuthMechanismExternal))
+#define XDBUS_AUTH_MECHANISM_EXTERNAL_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL, GDBusAuthMechanismExternalClass))
+#define XDBUS_AUTH_MECHANISM_EXTERNAL_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL, GDBusAuthMechanismExternalClass))
 #define X_IS_DBUS_AUTH_MECHANISM_EXTERNAL(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL))
 #define X_IS_DBUS_AUTH_MECHANISM_EXTERNAL_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DBUS_AUTH_MECHANISM_EXTERNAL))
 
@@ -44,18 +44,18 @@ typedef struct _GDBusAuthMechanismExternalPrivate GDBusAuthMechanismExternalPriv
 struct _GDBusAuthMechanismExternalClass
 {
   /*< private >*/
-  GDBusAuthMechanismClass parent_class;
+  xdbus_auth_mechanism_class_t parent_class;
 };
 
 struct _GDBusAuthMechanismExternal
 {
-  GDBusAuthMechanism parent_instance;
+  xdbus_auth_mechanism_t parent_instance;
   GDBusAuthMechanismExternalPrivate *priv;
 };
 
-xtype_t _g_dbus_auth_mechanism_external_get_type (void) G_GNUC_CONST;
+xtype_t _xdbus_auth_mechanism_external_get_type (void) G_GNUC_CONST;
 
 
 G_END_DECLS
 
-#endif /* __G_DBUS_AUTH_MECHANISM_EXTERNAL_H__ */
+#endif /* __XDBUS_AUTH_MECHANISM_EXTERNAL_H__ */

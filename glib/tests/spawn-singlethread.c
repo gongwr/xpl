@@ -74,7 +74,7 @@ on_child_exited (xpid_t     pid,
   if (data->child_exited && data->stdout_done)
     xmain_loop_quit (data->loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -155,8 +155,8 @@ test_spawn_async (void)
 
   xmain_loop_run (loop);
 
-  g_assert (data.child_exited);
-  g_assert (data.stdout_done);
+  xassert (data.child_exited);
+  xassert (data.stdout_done);
   g_assert_cmpstr (data.stdout_buf->str, ==, arg);
   xstring_free (data.stdout_buf, TRUE);
 
@@ -513,8 +513,8 @@ main (int   argc,
     }
   g_free (dirname);
 
-  g_assert (xfile_test (echo_prog_path, XFILE_TEST_EXISTS));
-  g_assert (xfile_test (echo_script_path, XFILE_TEST_EXISTS));
+  xassert (xfile_test (echo_prog_path, XFILE_TEST_EXISTS));
+  xassert (xfile_test (echo_script_path, XFILE_TEST_EXISTS));
 
   g_test_add_func ("/gthread/spawn-single-sync", test_spawn_sync);
   g_test_add_func ("/gthread/spawn-single-async", test_spawn_async);

@@ -912,8 +912,8 @@ xkey_file_load_from_file (xkey_file_t       *key_file,
   xint_t fd;
   int errsv;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (file != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (file != NULL, FALSE);
 
   fd = g_open (file, O_RDONLY, 0);
   errsv = errno;
@@ -963,8 +963,8 @@ xkey_file_load_from_data (xkey_file_t       *key_file,
   xerror_t *key_file_error = NULL;
   xchar_t list_separator;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (data != NULL || length == 0, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (data != NULL || length == 0, FALSE);
 
   if (length == (xsize_t)-1)
     length = strlen (data);
@@ -1017,8 +1017,8 @@ xkey_file_load_from_bytes (xkey_file_t       *key_file,
   const xuchar_t *data;
   xsize_t size;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (bytes != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (bytes != NULL, FALSE);
 
   data = xbytes_get_data (bytes, &size);
   return xkey_file_load_from_data (key_file, (const xchar_t *) data, size, flags, error);
@@ -1062,9 +1062,9 @@ xkey_file_load_from_dirs (xkey_file_t       *key_file,
   xint_t fd;
   xboolean_t found_file;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (!g_path_is_absolute (file), FALSE);
-  g_return_val_if_fail (search_dirs != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (!g_path_is_absolute (file), FALSE);
+  xreturn_val_if_fail (search_dirs != NULL, FALSE);
 
   found_file = FALSE;
   data_dirs = search_dirs;
@@ -1134,8 +1134,8 @@ xkey_file_load_from_data_dirs (xkey_file_t       *key_file,
   xsize_t i, j;
   xboolean_t found_file;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (!g_path_is_absolute (file), FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (!g_path_is_absolute (file), FALSE);
 
   user_data_dir = g_get_user_data_dir ();
   system_data_dirs = g_get_system_data_dirs ();
@@ -1174,7 +1174,7 @@ xkey_file_load_from_data_dirs (xkey_file_t       *key_file,
 xkey_file_t *
 xkey_file_ref (xkey_file_t *key_file)
 {
-  g_return_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
 
   g_atomic_int_inc (&key_file->ref_count);
 
@@ -1240,7 +1240,7 @@ xkey_file_locale_is_interesting (xkey_file_t    *key_file,
 
   if (!key_file->checked_locales)
     {
-      g_assert (key_file->locales == NULL);
+      xassert (key_file->locales == NULL);
       key_file->locales = xstrdupv ((xchar_t **)g_get_language_names ());
       key_file->checked_locales = TRUE;
     }
@@ -1407,8 +1407,8 @@ xkey_file_parse_key_value_pair (xkey_file_t     *key_file,
   g_warn_if_fail (key_file->start_group != NULL);
 
   /* Checked on entry to this function */
-  g_assert (key_file->current_group != NULL);
-  g_assert (key_file->current_group->name != NULL);
+  xassert (key_file->current_group != NULL);
+  xassert (key_file->current_group->name != NULL);
 
   if (key_file->start_group == key_file->current_group
       && strcmp (key, "Encoding") == 0)
@@ -1592,7 +1592,7 @@ xkey_file_to_data (xkey_file_t  *key_file,
   xstring_t *data_string;
   xlist_t *group_node, *key_file_node;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
 
   data_string = xstring_new (NULL);
 
@@ -1665,8 +1665,8 @@ xkey_file_get_keys (xkey_file_t     *key_file,
   xchar_t **keys;
   xsize_t i, num_keys;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
 
   group = xkey_file_lookup_group (key_file, group_name);
 
@@ -1727,7 +1727,7 @@ xkey_file_get_keys (xkey_file_t     *key_file,
 xchar_t *
 xkey_file_get_start_group (xkey_file_t *key_file)
 {
-  g_return_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
 
   if (key_file->start_group)
     return xstrdup (key_file->start_group->name);
@@ -1756,15 +1756,15 @@ xkey_file_get_groups (xkey_file_t *key_file,
   xchar_t **groups;
   xsize_t i, num_groups;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
 
   num_groups = xlist_length (key_file->groups);
 
-  g_return_val_if_fail (num_groups > 0, NULL);
+  xreturn_val_if_fail (num_groups > 0, NULL);
 
   group_node = xlist_last (key_file->groups);
 
-  g_return_val_if_fail (((GKeyFileGroup *) group_node->data)->name == NULL, NULL);
+  xreturn_val_if_fail (((GKeyFileGroup *) group_node->data)->name == NULL, NULL);
 
   /* Only need num_groups instead of num_groups + 1
    * because the first group of the file (last in the
@@ -1837,9 +1837,9 @@ xkey_file_get_value (xkey_file_t     *key_file,
   GKeyFileKeyValuePair *pair;
   xchar_t *value = NULL;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   group = xkey_file_lookup_group (key_file, group_name);
 
@@ -1945,9 +1945,9 @@ xkey_file_get_string (xkey_file_t     *key_file,
   xchar_t *value, *strinxvalue;
   xerror_t *key_file_error;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   key_file_error = NULL;
 
@@ -2060,9 +2060,9 @@ xkey_file_get_string_list (xkey_file_t     *key_file,
   xint_t i, len;
   xslist_t *p, *pieces = NULL;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   if (length)
     *length = 0;
@@ -2242,9 +2242,9 @@ xkey_file_get_locale_string (xkey_file_t     *key_file,
   xboolean_t free_languages = FALSE;
   xint_t i;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   candidate_key = NULL;
   translated_value = NULL;
@@ -2324,9 +2324,9 @@ xkey_file_get_locale_for_key (xkey_file_t    *key_file,
   xchar_t *result = NULL;
   xsize_t i;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   if (locale != NULL)
     {
@@ -2399,9 +2399,9 @@ xkey_file_get_locale_string_list (xkey_file_t     *key_file,
   char list_separator[2];
   xsize_t len;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   key_file_error = NULL;
 
@@ -2515,9 +2515,9 @@ xkey_file_get_boolean (xkey_file_t     *key_file,
   xchar_t *value;
   xboolean_t bool_value;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (group_name != NULL, FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (group_name != NULL, FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   value = xkey_file_get_value (key_file, group_name, key, &key_file_error);
 
@@ -2612,9 +2612,9 @@ xkey_file_get_boolean_list (xkey_file_t     *key_file,
   xboolean_t *bool_values;
   xsize_t i, num_bools;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   if (length)
     *length = 0;
@@ -2728,9 +2728,9 @@ xkey_file_get_integer (xkey_file_t     *key_file,
   xchar_t *value;
   xint_t int_value;
 
-  g_return_val_if_fail (key_file != NULL, -1);
-  g_return_val_if_fail (group_name != NULL, -1);
-  g_return_val_if_fail (key != NULL, -1);
+  xreturn_val_if_fail (key_file != NULL, -1);
+  xreturn_val_if_fail (group_name != NULL, -1);
+  xreturn_val_if_fail (key != NULL, -1);
 
   key_file_error = NULL;
 
@@ -2818,9 +2818,9 @@ xkey_file_get_int64 (xkey_file_t     *key_file,
   xchar_t *s, *end;
   sint64_t v;
 
-  g_return_val_if_fail (key_file != NULL, -1);
-  g_return_val_if_fail (group_name != NULL, -1);
-  g_return_val_if_fail (key != NULL, -1);
+  xreturn_val_if_fail (key_file != NULL, -1);
+  xreturn_val_if_fail (group_name != NULL, -1);
+  xreturn_val_if_fail (key != NULL, -1);
 
   s = xkey_file_get_value (key_file, group_name, key, error);
 
@@ -2895,9 +2895,9 @@ xkey_file_get_uint64 (xkey_file_t     *key_file,
   xchar_t *s, *end;
   xuint64_t v;
 
-  g_return_val_if_fail (key_file != NULL, -1);
-  g_return_val_if_fail (group_name != NULL, -1);
-  g_return_val_if_fail (key != NULL, -1);
+  xreturn_val_if_fail (key_file != NULL, -1);
+  xreturn_val_if_fail (group_name != NULL, -1);
+  xreturn_val_if_fail (key != NULL, -1);
 
   s = xkey_file_get_value (key_file, group_name, key, error);
 
@@ -2983,9 +2983,9 @@ xkey_file_get_integer_list (xkey_file_t     *key_file,
   xint_t *int_values;
   xsize_t i, num_ints;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   if (length)
     *length = 0;
@@ -3097,9 +3097,9 @@ xkey_file_get_double  (xkey_file_t     *key_file,
   xchar_t *value;
   xdouble_t double_value;
 
-  g_return_val_if_fail (key_file != NULL, -1);
-  g_return_val_if_fail (group_name != NULL, -1);
-  g_return_val_if_fail (key != NULL, -1);
+  xreturn_val_if_fail (key_file != NULL, -1);
+  xreturn_val_if_fail (group_name != NULL, -1);
+  xreturn_val_if_fail (key != NULL, -1);
 
   key_file_error = NULL;
 
@@ -3196,9 +3196,9 @@ xkey_file_get_double_list  (xkey_file_t     *key_file,
   xdouble_t *double_values;
   xsize_t i, num_doubles;
 
-  g_return_val_if_fail (key_file != NULL, NULL);
-  g_return_val_if_fail (group_name != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (group_name != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   if (length)
     *length = 0;
@@ -3351,7 +3351,7 @@ xkey_file_set_group_comment (xkey_file_t     *key_file,
 {
   GKeyFileGroup *group;
 
-  g_return_val_if_fail (group_name != NULL && xkey_file_is_group_name (group_name), FALSE);
+  xreturn_val_if_fail (group_name != NULL && xkey_file_is_group_name (group_name), FALSE);
 
   group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
@@ -3448,7 +3448,7 @@ xkey_file_set_comment (xkey_file_t     *key_file,
                         const xchar_t  *comment,
                         xerror_t      **error)
 {
-  g_return_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
 
   if (group_name != NULL && key != NULL)
     {
@@ -3481,7 +3481,7 @@ xkey_file_get_key_comment (xkey_file_t     *key_file,
   xstring_t *string;
   xchar_t *comment;
 
-  g_return_val_if_fail (group_name != NULL && xkey_file_is_group_name (group_name), NULL);
+  xreturn_val_if_fail (group_name != NULL && xkey_file_is_group_name (group_name), NULL);
 
   group = xkey_file_lookup_group (key_file, group_name);
   if (!group)
@@ -3679,7 +3679,7 @@ xkey_file_get_comment (xkey_file_t     *key_file,
                         const xchar_t  *key,
                         xerror_t      **error)
 {
-  g_return_val_if_fail (key_file != NULL, NULL);
+  xreturn_val_if_fail (key_file != NULL, NULL);
 
   if (group_name != NULL && key != NULL)
     return xkey_file_get_key_comment (key_file, group_name, key, error);
@@ -3712,7 +3712,7 @@ xkey_file_remove_comment (xkey_file_t     *key_file,
                            const xchar_t  *key,
                            xerror_t      **error)
 {
-  g_return_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
 
   if (group_name != NULL && key != NULL)
     return xkey_file_set_key_comment (key_file, group_name, key, NULL, error);
@@ -3737,8 +3737,8 @@ xboolean_t
 xkey_file_has_group (xkey_file_t    *key_file,
 		      const xchar_t *group_name)
 {
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (group_name != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (group_name != NULL, FALSE);
 
   return xkey_file_lookup_group (key_file, group_name) != NULL;
 }
@@ -3756,9 +3756,9 @@ xkey_file_has_key_full (xkey_file_t     *key_file,
   GKeyFileKeyValuePair *pair;
   GKeyFileGroup *group;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (group_name != NULL, FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (group_name != NULL, FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   group = xkey_file_lookup_group (key_file, group_name);
 
@@ -3902,7 +3902,7 @@ xkey_file_remove_group_node (xkey_file_t *key_file,
 
   if (group->name)
     {
-      g_assert (key_file->group_hash);
+      xassert (key_file->group_hash);
       xhash_table_remove (key_file->group_hash, group->name);
     }
 
@@ -3992,8 +3992,8 @@ xkey_file_remove_group (xkey_file_t     *key_file,
 {
   xlist_t *group_node;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (group_name != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (group_name != NULL, FALSE);
 
   group_node = xkey_file_lookup_group_node (key_file, group_name);
 
@@ -4057,9 +4057,9 @@ xkey_file_remove_key (xkey_file_t     *key_file,
   GKeyFileGroup *group;
   GKeyFileKeyValuePair *pair;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (group_name != NULL, FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (group_name != NULL, FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   pair = NULL;
 
@@ -4156,7 +4156,7 @@ xkey_file_is_group_name (const xchar_t *name)
 {
   const xchar_t *p, *q;
 
-  g_assert (name != NULL);
+  xassert (name != NULL);
 
   p = q = name;
   while (*q && *q != ']' && *q != '[' && !g_ascii_iscntrl (*q))
@@ -4174,7 +4174,7 @@ xkey_file_is_key_name (const xchar_t *name,
 {
   const xchar_t *p, *q, *end;
 
-  g_assert (name != NULL);
+  xassert (name != NULL);
 
   p = q = name;
   end = name + len;
@@ -4672,12 +4672,12 @@ xkey_file_save_to_file (xkey_file_t     *key_file,
   xboolean_t success;
   xsize_t length;
 
-  g_return_val_if_fail (key_file != NULL, FALSE);
-  g_return_val_if_fail (filename != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (key_file != NULL, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   contents = xkey_file_to_data (key_file, &length, NULL);
-  g_assert (contents != NULL);
+  xassert (contents != NULL);
 
   success = xfile_set_contents (filename, contents, length, error);
   g_free (contents);

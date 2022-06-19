@@ -1430,10 +1430,10 @@ desktop_file_dir_init (desktop_file_dir_t *dir)
 {
   const xchar_t *watch_dir;
 
-  g_assert (!dir->is_setup);
+  xassert (!dir->is_setup);
 
-  g_assert (!dir->alternatively_watching);
-  g_assert (!dir->monitor);
+  xassert (!dir->alternatively_watching);
+  xassert (!dir->monitor);
 
   dir->alternatively_watching = desktop_file_dir_get_alternative_dir (dir);
   watch_dir = dir->alternatively_watching ? dir->alternatively_watching : dir->path;
@@ -1676,7 +1676,7 @@ xdesktop_app_info_finalize (xobject_t *object)
   g_free (info->app_id);
   xstrfreev (info->actions);
 
-  G_OBJECT_CLASS (xdesktop_app_info_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdesktop_app_info_parent_class)->finalize (object);
 }
 
 static void
@@ -1721,21 +1721,21 @@ xdesktop_app_info_get_property (xobject_t    *object,
 static void
 xdesktop_app_info_class_init (GDesktopAppInfoClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xdesktop_app_info_get_property;
-  gobject_class->set_property = xdesktop_app_info_set_property;
-  gobject_class->finalize = xdesktop_app_info_finalize;
+  xobject_class->get_property = xdesktop_app_info_get_property;
+  xobject_class->set_property = xdesktop_app_info_set_property;
+  xobject_class->finalize = xdesktop_app_info_finalize;
 
   /**
    * xdesktop_app_info_t:filename:
    *
    * The origin filename of this #xdesktop_app_info_t
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_FILENAME,
-                                   g_param_spec_string ("filename", "Filename", "", NULL,
-                                                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+                                   xparam_spec_string ("filename", "Filename", "", NULL,
+                                                        XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY));
 }
 
 static void
@@ -1784,7 +1784,7 @@ xdesktop_app_info_get_desktop_id_for_filename (xdesktop_app_info_t *self)
   xuint_t i;
   xchar_t *desktop_id = NULL;
 
-  g_return_val_if_fail (self->filename != NULL, NULL);
+  xreturn_val_if_fail (self->filename != NULL, NULL);
 
   for (i = 0; i < desktop_file_dirs->len; i++)
     {
@@ -1883,7 +1883,7 @@ xdesktop_app_info_load_from_keyfile (xdesktop_app_info_t *info,
 
           /* Since @exec is not an empty string, there must be at least one
            * argument, so dereferencing argv[0] should return non-NULL. */
-          g_assert (argc > 0);
+          xassert (argc > 0);
           t = g_find_program_in_path (argv[0]);
           xstrfreev (argv);
 
@@ -1994,7 +1994,7 @@ xdesktop_app_info_load_file (xdesktop_app_info_t *self)
   xkey_file_t *key_file;
   xboolean_t retval = FALSE;
 
-  g_return_val_if_fail (self->filename != NULL, FALSE);
+  xreturn_val_if_fail (self->filename != NULL, FALSE);
 
   key_file = xkey_file_new ();
 
@@ -2348,7 +2348,7 @@ xdesktop_app_info_get_show_in (xdesktop_app_info_t *info,
   const xchar_t * const *envs;
   xint_t i;
 
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), FALSE);
 
   if (desktop_env)
     envs = specified_envs;
@@ -2430,7 +2430,7 @@ expand_macro_uri (char macro, const char *uri, xboolean_t force_file_uri, char f
 {
   char *expanded = NULL;
 
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   if (!force_file_uri ||
       /* Pass URI if it contains an anchor */
@@ -2630,8 +2630,8 @@ prepend_terminal_to_vector (int    *argc,
   char *check;
   char **the_argv;
 
-  g_return_val_if_fail (argc != NULL, FALSE);
-  g_return_val_if_fail (argv != NULL, FALSE);
+  xreturn_val_if_fail (argc != NULL, FALSE);
+  xreturn_val_if_fail (argv != NULL, FALSE);
 
   /* sanity */
   if(*argv == NULL)
@@ -2848,7 +2848,7 @@ xdesktop_app_info_launch_uris_with_spawn (xdesktop_app_info_t            *info,
   char **argv, **envp;
   int argc;
 
-  g_return_val_if_fail (info != NULL, FALSE);
+  xreturn_val_if_fail (info != NULL, FALSE);
 
   argv = NULL;
 
@@ -3175,7 +3175,7 @@ xdesktop_app_info_launch_uris_with_dbus (xdesktop_app_info_t    *info,
   xlist_t *ruris = uris;
   char *app_id = NULL;
 
-  g_return_val_if_fail (info != NULL, FALSE);
+  xreturn_val_if_fail (info != NULL, FALSE);
 
 #ifdef G_OS_UNIX
   app_id = xdesktop_app_info_get_string (info, "X-Flatpak");
@@ -3384,7 +3384,7 @@ xdesktop_app_info_launch_uris_finish (xapp_info_t     *appinfo,
                                        xasync_result_t *result,
                                        xerror_t      **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, appinfo), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, appinfo), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -3651,7 +3651,7 @@ update_mimeapps_list (const char  *desktop_id,
   char **content_types;
 
   /* Don't add both at start and end */
-  g_assert (!((flags & UPDATE_MIME_SET_DEFAULT) &&
+  xassert (!((flags & UPDATE_MIME_SET_DEFAULT) &&
               (flags & UPDATE_MIME_SET_NON_DEFAULT)));
 
   dirname = ensure_dir (CONF_DIR, error);
@@ -4235,7 +4235,7 @@ xapp_info_create_from_commandline (const char           *commandline,
   char *basename;
   xdesktop_app_info_t *info;
 
-  g_return_val_if_fail (commandline, NULL);
+  xreturn_val_if_fail (commandline, NULL);
 
   info = xobject_new (XTYPE_DESKTOP_APP_INFO, NULL);
 
@@ -4401,7 +4401,7 @@ xapp_info_get_recommended_for_type (const xchar_t *content_type)
   xlist_t *infos;
   xint_t i;
 
-  g_return_val_if_fail (content_type != NULL, NULL);
+  xreturn_val_if_fail (content_type != NULL, NULL);
 
   desktop_ids = xdesktop_app_info_get_desktop_ids_for_content_type (content_type, FALSE);
 
@@ -4441,7 +4441,7 @@ xapp_info_get_fallback_for_type (const xchar_t *content_type)
   xlist_t *infos;
   xint_t i;
 
-  g_return_val_if_fail (content_type != NULL, NULL);
+  xreturn_val_if_fail (content_type != NULL, NULL);
 
   recommended_ids = xdesktop_app_info_get_desktop_ids_for_content_type (content_type, FALSE);
   all_ids = xdesktop_app_info_get_desktop_ids_for_content_type (content_type, TRUE);
@@ -4491,7 +4491,7 @@ xapp_info_get_all_for_type (const char *content_type)
   xlist_t *infos;
   xint_t i;
 
-  g_return_val_if_fail (content_type != NULL, NULL);
+  xreturn_val_if_fail (content_type != NULL, NULL);
 
   desktop_ids = xdesktop_app_info_get_desktop_ids_for_content_type (content_type, TRUE);
 
@@ -4551,7 +4551,7 @@ xapp_info_get_default_for_type (const char *content_type,
   xchar_t **types;
   xuint_t i, j, k;
 
-  g_return_val_if_fail (content_type != NULL, NULL);
+  xreturn_val_if_fail (content_type != NULL, NULL);
 
   types = get_list_of_mimetypes (content_type, TRUE);
 
@@ -4872,7 +4872,7 @@ xdesktop_app_info_lookup_get_default_for_uri_scheme (GDesktopAppInfoLookup *look
 {
   GDesktopAppInfoLookupIface *iface;
 
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO_LOOKUP (lookup), NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO_LOOKUP (lookup), NULL);
 
   iface = G_DESKTOP_APP_INFO_LOOKUP_GET_IFACE (lookup);
 
@@ -4899,7 +4899,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
 const char *
 xdesktop_app_info_get_startup_wm_class (xdesktop_app_info_t *info)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
 
   return info->startup_wm_class;
 }
@@ -4922,7 +4922,7 @@ char *
 xdesktop_app_info_get_string (xdesktop_app_info_t *info,
                                const char      *key)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
 
   return xkey_file_get_string (info->keyfile,
                                 G_KEY_FILE_DESKTOP_GROUP, key, NULL);
@@ -4947,8 +4947,8 @@ char *
 xdesktop_app_info_get_locale_string (xdesktop_app_info_t *info,
                                       const char      *key)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
-  g_return_val_if_fail (key != NULL && *key != '\0', NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
+  xreturn_val_if_fail (key != NULL && *key != '\0', NULL);
 
   return xkey_file_get_locale_string (info->keyfile,
                                        G_KEY_FILE_DESKTOP_GROUP,
@@ -4973,7 +4973,7 @@ xboolean_t
 xdesktop_app_info_get_boolean (xdesktop_app_info_t *info,
                                 const char      *key)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), FALSE);
 
   return xkey_file_get_boolean (info->keyfile,
                                  G_KEY_FILE_DESKTOP_GROUP, key, NULL);
@@ -5000,7 +5000,7 @@ xdesktop_app_info_get_string_list (xdesktop_app_info_t *info,
                                     const char      *key,
                                     xsize_t           *length)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
 
   return xkey_file_get_string_list (info->keyfile,
                                      G_KEY_FILE_DESKTOP_GROUP, key, length, NULL);
@@ -5022,7 +5022,7 @@ xboolean_t
 xdesktop_app_info_has_key (xdesktop_app_info_t *info,
                             const char      *key)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), FALSE);
 
   return xkey_file_has_key (info->keyfile,
                              G_KEY_FILE_DESKTOP_GROUP, key, NULL);
@@ -5047,7 +5047,7 @@ xdesktop_app_info_has_key (xdesktop_app_info_t *info,
 const xchar_t * const *
 xdesktop_app_info_list_actions (xdesktop_app_info_t *info)
 {
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
 
   return (const xchar_t **) info->actions;
 }
@@ -5088,9 +5088,9 @@ xdesktop_app_info_get_action_name (xdesktop_app_info_t *info,
   xchar_t *group_name;
   xchar_t *result;
 
-  g_return_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
-  g_return_val_if_fail (action_name != NULL, NULL);
-  g_return_val_if_fail (app_info_has_action (info, action_name), NULL);
+  xreturn_val_if_fail (X_IS_DESKTOP_APP_INFO (info), NULL);
+  xreturn_val_if_fail (action_name != NULL, NULL);
+  xreturn_val_if_fail (app_info_has_action (info, action_name), NULL);
 
   group_name = xstrdup_printf ("Desktop Action %s", action_name);
   result = xkey_file_get_locale_string (info->keyfile, group_name, "Name", NULL, NULL);

@@ -41,16 +41,16 @@
  **/
 
 
-typedef GConverterIface GConverterInterface;
+typedef xconverter_iface_t GConverterInterface;
 G_DEFINE_INTERFACE (xconverter, g_converter, XTYPE_OBJECT)
 
 static void
-g_converter_default_init (GConverterInterface *iface)
+xconverter_default_init (GConverterInterface *iface)
 {
 }
 
 /**
- * g_converter_convert:
+ * xconverter_convert:
  * @converter: a #xconverter_t.
  * @inbuf: (array length=inbuf_size) (element-type xuint8_t): the buffer
  *         containing the data to convert.
@@ -58,7 +58,7 @@ g_converter_default_init (GConverterInterface *iface)
  * @outbuf: (element-type xuint8_t) (array length=outbuf_size): a buffer to write
  *    converted data in.
  * @outbuf_size: the number of bytes in @outbuf, must be at least one
- * @flags: a #GConverterFlags controlling the conversion details
+ * @flags: a #xconverter_flags_t controlling the conversion details
  * @bytes_read: (out): will be set to the number of bytes read from @inbuf on success
  * @bytes_written: (out): will be set to the number of bytes written to @outbuf on success
  * @error: location to store the error occurring, or %NULL to ignore
@@ -78,22 +78,22 @@ g_converter_default_init (GConverterInterface *iface)
  *
  * A full conversion loop involves calling this method repeatedly, each time
  * giving it new input and space output space. When there is no more input
- * data after the data in @inbuf, the flag %G_CONVERTER_INPUT_AT_END must be set.
- * The loop will be (unless some error happens) returning %G_CONVERTER_CONVERTED
+ * data after the data in @inbuf, the flag %XCONVERTER_INPUT_AT_END must be set.
+ * The loop will be (unless some error happens) returning %XCONVERTER_CONVERTED
  * each time until all data is consumed and all output is produced, then
- * %G_CONVERTER_FINISHED is returned instead. Note, that %G_CONVERTER_FINISHED
- * may be returned even if %G_CONVERTER_INPUT_AT_END is not set, for instance
+ * %XCONVERTER_FINISHED is returned instead. Note, that %XCONVERTER_FINISHED
+ * may be returned even if %XCONVERTER_INPUT_AT_END is not set, for instance
  * in a decompression converter where the end of data is detectable from the
  * data (and there might even be other data after the end of the compressed data).
  *
  * When some data has successfully been converted @bytes_read and is set to
  * the number of bytes read from @inbuf, and @bytes_written is set to indicate
  * how many bytes was written to @outbuf. If there are more data to output
- * or consume (i.e. unless the %G_CONVERTER_INPUT_AT_END is specified) then
- * %G_CONVERTER_CONVERTED is returned, and if no more data is to be output
- * then %G_CONVERTER_FINISHED is returned.
+ * or consume (i.e. unless the %XCONVERTER_INPUT_AT_END is specified) then
+ * %XCONVERTER_CONVERTED is returned, and if no more data is to be output
+ * then %XCONVERTER_FINISHED is returned.
  *
- * On error %G_CONVERTER_ERROR is returned and @error is set accordingly.
+ * On error %XCONVERTER_ERROR is returned and @error is set accordingly.
  * Some errors need special handling:
  *
  * %G_IO_ERROR_NO_SPACE is returned if there is not enough space
@@ -102,7 +102,7 @@ g_converter_default_init (GConverterInterface *iface)
  *
  * %G_IO_ERROR_PARTIAL_INPUT is returned if there is not enough
  * input to fully determine what the conversion should produce,
- * and the %G_CONVERTER_INPUT_AT_END flag is not set. This happens for
+ * and the %XCONVERTER_INPUT_AT_END flag is not set. This happens for
  * example with an incomplete multibyte sequence when converting text,
  * or when a regexp matches up to the end of the input (and may match
  * further input). It may also happen when @inbuf_size is zero and
@@ -111,23 +111,23 @@ g_converter_default_init (GConverterInterface *iface)
  * When this happens the application should read more input and then
  * call the function again. If further input shows that there is no
  * more data call the function again with the same data but with
- * the %G_CONVERTER_INPUT_AT_END flag set. This may cause the conversion
+ * the %XCONVERTER_INPUT_AT_END flag set. This may cause the conversion
  * to finish as e.g. in the regexp match case (or, to fail again with
  * %G_IO_ERROR_PARTIAL_INPUT in e.g. a charset conversion where the
  * input is actually partial).
  *
- * After g_converter_convert() has returned %G_CONVERTER_FINISHED the
+ * After xconverter_convert() has returned %XCONVERTER_FINISHED the
  * converter object is in an invalid state where its not allowed
- * to call g_converter_convert() anymore. At this time you can only
- * free the object or call g_converter_reset() to reset it to the
+ * to call xconverter_convert() anymore. At this time you can only
+ * free the object or call xconverter_reset() to reset it to the
  * initial state.
  *
- * If the flag %G_CONVERTER_FLUSH is set then conversion is modified
+ * If the flag %XCONVERTER_FLUSH is set then conversion is modified
  * to try to write out all internal state to the output. The application
  * has to call the function multiple times with the flag set, and when
  * the available input has been consumed and all internal state has
- * been produced then %G_CONVERTER_FLUSHED (or %G_CONVERTER_FINISHED if
- * really at the end) is returned instead of %G_CONVERTER_CONVERTED.
+ * been produced then %XCONVERTER_FLUSHED (or %XCONVERTER_FINISHED if
+ * really at the end) is returned instead of %XCONVERTER_CONVERTED.
  * This is somewhat similar to what happens at the end of the input stream,
  * but done in the middle of the data.
  *
@@ -146,30 +146,30 @@ g_converter_default_init (GConverterInterface *iface)
  * to produce as much output as possible and then return an error
  * (typically %G_IO_ERROR_PARTIAL_INPUT).
  *
- * Returns: a #GConverterResult, %G_CONVERTER_ERROR on error.
+ * Returns: a #xconverter_result_t, %XCONVERTER_ERROR on error.
  *
  * Since: 2.24
  **/
-GConverterResult
-g_converter_convert (xconverter_t *converter,
+xconverter_result_t
+xconverter_convert (xconverter_t *converter,
 		     const void *inbuf,
 		     xsize_t       inbuf_size,
 		     void       *outbuf,
 		     xsize_t       outbuf_size,
-		     GConverterFlags flags,
+		     xconverter_flags_t flags,
 		     xsize_t      *bytes_read,
 		     xsize_t      *bytes_written,
 		     xerror_t    **error)
 {
-  GConverterIface *iface;
+  xconverter_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_CONVERTER (converter), G_CONVERTER_ERROR);
-  g_return_val_if_fail (outbuf_size > 0, G_CONVERTER_ERROR);
+  xreturn_val_if_fail (X_IS_CONVERTER (converter), XCONVERTER_ERROR);
+  xreturn_val_if_fail (outbuf_size > 0, XCONVERTER_ERROR);
 
   *bytes_read = 0;
   *bytes_written = 0;
 
-  iface = G_CONVERTER_GET_IFACE (converter);
+  iface = XCONVERTER_GET_IFACE (converter);
 
   return (* iface->convert) (converter,
 			     inbuf, inbuf_size,
@@ -179,7 +179,7 @@ g_converter_convert (xconverter_t *converter,
 }
 
 /**
- * g_converter_reset:
+ * xconverter_reset:
  * @converter: a #xconverter_t.
  *
  * Resets all internal state in the converter, making it behave
@@ -189,13 +189,13 @@ g_converter_convert (xconverter_t *converter,
  * Since: 2.24
  **/
 void
-g_converter_reset (xconverter_t *converter)
+xconverter_reset (xconverter_t *converter)
 {
-  GConverterIface *iface;
+  xconverter_iface_t *iface;
 
   g_return_if_fail (X_IS_CONVERTER (converter));
 
-  iface = G_CONVERTER_GET_IFACE (converter);
+  iface = XCONVERTER_GET_IFACE (converter);
 
   (* iface->reset) (converter);
 }

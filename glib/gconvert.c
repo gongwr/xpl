@@ -406,7 +406,7 @@ g_convert_with_iconv (const xchar_t *str,
   xboolean_t done = FALSE;
   xboolean_t reset = FALSE;
 
-  g_return_val_if_fail (converter != (GIConv) -1, NULL);
+  xreturn_val_if_fail (converter != (GIConv) -1, NULL);
 
   if (len < 0)
     len = strlen (str);
@@ -565,9 +565,9 @@ g_convert (const xchar_t *str,
   xchar_t *res;
   GIConv cd;
 
-  g_return_val_if_fail (str != NULL, NULL);
-  g_return_val_if_fail (to_codeset != NULL, NULL);
-  g_return_val_if_fail (from_codeset != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (to_codeset != NULL, NULL);
+  xreturn_val_if_fail (from_codeset != NULL, NULL);
 
   cd = open_converter (to_codeset, from_codeset, error);
 
@@ -666,9 +666,9 @@ g_convert_with_fallback (const xchar_t *str,
 
   xerror_t *local_error = NULL;
 
-  g_return_val_if_fail (str != NULL, NULL);
-  g_return_val_if_fail (to_codeset != NULL, NULL);
-  g_return_val_if_fail (from_codeset != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (to_codeset != NULL, NULL);
+  xreturn_val_if_fail (from_codeset != NULL, NULL);
 
   if (len < 0)
     len = strlen (str);
@@ -1167,7 +1167,7 @@ filename_charset_cache_free (xpointer_t data)
 xboolean_t
 g_get_filename_charsets (const xchar_t ***filename_charsets)
 {
-  static GPrivate cache_private = G_PRIVATE_INIT (filename_charset_cache_free);
+  static xprivate_t cache_private = G_PRIVATE_INIT (filename_charset_cache_free);
   GFilenameCharsetCache *cache = g_private_get (&cache_private);
   const xchar_t *charset;
 
@@ -1313,7 +1313,7 @@ xfilename_to_utf8 (const xchar_t *opsysstring,
 {
   const xchar_t *charset;
 
-  g_return_val_if_fail (opsysstring != NULL, NULL);
+  xreturn_val_if_fail (opsysstring != NULL, NULL);
 
   if (get_filename_charset (&charset))
     return strdup_len (opsysstring, len, bytes_read, bytes_written, error);
@@ -1437,7 +1437,7 @@ g_escape_uri_string (const xchar_t *string,
   xint_t unacceptable;
   UnsafeCharacterSet use_mask;
 
-  g_return_val_if_fail (mask == UNSAFE_ALL
+  xreturn_val_if_fail (mask == UNSAFE_ALL
 			|| mask == UNSAFE_ALLOW_PLUS
 			|| mask == UNSAFE_PATH
 			|| mask == UNSAFE_HOST
@@ -1589,7 +1589,7 @@ g_unescape_uri_string (const char *escaped,
       *out++ = c;
     }
 
-  g_assert (out - result <= len);
+  xassert (out - result <= len);
   *out = '\0';
 
   if (in != in_end)
@@ -1807,7 +1807,7 @@ xfilename_to_uri (const xchar_t *filename,
 {
   char *escaped_uri;
 
-  g_return_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
 
   if (!g_path_is_absolute (filename))
     {
@@ -1932,7 +1932,7 @@ xfilename_display_basename (const xchar_t *filename)
   char *basename;
   char *display_name;
 
-  g_return_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
 
   basename = g_path_get_basename (filename);
   display_name = xfilename_display_name (basename);

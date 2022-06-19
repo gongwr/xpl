@@ -501,7 +501,7 @@ _g_win32_call_rtl_version (OSVERSIONINFOEXW *info)
   static OSVERSIONINFOEXW result;
   static xsize_t inited = 0;
 
-  g_return_val_if_fail (info != NULL, FALSE);
+  xreturn_val_if_fail (info != NULL, FALSE);
 
   if (g_once_init_enter (&inited))
     {
@@ -511,10 +511,10 @@ _g_win32_call_rtl_version (OSVERSIONINFOEXW *info)
 
       fRtlGetVersion *RtlGetVersion;
       HMODULE hmodule = LoadLibraryW (L"ntdll.dll");
-      g_return_val_if_fail (hmodule != NULL, FALSE);
+      xreturn_val_if_fail (hmodule != NULL, FALSE);
 
       RtlGetVersion = (fRtlGetVersion *) GetProcAddress (hmodule, "RtlGetVersion");
-      g_return_val_if_fail (RtlGetVersion != NULL, FALSE);
+      xreturn_val_if_fail (RtlGetVersion != NULL, FALSE);
 #endif
 
       memset (&result, 0, sizeof (OSVERSIONINFOEXW));
@@ -569,12 +569,12 @@ g_win32_check_windows_version (const xint_t major,
   xboolean_t is_type_checked = FALSE;
 
   /* We Only Support Checking for XP or later */
-  g_return_val_if_fail (major >= 5 && (major <= 6 || major == 10), FALSE);
-  g_return_val_if_fail ((major >= 5 && minor >= 1) || major >= 6, FALSE);
+  xreturn_val_if_fail (major >= 5 && (major <= 6 || major == 10), FALSE);
+  xreturn_val_if_fail ((major >= 5 && minor >= 1) || major >= 6, FALSE);
 
   /* Check for Service Pack Version >= 0 */
-  g_return_val_if_fail (spver >= 0, FALSE);
-  g_return_val_if_fail (_g_win32_call_rtl_version (&osverinfo), FALSE);
+  xreturn_val_if_fail (spver >= 0, FALSE);
+  xreturn_val_if_fail (_g_win32_call_rtl_version (&osverinfo), FALSE);
 
   /* check the OS and Service Pack Versions */
   if (osverinfo.dwMajorVersion > (DWORD) major)
@@ -1391,7 +1391,7 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
   xchar_t *executable_path;
   xsize_t i;
 
-  g_return_val_if_fail (executable_name && *executable_name, NULL);
+  xreturn_val_if_fail (executable_name && *executable_name, NULL);
 
   module_path_len = GetModuleFileNameW (dll_handle, module_path, MAX_PATH + 1);
   /* The > MAX_PATH check prevents truncated module path usage */
@@ -1424,7 +1424,7 @@ g_win32_find_helper_executable_path (const xchar_t *executable_name, void *dll_h
            * one day someone tries to use this function on Linux or Mac.
            */
           executable_path = g_build_filename (base_searching_path, subdirs[i], executable_name, NULL);
-          g_assert (g_path_is_absolute (executable_path));
+          xassert (g_path_is_absolute (executable_path));
           if (xfile_test (executable_path, XFILE_TEST_IS_REGULAR))
             break;
 

@@ -104,7 +104,7 @@ xtype_module_dispose (xobject_t *object)
       xobject_ref (object);
     }
 
-  G_OBJECT_CLASS (parent_class)->dispose (object);
+  XOBJECT_CLASS (parent_class)->dispose (object);
 }
 
 static void
@@ -114,18 +114,18 @@ xtype_module_finalize (xobject_t *object)
 
   g_free (module->name);
 
-  G_OBJECT_CLASS (parent_class)->finalize (object);
+  XOBJECT_CLASS (parent_class)->finalize (object);
 }
 
 static void
 xtype_module_class_init (xtype_module_class_t *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  parent_class = G_OBJECT_CLASS (xtype_class_peek_parent (class));
+  parent_class = XOBJECT_CLASS (xtype_class_peek_parent (class));
 
-  gobject_class->dispose = xtype_module_dispose;
-  gobject_class->finalize = xtype_module_finalize;
+  xobject_class->dispose = xtype_module_dispose;
+  xobject_class->finalize = xtype_module_finalize;
 }
 
 static void
@@ -238,7 +238,7 @@ xtype_module_find_interface_info (xtype_module_t *module,
 xboolean_t
 xtype_module_use (xtype_module_t *module)
 {
-  g_return_val_if_fail (X_IS_TYPE_MODULE (module), FALSE);
+  xreturn_val_if_fail (X_IS_TYPE_MODULE (module), FALSE);
 
   module->use_count++;
   if (module->use_count == 1)
@@ -381,8 +381,8 @@ xtype_module_register_type (xtype_module_t     *module,
   ModuleTypeInfo *module_type_info = NULL;
   xtype_t type;
 
-  g_return_val_if_fail (type_name != NULL, 0);
-  g_return_val_if_fail (type_info != NULL, 0);
+  xreturn_val_if_fail (type_name != NULL, 0);
+  xreturn_val_if_fail (type_info != NULL, 0);
 
   if (module == NULL)
     {
@@ -499,7 +499,7 @@ xtype_module_add_interface (xtype_module_t          *module,
 
       module_interface_info = xtype_module_find_interface_info (module, instance_type, interface_type);
 
-      g_assert (module_interface_info);
+      xassert (module_interface_info);
     }
   else
     {
@@ -548,9 +548,9 @@ xtype_module_register_enum (xtype_module_t      *module,
 {
   xtype_info_t enum_type_info = { 0, };
 
-  g_return_val_if_fail (module == NULL || X_IS_TYPE_MODULE (module), 0);
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (const_static_values != NULL, 0);
+  xreturn_val_if_fail (module == NULL || X_IS_TYPE_MODULE (module), 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (const_static_values != NULL, 0);
 
   xenum_complete_type_info (XTYPE_ENUM,
                              &enum_type_info, const_static_values);
@@ -590,9 +590,9 @@ xtype_module_register_flags (xtype_module_t      *module,
 {
   xtype_info_t flags_type_info = { 0, };
 
-  g_return_val_if_fail (module == NULL || X_IS_TYPE_MODULE (module), 0);
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (const_static_values != NULL, 0);
+  xreturn_val_if_fail (module == NULL || X_IS_TYPE_MODULE (module), 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (const_static_values != NULL, 0);
 
   xflags_complete_type_info (XTYPE_FLAGS,
                              &flags_type_info, const_static_values);

@@ -124,10 +124,10 @@ main (int   argc,
                     G_CALLBACK (test_object_signal_callback2), NULL);
   xsignal_emit_by_name (object, "test-signal");
 
-  g_assert (callback1_ran);
-  g_assert (!callback2_ran);
-  g_assert (!callback3_ran);
-  g_assert (default_handler_ran);
+  xassert (callback1_ran);
+  xassert (!callback2_ran);
+  xassert (!callback3_ran);
+  xassert (default_handler_ran);
 
   xobject_unref (object);
   return 0;

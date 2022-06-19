@@ -20,8 +20,8 @@
  * Author: Tor Lillqvist <tml@novell.com>
  */
 
-#ifndef __G_WINHTTP_VFS_H__
-#define __G_WINHTTP_VFS_H__
+#ifndef __XWINHTTP_VFS_H__
+#define __XWINHTTP_VFS_H__
 
 #include <gio/giotypes.h>
 #include <gio/gvfs.h>
@@ -33,11 +33,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_WINHTTP_VFS                      (_g_winhttp_vfs_get_type ())
-#define G_WINHTTP_VFS(obj)                      (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_WINHTTP_VFS, GWinHttpVfs))
-#define G_WINHTTP_VFS_CLASS(klass)              (XTYPE_CHECK_CLASS_CAST ((klass), XTYPE_WINHTTP_VFS, GWinHttpVfsClass))
+#define XWINHTTP_VFS(obj)                      (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_WINHTTP_VFS, GWinHttpVfs))
+#define XWINHTTP_VFS_CLASS(klass)              (XTYPE_CHECK_CLASS_CAST ((klass), XTYPE_WINHTTP_VFS, GWinHttpVfsClass))
 #define X_IS_WINHTTP_VFS(obj)                   (XTYPE_CHECK_INSTANCE_TYPE ((obj), XTYPE_WINHTTP_VFS))
 #define X_IS_WINHTTP_VFS_CLASS(klass)           (XTYPE_CHECK_CLASS_TYPE ((klass), XTYPE_WINHTTP_VFS))
-#define G_WINHTTP_VFS_GET_CLASS(obj)            (XTYPE_INSTANCE_GET_CLASS ((obj), XTYPE_WINHTTP_VFS, GWinHttpVfsClass))
+#define XWINHTTP_VFS_GET_CLASS(obj)            (XTYPE_INSTANCE_GET_CLASS ((obj), XTYPE_WINHTTP_VFS, GWinHttpVfsClass))
 
 typedef struct _GWinHttpVfs       GWinHttpVfs;
 typedef struct _GWinHttpDllFuncs  GWinHttpDllFuncs;
@@ -103,4 +103,4 @@ xboolean_t _g_winhttp_query_header (GWinHttpVfs *vfs,
 
 G_END_DECLS
 
-#endif /* __G_WINHTTP_VFS_H__ */
+#endif /* __XWINHTTP_VFS_H__ */

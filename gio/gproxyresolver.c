@@ -113,7 +113,7 @@ xproxy_resolver_is_supported (xproxy_resolver_t *resolver)
 {
   xproxy_resolver_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_PROXY_RESOLVER (resolver), FALSE);
+  xreturn_val_if_fail (X_IS_PROXY_RESOLVER (resolver), FALSE);
 
   iface = G_PROXY_RESOLVER_GET_IFACE (resolver);
 
@@ -157,8 +157,8 @@ xproxy_resolver_lookup (xproxy_resolver_t  *resolver,
 {
   xproxy_resolver_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_PROXY_RESOLVER (resolver), NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (X_IS_PROXY_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   if (!xuri_is_valid (uri, XURI_FLAGS_NONE, NULL))
     {
@@ -236,7 +236,7 @@ xproxy_resolver_lookup_finish (xproxy_resolver_t     *resolver,
 {
   xproxy_resolver_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_PROXY_RESOLVER (resolver), NULL);
+  xreturn_val_if_fail (X_IS_PROXY_RESOLVER (resolver), NULL);
 
   iface = G_PROXY_RESOLVER_GET_IFACE (resolver);
 

@@ -111,43 +111,43 @@ g_network_address_finalize (xobject_t *object)
   g_free (addr->priv->scheme);
   xlist_free_full (addr->priv->cached_sockaddrs, xobject_unref);
 
-  G_OBJECT_CLASS (g_network_address_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_network_address_parent_class)->finalize (object);
 }
 
 static void
 g_network_address_class_init (GNetworkAddressClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = g_network_address_set_property;
-  gobject_class->get_property = g_network_address_get_property;
-  gobject_class->finalize = g_network_address_finalize;
+  xobject_class->set_property = g_network_address_set_property;
+  xobject_class->get_property = g_network_address_get_property;
+  xobject_class->finalize = g_network_address_finalize;
 
-  xobject_class_install_property (gobject_class, PROP_HOSTNAME,
-                                   g_param_spec_string ("hostname",
+  xobject_class_install_property (xobject_class, PROP_HOSTNAME,
+                                   xparam_spec_string ("hostname",
                                                         P_("Hostname"),
                                                         P_("Hostname to resolve"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_PORT,
-                                   g_param_spec_uint ("port",
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_PORT,
+                                   xparam_spec_uint ("port",
                                                       P_("Port"),
                                                       P_("Network port"),
                                                       0, 65535, 0,
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_STATIC_STRINGS));
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_SCHEME,
-                                   g_param_spec_string ("scheme",
+  xobject_class_install_property (xobject_class, PROP_SCHEME,
+                                   xparam_spec_string ("scheme",
                                                         P_("Scheme"),
                                                         P_("URI Scheme"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -260,7 +260,7 @@ g_network_address_set_cached_addresses (xnetwork_address_t *addr,
                                         xlist_t           *addresses,
                                         xuint64_t          resolver_serial)
 {
-  g_assert (addresses != NULL);
+  xassert (addresses != NULL);
 
   if (addr->priv->cached_sockaddrs)
     xlist_free_full (addr->priv->cached_sockaddrs, xobject_unref);
@@ -277,7 +277,7 @@ g_network_address_parse_sockaddr (xnetwork_address_t *addr)
 {
   xsocket_address_t *sockaddr;
 
-  g_assert (addr->priv->cached_sockaddrs == NULL);
+  xassert (addr->priv->cached_sockaddrs == NULL);
 
   sockaddr = g_inet_socket_address_new_from_string (addr->priv->hostname,
                                                     addr->priv->port);
@@ -400,7 +400,7 @@ g_network_address_parse (const xchar_t  *host_and_port,
   xuint16_t portnum;
   xchar_t *name;
 
-  g_return_val_if_fail (host_and_port != NULL, NULL);
+  xreturn_val_if_fail (host_and_port != NULL, NULL);
 
   port = NULL;
   if (host_and_port[0] == '[')
@@ -582,7 +582,7 @@ g_network_address_parse_uri (const xchar_t  *uri,
 const xchar_t *
 g_network_address_get_hostname (xnetwork_address_t *addr)
 {
-  g_return_val_if_fail (X_IS_NETWORK_ADDRESS (addr), NULL);
+  xreturn_val_if_fail (X_IS_NETWORK_ADDRESS (addr), NULL);
 
   return addr->priv->hostname;
 }
@@ -600,7 +600,7 @@ g_network_address_get_hostname (xnetwork_address_t *addr)
 xuint16_t
 g_network_address_get_port (xnetwork_address_t *addr)
 {
-  g_return_val_if_fail (X_IS_NETWORK_ADDRESS (addr), 0);
+  xreturn_val_if_fail (X_IS_NETWORK_ADDRESS (addr), 0);
 
   return addr->priv->port;
 }
@@ -618,7 +618,7 @@ g_network_address_get_port (xnetwork_address_t *addr)
 const xchar_t *
 g_network_address_get_scheme (xnetwork_address_t *addr)
 {
-  g_return_val_if_fail (X_IS_NETWORK_ADDRESS (addr), NULL);
+  xreturn_val_if_fail (X_IS_NETWORK_ADDRESS (addr), NULL);
 
   return addr->priv->scheme;
 }
@@ -647,12 +647,12 @@ typedef struct {
 } xnetwork_address_address_enumerator_t;
 
 typedef struct {
-  GSocketAddressEnumeratorClass parent_class;
+  xsocket_address_enumerator_class_t parent_class;
 
 } xnetwork_address_address_enumerator_class_t;
 
 static xtype_t xnetwork_address_address_enumerator_get_type (void);
-G_DEFINE_TYPE (xnetwork_address_address_enumerator_t, xnetwork_address_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
+XDEFINE_TYPE (xnetwork_address_address_enumerator, xnetwork_address_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
 
 static void
 xnetwork_address_address_enumerator_finalize (xobject_t *object)
@@ -672,7 +672,7 @@ xnetwork_address_address_enumerator_finalize (xobject_t *object)
   g_clear_pointer (&addr_enum->context, xmain_context_unref);
   xlist_free_full (addr_enum->addresses, xobject_unref);
 
-  G_OBJECT_CLASS (xnetwork_address_address_enumerator_parent_class)->finalize (object);
+  XOBJECT_CLASS (xnetwork_address_address_enumerator_parent_class)->finalize (object);
 }
 
 static inline xsocket_family_t
@@ -686,8 +686,8 @@ list_split_families (xlist_t  *list,
                      xlist_t **out_ipv4,
                      xlist_t **out_ipv6)
 {
-  g_assert (out_ipv4);
-  g_assert (out_ipv6);
+  xassert (out_ipv4);
+  xassert (out_ipv6);
 
   while (list)
     {
@@ -943,7 +943,7 @@ on_address_timeout (xpointer_t user_data)
   g_clear_pointer (&addr_enum->wait_source, xsource_unref);
   xobject_unref (addr_enum);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1033,7 +1033,7 @@ got_ipv4_addresses (xobject_t      *source_object,
    */
   if (addr_enum->last_error)
     {
-      g_assert (addr_enum->queued_task);
+      xassert (addr_enum->queued_task);
       g_clear_error (&addr_enum->last_error);
       complete_queued_task (addr_enum, g_steal_pointer (&addr_enum->queued_task),
                             g_steal_pointer (&error));
@@ -1092,7 +1092,7 @@ xnetwork_address_address_enumerator_next_async (xsocket_address_enumerator_t  *e
             {
               /* It does not make sense for this to be called multiple
                * times before the initial callback has been called */
-              g_assert (addr_enum->queued_task == NULL);
+              xassert (addr_enum->queued_task == NULL);
 
               addr_enum->state = RESOLVE_STATE_WAITING_ON_IPV4 | RESOLVE_STATE_WAITING_ON_IPV6;
               addr_enum->queued_task = g_steal_pointer (&task);
@@ -1133,7 +1133,7 @@ xnetwork_address_address_enumerator_next_finish (xsocket_address_enumerator_t  *
                                                   xasync_result_t              *result,
                                                   xerror_t                   **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -1147,8 +1147,8 @@ xnetwork_address_address_enumerator_init (xnetwork_address_address_enumerator_t 
 static void
 xnetwork_address_address_enumerator_class_init (xnetwork_address_address_enumerator_class_t *addrenum_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (addrenum_class);
-  GSocketAddressEnumeratorClass *enumerator_class =
+  xobject_class_t *object_class = XOBJECT_CLASS (addrenum_class);
+  xsocket_address_enumerator_class_t *enumerator_class =
     XSOCKET_ADDRESS_ENUMERATOR_CLASS (addrenum_class);
 
   enumerator_class->next = xnetwork_address_address_enumerator_next;

@@ -66,13 +66,13 @@ xdebug_controller_default_init (xdebug_controller_tInterface *iface)
    * Since: 2.72
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_boolean ("debug-enabled",
+                                       xparam_spec_boolean ("debug-enabled",
                                                              "Debug Enabled",
                                                              "Whether to expose debug output",
                                                              FALSE,
-                                                             G_PARAM_READWRITE |
-                                                             G_PARAM_STATIC_STRINGS |
-                                                             G_PARAM_EXPLICIT_NOTIFY));
+                                                             XPARAM_READWRITE |
+                                                             XPARAM_STATIC_STRINGS |
+                                                             XPARAM_EXPLICIT_NOTIFY));
 }
 
 /**
@@ -89,7 +89,7 @@ xdebug_controller_get_debug_enabled (xdebug_controller_t *self)
 {
   xboolean_t enabled;
 
-  g_return_val_if_fail (X_IS_DEBUG_CONTROLLER (self), FALSE);
+  xreturn_val_if_fail (X_IS_DEBUG_CONTROLLER (self), FALSE);
 
   xobject_get (G_OBJECT (self),
                 "debug-enabled", &enabled,

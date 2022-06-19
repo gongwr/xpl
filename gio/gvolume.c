@@ -126,7 +126,7 @@ g_volume_get_name (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -148,7 +148,7 @@ g_volume_get_icon (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -173,7 +173,7 @@ g_volume_get_symbolic_icon (xvolume_t *volume)
   GVolumeIface *iface;
   xicon_t *ret;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -205,7 +205,7 @@ g_volume_get_uuid (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -227,7 +227,7 @@ g_volume_get_drive (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -249,7 +249,7 @@ g_volume_get_mount (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -270,7 +270,7 @@ g_volume_can_mount (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), FALSE);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -293,7 +293,7 @@ g_volume_can_eject (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), FALSE);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -316,7 +316,7 @@ g_volume_should_automount (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), FALSE);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -391,8 +391,8 @@ g_volume_mount_finish (xvolume_t       *volume,
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -462,8 +462,8 @@ g_volume_eject_finish (xvolume_t       *volume,
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -542,8 +542,8 @@ g_volume_eject_with_operation_finish (xvolume_t        *volume,
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -576,8 +576,8 @@ g_volume_get_identifier (xvolume_t    *volume,
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
-  g_return_val_if_fail (kind != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (kind != NULL, NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
 
@@ -602,7 +602,7 @@ g_volume_enumerate_identifiers (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
   iface = G_VOLUME_GET_IFACE (volume);
 
   if (iface->enumerate_identifiers == NULL)
@@ -652,7 +652,7 @@ g_volume_get_activation_root (xvolume_t *volume)
 {
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
   iface = G_VOLUME_GET_IFACE (volume);
 
   if (iface->get_activation_root == NULL)
@@ -677,7 +677,7 @@ g_volume_get_sort_key (xvolume_t *volume)
   const xchar_t *ret = NULL;
   GVolumeIface *iface;
 
-  g_return_val_if_fail (X_IS_VOLUME (volume), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME (volume), NULL);
 
   iface = G_VOLUME_GET_IFACE (volume);
   if (iface->get_sort_key != NULL)

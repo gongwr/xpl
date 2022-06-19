@@ -28,9 +28,9 @@ event_cb (xsocket_listener_t      *listener,
   static GSocketListenerEvent expected_event = XSOCKET_LISTENER_BINDING;
   xboolean_t *success = (xboolean_t *)data;
 
-  g_assert (X_IS_SOCKET_LISTENER (listener));
-  g_assert (X_IS_SOCKET (socket));
-  g_assert (event == expected_event);
+  xassert (X_IS_SOCKET_LISTENER (listener));
+  xassert (X_IS_SOCKET (socket));
+  xassert (event == expected_event);
 
   switch (event)
     {

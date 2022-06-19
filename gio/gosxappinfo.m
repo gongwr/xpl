@@ -96,15 +96,15 @@ g_osx_app_info_finalize (xobject_t *object)
 
   [info->bundle release];
 
-  G_OBJECT_CLASS (g_osx_app_info_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_osx_app_info_parent_class)->finalize (object);
 }
 
 static void
 g_osx_app_info_class_init (GOsxAppInfoClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_osx_app_info_finalize;
+  xobject_class->finalize = g_osx_app_info_finalize;
 }
 
 static xapp_info_t *
@@ -113,7 +113,7 @@ g_osx_app_info_dup (xapp_info_t *appinfo)
   GOsxAppInfo *info;
   GOsxAppInfo *new_info;
 
-  g_return_val_if_fail (appinfo != NULL, NULL);
+  xreturn_val_if_fail (appinfo != NULL, NULL);
 
   info = G_OSX_APP_INFO (appinfo);
   new_info = g_osx_app_info_new ([info->bundle retain]);
@@ -127,8 +127,8 @@ g_osx_app_info_equal (xapp_info_t *appinfo1,
 {
   const xchar_t *str1, *str2;
 
-  g_return_val_if_fail (appinfo1 != NULL, FALSE);
-  g_return_val_if_fail (appinfo2 != NULL, FALSE);
+  xreturn_val_if_fail (appinfo1 != NULL, FALSE);
+  xreturn_val_if_fail (appinfo2 != NULL, FALSE);
 
   str1 = g_osx_app_info_get_id (appinfo1);
   str2 = g_osx_app_info_get_id (appinfo2);
@@ -153,7 +153,7 @@ get_bundle_strinxvalue (NSBundle *bundle,
   const xchar_t *cvalue;
   xchar_t *ret;
 
-  g_return_val_if_fail (bundle != NULL, NULL);
+  xreturn_val_if_fail (bundle != NULL, NULL);
 
   value = (NSString *)[bundle objectForInfoDictionaryKey: key];
   if (!value)
@@ -168,7 +168,7 @@ get_bundle_strinxvalue (NSBundle *bundle,
 static CFStringRef
 create_cfstring_from_cstr (const xchar_t *cstr)
 {
-  g_return_val_if_fail (cstr != NULL, NULL);
+  xreturn_val_if_fail (cstr != NULL, NULL);
   return CFStringCreateWithCString (NULL, cstr, kCFStringEncodingUTF8);
 }
 
@@ -176,7 +176,7 @@ create_cfstring_from_cstr (const xchar_t *cstr)
 static xchar_t *
 create_cstr_from_cfstring (CFStringRef str)
 {
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   CFIndex length = CFStringGetLength (str);
   CFIndex maxlen = CFStringGetMaximumSizeForEncoding (length, kCFStringEncodingUTF8);
@@ -283,11 +283,11 @@ create_urlspec_for_appinfo (GOsxAppInfo *info,
   LSLaunchURLSpec *urlspec = NULL;
   const xchar_t *app_cstr;
 
-  g_return_val_if_fail (X_IS_OSX_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_OSX_APP_INFO (info), NULL);
 
   urlspec = g_new0 (LSLaunchURLSpec, 1);
   app_cstr = g_osx_app_info_get_filename (info);
-  g_assert (app_cstr != NULL);
+  xassert (app_cstr != NULL);
 
   /* Strip file:// from app url but ensure filesystem url */
   urlspec->appURL = create_url_from_cstr (app_cstr + strlen ("file://"), TRUE);
@@ -412,7 +412,7 @@ g_osx_app_info_get_executable (xapp_info_t *appinfo)
 const char *
 g_osx_app_info_get_filename (GOsxAppInfo *info)
 {
-  g_return_val_if_fail (info != NULL, NULL);
+  xreturn_val_if_fail (info != NULL, NULL);
 
   if (!info->filename)
     {
@@ -470,8 +470,8 @@ g_osx_app_info_launch_internal (xapp_info_t  *appinfo,
   LSLaunchURLSpec *urlspec;
   xint_t ret, success = TRUE;
 
-  g_return_val_if_fail (X_IS_OSX_APP_INFO (appinfo), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OSX_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   urlspec = create_urlspec_for_appinfo (info, uris, are_files);
 

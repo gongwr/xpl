@@ -38,7 +38,7 @@ g_nearest_pow (xsize_t num)
 {
   xsize_t n = num - 1;
 
-  g_assert (num > 0 && num <= G_MAXSIZE / 2);
+  xassert (num > 0 && num <= G_MAXSIZE / 2);
 
   n |= n >> 1;
   n |= n >> 2;

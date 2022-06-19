@@ -30,7 +30,7 @@
                                          GNullSettingsBackend))
 
 
-typedef GSettingsBackendClass GNullSettingsBackendClass;
+typedef xsettings_backend_class_t GNullSettingsBackendClass;
 typedef xsettings_backend_t      GNullSettingsBackend;
 
 G_DEFINE_TYPE_WITH_CODE (GNullSettingsBackend,
@@ -107,7 +107,7 @@ g_null_settings_backend_init (GNullSettingsBackend *memory)
 static void
 g_null_settings_backend_class_init (GNullSettingsBackendClass *class)
 {
-  GSettingsBackendClass *backend_class = G_SETTINGS_BACKEND_CLASS (class);
+  xsettings_backend_class_t *backend_class = G_SETTINGS_BACKEND_CLASS (class);
 
   backend_class->read = g_null_settings_backend_read;
   backend_class->write = g_null_settings_backend_write;

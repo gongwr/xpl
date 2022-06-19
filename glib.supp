@@ -328,7 +328,7 @@
 	match-leak-kinds:reachable
 	fun:malloc
 	...
-	fun:g_param_spec_pool_new
+	fun:xparam_spec_pool_new
 	...
 	fun:type_class_init_Wm
 }

@@ -1017,7 +1017,7 @@ sum_to_digest (const xchar_t *sum, xsize_t *len)
   xsize_t i, l;
   xuint8_t *digest;
 
-  g_assert (strlen (sum) % 2 == 0);
+  xassert (strlen (sum) % 2 == 0);
   l = strlen (sum) / 2;
 
   digest = g_malloc (l);
@@ -1172,7 +1172,7 @@ static void
 test_unsupported (void)
 {
   g_assert_cmpint (xchecksum_type_get_length (20), ==, -1);
-  g_assert (xchecksum_new (20) == NULL);
+  xassert (xchecksum_new (20) == NULL);
 }
 
 int

@@ -111,10 +111,10 @@ XPL_AVAILABLE_IN_2_28
 void                    xsocket_client_set_tls                         (xsocket_client_t        *client,
 									 xboolean_t              tls);
 XPL_DEPRECATED_IN_2_72
-GTlsCertificateFlags    xsocket_client_get_tls_validation_flags        (xsocket_client_t        *client);
+xtls_certificate_flags_t    xsocket_client_get_tls_validation_flags        (xsocket_client_t        *client);
 XPL_DEPRECATED_IN_2_72
 void                    xsocket_client_set_tls_validation_flags        (xsocket_client_t        *client,
-									 GTlsCertificateFlags  flags);
+									 xtls_certificate_flags_t  flags);
 XPL_AVAILABLE_IN_2_36
 xproxy_resolver_t         *xsocket_client_get_proxy_resolver              (xsocket_client_t        *client);
 XPL_AVAILABLE_IN_2_36

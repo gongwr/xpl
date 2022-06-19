@@ -47,9 +47,9 @@ _g_win32_sid_replace (SID **dest,
   DWORD sid_len;
   SID *new_sid;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail (src != NULL, FALSE);
-  g_return_val_if_fail (dest && *dest == NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (src != NULL, FALSE);
+  xreturn_val_if_fail (dest && *dest == NULL, FALSE);
 
   sid_len = GetLengthSid (src);
   new_sid = g_malloc (sid_len);
@@ -90,7 +90,7 @@ _g_win32_token_get_sid (HANDLE token,
   PSID psid;
   SID *result = NULL;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!GetTokenInformation (token, TokenUser, NULL, 0, &n)
       && GetLastError () != ERROR_INSUFFICIENT_BUFFER)
@@ -146,7 +146,7 @@ _g_win32_process_get_access_token_sid (DWORD process_id,
   HANDLE process_token;
   SID *result = NULL;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (process_id == 0)
     process_handle = GetCurrentProcess ();
@@ -192,8 +192,8 @@ _g_win32_sid_to_string (SID *sid, xerror_t **error)
 {
   xchar_t *tmp, *ret;
 
-  g_return_val_if_fail (sid != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (sid != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!ConvertSidToStringSidA (sid, &tmp))
     {
@@ -222,7 +222,7 @@ _g_win32_current_process_sid_string (xerror_t **error)
   SID *sid;
   xchar_t *ret;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   sid = _g_win32_process_get_access_token_sid (0, error);
   if (!sid)

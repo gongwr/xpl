@@ -97,12 +97,12 @@ test_qdata_dup (void)
   s2 = xobject_dup_qdata (object, quark, (GDuplicateFunc)xstrdup, NULL);
 
   g_assert_cmpstr (s, ==, s2);
-  g_assert (s != s2);
+  xassert (s != s2);
 
   g_free (s2);
 
   b = xobject_replace_qdata (object, quark, s, "s2", NULL, NULL);
-  g_assert (b);
+  xassert (b);
 
   g_free (s);
 

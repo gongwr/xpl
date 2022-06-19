@@ -180,13 +180,13 @@ g_cache_new (GCacheNewFunc      value_new_func,
 {
   GCache *cache;
 
-  g_return_val_if_fail (value_new_func != NULL, NULL);
-  g_return_val_if_fail (value_destroy_func != NULL, NULL);
-  g_return_val_if_fail (key_dup_func != NULL, NULL);
-  g_return_val_if_fail (key_destroy_func != NULL, NULL);
-  g_return_val_if_fail (hash_key_func != NULL, NULL);
-  g_return_val_if_fail (hash_value_func != NULL, NULL);
-  g_return_val_if_fail (key_equal_func != NULL, NULL);
+  xreturn_val_if_fail (value_new_func != NULL, NULL);
+  xreturn_val_if_fail (value_destroy_func != NULL, NULL);
+  xreturn_val_if_fail (key_dup_func != NULL, NULL);
+  xreturn_val_if_fail (key_destroy_func != NULL, NULL);
+  xreturn_val_if_fail (hash_key_func != NULL, NULL);
+  xreturn_val_if_fail (hash_value_func != NULL, NULL);
+  xreturn_val_if_fail (key_equal_func != NULL, NULL);
 
   cache = g_slice_new (GCache);
   cache->value_new_func = value_new_func;
@@ -245,7 +245,7 @@ g_cache_insert (GCache   *cache,
   GCacheNode *node;
   xpointer_t value;
 
-  g_return_val_if_fail (cache != NULL, NULL);
+  xreturn_val_if_fail (cache != NULL, NULL);
 
   node = xhash_table_lookup (cache->key_table, key);
   if (node)

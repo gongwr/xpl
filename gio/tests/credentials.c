@@ -61,11 +61,11 @@ test_basic (void)
 #endif
 
   /* You can always get a credentials object, but it might not work. */
-  g_assert (creds != NULL);
-  g_assert (other != NULL);
+  xassert (creds != NULL);
+  xassert (other != NULL);
 
 #if G_CREDENTIALS_SUPPORTED
-  g_assert (xcredentials_is_same_user (creds, other, &error));
+  xassert (xcredentials_is_same_user (creds, other, &error));
   g_assert_no_error (error);
 
   if (geteuid () == 0)
@@ -90,18 +90,18 @@ test_basic (void)
   set = xcredentials_set_unix_user (other, not_me, &error);
 #if G_CREDENTIALS_SPOOFING_SUPPORTED
   g_assert_no_error (error);
-  g_assert (set);
+  xassert (set);
 
   g_assert_cmpuint (xcredentials_get_unix_user (other, &error), ==, not_me);
-  g_assert (!xcredentials_is_same_user (creds, other, &error));
+  xassert (!xcredentials_is_same_user (creds, other, &error));
   g_assert_no_error (error);
 #else
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED);
-  g_assert (!set);
+  xassert (!set);
   g_clear_error (&error);
 
   g_assert_cmpuint (xcredentials_get_unix_user (other, &error), ==, geteuid ());
-  g_assert (xcredentials_is_same_user (creds, other, &error));
+  xassert (xcredentials_is_same_user (creds, other, &error));
   g_assert_no_error (error);
 #endif
 

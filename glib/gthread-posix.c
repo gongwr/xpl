@@ -25,7 +25,7 @@
  * GLib at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-/* The xmutex_t, xcond_t and GPrivate implementations in this file are some
+/* The xmutex_t, xcond_t and xprivate_t implementations in this file are some
  * of the lowest-level code in GLib.  All other parts of GLib (messages,
  * memory, slices, etc) assume that they can freely use these facilities
  * without risking recursion.
@@ -940,12 +940,12 @@ g_cond_wait_until (xcond_t  *cond,
 
 #endif /* defined(USE_NATIVE_MUTEX) */
 
-/* {{{1 GPrivate */
+/* {{{1 xprivate_t */
 
 /**
- * GPrivate:
+ * xprivate_t:
  *
- * The #GPrivate struct is an opaque data structure to represent a
+ * The #xprivate_t struct is an opaque data structure to represent a
  * thread-local data key. It is approximately equivalent to the
  * pthread_setspecific()/pthread_getspecific() APIs on POSIX and to
  * TlsSetValue()/TlsGetValue() on Windows.
@@ -953,14 +953,14 @@ g_cond_wait_until (xcond_t  *cond,
  * If you don't already know why you might want this functionality,
  * then you probably don't need it.
  *
- * #GPrivate is a very limited resource (as far as 128 per program,
+ * #xprivate_t is a very limited resource (as far as 128 per program,
  * shared between all libraries). It is also not possible to destroy a
- * #GPrivate after it has been used. As such, it is only ever acceptable
- * to use #GPrivate in static scope, and even then sparingly so.
+ * #xprivate_t after it has been used. As such, it is only ever acceptable
+ * to use #xprivate_t in static scope, and even then sparingly so.
  *
  * See G_PRIVATE_INIT() for a couple of examples.
  *
- * The #GPrivate structure should be considered opaque.  It should only
+ * The #xprivate_t structure should be considered opaque.  It should only
  * be accessed via the g_private_ functions.
  */
 
@@ -968,7 +968,7 @@ g_cond_wait_until (xcond_t  *cond,
  * G_PRIVATE_INIT:
  * @notify: a #xdestroy_notify_t
  *
- * A macro to assist with the static initialisation of a #GPrivate.
+ * A macro to assist with the static initialisation of a #xprivate_t.
  *
  * This macro is useful for the case that a #xdestroy_notify_t function
  * should be associated with the key.  This is needed when the key will be
@@ -979,12 +979,12 @@ g_cond_wait_until (xcond_t  *cond,
  * value stored in the key when g_private_replace() is used.
  *
  * If no #xdestroy_notify_t is needed, then use of this macro is not
- * required -- if the #GPrivate is declared in static scope then it will
+ * required -- if the #xprivate_t is declared in static scope then it will
  * be properly initialised by default (ie: to all zeros).  See the
  * examples below.
  *
  * |[<!-- language="C" -->
- * static GPrivate name_key = G_PRIVATE_INIT (g_free);
+ * static xprivate_t name_key = G_PRIVATE_INIT (g_free);
  *
  * // return value should not be freed
  * const xchar_t *
@@ -1000,7 +1000,7 @@ g_cond_wait_until (xcond_t  *cond,
  * }
  *
  *
- * static GPrivate count_key;   // no free function
+ * static xprivate_t count_key;   // no free function
  *
  * xint_t
  * get_local_count (void)
@@ -1046,7 +1046,7 @@ g_private_impl_free (pthread_key_t *key)
 }
 
 static inline pthread_key_t *
-g_private_get_impl (GPrivate *key)
+g_private_get_impl (xprivate_t *key)
 {
   pthread_key_t *impl = g_atomic_pointer_get (&key->p);
 
@@ -1065,7 +1065,7 @@ g_private_get_impl (GPrivate *key)
 
 /**
  * g_private_get:
- * @key: a #GPrivate
+ * @key: a #xprivate_t
  *
  * Returns the current value of the thread local variable @key.
  *
@@ -1076,7 +1076,7 @@ g_private_get_impl (GPrivate *key)
  * Returns: the thread-local value
  */
 xpointer_t
-g_private_get (GPrivate *key)
+g_private_get (xprivate_t *key)
 {
   /* quote POSIX: No errors are returned from pthread_getspecific(). */
   return pthread_getspecific (*g_private_get_impl (key));
@@ -1084,7 +1084,7 @@ g_private_get (GPrivate *key)
 
 /**
  * g_private_set:
- * @key: a #GPrivate
+ * @key: a #xprivate_t
  * @value: the new value
  *
  * Sets the thread local variable @key to have the value @value in the
@@ -1094,7 +1094,7 @@ g_private_get (GPrivate *key)
  * the #xdestroy_notify_t for @key is not called on the old value.
  */
 void
-g_private_set (GPrivate *key,
+g_private_set (xprivate_t *key,
                xpointer_t  value)
 {
   xint_t status;
@@ -1105,7 +1105,7 @@ g_private_set (GPrivate *key,
 
 /**
  * g_private_replace:
- * @key: a #GPrivate
+ * @key: a #xprivate_t
  * @value: the new value
  *
  * Sets the thread local variable @key to have the value @value in the
@@ -1118,7 +1118,7 @@ g_private_set (GPrivate *key,
  * Since: 2.32
  **/
 void
-g_private_replace (GPrivate *key,
+g_private_replace (xprivate_t *key,
                    xpointer_t  value)
 {
   pthread_key_t *impl = g_private_get_impl (key);
@@ -1205,7 +1205,7 @@ g_system_thread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_sett
             }
           else if (errsv == E2BIG)
             {
-              g_assert (size < G_MAXINT);
+              xassert (size < G_MAXINT);
               size *= 2;
               scheduler_settings->attr = g_realloc (scheduler_settings->attr, size);
               /* Needs to be zero-initialized */

@@ -20,7 +20,7 @@ test_enum_basic (void)
   type = xenum_register_static ("my_enum_t", my_enum_values);
 
   xvalue_init (&value, type);
-  g_assert (G_VALUE_HOLDS_ENUM (&value));
+  xassert (G_VALUE_HOLDS_ENUM (&value));
 
   xvalue_set_enum (&value, 2);
   g_assert_cmpint (xvalue_get_enum (&value), ==, 2);
@@ -33,22 +33,22 @@ test_enum_basic (void)
   g_assert_cmpint (class->n_values, ==, 3);
 
   val = xenum_get_value (class, 2);
-  g_assert (val != NULL);
+  xassert (val != NULL);
   g_assert_cmpstr (val->value_name, ==, "the second value");
   val = xenum_get_value (class, 15);
-  g_assert (val == NULL);
+  xassert (val == NULL);
 
   val = xenum_get_value_by_name (class, "the third value");
-  g_assert (val != NULL);
+  xassert (val != NULL);
   g_assert_cmpint (val->value, ==, 3);
   val = xenum_get_value_by_name (class, "the color purple");
-  g_assert (val == NULL);
+  xassert (val == NULL);
 
   val = xenum_get_value_by_nick (class, "one");
-  g_assert (val != NULL);
+  xassert (val != NULL);
   g_assert_cmpint (val->value, ==, 1);
   val = xenum_get_value_by_nick (class, "purple");
-  g_assert (val == NULL);
+  xassert (val == NULL);
 
   to_string = xenum_to_string (type, 2);
   g_assert_cmpstr (to_string, ==, "the second value");
@@ -100,7 +100,7 @@ test_flags_basic (void)
                                              no_default_flaxvalues);
 
   xvalue_init (&value, type);
-  g_assert (G_VALUE_HOLDS_FLAGS (&value));
+  xassert (G_VALUE_HOLDS_FLAGS (&value));
 
   xvalue_set_flags (&value, 2|8);
   g_assert_cmpint (xvalue_get_flags (&value), ==, 2|8);
@@ -111,22 +111,22 @@ test_flags_basic (void)
   g_assert_cmpint (class->n_values, ==, 4);
 
   val = xflags_get_first_value (class, 2|8);
-  g_assert (val != NULL);
+  xassert (val != NULL);
   g_assert_cmpstr (val->value_name, ==, "the second flag");
   val = xflags_get_first_value (class, 16);
-  g_assert (val == NULL);
+  xassert (val == NULL);
 
   val = xflags_get_value_by_name (class, "the third flag");
-  g_assert (val != NULL);
+  xassert (val != NULL);
   g_assert_cmpint (val->value, ==, 8);
   val = xflags_get_value_by_name (class, "the color purple");
-  g_assert (val == NULL);
+  xassert (val == NULL);
 
   val = xflags_get_value_by_nick (class, "one");
-  g_assert (val != NULL);
+  xassert (val != NULL);
   g_assert_cmpint (val->value, ==, 1);
   val = xflags_get_value_by_nick (class, "purple");
-  g_assert (val == NULL);
+  xassert (val == NULL);
 
   test_flags_transform_to_string (&value);
   xvalue_unset (&value);

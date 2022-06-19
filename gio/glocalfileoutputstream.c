@@ -150,17 +150,17 @@ g_local_file_output_stream_finalize (xobject_t *object)
   g_free (file->priv->backup_filename);
   g_free (file->priv->etag);
 
-  G_OBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_local_file_output_stream_parent_class)->finalize (object);
 }
 
 static void
 g_local_file_output_stream_class_init (GLocalFileOutputStreamClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xoutput_stream_class_t *stream_class = G_OUTPUT_STREAM_CLASS (klass);
-  GFileOutputStreamClass *file_stream_class = XFILE_OUTPUT_STREAM_CLASS (klass);
+  xfile_output_stream_class_t *file_stream_class = XFILE_OUTPUT_STREAM_CLASS (klass);
 
-  gobject_class->finalize = g_local_file_output_stream_finalize;
+  xobject_class->finalize = g_local_file_output_stream_finalize;
 
   stream_class->write_fn = g_local_file_output_stream_write;
 #ifdef G_OS_UNIX
@@ -1324,7 +1324,7 @@ _g_local_file_output_stream_replace (const char        *filename,
 xint_t
 _g_local_file_output_stream_get_fd (GLocalFileOutputStream *stream)
 {
-  g_return_val_if_fail (X_IS_LOCAL_FILE_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_LOCAL_FILE_OUTPUT_STREAM (stream), -1);
   return stream->priv->fd;
 }
 

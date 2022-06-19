@@ -478,20 +478,20 @@ xnetwork_monitor_portal_finalize (xobject_t *object)
 
   g_clear_object (&nm->priv->proxy);
 
-  G_OBJECT_CLASS (xnetwork_monitor_portal_parent_class)->finalize (object);
+  XOBJECT_CLASS (xnetwork_monitor_portal_parent_class)->finalize (object);
 }
 
 static void
 xnetwork_monitor_portal_class_init (GNetworkMonitorPortalClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->finalize  = xnetwork_monitor_portal_finalize;
-  gobject_class->get_property = xnetwork_monitor_portal_get_property;
+  xobject_class->finalize  = xnetwork_monitor_portal_finalize;
+  xobject_class->get_property = xnetwork_monitor_portal_get_property;
 
-  xobject_class_override_property (gobject_class, PROP_NETWORK_AVAILABLE, "network-available");
-  xobject_class_override_property (gobject_class, PROP_NETWORK_METERED, "network-metered");
-  xobject_class_override_property (gobject_class, PROP_CONNECTIVITY, "connectivity");
+  xobject_class_override_property (xobject_class, PROP_NETWORK_AVAILABLE, "network-available");
+  xobject_class_override_property (xobject_class, PROP_NETWORK_METERED, "network-metered");
+  xobject_class_override_property (xobject_class, PROP_CONNECTIVITY, "connectivity");
 }
 
 static xboolean_t

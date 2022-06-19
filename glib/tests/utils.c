@@ -68,11 +68,11 @@ test_language_names (void)
 
   g_setenv ("LANGUAGE", "de:en_US", TRUE);
   names = g_get_language_names ();
-  g_assert (strv_check (names, "de", "en_US", "en", "C", NULL));
+  xassert (strv_check (names, "de", "en_US", "en", "C", NULL));
 
   g_setenv ("LANGUAGE", "tt_RU.UTF-8@iqtelif", TRUE);
   names = g_get_language_names ();
-  g_assert (strv_check (names,
+  xassert (strv_check (names,
                         "tt_RU.UTF-8@iqtelif",
                         "tt_RU@iqtelif",
                         "tt.UTF-8@iqtelif",
@@ -91,11 +91,11 @@ test_locale_variants (void)
   char **v;
 
   v = g_get_locale_variants ("fr_BE");
-  g_assert (strv_check ((const xchar_t * const *) v, "fr_BE", "fr", NULL));
+  xassert (strv_check ((const xchar_t * const *) v, "fr_BE", "fr", NULL));
   xstrfreev (v);
 
   v = g_get_locale_variants ("sr_SR@latin");
-  g_assert (strv_check ((const xchar_t * const *) v, "sr_SR@latin", "sr@latin", "sr_SR", "sr", NULL));
+  xassert (strv_check ((const xchar_t * const *) v, "sr_SR@latin", "sr@latin", "sr_SR", "sr", NULL));
   xstrfreev (v);
 }
 
@@ -107,25 +107,25 @@ test_version (void)
               XPL_MAJOR_VERSION, XPL_MINOR_VERSION, XPL_MICRO_VERSION,
               glib_major_version, glib_minor_version, glib_micro_version);
 
-  g_assert (glib_check_version (XPL_MAJOR_VERSION,
+  xassert (glib_check_version (XPL_MAJOR_VERSION,
                                 XPL_MINOR_VERSION,
                                 XPL_MICRO_VERSION) == NULL);
-  g_assert (glib_check_version (XPL_MAJOR_VERSION,
+  xassert (glib_check_version (XPL_MAJOR_VERSION,
                                 XPL_MINOR_VERSION,
                                 0) == NULL);
-  g_assert (glib_check_version (XPL_MAJOR_VERSION - 1,
+  xassert (glib_check_version (XPL_MAJOR_VERSION - 1,
                                 0,
                                 0) != NULL);
-  g_assert (glib_check_version (XPL_MAJOR_VERSION + 1,
+  xassert (glib_check_version (XPL_MAJOR_VERSION + 1,
                                 0,
                                 0) != NULL);
-  g_assert (glib_check_version (XPL_MAJOR_VERSION,
+  xassert (glib_check_version (XPL_MAJOR_VERSION,
                                 XPL_MINOR_VERSION + 1,
                                 0) != NULL);
   /* don't use + 1 here, since a +/-1 difference can
    * happen due to post-release version bumps in git
    */
-  g_assert (glib_check_version (XPL_MAJOR_VERSION,
+  xassert (glib_check_version (XPL_MAJOR_VERSION,
                                 XPL_MINOR_VERSION,
                                 XPL_MICRO_VERSION + 3) != NULL);
 }
@@ -440,11 +440,11 @@ test_find_program (void)
   xsize_t i;
 
   res = g_find_program_in_path ("sh");
-  g_assert (res != NULL);
+  xassert (res != NULL);
   g_free (res);
 
   res = g_find_program_in_path ("/bin/sh");
-  g_assert (res != NULL);
+  xassert (res != NULL);
   g_free (res);
 
   cwd = g_get_current_dir ();
@@ -474,13 +474,13 @@ test_find_program (void)
 #endif
 
   res = g_find_program_in_path ("this_program_does_not_exit");
-  g_assert (res == NULL);
+  xassert (res == NULL);
 
   res = g_find_program_in_path ("/bin");
-  g_assert (res == NULL);
+  xassert (res == NULL);
 
   res = g_find_program_in_path ("/etc/passwd");
-  g_assert (res == NULL);
+  xassert (res == NULL);
 }
 
 static void
@@ -628,7 +628,7 @@ test_username (void)
 
   name = g_get_user_name ();
 
-  g_assert (name != NULL);
+  xassert (name != NULL);
 }
 
 static void
@@ -638,7 +638,7 @@ test_realname (void)
 
   name = g_get_real_name ();
 
-  g_assert (name != NULL);
+  xassert (name != NULL);
 }
 
 static void
@@ -648,7 +648,7 @@ test_hostname (void)
 
   name = g_get_host_name ();
 
-  g_assert (name != NULL);
+  xassert (name != NULL);
   g_assert_true (xutf8_validate (name, -1, NULL));
 }
 
@@ -738,11 +738,11 @@ test_desktop_special_dir (void)
   const xchar_t *dir, *dir2;
 
   dir = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
-  g_assert (dir != NULL);
+  xassert (dir != NULL);
 
   g_reload_user_special_dirs_cache ();
   dir2 = g_get_user_special_dir (G_USER_DIRECTORY_DESKTOP);
-  g_assert (dir2 != NULL);
+  xassert (dir2 != NULL);
 }
 
 static void
@@ -782,7 +782,7 @@ static xboolean_t
 source_test (xpointer_t data)
 {
   g_assert_not_reached ();
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -810,11 +810,11 @@ test_clear_pointer (void)
 
   a = g_malloc (5);
   g_clear_pointer (&a, g_free);
-  g_assert (a == NULL);
+  xassert (a == NULL);
 
   a = g_malloc (5);
   (g_clear_pointer) (&a, g_free);
-  g_assert (a == NULL);
+  xassert (a == NULL);
 }
 
 /* test_t that g_clear_pointer() works with a xdestroy_notify_t which contains a cast.
@@ -886,15 +886,15 @@ test_take_pointer (void)
   get_obj (NULL);
 
   get_obj (&a);
-  g_assert (a);
+  xassert (a);
 
   /* ensure that it works to skip the macro */
   b = (g_steal_pointer) (&a);
-  g_assert (!a);
+  xassert (!a);
   obj_count--;
   g_free (b);
 
-  g_assert (!obj_count);
+  xassert (!obj_count);
 }
 
 static void
@@ -903,16 +903,16 @@ test_misc_mem (void)
   xpointer_t a;
 
   a = g_try_malloc (0);
-  g_assert (a == NULL);
+  xassert (a == NULL);
 
   a = g_try_malloc0 (0);
-  g_assert (a == NULL);
+  xassert (a == NULL);
 
   a = g_malloc (16);
   a = g_try_realloc (a, 20);
   a = g_try_realloc (a, 0);
 
-  g_assert (a == NULL);
+  xassert (a == NULL);
 }
 
 static void
@@ -1015,11 +1015,11 @@ test_nullify (void)
 {
   xpointer_t p = &test_nullify;
 
-  g_assert (p != NULL);
+  xassert (p != NULL);
 
   g_nullify_pointer (&p);
 
-  g_assert (p == NULL);
+  xassert (p == NULL);
 }
 
 static void
@@ -1047,7 +1047,7 @@ test_check_setuid (void)
   xboolean_t res;
 
   res = XPL_PRIVATE_CALL(g_check_setuid) ();
-  g_assert (!res);
+  xassert (!res);
 }
 
 /* test_t the defined integer limits are correct, as some compilers have had

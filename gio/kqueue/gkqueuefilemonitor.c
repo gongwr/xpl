@@ -197,8 +197,8 @@ g_kqueue_file_monitor_finalize (xobject_t *object)
     xobject_unref (kqueue_monitor->fbfile);
 #endif
 
-  if (G_OBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize) (object);
+  if (XOBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize)
+    (*XOBJECT_CLASS (g_kqueue_file_monitor_parent_class)->finalize) (object);
 }
 
 static void
@@ -255,7 +255,7 @@ g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
       g_free (path_file);
       g_free (file_basename);
       kqueue_monitor->fbfile = file;
-      kqueue_monitor->fallback = _g_poll_file_monitor_new (file);
+      kqueue_monitor->fallback = _xpoll_file_monitor_new (file);
       xsignal_connect (kqueue_monitor->fallback, "changed",
 			G_CALLBACK (_fallback_callback), kqueue_monitor);
       return;
@@ -298,11 +298,11 @@ g_kqueue_file_monitor_start (xlocal_file_monitor_t *local_monitor,
 static void
 g_kqueue_file_monitor_class_init (GKqueueFileMonitorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
   xlocal_file_monitor_class_t *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
 
-  gobject_class->finalize = g_kqueue_file_monitor_finalize;
+  xobject_class->finalize = g_kqueue_file_monitor_finalize;
   file_monitor_class->cancel = g_kqueue_file_monitor_cancel;
 
   local_file_monitor_class->is_supported = g_kqueue_file_monitor_is_supported;
@@ -538,8 +538,8 @@ _kqsub_new (xchar_t *filename, xchar_t *basename, GKqueueFileMonitor *mon, GFile
 static void
 _kqsub_free (kqueue_sub *sub)
 {
-  g_assert (sub->deps == NULL);
-  g_assert (sub->fd == -1);
+  xassert (sub->deps == NULL);
+  xassert (sub->fd == -1);
 
   xsource_unref ((xsource_t *) sub->source);
   g_free (sub->filename);

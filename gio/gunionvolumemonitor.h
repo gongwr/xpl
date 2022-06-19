@@ -19,29 +19,29 @@
  *         David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __G_UNION_VOLUME_MONITOR_H__
-#define __G_UNION_VOLUME_MONITOR_H__
+#ifndef __XUNION_VOLUME_MONITOR_H__
+#define __XUNION_VOLUME_MONITOR_H__
 
 #include <gio/gvolumemonitor.h>
 
 G_BEGIN_DECLS
 
-#define XTYPE_UNION_VOLUME_MONITOR        (_g_union_volume_monitor_get_type ())
-#define G_UNION_VOLUME_MONITOR(o)          (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNION_VOLUME_MONITOR, GUnionVolumeMonitor))
-#define G_UNION_VOLUME_MONITOR_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNION_VOLUME_MONITOR, GUnionVolumeMonitorClass))
+#define XTYPE_UNION_VOLUME_MONITOR        (_xunion_volume_monitor_get_type ())
+#define XUNION_VOLUME_MONITOR(o)          (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNION_VOLUME_MONITOR, xunion_volume_monitor_t))
+#define XUNION_VOLUME_MONITOR_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNION_VOLUME_MONITOR, GUnionVolumeMonitorClass))
 #define X_IS_UNION_VOLUME_MONITOR(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNION_VOLUME_MONITOR))
 #define X_IS_UNION_VOLUME_MONITOR_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNION_VOLUME_MONITOR))
 
-typedef struct _GUnionVolumeMonitor      GUnionVolumeMonitor;
-typedef struct _GUnionVolumeMonitorClass GUnionVolumeMonitorClass;
+typedef struct _xunion_volume_monitor      xunion_volume_monitor_t;
+typedef struct _xunion_volume_monitorClass GUnionVolumeMonitorClass;
 
-struct _GUnionVolumeMonitorClass
+struct _xunion_volume_monitorClass
 {
   GVolumeMonitorClass parent_class;
 };
 
-xtype_t _g_union_volume_monitor_get_type (void) G_GNUC_CONST;
+xtype_t _xunion_volume_monitor_get_type (void) G_GNUC_CONST;
 
 G_END_DECLS
 
-#endif /* __G_UNION_VOLUME_MONITOR_H__ */
+#endif /* __XUNION_VOLUME_MONITOR_H__ */

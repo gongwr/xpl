@@ -267,7 +267,7 @@ xproxy_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
 	  g_free (dest_hostname);
 	  g_free (dest_protocol);
         }
-      g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (priv->proxy_address), NULL);
+      xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (priv->proxy_address), NULL);
 
       inetsaddr = G_INET_SOCKET_ADDRESS (priv->proxy_address);
       inetaddr = g_inet_socket_address_get_address (inetsaddr);
@@ -565,7 +565,7 @@ xproxy_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerator
 					xasync_result_t              *result,
 					xerror_t                   **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -594,7 +594,7 @@ xproxy_address_enumerator_constructed (xobject_t *object)
         g_warning ("Invalid URI '%s'", priv->dest_uri);
     }
 
-  G_OBJECT_CLASS (xproxy_address_enumerator_parent_class)->constructed (object);
+  XOBJECT_CLASS (xproxy_address_enumerator_parent_class)->constructed (object);
 }
 
 static void
@@ -690,7 +690,7 @@ xproxy_address_enumerator_finalize (xobject_t *object)
 
   g_clear_error (&priv->last_error);
 
-  G_OBJECT_CLASS (xproxy_address_enumerator_parent_class)->finalize (object);
+  XOBJECT_CLASS (xproxy_address_enumerator_parent_class)->finalize (object);
 }
 
 static void
@@ -702,8 +702,8 @@ xproxy_address_enumerator_init (xproxy_address_enumerator_t *self)
 static void
 xproxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enumerator_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (proxy_enumerator_class);
-  GSocketAddressEnumeratorClass *enumerator_class = XSOCKET_ADDRESS_ENUMERATOR_CLASS (proxy_enumerator_class);
+  xobject_class_t *object_class = XOBJECT_CLASS (proxy_enumerator_class);
+  xsocket_address_enumerator_class_t *enumerator_class = XSOCKET_ADDRESS_ENUMERATOR_CLASS (proxy_enumerator_class);
 
   object_class->constructed = xproxy_address_enumerator_constructed;
   object_class->set_property = xproxy_address_enumerator_set_property;
@@ -716,13 +716,13 @@ xproxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enumer
 
   xobject_class_install_property (object_class,
 				   PROP_URI,
-				   g_param_spec_string ("uri",
+				   xparam_spec_string ("uri",
 							P_("URI"),
 							P_("The destination URI, use none:// for generic socket"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
 
   /**
    * xproxy_address_enumerator_t:default-port:
@@ -734,23 +734,23 @@ xproxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enumer
    */
   xobject_class_install_property (object_class,
 				   PROP_DEFAULT_PORT,
-				   g_param_spec_uint ("default-port",
+				   xparam_spec_uint ("default-port",
                                                       P_("Default port"),
                                                       P_("The default port to use if uri does not specify one"),
                                                       0, 65535, 0,
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_STATIC_STRINGS));
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class,
 				   PROP_CONNECTABLE,
-				   g_param_spec_object ("connectable",
+				   xparam_spec_object ("connectable",
 							P_("Connectable"),
 							P_("The connectable being enumerated."),
 							XTYPE_SOCKET_CONNECTABLE,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
 
   /**
    * xproxy_address_enumerator_t:proxy-resolver:
@@ -761,11 +761,11 @@ xproxy_address_enumerator_class_init (GProxyAddressEnumeratorClass *proxy_enumer
    */
   xobject_class_install_property (object_class,
                                    PROP_PROXY_RESOLVER,
-                                   g_param_spec_object ("proxy-resolver",
+                                   xparam_spec_object ("proxy-resolver",
                                                         P_("Proxy resolver"),
                                                         P_("The proxy resolver to use."),
                                                         XTYPE_PROXY_RESOLVER,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT |
+                                                        XPARAM_STATIC_STRINGS));
 }

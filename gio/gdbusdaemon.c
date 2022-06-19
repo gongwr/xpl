@@ -170,7 +170,7 @@ name_new (xdbus_daemon_t *daemon, const char *str)
 static Name *
 name_ref (Name *name)
 {
-  g_assert (name->refcount > 0);
+  xassert (name->refcount > 0);
   name->refcount++;
   return name;
 }
@@ -178,7 +178,7 @@ name_ref (Name *name)
 static void
 name_unref (Name *name)
 {
-  g_assert (name->refcount > 0);
+  xassert (name->refcount > 0);
   if (--name->refcount == 0)
     {
       xhash_table_remove (name->daemon->names, name->name);
@@ -210,7 +210,7 @@ is_key (const char *key_start, const char *key_end, const char *value)
 {
   xsize_t len = strlen (value);
 
-  g_assert (key_end >= key_start);
+  xassert (key_end >= key_start);
   if (len != (xsize_t) (key_end - key_start))
     return FALSE;
 
@@ -738,7 +738,7 @@ name_replace_owner (Name *name, NameOwner *owner)
     {
       Client *old_client = old_owner->client;
 
-      g_assert (old_owner->client != new_client);
+      xassert (old_owner->client != new_client);
 
       xdbus_connection_emit_signal (old_client->connection,
 				     NULL, "/org/freedesktop/DBus",
@@ -905,7 +905,7 @@ idle_timeout_cb (xpointer_t user_data)
 		 xdbus_daemon_signals[SIGNAL_IDLE_TIMEOUT],
 		 0);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1552,8 +1552,8 @@ xdbus_daemon_finalize (xobject_t *object)
     client_free (l->data);
   xlist_free (clients);
 
-  g_assert (xhash_table_size (daemon->clients) == 0);
-  g_assert (xhash_table_size (daemon->names) == 0);
+  xassert (xhash_table_size (daemon->clients) == 0);
+  xassert (xhash_table_size (daemon->names) == 0);
 
   xhash_table_destroy (daemon->clients);
   xhash_table_destroy (daemon->names);
@@ -1569,7 +1569,7 @@ xdbus_daemon_finalize (xobject_t *object)
   g_free (daemon->guid);
   g_free (daemon->address);
 
-  G_OBJECT_CLASS (xdbus_daemon_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdbus_daemon_parent_class)->finalize (object);
 }
 
 static void
@@ -1670,12 +1670,12 @@ xdbus_daemon_get_property (xobject_t    *object,
 static void
 xdbus_daemon_class_init (xdbus_daemon_class_t *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = xdbus_daemon_finalize;
-  gobject_class->set_property = xdbus_daemon_set_property;
-  gobject_class->get_property = xdbus_daemon_get_property;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize = xdbus_daemon_finalize;
+  xobject_class->set_property = xdbus_daemon_set_property;
+  xobject_class->get_property = xdbus_daemon_get_property;
 
   xdbus_daemon_signals[SIGNAL_IDLE_TIMEOUT] =
     xsignal_new (I_("idle-timeout"),
@@ -1686,15 +1686,15 @@ xdbus_daemon_class_init (xdbus_daemon_class_t *klass)
 		  NULL,
 		  XTYPE_NONE, 0);
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_ADDRESS,
-				   g_param_spec_string ("address",
+				   xparam_spec_string ("address",
 							"Bus Address",
 							"The address the bus should use",
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
 }
 
 static void

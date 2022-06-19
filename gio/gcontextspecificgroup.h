@@ -30,22 +30,22 @@ typedef struct
   xboolean_t    requested_state;
   xcallback_t   requested_func;
   xboolean_t    effective_state;
-} GContextSpecificGroup;
+} xcontext_specific_group_t;
 
 xpointer_t
-g_context_specific_group_get (GContextSpecificGroup *group,
+xcontext_specific_group_get (xcontext_specific_group_t *group,
                               xtype_t                  type,
                               xoffset_t                context_offset,
                               xcallback_t              start_func);
 
 void
-g_context_specific_group_remove (GContextSpecificGroup *group,
+xcontext_specific_group_remove (xcontext_specific_group_t *group,
                                  xmain_context_t          *context,
                                  xpointer_t               instance,
                                  xcallback_t              stop_func);
 
 void
-g_context_specific_group_emit (GContextSpecificGroup *group,
+xcontext_specific_group_emit (xcontext_specific_group_t *group,
                                xuint_t                  signal_id);
 
 #endif /* __G_CONTEXT_SPECIFIC_GROUP_H__ */

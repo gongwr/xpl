@@ -30,7 +30,7 @@ xtype_t g_nextstep_settings_backend_get_type (void);
 #define G_NEXTSTEP_SETTINGS_BACKEND(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), g_nextstep_settings_backend_get_type (), GNextstepSettingsBackend))
 
 typedef struct _GNextstepSettingsBackend GNextstepSettingsBackend;
-typedef GSettingsBackendClass            GNextstepSettingsBackendClass;
+typedef xsettings_backend_class_t            GNextstepSettingsBackendClass;
 
 struct _GNextstepSettingsBackend
 {
@@ -93,7 +93,7 @@ static id            g_nextstep_settings_backend_get_ns_object  (xvariant_t     
 static void
 g_nextstep_settings_backend_class_init (GNextstepSettingsBackendClass *class)
 {
-  G_OBJECT_CLASS (class)->finalize = g_nextstep_settings_backend_finalize;
+  XOBJECT_CLASS (class)->finalize = g_nextstep_settings_backend_finalize;
   class->read = g_nextstep_settings_backend_read;
   class->get_writable = g_nextstep_settings_backend_get_writable;
   class->write = g_nextstep_settings_backend_write;
@@ -133,7 +133,7 @@ g_nextstep_settings_backend_finalize (xobject_t *self)
 
   [pool drain];
 
-  G_OBJECT_CLASS (g_nextstep_settings_backend_parent_class)->finalize (self);
+  XOBJECT_CLASS (g_nextstep_settings_backend_parent_class)->finalize (self);
 }
 
 static xvariant_t *

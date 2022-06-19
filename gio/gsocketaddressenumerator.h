@@ -29,10 +29,10 @@ G_BEGIN_DECLS
 
 #define XTYPE_SOCKET_ADDRESS_ENUMERATOR         (xsocket_address_enumerator_get_type ())
 #define XSOCKET_ADDRESS_ENUMERATOR(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR, xsocket_address_enumerator))
-#define XSOCKET_ADDRESS_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SOCKET_ADDRESS_ENUMERATOR, GSocketAddressEnumeratorClass))
+#define XSOCKET_ADDRESS_ENUMERATOR_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_SOCKET_ADDRESS_ENUMERATOR, xsocket_address_enumerator_class_t))
 #define X_IS_SOCKET_ADDRESS_ENUMERATOR(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR))
 #define X_IS_SOCKET_ADDRESS_ENUMERATOR_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_SOCKET_ADDRESS_ENUMERATOR))
-#define XSOCKET_ADDRESS_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR, GSocketAddressEnumeratorClass))
+#define XSOCKET_ADDRESS_ENUMERATOR_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_SOCKET_ADDRESS_ENUMERATOR, xsocket_address_enumerator_class_t))
 
 /**
  * xsocket_address_enumerator_t:
@@ -40,7 +40,7 @@ G_BEGIN_DECLS
  * Enumerator type for objects that contain or generate
  * #xsocket_address_t instances.
  */
-typedef struct _GSocketAddressEnumeratorClass GSocketAddressEnumeratorClass;
+typedef struct _GSocketAddressEnumeratorClass xsocket_address_enumerator_class_t;
 
 struct _GSocketAddressEnumerator
 {
@@ -49,7 +49,7 @@ struct _GSocketAddressEnumerator
 };
 
 /**
- * GSocketAddressEnumeratorClass:
+ * xsocket_address_enumerator_class_t:
  * @next: Virtual method for xsocket_address_enumerator_next().
  * @next_async: Virtual method for xsocket_address_enumerator_next_async().
  * @next_finish: Virtual method for xsocket_address_enumerator_next_finish().

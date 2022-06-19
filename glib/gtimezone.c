@@ -225,7 +225,7 @@ xtime_zone_unref (xtimezone_t *tz)
 again:
   ref_count = g_atomic_int_get (&tz->ref_count);
 
-  g_assert (ref_count > 0);
+  xassert (ref_count > 0);
 
   if (ref_count == 1)
     {
@@ -281,7 +281,7 @@ again:
 xtimezone_t *
 xtime_zone_ref (xtimezone_t *tz)
 {
-  g_assert (tz->ref_count > 0);
+  xassert (tz->ref_count > 0);
 
   g_atomic_int_inc (&tz->ref_count);
 
@@ -564,7 +564,7 @@ zone_identifier_unix (void)
       else
         {
           /* Error */
-          g_assert (resolved_identifier == NULL);
+          xassert (resolved_identifier == NULL);
           goto out;
         }
     }
@@ -592,7 +592,7 @@ zone_identifier_unix (void)
     memmove (resolved_identifier, resolved_identifier + prefix_len,
              strlen (resolved_identifier) - prefix_len + 1  /* nul terminator */);
 
-  g_assert (resolved_identifier != NULL);
+  xassert (resolved_identifier != NULL);
 
 out:
   g_free (canonical_path);
@@ -645,7 +645,7 @@ zone_info_unix (const xchar_t *identifier,
       xmapped_file_unref (file);
     }
 
-  g_assert (resolved_identifier != NULL);
+  xassert (resolved_identifier != NULL);
 
 out:
   g_free (filename);
@@ -746,8 +746,8 @@ init_zone_from_iana_info (xtimezone_t *gtz,
         trans.time = gint32_from_be (((gint32_be*)tz_transitions)[index]);
       last_explicit_transition_time = trans.time;
       trans.info_index = tz_type_index[index];
-      g_assert (trans.info_index >= 0);
-      g_assert ((xuint_t) trans.info_index < gtz->t_info->len);
+      xassert (trans.info_index >= 0);
+      xassert ((xuint_t) trans.info_index < gtz->t_info->len);
       g_array_append_val (gtz->transitions, trans);
     }
 
@@ -940,7 +940,7 @@ rules_from_windows_time_zone (const xchar_t   *identifier,
   if (GetSystemDirectoryW (winsyspath, MAX_PATH) == 0)
     return 0;
 
-  g_assert (rules != NULL);
+  xassert (rules != NULL);
 
   *rules = NULL;
   key_name = NULL;
@@ -1168,7 +1168,7 @@ boundary_for_year (TimeZoneDate *boundary,
         find_relative_date (&buffer);
     }
 
-  g_assert (buffer.year == year);
+  xassert (buffer.year == year);
   xdate_clear (&date, 1);
   xdate_set_dmy (&date, buffer.mday, buffer.mon, buffer.year);
   return ((xdate_get_julian (&date) - unix_epoch_start) * seconds_per_day +
@@ -1548,7 +1548,7 @@ set_tz_name (xchar_t **pos, xchar_t *buffer, xuint_t size)
   xchar_t *name_pos = *pos;
   xuint_t len;
 
-  g_assert (size != 0);
+  xassert (size != 0);
 
   if (quoted)
     {
@@ -1604,7 +1604,7 @@ rules_from_identifier (const xchar_t   *identifier,
   xchar_t *pos;
   TimeZoneRule tzr;
 
-  g_assert (rules != NULL);
+  xassert (rules != NULL);
 
   *rules = NULL;
 
@@ -1717,7 +1717,7 @@ xtime_zone_new (const xchar_t *identifier)
   if (tz == NULL)
     tz = xtime_zone_new_utc ();
 
-  g_assert (tz != NULL);
+  xassert (tz != NULL);
 
   return g_steal_pointer (&tz);
 }
@@ -1924,8 +1924,8 @@ xtime_zone_new_identifier (const xchar_t *identifier)
       return NULL;
     }
 
-  g_assert (tz->name != NULL);
-  g_assert (tz->t_info != NULL);
+  xassert (tz->name != NULL);
+  xassert (tz->t_info != NULL);
 
   if (identifier)
     xhash_table_insert (time_zones, tz->name, tz);
@@ -1970,7 +1970,7 @@ xtime_zone_new_utc (void)
   if (g_once_init_enter (&initialised))
     {
       utc = xtime_zone_new_identifier ("UTC");
-      g_assert (utc != NULL);
+      xassert (utc != NULL);
       g_once_init_leave (&initialised, TRUE);
     }
 
@@ -2058,9 +2058,9 @@ xtime_zone_new_offset (gint32 seconds)
   if (tz == NULL)
     tz = xtime_zone_new_utc ();
   else
-    g_assert (xtime_zone_get_offset (tz, 0) == seconds);
+    xassert (xtime_zone_get_offset (tz, 0) == seconds);
 
-  g_assert (tz != NULL);
+  xassert (tz != NULL);
   g_free (identifier);
 
   return tz;
@@ -2083,7 +2083,7 @@ interval_info (xtimezone_t *tz,
                xuint_t      interval)
 {
   xuint_t index;
-  g_return_val_if_fail (tz->t_info != NULL, NULL);
+  xreturn_val_if_fail (tz->t_info != NULL, NULL);
   if (interval && tz->transitions && interval <= tz->transitions->len)
     index = (TRANSITION(interval - 1)).info_index;
   else
@@ -2127,7 +2127,7 @@ inline static gint32
 interval_offset (xtimezone_t *tz,
                  xuint_t      interval)
 {
-  g_return_val_if_fail (tz->t_info != NULL, 0);
+  xreturn_val_if_fail (tz->t_info != NULL, 0);
   return interval_info (tz, interval)->gmt_offset;
 }
 
@@ -2135,7 +2135,7 @@ inline static xboolean_t
 interval_isdst (xtimezone_t *tz,
                 xuint_t      interval)
 {
-  g_return_val_if_fail (tz->t_info != NULL, 0);
+  xreturn_val_if_fail (tz->t_info != NULL, 0);
   return interval_info (tz, interval)->is_dst;
 }
 
@@ -2144,7 +2144,7 @@ inline static xchar_t*
 interval_abbrev (xtimezone_t *tz,
                   xuint_t      interval)
 {
-  g_return_val_if_fail (tz->t_info != NULL, 0);
+  xreturn_val_if_fail (tz->t_info != NULL, 0);
   return interval_info (tz, interval)->abbrev;
 }
 
@@ -2225,7 +2225,7 @@ xtime_zone_adjust_time (xtimezone_t *tz,
     if (*time_ <= interval_end (tz, i))
       break;
 
-  g_assert (interval_start (tz, i) <= *time_ && *time_ <= interval_end (tz, i));
+  xassert (interval_start (tz, i) <= *time_ && *time_ <= interval_end (tz, i));
 
   if (type != G_TIME_TYPE_UNIVERSAL)
     {
@@ -2373,7 +2373,7 @@ const xchar_t *
 xtime_zone_get_abbreviation (xtimezone_t *tz,
                               xint_t       interval)
 {
-  g_return_val_if_fail (interval_valid (tz, (xuint_t)interval), NULL);
+  xreturn_val_if_fail (interval_valid (tz, (xuint_t)interval), NULL);
 
   return interval_abbrev (tz, (xuint_t)interval);
 }
@@ -2399,7 +2399,7 @@ gint32
 xtime_zone_get_offset (xtimezone_t *tz,
                         xint_t       interval)
 {
-  g_return_val_if_fail (interval_valid (tz, (xuint_t)interval), 0);
+  xreturn_val_if_fail (interval_valid (tz, (xuint_t)interval), 0);
 
   return interval_offset (tz, (xuint_t)interval);
 }
@@ -2420,7 +2420,7 @@ xboolean_t
 xtime_zone_is_dst (xtimezone_t *tz,
                     xint_t       interval)
 {
-  g_return_val_if_fail (interval_valid (tz, interval), FALSE);
+  xreturn_val_if_fail (interval_valid (tz, interval), FALSE);
 
   if (tz->transitions == NULL)
     return FALSE;
@@ -2447,7 +2447,7 @@ xtime_zone_is_dst (xtimezone_t *tz,
 const xchar_t *
 xtime_zone_get_identifier (xtimezone_t *tz)
 {
-  g_return_val_if_fail (tz != NULL, NULL);
+  xreturn_val_if_fail (tz != NULL, NULL);
 
   return tz->name;
 }

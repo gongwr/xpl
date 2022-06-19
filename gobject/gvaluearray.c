@@ -31,7 +31,7 @@
  * SECTION:value_arrays
  * @short_description: A container structure to maintain an array of
  *     generic values
- * @see_also: #xvalue_t, #GParamSpecValueArray, g_param_spec_value_array()
+ * @see_also: #xvalue_t, #GParamSpecValueArray, xparam_spec_value_array()
  * @title: Value arrays
  *
  * The prime purpose of a #xvalue_array_t is for it to be used as an
@@ -79,8 +79,8 @@ xvalue_t*
 xvalue_array_get_nth (xvalue_array_t *value_array,
 		       xuint_t        index)
 {
-  g_return_val_if_fail (value_array != NULL, NULL);
-  g_return_val_if_fail (index < value_array->n_values, NULL);
+  xreturn_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (index < value_array->n_values, NULL);
 
   return value_array->values + index;
 }
@@ -175,7 +175,7 @@ xvalue_array_copy (const xvalue_array_t *value_array)
   xvalue_array_t *new_array;
   xuint_t i;
 
-  g_return_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (value_array != NULL, NULL);
 
   new_array = g_slice_new (xvalue_array_t);
   new_array->n_values = 0;
@@ -210,7 +210,7 @@ xvalue_array_t*
 xvalue_array_prepend (xvalue_array_t  *value_array,
 		       const xvalue_t *value)
 {
-  g_return_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (value_array != NULL, NULL);
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   return xvalue_array_insert (value_array, 0, value);
@@ -233,7 +233,7 @@ xvalue_array_t*
 xvalue_array_append (xvalue_array_t  *value_array,
 		      const xvalue_t *value)
 {
-  g_return_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (value_array != NULL, NULL);
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   return xvalue_array_insert (value_array, value_array->n_values, value);
@@ -260,8 +260,8 @@ xvalue_array_insert (xvalue_array_t  *value_array,
 {
   xuint_t i;
 
-  g_return_val_if_fail (value_array != NULL, NULL);
-  g_return_val_if_fail (index <= value_array->n_values, value_array);
+  xreturn_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (index <= value_array->n_values, value_array);
 
   i = value_array->n_values;
   value_array_grow (value_array, value_array->n_values + 1, FALSE);
@@ -293,8 +293,8 @@ xvalue_array_t*
 xvalue_array_remove (xvalue_array_t *value_array,
 		      xuint_t        index)
 {
-  g_return_val_if_fail (value_array != NULL, NULL);
-  g_return_val_if_fail (index < value_array->n_values, value_array);
+  xreturn_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (index < value_array->n_values, value_array);
 
   if (G_VALUE_TYPE (value_array->values + index) != 0)
     xvalue_unset (value_array->values + index);
@@ -327,7 +327,7 @@ xvalue_array_t*
 xvalue_array_sort (xvalue_array_t *value_array,
 		    GCompareFunc compare_func)
 {
-  g_return_val_if_fail (compare_func != NULL, NULL);
+  xreturn_val_if_fail (compare_func != NULL, NULL);
 
   if (value_array->n_values)
     qsort (value_array->values,
@@ -358,8 +358,8 @@ xvalue_array_sort_with_data (xvalue_array_t     *value_array,
 			      GCompareDataFunc compare_func,
 			      xpointer_t         user_data)
 {
-  g_return_val_if_fail (value_array != NULL, NULL);
-  g_return_val_if_fail (compare_func != NULL, NULL);
+  xreturn_val_if_fail (value_array != NULL, NULL);
+  xreturn_val_if_fail (compare_func != NULL, NULL);
 
   if (value_array->n_values)
     g_qsort_with_data (value_array->values,

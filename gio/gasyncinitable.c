@@ -116,7 +116,7 @@
  *                  xasync_result_t         *result,
  *                  xerror_t              **error)
  * {
- *   g_return_val_if_fail (xtask_is_valid (result, initable), FALSE);
+ *   xreturn_val_if_fail (xtask_is_valid (result, initable), FALSE);
  *
  *   return xtask_propagate_boolean (XTASK (result), error);
  * }
@@ -239,8 +239,8 @@ xasync_initable_init_finish (xasync_initable_t  *initable,
 {
   xasync_initable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_ASYNC_INITABLE (initable), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_INITABLE (initable), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), FALSE);
 
   if (xasync_result_legacy_propagate_error (res, error))
     return FALSE;
@@ -302,7 +302,7 @@ xasync_initable_real_init_finish (xasync_initable_t  *initable,
     }
   G_GNUC_END_IGNORE_DEPRECATIONS
 
-  g_return_val_if_fail (xtask_is_valid (res, initable), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, initable), FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }

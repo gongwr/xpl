@@ -505,7 +505,7 @@ get_body_signature (xvariant_t *value)
 
   s = xvariant_get_type_string (value);
   len = strlen (s);
-  g_assert (len >= 2);
+  xassert (len >= 2);
 
   ret = xstrndup (s + 1, len - 2);
 
@@ -562,7 +562,7 @@ get_and_check_serialization (xvariant_t *value)
                                      G_DBUS_CAPABILITY_FLAGS_NONE,
                                      &error);
       g_assert_no_error (error);
-      g_assert (blob != NULL);
+      xassert (blob != NULL);
 
       switch (byte_order)
         {
@@ -605,15 +605,15 @@ get_and_check_serialization (xvariant_t *value)
                                                         G_DBUS_CAPABILITY_FLAGS_NONE,
                                                         &error);
       g_assert_no_error (error);
-      g_assert (recovered_message != NULL);
+      xassert (recovered_message != NULL);
 
       if (value == NULL)
         {
-          g_assert (xdbus_message_get_body (recovered_message) == NULL);
+          xassert (xdbus_message_get_body (recovered_message) == NULL);
         }
       else
         {
-          g_assert (xdbus_message_get_body (recovered_message) != NULL);
+          xassert (xdbus_message_get_body (recovered_message) != NULL);
           g_assert_cmpvariant (xdbus_message_get_body (recovered_message), value);
         }
       xobject_unref (recovered_message);
@@ -691,7 +691,7 @@ test_message_serialize_complex (void)
                            "([1, 2, 3], {'one': 'white', 'two': 'black'})",
                            NULL, NULL, &error);
   g_assert_no_error (error);
-  g_assert (value != NULL);
+  xassert (value != NULL);
   check_serialization (value,
                        "value 0:   array:\n"
                        "    int32: 1\n"
@@ -710,7 +710,7 @@ test_message_serialize_complex (void)
                            "('01234567890123456', {}, ['Something'])",
                            NULL, NULL, &error);
   g_assert_no_error (error);
-  g_assert (value != NULL);
+  xassert (value != NULL);
   check_serialization (value,
                        "value 0:   string: '01234567890123456'\n"
                        "value 1:   array:\n"
@@ -732,7 +732,7 @@ test_message_serialize_complex (void)
                            "(42, [43, 44])",
                            NULL, NULL, &error);
   g_assert_no_error (error);
-  g_assert (value != NULL);
+  xassert (value != NULL);
   /* about (not extracted), see comment in DBUS_TYPE_UNIX_FD case in
    * dbus_1_message_append() above.
    */
@@ -881,7 +881,7 @@ test_message_serialize_invalid (void)
                                               &error);
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
       xerror_free (error);
-      g_assert (message == NULL);
+      xassert (message == NULL);
 
       dbus_free (blob);
       dbus_message_unref (dbus_message);

@@ -121,21 +121,21 @@ g_tcp_connection_set_property (xobject_t      *object,
 static void
 g_tcp_connection_class_init (GTcpConnectionClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
   xio_stream_class_t *stream_class = XIO_STREAM_CLASS (class);
 
-  gobject_class->set_property = g_tcp_connection_set_property;
-  gobject_class->get_property = g_tcp_connection_get_property;
+  xobject_class->set_property = g_tcp_connection_set_property;
+  xobject_class->get_property = g_tcp_connection_get_property;
 
   stream_class->close_fn = g_tcp_connection_close;
   stream_class->close_async = g_tcp_connection_close_async;
 
-  xobject_class_install_property (gobject_class, PROP_GRACEFUL_DISCONNECT,
-				   g_param_spec_boolean ("graceful-disconnect",
+  xobject_class_install_property (xobject_class, PROP_GRACEFUL_DISCONNECT,
+				   xparam_spec_boolean ("graceful-disconnect",
 							 P_("Graceful Disconnect"),
 							 P_("Whether or not close does a graceful disconnect"),
 							 FALSE,
-							 G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+							 XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
 }
 

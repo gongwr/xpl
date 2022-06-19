@@ -452,7 +452,7 @@ stop_timeout (xpointer_t user_data)
   data->timed_out = TRUE;
   xmain_context_wakeup (data->context);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 /*
@@ -486,7 +486,7 @@ test_create_delete (xconstpointer d)
   data->monitor = xfile_monitor_file (data->file, 0, NULL, &error);
   g_assert_no_error (error);
 
-  /* This test doesn't work with GPollFileMonitor, because it assumes
+  /* This test doesn't work with xpoll_file_monitor_t, because it assumes
    * that the monitor will notice a create immediately followed by a
    * delete, rather than coalescing them into nothing.
    */
@@ -497,7 +497,7 @@ test_create_delete (xconstpointer d)
    * difference itself. This is usually too slow for rapid file creation
    * and deletion tests.
    */
-  if (strcmp (G_OBJECT_TYPE_NAME (data->monitor), "GPollFileMonitor") == 0 ||
+  if (strcmp (G_OBJECT_TYPE_NAME (data->monitor), "xpoll_file_monitor_t") == 0 ||
       strcmp (G_OBJECT_TYPE_NAME (data->monitor), "GKqueueFileMonitor") == 0)
     {
       g_test_skip ("skipping test for this xfile_monitor_t implementation");
@@ -1086,7 +1086,7 @@ create_test_file (xfile_t             *tmpdir,
     {
     case FILE_TEST_SETUP_TYPE_NONEXISTENT:
       /* Nothing to do here. */
-      g_assert (setup_mode == 0);
+      xassert (setup_mode == 0);
       break;
     case FILE_TEST_SETUP_TYPE_REGULAR_EMPTY:
     case FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY:
@@ -1110,7 +1110,7 @@ create_test_file (xfile_t             *tmpdir,
           break;
         }
     case FILE_TEST_SETUP_TYPE_DIRECTORY:
-      g_assert (setup_mode == 0);
+      xassert (setup_mode == 0);
 
       xfile_make_directory (test_file, NULL, &local_error);
       g_assert_no_error (local_error);
@@ -1125,7 +1125,7 @@ create_test_file (xfile_t             *tmpdir,
     case FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING:
       /* Permissions on a symlink are not used by the kernel, so are only
        * applicable if the symlink is valid (and are applied to the target) */
-      g_assert (setup_type != FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING || setup_mode == 0);
+      xassert (setup_type != FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING || setup_mode == 0);
 
       xfile_make_symbolic_link (test_file, target_basename, NULL, &local_error);
       g_assert_no_error (local_error);
@@ -1179,16 +1179,16 @@ check_test_file (xfile_t             *test_file,
   switch (expected_type)
     {
     case FILE_TEST_SETUP_TYPE_NONEXISTENT:
-      g_assert (expected_mode == 0);
-      g_assert (expected_contents == NULL);
+      xassert (expected_mode == 0);
+      xassert (expected_contents == NULL);
 
       g_assert_false (xfile_query_exists (test_file, NULL));
       g_assert_cmpint (test_file_type, ==, XFILE_TYPE_UNKNOWN);
       break;
     case FILE_TEST_SETUP_TYPE_REGULAR_EMPTY:
     case FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY:
-      g_assert (expected_type != FILE_TEST_SETUP_TYPE_REGULAR_EMPTY || expected_contents == NULL);
-      g_assert (expected_type != FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY || expected_contents != NULL);
+      xassert (expected_type != FILE_TEST_SETUP_TYPE_REGULAR_EMPTY || expected_contents == NULL);
+      xassert (expected_type != FILE_TEST_SETUP_TYPE_REGULAR_NONEMPTY || expected_contents != NULL);
 
       g_assert_cmpint (test_file_type, ==, XFILE_TYPE_REGULAR);
 
@@ -1219,13 +1219,13 @@ check_test_file (xfile_t             *test_file,
 
       break;
     case FILE_TEST_SETUP_TYPE_DIRECTORY:
-      g_assert (expected_mode == 0);
-      g_assert (expected_contents == NULL);
+      xassert (expected_mode == 0);
+      xassert (expected_contents == NULL);
 
       g_assert_cmpint (test_file_type, ==, XFILE_TYPE_DIRECTORY);
       break;
     case FILE_TEST_SETUP_TYPE_SOCKET:
-      g_assert (expected_contents == NULL);
+      xassert (expected_contents == NULL);
 
       g_assert_cmpint (test_file_type, ==, XFILE_TYPE_SPECIAL);
 
@@ -1243,8 +1243,8 @@ check_test_file (xfile_t             *test_file,
 
           /* Permissions on a symlink are not used by the kernel, so are only
            * applicable if the symlink is valid (and are applied to the target) */
-          g_assert (expected_type != FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING || expected_mode == 0);
-          g_assert (expected_contents != NULL);
+          xassert (expected_type != FILE_TEST_SETUP_TYPE_SYMLINK_DANGLING || expected_mode == 0);
+          xassert (expected_contents != NULL);
 
           g_assert_cmpint (test_file_type, ==, XFILE_TYPE_SYMBOLIC_LINK);
 

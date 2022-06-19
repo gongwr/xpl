@@ -78,7 +78,7 @@ g_pollable_input_stream_default_can_poll (xpollable_input_stream_t *stream)
 xboolean_t
 g_pollable_input_stream_can_poll (xpollable_input_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), FALSE);
 
   return G_POLLABLE_INPUT_STREAM_GET_INTERFACE (stream)->can_poll (stream);
 }
@@ -106,7 +106,7 @@ g_pollable_input_stream_can_poll (xpollable_input_stream_t *stream)
 xboolean_t
 g_pollable_input_stream_is_readable (xpollable_input_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), FALSE);
 
   return G_POLLABLE_INPUT_STREAM_GET_INTERFACE (stream)->is_readable (stream);
 }
@@ -133,7 +133,7 @@ xsource_t *
 g_pollable_input_stream_create_source (xpollable_input_stream_t *stream,
 				       xcancellable_t         *cancellable)
 {
-  g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), NULL);
 
   return G_POLLABLE_INPUT_STREAM_GET_INTERFACE (stream)->
 	  create_source (stream, cancellable);
@@ -190,8 +190,8 @@ g_pollable_input_stream_read_nonblocking (xpollable_input_stream_t  *stream,
 {
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), -1);
-  g_return_val_if_fail (buffer != NULL, 0);
+  xreturn_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (buffer != NULL, 0);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;

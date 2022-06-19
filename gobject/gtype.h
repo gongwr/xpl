@@ -1219,7 +1219,7 @@ struct _GInterfaceInfo
  *  #xobject_t:
  *  |[<!-- language="C" -->
  *    xobject_t *object = G_OBJECT (collect_values[0].v_pointer);
- *    g_return_val_if_fail (object != NULL,
+ *    xreturn_val_if_fail (object != NULL,
  *       xstrdup_printf ("Object passed as invalid NULL pointer"));
  *    // never honour G_VALUE_NOCOPY_CONTENTS for ref-counted types
  *    value->data[0].v_pointer = xobject_ref (object);
@@ -1255,7 +1255,7 @@ struct _GInterfaceInfo
  *  To complete the string example:
  *  |[<!-- language="C" -->
  *  xchar_t **string_p = collect_values[0].v_pointer;
- *  g_return_val_if_fail (string_p != NULL,
+ *  xreturn_val_if_fail (string_p != NULL,
  *      xstrdup_printf ("string location passed as NULL"));
  *  if (collect_flags & G_VALUE_NOCOPY_CONTENTS)
  *    *string_p = value->data[0].v_pointer;
@@ -1266,7 +1266,7 @@ struct _GInterfaceInfo
  *  reference-counted types:
  *  |[<!-- language="C" -->
  *  xobject_t **object_p = collect_values[0].v_pointer;
- *  g_return_val_if_fail (object_p != NULL,
+ *  xreturn_val_if_fail (object_p != NULL,
  *    xstrdup_printf ("object location passed as NULL"));
  *  if (!value->data[0].v_pointer)
  *    *object_p = NULL;
@@ -1409,7 +1409,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *  GtkWindow parent;
  *  ...
  * };
- * G_DEFINE_TYPE (MyAppWindow, my_app_window, GTK_TYPE_WINDOW)
+ * XDEFINE_TYPE (MyAppWindow, my_app_window, GTK_TYPE_WINDOW)
  * ]|
  *
  * This results in the following things happening:
@@ -1417,7 +1417,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  * - the usual `my_app_window_get_type()` function is declared with a return type of #xtype_t
  *
  * - the `MyAppWindow` type is defined as a `typedef` of `struct _MyAppWindow`.  The struct itself is not
- *   defined and should be defined from the .c file before G_DEFINE_TYPE() is used.
+ *   defined and should be defined from the .c file before XDEFINE_TYPE() is used.
  *
  * - the `MY_APP_WINDOW()` cast is emitted as `static inline` function along with the `MY_APP_IS_WINDOW()` type
  *   checking function
@@ -1651,7 +1651,7 @@ xuint_t     xtype_get_type_registration_serial (void);
                                                                                                            \
   _XPL_DEFINE_AUTOPTR_CHAINUP (ModuleObjNameNoT, PrerequisiteNameNoT)                                           \
                                                                                                            \
-  G_GNUC_UNUSED static inline ModuleObjNameNoT * MODULE##_##OBJ_NAME (xpointer_t ptr) {                         \
+  G_GNUC_UNUSED static inline ModuleObjNameNoT##_t * MODULE##_##OBJ_NAME (xpointer_t ptr) {                         \
     return XTYPE_CHECK_INSTANCE_CAST (ptr, module_obj_name##_get_type (), ModuleObjNameNoT##_t); }               \
   G_GNUC_UNUSED static inline xboolean_t MODULE##_IS_##OBJ_NAME (xpointer_t ptr) {                             \
     return XTYPE_CHECK_INSTANCE_TYPE (ptr, module_obj_name##_get_type ()); }                              \
@@ -1660,7 +1660,7 @@ xuint_t     xtype_get_type_registration_serial (void);
   G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * G_DEFINE_TYPE:
+ * XDEFINE_TYPE:
  * @TN: The name of the new type, in Camel case.
  * @t_n: The name of the new type, in lowercase, with words
  *  separated by `_`.
@@ -1674,7 +1674,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * Since: 2.4
  */
-#define G_DEFINE_TYPE(TN, t_n, T_P)			    G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, 0, {})
+#define XDEFINE_TYPE(TN, t_n, T_P)			    G_DEFINE_TYPE_EXTENDED (TN, t_n, T_P, 0, {})
 /**
  * G_DEFINE_TYPE_WITH_CODE:
  * @TN: The name of the new type, in Camel case.
@@ -1684,7 +1684,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * A convenience macro for type implementations.
  *
- * Similar to G_DEFINE_TYPE(), but allows you to insert custom code into the
+ * Similar to XDEFINE_TYPE(), but allows you to insert custom code into the
  * `*_get_type()` function, e.g. interface implementations via G_IMPLEMENT_INTERFACE().
  * See G_DEFINE_TYPE_EXTENDED() for an example.
  *
@@ -1726,7 +1726,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * A convenience macro for type implementations.
  *
- * Similar to G_DEFINE_TYPE(), but defines an abstract type.
+ * Similar to XDEFINE_TYPE(), but defines an abstract type.
  * See G_DEFINE_TYPE_EXTENDED() for an example.
  *
  * Since: 2.4
@@ -1774,7 +1774,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *
  * A convenience macro for type implementations.
  *
- * Similar to G_DEFINE_TYPE(), but defines a final type.
+ * Similar to XDEFINE_TYPE(), but defines a final type.
  *
  * See G_DEFINE_TYPE_EXTENDED() for an example.
  *
@@ -1826,7 +1826,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  * @_C_: Custom code that gets inserted in the `*_get_type()` function.
  *
  * The most general convenience macro for type implementations, on which
- * G_DEFINE_TYPE(), etc are based.
+ * XDEFINE_TYPE(), etc are based.
  *
  * |[<!-- language="C" -->
  * G_DEFINE_TYPE_EXTENDED (GtkGadget,
@@ -1998,7 +1998,7 @@ xuint_t     xtype_get_type_registration_serial (void);
  *   {
  *     xobject_private_t *priv = my_object_get_instance_private (obj);
  *
- *     g_return_val_if_fail (MY_IS_OBJECT (obj), 0);
+ *     xreturn_val_if_fail (MY_IS_OBJECT (obj), 0);
  *
  *     return priv->foo;
  *   }
@@ -2141,7 +2141,7 @@ type_name##_get_type (void) \
   /* Prelude goes here */
 
 /* Added for _G_DEFINE_TYPE_EXTENDED_WITH_PRELUDE */
-#define _G_DEFINE_TYPE_EXTENDED_BEGIN_REGISTER(TypeName, type_name, TYPE_PARENT, flags) \
+#define _G_DEFINE_TYPE_EXTENDED_BEGIN_REGISTER(TypeNameNoT, type_name, TYPE_PARENT, flags) \
   if (g_once_init_enter (&static_g_define_type_id)) \
     { \
       xtype_t g_define_type_id = type_name##_get_type_once (); \
@@ -2156,10 +2156,10 @@ type_name##_get_type_once (void) \
 { \
   xtype_t g_define_type_id = \
         xtype_register_static_simple (TYPE_PARENT, \
-                                       g_intern_static_string (#TypeName), \
-                                       sizeof (TypeName##_class_t), \
+                                       g_intern_static_string (#TypeNameNoT), \
+                                       sizeof (TypeNameNoT##_class_t), \
                                        (xclass_init_func_t)(void (*)(void)) type_name##_class_intern_init, \
-                                       sizeof (TypeName##_t), \
+                                       sizeof (TypeNameNoT##_t), \
                                        (xinstance_init_func_t)(void (*)(void)) type_name##_init, \
                                        (xtype_flags_t) flags); \
     { /* custom code follows */

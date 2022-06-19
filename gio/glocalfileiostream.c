@@ -35,7 +35,7 @@
 
 
 #define xlocal_file_io_stream_get_type _xlocal_file_io_stream_get_type
-G_DEFINE_TYPE (xlocal_file_io_stream, xlocal_file_io_stream, XTYPE_FILE_IO_STREAM)
+XDEFINE_TYPE (xlocal_file_io_stream, xlocal_file_io_stream, XTYPE_FILE_IO_STREAM)
 
 static void
 xlocal_file_io_stream_finalize (xobject_t *object)
@@ -47,7 +47,7 @@ xlocal_file_io_stream_finalize (xobject_t *object)
   xobject_unref (file->input_stream);
   xobject_unref (file->output_stream);
 
-  G_OBJECT_CLASS (xlocal_file_io_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xlocal_file_io_stream_parent_class)->finalize (object);
 }
 
 xfile_io_stream_t *
@@ -100,10 +100,10 @@ xlocal_file_io_stream_close (xio_stream_t  *stream,
 static void
 xlocal_file_io_stream_class_init (xlocal_file_io_stream_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xio_stream_class_t *stream_class = XIO_STREAM_CLASS (klass);
 
-  gobject_class->finalize = xlocal_file_io_stream_finalize;
+  xobject_class->finalize = xlocal_file_io_stream_finalize;
 
   stream_class->get_input_stream = xlocal_file_io_stream_get_input_stream;
   stream_class->get_output_stream = xlocal_file_io_stream_get_output_stream;

@@ -39,7 +39,7 @@ create_app (xpointer_t data)
   xfile_set_contents (path, contents, -1, &error);
   g_assert_no_error (error);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -67,7 +67,7 @@ quit_loop (xpointer_t data)
   if (xmain_loop_is_running (loop))
     xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -92,7 +92,7 @@ test_app_monitor (Fixture       *fixture,
   g_timeout_add_seconds (3, quit_loop, loop);
 
   xmain_loop_run (loop);
-  g_assert (changed_fired);
+  xassert (changed_fired);
   changed_fired = FALSE;
 
   /* FIXME: this shouldn't be required */
@@ -104,7 +104,7 @@ test_app_monitor (Fixture       *fixture,
 
   xmain_loop_run (loop);
 
-  g_assert (changed_fired);
+  xassert (changed_fired);
 
   xmain_loop_unref (loop);
   g_remove (app_path);

@@ -91,7 +91,7 @@ xsimple_proxy_resolver_finalize (xobject_t *object)
   /* This will free ignore_ips and ignore_domains */
   reparse_ignore_hosts (resolver);
 
-  G_OBJECT_CLASS (xsimple_proxy_resolver_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsimple_proxy_resolver_parent_class)->finalize (object);
 }
 
 static void
@@ -400,7 +400,7 @@ xsimple_proxy_resolver_lookup_finish (xproxy_resolver_t  *resolver,
                                        xasync_result_t    *result,
                                        xerror_t         **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -408,7 +408,7 @@ xsimple_proxy_resolver_lookup_finish (xproxy_resolver_t  *resolver,
 static void
 xsimple_proxy_resolver_class_init (xsimple_proxy_resolver_class_t *resolver_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (resolver_class);
+  xobject_class_t *object_class = XOBJECT_CLASS (resolver_class);
 
   object_class->get_property = xsimple_proxy_resolver_get_property;
   object_class->set_property = xsimple_proxy_resolver_set_property;
@@ -426,12 +426,12 @@ xsimple_proxy_resolver_class_init (xsimple_proxy_resolver_class_t *resolver_clas
    * to all three of the socks5, socks4a, and socks4 proxy types.
    */
   xobject_class_install_property (object_class, PROP_DEFAULT_PROXY,
-				   g_param_spec_string ("default-proxy",
+				   xparam_spec_string ("default-proxy",
                                                         P_("Default proxy"),
                                                         P_("The default proxy URI"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xsimple_proxy_resolver_t:ignore-hosts:
@@ -472,12 +472,12 @@ xsimple_proxy_resolver_class_init (xsimple_proxy_resolver_class_t *resolver_clas
    * commonly used by other applications.
    */
   xobject_class_install_property (object_class, PROP_IGNORE_HOSTS,
-				   g_param_spec_boxed ("ignore-hosts",
+				   xparam_spec_boxed ("ignore-hosts",
                                                        P_("Ignore hosts"),
                                                        P_("Hosts that will not use the proxy"),
                                                        XTYPE_STRV,
-                                                       G_PARAM_READWRITE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READWRITE |
+                                                       XPARAM_STATIC_STRINGS));
 
 }
 

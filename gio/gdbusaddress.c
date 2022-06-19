@@ -100,7 +100,7 @@ g_dbus_is_address (const xchar_t *string)
 
   ret = FALSE;
 
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   a = xstrsplit (string, ";", 0);
   if (a[0] == NULL)
@@ -391,8 +391,8 @@ g_dbus_is_supported_address (const xchar_t  *string,
 
   ret = FALSE;
 
-  g_return_val_if_fail (string != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   a = xstrsplit (string, ";", 0);
   for (n = 0; a[n] != NULL; n++)
@@ -433,7 +433,7 @@ g_dbus_is_supported_address (const xchar_t  *string,
  out:
   xstrfreev (a);
 
-  g_assert (ret || (!ret && (error == NULL || *error != NULL)));
+  xassert (ret || (!ret && (error == NULL || *error != NULL)));
 
   return ret;
 }
@@ -687,7 +687,7 @@ g_dbus_address_connect (const xchar_t   *address_entry,
       xsocket_client_t *client;
       xsocket_connection_t *connection;
 
-      g_assert (ret == NULL);
+      xassert (ret == NULL);
       client = xsocket_client_new ();
 
       /* Disable proxy support to prevent a deadlock on startup, since loading a
@@ -923,8 +923,8 @@ g_dbus_address_get_stream_finish (xasync_result_t        *res,
   GetStreamData *data;
   xio_stream_t *ret;
 
-  g_return_val_if_fail (xtask_is_valid (res, NULL), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, NULL), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   task = XTASK (res);
   ret = xtask_propagate_pointer (task, error);
@@ -972,8 +972,8 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
   xuint_t n;
   xerror_t *last_error;
 
-  g_return_val_if_fail (address != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (address != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   ret = NULL;
   last_error = NULL;
@@ -1003,7 +1003,7 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
         }
       else
         {
-          g_assert (this_error != NULL);
+          xassert (this_error != NULL);
           if (last_error != NULL)
             xerror_free (last_error);
           last_error = this_error;
@@ -1018,7 +1018,7 @@ g_dbus_address_get_stream_sync (const xchar_t   *address,
     }
   else
     {
-      g_assert (last_error != NULL);
+      xassert (last_error != NULL);
       g_propagate_error (error, last_error);
     }
 
@@ -1289,7 +1289,7 @@ g_dbus_address_get_for_bus_sync (xbus_type_t       bus_type,
   const xchar_t *starter_bus;
   xerror_t *local_error;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   ret = NULL;
   local_error = NULL;
@@ -1443,7 +1443,7 @@ g_dbus_address_escape_value (const xchar_t *string)
   xstring_t *s;
   xsize_t i;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   /* There will often not be anything needing escaping at all. */
   s = xstring_sized_new (strlen (string));

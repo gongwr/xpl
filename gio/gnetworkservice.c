@@ -109,49 +109,49 @@ g_network_service_finalize (xobject_t *object)
   if (srv->priv->targets)
     g_resolver_free_targets (srv->priv->targets);
 
-  G_OBJECT_CLASS (g_network_service_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_network_service_parent_class)->finalize (object);
 }
 
 static void
 g_network_service_class_init (GNetworkServiceClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = g_network_service_set_property;
-  gobject_class->get_property = g_network_service_get_property;
-  gobject_class->finalize = g_network_service_finalize;
+  xobject_class->set_property = g_network_service_set_property;
+  xobject_class->get_property = g_network_service_get_property;
+  xobject_class->finalize = g_network_service_finalize;
 
-  xobject_class_install_property (gobject_class, PROP_SERVICE,
-                                   g_param_spec_string ("service",
+  xobject_class_install_property (xobject_class, PROP_SERVICE,
+                                   xparam_spec_string ("service",
                                                         P_("Service"),
                                                         P_("Service name, eg \"ldap\""),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_PROTOCOL,
-                                   g_param_spec_string ("protocol",
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_PROTOCOL,
+                                   xparam_spec_string ("protocol",
                                                         P_("Protocol"),
                                                         P_("Network protocol, eg \"tcp\""),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_DOMAIN,
-                                   g_param_spec_string ("domain",
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_DOMAIN,
+                                   xparam_spec_string ("domain",
                                                         P_("Domain"),
                                                         P_("Network domain, eg, \"example.com\""),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_DOMAIN,
-                                   g_param_spec_string ("scheme",
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_DOMAIN,
+                                   xparam_spec_string ("scheme",
                                                         P_("Scheme"),
                                                         P_("Network scheme (default is to use service)"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 
 }
 
@@ -272,7 +272,7 @@ g_network_service_new (const xchar_t *service,
 const xchar_t *
 g_network_service_get_service (xnetwork_service_t *srv)
 {
-  g_return_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
 
   return srv->priv->service;
 }
@@ -290,7 +290,7 @@ g_network_service_get_service (xnetwork_service_t *srv)
 const xchar_t *
 g_network_service_get_protocol (xnetwork_service_t *srv)
 {
-  g_return_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
 
   return srv->priv->protocol;
 }
@@ -309,7 +309,7 @@ g_network_service_get_protocol (xnetwork_service_t *srv)
 const xchar_t *
 g_network_service_get_domain (xnetwork_service_t *srv)
 {
-  g_return_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
 
   return srv->priv->domain;
 }
@@ -328,7 +328,7 @@ g_network_service_get_domain (xnetwork_service_t *srv)
 const xchar_t *
 g_network_service_get_scheme (xnetwork_service_t *srv)
 {
-  g_return_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
+  xreturn_val_if_fail (X_IS_NETWORK_SERVICE (srv), NULL);
 
   if (srv->priv->scheme)
     return srv->priv->scheme;
@@ -395,12 +395,12 @@ typedef struct {
 } xnetwork_service_address_enumerator_t;
 
 typedef struct {
-  GSocketAddressEnumeratorClass parent_class;
+  xsocket_address_enumerator_class_t parent_class;
 
 } xnetwork_service_address_enumerator_class_t;
 
 static xtype_t xnetwork_service_address_enumerator_get_type (void);
-G_DEFINE_TYPE (xnetwork_service_address_enumerator_t, xnetwork_service_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
+XDEFINE_TYPE (xnetwork_service_address_enumerator, xnetwork_service_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
 
 static xsocket_address_t *
 g_network_service_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
@@ -710,14 +710,14 @@ g_network_service_address_enumerator_finalize (xobject_t *object)
   if (srv_enum->error)
     xerror_free (srv_enum->error);
 
-  G_OBJECT_CLASS (xnetwork_service_address_enumerator_parent_class)->finalize (object);
+  XOBJECT_CLASS (xnetwork_service_address_enumerator_parent_class)->finalize (object);
 }
 
 static void
 xnetwork_service_address_enumerator_class_init (xnetwork_service_address_enumerator_class_t *srvenum_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (srvenum_class);
-  GSocketAddressEnumeratorClass *enumerator_class =
+  xobject_class_t *object_class = XOBJECT_CLASS (srvenum_class);
+  xsocket_address_enumerator_class_t *enumerator_class =
     XSOCKET_ADDRESS_ENUMERATOR_CLASS (srvenum_class);
 
   enumerator_class->next        = g_network_service_address_enumerator_next;

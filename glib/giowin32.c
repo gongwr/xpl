@@ -1631,9 +1631,9 @@ g_io_channel_new_file (const xchar_t  *filename,
   };
   int mode_num, errsv;
 
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (mode != NULL, NULL);
-  g_return_val_if_fail ((error == NULL) || (*error == NULL), NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (mode != NULL, NULL);
+  xreturn_val_if_fail ((error == NULL) || (*error == NULL), NULL);
 
   switch (mode[0])
     {
@@ -1806,8 +1806,8 @@ g_io_win32_fd_get_flags (xio_channel_t *channel)
   struct _stati64 st;
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
 
-  g_return_val_if_fail (win32_channel != NULL, 0);
-  g_return_val_if_fail (win32_channel->type == G_IO_WIN32_FILE_DESC, 0);
+  xreturn_val_if_fail (win32_channel != NULL, 0);
+  xreturn_val_if_fail (win32_channel->type == G_IO_WIN32_FILE_DESC, 0);
 
   if (0 == _fstati64 (win32_channel->fd, &st))
     return g_io_win32_fd_get_flags_internal (channel, &st);
@@ -1836,8 +1836,8 @@ g_io_win32_console_get_flags (xio_channel_t *channel)
 {
   GIOWin32Channel *win32_channel = (GIOWin32Channel *)channel;
 
-  g_return_val_if_fail (win32_channel != NULL, 0);
-  g_return_val_if_fail (win32_channel->type == G_IO_WIN32_CONSOLE, 0);
+  xreturn_val_if_fail (win32_channel != NULL, 0);
+  xreturn_val_if_fail (win32_channel->type == G_IO_WIN32_CONSOLE, 0);
 
   return g_io_win32_console_get_flags_internal (channel);
 }
@@ -2156,7 +2156,7 @@ g_io_channel_win32_poll (xpollfd_t *fds,
 			 xint_t     n_fds,
 			 xint_t     timeout)
 {
-  g_return_val_if_fail (n_fds >= 0, 0);
+  xreturn_val_if_fail (n_fds >= 0, 0);
 
   return g_poll (fds, n_fds, timeout);
 }

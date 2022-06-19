@@ -63,13 +63,13 @@ notification_received (GNotificationServer *server,
   xint_t *count = user_data;
   const xchar_t *title;
 
-  g_assert_cmpstr (app_id, ==, "org.gtk.TestApplication");
+  g_assert_cmpstr (app_id, ==, "org.gtk.test_application_t");
 
   switch (*count)
     {
     case 0:
       g_assert_cmpstr (notification_id, ==, "test1");
-      g_assert (xvariant_lookup (notification, "title", "&s", &title));
+      xassert (xvariant_lookup (notification, "title", "&s", &title));
       g_assert_cmpstr (title, ==, "test_t");
       break;
 
@@ -86,7 +86,7 @@ notification_received (GNotificationServer *server,
       break;
 
     case 4:
-      g_assert (g_dbus_is_guid (notification_id));
+      xassert (g_dbus_is_guid (notification_id));
 
       xnotification_server_stop (server);
       break;
@@ -103,7 +103,7 @@ notification_removed (GNotificationServer *server,
 {
   xint_t *count = user_data;
 
-  g_assert_cmpstr (app_id, ==, "org.gtk.TestApplication");
+  g_assert_cmpstr (app_id, ==, "org.gtk.test_application_t");
   g_assert_cmpstr (notification_id, ==, "test1");
 
   (*count)++;
@@ -121,7 +121,7 @@ server_notify_is_running (xobject_t    *object,
     {
       xapplication_t *app;
 
-      app = xapplication_new ("org.gtk.TestApplication", G_APPLICATION_FLAGS_NONE);
+      app = xapplication_new ("org.gtk.test_application_t", G_APPLICATION_FLAGS_NONE);
       xsignal_connect (app, "activate", G_CALLBACK (activate_app), NULL);
 
       xapplication_run (app, 0, NULL);
@@ -141,7 +141,7 @@ timeout (xpointer_t user_data)
 
   xnotification_server_stop (server);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -219,12 +219,12 @@ test_properties (void)
 
   g_assert_cmpstr (rn->title, ==, "title");
   g_assert_cmpstr (rn->body, ==, "body");
-  g_assert (X_IS_THEMED_ICON (rn->icon));
+  xassert (X_IS_THEMED_ICON (rn->icon));
   names = g_themed_icon_get_names (G_THEMED_ICON (rn->icon));
   g_assert_cmpstr (names[0], ==, "i-c-o-n");
   g_assert_cmpstr (names[1], ==, "i-c-o-n-symbolic");
   g_assert_null (names[2]);
-  g_assert (rn->priority == G_NOTIFICATION_PRIORITY_HIGH);
+  xassert (rn->priority == G_NOTIFICATION_PRIORITY_HIGH);
   g_assert_cmpstr (rn->category, ==, "cate.gory");
 
   g_assert_cmpint (rn->buttons->len, ==, 1);

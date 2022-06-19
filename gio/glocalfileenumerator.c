@@ -76,7 +76,7 @@ struct _xlocal_file_enumerator
 };
 
 #define xlocal_file_enumerator_get_type _xlocal_file_enumerator_get_type
-G_DEFINE_TYPE (xlocal_file_enumerator, xlocal_file_enumerator, XTYPE_FILE_ENUMERATOR)
+XDEFINE_TYPE (xlocal_file_enumerator, xlocal_file_enumerator, XTYPE_FILE_ENUMERATOR)
 
 static xfile_info_t *xlocal_file_enumerator_next_file (xfile_enumerator_t  *enumerator,
 						     xcancellable_t     *cancellable,
@@ -126,17 +126,17 @@ xlocal_file_enumerator_finalize (xobject_t *object)
 
   free_entries (local);
 
-  G_OBJECT_CLASS (xlocal_file_enumerator_parent_class)->finalize (object);
+  XOBJECT_CLASS (xlocal_file_enumerator_parent_class)->finalize (object);
 }
 
 
 static void
 xlocal_file_enumerator_class_init (xlocal_file_enumerator_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xfile_enumerator_class_t *enumerator_class = XFILE_ENUMERATOR_CLASS (klass);
 
-  gobject_class->finalize = xlocal_file_enumerator_finalize;
+  xobject_class->finalize = xlocal_file_enumerator_finalize;
 
   enumerator_class->next_file = xlocal_file_enumerator_next_file;
   enumerator_class->close_fn = xlocal_file_enumerator_close;

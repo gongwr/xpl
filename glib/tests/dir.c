@@ -36,7 +36,7 @@ test_dir_nonexisting (void)
 
   error = NULL;
   dir = g_dir_open ("/pfrkstrf", 0, &error);
-  g_assert (dir == NULL);
+  xassert (dir == NULL);
   g_assert_error (error, XFILE_ERROR, XFILE_ERROR_NOENT);
   xerror_free (error);
 }

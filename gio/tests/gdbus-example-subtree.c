@@ -344,7 +344,7 @@ on_bus_acquired (xdbus_connection_t *connection,
                                                         NULL,  /* user_data */
                                                         NULL,  /* user_data_free_func */
                                                         NULL); /* xerror_t** */
-  g_assert (registration_id > 0);
+  xassert (registration_id > 0);
 }
 
 static void
@@ -373,14 +373,14 @@ main (int argc, char *argv[])
    * them from XML.
    */
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
 
   manager_interface_info = g_dbus_node_info_lookup_interface (introspection_data, "org.gtk.GDBus.Example.Manager");
   block_interface_info = g_dbus_node_info_lookup_interface (introspection_data, "org.gtk.GDBus.Example.Block");
   partition_interface_info = g_dbus_node_info_lookup_interface (introspection_data, "org.gtk.GDBus.Example.Partition");
-  g_assert (manager_interface_info != NULL);
-  g_assert (block_interface_info != NULL);
-  g_assert (partition_interface_info != NULL);
+  xassert (manager_interface_info != NULL);
+  xassert (block_interface_info != NULL);
+  xassert (partition_interface_info != NULL);
 
   owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                              "org.gtk.GDBus.TestSubtree",

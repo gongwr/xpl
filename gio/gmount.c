@@ -133,7 +133,7 @@ g_mount_get_root (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -158,7 +158,7 @@ g_mount_get_default_location (xmount_t *mount)
   GMountIface *iface;
   xfile_t       *file;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -186,7 +186,7 @@ g_mount_get_name (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -208,7 +208,7 @@ g_mount_get_icon (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -234,7 +234,7 @@ g_mount_get_symbolic_icon (xmount_t *mount)
   GMountIface *iface;
   xicon_t *ret;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -265,7 +265,7 @@ g_mount_get_uuid (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -288,7 +288,7 @@ g_mount_get_volume (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -314,7 +314,7 @@ g_mount_get_drive (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -334,7 +334,7 @@ g_mount_can_unmount (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -354,7 +354,7 @@ g_mount_can_eject (xmount_t *mount)
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -424,8 +424,8 @@ g_mount_unmount_finish (xmount_t        *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -500,8 +500,8 @@ g_mount_eject_finish (xmount_t        *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -581,8 +581,8 @@ g_mount_unmount_with_operation_finish (xmount_t        *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -666,8 +666,8 @@ g_mount_eject_with_operation_finish (xmount_t        *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -749,8 +749,8 @@ g_mount_remount_finish (xmount_t        *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -837,8 +837,8 @@ g_mount_guess_content_type_finish (xmount_t        *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -881,7 +881,7 @@ g_mount_guess_content_type_sync (xmount_t              *mount,
 {
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
 
@@ -974,7 +974,7 @@ g_mount_is_shadowed (xmount_t *mount)
   GMountPrivate *priv;
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), FALSE);
 
   G_LOCK (priv_lock);
   priv = get_private (mount);
@@ -1050,7 +1050,7 @@ g_mount_get_sort_key (xmount_t  *mount)
   const xchar_t *ret = NULL;
   GMountIface *iface;
 
-  g_return_val_if_fail (X_IS_MOUNT (mount), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT (mount), NULL);
 
   iface = G_MOUNT_GET_IFACE (mount);
   if (iface->get_sort_key != NULL)

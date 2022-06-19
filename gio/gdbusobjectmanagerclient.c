@@ -205,7 +205,7 @@ xdbus_object_manager_client_dispose (xobject_t *object)
       g_clear_object (&manager->priv->cancel);
     }
 
-  G_OBJECT_CLASS (xdbus_object_manager_client_parent_class)->dispose (object);
+  XOBJECT_CLASS (xdbus_object_manager_client_parent_class)->dispose (object);
 }
 
 static void
@@ -240,8 +240,8 @@ xdbus_object_manager_client_finalize (xobject_t *object)
 
   g_mutex_clear (&manager->priv->lock);
 
-  if (G_OBJECT_CLASS (xdbus_object_manager_client_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (xdbus_object_manager_client_parent_class)->finalize (object);
+  if (XOBJECT_CLASS (xdbus_object_manager_client_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (xdbus_object_manager_client_parent_class)->finalize (object);
 }
 
 static void
@@ -298,22 +298,22 @@ xdbus_object_manager_client_set_property (xobject_t       *_object,
     case PROP_CONNECTION:
       if (xvalue_get_object (value) != NULL)
         {
-          g_assert (manager->priv->connection == NULL);
-          g_assert (X_IS_DBUS_CONNECTION (xvalue_get_object (value)));
+          xassert (manager->priv->connection == NULL);
+          xassert (X_IS_DBUS_CONNECTION (xvalue_get_object (value)));
           manager->priv->connection = xvalue_dup_object (value);
         }
       break;
 
     case PROP_OBJECT_PATH:
-      g_assert (manager->priv->object_path == NULL);
-      g_assert (xvariant_is_object_path (xvalue_get_string (value)));
+      xassert (manager->priv->object_path == NULL);
+      xassert (xvariant_is_object_path (xvalue_get_string (value)));
       manager->priv->object_path = xvalue_dup_string (value);
       break;
 
     case PROP_NAME:
-      g_assert (manager->priv->name == NULL);
+      xassert (manager->priv->name == NULL);
       name = xvalue_get_string (value);
-      g_assert (name == NULL || g_dbus_is_name (name));
+      xassert (name == NULL || g_dbus_is_name (name));
       manager->priv->name = xstrdup (name);
       break;
 
@@ -342,12 +342,12 @@ xdbus_object_manager_client_set_property (xobject_t       *_object,
 static void
 xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose      = xdbus_object_manager_client_dispose;
-  gobject_class->finalize     = xdbus_object_manager_client_finalize;
-  gobject_class->set_property = xdbus_object_manager_client_set_property;
-  gobject_class->get_property = xdbus_object_manager_client_get_property;
+  xobject_class->dispose      = xdbus_object_manager_client_dispose;
+  xobject_class->finalize     = xdbus_object_manager_client_finalize;
+  xobject_class->set_property = xdbus_object_manager_client_set_property;
+  xobject_class->get_property = xdbus_object_manager_client_get_property;
 
   /**
    * xdbus_object_manager_client_t:connection:
@@ -356,16 +356,16 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_CONNECTION,
-                                   g_param_spec_object ("connection",
+                                   xparam_spec_object ("connection",
                                                         "Connection",
                                                         "The connection to use",
                                                         XTYPE_DBUS_CONNECTION,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t:bus-type:
@@ -377,18 +377,18 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_BUS_TYPE,
-                                   g_param_spec_enum ("bus-type",
+                                   xparam_spec_enum ("bus-type",
                                                       "Bus Type",
                                                       "The bus to connect to, if any",
                                                       XTYPE_BUS_TYPE,
                                                       G_BUS_TYPE_NONE,
-                                                      G_PARAM_WRITABLE |
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_STATIC_NAME |
-                                                      G_PARAM_STATIC_BLURB |
-                                                      G_PARAM_STATIC_NICK));
+                                                      XPARAM_WRITABLE |
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_STATIC_NAME |
+                                                      XPARAM_STATIC_BLURB |
+                                                      XPARAM_STATIC_NICK));
 
   /**
    * xdbus_object_manager_client_t:flags:
@@ -397,19 +397,19 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_FLAGS,
-                                   g_param_spec_flags ("flags",
+                                   xparam_spec_flags ("flags",
                                                        "Flags",
                                                        "Flags for the proxy manager",
                                                        XTYPE_DBUS_OBJECT_MANAGER_CLIENT_FLAGS,
                                                        G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_WRITABLE |
-                                                       G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_STATIC_NAME |
-                                                       G_PARAM_STATIC_BLURB |
-                                                       G_PARAM_STATIC_NICK));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_WRITABLE |
+                                                       XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_STATIC_NAME |
+                                                       XPARAM_STATIC_BLURB |
+                                                       XPARAM_STATIC_NICK));
 
   /**
    * xdbus_object_manager_client_t:object-path:
@@ -418,16 +418,16 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_OBJECT_PATH,
-                                   g_param_spec_string ("object-path",
+                                   xparam_spec_string ("object-path",
                                                         "Object Path",
                                                         "The object path of the control object",
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t:name:
@@ -436,16 +436,16 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_NAME,
-                                   g_param_spec_string ("name",
+                                   xparam_spec_string ("name",
                                                         "Name",
                                                         "Name that the manager is for",
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t:name-owner:
@@ -456,14 +456,14 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_NAME_OWNER,
-                                   g_param_spec_string ("name-owner",
+                                   xparam_spec_string ("name-owner",
                                                         "Name Owner",
                                                         "The owner of the name we are watching",
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t:get-proxy-type-func:
@@ -473,15 +473,15 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_GET_PROXY_TYPE_FUNC,
-                                   g_param_spec_pointer ("get-proxy-type-func",
+                                   xparam_spec_pointer ("get-proxy-type-func",
                                                          "xdbus_proxy_type_func_t Function Pointer",
                                                          "The xdbus_proxy_type_func_t pointer to use",
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_WRITABLE |
-                                                         G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_WRITABLE |
+                                                         XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t:get-proxy-type-user-data:
@@ -490,15 +490,15 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_GET_PROXY_TYPE_USER_DATA,
-                                   g_param_spec_pointer ("get-proxy-type-user-data",
+                                   xparam_spec_pointer ("get-proxy-type-user-data",
                                                          "xdbus_proxy_type_func_t User Data",
                                                          "The xdbus_proxy_type_func_t user_data",
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_WRITABLE |
-                                                         G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_WRITABLE |
+                                                         XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t:get-proxy-type-destroy-notify:
@@ -507,15 +507,15 @@ xdbus_object_manager_client_class_init (GDBusObjectManagerClientClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_GET_PROXY_TYPE_DESTROY_NOTIFY,
-                                   g_param_spec_pointer ("get-proxy-type-destroy-notify",
+                                   xparam_spec_pointer ("get-proxy-type-destroy-notify",
                                                          "xdbus_proxy_type_func_t user data free function",
                                                          "The xdbus_proxy_type_func_t user data free function",
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_WRITABLE |
-                                                         G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_WRITABLE |
+                                                         XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_manager_client_t::interface-proxy-signal:
@@ -649,11 +649,11 @@ xdbus_object_manager_client_new_sync (xdbus_connection_t               *connecti
 {
   xinitable_t *initable;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail ((name == NULL && xdbus_connection_get_unique_name (connection) == NULL) ||
                         g_dbus_is_name (name), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   initable = xinitable_new (XTYPE_DBUS_OBJECT_MANAGER_CLIENT,
                              cancellable,
@@ -749,7 +749,7 @@ xdbus_object_manager_client_new_finish (xasync_result_t   *res,
   xobject_t *source_object;
 
   source_object = xasync_result_get_source_object (res);
-  g_assert (source_object != NULL);
+  xassert (source_object != NULL);
 
   object = xasync_initable_new_finish (XASYNC_INITABLE (source_object),
                                         res,
@@ -802,10 +802,10 @@ xdbus_object_manager_client_new_for_bus_sync (xbus_type_t                       
 {
   xinitable_t *initable;
 
-  g_return_val_if_fail (bus_type != G_BUS_TYPE_NONE, NULL);
-  g_return_val_if_fail (g_dbus_is_name (name), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (bus_type != G_BUS_TYPE_NONE, NULL);
+  xreturn_val_if_fail (g_dbus_is_name (name), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   initable = xinitable_new (XTYPE_DBUS_OBJECT_MANAGER_CLIENT,
                              cancellable,
@@ -901,7 +901,7 @@ xdbus_object_manager_client_new_for_bus_finish (xasync_result_t   *res,
   xobject_t *source_object;
 
   source_object = xasync_result_get_source_object (res);
-  g_assert (source_object != NULL);
+  xassert (source_object != NULL);
 
   object = xasync_initable_new_finish (XASYNC_INITABLE (source_object),
                                         res,
@@ -931,7 +931,7 @@ xdbus_connection_t *
 xdbus_object_manager_client_get_connection (xdbus_object_manager_client_t *manager)
 {
   xdbus_connection_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
   g_mutex_lock (&manager->priv->lock);
   ret = manager->priv->connection;
   g_mutex_unlock (&manager->priv->lock);
@@ -954,7 +954,7 @@ const xchar_t *
 xdbus_object_manager_client_get_name (xdbus_object_manager_client_t *manager)
 {
   const xchar_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
   g_mutex_lock (&manager->priv->lock);
   ret = manager->priv->name;
   g_mutex_unlock (&manager->priv->lock);
@@ -976,7 +976,7 @@ GDBusObjectManagerClientFlags
 xdbus_object_manager_client_get_flags (xdbus_object_manager_client_t *manager)
 {
   GDBusObjectManagerClientFlags ret;
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE);
   g_mutex_lock (&manager->priv->lock);
   ret = manager->priv->flags;
   g_mutex_unlock (&manager->priv->lock);
@@ -1001,7 +1001,7 @@ xchar_t *
 xdbus_object_manager_client_get_name_owner (xdbus_object_manager_client_t *manager)
 {
   xchar_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
   g_mutex_lock (&manager->priv->lock);
   ret = xstrdup (manager->priv->name_owner);
   g_mutex_unlock (&manager->priv->lock);
@@ -1418,7 +1418,7 @@ initable_init (xinitable_t     *initable,
 
   if (manager->priv->bus_type != G_BUS_TYPE_NONE)
     {
-      g_assert (manager->priv->connection == NULL);
+      xassert (manager->priv->connection == NULL);
       manager->priv->connection = g_bus_get_sync (manager->priv->bus_type, cancellable, error);
       if (manager->priv->connection == NULL)
         goto out;
@@ -1849,7 +1849,7 @@ xdbus_object_manager_client_get_objects (xdbus_object_manager_t *_manager)
   xdbus_object_manager_client_t *manager = G_DBUS_OBJECT_MANAGER_CLIENT (_manager);
   xlist_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_MANAGER_CLIENT (manager), NULL);
 
   g_mutex_lock (&manager->priv->lock);
   ret = xhash_table_get_values (manager->priv->map_object_path_to_object_proxy);

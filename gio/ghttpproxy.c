@@ -204,7 +204,7 @@ g_http_proxy_connect (xproxy_t         *proxy,
 
 #ifdef DEBUG
       {
-        GTlsCertificateFlags tls_validation_flags = G_TLS_CERTIFICATE_VALIDATE_ALL;
+        xtls_certificate_flags_t tls_validation_flags = G_TLS_CERTIFICATE_VALIDATE_ALL;
 
         tls_validation_flags &= ~(G_TLS_CERTIFICATE_UNKNOWN_CA | G_TLS_CERTIFICATE_BAD_IDENTITY);
         xtls_client_connection_set_validation_flags (G_TLS_CLIENT_CONNECTION (tlsconn),

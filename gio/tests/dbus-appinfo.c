@@ -29,9 +29,9 @@ static xboolean_t requested_startup_id;
 
 
 static xtype_t test_app_launch_context_get_type (void);
-typedef xapp_launch_context_t TestAppLaunchContext;
-typedef xapp_launch_context_class_t TestAppLaunchContextClass;
-G_DEFINE_TYPE (TestAppLaunchContext, test_app_launch_context, XTYPE_APP_LAUNCH_CONTEXT)
+typedef xapp_launch_context_t test_app_launch_context_t;
+typedef xapp_launch_context_class_t test_app_launch_context_class_t;
+XDEFINE_TYPE (test_app_launch_context_t, test_app_launch_context, XTYPE_APP_LAUNCH_CONTEXT)
 
 static xchar_t *
 test_app_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
@@ -43,7 +43,7 @@ test_app_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
 }
 
 static void
-test_app_launch_context_init (TestAppLaunchContext *ctx)
+test_app_launch_context_init (test_app_launch_context_t *ctx)
 {
 }
 
@@ -54,9 +54,9 @@ test_app_launch_context_class_init (xapp_launch_context_class_t *class)
 }
 
 static xtype_t test_application_get_type (void);
-typedef xapplication_t TestApplication;
-typedef xapplication_class_t TestApplicationClass;
-G_DEFINE_TYPE (TestApplication, test_application, XTYPE_APPLICATION)
+typedef xapplication_t test_application_t;
+typedef xapplication_class_t test_application_class_t;
+XDEFINE_TYPE (test_application, test_application, XTYPE_APPLICATION)
 
 static void
 saw_action (const xchar_t *action)
@@ -106,28 +106,28 @@ saw_action (const xchar_t *action)
       {
         xapp_launch_context_t *ctx;
 
-        g_assert (saw_startup_id == FALSE);
+        xassert (saw_startup_id == FALSE);
         ctx = xobject_new (test_app_launch_context_get_type (), NULL);
         xapp_info_launch (G_APP_INFO (appinfo), NULL, ctx, NULL);
-        g_assert (requested_startup_id);
+        xassert (requested_startup_id);
         requested_startup_id = FALSE;
         xobject_unref (ctx);
       }
-      current_state = 6; return; case 6: g_assert_cmpstr (action, ==, "activate"); g_assert (saw_startup_id);
+      current_state = 6; return; case 6: g_assert_cmpstr (action, ==, "activate"); xassert (saw_startup_id);
       saw_startup_id = FALSE;
 
       /* Now do the same for an action */
       {
         xapp_launch_context_t *ctx;
 
-        g_assert (saw_startup_id == FALSE);
+        xassert (saw_startup_id == FALSE);
         ctx = xobject_new (test_app_launch_context_get_type (), NULL);
         xdesktop_app_info_launch_action (appinfo, "frob", ctx);
-        g_assert (requested_startup_id);
+        xassert (requested_startup_id);
         requested_startup_id = FALSE;
         xobject_unref (ctx);
       }
-      current_state = 7; return; case 7: g_assert_cmpstr (action, ==, "frob"); g_assert (saw_startup_id);
+      current_state = 7; return; case 7: g_assert_cmpstr (action, ==, "frob"); xassert (saw_startup_id);
       saw_startup_id = FALSE;
 
       /* Now quit... */
@@ -141,7 +141,7 @@ test_application_frob (xsimple_action_t *action,
                        xvariant_t      *parameter,
                        xpointer_t       user_data)
 {
-  g_assert (parameter == NULL);
+  xassert (parameter == NULL);
   saw_action ("frob");
 }
 
@@ -150,7 +150,7 @@ test_application_tweak (xsimple_action_t *action,
                         xvariant_t      *parameter,
                         xpointer_t       user_data)
 {
-  g_assert (parameter == NULL);
+  xassert (parameter == NULL);
   saw_action ("tweak");
 }
 
@@ -159,7 +159,7 @@ test_application_twiddle (xsimple_action_t *action,
                           xvariant_t      *parameter,
                           xpointer_t       user_data)
 {
-  g_assert (parameter == NULL);
+  xassert (parameter == NULL);
   saw_action ("twiddle");
 }
 
@@ -201,10 +201,10 @@ test_application_open (xapplication_t  *application,
 
   g_assert_cmpint (n_files, ==, 2);
   f = xfile_new_for_uri ("file:///a/b");
-  g_assert (xfile_equal (files[0], f));
+  xassert (xfile_equal (files[0], f));
   xobject_unref (f);
   f = xfile_new_for_uri ("file:///c/d");
-  g_assert (xfile_equal (files[1], f));
+  xassert (xfile_equal (files[1], f));
   xobject_unref (f);
 
   saw_action ("open");
@@ -225,7 +225,7 @@ test_application_before_emit (xapplication_t *application,
 {
   const xchar_t *startup_id;
 
-  g_assert (!saw_startup_id);
+  xassert (!saw_startup_id);
 
   if (!xvariant_lookup (platform_data, "desktop-startup-id", "&s", &startup_id))
     return;
@@ -235,7 +235,7 @@ test_application_before_emit (xapplication_t *application,
 }
 
 static void
-test_application_init (TestApplication *app)
+test_application_init (test_application_t *app)
 {
 }
 
@@ -252,7 +252,7 @@ static void
 test_dbus_appinfo (void)
 {
   const xchar_t *argv[] = { "myapp", NULL };
-  TestApplication *app;
+  test_application_t *app;
   int status;
   xchar_t *desktop_file = NULL;
 
@@ -260,7 +260,7 @@ test_dbus_appinfo (void)
                                         "org.gtk.test.dbusappinfo.desktop",
                                         NULL);
   appinfo = xdesktop_app_info_new_from_filename (desktop_file);
-  g_assert (appinfo != NULL);
+  xassert (appinfo != NULL);
   g_free (desktop_file);
 
   app = xobject_new (test_application_get_type (),

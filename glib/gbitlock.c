@@ -488,7 +488,7 @@ xboolean_t
 (g_pointer_bit_trylock) (volatile void *address,
                          xint_t           lock_bit)
 {
-  g_return_val_if_fail (lock_bit < 32, FALSE);
+  xreturn_val_if_fail (lock_bit < 32, FALSE);
 
   {
 #ifdef USE_ASM_GOTO
@@ -508,7 +508,7 @@ xboolean_t
     xsize_t mask = 1u << lock_bit;
     xsize_t v;
 
-    g_return_val_if_fail (lock_bit < 32, FALSE);
+    xreturn_val_if_fail (lock_bit < 32, FALSE);
 
     v = g_atomic_pointer_or (pointer_address, mask);
 

@@ -55,7 +55,7 @@ struct _GTlsDatabaseClass
 
   /* virtual methods */
 
-  GTlsCertificateFlags  (*verify_chain)                         (xtls_database_t            *self,
+  xtls_certificate_flags_t  (*verify_chain)                         (xtls_database_t            *self,
                                                                  xtls_certificate_t         *chain,
                                                                  const xchar_t             *purpose,
                                                                  xsocket_connectable_t      *identity,
@@ -74,7 +74,7 @@ struct _GTlsDatabaseClass
                                                                  xasync_ready_callback_t      callback,
                                                                  xpointer_t                 user_data);
 
-  GTlsCertificateFlags  (*verify_chain_finish)                  (xtls_database_t            *self,
+  xtls_certificate_flags_t  (*verify_chain_finish)                  (xtls_database_t            *self,
                                                                  xasync_result_t            *result,
                                                                  xerror_t                 **error);
 
@@ -147,7 +147,7 @@ XPL_AVAILABLE_IN_ALL
 xtype_t                xtls_database_get_type                              (void) G_GNUC_CONST;
 
 XPL_AVAILABLE_IN_ALL
-GTlsCertificateFlags xtls_database_verify_chain                          (xtls_database_t            *self,
+xtls_certificate_flags_t xtls_database_verify_chain                          (xtls_database_t            *self,
                                                                            xtls_certificate_t         *chain,
                                                                            const xchar_t             *purpose,
                                                                            xsocket_connectable_t      *identity,
@@ -168,7 +168,7 @@ void                 xtls_database_verify_chain_async                    (xtls_d
                                                                            xpointer_t                 user_data);
 
 XPL_AVAILABLE_IN_ALL
-GTlsCertificateFlags xtls_database_verify_chain_finish                   (xtls_database_t            *self,
+xtls_certificate_flags_t xtls_database_verify_chain_finish                   (xtls_database_t            *self,
                                                                            xasync_result_t            *result,
                                                                            xerror_t                 **error);
 

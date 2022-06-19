@@ -357,8 +357,8 @@ g_completion_complete (GCompletion* cmp,
   xboolean_t done = FALSE;
   xlist_t* list;
 
-  g_return_val_if_fail (cmp != NULL, NULL);
-  g_return_val_if_fail (prefix != NULL, NULL);
+  xreturn_val_if_fail (cmp != NULL, NULL);
+  xreturn_val_if_fail (prefix != NULL, NULL);
 
   len = strlen (prefix);
   if (cmp->prefix && cmp->cache)

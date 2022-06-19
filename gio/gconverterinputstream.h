@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_CONVERTER_INPUT_STREAM_H__
-#define __G_CONVERTER_INPUT_STREAM_H__
+#ifndef __XCONVERTER_INPUT_STREAM_H__
+#define __XCONVERTER_INPUT_STREAM_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -31,11 +31,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CONVERTER_INPUT_STREAM         (xconverter_input_stream_get_type ())
-#define G_CONVERTER_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream))
-#define G_CONVERTER_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream_class_t))
+#define XCONVERTER_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream))
+#define XCONVERTER_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream_class_t))
 #define X_IS_CONVERTER_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CONVERTER_INPUT_STREAM))
 #define X_IS_CONVERTER_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CONVERTER_INPUT_STREAM))
-#define G_CONVERTER_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream_class_t))
+#define XCONVERTER_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CONVERTER_INPUT_STREAM, xconverter_input_stream_class_t))
 
 /**
  * xconverter_input_stream_t:
@@ -77,4 +77,4 @@ xconverter_t            *xconverter_input_stream_get_converter (xconverter_input
 
 G_END_DECLS
 
-#endif /* __G_CONVERTER_INPUT_STREAM_H__ */
+#endif /* __XCONVERTER_INPUT_STREAM_H__ */

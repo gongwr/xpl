@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef __G_EMBLEM_H__
-#define __G_EMBLEM_H__
+#ifndef __XEMBLEM_H__
+#define __XEMBLEM_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -29,19 +29,19 @@
 G_BEGIN_DECLS
 
 #define XTYPE_EMBLEM         (xemblem_get_type ())
-#define G_EMBLEM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_EMBLEM, xemblem))
-#define G_EMBLEM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_EMBLEM, GEmblemClass))
+#define XEMBLEM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_EMBLEM, xemblem_t))
+#define XEMBLEM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_EMBLEM, xemblem_class_t))
 #define X_IS_EMBLEM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_EMBLEM))
 #define X_IS_EMBLEM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_EMBLEM))
-#define G_EMBLEM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_EMBLEM, GEmblemClass))
+#define XEMBLEM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_EMBLEM, xemblem_class_t))
 
 /**
  * xemblem_t:
  *
  * An object for Emblems
  */
-typedef struct _GEmblem        xemblem_t;
-typedef struct _GEmblemClass   GEmblemClass;
+typedef struct _xemblem        xemblem_t;
+typedef struct _xemblem_class   xemblem_class_t;
 
 XPL_AVAILABLE_IN_ALL
 xtype_t          xemblem_get_type        (void) G_GNUC_CONST;
@@ -58,4 +58,4 @@ GEmblemOrigin  xemblem_get_origin      (xemblem_t       *emblem);
 
 G_END_DECLS
 
-#endif /* __G_EMBLEM_H__ */
+#endif /* __XEMBLEM_H__ */

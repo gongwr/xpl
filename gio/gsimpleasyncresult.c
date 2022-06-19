@@ -187,7 +187,7 @@
  *   xsimple_async_result_t *simple;
  *   Cake               *cake;
  *
- *   g_return_val_if_fail (xsimple_async_result_is_valid (result,
+ *   xreturn_val_if_fail (xsimple_async_result_is_valid (result,
  *                                                         G_OBJECT (self),
  *                                                         baker_bake_cake_async),
  *                         NULL);
@@ -270,15 +270,15 @@ xsimple_async_result_finalize (xobject_t *object)
   if (simple->error)
     xerror_free (simple->error);
 
-  G_OBJECT_CLASS (xsimple_async_result_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsimple_async_result_parent_class)->finalize (object);
 }
 
 static void
 xsimple_async_result_class_init (xsimple_async_result_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xsimple_async_result_finalize;
+  xobject_class->finalize = xsimple_async_result_finalize;
 }
 
 static void
@@ -319,7 +319,7 @@ xsimple_async_result_new (xobject_t             *source_object,
 {
   xsimple_async_result_t *simple;
 
-  g_return_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
+  xreturn_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
 
   simple = xobject_new (XTYPE_SIMPLE_ASYNC_RESULT, NULL);
   simple->callback = callback;
@@ -354,7 +354,7 @@ xsimple_async_result_new_from_error (xobject_t             *source_object,
 {
   xsimple_async_result_t *simple;
 
-  g_return_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
+  xreturn_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
 
   simple = xsimple_async_result_new (source_object,
 				      callback,
@@ -388,7 +388,7 @@ xsimple_async_result_new_take_error (xobject_t             *source_object,
 {
   xsimple_async_result_t *simple;
 
-  g_return_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
+  xreturn_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
 
   simple = xsimple_async_result_new (source_object,
 				      callback,
@@ -426,9 +426,9 @@ xsimple_async_result_new_error (xobject_t             *source_object,
   xsimple_async_result_t *simple;
   va_list args;
 
-  g_return_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
-  g_return_val_if_fail (domain != 0, NULL);
-  g_return_val_if_fail (format != NULL, NULL);
+  xreturn_val_if_fail (!source_object || X_IS_OBJECT (source_object), NULL);
+  xreturn_val_if_fail (domain != 0, NULL);
+  xreturn_val_if_fail (format != NULL, NULL);
 
   simple = xsimple_async_result_new (source_object,
 				      callback,
@@ -505,7 +505,7 @@ xsimple_async_result_set_handle_cancellation (xsimple_async_result_t *simple,
 xpointer_t
 xsimple_async_result_get_source_tag (xsimple_async_result_t *simple)
 {
-  g_return_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), NULL);
+  xreturn_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), NULL);
   return simple->source_tag;
 }
 
@@ -529,7 +529,7 @@ xboolean_t
 xsimple_async_result_propagate_error (xsimple_async_result_t  *simple,
                                        xerror_t             **dest)
 {
-  g_return_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), FALSE);
+  xreturn_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), FALSE);
 
   if (xcancellable_set_error_if_cancelled (simple->check_cancellable, dest))
     return TRUE;
@@ -579,7 +579,7 @@ xsimple_async_result_set_op_res_gpointer (xsimple_async_result_t *simple,
 xpointer_t
 xsimple_async_result_get_op_res_gpointer (xsimple_async_result_t *simple)
 {
-  g_return_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), NULL);
+  xreturn_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), NULL);
   return simple->op_res.v_pointer;
 }
 
@@ -615,7 +615,7 @@ xsimple_async_result_set_op_res_gssize (xsimple_async_result_t *simple,
 xssize_t
 xsimple_async_result_get_op_res_gssize (xsimple_async_result_t *simple)
 {
-  g_return_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), 0);
+  xreturn_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), 0);
   return simple->op_res.v_ssize;
 }
 
@@ -651,7 +651,7 @@ xsimple_async_result_set_op_res_gboolean (xsimple_async_result_t *simple,
 xboolean_t
 xsimple_async_result_get_op_res_gboolean (xsimple_async_result_t *simple)
 {
-  g_return_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), FALSE);
+  xreturn_val_if_fail (X_IS_SIMPLE_ASYNC_RESULT (simple), FALSE);
   return simple->op_res.v_boolean;
 }
 

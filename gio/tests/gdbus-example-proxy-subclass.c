@@ -108,15 +108,15 @@ enum
 
 static xuint_t signals[LAST_SIGNAL] = {0};
 
-G_DEFINE_TYPE (AccountsUser, accounts_user, XTYPE_DBUS_PROXY)
+XDEFINE_TYPE (AccountsUser, accounts_user, XTYPE_DBUS_PROXY)
 
 static void
 accounts_user_finalize (xobject_t *object)
 {
   G_GNUC_UNUSED AccountsUser *user = ACCOUNTS_USER (object);
 
-  if (G_OBJECT_CLASS (accounts_user_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (accounts_user_parent_class)->finalize (object);
+  if (XOBJECT_CLASS (accounts_user_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (accounts_user_parent_class)->finalize (object);
 }
 
 static void
@@ -159,7 +159,7 @@ accounts_user_get_user_name (AccountsUser *user)
 {
   xvariant_t *value;
   const xchar_t *ret;
-  g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
+  xreturn_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
   value = xdbus_proxy_get_cached_property (G_DBUS_PROXY (user), "UserName");
   ret = xvariant_get_string (value, NULL);
   xvariant_unref (value);
@@ -171,7 +171,7 @@ accounts_user_get_real_name (AccountsUser *user)
 {
   xvariant_t *value;
   const xchar_t *ret;
-  g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
+  xreturn_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
   value = xdbus_proxy_get_cached_property (G_DBUS_PROXY (user), "RealName");
   ret = xvariant_get_string (value, NULL);
   xvariant_unref (value);
@@ -183,7 +183,7 @@ accounts_user_get_automatic_login (AccountsUser *user)
 {
   xvariant_t *value;
   xboolean_t ret;
-  g_return_val_if_fail (ACCOUNTS_IS_USER (user), FALSE);
+  xreturn_val_if_fail (ACCOUNTS_IS_USER (user), FALSE);
   value = xdbus_proxy_get_cached_property (G_DBUS_PROXY (user), "AutomaticLogin");
   ret = xvariant_get_boolean (value);
   xvariant_unref (value);
@@ -229,43 +229,43 @@ accounts_user_g_properties_changed (xdbus_proxy_t          *proxy,
 static void
 accounts_user_class_init (AccountsUserClass *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
   GDBusProxyClass *proxy_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = accounts_user_get_property;
-  gobject_class->finalize = accounts_user_finalize;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->get_property = accounts_user_get_property;
+  xobject_class->finalize = accounts_user_finalize;
 
   proxy_class = G_DBUS_PROXY_CLASS (klass);
   proxy_class->g_signal             = accounts_user_g_signal;
   proxy_class->g_properties_changed = accounts_user_g_properties_changed;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_USER_NAME,
-                                   g_param_spec_string ("user-name",
+                                   xparam_spec_string ("user-name",
                                                         "User Name",
                                                         "The user name of the user",
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_REAL_NAME,
-                                   g_param_spec_string ("real-name",
+                                   xparam_spec_string ("real-name",
                                                         "Real Name",
                                                         "The real name of the user",
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_AUTOMATIC_LOGIN,
-                                   g_param_spec_boolean ("automatic-login",
+                                   xparam_spec_boolean ("automatic-login",
                                                          "Automatic Login",
                                                          "Whether the user is automatically logged in",
                                                          FALSE,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 
   signals[CHANGED_SIGNAL] = xsignal_new ("changed",
                                           ACCOUNTS_TYPE_USER,
@@ -288,7 +288,7 @@ accounts_user_frobnicate_sync (AccountsUser        *user,
   xchar_t *ret;
   xvariant_t *value;
 
-  g_return_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
+  xreturn_val_if_fail (ACCOUNTS_IS_USER (user), NULL);
 
   ret = NULL;
 

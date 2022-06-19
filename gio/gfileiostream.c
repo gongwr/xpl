@@ -147,7 +147,7 @@ xfile_io_stream_query_info (xfile_io_stream_t      *stream,
   xio_stream_t *io_stream;
   xfile_info_t *info;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
 
   io_stream = XIO_STREAM (stream);
 
@@ -257,8 +257,8 @@ xfile_io_stream_query_info_finish (xfile_io_stream_t     *stream,
 {
   GFileIOStreamClass *class;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return NULL;
@@ -288,7 +288,7 @@ xfile_io_stream_get_etag (xfile_io_stream_t  *stream)
   xio_stream_t *io_stream;
   char *etag;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), NULL);
 
   io_stream = XIO_STREAM (stream);
 
@@ -313,7 +313,7 @@ xfile_io_stream_tell (xfile_io_stream_t  *stream)
   GFileIOStreamClass *class;
   xoffset_t offset;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), 0);
 
   class = XFILE_IO_STREAM_GET_CLASS (stream);
 
@@ -336,7 +336,7 @@ xfile_io_stream_can_seek (xfile_io_stream_t  *stream)
   GFileIOStreamClass *class;
   xboolean_t can_seek;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
 
   class = XFILE_IO_STREAM_GET_CLASS (stream);
 
@@ -368,7 +368,7 @@ xfile_io_stream_seek (xfile_io_stream_t  *stream,
   xio_stream_t *io_stream;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
 
   io_stream = XIO_STREAM (stream);
   class = XFILE_IO_STREAM_GET_CLASS (stream);
@@ -413,7 +413,7 @@ xfile_io_stream_can_truncate (xfile_io_stream_t  *stream)
   GFileIOStreamClass *class;
   xboolean_t can_truncate;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
 
   class = XFILE_IO_STREAM_GET_CLASS (stream);
 
@@ -444,7 +444,7 @@ xfile_io_stream_truncate (xfile_io_stream_t  *stream,
   xio_stream_t *io_stream;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_IO_STREAM (stream), FALSE);
 
   io_stream = XIO_STREAM (stream);
   class = XFILE_IO_STREAM_GET_CLASS (stream);

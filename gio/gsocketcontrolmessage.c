@@ -70,7 +70,7 @@ G_DEFINE_ABSTRACT_TYPE (xsocket_control_message, xsocket_control_message, XTYPE_
 xsize_t
 xsocket_control_message_get_size (xsocket_control_message_t *message)
 {
-  g_return_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
+  xreturn_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
 
   return XSOCKET_CONTROL_MESSAGE_GET_CLASS (message)->get_size (message);
 }
@@ -89,7 +89,7 @@ xsocket_control_message_get_size (xsocket_control_message_t *message)
 int
 xsocket_control_message_get_level (xsocket_control_message_t *message)
 {
-  g_return_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
+  xreturn_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
 
   return XSOCKET_CONTROL_MESSAGE_GET_CLASS (message)->get_level (message);
 }
@@ -108,7 +108,7 @@ xsocket_control_message_get_level (xsocket_control_message_t *message)
 int
 xsocket_control_message_get_msg_type (xsocket_control_message_t *message)
 {
-  g_return_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
+  xreturn_val_if_fail (X_IS_SOCKET_CONTROL_MESSAGE (message), 0);
 
   return XSOCKET_CONTROL_MESSAGE_GET_CLASS (message)->get_type (message);
 }

@@ -39,7 +39,7 @@
  * SECTION:objects
  * @title: xobject_t
  * @short_description: The base object type
- * @see_also: #GParamSpecObject, g_param_spec_object()
+ * @see_also: #GParamSpecObject, xparam_spec_object()
  *
  * xobject_t is the fundamental type providing the common attributes and
  * methods for all object types in GTK+, Pango and other libraries
@@ -357,7 +357,7 @@ xobject_notify_queue_add (xobject_t            *object,
 {
   G_LOCK(notify_lock);
 
-  g_assert (nqueue->n_pspecs < 65535);
+  xassert (nqueue->n_pspecs < 65535);
 
   if (xslist_find (nqueue->pspecs, pspec) == NULL)
     {
@@ -444,7 +444,7 @@ _xobject_type_init (void)
    */
   info.value_table = &value_table;
   type = xtype_register_fundamental (XTYPE_OBJECT, g_intern_static_string ("xobject_t"), &info, &finfo, 0);
-  g_assert (type == XTYPE_OBJECT);
+  xassert (type == XTYPE_OBJECT);
   xvalue_register_transform_func (XTYPE_OBJECT, XTYPE_OBJECT, xvalue_object_transform_value);
 
 #if G_ENABLE_DEBUG
@@ -491,14 +491,14 @@ xobject_base_class_finalize (xobject_class_t *class)
 
   xslist_free (class->construct_properties);
   class->construct_properties = NULL;
-  list = g_param_spec_pool_list_owned (pspec_pool, G_OBJECT_CLASS_TYPE (class));
+  list = xparam_spec_pool_list_owned (pspec_pool, G_OBJECT_CLASS_TYPE (class));
   for (node = list; node; node = node->next)
     {
       xparam_spec_t *pspec = node->data;
 
-      g_param_spec_pool_remove (pspec_pool, pspec);
+      xparam_spec_pool_remove (pspec_pool, pspec);
       PARAM_SPEC_SET_PARAM_ID (pspec, 0);
-      g_param_spec_unref (pspec);
+      xparam_spec_unref (pspec);
     }
   xlist_free (list);
 }
@@ -514,7 +514,7 @@ xobject_do_class_init (xobject_class_t *class)
   quark_toggle_refs = g_quark_from_static_string ("xobject-toggle-references");
   quark_notify_queue = g_quark_from_static_string ("xobject-notify-queue");
   quark_in_construction = g_quark_from_static_string ("xobject-in-construction");
-  pspec_pool = g_param_spec_pool_new (TRUE);
+  pspec_pool = xparam_spec_pool_new (TRUE);
 
   class->constructor = xobject_constructor;
   class->constructed = xobject_constructed;
@@ -536,9 +536,9 @@ xobject_do_class_init (xobject_class_t *class)
    * Note that getting this signal doesn’t itself guarantee that the value of
    * the property has actually changed. When it is emitted is determined by the
    * derived xobject_t class. If the implementor did not create the property with
-   * %G_PARAM_EXPLICIT_NOTIFY, then any call to xobject_set_property() results
+   * %XPARAM_EXPLICIT_NOTIFY, then any call to xobject_set_property() results
    * in ::notify being emitted, even if the new value is the same as the old.
-   * If they did pass %G_PARAM_EXPLICIT_NOTIFY, then this signal is emitted only
+   * If they did pass %XPARAM_EXPLICIT_NOTIFY, then this signal is emitted only
    * when they explicitly call xobject_notify() or xobject_notify_by_pspec(),
    * and common practice is to do that only when the value has actually changed.
    *
@@ -577,7 +577,7 @@ install_property_internal (xtype_t       g_type,
 			   xuint_t       property_id,
 			   xparam_spec_t *pspec)
 {
-  if (g_param_spec_pool_lookup (pspec_pool, pspec->name, g_type, FALSE))
+  if (xparam_spec_pool_lookup (pspec_pool, pspec->name, g_type, FALSE))
     {
       g_warning ("When installing property: type '%s' already has a property named '%s'",
 		 xtype_name (g_type),
@@ -585,25 +585,25 @@ install_property_internal (xtype_t       g_type,
       return FALSE;
     }
 
-  g_param_spec_ref_sink (pspec);
+  xparam_spec_ref_sink (pspec);
   PARAM_SPEC_SET_PARAM_ID (pspec, property_id);
-  g_param_spec_pool_insert (pspec_pool, pspec, g_type);
+  xparam_spec_pool_insert (pspec_pool, pspec, g_type);
   return TRUE;
 }
 
 static xboolean_t
 validate_pspec_to_install (xparam_spec_t *pspec)
 {
-  g_return_val_if_fail (X_IS_PARAM_SPEC (pspec), FALSE);
-  g_return_val_if_fail (PARAM_SPEC_PARAM_ID (pspec) == 0, FALSE);	/* paranoid */
+  xreturn_val_if_fail (X_IS_PARAM_SPEC (pspec), FALSE);
+  xreturn_val_if_fail (PARAM_SPEC_PARAM_ID (pspec) == 0, FALSE);	/* paranoid */
 
-  g_return_val_if_fail (pspec->flags & (G_PARAM_READABLE | G_PARAM_WRITABLE), FALSE);
+  xreturn_val_if_fail (pspec->flags & (XPARAM_READABLE | XPARAM_WRITABLE), FALSE);
 
-  if (pspec->flags & G_PARAM_CONSTRUCT)
-    g_return_val_if_fail ((pspec->flags & G_PARAM_CONSTRUCT_ONLY) == 0, FALSE);
+  if (pspec->flags & XPARAM_CONSTRUCT)
+    xreturn_val_if_fail ((pspec->flags & XPARAM_CONSTRUCT_ONLY) == 0, FALSE);
 
-  if (pspec->flags & (G_PARAM_CONSTRUCT | G_PARAM_CONSTRUCT_ONLY))
-    g_return_val_if_fail (pspec->flags & G_PARAM_WRITABLE, FALSE);
+  if (pspec->flags & (XPARAM_CONSTRUCT | XPARAM_CONSTRUCT_ONLY))
+    xreturn_val_if_fail (pspec->flags & XPARAM_WRITABLE, FALSE);
 
   return TRUE;
 }
@@ -618,22 +618,22 @@ validate_and_install_class_property (xobject_class_t *class,
   if (!validate_pspec_to_install (pspec))
     return FALSE;
 
-  if (pspec->flags & G_PARAM_WRITABLE)
-    g_return_val_if_fail (class->set_property != NULL, FALSE);
-  if (pspec->flags & G_PARAM_READABLE)
-    g_return_val_if_fail (class->get_property != NULL, FALSE);
+  if (pspec->flags & XPARAM_WRITABLE)
+    xreturn_val_if_fail (class->set_property != NULL, FALSE);
+  if (pspec->flags & XPARAM_READABLE)
+    xreturn_val_if_fail (class->get_property != NULL, FALSE);
 
   class->flags |= CLASS_HAS_PROPS_FLAG;
   if (install_property_internal (oclass_type, property_id, pspec))
     {
-      if (pspec->flags & (G_PARAM_CONSTRUCT | G_PARAM_CONSTRUCT_ONLY))
+      if (pspec->flags & (XPARAM_CONSTRUCT | XPARAM_CONSTRUCT_ONLY))
         class->construct_properties = xslist_append (class->construct_properties, pspec);
 
       /* for property overrides of construct properties, we have to get rid
        * of the overridden inherited construct property
        */
-      pspec = g_param_spec_pool_lookup (pspec_pool, pspec->name, parent_type, TRUE);
-      if (pspec && pspec->flags & (G_PARAM_CONSTRUCT | G_PARAM_CONSTRUCT_ONLY))
+      pspec = xparam_spec_pool_lookup (pspec_pool, pspec->name, parent_type, TRUE);
+      if (pspec && pspec->flags & (XPARAM_CONSTRUCT | XPARAM_CONSTRUCT_ONLY))
         class->construct_properties = xslist_remove (class->construct_properties, pspec);
 
       return TRUE;
@@ -716,22 +716,22 @@ xobject_class_install_property (xobject_class_t *class,
  * static void
  * my_object_class_init (xobject_class_t *klass)
  * {
- *   xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+ *   xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
  *
  *   obj_properties[PROP_FOO] =
- *     g_param_spec_int ("foo", "foo_t", "foo_t",
+ *     xparam_spec_int ("foo", "foo_t", "foo_t",
  *                       -1, G_MAXINT,
  *                       0,
- *                       G_PARAM_READWRITE);
+ *                       XPARAM_READWRITE);
  *
  *   obj_properties[PROP_BAR] =
- *     g_param_spec_string ("bar", "Bar", "Bar",
+ *     xparam_spec_string ("bar", "Bar", "Bar",
  *                          NULL,
- *                          G_PARAM_READWRITE);
+ *                          XPARAM_READWRITE);
  *
- *   gobject_class->set_property = my_object_set_property;
- *   gobject_class->get_property = my_object_get_property;
- *   xobject_class_install_properties (gobject_class,
+ *   xobject_class->set_property = my_object_set_property;
+ *   xobject_class->get_property = my_object_get_property;
+ *   xobject_class_install_properties (xobject_class,
  *                                      N_PROPERTIES,
  *                                      obj_properties);
  * }
@@ -846,16 +846,16 @@ xobject_class_find_property (xobject_class_t *class,
   xparam_spec_t *pspec;
   xparam_spec_t *redirect;
 
-  g_return_val_if_fail (X_IS_OBJECT_CLASS (class), NULL);
-  g_return_val_if_fail (property_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT_CLASS (class), NULL);
+  xreturn_val_if_fail (property_name != NULL, NULL);
 
-  pspec = g_param_spec_pool_lookup (pspec_pool,
+  pspec = xparam_spec_pool_lookup (pspec_pool,
 				    property_name,
 				    G_OBJECT_CLASS_TYPE (class),
 				    TRUE);
   if (pspec)
     {
-      redirect = g_param_spec_get_redirect_target (pspec);
+      redirect = xparam_spec_get_redirect_target (pspec);
       if (redirect)
 	return redirect;
       else
@@ -889,10 +889,10 @@ xobject_interface_find_property (xpointer_t      x_iface,
 {
   xtype_interface_t *iface_class = x_iface;
 
-  g_return_val_if_fail (XTYPE_IS_INTERFACE (iface_class->g_type), NULL);
-  g_return_val_if_fail (property_name != NULL, NULL);
+  xreturn_val_if_fail (XTYPE_IS_INTERFACE (iface_class->g_type), NULL);
+  xreturn_val_if_fail (property_name != NULL, NULL);
 
-  return g_param_spec_pool_lookup (pspec_pool,
+  return xparam_spec_pool_lookup (pspec_pool,
 				   property_name,
 				   iface_class->g_type,
 				   FALSE);
@@ -920,7 +920,7 @@ xobject_interface_find_property (xpointer_t      x_iface,
  * instead, so that the @param_id field of the #xparam_spec_t will be
  * correct.  For virtually all uses, this makes no difference. If you
  * need to get the overridden property, you can call
- * g_param_spec_get_redirect_target().
+ * xparam_spec_get_redirect_target().
  *
  * Since: 2.4
  */
@@ -941,7 +941,7 @@ xobject_class_override_property (xobject_class_t *oclass,
    */
   parent_type = xtype_parent (G_OBJECT_CLASS_TYPE (oclass));
   if (parent_type != XTYPE_NONE)
-    overridden = g_param_spec_pool_lookup (pspec_pool,
+    overridden = xparam_spec_pool_lookup (pspec_pool,
 					   name,
 					   parent_type,
 					   TRUE);
@@ -955,7 +955,7 @@ xobject_class_override_property (xobject_class_t *oclass,
       ifaces = xtype_interfaces (G_OBJECT_CLASS_TYPE (oclass), &n_ifaces);
       while (n_ifaces-- && !overridden)
 	{
-	  overridden = g_param_spec_pool_lookup (pspec_pool,
+	  overridden = xparam_spec_pool_lookup (pspec_pool,
 						 name,
 						 ifaces[n_ifaces],
 						 FALSE);
@@ -971,7 +971,7 @@ xobject_class_override_property (xobject_class_t *oclass,
       return;
     }
 
-  new = g_param_spec_override (name, overridden);
+  new = xparam_spec_override (name, overridden);
   xobject_class_install_property (oclass, property_id, new);
 }
 
@@ -992,9 +992,9 @@ xobject_class_list_properties (xobject_class_t *class,
   xparam_spec_t **pspecs;
   xuint_t n;
 
-  g_return_val_if_fail (X_IS_OBJECT_CLASS (class), NULL);
+  xreturn_val_if_fail (X_IS_OBJECT_CLASS (class), NULL);
 
-  pspecs = g_param_spec_pool_list (pspec_pool,
+  pspecs = xparam_spec_pool_list (pspec_pool,
 				   G_OBJECT_CLASS_TYPE (class),
 				   &n);
   if (n_properties_p)
@@ -1030,9 +1030,9 @@ xobject_interface_list_properties (xpointer_t      x_iface,
   xparam_spec_t **pspecs;
   xuint_t n;
 
-  g_return_val_if_fail (XTYPE_IS_INTERFACE (iface_class->g_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_INTERFACE (iface_class->g_type), NULL);
 
-  pspecs = g_param_spec_pool_list (pspec_pool,
+  pspecs = xparam_spec_pool_list (pspec_pool,
 				   iface_class->g_type,
 				   &n);
   if (n_properties_p)
@@ -1230,7 +1230,7 @@ xobject_finalize (xobject_t *object)
   GOBJECT_IF_DEBUG (OBJECTS,
     {
       G_LOCK (debug_objects);
-      g_assert (xhash_table_contains (debug_objects_ht, object));
+      xassert (xhash_table_contains (debug_objects_ht, object));
       xhash_table_remove (debug_objects_ht, object);
       debug_objects_count--;
       G_UNLOCK (debug_objects);
@@ -1245,7 +1245,7 @@ xobject_dispatch_properties_changed (xobject_t     *object,
   xuint_t i;
 
   for (i = 0; i < n_pspecs; i++)
-    xsignal_emit (object, gobject_signals[NOTIFY], g_param_spec_get_name_quark (pspecs[i]), pspecs[i]);
+    xsignal_emit (object, gobject_signals[NOTIFY], xparam_spec_get_name_quark (pspecs[i]), pspecs[i]);
 }
 
 /**
@@ -1303,11 +1303,11 @@ get_notify_pspec (xparam_spec_t *pspec)
   xparam_spec_t *redirected;
 
   /* we don't notify on non-READABLE parameters */
-  if (~pspec->flags & G_PARAM_READABLE)
+  if (~pspec->flags & XPARAM_READABLE)
     return NULL;
 
   /* if the paramspec is redirected, notify on the target */
-  redirected = g_param_spec_get_redirect_target (pspec);
+  redirected = xparam_spec_get_redirect_target (pspec);
   if (redirected != NULL)
     return redirected;
 
@@ -1375,7 +1375,7 @@ xobject_notify (xobject_t     *object,
    * (by, e.g. calling xobject_class_find_property())
    * because xobject_notify_queue_add() does that
    */
-  pspec = g_param_spec_pool_lookup (pspec_pool,
+  pspec = xparam_spec_pool_lookup (pspec_pool,
 				    property_name,
 				    G_OBJECT_TYPE (object),
 				    TRUE);
@@ -1418,11 +1418,11 @@ xobject_notify (xobject_t     *object,
  *   static void
  *   my_object_class_init (xobject_class_t *klass)
  *   {
- *     properties[PROP_FOO] = g_param_spec_int ("foo", "foo_t", "The foo",
+ *     properties[PROP_FOO] = xparam_spec_int ("foo", "foo_t", "The foo",
  *                                              0, 100,
  *                                              50,
- *                                              G_PARAM_READWRITE);
- *     xobject_class_install_property (gobject_class,
+ *                                              XPARAM_READWRITE);
+ *     xobject_class_install_property (xobject_class,
  *                                      PROP_FOO,
  *                                      properties[PROP_FOO]);
  *   }
@@ -1495,7 +1495,7 @@ consider_issuing_property_deprecation_warning (const xparam_spec_t *pspec)
   static xmutex_t already_warned_lock;
   xboolean_t already;
 
-  if (!(pspec->flags & G_PARAM_DEPRECATED))
+  if (!(pspec->flags & XPARAM_DEPRECATED))
     return;
 
   if (g_once_init_enter (&enable_diagnostic))
@@ -1553,7 +1553,7 @@ object_get_property (xobject_t     *object,
       return;
     }
 
-  redirect = g_param_spec_get_redirect_target (pspec);
+  redirect = xparam_spec_get_redirect_target (pspec);
   if (redirect)
     pspec = redirect;
 
@@ -1580,7 +1580,7 @@ object_set_property (xobject_t             *object,
       return;
     }
 
-  redirect = g_param_spec_get_redirect_target (pspec);
+  redirect = xparam_spec_get_redirect_target (pspec);
   if (redirect)
     pspec = redirect;
 
@@ -1591,7 +1591,7 @@ object_set_property (xobject_t             *object,
 	       pspec->name,
 	       xtype_name (pspec->value_type),
 	       G_VALUE_TYPE_NAME (value));
-  else if (g_param_value_validate (pspec, &tmp_value) && !(pspec->flags & G_PARAM_LAX_VALIDATION))
+  else if (g_param_value_validate (pspec, &tmp_value) && !(pspec->flags & XPARAM_LAX_VALIDATION))
     {
       xchar_t *contents = xstrdup_value_contents (value);
 
@@ -1606,8 +1606,8 @@ object_set_property (xobject_t             *object,
     {
       class->set_property (object, param_id, &tmp_value, pspec);
 
-      if (~pspec->flags & G_PARAM_EXPLICIT_NOTIFY &&
-          pspec->flags & G_PARAM_READABLE)
+      if (~pspec->flags & XPARAM_EXPLICIT_NOTIFY &&
+          pspec->flags & XPARAM_READABLE)
         xobject_notify_queue_add (object, nqueue, pspec);
     }
   xvalue_unset (&tmp_value);
@@ -1631,11 +1631,11 @@ object_interface_check_properties (xpointer_t check_data,
   if (!X_IS_OBJECT_CLASS (class))
     goto out;
 
-  pspecs = g_param_spec_pool_list (pspec_pool, iface_type, &n);
+  pspecs = xparam_spec_pool_list (pspec_pool, iface_type, &n);
 
   while (n--)
     {
-      xparam_spec_t *class_pspec = g_param_spec_pool_lookup (pspec_pool,
+      xparam_spec_t *class_pspec = xparam_spec_pool_lookup (pspec_pool,
 							  pspecs[n]->name,
 							  G_OBJECT_CLASS_TYPE (class),
 							  TRUE);
@@ -1670,7 +1670,7 @@ object_interface_check_properties (xpointer_t check_data,
        * implementation must be readable.  If the interface is writable
        * then the implementation must be writable.
        */
-      if (!SUBSET (pspecs[n]->flags, class_pspec->flags, G_PARAM_READABLE | G_PARAM_WRITABLE))
+      if (!SUBSET (pspecs[n]->flags, class_pspec->flags, XPARAM_READABLE | XPARAM_WRITABLE))
         {
           g_critical ("Flags for property '%s' on class '%s' remove functionality compared with the "
                       "property on interface '%s'\n", pspecs[n]->name,
@@ -1686,9 +1686,9 @@ object_interface_check_properties (xpointer_t check_data,
        * really have any problems here because "writable at construct
        * time only" is still more permissive than "read only".
        */
-      if (pspecs[n]->flags & G_PARAM_WRITABLE)
+      if (pspecs[n]->flags & XPARAM_WRITABLE)
         {
-          if (!SUBSET (class_pspec->flags, pspecs[n]->flags, G_PARAM_CONSTRUCT_ONLY))
+          if (!SUBSET (class_pspec->flags, pspecs[n]->flags, XPARAM_CONSTRUCT_ONLY))
             {
               g_critical ("Flags for property '%s' on class '%s' introduce additional restrictions on "
                           "writability compared with the property on interface '%s'\n", pspecs[n]->name,
@@ -1725,33 +1725,33 @@ object_interface_check_properties (xpointer_t check_data,
        * then the only way that both of the above can be satisfied is
        * with a type that is exactly equal.
        */
-      switch (pspecs[n]->flags & (G_PARAM_READABLE | G_PARAM_WRITABLE))
+      switch (pspecs[n]->flags & (XPARAM_READABLE | XPARAM_WRITABLE))
         {
-        case G_PARAM_READABLE | G_PARAM_WRITABLE:
+        case XPARAM_READABLE | XPARAM_WRITABLE:
           /* class pspec value type must have exact equality with interface */
           if (pspecs[n]->value_type != class_pspec->value_type)
             g_critical ("Read/writable property '%s' on class '%s' has type '%s' which is not exactly equal to the "
                         "type '%s' of the property on the interface '%s'\n", pspecs[n]->name,
-                        xtype_name (G_OBJECT_CLASS_TYPE (class)), xtype_name (G_PARAM_SPEC_VALUE_TYPE (class_pspec)),
-                        xtype_name (G_PARAM_SPEC_VALUE_TYPE (pspecs[n])), xtype_name (iface_type));
+                        xtype_name (G_OBJECT_CLASS_TYPE (class)), xtype_name (XPARAM_SPEC_VALUE_TYPE (class_pspec)),
+                        xtype_name (XPARAM_SPEC_VALUE_TYPE (pspecs[n])), xtype_name (iface_type));
           break;
 
-        case G_PARAM_READABLE:
+        case XPARAM_READABLE:
           /* class pspec value type equal or more restrictive than interface */
           if (!xtype_is_a (class_pspec->value_type, pspecs[n]->value_type))
             g_critical ("Read-only property '%s' on class '%s' has type '%s' which is not equal to or more "
                         "restrictive than the type '%s' of the property on the interface '%s'\n", pspecs[n]->name,
-                        xtype_name (G_OBJECT_CLASS_TYPE (class)), xtype_name (G_PARAM_SPEC_VALUE_TYPE (class_pspec)),
-                        xtype_name (G_PARAM_SPEC_VALUE_TYPE (pspecs[n])), xtype_name (iface_type));
+                        xtype_name (G_OBJECT_CLASS_TYPE (class)), xtype_name (XPARAM_SPEC_VALUE_TYPE (class_pspec)),
+                        xtype_name (XPARAM_SPEC_VALUE_TYPE (pspecs[n])), xtype_name (iface_type));
           break;
 
-        case G_PARAM_WRITABLE:
+        case XPARAM_WRITABLE:
           /* class pspec value type equal or less restrictive than interface */
           if (!xtype_is_a (pspecs[n]->value_type, class_pspec->value_type))
             g_critical ("Write-only property '%s' on class '%s' has type '%s' which is not equal to or less "
                         "restrictive than the type '%s' of the property on the interface '%s' \n", pspecs[n]->name,
-                        xtype_name (G_OBJECT_CLASS_TYPE (class)), xtype_name (G_PARAM_SPEC_VALUE_TYPE (class_pspec)),
-                        xtype_name (G_PARAM_SPEC_VALUE_TYPE (pspecs[n])), xtype_name (iface_type));
+                        xtype_name (G_OBJECT_CLASS_TYPE (class)), xtype_name (XPARAM_SPEC_VALUE_TYPE (class_pspec)),
+                        xtype_name (XPARAM_SPEC_VALUE_TYPE (pspecs[n])), xtype_name (iface_type));
           break;
 
         default:
@@ -1780,7 +1780,7 @@ xobject_get_type (void)
  *
  * Creates a new instance of a #xobject_t subtype and sets its properties.
  *
- * Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
+ * Construction parameters (see %XPARAM_CONSTRUCT, %XPARAM_CONSTRUCT_ONLY)
  * which are not explicitly specified are set to their default values. Any
  * private data for the object is guaranteed to be initialized with zeros, as
  * per xtype_create_instance().
@@ -1984,7 +1984,7 @@ xobject_new_with_custom_constructor (xobject_class_t          *class,
 
   /* set remaining properties */
   for (i = 0; i < n_params; i++)
-    if (!(params[i].pspec->flags & (G_PARAM_CONSTRUCT | G_PARAM_CONSTRUCT_ONLY)))
+    if (!(params[i].pspec->flags & (XPARAM_CONSTRUCT | XPARAM_CONSTRUCT_ONLY)))
       {
         consider_issuing_property_deprecation_warning (params[i].pspec);
         object_set_property (object, params[i].pspec, params[i].value, nqueue);
@@ -2010,7 +2010,7 @@ xobject_new_internal (xobject_class_t          *class,
 
   object = (xobject_t *) xtype_create_instance (class->xtype_class.g_type);
 
-  g_assert (xobject_is_aligned (object));
+  xassert (xobject_is_aligned (object));
 
   if (CLASS_HAS_PROPS (class))
     {
@@ -2018,7 +2018,7 @@ xobject_new_internal (xobject_class_t          *class,
 
       /* This will have been setup in xobject_init() */
       nqueue = g_datalist_id_get_data (&object->qdata, quark_notify_queue);
-      g_assert (nqueue != NULL);
+      xassert (nqueue != NULL);
 
       /* We will set exactly n_construct_properties construct
        * properties, but they may come from either the class default
@@ -2042,7 +2042,7 @@ xobject_new_internal (xobject_class_t          *class,
               }
 
           if (value == NULL)
-            value = g_param_spec_get_default_value (pspec);
+            value = xparam_spec_get_default_value (pspec);
 
           object_set_property (object, pspec, value, nqueue);
         }
@@ -2061,7 +2061,7 @@ xobject_new_internal (xobject_class_t          *class,
        * ones.
        */
       for (i = 0; i < n_params; i++)
-        if (!(params[i].pspec->flags & (G_PARAM_CONSTRUCT | G_PARAM_CONSTRUCT_ONLY)))
+        if (!(params[i].pspec->flags & (XPARAM_CONSTRUCT | XPARAM_CONSTRUCT_ONLY)))
           {
             consider_issuing_property_deprecation_warning (params[i].pspec);
             object_set_property (object, params[i].pspec, params[i].value, nqueue);
@@ -2090,14 +2090,14 @@ xobject_new_is_valid_property (xtype_t                  object_type,
       return FALSE;
     }
 
-  if (G_UNLIKELY (~pspec->flags & G_PARAM_WRITABLE))
+  if (G_UNLIKELY (~pspec->flags & XPARAM_WRITABLE))
     {
       g_critical ("%s: property '%s' of object class '%s' is not writable",
                   G_STRFUNC, pspec->name, xtype_name (object_type));
       return FALSE;
     }
 
-  if (G_UNLIKELY (pspec->flags & (G_PARAM_CONSTRUCT | G_PARAM_CONSTRUCT_ONLY)))
+  if (G_UNLIKELY (pspec->flags & (XPARAM_CONSTRUCT | XPARAM_CONSTRUCT_ONLY)))
     {
       for (i = 0; i < n_params; i++)
         if (params[i].pspec == pspec)
@@ -2124,7 +2124,7 @@ xobject_new_is_valid_property (xtype_t                  object_type,
  * the provided arrays. Both arrays must have exactly @n_properties elements,
  * and the names and values correspond by index.
  *
- * Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
+ * Construction parameters (see %XPARAM_CONSTRUCT, %XPARAM_CONSTRUCT_ONLY)
  * which are not explicitly specified are set to their default values.
  *
  * Returns: (type xobject_t.Object) (transfer full): a new instance of
@@ -2141,7 +2141,7 @@ xobject_new_with_properties (xtype_t          object_type,
   xobject_class_t *class, *unref_class = NULL;
   xobject_t *object;
 
-  g_return_val_if_fail (XTYPE_IS_OBJECT (object_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_OBJECT (object_type), NULL);
 
   /* Try to avoid thrashing the ref_count if we don't need to (since
    * it's a locked operation).
@@ -2160,7 +2160,7 @@ xobject_new_with_properties (xtype_t          object_type,
       for (i = 0; i < n_properties; i++)
         {
           xparam_spec_t *pspec;
-          pspec = g_param_spec_pool_lookup (pspec_pool, names[i], object_type, TRUE);
+          pspec = xparam_spec_pool_lookup (pspec_pool, names[i], object_type, TRUE);
           if (!xobject_new_is_valid_property (object_type, pspec, names[i], params, count))
             continue;
           params[count].pspec = pspec;
@@ -2194,7 +2194,7 @@ xobject_new_with_properties (xtype_t          object_type,
  *
  * Creates a new instance of a #xobject_t subtype and sets its properties.
  *
- * Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
+ * Construction parameters (see %XPARAM_CONSTRUCT, %XPARAM_CONSTRUCT_ONLY)
  * which are not explicitly specified are set to their default values.
  *
  * Returns: (type xobject_t.Object) (transfer full): a new instance of
@@ -2212,8 +2212,8 @@ xobject_newv (xtype_t       object_type,
   xobject_class_t *class, *unref_class = NULL;
   xobject_t *object;
 
-  g_return_val_if_fail (XTYPE_IS_OBJECT (object_type), NULL);
-  g_return_val_if_fail (n_parameters == 0 || parameters != NULL, NULL);
+  xreturn_val_if_fail (XTYPE_IS_OBJECT (object_type), NULL);
+  xreturn_val_if_fail (n_parameters == 0 || parameters != NULL, NULL);
 
   /* Try to avoid thrashing the ref_count if we don't need to (since
    * it's a locked operation).
@@ -2235,7 +2235,7 @@ xobject_newv (xtype_t       object_type,
         {
           xparam_spec_t *pspec;
 
-          pspec = g_param_spec_pool_lookup (pspec_pool, parameters[i].name, object_type, TRUE);
+          pspec = xparam_spec_pool_lookup (pspec_pool, parameters[i].name, object_type, TRUE);
           if (!xobject_new_is_valid_property (object_type, pspec, parameters[i].name, cparams, j))
             continue;
 
@@ -2266,7 +2266,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  *
  * Creates a new instance of a #xobject_t subtype and sets its properties.
  *
- * Construction parameters (see %G_PARAM_CONSTRUCT, %G_PARAM_CONSTRUCT_ONLY)
+ * Construction parameters (see %XPARAM_CONSTRUCT, %XPARAM_CONSTRUCT_ONLY)
  * which are not explicitly specified are set to their default values.
  *
  * Returns: a new instance of @object_type
@@ -2279,7 +2279,7 @@ xobject_new_valist (xtype_t        object_type,
   xobject_class_t *class, *unref_class = NULL;
   xobject_t *object;
 
-  g_return_val_if_fail (XTYPE_IS_OBJECT (object_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_OBJECT (object_type), NULL);
 
   /* Try to avoid thrashing the ref_count if we don't need to (since
    * it's a locked operation).
@@ -2306,7 +2306,7 @@ xobject_new_valist (xtype_t        object_type,
           xchar_t *error = NULL;
           xparam_spec_t *pspec;
 
-          pspec = g_param_spec_pool_lookup (pspec_pool, name, object_type, TRUE);
+          pspec = xparam_spec_pool_lookup (pspec_pool, name, object_type, TRUE);
 
           if (!xobject_new_is_valid_property (object_type, pspec, name, params, n_params))
             break;
@@ -2424,13 +2424,13 @@ xobject_set_is_valid_property (xobject_t         *object,
                  G_STRFUNC, G_OBJECT_TYPE_NAME (object), property_name);
       return FALSE;
     }
-  if (G_UNLIKELY (!(pspec->flags & G_PARAM_WRITABLE)))
+  if (G_UNLIKELY (!(pspec->flags & XPARAM_WRITABLE)))
     {
       g_warning ("%s: property '%s' of object class '%s' is not writable",
                  G_STRFUNC, pspec->name, G_OBJECT_TYPE_NAME (object));
       return FALSE;
     }
-  if (G_UNLIKELY (((pspec->flags & G_PARAM_CONSTRUCT_ONLY) && !object_in_construction (object))))
+  if (G_UNLIKELY (((pspec->flags & XPARAM_CONSTRUCT_ONLY) && !object_in_construction (object))))
     {
       g_warning ("%s: construct property \"%s\" for object '%s' can't be set after construction",
                  G_STRFUNC, pspec->name, G_OBJECT_TYPE_NAME (object));
@@ -2474,7 +2474,7 @@ xobject_setv (xobject_t       *object,
   nqueue = xobject_notify_queue_freeze (object, FALSE);
   for (i = 0; i < n_properties; i++)
     {
-      pspec = g_param_spec_pool_lookup (pspec_pool, names[i], obj_type, TRUE);
+      pspec = xparam_spec_pool_lookup (pspec_pool, names[i], obj_type, TRUE);
 
       if (!xobject_set_is_valid_property (object, pspec, names[i]))
         break;
@@ -2516,7 +2516,7 @@ xobject_set_valist (xobject_t	 *object,
       xparam_spec_t *pspec;
       xchar_t *error = NULL;
 
-      pspec = g_param_spec_pool_lookup (pspec_pool,
+      pspec = xparam_spec_pool_lookup (pspec_pool,
 					name,
 					G_OBJECT_TYPE (object),
 					TRUE);
@@ -2556,7 +2556,7 @@ xobject_get_is_valid_property (xobject_t          *object,
                  G_STRFUNC, G_OBJECT_TYPE_NAME (object), property_name);
       return FALSE;
     }
-  if (G_UNLIKELY (!(pspec->flags & G_PARAM_READABLE)))
+  if (G_UNLIKELY (!(pspec->flags & XPARAM_READABLE)))
     {
       g_warning ("%s: property '%s' of object class '%s' is not readable",
                  G_STRFUNC, pspec->name, G_OBJECT_TYPE_NAME (object));
@@ -2601,7 +2601,7 @@ xobject_getv (xobject_t      *object,
   obj_type = G_OBJECT_TYPE (object);
   for (i = 0; i < n_properties; i++)
     {
-      pspec = g_param_spec_pool_lookup (pspec_pool, names[i], obj_type, TRUE);
+      pspec = xparam_spec_pool_lookup (pspec_pool, names[i], obj_type, TRUE);
       if (!xobject_get_is_valid_property (object, pspec, names[i]))
         break;
       xvalue_init (&values[i], pspec->value_type);
@@ -2644,7 +2644,7 @@ xobject_get_valist (xobject_t	 *object,
       xparam_spec_t *pspec;
       xchar_t *error;
 
-      pspec = g_param_spec_pool_lookup (pspec_pool,
+      pspec = xparam_spec_pool_lookup (pspec_pool,
 					name,
 					G_OBJECT_TYPE (object),
 					TRUE);
@@ -2807,7 +2807,7 @@ xobject_get_property (xobject_t	   *object,
 
   xobject_ref (object);
 
-  pspec = g_param_spec_pool_lookup (pspec_pool,
+  pspec = xparam_spec_pool_lookup (pspec_pool,
 				    property_name,
 				    G_OBJECT_TYPE (object),
 				    TRUE);
@@ -2895,8 +2895,8 @@ xobject_connect (xpointer_t     _object,
   xobject_t *object = _object;
   va_list var_args;
 
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (object->ref_count > 0, object);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (object->ref_count > 0, object);
 
   va_start (var_args, signal_spec);
   while (signal_spec)
@@ -3217,7 +3217,7 @@ xboolean_t
 xobject_is_floating (xpointer_t _object)
 {
   xobject_t *object = _object;
-  g_return_val_if_fail (X_IS_OBJECT (object), FALSE);
+  xreturn_val_if_fail (X_IS_OBJECT (object), FALSE);
   return floating_flag_handler (object, 0);
 }
 
@@ -3246,8 +3246,8 @@ xpointer_t
 {
   xobject_t *object = _object;
   xboolean_t was_floating;
-  g_return_val_if_fail (X_IS_OBJECT (object), object);
-  g_return_val_if_fail (g_atomic_int_get (&object->ref_count) >= 1, object);
+  xreturn_val_if_fail (X_IS_OBJECT (object), object);
+  xreturn_val_if_fail (g_atomic_int_get (&object->ref_count) >= 1, object);
   xobject_ref (object);
   was_floating = floating_flag_handler (object, -1);
   if (was_floating)
@@ -3303,8 +3303,8 @@ xpointer_t
 xobject_take_ref (xpointer_t _object)
 {
   xobject_t *object = _object;
-  g_return_val_if_fail (X_IS_OBJECT (object), object);
-  g_return_val_if_fail (g_atomic_int_get (&object->ref_count) >= 1, object);
+  xreturn_val_if_fail (X_IS_OBJECT (object), object);
+  xreturn_val_if_fail (g_atomic_int_get (&object->ref_count) >= 1, object);
 
   floating_flag_handler (object, -1);
 
@@ -3364,7 +3364,7 @@ toggle_refs_notify (xobject_t *object,
   /* Reentrancy here is not as tricky as it seems, because a toggle reference
    * will only be notified when there is exactly one of them.
    */
-  g_assert (tstack.n_toggle_refs == 1);
+  xassert (tstack.n_toggle_refs == 1);
   tstack.toggle_refs[0].notify (tstack.toggle_refs[0].data, tstack.object, is_last_ref);
 }
 
@@ -3523,11 +3523,11 @@ xpointer_t
   xint_t old_val;
   xboolean_t object_already_finalized;
 
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
 
   old_val = g_atomic_int_add (&object->ref_count, 1);
   object_already_finalized = (old_val <= 0);
-  g_return_val_if_fail (!object_already_finalized, NULL);
+  xreturn_val_if_fail (!object_already_finalized, NULL);
 
   if (old_val == 1 && OBJECT_HAS_TOGGLE_REF (object))
     toggle_refs_notify (object, FALSE);
@@ -3741,7 +3741,7 @@ xpointer_t
 xobject_get_qdata (xobject_t *object,
 		    xquark   quark)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
 
   return quark ? g_datalist_id_get_data (&object->qdata, quark) : NULL;
 }
@@ -3807,8 +3807,8 @@ xobject_dup_qdata (xobject_t        *object,
                     GDuplicateFunc   dup_func,
                     xpointer_t         user_data)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (quark > 0, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (quark > 0, NULL);
 
   return g_datalist_id_dup_data (&object->qdata, quark, dup_func, user_data);
 }
@@ -3849,8 +3849,8 @@ xobject_replace_qdata (xobject_t        *object,
                         xdestroy_notify_t  destroy,
                         xdestroy_notify_t *old_destroy)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (quark > 0, FALSE);
+  xreturn_val_if_fail (X_IS_OBJECT (object), FALSE);
+  xreturn_val_if_fail (quark > 0, FALSE);
 
   return g_datalist_id_replace_data (&object->qdata, quark,
                                      oldval, newval, destroy,
@@ -3931,8 +3931,8 @@ xpointer_t
 xobject_steal_qdata (xobject_t *object,
 		      xquark   quark)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (quark > 0, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (quark > 0, NULL);
 
   return g_datalist_id_remove_no_notify (&object->qdata, quark);
 }
@@ -3951,8 +3951,8 @@ xpointer_t
 xobject_get_data (xobject_t     *object,
                    const xchar_t *key)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   return g_datalist_get_data (&object->qdata, key);
 }
@@ -4020,8 +4020,8 @@ xobject_dup_data (xobject_t        *object,
                    GDuplicateFunc   dup_func,
                    xpointer_t         user_data)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   return g_datalist_id_dup_data (&object->qdata,
                                  g_quark_from_string (key),
@@ -4067,8 +4067,8 @@ xobject_replace_data (xobject_t        *object,
                        xdestroy_notify_t  destroy,
                        xdestroy_notify_t *old_destroy)
 {
-  g_return_val_if_fail (X_IS_OBJECT (object), FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_OBJECT (object), FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   return g_datalist_id_replace_data (&object->qdata,
                                      g_quark_from_string (key),
@@ -4119,8 +4119,8 @@ xobject_steal_data (xobject_t     *object,
 {
   xquark quark;
 
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   quark = g_quark_try_string (key);
 
@@ -4205,7 +4205,7 @@ xvalue_object_lcopy_value (const xvalue_t *value,
 {
   xobject_t **object_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (object_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (object_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   if (!value->data[0].v_pointer)
     *object_p = NULL;
@@ -4322,7 +4322,7 @@ xvalue_take_object (xvalue_t  *value,
 xpointer_t
 xvalue_get_object (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_OBJECT (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_OBJECT (value), NULL);
 
   return value->data[0].v_pointer;
 }
@@ -4341,7 +4341,7 @@ xvalue_get_object (const xvalue_t *value)
 xpointer_t
 xvalue_dup_object (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_OBJECT (value), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_OBJECT (value), NULL);
 
   return value->data[0].v_pointer ? xobject_ref (value->data[0].v_pointer) : NULL;
 }
@@ -4373,15 +4373,15 @@ xsignal_connect_object (xpointer_t      instance,
 			 xpointer_t      gobject,
 			 GConnectFlags connect_flags)
 {
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail (detailed_signal != NULL, 0);
-  g_return_val_if_fail (c_handler != NULL, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail (detailed_signal != NULL, 0);
+  xreturn_val_if_fail (c_handler != NULL, 0);
 
   if (gobject)
     {
       xclosure_t *closure;
 
-      g_return_val_if_fail (X_IS_OBJECT (gobject), 0);
+      xreturn_val_if_fail (X_IS_OBJECT (gobject), 0);
 
       closure = ((connect_flags & G_CONNECT_SWAPPED) ? g_cclosure_new_object_swap : g_cclosure_new_object) (c_handler, gobject);
 
@@ -4401,7 +4401,7 @@ typedef struct {
  * xslist_t* xobject_list_watched_closures (xobject_t *object)
  * {
  *   CArray *carray;
- *   g_return_val_if_fail (X_IS_OBJECT (object), NULL);
+ *   xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
  *   carray = xobject_get_data (object, "xobject-closure-array");
  *   if (carray)
  *     {
@@ -4529,8 +4529,8 @@ xclosure_new_object (xuint_t    sizeof_closure,
 {
   xclosure_t *closure;
 
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (g_atomic_int_get (&object->ref_count) > 0, NULL);     /* this doesn't work on finalizing objects */
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&object->ref_count) > 0, NULL);     /* this doesn't work on finalizing objects */
 
   closure = xclosure_new_simple (sizeof_closure, object);
   xobject_watch_closure (object, closure);
@@ -4557,9 +4557,9 @@ g_cclosure_new_object (xcallback_t callback_func,
 {
   xclosure_t *closure;
 
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (g_atomic_int_get (&object->ref_count) > 0, NULL);     /* this doesn't work on finalizing objects */
-  g_return_val_if_fail (callback_func != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&object->ref_count) > 0, NULL);     /* this doesn't work on finalizing objects */
+  xreturn_val_if_fail (callback_func != NULL, NULL);
 
   closure = g_cclosure_new (callback_func, object, NULL);
   xobject_watch_closure (object, closure);
@@ -4586,9 +4586,9 @@ g_cclosure_new_object_swap (xcallback_t callback_func,
 {
   xclosure_t *closure;
 
-  g_return_val_if_fail (X_IS_OBJECT (object), NULL);
-  g_return_val_if_fail (g_atomic_int_get (&object->ref_count) > 0, NULL);     /* this doesn't work on finalizing objects */
-  g_return_val_if_fail (callback_func != NULL, NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (object), NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&object->ref_count) > 0, NULL);     /* this doesn't work on finalizing objects */
+  xreturn_val_if_fail (callback_func != NULL, NULL);
 
   closure = g_cclosure_new_swap (callback_func, object, NULL);
   xobject_watch_closure (object, closure);
@@ -4617,7 +4617,7 @@ xobject_compat_control (xsize_t           what,
     }
 }
 
-G_DEFINE_TYPE (xinitially_unowned, xinitially_unowned, XTYPE_OBJECT)
+XDEFINE_TYPE (xinitially_unowned, xinitially_unowned, XTYPE_OBJECT)
 
 static void
 xinitially_unowned_init (xinitially_unowned_t *object)
@@ -4732,7 +4732,7 @@ g_weak_ref_get (GWeakRef *weak_ref)
 {
   xpointer_t object_or_null;
 
-  g_return_val_if_fail (weak_ref!= NULL, NULL);
+  xreturn_val_if_fail (weak_ref!= NULL, NULL);
 
   g_rw_lock_reader_lock (&weak_locations_lock);
 
@@ -4828,7 +4828,7 @@ g_weak_ref_set (GWeakRef *weak_ref,
         {
           weak_locations = g_datalist_id_get_data (&old_object->qdata, quark_weak_locations);
           /* for it to point to an object, the object must have had it added once */
-          g_assert (weak_locations != NULL);
+          xassert (weak_locations != NULL);
 
           *weak_locations = xslist_remove (*weak_locations, weak_ref);
 

@@ -368,7 +368,7 @@ g_dbus_error_register_error (xquark       error_domain,
   QuarkCodePair pair;
   RegisteredError *re;
 
-  g_return_val_if_fail (dbus_error_name != NULL, FALSE);
+  xreturn_val_if_fail (dbus_error_name != NULL, FALSE);
 
   ret = FALSE;
 
@@ -376,7 +376,7 @@ g_dbus_error_register_error (xquark       error_domain,
 
   if (quark_code_pair_to_re == NULL)
     {
-      g_assert (dbus_error_name_to_re == NULL); /* check invariant */
+      xassert (dbus_error_name_to_re == NULL); /* check invariant */
       quark_code_pair_to_re = xhash_table_new ((GHashFunc) quark_code_pair_hash_func,
                                                 (GEqualFunc) quark_code_pair_equal_func);
       dbus_error_name_to_re = xhash_table_new_full (xstr_hash,
@@ -429,7 +429,7 @@ g_dbus_error_unregister_error (xquark       error_domain,
   RegisteredError *re;
   xuint_t hash_size;
 
-  g_return_val_if_fail (dbus_error_name != NULL, FALSE);
+  xreturn_val_if_fail (dbus_error_name != NULL, FALSE);
 
   ret = FALSE;
 
@@ -437,7 +437,7 @@ g_dbus_error_unregister_error (xquark       error_domain,
 
   if (dbus_error_name_to_re == NULL)
     {
-      g_assert (quark_code_pair_to_re == NULL); /* check invariant */
+      xassert (quark_code_pair_to_re == NULL); /* check invariant */
       goto out;
     }
 
@@ -496,7 +496,7 @@ g_dbus_error_unregister_error (xquark       error_domain,
 xboolean_t
 g_dbus_error_is_remote_error (const xerror_t *error)
 {
-  g_return_val_if_fail (error != NULL, FALSE);
+  xreturn_val_if_fail (error != NULL, FALSE);
   return xstr_has_prefix (error->message, "GDBus.Error:");
 }
 
@@ -523,7 +523,7 @@ g_dbus_error_get_remote_error (const xerror_t *error)
   RegisteredError *re;
   xchar_t *ret;
 
-  g_return_val_if_fail (error != NULL, NULL);
+  xreturn_val_if_fail (error != NULL, NULL);
 
   /* Ensure that e.g. G_DBUS_ERROR is registered using g_dbus_error_register_error() */
   _g_dbus_initialize ();
@@ -538,7 +538,7 @@ g_dbus_error_get_remote_error (const xerror_t *error)
       QuarkCodePair pair;
       pair.error_domain = error->domain;
       pair.error_code = error->code;
-      g_assert (dbus_error_name_to_re != NULL); /* check invariant */
+      xassert (dbus_error_name_to_re != NULL); /* check invariant */
       re = xhash_table_lookup (quark_code_pair_to_re, &pair);
     }
 
@@ -611,8 +611,8 @@ g_dbus_error_new_for_dbus_error (const xchar_t *dbus_error_name,
   xerror_t *error;
   RegisteredError *re;
 
-  g_return_val_if_fail (dbus_error_name != NULL, NULL);
-  g_return_val_if_fail (dbus_error_message != NULL, NULL);
+  xreturn_val_if_fail (dbus_error_name != NULL, NULL);
+  xreturn_val_if_fail (dbus_error_message != NULL, NULL);
 
   /* Ensure that e.g. G_DBUS_ERROR is registered using g_dbus_error_register_error() */
   _g_dbus_initialize ();
@@ -622,7 +622,7 @@ g_dbus_error_new_for_dbus_error (const xchar_t *dbus_error_name,
   re = NULL;
   if (dbus_error_name_to_re != NULL)
     {
-      g_assert (quark_code_pair_to_re != NULL); /* check invariant */
+      xassert (quark_code_pair_to_re != NULL); /* check invariant */
       re = xhash_table_lookup (dbus_error_name_to_re, dbus_error_name);
     }
 
@@ -770,7 +770,7 @@ g_dbus_error_strip_remote_error (xerror_t *error)
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (error != NULL, FALSE);
+  xreturn_val_if_fail (error != NULL, FALSE);
 
   ret = FALSE;
 
@@ -821,7 +821,7 @@ g_dbus_error_encode_gerror (const xerror_t *error)
   RegisteredError *re;
   xchar_t *error_name;
 
-  g_return_val_if_fail (error != NULL, NULL);
+  xreturn_val_if_fail (error != NULL, NULL);
 
   /* Ensure that e.g. G_DBUS_ERROR is registered using g_dbus_error_register_error() */
   _g_dbus_initialize ();
@@ -835,7 +835,7 @@ g_dbus_error_encode_gerror (const xerror_t *error)
       QuarkCodePair pair;
       pair.error_domain = error->domain;
       pair.error_code = error->code;
-      g_assert (dbus_error_name_to_re != NULL); /* check invariant */
+      xassert (dbus_error_name_to_re != NULL); /* check invariant */
       re = xhash_table_lookup (quark_code_pair_to_re, &pair);
     }
   if (re != NULL)
@@ -858,7 +858,7 @@ g_dbus_error_encode_gerror (const xerror_t *error)
       domain_as_string = g_quark_to_string (error->domain);
 
       /* 0 is not a domain; neither are non-quark integers */
-      g_return_val_if_fail (domain_as_string != NULL, NULL);
+      xreturn_val_if_fail (domain_as_string != NULL, NULL);
 
       s = xstring_new ("org.gtk.GDBus.UnmappedGError.Quark._");
       for (n = 0; domain_as_string[n] != 0; n++)

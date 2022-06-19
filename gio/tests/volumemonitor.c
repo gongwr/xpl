@@ -11,16 +11,16 @@ do_mount_tests (xdrive_t *drive, xvolume_t *volume, xmount_t *mount)
   xchar_t *uuid;
 
   name = g_mount_get_name (mount);
-  g_assert (name != NULL);
+  xassert (name != NULL);
   g_free (name);
 
   v = g_mount_get_volume (mount);
-  g_assert (v == volume);
+  xassert (v == volume);
   if (v != NULL)
     xobject_unref (v);
 
   d = g_mount_get_drive (mount);
-  g_assert (d == drive);
+  xassert (d == drive);
   if (d != NULL)
     xobject_unref (d);
 
@@ -29,7 +29,7 @@ do_mount_tests (xdrive_t *drive, xvolume_t *volume, xmount_t *mount)
     {
       xmount_t *m;
       m = g_volume_monitor_get_mount_for_uuid (monitor, uuid);
-      g_assert (m == mount);
+      xassert (m == mount);
       xobject_unref (m);
       g_free (uuid);
     }
@@ -44,11 +44,11 @@ do_volume_tests (xdrive_t *drive, xvolume_t *volume)
   xchar_t *uuid;
 
   name = g_volume_get_name (volume);
-  g_assert (name != NULL);
+  xassert (name != NULL);
   g_free (name);
 
   d = g_volume_get_drive (volume);
-  g_assert (d == drive);
+  xassert (d == drive);
   if (d != NULL)
     xobject_unref (d);
 
@@ -64,7 +64,7 @@ do_volume_tests (xdrive_t *drive, xvolume_t *volume)
     {
       xvolume_t *v;
       v = g_volume_monitor_get_volume_for_uuid (monitor, uuid);
-      g_assert (v == volume);
+      xassert (v == volume);
       xobject_unref (v);
       g_free (uuid);
     }
@@ -77,14 +77,14 @@ do_drive_tests (xdrive_t *drive)
   xchar_t *name;
   xboolean_t has_volumes;
 
-  g_assert (X_IS_DRIVE (drive));
+  xassert (X_IS_DRIVE (drive));
   name = xdrive_get_name (drive);
-  g_assert (name != NULL);
+  xassert (name != NULL);
   g_free (name);
 
   has_volumes = xdrive_has_volumes (drive);
   volumes = xdrive_get_volumes (drive);
-  g_assert (has_volumes == (volumes != NULL));
+  xassert (has_volumes == (volumes != NULL));
   for (l = volumes; l; l = l->next)
     {
       xvolume_t *volume = l->data;

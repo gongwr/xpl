@@ -189,7 +189,7 @@ g_unix_socket_address_get_property (xobject_t    *object,
 static xsocket_family_t
 g_unix_socket_address_get_family (xsocket_address_t *address)
 {
-  g_assert (PF_UNIX == XSOCKET_FAMILY_UNIX);
+  xassert (PF_UNIX == XSOCKET_FAMILY_UNIX);
 
   return XSOCKET_FAMILY_UNIX;
 }
@@ -221,7 +221,7 @@ g_unix_socket_address_to_native (xsocket_address_t *address,
   xssize_t socklen;
 
   socklen = g_unix_socket_address_get_native_size (address);
-  g_assert (socklen >= 0);
+  xassert (socklen >= 0);
   if (destlen < (xsize_t) socklen)
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
@@ -263,33 +263,33 @@ g_unix_socket_address_to_native (xsocket_address_t *address,
 static void
 g_unix_socket_address_class_init (GUnixSocketAddressClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   GSocketAddressClass *gsocketaddress_class = XSOCKET_ADDRESS_CLASS (klass);
 
-  gobject_class->set_property = g_unix_socket_address_set_property;
-  gobject_class->get_property = g_unix_socket_address_get_property;
+  xobject_class->set_property = g_unix_socket_address_set_property;
+  xobject_class->get_property = g_unix_socket_address_get_property;
 
   gsocketaddress_class->get_family = g_unix_socket_address_get_family;
   gsocketaddress_class->to_native = g_unix_socket_address_to_native;
   gsocketaddress_class->get_native_size = g_unix_socket_address_get_native_size;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_PATH,
-				   g_param_spec_string ("path",
+				   xparam_spec_string ("path",
 							P_("Path"),
 							P_("UNIX socket path"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_PATH_AS_ARRAY,
-				   g_param_spec_boxed ("path-as-array",
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_PATH_AS_ARRAY,
+				   xparam_spec_boxed ("path-as-array",
 						       P_("Path array"),
 						       P_("UNIX socket path, as byte array"),
 						       XTYPE_BYTE_ARRAY,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
   /**
    * GUnixSocketAddress:abstract:
    *
@@ -299,23 +299,23 @@ g_unix_socket_address_class_init (GUnixSocketAddressClass *klass)
    * distinguishes between zero-padded and non-zero-padded
    * abstract addresses.
    */
-  xobject_class_install_property (gobject_class, PROP_ABSTRACT,
-				   g_param_spec_boolean ("abstract",
+  xobject_class_install_property (xobject_class, PROP_ABSTRACT,
+				   xparam_spec_boolean ("abstract",
 							 P_("Abstract"),
 							 P_("Whether or not this is an abstract address"),
 							 FALSE,
-							 G_PARAM_READWRITE |
-							 G_PARAM_CONSTRUCT_ONLY |
-							 G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_ADDRESS_TYPE,
-				   g_param_spec_enum ("address-type",
+							 XPARAM_READWRITE |
+							 XPARAM_CONSTRUCT_ONLY |
+							 XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_ADDRESS_TYPE,
+				   xparam_spec_enum ("address-type",
 						      P_("Address type"),
 						      P_("The type of UNIX socket address"),
 						      XTYPE_UNIX_SOCKET_ADDRESS_TYPE,
 						      G_UNIX_SOCKET_ADDRESS_PATH,
-						      G_PARAM_READWRITE |
-						      G_PARAM_CONSTRUCT_ONLY |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE |
+						      XPARAM_CONSTRUCT_ONLY |
+						      XPARAM_STATIC_STRINGS));
 }
 
 static void

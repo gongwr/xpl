@@ -115,7 +115,7 @@ test_validity (void)
 
       g_free (file_uri);
 
-      g_assert (result == tests[i].expected_validity);
+      xassert (result == tests[i].expected_validity);
     }
 }
 

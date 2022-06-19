@@ -161,7 +161,7 @@ g_async_queue_new_full (xdestroy_notify_t item_free_func)
 xasync_queue_t *
 g_async_queue_ref (xasync_queue_t *queue)
 {
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   g_atomic_int_inc (&queue->ref_count);
 
@@ -428,7 +428,7 @@ g_async_queue_pop_intern_unlocked (xasync_queue_t *queue,
 
   retval = g_queue_pop_tail (&queue->queue);
 
-  g_assert (retval || !wait || end_time > 0);
+  xassert (retval || !wait || end_time > 0);
 
   return retval;
 }
@@ -447,7 +447,7 @@ g_async_queue_pop (xasync_queue_t *queue)
 {
   xpointer_t retval;
 
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   g_mutex_lock (&queue->mutex);
   retval = g_async_queue_pop_intern_unlocked (queue, TRUE, -1);
@@ -470,7 +470,7 @@ g_async_queue_pop (xasync_queue_t *queue)
 xpointer_t
 g_async_queue_pop_unlocked (xasync_queue_t *queue)
 {
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   return g_async_queue_pop_intern_unlocked (queue, TRUE, -1);
 }
@@ -490,7 +490,7 @@ g_async_queue_try_pop (xasync_queue_t *queue)
 {
   xpointer_t retval;
 
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   g_mutex_lock (&queue->mutex);
   retval = g_async_queue_pop_intern_unlocked (queue, FALSE, -1);
@@ -514,7 +514,7 @@ g_async_queue_try_pop (xasync_queue_t *queue)
 xpointer_t
 g_async_queue_try_pop_unlocked (xasync_queue_t *queue)
 {
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   return g_async_queue_pop_intern_unlocked (queue, FALSE, -1);
 }
@@ -539,7 +539,7 @@ g_async_queue_timeout_pop (xasync_queue_t *queue,
   sint64_t end_time = g_get_monotonic_time () + timeout;
   xpointer_t retval;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   g_mutex_lock (&queue->mutex);
   retval = g_async_queue_pop_intern_unlocked (queue, TRUE, end_time);
@@ -569,7 +569,7 @@ g_async_queue_timeout_pop_unlocked (xasync_queue_t *queue,
 {
   sint64_t end_time = g_get_monotonic_time () + timeout;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   return g_async_queue_pop_intern_unlocked (queue, TRUE, end_time);
 }
@@ -600,7 +600,7 @@ g_async_queue_timed_pop (xasync_queue_t *queue,
   sint64_t m_end_time;
   xpointer_t retval;
 
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   if (end_time != NULL)
     {
@@ -645,7 +645,7 @@ g_async_queue_timed_pop_unlocked (xasync_queue_t *queue,
 {
   sint64_t m_end_time;
 
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   if (end_time != NULL)
     {
@@ -679,7 +679,7 @@ g_async_queue_length (xasync_queue_t *queue)
 {
   xint_t retval;
 
-  g_return_val_if_fail (queue, 0);
+  xreturn_val_if_fail (queue, 0);
 
   g_mutex_lock (&queue->mutex);
   retval = queue->queue.length - queue->waitinxthreads;
@@ -708,7 +708,7 @@ g_async_queue_length (xasync_queue_t *queue)
 xint_t
 g_async_queue_length_unlocked (xasync_queue_t *queue)
 {
-  g_return_val_if_fail (queue, 0);
+  xreturn_val_if_fail (queue, 0);
 
   return queue->queue.length - queue->waitinxthreads;
 }
@@ -810,8 +810,8 @@ g_async_queue_remove (xasync_queue_t *queue,
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (queue != NULL, FALSE);
-  g_return_val_if_fail (item != NULL, FALSE);
+  xreturn_val_if_fail (queue != NULL, FALSE);
+  xreturn_val_if_fail (item != NULL, FALSE);
 
   g_mutex_lock (&queue->mutex);
   ret = g_async_queue_remove_unlocked (queue, item);
@@ -837,8 +837,8 @@ xboolean_t
 g_async_queue_remove_unlocked (xasync_queue_t *queue,
                                xpointer_t     item)
 {
-  g_return_val_if_fail (queue != NULL, FALSE);
-  g_return_val_if_fail (item != NULL, FALSE);
+  xreturn_val_if_fail (queue != NULL, FALSE);
+  xreturn_val_if_fail (item != NULL, FALSE);
 
   return g_queue_remove (&queue->queue, item);
 }
@@ -900,7 +900,7 @@ g_async_queue_push_front_unlocked (xasync_queue_t *queue,
 xmutex_t *
 _g_async_queue_get_mutex (xasync_queue_t *queue)
 {
-  g_return_val_if_fail (queue, NULL);
+  xreturn_val_if_fail (queue, NULL);
 
   return &queue->mutex;
 }

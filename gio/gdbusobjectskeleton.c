@@ -81,8 +81,8 @@ xdbus_object_skeleton_finalize (xobject_t *_object)
 
   g_mutex_clear (&object->priv->lock);
 
-  if (G_OBJECT_CLASS (xdbus_object_skeleton_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (xdbus_object_skeleton_parent_class)->finalize (_object);
+  if (XOBJECT_CLASS (xdbus_object_skeleton_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (xdbus_object_skeleton_parent_class)->finalize (_object);
 }
 
 static void
@@ -138,11 +138,11 @@ xdbus_object_skeleton_authorize_method_default (xdbus_object_skeleton_t    *obje
 static void
 xdbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize     = xdbus_object_skeleton_finalize;
-  gobject_class->set_property = xdbus_object_skeleton_set_property;
-  gobject_class->get_property = xdbus_object_skeleton_get_property;
+  xobject_class->finalize     = xdbus_object_skeleton_finalize;
+  xobject_class->set_property = xdbus_object_skeleton_set_property;
+  xobject_class->get_property = xdbus_object_skeleton_get_property;
 
   klass->authorize_method = xdbus_object_skeleton_authorize_method_default;
 
@@ -153,16 +153,16 @@ xdbus_object_skeleton_class_init (GDBusObjectSkeletonClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_OBJECT_PATH,
-                                   g_param_spec_string ("g-object-path",
+                                   xparam_spec_string ("g-object-path",
                                                         "Object Path",
                                                         "The object path where the object is exported",
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT |
+                                                        XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_object_skeleton_t::authorize-method:
@@ -221,7 +221,7 @@ xdbus_object_skeleton_init (xdbus_object_skeleton_t *object)
 xdbus_object_skeleton_t *
 xdbus_object_skeleton_new (const xchar_t *object_path)
 {
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
   return G_DBUS_OBJECT_SKELETON (xobject_new (XTYPE_DBUS_OBJECT_SKELETON,
                                                "g-object-path", object_path,
                                                NULL));
@@ -429,8 +429,8 @@ xdbus_object_skeleton_get_interface (xdbus_object_t  *_object,
   xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
   xdbus_interface_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_SKELETON (object), NULL);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_SKELETON (object), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
 
   g_mutex_lock (&object->priv->lock);
   ret = xhash_table_lookup (object->priv->map_name_to_iface, interface_name);
@@ -446,7 +446,7 @@ xdbus_object_skeleton_get_interfaces (xdbus_object_t *_object)
   xdbus_object_skeleton_t *object = G_DBUS_OBJECT_SKELETON (_object);
   xlist_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_OBJECT_SKELETON (object), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_OBJECT_SKELETON (object), NULL);
 
   ret = NULL;
 

@@ -78,11 +78,11 @@ test_utf8_strrchr (void)
 {
   const xchar_t *string = "\xe2\x82\xa0gh\xe2\x82\xa4jl\xe2\x82\xa4jl";
 
-  g_assert (xutf8_strrchr (string, -1, 'j') == string + 13);
-  g_assert (xutf8_strrchr (string, -1, 8356) == string + 10);
-  g_assert (xutf8_strrchr (string, 9, 8356) == string + 5);
-  g_assert (xutf8_strrchr (string, 3, 'j') == NULL);
-  g_assert (xutf8_strrchr (string, -1, 'x') == NULL);
+  xassert (xutf8_strrchr (string, -1, 'j') == string + 13);
+  xassert (xutf8_strrchr (string, -1, 8356) == string + 10);
+  xassert (xutf8_strrchr (string, 9, 8356) == string + 5);
+  xassert (xutf8_strrchr (string, 3, 'j') == NULL);
+  xassert (xutf8_strrchr (string, -1, 'x') == NULL);
 }
 
 static void

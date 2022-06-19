@@ -163,7 +163,7 @@ _g_atomic_array_update (GAtomicArray *array,
   G_LOCK (array);
   old = g_atomic_pointer_get (&array->data);
 
-  g_assert (old == NULL || G_ATOMIC_ARRAY_DATA_SIZE (old) <= G_ATOMIC_ARRAY_DATA_SIZE (new_data));
+  xassert (old == NULL || G_ATOMIC_ARRAY_DATA_SIZE (old) <= G_ATOMIC_ARRAY_DATA_SIZE (new_data));
 
   g_atomic_pointer_set (&array->data, new_data);
   if (old)

@@ -8,7 +8,7 @@ typedef xobject_class_t my_singleton_object_class_t;
 
 xtype_t my_singleton_object_get_type (void);
 
-G_DEFINE_TYPE (my_singleton_object, my_singleton_object, XTYPE_OBJECT)
+XDEFINE_TYPE (my_singleton_object, my_singleton_object, XTYPE_OBJECT)
 
 static my_singleton_object_t *singleton;
 
@@ -27,7 +27,7 @@ my_singleton_object_constructor (xtype_t                  type,
   if (singleton)
     return xobject_ref (singleton);
 
-  object = G_OBJECT_CLASS (my_singleton_object_parent_class)->
+  object = XOBJECT_CLASS (my_singleton_object_parent_class)->
     constructor (type, n_construct_properties, construct_params);
   singleton = (my_singleton_object_t *)object;
 
@@ -39,13 +39,13 @@ my_singleton_object_finalize (my_singleton_object_t *obj)
 {
   singleton = NULL;
 
-  G_OBJECT_CLASS (my_singleton_object_parent_class)->finalize (obj);
+  XOBJECT_CLASS (my_singleton_object_parent_class)->finalize (obj);
 }
 
 static void
 my_singleton_object_class_init (my_singleton_object_class_t *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->constructor = my_singleton_object_constructor;
   object_class->finalize = my_singleton_object_finalize;
@@ -60,22 +60,22 @@ test_object_constructor_singleton (void)
   g_assert_cmpint (G_OBJECT (one)->ref_count, ==, 1);
 
   two = xobject_new (my_singleton_object_get_type (), NULL);
-  g_assert (one == two);
+  xassert (one == two);
   g_assert_cmpint (G_OBJECT (two)->ref_count, ==, 2);
 
   three = xobject_new (my_singleton_object_get_type (), NULL);
-  g_assert (one == three);
+  xassert (one == three);
   g_assert_cmpint (G_OBJECT (three)->ref_count, ==, 3);
 
   xobject_add_weak_pointer (G_OBJECT (one), (xpointer_t *)&one);
 
   xobject_unref (one);
-  g_assert (one != NULL);
+  xassert (one != NULL);
 
   xobject_unref (three);
   xobject_unref (two);
 
-  g_assert (one == NULL);
+  xassert (one == NULL);
 }
 
 /* ----------------------------------- */
@@ -86,7 +86,7 @@ typedef xobject_class_t my_infanticide_object_class_t;
 
 xtype_t my_infanticide_object_get_type (void);
 
-G_DEFINE_TYPE (my_infanticide_object, my_infanticide_object, XTYPE_OBJECT)
+XDEFINE_TYPE (my_infanticide_object, my_infanticide_object, XTYPE_OBJECT)
 
 static void
 my_infanticide_object_init (my_infanticide_object_t *obj)
@@ -100,7 +100,7 @@ my_infanticide_object_constructor (xtype_t                  type,
 {
   xobject_t *object;
 
-  object = G_OBJECT_CLASS (my_infanticide_object_parent_class)->
+  object = XOBJECT_CLASS (my_infanticide_object_parent_class)->
     constructor (type, n_construct_properties, construct_params);
 
   xobject_unref (object);
@@ -111,7 +111,7 @@ my_infanticide_object_constructor (xtype_t                  type,
 static void
 my_infanticide_object_class_init (my_infanticide_object_class_t *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->constructor = my_infanticide_object_constructor;
 }

@@ -597,7 +597,7 @@ g_emblemed_icon_get_emblems
 g_emblemed_icon_add_emblem
 g_emblemed_icon_clear_emblems
 <SUBSECTION Standard>
-xemblemed_icon_tClass
+xemblemed_icon_class_t
 G_EMBLEMED_ICON
 G_EMBLEMED_ICON_CLASS
 G_EMBLEMED_ICON_GET_CLASS
@@ -620,11 +620,11 @@ xemblem_new_with_origin
 xemblem_get_icon
 xemblem_get_origin
 <SUBSECTION Private>
-GEmblemClass
+xemblem_class_t
 xemblem_get_type
-G_EMBLEM
-G_EMBLEM_CLASS
-G_EMBLEM_GET_CLASS
+XEMBLEM
+XEMBLEM_CLASS
+XEMBLEM_GET_CLASS
 X_IS_EMBLEM
 X_IS_EMBLEM_CLASS
 XTYPE_EMBLEM
@@ -676,7 +676,7 @@ xfile_input_stream_query_info
 xfile_input_stream_query_info_async
 xfile_input_stream_query_info_finish
 <SUBSECTION Standard>
-GFileInputStreamClass
+xfile_input_stream_class_t
 XFILE_INPUT_STREAM
 X_IS_FILE_INPUT_STREAM
 XTYPE_FILE_INPUT_STREAM
@@ -754,33 +754,33 @@ g_memory_input_stream_get_type
 <FILE>gdatainputstream</FILE>
 <TITLE>xdata_input_stream_t</TITLE>
 xdata_input_stream_t
-GDataStreamByteOrder
-GDataStreamNewlineType
-g_data_input_stream_new
-g_data_input_stream_set_byte_order
-g_data_input_stream_get_byte_order
-g_data_input_stream_set_newline_type
-g_data_input_stream_get_newline_type
-g_data_input_stream_read_byte
-g_data_input_stream_read_int16
-g_data_input_stream_read_uint16
-g_data_input_stream_read_int32
-g_data_input_stream_read_uint32
-g_data_input_stream_read_int64
-g_data_input_stream_read_uint64
-g_data_input_stream_read_line
-g_data_input_stream_read_line_utf8
-g_data_input_stream_read_line_async
-g_data_input_stream_read_line_finish
-g_data_input_stream_read_line_finish_utf8
-g_data_input_stream_read_upto
-g_data_input_stream_read_upto_async
-g_data_input_stream_read_upto_finish
-g_data_input_stream_read_until
-g_data_input_stream_read_until_async
-g_data_input_stream_read_until_finish
+xdata_stream_byte_order_t
+xdata_stream_newline_type_t
+xdata_input_stream_new
+xdata_input_stream_set_byte_order
+xdata_input_stream_get_byte_order
+xdata_input_stream_set_newline_type
+xdata_input_stream_get_newline_type
+xdata_input_stream_read_byte
+xdata_input_stream_read_int16
+xdata_input_stream_read_uint16
+xdata_input_stream_read_int32
+xdata_input_stream_read_uint32
+xdata_input_stream_read_int64
+xdata_input_stream_read_uint64
+xdata_input_stream_read_line
+xdata_input_stream_read_line_utf8
+xdata_input_stream_read_line_async
+xdata_input_stream_read_line_finish
+xdata_input_stream_read_line_finish_utf8
+xdata_input_stream_read_upto
+xdata_input_stream_read_upto_async
+xdata_input_stream_read_upto_finish
+xdata_input_stream_read_until
+xdata_input_stream_read_until_async
+xdata_input_stream_read_until_finish
 <SUBSECTION Standard>
-GDataInputStreamClass
+xdata_input_stream_class_t
 G_DATA_INPUT_STREAM
 X_IS_DATA_INPUT_STREAM
 XTYPE_DATA_INPUT_STREAM
@@ -790,8 +790,8 @@ G_DATA_INPUT_STREAM_GET_CLASS
 XTYPE_DATA_STREAM_BYTE_ORDER
 XTYPE_DATA_STREAM_NEWLINE_TYPE
 <SUBSECTION Private>
-g_data_input_stream_get_type
-GDataInputStreamPrivate
+xdata_input_stream_get_type
+xdata_input_stream_private_t
 g_data_stream_byte_order_get_type
 g_data_stream_newline_type_get_type
 </SECTION>
@@ -884,7 +884,7 @@ xfile_output_stream_query_info_async
 xfile_output_stream_query_info_finish
 xfile_output_stream_get_etag
 <SUBSECTION Standard>
-GFileOutputStreamClass
+xfile_output_stream_class_t
 XFILE_OUTPUT_STREAM
 X_IS_FILE_OUTPUT_STREAM
 XTYPE_FILE_OUTPUT_STREAM
@@ -904,7 +904,7 @@ g_filter_output_stream_get_base_stream
 g_filter_output_stream_get_close_base_stream
 g_filter_output_stream_set_close_base_stream
 <SUBSECTION Standard>
-GFilterOutputStreamClass
+xfilter_output_stream_class_t
 G_FILTER_OUTPUT_STREAM
 X_IS_FILTER_OUTPUT_STREAM
 XTYPE_FILTER_OUTPUT_STREAM
@@ -1277,15 +1277,15 @@ xcancellable_connect
 xcancellable_disconnect
 xcancellable_cancel
 <SUBSECTION Standard>
-GCancellableClass
-G_CANCELLABLE
+xcancellable_class_t
+XCANCELLABLE
 X_IS_CANCELLABLE
 XTYPE_CANCELLABLE
-G_CANCELLABLE_CLASS
+XCANCELLABLE_CLASS
 X_IS_CANCELLABLE_CLASS
-G_CANCELLABLE_GET_CLASS
+XCANCELLABLE_GET_CLASS
 <SUBSECTION Private>
-GCancellablePrivate
+_xcancellable_private
 xcancellable_get_type
 </SECTION>
 
@@ -1548,7 +1548,7 @@ xfilename_completer_get_type
 <TITLE>Unix Mounts</TITLE>
 GUnixMountPoint
 GUnixMountEntry
-GUnixMountMonitor
+xunix_mount_monitor_t
 g_unix_mount_free
 g_unix_mount_compare
 g_unix_mount_copy
@@ -1585,14 +1585,14 @@ g_unix_mount_at
 g_unix_mount_for
 g_unix_mounts_changed_since
 g_unix_mount_points_changed_since
-g_unix_mount_monitor_get
-g_unix_mount_monitor_new
-g_unix_mount_monitor_set_rate_limit
+xunix_mount_monitor_get
+xunix_mount_monitor_new
+xunix_mount_monitor_set_rate_limit
 g_unix_is_mount_path_system_internal
 g_unix_is_system_fs_type
 g_unix_is_system_device_path
 <SUBSECTION Standard>
-GUnixMountMonitorClass
+xunix_mount_monitor_class_t
 G_UNIX_MOUNT_MONITOR
 X_IS_UNIX_MOUNT_MONITOR
 XTYPE_UNIX_MOUNT_MONITOR
@@ -1601,7 +1601,7 @@ X_IS_UNIX_MOUNT_MONITOR_CLASS
 XTYPE_UNIX_MOUNT_ENTRY
 XTYPE_UNIX_MOUNT_POINT
 <SUBSECTION Private>
-g_unix_mount_monitor_get_type
+xunix_mount_monitor_get_type
 g_unix_mount_entry_get_type
 g_unix_mount_point_get_type
 </SECTION>
@@ -1977,7 +1977,7 @@ xsocket_connectable_get_type
 <FILE>gsocketaddressenumerator</FILE>
 <TITLE>xsocket_address_enumerator_t</TITLE>
 xsocket_address_enumerator_t
-GSocketAddressEnumeratorClass
+xsocket_address_enumerator_class_t
 xsocket_address_enumerator_next
 xsocket_address_enumerator_next_async
 xsocket_address_enumerator_next_finish
@@ -2430,42 +2430,42 @@ g_unix_fd_message_get_type
 <FILE>gconverter</FILE>
 <TITLE>xconverter_t</TITLE>
 xconverter_t
-GConverterIface
-GConverterResult
-GConverterFlags
-g_converter_convert
-g_converter_reset
+xconverter_iface_t
+xconverter_result_t
+xconverter_flags_t
+xconverter_convert
+xconverter_reset
 <SUBSECTION Standard>
 XTYPE_CONVERTER
-G_CONVERTER
+XCONVERTER
 X_IS_CONVERTER
-G_CONVERTER_GET_IFACE
+XCONVERTER_GET_IFACE
 XTYPE_CONVERTER_FLAGS
 XTYPE_CONVERTER_RESULT
 <SUBSECTION Private>
-g_converter_get_type
-g_converter_flags_get_type
-g_converter_result_get_type
+xconverter_get_type
+xconverter_flags_get_type
+xconverter_result_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gcharsetconverter</FILE>
 <TITLE>xcharset_converter_t</TITLE>
 xcharset_converter_t
-g_charset_converter_new
-g_charset_converter_set_use_fallback
-g_charset_converter_get_use_fallback
-g_charset_converter_get_num_fallbacks
+xcharset_converter_new
+xcharset_converter_set_use_fallback
+xcharset_converter_get_use_fallback
+xcharset_converter_get_num_fallbacks
 <SUBSECTION Standard>
-GCharsetConverterClass
+xcharset_converter_class_t
 XTYPE_CHARSET_CONVERTER
-G_CHARSET_CONVERTER
+XCHARSET_CONVERTER
 X_IS_CHARSET_CONVERTER
-G_CHARSET_CONVERTER_CLASS
+XCHARSET_CONVERTER_CLASS
 X_IS_CHARSET_CONVERTER_CLASS
-G_CHARSET_CONVERTER_GET_CLASS
+XCHARSET_CONVERTER_GET_CLASS
 <SUBSECTION Private>
-g_charset_converter_get_type
+xcharset_converter_get_type
 </SECTION>
 
 <SECTION>
@@ -2477,11 +2477,11 @@ xconverter_input_stream_get_converter
 <SUBSECTION Standard>
 xconverter_input_stream_class_t
 XTYPE_CONVERTER_INPUT_STREAM
-G_CONVERTER_INPUT_STREAM
+XCONVERTER_INPUT_STREAM
 X_IS_CONVERTER_INPUT_STREAM
-G_CONVERTER_INPUT_STREAM_CLASS
+XCONVERTER_INPUT_STREAM_CLASS
 X_IS_CONVERTER_INPUT_STREAM_CLASS
-G_CONVERTER_INPUT_STREAM_GET_CLASS
+XCONVERTER_INPUT_STREAM_GET_CLASS
 <SUBSECTION Private>
 GConverterInputStreamPrivate
 xconverter_input_stream_get_type
@@ -2494,15 +2494,15 @@ xconverter_output_stream_t
 xconverter_output_stream_new
 xconverter_output_stream_get_converter
 <SUBSECTION Standard>
-GConverterOutputStreamClass
+xconverter_output_stream_class_t
 XTYPE_CONVERTER_OUTPUT_STREAM
-G_CONVERTER_OUTPUT_STREAM
+XCONVERTER_OUTPUT_STREAM
 X_IS_CONVERTER_OUTPUT_STREAM
-G_CONVERTER_OUTPUT_STREAM_CLASS
+XCONVERTER_OUTPUT_STREAM_CLASS
 X_IS_CONVERTER_OUTPUT_STREAM_CLASS
-G_CONVERTER_OUTPUT_STREAM_GET_CLASS
+XCONVERTER_OUTPUT_STREAM_GET_CLASS
 <SUBSECTION Private>
-GConverterOutputStreamPrivate
+xconverter_output_stream_private_t
 xconverter_output_stream_get_type
 </SECTION>
 
@@ -2564,7 +2564,7 @@ XTYPE_FILE_DESCRIPTOR_BASED
 <FILE>gsettingsbackend</FILE>
 <TITLE>xsettings_backend_t</TITLE>
 xsettings_backend_t
-GSettingsBackendClass
+xsettings_backend_class_t
 G_SETTINGS_BACKEND_EXTENSION_POINT_NAME
 g_settings_backend_get_default
 g_settings_backend_changed
@@ -2574,7 +2574,7 @@ g_settings_backend_path_writable_changed
 g_settings_backend_writable_changed
 g_settings_backend_changed_tree
 g_settings_backend_flatten_tree
-g_keyfile_settings_backend_new
+xkeyfile_settings_backend_new
 xmemory_settings_backend_new
 g_null_settings_backend_new
 
@@ -2824,7 +2824,7 @@ xdbus_auth_observer_new
 xdbus_auth_observer_authorize_authenticated_peer
 xdbus_auth_observer_allow_mechanism
 <SUBSECTION Standard>
-G_DBUS_AUTH_OBSERVER
+XDBUS_AUTH_OBSERVER
 X_IS_DBUS_AUTH_OBSERVER
 XTYPE_DBUS_AUTH_OBSERVER
 <SUBSECTION Private>
@@ -2955,7 +2955,7 @@ xdbus_connection_get_stream
 xdbus_connection_get_flags
 xdbus_connection_get_guid
 xdbus_connection_get_unique_name
-GDBusCapabilityFlags
+xdbus_capability_flags_t
 xdbus_connection_get_capabilities
 xdbus_connection_get_peer_credentials
 xdbus_connection_get_last_serial
@@ -3445,7 +3445,7 @@ g_action_change_state
 g_action_activate
 
 <SUBSECTION>
-g_action_parse_detailed_name
+xaction_parse_detailed_name
 g_action_print_detailed_name
 
 <SUBSECTION Standard>
@@ -3669,7 +3669,7 @@ G_TLS_CHANNEL_BINDING_ERROR
 GTlsChannelBindingError
 <SUBSECTION>
 GTlsAuthenticationMode
-GTlsCertificateFlags
+xtls_certificate_flags_t
 GTlsProtocolVersion
 <SUBSECTION Standard>
 XTYPE_TLS_AUTHENTICATION_MODE
@@ -3949,83 +3949,83 @@ xtls_certificate_request_flags_get_type
 <FILE>gdtlsconnection</FILE>
 <TITLE>xdtls_connection_t</TITLE>
 xdtls_connection_t
-g_dtls_connection_set_certificate
-g_dtls_connection_get_certificate
-g_dtls_connection_get_peer_certificate
-g_dtls_connection_get_peer_certificate_errors
-g_dtls_connection_get_channel_binding_data
-g_dtls_connection_set_require_close_notify
-g_dtls_connection_get_require_close_notify
-g_dtls_connection_set_rehandshake_mode
-g_dtls_connection_get_rehandshake_mode
-g_dtls_connection_set_advertised_protocols
-g_dtls_connection_get_negotiated_protocol
-g_dtls_connection_get_database
-g_dtls_connection_set_database
-g_dtls_connection_get_interaction
-g_dtls_connection_set_interaction
-g_dtls_connection_get_protocol_version
-g_dtls_connection_get_ciphersuite_name
+xdtls_connection_set_certificate
+xdtls_connection_get_certificate
+xdtls_connection_get_peer_certificate
+xdtls_connection_get_peer_certificate_errors
+xdtls_connection_get_channel_binding_data
+xdtls_connection_set_require_close_notify
+xdtls_connection_get_require_close_notify
+xdtls_connection_set_rehandshake_mode
+xdtls_connection_get_rehandshake_mode
+xdtls_connection_set_advertised_protocols
+xdtls_connection_get_negotiated_protocol
+xdtls_connection_get_database
+xdtls_connection_set_database
+xdtls_connection_get_interaction
+xdtls_connection_set_interaction
+xdtls_connection_get_protocol_version
+xdtls_connection_get_ciphersuite_name
 <SUBSECTION>
-g_dtls_connection_handshake
-g_dtls_connection_handshake_async
-g_dtls_connection_handshake_finish
+xdtls_connection_handshake
+xdtls_connection_handshake_async
+xdtls_connection_handshake_finish
 <SUBSECTION>
-g_dtls_connection_shutdown
-g_dtls_connection_shutdown_async
-g_dtls_connection_shutdown_finish
-g_dtls_connection_close
-g_dtls_connection_close_async
-g_dtls_connection_close_finish
+xdtls_connection_shutdown
+xdtls_connection_shutdown_async
+xdtls_connection_shutdown_finish
+xdtls_connection_close
+xdtls_connection_close_async
+xdtls_connection_close_finish
 <SUBSECTION>
-g_dtls_connection_emit_accept_certificate
+xdtls_connection_emit_accept_certificate
 <SUBSECTION Standard>
 GDtlsConnectionClass
 GDtlsConnectionPrivate
 X_IS_DTLS_CONNECTION
 X_IS_DTLS_CONNECTION_CLASS
-G_DTLS_CONNECTION
-G_DTLS_CONNECTION_CLASS
-G_DTLS_CONNECTION_GET_CLASS
+XDTLS_CONNECTION
+XDTLS_CONNECTION_CLASS
+XDTLS_CONNECTION_GET_CLASS
 XTYPE_DTLS_CONNECTION
-G_DTLS_CONNECTION_GET_INTERFACE
+XDTLS_CONNECTION_GET_INTERFACE
 <SUBSECTION Private>
-g_dtls_connection_get_type
+xdtls_connection_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gdtlsclientconnection</FILE>
 <TITLE>xdtls_client_connection_t</TITLE>
 xdtls_client_connection_t
-GDtlsClientConnectionInterface
-g_dtls_client_connection_new
-g_dtls_client_connection_set_server_identity
-g_dtls_client_connection_get_server_identity
-g_dtls_client_connection_set_validation_flags
-g_dtls_client_connection_get_validation_flags
-g_dtls_client_connection_get_accepted_cas
+xdtls_client_connection_interface_t
+xdtls_client_connection_new
+xdtls_client_connection_set_server_identity
+xdtls_client_connection_get_server_identity
+xdtls_client_connection_set_validation_flags
+xdtls_client_connection_get_validation_flags
+xdtls_client_connection_get_accepted_cas
 <SUBSECTION Standard>
 X_IS_DTLS_CLIENT_CONNECTION
-G_DTLS_CLIENT_CONNECTION
-G_DTLS_CLIENT_CONNECTION_GET_INTERFACE
+XDTLS_CLIENT_CONNECTION
+XDTLS_CLIENT_CONNECTION_GET_INTERFACE
 XTYPE_DTLS_CLIENT_CONNECTION
 <SUBSECTION Private>
-g_dtls_client_connection_get_type
+xdtls_client_connection_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gdtlsserverconnection</FILE>
 <TITLE>xdtls_server_connection_t</TITLE>
 xdtls_server_connection_t
-GDtlsServerConnectionInterface
-g_dtls_server_connection_new
+xdtls_server_connection_interface_t
+xdtls_server_connection_new
 <SUBSECTION Standard>
 X_IS_DTLS_SERVER_CONNECTION
-G_DTLS_SERVER_CONNECTION
-G_DTLS_SERVER_CONNECTION_GET_INTERFACE
+XDTLS_SERVER_CONNECTION
+XDTLS_SERVER_CONNECTION_GET_INTERFACE
 XTYPE_DTLS_SERVER_CONNECTION
 <SUBSECTION Private>
-g_dtls_server_connection_get_type
+xdtls_server_connection_get_type
 </SECTION>
 
 <SECTION>

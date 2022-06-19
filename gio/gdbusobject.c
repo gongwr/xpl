@@ -147,6 +147,6 @@ g_dbus_object_get_interface (xdbus_object_t *object,
                              const xchar_t *interface_name)
 {
   xdbus_object_iface_t *iface = G_DBUS_OBJECT_GET_IFACE (object);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
   return iface->get_interface (object, interface_name);
 }

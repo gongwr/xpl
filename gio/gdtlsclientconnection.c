@@ -53,7 +53,7 @@ G_DEFINE_INTERFACE (xdtls_client_connection, g_dtls_client_connection,
                     XTYPE_DTLS_CONNECTION)
 
 static void
-g_dtls_client_connection_default_init (GDtlsClientConnectionInterface *iface)
+xdtls_client_connection_default_init (xdtls_client_connection_interface_t *iface)
 {
   /**
    * xdtls_client_connection_t:validation-flags:
@@ -66,14 +66,14 @@ g_dtls_client_connection_default_init (GDtlsClientConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_flags ("validation-flags",
+                                       xparam_spec_flags ("validation-flags",
                                                            P_("Validation flags"),
                                                            P_("What certificate validation to perform"),
                                                            XTYPE_TLS_CERTIFICATE_FLAGS,
                                                            G_TLS_CERTIFICATE_VALIDATE_ALL,
-                                                           G_PARAM_READWRITE |
-                                                           G_PARAM_CONSTRUCT |
-                                                           G_PARAM_STATIC_STRINGS));
+                                                           XPARAM_READWRITE |
+                                                           XPARAM_CONSTRUCT |
+                                                           XPARAM_STATIC_STRINGS));
 
   /**
    * xdtls_client_connection_t:server-identity:
@@ -96,13 +96,13 @@ g_dtls_client_connection_default_init (GDtlsClientConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_object ("server-identity",
+                                       xparam_spec_object ("server-identity",
                                                             P_("Server identity"),
                                                             P_("xsocket_connectable_t identifying the server"),
                                                             XTYPE_SOCKET_CONNECTABLE,
-                                                            G_PARAM_READWRITE |
-                                                            G_PARAM_CONSTRUCT |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READWRITE |
+                                                            XPARAM_CONSTRUCT |
+                                                            XPARAM_STATIC_STRINGS));
 
   /**
    * xdtls_client_connection_t:accepted-cas: (type GLib.List) (element-type GLib.ByteArray)
@@ -118,15 +118,15 @@ g_dtls_client_connection_default_init (GDtlsClientConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_pointer ("accepted-cas",
+                                       xparam_spec_pointer ("accepted-cas",
                                                              P_("Accepted CAs"),
                                                              P_("Distinguished names of the CAs the server accepts certificates from"),
-                                                             G_PARAM_READABLE |
-                                                             G_PARAM_STATIC_STRINGS));
+                                                             XPARAM_READABLE |
+                                                             XPARAM_STATIC_STRINGS));
 }
 
 /**
- * g_dtls_client_connection_new:
+ * xdtls_client_connection_new:
  * @base_socket: the #xdatagram_based_t to wrap
  * @server_identity: (nullable): the expected identity of the server
  * @error: #xerror_t for error reporting, or %NULL to ignore.
@@ -140,7 +140,7 @@ g_dtls_client_connection_default_init (GDtlsClientConnectionInterface *iface)
  * Since: 2.48
  */
 xdatagram_based_t *
-g_dtls_client_connection_new (xdatagram_based_t      *base_socket,
+xdtls_client_connection_new (xdatagram_based_t      *base_socket,
                               xsocket_connectable_t  *server_identity,
                               xerror_t             **error)
 {
@@ -157,7 +157,7 @@ g_dtls_client_connection_new (xdatagram_based_t      *base_socket,
 }
 
 /**
- * g_dtls_client_connection_get_validation_flags:
+ * xdtls_client_connection_get_validation_flags:
  * @conn: the #xdtls_client_connection_t
  *
  * Gets @conn's validation flags
@@ -166,21 +166,21 @@ g_dtls_client_connection_new (xdatagram_based_t      *base_socket,
  *
  * Since: 2.48
  */
-GTlsCertificateFlags
-g_dtls_client_connection_get_validation_flags (xdtls_client_connection_t *conn)
+xtls_certificate_flags_t
+xdtls_client_connection_get_validation_flags (xdtls_client_connection_t *conn)
 {
-  GTlsCertificateFlags flags = 0;
+  xtls_certificate_flags_t flags = 0;
 
-  g_return_val_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "validation-flags", &flags, NULL);
   return flags;
 }
 
 /**
- * g_dtls_client_connection_set_validation_flags:
+ * xdtls_client_connection_set_validation_flags:
  * @conn: the #xdtls_client_connection_t
- * @flags: the #GTlsCertificateFlags to use
+ * @flags: the #xtls_certificate_flags_t to use
  *
  * Sets @conn's validation flags, to override the default set of
  * checks performed when validating a server certificate. By default,
@@ -189,8 +189,8 @@ g_dtls_client_connection_get_validation_flags (xdtls_client_connection_t *conn)
  * Since: 2.48
  */
 void
-g_dtls_client_connection_set_validation_flags (xdtls_client_connection_t  *conn,
-                                               GTlsCertificateFlags   flags)
+xdtls_client_connection_set_validation_flags (xdtls_client_connection_t  *conn,
+                                               xtls_certificate_flags_t   flags)
 {
   g_return_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn));
 
@@ -198,7 +198,7 @@ g_dtls_client_connection_set_validation_flags (xdtls_client_connection_t  *conn,
 }
 
 /**
- * g_dtls_client_connection_get_server_identity:
+ * xdtls_client_connection_get_server_identity:
  * @conn: the #xdtls_client_connection_t
  *
  * Gets @conn's expected server identity
@@ -210,11 +210,11 @@ g_dtls_client_connection_set_validation_flags (xdtls_client_connection_t  *conn,
  * Since: 2.48
  */
 xsocket_connectable_t *
-g_dtls_client_connection_get_server_identity (xdtls_client_connection_t *conn)
+xdtls_client_connection_get_server_identity (xdtls_client_connection_t *conn)
 {
   xsocket_connectable_t *identity = NULL;
 
-  g_return_val_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "server-identity", &identity, NULL);
   if (identity)
@@ -223,7 +223,7 @@ g_dtls_client_connection_get_server_identity (xdtls_client_connection_t *conn)
 }
 
 /**
- * g_dtls_client_connection_set_server_identity:
+ * xdtls_client_connection_set_server_identity:
  * @conn: the #xdtls_client_connection_t
  * @identity: a #xsocket_connectable_t describing the expected server identity
  *
@@ -235,7 +235,7 @@ g_dtls_client_connection_get_server_identity (xdtls_client_connection_t *conn)
  * Since: 2.48
  */
 void
-g_dtls_client_connection_set_server_identity (xdtls_client_connection_t *conn,
+xdtls_client_connection_set_server_identity (xdtls_client_connection_t *conn,
                                               xsocket_connectable_t    *identity)
 {
   g_return_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn));
@@ -244,7 +244,7 @@ g_dtls_client_connection_set_server_identity (xdtls_client_connection_t *conn,
 }
 
 /**
- * g_dtls_client_connection_get_accepted_cas:
+ * xdtls_client_connection_get_accepted_cas:
  * @conn: the #xdtls_client_connection_t
  *
  * Gets the list of distinguished names of the Certificate Authorities
@@ -262,11 +262,11 @@ g_dtls_client_connection_set_server_identity (xdtls_client_connection_t *conn,
  * Since: 2.48
  */
 xlist_t *
-g_dtls_client_connection_get_accepted_cas (xdtls_client_connection_t *conn)
+xdtls_client_connection_get_accepted_cas (xdtls_client_connection_t *conn)
 {
   xlist_t *accepted_cas = NULL;
 
-  g_return_val_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_DTLS_CLIENT_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "accepted-cas", &accepted_cas, NULL);
   return accepted_cas;

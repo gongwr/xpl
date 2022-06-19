@@ -21,14 +21,14 @@
 
 #include <glib-object.h>
 
-G_DECLARE_FINAL_TYPE (signal_target_t, signal_target, TEST, SIGNAL_TARGET, xobject)
+G_DECLARE_FINAL_TYPE (signal_target, signal_target, TEST, SIGNAL_TARGET, xobject)
 
-struct _signal_target_t
+struct _signal_target
 {
   xobject_t parent_instance;
 };
 
-G_DEFINE_TYPE (signal_target, signal_target, XTYPE_OBJECT)
+XDEFINE_TYPE (signal_target, signal_target, XTYPE_OBJECT)
 
 static G_DEFINE_QUARK (detail, signal_detail);
 
@@ -252,8 +252,8 @@ assert_signals (signal_target_t *target,
                 xsignal_group_t *group,
                 xboolean_t      success)
 {
-  g_assert (TEST_IS_SIGNAL_TARGET (target));
-  g_assert (group == NULL || X_IS_SIGNAL_GROUP (group));
+  xassert (TEST_IS_SIGNAL_TARGET (target));
+  xassert (group == NULL || X_IS_SIGNAL_GROUP (group));
 
   global_signal_calls = 0;
   xsignal_emit (target, signals[THE_SIGNAL],

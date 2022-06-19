@@ -93,12 +93,12 @@ g_dir_open_with_errno (const xchar_t *path,
   wchar_t *wpath;
 #endif
 
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
 #ifdef G_OS_WIN32
   wpath = xutf8_to_utf16 (path, -1, NULL, NULL, NULL);
 
-  g_return_val_if_fail (wpath != NULL, NULL);
+  xreturn_val_if_fail (wpath != NULL, NULL);
 
   dir.wdirp = _wopendir (wpath);
   saved_errno = errno;
@@ -183,7 +183,7 @@ g_dir_new_from_dirp (xpointer_t dirp)
 #ifdef G_OS_UNIX
   xdir_t *dir;
 
-  g_return_val_if_fail (dirp != NULL, NULL);
+  xreturn_val_if_fail (dirp != NULL, NULL);
 
   dir = g_new (xdir_t, 1);
   dir->dirp = dirp;
@@ -228,7 +228,7 @@ g_dir_read_name (xdir_t *dir)
   struct dirent *entry;
 #endif
 
-  g_return_val_if_fail (dir != NULL, NULL);
+  xreturn_val_if_fail (dir != NULL, NULL);
 
 #ifdef G_OS_WIN32
   while (1)

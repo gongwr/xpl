@@ -295,7 +295,7 @@ test (xconstpointer user_data)
   if (result)
     result = xmarkup_parse_context_end_parse (ctx, &error);
   xmarkup_parse_context_free (ctx);
-  g_assert (strings_allocated == 0);
+  xassert (strings_allocated == 0);
 
   if (result)
     {

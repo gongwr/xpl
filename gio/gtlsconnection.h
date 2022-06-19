@@ -64,7 +64,7 @@ struct _GTlsConnectionClass
   /* signals */
   xboolean_t          ( *accept_certificate) (xtls_connection_t       *connection,
 					    xtls_certificate_t      *peer_cert,
-					    GTlsCertificateFlags  errors);
+					    xtls_certificate_flags_t  errors);
 
   /* methods */
   xboolean_t ( *handshake )        (xtls_connection_t       *conn,
@@ -124,7 +124,7 @@ xtls_interaction_t *     xtls_connection_get_interaction             (xtls_conne
 XPL_AVAILABLE_IN_ALL
 xtls_certificate_t      *xtls_connection_get_peer_certificate        (xtls_connection_t       *conn);
 XPL_AVAILABLE_IN_ALL
-GTlsCertificateFlags  xtls_connection_get_peer_certificate_errors (xtls_connection_t       *conn);
+xtls_certificate_flags_t  xtls_connection_get_peer_certificate_errors (xtls_connection_t       *conn);
 
 XPL_AVAILABLE_IN_ALL
 void                  xtls_connection_set_require_close_notify    (xtls_connection_t       *conn,
@@ -205,7 +205,7 @@ xquark xtls_channel_bindinxerror_quark (void);
 XPL_AVAILABLE_IN_ALL
 xboolean_t              xtls_connection_emit_accept_certificate     (xtls_connection_t       *conn,
 								    xtls_certificate_t      *peer_cert,
-								    GTlsCertificateFlags  errors);
+								    xtls_certificate_flags_t  errors);
 
 G_END_DECLS
 

@@ -158,10 +158,10 @@ xvariant_type_info_check (const GVariantTypeInfo *info,
                            char                    container_class)
 {
 #ifndef G_DISABLE_ASSERT
-  g_assert (!container_class || info->container_class == container_class);
+  xassert (!container_class || info->container_class == container_class);
 
   /* alignment can only be one of these */
-  g_assert (info->alignment == 0 || info->alignment == 1 ||
+  xassert (info->alignment == 0 || info->alignment == 1 ||
             info->alignment == 3 || info->alignment == 7);
 
   if (info->container_class)
@@ -169,8 +169,8 @@ xvariant_type_info_check (const GVariantTypeInfo *info,
       ContainerInfo *container = (ContainerInfo *) info;
 
       /* extra checks for containers */
-      g_assert (!g_atomic_ref_count_compare (&container->ref_count, 0));
-      g_assert (container->type_string != NULL);
+      xassert (!g_atomic_ref_count_compare (&container->ref_count, 0));
+      xassert (container->type_string != NULL);
     }
   else
     {
@@ -181,10 +181,10 @@ xvariant_type_info_check (const GVariantTypeInfo *info,
        */
       index = info - xvariant_type_info_basic_table;
 
-      g_assert (G_N_ELEMENTS (xvariant_type_info_basic_table) == 24);
-      g_assert (G_N_ELEMENTS (xvariant_type_info_basic_chars) == 24);
-      g_assert (0 <= index && index < 24);
-      g_assert (xvariant_type_info_basic_chars[index][0] != ' ');
+      xassert (G_N_ELEMENTS (xvariant_type_info_basic_table) == 24);
+      xassert (G_N_ELEMENTS (xvariant_type_info_basic_chars) == 24);
+      xassert (0 <= index && index < 24);
+      xassert (xvariant_type_info_basic_chars[index][0] != ' ');
     }
 #endif  /* !G_DISABLE_ASSERT */
 }
@@ -294,7 +294,7 @@ array_info_free (GVariantTypeInfo *info)
 {
   ArrayInfo *array_info;
 
-  g_assert (info->container_class == GV_ARRAY_INFO_CLASS);
+  xassert (info->container_class == GV_ARRAY_INFO_CLASS);
   array_info = (ArrayInfo *) info;
 
   xvariant_type_info_unref (array_info->element);
@@ -364,7 +364,7 @@ tuple_info_free (GVariantTypeInfo *info)
   TupleInfo *tuple_info;
   xsize_t i;
 
-  g_assert (info->container_class == GV_TUPLE_INFO_CLASS);
+  xassert (info->container_class == GV_TUPLE_INFO_CLASS);
   tuple_info = (TupleInfo *) info;
 
   for (i = 0; i < tuple_info->n_members; i++)
@@ -402,7 +402,7 @@ tuple_allocate_members (const xvariant_type_t  *type,
         member->ending_type = G_VARIANT_MEMBER_ENDING_OFFSET;
     }
 
-  g_assert (i == *n_members);
+  xassert (i == *n_members);
 }
 
 /* this is xvariant_type_info_query for a given member of the tuple.
@@ -811,7 +811,7 @@ xvariant_type_info_get (const xvariant_type_t *type)
       int index;
 
       index = type_char - 'b';
-      g_assert (G_N_ELEMENTS (xvariant_type_info_basic_table) == 24);
+      xassert (G_N_ELEMENTS (xvariant_type_info_basic_table) == 24);
       g_assert_cmpint (0, <=, index);
       g_assert_cmpint (index, <, 24);
 
@@ -890,5 +890,5 @@ xvariant_type_info_unref (GVariantTypeInfo *info)
 void
 xvariant_type_info_assert_no_infos (void)
 {
-  g_assert (xvariant_type_info_table == NULL);
+  xassert (xvariant_type_info_table == NULL);
 }

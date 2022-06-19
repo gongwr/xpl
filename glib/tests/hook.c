@@ -53,7 +53,7 @@ test_hook1 (void)
   id = hook->hook_id;
 
   h = g_hook_get (hl, id);
-  g_assert (h == hook);
+  xassert (h == hook);
 
   h = hook = g_hook_alloc (hl);
   hook->data = GINT_TO_POINTER(2);

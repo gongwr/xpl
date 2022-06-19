@@ -171,15 +171,15 @@ test_message (void)
   g_io_channel_set_encoding (channel, NULL, NULL);
   g_io_channel_set_buffered (channel, FALSE);
   g_io_channel_set_flags (channel, G_IO_FLAG_NONBLOCK, NULL);
-  g_assert (g_io_channel_get_line_term (channel, NULL) == NULL);
+  xassert (g_io_channel_get_line_term (channel, NULL) == NULL);
   g_io_channel_set_line_term (channel, "\n", 1);
   line_term = g_io_channel_get_line_term (channel, &line_term_len);
   g_assert_cmpint (*line_term, ==, '\n');
   g_assert_cmpint (line_term_len, ==, 1);
 
-  g_assert (g_io_channel_get_close_on_unref (channel));
-  g_assert (g_io_channel_get_encoding (channel) == NULL);
-  g_assert (!g_io_channel_get_buffered (channel));
+  xassert (g_io_channel_get_close_on_unref (channel));
+  xassert (g_io_channel_get_encoding (channel) == NULL);
+  xassert (!g_io_channel_get_buffered (channel));
 
   io_source = g_io_add_watch (channel, G_IO_IN, test_message_cb1, tlb);
   child_source = g_child_watch_add (pid, test_message_cb2, loop);
@@ -189,9 +189,9 @@ test_message (void)
   test_message_cb1 (channel, G_IO_IN, tlb);
 
   g_test_expect_message ("GLib", G_LOG_LEVEL_CRITICAL, "Source ID*");
-  g_assert (!xsource_remove (child_source));
+  xassert (!xsource_remove (child_source));
   g_test_assert_expected_messages ();
-  g_assert (xsource_remove (io_source));
+  xassert (xsource_remove (io_source));
   g_io_channel_unref (channel);
 
   for (msg = g_test_log_buffer_pop (tlb);
@@ -307,9 +307,9 @@ test_error (void)
       test_message_cb1 (channel, G_IO_IN, tlb);
 
       g_test_expect_message ("GLib", G_LOG_LEVEL_CRITICAL, "Source ID*");
-      g_assert (!xsource_remove (child_source));
+      xassert (!xsource_remove (child_source));
       g_test_assert_expected_messages ();
-      g_assert (xsource_remove (io_source));
+      xassert (xsource_remove (io_source));
       g_io_channel_unref (channel);
 
       for (msg = g_test_log_buffer_pop (tlb);

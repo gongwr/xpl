@@ -350,8 +350,8 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
   xboolean_t interesting = TRUE;
   xfile_monitor_t *instance = NULL;
 
-  g_assert (!child || is_basename (child));
-  g_assert (!rename_to || is_basename (rename_to));
+  xassert (!child || is_basename (child));
+  xassert (!rename_to || is_basename (rename_to));
 
   if (fms->basename && (!child || !xstr_equal (child, fms->basename))
                     && (!rename_to || !xstr_equal (rename_to, fms->basename)))
@@ -370,22 +370,22 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
   switch (event_type)
     {
     case XFILE_MONITOR_EVENT_CREATED:
-      g_assert (!other && !rename_to);
+      xassert (!other && !rename_to);
       xfile_monitor_source_file_created (fms, child, event_time);
       break;
 
     case XFILE_MONITOR_EVENT_CHANGED:
-      g_assert (!other && !rename_to);
+      xassert (!other && !rename_to);
       interesting = xfile_monitor_source_file_changed (fms, child, event_time);
       break;
 
     case XFILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-      g_assert (!other && !rename_to);
+      xassert (!other && !rename_to);
       xfile_monitor_source_file_changes_done (fms, child);
       break;
 
     case XFILE_MONITOR_EVENT_MOVED_IN:
-      g_assert (!rename_to);
+      xassert (!rename_to);
       if (fms->flags & XFILE_MONITOR_WATCH_MOVES)
         xfile_monitor_source_send_event (fms, XFILE_MONITOR_EVENT_MOVED_IN, child, other);
       else
@@ -393,7 +393,7 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
       break;
 
     case XFILE_MONITOR_EVENT_MOVED_OUT:
-      g_assert (!rename_to);
+      xassert (!rename_to);
       if (fms->flags & XFILE_MONITOR_WATCH_MOVES)
         xfile_monitor_source_send_event (fms, XFILE_MONITOR_EVENT_MOVED_OUT, child, other);
       else if (other && (fms->flags & XFILE_MONITOR_SEND_MOVED))
@@ -403,7 +403,7 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
       break;
 
     case XFILE_MONITOR_EVENT_RENAMED:
-      g_assert (!other && rename_to);
+      xassert (!other && rename_to);
       if (fms->flags & (XFILE_MONITOR_WATCH_MOVES | XFILE_MONITOR_SEND_MOVED))
         {
           xfile_t *other;
@@ -439,7 +439,7 @@ xfile_monitor_source_handle_event (GFileMonitorSource *fms,
     case XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
     case XFILE_MONITOR_EVENT_PRE_UNMOUNT:
     case XFILE_MONITOR_EVENT_UNMOUNTED:
-      g_assert (!other && !rename_to);
+      xassert (!other && !rename_to);
       xfile_monitor_source_send_event (fms, event_type, child, NULL);
       break;
 
@@ -592,9 +592,9 @@ xfile_monitor_source_dispose (GFileMonitorSource *fms)
   while ((event = g_queue_pop_head (&fms->event_queue)))
     queued_event_free (event);
 
-  g_assert (g_sequence_is_empty (fms->pending_changes));
-  g_assert (xhash_table_size (fms->pending_changes_table) == 0);
-  g_assert (fms->event_queue.length == 0);
+  xassert (g_sequence_is_empty (fms->pending_changes));
+  xassert (xhash_table_size (fms->pending_changes_table) == 0);
+  xassert (fms->event_queue.length == 0);
   g_weak_ref_set (&fms->instance_ref, NULL);
 
   xfile_monitor_source_update_ready_time (fms);
@@ -610,12 +610,12 @@ xfile_monitor_source_finalize (xsource_t *source)
   GFileMonitorSource *fms = (GFileMonitorSource *) source;
 
   /* should already have been cleared in dispose of the monitor */
-  g_assert (g_weak_ref_get (&fms->instance_ref) == NULL);
+  xassert (g_weak_ref_get (&fms->instance_ref) == NULL);
   g_weak_ref_clear (&fms->instance_ref);
 
-  g_assert (g_sequence_is_empty (fms->pending_changes));
-  g_assert (xhash_table_size (fms->pending_changes_table) == 0);
-  g_assert (fms->event_queue.length == 0);
+  xassert (g_sequence_is_empty (fms->pending_changes));
+  xassert (xhash_table_size (fms->pending_changes_table) == 0);
+  xassert (fms->event_queue.length == 0);
 
   xhash_table_unref (fms->pending_changes_table);
   g_sequence_free (fms->pending_changes);
@@ -703,7 +703,7 @@ g_local_file_monitor_get_property (xobject_t *object, xuint_t prop_id,
   xlocal_file_monitor_t *monitor = G_LOCAL_FILE_MONITOR (object);
   sint64_t rate_limit;
 
-  g_assert (prop_id == PROP_RATE_LIMIT);
+  xassert (prop_id == PROP_RATE_LIMIT);
 
   rate_limit = xfile_monitor_source_get_rate_limit (monitor->source);
   rate_limit /= G_TIME_SPAN_MILLISECOND;
@@ -718,7 +718,7 @@ g_local_file_monitor_set_property (xobject_t *object, xuint_t prop_id,
   xlocal_file_monitor_t *monitor = G_LOCAL_FILE_MONITOR (object);
   sint64_t rate_limit;
 
-  g_assert (prop_id == PROP_RATE_LIMIT);
+  xassert (prop_id == PROP_RATE_LIMIT);
 
   rate_limit = xvalue_get_int (value);
   rate_limit *= G_TIME_SPAN_MILLISECOND;
@@ -729,7 +729,7 @@ g_local_file_monitor_set_property (xobject_t *object, xuint_t prop_id,
 
 #ifndef G_OS_WIN32
 static void
-g_local_file_monitor_mounts_changed (GUnixMountMonitor *mount_monitor,
+g_local_file_monitor_mounts_changed (xunix_mount_monitor_t *mount_monitor,
                                      xpointer_t           user_data)
 {
   xlocal_file_monitor_t *local_monitor = user_data;
@@ -770,7 +770,7 @@ g_local_file_monitor_start (xlocal_file_monitor_t *local_monitor,
 
   g_return_if_fail (X_IS_LOCAL_FILE_MONITOR (local_monitor));
 
-  g_assert (!local_monitor->source);
+  xassert (!local_monitor->source);
 
   source = xfile_monitor_source_new (local_monitor, filename, is_directory, flags);
   local_monitor->source = source; /* owns the ref */
@@ -792,7 +792,7 @@ g_local_file_monitor_start (xlocal_file_monitor_t *local_monitor,
       if (mount)
         g_unix_mount_free (mount);
 
-      local_monitor->mount_monitor = g_unix_mount_monitor_get ();
+      local_monitor->mount_monitor = xunix_mount_monitor_get ();
       xsignal_connect_object (local_monitor->mount_monitor, "mounts-changed",
                                G_CALLBACK (g_local_file_monitor_mounts_changed), local_monitor, 0);
 #endif
@@ -812,7 +812,7 @@ g_local_file_monitor_dispose (xobject_t *object)
 
   xfile_monitor_source_dispose (local_monitor->source);
 
-  G_OBJECT_CLASS (g_local_file_monitor_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_local_file_monitor_parent_class)->dispose (object);
 }
 
 static void
@@ -822,7 +822,7 @@ g_local_file_monitor_finalize (xobject_t *object)
 
   xsource_unref ((xsource_t *) local_monitor->source);
 
-  G_OBJECT_CLASS (g_local_file_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_local_file_monitor_parent_class)->finalize (object);
 }
 
 static void
@@ -832,14 +832,14 @@ g_local_file_monitor_init (xlocal_file_monitor_t* local_monitor)
 
 static void g_local_file_monitor_class_init (xlocal_file_monitor_class_t *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->get_property = g_local_file_monitor_get_property;
-  gobject_class->set_property = g_local_file_monitor_set_property;
-  gobject_class->dispose = g_local_file_monitor_dispose;
-  gobject_class->finalize = g_local_file_monitor_finalize;
+  xobject_class->get_property = g_local_file_monitor_get_property;
+  xobject_class->set_property = g_local_file_monitor_set_property;
+  xobject_class->dispose = g_local_file_monitor_dispose;
+  xobject_class->finalize = g_local_file_monitor_finalize;
 
-  xobject_class_override_property (gobject_class, PROP_RATE_LIMIT, "rate-limit");
+  xobject_class_override_property (xobject_class, PROP_RATE_LIMIT, "rate-limit");
 }
 
 static xlocal_file_monitor_t *

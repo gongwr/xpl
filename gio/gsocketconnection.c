@@ -154,8 +154,8 @@ xsocket_connection_connect (xsocket_connection_t  *connection,
 			     xcancellable_t       *cancellable,
 			     xerror_t            **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (X_IS_SOCKET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET_ADDRESS (address), FALSE);
 
   return xsocket_connect (connection->priv->socket, address,
 			   cancellable, error);
@@ -259,8 +259,8 @@ xsocket_connection_connect_finish (xsocket_connection_t  *connection,
 				    xasync_result_t       *result,
 				    xerror_t            **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (xtask_is_valid (result, connection), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, connection), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -280,7 +280,7 @@ xsocket_connection_connect_finish (xsocket_connection_t  *connection,
 xsocket_t *
 xsocket_connection_get_socket (xsocket_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_SOCKET_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_CONNECTION (connection), NULL);
 
   return connection->priv->socket;
 }
@@ -393,7 +393,7 @@ xsocket_connection_constructed (xobject_t *object)
   xsocket_connection_t *connection = XSOCKET_CONNECTION (object);
 #endif
 
-  g_assert (connection->priv->socket != NULL);
+  xassert (connection->priv->socket != NULL);
 }
 
 static void
@@ -405,7 +405,7 @@ xsocket_connection_dispose (xobject_t *object)
 
   g_clear_object (&connection->priv->cached_remote_address);
 
-  G_OBJECT_CLASS (xsocket_connection_parent_class)
+  XOBJECT_CLASS (xsocket_connection_parent_class)
     ->dispose (object);
 
   connection->priv->in_dispose = FALSE;
@@ -424,21 +424,21 @@ xsocket_connection_finalize (xobject_t *object)
 
   xobject_unref (connection->priv->socket);
 
-  G_OBJECT_CLASS (xsocket_connection_parent_class)
+  XOBJECT_CLASS (xsocket_connection_parent_class)
     ->finalize (object);
 }
 
 static void
 xsocket_connection_class_init (xsocket_connection_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xio_stream_class_t *stream_class = XIO_STREAM_CLASS (klass);
 
-  gobject_class->set_property = xsocket_connection_set_property;
-  gobject_class->get_property = xsocket_connection_get_property;
-  gobject_class->constructed = xsocket_connection_constructed;
-  gobject_class->finalize = xsocket_connection_finalize;
-  gobject_class->dispose = xsocket_connection_dispose;
+  xobject_class->set_property = xsocket_connection_set_property;
+  xobject_class->get_property = xsocket_connection_get_property;
+  xobject_class->constructed = xsocket_connection_constructed;
+  xobject_class->finalize = xsocket_connection_finalize;
+  xobject_class->dispose = xsocket_connection_dispose;
 
   stream_class->get_input_stream = xsocket_connection_get_input_stream;
   stream_class->get_output_stream = xsocket_connection_get_output_stream;
@@ -446,15 +446,15 @@ xsocket_connection_class_init (xsocket_connection_class_t *klass)
   stream_class->close_async = xsocket_connection_close_async;
   stream_class->close_finish = xsocket_connection_close_finish;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_SOCKET,
-                                   g_param_spec_object ("socket",
+                                   xparam_spec_object ("socket",
 			                                P_("Socket"),
 			                                P_("The underlying xsocket_t"),
                                                         XTYPE_SOCKET,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 }
 
 static void

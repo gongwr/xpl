@@ -109,7 +109,7 @@ xsocket_connectable_enumerate (xsocket_connectable_t *connectable)
 {
   xsocket_connectable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SOCKET_CONNECTABLE (connectable), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_CONNECTABLE (connectable), NULL);
 
   iface = XSOCKET_CONNECTABLE_GET_IFACE (connectable);
 
@@ -137,7 +137,7 @@ xsocket_connectable_proxy_enumerate (xsocket_connectable_t *connectable)
 {
   xsocket_connectable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SOCKET_CONNECTABLE (connectable), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_CONNECTABLE (connectable), NULL);
 
   iface = XSOCKET_CONNECTABLE_GET_IFACE (connectable);
 
@@ -168,7 +168,7 @@ xsocket_connectable_to_string (xsocket_connectable_t *connectable)
 {
   xsocket_connectable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SOCKET_CONNECTABLE (connectable), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_CONNECTABLE (connectable), NULL);
 
   iface = XSOCKET_CONNECTABLE_GET_IFACE (connectable);
 

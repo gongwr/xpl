@@ -45,7 +45,7 @@ struct _xlocal_file_monitor_t
   xfile_monitor_t parent_instance;
 
   GFileMonitorSource *source;
-  GUnixMountMonitor  *mount_monitor;
+  xunix_mount_monitor_t  *mount_monitor;
   xboolean_t            was_mounted;
 };
 

@@ -389,14 +389,14 @@ g_sequence_range_get_midpoint (GSequenceIter *begin,
 {
   int begin_pos, end_pos, mid_pos;
 
-  g_return_val_if_fail (begin != NULL, NULL);
-  g_return_val_if_fail (end != NULL, NULL);
-  g_return_val_if_fail (get_sequence (begin) == get_sequence (end), NULL);
+  xreturn_val_if_fail (begin != NULL, NULL);
+  xreturn_val_if_fail (end != NULL, NULL);
+  xreturn_val_if_fail (get_sequence (begin) == get_sequence (end), NULL);
 
   begin_pos = node_get_pos (begin);
   end_pos = node_get_pos (end);
 
-  g_return_val_if_fail (end_pos >= begin_pos, NULL);
+  xreturn_val_if_fail (end_pos >= begin_pos, NULL);
 
   mid_pos = begin_pos + (end_pos - begin_pos) / 2;
 
@@ -425,12 +425,12 @@ g_sequence_iter_compare (GSequenceIter *a,
   xint_t a_pos, b_pos;
   xsequence_t *seq_a, *seq_b;
 
-  g_return_val_if_fail (a != NULL, 0);
-  g_return_val_if_fail (b != NULL, 0);
+  xreturn_val_if_fail (a != NULL, 0);
+  xreturn_val_if_fail (b != NULL, 0);
 
   seq_a = get_sequence (a);
   seq_b = get_sequence (b);
-  g_return_val_if_fail (seq_a == seq_b, 0);
+  xreturn_val_if_fail (seq_a == seq_b, 0);
 
   check_seq_access (seq_a);
   check_seq_access (seq_b);
@@ -463,7 +463,7 @@ g_sequence_append (xsequence_t *seq,
 {
   GSequenceNode *node;
 
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   check_seq_access (seq);
 
@@ -490,7 +490,7 @@ g_sequence_prepend (xsequence_t *seq,
 {
   GSequenceNode *node, *first;
 
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   check_seq_access (seq);
 
@@ -520,7 +520,7 @@ g_sequence_insert_before (GSequenceIter *iter,
   xsequence_t *seq;
   GSequenceNode *node;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
 
   seq = get_sequence (iter);
   check_seq_access (seq);
@@ -733,8 +733,8 @@ g_sequence_insert_sorted (xsequence_t        *seq,
 {
   SortInfo info;
 
-  g_return_val_if_fail (seq != NULL, NULL);
-  g_return_val_if_fail (cmp_func != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (cmp_func != NULL, NULL);
 
   info.cmp_func = cmp_func;
   info.cmp_data = cmp_data;
@@ -818,7 +818,7 @@ g_sequence_search (xsequence_t        *seq,
 {
   SortInfo info;
 
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   info.cmp_func = cmp_func;
   info.cmp_data = cmp_data;
@@ -863,7 +863,7 @@ g_sequence_lookup (xsequence_t        *seq,
 {
   SortInfo info;
 
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   info.cmp_func = cmp_func;
   info.cmp_data = cmp_data;
@@ -1024,8 +1024,8 @@ g_sequence_insert_sorted_iter (xsequence_t                *seq,
   GSequenceNode *new_node;
   xsequence_t *tmp_seq;
 
-  g_return_val_if_fail (seq != NULL, NULL);
-  g_return_val_if_fail (iter_cmp != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (iter_cmp != NULL, NULL);
 
   check_seq_access (seq);
 
@@ -1095,7 +1095,7 @@ g_sequence_search_iter (xsequence_t                *seq,
   GSequenceNode *dummy;
   xsequence_t *tmp_seq;
 
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   check_seq_access (seq);
 
@@ -1150,7 +1150,7 @@ g_sequence_lookup_iter (xsequence_t                *seq,
   GSequenceNode *dummy;
   xsequence_t *tmp_seq;
 
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   check_seq_access (seq);
 
@@ -1186,7 +1186,7 @@ g_sequence_iter_get_sequence (GSequenceIter *iter)
 {
   xsequence_t *seq;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
 
   seq = get_sequence (iter);
 
@@ -1209,8 +1209,8 @@ g_sequence_iter_get_sequence (GSequenceIter *iter)
 xpointer_t
 g_sequence_get (GSequenceIter *iter)
 {
-  g_return_val_if_fail (iter != NULL, NULL);
-  g_return_val_if_fail (!is_end (iter), NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (!is_end (iter), NULL);
 
   return iter->data;
 }
@@ -1303,7 +1303,7 @@ g_sequence_is_empty (xsequence_t *seq)
 GSequenceIter *
 g_sequence_get_end_iter (xsequence_t *seq)
 {
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   return seq->end_node;
 }
@@ -1321,7 +1321,7 @@ g_sequence_get_end_iter (xsequence_t *seq)
 GSequenceIter *
 g_sequence_get_begin_iter (xsequence_t *seq)
 {
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   return node_get_first (seq->end_node);
 }
@@ -1354,7 +1354,7 @@ GSequenceIter *
 g_sequence_get_iter_at_pos (xsequence_t *seq,
                             xint_t       pos)
 {
-  g_return_val_if_fail (seq != NULL, NULL);
+  xreturn_val_if_fail (seq != NULL, NULL);
 
   pos = clamp_position (seq, pos);
 
@@ -1404,7 +1404,7 @@ g_sequence_move (GSequenceIter *src,
 xboolean_t
 g_sequence_iter_is_end (GSequenceIter *iter)
 {
-  g_return_val_if_fail (iter != NULL, FALSE);
+  xreturn_val_if_fail (iter != NULL, FALSE);
 
   return is_end (iter);
 }
@@ -1422,7 +1422,7 @@ g_sequence_iter_is_end (GSequenceIter *iter)
 xboolean_t
 g_sequence_iter_is_begin (GSequenceIter *iter)
 {
-  g_return_val_if_fail (iter != NULL, FALSE);
+  xreturn_val_if_fail (iter != NULL, FALSE);
 
   return (node_get_prev (iter) == iter);
 }
@@ -1440,7 +1440,7 @@ g_sequence_iter_is_begin (GSequenceIter *iter)
 xint_t
 g_sequence_iter_get_position (GSequenceIter *iter)
 {
-  g_return_val_if_fail (iter != NULL, -1);
+  xreturn_val_if_fail (iter != NULL, -1);
 
   return node_get_pos (iter);
 }
@@ -1459,7 +1459,7 @@ g_sequence_iter_get_position (GSequenceIter *iter)
 GSequenceIter *
 g_sequence_iter_next (GSequenceIter *iter)
 {
-  g_return_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
 
   return node_get_next (iter);
 }
@@ -1479,7 +1479,7 @@ g_sequence_iter_next (GSequenceIter *iter)
 GSequenceIter *
 g_sequence_iter_prev (GSequenceIter *iter)
 {
-  g_return_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
 
   return node_get_prev (iter);
 }
@@ -1506,7 +1506,7 @@ g_sequence_iter_move (GSequenceIter *iter,
   xint_t new_pos;
   xint_t len;
 
-  g_return_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
 
   len = g_sequence_get_length (get_sequence (iter));
 
@@ -1910,8 +1910,8 @@ node_rotate (GSequenceNode *node)
 {
   GSequenceNode *tmp, *old;
 
-  g_assert (node->parent);
-  g_assert (node->parent != node);
+  xassert (node->parent);
+  xassert (node->parent != node);
 
   if (NODE_LEFT_CHILD (node))
     {
@@ -1928,7 +1928,7 @@ node_rotate (GSequenceNode *node)
             node->parent->right = node;
         }
 
-      g_assert (node->right);
+      xassert (node->right);
 
       node->right->parent = node;
       node->right->left = tmp;
@@ -1953,7 +1953,7 @@ node_rotate (GSequenceNode *node)
             node->parent->left = node;
         }
 
-      g_assert (node->left);
+      xassert (node->left);
 
       node->left->parent = node;
       node->left->right = tmp;

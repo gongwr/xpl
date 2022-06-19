@@ -39,7 +39,7 @@
 struct _GUnixVolumeMonitor {
   xnative_volume_monitor_t parent;
 
-  GUnixMountMonitor *mount_monitor;
+  xunix_mount_monitor_t *mount_monitor;
 
   xlist_t *last_mountpoints;
   xlist_t *last_mounts;
@@ -48,9 +48,9 @@ struct _GUnixVolumeMonitor {
   xlist_t *mounts;
 };
 
-static void mountpoints_changed      (GUnixMountMonitor  *mount_monitor,
+static void mountpoints_changed      (xunix_mount_monitor_t  *mount_monitor,
                                       xpointer_t            user_data);
-static void mounts_changed           (GUnixMountMonitor  *mount_monitor,
+static void mounts_changed           (xunix_mount_monitor_t  *mount_monitor,
                                       xpointer_t            user_data);
 static void update_volumes           (GUnixVolumeMonitor *monitor);
 static void update_mounts            (GUnixVolumeMonitor *monitor);
@@ -80,7 +80,7 @@ g_unix_volume_monitor_finalize (xobject_t *object)
   xlist_free_full (monitor->volumes, xobject_unref);
   xlist_free_full (monitor->mounts, xobject_unref);
 
-  G_OBJECT_CLASS (g_unix_volume_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_unix_volume_monitor_parent_class)->finalize (object);
 }
 
 static void
@@ -96,7 +96,7 @@ g_unix_volume_monitor_dispose (xobject_t *object)
   xlist_free_full (monitor->mounts, xobject_unref);
   monitor->mounts = NULL;
 
-  G_OBJECT_CLASS (g_unix_volume_monitor_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_unix_volume_monitor_parent_class)->dispose (object);
 }
 
 static xlist_t *
@@ -166,12 +166,12 @@ get_mount_for_mount_path (const char *mount_path,
 static void
 g_unix_volume_monitor_class_init (GUnixVolumeMonitorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   GVolumeMonitorClass *monitor_class = G_VOLUME_MONITOR_CLASS (klass);
   GNativeVolumeMonitorClass *native_class = G_NATIVE_VOLUME_MONITOR_CLASS (klass);
 
-  gobject_class->finalize = g_unix_volume_monitor_finalize;
-  gobject_class->dispose = g_unix_volume_monitor_dispose;
+  xobject_class->finalize = g_unix_volume_monitor_finalize;
+  xobject_class->dispose = g_unix_volume_monitor_dispose;
 
   monitor_class->get_mounts = get_mounts;
   monitor_class->get_volumes = get_volumes;
@@ -192,7 +192,7 @@ _g_unix_volume_monitor_update (GUnixVolumeMonitor *unix_monitor)
 }
 
 static void
-mountpoints_changed (GUnixMountMonitor *mount_monitor,
+mountpoints_changed (xunix_mount_monitor_t *mount_monitor,
 		     xpointer_t           user_data)
 {
   GUnixVolumeMonitor *unix_monitor = user_data;
@@ -201,7 +201,7 @@ mountpoints_changed (GUnixMountMonitor *mount_monitor,
 }
 
 static void
-mounts_changed (GUnixMountMonitor *mount_monitor,
+mounts_changed (xunix_mount_monitor_t *mount_monitor,
 		xpointer_t           user_data)
 {
   GUnixVolumeMonitor *unix_monitor = user_data;
@@ -213,7 +213,7 @@ static void
 g_unix_volume_monitor_init (GUnixVolumeMonitor *unix_monitor)
 {
 
-  unix_monitor->mount_monitor = g_unix_mount_monitor_get ();
+  unix_monitor->mount_monitor = xunix_mount_monitor_get ();
 
   xsignal_connect (unix_monitor->mount_monitor,
 		    "mounts-changed", G_CALLBACK (mounts_changed),

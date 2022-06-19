@@ -94,15 +94,15 @@ xtest_get_type (void)
 static void
 xtest_class_init (xtest_class_t * klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = (xobject_class_t *) klass;
+  xobject_class = (xobject_class_t *) klass;
 
   parent_class = xtype_class_ref (XTYPE_OBJECT);
 
-  gobject_class->dispose = xtest_dispose;
-  gobject_class->set_property = xtest_set_property;
-  gobject_class->get_property = xtest_get_property;
+  xobject_class->dispose = xtest_dispose;
+  xobject_class->set_property = xtest_set_property;
+  xobject_class->get_property = xtest_get_property;
 
   xtest_signals[TEST_SIGNAL1] =
       xsignal_new ("test-signal1", XTYPE_FROM_CLASS (klass),
@@ -117,9 +117,9 @@ xtest_class_init (xtest_class_t * klass)
       G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET (xtest_class_t, test_signal3), NULL,
       NULL, g_cclosure_marshal_generic, XTYPE_STRING, 1, XTYPE_INT);
 
-  xobject_class_install_property (G_OBJECT_CLASS (klass), ARG_TEST_PROP,
-      g_param_spec_int ("test-prop", "test_t Prop", "test_t property",
-          0, 1, 0, G_PARAM_READWRITE));
+  xobject_class_install_property (XOBJECT_CLASS (klass), ARG_TEST_PROP,
+      xparam_spec_int ("test-prop", "test_t Prop", "test_t property",
+          0, 1, 0, XPARAM_READWRITE));
 
   klass->test_signal2 = signal2_handler;
   klass->test_signal3 = signal3_handler;
@@ -142,7 +142,7 @@ xtest_dispose (xobject_t * object)
 
   g_print ("dispose %p!\n", test);
 
-  G_OBJECT_CLASS (parent_class)->dispose (object);
+  XOBJECT_CLASS (parent_class)->dispose (object);
 }
 
 static void
@@ -210,7 +210,7 @@ xtest_do_signal3 (xtest_t * test)
   xchar_t *res;
 
   xsignal_emit (G_OBJECT (test), xtest_signals[TEST_SIGNAL3], 0, 0, &res);
-  g_assert (res);
+  xassert (res);
   g_free (res);
 }
 

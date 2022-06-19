@@ -136,8 +136,8 @@ old_mem_chunk_new (const xchar_t  *name,
   GMemChunk *mem_chunk;
   xulong_t rarea_size;
 
-  g_return_val_if_fail (atom_size > 0, NULL);
-  g_return_val_if_fail (area_size >= atom_size, NULL);
+  xreturn_val_if_fail (atom_size > 0, NULL);
+  xreturn_val_if_fail (area_size >= atom_size, NULL);
 
   ENTER_MEM_CHUNK_ROUTINE ();
 
@@ -223,7 +223,7 @@ old_mem_chunk_alloc (GMemChunk *mem_chunk)
 
   ENTER_MEM_CHUNK_ROUTINE ();
 
-  g_return_val_if_fail (mem_chunk != NULL, NULL);
+  xreturn_val_if_fail (mem_chunk != NULL, NULL);
 
   while (mem_chunk->free_atoms)
     {

@@ -116,7 +116,7 @@ xsocket_output_stream_finalize (xobject_t *object)
   if (stream->priv->socket)
     xobject_unref (stream->priv->socket);
 
-  G_OBJECT_CLASS (xsocket_output_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsocket_output_stream_parent_class)->finalize (object);
 }
 
 static xssize_t
@@ -157,7 +157,7 @@ xsocket_output_stream_writev (xoutput_stream_t        *stream,
                                             cancellable, error);
 
   /* we have a non-zero timeout so this can't happen */
-  g_assert (res != G_POLLABLE_RETURN_WOULD_BLOCK);
+  xassert (res != G_POLLABLE_RETURN_WOULD_BLOCK);
 
   return res == G_POLLABLE_RETURN_OK;
 }
@@ -234,22 +234,22 @@ xsocket_output_stream_get_fd (xfile_descriptor_based_t *fd_based)
 static void
 xsocket_output_stream_class_init (GSocketOutputStreamClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xoutput_stream_class_t *goutputstream_class = G_OUTPUT_STREAM_CLASS (klass);
 
-  gobject_class->finalize = xsocket_output_stream_finalize;
-  gobject_class->get_property = xsocket_output_stream_get_property;
-  gobject_class->set_property = xsocket_output_stream_set_property;
+  xobject_class->finalize = xsocket_output_stream_finalize;
+  xobject_class->get_property = xsocket_output_stream_get_property;
+  xobject_class->set_property = xsocket_output_stream_set_property;
 
   goutputstream_class->write_fn = xsocket_output_stream_write;
   goutputstream_class->writev_fn = xsocket_output_stream_writev;
 
-  xobject_class_install_property (gobject_class, PROP_SOCKET,
-				   g_param_spec_object ("socket",
+  xobject_class_install_property (xobject_class, PROP_SOCKET,
+				   xparam_spec_object ("socket",
 							P_("socket"),
 							P_("The socket that this stream wraps"),
-							XTYPE_SOCKET, G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+							XTYPE_SOCKET, XPARAM_CONSTRUCT_ONLY |
+							XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 }
 
 #ifdef G_OS_UNIX

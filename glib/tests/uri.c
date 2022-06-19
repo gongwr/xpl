@@ -1589,7 +1589,7 @@ test_uri_iter_params (xconstpointer test_data)
 
       g_test_message ("URI %" G_GSIZE_FORMAT ": %s", i, params_tests[i].uri);
 
-      g_assert (params_tests[i].expected_n_params < 0 ||
+      xassert (params_tests[i].expected_n_params < 0 ||
                 params_tests[i].expected_n_params <= (xssize_t) G_N_ELEMENTS (params_tests[i].expected_param_key_values) / 2);
 
       /* The tests get run twice: once with the length unspecified, using a
@@ -1656,7 +1656,7 @@ test_uri_parse_params (xconstpointer test_data)
 
       g_test_message ("URI %" G_GSIZE_FORMAT ": %s", i, params_tests[i].uri);
 
-      g_assert (params_tests[i].expected_n_params < 0 ||
+      xassert (params_tests[i].expected_n_params < 0 ||
                 params_tests[i].expected_n_params <= (xssize_t) G_N_ELEMENTS (params_tests[i].expected_param_key_values) / 2);
 
       /* The tests get run twice: once with the length unspecified, using a

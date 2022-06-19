@@ -52,7 +52,7 @@ static xtype_t xtest_flags_get_type (void);
 
 #define XTYPE_TEST (xtest_get_type())
 #define XTEST(test) (XTYPE_CHECK_INSTANCE_CAST ((test), XTYPE_TEST, xtest_t))
-G_DEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
+XDEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
 
 static void xtest_class_init (xtest_class_t * klass);
 static void xtest_init (xtest_t * test);
@@ -86,17 +86,17 @@ xtest_flags_get_type (void)
 static void
 xtest_class_init (xtest_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xtest_get_property;
-  gobject_class->set_property = xtest_set_property;
+  xobject_class->get_property = xtest_get_property;
+  xobject_class->set_property = xtest_set_property;
 
-  xobject_class_install_property (gobject_class, 1,
-				   g_param_spec_flags ("flags",
+  xobject_class_install_property (xobject_class, 1,
+				   xparam_spec_flags ("flags",
 						       "Flags",
 						       "Flags test property",
 						       xtest_flags_get_type(), 0,
-						       G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+						       XPARAM_READWRITE | XPARAM_CONSTRUCT));
 }
 
 static void xtest_init (xtest_t *test)

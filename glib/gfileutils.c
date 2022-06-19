@@ -348,7 +348,7 @@ xfile_test (const xchar_t *filename,
   wchar_t *wfilename;
 #endif
 
-  g_return_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
 
 #ifdef G_OS_WIN32
 /* stuff missing in std vc6 api */
@@ -696,7 +696,7 @@ get_contents_stdio (const xchar_t  *filename,
   xchar_t *tmp;
   xchar_t *display_filename;
 
-  g_assert (f != NULL);
+  xassert (f != NULL);
 
   while (!feof (f))
     {
@@ -755,7 +755,7 @@ get_contents_stdio (const xchar_t  *filename,
           goto error;
         }
 
-      g_assert (str != NULL);
+      xassert (str != NULL);
       memcpy (str + total_bytes, buf, bytes);
 
       total_bytes += bytes;
@@ -1012,8 +1012,8 @@ xfile_get_contents (const xchar_t  *filename,
                      xsize_t        *length,
                      xerror_t      **error)
 {
-  g_return_val_if_fail (filename != NULL, FALSE);
-  g_return_val_if_fail (contents != NULL, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (contents != NULL, FALSE);
 
   *contents = NULL;
   if (length)
@@ -1158,7 +1158,7 @@ write_to_file (const xchar_t  *contents,
           return FALSE;
         }
 
-      g_assert ((xsize_t) s <= length);
+      xassert ((xsize_t) s <= length);
 
       contents += s;
       length -= s;
@@ -1293,10 +1293,10 @@ xfile_set_contents_full (const xchar_t            *filename,
                           int                     mode,
                           xerror_t                **error)
 {
-  g_return_val_if_fail (filename != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail (contents != NULL || length == 0, FALSE);
-  g_return_val_if_fail (length >= -1, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (contents != NULL || length == 0, FALSE);
+  xreturn_val_if_fail (length >= -1, FALSE);
 
   /* @flags are handled as follows:
    *  - %XFILE_SET_CONTENTS_NONE: write directly to @filename, no fsync()s
@@ -1479,7 +1479,7 @@ get_tmp_file (xchar_t            *tmpl,
   sint64_t now_us;
   static int counter = 0;
 
-  g_return_val_if_fail (tmpl != NULL, -1);
+  xreturn_val_if_fail (tmpl != NULL, -1);
 
   /* find the last occurrence of "XXXXXX" */
   XXXXXX = xstrrstr (tmpl, "XXXXXX");
@@ -1797,7 +1797,7 @@ xfile_open_tmp (const xchar_t  *tmpl,
   xchar_t *fulltemplate;
   xint_t result;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   result = g_get_tmp_name (tmpl, &fulltemplate,
                            wrap_g_open,
@@ -1846,7 +1846,7 @@ g_dir_make_tmp (const xchar_t  *tmpl,
 {
   xchar_t *fulltemplate;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (g_get_tmp_name (tmpl, &fulltemplate, wrap_g_mkdir, 0, 0700, error) == -1)
     return NULL;
@@ -2027,7 +2027,7 @@ g_build_path (const xchar_t *separator,
   xchar_t *str;
   va_list args;
 
-  g_return_val_if_fail (separator != NULL, NULL);
+  xreturn_val_if_fail (separator != NULL, NULL);
 
   va_start (args, first_element);
   str = g_build_path_va (separator, first_element, &args, NULL);
@@ -2185,7 +2185,7 @@ xchar_t *
 g_build_filename_valist (const xchar_t  *first_element,
                          va_list      *args)
 {
-  g_return_val_if_fail (first_element != NULL, NULL);
+  xreturn_val_if_fail (first_element != NULL, NULL);
 
   return g_build_filename_va (first_element, args, NULL);
 }
@@ -2271,8 +2271,8 @@ xfile_read_link (const xchar_t  *filename,
   size_t size;
   xssize_t read_size;
 
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   size = 256;
   buffer = g_malloc (size);
@@ -2305,8 +2305,8 @@ xfile_read_link (const xchar_t  *filename,
   xchar_t *buffer;
   xssize_t read_size;
 
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   read_size = g_win32_readlink_utf8 (filename, NULL, 0, &buffer, TRUE);
   if (read_size < 0)
@@ -2324,8 +2324,8 @@ xfile_read_link (const xchar_t  *filename,
   else
     return buffer;
 #else
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   g_set_error_literal (error,
                        XFILE_ERROR,
@@ -2370,7 +2370,7 @@ xfile_read_link (const xchar_t  *filename,
 xboolean_t
 g_path_is_absolute (const xchar_t *file_name)
 {
-  g_return_val_if_fail (file_name != NULL, FALSE);
+  xreturn_val_if_fail (file_name != NULL, FALSE);
 
   if (X_IS_DIR_SEPARATOR (file_name[0]))
     return TRUE;
@@ -2399,7 +2399,7 @@ g_path_is_absolute (const xchar_t *file_name)
 const xchar_t *
 g_path_skip_root (const xchar_t *file_name)
 {
-  g_return_val_if_fail (file_name != NULL, NULL);
+  xreturn_val_if_fail (file_name != NULL, NULL);
 
 #ifdef XPLATFORM_WIN32
   /* Skip \\server\share or //server/share */
@@ -2477,7 +2477,7 @@ g_basename (const xchar_t *file_name)
 {
   xchar_t *base;
 
-  g_return_val_if_fail (file_name != NULL, NULL);
+  xreturn_val_if_fail (file_name != NULL, NULL);
 
   base = strrchr (file_name, G_DIR_SEPARATOR);
 
@@ -2523,7 +2523,7 @@ g_path_get_basename (const xchar_t *file_name)
   xsize_t len;
   xchar_t *retval;
 
-  g_return_val_if_fail (file_name != NULL, NULL);
+  xreturn_val_if_fail (file_name != NULL, NULL);
 
   if (file_name[0] == '\0')
     return xstrdup (".");
@@ -2597,7 +2597,7 @@ g_path_get_dirname (const xchar_t *file_name)
   xchar_t *base;
   xsize_t len;
 
-  g_return_val_if_fail (file_name != NULL, NULL);
+  xreturn_val_if_fail (file_name != NULL, NULL);
 
   base = strrchr (file_name, G_DIR_SEPARATOR);
 
@@ -2716,7 +2716,7 @@ g_canonicalize_filename (const xchar_t *filename,
 {
   xchar_t *canon, *input, *output, *after_root, *output_start;
 
-  g_return_val_if_fail (relative_to == NULL || g_path_is_absolute (relative_to), NULL);
+  xreturn_val_if_fail (relative_to == NULL || g_path_is_absolute (relative_to), NULL);
 
   if (!g_path_is_absolute (filename))
     {
@@ -2774,9 +2774,9 @@ g_canonicalize_filename (const xchar_t *filename,
     {
       /* input points to the next non-separator to be processed. */
       /* output points to the next location to write to. */
-      g_assert (input > canon && X_IS_DIR_SEPARATOR (input[-1]));
-      g_assert (output > canon && X_IS_DIR_SEPARATOR (output[-1]));
-      g_assert (input >= output);
+      xassert (input > canon && X_IS_DIR_SEPARATOR (input[-1]));
+      xassert (output > canon && X_IS_DIR_SEPARATOR (output[-1]));
+      xassert (input >= output);
 
       /* Ignore repeated dir separators. */
       while (X_IS_DIR_SEPARATOR (input[0]))

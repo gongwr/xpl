@@ -58,7 +58,7 @@ create_cfstring_from_cstr (const xchar_t *cstr)
 static xchar_t *
 create_cstr_from_cfstring (CFStringRef str)
 {
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   CFIndex length = CFStringGetLength (str);
   CFIndex maxlen = CFStringGetMaximumSizeForEncoding (length, kCFStringEncodingUTF8);
@@ -122,8 +122,8 @@ g_content_type_equals (const xchar_t *type1,
   CFStringRef str1, str2;
   xboolean_t ret;
 
-  g_return_val_if_fail (type1 != NULL, FALSE);
-  g_return_val_if_fail (type2 != NULL, FALSE);
+  xreturn_val_if_fail (type1 != NULL, FALSE);
+  xreturn_val_if_fail (type2 != NULL, FALSE);
 
   if (g_ascii_strcasecmp (type1, type2) == 0)
     return TRUE;
@@ -146,8 +146,8 @@ g_content_type_is_a (const xchar_t *ctype,
   CFStringRef type, supertype;
   xboolean_t ret;
 
-  g_return_val_if_fail (ctype != NULL, FALSE);
-  g_return_val_if_fail (csupertype != NULL, FALSE);
+  xreturn_val_if_fail (ctype != NULL, FALSE);
+  xreturn_val_if_fail (csupertype != NULL, FALSE);
 
   type = create_cfstring_from_cstr (ctype);
   supertype = create_cfstring_from_cstr (csupertype);
@@ -167,8 +167,8 @@ g_content_type_is_mime_type (const xchar_t *type,
   xchar_t *content_type;
   xboolean_t ret;
 
-  g_return_val_if_fail (type != NULL, FALSE);
-  g_return_val_if_fail (mime_type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (mime_type != NULL, FALSE);
 
   content_type = g_content_type_from_mime_type (mime_type);
   ret = g_content_type_is_a (type, content_type);
@@ -180,7 +180,7 @@ g_content_type_is_mime_type (const xchar_t *type,
 xboolean_t
 g_content_type_is_unknown (const xchar_t *type)
 {
-  g_return_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
 
   /* Should dynamic types be considered "unknown"? */
   if (xstr_has_prefix (type, "dyn."))
@@ -198,7 +198,7 @@ g_content_type_get_description (const xchar_t *type)
   CFStringRef str;
   CFStringRef desc_str;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   str = create_cfstring_from_cstr (type);
   desc_str = UTTypeCopyDescription (str);
@@ -278,7 +278,7 @@ g_content_type_get_icon_internal (const xchar_t *uti,
   const char  *xdg_icon;
   int i;
 
-  g_return_val_if_fail (uti != NULL, NULL);
+  xreturn_val_if_fail (uti != NULL, NULL);
 
   mime_type = g_content_type_get_mime_type (uti);
 
@@ -345,7 +345,7 @@ g_content_type_can_be_executable (const xchar_t *type)
   CFStringRef uti;
   xboolean_t ret = FALSE;
 
-  g_return_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
 
   uti = create_cfstring_from_cstr (type);
 
@@ -369,7 +369,7 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
   CFStringRef mime_str;
   CFStringRef uti_str;
 
-  g_return_val_if_fail (mime_type != NULL, NULL);
+  xreturn_val_if_fail (mime_type != NULL, NULL);
 
   /* Their api does not handle globs but they are common. */
   if (xstr_has_suffix (mime_type, "*"))
@@ -431,7 +431,7 @@ g_content_type_get_mime_type (const xchar_t *type)
   CFStringRef uti_str;
   CFStringRef mime_str;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   /* We must match the additions above
    * so conversions back and forth work.
@@ -488,7 +488,7 @@ g_content_type_guess (const xchar_t  *filename,
   CFStringRef extension;
   int uncertain = -1;
 
-  g_return_val_if_fail (data_size != (xsize_t) -1, NULL);
+  xreturn_val_if_fail (data_size != (xsize_t) -1, NULL);
 
   if (filename && *filename)
     {

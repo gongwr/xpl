@@ -42,7 +42,7 @@ static void
 wait_for_read (xboolean_t success,
                xsize_t    read)
 {
-  g_assert (!got_read_done);
+  xassert (!got_read_done);
   expected_read_success = success;
   expected_read = read;
 
@@ -74,7 +74,7 @@ static void
 wait_for_write (xboolean_t success,
                 xsize_t    written)
 {
-  g_assert (!got_write_done);
+  xassert (!got_write_done);
   expected_write_success = success;
   expected_written = written;
 
@@ -108,7 +108,7 @@ test_write_all_async_memory (void)
   xoutput_stream_write_all_async (ms, "0123456789", 10, 0, NULL, write_done, NULL);
   wait_for_write (FALSE, 0);
 
-  g_assert (!memcmp (b, "012345678901234567890123", 24));
+  xassert (!memcmp (b, "012345678901234567890123", 24));
 
   xobject_unref (ms);
 }
@@ -124,16 +124,16 @@ test_read_all_async_memory (void)
 
   xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 10);
-  g_assert (!memcmp (buf, "0123456789", 10));
+  xassert (!memcmp (buf, "0123456789", 10));
 
   xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 10);
-  g_assert (!memcmp (buf, "ABCDEFGHIJ", 10));
+  xassert (!memcmp (buf, "ABCDEFGHIJ", 10));
 
   /* partial read... */
   xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
   wait_for_read (TRUE, 4);
-  g_assert (!memcmp (buf, "!@#$", 4));
+  xassert (!memcmp (buf, "!@#$", 4));
 
   /* EOF */
   xinput_stream_read_all_async (ms, buf, 10, 0, NULL, read_done, NULL);
@@ -166,7 +166,7 @@ test_read_write_all_async_pipe (void)
     xint_t s;
 
     s = socketpair (AF_UNIX, SOCK_STREAM, 0, sv);
-    g_assert (s == 0);
+    xassert (s == 0);
 
     out = g_unix_output_stream_new (sv[0], TRUE);
     in = g_unix_input_stream_new (sv[1], TRUE);
@@ -178,7 +178,7 @@ test_read_write_all_async_pipe (void)
     {
       s = xoutput_stream_write (out, wbuf, sizeof wbuf, NULL, &error);
       g_assert_no_error (error);
-      g_assert (s > 0);
+      xassert (s > 0);
       in_flight += s;
     }
 
@@ -187,7 +187,7 @@ test_read_write_all_async_pipe (void)
   xoutput_stream_write_all_async (out, "0123456789", 10, 0, cancellable, write_done, NULL);
   while (xmain_context_iteration (NULL, FALSE))
     ;
-  g_assert (!got_write_done);
+  xassert (!got_write_done);
 
   /* Cancel that to make sure it works */
   xcancellable_cancel (cancellable);
@@ -198,7 +198,7 @@ test_read_write_all_async_pipe (void)
   xoutput_stream_write_all_async (out, "0123456789", 10, 0, NULL, write_done, NULL);
   while (xmain_context_iteration (NULL, FALSE))
     ;
-  g_assert (!got_write_done);
+  xassert (!got_write_done);
 
   /* Now drain as much as we originally put in the buffer to make it
    * block -- this will unblock the writer.
@@ -207,7 +207,7 @@ test_read_write_all_async_pipe (void)
     {
       s = xinput_stream_read (in, rbuf, MIN (sizeof wbuf, in_flight), NULL, &error);
       g_assert_no_error (error);
-      g_assert (s > 0);
+      xassert (s > 0);
       in_flight -= s;
     }
 
@@ -219,7 +219,7 @@ test_read_write_all_async_pipe (void)
   /* The write is surely finished by now */
   wait_for_write (TRUE, 10);
   /* ...but the read will not yet be satisfied */
-  g_assert (!got_read_done);
+  xassert (!got_read_done);
 
   /* Feed the read more than it asked for; this really should not block
    * since the buffer is so small...

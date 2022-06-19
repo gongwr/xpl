@@ -60,10 +60,10 @@ test_rec_mutex3 (void)
   xboolean_t ret;
 
   ret = g_rec_mutex_trylock (&mutex);
-  g_assert (ret);
+  xassert (ret);
 
   ret = g_rec_mutex_trylock (&mutex);
-  g_assert (ret);
+  xassert (ret);
 
   g_rec_mutex_unlock (&mutex);
   g_rec_mutex_unlock (&mutex);
@@ -92,28 +92,28 @@ acquire (xint_t nr)
       g_rec_mutex_lock (&locks[nr]);
     }
 
-  g_assert (owners[nr] == NULL);   /* hopefully nobody else is here */
+  xassert (owners[nr] == NULL);   /* hopefully nobody else is here */
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
   xthread_yield ();
   xthread_yield ();
 
-  g_assert (owners[nr] == self);   /* hopefully this is still us... */
+  xassert (owners[nr] == self);   /* hopefully this is still us... */
 
   if (g_test_verbose ())
     g_printerr ("thread %p recursively taking lock %d\n", self, nr);
 
   g_rec_mutex_lock (&locks[nr]);  /* we're recursive, after all */
 
-  g_assert (owners[nr] == self);   /* hopefully this is still us... */
+  xassert (owners[nr] == self);   /* hopefully this is still us... */
 
   g_rec_mutex_unlock (&locks[nr]);
 
   xthread_yield ();
   xthread_yield ();
 
-  g_assert (owners[nr] == self);   /* hopefully this is still us... */
+  xassert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
 
   g_rec_mutex_unlock (&locks[nr]);
@@ -154,7 +154,7 @@ test_rec_mutex4 (void)
     g_rec_mutex_clear (&locks[i]);
 
   for (i = 0; i < LOCKS; i++)
-    g_assert (owners[i] == NULL);
+    xassert (owners[i] == NULL);
 }
 
 #define COUNT_TO 100000000

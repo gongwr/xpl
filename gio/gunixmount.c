@@ -89,15 +89,15 @@ g_unix_mount_finalize (xobject_t *object)
   g_free (mount->device_path);
   g_free (mount->mount_path);
 
-  G_OBJECT_CLASS (g_unix_mount_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_unix_mount_parent_class)->finalize (object);
 }
 
 static void
 g_unix_mount_class_init (GUnixMountClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_unix_mount_finalize;
+  xobject_class->finalize = g_unix_mount_finalize;
 }
 
 static void
@@ -284,7 +284,7 @@ eject_unmount_do_cb (xpointer_t user_data)
   if (xtask_return_error_if_cancelled (task))
     {
       xobject_unref (task);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
 
   subprocess = xsubprocess_newv (argv, G_SUBPROCESS_FLAGS_STDOUT_SILENCE | G_SUBPROCESS_FLAGS_STDERR_PIPE, &error);
@@ -294,7 +294,7 @@ eject_unmount_do_cb (xpointer_t user_data)
                                        xtask_get_cancellable (task),
                                        eject_unmount_done, task);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void

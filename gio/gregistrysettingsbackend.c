@@ -158,7 +158,7 @@ typedef struct
 #define X_IS_REGISTRY_BACKEND(inst)  (XTYPE_CHECK_INSTANCE_TYPE ((inst),         \
                                       XTYPE_REGISTRY_BACKEND))
 
-typedef GSettingsBackendClass GRegistryBackendClass;
+typedef xsettings_backend_class_t GRegistryBackendClass;
 
 typedef struct {
   xsettings_backend_t parent_instance;
@@ -394,8 +394,8 @@ registry_cache_add_item (xnode_t         *parent,
   RegistryCacheItem *item;
   xnode_t *cache_node;
 
-  g_return_val_if_fail (name != NULL, NULL);
-  g_return_val_if_fail (parent != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (parent != NULL, NULL);
 
   item = g_slice_new (RegistryCacheItem);
 
@@ -544,8 +544,8 @@ registry_cache_find_compare (xnode_t    *node,
   if (item == NULL)  /* root node */
     return FALSE;
 
-  g_return_val_if_fail (search->name != NULL, FALSE);
-  g_return_val_if_fail (item->name != NULL, FALSE);
+  xreturn_val_if_fail (search->name != NULL, FALSE);
+  xreturn_val_if_fail (item->name != NULL, FALSE);
 
   if (strcmp (search->name, item->name) == 0)
     {
@@ -625,7 +625,7 @@ registry_cache_get_node_for_key (xnode_t       *root,
   xnode_t *result = NULL;
   xchar_t *component, *c;
 
-  g_return_val_if_fail (key_name != NULL, NULL);
+  xreturn_val_if_fail (key_name != NULL, NULL);
 
   if (key_name[0] == '/')
     key_name++;
@@ -675,8 +675,8 @@ registry_cache_update_node (xnode_t        *cache_node,
 {
   RegistryCacheItem *cache_item;
 
-  g_return_val_if_fail (cache_node != NULL, FALSE);
-  g_return_val_if_fail (cache_node->data != NULL, FALSE);
+  xreturn_val_if_fail (cache_node != NULL, FALSE);
+  xreturn_val_if_fail (cache_node->data != NULL, FALSE);
 
   cache_item = cache_node->data;
 
@@ -705,7 +705,7 @@ registry_cache_update_node (xnode_t        *cache_node,
       }
     case REG_QWORD:
       {
-        g_return_val_if_fail (registry_value.ptr != NULL &&
+        xreturn_val_if_fail (registry_value.ptr != NULL &&
                               cache_item->value.ptr != NULL, FALSE);
 
         if (memcmp (registry_value.ptr, cache_item->value.ptr, 8)==0)
@@ -723,8 +723,8 @@ registry_cache_update_node (xnode_t        *cache_node,
     case REG_SZ:
       {
         /* Value should not exist if it is NULL, an empty string is "" */
-        g_return_val_if_fail (cache_item->value.ptr != NULL, FALSE);
-        g_return_val_if_fail (registry_value.ptr != NULL, FALSE);
+        xreturn_val_if_fail (cache_item->value.ptr != NULL, FALSE);
+        xreturn_val_if_fail (registry_value.ptr != NULL, FALSE);
 
         if (strcmp (registry_value.ptr, cache_item->value.ptr) == 0)
           {
@@ -783,7 +783,7 @@ registry_read (HKEY           hpath,
   xpointer_t *buffer;
   xunichar2_t *value_namew;
 
-  g_return_val_if_fail (p_value != NULL, FALSE);
+  xreturn_val_if_fail (p_value != NULL, FALSE);
 
   p_value->type = REG_NONE;
   p_value->ptr = NULL;
@@ -846,7 +846,7 @@ g_registry_backend_read (xsettings_backend_t   *backend,
   xvariant_t *gsettings_value = NULL;
   xchar_t *gsettings_type;
 
-  g_return_val_if_fail (expected_type != NULL, NULL);
+  xreturn_val_if_fail (expected_type != NULL, NULL);
 
   if (default_value)
     return NULL;
@@ -1550,7 +1550,7 @@ watch_handler (RegistryEvent *event)
   xobject_unref (event->self);
   g_slice_free (RegistryEvent, event);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1834,7 +1834,7 @@ watch_start (GRegistryBackend *self)
 {
   WatchThreadState *watch;
 
-  g_return_val_if_fail (self->watch == NULL, FALSE);
+  xreturn_val_if_fail (self->watch == NULL, FALSE);
 
   watch = g_slice_new (WatchThreadState);
   watch->owner = G_SETTINGS_BACKEND (self);
@@ -1923,7 +1923,7 @@ watch_add_notify (GRegistryBackend *self,
   DWORD result;
 #endif
 
-  g_return_val_if_fail (watch != NULL, FALSE);
+  xreturn_val_if_fail (watch != NULL, FALSE);
 
   trace ("watch_add_notify: prefix %s.\n", gsettings_prefix);
 
@@ -2130,8 +2130,8 @@ g_registry_backend_finalize (xobject_t *object)
 static void
 g_registry_backend_class_init (GRegistryBackendClass *class)
 {
-  GSettingsBackendClass *backend_class = G_SETTINGS_BACKEND_CLASS (class);
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xsettings_backend_class_t *backend_class = G_SETTINGS_BACKEND_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = g_registry_backend_finalize;
 

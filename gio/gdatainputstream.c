@@ -41,9 +41,9 @@
  *
  **/
 
-struct _GDataInputStreamPrivate {
-  GDataStreamByteOrder byte_order;
-  GDataStreamNewlineType newline_type;
+struct _xdata_input_stream_private {
+  xdata_stream_byte_order_t byte_order;
+  xdata_stream_newline_type_t newline_type;
 };
 
 enum {
@@ -52,28 +52,28 @@ enum {
   PROP_NEWLINE_TYPE
 };
 
-static void g_data_input_stream_set_property (xobject_t      *object,
+static void xdata_input_stream_set_property (xobject_t      *object,
 					      xuint_t         prop_id,
 					      const xvalue_t *value,
 					      xparam_spec_t   *pspec);
-static void g_data_input_stream_get_property (xobject_t      *object,
+static void xdata_input_stream_get_property (xobject_t      *object,
 					      xuint_t         prop_id,
 					      xvalue_t       *value,
 					      xparam_spec_t   *pspec);
 
 G_DEFINE_TYPE_WITH_PRIVATE (xdata_input_stream_t,
-                            g_data_input_stream,
+                            xdata_input_stream,
                             XTYPE_BUFFERED_INPUT_STREAM)
 
 
 static void
-g_data_input_stream_class_init (GDataInputStreamClass *klass)
+xdata_input_stream_class_init (xdata_input_stream_class_t *klass)
 {
   xobject_class_t *object_class;
 
-  object_class = G_OBJECT_CLASS (klass);
-  object_class->get_property = g_data_input_stream_get_property;
-  object_class->set_property = g_data_input_stream_set_property;
+  object_class = XOBJECT_CLASS (klass);
+  object_class->get_property = xdata_input_stream_get_property;
+  object_class->set_property = xdata_input_stream_set_property;
 
   /**
    * xdata_input_stream_t:byte-order:
@@ -84,12 +84,12 @@ g_data_input_stream_class_init (GDataInputStreamClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_BYTE_ORDER,
-                                   g_param_spec_enum ("byte-order",
+                                   xparam_spec_enum ("byte-order",
                                                       P_("Byte order"),
                                                       P_("The byte order"),
                                                       XTYPE_DATA_STREAM_BYTE_ORDER,
                                                       G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN,
-                                                      G_PARAM_READWRITE|G_PARAM_STATIC_NAME|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE|XPARAM_STATIC_NAME|XPARAM_STATIC_BLURB));
 
   /**
    * xdata_input_stream_t:newline-type:
@@ -99,16 +99,16 @@ g_data_input_stream_class_init (GDataInputStreamClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_NEWLINE_TYPE,
-                                   g_param_spec_enum ("newline-type",
+                                   xparam_spec_enum ("newline-type",
                                                       P_("Newline type"),
                                                       P_("The accepted types of line ending"),
                                                       XTYPE_DATA_STREAM_NEWLINE_TYPE,
                                                       G_DATA_STREAM_NEWLINE_TYPE_LF,
-                                                      G_PARAM_READWRITE|G_PARAM_STATIC_NAME|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE|XPARAM_STATIC_NAME|XPARAM_STATIC_BLURB));
 }
 
 static void
-g_data_input_stream_set_property (xobject_t      *object,
+xdata_input_stream_set_property (xobject_t      *object,
 				  xuint_t         prop_id,
 				  const xvalue_t *value,
 				  xparam_spec_t   *pspec)
@@ -120,11 +120,11 @@ g_data_input_stream_set_property (xobject_t      *object,
    switch (prop_id)
     {
     case PROP_BYTE_ORDER:
-      g_data_input_stream_set_byte_order (dstream, xvalue_get_enum (value));
+      xdata_input_stream_set_byte_order (dstream, xvalue_get_enum (value));
       break;
 
     case PROP_NEWLINE_TYPE:
-      g_data_input_stream_set_newline_type (dstream, xvalue_get_enum (value));
+      xdata_input_stream_set_newline_type (dstream, xvalue_get_enum (value));
       break;
 
     default:
@@ -135,12 +135,12 @@ g_data_input_stream_set_property (xobject_t      *object,
 }
 
 static void
-g_data_input_stream_get_property (xobject_t    *object,
+xdata_input_stream_get_property (xobject_t    *object,
                                   xuint_t       prop_id,
                                   xvalue_t     *value,
                                   xparam_spec_t *pspec)
 {
-  GDataInputStreamPrivate *priv;
+  xdata_input_stream_private_t *priv;
   xdata_input_stream_t        *dstream;
 
   dstream = G_DATA_INPUT_STREAM (object);
@@ -163,15 +163,15 @@ g_data_input_stream_get_property (xobject_t    *object,
 
 }
 static void
-g_data_input_stream_init (xdata_input_stream_t *stream)
+xdata_input_stream_init (xdata_input_stream_t *stream)
 {
-  stream->priv = g_data_input_stream_get_instance_private (stream);
+  stream->priv = xdata_input_stream_get_instance_private (stream);
   stream->priv->byte_order = G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN;
   stream->priv->newline_type = G_DATA_STREAM_NEWLINE_TYPE_LF;
 }
 
 /**
- * g_data_input_stream_new:
+ * xdata_input_stream_new:
  * @base_stream: a #xinput_stream_t.
  *
  * Creates a new data input stream for the @base_stream.
@@ -179,11 +179,11 @@ g_data_input_stream_init (xdata_input_stream_t *stream)
  * Returns: a new #xdata_input_stream_t.
  **/
 xdata_input_stream_t *
-g_data_input_stream_new (xinput_stream_t *base_stream)
+xdata_input_stream_new (xinput_stream_t *base_stream)
 {
   xdata_input_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_DATA_INPUT_STREAM,
                          "base-stream", base_stream,
@@ -193,19 +193,19 @@ g_data_input_stream_new (xinput_stream_t *base_stream)
 }
 
 /**
- * g_data_input_stream_set_byte_order:
+ * xdata_input_stream_set_byte_order:
  * @stream: a given #xdata_input_stream_t.
- * @order: a #GDataStreamByteOrder to set.
+ * @order: a #xdata_stream_byte_order_t to set.
  *
  * This function sets the byte order for the given @stream. All subsequent
  * reads from the @stream will be read in the given @order.
  *
  **/
 void
-g_data_input_stream_set_byte_order (xdata_input_stream_t     *stream,
-				    GDataStreamByteOrder  order)
+xdata_input_stream_set_byte_order (xdata_input_stream_t     *stream,
+				    xdata_stream_byte_order_t  order)
 {
-  GDataInputStreamPrivate *priv;
+  xdata_input_stream_private_t *priv;
 
   g_return_if_fail (X_IS_DATA_INPUT_STREAM (stream));
 
@@ -220,25 +220,25 @@ g_data_input_stream_set_byte_order (xdata_input_stream_t     *stream,
 }
 
 /**
- * g_data_input_stream_get_byte_order:
+ * xdata_input_stream_get_byte_order:
  * @stream: a given #xdata_input_stream_t.
  *
  * Gets the byte order for the data input stream.
  *
- * Returns: the @stream's current #GDataStreamByteOrder.
+ * Returns: the @stream's current #xdata_stream_byte_order_t.
  **/
-GDataStreamByteOrder
-g_data_input_stream_get_byte_order (xdata_input_stream_t *stream)
+xdata_stream_byte_order_t
+xdata_input_stream_get_byte_order (xdata_input_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN);
 
   return stream->priv->byte_order;
 }
 
 /**
- * g_data_input_stream_set_newline_type:
+ * xdata_input_stream_set_newline_type:
  * @stream: a #xdata_input_stream_t.
- * @type: the type of new line return as #GDataStreamNewlineType.
+ * @type: the type of new line return as #xdata_stream_newline_type_t.
  *
  * Sets the newline type for the @stream.
  *
@@ -248,10 +248,10 @@ g_data_input_stream_get_byte_order (xdata_input_stream_t *stream)
  *
  **/
 void
-g_data_input_stream_set_newline_type (xdata_input_stream_t       *stream,
-				      GDataStreamNewlineType  type)
+xdata_input_stream_set_newline_type (xdata_input_stream_t       *stream,
+				      xdata_stream_newline_type_t  type)
 {
-  GDataInputStreamPrivate *priv;
+  xdata_input_stream_private_t *priv;
 
   g_return_if_fail (X_IS_DATA_INPUT_STREAM (stream));
 
@@ -266,17 +266,17 @@ g_data_input_stream_set_newline_type (xdata_input_stream_t       *stream,
 }
 
 /**
- * g_data_input_stream_get_newline_type:
+ * xdata_input_stream_get_newline_type:
  * @stream: a given #xdata_input_stream_t.
  *
  * Gets the current newline type for the @stream.
  *
- * Returns: #GDataStreamNewlineType for the given @stream.
+ * Returns: #xdata_stream_newline_type_t for the given @stream.
  **/
-GDataStreamNewlineType
-g_data_input_stream_get_newline_type (xdata_input_stream_t *stream)
+xdata_stream_newline_type_t
+xdata_input_stream_get_newline_type (xdata_input_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), G_DATA_STREAM_NEWLINE_TYPE_ANY);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), G_DATA_STREAM_NEWLINE_TYPE_ANY);
 
   return stream->priv->newline_type;
 }
@@ -316,7 +316,7 @@ read_data (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_byte:
+ * xdata_input_stream_read_byte:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -327,13 +327,13 @@ read_data (xdata_input_stream_t  *stream,
  * if an error occurred.
  **/
 xuchar_t
-g_data_input_stream_read_byte (xdata_input_stream_t  *stream,
+xdata_input_stream_read_byte (xdata_input_stream_t  *stream,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
 {
   xuchar_t c;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), '\0');
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), '\0');
 
   if (read_data (stream, &c, 1, cancellable, error))
       return c;
@@ -343,7 +343,7 @@ g_data_input_stream_read_byte (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_int16:
+ * xdata_input_stream_read_int16:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -351,19 +351,19 @@ g_data_input_stream_read_byte (xdata_input_stream_t  *stream,
  * Reads a 16-bit/2-byte value from @stream.
  *
  * In order to get the correct byte order for this read operation,
- * see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order().
+ * see xdata_input_stream_get_byte_order() and xdata_input_stream_set_byte_order().
  *
  * Returns: a signed 16-bit/2-byte value read from @stream or `0` if
  * an error occurred.
  **/
 gint16
-g_data_input_stream_read_int16 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_int16 (xdata_input_stream_t  *stream,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
 {
   gint16 v;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
   if (read_data (stream, &v, 2, cancellable, error))
     {
@@ -387,7 +387,7 @@ g_data_input_stream_read_int16 (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_uint16:
+ * xdata_input_stream_read_uint16:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -395,19 +395,19 @@ g_data_input_stream_read_int16 (xdata_input_stream_t  *stream,
  * Reads an unsigned 16-bit/2-byte value from @stream.
  *
  * In order to get the correct byte order for this read operation,
- * see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order().
+ * see xdata_input_stream_get_byte_order() and xdata_input_stream_set_byte_order().
  *
  * Returns: an unsigned 16-bit/2-byte value read from the @stream or `0` if
  * an error occurred.
  **/
 xuint16_t
-g_data_input_stream_read_uint16 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_uint16 (xdata_input_stream_t  *stream,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
 {
   xuint16_t v;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
   if (read_data (stream, &v, 2, cancellable, error))
     {
@@ -431,7 +431,7 @@ g_data_input_stream_read_uint16 (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_int32:
+ * xdata_input_stream_read_int32:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -439,7 +439,7 @@ g_data_input_stream_read_uint16 (xdata_input_stream_t  *stream,
  * Reads a signed 32-bit/4-byte value from @stream.
  *
  * In order to get the correct byte order for this read operation,
- * see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order().
+ * see xdata_input_stream_get_byte_order() and xdata_input_stream_set_byte_order().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -449,13 +449,13 @@ g_data_input_stream_read_uint16 (xdata_input_stream_t  *stream,
  * an error occurred.
  **/
 gint32
-g_data_input_stream_read_int32 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_int32 (xdata_input_stream_t  *stream,
 				xcancellable_t       *cancellable,
 				xerror_t            **error)
 {
   gint32 v;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
   if (read_data (stream, &v, 4, cancellable, error))
     {
@@ -479,7 +479,7 @@ g_data_input_stream_read_int32 (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_uint32:
+ * xdata_input_stream_read_uint32:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -487,7 +487,7 @@ g_data_input_stream_read_int32 (xdata_input_stream_t  *stream,
  * Reads an unsigned 32-bit/4-byte value from @stream.
  *
  * In order to get the correct byte order for this read operation,
- * see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order().
+ * see xdata_input_stream_get_byte_order() and xdata_input_stream_set_byte_order().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -497,13 +497,13 @@ g_data_input_stream_read_int32 (xdata_input_stream_t  *stream,
  * an error occurred.
  **/
 xuint32_t
-g_data_input_stream_read_uint32 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_uint32 (xdata_input_stream_t  *stream,
 				 xcancellable_t       *cancellable,
 				 xerror_t            **error)
 {
   xuint32_t v;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
   if (read_data (stream, &v, 4, cancellable, error))
     {
@@ -527,7 +527,7 @@ g_data_input_stream_read_uint32 (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_int64:
+ * xdata_input_stream_read_int64:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -535,7 +535,7 @@ g_data_input_stream_read_uint32 (xdata_input_stream_t  *stream,
  * Reads a 64-bit/8-byte value from @stream.
  *
  * In order to get the correct byte order for this read operation,
- * see g_data_input_stream_get_byte_order() and g_data_input_stream_set_byte_order().
+ * see xdata_input_stream_get_byte_order() and xdata_input_stream_set_byte_order().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -545,13 +545,13 @@ g_data_input_stream_read_uint32 (xdata_input_stream_t  *stream,
  * an error occurred.
  **/
 sint64_t
-g_data_input_stream_read_int64 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_int64 (xdata_input_stream_t  *stream,
 			       xcancellable_t       *cancellable,
 			       xerror_t            **error)
 {
   sint64_t v;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
   if (read_data (stream, &v, 8, cancellable, error))
     {
@@ -575,7 +575,7 @@ g_data_input_stream_read_int64 (xdata_input_stream_t  *stream,
 
 
 /**
- * g_data_input_stream_read_uint64:
+ * xdata_input_stream_read_uint64:
  * @stream: a given #xdata_input_stream_t.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @error: #xerror_t for error reporting.
@@ -583,7 +583,7 @@ g_data_input_stream_read_int64 (xdata_input_stream_t  *stream,
  * Reads an unsigned 64-bit/8-byte value from @stream.
  *
  * In order to get the correct byte order for this read operation,
- * see g_data_input_stream_get_byte_order().
+ * see xdata_input_stream_get_byte_order().
  *
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -593,13 +593,13 @@ g_data_input_stream_read_int64 (xdata_input_stream_t  *stream,
  * an error occurred.
  **/
 xuint64_t
-g_data_input_stream_read_uint64 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_uint64 (xdata_input_stream_t  *stream,
 				xcancellable_t       *cancellable,
 				xerror_t            **error)
 {
   xuint64_t v;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), 0);
 
   if (read_data (stream, &v, 8, cancellable, error))
     {
@@ -628,7 +628,7 @@ scan_for_newline (xdata_input_stream_t *stream,
 		  int              *newline_len_out)
 {
   xbuffered_input_stream_t *bstream;
-  GDataInputStreamPrivate *priv;
+  xdata_input_stream_private_t *priv;
   const char *buffer;
   xsize_t start, end, peeked;
   xsize_t i;
@@ -721,7 +721,7 @@ scan_for_newline (xdata_input_stream_t *stream,
 
 
 /**
- * g_data_input_stream_read_line:
+ * xdata_input_stream_read_line:
  * @stream: a given #xdata_input_stream_t.
  * @length: (out) (optional): a #xsize_t to get the length of the data read in.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -743,7 +743,7 @@ scan_for_newline (xdata_input_stream_t *stream,
  *  %NULL, but @error won't be set.
  **/
 char *
-g_data_input_stream_read_line (xdata_input_stream_t  *stream,
+xdata_input_stream_read_line (xdata_input_stream_t  *stream,
 			       xsize_t             *length,
 			       xcancellable_t      *cancellable,
 			       xerror_t           **error)
@@ -756,7 +756,7 @@ g_data_input_stream_read_line (xdata_input_stream_t  *stream,
   int newline_len;
   char *line;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), NULL);
 
   bstream = G_BUFFERED_INPUT_STREAM (stream);
 
@@ -807,7 +807,7 @@ g_data_input_stream_read_line (xdata_input_stream_t  *stream,
 }
 
 /**
- * g_data_input_stream_read_line_utf8:
+ * xdata_input_stream_read_line_utf8:
  * @stream: a given #xdata_input_stream_t.
  * @length: (out) (optional): a #xsize_t to get the length of the data read in.
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
@@ -830,14 +830,14 @@ g_data_input_stream_read_line (xdata_input_stream_t  *stream,
  * Since: 2.30
  **/
 char *
-g_data_input_stream_read_line_utf8 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_line_utf8 (xdata_input_stream_t  *stream,
 				    xsize_t             *length,
 				    xcancellable_t      *cancellable,
 				    xerror_t           **error)
 {
   char *res;
 
-  res = g_data_input_stream_read_line (stream, length, cancellable, error);
+  res = xdata_input_stream_read_line (stream, length, cancellable, error);
   if (!res)
     return NULL;
 
@@ -892,7 +892,7 @@ scan_for_chars (xdata_input_stream_t *stream,
 }
 
 /**
- * g_data_input_stream_read_until:
+ * xdata_input_stream_read_until:
  * @stream: a given #xdata_input_stream_t.
  * @stop_chars: characters to terminate the read.
  * @length: (out) (optional): a #xsize_t to get the length of the data read in.
@@ -902,24 +902,24 @@ scan_for_chars (xdata_input_stream_t *stream,
  * Reads a string from the data input stream, up to the first
  * occurrence of any of the stop characters.
  *
- * Note that, in contrast to g_data_input_stream_read_until_async(),
+ * Note that, in contrast to xdata_input_stream_read_until_async(),
  * this function consumes the stop character that it finds.
  *
  * Don't use this function in new code.  Its functionality is
- * inconsistent with g_data_input_stream_read_until_async().  Both
+ * inconsistent with xdata_input_stream_read_until_async().  Both
  * functions will be marked as deprecated in a future release.  Use
- * g_data_input_stream_read_upto() instead, but note that that function
+ * xdata_input_stream_read_upto() instead, but note that that function
  * does not consume the stop character.
  *
  * Returns: (transfer full): a string with the data that was read
  *     before encountering any of the stop characters. Set @length to
  *     a #xsize_t to get the length of the string. This function will
  *     return %NULL on an error.
- * Deprecated: 2.56: Use g_data_input_stream_read_upto() instead, which has more
+ * Deprecated: 2.56: Use xdata_input_stream_read_upto() instead, which has more
  *     consistent behaviour regarding the stop character.
  */
 char *
-g_data_input_stream_read_until (xdata_input_stream_t  *stream,
+xdata_input_stream_read_until (xdata_input_stream_t  *stream,
 			       const xchar_t        *stop_chars,
 			       xsize_t              *length,
 			       xcancellable_t       *cancellable,
@@ -930,7 +930,7 @@ g_data_input_stream_read_until (xdata_input_stream_t  *stream,
 
   bstream = G_BUFFERED_INPUT_STREAM (stream);
 
-  result = g_data_input_stream_read_upto (stream, stop_chars, -1,
+  result = xdata_input_stream_read_upto (stream, stop_chars, -1,
                                           length, cancellable, error);
 
   /* If we're not at end of stream then we have a stop_char to consume. */
@@ -940,7 +940,7 @@ g_data_input_stream_read_until (xdata_input_stream_t  *stream,
       xchar_t b;
 
       res = xinput_stream_read (G_INPUT_STREAM (stream), &b, 1, NULL, NULL);
-      g_assert (res == 1);
+      xassert (res == 1);
     }
 
   return result;
@@ -957,7 +957,7 @@ typedef struct
 } GDataInputStreamReadData;
 
 static void
-g_data_input_stream_read_complete (xtask_t *task,
+xdata_input_stream_read_complete (xtask_t *task,
                                    xsize_t  read_length,
                                    xsize_t  skip_length)
 {
@@ -986,7 +986,7 @@ g_data_input_stream_read_complete (xtask_t *task,
 }
 
 static void
-g_data_input_stream_read_line_ready (xobject_t      *object,
+xdata_input_stream_read_line_ready (xobject_t      *object,
                                      xasync_result_t *result,
                                      xpointer_t      user_data)
 {
@@ -1014,7 +1014,7 @@ g_data_input_stream_read_line_ready (xobject_t      *object,
               return;
             }
 
-          g_data_input_stream_read_complete (task, data->checked, 0);
+          xdata_input_stream_read_complete (task, data->checked, 0);
           return;
         }
 
@@ -1048,18 +1048,18 @@ g_data_input_stream_read_line_ready (xobject_t      *object,
       xbuffered_input_stream_fill_async (buffer, -1,
                                           xtask_get_priority (task),
                                           xtask_get_cancellable (task),
-                                          g_data_input_stream_read_line_ready,
+                                          xdata_input_stream_read_line_ready,
                                           user_data);
     }
   else
     {
       /* read the line and the EOL.  no error is possible. */
-      g_data_input_stream_read_complete (task, found_pos, newline_len);
+      xdata_input_stream_read_complete (task, found_pos, newline_len);
     }
 }
 
 static void
-g_data_input_stream_read_data_free (xpointer_t user_data)
+xdata_input_stream_read_data_free (xpointer_t user_data)
 {
   GDataInputStreamReadData *data = user_data;
 
@@ -1068,7 +1068,7 @@ g_data_input_stream_read_data_free (xpointer_t user_data)
 }
 
 static void
-g_data_input_stream_read_async (xdata_input_stream_t    *stream,
+xdata_input_stream_read_async (xdata_input_stream_t    *stream,
                                 const xchar_t         *stop_chars,
                                 xssize_t               stop_chars_len,
                                 xint_t                 io_priority,
@@ -1092,15 +1092,15 @@ g_data_input_stream_read_async (xdata_input_stream_t    *stream,
   data->last_saw_cr = FALSE;
 
   task = xtask_new (stream, cancellable, callback, user_data);
-  xtask_set_source_tag (task, g_data_input_stream_read_async);
-  xtask_set_task_data (task, data, g_data_input_stream_read_data_free);
+  xtask_set_source_tag (task, xdata_input_stream_read_async);
+  xtask_set_task_data (task, data, xdata_input_stream_read_data_free);
   xtask_set_priority (task, io_priority);
 
-  g_data_input_stream_read_line_ready (NULL, NULL, task);
+  xdata_input_stream_read_line_ready (NULL, NULL, task);
 }
 
 static xchar_t *
-g_data_input_stream_read_finish (xdata_input_stream_t  *stream,
+xdata_input_stream_read_finish (xdata_input_stream_t  *stream,
                                  xasync_result_t      *result,
                                  xsize_t             *length,
                                  xerror_t           **error)
@@ -1121,24 +1121,24 @@ g_data_input_stream_read_finish (xdata_input_stream_t  *stream,
 }
 
 /**
- * g_data_input_stream_read_line_async:
+ * xdata_input_stream_read_line_async:
  * @stream: a given #xdata_input_stream_t.
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): optional #xcancellable_t object, %NULL to ignore.
  * @callback: (scope async): callback to call when the request is satisfied.
  * @user_data: (closure): the data to pass to callback function.
  *
- * The asynchronous version of g_data_input_stream_read_line().  It is
+ * The asynchronous version of xdata_input_stream_read_line().  It is
  * an error to have two outstanding calls to this function.
  *
  * When the operation is finished, @callback will be called. You
- * can then call g_data_input_stream_read_line_finish() to get
+ * can then call xdata_input_stream_read_line_finish() to get
  * the result of the operation.
  *
  * Since: 2.20
  */
 void
-g_data_input_stream_read_line_async (xdata_input_stream_t    *stream,
+xdata_input_stream_read_line_async (xdata_input_stream_t    *stream,
                                      xint_t                 io_priority,
                                      xcancellable_t        *cancellable,
                                      xasync_ready_callback_t  callback,
@@ -1147,12 +1147,12 @@ g_data_input_stream_read_line_async (xdata_input_stream_t    *stream,
   g_return_if_fail (X_IS_DATA_INPUT_STREAM (stream));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  g_data_input_stream_read_async (stream, NULL, 0, io_priority,
+  xdata_input_stream_read_async (stream, NULL, 0, io_priority,
                                   cancellable, callback, user_data);
 }
 
 /**
- * g_data_input_stream_read_until_async:
+ * xdata_input_stream_read_until_async:
  * @stream: a given #xdata_input_stream_t.
  * @stop_chars: characters to terminate the read.
  * @io_priority: the [I/O priority][io-priority] of the request
@@ -1160,28 +1160,28 @@ g_data_input_stream_read_line_async (xdata_input_stream_t    *stream,
  * @callback: (scope async): callback to call when the request is satisfied.
  * @user_data: (closure): the data to pass to callback function.
  *
- * The asynchronous version of g_data_input_stream_read_until().
+ * The asynchronous version of xdata_input_stream_read_until().
  * It is an error to have two outstanding calls to this function.
  *
- * Note that, in contrast to g_data_input_stream_read_until(),
+ * Note that, in contrast to xdata_input_stream_read_until(),
  * this function does not consume the stop character that it finds.  You
  * must read it for yourself.
  *
  * When the operation is finished, @callback will be called. You
- * can then call g_data_input_stream_read_until_finish() to get
+ * can then call xdata_input_stream_read_until_finish() to get
  * the result of the operation.
  *
  * Don't use this function in new code.  Its functionality is
- * inconsistent with g_data_input_stream_read_until().  Both functions
+ * inconsistent with xdata_input_stream_read_until().  Both functions
  * will be marked as deprecated in a future release.  Use
- * g_data_input_stream_read_upto_async() instead.
+ * xdata_input_stream_read_upto_async() instead.
  *
  * Since: 2.20
- * Deprecated: 2.56: Use g_data_input_stream_read_upto_async() instead, which
+ * Deprecated: 2.56: Use xdata_input_stream_read_upto_async() instead, which
  *     has more consistent behaviour regarding the stop character.
  */
 void
-g_data_input_stream_read_until_async (xdata_input_stream_t    *stream,
+xdata_input_stream_read_until_async (xdata_input_stream_t    *stream,
                                       const xchar_t         *stop_chars,
                                       xint_t                 io_priority,
                                       xcancellable_t        *cancellable,
@@ -1192,20 +1192,20 @@ g_data_input_stream_read_until_async (xdata_input_stream_t    *stream,
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
   g_return_if_fail (stop_chars != NULL);
 
-  g_data_input_stream_read_async (stream, stop_chars, -1, io_priority,
+  xdata_input_stream_read_async (stream, stop_chars, -1, io_priority,
                                   cancellable, callback, user_data);
 }
 
 /**
- * g_data_input_stream_read_line_finish:
+ * xdata_input_stream_read_line_finish:
  * @stream: a given #xdata_input_stream_t.
  * @result: the #xasync_result_t that was provided to the callback.
  * @length: (out) (optional): a #xsize_t to get the length of the data read in.
  * @error: #xerror_t for error reporting.
  *
  * Finish an asynchronous call started by
- * g_data_input_stream_read_line_async().  Note the warning about
- * string encoding in g_data_input_stream_read_line() applies here as
+ * xdata_input_stream_read_line_async().  Note the warning about
+ * string encoding in xdata_input_stream_read_line() applies here as
  * well.
  *
  * Returns: (nullable) (transfer full) (array zero-terminated=1) (element-type xuint8_t):
@@ -1218,25 +1218,25 @@ g_data_input_stream_read_until_async (xdata_input_stream_t    *stream,
  * Since: 2.20
  */
 xchar_t *
-g_data_input_stream_read_line_finish (xdata_input_stream_t  *stream,
+xdata_input_stream_read_line_finish (xdata_input_stream_t  *stream,
                                       xasync_result_t      *result,
                                       xsize_t             *length,
                                       xerror_t           **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), NULL);
 
-  return g_data_input_stream_read_finish (stream, result, length, error);
+  return xdata_input_stream_read_finish (stream, result, length, error);
 }
 
 /**
- * g_data_input_stream_read_line_finish_utf8:
+ * xdata_input_stream_read_line_finish_utf8:
  * @stream: a given #xdata_input_stream_t.
  * @result: the #xasync_result_t that was provided to the callback.
  * @length: (out) (optional): a #xsize_t to get the length of the data read in.
  * @error: #xerror_t for error reporting.
  *
  * Finish an asynchronous call started by
- * g_data_input_stream_read_line_async().
+ * xdata_input_stream_read_line_async().
  *
  * Returns: (nullable) (transfer full): a string with the line that
  *  was read in (without the newlines).  Set @length to a #xsize_t to
@@ -1248,14 +1248,14 @@ g_data_input_stream_read_line_finish (xdata_input_stream_t  *stream,
  * Since: 2.30
  */
 xchar_t *
-g_data_input_stream_read_line_finish_utf8 (xdata_input_stream_t  *stream,
+xdata_input_stream_read_line_finish_utf8 (xdata_input_stream_t  *stream,
 					   xasync_result_t      *result,
 					   xsize_t             *length,
 					   xerror_t           **error)
 {
   xchar_t *res;
 
-  res = g_data_input_stream_read_line_finish (stream, result, length, error);
+  res = xdata_input_stream_read_line_finish (stream, result, length, error);
   if (!res)
     return NULL;
 
@@ -1271,14 +1271,14 @@ g_data_input_stream_read_line_finish_utf8 (xdata_input_stream_t  *stream,
 }
 
 /**
- * g_data_input_stream_read_until_finish:
+ * xdata_input_stream_read_until_finish:
  * @stream: a given #xdata_input_stream_t.
  * @result: the #xasync_result_t that was provided to the callback.
  * @length: (out) (optional): a #xsize_t to get the length of the data read in.
  * @error: #xerror_t for error reporting.
  *
  * Finish an asynchronous call started by
- * g_data_input_stream_read_until_async().
+ * xdata_input_stream_read_until_async().
  *
  * Since: 2.20
  *
@@ -1286,22 +1286,22 @@ g_data_input_stream_read_line_finish_utf8 (xdata_input_stream_t  *stream,
  *     before encountering any of the stop characters. Set @length to
  *     a #xsize_t to get the length of the string. This function will
  *     return %NULL on an error.
- * Deprecated: 2.56: Use g_data_input_stream_read_upto_finish() instead, which
+ * Deprecated: 2.56: Use xdata_input_stream_read_upto_finish() instead, which
  *     has more consistent behaviour regarding the stop character.
  */
 xchar_t *
-g_data_input_stream_read_until_finish (xdata_input_stream_t  *stream,
+xdata_input_stream_read_until_finish (xdata_input_stream_t  *stream,
                                        xasync_result_t      *result,
                                        xsize_t             *length,
                                        xerror_t           **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), NULL);
 
-  return g_data_input_stream_read_finish (stream, result, length, error);
+  return xdata_input_stream_read_finish (stream, result, length, error);
 }
 
 /**
- * g_data_input_stream_read_upto:
+ * xdata_input_stream_read_upto:
  * @stream: a #xdata_input_stream_t
  * @stop_chars: characters to terminate the read
  * @stop_chars_len: length of @stop_chars. May be -1 if @stop_chars is
@@ -1313,10 +1313,10 @@ g_data_input_stream_read_until_finish (xdata_input_stream_t  *stream,
  * Reads a string from the data input stream, up to the first
  * occurrence of any of the stop characters.
  *
- * In contrast to g_data_input_stream_read_until(), this function
+ * In contrast to xdata_input_stream_read_until(), this function
  * does not consume the stop character. You have to use
- * g_data_input_stream_read_byte() to get it before calling
- * g_data_input_stream_read_upto() again.
+ * xdata_input_stream_read_byte() to get it before calling
+ * xdata_input_stream_read_upto() again.
  *
  * Note that @stop_chars may contain '\0' if @stop_chars_len is
  * specified.
@@ -1331,7 +1331,7 @@ g_data_input_stream_read_until_finish (xdata_input_stream_t  *stream,
  * Since: 2.26
  */
 char *
-g_data_input_stream_read_upto (xdata_input_stream_t  *stream,
+xdata_input_stream_read_upto (xdata_input_stream_t  *stream,
                                const xchar_t       *stop_chars,
                                xssize_t             stop_chars_len,
                                xsize_t             *length,
@@ -1345,7 +1345,7 @@ g_data_input_stream_read_upto (xdata_input_stream_t  *stream,
   char *data_until;
   xsize_t stop_chars_len_unsigned;
 
-  g_return_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_DATA_INPUT_STREAM (stream), NULL);
 
   if (stop_chars_len < 0)
     stop_chars_len_unsigned = strlen (stop_chars);
@@ -1398,7 +1398,7 @@ g_data_input_stream_read_upto (xdata_input_stream_t  *stream,
 }
 
 /**
- * g_data_input_stream_read_upto_async:
+ * xdata_input_stream_read_upto_async:
  * @stream: a #xdata_input_stream_t
  * @stop_chars: characters to terminate the read
  * @stop_chars_len: length of @stop_chars. May be -1 if @stop_chars is
@@ -1408,25 +1408,25 @@ g_data_input_stream_read_upto (xdata_input_stream_t  *stream,
  * @callback: (scope async): callback to call when the request is satisfied
  * @user_data: (closure): the data to pass to callback function
  *
- * The asynchronous version of g_data_input_stream_read_upto().
+ * The asynchronous version of xdata_input_stream_read_upto().
  * It is an error to have two outstanding calls to this function.
  *
- * In contrast to g_data_input_stream_read_until(), this function
+ * In contrast to xdata_input_stream_read_until(), this function
  * does not consume the stop character. You have to use
- * g_data_input_stream_read_byte() to get it before calling
- * g_data_input_stream_read_upto() again.
+ * xdata_input_stream_read_byte() to get it before calling
+ * xdata_input_stream_read_upto() again.
  *
  * Note that @stop_chars may contain '\0' if @stop_chars_len is
  * specified.
  *
  * When the operation is finished, @callback will be called. You
- * can then call g_data_input_stream_read_upto_finish() to get
+ * can then call xdata_input_stream_read_upto_finish() to get
  * the result of the operation.
  *
  * Since: 2.26
  */
 void
-g_data_input_stream_read_upto_async (xdata_input_stream_t    *stream,
+xdata_input_stream_read_upto_async (xdata_input_stream_t    *stream,
                                      const xchar_t         *stop_chars,
                                      xssize_t               stop_chars_len,
                                      xint_t                 io_priority,
@@ -1438,23 +1438,23 @@ g_data_input_stream_read_upto_async (xdata_input_stream_t    *stream,
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
   g_return_if_fail (stop_chars != NULL);
 
-  g_data_input_stream_read_async (stream, stop_chars, stop_chars_len, io_priority,
+  xdata_input_stream_read_async (stream, stop_chars, stop_chars_len, io_priority,
                                   cancellable, callback, user_data);
 }
 
 /**
- * g_data_input_stream_read_upto_finish:
+ * xdata_input_stream_read_upto_finish:
  * @stream: a #xdata_input_stream_t
  * @result: the #xasync_result_t that was provided to the callback
  * @length: (out) (optional): a #xsize_t to get the length of the data read in
  * @error: #xerror_t for error reporting
  *
  * Finish an asynchronous call started by
- * g_data_input_stream_read_upto_async().
+ * xdata_input_stream_read_upto_async().
  *
  * Note that this function does not consume the stop character. You
- * have to use g_data_input_stream_read_byte() to get it before calling
- * g_data_input_stream_read_upto_async() again.
+ * have to use xdata_input_stream_read_byte() to get it before calling
+ * xdata_input_stream_read_upto_async() again.
  *
  * The returned string will always be nul-terminated on success.
  *
@@ -1466,12 +1466,12 @@ g_data_input_stream_read_upto_async (xdata_input_stream_t    *stream,
  * Since: 2.24
  */
 xchar_t *
-g_data_input_stream_read_upto_finish (xdata_input_stream_t  *stream,
+xdata_input_stream_read_upto_finish (xdata_input_stream_t  *stream,
                                       xasync_result_t      *result,
                                       xsize_t             *length,
                                       xerror_t           **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), NULL);
 
-  return g_data_input_stream_read_finish (stream, result, length, error);
+  return xdata_input_stream_read_finish (stream, result, length, error);
 }

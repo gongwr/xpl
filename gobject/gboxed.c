@@ -36,7 +36,7 @@
  * SECTION:gboxed
  * @short_description: A mechanism to wrap opaque C structures registered
  *     by the type system
- * @see_also: #GParamSpecBoxed, g_param_spec_boxed()
+ * @see_also: #GParamSpecBoxed, xparam_spec_boxed()
  * @title: Boxed Types
  *
  * #GBoxed is a generic wrapper mechanism for arbitrary C structures.
@@ -120,7 +120,7 @@ _xboxed_type_init (void)
    */
   type = xtype_register_fundamental (XTYPE_BOXED, g_intern_static_string ("GBoxed"), &info, &finfo,
 				      XTYPE_FLAG_ABSTRACT | XTYPE_FLAG_VALUE_ABSTRACT);
-  g_assert (type == XTYPE_BOXED);
+  xassert (type == XTYPE_BOXED);
 }
 
 static xstring_t *
@@ -262,7 +262,7 @@ boxed_proxy_lcopy_value (const xvalue_t *value,
 {
   xpointer_t *boxed_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (boxed_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (boxed_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   if (!value->data[0].v_pointer)
     *boxed_p = NULL;
@@ -321,10 +321,10 @@ xboxed_type_register_static (const xchar_t   *name,
   };
   xtype_t type;
 
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (boxed_copy != NULL, 0);
-  g_return_val_if_fail (boxed_free != NULL, 0);
-  g_return_val_if_fail (xtype_from_name (name) == 0, 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (boxed_copy != NULL, 0);
+  xreturn_val_if_fail (boxed_free != NULL, 0);
+  xreturn_val_if_fail (xtype_from_name (name) == 0, 0);
 
   type = xtype_register_static (XTYPE_BOXED, name, &type_info, 0);
 
@@ -352,12 +352,12 @@ xboxed_copy (xtype_t         boxed_type,
   xtype_value_table_t *value_table;
   xpointer_t dest_boxed;
 
-  g_return_val_if_fail (XTYPE_IS_BOXED (boxed_type), NULL);
-  g_return_val_if_fail (XTYPE_IS_ABSTRACT (boxed_type) == FALSE, NULL);
-  g_return_val_if_fail (src_boxed != NULL, NULL);
+  xreturn_val_if_fail (XTYPE_IS_BOXED (boxed_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_ABSTRACT (boxed_type) == FALSE, NULL);
+  xreturn_val_if_fail (src_boxed != NULL, NULL);
 
   value_table = xtype_value_table_peek (boxed_type);
-  g_assert (value_table != NULL);
+  xassert (value_table != NULL);
 
   /* check if our proxying implementation is used, we can short-cut here */
   if (value_table->value_copy == boxed_proxy_value_copy)
@@ -414,7 +414,7 @@ xboxed_free (xtype_t    boxed_type,
   g_return_if_fail (boxed != NULL);
 
   value_table = xtype_value_table_peek (boxed_type);
-  g_assert (value_table != NULL);
+  xassert (value_table != NULL);
 
   /* check if our proxying implementation is used, we can short-cut here */
   if (value_table->value_free == boxed_proxy_value_free)
@@ -441,8 +441,8 @@ xboxed_free (xtype_t    boxed_type,
 xpointer_t
 xvalue_get_boxed (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_BOXED (value), NULL);
-  g_return_val_if_fail (XTYPE_IS_VALUE (G_VALUE_TYPE (value)), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_BOXED (value), NULL);
+  xreturn_val_if_fail (XTYPE_IS_VALUE (G_VALUE_TYPE (value)), NULL);
 
   return value->data[0].v_pointer;
 }
@@ -461,8 +461,8 @@ xvalue_get_boxed (const xvalue_t *value)
 xpointer_t
 xvalue_dup_boxed (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_BOXED (value), NULL);
-  g_return_val_if_fail (XTYPE_IS_VALUE (G_VALUE_TYPE (value)), NULL);
+  xreturn_val_if_fail (G_VALUE_HOLDS_BOXED (value), NULL);
+  xreturn_val_if_fail (XTYPE_IS_VALUE (G_VALUE_TYPE (value)), NULL);
 
   return value->data[0].v_pointer ? xboxed_copy (G_VALUE_TYPE (value), value->data[0].v_pointer) : NULL;
 }

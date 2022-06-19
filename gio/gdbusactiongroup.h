@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_DBUS_ACTION_GROUP                            (xdbus_action_group_get_type ())
 #define G_DBUS_ACTION_GROUP(inst)                           (XTYPE_CHECK_INSTANCE_CAST ((inst),                     \
-                                                             XTYPE_DBUS_ACTION_GROUP, xdbus_action_group))
+                                                             XTYPE_DBUS_ACTION_GROUP, xdbus_action_group_t))
 #define G_DBUS_ACTION_GROUP_CLASS(class)                    (XTYPE_CHECK_CLASS_CAST ((class),                       \
                                                              XTYPE_DBUS_ACTION_GROUP, xdbus_action_group_class_t))
 #define X_IS_DBUS_ACTION_GROUP(inst)                        (XTYPE_CHECK_INSTANCE_TYPE ((inst),                     \

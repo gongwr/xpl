@@ -202,7 +202,7 @@ typedef struct {
 typedef xmenu_model_class_t RandomMenuClass;
 
 static xtype_t random_menu_get_type (void);
-G_DEFINE_TYPE (RandomMenu, random_menu, XTYPE_MENU_MODEL)
+XDEFINE_TYPE (RandomMenu, random_menu, XTYPE_MENU_MODEL)
 
 static xboolean_t
 random_menu_is_mutable (xmenu_model_t *model)
@@ -249,7 +249,7 @@ random_menu_finalize (xobject_t *object)
 
   g_sequence_free (menu->items);
 
-  G_OBJECT_CLASS (random_menu_parent_class)
+  XOBJECT_CLASS (random_menu_parent_class)
     ->finalize (object);
 }
 
@@ -261,7 +261,7 @@ random_menu_init (RandomMenu *menu)
 static void
 random_menu_class_init (xmenu_model_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   class->is_mutable = random_menu_is_mutable;
   class->get_n_items = random_menu_get_n_items;
@@ -378,7 +378,7 @@ typedef struct {
 typedef xmenu_model_class_t MirrorMenuClass;
 
 static xtype_t mirror_menu_get_type (void);
-G_DEFINE_TYPE (MirrorMenu, mirror_menu, XTYPE_MENU_MODEL)
+XDEFINE_TYPE (MirrorMenu, mirror_menu, XTYPE_MENU_MODEL)
 
 static xboolean_t
 mirror_menu_is_mutable (xmenu_model_t *model)
@@ -431,7 +431,7 @@ mirror_menu_finalize (xobject_t *object)
   g_sequence_free (menu->items);
   xobject_unref (menu->clone_of);
 
-  G_OBJECT_CLASS (mirror_menu_parent_class)
+  XOBJECT_CLASS (mirror_menu_parent_class)
     ->finalize (object);
 }
 
@@ -443,7 +443,7 @@ mirror_menu_init (MirrorMenu *menu)
 static void
 mirror_menu_class_init (xmenu_model_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   class->is_mutable = mirror_menu_is_mutable;
   class->get_n_items = mirror_menu_get_n_items;
@@ -466,7 +466,7 @@ mirror_menu_changed (xmenu_model_t *model,
   GSequenceIter *point;
   xint_t i;
 
-  g_assert (model == menu->clone_of);
+  xassert (model == menu->clone_of);
 
   point = g_sequence_get_iter_at_pos (menu->items, position + removed);
 
@@ -639,7 +639,7 @@ assert_menuitem_equal (xmenu_item_t  *item,
       xvariant_t *item_value;
 
       item_value = xmenu_item_get_attribute_value (item, name, xvariant_get_type (value));
-      g_assert (item_value && xvariant_equal (item_value, value));
+      xassert (item_value && xvariant_equal (item_value, value));
 
       xvariant_unref (item_value);
       xvariant_unref (value);
@@ -651,7 +651,7 @@ assert_menuitem_equal (xmenu_item_t  *item,
       xmenu_model_t *item_linked_model;
 
       item_linked_model = xmenu_item_get_link (item, name);
-      g_assert (linked_model == item_linked_model);
+      xassert (linked_model == item_linked_model);
 
       xobject_unref (item_linked_model);
       xobject_unref (linked_model);
@@ -780,7 +780,7 @@ static void
 create_service_loop (xmain_context_t   *service_context,
                      PeerConnection *data)
 {
-  g_assert (data->service_loop == NULL);
+  xassert (data->service_loop == NULL);
   g_mutex_lock (&data->service_loop_lock);
   data->service_loop = xmain_loop_new (service_context, FALSE);
   g_cond_broadcast (&data->service_loop_cond);
@@ -896,7 +896,7 @@ peer_connection_up (PeerConnection *data)
                                        service_thread_func,
                                        data);
   await_service_loop (data);
-  g_assert (data->server != NULL);
+  xassert (data->server != NULL);
 
   /* bring up a connection and accept it */
   error = NULL;
@@ -907,7 +907,7 @@ peer_connection_up (PeerConnection *data)
                                             NULL, /* cancellable */
                                             &error);
   g_assert_no_error (error);
-  g_assert (data->client_connection != NULL);
+  xassert (data->client_connection != NULL);
   await_server_connection (data);
 }
 
@@ -1046,7 +1046,7 @@ stop_loop (xpointer_t data)
 
   xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1265,19 +1265,19 @@ test_attributes (void)
   g_assert_cmpint (xmenu_model_get_n_items (XMENU_MODEL (menu)), ==, 1);
 
   v = xmenu_model_get_item_attribute_value (XMENU_MODEL (menu), 0, "boolean", NULL);
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN));
   xvariant_unref (v);
 
   v = xmenu_model_get_item_attribute_value (XMENU_MODEL (menu), 0, "string", NULL);
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
   xvariant_unref (v);
 
   v = xmenu_model_get_item_attribute_value (XMENU_MODEL (menu), 0, "double", NULL);
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_DOUBLE));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_DOUBLE));
   xvariant_unref (v);
 
   v = xmenu_model_get_item_attribute_value (XMENU_MODEL (menu), 0, "complex", NULL);
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE("a(si)")));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE("a(si)")));
   xvariant_unref (v);
 
   xmenu_remove_all (menu);
@@ -1322,22 +1322,22 @@ test_attribute_iter (void)
   g_assert_cmpint (xhash_table_size (found), ==, 6);
 
   v = xhash_table_lookup (found, "label");
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
 
   v = xhash_table_lookup (found, "boolean");
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_BOOLEAN));
 
   v = xhash_table_lookup (found, "string");
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
 
   v = xhash_table_lookup (found, "double");
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_DOUBLE));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_DOUBLE));
 
   v = xhash_table_lookup (found, "complex");
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE("a(si)")));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE("a(si)")));
 
   v = xhash_table_lookup (found, "test-123");
-  g_assert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
+  xassert (xvariant_is_of_type (v, G_VARIANT_TYPE_STRING));
 
   xhash_table_unref (found);
 
@@ -1380,19 +1380,19 @@ test_links (void)
   g_assert_cmpint (xmenu_model_get_n_items (XMENU_MODEL (menu)), ==, 4);
 
   x = xmenu_model_get_item_link (XMENU_MODEL (menu), 0, "section");
-  g_assert (x == m);
+  xassert (x == m);
   xobject_unref (x);
 
   x = xmenu_model_get_item_link (XMENU_MODEL (menu), 1, "submenu");
-  g_assert (x == m);
+  xassert (x == m);
   xobject_unref (x);
 
   x = xmenu_model_get_item_link (XMENU_MODEL (menu), 2, "wallet");
-  g_assert (x == m);
+  xassert (x == m);
   xobject_unref (x);
 
   x = xmenu_model_get_item_link (XMENU_MODEL (menu), 3, "purse");
-  g_assert (x == NULL);
+  xassert (x == NULL);
 
   xobject_unref (m);
   xobject_unref (menu);
@@ -1406,9 +1406,9 @@ test_mutable (void)
   menu = xmenu_new ();
   xmenu_append (menu, "test", "test");
 
-  g_assert (xmenu_model_is_mutable (XMENU_MODEL (menu)));
+  xassert (xmenu_model_is_mutable (XMENU_MODEL (menu)));
   xmenu_freeze (menu);
-  g_assert (!xmenu_model_is_mutable (XMENU_MODEL (menu)));
+  xassert (!xmenu_model_is_mutable (XMENU_MODEL (menu)));
 
   xobject_unref (menu);
 }
@@ -1480,12 +1480,12 @@ test_menuitem (void)
   xmenu_item_set_icon (item, icon);
   xobject_unref (icon);
 
-  g_assert (xmenu_item_get_attribute (item, "attribute", "b", &b));
-  g_assert (b);
+  xassert (xmenu_item_get_attribute (item, "attribute", "b", &b));
+  xassert (b);
 
   xmenu_item_set_action_and_target (item, "action", "(bs)", TRUE, "string");
-  g_assert (xmenu_item_get_attribute (item, "target", "(bs)", &b, &s));
-  g_assert (b);
+  xassert (xmenu_item_get_attribute (item, "target", "(bs)", &b, &s));
+  xassert (b);
   g_assert_cmpstr (s, ==, "string");
   g_free (s);
 

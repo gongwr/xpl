@@ -146,14 +146,14 @@ enum
 
 static xuint_t signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE (xdbus_auth_observer, xdbus_auth_observer, XTYPE_OBJECT)
+XDEFINE_TYPE (xdbus_auth_observer, xdbus_auth_observer, XTYPE_OBJECT)
 
 /* ---------------------------------------------------------------------------------------------------- */
 
 static void
 xdbus_auth_observer_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (xdbus_auth_observer_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdbus_auth_observer_parent_class)->finalize (object);
 }
 
 static xboolean_t
@@ -174,9 +174,9 @@ xdbus_auth_observer_allow_mechanism_real (xdbus_auth_observer_t  *observer,
 static void
 xdbus_auth_observer_class_init (GDBusAuthObserverClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xdbus_auth_observer_finalize;
+  xobject_class->finalize = xdbus_auth_observer_finalize;
 
   klass->authorize_authenticated_peer = xdbus_auth_observer_authorize_authenticated_peer_real;
   klass->allow_mechanism = xdbus_auth_observer_allow_mechanism_real;

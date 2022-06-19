@@ -34,7 +34,7 @@ typedef struct
 } GContextSpecificSource;
 
 static xboolean_t
-g_context_specific_source_dispatch (xsource_t     *source,
+xcontext_specific_source_dispatch (xsource_t     *source,
                                     xsource_func_t  callback,
                                     xpointer_t     user_data)
 {
@@ -43,7 +43,7 @@ g_context_specific_source_dispatch (xsource_t     *source,
 
   g_mutex_lock (&css->lock);
 
-  g_assert (!g_queue_is_empty (&css->pending));
+  xassert (!g_queue_is_empty (&css->pending));
   signal_id = GPOINTER_TO_UINT (g_queue_pop_head (&css->pending));
 
   if (g_queue_is_empty (&css->pending))
@@ -57,7 +57,7 @@ g_context_specific_source_dispatch (xsource_t     *source,
 }
 
 static void
-g_context_specific_source_finalize (xsource_t *source)
+xcontext_specific_source_finalize (xsource_t *source)
 {
   GContextSpecificSource *css = (GContextSpecificSource *) source;
 
@@ -66,14 +66,14 @@ g_context_specific_source_finalize (xsource_t *source)
 }
 
 static GContextSpecificSource *
-g_context_specific_source_new (const xchar_t *name,
+xcontext_specific_source_new (const xchar_t *name,
                                xpointer_t     instance)
 {
   static xsource_funcs_t source_funcs = {
     NULL,
     NULL,
-    g_context_specific_source_dispatch,
-    g_context_specific_source_finalize,
+    xcontext_specific_source_dispatch,
+    xcontext_specific_source_finalize,
     NULL, NULL
   };
   GContextSpecificSource *css;
@@ -92,9 +92,9 @@ g_context_specific_source_new (const xchar_t *name,
 }
 
 static xboolean_t
-g_context_specific_group_change_state (xpointer_t user_data)
+xcontext_specific_group_change_state (xpointer_t user_data)
 {
-  GContextSpecificGroup *group = user_data;
+  xcontext_specific_group_t *group = user_data;
 
   g_mutex_lock (&group->lock);
 
@@ -126,7 +126,7 @@ g_context_specific_group_change_state (xpointer_t user_data)
  *    example)
  */
 static void
-g_context_specific_group_request_state (GContextSpecificGroup *group,
+xcontext_specific_group_request_state (xcontext_specific_group_t *group,
                                         xboolean_t               requested_state,
                                         xcallback_t              requested_func)
 {
@@ -135,7 +135,7 @@ g_context_specific_group_request_state (GContextSpecificGroup *group,
       if (group->effective_state != group->requested_state)
         {
           /* abort the currently pending state transition */
-          g_assert (group->effective_state == requested_state);
+          xassert (group->effective_state == requested_state);
 
           group->requested_state = requested_state;
           group->requested_func = NULL;
@@ -147,7 +147,7 @@ g_context_specific_group_request_state (GContextSpecificGroup *group,
           group->requested_func = requested_func;
 
           xmain_context_invoke (XPL_PRIVATE_CALL(g_get_worker_context) (),
-                                 g_context_specific_group_change_state, group);
+                                 xcontext_specific_group_change_state, group);
         }
     }
 
@@ -161,12 +161,12 @@ g_context_specific_group_request_state (GContextSpecificGroup *group,
        * that we just created in this thread would have to have been
        * destroyed again (from this thread) before that could happen.
        */
-      g_assert (group->effective_state);
+      xassert (group->effective_state);
     }
 }
 
 xpointer_t
-g_context_specific_group_get (GContextSpecificGroup *group,
+xcontext_specific_group_get (xcontext_specific_group_t *group,
                               xtype_t                  type,
                               xoffset_t                context_offset,
                               xcallback_t              start_func)
@@ -190,7 +190,7 @@ g_context_specific_group_get (GContextSpecificGroup *group,
       xpointer_t instance;
 
       instance = xobject_new (type, NULL);
-      css = g_context_specific_source_new (xtype_name (type), instance);
+      css = xcontext_specific_source_new (xtype_name (type), instance);
       G_STRUCT_MEMBER (xmain_context_t *, instance, context_offset) = xmain_context_ref (context);
       xsource_attach ((xsource_t *) css, context);
 
@@ -200,7 +200,7 @@ g_context_specific_group_get (GContextSpecificGroup *group,
     xobject_ref (css->instance);
 
   if (start_func)
-    g_context_specific_group_request_state (group, TRUE, start_func);
+    xcontext_specific_group_request_state (group, TRUE, start_func);
 
   g_mutex_unlock (&group->lock);
 
@@ -208,7 +208,7 @@ g_context_specific_group_get (GContextSpecificGroup *group,
 }
 
 void
-g_context_specific_group_remove (GContextSpecificGroup *group,
+xcontext_specific_group_remove (xcontext_specific_group_t *group,
                                  xmain_context_t          *context,
                                  xpointer_t               instance,
                                  xcallback_t              stop_func)
@@ -225,15 +225,15 @@ g_context_specific_group_remove (GContextSpecificGroup *group,
   g_mutex_lock (&group->lock);
   css = xhash_table_lookup (group->table, context);
   xhash_table_remove (group->table, context);
-  g_assert (css);
+  xassert (css);
 
   /* stop only if we were the last one */
   if (stop_func && xhash_table_size (group->table) == 0)
-    g_context_specific_group_request_state (group, FALSE, stop_func);
+    xcontext_specific_group_request_state (group, FALSE, stop_func);
 
   g_mutex_unlock (&group->lock);
 
-  g_assert (css->instance == instance);
+  xassert (css->instance == instance);
 
   xsource_destroy ((xsource_t *) css);
   xsource_unref ((xsource_t *) css);
@@ -241,7 +241,7 @@ g_context_specific_group_remove (GContextSpecificGroup *group,
 }
 
 void
-g_context_specific_group_emit (GContextSpecificGroup *group,
+xcontext_specific_group_emit (xcontext_specific_group_t *group,
                                xuint_t                  signal_id)
 {
   g_mutex_lock (&group->lock);

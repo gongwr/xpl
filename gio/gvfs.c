@@ -65,13 +65,13 @@ xvfs_dispose (xobject_t *object)
   g_clear_pointer (&priv->additional_schemes, xhash_table_destroy);
   g_clear_pointer (&priv->supported_schemes, g_free);
 
-  G_OBJECT_CLASS (xvfs_parent_class)->dispose (object);
+  XOBJECT_CLASS (xvfs_parent_class)->dispose (object);
 }
 
 static void
 xvfs_class_init (xvfs_class_t *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
   object_class->dispose = xvfs_dispose;
 }
 
@@ -134,7 +134,7 @@ xvfs_is_active (xvfs_t *vfs)
 {
   xvfs_class_t *class;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), FALSE);
+  xreturn_val_if_fail (X_IS_VFS (vfs), FALSE);
 
   class = XVFS_GET_CLASS (vfs);
 
@@ -158,8 +158,8 @@ xvfs_get_file_for_path (xvfs_t       *vfs,
 {
   xvfs_class_t *class;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
   class = XVFS_GET_CLASS (vfs);
 
@@ -238,8 +238,8 @@ xvfs_get_file_for_uri (xvfs_t       *vfs,
   xvfs_class_t *class;
   xfile_t *ret = NULL;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   class = XVFS_GET_CLASS (vfs);
 
@@ -247,7 +247,7 @@ xvfs_get_file_for_uri (xvfs_t       *vfs,
   if (!ret)
     ret = (* class->get_file_for_uri) (vfs, uri);
 
-  g_assert (ret != NULL);
+  xassert (ret != NULL);
 
   return g_steal_pointer (&ret);
 }
@@ -267,7 +267,7 @@ xvfs_get_supported_uri_schemes (xvfs_t *vfs)
 {
   GVfsPrivate *priv;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), NULL);
+  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
 
   priv = xvfs_get_instance_private (vfs);
 
@@ -325,8 +325,8 @@ xvfs_parse_name (xvfs_t       *vfs,
   xvfs_class_t *class;
   xfile_t *ret;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), NULL);
-  g_return_val_if_fail (parse_name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VFS (vfs), NULL);
+  xreturn_val_if_fail (parse_name != NULL, NULL);
 
   class = XVFS_GET_CLASS (vfs);
 
@@ -440,8 +440,8 @@ xvfs_register_uri_scheme (xvfs_t              *vfs,
   GVfsPrivate *priv;
   GVfsURISchemeData *closure;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), FALSE);
-  g_return_val_if_fail (scheme != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_VFS (vfs), FALSE);
+  xreturn_val_if_fail (scheme != NULL, FALSE);
 
   priv = xvfs_get_instance_private (vfs);
 
@@ -490,8 +490,8 @@ xvfs_unregister_uri_scheme (xvfs_t       *vfs,
   GVfsPrivate *priv;
   xboolean_t res;
 
-  g_return_val_if_fail (X_IS_VFS (vfs), FALSE);
-  g_return_val_if_fail (scheme != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_VFS (vfs), FALSE);
+  xreturn_val_if_fail (scheme != NULL, FALSE);
 
   priv = xvfs_get_instance_private (vfs);
 

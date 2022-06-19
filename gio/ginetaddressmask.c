@@ -130,40 +130,40 @@ xinet_address_mask_dispose (xobject_t *object)
 
   g_clear_object (&mask->priv->addr);
 
-  G_OBJECT_CLASS (xinet_address_mask_parent_class)->dispose (object);
+  XOBJECT_CLASS (xinet_address_mask_parent_class)->dispose (object);
 }
 
 static void
 xinet_address_mask_class_init (xinet_address_mask_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = xinet_address_mask_set_property;
-  gobject_class->get_property = xinet_address_mask_get_property;
-  gobject_class->dispose = xinet_address_mask_dispose;
+  xobject_class->set_property = xinet_address_mask_set_property;
+  xobject_class->get_property = xinet_address_mask_get_property;
+  xobject_class->dispose = xinet_address_mask_dispose;
 
-  xobject_class_install_property (gobject_class, PROP_FAMILY,
-                                   g_param_spec_enum ("family",
+  xobject_class_install_property (xobject_class, PROP_FAMILY,
+                                   xparam_spec_enum ("family",
 						      P_("Address family"),
 						      P_("The address family (IPv4 or IPv6)"),
 						      XTYPE_SOCKET_FAMILY,
 						      XSOCKET_FAMILY_INVALID,
-						      G_PARAM_READABLE |
-                                                      G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_ADDRESS,
-                                   g_param_spec_object ("address",
+						      XPARAM_READABLE |
+                                                      XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_ADDRESS,
+                                   xparam_spec_object ("address",
 							P_("Address"),
 							P_("The base address"),
 							XTYPE_INET_ADDRESS,
-							G_PARAM_READWRITE |
-							G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class, PROP_LENGTH,
-                                   g_param_spec_uint ("length",
+							XPARAM_READWRITE |
+							XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class, PROP_LENGTH,
+                                   xparam_spec_uint ("length",
 						      P_("Length"),
 						      P_("The prefix length"),
 						      0, 128, 0,
-						      G_PARAM_READWRITE |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE |
+						      XPARAM_STATIC_STRINGS));
 }
 
 static xboolean_t
@@ -339,7 +339,7 @@ xinet_address_mask_to_string (xinet_address_mask_t *mask)
 {
   xchar_t *addr_string, *mask_string;
 
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), NULL);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), NULL);
 
   addr_string = xinet_address_to_string (mask->priv->addr);
 
@@ -365,7 +365,7 @@ xinet_address_mask_to_string (xinet_address_mask_t *mask)
 xsocket_family_t
 xinet_address_mask_get_family (xinet_address_mask_t *mask)
 {
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), XSOCKET_FAMILY_INVALID);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), XSOCKET_FAMILY_INVALID);
 
   return xinet_address_get_family (mask->priv->addr);
 }
@@ -383,7 +383,7 @@ xinet_address_mask_get_family (xinet_address_mask_t *mask)
 xinet_address_t *
 xinet_address_mask_get_address (xinet_address_mask_t *mask)
 {
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), NULL);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), NULL);
 
   return mask->priv->addr;
 }
@@ -401,7 +401,7 @@ xinet_address_mask_get_address (xinet_address_mask_t *mask)
 xuint_t
 xinet_address_mask_get_length (xinet_address_mask_t *mask)
 {
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), 0);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), 0);
 
   return mask->priv->length;
 }
@@ -425,8 +425,8 @@ xinet_address_mask_matches (xinet_address_mask_t *mask,
   const xuint8_t *maskbytes, *addrbytes;
   int nbytes, nbits;
 
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), FALSE);
-  g_return_val_if_fail (X_IS_INET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), FALSE);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS (address), FALSE);
 
   if (xinet_address_get_family (mask->priv->addr) !=
       xinet_address_get_family (address))
@@ -465,8 +465,8 @@ xboolean_t
 xinet_address_mask_equal (xinet_address_mask_t  *mask,
 			   xinet_address_mask_t  *mask2)
 {
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), FALSE);
-  g_return_val_if_fail (X_IS_INET_ADDRESS_MASK (mask2), FALSE);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask), FALSE);
+  xreturn_val_if_fail (X_IS_INET_ADDRESS_MASK (mask2), FALSE);
 
   return ((mask->priv->length == mask2->priv->length) &&
 	  xinet_address_equal (mask->priv->addr, mask2->priv->addr));

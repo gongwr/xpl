@@ -2,11 +2,11 @@
 
 typedef struct {
   xobject_t instance;
-} xobj_t;
+} my_obj_t;
 
 typedef struct {
   xobject_class_t parent_class;
-} xobj_class_t;
+} my_obj_class_t;
 
 enum {
   SIGNAL1,
@@ -16,17 +16,17 @@ enum {
 
 xuint_t signals[LAST_SIGNAL];
 
-xtype_t xobj_get_type (void);
+xtype_t my_obj_get_type (void);
 
-G_DEFINE_TYPE (xobj, my_obj, XTYPE_OBJECT)
+XDEFINE_TYPE (my_obj, my_obj, XTYPE_OBJECT)
 
 static void
-xobj_init (xobj_t *o)
+my_obj_init (my_obj_t *o)
 {
 }
 
 static void
-xobj_class_init (xobj_class_t *class)
+my_obj_class_init (my_obj_class_t *class)
 {
   signals[SIGNAL1] =
     xsignal_new ("signal1",
@@ -50,11 +50,11 @@ nop (void)
 static void
 test_connect_many (void)
 {
-  xobj_t *o;
+  my_obj_t *o;
   xdouble_t time_elapsed;
   xint_t i;
 
-  o = xobject_new (xobj_get_type (), NULL);
+  o = xobject_new (my_obj_get_type (), NULL);
 
   g_test_timer_start ();
 
@@ -71,12 +71,12 @@ test_connect_many (void)
 static void
 test_disconnect_many_ordered (void)
 {
-  xobj_t *o;
+  my_obj_t *o;
   xulong_t handlers[HANDLERS];
   xdouble_t time_elapsed;
   xint_t i;
 
-  o = xobject_new (xobj_get_type (), NULL);
+  o = xobject_new (my_obj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -96,12 +96,12 @@ test_disconnect_many_ordered (void)
 static void
 test_disconnect_many_inverse (void)
 {
-  xobj_t *o;
+  my_obj_t *o;
   xulong_t handlers[HANDLERS];
   xdouble_t time_elapsed;
   xint_t i;
 
-  o = xobject_new (xobj_get_type (), NULL);
+  o = xobject_new (my_obj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -121,13 +121,13 @@ test_disconnect_many_inverse (void)
 static void
 test_disconnect_many_random (void)
 {
-  xobj_t *o;
+  my_obj_t *o;
   xulong_t handlers[HANDLERS];
   xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o = xobject_new (xobj_get_type (), NULL);
+  o = xobject_new (my_obj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);
@@ -155,13 +155,13 @@ test_disconnect_many_random (void)
 static void
 test_disconnect_2_signals (void)
 {
-  xobj_t *o;
+  my_obj_t *o;
   xulong_t handlers[HANDLERS];
   xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o = xobject_new (xobj_get_type (), NULL);
+  o = xobject_new (my_obj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     {
@@ -194,15 +194,15 @@ test_disconnect_2_signals (void)
 static void
 test_disconnect_2_objects (void)
 {
-  xobj_t *o1, *o2, *o;
+  my_obj_t *o1, *o2, *o;
   xulong_t handlers[HANDLERS];
-  xobj_t *objects[HANDLERS];
+  my_obj_t *objects[HANDLERS];
   xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o1 = xobject_new (xobj_get_type (), NULL);
-  o2 = xobject_new (xobj_get_type (), NULL);
+  o1 = xobject_new (my_obj_get_type (), NULL);
+  o2 = xobject_new (my_obj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     {
@@ -245,13 +245,13 @@ test_disconnect_2_objects (void)
 static void
 test_block_many (void)
 {
-  xobj_t *o;
+  my_obj_t *o;
   xulong_t handlers[HANDLERS];
   xulong_t id;
   xdouble_t time_elapsed;
   xint_t i, j;
 
-  o = xobject_new (xobj_get_type (), NULL);
+  o = xobject_new (my_obj_get_type (), NULL);
 
   for (i = 0; i < HANDLERS; i++)
     handlers[i] = xsignal_connect (o, "signal1", G_CALLBACK (nop), NULL);

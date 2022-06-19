@@ -50,11 +50,11 @@ typedef xsize_t xtype_t;
  * |[
  * xobject_class_install_property (object_class,
  *                                  PROP_AUTHORS,
- *                                  g_param_spec_boxed ("authors",
+ *                                  xparam_spec_boxed ("authors",
  *                                                      _("Authors"),
  *                                                      _("List of authors"),
  *                                                      XTYPE_STRV,
- *                                                      G_PARAM_READWRITE));
+ *                                                      XPARAM_READWRITE));
  *
  * xchar_t *authors[] = { "Owen", "Tim", NULL };
  * xobject_set (obj, "authors", authors, NULL);

@@ -127,7 +127,7 @@ test_type (xconstpointer data)
       if (pspec->owner_type != type)
 	continue;
 
-      if ((pspec->flags & G_PARAM_READABLE) == 0)
+      if ((pspec->flags & XPARAM_READABLE) == 0)
 	continue;
 
       if (xtype_is_a (type, XTYPE_APPLICATION) &&
@@ -153,7 +153,7 @@ test_type (xconstpointer data)
 
       if (g_test_verbose ())
         g_printerr ("Property %s.%s\n", xtype_name (pspec->owner_type), pspec->name);
-      xvalue_init (&value, G_PARAM_SPEC_VALUE_TYPE (pspec));
+      xvalue_init (&value, XPARAM_SPEC_VALUE_TYPE (pspec));
       xobject_get_property (instance, pspec->name, &value);
       check_property ("Property", pspec, &value);
       xvalue_unset (&value);

@@ -83,15 +83,15 @@ xdummy_file_finalize (xobject_t *object)
 
   g_free (dummy->text_uri);
 
-  G_OBJECT_CLASS (xdummy_file_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdummy_file_parent_class)->finalize (object);
 }
 
 static void
 xdummy_file_class_init (xdummy_file_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xdummy_file_finalize;
+  xobject_class->finalize = xdummy_file_finalize;
 }
 
 static void
@@ -104,7 +104,7 @@ _xdummy_file_new (const char *uri)
 {
   xdummy_file_t *dummy;
 
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   dummy = xobject_new (XTYPE_DUMMY_FILE, NULL);
   dummy->text_uri = xstrdup (uri);

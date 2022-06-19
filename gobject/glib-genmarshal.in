@@ -336,7 +336,7 @@ IN_ARGS = {
         'signal': 'PARAM',
         'ctype': 'xpointer_t',
         'getter': 'g_marshal_value_peek_param',
-        'box': ['g_param_spec_ref', 'g_param_spec_unref'],
+        'box': ['xparam_spec_ref', 'xparam_spec_unref'],
         'static-check': True,
     },
     'BOXED': {

@@ -56,20 +56,20 @@ struct _test_object_class
   xobject_class_t parent_class;
 };
 
-G_DEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
+XDEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
 
 static void
 test_object_finalize (xobject_t *object)
 {
   object_destroyed = TRUE;
 
-  G_OBJECT_CLASS (test_object_parent_class)->finalize (object);
+  XOBJECT_CLASS (test_object_parent_class)->finalize (object);
 }
 
 static void
 test_object_class_init (test_object_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = test_object_finalize;
 }
@@ -97,8 +97,8 @@ static void
 weak_ref1 (xpointer_t data,
 	   xobject_t *object)
 {
-  g_assert (object == global_object);
-  g_assert (data == GUINT_TO_POINTER (42));
+  xassert (object == global_object);
+  xassert (data == GUINT_TO_POINTER (42));
 
   weak_ref1_notified = TRUE;
 }
@@ -107,8 +107,8 @@ static void
 weak_ref2 (xpointer_t data,
 	   xobject_t *object)
 {
-  g_assert (object == global_object);
-  g_assert (data == GUINT_TO_POINTER (24));
+  xassert (object == global_object);
+  xassert (data == GUINT_TO_POINTER (24));
 
   weak_ref2_notified = TRUE;
 }
@@ -118,8 +118,8 @@ toggle_ref1 (xpointer_t data,
 	     xobject_t *object,
 	     xboolean_t is_last_ref)
 {
-  g_assert (object == global_object);
-  g_assert (data == GUINT_TO_POINTER (42));
+  xassert (object == global_object);
+  xassert (data == GUINT_TO_POINTER (42));
 
   if (is_last_ref)
     toggle_ref1_weakened = TRUE;
@@ -132,8 +132,8 @@ toggle_ref2 (xpointer_t data,
 	     xobject_t *object,
 	     xboolean_t is_last_ref)
 {
-  g_assert (object == global_object);
-  g_assert (data == GUINT_TO_POINTER (24));
+  xassert (object == global_object);
+  xassert (data == GUINT_TO_POINTER (24));
 
   if (is_last_ref)
     toggle_ref2_weakened = TRUE;
@@ -146,8 +146,8 @@ toggle_ref3 (xpointer_t data,
 	     xobject_t *object,
 	     xboolean_t is_last_ref)
 {
-  g_assert (object == global_object);
-  g_assert (data == GUINT_TO_POINTER (34));
+  xassert (object == global_object);
+  xassert (data == GUINT_TO_POINTER (34));
 
   if (is_last_ref)
     {
@@ -176,8 +176,8 @@ main (int   argc,
 
   clear_flags ();
   xobject_unref (object);
-  g_assert (weak_ref1_notified == TRUE);
-  g_assert (object_destroyed == TRUE);
+  xassert (weak_ref1_notified == TRUE);
+  xassert (object_destroyed == TRUE);
 
   /* test_t two weak references at once
    */
@@ -188,9 +188,9 @@ main (int   argc,
 
   clear_flags ();
   xobject_unref (object);
-  g_assert (weak_ref1_notified == TRUE);
-  g_assert (weak_ref2_notified == TRUE);
-  g_assert (object_destroyed == TRUE);
+  xassert (weak_ref1_notified == TRUE);
+  xassert (weak_ref2_notified == TRUE);
+  xassert (object_destroyed == TRUE);
 
   /* test_t remove weak references
    */
@@ -202,9 +202,9 @@ main (int   argc,
 
   clear_flags ();
   xobject_unref (object);
-  g_assert (weak_ref1_notified == FALSE);
-  g_assert (weak_ref2_notified == TRUE);
-  g_assert (object_destroyed == TRUE);
+  xassert (weak_ref1_notified == FALSE);
+  xassert (weak_ref2_notified == TRUE);
+  xassert (object_destroyed == TRUE);
 
   /* test_t basic toggle reference operation
    */
@@ -214,23 +214,23 @@ main (int   argc,
 
   clear_flags ();
   xobject_unref (object);
-  g_assert (toggle_ref1_weakened == TRUE);
-  g_assert (toggle_ref1_strengthened == FALSE);
-  g_assert (object_destroyed == FALSE);
+  xassert (toggle_ref1_weakened == TRUE);
+  xassert (toggle_ref1_strengthened == FALSE);
+  xassert (object_destroyed == FALSE);
 
   clear_flags ();
   xobject_ref (object);
-  g_assert (toggle_ref1_weakened == FALSE);
-  g_assert (toggle_ref1_strengthened == TRUE);
-  g_assert (object_destroyed == FALSE);
+  xassert (toggle_ref1_weakened == FALSE);
+  xassert (toggle_ref1_strengthened == TRUE);
+  xassert (object_destroyed == FALSE);
 
   xobject_unref (object);
 
   clear_flags ();
   xobject_remove_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
-  g_assert (toggle_ref1_weakened == FALSE);
-  g_assert (toggle_ref1_strengthened == FALSE);
-  g_assert (object_destroyed == TRUE);
+  xassert (toggle_ref1_weakened == FALSE);
+  xassert (toggle_ref1_strengthened == FALSE);
+  xassert (object_destroyed == TRUE);
 
   global_object = object = xobject_new (TEST_TYPE_OBJECT, NULL);
 
@@ -241,28 +241,28 @@ main (int   argc,
 
   clear_flags ();
   xobject_unref (object);
-  g_assert (toggle_ref1_weakened == FALSE);
-  g_assert (toggle_ref1_strengthened == FALSE);
-  g_assert (toggle_ref2_weakened == FALSE);
-  g_assert (toggle_ref2_strengthened == FALSE);
-  g_assert (object_destroyed == FALSE);
+  xassert (toggle_ref1_weakened == FALSE);
+  xassert (toggle_ref1_strengthened == FALSE);
+  xassert (toggle_ref2_weakened == FALSE);
+  xassert (toggle_ref2_strengthened == FALSE);
+  xassert (object_destroyed == FALSE);
 
   clear_flags ();
   xobject_remove_toggle_ref (object, toggle_ref1, GUINT_TO_POINTER (42));
-  g_assert (toggle_ref1_weakened == FALSE);
-  g_assert (toggle_ref1_strengthened == FALSE);
-  g_assert (toggle_ref2_weakened == TRUE);
-  g_assert (toggle_ref2_strengthened == FALSE);
-  g_assert (object_destroyed == FALSE);
+  xassert (toggle_ref1_weakened == FALSE);
+  xassert (toggle_ref1_strengthened == FALSE);
+  xassert (toggle_ref2_weakened == TRUE);
+  xassert (toggle_ref2_strengthened == FALSE);
+  xassert (object_destroyed == FALSE);
 
   clear_flags ();
   /* Check that removing a toggle ref with %NULL data works fine. */
   xobject_remove_toggle_ref (object, toggle_ref2, NULL);
-  g_assert (toggle_ref1_weakened == FALSE);
-  g_assert (toggle_ref1_strengthened == FALSE);
-  g_assert (toggle_ref2_weakened == FALSE);
-  g_assert (toggle_ref2_strengthened == FALSE);
-  g_assert (object_destroyed == TRUE);
+  xassert (toggle_ref1_weakened == FALSE);
+  xassert (toggle_ref1_strengthened == FALSE);
+  xassert (toggle_ref2_weakened == FALSE);
+  xassert (toggle_ref2_strengthened == FALSE);
+  xassert (object_destroyed == TRUE);
 
   /* test_t a toggle reference that removes itself
    */
@@ -272,9 +272,9 @@ main (int   argc,
 
   clear_flags ();
   xobject_unref (object);
-  g_assert (toggle_ref3_weakened == TRUE);
-  g_assert (toggle_ref3_strengthened == FALSE);
-  g_assert (object_destroyed == TRUE);
+  xassert (toggle_ref3_weakened == TRUE);
+  xassert (toggle_ref3_strengthened == FALSE);
+  xassert (object_destroyed == TRUE);
 
   return 0;
 }

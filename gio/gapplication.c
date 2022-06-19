@@ -490,7 +490,7 @@ xapplication_parse_command_line (xapplication_t   *application,
    * local_command_line() should never get invoked more than once
    * anyway.  Add a sanity check just to be sure.
    */
-  g_return_val_if_fail (!application->priv->options_parsed, NULL);
+  xreturn_val_if_fail (!application->priv->options_parsed, NULL);
 
   context = g_option_context_new (application->priv->parameter_string);
   g_option_context_set_summary (context, application->priv->summary);
@@ -1337,7 +1337,7 @@ xapplication_constructed (xobject_t *object)
     xapplication_set_default (application);
 
   /* People should not set properties from _init... */
-  g_assert (application->priv->resource_path == NULL);
+  xassert (application->priv->resource_path == NULL);
 
   if (application->priv->id != NULL)
     {
@@ -1370,7 +1370,7 @@ xapplication_dispose (xobject_t *object)
       warned = TRUE;
     }
 
-  G_OBJECT_CLASS (xapplication_parent_class)->dispose (object);
+  XOBJECT_CLASS (xapplication_parent_class)->dispose (object);
 }
 
 static void
@@ -1410,7 +1410,7 @@ xapplication_finalize (xobject_t *object)
 
   g_free (application->priv->resource_path);
 
-  G_OBJECT_CLASS (xapplication_parent_class)
+  XOBJECT_CLASS (xapplication_parent_class)
     ->finalize (object);
 }
 
@@ -1451,7 +1451,7 @@ xapplication_handle_local_options_accumulator (xsignal_invocation_hint_t *ihint,
 static void
 xapplication_class_init (xapplication_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->constructed = xapplication_constructed;
   object_class->dispose = xapplication_dispose;
@@ -1474,50 +1474,50 @@ xapplication_class_init (xapplication_class_t *class)
   class->name_lost = xapplication_real_name_lost;
 
   xobject_class_install_property (object_class, PROP_APPLICATION_ID,
-    g_param_spec_string ("application-id",
+    xparam_spec_string ("application-id",
                          P_("Application identifier"),
                          P_("The unique identifier for the application"),
-                         NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT |
-                         G_PARAM_STATIC_STRINGS));
+                         NULL, XPARAM_READWRITE | XPARAM_CONSTRUCT |
+                         XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_FLAGS,
-    g_param_spec_flags ("flags",
+    xparam_spec_flags ("flags",
                         P_("Application flags"),
                         P_("Flags specifying the behaviour of the application"),
                         XTYPE_APPLICATION_FLAGS, G_APPLICATION_FLAGS_NONE,
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                        XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_RESOURCE_BASE_PATH,
-    g_param_spec_string ("resource-base-path",
+    xparam_spec_string ("resource-base-path",
                          P_("Resource base path"),
                          P_("The base resource path for the application"),
-                         NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         NULL, XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_IS_REGISTERED,
-    g_param_spec_boolean ("is-registered",
+    xparam_spec_boolean ("is-registered",
                           P_("Is registered"),
                           P_("If xapplication_register() has been called"),
-                          FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                          FALSE, XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_IS_REMOTE,
-    g_param_spec_boolean ("is-remote",
+    xparam_spec_boolean ("is-remote",
                           P_("Is remote"),
                           P_("If this application instance is remote"),
-                          FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                          FALSE, XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_INACTIVITY_TIMEOUT,
-    g_param_spec_uint ("inactivity-timeout",
+    xparam_spec_uint ("inactivity-timeout",
                        P_("Inactivity timeout"),
                        P_("Time (ms) to stay alive after becoming idle"),
                        0, G_MAXUINT, 0,
-                       G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                       XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_ACTION_GROUP,
-    g_param_spec_object ("action-group",
+    xparam_spec_object ("action-group",
                          P_("Action group"),
                          P_("The group of actions that the application exports"),
                          XTYPE_ACTION_GROUP,
-                         G_PARAM_DEPRECATED | G_PARAM_WRITABLE | G_PARAM_STATIC_STRINGS));
+                         XPARAM_DEPRECATED | XPARAM_WRITABLE | XPARAM_STATIC_STRINGS));
 
   /**
    * xapplication_t:is-busy:
@@ -1528,10 +1528,10 @@ xapplication_class_init (xapplication_class_t *class)
    * Since: 2.44
    */
   xobject_class_install_property (object_class, PROP_IS_BUSY,
-    g_param_spec_boolean ("is-busy",
+    xparam_spec_boolean ("is-busy",
                           P_("Is busy"),
                           P_("If this application is currently marked busy"),
-                          FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                          FALSE, XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
   /**
    * xapplication_t::startup:
@@ -1783,7 +1783,7 @@ xapplication_t *
 xapplication_new (const xchar_t       *application_id,
                    GApplicationFlags  flags)
 {
-  g_return_val_if_fail (application_id == NULL || xapplication_id_is_valid (application_id), NULL);
+  xreturn_val_if_fail (application_id == NULL || xapplication_id_is_valid (application_id), NULL);
 
   return xobject_new (XTYPE_APPLICATION,
                        "application-id", application_id,
@@ -1805,7 +1805,7 @@ xapplication_new (const xchar_t       *application_id,
 const xchar_t *
 xapplication_get_application_id (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), NULL);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), NULL);
 
   return application->priv->id;
 }
@@ -1858,7 +1858,7 @@ xapplication_set_application_id (xapplication_t *application,
 GApplicationFlags
 xapplication_get_flags (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), 0);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), 0);
 
   return application->priv->flags;
 }
@@ -1908,7 +1908,7 @@ xapplication_set_flags (xapplication_t      *application,
 const xchar_t *
 xapplication_get_resource_base_path (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), NULL);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), NULL);
 
   return application->priv->resource_path;
 }
@@ -1987,7 +1987,7 @@ xapplication_set_resource_base_path (xapplication_t *application,
 xuint_t
 xapplication_get_inactivity_timeout (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), 0);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), 0);
 
   return application->priv->inactivity_timeout;
 }
@@ -2038,7 +2038,7 @@ xapplication_set_inactivity_timeout (xapplication_t *application,
 xboolean_t
 xapplication_get_is_registered (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), FALSE);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), FALSE);
 
   return application->priv->is_registered;
 }
@@ -2065,8 +2065,8 @@ xapplication_get_is_registered (xapplication_t *application)
 xboolean_t
 xapplication_get_is_remote (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), FALSE);
-  g_return_val_if_fail (application->priv->is_registered, FALSE);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), FALSE);
+  xreturn_val_if_fail (application->priv->is_registered, FALSE);
 
   return application->priv->is_remote;
 }
@@ -2096,8 +2096,8 @@ xapplication_get_is_remote (xapplication_t *application)
 xdbus_connection_t *
 xapplication_get_dbus_connection (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), FALSE);
-  g_return_val_if_fail (application->priv->is_registered, FALSE);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), FALSE);
+  xreturn_val_if_fail (application->priv->is_registered, FALSE);
 
   return xapplication_impl_get_dbus_connection (application->priv->impl);
 }
@@ -2128,8 +2128,8 @@ xapplication_get_dbus_connection (xapplication_t *application)
 const xchar_t *
 xapplication_get_dbus_object_path (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), FALSE);
-  g_return_val_if_fail (application->priv->is_registered, FALSE);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), FALSE);
+  xreturn_val_if_fail (application->priv->is_registered, FALSE);
 
   return xapplication_impl_get_dbus_object_path (application->priv->impl);
 }
@@ -2182,7 +2182,7 @@ xapplication_register (xapplication_t  *application,
                         xcancellable_t  *cancellable,
                         xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), FALSE);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), FALSE);
 
   if (!application->priv->is_registered)
     {
@@ -2252,7 +2252,7 @@ inactivity_timeout_expired (xpointer_t data)
 
   application->priv->inactivity_timeout_id = 0;
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 
@@ -2451,9 +2451,9 @@ xapplication_run (xapplication_t  *application,
   xmain_context_t *context;
   xboolean_t acquired_context;
 
-  g_return_val_if_fail (X_IS_APPLICATION (application), 1);
-  g_return_val_if_fail (argc == 0 || argv != NULL, 1);
-  g_return_val_if_fail (!application->priv->must_quit_now, 1);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), 1);
+  xreturn_val_if_fail (argc == 0 || argv != NULL, 1);
+  xreturn_val_if_fail (!application->priv->must_quit_now, 1);
 
 #ifdef G_OS_WIN32
   {
@@ -2610,7 +2610,7 @@ xapplication_list_actions (xaction_group_t *action_group)
 {
   xapplication_t *application = G_APPLICATION (action_group);
 
-  g_return_val_if_fail (application->priv->is_registered, NULL);
+  xreturn_val_if_fail (application->priv->is_registered, NULL);
 
   if (application->priv->remote_actions != NULL)
     return xaction_group_list_actions (XACTION_GROUP (application->priv->remote_actions));
@@ -2634,7 +2634,7 @@ xapplication_query_action (xaction_group_t        *group,
 {
   xapplication_t *application = G_APPLICATION (group);
 
-  g_return_val_if_fail (application->priv->is_registered, FALSE);
+  xreturn_val_if_fail (application->priv->is_registered, FALSE);
 
   if (application->priv->remote_actions != NULL)
     return xaction_group_query_action (XACTION_GROUP (application->priv->remote_actions),
@@ -2701,7 +2701,7 @@ xapplication_lookup_action (xaction_map_t  *action_map,
 {
   xapplication_t *application = G_APPLICATION (action_map);
 
-  g_return_val_if_fail (X_IS_ACTION_MAP (application->priv->actions), NULL);
+  xreturn_val_if_fail (X_IS_ACTION_MAP (application->priv->actions), NULL);
 
   return xaction_map_lookup_action (G_ACTION_MAP (application->priv->actions), action_name);
 }
@@ -2897,7 +2897,7 @@ xapplication_unmark_busy (xapplication_t *application)
 xboolean_t
 xapplication_get_is_busy (xapplication_t *application)
 {
-  g_return_val_if_fail (X_IS_APPLICATION (application), FALSE);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), FALSE);
 
   return application->priv->busy_count > 0;
 }

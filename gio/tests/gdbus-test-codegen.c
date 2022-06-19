@@ -66,31 +66,31 @@ test_annotations (void)
   xdbus_property_info_t *property;
 
   iface = foo_igen_bar_interface_info ();
-  g_assert (iface != NULL);
+  xassert (iface != NULL);
 
   /* see meson.build for where these annotations are injected */
   g_assert_cmpint (count_annotations (iface->annotations), ==, 1);
   g_assert_cmpstr (g_dbus_annotation_info_lookup (iface->annotations, "Key1"), ==, "Value1");
 
   method = g_dbus_interface_info_lookup_method (iface, "HelloWorld");
-  g_assert (method != NULL);
+  xassert (method != NULL);
   g_assert_cmpint (count_annotations (method->annotations), ==, 2);
   g_assert_cmpstr (g_dbus_annotation_info_lookup (method->annotations, "ExistingAnnotation"), ==, "blah");
   g_assert_cmpstr (g_dbus_annotation_info_lookup (method->annotations, "Key3"), ==, "Value3");
 
   signal = g_dbus_interface_info_lookup_signal (iface, "TestSignal");
-  g_assert (signal != NULL);
+  xassert (signal != NULL);
   g_assert_cmpint (count_annotations (signal->annotations), ==, 1);
   g_assert_cmpstr (g_dbus_annotation_info_lookup (signal->annotations, "Key4"), ==, "Value4");
   g_assert_cmpstr (g_dbus_annotation_info_lookup (signal->args[1]->annotations, "Key8"), ==, "Value8");
 
   property = g_dbus_interface_info_lookup_property (iface, "ay");
-  g_assert (property != NULL);
+  xassert (property != NULL);
   g_assert_cmpint (count_annotations (property->annotations), ==, 1);
   g_assert_cmpstr (g_dbus_annotation_info_lookup (property->annotations, "Key5"), ==, "Value5");
 
   method = g_dbus_interface_info_lookup_method (iface, "TestPrimitiveTypes");
-  g_assert (method != NULL);
+  xassert (method != NULL);
   g_assert_cmpstr (g_dbus_annotation_info_lookup (method->in_args[4]->annotations, "Key6"), ==, "Value6");
   g_assert_cmpstr (g_dbus_annotation_info_lookup (method->out_args[5]->annotations, "Key7"), ==, "Value7");
 }
@@ -559,7 +559,7 @@ on_bus_acquired (xdbus_connection_t *connection,
   g_dbus_interface_skeleton_set_flags (G_DBUS_INTERFACE_SKELETON (exported_thread_object_1),
                                        G_DBUS_INTERFACE_SKELETON_FLAGS_HANDLE_METHOD_INVOCATIONS_IN_THREAD);
 
-  g_assert (!g_dbus_interface_skeleton_has_connection (G_DBUS_INTERFACE_SKELETON (exported_thread_object_1), connection));
+  xassert (!g_dbus_interface_skeleton_has_connection (G_DBUS_INTERFACE_SKELETON (exported_thread_object_1), connection));
   g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (exported_thread_object_1),
                                     connection,
                                     "/method_threads_1",
@@ -683,10 +683,10 @@ on_test_signal (FooiGenBar          *proxy,
   g_assert_cmpint (val_int32, ==, 43);
   g_assert_cmpstr (array_of_strings[0], ==, "foo");
   g_assert_cmpstr (array_of_strings[1], ==, "bar");
-  g_assert (array_of_strings[2] == NULL);
+  xassert (array_of_strings[2] == NULL);
   g_assert_cmpstr (array_of_bytestrings[0], ==, "foo\xff");
   g_assert_cmpstr (array_of_bytestrings[1], ==, "bar\xff");
-  g_assert (array_of_bytestrings[2] == NULL);
+  xassert (array_of_bytestrings[2] == NULL);
 
   data->received_test_signal = TRUE;
   xmain_loop_quit (data->thread_loop);
@@ -704,7 +704,7 @@ on_property_cancellation_cb (FooiGenBar    *proxy,
   error = NULL;
   ret = foo_igen_bar_call_property_cancellation_finish (proxy, res, &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
   xmain_loop_quit (data->thread_loop);
 }
@@ -775,7 +775,7 @@ check_bar_proxy (FooiGenBar *proxy,
   data->thread_loop = thread_loop;
 
   v = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "y");
-  g_assert (v != NULL);
+  xassert (v != NULL);
   xvariant_unref (v);
 
   /* set empty values to non-empty */
@@ -840,10 +840,10 @@ check_bar_proxy (FooiGenBar *proxy,
   g_free (val_unset_o);
   g_free (val_unset_g);
   g_assert_cmpstr (val_unset_ay, ==, "");
-  g_assert (val_unset_as[0] == NULL);
-  g_assert (val_unset_ao[0] == NULL);
-  g_assert (xvariant_is_of_type (val_unset_ag, G_VARIANT_TYPE ("ag")));
-  g_assert (xvariant_is_of_type (val_unset_struct, G_VARIANT_TYPE ("(idsogayasaoag)")));
+  xassert (val_unset_as[0] == NULL);
+  xassert (val_unset_ao[0] == NULL);
+  xassert (xvariant_is_of_type (val_unset_ag, G_VARIANT_TYPE ("ag")));
+  xassert (xvariant_is_of_type (val_unset_struct, G_VARIANT_TYPE ("(idsogayasaoag)")));
   s = xvariant_print (val_unset_struct, TRUE);
   g_assert_cmpstr (s, ==, "(0, 0.0, '', objectpath '/', signature '', @ay [], @as [], @ao [], @ag [])");
   g_free (s);
@@ -910,7 +910,7 @@ check_bar_proxy (FooiGenBar *proxy,
                                                      NULL, /* xcancellable_t */
                                                      &error);
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
   g_clear_pointer (&ret_val_string, g_free);
   g_clear_pointer (&ret_val_objpath, g_free);
@@ -942,7 +942,7 @@ check_bar_proxy (FooiGenBar *proxy,
                                                          &error);
 
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
   g_assert_nonnull (ret_array_of_strings);
   g_assert_cmpuint (xstrv_length ((xchar_t **) ret_array_of_strings), ==,
@@ -974,7 +974,7 @@ check_bar_proxy (FooiGenBar *proxy,
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
   xerror_free (error);
   error = NULL;
-  g_assert (!ret);
+  xassert (!ret);
 
   xsignal_connect (proxy,
                     "test-signal",
@@ -987,11 +987,11 @@ check_bar_proxy (FooiGenBar *proxy,
   ret = foo_igen_bar_call_request_signal_emission_sync (proxy, 0, NULL, &error);
 #endif
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
-  g_assert (!data->received_test_signal);
+  xassert (!data->received_test_signal);
   xmain_loop_run (thread_loop);
-  g_assert (data->received_test_signal);
+  xassert (data->received_test_signal);
 
   /* Try setting a property. This causes the generated glue to invoke
    * the org.fd.DBus.Properties.Set() method asynchronously. So we
@@ -1010,7 +1010,7 @@ check_bar_proxy (FooiGenBar *proxy,
   g_assert_cmpint (xstrv_length ((xchar_t **) read_as), ==, 2);
   g_assert_cmpstr (read_as[0], ==, "one");
   g_assert_cmpstr (read_as[1], ==, "two");
-  g_assert (read_as == read_as2); /* this is more testing an implementation detail */
+  xassert (read_as == read_as2); /* this is more testing an implementation detail */
   xobject_set (proxy,
                 "as", array_of_strings_2,
                 NULL);
@@ -1045,7 +1045,7 @@ check_bar_proxy (FooiGenBar *proxy,
   ret = foo_igen_bar_call_request_multi_property_mods_sync (proxy, NULL, &error);
 #endif
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
   xmain_loop_run (thread_loop);
   g_assert_cmpint (data->num_g_properties_changed, ==, 2);
   xsignal_handlers_disconnect_by_func (proxy,
@@ -1138,7 +1138,7 @@ on_force_signal (FooiGenBat *proxy,
   xboolean_t *signal_received = user_data;
   xint_t val;
 
-  g_assert (!(*signal_received));
+  xassert (!(*signal_received));
 
   g_assert_cmpint (xvariant_get_int32 (force_i), ==, 42 + 10);
   g_assert_cmpstr (xvariant_get_string (force_s, NULL), ==, "a string_foo");
@@ -1216,7 +1216,7 @@ check_bat_proxy (FooiGenBat *proxy,
   xvariant_unref (ret_ay);
   xvariant_unref (ret_struct);
   _g_assert_signal_received (proxy, "force-signal");
-  g_assert (force_signal_received);
+  xassert (force_signal_received);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1238,7 +1238,7 @@ check_authorize_proxy (FooiGenAuthorize *proxy,
 #endif
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED);
   xerror_free (error);
-  g_assert (!ret);
+  xassert (!ret);
 
   error = NULL;
 #if XPL_VERSION_MIN_REQUIRED >= XPL_VERSION_2_64
@@ -1247,7 +1247,7 @@ check_authorize_proxy (FooiGenAuthorize *proxy,
   ret = foo_igen_authorize_call_check_authorized_sync (proxy, NULL, &error);
 #endif
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
   error = NULL;
 #if XPL_VERSION_MIN_REQUIRED >= XPL_VERSION_2_64
@@ -1257,7 +1257,7 @@ check_authorize_proxy (FooiGenAuthorize *proxy,
 #endif
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_PENDING);
   xerror_free (error);
-  g_assert (!ret);
+  xassert (!ret);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1277,7 +1277,7 @@ get_self_via_proxy (FooiGenMethodThreads *proxy_1)
   ret = foo_igen_method_threads_call_get_self_sync (proxy_1, &self_str, NULL, &error);
 #endif
   g_assert_no_error (error);
-  g_assert (ret);
+  xassert (ret);
 
   g_assert_cmpint (sscanf (self_str, "%p", &self), ==, 1);
 
@@ -1292,10 +1292,10 @@ check_thread_proxies (FooiGenMethodThreads *proxy_1,
                       xmain_loop_t            *thread_loop)
 {
   /* proxy_1 is indeed using threads so should never get the handler thread */
-  g_assert (get_self_via_proxy (proxy_1) != method_handler_thread);
+  xassert (get_self_via_proxy (proxy_1) != method_handler_thread);
 
   /* proxy_2 is not using threads so should get the handler thread */
-  g_assert (get_self_via_proxy (proxy_2) == method_handler_thread);
+  xassert (get_self_via_proxy (proxy_2) == method_handler_thread);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -1413,7 +1413,7 @@ introspect_cb (xdbus_connection_t   *connection,
                                           res,
                                           &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   xvariant_get (result, "(s)", &data->xml);
   xvariant_unref (result);
 
@@ -1448,12 +1448,12 @@ introspect (xdbus_connection_t  *connection,
                           (xasync_ready_callback_t) introspect_cb,
                           data);
   xmain_loop_run (loop);
-  g_assert (data->xml != NULL);
+  xassert (data->xml != NULL);
 
   error = NULL;
   node_info = g_dbus_node_info_new_for_xml (data->xml, &error);
   g_assert_no_error (error);
-  g_assert (node_info != NULL);
+  xassert (node_info != NULL);
   g_free (data->xml);
   g_free (data);
 
@@ -1511,7 +1511,7 @@ om_get_all_cb (xdbus_connection_t *connection,
                                                 res,
                                                 &error);
   g_assert_no_error (error);
-  g_assert (data->result != NULL);
+  xassert (data->result != NULL);
   xmain_loop_quit (data->loop);
 }
 
@@ -1540,7 +1540,7 @@ om_check_get_all (xdbus_connection_t *c,
                           (xasync_ready_callback_t) om_get_all_cb,
                           &data);
   xmain_loop_run (loop);
-  g_assert (data.result != NULL);
+  xassert (data.result != NULL);
   s = xvariant_print (data.result, TRUE);
   g_assert_cmpstr (s, ==, str);
   g_free (s);
@@ -1877,7 +1877,7 @@ om_check_property_and_signal_emission (xmain_loop_t  *loop,
   foo_igen_bar_set_d (skeleton, 1.0);
   foo_igen_bar_set_i (skeleton, 2);
   _g_assert_property_notify (proxy, "i");
-  g_assert (d_changed == FALSE);
+  xassert (d_changed == FALSE);
   xsignal_handler_disconnect (proxy, handler);
 
   /* Verify that re-setting a property with the "EmitsChangedSignal"
@@ -1887,7 +1887,7 @@ om_check_property_and_signal_emission (xmain_loop_t  *loop,
   foo_igen_bar_set_quiet (skeleton, "hush!");
   foo_igen_bar_set_i (skeleton, 3);
   _g_assert_property_notify (proxy, "i");
-  g_assert (quiet_changed == FALSE);
+  xassert (quiet_changed == FALSE);
   g_assert_cmpstr (foo_igen_bar_get_quiet (skeleton), ==, "hush!");
   xsignal_handler_disconnect (proxy, handler);
 
@@ -1898,7 +1898,7 @@ om_check_property_and_signal_emission (xmain_loop_t  *loop,
   foo_igen_bar_set_quiet_too (skeleton, "hush too!");
   foo_igen_bar_set_i (skeleton, 4);
   _g_assert_property_notify (proxy, "i");
-  g_assert (quiet_too_changed == FALSE);
+  xassert (quiet_too_changed == FALSE);
   g_assert_cmpstr (foo_igen_bar_get_quiet_too (skeleton), ==, "hush too!");
   xsignal_handler_disconnect (proxy, handler);
 
@@ -1941,7 +1941,7 @@ check_object_manager (void)
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  g_assert (c != NULL);
+  xassert (c != NULL);
 
   om_signal_id = xdbus_connection_signal_subscribe (c,
                                                      NULL, /* sender */
@@ -1971,25 +1971,25 @@ check_object_manager (void)
                                                 &error);
   g_assert_error (error, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD);
   xerror_free (error);
-  g_assert (pm == NULL);
+  xassert (pm == NULL);
 
   manager = xdbus_object_manager_server_new ("/managed");
 
-  g_assert (xdbus_object_manager_server_get_connection (manager) == NULL);
+  xassert (xdbus_object_manager_server_get_connection (manager) == NULL);
 
   xdbus_object_manager_server_set_connection (manager, c);
 
   g_assert_cmpstr (g_dbus_object_manager_get_object_path (G_DBUS_OBJECT_MANAGER (manager)), ==, "/managed");
   xobject_get (manager, "object-path", &path, "connection", &c2, NULL);
   g_assert_cmpstr (path, ==, "/managed");
-  g_assert (c2 == c);
+  xassert (c2 == c);
   g_free (path);
   g_clear_object (&c2);
 
   /* Check that the manager object is visible */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* ObjectManager + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.freedesktop.DBus.ObjectManager"));
+  xassert (has_interface (info, "org.freedesktop.DBus.ObjectManager"));
   g_assert_cmpint (count_nodes (info), ==, 0);
   g_dbus_node_info_unref (info);
 
@@ -2011,7 +2011,7 @@ check_object_manager (void)
   pm = foo_igen_object_manager_client_new_finish (om_res, &error);
   g_clear_object (&om_res);
   g_assert_no_error (error);
-  g_assert (pm != NULL);
+  xassert (pm != NULL);
   xsignal_connect (pm,
                     "object-added",
                     G_CALLBACK (on_object_proxy_added),
@@ -2033,7 +2033,7 @@ check_object_manager (void)
   g_assert_cmpstr (name, ==, xdbus_connection_get_unique_name (c));
   g_assert_cmpstr (name_owner, ==, xdbus_connection_get_unique_name (c));
   g_assert_cmpint (flags, ==, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE);
-  g_assert (c2 == c);
+  xassert (c2 == c);
   g_free (path);
   g_clear_object (&c2);
   g_free (name);
@@ -2041,28 +2041,28 @@ check_object_manager (void)
 
   /* ... check there are no object proxies yet */
   object_proxies = g_dbus_object_manager_get_objects (pm);
-  g_assert (object_proxies == NULL);
+  xassert (object_proxies == NULL);
 
   /* First, export an object with a single interface (also check that
    * g_dbus_interface_get_object() works and that the object isn't reffed)
    */
   o = foo_igen_object_skeleton_new ("/managed/first");
   i = G_DBUS_INTERFACE_SKELETON (foo_igen_bar_skeleton_new ());
-  g_assert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == NULL);
+  xassert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == NULL);
   g_assert_cmpint (G_OBJECT (o)->ref_count, ==, 1);
   foo_igen_object_skeleton_set_bar (o, FOO_IGEN_BAR (i));
   g_assert_cmpint (G_OBJECT (o)->ref_count, ==, 1);
-  g_assert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == G_DBUS_OBJECT (o));
+  xassert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == G_DBUS_OBJECT (o));
   g_assert_cmpint (G_OBJECT (o)->ref_count, ==, 1);
   foo_igen_object_skeleton_set_bar (o, NULL);
-  g_assert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == NULL);
+  xassert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == NULL);
   g_assert_cmpint (G_OBJECT (o)->ref_count, ==, 1);
   foo_igen_object_skeleton_set_bar (o, FOO_IGEN_BAR (i));
-  g_assert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == G_DBUS_OBJECT (o));
+  xassert (g_dbus_interface_get_object (G_DBUS_INTERFACE (i)) == G_DBUS_OBJECT (o));
   g_assert_cmpint (G_OBJECT (o)->ref_count, ==, 1);
 
   o2 = FOO_IGEN_OBJECT_SKELETON (g_dbus_interface_dup_object (G_DBUS_INTERFACE (i)));
-  g_assert (G_DBUS_OBJECT (o2) == G_DBUS_OBJECT (o));
+  xassert (G_DBUS_OBJECT (o2) == G_DBUS_OBJECT (o));
   g_assert_cmpint (G_OBJECT (o2)->ref_count, ==, 2);
   g_clear_object (&o2);
 
@@ -2081,20 +2081,20 @@ check_object_manager (void)
   /* ... check there's one non-standard interfaces */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* Bar + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.project.Bar"));
+  xassert (has_interface (info, "org.project.Bar"));
   g_dbus_node_info_unref (info);
 
   /* Also check g_dbus_object_manager_get_interface */
   iface = g_dbus_object_manager_get_interface (G_DBUS_OBJECT_MANAGER (manager), "/managed/first", "org.project.Bar");
-  g_assert (iface != NULL);
+  xassert (iface != NULL);
   g_clear_object (&iface);
   iface = g_dbus_object_manager_get_interface (G_DBUS_OBJECT_MANAGER (manager), "/managed/first", "org.project.Bat");
-  g_assert (iface == NULL);
+  xassert (iface == NULL);
   iface = g_dbus_object_manager_get_interface (G_DBUS_OBJECT_MANAGER (pm), "/managed/first", "org.project.Bar");
-  g_assert (iface != NULL);
+  xassert (iface != NULL);
   g_clear_object (&iface);
   iface = g_dbus_object_manager_get_interface (G_DBUS_OBJECT_MANAGER (pm), "/managed/first", "org.project.Bat");
-  g_assert (iface == NULL);
+  xassert (iface == NULL);
 
   /* Now, check adding the same interface replaces the existing one */
   foo_igen_object_skeleton_set_bar (o, FOO_IGEN_BAR (i));
@@ -2110,7 +2110,7 @@ check_object_manager (void)
   /* ... check introspection data */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* Bar + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.project.Bar"));
+  xassert (has_interface (info, "org.project.Bar"));
   g_dbus_node_info_unref (info);
   g_clear_object (&i);
 
@@ -2128,7 +2128,7 @@ check_object_manager (void)
   /* ... check introspection data */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* Bar + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.project.Bar"));
+  xassert (has_interface (info, "org.project.Bar"));
   g_dbus_node_info_unref (info);
   g_clear_object (&i);
 
@@ -2147,8 +2147,8 @@ check_object_manager (void)
   /* ... check introspection data */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 5); /* Bar,Bat + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.project.Bar"));
-  g_assert (has_interface (info, "org.project.Bat"));
+  xassert (has_interface (info, "org.project.Bar"));
+  xassert (has_interface (info, "org.project.Bat"));
   g_dbus_node_info_unref (info);
 
   /* check we can remove an interface */
@@ -2164,7 +2164,7 @@ check_object_manager (void)
   /* ... check introspection data */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* Bat + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.project.Bat"));
+  xassert (has_interface (info, "org.project.Bat"));
   g_dbus_node_info_unref (info);
   /* also and that the call only has effect if the interface actually exists
    *
@@ -2175,7 +2175,7 @@ check_object_manager (void)
   /* ... check introspection data */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* Bat + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "org.project.Bat"));
+  xassert (has_interface (info, "org.project.Bat"));
   g_dbus_node_info_unref (info);
 
   /* remove the last interface */
@@ -2208,7 +2208,7 @@ check_object_manager (void)
   /* ... check introspection data */
   info = introspect (c, xdbus_connection_get_unique_name (c), "/managed/first", loop);
   g_assert_cmpint (count_interfaces (info), ==, 4); /* com.acme.Coyote + Properties,Introspectable,Peer */
-  g_assert (has_interface (info, "com.acme.Coyote"));
+  xassert (has_interface (info, "com.acme.Coyote"));
   g_dbus_node_info_unref (info);
 
   /* Check GetManagedObjects() - should be just the Coyote */
@@ -2262,48 +2262,48 @@ check_object_manager (void)
    * the generated ::get-proxy-type signal handler
    */
   object_proxies = g_dbus_object_manager_get_objects (pm);
-  g_assert (xlist_length (object_proxies) == 2);
+  xassert (xlist_length (object_proxies) == 2);
   xlist_free_full (object_proxies, xobject_unref);
   op = g_dbus_object_manager_get_object (pm, "/managed/first");
-  g_assert (op != NULL);
-  g_assert (FOO_IGEN_IS_OBJECT_PROXY (op));
+  xassert (op != NULL);
+  xassert (FOO_IGEN_IS_OBJECT_PROXY (op));
   g_assert_cmpstr (g_dbus_object_get_object_path (op), ==, "/managed/first");
   proxies = g_dbus_object_get_interfaces (op);
-  g_assert (xlist_length (proxies) == 1);
+  xassert (xlist_length (proxies) == 1);
   xlist_free_full (proxies, xobject_unref);
   p = G_DBUS_PROXY (foo_igen_object_get_com_acme_coyote (FOO_IGEN_OBJECT (op)));
-  g_assert (p != NULL);
+  xassert (p != NULL);
   g_assert_cmpint (XTYPE_FROM_INSTANCE (p), ==, FOO_IGEN_TYPE_COM_ACME_COYOTE_PROXY);
-  g_assert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_COM_ACME_COYOTE));
+  xassert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_COM_ACME_COYOTE));
   g_clear_object (&p);
   p = (xdbus_proxy_t *) g_dbus_object_get_interface (op, "org.project.NonExisting");
-  g_assert (p == NULL);
+  xassert (p == NULL);
   g_clear_object (&op);
 
   /* -- */
   op = g_dbus_object_manager_get_object (pm, "/managed/second");
-  g_assert (op != NULL);
-  g_assert (FOO_IGEN_IS_OBJECT_PROXY (op));
+  xassert (op != NULL);
+  xassert (FOO_IGEN_IS_OBJECT_PROXY (op));
   g_assert_cmpstr (g_dbus_object_get_object_path (op), ==, "/managed/second");
   proxies = g_dbus_object_get_interfaces (op);
-  g_assert (xlist_length (proxies) == 2);
+  xassert (xlist_length (proxies) == 2);
   xlist_free_full (proxies, xobject_unref);
   p = G_DBUS_PROXY (foo_igen_object_get_bat (FOO_IGEN_OBJECT (op)));
-  g_assert (p != NULL);
+  xassert (p != NULL);
   g_assert_cmpint (XTYPE_FROM_INSTANCE (p), ==, FOO_IGEN_TYPE_BAT_PROXY);
-  g_assert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAT));
+  xassert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAT));
   g_clear_object (&p);
   p = G_DBUS_PROXY (foo_igen_object_get_bar (FOO_IGEN_OBJECT (op)));
-  g_assert (p != NULL);
+  xassert (p != NULL);
   g_assert_cmpint (XTYPE_FROM_INSTANCE (p), ==, FOO_IGEN_TYPE_BAR_PROXY);
-  g_assert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAR));
+  xassert (xtype_is_a (XTYPE_FROM_INSTANCE (p), FOO_IGEN_TYPE_BAR));
   /* ... now that we have a Bar instance around, also check that we get signals
    *     and property changes...
    */
   om_check_property_and_signal_emission (loop, bar_skeleton, FOO_IGEN_BAR (p));
   g_clear_object (&p);
   p = (xdbus_proxy_t *) g_dbus_object_get_interface (op, "org.project.NonExisting");
-  g_assert (p == NULL);
+  xassert (p == NULL);
   g_clear_object (&op);
 
   /* -------------------------------------------------- */
@@ -2348,9 +2348,9 @@ check_object_manager (void)
   //xmain_loop_run (loop); /* TODO: tmp */
 
   /* Clean up objects */
-  g_assert (xdbus_object_manager_server_unexport (manager, "/managed/first_1"));
-  //g_assert (xdbus_object_manager_server_unexport (manager, "/managed/second"));
-  g_assert (xdbus_object_manager_server_unexport (manager, "/managed/first"));
+  xassert (xdbus_object_manager_server_unexport (manager, "/managed/first_1"));
+  //xassert (xdbus_object_manager_server_unexport (manager, "/managed/second"));
+  xassert (xdbus_object_manager_server_unexport (manager, "/managed/first"));
   g_assert_cmpint (xlist_length (g_dbus_object_manager_get_objects (G_DBUS_OBJECT_MANAGER (manager))), ==, 0);
 
   if (loop != NULL)
@@ -2471,7 +2471,7 @@ test_property_naming (void)
   (void) c_setter_name;
 
   skel = foo_igen_naming_skeleton_new ();
-  g_assert (xobject_class_find_property (G_OBJECT_GET_CLASS (skel), "type") != NULL);
+  xassert (xobject_class_find_property (G_OBJECT_GET_CLASS (skel), "type") != NULL);
   xobject_unref (skel);
 }
 
@@ -2535,7 +2535,7 @@ test_deprecations (void)
 
     pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (iskel), "bat");
     g_assert_nonnull (pspec);
-    g_assert_cmpint (pspec->flags & G_PARAM_DEPRECATED, ==, G_PARAM_DEPRECATED);
+    g_assert_cmpint (pspec->flags & XPARAM_DEPRECATED, ==, XPARAM_DEPRECATED);
 
     xobject_unref (iskel);
   }
@@ -2547,7 +2547,7 @@ test_deprecations (void)
     oskel = foo_igen_object_skeleton_new ("/objects/first");
     pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (oskel), "oldie-interface");
     g_assert_nonnull (pspec);
-    g_assert_cmpint (pspec->flags & G_PARAM_DEPRECATED, ==, G_PARAM_DEPRECATED);
+    g_assert_cmpint (pspec->flags & XPARAM_DEPRECATED, ==, XPARAM_DEPRECATED);
 
     xobject_unref (oskel);
   }

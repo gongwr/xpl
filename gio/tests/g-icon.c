@@ -54,14 +54,14 @@ test_xicon_to_string (void)
   icon = xfile_icon_new (location);
 
   xobject_get (icon, "file", &file, NULL);
-  g_assert (file == location);
+  xassert (file == location);
   xobject_unref (file);
 
   data = xicon_to_string (icon);
   g_assert_cmpstr (data, ==, G_DIR_SEPARATOR_S "some" G_DIR_SEPARATOR_S "native" G_DIR_SEPARATOR_S "path" G_DIR_SEPARATOR_S "to" G_DIR_SEPARATOR_S "an" G_DIR_SEPARATOR_S "icon.png");
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -74,7 +74,7 @@ test_xicon_to_string (void)
   g_assert_cmpstr (data, ==, G_DIR_SEPARATOR_S "some" G_DIR_SEPARATOR_S "native" G_DIR_SEPARATOR_S "path" G_DIR_SEPARATOR_S "to" G_DIR_SEPARATOR_S "an" G_DIR_SEPARATOR_S "icon with spaces.png");
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -87,7 +87,7 @@ test_xicon_to_string (void)
   g_assert_cmpstr (data, ==, "sftp:///some/non-native/path/to/an/icon.png");
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -101,7 +101,7 @@ test_xicon_to_string (void)
   g_assert_cmpstr (data, ==, "sftp:///some/non-native/path/to/an/icon%20with%20spaces.png");
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -122,7 +122,7 @@ test_xicon_to_string (void)
   g_assert_cmpstr (data, ==, "network-server");
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -132,7 +132,7 @@ test_xicon_to_string (void)
   g_assert_cmpstr (data, ==, ". xthemed_icon_t network-server network network-server-symbolic network-symbolic");
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -141,7 +141,7 @@ test_xicon_to_string (void)
   icon = xicon_new_for_string ("network-server%", &error);
   g_assert_no_error (error);
   icon2 = g_themed_icon_new ("network-server%");
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (icon);
   xobject_unref (icon2);
 
@@ -149,7 +149,7 @@ test_xicon_to_string (void)
   g_assert_no_error (error);
   location = xfile_new_for_commandline_arg ("/path/to/somewhere.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (icon);
   xobject_unref (icon2);
   xobject_unref (location);
@@ -161,12 +161,12 @@ test_xicon_to_string (void)
   g_free (data);
   location = xfile_new_for_commandline_arg ("/path/to/somewhere with whitespace.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (location);
   xobject_unref (icon2);
   location = xfile_new_for_commandline_arg ("/path/to/somewhere%20with%20whitespace.png");
   icon2 = xfile_icon_new (location);
-  g_assert (!xicon_equal (icon, icon2));
+  xassert (!xicon_equal (icon, icon2));
   xobject_unref (location);
   xobject_unref (icon2);
   xobject_unref (icon);
@@ -178,7 +178,7 @@ test_xicon_to_string (void)
   g_free (data);
   location = xfile_new_for_commandline_arg ("sftp:///path/to/somewhere.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (icon);
   xobject_unref (icon2);
   xobject_unref (location);
@@ -191,12 +191,12 @@ test_xicon_to_string (void)
   g_free (data);
   location = xfile_new_for_commandline_arg ("sftp:///path/to/somewhere with whitespace.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (location);
   xobject_unref (icon2);
   location = xfile_new_for_commandline_arg ("sftp:///path/to/somewhere%20with%20whitespace.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (location);
   xobject_unref (icon2);
   xobject_unref (icon);
@@ -209,7 +209,7 @@ test_xicon_to_string (void)
   data = xicon_to_string (icon);
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -219,7 +219,7 @@ test_xicon_to_string (void)
   data = xicon_to_string (icon);
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -229,7 +229,7 @@ test_xicon_to_string (void)
   data = xicon_to_string (icon);
   icon2 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -242,18 +242,18 @@ test_xicon_to_string (void)
   location = xfile_new_for_uri ("file:///some/path/somewhere.png");
   icon3 = xfile_icon_new (location);
   xobject_unref (location);
-  emblem1 = xemblem_new_with_origin (icon2, G_EMBLEM_ORIGIN_DEVICE);
-  emblem2 = xemblem_new_with_origin (icon3, G_EMBLEM_ORIGIN_LIVEMETADATA);
+  emblem1 = xemblem_new_with_origin (icon2, XEMBLEM_ORIGIN_DEVICE);
+  emblem2 = xemblem_new_with_origin (icon3, XEMBLEM_ORIGIN_LIVEMETADATA);
   icon4 = g_emblemed_icon_new (icon, emblem1);
   g_emblemed_icon_add_emblem (G_EMBLEMED_ICON (icon4), emblem2);
   data = xicon_to_string (icon4);
   icon5 = xicon_new_for_string (data, &error);
   g_assert_no_error (error);
-  g_assert (xicon_equal (icon4, icon5));
+  xassert (xicon_equal (icon4, icon5));
 
   xobject_get (emblem1, "origin", &origin, "icon", &i, NULL);
-  g_assert (origin == G_EMBLEM_ORIGIN_DEVICE);
-  g_assert (i == icon2);
+  xassert (origin == XEMBLEM_ORIGIN_DEVICE);
+  xassert (i == icon2);
   xobject_unref (i);
 
   xobject_unref (emblem1);
@@ -286,7 +286,7 @@ test_xicon_serialize (void)
   icon = xicon_deserialize (xvariant_ref_sink (data));
   xvariant_unref (data);
   icon2 = g_themed_icon_new ("network-server%");
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (icon);
   xobject_unref (icon2);
 
@@ -295,7 +295,7 @@ test_xicon_serialize (void)
   xvariant_unref (data);
   location = xfile_new_for_commandline_arg ("/path/to/somewhere.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (icon);
   xobject_unref (icon2);
   xobject_unref (location);
@@ -305,12 +305,12 @@ test_xicon_serialize (void)
   xvariant_unref (data);
   location = xfile_new_for_commandline_arg ("/path/to/somewhere with whitespace.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (location);
   xobject_unref (icon2);
   location = xfile_new_for_commandline_arg ("/path/to/somewhere%20with%20whitespace.png");
   icon2 = xfile_icon_new (location);
-  g_assert (!xicon_equal (icon, icon2));
+  xassert (!xicon_equal (icon, icon2));
   xobject_unref (location);
   xobject_unref (icon2);
   xobject_unref (icon);
@@ -320,7 +320,7 @@ test_xicon_serialize (void)
   xvariant_unref (data);
   location = xfile_new_for_commandline_arg ("sftp:///path/to/somewhere.png");
   icon2 = xfile_icon_new (location);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xobject_unref (icon);
   xobject_unref (icon2);
   xobject_unref (location);
@@ -331,7 +331,7 @@ test_xicon_serialize (void)
   g_themed_icon_append_name (G_THEMED_ICON (icon), "computer");
   data = xicon_serialize (icon);
   icon2 = xicon_deserialize (data);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xvariant_unref (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -340,7 +340,7 @@ test_xicon_serialize (void)
   g_themed_icon_append_name (G_THEMED_ICON (icon), "computer");
   data = xicon_serialize (icon);
   icon2 = xicon_deserialize (data);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xvariant_unref (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -349,7 +349,7 @@ test_xicon_serialize (void)
   g_themed_icon_append_name (G_THEMED_ICON (icon), "computer");
   data = xicon_serialize (icon);
   icon2 = xicon_deserialize (data);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   xvariant_unref (data);
   xobject_unref (icon);
   xobject_unref (icon2);
@@ -362,17 +362,17 @@ test_xicon_serialize (void)
   location = xfile_new_for_uri ("file:///some/path/somewhere.png");
   icon3 = xfile_icon_new (location);
   xobject_unref (location);
-  emblem1 = xemblem_new_with_origin (icon2, G_EMBLEM_ORIGIN_DEVICE);
-  emblem2 = xemblem_new_with_origin (icon3, G_EMBLEM_ORIGIN_LIVEMETADATA);
+  emblem1 = xemblem_new_with_origin (icon2, XEMBLEM_ORIGIN_DEVICE);
+  emblem2 = xemblem_new_with_origin (icon3, XEMBLEM_ORIGIN_LIVEMETADATA);
   icon4 = g_emblemed_icon_new (icon, emblem1);
   g_emblemed_icon_add_emblem (G_EMBLEMED_ICON (icon4), emblem2);
   data = xicon_serialize (icon4);
   icon5 = xicon_deserialize (data);
-  g_assert (xicon_equal (icon4, icon5));
+  xassert (xicon_equal (icon4, icon5));
 
   xobject_get (emblem1, "origin", &origin, "icon", &i, NULL);
-  g_assert (origin == G_EMBLEM_ORIGIN_DEVICE);
-  g_assert (i == icon2);
+  xassert (origin == XEMBLEM_ORIGIN_DEVICE);
+  xassert (i == icon2);
   xobject_unref (i);
 
   xobject_unref (emblem1);
@@ -398,7 +398,7 @@ test_themed_icon (void)
   icon1 = g_themed_icon_new ("testicon");
 
   xobject_get (icon1, "use-default-fallbacks", &fallbacks, NULL);
-  g_assert (!fallbacks);
+  xassert (!fallbacks);
 
   names = g_themed_icon_get_names (G_THEMED_ICON (icon1));
   g_assert_cmpint (xstrv_length ((xchar_t **)names), ==, 2);
@@ -418,17 +418,17 @@ test_themed_icon (void)
   g_assert_cmpuint (xicon_hash (icon1), ==, 1812785139);
 
   icon2 = g_themed_icon_new_from_names ((xchar_t**)names2, -1);
-  g_assert (xicon_equal (icon1, icon2));
+  xassert (xicon_equal (icon1, icon2));
 
   str = xicon_to_string (icon2);
   icon3 = xicon_new_for_string (str, NULL);
-  g_assert (xicon_equal (icon2, icon3));
+  xassert (xicon_equal (icon2, icon3));
   g_free (str);
 
   variant = xicon_serialize (icon3);
   icon4 = xicon_deserialize (variant);
-  g_assert (xicon_equal (icon3, icon4));
-  g_assert (xicon_hash (icon3) == xicon_hash (icon4));
+  xassert (xicon_equal (icon3, icon4));
+  xassert (xicon_hash (icon3) == xicon_hash (icon4));
   xvariant_unref (variant);
 
   xobject_unref (icon1);
@@ -449,40 +449,40 @@ test_emblemed_icon (void)
   icon1 = g_themed_icon_new ("testicon");
   icon2 = g_themed_icon_new ("testemblem");
   emblem1 = xemblem_new (icon2);
-  emblem2 = xemblem_new_with_origin (icon2, G_EMBLEM_ORIGIN_TAG);
+  emblem2 = xemblem_new_with_origin (icon2, XEMBLEM_ORIGIN_TAG);
 
   icon3 = g_emblemed_icon_new (icon1, emblem1);
   emblems = g_emblemed_icon_get_emblems (G_EMBLEMED_ICON (icon3));
   g_assert_cmpint (xlist_length (emblems), ==, 1);
-  g_assert (g_emblemed_icon_get_icon (G_EMBLEMED_ICON (icon3)) == icon1);
+  xassert (g_emblemed_icon_get_icon (G_EMBLEMED_ICON (icon3)) == icon1);
 
   icon4 = g_emblemed_icon_new (icon1, emblem1);
   g_emblemed_icon_add_emblem (G_EMBLEMED_ICON (icon4), emblem2);
   emblems = g_emblemed_icon_get_emblems (G_EMBLEMED_ICON (icon4));
   g_assert_cmpint (xlist_length (emblems), ==, 2);
 
-  g_assert (!xicon_equal (icon3, icon4));
+  xassert (!xicon_equal (icon3, icon4));
 
   variant = xicon_serialize (icon4);
   icon5 = xicon_deserialize (variant);
-  g_assert (xicon_equal (icon4, icon5));
-  g_assert (xicon_hash (icon4) == xicon_hash (icon5));
+  xassert (xicon_equal (icon4, icon5));
+  xassert (xicon_hash (icon4) == xicon_hash (icon5));
   xvariant_unref (variant);
 
   emblem = emblems->data;
-  g_assert (xemblem_get_icon (emblem) == icon2);
-  g_assert (xemblem_get_origin (emblem) == G_EMBLEM_ORIGIN_UNKNOWN);
+  xassert (xemblem_get_icon (emblem) == icon2);
+  xassert (xemblem_get_origin (emblem) == XEMBLEM_ORIGIN_UNKNOWN);
 
   emblem = emblems->next->data;
-  g_assert (xemblem_get_icon (emblem) == icon2);
-  g_assert (xemblem_get_origin (emblem) == G_EMBLEM_ORIGIN_TAG);
+  xassert (xemblem_get_icon (emblem) == icon2);
+  xassert (xemblem_get_origin (emblem) == XEMBLEM_ORIGIN_TAG);
 
   g_emblemed_icon_clear_emblems (G_EMBLEMED_ICON (icon4));
-  g_assert (g_emblemed_icon_get_emblems (G_EMBLEMED_ICON (icon4)) == NULL);
+  xassert (g_emblemed_icon_get_emblems (G_EMBLEMED_ICON (icon4)) == NULL);
 
-  g_assert (xicon_hash (icon4) != xicon_hash (icon2));
+  xassert (xicon_hash (icon4) != xicon_hash (icon2));
   xobject_get (icon4, "gicon", &icon, NULL);
-  g_assert (icon == icon1);
+  xassert (icon == icon1);
   xobject_unref (icon);
 
   xobject_unref (icon1);
@@ -507,7 +507,7 @@ load_cb (xobject_t      *source_object,
 
   stream = g_loadable_icon_load_finish (icon, res, NULL, &error);
   g_assert_no_error (error);
-  g_assert (X_IS_INPUT_STREAM (stream));
+  xassert (X_IS_INPUT_STREAM (stream));
   xobject_unref (stream);
   xmain_loop_quit (loop);
 }
@@ -521,7 +521,7 @@ loadable_icon_tests (xloadable_icon_t *icon)
 
   stream = g_loadable_icon_load (icon, 20, NULL, NULL, &error);
   g_assert_no_error (error);
-  g_assert (X_IS_INPUT_STREAM (stream));
+  xassert (X_IS_INPUT_STREAM (stream));
   xobject_unref (stream);
 
   loop = xmain_loop_new (NULL, FALSE);
@@ -549,7 +549,7 @@ test_file_icon (void)
 
   str = xicon_to_string (icon);
   icon2 = xicon_new_for_string (str, NULL);
-  g_assert (xicon_equal (icon, icon2));
+  xassert (xicon_equal (icon, icon2));
   g_free (str);
 
   file = xfile_new_for_path ("/\1\2\3/\244");
@@ -557,8 +557,8 @@ test_file_icon (void)
 
   variant = xicon_serialize (icon4);
   icon3 = xicon_deserialize (variant);
-  g_assert (xicon_equal (icon4, icon3));
-  g_assert (xicon_hash (icon4) == xicon_hash (icon3));
+  xassert (xicon_equal (icon4, icon3));
+  xassert (xicon_hash (icon4) == xicon_hash (icon3));
   xvariant_unref (variant);
 
   xobject_unref (icon);
@@ -583,18 +583,18 @@ test_bytes_icon (void)
   icon = xbytes_icon_new (bytes);
   icon2 = xbytes_icon_new (bytes);
 
-  g_assert (xbytes_icon_get_bytes (XBYTES_ICON (icon)) == bytes);
-  g_assert (xicon_equal (icon, icon2));
-  g_assert (xicon_hash (icon) == xicon_hash (icon2));
+  xassert (xbytes_icon_get_bytes (XBYTES_ICON (icon)) == bytes);
+  xassert (xicon_equal (icon, icon2));
+  xassert (xicon_hash (icon) == xicon_hash (icon2));
 
   xobject_get (icon, "bytes", &bytes2, NULL);
-  g_assert (bytes == bytes2);
+  xassert (bytes == bytes2);
   xbytes_unref (bytes2);
 
   variant = xicon_serialize (icon);
   icon3 = xicon_deserialize (variant);
-  g_assert (xicon_equal (icon, icon3));
-  g_assert (xicon_hash (icon) == xicon_hash (icon3));
+  xassert (xicon_equal (icon, icon3));
+  xassert (xicon_hash (icon) == xicon_hash (icon3));
 
   loadable_icon_tests (G_LOADABLE_ICON (icon));
 

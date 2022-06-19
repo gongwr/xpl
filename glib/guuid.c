@@ -73,7 +73,7 @@ g_uuid_to_string (const GUuid *uuid)
 {
   const xuint8_t *bytes;
 
-  g_return_val_if_fail (uuid != NULL, NULL);
+  xreturn_val_if_fail (uuid != NULL, NULL);
 
   bytes = uuid->bytes;
 
@@ -141,7 +141,7 @@ uuid_parse_string (const xchar_t *str,
 xboolean_t
 g_uuid_string_is_valid (const xchar_t *str)
 {
-  g_return_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
 
   return uuid_parse_string (str, NULL);
 }

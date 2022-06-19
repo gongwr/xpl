@@ -273,7 +273,7 @@ test_print_handler (void)
   GPrintFunc old_print_handler;
 
   old_print_handler = g_set_print_handler (my_print_handler);
-  g_assert (old_print_handler == NULL);
+  xassert (old_print_handler == NULL);
 
   my_print_count = 0;
   g_print ("bu ba");
@@ -288,7 +288,7 @@ test_printerr_handler (void)
   GPrintFunc old_printerr_handler;
 
   old_printerr_handler = g_set_printerr_handler (my_print_handler);
-  g_assert (old_printerr_handler == NULL);
+  xassert (old_printerr_handler == NULL);
 
   my_print_count = 0;
   g_printerr ("bu ba");
@@ -307,8 +307,8 @@ good_failure_handler (const xchar_t    *log_domain,
                       xpointer_t        user_data)
 {
   g_test_message ("The Good Fail Message Handler\n");
-  g_assert ((char *)user_data != loxstr);
-  g_assert ((char *)user_data == fail_str);
+  xassert ((char *)user_data != loxstr);
+  xassert ((char *)user_data == fail_str);
 
   return FALSE;
 }
@@ -320,8 +320,8 @@ bad_failure_handler (const xchar_t    *log_domain,
                      xpointer_t        user_data)
 {
   g_test_message ("The Bad Fail Message Handler\n");
-  g_assert ((char *)user_data == loxstr);
-  g_assert ((char *)user_data != fail_str);
+  xassert ((char *)user_data == loxstr);
+  xassert ((char *)user_data != fail_str);
 
   return FALSE;
 }
@@ -333,8 +333,8 @@ test_handler (const xchar_t    *log_domain,
               xpointer_t        user_data)
 {
   g_test_message ("The Log Message Handler\n");
-  g_assert ((char *)user_data != fail_str);
-  g_assert ((char *)user_data == loxstr);
+  xassert ((char *)user_data != fail_str);
+  xassert ((char *)user_data == loxstr);
 }
 
 static void
@@ -555,7 +555,7 @@ test_structured_logging_roundtrip2 (void)
                     "MESSAGE", "This is a debug message about string '%s'.",
                     some_string);
 
-  g_assert (expected_messages == NULL);
+  xassert (expected_messages == NULL);
 }
 
 static void
@@ -574,7 +574,7 @@ test_structured_logging_roundtrip3 (void)
   g_loxstructured ("some-domain", G_LOG_LEVEL_WARNING,
                     "MESSAGE", "test_t test test.");
 
-  g_assert (expected_messages == NULL);
+  xassert (expected_messages == NULL);
 }
 
 static xvariant_t *
@@ -626,7 +626,7 @@ test_structured_logging_variant2 (void)
 
   g_log_variant ("some-domain", G_LOG_LEVEL_MESSAGE, v);
   xvariant_unref (v);
-  g_assert (expected_messages == NULL);
+  xassert (expected_messages == NULL);
 }
 
 int

@@ -221,7 +221,7 @@ g_content_type_get_mime_dirs (void)
 
   G_UNLOCK (global_mime_dirs);
 
-  g_assert (mime_dirs != NULL);
+  xassert (mime_dirs != NULL);
   return mime_dirs;
 }
 
@@ -241,8 +241,8 @@ g_content_type_equals (const xchar_t *type1,
 {
   xboolean_t res;
 
-  g_return_val_if_fail (type1 != NULL, FALSE);
-  g_return_val_if_fail (type2 != NULL, FALSE);
+  xreturn_val_if_fail (type1 != NULL, FALSE);
+  xreturn_val_if_fail (type2 != NULL, FALSE);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -269,8 +269,8 @@ g_content_type_is_a (const xchar_t *type,
 {
   xboolean_t res;
 
-  g_return_val_if_fail (type != NULL, FALSE);
-  g_return_val_if_fail (supertype != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (supertype != NULL, FALSE);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -315,7 +315,7 @@ g_content_type_is_mime_type (const xchar_t *type,
 xboolean_t
 g_content_type_is_unknown (const xchar_t *type)
 {
-  g_return_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
 
   return strcmp (XDG_MIME_TYPE_UNKNOWN, type) == 0;
 }
@@ -485,7 +485,7 @@ g_content_type_get_description (const xchar_t *type)
   static xhashtable_t *type_comment_cache = NULL;
   xchar_t *comment;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -525,7 +525,7 @@ g_content_type_get_description (const xchar_t *type)
 char *
 g_content_type_get_mime_type (const char *type)
 {
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   return xstrdup (type);
 }
@@ -543,7 +543,7 @@ g_content_type_get_icon_internal (const xchar_t *type,
   const char  *xdg_icon;
   int i;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -636,7 +636,7 @@ g_content_type_get_generic_icon_name (const xchar_t *type)
   const xchar_t *xdxicon_name;
   xchar_t *icon_name;
 
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -679,7 +679,7 @@ g_content_type_get_generic_icon_name (const xchar_t *type)
 xboolean_t
 g_content_type_can_be_executable (const xchar_t *type)
 {
-  g_return_val_if_fail (type != NULL, FALSE);
+  xreturn_val_if_fail (type != NULL, FALSE);
 
   if (g_content_type_is_a (type, "application/x-executable")  ||
       g_content_type_is_a (type, "text/plain"))
@@ -722,7 +722,7 @@ g_content_type_from_mime_type (const xchar_t *mime_type)
 {
   char *umime;
 
-  g_return_val_if_fail (mime_type != NULL, NULL);
+  xreturn_val_if_fail (mime_type != NULL, NULL);
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();
@@ -772,7 +772,7 @@ g_content_type_guess (const xchar_t  *filename,
 
   /* our test suite and potentially other code used -1 in the past, which is
    * not documented and not allowed; guard against that */
-  g_return_val_if_fail (data_size != (xsize_t) -1, xstrdup (XDG_MIME_TYPE_UNKNOWN));
+  xreturn_val_if_fail (data_size != (xsize_t) -1, xstrdup (XDG_MIME_TYPE_UNKNOWN));
 
   G_LOCK (gio_xdgmime);
   g_begin_ignore_leaks ();

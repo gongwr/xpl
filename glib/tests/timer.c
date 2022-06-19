@@ -315,7 +315,7 @@ test_timeval_to_iso8601 (void)
       g_assert_cmpstr (out, ==, tests[i].expected);
 
       ret = g_time_val_from_iso8601 (out, &val);
-      g_assert (ret);
+      xassert (ret);
       g_assert_cmpint (val.tv_sec, ==, tests[i].val.tv_sec);
       g_assert_cmpint (val.tv_usec, ==, tests[i].val.tv_usec);
       g_free (out);

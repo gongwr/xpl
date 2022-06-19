@@ -541,8 +541,8 @@ xsource_funcs_t g_idle_funcs =
 xmain_context_t *
 xmain_context_ref (xmain_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
-  g_return_val_if_fail (g_atomic_int_get (&context->ref_count) > 0, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&context->ref_count) > 0, NULL);
 
   g_atomic_int_inc (&context->ref_count);
 
@@ -799,7 +799,7 @@ free_context_stack (xpointer_t data)
   g_queue_free_full((xqueue_t *) data, (xdestroy_notify_t) free_context);
 }
 
-static GPrivate thread_context_stack = G_PRIVATE_INIT (free_context_stack);
+static xprivate_t thread_context_stack = G_PRIVATE_INIT (free_context_stack);
 
 /**
  * xmain_context_push_thread_default:
@@ -986,8 +986,8 @@ xsource_new (xsource_funcs_t *source_funcs,
 {
   xsource_t *source;
 
-  g_return_val_if_fail (source_funcs != NULL, NULL);
-  g_return_val_if_fail (struct_size >= sizeof (xsource_t), NULL);
+  xreturn_val_if_fail (source_funcs != NULL, NULL);
+  xreturn_val_if_fail (struct_size >= sizeof (xsource_t), NULL);
 
   source = (xsource_t*) g_malloc0 (struct_size);
   source->priv = g_slice_new0 (xsource_private_t);
@@ -1178,7 +1178,7 @@ source_add_to_context (xsource_t      *source,
 
   if (source->priv->parent_source)
     {
-      g_assert (source_list->head != NULL);
+      xassert (source_list->head != NULL);
 
       /* Put the source immediately before its parent */
       prev = source->priv->parent_source->prev;
@@ -1316,10 +1316,10 @@ xsource_attach (xsource_t      *source,
 {
   xuint_t result = 0;
 
-  g_return_val_if_fail (source != NULL, 0);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
-  g_return_val_if_fail (source->context == NULL, 0);
-  g_return_val_if_fail (!SOURCE_DESTROYED (source), 0);
+  xreturn_val_if_fail (source != NULL, 0);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
+  xreturn_val_if_fail (source->context == NULL, 0);
+  xreturn_val_if_fail (!SOURCE_DESTROYED (source), 0);
 
   if (!context)
     context = xmain_context_default ();
@@ -1450,9 +1450,9 @@ xsource_get_id (xsource_t *source)
 {
   xuint_t result;
 
-  g_return_val_if_fail (source != NULL, 0);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
-  g_return_val_if_fail (source->context != NULL, 0);
+  xreturn_val_if_fail (source != NULL, 0);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
+  xreturn_val_if_fail (source->context != NULL, 0);
 
   LOCK_CONTEXT (source->context);
   result = source->source_id;
@@ -1481,9 +1481,9 @@ xsource_get_id (xsource_t *source)
 xmain_context_t *
 xsource_get_context (xsource_t *source)
 {
-  g_return_val_if_fail (source != NULL, NULL);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, NULL);
-  g_return_val_if_fail (source->context != NULL || !SOURCE_DESTROYED (source), NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, NULL);
+  xreturn_val_if_fail (source->context != NULL || !SOURCE_DESTROYED (source), NULL);
 
   return source->context;
 }
@@ -1953,8 +1953,8 @@ xsource_set_priority (xsource_t  *source,
 xint_t
 xsource_get_priority (xsource_t *source)
 {
-  g_return_val_if_fail (source != NULL, 0);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
+  xreturn_val_if_fail (source != NULL, 0);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
 
   return source->priority;
 }
@@ -2040,8 +2040,8 @@ xsource_set_ready_time (xsource_t *source,
 sint64_t
 xsource_get_ready_time (xsource_t *source)
 {
-  g_return_val_if_fail (source != NULL, -1);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, -1);
+  xreturn_val_if_fail (source != NULL, -1);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, -1);
 
   return source->priv->ready_time;
 }
@@ -2091,8 +2091,8 @@ xsource_set_can_recurse (xsource_t  *source,
 xboolean_t
 xsource_get_can_recurse (xsource_t  *source)
 {
-  g_return_val_if_fail (source != NULL, FALSE);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, FALSE);
+  xreturn_val_if_fail (source != NULL, FALSE);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, FALSE);
 
   return (source->flags & G_SOURCE_CAN_RECURSE) != 0;
 }
@@ -2198,8 +2198,8 @@ xsource_set_static_name (xsource_t    *source,
 const char *
 xsource_get_name (xsource_t *source)
 {
-  g_return_val_if_fail (source != NULL, NULL);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, NULL);
 
   return source->name;
 }
@@ -2255,10 +2255,10 @@ xsource_set_name_by_id (xuint_t           tag,
 xsource_t *
 xsource_ref (xsource_t *source)
 {
-  g_return_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
   /* We allow ref_count == 0 here to allow the dispose function to resurrect
    * the xsource_t if needed */
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) >= 0, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) >= 0, NULL);
 
   g_atomic_int_inc (&source->ref_count);
 
@@ -2429,7 +2429,7 @@ xmain_context_find_source_by_id (xmain_context_t *context,
 {
   xsource_t *source;
 
-  g_return_val_if_fail (source_id > 0, NULL);
+  xreturn_val_if_fail (source_id > 0, NULL);
 
   if (context == NULL)
     context = xmain_context_default ();
@@ -2464,7 +2464,7 @@ xmain_context_find_source_by_funcs_user_data (xmain_context_t *context,
   GSourceIter iter;
   xsource_t *source;
 
-  g_return_val_if_fail (funcs != NULL, NULL);
+  xreturn_val_if_fail (funcs != NULL, NULL);
 
   if (context == NULL)
     context = xmain_context_default ();
@@ -2570,7 +2570,7 @@ xsource_remove (xuint_t tag)
 {
   xsource_t *source;
 
-  g_return_val_if_fail (tag > 0, FALSE);
+  xreturn_val_if_fail (tag > 0, FALSE);
 
   source = xmain_context_find_source_by_id (NULL, tag);
   if (source)
@@ -2623,7 +2623,7 @@ xsource_remove_by_funcs_user_data (xsource_funcs_t *funcs,
 {
   xsource_t *source;
 
-  g_return_val_if_fail (funcs != NULL, FALSE);
+  xreturn_val_if_fail (funcs != NULL, FALSE);
 
   source = xmain_context_find_source_by_funcs_user_data (NULL, funcs, user_data);
   if (source)
@@ -2701,9 +2701,9 @@ xsource_add_unix_fd (xsource_t      *source,
   xmain_context_t *context;
   xpollfd_t *poll_fd;
 
-  g_return_val_if_fail (source != NULL, NULL);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, NULL);
-  g_return_val_if_fail (!SOURCE_DESTROYED (source), NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, NULL);
+  xreturn_val_if_fail (!SOURCE_DESTROYED (source), NULL);
 
   poll_fd = g_new (xpollfd_t, 1);
   poll_fd->fd = fd;
@@ -2842,9 +2842,9 @@ xsource_query_unix_fd (xsource_t  *source,
 {
   xpollfd_t *poll_fd;
 
-  g_return_val_if_fail (source != NULL, 0);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
-  g_return_val_if_fail (xslist_find (source->priv->fds, tag), 0);
+  xreturn_val_if_fail (source != NULL, 0);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
+  xreturn_val_if_fail (xslist_find (source->priv->fds, tag), 0);
 
   poll_fd = tag;
 
@@ -3048,7 +3048,7 @@ g_main_dispatch_free (xpointer_t dispatch)
 static GMainDispatch *
 get_dispatch (void)
 {
-  static GPrivate depth_private = G_PRIVATE_INIT (g_main_dispatch_free);
+  static xprivate_t depth_private = G_PRIVATE_INIT (g_main_dispatch_free);
   GMainDispatch *dispatch;
 
   dispatch = g_private_get (&depth_private);
@@ -3210,7 +3210,7 @@ g_main_current_source (void)
  *   self->idle_id = 0;
  *   g_mutex_unlock (&self->idle_id_mutex);
  *
- *   return G_SOURCE_REMOVE;
+ *   return XSOURCE_REMOVE;
  * }
  *
  * static void
@@ -3239,7 +3239,7 @@ g_main_current_source (void)
  *
  *   g_mutex_clear (&self->idle_id_mutex);
  *
- *   G_OBJECT_CLASS (parent_class)->finalize (object);
+ *   XOBJECT_CLASS (parent_class)->finalize (object);
  * }
  * ]|
  *
@@ -3279,8 +3279,8 @@ g_main_current_source (void)
 xboolean_t
 xsource_is_destroyed (xsource_t *source)
 {
-  g_return_val_if_fail (source != NULL, TRUE);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, TRUE);
+  xreturn_val_if_fail (source != NULL, TRUE);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, TRUE);
   return SOURCE_DESTROYED (source);
 }
 
@@ -3366,7 +3366,7 @@ g_main_dispatch (xmain_context_t *context)
       xsource_t *source = context->pending_dispatches->pdata[i];
 
       context->pending_dispatches->pdata[i] = NULL;
-      g_assert (source);
+      xassert (source);
 
       source->flags &= ~G_SOURCE_READY;
 
@@ -3443,7 +3443,7 @@ g_main_dispatch (xmain_context_t *context)
 	   */
 	  if (need_destroy && !SOURCE_DESTROYED (source))
 	    {
-	      g_assert (source->context == context);
+	      xassert (source->context == context);
 	      xsource_destroy_internal (source, context, TRUE);
 	    }
 	}
@@ -3486,7 +3486,7 @@ xmain_context_acquire (xmain_context_t *context)
   if (!context->owner)
     {
       context->owner = self;
-      g_assert (context->owner_count == 0);
+      xassert (context->owner_count == 0);
       TRACE (XPL_MAIN_CONTEXT_ACQUIRE (context, TRUE  /* success */));
     }
 
@@ -3586,7 +3586,7 @@ xmain_context_wait_internal (xmain_context_t *context,
   if (!context->owner)
     {
       context->owner = self;
-      g_assert (context->owner_count == 0);
+      xassert (context->owner_count == 0);
     }
 
   if (context->owner == self)
@@ -3986,7 +3986,7 @@ xmain_context_check (xmain_context_t *context,
   while (pollrec && i < n_fds)
     {
       /* Make sure that fds is sorted by file descriptor identifier. */
-      g_assert (i <= 0 || fds[i - 1].fd < fds[i].fd);
+      xassert (i <= 0 || fds[i - 1].fd < fds[i].fd);
 
       /* Skip until finding the first GPollRec matching the current xpollfd_t. */
       while (pollrec && pollrec->fd->fd != fds[i].fd)
@@ -4322,8 +4322,8 @@ xmain_loop_new (xmain_context_t *context,
 xmain_loop_t *
 xmain_loop_ref (xmain_loop_t *loop)
 {
-  g_return_val_if_fail (loop != NULL, NULL);
-  g_return_val_if_fail (g_atomic_int_get (&loop->ref_count) > 0, NULL);
+  xreturn_val_if_fail (loop != NULL, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&loop->ref_count) > 0, NULL);
 
   g_atomic_int_inc (&loop->ref_count);
 
@@ -4393,7 +4393,7 @@ xmain_loop_run (xmain_loop_t *loop)
 	  return;
 	}
 
-      g_assert (got_ownership);
+      xassert (got_ownership);
     }
   else
     LOCK_CONTEXT (loop->context);
@@ -4455,8 +4455,8 @@ xmain_loop_quit (xmain_loop_t *loop)
 xboolean_t
 xmain_loop_is_running (xmain_loop_t *loop)
 {
-  g_return_val_if_fail (loop != NULL, FALSE);
-  g_return_val_if_fail (g_atomic_int_get (&loop->ref_count) > 0, FALSE);
+  xreturn_val_if_fail (loop != NULL, FALSE);
+  xreturn_val_if_fail (g_atomic_int_get (&loop->ref_count) > 0, FALSE);
 
   return g_atomic_int_get (&loop->is_running);
 }
@@ -4472,8 +4472,8 @@ xmain_loop_is_running (xmain_loop_t *loop)
 xmain_context_t *
 xmain_loop_get_context (xmain_loop_t *loop)
 {
-  g_return_val_if_fail (loop != NULL, NULL);
-  g_return_val_if_fail (g_atomic_int_get (&loop->ref_count) > 0, NULL);
+  xreturn_val_if_fail (loop != NULL, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&loop->ref_count) > 0, NULL);
 
   return loop->context;
 }
@@ -4747,9 +4747,9 @@ xsource_get_time (xsource_t *source)
   xmain_context_t *context;
   sint64_t result;
 
-  g_return_val_if_fail (source != NULL, 0);
-  g_return_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
-  g_return_val_if_fail (source->context != NULL, 0);
+  xreturn_val_if_fail (source != NULL, 0);
+  xreturn_val_if_fail (g_atomic_int_get (&source->ref_count) > 0, 0);
+  xreturn_val_if_fail (source->context != NULL, 0);
 
   context = source->context;
 
@@ -4816,7 +4816,7 @@ xmain_context_get_poll_func (xmain_context_t *context)
   if (!context)
     context = xmain_context_default ();
 
-  g_return_val_if_fail (g_atomic_int_get (&context->ref_count) > 0, NULL);
+  xreturn_val_if_fail (g_atomic_int_get (&context->ref_count) > 0, NULL);
 
   LOCK_CONTEXT (context);
   result = context->poll_func;
@@ -5087,7 +5087,7 @@ g_timeout_add_full (xint_t           priority,
   xsource_t *source;
   xuint_t id;
 
-  g_return_val_if_fail (function != NULL, 0);
+  xreturn_val_if_fail (function != NULL, 0);
 
   source = g_timeout_source_new (interval);
 
@@ -5114,7 +5114,7 @@ g_timeout_add_full (xint_t           priority,
  * Sets a function to be called at regular intervals, with the default
  * priority, %G_PRIORITY_DEFAULT.
  *
- * The given @function is called repeatedly until it returns %G_SOURCE_REMOVE
+ * The given @function is called repeatedly until it returns %XSOURCE_REMOVE
  * or %FALSE, at which point the timeout is automatically destroyed and the
  * function will not be called again. The first call to the function will be
  * at the end of the first @interval.
@@ -5166,7 +5166,7 @@ g_timeout_add (xuint32_t        interval,
  *
  * Sets a function to be called at regular intervals, with @priority.
  *
- * The function is called repeatedly until it returns %G_SOURCE_REMOVE
+ * The function is called repeatedly until it returns %XSOURCE_REMOVE
  * or %FALSE, at which point the timeout is automatically destroyed and
  * the function will not be called again.
  *
@@ -5218,7 +5218,7 @@ g_timeout_add_seconds_full (xint_t           priority,
   xsource_t *source;
   xuint_t id;
 
-  g_return_val_if_fail (function != NULL, 0);
+  xreturn_val_if_fail (function != NULL, 0);
 
   source = g_timeout_source_new_seconds (interval);
 
@@ -5241,7 +5241,7 @@ g_timeout_add_seconds_full (xint_t           priority,
  * Sets a function to be called at regular intervals with the default
  * priority, %G_PRIORITY_DEFAULT.
  *
- * The function is called repeatedly until it returns %G_SOURCE_REMOVE
+ * The function is called repeatedly until it returns %XSOURCE_REMOVE
  * or %FALSE, at which point the timeout is automatically destroyed
  * and the function will not be called again.
  *
@@ -5271,7 +5271,7 @@ g_timeout_add_seconds (xuint_t       interval,
                        xsource_func_t function,
                        xpointer_t    data)
 {
-  g_return_val_if_fail (function != NULL, 0);
+  xreturn_val_if_fail (function != NULL, 0);
 
   return g_timeout_add_seconds_full (G_PRIORITY_DEFAULT, interval, function, data, NULL);
 }
@@ -5417,7 +5417,7 @@ dispatch_unix_signals_unlocked (void)
               pid_t pid;
               do
                 {
-                  g_assert (source->pid > 0);
+                  xassert (source->pid > 0);
 
                   pid = waitpid (source->pid, &source->child_status, WNOHANG);
                   if (pid > 0)
@@ -5765,7 +5765,7 @@ g_child_watch_source_new (xpid_t pid)
   GChildWatchSource *child_watch_source;
 
 #ifndef G_OS_WIN32
-  g_return_val_if_fail (pid > 0, NULL);
+  xreturn_val_if_fail (pid > 0, NULL);
 #endif
 
   source = xsource_new (&g_child_watch_funcs, sizeof (GChildWatchSource));
@@ -5842,9 +5842,9 @@ g_child_watch_add_full (xint_t            priority,
   xsource_t *source;
   xuint_t id;
 
-  g_return_val_if_fail (function != NULL, 0);
+  xreturn_val_if_fail (function != NULL, 0);
 #ifndef G_OS_WIN32
-  g_return_val_if_fail (pid > 0, 0);
+  xreturn_val_if_fail (pid > 0, 0);
 #endif
 
   source = g_child_watch_source_new (pid);
@@ -5977,7 +5977,7 @@ g_idle_source_new (void)
  * Adds a function to be called whenever there are no higher priority
  * events pending.
  *
- * If the function returns %G_SOURCE_REMOVE or %FALSE it is automatically
+ * If the function returns %XSOURCE_REMOVE or %FALSE it is automatically
  * removed from the list of event sources and will not be called again.
  *
  * See [memory management of sources][mainloop-memory-management] for details
@@ -6000,7 +6000,7 @@ g_idle_add_full (xint_t           priority,
   xsource_t *source;
   xuint_t id;
 
-  g_return_val_if_fail (function != NULL, 0);
+  xreturn_val_if_fail (function != NULL, 0);
 
   source = g_idle_source_new ();
 

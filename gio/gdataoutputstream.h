@@ -56,7 +56,7 @@ struct _GDataOutputStream
 
 struct _xdata_output_stream_class
 {
-  GFilterOutputStreamClass parent_class;
+  xfilter_output_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */
@@ -75,9 +75,9 @@ xdata_output_stream_t *  xdata_output_stream_new            (xoutput_stream_t   
 
 XPL_AVAILABLE_IN_ALL
 void                 xdata_output_stream_set_byte_order (xdata_output_stream_t     *stream,
-							  GDataStreamByteOrder   order);
+							  xdata_stream_byte_order_t   order);
 XPL_AVAILABLE_IN_ALL
-GDataStreamByteOrder xdata_output_stream_get_byte_order (xdata_output_stream_t     *stream);
+xdata_stream_byte_order_t xdata_output_stream_get_byte_order (xdata_output_stream_t     *stream);
 
 XPL_AVAILABLE_IN_ALL
 xboolean_t             xdata_output_stream_put_byte       (xdata_output_stream_t     *stream,

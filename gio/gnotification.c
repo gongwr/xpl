@@ -50,10 +50,10 @@
  *   Name=test_t Application
  *   Comment=Description of what test_t Application does
  *   Exec=gnome-test-application
- *   Icon=org.gnome.TestApplication
+ *   Icon=org.gnome.test_application_t
  *   Terminal=false
  *   Type=Application
- *   Categories=GNOME;GTK;TestApplication Category;
+ *   Categories=GNOME;GTK;test_application_t Category;
  *   StartupNotify=true
  *   DBusActivatable=true
  *   X-GNOME-UsesNotifications=true
@@ -63,8 +63,8 @@
  * that this application uses notifications, so it can be listed in the
  * Control Center’s ‘Notifications’ panel.
  *
- * The `.desktop` file must be named as `org.gnome.TestApplication.desktop`,
- * where `org.gnome.TestApplication` is the ID passed to xapplication_new().
+ * The `.desktop` file must be named as `org.gnome.test_application_t.desktop`,
+ * where `org.gnome.test_application_t` is the ID passed to xapplication_new().
  *
  * User interaction with a notification (either the default action, or
  * buttons) must be associated with actions on the application (ie:
@@ -110,7 +110,7 @@ typedef struct
   xvariant_t *target;
 } Button;
 
-G_DEFINE_TYPE (xnotification, xnotification, XTYPE_OBJECT)
+XDEFINE_TYPE (xnotification, xnotification, XTYPE_OBJECT)
 
 static void
 button_free (xpointer_t data)
@@ -132,7 +132,7 @@ xnotification_dispose (xobject_t *object)
 
   g_clear_object (&notification->icon);
 
-  G_OBJECT_CLASS (xnotification_parent_class)->dispose (object);
+  XOBJECT_CLASS (xnotification_parent_class)->dispose (object);
 }
 
 static void
@@ -148,13 +148,13 @@ xnotification_finalize (xobject_t *object)
     xvariant_unref (notification->default_action_target);
   xptr_array_free (notification->buttons, TRUE);
 
-  G_OBJECT_CLASS (xnotification_parent_class)->finalize (object);
+  XOBJECT_CLASS (xnotification_parent_class)->finalize (object);
 }
 
 static void
 xnotification_class_init (GNotificationClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->dispose = xnotification_dispose;
   object_class->finalize = xnotification_finalize;
@@ -186,7 +186,7 @@ xnotification_new (const xchar_t *title)
 {
   xnotification_t *notification;
 
-  g_return_val_if_fail (title != NULL, NULL);
+  xreturn_val_if_fail (title != NULL, NULL);
 
   notification = xobject_new (XTYPE_NOTIFICATION, NULL);
   notification->title = xstrdup (title);
@@ -207,7 +207,7 @@ xnotification_new (const xchar_t *title)
 const xchar_t *
 xnotification_get_title (xnotification_t *notification)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
   return notification->title;
 }
@@ -246,7 +246,7 @@ xnotification_set_title (xnotification_t *notification,
 const xchar_t *
 xnotification_get_body (xnotification_t *notification)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
   return notification->body;
 }
@@ -285,7 +285,7 @@ xnotification_set_body (xnotification_t *notification,
 xicon_t *
 xnotification_get_icon (xnotification_t *notification)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
   return notification->icon;
 }
@@ -322,7 +322,7 @@ xnotification_set_icon (xnotification_t *notification,
 GNotificationPriority
 xnotification_get_priority (xnotification_t *notification)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION (notification), G_NOTIFICATION_PRIORITY_NORMAL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION (notification), G_NOTIFICATION_PRIORITY_NORMAL);
 
   return notification->priority;
 }
@@ -364,7 +364,7 @@ xnotification_set_urgent (xnotification_t *notification,
 const xchar_t *
 xnotification_get_category (xnotification_t *notification)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION (notification), NULL);
 
   return notification->category;
 }
@@ -424,7 +424,7 @@ xnotification_set_priority (xnotification_t         *notification,
  * contains a target, the action will be activated with that target as
  * its parameter.
  *
- * See g_action_parse_detailed_name() for a description of the format
+ * See xaction_parse_detailed_name() for a description of the format
  * for @detailed_action.
  *
  * Since: 2.40
@@ -440,7 +440,7 @@ xnotification_add_button (xnotification_t *notification,
 
   g_return_if_fail (detailed_action != NULL);
 
-  if (!g_action_parse_detailed_name (detailed_action, &action, &target, &error))
+  if (!xaction_parse_detailed_name (detailed_action, &action, &target, &error))
     {
       g_warning ("%s: %s", G_STRFUNC, error->message);
       xerror_free (error);
@@ -653,7 +653,7 @@ xnotification_get_default_action (xnotification_t  *notification,
  * The action in @detailed_action must be an application-wide action (it
  * must start with "app."). If @detailed_action contains a target, the
  * given action will be activated with that target as its parameter.
- * See g_action_parse_detailed_name() for a description of the format
+ * See xaction_parse_detailed_name() for a description of the format
  * for @detailed_action.
  *
  * When no default action is set, the application that the notification
@@ -669,7 +669,7 @@ xnotification_set_default_action (xnotification_t *notification,
   xvariant_t *target;
   xerror_t *error = NULL;
 
-  if (!g_action_parse_detailed_name (detailed_action, &action, &target, &error))
+  if (!xaction_parse_detailed_name (detailed_action, &action, &target, &error))
     {
       g_warning ("%s: %s", G_STRFUNC, error->message);
       xerror_free (error);
@@ -789,7 +789,7 @@ xnotification_get_priority_nick (xnotification_t *notification)
 
   enum_class = xtype_class_ref (XTYPE_NOTIFICATION_PRIORITY);
   value = xenum_get_value (enum_class, xnotification_get_priority (notification));
-  g_assert (value != NULL);
+  xassert (value != NULL);
   nick = xvariant_new_string (value->value_nick);
   xtype_class_unref (enum_class);
 

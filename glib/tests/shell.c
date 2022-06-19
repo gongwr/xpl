@@ -82,14 +82,14 @@ do_cmdline_test (xconstpointer d)
   res = g_shell_parse_argv (test->cmdline, &argc, &argv, &err);
   if (test->error_code == -1)
     {
-      g_assert (res);
+      xassert (res);
       g_assert_cmpint (argc, ==, test->argc);
-      g_assert (xstrv_equal ((const xchar_t * const *) argv, (const xchar_t * const *) test->argv));
+      xassert (xstrv_equal ((const xchar_t * const *) argv, (const xchar_t * const *) test->argv));
       g_assert_no_error (err);
     }
   else
     {
-      g_assert (!res);
+      xassert (!res);
       g_assert_error (err, G_SHELL_ERROR, test->error_code);
     }
 

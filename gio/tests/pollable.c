@@ -50,7 +50,7 @@ poll_source_callback (xpollable_input_stream_t *in,
   g_assert_false (g_pollable_input_stream_is_readable (G_POLLABLE_INPUT_STREAM (in)));
 
   *success = TRUE;
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -61,7 +61,7 @@ check_source_readability_callback (xpointer_t user_data)
 
   readable = g_pollable_input_stream_is_readable (in);
   g_assert_cmpint (readable, ==, expected);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -84,7 +84,7 @@ write_callback (xpointer_t user_data)
 
   check_source_readability_callback (GINT_TO_POINTER (TRUE));
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -92,7 +92,7 @@ check_source_and_quit_callback (xpointer_t user_data)
 {
   check_source_readability_callback (user_data);
   xmain_loop_quit (loop);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -105,11 +105,11 @@ test_streams (void)
   xsource_t *poll_source;
   xboolean_t success = FALSE;
 
-  g_assert (g_pollable_input_stream_can_poll (in));
-  g_assert (xpollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (out)));
+  xassert (g_pollable_input_stream_can_poll (in));
+  xassert (xpollable_output_stream_can_poll (G_POLLABLE_OUTPUT_STREAM (out)));
 
   readable = g_pollable_input_stream_is_readable (in);
-  g_assert (!readable);
+  xassert (!readable);
 
   nread = g_pollable_input_stream_read_nonblocking (in, buf, 1, NULL, &error);
   g_assert_cmpint (nread, ==, -1);
@@ -155,8 +155,8 @@ test_streams (void)
     in = G_POLLABLE_INPUT_STREAM (g_unix_input_stream_new (fd, FALSE)); \
     out = g_unix_output_stream_new (fd, FALSE);                         \
                                                                         \
-    g_assert (!g_pollable_input_stream_can_poll (in));                  \
-    g_assert (!xpollable_output_stream_can_poll (                      \
+    xassert (!g_pollable_input_stream_can_poll (in));                  \
+    xassert (!xpollable_output_stream_can_poll (                      \
         G_POLLABLE_OUTPUT_STREAM (out)));                               \
                                                                         \
     g_clear_object (&in);                                               \
@@ -283,7 +283,7 @@ test_pollable_converter (void)
   g_assert_cmpint (status, ==, 0);
 
   ibase = G_INPUT_STREAM (g_unix_input_stream_new (pipefds[0], TRUE));
-  converter = G_CONVERTER (g_charset_converter_new ("UTF-8", "UTF-8", &error));
+  converter = XCONVERTER (xcharset_converter_new ("UTF-8", "UTF-8", &error));
   g_assert_no_error (error);
 
   in = G_POLLABLE_INPUT_STREAM (xconverter_input_stream_new (ibase, converter));

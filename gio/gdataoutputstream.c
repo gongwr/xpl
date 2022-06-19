@@ -41,7 +41,7 @@
 
 
 struct _xdata_output_stream_private {
-  GDataStreamByteOrder byte_order;
+  xdata_stream_byte_order_t byte_order;
 };
 
 enum {
@@ -85,7 +85,7 @@ xdata_output_stream_class_init (xdata_output_stream_class_t *klass)
 {
   xobject_class_t *object_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->get_property = xdata_output_stream_get_property;
   object_class->set_property = xdata_output_stream_set_property;
 
@@ -97,12 +97,12 @@ xdata_output_stream_class_init (xdata_output_stream_class_t *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_BYTE_ORDER,
-                                   g_param_spec_enum ("byte-order",
+                                   xparam_spec_enum ("byte-order",
                                                       P_("Byte order"),
                                                       P_("The byte order"),
                                                       XTYPE_DATA_STREAM_BYTE_ORDER,
                                                       G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN,
-                                                      G_PARAM_READWRITE|G_PARAM_STATIC_NAME|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE|XPARAM_STATIC_NAME|XPARAM_STATIC_BLURB));
 
 }
 
@@ -182,7 +182,7 @@ xdata_output_stream_new (xoutput_stream_t *base_stream)
 {
   xdata_output_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_DATA_OUTPUT_STREAM,
                          "base-stream", base_stream,
@@ -194,13 +194,13 @@ xdata_output_stream_new (xoutput_stream_t *base_stream)
 /**
  * xdata_output_stream_set_byte_order:
  * @stream: a #xdata_output_stream_t.
- * @order: a %GDataStreamByteOrder.
+ * @order: a %xdata_stream_byte_order_t.
  *
  * Sets the byte order of the data output stream to @order.
  **/
 void
 xdata_output_stream_set_byte_order (xdata_output_stream_t    *stream,
-                                     GDataStreamByteOrder  order)
+                                     xdata_stream_byte_order_t  order)
 {
   xdata_output_stream_private_t *priv;
   g_return_if_fail (X_IS_DATA_OUTPUT_STREAM (stream));
@@ -218,12 +218,12 @@ xdata_output_stream_set_byte_order (xdata_output_stream_t    *stream,
  *
  * Gets the byte order for the stream.
  *
- * Returns: the #GDataStreamByteOrder for the @stream.
+ * Returns: the #xdata_stream_byte_order_t for the @stream.
  **/
-GDataStreamByteOrder
+xdata_stream_byte_order_t
 xdata_output_stream_get_byte_order (xdata_output_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN);
 
   return stream->priv->byte_order;
 }
@@ -247,7 +247,7 @@ xdata_output_stream_put_byte (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    &data, 1,
@@ -274,7 +274,7 @@ xdata_output_stream_put_int16 (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   switch (stream->priv->byte_order)
     {
@@ -314,7 +314,7 @@ xdata_output_stream_put_uint16 (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   switch (stream->priv->byte_order)
     {
@@ -354,7 +354,7 @@ xdata_output_stream_put_int32 (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   switch (stream->priv->byte_order)
     {
@@ -394,7 +394,7 @@ xdata_output_stream_put_uint32 (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   switch (stream->priv->byte_order)
     {
@@ -434,7 +434,7 @@ xdata_output_stream_put_int64 (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   switch (stream->priv->byte_order)
     {
@@ -474,7 +474,7 @@ xdata_output_stream_put_uint64 (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
 
   switch (stream->priv->byte_order)
     {
@@ -514,8 +514,8 @@ xdata_output_stream_put_string (xdata_output_stream_t  *stream,
 {
   xsize_t bytes_written;
 
-  g_return_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
-  g_return_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DATA_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
 
   return xoutput_stream_write_all (G_OUTPUT_STREAM (stream),
 				    str, strlen (str),

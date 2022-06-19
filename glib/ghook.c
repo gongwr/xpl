@@ -265,8 +265,8 @@ g_hook_alloc (GHookList *hook_list)
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
-  g_return_val_if_fail (hook_list->is_setup, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (hook_list->is_setup, NULL);
 
   hook = g_slice_alloc0 (hook_list->hook_size);
   hook->data = NULL;
@@ -341,8 +341,8 @@ g_hook_destroy (GHookList   *hook_list,
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, FALSE);
-  g_return_val_if_fail (hook_id > 0, FALSE);
+  xreturn_val_if_fail (hook_list != NULL, FALSE);
+  xreturn_val_if_fail (hook_id > 0, FALSE);
 
   hook = g_hook_get (hook_list, hook_id);
   if (hook)
@@ -417,9 +417,9 @@ GHook *
 g_hook_ref (GHookList *hook_list,
 	    GHook     *hook)
 {
-  g_return_val_if_fail (hook_list != NULL, NULL);
-  g_return_val_if_fail (hook != NULL, NULL);
-  g_return_val_if_fail (hook->ref_count > 0, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (hook != NULL, NULL);
+  xreturn_val_if_fail (hook->ref_count > 0, NULL);
 
   hook->ref_count++;
 
@@ -695,7 +695,7 @@ GHook*
 g_hook_first_valid (GHookList *hook_list,
 		    xboolean_t   may_be_in_call)
 {
-  g_return_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
 
   if (hook_list->is_setup)
     {
@@ -737,7 +737,7 @@ g_hook_next_valid (GHookList *hook_list,
 {
   GHook *ohook = hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
 
   if (!hook)
     return NULL;
@@ -774,8 +774,8 @@ g_hook_get (GHookList *hook_list,
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
-  g_return_val_if_fail (hook_id > 0, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (hook_id > 0, NULL);
 
   hook = hook_list->hooks;
   while (hook)
@@ -820,8 +820,8 @@ g_hook_find (GHookList	  *hook_list,
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
-  g_return_val_if_fail (func != NULL, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (func != NULL, NULL);
 
   hook = hook_list->hooks;
   while (hook)
@@ -871,7 +871,7 @@ g_hook_find_data (GHookList *hook_list,
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
 
   hook = hook_list->hooks;
   while (hook)
@@ -907,8 +907,8 @@ g_hook_find_func (GHookList *hook_list,
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
-  g_return_val_if_fail (func != NULL, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (func != NULL, NULL);
 
   hook = hook_list->hooks;
   while (hook)
@@ -946,8 +946,8 @@ g_hook_find_func_data (GHookList *hook_list,
 {
   GHook *hook;
 
-  g_return_val_if_fail (hook_list != NULL, NULL);
-  g_return_val_if_fail (func != NULL, NULL);
+  xreturn_val_if_fail (hook_list != NULL, NULL);
+  xreturn_val_if_fail (func != NULL, NULL);
 
   hook = hook_list->hooks;
   while (hook)

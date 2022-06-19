@@ -59,7 +59,7 @@ g_inotify_file_monitor_start (xlocal_file_monitor_t  *local_monitor,
 
   /* should already have been called, from is_supported() */
   success = _ih_startup ();
-  g_assert (success);
+  xassert (success);
 
   inotify_monitor->sub = _ih_sub_new (dirname, basename, filename, source);
   _ih_sub_add (inotify_monitor->sub);
@@ -88,9 +88,9 @@ g_inotify_file_monitor_finalize (xobject_t *object)
 #endif
 
   /* must surely have been cancelled already */
-  g_assert (!inotify_monitor->sub);
+  xassert (!inotify_monitor->sub);
 
-  G_OBJECT_CLASS (g_inotify_file_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_inotify_file_monitor_parent_class)->finalize (object);
 }
 
 static void
@@ -101,7 +101,7 @@ g_inotify_file_monitor_init (GInotifyFileMonitor* monitor)
 static void
 g_inotify_file_monitor_class_init (GInotifyFileMonitorClass* klass)
 {
-  xobject_class_t* gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t* xobject_class = XOBJECT_CLASS (klass);
   xfile_monitor_class_t *file_monitor_class = XFILE_MONITOR_CLASS (klass);
   xlocal_file_monitor_class_t *local_file_monitor_class = G_LOCAL_FILE_MONITOR_CLASS (klass);
 
@@ -110,5 +110,5 @@ g_inotify_file_monitor_class_init (GInotifyFileMonitorClass* klass)
   local_file_monitor_class->mount_notify = TRUE;
   file_monitor_class->cancel = g_inotify_file_monitor_cancel;
 
-  gobject_class->finalize = g_inotify_file_monitor_finalize;
+  xobject_class->finalize = g_inotify_file_monitor_finalize;
 }

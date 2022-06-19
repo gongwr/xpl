@@ -25,7 +25,7 @@
 #include <string.h>
 
 
-struct _GDelayedSettingsBackendPrivate
+struct _xdelayed_settings_backend_private
 {
   xsettings_backend_t *backend;
   xmutex_t lock;
@@ -35,8 +35,8 @@ struct _GDelayedSettingsBackendPrivate
   xpointer_t owner;
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (GDelayedSettingsBackend,
-                            g_delayed_settings_backend,
+G_DEFINE_TYPE_WITH_PRIVATE (xdelayed_settings_backend,
+                            xdelayed_settings_backend,
                             XTYPE_SETTINGS_BACKEND)
 
 static xboolean_t
@@ -49,7 +49,7 @@ invoke_notify_unapplied (xpointer_t data)
 }
 
 static void
-g_delayed_settings_backend_notify_unapplied (GDelayedSettingsBackend *delayed)
+xdelayed_settings_backend_notify_unapplied (xdelayed_settings_backend_t *delayed)
 {
   xmain_context_t *target_context;
   xobject_t *target;
@@ -73,12 +73,12 @@ g_delayed_settings_backend_notify_unapplied (GDelayedSettingsBackend *delayed)
 
 
 static xvariant_t *
-g_delayed_settings_backend_read (xsettings_backend_t   *backend,
+xdelayed_settings_backend_read (xsettings_backend_t   *backend,
                                  const xchar_t        *key,
                                  const xvariant_type_t *expected_type,
                                  xboolean_t            default_value)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
   xpointer_t result = NULL;
 
   if (!default_value)
@@ -103,11 +103,11 @@ g_delayed_settings_backend_read (xsettings_backend_t   *backend,
 }
 
 static xvariant_t *
-g_delayed_settings_backend_read_user_value (xsettings_backend_t   *backend,
+xdelayed_settings_backend_read_user_value (xsettings_backend_t   *backend,
                                             const xchar_t        *key,
                                             const xvariant_type_t *expected_type)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
   xboolean_t value_found = FALSE;
   xpointer_t result = NULL;
 
@@ -129,12 +129,12 @@ g_delayed_settings_backend_read_user_value (xsettings_backend_t   *backend,
 }
 
 static xboolean_t
-g_delayed_settings_backend_write (xsettings_backend_t *backend,
+xdelayed_settings_backend_write (xsettings_backend_t *backend,
                                   const xchar_t      *key,
                                   xvariant_t         *value,
                                   xpointer_t          origin_tag)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
   xboolean_t was_empty;
 
   g_mutex_lock (&delayed->priv->lock);
@@ -146,7 +146,7 @@ g_delayed_settings_backend_write (xsettings_backend_t *backend,
   g_settings_backend_changed (backend, key, origin_tag);
 
   if (was_empty)
-    g_delayed_settings_backend_notify_unapplied (delayed);
+    xdelayed_settings_backend_notify_unapplied (delayed);
 
   return TRUE;
 }
@@ -162,11 +162,11 @@ add_to_tree (xpointer_t key,
 }
 
 static xboolean_t
-g_delayed_settings_backend_write_tree (xsettings_backend_t *backend,
+xdelayed_settings_backend_write_tree (xsettings_backend_t *backend,
                                        xtree_t            *tree,
                                        xpointer_t          origin_tag)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
   xboolean_t was_empty;
 
   g_mutex_lock (&delayed->priv->lock);
@@ -178,26 +178,26 @@ g_delayed_settings_backend_write_tree (xsettings_backend_t *backend,
   g_settings_backend_changed_tree (backend, tree, origin_tag);
 
   if (was_empty)
-    g_delayed_settings_backend_notify_unapplied (delayed);
+    xdelayed_settings_backend_notify_unapplied (delayed);
 
   return TRUE;
 }
 
 static xboolean_t
-g_delayed_settings_backend_get_writable (xsettings_backend_t *backend,
+xdelayed_settings_backend_get_writable (xsettings_backend_t *backend,
                                          const xchar_t      *name)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
 
   return g_settings_backend_get_writable (delayed->priv->backend, name);
 }
 
 static void
-g_delayed_settings_backend_reset (xsettings_backend_t *backend,
+xdelayed_settings_backend_reset (xsettings_backend_t *backend,
                                   const xchar_t      *key,
                                   xpointer_t          origin_tag)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
   xboolean_t was_empty;
 
   g_mutex_lock (&delayed->priv->lock);
@@ -208,32 +208,32 @@ g_delayed_settings_backend_reset (xsettings_backend_t *backend,
   g_settings_backend_changed (backend, key, origin_tag);
 
   if (was_empty)
-    g_delayed_settings_backend_notify_unapplied (delayed);
+    xdelayed_settings_backend_notify_unapplied (delayed);
 }
 
 static void
-g_delayed_settings_backend_subscribe (xsettings_backend_t *backend,
+xdelayed_settings_backend_subscribe (xsettings_backend_t *backend,
                                       const char       *name)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
 
   g_settings_backend_subscribe (delayed->priv->backend, name);
 }
 
 static void
-g_delayed_settings_backend_unsubscribe (xsettings_backend_t *backend,
+xdelayed_settings_backend_unsubscribe (xsettings_backend_t *backend,
                                         const char       *name)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
 
   g_settings_backend_unsubscribe (delayed->priv->backend, name);
 }
 
 static xpermission_t *
-g_delayed_settings_backend_get_permission (xsettings_backend_t *backend,
+xdelayed_settings_backend_get_permission (xsettings_backend_t *backend,
                                            const xchar_t      *path)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (backend);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (backend);
 
   return g_settings_backend_get_permission (delayed->priv->backend, path);
 }
@@ -241,7 +241,7 @@ g_delayed_settings_backend_get_permission (xsettings_backend_t *backend,
 
 /* method calls */
 xboolean_t
-g_delayed_settings_backend_get_has_unapplied (GDelayedSettingsBackend *delayed)
+xdelayed_settings_backend_get_has_unapplied (xdelayed_settings_backend_t *delayed)
 {
   /* we don't need to lock for this... */
 
@@ -249,7 +249,7 @@ g_delayed_settings_backend_get_has_unapplied (GDelayedSettingsBackend *delayed)
 }
 
 void
-g_delayed_settings_backend_apply (GDelayedSettingsBackend *delayed)
+xdelayed_settings_backend_apply (xdelayed_settings_backend_t *delayed)
 {
   if (xtree_nnodes (delayed->priv->delayed) > 0)
     {
@@ -269,12 +269,12 @@ g_delayed_settings_backend_apply (GDelayedSettingsBackend *delayed)
 
       xtree_unref (tmp);
 
-      g_delayed_settings_backend_notify_unapplied (delayed);
+      xdelayed_settings_backend_notify_unapplied (delayed);
     }
 }
 
 void
-g_delayed_settings_backend_revert (GDelayedSettingsBackend *delayed)
+xdelayed_settings_backend_revert (xdelayed_settings_backend_t *delayed)
 {
   if (xtree_nnodes (delayed->priv->delayed) > 0)
     {
@@ -287,7 +287,7 @@ g_delayed_settings_backend_revert (GDelayedSettingsBackend *delayed)
       g_settings_backend_changed_tree (G_SETTINGS_BACKEND (delayed), tmp, NULL);
       xtree_unref (tmp);
 
-      g_delayed_settings_backend_notify_unapplied (delayed);
+      xdelayed_settings_backend_notify_unapplied (delayed);
     }
 }
 
@@ -298,7 +298,7 @@ delayed_backend_changed (xobject_t          *target,
                          const xchar_t      *key,
                          xpointer_t          origin_tag)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (target);
 
   if (origin_tag != delayed->priv)
     g_settings_backend_changed (G_SETTINGS_BACKEND (delayed),
@@ -312,7 +312,7 @@ delayed_backend_keys_changed (xobject_t             *target,
                               xpointer_t             origin_tag,
                               const xchar_t * const *items)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (target);
 
   if (origin_tag != delayed->priv)
     g_settings_backend_keys_changed (G_SETTINGS_BACKEND (delayed),
@@ -325,7 +325,7 @@ delayed_backend_path_changed (xobject_t          *target,
                               const xchar_t      *path,
                               xpointer_t          origin_tag)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (target);
 
   if (origin_tag != delayed->priv)
     g_settings_backend_path_changed (G_SETTINGS_BACKEND (delayed),
@@ -337,7 +337,7 @@ delayed_backend_writable_changed (xobject_t          *target,
                                   xsettings_backend_t *backend,
                                   const xchar_t      *key)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (target);
   xboolean_t last_one = FALSE;
 
   g_mutex_lock (&delayed->priv->lock);
@@ -362,7 +362,7 @@ delayed_backend_writable_changed (xobject_t          *target,
   g_mutex_unlock (&delayed->priv->lock);
 
   if (last_one)
-    g_delayed_settings_backend_notify_unapplied (delayed);
+    xdelayed_settings_backend_notify_unapplied (delayed);
 
   g_settings_backend_writable_changed (G_SETTINGS_BACKEND (delayed), key);
 }
@@ -394,7 +394,7 @@ delayed_backend_path_writable_changed (xobject_t          *target,
                                        xsettings_backend_t *backend,
                                        const xchar_t      *path)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (target);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (target);
   xboolean_t last_one = FALSE;
   xsize_t n_keys;
 
@@ -427,60 +427,60 @@ delayed_backend_path_writable_changed (xobject_t          *target,
   g_mutex_unlock (&delayed->priv->lock);
 
   if (last_one)
-    g_delayed_settings_backend_notify_unapplied (delayed);
+    xdelayed_settings_backend_notify_unapplied (delayed);
 
   g_settings_backend_path_writable_changed (G_SETTINGS_BACKEND (delayed),
                                             path);
 }
 
 static void
-g_delayed_settings_backend_finalize (xobject_t *object)
+xdelayed_settings_backend_finalize (xobject_t *object)
 {
-  GDelayedSettingsBackend *delayed = G_DELAYED_SETTINGS_BACKEND (object);
+  xdelayed_settings_backend_t *delayed = XDELAYED_SETTINGS_BACKEND (object);
 
   g_mutex_clear (&delayed->priv->lock);
   xobject_unref (delayed->priv->backend);
   xtree_unref (delayed->priv->delayed);
 
   /* if our owner is still alive, why are we finalizing? */
-  g_assert (delayed->priv->owner == NULL);
+  xassert (delayed->priv->owner == NULL);
 
-  G_OBJECT_CLASS (g_delayed_settings_backend_parent_class)
+  XOBJECT_CLASS (xdelayed_settings_backend_parent_class)
     ->finalize (object);
 }
 
 static void
-g_delayed_settings_backend_class_init (GDelayedSettingsBackendClass *class)
+xdelayed_settings_backend_class_init (xdelayed_settings_backend_class_t *class)
 {
-  GSettingsBackendClass *backend_class = G_SETTINGS_BACKEND_CLASS (class);
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xsettings_backend_class_t *backend_class = G_SETTINGS_BACKEND_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
-  backend_class->read = g_delayed_settings_backend_read;
-  backend_class->read_user_value = g_delayed_settings_backend_read_user_value;
-  backend_class->write = g_delayed_settings_backend_write;
-  backend_class->write_tree = g_delayed_settings_backend_write_tree;
-  backend_class->reset = g_delayed_settings_backend_reset;
-  backend_class->get_writable = g_delayed_settings_backend_get_writable;
-  backend_class->subscribe = g_delayed_settings_backend_subscribe;
-  backend_class->unsubscribe = g_delayed_settings_backend_unsubscribe;
-  backend_class->get_permission = g_delayed_settings_backend_get_permission;
+  backend_class->read = xdelayed_settings_backend_read;
+  backend_class->read_user_value = xdelayed_settings_backend_read_user_value;
+  backend_class->write = xdelayed_settings_backend_write;
+  backend_class->write_tree = xdelayed_settings_backend_write_tree;
+  backend_class->reset = xdelayed_settings_backend_reset;
+  backend_class->get_writable = xdelayed_settings_backend_get_writable;
+  backend_class->subscribe = xdelayed_settings_backend_subscribe;
+  backend_class->unsubscribe = xdelayed_settings_backend_unsubscribe;
+  backend_class->get_permission = xdelayed_settings_backend_get_permission;
 
-  object_class->finalize = g_delayed_settings_backend_finalize;
+  object_class->finalize = xdelayed_settings_backend_finalize;
 }
 
 static void
-g_delayed_settings_backend_init (GDelayedSettingsBackend *delayed)
+xdelayed_settings_backend_init (xdelayed_settings_backend_t *delayed)
 {
-  delayed->priv = g_delayed_settings_backend_get_instance_private (delayed);
+  delayed->priv = xdelayed_settings_backend_get_instance_private (delayed);
   delayed->priv->delayed = g_settings_backend_create_tree ();
   g_mutex_init (&delayed->priv->lock);
 }
 
 static void
-g_delayed_settings_backend_disown (xpointer_t  data,
+xdelayed_settings_backend_disown (xpointer_t  data,
                                    xobject_t  *where_the_object_was)
 {
-  GDelayedSettingsBackend *delayed = data;
+  xdelayed_settings_backend_t *delayed = data;
 
   g_mutex_lock (&delayed->priv->lock);
   delayed->priv->owner_context = NULL;
@@ -488,8 +488,8 @@ g_delayed_settings_backend_disown (xpointer_t  data,
   g_mutex_unlock (&delayed->priv->lock);
 }
 
-GDelayedSettingsBackend *
-g_delayed_settings_backend_new (xsettings_backend_t *backend,
+xdelayed_settings_backend_t *
+xdelayed_settings_backend_new (xsettings_backend_t *backend,
                                 xpointer_t          owner,
                                 xmain_context_t     *owner_context)
 {
@@ -500,14 +500,14 @@ g_delayed_settings_backend_new (xsettings_backend_t *backend,
     delayed_backend_writable_changed,
     delayed_backend_path_writable_changed
   };
-  GDelayedSettingsBackend *delayed;
+  xdelayed_settings_backend_t *delayed;
 
   delayed = xobject_new (XTYPE_DELAYED_SETTINGS_BACKEND, NULL);
   delayed->priv->backend = xobject_ref (backend);
   delayed->priv->owner_context = owner_context;
   delayed->priv->owner = owner;
 
-  xobject_weak_ref (owner, g_delayed_settings_backend_disown, delayed);
+  xobject_weak_ref (owner, xdelayed_settings_backend_disown, delayed);
 
   g_settings_backend_watch (delayed->priv->backend,
                             &vtable, G_OBJECT (delayed), NULL);

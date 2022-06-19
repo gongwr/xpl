@@ -284,7 +284,7 @@ xnetwork_monitor_real_can_reach_finish (xnetwork_monitor_t  *monitor,
                                          xasync_result_t     *result,
                                          xerror_t          **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, monitor), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, monitor), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -360,12 +360,12 @@ xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
    * Since: 2.32
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_boolean ("network-available",
+                                       xparam_spec_boolean ("network-available",
                                                              P_("Network available"),
                                                              P_("Whether the network is available"),
                                                              FALSE,
-                                                             G_PARAM_READABLE |
-                                                             G_PARAM_STATIC_STRINGS));
+                                                             XPARAM_READABLE |
+                                                             XPARAM_STATIC_STRINGS));
 
   /**
    * xnetwork_monitor_t:network-metered:
@@ -391,12 +391,12 @@ xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
    * Since: 2.46
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_boolean ("network-metered",
+                                       xparam_spec_boolean ("network-metered",
                                                              P_("Network metered"),
                                                              P_("Whether the network is metered"),
                                                              FALSE,
-                                                             G_PARAM_READABLE |
-                                                             G_PARAM_STATIC_STRINGS));
+                                                             XPARAM_READABLE |
+                                                             XPARAM_STATIC_STRINGS));
 
   /**
    * xnetwork_monitor_t:connectivity:
@@ -408,11 +408,11 @@ xnetwork_monitor_default_init (GNetworkMonitorInterface *iface)
    * Since: 2.44
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_enum ("connectivity",
+                                       xparam_spec_enum ("connectivity",
                                                           P_("Network connectivity"),
                                                           P_("Level of network connectivity"),
                                                           XTYPE_NETWORK_CONNECTIVITY,
                                                           G_NETWORK_CONNECTIVITY_FULL,
-                                                          G_PARAM_READABLE |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                          XPARAM_READABLE |
+                                                          XPARAM_STATIC_STRINGS));
 }

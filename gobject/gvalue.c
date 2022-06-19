@@ -83,11 +83,11 @@
  *   const xchar_t *message;
  *
  *   // The xvalue_t starts empty
- *   g_assert (!G_VALUE_HOLDS_STRING (&a));
+ *   xassert (!G_VALUE_HOLDS_STRING (&a));
  *
  *   // Put a string in it
  *   xvalue_init (&a, XTYPE_STRING);
- *   g_assert (G_VALUE_HOLDS_STRING (&a));
+ *   xassert (G_VALUE_HOLDS_STRING (&a));
  *   xvalue_set_static_string (&a, "Hello, world!");
  *   g_printf ("%s\n", xvalue_get_string (&a));
  *
@@ -102,7 +102,7 @@
  *   xvalue_init (&b, XTYPE_STRING);
  *
  *   // An INT is transformable to a STRING
- *   g_assert (xvalue_type_transformable (XTYPE_INT, XTYPE_STRING));
+ *   xassert (xvalue_type_transformable (XTYPE_INT, XTYPE_STRING));
  *
  *   xvalue_transform (&a, &b);
  *   g_printf ("%s\n", xvalue_get_string (&b));
@@ -196,9 +196,9 @@ xvalue_init (xvalue_t *value,
 	      xtype_t   g_type)
 {
   xtype_value_table_t *value_table;
-  /* g_return_val_if_fail (XTYPE_IS_VALUE (g_type), NULL);	be more elaborate below */
-  g_return_val_if_fail (value != NULL, NULL);
-  /* g_return_val_if_fail (G_VALUE_TYPE (value) == 0, NULL);	be more elaborate below */
+  /* xreturn_val_if_fail (XTYPE_IS_VALUE (g_type), NULL);	be more elaborate below */
+  xreturn_val_if_fail (value != NULL, NULL);
+  /* xreturn_val_if_fail (G_VALUE_TYPE (value) == 0, NULL);	be more elaborate below */
 
   value_table = xtype_value_table_peek (g_type);
 
@@ -268,11 +268,11 @@ xvalue_reset (xvalue_t *value)
   xtype_value_table_t *value_table;
   xtype_t g_type;
 
-  g_return_val_if_fail (value, NULL);
+  xreturn_val_if_fail (value, NULL);
   g_type = G_VALUE_TYPE (value);
 
   value_table = xtype_value_table_peek (g_type);
-  g_return_val_if_fail (value_table, NULL);
+  xreturn_val_if_fail (value_table, NULL);
 
   /* make sure value's value is free()d */
   if (value_table->value_free)
@@ -326,10 +326,10 @@ xvalue_fits_pointer (const xvalue_t *value)
 {
   xtype_value_table_t *value_table;
 
-  g_return_val_if_fail (value, FALSE);
+  xreturn_val_if_fail (value, FALSE);
 
   value_table = xtype_value_table_peek (G_VALUE_TYPE (value));
-  g_return_val_if_fail (value_table, FALSE);
+  xreturn_val_if_fail (value_table, FALSE);
 
   return value_table->value_peek_pointer != NULL;
 }
@@ -349,14 +349,14 @@ xvalue_peek_pointer (const xvalue_t *value)
 {
   xtype_value_table_t *value_table;
 
-  g_return_val_if_fail (value, NULL);
+  xreturn_val_if_fail (value, NULL);
 
   value_table = xtype_value_table_peek (G_VALUE_TYPE (value));
-  g_return_val_if_fail (value_table, NULL);
+  xreturn_val_if_fail (value_table, NULL);
 
   if (!value_table->value_peek_pointer)
     {
-      g_return_val_if_fail (xvalue_fits_pointer (value) == TRUE, NULL);
+      xreturn_val_if_fail (xvalue_fits_pointer (value) == TRUE, NULL);
       return NULL;
     }
 
@@ -592,8 +592,8 @@ xboolean_t
 xvalue_type_transformable (xtype_t src_type,
 			    xtype_t dest_type)
 {
-  g_return_val_if_fail (src_type, FALSE);
-  g_return_val_if_fail (dest_type, FALSE);
+  xreturn_val_if_fail (src_type, FALSE);
+  xreturn_val_if_fail (dest_type, FALSE);
 
   return (xvalue_type_compatible (src_type, dest_type) ||
 	  transform_func_lookup (src_type, dest_type) != NULL);
@@ -613,8 +613,8 @@ xboolean_t
 xvalue_type_compatible (xtype_t src_type,
 			 xtype_t dest_type)
 {
-  g_return_val_if_fail (src_type, FALSE);
-  g_return_val_if_fail (dest_type, FALSE);
+  xreturn_val_if_fail (src_type, FALSE);
+  xreturn_val_if_fail (dest_type, FALSE);
 
   /* Fast path */
   if (src_type == dest_type)
@@ -646,8 +646,8 @@ xvalue_transform (const xvalue_t *src_value,
 {
   xtype_t dest_type;
 
-  g_return_val_if_fail (src_value, FALSE);
-  g_return_val_if_fail (dest_value, FALSE);
+  xreturn_val_if_fail (src_value, FALSE);
+  xreturn_val_if_fail (dest_value, FALSE);
 
   dest_type = G_VALUE_TYPE (dest_value);
   if (xvalue_type_compatible (G_VALUE_TYPE (src_value), dest_type))

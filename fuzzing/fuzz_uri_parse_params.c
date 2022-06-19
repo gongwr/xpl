@@ -15,7 +15,7 @@ LLVMFuzzerTestOneInput (const unsigned char *data, size_t size)
                                       "&", XURI_PARAMS_NONE, &error);
   if (parsed_params == NULL)
     {
-      g_assert (error);
+      xassert (error);
       g_clear_error (&error);
       return 0;
     }

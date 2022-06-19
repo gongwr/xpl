@@ -94,7 +94,7 @@ xlist_store_dispose (xobject_t *object)
 
   g_clear_pointer (&store->items, g_sequence_free);
 
-  G_OBJECT_CLASS (xlist_store_parent_class)->dispose (object);
+  XOBJECT_CLASS (xlist_store_parent_class)->dispose (object);
 }
 
 static void
@@ -127,7 +127,7 @@ xlist_store_set_property (xobject_t      *object,
   switch (property_id)
     {
     case PROP_ITEM_TYPE: /* construct-only */
-      g_assert (xtype_is_a (xvalue_get_gtype (value), XTYPE_OBJECT));
+      xassert (xtype_is_a (xvalue_get_gtype (value), XTYPE_OBJECT));
       store->item_type = xvalue_get_gtype (value);
       break;
 
@@ -139,7 +139,7 @@ xlist_store_set_property (xobject_t      *object,
 static void
 xlist_store_class_init (GListStoreClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->dispose = xlist_store_dispose;
   object_class->get_property = xlist_store_get_property;
@@ -154,8 +154,8 @@ xlist_store_class_init (GListStoreClass *klass)
    * Since: 2.44
    **/
   xobject_class_install_property (object_class, PROP_ITEM_TYPE,
-    g_param_spec_gtype ("item-type", "", "", XTYPE_OBJECT,
-                        G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+    xparam_spec_gtype ("item-type", "", "", XTYPE_OBJECT,
+                        XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 }
 
 static xtype_t
@@ -236,7 +236,7 @@ xlist_store_new (xtype_t item_type)
   /* We only allow GObjects as item types right now. This might change
    * in the future.
    */
-  g_return_val_if_fail (xtype_is_a (item_type, XTYPE_OBJECT), NULL);
+  xreturn_val_if_fail (xtype_is_a (item_type, XTYPE_OBJECT), NULL);
 
   return xobject_new (XTYPE_LIST_STORE,
                        "item-type", item_type,
@@ -306,9 +306,9 @@ xlist_store_insert_sorted (xlist_store_t       *store,
   GSequenceIter *it;
   xuint_t position;
 
-  g_return_val_if_fail (X_IS_LIST_STORE (store), 0);
-  g_return_val_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type), 0);
-  g_return_val_if_fail (compare_func != NULL, 0);
+  xreturn_val_if_fail (X_IS_LIST_STORE (store), 0);
+  xreturn_val_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type), 0);
+  xreturn_val_if_fail (compare_func != NULL, 0);
 
   it = g_sequence_insert_sorted (store->items, xobject_ref (item), compare_func, user_data);
   position = g_sequence_iter_get_position (it);
@@ -520,10 +520,10 @@ xlist_store_find_with_equal_func (xlist_store_t *store,
 {
   GSequenceIter *iter, *begin, *end;
 
-  g_return_val_if_fail (X_IS_LIST_STORE (store), FALSE);
-  g_return_val_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type),
+  xreturn_val_if_fail (X_IS_LIST_STORE (store), FALSE);
+  xreturn_val_if_fail (xtype_is_a (G_OBJECT_TYPE (item), store->item_type),
                         FALSE);
-  g_return_val_if_fail (equal_func != NULL, FALSE);
+  xreturn_val_if_fail (equal_func != NULL, FALSE);
 
   /* NOTE: We can't use g_sequence_lookup() or g_sequence_search(), because we
    * can't assume the sequence is sorted. */

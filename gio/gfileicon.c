@@ -118,10 +118,10 @@ xfile_icon_constructed (xobject_t *object)
   xfile_icon_t *icon = XFILE_ICON (object);
 #endif
 
-  G_OBJECT_CLASS (xfile_icon_parent_class)->constructed (object);
+  XOBJECT_CLASS (xfile_icon_parent_class)->constructed (object);
 
   /* Must have be set during construction */
-  g_assert (icon->file != NULL);
+  xassert (icon->file != NULL);
 }
 
 static void
@@ -134,30 +134,30 @@ xfile_icon_finalize (xobject_t *object)
   if (icon->file)
     xobject_unref (icon->file);
 
-  G_OBJECT_CLASS (xfile_icon_parent_class)->finalize (object);
+  XOBJECT_CLASS (xfile_icon_parent_class)->finalize (object);
 }
 
 static void
 xfile_icon_class_init (GFileIconClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xfile_icon_get_property;
-  gobject_class->set_property = xfile_icon_set_property;
-  gobject_class->finalize = xfile_icon_finalize;
-  gobject_class->constructed = xfile_icon_constructed;
+  xobject_class->get_property = xfile_icon_get_property;
+  xobject_class->set_property = xfile_icon_set_property;
+  xobject_class->finalize = xfile_icon_finalize;
+  xobject_class->constructed = xfile_icon_constructed;
 
   /**
    * xfile_icon_t:file:
    *
    * The file containing the icon.
    */
-  xobject_class_install_property (gobject_class, PROP_FILE,
-                                   g_param_spec_object ("file",
+  xobject_class_install_property (xobject_class, PROP_FILE,
+                                   xparam_spec_object ("file",
                                                         P_("file"),
                                                         P_("The file containing the icon"),
                                                         XTYPE_FILE,
-                                                        G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB | G_PARAM_STATIC_NICK));
+                                                        XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_NAME | XPARAM_STATIC_BLURB | XPARAM_STATIC_NICK));
 }
 
 static void
@@ -177,7 +177,7 @@ xfile_icon_init (xfile_icon_t *file)
 xicon_t *
 xfile_icon_new (xfile_t *file)
 {
-  g_return_val_if_fail (X_IS_FILE (file), NULL);
+  xreturn_val_if_fail (X_IS_FILE (file), NULL);
 
   return XICON (xobject_new (XTYPE_FILE_ICON, "file", file, NULL));
 }
@@ -193,7 +193,7 @@ xfile_icon_new (xfile_t *file)
 xfile_t *
 xfile_icon_get_file (xfile_icon_t *icon)
 {
-  g_return_val_if_fail (X_IS_FILE_ICON (icon), NULL);
+  xreturn_val_if_fail (X_IS_FILE_ICON (icon), NULL);
 
   return icon->file;
 }
@@ -223,7 +223,7 @@ xfile_icon_to_tokens (xicon_t *icon,
 {
   xfile_icon_t *file_icon = XFILE_ICON (icon);
 
-  g_return_val_if_fail (out_version != NULL, FALSE);
+  xreturn_val_if_fail (out_version != NULL, FALSE);
 
   *out_version = 0;
 
@@ -349,7 +349,7 @@ xfile_icon_load_finish (xloadable_icon_t  *icon,
 			 char          **type,
 			 xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, icon), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, icon), NULL);
 
   if (type)
     *type = NULL;

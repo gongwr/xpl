@@ -57,7 +57,7 @@ static xint_t           quark_block_offset = 0;
 void
 g_quark_init (void)
 {
-  g_assert (quark_seq_id == 0);
+  xassert (quark_seq_id == 0);
   quark_ht = xhash_table_new (xstr_hash, xstr_equal);
   quarks = g_new (xchar_t*, QUARK_BLOCK_SIZE);
   quarks[0] = NULL;

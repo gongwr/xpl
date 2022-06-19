@@ -62,7 +62,7 @@ writer_thread (xpointer_t user_data)
 	  offset += nwrote;
 	}
 
-      g_assert (nwrote > 0 || err != NULL);
+      xassert (nwrote > 0 || err != NULL);
     }
   while (err == NULL);
 
@@ -105,14 +105,14 @@ reader_thread (xpointer_t user_data)
 
       if (nread == 0)
 	{
-	  g_assert (err == NULL);
+	  xassert (err == NULL);
 	  /* pipe closed */
 	  xobject_unref (in);
 	  return NULL;
 	}
 
       g_assert_cmpstr (buf, ==, DATA);
-      g_assert (!xcancellable_is_cancelled (reader_cancel));
+      xassert (!xcancellable_is_cancelled (reader_cancel));
     }
   while (err == NULL);
 
@@ -267,7 +267,7 @@ test_pipe_io (xconstpointer nonblocking)
    * read op to fail.
    */
 
-  g_assert (pipe (writer_pipe) == 0 && pipe (reader_pipe) == 0);
+  xassert (pipe (writer_pipe) == 0 && pipe (reader_pipe) == 0);
 
   if (nonblocking)
     {
@@ -327,13 +327,13 @@ test_basic (void)
                 "close-fd", &close_fd,
                 NULL);
   g_assert_cmpint (fd, ==, 0);
-  g_assert (close_fd);
+  xassert (close_fd);
 
   g_unix_input_stream_set_close_fd (is, FALSE);
-  g_assert (!g_unix_input_stream_get_close_fd (is));
+  xassert (!g_unix_input_stream_get_close_fd (is));
   g_assert_cmpint (g_unix_input_stream_get_fd (is), ==, 0);
 
-  g_assert (!xinput_stream_has_pending (G_INPUT_STREAM (is)));
+  xassert (!xinput_stream_has_pending (G_INPUT_STREAM (is)));
 
   xobject_unref (is);
 
@@ -343,13 +343,13 @@ test_basic (void)
                 "close-fd", &close_fd,
                 NULL);
   g_assert_cmpint (fd, ==, 1);
-  g_assert (close_fd);
+  xassert (close_fd);
 
   g_unix_output_stream_set_close_fd (os, FALSE);
-  g_assert (!g_unix_output_stream_get_close_fd (os));
+  xassert (!g_unix_output_stream_get_close_fd (os));
   g_assert_cmpint (g_unix_output_stream_get_fd (os), ==, 1);
 
-  g_assert (!xoutput_stream_has_pending (G_OUTPUT_STREAM (os)));
+  xassert (!xoutput_stream_has_pending (G_OUTPUT_STREAM (os)));
 
   xobject_unref (os);
 }

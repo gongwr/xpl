@@ -36,17 +36,17 @@ test_basic (void)
   xint_t val;
 
   base_stream = g_memory_input_stream_new ();
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
 
   xobject_get (stream, "byte-order", &val, NULL);
   g_assert_cmpint (val, ==, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
   xobject_set (stream, "byte-order", G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN, NULL);
-  g_assert_cmpint (g_data_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+  g_assert_cmpint (xdata_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
   xobject_get (stream, "newline-type", &val, NULL);
   g_assert_cmpint (val, ==, G_DATA_STREAM_NEWLINE_TYPE_LF);
   xobject_set (stream, "newline-type", G_DATA_STREAM_NEWLINE_TYPE_CR_LF, NULL);
-  g_assert_cmpint (g_data_input_stream_get_newline_type (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
+  g_assert_cmpint (xdata_input_stream_get_newline_type (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_NEWLINE_TYPE_CR_LF);
 
   xobject_unref (stream);
   xobject_unref (base_stream);
@@ -62,7 +62,7 @@ test_seek_to_start (xinput_stream_t *stream)
 }
 
 static void
-test_read_lines (GDataStreamNewlineType newline_type)
+test_read_lines (xdata_stream_newline_type_t newline_type)
 {
   xinput_stream_t *stream;
   xinput_stream_t *base_stream;
@@ -78,19 +78,19 @@ test_read_lines (GDataStreamNewlineType newline_type)
     lines[i] = "some_text";
 
   base_stream = g_memory_input_stream_new ();
-  g_assert (base_stream != NULL);
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
-  g_assert(stream != NULL);
+  xassert (base_stream != NULL);
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
+  xassert(stream != NULL);
 
   /*  Byte order testing */
-  g_data_input_stream_set_byte_order (G_DATA_INPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
-  g_assert_cmpint (g_data_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
-  g_data_input_stream_set_byte_order (G_DATA_INPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
-  g_assert_cmpint (g_data_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+  xdata_input_stream_set_byte_order (G_DATA_INPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
+  g_assert_cmpint (xdata_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN);
+  xdata_input_stream_set_byte_order (G_DATA_INPUT_STREAM (stream), G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
+  g_assert_cmpint (xdata_input_stream_get_byte_order (G_DATA_INPUT_STREAM (stream)), ==, G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN);
 
   /*  Line ends testing */
-  g_data_input_stream_set_newline_type (G_DATA_INPUT_STREAM (stream), newline_type);
-  g_assert_cmpint (g_data_input_stream_get_newline_type (G_DATA_INPUT_STREAM (stream)), ==, newline_type);
+  xdata_input_stream_set_newline_type (G_DATA_INPUT_STREAM (stream), newline_type);
+  g_assert_cmpint (xdata_input_stream_get_newline_type (G_DATA_INPUT_STREAM (stream)), ==, newline_type);
 
 
   /*  Add sample data */
@@ -108,7 +108,7 @@ test_read_lines (GDataStreamNewlineType newline_type)
   while (data)
     {
       xsize_t length = -1;
-      data = g_data_input_stream_read_line (G_DATA_INPUT_STREAM (stream), &length, NULL, &error);
+      data = xdata_input_stream_read_line (G_DATA_INPUT_STREAM (stream), &length, NULL, &error);
       if (data)
 	{
 	  g_assert_cmpstr (data, ==, lines[line]);
@@ -160,7 +160,7 @@ test_read_lines_LF_valid_utf8 (void)
   xuint_t n_lines = 0;
 
   base_stream = g_memory_input_stream_new ();
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
 
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream),
 				  "foo\nthis is valid UTF-8 ☺!\nbar\n", -1, NULL);
@@ -170,7 +170,7 @@ test_read_lines_LF_valid_utf8 (void)
   while (TRUE)
     {
       xsize_t length = -1;
-      line = g_data_input_stream_read_line_utf8 (G_DATA_INPUT_STREAM (stream), &length, NULL, &error);
+      line = xdata_input_stream_read_line_utf8 (G_DATA_INPUT_STREAM (stream), &length, NULL, &error);
       g_assert_no_error (error);
       if (line == NULL)
 	break;
@@ -193,7 +193,7 @@ test_read_lines_LF_invalid_utf8 (void)
   xuint_t n_lines = 0;
 
   base_stream = g_memory_input_stream_new ();
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
 
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream),
 				  "foo\nthis is not valid UTF-8 \xE5 =(\nbar\n", -1, NULL);
@@ -203,12 +203,12 @@ test_read_lines_LF_invalid_utf8 (void)
   while (TRUE)
     {
       xsize_t length = -1;
-      line = g_data_input_stream_read_line_utf8 (G_DATA_INPUT_STREAM (stream), &length, NULL, &error);
+      line = xdata_input_stream_read_line_utf8 (G_DATA_INPUT_STREAM (stream), &length, NULL, &error);
       if (n_lines == 0)
 	g_assert_no_error (error);
       else
 	{
-	  g_assert (error != NULL);
+	  xassert (error != NULL);
 	  g_clear_error (&error);
 	  g_free (line);
 	  break;
@@ -242,7 +242,7 @@ test_read_until (void)
   const int DATA_PARTS_NUM = DATA_SEP_LEN * REPEATS;
 
   base_stream = g_memory_input_stream_new ();
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
 
   for (i = 0; i < REPEATS; i++)
     g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream), DATA_STRING, -1, NULL);
@@ -254,7 +254,7 @@ test_read_until (void)
   while (data)
     {
       xsize_t length = -1;
-      data = g_data_input_stream_read_until (G_DATA_INPUT_STREAM (stream), DATA_SEP, &length, NULL, &error);
+      data = xdata_input_stream_read_until (G_DATA_INPUT_STREAM (stream), DATA_SEP, &length, NULL, &error);
       if (data)
 	{
 	  g_assert_cmpint (strlen (data), ==, DATA_PART_LEN);
@@ -296,7 +296,7 @@ test_read_upto (void)
   const int DATA_PARTS_NUM = DATA_SEP_LEN * REPEATS;
 
   base_stream = g_memory_input_stream_new ();
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
 
   for (i = 0; i < REPEATS; i++)
     g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream), DATA_STRING, 32, NULL);
@@ -308,15 +308,15 @@ test_read_upto (void)
   while (data)
     {
       xsize_t length = -1;
-      data = g_data_input_stream_read_upto (G_DATA_INPUT_STREAM (stream), DATA_SEP, DATA_SEP_LEN, &length, NULL, &error);
+      data = xdata_input_stream_read_upto (G_DATA_INPUT_STREAM (stream), DATA_SEP, DATA_SEP_LEN, &length, NULL, &error);
       if (data)
         {
           g_assert_cmpint (strlen (data), ==, DATA_PART_LEN);
           g_assert_no_error (error);
           line++;
 
-          stop_char = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (stream), NULL, &error);
-          g_assert (memchr (DATA_SEP, stop_char, DATA_SEP_LEN) != NULL);
+          stop_char = xdata_input_stream_read_byte (G_DATA_INPUT_STREAM (stream), NULL, &error);
+          xassert (memchr (DATA_SEP, stop_char, DATA_SEP_LEN) != NULL);
           g_assert_no_error (error);
         }
       g_free (data);
@@ -351,13 +351,13 @@ enum TestDataType {
 static void
 test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
 		 xpointer_t buffer, int len,
-		 enum TestDataType data_type, GDataStreamByteOrder byte_order)
+		 enum TestDataType data_type, xdata_stream_byte_order_t byte_order)
 {
   xerror_t *error = NULL;
   int pos = 0;
   int data_size = 1;
   sint64_t data;
-  GDataStreamByteOrder native;
+  xdata_stream_byte_order_t native;
   xboolean_t swap;
 
   /*  Seek to start */
@@ -396,35 +396,35 @@ test_data_array (xinput_stream_t *stream, xinput_stream_t *base_stream,
       switch (data_type)
 	{
 	case TEST_DATA_BYTE:
-	  data = g_data_input_stream_read_byte (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_byte (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  break;
 	case TEST_DATA_INT16:
-	  data = g_data_input_stream_read_int16 (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_int16 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
 	    data = (gint16)GUINT16_SWAP_LE_BE((gint16)data);
 	  break;
 	case TEST_DATA_UINT16:
-	  data = g_data_input_stream_read_uint16 (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_uint16 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
 	    data = (xuint16_t)GUINT16_SWAP_LE_BE((xuint16_t)data);
 	  break;
 	case TEST_DATA_INT32:
-	  data = g_data_input_stream_read_int32 (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_int32 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
 	    data = (gint32)GUINT32_SWAP_LE_BE((gint32)data);
 	  break;
 	case TEST_DATA_UINT32:
-	  data = g_data_input_stream_read_uint32 (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_uint32 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
 	    data = (xuint32_t)GUINT32_SWAP_LE_BE((xuint32_t)data);
 	  break;
 	case TEST_DATA_INT64:
-	  data = g_data_input_stream_read_int64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_int64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
 	    data = (sint64_t)GUINT64_SWAP_LE_BE((sint64_t)data);
 	  break;
 	case TEST_DATA_UINT64:
-	  data = g_data_input_stream_read_uint64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
+	  data = xdata_input_stream_read_uint64 (G_DATA_INPUT_STREAM (stream), NULL, &error);
 	  if (swap)
 	    data = (xuint64_t)GUINT64_SWAP_LE_BE((xuint64_t)data);
 	  break;
@@ -466,14 +466,14 @@ test_read_int (void)
     }
 
   base_stream = g_memory_input_stream_new ();
-  stream = G_INPUT_STREAM (g_data_input_stream_new (base_stream));
+  stream = G_INPUT_STREAM (xdata_input_stream_new (base_stream));
   g_memory_input_stream_add_data (G_MEMORY_INPUT_STREAM (base_stream), buffer, MAX_BYTES, NULL);
 
 
   for (i = 0; i < 3; i++)
     {
       int j;
-      g_data_input_stream_set_byte_order (G_DATA_INPUT_STREAM (stream), i);
+      xdata_input_stream_set_byte_order (G_DATA_INPUT_STREAM (stream), i);
 
       for (j = 0; j <= TEST_DATA_UINT64; j++)
 	test_data_array (stream, base_stream, buffer, MAX_BYTES, j, i);

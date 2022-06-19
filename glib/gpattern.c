@@ -193,8 +193,8 @@ xpattern_spec_match (xpattern_spec_t *pspec,
                       const xchar_t *string,
                       const xchar_t *string_reversed)
 {
-  g_return_val_if_fail (pspec != NULL, FALSE);
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (pspec != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   if (string_length < pspec->min_length ||
       string_length > pspec->max_length)
@@ -235,7 +235,7 @@ xpattern_spec_match (xpattern_spec_t *pspec,
       else
         return strcmp (pspec->pattern, string) == 0;
     default:
-      g_return_val_if_fail (pspec->match_type < XMATCH_LAST, FALSE);
+      xreturn_val_if_fail (pspec->match_type < XMATCH_LAST, FALSE);
       return FALSE;
     }
 }
@@ -298,7 +298,7 @@ xpattern_spec_new (const xchar_t *pattern)
   xchar_t *d;
   xuint_t i;
 
-  g_return_val_if_fail (pattern != NULL, NULL);
+  xreturn_val_if_fail (pattern != NULL, NULL);
 
   /* canonicalize pattern and collect necessary stats */
   pspec = g_new (xpattern_spec_t, 1);
@@ -409,7 +409,7 @@ xpattern_spec_copy (xpattern_spec_t *pspec)
 {
   xpattern_spec_t *pspec_copy;
 
-  g_return_val_if_fail (pspec != NULL, NULL);
+  xreturn_val_if_fail (pspec != NULL, NULL);
 
   pspec_copy = g_new (xpattern_spec_t, 1);
   *pspec_copy = *pspec;
@@ -447,8 +447,8 @@ xboolean_t
 xpattern_spec_equal (xpattern_spec_t *pspec1,
 		      xpattern_spec_t *pspec2)
 {
-  g_return_val_if_fail (pspec1 != NULL, FALSE);
-  g_return_val_if_fail (pspec2 != NULL, FALSE);
+  xreturn_val_if_fail (pspec1 != NULL, FALSE);
+  xreturn_val_if_fail (pspec2 != NULL, FALSE);
 
   return (pspec1->pattern_length == pspec2->pattern_length &&
 	  pspec1->match_type == pspec2->match_type &&
@@ -472,8 +472,8 @@ xboolean_t
 xpattern_spec_match_string (xpattern_spec_t *pspec,
                              const xchar_t *string)
 {
-  g_return_val_if_fail (pspec != NULL, FALSE);
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (pspec != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   return xpattern_spec_match (pspec, strlen (string), string, NULL);
 }
@@ -516,8 +516,8 @@ g_pattern_match_simple (const xchar_t *pattern,
   xpattern_spec_t *pspec;
   xboolean_t ergo;
 
-  g_return_val_if_fail (pattern != NULL, FALSE);
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (pattern != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   pspec = xpattern_spec_new (pattern);
   ergo = xpattern_spec_match (pspec, strlen (string), string, NULL);

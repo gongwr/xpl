@@ -63,13 +63,13 @@ xtls_file_database_default_init (xtls_file_database_interface_t *iface)
    * Since: 2.30
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_string ("anchors",
+                                       xparam_spec_string ("anchors",
                                                            P_("Anchors"),
                                                            P_("The certificate authority anchor file"),
                                                            NULL,
-                                                           G_PARAM_READWRITE |
-                                                           G_PARAM_CONSTRUCT |
-                                                           G_PARAM_STATIC_STRINGS));
+                                                           XPARAM_READWRITE |
+                                                           XPARAM_CONSTRUCT |
+                                                           XPARAM_STATIC_STRINGS));
 }
 
 /**

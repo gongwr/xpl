@@ -98,12 +98,12 @@ g_action_default_init (xaction_interface_t *iface)
    * Since: 2.28
    **/
   xobject_interface_install_property (iface,
-                                       g_param_spec_string ("name",
+                                       xparam_spec_string ("name",
                                                             P_("Action Name"),
                                                             P_("The name used to invoke the action"),
                                                             NULL,
-                                                            G_PARAM_READABLE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READABLE |
+                                                            XPARAM_STATIC_STRINGS));
 
   /**
    * xaction_t:parameter-type:
@@ -115,12 +115,12 @@ g_action_default_init (xaction_interface_t *iface)
    * Since: 2.28
    **/
   xobject_interface_install_property (iface,
-                                       g_param_spec_boxed ("parameter-type",
+                                       xparam_spec_boxed ("parameter-type",
                                                            P_("Parameter Type"),
                                                            P_("The type of xvariant_t passed to activate()"),
                                                            XTYPE_VARIANT_TYPE,
-                                                           G_PARAM_READABLE |
-                                                           G_PARAM_STATIC_STRINGS));
+                                                           XPARAM_READABLE |
+                                                           XPARAM_STATIC_STRINGS));
 
   /**
    * xaction_t:enabled:
@@ -133,12 +133,12 @@ g_action_default_init (xaction_interface_t *iface)
    * Since: 2.28
    **/
   xobject_interface_install_property (iface,
-                                       g_param_spec_boolean ("enabled",
+                                       xparam_spec_boolean ("enabled",
                                                              P_("Enabled"),
                                                              P_("If the action can be activated"),
                                                              TRUE,
-                                                             G_PARAM_READABLE |
-                                                             G_PARAM_STATIC_STRINGS));
+                                                             XPARAM_READABLE |
+                                                             XPARAM_STATIC_STRINGS));
 
   /**
    * xaction_t:state-type:
@@ -149,12 +149,12 @@ g_action_default_init (xaction_interface_t *iface)
    * Since: 2.28
    **/
   xobject_interface_install_property (iface,
-                                       g_param_spec_boxed ("state-type",
+                                       xparam_spec_boxed ("state-type",
                                                            P_("State Type"),
                                                            P_("The type of the state kept by the action"),
                                                            XTYPE_VARIANT_TYPE,
-                                                           G_PARAM_READABLE |
-                                                           G_PARAM_STATIC_STRINGS));
+                                                           XPARAM_READABLE |
+                                                           XPARAM_STATIC_STRINGS));
 
   /**
    * xaction_t:state:
@@ -164,13 +164,13 @@ g_action_default_init (xaction_interface_t *iface)
    * Since: 2.28
    **/
   xobject_interface_install_property (iface,
-                                       g_param_spec_variant ("state",
+                                       xparam_spec_variant ("state",
                                                              P_("State"),
                                                              P_("The state the action is in"),
                                                              G_VARIANT_TYPE_ANY,
                                                              NULL,
-                                                             G_PARAM_READABLE |
-                                                             G_PARAM_STATIC_STRINGS));
+                                                             XPARAM_READABLE |
+                                                             XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -231,7 +231,7 @@ g_action_change_state (xaction_t  *action,
 xvariant_t *
 g_action_get_state (xaction_t *action)
 {
-  g_return_val_if_fail (X_IS_ACTION (action), NULL);
+  xreturn_val_if_fail (X_IS_ACTION (action), NULL);
 
   return G_ACTION_GET_IFACE (action)
     ->get_state (action);
@@ -250,7 +250,7 @@ g_action_get_state (xaction_t *action)
 const xchar_t *
 g_action_get_name (xaction_t *action)
 {
-  g_return_val_if_fail (X_IS_ACTION (action), NULL);
+  xreturn_val_if_fail (X_IS_ACTION (action), NULL);
 
   return G_ACTION_GET_IFACE (action)
     ->get_name (action);
@@ -276,7 +276,7 @@ g_action_get_name (xaction_t *action)
 const xvariant_type_t *
 g_action_get_parameter_type (xaction_t *action)
 {
-  g_return_val_if_fail (X_IS_ACTION (action), NULL);
+  xreturn_val_if_fail (X_IS_ACTION (action), NULL);
 
   return G_ACTION_GET_IFACE (action)
     ->get_parameter_type (action);
@@ -306,7 +306,7 @@ g_action_get_parameter_type (xaction_t *action)
 const xvariant_type_t *
 g_action_get_state_type (xaction_t *action)
 {
-  g_return_val_if_fail (X_IS_ACTION (action), NULL);
+  xreturn_val_if_fail (X_IS_ACTION (action), NULL);
 
   return G_ACTION_GET_IFACE (action)
     ->get_state_type (action);
@@ -342,7 +342,7 @@ g_action_get_state_type (xaction_t *action)
 xvariant_t *
 g_action_get_state_hint (xaction_t *action)
 {
-  g_return_val_if_fail (X_IS_ACTION (action), NULL);
+  xreturn_val_if_fail (X_IS_ACTION (action), NULL);
 
   return G_ACTION_GET_IFACE (action)
     ->get_state_hint (action);
@@ -364,7 +364,7 @@ g_action_get_state_hint (xaction_t *action)
 xboolean_t
 g_action_get_enabled (xaction_t *action)
 {
-  g_return_val_if_fail (X_IS_ACTION (action), FALSE);
+  xreturn_val_if_fail (X_IS_ACTION (action), FALSE);
 
   return G_ACTION_GET_IFACE (action)
     ->get_enabled (action);
@@ -423,7 +423,7 @@ g_action_name_is_valid (const xchar_t *action_name)
   xchar_t c;
   xint_t i;
 
-  g_return_val_if_fail (action_name != NULL, FALSE);
+  xreturn_val_if_fail (action_name != NULL, FALSE);
 
   for (i = 0; (c = action_name[i]); i++)
     if (!g_ascii_isalnum (c) && c != '.' && c != '-')
@@ -433,7 +433,7 @@ g_action_name_is_valid (const xchar_t *action_name)
 }
 
 /**
- * g_action_parse_detailed_name:
+ * xaction_parse_detailed_name:
  * @detailed_name: a detailed action name
  * @action_name: (out): the action name
  * @target_value: (out): the target value, or %NULL for no target
@@ -469,7 +469,7 @@ g_action_name_is_valid (const xchar_t *action_name)
  * Since: 2.38
  **/
 xboolean_t
-g_action_parse_detailed_name (const xchar_t  *detailed_name,
+xaction_parse_detailed_name (const xchar_t  *detailed_name,
                               xchar_t       **action_name,
                               xvariant_t    **target_value,
                               xerror_t      **error)
@@ -548,7 +548,7 @@ bad_fmt:
  *
  * It is an error to call this function with an invalid action name.
  *
- * This function is the opposite of g_action_parse_detailed_name().
+ * This function is the opposite of xaction_parse_detailed_name().
  * It will produce a string that can be parsed back to the @action_name
  * and @target_value by that function.
  *
@@ -563,7 +563,7 @@ xchar_t *
 g_action_print_detailed_name (const xchar_t *action_name,
                               xvariant_t    *target_value)
 {
-  g_return_val_if_fail (g_action_name_is_valid (action_name), NULL);
+  xreturn_val_if_fail (g_action_name_is_valid (action_name), NULL);
 
   if (target_value == NULL)
     return xstrdup (action_name);

@@ -72,7 +72,7 @@ on_bus_acquired (xdbus_connection_t *connection,
                                                        NULL, /* user_data_free_func */
                                                        &error);
   g_assert_no_error (error);
-  g_assert (registration_id > 0);
+  xassert (registration_id > 0);
 }
 
 static void
@@ -98,7 +98,7 @@ main (xint_t argc, xchar_t *argv[])
 
   loop = xmain_loop_new (NULL, FALSE);
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
 
   id = g_bus_own_name (G_BUS_TYPE_SESSION,
                        "org.gtk.GDBus.FakeService",

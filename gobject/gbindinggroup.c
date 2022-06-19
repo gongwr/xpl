@@ -75,7 +75,7 @@ typedef struct
   xuint_t               usinxclosures : 1;
 } LazyBinding;
 
-G_DEFINE_TYPE (xbinding_group, xbinding_group, XTYPE_OBJECT)
+XDEFINE_TYPE (xbinding_group, xbinding_group, XTYPE_OBJECT)
 
 typedef enum
 {
@@ -93,13 +93,13 @@ xbinding_group_connect (xbinding_group_t *self,
 {
   xbinding_t *binding;
 
-  g_assert (X_IS_BINDING_GROUP (self));
-  g_assert (self->source != NULL);
-  g_assert (lazy_binding != NULL);
-  g_assert (lazy_binding->binding == NULL);
-  g_assert (lazy_binding->target != NULL);
-  g_assert (lazy_binding->target_property != NULL);
-  g_assert (lazy_binding->source_property != NULL);
+  xassert (X_IS_BINDING_GROUP (self));
+  xassert (self->source != NULL);
+  xassert (lazy_binding != NULL);
+  xassert (lazy_binding->binding == NULL);
+  xassert (lazy_binding->target != NULL);
+  xassert (lazy_binding->target_property != NULL);
+  xassert (lazy_binding->source_property != NULL);
 
 #ifdef DEBUG_BINDINGS
   {
@@ -147,7 +147,7 @@ xbinding_group_connect (xbinding_group_t *self,
 static void
 xbinding_group_disconnect (LazyBinding *lazy_binding)
 {
-  g_assert (lazy_binding != NULL);
+  xassert (lazy_binding != NULL);
 
   if (lazy_binding->binding != NULL)
     {
@@ -163,7 +163,7 @@ xbinding_group__source_weak_notify (xpointer_t  data,
   xbinding_group_t *self = data;
   xuint_t i;
 
-  g_assert (X_IS_BINDING_GROUP (self));
+  xassert (X_IS_BINDING_GROUP (self));
 
   g_mutex_lock (&self->mutex);
 
@@ -187,7 +187,7 @@ xbinding_group__target_weak_notify (xpointer_t  data,
   LazyBinding *to_free = NULL;
   xuint_t i;
 
-  g_assert (X_IS_BINDING_GROUP (self));
+  xassert (X_IS_BINDING_GROUP (self));
 
   g_mutex_lock (&self->mutex);
 
@@ -250,7 +250,7 @@ xbinding_group_dispose (xobject_t *object)
   xsize_t len = 0;
   xsize_t i;
 
-  g_assert (X_IS_BINDING_GROUP (self));
+  xassert (X_IS_BINDING_GROUP (self));
 
   g_mutex_lock (&self->mutex);
 
@@ -275,7 +275,7 @@ xbinding_group_dispose (xobject_t *object)
     lazy_binding_free (lazy_bindings[i]);
   g_free (lazy_bindings);
 
-  G_OBJECT_CLASS (xbinding_group_parent_class)->dispose (object);
+  XOBJECT_CLASS (xbinding_group_parent_class)->dispose (object);
 }
 
 static void
@@ -283,13 +283,13 @@ xbinding_group_finalize (xobject_t *object)
 {
   xbinding_group_t *self = (xbinding_group_t *)object;
 
-  g_assert (self->lazy_bindings != NULL);
-  g_assert (self->lazy_bindings->len == 0);
+  xassert (self->lazy_bindings != NULL);
+  xassert (self->lazy_bindings->len == 0);
 
   g_clear_pointer (&self->lazy_bindings, xptr_array_unref);
   g_mutex_clear (&self->mutex);
 
-  G_OBJECT_CLASS (xbinding_group_parent_class)->finalize (object);
+  XOBJECT_CLASS (xbinding_group_parent_class)->finalize (object);
 }
 
 static void
@@ -333,7 +333,7 @@ xbinding_group_set_property (xobject_t      *object,
 static void
 xbinding_group_class_init (xbinding_group_class_t *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->dispose = xbinding_group_dispose;
   object_class->finalize = xbinding_group_finalize;
@@ -348,11 +348,11 @@ xbinding_group_class_init (xbinding_group_class_t *klass)
    * Since: 2.72
    */
   properties[PROP_SOURCE] =
-      g_param_spec_object ("source",
+      xparam_spec_object ("source",
                            "Source",
                            "The source xobject_t used for binding properties.",
                            XTYPE_OBJECT,
-                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                           (XPARAM_READWRITE | XPARAM_EXPLICIT_NOTIFY | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -394,7 +394,7 @@ xbinding_group_dup_source (xbinding_group_t *self)
 {
   xobject_t *source;
 
-  g_return_val_if_fail (X_IS_BINDING_GROUP (self), NULL);
+  xreturn_val_if_fail (X_IS_BINDING_GROUP (self), NULL);
 
   g_mutex_lock (&self->mutex);
   source = self->source ? xobject_ref (self->source) : NULL;
@@ -409,14 +409,14 @@ xbinding_group_check_source (xbinding_group_t *self,
 {
   xuint_t i;
 
-  g_assert (X_IS_BINDING_GROUP (self));
-  g_assert (!source || X_IS_OBJECT (source));
+  xassert (X_IS_BINDING_GROUP (self));
+  xassert (!source || X_IS_OBJECT (source));
 
   for (i = 0; i < self->lazy_bindings->len; i++)
     {
       LazyBinding *lazy_binding = xptr_array_index (self->lazy_bindings, i);
 
-      g_return_val_if_fail (xobject_class_find_property (G_OBJECT_GET_CLASS (source),
+      xreturn_val_if_fail (xobject_class_find_property (G_OBJECT_GET_CLASS (source),
                                                           lazy_binding->source_property) != NULL,
                             FALSE);
     }

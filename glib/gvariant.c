@@ -286,7 +286,7 @@
 
 /* definition of xvariant_t structure is in gvariant-core.c */
 
-/* this is a g_return_val_if_fail() for making
+/* this is a xreturn_val_if_fail() for making
  * sure a (xvariant_t *) has the required type.
  */
 #define TYPE_CHECK(value, TYPE, val) \
@@ -650,10 +650,10 @@ xvariant_new_maybe (const xvariant_type_t *child_type,
   xvariant_type_t *maybe_type;
   xvariant_t *value;
 
-  g_return_val_if_fail (child_type == NULL || xvariant_type_is_definite
+  xreturn_val_if_fail (child_type == NULL || xvariant_type_is_definite
                         (child_type), 0);
-  g_return_val_if_fail (child_type != NULL || child != NULL, NULL);
-  g_return_val_if_fail (child_type == NULL || child == NULL ||
+  xreturn_val_if_fail (child_type != NULL || child != NULL, NULL);
+  xreturn_val_if_fail (child_type == NULL || child == NULL ||
                         xvariant_is_of_type (child, child_type),
                         NULL);
 
@@ -720,7 +720,7 @@ xvariant_get_maybe (xvariant_t *value)
 xvariant_t *
 xvariant_new_variant (xvariant_t *value)
 {
-  g_return_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
 
   xvariant_ref_sink (value);
 
@@ -786,9 +786,9 @@ xvariant_new_array (const xvariant_type_t *child_type,
   xvariant_t *value;
   xsize_t i;
 
-  g_return_val_if_fail (n_children > 0 || child_type != NULL, NULL);
-  g_return_val_if_fail (n_children == 0 || children != NULL, NULL);
-  g_return_val_if_fail (child_type == NULL ||
+  xreturn_val_if_fail (n_children > 0 || child_type != NULL, NULL);
+  xreturn_val_if_fail (n_children == 0 || children != NULL, NULL);
+  xreturn_val_if_fail (child_type == NULL ||
                         xvariant_type_is_definite (child_type), NULL);
 
   my_children = g_new (xvariant_t *, n_children);
@@ -805,7 +805,7 @@ xvariant_new_array (const xvariant_type_t *child_type,
           while (i != 0)
             xvariant_unref (my_children[--i]);
           g_free (my_children);
-	  g_return_val_if_fail (xvariant_is_of_type (children[i], child_type), NULL);
+	  xreturn_val_if_fail (xvariant_is_of_type (children[i], child_type), NULL);
         }
       my_children[i] = xvariant_ref_sink (children[i]);
       trusted &= xvariant_is_trusted (children[i]);
@@ -872,7 +872,7 @@ xvariant_new_tuple (xvariant_t * const *children,
   xvariant_t *value;
   xsize_t i;
 
-  g_return_val_if_fail (n_children == 0 || children != NULL, NULL);
+  xreturn_val_if_fail (n_children == 0 || children != NULL, NULL);
 
   my_children = g_new (xvariant_t *, n_children);
   trusted = TRUE;
@@ -930,8 +930,8 @@ xvariant_new_dict_entry (xvariant_t *key,
   xvariant_t **children;
   xboolean_t trusted;
 
-  g_return_val_if_fail (key != NULL && value != NULL, NULL);
-  g_return_val_if_fail (!xvariant_is_container (key), NULL);
+  xreturn_val_if_fail (key != NULL && value != NULL, NULL);
+  xreturn_val_if_fail (!xvariant_is_container (key), NULL);
 
   children = g_new (xvariant_t *, 2);
   children[0] = xvariant_ref_sink (key);
@@ -1044,7 +1044,7 @@ xvariant_lookup_value (xvariant_t           *dictionary,
   xvariant_t *entry;
   xvariant_t *value;
 
-  g_return_val_if_fail (xvariant_is_of_type (dictionary,
+  xreturn_val_if_fail (xvariant_is_of_type (dictionary,
                                               G_VARIANT_TYPE ("a{s*}")) ||
                         xvariant_is_of_type (dictionary,
                                               G_VARIANT_TYPE ("a{o*}")),
@@ -1089,7 +1089,7 @@ xvariant_lookup_value (xvariant_t           *dictionary,
       value = tmp;
     }
 
-  g_return_val_if_fail (expected_type == NULL || value == NULL ||
+  xreturn_val_if_fail (expected_type == NULL || value == NULL ||
                         xvariant_is_of_type (value, expected_type), NULL);
 
   return value;
@@ -1145,13 +1145,13 @@ xvariant_get_fixed_array (xvariant_t *value,
 
   TYPE_CHECK (value, G_VARIANT_TYPE_ARRAY, NULL);
 
-  g_return_val_if_fail (n_elements != NULL, NULL);
-  g_return_val_if_fail (element_size > 0, NULL);
+  xreturn_val_if_fail (n_elements != NULL, NULL);
+  xreturn_val_if_fail (element_size > 0, NULL);
 
   array_info = xvariant_get_type_info (value);
   xvariant_type_info_query_element (array_info, NULL, &array_element_size);
 
-  g_return_val_if_fail (array_element_size, NULL);
+  xreturn_val_if_fail (array_element_size, NULL);
 
   if G_UNLIKELY (array_element_size != element_size)
     {
@@ -1218,8 +1218,8 @@ xvariant_new_fixed_array (const xvariant_type_t  *element_type,
   xvariant_t *value;
   xpointer_t data;
 
-  g_return_val_if_fail (xvariant_type_is_definite (element_type), NULL);
-  g_return_val_if_fail (element_size > 0, NULL);
+  xreturn_val_if_fail (xvariant_type_is_definite (element_type), NULL);
+  xreturn_val_if_fail (element_size > 0, NULL);
 
   array_type = xvariant_type_new_array (element_type);
   array_info = xvariant_type_info_get (array_type);
@@ -1264,8 +1264,8 @@ xvariant_new_fixed_array (const xvariant_type_t  *element_type,
 xvariant_t *
 xvariant_new_string (const xchar_t *string)
 {
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (xutf8_validate (string, -1, NULL), NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (xutf8_validate (string, -1, NULL), NULL);
 
   return xvariant_new_from_trusted (G_VARIANT_TYPE_STRING,
                                      string, strlen (string) + 1);
@@ -1298,8 +1298,8 @@ xvariant_new_take_string (xchar_t *string)
   xvariant_t *value;
   xbytes_t *bytes;
 
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (xutf8_validate (string, -1, NULL), NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (xutf8_validate (string, -1, NULL), NULL);
 
   bytes = xbytes_new_take (string, strlen (string) + 1);
   value = xvariant_new_from_bytes (G_VARIANT_TYPE_STRING, bytes, TRUE);
@@ -1333,7 +1333,7 @@ xvariant_new_printf (const xchar_t *format_string,
   xchar_t *string;
   va_list ap;
 
-  g_return_val_if_fail (format_string != NULL, NULL);
+  xreturn_val_if_fail (format_string != NULL, NULL);
 
   va_start (ap, format_string);
   string = xstrdup_vprintf (format_string, ap);
@@ -1361,7 +1361,7 @@ xvariant_new_printf (const xchar_t *format_string,
 xvariant_t *
 xvariant_new_object_path (const xchar_t *object_path)
 {
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
 
   return xvariant_new_from_trusted (G_VARIANT_TYPE_OBJECT_PATH,
                                      object_path, strlen (object_path) + 1);
@@ -1387,7 +1387,7 @@ xvariant_new_object_path (const xchar_t *object_path)
 xboolean_t
 xvariant_is_object_path (const xchar_t *string)
 {
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   return xvariant_serialiser_is_object_path (string, strlen (string) + 1);
 }
@@ -1407,7 +1407,7 @@ xvariant_is_object_path (const xchar_t *string)
 xvariant_t *
 xvariant_new_signature (const xchar_t *signature)
 {
-  g_return_val_if_fail (xvariant_is_signature (signature), NULL);
+  xreturn_val_if_fail (xvariant_is_signature (signature), NULL);
 
   return xvariant_new_from_trusted (G_VARIANT_TYPE_SIGNATURE,
                                      signature, strlen (signature) + 1);
@@ -1431,7 +1431,7 @@ xvariant_new_signature (const xchar_t *signature)
 xboolean_t
 xvariant_is_signature (const xchar_t *string)
 {
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   return xvariant_serialiser_is_signature (string, strlen (string) + 1);
 }
@@ -1472,8 +1472,8 @@ xvariant_get_string (xvariant_t *value,
   xconstpointer data;
   xsize_t size;
 
-  g_return_val_if_fail (value != NULL, NULL);
-  g_return_val_if_fail (
+  xreturn_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (
     xvariant_is_of_type (value, G_VARIANT_TYPE_STRING) ||
     xvariant_is_of_type (value, G_VARIANT_TYPE_OBJECT_PATH) ||
     xvariant_is_of_type (value, G_VARIANT_TYPE_SIGNATURE), NULL);
@@ -1564,7 +1564,7 @@ xvariant_new_strv (const xchar_t * const *strv,
   xvariant_t **strings;
   xsize_t i, length_unsigned;
 
-  g_return_val_if_fail (length == 0 || strv != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || strv != NULL, NULL);
 
   if (length < 0)
     length = xstrv_length ((xchar_t **) strv);
@@ -1701,7 +1701,7 @@ xvariant_new_objv (const xchar_t * const *strv,
   xvariant_t **strings;
   xsize_t i, length_unsigned;
 
-  g_return_val_if_fail (length == 0 || strv != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || strv != NULL, NULL);
 
   if (length < 0)
     length = xstrv_length ((xchar_t **) strv);
@@ -1834,7 +1834,7 @@ xvariant_dup_objv (xvariant_t *value,
 xvariant_t *
 xvariant_new_bytestring (const xchar_t *string)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   return xvariant_new_from_trusted (G_VARIANT_TYPE_BYTESTRING,
                                      string, strlen (string) + 1);
@@ -1942,7 +1942,7 @@ xvariant_new_bytestring_array (const xchar_t * const *strv,
   xvariant_t **strings;
   xsize_t i, length_unsigned;
 
-  g_return_val_if_fail (length == 0 || strv != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || strv != NULL, NULL);
 
   if (length < 0)
     length = xstrv_length ((xchar_t **) strv);
@@ -2075,7 +2075,7 @@ xvariant_get_type (xvariant_t *value)
 {
   GVariantTypeInfo *type_info;
 
-  g_return_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
 
   type_info = xvariant_get_type_info (value);
 
@@ -2099,7 +2099,7 @@ xvariant_get_type_string (xvariant_t *value)
 {
   GVariantTypeInfo *type_info;
 
-  g_return_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
 
   type_info = xvariant_get_type_info (value);
 
@@ -2181,7 +2181,7 @@ xvariant_is_container (xvariant_t *value)
 xvariant_class_t
 xvariant_classify (xvariant_t *value)
 {
-  g_return_val_if_fail (value != NULL, 0);
+  xreturn_val_if_fail (value != NULL, 0);
 
   return *xvariant_get_type_string (value);
 }
@@ -2720,7 +2720,7 @@ xvariant_hash (xconstpointer value_)
       }
 
     default:
-      g_return_val_if_fail (!xvariant_is_container (value), 0);
+      xreturn_val_if_fail (!xvariant_is_container (value), 0);
       g_assert_not_reached ();
     }
 }
@@ -2745,7 +2745,7 @@ xvariant_equal (xconstpointer one,
 {
   xboolean_t equal;
 
-  g_return_val_if_fail (one != NULL && two != NULL, FALSE);
+  xreturn_val_if_fail (one != NULL && two != NULL, FALSE);
 
   if (xvariant_get_type_info ((xvariant_t *) one) !=
       xvariant_get_type_info ((xvariant_t *) two))
@@ -2832,7 +2832,7 @@ xvariant_compare (xconstpointer one,
   xvariant_t *a = (xvariant_t *) one;
   xvariant_t *b = (xvariant_t *) two;
 
-  g_return_val_if_fail (xvariant_classify (a) == xvariant_classify (b), 0);
+  xreturn_val_if_fail (xvariant_classify (a) == xvariant_classify (b), 0);
 
   switch (xvariant_classify (a))
     {
@@ -2899,7 +2899,7 @@ xvariant_compare (xconstpointer one,
                      xvariant_get_string (b, NULL));
 
     default:
-      g_return_val_if_fail (!xvariant_is_container (a), 0);
+      xreturn_val_if_fail (!xvariant_is_container (a), 0);
       g_assert_not_reached ();
     }
 }
@@ -3025,7 +3025,7 @@ xvariant_iter_copy (xvariant_iter_t *iter)
 {
   xvariant_iter_t *copy;
 
-  g_return_val_if_fail (is_valid_iter (iter), 0);
+  xreturn_val_if_fail (is_valid_iter (iter), 0);
 
   copy = xvariant_iter_new (GVSI(iter)->value);
   GVSI(copy)->i = GVSI(iter)->i;
@@ -3050,7 +3050,7 @@ xvariant_iter_copy (xvariant_iter_t *iter)
 xsize_t
 xvariant_iter_n_children (xvariant_iter_t *iter)
 {
-  g_return_val_if_fail (is_valid_iter (iter), 0);
+  xreturn_val_if_fail (is_valid_iter (iter), 0);
 
   return GVSI(iter)->n;
 }
@@ -3115,7 +3115,7 @@ xvariant_iter_free (xvariant_iter_t *iter)
 xvariant_t *
 xvariant_iter_next_value (xvariant_iter_t *iter)
 {
-  g_return_val_if_fail (is_valid_iter (iter), FALSE);
+  xreturn_val_if_fail (is_valid_iter (iter), FALSE);
 
   if G_UNLIKELY (GVSI(iter)->i >= GVSI(iter)->n)
     {
@@ -3235,12 +3235,12 @@ ensure_valid_builder (xvariant_builder_t *builder)
 } G_STMT_END
 
 /* return_val_if_invalid_builder (b, val) is like
- * g_return_val_if_fail (ensure_valid_builder (b), val), except that
+ * xreturn_val_if_fail (ensure_valid_builder (b), val), except that
  * the side effects of ensure_valid_builder are evaluated
  * regardless of whether G_DISABLE_CHECKS is defined or not. */
 #define return_val_if_invalid_builder(b, val) G_STMT_START {       \
   xboolean_t valid_builder G_GNUC_UNUSED = ensure_valid_builder (b); \
-  g_return_val_if_fail (valid_builder, val);                       \
+  xreturn_val_if_fail (valid_builder, val);                       \
 } G_STMT_END
 
 /**
@@ -3318,7 +3318,7 @@ xvariant_builder_unref (xvariant_builder_t *builder)
 xvariant_builder_t *
 xvariant_builder_ref (xvariant_builder_t *builder)
 {
-  g_return_val_if_fail (is_valid_heap_builder (builder), NULL);
+  xreturn_val_if_fail (is_valid_heap_builder (builder), NULL);
 
   GVHB(builder)->ref_count++;
 
@@ -3714,9 +3714,9 @@ xvariant_builder_end (xvariant_builder_t *builder)
   xvariant_t *value;
 
   return_val_if_invalid_builder (builder, NULL);
-  g_return_val_if_fail (GVSB(builder)->offset >= GVSB(builder)->min_items,
+  xreturn_val_if_fail (GVSB(builder)->offset >= GVSB(builder)->min_items,
                         NULL);
-  g_return_val_if_fail (!GVSB(builder)->uniform_item_types ||
+  xreturn_val_if_fail (!GVSB(builder)->uniform_item_types ||
                         GVSB(builder)->prev_item_type != NULL ||
                         xvariant_type_is_definite (GVSB(builder)->type),
                         NULL);
@@ -3911,12 +3911,12 @@ ensure_valid_dict (xvariant_dict_t *dict)
 } G_STMT_END
 
 /* return_val_if_invalid_dict (d, val) is like
- * g_return_val_if_fail (ensure_valid_dict (d), val), except that
+ * xreturn_val_if_fail (ensure_valid_dict (d), val), except that
  * the side effects of ensure_valid_dict are evaluated
  * regardless of whether G_DISABLE_CHECKS is defined or not. */
 #define return_val_if_invalid_dict(d, val) G_STMT_START {       \
   xboolean_t valid_dict G_GNUC_UNUSED = ensure_valid_dict (d);    \
-  g_return_val_if_fail (valid_dict, val);                       \
+  xreturn_val_if_fail (valid_dict, val);                       \
 } G_STMT_END
 
 /**
@@ -4027,8 +4027,8 @@ xvariant_dict_lookup (xvariant_dict_t *dict,
   va_list ap;
 
   return_val_if_invalid_dict (dict, FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
-  g_return_val_if_fail (format_string != NULL, FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (format_string != NULL, FALSE);
 
   value = xhash_table_lookup (GVSD(dict)->values, key);
 
@@ -4072,7 +4072,7 @@ xvariant_dict_lookup_value (xvariant_dict_t       *dict,
   xvariant_t *result;
 
   return_val_if_invalid_dict (dict, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   result = xhash_table_lookup (GVSD(dict)->values, key);
 
@@ -4098,7 +4098,7 @@ xvariant_dict_contains (xvariant_dict_t *dict,
                          const xchar_t  *key)
 {
   return_val_if_invalid_dict (dict, FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   return xhash_table_contains (GVSD(dict)->values, key);
 }
@@ -4174,7 +4174,7 @@ xvariant_dict_remove (xvariant_dict_t *dict,
                        const xchar_t  *key)
 {
   return_val_if_invalid_dict (dict, FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   return xhash_table_remove (GVSD(dict)->values, key);
 }
@@ -4267,7 +4267,7 @@ xvariant_dict_end (xvariant_dict_t *dict)
 xvariant_dict_t *
 xvariant_dict_ref (xvariant_dict_t *dict)
 {
-  g_return_val_if_fail (is_valid_heap_dict (dict), NULL);
+  xreturn_val_if_fail (is_valid_heap_dict (dict), NULL);
 
   GVHD(dict)->ref_count++;
 
@@ -5201,7 +5201,7 @@ xvariant_valist_skip (const xchar_t **str,
     }
   else /* tuple, dictionary entry */
     {
-      g_assert (**str == '(' || **str == '{');
+      xassert (**str == '(' || **str == '{');
       (*str)++;
       while (**str != ')' && **str != '}')
         xvariant_valist_skip (str, app);
@@ -5260,7 +5260,7 @@ xvariant_valist_new (const xchar_t **str,
         xvariant_builder_init (&b, G_VARIANT_TYPE_TUPLE);
       else
         {
-          g_assert (**str == '{');
+          xassert (**str == '{');
           xvariant_builder_init (&b, G_VARIANT_TYPE_DICT_ENTRY);
         }
 
@@ -5307,7 +5307,7 @@ xvariant_valist_get (const xchar_t **str,
     {
       xint_t index = 0;
 
-      g_assert (**str == '(' || **str == '{');
+      xassert (**str == '(' || **str == '{');
 
       (*str)++;
       while (**str != ')' && **str != '}')
@@ -5371,7 +5371,7 @@ xvariant_new (const xchar_t *format_string,
   xvariant_t *value;
   va_list ap;
 
-  g_return_val_if_fail (valid_format_string (format_string, TRUE, NULL) &&
+  xreturn_val_if_fail (valid_format_string (format_string, TRUE, NULL) &&
                         format_string[0] != '?' && format_string[0] != '@' &&
                         format_string[0] != '*' && format_string[0] != 'r',
                         NULL);
@@ -5438,9 +5438,9 @@ xvariant_new_va (const xchar_t  *format_string,
 {
   xvariant_t *value;
 
-  g_return_val_if_fail (valid_format_string (format_string, !endptr, NULL),
+  xreturn_val_if_fail (valid_format_string (format_string, !endptr, NULL),
                         NULL);
-  g_return_val_if_fail (app != NULL, NULL);
+  xreturn_val_if_fail (app != NULL, NULL);
 
   value = xvariant_valist_new (&format_string, app);
 
@@ -5708,7 +5708,7 @@ xvariant_iter_next (xvariant_iter_t *iter,
 
   value = xvariant_iter_next_value (iter);
 
-  g_return_val_if_fail (valid_format_string (format_string, TRUE, value),
+  xreturn_val_if_fail (valid_format_string (format_string, TRUE, value),
                         FALSE);
 
   if (value != NULL)
@@ -5808,7 +5808,7 @@ xvariant_iter_loop (xvariant_iter_t *iter,
   xvariant_t *value;
   va_list ap;
 
-  g_return_val_if_fail (first_time ||
+  xreturn_val_if_fail (first_time ||
                         format_string == GVSI(iter)->loop_format,
                         FALSE);
 
@@ -5823,7 +5823,7 @@ xvariant_iter_loop (xvariant_iter_t *iter,
 
   value = xvariant_iter_next_value (iter);
 
-  g_return_val_if_fail (!first_time ||
+  xreturn_val_if_fail (!first_time ||
                         valid_format_string (format_string, TRUE, value),
                         FALSE);
 
@@ -5949,7 +5949,7 @@ xvariant_get_normal_form (xvariant_t *value)
     return xvariant_ref (value);
 
   trusted = xvariant_deep_copy (value);
-  g_assert (xvariant_is_trusted (trusted));
+  xassert (xvariant_is_trusted (trusted));
 
   return xvariant_ref_sink (trusted);
 }
@@ -6067,8 +6067,8 @@ xvariant_new_from_data (const xvariant_type_t *type,
   xvariant_t *value;
   xbytes_t *bytes;
 
-  g_return_val_if_fail (xvariant_type_is_definite (type), NULL);
-  g_return_val_if_fail (data != NULL || size == 0, NULL);
+  xreturn_val_if_fail (xvariant_type_is_definite (type), NULL);
+  xreturn_val_if_fail (data != NULL || size == 0, NULL);
 
   if (notify)
     bytes = xbytes_new_with_free_func (data, size, notify, user_data);

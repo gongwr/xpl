@@ -93,7 +93,7 @@ main (int   argc,
   setmode (fileno (stdout), O_BINARY);
 #endif
 
-  g_return_val_if_fail (argc > 1, 1);
+  xreturn_val_if_fail (argc > 1, 1);
   argv1 = argv[1];
 
   if (argc > 2)

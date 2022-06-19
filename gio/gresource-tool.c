@@ -188,10 +188,10 @@ elf_foreach_resource_section (Elf             *elf,
   const xchar_t *section_name;
 
   ret = elf_getshdrstrndx (elf, &shstrndx);
-  g_assert (ret == 0);
+  xassert (ret == 0);
 
   ret = elf_getshdrnum (elf, &shnum);
-  g_assert (ret == 0);
+  xassert (ret == 0);
 
   for (scnidx = 1; scnidx < shnum; scnidx++)
     {

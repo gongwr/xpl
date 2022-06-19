@@ -103,7 +103,7 @@ signal_parent (xpointer_t data)
 #ifndef G_OS_WIN32
   kill (parent_pid, SIGUSR1);
 #endif
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static int
@@ -142,11 +142,11 @@ test_mapping (void)
   write_or_die (global_filename, "ABC", -1);
 
   map = map_or_die (global_filename, FALSE);
-  g_assert (xmapped_file_get_length (map) == 3);
+  xassert (xmapped_file_get_length (map) == 3);
   xmapped_file_free (map);
 
   map = map_or_die (global_filename, TRUE);
-  g_assert (xmapped_file_get_length (map) == 3);
+  xassert (xmapped_file_get_length (map) == 3);
   xmapped_file_free (map);
   g_message ("test_mapping: ok");
 }
@@ -175,8 +175,8 @@ test_private (void)
       exit (1);
 
     }
-  g_assert (len == 3);
-  g_assert (strcmp (buffer, "ABC") == 0);
+  xassert (len == 3);
+  xassert (strcmp (buffer, "ABC") == 0);
   g_free (buffer);
 
   g_message ("test_private: ok");
@@ -198,7 +198,7 @@ test_child_private (xchar_t *argv0)
 
 #ifdef G_OS_WIN32
   g_remove ("STOP");
-  g_assert (!xfile_test ("STOP", XFILE_TEST_EXISTS));
+  xassert (!xfile_test ("STOP", XFILE_TEST_EXISTS));
 #endif
 
   write_or_die (global_filename, "ABC", -1);
@@ -262,8 +262,8 @@ test_child_private (xchar_t *argv0)
       g_print ("failed to read '%s': %s\n", name, error->message);
       exit (1);
     }
-  g_assert (len == 3);
-  g_assert (strcmp (buffer, "ABC") == 0);
+  xassert (len == 3);
+  xassert (strcmp (buffer, "ABC") == 0);
   g_free (buffer);
 
   g_message ("test_child_private: ok");

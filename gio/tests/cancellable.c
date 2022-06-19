@@ -91,7 +91,7 @@ mock_operation_timeout (xpointer_t user_data)
         g_test_message ("LOOP: %u stopped at %u",
                         data->iterations_requested, iterations_done);
       xtask_return_boolean (task, TRUE);
-      return G_SOURCE_REMOVE;
+      return XSOURCE_REMOVE;
     }
   else
     {
@@ -327,7 +327,7 @@ test_cancellable_source_threaded_dispose (void)
 
   xthread_join (g_steal_pointer (&thread));
 
-  g_assert (g_async_queue_length (data.cancellable_source_queue) == 0);
+  xassert (g_async_queue_length (data.cancellable_source_queue) == 0);
   g_async_queue_unref (data.cancellable_source_queue);
   g_mutex_clear (&data.mutex);
   g_cond_clear (&data.cond);

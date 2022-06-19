@@ -152,7 +152,7 @@ _xsocket_read_with_control_messages_ready (xsocket_t      *socket,
       return TRUE;
     }
 
-  g_assert (result >= 0 || error != NULL);
+  xassert (result >= 0 || error != NULL);
   if (result >= 0)
     xtask_return_int (task, result);
   else
@@ -206,8 +206,8 @@ _xsocket_read_with_control_messages_finish (xsocket_t       *socket,
                                              xasync_result_t  *result,
                                              xerror_t       **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET (socket), -1);
-  g_return_val_if_fail (xtask_is_valid (result, socket), -1);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, socket), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -236,7 +236,7 @@ release_required_types (void)
 static void
 ensure_required_types (void)
 {
-  g_assert (ensured_classes == NULL);
+  xassert (ensured_classes == NULL);
   ensured_classes = xptr_array_new ();
   /* Generally in this list, you should initialize types which are used as
    * properties first, then the class which has them. For example, xdbus_proxy_t
@@ -321,7 +321,7 @@ _g_dbus_shared_thread_unref (SharedThreadData *data)
 {
   /* TODO: actually destroy the shared thread here */
 #if 0
-  g_assert (data != NULL);
+  xassert (data != NULL);
   if (g_atomic_int_dec_and_test (&data->refcount))
     {
       xmain_loop_quit (data->loop);
@@ -355,7 +355,7 @@ struct GDBusWorker
    * only user) - we might want it to affect messages sent to the other peer too?
    */
   xboolean_t                            frozen;
-  GDBusCapabilityFlags                capabilities;
+  xdbus_capability_flags_t                capabilities;
   xqueue_t                             *received_messages_while_frozen;
 
   xio_stream_t                          *stream;
@@ -453,7 +453,7 @@ _g_dbus_worker_unref (GDBusWorker *worker)
 {
   if (g_atomic_int_dec_and_test (&worker->ref_count))
     {
-      g_assert (worker->write_pending_flushes == NULL);
+      xassert (worker->write_pending_flushes == NULL);
 
       _g_dbus_shared_thread_unref (worker->shared_thread_data);
 
@@ -539,7 +539,7 @@ unfreeze_in_idle_cb (xpointer_t user_data)
     }
   else
     {
-      g_assert (g_queue_get_length (worker->received_messages_while_frozen) == 0);
+      xassert (g_queue_get_length (worker->received_messages_while_frozen) == 0);
     }
   g_mutex_unlock (&worker->read_lock);
   return FALSE;
@@ -939,12 +939,12 @@ write_message_async_cb (xobject_t      *source_object,
       xobject_unref (task);
       goto out;
     }
-  g_assert (bytes_written > 0); /* zero is never returned */
+  xassert (bytes_written > 0); /* zero is never returned */
 
   write_message_print_transport_debug (bytes_written, data);
 
   data->total_written += bytes_written;
-  g_assert (data->total_written <= data->blob_size);
+  xassert (data->total_written <= data->blob_size);
   if (data->total_written == data->blob_size)
     {
       xtask_return_boolean (task, TRUE);
@@ -1001,7 +1001,7 @@ write_message_continue_writing (MessageToWriteData *data)
   fd_list = xdbus_message_get_unix_fd_list (data->message);
 #endif
 
-  g_assert (!xoutput_stream_has_pending (ostream));
+  xassert (!xoutput_stream_has_pending (ostream));
   g_assert_cmpint (data->total_written, <, data->blob_size);
 
   if (FALSE)
@@ -1068,12 +1068,12 @@ write_message_continue_writing (MessageToWriteData *data)
           xobject_unref (task);
           goto out;
         }
-      g_assert (bytes_written > 0); /* zero is never returned */
+      xassert (bytes_written > 0); /* zero is never returned */
 
       write_message_print_transport_debug (bytes_written, data);
 
       data->total_written += bytes_written;
-      g_assert (data->total_written <= data->blob_size);
+      xassert (data->total_written <= data->blob_size);
       if (data->total_written == data->blob_size)
         {
           xtask_return_boolean (task, TRUE);
@@ -1139,7 +1139,7 @@ static xboolean_t
 write_message_finish (xasync_result_t   *res,
                       xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, NULL), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, NULL), FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -1207,11 +1207,11 @@ ostream_flush_cb (xobject_t      *source_object,
      flushes pending */
   g_mutex_lock (&data->worker->write_lock);
   data->worker->write_num_messages_flushed = data->worker->write_num_messages_written;
-  g_assert (data->worker->output_pending == PENDING_FLUSH);
+  xassert (data->worker->output_pending == PENDING_FLUSH);
   data->worker->output_pending = PENDING_NONE;
   g_mutex_unlock (&data->worker->write_lock);
 
-  g_assert (data->flushers != NULL);
+  xassert (data->flushers != NULL);
   flush_data_list_complete (data->flushers, error);
   xlist_free (data->flushers);
   if (error != NULL)
@@ -1299,7 +1299,7 @@ prepare_flush_unlocked (GDBusWorker *worker)
     }
   if (flushers != NULL)
     {
-      g_assert (worker->output_pending == PENDING_NONE);
+      xassert (worker->output_pending == PENDING_NONE);
       worker->output_pending = PENDING_FLUSH;
     }
 
@@ -1330,7 +1330,7 @@ write_message_cb (xobject_t       *source_object,
   xerror_t *error;
 
   g_mutex_lock (&data->worker->write_lock);
-  g_assert (data->worker->output_pending == PENDING_WRITE);
+  xassert (data->worker->output_pending == PENDING_WRITE);
   data->worker->output_pending = PENDING_NONE;
 
   error = NULL;
@@ -1382,7 +1382,7 @@ iostream_close_cb (xobject_t      *source_object,
   send_queue = worker->write_queue;
   worker->write_queue = g_queue_new ();
 
-  g_assert (worker->output_pending == PENDING_CLOSE);
+  xassert (worker->output_pending == PENDING_CLOSE);
   worker->output_pending = PENDING_NONE;
 
   /* Ensure threads waiting for pending flushes to finish will be unblocked. */
@@ -1436,7 +1436,7 @@ continue_writing (GDBusWorker *worker)
 
  write_next:
   /* we mustn't try to write two things at once */
-  g_assert (worker->output_pending == PENDING_NONE);
+  xassert (worker->output_pending == PENDING_NONE);
 
   g_mutex_lock (&worker->write_lock);
 
@@ -1485,7 +1485,7 @@ continue_writing (GDBusWorker *worker)
   if (flush_async_data != NULL)
     {
       start_flush (flush_async_data);
-      g_assert (data == NULL);
+      xassert (data == NULL);
     }
   else if (data != NULL)
     {
@@ -1652,7 +1652,7 @@ _g_dbus_worker_send_message (GDBusWorker    *worker,
 
 GDBusWorker *
 _g_dbus_worker_new (xio_stream_t                              *stream,
-                    GDBusCapabilityFlags                    capabilities,
+                    xdbus_capability_flags_t                    capabilities,
                     xboolean_t                                initially_frozen,
                     GDBusWorkerMessageReceivedCallback      message_received_callback,
                     GDBusWorkerMessageAboutToBeSentCallback message_about_to_be_sent_callback,
@@ -1662,10 +1662,10 @@ _g_dbus_worker_new (xio_stream_t                              *stream,
   GDBusWorker *worker;
   xsource_t *idle_source;
 
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), NULL);
-  g_return_val_if_fail (message_received_callback != NULL, NULL);
-  g_return_val_if_fail (message_about_to_be_sent_callback != NULL, NULL);
-  g_return_val_if_fail (disconnected_callback != NULL, NULL);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), NULL);
+  xreturn_val_if_fail (message_received_callback != NULL, NULL);
+  xreturn_val_if_fail (message_about_to_be_sent_callback != NULL, NULL);
+  xreturn_val_if_fail (disconnected_callback != NULL, NULL);
 
   worker = g_new0 (GDBusWorker, 1);
   worker->ref_count = 1;
@@ -1995,7 +1995,7 @@ _g_dbus_compute_complete_signature (xdbus_arg_info_t **args)
         /* DBus places a hard limit of 255 on signature length.
          * therefore number of args must be less than 256.
          */
-        g_assert (n < 256);
+        xassert (n < 256);
 
         arg_types[n] = G_VARIANT_TYPE (args[n]->signature);
 

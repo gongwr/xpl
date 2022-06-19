@@ -130,10 +130,10 @@ xtls_certificate_set_property (xobject_t      *object,
 static void
 xtls_certificate_class_init (GTlsCertificateClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->set_property = xtls_certificate_set_property;
-  gobject_class->get_property = xtls_certificate_get_property;
+  xobject_class->set_property = xtls_certificate_set_property;
+  xobject_class->get_property = xtls_certificate_get_property;
 
   /**
    * xtls_certificate_t:pkcs12-data: (nullable)
@@ -144,14 +144,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.72
    */
-  xobject_class_install_property (gobject_class, PROP_PKCS12_DATA,
-				   g_param_spec_boxed ("pkcs12-data",
+  xobject_class_install_property (xobject_class, PROP_PKCS12_DATA,
+				   xparam_spec_boxed ("pkcs12-data",
 						       P_("PKCS #12 data"),
 						       P_("The PKCS #12 data used for construction"),
 						       XTYPE_BYTE_ARRAY,
-						       G_PARAM_WRITABLE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_WRITABLE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:password: (nullable)
@@ -160,14 +160,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.72
    */
-  xobject_class_install_property (gobject_class, PROP_PASSWORD,
-                                   g_param_spec_string ("password",
+  xobject_class_install_property (xobject_class, PROP_PASSWORD,
+                                   xparam_spec_string ("password",
                                                         P_("Password"),
                                                         P_("Password used when constructing from bytes"),
                                                         NULL,
-                                                        G_PARAM_WRITABLE |
-                                                          G_PARAM_CONSTRUCT_ONLY |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_WRITABLE |
+                                                          XPARAM_CONSTRUCT_ONLY |
+                                                          XPARAM_STATIC_STRINGS));
   /**
    * xtls_certificate_t:certificate:
    *
@@ -177,14 +177,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_CERTIFICATE,
-				   g_param_spec_boxed ("certificate",
+  xobject_class_install_property (xobject_class, PROP_CERTIFICATE,
+				   xparam_spec_boxed ("certificate",
 						       P_("Certificate"),
 						       P_("The DER representation of the certificate"),
 						       XTYPE_BYTE_ARRAY,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
   /**
    * xtls_certificate_t:certificate-pem:
    *
@@ -194,14 +194,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_CERTIFICATE_PEM,
-				   g_param_spec_string ("certificate-pem",
+  xobject_class_install_property (xobject_class, PROP_CERTIFICATE_PEM,
+				   xparam_spec_string ("certificate-pem",
 							P_("Certificate (PEM)"),
 							P_("The PEM representation of the certificate"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
   /**
    * xtls_certificate_t:private-key: (nullable)
    *
@@ -225,14 +225,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_PRIVATE_KEY,
-				   g_param_spec_boxed ("private-key",
+  xobject_class_install_property (xobject_class, PROP_PRIVATE_KEY,
+				   xparam_spec_boxed ("private-key",
 						       P_("Private key"),
 						       P_("The DER representation of the certificate’s private key"),
 						       XTYPE_BYTE_ARRAY,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
   /**
    * xtls_certificate_t:private-key-pem: (nullable)
    *
@@ -257,14 +257,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_PRIVATE_KEY_PEM,
-				   g_param_spec_string ("private-key-pem",
+  xobject_class_install_property (xobject_class, PROP_PRIVATE_KEY_PEM,
+				   xparam_spec_string ("private-key-pem",
 							P_("Private key (PEM)"),
 							P_("The PEM representation of the certificate’s private key"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
   /**
    * xtls_certificate_t:issuer:
    *
@@ -287,14 +287,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.28
    */
-  xobject_class_install_property (gobject_class, PROP_ISSUER,
-				   g_param_spec_object ("issuer",
+  xobject_class_install_property (xobject_class, PROP_ISSUER,
+				   xparam_spec_object ("issuer",
 							P_("Issuer"),
 							P_("The certificate for the issuing entity"),
 							XTYPE_TLS_CERTIFICATE,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:pkcs11-uri: (nullable)
@@ -307,14 +307,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.68
    */
-  xobject_class_install_property (gobject_class, PROP_PKCS11_URI,
-                                   g_param_spec_string ("pkcs11-uri",
+  xobject_class_install_property (xobject_class, PROP_PKCS11_URI,
+                                   xparam_spec_string ("pkcs11-uri",
                                                         P_("PKCS #11 URI"),
                                                         P_("The PKCS #11 URI"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                          G_PARAM_CONSTRUCT_ONLY |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                          XPARAM_CONSTRUCT_ONLY |
+                                                          XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:private-key-pkcs11-uri: (nullable)
@@ -324,14 +324,14 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.68
    */
-  xobject_class_install_property (gobject_class, PROP_PRIVATE_KEY_PKCS11_URI,
-                                   g_param_spec_string ("private-key-pkcs11-uri",
+  xobject_class_install_property (xobject_class, PROP_PRIVATE_KEY_PKCS11_URI,
+                                   xparam_spec_string ("private-key-pkcs11-uri",
                                                         P_("PKCS #11 URI"),
                                                         P_("The PKCS #11 URI for a private key"),
                                                         NULL,
-                                                        G_PARAM_READWRITE |
-                                                          G_PARAM_CONSTRUCT_ONLY |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READWRITE |
+                                                          XPARAM_CONSTRUCT_ONLY |
+                                                          XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:not-valid-before: (nullable)
@@ -341,13 +341,13 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_NOT_VALID_BEFORE,
-                                   g_param_spec_boxed ("not-valid-before",
+  xobject_class_install_property (xobject_class, PROP_NOT_VALID_BEFORE,
+                                   xparam_spec_boxed ("not-valid-before",
                                                        P_("Not Valid Before"),
                                                        P_("Cert should not be considered valid before this time."),
                                                        XTYPE_DATE_TIME,
-                                                       G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:not-valid-after: (nullable)
@@ -357,13 +357,13 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_NOT_VALID_AFTER,
-                                   g_param_spec_boxed ("not-valid-after",
+  xobject_class_install_property (xobject_class, PROP_NOT_VALID_AFTER,
+                                   xparam_spec_boxed ("not-valid-after",
                                                        P_("Not Valid after"),
                                                        P_("Cert should not be considered valid after this time."),
                                                        XTYPE_DATE_TIME,
-                                                       G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:subject-name: (nullable)
@@ -373,13 +373,13 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_SUBJECT_NAME,
-                                   g_param_spec_string ("subject-name",
+  xobject_class_install_property (xobject_class, PROP_SUBJECT_NAME,
+                                   xparam_spec_string ("subject-name",
                                                         P_("Subject Name"),
                                                         P_("The subject name from the certificate."),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                          XPARAM_STATIC_STRINGS));
   /**
    * xtls_certificate_t:issuer-name: (nullable)
    *
@@ -388,13 +388,13 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_ISSUER_NAME,
-                                   g_param_spec_string ("issuer-name",
+  xobject_class_install_property (xobject_class, PROP_ISSUER_NAME,
+                                   xparam_spec_string ("issuer-name",
                                                         P_("Issuer Name"),
                                                         P_("The issuer from the certificate."),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_READABLE |
+                                                          XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:dns-names: (nullable) (element-type xbytes_t) (transfer container)
@@ -404,13 +404,13 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_DNS_NAMES,
-                                   g_param_spec_boxed ("dns-names",
+  xobject_class_install_property (xobject_class, PROP_DNS_NAMES,
+                                   xparam_spec_boxed ("dns-names",
                                                        P_("DNS Names"),
                                                        P_("DNS Names listed on the cert."),
                                                        XTYPE_PTR_ARRAY,
-                                                       G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_certificate_t:ip-addresses: (nullable) (element-type xinet_address_t) (transfer container)
@@ -420,13 +420,13 @@ xtls_certificate_class_init (GTlsCertificateClass *class)
    *
    * Since: 2.70
    */
-  xobject_class_install_property (gobject_class, PROP_IP_ADDRESSES,
-                                   g_param_spec_boxed ("ip-addresses",
+  xobject_class_install_property (xobject_class, PROP_IP_ADDRESSES,
+                                   xparam_spec_boxed ("ip-addresses",
                                                        P_("IP Addresses"),
                                                        P_("IP Addresses listed on the cert."),
                                                        XTYPE_PTR_ARRAY,
-                                                       G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                         XPARAM_STATIC_STRINGS));
 }
 
 static xtls_certificate_t *
@@ -598,7 +598,7 @@ create_certificate_chain_from_list (xslist_t       *pem_list,
                                     const xchar_t  *key_pem)
 {
   xtls_certificate_t *cert = NULL, *issuer = NULL, *root = NULL;
-  GTlsCertificateFlags flags;
+  xtls_certificate_flags_t flags;
   xslist_t *pem;
 
   pem = pem_list;
@@ -711,8 +711,8 @@ xtls_certificate_new_from_pem  (const xchar_t  *data,
   xchar_t *key_pem;
   xtls_certificate_t *cert;
 
-  g_return_val_if_fail (data != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (data != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (length == -1)
     length = strlen (data);
@@ -769,8 +769,8 @@ xtls_certificate_new_from_pkcs12 (const xuint8_t  *data,
   xtls_backend_t *backend;
   xbyte_array_t *bytes;
 
-  g_return_val_if_fail (data != NULL || length == 0, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (data != NULL || length == 0, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   backend = xtls_backend_get_default ();
 
@@ -829,9 +829,9 @@ xtls_certificate_new_from_file_with_password (const xchar_t  *file,
   xchar_t *contents;
   xsize_t length;
 
-  g_return_val_if_fail (file != NULL, NULL);
-  g_return_val_if_fail (password != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (file != NULL, NULL);
+  xreturn_val_if_fail (password != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!xstr_has_suffix (file, ".p12") && !xstr_has_suffix (file, ".pfx"))
     {
@@ -876,8 +876,8 @@ xtls_certificate_new_from_file (const xchar_t  *file,
   xchar_t *contents;
   xsize_t length;
 
-  g_return_val_if_fail (file != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (file != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!xfile_get_contents (file, &contents, &length, error))
     return NULL;
@@ -991,8 +991,8 @@ xtls_certificate_new_from_pkcs11_uris (const xchar_t  *pkcs11_uri,
   xobject_t *cert;
   xtls_backend_t *backend;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (pkcs11_uri, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (pkcs11_uri, NULL);
 
   backend = xtls_backend_get_default ();
 
@@ -1111,7 +1111,7 @@ xtls_certificate_get_issuer (xtls_certificate_t  *cert)
  * @identity: (nullable): the expected peer identity
  * @trusted_ca: (nullable): the certificate of a trusted authority
  *
- * This verifies @cert and returns a set of #GTlsCertificateFlags
+ * This verifies @cert and returns a set of #xtls_certificate_flags_t
  * indicating any problems found with it. This can be used to verify a
  * certificate outside the context of making a connection, or to
  * check a certificate against a CA that is not part of the system
@@ -1143,11 +1143,11 @@ xtls_certificate_get_issuer (xtls_certificate_t  *cert)
  * certificates used by a TLS connection is to let #xtls_connection_t
  * handle the verification.
  *
- * Returns: the appropriate #GTlsCertificateFlags
+ * Returns: the appropriate #xtls_certificate_flags_t
  *
  * Since: 2.28
  */
-GTlsCertificateFlags
+xtls_certificate_flags_t
 xtls_certificate_verify (xtls_certificate_t     *cert,
 			  xsocket_connectable_t  *identity,
 			  xtls_certificate_t     *trusted_ca)
@@ -1177,8 +1177,8 @@ xtls_certificate_is_same (xtls_certificate_t     *cert_one,
   xbyte_array_t *b1, *b2;
   xboolean_t equal;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert_one), FALSE);
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert_two), FALSE);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert_one), FALSE);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert_two), FALSE);
 
   xobject_get (cert_one, "certificate", &b1, NULL);
   xobject_get (cert_two, "certificate", &b2, NULL);
@@ -1208,7 +1208,7 @@ xtls_certificate_get_not_valid_before (xtls_certificate_t *cert)
 {
   xdatetime_t *not_valid_before = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
   xobject_get (G_OBJECT (cert), "not-valid-before", &not_valid_before, NULL);
 
@@ -1230,7 +1230,7 @@ xtls_certificate_get_not_valid_after (xtls_certificate_t *cert)
 {
   xdatetime_t *not_valid_after = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
   xobject_get (G_OBJECT (cert), "not-valid-after", &not_valid_after, NULL);
 
@@ -1252,7 +1252,7 @@ xtls_certificate_get_subject_name (xtls_certificate_t *cert)
 {
   xchar_t *subject_name = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
   xobject_get (G_OBJECT (cert), "subject-name", &subject_name, NULL);
 
@@ -1274,7 +1274,7 @@ xtls_certificate_get_issuer_name (xtls_certificate_t *cert)
 {
   xchar_t *issuer_name = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
   xobject_get (G_OBJECT (cert), "issuer-name", &issuer_name, NULL);
 
@@ -1297,7 +1297,7 @@ xtls_certificate_get_dns_names (xtls_certificate_t *cert)
 {
   xptr_array_t *dns_names = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
   xobject_get (G_OBJECT (cert), "dns-names", &dns_names, NULL);
 
@@ -1320,7 +1320,7 @@ xtls_certificate_get_ip_addresses (xtls_certificate_t *cert)
 {
   xptr_array_t *ip_addresses = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (cert), NULL);
 
   xobject_get (G_OBJECT (cert), "ip-addresses", &ip_addresses, NULL);
 

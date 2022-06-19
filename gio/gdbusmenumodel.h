@@ -26,7 +26,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_DBUS_MENU_MODEL          (g_dbus_menu_model_get_type ())
 #define G_DBUS_MENU_MODEL(inst)         (XTYPE_CHECK_INSTANCE_CAST ((inst),   \
-                                         XTYPE_DBUS_MENU_MODEL, xdbus_menu_model))
+                                         XTYPE_DBUS_MENU_MODEL, xdbus_menu_model_t)
 #define X_IS_DBUS_MENU_MODEL(inst)      (XTYPE_CHECK_INSTANCE_TYPE ((inst),   \
                                          XTYPE_DBUS_MENU_MODEL))
 

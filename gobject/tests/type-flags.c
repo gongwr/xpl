@@ -41,7 +41,7 @@ struct _test_final2_class
   test_final_class_t parent_class;
 };
 
-G_DEFINE_TYPE (test_final2, test_final2, TEST_TYPE_FINAL)
+XDEFINE_TYPE (test_final2, test_final2, TEST_TYPE_FINAL)
 
 static void
 test_final2_class_init (test_final2_class_t *klass)

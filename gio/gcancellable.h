@@ -18,8 +18,8 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_CANCELLABLE_H__
-#define __G_CANCELLABLE_H__
+#ifndef __XCANCELLABLE_H__
+#define __XCANCELLABLE_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,29 +30,29 @@
 G_BEGIN_DECLS
 
 #define XTYPE_CANCELLABLE         (xcancellable_get_type ())
-#define G_CANCELLABLE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CANCELLABLE, xcancellable))
-#define G_CANCELLABLE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CANCELLABLE, GCancellableClass))
+#define XCANCELLABLE(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_CANCELLABLE, xcancellable_t))
+#define XCANCELLABLE_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_CANCELLABLE, xcancellable_class_t))
 #define X_IS_CANCELLABLE(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_CANCELLABLE))
 #define X_IS_CANCELLABLE_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_CANCELLABLE))
-#define G_CANCELLABLE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CANCELLABLE, GCancellableClass))
+#define XCANCELLABLE_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_CANCELLABLE, xcancellable_class_t))
 
 /**
  * xcancellable_t:
  *
  * Allows actions to be cancelled.
  */
-typedef struct _GCancellableClass   GCancellableClass;
-typedef struct _GCancellablePrivate GCancellablePrivate;
+typedef struct _xcancellable_class   xcancellable_class_t;
+typedef struct _xcancellable_private _xcancellable_private;
 
 struct _GCancellable
 {
   xobject_t parent_instance;
 
   /*< private >*/
-  GCancellablePrivate *priv;
+  _xcancellable_private *priv;
 };
 
-struct _GCancellableClass
+struct _xcancellable_class
 {
   xobject_class_t parent_class;
 
@@ -115,4 +115,4 @@ void          xcancellable_cancel       (xcancellable_t  *cancellable);
 
 G_END_DECLS
 
-#endif /* __G_CANCELLABLE_H__ */
+#endif /* __XCANCELLABLE_H__ */

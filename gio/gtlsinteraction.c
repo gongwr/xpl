@@ -137,7 +137,7 @@ static void
 invoke_closure_free (xpointer_t data)
 {
   InvokeClosure *closure = data;
-  g_assert (closure);
+  xassert (closure);
   xobject_unref (closure->interaction);
   g_clear_object (&closure->argument);
   g_clear_object (&closure->cancellable);
@@ -146,8 +146,8 @@ invoke_closure_free (xpointer_t data)
   g_clear_error (&closure->error);
 
   /* Insurance that we've actually used these before freeing */
-  g_assert (closure->callback == NULL);
-  g_assert (closure->user_data == NULL);
+  xassert (closure->callback == NULL);
+  xassert (closure->user_data == NULL);
 
   g_free (closure);
 }
@@ -254,15 +254,15 @@ xtls_interaction_finalize (xobject_t *object)
 
   xmain_context_unref (interaction->priv->context);
 
-  G_OBJECT_CLASS (xtls_interaction_parent_class)->finalize (object);
+  XOBJECT_CLASS (xtls_interaction_parent_class)->finalize (object);
 }
 
 static void
 xtls_interaction_class_init (GTlsInteractionClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xtls_interaction_finalize;
+  xobject_class->finalize = xtls_interaction_finalize;
 }
 
 static xboolean_t
@@ -274,7 +274,7 @@ on_invoke_ask_password_sync (xpointer_t user_data)
   g_mutex_lock (&closure->mutex);
 
   klass = G_TLS_INTERACTION_GET_CLASS (closure->interaction);
-  g_assert (klass->ask_password);
+  xassert (klass->ask_password);
 
   closure->result = klass->ask_password (closure->interaction,
                                          G_TLS_PASSWORD (closure->argument),
@@ -299,7 +299,7 @@ on_ask_password_complete (xobject_t      *source,
   g_mutex_lock (&closure->mutex);
 
   klass = G_TLS_INTERACTION_GET_CLASS (closure->interaction);
-  g_assert (klass->ask_password_finish);
+  xassert (klass->ask_password_finish);
 
   closure->result = klass->ask_password_finish (closure->interaction,
                                                 result,
@@ -319,7 +319,7 @@ on_invoke_ask_password_async_as_sync (xpointer_t user_data)
   g_mutex_lock (&closure->mutex);
 
   klass = G_TLS_INTERACTION_GET_CLASS (closure->interaction);
-  g_assert (klass->ask_password_async);
+  xassert (klass->ask_password_async);
 
   klass->ask_password_async (closure->interaction,
                              G_TLS_PASSWORD (closure->argument),
@@ -377,9 +377,9 @@ xtls_interaction_invoke_ask_password (xtls_interaction_t    *interaction,
   InvokeClosure *closure;
   GTlsInteractionClass *klass;
 
-  g_return_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
 
   klass = G_TLS_INTERACTION_GET_CLASS (interaction);
 
@@ -392,7 +392,7 @@ xtls_interaction_invoke_ask_password (xtls_interaction_t    *interaction,
     }
   else if (klass->ask_password_async)
     {
-      g_return_val_if_fail (klass->ask_password_finish, G_TLS_INTERACTION_UNHANDLED);
+      xreturn_val_if_fail (klass->ask_password_finish, G_TLS_INTERACTION_UNHANDLED);
 
       closure = invoke_closure_new (interaction, G_OBJECT (password), cancellable);
       xmain_context_invoke (interaction->priv->context,
@@ -441,9 +441,9 @@ xtls_interaction_ask_password (xtls_interaction_t    *interaction,
 {
   GTlsInteractionClass *klass;
 
-  g_return_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_PASSWORD (password), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
 
   klass = G_TLS_INTERACTION_GET_CLASS (interaction);
   if (klass->ask_password)
@@ -535,19 +535,19 @@ xtls_interaction_ask_password_finish (xtls_interaction_t    *interaction,
 {
   GTlsInteractionClass *klass;
 
-  g_return_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), G_TLS_INTERACTION_UNHANDLED);
 
   klass = G_TLS_INTERACTION_GET_CLASS (interaction);
   if (klass->ask_password_finish)
     {
-      g_return_val_if_fail (klass->ask_password_async != NULL, G_TLS_INTERACTION_UNHANDLED);
+      xreturn_val_if_fail (klass->ask_password_async != NULL, G_TLS_INTERACTION_UNHANDLED);
 
       return (klass->ask_password_finish) (interaction, result, error);
     }
   else
     {
-      g_return_val_if_fail (xasync_result_is_tagged (result, xtls_interaction_ask_password_async), G_TLS_INTERACTION_UNHANDLED);
+      xreturn_val_if_fail (xasync_result_is_tagged (result, xtls_interaction_ask_password_async), G_TLS_INTERACTION_UNHANDLED);
 
       return xtask_propagate_int (XTASK (result), error);
     }
@@ -562,7 +562,7 @@ on_invoke_request_certificate_sync (xpointer_t user_data)
   g_mutex_lock (&closure->mutex);
 
   klass = G_TLS_INTERACTION_GET_CLASS (closure->interaction);
-  g_assert (klass->request_certificate != NULL);
+  xassert (klass->request_certificate != NULL);
 
   closure->result = klass->request_certificate (closure->interaction,
                                                 G_TLS_CONNECTION (closure->argument),
@@ -588,7 +588,7 @@ on_request_certificate_complete (xobject_t      *source,
   g_mutex_lock (&closure->mutex);
 
   klass = G_TLS_INTERACTION_GET_CLASS (closure->interaction);
-  g_assert (klass->request_certificate_finish != NULL);
+  xassert (klass->request_certificate_finish != NULL);
 
   closure->result = klass->request_certificate_finish (closure->interaction,
                                                        result, &closure->error);
@@ -607,7 +607,7 @@ on_invoke_request_certificate_async_as_sync (xpointer_t user_data)
   g_mutex_lock (&closure->mutex);
 
   klass = G_TLS_INTERACTION_GET_CLASS (closure->interaction);
-  g_assert (klass->request_certificate_async);
+  xassert (klass->request_certificate_async);
 
   klass->request_certificate_async (closure->interaction,
                                     G_TLS_CONNECTION (closure->argument), 0,
@@ -668,9 +668,9 @@ xtls_interaction_invoke_request_certificate (xtls_interaction_t    *interaction,
   InvokeClosure *closure;
   GTlsInteractionClass *klass;
 
-  g_return_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (connection), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (connection), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
 
   klass = G_TLS_INTERACTION_GET_CLASS (interaction);
 
@@ -683,7 +683,7 @@ xtls_interaction_invoke_request_certificate (xtls_interaction_t    *interaction,
     }
   else if (klass->request_certificate_async)
     {
-      g_return_val_if_fail (klass->request_certificate_finish, G_TLS_INTERACTION_UNHANDLED);
+      xreturn_val_if_fail (klass->request_certificate_finish, G_TLS_INTERACTION_UNHANDLED);
 
       closure = invoke_closure_new (interaction, G_OBJECT (connection), cancellable);
       xmain_context_invoke (interaction->priv->context,
@@ -737,9 +737,9 @@ xtls_interaction_request_certificate (xtls_interaction_t              *interacti
 {
   GTlsInteractionClass *klass;
 
-  g_return_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (X_IS_TLS_CONNECTION (connection), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_CONNECTION (connection), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_TLS_INTERACTION_UNHANDLED);
 
   klass = G_TLS_INTERACTION_GET_CLASS (interaction);
   if (klass->request_certificate)
@@ -827,19 +827,19 @@ xtls_interaction_request_certificate_finish (xtls_interaction_t    *interaction,
 {
   GTlsInteractionClass *klass;
 
-  g_return_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_TLS_INTERACTION (interaction), G_TLS_INTERACTION_UNHANDLED);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), G_TLS_INTERACTION_UNHANDLED);
 
   klass = G_TLS_INTERACTION_GET_CLASS (interaction);
   if (klass->request_certificate_finish)
     {
-      g_return_val_if_fail (klass->request_certificate_async != NULL, G_TLS_INTERACTION_UNHANDLED);
+      xreturn_val_if_fail (klass->request_certificate_async != NULL, G_TLS_INTERACTION_UNHANDLED);
 
       return (klass->request_certificate_finish) (interaction, result, error);
     }
   else
     {
-      g_return_val_if_fail (xasync_result_is_tagged (result, xtls_interaction_request_certificate_async), G_TLS_INTERACTION_UNHANDLED);
+      xreturn_val_if_fail (xasync_result_is_tagged (result, xtls_interaction_request_certificate_async), G_TLS_INTERACTION_UNHANDLED);
 
       return xtask_propagate_int (XTASK (result), error);
     }

@@ -106,7 +106,7 @@ main (void)
   for (t = 0; t < N_THREADS; t++)
     {
       tdata[t].gthread   = xthread_create (thread_func, &tdata[t], TRUE, NULL);
-      g_assert (tdata[t].gthread != NULL);
+      xassert (tdata[t].gthread != NULL);
     }
   for (t = 0; t < N_THREADS; t++)
     {

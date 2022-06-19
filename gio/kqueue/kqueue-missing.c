@@ -90,8 +90,8 @@ _kh_file_appeared_cb (kqueue_sub *sub)
 {
   sint64_t now = g_get_monotonic_time ();
 
-  g_assert (sub != NULL);
-  g_assert (sub->filename);
+  xassert (sub != NULL);
+  xassert (sub->filename);
 
   if (!xfile_test (sub->filename, XFILE_TEST_EXISTS))
     return;
@@ -129,8 +129,8 @@ _km_scan_missing (kqueue_sub *check_this_sub_only)
   for (head = missing_subs_list; head; head = head->next)
     {
       kqueue_sub *sub = (kqueue_sub *) head->data;
-      g_assert (sub != NULL);
-      g_assert (sub->filename != NULL);
+      xassert (sub != NULL);
+      xassert (sub->filename != NULL);
 
       if (check_this_sub_only != NULL && sub != check_this_sub_only)
         continue;

@@ -56,7 +56,7 @@ main (int argc, char **argv)
     G_OPTION_ENTRY_NULL
   };
 
-  app = xapplication_new ("org.gtk.TestApplication",
+  app = xapplication_new ("org.gtk.test_application_t",
                            G_APPLICATION_HANDLES_COMMAND_LINE);
 
   xapplication_add_main_option_entries (app, entries);

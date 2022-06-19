@@ -481,7 +481,7 @@ test_parse_detailed (void)
       xboolean_t success;
       xchar_t *name;
 
-      success = g_action_parse_detailed_name (testcases[i].detailed, &name, &target, &error);
+      success = xaction_parse_detailed_name (testcases[i].detailed, &name, &target, &error);
       g_assert_true (success == (error == NULL));
       if (success && testcases[i].expected_error)
         xerror ("Unexpected success on '%s'.  Expected error containing '%s'",
@@ -640,7 +640,7 @@ stop_loop (xpointer_t data)
 
   xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xaction_entry_t exported_entries[] = {
@@ -693,7 +693,7 @@ call_list (xpointer_t user_data)
                           user_data);
   xobject_unref (bus);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -743,7 +743,7 @@ call_describe (xpointer_t user_data)
                           user_data);
   xobject_unref (bus);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS

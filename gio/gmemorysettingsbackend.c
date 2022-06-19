@@ -29,7 +29,7 @@
                                          XTYPE_MEMORY_SETTINGS_BACKEND,     \
                                          xmemory_settings_backend_t))
 
-typedef GSettingsBackendClass xmemory_settings_backend_class_t;
+typedef xsettings_backend_class_t xmemory_settings_backend_class_t;
 typedef struct
 {
   xsettings_backend_t parent_instance;
@@ -146,7 +146,7 @@ xmemory_settings_backend_finalize (xobject_t *object)
 
   xhash_table_unref (memory->table);
 
-  G_OBJECT_CLASS (xmemory_settings_backend_parent_class)
+  XOBJECT_CLASS (xmemory_settings_backend_parent_class)
     ->finalize (object);
 }
 
@@ -160,8 +160,8 @@ xmemory_settings_backend_init (xmemory_settings_backend_t *memory)
 static void
 xmemory_settings_backend_class_init (xmemory_settings_backend_class_t *class)
 {
-  GSettingsBackendClass *backend_class = G_SETTINGS_BACKEND_CLASS (class);
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xsettings_backend_class_t *backend_class = G_SETTINGS_BACKEND_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   backend_class->read = xmemory_settings_backend_read;
   backend_class->write = xmemory_settings_backend_write;

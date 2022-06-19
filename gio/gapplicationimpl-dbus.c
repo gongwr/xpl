@@ -383,7 +383,7 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
       if G_UNLIKELY (info == NULL)
         xerror ("%s", error->message);
       org_gtk_Application = g_dbus_node_info_lookup_interface (info, "org.gtk.Application");
-      g_assert (org_gtk_Application != NULL);
+      xassert (org_gtk_Application != NULL);
       g_dbus_interface_info_ref (org_gtk_Application);
       g_dbus_node_info_unref (info);
 
@@ -391,7 +391,7 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
       if G_UNLIKELY (info == NULL)
         xerror ("%s", error->message);
       org_freedesktop_Application = g_dbus_node_info_lookup_interface (info, "org.freedesktop.Application");
-      g_assert (org_freedesktop_Application != NULL);
+      xassert (org_freedesktop_Application != NULL);
       g_dbus_interface_info_ref (org_freedesktop_Application);
       g_dbus_node_info_unref (info);
     }
@@ -434,12 +434,12 @@ xapplication_impl_attempt_primary (GApplicationImpl  *impl,
                                  impl->object_path,
                                  &local_error))
     {
-      g_return_val_if_fail (local_error != NULL, FALSE);
+      xreturn_val_if_fail (local_error != NULL, FALSE);
       g_propagate_error (error, g_steal_pointer (&local_error));
       return FALSE;
     }
 
-  g_return_val_if_fail (local_error == NULL, FALSE);
+  xreturn_val_if_fail (local_error == NULL, FALSE);
 
   if (impl->bus_name == NULL)
     {
@@ -595,7 +595,7 @@ xapplication_impl_register (xapplication_t        *application,
   xdbus_action_group_t *actions;
   GApplicationImpl *impl;
 
-  g_assert ((flags & G_APPLICATION_NON_UNIQUE) || appid != NULL);
+  xassert ((flags & G_APPLICATION_NON_UNIQUE) || appid != NULL);
 
   impl = g_slice_new0 (GApplicationImpl);
 
@@ -797,7 +797,7 @@ xapplication_impl_command_line (GApplicationImpl    *impl,
       if G_UNLIKELY (info == NULL)
         xerror ("%s", error->message);
       org_gtk_private_CommandLine = g_dbus_node_info_lookup_interface (info, "org.gtk.private.CommandLine");
-      g_assert (org_gtk_private_CommandLine != NULL);
+      xassert (org_gtk_private_CommandLine != NULL);
       g_dbus_interface_info_ref (org_gtk_private_CommandLine);
       g_dbus_node_info_unref (info);
     }
@@ -806,7 +806,7 @@ xapplication_impl_command_line (GApplicationImpl    *impl,
                                                  org_gtk_private_CommandLine,
                                                  &vtable, &data, NULL, NULL);
   /* In theory we should try other paths... */
-  g_assert (object_id != 0);
+  xassert (object_id != 0);
 
 #ifdef G_OS_UNIX
   {
@@ -878,7 +878,7 @@ typedef struct
 } xdbus_command_line_t;
 
 
-G_DEFINE_TYPE (xdbus_command_line,
+XDEFINE_TYPE (xdbus_command_line,
                xdbus_command_line,
                XTYPE_APPLICATION_COMMAND_LINE)
 
@@ -952,7 +952,7 @@ xdbus_command_line_finalize (xobject_t *object)
                                          xvariant_new ("(i)", status));
   xobject_unref (gdbcl->invocation);
 
-  G_OBJECT_CLASS (xdbus_command_line_parent_class)
+  XOBJECT_CLASS (xdbus_command_line_parent_class)
     ->finalize (object);
 }
 
@@ -964,7 +964,7 @@ xdbus_command_line_init (xdbus_command_line_t *gdbcl)
 static void
 xdbus_command_line_class_init (xapplication_command_line_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xdbus_command_line_finalize;
   class->printerr_literal = xdbus_command_line_printerr_literal;

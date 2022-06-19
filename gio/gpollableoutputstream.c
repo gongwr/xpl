@@ -85,7 +85,7 @@ xpollable_output_stream_default_can_poll (xpollable_output_stream_t *stream)
 xboolean_t
 xpollable_output_stream_can_poll (xpollable_output_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
 
   return G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->can_poll (stream);
 }
@@ -113,7 +113,7 @@ xpollable_output_stream_can_poll (xpollable_output_stream_t *stream)
 xboolean_t
 xpollable_output_stream_is_writable (xpollable_output_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), FALSE);
 
   return G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->is_writable (stream);
 }
@@ -140,7 +140,7 @@ xsource_t *
 xpollable_output_stream_create_source (xpollable_output_stream_t *stream,
 					xcancellable_t          *cancellable)
 {
-  g_return_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), NULL);
 
   return G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream)->
 	  create_source (stream, cancellable);
@@ -262,8 +262,8 @@ xpollable_output_stream_write_nonblocking (xpollable_output_stream_t  *stream,
 {
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), -1);
-  g_return_val_if_fail (buffer != NULL, 0);
+  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (buffer != NULL, 0);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return -1;
@@ -341,10 +341,10 @@ xpollable_output_stream_writev_nonblocking (xpollable_output_stream_t  *stream,
   if (bytes_written)
     *bytes_written = 0;
 
-  g_return_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (vectors != NULL || n_vectors == 0, G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
-  g_return_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (X_IS_POLLABLE_OUTPUT_STREAM (stream), G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (vectors != NULL || n_vectors == 0, G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (error == NULL || *error == NULL, G_POLLABLE_RETURN_FAILED);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return G_POLLABLE_RETURN_FAILED;
@@ -353,7 +353,7 @@ xpollable_output_stream_writev_nonblocking (xpollable_output_stream_t  *stream,
     return G_POLLABLE_RETURN_OK;
 
   iface = G_POLLABLE_OUTPUT_STREAM_GET_INTERFACE (stream);
-  g_return_val_if_fail (iface->writev_nonblocking != NULL, G_POLLABLE_RETURN_FAILED);
+  xreturn_val_if_fail (iface->writev_nonblocking != NULL, G_POLLABLE_RETURN_FAILED);
 
   if (cancellable)
     xcancellable_push_current (cancellable);

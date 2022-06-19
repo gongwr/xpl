@@ -50,7 +50,7 @@ typedef void (*GDBusWorkerDisconnectedCallback)    (GDBusWorker   *worker,
  * and must not block.
  */
 GDBusWorker *_g_dbus_worker_new          (xio_stream_t                          *stream,
-                                          GDBusCapabilityFlags                capabilities,
+                                          xdbus_capability_flags_t                capabilities,
                                           xboolean_t                            initially_frozen,
                                           GDBusWorkerMessageReceivedCallback  message_received_callback,
                                           GDBusWorkerMessageAboutToBeSentCallback message_about_to_be_sent_callback,

@@ -63,7 +63,7 @@ typedef struct
 
 static xtype_t my_io_stream_get_type (void) G_GNUC_CONST;
 
-G_DEFINE_TYPE (MyIOStream, my_io_stream, XTYPE_IO_STREAM)
+XDEFINE_TYPE (MyIOStream, my_io_stream, XTYPE_IO_STREAM)
 
 static void
 my_io_stream_finalize (xobject_t *object)
@@ -71,7 +71,7 @@ my_io_stream_finalize (xobject_t *object)
   MyIOStream *stream = MY_IO_STREAM (object);
   xobject_unref (stream->input_stream);
   xobject_unref (stream->output_stream);
-  G_OBJECT_CLASS (my_io_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (my_io_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -96,11 +96,11 @@ my_io_stream_get_output_stream (xio_stream_t *_stream)
 static void
 my_io_stream_class_init (MyIOStreamClass *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
   xio_stream_class_t *giostream_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = my_io_stream_finalize;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize = my_io_stream_finalize;
 
   giostream_class = XIO_STREAM_CLASS (klass);
   giostream_class->get_input_stream  = my_io_stream_get_input_stream;
@@ -112,8 +112,8 @@ my_io_stream_new (xinput_stream_t  *input_stream,
                   xoutput_stream_t *output_stream)
 {
   MyIOStream *stream;
-  g_return_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
   stream = MY_IO_STREAM (xobject_new (MY_TYPE_IO_STREAM, NULL));
   stream->input_stream = xobject_ref (input_stream);
   stream->output_stream = xobject_ref (output_stream);
@@ -129,7 +129,7 @@ typedef struct
 
 typedef struct
 {
-  GFilterOutputStreamClass parent_class;
+  xfilter_output_stream_class_t parent_class;
 } MySlowCloseOutputStreamClass;
 
 #define MY_TYPE_SLOW_CLOSE_OUTPUT_STREAM \
@@ -142,7 +142,7 @@ typedef struct
 
 static xtype_t my_slow_close_output_stream_get_type (void) G_GNUC_CONST;
 
-G_DEFINE_TYPE (MySlowCloseOutputStream, my_slow_close_output_stream,
+XDEFINE_TYPE (MySlowCloseOutputStream, my_slow_close_output_stream,
                XTYPE_FILTER_OUTPUT_STREAM)
 
 static void
@@ -188,7 +188,7 @@ delayed_close_cb (xpointer_t data)
     close_async (df->stream, df->io_priority, df->cancellable, df->callback,
                  df->user_data);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -305,9 +305,9 @@ test_once (Fixture       *f,
   xboolean_t pipe_res;
 
   pipe_res = g_unix_open_pipe (f->server_to_client, FD_CLOEXEC, &f->error);
-  g_assert (pipe_res);
+  xassert (pipe_res);
   pipe_res = g_unix_open_pipe (f->client_to_server, FD_CLOEXEC, &f->error);
-  g_assert (pipe_res);
+  xassert (pipe_res);
 
   f->server_iostream = my_io_stream_new_for_fds (f->client_to_server[0],
                                                  f->server_to_client[1]);

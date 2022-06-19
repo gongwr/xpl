@@ -199,7 +199,7 @@ xstring_free (xstring_t  *string,
 {
   xchar_t *segment;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (free_segment)
     {
@@ -236,7 +236,7 @@ xstring_free_to_bytes (xstring_t *string)
   xsize_t len;
   xchar_t *buf;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   len = string->len;
 
@@ -323,8 +323,8 @@ xstring_t *
 xstring_assign (xstring_t     *string,
                  const xchar_t *rval)
 {
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (rval != NULL, string);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (rval != NULL, string);
 
   /* Make sure assigning to itself doesn't corrupt the string. */
   if (string->str != rval)
@@ -352,7 +352,7 @@ xstring_t *
 xstring_truncate (xstring_t *string,
                    xsize_t    len)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   string->len = MIN (len, string->len);
   string->str[string->len] = 0;
@@ -377,7 +377,7 @@ xstring_t *
 xstring_set_size (xstring_t *string,
                    xsize_t    len)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (len >= string->allocated_len)
     xstring_maybe_expand (string, len - string->len);
@@ -417,8 +417,8 @@ xstring_insert_len (xstring_t     *string,
 {
   xsize_t len_unsigned, pos_unsigned;
 
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (len == 0 || val != NULL, string);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (len == 0 || val != NULL, string);
 
   if (len == 0)
     return string;
@@ -432,7 +432,7 @@ xstring_insert_len (xstring_t     *string,
   else
     {
       pos_unsigned = pos;
-      g_return_val_if_fail (pos_unsigned <= string->len, string);
+      xreturn_val_if_fail (pos_unsigned <= string->len, string);
     }
 
   /* Check whether val represents a substring of string.
@@ -577,7 +577,7 @@ xstring_t *
 xstring_append_c (xstring_t *string,
                    xchar_t    c)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   return xstring_insert_c (string, -1, c);
 }
@@ -596,7 +596,7 @@ xstring_t *
 xstring_append_unichar (xstring_t  *string,
                          xunichar_t  wc)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   return xstring_insert_unichar (string, -1, wc);
 }
@@ -658,7 +658,7 @@ xstring_t *
 xstring_prepend_c (xstring_t *string,
                     xchar_t    c)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   return xstring_insert_c (string, 0, c);
 }
@@ -677,7 +677,7 @@ xstring_t *
 xstring_prepend_unichar (xstring_t  *string,
                           xunichar_t  wc)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   return xstring_insert_unichar (string, 0, wc);
 }
@@ -718,14 +718,14 @@ xstring_insert_c (xstring_t *string,
 {
   xsize_t pos_unsigned;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   xstring_maybe_expand (string, 1);
 
   if (pos < 0)
     pos = string->len;
   else
-    g_return_val_if_fail ((xsize_t) pos <= string->len, string);
+    xreturn_val_if_fail ((xsize_t) pos <= string->len, string);
   pos_unsigned = pos;
 
   /* If not just an append, move the old stuff */
@@ -762,7 +762,7 @@ xstring_insert_unichar (xstring_t  *string,
   xint_t charlen, first, i;
   xchar_t *dest;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   /* Code copied from xunichar_to_utf() */
   if (wc < 0x80)
@@ -802,7 +802,7 @@ xstring_insert_unichar (xstring_t  *string,
   if (pos < 0)
     pos = string->len;
   else
-    g_return_val_if_fail ((xsize_t) pos <= string->len, string);
+    xreturn_val_if_fail ((xsize_t) pos <= string->len, string);
 
   /* If not just an append, move the old stuff */
   if ((xsize_t) pos < string->len)
@@ -842,7 +842,7 @@ xstring_overwrite (xstring_t     *string,
                     xsize_t        pos,
                     const xchar_t *val)
 {
-  g_return_val_if_fail (val != NULL, string);
+  xreturn_val_if_fail (val != NULL, string);
   return xstring_overwrite_len (string, pos, val, strlen (val));
 }
 
@@ -868,13 +868,13 @@ xstring_overwrite_len (xstring_t     *string,
 {
   xsize_t end;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (!len)
     return string;
 
-  g_return_val_if_fail (val != NULL, string);
-  g_return_val_if_fail (pos <= string->len, string);
+  xreturn_val_if_fail (val != NULL, string);
+  xreturn_val_if_fail (pos <= string->len, string);
 
   if (len < 0)
     len = strlen (val);
@@ -914,18 +914,18 @@ xstring_erase (xstring_t *string,
 {
   xsize_t len_unsigned, pos_unsigned;
 
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (pos >= 0, string);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (pos >= 0, string);
   pos_unsigned = pos;
 
-  g_return_val_if_fail (pos_unsigned <= string->len, string);
+  xreturn_val_if_fail (pos_unsigned <= string->len, string);
 
   if (len < 0)
     len_unsigned = string->len - pos_unsigned;
   else
     {
       len_unsigned = len;
-      g_return_val_if_fail (pos_unsigned + len_unsigned <= string->len, string);
+      xreturn_val_if_fail (pos_unsigned + len_unsigned <= string->len, string);
 
       if (pos_unsigned + len_unsigned < string->len)
         memmove (string->str + pos_unsigned,
@@ -972,9 +972,9 @@ xstring_replace (xstring_t     *string,
   xchar_t *cur, *next;
   xuint_t n = 0;
 
-  g_return_val_if_fail (string != NULL, 0);
-  g_return_val_if_fail (find != NULL, 0);
-  g_return_val_if_fail (replace != NULL, 0);
+  xreturn_val_if_fail (string != NULL, 0);
+  xreturn_val_if_fail (find != NULL, 0);
+  xreturn_val_if_fail (replace != NULL, 0);
 
   f_len = strlen (find);
   r_len = strlen (replace);
@@ -1019,7 +1019,7 @@ xstring_ascii_down (xstring_t *string)
   xchar_t *s;
   xint_t n;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   n = string->len;
   s = string->str;
@@ -1050,7 +1050,7 @@ xstring_ascii_up (xstring_t *string)
   xchar_t *s;
   xint_t n;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   n = string->len;
   s = string->str;
@@ -1083,7 +1083,7 @@ xstring_down (xstring_t *string)
   xuchar_t *s;
   xlong_t n;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   n = string->len;
   s = (xuchar_t *) string->str;
@@ -1117,7 +1117,7 @@ xstring_up (xstring_t *string)
   xuchar_t *s;
   xlong_t n;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   n = string->len;
   s = (xuchar_t *) string->str;

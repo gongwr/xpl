@@ -40,7 +40,7 @@
  * First and foremost: #xerror_t should only be used to report recoverable
  * runtime errors, never to report programming errors. If the programmer
  * has screwed up, then you should use g_warning(), g_return_if_fail(),
- * g_assert(), xerror(), or some similar facility. (Incidentally,
+ * xassert(), xerror(), or some similar facility. (Incidentally,
  * remember that the xerror() function should only be used for
  * programming errors, it should not be used to print any error
  * reportable via #xerror_t.)
@@ -69,18 +69,18 @@
  * xerror_t *err = NULL;
  *
  * xfile_get_contents ("foo.txt", &contents, NULL, &err);
- * g_assert ((contents == NULL && err != NULL) || (contents != NULL && err == NULL));
+ * xassert ((contents == NULL && err != NULL) || (contents != NULL && err == NULL));
  * if (err != NULL)
  *   {
  *     // Report error to user, and free error
- *     g_assert (contents == NULL);
+ *     xassert (contents == NULL);
  *     fprintf (stderr, "Unable to read file: %s\n", err->message);
  *     xerror_free (err);
  *   }
  * else
  *   {
  *     // Use file contents
- *     g_assert (contents != NULL);
+ *     xassert (contents != NULL);
  *   }
  * ]|
  * Note that `err != NULL` in this example is a reliable indicator
@@ -139,7 +139,7 @@
  *   xint_t fd;
  *   int saved_errno;
  *
- *   g_return_val_if_fail (error == NULL || *error == NULL, -1);
+ *   xreturn_val_if_fail (error == NULL || *error == NULL, -1);
  *
  *   fd = open ("file.txt", O_RDONLY);
  *   saved_errno = errno;
@@ -166,17 +166,17 @@
  * xboolean_t
  * my_function_that_can_fail (xerror_t **err)
  * {
- *   g_return_val_if_fail (err == NULL || *err == NULL, FALSE);
+ *   xreturn_val_if_fail (err == NULL || *err == NULL, FALSE);
  *
  *   if (!sub_function_that_can_fail (err))
  *     {
  *       // assert that error was set by the sub-function
- *       g_assert (err == NULL || *err != NULL);
+ *       xassert (err == NULL || *err != NULL);
  *       return FALSE;
  *     }
  *
  *   // otherwise continue, no error occurred
- *   g_assert (err == NULL || *err == NULL);
+ *   xassert (err == NULL || *err == NULL);
  * }
  * ]|
  *
@@ -191,7 +191,7 @@
  * {
  *   xerror_t *tmp_error;
  *
- *   g_return_val_if_fail (err == NULL || *err == NULL, FALSE);
+ *   xreturn_val_if_fail (err == NULL || *err == NULL, FALSE);
  *
  *   tmp_error = NULL;
  *   sub_function_that_can_fail (&tmp_error);
@@ -215,7 +215,7 @@
  * {
  *   xerror_t *tmp_error;
  *
- *   g_return_val_if_fail (err == NULL || *err == NULL, FALSE);
+ *   xreturn_val_if_fail (err == NULL || *err == NULL, FALSE);
  *
  *   tmp_error = NULL;
  *   sub_function_that_can_fail (&tmp_error);
@@ -242,7 +242,7 @@
  * {
  *   xerror_t *tmp_error;
  *
- *   g_return_val_if_fail (err == NULL || *err == NULL, FALSE);
+ *   xreturn_val_if_fail (err == NULL || *err == NULL, FALSE);
  *
  *   sub_function_that_can_fail (NULL); // ignore errors
  *
@@ -365,7 +365,7 @@
  *   are hard to use because of this. If %FALSE is returned, the error must
  *   be set to a non-%NULL value.  One exception to this is that in situations
  *   that are already considered to be undefined behaviour (such as when a
- *   g_return_val_if_fail() check fails), the error need not be set.
+ *   xreturn_val_if_fail() check fails), the error need not be set.
  *   Instead of checking separately whether the error is set, callers
  *   should ensure that they do not provoke undefined behaviour, then
  *   assume that the error will be set on failure.
@@ -434,7 +434,7 @@
  * my_error_get_parse_error_id (xerror_t *error)
  * {
  *   MyErrorPrivate *priv = my_error_get_private (error);
- *   g_return_val_if_fail (priv != NULL, -1);
+ *   xreturn_val_if_fail (priv != NULL, -1);
  *   return priv->parse_error_id;
  * }
  *
@@ -442,8 +442,8 @@
  * my_error_get_bad_request_details (xerror_t *error)
  * {
  *   MyErrorPrivate *priv = my_error_get_private (error);
- *   g_return_val_if_fail (priv != NULL, NULL);
- *   g_return_val_if_fail (error->code != MY_ERROR_BAD_REQUEST, NULL);
+ *   xreturn_val_if_fail (priv != NULL, NULL);
+ *   xreturn_val_if_fail (error->code != MY_ERROR_BAD_REQUEST, NULL);
  *   return priv->bad_request_details;
  * }
  *
@@ -458,7 +458,7 @@
  *   if (error != NULL && *error != NULL)
  *     {
  *       priv = my_error_get_private (error);
- *       g_return_val_if_fail (priv != NULL, NULL);
+ *       xreturn_val_if_fail (priv != NULL, NULL);
  *       priv->parse_error_id = error_id;
  *       priv->bad_request_details = xstrdup (details);
  *     }
@@ -613,11 +613,11 @@ xerror_domain_register_static (const char        *error_type_name,
 {
   xquark error_quark;
 
-  g_return_val_if_fail (error_type_name != NULL, 0);
-  g_return_val_if_fail (error_type_private_size > 0, 0);
-  g_return_val_if_fail (error_type_init != NULL, 0);
-  g_return_val_if_fail (error_type_copy != NULL, 0);
-  g_return_val_if_fail (error_type_clear != NULL, 0);
+  xreturn_val_if_fail (error_type_name != NULL, 0);
+  xreturn_val_if_fail (error_type_private_size > 0, 0);
+  xreturn_val_if_fail (error_type_init != NULL, 0);
+  xreturn_val_if_fail (error_type_copy != NULL, 0);
+  xreturn_val_if_fail (error_type_clear != NULL, 0);
 
   error_quark = g_quark_from_static_string (error_type_name);
   error_domain_register (error_quark,
@@ -652,11 +652,11 @@ xerror_domain_register (const char        *error_type_name,
 {
   xquark error_quark;
 
-  g_return_val_if_fail (error_type_name != NULL, 0);
-  g_return_val_if_fail (error_type_private_size > 0, 0);
-  g_return_val_if_fail (error_type_init != NULL, 0);
-  g_return_val_if_fail (error_type_copy != NULL, 0);
-  g_return_val_if_fail (error_type_clear != NULL, 0);
+  xreturn_val_if_fail (error_type_name != NULL, 0);
+  xreturn_val_if_fail (error_type_private_size > 0, 0);
+  xreturn_val_if_fail (error_type_init != NULL, 0);
+  xreturn_val_if_fail (error_type_copy != NULL, 0);
+  xreturn_val_if_fail (error_type_clear != NULL, 0);
 
   error_quark = g_quark_from_string (error_type_name);
   error_domain_register (error_quark,
@@ -754,8 +754,8 @@ xerror_new_valist (xquark       domain,
                     va_list      args)
 {
   /* Historically, xerror_t allowed this (although it was never meant to work),
-   * and it has significant use in the wild, which g_return_val_if_fail
-   * would break. It should maybe g_return_val_if_fail in GLib 4.
+   * and it has significant use in the wild, which xreturn_val_if_fail
+   * would break. It should maybe xreturn_val_if_fail in GLib 4.
    * (GNOME#660371, GNOME#560482)
    */
   g_warn_if_fail (domain != 0);
@@ -785,8 +785,8 @@ xerror_new (xquark       domain,
   xerror_t* error;
   va_list args;
 
-  g_return_val_if_fail (format != NULL, NULL);
-  g_return_val_if_fail (domain != 0, NULL);
+  xreturn_val_if_fail (format != NULL, NULL);
+  xreturn_val_if_fail (domain != 0, NULL);
 
   va_start (args, format);
   error = xerror_new_valist (domain, code, format, args);
@@ -813,8 +813,8 @@ xerror_new_literal (xquark         domain,
                      xint_t           code,
                      const xchar_t   *message)
 {
-  g_return_val_if_fail (message != NULL, NULL);
-  g_return_val_if_fail (domain != 0, NULL);
+  xreturn_val_if_fail (message != NULL, NULL);
+  xreturn_val_if_fail (domain != 0, NULL);
 
   return xerror_new_steal (domain, code, xstrdup (message), NULL);
 }
@@ -884,7 +884,7 @@ xerror_copy (const xerror_t *error)
   xerror_t *copy;
   ErrorDomainInfo info;
 
-  g_return_val_if_fail (error != NULL, NULL);
+  xreturn_val_if_fail (error != NULL, NULL);
   /* See xerror_new_valist for why these don't return */
   g_warn_if_fail (error->domain != 0);
   g_warn_if_fail (error->message != NULL);
@@ -1149,7 +1149,7 @@ g_propagate_prefixed_error (xerror_t      **dest,
     {
       va_list ap;
 
-      g_assert (*dest != NULL);
+      xassert (*dest != NULL);
       va_start (ap, format);
       xerror_add_prefix (&(*dest)->message, format, ap);
       va_end (ap);

@@ -207,7 +207,7 @@ typedef enum
  * to the corresponding argument of xsignal_new().
  * |[
  * xsignal_new ("size_request",
- *   XTYPE_FROM_CLASS (gobject_class),
+ *   XTYPE_FROM_CLASS (xobject_class),
  * 	 G_SIGNAL_RUN_FIRST,
  * 	 G_STRUCT_OFFSET (GtkWidgetClass, size_request),
  * 	 NULL, NULL,

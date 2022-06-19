@@ -133,7 +133,7 @@ xbuffered_output_stream_class_init (GBufferedOutputStreamClass *klass)
   xobject_class_t *object_class;
   xoutput_stream_class_t *ostream_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->get_property = xbuffered_output_stream_get_property;
   object_class->set_property = xbuffered_output_stream_set_property;
   object_class->finalize     = xbuffered_output_stream_finalize;
@@ -149,23 +149,23 @@ xbuffered_output_stream_class_init (GBufferedOutputStreamClass *klass)
 
   xobject_class_install_property (object_class,
                                    PROP_BUFSIZE,
-                                   g_param_spec_uint ("buffer-size",
+                                   xparam_spec_uint ("buffer-size",
                                                       P_("buffer_t Size"),
                                                       P_("The size of the backend buffer"),
                                                       1,
                                                       G_MAXUINT,
                                                       DEFAULT_BUFFER_SIZE,
-                                                      G_PARAM_READWRITE|G_PARAM_CONSTRUCT|
-                                                      G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE|XPARAM_CONSTRUCT|
+                                                      XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   xobject_class_install_property (object_class,
                                    PROP_AUTO_GROW,
-                                   g_param_spec_boolean ("auto-grow",
+                                   xparam_spec_boolean ("auto-grow",
                                                          P_("Auto-grow"),
                                                          P_("Whether the buffer should automatically grow"),
                                                          FALSE,
-                                                         G_PARAM_READWRITE|
-                                                         G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                         XPARAM_READWRITE|
+                                                         XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
 }
 
@@ -180,7 +180,7 @@ xbuffered_output_stream_class_init (GBufferedOutputStreamClass *klass)
 xsize_t
 xbuffered_output_stream_get_buffer_size (xbuffered_output_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream), -1);
 
   return stream->priv->len;
 }
@@ -239,7 +239,7 @@ xbuffered_output_stream_set_buffer_size (xbuffered_output_stream_t *stream,
 xboolean_t
 xbuffered_output_stream_get_auto_grow (xbuffered_output_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_BUFFERED_OUTPUT_STREAM (stream), FALSE);
 
   return stream->priv->auto_grow;
 }
@@ -336,7 +336,7 @@ xbuffered_output_stream_finalize (xobject_t *object)
 
   g_free (priv->buffer);
 
-  G_OBJECT_CLASS (xbuffered_output_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xbuffered_output_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -368,7 +368,7 @@ xbuffered_output_stream_new (xoutput_stream_t *base_stream)
 {
   xoutput_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_BUFFERED_OUTPUT_STREAM,
                          "base-stream", base_stream,
@@ -392,7 +392,7 @@ xbuffered_output_stream_new_sized (xoutput_stream_t *base_stream,
 {
   xoutput_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_BUFFERED_OUTPUT_STREAM,
                          "base-stream", base_stream,
@@ -417,7 +417,7 @@ flush_buffer (xbuffered_output_stream_t  *stream,
   bytes_written = 0;
   base_stream = G_FILTER_OUTPUT_STREAM (stream)->base_stream;
 
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), FALSE);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (base_stream), FALSE);
 
   res = xoutput_stream_write_all (base_stream,
                                    priv->buffer,
@@ -717,7 +717,7 @@ xbuffered_output_stream_flush_finish (xoutput_stream_t        *stream,
                                        xasync_result_t         *result,
                                        xerror_t              **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -749,7 +749,7 @@ xbuffered_output_stream_close_finish (xoutput_stream_t        *stream,
                                        xasync_result_t         *result,
                                        xerror_t              **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

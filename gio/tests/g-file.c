@@ -62,7 +62,7 @@ test_xfile_new_null (void)
   while (paths[i])
     {
       file = xfile_new_for_path (paths[i++]);
-      g_assert (file != NULL);
+      xassert (file != NULL);
       xobject_unref (file);
     }
 
@@ -70,7 +70,7 @@ test_xfile_new_null (void)
   while (uris[i])
     {
       file = xfile_new_for_uri (uris[i++]);
-      g_assert (file != NULL);
+      xassert (file != NULL);
       xobject_unref(file);
     }
 }
@@ -95,8 +95,8 @@ compare_two_files (const xboolean_t use_uri, const char *path1, const char *path
       file2 = xfile_new_for_path (path2);
     }
 
-  g_assert (file1 != NULL);
-  g_assert (file2 != NULL);
+  xassert (file1 != NULL);
+  xassert (file2 != NULL);
 
   equal = xfile_equal (file1, file2);
 
@@ -179,11 +179,11 @@ dup_equals (const xboolean_t use_uri, const char *path)
   else
     file1 = xfile_new_for_path (path);
 
-  g_assert (file1 != NULL);
+  xassert (file1 != NULL);
 
   file2 = xfile_dup (file1);
 
-  g_assert (file2 != NULL);
+  xassert (file2 != NULL);
 
   equal = xfile_equal (file1, file2);
 
@@ -209,7 +209,7 @@ test_xfile_dup (void)
   for (i = 0; i < G_N_ELEMENTS (dup_paths); i++)
     {
       xboolean_t equal = dup_equals (dup_paths[i].use_uri, dup_paths[i].path1);
-      g_assert (equal == TRUE);
+      xassert (equal == TRUE);
     }
 }
 
@@ -229,22 +229,22 @@ parse_check_utf8 (const xboolean_t use_uri, const char *path, const char *result
   else
     file1 = xfile_new_for_path (path);
 
-  g_assert (file1 != NULL);
+  xassert (file1 != NULL);
 
   parsed_name = xfile_get_parse_name (file1);
 
-  g_assert (parsed_name != NULL);
+  xassert (parsed_name != NULL);
 
   /* UTF-8 validation */
   is_utf8_valid = xutf8_validate (parsed_name, -1, NULL);
-  g_assert (is_utf8_valid == TRUE);
+  xassert (is_utf8_valid == TRUE);
 
   if (result_parse_name)
     g_assert_cmpstr (parsed_name, ==, result_parse_name);
 
   file2 = xfile_parse_name (parsed_name);
 
-  g_assert (file2 != NULL);
+  xassert (file2 != NULL);
 
   equal = xfile_equal (file1, file2);
 
@@ -272,7 +272,7 @@ test_xfile_get_parse_name_utf8 (void)
   for (i = 0; i < G_N_ELEMENTS (strings); i++)
     {
       xboolean_t equal = parse_check_utf8 (strings[i].use_uri, strings[i].path1, strings[i].path2);
-      g_assert (equal == TRUE);
+      xassert (equal == TRUE);
     }
 }
 
@@ -285,7 +285,7 @@ resolve_arg (const xboolean_t is_uri_only, const char *arg)
   char *s = NULL;
 
   file1 = xfile_new_for_commandline_arg (arg);
-  g_assert (file1 != NULL);
+  xassert (file1 != NULL);
 
   /*  test_t if we get URI string */
   uri = xfile_get_uri (file1);
@@ -297,7 +297,7 @@ resolve_arg (const xboolean_t is_uri_only, const char *arg)
   if (is_uri_only)
     g_assert_cmpstr (path, ==, NULL);
   else
-    g_assert (g_path_is_absolute (path) == TRUE);
+    xassert (g_path_is_absolute (path) == TRUE);
 
   /*  Get the URI scheme and compare it with expected one */
   s = xfile_get_uri_scheme (file1);
@@ -367,20 +367,20 @@ get_relative_path (const xboolean_t use_uri, const xboolean_t should_have_prefix
       file2 = xfile_new_for_path (dir2);
     }
 
-  g_assert (file1 != NULL);
-  g_assert (file2 != NULL);
+  xassert (file1 != NULL);
+  xassert (file2 != NULL);
 
   has_prefix = xfile_has_prefix (file2, file1);
   g_printerr ("%s %s\n", dir1, dir2);
-  g_assert (has_prefix == should_have_prefix);
+  xassert (has_prefix == should_have_prefix);
 
   relative_path = xfile_get_relative_path (file1, file2);
   if (should_have_prefix)
     {
-      g_assert (relative_path != NULL);
+      xassert (relative_path != NULL);
 
       file3 = xfile_resolve_relative_path (file1, relative_path);
-      g_assert (xfile_equal (file2, file3) == TRUE);
+      xassert (xfile_equal (file2, file3) == TRUE);
     }
 
   if (file1)
@@ -450,27 +450,27 @@ roundtrip_parent_child (const xboolean_t use_uri, const xboolean_t under_root_de
       files[1] = xfile_new_for_path (path);
     }
 
-  g_assert (files[0] != NULL);
-  g_assert (files[1] != NULL);
+  xassert (files[0] != NULL);
+  xassert (files[1] != NULL);
 
   files[2] = xfile_get_child (files[1], dir_holder);
-  g_assert (files[2] != NULL);
+  xassert (files[2] != NULL);
 
   files[3] = xfile_get_parent (files[2]);
-  g_assert (files[3] != NULL);
-  g_assert (xfile_equal (files[3], files[0]) == TRUE);
+  xassert (files[3] != NULL);
+  xassert (xfile_equal (files[3], files[0]) == TRUE);
 
   files[4] = xfile_get_parent (files[3]);
   /*  Don't go lower beyond the root */
   if (under_root_descending)
-    g_assert (files[4] == NULL);
+    xassert (files[4] == NULL);
   else
     {
-      g_assert (files[4] != NULL);
+      xassert (files[4] != NULL);
 
       files[5] = xfile_get_child (files[4], dir_holder);
-      g_assert (files[5] != NULL);
-      g_assert (xfile_equal (files[5], files[0]) == TRUE);
+      xassert (files[5] != NULL);
+      xassert (xfile_equal (files[5], files[0]) == TRUE);
     }
 
   for (i = 0; i < G_N_ELEMENTS (files); i++)

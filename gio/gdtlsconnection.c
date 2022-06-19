@@ -50,7 +50,7 @@
  * operates over a base datagram connection, which is also a #xdatagram_based_t
  * (#xdtls_connection_t:base-socket).
  *
- * To close a DTLS connection, use g_dtls_connection_close().
+ * To close a DTLS connection, use xdtls_connection_close().
  *
  * Neither #xdtls_server_connection_t or #xdtls_client_connection_t set the peer address
  * on their base #xdatagram_based_t if it is a #xsocket_t — it is up to the caller to
@@ -70,7 +70,7 @@
  * Since: 2.48
  */
 
-G_DEFINE_INTERFACE (xdtls_connection, g_dtls_connection, XTYPE_DATAGRAM_BASED)
+G_DEFINE_INTERFACE (xdtls_connection, xdtls_connection, XTYPE_DATAGRAM_BASED)
 
 enum {
   ACCEPT_CERTIFICATE,
@@ -93,7 +93,7 @@ enum {
 };
 
 static void
-g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
+xdtls_connection_default_init (xdtls_connection_interface_t *iface)
 {
   /**
    * xdtls_connection_t:base-socket:
@@ -104,13 +104,13 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_object ("base-socket",
+                                       xparam_spec_object ("base-socket",
                                                             P_("Base Socket"),
                                                             P_("The xdatagram_based_t that the connection wraps"),
                                                             XTYPE_DATAGRAM_BASED,
-                                                            G_PARAM_READWRITE |
-                                                            G_PARAM_CONSTRUCT_ONLY |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READWRITE |
+                                                            XPARAM_CONSTRUCT_ONLY |
+                                                            XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:database: (nullable)
    *
@@ -134,12 +134,12 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_object ("database",
+                                       xparam_spec_object ("database",
                                                             P_("Database"),
                                                             P_("Certificate database to use for looking up or verifying certificates"),
                                                             XTYPE_TLS_DATABASE,
-                                                            G_PARAM_READWRITE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READWRITE |
+                                                            XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:interaction: (nullable)
    *
@@ -150,63 +150,63 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_object ("interaction",
+                                       xparam_spec_object ("interaction",
                                                             P_("Interaction"),
                                                             P_("Optional object for user interaction"),
                                                             XTYPE_TLS_INTERACTION,
-                                                            G_PARAM_READWRITE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READWRITE |
+                                                            XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:require-close-notify:
    *
    * Whether or not proper TLS close notification is required.
-   * See g_dtls_connection_set_require_close_notify().
+   * See xdtls_connection_set_require_close_notify().
    *
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_boolean ("require-close-notify",
+                                       xparam_spec_boolean ("require-close-notify",
                                                              P_("Require close notify"),
                                                              P_("Whether to require proper TLS close notification"),
                                                              TRUE,
-                                                             G_PARAM_READWRITE |
-                                                             G_PARAM_CONSTRUCT |
-                                                             G_PARAM_STATIC_STRINGS));
+                                                             XPARAM_READWRITE |
+                                                             XPARAM_CONSTRUCT |
+                                                             XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:rehandshake-mode:
    *
    * The rehandshaking mode. See
-   * g_dtls_connection_set_rehandshake_mode().
+   * xdtls_connection_set_rehandshake_mode().
    *
    * Since: 2.48
    *
    * Deprecated: 2.60: The rehandshake mode is ignored.
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_enum ("rehandshake-mode",
+                                       xparam_spec_enum ("rehandshake-mode",
                                                           P_("Rehandshake mode"),
                                                           P_("When to allow rehandshaking"),
                                                           XTYPE_TLS_REHANDSHAKE_MODE,
                                                           G_TLS_REHANDSHAKE_NEVER,
-                                                          G_PARAM_READWRITE |
-                                                          G_PARAM_CONSTRUCT |
-                                                          G_PARAM_STATIC_STRINGS |
-                                                          G_PARAM_DEPRECATED));
+                                                          XPARAM_READWRITE |
+                                                          XPARAM_CONSTRUCT |
+                                                          XPARAM_STATIC_STRINGS |
+                                                          XPARAM_DEPRECATED));
   /**
    * xdtls_connection_t:certificate:
    *
    * The connection's certificate; see
-   * g_dtls_connection_set_certificate().
+   * xdtls_connection_set_certificate().
    *
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_object ("certificate",
+                                       xparam_spec_object ("certificate",
                                                             P_("Certificate"),
                                                             P_("The connection’s certificate"),
                                                             XTYPE_TLS_CERTIFICATE,
-                                                            G_PARAM_READWRITE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READWRITE |
+                                                            XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:peer-certificate: (nullable)
    *
@@ -220,12 +220,12 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_object ("peer-certificate",
+                                       xparam_spec_object ("peer-certificate",
                                                             P_("Peer Certificate"),
                                                             P_("The connection’s peer’s certificate"),
                                                             XTYPE_TLS_CERTIFICATE,
-                                                            G_PARAM_READABLE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READABLE |
+                                                            XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:peer-certificate-errors:
    *
@@ -247,75 +247,75 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_flags ("peer-certificate-errors",
+                                       xparam_spec_flags ("peer-certificate-errors",
                                                            P_("Peer Certificate Errors"),
                                                            P_("Errors found with the peer’s certificate"),
                                                            XTYPE_TLS_CERTIFICATE_FLAGS,
                                                            0,
-                                                           G_PARAM_READABLE |
-                                                           G_PARAM_STATIC_STRINGS));
+                                                           XPARAM_READABLE |
+                                                           XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:advertised-protocols: (nullable)
    *
    * The list of application-layer protocols that the connection
    * advertises that it is willing to speak. See
-   * g_dtls_connection_set_advertised_protocols().
+   * xdtls_connection_set_advertised_protocols().
    *
    * Since: 2.60
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_boxed ("advertised-protocols",
+                                       xparam_spec_boxed ("advertised-protocols",
                                                            P_("Advertised Protocols"),
                                                            P_("Application-layer protocols available on this connection"),
                                                            XTYPE_STRV,
-                                                           G_PARAM_READWRITE |
-                                                           G_PARAM_STATIC_STRINGS));
+                                                           XPARAM_READWRITE |
+                                                           XPARAM_STATIC_STRINGS));
   /**
    * xdtls_connection_t:negotiated-protocol:
    *
    * The application-layer protocol negotiated during the TLS
-   * handshake. See g_dtls_connection_get_negotiated_protocol().
+   * handshake. See xdtls_connection_get_negotiated_protocol().
    *
    * Since: 2.60
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_string ("negotiated-protocol",
+                                       xparam_spec_string ("negotiated-protocol",
                                                             P_("Negotiated Protocol"),
                                                             P_("Application-layer protocol negotiated for this connection"),
                                                             NULL,
-                                                            G_PARAM_READABLE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READABLE |
+                                                            XPARAM_STATIC_STRINGS));
 
   /**
    * xdtls_connection_t:protocol-version:
    *
-   * The DTLS protocol version in use. See g_dtls_connection_get_protocol_version().
+   * The DTLS protocol version in use. See xdtls_connection_get_protocol_version().
    *
    * Since: 2.70
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_enum ("protocol-version",
+                                       xparam_spec_enum ("protocol-version",
                                                           P_("Protocol Version"),
                                                           P_("DTLS protocol version negotiated for this connection"),
                                                           XTYPE_TLS_PROTOCOL_VERSION,
                                                           G_TLS_PROTOCOL_VERSION_UNKNOWN,
-                                                          G_PARAM_READABLE |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                          XPARAM_READABLE |
+                                                          XPARAM_STATIC_STRINGS));
 
   /**
    * xdtls_connection_t:ciphersuite-name: (nullable)
    *
-   * The name of the DTLS ciphersuite in use. See g_dtls_connection_get_ciphersuite_name().
+   * The name of the DTLS ciphersuite in use. See xdtls_connection_get_ciphersuite_name().
    *
    * Since: 2.70
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_string ("ciphersuite-name",
+                                       xparam_spec_string ("ciphersuite-name",
                                                             P_("Ciphersuite Name"),
                                                             P_("Name of ciphersuite negotiated for this connection"),
                                                             NULL,
-                                                            G_PARAM_READABLE |
-                                                            G_PARAM_STATIC_STRINGS));
+                                                            XPARAM_READABLE |
+                                                            XPARAM_STATIC_STRINGS));
 
   /**
    * xdtls_connection_t::accept-certificate:
@@ -377,7 +377,7 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
     xsignal_new (I_("accept-certificate"),
                   XTYPE_DTLS_CONNECTION,
                   G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (GDtlsConnectionInterface, accept_certificate),
+                  G_STRUCT_OFFSET (xdtls_connection_interface_t, accept_certificate),
                   xsignal_accumulator_true_handled, NULL,
                   _g_cclosure_marshal_BOOLEAN__OBJECT_FLAGS,
                   XTYPE_BOOLEAN, 2,
@@ -389,7 +389,7 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
 }
 
 /**
- * g_dtls_connection_set_database:
+ * xdtls_connection_set_database:
  * @conn: a #xdtls_connection_t
  * @database: (nullable): a #xtls_database_t
  *
@@ -408,7 +408,7 @@ g_dtls_connection_default_init (GDtlsConnectionInterface *iface)
  * Since: 2.48
  */
 void
-g_dtls_connection_set_database (xdtls_connection_t *conn,
+xdtls_connection_set_database (xdtls_connection_t *conn,
                                 xtls_database_t    *database)
 {
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
@@ -420,22 +420,22 @@ g_dtls_connection_set_database (xdtls_connection_t *conn,
 }
 
 /**
- * g_dtls_connection_get_database:
+ * xdtls_connection_get_database:
  * @conn: a #xdtls_connection_t
  *
  * Gets the certificate database that @conn uses to verify
- * peer certificates. See g_dtls_connection_set_database().
+ * peer certificates. See xdtls_connection_set_database().
  *
  * Returns: (transfer none) (nullable): the certificate database that @conn uses or %NULL
  *
  * Since: 2.48
  */
 xtls_database_t*
-g_dtls_connection_get_database (xdtls_connection_t *conn)
+xdtls_connection_get_database (xdtls_connection_t *conn)
 {
   xtls_database_t *database = NULL;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn),
                 "database", &database,
@@ -446,7 +446,7 @@ g_dtls_connection_get_database (xdtls_connection_t *conn)
 }
 
 /**
- * g_dtls_connection_set_certificate:
+ * xdtls_connection_set_certificate:
  * @conn: a #xdtls_connection_t
  * @certificate: the certificate to use for @conn
  *
@@ -459,20 +459,20 @@ g_dtls_connection_get_database (xdtls_connection_t *conn)
  * with %G_TLS_ERROR_CERTIFICATE_REQUIRED, that means that the server
  * requires a certificate, and if you try connecting again, you should
  * call this method first. You can call
- * g_dtls_client_connection_get_accepted_cas() on the failed connection
+ * xdtls_client_connection_get_accepted_cas() on the failed connection
  * to get a list of Certificate Authorities that the server will
  * accept certificates from.
  *
  * (It is also possible that a server will allow the connection with
  * or without a certificate; in that case, if you don't provide a
  * certificate, you can tell that the server requested one by the fact
- * that g_dtls_client_connection_get_accepted_cas() will return
+ * that xdtls_client_connection_get_accepted_cas() will return
  * non-%NULL.)
  *
  * Since: 2.48
  */
 void
-g_dtls_connection_set_certificate (xdtls_connection_t *conn,
+xdtls_connection_set_certificate (xdtls_connection_t *conn,
                                    xtls_certificate_t *certificate)
 {
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
@@ -482,22 +482,22 @@ g_dtls_connection_set_certificate (xdtls_connection_t *conn,
 }
 
 /**
- * g_dtls_connection_get_certificate:
+ * xdtls_connection_get_certificate:
  * @conn: a #xdtls_connection_t
  *
  * Gets @conn's certificate, as set by
- * g_dtls_connection_set_certificate().
+ * xdtls_connection_set_certificate().
  *
  * Returns: (transfer none) (nullable): @conn's certificate, or %NULL
  *
  * Since: 2.48
  */
 xtls_certificate_t *
-g_dtls_connection_get_certificate (xdtls_connection_t *conn)
+xdtls_connection_get_certificate (xdtls_connection_t *conn)
 {
   xtls_certificate_t *certificate;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "certificate", &certificate, NULL);
   if (certificate)
@@ -507,7 +507,7 @@ g_dtls_connection_get_certificate (xdtls_connection_t *conn)
 }
 
 /**
- * g_dtls_connection_set_interaction:
+ * xdtls_connection_set_interaction:
  * @conn: a connection
  * @interaction: (nullable): an interaction object, or %NULL
  *
@@ -521,7 +521,7 @@ g_dtls_connection_get_certificate (xdtls_connection_t *conn)
  * Since: 2.48
  */
 void
-g_dtls_connection_set_interaction (xdtls_connection_t *conn,
+xdtls_connection_set_interaction (xdtls_connection_t *conn,
                                    xtls_interaction_t *interaction)
 {
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
@@ -531,7 +531,7 @@ g_dtls_connection_set_interaction (xdtls_connection_t *conn,
 }
 
 /**
- * g_dtls_connection_get_interaction:
+ * xdtls_connection_get_interaction:
  * @conn: a connection
  *
  * Get the object that will be used to interact with the user. It will be used
@@ -543,11 +543,11 @@ g_dtls_connection_set_interaction (xdtls_connection_t *conn,
  * Since: 2.48
  */
 xtls_interaction_t *
-g_dtls_connection_get_interaction (xdtls_connection_t       *conn)
+xdtls_connection_get_interaction (xdtls_connection_t       *conn)
 {
   xtls_interaction_t *interaction = NULL;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "interaction", &interaction, NULL);
   if (interaction)
@@ -557,7 +557,7 @@ g_dtls_connection_get_interaction (xdtls_connection_t       *conn)
 }
 
 /**
- * g_dtls_connection_get_peer_certificate:
+ * xdtls_connection_get_peer_certificate:
  * @conn: a #xdtls_connection_t
  *
  * Gets @conn's peer's certificate after the handshake has completed
@@ -569,11 +569,11 @@ g_dtls_connection_get_interaction (xdtls_connection_t       *conn)
  * Since: 2.48
  */
 xtls_certificate_t *
-g_dtls_connection_get_peer_certificate (xdtls_connection_t *conn)
+xdtls_connection_get_peer_certificate (xdtls_connection_t *conn)
 {
   xtls_certificate_t *peer_certificate;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "peer-certificate", &peer_certificate, NULL);
   if (peer_certificate)
@@ -583,7 +583,7 @@ g_dtls_connection_get_peer_certificate (xdtls_connection_t *conn)
 }
 
 /**
- * g_dtls_connection_get_peer_certificate_errors:
+ * xdtls_connection_get_peer_certificate_errors:
  * @conn: a #xdtls_connection_t
  *
  * Gets the errors associated with validating @conn's peer's
@@ -594,19 +594,19 @@ g_dtls_connection_get_peer_certificate (xdtls_connection_t *conn)
  *
  * Since: 2.48
  */
-GTlsCertificateFlags
-g_dtls_connection_get_peer_certificate_errors (xdtls_connection_t *conn)
+xtls_certificate_flags_t
+xdtls_connection_get_peer_certificate_errors (xdtls_connection_t *conn)
 {
-  GTlsCertificateFlags errors;
+  xtls_certificate_flags_t errors;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "peer-certificate-errors", &errors, NULL);
   return errors;
 }
 
 /**
- * g_dtls_connection_set_require_close_notify:
+ * xdtls_connection_set_require_close_notify:
  * @conn: a #xdtls_connection_t
  * @require_close_notify: whether or not to require close notification
  *
@@ -623,14 +623,14 @@ g_dtls_connection_get_peer_certificate_errors (xdtls_connection_t *conn)
  * (because the application-level data includes a length field, or is
  * somehow self-delimiting); in this case, the close notify is
  * redundant and may be omitted. You
- * can use g_dtls_connection_set_require_close_notify() to tell @conn
+ * can use xdtls_connection_set_require_close_notify() to tell @conn
  * to allow an "unannounced" connection close, in which case the close
  * will show up as a 0-length read, as in a non-TLS
  * #xdatagram_based_t, and it is up to the application to check that
  * the data has been fully received.
  *
  * Note that this only affects the behavior when the peer closes the
- * connection; when the application calls g_dtls_connection_close_async() on
+ * connection; when the application calls xdtls_connection_close_async() on
  * @conn itself, this will send a close notification regardless of the
  * setting of this property. If you explicitly want to do an unclean
  * close, you can close @conn's #xdtls_connection_t:base-socket rather
@@ -639,7 +639,7 @@ g_dtls_connection_get_peer_certificate_errors (xdtls_connection_t *conn)
  * Since: 2.48
  */
 void
-g_dtls_connection_set_require_close_notify (xdtls_connection_t *conn,
+xdtls_connection_set_require_close_notify (xdtls_connection_t *conn,
                                             xboolean_t         require_close_notify)
 {
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
@@ -650,23 +650,23 @@ g_dtls_connection_set_require_close_notify (xdtls_connection_t *conn,
 }
 
 /**
- * g_dtls_connection_get_require_close_notify:
+ * xdtls_connection_get_require_close_notify:
  * @conn: a #xdtls_connection_t
  *
  * Tests whether or not @conn expects a proper TLS close notification
  * when the connection is closed. See
- * g_dtls_connection_set_require_close_notify() for details.
+ * xdtls_connection_set_require_close_notify() for details.
  *
  * Returns: %TRUE if @conn requires a proper TLS close notification.
  *
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_get_require_close_notify (xdtls_connection_t *conn)
+xdtls_connection_get_require_close_notify (xdtls_connection_t *conn)
 {
   xboolean_t require_close_notify;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), TRUE);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), TRUE);
 
   xobject_get (G_OBJECT (conn),
                 "require-close-notify", &require_close_notify,
@@ -675,7 +675,7 @@ g_dtls_connection_get_require_close_notify (xdtls_connection_t *conn)
 }
 
 /**
- * g_dtls_connection_set_rehandshake_mode:
+ * xdtls_connection_set_rehandshake_mode:
  * @conn: a #xdtls_connection_t
  * @mode: the rehandshaking mode
  *
@@ -692,7 +692,7 @@ g_dtls_connection_get_require_close_notify (xdtls_connection_t *conn)
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 void
-g_dtls_connection_set_rehandshake_mode (xdtls_connection_t     *conn,
+xdtls_connection_set_rehandshake_mode (xdtls_connection_t     *conn,
                                         GTlsRehandshakeMode  mode)
 {
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
@@ -704,11 +704,11 @@ g_dtls_connection_set_rehandshake_mode (xdtls_connection_t     *conn,
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * g_dtls_connection_get_rehandshake_mode:
+ * xdtls_connection_get_rehandshake_mode:
  * @conn: a #xdtls_connection_t
  *
  * Gets @conn rehandshaking mode. See
- * g_dtls_connection_set_rehandshake_mode() for details.
+ * xdtls_connection_set_rehandshake_mode() for details.
  *
  * Returns: %G_TLS_REHANDSHAKE_SAFELY
  *
@@ -720,11 +720,11 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  */
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 GTlsRehandshakeMode
-g_dtls_connection_get_rehandshake_mode (xdtls_connection_t *conn)
+xdtls_connection_get_rehandshake_mode (xdtls_connection_t *conn)
 {
   GTlsRehandshakeMode mode;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), G_TLS_REHANDSHAKE_SAFELY);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), G_TLS_REHANDSHAKE_SAFELY);
 
   /* Continue to call xobject_get(), even though the return value is
    * ignored, so that behavior doesn’t change for derived classes.
@@ -737,7 +737,7 @@ g_dtls_connection_get_rehandshake_mode (xdtls_connection_t *conn)
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 /**
- * g_dtls_connection_handshake:
+ * xdtls_connection_handshake:
  * @conn: a #xdtls_connection_t
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @error: a #xerror_t, or %NULL
@@ -748,7 +748,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * although the connection needs to perform a handshake after
  * connecting, #xdtls_connection_t will handle this for you automatically
  * when you try to send or receive data on the connection. You can call
- * g_dtls_connection_handshake() manually if you want to know whether
+ * xdtls_connection_handshake() manually if you want to know whether
  * the initial handshake succeeded or failed (as opposed to just
  * immediately trying to use @conn to read or write, in which case,
  * if it fails, it may not be possible to tell if it failed before
@@ -760,7 +760,7 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * the beginning of the communication, you do not need to call this
  * function explicitly unless you want clearer error reporting.
  *
- * Previously, calling g_dtls_connection_handshake() after the initial
+ * Previously, calling xdtls_connection_handshake() after the initial
  * handshake would trigger a rehandshake; however, this usage was
  * deprecated in GLib 2.60 because rehandshaking was removed from the
  * TLS protocol in TLS 1.3. Since GLib 2.64, calling this function after
@@ -774,18 +774,18 @@ G_GNUC_END_IGNORE_DEPRECATIONS
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_handshake (xdtls_connection_t  *conn,
+xdtls_connection_handshake (xdtls_connection_t  *conn,
                              xcancellable_t     *cancellable,
                              xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
 
-  return G_DTLS_CONNECTION_GET_INTERFACE (conn)->handshake (conn, cancellable,
+  return XDTLS_CONNECTION_GET_INTERFACE (conn)->handshake (conn, cancellable,
                                                             error);
 }
 
 /**
- * g_dtls_connection_handshake_async:
+ * xdtls_connection_handshake_async:
  * @conn: a #xdtls_connection_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
@@ -793,12 +793,12 @@ g_dtls_connection_handshake (xdtls_connection_t  *conn,
  * @user_data: the data to pass to the callback function
  *
  * Asynchronously performs a TLS handshake on @conn. See
- * g_dtls_connection_handshake() for more information.
+ * xdtls_connection_handshake() for more information.
  *
  * Since: 2.48
  */
 void
-g_dtls_connection_handshake_async (xdtls_connection_t      *conn,
+xdtls_connection_handshake_async (xdtls_connection_t      *conn,
                                    int                   io_priority,
                                    xcancellable_t         *cancellable,
                                    xasync_ready_callback_t   callback,
@@ -806,19 +806,19 @@ g_dtls_connection_handshake_async (xdtls_connection_t      *conn,
 {
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
 
-  G_DTLS_CONNECTION_GET_INTERFACE (conn)->handshake_async (conn, io_priority,
+  XDTLS_CONNECTION_GET_INTERFACE (conn)->handshake_async (conn, io_priority,
                                                            cancellable,
                                                            callback, user_data);
 }
 
 /**
- * g_dtls_connection_handshake_finish:
+ * xdtls_connection_handshake_finish:
  * @conn: a #xdtls_connection_t
  * @result: a #xasync_result_t.
  * @error: a #xerror_t pointer, or %NULL
  *
  * Finish an asynchronous TLS handshake operation. See
- * g_dtls_connection_handshake() for more information.
+ * xdtls_connection_handshake() for more information.
  *
  * Returns: %TRUE on success, %FALSE on failure, in which
  * case @error will be set.
@@ -826,19 +826,19 @@ g_dtls_connection_handshake_async (xdtls_connection_t      *conn,
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_handshake_finish (xdtls_connection_t  *conn,
+xdtls_connection_handshake_finish (xdtls_connection_t  *conn,
                                     xasync_result_t     *result,
                                     xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
 
-  return G_DTLS_CONNECTION_GET_INTERFACE (conn)->handshake_finish (conn,
+  return XDTLS_CONNECTION_GET_INTERFACE (conn)->handshake_finish (conn,
                                                                    result,
                                                                    error);
 }
 
 /**
- * g_dtls_connection_shutdown:
+ * xdtls_connection_shutdown:
  * @conn: a #xdtls_connection_t
  * @shutdown_read: %TRUE to stop reception of incoming datagrams
  * @shutdown_write: %TRUE to stop sending outgoing datagrams
@@ -856,42 +856,42 @@ g_dtls_connection_handshake_finish (xdtls_connection_t  *conn,
  * g_datagram_based_send_messages() will return %G_IO_ERROR_CLOSED.
  *
  * It is allowed for both @shutdown_read and @shutdown_write to be TRUE — this
- * is equivalent to calling g_dtls_connection_close().
+ * is equivalent to calling xdtls_connection_close().
  *
  * If @cancellable is cancelled, the #xdtls_connection_t may be left
  * partially-closed and any pending untransmitted data may be lost. Call
- * g_dtls_connection_shutdown() again to complete closing the #xdtls_connection_t.
+ * xdtls_connection_shutdown() again to complete closing the #xdtls_connection_t.
  *
  * Returns: %TRUE on success, %FALSE otherwise
  *
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_shutdown (xdtls_connection_t  *conn,
+xdtls_connection_shutdown (xdtls_connection_t  *conn,
                             xboolean_t          shutdown_read,
                             xboolean_t          shutdown_write,
                             xcancellable_t     *cancellable,
                             xerror_t          **error)
 {
-  GDtlsConnectionInterface *iface;
+  xdtls_connection_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable),
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable),
                         FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (!shutdown_read && !shutdown_write)
     return TRUE;
 
-  iface = G_DTLS_CONNECTION_GET_INTERFACE (conn);
-  g_assert (iface->shutdown != NULL);
+  iface = XDTLS_CONNECTION_GET_INTERFACE (conn);
+  xassert (iface->shutdown != NULL);
 
   return iface->shutdown (conn, shutdown_read, shutdown_write,
                           cancellable, error);
 }
 
 /**
- * g_dtls_connection_shutdown_async:
+ * xdtls_connection_shutdown_async:
  * @conn: a #xdtls_connection_t
  * @shutdown_read: %TRUE to stop reception of incoming datagrams
  * @shutdown_write: %TRUE to stop sending outgoing datagrams
@@ -901,12 +901,12 @@ g_dtls_connection_shutdown (xdtls_connection_t  *conn,
  * @user_data: the data to pass to the callback function
  *
  * Asynchronously shut down part or all of the DTLS connection. See
- * g_dtls_connection_shutdown() for more information.
+ * xdtls_connection_shutdown() for more information.
  *
  * Since: 2.48
  */
 void
-g_dtls_connection_shutdown_async (xdtls_connection_t      *conn,
+xdtls_connection_shutdown_async (xdtls_connection_t      *conn,
                                   xboolean_t              shutdown_read,
                                   xboolean_t              shutdown_write,
                                   int                   io_priority,
@@ -914,26 +914,26 @@ g_dtls_connection_shutdown_async (xdtls_connection_t      *conn,
                                   xasync_ready_callback_t   callback,
                                   xpointer_t              user_data)
 {
-  GDtlsConnectionInterface *iface;
+  xdtls_connection_interface_t *iface;
 
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  iface = G_DTLS_CONNECTION_GET_INTERFACE (conn);
-  g_assert (iface->shutdown_async != NULL);
+  iface = XDTLS_CONNECTION_GET_INTERFACE (conn);
+  xassert (iface->shutdown_async != NULL);
 
   iface->shutdown_async (conn, TRUE, TRUE, io_priority, cancellable,
                          callback, user_data);
 }
 
 /**
- * g_dtls_connection_shutdown_finish:
+ * xdtls_connection_shutdown_finish:
  * @conn: a #xdtls_connection_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t pointer, or %NULL
  *
  * Finish an asynchronous TLS shutdown operation. See
- * g_dtls_connection_shutdown() for more information.
+ * xdtls_connection_shutdown() for more information.
  *
  * Returns: %TRUE on success, %FALSE on failure, in which
  * case @error will be set
@@ -941,29 +941,29 @@ g_dtls_connection_shutdown_async (xdtls_connection_t      *conn,
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_shutdown_finish (xdtls_connection_t  *conn,
+xdtls_connection_shutdown_finish (xdtls_connection_t  *conn,
                                    xasync_result_t     *result,
                                    xerror_t          **error)
 {
-  GDtlsConnectionInterface *iface;
+  xdtls_connection_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  iface = G_DTLS_CONNECTION_GET_INTERFACE (conn);
-  g_assert (iface->shutdown_finish != NULL);
+  iface = XDTLS_CONNECTION_GET_INTERFACE (conn);
+  xassert (iface->shutdown_finish != NULL);
 
   return iface->shutdown_finish (conn, result, error);
 }
 
 /**
- * g_dtls_connection_close:
+ * xdtls_connection_close:
  * @conn: a #xdtls_connection_t
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @error: a #xerror_t, or %NULL
  *
  * Close the DTLS connection. This is equivalent to calling
- * g_dtls_connection_shutdown() to shut down both sides of the connection.
+ * xdtls_connection_shutdown() to shut down both sides of the connection.
  *
  * Closing a #xdtls_connection_t waits for all buffered but untransmitted data to
  * be sent before it completes. It then sends a `close_notify` DTLS alert to the
@@ -980,41 +980,41 @@ g_dtls_connection_shutdown_finish (xdtls_connection_t  *conn,
  *
  * If @cancellable is cancelled, the #xdtls_connection_t may be left
  * partially-closed and any pending untransmitted data may be lost. Call
- * g_dtls_connection_close() again to complete closing the #xdtls_connection_t.
+ * xdtls_connection_close() again to complete closing the #xdtls_connection_t.
  *
  * Returns: %TRUE on success, %FALSE otherwise
  *
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_close (xdtls_connection_t  *conn,
+xdtls_connection_close (xdtls_connection_t  *conn,
                          xcancellable_t     *cancellable,
                          xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable),
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable),
                         FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return G_DTLS_CONNECTION_GET_INTERFACE (conn)->shutdown (conn, TRUE, TRUE,
+  return XDTLS_CONNECTION_GET_INTERFACE (conn)->shutdown (conn, TRUE, TRUE,
                                                            cancellable, error);
 }
 
 /**
- * g_dtls_connection_close_async:
+ * xdtls_connection_close_async:
  * @conn: a #xdtls_connection_t
  * @io_priority: the [I/O priority][io-priority] of the request
  * @cancellable: (nullable): a #xcancellable_t, or %NULL
  * @callback: callback to call when the close operation is complete
  * @user_data: the data to pass to the callback function
  *
- * Asynchronously close the DTLS connection. See g_dtls_connection_close() for
+ * Asynchronously close the DTLS connection. See xdtls_connection_close() for
  * more information.
  *
  * Since: 2.48
  */
 void
-g_dtls_connection_close_async (xdtls_connection_t      *conn,
+xdtls_connection_close_async (xdtls_connection_t      *conn,
                                int                   io_priority,
                                xcancellable_t         *cancellable,
                                xasync_ready_callback_t   callback,
@@ -1023,19 +1023,19 @@ g_dtls_connection_close_async (xdtls_connection_t      *conn,
   g_return_if_fail (X_IS_DTLS_CONNECTION (conn));
   g_return_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
-  G_DTLS_CONNECTION_GET_INTERFACE (conn)->shutdown_async (conn, TRUE, TRUE,
+  XDTLS_CONNECTION_GET_INTERFACE (conn)->shutdown_async (conn, TRUE, TRUE,
                                                           io_priority,
                                                           cancellable,
                                                           callback, user_data);
 }
 
 /**
- * g_dtls_connection_close_finish:
+ * xdtls_connection_close_finish:
  * @conn: a #xdtls_connection_t
  * @result: a #xasync_result_t
  * @error: a #xerror_t pointer, or %NULL
  *
- * Finish an asynchronous TLS close operation. See g_dtls_connection_close()
+ * Finish an asynchronous TLS close operation. See xdtls_connection_close()
  * for more information.
  *
  * Returns: %TRUE on success, %FALSE on failure, in which
@@ -1044,19 +1044,19 @@ g_dtls_connection_close_async (xdtls_connection_t      *conn,
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_close_finish (xdtls_connection_t  *conn,
+xdtls_connection_close_finish (xdtls_connection_t  *conn,
                                 xasync_result_t     *result,
                                 xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  return G_DTLS_CONNECTION_GET_INTERFACE (conn)->shutdown_finish (conn, result,
+  return XDTLS_CONNECTION_GET_INTERFACE (conn)->shutdown_finish (conn, result,
                                                                   error);
 }
 
 /**
- * g_dtls_connection_emit_accept_certificate:
+ * xdtls_connection_emit_accept_certificate:
  * @conn: a #xdtls_connection_t
  * @peer_cert: the peer's #xtls_certificate_t
  * @errors: the problems with @peer_cert
@@ -1070,9 +1070,9 @@ g_dtls_connection_close_finish (xdtls_connection_t  *conn,
  * Since: 2.48
  */
 xboolean_t
-g_dtls_connection_emit_accept_certificate (xdtls_connection_t      *conn,
+xdtls_connection_emit_accept_certificate (xdtls_connection_t      *conn,
                                            xtls_certificate_t      *peer_cert,
-                                           GTlsCertificateFlags  errors)
+                                           xtls_certificate_flags_t  errors)
 {
   xboolean_t accept = FALSE;
 
@@ -1082,7 +1082,7 @@ g_dtls_connection_emit_accept_certificate (xdtls_connection_t      *conn,
 }
 
 /**
- * g_dtls_connection_set_advertised_protocols:
+ * xdtls_connection_set_advertised_protocols:
  * @conn: a #xdtls_connection_t
  * @protocols: (array zero-terminated=1) (nullable): a %NULL-terminated
  *   array of ALPN protocol names (eg, "http/1.1", "h2"), or %NULL
@@ -1091,7 +1091,7 @@ g_dtls_connection_emit_accept_certificate (xdtls_connection_t      *conn,
  * caller is willing to speak on this connection. The
  * Application-Layer Protocol Negotiation (ALPN) extension will be
  * used to negotiate a compatible protocol with the peer; use
- * g_dtls_connection_get_negotiated_protocol() to find the negotiated
+ * xdtls_connection_get_negotiated_protocol() to find the negotiated
  * protocol after the handshake.  Specifying %NULL for the the value
  * of @protocols will disable ALPN negotiation.
  *
@@ -1101,12 +1101,12 @@ g_dtls_connection_emit_accept_certificate (xdtls_connection_t      *conn,
  * Since: 2.60
  */
 void
-g_dtls_connection_set_advertised_protocols (xdtls_connection_t     *conn,
+xdtls_connection_set_advertised_protocols (xdtls_connection_t     *conn,
                                             const xchar_t * const *protocols)
 {
-  GDtlsConnectionInterface *iface;
+  xdtls_connection_interface_t *iface;
 
-  iface = G_DTLS_CONNECTION_GET_INTERFACE (conn);
+  iface = XDTLS_CONNECTION_GET_INTERFACE (conn);
   if (iface->set_advertised_protocols == NULL)
     return;
 
@@ -1114,7 +1114,7 @@ g_dtls_connection_set_advertised_protocols (xdtls_connection_t     *conn,
 }
 
 /**
- * g_dtls_connection_get_negotiated_protocol:
+ * xdtls_connection_get_negotiated_protocol:
  * @conn: a #xdtls_connection_t
  *
  * Gets the name of the application-layer protocol negotiated during
@@ -1123,18 +1123,18 @@ g_dtls_connection_set_advertised_protocols (xdtls_connection_t     *conn,
  * If the peer did not use the ALPN extension, or did not advertise a
  * protocol that matched one of @conn's protocols, or the TLS backend
  * does not support ALPN, then this will be %NULL. See
- * g_dtls_connection_set_advertised_protocols().
+ * xdtls_connection_set_advertised_protocols().
  *
  * Returns: (nullable): the negotiated protocol, or %NULL
  *
  * Since: 2.60
  */
 const xchar_t *
-g_dtls_connection_get_negotiated_protocol (xdtls_connection_t *conn)
+xdtls_connection_get_negotiated_protocol (xdtls_connection_t *conn)
 {
-  GDtlsConnectionInterface *iface;
+  xdtls_connection_interface_t *iface;
 
-  iface = G_DTLS_CONNECTION_GET_INTERFACE (conn);
+  iface = XDTLS_CONNECTION_GET_INTERFACE (conn);
   if (iface->get_negotiated_protocol == NULL)
     return NULL;
 
@@ -1142,7 +1142,7 @@ g_dtls_connection_get_negotiated_protocol (xdtls_connection_t *conn)
 }
 
 /**
- * g_dtls_connection_get_channel_binding_data:
+ * xdtls_connection_get_channel_binding_data:
  * @conn: a #xdtls_connection_t
  * @type: #GTlsChannelBindingType type of data to fetch
  * @data: (out callee-allocates)(optional)(transfer none): #xbyte_array_t is
@@ -1168,17 +1168,17 @@ g_dtls_connection_get_negotiated_protocol (xdtls_connection_t *conn)
  * Since: 2.66
  */
 xboolean_t
-g_dtls_connection_get_channel_binding_data (xdtls_connection_t         *conn,
+xdtls_connection_get_channel_binding_data (xdtls_connection_t         *conn,
                                             GTlsChannelBindingType   type,
                                             xbyte_array_t              *data,
                                             xerror_t                 **error)
 {
-  GDtlsConnectionInterface *iface;
+  xdtls_connection_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  iface = G_DTLS_CONNECTION_GET_INTERFACE (conn);
+  iface = XDTLS_CONNECTION_GET_INTERFACE (conn);
   if (iface->get_binding_data == NULL)
     {
       g_set_error_literal (error, G_TLS_CHANNEL_BINDING_ERROR,
@@ -1191,7 +1191,7 @@ g_dtls_connection_get_channel_binding_data (xdtls_connection_t         *conn,
 }
 
 /**
- * g_dtls_connection_get_protocol_version:
+ * xdtls_connection_get_protocol_version:
  * @conn: a #GDTlsConnection
  *
  * Returns the current DTLS protocol version, which may be
@@ -1204,13 +1204,13 @@ g_dtls_connection_get_channel_binding_data (xdtls_connection_t         *conn,
  * Since: 2.70
  */
 GTlsProtocolVersion
-g_dtls_connection_get_protocol_version (xdtls_connection_t *conn)
+xdtls_connection_get_protocol_version (xdtls_connection_t *conn)
 {
   GTlsProtocolVersion protocol_version;
   xenum_class_t *enum_class;
   xenum_value_t *enum_value;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), G_TLS_PROTOCOL_VERSION_UNKNOWN);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), G_TLS_PROTOCOL_VERSION_UNKNOWN);
 
   xobject_get (G_OBJECT (conn),
                 "protocol-version", &protocol_version,
@@ -1223,7 +1223,7 @@ g_dtls_connection_get_protocol_version (xdtls_connection_t *conn)
 }
 
 /**
- * g_dtls_connection_get_ciphersuite_name:
+ * xdtls_connection_get_ciphersuite_name:
  * @conn: a #GDTlsConnection
  *
  * Returns the name of the current DTLS ciphersuite, or %NULL if the
@@ -1240,11 +1240,11 @@ g_dtls_connection_get_protocol_version (xdtls_connection_t *conn)
  * Since: 2.70
  */
 xchar_t *
-g_dtls_connection_get_ciphersuite_name (xdtls_connection_t *conn)
+xdtls_connection_get_ciphersuite_name (xdtls_connection_t *conn)
 {
   xchar_t *ciphersuite_name;
 
-  g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn),
                 "ciphersuite-name", &ciphersuite_name,

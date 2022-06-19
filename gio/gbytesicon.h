@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_BYTES_ICON         (xbytes_icon_get_type ())
-#define XBYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, xbytes_icon))
+#define XBYTES_ICON(inst)        (XTYPE_CHECK_INSTANCE_CAST ((inst), XTYPE_BYTES_ICON, xbytes_icon_t))
 #define X_IS_BYTES_ICON(inst)     (XTYPE_CHECK_INSTANCE_TYPE ((inst), XTYPE_BYTES_ICON))
 
 /**

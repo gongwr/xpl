@@ -47,47 +47,47 @@ typedef enum {
 } GAppInfoCreateFlags;
 
 /**
- * GConverterFlags:
- * @G_CONVERTER_NO_FLAGS: No flags.
- * @G_CONVERTER_INPUT_AT_END: At end of input data
- * @G_CONVERTER_FLUSH: Flush data
+ * xconverter_flags_t:
+ * @XCONVERTER_NO_FLAGS: No flags.
+ * @XCONVERTER_INPUT_AT_END: At end of input data
+ * @XCONVERTER_FLUSH: Flush data
  *
- * Flags used when calling a g_converter_convert().
- *
- * Since: 2.24
- */
-typedef enum {
-  G_CONVERTER_NO_FLAGS     = 0,         /*< nick=none >*/
-  G_CONVERTER_INPUT_AT_END = (1 << 0),  /*< nick=input-at-end >*/
-  G_CONVERTER_FLUSH        = (1 << 1)   /*< nick=flush >*/
-} GConverterFlags;
-
-/**
- * GConverterResult:
- * @G_CONVERTER_ERROR: There was an error during conversion.
- * @G_CONVERTER_CONVERTED: Some data was consumed or produced
- * @G_CONVERTER_FINISHED: The conversion is finished
- * @G_CONVERTER_FLUSHED: Flushing is finished
- *
- * Results returned from g_converter_convert().
+ * Flags used when calling a xconverter_convert().
  *
  * Since: 2.24
  */
 typedef enum {
-  G_CONVERTER_ERROR     = 0,  /*< nick=error >*/
-  G_CONVERTER_CONVERTED = 1,  /*< nick=converted >*/
-  G_CONVERTER_FINISHED  = 2,  /*< nick=finished >*/
-  G_CONVERTER_FLUSHED   = 3   /*< nick=flushed >*/
-} GConverterResult;
+  XCONVERTER_NO_FLAGS     = 0,         /*< nick=none >*/
+  XCONVERTER_INPUT_AT_END = (1 << 0),  /*< nick=input-at-end >*/
+  XCONVERTER_FLUSH        = (1 << 1)   /*< nick=flush >*/
+} xconverter_flags_t;
+
+/**
+ * xconverter_result_t:
+ * @XCONVERTER_ERROR: There was an error during conversion.
+ * @XCONVERTER_CONVERTED: Some data was consumed or produced
+ * @XCONVERTER_FINISHED: The conversion is finished
+ * @XCONVERTER_FLUSHED: Flushing is finished
+ *
+ * Results returned from xconverter_convert().
+ *
+ * Since: 2.24
+ */
+typedef enum {
+  XCONVERTER_ERROR     = 0,  /*< nick=error >*/
+  XCONVERTER_CONVERTED = 1,  /*< nick=converted >*/
+  XCONVERTER_FINISHED  = 2,  /*< nick=finished >*/
+  XCONVERTER_FLUSHED   = 3   /*< nick=flushed >*/
+} xconverter_result_t;
 
 
 /**
- * GDataStreamByteOrder:
+ * xdata_stream_byte_order_t:
  * @G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN: Selects Big Endian byte order.
  * @G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN: Selects Little Endian byte order.
  * @G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN: Selects endianness based on host machine's architecture.
  *
- * #GDataStreamByteOrder is used to ensure proper endianness of streaming data sources
+ * #xdata_stream_byte_order_t is used to ensure proper endianness of streaming data sources
  * across various machine architectures.
  *
  **/
@@ -95,24 +95,24 @@ typedef enum {
   G_DATA_STREAM_BYTE_ORDER_BIG_ENDIAN,
   G_DATA_STREAM_BYTE_ORDER_LITTLE_ENDIAN,
   G_DATA_STREAM_BYTE_ORDER_HOST_ENDIAN
-} GDataStreamByteOrder;
+} xdata_stream_byte_order_t;
 
 
 /**
- * GDataStreamNewlineType:
+ * xdata_stream_newline_type_t:
  * @G_DATA_STREAM_NEWLINE_TYPE_LF: Selects "LF" line endings, common on most modern UNIX platforms.
  * @G_DATA_STREAM_NEWLINE_TYPE_CR: Selects "CR" line endings.
  * @G_DATA_STREAM_NEWLINE_TYPE_CR_LF: Selects "CR, LF" line ending, common on Microsoft Windows.
  * @G_DATA_STREAM_NEWLINE_TYPE_ANY: Automatically try to handle any line ending type.
  *
- * #GDataStreamNewlineType is used when checking for or setting the line endings for a given file.
+ * #xdata_stream_newline_type_t is used when checking for or setting the line endings for a given file.
  **/
 typedef enum {
   G_DATA_STREAM_NEWLINE_TYPE_LF,
   G_DATA_STREAM_NEWLINE_TYPE_CR,
   G_DATA_STREAM_NEWLINE_TYPE_CR_LF,
   G_DATA_STREAM_NEWLINE_TYPE_ANY
-} GDataStreamNewlineType;
+} xdata_stream_newline_type_t;
 
 
 /**
@@ -679,10 +679,10 @@ typedef enum {
 
 /**
  * GEmblemOrigin:
- * @G_EMBLEM_ORIGIN_UNKNOWN: Emblem of unknown origin
- * @G_EMBLEM_ORIGIN_DEVICE: Emblem adds device-specific information
- * @G_EMBLEM_ORIGIN_LIVEMETADATA: Emblem depicts live metadata, such as "readonly"
- * @G_EMBLEM_ORIGIN_TAG: Emblem comes from a user-defined tag, e.g. set by nautilus (in the future)
+ * @XEMBLEM_ORIGIN_UNKNOWN: Emblem of unknown origin
+ * @XEMBLEM_ORIGIN_DEVICE: Emblem adds device-specific information
+ * @XEMBLEM_ORIGIN_LIVEMETADATA: Emblem depicts live metadata, such as "readonly"
+ * @XEMBLEM_ORIGIN_TAG: Emblem comes from a user-defined tag, e.g. set by nautilus (in the future)
  *
  * GEmblemOrigin is used to add information about the origin of the emblem
  * to #xemblem_t.
@@ -690,10 +690,10 @@ typedef enum {
  * Since: 2.18
  */
 typedef enum  {
-  G_EMBLEM_ORIGIN_UNKNOWN,
-  G_EMBLEM_ORIGIN_DEVICE,
-  G_EMBLEM_ORIGIN_LIVEMETADATA,
-  G_EMBLEM_ORIGIN_TAG
+  XEMBLEM_ORIGIN_UNKNOWN,
+  XEMBLEM_ORIGIN_DEVICE,
+  XEMBLEM_ORIGIN_LIVEMETADATA,
+  XEMBLEM_ORIGIN_TAG
 } GEmblemOrigin;
 
 /**
@@ -1228,7 +1228,7 @@ typedef enum {
 } GDBusConnectionFlags;
 
 /**
- * GDBusCapabilityFlags:
+ * xdbus_capability_flags_t:
  * @G_DBUS_CAPABILITY_FLAGS_NONE: No flags set.
  * @G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING: The connection
  * supports exchanging UNIX file descriptors with the remote peer.
@@ -1240,7 +1240,7 @@ typedef enum {
 typedef enum {
   G_DBUS_CAPABILITY_FLAGS_NONE = 0,
   G_DBUS_CAPABILITY_FLAGS_UNIX_FD_PASSING = (1<<0)
-} GDBusCapabilityFlags;
+} xdbus_capability_flags_t;
 
 /**
  * GDBusCallFlags:
@@ -1575,7 +1575,7 @@ typedef enum {
 } GTlsError;
 
 /**
- * GTlsCertificateFlags:
+ * xtls_certificate_flags_t:
  * @G_TLS_CERTIFICATE_UNKNOWN_CA: The signing certificate authority is
  *   not known.
  * @G_TLS_CERTIFICATE_BAD_IDENTITY: The certificate does not match the
@@ -1616,7 +1616,7 @@ typedef enum {
   G_TLS_CERTIFICATE_GENERIC_ERROR = (1 << 6),
 
   G_TLS_CERTIFICATE_VALIDATE_ALL  = 0x007f
-} GTlsCertificateFlags;
+} xtls_certificate_flags_t;
 
 /**
  * GTlsAuthenticationMode:

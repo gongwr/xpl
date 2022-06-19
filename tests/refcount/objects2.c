@@ -61,13 +61,13 @@ xtest_get_type (void)
 static void
 xtest_class_init (xtest_class_t * klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = (xobject_class_t *) klass;
+  xobject_class = (xobject_class_t *) klass;
 
   parent_class = xtype_class_ref (XTYPE_OBJECT);
 
-  gobject_class->dispose = xtest_dispose;
+  xobject_class->dispose = xtest_dispose;
 }
 
 static void
@@ -85,7 +85,7 @@ xtest_dispose (xobject_t * object)
 
   g_print ("dispose %p!\n", test);
 
-  G_OBJECT_CLASS (parent_class)->dispose (object);
+  XOBJECT_CLASS (parent_class)->dispose (object);
 }
 
 static void

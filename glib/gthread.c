@@ -84,7 +84,7 @@
  * individual bits for locks (g_bit_lock()). There are primitives
  * for condition variables to allow synchronization of threads (#xcond_t).
  * There are primitives for thread-private data - data that every
- * thread has a private instance of (#GPrivate). There are facilities
+ * thread has a private instance of (#xprivate_t). There are facilities
  * for one-time initialization (#GOnce, g_once_init_enter()). Finally,
  * there are primitives to create and manage threads (#xthread_t).
  *
@@ -517,11 +517,11 @@ static xslist_t   *g_once_init_list = NULL;
 static xuint_t xthread_n_created_counter = 0;  /* (atomic) */
 
 static void xthread_cleanup (xpointer_t data);
-static GPrivate     xthread_specific_private = G_PRIVATE_INIT (xthread_cleanup);
+static xprivate_t     xthread_specific_private = G_PRIVATE_INIT (xthread_cleanup);
 
 /*
  * g_private_set_alloc0:
- * @key: a #GPrivate
+ * @key: a #xprivate_t
  * @size: size of the allocation, in bytes
  *
  * Sets the thread local variable @key to have a newly-allocated and zero-filled
@@ -536,7 +536,7 @@ static GPrivate     xthread_specific_private = G_PRIVATE_INIT (xthread_cleanup);
  */
 /*< private >*/
 xpointer_t
-g_private_set_alloc0 (GPrivate *key,
+g_private_set_alloc0 (xprivate_t *key,
                       xsize_t     size)
 {
   xpointer_t allocated = g_malloc0 (size);
@@ -811,7 +811,7 @@ xthread_proxy (xpointer_t data)
 {
   GRealThread* thread = data;
 
-  g_assert (data);
+  xassert (data);
   g_private_set (&xthread_specific_private, data);
 
   TRACE (XPL_THREAD_SPAWNED (thread->thread.func, thread->thread.data,
@@ -924,7 +924,7 @@ xthread_new_internal (const xchar_t *name,
                        const GThreadSchedulerSettings *scheduler_settings,
                        xerror_t **error)
 {
-  g_return_val_if_fail (func != NULL, NULL);
+  xreturn_val_if_fail (func != NULL, NULL);
 
   g_atomic_int_inc (&xthread_n_created_counter);
 
@@ -936,7 +936,7 @@ xthread_new_internal (const xchar_t *name,
 xboolean_t
 xthread_get_scheduler_settings (GThreadSchedulerSettings *scheduler_settings)
 {
-  g_return_val_if_fail (scheduler_settings != NULL, FALSE);
+  xreturn_val_if_fail (scheduler_settings != NULL, FALSE);
 
   return g_system_thread_get_scheduler_settings (scheduler_settings);
 }
@@ -1001,8 +1001,8 @@ xthread_join (xthread_t *thread)
   GRealThread *real = (GRealThread*) thread;
   xpointer_t retval;
 
-  g_return_val_if_fail (thread, NULL);
-  g_return_val_if_fail (real->ours, NULL);
+  xreturn_val_if_fail (thread, NULL);
+  xreturn_val_if_fail (real->ours, NULL);
 
   g_system_thread_wait (real);
 

@@ -31,10 +31,10 @@ G_BEGIN_DECLS
 
 #define XTYPE_FILE_INPUT_STREAM         (xfile_input_stream_get_type ())
 #define XFILE_INPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_INPUT_STREAM, xfile_input_stream))
-#define XFILE_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_INPUT_STREAM, GFileInputStreamClass))
+#define XFILE_INPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_INPUT_STREAM, xfile_input_stream_class_t))
 #define X_IS_FILE_INPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_INPUT_STREAM))
 #define X_IS_FILE_INPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_INPUT_STREAM))
-#define XFILE_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_INPUT_STREAM, GFileInputStreamClass))
+#define XFILE_INPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_INPUT_STREAM, xfile_input_stream_class_t))
 
 /**
  * xfile_input_stream_t:
@@ -44,10 +44,10 @@ G_BEGIN_DECLS
  *
  * #xfile_input_stream_t implements #xseekable__t.
  **/
-typedef struct _GFileInputStreamClass    GFileInputStreamClass;
+typedef struct _xfile_input_stream_class    xfile_input_stream_class_t;
 typedef struct _GFileInputStreamPrivate  GFileInputStreamPrivate;
 
-struct _GFileInputStream
+struct _xfile_input_stream
 {
   xinput_stream_t parent_instance;
 
@@ -55,7 +55,7 @@ struct _GFileInputStream
   GFileInputStreamPrivate *priv;
 };
 
-struct _GFileInputStreamClass
+struct _xfile_input_stream_class
 {
   xinput_stream_class_t parent_class;
 

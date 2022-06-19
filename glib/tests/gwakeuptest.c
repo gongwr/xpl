@@ -36,13 +36,13 @@ test_semantics (void)
   alarm (60);
 
   wakeup = g_wakeup_new ();
-  g_assert (!check_signaled (wakeup));
+  xassert (!check_signaled (wakeup));
 
   g_wakeup_signal (wakeup);
-  g_assert (check_signaled (wakeup));
+  xassert (check_signaled (wakeup));
 
   g_wakeup_acknowledge (wakeup);
-  g_assert (!check_signaled (wakeup));
+  xassert (!check_signaled (wakeup));
 
   g_wakeup_free (wakeup);
 
@@ -59,11 +59,11 @@ test_semantics (void)
   wakeup = g_wakeup_new ();
   for (i = 0; i < 1000000; i++)
     g_wakeup_signal (wakeup);
-  g_assert (check_signaled (wakeup));
+  xassert (check_signaled (wakeup));
 
   /* ensure a single acknowledgement is sufficient */
   g_wakeup_acknowledge (wakeup);
-  g_assert (!check_signaled (wakeup));
+  xassert (!check_signaled (wakeup));
 
   g_wakeup_free (wakeup);
 
@@ -106,8 +106,8 @@ context_init (struct context *ctx)
 static void
 context_clear (struct context *ctx)
 {
-  g_assert (ctx->pending_tokens == NULL);
-  g_assert (ctx->quit);
+  xassert (ctx->pending_tokens == NULL);
+  xassert (ctx->quit);
 
   g_mutex_clear (&ctx->lock);
   g_wakeup_free (ctx->wakeup);
@@ -141,7 +141,7 @@ static void
 context_push_token (struct context *ctx,
                     struct token   *token)
 {
-  g_assert (token->owner == ctx);
+  xassert (token->owner == ctx);
 
   g_mutex_lock (&ctx->lock);
   ctx->pending_tokens = xslist_prepend (ctx->pending_tokens, token);
@@ -200,7 +200,7 @@ thread_func (xpointer_t data)
 
       while ((token = context_try_pop_token (ctx)) != NULL)
         {
-          g_assert (token->owner == ctx);
+          xassert (token->owner == ctx);
           dispatch_token (token);
         }
     }

@@ -308,7 +308,7 @@ fill_poll_thread_data (xpollfd_t              *fds,
       if (_g_main_poll_debug)
         g_print (" Stop FD: %p", (HANDLE) stop_fd->fd);
 
-      g_assert (data->nhandles < MAXIMUM_WAIT_OBJECTS);
+      xassert (data->nhandles < MAXIMUM_WAIT_OBJECTS);
 
       data->stop_fd = stop_fd;
       data->handle_to_fd[data->nhandles] = stop_fd;

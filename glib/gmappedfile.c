@@ -247,8 +247,8 @@ xmapped_file_new (const xchar_t  *filename,
   xmapped_file_t *file;
   int fd;
 
-  g_return_val_if_fail (filename != NULL, NULL);
-  g_return_val_if_fail (!error || *error == NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (!error || *error == NULL, NULL);
 
   fd = g_open (filename, (writable ? O_RDWR : O_RDONLY) | _O_BINARY, 0);
   if (fd == -1)
@@ -318,7 +318,7 @@ xmapped_file_new_from_fd (xint_t          fd,
 xsize_t
 xmapped_file_get_length (xmapped_file_t *file)
 {
-  g_return_val_if_fail (file != NULL, 0);
+  xreturn_val_if_fail (file != NULL, 0);
 
   return file->length;
 }
@@ -341,7 +341,7 @@ xmapped_file_get_length (xmapped_file_t *file)
 xchar_t *
 xmapped_file_get_contents (xmapped_file_t *file)
 {
-  g_return_val_if_fail (file != NULL, NULL);
+  xreturn_val_if_fail (file != NULL, NULL);
 
   return file->contents;
 }
@@ -376,7 +376,7 @@ xmapped_file_free (xmapped_file_t *file)
 xmapped_file_t *
 xmapped_file_ref (xmapped_file_t *file)
 {
-  g_return_val_if_fail (file != NULL, NULL);
+  xreturn_val_if_fail (file != NULL, NULL);
 
   g_atomic_int_inc (&file->ref_count);
 
@@ -419,7 +419,7 @@ xmapped_file_unref (xmapped_file_t *file)
 xbytes_t *
 xmapped_file_get_bytes (xmapped_file_t *file)
 {
-  g_return_val_if_fail (file != NULL, NULL);
+  xreturn_val_if_fail (file != NULL, NULL);
 
   return xbytes_new_with_free_func (file->contents,
 				     file->length,

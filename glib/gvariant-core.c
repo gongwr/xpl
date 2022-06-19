@@ -258,8 +258,8 @@ xvariant_release_children (xvariant_t *value)
 {
   xsize_t i;
 
-  g_assert (value->state & STATE_LOCKED);
-  g_assert (~value->state & STATE_SERIALISED);
+  xassert (value->state & STATE_LOCKED);
+  xassert (~value->state & STATE_SERIALISED);
 
   for (i = 0; i < value->contents.tree.n_children; i++)
     xvariant_unref (value->contents.tree.children[i]);
@@ -334,7 +334,7 @@ static void xvariant_fill_gvs (GVariantSerialised *, xpointer_t);
 static void
 xvariant_ensure_size (xvariant_t *value)
 {
-  g_assert (value->state & STATE_LOCKED);
+  xassert (value->state & STATE_LOCKED);
 
   if (value->size == (xsize_t) -1)
     {
@@ -368,8 +368,8 @@ xvariant_serialise (xvariant_t *value,
   xpointer_t *children;
   xsize_t n_children;
 
-  g_assert (~value->state & STATE_SERIALISED);
-  g_assert (value->state & STATE_LOCKED);
+  xassert (~value->state & STATE_SERIALISED);
+  xassert (value->state & STATE_LOCKED);
 
   serialised.type_info = value->type_info;
   serialised.size = value->size;
@@ -411,11 +411,11 @@ xvariant_fill_gvs (GVariantSerialised *serialised,
 
   if (serialised->type_info == NULL)
     serialised->type_info = value->type_info;
-  g_assert (serialised->type_info == value->type_info);
+  xassert (serialised->type_info == value->type_info);
 
   if (serialised->size == 0)
     serialised->size = value->size;
-  g_assert (serialised->size == value->size);
+  xassert (serialised->size == value->size);
   serialised->depth = value->depth;
 
   if (serialised->data)
@@ -444,7 +444,7 @@ xvariant_fill_gvs (GVariantSerialised *serialised,
 static void
 xvariant_ensure_serialised (xvariant_t *value)
 {
-  g_assert (value->state & STATE_LOCKED);
+  xassert (value->state & STATE_LOCKED);
 
   if (~value->state & STATE_SERIALISED)
     {
@@ -730,7 +730,7 @@ xvariant_unref (xvariant_t *value)
 xvariant_t *
 xvariant_ref (xvariant_t *value)
 {
-  g_return_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
 
   g_atomic_ref_count_inc (&value->ref_count);
 
@@ -771,8 +771,8 @@ xvariant_ref (xvariant_t *value)
 xvariant_t *
 xvariant_ref_sink (xvariant_t *value)
 {
-  g_return_val_if_fail (value != NULL, NULL);
-  g_return_val_if_fail (!g_atomic_ref_count_compare (&value->ref_count, 0), NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (!g_atomic_ref_count_compare (&value->ref_count, 0), NULL);
 
   xvariant_lock (value);
 
@@ -828,8 +828,8 @@ xvariant_ref_sink (xvariant_t *value)
 xvariant_t *
 xvariant_take_ref (xvariant_t *value)
 {
-  g_return_val_if_fail (value != NULL, NULL);
-  g_return_val_if_fail (!g_atomic_ref_count_compare (&value->ref_count, 0), NULL);
+  xreturn_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (!g_atomic_ref_count_compare (&value->ref_count, 0), NULL);
 
   g_atomic_int_and (&value->state, ~STATE_FLOATING);
 
@@ -857,7 +857,7 @@ xvariant_take_ref (xvariant_t *value)
 xboolean_t
 xvariant_is_floating (xvariant_t *value)
 {
-  g_return_val_if_fail (value != NULL, FALSE);
+  xreturn_val_if_fail (value != NULL, FALSE);
 
   return (value->state & STATE_FLOATING) != 0;
 }
@@ -967,7 +967,7 @@ xvariant_get_data_as_bytes (xvariant_t *value)
 
   if (data == NULL)
     {
-      g_assert (size == 0);
+      xassert (size == 0);
       data = bytes_data;
     }
 
@@ -1062,8 +1062,8 @@ xvariant_t *
 xvariant_get_child_value (xvariant_t *value,
                            xsize_t     index_)
 {
-  g_return_val_if_fail (index_ < xvariant_n_children (value), NULL);
-  g_return_val_if_fail (value->depth < G_MAXSIZE, NULL);
+  xreturn_val_if_fail (index_ < xvariant_n_children (value), NULL);
+  xreturn_val_if_fail (value->depth < G_MAXSIZE, NULL);
 
   if (~g_atomic_int_get (&value->state) & STATE_SERIALISED)
     {
@@ -1107,7 +1107,7 @@ xvariant_get_child_value (xvariant_t *value,
         xvariant_type_info_query_depth (s_child.type_info) >=
         G_VARIANT_MAX_RECURSION_DEPTH - value->depth)
       {
-        g_assert (xvariant_is_of_type (value, G_VARIANT_TYPE_VARIANT));
+        xassert (xvariant_is_of_type (value, G_VARIANT_TYPE_VARIANT));
         return xvariant_new_tuple (NULL, 0);
       }
 

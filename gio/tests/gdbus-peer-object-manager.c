@@ -38,7 +38,7 @@ typedef struct {
 } MockInterfaceClass;
 
 static xtype_t mock_interface_get_type (void);
-G_DEFINE_TYPE (MockInterface, mock_interface, XTYPE_DBUS_INTERFACE_SKELETON)
+XDEFINE_TYPE (MockInterface, mock_interface, XTYPE_DBUS_INTERFACE_SKELETON)
 
 static void
 mock_interface_init (MockInterface *self)
@@ -133,7 +133,7 @@ mock_interface_get_properties (xdbus_interface_skeleton_t *interface)
       if (info->properties[n]->flags & G_DBUS_PROPERTY_INFO_FLAGS_READABLE)
         {
           xvariant_t *value;
-          g_return_val_if_fail (vtable->get_property != NULL, NULL);
+          xreturn_val_if_fail (vtable->get_property != NULL, NULL);
           value = (vtable->get_property) (g_dbus_interface_skeleton_get_connection (interface), NULL,
                                           g_dbus_interface_skeleton_get_object_path (interface),
                                           info->name, info->properties[n]->name,
@@ -180,10 +180,10 @@ on_server_connection (xobject_t *source,
   test_t *test = user_data;
   xerror_t *error = NULL;
 
-  g_assert (test->server == NULL);
+  xassert (test->server == NULL);
   test->server = xdbus_connection_new_finish (result, &error);
   g_assert_no_error (error);
-  g_assert (test->server != NULL);
+  xassert (test->server != NULL);
 
   if (test->server && test->client)
     xmain_loop_quit (test->loop);
@@ -197,10 +197,10 @@ on_client_connection (xobject_t *source,
   test_t *test = user_data;
   xerror_t *error = NULL;
 
-  g_assert (test->client == NULL);
+  xassert (test->client == NULL);
   test->client = xdbus_connection_new_finish (result, &error);
   g_assert_no_error (error);
-  g_assert (test->client != NULL);
+  xassert (test->client != NULL);
 
   if (test->server && test->client)
     xmain_loop_quit (test->loop);
@@ -231,7 +231,7 @@ setup (test_t *test,
   g_assert_no_error (error);
 
   stream = xsocket_connection_factory_create_connection (socket);
-  g_assert (stream != NULL);
+  xassert (stream != NULL);
   xobject_unref (socket);
 
   guid = g_dbus_generate_guid ();
@@ -247,7 +247,7 @@ setup (test_t *test,
   g_assert_no_error (error);
 
   stream = xsocket_connection_factory_create_connection (socket);
-  g_assert (stream != NULL);
+  xassert (stream != NULL);
   xobject_unref (socket);
 
   xdbus_connection_new (XIO_STREAM (stream), NULL,
@@ -257,8 +257,8 @@ setup (test_t *test,
 
   xmain_loop_run (test->loop);
 
-  g_assert (test->server);
-  g_assert (test->client);
+  xassert (test->server);
+  xassert (test->client);
 
   xobject_unref (stream);
 }
@@ -278,7 +278,7 @@ on_result (xobject_t *source,
            xpointer_t user_data)
 {
   test_t *test = user_data;
-  g_assert (test->result == NULL);
+  xassert (test->result == NULL);
   test->result = xobject_ref (result);
   xmain_loop_quit (test->loop);
 
@@ -337,28 +337,28 @@ test_object_manager (test_t *test,
   g_clear_object (&test->result);
 
   proxy = g_dbus_object_manager_get_interface (client, number1_path, "org.mock.Interface");
-  g_assert (proxy != NULL);
+  xassert (proxy != NULL);
   prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Path");
-  g_assert (prop != NULL);
+  xassert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_OBJECT_PATH);
   g_assert_cmpstr (xvariant_get_string (prop, NULL), ==, number1_path);
   xvariant_unref (prop);
   prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Number");
-  g_assert (prop != NULL);
+  xassert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_INT32);
   g_assert_cmpint (xvariant_get_int32 (prop), ==, 1);
   xvariant_unref (prop);
   xobject_unref (proxy);
 
   proxy = g_dbus_object_manager_get_interface (client, number2_path, "org.mock.Interface");
-  g_assert (proxy != NULL);
+  xassert (proxy != NULL);
   prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Path");
-  g_assert (prop != NULL);
+  xassert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_OBJECT_PATH);
   g_assert_cmpstr (xvariant_get_string (prop, NULL), ==, number2_path);
   xvariant_unref (prop);
   prop = xdbus_proxy_get_cached_property (G_DBUS_PROXY (proxy), "Number");
-  g_assert (prop != NULL);
+  xassert (prop != NULL);
   g_assert_cmpstr ((xchar_t *)xvariant_get_type (prop), ==, (xchar_t *)G_VARIANT_TYPE_INT32);
   g_assert_cmpint (xvariant_get_int32 (prop), ==, 2);
   xvariant_unref (prop);

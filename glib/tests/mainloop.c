@@ -329,7 +329,7 @@ quit_loop (xpointer_t data)
 
   xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xint_t count;
@@ -350,7 +350,7 @@ call_func (xpointer_t data)
 {
   func (xthread_self ());
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xmutex_t mutex;
@@ -679,7 +679,7 @@ assert_not_reached_callback (xpointer_t user_data)
 {
   g_assert_not_reached ();
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -1673,7 +1673,7 @@ timeout_cb (xpointer_t data)
 
   xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xpointer_t
@@ -2246,7 +2246,7 @@ test_maincontext_source_finalization_from_source (xconstpointer user_data)
 static xboolean_t
 dispatch_source_with_source (xsource_t *source, xsource_func_t callback, xpointer_t user_data)
 {
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xsource_funcs_t source_with_source_funcs_dispatch = {

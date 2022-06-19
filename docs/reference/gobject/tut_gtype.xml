@@ -271,10 +271,10 @@ G_DECLARE_FINAL_TYPE (viewer_file_t, viewer_file, VIEWER, FILE, xobject_t)
 
       <para>
         Unless your code has special requirements, you can use the
-        <function><link linkend="G-DEFINE-TYPE:CAPS">G_DEFINE_TYPE</link></function>
+        <function><link linkend="G-DEFINE-TYPE:CAPS">XDEFINE_TYPE</link></function>
 	macro to define a class:
 <informalexample><programlisting>
-G_DEFINE_TYPE (viewer_file_t, viewer_file, XTYPE_OBJECT)
+XDEFINE_TYPE (viewer_file, viewer_file, XTYPE_OBJECT)
 </programlisting></informalexample>
       </para>
 

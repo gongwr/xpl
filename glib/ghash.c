@@ -347,7 +347,7 @@ xhash_table_set_shift (xhashtable_t *hash_table, xint_t shift)
    * by simply subtracting 1 from it. The leading assertion ensures that
    * we're really dealing with a power of two. */
 
-  g_assert ((hash_table->size & (hash_table->size - 1)) == 0);
+  xassert ((hash_table->size & (hash_table->size - 1)) == 0);
   hash_table->mask = hash_table->size - 1;
 }
 
@@ -1104,7 +1104,7 @@ xhash_table_new_full (GHashFunc      hash_func,
 xhashtable_t *
 xhash_table_new_similar (xhashtable_t *other_hash_table)
 {
-  g_return_val_if_fail (other_hash_table, NULL);
+  xreturn_val_if_fail (other_hash_table, NULL);
 
   return xhash_table_new_full (other_hash_table->hash_func,
                                 other_hash_table->key_equal_func,
@@ -1175,11 +1175,11 @@ xhash_table_iter_next (xhash_table_iter_t *iter,
   RealIter *ri = (RealIter *) iter;
   xint_t position;
 
-  g_return_val_if_fail (iter != NULL, FALSE);
+  xreturn_val_if_fail (iter != NULL, FALSE);
 #ifndef G_DISABLE_ASSERT
-  g_return_val_if_fail (ri->version == ri->hash_table->version, FALSE);
+  xreturn_val_if_fail (ri->version == ri->hash_table->version, FALSE);
 #endif
-  g_return_val_if_fail (ri->position < (xssize_t) ri->hash_table->size, FALSE);
+  xreturn_val_if_fail (ri->position < (xssize_t) ri->hash_table->size, FALSE);
 
   position = ri->position;
 
@@ -1216,7 +1216,7 @@ xhash_table_iter_next (xhash_table_iter_t *iter,
 xhashtable_t *
 xhash_table_iter_get_hash_table (xhash_table_iter_t *iter)
 {
-  g_return_val_if_fail (iter != NULL, NULL);
+  xreturn_val_if_fail (iter != NULL, NULL);
 
   return ((RealIter *) iter)->hash_table;
 }
@@ -1460,7 +1460,7 @@ xhash_table_iter_steal (xhash_table_iter_t *iter)
 xhashtable_t *
 xhash_table_ref (xhashtable_t *hash_table)
 {
-  g_return_val_if_fail (hash_table != NULL, NULL);
+  xreturn_val_if_fail (hash_table != NULL, NULL);
 
   g_atomic_ref_count_inc (&hash_table->ref_count);
 
@@ -1533,7 +1533,7 @@ xhash_table_lookup (xhashtable_t    *hash_table,
   xuint_t node_index;
   xuint_t node_hash;
 
-  g_return_val_if_fail (hash_table != NULL, NULL);
+  xreturn_val_if_fail (hash_table != NULL, NULL);
 
   node_index = xhash_table_lookup_node (hash_table, key, &node_hash);
 
@@ -1570,7 +1570,7 @@ xhash_table_lookup_extended (xhashtable_t    *hash_table,
   xuint_t node_index;
   xuint_t node_hash;
 
-  g_return_val_if_fail (hash_table != NULL, FALSE);
+  xreturn_val_if_fail (hash_table != NULL, FALSE);
 
   node_index = xhash_table_lookup_node (hash_table, lookup_key, &node_hash);
 
@@ -1620,7 +1620,7 @@ xhash_table_insert_internal (xhashtable_t *hash_table,
   xuint_t key_hash;
   xuint_t node_index;
 
-  g_return_val_if_fail (hash_table != NULL, FALSE);
+  xreturn_val_if_fail (hash_table != NULL, FALSE);
 
   node_index = xhash_table_lookup_node (hash_table, key, &key_hash);
 
@@ -1734,7 +1734,7 @@ xhash_table_contains (xhashtable_t    *hash_table,
   xuint_t node_index;
   xuint_t node_hash;
 
-  g_return_val_if_fail (hash_table != NULL, FALSE);
+  xreturn_val_if_fail (hash_table != NULL, FALSE);
 
   node_index = xhash_table_lookup_node (hash_table, key, &node_hash);
 
@@ -1762,7 +1762,7 @@ xhash_table_remove_internal (xhashtable_t    *hash_table,
   xuint_t node_index;
   xuint_t node_hash;
 
-  g_return_val_if_fail (hash_table != NULL, FALSE);
+  xreturn_val_if_fail (hash_table != NULL, FALSE);
 
   node_index = xhash_table_lookup_node (hash_table, key, &node_hash);
 
@@ -1849,7 +1849,7 @@ xhash_table_steal_extended (xhashtable_t    *hash_table,
   xuint_t node_index;
   xuint_t node_hash;
 
-  g_return_val_if_fail (hash_table != NULL, FALSE);
+  xreturn_val_if_fail (hash_table != NULL, FALSE);
 
   node_index = xhash_table_lookup_node (hash_table, lookup_key, &node_hash);
 
@@ -1977,7 +1977,7 @@ xhash_table_foreach_remove_or_steal (xhashtable_t *hash_table,
         }
 
 #ifndef G_DISABLE_ASSERT
-      g_return_val_if_fail (version == hash_table->version, 0);
+      xreturn_val_if_fail (version == hash_table->version, 0);
 #endif
     }
 
@@ -2013,8 +2013,8 @@ xhash_table_foreach_remove (xhashtable_t *hash_table,
                              GHRFunc     func,
                              xpointer_t    user_data)
 {
-  g_return_val_if_fail (hash_table != NULL, 0);
-  g_return_val_if_fail (func != NULL, 0);
+  xreturn_val_if_fail (hash_table != NULL, 0);
+  xreturn_val_if_fail (func != NULL, 0);
 
   return xhash_table_foreach_remove_or_steal (hash_table, func, user_data, TRUE);
 }
@@ -2040,8 +2040,8 @@ xhash_table_foreach_steal (xhashtable_t *hash_table,
                             GHRFunc     func,
                             xpointer_t    user_data)
 {
-  g_return_val_if_fail (hash_table != NULL, 0);
-  g_return_val_if_fail (func != NULL, 0);
+  xreturn_val_if_fail (hash_table != NULL, 0);
+  xreturn_val_if_fail (func != NULL, 0);
 
   return xhash_table_foreach_remove_or_steal (hash_table, func, user_data, FALSE);
 }
@@ -2134,8 +2134,8 @@ xhash_table_find (xhashtable_t *hash_table,
 #endif
   xboolean_t match;
 
-  g_return_val_if_fail (hash_table != NULL, NULL);
-  g_return_val_if_fail (predicate != NULL, NULL);
+  xreturn_val_if_fail (hash_table != NULL, NULL);
+  xreturn_val_if_fail (predicate != NULL, NULL);
 
 #ifndef G_DISABLE_ASSERT
   version = hash_table->version;
@@ -2153,7 +2153,7 @@ xhash_table_find (xhashtable_t *hash_table,
         match = predicate (node_key, node_value, user_data);
 
 #ifndef G_DISABLE_ASSERT
-      g_return_val_if_fail (version == hash_table->version, NULL);
+      xreturn_val_if_fail (version == hash_table->version, NULL);
 #endif
 
       if (match)
@@ -2174,7 +2174,7 @@ xhash_table_find (xhashtable_t *hash_table,
 xuint_t
 xhash_table_size (xhashtable_t *hash_table)
 {
-  g_return_val_if_fail (hash_table != NULL, 0);
+  xreturn_val_if_fail (hash_table != NULL, 0);
 
   return hash_table->nnodes;
 }
@@ -2203,7 +2203,7 @@ xhash_table_get_keys (xhashtable_t *hash_table)
   xsize_t i;
   xlist_t *retval;
 
-  g_return_val_if_fail (hash_table != NULL, NULL);
+  xreturn_val_if_fail (hash_table != NULL, NULL);
 
   retval = NULL;
   for (i = 0; i < hash_table->size; i++)
@@ -2289,7 +2289,7 @@ xhash_table_get_values (xhashtable_t *hash_table)
   xsize_t i;
   xlist_t *retval;
 
-  g_return_val_if_fail (hash_table != NULL, NULL);
+  xreturn_val_if_fail (hash_table != NULL, NULL);
 
   retval = NULL;
   for (i = 0; i < hash_table->size; i++)

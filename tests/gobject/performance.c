@@ -172,38 +172,38 @@ run_test (PerformanceTest *test)
 
 static xtype_t simple_object_get_type (void);
 #define SIMPLE_TYPE_OBJECT        (simple_object_get_type ())
-typedef struct _SimpleObject      SimpleObject;
-typedef struct _SimpleObjectClass   SimpleObjectClass;
+typedef struct _simple_object      simple_object_t;
+typedef struct _simple_object_class   simple_object_class_t;
 
-struct _SimpleObject
+struct _simple_object
 {
   xobject_t parent_instance;
   int val;
 };
 
-struct _SimpleObjectClass
+struct _simple_object_class
 {
   xobject_class_t parent_class;
 };
 
-G_DEFINE_TYPE (SimpleObject, simple_object, XTYPE_OBJECT)
+XDEFINE_TYPE (simple_object, simple_object, XTYPE_OBJECT)
 
 static void
 simple_object_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (simple_object_parent_class)->finalize (object);
+  XOBJECT_CLASS (simple_object_parent_class)->finalize (object);
 }
 
 static void
-simple_object_class_init (SimpleObjectClass *class)
+simple_object_class_init (simple_object_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = simple_object_finalize;
 }
 
 static void
-simple_object_init (SimpleObject *simple_object)
+simple_object_init (simple_object_t *simple_object)
 {
   simple_object->val = 42;
 }
@@ -234,11 +234,11 @@ static xtype_t test_iface5_get_type (void);
 #define TEST_TYPE_IFACE4 (test_iface4_get_type ())
 #define TEST_TYPE_IFACE5 (test_iface5_get_type ())
 
-static DEFINE_IFACE (TestIface1, test_iface1,  NULL, NULL)
-static DEFINE_IFACE (TestIface2, test_iface2,  NULL, NULL)
-static DEFINE_IFACE (TestIface3, test_iface3,  NULL, NULL)
-static DEFINE_IFACE (TestIface4, test_iface4,  NULL, NULL)
-static DEFINE_IFACE (TestIface5, test_iface5,  NULL, NULL)
+static DEFINE_IFACE (test_iface1, test_iface1, NULL, NULL)
+static DEFINE_IFACE (test_iface2, test_iface2, NULL, NULL)
+static DEFINE_IFACE (test_iface3, test_iface3, NULL, NULL)
+static DEFINE_IFACE (test_iface4, test_iface4, NULL, NULL)
+static DEFINE_IFACE (test_iface5, test_iface5, NULL, NULL)
 
 /*************************************************************
  * Complex object is a xobject_t subclass with a properties,
@@ -247,28 +247,28 @@ static DEFINE_IFACE (TestIface5, test_iface5,  NULL, NULL)
 
 static xtype_t complex_object_get_type (void);
 #define COMPLEX_TYPE_OBJECT        (complex_object_get_type ())
-typedef struct _ComplexObject      ComplexObject;
-typedef struct _ComplexObjectClass ComplexObjectClass;
+typedef struct _complex_object      complex_object_t;
+typedef struct _complex_object_class complex_object_class_t;
 
-struct _ComplexObject
+struct _complex_object
 {
   xobject_t parent_instance;
   int val1;
   int val2;
 };
 
-struct _ComplexObjectClass
+struct _complex_object_class
 {
   xobject_class_t parent_class;
 
-  void (*signal) (ComplexObject *obj);
-  void (*signal_empty) (ComplexObject *obj);
+  void (*signal) (complex_object_t *obj);
+  void (*signal_empty) (complex_object_t *obj);
 };
 
 static void complex_test_iface_init (xpointer_t         x_iface,
 				     xpointer_t         iface_data);
 
-G_DEFINE_TYPE_EXTENDED (ComplexObject, complex_object,
+G_DEFINE_TYPE_EXTENDED (complex_object_t, complex_object,
 			XTYPE_OBJECT, 0,
 			G_IMPLEMENT_INTERFACE (TEST_TYPE_IFACE1, complex_test_iface_init)
 			G_IMPLEMENT_INTERFACE (TEST_TYPE_IFACE2, complex_test_iface_init)
@@ -276,7 +276,7 @@ G_DEFINE_TYPE_EXTENDED (ComplexObject, complex_object,
 			G_IMPLEMENT_INTERFACE (TEST_TYPE_IFACE4, complex_test_iface_init)
 			G_IMPLEMENT_INTERFACE (TEST_TYPE_IFACE5, complex_test_iface_init))
 
-#define COMPLEX_OBJECT(object) (XTYPE_CHECK_INSTANCE_CAST ((object), COMPLEX_TYPE_OBJECT, ComplexObject))
+#define COMPLEX_OBJECT(object) (XTYPE_CHECK_INSTANCE_CAST ((object), COMPLEX_TYPE_OBJECT, complex_object_t))
 
 enum {
   PROP_0,
@@ -298,7 +298,7 @@ static xuint_t complex_signals[COMPLEX_LAST_SIGNAL] = { 0 };
 static void
 complex_object_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (complex_object_parent_class)->finalize (object);
+  XOBJECT_CLASS (complex_object_parent_class)->finalize (object);
 }
 
 static void
@@ -307,7 +307,7 @@ complex_object_set_property (xobject_t         *object,
 			     const xvalue_t    *value,
 			     xparam_spec_t      *pspec)
 {
-  ComplexObject *complex = COMPLEX_OBJECT (object);
+  complex_object_t *complex = COMPLEX_OBJECT (object);
 
   switch (prop_id)
     {
@@ -329,7 +329,7 @@ complex_object_get_property (xobject_t         *object,
 			     xvalue_t          *value,
 			     xparam_spec_t      *pspec)
 {
-  ComplexObject *complex = COMPLEX_OBJECT (object);
+  complex_object_t *complex = COMPLEX_OBJECT (object);
 
   switch (prop_id)
     {
@@ -346,14 +346,14 @@ complex_object_get_property (xobject_t         *object,
 }
 
 static void
-complex_object_real_signal (ComplexObject *obj)
+complex_object_real_signal (complex_object_t *obj)
 {
 }
 
 static void
-complex_object_class_init (ComplexObjectClass *class)
+complex_object_class_init (complex_object_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = complex_object_finalize;
   object_class->set_property = complex_object_set_property;
@@ -365,7 +365,7 @@ complex_object_class_init (ComplexObjectClass *class)
     xsignal_new ("signal",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
-		  G_STRUCT_OFFSET (ComplexObjectClass, signal),
+		  G_STRUCT_OFFSET (complex_object_class_t, signal),
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__VOID,
 		  XTYPE_NONE, 0);
@@ -374,7 +374,7 @@ complex_object_class_init (ComplexObjectClass *class)
     xsignal_new ("signal-empty",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
-		  G_STRUCT_OFFSET (ComplexObjectClass, signal_empty),
+		  G_STRUCT_OFFSET (complex_object_class_t, signal_empty),
 		  NULL, NULL,
 		  g_cclosure_marshal_VOID__VOID,
 		  XTYPE_NONE, 0);
@@ -383,7 +383,7 @@ complex_object_class_init (ComplexObjectClass *class)
     xsignal_new ("signal-generic",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
-		  G_STRUCT_OFFSET (ComplexObjectClass, signal),
+		  G_STRUCT_OFFSET (complex_object_class_t, signal),
 		  NULL, NULL,
 		  NULL,
 		  XTYPE_NONE, 0);
@@ -391,7 +391,7 @@ complex_object_class_init (ComplexObjectClass *class)
     xsignal_new ("signal-generic-empty",
 		  XTYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_FIRST,
-		  G_STRUCT_OFFSET (ComplexObjectClass, signal_empty),
+		  G_STRUCT_OFFSET (complex_object_class_t, signal_empty),
 		  NULL, NULL,
 		  NULL,
 		  XTYPE_NONE, 0);
@@ -400,29 +400,29 @@ complex_object_class_init (ComplexObjectClass *class)
     xsignal_new ("signal-args",
                   XTYPE_FROM_CLASS (object_class),
                   G_SIGNAL_RUN_FIRST,
-                  G_STRUCT_OFFSET (ComplexObjectClass, signal),
+                  G_STRUCT_OFFSET (complex_object_class_t, signal),
                   NULL, NULL,
                   g_cclosure_marshal_VOID__UINT_POINTER,
                   XTYPE_NONE, 2, XTYPE_UINT, XTYPE_POINTER);
 
   xobject_class_install_property (object_class,
 				   PROP_VAL1,
-				   g_param_spec_int ("val1",
+				   xparam_spec_int ("val1",
  						     "val1",
  						     "val1",
  						     0,
  						     G_MAXINT,
  						     42,
- 						     G_PARAM_CONSTRUCT | G_PARAM_READWRITE));
+ 						     XPARAM_CONSTRUCT | XPARAM_READWRITE));
   xobject_class_install_property (object_class,
 				   PROP_VAL2,
-				   g_param_spec_int ("val2",
+				   xparam_spec_int ("val2",
  						     "val2",
  						     "val2",
  						     0,
  						     G_MAXINT,
  						     43,
- 						     G_PARAM_READWRITE));
+ 						     XPARAM_READWRITE));
 
 
 }
@@ -430,7 +430,7 @@ complex_object_class_init (ComplexObjectClass *class)
 static void
 complex_object_iface_method (test_iface_t *obj)
 {
-  ComplexObject *complex = COMPLEX_OBJECT (obj);
+  complex_object_t *complex = COMPLEX_OBJECT (obj);
   complex->val1++;
 }
 
@@ -443,7 +443,7 @@ complex_test_iface_init (xpointer_t         x_iface,
 }
 
 static void
-complex_object_init (ComplexObject *complex_object)
+complex_object_init (complex_object_t *complex_object)
 {
   complex_object->val2 = 43;
 }
@@ -715,7 +715,7 @@ test_emission_unhandled_teardown (PerformanceTest *test,
  *************************************************************/
 
 static void
-test_emission_handled_handler (ComplexObject *obj, xpointer_t data)
+test_emission_handled_handler (complex_object_t *obj, xpointer_t data)
 {
 }
 

@@ -49,7 +49,7 @@ enum {
  * compresses data using zlib.
  */
 
-static void g_zlib_compressor_iface_init          (GConverterIface *iface);
+static void g_zlib_compressor_iface_init          (xconverter_iface_t *iface);
 
 /**
  * xzlib_compressor_t:
@@ -110,7 +110,7 @@ g_zlib_compressor_finalize (xobject_t *object)
   if (compressor->file_info)
     xobject_unref (compressor->file_info);
 
-  G_OBJECT_CLASS (g_zlib_compressor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_zlib_compressor_parent_class)->finalize (object);
 }
 
 
@@ -219,32 +219,32 @@ g_zlib_compressor_constructed (xobject_t *object)
 static void
 g_zlib_compressor_class_init (GZlibCompressorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_zlib_compressor_finalize;
-  gobject_class->constructed = g_zlib_compressor_constructed;
-  gobject_class->get_property = g_zlib_compressor_get_property;
-  gobject_class->set_property = g_zlib_compressor_set_property;
+  xobject_class->finalize = g_zlib_compressor_finalize;
+  xobject_class->constructed = g_zlib_compressor_constructed;
+  xobject_class->get_property = g_zlib_compressor_get_property;
+  xobject_class->set_property = g_zlib_compressor_set_property;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_FORMAT,
-				   g_param_spec_enum ("format",
+				   xparam_spec_enum ("format",
 						      P_("compression format"),
 						      P_("The format of the compressed data"),
 						      XTYPE_ZLIB_COMPRESSOR_FORMAT,
 						      G_ZLIB_COMPRESSOR_FORMAT_ZLIB,
-						      G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-						      G_PARAM_STATIC_STRINGS));
-  xobject_class_install_property (gobject_class,
+						      XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+						      XPARAM_STATIC_STRINGS));
+  xobject_class_install_property (xobject_class,
 				   PROP_LEVEL,
-				   g_param_spec_int ("level",
+				   xparam_spec_int ("level",
 						     P_("compression level"),
 						     P_("The level of compression from 0 (no compression) to 9 (most compression), -1 for the default level"),
 						     -1, 9,
 						     -1,
-						     G_PARAM_READWRITE |
-						     G_PARAM_CONSTRUCT_ONLY |
-						     G_PARAM_STATIC_STRINGS));
+						     XPARAM_READWRITE |
+						     XPARAM_CONSTRUCT_ONLY |
+						     XPARAM_STATIC_STRINGS));
 
   /**
    * xzlib_compressor_t:file-info:
@@ -255,14 +255,14 @@ g_zlib_compressor_class_init (GZlibCompressorClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_FILE_INFO,
-                                   g_param_spec_object ("file-info",
+                                   xparam_spec_object ("file-info",
                                                        P_("file info"),
                                                        P_("File info"),
                                                        XTYPE_FILE_INFO,
-                                                       G_PARAM_READWRITE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READWRITE |
+                                                       XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -303,7 +303,7 @@ g_zlib_compressor_new (GZlibCompressorFormat format,
 xfile_info_t *
 g_zlib_compressor_get_file_info (xzlib_compressor_t *compressor)
 {
-  g_return_val_if_fail (X_IS_ZLIB_COMPRESSOR (compressor), NULL);
+  xreturn_val_if_fail (X_IS_ZLIB_COMPRESSOR (compressor), NULL);
 
   return compressor->file_info;
 }
@@ -320,7 +320,7 @@ g_zlib_compressor_get_file_info (xzlib_compressor_t *compressor)
  *
  * Note: it is an error to call this function while a compression is in
  * progress; it may only be called immediately after creation of @compressor,
- * or after resetting it with g_converter_reset().
+ * or after resetting it with xconverter_reset().
  *
  * Since: 2.26
  */
@@ -357,13 +357,13 @@ g_zlib_compressor_reset (xconverter_t *converter)
   g_zlib_compressor_set_gzheader (compressor);
 }
 
-static GConverterResult
+static xconverter_result_t
 g_zlib_compressor_convert (xconverter_t *converter,
 			   const void *inbuf,
 			   xsize_t       inbuf_size,
 			   void       *outbuf,
 			   xsize_t       outbuf_size,
-			   GConverterFlags flags,
+			   xconverter_flags_t flags,
 			   xsize_t      *bytes_read,
 			   xsize_t      *bytes_written,
 			   xerror_t    **error)
@@ -381,9 +381,9 @@ g_zlib_compressor_convert (xconverter_t *converter,
   compressor->zstream.avail_out = outbuf_size;
 
   flush = Z_NO_FLUSH;
-  if (flags & G_CONVERTER_INPUT_AT_END)
+  if (flags & XCONVERTER_INPUT_AT_END)
     flush = Z_FINISH;
-  else if (flags & G_CONVERTER_FLUSH)
+  else if (flags & XCONVERTER_FLUSH)
     flush = Z_SYNC_FLUSH;
 
   res = deflate (&compressor->zstream, flush);
@@ -392,27 +392,27 @@ g_zlib_compressor_convert (xconverter_t *converter,
     {
       g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 			   _("Not enough memory"));
-      return G_CONVERTER_ERROR;
+      return XCONVERTER_ERROR;
     }
 
     if (res == Z_STREAM_ERROR)
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
 		   _("Internal error: %s"), compressor->zstream.msg);
-      return G_CONVERTER_ERROR;
+      return XCONVERTER_ERROR;
     }
 
     if (res == Z_BUF_ERROR)
       {
-	if (flags & G_CONVERTER_FLUSH)
-	  return G_CONVERTER_FLUSHED;
+	if (flags & XCONVERTER_FLUSH)
+	  return XCONVERTER_FLUSHED;
 
 	/* We do have output space, so this should only happen if we
 	   have no input but need some */
 
 	g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PARTIAL_INPUT,
 			     _("Need more input"));
-	return G_CONVERTER_ERROR;
+	return XCONVERTER_ERROR;
       }
 
   if (res == Z_OK || res == Z_STREAM_END)
@@ -421,15 +421,15 @@ g_zlib_compressor_convert (xconverter_t *converter,
       *bytes_written = outbuf_size - compressor->zstream.avail_out;
 
       if (res == Z_STREAM_END)
-	return G_CONVERTER_FINISHED;
-      return G_CONVERTER_CONVERTED;
+	return XCONVERTER_FINISHED;
+      return XCONVERTER_CONVERTED;
     }
 
   g_assert_not_reached ();
 }
 
 static void
-g_zlib_compressor_iface_init (GConverterIface *iface)
+g_zlib_compressor_iface_init (xconverter_iface_t *iface)
 {
   iface->convert = g_zlib_compressor_convert;
   iface->reset = g_zlib_compressor_reset;

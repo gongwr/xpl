@@ -29,7 +29,7 @@ struct _test_auto_cleanup_base_class {
   xobject_class_t parent_class;
 };
 
-G_DEFINE_TYPE (test_auto_cleanup_base, test_base_auto_cleanup, XTYPE_OBJECT)
+XDEFINE_TYPE (test_auto_cleanup_base, test_base_auto_cleanup, XTYPE_OBJECT)
 
 static void
 test_base_auto_cleanup_class_init (test_auto_cleanup_base_class_t *class)
@@ -48,7 +48,7 @@ struct _test_auto_cleanup
   test_auto_cleanup_base_t parent_instance;
 };
 
-G_DEFINE_TYPE (test_auto_cleanup, test_auto_cleanup, XTYPE_OBJECT)
+XDEFINE_TYPE (test_auto_cleanup, test_auto_cleanup, XTYPE_OBJECT)
 
 static void
 test_auto_cleanup_class_init (test_auto_cleanup_class_t *class)

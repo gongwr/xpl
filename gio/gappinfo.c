@@ -124,7 +124,7 @@ xapp_info_dup (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -150,8 +150,8 @@ xapp_info_equal (xapp_info_t *appinfo1,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo1), FALSE);
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo2), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo1), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo2), FALSE);
 
   if (XTYPE_FROM_INSTANCE (appinfo1) != XTYPE_FROM_INSTANCE (appinfo2))
     return FALSE;
@@ -180,7 +180,7 @@ xapp_info_get_id (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -200,7 +200,7 @@ xapp_info_get_name (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -224,7 +224,7 @@ xapp_info_get_display_name (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -248,7 +248,7 @@ xapp_info_get_description (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -269,7 +269,7 @@ xapp_info_get_executable (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -294,7 +294,7 @@ xapp_info_get_commandline (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -321,8 +321,8 @@ xapp_info_set_as_default_for_type (xapp_info_t    *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  g_return_val_if_fail (content_type != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -354,8 +354,8 @@ xapp_info_set_as_last_used_for_type (xapp_info_t    *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  g_return_val_if_fail (content_type != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -385,8 +385,8 @@ xapp_info_set_as_default_for_extension (xapp_info_t    *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  g_return_val_if_fail (extension != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (extension != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -417,8 +417,8 @@ xapp_info_add_supports_type (xapp_info_t    *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  g_return_val_if_fail (content_type != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -447,7 +447,7 @@ xapp_info_can_remove_supports_type (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -475,8 +475,8 @@ xapp_info_remove_supports_type (xapp_info_t    *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
-  g_return_val_if_fail (content_type != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (content_type != NULL, FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -511,7 +511,7 @@ xapp_info_get_supported_types (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -536,7 +536,7 @@ xapp_info_get_icon (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), NULL);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -589,7 +589,7 @@ xapp_info_launch (xapp_info_t           *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -610,7 +610,7 @@ xapp_info_supports_uris (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -631,7 +631,7 @@ xapp_info_supports_files (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -667,7 +667,7 @@ xapp_info_launch_uris (xapp_info_t           *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -742,7 +742,7 @@ xapp_info_launch_uris_finish (xapp_info_t     *appinfo,
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
   if (iface->launch_uris_finish == NULL)
@@ -769,7 +769,7 @@ xapp_info_should_show (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -1048,7 +1048,7 @@ xboolean_t
 xapp_info_launch_default_for_uri_finish (xasync_result_t  *result,
                                           xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, NULL), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, NULL), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -1069,7 +1069,7 @@ xapp_info_can_delete (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -1100,7 +1100,7 @@ xapp_info_delete (xapp_info_t *appinfo)
 {
   xapp_info_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
+  xreturn_val_if_fail (X_IS_APP_INFO (appinfo), FALSE);
 
   iface = G_APP_INFO_GET_IFACE (appinfo);
 
@@ -1143,13 +1143,13 @@ xapp_launch_context_finalize (xobject_t *object)
 
   xstrfreev (context->priv->envp);
 
-  G_OBJECT_CLASS (xapp_launch_context_parent_class)->finalize (object);
+  XOBJECT_CLASS (xapp_launch_context_parent_class)->finalize (object);
 }
 
 static void
 xapp_launch_context_class_init (xapp_launch_context_class_t *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->finalize = xapp_launch_context_finalize;
 
@@ -1311,7 +1311,7 @@ xapp_launch_context_unsetenv (xapp_launch_context_t *context,
 char **
 xapp_launch_context_get_environment (xapp_launch_context_t *context)
 {
-  g_return_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
+  xreturn_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
 
   if (!context->priv->envp)
     context->priv->envp = g_get_environ ();
@@ -1338,8 +1338,8 @@ xapp_launch_context_get_display (xapp_launch_context_t *context,
 {
   xapp_launch_context_class_t *class;
 
-  g_return_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
-  g_return_val_if_fail (X_IS_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (info), NULL);
 
   class = G_APP_LAUNCH_CONTEXT_GET_CLASS (context);
 
@@ -1371,8 +1371,8 @@ xapp_launch_context_get_startup_notify_id (xapp_launch_context_t *context,
 {
   xapp_launch_context_class_t *class;
 
-  g_return_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
-  g_return_val_if_fail (X_IS_APP_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_APP_LAUNCH_CONTEXT (context), NULL);
+  xreturn_val_if_fail (X_IS_APP_INFO (info), NULL);
 
   class = G_APP_LAUNCH_CONTEXT_GET_CLASS (context);
 
@@ -1450,19 +1450,19 @@ struct _GAppInfoMonitorClass
   xobject_class_t parent_class;
 };
 
-static GContextSpecificGroup xapp_info_monitor_group;
+static xcontext_specific_group_t xapp_info_monitor_group;
 static xuint_t                 xapp_info_monitor_changed_signal;
 
-G_DEFINE_TYPE (xapp_info_monitor, xapp_info_monitor, XTYPE_OBJECT)
+XDEFINE_TYPE (xapp_info_monitor, xapp_info_monitor, XTYPE_OBJECT)
 
 static void
 xapp_info_monitor_finalize (xobject_t *object)
 {
   xapp_info_monitor_t *monitor = G_APP_INFO_MONITOR (object);
 
-  g_context_specific_group_remove (&xapp_info_monitor_group, monitor->context, monitor, NULL);
+  xcontext_specific_group_remove (&xapp_info_monitor_group, monitor->context, monitor, NULL);
 
-  G_OBJECT_CLASS (xapp_info_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (xapp_info_monitor_parent_class)->finalize (object);
 }
 
 static void
@@ -1473,7 +1473,7 @@ xapp_info_monitor_init (xapp_info_monitor_t *monitor)
 static void
 xapp_info_monitor_class_init (GAppInfoMonitorClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   /**
    * xapp_info_monitor_t::changed:
@@ -1507,7 +1507,7 @@ xapp_info_monitor_class_init (GAppInfoMonitorClass *class)
 xapp_info_monitor_t *
 xapp_info_monitor_get (void)
 {
-  return g_context_specific_group_get (&xapp_info_monitor_group,
+  return xcontext_specific_group_get (&xapp_info_monitor_group,
                                        XTYPE_APP_INFO_MONITOR,
                                        G_STRUCT_OFFSET (xapp_info_monitor_t, context),
                                        NULL);
@@ -1516,5 +1516,5 @@ xapp_info_monitor_get (void)
 void
 xapp_info_monitor_fire (void)
 {
-  g_context_specific_group_emit (&xapp_info_monitor_group, xapp_info_monitor_changed_signal);
+  xcontext_specific_group_emit (&xapp_info_monitor_group, xapp_info_monitor_changed_signal);
 }

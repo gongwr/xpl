@@ -19,25 +19,25 @@
 #include <glib-object.h>
 #include <string.h>
 
-/* --- MySingleton class --- */
+/* --- my_singleton_t class --- */
 typedef struct {
   xobject_t parent_instance;
-} MySingleton;
+} my_singleton_t;
 typedef struct {
   xobject_class_t parent_class;
-} MySingletonClass;
+} my_singleton_class_t;
 
 static xtype_t my_singleton_get_type (void);
 #define MY_TYPE_SINGLETON         (my_singleton_get_type ())
-#define MY_SINGLETON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_SINGLETON, MySingleton))
+#define MY_SINGLETON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), MY_TYPE_SINGLETON, my_singleton_t))
 #define MY_IS_SINGLETON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), MY_TYPE_SINGLETON))
-#define MY_SINGLETON_CLASS(c)     (XTYPE_CHECK_CLASS_CAST ((c), MY_TYPE_SINGLETON, MySingletonClass))
+#define MY_SINGLETON_CLASS(c)     (XTYPE_CHECK_CLASS_CAST ((c), MY_TYPE_SINGLETON, my_singleton_class_t))
 #define MY_IS_SINGLETON_CLASS(c)  (XTYPE_CHECK_CLASS_TYPE ((c), MY_TYPE_SINGLETON))
-#define MY_SINGLETON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), MY_TYPE_SINGLETON, MySingletonClass))
+#define MY_SINGLETON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), MY_TYPE_SINGLETON, my_singleton_class_t))
 
-G_DEFINE_TYPE (MySingleton, my_singleton, XTYPE_OBJECT)
+XDEFINE_TYPE (my_singleton, my_singleton, XTYPE_OBJECT)
 
-static MySingleton *the_one_and_only = NULL;
+static my_singleton_t *the_one_and_only = NULL;
 
 /* --- methods --- */
 static xobject_t*
@@ -48,20 +48,20 @@ my_singleton_constructor (xtype_t                  type,
   if (the_one_and_only)
     return xobject_ref (G_OBJECT (the_one_and_only));
   else
-    return G_OBJECT_CLASS (my_singleton_parent_class)->constructor (type, n_construct_properties, construct_properties);
+    return XOBJECT_CLASS (my_singleton_parent_class)->constructor (type, n_construct_properties, construct_properties);
 }
 
 static void
-my_singleton_init (MySingleton *self)
+my_singleton_init (my_singleton_t *self)
 {
-  g_assert (the_one_and_only == NULL);
+  xassert (the_one_and_only == NULL);
   the_one_and_only = self;
 }
 
 static void
-my_singleton_class_init (MySingletonClass *klass)
+my_singleton_class_init (my_singleton_class_t *klass)
 {
-  G_OBJECT_CLASS (klass)->constructor = my_singleton_constructor;
+  XOBJECT_CLASS (klass)->constructor = my_singleton_constructor;
 }
 
 /* --- test program --- */
@@ -69,14 +69,14 @@ int
 main (int   argc,
       char *argv[])
 {
-  MySingleton *singleton, *obj;
+  my_singleton_t *singleton, *obj;
 
   /* create the singleton */
   singleton = xobject_new (MY_TYPE_SINGLETON, NULL);
-  g_assert (singleton != NULL);
+  xassert (singleton != NULL);
   /* assert _singleton_ creation */
   obj = xobject_new (MY_TYPE_SINGLETON, NULL);
-  g_assert (singleton == obj);
+  xassert (singleton == obj);
   xobject_unref (obj);
   /* shutdown */
   xobject_unref (singleton);

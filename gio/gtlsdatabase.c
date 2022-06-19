@@ -146,7 +146,7 @@ async_verify_chain_thread (xtask_t         *task,
 			   xcancellable_t  *cancellable)
 {
   AsyncVerifyChain *args = task_data;
-  GTlsCertificateFlags verify_result;
+  xtls_certificate_flags_t verify_result;
   xerror_t *error = NULL;
 
   verify_result = xtls_database_verify_chain (G_TLS_DATABASE (object),
@@ -192,17 +192,17 @@ xtls_database_real_verify_chain_async (xtls_database_t           *self,
   xobject_unref (task);
 }
 
-static GTlsCertificateFlags
+static xtls_certificate_flags_t
 xtls_database_real_verify_chain_finish (xtls_database_t          *self,
                                          xasync_result_t          *result,
                                          xerror_t               **error)
 {
-  GTlsCertificateFlags ret;
+  xtls_certificate_flags_t ret;
 
-  g_return_val_if_fail (xtask_is_valid (result, self), G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (xtask_is_valid (result, self), G_TLS_CERTIFICATE_GENERIC_ERROR);
 
-  ret = (GTlsCertificateFlags)xtask_propagate_int (XTASK (result), error);
-  if (ret == (GTlsCertificateFlags)-1)
+  ret = (xtls_certificate_flags_t)xtask_propagate_int (XTASK (result), error);
+  if (ret == (xtls_certificate_flags_t)-1)
     return G_TLS_CERTIFICATE_GENERIC_ERROR;
   else
     return ret;
@@ -276,7 +276,7 @@ xtls_database_real_lookup_certificate_for_handle_finish (xtls_database_t        
                                                           xasync_result_t          *result,
                                                           xerror_t               **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, self), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -351,7 +351,7 @@ xtls_database_real_lookup_certificate_issuer_finish (xtls_database_t          *s
                                                       xasync_result_t          *result,
                                                       xerror_t               **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, self), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -433,7 +433,7 @@ xtls_database_real_lookup_certificates_issued_by_finish (xtls_database_t        
                                                           xasync_result_t          *result,
                                                           xerror_t               **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, self), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, self), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -523,12 +523,12 @@ xtls_database_class_init (GTlsDatabaseClass *klass)
  * This function can block. Use xtls_database_verify_chain_async() to
  * perform the verification operation asynchronously.
  *
- * Returns: the appropriate #GTlsCertificateFlags which represents the
+ * Returns: the appropriate #xtls_certificate_flags_t which represents the
  * result of verification.
  *
  * Since: 2.30
  */
-GTlsCertificateFlags
+xtls_certificate_flags_t
 xtls_database_verify_chain (xtls_database_t           *self,
                              xtls_certificate_t        *chain,
                              const xchar_t            *purpose,
@@ -538,17 +538,17 @@ xtls_database_verify_chain (xtls_database_t           *self,
                              xcancellable_t           *cancellable,
                              xerror_t                **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (chain),
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (chain),
                         G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (purpose, G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction),
+  xreturn_val_if_fail (purpose, G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction),
                         G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (identity == NULL || X_IS_SOCKET_CONNECTABLE (identity),
+  xreturn_val_if_fail (identity == NULL || X_IS_SOCKET_CONNECTABLE (identity),
                         G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (error == NULL || *error == NULL, G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (error == NULL || *error == NULL, G_TLS_CERTIFICATE_GENERIC_ERROR);
 
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->verify_chain,
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->verify_chain,
                         G_TLS_CERTIFICATE_GENERIC_ERROR);
 
   return G_TLS_DATABASE_GET_CLASS (self)->verify_chain (self,
@@ -628,20 +628,20 @@ xtls_database_verify_chain_async (xtls_database_t           *self,
  * accordingly. @error is not set when @chain is successfully analyzed
  * but found to be invalid.
  *
- * Returns: the appropriate #GTlsCertificateFlags which represents the
+ * Returns: the appropriate #xtls_certificate_flags_t which represents the
  * result of verification.
  *
  * Since: 2.30
  */
-GTlsCertificateFlags
+xtls_certificate_flags_t
 xtls_database_verify_chain_finish (xtls_database_t          *self,
                                     xasync_result_t          *result,
                                     xerror_t               **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (error == NULL || *error == NULL, G_TLS_CERTIFICATE_GENERIC_ERROR);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->verify_chain_finish,
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (error == NULL || *error == NULL, G_TLS_CERTIFICATE_GENERIC_ERROR);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->verify_chain_finish,
                         G_TLS_CERTIFICATE_GENERIC_ERROR);
   return G_TLS_DATABASE_GET_CLASS (self)->verify_chain_finish (self,
                                                                result,
@@ -671,9 +671,9 @@ xchar_t*
 xtls_database_create_certificate_handle (xtls_database_t            *self,
                                           xtls_certificate_t         *certificate)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (certificate), NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->create_certificate_handle, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (certificate), NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->create_certificate_handle, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->create_certificate_handle (self,
                                                                      certificate);
 }
@@ -713,12 +713,12 @@ xtls_database_lookup_certificate_for_handle (xtls_database_t            *self,
                                               xcancellable_t            *cancellable,
                                               xerror_t                 **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (handle != NULL, NULL);
-  g_return_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction), NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_for_handle, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (handle != NULL, NULL);
+  xreturn_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction), NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_for_handle, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_for_handle (self,
                                                                          handle,
                                                                          interaction,
@@ -788,10 +788,10 @@ xtls_database_lookup_certificate_for_handle_finish (xtls_database_t            *
                                                      xasync_result_t            *result,
                                                      xerror_t                 **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_for_handle_finish, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_for_handle_finish, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_for_handle_finish (self,
                                                                                 result,
                                                                                 error);
@@ -840,12 +840,12 @@ xtls_database_lookup_certificate_issuer (xtls_database_t           *self,
                                           xcancellable_t           *cancellable,
                                           xerror_t                **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (X_IS_TLS_CERTIFICATE (certificate), NULL);
-  g_return_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction), NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_issuer, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CERTIFICATE (certificate), NULL);
+  xreturn_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction), NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_issuer, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_issuer (self,
                                                                      certificate,
                                                                      interaction,
@@ -912,10 +912,10 @@ xtls_database_lookup_certificate_issuer_finish (xtls_database_t          *self,
                                                  xasync_result_t          *result,
                                                  xerror_t               **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_issuer_finish, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_issuer_finish, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->lookup_certificate_issuer_finish (self,
                                                                 result,
                                                                 error);
@@ -948,12 +948,12 @@ xtls_database_lookup_certificates_issued_by (xtls_database_t           *self,
                                               xcancellable_t           *cancellable,
                                               xerror_t                **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (issuer_raw_dn, NULL);
-  g_return_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction), NULL);
-  g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificates_issued_by, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (issuer_raw_dn, NULL);
+  xreturn_val_if_fail (interaction == NULL || X_IS_TLS_INTERACTION (interaction), NULL);
+  xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificates_issued_by, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->lookup_certificates_issued_by (self,
                                                                          issuer_raw_dn,
                                                                          interaction,
@@ -1024,10 +1024,10 @@ xtls_database_lookup_certificates_issued_by_finish (xtls_database_t          *se
                                                      xasync_result_t          *result,
                                                      xerror_t               **error)
 {
-  g_return_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificates_issued_by_finish, NULL);
+  xreturn_val_if_fail (X_IS_TLS_DATABASE (self), NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (G_TLS_DATABASE_GET_CLASS (self)->lookup_certificates_issued_by_finish, NULL);
   return G_TLS_DATABASE_GET_CLASS (self)->lookup_certificates_issued_by_finish (self,
                                                                                 result,
                                                                                 error);

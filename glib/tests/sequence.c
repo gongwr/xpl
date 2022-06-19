@@ -37,14 +37,14 @@ check_node (GSequenceNode *node)
 {
   if (node)
     {
-      g_assert (node->parent != node);
+      xassert (node->parent != node);
       if (node->parent)
-        g_assert (node->parent->left == node || node->parent->right == node);
-      g_assert (node->n_nodes == 1 + (node->left ? node->left->n_nodes : 0) + (node->right ? node->right->n_nodes : 0));
+        xassert (node->parent->left == node || node->parent->right == node);
+      xassert (node->n_nodes == 1 + (node->left ? node->left->n_nodes : 0) + (node->right ? node->right->n_nodes : 0));
       if (node->left)
-          g_assert (get_priority (node) >= get_priority (node->left));
+          xassert (get_priority (node) >= get_priority (node->left));
       if (node->right)
-          g_assert (get_priority (node) >= get_priority (node->right));
+          xassert (get_priority (node) >= get_priority (node->right));
       check_node (node->left);
       check_node (node->right);
     }
@@ -63,8 +63,8 @@ g_sequence_check (xsequence_t *seq)
   while (node->right)
     node = node->right;
 
-  g_assert (seq->end_node == node);
-  g_assert (node->data == seq);
+  xassert (seq->end_node == node);
+  xassert (node->data == seq);
 
 }
 
@@ -131,8 +131,8 @@ check_integrity (SequenceInfo *info)
     g_printerr ("%d %d\n",
              g_sequence_get_length (info->sequence), info->n_items);
 #endif
-  g_assert (info->n_items == g_queue_get_length (info->queue));
-  g_assert ((xuint_t) g_sequence_get_length (info->sequence) == info->n_items);
+  xassert (info->n_items == g_queue_get_length (info->queue));
+  xassert ((xuint_t) g_sequence_get_length (info->sequence) == info->n_items);
 
   iter = g_sequence_get_begin_iter (info->sequence);
   list = info->queue->head;
@@ -140,17 +140,17 @@ check_integrity (SequenceInfo *info)
   while (iter != g_sequence_get_end_iter (info->sequence))
     {
       Item *item;
-      g_assert (list->data == iter);
+      xassert (list->data == iter);
       item = get_item (list->data);
-      g_assert (item->seq == info);
+      xassert (item->seq == info);
 
       iter = g_sequence_iter_next (iter);
       list = list->next;
       i++;
     }
 
-  g_assert (info->n_items == g_queue_get_length (info->queue));
-  g_assert ((xuint_t) g_sequence_get_length (info->sequence) == info->n_items);
+  xassert (info->n_items == g_queue_get_length (info->queue));
+  xassert ((xuint_t) g_sequence_get_length (info->sequence) == info->n_items);
 }
 
 static xpointer_t
@@ -184,11 +184,11 @@ seq_foreach (xpointer_t data,
   xlist_t **link = user_data;
   GSequenceIter *iter;
 
-  g_assert (*link != NULL);
+  xassert (*link != NULL);
 
   iter = (*link)->data;
 
-  g_assert (get_item (iter) == item);
+  xassert (get_item (iter) == item);
 
   item->number = g_random_int();
 
@@ -224,8 +224,8 @@ simple_iters_cmp (xconstpointer a,
 
   if (seq)
     {
-      g_assert (g_sequence_iter_get_sequence (iter_a) == seq);
-      g_assert (g_sequence_iter_get_sequence (iter_b) == seq);
+      xassert (g_sequence_iter_get_sequence (iter_a) == seq);
+      xassert (g_sequence_iter_get_sequence (iter_b) == seq);
     }
 
   return simple_items_cmp (item_a, item_b, data);
@@ -280,12 +280,12 @@ check_sorted (SequenceInfo *info)
       GSequenceIter *iter = list->data;
       Item *item = get_item (iter);
 
-      g_assert (item->number >= last);
+      xassert (item->number >= last);
       /* Check that the ordering is the same as that of the queue,
        * ie. that the sort is stable
        */
       if (last_iter)
-        g_assert (iter == g_sequence_iter_next (last_iter));
+        xassert (iter == g_sequence_iter_next (last_iter));
 
       last = item->number;
       last_iter = iter;
@@ -306,8 +306,8 @@ compare_iters (xconstpointer a,
 
   if (seq)
     {
-      g_assert (g_sequence_iter_get_sequence (iter_a) == seq);
-      g_assert (g_sequence_iter_get_sequence (iter_b) == seq);
+      xassert (g_sequence_iter_get_sequence (iter_a) == seq);
+      xassert (g_sequence_iter_get_sequence (iter_b) == seq);
     }
 
   return compare_items (item_a, item_b, data);
@@ -336,7 +336,7 @@ get_random_range (SequenceInfo *seq,
   int b = g_random_int_range (0, length + 1);
   int e = g_random_int_range (b, length + 1);
 
-  g_assert (length == g_sequence_get_length (seq->sequence));
+  xassert (length == g_sequence_get_length (seq->sequence));
 
   if (begin_iter)
     *begin_iter = g_sequence_get_iter_at_pos (seq->sequence, b);
@@ -348,13 +348,13 @@ get_random_range (SequenceInfo *seq,
     *end_link = g_queue_peek_nth_link (seq->queue, e);
   if (begin_iter && begin_link)
     {
-      g_assert (
+      xassert (
                 queue_link_index (seq, *begin_link) ==
                 g_sequence_iter_get_position (*begin_iter));
     }
   if (end_iter && end_link)
     {
-      g_assert (
+      xassert (
                 queue_link_index (seq, *end_link) ==
                 g_sequence_iter_get_position (*end_iter));
     }
@@ -365,7 +365,7 @@ get_random_position (SequenceInfo *seq)
 {
   int length = g_queue_get_length (seq->queue);
 
-  g_assert (length == g_sequence_get_length (seq->sequence));
+  xassert (length == g_sequence_get_length (seq->sequence));
 
   return g_random_int_range (-2, length + 5);
 }
@@ -380,7 +380,7 @@ get_random_iter (SequenceInfo  *seq,
     *link = g_queue_peek_nth_link (seq->queue, pos);
   iter = g_sequence_get_iter_at_pos (seq->sequence, pos);
   if (link)
-    g_assert (queue_link_index (seq, *link) == g_sequence_iter_get_position (iter));
+    xassert (queue_link_index (seq, *link) == g_sequence_iter_get_position (iter));
   return iter;
 }
 
@@ -449,7 +449,7 @@ run_random_tests (xconstpointer d)
             g_queue_free (seq->queue);
             g_sequence_free (seq->sequence);
 
-            g_assert (seq->n_items == 0);
+            xassert (seq->n_items == 0);
 
             seq->queue = g_queue_new ();
             seq->sequence = g_sequence_new (free_item);
@@ -462,14 +462,14 @@ run_random_tests (xconstpointer d)
             int slen = g_sequence_get_length (seq->sequence);
             int qlen = g_queue_get_length (seq->queue);
 
-            g_assert (slen == qlen);
+            xassert (slen == qlen);
           }
           break;
         case FOREACH:
           {
             xlist_t *link = seq->queue->head;
             g_sequence_foreach (seq->sequence, seq_foreach, &link);
-            g_assert (link == NULL);
+            xassert (link == NULL);
           }
           break;
         case FOREACH_RANGE:
@@ -483,7 +483,7 @@ run_random_tests (xconstpointer d)
 
             g_sequence_foreach_range (begin_iter, end_iter, seq_foreach, &begin_link);
 
-            g_assert (begin_link == end_link);
+            xassert (begin_link == end_link);
           }
           break;
         case SORT:
@@ -527,24 +527,24 @@ run_random_tests (xconstpointer d)
 
             if (g_sequence_get_length (seq->sequence) > 0)
               {
-                g_assert (seq->queue->head);
-                g_assert (seq->queue->head->data == begin_iter);
-                g_assert (seq->queue->tail);
-                g_assert (seq->queue->tail->data == penultimate_iter);
+                xassert (seq->queue->head);
+                xassert (seq->queue->head->data == begin_iter);
+                xassert (seq->queue->tail);
+                xassert (seq->queue->tail->data == penultimate_iter);
               }
             else
               {
-                g_assert (penultimate_iter == end_iter);
-                g_assert (begin_iter == end_iter);
-                g_assert (penultimate_iter == begin_iter);
-                g_assert (seq->queue->head == NULL);
-                g_assert (seq->queue->tail == NULL);
+                xassert (penultimate_iter == end_iter);
+                xassert (begin_iter == end_iter);
+                xassert (penultimate_iter == begin_iter);
+                xassert (seq->queue->head == NULL);
+                xassert (seq->queue->tail == NULL);
               }
           }
           break;
         case GET_ITER_AT_POS:
           {
-            g_assert (g_queue_get_length (seq->queue) == (xuint_t) g_sequence_get_length (seq->sequence));
+            xassert (g_queue_get_length (seq->queue) == (xuint_t) g_sequence_get_length (seq->sequence));
 
             for (i = 0; i < 10; ++i)
               {
@@ -554,13 +554,13 @@ run_random_tests (xconstpointer d)
                 check_integrity (seq);
                 if (pos >= g_sequence_get_length (seq->sequence) || pos < 0)
                   {
-                    g_assert (iter == g_sequence_get_end_iter (seq->sequence));
-                    g_assert (link == NULL);
+                    xassert (iter == g_sequence_get_end_iter (seq->sequence));
+                    xassert (link == NULL);
                   }
                 else
                   {
-                    g_assert (link);
-                    g_assert (link->data == iter);
+                    xassert (link);
+                    xassert (link->data == iter);
                   }
               }
           }
@@ -611,7 +611,7 @@ run_random_tests (xconstpointer d)
                 g_sequence_move (iter1, iter2);
 
                 if (!link2)
-                  g_assert (g_sequence_iter_is_end (iter2));
+                  xassert (g_sequence_iter_is_end (iter2));
 
                 g_queue_insert_before (seq2->queue, link2, link1->data);
 
@@ -804,8 +804,8 @@ run_random_tests (xconstpointer d)
 
             xlist_t *list;
 
-            g_assert (src->queue);
-            g_assert (dst->queue);
+            xassert (src->queue);
+            xassert (dst->queue);
 
             get_random_range (src, &begin_iter, &end_iter, &begin_link, &end_link);
             dst_iter = get_random_iter (dst, &dst_link);
@@ -838,11 +838,11 @@ run_random_tests (xconstpointer d)
                 xlist_t *next = list->next;
                 Item *item = get_item (list->data);
 
-                g_assert (dst->queue);
+                xassert (dst->queue);
                 g_queue_insert_before (dst->queue, dst_link, list->data);
                 g_queue_delete_link (src->queue, list);
 
-                g_assert (item->seq == src);
+                xassert (item->seq == src);
 
                 src->n_items--;
                 dst->n_items++;
@@ -868,7 +868,7 @@ run_random_tests (xconstpointer d)
 
             insert_iter = g_sequence_insert_sorted (seq->sequence, item, compare_items, NULL);
 
-            g_assert (search_iter == g_sequence_iter_next (insert_iter));
+            xassert (search_iter == g_sequence_iter_next (insert_iter));
 
             g_queue_insert_sorted (seq->queue, insert_iter, compare_iters, NULL);
           }
@@ -891,7 +891,7 @@ run_random_tests (xconstpointer d)
 
             insert_iter = g_sequence_insert_sorted (seq->sequence, item, compare_items, NULL);
 
-            g_assert (search_iter == g_sequence_iter_next (insert_iter));
+            xassert (search_iter == g_sequence_iter_next (insert_iter));
 
             g_queue_insert_sorted (seq->queue, insert_iter, compare_iters, NULL);
           }
@@ -912,7 +912,7 @@ run_random_tests (xconstpointer d)
             g_queue_insert_sorted (seq->queue, insert_iter, compare_iters, NULL);
 
             lookup_iter = g_sequence_lookup (seq->sequence, item, simple_items_cmp, NULL);
-            g_assert (simple_iters_cmp (insert_iter, lookup_iter, NULL) == 0);
+            xassert (simple_iters_cmp (insert_iter, lookup_iter, NULL) == 0);
           }
           break;
         case LOOKUP_ITER:
@@ -932,7 +932,7 @@ run_random_tests (xconstpointer d)
 
             lookup_iter = g_sequence_lookup_iter (seq->sequence, item,
                 (GSequenceIterCompareFunc) simple_iters_cmp, NULL);
-            g_assert (simple_iters_cmp (insert_iter, lookup_iter, NULL) == 0);
+            xassert (simple_iters_cmp (insert_iter, lookup_iter, NULL) == 0);
           }
           break;
 
@@ -954,7 +954,7 @@ run_random_tests (xconstpointer d)
                 /* test_t basic functionality */
                 item = new_item (seq);
                 g_sequence_set (iter, item);
-                g_assert (g_sequence_get (iter) == item);
+                xassert (g_sequence_get (iter) == item);
 
                 /* Make sure that existing items are freed */
                 for (i = 0; i < N_TIMES; ++i)
@@ -974,20 +974,20 @@ run_random_tests (xconstpointer d)
 
             iter = g_sequence_get_iter_at_pos (seq->sequence, 0);
 
-            g_assert (g_sequence_iter_is_begin (iter));
+            xassert (g_sequence_iter_is_begin (iter));
 
             check_integrity (seq);
 
             if (g_sequence_get_length (seq->sequence) > 0)
               {
-                g_assert (!g_sequence_iter_is_begin (g_sequence_get_end_iter (seq->sequence)));
+                xassert (!g_sequence_iter_is_begin (g_sequence_get_end_iter (seq->sequence)));
               }
             else
               {
-                g_assert (g_sequence_iter_is_begin (g_sequence_get_end_iter (seq->sequence)));
+                xassert (g_sequence_iter_is_begin (g_sequence_get_end_iter (seq->sequence)));
               }
 
-            g_assert (g_sequence_iter_is_begin (g_sequence_get_begin_iter (seq->sequence)));
+            xassert (g_sequence_iter_is_begin (g_sequence_get_begin_iter (seq->sequence)));
           }
           break;
         case ITER_IS_END:
@@ -997,18 +997,18 @@ run_random_tests (xconstpointer d)
 
             iter = g_sequence_get_iter_at_pos (seq->sequence, len);
 
-            g_assert (g_sequence_iter_is_end (iter));
+            xassert (g_sequence_iter_is_end (iter));
 
             if (len > 0)
               {
-                g_assert (!g_sequence_iter_is_end (g_sequence_get_begin_iter (seq->sequence)));
+                xassert (!g_sequence_iter_is_end (g_sequence_get_begin_iter (seq->sequence)));
               }
             else
               {
-                g_assert (g_sequence_iter_is_end (g_sequence_get_begin_iter (seq->sequence)));
+                xassert (g_sequence_iter_is_end (g_sequence_get_begin_iter (seq->sequence)));
               }
 
-            g_assert (g_sequence_iter_is_end (g_sequence_get_end_iter (seq->sequence)));
+            xassert (g_sequence_iter_is_end (g_sequence_get_end_iter (seq->sequence)));
           }
           break;
         case ITER_NEXT:
@@ -1021,10 +1021,10 @@ run_random_tests (xconstpointer d)
 
             end = g_sequence_get_end_iter (seq->sequence);
 
-            g_assert (g_sequence_iter_next (iter1) == iter2);
-            g_assert (g_sequence_iter_next (iter2) == iter3);
-            g_assert (g_sequence_iter_next (iter3) == end);
-            g_assert (g_sequence_iter_next (end) == end);
+            xassert (g_sequence_iter_next (iter1) == iter2);
+            xassert (g_sequence_iter_next (iter2) == iter3);
+            xassert (g_sequence_iter_next (iter3) == end);
+            xassert (g_sequence_iter_next (end) == end);
 
             g_queue_push_tail (seq->queue, iter1);
             g_queue_push_tail (seq->queue, iter2);
@@ -1041,11 +1041,11 @@ run_random_tests (xconstpointer d)
 
             begin = g_sequence_get_begin_iter (seq->sequence);
 
-            g_assert (g_sequence_iter_prev (iter1) == iter2);
-            g_assert (g_sequence_iter_prev (iter2) == iter3);
-            g_assert (iter3 == begin);
-            g_assert (g_sequence_iter_prev (iter3) == begin);
-            g_assert (g_sequence_iter_prev (begin) == begin);
+            xassert (g_sequence_iter_prev (iter1) == iter2);
+            xassert (g_sequence_iter_prev (iter2) == iter3);
+            xassert (iter3 == begin);
+            xassert (g_sequence_iter_prev (iter3) == begin);
+            xassert (g_sequence_iter_prev (begin) == begin);
 
             g_queue_push_head (seq->queue, iter1);
             g_queue_push_head (seq->queue, iter2);
@@ -1057,7 +1057,7 @@ run_random_tests (xconstpointer d)
             xlist_t *link;
             GSequenceIter *iter = get_random_iter (seq, &link);
 
-            g_assert (g_sequence_iter_get_position (iter) ==
+            xassert (g_sequence_iter_get_position (iter) ==
                       queue_link_index (seq, link));
           }
           break;
@@ -1070,25 +1070,25 @@ run_random_tests (xconstpointer d)
             iter = get_random_iter (seq, NULL);
             pos = g_sequence_iter_get_position (iter);
             iter = g_sequence_iter_move (iter, len - pos);
-            g_assert (g_sequence_iter_is_end (iter));
+            xassert (g_sequence_iter_is_end (iter));
 
 
             iter = get_random_iter (seq, NULL);
             pos = g_sequence_iter_get_position (iter);
             while (pos < len)
               {
-                g_assert (!g_sequence_iter_is_end (iter));
+                xassert (!g_sequence_iter_is_end (iter));
                 pos++;
                 iter = g_sequence_iter_move (iter, 1);
               }
-            g_assert (g_sequence_iter_is_end (iter));
+            xassert (g_sequence_iter_is_end (iter));
           }
           break;
         case ITER_GET_SEQUENCE:
           {
             GSequenceIter *iter = get_random_iter (seq, NULL);
 
-            g_assert (g_sequence_iter_get_sequence (iter) == seq->sequence);
+            xassert (g_sequence_iter_get_sequence (iter) == seq->sequence);
           }
           break;
 
@@ -1105,15 +1105,15 @@ run_random_tests (xconstpointer d)
 
             if (cmp == 0)
               {
-                g_assert (pos1 == pos2);
+                xassert (pos1 == pos2);
               }
             else if (cmp < 0)
               {
-                g_assert (pos1 < pos2);
+                xassert (pos1 < pos2);
               }
             else
               {
-                g_assert (pos1 > pos2);
+                xassert (pos1 > pos2);
               }
           }
           break;
@@ -1139,13 +1139,13 @@ run_random_tests (xconstpointer d)
 
             if (cmp == 0)
               {
-                g_assert (iter3 == iter1);
-                g_assert (iter3 == iter2);
+                xassert (iter3 == iter1);
+                xassert (iter3 == iter2);
               }
 
-            g_assert (g_sequence_iter_get_position (iter3) >=
+            xassert (g_sequence_iter_get_position (iter3) >=
                       g_sequence_iter_get_position (iter1));
-            g_assert (g_sequence_iter_get_position (iter2) >=
+            xassert (g_sequence_iter_get_position (iter2) >=
                       g_sequence_iter_get_position (iter3));
           }
           break;
@@ -1189,8 +1189,8 @@ test_out_of_range_jump (void)
 
   g_sequence_iter_move (iter, 5);
 
-  g_assert (g_sequence_iter_is_begin (iter));
-  g_assert (g_sequence_iter_is_end (iter));
+  xassert (g_sequence_iter_is_begin (iter));
+  xassert (g_sequence_iter_is_end (iter));
 
   g_sequence_free (seq);
 }
@@ -1210,14 +1210,14 @@ test_iter_move (void)
   g_assert_cmpint (GPOINTER_TO_INT (g_sequence_get (iter)), ==, 5);
 
   iter = g_sequence_iter_move (iter, -10);
-  g_assert (g_sequence_iter_is_begin (iter));
+  xassert (g_sequence_iter_is_begin (iter));
 
   iter = g_sequence_get_end_iter (seq);
   iter = g_sequence_iter_move (iter, -5);
   g_assert_cmpint (GPOINTER_TO_INT (g_sequence_get (iter)), ==, 5);
 
   iter = g_sequence_iter_move (iter, 10);
-  g_assert (g_sequence_iter_is_end (iter));
+  xassert (g_sequence_iter_is_end (iter));
 
   g_sequence_free (seq);
 }
@@ -1288,17 +1288,17 @@ test_stable_sort (void)
     {
       iters[i] = g_sequence_append (seq, GINT_TO_POINTER (3000));
       g_sequence_check (seq);
-      g_assert (g_sequence_iter_get_sequence (iters[i]) == seq);
+      xassert (g_sequence_iter_get_sequence (iters[i]) == seq);
    }
 
   i = 0;
   iter = g_sequence_get_begin_iter (seq);
-  g_assert (g_sequence_iter_get_sequence (iter) == seq);
+  xassert (g_sequence_iter_get_sequence (iter) == seq);
   g_sequence_check (seq);
   while (!g_sequence_iter_is_end (iter))
     {
-      g_assert (g_sequence_iter_get_sequence (iters[i]) == seq);
-      g_assert (iters[i++] == iter);
+      xassert (g_sequence_iter_get_sequence (iters[i]) == seq);
+      xassert (iters[i++] == iter);
 
       iter = g_sequence_iter_next (iter);
       g_sequence_check (seq);
@@ -1310,8 +1310,8 @@ test_stable_sort (void)
   iter = g_sequence_get_begin_iter (seq);
   while (!g_sequence_iter_is_end (iter))
     {
-      g_assert (g_sequence_iter_get_sequence (iters[i]) == seq);
-      g_assert (iters[i] == iter);
+      xassert (g_sequence_iter_get_sequence (iters[i]) == seq);
+      xassert (iters[i] == iter);
 
       iter = g_sequence_iter_next (iter);
       g_sequence_check (seq);
@@ -1322,8 +1322,8 @@ test_stable_sort (void)
   for (i = N_ITEMS - 1; i >= 0; --i)
     {
       g_sequence_check (seq);
-      g_assert (g_sequence_iter_get_sequence (iters[i]) == seq);
-      g_assert (g_sequence_get_end_iter (seq) != iters[i]);
+      xassert (g_sequence_iter_get_sequence (iters[i]) == seq);
+      xassert (g_sequence_get_end_iter (seq) != iters[i]);
       g_sequence_sort_changed (iters[i], compare, NULL);
     }
 
@@ -1331,7 +1331,7 @@ test_stable_sort (void)
   iter = g_sequence_get_begin_iter (seq);
   while (!g_sequence_iter_is_end (iter))
     {
-      g_assert (iters[i++] == iter);
+      xassert (iters[i++] == iter);
 
       iter = g_sequence_iter_next (iter);
       g_sequence_check (seq);

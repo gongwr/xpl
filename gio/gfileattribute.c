@@ -253,7 +253,7 @@ _xfile_attribute_value_dup (const GFileAttributeValue *other)
 {
   GFileAttributeValue *attr;
 
-  g_return_val_if_fail (other != NULL, NULL);
+  xreturn_val_if_fail (other != NULL, NULL);
 
   attr = g_new (GFileAttributeValue, 1);
   attr->type = XFILE_ATTRIBUTE_TYPE_INVALID;
@@ -331,7 +331,7 @@ _xfile_attribute_value_as_string (const GFileAttributeValue *attr)
   int i;
   char *str;
 
-  g_return_val_if_fail (attr != NULL, NULL);
+  xreturn_val_if_fail (attr != NULL, NULL);
 
   switch (attr->type)
     {
@@ -399,7 +399,7 @@ _xfile_attribute_value_get_string (const GFileAttributeValue *attr)
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_STRING, NULL);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_STRING, NULL);
 
   return attr->u.string;
 }
@@ -419,7 +419,7 @@ _xfile_attribute_value_get_byte_string (const GFileAttributeValue *attr)
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_BYTE_STRING, NULL);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_BYTE_STRING, NULL);
 
   return attr->u.string;
 }
@@ -430,7 +430,7 @@ _xfile_attribute_value_get_stringv (const GFileAttributeValue *attr)
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_STRINGV, NULL);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_STRINGV, NULL);
 
   return attr->u.stringv;
 }
@@ -450,7 +450,7 @@ _xfile_attribute_value_get_boolean (const GFileAttributeValue *attr)
   if (attr == NULL)
     return FALSE;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_BOOLEAN, FALSE);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_BOOLEAN, FALSE);
 
   return attr->u.boolean;
 }
@@ -470,7 +470,7 @@ _xfile_attribute_value_get_uint32 (const GFileAttributeValue *attr)
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_UINT32, 0);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_UINT32, 0);
 
   return attr->u.uint32;
 }
@@ -490,7 +490,7 @@ _xfile_attribute_value_get_int32 (const GFileAttributeValue *attr)
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_INT32, 0);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_INT32, 0);
 
   return attr->u.int32;
 }
@@ -510,7 +510,7 @@ _xfile_attribute_value_get_uint64 (const GFileAttributeValue *attr)
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_UINT64, 0);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_UINT64, 0);
 
   return attr->u.uint64;
 }
@@ -530,7 +530,7 @@ _xfile_attribute_value_get_int64 (const GFileAttributeValue *attr)
   if (attr == NULL)
     return 0;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_INT64, 0);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_INT64, 0);
 
   return attr->u.int64;
 }
@@ -550,7 +550,7 @@ _xfile_attribute_value_get_object (const GFileAttributeValue *attr)
   if (attr == NULL)
     return NULL;
 
-  g_return_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_OBJECT, NULL);
+  xreturn_val_if_fail (attr->type == XFILE_ATTRIBUTE_TYPE_OBJECT, NULL);
 
   return attr->u.obj;
 }
@@ -827,7 +827,7 @@ xfile_attribute_info_list_dup (xfile_attribute_info_list_t *list)
   GFileAttributeInfoListPriv *new;
   int i;
 
-  g_return_val_if_fail (list != NULL, NULL);
+  xreturn_val_if_fail (list != NULL, NULL);
 
   new = g_new0 (GFileAttributeInfoListPriv, 1);
   new->ref_count = 1;
@@ -858,8 +858,8 @@ xfile_attribute_info_list_ref (xfile_attribute_info_list_t *list)
 {
   GFileAttributeInfoListPriv *priv = (GFileAttributeInfoListPriv *)list;
 
-  g_return_val_if_fail (list != NULL, NULL);
-  g_return_val_if_fail (priv->ref_count > 0, NULL);
+  xreturn_val_if_fail (list != NULL, NULL);
+  xreturn_val_if_fail (priv->ref_count > 0, NULL);
 
   g_atomic_int_inc (&priv->ref_count);
 
@@ -930,8 +930,8 @@ xfile_attribute_info_list_lookup (xfile_attribute_info_list_t *list,
 {
   int i;
 
-  g_return_val_if_fail (list != NULL, NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (list != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   i = xfile_attribute_info_list_bsearch (list, name);
 

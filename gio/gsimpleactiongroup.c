@@ -251,7 +251,7 @@ g_simple_action_group_finalize (xobject_t *object)
                         simple);
   xhash_table_unref (simple->priv->table);
 
-  G_OBJECT_CLASS (g_simple_action_group_parent_class)
+  XOBJECT_CLASS (g_simple_action_group_parent_class)
     ->finalize (object);
 }
 
@@ -266,7 +266,7 @@ g_simple_action_group_init (xsimple_action_group_t *simple)
 static void
 g_simple_action_group_class_init (GSimpleActionGroupClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = g_simple_action_group_finalize;
 }
@@ -322,7 +322,7 @@ xaction_t *
 g_simple_action_group_lookup (xsimple_action_group_t *simple,
                               const xchar_t        *action_name)
 {
-  g_return_val_if_fail (X_IS_SIMPLE_ACTION_GROUP (simple), NULL);
+  xreturn_val_if_fail (X_IS_SIMPLE_ACTION_GROUP (simple), NULL);
 
   return xaction_map_lookup_action (G_ACTION_MAP (simple), action_name);
 }

@@ -45,7 +45,7 @@ start (xmarkup_parse_context_t  *context,
                         OPTBOOL, "ob", &ob,
                         TRI,     "tri", &tri);
 
-      g_assert (result ||
+      xassert (result ||
                 (mb == FALSE && ob == FALSE && tri != TRUE && tri != FALSE));
 
       if (tri != FALSE && tri != TRUE)
@@ -65,7 +65,7 @@ start (xmarkup_parse_context_t  *context,
                         OPTDUP, "ao", &ao,
                         OPTSTR, "co", &co);
 
-      g_assert (result ||
+      xassert (result ||
                 (cm == NULL && am == NULL && ao == NULL && co == NULL));
 
       xstring_append_printf (string, "<str(%d) %s %s %s %s>",

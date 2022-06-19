@@ -794,7 +794,7 @@ g_scanner_lookup_symbol (xscanner_t	*scanner,
   GScannerKey	*key;
   xuint_t scope_id;
 
-  g_return_val_if_fail (scanner != NULL, NULL);
+  xreturn_val_if_fail (scanner != NULL, NULL);
 
   if (!symbol)
     return NULL;
@@ -830,7 +830,7 @@ g_scanner_scope_lookup_symbol (xscanner_t	      *scanner,
 {
   GScannerKey	*key;
 
-  g_return_val_if_fail (scanner != NULL, NULL);
+  xreturn_val_if_fail (scanner != NULL, NULL);
 
   if (!symbol)
     return NULL;
@@ -858,7 +858,7 @@ g_scanner_set_scope (xscanner_t	    *scanner,
 {
   xuint_t old_scope_id;
 
-  g_return_val_if_fail (scanner != NULL, 0);
+  xreturn_val_if_fail (scanner != NULL, 0);
 
   old_scope_id = scanner->scope_id;
   scanner->scope_id = scope_id;
@@ -948,7 +948,7 @@ g_scanner_scope_foreach_symbol (xscanner_t       *scanner,
 GTokenType
 g_scanner_peek_next_token (xscanner_t	*scanner)
 {
-  g_return_val_if_fail (scanner != NULL, G_TOKEN_EOF);
+  xreturn_val_if_fail (scanner != NULL, G_TOKEN_EOF);
 
   if (scanner->next_token == G_TOKEN_NONE)
     {
@@ -978,7 +978,7 @@ g_scanner_peek_next_token (xscanner_t	*scanner)
 GTokenType
 g_scanner_get_next_token (xscanner_t	*scanner)
 {
-  g_return_val_if_fail (scanner != NULL, G_TOKEN_EOF);
+  xreturn_val_if_fail (scanner != NULL, G_TOKEN_EOF);
 
   if (scanner->next_token != G_TOKEN_NONE)
     {
@@ -1012,7 +1012,7 @@ g_scanner_get_next_token (xscanner_t	*scanner)
 GTokenType
 g_scanner_cur_token (xscanner_t *scanner)
 {
-  g_return_val_if_fail (scanner != NULL, G_TOKEN_EOF);
+  xreturn_val_if_fail (scanner != NULL, G_TOKEN_EOF);
 
   return scanner->token;
 }
@@ -1033,7 +1033,7 @@ g_scanner_cur_value (xscanner_t *scanner)
 
   v.v_int64 = 0;
 
-  g_return_val_if_fail (scanner != NULL, v);
+  xreturn_val_if_fail (scanner != NULL, v);
 
   /* MSC isn't capable of handling return scanner->value; ? */
 
@@ -1055,7 +1055,7 @@ g_scanner_cur_value (xscanner_t *scanner)
 xuint_t
 g_scanner_cur_line (xscanner_t *scanner)
 {
-  g_return_val_if_fail (scanner != NULL, 0);
+  xreturn_val_if_fail (scanner != NULL, 0);
 
   return scanner->line;
 }
@@ -1073,7 +1073,7 @@ g_scanner_cur_line (xscanner_t *scanner)
 xuint_t
 g_scanner_cur_position (xscanner_t *scanner)
 {
-  g_return_val_if_fail (scanner != NULL, 0);
+  xreturn_val_if_fail (scanner != NULL, 0);
 
   return scanner->position;
 }
@@ -1091,7 +1091,7 @@ g_scanner_cur_position (xscanner_t *scanner)
 xboolean_t
 g_scanner_eof (xscanner_t	*scanner)
 {
-  g_return_val_if_fail (scanner != NULL, TRUE);
+  xreturn_val_if_fail (scanner != NULL, TRUE);
 
   return scanner->token == G_TOKEN_EOF || scanner->token == G_TOKEN_ERROR;
 }
@@ -2186,7 +2186,7 @@ g_scanner_get_token_ll	(xscanner_t	*scanner,
 	} /* default_case:... */
 	break;
 	}
-      g_assert (ch == 0 && token != G_TOKEN_NONE); /* paranoid */
+      xassert (ch == 0 && token != G_TOKEN_NONE); /* paranoid */
     }
   while (ch != 0);
 

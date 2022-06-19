@@ -40,7 +40,7 @@ create_streams (SetupData *data)
 {
   xconverter_t *converter;
 
-  converter = G_CONVERTER (g_zlib_compressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP, -1));
+  converter = XCONVERTER (g_zlib_compressor_new (G_ZLIB_COMPRESSOR_FORMAT_GZIP, -1));
 
   data->data_stream = g_memory_output_stream_new (NULL, 0, g_realloc, g_free);
   data->conv_stream = xconverter_output_stream_new (data->data_stream,

@@ -48,7 +48,7 @@
  * a main loop must be running.
  **/
 
-G_DEFINE_TYPE (xvolume_monitor, g_volume_monitor, XTYPE_OBJECT)
+XDEFINE_TYPE (xvolume_monitor, g_volume_monitor, XTYPE_OBJECT)
 
 enum {
   VOLUME_ADDED,
@@ -72,15 +72,15 @@ static xuint_t signals[LAST_SIGNAL] = { 0 };
 static void
 g_volume_monitor_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (g_volume_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_volume_monitor_parent_class)->finalize (object);
 }
 
 static void
 g_volume_monitor_class_init (GVolumeMonitorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_volume_monitor_finalize;
+  xobject_class->finalize = g_volume_monitor_finalize;
 
   /**
    * xvolume_monitor_t::volume-added:
@@ -293,7 +293,7 @@ g_volume_monitor_get_connected_drives (xvolume_monitor_t *volume_monitor)
 {
   GVolumeMonitorClass *class;
 
-  g_return_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
 
   class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
 
@@ -316,7 +316,7 @@ g_volume_monitor_get_volumes (xvolume_monitor_t *volume_monitor)
 {
   GVolumeMonitorClass *class;
 
-  g_return_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
 
   class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
 
@@ -339,7 +339,7 @@ g_volume_monitor_get_mounts (xvolume_monitor_t *volume_monitor)
 {
   GVolumeMonitorClass *class;
 
-  g_return_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
+  xreturn_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
 
   class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
 
@@ -362,8 +362,8 @@ g_volume_monitor_get_volume_for_uuid (xvolume_monitor_t *volume_monitor,
 {
   GVolumeMonitorClass *class;
 
-  g_return_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
-  g_return_val_if_fail (uuid != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
+  xreturn_val_if_fail (uuid != NULL, NULL);
 
   class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
 
@@ -386,8 +386,8 @@ g_volume_monitor_get_mount_for_uuid (xvolume_monitor_t *volume_monitor,
 {
   GVolumeMonitorClass *class;
 
-  g_return_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
-  g_return_val_if_fail (uuid != NULL, NULL);
+  xreturn_val_if_fail (X_IS_VOLUME_MONITOR (volume_monitor), NULL);
+  xreturn_val_if_fail (uuid != NULL, NULL);
 
   class = G_VOLUME_MONITOR_GET_CLASS (volume_monitor);
 

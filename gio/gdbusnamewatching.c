@@ -94,7 +94,7 @@ static xboolean_t
 free_user_data_cb (xpointer_t user_data)
 {
   /* The user data is actually freed by the xdestroy_notify_t for the idle source */
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -286,8 +286,8 @@ dup_client (xuint_t watcher_id)
 
   G_LOCK (lock);
 
-  g_assert (watcher_id != 0);
-  g_assert (map_id_to_client != NULL);
+  xassert (watcher_id != 0);
+  xassert (map_id_to_client != NULL);
 
   client = xhash_table_lookup (map_id_to_client, GUINT_TO_POINTER (watcher_id));
 
@@ -625,7 +625,7 @@ g_bus_watch_name (xbus_type_t                  bus_type,
 {
   Client *client;
 
-  g_return_val_if_fail (g_dbus_is_name (name), 0);
+  xreturn_val_if_fail (g_dbus_is_name (name), 0);
 
   G_LOCK (lock);
 
@@ -686,8 +686,8 @@ xuint_t g_bus_watch_name_on_connection (xdbus_connection_t          *connection,
 {
   Client *client;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  g_return_val_if_fail (g_dbus_is_name (name), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (g_dbus_is_name (name), 0);
 
   G_LOCK (lock);
 

@@ -155,9 +155,9 @@ check_utf8_to_ucs4 (const char     *utf8,
       result = xutf8_to_ucs4_fast (utf8, utf8_len, &items_written);
 
       g_assert_cmpint (items_written, ==, ucs4_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= items_written; i++)
-	g_assert (result[i] == ucs4[i]);
+	xassert (result[i] == ucs4[i]);
 
       g_free (result);
     }
@@ -170,13 +170,13 @@ check_utf8_to_ucs4 (const char     *utf8,
       /* check that len == -1 yields identical results */
       error2 = NULL;
       result2 = xutf8_to_ucs4 (utf8, -1, &items_read2, &items_written2, &error2);
-      g_assert (error || items_read2 == items_read);
-      g_assert (error || items_written2 == items_written);
+      xassert (error || items_read2 == items_read);
+      xassert (error || items_written2 == items_written);
       g_assert_cmpint (!!result, ==, !!result2);
       g_assert_cmpint (!!error, ==, !!error2);
       if (result)
 	for (i = 0; i <= items_written; i++)
-	  g_assert (result[i] == result2[i]);
+	  xassert (result[i] == result2[i]);
 
       g_free (result2);
       if (error2)
@@ -191,20 +191,20 @@ check_utf8_to_ucs4 (const char     *utf8,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, error_pos);
       g_assert_cmpint (items_written, ==, ucs4_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= items_written; i++)
-	g_assert (result[i] == ucs4[i]);
+	xassert (result[i] == ucs4[i]);
       xerror_free (error3);
     }
   else if (error_pos)
     {
-      g_assert (error != NULL);
-      g_assert (result == NULL);
+      xassert (error != NULL);
+      xassert (result == NULL);
       g_assert_cmpint (items_read, ==, error_pos);
       xerror_free (error);
 
-      g_assert (error3 != NULL);
-      g_assert (result3 == NULL);
+      xassert (error3 != NULL);
+      xassert (result3 == NULL);
       xerror_free (error3);
     }
   else
@@ -212,14 +212,14 @@ check_utf8_to_ucs4 (const char     *utf8,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, utf8_len);
       g_assert_cmpint (items_written, ==, ucs4_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= items_written; i++)
-	g_assert (result[i] == ucs4[i]);
+	xassert (result[i] == ucs4[i]);
 
       g_assert_no_error (error3);
-      g_assert (result3);
+      xassert (result3);
       for (i = 0; i <= ucs4_len; i++)
-	g_assert (result3[i] == ucs4[i]);
+	xassert (result3[i] == ucs4[i]);
     }
 
   g_free (result);
@@ -247,8 +247,8 @@ check_ucs4_to_utf8 (const xunichar_t *ucs4,
       error2 = NULL;
       result2 = g_ucs4_to_utf8 (ucs4, -1, &items_read2, &items_written2, &error2);
 
-      g_assert (error || items_read2 == items_read);
-      g_assert (error || items_written2 == items_written);
+      xassert (error || items_read2 == items_read);
+      xassert (error || items_written2 == items_written);
       g_assert_cmpint (!!result, ==, !!result2);
       g_assert_cmpint (!!error, ==, !!error2);
       if (result)
@@ -264,13 +264,13 @@ check_ucs4_to_utf8 (const xunichar_t *ucs4,
 
   if (error_pos)
     {
-      g_assert (error != NULL);
-      g_assert (result == NULL);
+      xassert (error != NULL);
+      xassert (result == NULL);
       g_assert_cmpint (items_read, ==, error_pos);
       xerror_free (error);
 
-      g_assert (error3 != NULL);
-      g_assert (result3 == NULL);
+      xassert (error3 != NULL);
+      xassert (result3 == NULL);
       xerror_free (error3);
     }
   else
@@ -278,11 +278,11 @@ check_ucs4_to_utf8 (const xunichar_t *ucs4,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, ucs4_len);
       g_assert_cmpint (items_written, ==, utf8_len);
-      g_assert (result);
+      xassert (result);
       g_assert_cmpstr (result, ==, utf8);
 
       g_assert_no_error (error3);
-      g_assert (result3);
+      xassert (result3);
       g_assert_cmpstr (result3, ==, utf8);
     }
 
@@ -311,13 +311,13 @@ check_utf8_to_utf16 (const char      *utf8,
       /* check that len == -1 yields identical results */
       error2 = NULL;
       result2 = xutf8_to_utf16 (utf8, -1, &items_read2, &items_written2, &error2);
-      g_assert (error || items_read2 == items_read);
-      g_assert (error || items_written2 == items_written);
+      xassert (error || items_read2 == items_read);
+      xassert (error || items_written2 == items_written);
       g_assert_cmpint (!!result, ==, !!result2);
       g_assert_cmpint (!!error, ==, !!error2);
       if (result)
 	for (i = 0; i <= items_written; i++)
-	  g_assert (result[i] == result2[i]);
+	  xassert (result[i] == result2[i]);
 
       g_free (result2);
       if (error2)
@@ -332,20 +332,20 @@ check_utf8_to_utf16 (const char      *utf8,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, error_pos);
       g_assert_cmpint (items_written, ==, utf16_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= items_written; i++)
-	g_assert (result[i] == utf16[i]);
+	xassert (result[i] == utf16[i]);
       xerror_free (error3);
     }
   else if (error_pos)
     {
-      g_assert (error != NULL);
-      g_assert (result == NULL);
+      xassert (error != NULL);
+      xassert (result == NULL);
       g_assert_cmpint (items_read, ==, error_pos);
       xerror_free (error);
 
-      g_assert (error3 != NULL);
-      g_assert (result3 == NULL);
+      xassert (error3 != NULL);
+      xassert (result3 == NULL);
       xerror_free (error3);
     }
   else
@@ -353,14 +353,14 @@ check_utf8_to_utf16 (const char      *utf8,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, utf8_len);
       g_assert_cmpint (items_written, ==, utf16_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= items_written; i++)
-	g_assert (result[i] == utf16[i]);
+	xassert (result[i] == utf16[i]);
 
       g_assert_no_error (error3);
-      g_assert (result3);
+      xassert (result3);
       for (i = 0; i <= utf16_len; i++)
-	g_assert (result3[i] == utf16[i]);
+	xassert (result3[i] == utf16[i]);
     }
 
   g_free (result);
@@ -387,8 +387,8 @@ check_utf16_to_utf8 (const xunichar2_t *utf16,
       error2 = NULL;
       result2 = xutf16_to_utf8 (utf16, -1, &items_read2, &items_written2, &error2);
 
-      g_assert (error || items_read2 == items_read);
-      g_assert (error || items_written2 == items_written);
+      xassert (error || items_read2 == items_read);
+      xassert (error || items_written2 == items_written);
       g_assert_cmpint (!!result, ==, !!result2);
       g_assert_cmpint (!!error, ==, !!error2);
       if (result)
@@ -408,19 +408,19 @@ check_utf16_to_utf8 (const xunichar2_t *utf16,
       g_assert_cmpint (items_read, ==, error_pos);
       g_assert_cmpint (items_read + 1, ==, utf16_len);
       g_assert_cmpint (items_written, ==, utf8_len);
-      g_assert (result);
+      xassert (result);
       g_assert_cmpstr (result, ==, utf8);
       xerror_free (error3);
     }
   else if (error_pos)
     {
-      g_assert (error != NULL);
-      g_assert (result == NULL);
+      xassert (error != NULL);
+      xassert (result == NULL);
       g_assert_cmpint (items_read, ==, error_pos);
       xerror_free (error);
 
-      g_assert (error3 != NULL);
-      g_assert (result3 == NULL);
+      xassert (error3 != NULL);
+      xassert (result3 == NULL);
       xerror_free (error3);
     }
   else
@@ -428,11 +428,11 @@ check_utf16_to_utf8 (const xunichar2_t *utf16,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, utf16_len);
       g_assert_cmpint (items_written, ==, utf8_len);
-      g_assert (result);
+      xassert (result);
       g_assert_cmpstr (result, ==, utf8);
 
       g_assert_no_error (error3);
-      g_assert (result3);
+      xassert (result3);
       g_assert_cmpstr (result3, ==, utf8);
     }
 
@@ -462,13 +462,13 @@ check_ucs4_to_utf16 (const xunichar_t  *ucs4,
       error2 = NULL;
       result2 = g_ucs4_to_utf16 (ucs4, -1, &items_read2, &items_written2, &error2);
 
-      g_assert (error || items_read2 == items_read);
-      g_assert (error || items_written2 == items_written);
+      xassert (error || items_read2 == items_read);
+      xassert (error || items_written2 == items_written);
       g_assert_cmpint (!!result, ==, !!result2);
       g_assert_cmpint (!!error, ==, !!error2);
       if (result)
       for (i = 0; i <= utf16_len; i++)
-	g_assert (result[i] == result2[i]);
+	xassert (result[i] == result2[i]);
 
       g_free (result2);
       if (error2)
@@ -480,13 +480,13 @@ check_ucs4_to_utf16 (const xunichar_t  *ucs4,
 
   if (error_pos)
     {
-      g_assert (error != NULL);
-      g_assert (result == NULL);
+      xassert (error != NULL);
+      xassert (result == NULL);
       g_assert_cmpint (items_read, ==, error_pos);
       xerror_free (error);
 
-      g_assert (error3 != NULL);
-      g_assert (result3 == NULL);
+      xassert (error3 != NULL);
+      xassert (result3 == NULL);
       xerror_free (error3);
     }
   else
@@ -494,14 +494,14 @@ check_ucs4_to_utf16 (const xunichar_t  *ucs4,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, ucs4_len);
       g_assert_cmpint (items_written, ==, utf16_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= utf16_len; i++)
-	g_assert (result[i] == utf16[i]);
+	xassert (result[i] == utf16[i]);
 
       g_assert_no_error (error3);
-      g_assert (result3);
+      xassert (result3);
       for (i = 0; i <= utf16_len; i++)
-	g_assert (result3[i] == utf16[i]);
+	xassert (result3[i] == utf16[i]);
     }
 
   g_free (result);
@@ -528,13 +528,13 @@ check_utf16_to_ucs4 (const xunichar2_t *utf16,
       /* check that len == -1 yields identical results */
       error2 = NULL;
       result2 = xutf16_to_ucs4 (utf16, -1, &items_read2, &items_written2, &error2);
-      g_assert (error || items_read2 == items_read);
-      g_assert (error || items_written2 == items_written);
+      xassert (error || items_read2 == items_read);
+      xassert (error || items_written2 == items_written);
       g_assert_cmpint (!!result, ==, !!result2);
       g_assert_cmpint (!!error, ==, !!error2);
       if (result)
 	for (i = 0; i <= items_written; i++)
-	  g_assert (result[i] == result2[i]);
+	  xassert (result[i] == result2[i]);
 
       g_free (result2);
       if (error2)
@@ -550,20 +550,20 @@ check_utf16_to_ucs4 (const xunichar2_t *utf16,
       g_assert_cmpint (items_read, ==, error_pos);
       g_assert_cmpint (items_read + 1, ==, utf16_len);
       g_assert_cmpint (items_written, ==, ucs4_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= items_written; i++)
-	g_assert (result[i] == ucs4[i]);
+	xassert (result[i] == ucs4[i]);
       xerror_free (error3);
     }
   else if (error_pos)
     {
-      g_assert (error != NULL);
-      g_assert (result == NULL);
+      xassert (error != NULL);
+      xassert (result == NULL);
       g_assert_cmpint (items_read, ==, error_pos);
       xerror_free (error);
 
-      g_assert (error3 != NULL);
-      g_assert (result3 == NULL);
+      xassert (error3 != NULL);
+      xassert (result3 == NULL);
       xerror_free (error3);
     }
   else
@@ -571,14 +571,14 @@ check_utf16_to_ucs4 (const xunichar2_t *utf16,
       g_assert_no_error (error);
       g_assert_cmpint (items_read, ==, utf16_len);
       g_assert_cmpint (items_written, ==, ucs4_len);
-      g_assert (result);
+      xassert (result);
       for (i = 0; i <= ucs4_len; i++)
-	g_assert (result[i] == ucs4[i]);
+	xassert (result[i] == ucs4[i]);
 
       g_assert_no_error (error3);
-      g_assert (result3);
+      xassert (result3);
       for (i = 0; i <= ucs4_len; i++)
-	g_assert (result3[i] == ucs4[i]);
+	xassert (result3[i] == ucs4[i]);
     }
 
   g_free (result);
@@ -935,7 +935,7 @@ test_no_conv (void)
                    &bytes_read, &bytes_written, &error);
 
   /* error code is unreliable, since we mishandle errno there */
-  g_assert (error && error->domain == G_CONVERT_ERROR);
+  xassert (error && error->domain == G_CONVERT_ERROR);
   xerror_free (error);
 }
 

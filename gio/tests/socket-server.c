@@ -238,7 +238,7 @@ main (int argc,
     }
   else
     {
-      g_assert (use_udp);
+      xassert (use_udp);
       istream = NULL;
       ostream = NULL;
     }

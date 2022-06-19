@@ -78,23 +78,23 @@ xtest_get_type (void)
 static void
 xtest_class_init (xtest_class_t * klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = (xobject_class_t *) klass;
+  xobject_class = (xobject_class_t *) klass;
 
   parent_class = xtype_class_ref (XTYPE_OBJECT);
 
-  gobject_class->dispose = xtest_dispose;
-  gobject_class->get_property = xtest_get_property;
-  gobject_class->set_property = xtest_set_property;
+  xobject_class->dispose = xtest_dispose;
+  xobject_class->get_property = xtest_get_property;
+  xobject_class->set_property = xtest_set_property;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_DUMMY,
-				   g_param_spec_int ("dummy",
+				   xparam_spec_int ("dummy",
 						     NULL,
 						     NULL,
 						     0, G_MAXINT, 0,
-						     G_PARAM_READWRITE));
+						     XPARAM_READWRITE));
 }
 
 static void
@@ -107,7 +107,7 @@ xtest_init (xtest_t * test)
 static void
 xtest_dispose (xobject_t * object)
 {
-  G_OBJECT_CLASS (parent_class)->dispose (object);
+  XOBJECT_CLASS (parent_class)->dispose (object);
 }
 
 static void
@@ -206,7 +206,7 @@ main (int argc, char **argv)
     test = xobject_new (XTYPE_TEST, NULL);
     test_objects[i] = test;
 
-    g_assert (test->count == test->dummy);
+    xassert (test->count == test->dummy);
     xsignal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
   }
 
@@ -229,7 +229,7 @@ main (int argc, char **argv)
   for (i = 0; i < N_THREADS; i++) {
     xtest_t *test = test_objects[i];
 
-    g_assert (test->count == test->dummy);
+    xassert (test->count == test->dummy);
     xobject_unref (test);
   }
 

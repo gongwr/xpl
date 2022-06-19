@@ -465,7 +465,7 @@ g_test_dbus_dispose (xobject_t *object)
   if (self->priv->up)
     g_test_dbus_down (self);
 
-  G_OBJECT_CLASS (g_test_dbus_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_test_dbus_parent_class)->dispose (object);
 }
 
 static void
@@ -476,7 +476,7 @@ g_test_dbus_finalize (xobject_t *object)
   xptr_array_unref (self->priv->service_dirs);
   g_free (self->priv->bus_address);
 
-  G_OBJECT_CLASS (g_test_dbus_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_test_dbus_parent_class)->finalize (object);
 }
 
 static void
@@ -520,7 +520,7 @@ g_test_dbus_set_property (xobject_t *object,
 static void
 g_test_dbus_class_init (GTestDBusClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->dispose = g_test_dbus_dispose;
   object_class->finalize = g_test_dbus_finalize;
@@ -535,12 +535,12 @@ g_test_dbus_class_init (GTestDBusClass *klass)
    * Since: 2.34
    */
   xobject_class_install_property (object_class, PROP_FLAGS,
-    g_param_spec_flags ("flags",
+    xparam_spec_flags ("flags",
                         P_("D-Bus session flags"),
                         P_("Flags specifying the behaviour of the D-Bus session"),
                         XTYPE_TEST_DBUS_FLAGS, G_TEST_DBUS_NONE,
-                        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                        G_PARAM_STATIC_STRINGS));
+                        XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                        XPARAM_STATIC_STRINGS));
 
 }
 
@@ -750,7 +750,7 @@ g_test_dbus_new (GTestDBusFlags flags)
 GTestDBusFlags
 g_test_dbus_get_flags (xtest_dbus_t *self)
 {
-  g_return_val_if_fail (X_IS_TEST_DBUS (self), G_TEST_DBUS_NONE);
+  xreturn_val_if_fail (X_IS_TEST_DBUS (self), G_TEST_DBUS_NONE);
 
   return self->priv->flags;
 }
@@ -768,7 +768,7 @@ g_test_dbus_get_flags (xtest_dbus_t *self)
 const xchar_t *
 g_test_dbus_get_bus_address (xtest_dbus_t *self)
 {
-  g_return_val_if_fail (X_IS_TEST_DBUS (self), NULL);
+  xreturn_val_if_fail (X_IS_TEST_DBUS (self), NULL);
 
   return self->priv->bus_address;
 }

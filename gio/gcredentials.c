@@ -128,7 +128,7 @@ struct _xcredentials_class
   xobject_class_t parent_class;
 };
 
-G_DEFINE_TYPE (xcredentials, xcredentials, XTYPE_OBJECT)
+XDEFINE_TYPE (xcredentials, xcredentials, XTYPE_OBJECT)
 
 static void
 xcredentials_finalize (xobject_t *object)
@@ -139,18 +139,18 @@ xcredentials_finalize (xobject_t *object)
   ucred_free (credentials->native);
 #endif
 
-  if (G_OBJECT_CLASS (xcredentials_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (xcredentials_parent_class)->finalize (object);
+  if (XOBJECT_CLASS (xcredentials_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (xcredentials_parent_class)->finalize (object);
 }
 
 
 static void
 xcredentials_class_init (xcredentials_class_t *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = xcredentials_finalize;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize = xcredentials_finalize;
 }
 
 static void
@@ -238,7 +238,7 @@ xcredentials_to_string (xcredentials_t *credentials)
   glib_typeof (credentials->native.cr_ngroups) i;
 #endif
 
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
 
   ret = xstring_new ("xcredentials_t:");
 #if G_CREDENTIALS_USE_LINUX_UCRED
@@ -363,9 +363,9 @@ xcredentials_is_same_user (xcredentials_t  *credentials,
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), FALSE);
-  g_return_val_if_fail (X_IS_CREDENTIALS (other_credentials), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), FALSE);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (other_credentials), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
 #if G_CREDENTIALS_USE_LINUX_UCRED
@@ -418,7 +418,7 @@ credentials_native_type_check (GCredentialsType  requested_type,
 
 #if G_CREDENTIALS_SUPPORTED
   supported = xenum_get_value (enum_class, G_CREDENTIALS_NATIVE_TYPE);
-  g_assert (supported);
+  xassert (supported);
   g_warning ("xcredentials_%s_native: Trying to %s credentials of type %s "
              "but only %s is supported on this platform.",
              op, op,
@@ -458,7 +458,7 @@ xpointer_t
 xcredentials_get_native (xcredentials_t     *credentials,
                           GCredentialsType  native_type)
 {
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), NULL);
 
   if (!credentials_native_type_check (native_type, "get"))
     return NULL;
@@ -529,8 +529,8 @@ xcredentials_get_unix_user (xcredentials_t    *credentials,
 {
   uid_t ret;
 
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   if (linux_ucred_check_valid (&credentials->native, error))
@@ -593,8 +593,8 @@ xcredentials_get_unix_pid (xcredentials_t    *credentials,
 {
   pid_t ret;
 
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   if (linux_ucred_check_valid (&credentials->native, error))
@@ -654,9 +654,9 @@ xcredentials_set_unix_user (xcredentials_t    *credentials,
 {
   xboolean_t ret = FALSE;
 
-  g_return_val_if_fail (X_IS_CREDENTIALS (credentials), FALSE);
-  g_return_val_if_fail (uid != (uid_t) -1, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_CREDENTIALS (credentials), FALSE);
+  xreturn_val_if_fail (uid != (uid_t) -1, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 #if G_CREDENTIALS_USE_LINUX_UCRED
   credentials->native.uid = uid;

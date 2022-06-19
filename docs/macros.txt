@@ -23,7 +23,7 @@ Notes on GLib's internal and global macros
 ==========================================
 
 G_DISABLE_ASSERT
-	The g_assert() and g_assert_not_reached() become non-functional
+	The xassert() and g_assert_not_reached() become non-functional
 	with this define. The motivation is to speed up end-user apps by
 	avoiding expensive checks.
 	This macro can affect third-party code. Defining it when building GLib
@@ -37,8 +37,8 @@ G_DISABLE_CHECKS
 	This macro is similar to G_DISABLE_ASSERT, it affects third-party
 	code as mentioned above and the NOTE about G_DISABLE_ASSERT applies
 	too. The macros that become non-functional here are
-	g_return_if_fail(), g_return_val_if_fail(), g_return_if_reached() and
-	g_return_val_if_reached().
+	g_return_if_fail(), xreturn_val_if_fail(), g_return_if_reached() and
+	xreturn_val_if_reached().
 	Additionally the glib_mem_profiler_table and g_mem_profile() from
 	gmem.h become non-functional if this macro is supplied.
 	This macro also switches off certain checks in the GSignal code.

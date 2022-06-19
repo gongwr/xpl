@@ -111,7 +111,7 @@ xsocket_input_stream_finalize (xobject_t *object)
   if (stream->priv->socket)
     xobject_unref (stream->priv->socket);
 
-  G_OBJECT_CLASS (xsocket_input_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsocket_input_stream_parent_class)->finalize (object);
 }
 
 static xssize_t
@@ -179,21 +179,21 @@ xsocket_input_stream_get_fd (xfile_descriptor_based_t *fd_based)
 static void
 xsocket_input_stream_class_init (GSocketInputStreamClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xinput_stream_class_t *ginputstream_class = G_INPUT_STREAM_CLASS (klass);
 
-  gobject_class->finalize = xsocket_input_stream_finalize;
-  gobject_class->get_property = xsocket_input_stream_get_property;
-  gobject_class->set_property = xsocket_input_stream_set_property;
+  xobject_class->finalize = xsocket_input_stream_finalize;
+  xobject_class->get_property = xsocket_input_stream_get_property;
+  xobject_class->set_property = xsocket_input_stream_set_property;
 
   ginputstream_class->read_fn = xsocket_input_stream_read;
 
-  xobject_class_install_property (gobject_class, PROP_SOCKET,
-				   g_param_spec_object ("socket",
+  xobject_class_install_property (xobject_class, PROP_SOCKET,
+				   xparam_spec_object ("socket",
 							P_("socket"),
 							P_("The socket that this stream wraps"),
-							XTYPE_SOCKET, G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+							XTYPE_SOCKET, XPARAM_CONSTRUCT_ONLY |
+							XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 }
 
 #ifdef G_OS_UNIX

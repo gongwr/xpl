@@ -207,7 +207,7 @@ variant_type_string_scan_internal (const xchar_t  *string,
 {
   xsize_t max_depth = 0, child_depth;
 
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   if (string == limit || *string == '\0')
     return FALSE;
@@ -320,7 +320,7 @@ xvariant_type_string_get_depth_ (const xchar_t *type_string)
   const xchar_t *endptr;
   xsize_t depth = 0;
 
-  g_return_val_if_fail (type_string != NULL, 0);
+  xreturn_val_if_fail (type_string != NULL, 0);
 
   if (!variant_type_string_scan_internal (type_string, NULL, &endptr, &depth,
                                           G_VARIANT_MAX_RECURSION_DEPTH) ||
@@ -347,7 +347,7 @@ xvariant_type_string_is_valid (const xchar_t *type_string)
 {
   const xchar_t *endptr;
 
-  g_return_val_if_fail (type_string != NULL, FALSE);
+  xreturn_val_if_fail (type_string != NULL, FALSE);
 
   if (!xvariant_type_string_scan (type_string, NULL, &endptr))
     return FALSE;
@@ -392,7 +392,7 @@ xvariant_type_copy (const xvariant_type_t *type)
   xsize_t length;
   xchar_t *new;
 
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   length = xvariant_type_get_string_length (type);
   new = g_malloc (length + 1);
@@ -421,7 +421,7 @@ xvariant_type_copy (const xvariant_type_t *type)
 xvariant_type_t *
 xvariant_type_new (const xchar_t *type_string)
 {
-  g_return_val_if_fail (type_string != NULL, NULL);
+  xreturn_val_if_fail (type_string != NULL, NULL);
 
   return xvariant_type_copy (G_VARIANT_TYPE (type_string));
 }
@@ -445,7 +445,7 @@ xvariant_type_get_string_length (const xvariant_type_t *type)
   xint_t brackets = 0;
   xsize_t index = 0;
 
-  g_return_val_if_fail (xvariant_type_check (type), 0);
+  xreturn_val_if_fail (xvariant_type_check (type), 0);
 
   do
     {
@@ -486,7 +486,7 @@ xvariant_type_get_string_length (const xvariant_type_t *type)
 const xchar_t *
 xvariant_type_peek_string (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   return (const xchar_t *) type;
 }
@@ -506,7 +506,7 @@ xvariant_type_peek_string (const xvariant_type_t *type)
 xchar_t *
 xvariant_type_dup_string (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   return xstrndup (xvariant_type_peek_string (type),
                     xvariant_type_get_string_length (type));
@@ -538,7 +538,7 @@ xvariant_type_is_definite (const xvariant_type_t *type)
   xsize_t type_length;
   xsize_t i;
 
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   type_length = xvariant_type_get_string_length (type);
   type_string = xvariant_type_peek_string (type);
@@ -574,7 +574,7 @@ xvariant_type_is_container (const xvariant_type_t *type)
 {
   xchar_t first_char;
 
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   first_char = xvariant_type_peek_string (type)[0];
   switch (first_char)
@@ -615,7 +615,7 @@ xvariant_type_is_basic (const xvariant_type_t *type)
 {
   xchar_t first_char;
 
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   first_char = xvariant_type_peek_string (type)[0];
   switch (first_char)
@@ -659,7 +659,7 @@ xvariant_type_is_basic (const xvariant_type_t *type)
 xboolean_t
 xvariant_type_is_maybe (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   return xvariant_type_peek_string (type)[0] == 'm';
 }
@@ -682,7 +682,7 @@ xvariant_type_is_maybe (const xvariant_type_t *type)
 xboolean_t
 xvariant_type_is_array (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   return xvariant_type_peek_string (type)[0] == 'a';
 }
@@ -708,7 +708,7 @@ xvariant_type_is_tuple (const xvariant_type_t *type)
 {
   xchar_t type_char;
 
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   type_char = xvariant_type_peek_string (type)[0];
   return type_char == 'r' || type_char == '(';
@@ -732,7 +732,7 @@ xvariant_type_is_tuple (const xvariant_type_t *type)
 xboolean_t
 xvariant_type_is_dict_entry (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   return xvariant_type_peek_string (type)[0] == '{';
 }
@@ -750,7 +750,7 @@ xvariant_type_is_dict_entry (const xvariant_type_t *type)
 xboolean_t
 xvariant_type_is_variant (const xvariant_type_t *type)
 {
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
 
   return xvariant_type_peek_string (type)[0] == 'v';
 }
@@ -777,7 +777,7 @@ xvariant_type_hash (xconstpointer type)
   xsize_t length;
   xsize_t i;
 
-  g_return_val_if_fail (xvariant_type_check (type), 0);
+  xreturn_val_if_fail (xvariant_type_check (type), 0);
 
   type_string = xvariant_type_peek_string (type);
   length = xvariant_type_get_string_length (type);
@@ -815,8 +815,8 @@ xvariant_type_equal (xconstpointer type1,
   const xchar_t *string1, *string2;
   xsize_t size1, size2;
 
-  g_return_val_if_fail (xvariant_type_check (type1), FALSE);
-  g_return_val_if_fail (xvariant_type_check (type2), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type1), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type2), FALSE);
 
   if (type1 == type2)
     return TRUE;
@@ -856,8 +856,8 @@ xvariant_type_is_subtype_of (const xvariant_type_t *type,
   const xchar_t *supertype_end;
   const xchar_t *type_string;
 
-  g_return_val_if_fail (xvariant_type_check (type), FALSE);
-  g_return_val_if_fail (xvariant_type_check (supertype), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (type), FALSE);
+  xreturn_val_if_fail (xvariant_type_check (supertype), FALSE);
 
   supertype_string = xvariant_type_peek_string (supertype);
   type_string = xvariant_type_peek_string (type);
@@ -925,11 +925,11 @@ xvariant_type_element (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   type_string = xvariant_type_peek_string (type);
 
-  g_assert (type_string[0] == 'a' || type_string[0] == 'm');
+  xassert (type_string[0] == 'a' || type_string[0] == 'm');
 
   return (const xvariant_type_t *) &type_string[1];
 }
@@ -962,10 +962,10 @@ xvariant_type_first (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   type_string = xvariant_type_peek_string (type);
-  g_assert (type_string[0] == '(' || type_string[0] == '{');
+  xassert (type_string[0] == '(' || type_string[0] == '{');
 
   if (type_string[1] == ')')
     return NULL;
@@ -998,7 +998,7 @@ xvariant_type_next (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   type_string = xvariant_type_peek_string (type);
   type_string += xvariant_type_get_string_length (type);
@@ -1032,7 +1032,7 @@ xvariant_type_n_items (const xvariant_type_t *type)
 {
   xsize_t count = 0;
 
-  g_return_val_if_fail (xvariant_type_check (type), 0);
+  xreturn_val_if_fail (xvariant_type_check (type), 0);
 
   for (type = xvariant_type_first (type);
        type;
@@ -1061,10 +1061,10 @@ xvariant_type_key (const xvariant_type_t *type)
 {
   const xchar_t *type_string;
 
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
   type_string = xvariant_type_peek_string (type);
-  g_assert (type_string[0] == '{');
+  xassert (type_string[0] == '{');
 
   return (const xvariant_type_t *) &type_string[1];
 }
@@ -1088,11 +1088,11 @@ xvariant_type_value (const xvariant_type_t *type)
   const xchar_t *type_string;
 #endif
 
-  g_return_val_if_fail (xvariant_type_check (type), NULL);
+  xreturn_val_if_fail (xvariant_type_check (type), NULL);
 
 #ifndef G_DISABLE_ASSERT
   type_string = xvariant_type_peek_string (type);
-  g_assert (type_string[0] == '{');
+  xassert (type_string[0] == '{');
 #endif
 
   return xvariant_type_next (xvariant_type_key (type));
@@ -1131,7 +1131,7 @@ xvariant_type_new_tuple_slow (const xvariant_type_t * const *items,
       const xvariant_type_t *type;
       xsize_t size;
 
-      g_return_val_if_fail (xvariant_type_check (items[i]), NULL);
+      xreturn_val_if_fail (xvariant_type_check (items[i]), NULL);
 
       type = items[i];
       size = xvariant_type_get_string_length (type);
@@ -1151,7 +1151,7 @@ xvariant_type_new_tuple (const xvariant_type_t * const *items,
   xsize_t i;
   xsize_t length_unsigned;
 
-  g_return_val_if_fail (length == 0 || items != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || items != NULL, NULL);
 
   if (length < 0)
     for (length_unsigned = 0; items[length_unsigned] != NULL; length_unsigned++);
@@ -1166,7 +1166,7 @@ xvariant_type_new_tuple (const xvariant_type_t * const *items,
       const xvariant_type_t *type;
       xsize_t size;
 
-      g_return_val_if_fail (xvariant_type_check (items[i]), NULL);
+      xreturn_val_if_fail (xvariant_type_check (items[i]), NULL);
 
       type = items[i];
       size = xvariant_type_get_string_length (type);
@@ -1178,7 +1178,7 @@ xvariant_type_new_tuple (const xvariant_type_t * const *items,
       offset += size;
     }
 
-  g_assert (offset < sizeof buffer);
+  xassert (offset < sizeof buffer);
   buffer[offset++] = ')';
 
   return (xvariant_type_t *) g_memdup2 (buffer, offset);
@@ -1203,7 +1203,7 @@ xvariant_type_new_array (const xvariant_type_t *element)
   xsize_t size;
   xchar_t *new;
 
-  g_return_val_if_fail (xvariant_type_check (element), NULL);
+  xreturn_val_if_fail (xvariant_type_check (element), NULL);
 
   size = xvariant_type_get_string_length (element);
   new = g_malloc (size + 1);
@@ -1233,7 +1233,7 @@ xvariant_type_new_maybe (const xvariant_type_t *element)
   xsize_t size;
   xchar_t *new;
 
-  g_return_val_if_fail (xvariant_type_check (element), NULL);
+  xreturn_val_if_fail (xvariant_type_check (element), NULL);
 
   size = xvariant_type_get_string_length (element);
   new = g_malloc (size + 1);
@@ -1265,8 +1265,8 @@ xvariant_type_new_dict_entry (const xvariant_type_t *key,
   xsize_t keysize, valsize;
   xchar_t *new;
 
-  g_return_val_if_fail (xvariant_type_check (key), NULL);
-  g_return_val_if_fail (xvariant_type_check (value), NULL);
+  xreturn_val_if_fail (xvariant_type_check (key), NULL);
+  xreturn_val_if_fail (xvariant_type_check (value), NULL);
 
   keysize = xvariant_type_get_string_length (key);
   valsize = xvariant_type_get_string_length (value);
@@ -1285,6 +1285,6 @@ xvariant_type_new_dict_entry (const xvariant_type_t *key,
 const xvariant_type_t *
 xvariant_type_checked_ (const xchar_t *type_string)
 {
-  g_return_val_if_fail (xvariant_type_string_is_valid (type_string), NULL);
+  xreturn_val_if_fail (xvariant_type_string_is_valid (type_string), NULL);
   return (const xvariant_type_t *) type_string;
 }

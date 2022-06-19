@@ -286,7 +286,7 @@ g_find_program_in_path (const xchar_t *program)
   xsize_t len;
   xsize_t pathlen;
 
-  g_return_val_if_fail (program != NULL, NULL);
+  xreturn_val_if_fail (program != NULL, NULL);
 
   /* If it is an absolute path, or a relative path including subdirectories,
    * don't look in PATH.
@@ -1575,7 +1575,7 @@ g_get_os_info (const xchar_t *key_name)
   xchar_t *buffer = NULL;
   xchar_t *result = NULL;
 
-  g_return_val_if_fail (key_name != NULL, NULL);
+  xreturn_val_if_fail (key_name != NULL, NULL);
 
   for (i = 0; i < G_N_ELEMENTS (os_release_files); i++)
     {
@@ -1723,7 +1723,7 @@ g_set_user_dirs (const xchar_t *first_dir_type,
   for (dir_type = first_dir_type; dir_type != NULL; dir_type = va_arg (args, const xchar_t *))
     {
       xconstpointer dir_value = va_arg (args, xconstpointer);
-      g_assert (dir_value != NULL);
+      xassert (dir_value != NULL);
 
       if (xstr_equal (dir_type, "HOME"))
         set_str_if_different (&g_home_dir, dir_type, dir_value);
@@ -2356,7 +2356,7 @@ g_get_user_special_dir (GUserDirectory directory)
 {
   const xchar_t *user_special_dir;
 
-  g_return_val_if_fail (directory >= G_USER_DIRECTORY_DESKTOP &&
+  xreturn_val_if_fail (directory >= G_USER_DIRECTORY_DESKTOP &&
                         directory < G_USER_N_DIRECTORIES, NULL);
 
   G_LOCK (g_utils_global);

@@ -97,7 +97,7 @@ xproxy_resolver_portal_lookup (xproxy_resolver_t *proxy_resolver,
   char **proxy = NULL;
 
   ensure_resolver_proxy (resolver);
-  g_assert (resolver->resolver);
+  xassert (resolver->resolver);
 
   if (!gxdp_proxy_resolver_call_lookup_sync (resolver->resolver,
                                              uri,
@@ -146,7 +146,7 @@ xproxy_resolver_portal_lookup_async (xproxy_resolver_t      *proxy_resolver,
   xtask_t *task;
 
   ensure_resolver_proxy (resolver);
-  g_assert (resolver->resolver);
+  xassert (resolver->resolver);
 
   task = xtask_new (proxy_resolver, cancellable, callback, user_data);
   gxdp_proxy_resolver_call_lookup (resolver->resolver,
@@ -186,7 +186,7 @@ xproxy_resolver_portal_finalize (xobject_t *object)
 
   g_clear_object (&resolver->resolver);
 
-  G_OBJECT_CLASS (xproxy_resolver_portal_parent_class)->finalize (object);
+  XOBJECT_CLASS (xproxy_resolver_portal_parent_class)->finalize (object);
 }
 
 static void
@@ -194,7 +194,7 @@ xproxy_resolver_portal_class_init (GProxyResolverPortalClass *resolver_class)
 {
   xobject_class_t *object_class;
 
-  object_class = G_OBJECT_CLASS (resolver_class);
+  object_class = XOBJECT_CLASS (resolver_class);
   object_class->finalize = xproxy_resolver_portal_finalize;
 }
 

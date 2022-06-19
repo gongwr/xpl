@@ -105,7 +105,7 @@ xtype_t test_threaded_socket_service_get_type (void);
 typedef xthreaded_socket_service_t TestThreadedSocketService;
 typedef GThreadedSocketServiceClass TestThreadedSocketServiceClass;
 
-G_DEFINE_TYPE (TestThreadedSocketService, test_threaded_socket_service, XTYPE_THREADED_SOCKET_SERVICE)
+XDEFINE_TYPE (TestThreadedSocketService, test_threaded_socket_service, XTYPE_THREADED_SOCKET_SERVICE)
 
 static void
 test_threaded_socket_service_init (TestThreadedSocketService *service)
@@ -115,7 +115,7 @@ test_threaded_socket_service_init (TestThreadedSocketService *service)
 static void
 test_threaded_socket_service_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (test_threaded_socket_service_parent_class)->finalize (object);
+  XOBJECT_CLASS (test_threaded_socket_service_parent_class)->finalize (object);
 
   /* Signal the main thread that finalization completed successfully
    * rather than hanging.
@@ -128,7 +128,7 @@ test_threaded_socket_service_finalize (xobject_t *object)
 static void
 test_threaded_socket_service_class_init (TestThreadedSocketServiceClass *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->finalize = test_threaded_socket_service_finalize;
 }

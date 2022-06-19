@@ -34,14 +34,14 @@ g_wcsdup (const xunichar2_t *str, xssize_t str_len)
   xsize_t str_len_unsigned;
   xsize_t str_size;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   if (str_len < 0)
     str_len_unsigned = xutf16_len (str);
   else
     str_len_unsigned = (xsize_t) str_len;
 
-  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
+  xassert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
   str_size = (str_len_unsigned + 1) * sizeof (xunichar2_t);
 
   return g_memdup2 (str, str_size);
@@ -286,7 +286,7 @@ _g_win32_extract_executable (const xunichar2_t  *commandline,
 
   folded = xutf16_to_utf8_and_fold (executable, (xssize_t) execlen, &ex, &ex_folded);
   /* This should never fail as @executable has to be valid UTF-16. */
-  g_assert (folded);
+  xassert (folded);
 
   if (dll_function_out)
     *dll_function_out = NULL;
@@ -365,7 +365,7 @@ _g_win32_extract_executable (const xunichar2_t  *commandline,
                 first_argument += 1;
 
               folded = xutf16_to_utf8_and_fold (first_argument, filename_len, &dllpart_utf8, &dllpart_utf8_folded);
-              g_assert (folded);
+              xassert (folded);
 
               function_utf8 = xutf16_to_utf8 (function_begin, function_len, NULL, NULL, NULL);
 

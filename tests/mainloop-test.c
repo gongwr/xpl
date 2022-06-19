@@ -308,7 +308,7 @@ remove_crawler (void)
     {
       other_source = crawler_array->pdata[g_random_int_range (0, crawler_array->len)];
       xsource_destroy (other_source);
-      g_assert (xptr_array_remove_fast (crawler_array, other_source));
+      xassert (xptr_array_remove_fast (crawler_array, other_source));
     }
 }
 

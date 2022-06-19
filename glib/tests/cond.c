@@ -265,7 +265,7 @@ test_wait_until (void)
   /* Make sure it returns FALSE on timeout */
   until = g_get_monotonic_time () + G_TIME_SPAN_SECOND / 50;
   g_mutex_lock (&lock);
-  g_assert (g_cond_wait_until (&cond, &lock, until) == FALSE);
+  xassert (g_cond_wait_until (&cond, &lock, until) == FALSE);
   g_mutex_unlock (&lock);
 
   g_mutex_clear (&lock);

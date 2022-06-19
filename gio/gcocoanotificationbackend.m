@@ -31,18 +31,18 @@
 #include "gfile.h"
 
 #define XTYPE_COCOA_NOTIFICATION_BACKEND  (g_cocoa_notification_backend_get_type ())
-#define G_COCOA_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_COCOA_NOTIFICATION_BACKEND, GCocoaNotificationBackend))
+#define G_COCOA_NOTIFICATION_BACKEND(o)    (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_COCOA_NOTIFICATION_BACKEND, xcocoa_notification_backend_t))
 
-typedef struct _GCocoaNotificationBackend GCocoaNotificationBackend;
-typedef xnotification_backend_class_t            GCocoaNotificationBackendClass;
-struct _GCocoaNotificationBackend
+typedef struct _xcocoa_notification_backend xcocoa_notification_backend_t;
+typedef xnotification_backend_class_t            xcocoa_notification_backend_class_t;
+struct _xcocoa_notification_backend
 {
   xnotification_backend_t parent;
 };
 
 xtype_t g_cocoa_notification_backend_get_type (void);
 
-G_DEFINE_TYPE_WITH_CODE (GCocoaNotificationBackend, g_cocoa_notification_backend, XTYPE_NOTIFICATION_BACKEND,
+G_DEFINE_TYPE_WITH_CODE (xcocoa_notification_backend, xcocoa_notification_backend, XTYPE_NOTIFICATION_BACKEND,
   _xio_modules_ensure_extension_points_registered ();
   g_io_extension_point_implement (G_NOTIFICATION_BACKEND_EXTENSION_POINT_NAME, g_define_type_id, "cocoa", 200));
 
@@ -95,7 +95,7 @@ activate_detailed_action (const char * action)
       return;
     }
 
-  if (g_action_parse_detailed_name (action, &name, &target, NULL))
+  if (xaction_parse_detailed_name (action, &name, &target, NULL))
     {
       xaction_group_activate_action (XACTION_GROUP (xapplication_get_default()), name + 4, target);
       g_free (name);
@@ -262,12 +262,12 @@ g_cocoa_notification_backend_withdraw_notification (xnotification_backend_t *bac
 }
 
 static void
-g_cocoa_notification_backend_init (GCocoaNotificationBackend *backend)
+g_cocoa_notification_backend_init (xcocoa_notification_backend_t *backend)
 {
 }
 
 static void
-g_cocoa_notification_backend_class_init (GCocoaNotificationBackendClass *klass)
+g_cocoa_notification_backend_class_init (xcocoa_notification_backend_class_t *klass)
 {
   xnotification_backend_class_t *backend_class = G_NOTIFICATION_BACKEND_CLASS (klass);
 

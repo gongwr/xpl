@@ -2535,8 +2535,8 @@
  * warn of programmer errors when calling functions, and print error messages
  * from command line programs.
  *
- * The g_return_if_fail(), g_return_val_if_fail(), g_return_if_reached() and
- * g_return_val_if_reached() macros are intended as pre-condition assertions, to
+ * The g_return_if_fail(), xreturn_val_if_fail(), g_return_if_reached() and
+ * xreturn_val_if_reached() macros are intended as pre-condition assertions, to
  * be used at the top of a public function to check that the function’s
  * arguments are acceptable. Any failure of such a pre-condition assertion is
  * considered a programming error on the part of the caller of the public API,
@@ -2547,7 +2547,7 @@
  * For example:
  * |[<!-- language="C" -->
  * xboolean_t
- * g_dtls_connection_shutdown (xdtls_connection_t  *conn,
+ * xdtls_connection_shutdown (xdtls_connection_t  *conn,
  *                             xboolean_t          shutdown_read,
  *                             xboolean_t          shutdown_write,
  *                             xcancellable_t     *cancellable,
@@ -2555,9 +2555,9 @@
  * {
  *   // local variable declarations
  *
- *   g_return_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
- *   g_return_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
- *   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+ *   xreturn_val_if_fail (X_IS_DTLS_CONNECTION (conn), FALSE);
+ *   xreturn_val_if_fail (cancellable == NULL || X_IS_CANCELLABLE (cancellable), FALSE);
+ *   xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
  *
  *   // function body
  *

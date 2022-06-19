@@ -76,8 +76,8 @@ error_type ## _get_private (const xerror_t *error)                        \
   /* Copied from gtype.c (STRUCT_ALIGNMENT and ALIGN_STRUCT macros). */ \
   const xsize_t sa = 2 * sizeof (xsize_t);                                  \
   const xsize_t as = (sizeof (ErrorType ## Private) + (sa - 1)) & -sa;    \
-  g_return_val_if_fail (error != NULL, NULL);                           \
-  g_return_val_if_fail (error->domain == error_type ## _quark (), NULL); \
+  xreturn_val_if_fail (error != NULL, NULL);                           \
+  xreturn_val_if_fail (error->domain == error_type ## _quark (), NULL); \
   return (ErrorType ## Private *) (((xuint8_t *)error) - as); \
 }                                                                       \
                                                                         \

@@ -33,8 +33,8 @@
  * SECTION:enumerations_flags
  * @short_description: Enumeration and flags types
  * @title: Enumeration and Flag Types
- * @see_also:#GParamSpecEnum, #GParamSpecFlags, g_param_spec_enum(),
- * g_param_spec_flags()
+ * @see_also:#GParamSpecEnum, #GParamSpecFlags, xparam_spec_enum(),
+ * xparam_spec_flags()
  *
  * The GLib type system provides fundamental types for enumeration and
  * flags types. (Flags types are like enumerations, but allow their
@@ -45,7 +45,7 @@
  * xflags_get_value_by_nick() can look up values by their name or
  * nickname.  When an enumeration or flags type is registered with the
  * GLib type system, it can be used as value type for object
- * properties, using g_param_spec_enum() or g_param_spec_flags().
+ * properties, using xparam_spec_enum() or xparam_spec_flags().
  *
  * xobject_t ships with a utility called [glib-mkenums][glib-mkenums],
  * that can construct suitable type registration functions from C enumeration
@@ -123,14 +123,14 @@ _xenum_types_init (void)
   info.class_size = sizeof (xenum_class_t);
   type = xtype_register_fundamental (XTYPE_ENUM, g_intern_static_string ("xenum_t"), &info, &finfo,
 				      XTYPE_FLAG_ABSTRACT | XTYPE_FLAG_VALUE_ABSTRACT);
-  g_assert (type == XTYPE_ENUM);
+  xassert (type == XTYPE_ENUM);
 
   /* XTYPE_FLAGS
    */
   info.class_size = sizeof (xflags_class_t);
   type = xtype_register_fundamental (XTYPE_FLAGS, g_intern_static_string ("GFlags"), &info, &finfo,
 				      XTYPE_FLAG_ABSTRACT | XTYPE_FLAG_VALUE_ABSTRACT);
-  g_assert (type == XTYPE_FLAGS);
+  xassert (type == XTYPE_FLAGS);
 }
 
 static void
@@ -168,7 +168,7 @@ value_flags_enum_lcopy_value (const xvalue_t *value,
 {
   xint_t *int_p = collect_values[0].v_pointer;
 
-  g_return_val_if_fail (int_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
+  xreturn_val_if_fail (int_p != NULL, xstrdup_printf ("value location for '%s' passed as NULL", G_VALUE_TYPE_NAME (value)));
 
   *int_p = value->data[0].v_long;
 
@@ -209,8 +209,8 @@ xenum_register_static (const xchar_t	 *name,
   };
   xtype_t type;
 
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (const_static_values != NULL, 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (const_static_values != NULL, 0);
 
   enum_type_info.class_data = const_static_values;
 
@@ -252,8 +252,8 @@ xflags_register_static (const xchar_t	   *name,
   };
   xtype_t type;
 
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (const_static_values != NULL, 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (const_static_values != NULL, 0);
 
   flags_type_info.class_data = const_static_values;
 
@@ -400,8 +400,8 @@ xenum_value_t*
 xenum_get_value_by_name (xenum_class_t  *enum_class,
 			  const xchar_t *name)
 {
-  g_return_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   if (enum_class->n_values)
     {
@@ -429,8 +429,8 @@ xflags_value_t*
 xflags_get_value_by_name (xflags_class_t *flags_class,
 			   const xchar_t *name)
 {
-  g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   if (flags_class->n_values)
     {
@@ -459,8 +459,8 @@ xenum_value_t*
 xenum_get_value_by_nick (xenum_class_t  *enum_class,
 			  const xchar_t *nick)
 {
-  g_return_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
-  g_return_val_if_fail (nick != NULL, NULL);
+  xreturn_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
+  xreturn_val_if_fail (nick != NULL, NULL);
 
   if (enum_class->n_values)
     {
@@ -488,8 +488,8 @@ xflags_value_t*
 xflags_get_value_by_nick (xflags_class_t *flags_class,
 			   const xchar_t *nick)
 {
-  g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
-  g_return_val_if_fail (nick != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
+  xreturn_val_if_fail (nick != NULL, NULL);
 
   if (flags_class->n_values)
     {
@@ -517,7 +517,7 @@ xenum_value_t*
 xenum_get_value (xenum_class_t *enum_class,
 		  xint_t	      value)
 {
-  g_return_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
+  xreturn_val_if_fail (X_IS_ENUM_CLASS (enum_class), NULL);
 
   if (enum_class->n_values)
     {
@@ -545,7 +545,7 @@ xflags_value_t*
 xflags_get_first_value (xflags_class_t *flags_class,
 			 xuint_t	      value)
 {
-  g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
+  xreturn_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
 
   if (flags_class->n_values)
     {
@@ -590,7 +590,7 @@ xenum_to_string (xtype_t xenum_type,
   xenum_class_t *enum_class;
   xenum_value_t *enum_value;
 
-  g_return_val_if_fail (XTYPE_IS_ENUM (xenum_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_ENUM (xenum_type), NULL);
 
   enum_class = xtype_class_ref (xenum_type);
 
@@ -631,7 +631,7 @@ xflags_get_value_string (xflags_class_t *flags_class,
   xstring_t *str;
   xflags_value_t *flags_value;
 
-  g_return_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
+  xreturn_val_if_fail (X_IS_FLAGS_CLASS (flags_class), NULL);
 
   str = xstring_new (NULL);
 
@@ -680,7 +680,7 @@ xflags_to_string (xtype_t flags_type,
   xchar_t *result;
   xflags_class_t *flags_class;
 
-  g_return_val_if_fail (XTYPE_IS_FLAGS (flags_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_FLAGS (flags_type), NULL);
 
   flags_class = xtype_class_ref (flags_type);
 
@@ -722,7 +722,7 @@ xvalue_set_enum (xvalue_t *value,
 xint_t
 xvalue_get_enum (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_ENUM (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_ENUM (value), 0);
 
   return value->data[0].v_long;
 }
@@ -754,7 +754,7 @@ xvalue_set_flags (xvalue_t *value,
 xuint_t
 xvalue_get_flags (const xvalue_t *value)
 {
-  g_return_val_if_fail (G_VALUE_HOLDS_FLAGS (value), 0);
+  xreturn_val_if_fail (G_VALUE_HOLDS_FLAGS (value), 0);
 
   return value->data[0].v_ulong;
 }

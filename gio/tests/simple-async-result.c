@@ -25,7 +25,7 @@ ensure_destroyed (xpointer_t obj)
 {
   xobject_add_weak_pointer (obj, &obj);
   xobject_unref (obj);
-  g_assert (obj == NULL);
+  xassert (obj == NULL);
 }
 
 static void
@@ -43,9 +43,9 @@ reset (void)
 static void
 check (xpointer_t a, xpointer_t b, xpointer_t c)
 {
-  g_assert (a == got_source);
-  g_assert (b == got_result);
-  g_assert (c == got_user_data);
+  xassert (a == got_source);
+  xassert (b == got_result);
+  xassert (c == got_user_data);
 }
 
 static void
@@ -70,17 +70,17 @@ test_simple_async_idle (xpointer_t user_data)
   c = xobject_new (XTYPE_OBJECT, NULL);
 
   result = xsimple_async_result_new (a, callback_func, b, test_simple_async_idle);
-  g_assert (xasync_result_get_user_data (G_ASYNC_RESULT (result)) == b);
+  xassert (xasync_result_get_user_data (G_ASYNC_RESULT (result)) == b);
   check (NULL, NULL, NULL);
   xsimple_async_result_complete (result);
   check (a, result, b);
   xobject_unref (result);
 
-  g_assert (xsimple_async_result_is_valid (got_result, a, test_simple_async_idle));
-  g_assert (!xsimple_async_result_is_valid (got_result, b, test_simple_async_idle));
-  g_assert (!xsimple_async_result_is_valid (got_result, c, test_simple_async_idle));
-  g_assert (!xsimple_async_result_is_valid (got_result, b, callback_func));
-  g_assert (!xsimple_async_result_is_valid ((xpointer_t) a, NULL, NULL));
+  xassert (xsimple_async_result_is_valid (got_result, a, test_simple_async_idle));
+  xassert (!xsimple_async_result_is_valid (got_result, b, test_simple_async_idle));
+  xassert (!xsimple_async_result_is_valid (got_result, c, test_simple_async_idle));
+  xassert (!xsimple_async_result_is_valid (got_result, b, callback_func));
+  xassert (!xsimple_async_result_is_valid ((xpointer_t) a, NULL, NULL));
   reset ();
   reset ();
   reset ();
@@ -90,7 +90,7 @@ test_simple_async_idle (xpointer_t user_data)
   ensure_destroyed (c);
 
   *ran = TRUE;
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -103,7 +103,7 @@ test_simple_async (void)
   g_idle_add (test_simple_async_idle, &ran_test_in_idle);
   xmain_context_iteration (NULL, FALSE);
 
-  g_assert (ran_test_in_idle);
+  xassert (ran_test_in_idle);
 
   a = xobject_new (XTYPE_OBJECT, NULL);
   b = xobject_new (XTYPE_OBJECT, NULL);

@@ -157,7 +157,7 @@ xobject_notify_queue_add (xobject_t            *object,
 			   xobject_notify_queue_t *nqueue,
 			   xparam_spec_t	      *pspec)
 {
-  if (pspec->flags & G_PARAM_READABLE)
+  if (pspec->flags & XPARAM_READABLE)
     {
       xparam_spec_t *redirect;
 
@@ -165,7 +165,7 @@ xobject_notify_queue_add (xobject_t            *object,
 
       g_return_if_fail (nqueue->n_pspecs < 65535);
 
-      redirect = g_param_spec_get_redirect_target (pspec);
+      redirect = xparam_spec_get_redirect_target (pspec);
       if (redirect)
 	pspec = redirect;
 

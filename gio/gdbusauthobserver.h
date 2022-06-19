@@ -18,8 +18,8 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __G_DBUS_AUTH_OBSERVER_H__
-#define __G_DBUS_AUTH_OBSERVER_H__
+#ifndef __XDBUS_AUTH_OBSERVER_H__
+#define __XDBUS_AUTH_OBSERVER_H__
 
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
@@ -30,7 +30,7 @@
 G_BEGIN_DECLS
 
 #define XTYPE_DBUS_AUTH_OBSERVER         (xdbus_auth_observer_get_type ())
-#define G_DBUS_AUTH_OBSERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_OBSERVER, xdbus_auth_observer))
+#define XDBUS_AUTH_OBSERVER(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_OBSERVER, xdbus_auth_observer))
 #define X_IS_DBUS_AUTH_OBSERVER(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_AUTH_OBSERVER))
 
 XPL_AVAILABLE_IN_ALL
@@ -48,4 +48,4 @@ xboolean_t           xdbus_auth_observer_allow_mechanism (xdbus_auth_observer_t 
 
 G_END_DECLS
 
-#endif /* _G_DBUS_AUTH_OBSERVER_H__ */
+#endif /* _XDBUS_AUTH_OBSERVER_H__ */

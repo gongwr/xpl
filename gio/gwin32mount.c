@@ -126,16 +126,16 @@ g_win32_mount_finalize (xobject_t *object)
   g_free (mount->name);
   g_free (mount->mount_path);
 
-  if (G_OBJECT_CLASS (g_win32_mount_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_win32_mount_parent_class)->finalize) (object);
+  if (XOBJECT_CLASS (g_win32_mount_parent_class)->finalize)
+    (*XOBJECT_CLASS (g_win32_mount_parent_class)->finalize) (object);
 }
 
 static void
 g_win32_mount_class_init (GWin32MountClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_win32_mount_finalize;
+  xobject_class->finalize = g_win32_mount_finalize;
 }
 
 static void
@@ -379,7 +379,7 @@ g_win32_mount_get_icon (xmount_t *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
-  g_return_val_if_fail (win32_mount->mount_path != NULL, NULL);
+  xreturn_val_if_fail (win32_mount->mount_path != NULL, NULL);
 
   /* lazy creation */
   if (!win32_mount->icon)
@@ -414,7 +414,7 @@ g_win32_mount_get_symbolic_icon (xmount_t *mount)
 {
   GWin32Mount *win32_mount = G_WIN32_MOUNT (mount);
 
-  g_return_val_if_fail (win32_mount->mount_path != NULL, NULL);
+  xreturn_val_if_fail (win32_mount->mount_path != NULL, NULL);
 
   /* lazy creation */
   if (!win32_mount->symbolic_icon)

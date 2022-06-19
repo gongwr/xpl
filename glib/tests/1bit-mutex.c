@@ -84,7 +84,7 @@ acquire (int      nr,
         g_bit_lock (&locks[nr], bits[nr]);
     }
 
-  g_assert (owners[nr] == NULL);   /* hopefully nobody else is here */
+  xassert (owners[nr] == NULL);   /* hopefully nobody else is here */
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
@@ -92,7 +92,7 @@ acquire (int      nr,
   xthread_yield ();
   xthread_yield ();
 
-  g_assert (owners[nr] == self);   /* hopefully this is still us... */
+  xassert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
 
   if (use_pointers)
@@ -131,7 +131,7 @@ testcase (xconstpointer data)
   /* ensure that we are using the emulated futex by checking
    * (at compile-time) for the existence of 'g_futex_address_list'
    */
-  g_assert (g_futex_address_list == NULL);
+  xassert (g_futex_address_list == NULL);
 #else
   #define SUFFIX ""
 #endif
@@ -148,8 +148,8 @@ testcase (xconstpointer data)
 
   for (i = 0; i < LOCKS; i++)
     {
-      g_assert (owners[i] == NULL);
-      g_assert (locks[i] == 0);
+      xassert (owners[i] == NULL);
+      xassert (locks[i] == 0);
     }
 }
 

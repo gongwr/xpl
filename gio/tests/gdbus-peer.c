@@ -170,7 +170,7 @@ test_interface_method_call (xdbus_connection_t       *connection,
       error = NULL;
       ret = xdbus_connection_send_message (connection, message, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, &error);
       g_assert_no_error (error);
-      g_assert (ret);
+      xassert (ret);
       xobject_unref (message);
 
       xdbus_method_invocation_return_value (invocation, NULL);
@@ -192,7 +192,7 @@ test_interface_method_call (xdbus_connection_t       *connection,
       error = NULL;
 
       fd = g_open (path, O_RDONLY, 0);
-      g_assert (fd != -1);
+      xassert (fd != -1);
       g_unix_fd_list_append (fd_list, fd, &error);
       g_assert_no_error (error);
       close (fd);
@@ -273,7 +273,7 @@ on_proxy_signal_received (xdbus_proxy_t *proxy,
 
   data->signal_received = TRUE;
 
-  g_assert (sender_name == NULL);
+  xassert (sender_name == NULL);
   g_assert_cmpstr (signal_name, ==, "PeerSignal");
   xmain_loop_quit (loop);
 }
@@ -387,7 +387,7 @@ on_new_connection (xdbus_server_t *server,
 
       credentials = xdbus_connection_get_peer_credentials (connection);
 
-      g_assert (credentials != NULL);
+      xassert (credentials != NULL);
       g_assert_cmpuint (xcredentials_get_unix_user (credentials, NULL), ==,
                         getuid ());
 #if G_CREDENTIALS_HAS_PID
@@ -411,7 +411,7 @@ on_new_connection (xdbus_server_t *server,
                                               NULL, /* xdestroy_notify_t for data */
                                               &error);
   g_assert_no_error (error);
-  g_assert (reg_id > 0);
+  xassert (reg_id > 0);
 
   xmain_loop_quit (loop);
 
@@ -423,13 +423,13 @@ on_new_connection (xdbus_server_t *server,
 static xboolean_t
 idle_in_service_loop (xpointer_t loop)
 {
-  g_assert (service_loop == NULL);
+  xassert (service_loop == NULL);
   g_mutex_lock (&service_loop_lock);
   service_loop = loop;
   g_cond_broadcast (&service_loop_cond);
   g_mutex_unlock (&service_loop_lock);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -438,7 +438,7 @@ run_service_loop (xmain_context_t *service_context)
   xmain_loop_t *loop;
   xsource_t *source;
 
-  g_assert (service_loop == NULL);
+  xassert (service_loop == NULL);
 
   loop = xmain_loop_new (service_context, FALSE);
   source = g_idle_source_new ();
@@ -510,8 +510,8 @@ service_thread_func (xpointer_t user_data)
   g_assert_cmpint (f, ==, G_DBUS_SERVER_FLAGS_NONE);
   g_assert_cmpstr (a, ==, tmp_address);
   g_assert_cmpstr (g, ==, test_guid);
-  g_assert (!b);
-  g_assert (o == observer);
+  xassert (!b);
+  xassert (o == observer);
   g_free (a);
   g_free (g);
   xobject_unref (o);
@@ -528,7 +528,7 @@ service_thread_func (xpointer_t user_data)
   xmain_context_unref (service_context);
 
   /* test code specifically unrefs the server - see below */
-  g_assert (server == NULL);
+  xassert (server == NULL);
 
   return NULL;
 }
@@ -568,7 +568,7 @@ on_incoming_connection (xsocket_service_t     *service,
                                                   NULL, /* xdestroy_notify_t for data */
                                                   &error);
       g_assert_no_error (error);
-      g_assert (reg_id > 0);
+      xassert (reg_id > 0);
 
     }
   else
@@ -672,7 +672,7 @@ check_connection (xpointer_t user_data)
         }
     }
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -682,7 +682,7 @@ on_do_disconnect_in_idle (xpointer_t data)
   g_debug ("GDC %p has ref_count %d", c, G_OBJECT (c)->ref_count);
   xdbus_connection_disconnect (c);
   xobject_unref (c);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 #endif
 
@@ -767,16 +767,16 @@ do_test_peer (void)
                                               NULL, /* cancellable */
                                               &error);
   _g_assert_error_domain (error, G_IO_ERROR);
-  g_assert (!g_dbus_error_is_remote_error (error));
+  xassert (!g_dbus_error_is_remote_error (error));
   g_clear_error (&error);
-  g_assert (c == NULL);
+  xassert (c == NULL);
 
   /* bring up a server - we run the server in a different thread to avoid deadlocks */
   service_thread = xthread_new ("test_peer",
                                  service_thread_func,
                                  &data);
   await_service_loop ();
-  g_assert (server != NULL);
+  xassert (server != NULL);
 
   /* bring up a connection and accept it */
   data.accept_connection = TRUE;
@@ -787,12 +787,12 @@ do_test_peer (void)
                                               NULL, /* cancellable */
                                               &error);
   g_assert_no_error (error);
-  g_assert (c != NULL);
+  xassert (c != NULL);
   while (data.current_connections->len < 1)
     xmain_loop_run (loop);
   g_assert_cmpint (data.current_connections->len, ==, 1);
   g_assert_cmpint (data.num_connection_attempts, ==, 1);
-  g_assert (xdbus_connection_get_unique_name (c) == NULL);
+  xassert (xdbus_connection_get_unique_name (c) == NULL);
   g_assert_cmpstr (xdbus_connection_get_guid (c), ==, test_guid);
 
   /* check that we create a proxy, read properties, receive signals and invoke
@@ -809,7 +809,7 @@ do_test_peer (void)
                                  NULL, /* xcancellable_t */
                                  &error);
   g_assert_no_error (error);
-  g_assert (proxy != NULL);
+  xassert (proxy != NULL);
   error = NULL;
   value = xdbus_proxy_get_cached_property (proxy, "PeerProperty");
   g_assert_cmpstr (xvariant_get_string (value, NULL), ==, "ThePropertyValue");
@@ -834,7 +834,7 @@ do_test_peer (void)
                                         "g-signal",
                                         G_CALLBACK (on_proxy_signal_received),
                                         &data);
-  g_assert (!data.signal_received);
+  xassert (!data.signal_received);
   xdbus_proxy_call (proxy,
                      "EmitSignal",
                      NULL,  /* no arguments */
@@ -844,7 +844,7 @@ do_test_peer (void)
                      NULL,  /* xasync_ready_callback_t - we don't care about the result */
                      NULL); /* user_data */
   xmain_loop_run (loop);
-  g_assert (data.signal_received);
+  xassert (data.signal_received);
   g_assert_cmpint (data.num_method_calls, ==, 2);
   xsignal_handler_disconnect (proxy, signal_handler_id);
 
@@ -868,7 +868,7 @@ do_test_peer (void)
                      NULL,  /* xasync_ready_callback_t - we don't care about the result */
                      NULL); /* user_data */
   xmain_loop_run (loop);
-  g_assert (data.signal_received);
+  xassert (data.signal_received);
   g_assert_cmpint (data.num_method_calls, ==, 3);
   xsignal_handler_disconnect (proxy, signal_handler_id);
 
@@ -919,7 +919,7 @@ do_test_peer (void)
                                                                              NULL, /* cancellable */
                                                                              &error);
       g_assert_no_error (error);
-      g_assert (xdbus_message_get_message_type (method_reply_message) == G_DBUS_MESSAGE_TYPE_METHOD_RETURN);
+      xassert (xdbus_message_get_message_type (method_reply_message) == G_DBUS_MESSAGE_TYPE_METHOD_RETURN);
 
       body = xdbus_message_get_body (method_reply_message);
 
@@ -940,7 +940,7 @@ do_test_peer (void)
         }
 
       fd_list = xdbus_message_get_unix_fd_list (method_reply_message);
-      g_assert (fd_list != NULL);
+      xassert (fd_list != NULL);
       g_assert_cmpint (g_unix_fd_list_get_length (fd_list), ==, 1);
       error = NULL;
       fd = g_unix_fd_list_get (fd_list, 0, &error);
@@ -952,7 +952,7 @@ do_test_peer (void)
       len = 0;
       buf = read_all_from_fd (fd, &len, &error);
       g_assert_no_error (error);
-      g_assert (buf != NULL);
+      xassert (buf != NULL);
       close (fd);
 
       error = NULL;
@@ -978,7 +978,7 @@ do_test_peer (void)
                                        NULL,  /* xcancellable_t */
                                        &error);
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR);
-      g_assert (result == NULL);
+      xassert (result == NULL);
       xerror_free (error);
 #endif /* G_OS_UNIX */
     }
@@ -990,13 +990,13 @@ do_test_peer (void)
     xsocket_t *socket;
     xcredentials_t *credentials;
     socket = xsocket_connection_get_socket (XSOCKET_CONNECTION (xdbus_connection_get_stream (c)));
-    g_assert (X_IS_SOCKET (socket));
+    xassert (X_IS_SOCKET (socket));
     error = NULL;
     credentials = xsocket_get_credentials (socket, &error);
 
 #if G_CREDENTIALS_SOCKET_GET_CREDENTIALS_SUPPORTED
     g_assert_no_error (error);
-    g_assert (X_IS_CREDENTIALS (credentials));
+    xassert (X_IS_CREDENTIALS (credentials));
 
     g_assert_cmpuint (xcredentials_get_unix_user (credentials, NULL), ==,
                       getuid ());
@@ -1012,7 +1012,7 @@ do_test_peer (void)
     xobject_unref (credentials);
 #else
     g_assert_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED);
-    g_assert (credentials == NULL);
+    xassert (credentials == NULL);
 #endif
   }
 
@@ -1028,7 +1028,7 @@ do_test_peer (void)
                                                &error);
   _g_assert_error_domain (error, G_IO_ERROR);
   xerror_free (error);
-  g_assert (c2 == NULL);
+  xassert (c2 == NULL);
 
 #if 0
   /* TODO: THIS TEST DOESN'T WORK YET */
@@ -1044,13 +1044,13 @@ do_test_peer (void)
                                                NULL, /* cancellable */
                                                &error);
   g_assert_no_error (error);
-  g_assert (c2 != NULL);
-  g_assert (!xdbus_connection_get_is_disconnected (c2));
+  xassert (c2 != NULL);
+  xassert (!xdbus_connection_get_is_disconnected (c2));
   while (data.num_connection_attempts < 3)
     xmain_loop_run (loop);
   g_assert_cmpint (data.current_connections->len, ==, 2);
   g_assert_cmpint (data.num_connection_attempts, ==, 3);
-  g_assert (!xdbus_connection_get_is_disconnected (G_DBUS_CONNECTION (data.current_connections->pdata[1])));
+  xassert (!xdbus_connection_get_is_disconnected (G_DBUS_CONNECTION (data.current_connections->pdata[1])));
   g_idle_add (on_do_disconnect_in_idle, c2);
   g_debug ("==================================================");
   g_debug ("==================================================");
@@ -1062,7 +1062,7 @@ do_test_peer (void)
   g_timeout_add (2000, check_connection, &data);
   //_g_assert_signal_received (G_DBUS_CONNECTION (data.current_connections->pdata[1]), "closed");
   xmain_loop_run (loop);
-  g_assert (xdbus_connection_get_is_disconnected (G_DBUS_CONNECTION (data.current_connections->pdata[1])));
+  xassert (xdbus_connection_get_is_disconnected (G_DBUS_CONNECTION (data.current_connections->pdata[1])));
   xptr_array_set_size (data.current_connections, 1); /* remove disconnected connection object */
 #endif
 
@@ -1096,11 +1096,11 @@ do_test_peer (void)
 
   /* now disconnect from the server side - check that the client side gets the signal */
   g_assert_cmpint (data.current_connections->len, ==, 1);
-  g_assert (G_DBUS_CONNECTION (data.current_connections->pdata[0]) != c);
+  xassert (G_DBUS_CONNECTION (data.current_connections->pdata[0]) != c);
   xdbus_connection_disconnect (G_DBUS_CONNECTION (data.current_connections->pdata[0]));
   if (!xdbus_connection_get_is_disconnected (c))
     _g_assert_signal_received (c, "closed");
-  g_assert (xdbus_connection_get_is_disconnected (c));
+  xassert (xdbus_connection_get_is_disconnected (c));
 #endif
 
   xobject_unref (c);
@@ -1666,7 +1666,7 @@ nonce_tcp_service_thread_func (xpointer_t user_data)
   xmain_context_unref (service_context);
 
   /* test code specifically unrefs the server - see below */
-  g_assert (server == NULL);
+  xassert (server == NULL);
 
   return NULL;
 }
@@ -1695,7 +1695,7 @@ test_nonce_tcp (void)
                                  nonce_tcp_service_thread_func,
                                  &data);
   await_service_loop ();
-  g_assert (server != NULL);
+  xassert (server != NULL);
 
   /* bring up a connection and accept it */
   data.accept_connection = TRUE;
@@ -1706,12 +1706,12 @@ test_nonce_tcp (void)
                                               NULL, /* cancellable */
                                               &error);
   g_assert_no_error (error);
-  g_assert (c != NULL);
+  xassert (c != NULL);
   while (data.current_connections->len < 1)
     xthread_yield ();
   g_assert_cmpint (data.current_connections->len, ==, 1);
   g_assert_cmpint (data.num_connection_attempts, ==, 1);
-  g_assert (xdbus_connection_get_unique_name (c) == NULL);
+  xassert (xdbus_connection_get_unique_name (c) == NULL);
   g_assert_cmpstr (xdbus_connection_get_guid (c), ==, test_guid);
   xobject_unref (c);
 
@@ -1721,7 +1721,7 @@ test_nonce_tcp (void)
   address = xdbus_server_get_client_address (server);
 
   s = strstr (address, "noncefile=");
-  g_assert (s != NULL);
+  xassert (s != NULL);
   s += sizeof "noncefile=" - 1;
   nonce_file = xstrdup (s);
 
@@ -1737,7 +1737,7 @@ test_nonce_tcp (void)
                              -1,
                              &error);
   g_assert_no_error (error);
-  g_assert (res);
+  xassert (res);
   c = xdbus_connection_new_for_address_sync (address,
                                               G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                               NULL, /* xdbus_auth_observer_t */
@@ -1745,7 +1745,7 @@ test_nonce_tcp (void)
                                               &error);
   _g_assert_error_domain (error, G_IO_ERROR);
   xerror_free (error);
-  g_assert (c == NULL);
+  xassert (c == NULL);
 
   /* Then try with a nonce-file of incorrect length - this will make
    * the client complain - we won't even try connecting to the server
@@ -1757,7 +1757,7 @@ test_nonce_tcp (void)
                              -1,
                              &error);
   g_assert_no_error (error);
-  g_assert (res);
+  xassert (res);
   c = xdbus_connection_new_for_address_sync (address,
                                               G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT,
                                               NULL, /* xdbus_auth_observer_t */
@@ -1765,7 +1765,7 @@ test_nonce_tcp (void)
                                               &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   xerror_free (error);
-  g_assert (c == NULL);
+  xassert (c == NULL);
 
   /* Finally try with no nonce-file at all */
   g_assert_cmpint (g_unlink (nonce_file), ==, 0);
@@ -1777,7 +1777,7 @@ test_nonce_tcp (void)
                                               &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT);
   xerror_free (error);
-  g_assert (c == NULL);
+  xassert (c == NULL);
 
   /* Recreate the nonce-file so we can ensure the server deletes it when stopped. */
   g_assert_cmpint (g_creat (nonce_file, 0600), !=, -1);
@@ -1813,11 +1813,11 @@ test_credentials (void)
     g_assert_no_error (error);
 
   g_clear_error (&error);
-  g_assert (xcredentials_is_same_user (c1, c2, &error));
+  xassert (xcredentials_is_same_user (c1, c2, &error));
   g_assert_no_error (error);
 
   desc = xcredentials_to_string (c1);
-  g_assert (desc != NULL);
+  xassert (desc != NULL);
   g_free (desc);
 
   xobject_unref (c1);
@@ -1888,7 +1888,7 @@ test_tcp_anonymous (void)
                                  tcp_anonymous_service_thread_func,
                                  &seen_connection);
   await_service_loop ();
-  g_assert (server != NULL);
+  xassert (server != NULL);
 
   error = NULL;
   connection = xdbus_connection_new_for_address_sync (xdbus_server_get_client_address (server),
@@ -1897,7 +1897,7 @@ test_tcp_anonymous (void)
                                                        NULL, /* xcancellable_t */
                                                        &error);
   g_assert_no_error (error);
-  g_assert (connection != NULL);
+  xassert (connection != NULL);
 
   while (!seen_connection)
     xthread_yield ();
@@ -2044,7 +2044,7 @@ static xboolean_t
 codegen_quit_mainloop_timeout (xpointer_t data)
 {
   xmain_loop_quit (loop);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -2067,7 +2067,7 @@ codegen_test_peer (void)
                                  codegen_service_thread_func,
                                  NULL);
   await_service_loop ();
-  g_assert (codegen_server != NULL);
+  xassert (codegen_server != NULL);
 
   /* Get an animal 1 ...  */
   connection = xdbus_connection_new_for_address_sync (xdbus_server_get_client_address (codegen_server),
@@ -2076,12 +2076,12 @@ codegen_test_peer (void)
                                                        NULL, /* cancellable */
                                                        &error);
   g_assert_no_error (error);
-  g_assert (connection != NULL);
+  xassert (connection != NULL);
 
   animal1 = example_animal_proxy_new_sync (connection, 0, NULL,
                                            "/Example/Animals/000", NULL, &error);
   g_assert_no_error (error);
-  g_assert (animal1 != NULL);
+  xassert (animal1 != NULL);
   xobject_unref (connection);
 
   /* Get animal 2 ...  */
@@ -2091,12 +2091,12 @@ codegen_test_peer (void)
                                                        NULL, /* cancellable */
                                                        &error);
   g_assert_no_error (error);
-  g_assert (connection != NULL);
+  xassert (connection != NULL);
 
   animal2 = example_animal_proxy_new_sync (connection, 0, NULL,
                                            "/Example/Animals/000", NULL, &error);
   g_assert_no_error (error);
-  g_assert (animal2 != NULL);
+  xassert (animal2 != NULL);
   xobject_unref (connection);
 
   /* Make animal sad via animal1  */
@@ -2109,7 +2109,7 @@ codegen_test_peer (void)
                                   NULL, G_DBUS_CALL_FLAGS_NONE, -1,
                                   NULL, &error);
   g_assert_no_error (error);
-  g_assert (value != NULL);
+  xassert (value != NULL);
   xvariant_unref (value);
 
   /* Give the proxies a chance to refresh in the default main loop */
@@ -2135,7 +2135,7 @@ codegen_test_peer (void)
   /* It's valid for machine-id inside containers to be empty, so we
    * need to test for that possibility
    */
-  g_assert ((s == NULL || *s == '\0') || g_dbus_is_guid (s));
+  xassert ((s == NULL || *s == '\0') || g_dbus_is_guid (s));
   xvariant_unref (value);
 
   /* Poke server and make sure animal is updated */
@@ -2144,7 +2144,7 @@ codegen_test_peer (void)
                                   NULL, G_DBUS_CALL_FLAGS_NONE, -1,
                                   NULL, &error);
   g_assert_no_error (error);
-  g_assert (value != NULL);
+  xassert (value != NULL);
   xvariant_unref (value);
 
   /* Give the proxies a chance to refresh in the default main loop */
@@ -2185,7 +2185,7 @@ main (int   argc,
   g_test_init (&argc, &argv, G_TEST_OPTION_ISOLATE_DIRS, NULL);
 
   introspection_data = g_dbus_node_info_new_for_xml (test_interface_introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
   test_interface_introspection_data = introspection_data->interfaces[0];
 
   g_test_add_func ("/gdbus/peer-to-peer", test_peer);

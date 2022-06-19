@@ -114,7 +114,7 @@ g_memory_input_stream_class_init (GMemoryInputStreamClass *klass)
   xobject_class_t *object_class;
   xinput_stream_class_t *istream_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->finalize     = g_memory_input_stream_finalize;
 
   istream_class = G_INPUT_STREAM_CLASS (klass);
@@ -139,7 +139,7 @@ g_memory_input_stream_finalize (xobject_t *object)
 
   xslist_free_full (priv->chunks, (xdestroy_notify_t)xbytes_unref);
 
-  G_OBJECT_CLASS (g_memory_input_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_memory_input_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -393,7 +393,7 @@ g_memory_input_stream_skip_finish (xinput_stream_t  *stream,
                                    xasync_result_t  *result,
                                    xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }

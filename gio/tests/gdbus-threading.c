@@ -41,7 +41,7 @@ timeout_cb (xpointer_t user_data)
   data->timed_out = TRUE;
   xmain_context_wakeup (data->context);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 /* Check that the given @connection has only one ref, waiting to let any pending

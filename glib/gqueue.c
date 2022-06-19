@@ -183,7 +183,7 @@ g_queue_clear_full (xqueue_t          *queue,
 xboolean_t
 g_queue_is_empty (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, TRUE);
+  xreturn_val_if_fail (queue != NULL, TRUE);
 
   return queue->head == NULL;
 }
@@ -201,7 +201,7 @@ g_queue_is_empty (xqueue_t *queue)
 xuint_t
 g_queue_get_length (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, 0);
+  xreturn_val_if_fail (queue != NULL, 0);
 
   return queue->length;
 }
@@ -241,7 +241,7 @@ g_queue_copy (xqueue_t *queue)
   xqueue_t *result;
   xlist_t *list;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   result = g_queue_new ();
 
@@ -299,7 +299,7 @@ xlist_t *
 g_queue_find (xqueue_t        *queue,
               xconstpointer  data)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   return xlist_find (queue->head, data);
 }
@@ -326,8 +326,8 @@ g_queue_find_custom (xqueue_t        *queue,
                      xconstpointer  data,
                      GCompareFunc   func)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
-  g_return_val_if_fail (func != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (func != NULL, NULL);
 
   return xlist_find_custom (queue->head, data, func);
 }
@@ -504,8 +504,8 @@ g_queue_push_nth_link (xqueue_t *queue,
       return;
     }
 
-  g_assert (queue->head);
-  g_assert (queue->tail);
+  xassert (queue->head);
+  xassert (queue->tail);
 
   next = g_queue_peek_nth_link (queue, n);
   prev = next->prev;
@@ -523,7 +523,7 @@ g_queue_push_nth_link (xqueue_t *queue,
   /* The case where we’re pushing @link_ at the end of @queue is handled above
    * using g_queue_push_tail_link(), so we should never have to manually adjust
    * queue->tail. */
-  g_assert (queue->tail->next == NULL);
+  xassert (queue->tail->next == NULL);
 
   queue->length++;
 }
@@ -540,7 +540,7 @@ g_queue_push_nth_link (xqueue_t *queue,
 xpointer_t
 g_queue_pop_head (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (queue->head)
     {
@@ -573,7 +573,7 @@ g_queue_pop_head (xqueue_t *queue)
 xlist_t *
 g_queue_pop_head_link (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (queue->head)
     {
@@ -608,7 +608,7 @@ g_queue_pop_head_link (xqueue_t *queue)
 xlist_t *
 g_queue_peek_head_link (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   return queue->head;
 }
@@ -626,7 +626,7 @@ g_queue_peek_head_link (xqueue_t *queue)
 xlist_t *
 g_queue_peek_tail_link (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   return queue->tail;
 }
@@ -643,7 +643,7 @@ g_queue_peek_tail_link (xqueue_t *queue)
 xpointer_t
 g_queue_pop_tail (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (queue->tail)
     {
@@ -682,7 +682,7 @@ g_queue_pop_nth (xqueue_t *queue,
   xlist_t *nth_link;
   xpointer_t result;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (n >= queue->length)
     return NULL;
@@ -707,7 +707,7 @@ g_queue_pop_nth (xqueue_t *queue,
 xlist_t *
 g_queue_pop_tail_link (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (queue->tail)
     {
@@ -746,7 +746,7 @@ g_queue_pop_nth_link (xqueue_t *queue,
 {
   xlist_t *link;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (n >= queue->length)
     return NULL;
@@ -776,7 +776,7 @@ g_queue_peek_nth_link (xqueue_t *queue,
   xlist_t *link;
   xuint_t i;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   if (n >= queue->length)
     return NULL;
@@ -815,7 +815,7 @@ xint_t
 g_queue_link_index (xqueue_t *queue,
                     xlist_t  *link_)
 {
-  g_return_val_if_fail (queue != NULL, -1);
+  xreturn_val_if_fail (queue != NULL, -1);
 
   return xlist_position (queue->head, link_);
 }
@@ -880,7 +880,7 @@ g_queue_delete_link (xqueue_t *queue,
 xpointer_t
 g_queue_peek_head (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   return queue->head ? queue->head->data : NULL;
 }
@@ -897,7 +897,7 @@ g_queue_peek_head (xqueue_t *queue)
 xpointer_t
 g_queue_peek_tail (xqueue_t *queue)
 {
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   return queue->tail ? queue->tail->data : NULL;
 }
@@ -920,7 +920,7 @@ g_queue_peek_nth (xqueue_t *queue,
 {
   xlist_t *link;
 
-  g_return_val_if_fail (queue != NULL, NULL);
+  xreturn_val_if_fail (queue != NULL, NULL);
 
   link = g_queue_peek_nth_link (queue, n);
 
@@ -946,7 +946,7 @@ xint_t
 g_queue_index (xqueue_t        *queue,
                xconstpointer  data)
 {
-  g_return_val_if_fail (queue != NULL, -1);
+  xreturn_val_if_fail (queue != NULL, -1);
 
   return xlist_index (queue->head, data);
 }
@@ -968,7 +968,7 @@ g_queue_remove (xqueue_t        *queue,
 {
   xlist_t *link;
 
-  g_return_val_if_fail (queue != NULL, FALSE);
+  xreturn_val_if_fail (queue != NULL, FALSE);
 
   link = xlist_find (queue->head, data);
 
@@ -996,7 +996,7 @@ g_queue_remove_all (xqueue_t        *queue,
   xlist_t *list;
   xuint_t old_length;
 
-  g_return_val_if_fail (queue != NULL, 0);
+  xreturn_val_if_fail (queue != NULL, 0);
 
   old_length = queue->length;
 

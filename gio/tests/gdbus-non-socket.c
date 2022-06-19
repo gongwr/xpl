@@ -142,13 +142,13 @@ test_non_socket (void)
 
   ok = test_bidi_pipe (&streams[0], &streams[1], &error);
   g_assert_no_error (error);
-  g_assert (ok);
-  g_assert (X_IS_IO_STREAM (streams[0]));
-  g_assert (X_IS_INPUT_STREAM (g_io_stream_get_input_stream (streams[0])));
-  g_assert (X_IS_OUTPUT_STREAM (g_io_stream_get_output_stream (streams[0])));
-  g_assert (X_IS_IO_STREAM (streams[1]));
-  g_assert (X_IS_INPUT_STREAM (g_io_stream_get_input_stream (streams[1])));
-  g_assert (X_IS_OUTPUT_STREAM (g_io_stream_get_output_stream (streams[1])));
+  xassert (ok);
+  xassert (X_IS_IO_STREAM (streams[0]));
+  xassert (X_IS_INPUT_STREAM (g_io_stream_get_input_stream (streams[0])));
+  xassert (X_IS_OUTPUT_STREAM (g_io_stream_get_output_stream (streams[0])));
+  xassert (X_IS_IO_STREAM (streams[1]));
+  xassert (X_IS_INPUT_STREAM (g_io_stream_get_input_stream (streams[1])));
+  xassert (X_IS_OUTPUT_STREAM (g_io_stream_get_output_stream (streams[1])));
 
   switch ((first_child = fork ()))
     {
@@ -166,7 +166,7 @@ test_non_socket (void)
 
       ok = g_io_stream_close (streams[1], NULL, &error);
       g_assert_no_error (error);
-      g_assert (ok);
+      xassert (ok);
       xobject_unref (streams[1]);
 
       guid = g_dbus_generate_guid ();
@@ -241,7 +241,7 @@ test_non_socket (void)
 
   ok = g_io_stream_close (streams[0], NULL, &error);
   g_assert_no_error (error);
-  g_assert (ok);
+  xassert (ok);
   xobject_unref (streams[0]);
 
   connection = xdbus_connection_new_sync (streams[1],

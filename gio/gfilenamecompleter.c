@@ -68,7 +68,7 @@ struct _xfilename_completer {
   LoadBasenamesData *basename_loader;
 };
 
-G_DEFINE_TYPE (xfilename_completer, xfilename_completer, XTYPE_OBJECT)
+XDEFINE_TYPE (xfilename_completer, xfilename_completer, XTYPE_OBJECT)
 
 static void cancel_load_basenames (xfilename_completer_t *completer);
 
@@ -86,15 +86,15 @@ xfilename_completer_finalize (xobject_t *object)
 
   xlist_free_full (completer->basenames, g_free);
 
-  G_OBJECT_CLASS (xfilename_completer_parent_class)->finalize (object);
+  XOBJECT_CLASS (xfilename_completer_parent_class)->finalize (object);
 }
 
 static void
 xfilename_completer_class_init (xfilename_completer_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xfilename_completer_finalize;
+  xobject_class->finalize = xfilename_completer_finalize;
   /**
    * xfilename_completer_t::got-completion-data:
    *
@@ -418,8 +418,8 @@ xfilename_completer_get_completion_suffix (xfilename_completer_t *completer,
   char *possible_match;
   char *lcp;
 
-  g_return_val_if_fail (X_IS_FILENAME_COMPLETER (completer), NULL);
-  g_return_val_if_fail (initial_text != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILENAME_COMPLETER (completer), NULL);
+  xreturn_val_if_fail (initial_text != NULL, NULL);
 
   possible_matches = init_completion (completer, initial_text, &prefix);
 
@@ -470,8 +470,8 @@ xfilename_completer_get_completions (xfilename_completer_t *completer,
   char *possible_match;
   xptr_array_t *res;
 
-  g_return_val_if_fail (X_IS_FILENAME_COMPLETER (completer), NULL);
-  g_return_val_if_fail (initial_text != NULL, NULL);
+  xreturn_val_if_fail (X_IS_FILENAME_COMPLETER (completer), NULL);
+  xreturn_val_if_fail (initial_text != NULL, NULL);
 
   possible_matches = init_completion (completer, initial_text, &prefix);
 

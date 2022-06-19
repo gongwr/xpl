@@ -303,7 +303,7 @@ xdate_new_dmy (GDateDay   day,
                 GDateYear  y)
 {
   xdate_t *d;
-  g_return_val_if_fail (xdate_valid_dmy (day, m, y), NULL);
+  xreturn_val_if_fail (xdate_valid_dmy (day, m, y), NULL);
 
   d = g_new (xdate_t, 1);
 
@@ -314,7 +314,7 @@ xdate_new_dmy (GDateDay   day,
   d->day   = day;
   d->year  = y;
 
-  g_assert (xdate_valid (d));
+  xassert (xdate_valid (d));
 
   return d;
 }
@@ -336,7 +336,7 @@ xdate_t*
 xdate_new_julian (xuint32_t julian_day)
 {
   xdate_t *d;
-  g_return_val_if_fail (xdate_valid_julian (julian_day), NULL);
+  xreturn_val_if_fail (xdate_valid_julian (julian_day), NULL);
 
   d = g_new (xdate_t, 1);
 
@@ -345,7 +345,7 @@ xdate_new_julian (xuint32_t julian_day)
 
   d->julian_days = julian_day;
 
-  g_assert (xdate_valid (d));
+  xassert (xdate_valid (d));
 
   return d;
 }
@@ -380,7 +380,7 @@ xdate_t *
 xdate_copy (const xdate_t *date)
 {
   xdate_t *res;
-  g_return_val_if_fail (date != NULL, NULL);
+  xreturn_val_if_fail (date != NULL, NULL);
 
   if (xdate_valid (date))
     res = xdate_new_julian (xdate_get_julian (date));
@@ -406,7 +406,7 @@ xdate_copy (const xdate_t *date)
 xboolean_t
 xdate_valid (const xdate_t *d)
 {
-  g_return_val_if_fail (d != NULL, FALSE);
+  xreturn_val_if_fail (d != NULL, FALSE);
 
   return (d->julian || d->dmy);
 }
@@ -623,12 +623,12 @@ xdate_update_dmy (const xdate_t *const_d)
 GDateWeekday
 xdate_get_weekday (const xdate_t *d)
 {
-  g_return_val_if_fail (xdate_valid (d), G_DATE_BAD_WEEKDAY);
+  xreturn_val_if_fail (xdate_valid (d), G_DATE_BAD_WEEKDAY);
 
   if (!d->julian)
     xdate_update_julian (d);
 
-  g_return_val_if_fail (d->julian, G_DATE_BAD_WEEKDAY);
+  xreturn_val_if_fail (d->julian, G_DATE_BAD_WEEKDAY);
 
   return ((d->julian_days - 1) % 7) + 1;
 }
@@ -644,12 +644,12 @@ xdate_get_weekday (const xdate_t *d)
 GDateMonth
 xdate_get_month (const xdate_t *d)
 {
-  g_return_val_if_fail (xdate_valid (d), G_DATE_BAD_MONTH);
+  xreturn_val_if_fail (xdate_valid (d), G_DATE_BAD_MONTH);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, G_DATE_BAD_MONTH);
+  xreturn_val_if_fail (d->dmy, G_DATE_BAD_MONTH);
 
   return d->month;
 }
@@ -665,12 +665,12 @@ xdate_get_month (const xdate_t *d)
 GDateYear
 xdate_get_year (const xdate_t *d)
 {
-  g_return_val_if_fail (xdate_valid (d), G_DATE_BAD_YEAR);
+  xreturn_val_if_fail (xdate_valid (d), G_DATE_BAD_YEAR);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, G_DATE_BAD_YEAR);
+  xreturn_val_if_fail (d->dmy, G_DATE_BAD_YEAR);
 
   return d->year;
 }
@@ -686,12 +686,12 @@ xdate_get_year (const xdate_t *d)
 GDateDay
 xdate_get_day (const xdate_t *d)
 {
-  g_return_val_if_fail (xdate_valid (d), G_DATE_BAD_DAY);
+  xreturn_val_if_fail (xdate_valid (d), G_DATE_BAD_DAY);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, G_DATE_BAD_DAY);
+  xreturn_val_if_fail (d->dmy, G_DATE_BAD_DAY);
 
   return d->day;
 }
@@ -710,12 +710,12 @@ xdate_get_day (const xdate_t *d)
 xuint32_t
 xdate_get_julian (const xdate_t *d)
 {
-  g_return_val_if_fail (xdate_valid (d), G_DATE_BAD_JULIAN);
+  xreturn_val_if_fail (xdate_valid (d), G_DATE_BAD_JULIAN);
 
   if (!d->julian)
     xdate_update_julian (d);
 
-  g_return_val_if_fail (d->julian, G_DATE_BAD_JULIAN);
+  xreturn_val_if_fail (d->julian, G_DATE_BAD_JULIAN);
 
   return d->julian_days;
 }
@@ -734,12 +734,12 @@ xdate_get_day_of_year (const xdate_t *d)
 {
   xint_t idx;
 
-  g_return_val_if_fail (xdate_valid (d), 0);
+  xreturn_val_if_fail (xdate_valid (d), 0);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, 0);
+  xreturn_val_if_fail (d->dmy, 0);
 
   idx = xdate_is_leap_year (d->year) ? 1 : 0;
 
@@ -763,12 +763,12 @@ xdate_get_monday_week_of_year (const xdate_t *d)
   xuint_t day;
   xdate_t first;
 
-  g_return_val_if_fail (xdate_valid (d), 0);
+  xreturn_val_if_fail (xdate_valid (d), 0);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, 0);
+  xreturn_val_if_fail (d->dmy, 0);
 
   xdate_clear (&first, 1);
 
@@ -797,12 +797,12 @@ xdate_get_sunday_week_of_year (const xdate_t *d)
   xuint_t day;
   xdate_t first;
 
-  g_return_val_if_fail (xdate_valid (d), 0);
+  xreturn_val_if_fail (xdate_valid (d), 0);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, 0);
+  xreturn_val_if_fail (d->dmy, 0);
 
   xdate_clear (&first, 1);
 
@@ -831,12 +831,12 @@ xdate_get_iso8601_week_of_year (const xdate_t *d)
 {
   xuint_t j, d4, L, d1, w;
 
-  g_return_val_if_fail (xdate_valid (d), 0);
+  xreturn_val_if_fail (xdate_valid (d), 0);
 
   if (!d->julian)
     xdate_update_julian (d);
 
-  g_return_val_if_fail (d->julian, 0);
+  xreturn_val_if_fail (d->julian, 0);
 
   /* Formula taken from the Calendar FAQ; the formula was for the
    * Julian Period which starts on 1 January 4713 BC, so we add
@@ -866,8 +866,8 @@ xint_t
 xdate_days_between (const xdate_t *d1,
 		     const xdate_t *d2)
 {
-  g_return_val_if_fail (xdate_valid (d1), 0);
-  g_return_val_if_fail (xdate_valid (d2), 0);
+  xreturn_val_if_fail (xdate_valid (d1), 0);
+  xreturn_val_if_fail (xdate_valid (d2), 0);
 
   return (xint_t)xdate_get_julian (d2) - (xint_t)xdate_get_julian (d1);
 }
@@ -1296,7 +1296,7 @@ xdate_set_parse (xdate_t       *d,
       int i = 0;
       int j = 0;
 
-      g_assert (pt.num_ints < 4); /* i.e., it is 2 or 3 */
+      xassert (pt.num_ints < 4); /* i.e., it is 2 or 3 */
 
       while (i < pt.num_ints && j < 3)
         {
@@ -1646,12 +1646,12 @@ xdate_set_julian (xdate_t   *d,
 xboolean_t
 xdate_is_first_of_month (const xdate_t *d)
 {
-  g_return_val_if_fail (xdate_valid (d), FALSE);
+  xreturn_val_if_fail (xdate_valid (d), FALSE);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, FALSE);
+  xreturn_val_if_fail (d->dmy, FALSE);
 
   if (d->day == 1) return TRUE;
   else return FALSE;
@@ -1671,12 +1671,12 @@ xdate_is_last_of_month (const xdate_t *d)
 {
   xint_t idx;
 
-  g_return_val_if_fail (xdate_valid (d), FALSE);
+  xreturn_val_if_fail (xdate_valid (d), FALSE);
 
   if (!d->dmy)
     xdate_update_dmy (d);
 
-  g_return_val_if_fail (d->dmy, FALSE);
+  xreturn_val_if_fail (d->dmy, FALSE);
 
   idx = xdate_is_leap_year (d->year) ? 1 : 0;
 
@@ -1912,7 +1912,7 @@ xdate_subtract_years (xdate_t *d,
 xboolean_t
 xdate_is_leap_year (GDateYear year)
 {
-  g_return_val_if_fail (xdate_valid_year (year), FALSE);
+  xreturn_val_if_fail (xdate_valid_year (year), FALSE);
 
   return ( (((year % 4) == 0) && ((year % 100) != 0)) ||
            (year % 400) == 0 );
@@ -1934,8 +1934,8 @@ xdate_get_days_in_month (GDateMonth month,
 {
   xint_t idx;
 
-  g_return_val_if_fail (xdate_valid_year (year), 0);
-  g_return_val_if_fail (xdate_valid_month (month), 0);
+  xreturn_val_if_fail (xdate_valid_year (year), 0);
+  xreturn_val_if_fail (xdate_valid_month (month), 0);
 
   idx = xdate_is_leap_year (year) ? 1 : 0;
 
@@ -1961,7 +1961,7 @@ xdate_get_monday_weeks_in_year (GDateYear year)
 {
   xdate_t d;
 
-  g_return_val_if_fail (xdate_valid_year (year), 0);
+  xreturn_val_if_fail (xdate_valid_year (year), 0);
 
   xdate_clear (&d, 1);
   xdate_set_dmy (&d, 1, 1, year);
@@ -1997,7 +1997,7 @@ xdate_get_sunday_weeks_in_year (GDateYear year)
 {
   xdate_t d;
 
-  g_return_val_if_fail (xdate_valid_year (year), 0);
+  xreturn_val_if_fail (xdate_valid_year (year), 0);
 
   xdate_clear (&d, 1);
   xdate_set_dmy (&d, 1, 1, year);
@@ -2029,10 +2029,10 @@ xint_t
 xdate_compare (const xdate_t *lhs,
                 const xdate_t *rhs)
 {
-  g_return_val_if_fail (lhs != NULL, 0);
-  g_return_val_if_fail (rhs != NULL, 0);
-  g_return_val_if_fail (xdate_valid (lhs), 0);
-  g_return_val_if_fail (xdate_valid (rhs), 0);
+  xreturn_val_if_fail (lhs != NULL, 0);
+  xreturn_val_if_fail (rhs != NULL, 0);
+  xreturn_val_if_fail (xdate_valid (lhs), 0);
+  xreturn_val_if_fail (xdate_valid (rhs), 0);
 
   /* Remember the self-comparison case! I think it works right now. */
 
@@ -2066,8 +2066,8 @@ xdate_compare (const xdate_t *lhs,
         {
           if (!lhs->julian) xdate_update_julian (lhs);
           if (!rhs->julian) xdate_update_julian (rhs);
-          g_return_val_if_fail (lhs->julian, 0);
-          g_return_val_if_fail (rhs->julian, 0);
+          xreturn_val_if_fail (lhs->julian, 0);
+          xreturn_val_if_fail (rhs->julian, 0);
         }
 
     }
@@ -2594,12 +2594,12 @@ win32_strftime_helper (const xdate_t     *d,
       return 0;
     }
 
-  g_assert (convlen >= 0);
+  xassert (convlen >= 0);
   if ((xsize_t) convlen >= slen)
     {
       /* Ensure only whole characters are copied into the buffer. */
       xchar_t *end = xutf8_find_prev_char (convbuf, convbuf + slen);
-      g_assert (end != NULL);
+      xassert (end != NULL);
       convlen = end - convbuf;
 
       /* Return 0 because the buffer isn't large enough. */
@@ -2662,10 +2662,10 @@ xdate_strftime (xchar_t       *s,
   xsize_t retval;
 #endif
 
-  g_return_val_if_fail (xdate_valid (d), 0);
-  g_return_val_if_fail (slen > 0, 0);
-  g_return_val_if_fail (format != NULL, 0);
-  g_return_val_if_fail (s != NULL, 0);
+  xreturn_val_if_fail (xdate_valid (d), 0);
+  xreturn_val_if_fail (slen > 0, 0);
+  xreturn_val_if_fail (format != NULL, 0);
+  xreturn_val_if_fail (s != NULL, 0);
 
   xdate_to_struct_tm (d, &tm);
 
@@ -2736,7 +2736,7 @@ xdate_strftime (xchar_t       *s,
       /* Ensure only whole characters are copied into the buffer.
        */
       xchar_t *end = xutf8_find_prev_char (convbuf, convbuf + slen);
-      g_assert (end != NULL);
+      xassert (end != NULL);
       convlen = end - convbuf;
 
       /* Return 0 because the buffer isn't large enough.

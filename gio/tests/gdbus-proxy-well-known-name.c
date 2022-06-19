@@ -40,7 +40,7 @@ proxy_new_cb (xobject_t       *source_object,
   error = NULL;
   *ret = xdbus_proxy_new_finish (res, &error);
   g_assert_no_error (error);
-  g_assert (ret != NULL);
+  xassert (ret != NULL);
 
   xmain_loop_quit (loop);
 }
@@ -64,7 +64,7 @@ test_proxy_well_known_name (void)
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  g_assert (c != NULL);
+  xassert (c != NULL);
 
   error = NULL;
   p = xdbus_proxy_new_sync (c,
@@ -79,7 +79,7 @@ test_proxy_well_known_name (void)
 
   /* we shouldn't have a name owner nor any cached properties */
   g_assert_cmpstr (xdbus_proxy_get_name_owner (p), ==, NULL);
-  g_assert (xdbus_proxy_get_cached_property_names (p) == NULL);
+  xassert (xdbus_proxy_get_cached_property_names (p) == NULL);
 
   /* also for async: we shouldn't have a name owner nor any cached properties */
   xdbus_proxy_new (c,
@@ -93,10 +93,10 @@ test_proxy_well_known_name (void)
                     &ap);
   xmain_loop_run (loop);
   g_assert_cmpstr (xdbus_proxy_get_name_owner (ap), ==, NULL);
-  g_assert (xdbus_proxy_get_cached_property_names (ap) == NULL);
+  xassert (xdbus_proxy_get_cached_property_names (ap) == NULL);
 
   /* this is safe; testserver will exit once the bus goes away */
-  g_assert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
+  xassert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
 
   /* check that we get the notify::g-name-owner signal */
   _g_assert_property_notify (p, "g-name-owner");
@@ -104,8 +104,8 @@ test_proxy_well_known_name (void)
   /* Now we should have a name owner as well as properties */
   name_owner = xdbus_proxy_get_name_owner (p);
   property_names = xdbus_proxy_get_cached_property_names (p);
-  g_assert (g_dbus_is_unique_name (name_owner));
-  g_assert (property_names != NULL && xstrv_length (property_names) > 0);
+  xassert (g_dbus_is_unique_name (name_owner));
+  xassert (property_names != NULL && xstrv_length (property_names) > 0);
   g_free (name_owner);
   xstrfreev (property_names);
 
@@ -124,8 +124,8 @@ test_proxy_well_known_name (void)
   g_assert_no_error (error);
   name_owner = xdbus_proxy_get_name_owner (p2);
   property_names = xdbus_proxy_get_cached_property_names (p2);
-  g_assert (g_dbus_is_unique_name (name_owner));
-  g_assert (property_names != NULL && xstrv_length (property_names) > 0);
+  xassert (g_dbus_is_unique_name (name_owner));
+  xassert (property_names != NULL && xstrv_length (property_names) > 0);
   g_free (name_owner);
   xstrfreev (property_names);
 
@@ -142,26 +142,26 @@ test_proxy_well_known_name (void)
   xmain_loop_run (loop);
   name_owner = xdbus_proxy_get_name_owner (ap2);
   property_names = xdbus_proxy_get_cached_property_names (ap2);
-  g_assert (g_dbus_is_unique_name (name_owner));
-  g_assert (property_names != NULL && xstrv_length (property_names) > 0);
+  xassert (g_dbus_is_unique_name (name_owner));
+  xassert (property_names != NULL && xstrv_length (property_names) > 0);
   g_free (name_owner);
   xstrfreev (property_names);
 
   /* Check property value is the initial value */
   variant = xdbus_proxy_get_cached_property (p, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
   xvariant_unref (variant);
   variant = xdbus_proxy_get_cached_property (p2, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
   xvariant_unref (variant);
   variant = xdbus_proxy_get_cached_property (ap, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
   xvariant_unref (variant);
   variant = xdbus_proxy_get_cached_property (ap2, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
   xvariant_unref (variant);
 
@@ -176,24 +176,24 @@ test_proxy_well_known_name (void)
                                    NULL,
                                    &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
   xvariant_unref (result);
   _g_assert_signal_received (p, "g-properties-changed");
   variant = xdbus_proxy_get_cached_property (p, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
   xvariant_unref (variant);
   variant = xdbus_proxy_get_cached_property (p2, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
   xvariant_unref (variant);
   variant = xdbus_proxy_get_cached_property (ap, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
   xvariant_unref (variant);
   variant = xdbus_proxy_get_cached_property (ap2, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 42);
   xvariant_unref (variant);
 
@@ -208,34 +208,34 @@ test_proxy_well_known_name (void)
                                    NULL,
                                    &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   g_assert_cmpstr (xvariant_get_type_string (result), ==, "()");
   xvariant_unref (result);
   /* and wait... */
   _g_assert_property_notify (p, "g-name-owner");
   /* now we shouldn't have a name owner nor any cached properties */
   g_assert_cmpstr (xdbus_proxy_get_name_owner (p), ==, NULL);
-  g_assert (xdbus_proxy_get_cached_property_names (p) == NULL);
-  g_assert (xdbus_proxy_get_cached_property (p, "y") == NULL);
+  xassert (xdbus_proxy_get_cached_property_names (p) == NULL);
+  xassert (xdbus_proxy_get_cached_property (p, "y") == NULL);
 
   /* now bring back the server and wait for the proxy to be updated.. now
    * the 'y' property should be back at 1...
    */
   /* this is safe; testserver will exit once the bus goes away */
-  g_assert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
+  xassert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
 
   /* check that we get the notify::g-name-owner signal */
   _g_assert_property_notify (p, "g-name-owner");
   /* Now we should have a name owner as well as properties */
   name_owner = xdbus_proxy_get_name_owner (p);
   property_names = xdbus_proxy_get_cached_property_names (p);
-  g_assert (g_dbus_is_unique_name (name_owner));
-  g_assert (property_names != NULL && xstrv_length (property_names) > 0);
+  xassert (g_dbus_is_unique_name (name_owner));
+  xassert (property_names != NULL && xstrv_length (property_names) > 0);
   g_free (name_owner);
   xstrfreev (property_names);
   /* and finally check the 'y' property */
   variant = xdbus_proxy_get_cached_property (p, "y");
-  g_assert (variant != NULL);
+  xassert (variant != NULL);
   g_assert_cmpint (xvariant_get_byte (variant), ==, 1);
   xvariant_unref (variant);
 

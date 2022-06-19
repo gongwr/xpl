@@ -163,21 +163,21 @@ xnetwork_monitor_base_finalize (xobject_t *object)
   if (monitor->priv->context)
     xmain_context_unref (monitor->priv->context);
 
-  G_OBJECT_CLASS (xnetwork_monitor_base_parent_class)->finalize (object);
+  XOBJECT_CLASS (xnetwork_monitor_base_parent_class)->finalize (object);
 }
 
 static void
 xnetwork_monitor_base_class_init (xnetwork_monitor_base_class_t *monitor_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (monitor_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (monitor_class);
 
-  gobject_class->constructed  = xnetwork_monitor_base_constructed;
-  gobject_class->get_property = xnetwork_monitor_base_get_property;
-  gobject_class->finalize     = xnetwork_monitor_base_finalize;
+  xobject_class->constructed  = xnetwork_monitor_base_constructed;
+  xobject_class->get_property = xnetwork_monitor_base_get_property;
+  xobject_class->finalize     = xnetwork_monitor_base_finalize;
 
-  xobject_class_override_property (gobject_class, PROP_NETWORK_AVAILABLE, "network-available");
-  xobject_class_override_property (gobject_class, PROP_NETWORK_METERED, "network-metered");
-  xobject_class_override_property (gobject_class, PROP_CONNECTIVITY, "connectivity");
+  xobject_class_override_property (xobject_class, PROP_NETWORK_AVAILABLE, "network-available");
+  xobject_class_override_property (xobject_class, PROP_NETWORK_METERED, "network-metered");
+  xobject_class_override_property (xobject_class, PROP_CONNECTIVITY, "connectivity");
 }
 
 static xboolean_t
@@ -336,7 +336,7 @@ xnetwork_monitor_base_can_reach_finish (xnetwork_monitor_t  *monitor,
                                          xasync_result_t     *result,
                                          xerror_t          **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, monitor), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, monitor), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

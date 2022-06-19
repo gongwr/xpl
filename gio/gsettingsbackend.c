@@ -88,15 +88,15 @@ is_key (const xchar_t *key)
   xint_t length;
   xint_t i;
 
-  g_return_val_if_fail (key != NULL, FALSE);
-  g_return_val_if_fail (key[0] == '/', FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (key[0] == '/', FALSE);
 
   for (i = 1; key[i]; i++)
-    g_return_val_if_fail (key[i] != '/' || key[i + 1] != '/', FALSE);
+    xreturn_val_if_fail (key[i] != '/' || key[i + 1] != '/', FALSE);
 
   length = i;
 
-  g_return_val_if_fail (key[length - 1] != '/', FALSE);
+  xreturn_val_if_fail (key[length - 1] != '/', FALSE);
 
   return TRUE;
 }
@@ -107,15 +107,15 @@ is_path (const xchar_t *path)
   xint_t length;
   xint_t i;
 
-  g_return_val_if_fail (path != NULL, FALSE);
-  g_return_val_if_fail (path[0] == '/', FALSE);
+  xreturn_val_if_fail (path != NULL, FALSE);
+  xreturn_val_if_fail (path[0] == '/', FALSE);
 
   for (i = 1; path[i]; i++)
-    g_return_val_if_fail (path[i] != '/' || path[i + 1] != '/', FALSE);
+    xreturn_val_if_fail (path[i] != '/' || path[i + 1] != '/', FALSE);
 
   length = i;
 
-  g_return_val_if_fail (path[length - 1] == '/', FALSE);
+  xreturn_val_if_fail (path[length - 1] == '/', FALSE);
 
   return TRUE;
 }
@@ -550,7 +550,7 @@ g_settings_backend_flatten_one (xpointer_t key,
   const xchar_t *skey = key;
   xint_t i;
 
-  g_return_val_if_fail (is_key (key), TRUE);
+  xreturn_val_if_fail (is_key (key), TRUE);
 
   /* calculate longest common prefix */
   if (state->prefix == NULL)
@@ -915,7 +915,7 @@ g_settings_backend_finalize (xobject_t *object)
 
   g_mutex_clear (&backend->priv->lock);
 
-  G_OBJECT_CLASS (g_settings_backend_parent_class)
+  XOBJECT_CLASS (g_settings_backend_parent_class)
     ->finalize (object);
 }
 
@@ -941,16 +941,16 @@ g_settings_backend_init (xsettings_backend_t *backend)
 }
 
 static void
-g_settings_backend_class_init (GSettingsBackendClass *class)
+g_settings_backend_class_init (xsettings_backend_class_t *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
   class->subscribe = ignore_subscription;
   class->unsubscribe = ignore_subscription;
 
   class->read_user_value = g_settings_backend_real_read_user_value;
 
-  gobject_class->finalize = g_settings_backend_finalize;
+  xobject_class->finalize = g_settings_backend_finalize;
 }
 
 static void
@@ -1048,7 +1048,7 @@ xpermission_t *
 g_settings_backend_get_permission (xsettings_backend_t *backend,
                                    const xchar_t      *path)
 {
-  GSettingsBackendClass *class = G_SETTINGS_BACKEND_GET_CLASS (backend);
+  xsettings_backend_class_t *class = G_SETTINGS_BACKEND_GET_CLASS (backend);
 
   if (class->get_permission)
     return class->get_permission (backend, path);
@@ -1066,7 +1066,7 @@ g_settings_backend_sync_default (void)
 {
   if (g_settings_has_backend)
     {
-      GSettingsBackendClass *class;
+      xsettings_backend_class_t *class;
       xsettings_backend_t *backend;
 
       backend = g_settings_backend_get_default ();

@@ -470,7 +470,7 @@ xnetwork_monitor_netlink_finalize (xobject_t *object)
   g_clear_pointer (&nl->priv->context, xmain_context_unref);
   g_clear_pointer (&nl->priv->dump_networks, xptr_array_unref);
 
-  G_OBJECT_CLASS (xnetwork_monitor_netlink_parent_class)->finalize (object);
+  XOBJECT_CLASS (xnetwork_monitor_netlink_parent_class)->finalize (object);
 }
 
 static xboolean_t
@@ -494,9 +494,9 @@ read_netlink_messages_callback (xsocket_t      *socket,
 static void
 xnetwork_monitor_netlink_class_init (xnetwork_monitor_netlink_class_t *nl_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
 
-  gobject_class->finalize = xnetwork_monitor_netlink_finalize;
+  xobject_class->finalize = xnetwork_monitor_netlink_finalize;
 }
 
 static void

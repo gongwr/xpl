@@ -290,7 +290,7 @@ g_cond_wait_until (xcond_t  *cond,
   return signalled;
 }
 
-/* {{{1 GPrivate */
+/* {{{1 xprivate_t */
 
 typedef struct _GPrivateDestructor GPrivateDestructor;
 
@@ -305,7 +305,7 @@ static GPrivateDestructor *g_private_destructors;  /* (atomic) prepend-only */
 static CRITICAL_SECTION g_private_lock;
 
 static DWORD
-g_private_get_impl (GPrivate *key)
+g_private_get_impl (xprivate_t *key)
 {
   DWORD impl = (DWORD) GPOINTER_TO_UINT(key->p);
 
@@ -364,20 +364,20 @@ g_private_get_impl (GPrivate *key)
 }
 
 xpointer_t
-g_private_get (GPrivate *key)
+g_private_get (xprivate_t *key)
 {
   return TlsGetValue (g_private_get_impl (key));
 }
 
 void
-g_private_set (GPrivate *key,
+g_private_set (xprivate_t *key,
                xpointer_t  value)
 {
   TlsSetValue (g_private_get_impl (key), value);
 }
 
 void
-g_private_replace (GPrivate *key,
+g_private_replace (xprivate_t *key,
                    xpointer_t  value)
 {
   DWORD impl = g_private_get_impl (key);

@@ -938,7 +938,7 @@ xutf8_strup (const xchar_t *str,
   LocaleType locale_type;
   xchar_t *result;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   locale_type = get_locale_type ();
 
@@ -1132,7 +1132,7 @@ xutf8_strdown (const xchar_t *str,
   LocaleType locale_type;
   xchar_t *result;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   locale_type = get_locale_type ();
 
@@ -1174,7 +1174,7 @@ xutf8_casefold (const xchar_t *str,
   xstring_t *result;
   const char *p;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   result = xstring_new (NULL);
   p = str;

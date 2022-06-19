@@ -24,7 +24,7 @@
 #include "gactiongroup.h"
 #include "giomodule-priv.h"
 
-G_DEFINE_TYPE (xnotification_backend_t, xnotification_backend, XTYPE_OBJECT)
+XDEFINE_TYPE (xnotification_backend, xnotification_backend, XTYPE_OBJECT)
 
 static void
 xnotification_backend_class_init (xnotification_backend_class_t *class)
@@ -42,7 +42,7 @@ xnotification_backend_new_default (xapplication_t *application)
   xtype_t backend_type;
   xnotification_backend_t *backend;
 
-  g_return_val_if_fail (X_IS_APPLICATION (application), NULL);
+  xreturn_val_if_fail (X_IS_APPLICATION (application), NULL);
 
   backend_type = _xio_module_get_default_type (G_NOTIFICATION_BACKEND_EXTENSION_POINT_NAME,
                                                 "GNOTIFICATION_BACKEND",

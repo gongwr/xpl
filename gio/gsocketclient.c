@@ -117,7 +117,7 @@ struct _GSocketClientPrivate
   xboolean_t enable_proxy;
   xhashtable_t *app_proxies;
   xboolean_t tls;
-  GTlsCertificateFlags tls_validation_flags;
+  xtls_certificate_flags_t tls_validation_flags;
   xproxy_resolver_t *proxy_resolver;
 };
 
@@ -245,7 +245,7 @@ xsocket_client_finalize (xobject_t *object)
   g_clear_object (&client->priv->local_address);
   g_clear_object (&client->priv->proxy_resolver);
 
-  G_OBJECT_CLASS (xsocket_client_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsocket_client_parent_class)->finalize (object);
 
   xhash_table_unref (client->priv->app_proxies);
 }
@@ -693,7 +693,7 @@ xsocket_client_set_tls (xsocket_client_t *client,
  *
  * Deprecated: 2.72: Do not attempt to ignore validation errors.
  */
-GTlsCertificateFlags
+xtls_certificate_flags_t
 xsocket_client_get_tls_validation_flags (xsocket_client_t *client)
 {
   return client->priv->tls_validation_flags;
@@ -717,7 +717,7 @@ xsocket_client_get_tls_validation_flags (xsocket_client_t *client)
  */
 void
 xsocket_client_set_tls_validation_flags (xsocket_client_t        *client,
-					  GTlsCertificateFlags  flags)
+					  xtls_certificate_flags_t  flags)
 {
   if (client->priv->tls_validation_flags != flags)
     {
@@ -787,11 +787,11 @@ xsocket_client_set_proxy_resolver (xsocket_client_t  *client,
 static void
 xsocket_client_class_init (GSocketClientClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->finalize = xsocket_client_finalize;
-  gobject_class->set_property = xsocket_client_set_property;
-  gobject_class->get_property = xsocket_client_get_property;
+  xobject_class->finalize = xsocket_client_finalize;
+  xobject_class->set_property = xsocket_client_set_property;
+  xobject_class->get_property = xsocket_client_get_property;
 
   /**
    * xsocket_client_t::event:
@@ -854,7 +854,7 @@ xsocket_client_class_init (GSocketClientClass *class)
    */
   signals[EVENT] =
     xsignal_new (I_("event"),
-		  XTYPE_FROM_CLASS (gobject_class),
+		  XTYPE_FROM_CLASS (xobject_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GSocketClientClass, event),
 		  NULL, NULL,
@@ -867,71 +867,71 @@ xsocket_client_class_init (GSocketClientClass *class)
                               XTYPE_FROM_CLASS (class),
                               _g_cclosure_marshal_VOID__ENUM_OBJECT_OBJECTv);
 
-  xobject_class_install_property (gobject_class, PROP_FAMILY,
-				   g_param_spec_enum ("family",
+  xobject_class_install_property (xobject_class, PROP_FAMILY,
+				   xparam_spec_enum ("family",
 						      P_("Socket family"),
 						      P_("The sockets address family to use for socket construction"),
 						      XTYPE_SOCKET_FAMILY,
 						      XSOCKET_FAMILY_INVALID,
-						      G_PARAM_CONSTRUCT |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_TYPE,
-				   g_param_spec_enum ("type",
+  xobject_class_install_property (xobject_class, PROP_TYPE,
+				   xparam_spec_enum ("type",
 						      P_("Socket type"),
 						      P_("The sockets type to use for socket construction"),
 						      XTYPE_SOCKET_TYPE,
 						      XSOCKET_TYPE_STREAM,
-						      G_PARAM_CONSTRUCT |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_PROTOCOL,
-				   g_param_spec_enum ("protocol",
+  xobject_class_install_property (xobject_class, PROP_PROTOCOL,
+				   xparam_spec_enum ("protocol",
 						      P_("Socket protocol"),
 						      P_("The protocol to use for socket construction, or 0 for default"),
 						      XTYPE_SOCKET_PROTOCOL,
 						      XSOCKET_PROTOCOL_DEFAULT,
-						      G_PARAM_CONSTRUCT |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_LOCAL_ADDRESS,
-				   g_param_spec_object ("local-address",
+  xobject_class_install_property (xobject_class, PROP_LOCAL_ADDRESS,
+				   xparam_spec_object ("local-address",
 							P_("Local address"),
 							P_("The local address constructed sockets will be bound to"),
 							XTYPE_SOCKET_ADDRESS,
-							G_PARAM_CONSTRUCT |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+							XPARAM_CONSTRUCT |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_TIMEOUT,
-				   g_param_spec_uint ("timeout",
+  xobject_class_install_property (xobject_class, PROP_TIMEOUT,
+				   xparam_spec_uint ("timeout",
 						      P_("Socket timeout"),
 						      P_("The I/O timeout for sockets, or 0 for none"),
 						      0, G_MAXUINT, 0,
-						      G_PARAM_CONSTRUCT |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_CONSTRUCT |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
-   xobject_class_install_property (gobject_class, PROP_ENABLE_PROXY,
-				    g_param_spec_boolean ("enable-proxy",
+   xobject_class_install_property (xobject_class, PROP_ENABLE_PROXY,
+				    xparam_spec_boolean ("enable-proxy",
 							  P_("Enable proxy"),
 							  P_("Enable proxy support"),
 							  TRUE,
-							  G_PARAM_CONSTRUCT |
-							  G_PARAM_READWRITE |
-							  G_PARAM_STATIC_STRINGS));
+							  XPARAM_CONSTRUCT |
+							  XPARAM_READWRITE |
+							  XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_TLS,
-				   g_param_spec_boolean ("tls",
+  xobject_class_install_property (xobject_class, PROP_TLS,
+				   xparam_spec_boolean ("tls",
 							 P_("TLS"),
 							 P_("Whether to create TLS connections"),
 							 FALSE,
-							 G_PARAM_CONSTRUCT |
-							 G_PARAM_READWRITE |
-							 G_PARAM_STATIC_STRINGS));
+							 XPARAM_CONSTRUCT |
+							 XPARAM_READWRITE |
+							 XPARAM_STATIC_STRINGS));
 
   /**
    * xsocket_client_t:tls-validation-flags:
@@ -955,16 +955,16 @@ xsocket_client_class_init (GSocketClientClass *class)
    *
    * Deprecated: 2.72: Do not attempt to ignore validation errors.
    */
-  xobject_class_install_property (gobject_class, PROP_TLS_VALIDATION_FLAGS,
-				   g_param_spec_flags ("tls-validation-flags",
+  xobject_class_install_property (xobject_class, PROP_TLS_VALIDATION_FLAGS,
+				   xparam_spec_flags ("tls-validation-flags",
 						       P_("TLS validation flags"),
 						       P_("TLS validation flags to use"),
 						       XTYPE_TLS_CERTIFICATE_FLAGS,
 						       G_TLS_CERTIFICATE_VALIDATE_ALL,
-						       G_PARAM_CONSTRUCT |
-						       G_PARAM_READWRITE |
-						       G_PARAM_STATIC_STRINGS |
-						       G_PARAM_DEPRECATED));
+						       XPARAM_CONSTRUCT |
+						       XPARAM_READWRITE |
+						       XPARAM_STATIC_STRINGS |
+						       XPARAM_DEPRECATED));
 
   /**
    * xsocket_client_t:proxy-resolver:
@@ -973,14 +973,14 @@ xsocket_client_class_init (GSocketClientClass *class)
    *
    * Since: 2.36
    */
-  xobject_class_install_property (gobject_class, PROP_PROXY_RESOLVER,
-                                   g_param_spec_object ("proxy-resolver",
+  xobject_class_install_property (xobject_class, PROP_PROXY_RESOLVER,
+                                   xparam_spec_object ("proxy-resolver",
                                                         P_("Proxy resolver"),
                                                         P_("The proxy resolver to use"),
                                                         XTYPE_PROXY_RESOLVER,
-                                                        G_PARAM_CONSTRUCT |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -1025,7 +1025,7 @@ socket_client_error_info_new (void)
 static void
 socket_client_error_info_free (SocketClientErrorInfo *info)
 {
-  g_assert (info->tmp_error == NULL);
+  xassert (info->tmp_error == NULL);
   g_clear_error (&info->best_error);
   g_free (info);
 }
@@ -1045,7 +1045,7 @@ consider_tmp_error (SocketClientErrorInfo *info,
    * if we get two errors on the same GSocketClientEvent, we wind up
    * preferring the last one, which is fine.
    */
-  g_assert (event <= XSOCKET_CLIENT_COMPLETE);
+  xassert (event <= XSOCKET_CLIENT_COMPLETE);
   if (event >= info->best_error_event)
     {
       g_clear_error (&info->best_error);
@@ -1148,7 +1148,7 @@ xsocket_client_connect (xsocket_client_t       *client,
       if (address == NULL)
 	{
           /* Enumeration is finished. */
-          g_assert (&error_info->best_error != NULL);
+          xassert (&error_info->best_error != NULL);
 	  break;
 	}
 
@@ -1571,8 +1571,8 @@ xsocket_client_async_connect_complete (ConnectionAttempt *attempt)
 {
   GSocketClientAsyncConnectData *data = attempt->data;
   xerror_t *error = NULL;
-  g_assert (attempt->connection);
-  g_assert (!data->completed);
+  xassert (attempt->connection);
+  xassert (!data->completed);
 
   if (!X_IS_SOCKET_CONNECTION (attempt->connection))
     {
@@ -1728,7 +1728,7 @@ complete_connection_with_error (GSocketClientAsyncConnectData *data,
                                 xerror_t                        *error)
 {
   g_debug ("xsocket_client_t: Connection failed: %s", error->message);
-  g_assert (!data->completed);
+  xassert (!data->completed);
 
   xsocket_client_emit_event (data->client, XSOCKET_CLIENT_COMPLETE, data->connectable, NULL);
   data->completed = TRUE;
@@ -1764,9 +1764,9 @@ try_next_successful_connection (GSocketClientAsyncConnectData *data)
   if (data->connection_in_progress)
     return FALSE;
 
-  g_assert (data->successful_connections != NULL);
+  xassert (data->successful_connections != NULL);
   attempt = data->successful_connections->data;
-  g_assert (attempt != NULL);
+  xassert (attempt != NULL);
   data->successful_connections = xslist_remove (data->successful_connections, attempt);
   data->connection_in_progress = TRUE;
 
@@ -1927,14 +1927,14 @@ on_connection_attempt_timeout (xpointer_t data)
     }
 
   g_clear_pointer (&attempt->timeout_source, xsource_unref);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
 on_connection_cancelled (xcancellable_t *cancellable,
                          xpointer_t      data)
 {
-  xcancellable_t *linked_cancellable = G_CANCELLABLE (data);
+  xcancellable_t *linked_cancellable = XCANCELLABLE (data);
 
   xcancellable_cancel (linked_cancellable);
 }
@@ -1979,7 +1979,7 @@ xsocket_client_enumerator_callback (xobject_t      *object,
           g_debug ("xsocket_client_t: Address enumeration failed: %s",
                    data->error_info->tmp_error ? data->error_info->tmp_error->message : NULL);
           consider_tmp_error (data->error_info, XSOCKET_CLIENT_RESOLVING);
-          g_assert (data->error_info->best_error);
+          xassert (data->error_info->best_error);
           complete_connection_with_error (data, g_steal_pointer (&data->error_info->best_error));
         }
 
@@ -2275,7 +2275,7 @@ xsocket_client_connect_finish (xsocket_client_t  *client,
 				xasync_result_t   *result,
 				xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, client), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, client), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }

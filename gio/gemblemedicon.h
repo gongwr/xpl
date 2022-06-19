@@ -32,11 +32,11 @@
 G_BEGIN_DECLS
 
 #define XTYPE_EMBLEMED_ICON         (g_emblemed_icon_get_type ())
-#define G_EMBLEMED_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_EMBLEMED_ICON, xemblemed_icon))
-#define G_EMBLEMED_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_EMBLEMED_ICON, xemblemed_icon_tClass))
+#define G_EMBLEMED_ICON(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_EMBLEMED_ICON, xemblemed_icon_t))
+#define G_EMBLEMED_ICON_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_EMBLEMED_ICON, xemblemed_icon_class_t))
 #define X_IS_EMBLEMED_ICON(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_EMBLEMED_ICON))
 #define X_IS_EMBLEMED_ICON_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_EMBLEMED_ICON))
-#define G_EMBLEMED_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_EMBLEMED_ICON, xemblemed_icon_tClass))
+#define G_EMBLEMED_ICON_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_EMBLEMED_ICON, xemblemed_icon_class_t))
 
 /**
  * xemblemed_icon_t:
@@ -44,7 +44,7 @@ G_BEGIN_DECLS
  * An implementation of #xicon_t for icons with emblems.
  **/
 typedef struct _xemblemed_icon_t        xemblemed_icon_t;
-typedef struct _xemblemed_icon_tClass   xemblemed_icon_tClass;
+typedef struct _xemblemed_icon_class   xemblemed_icon_class_t;
 typedef struct _xemblemed_icon_tPrivate xemblemed_icon_tPrivate;
 
 struct _xemblemed_icon_t
@@ -55,7 +55,7 @@ struct _xemblemed_icon_t
   xemblemed_icon_tPrivate *priv;
 };
 
-struct _xemblemed_icon_tClass
+struct _xemblemed_icon_class
 {
   xobject_class_t parent_class;
 };

@@ -384,8 +384,8 @@ g_dbus_menu_group_unref (GDBusMenuGroup *group)
 {
   if (--group->ref_count == 0)
     {
-      g_assert (group->state == GROUP_OFFLINE);
-      g_assert (group->active == 0);
+      xassert (group->state == GROUP_OFFLINE);
+      xassert (group->active == 0);
 
       xhash_table_remove (group->path->groups, GINT_TO_POINTER (group->id));
       xhash_table_unref (group->proxies);
@@ -502,7 +502,7 @@ g_dbus_menu_group_start_ready (xobject_t      *source_object,
   GDBusMenuGroup *group = user_data;
   xvariant_t *reply;
 
-  g_assert (group->state == GROUP_PENDING);
+  xassert (group->state == GROUP_PENDING);
 
   reply = xdbus_connection_call_finish (connection, result, NULL);
 
@@ -539,7 +539,7 @@ g_dbus_menu_group_activate (GDBusMenuGroup *group)
 {
   if (group->active++ == 0)
     {
-      g_assert (group->state != GROUP_ONLINE);
+      xassert (group->state != GROUP_ONLINE);
 
       if (group->state == GROUP_OFFLINE)
         {
@@ -564,7 +564,7 @@ g_dbus_menu_group_deactivate (GDBusMenuGroup *group)
 {
   if (--group->active == 0)
     {
-      g_assert (group->state != GROUP_OFFLINE);
+      xassert (group->state != GROUP_OFFLINE);
 
       if (group->state == GROUP_ONLINE)
         {
@@ -691,7 +691,7 @@ struct _GDBusMenuModel
   xboolean_t active;
 };
 
-G_DEFINE_TYPE (xdbus_menu_model, xdbus_menu_model, XTYPE_MENU_MODEL)
+XDEFINE_TYPE (xdbus_menu_model, xdbus_menu_model, XTYPE_MENU_MODEL)
 
 static xboolean_t
 g_dbus_menu_model_is_mutable (xmenu_model_t *model)
@@ -797,7 +797,7 @@ g_dbus_menu_model_finalize (xobject_t *object)
   xhash_table_remove (proxy->group->proxies, GINT_TO_POINTER (proxy->id));
   g_dbus_menu_group_unref (proxy->group);
 
-  G_OBJECT_CLASS (g_dbus_menu_model_parent_class)
+  XOBJECT_CLASS (g_dbus_menu_model_parent_class)
     ->finalize (object);
 }
 
@@ -809,7 +809,7 @@ g_dbus_menu_model_init (xdbus_menu_model_t *proxy)
 static void
 g_dbus_menu_model_class_init (xdbus_menu_model_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   class->is_mutable = g_dbus_menu_model_is_mutable;
   class->get_n_items = g_dbus_menu_model_get_n_items;
@@ -884,7 +884,7 @@ g_dbus_menu_model_get (xdbus_connection_t *connection,
   xdbus_menu_model_t *proxy;
   xmain_context_t *context;
 
-  g_return_val_if_fail (bus_name != NULL || xdbus_connection_get_unique_name (connection) == NULL, NULL);
+  xreturn_val_if_fail (bus_name != NULL || xdbus_connection_get_unique_name (connection) == NULL, NULL);
 
   context = xmain_context_get_thread_default ();
   if (context == NULL)

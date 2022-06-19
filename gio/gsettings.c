@@ -499,7 +499,7 @@ settings_backend_keys_changed (xobject_t             *target,
            /* "256 quarks ought to be enough for anybody!"
             * If this bites you, I'm sorry.  Please file a bug.
             */
-           g_assert (l < 256);
+           xassert (l < 256);
          }
 
       if (l > 0)
@@ -562,7 +562,7 @@ g_settings_set_property (xobject_t      *object,
          */
         if (schema != NULL)
           {
-            g_assert (settings->priv->schema == NULL);
+            xassert (settings->priv->schema == NULL);
             settings->priv->schema = schema;
           }
       }
@@ -582,7 +582,7 @@ g_settings_set_property (xobject_t      *object,
           {
             xsettings_schema_source_t *default_source;
 
-            g_assert (settings->priv->schema == NULL);
+            xassert (settings->priv->schema == NULL);
             default_source = g_settings_schema_source_get_default ();
 
             if (default_source == NULL)
@@ -699,7 +699,7 @@ g_settings_finalize (xobject_t *object)
   g_settings_schema_unref (settings->priv->schema);
   g_free (settings->priv->path);
 
-  G_OBJECT_CLASS (g_settings_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_settings_parent_class)->finalize (object);
 }
 
 static void
@@ -712,7 +712,7 @@ g_settings_init (xsettings_t *settings)
 static void
 g_settings_class_init (GSettingsClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   class->writable_change_event = g_settings_real_writable_change_event;
   class->change_event = g_settings_real_change_event;
@@ -846,11 +846,11 @@ g_settings_class_init (GSettingsClass *class)
    * The name of the context that the settings are stored in.
    */
   xobject_class_install_property (object_class, PROP_BACKEND,
-    g_param_spec_object ("backend",
+    xparam_spec_object ("backend",
                          P_("xsettings_backend_t"),
                          P_("The xsettings_backend_t for this settings object"),
-                         XTYPE_SETTINGS_BACKEND, G_PARAM_CONSTRUCT_ONLY |
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         XTYPE_SETTINGS_BACKEND, XPARAM_CONSTRUCT_ONLY |
+                         XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   /**
    * xsettings_t:settings-schema:
@@ -864,12 +864,12 @@ g_settings_class_init (GSettingsClass *class)
    * than the schema itself.  Take care.
    */
   xobject_class_install_property (object_class, PROP_SCHEMA,
-    g_param_spec_boxed ("settings-schema",
+    xparam_spec_boxed ("settings-schema",
                         P_("schema"),
                         P_("The xsettings_schema_t for this settings object"),
                         XTYPE_SETTINGS_SCHEMA,
-                        G_PARAM_CONSTRUCT_ONLY |
-                        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                        XPARAM_CONSTRUCT_ONLY |
+                        XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   /**
    * xsettings_t:schema:
@@ -888,12 +888,12 @@ g_settings_class_init (GSettingsClass *class)
    * version, this property may instead refer to a #xsettings_schema_t.
    */
   xobject_class_install_property (object_class, PROP_SCHEMA_ID,
-    g_param_spec_string ("schema",
+    xparam_spec_string ("schema",
                          P_("Schema name"),
                          P_("The name of the schema for this settings object"),
                          NULL,
-                         G_PARAM_CONSTRUCT_ONLY |
-                         G_PARAM_DEPRECATED | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         XPARAM_CONSTRUCT_ONLY |
+                         XPARAM_DEPRECATED | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
   /**
    * xsettings_t:schema-id:
@@ -902,12 +902,12 @@ g_settings_class_init (GSettingsClass *class)
    * for this #xsettings_t object.
    */
   xobject_class_install_property (object_class, PROP_SCHEMA_ID,
-    g_param_spec_string ("schema-id",
+    xparam_spec_string ("schema-id",
                          P_("Schema name"),
                          P_("The name of the schema for this settings object"),
                          NULL,
-                         G_PARAM_CONSTRUCT_ONLY |
-                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                         XPARAM_CONSTRUCT_ONLY |
+                         XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
    /**
     * xsettings_t:path:
@@ -915,12 +915,12 @@ g_settings_class_init (GSettingsClass *class)
     * The path within the backend where the settings are stored.
     */
    xobject_class_install_property (object_class, PROP_PATH,
-     g_param_spec_string ("path",
+     xparam_spec_string ("path",
                           P_("Base path"),
                           P_("The path within the backend where the settings are"),
                           NULL,
-                          G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                          XPARAM_CONSTRUCT_ONLY |
+                          XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 
    /**
     * xsettings_t:has-unapplied:
@@ -929,11 +929,11 @@ g_settings_class_init (GSettingsClass *class)
     * changes that will be applied when g_settings_apply() is called.
     */
    xobject_class_install_property (object_class, PROP_HAS_UNAPPLIED,
-     g_param_spec_boolean ("has-unapplied",
+     xparam_spec_boolean ("has-unapplied",
                            P_("Has unapplied changes"),
                            P_("TRUE if there are outstanding changes to apply()"),
                            FALSE,
-                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                           XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
    /**
     * xsettings_t:delay-apply:
@@ -944,11 +944,11 @@ g_settings_class_init (GSettingsClass *class)
     * Since: 2.28
     */
    xobject_class_install_property (object_class, PROP_DELAY_APPLY,
-     g_param_spec_boolean ("delay-apply",
+     xparam_spec_boolean ("delay-apply",
                            P_("Delay-apply mode"),
                            P_("Whether this settings object is in “delay-apply” mode"),
                            FALSE,
-                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                           XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 }
 
 /* Construction (new, new_with_path, etc.) {{{1 */
@@ -977,7 +977,7 @@ g_settings_class_init (GSettingsClass *class)
 xsettings_t *
 g_settings_new (const xchar_t *schema_id)
 {
-  g_return_val_if_fail (schema_id != NULL, NULL);
+  xreturn_val_if_fail (schema_id != NULL, NULL);
 
   return xobject_new (XTYPE_SETTINGS,
                        "schema-id", schema_id,
@@ -1026,8 +1026,8 @@ xsettings_t *
 g_settings_new_with_path (const xchar_t *schema_id,
                           const xchar_t *path)
 {
-  g_return_val_if_fail (schema_id != NULL, NULL);
-  g_return_val_if_fail (path_is_valid (path), NULL);
+  xreturn_val_if_fail (schema_id != NULL, NULL);
+  xreturn_val_if_fail (path_is_valid (path), NULL);
 
   return xobject_new (XTYPE_SETTINGS,
                        "schema-id", schema_id,
@@ -1057,8 +1057,8 @@ xsettings_t *
 g_settings_new_with_backend (const xchar_t      *schema_id,
                              xsettings_backend_t *backend)
 {
-  g_return_val_if_fail (schema_id != NULL, NULL);
-  g_return_val_if_fail (X_IS_SETTINGS_BACKEND (backend), NULL);
+  xreturn_val_if_fail (schema_id != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS_BACKEND (backend), NULL);
 
   return xobject_new (XTYPE_SETTINGS,
                        "schema-id", schema_id,
@@ -1087,9 +1087,9 @@ g_settings_new_with_backend_and_path (const xchar_t      *schema_id,
                                       xsettings_backend_t *backend,
                                       const xchar_t      *path)
 {
-  g_return_val_if_fail (schema_id != NULL, NULL);
-  g_return_val_if_fail (X_IS_SETTINGS_BACKEND (backend), NULL);
-  g_return_val_if_fail (path_is_valid (path), NULL);
+  xreturn_val_if_fail (schema_id != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS_BACKEND (backend), NULL);
+  xreturn_val_if_fail (path_is_valid (path), NULL);
 
   return xobject_new (XTYPE_SETTINGS,
                        "schema-id", schema_id,
@@ -1137,9 +1137,9 @@ g_settings_new_full (xsettings_schema_t  *schema,
                      xsettings_backend_t *backend,
                      const xchar_t      *path)
 {
-  g_return_val_if_fail (schema != NULL, NULL);
-  g_return_val_if_fail (backend == NULL || X_IS_SETTINGS_BACKEND (backend), NULL);
-  g_return_val_if_fail (path == NULL || path_is_valid (path), NULL);
+  xreturn_val_if_fail (schema != NULL, NULL);
+  xreturn_val_if_fail (backend == NULL || X_IS_SETTINGS_BACKEND (backend), NULL);
+  xreturn_val_if_fail (path == NULL || path_is_valid (path), NULL);
 
   return xobject_new (XTYPE_SETTINGS,
                        "settings-schema", schema,
@@ -1216,8 +1216,8 @@ g_settings_get_value (xsettings_t   *settings,
   xsettings_schema_key_t skey;
   xvariant_t *value;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   value = g_settings_read_from_backend (settings, &skey, FALSE, FALSE);
@@ -1265,8 +1265,8 @@ g_settings_get_user_value (xsettings_t   *settings,
   xsettings_schema_key_t skey;
   xvariant_t *value;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   value = g_settings_read_from_backend (settings, &skey, TRUE, FALSE);
@@ -1313,8 +1313,8 @@ g_settings_get_default_value (xsettings_t   *settings,
   xsettings_schema_key_t skey;
   xvariant_t *value;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
   value = g_settings_read_from_backend (settings, &skey, FALSE, TRUE);
@@ -1357,8 +1357,8 @@ g_settings_get_enum (xsettings_t   *settings,
   xvariant_t *value;
   xint_t result;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), -1);
-  g_return_val_if_fail (key != NULL, -1);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), -1);
+  xreturn_val_if_fail (key != NULL, -1);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1410,8 +1410,8 @@ g_settings_set_enum (xsettings_t   *settings,
   xvariant_t *variant;
   xboolean_t success;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1467,8 +1467,8 @@ g_settings_get_flags (xsettings_t   *settings,
   xvariant_t *value;
   xuint_t result;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), -1);
-  g_return_val_if_fail (key != NULL, -1);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), -1);
+  xreturn_val_if_fail (key != NULL, -1);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1521,8 +1521,8 @@ g_settings_set_flags (xsettings_t   *settings,
   xvariant_t *variant;
   xboolean_t success;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -1575,8 +1575,8 @@ g_settings_set_value (xsettings_t   *settings,
   xsettings_schema_key_t skey;
   xboolean_t success;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), FALSE);
-  g_return_val_if_fail (key != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  xreturn_val_if_fail (key != NULL, FALSE);
 
   xvariant_ref_sink (value);
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
@@ -1738,9 +1738,9 @@ g_settings_get_mapped (xsettings_t           *settings,
   xvariant_t *value;
   xboolean_t okay;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
-  g_return_val_if_fail (mapping != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (mapping != NULL, NULL);
 
   g_settings_schema_key_init (&skey, settings->priv->schema, key);
 
@@ -2254,14 +2254,14 @@ g_settings_set_strv (xsettings_t           *settings,
 void
 g_settings_delay (xsettings_t *settings)
 {
-  GDelayedSettingsBackend *delayed = NULL;
+  xdelayed_settings_backend_t *delayed = NULL;
 
   g_return_if_fail (X_IS_SETTINGS (settings));
 
   if (X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
     return;
 
-  delayed = g_delayed_settings_backend_new (settings->priv->backend,
+  delayed = xdelayed_settings_backend_new (settings->priv->backend,
                                             settings,
                                             settings->priv->main_context);
   g_settings_backend_unwatch (settings->priv->backend, G_OBJECT (settings));
@@ -2289,10 +2289,10 @@ g_settings_apply (xsettings_t *settings)
 {
   if (X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
     {
-      GDelayedSettingsBackend *delayed;
+      xdelayed_settings_backend_t *delayed;
 
-      delayed = G_DELAYED_SETTINGS_BACKEND (settings->priv->backend);
-      g_delayed_settings_backend_apply (delayed);
+      delayed = XDELAYED_SETTINGS_BACKEND (settings->priv->backend);
+      xdelayed_settings_backend_apply (delayed);
     }
 }
 
@@ -2312,10 +2312,10 @@ g_settings_revert (xsettings_t *settings)
 {
   if (X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend))
     {
-      GDelayedSettingsBackend *delayed;
+      xdelayed_settings_backend_t *delayed;
 
-      delayed = G_DELAYED_SETTINGS_BACKEND (settings->priv->backend);
-      g_delayed_settings_backend_revert (delayed);
+      delayed = XDELAYED_SETTINGS_BACKEND (settings->priv->backend);
+      xdelayed_settings_backend_revert (delayed);
     }
 }
 
@@ -2333,11 +2333,11 @@ g_settings_revert (xsettings_t *settings)
 xboolean_t
 g_settings_get_has_unapplied (xsettings_t *settings)
 {
-  g_return_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
 
   return X_IS_DELAYED_SETTINGS_BACKEND (settings->priv->backend) &&
-         g_delayed_settings_backend_get_has_unapplied (
-           G_DELAYED_SETTINGS_BACKEND (settings->priv->backend));
+         xdelayed_settings_backend_get_has_unapplied (
+           XDELAYED_SETTINGS_BACKEND (settings->priv->backend));
 }
 
 /* Extra API (reset, sync, get_child, is_writable, list_*, ranges) {{{1 */
@@ -2404,7 +2404,7 @@ g_settings_is_writable (xsettings_t   *settings,
   xboolean_t writable;
   xchar_t *path;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), FALSE);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), FALSE);
 
   path = xstrconcat (settings->priv->path, name, NULL);
   writable = g_settings_backend_get_writable (settings->priv->backend, path);
@@ -2440,7 +2440,7 @@ g_settings_get_child (xsettings_t   *settings,
   xchar_t *child_path;
   xsettings_t *child;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
 
   child_schema = g_settings_schema_get_child_schema (settings->priv->schema,
                                                      name);
@@ -2587,7 +2587,7 @@ g_settings_binding_free (xpointer_t data)
 {
   GSettingsBinding *binding = data;
 
-  g_assert (!binding->running);
+  xassert (!binding->running);
 
   if (binding->writable_handler_id)
     xsignal_handler_disconnect (binding->settings,
@@ -2634,8 +2634,8 @@ g_settings_binding_key_changed (xsettings_t   *settings,
   xvalue_t value = G_VALUE_INIT;
   xvariant_t *variant;
 
-  g_assert (settings == binding->settings);
-  g_assert (key == binding->key.name);
+  xassert (settings == binding->settings);
+  xassert (key == binding->key.name);
 
   if (binding->running)
     return;
@@ -2708,8 +2708,8 @@ g_settings_binding_property_changed (xobject_t          *object,
   xvariant_t *variant;
   xboolean_t valid = TRUE;
 
-  g_assert (object == binding->object);
-  g_assert (pspec == binding->property);
+  xassert (object == binding->object);
+  xassert (pspec == binding->property);
 
   if (binding->running)
     return;
@@ -2902,14 +2902,14 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
     }
 
   if ((flags & G_SETTINGS_BIND_GET) &&
-      (binding->property->flags & G_PARAM_WRITABLE) == 0)
+      (binding->property->flags & XPARAM_WRITABLE) == 0)
     {
       g_critical ("g_settings_bind: property '%s' on class '%s' is not "
                   "writable", binding->property->name, G_OBJECT_TYPE_NAME (object));
       return;
     }
   if ((flags & G_SETTINGS_BIND_SET) &&
-      (binding->property->flags & G_PARAM_READABLE) == 0)
+      (binding->property->flags & XPARAM_READABLE) == 0)
     {
       g_critical ("g_settings_bind: property '%s' on class '%s' is not "
                   "readable", binding->property->name, G_OBJECT_TYPE_NAME (object));
@@ -2971,7 +2971,7 @@ g_settings_bind_with_mapping (xsettings_t               *settings,
       sensitive = xobject_class_find_property (objectclass, "sensitive");
 
       if (sensitive && sensitive->value_type == XTYPE_BOOLEAN &&
-          (sensitive->flags & G_PARAM_WRITABLE))
+          (sensitive->flags & XPARAM_WRITABLE))
         g_settings_bind_writable (settings, binding->key.name, object, "sensitive", FALSE);
     }
 
@@ -3039,8 +3039,8 @@ g_settings_binding_writable_changed (xsettings_t   *settings,
   GSettingsWritableBinding *binding = user_data;
   xboolean_t writable;
 
-  g_assert (settings == binding->settings);
-  g_assert (key == binding->key);
+  xassert (settings == binding->settings);
+  xassert (key == binding->key);
 
   writable = g_settings_is_writable (settings, key);
 
@@ -3098,7 +3098,7 @@ g_settings_bind_writable (xsettings_t   *settings,
                   property, G_OBJECT_TYPE_NAME (object));
       return;
     }
-  if ((pspec->flags & G_PARAM_WRITABLE) == 0)
+  if ((pspec->flags & XPARAM_WRITABLE) == 0)
     {
       g_critical ("g_settings_bind_writable: property '%s' on class '%s' is not writable",
                   property, G_OBJECT_TYPE_NAME (object));
@@ -3311,7 +3311,7 @@ g_settings_action_finalize (xobject_t *object)
   xobject_unref (gsa->settings);
   g_settings_schema_key_clear (&gsa->key);
 
-  G_OBJECT_CLASS (g_settings_action_parent_class)
+  XOBJECT_CLASS (g_settings_action_parent_class)
     ->finalize (object);
 }
 
@@ -3393,8 +3393,8 @@ g_settings_create_action (xsettings_t   *settings,
   GSettingsAction *gsa;
   xchar_t *detailed_signal;
 
-  g_return_val_if_fail (X_IS_SETTINGS (settings), NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (X_IS_SETTINGS (settings), NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   gsa = xobject_new (g_settings_action_get_type (), NULL);
   gsa->settings = xobject_ref (settings);

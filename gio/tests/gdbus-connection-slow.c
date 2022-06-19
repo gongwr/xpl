@@ -49,7 +49,7 @@ test_connection_flush_on_timeout (xpointer_t user_data)
   xuint_t iteration = GPOINTER_TO_UINT (user_data);
   g_printerr ("Timeout waiting 1000 msec on iteration %d\n", iteration);
   g_assert_not_reached ();
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -66,7 +66,7 @@ test_connection_flush (void)
   error = NULL;
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  g_assert (connection != NULL);
+  xassert (connection != NULL);
 
   signal_handler_id = xdbus_connection_signal_subscribe (connection,
                                                           NULL, /* sender */
@@ -133,7 +133,7 @@ large_message_timeout_cb (xpointer_t data)
 
   xerror ("Error: timeout waiting for dbus name to appear");
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -148,7 +148,7 @@ large_message_on_name_appeared (xdbus_connection_t *connection,
   xvariant_t *result;
   xuint_t n;
 
-  g_assert (xsource_remove (GPOINTER_TO_UINT (user_data)));
+  xassert (xsource_remove (GPOINTER_TO_UINT (user_data)));
 
   request = g_new (xchar_t, LARGE_MESSAGE_STRING_LENGTH + 1);
   for (n = 0; n < LARGE_MESSAGE_STRING_LENGTH; n++)
@@ -168,11 +168,11 @@ large_message_on_name_appeared (xdbus_connection_t *connection,
                                         NULL,
                                         &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   xvariant_get (result, "(&s)", &reply);
   g_assert_cmpint (strlen (reply), >, LARGE_MESSAGE_STRING_LENGTH);
-  g_assert (xstr_has_prefix (reply, "You greeted me with '01234567890123456789012"));
-  g_assert (xstr_has_suffix (reply, "6789'. Thanks!"));
+  xassert (xstr_has_prefix (reply, "You greeted me with '01234567890123456789012"));
+  xassert (xstr_has_suffix (reply, "6789'. Thanks!"));
   xvariant_unref (result);
 
   g_free (request);
@@ -196,7 +196,7 @@ test_connection_large_message (void)
   session_bus_up ();
 
   /* this is safe; testserver will exit once the bus goes away */
-  g_assert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
+  xassert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
 
   timeout_id = g_timeout_add_seconds (LARGE_MESSAGE_TIMEOUT_SECONDS,
                                       large_message_timeout_cb,

@@ -216,18 +216,18 @@ xpower_profile_monitor_dbus_finalize (xobject_t *object)
   g_clear_object (&dbus->proxy);
   g_clear_handle_id (&dbus->watch_id, g_bus_unwatch_name);
 
-  G_OBJECT_CLASS (xpower_profile_monitor_dbus_parent_class)->finalize (object);
+  XOBJECT_CLASS (xpower_profile_monitor_dbus_parent_class)->finalize (object);
 }
 
 static void
 xpower_profile_monitor_dbus_class_init (xpower_profile_monitor_dbus_tClass *nl_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
 
-  gobject_class->get_property = xpower_profile_monitor_dbus_get_property;
-  gobject_class->finalize = xpower_profile_monitor_dbus_finalize;
+  xobject_class->get_property = xpower_profile_monitor_dbus_get_property;
+  xobject_class->finalize = xpower_profile_monitor_dbus_finalize;
 
-  xobject_class_override_property (gobject_class, PROP_POWER_SAVER_ENABLED, "power-saver-enabled");
+  xobject_class_override_property (xobject_class, PROP_POWER_SAVER_ENABLED, "power-saver-enabled");
 }
 
 static void

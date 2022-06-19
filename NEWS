@@ -361,7 +361,7 @@ Overview of changes in GLib 2.71.0
  - !2064 gobject: Cleanup GWeakRef locations on object finalization
  - !2114 Coerce type cast to void* because it causes compiler warnings
  - !2191 docs: Add .editorconfig file
- - !2214 Document potential footgun with GTlsCertificateFlags and deprecate certain usages
+ - !2214 Document potential footgun with xtls_certificate_flags_t and deprecate certain usages
  - !2223 Better detection of the cleanup attribute.
  - !2227 gdesktopappinfo: Emit "launched" signal for D-Bus activation too
  - !2242 gsettings: Add various missing (nullable) or (not nullable) annotations
@@ -555,7 +555,7 @@ Overview of changes in GLib 2.69.1
 
 * Bugs fixed:
  - #203 API: need g_module_open() variant with xerror_t
- - #2058 win32: GPrivate can leak some objects
+ - #2058 win32: xprivate_t can leak some objects
  - #2321 Add a GTypeFlag for final types
  - #2429 safe_fdwalk/safe_closefrom for Solaris 11.3/11.4
  - #2439 gio trash doesn't recognize existing trash directory in non-fs-root mount
@@ -1632,7 +1632,7 @@ Overview of changes in GLib 2.65.0
  - #1398 gdate: Add error handling for GetDateFormatW calls
  - #1841 Signal handler disconnection race when finalising GCancellableSource
  - #1851 Meson Build Failure on Windows: Undefined Reference to libiconv
- - #1911 Memory leak in g_param_spec_flags and/or g_param_spec_enum
+ - #1911 Memory leak in xparam_spec_flags and/or xparam_spec_enum
  - #1931 xbookmark_file_t API involves time_t
  - #1954 gdbus-server-auth intermittent failure
  - #1957 gdbus-connection test failure on FreeBSD
@@ -1801,7 +1801,7 @@ Overview of changes in GLib 2.63.6
 
 * Fix win32 exception handling with C# exceptions (#2025)
 
-* Fix thread safety of `GUnixMountMonitor` (#2030)
+* Fix thread safety of `xunix_mount_monitor_t` (#2030)
 
 * Additional fixes to new thread pool attribute behaviour from GLib 2.63.4 to
   check if sched_setattr() is allowed by system policies before depending on it (#2039, !1356)
@@ -1819,7 +1819,7 @@ Overview of changes in GLib 2.63.6
  - #1995 Tracker issue for Happy Eyeballs regressions
  - #2002 g_io_channel_read_line does not honour the line_term symbols set
  - #2025 W32 exception handling misbehaves when C# exceptions are thrown when running inside the Visual Studio debugger
- - #2030 Random nautilus test suite failures involving GUnixMountMonitor
+ - #2030 Random nautilus test suite failures involving xunix_mount_monitor_t
  - #2039 sched_setattr() still can cause EPERM through natural causes
  - #2043 Low memory monitor test failed in CI
  - #2044 xapplication_t docs suggest invalid xvariant_t type
@@ -2660,7 +2660,7 @@ Overview of changes in GLib 2.61.0
 * Set `G_WITH_CYGWIN` again when GLib is built on Cygwin (this was a regression
   from the autotools build) (!736)
 
-* Use `GCocoaNotificationBackend` by default on macOS, rather than
+* Use `xcocoa_notification_backend_t` by default on macOS, rather than
   `GGtkNotificationBackend` (!745)
 
 * Use Windows symbol visibility when GLib is built on Cygwin, as PE binaries
@@ -3183,7 +3183,7 @@ Overview of changes in GLib 2.59.0
  - !482 Check for 'z' library before fallbacking to subproject
  - !483 meson: Turn selinux into a meson feature and make it auto by default
  - !484 Meson: Add 'nls' option to disable translation
- - !485 gdbus-codegen: Tag interfaces and properties so annotated with G_PARAM_DEPRECATED
+ - !485 gdbus-codegen: Tag interfaces and properties so annotated with XPARAM_DEPRECATED
  - !486 Check for zlib header
  - !489 glib-mkenums: Support reading @rspfiles for arguments
  - !490 gspawn: Fix g_spawn deadlock in a multi-threaded program on Linux
@@ -3343,7 +3343,7 @@ Bugs fixed:
  !230 gbookmarkfile: Fix some more minor leaks when metadata elements are repeated
  #1466 Not Able to Build glib 2.57.2 in Mingw-w64 x64 bits
  #1433 test_posix_parse: assertion failed (xtime_zone_get_abbreviation (tz, 0) == "UTC"): ("LMT" == "UTC")
- #1446 Follow-up from "Document difference between g_assert() and g_assert_*() wrt G_DISABLE_ASSERT"
+ #1446 Follow-up from "Document difference between xassert() and g_assert_*() wrt G_DISABLE_ASSERT"
  !206 grefstring: Avoid an unnecessary NUL assignment
  #1458 g_volume_get_mount returns NULL value after g_volume_mount_finish is called with no error
  !72 gio: icons should fallback to non-preferred style appropriately.
@@ -3375,11 +3375,11 @@ Overview of changes in GLib 2.57.2
  #903 xmain_context_wait() not deprecated in API, but emits a g_critical()...
  #786 Fix memory leaks in libgio tests
  #927 gio/gresource.c:do_lookup check for terminating "/"
- #976 Document difference between g_assert() and g_assert_*()...
+ #976 Document difference between xassert() and g_assert_*()...
  #1447 glib 2.57.1: test_month_names: assertion failed...
  #1407 Update to Unicode Character Database 11
  #1455 glib python tools have full python path in shebang, limits to 128 characters
- #1459 Missing g_return_val_if_fail in g_async_queue_timeout_pop
+ #1459 Missing xreturn_val_if_fail in g_async_queue_timeout_pop
 
 * Translation updates:
  Friulian
@@ -3452,7 +3452,7 @@ Overview of changes in GLib 2.57.0
  794285	glib-compile-resources should not noisily g_printerr() when xmllint is...
  794473	Remove duplicated option in gio.xml
  794506	glib-mkenums: Enters infinite loop if using typedef enum SomeIdentifier
- 794528	Fix segfault caused by use-after-free in GPollFileMonitor
+ 794528	Fix segfault caused by use-after-free in xpoll_file_monitor_t
  794555	glib meson build fails on MinGW due to misdetected functions
  794557	gtkdoc-scangobj fails on gio in meson builds
  794606	glib-2.56.0 fails to compile when res_nquery is not available
@@ -3475,7 +3475,7 @@ Overview of changes in GLib 2.56.0
  672777 Error in gdummyfile.c
  732184 xobject_t: warn on use of deprecated properties
  733338 Don't segfault in xnetwork_monitor_t when IPv6 support is unavailable
- 742124 g_data_input_stream_read_upto()'s documentation should say that the...
+ 742124 xdata_input_stream_read_upto()'s documentation should say that the...
  749206 xdatetime_t: month names in the genitive case
  768507 simplify qguark functions
  791457 Slow transfer rate when writing to smb/cifs
@@ -3526,7 +3526,7 @@ Overview of changes in GLib 2.55.2
 
 * Bugs fixed:
  520116 xutf8_strlcpy()
- 584284 g_data_input_stream_read_until_async behaves confusingly different f...
+ 584284 xdata_input_stream_read_until_async behaves confusingly different f...
  605700 request for xkey_file_get_locale()
  658713 ngettext (plural forms) needed for "Message has %d file descriptors ...
  685442 windows xnetwork_monitor_t implementation
@@ -3781,7 +3781,7 @@ Overview of changes in GLib 2.55.0
  789681 meson: Libmount support not built
  789723 [PATCH] gdbus-codegen: Call abspath() earlier
  789755 g_get_host_name: ensure return value is always UTF8 encoded
- 789820 GPollFileMonitor is not cleaning up correctly
+ 789820 xpoll_file_monitor_t is not cleaning up correctly
  790015 docs: Various linking and syntax fixes
  790030 xresource_t/xvariant_t fails to load from non-pointer aligned memory
  790093 gio-tool: fix inverted logic in monitor tool
@@ -3955,7 +3955,7 @@ Overview of changes in GLib 2.53.3
  783193 Adapt to OpenURI api change
  783201 gdbus-codegen: Apply --output-directory to generated docs as well
  783340 win32: port monotonic times to use QPC
- 783350 length parameter can be NULL g_data_input_stream_read_line
+ 783350 length parameter can be NULL xdata_input_stream_read_line
  783392 incorrect (out) annotation for g_dbus_interface_info_generate_xml
  783593 GGtkNotificationBackend should use /org/freedesktop/DBus to call Ge...
 
@@ -4341,7 +4341,7 @@ Overview of changes in GLib 2.49.5
 * Add an async variant of xapp_info_launch_default_for_uri
 
 Bugs fixed:
- 522053 GUnixMountMonitor needs to use /proc/self/mountinfo on recent Linux
+ 522053 xunix_mount_monitor_t needs to use /proc/self/mountinfo on recent Linux
  682794 Add usage guidance to logging documentation
  744456 Structured logging API
  766370 Add a macro for initializing x_auto(xvariant_builder)
@@ -5186,7 +5186,7 @@ Overview of changes in GLib 2.43.92
 GLib is now considered frozen.  We do not expect any major changes
 before the release of 2.44.0.
 
- * GUnixMountMonitor now properly supports multiple main contexts
+ * xunix_mount_monitor_t now properly supports multiple main contexts
 
  * many documentation improvements and cleanups.  We are now
    approaching a point where the documentation is 100% complete and the
@@ -5205,7 +5205,7 @@ Bugs fixed:
  730352 Use inet_pton(), if_nametoindex() and if_indextoname() for newer versions of Windows
  733876 Proxy protocol 'http' is not supported.
  741442 threads: use FUTEX_WAIT_PRIVATE and FUTEX_WAKE_PRIVATE if possible
- 742599 Clean up GUnixMountMonitor
+ 742599 Clean up xunix_mount_monitor_t
  743636 gtask: Add a xtask_t:completed property
  743661 g_win32_check_windows_version() is missing from doc
  744722 docs: Expand introduction to mention using async calls over sync ones
@@ -5318,7 +5318,7 @@ Overview of changes in GLib 2.43.4
   are new functions to complete the xsettings_schema_t API.
 
 * Bugs fixed:
- 389585 G_DEFINE_TYPE hack for header files
+ 389585 XDEFINE_TYPE hack for header files
  729351 Add xlist_model_t
  736914 Docs: various fixes and improvements
  741807 Add thread name support on OS X and iOS
@@ -5415,7 +5415,7 @@ Overview of changes in GLib 2.43.1
 
 * Bugs fixed:
   11059 Linux poll issue
- 726037 Add G_PARAM_READWRITE value to the GParamFlags enumeration
+ 726037 Add XPARAM_READWRITE value to the GParamFlags enumeration
  727988 xmemory_output_stream_t hangs when writing more than 1GiB
  729739 tlscertificate: add support for loading certificate chains
  733791 xsettings_t: delay backend subscription
@@ -5653,7 +5653,7 @@ Overview of changes in GLib 2.41.1
  731050 <structname> tags appear in documentation
  731200 unconditional 'notify' during xobject_set() is problematic
  731335 gtype: guard uses of new fundamental type check
- 731341 gparam: change value of G_PARAM_EXPLICIT_NOTIFY
+ 731341 gparam: change value of XPARAM_EXPLICIT_NOTIFY
  731366 run-assert-msg-test.sh gdb leaves assert-msg-test zombie
  731425 giomodule protects function-call with different token than function...
  731513 clang: build failure: implicit declaration of function '__atomic_load_4'
@@ -5777,7 +5777,7 @@ been fixed.
 
 * Bugs fixed:
  710367 Crash in g_settings_backend_dispatch_signal()
- 723899 G_DEFINE_TYPE() causes compiler warnings with clang due to foo_get_instance_private
+ 723899 XDEFINE_TYPE() causes compiler warnings with clang due to foo_get_instance_private
  724859 Let the test_wait_until() test also run on non-*nix
  724916 gio unmount code makes XFCE's Thunar crash
  725651 xsubprocess_launcher_t: Does not copy the calling process environment.
@@ -5946,7 +5946,7 @@ improvements in test coverage.
 
  * fix gsettings.m4 wrt. builddir != srcdir with non-recursive make
 
- * use a directory monitor in GKeyfileSettingsBackend
+ * use a directory monitor in xkeyfile_settings_backend_t
 
  * improve robustness of some xicon_t classes
 
@@ -6153,7 +6153,7 @@ Translations updated:
 Bugs fixed:
  635641 schema compiler should ignore unknown attributes
  637257 xtls_client_connection_gnutls_retrieve_function needs to be able to block
- 637956 GKeyfileSettingsBackend should ignore file deletions
+ 637956 xkeyfile_settings_backend_t should ignore file deletions
  645453 keys from base schema missing from extended schema
  665634 g_dbus_node_info_new_for_xml() errors on unknown attributes in XML files
  668232 Unable to get description and summary for a key
@@ -7939,7 +7939,7 @@ Overview of changes from GLib 2.31.22 to 2.32.0
 * The thread and synchronisation APIs have been updated.
   xmutex_t and xcond_t can be statically allocated without explicit
   initialisation, as can new types GRWLock and GRecMutex.  The
-  GStatic_______ variants of these types have been deprecated.  GPrivate
+  GStatic_______ variants of these types have been deprecated.  xprivate_t
   can also be statically allocated and has a nicer API (deprecating
   GStaticPrivate).  Finally, xthread_create() has been replaced with a
   substantially simplified xthread_new().
@@ -8442,8 +8442,8 @@ list below attempts to summarise, but not every change is listed.
    initialisation.  Dynamic allocation for these types is deprecated.
  - new types GRecMutex and GRWLock can also be statically allocated
    without explicit initialisation.
- - GPrivate can now be statically allocated and has an improved API.
-   Dynamic allocation of GPrivate is deprecated.
+ - xprivate_t can now be statically allocated and has an improved API.
+   Dynamic allocation of xprivate_t is deprecated.
  - GStaticMutex, GStaticRecMutex, GStaticRwLock, GStaticPrivate are
    deprecated.
  - xcond_t now uses monotonic time internally and a new API takes
@@ -8524,7 +8524,7 @@ list below attempts to summarise, but not every change is listed.
 * mount monitoring is now based on /proc/mounts (where available)
   instead of mtab
 
-* new macros G_SOURCE_CONTINUE and G_SOURCE_REMOVE for returning from
+* new macros G_SOURCE_CONTINUE and XSOURCE_REMOVE for returning from
   xsource_func_t (so you don't have to remember what TRUE and FALSE mean)
 
 * use xlocale functions where available to avoid too much heavy lifting
@@ -8601,7 +8601,7 @@ list below attempts to summarise, but not every change is listed.
  660741 g_cond_timedwait is a disaster
  660743 macro wrappers for g_once_init_enter/leave
  660744 finish killing xthread_init()
- 660745 GPrivate leaks on Windows
+ 660745 xprivate_t leaks on Windows
  660791 [gio] Improve doc for xfile_make_directory_with_parents()
  660843 asyncqueue-test is broken
  660849 Remove cruft from xstrerror and xstrsignal
@@ -8926,7 +8926,7 @@ Overview of changes from GLib 2.29.8 to 2.29.10
  652072 gmain: make use of signalfd()
  652168 Crosscompiling Fails if build<=2.24 and host >2.24
  652750 make dist fails
- 652758 xdata_input_stream_t: Clarify g_data_input_stream_read_line docs...
+ 652758 xdata_input_stream_t: Clarify xdata_input_stream_read_line docs...
  652822 Add a xhash_table_iter_replace
  652897 tiny docs clarification for xutf8_to_ucs4_fast
  653140 gmain: use Linux eventfd() for main context wake up
@@ -9630,7 +9630,7 @@ GIO:
   - fix support for IPv6 addresses in URI parsing functions
   - xsocket_client_t fixes for when xsocket_connect succeeds immediately
   - clarify string encoding for xfile_t constructors in docs
-  - new functions g_data_input_stream_read_upto{,async,finish}
+  - new functions xdata_input_stream_read_upto{,async,finish}
   - tweak confusing documentation for xoutput_stream_write()
 
 GDBus:
@@ -9660,7 +9660,7 @@ Other:
 
 Bugs closed:
   50076 Time API to go with date API
- 584284 g_data_input_stream_read_until_async different from sync version
+ 584284 xdata_input_stream_read_until_async different from sync version
  624546 Modification of xdbus_message_t in filter function
  626919 Let xobject_class_install_property() return the installed xparam_spec_t*
  628029 xdatetime_t missing get_week_of_year method
@@ -10074,7 +10074,7 @@ Tests:
  623319 use g_parse_debuxstring for dbus debug flags
  623401 process enums first
  623402 schema compiler reports wrong line numbers
- 623407 g_keyfile_settings_backend_new crashes with the key "/"
+ 623407 xkeyfile_settings_backend_new crashes with the key "/"
  623473 zlib should be checked with pkg-config
  623537 xdbus_proxy_t has weird checking on NameOwnerChanged
  623538 xdbus_proxy_t::g-properties-changed emission for corner cases
@@ -10127,7 +10127,7 @@ Overview of Changes from GLib 2.25.9 to GLib 2.25.10
 * Other:
  - allow xchecksum_t to take (NULL, 0) for data/length
  - GRelation and GCompletion are now deprecated
- - introduce G_PARAM_DEPRECATED and G_ENABLE_DIAGNOSTIC
+ - introduce XPARAM_DEPRECATED and G_ENABLE_DIAGNOSTIC
  - add working directory to xapplication_t platform data
  - lots of documentation cleanups
  - PCRE updated to 8.02
@@ -10293,7 +10293,7 @@ Overview of Changes from GLib 2.25.6 to GLib 2.25.7
 
 * NOTE: API/ABI breaks since 2.25.6 release:
   - xdbus_connection_sync{,_sync} takes a new 'reply_type' argument
-  - GSettingsBackendClass 'list' virtual function changed
+  - xsettings_backend_class_t 'list' virtual function changed
 
   xsettings_t backends and things using GDBus may need to be rebuilt.
 
@@ -10499,7 +10499,7 @@ Overview of Changes from GLib 2.23.6 to GLib 2.24.0
 
 * Bug fixes:
  613601 buglet in dup_close_on_exec_fd
- 584284 g_data_input_stream_read_until_async behaves confusingly
+ 584284 xdata_input_stream_read_until_async behaves confusingly
  613748 Write errors in middle of copy cause hang
  613923 splice_stream_with_progress: wrong error handling
  613667 Typo in xobject_t documentation
@@ -10575,7 +10575,7 @@ Overview of Changes from GLib 2.23.4 to GLib 2.23.5
  611897 g_io_modules_scan_all_in_directory leaks
  608196 Overflow-safe g_new family
  611696 gio uses GetAddrInfo which requires special handing on windows 2k
- 605667 Don't use G_PARAM_SPEC_VALUE_TYPE when we know the pspec is valid
+ 605667 Don't use XPARAM_SPEC_VALUE_TYPE when we know the pspec is valid
  610860 test_xfile_open_readwrite fails if $HOME is unwritable
  552912 glib-2.18 /live-g-file/test_copy_move failed when run as root
  609813 Renaming a file discards file notes
@@ -10669,7 +10669,7 @@ Overview of Changes from GLib 2.23.1 to GLib 2.23.2
 
 * We are now using gcc builtins for atomic operations when available
 
-* g_assert() grew the ability to store assertions in core dumps
+* xassert() grew the ability to store assertions in core dumps
 
 * GIO supports lazy loading of GIO modules, and there is a new
   gio-querymodule utility that goes along with this.
@@ -10748,7 +10748,7 @@ Overview of Changes from GLib 2.23.0 to GLib 2.23.1
 603982 Stack overflow when reading file async with filter
 604645 G_DEFINE_INTERFACE_* documentation is not generated
 604875 Use of sa_len conflicts with system header
-320482 provide G_DEFINE_TYPE like macros for interfaces
+320482 provide XDEFINE_TYPE like macros for interfaces
 
 * Updated translations:
  Estonian
@@ -11124,7 +11124,7 @@ Overview of Changes from GLib 2.21.0 to GLib 2.21.1
  583663	xsocket_type_t enum ends with a comma
  569024	Make xerror_new_valist public
  569376	missing G_G[U]INTPTR_FORMAT
- 580347 off-by-1 bug in GWinHttpFile
+ 580347 off-by-1 bug in xwin_http_file_t
 
 * Updated translations:
  Oriya
@@ -11355,7 +11355,7 @@ Overview of Changes from GLib 2.19.5 to GLib 2.19.6
  - Add a GFilter{Input,Output}Stream::close-base-stream properties which
    determine whether the base stream will be closed when the filter stream
    is finalized.
- - g_data_input_stream_read_line and ..._read_until have asynchronous
+ - xdata_input_stream_read_line and ..._read_until have asynchronous
    variants now.
 
 * Bugs fixed:
@@ -11412,7 +11412,7 @@ Overview of Changes from GLib 2.19.3 to GLib 2.19.4
 
 * Bugs fixed:
  560676 function access for xthreads_supported
- 565905 There is no g_context_group_set_translation_domain
+ 565905 There is no xcontext_group_set_translation_domain
  564210 SUN Studio 12 has supported visibility attribute
  565136 xobject_t's "notify" signal parameters are wrong in gtk-doc
  565831 error in interface creation sample
@@ -11503,7 +11503,7 @@ Overview of Changes from GLib 2.19.0 to GLib 2.19.1
  561807 inotify_sub.c: dup_dirname() fails to remove trailing '/'
  562393 xbuffered_input_stream_read_byte broken if data available
  541715 win32 : patch for warnings and signature problems in recent code
- 547481 g_data_input_stream_read_line behaves not as stated in the docs
+ 547481 xdata_input_stream_read_line behaves not as stated in the docs
  548163 Nautilus displays wrong error message for too long file names
  559633 gtk_image_new_from_gicon does not always work for .desktop files
  555486 – No way to recover command line from xapp_info_t
@@ -11853,7 +11853,7 @@ Overview of Changes from GLib 2.17.0 to GLib 2.17.1
 * Bugs fixed:
  535418 Please document which glib version defines xoffset_t
  528715 Misprint in the description of the interface xtype_class_add_private
- 528714 Misprint in the description of the interface g_param_spec_flags
+ 528714 Misprint in the description of the interface xparam_spec_flags
  537260 Doc bug in XTYPE_INSTANCE_GET_CLASS()
  530527 Misprint in the description of the interface
         g_cclosure_marshal_VOID__FLAGS
@@ -11922,7 +11922,7 @@ Overview of Changes from GLib 2.16.x to GLib 2.17.0
 
 * xchecksum_reset: New function to reset the state of a xchecksum_t
 
-* g_unix_mount_monitor_set_rate_limit: New function to limit the
+* xunix_mount_monitor_set_rate_limit: New function to limit the
   rate at which events are reported
 
 * xfile_query_file_type: New utility function to query the type of
@@ -11965,14 +11965,14 @@ Overview of Changes from GLib 2.16.x to GLib 2.17.0
  526572 Missing * in declaration of parent_class in Object
         Destruction section of xobject_t Reference Manual
  528648 Extra >s in Object Construction section
- 535021 g_param_spec_internal documentation should
+ 535021 xparam_spec_internal documentation should
         describe purpose of nick and blurb
  521513 Firefox crash when using file picker
  528433 gdesktopappinfo snafu ...
  533369 API xfile_info_get_attribute_string () unables to get "...
  521045 glib f_fstypename miscellany
  521672 compile error
- 521946 control rate limit on GUnixMountMonitor
+ 521946 control rate limit on xunix_mount_monitor_t
  522335 Fails to build: glib/gtester.c:276: error: 'ARG_MAX' unde...
  523015 Implement sliding window based upload operation
  523019 Use new GCC 4 feature
@@ -12950,7 +12950,7 @@ Overview of Changes from GLib 2.10.0 to GLib 2.10.1
 
 * Win32 changes:
  - Fix g_listenv() implementation.
- - Allow up to 100 GPrivate structs
+ - Allow up to 100 xprivate_t structs
 
 * Translation updates (fr,hu,lt,pl,sv)
 
@@ -12998,7 +12998,7 @@ Overview of Changes from GLib 2.9.6 to GLib 2.10.0
         number of bytes to check is specified
         [Matthias Clasen]
  331367 gslice requires more POSIX-like semantics for
-        GPrivate destructors [Tor Lillqvist]
+        xprivate_t destructors [Tor Lillqvist]
 
 * Documentation improvements [Matthias, Kang Jeong-Hee,
   Tor Lillqvist, Stefan Kost]
@@ -13173,7 +13173,7 @@ Overview of Changes from GLib 2.9.0 to GLib 2.9.1
    by a function is ignored. [Arjan van de Ven, Alex Larsson]
  - xlist_t and xslist_t now have sort functions which take an
    extra user data argument [Martyn Russell]
- - g_param_spec_ref_sink() has been added for consistency [Tim]
+ - xparam_spec_ref_sink() has been added for consistency [Tim]
 
 * $LOGNAME is respected when determining user data. [Laszlo Peter]
 
@@ -13585,7 +13585,7 @@ Make the handling of filename encodings consistent across all
    functions which accept the same filename encoding. [Tor Lillqvist,
    Owen Taylor]
 GOption
- - Rename g_context_option_error_quark() to a more language-binding
+ - Rename xcontext_option_error_quark() to a more language-binding
    friendly name [Murray Cumming]
  - Accept backslashes in filenames on Win32 [Tor Lillqvist]
 * Strip the internal aliasing prefix IA__ from function names in
@@ -13753,7 +13753,7 @@ Overview of Changes from GLib 2.3.1 to GLib 2.3.2
 * Fix xfilename_{to,from}_utf8() on Win32 and improve
   xfile_test() there too [Hans Breuer]
 * Add a boxed type for NULL-terminated string arrays.  [Matthias]
-* Add G_DEFINE_TYPE() plus variants to ease the constuction
+* Add XDEFINE_TYPE() plus variants to ease the constuction
   of xobject_t boilerplate code.  [Tim Janik]
 * Support & in password GECOS field [Matthias, Soeren Boll Overgaard]
 * Documentation improvements [Matthias, Manish]

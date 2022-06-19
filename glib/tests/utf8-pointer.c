@@ -34,7 +34,7 @@ static void test_utf8 (xconstpointer d)
   xint_t i, j;
   const xchar_t *string = d;
 
-  g_assert (xutf8_validate (string, -1, NULL));
+  xassert (xutf8_validate (string, -1, NULL));
 
   num_chars = xutf8_strlen (string, -1);
 
@@ -47,8 +47,8 @@ static void test_utf8 (xconstpointer d)
   for (i = 0; i < num_chars; i++)
     for (j = 0; j < num_chars; j++)
       {
-        g_assert (xutf8_offset_to_pointer (p[i], j - i) == p[j]);
-        g_assert (xutf8_pointer_to_offset (p[i], p[j]) == j - i);
+        xassert (xutf8_offset_to_pointer (p[i], j - i) == p[j]);
+        xassert (xutf8_pointer_to_offset (p[i], p[j]) == j - i);
       }
 
   g_free (p);
@@ -67,26 +67,26 @@ xchar_t *longline = "asdasdas dsaf asfd as fdasdf asfd asdf as dfas dfasdf a"
 static void
 test_length (void)
 {
-  g_assert (xutf8_strlen ("1234", -1) == 4);
-  g_assert (xutf8_strlen ("1234", 0) == 0);
-  g_assert (xutf8_strlen ("1234", 1) == 1);
-  g_assert (xutf8_strlen ("1234", 2) == 2);
-  g_assert (xutf8_strlen ("1234", 3) == 3);
-  g_assert (xutf8_strlen ("1234", 4) == 4);
-  g_assert (xutf8_strlen ("1234", 5) == 4);
+  xassert (xutf8_strlen ("1234", -1) == 4);
+  xassert (xutf8_strlen ("1234", 0) == 0);
+  xassert (xutf8_strlen ("1234", 1) == 1);
+  xassert (xutf8_strlen ("1234", 2) == 2);
+  xassert (xutf8_strlen ("1234", 3) == 3);
+  xassert (xutf8_strlen ("1234", 4) == 4);
+  xassert (xutf8_strlen ("1234", 5) == 4);
 
-  g_assert (xutf8_strlen (longline, -1) == 762);
-  g_assert (xutf8_strlen (longline, strlen (longline)) == 762);
-  g_assert (xutf8_strlen (longline, 1024) == 762);
+  xassert (xutf8_strlen (longline, -1) == 762);
+  xassert (xutf8_strlen (longline, strlen (longline)) == 762);
+  xassert (xutf8_strlen (longline, 1024) == 762);
 
-  g_assert (xutf8_strlen (NULL, 0) == 0);
+  xassert (xutf8_strlen (NULL, 0) == 0);
 
-  g_assert (xutf8_strlen ("a\340\250\201c", -1) == 3);
-  g_assert (xutf8_strlen ("a\340\250\201c", 1) == 1);
-  g_assert (xutf8_strlen ("a\340\250\201c", 2) == 1);
-  g_assert (xutf8_strlen ("a\340\250\201c", 3) == 1);
-  g_assert (xutf8_strlen ("a\340\250\201c", 4) == 2);
-  g_assert (xutf8_strlen ("a\340\250\201c", 5) == 3);
+  xassert (xutf8_strlen ("a\340\250\201c", -1) == 3);
+  xassert (xutf8_strlen ("a\340\250\201c", 1) == 1);
+  xassert (xutf8_strlen ("a\340\250\201c", 2) == 1);
+  xassert (xutf8_strlen ("a\340\250\201c", 3) == 1);
+  xassert (xutf8_strlen ("a\340\250\201c", 4) == 2);
+  xassert (xutf8_strlen ("a\340\250\201c", 5) == 3);
 }
 
 static void
@@ -113,36 +113,36 @@ test_find (void)
     p = STR + (str_size - 1); \
     \
     q = xutf8_find_prev_char (STR, p); \
-    g_assert (q == STR + 12); \
+    xassert (q == STR + 12); \
     q = xutf8_find_prev_char (STR, q); \
-    g_assert (q == STR + 11); \
+    xassert (q == STR + 11); \
     q = xutf8_find_prev_char (STR, q); \
-    g_assert (q == STR + 8); \
+    xassert (q == STR + 8); \
     q = xutf8_find_prev_char (STR, q); \
-    g_assert (q == STR + 7); \
+    xassert (q == STR + 7); \
     q = xutf8_find_prev_char (STR, q); \
-    g_assert (q == STR + 3); \
+    xassert (q == STR + 3); \
     q = xutf8_find_prev_char (STR, q); \
-    g_assert (q == STR); \
+    xassert (q == STR); \
     q = xutf8_find_prev_char (STR, q); \
     g_assert_null (q); \
     \
     p = STR + 4; \
     q = xutf8_find_prev_char (STR, p); \
-    g_assert (q == STR + 3); \
+    xassert (q == STR + 3); \
     \
     p = STR + 2; \
     q = xutf8_find_prev_char (STR, p); \
-    g_assert (q == STR); \
+    xassert (q == STR); \
     \
     p = STR + 2; \
     q = xutf8_find_next_char (p, NULL); \
-    g_assert (q == STR + 3); \
+    xassert (q == STR + 3); \
     q = xutf8_find_next_char (q, NULL); \
-    g_assert (q == STR + 7); \
+    xassert (q == STR + 7); \
     \
     q = xutf8_find_next_char (p, STR + 6); \
-    g_assert (q == STR + 3); \
+    xassert (q == STR + 3); \
     q = xutf8_find_next_char (q, STR + 6); \
     g_assert_null (q); \
     \
@@ -150,13 +150,13 @@ test_find (void)
     g_assert_null (q); \
     \
     q = xutf8_find_next_char (STR + strlen (STR), NULL); \
-    g_assert (q == STR + strlen (STR) + 1); \
+    xassert (q == STR + strlen (STR) + 1); \
     \
     /* Check return values when reaching the end of the string, \
      * with @end set and unset. */ \
     q = xutf8_find_next_char (STR + 10, NULL); \
     g_assert_nonnull (q); \
-    g_assert (*q == '\0'); \
+    xassert (*q == '\0'); \
     \
     q = xutf8_find_next_char (STR + 10, STR + 11); \
     g_assert_null (q); \

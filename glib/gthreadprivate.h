@@ -83,7 +83,7 @@ xpointer_t        xthread_proxy                  (xpointer_t      thread);
 
 xuint_t           xthread_n_created              (void);
 
-xpointer_t        g_private_set_alloc0            (GPrivate       *key,
+xpointer_t        g_private_set_alloc0            (xprivate_t       *key,
                                                  xsize_t           size);
 
 #endif /* __G_THREADPRIVATE_H__ */

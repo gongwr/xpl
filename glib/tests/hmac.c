@@ -419,7 +419,7 @@ test_hmac_ref_unref (void)
 
   hmac = g_hmac_new (G_CHECKSUM_SHA1, (xuchar_t*)"aaa", 3);
   check = g_hmac_ref (hmac);
-  g_assert (check == hmac);
+  xassert (check == hmac);
   g_hmac_unref (check);
   g_hmac_unref (hmac);
 }
@@ -431,7 +431,7 @@ test_hmac_copy (void)
 
   hmac = g_hmac_new (G_CHECKSUM_SHA256, (xuchar_t*)"aaa", 3);
   check = g_hmac_copy (hmac);
-  g_assert (check != hmac);
+  xassert (check != hmac);
   g_assert_cmpstr (g_hmac_get_string (hmac), ==, g_hmac_get_string (check));
   g_hmac_unref (check);
   g_hmac_unref (hmac);

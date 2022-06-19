@@ -37,7 +37,7 @@ struct _GNotificationServer
   xhashtable_t *applications;
 };
 
-G_DEFINE_TYPE (GNotificationServer, xnotification_server, XTYPE_OBJECT)
+XDEFINE_TYPE (GNotificationServer, xnotification_server, XTYPE_OBJECT)
 
 enum
 {
@@ -74,7 +74,7 @@ org_gtk_Notifications_get_interface (void)
         xerror ("%s", error->message);
 
       iface_info = g_dbus_node_info_lookup_interface (info, "org.gtk.Notifications");
-      g_assert (iface_info);
+      xassert (iface_info);
 
       g_dbus_interface_info_ref (iface_info);
       g_dbus_node_info_unref (info);
@@ -171,7 +171,7 @@ xnotification_server_dispose (xobject_t *object)
   g_clear_pointer (&server->applications, xhash_table_unref);
   g_clear_object (&server->connection);
 
-  G_OBJECT_CLASS (xnotification_server_parent_class)->dispose (object);
+  XOBJECT_CLASS (xnotification_server_parent_class)->dispose (object);
 }
 
 static void
@@ -196,14 +196,14 @@ xnotification_server_get_property (xobject_t    *object,
 static void
 xnotification_server_class_init (GNotificationServerClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->get_property = xnotification_server_get_property;
   object_class->dispose = xnotification_server_dispose;
 
   xobject_class_install_property (object_class, PROP_IS_RUNNING,
-                                   g_param_spec_boolean ("is-running", "", "", FALSE,
-                                                         G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                                   xparam_spec_boolean ("is-running", "", "", FALSE,
+                                                         XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 
   xsignal_new ("notification-received", XTYPE_NOTIFICATION_SERVER, G_SIGNAL_RUN_FIRST,
                 0, NULL, NULL, g_cclosure_marshal_generic, XTYPE_NONE, 3,
@@ -229,7 +229,7 @@ xnotification_server_bus_acquired (xdbus_connection_t *connection,
                                                          &vtable, server, NULL, NULL);
 
   /* register_object only fails if the same object is exported more than once */
-  g_assert (server->object_id > 0);
+  xassert (server->object_id > 0);
 
   server->connection = xobject_ref (connection);
 }
@@ -306,7 +306,7 @@ xnotification_server_stop (GNotificationServer *server)
 xboolean_t
 xnotification_server_get_is_running (GNotificationServer *server)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION_SERVER (server), FALSE);
+  xreturn_val_if_fail (X_IS_NOTIFICATION_SERVER (server), FALSE);
 
   return server->is_running;
 }
@@ -314,7 +314,7 @@ xnotification_server_get_is_running (GNotificationServer *server)
 xchar_t **
 xnotification_server_list_applications (GNotificationServer *server)
 {
-  g_return_val_if_fail (X_IS_NOTIFICATION_SERVER (server), NULL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION_SERVER (server), NULL);
 
   return (xchar_t **) xhash_table_get_keys_as_array (server->applications, NULL);
 }
@@ -325,8 +325,8 @@ xnotification_server_list_notifications (GNotificationServer *server,
 {
   xhashtable_t *notifications;
 
-  g_return_val_if_fail (X_IS_NOTIFICATION_SERVER (server), NULL);
-  g_return_val_if_fail (app_id != NULL, NULL);
+  xreturn_val_if_fail (X_IS_NOTIFICATION_SERVER (server), NULL);
+  xreturn_val_if_fail (app_id != NULL, NULL);
 
   notifications = xhash_table_lookup (server->applications, app_id);
 

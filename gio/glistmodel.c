@@ -173,7 +173,7 @@ xlist_model_default_init (xlist_model_interface_t *iface)
 xtype_t
 xlist_model_get_item_type (xlist_model_t *list)
 {
-  g_return_val_if_fail (X_IS_LIST_MODEL (list), XTYPE_NONE);
+  xreturn_val_if_fail (X_IS_LIST_MODEL (list), XTYPE_NONE);
 
   return XLIST_MODEL_GET_IFACE (list)->get_item_type (list);
 }
@@ -195,7 +195,7 @@ xlist_model_get_item_type (xlist_model_t *list)
 xuint_t
 xlist_model_get_n_items (xlist_model_t *list)
 {
-  g_return_val_if_fail (X_IS_LIST_MODEL (list), 0);
+  xreturn_val_if_fail (X_IS_LIST_MODEL (list), 0);
 
   return XLIST_MODEL_GET_IFACE (list)->get_n_items (list);
 }
@@ -223,7 +223,7 @@ xpointer_t
 xlist_model_get_item (xlist_model_t *list,
                        xuint_t       position)
 {
-  g_return_val_if_fail (X_IS_LIST_MODEL (list), NULL);
+  xreturn_val_if_fail (X_IS_LIST_MODEL (list), NULL);
 
   return XLIST_MODEL_GET_IFACE (list)->get_item (list, position);
 }
@@ -256,7 +256,7 @@ xlist_model_get_object (xlist_model_t *list,
 {
   xpointer_t item;
 
-  g_return_val_if_fail (X_IS_LIST_MODEL (list), NULL);
+  xreturn_val_if_fail (X_IS_LIST_MODEL (list), NULL);
 
   item = xlist_model_get_item (list, position);
 

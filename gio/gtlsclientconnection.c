@@ -76,15 +76,15 @@ xtls_client_connection_default_init (xtls_client_connection_interface_t *iface)
    * Deprecated: 2.72: Do not attempt to ignore validation errors.
    */
   xobject_interface_install_property (iface,
-				       g_param_spec_flags ("validation-flags",
+				       xparam_spec_flags ("validation-flags",
 							   P_("Validation flags"),
 							   P_("What certificate validation to perform"),
 							   XTYPE_TLS_CERTIFICATE_FLAGS,
 							   G_TLS_CERTIFICATE_VALIDATE_ALL,
-							   G_PARAM_READWRITE |
-							   G_PARAM_CONSTRUCT |
-							   G_PARAM_STATIC_STRINGS |
-							   G_PARAM_DEPRECATED));
+							   XPARAM_READWRITE |
+							   XPARAM_CONSTRUCT |
+							   XPARAM_STATIC_STRINGS |
+							   XPARAM_DEPRECATED));
 
   /**
    * xtls_client_connection_t:server-identity:
@@ -107,13 +107,13 @@ xtls_client_connection_default_init (xtls_client_connection_interface_t *iface)
    * Since: 2.28
    */
   xobject_interface_install_property (iface,
-				       g_param_spec_object ("server-identity",
+				       xparam_spec_object ("server-identity",
 							    P_("Server identity"),
 							    P_("xsocket_connectable_t identifying the server"),
 							    XTYPE_SOCKET_CONNECTABLE,
-							    G_PARAM_READWRITE |
-							    G_PARAM_CONSTRUCT |
-							    G_PARAM_STATIC_STRINGS));
+							    XPARAM_READWRITE |
+							    XPARAM_CONSTRUCT |
+							    XPARAM_STATIC_STRINGS));
 
   /**
    * xtls_client_connection_t:use-ssl3:
@@ -126,14 +126,14 @@ xtls_client_connection_default_init (xtls_client_connection_interface_t *iface)
    * Deprecated: 2.56: SSL 3.0 is insecure.
    */
   xobject_interface_install_property (iface,
-				       g_param_spec_boolean ("use-ssl3",
+				       xparam_spec_boolean ("use-ssl3",
 							     P_("Use fallback"),
 							     P_("Use fallback version of SSL/TLS rather than most recent version"),
 							     FALSE,
-							     G_PARAM_READWRITE |
-							     G_PARAM_CONSTRUCT |
-							     G_PARAM_STATIC_STRINGS |
-							     G_PARAM_DEPRECATED));
+							     XPARAM_READWRITE |
+							     XPARAM_CONSTRUCT |
+							     XPARAM_STATIC_STRINGS |
+							     XPARAM_DEPRECATED));
 
   /**
    * xtls_client_connection_t:accepted-cas: (type GLib.List) (element-type GLib.ByteArray)
@@ -149,11 +149,11 @@ xtls_client_connection_default_init (xtls_client_connection_interface_t *iface)
    * Since: 2.28
    */
   xobject_interface_install_property (iface,
-				       g_param_spec_pointer ("accepted-cas",
+				       xparam_spec_pointer ("accepted-cas",
 							     P_("Accepted CAs"),
 							     P_("Distinguished names of the CAs the server accepts certificates from"),
-							     G_PARAM_READABLE |
-							     G_PARAM_STATIC_STRINGS));
+							     XPARAM_READABLE |
+							     XPARAM_STATIC_STRINGS));
 }
 
 /**
@@ -208,12 +208,12 @@ xtls_client_connection_new (xio_stream_t           *base_io_stream,
  *
  * Deprecated: 2.72: Do not attempt to ignore validation errors.
  */
-GTlsCertificateFlags
+xtls_certificate_flags_t
 xtls_client_connection_get_validation_flags (xtls_client_connection_t *conn)
 {
-  GTlsCertificateFlags flags = 0;
+  xtls_certificate_flags_t flags = 0;
 
-  g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "validation-flags", &flags, NULL);
   return flags;
@@ -222,7 +222,7 @@ xtls_client_connection_get_validation_flags (xtls_client_connection_t *conn)
 /**
  * xtls_client_connection_set_validation_flags:
  * @conn: the #xtls_client_connection_t
- * @flags: the #GTlsCertificateFlags to use
+ * @flags: the #xtls_certificate_flags_t to use
  *
  * Sets @conn's validation flags, to override the default set of
  * checks performed when validating a server certificate. By default,
@@ -238,7 +238,7 @@ xtls_client_connection_get_validation_flags (xtls_client_connection_t *conn)
  */
 void
 xtls_client_connection_set_validation_flags (xtls_client_connection_t  *conn,
-					      GTlsCertificateFlags   flags)
+					      xtls_certificate_flags_t   flags)
 {
   g_return_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn));
 
@@ -262,7 +262,7 @@ xtls_client_connection_get_server_identity (xtls_client_connection_t *conn)
 {
   xsocket_connectable_t *identity = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "server-identity", &identity, NULL);
   if (identity)
@@ -309,7 +309,7 @@ xtls_client_connection_get_use_ssl3 (xtls_client_connection_t *conn)
 {
   xboolean_t use_ssl3 = FALSE;
 
-  g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
+  xreturn_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), 0);
 
   xobject_get (G_OBJECT (conn), "use-ssl3", &use_ssl3, NULL);
   return FALSE;
@@ -367,7 +367,7 @@ xtls_client_connection_get_accepted_cas (xtls_client_connection_t *conn)
 {
   xlist_t *accepted_cas = NULL;
 
-  g_return_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TLS_CLIENT_CONNECTION (conn), NULL);
 
   xobject_get (G_OBJECT (conn), "accepted-cas", &accepted_cas, NULL);
   return accepted_cas;

@@ -59,7 +59,7 @@ xsocket_address_enumerator_init (xsocket_address_enumerator_t *enumerator)
 }
 
 static void
-xsocket_address_enumerator_class_init (GSocketAddressEnumeratorClass *enumerator_class)
+xsocket_address_enumerator_class_init (xsocket_address_enumerator_class_t *enumerator_class)
 {
   enumerator_class->next_async = xsocket_address_enumerator_real_next_async;
   enumerator_class->next_finish = xsocket_address_enumerator_real_next_finish;
@@ -94,9 +94,9 @@ xsocket_address_enumerator_next (xsocket_address_enumerator_t  *enumerator,
 				  xcancellable_t              *cancellable,
 				  xerror_t                   **error)
 {
-  GSocketAddressEnumeratorClass *klass;
+  xsocket_address_enumerator_class_t *klass;
 
-  g_return_val_if_fail (X_IS_SOCKET_ADDRESS_ENUMERATOR (enumerator), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_ADDRESS_ENUMERATOR (enumerator), NULL);
 
   klass = XSOCKET_ADDRESS_ENUMERATOR_GET_CLASS (enumerator);
 
@@ -149,7 +149,7 @@ xsocket_address_enumerator_next_async (xsocket_address_enumerator_t *enumerator,
 					xasync_ready_callback_t       callback,
 					xpointer_t                  user_data)
 {
-  GSocketAddressEnumeratorClass *klass;
+  xsocket_address_enumerator_class_t *klass;
 
   g_return_if_fail (X_IS_SOCKET_ADDRESS_ENUMERATOR (enumerator));
 
@@ -163,7 +163,7 @@ xsocket_address_enumerator_real_next_finish (xsocket_address_enumerator_t  *enum
 					      xasync_result_t              *result,
 					      xerror_t                   **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, enumerator), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, enumerator), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -188,9 +188,9 @@ xsocket_address_enumerator_next_finish (xsocket_address_enumerator_t  *enumerato
 					 xasync_result_t              *result,
 					 xerror_t                   **error)
 {
-  GSocketAddressEnumeratorClass *klass;
+  xsocket_address_enumerator_class_t *klass;
 
-  g_return_val_if_fail (X_IS_SOCKET_ADDRESS_ENUMERATOR (enumerator), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET_ADDRESS_ENUMERATOR (enumerator), NULL);
 
   klass = XSOCKET_ADDRESS_ENUMERATOR_GET_CLASS (enumerator);
 

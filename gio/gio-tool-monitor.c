@@ -60,7 +60,7 @@ watch_callback (xfile_monitor_t      *monitor,
   xchar_t *child_str;
   xchar_t *other_str;
 
-  g_assert (child);
+  xassert (child);
 
   if (xfile_is_native (child))
     child_str = xfile_get_path (child);
@@ -81,31 +81,31 @@ watch_callback (xfile_monitor_t      *monitor,
   switch (event_type)
     {
     case XFILE_MONITOR_EVENT_CHANGED:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: changed", child_str);
       break;
     case XFILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: changes done", child_str);
       break;
     case XFILE_MONITOR_EVENT_DELETED:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: deleted", child_str);
       break;
     case XFILE_MONITOR_EVENT_CREATED:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: created", child_str);
       break;
     case XFILE_MONITOR_EVENT_ATTRIBUTE_CHANGED:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: attributes changed", child_str);
       break;
     case XFILE_MONITOR_EVENT_PRE_UNMOUNT:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: pre-unmount", child_str);
       break;
     case XFILE_MONITOR_EVENT_UNMOUNTED:
-      g_assert (!other);
+      xassert (!other);
       g_print ("%s: unmounted", child_str);
       break;
     case XFILE_MONITOR_EVENT_MOVED_IN:
@@ -119,7 +119,7 @@ watch_callback (xfile_monitor_t      *monitor,
         g_print (" (to %s)", other_str);
       break;
     case XFILE_MONITOR_EVENT_RENAMED:
-      g_assert (other);
+      xassert (other);
       g_print ("%s: renamed to %s\n", child_str, other_str);
       break;
 

@@ -611,7 +611,7 @@ match_info_new (const xregex_t *regex,
 xregex_t *
 xmatch_info_get_regex (const xmatch_info_t *match_info)
 {
-  g_return_val_if_fail (match_info != NULL, NULL);
+  xreturn_val_if_fail (match_info != NULL, NULL);
   return match_info->regex;
 }
 
@@ -630,7 +630,7 @@ xmatch_info_get_regex (const xmatch_info_t *match_info)
 const xchar_t *
 xmatch_info_get_string (const xmatch_info_t *match_info)
 {
-  g_return_val_if_fail (match_info != NULL, NULL);
+  xreturn_val_if_fail (match_info != NULL, NULL);
   return match_info->string;
 }
 
@@ -647,7 +647,7 @@ xmatch_info_get_string (const xmatch_info_t *match_info)
 xmatch_info_t       *
 xmatch_info_ref (xmatch_info_t *match_info)
 {
-  g_return_val_if_fail (match_info != NULL, NULL);
+  xreturn_val_if_fail (match_info != NULL, NULL);
   g_atomic_int_inc (&match_info->ref_count);
   return match_info;
 }
@@ -714,9 +714,9 @@ xmatch_info_next (xmatch_info_t  *match_info,
   xint_t prev_match_start;
   xint_t prev_match_end;
 
-  g_return_val_if_fail (match_info != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail (match_info->pos >= 0, FALSE);
+  xreturn_val_if_fail (match_info != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (match_info->pos >= 0, FALSE);
 
   prev_match_start = match_info->offsets[0];
   prev_match_end = match_info->offsets[1];
@@ -766,7 +766,7 @@ xmatch_info_next (xmatch_info_t  *match_info,
       match_info->pos = match_info->offsets[1];
     }
 
-  g_assert (match_info->matches <= match_info->n_subpatterns + 1);
+  xassert (match_info->matches <= match_info->n_subpatterns + 1);
 
   /* it's possible to get two identical matches when we are matching
    * empty strings, for instance if the pattern is "(?=[A-Z0-9])" and
@@ -804,7 +804,7 @@ xmatch_info_next (xmatch_info_t  *match_info,
 xboolean_t
 xmatch_info_matches (const xmatch_info_t *match_info)
 {
-  g_return_val_if_fail (match_info != NULL, FALSE);
+  xreturn_val_if_fail (match_info != NULL, FALSE);
 
   return match_info->matches >= 0;
 }
@@ -829,7 +829,7 @@ xmatch_info_matches (const xmatch_info_t *match_info)
 xint_t
 xmatch_info_get_match_count (const xmatch_info_t *match_info)
 {
-  g_return_val_if_fail (match_info, -1);
+  xreturn_val_if_fail (match_info, -1);
 
   if (match_info->matches == PCRE_ERROR_NOMATCH)
     /* no match */
@@ -887,7 +887,7 @@ xmatch_info_get_match_count (const xmatch_info_t *match_info)
 xboolean_t
 xmatch_info_is_partial_match (const xmatch_info_t *match_info)
 {
-  g_return_val_if_fail (match_info != NULL, FALSE);
+  xreturn_val_if_fail (match_info != NULL, FALSE);
 
   return match_info->matches == PCRE_ERROR_PARTIAL;
 }
@@ -929,8 +929,8 @@ xmatch_info_expand_references (const xmatch_info_t  *match_info,
   xlist_t *list;
   xerror_t *tmp_error = NULL;
 
-  g_return_val_if_fail (string_to_expand != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (string_to_expand != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   list = split_replacement (string_to_expand, &tmp_error);
   if (tmp_error != NULL)
@@ -991,8 +991,8 @@ xmatch_info_fetch (const xmatch_info_t *match_info,
   xchar_t *match = NULL;
   xint_t start, end;
 
-  g_return_val_if_fail (match_info != NULL, NULL);
-  g_return_val_if_fail (match_num >= 0, NULL);
+  xreturn_val_if_fail (match_info != NULL, NULL);
+  xreturn_val_if_fail (match_num >= 0, NULL);
 
   /* match_num does not exist or it didn't matched, i.e. matching "b"
    * against "(a)?b" then group 0 is empty. */
@@ -1041,8 +1041,8 @@ xmatch_info_fetch_pos (const xmatch_info_t *match_info,
                         xint_t             *start_pos,
                         xint_t             *end_pos)
 {
-  g_return_val_if_fail (match_info != NULL, FALSE);
-  g_return_val_if_fail (match_num >= 0, FALSE);
+  xreturn_val_if_fail (match_info != NULL, FALSE);
+  xreturn_val_if_fail (match_num >= 0, FALSE);
 
   /* check whether there was an error */
   if (match_info->matches < 0)
@@ -1126,8 +1126,8 @@ xmatch_info_fetch_named (const xmatch_info_t *match_info,
    * string using pcre_malloc(). */
   xint_t num;
 
-  g_return_val_if_fail (match_info != NULL, NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (match_info != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   num = get_matched_substring_number (match_info, name);
   if (num < 0)
@@ -1165,8 +1165,8 @@ xmatch_info_fetch_named_pos (const xmatch_info_t *match_info,
 {
   xint_t num;
 
-  g_return_val_if_fail (match_info != NULL, FALSE);
-  g_return_val_if_fail (name != NULL, FALSE);
+  xreturn_val_if_fail (match_info != NULL, FALSE);
+  xreturn_val_if_fail (name != NULL, FALSE);
 
   num = get_matched_substring_number (match_info, name);
   if (num < 0)
@@ -1210,7 +1210,7 @@ xmatch_info_fetch_all (const xmatch_info_t *match_info)
   xchar_t **result;
   xint_t i;
 
-  g_return_val_if_fail (match_info != NULL, NULL);
+  xreturn_val_if_fail (match_info != NULL, NULL);
 
   if (match_info->matches < 0)
     return NULL;
@@ -1241,7 +1241,7 @@ G_DEFINE_QUARK (g-regex-error-quark, xregex_error)
 xregex_t *
 xregex_ref (xregex_t *regex)
 {
-  g_return_val_if_fail (regex != NULL, NULL);
+  xreturn_val_if_fail (regex != NULL, NULL);
   g_atomic_int_inc (&regex->ref_count);
   return regex;
 }
@@ -1307,10 +1307,10 @@ xregex_new (const xchar_t         *pattern,
   xboolean_t optimize = FALSE;
   static xsize_t initialised = 0;
 
-  g_return_val_if_fail (pattern != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail ((compile_options & ~XREGEX_COMPILE_MASK) == 0, NULL);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
+  xreturn_val_if_fail (pattern != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail ((compile_options & ~XREGEX_COMPILE_MASK) == 0, NULL);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
 
   if (g_once_init_enter (&initialised))
     {
@@ -1487,7 +1487,7 @@ regex_compile (const xchar_t         *pattern,
 const xchar_t *
 xregex_get_pattern (const xregex_t *regex)
 {
-  g_return_val_if_fail (regex != NULL, NULL);
+  xreturn_val_if_fail (regex != NULL, NULL);
 
   return regex->pattern;
 }
@@ -1597,7 +1597,7 @@ xregex_get_max_lookbehind (const xregex_t *regex)
 xregex_compile_flags_t
 xregex_get_compile_flags (const xregex_t *regex)
 {
-  g_return_val_if_fail (regex != NULL, 0);
+  xreturn_val_if_fail (regex != NULL, 0);
 
   return regex->compile_opts;
 }
@@ -1615,7 +1615,7 @@ xregex_get_compile_flags (const xregex_t *regex)
 xregex_match_flags_t
 xregex_get_match_flags (const xregex_t *regex)
 {
-  g_return_val_if_fail (regex != NULL, 0);
+  xreturn_val_if_fail (regex != NULL, 0);
 
   return regex->match_opts & XREGEX_MATCH_MASK;
 }
@@ -1801,11 +1801,11 @@ xregex_match_full (const xregex_t      *regex,
   xmatch_info_t *info;
   xboolean_t match_ok;
 
-  g_return_val_if_fail (regex != NULL, FALSE);
-  g_return_val_if_fail (string != NULL, FALSE);
-  g_return_val_if_fail (start_position >= 0, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, FALSE);
+  xreturn_val_if_fail (regex != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (start_position >= 0, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, FALSE);
 
   info = match_info_new (regex, string, string_len, start_position,
                          match_options, FALSE);
@@ -1924,11 +1924,11 @@ xregex_match_all_full (const xregex_t      *regex,
   pcre_extra *extra;
   xboolean_t retval;
 
-  g_return_val_if_fail (regex != NULL, FALSE);
-  g_return_val_if_fail (string != NULL, FALSE);
-  g_return_val_if_fail (start_position >= 0, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, FALSE);
+  xreturn_val_if_fail (regex != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (start_position >= 0, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, FALSE);
 
 #ifdef PCRE_NO_AUTO_POSSESS
   /* For PCRE >= 8.34 we need to turn off PCRE_NO_AUTO_POSSESS, which
@@ -2027,8 +2027,8 @@ xregex_get_string_number (const xregex_t *regex,
 {
   xint_t num;
 
-  g_return_val_if_fail (regex != NULL, -1);
-  g_return_val_if_fail (name != NULL, -1);
+  xreturn_val_if_fail (regex != NULL, -1);
+  xreturn_val_if_fail (name != NULL, -1);
 
   num = pcre_get_stringnumber (regex->pcre_re, name);
   if (num == PCRE_ERROR_NOSUBSTRING)
@@ -2193,11 +2193,11 @@ xregex_split_full (const xregex_t      *regex,
   /* the returned array of char **s */
   xchar_t **string_list;
 
-  g_return_val_if_fail (regex != NULL, NULL);
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (start_position >= 0, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
+  xreturn_val_if_fail (regex != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (start_position >= 0, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
 
   if (max_tokens <= 0)
     max_tokens = G_MAXINT;
@@ -2817,12 +2817,12 @@ xregex_replace (const xregex_t      *regex,
   xlist_t *list;
   xerror_t *tmp_error = NULL;
 
-  g_return_val_if_fail (regex != NULL, NULL);
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (start_position >= 0, NULL);
-  g_return_val_if_fail (replacement != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
+  xreturn_val_if_fail (regex != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (start_position >= 0, NULL);
+  xreturn_val_if_fail (replacement != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
 
   list = split_replacement (replacement, &tmp_error);
   if (tmp_error != NULL)
@@ -2886,8 +2886,8 @@ xregex_replace_literal (const xregex_t      *regex,
                          xregex_match_flags_t   match_options,
                          xerror_t           **error)
 {
-  g_return_val_if_fail (replacement != NULL, NULL);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
+  xreturn_val_if_fail (replacement != NULL, NULL);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
 
   return xregex_replace_eval (regex,
                                string, string_len, start_position,
@@ -2974,11 +2974,11 @@ xregex_replace_eval (const xregex_t        *regex,
   xboolean_t done = FALSE;
   xerror_t *tmp_error = NULL;
 
-  g_return_val_if_fail (regex != NULL, NULL);
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (start_position >= 0, NULL);
-  g_return_val_if_fail (eval != NULL, NULL);
-  g_return_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
+  xreturn_val_if_fail (regex != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (start_position >= 0, NULL);
+  xreturn_val_if_fail (eval != NULL, NULL);
+  xreturn_val_if_fail ((match_options & ~XREGEX_MATCH_MASK) == 0, NULL);
 
   if (string_len < 0)
     string_len = strlen (string);
@@ -3077,7 +3077,7 @@ xregex_escape_nul (const xchar_t *string,
   const xchar_t *p, *piece_start, *end;
   xint_t backslashes;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (length < 0)
     return xstrdup (string);
@@ -3146,7 +3146,7 @@ xregex_escape_string (const xchar_t *string,
   xstring_t *escaped;
   const char *p, *piece_start, *end;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (length < 0)
     length = strlen (string);

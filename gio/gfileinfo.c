@@ -88,7 +88,7 @@ struct _xfile_info_class
 };
 
 
-G_DEFINE_TYPE (xfile_info, xfile_info, XTYPE_OBJECT)
+XDEFINE_TYPE (xfile_info, xfile_info, XTYPE_OBJECT)
 
 typedef struct {
   xuint32_t id;
@@ -187,7 +187,7 @@ ensure_attribute_hash (void)
   xuint_t _u G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */; \
   _u = _lookup_attribute (XFILE_ATTRIBUTE_ ## name); \
   /* use for generating the ID: g_print ("#define XFILE_ATTRIBUTE_ID_%s (%u + %u)\n", #name + 17, _u & ~ID_MASK, _u & ID_MASK); */ \
-  g_assert (_u == XFILE_ATTRIBUTE_ID_ ## name); \
+  xassert (_u == XFILE_ATTRIBUTE_ID_ ## name); \
 }G_STMT_END
 
   REGISTER_ATTRIBUTE (STANDARD_TYPE);
@@ -336,15 +336,15 @@ xfile_info_finalize (xobject_t *object)
   if (info->mask != NO_ATTRIBUTE_MASK)
     xfile_attribute_matcher_unref (info->mask);
 
-  G_OBJECT_CLASS (xfile_info_parent_class)->finalize (object);
+  XOBJECT_CLASS (xfile_info_parent_class)->finalize (object);
 }
 
 static void
 xfile_info_class_init (xfile_info_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xfile_info_finalize;
+  xobject_class->finalize = xfile_info_finalize;
 }
 
 static void
@@ -425,7 +425,7 @@ xfile_info_dup (xfile_info_t *other)
 {
   xfile_info_t *new;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (other), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (other), NULL);
 
   new = xfile_info_new ();
   xfile_info_copy_into (other, new);
@@ -578,8 +578,8 @@ xfile_info_has_attribute (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return value != NULL;
@@ -606,8 +606,8 @@ xfile_info_has_namespace (xfile_info_t  *info,
   xuint32_t ns_id;
   xuint_t i;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
-  g_return_val_if_fail (name_space != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (name_space != NULL, FALSE);
 
   ns_id = lookup_namespace (name_space);
 
@@ -643,7 +643,7 @@ xfile_info_list_attributes (xfile_info_t  *info,
   xuint32_t ns_id = (name_space) ? lookup_namespace (name_space) : 0;
   xuint_t i;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   names = xptr_array_new ();
   attrs = (xfile_attribute_t *)info->attributes->data;
@@ -676,8 +676,8 @@ xfile_info_get_attribute_type (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), XFILE_ATTRIBUTE_TYPE_INVALID);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', XFILE_ATTRIBUTE_TYPE_INVALID);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), XFILE_ATTRIBUTE_TYPE_INVALID);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', XFILE_ATTRIBUTE_TYPE_INVALID);
 
   value = xfile_info_find_value_by_name (info, attribute);
   if (value)
@@ -739,8 +739,8 @@ xfile_info_get_attribute_data (xfile_info_t            *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   value = xfile_info_find_value_by_name (info, attribute);
   if (value == NULL)
@@ -775,8 +775,8 @@ xfile_info_get_attribute_status (xfile_info_t  *info,
 {
   GFileAttributeValue *val;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), 0);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), 0);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', 0);
 
   val = xfile_info_find_value_by_name (info, attribute);
   if (val)
@@ -809,8 +809,8 @@ xfile_info_set_attribute_status (xfile_info_t  *info,
 {
   GFileAttributeValue *val;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   val = xfile_info_find_value_by_name (info, attribute);
   if (val)
@@ -827,8 +827,8 @@ _xfile_info_get_attribute_value (xfile_info_t  *info,
 				  const char *attribute)
 
 {
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
 
   return xfile_info_find_value_by_name (info, attribute);
 }
@@ -875,8 +875,8 @@ xfile_info_get_attribute_object (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_object (value);
@@ -899,8 +899,8 @@ xfile_info_get_attribute_string (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_string (value);
@@ -923,8 +923,8 @@ xfile_info_get_attribute_byte_string (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_byte_string (value);
@@ -949,8 +949,8 @@ xfile_info_get_attribute_stringv (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', NULL);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_stringv (value);
@@ -972,8 +972,8 @@ xfile_info_get_attribute_boolean (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_boolean (value);
@@ -996,8 +996,8 @@ xfile_info_get_attribute_uint32 (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), 0);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), 0);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', 0);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_uint32 (value);
@@ -1020,8 +1020,8 @@ xfile_info_get_attribute_int32 (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), 0);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), 0);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', 0);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_int32 (value);
@@ -1044,8 +1044,8 @@ xfile_info_get_attribute_uint64 (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), 0);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), 0);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', 0);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_uint64 (value);
@@ -1068,8 +1068,8 @@ xfile_info_get_attribute_int64  (xfile_info_t  *info,
 {
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), 0);
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), 0);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', 0);
 
   value = xfile_info_find_value_by_name (info, attribute);
   return _xfile_attribute_value_get_int64 (value);
@@ -1475,7 +1475,7 @@ xfile_info_get_deletion_date (xfile_info_t *info)
   xtimezone_t *local_tz = NULL;
   xdatetime_t *dt = NULL;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_TRASH_DELETION_DATE);
@@ -1507,7 +1507,7 @@ xfile_info_get_file_type (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), XFILE_TYPE_UNKNOWN);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), XFILE_TYPE_UNKNOWN);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_TYPE);
@@ -1530,7 +1530,7 @@ xfile_info_get_is_hidden (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_IS_HIDDEN);
@@ -1553,7 +1553,7 @@ xfile_info_get_is_backup (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_IS_BACKUP);
@@ -1576,7 +1576,7 @@ xfile_info_get_is_symlink (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), FALSE);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), FALSE);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_IS_SYMLINK);
@@ -1599,7 +1599,7 @@ xfile_info_get_name (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_NAME);
@@ -1622,7 +1622,7 @@ xfile_info_get_display_name (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_DISPLAY_NAME);
@@ -1645,7 +1645,7 @@ xfile_info_get_edit_name (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_EDIT_NAME);
@@ -1669,7 +1669,7 @@ xfile_info_get_icon (xfile_info_t *info)
   GFileAttributeValue *value;
   xobject_t *obj;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_ICON);
@@ -1698,7 +1698,7 @@ xfile_info_get_symbolic_icon (xfile_info_t *info)
   GFileAttributeValue *value;
   xobject_t *obj;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON);
@@ -1725,7 +1725,7 @@ xfile_info_get_content_type (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_CONTENT_TYPE);
@@ -1750,7 +1750,7 @@ xfile_info_get_size (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), (xoffset_t) 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), (xoffset_t) 0);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_SIZE);
@@ -1815,7 +1815,7 @@ xfile_info_get_modification_date_time (xfile_info_t *info)
   GFileAttributeValue *value, *value_usec;
   xdatetime_t *dt = NULL, *dt2 = NULL;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr_mtime == 0)
     {
@@ -1860,7 +1860,7 @@ xfile_info_get_access_date_time (xfile_info_t *info)
   GFileAttributeValue *value, *value_usec;
   xdatetime_t *dt = NULL, *dt2 = NULL;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr_atime == 0)
     {
@@ -1905,7 +1905,7 @@ xfile_info_get_creation_date_time (xfile_info_t *info)
   GFileAttributeValue *value, *value_usec;
   xdatetime_t *dt = NULL, *dt2 = NULL;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr_ctime == 0)
     {
@@ -1943,7 +1943,7 @@ xfile_info_get_symlink_target (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_SYMLINK_TARGET);
@@ -1967,7 +1967,7 @@ xfile_info_get_etag (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), NULL);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), NULL);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_ETAG_VALUE);
@@ -1991,7 +1991,7 @@ xfile_info_get_sort_order (xfile_info_t *info)
   static xuint32_t attr = 0;
   GFileAttributeValue *value;
 
-  g_return_val_if_fail (X_IS_FILE_INFO (info), 0);
+  xreturn_val_if_fail (X_IS_FILE_INFO (info), 0);
 
   if (attr == 0)
     attr = lookup_attribute (XFILE_ATTRIBUTE_STANDARD_SORT_ORDER);
@@ -2671,7 +2671,7 @@ xfile_attribute_matcher_subtract (xfile_attribute_matcher_t *matcher,
   result->sub_matchers = g_array_new (FALSE, FALSE, sizeof (SubMatcher));
 
   si = 0;
-  g_assert (subtract->sub_matchers->len > 0);
+  xassert (subtract->sub_matchers->len > 0);
   ssub = &g_array_index (subtract->sub_matchers, SubMatcher, si);
 
   for (mi = 0; mi < matcher->sub_matchers->len; mi++)
@@ -2716,7 +2716,7 @@ xfile_attribute_matcher_ref (xfile_attribute_matcher_t *matcher)
 {
   if (matcher)
     {
-      g_return_val_if_fail (matcher->ref > 0, NULL);
+      xreturn_val_if_fail (matcher->ref > 0, NULL);
       g_atomic_int_inc (&matcher->ref);
     }
   return matcher;
@@ -2764,7 +2764,7 @@ xfile_attribute_matcher_matches_only (xfile_attribute_matcher_t *matcher,
   SubMatcher *sub_matcher;
   xuint32_t id;
 
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   if (matcher == NULL ||
       matcher->all)
@@ -2830,7 +2830,7 @@ xboolean_t
 xfile_attribute_matcher_matches (xfile_attribute_matcher_t *matcher,
 				  const char            *attribute)
 {
-  g_return_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
+  xreturn_val_if_fail (attribute != NULL && *attribute != '\0', FALSE);
 
   /* We return a NULL matcher for an empty match string, so handle this */
   if (matcher == NULL)
@@ -2866,7 +2866,7 @@ xfile_attribute_matcher_enumerate_namespace (xfile_attribute_matcher_t *matcher,
   xuint_t ns_id;
   xuint_t i;
 
-  g_return_val_if_fail (ns != NULL && *ns != '\0', FALSE);
+  xreturn_val_if_fail (ns != NULL && *ns != '\0', FALSE);
 
   /* We return a NULL matcher for an empty match string, so handle this */
   if (matcher == NULL)

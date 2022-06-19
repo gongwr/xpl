@@ -159,42 +159,42 @@ g_themed_icon_finalize (xobject_t *object)
   xstrfreev (themed->init_names);
   xstrfreev (themed->names);
 
-  G_OBJECT_CLASS (g_themed_icon_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_themed_icon_parent_class)->finalize (object);
 }
 
 static void
 g_themed_icon_class_init (GThemedIconClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_themed_icon_finalize;
-  gobject_class->constructed = g_themed_icon_constructed;
-  gobject_class->set_property = g_themed_icon_set_property;
-  gobject_class->get_property = g_themed_icon_get_property;
+  xobject_class->finalize = g_themed_icon_finalize;
+  xobject_class->constructed = g_themed_icon_constructed;
+  xobject_class->set_property = g_themed_icon_set_property;
+  xobject_class->get_property = g_themed_icon_get_property;
 
   /**
    * xthemed_icon_t:name:
    *
    * The icon name.
    */
-  xobject_class_install_property (gobject_class, PROP_NAME,
-                                   g_param_spec_string ("name",
+  xobject_class_install_property (xobject_class, PROP_NAME,
+                                   xparam_spec_string ("name",
                                                         P_("name"),
                                                         P_("The name of the icon"),
                                                         NULL,
-                                                        G_PARAM_CONSTRUCT_ONLY | G_PARAM_WRITABLE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB | G_PARAM_STATIC_NICK));
+                                                        XPARAM_CONSTRUCT_ONLY | XPARAM_WRITABLE | XPARAM_STATIC_NAME | XPARAM_STATIC_BLURB | XPARAM_STATIC_NICK));
 
   /**
    * xthemed_icon_t:names:
    *
    * A %NULL-terminated array of icon names.
    */
-  xobject_class_install_property (gobject_class, PROP_NAMES,
-                                   g_param_spec_boxed ("names",
+  xobject_class_install_property (xobject_class, PROP_NAMES,
+                                   xparam_spec_boxed ("names",
                                                        P_("names"),
                                                        P_("An array containing the icon names"),
                                                        XTYPE_STRV,
-                                                       G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB | G_PARAM_STATIC_NICK));
+                                                       XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_NAME | XPARAM_STATIC_BLURB | XPARAM_STATIC_NICK));
 
   /**
    * xthemed_icon_t:use-default-fallbacks:
@@ -215,12 +215,12 @@ g_themed_icon_class_init (GThemedIconClass *klass)
    * };
    * ]|
    */
-  xobject_class_install_property (gobject_class, PROP_USE_DEFAULT_FALLBACKS,
-                                   g_param_spec_boolean ("use-default-fallbacks",
+  xobject_class_install_property (xobject_class, PROP_USE_DEFAULT_FALLBACKS,
+                                   xparam_spec_boolean ("use-default-fallbacks",
                                                          P_("use default fallbacks"),
                                                          P_("Whether to use default fallbacks found by shortening the name at “-” characters. Ignores names after the first if multiple names are given."),
                                                          FALSE,
-                                                         G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB | G_PARAM_STATIC_NICK));
+                                                         XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_NAME | XPARAM_STATIC_BLURB | XPARAM_STATIC_NICK));
 }
 
 static void
@@ -369,7 +369,7 @@ g_themed_icon_update_names (xthemed_icon_t *themed)
 xicon_t *
 g_themed_icon_new (const char *iconname)
 {
-  g_return_val_if_fail (iconname != NULL, NULL);
+  xreturn_val_if_fail (iconname != NULL, NULL);
 
   return XICON (xobject_new (XTYPE_THEMED_ICON, "name", iconname, NULL));
 }
@@ -390,7 +390,7 @@ g_themed_icon_new_from_names (char **iconnames,
 {
   xicon_t *icon;
 
-  g_return_val_if_fail (iconnames != NULL, NULL);
+  xreturn_val_if_fail (iconnames != NULL, NULL);
 
   if (len >= 0)
     {
@@ -439,7 +439,7 @@ g_themed_icon_new_from_names (char **iconnames,
 xicon_t *
 g_themed_icon_new_with_default_fallbacks (const char *iconname)
 {
-  g_return_val_if_fail (iconname != NULL, NULL);
+  xreturn_val_if_fail (iconname != NULL, NULL);
 
   return XICON (xobject_new (XTYPE_THEMED_ICON, "name", iconname, "use-default-fallbacks", TRUE, NULL));
 }
@@ -456,7 +456,7 @@ g_themed_icon_new_with_default_fallbacks (const char *iconname)
 const char * const *
 g_themed_icon_get_names (xthemed_icon_t *icon)
 {
-  g_return_val_if_fail (X_IS_THEMED_ICON (icon), NULL);
+  xreturn_val_if_fail (X_IS_THEMED_ICON (icon), NULL);
   return (const char * const *)icon->names;
 }
 
@@ -564,7 +564,7 @@ g_themed_icon_to_tokens (xicon_t *icon,
   xthemed_icon_t *themed_icon = G_THEMED_ICON (icon);
   int n;
 
-  g_return_val_if_fail (out_version != NULL, FALSE);
+  xreturn_val_if_fail (out_version != NULL, FALSE);
 
   *out_version = 0;
 

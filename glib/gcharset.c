@@ -199,7 +199,7 @@ charset_cache_free (xpointer_t data)
 xboolean_t
 g_get_charset (const char **charset)
 {
-  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
   const xchar_t *raw;
 
@@ -236,7 +236,7 @@ g_get_charset (const char **charset)
 xboolean_t
 _g_get_time_charset (const char **charset)
 {
-  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
   const xchar_t *raw;
 
@@ -276,7 +276,7 @@ _g_get_time_charset (const char **charset)
 xboolean_t
 _g_get_ctype_charset (const char **charset)
 {
-  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
   const xchar_t *raw;
 
@@ -357,7 +357,7 @@ xboolean_t
 g_get_console_charset (const char **charset)
 {
 #ifdef G_OS_WIN32
-  static GPrivate cache_private = G_PRIVATE_INIT (charset_cache_free);
+  static xprivate_t cache_private = G_PRIVATE_INIT (charset_cache_free);
   GCharsetCache *cache = g_private_get (&cache_private);
   const xchar_t *locale;
   unsigned int cp;
@@ -666,7 +666,7 @@ g_get_locale_variants (const xchar_t *locale)
 {
   xptr_array_t *array;
 
-  g_return_val_if_fail (locale != NULL, NULL);
+  xreturn_val_if_fail (locale != NULL, NULL);
 
   array = xptr_array_sized_new (8);
   append_locale_variants (array, locale);
@@ -792,12 +792,12 @@ g_get_language_names (void)
 const xchar_t * const *
 g_get_language_names_with_category (const xchar_t *category_name)
 {
-  static GPrivate cache_private = G_PRIVATE_INIT ((void (*)(xpointer_t)) xhash_table_unref);
+  static xprivate_t cache_private = G_PRIVATE_INIT ((void (*)(xpointer_t)) xhash_table_unref);
   xhashtable_t *cache = g_private_get (&cache_private);
   const xchar_t *languages;
   GLanguageNamesCache *name_cache;
 
-  g_return_val_if_fail (category_name != NULL, NULL);
+  xreturn_val_if_fail (category_name != NULL, NULL);
 
   if (!cache)
     {

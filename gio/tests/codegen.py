@@ -209,7 +209,7 @@ class TestCodegen(unittest.TestCase):
             "_xvalue_equal (const xvalue_t *a, const xvalue_t *b)\n"
             "{\n"
             "  xboolean_t ret = FALSE;\n"
-            "  g_assert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
+            "  xassert (G_VALUE_TYPE (a) == G_VALUE_TYPE (b));\n"
             "  switch (G_VALUE_TYPE (a))\n"
             "    {\n"
             "      case XTYPE_BOOLEAN:\n"

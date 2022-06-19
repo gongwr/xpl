@@ -112,7 +112,7 @@ g_pollable_source_new (xobject_t *pollable_stream)
   xsource_t *source;
   GPollableSource *pollable_source;
 
-  g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (pollable_stream) ||
+  xreturn_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (pollable_stream) ||
 			X_IS_POLLABLE_OUTPUT_STREAM (pollable_stream), NULL);
 
   source = xsource_new (&pollable_source_funcs, sizeof (GPollableSource));
@@ -146,7 +146,7 @@ g_pollable_source_new_full (xpointer_t      pollable_stream,
 {
   xsource_t *source;
 
-  g_return_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (pollable_stream) ||
+  xreturn_val_if_fail (X_IS_POLLABLE_INPUT_STREAM (pollable_stream) ||
 			X_IS_POLLABLE_OUTPUT_STREAM (pollable_stream), NULL);
 
   source = g_pollable_source_new (pollable_stream);

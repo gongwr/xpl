@@ -162,15 +162,15 @@ xmemory_monitor_dbus_finalize (xobject_t *object)
   g_clear_object (&dbus->proxy);
   g_clear_handle_id (&dbus->watch_id, g_bus_unwatch_name);
 
-  G_OBJECT_CLASS (xmemory_monitor_dbus_parent_class)->finalize (object);
+  XOBJECT_CLASS (xmemory_monitor_dbus_parent_class)->finalize (object);
 }
 
 static void
 xmemory_monitor_dbus_class_init (GMemoryMonitorDBusClass *nl_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
 
-  gobject_class->finalize = xmemory_monitor_dbus_finalize;
+  xobject_class->finalize = xmemory_monitor_dbus_finalize;
 }
 
 static void

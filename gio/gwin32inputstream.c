@@ -135,7 +135,7 @@ g_win32_input_stream_read (xinput_stream_t  *stream,
     nbytes = count;
 
   overlap.hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
-  g_return_val_if_fail (overlap.hEvent != NULL, -1);
+  xreturn_val_if_fail (overlap.hEvent != NULL, -1);
 
   res = ReadFile (win32_stream->priv->handle, buffer, nbytes, &nread, &overlap);
   if (res)
@@ -242,11 +242,11 @@ g_win32_input_stream_close (xinput_stream_t  *stream,
 static void
 g_win32_input_stream_class_init (GWin32InputStreamClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xinput_stream_class_t *stream_class = G_INPUT_STREAM_CLASS (klass);
 
-  gobject_class->get_property = g_win32_input_stream_get_property;
-  gobject_class->set_property = g_win32_input_stream_set_property;
+  xobject_class->get_property = g_win32_input_stream_get_property;
+  xobject_class->set_property = g_win32_input_stream_set_property;
 
   stream_class->read_fn = g_win32_input_stream_read;
   stream_class->close_fn = g_win32_input_stream_close;
@@ -259,13 +259,13 @@ g_win32_input_stream_class_init (GWin32InputStreamClass *klass)
    * Since: 2.26
    */
   props[PROP_HANDLE] =
-    g_param_spec_pointer ("handle",
+    xparam_spec_pointer ("handle",
                           P_("File handle"),
                           P_("The file handle to read from"),
-                          G_PARAM_READABLE |
-                          G_PARAM_WRITABLE |
-                          G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS);
+                          XPARAM_READABLE |
+                          XPARAM_WRITABLE |
+                          XPARAM_CONSTRUCT_ONLY |
+                          XPARAM_STATIC_STRINGS);
 
   /**
    * GWin32InputStream:close-handle:
@@ -275,15 +275,15 @@ g_win32_input_stream_class_init (GWin32InputStreamClass *klass)
    * Since: 2.26
    */
   props[PROP_CLOSE_HANDLE] =
-    g_param_spec_boolean ("close-handle",
+    xparam_spec_boolean ("close-handle",
                           P_("Close file handle"),
                           P_("Whether to close the file handle when the stream is closed"),
                           TRUE,
-                          G_PARAM_READABLE |
-                          G_PARAM_WRITABLE |
-                          G_PARAM_STATIC_STRINGS);
+                          XPARAM_READABLE |
+                          XPARAM_WRITABLE |
+                          XPARAM_STATIC_STRINGS);
 
-  xobject_class_install_properties (gobject_class, LAST_PROP, props);
+  xobject_class_install_properties (xobject_class, LAST_PROP, props);
 }
 
 static void
@@ -316,7 +316,7 @@ g_win32_input_stream_new (void     *handle,
 {
   GWin32InputStream *stream;
 
-  g_return_val_if_fail (handle != NULL, NULL);
+  xreturn_val_if_fail (handle != NULL, NULL);
 
   stream = xobject_new (XTYPE_WIN32_INPUT_STREAM,
 			 "handle", handle,
@@ -364,7 +364,7 @@ g_win32_input_stream_set_close_handle (GWin32InputStream *stream,
 xboolean_t
 g_win32_input_stream_get_close_handle (GWin32InputStream *stream)
 {
-  g_return_val_if_fail (X_IS_WIN32_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_WIN32_INPUT_STREAM (stream), FALSE);
 
   return stream->priv->close_handle;
 }
@@ -382,7 +382,7 @@ g_win32_input_stream_get_close_handle (GWin32InputStream *stream)
 void *
 g_win32_input_stream_get_handle (GWin32InputStream *stream)
 {
-  g_return_val_if_fail (X_IS_WIN32_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_WIN32_INPUT_STREAM (stream), NULL);
 
   return stream->priv->handle;
 }

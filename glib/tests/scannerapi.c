@@ -30,13 +30,13 @@ scanner_fixture_setup (ScannerFixture *fix,
                        xconstpointer   test_data)
 {
   fix->scanner = g_scanner_new (NULL);
-  g_assert (fix->scanner != NULL);
+  xassert (fix->scanner != NULL);
 }
 static void
 scanner_fixture_teardown (ScannerFixture *fix,
                           xconstpointer   test_data)
 {
-  g_assert (fix->scanner != NULL);
+  xassert (fix->scanner != NULL);
   g_scanner_destroy (fix->scanner);
 }
 
@@ -98,7 +98,7 @@ test_scanner_symbols (ScannerFixture *fix,
   g_scanner_scope_foreach_symbol (fix->scanner, 1, check_keys, NULL);
   g_assert_cmpint (GPOINTER_TO_INT (g_scanner_lookup_symbol (fix->scanner, "5")), ==, 5);
   g_scanner_scope_remove_symbol (fix->scanner, 1, "5");
-  g_assert (g_scanner_lookup_symbol (fix->scanner, "5") == NULL);
+  xassert (g_scanner_lookup_symbol (fix->scanner, "5") == NULL);
 
   g_assert_cmpint (GPOINTER_TO_INT (g_scanner_scope_lookup_symbol (fix->scanner, 1, "4")), ==, 4);
   g_assert_cmpint (GPOINTER_TO_INT (g_scanner_scope_lookup_symbol (fix->scanner, 1, "5")), ==, 0);

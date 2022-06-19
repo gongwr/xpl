@@ -74,7 +74,7 @@ org_gtk_Menus_get_interface (void)
       if (info == NULL)
         xerror ("%s", error->message);
       interface_info = g_dbus_node_info_lookup_interface (info, "org.gtk.Menus");
-      g_assert (interface_info != NULL);
+      xassert (interface_info != NULL);
       g_dbus_interface_info_ref (interface_info);
       g_dbus_node_info_unref (info);
     }
@@ -251,9 +251,9 @@ xmenu_exporter_menu_items_changed (xmenu_model_t *model,
   GSequenceIter *point;
   xint_t i;
 
-  g_assert (menu->model == model);
-  g_assert (menu->item_links != NULL);
-  g_assert (position + removed <= g_sequence_get_length (menu->item_links));
+  xassert (menu->model == model);
+  xassert (menu->item_links != NULL);
+  xassert (position + removed <= g_sequence_get_length (menu->item_links));
 
   point = g_sequence_get_iter_at_pos (menu->item_links, position + removed);
   g_sequence_remove_range (g_sequence_get_iter_at_pos (menu->item_links, position), point);
@@ -285,7 +285,7 @@ xmenu_exporter_menu_prepare (GMenuExporterMenu *menu)
 {
   xint_t n_items;
 
-  g_assert (menu->item_links == NULL);
+  xassert (menu->item_links == NULL);
 
   if (xmenu_model_is_mutable (menu->model))
     menu->handler_id = xsignal_connect (menu->model, "items-changed",
@@ -392,7 +392,7 @@ static void
 xmenu_exporter_group_unsubscribe (GMenuExporterGroup *group,
                                    xint_t                count)
 {
-  g_assert (group->subscribed >= count);
+  xassert (group->subscribed >= count);
 
   group->subscribed -= count;
 
@@ -570,7 +570,7 @@ xmenu_exporter_name_vanished (xdbus_connection_t *connection,
   GMenuExporter *exporter = user_data;
 
   /* connection == NULL when we get called because the connection closed */
-  g_assert (exporter->connection == connection || connection == NULL);
+  xassert (exporter->connection == connection || connection == NULL);
 
   xhash_table_remove (exporter->remotes, name);
 }

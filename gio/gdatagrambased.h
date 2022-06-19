@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 
 #define XTYPE_DATAGRAM_BASED             (g_datagram_based_get_type ())
 #define G_DATAGRAM_BASED(inst)            (XTYPE_CHECK_INSTANCE_CAST ((inst), \
-                                           XTYPE_DATAGRAM_BASED, xdatagram_based))
+                                           XTYPE_DATAGRAM_BASED, xdatagram_based_t))
 #define X_IS_DATAGRAM_BASED(inst)         (XTYPE_CHECK_INSTANCE_TYPE ((inst), \
                                            XTYPE_DATAGRAM_BASED))
 #define G_DATAGRAM_BASED_GET_IFACE(inst)  (XTYPE_INSTANCE_GET_INTERFACE ((inst), \

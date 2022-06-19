@@ -102,7 +102,7 @@ g_hmac_new (GChecksumType  digest_type,
   xsize_t block_size;
 
   checksum = xchecksum_new (digest_type);
-  g_return_val_if_fail (checksum != NULL, NULL);
+  xreturn_val_if_fail (checksum != NULL, NULL);
 
   switch (digest_type)
     {
@@ -118,7 +118,7 @@ g_hmac_new (GChecksumType  digest_type,
       block_size = 128; /* RFC 4868 */
       break;
     default:
-      g_return_val_if_reached (NULL);
+      xreturn_val_if_reached (NULL);
     }
 
   hmac = g_slice_new0 (xhmac_t);
@@ -176,7 +176,7 @@ g_hmac_copy (const xhmac_t *hmac)
 {
   xhmac_t *copy;
 
-  g_return_val_if_fail (hmac != NULL, NULL);
+  xreturn_val_if_fail (hmac != NULL, NULL);
 
   copy = g_slice_new (xhmac_t);
   copy->ref_count = 1;
@@ -202,7 +202,7 @@ g_hmac_copy (const xhmac_t *hmac)
 xhmac_t *
 g_hmac_ref (xhmac_t *hmac)
 {
-  g_return_val_if_fail (hmac != NULL, NULL);
+  xreturn_val_if_fail (hmac != NULL, NULL);
 
   g_atomic_int_inc (&hmac->ref_count);
 
@@ -282,7 +282,7 @@ g_hmac_get_string (xhmac_t *hmac)
   xuint8_t *buffer;
   xsize_t digest_len;
 
-  g_return_val_if_fail (hmac != NULL, NULL);
+  xreturn_val_if_fail (hmac != NULL, NULL);
 
   digest_len = xchecksum_type_get_length (hmac->digest_type);
   buffer = g_alloca (digest_len);
@@ -357,7 +357,7 @@ g_compute_hmac_for_data (GChecksumType  digest_type,
   xhmac_t *hmac;
   xchar_t *retval;
 
-  g_return_val_if_fail (length == 0 || data != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || data != NULL, NULL);
 
   hmac = g_hmac_new (digest_type, key, key_len);
   if (!hmac)
@@ -397,8 +397,8 @@ g_compute_hmac_for_bytes (GChecksumType  digest_type,
   xconstpointer key_data;
   xsize_t key_len;
 
-  g_return_val_if_fail (data != NULL, NULL);
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (data != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   byte_data = xbytes_get_data (data, &length);
   key_data = xbytes_get_data (key, &key_len);
@@ -431,7 +431,7 @@ g_compute_hmac_for_string (GChecksumType  digest_type,
                            const xchar_t   *str,
                            xssize_t         length)
 {
-  g_return_val_if_fail (length == 0 || str != NULL, NULL);
+  xreturn_val_if_fail (length == 0 || str != NULL, NULL);
 
   if (length < 0)
     length = strlen (str);

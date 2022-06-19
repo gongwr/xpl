@@ -224,7 +224,7 @@ xmarkup_parse_context_new (const GMarkupParser *parser,
 {
   xmarkup_parse_context_t *context;
 
-  g_return_val_if_fail (parser != NULL, NULL);
+  xreturn_val_if_fail (parser != NULL, NULL);
 
   context = g_new (xmarkup_parse_context_t, 1);
 
@@ -284,8 +284,8 @@ xmarkup_parse_context_new (const GMarkupParser *parser,
 xmarkup_parse_context_t *
 xmarkup_parse_context_ref (xmarkup_parse_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
-  g_return_val_if_fail (context->ref_count > 0, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context->ref_count > 0, NULL);
 
   g_atomic_int_inc (&context->ref_count);
 
@@ -786,7 +786,7 @@ unescape_xstring_inplace (xmarkup_parse_context_t  *context,
         }
     }
 
-  g_assert (to - string->str <= (xssize_t) string->len);
+  xassert (to - string->str <= (xssize_t) string->len);
   if (to - string->str != (xssize_t) string->len)
     xstring_truncate (string, to - string->str);
 
@@ -901,7 +901,7 @@ pop_subparser_stack (xmarkup_parse_context_t *context)
 {
   GMarkupRecursionTracker *tracker;
 
-  g_assert (context->subparser_stack);
+  xassert (context->subparser_stack);
 
   tracker = context->subparser_stack->data;
 
@@ -966,7 +966,7 @@ ensure_no_outstanding_subparser (xmarkup_parse_context_t *context)
 static const xchar_t*
 current_attribute (xmarkup_parse_context_t *context)
 {
-  g_assert (context->cur_attr >= 0);
+  xassert (context->cur_attr >= 0);
   return context->attr_names[context->cur_attr]->str;
 }
 
@@ -1003,10 +1003,10 @@ clear_attributes (xmarkup_parse_context_t *context)
       release_chunk (context, context->attr_values[pos]);
       context->attr_names[pos] = context->attr_values[pos] = NULL;
     }
-  g_assert (context->cur_attr == -1);
-  g_assert (context->attr_names == NULL ||
+  xassert (context->cur_attr == -1);
+  xassert (context->attr_names == NULL ||
             context->attr_names[0] == NULL);
-  g_assert (context->attr_values == NULL ||
+  xassert (context->attr_values == NULL ||
             context->attr_values[0] == NULL);
 }
 
@@ -1082,7 +1082,7 @@ emit_end_element (xmarkup_parse_context_t  *context,
    */
   xerror_t *tmp_error = NULL;
 
-  g_assert (context->tag_stack != NULL);
+  xassert (context->tag_stack != NULL);
 
   possibly_finish_subparser (context);
 
@@ -1138,10 +1138,10 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                               xssize_t                text_len,
                               xerror_t              **error)
 {
-  g_return_val_if_fail (context != NULL, FALSE);
-  g_return_val_if_fail (text != NULL, FALSE);
-  g_return_val_if_fail (context->state != STATE_ERROR, FALSE);
-  g_return_val_if_fail (!context->parsing, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (text != NULL, FALSE);
+  xreturn_val_if_fail (context->state != STATE_ERROR, FALSE);
+  xreturn_val_if_fail (!context->parsing, FALSE);
 
   if (text_len < 0)
     text_len = strlen (text);
@@ -1165,7 +1165,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
         case STATE_START:
           /* Possible next state: AFTER_OPEN_ANGLE */
 
-          g_assert (context->tag_stack == NULL);
+          xassert (context->tag_stack == NULL);
 
           /* whitespace is ignored outside of any elements */
           skip_spaces (context);
@@ -1499,7 +1499,7 @@ xmarkup_parse_context_parse (xmarkup_parse_context_t  *context,
                */
               add_to_partial (context, context->start, context->iter);
 
-              g_assert (context->cur_attr >= 0);
+              xassert (context->cur_attr >= 0);
 
               if (unescape_xstring_inplace (context, context->partial_chunk, &is_ascii, error) &&
                   (is_ascii || text_validate (context, context->partial_chunk->str,
@@ -1783,9 +1783,9 @@ xboolean_t
 xmarkup_parse_context_end_parse (xmarkup_parse_context_t  *context,
                                   xerror_t              **error)
 {
-  g_return_val_if_fail (context != NULL, FALSE);
-  g_return_val_if_fail (!context->parsing, FALSE);
-  g_return_val_if_fail (context->state != STATE_ERROR, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (!context->parsing, FALSE);
+  xreturn_val_if_fail (context->state != STATE_ERROR, FALSE);
 
   if (context->partial_chunk != NULL)
     {
@@ -1861,7 +1861,7 @@ xmarkup_parse_context_end_parse (xmarkup_parse_context_t  *context,
       break;
 
     case STATE_INSIDE_TEXT:
-      g_assert (context->tag_stack != NULL);
+      xassert (context->tag_stack != NULL);
       set_error (context, error, G_MARKUP_ERROR_PARSE,
                  _("Document ended unexpectedly with elements still open — "
                    "“%s” was the last element opened"),
@@ -1915,7 +1915,7 @@ xmarkup_parse_context_end_parse (xmarkup_parse_context_t  *context,
 const xchar_t *
 xmarkup_parse_context_get_element (xmarkup_parse_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
 
   if (context->tag_stack == NULL)
     return NULL;
@@ -1946,7 +1946,7 @@ xmarkup_parse_context_get_element (xmarkup_parse_context_t *context)
 const xslist_t *
 xmarkup_parse_context_get_element_stack (xmarkup_parse_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
   return context->tag_stack;
 }
 
@@ -2170,7 +2170,7 @@ xmarkup_parse_context_pop (xmarkup_parse_context_t *context)
   if (!context->awaiting_pop)
     possibly_finish_subparser (context);
 
-  g_assert (context->awaiting_pop);
+  xassert (context->awaiting_pop);
 
   context->awaiting_pop = FALSE;
 
@@ -2312,7 +2312,7 @@ g_markup_escape_text (const xchar_t *text,
 {
   xstring_t *str;
 
-  g_return_val_if_fail (text != NULL, NULL);
+  xreturn_val_if_fail (text != NULL, NULL);
 
   if (length < 0)
     length = strlen (text);

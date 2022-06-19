@@ -87,7 +87,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_CODE (xsocket_address_t, xsocket_address, XTYPE_OBJE
 xsocket_family_t
 xsocket_address_get_family (xsocket_address_t *address)
 {
-  g_return_val_if_fail (X_IS_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (X_IS_SOCKET_ADDRESS (address), 0);
 
   return XSOCKET_ADDRESS_GET_CLASS (address)->get_family (address);
 }
@@ -112,18 +112,18 @@ xsocket_address_get_property (xobject_t *object, xuint_t prop_id,
 static void
 xsocket_address_class_init (GSocketAddressClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xsocket_address_get_property;
+  xobject_class->get_property = xsocket_address_get_property;
 
-  xobject_class_install_property (gobject_class, PROP_FAMILY,
-                                   g_param_spec_enum ("family",
+  xobject_class_install_property (xobject_class, PROP_FAMILY,
+                                   xparam_spec_enum ("family",
 						      P_("Address family"),
 						      P_("The family of the socket address"),
 						      XTYPE_SOCKET_FAMILY,
 						      XSOCKET_FAMILY_INVALID,
-						      G_PARAM_READABLE |
-                                                      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READABLE |
+                                                      XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -156,7 +156,7 @@ xsocket_address_init (xsocket_address_t *address)
 xssize_t
 xsocket_address_get_native_size (xsocket_address_t *address)
 {
-  g_return_val_if_fail (X_IS_SOCKET_ADDRESS (address), -1);
+  xreturn_val_if_fail (X_IS_SOCKET_ADDRESS (address), -1);
 
   return XSOCKET_ADDRESS_GET_CLASS (address)->get_native_size (address);
 }
@@ -187,7 +187,7 @@ xsocket_address_to_native (xsocket_address_t  *address,
 			    xsize_t            destlen,
 			    xerror_t         **error)
 {
-  g_return_val_if_fail (X_IS_SOCKET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET_ADDRESS (address), FALSE);
 
   return XSOCKET_ADDRESS_GET_CLASS (address)->to_native (address, dest, destlen, error);
 }
@@ -306,32 +306,32 @@ xsocket_address_new_from_native (xpointer_t native,
 
 
 #define XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR (_xsocket_address_address_enumerator_get_type ())
-#define XSOCKET_ADDRESS_ADDRESS_ENUMERATOR(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR, GSocketAddressAddressEnumerator))
+#define XSOCKET_ADDRESS_ADDRESS_ENUMERATOR(obj) (XTYPE_CHECK_INSTANCE_CAST ((obj), XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR, xsocket_address_address_enumerator_t))
 
 typedef struct {
   xsocket_address_enumerator_t parent_instance;
 
   xsocket_address_t *sockaddr;
-} GSocketAddressAddressEnumerator;
+} xsocket_address_address_enumerator_t;
 
 typedef struct {
-  GSocketAddressEnumeratorClass parent_class;
+  xsocket_address_enumerator_class_t parent_class;
 
-} GSocketAddressAddressEnumeratorClass;
+} xsocket_address_address_enumerator_class_t;
 
 static xtype_t _xsocket_address_address_enumerator_get_type (void);
-G_DEFINE_TYPE (GSocketAddressAddressEnumerator, _xsocket_address_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
+XDEFINE_TYPE (xsocket_address_address_enumerator, _xsocket_address_address_enumerator, XTYPE_SOCKET_ADDRESS_ENUMERATOR)
 
 static void
 xsocket_address_address_enumerator_finalize (xobject_t *object)
 {
-  GSocketAddressAddressEnumerator *sockaddr_enum =
+  xsocket_address_address_enumerator_t *sockaddr_enum =
     XSOCKET_ADDRESS_ADDRESS_ENUMERATOR (object);
 
   if (sockaddr_enum->sockaddr)
     xobject_unref (sockaddr_enum->sockaddr);
 
-  G_OBJECT_CLASS (_xsocket_address_address_enumerator_parent_class)->finalize (object);
+  XOBJECT_CLASS (_xsocket_address_address_enumerator_parent_class)->finalize (object);
 }
 
 static xsocket_address_t *
@@ -339,7 +339,7 @@ xsocket_address_address_enumerator_next (xsocket_address_enumerator_t  *enumerat
 					  xcancellable_t              *cancellable,
 					  xerror_t                   **error)
 {
-  GSocketAddressAddressEnumerator *sockaddr_enum =
+  xsocket_address_address_enumerator_t *sockaddr_enum =
     XSOCKET_ADDRESS_ADDRESS_ENUMERATOR (enumerator);
 
   if (sockaddr_enum->sockaddr)
@@ -354,15 +354,15 @@ xsocket_address_address_enumerator_next (xsocket_address_enumerator_t  *enumerat
 }
 
 static void
-_xsocket_address_address_enumerator_init (GSocketAddressAddressEnumerator *enumerator)
+_xsocket_address_address_enumerator_init (xsocket_address_address_enumerator_t *enumerator)
 {
 }
 
 static void
-_xsocket_address_address_enumerator_class_init (GSocketAddressAddressEnumeratorClass *sockaddrenum_class)
+_xsocket_address_address_enumerator_class_init (xsocket_address_address_enumerator_class_t *sockaddrenum_class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (sockaddrenum_class);
-  GSocketAddressEnumeratorClass *enumerator_class =
+  xobject_class_t *object_class = XOBJECT_CLASS (sockaddrenum_class);
+  xsocket_address_enumerator_class_t *enumerator_class =
     XSOCKET_ADDRESS_ENUMERATOR_CLASS (sockaddrenum_class);
 
   enumerator_class->next = xsocket_address_address_enumerator_next;
@@ -372,7 +372,7 @@ _xsocket_address_address_enumerator_class_init (GSocketAddressAddressEnumeratorC
 static xsocket_address_enumerator_t *
 xsocket_address_connectable_enumerate (xsocket_connectable_t *connectable)
 {
-  GSocketAddressAddressEnumerator *sockaddr_enum;
+  xsocket_address_address_enumerator_t *sockaddr_enum;
 
   sockaddr_enum = xobject_new (XTYPE_SOCKET_ADDRESS_ADDRESS_ENUMERATOR, NULL);
   sockaddr_enum->sockaddr = xobject_ref (XSOCKET_ADDRESS (connectable));
@@ -385,7 +385,7 @@ xsocket_address_connectable_proxy_enumerate (xsocket_connectable_t *connectable)
 {
   xsocket_address_enumerator_t *addr_enum = NULL;
 
-  g_assert (connectable != NULL);
+  xassert (connectable != NULL);
 
   if (X_IS_INET_SOCKET_ADDRESS (connectable) &&
       !X_IS_PROXY_ADDRESS (connectable))

@@ -36,8 +36,8 @@ check_registered_error (const xchar_t *given_dbus_error_name,
 
   error = g_dbus_error_new_for_dbus_error (given_dbus_error_name, "test message");
   g_assert_error (error, error_domain, error_code);
-  g_assert (g_dbus_error_is_remote_error (error));
-  g_assert (g_dbus_error_strip_remote_error (error));
+  xassert (g_dbus_error_is_remote_error (error));
+  xassert (g_dbus_error_strip_remote_error (error));
   g_assert_cmpstr (error->message, ==, "test message");
   dbus_error_name = g_dbus_error_get_remote_error (error);
   g_assert_cmpstr (dbus_error_name, ==, given_dbus_error_name);
@@ -88,17 +88,17 @@ check_unregistered_error (const xchar_t *given_dbus_error_name)
 
   error = g_dbus_error_new_for_dbus_error (given_dbus_error_name, "test message");
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR);
-  g_assert (g_dbus_error_is_remote_error (error));
+  xassert (g_dbus_error_is_remote_error (error));
   dbus_error_name = g_dbus_error_get_remote_error (error);
   g_assert_cmpstr (dbus_error_name, ==, given_dbus_error_name);
   g_free (dbus_error_name);
 
   /* strip the message */
-  g_assert (g_dbus_error_strip_remote_error (error));
+  xassert (g_dbus_error_strip_remote_error (error));
   g_assert_cmpstr (error->message, ==, "test message");
 
   /* check that we can no longer recover the D-Bus error name */
-  g_assert (g_dbus_error_get_remote_error (error) == NULL);
+  xassert (g_dbus_error_get_remote_error (error) == NULL);
 
   xerror_free (error);
 
@@ -137,23 +137,23 @@ check_transparent_gerror (xquark error_domain,
 
   error = xerror_new (error_domain, error_code, "test message");
   given_dbus_error_name = g_dbus_error_encode_gerror (error);
-  g_assert (xstr_has_prefix (given_dbus_error_name, "org.gtk.GDBus.UnmappedGError.Quark"));
+  xassert (xstr_has_prefix (given_dbus_error_name, "org.gtk.GDBus.UnmappedGError.Quark"));
   xerror_free (error);
 
   error = g_dbus_error_new_for_dbus_error (given_dbus_error_name, "test message");
   g_assert_error (error, error_domain, error_code);
-  g_assert (g_dbus_error_is_remote_error (error));
+  xassert (g_dbus_error_is_remote_error (error));
   dbus_error_name = g_dbus_error_get_remote_error (error);
   g_assert_cmpstr (dbus_error_name, ==, given_dbus_error_name);
   g_free (dbus_error_name);
   g_free (given_dbus_error_name);
 
   /* strip the message */
-  g_assert (g_dbus_error_strip_remote_error (error));
+  xassert (g_dbus_error_strip_remote_error (error));
   g_assert_cmpstr (error->message, ==, "test message");
 
   /* check that we can no longer recover the D-Bus error name */
-  g_assert (g_dbus_error_get_remote_error (error) == NULL);
+  xassert (g_dbus_error_get_remote_error (error) == NULL);
 
   xerror_free (error);
 }
@@ -211,10 +211,10 @@ test_register_error (void)
   g_assert_error (error, test_error_quark, TEST_ERROR_FAILED);
   res = g_dbus_error_is_remote_error (error);
   msg = g_dbus_error_get_remote_error (error);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpstr (msg, ==, "org.gtk.test.Error.Failed");
   res = g_dbus_error_strip_remote_error (error);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpstr (error->message, ==, "Failed");
   g_clear_error (&error);
   g_free (msg);
@@ -222,10 +222,10 @@ test_register_error (void)
   g_dbus_error_set_dbus_error (&error, "org.gtk.test.Error.Failed", "Failed again", "Prefix %d", 1);
   res = g_dbus_error_is_remote_error (error);
   msg = g_dbus_error_get_remote_error (error);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpstr (msg, ==, "org.gtk.test.Error.Failed");
   res = g_dbus_error_strip_remote_error (error);
-  g_assert (res);
+  xassert (res);
   g_assert_cmpstr (error->message, ==, "Prefix 1: Failed again");
   g_clear_error (&error);
   g_free (msg);
@@ -233,10 +233,10 @@ test_register_error (void)
   error = xerror_new_literal (G_IO_ERROR, G_IO_ERROR_NOT_EMPTY, "Not Empty");
   res = g_dbus_error_is_remote_error (error);
   msg = g_dbus_error_get_remote_error (error);
-  g_assert (!res);
+  xassert (!res);
   g_assert_cmpstr (msg, ==, NULL);
   res = g_dbus_error_strip_remote_error (error);
-  g_assert (!res);
+  xassert (!res);
   g_assert_cmpstr (error->message, ==, "Not Empty");
   g_clear_error (&error);
 
@@ -248,7 +248,7 @@ test_register_error (void)
 
   res = g_dbus_error_unregister_error (test_error_quark,
                                        TEST_ERROR_BLA, "org.gtk.test.Error.Bla");
-  g_assert (res);
+  xassert (res);
 }
 
 

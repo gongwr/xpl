@@ -1713,7 +1713,7 @@ g_bookmark_file_load_from_data (xbookmark_file_t  *bookmark,
   xerror_t *parse_error;
   xboolean_t retval;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
 
   if (length == (xsize_t) -1)
     length = strlen (data);
@@ -1757,8 +1757,8 @@ g_bookmark_file_load_from_file (xbookmark_file_t  *bookmark,
   xchar_t *buffer = NULL;
   xsize_t len;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
 
   if (!xfile_get_contents (filename, &buffer, &len, error))
     goto out;
@@ -1874,8 +1874,8 @@ g_bookmark_file_load_from_data_dirs (xbookmark_file_t  *bookmark,
   xchar_t *output_path;
   xboolean_t found_file;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (!g_path_is_absolute (file), FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (!g_path_is_absolute (file), FALSE);
 
   user_data_dir = g_get_user_data_dir ();
   system_data_dirs = g_get_system_data_dirs ();
@@ -1945,7 +1945,7 @@ g_bookmark_file_to_data (xbookmark_file_t  *bookmark,
   xerror_t *write_error = NULL;
   xchar_t *retval;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
 
   retval = g_bookmark_file_dump (bookmark, length, &write_error);
   if (write_error)
@@ -1981,8 +1981,8 @@ g_bookmark_file_to_file (xbookmark_file_t  *bookmark,
   xsize_t len;
   xboolean_t retval;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (filename != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (filename != NULL, FALSE);
 
   data_error = NULL;
   data = g_bookmark_file_to_data (bookmark, &len, &data_error);
@@ -2074,8 +2074,8 @@ g_bookmark_file_remove_item (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
 
@@ -2111,8 +2111,8 @@ xboolean_t
 g_bookmark_file_has_item (xbookmark_file_t *bookmark,
 			  const xchar_t   *uri)
 {
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
 
   return (NULL != xhash_table_lookup (bookmark->items_by_uri, uri));
 }
@@ -2139,7 +2139,7 @@ g_bookmark_file_get_uris (xbookmark_file_t *bookmark,
   xchar_t **uris;
   xsize_t i, n_items;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
 
   n_items = xlist_length (bookmark->items);
   uris = g_new0 (xchar_t *, n_items + 1);
@@ -2231,7 +2231,7 @@ g_bookmark_file_get_title (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
 
   if (!uri)
     return xstrdup (bookmark->title);
@@ -2316,7 +2316,7 @@ g_bookmark_file_get_description (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
 
   if (!uri)
     return xstrdup (bookmark->description);
@@ -2398,8 +2398,8 @@ g_bookmark_file_get_mime_type (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2483,8 +2483,8 @@ g_bookmark_file_get_is_private (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2616,9 +2616,9 @@ g_bookmark_file_get_added_date_time (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2749,9 +2749,9 @@ g_bookmark_file_get_modified_date_time (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2884,9 +2884,9 @@ g_bookmark_file_get_visited_date_time (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -2927,8 +2927,8 @@ g_bookmark_file_has_group (xbookmark_file_t  *bookmark,
   BookmarkItem *item;
   xlist_t *l;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3024,8 +3024,8 @@ g_bookmark_file_remove_group (xbookmark_file_t  *bookmark,
   BookmarkItem *item;
   xlist_t *l;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3145,8 +3145,8 @@ g_bookmark_file_get_groups (xbookmark_file_t  *bookmark,
   xsize_t len, i;
   xchar_t **retval;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3292,9 +3292,9 @@ g_bookmark_file_remove_application (xbookmark_file_t  *bookmark,
   xerror_t *set_error;
   xboolean_t retval;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
-  g_return_val_if_fail (name != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (name != NULL, FALSE);
 
   set_error = NULL;
   retval = g_bookmark_file_set_application_info (bookmark, uri,
@@ -3338,9 +3338,9 @@ g_bookmark_file_has_application (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
-  g_return_val_if_fail (name != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (name != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3474,12 +3474,12 @@ g_bookmark_file_set_application_info (xbookmark_file_t  *bookmark,
   BookmarkItem *item;
   BookmarkAppInfo *ai;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
-  g_return_val_if_fail (name != NULL, FALSE);
-  g_return_val_if_fail (exec != NULL, FALSE);
-  g_return_val_if_fail (count == 0 || stamp != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (name != NULL, FALSE);
+  xreturn_val_if_fail (exec != NULL, FALSE);
+  xreturn_val_if_fail (count == 0 || stamp != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3697,10 +3697,10 @@ g_bookmark_file_get_application_info (xbookmark_file_t  *bookmark,
   BookmarkItem *item;
   BookmarkAppInfo *ai;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
-  g_return_val_if_fail (name != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (name != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3788,8 +3788,8 @@ g_bookmark_file_get_applications (xbookmark_file_t  *bookmark,
   xchar_t **apps;
   xsize_t i, n_apps;
 
-  g_return_val_if_fail (bookmark != NULL, NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (bookmark != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)
@@ -3846,7 +3846,7 @@ g_bookmark_file_get_applications (xbookmark_file_t  *bookmark,
 xint_t
 g_bookmark_file_get_size (xbookmark_file_t *bookmark)
 {
-  g_return_val_if_fail (bookmark != NULL, 0);
+  xreturn_val_if_fail (bookmark != NULL, 0);
 
   return xlist_length (bookmark->items);
 }
@@ -3877,8 +3877,8 @@ g_bookmark_file_move_item (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (old_uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (old_uri != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, old_uri);
   if (!item)
@@ -3996,8 +3996,8 @@ g_bookmark_file_get_icon (xbookmark_file_t  *bookmark,
 {
   BookmarkItem *item;
 
-  g_return_val_if_fail (bookmark != NULL, FALSE);
-  g_return_val_if_fail (uri != NULL, FALSE);
+  xreturn_val_if_fail (bookmark != NULL, FALSE);
+  xreturn_val_if_fail (uri != NULL, FALSE);
 
   item = g_bookmark_file_lookup_item (bookmark, uri);
   if (!item)

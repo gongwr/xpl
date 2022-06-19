@@ -109,7 +109,7 @@ parser_set_error_va (xerror_t      **error,
 
   if (other != NULL)
     {
-      g_assert (other->start != other->end);
+      xassert (other->start != other->end);
       xstring_append_printf (msg, ",%d-%d", other->start, other->end);
     }
   xstring_append_c (msg, ':');
@@ -261,7 +261,7 @@ token_stream_prepare (TokenStream *stream)
   stream->stream = end;
 
   /* We must have at least one byte in a token. */
-  g_assert (stream->stream - stream->this >= 1);
+  xassert (stream->stream - stream->this >= 1);
 
   return TRUE;
 }
@@ -367,7 +367,7 @@ token_stream_assert (TokenStream *stream,
   xboolean_t correct_token G_GNUC_UNUSED  /* when compiling with G_DISABLE_ASSERT */;
 
   correct_token = token_stream_consume (stream, token);
-  g_assert (correct_token);
+  xassert (correct_token);
 }
 
 static xchar_t *
@@ -727,7 +727,7 @@ ast_array_get_pattern (AST    **array,
                 }
 
               tmp2 = ast_get_pattern (array[j], NULL);
-              g_assert (tmp2 != NULL);
+              xassert (tmp2 != NULL);
 
               m = pattern_coalesce (tmp, tmp2);
               g_free (tmp2);
@@ -1443,7 +1443,7 @@ dictionary_parse (TokenStream  *stream,
                                  error))
         goto error;
 
-      g_assert (n_keys == 1 && n_values == 1);
+      xassert (n_keys == 1 && n_values == 1);
       dict->n_children = -1;
 
       return (AST *) dict;
@@ -1476,7 +1476,7 @@ dictionary_parse (TokenStream  *stream,
       ast_array_append (&dict->values, &n_values, child);
     }
 
-  g_assert (n_keys == n_values);
+  xassert (n_keys == n_values);
   dict->n_children = n_keys;
 
   return (AST *) dict;
@@ -1569,7 +1569,7 @@ unicode_unescape (const xchar_t  *src,
 
   (*src_ofs)++;
 
-  g_assert (length < sizeof (buffer));
+  xassert (length < sizeof (buffer));
   strncpy (buffer, src + *src_ofs, length);
   buffer[length] = '\0';
 
@@ -1594,7 +1594,7 @@ unicode_unescape (const xchar_t  *src,
       return FALSE;
     }
 
-  g_assert (value <= G_MAXUINT32);
+  xassert (value <= G_MAXUINT32);
 
   *dest_ofs += xunichar_to_utf8 (value, dest + *dest_ofs);
   *src_ofs += length;
@@ -1627,7 +1627,7 @@ string_parse (TokenStream  *stream,
   quote = token[0];
 
   str = g_malloc (length);
-  g_assert (quote == '"' || quote == '\'');
+  xassert (quote == '"' || quote == '\'');
   j = 0;
   i = 1;
   while (token[i] != quote)
@@ -1753,12 +1753,12 @@ bytestring_parse (TokenStream  *stream,
   token_stream_start_ref (stream, &ref);
   token = token_stream_get (stream);
   token_stream_end_ref (stream, &ref);
-  g_assert (token[0] == 'b');
+  xassert (token[0] == 'b');
   length = strlen (token);
   quote = token[1];
 
   str = g_malloc (length);
-  g_assert (quote == '"' || quote == '\'');
+  xassert (quote == '"' || quote == '\'');
   j = 0;
   i = 2;
   while (token[i] != quote)
@@ -2097,7 +2097,7 @@ positional_get_value (AST                 *ast,
   Positional *positional = (Positional *) ast;
   xvariant_t *value;
 
-  g_assert (positional->value != NULL);
+  xassert (positional->value != NULL);
 
   if G_UNLIKELY (!xvariant_is_of_type (positional->value, type))
     return ast_type_error (ast, type, error);
@@ -2107,7 +2107,7 @@ positional_get_value (AST                 *ast,
    *
    * fortunately, this function should only ever get called once.
    */
-  g_assert (positional->value != NULL);
+  xassert (positional->value != NULL);
   value = positional->value;
   positional->value = NULL;
 
@@ -2140,7 +2140,7 @@ positional_parse (TokenStream  *stream,
   xchar_t *token;
 
   token = token_stream_get (stream);
-  g_assert (token[0] == '%');
+  xassert (token[0] == '%');
 
   positional = g_slice_new (Positional);
   positional->ast.class = &positional_class;
@@ -2445,8 +2445,8 @@ xvariant_parse (const xvariant_type_t  *type,
   xvariant_t *result = NULL;
   AST *ast;
 
-  g_return_val_if_fail (text != NULL, NULL);
-  g_return_val_if_fail (text == limit || text != NULL, NULL);
+  xreturn_val_if_fail (text != NULL, NULL);
+  xreturn_val_if_fail (text == limit || text != NULL, NULL);
 
   stream.start = text;
   stream.stream = text;
@@ -2530,8 +2530,8 @@ xvariant_new_parsed_va (const xchar_t *format,
   xerror_t *error = NULL;
   AST *ast;
 
-  g_return_val_if_fail (format != NULL, NULL);
-  g_return_val_if_fail (app != NULL, NULL);
+  xreturn_val_if_fail (format != NULL, NULL);
+  xreturn_val_if_fail (app != NULL, NULL);
 
   stream.start = format;
   stream.stream = format;
@@ -2803,7 +2803,7 @@ xvariant_parse_error_print_context (xerror_t      *error,
   xboolean_t success = FALSE;
   xstring_t *err;
 
-  g_return_val_if_fail (error->domain == G_VARIANT_PARSE_ERROR, FALSE);
+  xreturn_val_if_fail (error->domain == G_VARIANT_PARSE_ERROR, FALSE);
 
   /* We can only have a limited number of possible types of ranges
    * emitted from the parser:

@@ -389,7 +389,7 @@ xsignal_is_valid_name (const xchar_t *name)
   if (xstr_equal (name, "-gtk-private-changed"))
     return TRUE;
 
-  return g_param_spec_is_valid_name (name);
+  return xparam_spec_is_valid_name (name);
 }
 
 static inline xuint_t
@@ -734,7 +734,7 @@ handler_unref_R (xuint_t    signal_id,
       else
         {
           hlist = handler_list_lookup (signal_id, instance);
-          g_assert (hlist != NULL);
+          xassert (hlist != NULL);
           hlist->handlers = handler->next;
         }
 
@@ -747,7 +747,7 @@ handler_unref_R (xuint_t    signal_id,
                 hlist = handler_list_lookup (signal_id, instance);
               if (hlist)
                 {
-                  g_assert (hlist->tail_before == handler); /* paranoid */
+                  xassert (hlist->tail_before == handler); /* paranoid */
                   hlist->tail_before = handler->prev;
                 }
             }
@@ -759,7 +759,7 @@ handler_unref_R (xuint_t    signal_id,
                 hlist = handler_list_lookup (signal_id, instance);
               if (hlist)
                 {
-                  g_assert (hlist->tail_after == handler); /* paranoid */
+                  xassert (hlist->tail_after == handler); /* paranoid */
                   hlist->tail_after = handler->prev;
                 }
             }
@@ -779,7 +779,7 @@ handler_insert (xuint_t    signal_id,
 {
   HandlerList *hlist;
 
-  g_assert (handler->prev == NULL && handler->next == NULL); /* paranoid */
+  xassert (handler->prev == NULL && handler->next == NULL); /* paranoid */
 
   hlist = handler_list_ensure (signal_id, instance);
   if (!hlist->handlers)
@@ -1057,8 +1057,8 @@ xsignal_add_emission_hook (xuint_t               signal_id,
   GHook *hook;
   SignalHook *signal_hook;
 
-  g_return_val_if_fail (signal_id > 0, 0);
-  g_return_val_if_fail (hook_func != NULL, 0);
+  xreturn_val_if_fail (signal_id > 0, 0);
+  xreturn_val_if_fail (hook_func != NULL, 0);
 
   SIGNAL_LOCK ();
   node = LOOKUP_SIGNAL_NODE (signal_id);
@@ -1209,8 +1209,8 @@ xsignal_parse_name (const xchar_t *detailed_signal,
   xquark detail = 0;
   xuint_t signal_id;
 
-  g_return_val_if_fail (detailed_signal != NULL, FALSE);
-  g_return_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), FALSE);
+  xreturn_val_if_fail (detailed_signal != NULL, FALSE);
+  xreturn_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), FALSE);
 
   SIGNAL_LOCK ();
   signal_id = signal_parse_name (detailed_signal, itype, &detail, force_detail_quark);
@@ -1309,8 +1309,8 @@ xsignal_lookup (const xchar_t *name,
                  xtype_t        itype)
 {
   xuint_t signal_id;
-  g_return_val_if_fail (name != NULL, 0);
-  g_return_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), 0);
+  xreturn_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), 0);
 
   SIGNAL_LOCK ();
   signal_id = signal_id_lookup (name, itype);
@@ -1349,8 +1349,8 @@ xsignal_list_ids (xtype_t  itype,
   xuint_t n_nodes;
   xuint_t i;
 
-  g_return_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), NULL);
-  g_return_val_if_fail (n_ids != NULL, NULL);
+  xreturn_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), NULL);
+  xreturn_val_if_fail (n_ids != NULL, NULL);
 
   SIGNAL_LOCK ();
   keys = g_bsearch_array_get_nth (xsignal_key_bsa, &xsignal_key_bconfig, 0);
@@ -1469,7 +1469,7 @@ xsignal_query (xuint_t         signal_id,
  * digits, separated by either the `-` or `_` character. The first
  * character of a signal name must be a letter. Names which violate these
  * rules lead to undefined behaviour. These are the same rules as for property
- * naming (see g_param_spec_internal()).
+ * naming (see xparam_spec_internal()).
  *
  * When registering a signal and looking up a signal, either separator can
  * be used, but they cannot be mixed. Using `-` is considerably more efficient.
@@ -1505,7 +1505,7 @@ xsignal_new (const xchar_t	 *signal_name,
   va_list args;
   xuint_t signal_id;
 
-  g_return_val_if_fail (signal_name != NULL, 0);
+  xreturn_val_if_fail (signal_name != NULL, 0);
 
   va_start (args, n_params);
 
@@ -1575,7 +1575,7 @@ xsignal_new_class_handler (const xchar_t        *signal_name,
   va_list args;
   xuint_t signal_id;
 
-  g_return_val_if_fail (signal_name != NULL, 0);
+  xreturn_val_if_fail (signal_name != NULL, 0);
 
   va_start (args, n_params);
 
@@ -1707,17 +1707,17 @@ xsignal_newv (const xchar_t       *signal_name,
   GSignalCVaMarshaller builtin_va_marshaller;
   GSignalCVaMarshaller va_marshaller;
 
-  g_return_val_if_fail (signal_name != NULL, 0);
-  g_return_val_if_fail (xsignal_is_valid_name (signal_name), 0);
-  g_return_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), 0);
+  xreturn_val_if_fail (signal_name != NULL, 0);
+  xreturn_val_if_fail (xsignal_is_valid_name (signal_name), 0);
+  xreturn_val_if_fail (XTYPE_IS_INSTANTIATABLE (itype) || XTYPE_IS_INTERFACE (itype), 0);
   if (n_params)
-    g_return_val_if_fail (param_types != NULL, 0);
-  g_return_val_if_fail ((return_type & G_SIGNAL_TYPE_STATIC_SCOPE) == 0, 0);
+    xreturn_val_if_fail (param_types != NULL, 0);
+  xreturn_val_if_fail ((return_type & G_SIGNAL_TYPE_STATIC_SCOPE) == 0, 0);
   if (return_type == (XTYPE_NONE & ~G_SIGNAL_TYPE_STATIC_SCOPE))
-    g_return_val_if_fail (accumulator == NULL, 0);
+    xreturn_val_if_fail (accumulator == NULL, 0);
   if (!accumulator)
-    g_return_val_if_fail (accu_data == NULL, 0);
-  g_return_val_if_fail ((signal_flags & G_SIGNAL_ACCUMULATOR_FIRST_RUN) == 0, 0);
+    xreturn_val_if_fail (accu_data == NULL, 0);
+  xreturn_val_if_fail ((signal_flags & G_SIGNAL_ACCUMULATOR_FIRST_RUN) == 0, 0);
 
   if (!is_canonical (signal_name))
     {
@@ -2157,7 +2157,7 @@ xsignal_chain_from_overridden (const xvalue_t *instance_and_params,
     {
       SignalNode *node = LOOKUP_SIGNAL_NODE (emission->ihint.signal_id);
 
-      g_assert (node != NULL);	/* paranoid */
+      xassert (node != NULL);	/* paranoid */
 
       /* we should probably do the same parameter checks as xsignal_emit() here.
        */
@@ -2165,7 +2165,7 @@ xsignal_chain_from_overridden (const xvalue_t *instance_and_params,
 	{
 	  ClassClosure *cc = signal_find_class_closure (node, emission->chain_type);
 
-	  g_assert (cc != NULL);	/* closure currently in call stack */
+	  xassert (cc != NULL);	/* closure currently in call stack */
 
 	  n_params = node->n_params;
 	  restore_type = cc->instance_type;
@@ -2230,7 +2230,7 @@ xsignal_chain_from_overridden_handler (xpointer_t instance,
     {
       node = LOOKUP_SIGNAL_NODE (emission->ihint.signal_id);
 
-      g_assert (node != NULL);	/* paranoid */
+      xassert (node != NULL);	/* paranoid */
 
       /* we should probably do the same parameter checks as xsignal_emit() here.
        */
@@ -2238,7 +2238,7 @@ xsignal_chain_from_overridden_handler (xpointer_t instance,
 	{
 	  ClassClosure *cc = signal_find_class_closure (node, emission->chain_type);
 
-	  g_assert (cc != NULL);	/* closure currently in call stack */
+	  xassert (cc != NULL);	/* closure currently in call stack */
 
 	  n_params = node->n_params;
 	  restore_type = cc->instance_type;
@@ -2373,7 +2373,7 @@ xsignal_get_invocation_hint (xpointer_t instance)
 {
   Emission *emission = NULL;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), NULL);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), NULL);
 
   SIGNAL_LOCK ();
   emission = emission_find_innermost (instance);
@@ -2405,9 +2405,9 @@ xsignal_connect_closure_by_id (xpointer_t  instance,
   SignalNode *node;
   xulong_t handler_seq_no = 0;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail (signal_id > 0, 0);
-  g_return_val_if_fail (closure != NULL, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail (signal_id > 0, 0);
+  xreturn_val_if_fail (closure != NULL, 0);
 
   SIGNAL_LOCK ();
   node = LOOKUP_SIGNAL_NODE (signal_id);
@@ -2468,9 +2468,9 @@ xsignal_connect_closure (xpointer_t     instance,
   xquark detail = 0;
   xtype_t itype;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail (detailed_signal != NULL, 0);
-  g_return_val_if_fail (closure != NULL, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail (detailed_signal != NULL, 0);
+  xreturn_val_if_fail (closure != NULL, 0);
 
   SIGNAL_LOCK ();
   itype = XTYPE_FROM_INSTANCE (instance);
@@ -2567,9 +2567,9 @@ xsignal_connect_data (xpointer_t       instance,
   xtype_t itype;
   xboolean_t swapped, after;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail (detailed_signal != NULL, 0);
-  g_return_val_if_fail (c_handler != NULL, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail (detailed_signal != NULL, 0);
+  xreturn_val_if_fail (c_handler != NULL, 0);
 
   swapped = (connect_flags & G_CONNECT_SWAPPED) != FALSE;
   after = (connect_flags & G_CONNECT_AFTER) != FALSE;
@@ -2748,7 +2748,7 @@ xsignal_handler_is_connected (xpointer_t instance,
   Handler *handler;
   xboolean_t connected;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), FALSE);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), FALSE);
 
   SIGNAL_LOCK ();
   handler = handler_lookup (instance, handler_id, NULL, NULL);
@@ -2840,8 +2840,8 @@ xsignal_handler_find (xpointer_t         instance,
 {
   xulong_t handler_seq_no = 0;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
 
   if (mask & G_SIGNAL_MATCH_MASK)
     {
@@ -2922,8 +2922,8 @@ xsignal_handlers_block_matched (xpointer_t         instance,
 {
   xuint_t n_handlers = 0;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
 
   if (mask & (G_SIGNAL_MATCH_CLOSURE | G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA))
     {
@@ -2970,8 +2970,8 @@ xsignal_handlers_unblock_matched (xpointer_t         instance,
 {
   xuint_t n_handlers = 0;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
 
   if (mask & (G_SIGNAL_MATCH_CLOSURE | G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA))
     {
@@ -3018,8 +3018,8 @@ xsignal_handlers_disconnect_matched (xpointer_t         instance,
 {
   xuint_t n_handlers = 0;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
-  g_return_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), 0);
+  xreturn_val_if_fail ((mask & ~G_SIGNAL_MATCH_MASK) == 0, 0);
 
   if (mask & (G_SIGNAL_MATCH_CLOSURE | G_SIGNAL_MATCH_FUNC | G_SIGNAL_MATCH_DATA))
     {
@@ -3070,8 +3070,8 @@ xsignal_has_handler_pending (xpointer_t instance,
   xboolean_t has_pending;
   SignalNode *node;
 
-  g_return_val_if_fail (XTYPE_CHECK_INSTANCE (instance), FALSE);
-  g_return_val_if_fail (signal_id > 0, FALSE);
+  xreturn_val_if_fail (XTYPE_CHECK_INSTANCE (instance), FALSE);
+  xreturn_val_if_fail (signal_id > 0, FALSE);
 
   SIGNAL_LOCK ();
 
@@ -3920,8 +3920,8 @@ invalid_closure_notify (xpointer_t  instance,
 
   handler = handler_lookup (instance, 0, closure, &signal_id);
   /* See https://bugzilla.gnome.org/show_bug.cgi?id=730296 for discussion about this... */
-  g_assert (handler != NULL);
-  g_assert (handler->closure == closure);
+  xassert (handler != NULL);
+  xassert (handler->closure == closure);
 
   xhash_table_remove (g_handlers, handler);
   handler->sequential_number = 0;

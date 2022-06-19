@@ -88,7 +88,7 @@ xproxy_address_finalize (xobject_t *object)
   g_free (proxy->priv->dest_hostname);
   g_free (proxy->priv->dest_protocol);
 
-  G_OBJECT_CLASS (xproxy_address_parent_class)->finalize (object);
+  XOBJECT_CLASS (xproxy_address_parent_class)->finalize (object);
 }
 
 static void
@@ -186,41 +186,41 @@ xproxy_address_get_property (xobject_t    *object,
 static void
 xproxy_address_class_init (GProxyAddressClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xproxy_address_finalize;
-  gobject_class->set_property = xproxy_address_set_property;
-  gobject_class->get_property = xproxy_address_get_property;
+  xobject_class->finalize = xproxy_address_finalize;
+  xobject_class->set_property = xproxy_address_set_property;
+  xobject_class->get_property = xproxy_address_get_property;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_PROTOCOL,
-				   g_param_spec_string ("protocol",
+				   xparam_spec_string ("protocol",
 						       P_("Protocol"),
 						       P_("The proxy protocol"),
 						       NULL,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_USERNAME,
-				   g_param_spec_string ("username",
+				   xparam_spec_string ("username",
 						       P_("Username"),
 						       P_("The proxy username"),
 						       NULL,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_PASSWORD,
-				   g_param_spec_string ("password",
+				   xparam_spec_string ("password",
 						       P_("Password"),
 						       P_("The proxy password"),
 						       NULL,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
 
   /**
    * xproxy_address_t:destination-protocol:
@@ -230,35 +230,35 @@ xproxy_address_class_init (GProxyAddressClass *klass)
    *
    * Since: 2.34
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_DESTINATION_PROTOCOL,
-				   g_param_spec_string ("destination-protocol",
+				   xparam_spec_string ("destination-protocol",
 						       P_("Destination Protocol"),
 						       P_("The proxy destination protocol"),
 						       NULL,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_DESTINATION_HOSTNAME,
-				   g_param_spec_string ("destination-hostname",
+				   xparam_spec_string ("destination-hostname",
 						       P_("Destination Hostname"),
 						       P_("The proxy destination hostname"),
 						       NULL,
-						       G_PARAM_READWRITE |
-						       G_PARAM_CONSTRUCT_ONLY |
-						       G_PARAM_STATIC_STRINGS));
+						       XPARAM_READWRITE |
+						       XPARAM_CONSTRUCT_ONLY |
+						       XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_DESTINATION_PORT,
-				   g_param_spec_uint ("destination-port",
+				   xparam_spec_uint ("destination-port",
 						      P_("Destination Port"),
 						      P_("The proxy destination port"),
 						      0, 65535, 0,
-						      G_PARAM_READWRITE |
-						      G_PARAM_CONSTRUCT_ONLY |
-						      G_PARAM_STATIC_STRINGS));
+						      XPARAM_READWRITE |
+						      XPARAM_CONSTRUCT_ONLY |
+						      XPARAM_STATIC_STRINGS));
 
   /**
    * xproxy_address_t:uri:
@@ -268,15 +268,15 @@ xproxy_address_class_init (GProxyAddressClass *klass)
    *
    * Since: 2.34
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_URI,
-				   g_param_spec_string ("uri",
+				   xparam_spec_string ("uri",
 							P_("URI"),
 							P_("The proxy’s URI"),
 							NULL,
-							G_PARAM_READWRITE |
-							G_PARAM_CONSTRUCT_ONLY |
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE |
+							XPARAM_CONSTRUCT_ONLY |
+							XPARAM_STATIC_STRINGS));
 }
 
 static void

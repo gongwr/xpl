@@ -112,7 +112,7 @@ xsocket_service_finalize (xobject_t *object)
 
   xobject_unref (service->priv->cancellable);
 
-  G_OBJECT_CLASS (xsocket_service_parent_class)
+  XOBJECT_CLASS (xsocket_service_parent_class)
     ->finalize (object);
 }
 
@@ -243,7 +243,7 @@ xsocket_service_changed (xsocket_listener_t *listener)
 xboolean_t
 xsocket_service_is_active (xsocket_service_t *service)
 {
-  g_return_val_if_fail (X_IS_SOCKET_SERVICE (service), FALSE);
+  xreturn_val_if_fail (X_IS_SOCKET_SERVICE (service), FALSE);
 
   return get_active (service);
 }
@@ -315,12 +315,12 @@ xsocket_service_incoming (xsocket_service_t    *service,
 static void
 xsocket_service_class_init (GSocketServiceClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
   GSocketListenerClass *listener_class = XSOCKET_LISTENER_CLASS (class);
 
-  gobject_class->finalize = xsocket_service_finalize;
-  gobject_class->set_property = xsocket_service_set_property;
-  gobject_class->get_property = xsocket_service_get_property;
+  xobject_class->finalize = xsocket_service_finalize;
+  xobject_class->set_property = xsocket_service_set_property;
+  xobject_class->get_property = xsocket_service_get_property;
   listener_class->changed = xsocket_service_changed;
   class->incoming = xsocket_service_real_incoming;
 
@@ -361,12 +361,12 @@ xsocket_service_class_init (GSocketServiceClass *class)
    *
    * Since: 2.46
    */
-  xobject_class_install_property (gobject_class, PROP_ACTIVE,
-                                   g_param_spec_boolean ("active",
+  xobject_class_install_property (xobject_class, PROP_ACTIVE,
+                                   xparam_spec_boolean ("active",
                                                          P_("Active"),
                                                          P_("Whether the service is currently accepting connections"),
                                                          TRUE,
-                                                         G_PARAM_CONSTRUCT | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                                                         XPARAM_CONSTRUCT | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 }
 
 static void

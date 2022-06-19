@@ -372,11 +372,11 @@ xtype_t g_win32_appinfo_shell_verb_get_type (void) G_GNUC_CONST;
 xtype_t g_win32_appinfo_handler_get_type (void) G_GNUC_CONST;
 xtype_t g_win32_appinfo_application_get_type (void) G_GNUC_CONST;
 
-G_DEFINE_TYPE (GWin32AppInfoURLSchema, g_win32_appinfo_url_schema, XTYPE_OBJECT)
-G_DEFINE_TYPE (GWin32AppInfoFileExtension, g_win32_appinfo_file_extension, XTYPE_OBJECT)
-G_DEFINE_TYPE (GWin32AppInfoShellVerb, g_win32_appinfo_shell_verb, XTYPE_OBJECT)
-G_DEFINE_TYPE (GWin32AppInfoHandler, g_win32_appinfo_handler, XTYPE_OBJECT)
-G_DEFINE_TYPE (GWin32AppInfoApplication, g_win32_appinfo_application, XTYPE_OBJECT)
+XDEFINE_TYPE (GWin32AppInfoURLSchema, g_win32_appinfo_url_schema, XTYPE_OBJECT)
+XDEFINE_TYPE (GWin32AppInfoFileExtension, g_win32_appinfo_file_extension, XTYPE_OBJECT)
+XDEFINE_TYPE (GWin32AppInfoShellVerb, g_win32_appinfo_shell_verb, XTYPE_OBJECT)
+XDEFINE_TYPE (GWin32AppInfoHandler, g_win32_appinfo_handler, XTYPE_OBJECT)
+XDEFINE_TYPE (GWin32AppInfoApplication, g_win32_appinfo_application, XTYPE_OBJECT)
 
 static void
 g_win32_appinfo_url_schema_dispose (xobject_t *object)
@@ -388,7 +388,7 @@ g_win32_appinfo_url_schema_dispose (xobject_t *object)
   g_clear_pointer (&url->schema_u8_folded, g_free);
   g_clear_object (&url->chosen_handler);
   g_clear_pointer (&url->handlers, xhash_table_destroy);
-  G_OBJECT_CLASS (g_win32_appinfo_url_schema_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_win32_appinfo_url_schema_parent_class)->dispose (object);
 }
 
 
@@ -403,7 +403,7 @@ g_win32_appinfo_handler_dispose (xobject_t *object)
   g_clear_object (&handler->icon);
   g_clear_pointer (&handler->verbs, xptr_array_unref);
   g_clear_pointer (&handler->uwp_aumid, g_free);
-  G_OBJECT_CLASS (g_win32_appinfo_handler_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_win32_appinfo_handler_parent_class)->dispose (object);
 }
 
 static void
@@ -415,7 +415,7 @@ g_win32_appinfo_file_extension_dispose (xobject_t *object)
   g_clear_pointer (&ext->extension_u8, g_free);
   g_clear_object (&ext->chosen_handler);
   g_clear_pointer (&ext->handlers, xhash_table_destroy);
-  G_OBJECT_CLASS (g_win32_appinfo_file_extension_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_win32_appinfo_file_extension_parent_class)->dispose (object);
 }
 
 static void
@@ -431,7 +431,7 @@ g_win32_appinfo_shell_verb_dispose (xobject_t *object)
   g_clear_pointer (&shverb->executable, g_free);
   g_clear_pointer (&shverb->dll_function, g_free);
   g_clear_object (&shverb->app);
-  G_OBJECT_CLASS (g_win32_appinfo_shell_verb_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_win32_appinfo_shell_verb_parent_class)->dispose (object);
 }
 
 static void
@@ -452,7 +452,7 @@ g_win32_appinfo_application_dispose (xobject_t *object)
   g_clear_pointer (&app->supported_exts, xhash_table_destroy);
   g_clear_object (&app->icon);
   g_clear_pointer (&app->verbs, xptr_array_unref);
-  G_OBJECT_CLASS (g_win32_appinfo_application_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_win32_appinfo_application_parent_class)->dispose (object);
 }
 
 static const xchar_t *
@@ -470,41 +470,41 @@ g_win32_appinfo_application_get_some_name (GWin32AppInfoApplication *app)
 static void
 g_win32_appinfo_url_schema_class_init (GWin32AppInfoURLSchemaClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_win32_appinfo_url_schema_dispose;
+  xobject_class->dispose = g_win32_appinfo_url_schema_dispose;
 }
 
 static void
 g_win32_appinfo_file_extension_class_init (GWin32AppInfoFileExtensionClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_win32_appinfo_file_extension_dispose;
+  xobject_class->dispose = g_win32_appinfo_file_extension_dispose;
 }
 
 static void
 g_win32_appinfo_shell_verb_class_init (GWin32AppInfoShellVerbClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_win32_appinfo_shell_verb_dispose;
+  xobject_class->dispose = g_win32_appinfo_shell_verb_dispose;
 }
 
 static void
 g_win32_appinfo_handler_class_init (GWin32AppInfoHandlerClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_win32_appinfo_handler_dispose;
+  xobject_class->dispose = g_win32_appinfo_handler_dispose;
 }
 
 static void
 g_win32_appinfo_application_class_init (GWin32AppInfoApplicationClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose = g_win32_appinfo_application_dispose;
+  xobject_class->dispose = g_win32_appinfo_application_dispose;
 }
 
 static void
@@ -662,7 +662,7 @@ read_handler_icon (GWin32RegistryKey  *key,
   GWin32RegistryValueType default_type;
   xchar_t *default_value;
 
-  g_assert (icon_out);
+  xassert (icon_out);
 
   *icon_out = NULL;
 
@@ -942,7 +942,7 @@ get_verbs (GWin32RegistryKey  *program_id_key,
   xsize_t verbname_prefix_len;
   xlist_t *i;
 
-  g_assert (program_id_key && verbs && preferred_verb);
+  xassert (program_id_key && verbs && preferred_verb);
 
   *verbs = NULL;
   *preferred_verb = NULL;
@@ -1353,7 +1353,7 @@ decide_which_id_to_use (const xunichar2_t    *program_id,
   xboolean_t got_value;
   xchar_t *handler_id_u8;
   xchar_t *handler_id_u8_folded;
-  g_assert (program_id);
+  xassert (program_id);
 
   if (return_key)
     *return_key = NULL;
@@ -1492,9 +1492,9 @@ process_verbs_commands (xlist_t             *verbs,
   xlist_t *i;
   xboolean_t got_value;
 
-  g_assert (handler != NULL);
-  g_assert (verbs != NULL);
-  g_assert (progid != NULL);
+  xassert (handler != NULL);
+  xassert (verbs != NULL);
+  xassert (progid != NULL);
 
   for (i = verbs; i; i = i->next)
     {
@@ -1611,7 +1611,7 @@ process_uwp_verbs (xlist_t                    *verbs,
 {
   xlist_t *i;
 
-  g_assert (verbs != NULL);
+  xassert (verbs != NULL);
 
   for (i = verbs; i; i = i->next)
     {
@@ -3633,7 +3633,7 @@ grab_registry_string (GWin32RegistryKey  *handler_appkey,
   /* Right now this function is not used without destination,
    * enforce this. destination_u8 is optional.
    */
-  g_assert (destination != NULL);
+  xassert (destination != NULL);
 
   if (*destination != NULL)
     return;
@@ -4075,15 +4075,15 @@ g_win32_app_info_finalize (xobject_t *object)
   g_clear_object (&info->app);
   g_clear_object (&info->handler);
 
-  G_OBJECT_CLASS (g_win32_app_info_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_win32_app_info_parent_class)->finalize (object);
 }
 
 static void
 g_win32_app_info_class_init (GWin32AppInfoClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_win32_app_info_finalize;
+  xobject_class->finalize = g_win32_app_info_finalize;
 }
 
 static void
@@ -4363,7 +4363,7 @@ expand_macro (char               macro,
   char *expanded;
   xboolean_t result = FALSE;
 
-  g_return_val_if_fail (exec != NULL, FALSE);
+  xreturn_val_if_fail (exec != NULL, FALSE);
 
 /*
 Legend: (from http://msdn.microsoft.com/en-us/library/windows/desktop/cc144101%28v=vs.85%29.aspx)
@@ -4741,8 +4741,8 @@ g_win32_app_info_launch_internal (GWin32AppInfo      *info,
   xchar_t *apppath;
   GWin32AppInfoShellVerb *shverb;
 
-  g_return_val_if_fail (info != NULL, FALSE);
-  g_return_val_if_fail (info->app != NULL, FALSE);
+  xreturn_val_if_fail (info != NULL, FALSE);
+  xreturn_val_if_fail (info->app != NULL, FALSE);
 
   argv = NULL;
   shverb = NULL;
@@ -4781,7 +4781,7 @@ g_win32_app_info_launch_internal (GWin32AppInfo      *info,
   else
     envp = g_get_environ ();
 
-  g_assert (shverb->command_utf8 != NULL);
+  xassert (shverb->command_utf8 != NULL);
   command = shverb->command_utf8;
   apppath = get_appath_for_exe (shverb->executable_basename);
 
@@ -5181,7 +5181,7 @@ xapp_info_create_from_commandline (const char           *commandline,
   GWin32AppInfoApplication *app;
   xunichar2_t *app_command;
 
-  g_return_val_if_fail (commandline, NULL);
+  xreturn_val_if_fail (commandline, NULL);
 
   app_command = xutf8_to_utf16 (commandline, -1, NULL, NULL, NULL);
 

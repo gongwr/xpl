@@ -283,7 +283,7 @@ enum
 
 static xuint_t gobject_notify_signal_id;
 
-G_DEFINE_TYPE (xbinding, xbinding, XTYPE_OBJECT)
+XDEFINE_TYPE (xbinding, xbinding, XTYPE_OBJECT)
 
 static void weak_unbind (xpointer_t user_data, xobject_t *where_the_object_was);
 
@@ -296,8 +296,8 @@ unbind_internal_locked (BindingContext *context, xbinding_t *binding, xobject_t 
 {
   xboolean_t binding_was_removed = FALSE;
 
-  g_assert (context != NULL);
-  g_assert (binding != NULL);
+  xassert (context != NULL);
+  xassert (binding != NULL);
 
   /* If the target went away we still have a strong reference to the source
    * here and can clear it from the binding. Otherwise if the source went away
@@ -483,8 +483,8 @@ default_invert_boolean_transform (xbinding_t     *binding,
 {
   xboolean_t value;
 
-  g_assert (G_VALUE_HOLDS_BOOLEAN (value_a));
-  g_assert (G_VALUE_HOLDS_BOOLEAN (value_b));
+  xassert (G_VALUE_HOLDS_BOOLEAN (value_a));
+  xassert (G_VALUE_HOLDS_BOOLEAN (value_b));
 
   value = xvalue_get_boolean (value_a);
   value = !value;
@@ -534,8 +534,8 @@ on_source_notify (xobject_t          *source,
   transform_func = transform_func_ref (binding->transform_func);
   g_mutex_unlock (&binding->unbind_lock);
 
-  xvalue_init (&from_value, G_PARAM_SPEC_VALUE_TYPE (binding->source_pspec));
-  xvalue_init (&to_value, G_PARAM_SPEC_VALUE_TYPE (binding->target_pspec));
+  xvalue_init (&from_value, XPARAM_SPEC_VALUE_TYPE (binding->source_pspec));
+  xvalue_init (&to_value, XPARAM_SPEC_VALUE_TYPE (binding->target_pspec));
 
   xobject_get_property (source, binding->source_pspec->name, &from_value);
 
@@ -603,8 +603,8 @@ on_target_notify (xobject_t          *target,
   transform_func = transform_func_ref (binding->transform_func);
   g_mutex_unlock (&binding->unbind_lock);
 
-  xvalue_init (&from_value, G_PARAM_SPEC_VALUE_TYPE (binding->target_pspec));
-  xvalue_init (&to_value, G_PARAM_SPEC_VALUE_TYPE (binding->source_pspec));
+  xvalue_init (&from_value, XPARAM_SPEC_VALUE_TYPE (binding->target_pspec));
+  xvalue_init (&to_value, XPARAM_SPEC_VALUE_TYPE (binding->source_pspec));
 
   xobject_get_property (target, binding->target_pspec->name, &from_value);
 
@@ -673,7 +673,7 @@ xbinding_finalize (xobject_t *gobject)
 
   g_mutex_clear (&binding->unbind_lock);
 
-  G_OBJECT_CLASS (xbinding_parent_class)->finalize (gobject);
+  XOBJECT_CLASS (xbinding_parent_class)->finalize (gobject);
 }
 
 /* @key must have already been validated with is_valid()
@@ -827,10 +827,10 @@ xbinding_constructed (xobject_t *gobject)
   /* assert that we were constructed correctly */
   source = g_weak_ref_get (&binding->context->source);
   target = g_weak_ref_get (&binding->context->target);
-  g_assert (source != NULL);
-  g_assert (target != NULL);
-  g_assert (binding->source_property != NULL);
-  g_assert (binding->target_property != NULL);
+  xassert (source != NULL);
+  xassert (target != NULL);
+  xassert (binding->source_property != NULL);
+  xassert (binding->target_property != NULL);
 
   /* we assume a check was performed prior to construction - since
    * xobject_bind_property_full() does it; we cannot fail construction
@@ -838,8 +838,8 @@ xbinding_constructed (xobject_t *gobject)
    */
   binding->source_pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (source), binding->source_property);
   binding->target_pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (target), binding->target_property);
-  g_assert (binding->source_pspec != NULL);
-  g_assert (binding->target_pspec != NULL);
+  xassert (binding->source_pspec != NULL);
+  xassert (binding->target_pspec != NULL);
 
   /* switch to the invert boolean transform if needed */
   if (binding->flags & XBINDING_INVERT_BOOLEAN)
@@ -893,15 +893,15 @@ xbinding_constructed (xobject_t *gobject)
 static void
 xbinding_class_init (xbinding_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
   gobject_notify_signal_id = xsignal_lookup ("notify", XTYPE_OBJECT);
-  g_assert (gobject_notify_signal_id != 0);
+  xassert (gobject_notify_signal_id != 0);
 
-  gobject_class->constructed = xbinding_constructed;
-  gobject_class->set_property = xbinding_set_property;
-  gobject_class->get_property = xbinding_get_property;
-  gobject_class->finalize = xbinding_finalize;
+  xobject_class->constructed = xbinding_constructed;
+  xobject_class->set_property = xbinding_set_property;
+  xobject_class->get_property = xbinding_get_property;
+  xobject_class->finalize = xbinding_finalize;
 
   /**
    * xbinding_t:source:
@@ -910,14 +910,14 @@ xbinding_class_init (xbinding_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class, PROP_SOURCE,
-                                   g_param_spec_object ("source",
+  xobject_class_install_property (xobject_class, PROP_SOURCE,
+                                   xparam_spec_object ("source",
                                                         P_("Source"),
                                                         P_("The source of the binding"),
                                                         XTYPE_OBJECT,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
   /**
    * xbinding_t:target:
    *
@@ -925,14 +925,14 @@ xbinding_class_init (xbinding_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class, PROP_TARGET,
-                                   g_param_spec_object ("target",
+  xobject_class_install_property (xobject_class, PROP_TARGET,
+                                   xparam_spec_object ("target",
                                                         P_("Target"),
                                                         P_("The target of the binding"),
                                                         XTYPE_OBJECT,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
   /**
    * xbinding_t:source-property:
    *
@@ -944,14 +944,14 @@ xbinding_class_init (xbinding_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class, PROP_SOURCE_PROPERTY,
-                                   g_param_spec_string ("source-property",
+  xobject_class_install_property (xobject_class, PROP_SOURCE_PROPERTY,
+                                   xparam_spec_string ("source-property",
                                                         P_("Source Property"),
                                                         P_("The property on the source to bind"),
                                                         NULL,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
   /**
    * xbinding_t:target-property:
    *
@@ -963,14 +963,14 @@ xbinding_class_init (xbinding_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class, PROP_TARGET_PROPERTY,
-                                   g_param_spec_string ("target-property",
+  xobject_class_install_property (xobject_class, PROP_TARGET_PROPERTY,
+                                   xparam_spec_string ("target-property",
                                                         P_("Target Property"),
                                                         P_("The property on the target to bind"),
                                                         NULL,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
   /**
    * xbinding_t:flags:
    *
@@ -978,15 +978,15 @@ xbinding_class_init (xbinding_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class, PROP_FLAGS,
-                                   g_param_spec_flags ("flags",
+  xobject_class_install_property (xobject_class, PROP_FLAGS,
+                                   xparam_spec_flags ("flags",
                                                        P_("Flags"),
                                                        P_("The binding flags"),
                                                        XTYPE_BINDING_FLAGS,
                                                        XBINDING_DEFAULT,
-                                                       G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_READWRITE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_READWRITE |
+                                                       XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -1013,7 +1013,7 @@ xbinding_init (xbinding_t *binding)
 xbinding_flags_t
 xbinding_get_flags (xbinding_t *binding)
 {
-  g_return_val_if_fail (X_IS_BINDING (binding), XBINDING_DEFAULT);
+  xreturn_val_if_fail (X_IS_BINDING (binding), XBINDING_DEFAULT);
 
   return binding->flags;
 }
@@ -1045,7 +1045,7 @@ xbinding_get_source (xbinding_t *binding)
 {
   xobject_t *source;
 
-  g_return_val_if_fail (X_IS_BINDING (binding), NULL);
+  xreturn_val_if_fail (X_IS_BINDING (binding), NULL);
 
   source = g_weak_ref_get (&binding->context->source);
   /* Unref here, this API is not thread-safe
@@ -1074,7 +1074,7 @@ xbinding_get_source (xbinding_t *binding)
 xobject_t *
 xbinding_dup_source (xbinding_t *binding)
 {
-  g_return_val_if_fail (X_IS_BINDING (binding), NULL);
+  xreturn_val_if_fail (X_IS_BINDING (binding), NULL);
 
   return g_weak_ref_get (&binding->context->source);
 }
@@ -1106,7 +1106,7 @@ xbinding_get_target (xbinding_t *binding)
 {
   xobject_t *target;
 
-  g_return_val_if_fail (X_IS_BINDING (binding), NULL);
+  xreturn_val_if_fail (X_IS_BINDING (binding), NULL);
 
   target = g_weak_ref_get (&binding->context->target);
   /* Unref here, this API is not thread-safe
@@ -1135,7 +1135,7 @@ xbinding_get_target (xbinding_t *binding)
 xobject_t *
 xbinding_dup_target (xbinding_t *binding)
 {
-  g_return_val_if_fail (X_IS_BINDING (binding), NULL);
+  xreturn_val_if_fail (X_IS_BINDING (binding), NULL);
 
   return g_weak_ref_get (&binding->context->target);
 }
@@ -1154,7 +1154,7 @@ xbinding_dup_target (xbinding_t *binding)
 const xchar_t *
 xbinding_get_source_property (xbinding_t *binding)
 {
-  g_return_val_if_fail (X_IS_BINDING (binding), NULL);
+  xreturn_val_if_fail (X_IS_BINDING (binding), NULL);
 
   return binding->source_property;
 }
@@ -1173,7 +1173,7 @@ xbinding_get_source_property (xbinding_t *binding)
 const xchar_t *
 xbinding_get_target_property (xbinding_t *binding)
 {
-  g_return_val_if_fail (X_IS_BINDING (binding), NULL);
+  xreturn_val_if_fail (X_IS_BINDING (binding), NULL);
 
   return binding->target_property;
 }
@@ -1266,12 +1266,12 @@ xobject_bind_property_full (xpointer_t               source,
   xparam_spec_t *pspec;
   xbinding_t *binding;
 
-  g_return_val_if_fail (X_IS_OBJECT (source), NULL);
-  g_return_val_if_fail (source_property != NULL, NULL);
-  g_return_val_if_fail (is_valid_property_name (source_property), NULL);
-  g_return_val_if_fail (X_IS_OBJECT (target), NULL);
-  g_return_val_if_fail (target_property != NULL, NULL);
-  g_return_val_if_fail (is_valid_property_name (target_property), NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (source), NULL);
+  xreturn_val_if_fail (source_property != NULL, NULL);
+  xreturn_val_if_fail (is_valid_property_name (source_property), NULL);
+  xreturn_val_if_fail (X_IS_OBJECT (target), NULL);
+  xreturn_val_if_fail (target_property != NULL, NULL);
+  xreturn_val_if_fail (is_valid_property_name (target_property), NULL);
 
   if (source == target && xstrcmp0 (source_property, target_property) == 0)
     {
@@ -1298,7 +1298,7 @@ xobject_bind_property_full (xpointer_t               source,
       return NULL;
     }
 
-  if (!(pspec->flags & G_PARAM_READABLE))
+  if (!(pspec->flags & XPARAM_READABLE))
     {
       g_warning ("%s: The source object of type %s has no readable property called '%s'",
                  G_STRLOC,
@@ -1308,7 +1308,7 @@ xobject_bind_property_full (xpointer_t               source,
     }
 
   if ((flags & XBINDING_BIDIRECTIONAL) &&
-      ((pspec->flags & G_PARAM_CONSTRUCT_ONLY) || !(pspec->flags & G_PARAM_WRITABLE)))
+      ((pspec->flags & XPARAM_CONSTRUCT_ONLY) || !(pspec->flags & XPARAM_WRITABLE)))
     {
       g_warning ("%s: The source object of type %s has no writable property called '%s'",
                  G_STRLOC,
@@ -1318,14 +1318,14 @@ xobject_bind_property_full (xpointer_t               source,
     }
 
   if ((flags & XBINDING_INVERT_BOOLEAN) &&
-      !(G_PARAM_SPEC_VALUE_TYPE (pspec) == XTYPE_BOOLEAN))
+      !(XPARAM_SPEC_VALUE_TYPE (pspec) == XTYPE_BOOLEAN))
     {
       g_warning ("%s: The XBINDING_INVERT_BOOLEAN flag can only be used "
                  "when binding boolean properties; the source property '%s' "
                  "is of type '%s'",
                  G_STRLOC,
                  source_property,
-                 xtype_name (G_PARAM_SPEC_VALUE_TYPE (pspec)));
+                 xtype_name (XPARAM_SPEC_VALUE_TYPE (pspec)));
       return NULL;
     }
 
@@ -1339,7 +1339,7 @@ xobject_bind_property_full (xpointer_t               source,
       return NULL;
     }
 
-  if ((pspec->flags & G_PARAM_CONSTRUCT_ONLY) || !(pspec->flags & G_PARAM_WRITABLE))
+  if ((pspec->flags & XPARAM_CONSTRUCT_ONLY) || !(pspec->flags & XPARAM_WRITABLE))
     {
       g_warning ("%s: The target object of type %s has no writable property called '%s'",
                  G_STRLOC,
@@ -1349,7 +1349,7 @@ xobject_bind_property_full (xpointer_t               source,
     }
 
   if ((flags & XBINDING_BIDIRECTIONAL) &&
-      !(pspec->flags & G_PARAM_READABLE))
+      !(pspec->flags & XPARAM_READABLE))
     {
       g_warning ("%s: The target object of type %s has no readable property called '%s'",
                  G_STRLOC,
@@ -1359,14 +1359,14 @@ xobject_bind_property_full (xpointer_t               source,
     }
 
   if ((flags & XBINDING_INVERT_BOOLEAN) &&
-      !(G_PARAM_SPEC_VALUE_TYPE (pspec) == XTYPE_BOOLEAN))
+      !(XPARAM_SPEC_VALUE_TYPE (pspec) == XTYPE_BOOLEAN))
     {
       g_warning ("%s: The XBINDING_INVERT_BOOLEAN flag can only be used "
                  "when binding boolean properties; the target property '%s' "
                  "is of type '%s'",
                  G_STRLOC,
                  target_property,
-                 xtype_name (G_PARAM_SPEC_VALUE_TYPE (pspec)));
+                 xtype_name (XPARAM_SPEC_VALUE_TYPE (pspec)));
       return NULL;
     }
 
@@ -1378,7 +1378,7 @@ xobject_bind_property_full (xpointer_t               source,
                           "flags", flags,
                           NULL);
 
-  g_assert (binding->transform_func != NULL);
+  xassert (binding->transform_func != NULL);
 
   /* Use default functions if not provided here */
   if (transform_to == NULL)
@@ -1500,7 +1500,7 @@ bind_with_closures_transform_to (xbinding_t     *binding,
     {
       const xvalue_t *out_value = xvalue_get_boxed (&params[2]);
 
-      g_assert (out_value != NULL);
+      xassert (out_value != NULL);
 
       xvalue_copy (out_value, target);
     }
@@ -1543,7 +1543,7 @@ bind_with_closures_transform_from (xbinding_t     *binding,
     {
       const xvalue_t *out_value = xvalue_get_boxed (&params[2]);
 
-      g_assert (out_value != NULL);
+      xassert (out_value != NULL);
 
       xvalue_copy (out_value, target);
     }

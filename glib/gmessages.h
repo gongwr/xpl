@@ -558,7 +558,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
  *
  * Verifies that the expression @expr, usually representing a precondition,
  * evaluates to %TRUE. If the function returns a value, use
- * g_return_val_if_fail() instead.
+ * xreturn_val_if_fail() instead.
  *
  * If @expr evaluates to %FALSE, the current function should be considered to
  * have undefined behaviour (a programmer error). The only correct solution
@@ -586,7 +586,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
 #define g_return_if_fail(expr) G_STMT_START{ (void)0; }G_STMT_END
 
 /**
- * g_return_val_if_fail:
+ * xreturn_val_if_fail:
  * @expr: the expression to check
  * @val: the value to return from the current function
  *       if the expression is not true
@@ -609,7 +609,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
  *
  * See g_return_if_fail() for guidance on how to debug failure of this check.
  */
-#define g_return_val_if_fail(expr,val) G_STMT_START{ (void)0; }G_STMT_END
+#define xreturn_val_if_fail(expr,val) G_STMT_START{ (void)0; }G_STMT_END
 
 /**
  * g_return_if_reached:
@@ -622,14 +622,14 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
 #define g_return_if_reached() G_STMT_START{ return; }G_STMT_END
 
 /**
- * g_return_val_if_reached:
+ * xreturn_val_if_reached:
  * @val: the value to return from the current function
  *
  * Logs a critical message and returns @val.
  *
  * See g_return_if_fail() for guidance on how to debug failure of this check.
  */
-#define g_return_val_if_reached(val) G_STMT_START{ return (val); }G_STMT_END
+#define xreturn_val_if_reached(val) G_STMT_START{ return (val); }G_STMT_END
 
 #else /* !G_DISABLE_CHECKS */
 
@@ -646,7 +646,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
       } \
   } G_STMT_END
 
-#define g_return_val_if_fail(expr, val) \
+#define xreturn_val_if_fail(expr, val) \
   G_STMT_START { \
     if (G_LIKELY (expr)) \
       { } \
@@ -670,7 +670,7 @@ GPrintFunc      g_set_printerr_handler  (GPrintFunc      func);
     return; \
   } G_STMT_END
 
-#define g_return_val_if_reached(val) \
+#define xreturn_val_if_reached(val) \
   G_STMT_START { \
     g_log (G_LOG_DOMAIN, \
            G_LOG_LEVEL_CRITICAL, \

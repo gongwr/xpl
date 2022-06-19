@@ -18,8 +18,8 @@
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __G_DBUS_AUTH_MECHANISM_SHA1_H__
-#define __G_DBUS_AUTH_MECHANISM_SHA1_H__
+#ifndef __XDBUS_AUTH_MECHANISM_SHA1_H__
+#define __XDBUS_AUTH_MECHANISM_SHA1_H__
 
 #if !defined (GIO_COMPILATION)
 #error "gdbusauthmechanismsha1.h is a private header file."
@@ -30,10 +30,10 @@
 
 G_BEGIN_DECLS
 
-#define XTYPE_DBUS_AUTH_MECHANISM_SHA1         (_g_dbus_auth_mechanism_sha1_get_type ())
-#define G_DBUS_AUTH_MECHANISM_SHA1(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_MECHANISM_SHA1, GDBusAuthMechanismSha1))
-#define G_DBUS_AUTH_MECHANISM_SHA1_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_AUTH_MECHANISM_SHA1, GDBusAuthMechanismSha1Class))
-#define G_DBUS_AUTH_MECHANISM_SHA1_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_AUTH_MECHANISM_SHA1, GDBusAuthMechanismSha1Class))
+#define XTYPE_DBUS_AUTH_MECHANISM_SHA1         (_xdbus_auth_mechanism_sha1_get_type ())
+#define XDBUS_AUTH_MECHANISM_SHA1(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_DBUS_AUTH_MECHANISM_SHA1, GDBusAuthMechanismSha1))
+#define XDBUS_AUTH_MECHANISM_SHA1_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_DBUS_AUTH_MECHANISM_SHA1, GDBusAuthMechanismSha1Class))
+#define XDBUS_AUTH_MECHANISM_SHA1_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_DBUS_AUTH_MECHANISM_SHA1, GDBusAuthMechanismSha1Class))
 #define X_IS_DBUS_AUTH_MECHANISM_SHA1(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_DBUS_AUTH_MECHANISM_SHA1))
 #define X_IS_DBUS_AUTH_MECHANISM_SHA1_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_DBUS_AUTH_MECHANISM_SHA1))
 
@@ -44,18 +44,18 @@ typedef struct _GDBusAuthMechanismSha1Private GDBusAuthMechanismSha1Private;
 struct _GDBusAuthMechanismSha1Class
 {
   /*< private >*/
-  GDBusAuthMechanismClass parent_class;
+  xdbus_auth_mechanism_class_t parent_class;
 };
 
 struct _GDBusAuthMechanismSha1
 {
-  GDBusAuthMechanism parent_instance;
+  xdbus_auth_mechanism_t parent_instance;
   GDBusAuthMechanismSha1Private *priv;
 };
 
-xtype_t _g_dbus_auth_mechanism_sha1_get_type (void) G_GNUC_CONST;
+xtype_t _xdbus_auth_mechanism_sha1_get_type (void) G_GNUC_CONST;
 
 
 G_END_DECLS
 
-#endif /* __G_DBUS_AUTH_MECHANISM_SHA1_H__ */
+#endif /* __XDBUS_AUTH_MECHANISM_SHA1_H__ */

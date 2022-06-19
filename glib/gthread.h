@@ -52,7 +52,7 @@ typedef union  _GMutex          xmutex_t;
 typedef struct _GRecMutex       GRecMutex;
 typedef struct _GRWLock         GRWLock;
 typedef struct _GCond           xcond_t;
-typedef struct _GPrivate        GPrivate;
+typedef struct _GPrivate        xprivate_t;
 typedef struct _GOnce           GOnce;
 
 union _GMutex
@@ -216,12 +216,12 @@ xboolean_t        g_cond_wait_until               (xcond_t          *cond,
                                                  sint64_t          end_time);
 
 XPL_AVAILABLE_IN_ALL
-xpointer_t        g_private_get                   (GPrivate       *key);
+xpointer_t        g_private_get                   (xprivate_t       *key);
 XPL_AVAILABLE_IN_ALL
-void            g_private_set                   (GPrivate       *key,
+void            g_private_set                   (xprivate_t       *key,
                                                  xpointer_t        value);
 XPL_AVAILABLE_IN_2_32
-void            g_private_replace               (GPrivate       *key,
+void            g_private_replace               (xprivate_t       *key,
                                                  xpointer_t        value);
 
 XPL_AVAILABLE_IN_ALL

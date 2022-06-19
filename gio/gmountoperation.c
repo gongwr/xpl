@@ -230,7 +230,7 @@ g_mount_operation_finalize (xobject_t *object)
   g_free (priv->user);
   g_free (priv->domain);
 
-  G_OBJECT_CLASS (g_mount_operation_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_mount_operation_parent_class)->finalize (object);
 }
 
 static xboolean_t
@@ -239,7 +239,7 @@ reply_non_handled_in_idle (xpointer_t data)
   xmount_operation_t *op = data;
 
   g_mount_operation_reply (op, G_MOUNT_OPERATION_UNHANDLED);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -292,7 +292,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
 {
   xobject_class_t *object_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->finalize = g_mount_operation_finalize;
   object_class->get_property = g_mount_operation_get_property;
   object_class->set_property = g_mount_operation_set_property;
@@ -478,12 +478,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_USERNAME,
-                                   g_param_spec_string ("username",
+                                   xparam_spec_string ("username",
                                                         P_("Username"),
                                                         P_("The user name"),
                                                         NULL,
-                                                        G_PARAM_READWRITE|
-                                                        G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                        XPARAM_READWRITE|
+                                                        XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
    * xmount_operation_t:password:
@@ -493,12 +493,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_PASSWORD,
-                                   g_param_spec_string ("password",
+                                   xparam_spec_string ("password",
                                                         P_("Password"),
                                                         P_("The password"),
                                                         NULL,
-                                                        G_PARAM_READWRITE|
-                                                        G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                        XPARAM_READWRITE|
+                                                        XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
    * xmount_operation_t:anonymous:
@@ -507,12 +507,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_ANONYMOUS,
-                                   g_param_spec_boolean ("anonymous",
+                                   xparam_spec_boolean ("anonymous",
                                                          P_("Anonymous"),
                                                          P_("Whether to use an anonymous user"),
                                                          FALSE,
-                                                         G_PARAM_READWRITE|
-                                                         G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                         XPARAM_READWRITE|
+                                                         XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
    * xmount_operation_t:domain:
@@ -521,12 +521,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_DOMAIN,
-                                   g_param_spec_string ("domain",
+                                   xparam_spec_string ("domain",
                                                         P_("Domain"),
                                                         P_("The domain of the mount operation"),
                                                         NULL,
-                                                        G_PARAM_READWRITE|
-                                                        G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                        XPARAM_READWRITE|
+                                                        XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
    * xmount_operation_t:password-save:
@@ -535,13 +535,13 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_PASSWORD_SAVE,
-                                   g_param_spec_enum ("password-save",
+                                   xparam_spec_enum ("password-save",
                                                       P_("Password save"),
                                                       P_("How passwords should be saved"),
                                                       XTYPE_PASSWORD_SAVE,
                                                       G_PASSWORD_SAVE_NEVER,
-                                                      G_PARAM_READWRITE|
-                                                      G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE|
+                                                      XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
    * xmount_operation_t:choice:
@@ -551,12 +551,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_CHOICE,
-                                   g_param_spec_int ("choice",
+                                   xparam_spec_int ("choice",
                                                      P_("Choice"),
                                                      P_("The users choice"),
                                                      0, G_MAXINT, 0,
-                                                     G_PARAM_READWRITE|
-                                                     G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                     XPARAM_READWRITE|
+                                                     XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
    * xmount_operation_t:is-tcrypt-hidden-volume:
@@ -568,12 +568,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    */
   xobject_class_install_property (object_class,
                                    PROP_IS_TCRYPT_HIDDEN_VOLUME,
-                                   g_param_spec_boolean ("is-tcrypt-hidden-volume",
+                                   xparam_spec_boolean ("is-tcrypt-hidden-volume",
                                                          P_("TCRYPT Hidden Volume"),
                                                          P_("Whether to unlock a TCRYPT hidden volume. See https://www.veracrypt.fr/en/Hidden%20Volume.html."),
                                                          FALSE,
-                                                         G_PARAM_READWRITE|
-                                                         G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                         XPARAM_READWRITE|
+                                                         XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
   * xmount_operation_t:is-tcrypt-system-volume:
@@ -588,12 +588,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
   */
   xobject_class_install_property (object_class,
                                    PROP_IS_TCRYPT_SYSTEM_VOLUME,
-                                   g_param_spec_boolean ("is-tcrypt-system-volume",
+                                   xparam_spec_boolean ("is-tcrypt-system-volume",
                                                          P_("TCRYPT System Volume"),
                                                          P_("Whether to unlock a TCRYPT system volume. Only supported for unlocking Windows system volumes. See https://www.veracrypt.fr/en/System%20Encryption.html."),
                                                          FALSE,
-                                                         G_PARAM_READWRITE|
-                                                         G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                         XPARAM_READWRITE|
+                                                         XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   /**
   * xmount_operation_t:pim:
@@ -605,12 +605,12 @@ g_mount_operation_class_init (GMountOperationClass *klass)
   */
   xobject_class_install_property (object_class,
                                    PROP_PIM,
-                                   g_param_spec_uint ("pim",
+                                   xparam_spec_uint ("pim",
                                                       P_("PIM"),
                                                       P_("The VeraCrypt PIM value"),
                                                       0, G_MAXUINT, 0,
-                                                      G_PARAM_READWRITE|
-                                                      G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE|
+                                                      XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 }
 
 static void
@@ -643,7 +643,7 @@ g_mount_operation_new (void)
 const char *
 g_mount_operation_get_username (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), NULL);
   return op->priv->user;
 }
 
@@ -675,7 +675,7 @@ g_mount_operation_set_username (xmount_operation_t *op,
 const char *
 g_mount_operation_get_password (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), NULL);
   return op->priv->password;
 }
 
@@ -709,7 +709,7 @@ g_mount_operation_set_password (xmount_operation_t *op,
 xboolean_t
 g_mount_operation_get_anonymous (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), FALSE);
   return op->priv->anonymous;
 }
 
@@ -746,7 +746,7 @@ g_mount_operation_set_anonymous (xmount_operation_t *op,
 const char *
 g_mount_operation_get_domain (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), NULL);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), NULL);
   return op->priv->domain;
 }
 
@@ -779,7 +779,7 @@ g_mount_operation_set_domain (xmount_operation_t *op,
 GPasswordSave
 g_mount_operation_get_password_save (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), G_PASSWORD_SAVE_NEVER);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), G_PASSWORD_SAVE_NEVER);
   return op->priv->password_save;
 }
 
@@ -818,7 +818,7 @@ g_mount_operation_set_password_save (xmount_operation_t *op,
 int
 g_mount_operation_get_choice (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), 0);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), 0);
   return op->priv->choice;
 }
 
@@ -857,7 +857,7 @@ g_mount_operation_set_choice (xmount_operation_t *op,
 xboolean_t
 g_mount_operation_get_is_tcrypt_hidden_volume (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), FALSE);
   return op->priv->hidden_volume;
 }
 
@@ -899,7 +899,7 @@ g_mount_operation_set_is_tcrypt_hidden_volume (xmount_operation_t *op,
 xboolean_t
 g_mount_operation_get_is_tcrypt_system_volume (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), FALSE);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), FALSE);
   return op->priv->system_volume;
 }
 
@@ -940,7 +940,7 @@ g_mount_operation_set_is_tcrypt_system_volume (xmount_operation_t *op,
 xuint_t
 g_mount_operation_get_pim (xmount_operation_t *op)
 {
-  g_return_val_if_fail (X_IS_MOUNT_OPERATION (op), 0);
+  xreturn_val_if_fail (X_IS_MOUNT_OPERATION (op), 0);
   return op->priv->pim;
 }
 

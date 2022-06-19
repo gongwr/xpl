@@ -70,7 +70,7 @@ struct _GMemoryBuffer
   xsize_t valid_len;
   xsize_t pos;
   xchar_t *data;
-  GDataStreamByteOrder byte_order;
+  xdata_stream_byte_order_t byte_order;
 };
 
 static xboolean_t
@@ -87,7 +87,7 @@ static xuchar_t
 g_memory_buffer_read_byte (GMemoryBuffer  *mbuf,
                            xerror_t        **error)
 {
-  g_return_val_if_fail (error == NULL || *error == NULL, 0);
+  xreturn_val_if_fail (error == NULL || *error == NULL, 0);
 
   if (mbuf->pos >= mbuf->valid_len)
     {
@@ -106,7 +106,7 @@ g_memory_buffer_read_int16 (GMemoryBuffer  *mbuf,
 {
   gint16 v;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   if (mbuf->pos > mbuf->valid_len - 2)
     {
@@ -132,7 +132,7 @@ g_memory_buffer_read_uint16 (GMemoryBuffer  *mbuf,
 {
   xuint16_t v;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, 0);
+  xreturn_val_if_fail (error == NULL || *error == NULL, 0);
 
   if (mbuf->pos > mbuf->valid_len - 2)
     {
@@ -158,7 +158,7 @@ g_memory_buffer_read_int32 (GMemoryBuffer  *mbuf,
 {
   gint32 v;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   if (mbuf->pos > mbuf->valid_len - 4)
     {
@@ -184,7 +184,7 @@ g_memory_buffer_read_uint32 (GMemoryBuffer  *mbuf,
 {
   xuint32_t v;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, 0);
+  xreturn_val_if_fail (error == NULL || *error == NULL, 0);
 
   if (mbuf->pos > mbuf->valid_len - 4)
     {
@@ -210,7 +210,7 @@ g_memory_buffer_read_int64 (GMemoryBuffer  *mbuf,
 {
   sint64_t v;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   if (mbuf->pos > mbuf->valid_len - 8)
     {
@@ -236,7 +236,7 @@ g_memory_buffer_read_uint64 (GMemoryBuffer  *mbuf,
 {
   xuint64_t v;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, 0);
+  xreturn_val_if_fail (error == NULL || *error == NULL, 0);
 
   if (mbuf->pos > mbuf->valid_len - 8)
     {
@@ -455,7 +455,7 @@ static xboolean_t
 g_memory_buffer_put_string (GMemoryBuffer  *mbuf,
 			    const char     *str)
 {
-  g_return_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
 
   return g_memory_buffer_write (mbuf, str, strlen (str));
 }
@@ -517,7 +517,7 @@ enum
   PROP_LOCKED
 };
 
-G_DEFINE_TYPE (xdbus_message, xdbus_message, XTYPE_OBJECT)
+XDEFINE_TYPE (xdbus_message, xdbus_message, XTYPE_OBJECT)
 
 static void
 xdbus_message_finalize (xobject_t *object)
@@ -533,8 +533,8 @@ xdbus_message_finalize (xobject_t *object)
     xobject_unref (message->fd_list);
 #endif
 
-  if (G_OBJECT_CLASS (xdbus_message_parent_class)->finalize != NULL)
-    G_OBJECT_CLASS (xdbus_message_parent_class)->finalize (object);
+  if (XOBJECT_CLASS (xdbus_message_parent_class)->finalize != NULL)
+    XOBJECT_CLASS (xdbus_message_parent_class)->finalize (object);
 }
 
 static void
@@ -560,11 +560,11 @@ xdbus_message_get_property (xobject_t    *object,
 static void
 xdbus_message_class_init (GDBusMessageClass *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize     = xdbus_message_finalize;
-  gobject_class->get_property = xdbus_message_get_property;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize     = xdbus_message_finalize;
+  xobject_class->get_property = xdbus_message_get_property;
 
   /**
    * xdbus_connection_t:locked:
@@ -573,16 +573,16 @@ xdbus_message_class_init (GDBusMessageClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_LOCKED,
-                                   g_param_spec_boolean ("locked",
+                                   xparam_spec_boolean ("locked",
                                                          P_("Locked"),
                                                          P_("Whether the message is locked"),
                                                          FALSE,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_NAME |
-                                                         G_PARAM_STATIC_BLURB |
-                                                         G_PARAM_STATIC_NICK));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_STATIC_NAME |
+                                                         XPARAM_STATIC_BLURB |
+                                                         XPARAM_STATIC_NICK));
 }
 
 static void
@@ -642,10 +642,10 @@ xdbus_message_new_method_call (const xchar_t *name,
 {
   xdbus_message_t *message;
 
-  g_return_val_if_fail (name == NULL || g_dbus_is_name (name), NULL);
-  g_return_val_if_fail (xvariant_is_object_path (path), NULL);
-  g_return_val_if_fail (g_dbus_is_member_name (method), NULL);
-  g_return_val_if_fail (interface_ == NULL || g_dbus_is_interface_name (interface_), NULL);
+  xreturn_val_if_fail (name == NULL || g_dbus_is_name (name), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (path), NULL);
+  xreturn_val_if_fail (g_dbus_is_member_name (method), NULL);
+  xreturn_val_if_fail (interface_ == NULL || g_dbus_is_interface_name (interface_), NULL);
 
   message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_METHOD_CALL;
@@ -679,9 +679,9 @@ xdbus_message_new_signal (const xchar_t  *path,
 {
   xdbus_message_t *message;
 
-  g_return_val_if_fail (xvariant_is_object_path (path), NULL);
-  g_return_val_if_fail (g_dbus_is_member_name (signal), NULL);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (path), NULL);
+  xreturn_val_if_fail (g_dbus_is_member_name (signal), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_), NULL);
 
   message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_SIGNAL;
@@ -712,9 +712,9 @@ xdbus_message_new_method_reply (xdbus_message_t *method_call_message)
   xdbus_message_t *message;
   const xchar_t *sender;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (method_call_message), NULL);
-  g_return_val_if_fail (xdbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
-  g_return_val_if_fail (xdbus_message_get_serial (method_call_message) != 0, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (method_call_message), NULL);
+  xreturn_val_if_fail (xdbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
+  xreturn_val_if_fail (xdbus_message_get_serial (method_call_message) != 0, NULL);
 
   message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_METHOD_RETURN;
@@ -784,11 +784,11 @@ xdbus_message_new_method_error_literal (xdbus_message_t  *method_call_message,
   xdbus_message_t *message;
   const xchar_t *sender;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (method_call_message), NULL);
-  g_return_val_if_fail (xdbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
-  g_return_val_if_fail (xdbus_message_get_serial (method_call_message) != 0, NULL);
-  g_return_val_if_fail (g_dbus_is_name (error_name), NULL);
-  g_return_val_if_fail (error_message != NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (method_call_message), NULL);
+  xreturn_val_if_fail (xdbus_message_get_message_type (method_call_message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL, NULL);
+  xreturn_val_if_fail (xdbus_message_get_serial (method_call_message) != 0, NULL);
+  xreturn_val_if_fail (g_dbus_is_name (error_name), NULL);
+  xreturn_val_if_fail (error_message != NULL, NULL);
 
   message = xdbus_message_new ();
   message->type = G_DBUS_MESSAGE_TYPE_ERROR;
@@ -851,7 +851,7 @@ xdbus_message_new_method_error_valist (xdbus_message_t             *method_call_
 GDBusMessageByteOrder
 xdbus_message_get_byte_order (xdbus_message_t *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), (GDBusMessageByteOrder) 0);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), (GDBusMessageByteOrder) 0);
   return message->byte_order;
 }
 
@@ -894,7 +894,7 @@ xdbus_message_set_byte_order (xdbus_message_t          *message,
 GDBusMessageType
 xdbus_message_get_message_type (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), G_DBUS_MESSAGE_TYPE_INVALID);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), G_DBUS_MESSAGE_TYPE_INVALID);
   return message->type;
 }
 
@@ -940,7 +940,7 @@ xdbus_message_set_message_type (xdbus_message_t      *message,
 GDBusMessageFlags
 xdbus_message_get_flags (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), G_DBUS_MESSAGE_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), G_DBUS_MESSAGE_FLAGS_NONE);
   return message->flags;
 }
 
@@ -985,7 +985,7 @@ xdbus_message_set_flags (xdbus_message_t       *message,
 xuint32_t
 xdbus_message_get_serial (xdbus_message_t *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
   return message->serial;
 }
 
@@ -1036,8 +1036,8 @@ xvariant_t *
 xdbus_message_get_header (xdbus_message_t             *message,
                            GDBusMessageHeaderField   header_field)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
-  g_return_val_if_fail ((xuint_t) header_field < 256, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail ((xuint_t) header_field < 256, NULL);
   return xhash_table_lookup (message->headers, GUINT_TO_POINTER (header_field));
 }
 
@@ -1098,14 +1098,14 @@ xdbus_message_get_header_fields (xdbus_message_t  *message)
   xlist_t *l;
   xuint_t n;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
 
   keys = xhash_table_get_keys (message->headers);
   num_keys = xlist_length (keys);
   ret = g_new (xuchar_t, num_keys + 1);
   for (l = keys, n = 0; l != NULL; l = l->next, n++)
     ret[n] = GPOINTER_TO_UINT (l->data);
-  g_assert (n == num_keys);
+  xassert (n == num_keys);
   ret[n] = G_DBUS_MESSAGE_HEADER_FIELD_INVALID;
   xlist_free (keys);
 
@@ -1128,7 +1128,7 @@ xdbus_message_get_header_fields (xdbus_message_t  *message)
 xvariant_t *
 xdbus_message_get_body (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return message->body;
 }
 
@@ -1175,7 +1175,7 @@ xdbus_message_set_body (xdbus_message_t  *message,
 
       type_string = xvariant_get_type_string (body);
       type_string_len = strlen (type_string);
-      g_assert (type_string_len >= 2);
+      xassert (type_string_len >= 2);
       signature = xstrndup (type_string + 1, type_string_len - 2);
       xdbus_message_set_signature (message, signature);
       g_free (signature);
@@ -1207,7 +1207,7 @@ xdbus_message_set_body (xdbus_message_t  *message,
 xunix_fd_list_t *
 xdbus_message_get_unix_fd_list (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return message->fd_list;
 }
 
@@ -1287,8 +1287,8 @@ validate_headers (xdbus_message_t  *message,
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
 
@@ -1374,7 +1374,7 @@ validate_headers (xdbus_message_t  *message,
   ret = TRUE;
 
  out:
-  g_assert (ret || (error == NULL || *error != NULL));
+  xassert (ret || (error == NULL || *error != NULL));
   return ret;
 }
 
@@ -1817,7 +1817,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                                                 TRUE,
                                                 indent + 2,
                                                 NULL);
-                  g_assert (item == NULL);
+                  xassert (item == NULL);
                 }
               else
                 {
@@ -1847,7 +1847,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
                        *
                        * See https://gitlab.gnome.org/GNOME/glib/-/issues/2557
                        */
-                      g_assert (buf->pos > (xsize_t) offset);
+                      xassert (buf->pos > (xsize_t) offset);
 
                       offset = buf->pos;
                     }
@@ -2026,7 +2026,7 @@ parse_value_from_blob (GMemoryBuffer       *buf,
       break;
     }
 
-  g_assert ((just_align && ret == NULL) || (!just_align && ret != NULL));
+  xassert ((just_align && ret == NULL) || (!just_align && ret != NULL));
 
 #ifdef DEBUG_SERIALIZER
   if (ret != NULL)
@@ -2094,9 +2094,9 @@ xdbus_message_bytes_needed (xuchar_t  *blob,
 
   ret = -1;
 
-  g_return_val_if_fail (blob != NULL, -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
-  g_return_val_if_fail (blob_len >= 16, -1);
+  xreturn_val_if_fail (blob != NULL, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (blob_len >= 16, -1);
 
   if (blob[0] == 'l')
     {
@@ -2142,7 +2142,7 @@ xdbus_message_bytes_needed (xuchar_t  *blob,
  * xdbus_message_new_from_blob:
  * @blob: (array length=blob_len) (element-type xuint8_t): A blob representing a binary D-Bus message.
  * @blob_len: The length of @blob.
- * @capabilities: A #GDBusCapabilityFlags describing what protocol features are supported.
+ * @capabilities: A #xdbus_capability_flags_t describing what protocol features are supported.
  * @error: Return location for error or %NULL.
  *
  * Creates a new #xdbus_message_t from the data stored at @blob. The byte
@@ -2160,7 +2160,7 @@ xdbus_message_bytes_needed (xuchar_t  *blob,
 xdbus_message_t *
 xdbus_message_new_from_blob (xuchar_t                *blob,
                               xsize_t                  blob_len,
-                              GDBusCapabilityFlags   capabilities,
+                              xdbus_capability_flags_t   capabilities,
                               xerror_t               **error)
 {
   xerror_t *local_error = NULL;
@@ -2176,8 +2176,8 @@ xdbus_message_new_from_blob (xuchar_t                *blob,
 
   /* TODO: check against @capabilities */
 
-  g_return_val_if_fail (blob != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (blob != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   message = xdbus_message_new ();
 
@@ -2495,7 +2495,7 @@ append_value_to_blob (xvariant_t            *value,
 #endif
 
           v = xvariant_get_string (value, &len);
-          g_assert (xutf8_validate (v, -1, &end) && (end == v + len));
+          xassert (xutf8_validate (v, -1, &end) && (end == v + len));
           g_memory_buffer_put_uint32 (mbuf, len);
           g_memory_buffer_put_string (mbuf, v);
           g_memory_buffer_put_byte (mbuf, '\0');
@@ -2508,7 +2508,7 @@ append_value_to_blob (xvariant_t            *value,
         {
           xsize_t len;
           const xchar_t *v = xvariant_get_string (value, &len);
-          g_assert (xvariant_is_object_path (v));
+          xassert (xvariant_is_object_path (v));
           g_memory_buffer_put_uint32 (mbuf, len);
           g_memory_buffer_put_string (mbuf, v);
           g_memory_buffer_put_byte (mbuf, '\0');
@@ -2520,7 +2520,7 @@ append_value_to_blob (xvariant_t            *value,
         {
           xsize_t len;
           const xchar_t *v = xvariant_get_string (value, &len);
-          g_assert (xvariant_is_signature (v));
+          xassert (xvariant_is_signature (v));
           g_memory_buffer_put_byte (mbuf, len);
           g_memory_buffer_put_string (mbuf, v);
           g_memory_buffer_put_byte (mbuf, '\0');
@@ -2754,7 +2754,7 @@ append_body_to_blob (xvariant_t       *value,
  * xdbus_message_to_blob:
  * @message: A #xdbus_message_t.
  * @out_size: Return location for size of generated blob.
- * @capabilities: A #GDBusCapabilityFlags describing what protocol features are supported.
+ * @capabilities: A #xdbus_capability_flags_t describing what protocol features are supported.
  * @error: Return location for error.
  *
  * Serializes @message to a blob. The byte order returned by
@@ -2769,7 +2769,7 @@ append_body_to_blob (xvariant_t       *value,
 xuchar_t *
 xdbus_message_to_blob (xdbus_message_t          *message,
                         xsize_t                 *out_size,
-                        GDBusCapabilityFlags   capabilities,
+                        xdbus_capability_flags_t   capabilities,
                         xerror_t               **error)
 {
   GMemoryBuffer mbuf;
@@ -2792,9 +2792,9 @@ xdbus_message_to_blob (xdbus_message_t          *message,
 
   ret = NULL;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
-  g_return_val_if_fail (out_size != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (out_size != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   memset (&mbuf, 0, sizeof (mbuf));
   mbuf.len = MIN_ARRAY_SIZE;
@@ -3062,7 +3062,7 @@ set_signature_header (xdbus_message_t             *message,
 xuint32_t
 xdbus_message_get_reply_serial (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
   return get_uint32_header (message, G_DBUS_MESSAGE_HEADER_FIELD_REPLY_SERIAL);
 }
 
@@ -3098,7 +3098,7 @@ xdbus_message_set_reply_serial (xdbus_message_t  *message,
 const xchar_t *
 xdbus_message_get_interface (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_INTERFACE);
 }
 
@@ -3135,7 +3135,7 @@ xdbus_message_set_interface (xdbus_message_t  *message,
 const xchar_t *
 xdbus_message_get_member (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_MEMBER);
 }
 
@@ -3172,7 +3172,7 @@ xdbus_message_set_member (xdbus_message_t  *message,
 const xchar_t *
 xdbus_message_get_path (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_object_path_header (message, G_DBUS_MESSAGE_HEADER_FIELD_PATH);
 }
 
@@ -3209,7 +3209,7 @@ xdbus_message_set_path (xdbus_message_t  *message,
 const xchar_t *
 xdbus_message_get_sender (xdbus_message_t *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SENDER);
 }
 
@@ -3246,7 +3246,7 @@ xdbus_message_set_sender (xdbus_message_t  *message,
 const xchar_t *
 xdbus_message_get_destination (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_DESTINATION);
 }
 
@@ -3283,7 +3283,7 @@ xdbus_message_set_destination (xdbus_message_t  *message,
 const xchar_t *
 xdbus_message_get_error_name (xdbus_message_t  *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   return get_string_header (message, G_DBUS_MESSAGE_HEADER_FIELD_ERROR_NAME);
 }
 
@@ -3323,7 +3323,7 @@ const xchar_t *
 xdbus_message_get_signature (xdbus_message_t  *message)
 {
   const xchar_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
   ret = get_signature_header (message, G_DBUS_MESSAGE_HEADER_FIELD_SIGNATURE);
   if (ret == NULL)
     ret = "";
@@ -3366,7 +3366,7 @@ xdbus_message_get_arg0 (xdbus_message_t  *message)
 {
   const xchar_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
 
   ret = NULL;
 
@@ -3397,7 +3397,7 @@ xdbus_message_get_arg0 (xdbus_message_t  *message)
 xuint32_t
 xdbus_message_get_num_unix_fds (xdbus_message_t *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), 0);
   return get_uint32_header (message, G_DBUS_MESSAGE_HEADER_FIELD_NUM_UNIX_FDS);
 }
 
@@ -3444,7 +3444,7 @@ xdbus_message_to_gerror (xdbus_message_t   *message,
   xboolean_t ret;
   const xchar_t *error_name;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
 
   ret = FALSE;
   if (message->type != G_DBUS_MESSAGE_TYPE_ERROR)
@@ -3600,7 +3600,7 @@ xdbus_message_print (xdbus_message_t *message,
   xlist_t *keys;
   xlist_t *l;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
 
   str = xstring_new (NULL);
 
@@ -3625,7 +3625,7 @@ xdbus_message_print (xdbus_message_t *message,
           xchar_t *value_str;
 
           value = xhash_table_lookup (message->headers, l->data);
-          g_assert (value != NULL);
+          xassert (value != NULL);
 
           s = _g_dbus_enum_to_string (XTYPE_DBUS_MESSAGE_HEADER_FIELD, key);
           value_str = xvariant_print (value, TRUE);
@@ -3732,7 +3732,7 @@ xdbus_message_print (xdbus_message_t *message,
 xboolean_t
 xdbus_message_get_locked (xdbus_message_t *message)
 {
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
   return message->locked;
 }
 
@@ -3785,8 +3785,8 @@ xdbus_message_copy (xdbus_message_t  *message,
   xpointer_t header_key;
   xvariant_t *header_value;
 
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   ret = xdbus_message_new ();
   ret->type                   = message->type;

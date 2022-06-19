@@ -129,15 +129,15 @@ xmemory_monitor_portal_finalize (xobject_t *object)
     g_clear_signal_handler (&portal->signal_id, portal->proxy);
   g_clear_object (&portal->proxy);
 
-  G_OBJECT_CLASS (xmemory_monitor_portal_parent_class)->finalize (object);
+  XOBJECT_CLASS (xmemory_monitor_portal_parent_class)->finalize (object);
 }
 
 static void
 xmemory_monitor_portal_class_init (GMemoryMonitorPortalClass *nl_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (nl_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (nl_class);
 
-  gobject_class->finalize  = xmemory_monitor_portal_finalize;
+  xobject_class->finalize  = xmemory_monitor_portal_finalize;
 }
 
 static void

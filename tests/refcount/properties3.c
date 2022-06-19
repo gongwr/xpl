@@ -32,7 +32,7 @@ struct _xtest_class
 };
 
 static xtype_t xtest_get_type (void);
-G_DEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
+XDEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
 
 static xint_t stopping;  /* (atomic) */
 
@@ -48,20 +48,20 @@ static void xtest_set_property (xobject_t      *object,
 static void
 xtest_class_init (xtest_class_t * klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = (xobject_class_t *) klass;
+  xobject_class = (xobject_class_t *) klass;
 
-  gobject_class->get_property = xtest_get_property;
-  gobject_class->set_property = xtest_set_property;
+  xobject_class->get_property = xtest_get_property;
+  xobject_class->set_property = xtest_set_property;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
 				   PROP_DUMMY,
-				   g_param_spec_int ("dummy",
+				   xparam_spec_int ("dummy",
 						     NULL,
 						     NULL,
 						     0, G_MAXINT, 0,
-						     G_PARAM_READWRITE));
+						     XPARAM_READWRITE));
 }
 
 static void
@@ -165,7 +165,7 @@ main (int argc, char **argv)
 
   test = xobject_new (XTYPE_TEST, NULL);
 
-  g_assert (test->count == test->dummy);
+  xassert (test->count == test->dummy);
   xsignal_connect (test, "notify::dummy", G_CALLBACK (dummy_notify), NULL);
 
   test_threads = g_array_new (FALSE, FALSE, sizeof (xthread_t *));

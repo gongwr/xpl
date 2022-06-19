@@ -37,50 +37,50 @@
 #include "glibintl.h"
 
 
-struct _GUnionVolumeMonitor {
+struct _xunion_volume_monitor {
   xvolume_monitor_t parent;
 
   xlist_t *monitors;
 };
 
-static void g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
+static void xunion_volume_monitor_remove_monitor (xunion_volume_monitor_t *union_monitor,
 						   xvolume_monitor_t *child_monitor);
 
 
-#define g_union_volume_monitor_get_type _g_union_volume_monitor_get_type
-G_DEFINE_TYPE (GUnionVolumeMonitor, g_union_volume_monitor, XTYPE_VOLUME_MONITOR)
+#define xunion_volume_monitor_get_type _xunion_volume_monitor_get_type
+XDEFINE_TYPE (xunion_volume_monitor, xunion_volume_monitor, XTYPE_VOLUME_MONITOR)
 
 static GRecMutex the_volume_monitor_mutex;
 
-static GUnionVolumeMonitor *the_volume_monitor = NULL;
+static xunion_volume_monitor_t *the_volume_monitor = NULL;
 
 static void
-g_union_volume_monitor_finalize (xobject_t *object)
+xunion_volume_monitor_finalize (xobject_t *object)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
 
-  monitor = G_UNION_VOLUME_MONITOR (object);
+  monitor = XUNION_VOLUME_MONITOR (object);
 
   while (monitor->monitors != NULL)
     {
       child_monitor = monitor->monitors->data;
-      g_union_volume_monitor_remove_monitor (monitor,
+      xunion_volume_monitor_remove_monitor (monitor,
                                              child_monitor);
       xobject_unref (child_monitor);
     }
 
-  G_OBJECT_CLASS (g_union_volume_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (xunion_volume_monitor_parent_class)->finalize (object);
 }
 
 static void
-g_union_volume_monitor_dispose (xobject_t *object)
+xunion_volume_monitor_dispose (xobject_t *object)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
   xlist_t *l;
 
-  monitor = G_UNION_VOLUME_MONITOR (object);
+  monitor = XUNION_VOLUME_MONITOR (object);
 
   g_rec_mutex_lock (&the_volume_monitor_mutex);
   the_volume_monitor = NULL;
@@ -93,18 +93,18 @@ g_union_volume_monitor_dispose (xobject_t *object)
 
   g_rec_mutex_unlock (&the_volume_monitor_mutex);
 
-  G_OBJECT_CLASS (g_union_volume_monitor_parent_class)->dispose (object);
+  XOBJECT_CLASS (xunion_volume_monitor_parent_class)->dispose (object);
 }
 
 static xlist_t *
 get_mounts (xvolume_monitor_t *volume_monitor)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
   xlist_t *res;
   xlist_t *l;
 
-  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+  monitor = XUNION_VOLUME_MONITOR (volume_monitor);
 
   res = NULL;
 
@@ -125,12 +125,12 @@ get_mounts (xvolume_monitor_t *volume_monitor)
 static xlist_t *
 get_volumes (xvolume_monitor_t *volume_monitor)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
   xlist_t *res;
   xlist_t *l;
 
-  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+  monitor = XUNION_VOLUME_MONITOR (volume_monitor);
 
   res = NULL;
 
@@ -151,12 +151,12 @@ get_volumes (xvolume_monitor_t *volume_monitor)
 static xlist_t *
 get_connected_drives (xvolume_monitor_t *volume_monitor)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
   xlist_t *res;
   xlist_t *l;
 
-  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+  monitor = XUNION_VOLUME_MONITOR (volume_monitor);
 
   res = NULL;
 
@@ -177,12 +177,12 @@ get_connected_drives (xvolume_monitor_t *volume_monitor)
 static xvolume_t *
 get_volume_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
   xvolume_t *volume;
   xlist_t *l;
 
-  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+  monitor = XUNION_VOLUME_MONITOR (volume_monitor);
 
   volume = NULL;
 
@@ -206,12 +206,12 @@ get_volume_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 static xmount_t *
 get_mount_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
   xvolume_monitor_t *child_monitor;
   xmount_t *mount;
   xlist_t *l;
 
-  monitor = G_UNION_VOLUME_MONITOR (volume_monitor);
+  monitor = XUNION_VOLUME_MONITOR (volume_monitor);
 
   mount = NULL;
 
@@ -233,13 +233,13 @@ get_mount_for_uuid (xvolume_monitor_t *volume_monitor, const char *uuid)
 }
 
 static void
-g_union_volume_monitor_class_init (GUnionVolumeMonitorClass *klass)
+xunion_volume_monitor_class_init (GUnionVolumeMonitorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   GVolumeMonitorClass *monitor_class = G_VOLUME_MONITOR_CLASS (klass);
 
-  gobject_class->finalize = g_union_volume_monitor_finalize;
-  gobject_class->dispose = g_union_volume_monitor_dispose;
+  xobject_class->finalize = xunion_volume_monitor_finalize;
+  xobject_class->dispose = xunion_volume_monitor_dispose;
 
   monitor_class->get_connected_drives = get_connected_drives;
   monitor_class->get_volumes = get_volumes;
@@ -251,7 +251,7 @@ g_union_volume_monitor_class_init (GUnionVolumeMonitorClass *klass)
 static void
 child_volume_added (xvolume_monitor_t      *child_monitor,
                     xvolume_t    *child_volume,
-                    GUnionVolumeMonitor *union_monitor)
+                    xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "volume-added",
@@ -261,7 +261,7 @@ child_volume_added (xvolume_monitor_t      *child_monitor,
 static void
 child_volume_removed (xvolume_monitor_t      *child_monitor,
                       xvolume_t    *child_volume,
-                      GUnionVolumeMonitor *union_monitor)
+                      xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "volume-removed",
@@ -271,7 +271,7 @@ child_volume_removed (xvolume_monitor_t      *child_monitor,
 static void
 child_volume_changed (xvolume_monitor_t      *child_monitor,
                       xvolume_t    *child_volume,
-                      GUnionVolumeMonitor *union_monitor)
+                      xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "volume-changed",
@@ -281,7 +281,7 @@ child_volume_changed (xvolume_monitor_t      *child_monitor,
 static void
 child_mount_added (xvolume_monitor_t      *child_monitor,
                    xmount_t              *child_mount,
-                   GUnionVolumeMonitor *union_monitor)
+                   xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
                          "mount-added",
@@ -291,7 +291,7 @@ child_mount_added (xvolume_monitor_t      *child_monitor,
 static void
 child_mount_removed (xvolume_monitor_t      *child_monitor,
                      xmount_t              *child_mount,
-                     GUnionVolumeMonitor *union_monitor)
+                     xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "mount-removed",
@@ -301,7 +301,7 @@ child_mount_removed (xvolume_monitor_t      *child_monitor,
 static void
 child_mount_pre_unmount (xvolume_monitor_t       *child_monitor,
                           xmount_t              *child_mount,
-                          GUnionVolumeMonitor *union_monitor)
+                          xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "mount-pre-unmount",
@@ -312,7 +312,7 @@ child_mount_pre_unmount (xvolume_monitor_t       *child_monitor,
 static void
 child_mount_changed (xvolume_monitor_t       *child_monitor,
                       xmount_t              *child_mount,
-                      GUnionVolumeMonitor *union_monitor)
+                      xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "mount-changed",
@@ -322,7 +322,7 @@ child_mount_changed (xvolume_monitor_t       *child_monitor,
 static void
 child_drive_connected (xvolume_monitor_t      *child_monitor,
                        xdrive_t              *child_drive,
-                       GUnionVolumeMonitor *union_monitor)
+                       xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "drive-connected",
@@ -332,7 +332,7 @@ child_drive_connected (xvolume_monitor_t      *child_monitor,
 static void
 child_drive_disconnected (xvolume_monitor_t      *child_monitor,
                           xdrive_t              *child_drive,
-                          GUnionVolumeMonitor *union_monitor)
+                          xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
 			 "drive-disconnected",
@@ -342,7 +342,7 @@ child_drive_disconnected (xvolume_monitor_t      *child_monitor,
 static void
 child_drive_changed (xvolume_monitor_t      *child_monitor,
                      xdrive_t             *child_drive,
-                     GUnionVolumeMonitor *union_monitor)
+                     xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
                          "drive-changed",
@@ -352,7 +352,7 @@ child_drive_changed (xvolume_monitor_t      *child_monitor,
 static void
 child_drive_eject_button (xvolume_monitor_t      *child_monitor,
                           xdrive_t             *child_drive,
-                          GUnionVolumeMonitor *union_monitor)
+                          xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
                          "drive-eject-button",
@@ -362,7 +362,7 @@ child_drive_eject_button (xvolume_monitor_t      *child_monitor,
 static void
 child_drive_stop_button (xvolume_monitor_t      *child_monitor,
                          xdrive_t             *child_drive,
-                         GUnionVolumeMonitor *union_monitor)
+                         xunion_volume_monitor_t *union_monitor)
 {
   xsignal_emit_by_name (union_monitor,
                          "drive-stop-button",
@@ -370,7 +370,7 @@ child_drive_stop_button (xvolume_monitor_t      *child_monitor,
 }
 
 static void
-g_union_volume_monitor_add_monitor (GUnionVolumeMonitor *union_monitor,
+xunion_volume_monitor_add_monitor (xunion_volume_monitor_t *union_monitor,
                                     xvolume_monitor_t      *volume_monitor)
 {
   if (xlist_find (union_monitor->monitors, volume_monitor))
@@ -395,7 +395,7 @@ g_union_volume_monitor_add_monitor (GUnionVolumeMonitor *union_monitor,
 }
 
 static void
-g_union_volume_monitor_remove_monitor (GUnionVolumeMonitor *union_monitor,
+xunion_volume_monitor_remove_monitor (xunion_volume_monitor_t *union_monitor,
                                        xvolume_monitor_t      *child_monitor)
 {
   xlist_t *l;
@@ -449,12 +449,12 @@ get_native_class (void)
 }
 
 static void
-g_union_volume_monitor_init (GUnionVolumeMonitor *union_monitor)
+xunion_volume_monitor_init (xunion_volume_monitor_t *union_monitor)
 {
 }
 
 static void
-populate_union_monitor (GUnionVolumeMonitor *union_monitor)
+populate_union_monitor (xunion_volume_monitor_t *union_monitor)
 {
   xvolume_monitor_t *monitor;
   GNativeVolumeMonitorClass *native_class;
@@ -468,7 +468,7 @@ populate_union_monitor (GUnionVolumeMonitor *union_monitor)
   if (native_class != NULL)
     {
       monitor = xobject_new (XTYPE_FROM_CLASS (native_class), NULL);
-      g_union_volume_monitor_add_monitor (union_monitor, monitor);
+      xunion_volume_monitor_add_monitor (union_monitor, monitor);
       xobject_unref (monitor);
       xtype_class_unref (native_class);
     }
@@ -482,17 +482,17 @@ populate_union_monitor (GUnionVolumeMonitor *union_monitor)
       if (klass->is_supported == NULL || klass->is_supported())
 	{
 	  monitor = xobject_new (g_io_extension_get_type (extension), NULL);
-	  g_union_volume_monitor_add_monitor (union_monitor, monitor);
+	  xunion_volume_monitor_add_monitor (union_monitor, monitor);
 	  xobject_unref (monitor);
 	}
       xtype_class_unref (klass);
     }
 }
 
-static GUnionVolumeMonitor *
-g_union_volume_monitor_new (void)
+static xunion_volume_monitor_t *
+xunion_volume_monitor_new (void)
 {
-  GUnionVolumeMonitor *monitor;
+  xunion_volume_monitor_t *monitor;
 
   monitor = xobject_new (XTYPE_UNION_VOLUME_MONITOR, NULL);
 
@@ -518,7 +518,7 @@ g_volume_monitor_get (void)
     vm = G_VOLUME_MONITOR (xobject_ref (the_volume_monitor));
   else
     {
-      the_volume_monitor = g_union_volume_monitor_new ();
+      the_volume_monitor = xunion_volume_monitor_new ();
       populate_union_monitor (the_volume_monitor);
       vm = G_VOLUME_MONITOR (the_volume_monitor);
     }
@@ -607,7 +607,7 @@ g_volume_monitor_adopt_orphan_mount (xmount_t *mount)
   xvolume_t *volume;
   xlist_t *l;
 
-  g_return_val_if_fail (mount != NULL, NULL);
+  xreturn_val_if_fail (mount != NULL, NULL);
 
   if (the_volume_monitor == NULL)
     return NULL;

@@ -551,7 +551,7 @@ test_casemap_and_casefold (void)
 
   filename = g_test_build_filename (G_TEST_DIST, "casemap.txt", NULL);
   infile = fopen (filename, "r");
-  g_assert (infile != NULL);
+  xassert (infile != NULL);
 
   while (fgets (buffer, sizeof (buffer), infile))
     {
@@ -606,7 +606,7 @@ test_casemap_and_casefold (void)
   filename = g_test_build_filename (G_TEST_DIST, "casefold.txt", NULL);
 
   infile = fopen (filename, "r");
-  g_assert (infile != NULL);
+  xassert (infile != NULL);
 
   while (fgets (buffer, sizeof (buffer), infile))
     {

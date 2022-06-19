@@ -19,7 +19,7 @@ main (int argc, char *argv[])
       g_free (expected);
 
       envvar = g_getenv ("GIO_LAUNCHED_DESKTOP_FILE_PID");
-      g_assert (envvar != NULL);
+      xassert (envvar != NULL);
       pid_from_env = atoi (envvar);
       g_assert_cmpint (pid_from_env, ==, getpid ());
     }

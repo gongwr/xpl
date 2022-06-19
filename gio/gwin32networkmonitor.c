@@ -232,7 +232,7 @@ win_network_monitor_invoke_route_changed (xpointer_t user_data)
         break;
     }
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static VOID WINAPI
@@ -314,15 +314,15 @@ g_win32_network_monitor_finalize (xobject_t *object)
 
   xmain_context_unref (win->priv->main_context);
 
-  G_OBJECT_CLASS (g_win32_network_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_win32_network_monitor_parent_class)->finalize (object);
 }
 
 static void
 g_win32_network_monitor_class_init (GWin32NetworkMonitorClass *win_class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (win_class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (win_class);
 
-  gobject_class->finalize = g_win32_network_monitor_finalize;
+  xobject_class->finalize = g_win32_network_monitor_finalize;
 }
 
 static void

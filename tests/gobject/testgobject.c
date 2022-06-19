@@ -98,12 +98,12 @@ test_object_test_iface_init (xpointer_t giface,
 {
   test_iface_class_t *iface = giface;
 
-  g_assert (iface_data == GUINT_TO_POINTER (42));
+  xassert (iface_data == GUINT_TO_POINTER (42));
 
-  g_assert (XTYPE_FROM_INTERFACE (iface) == TEST_TYPE_IFACE);
+  xassert (XTYPE_FROM_INTERFACE (iface) == TEST_TYPE_IFACE);
 
   /* assert iface_base_init() was already called */
-  g_assert (iface_base_init_count > 0);
+  xassert (iface_base_init_count > 0);
 
   /* initialize stuff */
   iface->print_string = print_foo;
@@ -202,7 +202,7 @@ test_object_get_type (void)
 static void
 test_object_class_init (test_object_class_t *class)
 {
-  /*  xobject_class_t *gobject_class = G_OBJECT_CLASS (class); */
+  /*  xobject_class_t *xobject_class = XOBJECT_CLASS (class); */
   xtype_class_adjust_private_offset (class, &test_object_private_offset);
 
   class->test_signal = test_object_test_signal;
@@ -220,7 +220,7 @@ test_object_init (test_object_t *tobject)
 {
   test_object_private_t *priv = test_object_get_instance_private (tobject);
 
-  g_assert (priv);
+  xassert (priv);
 
   priv->dummy1 = 54321;
 }
@@ -233,7 +233,7 @@ test_object_check_private_init (test_object_t *tobject)
   test_object_private_t *priv = test_object_get_instance_private (tobject);
 
   g_print ("private data during initialization: %u == %u\n", priv->dummy1, 54321);
-  g_assert (priv->dummy1 == 54321);
+  xassert (priv->dummy1 == 54321);
 }
 static xboolean_t
 test_signal_accumulator (xsignal_invocation_hint_t *ihint,
@@ -263,7 +263,7 @@ test_object_test_signal (test_object_t *tobject,
 {
   g_message ("::test_signal default_handler called");
 
-  g_return_val_if_fail (TEST_IS_IFACE (iface_object), NULL);
+  xreturn_val_if_fail (TEST_IS_IFACE (iface_object), NULL);
 
   return xstrdup ("<default_handler>");
 }
@@ -286,7 +286,7 @@ print_bar (test_iface_t   *tiobj,
   parent_iface = xtype_interface_peek_parent (TEST_IFACE_GET_CLASS (tiobj));
   parent_iface->print_string (tiobj, string);
 
-  g_assert (xtype_interface_peek_parent (parent_iface) == NULL);
+  xassert (xtype_interface_peek_parent (parent_iface) == NULL);
 }
 
 static void
@@ -295,12 +295,12 @@ derived_object_test_iface_init (xpointer_t giface,
 {
   test_iface_class_t *iface = giface;
 
-  g_assert (iface_data == GUINT_TO_POINTER (87));
+  xassert (iface_data == GUINT_TO_POINTER (87));
 
-  g_assert (XTYPE_FROM_INTERFACE (iface) == TEST_TYPE_IFACE);
+  xassert (XTYPE_FROM_INTERFACE (iface) == TEST_TYPE_IFACE);
 
   /* assert test_object_test_iface_init() was already called */
-  g_assert (iface->print_string == print_foo);
+  xassert (iface->print_string == print_foo);
 
   /* override stuff */
   iface->print_string = print_bar;
@@ -379,11 +379,11 @@ derived_object_init (derived_object_t *dobject)
 
   derived_priv = derived_object_get_instance_private (dobject);
 
-  g_assert (derived_priv);
+  xassert (derived_priv);
 
   test_priv = test_object_get_instance_private (TEST_OBJECT (dobject));
 
-  g_assert (test_priv);
+  xassert (test_priv);
 }
 
 /* --- main --- */
@@ -404,15 +404,15 @@ main (int   argc,
 			  G_LOG_LEVEL_CRITICAL);
 
   /* test new fundamentals */
-  g_assert (XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST) == xtype_fundamental_next ());
+  xassert (XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST) == xtype_fundamental_next ());
   type = xtype_register_fundamental (xtype_fundamental_next (), "FooShadow1", &info, &finfo, 0);
-  g_assert (type == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST));
-  g_assert (XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 1) == xtype_fundamental_next ());
+  xassert (type == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST));
+  xassert (XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 1) == xtype_fundamental_next ());
   type = xtype_register_fundamental (xtype_fundamental_next (), "FooShadow2", &info, &finfo, 0);
-  g_assert (type == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 1));
-  g_assert (XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 2) == xtype_fundamental_next ());
-  g_assert (xtype_from_name ("FooShadow1") == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST));
-  g_assert (xtype_from_name ("FooShadow2") == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 1));
+  xassert (type == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 1));
+  xassert (XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 2) == xtype_fundamental_next ());
+  xassert (xtype_from_name ("FooShadow1") == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST));
+  xassert (xtype_from_name ("FooShadow2") == XTYPE_MAKE_FUNDAMENTAL (XTYPE_RESERVED_USER_FIRST + 1));
 
   /* to test past class initialization interface setups, create the class here */
   xtype_class_ref (TEST_TYPE_OBJECT);
@@ -434,7 +434,7 @@ main (int   argc,
 
   priv = test_object_get_instance_private (TEST_OBJECT (dobject));
   g_print ("private data after initialization: %u == %u\n", priv->dummy1, 54321);
-  g_assert (priv->dummy1 == 54321);
+  xassert (priv->dummy1 == 54321);
 
   xobject_unref (sigarg);
   xobject_unref (dobject);

@@ -69,9 +69,9 @@ struct _GThreadFunctions
                                    xmutex_t               *mutex,
                                    GTimeVal             *end_time);
   void      (*cond_free)          (xcond_t                *cond);
-  GPrivate* (*private_new)        (xdestroy_notify_t        destructor);
-  xpointer_t  (*private_get)        (GPrivate             *private_key);
-  void      (*private_set)        (GPrivate             *private_key,
+  xprivate_t* (*private_new)        (xdestroy_notify_t        destructor);
+  xpointer_t  (*private_get)        (xprivate_t             *private_key);
+  void      (*private_set)        (xprivate_t             *private_key,
                                    xpointer_t              data);
   void      (*thread_create)      (GThreadFunc           func,
                                    xpointer_t              data,
@@ -234,14 +234,14 @@ XPL_DEPRECATED_IN_2_32_FOR(g_rw_lock_free)
 void      g_static_rw_lock_free           (GStaticRWLock *lock);
 
 XPL_DEPRECATED_IN_2_32
-GPrivate *      g_private_new             (xdestroy_notify_t notify);
+xprivate_t *      g_private_new             (xdestroy_notify_t notify);
 
-typedef struct _GStaticPrivate  GStaticPrivate XPL_DEPRECATED_TYPE_IN_2_32_FOR(GPrivate);
+typedef struct _GStaticPrivate  GStaticPrivate XPL_DEPRECATED_TYPE_IN_2_32_FOR(xprivate_t);
 struct _GStaticPrivate
 {
   /*< private >*/
   xuint_t index;
-} XPL_DEPRECATED_TYPE_IN_2_32_FOR(GPrivate);
+} XPL_DEPRECATED_TYPE_IN_2_32_FOR(xprivate_t);
 
 #define G_STATIC_PRIVATE_INIT { 0 } XPL_DEPRECATED_MACRO_IN_2_32_FOR(G_PRIVATE_INIT)
 XPL_DEPRECATED_IN_2_32

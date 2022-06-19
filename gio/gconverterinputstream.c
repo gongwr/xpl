@@ -106,7 +106,7 @@ xconverter_input_stream_class_init (xconverter_input_stream_class_t *klass)
   xobject_class_t *object_class;
   xinput_stream_class_t *istream_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->get_property = xconverter_input_stream_get_property;
   object_class->set_property = xconverter_input_stream_set_property;
   object_class->finalize     = xconverter_input_stream_finalize;
@@ -116,13 +116,13 @@ xconverter_input_stream_class_init (xconverter_input_stream_class_t *klass)
 
   xobject_class_install_property (object_class,
 				   PROP_CONVERTER,
-				   g_param_spec_object ("converter",
+				   xparam_spec_object ("converter",
 							P_("Converter"),
 							P_("The converter object"),
 							XTYPE_CONVERTER,
-							G_PARAM_READWRITE|
-							G_PARAM_CONSTRUCT_ONLY|
-							G_PARAM_STATIC_STRINGS));
+							XPARAM_READWRITE|
+							XPARAM_CONSTRUCT_ONLY|
+							XPARAM_STATIC_STRINGS));
 
 }
 
@@ -141,7 +141,7 @@ xconverter_input_stream_finalize (xobject_t *object)
   GConverterInputStreamPrivate *priv;
   xconverter_input_stream_t        *stream;
 
-  stream = G_CONVERTER_INPUT_STREAM (object);
+  stream = XCONVERTER_INPUT_STREAM (object);
   priv = stream->priv;
 
   g_free (priv->input_buffer.data);
@@ -149,7 +149,7 @@ xconverter_input_stream_finalize (xobject_t *object)
   if (priv->converter)
     xobject_unref (priv->converter);
 
-  G_OBJECT_CLASS (xconverter_input_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xconverter_input_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -160,7 +160,7 @@ xconverter_input_stream_set_property (xobject_t      *object,
 {
   xconverter_input_stream_t *cstream;
 
-  cstream = G_CONVERTER_INPUT_STREAM (object);
+  cstream = XCONVERTER_INPUT_STREAM (object);
 
    switch (prop_id)
     {
@@ -184,7 +184,7 @@ xconverter_input_stream_get_property (xobject_t    *object,
   GConverterInputStreamPrivate *priv;
   xconverter_input_stream_t        *cstream;
 
-  cstream = G_CONVERTER_INPUT_STREAM (object);
+  cstream = XCONVERTER_INPUT_STREAM (object);
   priv = cstream->priv;
 
   switch (prop_id)
@@ -220,7 +220,7 @@ xconverter_input_stream_new (xinput_stream_t *base_stream,
 {
   xinput_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_CONVERTER_INPUT_STREAM,
                          "base-stream", base_stream,
@@ -387,13 +387,13 @@ read_internal (xinput_stream_t *stream,
   GConverterInputStreamPrivate *priv;
   xsize_t available, total_bytes_read;
   xssize_t nread;
-  GConverterResult res;
+  xconverter_result_t res;
   xsize_t bytes_read;
   xsize_t bytes_written;
   xerror_t *my_error;
   xerror_t *my_error2;
 
-  cstream = G_CONVERTER_INPUT_STREAM (stream);
+  cstream = XCONVERTER_INPUT_STREAM (stream);
   priv = cstream->priv;
 
   available = buffer_data_size (&priv->converted_buffer);
@@ -432,19 +432,19 @@ read_internal (xinput_stream_t *stream,
   if (!priv->finished)
     {
       my_error = NULL;
-      res = g_converter_convert (priv->converter,
+      res = xconverter_convert (priv->converter,
 				 buffer_data (&priv->input_buffer),
 				 buffer_data_size (&priv->input_buffer),
 				 buffer, count,
-				 priv->at_input_end ? G_CONVERTER_INPUT_AT_END : 0,
+				 priv->at_input_end ? XCONVERTER_INPUT_AT_END : 0,
 				 &bytes_read,
 				 &bytes_written,
 				 &my_error);
-      if (res != G_CONVERTER_ERROR)
+      if (res != XCONVERTER_ERROR)
 	{
 	  total_bytes_read += bytes_written;
 	  buffer_consumed (&priv->input_buffer, bytes_read);
-	  if (res == G_CONVERTER_FINISHED)
+	  if (res == XCONVERTER_FINISHED)
 	    priv->finished = TRUE; /* We're done converting */
 	}
       else if (total_bytes_read == 0 &&
@@ -471,7 +471,7 @@ read_internal (xinput_stream_t *stream,
   /* If there is no more to convert, return EOF */
   if (priv->finished)
     {
-      g_assert (buffer_data_size (&priv->converted_buffer) == 0);
+      xassert (buffer_data_size (&priv->converted_buffer) == 0);
       return 0;
     }
 
@@ -485,35 +485,35 @@ read_internal (xinput_stream_t *stream,
 
   while (TRUE)
     {
-      g_assert (!priv->finished);
+      xassert (!priv->finished);
 
       /* Try to convert to our buffer */
       my_error = NULL;
-      res = g_converter_convert (priv->converter,
+      res = xconverter_convert (priv->converter,
 				 buffer_data (&priv->input_buffer),
 				 buffer_data_size (&priv->input_buffer),
 				 buffer_data (&priv->converted_buffer),
 				 buffer_tailspace (&priv->converted_buffer),
-				 priv->at_input_end ? G_CONVERTER_INPUT_AT_END : 0,
+				 priv->at_input_end ? XCONVERTER_INPUT_AT_END : 0,
 				 &bytes_read,
 				 &bytes_written,
 				 &my_error);
-      if (res != G_CONVERTER_ERROR)
+      if (res != XCONVERTER_ERROR)
 	{
 	  priv->converted_buffer.end += bytes_written;
 	  buffer_consumed (&priv->input_buffer, bytes_read);
 
 	  /* Maybe we consumed without producing any output */
-	  if (buffer_data_size (&priv->converted_buffer) == 0 && res != G_CONVERTER_FINISHED)
+	  if (buffer_data_size (&priv->converted_buffer) == 0 && res != XCONVERTER_FINISHED)
 	    continue; /* Convert more */
 
-	  if (res == G_CONVERTER_FINISHED)
+	  if (res == XCONVERTER_FINISHED)
 	    priv->finished = TRUE;
 
 	  total_bytes_read = MIN (count, buffer_data_size (&priv->converted_buffer));
 	  buffer_read (&priv->converted_buffer, buffer, total_bytes_read);
 
-	  g_assert (priv->finished || total_bytes_read > 0);
+	  xassert (priv->finished || total_bytes_read > 0);
 
 	  return total_bytes_read;
 	}
@@ -593,7 +593,7 @@ static xboolean_t
 xconverter_input_stream_is_readable (xpollable_input_stream_t *stream)
 {
   xinput_stream_t *base_stream = G_FILTER_INPUT_STREAM (stream)->base_stream;
-  xconverter_input_stream_t *cstream = G_CONVERTER_INPUT_STREAM (stream);
+  xconverter_input_stream_t *cstream = XCONVERTER_INPUT_STREAM (stream);
 
   if (buffer_data_size (&cstream->priv->converted_buffer))
     return TRUE;

@@ -166,7 +166,7 @@ xthreaded_socket_service_finalize (xobject_t *object)
    * this should only be called once the pool is empty: */
   xthread_pool_free (service->priv->thread_pool, FALSE, FALSE);
 
-  G_OBJECT_CLASS (xthreaded_socket_service_parent_class)
+  XOBJECT_CLASS (xthreaded_socket_service_parent_class)
     ->finalize (object);
 }
 
@@ -212,13 +212,13 @@ xthreaded_socket_service_set_property (xobject_t      *object,
 static void
 xthreaded_socket_service_class_init (GThreadedSocketServiceClass *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
   GSocketServiceClass *ss_class = &class->parent_class;
 
-  gobject_class->constructed = xthreaded_socket_service_constructed;
-  gobject_class->finalize = xthreaded_socket_service_finalize;
-  gobject_class->set_property = xthreaded_socket_service_set_property;
-  gobject_class->get_property = xthreaded_socket_service_get_property;
+  xobject_class->constructed = xthreaded_socket_service_constructed;
+  xobject_class->finalize = xthreaded_socket_service_finalize;
+  xobject_class->set_property = xthreaded_socket_service_set_property;
+  xobject_class->get_property = xthreaded_socket_service_get_property;
 
   ss_class->incoming = xthreaded_socket_service_incoming;
 
@@ -246,14 +246,14 @@ xthreaded_socket_service_class_init (GThreadedSocketServiceClass *class)
 			      XTYPE_FROM_CLASS (class),
 			      _g_cclosure_marshal_BOOLEAN__OBJECT_OBJECTv);
 
-  xobject_class_install_property (gobject_class, PROP_MAX_THREADS,
-				   g_param_spec_int ("max-threads",
+  xobject_class_install_property (xobject_class, PROP_MAX_THREADS,
+				   xparam_spec_int ("max-threads",
 						     P_("Max threads"),
 						     P_("The max number of threads handling clients for this service"),
 						     -1,
 						     G_MAXINT,
 						     10,
-						     G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+						     XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 }
 
 /**

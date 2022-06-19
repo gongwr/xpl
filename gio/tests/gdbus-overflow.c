@@ -95,7 +95,7 @@ static xboolean_t
 overflow_on_500ms_later_func (xpointer_t user_data)
 {
   xmain_loop_quit (loop);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -117,7 +117,7 @@ test_overflow (void)
   socket = xsocket_new_from_fd (sv[0], &error);
   g_assert_no_error (error);
   socket_connection = xsocket_connection_factory_create_connection (socket);
-  g_assert (socket_connection != NULL);
+  xassert (socket_connection != NULL);
   xobject_unref (socket);
   producer = xdbus_connection_new_sync (XIO_STREAM (socket_connection),
 					 NULL, /* guid */
@@ -161,7 +161,7 @@ test_overflow (void)
   socket = xsocket_new_from_fd (sv[1], &error);
   g_assert_no_error (error);
   socket_connection = xsocket_connection_factory_create_connection (socket);
-  g_assert (socket_connection != NULL);
+  xassert (socket_connection != NULL);
   xobject_unref (socket);
   consumer = xdbus_connection_new_sync (XIO_STREAM (socket_connection),
 					 NULL, /* guid */
@@ -210,7 +210,7 @@ main (int   argc,
   g_test_init (&argc, &argv, NULL);
 
   introspection_data = g_dbus_node_info_new_for_xml (test_interface_introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
   test_interface_introspection_data = introspection_data->interfaces[0];
 
   test_guid = g_dbus_generate_guid ();

@@ -231,7 +231,7 @@ main (int ignored_argc, char **ignored_argv)
   /* Fetch the wide-char argument vector */
   wargv = CommandLineToArgvW (GetCommandLineW(), &argc);
 
-  g_assert (argc >= ARG_COUNT);
+  xassert (argc >= ARG_COUNT);
 
   /* Convert unicode wargs to utf8 */
   argv = g_new(char *, argc + 1);
@@ -332,14 +332,14 @@ main (int ignored_argc, char **ignored_argv)
           sint64_t val;
 
           val = g_ascii_strtoll (fdsv[i], &endptr, 10);
-          g_assert (val <= G_MAXINT32);
+          xassert (val <= G_MAXINT32);
           sourcefd = val;
-          g_assert (endptr != fdsv[i]);
-          g_assert (*endptr == ':');
+          xassert (endptr != fdsv[i]);
+          xassert (*endptr == ':');
           val = g_ascii_strtoll (endptr + 1, &endptr, 10);
           targetfd = val;
-          g_assert (val <= G_MAXINT32);
-          g_assert (*endptr == '\0');
+          xassert (val <= G_MAXINT32);
+          xassert (*endptr == '\0');
 
           maxfd = MAX (maxfd, sourcefd);
           maxfd = MAX (maxfd, targetfd);

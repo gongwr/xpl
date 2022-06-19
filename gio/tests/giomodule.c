@@ -42,13 +42,13 @@ test_extension_point (void)
   g_assert_null (ep);
   ep = g_io_extension_point_register ("test-extension-point");
   ep2 = g_io_extension_point_lookup ("test-extension-point");
-  g_assert (ep2 == ep);
+  xassert (ep2 == ep);
 
   req = g_io_extension_point_get_required_type (ep);
-  g_assert (req == XTYPE_INVALID);
+  xassert (req == XTYPE_INVALID);
   g_io_extension_point_set_required_type (ep, XTYPE_OBJECT);
   req = g_io_extension_point_get_required_type (ep);
-  g_assert (req == XTYPE_OBJECT);
+  xassert (req == XTYPE_OBJECT);
 
   list = g_io_extension_point_get_extensions (ep);
   g_assert_null (list);
@@ -68,16 +68,16 @@ test_extension_point (void)
 
   ext = list->data;
   g_assert_cmpstr (g_io_extension_get_name (ext), ==, "extension2");
-  g_assert (g_io_extension_get_type (ext) == XTYPE_OBJECT);
-  g_assert (g_io_extension_get_priority (ext) == 20);
+  xassert (g_io_extension_get_type (ext) == XTYPE_OBJECT);
+  xassert (g_io_extension_get_priority (ext) == 20);
   class = g_io_extension_ref_class (ext);
-  g_assert (class == xtype_class_peek (XTYPE_OBJECT));
+  xassert (class == xtype_class_peek (XTYPE_OBJECT));
   xtype_class_unref (class);
 
   ext = list->next->data;
   g_assert_cmpstr (g_io_extension_get_name (ext), ==, "extension1");
-  g_assert (g_io_extension_get_type (ext) == XTYPE_VFS);
-  g_assert (g_io_extension_get_priority (ext) == 10);
+  xassert (g_io_extension_get_type (ext) == XTYPE_VFS);
+  xassert (g_io_extension_get_priority (ext) == 10);
 }
 
 static void

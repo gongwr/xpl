@@ -85,7 +85,7 @@ typedef struct
   xuint_t              connect_after : 1;
 } SignalHandler;
 
-G_DEFINE_TYPE (xsignal_group, xsignal_group, XTYPE_OBJECT)
+XDEFINE_TYPE (xsignal_group, xsignal_group, XTYPE_OBJECT)
 
 typedef enum
 {
@@ -108,8 +108,8 @@ static void
 xsignal_group_set_target_type (xsignal_group_t *self,
                                 xtype_t         target_type)
 {
-  g_assert (X_IS_SIGNAL_GROUP (self));
-  g_assert (xtype_is_a (target_type, XTYPE_OBJECT));
+  xassert (X_IS_SIGNAL_GROUP (self));
+  xassert (xtype_is_a (target_type, XTYPE_OBJECT));
 
   self->target_type = target_type;
 
@@ -133,7 +133,7 @@ xsignal_group_gc_handlers (xsignal_group_t *self)
 {
   xuint_t i;
 
-  g_assert (X_IS_SIGNAL_GROUP (self));
+  xassert (X_IS_SIGNAL_GROUP (self));
 
   /*
    * Remove any handlers for which the closures have become invalid. We do
@@ -145,8 +145,8 @@ xsignal_group_gc_handlers (xsignal_group_t *self)
     {
       const SignalHandler *handler = xptr_array_index (self->handlers, i - 1);
 
-      g_assert (handler != NULL);
-      g_assert (handler->closure != NULL);
+      xassert (handler != NULL);
+      xassert (handler->closure != NULL);
 
       if (handler->closure->is_invalid)
         xptr_array_remove_index (self->handlers, i - 1);
@@ -160,8 +160,8 @@ xsignal_group__target_weak_notify (xpointer_t  data,
   xsignal_group_t *self = data;
   xuint_t i;
 
-  g_assert (X_IS_SIGNAL_GROUP (self));
-  g_assert (where_object_was != NULL);
+  xassert (X_IS_SIGNAL_GROUP (self));
+  xassert (where_object_was != NULL);
 
   g_rec_mutex_lock (&self->mutex);
 
@@ -187,13 +187,13 @@ xsignal_group_bind_handler (xsignal_group_t  *self,
 {
   xssize_t i;
 
-  g_assert (self != NULL);
-  g_assert (X_IS_OBJECT (target));
-  g_assert (handler != NULL);
-  g_assert (handler->signal_id != 0);
-  g_assert (handler->closure != NULL);
-  g_assert (handler->closure->is_invalid == 0);
-  g_assert (handler->handler_id == 0);
+  xassert (self != NULL);
+  xassert (X_IS_OBJECT (target));
+  xassert (handler != NULL);
+  xassert (handler->signal_id != 0);
+  xassert (handler->closure != NULL);
+  xassert (handler->closure->is_invalid == 0);
+  xassert (handler->handler_id == 0);
 
   handler->handler_id = xsignal_connect_closure_by_id (target,
                                                         handler->signal_id,
@@ -201,7 +201,7 @@ xsignal_group_bind_handler (xsignal_group_t  *self,
                                                         handler->closure,
                                                         handler->connect_after);
 
-  g_assert (handler->handler_id != 0);
+  xassert (handler->handler_id != 0);
 
   for (i = 0; i < self->block_count; i++)
     xsignal_handler_block (target, handler->handler_id);
@@ -214,8 +214,8 @@ xsignal_group_bind (xsignal_group_t *self,
   xobject_t *hold;
   xuint_t i;
 
-  g_assert (X_IS_SIGNAL_GROUP (self));
-  g_assert (!target || X_IS_OBJECT (target));
+  xassert (X_IS_SIGNAL_GROUP (self));
+  xassert (!target || X_IS_OBJECT (target));
 
   if (target == NULL)
     return;
@@ -279,9 +279,9 @@ xsignal_group_unbind (xsignal_group_t *self)
 
       handler = xptr_array_index (self->handlers, i);
 
-      g_assert (handler != NULL);
-      g_assert (handler->signal_id != 0);
-      g_assert (handler->closure != NULL);
+      xassert (handler != NULL);
+      xassert (handler->signal_id != 0);
+      xassert (handler->closure != NULL);
 
       handler_id = handler->handler_id;
       handler->handler_id = 0;
@@ -352,10 +352,10 @@ xsignal_group_block (xsignal_group_t *self)
     {
       const SignalHandler *handler = xptr_array_index (self->handlers, i);
 
-      g_assert (handler != NULL);
-      g_assert (handler->signal_id != 0);
-      g_assert (handler->closure != NULL);
-      g_assert (handler->handler_id != 0);
+      xassert (handler != NULL);
+      xassert (handler->signal_id != 0);
+      xassert (handler->closure != NULL);
+      xassert (handler->handler_id != 0);
 
       xsignal_handler_block (target, handler->handler_id);
     }
@@ -398,10 +398,10 @@ xsignal_group_unblock (xsignal_group_t *self)
     {
       const SignalHandler *handler = xptr_array_index (self->handlers, i);
 
-      g_assert (handler != NULL);
-      g_assert (handler->signal_id != 0);
-      g_assert (handler->closure != NULL);
-      g_assert (handler->handler_id != 0);
+      xassert (handler != NULL);
+      xassert (handler->signal_id != 0);
+      xassert (handler->closure != NULL);
+      xassert (handler->handler_id != 0);
 
       xsignal_handler_unblock (target, handler->handler_id);
     }
@@ -427,7 +427,7 @@ xsignal_group_dup_target (xsignal_group_t *self)
 {
   xobject_t *target;
 
-  g_return_val_if_fail (X_IS_SIGNAL_GROUP (self), NULL);
+  xreturn_val_if_fail (X_IS_SIGNAL_GROUP (self), NULL);
 
   g_rec_mutex_lock (&self->mutex);
   target = g_weak_ref_get (&self->target_ref);
@@ -509,7 +509,7 @@ xsignal_group_constructed (xobject_t *object)
   if (!xsignal_group_check_target_type (self, target))
     xsignal_group_set_target (self, NULL);
 
-  G_OBJECT_CLASS (xsignal_group_parent_class)->constructed (object);
+  XOBJECT_CLASS (xsignal_group_parent_class)->constructed (object);
 
   g_clear_object (&target);
 
@@ -532,7 +532,7 @@ xsignal_group_dispose (xobject_t *object)
 
   g_rec_mutex_unlock (&self->mutex);
 
-  G_OBJECT_CLASS (xsignal_group_parent_class)->dispose (object);
+  XOBJECT_CLASS (xsignal_group_parent_class)->dispose (object);
 }
 
 static void
@@ -543,7 +543,7 @@ xsignal_group_finalize (xobject_t *object)
   g_weak_ref_clear (&self->target_ref);
   g_rec_mutex_clear (&self->mutex);
 
-  G_OBJECT_CLASS (xsignal_group_parent_class)->finalize (object);
+  XOBJECT_CLASS (xsignal_group_parent_class)->finalize (object);
 }
 
 static void
@@ -595,7 +595,7 @@ xsignal_group_set_property (xobject_t      *object,
 static void
 xsignal_group_class_init (xsignal_group_class_t *klass)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
 
   object_class->constructed = xsignal_group_constructed;
   object_class->dispose = xsignal_group_dispose;
@@ -611,11 +611,11 @@ xsignal_group_class_init (xsignal_group_class_t *klass)
    * Since: 2.72
    */
   properties[PROP_TARGET] =
-      g_param_spec_object ("target",
+      xparam_spec_object ("target",
                            "Target",
                            "The target instance used when connecting signals.",
                            XTYPE_OBJECT,
-                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+                           (XPARAM_READWRITE | XPARAM_EXPLICIT_NOTIFY | XPARAM_STATIC_STRINGS));
 
   /**
    * xsignal_group_t:target-type
@@ -625,11 +625,11 @@ xsignal_group_class_init (xsignal_group_class_t *klass)
    * Since: 2.72
    */
   properties[PROP_TARGET_TYPE] =
-      g_param_spec_gtype ("target-type",
+      xparam_spec_gtype ("target-type",
                           "Target Type",
                           "The xtype_t of the target property.",
                           XTYPE_OBJECT,
-                          (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                          (XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_properties (object_class, LAST_PROP, properties);
 
@@ -698,7 +698,7 @@ xsignal_group_init (xsignal_group_t *self)
 xsignal_group_t *
 xsignal_group_new (xtype_t target_type)
 {
-  g_return_val_if_fail (xtype_is_a (target_type, XTYPE_OBJECT), NULL);
+  xreturn_val_if_fail (xtype_is_a (target_type, XTYPE_OBJECT), NULL);
 
   return xobject_new (XTYPE_SIGNAL_GROUP,
                        "target-type", target_type,

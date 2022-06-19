@@ -52,27 +52,27 @@ test_local_cmdline (xapplication_t   *application,
   return FALSE;
 }
 
-typedef xapplication_t TestApplication;
-typedef xapplication_class_t TestApplicationClass;
+typedef xapplication_t test_application_t;
+typedef xapplication_class_t test_application_class_t;
 
 static xtype_t test_application_get_type (void);
-G_DEFINE_TYPE (TestApplication, test_application, XTYPE_APPLICATION)
+XDEFINE_TYPE (test_application_t, test_application, XTYPE_APPLICATION)
 
 static void
 test_application_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (test_application_parent_class)->finalize (object);
+  XOBJECT_CLASS (test_application_parent_class)->finalize (object);
 }
 
 static void
-test_application_init (TestApplication *app)
+test_application_init (test_application_t *app)
 {
 }
 
 static void
-test_application_class_init (TestApplicationClass *class)
+test_application_class_init (test_application_class_t *class)
 {
-  G_OBJECT_CLASS (class)->finalize = test_application_finalize;
+  XOBJECT_CLASS (class)->finalize = test_application_finalize;
   G_APPLICATION_CLASS (class)->local_command_line = test_local_cmdline;
 }
 
@@ -80,7 +80,7 @@ static xapplication_t *
 test_application_new (const xchar_t       *application_id,
                       GApplicationFlags  flags)
 {
-  g_return_val_if_fail (xapplication_id_is_valid (application_id), NULL);
+  xreturn_val_if_fail (xapplication_id_is_valid (application_id), NULL);
 
   return xobject_new (test_application_get_type (),
                        "application-id", application_id,
@@ -94,7 +94,7 @@ main (int argc, char **argv)
   xapplication_t *app;
   int status;
 
-  app = test_application_new ("org.gtk.TestApplication", 0);
+  app = test_application_new ("org.gtk.test_application_t", 0);
   xapplication_set_inactivity_timeout (app, 10000);
   xsignal_connect (app, "command-line", G_CALLBACK (command_line), NULL);
 

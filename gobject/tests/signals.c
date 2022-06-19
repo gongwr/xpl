@@ -200,7 +200,7 @@ struct _test_class
 };
 
 static xtype_t test_get_type (void);
-G_DEFINE_TYPE (test, test, XTYPE_OBJECT)
+XDEFINE_TYPE (test, test, XTYPE_OBJECT)
 
 static void
 test_init (test_t *test)
@@ -409,7 +409,7 @@ test_class_init (test_class_t *klass)
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (test_class_t, all_types),
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRINXPARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -436,7 +436,7 @@ test_class_init (test_class_t *klass)
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (test_class_t, all_types),
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRINXPARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -459,7 +459,7 @@ test_class_init (test_class_t *klass)
 		XTYPE_INT64,
 		XTYPE_UINT64);
   xsignal_set_va_marshaller (s, XTYPE_FROM_CLASS (klass),
-			      test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64v);
+			      test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRINXPARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64v);
 
   xsignal_new ("all-types-generic",
                 XTYPE_FROM_CLASS (klass),
@@ -493,7 +493,7 @@ test_class_init (test_class_t *klass)
                 G_SIGNAL_RUN_LAST,
                 G_STRUCT_OFFSET (test_class_t, all_types_null),
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRINXPARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -520,7 +520,7 @@ test_class_init (test_class_t *klass)
                 G_SIGNAL_RUN_LAST,
                 0,
                 NULL, NULL,
-                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRING_PARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
+                test_VOID__INT_BOOLEAN_CHAR_UCHAR_UINT_LONG_ULONXENUM_FLAGS_FLOAT_DOUBLE_STRINXPARAM_BOXED_POINTER_OBJECT_VARIANT_INT64_UINT64,
                 XTYPE_NONE,
                 19,
 		XTYPE_INT,
@@ -548,7 +548,7 @@ typedef struct _test test2_t;
 typedef struct _test_class test2_class_t;
 
 static xtype_t test2_get_type (void);
-G_DEFINE_TYPE (test2, test2, XTYPE_OBJECT)
+XDEFINE_TYPE (test2, test2, XTYPE_OBJECT)
 
 static void
 test2_init (test2_t *test)
@@ -947,7 +947,7 @@ all_types_handler (test_t *test, int i, xboolean_t b, char c, xuchar_t uc, xuint
   g_assert_cmpfloat (fl, ==, 0.25);
   g_assert_cmpfloat (db, ==, 1.5);
   g_assert_cmpstr (str, ==, "test_t");
-  g_assert_cmpstr (g_param_spec_get_nick (param), ==, "nick");
+  g_assert_cmpstr (xparam_spec_get_nick (param), ==, "nick");
   g_assert_cmpstr (xbytes_get_data (bytes, NULL), ==, "Blah");
   g_assert_true (ptr == &enum_type);
   g_assert_cmpuint (xvariant_get_uint16 (var), == , 99);
@@ -979,7 +979,7 @@ test_all_types (void)
   float fl = 0.25;
   double db = 1.5;
   char *str = "test_t";
-  xparam_spec_t *param = g_param_spec_long	 ("param", "nick", "blurb", 0, 10, 4, 0);
+  xparam_spec_t *param = xparam_spec_long	 ("param", "nick", "blurb", 0, 10, 4, 0);
   xbytes_t *bytes = xbytes_new_static ("Blah", 5);
   xpointer_t ptr = &enum_type;
   xvariant_t *var = xvariant_new_uint16 (99);
@@ -1049,7 +1049,7 @@ test_all_types (void)
   g_assert_cmpint (all_type_handlers_count, ==, 3 + 5 + 5);
 
   xobject_unref (test);
-  g_param_spec_unref (param);
+  xparam_spec_unref (param);
   xbytes_unref (bytes);
   xvariant_unref (var);
 }

@@ -280,7 +280,7 @@ strinfo_enumerate (const xuint32_t *strinfo,
 
       /* find the end of this string */
       ptr = memchr (ptr, '\xff', end - ptr);
-      g_assert (ptr != NULL);
+      xassert (ptr != NULL);
 
       /* skip over the int to the next string */
       ptr += 5;

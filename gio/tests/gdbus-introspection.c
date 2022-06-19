@@ -55,43 +55,43 @@ test_introspection (xdbus_proxy_t *proxy)
                                    NULL,
                                    &error);
   g_assert_no_error (error);
-  g_assert (result != NULL);
+  xassert (result != NULL);
   xvariant_get (result, "(&s)", &xml_data);
 
   node_info = g_dbus_node_info_new_for_xml (xml_data, &error);
   g_assert_no_error (error);
-  g_assert (node_info != NULL);
+  xassert (node_info != NULL);
 
   /* for now we only check a couple of things. TODO: check more things */
 
   interface_info = g_dbus_node_info_lookup_interface (node_info, "com.example.NonExistantInterface");
-  g_assert (interface_info == NULL);
+  xassert (interface_info == NULL);
 
   interface_info = g_dbus_node_info_lookup_interface (node_info, "org.freedesktop.DBus.Introspectable");
-  g_assert (interface_info != NULL);
+  xassert (interface_info != NULL);
   method_info = g_dbus_interface_info_lookup_method (interface_info, "NonExistantMethod");
-  g_assert (method_info == NULL);
+  xassert (method_info == NULL);
   method_info = g_dbus_interface_info_lookup_method (interface_info, "Introspect");
-  g_assert (method_info != NULL);
-  g_assert (method_info->in_args != NULL);
-  g_assert (method_info->in_args[0] == NULL);
-  g_assert (method_info->out_args != NULL);
-  g_assert (method_info->out_args[0] != NULL);
-  g_assert (method_info->out_args[1] == NULL);
+  xassert (method_info != NULL);
+  xassert (method_info->in_args != NULL);
+  xassert (method_info->in_args[0] == NULL);
+  xassert (method_info->out_args != NULL);
+  xassert (method_info->out_args[0] != NULL);
+  xassert (method_info->out_args[1] == NULL);
   g_assert_cmpstr (method_info->out_args[0]->signature, ==, "s");
 
   interface_info = g_dbus_node_info_lookup_interface (node_info, "com.example.Frob");
-  g_assert (interface_info != NULL);
+  xassert (interface_info != NULL);
   signal_info = g_dbus_interface_info_lookup_signal (interface_info, "TestSignal");
-  g_assert (signal_info != NULL);
-  g_assert (signal_info->args != NULL);
-  g_assert (signal_info->args[0] != NULL);
+  xassert (signal_info != NULL);
+  xassert (signal_info->args != NULL);
+  xassert (signal_info->args[0] != NULL);
   g_assert_cmpstr (signal_info->args[0]->signature, ==, "s");
-  g_assert (signal_info->args[1] != NULL);
+  xassert (signal_info->args[1] != NULL);
   g_assert_cmpstr (signal_info->args[1]->signature, ==, "o");
-  g_assert (signal_info->args[2] != NULL);
+  xassert (signal_info->args[2] != NULL);
   g_assert_cmpstr (signal_info->args[2]->signature, ==, "v");
-  g_assert (signal_info->args[3] == NULL);
+  xassert (signal_info->args[3] == NULL);
 
   g_dbus_node_info_unref (node_info);
   xvariant_unref (result);
@@ -123,7 +123,7 @@ test_introspection_parser (void)
   g_assert_no_error (error);
 
   /* this is safe; testserver will exit once the bus goes away */
-  g_assert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
+  xassert (g_spawn_command_line_async (g_test_get_filename (G_TEST_BUILT, "gdbus-testserver", NULL), NULL));
 
   _g_assert_property_notify (proxy, "g-name-owner");
 
@@ -179,22 +179,22 @@ test_generate (void)
   aninfo = iinfo->annotations[0];
   g_assert_cmpstr (aninfo->key, ==, "foo");
   g_assert_cmpstr (aninfo->value, ==, "bar");
-  g_assert (iinfo->annotations[1] == NULL);
+  xassert (iinfo->annotations[1] == NULL);
   minfo = g_dbus_interface_info_lookup_method (iinfo, "PairReturn");
   g_assert_cmpstr (g_dbus_annotation_info_lookup (minfo->annotations, "org.freedesktop.DBus.GLib.Async"), ==, "");
   arginfo = minfo->in_args[0];
   g_assert_cmpstr (arginfo->name, ==, "somenumber");
   g_assert_cmpstr (arginfo->signature, ==, "u");
-  g_assert (minfo->in_args[1] == NULL);
+  xassert (minfo->in_args[1] == NULL);
   arginfo = minfo->out_args[0];
   g_assert_cmpstr (arginfo->name, ==, "somestring");
   g_assert_cmpstr (arginfo->signature, ==, "s");
-  g_assert (minfo->out_args[1] == NULL);
+  xassert (minfo->out_args[1] == NULL);
   sinfo = g_dbus_interface_info_lookup_signal (iinfo, "HelloWorld");
   arginfo = sinfo->args[0];
   g_assert_cmpstr (arginfo->name, ==, "greeting");
   g_assert_cmpstr (arginfo->signature, ==, "s");
-  g_assert (sinfo->args[1] == NULL);
+  xassert (sinfo->args[1] == NULL);
   pinfo = g_dbus_interface_info_lookup_property (iinfo, "y");
   g_assert_cmpstr (pinfo->signature, ==, "y");
   g_assert_cmpint (pinfo->flags, ==, G_DBUS_PROPERTY_INFO_FLAGS_READABLE |
@@ -246,15 +246,15 @@ test_default_direction (void)
 
   iinfo = g_dbus_node_info_lookup_interface (info, "com.example.Frob");
   sinfo = g_dbus_interface_info_lookup_signal (iinfo, "HelloWorld");
-  g_assert (sinfo->args != NULL);
+  xassert (sinfo->args != NULL);
   arginfo = sinfo->args[0];
   g_assert_cmpstr (arginfo->name, ==, "greeting");
-  g_assert (sinfo->args[1] == NULL);
+  xassert (sinfo->args[1] == NULL);
   minfo = g_dbus_interface_info_lookup_method (iinfo, "Sleep");
-  g_assert (minfo->in_args != NULL);
+  xassert (minfo->in_args != NULL);
   arginfo = minfo->in_args[0];
   g_assert_cmpstr (arginfo->name, ==, "timeout");
-  g_assert (minfo->in_args[1] == NULL);
+  xassert (minfo->in_args[1] == NULL);
 
   g_dbus_node_info_unref (info);
 }

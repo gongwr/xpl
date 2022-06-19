@@ -10,7 +10,7 @@ stop_waiting (xpointer_t data)
 {
   xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static xboolean_t
@@ -18,7 +18,7 @@ unreachable_callback (xpointer_t data)
 {
   g_assert_not_reached ();
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void

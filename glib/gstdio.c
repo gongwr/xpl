@@ -385,7 +385,7 @@ _g_win32_readlink_handle_raw (HANDLE      h,
   DWORD max_buffer_size = sizeof (REPARSE_DATA_BUFFER) + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
   REPARSE_DATA_BUFFER *rep_buf;
 
-  g_return_val_if_fail ((buf != NULL || alloc_buf != NULL || reparse_tag != NULL) &&
+  xreturn_val_if_fail ((buf != NULL || alloc_buf != NULL || reparse_tag != NULL) &&
                         (buf == NULL || alloc_buf == NULL),
                         -1);
 
@@ -533,7 +533,7 @@ _g_win32_readlink_utf16_handle (const xunichar2_t  *filename,
   int   result;
   xsize_t string_size;
 
-  g_return_val_if_fail ((buf != NULL || alloc_buf != NULL || reparse_tag != NULL) &&
+  xreturn_val_if_fail ((buf != NULL || alloc_buf != NULL || reparse_tag != NULL) &&
                         (filename != NULL || file_handle != NULL) &&
                         (buf == NULL || alloc_buf == NULL) &&
                         (filename == NULL || file_handle == NULL),
@@ -853,7 +853,7 @@ g_win32_readlink_utf8 (const xchar_t  *filename,
   xlong_t tmp_len;
   xchar_t *tmp;
 
-  g_return_val_if_fail ((buf != NULL || alloc_buf != NULL) &&
+  xreturn_val_if_fail ((buf != NULL || alloc_buf != NULL) &&
                         (buf == NULL || alloc_buf == NULL),
                         -1);
 

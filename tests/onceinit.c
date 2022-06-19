@@ -121,9 +121,9 @@ main (int   argc,
   initializer1();
   /* test pointer initializer */
   p = initializer2();
-  g_assert (p == &dummy_value);
+  xassert (p == &dummy_value);
   p = initializer2();
-  g_assert (p == &dummy_value);
+  xassert (p == &dummy_value);
   /* start multiple threads for initializer3() */
   g_mutex_lock (&tmutex);
   for (i = 0; i < N_THREADS; i++)

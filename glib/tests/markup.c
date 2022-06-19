@@ -54,7 +54,7 @@ end (xmarkup_parse_context_t  *context,
   stack = xmarkup_parse_context_get_element_stack (context);
   for (s1 = stack, s2 = data->stack; s1 && s2; s1 = s1->next, s2 = s2->next)
     g_assert_cmpstr (s1->data, ==, s2->data);
-  g_assert (s1 == NULL && s2 == NULL);
+  xassert (s1 == NULL && s2 == NULL);
 
   s = data->stack;
   data->stack = data->stack->next;
@@ -82,7 +82,7 @@ test_markup_stack (void)
 
   context = xmarkup_parse_context_new (&parser, 0, &data, NULL);
   res = xmarkup_parse_context_parse (context, content, -1, &error);
-  g_assert (res);
+  xassert (res);
   g_assert_no_error (error);
   xmarkup_parse_context_free (context);
 }

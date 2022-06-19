@@ -270,7 +270,7 @@ ik_source_dispatch (xsource_t     *source,
               pair = xhash_table_lookup (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
               if (pair != NULL)
                 {
-                  g_assert (!pair->pair);
+                  xassert (!pair->pair);
 
                   xhash_table_remove (iks->unmatched_moves, GUINT_TO_POINTER (event->cookie));
                   event->is_second_in_pair = TRUE;
@@ -304,7 +304,7 @@ ik_source_dispatch (xsource_t     *source,
            * In that case, we need to switch back to polling the file
            * descriptor in the usual way.
            */
-          g_assert (iks->is_bored);
+          xassert (iks->is_bored);
           interesting = TRUE;
         }
 
@@ -330,7 +330,7 @@ ik_source_dispatch (xsource_t     *source,
     }
 
   /* The queue gets blocked iff we have unmatched moves */
-  g_assert ((iks->queue.length > 0) == (xhash_table_size (iks->unmatched_moves) > 0));
+  xassert ((iks->queue.length > 0) == (xhash_table_size (iks->unmatched_moves) > 0));
 
   /* Here's where we decide what will wake us up next.
    *
@@ -422,8 +422,8 @@ _ik_watch (const char *path,
 {
   gint32 wd = -1;
 
-  g_assert (path != NULL);
-  g_assert (inotify_source && inotify_source->fd >= 0);
+  xassert (path != NULL);
+  xassert (inotify_source && inotify_source->fd >= 0);
 
   wd = inotify_add_watch (inotify_source->fd, path, mask);
 
@@ -436,7 +436,7 @@ _ik_watch (const char *path,
       return wd;
     }
 
-  g_assert (wd >= 0);
+  xassert (wd >= 0);
   return wd;
 }
 
@@ -444,8 +444,8 @@ int
 _ik_ignore (const char *path,
             gint32      wd)
 {
-  g_assert (wd >= 0);
-  g_assert (inotify_source && inotify_source->fd >= 0);
+  xassert (wd >= 0);
+  xassert (inotify_source && inotify_source->fd >= 0);
 
   if (inotify_rm_watch (inotify_source->fd, wd) < 0)
     {

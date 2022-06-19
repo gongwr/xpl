@@ -178,7 +178,7 @@ xdbus_server_dispose (xobject_t *object)
   if (server->active)
     xdbus_server_stop (server);
 
-  G_OBJECT_CLASS (xdbus_server_parent_class)->dispose (object);
+  XOBJECT_CLASS (xdbus_server_parent_class)->dispose (object);
 }
 
 static void
@@ -186,7 +186,7 @@ xdbus_server_finalize (xobject_t *object)
 {
   xdbus_server_t *server = G_DBUS_SERVER (object);
 
-  g_assert (!server->active);
+  xassert (!server->active);
 
   if (server->authentication_observer != NULL)
     xobject_unref (server->authentication_observer);
@@ -211,7 +211,7 @@ xdbus_server_finalize (xobject_t *object)
 
   xmain_context_unref (server->main_context_at_construction);
 
-  G_OBJECT_CLASS (xdbus_server_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdbus_server_parent_class)->finalize (object);
 }
 
 static void
@@ -289,12 +289,12 @@ xdbus_server_set_property (xobject_t      *object,
 static void
 xdbus_server_class_init (xdbus_server_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->dispose      = xdbus_server_dispose;
-  gobject_class->finalize     = xdbus_server_finalize;
-  gobject_class->set_property = xdbus_server_set_property;
-  gobject_class->get_property = xdbus_server_get_property;
+  xobject_class->dispose      = xdbus_server_dispose;
+  xobject_class->finalize     = xdbus_server_finalize;
+  xobject_class->set_property = xdbus_server_set_property;
+  xobject_class->get_property = xdbus_server_get_property;
 
   /**
    * xdbus_server_t:flags:
@@ -303,19 +303,19 @@ xdbus_server_class_init (xdbus_server_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_FLAGS,
-                                   g_param_spec_flags ("flags",
+                                   xparam_spec_flags ("flags",
                                                        P_("Flags"),
                                                        P_("Flags for the server"),
                                                        XTYPE_DBUS_SERVER_FLAGS,
                                                        G_DBUS_SERVER_FLAGS_NONE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_WRITABLE |
-                                                       G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_STATIC_NAME |
-                                                       G_PARAM_STATIC_BLURB |
-                                                       G_PARAM_STATIC_NICK));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_WRITABLE |
+                                                       XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_STATIC_NAME |
+                                                       XPARAM_STATIC_BLURB |
+                                                       XPARAM_STATIC_NICK));
 
   /**
    * xdbus_server_t:guid:
@@ -326,18 +326,18 @@ xdbus_server_class_init (xdbus_server_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_GUID,
-                                   g_param_spec_string ("guid",
+                                   xparam_spec_string ("guid",
                                                         P_("GUID"),
                                                         P_("The guid of the server"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_server_t:address:
@@ -346,18 +346,18 @@ xdbus_server_class_init (xdbus_server_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_ADDRESS,
-                                   g_param_spec_string ("address",
+                                   xparam_spec_string ("address",
                                                         P_("Address"),
                                                         P_("The address to listen on"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_server_t:client-address:
@@ -366,16 +366,16 @@ xdbus_server_class_init (xdbus_server_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_CLIENT_ADDRESS,
-                                   g_param_spec_string ("client-address",
+                                   xparam_spec_string ("client-address",
                                                         P_("Client Address"),
                                                         P_("The address clients can use"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_server_t:active:
@@ -384,16 +384,16 @@ xdbus_server_class_init (xdbus_server_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_ACTIVE,
-                                   g_param_spec_boolean ("active",
+                                   xparam_spec_boolean ("active",
                                                          P_("Active"),
                                                          P_("Whether the server is currently active"),
                                                          FALSE,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_NAME |
-                                                         G_PARAM_STATIC_BLURB |
-                                                         G_PARAM_STATIC_NICK));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_STATIC_NAME |
+                                                         XPARAM_STATIC_BLURB |
+                                                         XPARAM_STATIC_NICK));
 
   /**
    * xdbus_server_t:authentication-observer:
@@ -402,18 +402,18 @@ xdbus_server_class_init (xdbus_server_class_t *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_AUTHENTICATION_OBSERVER,
-                                   g_param_spec_object ("authentication-observer",
+                                   xparam_spec_object ("authentication-observer",
                                                         P_("Authentication Observer"),
                                                         P_("Object used to assist in the authentication process"),
                                                         XTYPE_DBUS_AUTH_OBSERVER,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_server_t::new-connection:
@@ -519,10 +519,10 @@ xdbus_server_new_sync (const xchar_t        *address,
 {
   xdbus_server_t *server;
 
-  g_return_val_if_fail (address != NULL, NULL);
-  g_return_val_if_fail (g_dbus_is_guid (guid), NULL);
-  g_return_val_if_fail ((flags & ~G_DBUS_SERVER_FLAGS_ALL) == 0, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (address != NULL, NULL);
+  xreturn_val_if_fail (g_dbus_is_guid (guid), NULL);
+  xreturn_val_if_fail ((flags & ~G_DBUS_SERVER_FLAGS_ALL) == 0, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   server = xinitable_new (XTYPE_DBUS_SERVER,
                            cancellable,
@@ -554,7 +554,7 @@ xdbus_server_new_sync (const xchar_t        *address,
 const xchar_t *
 xdbus_server_get_client_address (xdbus_server_t *server)
 {
-  g_return_val_if_fail (X_IS_DBUS_SERVER (server), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_SERVER (server), NULL);
   return server->client_address;
 }
 
@@ -571,7 +571,7 @@ xdbus_server_get_client_address (xdbus_server_t *server)
 const xchar_t *
 xdbus_server_get_guid (xdbus_server_t *server)
 {
-  g_return_val_if_fail (X_IS_DBUS_SERVER (server), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_SERVER (server), NULL);
   return server->guid;
 }
 
@@ -588,7 +588,7 @@ xdbus_server_get_guid (xdbus_server_t *server)
 xdbus_server_flags_t
 xdbus_server_get_flags (xdbus_server_t *server)
 {
-  g_return_val_if_fail (X_IS_DBUS_SERVER (server), G_DBUS_SERVER_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_SERVER (server), G_DBUS_SERVER_FLAGS_NONE);
   return server->flags;
 }
 
@@ -605,7 +605,7 @@ xdbus_server_get_flags (xdbus_server_t *server)
 xboolean_t
 xdbus_server_is_active (xdbus_server_t *server)
 {
-  g_return_val_if_fail (X_IS_DBUS_SERVER (server), G_DBUS_SERVER_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_SERVER (server), G_DBUS_SERVER_FLAGS_NONE);
   return server->active;
 }
 
@@ -624,7 +624,7 @@ xdbus_server_start (xdbus_server_t *server)
   if (server->active)
     return;
   /* Right now we don't have any transport not using the listener... */
-  g_assert (server->is_using_listener);
+  xassert (server->is_using_listener);
   server->run_signal_handler_id = xsignal_connect_data (XSOCKET_SERVICE (server->listener),
                                                          "run",
                                                          G_CALLBACK (on_run),
@@ -651,8 +651,8 @@ xdbus_server_stop (xdbus_server_t *server)
   if (!server->active)
     return;
   /* Right now we don't have any transport not using the listener... */
-  g_assert (server->is_using_listener);
-  g_assert (server->run_signal_handler_id > 0);
+  xassert (server->is_using_listener);
+  xassert (server->run_signal_handler_id > 0);
   g_clear_signal_handler (&server->run_signal_handler_id, server->listener);
   xsocket_service_stop (XSOCKET_SERVICE (server->listener));
   server->active = FALSE;
@@ -1163,7 +1163,7 @@ initable_init (xinitable_t     *initable,
 
           if (ret)
             {
-              g_assert (this_error == NULL);
+              xassert (this_error == NULL);
               goto out;
             }
         }
@@ -1186,7 +1186,7 @@ initable_init (xinitable_t     *initable,
     }
   else
     {
-      g_assert (last_error != NULL);
+      xassert (last_error != NULL);
       g_propagate_error (error, last_error);
     }
   return ret;

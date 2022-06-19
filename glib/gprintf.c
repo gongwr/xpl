@@ -193,7 +193,7 @@ xint_t
 g_vprintf (xchar_t const *format,
 	   va_list      args)
 {
-  g_return_val_if_fail (format != NULL, -1);
+  xreturn_val_if_fail (format != NULL, -1);
 
   return _g_vprintf (format, args);
 }
@@ -219,7 +219,7 @@ g_vfprintf (FILE        *file,
             xchar_t const *format,
 	    va_list      args)
 {
-  g_return_val_if_fail (format != NULL, -1);
+  xreturn_val_if_fail (format != NULL, -1);
 
   return _g_vfprintf (file, format, args);
 }
@@ -245,8 +245,8 @@ g_vsprintf (xchar_t	 *string,
 	    xchar_t const *format,
 	    va_list      args)
 {
-  g_return_val_if_fail (string != NULL, -1);
-  g_return_val_if_fail (format != NULL, -1);
+  xreturn_val_if_fail (string != NULL, -1);
+  xreturn_val_if_fail (format != NULL, -1);
 
   return _g_vsprintf (string, format, args);
 }
@@ -287,8 +287,8 @@ g_vsnprintf (xchar_t	 *string,
 	     xchar_t const *format,
 	     va_list      args)
 {
-  g_return_val_if_fail (n == 0 || string != NULL, -1);
-  g_return_val_if_fail (format != NULL, -1);
+  xreturn_val_if_fail (n == 0 || string != NULL, -1);
+  xreturn_val_if_fail (format != NULL, -1);
 
   return _g_vsnprintf (string, n, format, args);
 }
@@ -323,7 +323,7 @@ g_vasprintf (xchar_t      **string,
 	     va_list      args)
 {
   xint_t len;
-  g_return_val_if_fail (string != NULL, -1);
+  xreturn_val_if_fail (string != NULL, -1);
 
 #if !defined(USE_SYSTEM_PRINTF)
 

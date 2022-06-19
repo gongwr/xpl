@@ -104,7 +104,7 @@ test_closure_child (void)
   xerror_t *error = NULL;
   xchar_t *argv[3];
 
-  g_assert (g_getenv ("DO_NOT_ACCIDENTALLY_RECURSE") == NULL);
+  xassert (g_getenv ("DO_NOT_ACCIDENTALLY_RECURSE") == NULL);
   g_setenv ("DO_NOT_ACCIDENTALLY_RECURSE", "1", TRUE);
 
   if (g_path_is_absolute (g_get_prgname ()))
@@ -153,7 +153,7 @@ test_closure_fd (void)
   xsource_t *source;
 
   fd = open ("/dev/null", O_RDONLY);
-  g_assert (fd != -1);
+  xassert (fd != -1);
 
   source = g_unix_fd_source_new (fd, G_IO_IN);
   test_source (source, G_CALLBACK (fd_quit_callback));

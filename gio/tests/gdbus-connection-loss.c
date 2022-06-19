@@ -44,7 +44,7 @@ sleep_cb (xobject_t      *source_object,
   xvariant_t *result;
 
   result = xdbus_proxy_call_finish (G_DBUS_PROXY (source_object), res, error);
-  g_assert (result == NULL);
+  xassert (result == NULL);
   xmain_loop_quit (loop);
 }
 
@@ -53,7 +53,7 @@ on_timeout (xpointer_t user_data)
 {
   /* tear down bus */
   session_bus_stop ();
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -96,7 +96,7 @@ test_connection_loss (void)
    * are acting correctly on connection loss.
    */
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED);
-  g_assert (!g_dbus_error_is_remote_error (error));
+  xassert (!g_dbus_error_is_remote_error (error));
   g_clear_error (&error);
 
   xobject_unref (proxy);
@@ -121,14 +121,14 @@ main (int   argc,
 
   /* this is safe; testserver will exit once the bus goes away */
   path = g_test_build_filename (G_TEST_BUILT, "gdbus-testserver", NULL);
-  g_assert (g_spawn_command_line_async (path, NULL));
+  xassert (g_spawn_command_line_async (path, NULL));
   g_free (path);
 
   /* Create the connection in the main thread */
   error = NULL;
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   g_assert_no_error (error);
-  g_assert (c != NULL);
+  xassert (c != NULL);
 
   ensure_gdbus_testserver_up (c, NULL);
 

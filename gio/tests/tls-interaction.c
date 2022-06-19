@@ -63,7 +63,7 @@ typedef struct {
 } TestInteractionClass;
 
 static xtype_t test_interaction_get_type (void);
-G_DEFINE_TYPE (TestInteraction, test_interaction, XTYPE_TLS_INTERACTION)
+XDEFINE_TYPE (TestInteraction, test_interaction, XTYPE_TLS_INTERACTION)
 
 #define TEST_TYPE_INTERACTION         (test_interaction_get_type ())
 #define TEST_INTERACTION(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), TEST_TYPE_INTERACTION, TestInteraction))
@@ -91,13 +91,13 @@ test_interaction_ask_password_async_success (xtls_interaction_t    *interaction,
   xtask_t *task;
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_PASSWORD (password));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (X_IS_TLS_PASSWORD (password));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
   task = xtask_new (self, cancellable, callback, user_data);
 
@@ -115,14 +115,14 @@ test_interaction_ask_password_finish_success (xtls_interaction_t    *interaction
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (xtask_is_valid (result, interaction));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (xtask_is_valid (result, interaction));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -137,13 +137,13 @@ test_interaction_ask_password_async_failure (xtls_interaction_t    *interaction,
   xtask_t *task;
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_PASSWORD (password));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (X_IS_TLS_PASSWORD (password));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
 
   task = xtask_new (self, cancellable, callback, user_data);
 
@@ -158,14 +158,14 @@ test_interaction_ask_password_finish_failure (xtls_interaction_t    *interaction
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (xtask_is_valid (result, interaction));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (xtask_is_valid (result, interaction));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   if (xtask_propagate_int (XTASK (result), error) != -1)
     g_assert_not_reached ();
@@ -216,15 +216,15 @@ test_interaction_ask_password_sync_success (xtls_interaction_t    *interaction,
   const xuchar_t *value;
   xsize_t len;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_PASSWORD (password));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (X_IS_TLS_PASSWORD (password));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   /* Exercise different ways to set the value */
   xtls_password_set_value (password, (const xuchar_t *) "foo", 4);
@@ -260,15 +260,15 @@ test_interaction_ask_password_sync_failure (xtls_interaction_t    *interaction,
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_PASSWORD (password));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (X_IS_TLS_PASSWORD (password));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   g_set_error (error, XFILE_ERROR, XFILE_ERROR_ACCES, "The message");
   return G_TLS_INTERACTION_FAILED;
@@ -285,14 +285,14 @@ test_interaction_request_certificate_async_success (xtls_interaction_t    *inter
   xtask_t *task;
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_CONNECTION (connection));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
-  g_assert (unused_flags == 0);
+  xassert (X_IS_TLS_CONNECTION (connection));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (unused_flags == 0);
 
   task = xtask_new (self, cancellable, callback, user_data);
 
@@ -312,14 +312,14 @@ test_interaction_request_certificate_finish_success (xtls_interaction_t    *inte
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (xtask_is_valid (result, interaction));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (xtask_is_valid (result, interaction));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -335,14 +335,14 @@ test_interaction_request_certificate_async_failure (xtls_interaction_t    *inter
   xtask_t *task;
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_CONNECTION (connection));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
-  g_assert (unused_flags == 0);
+  xassert (X_IS_TLS_CONNECTION (connection));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (unused_flags == 0);
 
   task = xtask_new (self, cancellable, callback, user_data);
 
@@ -357,14 +357,14 @@ test_interaction_request_certificate_finish_failure (xtls_interaction_t    *inte
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (xtask_is_valid (result, interaction));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (xtask_is_valid (result, interaction));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   if (xtask_propagate_int (XTASK (result), error) != -1)
     g_assert_not_reached ();
@@ -381,15 +381,15 @@ test_interaction_request_certificate_sync_success (xtls_interaction_t    *intera
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_CONNECTION (connection));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (X_IS_TLS_CONNECTION (connection));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   /*
    * IRL would call xtls_connection_set_certificate(). But here just touch
@@ -408,16 +408,16 @@ test_interaction_request_certificate_sync_failure (xtls_interaction_t    *intera
 {
   TestInteraction *self;
 
-  g_assert (TEST_IS_INTERACTION (interaction));
+  xassert (TEST_IS_INTERACTION (interaction));
   self = TEST_INTERACTION (interaction);
 
-  g_assert (xthread_self () == self->test->interaction_thread);
+  xassert (xthread_self () == self->test->interaction_thread);
 
-  g_assert (X_IS_TLS_CONNECTION (connection));
-  g_assert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
-  g_assert (unused_flags == 0);
-  g_assert (error != NULL);
-  g_assert (*error == NULL);
+  xassert (X_IS_TLS_CONNECTION (connection));
+  xassert (cancellable == NULL || X_IS_CANCELLABLE (cancellable));
+  xassert (unused_flags == 0);
+  xassert (error != NULL);
+  xassert (*error == NULL);
 
   g_set_error (error, XFILE_ERROR, XFILE_ERROR_NOENT, "Another message");
   return G_TLS_INTERACTION_FAILED;
@@ -436,11 +436,11 @@ on_ask_password_async_call (xobject_t      *source,
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
-  g_assert (X_IS_TLS_INTERACTION (source));
-  g_assert (G_TLS_INTERACTION (source) == test->interaction);
+  xassert (X_IS_TLS_INTERACTION (source));
+  xassert (G_TLS_INTERACTION (source) == test->interaction);
 
   /* Check that this callback is being run in the right place */
-  g_assert (xthread_self () == test->interaction_thread);
+  xassert (xthread_self () == test->interaction_thread);
 
   res = xtls_interaction_ask_password_finish (test->interaction, result,
                                                &error);
@@ -474,7 +474,7 @@ test_ask_password_async (test_t            *test,
                          xconstpointer    unused)
 {
   /* This test only works with a main loop */
-  g_assert (test->loop);
+  xassert (test->loop);
 
   xtls_interaction_ask_password_async (test->interaction,
                                         test->password, NULL,
@@ -563,11 +563,11 @@ on_request_certificate_async_call (xobject_t      *source,
   GTlsInteractionResult res;
   xerror_t *error = NULL;
 
-  g_assert (X_IS_TLS_INTERACTION (source));
-  g_assert (G_TLS_INTERACTION (source) == test->interaction);
+  xassert (X_IS_TLS_INTERACTION (source));
+  xassert (G_TLS_INTERACTION (source) == test->interaction);
 
   /* Check that this callback is being run in the right place */
-  g_assert (xthread_self () == test->interaction_thread);
+  xassert (xthread_self () == test->interaction_thread);
 
   res = xtls_interaction_request_certificate_finish (test->interaction, result, &error);
 
@@ -600,7 +600,7 @@ test_request_certificate_async (test_t            *test,
                                 xconstpointer    unused)
 {
   /* This test only works with a main loop */
-  g_assert (test->loop);
+  xassert (test->loop);
 
   xtls_interaction_request_certificate_async (test->interaction,
                                                test->connection, 0, NULL,
@@ -697,7 +697,7 @@ setup_without_loop (test_t           *test,
   test->fixture = fixture;
 
   test->interaction = xobject_new (TEST_TYPE_INTERACTION, NULL);
-  g_assert (TEST_IS_INTERACTION (test->interaction));
+  xassert (TEST_IS_INTERACTION (test->interaction));
 
   TEST_INTERACTION (test->interaction)->test = test;
 
@@ -750,8 +750,8 @@ thread_loop (xpointer_t user_data)
 
   g_mutex_lock (&closure->loop_mutex);
 
-  g_assert (test->loop_thread == xthread_self ());
-  g_assert (test->loop == NULL);
+  xassert (test->loop_thread == xthread_self ());
+  xassert (test->loop == NULL);
   test->loop = xmain_loop_new (context, TRUE);
 
   xmain_context_acquire (context);
@@ -801,9 +801,9 @@ teardown_with_thread_loop (test_t            *test,
 {
   xpointer_t check;
 
-  g_assert (test->loop_thread);
+  xassert (test->loop_thread);
   check = xthread_join (test->loop_thread);
-  g_assert (check == test);
+  xassert (check == test);
   test->loop_thread = NULL;
 
   xmain_loop_unref (test->loop);
@@ -824,7 +824,7 @@ setup_with_normal_loop (test_t            *test,
     g_assert_not_reached ();
 
   test->loop = xmain_loop_new (context, TRUE);
-  g_assert (xmain_loop_is_running (test->loop));
+  xassert (xmain_loop_is_running (test->loop));
 }
 
 static void

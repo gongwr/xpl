@@ -243,7 +243,7 @@ xslist_append (xslist_t   *list,
   if (list)
     {
       last = xslist_last (list);
-      /* g_assert (last != NULL); */
+      /* xassert (last != NULL); */
       last->next = new_list;
 
       return list;
@@ -355,7 +355,7 @@ xslist_insert_before (xslist_t  *slist,
       slist = _xslist_alloc ();
       slist->data = data;
       slist->next = NULL;
-      g_return_val_if_fail (sibling == NULL, slist);
+      xreturn_val_if_fail (sibling == NULL, slist);
       return slist;
     }
   else
@@ -743,7 +743,7 @@ xslist_find_custom (xslist_t        *list,
                      xconstpointer  data,
                      GCompareFunc   func)
 {
-  g_return_val_if_fail (func != NULL, list);
+  xreturn_val_if_fail (func != NULL, list);
 
   while (list)
     {
@@ -898,7 +898,7 @@ xslist_insert_sorted_real (xslist_t   *list,
   xslist_t *new_list;
   xint_t cmp;
 
-  g_return_val_if_fail (func != NULL, list);
+  xreturn_val_if_fail (func != NULL, list);
 
   if (!list)
     {

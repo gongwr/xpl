@@ -198,7 +198,7 @@ xclosure_new_simple (xuint_t           sizeof_closure,
   xint_t private_size;
   xchar_t *allocated;
 
-  g_return_val_if_fail (sizeof_closure >= sizeof (xclosure_t), NULL);
+  xreturn_val_if_fail (sizeof_closure >= sizeof (xclosure_t), NULL);
 
   private_size = sizeof (GRealClosure) - sizeof (xclosure_t);
 
@@ -553,12 +553,12 @@ xclosure_t*
 xclosure_ref (xclosure_t *closure)
 {
   xuint_t new_ref_count;
-  g_return_val_if_fail (closure != NULL, NULL);
-  g_return_val_if_fail (closure->ref_count > 0, NULL);
-  g_return_val_if_fail (closure->ref_count < CLOSURE_MAX_REF_COUNT, NULL);
+  xreturn_val_if_fail (closure != NULL, NULL);
+  xreturn_val_if_fail (closure->ref_count > 0, NULL);
+  xreturn_val_if_fail (closure->ref_count < CLOSURE_MAX_REF_COUNT, NULL);
 
   INC_ASSIGN (closure, ref_count, &new_ref_count);
-  g_return_val_if_fail (new_ref_count > 1, NULL);
+  xreturn_val_if_fail (new_ref_count > 1, NULL);
 
   return closure;
 }
@@ -844,7 +844,7 @@ _xclosure_supports_invoke_va (xclosure_t       *closure)
 {
   GRealClosure *real_closure;
 
-  g_return_val_if_fail (closure != NULL, FALSE);
+  xreturn_val_if_fail (closure != NULL, FALSE);
 
   real_closure = G_REAL_CLOSURE (closure);
 
@@ -971,7 +971,7 @@ g_cclosure_new (xcallback_t      callback_func,
 {
   xclosure_t *closure;
 
-  g_return_val_if_fail (callback_func != NULL, NULL);
+  xreturn_val_if_fail (callback_func != NULL, NULL);
 
   closure = xclosure_new_simple (sizeof (GCClosure), user_data);
   if (destroy_data)
@@ -1001,7 +1001,7 @@ g_cclosure_new_swap (xcallback_t      callback_func,
 {
   xclosure_t *closure;
 
-  g_return_val_if_fail (callback_func != NULL, NULL);
+  xreturn_val_if_fail (callback_func != NULL, NULL);
 
   closure = xclosure_new_simple (sizeof (GCClosure), user_data);
   if (destroy_data)
@@ -1168,8 +1168,8 @@ xsignal_type_cclosure_new (xtype_t    itype,
 {
   xclosure_t *closure;
 
-  g_return_val_if_fail (XTYPE_IS_CLASSED (itype) || XTYPE_IS_INTERFACE (itype), NULL);
-  g_return_val_if_fail (struct_offset >= sizeof (xtype_class_t), NULL);
+  xreturn_val_if_fail (XTYPE_IS_CLASSED (itype) || XTYPE_IS_INTERFACE (itype), NULL);
+  xreturn_val_if_fail (struct_offset >= sizeof (xtype_class_t), NULL);
 
   closure = xclosure_new_simple (sizeof (xclosure_t), (xpointer_t) itype);
   if (XTYPE_IS_INTERFACE (itype))
@@ -1194,11 +1194,11 @@ value_to_ffi_type (const xvalue_t *gvalue,
 {
   ffi_type *rettype = NULL;
   xtype_t type = xtype_fundamental (G_VALUE_TYPE (gvalue));
-  g_assert (type != XTYPE_INVALID);
+  xassert (type != XTYPE_INVALID);
 
   if (enum_tmpval)
     {
-      g_assert (tmpval_used != NULL);
+      xassert (tmpval_used != NULL);
       *tmpval_used = FALSE;
     }
 
@@ -1217,14 +1217,14 @@ value_to_ffi_type (const xvalue_t *gvalue,
        * value to pass to libffi otherwise it'll pull the wrong value on
        * BE machines with 32-bit integers when treating v_long as 32-bit int.
        */
-      g_assert (enum_tmpval != NULL);
+      xassert (enum_tmpval != NULL);
       rettype = &ffi_type_sint;
       *enum_tmpval = xvalue_get_enum (gvalue);
       *value = enum_tmpval;
       *tmpval_used = TRUE;
       break;
     case XTYPE_FLAGS:
-      g_assert (enum_tmpval != NULL);
+      xassert (enum_tmpval != NULL);
       rettype = &ffi_type_uint;
       *enum_tmpval = xvalue_get_flags (gvalue);
       *value = enum_tmpval;
@@ -1377,7 +1377,7 @@ va_to_ffi_type (xtype_t gtype,
 {
   ffi_type *rettype = NULL;
   xtype_t type = xtype_fundamental (gtype);
-  g_assert (type != XTYPE_INVALID);
+  xassert (type != XTYPE_INVALID);
 
   switch (type)
     {
@@ -1630,7 +1630,7 @@ g_cclosure_marshal_generic_va (xclosure_t *closure,
 	  if (fundamental == XTYPE_STRING && storage[i]._gpointer != NULL)
 	    storage[i]._gpointer = xstrdup (storage[i]._gpointer);
 	  else if (fundamental == XTYPE_PARAM && storage[i]._gpointer != NULL)
-	    storage[i]._gpointer = g_param_spec_ref (storage[i]._gpointer);
+	    storage[i]._gpointer = xparam_spec_ref (storage[i]._gpointer);
 	  else if (fundamental == XTYPE_BOXED && storage[i]._gpointer != NULL)
 	    storage[i]._gpointer = xboxed_copy (type, storage[i]._gpointer);
 	  else if (fundamental == XTYPE_VARIANT && storage[i]._gpointer != NULL)
@@ -1658,7 +1658,7 @@ g_cclosure_marshal_generic_va (xclosure_t *closure,
 	  if (fundamental == XTYPE_STRING && storage[i]._gpointer != NULL)
 	    g_free (storage[i]._gpointer);
 	  else if (fundamental == XTYPE_PARAM && storage[i]._gpointer != NULL)
-	    g_param_spec_unref (storage[i]._gpointer);
+	    xparam_spec_unref (storage[i]._gpointer);
 	  else if (fundamental == XTYPE_BOXED && storage[i]._gpointer != NULL)
 	    xboxed_free (type, storage[i]._gpointer);
 	  else if (fundamental == XTYPE_VARIANT && storage[i]._gpointer != NULL)

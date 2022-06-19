@@ -543,8 +543,8 @@ g_bus_own_name_on_connection (xdbus_connection_t          *connection,
 {
   Client *client;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  g_return_val_if_fail (g_dbus_is_name (name) && !g_dbus_is_unique_name (name), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (g_dbus_is_name (name) && !g_dbus_is_unique_name (name), 0);
 
   G_LOCK (lock);
 
@@ -654,7 +654,7 @@ g_bus_own_name (xbus_type_t                  bus_type,
 {
   Client *client;
 
-  g_return_val_if_fail (g_dbus_is_name (name) && !g_dbus_is_unique_name (name), 0);
+  xreturn_val_if_fail (g_dbus_is_name (name) && !g_dbus_is_unique_name (name), 0);
 
   G_LOCK (lock);
 

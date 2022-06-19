@@ -92,7 +92,7 @@ test_filesystem_readonly (xconstpointer with_mount_monitor)
 {
   xfile_info_t *file_info;
   xfile_t *mounted_file;
-  GUnixMountMonitor *mount_monitor = NULL;
+  xunix_mount_monitor_t *mount_monitor = NULL;
   xchar_t *bindfs, *fusermount;
   xchar_t *curdir, *dir_to_mount, *dir_mountpoint;
   xchar_t *file_in_mount, *file_in_mountpoint;
@@ -146,7 +146,7 @@ test_filesystem_readonly (xconstpointer with_mount_monitor)
     }
 
   if (with_mount_monitor)
-    mount_monitor = g_unix_mount_monitor_get ();
+    mount_monitor = xunix_mount_monitor_get ();
 
   /* Use bindfs, which does not need root privileges, to mount the contents of one dir
    * into another dir (and do the mount as readonly as per passed '-o ro' option) */
@@ -259,7 +259,7 @@ main (int argc, char *argv[])
   g_test_add_data_func ("/g-file-info-filesystem-readonly/test-fs-ro",
                         GINT_TO_POINTER (FALSE), test_filesystem_readonly);
 
-  /* This second test is using a running GUnixMountMonitor, so the calls to:
+  /* This second test is using a running xunix_mount_monitor_t, so the calls to:
    *  g_unix_mount_get(&time_read) - To fill the time_read parameter
    *  g_unix_mounts_changed_since()
    *

@@ -143,10 +143,10 @@ assert_signals (xnetwork_monitor_t *monitor,
   xsignal_handler_disconnect (monitor, h1);
   xsignal_handler_disconnect (monitor, h2);
 
-  g_assert (emitted_notify == should_emit_notify);
-  g_assert (emitted_network_changed == should_emit_network_changed);
+  xassert (emitted_notify == should_emit_notify);
+  xassert (emitted_network_changed == should_emit_network_changed);
 
-  g_assert (xnetwork_monitor_get_network_available (monitor) == expected_network_available);
+  xassert (xnetwork_monitor_get_network_available (monitor) == expected_network_available);
 }
 
 typedef struct {
@@ -171,10 +171,10 @@ reach_cb (xobject_t      *source,
     g_assert_no_error (error);
   else
     {
-      g_assert (error != NULL);
+      xassert (error != NULL);
       g_clear_error (&error);
     }
-  g_assert (reachable == data->should_be_reachable);
+  xassert (reachable == data->should_be_reachable);
 
   xmain_loop_quit (data->loop);
 }
@@ -189,7 +189,7 @@ test_reach_async (xpointer_t user_data)
                                      NULL,
                                      reach_cb,
                                      data);
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -224,7 +224,7 @@ run_tests (xnetwork_monitor_t *monitor,
         g_assert_no_error (error);
       else
         {
-          g_assert (error != NULL);
+          xassert (error != NULL);
           g_clear_error (&error);
         }
     }
@@ -239,7 +239,7 @@ test_default (void)
   xerror_t *error = NULL;
 
   m = xnetwork_monitor_get_default ();
-  g_assert (X_IS_NETWORK_MONITOR (m));
+  xassert (X_IS_NETWORK_MONITOR (m));
 
   monitor = xobject_new (XTYPE_NETWORK_MONITOR_BASE, NULL);
   xinitable_init (XINITABLE (monitor), NULL, &error);

@@ -64,7 +64,7 @@ g_native_socket_address_dispose (xobject_t *object)
   if (address->priv->sockaddr != &address->priv->storage.sa)
     g_free (address->priv->sockaddr);
 
-  G_OBJECT_CLASS (g_native_socket_address_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_native_socket_address_parent_class)->dispose (object);
 }
 
 static xsocket_family_t
@@ -72,7 +72,7 @@ g_native_socket_address_get_family (xsocket_address_t *address)
 {
   xnative_socket_address_t *addr;
 
-  g_return_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), 0);
 
   addr = G_NATIVE_SOCKET_ADDRESS (address);
 
@@ -84,7 +84,7 @@ g_native_socket_address_get_native_size (xsocket_address_t *address)
 {
   xnative_socket_address_t *addr;
 
-  g_return_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), 0);
 
   addr = G_NATIVE_SOCKET_ADDRESS (address);
 
@@ -99,7 +99,7 @@ g_native_socket_address_to_native (xsocket_address_t  *address,
 {
   xnative_socket_address_t *addr;
 
-  g_return_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_NATIVE_SOCKET_ADDRESS (address), FALSE);
 
   addr = G_NATIVE_SOCKET_ADDRESS (address);
 
@@ -117,10 +117,10 @@ g_native_socket_address_to_native (xsocket_address_t  *address,
 static void
 g_native_socket_address_class_init (GNativeSocketAddressClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   GSocketAddressClass *gsocketaddress_class = XSOCKET_ADDRESS_CLASS (klass);
 
-  gobject_class->dispose = g_native_socket_address_dispose;
+  xobject_class->dispose = g_native_socket_address_dispose;
 
   gsocketaddress_class->get_family = g_native_socket_address_get_family;
   gsocketaddress_class->to_native = g_native_socket_address_to_native;

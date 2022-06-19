@@ -71,7 +71,7 @@ test_slice_copy (void)
   xpointer_t p;
 
   p = g_slice_copy (12, block);
-  g_assert (memcmp (p, block, 12) == 0);
+  xassert (memcmp (p, block, 12) == 0);
   g_slice_free1 (12, p);
 }
 

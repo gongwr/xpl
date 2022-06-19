@@ -312,7 +312,7 @@ static xlong_t
 _xutf8_strwidth (const xchar_t *p)
 {
   xlong_t len = 0;
-  g_return_val_if_fail (p != NULL, 0);
+  xreturn_val_if_fail (p != NULL, 0);
 
   while (*p)
     {
@@ -447,7 +447,7 @@ void g_option_context_set_help_enabled (xoption_context_t *context,
 xboolean_t
 g_option_context_get_help_enabled (xoption_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
 
   return context->help_enabled;
 }
@@ -491,7 +491,7 @@ g_option_context_set_ignore_unknown_options (xoption_context_t *context,
 xboolean_t
 g_option_context_get_ignore_unknown_options (xoption_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
 
   return context->ignore_unknown;
 }
@@ -552,7 +552,7 @@ g_option_context_set_strict_posix (xoption_context_t *context,
 xboolean_t
 g_option_context_get_strict_posix (xoption_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
 
   return context->strict_posix;
 }
@@ -637,7 +637,7 @@ g_option_context_set_main_group (xoption_context_t *context,
 xoption_group_t *
 g_option_context_get_main_group (xoption_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
 
   return context->main_group;
 }
@@ -847,7 +847,7 @@ g_option_context_get_help (xoption_context_t *context,
   xstring_t *string;
   xuchar_t token;
 
-  g_return_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
 
   string = xstring_sized_new (1024);
 
@@ -1263,7 +1263,7 @@ parse_arg (xoption_context_t *context,
 {
   Change *change;
 
-  g_assert (value || OPTIONAL_ARG (entry) || NO_ARG (entry));
+  xassert (value || OPTIONAL_ARG (entry) || NO_ARG (entry));
 
   switch (entry->arg)
     {
@@ -1711,7 +1711,7 @@ parse_remaining_arg (xoption_context_t *context,
       if (group->entries[j].long_name[0])
         continue;
 
-      g_return_val_if_fail (group->entries[j].arg == G_OPTION_ARG_CALLBACK ||
+      xreturn_val_if_fail (group->entries[j].arg == G_OPTION_ARG_CALLBACK ||
                             group->entries[j].arg == G_OPTION_ARG_STRING_ARRAY ||
                             group->entries[j].arg == G_OPTION_ARXFILENAME_ARRAY, FALSE);
 
@@ -1832,7 +1832,7 @@ platform_get_argv0 (void)
   /* xfile_get_contents() guarantees to put a NUL immediately after the
    * file's contents (at cmdline[len] here), even if the file itself was
    * not NUL-terminated. */
-  g_assert (memchr (cmdline, 0, len + 1));
+  xassert (memchr (cmdline, 0, len + 1));
 
   /* We could just return cmdline, but I think it's better
    * to hold on to a smaller malloc block; the arguments
@@ -1959,7 +1959,7 @@ g_option_context_parse (xoption_context_t   *context,
   xint_t i, j, k;
   xlist_t *list;
 
-  g_return_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
 
   /* Set program name */
   if (!g_get_prgname())
@@ -2352,7 +2352,7 @@ xoption_group_free (xoption_group_t *group)
 xoption_group_t *
 xoption_group_ref (xoption_group_t *group)
 {
-  g_return_val_if_fail (group != NULL, NULL);
+  xreturn_val_if_fail (group != NULL, NULL);
 
   group->ref_count++;
 
@@ -2663,7 +2663,7 @@ g_option_context_set_summary (xoption_context_t *context,
 const xchar_t *
 g_option_context_get_summary (xoption_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
 
   return context->summary;
 }
@@ -2706,7 +2706,7 @@ g_option_context_set_description (xoption_context_t *context,
 const xchar_t *
 g_option_context_get_description (xoption_context_t *context)
 {
-  g_return_val_if_fail (context != NULL, NULL);
+  xreturn_val_if_fail (context != NULL, NULL);
 
   return context->description;
 }
@@ -2750,7 +2750,7 @@ g_option_context_parse_strv (xoption_context_t   *context,
   xboolean_t success;
   xint_t argc;
 
-  g_return_val_if_fail (context != NULL, FALSE);
+  xreturn_val_if_fail (context != NULL, FALSE);
 
   context->strv_mode = TRUE;
   argc = arguments && *arguments ? xstrv_length (*arguments) : 0;

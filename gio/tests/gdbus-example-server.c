@@ -335,7 +335,7 @@ on_bus_acquired (xdbus_connection_t *connection,
                                                        NULL,  /* user_data */
                                                        NULL,  /* user_data_free_func */
                                                        NULL); /* xerror_t** */
-  g_assert (registration_id > 0);
+  xassert (registration_id > 0);
 
   /* swap value of properties foo_t and Bar every two seconds */
   g_timeout_add_seconds (2,
@@ -369,7 +369,7 @@ main (int argc, char *argv[])
    * them from XML.
    */
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
 
   owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
                              "org.gtk.GDBus.TestServer",

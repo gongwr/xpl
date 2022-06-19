@@ -148,7 +148,7 @@
  * }
  *
  * static void
- * test_application_class_init (TestApplicationClass *class)
+ * test_application_class_init (test_application_class_t *class)
  * {
  *   G_APPLICATION_CLASS (class)->local_command_line = test_local_cmdline;
  *
@@ -176,7 +176,7 @@
  *   xapplication_command_line_set_exit_status (cmdline, 0);
  *   xobject_unref (cmdline); // this releases the application
  *
- *   return G_SOURCE_REMOVE;
+ *   return XSOURCE_REMOVE;
  * }
  *
  * static int
@@ -340,17 +340,17 @@ xapplication_command_line_set_property (xobject_t      *object,
   switch (prop_id)
     {
     case PROP_ARGUMENTS:
-      g_assert (cmdline->priv->arguments == NULL);
+      xassert (cmdline->priv->arguments == NULL);
       cmdline->priv->arguments = xvalue_dup_variant (value);
       break;
 
     case PROP_OPTIONS:
-      g_assert (cmdline->priv->options == NULL);
+      xassert (cmdline->priv->options == NULL);
       cmdline->priv->options = xvalue_dup_variant (value);
       break;
 
     case PROP_PLATFORM_DATA:
-      g_assert (cmdline->priv->platform_data == NULL);
+      xassert (cmdline->priv->platform_data == NULL);
       cmdline->priv->platform_data = xvalue_dup_variant (value);
       if (cmdline->priv->platform_data != NULL)
         grok_platform_data (cmdline);
@@ -380,7 +380,7 @@ xapplication_command_line_finalize (xobject_t *object)
   g_free (cmdline->priv->cwd);
   xstrfreev (cmdline->priv->environ);
 
-  G_OBJECT_CLASS (xapplication_command_line_parent_class)
+  XOBJECT_CLASS (xapplication_command_line_parent_class)
     ->finalize (object);
 }
 
@@ -409,7 +409,7 @@ xapplication_command_line_constructed (xobject_t *object)
 static void
 xapplication_command_line_class_init (xapplication_command_line_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->get_property = xapplication_command_line_get_property;
   object_class->set_property = xapplication_command_line_set_property;
@@ -421,34 +421,34 @@ xapplication_command_line_class_init (xapplication_command_line_class_t *class)
   class->get_stdin = xapplication_command_line_real_get_stdin;
 
   xobject_class_install_property (object_class, PROP_ARGUMENTS,
-    g_param_spec_variant ("arguments",
+    xparam_spec_variant ("arguments",
                           P_("Commandline arguments"),
                           P_("The commandline that caused this ::command-line signal emission"),
                           G_VARIANT_TYPE_BYTESTRING_ARRAY, NULL,
-                          G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS));
+                          XPARAM_WRITABLE | XPARAM_CONSTRUCT_ONLY |
+                          XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_OPTIONS,
-    g_param_spec_variant ("options",
+    xparam_spec_variant ("options",
                           P_("Options"),
                           P_("The options sent along with the commandline"),
-                          G_VARIANT_TYPE_VARDICT, NULL, G_PARAM_WRITABLE |
-                          G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                          G_VARIANT_TYPE_VARDICT, NULL, XPARAM_WRITABLE |
+                          XPARAM_CONSTRUCT_ONLY | XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_PLATFORM_DATA,
-    g_param_spec_variant ("platform-data",
+    xparam_spec_variant ("platform-data",
                           P_("Platform data"),
                           P_("Platform-specific data for the commandline"),
                           G_VARIANT_TYPE ("a{sv}"), NULL,
-                          G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS));
+                          XPARAM_WRITABLE | XPARAM_CONSTRUCT_ONLY |
+                          XPARAM_STATIC_STRINGS));
 
   xobject_class_install_property (object_class, PROP_IS_REMOTE,
-    g_param_spec_boolean ("is-remote",
+    xparam_spec_boolean ("is-remote",
                           P_("Is remote"),
                           P_("TRUE if this is a remote commandline"),
                           FALSE,
-                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                          XPARAM_READABLE | XPARAM_STATIC_STRINGS));
 }
 
 
@@ -481,7 +481,7 @@ xapplication_command_line_get_arguments (xapplication_command_line_t *cmdline,
   xchar_t **argv;
   xsize_t len;
 
-  g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
+  xreturn_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
 
   argv = xvariant_dup_bytestring_array (cmdline->priv->arguments, &len);
 
@@ -512,7 +512,7 @@ xapplication_command_line_get_arguments (xapplication_command_line_t *cmdline,
 xvariant_dict_t *
 xapplication_command_line_get_options_dict (xapplication_command_line_t *cmdline)
 {
-  g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
+  xreturn_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
 
   if (!cmdline->priv->options_dict)
     cmdline->priv->options_dict = xvariant_dict_new (cmdline->priv->options);
@@ -775,7 +775,7 @@ xapplication_command_line_set_exit_status (xapplication_command_line_t *cmdline,
 int
 xapplication_command_line_get_exit_status (xapplication_command_line_t *cmdline)
 {
-  g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), -1);
+  xreturn_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), -1);
 
   return cmdline->priv->exit_status;
 }
@@ -800,7 +800,7 @@ xapplication_command_line_get_exit_status (xapplication_command_line_t *cmdline)
 xvariant_t *
 xapplication_command_line_get_platform_data (xapplication_command_line_t *cmdline)
 {
-  g_return_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
+  xreturn_val_if_fail (X_IS_APPLICATION_COMMAND_LINE (cmdline), NULL);
 
   if (cmdline->priv->platform_data)
     return xvariant_ref (cmdline->priv->platform_data);
@@ -828,7 +828,7 @@ xfile_t *
 xapplication_command_line_create_file_for_arg (xapplication_command_line_t *cmdline,
                                                 const xchar_t             *arg)
 {
-  g_return_val_if_fail (arg != NULL, NULL);
+  xreturn_val_if_fail (arg != NULL, NULL);
 
   if (cmdline->priv->cwd)
     return xfile_new_for_commandline_arg_and_cwd (arg, cmdline->priv->cwd);

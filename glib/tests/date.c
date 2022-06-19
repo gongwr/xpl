@@ -1399,8 +1399,8 @@ test_year (xconstpointer t)
 
   g_assert_true (xdate_valid_year (y));
   /* Years ought to have roundabout 52 weeks */
-  g_assert (sunday_weeks_in_year == 52 || sunday_weeks_in_year == 53);
-  g_assert (monday_weeks_in_year == 52 || monday_weeks_in_year == 53);
+  xassert (sunday_weeks_in_year == 52 || sunday_weeks_in_year == 53);
+  xassert (monday_weeks_in_year == 52 || monday_weeks_in_year == 53);
 
   m = 1;
   while (m < 13)
@@ -1410,7 +1410,7 @@ test_year (xconstpointer t)
 
       xdate_clear (days, 31);
 
-      g_assert (dim > 0 && dim < 32);
+      xassert (dim > 0 && dim < 32);
       g_assert_true (xdate_valid_month (m));
 
       day = 1;

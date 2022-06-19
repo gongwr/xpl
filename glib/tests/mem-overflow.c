@@ -81,7 +81,7 @@ mem_overflow_malloc_0 (void)
   xpointer_t p;
 
   p = g_malloc (0);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 }
 
 static void
@@ -90,9 +90,9 @@ mem_overflow_realloc_0 (void)
   xpointer_t p;
 
   p = g_malloc (10);
-  g_assert (p != NULL);
+  xassert (p != NULL);
   p = g_realloc (p, 0);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 }
 
 static void
@@ -101,8 +101,8 @@ mem_overflow (void)
   xpointer_t p, q;
 
   /* "FAIL" here apparently means "fail to overflow"... */
-#define CHECK_PASS(P)	p = (P); g_assert (p == NULL);
-#define CHECK_FAIL(P)	p = (P); g_assert (p != NULL);
+#define CHECK_PASS(P)	p = (P); xassert (p == NULL);
+#define CHECK_FAIL(P)	p = (P); xassert (p != NULL);
 
   CHECK_PASS (g_try_malloc_n (a, a));
   CHECK_PASS (g_try_malloc_n (a, b));
@@ -197,7 +197,7 @@ empty_alloc_subprocess (void)
   Empty *empty;
 
   empty = g_new0 (Empty, 1);
-  g_assert (empty == NULL);
+  xassert (empty == NULL);
   exit (0);
 }
 

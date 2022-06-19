@@ -81,8 +81,8 @@ struct _GMenu
 
 typedef xmenu_model_class_t xmenu_class_t;
 
-G_DEFINE_TYPE (xmenu, xmenu, XTYPE_MENU_MODEL)
-G_DEFINE_TYPE (xmenu_item, xmenu_item, XTYPE_OBJECT)
+XDEFINE_TYPE (xmenu, xmenu, XTYPE_MENU_MODEL)
+XDEFINE_TYPE (xmenu_item, xmenu_item, XTYPE_OBJECT)
 
 struct item
 {
@@ -524,7 +524,7 @@ xmenu_finalize (xobject_t *object)
     xmenu_clear_item (&items[i]);
   g_free (items);
 
-  G_OBJECT_CLASS (xmenu_parent_class)
+  XOBJECT_CLASS (xmenu_parent_class)
     ->finalize (object);
 }
 
@@ -539,7 +539,7 @@ static void
 xmenu_class_init (xmenu_class_t *class)
 {
   xmenu_model_class_t *model_class = XMENU_MODEL_CLASS (class);
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xmenu_finalize;
 
@@ -586,7 +586,7 @@ xmenu_item_finalize (xobject_t *object)
   xhash_table_unref (menu_item->attributes);
   xhash_table_unref (menu_item->links);
 
-  G_OBJECT_CLASS (xmenu_item_parent_class)
+  XOBJECT_CLASS (xmenu_item_parent_class)
     ->finalize (object);
 }
 
@@ -792,8 +792,8 @@ xmenu_item_get_attribute_value (xmenu_item_t          *menu_item,
 {
   xvariant_t *value;
 
-  g_return_val_if_fail (X_IS_MENU_ITEM (menu_item), NULL);
-  g_return_val_if_fail (attribute != NULL, NULL);
+  xreturn_val_if_fail (X_IS_MENU_ITEM (menu_item), NULL);
+  xreturn_val_if_fail (attribute != NULL, NULL);
 
   value = xhash_table_lookup (menu_item->attributes, attribute);
 
@@ -839,9 +839,9 @@ xmenu_item_get_attribute (xmenu_item_t   *menu_item,
   xvariant_t *value;
   va_list ap;
 
-  g_return_val_if_fail (X_IS_MENU_ITEM (menu_item), FALSE);
-  g_return_val_if_fail (attribute != NULL, FALSE);
-  g_return_val_if_fail (format_string != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_MENU_ITEM (menu_item), FALSE);
+  xreturn_val_if_fail (attribute != NULL, FALSE);
+  xreturn_val_if_fail (format_string != NULL, FALSE);
 
   value = xhash_table_lookup (menu_item->attributes, attribute);
 
@@ -875,9 +875,9 @@ xmenu_item_get_link (xmenu_item_t   *menu_item,
 {
   xmenu_model_t *model;
 
-  g_return_val_if_fail (X_IS_MENU_ITEM (menu_item), NULL);
-  g_return_val_if_fail (link != NULL, NULL);
-  g_return_val_if_fail (valid_attribute_name (link), NULL);
+  xreturn_val_if_fail (X_IS_MENU_ITEM (menu_item), NULL);
+  xreturn_val_if_fail (link != NULL, NULL);
+  xreturn_val_if_fail (valid_attribute_name (link), NULL);
 
   model = xhash_table_lookup (menu_item->links, link);
 
@@ -1082,7 +1082,7 @@ xmenu_item_set_action_and_target (xmenu_item_t   *menu_item,
  * Sets the "action" and possibly the "target" attribute of @menu_item.
  *
  * The format of @detailed_action is the same format parsed by
- * g_action_parse_detailed_name().
+ * xaction_parse_detailed_name().
  *
  * See xmenu_item_set_action_and_target() or
  * xmenu_item_set_action_and_target_value() for more flexible (but
@@ -1101,7 +1101,7 @@ xmenu_item_set_detailed_action (xmenu_item_t   *menu_item,
   xvariant_t *target;
   xchar_t *name;
 
-  if (!g_action_parse_detailed_name (detailed_action, &name, &target, &error))
+  if (!xaction_parse_detailed_name (detailed_action, &name, &target, &error))
     xerror ("xmenu_item_set_detailed_action: %s", error->message);
 
   xmenu_item_set_action_and_target_value (menu_item, name, target);

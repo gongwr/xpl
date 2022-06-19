@@ -31,10 +31,10 @@ G_BEGIN_DECLS
 
 #define XTYPE_FILE_OUTPUT_STREAM         (xfile_output_stream_get_type ())
 #define XFILE_OUTPUT_STREAM(o)           (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_FILE_OUTPUT_STREAM, xfile_output_stream))
-#define XFILE_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStreamClass))
+#define XFILE_OUTPUT_STREAM_CLASS(k)     (XTYPE_CHECK_CLASS_CAST((k), XTYPE_FILE_OUTPUT_STREAM, xfile_output_stream_class_t))
 #define X_IS_FILE_OUTPUT_STREAM(o)        (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_FILE_OUTPUT_STREAM))
 #define X_IS_FILE_OUTPUT_STREAM_CLASS(k)  (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_FILE_OUTPUT_STREAM))
-#define XFILE_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_OUTPUT_STREAM, GFileOutputStreamClass))
+#define XFILE_OUTPUT_STREAM_GET_CLASS(o) (XTYPE_INSTANCE_GET_CLASS ((o), XTYPE_FILE_OUTPUT_STREAM, xfile_output_stream_class_t))
 
 /**
  * xfile_output_stream_t:
@@ -44,7 +44,7 @@ G_BEGIN_DECLS
  *
  * #xfile_output_stream_t implements xseekable__t.
  **/
-typedef struct _GFileOutputStreamClass    GFileOutputStreamClass;
+typedef struct _GFileOutputStreamClass    xfile_output_stream_class_t;
 typedef struct _GFileOutputStreamPrivate  GFileOutputStreamPrivate;
 
 struct _GFileOutputStream

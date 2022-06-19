@@ -181,7 +181,7 @@ xcond_t *cond, xmutex_t *mutex, GTimeVal *abs_time
 xcond_t *cond
 </FUNCTION>
 
-# GPrivate
+# xprivate_t
 <MACRO>
 <NAME>G_PRIVATE_INIT</NAME>
 #define G_PRIVATE_INIT(notify)

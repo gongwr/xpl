@@ -57,7 +57,7 @@ quit_later_cb (xpointer_t data G_GNUC_UNUSED)
 {
   xmain_loop_quit (loop);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -115,7 +115,7 @@ test_exit_on_close_subprocess (xconstpointer test_data)
   session_bus_up ();
   c = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
 
-  g_assert (c != NULL);
+  xassert (c != NULL);
 
   /* the default is meant to be TRUE */
   if (td->exit_on_close != IMPLICITLY_TRUE)
@@ -123,7 +123,7 @@ test_exit_on_close_subprocess (xconstpointer test_data)
 
   g_assert_cmpint (xdbus_connection_get_exit_on_close (c), ==,
                    (td->exit_on_close != EXPLICITLY_FALSE));
-  g_assert (!xdbus_connection_is_closed (c));
+  xassert (!xdbus_connection_is_closed (c));
 
   g_timeout_add (50, quit_later_cb, NULL);
   xmain_loop_run (loop);
@@ -146,7 +146,7 @@ test_exit_on_close_subprocess (xconstpointer test_data)
                                        NULL,
                                        &error);
       g_assert_no_error (error);
-      g_assert (v != NULL);
+      xassert (v != NULL);
       xvariant_unref (v);
 
       xdbus_connection_close (c, NULL, close_async_cb, NULL);

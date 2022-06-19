@@ -279,7 +279,7 @@ static int      smc_notify_free   (void   *pointer,
                                    size_t  size);
 
 /* --- variables --- */
-static GPrivate    private_thread_memory = G_PRIVATE_INIT (private_thread_memory_cleanup);
+static xprivate_t    private_thread_memory = G_PRIVATE_INIT (private_thread_memory_cleanup);
 static xsize_t       sys_page_size = 0;
 static Allocator   allocator[1] = { { 0, }, };
 static SliceConfig slice_config = {
@@ -341,7 +341,7 @@ g_slice_get_config_state (GSliceConfig ckey,
                           xuint_t       *n_values)
 {
   xuint_t i = 0;
-  g_return_val_if_fail (n_values != NULL, NULL);
+  xreturn_val_if_fail (n_values != NULL, NULL);
   *n_values = 0;
   switch (ckey)
     {

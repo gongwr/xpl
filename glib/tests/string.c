@@ -45,7 +45,7 @@ test_string_chunks (void)
     }
 
   tmp_string_2 = xstring_chunk_insert_const (string_chunk, tmp_string);
-  g_assert (tmp_string_2 != tmp_string);
+  xassert (tmp_string_2 != tmp_string);
   g_assert_cmpstr (tmp_string_2, ==, tmp_string);
 
   tmp_string = xstring_chunk_insert_const (string_chunk, tmp_string);
@@ -70,9 +70,9 @@ test_string_chunk_insert (void)
   str[1] = xstring_chunk_insert_len (chunk, s1, 8);
   str[2] = xstring_chunk_insert (chunk, s2);
 
-  g_assert (memcmp (s0, str[0], sizeof s0) == 0);
-  g_assert (memcmp (s1, str[1], sizeof s1) == 0);
-  g_assert (memcmp (s2, str[2], sizeof s2) == 0);
+  xassert (memcmp (s0, str[0], sizeof s0) == 0);
+  xassert (memcmp (s1, str[1], sizeof s1) == 0);
+  xassert (memcmp (s2, str[2], sizeof s2) == 0);
 
   xstring_chunk_free (chunk);
 }
@@ -85,11 +85,11 @@ test_string_new (void)
   string1 = xstring_new ("hi pete!");
   string2 = xstring_new (NULL);
 
-  g_assert (string1 != NULL);
-  g_assert (string2 != NULL);
-  g_assert (strlen (string1->str) == string1->len);
-  g_assert (strlen (string2->str) == string2->len);
-  g_assert (string2->len == 0);
+  xassert (string1 != NULL);
+  xassert (string2 != NULL);
+  xassert (strlen (string1->str) == string1->len);
+  xassert (strlen (string2->str) == string2->len);
+  xassert (string2->len == 0);
   g_assert_cmpstr ("hi pete!", ==, string1->str);
   g_assert_cmpstr ("", ==, string2->str);
 
@@ -191,8 +191,8 @@ test_string_append_c (void)
     else
       (xstring_append_c) (string, 'a'+(i%26));
 
-  g_assert((strlen("hi pete!") + 10000) == string->len);
-  g_assert((strlen("hi pete!") + 10000) == strlen(string->str));
+  xassert((strlen("hi pete!") + 10000) == string->len);
+  xassert((strlen("hi pete!") + 10000) == strlen(string->str));
 
   xstring_free (string, TRUE);
 }
@@ -264,8 +264,8 @@ test_string_prepend_c (void)
   for (i = 0; i < 10000; i++)
     xstring_prepend_c (string, 'a'+(i%26));
 
-  g_assert((strlen("hi pete!") + 10000) == string->len);
-  g_assert((strlen("hi pete!") + 10000) == strlen(string->str));
+  xassert((strlen("hi pete!") + 10000) == string->len);
+  xassert((strlen("hi pete!") + 10000) == strlen(string->str));
 
   xstring_free (string, TRUE);
 }
@@ -385,9 +385,9 @@ test_string_equal (void)
 
   string1 = xstring_new ("test");
   string2 = xstring_new ("te");
-  g_assert (!xstring_equal(string1, string2));
+  xassert (!xstring_equal(string1, string2));
   xstring_append (string2, "st");
-  g_assert (xstring_equal(string1, string2));
+  xassert (xstring_equal(string1, string2));
   xstring_free (string1, TRUE);
   xstring_free (string2, TRUE);
 }
@@ -400,15 +400,15 @@ test_string_truncate (void)
   string = xstring_new ("testing");
 
   xstring_truncate (string, 1000);
-  g_assert (string->len == strlen("testing"));
+  xassert (string->len == strlen("testing"));
   g_assert_cmpstr (string->str, ==, "testing");
 
   xstring_truncate (string, 4);
-  g_assert (string->len == 4);
+  xassert (string->len == 4);
   g_assert_cmpstr (string->str, ==, "test");
 
   xstring_truncate (string, 0);
-  g_assert (string->len == 0);
+  xassert (string->len == 0);
   g_assert_cmpstr (string->str, ==, "");
 
   xstring_free (string, TRUE);
@@ -423,24 +423,24 @@ test_string_overwrite (void)
   string = xstring_new ("testing");
 
   xstring_overwrite (string, 4, " and expand");
-  g_assert (15 == string->len);
-  g_assert ('\0' == string->str[15]);
-  g_assert (xstr_equal ("test and expand", string->str));
+  xassert (15 == string->len);
+  xassert ('\0' == string->str[15]);
+  xassert (xstr_equal ("test and expand", string->str));
 
   xstring_overwrite (string, 5, "NOT-");
-  g_assert (15 == string->len);
-  g_assert ('\0' == string->str[15]);
-  g_assert (xstr_equal ("test NOT-expand", string->str));
+  xassert (15 == string->len);
+  xassert ('\0' == string->str[15]);
+  xassert (xstr_equal ("test NOT-expand", string->str));
 
   xstring_overwrite_len (string, 9, "blablabla", 6);
-  g_assert (15 == string->len);
-  g_assert ('\0' == string->str[15]);
-  g_assert (xstr_equal ("test NOT-blabla", string->str));
+  xassert (15 == string->len);
+  xassert ('\0' == string->str[15]);
+  xassert (xstr_equal ("test NOT-blabla", string->str));
 
   xstring_overwrite_len (string, 4, "BLABL", 0);
-  g_assert (xstr_equal ("test NOT-blabla", string->str));
+  xassert (xstr_equal ("test NOT-blabla", string->str));
   xstring_overwrite_len (string, 4, "BLABL", -1);
-  g_assert (xstr_equal ("testBLABLblabla", string->str));
+  xassert (xstr_equal ("testBLABLblabla", string->str));
 
   xstring_free (string, TRUE);
 }
@@ -453,15 +453,15 @@ test_string_nul_handling (void)
   /* Check handling of embedded ASCII 0 (NUL) characters in xstring_t. */
   string1 = xstring_new ("fiddle");
   string2 = xstring_new ("fiddle");
-  g_assert (xstring_equal (string1, string2));
+  xassert (xstring_equal (string1, string2));
   xstring_append_c (string1, '\0');
-  g_assert (!xstring_equal (string1, string2));
+  xassert (!xstring_equal (string1, string2));
   xstring_append_c (string2, '\0');
-  g_assert (xstring_equal (string1, string2));
+  xassert (xstring_equal (string1, string2));
   xstring_append_c (string1, 'x');
   xstring_append_c (string2, 'y');
-  g_assert (!xstring_equal (string1, string2));
-  g_assert (string1->len == 8);
+  xassert (!xstring_equal (string1, string2));
+  xassert (string1->len == 8);
   xstring_append (string1, "yzzy");
   g_assert_cmpmem (string1->str, string1->len + 1, "fiddle\0xyzzy", 13);
   xstring_insert (string1, 1, "QED");

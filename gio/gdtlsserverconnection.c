@@ -39,33 +39,33 @@
  * Since: 2.48
  */
 
-G_DEFINE_INTERFACE (xdtls_server_connection, g_dtls_server_connection,
+G_DEFINE_INTERFACE (xdtls_server_connection, xdtls_server_connection,
                     XTYPE_DTLS_CONNECTION)
 
 static void
-g_dtls_server_connection_default_init (GDtlsServerConnectionInterface *iface)
+xdtls_server_connection_default_init (xdtls_server_connection_interface_t *iface)
 {
   /**
    * xdtls_server_connection_t:authentication-mode:
    *
    * The #GTlsAuthenticationMode for the server. This can be changed
-   * before calling g_dtls_connection_handshake() if you want to
+   * before calling xdtls_connection_handshake() if you want to
    * rehandshake with a different mode from the initial handshake.
    *
    * Since: 2.48
    */
   xobject_interface_install_property (iface,
-                                       g_param_spec_enum ("authentication-mode",
+                                       xparam_spec_enum ("authentication-mode",
                                                           P_("Authentication Mode"),
                                                           P_("The client authentication mode"),
                                                           XTYPE_TLS_AUTHENTICATION_MODE,
                                                           G_TLS_AUTHENTICATION_NONE,
-                                                          G_PARAM_READWRITE |
-                                                          G_PARAM_STATIC_STRINGS));
+                                                          XPARAM_READWRITE |
+                                                          XPARAM_STATIC_STRINGS));
 }
 
 /**
- * g_dtls_server_connection_new:
+ * xdtls_server_connection_new:
  * @base_socket: the #xdatagram_based_t to wrap
  * @certificate: (nullable): the default server certificate, or %NULL
  * @error: #xerror_t for error reporting, or %NULL to ignore
@@ -78,7 +78,7 @@ g_dtls_server_connection_default_init (GDtlsServerConnectionInterface *iface)
  * Since: 2.48
  */
 xdatagram_based_t *
-g_dtls_server_connection_new (xdatagram_based_t   *base_socket,
+xdtls_server_connection_new (xdatagram_based_t   *base_socket,
                               xtls_certificate_t  *certificate,
                               xerror_t          **error)
 {

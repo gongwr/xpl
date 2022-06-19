@@ -435,7 +435,7 @@ g_resource_find_overlay (const xchar_t    *path,
         /* split the overlay into src/dst */
         src = overlay_dirs[i];
         eq = strchr (src, '=');
-        g_assert (eq); /* we checked this already */
+        xassert (eq); /* we checked this already */
         src_len = eq - src;
         dst = eq + 1;
         /* hold off on dst_len because we will probably fail the checks below */
@@ -759,7 +759,7 @@ g_resource_open_stream (xresource_t             *resource,
       xzlib_decompressor_t *decompressor =
         g_zlib_decompressor_new (G_ZLIB_COMPRESSOR_FORMAT_ZLIB);
 
-      stream2 = xconverter_input_stream_new (stream, G_CONVERTER (decompressor));
+      stream2 = xconverter_input_stream_new (stream, XCONVERTER (decompressor));
       xobject_unref (decompressor);
       xobject_unref (stream);
       stream = stream2;
@@ -815,7 +815,7 @@ g_resource_lookup_data (xresource_t             *resource,
     {
       char *uncompressed, *d;
       const char *s;
-      GConverterResult res;
+      xconverter_result_t res;
       xsize_t d_size, s_size;
       xsize_t bytes_read, bytes_written;
 
@@ -832,14 +832,14 @@ g_resource_lookup_data (xresource_t             *resource,
 
       do
         {
-          res = g_converter_convert (G_CONVERTER (decompressor),
+          res = xconverter_convert (XCONVERTER (decompressor),
                                      s, s_size,
                                      d, d_size,
-                                     G_CONVERTER_INPUT_AT_END,
+                                     XCONVERTER_INPUT_AT_END,
                                      &bytes_read,
                                      &bytes_written,
                                      NULL);
-          if (res == G_CONVERTER_ERROR)
+          if (res == XCONVERTER_ERROR)
             {
               g_free (uncompressed);
               xobject_unref (decompressor);
@@ -855,7 +855,7 @@ g_resource_lookup_data (xresource_t             *resource,
           d += bytes_written;
           d_size -= bytes_written;
         }
-      while (res != G_CONVERTER_FINISHED);
+      while (res != XCONVERTER_FINISHED);
 
       uncompressed[size] = 0; /* Zero terminate */
 

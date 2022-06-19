@@ -180,7 +180,7 @@ xtls_backend_get_default_database (xtls_backend_t *backend)
 {
   xtls_database_t *db;
 
-  g_return_val_if_fail (X_IS_TLS_BACKEND (backend), NULL);
+  xreturn_val_if_fail (X_IS_TLS_BACKEND (backend), NULL);
 
   /* This method was added later, so accept the (remote) possibility it can be NULL */
   if (!G_TLS_BACKEND_GET_INTERFACE (backend)->get_default_database)
@@ -291,7 +291,7 @@ xtls_backend_get_dtls_client_connection_type (xtls_backend_t *backend)
 {
   xtls_backend_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_TLS_BACKEND (backend), XTYPE_INVALID);
+  xreturn_val_if_fail (X_IS_TLS_BACKEND (backend), XTYPE_INVALID);
 
   iface = G_TLS_BACKEND_GET_INTERFACE (backend);
   if (iface->get_dtls_client_connection_type == NULL)
@@ -316,7 +316,7 @@ xtls_backend_get_dtls_server_connection_type (xtls_backend_t *backend)
 {
   xtls_backend_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_TLS_BACKEND (backend), XTYPE_INVALID);
+  xreturn_val_if_fail (X_IS_TLS_BACKEND (backend), XTYPE_INVALID);
 
   iface = G_TLS_BACKEND_GET_INTERFACE (backend);
   if (iface->get_dtls_server_connection_type == NULL)
@@ -338,7 +338,7 @@ xtls_backend_get_dtls_server_connection_type (xtls_backend_t *backend)
 xtype_t
 xtls_backend_get_file_database_type (xtls_backend_t *backend)
 {
-  g_return_val_if_fail (X_IS_TLS_BACKEND (backend), 0);
+  xreturn_val_if_fail (X_IS_TLS_BACKEND (backend), 0);
 
   /* This method was added later, so accept the (remote) possibility it can be NULL */
   if (!G_TLS_BACKEND_GET_INTERFACE (backend)->get_file_database_type)

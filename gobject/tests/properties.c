@@ -19,7 +19,7 @@ enum { PROP_0, PROP_FOO, PROP_BAR, PROP_BAZ, PROP_QUUX, N_PROPERTIES };
 static xparam_spec_t *properties[N_PROPERTIES] = { NULL, };
 
 static xtype_t test_object_get_type (void);
-G_DEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
+XDEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
 
 static void
 test_object_set_foo (test_object_t *obj,
@@ -29,7 +29,7 @@ test_object_set_foo (test_object_t *obj,
     {
       obj->foo = foo;
 
-      g_assert (properties[PROP_FOO] != NULL);
+      xassert (properties[PROP_FOO] != NULL);
       xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_FOO]);
     }
 }
@@ -44,7 +44,7 @@ test_object_set_bar (test_object_t *obj,
     {
       obj->bar = bar;
 
-      g_assert (properties[PROP_BAR] != NULL);
+      xassert (properties[PROP_BAR] != NULL);
       xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_BAR]);
     }
 }
@@ -58,7 +58,7 @@ test_object_set_baz (test_object_t  *obj,
       g_free (obj->baz);
       obj->baz = xstrdup (baz);
 
-      g_assert (properties[PROP_BAZ] != NULL);
+      xassert (properties[PROP_BAZ] != NULL);
       xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_BAZ]);
     }
 }
@@ -72,7 +72,7 @@ test_object_set_quux (test_object_t  *obj,
       g_free (obj->quux);
       obj->quux = xstrdup (quux);
 
-      g_assert (properties[PROP_QUUX] != NULL);
+      xassert (properties[PROP_QUUX] != NULL);
       xobject_notify_by_pspec (G_OBJECT (obj), properties[PROP_QUUX]);
     }
 }
@@ -92,7 +92,7 @@ test_object_finalize (xobject_t *gobject)
   xobject_notify (gobject, "foo");
   xobject_notify_by_pspec (gobject, properties[PROP_BAR]);
 
-  G_OBJECT_CLASS (test_object_parent_class)->finalize (gobject);
+  XOBJECT_CLASS (test_object_parent_class)->finalize (gobject);
 }
 
 static void
@@ -105,7 +105,7 @@ test_object_set_property (xobject_t *gobject,
 
   g_assert_cmpint (prop_id, !=, 0);
   g_assert_cmpint (prop_id, !=, N_PROPERTIES);
-  g_assert (pspec == properties[prop_id]);
+  xassert (pspec == properties[prop_id]);
 
   switch (prop_id)
     {
@@ -140,7 +140,7 @@ test_object_get_property (xobject_t *gobject,
 
   g_assert_cmpint (prop_id, !=, 0);
   g_assert_cmpint (prop_id, !=, N_PROPERTIES);
-  g_assert (pspec == properties[prop_id]);
+  xassert (pspec == properties[prop_id]);
 
   switch (prop_id)
     {
@@ -168,27 +168,27 @@ test_object_get_property (xobject_t *gobject,
 static void
 test_object_class_init (test_object_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  properties[PROP_FOO] = g_param_spec_int ("foo", "foo_t", "foo_t",
+  properties[PROP_FOO] = xparam_spec_int ("foo", "foo_t", "foo_t",
                                            -1, G_MAXINT,
                                            0,
-                                           G_PARAM_READWRITE);
-  properties[PROP_BAR] = g_param_spec_boolean ("bar", "Bar", "Bar",
+                                           XPARAM_READWRITE);
+  properties[PROP_BAR] = xparam_spec_boolean ("bar", "Bar", "Bar",
                                                FALSE,
-                                               G_PARAM_READWRITE);
-  properties[PROP_BAZ] = g_param_spec_string ("baz", "baz_t", "baz_t",
+                                               XPARAM_READWRITE);
+  properties[PROP_BAZ] = xparam_spec_string ("baz", "baz_t", "baz_t",
                                               NULL,
-                                              G_PARAM_READWRITE);
-  properties[PROP_QUUX] = g_param_spec_string ("quux", "quux", "quux",
+                                              XPARAM_READWRITE);
+  properties[PROP_QUUX] = xparam_spec_string ("quux", "quux", "quux",
                                                NULL,
-                                               G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY);
+                                               XPARAM_READWRITE | XPARAM_EXPLICIT_NOTIFY);
 
-  gobject_class->set_property = test_object_set_property;
-  gobject_class->get_property = test_object_get_property;
-  gobject_class->finalize = test_object_finalize;
+  xobject_class->set_property = test_object_set_property;
+  xobject_class->get_property = test_object_get_property;
+  xobject_class->finalize = test_object_finalize;
 
-  xobject_class_install_properties (gobject_class, N_PROPERTIES, properties);
+  xobject_class_install_properties (xobject_class, N_PROPERTIES, properties);
 }
 
 static void
@@ -206,10 +206,10 @@ properties_install (void)
   test_object_t *obj = xobject_new (test_object_get_type (), NULL);
   xparam_spec_t *pspec;
 
-  g_assert (properties[PROP_FOO] != NULL);
+  xassert (properties[PROP_FOO] != NULL);
 
   pspec = xobject_class_find_property (G_OBJECT_GET_CLASS (obj), "foo");
-  g_assert (properties[PROP_FOO] == pspec);
+  xassert (properties[PROP_FOO] == pspec);
 
   xobject_unref (obj);
 }
@@ -225,7 +225,7 @@ on_notify (xobject_t           *gobject,
            xparam_spec_t        *pspec,
            TestNotifyClosure *closure)
 {
-  g_assert (closure->pspec == pspec);
+  xassert (closure->pspec == pspec);
   g_assert_cmpstr (closure->name, ==, pspec->name);
   closure->fired = TRUE;
 }
@@ -236,8 +236,8 @@ properties_notify (void)
   test_object_t *obj = xobject_new (test_object_get_type (), NULL);
   TestNotifyClosure closure;
 
-  g_assert (properties[PROP_FOO] != NULL);
-  g_assert (properties[PROP_QUUX] != NULL);
+  xassert (properties[PROP_FOO] != NULL);
+  xassert (properties[PROP_QUUX] != NULL);
   xsignal_connect (obj, "notify", G_CALLBACK (on_notify), &closure);
 
   closure.name = "foo";
@@ -245,19 +245,19 @@ properties_notify (void)
 
   closure.fired = FALSE;
   xobject_set (obj, "foo", 47, NULL);
-  g_assert (closure.fired);
+  xassert (closure.fired);
 
   closure.name = "baz";
   closure.pspec = properties[PROP_BAZ];
 
   closure.fired = FALSE;
   xobject_set (obj, "baz", "something new", NULL);
-  g_assert (closure.fired);
+  xassert (closure.fired);
 
   /* baz lacks explicit notify, so we will see this twice */
   closure.fired = FALSE;
   xobject_set (obj, "baz", "something new", NULL);
-  g_assert (closure.fired);
+  xassert (closure.fired);
 
   /* quux on the other hand, ... */
   closure.name = "quux";
@@ -265,12 +265,12 @@ properties_notify (void)
 
   closure.fired = FALSE;
   xobject_set (obj, "quux", "something new", NULL);
-  g_assert (closure.fired);
+  xassert (closure.fired);
 
   /* no change; no notify */
   closure.fired = FALSE;
   xobject_set (obj, "quux", "something new", NULL);
-  g_assert (!closure.fired);
+  xassert (!closure.fired);
 
 
   xobject_unref (obj);
@@ -286,7 +286,7 @@ on_notify2 (xobject_t    *gobject,
             xparam_spec_t *pspec,
             Notifys    *n)
 {
-  g_assert (n->pspec[n->pos] == pspec);
+  xassert (n->pspec[n->pos] == pspec);
   n->pos++;
 }
 
@@ -296,7 +296,7 @@ properties_notify_queue (void)
   test_object_t *obj = xobject_new (test_object_get_type (), NULL);
   Notifys n;
 
-  g_assert (properties[PROP_FOO] != NULL);
+  xassert (properties[PROP_FOO] != NULL);
 
   n.pspec[0] = properties[PROP_BAZ];
   n.pspec[1] = properties[PROP_BAR];
@@ -309,7 +309,7 @@ properties_notify_queue (void)
   xobject_set (obj, "foo", 47, NULL);
   xobject_set (obj, "bar", TRUE, "foo", 42, "baz", "abc", NULL);
   xobject_thaw_notify (G_OBJECT (obj));
-  g_assert (n.pos == 3);
+  xassert (n.pos == 3);
 
   xobject_unref (obj);
 }
@@ -349,9 +349,9 @@ properties_construct (void)
                       NULL);
 
   xobject_get (obj, "foo", &val, NULL);
-  g_assert (val == 18);
+  xassert (val == 18);
   xobject_get (obj, "bar", &b, NULL);
-  g_assert (!b);
+  xassert (!b);
   xobject_get (obj, "baz", &s, NULL);
   g_assert_cmpstr (s, ==, "boo");
   g_free (s);

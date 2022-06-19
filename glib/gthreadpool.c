@@ -594,9 +594,9 @@ xthread_pool_new_full (GFunc           func,
   GRealThreadPool *retval;
   G_LOCK_DEFINE_STATIC (init);
 
-  g_return_val_if_fail (func, NULL);
-  g_return_val_if_fail (!exclusive || max_threads != -1, NULL);
-  g_return_val_if_fail (max_threads >= -1, NULL);
+  xreturn_val_if_fail (func, NULL);
+  xreturn_val_if_fail (!exclusive || max_threads != -1, NULL);
+  xreturn_val_if_fail (max_threads >= -1, NULL);
 
   retval = g_new (GRealThreadPool, 1);
 
@@ -708,8 +708,8 @@ xthread_pool_push (GThreadPool  *pool,
 
   real = (GRealThreadPool*) pool;
 
-  g_return_val_if_fail (real, FALSE);
-  g_return_val_if_fail (real->running, FALSE);
+  xreturn_val_if_fail (real, FALSE);
+  xreturn_val_if_fail (real->running, FALSE);
 
   result = TRUE;
 
@@ -774,10 +774,10 @@ xthread_pool_set_max_threads (GThreadPool  *pool,
 
   real = (GRealThreadPool*) pool;
 
-  g_return_val_if_fail (real, FALSE);
-  g_return_val_if_fail (real->running, FALSE);
-  g_return_val_if_fail (!real->pool.exclusive || max_threads != -1, FALSE);
-  g_return_val_if_fail (max_threads >= -1, FALSE);
+  xreturn_val_if_fail (real, FALSE);
+  xreturn_val_if_fail (real->running, FALSE);
+  xreturn_val_if_fail (!real->pool.exclusive || max_threads != -1, FALSE);
+  xreturn_val_if_fail (max_threads >= -1, FALSE);
 
   result = TRUE;
 
@@ -823,8 +823,8 @@ xthread_pool_get_max_threads (GThreadPool *pool)
 
   real = (GRealThreadPool*) pool;
 
-  g_return_val_if_fail (real, 0);
-  g_return_val_if_fail (real->running, 0);
+  xreturn_val_if_fail (real, 0);
+  xreturn_val_if_fail (real->running, 0);
 
   g_async_queue_lock (real->queue);
   retval = real->max_threads;
@@ -849,8 +849,8 @@ xthread_pool_get_num_threads (GThreadPool *pool)
 
   real = (GRealThreadPool*) pool;
 
-  g_return_val_if_fail (real, 0);
-  g_return_val_if_fail (real->running, 0);
+  xreturn_val_if_fail (real, 0);
+  xreturn_val_if_fail (real->running, 0);
 
   g_async_queue_lock (real->queue);
   retval = real->num_threads;
@@ -875,8 +875,8 @@ xthread_pool_unprocessed (GThreadPool *pool)
 
   real = (GRealThreadPool*) pool;
 
-  g_return_val_if_fail (real, 0);
-  g_return_val_if_fail (real->running, 0);
+  xreturn_val_if_fail (real, 0);
+  xreturn_val_if_fail (real->running, 0);
 
   unprocessed = g_async_queue_length (real->queue);
 

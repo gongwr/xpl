@@ -87,15 +87,15 @@ g_unix_volume_finalize (xobject_t *object)
   g_free (volume->identifier);
   g_free (volume->identifier_type);
 
-  G_OBJECT_CLASS (g_unix_volume_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_unix_volume_parent_class)->finalize (object);
 }
 
 static void
 g_unix_volume_class_init (GUnixVolumeClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_unix_volume_finalize;
+  xobject_class->finalize = g_unix_volume_finalize;
 }
 
 static void
@@ -354,7 +354,7 @@ g_unix_volume_mount_finish (xvolume_t        *volume,
                             xasync_result_t  *result,
                             xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, volume), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, volume), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }
@@ -379,7 +379,7 @@ g_unix_volume_eject_finish (xvolume_t       *volume,
                             xasync_result_t  *result,
                             xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, volume), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (result, volume), FALSE);
 
   return xtask_propagate_boolean (XTASK (result), error);
 }

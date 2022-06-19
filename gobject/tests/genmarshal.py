@@ -783,7 +783,7 @@ class TestGenmarshal(unittest.TestCase):
               G_VA_COPY (args_copy, args);
               arg0 = (xpointer_t) va_arg (args_copy, xpointer_t);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                arg0 = g_param_spec_ref (arg0);
+                arg0 = xparam_spec_ref (arg0);
               va_end (args_copy);
 
 
@@ -803,7 +803,7 @@ class TestGenmarshal(unittest.TestCase):
                         arg0,
                         data2);
               if ((param_types[0] & G_SIGNAL_TYPE_STATIC_SCOPE) == 0 && arg0 != NULL)
-                g_param_spec_unref (arg0);
+                xparam_spec_unref (arg0);
             }}
             """
             )

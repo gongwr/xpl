@@ -693,8 +693,8 @@ xdate_time_alloc (xtimezone_t *tz)
 xdatetime_t *
 xdate_time_ref (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
-  g_return_val_if_fail (datetime->ref_count > 0, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime->ref_count > 0, NULL);
 
   g_atomic_int_inc (&datetime->ref_count);
 
@@ -1499,7 +1499,7 @@ xdate_time_new_from_iso8601 (const xchar_t *text, xtimezone_t *default_tz)
   xtimezone_t *tz = NULL;
   xdatetime_t *datetime = NULL;
 
-  g_return_val_if_fail (text != NULL, NULL);
+  xreturn_val_if_fail (text != NULL, NULL);
 
   /* Count length of string and find date / time separator ('T', 't', or ' ') */
   for (length = 0; text[length] != '\0'; length++)
@@ -1587,7 +1587,7 @@ xdate_time_new (xtimezone_t *tz,
   volatile sint64_t usec;
   volatile xdouble_t usecd;
 
-  g_return_val_if_fail (tz != NULL, NULL);
+  xreturn_val_if_fail (tz != NULL, NULL);
 
   if (year < 1 || year > 9999 ||
       month < 1 || month > 12 ||
@@ -1725,7 +1725,7 @@ xdatetime_t*
 xdate_time_add (xdatetime_t *datetime,
                  GTimeSpan  timespan)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
 
   return xdate_time_from_instant (datetime->tz, timespan +
                                    xdate_time_to_instant (datetime));
@@ -1753,7 +1753,7 @@ xdate_time_add_years (xdatetime_t *datetime,
 {
   xint_t year, month, day;
 
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
 
   if (years < -10000 || years > 10000)
     return NULL;
@@ -1793,7 +1793,7 @@ xdate_time_add_months (xdatetime_t *datetime,
 {
   xint_t year, month, day;
 
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
   xdate_time_get_ymd (datetime, &year, &month, &day);
 
   if (months < -120000 || months > 120000)
@@ -1834,7 +1834,7 @@ xdatetime_t*
 xdate_time_add_weeks (xdatetime_t *datetime,
                        xint_t             weeks)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
 
   return xdate_time_add_days (datetime, weeks * 7);
 }
@@ -1856,7 +1856,7 @@ xdatetime_t*
 xdate_time_add_days (xdatetime_t *datetime,
                       xint_t       days)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
 
   if (days < -3660000 || days > 3660000)
     return NULL;
@@ -1957,7 +1957,7 @@ xdate_time_add_full (xdatetime_t *datetime,
   xdatetime_t *new;
   xint_t interval;
 
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
   xdate_time_get_ymd (datetime, &year, &month, &day);
 
   months += years * 12;
@@ -2075,8 +2075,8 @@ GTimeSpan
 xdate_time_difference (xdatetime_t *end,
                         xdatetime_t *begin)
 {
-  g_return_val_if_fail (begin != NULL, 0);
-  g_return_val_if_fail (end != NULL, 0);
+  xreturn_val_if_fail (begin != NULL, 0);
+  xreturn_val_if_fail (end != NULL, 0);
 
   return xdate_time_to_instant (end) -
          xdate_time_to_instant (begin);
@@ -2095,7 +2095,7 @@ xdate_time_difference (xdatetime_t *end,
 xuint_t
 xdate_time_hash (xconstpointer datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return xdate_time_to_instant ((xdatetime_t *) datetime);
 }
@@ -2179,7 +2179,7 @@ xdate_time_get_ymd (xdatetime_t *datetime,
   remaining_days = remaining_days % 365;
 
   if (y1_cycles == 4 || y100_cycles == 4) {
-    g_assert (remaining_days == 0);
+    xassert (remaining_days == 0);
 
     /* special case that indicates that the date is actually one year before,
      * in the 31th of December */
@@ -2192,7 +2192,7 @@ xdate_time_get_ymd (xdatetime_t *datetime,
   /* now get the month and the day */
   leap = y1_cycles == 3 && (y4_cycles != 24 || y100_cycles == 3);
 
-  g_assert (leap == GREGORIAN_LEAP(the_year));
+  xassert (leap == GREGORIAN_LEAP(the_year));
 
   the_month = (remaining_days + 50) >> 5;
   preceding = (days_in_year[0][the_month - 1] + (the_month > 2 && leap));
@@ -2205,7 +2205,7 @@ xdate_time_get_ymd (xdatetime_t *datetime,
     }
 
   remaining_days -= preceding;
-  g_assert(0 <= remaining_days);
+  xassert(0 <= remaining_days);
 
   the_day = remaining_days + 1;
 
@@ -2233,7 +2233,7 @@ xdate_time_get_year (xdatetime_t *datetime)
 {
   xint_t year;
 
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   xdate_time_get_ymd (datetime, &year, NULL, NULL);
 
@@ -2256,7 +2256,7 @@ xdate_time_get_month (xdatetime_t *datetime)
 {
   xint_t month;
 
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   xdate_time_get_ymd (datetime, NULL, &month, NULL);
 
@@ -2282,7 +2282,7 @@ xdate_time_get_day_of_month (xdatetime_t *datetime)
   const xuint16_t *days;
   xuint16_t        last = 0;
 
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   days = days_in_year[GREGORIAN_LEAP (xdate_time_get_year (datetime)) ? 1 : 0];
   xdate_time_get_week_number (datetime, NULL, NULL, &day_of_year);
@@ -2404,7 +2404,7 @@ xdate_time_get_week_of_year (xdatetime_t *datetime)
 {
   xint_t weeknum;
 
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   xdate_time_get_week_number (datetime, &weeknum, NULL, NULL);
 
@@ -2425,7 +2425,7 @@ xdate_time_get_week_of_year (xdatetime_t *datetime)
 xint_t
 xdate_time_get_day_of_week (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return (datetime->days - 1) % 7 + 1;
 }
@@ -2447,7 +2447,7 @@ xdate_time_get_day_of_year (xdatetime_t *datetime)
 {
   xint_t doy = 0;
 
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   xdate_time_get_week_number (datetime, NULL, NULL, &doy);
   return doy;
@@ -2468,7 +2468,7 @@ xdate_time_get_day_of_year (xdatetime_t *datetime)
 xint_t
 xdate_time_get_hour (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return (datetime->usec / USEC_PER_HOUR);
 }
@@ -2486,7 +2486,7 @@ xdate_time_get_hour (xdatetime_t *datetime)
 xint_t
 xdate_time_get_minute (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return (datetime->usec % USEC_PER_HOUR) / USEC_PER_MINUTE;
 }
@@ -2504,7 +2504,7 @@ xdate_time_get_minute (xdatetime_t *datetime)
 xint_t
 xdate_time_get_second (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return (datetime->usec % USEC_PER_MINUTE) / USEC_PER_SECOND;
 }
@@ -2522,7 +2522,7 @@ xdate_time_get_second (xdatetime_t *datetime)
 xint_t
 xdate_time_get_microsecond (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return (datetime->usec % USEC_PER_SECOND);
 }
@@ -2541,7 +2541,7 @@ xdate_time_get_microsecond (xdatetime_t *datetime)
 xdouble_t
 xdate_time_get_seconds (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return (datetime->usec % USEC_PER_MINUTE) / 1000000.0;
 }
@@ -2564,7 +2564,7 @@ xdate_time_get_seconds (xdatetime_t *datetime)
 sint64_t
 xdate_time_to_unix (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   return INSTANT_TO_UNIX (xdate_time_to_instant (datetime));
 }
@@ -2599,7 +2599,7 @@ xboolean_t
 xdate_time_to_timeval (xdatetime_t *datetime,
                         GTimeVal  *tv)
 {
-  g_return_val_if_fail (datetime != NULL, FALSE);
+  xreturn_val_if_fail (datetime != NULL, FALSE);
 
   tv->tv_sec = INSTANT_TO_UNIX (xdate_time_to_instant (datetime));
   tv->tv_usec = datetime->usec % USEC_PER_SECOND;
@@ -2632,7 +2632,7 @@ xdate_time_get_utc_offset (xdatetime_t *datetime)
 {
   xint_t offset;
 
-  g_return_val_if_fail (datetime != NULL, 0);
+  xreturn_val_if_fail (datetime != NULL, 0);
 
   offset = xtime_zone_get_offset (datetime->tz, datetime->interval);
 
@@ -2651,9 +2651,9 @@ xdate_time_get_utc_offset (xdatetime_t *datetime)
 xtimezone_t *
 xdate_time_get_timezone (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
 
-  g_assert (datetime->tz != NULL);
+  xassert (datetime->tz != NULL);
   return datetime->tz;
 }
 
@@ -2677,7 +2677,7 @@ xdate_time_get_timezone (xdatetime_t *datetime)
 const xchar_t *
 xdate_time_get_timezone_abbreviation (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
 
   return xtime_zone_get_abbreviation (datetime->tz, datetime->interval);
 }
@@ -2696,7 +2696,7 @@ xdate_time_get_timezone_abbreviation (xdatetime_t *datetime)
 xboolean_t
 xdate_time_is_daylight_savings (xdatetime_t *datetime)
 {
-  g_return_val_if_fail (datetime != NULL, FALSE);
+  xreturn_val_if_fail (datetime != NULL, FALSE);
 
   return xtime_zone_is_dst (datetime->tz, datetime->interval);
 }
@@ -2723,8 +2723,8 @@ xdatetime_t *
 xdate_time_to_timezone (xdatetime_t *datetime,
                          xtimezone_t *tz)
 {
-  g_return_val_if_fail (datetime != NULL, NULL);
-  g_return_val_if_fail (tz != NULL, NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (tz != NULL, NULL);
 
   return xdate_time_from_instant (tz, xdate_time_to_instant (datetime));
 }
@@ -2876,7 +2876,7 @@ initialize_alt_digits (void)
       if (digit == NULL)
         return NULL;
 
-      g_assert (digit_len < (xsize_t) (buffer + sizeof (buffer) - buffer_end));
+      xassert (digit_len < (xsize_t) (buffer + sizeof (buffer) - buffer_end));
 
       alt_digits[i] = buffer_end;
       buffer_end = g_stpcpy (buffer_end, digit);
@@ -2937,7 +2937,7 @@ format_number (xstring_t     *str,
     tmp[i++] = *pad == '0' ? digits[0] : pad;
 
   /* should really be impossible */
-  g_assert (i <= 10);
+  xassert (i <= 10);
 
   while (i)
     xstring_append (str, tmp[--i]);
@@ -3059,7 +3059,7 @@ xdate_time_format_utf8 (xdatetime_t   *datetime,
       if (!*utf8_format)
 	break;
 
-      g_assert (*utf8_format == '%');
+      xassert (*utf8_format == '%');
       utf8_format++;
       if (!*utf8_format)
 	break;
@@ -3454,9 +3454,9 @@ xdate_time_format (xdatetime_t   *datetime,
     xstrcmp0 ("ASCII", charset) == 0 ||
     xstrcmp0 ("ANSI_X3.4-1968", charset) == 0;
 
-  g_return_val_if_fail (datetime != NULL, NULL);
-  g_return_val_if_fail (format != NULL, NULL);
-  g_return_val_if_fail (xutf8_validate (format, -1, NULL), NULL);
+  xreturn_val_if_fail (datetime != NULL, NULL);
+  xreturn_val_if_fail (format != NULL, NULL);
+  xreturn_val_if_fail (xutf8_validate (format, -1, NULL), NULL);
 
   outstr = xstring_sized_new (strlen (format) * 2);
 

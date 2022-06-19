@@ -36,7 +36,7 @@
  * functions like getpass() and does lazy things with threads.
  */
 
-G_DEFINE_TYPE (GTlsConsoleInteraction, xtls_console_interaction, XTYPE_TLS_INTERACTION)
+XDEFINE_TYPE (GTlsConsoleInteraction, xtls_console_interaction, XTYPE_TLS_INTERACTION)
 
 #if defined(G_OS_WIN32) || defined(__BIONIC__)
 /* win32 doesn't have getpass() */
@@ -130,7 +130,7 @@ xtls_console_interaction_ask_password_finish (xtls_interaction_t    *interaction
 {
   GTlsInteractionResult ret;
 
-  g_return_val_if_fail (xtask_is_valid (result, interaction),
+  xreturn_val_if_fail (xtask_is_valid (result, interaction),
                         G_TLS_INTERACTION_FAILED);
 
   ret = xtask_propagate_int (XTASK (result), error);

@@ -80,9 +80,9 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
   xchar_t* s;
   xchar_t quote_char;
 
-  g_return_val_if_fail(end != NULL, FALSE);
-  g_return_val_if_fail(err == NULL || *err == NULL, FALSE);
-  g_return_val_if_fail(str != NULL, FALSE);
+  xreturn_val_if_fail(end != NULL, FALSE);
+  xreturn_val_if_fail(err == NULL || *err == NULL, FALSE);
+  xreturn_val_if_fail(str != NULL, FALSE);
 
   dest = s = str;
 
@@ -105,7 +105,7 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
     {
       while (*s)
         {
-          g_assert(s > dest); /* loop invariant */
+          xassert(s > dest); /* loop invariant */
 
           switch (*s)
             {
@@ -148,14 +148,14 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
               break;
             }
 
-          g_assert(s > dest); /* loop invariant */
+          xassert(s > dest); /* loop invariant */
         }
     }
   else
     {
       while (*s)
         {
-          g_assert(s > dest); /* loop invariant */
+          xassert(s > dest); /* loop invariant */
 
           if (*s == '\'')
             {
@@ -172,7 +172,7 @@ unquote_string_inplace (xchar_t* str, xchar_t** end, xerror_t** err)
               ++s;
             }
 
-          g_assert(s > dest); /* loop invariant */
+          xassert(s > dest); /* loop invariant */
         }
     }
 
@@ -216,7 +216,7 @@ g_shell_quote (const xchar_t *unquoted_string)
   const xchar_t *p;
   xstring_t *dest;
 
-  g_return_val_if_fail (unquoted_string != NULL, NULL);
+  xreturn_val_if_fail (unquoted_string != NULL, NULL);
 
   dest = xstring_new ("'");
 
@@ -286,7 +286,7 @@ g_shell_unquote (const xchar_t *quoted_string,
   xchar_t *start;
   xstring_t *retval;
 
-  g_return_val_if_fail (quoted_string != NULL, NULL);
+  xreturn_val_if_fail (quoted_string != NULL, NULL);
 
   unquoted = xstrdup (quoted_string);
 
@@ -344,7 +344,7 @@ g_shell_unquote (const xchar_t *quoted_string,
   return xstring_free (retval, FALSE);
 
  error:
-  g_assert (error == NULL || *error != NULL);
+  xassert (error == NULL || *error != NULL);
 
   g_free (unquoted);
   xstring_free (retval, TRUE);
@@ -619,7 +619,7 @@ tokenize_command_line (const xchar_t *command_line,
   return retval;
 
  error:
-  g_assert (error == NULL || *error != NULL);
+  xassert (error == NULL || *error != NULL);
 
   xslist_free_full (retval, g_free);
 
@@ -668,7 +668,7 @@ g_shell_parse_argv (const xchar_t *command_line,
   xint_t i;
   xslist_t *tmp_list;
 
-  g_return_val_if_fail (command_line != NULL, FALSE);
+  xreturn_val_if_fail (command_line != NULL, FALSE);
 
   tokens = tokenize_command_line (command_line, error);
   if (tokens == NULL)
@@ -708,8 +708,8 @@ g_shell_parse_argv (const xchar_t *command_line,
 
   xslist_free_full (tokens, g_free);
 
-  g_assert (argc > 0);
-  g_assert (argv != NULL && argv[0] != NULL);
+  xassert (argc > 0);
+  xassert (argv != NULL && argv[0] != NULL);
 
   if (argcp)
     *argcp = argc;
@@ -723,7 +723,7 @@ g_shell_parse_argv (const xchar_t *command_line,
 
  failed:
 
-  g_assert (error == NULL || *error != NULL);
+  xassert (error == NULL || *error != NULL);
   xstrfreev (argv);
   xslist_free_full (tokens, g_free);
 

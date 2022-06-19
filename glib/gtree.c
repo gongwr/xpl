@@ -161,7 +161,7 @@ xtree_node_new (xpointer_t key,
 xtree_t *
 xtree_new (GCompareFunc key_compare_func)
 {
-  g_return_val_if_fail (key_compare_func != NULL, NULL);
+  xreturn_val_if_fail (key_compare_func != NULL, NULL);
 
   return xtree_new_full ((GCompareDataFunc) key_compare_func, NULL,
                           NULL, NULL);
@@ -181,7 +181,7 @@ xtree_t *
 xtree_new_with_data (GCompareDataFunc key_compare_func,
                       xpointer_t         key_compare_data)
 {
-  g_return_val_if_fail (key_compare_func != NULL, NULL);
+  xreturn_val_if_fail (key_compare_func != NULL, NULL);
 
   return xtree_new_full (key_compare_func, key_compare_data,
                           NULL, NULL);
@@ -212,7 +212,7 @@ xtree_new_full (GCompareDataFunc key_compare_func,
 {
   xtree_t *tree;
 
-  g_return_val_if_fail (key_compare_func != NULL, NULL);
+  xreturn_val_if_fail (key_compare_func != NULL, NULL);
 
   tree = g_slice_new (xtree_t);
   tree->root               = NULL;
@@ -242,7 +242,7 @@ xtree_node_first (xtree_t *tree)
 {
   GTreeNode *tmp;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   if (!tree->root)
     return NULL;
@@ -271,7 +271,7 @@ xtree_node_last (xtree_t *tree)
 {
   GTreeNode *tmp;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   if (!tree->root)
     return NULL;
@@ -300,7 +300,7 @@ xtree_node_previous (GTreeNode *node)
 {
   GTreeNode *tmp;
 
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   tmp = node->left;
 
@@ -327,7 +327,7 @@ xtree_node_next (GTreeNode *node)
 {
   GTreeNode *tmp;
 
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   tmp = node->right;
 
@@ -368,7 +368,7 @@ xtree_remove_all (xtree_t *tree)
       g_slice_free (GTreeNode, node);
 
 #ifdef G_TREE_DEBUG
-      g_assert (tree->nnodes > 0);
+      xassert (tree->nnodes > 0);
       tree->nnodes--;
 #endif
 
@@ -376,7 +376,7 @@ xtree_remove_all (xtree_t *tree)
     }
 
 #ifdef G_TREE_DEBUG
-  g_assert (tree->nnodes == 0);
+  xassert (tree->nnodes == 0);
 #endif
 
   tree->root = NULL;
@@ -400,7 +400,7 @@ xtree_remove_all (xtree_t *tree)
 xtree_t *
 xtree_ref (xtree_t *tree)
 {
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   g_atomic_int_inc (&tree->ref_count);
 
@@ -483,7 +483,7 @@ xtree_insert_node (xtree_t    *tree,
 {
   GTreeNode *node;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   node = xtree_insert_internal (tree, key, value, FALSE);
 
@@ -540,7 +540,7 @@ xtree_replace_node (xtree_t    *tree,
 {
   GTreeNode *node;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   node = xtree_insert_internal (tree, key, value, TRUE);
 
@@ -579,7 +579,7 @@ xtree_insert_internal (xtree_t    *tree,
   GTreeNode *path[MAX_GTREE_HEIGHT];
   int idx;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   if (!tree->root)
     {
@@ -675,7 +675,7 @@ xtree_insert_internal (xtree_t    *tree,
     {
       GTreeNode *bparent = path[--idx];
       xboolean_t left_node = (bparent && node == bparent->left);
-      g_assert (!bparent || bparent->left == node || bparent->right == node);
+      xassert (!bparent || bparent->left == node || bparent->right == node);
 
       if (node->balance < -1 || node->balance > 1)
         {
@@ -727,7 +727,7 @@ xtree_remove (xtree_t         *tree,
 {
   xboolean_t removed;
 
-  g_return_val_if_fail (tree != NULL, FALSE);
+  xreturn_val_if_fail (tree != NULL, FALSE);
 
   removed = xtree_remove_internal (tree, key, FALSE);
 
@@ -757,7 +757,7 @@ xtree_steal (xtree_t         *tree,
 {
   xboolean_t removed;
 
-  g_return_val_if_fail (tree != NULL, FALSE);
+  xreturn_val_if_fail (tree != NULL, FALSE);
 
   removed = xtree_remove_internal (tree, key, TRUE);
 
@@ -779,7 +779,7 @@ xtree_remove_internal (xtree_t         *tree,
   int idx;
   xboolean_t left_node;
 
-  g_return_val_if_fail (tree != NULL, FALSE);
+  xreturn_val_if_fail (tree != NULL, FALSE);
 
   if (!tree->root)
     return FALSE;
@@ -816,7 +816,7 @@ xtree_remove_internal (xtree_t         *tree,
    * except that we do not have to call xtree_node_parent.
    */
   balance = parent = path[--idx];
-  g_assert (!parent || parent->left == node || parent->right == node);
+  xassert (!parent || parent->left == node || parent->right == node);
   left_node = (parent && node == parent->left);
 
   if (!node->left_child)
@@ -935,7 +935,7 @@ xtree_remove_internal (xtree_t         *tree,
     while (1)
       {
         GTreeNode *bparent = path[--idx];
-        g_assert (!bparent || bparent->left == balance || bparent->right == balance);
+        xassert (!bparent || bparent->left == balance || bparent->right == balance);
         left_node = (bparent && balance == bparent->left);
 
         if(balance->balance < -1 || balance->balance > 1)
@@ -988,7 +988,7 @@ xtree_remove_internal (xtree_t         *tree,
 xpointer_t
 xtree_node_key (GTreeNode *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   return node->key;
 }
@@ -1006,7 +1006,7 @@ xtree_node_key (GTreeNode *node)
 xpointer_t
 xtree_node_value (GTreeNode *node)
 {
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   return node->value;
 }
@@ -1029,7 +1029,7 @@ GTreeNode *
 xtree_lookup_node (xtree_t         *tree,
                     xconstpointer  key)
 {
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   return xtree_find_node (tree, key);
 }
@@ -1079,7 +1079,7 @@ xtree_lookup_extended (xtree_t         *tree,
 {
   GTreeNode *node;
 
-  g_return_val_if_fail (tree != NULL, FALSE);
+  xreturn_val_if_fail (tree != NULL, FALSE);
 
   node = xtree_find_node (tree, lookup_key);
 
@@ -1261,7 +1261,7 @@ xtree_search_node (xtree_t         *tree,
                     GCompareFunc   search_func,
                     xconstpointer  user_data)
 {
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   if (!tree->root)
     return NULL;
@@ -1325,7 +1325,7 @@ xtree_lower_bound (xtree_t         *tree,
   GTreeNode *node, *result;
   xint_t cmp;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   node = tree->root;
   if (!node)
@@ -1379,7 +1379,7 @@ xtree_upper_bound (xtree_t         *tree,
   GTreeNode *node, *result;
   xint_t cmp;
 
-  g_return_val_if_fail (tree != NULL, NULL);
+  xreturn_val_if_fail (tree != NULL, NULL);
 
   node = tree->root;
   if (!node)
@@ -1426,7 +1426,7 @@ xtree_height (xtree_t *tree)
   GTreeNode *node;
   xint_t height;
 
-  g_return_val_if_fail (tree != NULL, 0);
+  xreturn_val_if_fail (tree != NULL, 0);
 
   if (!tree->root)
     return 0;
@@ -1456,7 +1456,7 @@ xtree_height (xtree_t *tree)
 xint_t
 xtree_nnodes (xtree_t *tree)
 {
-  g_return_val_if_fail (tree != NULL, 0);
+  xreturn_val_if_fail (tree != NULL, 0);
 
   return tree->nnodes;
 }
@@ -1733,13 +1733,13 @@ xtree_node_check (GTreeNode *node)
       if (node->left_child)
         {
           tmp = xtree_node_previous (node);
-          g_assert (tmp->right == node);
+          xassert (tmp->right == node);
         }
 
       if (node->right_child)
         {
           tmp = xtree_node_next (node);
-          g_assert (tmp->left == node);
+          xassert (tmp->left == node);
         }
 
       left_height = 0;
@@ -1751,7 +1751,7 @@ xtree_node_check (GTreeNode *node)
         right_height = xtree_node_height (node->right);
 
       balance = right_height - left_height;
-      g_assert (balance == node->balance);
+      xassert (balance == node->balance);
 
       if (node->left_child)
         xtree_node_check (node->left);

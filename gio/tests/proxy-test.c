@@ -122,7 +122,7 @@ g_test_proxy_resolver_lookup (xproxy_resolver_t  *resolver,
 {
   xchar_t **proxies;
 
-  g_assert (last_proxies == NULL);
+  xassert (last_proxies == NULL);
 
   if (xcancellable_set_error_if_cancelled (cancellable, error))
     return NULL;
@@ -719,7 +719,7 @@ typedef xresolver_t GFakeResolver;
 typedef GResolverClass GFakeResolverClass;
 
 static xtype_t g_fake_resolver_get_type (void);
-G_DEFINE_TYPE (GFakeResolver, g_fake_resolver, XTYPE_RESOLVER)
+XDEFINE_TYPE (GFakeResolver, g_fake_resolver, XTYPE_RESOLVER)
 
 static void
 g_fake_resolver_init (GFakeResolver *gtr)
@@ -885,10 +885,10 @@ async_got_error (xobject_t      *source,
 {
   xerror_t **error = user_data;
 
-  g_assert (error != NULL && *error == NULL);
+  xassert (error != NULL && *error == NULL);
   xsocket_client_connect_finish (XSOCKET_CLIENT (source),
 				  result, error);
-  g_assert (*error != NULL);
+  xassert (*error != NULL);
 }
 
 
@@ -905,14 +905,14 @@ assert_direct (xsocket_connection_t *conn)
 
   addr = xsocket_connection_get_remote_address (conn, &error);
   g_assert_no_error (error);
-  g_assert (addr != NULL && !X_IS_PROXY_ADDRESS (addr));
+  xassert (addr != NULL && !X_IS_PROXY_ADDRESS (addr));
   xobject_unref (addr);
 
   addr = xsocket_connection_get_local_address (conn, &error);
   g_assert_no_error (error);
   xobject_unref (addr);
 
-  g_assert (xsocket_connection_is_connected (conn));
+  xassert (xsocket_connection_is_connected (conn));
 }
 
 static void
@@ -972,7 +972,7 @@ assert_single (xsocket_connection_t *conn)
 
   addr = xsocket_connection_get_remote_address (conn, &error);
   g_assert_no_error (error);
-  g_assert (X_IS_PROXY_ADDRESS (addr));
+  xassert (X_IS_PROXY_ADDRESS (addr));
   proxy_uri = xproxy_address_get_uri (G_PROXY_ADDRESS (addr));
   g_assert_cmpstr (proxy_uri, ==, proxy_a.uri);
   proxy_port = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr));
@@ -1038,7 +1038,7 @@ assert_multiple (xsocket_connection_t *conn)
 
   addr = xsocket_connection_get_remote_address (conn, &error);
   g_assert_no_error (error);
-  g_assert (X_IS_PROXY_ADDRESS (addr));
+  xassert (X_IS_PROXY_ADDRESS (addr));
   proxy_uri = xproxy_address_get_uri (G_PROXY_ADDRESS (addr));
   g_assert_cmpstr (proxy_uri, ==, proxy_b.uri);
   proxy_port = g_inet_socket_address_get_port (G_INET_SOCKET_ADDRESS (addr));
@@ -1198,10 +1198,10 @@ test_override (xpointer_t fixture,
   xerror_t *error = NULL;
   xchar_t *uri;
 
-  g_assert (xsocket_client_get_proxy_resolver (client) == xproxy_resolver_get_default ());
+  xassert (xsocket_client_get_proxy_resolver (client) == xproxy_resolver_get_default ());
   alt_resolver = xobject_new (g_test_alt_proxy_resolver_get_type (), NULL);
   xsocket_client_set_proxy_resolver (client, alt_resolver);
-  g_assert (xsocket_client_get_proxy_resolver (client) == alt_resolver);
+  xassert (xsocket_client_get_proxy_resolver (client) == alt_resolver);
 
   /* Alt proxy resolver always returns Proxy A, so alpha:// should
    * succeed, and simple:// and beta:// should fail.
@@ -1263,9 +1263,9 @@ test_override (xpointer_t fixture,
   g_free (uri);
   teardown_test (NULL, NULL);
 
-  g_assert (xsocket_client_get_proxy_resolver (client) == alt_resolver);
+  xassert (xsocket_client_get_proxy_resolver (client) == alt_resolver);
   xsocket_client_set_proxy_resolver (client, NULL);
-  g_assert (xsocket_client_get_proxy_resolver (client) == xproxy_resolver_get_default ());
+  xassert (xsocket_client_get_proxy_resolver (client) == xproxy_resolver_get_default ());
   xobject_unref (alt_resolver);
 }
 
@@ -1281,7 +1281,7 @@ assert_destination_port (xsocket_address_enumerator_t *etor,
     {
       g_assert_no_error (error);
 
-      g_assert (X_IS_PROXY_ADDRESS (addr));
+      xassert (X_IS_PROXY_ADDRESS (addr));
       paddr = G_PROXY_ADDRESS (addr);
       g_assert_cmpint (xproxy_address_get_destination_port (paddr), ==, port);
       xobject_unref (addr);

@@ -230,7 +230,7 @@ struct _xuri {
 xuri_t *
 xuri_ref (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return g_atomic_rc_box_acquire (uri);
 }
@@ -357,7 +357,7 @@ uri_decoder (xchar_t       **out,
     }
 
   len = decoded->len;
-  g_assert (len >= 0);
+  xassert (len >= 0);
 
   if (!(flags & XURI_FLAGS_ENCODED) &&
       !xutf8_validate (decoded->str, len, &invalid))
@@ -515,7 +515,7 @@ parse_ip_literal (const xchar_t  *start,
       else
         goto bad_ipv6_literal;
 
-      g_assert (zone_id_length >= 1);
+      xassert (zone_id_length >= 1);
     }
 
   /* addr must be an IPv6 address */
@@ -1099,8 +1099,8 @@ xuri_split (const xchar_t  *uri_ref,
              xchar_t       **fragment,
              xerror_t      **error)
 {
-  g_return_val_if_fail (uri_ref != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (uri_ref != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return xuri_split_internal (uri_ref, flags,
                                scheme, userinfo, NULL, NULL, NULL,
@@ -1163,8 +1163,8 @@ xuri_split_with_user (const xchar_t  *uri_ref,
                        xchar_t       **fragment,
                        xerror_t      **error)
 {
-  g_return_val_if_fail (uri_ref != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (uri_ref != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return xuri_split_internal (uri_ref, flags,
                                scheme, NULL, user, password, auth_params,
@@ -1207,8 +1207,8 @@ xuri_split_network (const xchar_t  *uri_string,
 {
   xchar_t *my_scheme = NULL, *my_host = NULL;
 
-  g_return_val_if_fail (uri_string != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (uri_string != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (!xuri_split_internal (uri_string, flags,
                              &my_scheme, NULL, NULL, NULL, NULL,
@@ -1273,8 +1273,8 @@ xuri_is_valid (const xchar_t  *uri_string,
 {
   xchar_t *my_scheme = NULL;
 
-  g_return_val_if_fail (uri_string != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (uri_string != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (!xuri_split_internal (uri_string, flags,
                              &my_scheme, NULL, NULL, NULL, NULL,
@@ -1404,8 +1404,8 @@ xuri_parse (const xchar_t  *uri_string,
              xuri_flags_t     flags,
              xerror_t      **error)
 {
-  g_return_val_if_fail (uri_string != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (uri_string != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   return xuri_parse_relative (NULL, uri_string, flags, error);
 }
@@ -1434,9 +1434,9 @@ xuri_parse_relative (xuri_t         *base_uri,
 {
   xuri_t *uri = NULL;
 
-  g_return_val_if_fail (uri_ref != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-  g_return_val_if_fail (base_uri == NULL || base_uri->scheme != NULL, NULL);
+  xreturn_val_if_fail (uri_ref != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (base_uri == NULL || base_uri->scheme != NULL, NULL);
 
   /* Use xuri_t struct to construct the return value: there is no guarantee it is
    * actually correct within the function body. */
@@ -1570,8 +1570,8 @@ xuri_resolve_relative (const xchar_t  *base_uri_string,
   xuri_t *base_uri, *resolved_uri;
   xchar_t *resolved_uri_string;
 
-  g_return_val_if_fail (uri_ref != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (uri_ref != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   flags |= XURI_FLAGS_ENCODED;
 
@@ -1629,9 +1629,9 @@ xuri_join_internal (xuri_flags_t    flags,
   /* Restrictions on path prefixes. See:
    * https://tools.ietf.org/html/rfc3986#section-3
    */
-  g_return_val_if_fail (path != NULL, NULL);
-  g_return_val_if_fail (host == NULL || (path[0] == '\0' || path[0] == '/'), NULL);
-  g_return_val_if_fail (host != NULL || (path[0] != '/' || path[1] != '/'), NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (host == NULL || (path[0] == '\0' || path[0] == '/'), NULL);
+  xreturn_val_if_fail (host != NULL || (path[0] != '/' || path[1] != '/'), NULL);
 
   str = xstring_new (scheme);
   if (scheme)
@@ -1773,8 +1773,8 @@ xuri_join (xuri_flags_t    flags,
             const xchar_t *query,
             const xchar_t *fragment)
 {
-  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
   return xuri_join_internal (flags,
                               scheme,
@@ -1827,8 +1827,8 @@ xuri_join_with_user (xuri_flags_t    flags,
                       const xchar_t *query,
                       const xchar_t *fragment)
 {
-  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
   return xuri_join_internal (flags,
                               scheme,
@@ -1872,9 +1872,9 @@ xuri_build (xuri_flags_t    flags,
 {
   xuri_t *uri;
 
-  g_return_val_if_fail (scheme != NULL, NULL);
-  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (scheme != NULL, NULL);
+  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
   uri = g_atomic_rc_box_new0 (xuri_t);
   uri->flags = flags;
@@ -1930,11 +1930,11 @@ xuri_build_with_user (xuri_flags_t    flags,
   xuri_t *uri;
   xstring_t *userinfo;
 
-  g_return_val_if_fail (scheme != NULL, NULL);
-  g_return_val_if_fail (password == NULL || user != NULL, NULL);
-  g_return_val_if_fail (auth_params == NULL || user != NULL, NULL);
-  g_return_val_if_fail (port >= -1 && port <= 65535, NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+  xreturn_val_if_fail (scheme != NULL, NULL);
+  xreturn_val_if_fail (password == NULL || user != NULL, NULL);
+  xreturn_val_if_fail (auth_params == NULL || user != NULL, NULL);
+  xreturn_val_if_fail (port >= -1 && port <= 65535, NULL);
+  xreturn_val_if_fail (path != NULL, NULL);
 
   uri = g_atomic_rc_box_new0 (xuri_t);
   uri->flags = flags | XURI_FLAGS_HAS_PASSWORD;
@@ -1992,7 +1992,7 @@ xuri_build_with_user (xuri_flags_t    flags,
 xchar_t *
 xuri_to_string (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return xuri_to_string_partial (uri, XURI_HIDE_NONE);
 }
@@ -2020,7 +2020,7 @@ xuri_to_string_partial (xuri_t          *uri,
   xboolean_t hide_query = (flags & XURI_HIDE_QUERY);
   xboolean_t hide_fragment = (flags & XURI_HIDE_FRAGMENT);
 
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   if (uri->flags & (XURI_FLAGS_HAS_PASSWORD | XURI_FLAGS_HAS_AUTH_PARAMS))
     {
@@ -2209,8 +2209,8 @@ xuri_params_iter_next (xuri_params_iter_t *iter,
   xboolean_t www_form = ri->flags & XURI_PARAMS_WWW_FORM;
   xuri_flags_t decode_flags = XURI_FLAGS_NONE;
 
-  g_return_val_if_fail (iter != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (iter != NULL, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   /* Pre-clear these in case of failure or finishing. */
   if (attribute)
@@ -2320,10 +2320,10 @@ xuri_parse_params (const xchar_t     *params,
   xchar_t *attribute, *value;
   xerror_t *err = NULL;
 
-  g_return_val_if_fail (length == 0 || params != NULL, NULL);
-  g_return_val_if_fail (length >= -1, NULL);
-  g_return_val_if_fail (separators != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (length == 0 || params != NULL, NULL);
+  xreturn_val_if_fail (length >= -1, NULL);
+  xreturn_val_if_fail (separators != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (flags & XURI_PARAMS_CASE_INSENSITIVE)
     {
@@ -2366,7 +2366,7 @@ xuri_parse_params (const xchar_t     *params,
 const xchar_t *
 xuri_get_scheme (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->scheme;
 }
@@ -2385,7 +2385,7 @@ xuri_get_scheme (xuri_t *uri)
 const xchar_t *
 xuri_get_userinfo (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->userinfo;
 }
@@ -2406,7 +2406,7 @@ xuri_get_userinfo (xuri_t *uri)
 const xchar_t *
 xuri_get_user (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->user;
 }
@@ -2426,7 +2426,7 @@ xuri_get_user (xuri_t *uri)
 const xchar_t *
 xuri_get_password (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->password;
 }
@@ -2450,7 +2450,7 @@ xuri_get_password (xuri_t *uri)
 const xchar_t *
 xuri_get_auth_params (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->auth_params;
 }
@@ -2476,7 +2476,7 @@ xuri_get_auth_params (xuri_t *uri)
 const xchar_t *
 xuri_get_host (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->host;
 }
@@ -2494,7 +2494,7 @@ xuri_get_host (xuri_t *uri)
 xint_t
 xuri_get_port (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, -1);
+  xreturn_val_if_fail (uri != NULL, -1);
 
   if (uri->port == -1 && uri->flags & XURI_FLAGS_SCHEME_NORMALIZE)
     return default_scheme_port (uri->scheme);
@@ -2516,7 +2516,7 @@ xuri_get_port (xuri_t *uri)
 const xchar_t *
 xuri_get_path (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->path;
 }
@@ -2538,7 +2538,7 @@ xuri_get_path (xuri_t *uri)
 const xchar_t *
 xuri_get_query (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->query;
 }
@@ -2557,7 +2557,7 @@ xuri_get_query (xuri_t *uri)
 const xchar_t *
 xuri_get_fragment (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   return uri->fragment;
 }
@@ -2576,7 +2576,7 @@ xuri_get_fragment (xuri_t *uri)
 xuri_flags_t
 xuri_get_flags (xuri_t *uri)
 {
-  g_return_val_if_fail (uri != NULL, XURI_FLAGS_NONE);
+  xreturn_val_if_fail (uri != NULL, XURI_FLAGS_NONE);
 
   return uri->flags;
 }
@@ -2696,7 +2696,7 @@ xuri_escape_string (const xchar_t *unescaped,
 {
   xstring_t *s;
 
-  g_return_val_if_fail (unescaped != NULL, NULL);
+  xreturn_val_if_fail (unescaped != NULL, NULL);
 
   s = xstring_sized_new (strlen (unescaped) * 1.25);
 
@@ -2740,8 +2740,8 @@ xuri_unescape_bytes (const xchar_t *escaped_string,
   xchar_t *buf;
   xssize_t unescaped_length;
 
-  g_return_val_if_fail (escaped_string != NULL, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (escaped_string != NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (length == -1)
     length = strlen (escaped_string);
@@ -2790,7 +2790,7 @@ xuri_escape_bytes (const xuint8_t *unescaped,
 {
   xstring_t *string;
 
-  g_return_val_if_fail (unescaped != NULL, NULL);
+  xreturn_val_if_fail (unescaped != NULL, NULL);
 
   string = xstring_sized_new (length * 1.25);
 
@@ -2840,7 +2840,7 @@ xuri_parse_scheme (const xchar_t *uri)
 {
   xssize_t len;
 
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   len = xuri_scheme_length (uri);
   return len == -1 ? NULL : xstrndup (uri, len);
@@ -2874,7 +2874,7 @@ xuri_peek_scheme (const xchar_t *uri)
   xchar_t *lower_scheme;
   const xchar_t *scheme;
 
-  g_return_val_if_fail (uri != NULL, NULL);
+  xreturn_val_if_fail (uri != NULL, NULL);
 
   len = xuri_scheme_length (uri);
   if (len == -1)

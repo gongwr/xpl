@@ -135,7 +135,7 @@ main (int argc, char **argv)
       monitor = xapp_info_monitor_get ();
 
       info = (xapp_info_t *) xdesktop_app_info_new ("this-desktop-file-does-not-exist");
-      g_assert (!info);
+      xassert (!info);
 
       xsignal_connect (monitor, "changed", G_CALLBACK (quit), NULL);
 

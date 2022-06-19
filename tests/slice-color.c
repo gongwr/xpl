@@ -81,7 +81,7 @@ touch_mem (xuint64_t block_size,
   g_timer_stop (timer);
 
   g_print ("Access-time = %fs\n", g_timer_elapsed (timer, NULL));
-  g_assert (accu / repeats == (2 + 3) * n / 2 + 4 * n / 2);
+  xassert (accu / repeats == (2 + 3) * n / 2 + 4 * n / 2);
 
   for (j = 0; j < n; j++)
     {

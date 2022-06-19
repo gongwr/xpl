@@ -8,9 +8,9 @@ test_registration_serial (void)
   serial1 = xtype_get_type_registration_serial ();
   g_pointer_type_register_static ("my+pointer");
   serial2 = xtype_get_type_registration_serial ();
-  g_assert (serial1 != serial2);
+  xassert (serial1 != serial2);
   serial3 = xtype_get_type_registration_serial ();
-  g_assert (serial2 == serial3);
+  xassert (serial2 == serial3);
 }
 
 typedef struct {
@@ -107,13 +107,13 @@ test_interface_prerequisite (void)
 
   prereqs = xtype_interface_prerequisites (foo_get_type (), &n_prereqs);
   g_assert_cmpint (n_prereqs, ==, 2);
-  g_assert (prereqs[0] == bar_get_type ());
-  g_assert (prereqs[1] == XTYPE_OBJECT);
-  g_assert (xtype_interface_instantiatable_prerequisite (foo_get_type ()) == XTYPE_OBJECT);
+  xassert (prereqs[0] == bar_get_type ());
+  xassert (prereqs[1] == XTYPE_OBJECT);
+  xassert (xtype_interface_instantiatable_prerequisite (foo_get_type ()) == XTYPE_OBJECT);
 
   iface = xtype_default_interface_ref (foo_get_type ());
   parent = xtype_interface_peek_parent (iface);
-  g_assert (parent == NULL);
+  xassert (parent == NULL);
   xtype_default_interface_unref (iface);
 
   g_free (prereqs);
@@ -173,7 +173,7 @@ static void
 check_func (xpointer_t check_data,
             xpointer_t x_iface)
 {
-  g_assert (check_data == &check_called);
+  xassert (check_data == &check_called);
 
   check_called++;
 }
@@ -198,7 +198,7 @@ test_next_base (void)
 
   type = xtype_next_base (bazo_get_type (), XTYPE_OBJECT);
 
-  g_assert (type == XTYPE_INITIALLY_UNOWNED);
+  xassert (type == XTYPE_INITIALLY_UNOWNED);
 }
 
 int

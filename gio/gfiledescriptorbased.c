@@ -63,7 +63,7 @@ xfile_descriptor_based_get_fd (xfile_descriptor_based_t *fd_based)
 {
   GFileDescriptorBasedIface *iface;
 
-  g_return_val_if_fail (X_IS_FILE_DESCRIPTOR_BASED (fd_based), 0);
+  xreturn_val_if_fail (X_IS_FILE_DESCRIPTOR_BASED (fd_based), 0);
 
   iface = XFILE_DESCRIPTOR_BASED_GET_IFACE (fd_based);
 

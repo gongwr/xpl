@@ -111,13 +111,13 @@ cat (xfile_t * file)
 
   if (from_charset && to_charset)
     {
-      cconv = g_charset_converter_new (to_charset, from_charset, &error);
+      cconv = xcharset_converter_new (to_charset, from_charset, &error);
       conv = (xconverter_t *)cconv;
       if (conv)
 	{
 	  xinput_stream_t *old;
 
-	  g_charset_converter_set_use_fallback (cconv, fallback);
+	  xcharset_converter_set_use_fallback (cconv, fallback);
 
 	  old = in;
 	  in = (xinput_stream_t *) xconverter_input_stream_new (in, conv);
@@ -209,7 +209,7 @@ cat (xfile_t * file)
 
   if (cconv != NULL && fallback)
     {
-      xuint_t num = g_charset_converter_get_num_fallbacks (cconv);
+      xuint_t num = xcharset_converter_get_num_fallbacks (cconv);
       if (num > 0)
 	g_printerr ("Number of fallback errors: %u\n", num);
     }

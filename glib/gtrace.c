@@ -138,7 +138,7 @@ xuint_t
 
   sysprof_collector_define_counters (&counter, 1);
 
-  g_assert (counter.id != 0);
+  xassert (counter.id != 0);
 
   return counter.id;
 #else

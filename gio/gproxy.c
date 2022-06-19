@@ -107,7 +107,7 @@ xproxy_connect (xproxy_t            *proxy,
 {
   xproxy_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_PROXY (proxy), NULL);
 
   iface = G_PROXY_GET_IFACE (proxy);
 
@@ -172,7 +172,7 @@ xproxy_connect_finish (xproxy_t       *proxy,
 {
   xproxy_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_PROXY (proxy), NULL);
+  xreturn_val_if_fail (X_IS_PROXY (proxy), NULL);
 
   iface = G_PROXY_GET_IFACE (proxy);
 
@@ -200,7 +200,7 @@ xproxy_supports_hostname (xproxy_t *proxy)
 {
   xproxy_interface_t *iface;
 
-  g_return_val_if_fail (X_IS_PROXY (proxy), FALSE);
+  xreturn_val_if_fail (X_IS_PROXY (proxy), FALSE);
 
   iface = G_PROXY_GET_IFACE (proxy);
 

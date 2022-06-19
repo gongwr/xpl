@@ -174,7 +174,7 @@ test_file (const xchar_t       *filename,
 
   /* test_t with nul termination. */
   context = xmarkup_parse_context_new (&parser, flags, NULL, NULL);
-  g_assert (xmarkup_parse_context_get_user_data (context) == NULL);
+  xassert (xmarkup_parse_context_get_user_data (context) == NULL);
   xmarkup_parse_context_get_position (context, &line, &col);
   g_assert_cmpint (line, ==, 1);
   g_assert_cmpint (col, ==, 1);

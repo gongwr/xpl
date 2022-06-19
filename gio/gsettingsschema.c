@@ -435,8 +435,8 @@ g_settings_schema_source_lookup (xsettings_schema_source_t *source,
   GvdbTable *table;
   const xchar_t *extends;
 
-  g_return_val_if_fail (source != NULL, NULL);
-  g_return_val_if_fail (schema_id != NULL, NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (schema_id != NULL, NULL);
 
   table = gvdb_table_get_table (source->table, schema_id);
 
@@ -811,7 +811,7 @@ g_settings_schema_source_list_schemas (xsettings_schema_source_t   *source,
               schema = xstrdup (list[i]);
 
               table = gvdb_table_get_table (s->table, list[i]);
-              g_assert (table != NULL);
+              xassert (table != NULL);
 
               if (gvdb_table_has_value (table, ".path"))
                 xhash_table_add (single, schema);
@@ -994,7 +994,7 @@ g_settings_schema_get_value (xsettings_schema_t *schema,
   xvariant_iter_t *iter;
   xvariant_t *value = NULL;
 
-  g_return_val_if_fail (schema != NULL, NULL);
+  xreturn_val_if_fail (schema != NULL, NULL);
 
   for (s = schema; s; s = s->extends)
     if ((value = gvdb_table_get_raw_value (s->table, key)))
@@ -1079,7 +1079,7 @@ g_settings_schema_list_children (xsettings_schema_t *schema)
   xint_t n_keys;
   xint_t i, j;
 
-  g_return_val_if_fail (schema != NULL, NULL);
+  xreturn_val_if_fail (schema != NULL, NULL);
 
   keys = g_settings_schema_list (schema, &n_keys);
   strv = g_new (xchar_t *, n_keys + 1);
@@ -1124,7 +1124,7 @@ g_settings_schema_list_keys (xsettings_schema_t *schema)
   xint_t n_keys;
   xint_t i, j;
 
-  g_return_val_if_fail (schema != NULL, NULL);
+  xreturn_val_if_fail (schema != NULL, NULL);
 
   keys = g_settings_schema_list (schema, &n_keys);
   strv = g_new (xchar_t *, n_keys + 1);
@@ -1235,7 +1235,7 @@ g_settings_schema_list (xsettings_schema_t *schema,
       while (xhash_table_iter_next (&iter, &name, NULL))
         schema->items[i++] = g_quark_from_string (name);
       schema->n_items = i;
-      g_assert (i == len);
+      xassert (i == len);
 
       xhash_table_unref (items);
     }
@@ -1356,7 +1356,7 @@ xboolean_t
 g_settings_schema_key_type_check (xsettings_schema_key_t *key,
                                   xvariant_t           *value)
 {
-  g_return_val_if_fail (value != NULL, FALSE);
+  xreturn_val_if_fail (value != NULL, FALSE);
 
   return xvariant_is_of_type (value, key->type);
 }
@@ -1499,7 +1499,7 @@ g_settings_schema_key_to_enum (xsettings_schema_key_t *key,
    * itself (which the schema compiler checks for validity).  If this assertion
    * fails then it's really a bug in xsettings_t or the schema compiler...
    */
-  g_assert (it_worked);
+  xassert (it_worked);
 
   return result;
 }
@@ -1536,7 +1536,7 @@ g_settings_schema_key_to_flags (xsettings_schema_key_t *key,
 
       it_worked = strinfo_enum_from_string (key->strinfo, key->strinfo_length, flag, &flaxvalue);
       /* as in g_settings_to_enum() */
-      g_assert (it_worked);
+      xassert (it_worked);
 
       result |= flaxvalue;
     }
@@ -1588,7 +1588,7 @@ G_DEFINE_BOXED_TYPE (xsettings_schema_key_t, g_settings_schema_key, g_settings_s
 xsettings_schema_key_t *
 g_settings_schema_key_ref (xsettings_schema_key_t *key)
 {
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   g_atomic_int_inc (&key->ref_count);
 
@@ -1636,8 +1636,8 @@ g_settings_schema_get_key (xsettings_schema_t *schema,
 {
   xsettings_schema_key_t *key;
 
-  g_return_val_if_fail (schema != NULL, NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (schema != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   key = g_slice_new (xsettings_schema_key_t);
   g_settings_schema_key_init (key, schema, name);
@@ -1659,7 +1659,7 @@ g_settings_schema_get_key (xsettings_schema_t *schema,
 const xchar_t *
 g_settings_schema_key_get_name (xsettings_schema_key_t *key)
 {
-  g_return_val_if_fail (key != NULL, NULL);
+  xreturn_val_if_fail (key != NULL, NULL);
 
   return key->name;
 }
@@ -1746,7 +1746,7 @@ g_settings_schema_key_get_description (xsettings_schema_key_t *key)
 const xvariant_type_t *
 g_settings_schema_key_get_value_type (xsettings_schema_key_t *key)
 {
-  g_return_val_if_fail (key, NULL);
+  xreturn_val_if_fail (key, NULL);
 
   return key->type;
 }
@@ -1769,7 +1769,7 @@ g_settings_schema_key_get_default_value (xsettings_schema_key_t *key)
 {
   xvariant_t *value;
 
-  g_return_val_if_fail (key, NULL);
+  xreturn_val_if_fail (key, NULL);
 
   value = g_settings_schema_key_get_translated_default (key);
 

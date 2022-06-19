@@ -47,7 +47,7 @@ typedef struct {
 #define XTEST_GET_CLASS(test)    (XTYPE_INSTANCE_GET_CLASS ((test), XTYPE_TEST, xtest_class_t))
 
 static xtype_t xtest_get_type (void);
-G_DEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
+XDEFINE_TYPE (xtest, xtest, XTYPE_OBJECT)
 
 /* test_t state */
 typedef struct
@@ -145,10 +145,10 @@ xtest_emit_test_signal2 (xtest_t *test,
 static void
 xtest_class_init (xtest_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = xtest_set_property;
-  gobject_class->get_property = xtest_get_property;
+  xobject_class->set_property = xtest_set_property;
+  xobject_class->get_property = xtest_get_property;
 
   signals[SIGNAL_TEST_SIGNAL1] =
       xsignal_new ("test-signal1", XTYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
@@ -159,9 +159,9 @@ xtest_class_init (xtest_class_t *klass)
                     G_STRUCT_OFFSET (xtest_class_t, test_signal2), NULL, NULL,
                     g_cclosure_marshal_VOID__INT, XTYPE_NONE, 1, XTYPE_INT);
 
-  xobject_class_install_property (G_OBJECT_CLASS (klass), PROP_TEST_PROP,
-                                   g_param_spec_int ("test-prop", "test_t Prop", "test_t property",
-                                                     0, 1, 0, G_PARAM_READWRITE));
+  xobject_class_install_property (XOBJECT_CLASS (klass), PROP_TEST_PROP,
+                                   xparam_spec_int ("test-prop", "test_t Prop", "test_t property",
+                                                     0, 1, 0, XPARAM_READWRITE));
   klass->test_signal2 = xtest_test_signal2;
 }
 

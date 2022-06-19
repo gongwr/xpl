@@ -21,9 +21,9 @@
 /*
  * TODO for GDBus:
  *
- * - would be nice to expose GDBusAuthMechanism and an extension point
+ * - would be nice to expose xdbus_auth_mechanism_t and an extension point
  *
- * - Need to rewrite GDBusAuth and rework GDBusAuthMechanism. In particular
+ * - Need to rewrite xdbus_auth_t and rework xdbus_auth_mechanism_t. In particular
  *   the mechanism VFuncs need to be able to set an error.
  *
  * - Need to document other mechanisms/sources for determining the D-Bus
@@ -368,7 +368,7 @@ struct _GDBusConnection
    * Read-only after initable_init(), so it may be read if you either
    * hold @init_lock or check for initialization first.
    */
-  GDBusAuth *auth;
+  xdbus_auth_t *auth;
 
   /* Last serial used. Protected by @lock. */
   xuint32_t last_serial;
@@ -448,7 +448,7 @@ struct _GDBusConnection
    * Read-only after initable_init(), so it may be read without holding a
    * lock, if you check for initialization first.
    */
-  GDBusCapabilityFlags capabilities;
+  xdbus_capability_flags_t capabilities;
 
   /* Protected by @init_lock */
   xdbus_auth_observer_t *authentication_observer;
@@ -558,10 +558,10 @@ check_initialized (xdbus_connection_t *connection)
    */
   xint_t flags = g_atomic_int_get (&connection->atomic_flags);
 
-  g_return_val_if_fail (flags & FLAG_INITIALIZED, FALSE);
+  xreturn_val_if_fail (flags & FLAG_INITIALIZED, FALSE);
 
   /* We can safely access this, due to the memory barrier above */
-  g_return_val_if_fail (connection->initialization_error == NULL, FALSE);
+  xreturn_val_if_fail (connection->initialization_error == NULL, FALSE);
 
   return TRUE;
 }
@@ -592,8 +592,8 @@ check_unclosed (xdbus_connection_t     *connection,
 
   if (!(check & MAY_BE_UNINITIALIZED))
     {
-      g_return_val_if_fail (flags & FLAG_INITIALIZED, FALSE);
-      g_return_val_if_fail (connection->initialization_error == NULL, FALSE);
+      xreturn_val_if_fail (flags & FLAG_INITIALIZED, FALSE);
+      xreturn_val_if_fail (connection->initialization_error == NULL, FALSE);
     }
 
   if (flags & FLAG_CLOSED)
@@ -632,8 +632,8 @@ xdbus_connection_dispose (xobject_t *object)
   CONNECTION_UNLOCK (connection);
   G_UNLOCK (message_bus_lock);
 
-  if (G_OBJECT_CLASS (xdbus_connection_parent_class)->dispose != NULL)
-    G_OBJECT_CLASS (xdbus_connection_parent_class)->dispose (object);
+  if (XOBJECT_CLASS (xdbus_connection_parent_class)->dispose != NULL)
+    XOBJECT_CLASS (xdbus_connection_parent_class)->dispose (object);
 }
 
 static void
@@ -691,7 +691,7 @@ xdbus_connection_finalize (xobject_t *object)
   g_mutex_clear (&connection->init_lock);
   g_mutex_clear (&connection->lock);
 
-  G_OBJECT_CLASS (xdbus_connection_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdbus_connection_parent_class)->finalize (object);
 }
 
 /* called in any user thread, with the connection's lock not held */
@@ -807,14 +807,14 @@ xdbus_connection_real_closed (xdbus_connection_t *connection,
 static void
 xdbus_connection_class_init (GDBusConnectionClass *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize     = xdbus_connection_finalize;
-  gobject_class->dispose      = xdbus_connection_dispose;
-  gobject_class->set_property = xdbus_connection_set_property;
-  gobject_class->get_property = xdbus_connection_get_property;
+  xobject_class->finalize     = xdbus_connection_finalize;
+  xobject_class->dispose      = xdbus_connection_dispose;
+  xobject_class->set_property = xdbus_connection_set_property;
+  xobject_class->get_property = xdbus_connection_get_property;
 
   klass->closed = xdbus_connection_real_closed;
 
@@ -832,18 +832,18 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_STREAM,
-                                   g_param_spec_object ("stream",
+                                   xparam_spec_object ("stream",
                                                         P_("IO Stream"),
                                                         P_("The underlying streams used for I/O"),
                                                         XTYPE_IO_STREAM,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:address:
@@ -853,17 +853,17 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_ADDRESS,
-                                   g_param_spec_string ("address",
+                                   xparam_spec_string ("address",
                                                         P_("Address"),
                                                         P_("D-Bus address specifying potential socket endpoints"),
                                                         NULL,
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:flags:
@@ -872,19 +872,19 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_FLAGS,
-                                   g_param_spec_flags ("flags",
+                                   xparam_spec_flags ("flags",
                                                        P_("Flags"),
                                                        P_("Flags"),
                                                        XTYPE_DBUS_CONNECTION_FLAGS,
                                                        G_DBUS_CONNECTION_FLAGS_NONE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_WRITABLE |
-                                                       G_PARAM_CONSTRUCT_ONLY |
-                                                       G_PARAM_STATIC_NAME |
-                                                       G_PARAM_STATIC_BLURB |
-                                                       G_PARAM_STATIC_NICK));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_WRITABLE |
+                                                       XPARAM_CONSTRUCT_ONLY |
+                                                       XPARAM_STATIC_NAME |
+                                                       XPARAM_STATIC_BLURB |
+                                                       XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:guid:
@@ -914,18 +914,18 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_GUID,
-                                   g_param_spec_string ("guid",
+                                   xparam_spec_string ("guid",
                                                         P_("GUID"),
                                                         P_("GUID of the server peer"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:unique-name:
@@ -935,16 +935,16 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_UNIQUE_NAME,
-                                   g_param_spec_string ("unique-name",
+                                   xparam_spec_string ("unique-name",
                                                         P_("unique-name"),
                                                         P_("Unique name of bus connection"),
                                                         NULL,
-                                                        G_PARAM_READABLE |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_READABLE |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:closed:
@@ -953,16 +953,16 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_CLOSED,
-                                   g_param_spec_boolean ("closed",
+                                   xparam_spec_boolean ("closed",
                                                          P_("Closed"),
                                                          P_("Whether the connection is closed"),
                                                          FALSE,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_STATIC_NAME |
-                                                         G_PARAM_STATIC_BLURB |
-                                                         G_PARAM_STATIC_NICK));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_STATIC_NAME |
+                                                         XPARAM_STATIC_BLURB |
+                                                         XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:exit-on-close:
@@ -976,37 +976,37 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_EXIT_ON_CLOSE,
-                                   g_param_spec_boolean ("exit-on-close",
+                                   xparam_spec_boolean ("exit-on-close",
                                                          P_("Exit on close"),
                                                          P_("Whether the process is terminated when the connection is closed"),
                                                          FALSE,
-                                                         G_PARAM_READABLE |
-                                                         G_PARAM_WRITABLE |
-                                                         G_PARAM_STATIC_NAME |
-                                                         G_PARAM_STATIC_BLURB |
-                                                         G_PARAM_STATIC_NICK));
+                                                         XPARAM_READABLE |
+                                                         XPARAM_WRITABLE |
+                                                         XPARAM_STATIC_NAME |
+                                                         XPARAM_STATIC_BLURB |
+                                                         XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:capabilities:
    *
-   * Flags from the #GDBusCapabilityFlags enumeration
+   * Flags from the #xdbus_capability_flags_t enumeration
    * representing connection features negotiated with the other peer.
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_CAPABILITY_FLAGS,
-                                   g_param_spec_flags ("capabilities",
+                                   xparam_spec_flags ("capabilities",
                                                        P_("Capabilities"),
                                                        P_("Capabilities"),
                                                        XTYPE_DBUS_CAPABILITY_FLAGS,
                                                        G_DBUS_CAPABILITY_FLAGS_NONE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_STATIC_NAME |
-                                                       G_PARAM_STATIC_BLURB |
-                                                       G_PARAM_STATIC_NICK));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_STATIC_NAME |
+                                                       XPARAM_STATIC_BLURB |
+                                                       XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t:authentication-observer:
@@ -1015,17 +1015,17 @@ xdbus_connection_class_init (GDBusConnectionClass *klass)
    *
    * Since: 2.26
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_AUTHENTICATION_OBSERVER,
-                                   g_param_spec_object ("authentication-observer",
+                                   xparam_spec_object ("authentication-observer",
                                                         P_("Authentication Observer"),
                                                         P_("Object used to assist in the authentication process"),
                                                         XTYPE_DBUS_AUTH_OBSERVER,
-                                                        G_PARAM_WRITABLE |
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_STATIC_NAME |
-                                                        G_PARAM_STATIC_BLURB |
-                                                        G_PARAM_STATIC_NICK));
+                                                        XPARAM_WRITABLE |
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_STATIC_NAME |
+                                                        XPARAM_STATIC_BLURB |
+                                                        XPARAM_STATIC_NICK));
 
   /**
    * xdbus_connection_t::closed:
@@ -1127,9 +1127,9 @@ xdbus_connection_init (xdbus_connection_t *connection)
 xio_stream_t *
 xdbus_connection_get_stream (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return NULL;
 
@@ -1152,11 +1152,11 @@ xdbus_connection_start_message_processing (xdbus_connection_t *connection)
 {
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return;
 
-  g_assert (connection->worker != NULL);
+  xassert (connection->worker != NULL);
   _g_dbus_worker_unfreeze (connection->worker);
 }
 
@@ -1175,7 +1175,7 @@ xdbus_connection_is_closed (xdbus_connection_t *connection)
 {
   xint_t flags;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
 
   flags = g_atomic_int_get (&connection->atomic_flags);
 
@@ -1188,16 +1188,16 @@ xdbus_connection_is_closed (xdbus_connection_t *connection)
  *
  * Gets the capabilities negotiated with the remote peer
  *
- * Returns: zero or more flags from the #GDBusCapabilityFlags enumeration
+ * Returns: zero or more flags from the #xdbus_capability_flags_t enumeration
  *
  * Since: 2.26
  */
-GDBusCapabilityFlags
+xdbus_capability_flags_t
 xdbus_connection_get_capabilities (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), G_DBUS_CAPABILITY_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), G_DBUS_CAPABILITY_FLAGS_NONE);
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return G_DBUS_CAPABILITY_FLAGS_NONE;
 
@@ -1217,9 +1217,9 @@ xdbus_connection_get_capabilities (xdbus_connection_t *connection)
 GDBusConnectionFlags
 xdbus_connection_get_flags (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), G_DBUS_CONNECTION_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), G_DBUS_CONNECTION_FLAGS_NONE);
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return G_DBUS_CONNECTION_FLAGS_NONE;
 
@@ -1304,9 +1304,9 @@ xdbus_connection_flush_finish (xdbus_connection_t  *connection,
                                 xasync_result_t     *res,
                                 xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (xtask_is_valid (res, connection), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, connection), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -1333,8 +1333,8 @@ xdbus_connection_flush_sync (xdbus_connection_t  *connection,
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
 
@@ -1348,7 +1348,7 @@ xdbus_connection_flush_sync (xdbus_connection_t  *connection,
   if (!check_unclosed (connection, 0, error))
     goto out;
 
-  g_assert (connection->worker != NULL);
+  xassert (connection->worker != NULL);
 
   ret = _g_dbus_worker_flush_sync (connection->worker,
                                    cancellable,
@@ -1471,11 +1471,11 @@ xdbus_connection_close (xdbus_connection_t     *connection,
 
   g_return_if_fail (X_IS_DBUS_CONNECTION (connection));
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return;
 
-  g_assert (connection->worker != NULL);
+  xassert (connection->worker != NULL);
 
   task = xtask_new (connection, cancellable, callback, user_data);
   xtask_set_source_tag (task, xdbus_connection_close);
@@ -1501,9 +1501,9 @@ xdbus_connection_close_finish (xdbus_connection_t  *connection,
                                 xasync_result_t     *res,
                                 xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (xtask_is_valid (res, connection), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (xtask_is_valid (res, connection), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   return xtask_propagate_boolean (XTASK (res), error);
 }
@@ -1547,8 +1547,8 @@ xdbus_connection_close_sync (xdbus_connection_t  *connection,
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   ret = FALSE;
 
@@ -1597,7 +1597,7 @@ xdbus_connection_get_last_serial (xdbus_connection_t *connection)
 {
   xuint32_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
 
   CONNECTION_LOCK (connection);
   ret = GPOINTER_TO_UINT (xhash_table_lookup (connection->map_thread_to_last_serial,
@@ -1623,8 +1623,8 @@ xdbus_connection_send_message_unlocked (xdbus_connection_t   *connection,
 
   CONNECTION_ENSURE_LOCK (connection);
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
 
   /* TODO: check all necessary headers are present */
 
@@ -1746,10 +1746,10 @@ xdbus_connection_send_message (xdbus_connection_t        *connection,
 {
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
-  g_return_val_if_fail ((flags & G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL) || !xdbus_message_get_locked (message), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), FALSE);
+  xreturn_val_if_fail ((flags & G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL) || !xdbus_message_get_locked (message), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   CONNECTION_LOCK (connection);
   ret = xdbus_connection_send_message_unlocked (connection, message, flags, (xuint32_t *) out_serial, error);
@@ -1774,8 +1774,8 @@ typedef struct
 static void
 send_message_data_free (SendMessageData *data)
 {
-  g_assert (data->timeout_source == NULL);
-  g_assert (data->cancellable_handler_id == 0);
+  xassert (data->timeout_source == NULL);
+  xassert (data->cancellable_handler_id == 0);
 
   g_slice_free (SendMessageData, data);
 }
@@ -1791,7 +1791,7 @@ send_message_with_reply_cleanup (xtask_t *task, xboolean_t remove)
 
   CONNECTION_ENSURE_LOCK (connection);
 
-  g_assert (!data->delivered);
+  xassert (!data->delivered);
 
   data->delivered = TRUE;
 
@@ -2069,9 +2069,9 @@ xdbus_connection_send_message_with_reply_finish (xdbus_connection_t  *connection
                                                   xasync_result_t     *res,
                                                   xerror_t          **error)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (xtask_is_valid (res, connection), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, connection), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }
@@ -2156,11 +2156,11 @@ xdbus_connection_send_message_with_reply_sync (xdbus_connection_t        *connec
   SendMessageSyncData data;
   xdbus_message_t *reply;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
-  g_return_val_if_fail ((flags & G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL) || !xdbus_message_get_locked (message), NULL);
-  g_return_val_if_fail (timeout_msec >= 0 || timeout_msec == -1, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_MESSAGE (message), NULL);
+  xreturn_val_if_fail ((flags & G_DBUS_SEND_MESSAGE_FLAGS_PRESERVE_SERIAL) || !xdbus_message_get_locked (message), NULL);
+  xreturn_val_if_fail (timeout_msec >= 0 || timeout_msec == -1, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   data.res = NULL;
   data.context = xmain_context_new ();
@@ -2473,10 +2473,10 @@ on_worker_closed (GDBusWorker *worker,
  *
  * Called with the init_lock held.
  */
-static GDBusCapabilityFlags
+static xdbus_capability_flags_t
 get_offered_capabilities_max (xdbus_connection_t *connection)
 {
-      GDBusCapabilityFlags ret;
+      xdbus_capability_flags_t ret;
       ret = G_DBUS_CAPABILITY_FLAGS_NONE;
 #ifdef G_OS_UNIX
       if (X_IS_UNIX_CONNECTION (connection->stream))
@@ -2516,7 +2516,7 @@ initable_init (xinitable_t     *initable,
     }
 
   /* Because of init_lock, we can't get here twice in different threads */
-  g_assert (connection->initialization_error == NULL);
+  xassert (connection->initialization_error == NULL);
 
   /* The user can pass multiple (but mutally exclusive) construct
    * properties:
@@ -2529,7 +2529,7 @@ initable_init (xinitable_t     *initable,
    */
   if (connection->address != NULL)
     {
-      g_assert (connection->stream == NULL);
+      xassert (connection->stream == NULL);
 
       if ((connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER) ||
           (connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS) ||
@@ -2561,10 +2561,10 @@ initable_init (xinitable_t     *initable,
   /* Authenticate the connection */
   if (connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER)
     {
-      g_assert (!(connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT));
-      g_assert (connection->guid != NULL);
-      connection->auth = _g_dbus_auth_new (connection->stream);
-      if (!_g_dbus_auth_run_server (connection->auth,
+      xassert (!(connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT));
+      xassert (connection->guid != NULL);
+      connection->auth = _xdbus_auth_new (connection->stream);
+      if (!_xdbus_auth_run_server (connection->auth,
                                     connection->authentication_observer,
                                     connection->guid,
                                     (connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_ALLOW_ANONYMOUS),
@@ -2578,10 +2578,10 @@ initable_init (xinitable_t     *initable,
     }
   else if (connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT)
     {
-      g_assert (!(connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER));
-      g_assert (connection->guid == NULL);
-      connection->auth = _g_dbus_auth_new (connection->stream);
-      connection->guid = _g_dbus_auth_run_client (connection->auth,
+      xassert (!(connection->flags & G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_SERVER));
+      xassert (connection->guid == NULL);
+      connection->auth = _xdbus_auth_new (connection->stream);
+      connection->guid = _xdbus_auth_run_client (connection->auth,
                                                   connection->authentication_observer,
                                                   get_offered_capabilities_max (connection),
                                                   &connection->capabilities,
@@ -2663,7 +2663,7 @@ initable_init (xinitable_t     *initable,
  out:
   if (!ret)
     {
-      g_assert (connection->initialization_error != NULL);
+      xassert (connection->initialization_error != NULL);
       g_propagate_error (error, xerror_copy (connection->initialization_error));
     }
 
@@ -2768,11 +2768,11 @@ xdbus_connection_new_finish (xasync_result_t  *res,
   xobject_t *object;
   xobject_t *source_object;
 
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   source_object = xasync_result_get_source_object (res);
-  g_assert (source_object != NULL);
+  xassert (source_object != NULL);
   object = xasync_initable_new_finish (XASYNC_INITABLE (source_object),
                                         res,
                                         error);
@@ -2822,9 +2822,9 @@ xdbus_connection_new_sync (xio_stream_t             *stream,
                             xerror_t               **error)
 {
   _g_dbus_initialize ();
-  g_return_val_if_fail (X_IS_IO_STREAM (stream), NULL);
-  g_return_val_if_fail ((flags & ~G_DBUS_CONNECTION_FLAGS_ALL) == 0, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_IO_STREAM (stream), NULL);
+  xreturn_val_if_fail ((flags & ~G_DBUS_CONNECTION_FLAGS_ALL) == 0, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
   return xinitable_new (XTYPE_DBUS_CONNECTION,
                          cancellable,
                          error,
@@ -2915,11 +2915,11 @@ xdbus_connection_new_for_address_finish (xasync_result_t  *res,
   xobject_t *object;
   xobject_t *source_object;
 
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (res), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   source_object = xasync_result_get_source_object (res);
-  g_assert (source_object != NULL);
+  xassert (source_object != NULL);
   object = xasync_initable_new_finish (XASYNC_INITABLE (source_object),
                                         res,
                                         error);
@@ -2970,9 +2970,9 @@ xdbus_connection_new_for_address_sync (const xchar_t           *address,
 {
   _g_dbus_initialize ();
 
-  g_return_val_if_fail (address != NULL, NULL);
-  g_return_val_if_fail ((flags & ~G_DBUS_CONNECTION_FLAGS_ALL) == 0, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (address != NULL, NULL);
+  xreturn_val_if_fail ((flags & ~G_DBUS_CONNECTION_FLAGS_ALL) == 0, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
   return xinitable_new (XTYPE_DBUS_CONNECTION,
                          cancellable,
                          error,
@@ -3032,7 +3032,7 @@ xdbus_connection_set_exit_on_close (xdbus_connection_t *connection,
 xboolean_t
 xdbus_connection_get_exit_on_close (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
 
   if (g_atomic_int_get (&connection->atomic_flags) & FLAG_EXIT_ON_CLOSE)
     return TRUE;
@@ -3055,7 +3055,7 @@ xdbus_connection_get_exit_on_close (xdbus_connection_t *connection)
 const xchar_t *
 xdbus_connection_get_guid (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
   return connection->guid;
 }
 
@@ -3076,9 +3076,9 @@ xdbus_connection_get_guid (xdbus_connection_t *connection)
 const xchar_t *
 xdbus_connection_get_unique_name (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return NULL;
 
@@ -3107,9 +3107,9 @@ xdbus_connection_get_unique_name (xdbus_connection_t *connection)
 xcredentials_t *
 xdbus_connection_get_peer_credentials (xdbus_connection_t *connection)
 {
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
 
-  /* do not use g_return_val_if_fail(), we want the memory barrier */
+  /* do not use xreturn_val_if_fail(), we want the memory barrier */
   if (!check_initialized (connection))
     return NULL;
 
@@ -3169,9 +3169,9 @@ xdbus_connection_add_filter (xdbus_connection_t            *connection,
 {
   FilterData *data;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  g_return_val_if_fail (filter_function != NULL, 0);
-  g_return_val_if_fail (check_initialized (connection), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (filter_function != NULL, 0);
+  xreturn_val_if_fail (check_initialized (connection), 0);
 
   CONNECTION_LOCK (connection);
   data = g_new0 (FilterData, 1);
@@ -3538,15 +3538,15 @@ xdbus_connection_signal_subscribe (xdbus_connection_t     *connection,
    * Doable, but not really sure it's worth it...
    */
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  g_return_val_if_fail (sender == NULL || (g_dbus_is_name (sender) && (connection->flags & G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION)), 0);
-  g_return_val_if_fail (interface_name == NULL || g_dbus_is_interface_name (interface_name), 0);
-  g_return_val_if_fail (member == NULL || g_dbus_is_member_name (member), 0);
-  g_return_val_if_fail (object_path == NULL || xvariant_is_object_path (object_path), 0);
-  g_return_val_if_fail (callback != NULL, 0);
-  g_return_val_if_fail (check_initialized (connection), 0);
-  g_return_val_if_fail (!((flags & G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH) && (flags & G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE)), 0);
-  g_return_val_if_fail (!(arg0 == NULL && (flags & (G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH | G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE))), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (sender == NULL || (g_dbus_is_name (sender) && (connection->flags & G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION)), 0);
+  xreturn_val_if_fail (interface_name == NULL || g_dbus_is_interface_name (interface_name), 0);
+  xreturn_val_if_fail (member == NULL || g_dbus_is_member_name (member), 0);
+  xreturn_val_if_fail (object_path == NULL || xvariant_is_object_path (object_path), 0);
+  xreturn_val_if_fail (callback != NULL, 0);
+  xreturn_val_if_fail (check_initialized (connection), 0);
+  xreturn_val_if_fail (!((flags & G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH) && (flags & G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE)), 0);
+  xreturn_val_if_fail (!(arg0 == NULL && (flags & (G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_PATH | G_DBUS_SIGNAL_FLAGS_MATCH_ARG0_NAMESPACE))), 0);
 
   CONNECTION_LOCK (connection);
 
@@ -3745,7 +3745,7 @@ xdbus_connection_signal_unsubscribe (xdbus_connection_t *connection,
   CONNECTION_UNLOCK (connection);
 
   /* invariant */
-  g_assert (n_subscribers_removed == 0 || n_subscribers_removed == 1);
+  xassert (n_subscribers_removed == 0 || n_subscribers_removed == 1);
 }
 
 /* ---------------------------------------------------------------------------------------------------- */
@@ -4196,7 +4196,7 @@ has_object_been_unregistered (xdbus_connection_t    *connection,
   ExportedInterface *ei = NULL;
   xpointer_t es = NULL;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
 
   ret = FALSE;
 
@@ -4297,7 +4297,7 @@ invoke_get_property_in_idle_cb (xpointer_t _data)
   else
     {
       xchar_t *dbus_error_name;
-      g_assert (error != NULL);
+      xassert (error != NULL);
       dbus_error_name = g_dbus_error_encode_gerror (error);
       reply = xdbus_message_new_method_error_literal (data->message,
                                                        dbus_error_name,
@@ -4343,7 +4343,7 @@ invoke_set_property_in_idle_cb (xpointer_t _data)
                                    data->user_data))
     {
       xchar_t *dbus_error_name;
-      g_assert (error != NULL);
+      xassert (error != NULL);
       dbus_error_name = g_dbus_error_encode_gerror (error);
       reply = xdbus_message_new_method_error_literal (data->message,
                                                        dbus_error_name,
@@ -4356,7 +4356,7 @@ invoke_set_property_in_idle_cb (xpointer_t _data)
       reply = xdbus_message_new_method_reply (data->message);
     }
 
-  g_assert (reply != NULL);
+  xassert (reply != NULL);
   xdbus_connection_send_message (data->connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, NULL, NULL);
   xobject_unref (reply);
   xvariant_unref (value);
@@ -5005,7 +5005,7 @@ call_in_idle_cb (xpointer_t user_data)
     }
 
   vtable = xobject_get_data (G_OBJECT (invocation), "g-dbus-interface-vtable");
-  g_assert (vtable != NULL && vtable->method_call != NULL);
+  xassert (vtable != NULL && vtable->method_call != NULL);
 
   vtable->method_call (xdbus_method_invocation_get_connection (invocation),
                        xdbus_method_invocation_get_sender (invocation),
@@ -5301,12 +5301,12 @@ xdbus_connection_register_object (xdbus_connection_t             *connection,
   ExportedInterface *ei;
   xuint_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  g_return_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), 0);
-  g_return_val_if_fail (interface_info != NULL, 0);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_info->name), 0);
-  g_return_val_if_fail (error == NULL || *error == NULL, 0);
-  g_return_val_if_fail (check_initialized (connection), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), 0);
+  xreturn_val_if_fail (interface_info != NULL, 0);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_info->name), 0);
+  xreturn_val_if_fail (error == NULL || *error == NULL, 0);
+  xreturn_val_if_fail (check_initialized (connection), 0);
 
   ret = 0;
 
@@ -5384,8 +5384,8 @@ xdbus_connection_unregister_object (xdbus_connection_t *connection,
   ExportedObject *eo;
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (check_initialized (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (check_initialized (connection), FALSE);
 
   ret = FALSE;
 
@@ -5708,13 +5708,13 @@ xdbus_connection_emit_signal (xdbus_connection_t  *connection,
   message = NULL;
   ret = FALSE;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (destination_bus_name == NULL || g_dbus_is_name (destination_bus_name), FALSE);
-  g_return_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), FALSE);
-  g_return_val_if_fail (interface_name != NULL && g_dbus_is_interface_name (interface_name), FALSE);
-  g_return_val_if_fail (signal_name != NULL && g_dbus_is_member_name (signal_name), FALSE);
-  g_return_val_if_fail (parameters == NULL || xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), FALSE);
-  g_return_val_if_fail (check_initialized (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (destination_bus_name == NULL || g_dbus_is_name (destination_bus_name), FALSE);
+  xreturn_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), FALSE);
+  xreturn_val_if_fail (interface_name != NULL && g_dbus_is_interface_name (interface_name), FALSE);
+  xreturn_val_if_fail (signal_name != NULL && g_dbus_is_member_name (signal_name), FALSE);
+  xreturn_val_if_fail (parameters == NULL || xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), FALSE);
+  xreturn_val_if_fail (check_initialized (connection), FALSE);
 
   if (G_UNLIKELY (_g_dbus_debug_emission ()))
     {
@@ -6020,9 +6020,9 @@ xdbus_connection_call_finish_internal (xdbus_connection_t  *connection,
   CallState *state;
   xvariant_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (xtask_is_valid (res, connection), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, connection), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   task = XTASK (res);
   state = xtask_get_task_data (task);
@@ -6062,22 +6062,22 @@ xdbus_connection_call_sync_internal (xdbus_connection_t         *connection,
   reply = NULL;
   result = NULL;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
-  g_return_val_if_fail (bus_name == NULL || g_dbus_is_name (bus_name), NULL);
-  g_return_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (interface_name != NULL && g_dbus_is_interface_name (interface_name), NULL);
-  g_return_val_if_fail (method_name != NULL && g_dbus_is_member_name (method_name), NULL);
-  g_return_val_if_fail (timeout_msec >= 0 || timeout_msec == -1, NULL);
-  g_return_val_if_fail ((parameters == NULL) || xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), NULL);
+  xreturn_val_if_fail (bus_name == NULL || g_dbus_is_name (bus_name), NULL);
+  xreturn_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (interface_name != NULL && g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (method_name != NULL && g_dbus_is_member_name (method_name), NULL);
+  xreturn_val_if_fail (timeout_msec >= 0 || timeout_msec == -1, NULL);
+  xreturn_val_if_fail ((parameters == NULL) || xvariant_is_of_type (parameters, G_VARIANT_TYPE_TUPLE), NULL);
 #ifdef G_OS_UNIX
-  g_return_val_if_fail (fd_list == NULL || X_IS_UNIX_FD_LIST (fd_list), NULL);
+  xreturn_val_if_fail (fd_list == NULL || X_IS_UNIX_FD_LIST (fd_list), NULL);
 #else
-  g_return_val_if_fail (fd_list == NULL, NULL);
+  xreturn_val_if_fail (fd_list == NULL, NULL);
 #endif
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!(flags & CALL_FLAGS_INITIALIZING))
-    g_return_val_if_fail (check_initialized (connection), FALSE);
+    xreturn_val_if_fail (check_initialized (connection), FALSE);
 
   if (reply_type == NULL)
     reply_type = G_VARIANT_TYPE_ANY;
@@ -6974,11 +6974,11 @@ xdbus_connection_register_subtree (xdbus_connection_t           *connection,
   xuint_t ret;
   ExportedSubtree *es;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
-  g_return_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), 0);
-  g_return_val_if_fail (vtable != NULL, 0);
-  g_return_val_if_fail (error == NULL || *error == NULL, 0);
-  g_return_val_if_fail (check_initialized (connection), 0);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), 0);
+  xreturn_val_if_fail (object_path != NULL && xvariant_is_object_path (object_path), 0);
+  xreturn_val_if_fail (vtable != NULL, 0);
+  xreturn_val_if_fail (error == NULL || *error == NULL, 0);
+  xreturn_val_if_fail (check_initialized (connection), 0);
 
   ret = 0;
 
@@ -7041,8 +7041,8 @@ xdbus_connection_unregister_subtree (xdbus_connection_t *connection,
   ExportedSubtree *es;
   xboolean_t ret;
 
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (check_initialized (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (check_initialized (connection), FALSE);
 
   ret = FALSE;
 
@@ -7202,7 +7202,7 @@ distribute_method_call (xdbus_connection_t *connection,
   xchar_t *needle;
   xboolean_t object_found = FALSE;
 
-  g_assert (xdbus_message_get_message_type (message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL);
+  xassert (xdbus_message_get_message_type (message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL);
 
   interface_name = xdbus_message_get_interface (message);
   member = xdbus_message_get_member (message);
@@ -7237,7 +7237,7 @@ distribute_method_call (xdbus_connection_t *connection,
     }
 
   object_path = xdbus_message_get_path (message);
-  g_assert (object_path != NULL);
+  xassert (object_path != NULL);
 
   eo = xhash_table_lookup (connection->map_object_path_to_eo, object_path);
   if (eo != NULL)
@@ -7390,7 +7390,7 @@ get_uninitialized_connection (xbus_type_t       bus_type,
       g_free (address);
     }
 
-  g_assert (ret != NULL);
+  xassert (ret != NULL);
 
  out:
   G_UNLOCK (message_bus_lock);
@@ -7471,7 +7471,7 @@ g_bus_get_sync (xbus_type_t       bus_type,
 
   _g_dbus_initialize ();
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   connection = get_uninitialized_connection (bus_type, cancellable, error);
   if (connection == NULL)
@@ -7499,7 +7499,7 @@ bus_get_async_initable_cb (xobject_t      *source_object,
                                      res,
                                      &error))
     {
-      g_assert (error != NULL);
+      xassert (error != NULL);
       xtask_return_error (task, error);
       xobject_unref (source_object);
     }
@@ -7545,7 +7545,7 @@ g_bus_get (xbus_type_t             bus_type,
   connection = get_uninitialized_connection (bus_type, cancellable, &error);
   if (connection == NULL)
     {
-      g_assert (error != NULL);
+      xassert (error != NULL);
       xtask_return_error (task, error);
       xobject_unref (task);
     }
@@ -7587,8 +7587,8 @@ xdbus_connection_t *
 g_bus_get_finish (xasync_result_t  *res,
                   xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, NULL), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, NULL), NULL);
+  xreturn_val_if_fail (error == NULL || *error == NULL, NULL);
 
   return xtask_propagate_pointer (XTASK (res), error);
 }

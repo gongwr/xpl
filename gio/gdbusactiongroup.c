@@ -252,10 +252,10 @@ xdbus_action_group_describe_all_done (xobject_t      *source,
   xdbus_action_group_t *group= user_data;
   xvariant_t *reply;
 
-  g_assert (group->actions == NULL);
+  xassert (group->actions == NULL);
   group->actions = xhash_table_new_full (xstr_hash, xstr_equal, NULL, action_info_free);
 
-  g_assert (group->connection == (xpointer_t) source);
+  xassert (group->connection == (xpointer_t) source);
   reply = xdbus_connection_call_finish (group->connection, result, NULL);
 
   if (reply != NULL)
@@ -439,7 +439,7 @@ xdbus_action_group_finalize (xobject_t *object)
   g_free (group->object_path);
   g_free (group->bus_name);
 
-  G_OBJECT_CLASS (xdbus_action_group_parent_class)
+  XOBJECT_CLASS (xdbus_action_group_parent_class)
     ->finalize (object);
 }
 
@@ -451,7 +451,7 @@ xdbus_action_group_init (xdbus_action_group_t *group)
 static void
 xdbus_action_group_class_init (xdbus_action_group_class_t *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = xdbus_action_group_finalize;
 }
@@ -504,7 +504,7 @@ xdbus_action_group_get (xdbus_connection_t *connection,
 {
   xdbus_action_group_t *group;
 
-  g_return_val_if_fail (bus_name != NULL || xdbus_connection_get_unique_name (connection) == NULL, NULL);
+  xreturn_val_if_fail (bus_name != NULL || xdbus_connection_get_unique_name (connection) == NULL, NULL);
 
   group = xobject_new (XTYPE_DBUS_ACTION_GROUP, NULL);
   group->connection = xobject_ref (connection);
@@ -521,7 +521,7 @@ xdbus_action_group_sync (xdbus_action_group_t  *group,
 {
   xvariant_t *reply;
 
-  g_assert (group->subscription_id == 0);
+  xassert (group->subscription_id == 0);
 
   group->subscription_id =
     xdbus_connection_signal_subscribe (group->connection, group->bus_name, "org.gtk.Actions", "Changed", group->object_path,
@@ -536,7 +536,7 @@ xdbus_action_group_sync (xdbus_action_group_t  *group,
       xvariant_iter_t *iter;
       action_info_t *action;
 
-      g_assert (group->actions == NULL);
+      xassert (group->actions == NULL);
       group->actions = xhash_table_new_full (xstr_hash, xstr_equal, NULL, action_info_free);
 
       xvariant_get (reply, "(a{s(bgav)})", &iter);

@@ -69,16 +69,16 @@ basic_callback (xobject_t      *object,
   xssize_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   *result_out = xtask_propagate_int (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -120,9 +120,9 @@ test_basic (void)
   xmain_loop_run (loop);
 
   g_assert_cmpint (result, ==, magic);
-  g_assert (task_data_destroyed == TRUE);
+  xassert (task_data_destroyed == TRUE);
   g_assert_true (notification_emitted);
-  g_assert (task == NULL);
+  xassert (task == NULL);
 }
 
 /* test_error */
@@ -135,17 +135,17 @@ error_callback (xobject_t      *object,
   xssize_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   *result_out = xtask_propagate_int (XTASK (result), &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
   xerror_free (error);
 
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -185,22 +185,22 @@ test_error (void)
   xsignal_connect (task, "notify::completed",
                     (xcallback_t) completed_cb, &notification_emitted);
 
-  g_assert (first_task_data_destroyed == FALSE);
+  xassert (first_task_data_destroyed == FALSE);
   xtask_set_task_data (task, &first_task_data_destroyed, error_destroy_notify);
-  g_assert (first_task_data_destroyed == FALSE);
+  xassert (first_task_data_destroyed == FALSE);
 
   /* Calling xtask_set_task_data() again will destroy the first data */
   xtask_set_task_data (task, &second_task_data_destroyed, error_destroy_notify);
-  g_assert (first_task_data_destroyed == TRUE);
-  g_assert (second_task_data_destroyed == FALSE);
+  xassert (first_task_data_destroyed == TRUE);
+  xassert (second_task_data_destroyed == FALSE);
 
   g_idle_add (error_return, task);
   xmain_loop_run (loop);
 
   g_assert_cmpint (result, ==, -1);
-  g_assert (second_task_data_destroyed == TRUE);
+  xassert (second_task_data_destroyed == TRUE);
   g_assert_true (notification_emitted);
-  g_assert (task == NULL);
+  xassert (task == NULL);
 }
 
 /* test_return_from_same_iteration: calling xtask_return_* from the
@@ -218,16 +218,16 @@ same_callback (xobject_t      *object,
   xboolean_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   *result_out = xtask_propagate_boolean (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -248,8 +248,8 @@ same_start (xpointer_t user_data)
   xobject_unref (task);
 
   /* same_callback should not have been invoked yet */
-  g_assert (same_result == FALSE);
-  g_assert (*weak_pointer == task);
+  xassert (same_result == FALSE);
+  xassert (*weak_pointer == task);
   g_assert_false (same_notification_emitted);
 
   return FALSE;
@@ -263,8 +263,8 @@ test_return_from_same_iteration (void)
   g_idle_add (same_start, &weak_pointer);
   xmain_loop_run (loop);
 
-  g_assert (same_result == TRUE);
-  g_assert (weak_pointer == NULL);
+  xassert (same_result == TRUE);
+  xassert (weak_pointer == NULL);
   g_assert_true (same_notification_emitted);
 }
 
@@ -281,16 +281,16 @@ toplevel_callback (xobject_t      *object,
   xboolean_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   *result_out = xtask_propagate_boolean (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -310,14 +310,14 @@ test_return_from_toplevel (void)
   xobject_unref (task);
 
   /* toplevel_callback should not have been invoked yet */
-  g_assert (result == FALSE);
-  g_assert (task != NULL);
+  xassert (result == FALSE);
+  xassert (task != NULL);
   g_assert_false (toplevel_notification_emitted);
 
   xmain_loop_run (loop);
 
-  g_assert (result == TRUE);
-  g_assert (task == NULL);
+  xassert (result == TRUE);
+  xassert (task == NULL);
   g_assert_true (toplevel_notification_emitted);
 }
 
@@ -337,18 +337,18 @@ anon_callback (xobject_t      *object,
   xssize_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
-  g_assert (xthread_self () == main_thread);
+  xassert (xthread_self () == main_thread);
 
   *result_out = xtask_propagate_int (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -392,7 +392,7 @@ test_return_from_anon_thread (void)
   xthread_join (anon_thread);
 
   g_assert_cmpint (result, ==, magic);
-  g_assert (task == NULL);
+  xassert (task == NULL);
   g_assert_true (anon_thread_notification_emitted);
 }
 
@@ -412,18 +412,18 @@ wrong_callback (xobject_t      *object,
   xssize_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
-  g_assert (xthread_self () == main_thread);
+  xassert (xthread_self () == main_thread);
 
   *result_out = xtask_propagate_int (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -437,7 +437,7 @@ wronxthread_func (xpointer_t user_data)
   context = xmain_context_new ();
   xmain_context_push_thread_default (context);
 
-  g_assert (xtask_get_context (task) != context);
+  xassert (xtask_get_context (task) != context);
 
   xtask_return_int (task, magic);
   xobject_unref (task);
@@ -476,7 +476,7 @@ test_return_from_wronxthread (void)
   xthread_join (wronxthread);
 
   g_assert_cmpint (result, ==, magic);
-  g_assert (task == NULL);
+  xassert (task == NULL);
   g_assert_true (wronxthread_notification_emitted);
 }
 
@@ -514,12 +514,12 @@ report_callback (xobject_t      *object,
   xerror_t *error = NULL;
   xssize_t ret;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (xasync_result_is_tagged (result, test_report_error));
-  g_assert (xtask_get_source_tag (XTASK (result)) == test_report_error);
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (xasync_result_is_tagged (result, test_report_error));
+  xassert (xtask_get_source_tag (XTASK (result)) == test_report_error);
+  xassert (xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   ret = xtask_propagate_int (XTASK (result), &error);
@@ -527,7 +527,7 @@ report_callback (xobject_t      *object,
   g_assert_cmpint (ret, ==, -1);
   xerror_free (error);
 
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (xtask_had_error (XTASK (result)));
 
   *weak_pointer = result;
   xobject_add_weak_pointer (G_OBJECT (result), weak_pointer);
@@ -548,7 +548,7 @@ test_report_error (void)
                            "Failed");
   xmain_loop_run (loop);
 
-  g_assert (weak_pointer == NULL);
+  xassert (weak_pointer == NULL);
   g_assert_true (error_notification_emitted);
 }
 
@@ -564,16 +564,16 @@ priority_callback (xobject_t      *object,
   xssize_t *ret_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   xtask_propagate_boolean (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   *ret_out = ++counter;
 
@@ -707,7 +707,7 @@ asynchronous_cancellation_cancel_task (xpointer_t user_data)
   xcancellable_cancel (cancellable);
   g_assert_false (xtask_get_completed (task));
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 /* asynchronous_cancellation_cancelled is the xcancellable_t::cancelled
@@ -818,32 +818,32 @@ cancel_callback (xobject_t      *object,
   xcancellable_t *cancellable;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
 
   task = XTASK (result);
   cancellable = xtask_get_cancellable (task);
-  g_assert (X_IS_CANCELLABLE (cancellable));
+  xassert (X_IS_CANCELLABLE (cancellable));
 
   if (state & (CANCEL_BEFORE | CANCEL_AFTER))
-    g_assert (xcancellable_is_cancelled (cancellable));
+    xassert (xcancellable_is_cancelled (cancellable));
   else
-    g_assert (!xcancellable_is_cancelled (cancellable));
+    xassert (!xcancellable_is_cancelled (cancellable));
 
   if (state & CHECK_CANCELLABLE)
-    g_assert (xtask_get_check_cancellable (task));
+    xassert (xtask_get_check_cancellable (task));
   else
-    g_assert (!xtask_get_check_cancellable (task));
+    xassert (!xtask_get_check_cancellable (task));
 
   if (xtask_propagate_boolean (task, &error))
     {
-      g_assert (!xcancellable_is_cancelled (cancellable) ||
+      xassert (!xcancellable_is_cancelled (cancellable) ||
                 !xtask_get_check_cancellable (task));
     }
   else
     {
-      g_assert (xcancellable_is_cancelled (cancellable) &&
+      xassert (xcancellable_is_cancelled (cancellable) &&
                 xtask_get_check_cancellable (task));
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
       xerror_free (error);
@@ -890,17 +890,17 @@ return_if_cancelled_callback (xobject_t      *object,
 {
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   xtask_propagate_boolean (XTASK (result), &error);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_clear_error (&error);
 
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -921,7 +921,7 @@ test_return_if_cancelled (void)
 
   xcancellable_cancel (cancellable);
   cancelled = xtask_return_error_if_cancelled (task);
-  g_assert (cancelled);
+  xassert (cancelled);
   g_assert_false (notification_emitted);
   xmain_loop_run (loop);
   xobject_unref (task);
@@ -937,7 +937,7 @@ test_return_if_cancelled (void)
   xtask_set_check_cancellable (task, FALSE);
   xcancellable_cancel (cancellable);
   cancelled = xtask_return_error_if_cancelled (task);
-  g_assert (cancelled);
+  xassert (cancelled);
   g_assert_false (notification_emitted);
   xmain_loop_run (loop);
   xobject_unref (task);
@@ -971,12 +971,12 @@ run_in_thread_callback (xobject_t      *object,
   xerror_t *error = NULL;
   xssize_t ret;
 
-  g_assert (xthread_self () == main_thread);
+  xassert (xthread_self () == main_thread);
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
   g_assert_cmpstr (xtask_get_name (XTASK (result)), ==, "test_run_in_thread name");
 
@@ -984,7 +984,7 @@ run_in_thread_callback (xobject_t      *object,
   g_assert_no_error (error);
   g_assert_cmpint (ret, ==, magic);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   *done = TRUE;
   xmain_loop_quit (loop);
@@ -998,13 +998,13 @@ run_in_thread_thread (xtask_t        *task,
 {
   xboolean_t *thread_ran = task_data;
 
-  g_assert (source_object == xtask_get_source_object (task));
-  g_assert (task_data == xtask_get_task_data (task));
-  g_assert (cancellable == xtask_get_cancellable (task));
+  xassert (source_object == xtask_get_source_object (task));
+  xassert (task_data == xtask_get_task_data (task));
+  xassert (cancellable == xtask_get_cancellable (task));
   g_assert_false (xtask_get_completed (task));
   g_assert_cmpstr (xtask_get_name (task), ==, "test_run_in_thread name");
 
-  g_assert (xthread_self () != main_thread);
+  xassert (xthread_self () != main_thread);
 
   g_mutex_lock (&run_in_thread_mutex);
   g_atomic_int_set (thread_ran, TRUE);
@@ -1037,12 +1037,12 @@ test_run_in_thread (void)
     g_cond_wait (&run_in_thread_cond, &run_in_thread_mutex);
   g_mutex_unlock (&run_in_thread_mutex);
 
-  g_assert (done == FALSE);
+  xassert (done == FALSE);
   g_assert_false (g_atomic_int_get (&weak_notify_ran));
 
   xmain_loop_run (loop);
 
-  g_assert (done == TRUE);
+  xassert (done == TRUE);
   g_assert_true (notification_emitted);
 
   g_assert_cmpstr (xtask_get_name (task), ==, "test_run_in_thread name");
@@ -1074,12 +1074,12 @@ run_in_thread_sync_thread (xtask_t        *task,
 {
   xboolean_t *thread_ran = task_data;
 
-  g_assert (source_object == xtask_get_source_object (task));
-  g_assert (task_data == xtask_get_task_data (task));
-  g_assert (cancellable == xtask_get_cancellable (task));
+  xassert (source_object == xtask_get_source_object (task));
+  xassert (task_data == xtask_get_task_data (task));
+  xassert (cancellable == xtask_get_cancellable (task));
   g_assert_false (xtask_get_completed (task));
 
-  g_assert (xthread_self () != main_thread);
+  xassert (xthread_self () != main_thread);
 
   g_atomic_int_set (thread_ran, TRUE);
   xtask_return_int (task, magic);
@@ -1103,8 +1103,8 @@ test_run_in_thread_sync (void)
   xtask_run_in_thread_sync (task, run_in_thread_sync_thread);
 
   g_assert_true (g_atomic_int_get (&thread_ran));
-  g_assert (task != NULL);
-  g_assert (!xtask_had_error (task));
+  xassert (task != NULL);
+  xassert (!xtask_had_error (task));
   g_assert_true (xtask_get_completed (task));
   g_assert_true (notification_emitted);
 
@@ -1112,7 +1112,7 @@ test_run_in_thread_sync (void)
   g_assert_no_error (error);
   g_assert_cmpint (ret, ==, magic);
 
-  g_assert (!xtask_had_error (task));
+  xassert (!xtask_had_error (task));
 
   xobject_unref (task);
 }
@@ -1130,19 +1130,19 @@ quit_main_loop_callback (xobject_t      *object,
   xerror_t *error = NULL;
   xboolean_t ret;
 
-  g_assert (xthread_self () == main_thread);
+  xassert (xthread_self () == main_thread);
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   ret = xtask_propagate_boolean (XTASK (result), &error);
   g_assert_no_error (error);
   g_assert_cmpint (ret, ==, TRUE);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -1429,12 +1429,12 @@ return_on_cancel_callback (xobject_t      *object,
   xerror_t *error = NULL;
   xssize_t ret;
 
-  g_assert (xthread_self () == main_thread);
+  xassert (xthread_self () == main_thread);
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   ret = xtask_propagate_int (XTASK (result), &error);
@@ -1442,7 +1442,7 @@ return_on_cancel_callback (xobject_t      *object,
   g_clear_error (&error);
   g_assert_cmpint (ret, ==, -1);
 
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (xtask_had_error (XTASK (result)));
 
   *callback_ran = TRUE;
   xmain_loop_quit (loop);
@@ -1456,11 +1456,11 @@ return_on_cancel_thread (xtask_t        *task,
 {
   ThreadState *state = task_data;
 
-  g_assert (source_object == xtask_get_source_object (task));
-  g_assert (task_data == xtask_get_task_data (task));
-  g_assert (cancellable == xtask_get_cancellable (task));
+  xassert (source_object == xtask_get_source_object (task));
+  xassert (task_data == xtask_get_task_data (task));
+  xassert (cancellable == xtask_get_cancellable (task));
 
-  g_assert (xthread_self () != main_thread);
+  xassert (xthread_self () != main_thread);
 
   g_mutex_lock (&roc_init_mutex);
   *state = THREAD_RUNNING;
@@ -1514,14 +1514,14 @@ test_return_on_cancel (void)
   g_mutex_unlock (&roc_init_mutex);
 
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
-  g_assert (callback_ran == FALSE);
+  xassert (callback_ran == FALSE);
 
   xcancellable_cancel (cancellable);
   g_mutex_unlock (&roc_finish_mutex);
   xmain_loop_run (loop);
 
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_COMPLETED);
-  g_assert (callback_ran == TRUE);
+  xassert (callback_ran == TRUE);
   g_assert_true (notification_emitted);
 
   xcancellable_reset (cancellable);
@@ -1547,12 +1547,12 @@ test_return_on_cancel (void)
   g_mutex_unlock (&roc_init_mutex);
 
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
-  g_assert (callback_ran == FALSE);
+  xassert (callback_ran == FALSE);
 
   xcancellable_cancel (cancellable);
   xmain_loop_run (loop);
   g_assert_cmpint (g_atomic_int_get (&thread_state), ==, THREAD_RUNNING);
-  g_assert (callback_ran == TRUE);
+  xassert (callback_ran == TRUE);
 
   g_assert_false (g_atomic_int_get (&weak_notify_ran));
 
@@ -1589,7 +1589,7 @@ test_return_on_cancel (void)
   xobject_unref (task);
 
   xmain_loop_run (loop);
-  g_assert (callback_ran == TRUE);
+  xassert (callback_ran == TRUE);
 
   while (g_atomic_int_get (&thread_state) == THREAD_STARTING)
     g_cond_wait (&roc_init_cond, &roc_init_mutex);
@@ -1751,12 +1751,12 @@ return_on_cancel_atomic_callback (xobject_t      *object,
   xerror_t *error = NULL;
   xssize_t ret;
 
-  g_assert (xthread_self () == main_thread);
+  xassert (xthread_self () == main_thread);
 
-  g_assert (object == NULL);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (object == NULL);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   ret = xtask_propagate_int (XTASK (result), &error);
@@ -1764,7 +1764,7 @@ return_on_cancel_atomic_callback (xobject_t      *object,
   g_clear_error (&error);
   g_assert_cmpint (ret, ==, -1);
 
-  g_assert (xtask_had_error (XTASK (result)));
+  xassert (xtask_had_error (XTASK (result)));
 
   *callback_ran = TRUE;
   xmain_loop_quit (loop);
@@ -1778,12 +1778,12 @@ return_on_cancel_atomic_thread (xtask_t        *task,
 {
   xint_t *state = task_data;  /* (atomic) */
 
-  g_assert (source_object == xtask_get_source_object (task));
-  g_assert (task_data == xtask_get_task_data (task));
-  g_assert (cancellable == xtask_get_cancellable (task));
+  xassert (source_object == xtask_get_source_object (task));
+  xassert (task_data == xtask_get_task_data (task));
+  xassert (cancellable == xtask_get_cancellable (task));
   g_assert_false (xtask_get_completed (task));
 
-  g_assert (xthread_self () != main_thread);
+  xassert (xthread_self () != main_thread);
   g_assert_cmpint (g_atomic_int_get (state), ==, 0);
 
   g_mutex_lock (&roca_mutex_1);
@@ -1864,9 +1864,9 @@ test_return_on_cancel_atomic (void)
   /* callback assumes there'll be a cancelled error */
   xcancellable_cancel (cancellable);
 
-  g_assert (callback_ran == FALSE);
+  xassert (callback_ran == FALSE);
   xmain_loop_run (loop);
-  g_assert (callback_ran == TRUE);
+  xassert (callback_ran == TRUE);
   g_assert_true (notification_emitted);
 
   xcancellable_reset (cancellable);
@@ -1892,25 +1892,25 @@ test_return_on_cancel_atomic (void)
   while (g_atomic_int_get (&state) == 0)
     g_cond_wait (&roca_cond_1, &roca_mutex_1);
   g_assert_cmpint (g_atomic_int_get (&state), ==, 1);
-  g_assert (xtask_get_return_on_cancel (task));
+  xassert (xtask_get_return_on_cancel (task));
 
   while (g_atomic_int_get (&state) == 1)
     g_cond_wait (&roca_cond_2, &roca_mutex_2);
   g_assert_cmpint (g_atomic_int_get (&state), ==, 2);
-  g_assert (!xtask_get_return_on_cancel (task));
+  xassert (!xtask_get_return_on_cancel (task));
 
   xcancellable_cancel (cancellable);
   g_idle_add (idle_quit_loop, NULL);
   xmain_loop_run (loop);
-  g_assert (callback_ran == FALSE);
+  xassert (callback_ran == FALSE);
 
   while (g_atomic_int_get (&state) == 2)
     g_cond_wait (&roca_cond_1, &roca_mutex_1);
   g_assert_cmpint (g_atomic_int_get (&state), ==, 5);
-  g_assert (!xtask_get_return_on_cancel (task));
+  xassert (!xtask_get_return_on_cancel (task));
 
   xmain_loop_run (loop);
-  g_assert (callback_ran == TRUE);
+  xassert (callback_ran == TRUE);
   g_assert_true (notification_emitted);
 
   while (g_atomic_int_get (&state) == 5)
@@ -1969,7 +1969,7 @@ test_return_pointer (void)
   g_assert_cmpint (object->ref_count, ==, 1);
 
   ret = xtask_propagate_pointer (task, &error);
-  g_assert (ret == NULL);
+  xassert (ret == NULL);
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CANCELLED);
   g_clear_error (&error);
   g_assert_cmpint (object->ref_count, ==, 1);
@@ -1996,14 +1996,14 @@ test_return_pointer (void)
 
   ret = xtask_propagate_pointer (task, &error);
   g_assert_no_error (error);
-  g_assert (ret == object);
+  xassert (ret == object);
   g_assert_cmpint (object->ref_count, ==, 1);
 
   xobject_unref (task);
   g_assert_nonnull (task);
   g_assert_cmpint (object->ref_count, ==, 1);
   xobject_unref (object);
-  g_assert (object == NULL);
+  xassert (object == NULL);
 
   wait_for_completed_notification (task);
   g_assert_null (task);
@@ -2062,16 +2062,16 @@ keepalive_callback (xobject_t      *object,
   xssize_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == keepalive_object);
-  g_assert (xtask_is_valid (result, object));
-  g_assert (xasync_result_get_user_data (result) == user_data);
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (object == keepalive_object);
+  xassert (xtask_is_valid (result, object));
+  xassert (xasync_result_get_user_data (result) == user_data);
+  xassert (!xtask_had_error (XTASK (result)));
   g_assert_false (xtask_get_completed (XTASK (result)));
 
   *result_out = xtask_propagate_int (XTASK (result), &error);
   g_assert_no_error (error);
 
-  g_assert (!xtask_had_error (XTASK (result)));
+  xassert (!xtask_had_error (XTASK (result)));
 
   xmain_loop_quit (loop);
 }
@@ -2096,24 +2096,24 @@ test_object_keepalive (void)
   ref_count = object->ref_count;
   g_assert_cmpint (ref_count, >, 1);
 
-  g_assert (xtask_get_source_object (task) == object);
-  g_assert (xasync_result_get_source_object (G_ASYNC_RESULT (task)) == object);
+  xassert (xtask_get_source_object (task) == object);
+  xassert (xasync_result_get_source_object (G_ASYNC_RESULT (task)) == object);
   g_assert_cmpint (object->ref_count, ==, ref_count + 1);
   xobject_unref (object);
 
   xobject_unref (object);
-  g_assert (object != NULL);
+  xassert (object != NULL);
 
   xtask_return_int (task, magic);
   xmain_loop_run (loop);
 
-  g_assert (object != NULL);
+  xassert (object != NULL);
   g_assert_cmpint (result, ==, magic);
   g_assert_true (notification_emitted);
 
   xobject_unref (task);
-  g_assert (task == NULL);
-  g_assert (object == NULL);
+  xassert (task == NULL);
+  xassert (object == NULL);
 }
 
 /* test_legacy_error: legacy xsimple_async_result_t handling */
@@ -2127,15 +2127,15 @@ legacy_error_callback (xobject_t      *object,
   xssize_t *result_out = user_data;
   xerror_t *error = NULL;
 
-  g_assert (object == NULL);
-  g_assert (xasync_result_is_tagged (result, test_legacy_error));
-  g_assert (xasync_result_get_user_data (result) == user_data);
+  xassert (object == NULL);
+  xassert (xasync_result_is_tagged (result, test_legacy_error));
+  xassert (xasync_result_get_user_data (result) == user_data);
 
   if (xasync_result_legacy_propagate_error (result, &error))
     {
-      g_assert (!xtask_is_valid (result, object));
+      xassert (!xtask_is_valid (result, object));
       G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
-      g_assert (xsimple_async_result_is_valid (result, object, test_legacy_error));
+      xassert (xsimple_async_result_is_valid (result, object, test_legacy_error));
       G_GNUC_END_IGNORE_DEPRECATIONS;
 
       g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
@@ -2144,7 +2144,7 @@ legacy_error_callback (xobject_t      *object,
     }
   else
     {
-      g_assert (xtask_is_valid (result, object));
+      xassert (xtask_is_valid (result, object));
 
       *result_out = xtask_propagate_int (XTASK (result), NULL);
       /* Might be error, might not */
@@ -2196,7 +2196,7 @@ test_legacy_error (void)
   xmain_loop_run (loop);
 
   g_assert_cmpint (result, ==, magic);
-  g_assert (task == NULL);
+  xassert (task == NULL);
 
   /* xtask_t error */
   task = xtask_new (NULL, NULL, legacy_error_callback, &result);
@@ -2209,7 +2209,7 @@ test_legacy_error (void)
   xmain_loop_run (loop);
 
   g_assert_cmpint (result, ==, -1);
-  g_assert (task == NULL);
+  xassert (task == NULL);
 
   /* xsimple_async_result_t error */
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
@@ -2222,7 +2222,7 @@ test_legacy_error (void)
   xmain_loop_run (loop);
 
   g_assert_cmpint (result, ==, -2);
-  g_assert (simple == NULL);
+  xassert (simple == NULL);
 }
 
 /* Various helper functions for the return tests below. */
@@ -2264,7 +2264,7 @@ idle_cb (xpointer_t user_data)
   return_twice (task);
   xobject_unref (task);
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void

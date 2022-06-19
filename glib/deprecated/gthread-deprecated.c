@@ -290,7 +290,7 @@ g_enumerable_thread_remove (xpointer_t data)
   G_UNLOCK (xthread);
 }
 
-GPrivate enumerable_thread_private = G_PRIVATE_INIT (g_enumerable_thread_remove);
+xprivate_t enumerable_thread_private = G_PRIVATE_INIT (g_enumerable_thread_remove);
 
 static void
 g_enumerable_thread_add (GRealThread *thread)
@@ -1034,7 +1034,7 @@ g_static_rw_lock_reader_trylock (GStaticRWLock* lock)
 {
   xboolean_t ret_val = FALSE;
 
-  g_return_val_if_fail (lock, FALSE);
+  xreturn_val_if_fail (lock, FALSE);
 
   if (!xthreads_got_initialized)
     return TRUE;
@@ -1123,7 +1123,7 @@ g_static_rw_lock_writer_trylock (GStaticRWLock* lock)
 {
   xboolean_t ret_val = FALSE;
 
-  g_return_val_if_fail (lock, FALSE);
+  xreturn_val_if_fail (lock, FALSE);
 
   if (!xthreads_got_initialized)
     return TRUE;
@@ -1196,26 +1196,26 @@ g_static_rw_lock_free (GStaticRWLock* lock)
   g_static_mutex_free (&lock->mutex);
 }
 
-/* GPrivate {{{1 ------------------------------------------------------ */
+/* xprivate_t {{{1 ------------------------------------------------------ */
 
 /**
  * g_private_new:
  * @notify: a #xdestroy_notify_t
  *
- * Creates a new #GPrivate.
+ * Creates a new #xprivate_t.
  *
- * Deprecated:2.32: dynamic allocation of #GPrivate is a bad idea.  Use
+ * Deprecated:2.32: dynamic allocation of #xprivate_t is a bad idea.  Use
  *                  static storage and G_PRIVATE_INIT() instead.
  *
- * Returns: a newly allocated #GPrivate (which can never be destroyed)
+ * Returns: a newly allocated #xprivate_t (which can never be destroyed)
  */
-GPrivate *
+xprivate_t *
 g_private_new (xdestroy_notify_t notify)
 {
-  GPrivate tmp = G_PRIVATE_INIT (notify);
-  GPrivate *key;
+  xprivate_t tmp = G_PRIVATE_INIT (notify);
+  xprivate_t *key;
 
-  key = g_slice_new (GPrivate);
+  key = g_slice_new (xprivate_t);
   *key = tmp;
 
   return key;
@@ -1247,14 +1247,14 @@ g_static_private_cleanup (xpointer_t data)
   g_array_free (array, TRUE);
 }
 
-GPrivate static_private_private = G_PRIVATE_INIT (g_static_private_cleanup);
+xprivate_t static_private_private = G_PRIVATE_INIT (g_static_private_cleanup);
 
 /**
  * GStaticPrivate:
  *
- * A #GStaticPrivate works almost like a #GPrivate, but it has one
+ * A #GStaticPrivate works almost like a #xprivate_t, but it has one
  * significant advantage. It doesn't need to be created at run-time
- * like a #GPrivate, but can be defined at compile-time. This is
+ * like a #xprivate_t, but can be defined at compile-time. This is
  * similar to the difference between #xmutex_t and #GStaticMutex.
  *
  * Now look at our give_me_next_number() example with #GStaticPrivate:

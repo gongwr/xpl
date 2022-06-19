@@ -96,7 +96,7 @@ test_search (xconstpointer d)
           tests[i].should_match ? "should match" : "should NOT match",
           skipped ? "SKIPPED" : ok ? "OK" : "FAILED");
 
-      g_assert (skipped || ok);
+      xassert (skipped || ok);
     }
 
   if (all_skipped)

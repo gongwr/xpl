@@ -62,7 +62,7 @@ struct _GProxyAddressEnumerator
 struct _GProxyAddressEnumeratorClass
 {
   /*< private >*/
-  GSocketAddressEnumeratorClass parent_class;
+  xsocket_address_enumerator_class_t parent_class;
 
   void (*_g_reserved1) (void);
   void (*_g_reserved2) (void);

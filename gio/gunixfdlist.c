@@ -73,14 +73,14 @@ g_unix_fd_list_finalize (xobject_t *object)
     close (list->priv->fds[i]);
   g_free (list->priv->fds);
 
-  G_OBJECT_CLASS (g_unix_fd_list_parent_class)
+  XOBJECT_CLASS (g_unix_fd_list_parent_class)
     ->finalize (object);
 }
 
 static void
 g_unix_fd_list_class_init (GUnixFDListClass *class)
 {
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   object_class->finalize = g_unix_fd_list_finalize;
 }
@@ -181,7 +181,7 @@ g_unix_fd_list_new_from_array (const xint_t *fds,
 {
   xunix_fd_list_t *list;
 
-  g_return_val_if_fail (fds != NULL || n_fds == 0, NULL);
+  xreturn_val_if_fail (fds != NULL || n_fds == 0, NULL);
 
   if (n_fds == -1)
     for (n_fds = 0; fds[n_fds] != -1; n_fds++);
@@ -233,7 +233,7 @@ g_unix_fd_list_steal_fds (xunix_fd_list_t *list,
 {
   xint_t *result;
 
-  g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), NULL);
+  xreturn_val_if_fail (X_IS_UNIX_FD_LIST (list), NULL);
 
   /* will be true for fresh object or if we were just called */
   if (list->priv->fds == NULL)
@@ -282,7 +282,7 @@ const xint_t *
 g_unix_fd_list_peek_fds (xunix_fd_list_t *list,
                          xint_t        *length)
 {
-  g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), NULL);
+  xreturn_val_if_fail (X_IS_UNIX_FD_LIST (list), NULL);
 
   /* will be true for fresh object or if steal() was just called */
   if (list->priv->fds == NULL)
@@ -329,9 +329,9 @@ g_unix_fd_list_append (xunix_fd_list_t  *list,
 {
   xint_t new_fd;
 
-  g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), -1);
-  g_return_val_if_fail (fd >= 0, -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (X_IS_UNIX_FD_LIST (list), -1);
+  xreturn_val_if_fail (fd >= 0, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   if ((new_fd = dup_close_on_exec_fd (fd, error)) < 0)
     return -1;
@@ -373,9 +373,9 @@ g_unix_fd_list_get (xunix_fd_list_t  *list,
                     xint_t          index_,
                     xerror_t      **error)
 {
-  g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), -1);
-  g_return_val_if_fail (index_ < list->priv->nfd, -1);
-  g_return_val_if_fail (error == NULL || *error == NULL, -1);
+  xreturn_val_if_fail (X_IS_UNIX_FD_LIST (list), -1);
+  xreturn_val_if_fail (index_ < list->priv->nfd, -1);
+  xreturn_val_if_fail (error == NULL || *error == NULL, -1);
 
   return dup_close_on_exec_fd (list->priv->fds[index_], error);
 }
@@ -394,7 +394,7 @@ g_unix_fd_list_get (xunix_fd_list_t  *list,
 xint_t
 g_unix_fd_list_get_length (xunix_fd_list_t *list)
 {
-  g_return_val_if_fail (X_IS_UNIX_FD_LIST (list), 0);
+  xreturn_val_if_fail (X_IS_UNIX_FD_LIST (list), 0);
 
   return list->priv->nfd;
 }

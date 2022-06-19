@@ -83,7 +83,7 @@ static xboolean_t
 _give_up (xpointer_t data)
 {
   xerror ("%s", (const xchar_t *) data);
-  g_return_val_if_reached (G_SOURCE_CONTINUE);
+  xreturn_val_if_reached (G_SOURCE_CONTINUE);
 }
 
 typedef struct
@@ -101,7 +101,7 @@ name_appeared_cb (xdbus_connection_t *connection,
 {
   WatchData *data = user_data;
 
-  g_assert (name_owner != NULL);
+  xassert (name_owner != NULL);
   data->name_appeared = TRUE;
   xmain_context_wakeup (data->context);
 }

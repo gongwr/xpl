@@ -225,10 +225,10 @@ typedef void (*GTestFixtureFunc) (xpointer_t      fixture,
 #define g_assert_not_reached()          G_STMT_START { (void) 0; } G_STMT_END
 #endif
 
-#define g_assert(expr)                  G_STMT_START { (void) 0; } G_STMT_END
+#define xassert(expr)                  G_STMT_START { (void) 0; } G_STMT_END
 #else /* !G_DISABLE_ASSERT */
 #define g_assert_not_reached()          G_STMT_START { g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, NULL); } G_STMT_END
-#define g_assert(expr)                  G_STMT_START { \
+#define xassert(expr)                  G_STMT_START { \
                                              if G_LIKELY (expr) ; else \
                                                g_assertion_message_expr (G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, \
                                                                          #expr); \
@@ -286,9 +286,9 @@ void    g_test_init                     (int            *argc,
  */
 #define G_TEST_OPTION_ISOLATE_DIRS "isolate_dirs"
 
-/* While we discourage its use, g_assert() is often used in unit tests
+/* While we discourage its use, xassert() is often used in unit tests
  * (especially in legacy code). g_assert_*() should really be used instead.
- * g_assert() can be disabled at client program compile time, which can render
+ * xassert() can be disabled at client program compile time, which can render
  * tests useless. Highlight that to the user. */
 #ifdef G_DISABLE_ASSERT
 #if defined(G_HAVE_ISO_VARARGS)

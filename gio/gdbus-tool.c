@@ -88,7 +88,7 @@ remove_arg (xint_t num, xint_t *argc, xchar_t **argv[])
 {
   xint_t n;
 
-  g_assert (num <= (*argc));
+  xassert (num <= (*argc));
 
   for (n = num; (*argv)[n] != NULL; n++)
     (*argv)[n] = (*argv)[n+1];
@@ -141,8 +141,8 @@ modify_argv0_for_command (xint_t *argc, xchar_t **argv[], const xchar_t *command
    *  2. save old argv[0] and restore later
    */
 
-  g_assert (*argc > 1);
-  g_assert (xstrcmp0 ((*argv)[1], command) == 0);
+  xassert (*argc > 1);
+  xassert (xstrcmp0 ((*argv)[1], command) == 0);
   remove_arg (1, argc, argv);
 
   program_name = g_path_get_basename ((*argv)[0]);
@@ -1962,7 +1962,7 @@ monitor_on_name_appeared (xdbus_connection_t *connection,
                           xpointer_t user_data)
 {
   g_print ("The name %s is owned by %s\n", name, name_owner);
-  g_assert (monitor_filter_id == 0);
+  xassert (monitor_filter_id == 0);
   monitor_filter_id = xdbus_connection_signal_subscribe (connection,
                                                           name_owner,
                                                           NULL,  /* any interface */

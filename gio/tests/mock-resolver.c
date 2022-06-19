@@ -29,7 +29,7 @@ struct _MockResolver
   xerror_t *ipv6_error;
 };
 
-G_DEFINE_TYPE (MockResolver, mock_resolver, XTYPE_RESOLVER)
+XDEFINE_TYPE (MockResolver, mock_resolver, XTYPE_RESOLVER)
 
 MockResolver *
 mock_resolver_new (void)
@@ -146,13 +146,13 @@ lookup_by_name_cb (xpointer_t user_data)
   else if (flags == G_RESOLVER_NAME_LOOKUP_FLAGS_DEFAULT)
     {
       /* This is only the minimal implementation needed for some tests */
-      g_assert (self->ipv4_error == NULL && self->ipv6_error == NULL && self->ipv6_results == NULL);
+      xassert (self->ipv4_error == NULL && self->ipv6_error == NULL && self->ipv6_results == NULL);
       xtask_return_pointer (task, xlist_copy_deep (self->ipv4_results, copy_object, NULL), NULL);
     }
   else
     g_assert_not_reached ();
 
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 static void
@@ -181,7 +181,7 @@ async_result_cb (xobject_t      *source_object,
 {
   xasync_result_t **result_out = user_data;
 
-  g_assert (*result_out == NULL);
+  xassert (*result_out == NULL);
   *result_out = xobject_ref (result);
 
   xmain_context_wakeup (xmain_context_get_thread_default ());
@@ -243,14 +243,14 @@ mock_resolver_finalize (xobject_t *object)
   if (self->ipv4_results)
     xlist_free_full (self->ipv4_results, xobject_unref);
 
-  G_OBJECT_CLASS (mock_resolver_parent_class)->finalize (object);
+  XOBJECT_CLASS (mock_resolver_parent_class)->finalize (object);
 }
 
 static void
 mock_resolver_class_init (MockResolverClass *klass)
 {
   GResolverClass *resolver_class = G_RESOLVER_CLASS (klass);
-  xobject_class_t *object_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *object_class = XOBJECT_CLASS (klass);
   resolver_class->lookup_by_name_with_flags_async  = lookup_by_name_with_flags_async;
   resolver_class->lookup_by_name_with_flags_finish = lookup_by_name_with_flags_finish;
   resolver_class->lookup_by_name = lookup_by_name;

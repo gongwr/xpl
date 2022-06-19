@@ -90,7 +90,7 @@ server_new_for_mechanism (const xchar_t *allowed_mechanism)
                                    NULL, /* cancellable */
                                    &error);
   g_assert_no_error (error);
-  g_assert (server != NULL);
+  xassert (server != NULL);
 
   xsignal_connect (auth_observer,
                     "allow-mechanism",
@@ -121,7 +121,7 @@ test_auth_on_timeout (xpointer_t user_data)
 {
   xerror ("Timeout waiting for client");
   g_assert_not_reached ();
-  return G_SOURCE_REMOVE;
+  return XSOURCE_REMOVE;
 }
 
 
@@ -153,7 +153,7 @@ test_auth_client_thread_func (xpointer_t user_data)
                                               NULL, /* xcancellable_t */
                                               &error);
   g_assert_no_error (error);
-  g_assert (c != NULL);
+  xassert (c != NULL);
   g_clear_object (&c);
   g_clear_object (&auth_observer);
   return NULL;
@@ -245,10 +245,10 @@ temp_dbus_keyrings_setup (void)
 {
   xerror_t *error = NULL;
 
-  g_assert (temp_dbus_keyrings_dir == NULL);
+  xassert (temp_dbus_keyrings_dir == NULL);
   temp_dbus_keyrings_dir = g_dir_make_tmp ("gdbus-test-dbus-keyrings-XXXXXX", &error);
   g_assert_no_error (error);
-  g_assert (temp_dbus_keyrings_dir != NULL);
+  xassert (temp_dbus_keyrings_dir != NULL);
   g_setenv ("G_DBUS_COOKIE_SHA1_KEYRING_DIR", temp_dbus_keyrings_dir, TRUE);
   g_setenv ("G_DBUS_COOKIE_SHA1_KEYRING_DIR_IGNORE_PERMISSION", "1", TRUE);
 }
@@ -260,19 +260,19 @@ temp_dbus_keyrings_teardown (void)
   xerror_t *error = NULL;
   const xchar_t *name;
 
-  g_assert (temp_dbus_keyrings_dir != NULL);
+  xassert (temp_dbus_keyrings_dir != NULL);
 
   dir = g_dir_open (temp_dbus_keyrings_dir, 0, &error);
   g_assert_no_error (error);
-  g_assert (dir != NULL);
+  xassert (dir != NULL);
   while ((name = g_dir_read_name (dir)) != NULL)
     {
       xchar_t *path = g_build_filename (temp_dbus_keyrings_dir, name, NULL);
-      g_assert (unlink (path) == 0);
+      xassert (unlink (path) == 0);
       g_free (path);
     }
   g_dir_close (dir);
-  g_assert (rmdir (temp_dbus_keyrings_dir) == 0);
+  xassert (rmdir (temp_dbus_keyrings_dir) == 0);
 
   g_free (temp_dbus_keyrings_dir);
   temp_dbus_keyrings_dir = NULL;

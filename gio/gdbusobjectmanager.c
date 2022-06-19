@@ -223,7 +223,7 @@ g_dbus_object_manager_get_object (xdbus_object_manager_t *manager,
                                   const xchar_t        *object_path)
 {
   xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
   return iface->get_object (manager, object_path);
 }
 
@@ -247,7 +247,7 @@ g_dbus_object_manager_get_interface (xdbus_object_manager_t *manager,
                                      const xchar_t        *interface_name)
 {
   xdbus_object_manager_iface_t *iface = G_DBUS_OBJECT_MANAGER_GET_IFACE (manager);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), NULL);
-  g_return_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), NULL);
+  xreturn_val_if_fail (g_dbus_is_interface_name (interface_name), NULL);
   return iface->get_interface (manager, object_path, interface_name);
 }

@@ -60,10 +60,10 @@ xio_stream_t *           xtls_client_connection_new                  (xio_stream
 								    xerror_t                 **error);
 
 XPL_DEPRECATED_IN_2_72
-GTlsCertificateFlags  xtls_client_connection_get_validation_flags (xtls_client_connection_t    *conn);
+xtls_certificate_flags_t  xtls_client_connection_get_validation_flags (xtls_client_connection_t    *conn);
 XPL_DEPRECATED_IN_2_72
 void                  xtls_client_connection_set_validation_flags (xtls_client_connection_t    *conn,
-								    GTlsCertificateFlags     flags);
+								    xtls_certificate_flags_t     flags);
 XPL_AVAILABLE_IN_ALL
 xsocket_connectable_t   *xtls_client_connection_get_server_identity  (xtls_client_connection_t    *conn);
 XPL_AVAILABLE_IN_ALL

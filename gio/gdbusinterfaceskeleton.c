@@ -119,7 +119,7 @@ g_dbus_interface_skeleton_finalize (xobject_t *object)
 
   g_mutex_clear (&interface->priv->lock);
 
-  G_OBJECT_CLASS (g_dbus_interface_skeleton_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_dbus_interface_skeleton_parent_class)->finalize (object);
 }
 
 static void
@@ -172,12 +172,12 @@ g_dbus_interface_skeleton_g_authorize_method_default (xdbus_interface_skeleton_t
 static void
 g_dbus_interface_skeleton_class_init (GDBusInterfaceSkeletonClass *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize     = g_dbus_interface_skeleton_finalize;
-  gobject_class->set_property = g_dbus_interface_skeleton_set_property;
-  gobject_class->get_property = g_dbus_interface_skeleton_get_property;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize     = g_dbus_interface_skeleton_finalize;
+  xobject_class->set_property = g_dbus_interface_skeleton_set_property;
+  xobject_class->get_property = g_dbus_interface_skeleton_get_property;
 
   klass->g_authorize_method = g_dbus_interface_skeleton_g_authorize_method_default;
 
@@ -188,16 +188,16 @@ g_dbus_interface_skeleton_class_init (GDBusInterfaceSkeletonClass *klass)
    *
    * Since: 2.30
    */
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_G_FLAGS,
-                                   g_param_spec_flags ("g-flags",
+                                   xparam_spec_flags ("g-flags",
                                                        "g-flags",
                                                        "Flags for the interface skeleton",
                                                        XTYPE_DBUS_INTERFACE_SKELETON_FLAGS,
                                                        G_DBUS_INTERFACE_SKELETON_FLAGS_NONE,
-                                                       G_PARAM_READABLE |
-                                                       G_PARAM_WRITABLE |
-                                                       G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_READABLE |
+                                                       XPARAM_WRITABLE |
+                                                       XPARAM_STATIC_STRINGS));
 
   /**
    * xdbus_interface_skeleton_t::g-authorize-method:
@@ -281,7 +281,7 @@ g_dbus_interface_skeleton_init (xdbus_interface_skeleton_t *interface)
 GDBusInterfaceSkeletonFlags
 g_dbus_interface_skeleton_get_flags (xdbus_interface_skeleton_t  *interface_)
 {
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), G_DBUS_INTERFACE_SKELETON_FLAGS_NONE);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), G_DBUS_INTERFACE_SKELETON_FLAGS_NONE);
   return interface_->priv->flags;
 }
 
@@ -327,7 +327,7 @@ xdbus_interface_info_t *
 g_dbus_interface_skeleton_get_info (xdbus_interface_skeleton_t *interface_)
 {
   xdbus_interface_info_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
   ret = G_DBUS_INTERFACE_SKELETON_GET_CLASS (interface_)->get_info (interface_);
   g_warn_if_fail (ret != NULL);
   return ret;
@@ -349,7 +349,7 @@ xdbus_interface_vtable_t *
 g_dbus_interface_skeleton_get_vtable (xdbus_interface_skeleton_t *interface_)
 {
   xdbus_interface_vtable_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
   ret = G_DBUS_INTERFACE_SKELETON_GET_CLASS (interface_)->get_vtable (interface_);
   g_warn_if_fail (ret != NULL);
   return ret;
@@ -371,7 +371,7 @@ xvariant_t *
 g_dbus_interface_skeleton_get_properties (xdbus_interface_skeleton_t *interface_)
 {
   xvariant_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
   ret = G_DBUS_INTERFACE_SKELETON_GET_CLASS (interface_)->get_properties (interface_);
   return xvariant_take_ref (ret);
 }
@@ -778,7 +778,7 @@ g_dbus_interface_skeleton_get_connection (xdbus_interface_skeleton_t *interface_
   ConnectionData  *data;
   xdbus_connection_t *ret;
 
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
   g_mutex_lock (&interface_->priv->lock);
 
   ret = NULL;
@@ -814,7 +814,7 @@ g_dbus_interface_skeleton_get_connections (xdbus_interface_skeleton_t *interface
   xslist_t          *l;
   ConnectionData  *data;
 
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
 
   g_mutex_lock (&interface_->priv->lock);
   connections = NULL;
@@ -850,8 +850,8 @@ g_dbus_interface_skeleton_has_connection (xdbus_interface_skeleton_t     *interf
   xslist_t *l;
   xboolean_t ret = FALSE;
 
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), FALSE);
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
 
   g_mutex_lock (&interface_->priv->lock);
 
@@ -885,7 +885,7 @@ const xchar_t *
 g_dbus_interface_skeleton_get_object_path (xdbus_interface_skeleton_t *interface_)
 {
   const xchar_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), NULL);
   g_mutex_lock (&interface_->priv->lock);
   ret = interface_->priv->object_path;
   g_mutex_unlock (&interface_->priv->lock);
@@ -920,13 +920,13 @@ g_dbus_interface_skeleton_export (xdbus_interface_skeleton_t  *interface_,
 {
   xboolean_t ret = FALSE;
 
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), FALSE);
-  g_return_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
-  g_return_val_if_fail (xvariant_is_object_path (object_path), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE_SKELETON (interface_), FALSE);
+  xreturn_val_if_fail (X_IS_DBUS_CONNECTION (connection), FALSE);
+  xreturn_val_if_fail (xvariant_is_object_path (object_path), FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   /* Assert that the object path is the same for multiple connections here */
-  g_return_val_if_fail (interface_->priv->object_path == NULL ||
+  xreturn_val_if_fail (interface_->priv->object_path == NULL ||
                         xstrcmp0 (interface_->priv->object_path, object_path) == 0, FALSE);
 
   g_mutex_lock (&interface_->priv->lock);
@@ -960,8 +960,8 @@ g_dbus_interface_skeleton_unexport (xdbus_interface_skeleton_t *interface_)
 
   g_mutex_lock (&interface_->priv->lock);
 
-  g_assert (interface_->priv->object_path != NULL);
-  g_assert (interface_->priv->hooked_vtable != NULL);
+  xassert (interface_->priv->object_path != NULL);
+  xassert (interface_->priv->hooked_vtable != NULL);
 
   /* Remove all connections */
   while (interface_->priv->connections != NULL)
@@ -999,8 +999,8 @@ g_dbus_interface_skeleton_unexport_from_connection (xdbus_interface_skeleton_t *
 
   g_mutex_lock (&interface_->priv->lock);
 
-  g_assert (interface_->priv->object_path != NULL);
-  g_assert (interface_->priv->hooked_vtable != NULL);
+  xassert (interface_->priv->object_path != NULL);
+  xassert (interface_->priv->hooked_vtable != NULL);
 
   remove_connection_locked (interface_, connection);
 

@@ -51,12 +51,12 @@ typedef struct {
 } MyOutputStream;
 
 typedef struct {
-    GFilterOutputStreamClass parent;
+    xfilter_output_stream_class_t parent;
 } MyOutputStreamClass;
 
 static xtype_t my_output_stream_get_type (void) G_GNUC_CONST;
 
-G_DEFINE_TYPE (MyOutputStream, my_output_stream, XTYPE_FILTER_OUTPUT_STREAM)
+XDEFINE_TYPE (MyOutputStream, my_output_stream, XTYPE_FILTER_OUTPUT_STREAM)
 
 /* Called from GDBusWorker thread */
 static xssize_t

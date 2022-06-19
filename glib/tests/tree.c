@@ -54,7 +54,7 @@ my_compare_with_data (xconstpointer a,
   const char *chb = b;
 
   /* just check that we got the right data */
-  g_assert (GPOINTER_TO_INT(user_data) == 123);
+  xassert (GPOINTER_TO_INT(user_data) == 123);
 
   return *cha - *chb;
 }
@@ -92,7 +92,7 @@ my_traverse (xpointer_t key,
 {
   char *ch = key;
 
-  g_assert ((*ch) > 0);
+  xassert ((*ch) > 0);
 
   if (*ch == 'd')
     return TRUE;
@@ -117,7 +117,7 @@ check_order (xpointer_t key,
   char **p = data;
   char *ch = key;
 
-  g_assert (**p == *ch);
+  xassert (**p == *ch);
 
   (*p)++;
 
@@ -149,12 +149,12 @@ test_tree_search (void)
   for (i = 0; i < 26; i++)
     {
       removed = xtree_remove (tree, &chars[i + 10]);
-      g_assert (removed);
+      xassert (removed);
     }
 
   c = '\0';
   removed = xtree_remove (tree, &c);
-  g_assert (!removed);
+  xassert (!removed);
 
   xtree_foreach (tree, my_traverse, NULL);
 
@@ -172,61 +172,61 @@ test_tree_search (void)
 
   c = '0';
   p = xtree_lookup (tree, &c);
-  g_assert (p && *p == c);
-  g_assert (xtree_lookup_extended (tree, &c, (xpointer_t *)&d, (xpointer_t *)&p));
-  g_assert (c == *d && c == *p);
+  xassert (p && *p == c);
+  xassert (xtree_lookup_extended (tree, &c, (xpointer_t *)&d, (xpointer_t *)&p));
+  xassert (c == *d && c == *p);
 
   c = 'A';
   p = xtree_lookup (tree, &c);
-  g_assert (p && *p == c);
+  xassert (p && *p == c);
 
   c = 'a';
   p = xtree_lookup (tree, &c);
-  g_assert (p && *p == c);
+  xassert (p && *p == c);
 
   c = 'z';
   p = xtree_lookup (tree, &c);
-  g_assert (p && *p == c);
+  xassert (p && *p == c);
 
   c = '!';
   p = xtree_lookup (tree, &c);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 
   c = '=';
   p = xtree_lookup (tree, &c);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 
   c = '|';
   p = xtree_lookup (tree, &c);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 
   c = '0';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p && *p == c);
+  xassert (p && *p == c);
 
   c = 'A';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p && *p == c);
+  xassert (p && *p == c);
 
   c = 'a';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p &&*p == c);
+  xassert (p &&*p == c);
 
   c = 'z';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p && *p == c);
+  xassert (p && *p == c);
 
   c = '!';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 
   c = '=';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 
   c = '|';
   p = xtree_search (tree, my_search, &c);
-  g_assert (p == NULL);
+  xassert (p == NULL);
 
   xtree_destroy (tree);
 }
@@ -249,37 +249,37 @@ test_tree_remove (void)
 
   c = '0';
   xtree_insert (tree, &c, &c);
-  g_assert (destroyed_key == &c);
-  g_assert (destroyed_value == &chars[0]);
+  xassert (destroyed_key == &c);
+  xassert (destroyed_value == &chars[0]);
   destroyed_key = NULL;
   destroyed_value = NULL;
 
   d = '1';
   xtree_replace (tree, &d, &d);
-  g_assert (destroyed_key == &chars[1]);
-  g_assert (destroyed_value == &chars[1]);
+  xassert (destroyed_key == &chars[1]);
+  xassert (destroyed_value == &chars[1]);
   destroyed_key = NULL;
   destroyed_value = NULL;
 
   c = '2';
   removed = xtree_remove (tree, &c);
-  g_assert (removed);
-  g_assert (destroyed_key == &chars[2]);
-  g_assert (destroyed_value == &chars[2]);
+  xassert (removed);
+  xassert (destroyed_key == &chars[2]);
+  xassert (destroyed_value == &chars[2]);
   destroyed_key = NULL;
   destroyed_value = NULL;
 
   c = '3';
   removed = xtree_steal (tree, &c);
-  g_assert (removed);
-  g_assert (destroyed_key == NULL);
-  g_assert (destroyed_value == NULL);
+  xassert (removed);
+  xassert (destroyed_key == NULL);
+  xassert (destroyed_value == NULL);
 
   remove = "omkjigfedba";
   for (i = 0; remove[i]; i++)
     {
       removed = xtree_remove (tree, &remove[i]);
-      g_assert (removed);
+      xassert (removed);
     }
 
   xtree_destroy (tree);
@@ -509,12 +509,12 @@ binary_tree_bound (xtree_t *tree,
         {
           GTreeNode *last = xtree_node_last (tree);
 
-          g_assert (last);
+          xassert (last);
           if (g_test_verbose ())
             g_test_message ("past end last %c",
                             *(char *) xtree_node_key (last));
         }
-      g_assert (expected == '\x00');
+      xassert (expected == '\x00');
     }
   else
     {
@@ -523,34 +523,34 @@ binary_tree_bound (xtree_t *tree,
       GTreeNode *prev = xtree_node_previous (node);
       GTreeNode *next = xtree_node_next (node);
 
-      g_assert (expected != '\x00');
-      g_assert (expected == *(char *) xtree_node_key (node));
+      xassert (expected != '\x00');
+      xassert (expected == *(char *) xtree_node_key (node));
 
       if (g_test_verbose ())
         g_test_message ("%c", *(char *) xtree_node_key (node));
 
       if (node != begin)
         {
-          g_assert (prev);
+          xassert (prev);
           if (g_test_verbose ())
             g_test_message (" prev %c", *(char *) xtree_node_key (prev));
         }
       else
         {
-          g_assert (!prev);
+          xassert (!prev);
           if (g_test_verbose ())
             g_test_message (" no prev, it's the first one");
         }
 
       if (node != last)
         {
-          g_assert (next);
+          xassert (next);
           if (g_test_verbose ())
             g_test_message (" next %c", *(char *) xtree_node_key (next));
         }
       else
         {
-          g_assert (!next);
+          xassert (!next);
           if (g_test_verbose ())
             g_test_message (" no next, it's the last one");
         }
@@ -568,7 +568,7 @@ binary_tree_bounds (xtree_t *tree,
   char expectedl, expectedu;
   char first = mode == 0 ? '0' : mode == 1 ? 'A' : 'z';
 
-  g_assert (mode >= 0 && mode <= 3);
+  xassert (mode >= 0 && mode <= 3);
 
   if (c < first)
     expectedl = first;
@@ -653,8 +653,8 @@ test_tree_bounds (void)
         g_test_message ("%c ", *(char *) elem);
 
       node = xtree_insert_node (tree, elem, elem);
-      g_assert (xtree_node_key (node) == elem);
-      g_assert (xtree_node_value (node) == elem);
+      xassert (xtree_node_key (node) == elem);
+      xassert (xtree_node_value (node) == elem);
     }
 
   if (g_test_verbose ())

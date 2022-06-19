@@ -24,7 +24,7 @@
 
 #include "test-io-stream.h"
 
-G_DEFINE_TYPE (TestIOStream, test_io_stream, XTYPE_IO_STREAM)
+XDEFINE_TYPE (TestIOStream, test_io_stream, XTYPE_IO_STREAM)
 
 static void
 test_io_stream_finalize (xobject_t *object)
@@ -37,7 +37,7 @@ test_io_stream_finalize (xobject_t *object)
   g_clear_object (&stream->input_stream);
   g_clear_object (&stream->output_stream);
 
-  G_OBJECT_CLASS (test_io_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (test_io_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -64,11 +64,11 @@ test_io_stream_get_output_stream (xio_stream_t *_stream)
 static void
 test_io_stream_class_init (TestIOStreamClass *klass)
 {
-  xobject_class_t *gobject_class;
+  xobject_class_t *xobject_class;
   xio_stream_class_t *giostream_class;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = test_io_stream_finalize;
+  xobject_class = XOBJECT_CLASS (klass);
+  xobject_class->finalize = test_io_stream_finalize;
 
   giostream_class = XIO_STREAM_CLASS (klass);
   giostream_class->get_input_stream  = test_io_stream_get_input_stream;
@@ -93,8 +93,8 @@ test_io_stream_new (xinput_stream_t  *input_stream,
 {
   TestIOStream *stream;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
-  g_return_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (input_stream), NULL);
+  xreturn_val_if_fail (X_IS_OUTPUT_STREAM (output_stream), NULL);
   stream = TEST_IO_STREAM (xobject_new (TEST_TYPE_IO_STREAM, NULL));
   stream->input_stream = xobject_ref (input_stream);
   stream->output_stream = xobject_ref (output_stream);

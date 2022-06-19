@@ -52,7 +52,7 @@ static void
 xdummy_proxy_resolver_finalize (xobject_t *object)
 {
   /* must chain up */
-  G_OBJECT_CLASS (xdummy_proxy_resolver_parent_class)->finalize (object);
+  XOBJECT_CLASS (xdummy_proxy_resolver_parent_class)->finalize (object);
 }
 
 static void
@@ -110,7 +110,7 @@ xdummy_proxy_resolver_lookup_finish (xproxy_resolver_t     *resolver,
 				      xasync_result_t       *result,
 				      xerror_t            **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -120,7 +120,7 @@ xdummy_proxy_resolver_class_init (xdummy_proxy_resolver_class_t *resolver_class)
 {
   xobject_class_t *object_class;
 
-  object_class = G_OBJECT_CLASS (resolver_class);
+  object_class = XOBJECT_CLASS (resolver_class);
   object_class->finalize = xdummy_proxy_resolver_finalize;
 }
 

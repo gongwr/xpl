@@ -79,7 +79,7 @@ g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
   xobject_class_t *object_class;
   xinput_stream_class_t *istream_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->get_property = g_filter_input_stream_get_property;
   object_class->set_property = g_filter_input_stream_set_property;
   object_class->finalize     = g_filter_input_stream_finalize;
@@ -91,20 +91,20 @@ g_filter_input_stream_class_init (GFilterInputStreamClass *klass)
 
   xobject_class_install_property (object_class,
                                    PROP_BASE_STREAM,
-                                   g_param_spec_object ("base-stream",
+                                   xparam_spec_object ("base-stream",
                                                          P_("The Filter Base Stream"),
                                                          P_("The underlying base stream on which the io ops will be done."),
                                                          XTYPE_INPUT_STREAM,
-                                                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
-                                                         G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                         XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY |
+                                                         XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
   xobject_class_install_property (object_class,
                                    PROP_CLOSE_BASE,
-                                   g_param_spec_boolean ("close-base-stream",
+                                   xparam_spec_boolean ("close-base-stream",
                                                          P_("Close Base Stream"),
                                                          P_("If the base stream should be closed when the filter stream is closed."),
-                                                         TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT |
-                                                         G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                         TRUE, XPARAM_READWRITE | XPARAM_CONSTRUCT |
+                                                         XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 }
 
 static void
@@ -175,7 +175,7 @@ g_filter_input_stream_finalize (xobject_t *object)
 
   xobject_unref (stream->base_stream);
 
-  G_OBJECT_CLASS (g_filter_input_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_filter_input_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -194,7 +194,7 @@ g_filter_input_stream_init (xfilter_input_stream_t *stream)
 xinput_stream_t *
 g_filter_input_stream_get_base_stream (xfilter_input_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_FILTER_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_FILTER_INPUT_STREAM (stream), NULL);
 
   return stream->base_stream;
 }
@@ -213,7 +213,7 @@ g_filter_input_stream_get_close_base_stream (xfilter_input_stream_t *stream)
 {
   GFilterInputStreamPrivate *priv;
 
-  g_return_val_if_fail (X_IS_FILTER_INPUT_STREAM (stream), FALSE);
+  xreturn_val_if_fail (X_IS_FILTER_INPUT_STREAM (stream), FALSE);
 
   priv = g_filter_input_stream_get_instance_private (stream);
 

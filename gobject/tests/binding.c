@@ -71,7 +71,7 @@ enum
 };
 
 static xtype_t binding_source_get_type (void);
-G_DEFINE_TYPE (binding_source, binding_source, XTYPE_OBJECT)
+XDEFINE_TYPE (binding_source, binding_source, XTYPE_OBJECT)
 
 static void
 binding_source_set_property (xobject_t      *gobject,
@@ -146,34 +146,34 @@ binding_source_get_property (xobject_t    *gobject,
 static void
 binding_source_class_init (binding_source_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = binding_source_set_property;
-  gobject_class->get_property = binding_source_get_property;
+  xobject_class->set_property = binding_source_set_property;
+  xobject_class->get_property = binding_source_get_property;
 
-  xobject_class_install_property (gobject_class, PROP_SOURCE_FOO,
-                                   g_param_spec_int ("foo", "foo_t", "foo_t",
+  xobject_class_install_property (xobject_class, PROP_SOURCE_FOO,
+                                   xparam_spec_int ("foo", "foo_t", "foo_t",
                                                      -1, 100,
                                                      0,
-                                                     G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_SOURCE_BAR,
-                                   g_param_spec_int ("bar", "Bar", "Bar",
+                                                     XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_SOURCE_BAR,
+                                   xparam_spec_int ("bar", "Bar", "Bar",
                                                      -1, 100,
                                                      0,
-                                                     G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_SOURCE_DOUBLE_VALUE,
-                                   g_param_spec_double ("double-value", "Value", "Value",
+                                                     XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_SOURCE_DOUBLE_VALUE,
+                                   xparam_spec_double ("double-value", "Value", "Value",
                                                         -100.0, 200.0,
                                                         0.0,
-                                                        G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_SOURCE_TOGGLE,
-                                   g_param_spec_boolean ("toggle", "Toggle", "Toggle",
+                                                        XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_SOURCE_TOGGLE,
+                                   xparam_spec_boolean ("toggle", "Toggle", "Toggle",
                                                          FALSE,
-                                                         G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_SOURCE_OBJECT,
-                                   g_param_spec_object ("object", "Object", "Object",
+                                                         XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_SOURCE_OBJECT,
+                                   xparam_spec_object ("object", "Object", "Object",
                                                         XTYPE_OBJECT,
-                                                        G_PARAM_READWRITE));
+                                                        XPARAM_READWRITE));
 }
 
 static void
@@ -207,7 +207,7 @@ enum
 };
 
 static xtype_t binding_target_get_type (void);
-G_DEFINE_TYPE (binding_target, binding_target, XTYPE_OBJECT)
+XDEFINE_TYPE (binding_target, binding_target, XTYPE_OBJECT)
 
 static void
 binding_target_set_property (xobject_t      *gobject,
@@ -274,29 +274,29 @@ binding_target_get_property (xobject_t    *gobject,
 static void
 binding_target_class_init (binding_target_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->set_property = binding_target_set_property;
-  gobject_class->get_property = binding_target_get_property;
+  xobject_class->set_property = binding_target_set_property;
+  xobject_class->get_property = binding_target_get_property;
 
-  xobject_class_install_property (gobject_class, PROP_TARGET_BAR,
-                                   g_param_spec_int ("bar", "Bar", "Bar",
+  xobject_class_install_property (xobject_class, PROP_TARGET_BAR,
+                                   xparam_spec_int ("bar", "Bar", "Bar",
                                                      -1, 100,
                                                      0,
-                                                     G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_TARGET_DOUBLE_VALUE,
-                                   g_param_spec_double ("double-value", "Value", "Value",
+                                                     XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_TARGET_DOUBLE_VALUE,
+                                   xparam_spec_double ("double-value", "Value", "Value",
                                                         -100.0, 200.0,
                                                         0.0,
-                                                        G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_TARGET_TOGGLE,
-                                   g_param_spec_boolean ("toggle", "Toggle", "Toggle",
+                                                        XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_TARGET_TOGGLE,
+                                   xparam_spec_boolean ("toggle", "Toggle", "Toggle",
                                                          FALSE,
-                                                         G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_TARGET_FOO,
-                                   g_param_spec_object ("foo", "foo_t", "foo_t",
+                                                         XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_TARGET_FOO,
+                                   xparam_spec_object ("foo", "foo_t", "foo_t",
                                                         foo_get_type (),
-                                                        G_PARAM_READWRITE));
+                                                        XPARAM_READWRITE));
 }
 
 static void

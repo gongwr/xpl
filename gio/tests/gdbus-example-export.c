@@ -28,7 +28,7 @@ enum
 };
 
 static xtype_t my_object_get_type (void);
-G_DEFINE_TYPE (xobject_t, my_object, XTYPE_OBJECT)
+XDEFINE_TYPE (xobject_t, my_object, XTYPE_OBJECT)
 
 static void
 my_object_finalize (xobject_t *object)
@@ -37,7 +37,7 @@ my_object_finalize (xobject_t *object)
 
   g_free (myobj->name);
 
-  G_OBJECT_CLASS (my_object_parent_class)->finalize (object);
+  XOBJECT_CLASS (my_object_parent_class)->finalize (object);
 }
 
 static void
@@ -97,27 +97,27 @@ my_object_set_property (xobject_t      *object,
 static void
 my_object_class_init (xobject_class_t *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->finalize = my_object_finalize;
-  gobject_class->set_property = my_object_set_property;
-  gobject_class->get_property = my_object_get_property;
+  xobject_class->finalize = my_object_finalize;
+  xobject_class->set_property = my_object_set_property;
+  xobject_class->get_property = my_object_get_property;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_COUNT,
-                                   g_param_spec_int ("count",
+                                   xparam_spec_int ("count",
                                                      "Count",
                                                      "Count",
                                                      0, 99999, 0,
-                                                     G_PARAM_READWRITE));
+                                                     XPARAM_READWRITE));
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_NAME,
-                                   g_param_spec_string ("name",
+                                   xparam_spec_string ("name",
                                                         "Name",
                                                         "Name",
                                                         NULL,
-                                                        G_PARAM_READWRITE));
+                                                        XPARAM_READWRITE));
 }
 
 /* A method that we want to export */
@@ -279,7 +279,7 @@ on_bus_acquired (xdbus_connection_t *connection,
                                                        myobj,
                                                        NULL,  /* user_data_free_func */
                                                        NULL); /* xerror_t** */
-  g_assert (registration_id > 0);
+  xassert (registration_id > 0);
 }
 
 static void
@@ -309,7 +309,7 @@ main (int argc, char *argv[])
    * them from XML.
    */
   introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
-  g_assert (introspection_data != NULL);
+  xassert (introspection_data != NULL);
 
   myobj = xobject_new (my_object_get_type (), NULL);
 

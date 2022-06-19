@@ -124,31 +124,31 @@ g_tcp_wrapper_connection_finalize (xobject_t *object)
   if (connection->priv->base_io_stream)
     xobject_unref (connection->priv->base_io_stream);
 
-  G_OBJECT_CLASS (g_tcp_wrapper_connection_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_tcp_wrapper_connection_parent_class)->finalize (object);
 }
 
 static void
 g_tcp_wrapper_connection_class_init (GTcpWrapperConnectionClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   xio_stream_class_t *stream_class = XIO_STREAM_CLASS (klass);
 
-  gobject_class->set_property = g_tcp_wrapper_connection_set_property;
-  gobject_class->get_property = g_tcp_wrapper_connection_get_property;
-  gobject_class->finalize = g_tcp_wrapper_connection_finalize;
+  xobject_class->set_property = g_tcp_wrapper_connection_set_property;
+  xobject_class->get_property = g_tcp_wrapper_connection_get_property;
+  xobject_class->finalize = g_tcp_wrapper_connection_finalize;
 
   stream_class->get_input_stream = g_tcp_wrapper_connection_get_input_stream;
   stream_class->get_output_stream = g_tcp_wrapper_connection_get_output_stream;
 
-  xobject_class_install_property (gobject_class,
+  xobject_class_install_property (xobject_class,
                                    PROP_BASE_IO_STREAM,
-                                   g_param_spec_object ("base-io-stream",
+                                   xparam_spec_object ("base-io-stream",
 			                                P_("Base IO Stream"),
 			                                P_("The wrapped xio_stream_t"),
                                                         XTYPE_IO_STREAM,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -172,11 +172,11 @@ xsocket_connection_t *
 g_tcp_wrapper_connection_new (xio_stream_t *base_io_stream,
 			      xsocket_t   *socket)
 {
-  g_return_val_if_fail (X_IS_IO_STREAM (base_io_stream), NULL);
-  g_return_val_if_fail (X_IS_SOCKET (socket), NULL);
-  g_return_val_if_fail (xsocket_get_family (socket) == XSOCKET_FAMILY_IPV4 ||
+  xreturn_val_if_fail (X_IS_IO_STREAM (base_io_stream), NULL);
+  xreturn_val_if_fail (X_IS_SOCKET (socket), NULL);
+  xreturn_val_if_fail (xsocket_get_family (socket) == XSOCKET_FAMILY_IPV4 ||
 			xsocket_get_family (socket) == XSOCKET_FAMILY_IPV6, NULL);
-  g_return_val_if_fail (xsocket_get_socket_type (socket) == XSOCKET_TYPE_STREAM, NULL);
+  xreturn_val_if_fail (xsocket_get_socket_type (socket) == XSOCKET_TYPE_STREAM, NULL);
 
   return xobject_new (XTYPE_TCP_WRAPPER_CONNECTION,
 		       "base-io-stream", base_io_stream,
@@ -195,7 +195,7 @@ g_tcp_wrapper_connection_new (xio_stream_t *base_io_stream,
 xio_stream_t *
 g_tcp_wrapper_connection_get_base_io_stream (xtcp_wrapper_connection_t *conn)
 {
-  g_return_val_if_fail (X_IS_TCP_WRAPPER_CONNECTION (conn), NULL);
+  xreturn_val_if_fail (X_IS_TCP_WRAPPER_CONNECTION (conn), NULL);
 
   return conn->priv->base_io_stream;
 }

@@ -50,19 +50,19 @@ XPL_AVAILABLE_IN_2_54
 xtype_t g_unix_mount_point_get_type (void) G_GNUC_CONST;
 
 /**
- * GUnixMountMonitor:
+ * xunix_mount_monitor_t:
  *
  * Watches #GUnixMounts for changes.
  **/
-typedef struct _GUnixMountMonitor      GUnixMountMonitor;
-typedef struct _GUnixMountMonitorClass GUnixMountMonitorClass;
+typedef struct _xunix_mount_monitor      xunix_mount_monitor_t;
+typedef struct _xunix_mount_monitor_class xunix_mount_monitor_class_t;
 
-#define XTYPE_UNIX_MOUNT_MONITOR        (g_unix_mount_monitor_get_type ())
-#define G_UNIX_MOUNT_MONITOR(o)          (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_MOUNT_MONITOR, GUnixMountMonitor))
-#define G_UNIX_MOUNT_MONITOR_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_MOUNT_MONITOR, GUnixMountMonitorClass))
+#define XTYPE_UNIX_MOUNT_MONITOR        (xunix_mount_monitor_get_type ())
+#define G_UNIX_MOUNT_MONITOR(o)          (XTYPE_CHECK_INSTANCE_CAST ((o), XTYPE_UNIX_MOUNT_MONITOR, xunix_mount_monitor_t))
+#define G_UNIX_MOUNT_MONITOR_CLASS(k)    (XTYPE_CHECK_CLASS_CAST((k), XTYPE_UNIX_MOUNT_MONITOR, xunix_mount_monitor_class_t))
 #define X_IS_UNIX_MOUNT_MONITOR(o)       (XTYPE_CHECK_INSTANCE_TYPE ((o), XTYPE_UNIX_MOUNT_MONITOR))
 #define X_IS_UNIX_MOUNT_MONITOR_CLASS(k) (XTYPE_CHECK_CLASS_TYPE ((k), XTYPE_UNIX_MOUNT_MONITOR))
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GUnixMountMonitor, xobject_unref)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC(xunix_mount_monitor_t, xobject_unref)
 
 XPL_AVAILABLE_IN_ALL
 void           g_unix_mount_free                    (GUnixMountEntry    *mount_entry);
@@ -149,13 +149,13 @@ XPL_AVAILABLE_IN_ALL
 xboolean_t       g_unix_mount_points_changed_since    (xuint64_t             time);
 
 XPL_AVAILABLE_IN_ALL
-xtype_t              g_unix_mount_monitor_get_type       (void) G_GNUC_CONST;
+xtype_t              xunix_mount_monitor_get_type       (void) G_GNUC_CONST;
 XPL_AVAILABLE_IN_2_44
-GUnixMountMonitor *g_unix_mount_monitor_get            (void);
-XPL_DEPRECATED_IN_2_44_FOR(g_unix_mount_monitor_get)
-GUnixMountMonitor *g_unix_mount_monitor_new            (void);
+xunix_mount_monitor_t *xunix_mount_monitor_get            (void);
+XPL_DEPRECATED_IN_2_44_FOR(xunix_mount_monitor_get)
+xunix_mount_monitor_t *xunix_mount_monitor_new            (void);
 XPL_DEPRECATED_IN_2_44
-void               g_unix_mount_monitor_set_rate_limit (GUnixMountMonitor *mount_monitor,
+void               xunix_mount_monitor_set_rate_limit (xunix_mount_monitor_t *mount_monitor,
                                                         int                limit_msec);
 
 XPL_AVAILABLE_IN_ALL

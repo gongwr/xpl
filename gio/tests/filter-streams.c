@@ -33,10 +33,10 @@ xtype_t test_filter_output_stream_get_type (void);
 typedef xfilter_input_stream_t       TestFilterInputStream;
 typedef GFilterInputStreamClass  TestFilterInputStreamClass;
 typedef xfilter_output_stream_t      TestFilterOutputStream;
-typedef GFilterOutputStreamClass TestFilterOutputStreamClass;
+typedef xfilter_output_stream_class_t TestFilterOutputStreamClass;
 
-G_DEFINE_TYPE (TestFilterInputStream, test_filter_input_stream, XTYPE_FILTER_INPUT_STREAM)
-G_DEFINE_TYPE (TestFilterOutputStream, test_filter_output_stream, XTYPE_FILTER_OUTPUT_STREAM)
+XDEFINE_TYPE (TestFilterInputStream, test_filter_input_stream, XTYPE_FILTER_INPUT_STREAM)
+XDEFINE_TYPE (TestFilterOutputStream, test_filter_output_stream, XTYPE_FILTER_OUTPUT_STREAM)
 
 static void
 test_filter_input_stream_init (TestFilterInputStream *stream)
@@ -78,25 +78,25 @@ test_input_filter (void)
                      "base-stream", base,
                      NULL);
 
-  g_assert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f1)) == base);
-  g_assert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f2)) == base);
+  xassert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f1)) == base);
+  xassert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f2)) == base);
 
-  g_assert (!xinput_stream_is_closed (base));
-  g_assert (!xinput_stream_is_closed (f1));
-  g_assert (!xinput_stream_is_closed (f2));
+  xassert (!xinput_stream_is_closed (base));
+  xassert (!xinput_stream_is_closed (f1));
+  xassert (!xinput_stream_is_closed (f2));
 
   xobject_get (f1,
                 "close-base-stream", &close_base,
                 "base-stream", &s,
                 NULL);
-  g_assert (!close_base);
-  g_assert (s == base);
+  xassert (!close_base);
+  xassert (s == base);
   xobject_unref (s);
 
   xobject_unref (f1);
 
-  g_assert (!xinput_stream_is_closed (base));
-  g_assert (!xinput_stream_is_closed (f2));
+  xassert (!xinput_stream_is_closed (base));
+  xassert (!xinput_stream_is_closed (f2));
 
   xinput_stream_skip (f2, 3, NULL, &error);
   g_assert_no_error (error);
@@ -108,7 +108,7 @@ test_input_filter (void)
 
   xobject_unref (f2);
 
-  g_assert (xinput_stream_is_closed (base));
+  xassert (xinput_stream_is_closed (base));
 
   xobject_unref (base);
 }
@@ -127,21 +127,21 @@ test_output_filter (void)
                      "base-stream", base,
                      NULL);
 
-  g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f1)) == base);
-  g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f2)) == base);
+  xassert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f1)) == base);
+  xassert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f2)) == base);
 
-  g_assert (!xoutput_stream_is_closed (base));
-  g_assert (!xoutput_stream_is_closed (f1));
-  g_assert (!xoutput_stream_is_closed (f2));
+  xassert (!xoutput_stream_is_closed (base));
+  xassert (!xoutput_stream_is_closed (f1));
+  xassert (!xoutput_stream_is_closed (f2));
 
   xobject_unref (f1);
 
-  g_assert (!xoutput_stream_is_closed (base));
-  g_assert (!xoutput_stream_is_closed (f2));
+  xassert (!xoutput_stream_is_closed (base));
+  xassert (!xoutput_stream_is_closed (f2));
 
   xobject_unref (f2);
 
-  g_assert (xoutput_stream_is_closed (base));
+  xassert (xoutput_stream_is_closed (base));
 
   xobject_unref (base);
 }
@@ -169,12 +169,12 @@ in_cb (xobject_t      *object,
 {
   xerror_t *error = NULL;
 
-  g_assert (object == expected_obj);
-  g_assert (user_data == expected_data);
-  g_assert (callback_happened == FALSE);
+  xassert (object == expected_obj);
+  xassert (user_data == expected_data);
+  xassert (callback_happened == FALSE);
 
   xinput_stream_close_finish (expected_obj, result, &error);
-  g_assert (error == NULL);
+  xassert (error == NULL);
 
   callback_happened = TRUE;
   xmain_loop_quit (loop);
@@ -199,8 +199,8 @@ test_input_async (void)
                      "base-stream", base,
                      NULL);
 
-  g_assert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f1)) == base);
-  g_assert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f2)) == base);
+  xassert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f1)) == base);
+  xassert (g_filter_input_stream_get_base_stream (G_FILTER_INPUT_STREAM (f2)) == base);
 
 
   memset (buf, 0, sizeof (buf));
@@ -235,41 +235,41 @@ test_input_async (void)
   g_assert_cmpint (xseekable_tell (G_SEEKABLE (base)), ==, 26);
 
 
-  g_assert (!xinput_stream_is_closed (base));
-  g_assert (!xinput_stream_is_closed (f1));
-  g_assert (!xinput_stream_is_closed (f2));
+  xassert (!xinput_stream_is_closed (base));
+  xassert (!xinput_stream_is_closed (f1));
+  xassert (!xinput_stream_is_closed (f2));
 
   expected_obj = f1;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
   xinput_stream_close_async (f1, 0, NULL, in_cb, expected_data);
 
-  g_assert (callback_happened == FALSE);
+  xassert (callback_happened == FALSE);
   xmain_loop_run (loop);
-  g_assert (callback_happened == TRUE);
+  xassert (callback_happened == TRUE);
 
-  g_assert (!xinput_stream_is_closed (base));
-  g_assert (!xinput_stream_is_closed (f2));
+  xassert (!xinput_stream_is_closed (base));
+  xassert (!xinput_stream_is_closed (f2));
   g_free (expected_data);
   xobject_unref (f1);
-  g_assert (!xinput_stream_is_closed (base));
-  g_assert (!xinput_stream_is_closed (f2));
+  xassert (!xinput_stream_is_closed (base));
+  xassert (!xinput_stream_is_closed (f2));
 
   expected_obj = f2;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
   xinput_stream_close_async (f2, 0, NULL, in_cb, expected_data);
 
-  g_assert (callback_happened == FALSE);
+  xassert (callback_happened == FALSE);
   xmain_loop_run (loop);
-  g_assert (callback_happened == TRUE);
+  xassert (callback_happened == TRUE);
 
-  g_assert (xinput_stream_is_closed (base));
-  g_assert (xinput_stream_is_closed (f2));
+  xassert (xinput_stream_is_closed (base));
+  xassert (xinput_stream_is_closed (f2));
   g_free (expected_data);
   xobject_unref (f2);
 
-  g_assert (xinput_stream_is_closed (base));
+  xassert (xinput_stream_is_closed (base));
   xobject_unref (base);
   xmain_loop_unref (loop);
 }
@@ -281,12 +281,12 @@ out_cb (xobject_t      *object,
 {
   xerror_t *error = NULL;
 
-  g_assert (object == expected_obj);
-  g_assert (user_data == expected_data);
-  g_assert (callback_happened == FALSE);
+  xassert (object == expected_obj);
+  xassert (user_data == expected_data);
+  xassert (callback_happened == FALSE);
 
   xoutput_stream_close_finish (expected_obj, result, &error);
-  g_assert (error == NULL);
+  xassert (error == NULL);
 
   callback_happened = TRUE;
   xmain_loop_quit (loop);
@@ -310,8 +310,8 @@ test_output_async (void)
                      "base-stream", base,
                      NULL);
 
-  g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f1)) == base);
-  g_assert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f2)) == base);
+  xassert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f1)) == base);
+  xassert (g_filter_output_stream_get_base_stream (G_FILTER_OUTPUT_STREAM (f2)) == base);
 
 
   xoutput_stream_write_async (f1, "abcdefghijklm", 13, G_PRIORITY_DEFAULT,
@@ -338,41 +338,41 @@ test_output_async (void)
   g_assert_cmpstr (g_memory_output_stream_get_data (G_MEMORY_OUTPUT_STREAM (base)), ==, "abcdefghijklmnopqrstuvwxyz");
 
 
-  g_assert (!xoutput_stream_is_closed (base));
-  g_assert (!xoutput_stream_is_closed (f1));
-  g_assert (!xoutput_stream_is_closed (f2));
+  xassert (!xoutput_stream_is_closed (base));
+  xassert (!xoutput_stream_is_closed (f1));
+  xassert (!xoutput_stream_is_closed (f2));
 
   expected_obj = f1;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
   xoutput_stream_close_async (f1, 0, NULL, out_cb, expected_data);
 
-  g_assert (callback_happened == FALSE);
+  xassert (callback_happened == FALSE);
   xmain_loop_run (loop);
-  g_assert (callback_happened == TRUE);
+  xassert (callback_happened == TRUE);
 
-  g_assert (!xoutput_stream_is_closed (base));
-  g_assert (!xoutput_stream_is_closed (f2));
+  xassert (!xoutput_stream_is_closed (base));
+  xassert (!xoutput_stream_is_closed (f2));
   g_free (expected_data);
   xobject_unref (f1);
-  g_assert (!xoutput_stream_is_closed (base));
-  g_assert (!xoutput_stream_is_closed (f2));
+  xassert (!xoutput_stream_is_closed (base));
+  xassert (!xoutput_stream_is_closed (f2));
 
   expected_obj = f2;
   expected_data = g_malloc (20);
   callback_happened = FALSE;
   xoutput_stream_close_async (f2, 0, NULL, out_cb, expected_data);
 
-  g_assert (callback_happened == FALSE);
+  xassert (callback_happened == FALSE);
   xmain_loop_run (loop);
-  g_assert (callback_happened == TRUE);
+  xassert (callback_happened == TRUE);
 
-  g_assert (xoutput_stream_is_closed (base));
-  g_assert (xoutput_stream_is_closed (f2));
+  xassert (xoutput_stream_is_closed (base));
+  xassert (xoutput_stream_is_closed (f2));
   g_free (expected_data);
   xobject_unref (f2);
 
-  g_assert (xoutput_stream_is_closed (base));
+  xassert (xoutput_stream_is_closed (base));
   xobject_unref (base);
   xmain_loop_unref (loop);
 }

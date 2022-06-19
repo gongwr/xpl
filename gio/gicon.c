@@ -96,7 +96,7 @@ xicon_hash (xconstpointer icon)
 {
   xicon_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_ICON (icon), 0);
+  xreturn_val_if_fail (X_IS_ICON (icon), 0);
 
   iface = XICON_GET_IFACE (icon);
 
@@ -140,8 +140,8 @@ xicon_to_string_tokenized (xicon_t *icon, xstring_t *s)
   xicon_iface_t *icon_iface;
   xuint_t i;
 
-  g_return_val_if_fail (icon != NULL, FALSE);
-  g_return_val_if_fail (X_IS_ICON (icon), FALSE);
+  xreturn_val_if_fail (icon != NULL, FALSE);
+  xreturn_val_if_fail (X_IS_ICON (icon), FALSE);
 
   icon_iface = XICON_GET_IFACE (icon);
   if (icon_iface->to_tokens == NULL)
@@ -213,8 +213,8 @@ xicon_to_string (xicon_t *icon)
 {
   xchar_t *ret;
 
-  g_return_val_if_fail (icon != NULL, NULL);
-  g_return_val_if_fail (X_IS_ICON (icon), NULL);
+  xreturn_val_if_fail (icon != NULL, NULL);
+  xreturn_val_if_fail (X_IS_ICON (icon), NULL);
 
   ret = NULL;
 
@@ -357,7 +357,7 @@ xicon_new_from_tokens (char   **tokens,
     }
 
   icon_iface = xtype_interface_peek (klass, XTYPE_ICON);
-  g_assert (icon_iface != NULL);
+  xassert (icon_iface != NULL);
 
   if (icon_iface->from_tokens == NULL)
     {
@@ -445,7 +445,7 @@ xicon_new_for_string (const xchar_t   *str,
 {
   xicon_t *icon = NULL;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   icon = xicon_new_for_string_simple (str);
   if (icon)
@@ -573,8 +573,8 @@ xicon_deserialize (xvariant_t *value)
   xvariant_t *val;
   xicon_t *icon;
 
-  g_return_val_if_fail (value != NULL, NULL);
-  g_return_val_if_fail (xvariant_is_of_type (value, G_VARIANT_TYPE_STRING) ||
+  xreturn_val_if_fail (value != NULL, NULL);
+  xreturn_val_if_fail (xvariant_is_of_type (value, G_VARIANT_TYPE_STRING) ||
                         xvariant_is_of_type (value, G_VARIANT_TYPE ("(sv)")), NULL);
 
   /* Handle some special cases directly so that people can hard-code

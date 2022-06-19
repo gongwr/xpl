@@ -79,14 +79,14 @@ g_wcsdup (const xunichar2_t *str, xssize_t str_len)
   xsize_t str_len_unsigned;
   xsize_t str_size;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   if (str_len < 0)
     str_len_unsigned = xutf16_len (str);
   else
     str_len_unsigned = (xsize_t) str_len;
 
-  g_assert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
+  xassert (str_len_unsigned <= G_MAXSIZE / sizeof (xunichar2_t) - 1);
   str_size = (str_len_unsigned + 1) * sizeof (xunichar2_t);
 
   return g_memdup2 (str, str_size);
@@ -628,7 +628,7 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
     {
     case XmlNodeType_Element:
       is_empty = IXmlReader_IsEmptyElement (xml_reader);
-      g_assert (local_name != NULL);
+      xassert (local_name != NULL);
 
       if (!is_empty &&
           _wcsicmp (local_name, L"Package") == 0 &&
@@ -699,9 +699,9 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
           if (!xml_parser_get_current_state (sax, xml_reader, &local_name, &prefix, &value))
             return FALSE;
 
-          g_assert (local_name != NULL);
-          g_assert (value != NULL);
-          g_assert (prefix != NULL);
+          xassert (local_name != NULL);
+          xassert (value != NULL);
+          xassert (prefix != NULL);
 
           if (is_application &&
               sax->application_usermodelid == NULL &&
@@ -744,13 +744,13 @@ xml_parser_iteration (struct _xml_sax_state  *sax,
         }
       break;
     case XmlNodeType_Text:
-      g_assert (value != NULL);
+      xassert (value != NULL);
 
       if (sax->in_filetype && value[0] != 0)
         xptr_array_add (sax->supported_extensions, g_wcsdup (value, -1));
       break;
     case XmlNodeType_EndElement:
-      g_assert (local_name != NULL);
+      xassert (local_name != NULL);
 
       if (_wcsicmp (local_name, L"Package") == 0 &&
           prefix[0] == 0)

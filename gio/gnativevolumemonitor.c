@@ -31,16 +31,16 @@ G_DEFINE_ABSTRACT_TYPE (xnative_volume_monitor_t, g_native_volume_monitor, XTYPE
 static void
 g_native_volume_monitor_finalize (xobject_t *object)
 {
-  G_OBJECT_CLASS (g_native_volume_monitor_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_native_volume_monitor_parent_class)->finalize (object);
 }
 
 
 static void
 g_native_volume_monitor_class_init (GNativeVolumeMonitorClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = g_native_volume_monitor_finalize;
+  xobject_class->finalize = g_native_volume_monitor_finalize;
 }
 
 

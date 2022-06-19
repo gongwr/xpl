@@ -54,7 +54,7 @@ struct _GBufferedOutputStream
 
 struct _GBufferedOutputStreamClass
 {
-  GFilterOutputStreamClass parent_class;
+  xfilter_output_stream_class_t parent_class;
 
   /*< private >*/
   /* Padding for future expansion */

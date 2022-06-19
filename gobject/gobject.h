@@ -51,12 +51,12 @@ G_BEGIN_DECLS
  */
 #define G_OBJECT(object)            (XTYPE_CHECK_INSTANCE_CAST ((object), XTYPE_OBJECT, xobject_t))
 /**
- * G_OBJECT_CLASS:
+ * XOBJECT_CLASS:
  * @class: a valid #xobject_class_t
  *
  * Casts a derived #xobject_class_t structure into a #xobject_class_t structure.
  */
-#define G_OBJECT_CLASS(class)       (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_OBJECT, xobject_class_t))
+#define XOBJECT_CLASS(class)       (XTYPE_CHECK_CLASS_CAST ((class), XTYPE_OBJECT, xobject_class_t))
 /**
  * X_IS_OBJECT:
  * @object: Instance to check for being a %XTYPE_OBJECT.
@@ -188,9 +188,9 @@ G_BEGIN_DECLS
 
 /* --- typedefs & structures --- */
 typedef struct _GObject                  xobject_t;
-typedef struct _GObjectClass             xobject_class_t;
+typedef struct _xobject_class             xobject_class_t;
 typedef struct _GObject                  xinitially_unowned_t;
-typedef struct _GObjectClass             xinitially_unowned_class_t;
+typedef struct _xobject_class             xinitially_unowned_class_t;
 typedef struct _GObjectConstructParam    GObjectConstructParam;
 /**
  * GObjectGetPropertyFunc:
@@ -309,7 +309,7 @@ struct  _GObject
  *
  * |[<!-- language="C" -->
  * // Example of implementing a singleton using a constructor.
- * static MySingleton *the_singleton = NULL;
+ * static my_singleton_t *the_singleton = NULL;
  *
  * static xobject_t*
  * my_singleton_constructor (xtype_t                  type,
@@ -320,7 +320,7 @@ struct  _GObject
  *
  *   if (!the_singleton)
  *     {
- *       object = G_OBJECT_CLASS (parent_class)->constructor (type,
+ *       object = XOBJECT_CLASS (parent_class)->constructor (type,
  *                                                            n_construct_params,
  *                                                            construct_params);
  *       the_singleton = MY_SINGLETON (object);
@@ -332,7 +332,7 @@ struct  _GObject
  * }
  * ]|
  */
-struct  _GObjectClass
+struct  _xobject_class
 {
   xtype_class_t   xtype_class;
 
@@ -683,7 +683,7 @@ G_STMT_START { \
              (pname), \
              _glib__property_id, \
              _glib__pspec->name, \
-             xtype_name (G_PARAM_SPEC_TYPE (_glib__pspec)), \
+             xtype_name (XPARAM_SPEC_TYPE (_glib__pspec)), \
              G_OBJECT_TYPE_NAME (_glib__object)); \
 } G_STMT_END
 /**

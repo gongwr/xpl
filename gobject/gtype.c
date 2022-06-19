@@ -137,7 +137,7 @@
       xerror ("%s()%s'%s'", _fname, _action, _tname); \
 }G_STMT_END
 #define g_assert_type_system_initialized() \
-  g_assert (static_quark_type_flags)
+  xassert (static_quark_type_flags)
 
 #define TYPE_FUNDAMENTAL_FLAG_MASK (XTYPE_FLAG_CLASSED | \
 				    XTYPE_FLAG_INSTANTIATABLE | \
@@ -450,7 +450,7 @@ type_node_any_new_W (TypeNode             *pnode,
   else
     type = (xtype_t) node;
 
-  g_assert ((type & TYPE_ID_MASK) == 0);
+  xassert ((type & TYPE_ID_MASK) == 0);
 
   node->n_supers = n_supers;
   if (!pnode)
@@ -543,8 +543,8 @@ type_node_fundamental_new_W (xtype_t                 ftype,
   GTypeFundamentalInfo *finfo;
   TypeNode *node;
 
-  g_assert ((ftype & TYPE_ID_MASK) == 0);
-  g_assert (ftype <= XTYPE_FUNDAMENTAL_MAX);
+  xassert ((ftype & TYPE_ID_MASK) == 0);
+  xassert (ftype <= XTYPE_FUNDAMENTAL_MAX);
 
   if (ftype >> XTYPE_FUNDAMENTAL_SHIFT == static_fundamental_next)
     static_fundamental_next++;
@@ -565,9 +565,9 @@ type_node_new_W (TypeNode    *pnode,
 		 GTypePlugin *plugin)
 
 {
-  g_assert (pnode);
-  g_assert (pnode->n_supers < MAX_N_SUPERS);
-  g_assert (pnode->n_children < MAX_N_CHILDREN);
+  xassert (pnode);
+  xassert (pnode->n_supers < MAX_N_SUPERS);
+  xassert (pnode->n_children < MAX_N_CHILDREN);
 
   return type_node_any_new_W (pnode, NODE_FUNDAMENTAL_TYPE (pnode), name, plugin, 0);
 }
@@ -900,7 +900,7 @@ check_type_info_I (TypeNode        *pnode,
   GTypeFundamentalInfo *finfo = type_node_fundamental_info_I (lookup_type_node_I (ftype));
   xboolean_t is_interface = ftype == XTYPE_INTERFACE;
 
-  g_assert (ftype <= XTYPE_FUNDAMENTAL_MAX && !(ftype & TYPE_ID_MASK));
+  xassert (ftype <= XTYPE_FUNDAMENTAL_MAX && !(ftype & TYPE_ID_MASK));
 
   /* check instance members */
   if (!(finfo->type_flags & XTYPE_FLAG_INSTANTIATABLE) &&
@@ -1097,7 +1097,7 @@ type_data_make_W (TypeNode              *node,
   xtype_value_table_t *vtable = NULL;
   xuint_t vtable_size = 0;
 
-  g_assert (node->data == NULL && info != NULL);
+  xassert (node->data == NULL && info != NULL);
 
   if (!value_table)
     {
@@ -1225,7 +1225,7 @@ type_data_make_W (TypeNode              *node,
 				 !((XTYPE_FLAG_VALUE_ABSTRACT | XTYPE_FLAG_ABSTRACT) &
 				   GPOINTER_TO_UINT (type_get_qdata_L (node, static_quark_type_flags))));
 
-  g_assert (node->data->common.value_table != NULL); /* paranoid */
+  xassert (node->data->common.value_table != NULL); /* paranoid */
 
   g_atomic_int_set ((int *) &node->ref_count, 1);
 }
@@ -1239,7 +1239,7 @@ type_data_ref_Wm (TypeNode *node)
       xtype_info_t tmp_info;
       xtype_value_table_t tmp_value_table;
 
-      g_assert (node->plugin != NULL);
+      xassert (node->plugin != NULL);
 
       if (pnode)
 	{
@@ -1265,7 +1265,7 @@ type_data_ref_Wm (TypeNode *node)
     }
   else
     {
-      g_assert (NODE_REFCOUNT (node) > 0);
+      xassert (NODE_REFCOUNT (node) > 0);
 
       g_atomic_int_inc ((int *) &node->ref_count);
     }
@@ -1381,14 +1381,14 @@ type_node_add_iface_entry_W (TypeNode   *node,
   xuint_t i, j;
   xuint_t num_entries;
 
-  g_assert (node->is_instantiatable);
+  xassert (node->is_instantiatable);
 
   entries = CLASSED_NODE_IFACES_ENTRIES_LOCKED (node);
   if (entries != NULL)
     {
       num_entries = IFACE_ENTRIES_N_ENTRIES (entries);
 
-      g_assert (num_entries < MAX_N_INTERFACES);
+      xassert (num_entries < MAX_N_INTERFACES);
 
       for (i = 0; i < num_entries; i++)
 	{
@@ -1404,7 +1404,7 @@ type_node_add_iface_entry_W (TypeNode   *node,
 	       *   added to a child type.
 	       */
 	      if (!parent_entry)
-		g_assert (entry->vtable == NULL && entry->init_state == UNINITIALIZED);
+		xassert (entry->vtable == NULL && entry->init_state == UNINITIALIZED);
 	      else
 		{
 		  /* sick, interface is added to ancestor *after* child type;
@@ -1479,7 +1479,7 @@ type_add_interface_Wm (TypeNode             *node,
   IFaceEntry *entry;
   xuint_t i;
 
-  g_assert (node->is_instantiatable && NODE_IS_IFACE (iface) && ((info && !plugin) || (!info && plugin)));
+  xassert (node->is_instantiatable && NODE_IS_IFACE (iface) && ((info && !plugin) || (!info && plugin)));
 
   iholder->next = iface_node_get_holders_L (iface);
   iface_node_set_holders_W (iface, iholder);
@@ -1518,7 +1518,7 @@ type_iface_add_prerequisite_W (TypeNode *iface,
   xtype_t *prerequisites, *dependants;
   xuint_t n_dependants, i;
 
-  g_assert (NODE_IS_IFACE (iface) &&
+  xassert (NODE_IS_IFACE (iface) &&
 	    IFACE_NODE_N_PREREQUISITES (iface) < MAX_N_PREREQUISITES &&
 	    (prerequisite_node->is_instantiatable || NODE_IS_IFACE (prerequisite_node)));
 
@@ -1662,7 +1662,7 @@ xtype_interface_prerequisites (xtype_t  interface_type,
 {
   TypeNode *iface;
 
-  g_return_val_if_fail (XTYPE_IS_INTERFACE (interface_type), NULL);
+  xreturn_val_if_fail (XTYPE_IS_INTERFACE (interface_type), NULL);
 
   iface = lookup_type_node_I (interface_type);
   if (iface)
@@ -1725,7 +1725,7 @@ xtype_interface_instantiatable_prerequisite (xtype_t interface_type)
   TypeNode *iface;
   xuint_t i;
 
-  g_return_val_if_fail (XTYPE_IS_INTERFACE (interface_type), XTYPE_INVALID);
+  xreturn_val_if_fail (XTYPE_IS_INTERFACE (interface_type), XTYPE_INVALID);
 
   iface = lookup_type_node_I (interface_type);
   if (iface == NULL)
@@ -1758,7 +1758,7 @@ type_iface_peek_holder_L (TypeNode *iface,
 {
   IFaceHolder *iholder;
 
-  g_assert (NODE_IS_IFACE (iface));
+  xassert (NODE_IS_IFACE (iface));
 
   iholder = iface_node_get_holders_L (iface);
   while (iholder && iholder->instance_type != instance_type)
@@ -1777,7 +1777,7 @@ type_iface_retrieve_holder_info_Wm (TypeNode *iface,
     {
       xinterface_info_t tmp_info;
 
-      g_assert (iholder->plugin != NULL);
+      xassert (iholder->plugin != NULL);
 
       type_data_ref_Wm (iface);
       if (iholder->info)
@@ -1805,7 +1805,7 @@ type_iface_blow_holder_info_Wm (TypeNode *iface,
 {
   IFaceHolder *iholder = iface_node_get_holders_L (iface);
 
-  g_assert (NODE_IS_IFACE (iface));
+  xassert (NODE_IS_IFACE (iface));
 
   while (iholder->instance_type != instance_type)
     iholder = iholder->next;
@@ -2020,7 +2020,7 @@ xtype_free_instance (GTypeInstance *instance)
 static void
 type_iface_ensure_dflt_vtable_Wm (TypeNode *iface)
 {
-  g_assert (iface->data);
+  xassert (iface->data);
 
   if (!iface->data->iface.dflt_vtable)
     {
@@ -2068,7 +2068,7 @@ type_iface_vtable_base_init_Wm (TypeNode *iface,
 
   entry = type_lookup_iface_entry_L (node, iface);
 
-  g_assert (iface->data && entry && entry->vtable == NULL && iholder && iholder->info);
+  xassert (iface->data && entry && entry->vtable == NULL && iholder && iholder->info);
 
   entry->init_state = IFACE_INIT;
 
@@ -2111,8 +2111,8 @@ type_iface_vtable_iface_init_Wm (TypeNode *iface,
   xuint_t i;
 
   /* iholder->info should have been filled in by type_iface_vtable_base_init_Wm() */
-  g_assert (iface->data && entry && iholder && iholder->info);
-  g_assert (entry->init_state == IFACE_INIT); /* assert prior base_init() */
+  xassert (iface->data && entry && iholder && iholder->info);
+  xassert (entry->init_state == IFACE_INIT); /* assert prior base_init() */
 
   entry->init_state = INITIALIZED;
 
@@ -2150,7 +2150,7 @@ type_iface_vtable_finalize_Wm (TypeNode       *iface,
   if (!iholder)
     return FALSE;	/* we don't modify write lock upon FALSE */
 
-  g_assert (entry && entry->vtable == vtable && iholder->info);
+  xassert (entry && entry->vtable == vtable && iholder->info);
 
   entry->vtable = NULL;
   entry->init_state = UNINITIALIZED;
@@ -2186,7 +2186,7 @@ type_class_init_Wm (TypeNode   *node,
   /* Accessing data->class will work for instantiatable types
    * too because ClassData is a subset of InstanceData
    */
-  g_assert (node->is_classed && node->data &&
+  xassert (node->is_classed && node->data &&
 	    node->data->class.class_size &&
 	    !node->data->class.class &&
 	    g_atomic_int_get (&node->data->class.init_state) == UNINITIALIZED);
@@ -2263,7 +2263,7 @@ type_class_init_Wm (TypeNode   *node,
 	  /* need to get this interface from parent, type_iface_vtable_base_init_Wm()
 	   * doesn't modify write lock upon FALSE, so entry is still valid;
 	   */
-	  g_assert (pnode != NULL);
+	  xassert (pnode != NULL);
 
 	  if (pentries)
 	    for (j = 0; j < IFACE_ENTRIES_N_ENTRIES (pentries); j++)
@@ -2277,7 +2277,7 @@ type_class_init_Wm (TypeNode   *node,
 		    break;
 		  }
 	      }
-	  g_assert (entry->vtable != NULL);
+	  xassert (entry->vtable != NULL);
 	}
 
       /* If the write lock was released, additional interface entries might
@@ -2338,7 +2338,7 @@ type_data_finalize_class_ifaces_Wm (TypeNode *node)
   xuint_t i;
   IFaceEntries *entries;
 
-  g_assert (node->is_instantiatable && node->data && node->data->class.class && NODE_REFCOUNT (node) == 0);
+  xassert (node->is_instantiatable && node->data && node->data->class.class && NODE_REFCOUNT (node) == 0);
 
  reiterate:
   entries = CLASSED_NODE_IFACES_ENTRIES_LOCKED (node);
@@ -2371,7 +2371,7 @@ type_data_finalize_class_U (TypeNode  *node,
   xtype_class_t *class = cdata->class;
   TypeNode *bnode;
 
-  g_assert (cdata->class && NODE_REFCOUNT (node) == 0);
+  xassert (cdata->class && NODE_REFCOUNT (node) == 0);
 
   if (cdata->class_finalize)
     cdata->class_finalize (class, (xpointer_t) cdata->class_data);
@@ -2507,7 +2507,7 @@ type_data_unref_U (TypeNode *node,
           return;
         }
 
-      g_assert (current > 0);
+      xassert (current > 0);
 
       g_rec_mutex_lock (&class_init_rec_mutex); /* required locking order: 1) class_init_rec_mutex, 2) type_rw_lock */
       G_WRITE_LOCK (&type_rw_lock);
@@ -2689,10 +2689,10 @@ xtype_register_fundamental (xtype_t                       type_id,
   TypeNode *node;
 
   g_assert_type_system_initialized ();
-  g_return_val_if_fail (type_id > 0, 0);
-  g_return_val_if_fail (type_name != NULL, 0);
-  g_return_val_if_fail (info != NULL, 0);
-  g_return_val_if_fail (finfo != NULL, 0);
+  xreturn_val_if_fail (type_id > 0, 0);
+  xreturn_val_if_fail (type_name != NULL, 0);
+  xreturn_val_if_fail (info != NULL, 0);
+  xreturn_val_if_fail (finfo != NULL, 0);
 
   if (!check_type_name_I (type_name))
     return 0;
@@ -2764,8 +2764,8 @@ xtype_register_static_simple (xtype_t             parent_type,
   /* Instances are not allowed to be larger than this. If you have a big
    * fixed-length array or something, point to it instead.
    */
-  g_return_val_if_fail (class_size <= G_MAXUINT16, XTYPE_INVALID);
-  g_return_val_if_fail (instance_size <= G_MAXUINT16, XTYPE_INVALID);
+  xreturn_val_if_fail (class_size <= G_MAXUINT16, XTYPE_INVALID);
+  xreturn_val_if_fail (instance_size <= G_MAXUINT16, XTYPE_INVALID);
 
   info.class_size = class_size;
   info.base_init = NULL;
@@ -2806,9 +2806,9 @@ xtype_register_static (xtype_t            parent_type,
   xtype_t type = 0;
 
   g_assert_type_system_initialized ();
-  g_return_val_if_fail (parent_type > 0, 0);
-  g_return_val_if_fail (type_name != NULL, 0);
-  g_return_val_if_fail (info != NULL, 0);
+  xreturn_val_if_fail (parent_type > 0, 0);
+  xreturn_val_if_fail (type_name != NULL, 0);
+  xreturn_val_if_fail (info != NULL, 0);
 
   if (!check_type_name_I (type_name) ||
       !check_derivation_I (parent_type, type_name))
@@ -2861,9 +2861,9 @@ xtype_register_dynamic (xtype_t        parent_type,
   xtype_t type;
 
   g_assert_type_system_initialized ();
-  g_return_val_if_fail (parent_type > 0, 0);
-  g_return_val_if_fail (type_name != NULL, 0);
-  g_return_val_if_fail (plugin != NULL, 0);
+  xreturn_val_if_fail (parent_type > 0, 0);
+  xreturn_val_if_fail (type_name != NULL, 0);
+  xreturn_val_if_fail (plugin != NULL, 0);
 
   if (!check_type_name_I (type_name) ||
       !check_derivation_I (parent_type, type_name) ||
@@ -3156,11 +3156,11 @@ xtype_class_peek_parent (xpointer_t g_class)
   TypeNode *node;
   xpointer_t class = NULL;
 
-  g_return_val_if_fail (g_class != NULL, NULL);
+  xreturn_val_if_fail (g_class != NULL, NULL);
 
   node = lookup_type_node_I (XTYPE_FROM_CLASS (g_class));
 
-  g_return_val_if_fail (node != NULL, NULL);
+  xreturn_val_if_fail (node != NULL, NULL);
 
   /* We used to acquire a read lock here. That is not necessary, since
    * parent->data->class.class is constant as long as the derived class
@@ -3198,7 +3198,7 @@ xtype_interface_peek (xpointer_t instance_class,
   xpointer_t vtable = NULL;
   xtype_class_t *class = instance_class;
 
-  g_return_val_if_fail (instance_class != NULL, NULL);
+  xreturn_val_if_fail (instance_class != NULL, NULL);
 
   node = lookup_type_node_I (class->g_type);
   iface = lookup_type_node_I (iface_type);
@@ -3232,7 +3232,7 @@ xtype_interface_peek_parent (xpointer_t x_iface)
   xpointer_t vtable = NULL;
   xtype_interface_t *iface_class = x_iface;
 
-  g_return_val_if_fail (x_iface != NULL, NULL);
+  xreturn_val_if_fail (x_iface != NULL, NULL);
 
   iface = lookup_type_node_I (iface_class->g_type);
   node = lookup_type_node_I (iface_class->g_instance_type);
@@ -3419,7 +3419,7 @@ xtype_from_name (const xchar_t *name)
 {
   xtype_t type = 0;
 
-  g_return_val_if_fail (name != NULL, 0);
+  xreturn_val_if_fail (name != NULL, 0);
 
   G_READ_LOCK (&type_rw_lock);
   type = (xtype_t) xhash_table_lookup (static_type_nodes_ht, name);
@@ -3767,7 +3767,7 @@ xtype_get_qdata (xtype_t  type,
     }
   else
     {
-      g_return_val_if_fail (node != NULL, NULL);
+      xreturn_val_if_fail (node != NULL, NULL);
       data = NULL;
     }
   return data;
@@ -3912,7 +3912,7 @@ xtype_get_instance_count (xtype_t type)
   TypeNode *node;
 
   node = lookup_type_node_I (type);
-  g_return_val_if_fail (node != NULL, 0);
+  xreturn_val_if_fail (node != NULL, 0);
 
   return g_atomic_int_get (&node->instance_count);
 #else
@@ -3997,7 +3997,7 @@ xtype_interface_get_plugin (xtype_t instance_type,
   TypeNode *node;
   TypeNode *iface;
 
-  g_return_val_if_fail (XTYPE_IS_INTERFACE (interface_type), NULL);	/* XTYPE_IS_INTERFACE() is an external call: _U */
+  xreturn_val_if_fail (XTYPE_IS_INTERFACE (interface_type), NULL);	/* XTYPE_IS_INTERFACE() is an external call: _U */
 
   node = lookup_type_node_I (instance_type);
   iface = lookup_type_node_I (interface_type);
@@ -4018,8 +4018,8 @@ xtype_interface_get_plugin (xtype_t instance_type,
       return plugin;
     }
 
-  g_return_val_if_fail (node == NULL, NULL);
-  g_return_val_if_fail (iface == NULL, NULL);
+  xreturn_val_if_fail (node == NULL, NULL);
+  xreturn_val_if_fail (iface == NULL, NULL);
 
   g_warning (G_STRLOC ": attempt to look up plugin for invalid instance/interface type pair.");
 
@@ -4470,7 +4470,7 @@ gobject_init (void)
    */
   node = type_node_fundamental_new_W (XTYPE_NONE, g_intern_static_string ("void"), 0);
   type = NODE_TYPE (node);
-  g_assert (type == XTYPE_NONE);
+  xassert (type == XTYPE_NONE);
 
   /* interface fundamental type XTYPE_INTERFACE (!classed)
    */
@@ -4478,7 +4478,7 @@ gobject_init (void)
   node = type_node_fundamental_new_W (XTYPE_INTERFACE, g_intern_static_string ("GInterface"), XTYPE_FLAG_DERIVABLE);
   type = NODE_TYPE (node);
   type_data_make_W (node, &info, NULL);
-  g_assert (type == XTYPE_INTERFACE);
+  xassert (type == XTYPE_INTERFACE);
 
   G_WRITE_UNLOCK (&type_rw_lock);
 
@@ -4510,7 +4510,7 @@ gobject_init (void)
 
   /* XTYPE_PARAM_* pspec types
    */
-  _g_param_spec_types_init ();
+  _xparam_spec_types_init ();
 
   /* Value Transformations
    */
@@ -4673,7 +4673,7 @@ gobject_init_ctor (void)
  * {
  *   xobject_private_t *priv;
  *
- *   g_return_val_if_fail (MY_IS_OBJECT (my_object), 0);
+ *   xreturn_val_if_fail (MY_IS_OBJECT (my_object), 0);
  *
  *   priv = my_object->priv;
  *
@@ -4715,7 +4715,7 @@ xtype_class_add_private (xpointer_t g_class,
   G_WRITE_LOCK (&type_rw_lock);
 
   private_size = ALIGN_STRUCT (node->data->instance.private_size + private_size);
-  g_assert (private_size <= 0xffff);
+  xassert (private_size <= 0xffff);
   node->data->instance.private_size = private_size;
 
   G_WRITE_UNLOCK (&type_rw_lock);
@@ -4728,8 +4728,8 @@ xtype_add_instance_private (xtype_t class_gtype,
 {
   TypeNode *node = lookup_type_node_I (class_gtype);
 
-  g_return_val_if_fail (private_size > 0, 0);
-  g_return_val_if_fail (private_size <= 0xffff, 0);
+  xreturn_val_if_fail (private_size > 0, 0);
+  xreturn_val_if_fail (private_size <= 0xffff, 0);
 
   if (!node || !node->is_classed || !node->is_instantiatable || !node->data)
     {
@@ -4820,7 +4820,7 @@ xtype_class_adjust_private_offset (xpointer_t  g_class,
   G_WRITE_LOCK (&type_rw_lock);
 
   private_size = ALIGN_STRUCT (node->data->instance.private_size + *private_size_or_offset);
-  g_assert (private_size <= 0xffff);
+  xassert (private_size <= 0xffff);
   node->data->instance.private_size = private_size;
 
   *private_size_or_offset = -(xint_t) node->data->instance.private_size;
@@ -4834,7 +4834,7 @@ xtype_instance_get_private (GTypeInstance *instance,
 {
   TypeNode *node;
 
-  g_return_val_if_fail (instance != NULL && instance->g_class != NULL, NULL);
+  xreturn_val_if_fail (instance != NULL && instance->g_class != NULL, NULL);
 
   node = lookup_type_node_I (private_type);
   if (G_UNLIKELY (!node || !node->is_instantiatable))
@@ -4871,13 +4871,13 @@ xtype_class_get_instance_private_offset (xpointer_t g_class)
   xuint16_t parent_size;
   TypeNode *node;
 
-  g_assert (g_class != NULL);
+  xassert (g_class != NULL);
 
   instance_type = ((xtype_class_t *) g_class)->g_type;
   node = lookup_type_node_I (instance_type);
 
-  g_assert (node != NULL);
-  g_assert (node->is_instantiatable);
+  xassert (node != NULL);
+  xassert (node->is_instantiatable);
 
   if (NODE_PARENT_TYPE (node))
     {
@@ -4956,7 +4956,7 @@ xtype_class_get_private (xtype_class_t *klass,
   TypeNode *parent_node;
   xsize_t offset;
 
-  g_return_val_if_fail (klass != NULL, NULL);
+  xreturn_val_if_fail (klass != NULL, NULL);
 
   class_node = lookup_type_node_I (klass->g_type);
   if (G_UNLIKELY (!class_node || !class_node->is_classed))
@@ -4979,7 +4979,7 @@ xtype_class_get_private (xtype_class_t *klass,
   if (NODE_PARENT_TYPE (private_node))
     {
       parent_node = lookup_type_node_I (NODE_PARENT_TYPE (private_node));
-      g_assert (parent_node->data && NODE_REFCOUNT (parent_node) > 0);
+      xassert (parent_node->data && NODE_REFCOUNT (parent_node) > 0);
 
       if (G_UNLIKELY (private_node->data->class.class_private_size == parent_node->data->class.class_private_size))
 	{

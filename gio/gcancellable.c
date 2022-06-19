@@ -41,7 +41,7 @@ enum {
   LAST_SIGNAL
 };
 
-struct _GCancellablePrivate
+struct _xcancellable_private
 {
   /* Atomic so that xcancellable_is_cancelled does not require holding the mutex. */
   xboolean_t cancelled;
@@ -55,29 +55,29 @@ struct _GCancellablePrivate
 
 static xuint_t signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (xcancellable_t, xcancellable, XTYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (xcancellable, xcancellable, XTYPE_OBJECT)
 
-static GPrivate current_cancellable;
+static xprivate_t current_cancellable;
 static xmutex_t cancellable_mutex;
 static xcond_t cancellable_cond;
 
 static void
 xcancellable_finalize (xobject_t *object)
 {
-  xcancellable_t *cancellable = G_CANCELLABLE (object);
+  xcancellable_t *cancellable = XCANCELLABLE (object);
 
   if (cancellable->priv->wakeup)
     XPL_PRIVATE_CALL (g_wakeup_free) (cancellable->priv->wakeup);
 
-  G_OBJECT_CLASS (xcancellable_parent_class)->finalize (object);
+  XOBJECT_CLASS (xcancellable_parent_class)->finalize (object);
 }
 
 static void
-xcancellable_class_init (GCancellableClass *klass)
+xcancellable_class_init (xcancellable_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->finalize = xcancellable_finalize;
+  xobject_class->finalize = xcancellable_finalize;
 
   /**
    * xcancellable_t::cancelled:
@@ -137,9 +137,9 @@ xcancellable_class_init (GCancellableClass *klass)
    */
   signals[CANCELLED] =
     xsignal_new (I_("cancelled"),
-		  XTYPE_FROM_CLASS (gobject_class),
+		  XTYPE_FROM_CLASS (xobject_class),
 		  G_SIGNAL_RUN_LAST,
-		  G_STRUCT_OFFSET (GCancellableClass, cancelled),
+		  G_STRUCT_OFFSET (xcancellable_class_t, cancelled),
 		  NULL, NULL,
 		  NULL,
 		  XTYPE_NONE, 0);
@@ -235,7 +235,7 @@ xcancellable_get_current  (void)
   if (l == NULL)
     return NULL;
 
-  return G_CANCELLABLE (l->data);
+  return XCANCELLABLE (l->data);
 }
 
 /**
@@ -257,7 +257,7 @@ xcancellable_get_current  (void)
 void
 xcancellable_reset (xcancellable_t *cancellable)
 {
-  GCancellablePrivate *priv;
+  _xcancellable_private *priv;
 
   g_return_if_fail (X_IS_CANCELLABLE (cancellable));
 
@@ -359,7 +359,7 @@ xcancellable_get_fd (xcancellable_t *cancellable)
   pollfd.fd = -1;
 #else
   retval = xcancellable_make_pollfd (cancellable, &pollfd);
-  g_assert (retval);
+  xassert (retval);
 #endif
 
   return pollfd.fd;
@@ -397,10 +397,10 @@ xcancellable_get_fd (xcancellable_t *cancellable)
 xboolean_t
 xcancellable_make_pollfd (xcancellable_t *cancellable, xpollfd_t *pollfd)
 {
-  g_return_val_if_fail (pollfd != NULL, FALSE);
+  xreturn_val_if_fail (pollfd != NULL, FALSE);
   if (cancellable == NULL)
     return FALSE;
-  g_return_val_if_fail (X_IS_CANCELLABLE (cancellable), FALSE);
+  xreturn_val_if_fail (X_IS_CANCELLABLE (cancellable), FALSE);
 
   g_mutex_lock (&cancellable_mutex);
 
@@ -440,7 +440,7 @@ xcancellable_make_pollfd (xcancellable_t *cancellable, xpollfd_t *pollfd)
 void
 xcancellable_release_fd (xcancellable_t *cancellable)
 {
-  GCancellablePrivate *priv;
+  _xcancellable_private *priv;
 
   if (cancellable == NULL)
     return;
@@ -450,7 +450,7 @@ xcancellable_release_fd (xcancellable_t *cancellable)
   priv = cancellable->priv;
 
   g_mutex_lock (&cancellable_mutex);
-  g_assert (priv->fd_refcount > 0);
+  xassert (priv->fd_refcount > 0);
 
   priv->fd_refcount--;
   if (priv->fd_refcount == 0)
@@ -486,7 +486,7 @@ xcancellable_release_fd (xcancellable_t *cancellable)
 void
 xcancellable_cancel (xcancellable_t *cancellable)
 {
-  GCancellablePrivate *priv;
+  _xcancellable_private *priv;
 
   if (cancellable == NULL || xcancellable_is_cancelled (cancellable))
     return;
@@ -563,7 +563,7 @@ xcancellable_connect (xcancellable_t   *cancellable,
 {
   xulong_t id;
 
-  g_return_val_if_fail (X_IS_CANCELLABLE (cancellable), 0);
+  xreturn_val_if_fail (X_IS_CANCELLABLE (cancellable), 0);
 
   g_mutex_lock (&cancellable_mutex);
 
@@ -622,7 +622,7 @@ void
 xcancellable_disconnect (xcancellable_t  *cancellable,
 			  xulong_t         handler_id)
 {
-  GCancellablePrivate *priv;
+  _xcancellable_private *priv;
 
   if (handler_id == 0 ||  cancellable == NULL)
     return;

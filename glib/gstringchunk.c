@@ -185,7 +185,7 @@ xchar_t*
 xstring_chunk_insert (xstring_chunk_t *chunk,
                        const xchar_t  *string)
 {
-  g_return_val_if_fail (chunk != NULL, NULL);
+  xreturn_val_if_fail (chunk != NULL, NULL);
 
   return xstring_chunk_insert_len (chunk, string, -1);
 }
@@ -218,7 +218,7 @@ xstring_chunk_insert_const (xstring_chunk_t *chunk,
 {
   char* lookup;
 
-  g_return_val_if_fail (chunk != NULL, NULL);
+  xreturn_val_if_fail (chunk != NULL, NULL);
 
   if (!chunk->const_table)
     chunk->const_table = xhash_table_new (xstr_hash, xstr_equal);
@@ -263,7 +263,7 @@ xstring_chunk_insert_len (xstring_chunk_t *chunk,
   xsize_t size;
   xchar_t* pos;
 
-  g_return_val_if_fail (chunk != NULL, NULL);
+  xreturn_val_if_fail (chunk != NULL, NULL);
 
   if (len < 0)
     size = strlen (string);

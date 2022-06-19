@@ -47,7 +47,7 @@ typedef struct _test_iface_class test_iface_class_t;
 static void test_iface_base_init    (test_iface_class_t *iface);
 static void test_iface_default_init (test_iface_class_t *iface, xpointer_t class_data);
 
-static DEFINE_IFACE(test_iface_t, test_iface, test_iface_base_init, test_iface_default_init)
+static DEFINE_IFACE(test_iface, test_iface, test_iface_base_init, test_iface_default_init)
 
 static void
 test_iface_default_init (test_iface_class_t *iface,
@@ -74,7 +74,7 @@ struct _dynamic_object_class
 
 static void dynamic_object_iface_init (test_iface_t *iface);
 
-G_DEFINE_DYNAMIC_TYPE_EXTENDED(dynamic_object_t, dynamic_object, XTYPE_OBJECT, 0,
+G_DEFINE_DYNAMIC_TYPE_EXTENDED(dynamic_object, dynamic_object, XTYPE_OBJECT, 0,
 			       G_IMPLEMENT_INTERFACE_DYNAMIC (TEST_TYPE_IFACE,
 							      dynamic_object_iface_init));
 
@@ -116,25 +116,25 @@ test_dynamic_type (void)
 
   /* Not loaded until we call ref for the first time */
   class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
-  g_assert (class == NULL);
-  g_assert (!loaded);
+  xassert (class == NULL);
+  xassert (!loaded);
 
   /* Make sure interfaces work */
-  g_assert (xtype_is_a (DYNAMIC_OBJECT_TYPE,
+  xassert (xtype_is_a (DYNAMIC_OBJECT_TYPE,
 			 TEST_TYPE_IFACE));
 
   /* Ref loads */
   class = xtype_class_ref (DYNAMIC_OBJECT_TYPE);
-  g_assert (class && class->val == 42);
-  g_assert (loaded);
+  xassert (class && class->val == 42);
+  xassert (loaded);
 
   /* Peek then works */
   class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
-  g_assert (class && class->val == 42);
-  g_assert (loaded);
+  xassert (class && class->val == 42);
+  xassert (loaded);
 
   /* Make sure interfaces still work */
-  g_assert (xtype_is_a (DYNAMIC_OBJECT_TYPE,
+  xassert (xtype_is_a (DYNAMIC_OBJECT_TYPE,
 			 TEST_TYPE_IFACE));
 
   /* Unref causes finalize */
@@ -143,21 +143,21 @@ test_dynamic_type (void)
   /* Peek returns NULL */
   class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
 #if 0
-  g_assert (!class);
-  g_assert (!loaded);
+  xassert (!class);
+  xassert (!loaded);
 #endif
 
   /* Ref reloads */
   class = xtype_class_ref (DYNAMIC_OBJECT_TYPE);
-  g_assert (class && class->val == 42);
-  g_assert (loaded);
+  xassert (class && class->val == 42);
+  xassert (loaded);
 
   /* And Unref causes finalize once more*/
   xtype_class_unref (class);
   class = xtype_class_peek (DYNAMIC_OBJECT_TYPE);
 #if 0
-  g_assert (!class);
-  g_assert (!loaded);
+  xassert (!class);
+  xassert (!loaded);
 #endif
 }
 

@@ -900,7 +900,7 @@ typedef struct
 } test_object_class_t;
 
 static xtype_t test_object_get_type (void);
-G_DEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
+XDEFINE_TYPE (test_object, test_object, XTYPE_OBJECT)
 
 static void
 test_object_init (test_object_t *object)
@@ -913,7 +913,7 @@ test_object_finalize (xobject_t *object)
   test_object_t *testo = (test_object_t*)object;
   xstrfreev (testo->strv_prop);
   g_free (testo->string_prop);
-  G_OBJECT_CLASS (test_object_parent_class)->finalize (object);
+  XOBJECT_CLASS (test_object_parent_class)->finalize (object);
 }
 
 static void
@@ -1088,44 +1088,44 @@ test_flags_get_type (void)
 static void
 test_object_class_init (test_object_class_t *class)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (class);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (class);
 
-  gobject_class->get_property = test_object_get_property;
-  gobject_class->set_property = test_object_set_property;
-  gobject_class->finalize = test_object_finalize;
+  xobject_class->get_property = test_object_get_property;
+  xobject_class->set_property = test_object_set_property;
+  xobject_class->finalize = test_object_finalize;
 
-  xobject_class_install_property (gobject_class, PROP_BOOL,
-    g_param_spec_boolean ("bool", "", "", FALSE, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_ANTI_BOOL,
-    g_param_spec_boolean ("anti-bool", "", "", FALSE, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_BYTE,
-    g_param_spec_char ("byte", "", "", G_MININT8, G_MAXINT8, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_INT16,
-    g_param_spec_int ("int16", "", "", -G_MAXINT16, G_MAXINT16, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_UINT16,
-    g_param_spec_uint ("uint16", "", "", 0, G_MAXUINT16, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_INT,
-    g_param_spec_int ("int", "", "", G_MININT, G_MAXINT, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_UINT,
-    g_param_spec_uint ("uint", "", "", 0, G_MAXUINT, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_INT64,
-    g_param_spec_int64 ("int64", "", "", G_MININT64, G_MAXINT64, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_UINT64,
-    g_param_spec_uint64 ("uint64", "", "", 0, G_MAXUINT64, 0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_DOUBLE,
-    g_param_spec_double ("double", "", "", -G_MAXDOUBLE, G_MAXDOUBLE, 0.0, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_STRING,
-    g_param_spec_string ("string", "", "", NULL, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_NO_WRITE,
-    g_param_spec_string ("no-write", "", "", NULL, G_PARAM_READABLE));
-  xobject_class_install_property (gobject_class, PROP_NO_READ,
-    g_param_spec_string ("no-read", "", "", NULL, G_PARAM_WRITABLE));
-  xobject_class_install_property (gobject_class, PROP_STRV,
-    g_param_spec_boxed ("strv", "", "", XTYPE_STRV, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_ENUM,
-    g_param_spec_enum ("enum", "", "", test_enum_get_type (), TEST_ENUM_FOO, G_PARAM_READWRITE));
-  xobject_class_install_property (gobject_class, PROP_FLAGS,
-    g_param_spec_flags ("flags", "", "", test_flags_get_type (), TEST_FLAGS_NONE, G_PARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_BOOL,
+    xparam_spec_boolean ("bool", "", "", FALSE, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_ANTI_BOOL,
+    xparam_spec_boolean ("anti-bool", "", "", FALSE, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_BYTE,
+    xparam_spec_char ("byte", "", "", G_MININT8, G_MAXINT8, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_INT16,
+    xparam_spec_int ("int16", "", "", -G_MAXINT16, G_MAXINT16, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_UINT16,
+    xparam_spec_uint ("uint16", "", "", 0, G_MAXUINT16, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_INT,
+    xparam_spec_int ("int", "", "", G_MININT, G_MAXINT, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_UINT,
+    xparam_spec_uint ("uint", "", "", 0, G_MAXUINT, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_INT64,
+    xparam_spec_int64 ("int64", "", "", G_MININT64, G_MAXINT64, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_UINT64,
+    xparam_spec_uint64 ("uint64", "", "", 0, G_MAXUINT64, 0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_DOUBLE,
+    xparam_spec_double ("double", "", "", -G_MAXDOUBLE, G_MAXDOUBLE, 0.0, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_STRING,
+    xparam_spec_string ("string", "", "", NULL, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_NO_WRITE,
+    xparam_spec_string ("no-write", "", "", NULL, XPARAM_READABLE));
+  xobject_class_install_property (xobject_class, PROP_NO_READ,
+    xparam_spec_string ("no-read", "", "", NULL, XPARAM_WRITABLE));
+  xobject_class_install_property (xobject_class, PROP_STRV,
+    xparam_spec_boxed ("strv", "", "", XTYPE_STRV, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_ENUM,
+    xparam_spec_enum ("enum", "", "", test_enum_get_type (), TEST_ENUM_FOO, XPARAM_READWRITE));
+  xobject_class_install_property (xobject_class, PROP_FLAGS,
+    xparam_spec_flags ("flags", "", "", test_flags_get_type (), TEST_FLAGS_NONE, XPARAM_READWRITE));
 }
 
 static test_object_t *
@@ -1752,7 +1752,7 @@ test_keyfile (Fixture       *fixture,
 
   keyfile_path = g_build_filename (fixture->tmp_dir, "keyfile", NULL);
   store_path = g_build_filename (keyfile_path, "gsettings.store", NULL);
-  kf_backend = g_keyfile_settings_backend_new (store_path, "/", "root");
+  kf_backend = xkeyfile_settings_backend_new (store_path, "/", "root");
   settings = g_settings_new_with_backend ("org.gtk.test", kf_backend);
   xobject_unref (kf_backend);
 
@@ -1880,7 +1880,7 @@ test_keyfile_no_path (Fixture       *fixture,
 
   keyfile_path = g_build_filename (fixture->tmp_dir, "keyfile", NULL);
   store_path = g_build_filename (keyfile_path, "gsettings.store", NULL);
-  kf_backend = g_keyfile_settings_backend_new (store_path, test_data->root_path, test_data->root_group);
+  kf_backend = xkeyfile_settings_backend_new (store_path, test_data->root_path, test_data->root_group);
   settings = g_settings_new_with_backend_and_path ("org.gtk.test.no-path", kf_backend, test_data->path);
   xobject_unref (kf_backend);
 
@@ -1959,7 +1959,7 @@ test_keyfile_outside_root_path (Fixture       *fixture,
 
   keyfile_path = g_build_filename (fixture->tmp_dir, "keyfile", NULL);
   store_path = g_build_filename (keyfile_path, "gsettings.store", NULL);
-  kf_backend = g_keyfile_settings_backend_new (store_path, "/tests/basic-types/", "root");
+  kf_backend = xkeyfile_settings_backend_new (store_path, "/tests/basic-types/", "root");
   settings = g_settings_new_with_backend_and_path ("org.gtk.test.no-path", kf_backend, "/tests/");
   xobject_unref (kf_backend);
 
@@ -1988,7 +1988,7 @@ test_keyfile_no_root_group (Fixture       *fixture,
 
   keyfile_path = g_build_filename (fixture->tmp_dir, "keyfile", NULL);
   store_path = g_build_filename (keyfile_path, "gsettings.store", NULL);
-  kf_backend = g_keyfile_settings_backend_new (store_path, "/", NULL);
+  kf_backend = xkeyfile_settings_backend_new (store_path, "/", NULL);
   settings = g_settings_new_with_backend_and_path ("org.gtk.test.no-path", kf_backend, "/");
   xobject_unref (kf_backend);
 

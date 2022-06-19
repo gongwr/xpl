@@ -59,7 +59,7 @@ g_dbus_interface_default_init (xdbus_interface_iface_t *iface)
 xdbus_interface_info_t *
 g_dbus_interface_get_info (xdbus_interface_t *interface_)
 {
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
   return G_DBUS_INTERFACE_GET_IFACE (interface_)->get_info (interface_);
 }
 
@@ -81,7 +81,7 @@ g_dbus_interface_get_info (xdbus_interface_t *interface_)
 xdbus_object_t *
 g_dbus_interface_get_object (xdbus_interface_t *interface_)
 {
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
   return G_DBUS_INTERFACE_GET_IFACE (interface_)->get_object (interface_);
 }
 
@@ -100,7 +100,7 @@ xdbus_object_t *
 g_dbus_interface_dup_object (xdbus_interface_t *interface_)
 {
   xdbus_object_t *ret;
-  g_return_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
+  xreturn_val_if_fail (X_IS_DBUS_INTERFACE (interface_), NULL);
   if (G_LIKELY (G_DBUS_INTERFACE_GET_IFACE (interface_)->dup_object != NULL))
     {
       ret = G_DBUS_INTERFACE_GET_IFACE (interface_)->dup_object (interface_);

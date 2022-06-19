@@ -37,7 +37,7 @@
 #include "gsrvtarget.h"
 
 
-G_DEFINE_TYPE (GThreadedResolver, xthreaded_resolver, XTYPE_RESOLVER)
+XDEFINE_TYPE (GThreadedResolver, xthreaded_resolver, XTYPE_RESOLVER)
 
 static void
 xthreaded_resolver_init (GThreadedResolver *gtr)
@@ -209,7 +209,7 @@ flags_to_family (GResolverNameLookupFlags flags)
     {
       address_family = AF_INET6;
       /* You can only filter by one family at a time */
-      g_return_val_if_fail (!(flags & G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY), address_family);
+      xreturn_val_if_fail (!(flags & G_RESOLVER_NAME_LOOKUP_FLAGS_IPV4_ONLY), address_family);
     }
 
   return address_family;
@@ -280,7 +280,7 @@ lookup_by_name_finish (xresolver_t     *resolver,
                        xasync_result_t  *result,
                        xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -290,7 +290,7 @@ lookup_by_name_with_flags_finish (xresolver_t     *resolver,
                                   xasync_result_t  *result,
                                   xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -386,7 +386,7 @@ lookup_by_address_finish (xresolver_t     *resolver,
                           xasync_result_t  *result,
                           xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }
@@ -649,7 +649,7 @@ g_resolver_record_type_to_rrtype (GResolverRecordType type)
     case G_RESOLVER_RECORD_MX:
       return T_MX;
   }
-  g_return_val_if_reached (-1);
+  xreturn_val_if_reached (-1);
 }
 
 xlist_t *
@@ -831,7 +831,7 @@ g_resolver_record_type_to_dnstype (GResolverRecordType type)
     case G_RESOLVER_RECORD_MX:
       return DNS_TYPE_MX;
   }
-  g_return_val_if_reached (-1);
+  xreturn_val_if_reached (-1);
 }
 
 static xlist_t *
@@ -1090,7 +1090,7 @@ lookup_records_finish (xresolver_t     *resolver,
                        xasync_result_t  *result,
                        xerror_t       **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, resolver), NULL);
+  xreturn_val_if_fail (xtask_is_valid (result, resolver), NULL);
 
   return xtask_propagate_pointer (XTASK (result), error);
 }

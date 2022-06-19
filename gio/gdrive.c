@@ -145,7 +145,7 @@ xdrive_get_name (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -166,7 +166,7 @@ xdrive_get_icon (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -190,7 +190,7 @@ xdrive_get_symbolic_icon (xdrive_t *drive)
   xdrive_iface_t *iface;
   xicon_t *ret;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -215,7 +215,7 @@ xdrive_has_volumes (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -238,7 +238,7 @@ xdrive_get_volumes (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -259,7 +259,7 @@ xdrive_is_media_check_automatic (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -282,7 +282,7 @@ xdrive_is_removable (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
   if (iface->is_removable != NULL)
@@ -304,7 +304,7 @@ xdrive_is_media_removable (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -326,7 +326,7 @@ xdrive_has_media (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -346,7 +346,7 @@ xdrive_can_eject (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -370,7 +370,7 @@ xdrive_can_poll_for_media (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -441,8 +441,8 @@ xdrive_eject_finish (xdrive_t        *drive,
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -523,8 +523,8 @@ xdrive_eject_with_operation_finish (xdrive_t        *drive,
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -593,8 +593,8 @@ xdrive_poll_for_media_finish (xdrive_t        *drive,
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -625,8 +625,8 @@ xdrive_get_identifier (xdrive_t     *drive,
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
-  g_return_val_if_fail (kind != NULL, NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (kind != NULL, NULL);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -653,7 +653,7 @@ xdrive_enumerate_identifiers (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
   iface = XDRIVE_GET_IFACE (drive);
 
   if (iface->enumerate_identifiers == NULL)
@@ -677,7 +677,7 @@ xdrive_get_start_stop_type (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -703,7 +703,7 @@ xdrive_can_start (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -728,7 +728,7 @@ xdrive_can_start_degraded (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -802,8 +802,8 @@ xdrive_start_finish (xdrive_t         *drive,
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -830,7 +830,7 @@ xdrive_can_stop (xdrive_t *drive)
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
 
   iface = XDRIVE_GET_IFACE (drive);
 
@@ -904,8 +904,8 @@ xdrive_stop_finish (xdrive_t        *drive,
 {
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), FALSE);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), FALSE);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), FALSE);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return FALSE;
@@ -933,7 +933,7 @@ xdrive_get_sort_key (xdrive_t  *drive)
   const xchar_t *ret = NULL;
   xdrive_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_DRIVE (drive), NULL);
+  xreturn_val_if_fail (X_IS_DRIVE (drive), NULL);
 
   iface = XDRIVE_GET_IFACE (drive);
   if (iface->get_sort_key != NULL)

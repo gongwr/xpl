@@ -505,15 +505,15 @@ g_stpcpy (xchar_t       *dest,
           const xchar_t *src)
 {
 #ifdef HAVE_STPCPY
-  g_return_val_if_fail (dest != NULL, NULL);
-  g_return_val_if_fail (src != NULL, NULL);
+  xreturn_val_if_fail (dest != NULL, NULL);
+  xreturn_val_if_fail (src != NULL, NULL);
   return stpcpy (dest, src);
 #else
   xchar_t *d = dest;
   const xchar_t *s = src;
 
-  g_return_val_if_fail (dest != NULL, NULL);
-  g_return_val_if_fail (src != NULL, NULL);
+  xreturn_val_if_fail (dest != NULL, NULL);
+  xreturn_val_if_fail (src != NULL, NULL);
   do
     *d++ = *s;
   while (*s++ != '\0');
@@ -668,7 +668,7 @@ xstrtod (const xchar_t *nptr,
   xdouble_t val_1;
   xdouble_t val_2 = 0;
 
-  g_return_val_if_fail (nptr != NULL, 0);
+  xreturn_val_if_fail (nptr != NULL, 0);
 
   fail_pos_1 = NULL;
   fail_pos_2 = NULL;
@@ -730,7 +730,7 @@ g_ascii_strtod (const xchar_t *nptr,
 {
 #if defined(USE_XLOCALE) && defined(HAVE_STRTOD_L)
 
-  g_return_val_if_fail (nptr != NULL, 0);
+  xreturn_val_if_fail (nptr != NULL, 0);
 
   errno = 0;
 
@@ -749,7 +749,7 @@ g_ascii_strtod (const xchar_t *nptr,
   const char *end = NULL; /* Silence gcc */
   int strtod_errno;
 
-  g_return_val_if_fail (nptr != NULL, 0);
+  xreturn_val_if_fail (nptr != NULL, 0);
 
   fail_pos = NULL;
 
@@ -762,7 +762,7 @@ g_ascii_strtod (const xchar_t *nptr,
   decimal_point_len = 1;
 #endif
 
-  g_assert (decimal_point_len != 0);
+  xassert (decimal_point_len != 0);
 
   decimal_point_pos = NULL;
   end = NULL;
@@ -954,9 +954,9 @@ g_ascii_formatd (xchar_t       *buffer,
 #ifdef USE_XLOCALE
   locale_t old_locale;
 
-  g_return_val_if_fail (buffer != NULL, NULL);
-  g_return_val_if_fail (format[0] == '%', NULL);
-  g_return_val_if_fail (strpbrk (format + 1, "'l%") == NULL, NULL);
+  xreturn_val_if_fail (buffer != NULL, NULL);
+  xreturn_val_if_fail (format[0] == '%', NULL);
+  xreturn_val_if_fail (strpbrk (format + 1, "'l%") == NULL, NULL);
 
   old_locale = uselocale (get_C_locale ());
    _g_snprintf (buffer, buf_len, format, d);
@@ -973,13 +973,13 @@ g_ascii_formatd (xchar_t       *buffer,
   int rest_len;
   xchar_t format_char;
 
-  g_return_val_if_fail (buffer != NULL, NULL);
-  g_return_val_if_fail (format[0] == '%', NULL);
-  g_return_val_if_fail (strpbrk (format + 1, "'l%") == NULL, NULL);
+  xreturn_val_if_fail (buffer != NULL, NULL);
+  xreturn_val_if_fail (format[0] == '%', NULL);
+  xreturn_val_if_fail (strpbrk (format + 1, "'l%") == NULL, NULL);
 
   format_char = format[strlen (format) - 1];
 
-  g_return_val_if_fail (format_char == 'e' || format_char == 'E' ||
+  xreturn_val_if_fail (format_char == 'e' || format_char == 'E' ||
                         format_char == 'f' || format_char == 'F' ||
                         format_char == 'g' || format_char == 'G',
                         NULL);
@@ -1006,7 +1006,7 @@ g_ascii_formatd (xchar_t       *buffer,
   decimal_point_len = 1;
 #endif
 
-  g_assert (decimal_point_len != 0);
+  xassert (decimal_point_len != 0);
 
   if (decimal_point[0] != '.' ||
       decimal_point[1] != 0)
@@ -1069,7 +1069,7 @@ g_parse_long_long (const xchar_t  *nptr,
   const xchar_t *s, *save;
   xuchar_t c;
 
-  g_return_val_if_fail (nptr != NULL, 0);
+  xreturn_val_if_fail (nptr != NULL, 0);
 
   *negative = FALSE;
   if (base == 1 || base > 36)
@@ -1415,8 +1415,8 @@ xstrlcpy (xchar_t       *dest,
            const xchar_t *src,
            xsize_t        dest_size)
 {
-  g_return_val_if_fail (dest != NULL, 0);
-  g_return_val_if_fail (src  != NULL, 0);
+  xreturn_val_if_fail (dest != NULL, 0);
+  xreturn_val_if_fail (src  != NULL, 0);
 
   return strlcpy (dest, src, dest_size);
 }
@@ -1426,8 +1426,8 @@ xstrlcat (xchar_t       *dest,
            const xchar_t *src,
            xsize_t        dest_size)
 {
-  g_return_val_if_fail (dest != NULL, 0);
-  g_return_val_if_fail (src  != NULL, 0);
+  xreturn_val_if_fail (dest != NULL, 0);
+  xreturn_val_if_fail (src  != NULL, 0);
 
   return strlcat (dest, src, dest_size);
 }
@@ -1465,8 +1465,8 @@ xstrlcpy (xchar_t       *dest,
   const xchar_t *s = src;
   xsize_t n = dest_size;
 
-  g_return_val_if_fail (dest != NULL, 0);
-  g_return_val_if_fail (src  != NULL, 0);
+  xreturn_val_if_fail (dest != NULL, 0);
+  xreturn_val_if_fail (src  != NULL, 0);
 
   /* Copy as many bytes as will fit */
   if (n != 0 && --n != 0)
@@ -1527,8 +1527,8 @@ xstrlcat (xchar_t       *dest,
   xsize_t bytes_left = dest_size;
   xsize_t dlength;  /* Logically, MIN (strlen (d), dest_size) */
 
-  g_return_val_if_fail (dest != NULL, 0);
-  g_return_val_if_fail (src  != NULL, 0);
+  xreturn_val_if_fail (dest != NULL, 0);
+  xreturn_val_if_fail (src  != NULL, 0);
 
   /* Find the end of dst and adjust bytes left but don't go past end */
   while (*d != 0 && bytes_left-- != 0)
@@ -1572,7 +1572,7 @@ g_ascii_strdown (const xchar_t *str,
 {
   xchar_t *result, *s;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   if (len < 0)
     len = (xssize_t) strlen (str);
@@ -1602,7 +1602,7 @@ g_ascii_strup (const xchar_t *str,
 {
   xchar_t *result, *s;
 
-  g_return_val_if_fail (str != NULL, NULL);
+  xreturn_val_if_fail (str != NULL, NULL);
 
   if (len < 0)
     len = (xssize_t) strlen (str);
@@ -1654,7 +1654,7 @@ xstrdown (xchar_t *string)
 {
   xuchar_t *s;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   s = (xuchar_t *) string;
 
@@ -1685,7 +1685,7 @@ xstrup (xchar_t *string)
 {
   xuchar_t *s;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   s = (xuchar_t *) string;
 
@@ -1715,7 +1715,7 @@ xstrup (xchar_t *string)
 xchar_t*
 xstrreverse (xchar_t *string)
 {
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (*string)
     {
@@ -1856,8 +1856,8 @@ g_ascii_strcasecmp (const xchar_t *s1,
 {
   xint_t c1, c2;
 
-  g_return_val_if_fail (s1 != NULL, 0);
-  g_return_val_if_fail (s2 != NULL, 0);
+  xreturn_val_if_fail (s1 != NULL, 0);
+  xreturn_val_if_fail (s2 != NULL, 0);
 
   while (*s1 && *s2)
     {
@@ -1900,8 +1900,8 @@ g_ascii_strncasecmp (const xchar_t *s1,
 {
   xint_t c1, c2;
 
-  g_return_val_if_fail (s1 != NULL, 0);
-  g_return_val_if_fail (s2 != NULL, 0);
+  xreturn_val_if_fail (s1 != NULL, 0);
+  xreturn_val_if_fail (s2 != NULL, 0);
 
   while (n && *s1 && *s2)
     {
@@ -1938,15 +1938,15 @@ xstrcasecmp (const xchar_t *s1,
               const xchar_t *s2)
 {
 #ifdef HAVE_STRCASECMP
-  g_return_val_if_fail (s1 != NULL, 0);
-  g_return_val_if_fail (s2 != NULL, 0);
+  xreturn_val_if_fail (s1 != NULL, 0);
+  xreturn_val_if_fail (s2 != NULL, 0);
 
   return strcasecmp (s1, s2);
 #else
   xint_t c1, c2;
 
-  g_return_val_if_fail (s1 != NULL, 0);
-  g_return_val_if_fail (s2 != NULL, 0);
+  xreturn_val_if_fail (s1 != NULL, 0);
+  xreturn_val_if_fail (s2 != NULL, 0);
 
   while (*s1 && *s2)
     {
@@ -2003,8 +2003,8 @@ xstrncasecmp (const xchar_t *s1,
 #else
   xint_t c1, c2;
 
-  g_return_val_if_fail (s1 != NULL, 0);
-  g_return_val_if_fail (s2 != NULL, 0);
+  xreturn_val_if_fail (s1 != NULL, 0);
+  xreturn_val_if_fail (s2 != NULL, 0);
 
   while (n && *s1 && *s2)
     {
@@ -2062,7 +2062,7 @@ xstrdelimit (xchar_t       *string,
 {
   xchar_t *c;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (!delimiters)
     delimiters = G_STR_DELIMITERS;
@@ -2109,8 +2109,8 @@ xstrcanon (xchar_t       *string,
 {
   xchar_t *c;
 
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (valid_chars != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (valid_chars != NULL, NULL);
 
   for (c = string; *c; c++)
     {
@@ -2139,7 +2139,7 @@ xstrcompress (const xchar_t *source)
   xchar_t *dest;
   xchar_t *q;
 
-  g_return_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
 
   dest = g_malloc (strlen (source) + 1);
   q = dest;
@@ -2225,7 +2225,7 @@ xstrescape (const xchar_t *source,
   xchar_t *q;
   xuchar_t excmap[256];
 
-  g_return_val_if_fail (source != NULL, NULL);
+  xreturn_val_if_fail (source != NULL, NULL);
 
   p = (xuchar_t *) source;
   /* Each source byte needs maximally four destination chars (\777) */
@@ -2324,7 +2324,7 @@ xstrchug (xchar_t *string)
 {
   xuchar_t *start;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   for (start = (xuchar_t*) string; *start && g_ascii_isspace (*start); start++)
     ;
@@ -2355,7 +2355,7 @@ xstrchomp (xchar_t *string)
 {
   xsize_t len;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   len = strlen (string);
   while (len--)
@@ -2405,9 +2405,9 @@ xstrsplit (const xchar_t *string,
   const xchar_t *remainder;
   xptr_array_t *string_list;
 
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (delimiter != NULL, NULL);
-  g_return_val_if_fail (delimiter[0] != '\0', NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (delimiter != NULL, NULL);
+  xreturn_val_if_fail (delimiter[0] != '\0', NULL);
 
   if (max_tokens < 1)
     max_tokens = G_MAXINT;
@@ -2486,8 +2486,8 @@ xstrsplit_set (const xchar_t *string,
   xchar_t *token;
   xchar_t **result;
 
-  g_return_val_if_fail (string != NULL, NULL);
-  g_return_val_if_fail (delimiters != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (delimiters != NULL, NULL);
 
   if (max_tokens < 1)
     max_tokens = G_MAXINT;
@@ -2632,7 +2632,7 @@ xstrjoinv (const xchar_t  *separator,
   xchar_t *string;
   xchar_t *ptr;
 
-  g_return_val_if_fail (str_array != NULL, NULL);
+  xreturn_val_if_fail (str_array != NULL, NULL);
 
   if (separator == NULL)
     separator = "";
@@ -2754,8 +2754,8 @@ xstrstr_len (const xchar_t *haystack,
               xssize_t       haystack_len,
               const xchar_t *needle)
 {
-  g_return_val_if_fail (haystack != NULL, NULL);
-  g_return_val_if_fail (needle != NULL, NULL);
+  xreturn_val_if_fail (haystack != NULL, NULL);
+  xreturn_val_if_fail (needle != NULL, NULL);
 
   if (haystack_len < 0)
     return strstr (haystack, needle);
@@ -2811,8 +2811,8 @@ xstrrstr (const xchar_t *haystack,
   xsize_t haystack_len;
   const xchar_t *p;
 
-  g_return_val_if_fail (haystack != NULL, NULL);
-  g_return_val_if_fail (needle != NULL, NULL);
+  xreturn_val_if_fail (haystack != NULL, NULL);
+  xreturn_val_if_fail (needle != NULL, NULL);
 
   needle_len = strlen (needle);
   haystack_len = strlen (haystack);
@@ -2859,8 +2859,8 @@ xstrrstr_len (const xchar_t *haystack,
                xssize_t        haystack_len,
                const xchar_t *needle)
 {
-  g_return_val_if_fail (haystack != NULL, NULL);
-  g_return_val_if_fail (needle != NULL, NULL);
+  xreturn_val_if_fail (haystack != NULL, NULL);
+  xreturn_val_if_fail (needle != NULL, NULL);
 
   if (haystack_len < 0)
     return xstrrstr (haystack, needle);
@@ -2914,8 +2914,8 @@ xstr_has_suffix (const xchar_t *str,
   xsize_t str_len;
   xsize_t suffix_len;
 
-  g_return_val_if_fail (str != NULL, FALSE);
-  g_return_val_if_fail (suffix != NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (suffix != NULL, FALSE);
 
   str_len = strlen (str);
   suffix_len = strlen (suffix);
@@ -2941,8 +2941,8 @@ xboolean_t
 xstr_has_prefix (const xchar_t *str,
                   const xchar_t *prefix)
 {
-  g_return_val_if_fail (str != NULL, FALSE);
-  g_return_val_if_fail (prefix != NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (prefix != NULL, FALSE);
 
   return strncmp (str, prefix, strlen (prefix)) == 0;
 }
@@ -2963,7 +2963,7 @@ xstrv_length (xchar_t **str_array)
 {
   xuint_t i = 0;
 
-  g_return_val_if_fail (str_array != NULL, 0);
+  xreturn_val_if_fail (str_array != NULL, 0);
 
   while (str_array[i])
     ++i;
@@ -3091,7 +3091,7 @@ xstr_tokenize_and_fold (const xchar_t   *string,
 {
   xchar_t **result;
 
-  g_return_val_if_fail (string != NULL, NULL);
+  xreturn_val_if_fail (string != NULL, NULL);
 
   if (ascii_alternates && xstr_is_ascii (string))
     {
@@ -3186,8 +3186,8 @@ xstr_match_string (const xchar_t *search_term,
   xboolean_t matched;
   xint_t i, j;
 
-  g_return_val_if_fail (search_term != NULL, FALSE);
-  g_return_val_if_fail (potential_hit != NULL, FALSE);
+  xreturn_val_if_fail (search_term != NULL, FALSE);
+  xreturn_val_if_fail (potential_hit != NULL, FALSE);
 
   term_tokens = xstr_tokenize_and_fold (search_term, NULL, NULL);
   hit_tokens = xstr_tokenize_and_fold (potential_hit, NULL, accept_alternates ? &alternates : NULL);
@@ -3234,8 +3234,8 @@ xboolean_t
 xstrv_contains (const xchar_t * const *strv,
                  const xchar_t         *str)
 {
-  g_return_val_if_fail (strv != NULL, FALSE);
-  g_return_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (strv != NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
 
   for (; *strv != NULL; strv++)
     {
@@ -3265,8 +3265,8 @@ xboolean_t
 xstrv_equal (const xchar_t * const *strv1,
               const xchar_t * const *strv2)
 {
-  g_return_val_if_fail (strv1 != NULL, FALSE);
-  g_return_val_if_fail (strv2 != NULL, FALSE);
+  xreturn_val_if_fail (strv1 != NULL, FALSE);
+  xreturn_val_if_fail (strv2 != NULL, FALSE);
 
   if (strv1 == strv2)
     return TRUE;
@@ -3339,10 +3339,10 @@ g_ascii_string_to_signed (const xchar_t  *str,
   const xchar_t *end_ptr = NULL;
   xint_t saved_errno = 0;
 
-  g_return_val_if_fail (str != NULL, FALSE);
-  g_return_val_if_fail (base >= 2 && base <= 36, FALSE);
-  g_return_val_if_fail (min <= max, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (base >= 2 && base <= 36, FALSE);
+  xreturn_val_if_fail (min <= max, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (str[0] == '\0')
     {
@@ -3441,10 +3441,10 @@ g_ascii_string_to_unsigned (const xchar_t  *str,
   const xchar_t *end_ptr = NULL;
   xint_t saved_errno = 0;
 
-  g_return_val_if_fail (str != NULL, FALSE);
-  g_return_val_if_fail (base >= 2 && base <= 36, FALSE);
-  g_return_val_if_fail (min <= max, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  xreturn_val_if_fail (str != NULL, FALSE);
+  xreturn_val_if_fail (base >= 2 && base <= 36, FALSE);
+  xreturn_val_if_fail (min <= max, FALSE);
+  xreturn_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (str[0] == '\0')
     {

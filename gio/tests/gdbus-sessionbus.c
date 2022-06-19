@@ -26,7 +26,7 @@ void
 session_bus_up (void)
 {
   xchar_t *relative, *servicesdir;
-  g_assert (singleton == NULL);
+  xassert (singleton == NULL);
   singleton = g_test_dbus_new (G_TEST_DBUS_NONE);
 
   /* We ignore deprecations here so that gdbus-test-codegen-old can
@@ -46,14 +46,14 @@ session_bus_up (void)
 void
 session_bus_stop (void)
 {
-  g_assert (singleton != NULL);
+  xassert (singleton != NULL);
   g_test_dbus_stop (singleton);
 }
 
 void
 session_bus_down (void)
 {
-  g_assert (singleton != NULL);
+  xassert (singleton != NULL);
   g_test_dbus_down (singleton);
   g_clear_object (&singleton);
 }

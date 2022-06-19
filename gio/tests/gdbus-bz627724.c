@@ -40,7 +40,7 @@ typedef struct {
 
 xtype_t my_object_get_type (void) G_GNUC_CONST;
 
-G_DEFINE_TYPE (xobject_t, my_object, XTYPE_OBJECT)
+XDEFINE_TYPE (xobject_t, my_object, XTYPE_OBJECT)
 
 static void
 my_object_init (xobject_t *object)
@@ -56,7 +56,7 @@ my_object_class_init (xobject_class_t *klass)
                                    NULL, /* xcancellable_t* */
                                    &error);
   g_assert_no_error (error);
-  g_assert (X_IS_DBUS_CONNECTION (the_connection));
+  xassert (X_IS_DBUS_CONNECTION (the_connection));
 }
 
 static void
@@ -65,9 +65,9 @@ test_bz627724 (void)
   xobject_t *object;
 
   session_bus_up ();
-  g_assert (the_connection == NULL);
+  xassert (the_connection == NULL);
   object = xobject_new (MY_TYPE_OBJECT, NULL);
-  g_assert (the_connection != NULL);
+  xassert (the_connection != NULL);
   xobject_unref (the_connection);
   xobject_unref (object);
   session_bus_down ();

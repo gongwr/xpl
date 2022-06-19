@@ -152,7 +152,7 @@ g_unix_fd_message_set_property (xobject_t *object, xuint_t prop_id,
 {
   GUnixFDMessage *message = G_UNIX_FD_MESSAGE (object);
 
-  g_assert (message->priv->list == NULL);
+  xassert (message->priv->list == NULL);
   g_assert_cmpint (prop_id, ==, 1);
 
   message->priv->list = xvalue_dup_object (value);
@@ -203,7 +203,7 @@ g_unix_fd_message_finalize (xobject_t *object)
 
   xobject_unref (message->priv->list);
 
-  G_OBJECT_CLASS (g_unix_fd_message_parent_class)
+  XOBJECT_CLASS (g_unix_fd_message_parent_class)
     ->finalize (object);
 }
 
@@ -211,7 +211,7 @@ static void
 g_unix_fd_message_class_init (GUnixFDMessageClass *class)
 {
   xsocket_control_message_class_t *scm_class = XSOCKET_CONTROL_MESSAGE_CLASS (class);
-  xobject_class_t *object_class = G_OBJECT_CLASS (class);
+  xobject_class_t *object_class = XOBJECT_CLASS (class);
 
   scm_class->get_size = g_unix_fd_message_get_size;
   scm_class->get_level = g_unix_fd_message_get_level;
@@ -223,10 +223,10 @@ g_unix_fd_message_class_init (GUnixFDMessageClass *class)
   object_class->get_property = g_unix_fd_message_get_property;
 
   xobject_class_install_property (object_class, 1,
-    g_param_spec_object ("fd-list", "file descriptor list",
+    xparam_spec_object ("fd-list", "file descriptor list",
                          "The xunix_fd_list_t object to send with the message",
-                         XTYPE_UNIX_FD_LIST, G_PARAM_STATIC_STRINGS |
-                         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+                         XTYPE_UNIX_FD_LIST, XPARAM_STATIC_STRINGS |
+                         XPARAM_READWRITE | XPARAM_CONSTRUCT_ONLY));
 }
 
 /**
@@ -296,7 +296,7 @@ xint_t *
 g_unix_fd_message_steal_fds (GUnixFDMessage *message,
                              xint_t           *length)
 {
-  g_return_val_if_fail (G_UNIX_FD_MESSAGE (message), NULL);
+  xreturn_val_if_fail (G_UNIX_FD_MESSAGE (message), NULL);
 
   return g_unix_fd_list_steal_fds (message->priv->list, length);
 }
@@ -325,7 +325,7 @@ g_unix_fd_message_append_fd (GUnixFDMessage  *message,
                              xint_t             fd,
                              xerror_t         **error)
 {
-  g_return_val_if_fail (G_UNIX_FD_MESSAGE (message), FALSE);
+  xreturn_val_if_fail (G_UNIX_FD_MESSAGE (message), FALSE);
 
   return g_unix_fd_list_append (message->priv->list, fd, error) >= 0;
 }

@@ -49,7 +49,7 @@ static void
 g_socks4_proxy_finalize (xobject_t *object)
 {
   /* must chain up */
-  G_OBJECT_CLASS (g_socks4_proxy_parent_class)->finalize (object);
+  XOBJECT_CLASS (g_socks4_proxy_parent_class)->finalize (object);
 }
 
 static void

@@ -39,7 +39,7 @@ test_slist_sort (void)
       p1 = xslist_nth_data (slist, i);
       p2 = xslist_nth_data (slist, i+1);
 
-      g_assert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
+      xassert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
     }
 
   xslist_free (slist);
@@ -62,7 +62,7 @@ test_slist_sort_with_data (void)
       p1 = xslist_nth_data (slist, i);
       p2 = xslist_nth_data (slist, i+1);
 
-      g_assert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
+      xassert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
     }
 
   xslist_free (slist);
@@ -93,7 +93,7 @@ test_slist_sort_stable (void)
       p1 = xslist_nth_data (list, i);
       p2 = xslist_nth_data (list, i);
 
-      g_assert (p1 == p2);
+      xassert (p1 == p2);
     }
 
   xslist_free (copy);
@@ -116,7 +116,7 @@ test_slist_insert_sorted (void)
       p1 = xslist_nth_data (slist, i);
       p2 = xslist_nth_data (slist, i+1);
 
-      g_assert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
+      xassert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
     }
 
   xslist_free (slist);
@@ -141,7 +141,7 @@ test_slist_insert_sorted_with_data (void)
       p1 = xslist_nth_data (slist, i);
       p2 = xslist_nth_data (slist, i+1);
 
-      g_assert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
+      xassert (GPOINTER_TO_INT (p1) <= GPOINTER_TO_INT (p2));
     }
 
   xslist_free (slist);
@@ -163,7 +163,7 @@ test_slist_reverse (void)
   for (i = 0; i < 10; i++)
     {
       st = xslist_nth (slist, i);
-      g_assert (*((xint_t*) st->data) == (9 - i));
+      xassert (*((xint_t*) st->data) == (9 - i));
     }
 
   xslist_free (slist);
@@ -183,7 +183,7 @@ test_slist_nth (void)
   for (i = 0; i < 10; i++)
     {
       st = xslist_nth (slist, i);
-      g_assert (*((xint_t*) st->data) == i);
+      xassert (*((xint_t*) st->data) == i);
     }
 
   xslist_free (slist);
@@ -215,7 +215,7 @@ test_slist_remove (void)
   for (i = 0; i < 10; i++)
     {
       st = xslist_nth (slist, i);
-      g_assert (*((xint_t*) st->data) == i);
+      xassert (*((xint_t*) st->data) == i);
     }
 
   xslist_free (slist);
@@ -243,7 +243,7 @@ test_slist_remove_all (void)
     }
 
   g_assert_cmpint (xslist_length (slist), ==, 0);
-  g_assert (slist == NULL);
+  xassert (slist == NULL);
 }
 
 static void
@@ -272,29 +272,29 @@ test_slist_insert (void)
   for (i = 0; i < 10; i++)
     {
       st = xslist_nth (slist, i);
-      g_assert (*((xint_t*) st->data) == i);
+      xassert (*((xint_t*) st->data) == i);
     }
 
   xslist_free (slist);
 
   slist = xslist_insert (NULL, a, 1);
-  g_assert (slist->data == a);
-  g_assert (slist->next == NULL);
+  xassert (slist->data == a);
+  xassert (slist->next == NULL);
   xslist_free (slist);
 
   slist = xslist_append (NULL, a);
   slist = xslist_append (slist, b);
   slist = xslist_insert (slist, c, 5);
 
-  g_assert (slist->next->next->data == c);
-  g_assert (slist->next->next->next == NULL);
+  xassert (slist->next->next->data == c);
+  xassert (slist->next->next->next == NULL);
   xslist_free (slist);
 
   slist = xslist_append (NULL, a);
   slist = xslist_insert_before (slist, slist, b);
-  g_assert (slist->data == b);
-  g_assert (slist->next->data == a);
-  g_assert (slist->next->next == NULL);
+  xassert (slist->data == b);
+  xassert (slist->next->data == a);
+  xassert (slist->next->next == NULL);
   xslist_free (slist);
 }
 
@@ -324,12 +324,12 @@ test_slist_position (void)
     {
       g_assert_cmpint (xslist_index (slist, &nums[i]), ==, i);
       st = xslist_find_custom (slist, GINT_TO_POINTER(i), find_num);
-      g_assert (st != NULL);
+      xassert (st != NULL);
       g_assert_cmpint (xslist_position (slist, st), ==, i);
     }
 
   st = xslist_find_custom (slist, GINT_TO_POINTER (1000), find_num);
-  g_assert (st == NULL);
+  xassert (st == NULL);
 
   xslist_free (slist);
 }
@@ -344,9 +344,9 @@ test_slist_concat (void)
   s1 = xslist_append (NULL, a);
   s2 = xslist_append (NULL, b);
   s = xslist_concat (s1, s2);
-  g_assert (s->data == a);
-  g_assert (s->next->data == b);
-  g_assert (s->next->next == NULL);
+  xassert (s->data == a);
+  xassert (s->next->data == b);
+  xassert (s->next->next == NULL);
   xslist_free (s);
 
   s1 = xslist_append (NULL, a);
@@ -359,7 +359,7 @@ test_slist_concat (void)
   xslist_free (s);
 
   s = xslist_concat (NULL, NULL);
-  g_assert (s == NULL);
+  xassert (s == NULL);
 }
 
 static void
@@ -379,7 +379,7 @@ test_slist_copy (void)
   g_assert_cmpuint (xslist_length (copy), ==, xslist_length (slist));
 
   for (s1 = copy, s2 = slist; s1 != NULL && s2 != NULL; s1 = s1->next, s2 = s2->next)
-    g_assert (s1->data == s2->data);
+    xassert (s1->data == s2->data);
 
   xslist_free (copy);
   xslist_free (slist);
@@ -420,7 +420,7 @@ test_slist_copy_deep (void)
   for (s1 = slist, s2 = copy; s1 != NULL && s2 != NULL; s1 = s1->next, s2 = s2->next)
     {
       g_assert_cmpstr (s1->data, ==, s2->data);
-      g_assert (s1->data != s2->data);
+      xassert (s1->data != s2->data);
     }
 
   xslist_free_full (copy, g_free);

@@ -46,7 +46,7 @@ struct _GLocalFileInputStream
 
 struct _GLocalFileInputStreamClass
 {
-  GFileInputStreamClass parent_class;
+  xfile_input_stream_class_t parent_class;
 };
 
 xtype_t              _g_local_file_input_stream_get_type (void) G_GNUC_CONST;

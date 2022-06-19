@@ -110,29 +110,29 @@ xbytes_icon_finalize (xobject_t *object)
 
   xbytes_unref (icon->bytes);
 
-  G_OBJECT_CLASS (xbytes_icon_parent_class)->finalize (object);
+  XOBJECT_CLASS (xbytes_icon_parent_class)->finalize (object);
 }
 
 static void
 xbytes_icon_class_init (xbytes_icon_class_t *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
 
-  gobject_class->get_property = xbytes_icon_get_property;
-  gobject_class->set_property = xbytes_icon_set_property;
-  gobject_class->finalize = xbytes_icon_finalize;
+  xobject_class->get_property = xbytes_icon_get_property;
+  xobject_class->set_property = xbytes_icon_set_property;
+  xobject_class->finalize = xbytes_icon_finalize;
 
   /**
    * xbytes_icon_t:bytes:
    *
    * The bytes containing the icon.
    */
-  xobject_class_install_property (gobject_class, PROP_BYTES,
-                                   g_param_spec_boxed ("bytes",
+  xobject_class_install_property (xobject_class, PROP_BYTES,
+                                   xparam_spec_boxed ("bytes",
                                                        P_("bytes"),
                                                        P_("The bytes containing the icon"),
                                                        XTYPE_BYTES,
-                                                       G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+                                                       XPARAM_CONSTRUCT_ONLY | XPARAM_READWRITE | XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -157,7 +157,7 @@ xbytes_icon_init (xbytes_icon_t *bytes)
 xicon_t *
 xbytes_icon_new (xbytes_t *bytes)
 {
-  g_return_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
 
   return xobject_new (XTYPE_BYTES_ICON, "bytes", bytes, NULL);
 }
@@ -175,7 +175,7 @@ xbytes_icon_new (xbytes_t *bytes)
 xbytes_t *
 xbytes_icon_get_bytes (xbytes_icon_t *icon)
 {
-  g_return_val_if_fail (X_IS_BYTES_ICON (icon), NULL);
+  xreturn_val_if_fail (X_IS_BYTES_ICON (icon), NULL);
 
   return icon->bytes;
 }
@@ -252,7 +252,7 @@ xbytes_icon_load_finish (xloadable_icon_t  *icon,
                           char          **type,
                           xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (res, icon), NULL);
+  xreturn_val_if_fail (xtask_is_valid (res, icon), NULL);
 
   if (type)
     *type = NULL;

@@ -61,9 +61,9 @@ handle_created (void *udata, const char *path, ino_t inode)
 
   (void) inode;
   ctx = (handle_ctx *) udata;
-  g_assert (udata != NULL);
-  g_assert (ctx->sub != NULL);
-  g_assert (ctx->source != NULL);
+  xassert (udata != NULL);
+  xassert (ctx->sub != NULL);
+  xassert (ctx->source != NULL);
 
   now = g_get_monotonic_time ();
   xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_CREATED, path,
@@ -93,9 +93,9 @@ handle_deleted (void *udata, const char *path, ino_t inode)
 
   (void) inode;
   ctx = (handle_ctx *) udata;
-  g_assert (udata != NULL);
-  g_assert (ctx->sub != NULL);
-  g_assert (ctx->source != NULL);
+  xassert (udata != NULL);
+  xassert (ctx->sub != NULL);
+  xassert (ctx->source != NULL);
 
   if (!ctx->handle_deleted)
     return;
@@ -128,9 +128,9 @@ handle_moved (void       *udata,
   (void) to_inode;
 
   ctx = (handle_ctx *) udata;
-  g_assert (udata != NULL);
-  g_assert (ctx->sub != NULL);
-  g_assert (ctx->source != NULL);
+  xassert (udata != NULL);
+  xassert (ctx->sub != NULL);
+  xassert (ctx->source != NULL);
 
   xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_RENAMED,
                                       from_path, to_path, NULL, g_get_monotonic_time ());
@@ -153,9 +153,9 @@ handle_overwritten (void *udata, const char *path, ino_t inode)
 
   (void) inode;
   ctx = (handle_ctx *) udata;
-  g_assert (udata != NULL);
-  g_assert (ctx->sub != NULL);
-  g_assert (ctx->source != NULL);
+  xassert (udata != NULL);
+  xassert (ctx->sub != NULL);
+  xassert (ctx->source != NULL);
 
   xfile_monitor_source_handle_event (ctx->source, XFILE_MONITOR_EVENT_DELETED,
                                       path, NULL, NULL, g_get_monotonic_time ());

@@ -67,7 +67,7 @@ xseekable_tell (xseekable__t *seekable)
 {
   xseekable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SEEKABLE (seekable), 0);
+  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), 0);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -87,7 +87,7 @@ xseekable_can_seek (xseekable__t *seekable)
 {
   xseekable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -131,7 +131,7 @@ xseekable_seek (xseekable__t     *seekable,
 {
   xseekable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -152,7 +152,7 @@ xseekable_can_truncate (xseekable__t *seekable)
 {
   xseekable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 
@@ -189,7 +189,7 @@ xseekable_truncate (xseekable__t     *seekable,
 {
   xseekable_iface_t *iface;
 
-  g_return_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
+  xreturn_val_if_fail (X_IS_SEEKABLE (seekable), FALSE);
 
   iface = G_SEEKABLE_GET_IFACE (seekable);
 

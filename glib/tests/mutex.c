@@ -73,7 +73,7 @@ test_mutex4 (void)
   xboolean_t ret;
 
   ret = g_mutex_trylock (&mutex);
-  g_assert (ret);
+  xassert (ret);
 
   /* no guarantees that mutex is recursive, so could return 0 or 1 */
   if (g_mutex_trylock (&mutex))
@@ -105,7 +105,7 @@ acquire (xint_t nr)
       g_mutex_lock (&locks[nr]);
     }
 
-  g_assert (owners[nr] == NULL);   /* hopefully nobody else is here */
+  xassert (owners[nr] == NULL);   /* hopefully nobody else is here */
   owners[nr] = self;
 
   /* let some other threads try to ruin our day */
@@ -113,7 +113,7 @@ acquire (xint_t nr)
   xthread_yield ();
   xthread_yield ();
 
-  g_assert (owners[nr] == self);   /* hopefully this is still us... */
+  xassert (owners[nr] == self);   /* hopefully this is still us... */
   owners[nr] = NULL;               /* make way for the next guy */
 
   g_mutex_unlock (&locks[nr]);
@@ -154,7 +154,7 @@ test_mutex5 (void)
     g_mutex_clear (&locks[i]);
 
   for (i = 0; i < LOCKS; i++)
-    g_assert (owners[i] == NULL);
+    xassert (owners[i] == NULL);
 }
 
 #define COUNT_TO 100000000
@@ -193,7 +193,7 @@ test_mutex_perf (xconstpointer data)
   xint_t x = -1;
   xuint_t i;
 
-  g_assert (n_threads <= G_N_ELEMENTS (threads));
+  xassert (n_threads <= G_N_ELEMENTS (threads));
 
   for (i = 0; n_threads > 0 && i < n_threads - 1; i++)
     threads[i] = xthread_create (addition_thread, &x, TRUE, NULL);

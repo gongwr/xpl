@@ -193,7 +193,7 @@ ih_event_callback (ik_event_t  *event,
            * properly. If not, the assumption we have made about event->mask
            * only ever having a single bit set (apart from IN_ISDIR) is false.
            * The kernel documentation is lacking here. */
-          g_assert ((int) event_flags != -1);
+          xassert ((int) event_flags != -1);
           interesting = xfile_monitor_source_handle_event (sub->user_data, event_flags,
                                                             event->name, NULL, other, event->timestamp);
 

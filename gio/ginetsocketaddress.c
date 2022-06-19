@@ -78,7 +78,7 @@ g_inet_socket_address_dispose (xobject_t *object)
 
   g_clear_object (&(address->priv->address));
 
-  G_OBJECT_CLASS (g_inet_socket_address_parent_class)->dispose (object);
+  XOBJECT_CLASS (g_inet_socket_address_parent_class)->dispose (object);
 }
 
 static void
@@ -153,7 +153,7 @@ g_inet_socket_address_get_family (xsocket_address_t *address)
 {
   xinet_socket_address_t *addr;
 
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
 
   addr = G_INET_SOCKET_ADDRESS (address);
 
@@ -166,7 +166,7 @@ g_inet_socket_address_get_native_size (xsocket_address_t *address)
   xinet_socket_address_t *addr;
   xsocket_family_t family;
 
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
 
   addr = G_INET_SOCKET_ADDRESS (address);
   family = xinet_address_get_family (addr->priv->address);
@@ -188,7 +188,7 @@ g_inet_socket_address_to_native (xsocket_address_t  *address,
   xinet_socket_address_t *addr;
   xsocket_family_t family;
 
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), FALSE);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), FALSE);
 
   addr = G_INET_SOCKET_ADDRESS (address);
   family = xinet_address_get_family (addr->priv->address);
@@ -240,36 +240,36 @@ g_inet_socket_address_to_native (xsocket_address_t  *address,
 static void
 g_inet_socket_address_class_init (GInetSocketAddressClass *klass)
 {
-  xobject_class_t *gobject_class = G_OBJECT_CLASS (klass);
+  xobject_class_t *xobject_class = XOBJECT_CLASS (klass);
   GSocketAddressClass *gsocketaddress_class = XSOCKET_ADDRESS_CLASS (klass);
 
-  gobject_class->dispose = g_inet_socket_address_dispose;
-  gobject_class->set_property = g_inet_socket_address_set_property;
-  gobject_class->get_property = g_inet_socket_address_get_property;
+  xobject_class->dispose = g_inet_socket_address_dispose;
+  xobject_class->set_property = g_inet_socket_address_set_property;
+  xobject_class->get_property = g_inet_socket_address_get_property;
 
   gsocketaddress_class->get_family = g_inet_socket_address_get_family;
   gsocketaddress_class->to_native = g_inet_socket_address_to_native;
   gsocketaddress_class->get_native_size = g_inet_socket_address_get_native_size;
 
-  xobject_class_install_property (gobject_class, PROP_ADDRESS,
-                                   g_param_spec_object ("address",
+  xobject_class_install_property (xobject_class, PROP_ADDRESS,
+                                   xparam_spec_object ("address",
                                                         P_("Address"),
                                                         P_("The address"),
                                                         XTYPE_INET_ADDRESS,
-                                                        G_PARAM_CONSTRUCT_ONLY |
-                                                        G_PARAM_READWRITE |
-                                                        G_PARAM_STATIC_STRINGS));
+                                                        XPARAM_CONSTRUCT_ONLY |
+                                                        XPARAM_READWRITE |
+                                                        XPARAM_STATIC_STRINGS));
 
-  xobject_class_install_property (gobject_class, PROP_PORT,
-                                   g_param_spec_uint ("port",
+  xobject_class_install_property (xobject_class, PROP_PORT,
+                                   xparam_spec_uint ("port",
                                                       P_("Port"),
                                                       P_("The port"),
                                                       0,
                                                       65535,
                                                       0,
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
   /**
    * xinet_socket_address_t:flowinfo:
@@ -278,16 +278,16 @@ g_inet_socket_address_class_init (GInetSocketAddressClass *klass)
    *
    * Since: 2.32
    */
-  xobject_class_install_property (gobject_class, PROP_FLOWINFO,
-                                   g_param_spec_uint ("flowinfo",
+  xobject_class_install_property (xobject_class, PROP_FLOWINFO,
+                                   xparam_spec_uint ("flowinfo",
                                                       P_("Flow info"),
                                                       P_("IPv6 flow info"),
                                                       0,
                                                       G_MAXUINT32,
                                                       0,
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 
   /**
    * xinet_socket_address_t:scope_id:
@@ -296,16 +296,16 @@ g_inet_socket_address_class_init (GInetSocketAddressClass *klass)
    *
    * Since: 2.32
    */
-  xobject_class_install_property (gobject_class, PROP_SCOPE_ID,
-                                   g_param_spec_uint ("scope-id",
+  xobject_class_install_property (xobject_class, PROP_SCOPE_ID,
+                                   xparam_spec_uint ("scope-id",
                                                       P_("Scope ID"),
                                                       P_("IPv6 scope ID"),
                                                       0,
                                                       G_MAXUINT32,
                                                       0,
-                                                      G_PARAM_CONSTRUCT_ONLY |
-                                                      G_PARAM_READWRITE |
-                                                      G_PARAM_STATIC_STRINGS));
+                                                      XPARAM_CONSTRUCT_ONLY |
+                                                      XPARAM_READWRITE |
+                                                      XPARAM_STATIC_STRINGS));
 }
 
 static void
@@ -478,7 +478,7 @@ g_inet_socket_address_new_from_string (const char *address,
 xinet_address_t *
 g_inet_socket_address_get_address (xinet_socket_address_t *address)
 {
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), NULL);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), NULL);
 
   return address->priv->address;
 }
@@ -496,7 +496,7 @@ g_inet_socket_address_get_address (xinet_socket_address_t *address)
 xuint16_t
 g_inet_socket_address_get_port (xinet_socket_address_t *address)
 {
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
 
   return address->priv->port;
 }
@@ -516,8 +516,8 @@ g_inet_socket_address_get_port (xinet_socket_address_t *address)
 xuint32_t
 g_inet_socket_address_get_flowinfo (xinet_socket_address_t *address)
 {
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
-  g_return_val_if_fail (xinet_address_get_family (address->priv->address) == XSOCKET_FAMILY_IPV6, 0);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (xinet_address_get_family (address->priv->address) == XSOCKET_FAMILY_IPV6, 0);
 
   return address->priv->flowinfo;
 }
@@ -536,8 +536,8 @@ g_inet_socket_address_get_flowinfo (xinet_socket_address_t *address)
 xuint32_t
 g_inet_socket_address_get_scope_id (xinet_socket_address_t *address)
 {
-  g_return_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
-  g_return_val_if_fail (xinet_address_get_family (address->priv->address) == XSOCKET_FAMILY_IPV6, 0);
+  xreturn_val_if_fail (X_IS_INET_SOCKET_ADDRESS (address), 0);
+  xreturn_val_if_fail (xinet_address_get_family (address->priv->address) == XSOCKET_FAMILY_IPV6, 0);
 
   return address->priv->scope_id;
 }

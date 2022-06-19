@@ -124,7 +124,7 @@ g_dbus_is_name (const xchar_t *string)
   xboolean_t ret;
   const xchar_t *s;
 
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   ret = FALSE;
 
@@ -171,7 +171,7 @@ g_dbus_is_unique_name (const xchar_t *string)
   xboolean_t ret;
   xuint_t len;
 
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   ret = FALSE;
 
@@ -245,7 +245,7 @@ g_dbus_is_interface_name (const xchar_t *string)
   xboolean_t ret;
   const xchar_t *s;
 
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   ret = FALSE;
 
@@ -358,7 +358,7 @@ g_dbus_is_guid (const xchar_t *string)
   xboolean_t ret;
   xuint_t n;
 
-  g_return_val_if_fail (string != NULL, FALSE);
+  xreturn_val_if_fail (string != NULL, FALSE);
 
   ret = FALSE;
 
@@ -576,8 +576,8 @@ g_dbus_gvalue_to_gvariant (const xvalue_t       *gvalue,
   const xchar_t * const *as;
   const xchar_t *empty_strv[1] = {NULL};
 
-  g_return_val_if_fail (gvalue != NULL, NULL);
-  g_return_val_if_fail (type != NULL, NULL);
+  xreturn_val_if_fail (gvalue != NULL, NULL);
+  xreturn_val_if_fail (type != NULL, NULL);
 
   ret = NULL;
 
@@ -717,7 +717,7 @@ g_dbus_gvalue_to_gvariant (const xvalue_t       *gvalue,
       xvariant_unref (untrusted_empty);
     }
 
-  g_assert (!xvariant_is_floating (ret));
+  xassert (!xvariant_is_floating (ret));
 
   return ret;
 }
@@ -754,7 +754,7 @@ g_dbus_escape_object_path_bytestring (const xuint8_t *bytes)
   xstring_t *escaped;
   const xuint8_t *p;
 
-  g_return_val_if_fail (bytes != NULL, NULL);
+  xreturn_val_if_fail (bytes != NULL, NULL);
 
   if (*bytes == '\0')
     return xstrdup ("_");
@@ -812,7 +812,7 @@ g_dbus_unescape_object_path (const xchar_t *s)
   xstring_t *unescaped;
   const xchar_t *p;
 
-  g_return_val_if_fail (s != NULL, NULL);
+  xreturn_val_if_fail (s != NULL, NULL);
 
   if (xstr_equal (s, "_"))
     return (xuint8_t *) xstrdup ("");

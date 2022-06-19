@@ -289,7 +289,7 @@ xlist_append (xlist_t    *list,
   if (list)
     {
       last = xlist_last (list);
-      /* g_assert (last != NULL); */
+      /* xassert (last != NULL); */
       last->next = new_list;
       new_list->prev = last;
 
@@ -407,13 +407,13 @@ xlist_insert_before_link (xlist_t *list,
                            xlist_t *sibling,
                            xlist_t *link_)
 {
-  g_return_val_if_fail (link_ != NULL, list);
-  g_return_val_if_fail (link_->prev == NULL, list);
-  g_return_val_if_fail (link_->next == NULL, list);
+  xreturn_val_if_fail (link_ != NULL, list);
+  xreturn_val_if_fail (link_->prev == NULL, list);
+  xreturn_val_if_fail (link_->next == NULL, list);
 
   if (list == NULL)
     {
-      g_return_val_if_fail (sibling == NULL, list);
+      xreturn_val_if_fail (sibling == NULL, list);
       return link_;
     }
   else if (sibling != NULL)
@@ -428,7 +428,7 @@ xlist_insert_before_link (xlist_t *list,
         }
       else
         {
-          g_return_val_if_fail (sibling == list, link_);
+          xreturn_val_if_fail (sibling == list, link_);
           return link_;
         }
     }
@@ -466,7 +466,7 @@ xlist_insert_before (xlist_t    *list,
     {
       list = xlist_alloc ();
       list->data = data;
-      g_return_val_if_fail (sibling == NULL, list);
+      xreturn_val_if_fail (sibling == NULL, list);
       return list;
     }
   else if (sibling != NULL)
@@ -485,7 +485,7 @@ xlist_insert_before (xlist_t    *list,
         }
       else
         {
-          g_return_val_if_fail (sibling == list, node);
+          xreturn_val_if_fail (sibling == list, node);
           return node;
         }
     }
@@ -920,7 +920,7 @@ xlist_find_custom (xlist_t         *list,
                     xconstpointer  data,
                     GCompareFunc   func)
 {
-  g_return_val_if_fail (func != NULL, list);
+  xreturn_val_if_fail (func != NULL, list);
 
   while (list)
     {
@@ -1102,7 +1102,7 @@ xlist_insert_sorted_real (xlist_t    *list,
   xlist_t *new_list;
   xint_t cmp;
 
-  g_return_val_if_fail (func != NULL, list);
+  xreturn_val_if_fail (func != NULL, list);
 
   if (!list)
     {

@@ -116,7 +116,7 @@
  *
  *  |[<!-- language="C" -->
  *  // Implement an extension point
- *  G_DEFINE_TYPE (my_example_impl, my_example_impl, MY_TYPE_EXAMPLE)
+ *  XDEFINE_TYPE (my_example_impl, my_example_impl, MY_TYPE_EXAMPLE)
  *  g_io_extension_point_implement ("my-extension-point",
  *                                  my_example_impl_get_type (),
  *                                  "my-example",
@@ -281,12 +281,12 @@ struct _GIOExtensionPoint {
 static xhashtable_t *extension_points = NULL;
 G_LOCK_DEFINE_STATIC(extension_points);
 
-G_DEFINE_TYPE (xio_module, xio_module, XTYPE_TYPE_MODULE)
+XDEFINE_TYPE (xio_module, xio_module, XTYPE_TYPE_MODULE)
 
 static void
 xio_module_class_init (xio_module_class_t *class)
 {
-  xobject_class_t     *object_class      = G_OBJECT_CLASS (class);
+  xobject_class_t     *object_class      = XOBJECT_CLASS (class);
   xtype_module_class_t *type_module_class = XTYPE_MODULE_CLASS (class);
 
   object_class->finalize     = xio_module_finalize;
@@ -307,7 +307,7 @@ xio_module_finalize (xobject_t *object)
 
   g_free (module->filename);
 
-  G_OBJECT_CLASS (xio_module_parent_class)->finalize (object);
+  XOBJECT_CLASS (xio_module_parent_class)->finalize (object);
 }
 
 static xboolean_t
@@ -413,7 +413,7 @@ xio_module_new (const xchar_t *filename)
 {
   xio_module_t *module;
 
-  g_return_val_if_fail (filename != NULL, NULL);
+  xreturn_val_if_fail (filename != NULL, NULL);
 
   module = xobject_new (G_IO_TYPE_MODULE, NULL);
   module->filename = xstrdup (filename);
@@ -1050,7 +1050,7 @@ _xio_module_get_default (const xchar_t         *extension_point,
 
   if (impl != NULL)
     {
-      g_assert (extension != NULL);
+      xassert (extension != NULL);
       g_debug ("%s: Found default implementation %s (%s) for ‘%s’",
                G_STRFUNC, g_io_extension_get_name (extension),
                G_OBJECT_TYPE_NAME (impl), extension_point);
@@ -1321,7 +1321,7 @@ _xio_modules_ensure_loaded (void)
       /* Initialize types from built-in "modules" */
       xtype_ensure (g_null_settings_backend_get_type ());
       xtype_ensure (xmemory_settings_backend_get_type ());
-      xtype_ensure (g_keyfile_settings_backend_get_type ());
+      xtype_ensure (xkeyfile_settings_backend_get_type ());
       xtype_ensure (xpower_profile_monitor_dbus_get_type ());
 #if defined(HAVE_INOTIFY_INIT1)
       xtype_ensure (g_inotify_file_monitor_get_type ());
@@ -1517,7 +1517,7 @@ lazy_load_modules (xio_extension_point_t *extension_point)
 xlist_t *
 g_io_extension_point_get_extensions (xio_extension_point_t *extension_point)
 {
-  g_return_val_if_fail (extension_point != NULL, NULL);
+  xreturn_val_if_fail (extension_point != NULL, NULL);
 
   lazy_load_modules (extension_point);
   return extension_point->extensions;
@@ -1539,7 +1539,7 @@ g_io_extension_point_get_extension_by_name (xio_extension_point_t *extension_poi
 {
   xlist_t *l;
 
-  g_return_val_if_fail (name != NULL, NULL);
+  xreturn_val_if_fail (name != NULL, NULL);
 
   lazy_load_modules (extension_point);
   for (l = extension_point->extensions; l != NULL; l = l->next)
@@ -1594,7 +1594,7 @@ g_io_extension_point_implement (const char *extension_point_name,
   xio_extension_t *extension;
   xlist_t *l;
 
-  g_return_val_if_fail (extension_point_name != NULL, NULL);
+  xreturn_val_if_fail (extension_point_name != NULL, NULL);
 
   extension_point = g_io_extension_point_lookup (extension_point_name);
   if (extension_point == NULL)

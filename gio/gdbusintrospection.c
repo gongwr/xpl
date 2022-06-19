@@ -1893,7 +1893,7 @@ typedef struct
 static void
 info_cache_free (InfoCacheEntry *cache)
 {
-  g_assert (cache->use_count == 0);
+  xassert (cache->use_count == 0);
   xhash_table_unref (cache->method_name_to_data);
   xhash_table_unref (cache->signal_name_to_data);
   xhash_table_unref (cache->property_name_to_data);

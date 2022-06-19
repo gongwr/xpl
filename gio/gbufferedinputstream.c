@@ -143,7 +143,7 @@ xbuffered_input_stream_class_init (xbuffered_input_stream_class_t *klass)
   xinput_stream_class_t *istream_class;
   xbuffered_input_stream_class_t *bstream_class;
 
-  object_class = G_OBJECT_CLASS (klass);
+  object_class = XOBJECT_CLASS (klass);
   object_class->get_property = xbuffered_input_stream_get_property;
   object_class->set_property = xbuffered_input_stream_set_property;
   object_class->finalize     = xbuffered_input_stream_finalize;
@@ -161,14 +161,14 @@ xbuffered_input_stream_class_init (xbuffered_input_stream_class_t *klass)
 
   xobject_class_install_property (object_class,
                                    PROP_BUFSIZE,
-                                   g_param_spec_uint ("buffer-size",
+                                   xparam_spec_uint ("buffer-size",
                                                       P_("buffer_t Size"),
                                                       P_("The size of the backend buffer"),
                                                       1,
                                                       G_MAXUINT,
                                                       DEFAULT_BUFFER_SIZE,
-                                                      G_PARAM_READWRITE | G_PARAM_CONSTRUCT |
-                                                      G_PARAM_STATIC_NAME|G_PARAM_STATIC_NICK|G_PARAM_STATIC_BLURB));
+                                                      XPARAM_READWRITE | XPARAM_CONSTRUCT |
+                                                      XPARAM_STATIC_NAME|XPARAM_STATIC_NICK|XPARAM_STATIC_BLURB));
 
 
 }
@@ -184,7 +184,7 @@ xbuffered_input_stream_class_init (xbuffered_input_stream_class_t *klass)
 xsize_t
 xbuffered_input_stream_get_buffer_size (xbuffered_input_stream_t  *stream)
 {
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), 0);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), 0);
 
   return stream->priv->len;
 }
@@ -296,7 +296,7 @@ xbuffered_input_stream_finalize (xobject_t *object)
 
   g_free (priv->buffer);
 
-  G_OBJECT_CLASS (xbuffered_input_stream_parent_class)->finalize (object);
+  XOBJECT_CLASS (xbuffered_input_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -330,7 +330,7 @@ xbuffered_input_stream_new (xinput_stream_t *base_stream)
 {
   xinput_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_BUFFERED_INPUT_STREAM,
                          "base-stream", base_stream,
@@ -355,7 +355,7 @@ xbuffered_input_stream_new_sized (xinput_stream_t *base_stream,
 {
   xinput_stream_t *stream;
 
-  g_return_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
+  xreturn_val_if_fail (X_IS_INPUT_STREAM (base_stream), NULL);
 
   stream = xobject_new (XTYPE_BUFFERED_INPUT_STREAM,
                          "base-stream", base_stream,
@@ -410,7 +410,7 @@ xbuffered_input_stream_fill (xbuffered_input_stream_t  *stream,
   xinput_stream_t *input_stream;
   xssize_t res;
 
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
 
   input_stream = G_INPUT_STREAM (stream);
 
@@ -533,8 +533,8 @@ xbuffered_input_stream_fill_finish (xbuffered_input_stream_t  *stream,
 {
   xbuffered_input_stream_class_t *class;
 
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
-  g_return_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_ASYNC_RESULT (result), -1);
 
   if (xasync_result_legacy_propagate_error (result, error))
     return -1;
@@ -556,7 +556,7 @@ xbuffered_input_stream_fill_finish (xbuffered_input_stream_t  *stream,
 xsize_t
 xbuffered_input_stream_get_available (xbuffered_input_stream_t *stream)
 {
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
 
   return stream->priv->end - stream->priv->pos;
 }
@@ -583,8 +583,8 @@ xbuffered_input_stream_peek (xbuffered_input_stream_t *stream,
   xsize_t available;
   xsize_t end;
 
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
-  g_return_val_if_fail (buffer != NULL, -1);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (buffer != NULL, -1);
 
   available = xbuffered_input_stream_get_available (stream);
 
@@ -616,7 +616,7 @@ xbuffered_input_stream_peek_buffer (xbuffered_input_stream_t *stream,
 {
   xbuffered_input_stream_private_t *priv;
 
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), NULL);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), NULL);
 
   priv = stream->priv;
 
@@ -972,7 +972,7 @@ xbuffered_input_stream_read_byte (xbuffered_input_stream_t  *stream,
   xsize_t available;
   xssize_t nread;
 
-  g_return_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
+  xreturn_val_if_fail (X_IS_BUFFERED_INPUT_STREAM (stream), -1);
 
   priv = stream->priv;
   input_stream = G_INPUT_STREAM (stream);
@@ -1097,7 +1097,7 @@ xbuffered_input_stream_real_fill_finish (xbuffered_input_stream_t *stream,
                                           xasync_result_t         *result,
                                           xerror_t              **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }
@@ -1186,7 +1186,7 @@ skip_fill_buffer_callback (xobject_t      *source_object,
 	  priv->pos += data->count;
 	}
 
-      g_assert (data->bytes_skipped <= G_MAXSSIZE);
+      xassert (data->bytes_skipped <= G_MAXSSIZE);
       xtask_return_int (task, data->bytes_skipped);
     }
 
@@ -1249,7 +1249,7 @@ xbuffered_input_stream_skip_async (xinput_stream_t        *stream,
       /* If 'count > G_MAXSSIZE then 'xinput_stream_skip_async()'
        * will return an error anyway before calling this.
        * Assert that this is never called for too big `count` for clarity. */
-      g_assert ((xssize_t) count >= 0);
+      xassert ((xssize_t) count >= 0);
       xinput_stream_skip_async (base_stream,
                                  count,
                                  io_priority, cancellable,
@@ -1269,7 +1269,7 @@ xbuffered_input_stream_skip_finish (xinput_stream_t   *stream,
                                      xasync_result_t   *result,
                                      xerror_t        **error)
 {
-  g_return_val_if_fail (xtask_is_valid (result, stream), -1);
+  xreturn_val_if_fail (xtask_is_valid (result, stream), -1);
 
   return xtask_propagate_int (XTASK (result), error);
 }

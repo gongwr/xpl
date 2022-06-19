@@ -91,7 +91,7 @@ run_tests (const xchar_t* argv0)
     }
   else
     {
-      g_assert (output != NULL);
+      xassert (output != NULL);
 
       if (strcmp (output, "hello\n") != 0)
         {
@@ -120,8 +120,8 @@ run_tests (const xchar_t* argv0)
     }
   else
     {
-      g_assert (output != NULL);
-      g_assert (erroutput != NULL);
+      xassert (output != NULL);
+      xassert (erroutput != NULL);
 
       if (strstr (output, "\nline first") == 0)
         {
@@ -154,7 +154,7 @@ run_tests (const xchar_t* argv0)
     }
   else
     {
-      g_assert (erroutput != NULL);
+      xassert (erroutput != NULL);
 
       if (erroutput[0] == '\0')
         {
@@ -189,8 +189,8 @@ run_tests (const xchar_t* argv0)
     }
   else
     {
-      g_assert (output != NULL);
-      g_assert (erroutput != NULL);
+      xassert (output != NULL);
+      xassert (erroutput != NULL);
 
       if (strcmp (output, "This is stdout\r\n") != 0)
         {
